@@ -1,0 +1,433 @@
+{
+  "stempel": {
+    "op": "2026-09-15T00:37:32.687Z",
+    "commit": "d4d9a3a1",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/doorbelasting.js",
+    "node": "v22.22.2"
+  },
+  "graad": "gemeten",
+  "wat": "of de doorbelasting van RTG aantoonbaar te classificeren is: per vorm en per euro",
+  "hoe": "npm run doorbelasting -- deel A leest de vormen met de lezer van scripts/objectmodel.js, deel B leest server/data/store.db en deelt elk bedrag in met dezelfde pure functie",
+  "grens": "De twee helften worden NOOIT opgeteld: een vorm die een herkomst KAN dragen zegt niets over of hij hem DRAAGT, en een euro die is ingedeeld zegt niets over de vormen eromheen. Deel A volgt geen verwijzingen en is daarom een ONDERgrens. Deel B verzint geen bedragen: is de opslag leeg, dan is de noemer nul en niet 100%. En deze meter BEREKENT GEEN BIJDRAGEBASIS -- dat is de volgende stap, en hij mag pas als het aandeel `onbekend` klein genoeg is dat een mens het kan verantwoorden.",
+  "klassen": [
+    "rtgEigen",
+    "derdePartij",
+    "belasting",
+    "fee",
+    "kortingRefund",
+    "onbekend"
+  ],
+  "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
+  "vorm": {
+    "vormenTotaal": 1401,
+    "geldvormen": 208,
+    "volgbaar": 26,
+    "nietVolgbaar": 182,
+    "volgbareModules": [
+      "server/kern/appbieb.js",
+      "server/kern/betaalopdracht/index.js",
+      "server/kern/betaalopdracht/index.js",
+      "server/kern/betaalregie-waarheid.js",
+      "server/kern/betaalwaarheid/beeld.js",
+      "server/kern/boerderij.js",
+      "server/kern/boerderij/beheer.js",
+      "server/kern/boerderij/erf.js",
+      "server/kern/commerce/koopbaar.js",
+      "server/kern/groothandel/assortiment.js",
+      "server/kern/horeca/foliolaag.js",
+      "server/kern/kosten/providerfactuur.js",
+      "server/kern/kosten/providerfactuur.js",
+      "server/kern/mall/bestellingen.js",
+      "server/kern/mall/bestellingen.js",
+      "server/kern/mall/bestellingen.js",
+      "server/kern/mall/bestellingen.js",
+      "server/kern/mall/demozaken.js",
+      "server/kern/mall/kaart.js",
+      "server/kern/munten.js",
+      "server/kern/onderneming/crediteuren.js",
+      "server/kern/ov/operatie.js",
+      "server/kern/rtfos/geld-uitgaven.js",
+      "server/kern/rtfos/inkoop.js",
+      "server/kern/wallet.js",
+      "server/kern/werkplaats.js"
+    ],
+    "perModule": {
+      "server/kern/aanmeldingen": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/alpine.js": {
+        "geldvormen": 4,
+        "volgbaar": 0
+      },
+      "server/kern/appbieb.js": {
+        "geldvormen": 1,
+        "volgbaar": 1
+      },
+      "server/kern/appstore": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/assets": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/autoverkoop": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/bank": {
+        "geldvormen": 8,
+        "volgbaar": 0
+      },
+      "server/kern/beroepenbieb": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/betaalopdracht": {
+        "geldvormen": 2,
+        "volgbaar": 2
+      },
+      "server/kern/betaalregie-waarheid.js": {
+        "geldvormen": 1,
+        "volgbaar": 1
+      },
+      "server/kern/betaalwaarheid": {
+        "geldvormen": 1,
+        "volgbaar": 1
+      },
+      "server/kern/boerderij": {
+        "geldvormen": 2,
+        "volgbaar": 2
+      },
+      "server/kern/boerderij.js": {
+        "geldvormen": 1,
+        "volgbaar": 1
+      },
+      "server/kern/bureau": {
+        "geldvormen": 4,
+        "volgbaar": 0
+      },
+      "server/kern/care": {
+        "geldvormen": 4,
+        "volgbaar": 0
+      },
+      "server/kern/care.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/clubs": {
+        "geldvormen": 3,
+        "volgbaar": 0
+      },
+      "server/kern/command": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/commerce": {
+        "geldvormen": 3,
+        "volgbaar": 1
+      },
+      "server/kern/commercie": {
+        "geldvormen": 7,
+        "volgbaar": 0
+      },
+      "server/kern/eten": {
+        "geldvormen": 3,
+        "volgbaar": 0
+      },
+      "server/kern/facturatie": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/festival": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/fonds": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/gast": {
+        "geldvormen": 4,
+        "volgbaar": 0
+      },
+      "server/kern/gebouw.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/geldbeleid": {
+        "geldvormen": 3,
+        "volgbaar": 0
+      },
+      "server/kern/geldgraaf": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/geloofbieb.js": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/gemeente": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/groothandel": {
+        "geldvormen": 1,
+        "volgbaar": 1
+      },
+      "server/kern/horeca": {
+        "geldvormen": 2,
+        "volgbaar": 1
+      },
+      "server/kern/koppel.js": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/kosten": {
+        "geldvormen": 2,
+        "volgbaar": 2
+      },
+      "server/kern/labfonds": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/labfonds.js": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/levensband": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/lid": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/livinglab": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/logies.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/machtiging.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/magnaat-dekkingsmatrix.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/magnaat-economie.js": {
+        "geldvormen": 4,
+        "volgbaar": 0
+      },
+      "server/kern/mall": {
+        "geldvormen": 11,
+        "volgbaar": 6
+      },
+      "server/kern/mediaos": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/mobiliteit": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/munten.js": {
+        "geldvormen": 2,
+        "volgbaar": 1
+      },
+      "server/kern/onderneming": {
+        "geldvormen": 5,
+        "volgbaar": 1
+      },
+      "server/kern/ov": {
+        "geldvormen": 2,
+        "volgbaar": 1
+      },
+      "server/kern/overheid": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/pasladder.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/pay": {
+        "geldvormen": 16,
+        "volgbaar": 0
+      },
+      "server/kern/payroll": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/podium": {
+        "geldvormen": 4,
+        "volgbaar": 0
+      },
+      "server/kern/rechterhand": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/reisaanbod.js": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/reisbieb": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/reisbureau.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/rijksbieb.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/rtfbieb.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/rtfos": {
+        "geldvormen": 16,
+        "volgbaar": 2
+      },
+      "server/kern/rugdekking": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/schoolbieb.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/spellen": {
+        "geldvormen": 8,
+        "volgbaar": 0
+      },
+      "server/kern/sportclub": {
+        "geldvormen": 6,
+        "volgbaar": 0
+      },
+      "server/kern/stadsweefsel": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/synergie.js": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/thuis": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/kern/tiener.js": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/vakwerk": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/verblijf": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/verzorging": {
+        "geldvormen": 5,
+        "volgbaar": 0
+      },
+      "server/kern/waarde": {
+        "geldvormen": 3,
+        "volgbaar": 0
+      },
+      "server/kern/wallet.js": {
+        "geldvormen": 1,
+        "volgbaar": 1
+      },
+      "server/kern/wbw.js": {
+        "geldvormen": 3,
+        "volgbaar": 0
+      },
+      "server/kern/werkplaats.js": {
+        "geldvormen": 1,
+        "volgbaar": 1
+      },
+      "server/bedrijf/contract.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/bedrijf/klant.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/bedrijf/postbrug.js": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/bedrijf/project.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/bedrijf/uitval.js": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/school/financien-beheer.js": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/school/financien.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      },
+      "server/papieren/index.js": {
+        "geldvormen": 1,
+        "volgbaar": 0
+      }
+    },
+    "grens": "Dit telt of een VORM een bedrag en een herkomst naast elkaar draagt. Het zegt niet dat die herkomst juist is ingevuld, en het volgt geen verwijzing: een rij die via een id naar een andere rij met een herkomst wijst, telt hier als NIET volgbaar. Dat is een ondergrens en met opzet -- een keten die je niet in een rij ziet, kun je bij een geschil ook niet in een rij tonen."
+  },
+  "euros": {
+    "noemerCenten": 24,
+    "rijen": 1,
+    "perKlasse": {
+      "rtgEigen": {
+        "rijen": 0,
+        "centen": 0
+      },
+      "derdePartij": {
+        "rijen": 0,
+        "centen": 0
+      },
+      "belasting": {
+        "rijen": 0,
+        "centen": 0
+      },
+      "fee": {
+        "rijen": 0,
+        "centen": 0
+      },
+      "kortingRefund": {
+        "rijen": 0,
+        "centen": 0
+      },
+      "onbekend": {
+        "rijen": 1,
+        "centen": 24
+      }
+    },
+    "redenen": [
+      {
+        "reden": "onbekend: wel een bedrag (totaal), geen herkomstveld -- niet te volgen",
+        "rijen": 1
+      }
+    ],
+    "waaromGeen": null
+  }
+}

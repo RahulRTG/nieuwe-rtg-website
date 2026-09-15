@@ -191,15 +191,6 @@
     },
     {
       "datum": "2026-09-15",
-      "soort": "aflossing",
-      "sleutel": "dbDeuren",
-      "van": 529,
-      "meter": "dbDeuren 529 -> 528",
-      "reden": "De schuld van een uur eerder is afgelost langs de weg die er toen bij stond. kern/reisbureau-betaling.js las `db.data.reisAanvragen` en `db.data.partnerTrips` rechtstreeks en schreef `a.betaald` op een rij die hij niet bezit; hij vraagt ze nu op bij de eigenaar (`aanvraagVan`, `tripVan`) en laat die zijn eigen rij bijwerken (`markeerBetaald`). De tand wordt aangedraaid en niet blijven staan: dit is de teller die over een ARCHITECTUURgrens gaat, en die hoort niet stil terug te kunnen. De prijs stond ernaast en is betaald in keuringOmvang.",
-      "waarheen": "De volgende stap is groter dan deze teller: een VERKLAARDE eigenaar voor `reisAanvragen` en `partnerTrips` via kern/eigencollectie.js. Elk van beide wordt vandaag door zes bestanden aangeraakt, dus dat is een eigen ronde -- en pas daarna is `dbDeuren` voor dit domein werkelijk op nul te brengen."
-    },
-    {
-      "datum": "2026-09-15",
       "soort": "schuld",
       "sleutel": "keuringOmvang",
       "van": 327,
@@ -210,22 +201,19 @@
     },
     {
       "datum": "2026-09-15",
-      "soort": "aflossing",
-      "sleutel": "keuringScheef",
-      "van": 19,
-      "meter": "keuringScheef 19 -> 18",
-      "reden": "DE SCHULD VAN VANOCHTEND IS AFGELOST, en langs de weg die er toen bij stond. kern/waarde/economischeherkomst.js en kern/waarde/herkomstsplitsing.js hadden nul aanroepers; de verticale slice geeft ze er drie (reisbureau-samenstelling, reisbureau-betaling, bijdragebasis) en daarmee vallen ze allebei uit deze post. Er komt er EEN voor terug -- kern/waarde/bijdragebasis.js, die de basis uitrekent en nog door geen enkele route wordt gelezen -- dus 19 - 2 + 1 = 18. De tand wordt aangedraaid en niet blijven staan: wat een keer beter is geworden, hoort niet stil terug te kunnen.",
-      "waarheen": "bijdragebasis.js krijgt zijn aanroeper zodra er een scherm of route is die de basis TOONT. Dat is bewust nog niet gebouwd: er staat geen tarief naast, dus er valt nog niets af te rekenen -- en een bord dat een basis toont zonder dat iemand weet wat ermee gebeurt, nodigt uit tot een getal dat niemand heeft afgewogen."
-    },
-    {
-      "datum": "2026-09-15",
       "soort": "schuld",
       "sleutel": "dbDeuren",
       "van": 528,
       "vervalt": "2026-12-15",
       "meter": "dbDeuren 528 -> 529",
       "reden": "server/kern/reisbureau-betaling.js leest `db.data.reisAanvragen` en `db.data.partnerTrips` rechtstreeks. Dat is geen nieuwe gewoonte maar die van het domein zelf: kern/reisbureau.js raakt db.data op negen plekken aan, en geen van beide collecties heeft een verklaarde eigenaar (regel 63 staat groen). De EIGEN collecties van deze module gaan wel netjes langs kern/eigencollectie.js (`reisGeldrijen`, `reisUitkeringen`). Het gaat dus om twee LEESwegen naar de bak van de buurman plus een veld op de aanvraag zelf (`a.betaald`).",
-      "waarheen": "Laat kern/reisbureau.js een `aanvraagVan(ref)` en een `tripVan(id)` exporteren en geef de betaallaag `reisbureauVan: () => kern.reisbureau` mee, zoals hij nu `payVan` krijgt. Dan zijn beide leeswegen weg en kan `reisAanvragen` meteen een verklaarde eigenaar krijgen -- dat tweede is het echte doel; de teller is er maar het symptoom van."
+      "waarheen": "Laat kern/reisbureau.js een `aanvraagVan(ref)` en een `tripVan(id)` exporteren en geef de betaallaag `reisbureauVan: () => kern.reisbureau` mee, zoals hij nu `payVan` krijgt. Dan zijn beide leeswegen weg en kan `reisAanvragen` meteen een verklaarde eigenaar krijgen -- dat tweede is het echte doel; de teller is er maar het symptoom van.",
+      "afgelost": {
+        "op": "2026-09-15",
+        "meter": "dbDeuren 529 -> 528",
+        "hoe": "De schuld van een uur eerder is afgelost langs de weg die er toen bij stond. kern/reisbureau-betaling.js las `db.data.reisAanvragen` en `db.data.partnerTrips` rechtstreeks en schreef `a.betaald` op een rij die hij niet bezit; hij vraagt ze nu op bij de eigenaar (`aanvraagVan`, `tripVan`) en laat die zijn eigen rij bijwerken (`markeerBetaald`). De tand wordt aangedraaid en niet blijven staan: dit is de teller die over een ARCHITECTUURgrens gaat, en die hoort niet stil terug te kunnen. De prijs stond ernaast en is betaald in keuringOmvang.",
+        "daarna": "De volgende stap is groter dan deze teller: een VERKLAARDE eigenaar voor `reisAanvragen` en `partnerTrips` via kern/eigencollectie.js. Elk van beide wordt vandaag door zes bestanden aangeraakt, dus dat is een eigen ronde -- en pas daarna is `dbDeuren` voor dit domein werkelijk op nul te brengen."
+      }
     },
     {
       "datum": "2026-09-15",
@@ -255,7 +243,13 @@
       "vervalt": "2026-12-15",
       "meter": "keuringScheef 17 -> 19",
       "reden": "server/kern/waarde/economischeherkomst.js en server/kern/waarde/herkomstsplitsing.js worden nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de PRIMITIEF uit besluit 1 en niet de migratie: van de 208 geldvormen in DOORBELASTING.json dragen er 26 een aantoonbare herkomst, en welke geldrij als EERSTE omgaat is een productbesluit op een echt betaalpad -- niet iets om terloops te kiezen om een ratel groen te krijgen. De vorm is wel volledig beproefd: de gezaaide wereld uit scripts/lib/economiewereld.js draait hem over 22 deterministische rijen (deel B1 van DOORBELASTING.json) en vond er meteen een echte fout in (de onbekende post liep negatief). Dit huis kent deze tussenstand met naam: NORM.json noteert op 14 september hetzelfde over kern/namens/versmalling.js, en INTELLIGENTIE.md over kern/stuur/mandaat.js -- nul productie-aanroepers, om precies dezelfde reden. Wat hier NIET gebeurt is de telling verlagen door de meting te verzachten: twee modules zonder aanroeper zijn twee modules zonder aanroeper, en dat hoort zichtbaar te blijven staan.",
-      "waarheen": "De eerste migratieronde: laat een geldrij die vandaag AL volgbaar is (een van de 26 uit DOORBELASTING.json deel A, `volgbareModules`) zijn herkomst via geldrij() opschrijven in plaats van via een eigen veld, en laat kern/pay/poort.js die rij lezen. Dat haalt beide modules in een keer uit deze post, en het is meteen de eerste tand van de ratel volgbaar 26 -> hoger."
+      "waarheen": "De eerste migratieronde: laat een geldrij die vandaag AL volgbaar is (een van de 26 uit DOORBELASTING.json deel A, `volgbareModules`) zijn herkomst via geldrij() opschrijven in plaats van via een eigen veld, en laat kern/pay/poort.js die rij lezen. Dat haalt beide modules in een keer uit deze post, en het is meteen de eerste tand van de ratel volgbaar 26 -> hoger.",
+      "afgelost": {
+        "op": "2026-09-15",
+        "meter": "keuringScheef 19 -> 18",
+        "hoe": "DE SCHULD VAN VANOCHTEND IS AFGELOST, en langs de weg die er toen bij stond. kern/waarde/economischeherkomst.js en kern/waarde/herkomstsplitsing.js hadden nul aanroepers; de verticale slice geeft ze er drie (reisbureau-samenstelling, reisbureau-betaling, bijdragebasis) en daarmee vallen ze allebei uit deze post. Er komt er EEN voor terug -- kern/waarde/bijdragebasis.js, die de basis uitrekent en nog door geen enkele route wordt gelezen -- dus 19 - 2 + 1 = 18. De tand wordt aangedraaid en niet blijven staan: wat een keer beter is geworden, hoort niet stil terug te kunnen.",
+        "daarna": "bijdragebasis.js krijgt zijn aanroeper zodra er een scherm of route is die de basis TOONT. Dat is bewust nog niet gebouwd: er staat geen tarief naast, dus er valt nog niets af te rekenen -- en een bord dat een basis toont zonder dat iemand weet wat ermee gebeurt, nodigt uit tot een getal dat niemand heeft afgewogen."
+      }
     },
     {
       "datum": "2026-09-14",

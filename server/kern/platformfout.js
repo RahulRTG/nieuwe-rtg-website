@@ -60,12 +60,19 @@ const CODES = {
   RTG_MACHTIGING_NIET_VERLEEND: {
     status: 403, herhaalbaar: false,
     uitleg: 'De app vraagt deze machtiging in zijn manifest, maar dit lid heeft hem niet verleend of weer ingetrokken.',
-    uitgezondenDoor: 'server/kern/appstore/brug.js'
+    uitgezondenDoor: 'server/kern/appstore/brugweigering.js'
+  },
+  /* Het derde geval; waarom het er een eigen code is en niet een variant van de
+     twee eromheen, staat op één plek en dat is de kop van brugweigering.js. */
+  RTG_MACHTIGING_VERSMALD: {
+    status: 403, herhaalbaar: false,
+    uitleg: 'Het lid heeft deze machtiging aangevinkt, maar mag hem zelf niet weggeven; hij is daarom niet verleend. Noch het lid noch de uitgever lost dit met een knop op.',
+    uitgezondenDoor: 'server/kern/appstore/brugweigering.js'
   },
   RTG_MACHTIGING_NIET_GEVRAAGD: {
     status: 403, herhaalbaar: false,
     uitleg: 'De app vraagt deze machtiging niet in zijn manifest, dus het lid heeft hem ook nooit kunnen geven.',
-    uitgezondenDoor: 'server/kern/appstore/brug.js'
+    uitgezondenDoor: 'server/kern/appstore/brugweigering.js'
   },
   RTG_ARGUMENT_ONGELDIG: {
     status: 400, herhaalbaar: false,

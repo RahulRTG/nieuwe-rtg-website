@@ -33,8 +33,8 @@
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 327,
-    "keuringScheef": 17,
+    "keuringOmvang": 331,
+    "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
     "laatSpoorVerdacht": 3,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1674,
-    "toetsenNietGemeten": 623,
+    "toetsenNietGemeten": 624,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -119,6 +119,46 @@
     {
       "datum": "2026-09-15",
       "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 330,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 330 -> 331",
+      "reden": "server/kern/fiscaal/gateway/mandaat.js groeide van 5978 naar 9606 bytes en komt daarmee in de waarschuwingsband onder 10 kB; de harde grens haalt hij niet en keuringTeGroot beweegt niet. De groei is de doorsnede plus de reden waarom er NIET op aangifteplicht wordt gesneden -- dat laatste is geen sierproza maar de grens zelf: er is geen btw-plichtregister en geen loonplichtvlag, en een snede daarop zou een fiscale positie innemen die dit huis niet mag innemen (kern/fiscaal/zekerheid.js: voorbehouden). Bij deze meting is server/kern/platformfout.js met 203 bytes teruggebracht door een echte dubbeling weg te halen: de uitleg over de drie weigeringsgevallen stond na de splitsing zowel daar als in de kop van brugweigering.js (LAT-regel 4). Dat hielp de meter niet -- dat bestand zat al in de band -- en is blijven staan omdat het los van de byte klopt.",
+      "waarheen": "De naad in mandaat.js is echt: verlenen/intrekken (het REGISTER) en geldt() (de VRAAG per dag) zijn twee dingen, en alleen het eerste schrijft. Bewust niet in deze wijziging, want die splitsing raakt de enige plek waar de gateway zijn mandaat ophaalt en hoort een eigen ronde met een eigen toets te zijn."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 623,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 623 -> 624",
+      "reden": "De som van drie lijnen die elk hun eigen post al hadden: de main-lijn (fiscaal-meegeleverd, idemcontract), stap 1 (namensvorm plus de drie namens-bestanden) en stap 2 (namensversmalling-bedrading). Er komt met deze merge GEEN nieuw ongemeten toetsbestand bij -- het getal stijgt omdat de drie lijnen nu in een boom staan. De drie posten blijven daarom apart bewaard: samenvoegen tot een post zou de herkomst wissen, en dan weet niemand meer welke bestanden de motor moet zien.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom dekt alle drie de lijnen in een keer."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 327,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 327 -> 330",
+      "reden": "Drie bronbestanden erbij, en ze zijn het GEVOLG van een reparatie en niet van groei. Vier bestanden gingen door stap 2 over de harde 10 kB-grens (appstore/brug.js, appstore/machtigingen.js, appstore/winkel.js, namens/versmalling.js) en zijn alle vier langs een echte naad geknipt: gevermacht.js (wat het lid zelf mag plus de snede), brugweigering.js (de drie weigeringen met hun drie verschillende uitwegen) en versmalling-besluit.js (doorsnede MEET, versmalNamens OORDEELT -- die naad stond al als alinea in de kop). keuringTeGroot bleef daardoor op 14 staan; deze meter telt de bestanden die binnen de band vallen, dus meer bestanden is hier per definitie een hoger getal. Er is geen byte weggeknipt uit de uitleg om onder een grens te komen.",
+      "waarheen": "Deze post lost zichzelf niet af en hoort dat ook niet te doen: hij is de prijs van vier splitsingen die de harde grens juist respecteren. Wat hem WEL omlaag brengt is de twaalf op de opknip-lijst van keuringsregel 13, en geen van die twaalf is van deze ronde."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 622,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 622 -> 623",
+      "reden": "test/namensversmalling-bedrading.test.js komt erbij -- negen toetsen op de versmalling op levende paden (REPRESENTATIE.md stap 2) -- en staat nog niet in MUTATIES.json. Alle negen zijn met de hand gemuteerd, op een SCHONE gecommitte boom, en elke mutatie raakte precies de toetsen die hij hoort te raken: geverEffectief niet meer snijden laat 1, 3 en 4 zakken; de versmald-tak uit de brug halen laat alleen 3 zakken; de onbekende-bron-tak uit versmalNamens halen laat 6 en 9 zakken; de doorsnede uit verleen() van het mandaat halen laat 5 en 7 zakken. Toets 2 is de besturingsproef en blijft bij alle vier staan -- hij valt alleen om als de snede ALLES wegsnijdt, en dat is precies waarvoor hij er is.",
+      "waarheen": "Laat scripts/mutatie.js over test/namensversmalling-bedrading.test.js lopen, samen met de drie namens-bestanden en namensvorm uit de notities hieronder."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
       "van": 622,
       "vervalt": "2026-12-15",
@@ -135,16 +175,6 @@
       "meter": "toetsenNietGemeten 618 -> 619",
       "reden": "test/namensvorm.test.js komt erbij -- zes toetsen op scripts/namensvorm.js (REPRESENTATIE.md par. 0) -- en staat nog niet in MUTATIES.json. Alle zes zijn met de hand gemuteerd en de dragende drie zagen zakken: `async` uit het naampatroon halen laat toets 2, 3 en 6 zakken, en alle zeven synoniemen op /./ zetten breekt toets 4. Die mutatie is niet academisch maar de fout die hier ECHT is gemaakt: zonder `async` meldde de meter dat kern/vertegenwoordiging/ geen verlenen, aanvaarden en intrekken heeft terwijl die drie er als async function staan -- een geldige uitslag van het verkeerde experiment (BEWIJSMACHINE.md par. 6a).",
       "waarheen": "Laat scripts/mutatie.js over test/namensvorm.test.js lopen, samen met railvergelijk, menselijkeuitvoering, mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hierboven."
-    },
-    {
-      "datum": "2026-09-14",
-      "soort": "schuld",
-      "sleutel": "keuringScheef",
-      "van": 16,
-      "vervalt": "2026-12-15",
-      "meter": "keuringScheef 16 -> 17",
-      "reden": "server/kern/namens/versmalling.js wordt nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de eerste helft van stap 1 uit REPRESENTATIE.md par. 6: de invariant (REP-03, effectief = gevraagd doorsnede geverEffectief doorsnede beleid doorsnede context) staat er en is met 500 gegenereerde invoeren beproefd, maar de zes mechanismen lopen er nog niet doorheen -- dat is echte gedragswijziging op onder meer SEPA-mandaten en app-rechten en hoort een eigen ronde te zijn. Dit huis kent die tussenstand met naam: INTELLIGENTIE.md noteert dat kern/stuur/mandaat.js nul productie-aanroepers heeft, om precies dezelfde reden.",
-      "waarheen": "De bedradingsronde: laat kern/appstore (winkel.js verleen) en kern/fiscaal/gateway/mandaat.js (verleen) de doorsnede aanroepen met een echte geverEffectief. Dat sluit tegelijk twee van de drie openstaande versmallen-posten uit kern/namens/verklaring.js."
     },
     {
       "datum": "2026-09-14",
@@ -2095,15 +2125,6 @@
       "meter": "kernBreedte 1559 -> 1560",
       "reden": "RTG Move (MOVE.md) voegt EEN naam aan de kern toe: `move`, een namespace met drie lezende functies erin (reis, gevolg, volgende). Dat is met opzet niet drie losse kernnamen -- de smalste vorm die deze laag kan hebben. De laag bezit geen collectie, kent geen schrijfweg (test/move.test.js toets 12 zakt op db.data of save()) en hangt aan een eigen schakelaar dom-move, zodat de boardroom hem kan sluiten zonder de navigatie mee te nemen.",
       "waarheen": "server/kern/move/ (naad, haalbaar, gevolg, index) met test/move.test.js en test/move-keten.test.js; de kern blijft een enkele naadlaag zonder eigen opslag"
-    },
-    {
-      "datum": "2026-09-10",
-      "soort": "schuld",
-      "sleutel": "keuringScheef",
-      "van": 16,
-      "vervalt": "2026-12-15",
-      "meter": "keuringScheef 16 -> 17",
-      "reden": "server/kern/navigatie/gebieden.js wordt nergens aangeroepen. Het bestand komt uit de Move-tak (#226) en droeg daar dezelfde bevinding: de keuring op die tak zelf meet 17 en niet 16, dus dit is geen artefact van de samenvoeging van zeven takken maar een schuld die de tak al had. De module is geen restant: hij houdt de catalogus en de licentiepoort van de navigatiegebieden (aangeboden / gebouwd / actief), ./gebiedkeuze.js is er van afgesplitst en test/navigatiegebieden.test.js bewaakt hem. Wat ontbreekt is de plek waar die catalogus wordt opgevraagd -- een route, of een aanroep uit de routemotor. Dat is een ontwerpbesluit van de tak en niet iets wat een samenvoeging hoort te verzinnen.\n\nVervalt op 2026-12-15: dan hangt hij ergens in, of hij is weg. Beide is beter dan blijven staan -- de eigen woorden van de keuring."
     },
     {
       "datum": "2026-09-10",

@@ -24,6 +24,8 @@
    navraagbaar blijven. */
 'use strict';
 
+const { versmalNamens } = require('../../namens/versmalling');
+
 const isDatum = (d) => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
 
 /* De soorten waarvoor een mandaat kan bestaan. Bewust een gesloten lijst: een
@@ -32,6 +34,39 @@ const SOORTEN = Object.freeze({
   btw: 'Aangifte omzetbelasting',
   loonheffing: 'Aangifte loonheffingen'
 });
+
+const ALLE_SOORTEN = Object.freeze(Object.keys(SOORTEN));
+
+/* ----------------------------------------------------------------------------
+   DE VERSMALLING, EN WAAROM ZIJ HIER EEN GRENDEL IS EN GEEN CONTROLE ERBIJ.
+
+   De kop hierboven zegt al jaren: "`verleen` eist een naam van de gever EN dat
+   die iemand van de zaak is; wie dat controleert staat buiten deze module (de
+   route), en dat het gecontroleerd MOET zijn staat hier." Dat tweede was een
+   BELOFTE en geen grendel -- deze module kon een mandaat verlenen aan wie hem
+   maar aanriep, en de enige aanroeper die de regel naleeft is er precies één.
+   Een tweede aanroeper (een script, een tweede route, een taakloper) had hem
+   stilzwijgend kunnen overslaan, en aan het mandaat was dat niet te zien.
+
+   `geverEffectief` IS NU EEN VERPLICHTE INVOER. Wie hem niet meegeeft krijgt
+   geen mandaat maar een VERKLAARDE WEIGERING: de doorsnede in
+   kern/namens/versmalling.js weigert een bron die niet is vast te stellen, in
+   plaats van hem als leeg door te laten. Dat is het verschil tussen "deze gever
+   mag niets" en "er heeft niemand gekeken", en die twee mogen nooit hetzelfde
+   antwoord opleveren.
+
+   WAT DEZE LAAG BEWUST NIET DOET, en dat is een grens en geen gat. Zij snijdt
+   NIET op de vraag of de zaak deze aangifteplicht werkelijk heeft. Dat is
+   verleidelijk -- "een zaak zonder personeel hoeft geen loonaangifte te doen"
+   klinkt als een goede versmalling -- maar het is onwaar (een ingehouden-
+   plichtige zonder loon doet nog steeds een nulaangifte) en RTG heeft er geen
+   register voor: er is geen btw-plichtvlag, geen loonplichtvlag en geen
+   inhoudingsplichtnummer. Zo'n snede zou een FISCALE POSITIE innemen die dit
+   huis niet mag innemen (kern/fiscaal/zekerheid.js: dat is `voorbehouden`).
+   Wat er wel is, is de zaakrol -- en dat is een boolean. Grof, maar echt.
+   -------------------------------------------------------------------------- */
+const GEEN_CONTEXTBEPERKING = 'Er is aan dit moment niets dat één soort afzonderlijk tegenhoudt; ' +
+  'de geldigheid in de tijd staat op het mandaat zelf (`van` en `tot`) en wordt door geldt() gerekend.';
 
 function maakMandaat({ db, save, nu }) {
   const tijd = nu || (() => new Date().toISOString());
@@ -43,12 +78,39 @@ function maakMandaat({ db, save, nu }) {
   const lees = () => eigen.kijk('gatewayMandaten');
 
 
-  function verleen({ code, soort, van, tot, doorNaam, doorRol, kenmerk }) {
+  function verleen({ code, soort, van, tot, doorNaam, doorRol, kenmerk, geverEffectief }) {
     const zaak = String(code || '').toUpperCase();
     if (!zaak) return { status: 400, error: 'Voor welke zaak geldt dit mandaat?' };
     if (!SOORTEN[soort]) return { status: 400, error: 'Kies een soort: ' + Object.keys(SOORTEN).join(', ') + '.' };
     const naam = String(doorNaam || '').trim();
     if (naam.length < 2) return { status: 400, error: 'Een mandaat wordt op naam verleend, door iemand van de zaak zelf.' };
+
+    /* DE DOORSNEDE, en zij staat VOOR de datumcontroles omdat een mandaat dat
+       deze gever niet mag verlenen ook niet op zijn datums hoeft te worden
+       nagekeken. Zie de kop bij ALLE_SOORTEN voor waarom `geverEffectief`
+       verplicht is en waarom er niet op aangifteplicht wordt gesneden. */
+    const snede = versmalNamens({
+      gevraagd: [String(soort)],
+      geverEffectief,
+      beleid: ALLE_SOORTEN,
+      context: ALLE_SOORTEN
+    });
+    if (!snede.ok) {
+      /* 503 en met opzet geen 403: er is niets mis met deze gever, er is een
+         bron niet aangesloten. Een storing die klinkt als een verbod stuurt de
+         verkeerde mens op onderzoek uit (CONTROLPLANE.md). */
+      return { status: 503, error: snede.weigering.reden, code: snede.weigering.code,
+        hoe: 'Dit is een gebrek aan onze kant: de aanroeper moet opgeven wat deze gever zelf mag ' +
+          'verlenen. Er is niets verleend.' };
+    }
+    if (!snede.effectief.includes(String(soort))) {
+      const weg = snede.versmald[0];
+      return { status: 403, error: 'Deze gever kan dit mandaat niet verlenen: ' +
+        (weg ? weg.reden : 'het valt buiten wat hij zelf mag') + '.',
+        bron: weg ? weg.bron : null,
+        hoe: 'Een machtiging verleent nooit vermogen, zij versmalt bestaand vermogen. Laat iemand ' +
+          'die deze aangifte zelf mag doen het mandaat verlenen.' };
+    }
     if (!isDatum(van)) return { status: 400, error: 'Geef een ingangsdatum (JJJJ-MM-DD).' };
     if (tot && !isDatum(tot)) return { status: 400, error: 'Geef een einddatum als JJJJ-MM-DD, of laat hem leeg.' };
     if (tot && tot < van) return { status: 400, error: 'De einddatum ligt voor de ingangsdatum.' };

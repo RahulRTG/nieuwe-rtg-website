@@ -183,7 +183,13 @@ test('mandaat: een mandaat opvragen dat er niet is, schept geen collectie', () =
 
   /* TEGENPROEF: verlenen schrijft wel, en intrekken landt daarna op de ECHTE
      rij -- zonder deze regel zou het blok ook slagen als er niets meer werkt. */
-  const v = mandaat.verleen({ code: 'KIKUNOI', soort: 'btw', van: '2026-01-01', doorNaam: 'R. Sardjoe' });
+  /* `geverEffectief` is verplicht sinds de versmalling (kern/namens/versmalling.js):
+     wie niet opgeeft wat deze gever zelf mag verlenen, krijgt geen mandaat maar
+     een verklaarde weigering. Deze opstelling speelt de route na en geeft dus op
+     wat een manager van de zaak mag. Zonder die regel zakt deze tegenproef, en
+     dat is de bedoeling -- het is een aanroepcontract en geen detail. */
+  const v = mandaat.verleen({ code: 'KIKUNOI', soort: 'btw', van: '2026-01-01', doorNaam: 'R. Sardjoe',
+    geverEffectief: Object.keys(mandaat.SOORTEN) });
   assert.ok(v.mandaat && v.mandaat.id, 'het mandaat is verleend: ' + (v.error || ''));
   assert.ok(Object.prototype.hasOwnProperty.call(db.data, 'gatewayMandaten'));
   assert.ok(mandaat.trekIn(v.mandaat.id, 'R. Sardjoe').ok);

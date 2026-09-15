@@ -3,17 +3,17 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-09-15T06:00:54.710Z",
-  "commit": "e99e5784e",
+  "op": "2026-09-15T20:23:59.597Z",
+  "commit": "d4c190d4f",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 10,
   "instrument": "scripts/machinedekking.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "bronnen": {
   "EXECUTION_MAP.json": "c712a29884bcaa0d",
   "KERNHERKOMST.json": "807b7a8bc53cd607",
-  "MUTATIECONTRACT.json": "1e21f5e6c019e868",
+  "MUTATIECONTRACT.json": "4de78cb7963927ca",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "kernherkomstStempel": {
    "op": "2026-09-03",
@@ -213,9 +213,9 @@
   }
  },
  "gemeten": {
-  "routes": 5067,
-  "muterend": 3794,
-  "leesroutesUitRegister": 1183,
+  "routes": 5102,
+  "muterend": 3815,
+  "leesroutesUitRegister": 1197,
   "assen": 19,
   "perAs": {
    "mensAanDeDeur": {
@@ -331,11 +331,12 @@
     "motor": "mandaat",
     "bron": "server/kern/stuur/mandaat.js",
     "bestaat": true,
-    "moduleLezers": 3,
+    "moduleLezers": 4,
     "zakLezers": 0,
     "lezers": [
      "server/kern/kantoor/geldketen/klaarzet.js",
      "server/kern/kantoor/geldketen.js",
+     "server/kern/stuur/mandaatpoort.js",
      "server/kern/stuur/plafond.js"
     ],
     "routesHandler": 0,
@@ -576,7 +577,7 @@
     }
    }
   ],
-  "mutatiesZonderEnigeAs": 2785,
+  "mutatiesZonderEnigeAs": 2806,
   "mutatiesZonderHandlerSpan": 0,
   "bestandsasOnbruikbaar": 13,
   "hubdrempel": 40,
@@ -593,7 +594,7 @@
   "assenPerMutatie": [
    {
     "assen": 0,
-    "routes": 2959
+    "routes": 2980
    },
    {
     "assen": 1,
@@ -3935,6 +3936,55 @@
    "methode": "POST",
    "pad": "/api/concern/vestigingen",
    "bestand": "server/routes/concern.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/naklank",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/naklank/weg",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/noteer",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/open",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/schuif",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/signaal",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/werk",
+   "bestand": "server/routes/connect.js",
    "onder": [],
    "boven": []
   },
@@ -12691,6 +12741,55 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/neiging/antwoord",
+   "bestand": "server/routes/neiging.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/neiging/geheugen",
+   "bestand": "server/routes/neiging.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/neiging/intake",
+   "bestand": "server/routes/neiging.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/neiging/niet-voor",
+   "bestand": "server/routes/neiging.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/neiging/opnieuw",
+   "bestand": "server/routes/neiging.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/neiging/overslaan",
+   "bestand": "server/routes/neiging.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/neiging/vergeet",
+   "bestand": "server/routes/neiging.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/noodkaart/weg",
    "bestand": "server/routes/noodkaart.js",
    "onder": [],
@@ -15203,6 +15302,13 @@
   {
    "methode": "POST",
    "pad": "/api/office/reisbureau/lees",
+   "bestand": "server/routes/kantoren/reisbureau.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/terugboeking",
    "bestand": "server/routes/kantoren/reisbureau.js",
    "onder": [],
    "boven": []
@@ -18273,6 +18379,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/reisbureau/betaal",
+   "bestand": "server/routes/member/winkel.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/reisbureau/boek",
    "bestand": "server/routes/member/winkel.js",
    "onder": [],
@@ -18699,6 +18812,41 @@
    "methode": "POST",
    "pad": "/api/rtf/club/portaal",
    "bestand": "server/routes/rtfkantoor/codedeuren.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/connect/naklank",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/connect/noteer",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/connect/open",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/connect/signaal",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/connect/werk",
+   "bestand": "server/routes/connect.js",
    "onder": [],
    "boven": []
   },

@@ -92,3 +92,65 @@ test('wat alleen in de keten draait, wordt geteld en niet verzwegen', () => {
   assert.equal(uit.telling.alleenKeten, alleenKeten.length);
   for (const doel of alleenKeten) assert.ok(doel, 'een mechanisme zonder naam telt niet mee');
 });
+
+/* ============================================================================
+   DE BEWIJSGRAAD VAN EEN SPORT -- de zwakste premisse, niet de sterkste.
+
+   Op 15 september 2026 stond de sport `geraakt` op `staat` omdat TWEE van zijn
+   vier mechanismen een gestempeld register achterlaten. Maar `attributie.js`
+   schrijft naar een artefact van vijf dagen en `impactbereik.js` draait nergens.
+   De stand nam de sterkste premisse, en zo leest een sport als gesloten terwijl
+   zijn bewijs niet gedragen wordt.
+
+   Een conclusie is nooit harder dan haar zachtste premisse. En de graden zijn de
+   VIER die dit huis al heeft (BESTUUR.md par. 3) -- geen vijfde woordenlijst.
+   ========================================================================== */
+const L = require('../scripts/bewijsladder');
+
+test('de graden zijn de vier van het huis, in deze volgorde', () => {
+  assert.deepEqual(L.GRADEN, ['onbekend', 'vermoed', 'gemeten', 'bewezen']);
+});
+
+test('de graad van een mechanisme komt uit zijn feiten en uit niets anders', () => {
+  assert.equal(L.graadVan({ register: null, stempel: null, lokaal: false, keten: [] }), 'onbekend',
+    'alleen wie NERGENS draait, vertelt ons niets');
+  assert.equal(L.graadVan({ register: 'X.json', stempel: null, lokaal: true, keten: ['ci.yml'] }), 'vermoed',
+    'een register zonder stempel hoort bij geen enkele commit');
+  assert.equal(L.graadVan({ register: 'X.json', stempel: true, lokaal: false, keten: ['ci.yml'] }), 'gemeten',
+    'gestempeld maar maar aan een kant');
+  assert.equal(L.graadVan({ register: 'X.json', stempel: true, lokaal: true, keten: ['ci.yml'] }), 'bewezen');
+});
+
+/* DE FOUT DIE DEZE METER ZELF BIJNA MAAKTE. De eerste versie gaf `onbekend` aan
+   elk mechanisme zonder register, en toen heette tien van de twaalf sporten
+   `onbekend`. Maar scripts/check.js schrijft geen JSON en geeft wel degelijk een
+   oordeel via zijn exitcode. Een poort met een uitspraak gelijkstellen aan een
+   poort die nergens draait, is meten wat je niet bedoelt. */
+test('een poort die draait maar geen register schrijft is vermoed, niet onbekend', () => {
+  assert.equal(L.graadVan({ register: null, stempel: null, lokaal: false, keten: ['ci.yml'] }), 'vermoed');
+  assert.equal(L.graadVan({ register: null, stempel: null, lokaal: true, keten: [] }), 'vermoed');
+});
+
+/* DIT IS DE TOETS DIE ERTOE DOET. Drie sterke mechanismen en een zwakke geven
+   samen de ZWAKKE graad -- zou hij de sterkste nemen, dan leest de sport als
+   gesloten terwijl een van zijn premissen niets draagt. */
+test('een sport draagt de graad van zijn ZWAKSTE mechanisme', () => {
+  const sterk = { doel: 'a.js', register: 'A.json', stempel: true, lokaal: true, keten: ['ci.yml'] };
+  const zwak = { doel: 'zwak.js', register: 'Z.json', stempel: null, lokaal: true, keten: ['ci.yml'] };
+  const uit = L.graadSport([sterk, sterk, sterk, zwak]);
+  assert.equal(uit.graad, 'vermoed');
+  assert.match(uit.graadWaarom, /zwak\.js/, 'en hij noemt welke premisse de zwakste is');
+});
+
+test('zonder mechanisme is de graad onbekend, niet bewezen', () => {
+  assert.equal(L.graadSport([]).graad, 'onbekend');
+});
+
+/* De sport waar dit allemaal om begon, tegen de ECHTE meting. */
+test('de sport `geraakt` draagt vandaag niet meer dan `vermoed`', () => {
+  const u = L.meet();
+  const g = u.sporten.find((s) => s.id === 'geraakt');
+  assert.ok(g, 'de sport bestaat');
+  assert.ok(L.GRADEN.indexOf(g.graad) <= L.GRADEN.indexOf('gemeten'),
+    'zolang attributie.js zijn uitslag niet draagt, kan deze sport niet bewezen zijn -- graad nu: ' + g.graad);
+});

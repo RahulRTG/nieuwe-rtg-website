@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T06:42:49.878Z",
-    "commit": "888e8545c",
+    "op": "2026-09-15T11:25:29.798Z",
+    "commit": "38299c54a",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 5,
     "instrument": "scripts/doorbelasting.js",
     "node": "v22.22.2"
   },
@@ -21,9 +21,17 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1401,
-    "geldvormen": 208,
-    "volgbaar": 26,
+    "vormenTotaal": 1405,
+    "geldvormen": 212,
+    "volgbaar": 30,
+    "perHerkomstveld": {
+      "bron": 15,
+      "provider": 2,
+      "aanbieder": 7,
+      "herkomst": 1,
+      "leverancier": 6,
+      "economischeHerkomst": 4
+    },
     "nietVolgbaar": 182,
     "volgbareModules": [
       "server/kern/appbieb.js",
@@ -48,6 +56,10 @@
       "server/kern/munten.js",
       "server/kern/onderneming/crediteuren.js",
       "server/kern/ov/operatie.js",
+      "server/kern/reisbureau-betaling.js",
+      "server/kern/reisbureau-betaling.js",
+      "server/kern/reisbureau-betaling.js",
+      "server/kern/reisbureau-betaling.js",
       "server/kern/rtfos/geld-uitgaven.js",
       "server/kern/rtfos/inkoop.js",
       "server/kern/wallet.js",
@@ -282,6 +294,10 @@
         "geldvormen": 2,
         "volgbaar": 0
       },
+      "server/kern/reisbureau-betaling.js": {
+        "geldvormen": 4,
+        "volgbaar": 4
+      },
       "server/kern/reisbureau.js": {
         "geldvormen": 1,
         "volgbaar": 0
@@ -442,6 +458,109 @@
       "eenValuta": null,
       "waaromGeenTotaal": "er staan 3 valuta in deze rijen (EUR, JPY, TRY) en dit huis kent geen koers die een bijdragebasis mag bepalen"
     },
+    "dekkingZaadwereld": {
+      "rijen": 22,
+      "perValuta": {
+        "EUR": {
+          "rijen": 19,
+          "totaalCenten": 328230,
+          "herkomst": {
+            "centen": 307890,
+            "percentage": 93.8
+          },
+          "economisch": {
+            "centen": 303590,
+            "percentage": 92.5
+          }
+        },
+        "JPY": {
+          "rijen": 1,
+          "totaalCenten": 500000,
+          "herkomst": {
+            "centen": 500000,
+            "percentage": 100
+          },
+          "economisch": {
+            "centen": 500000,
+            "percentage": 100
+          }
+        },
+        "TRY": {
+          "rijen": 2,
+          "totaalCenten": 1945000,
+          "herkomst": {
+            "centen": 1945000,
+            "percentage": 100
+          },
+          "economisch": {
+            "centen": 1945000,
+            "percentage": 100
+          }
+        }
+      },
+      "eenValuta": null,
+      "totaalCenten": null,
+      "herkomst": null,
+      "economisch": null,
+      "ontbreekt": {
+        "economischeHerkomst": 3,
+        "economischeEigenaar": 3,
+        "naarWie": 4
+      },
+      "waaromGeenTotaal": "er staan 3 valuta tussen deze rijen (EUR, JPY, TRY) en dit huis kent geen koers; een dekkingspercentage over twee munten telt een teller uit de ene bij een noemer uit de andere",
+      "reden": null
+    },
+    "euroDekkingZaadwereld": {
+      "status": "GEEN_NOEMER",
+      "percentage": null,
+      "verklaardEuro": null,
+      "totaalEuro": null,
+      "rijen": 22,
+      "perValuta": {
+        "EUR": {
+          "rijen": 19,
+          "totaalCenten": 328230,
+          "herkomst": {
+            "centen": 307890,
+            "percentage": 93.8
+          },
+          "economisch": {
+            "centen": 303590,
+            "percentage": 92.5
+          }
+        },
+        "JPY": {
+          "rijen": 1,
+          "totaalCenten": 500000,
+          "herkomst": {
+            "centen": 500000,
+            "percentage": 100
+          },
+          "economisch": {
+            "centen": 500000,
+            "percentage": 100
+          }
+        },
+        "TRY": {
+          "rijen": 2,
+          "totaalCenten": 1945000,
+          "herkomst": {
+            "centen": 1945000,
+            "percentage": 100
+          },
+          "economisch": {
+            "centen": 1945000,
+            "percentage": 100
+          }
+        }
+      },
+      "ontbreekt": {
+        "economischeHerkomst": 3,
+        "economischeEigenaar": 3,
+        "naarWie": 4
+      },
+      "reden": "er staan 3 valuta tussen deze rijen (EUR, JPY, TRY) en dit huis kent geen koers; een dekkingspercentage over twee munten telt een teller uit de ene bij een noemer uit de andere"
+    },
     "verwacht": {
       "rijen": 22,
       "nietVolgbaar": 4,
@@ -454,7 +573,7 @@
       "waarom": "de vier niet-volgbare rijen staan er om te toetsen of de meter een gat ZIET in plaats van het dicht te rekenen; de drie valuta om te toetsen dat hij weigert te totaliseren"
     },
     "klopt": true,
-    "grens": "Dit is de NORM en geen waarneming: deze wereld is verzonnen en deterministisch. Hij bewijst dat de machine niet gaat raden, en zegt NIETS over wat RTG werkelijk verdient. Dat staat in B2, en die twee worden nooit opgeteld."
+    "grens": "Dit is de NORM en geen waarneming: deze wereld is verzonnen en deterministisch. Hij bewijst dat de machine niet gaat raden, en zegt NIETS over wat RTG werkelijk verdient. Dat staat in B2, en die twee worden nooit opgeteld. Dat geldt ook voor de dekkingsgetallen hierboven: een zaadwereld bewijst dat de rekenmachine werkt, productie vertelt hoeveel van de werkelijkheid zij begrijpt."
   },
   "euros": {
     "noemerCenten": 24,
@@ -492,5 +611,22 @@
       }
     ],
     "waaromGeen": null
+  },
+  "euroDekkingProductie": {
+    "status": "GEEN_NOEMER",
+    "percentage": null,
+    "verklaardEuro": null,
+    "totaalEuro": null,
+    "verklaardCenten": 0,
+    "noemerCenten": 24,
+    "kanoniekeRijen": 0,
+    "bedragrijen": 1,
+    "ontbreekt": {},
+    "beletsels": [
+      "de bedragen in de opslag dragen geen valuta, dus deze noemer is niet aantoonbaar in euro; kern/waarde/dekking.js weigert om die reden ook een totaal over meerdere munten",
+      "niemand heeft verklaard of deze opslag productie of een ontwikkelomgeving is (RTG_ECONOMIE_WERELD is niet gezet). Een dekkingscijfer zonder die verklaring leest als productie, en zaaddata is uiterlijk niet van echte handel te onderscheiden."
+    ],
+    "reden": "de bedragen in de opslag dragen geen valuta, dus deze noemer is niet aantoonbaar in euro; kern/waarde/dekking.js weigert om die reden ook een totaal over meerdere munten",
+    "grens": "De noemer is ELK bedrag dat deze meter in de opslag vindt, niet alleen de rijen die de economische keten dragen -- anders meldt zes goede rijen naast tienduizend losse bedragen 100%. De teller is de STRENGE: bedrag, herkomst, eigenaar, tegenpartij, bron en classificatie moeten er alle zes staan. Dit getal wordt nooit vergeleken met de vormdekking uit A (die telt vormen) en nooit met de dekking uit B1 (die rekent over een fixture)."
   }
 }

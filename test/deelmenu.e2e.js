@@ -10,7 +10,7 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const bundel = require('../scripts/bundel');
 
 const pw = laadPlaywright();
@@ -35,7 +35,7 @@ test('deelmenu: een deel tegelijk, wisselen werkt, deep-link werkt',
     await page.goto(base + '/apps/rtgschool.html', { waitUntil: 'domcontentloaded' });
 
     /* 1. de balk met de delen van deze pagina */
-    await page.waitForSelector('.rtgdeel-balk button', { timeout: 8000 });
+    await page.waitForSelector('.rtgdeel-balk button', { state: 'attached', timeout: 8000 });
     const knoppen = await page.$$eval('.rtgdeel-balk button', bs => bs.map(b => b.textContent));
     assert.ok(knoppen.length >= 3, 'minstens drie delen in het menu, kreeg: ' + knoppen.join(', '));
 
@@ -47,7 +47,8 @@ test('deelmenu: een deel tegelijk, wisselen werkt, deep-link werkt',
     }));
     assert.equal(voor.paspoort, true, 'het paspoort-deel is zichtbaar');
     assert.equal(voor.examen, false, 'het toetsing-deel is dan echt weg');
-    await page.click('.rtgdeel-balk button:nth-child(3)');
+    await edgeActies(page);
+    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: knoppen[2], exact: true }).click();
     const na = await page.evaluate(() => ({
       paspoort: !!document.getElementById('paspoort').offsetParent,
       examen: !!document.getElementById('examenKies').offsetParent,
@@ -59,7 +60,7 @@ test('deelmenu: een deel tegelijk, wisselen werkt, deep-link werkt',
 
     /* 4. deep-link: de hash opent het deel direct */
     await page.goto(base + '/apps/rtgschool.html#deel-bijles', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.rtgdeel-balk button', { timeout: 8000 });
+    await page.waitForSelector('.rtgdeel-balk button', { state: 'attached', timeout: 8000 });
     const diep = await page.evaluate(() => ({
       bijles: !!document.getElementById('bijlesLog').offsetParent,
       paspoort: !!document.getElementById('paspoort').offsetParent
@@ -101,7 +102,7 @@ test('deelmenu: ook een app die zijn scherm pas na een fetch bouwt',
     await page.goto(base + '/apps/pay.html', { waitUntil: 'domcontentloaded' });
 
     // het menu verschijnt vanzelf zodra de app zijn schermen heeft gezet
-    await page.waitForSelector('.rtgdeel-balk button', { timeout: 12000 });
+    await page.waitForSelector('.rtgdeel-balk button', { state: 'attached', timeout: 12000 });
     const knoppen = await page.$$eval('.rtgdeel-balk button', bs => bs.map(b => b.textContent));
     assert.ok(knoppen.length >= 3, 'het menu vindt de delen: ' + knoppen.join(', '));
     const actief = await page.$$eval('.rtgdeel-balk button[aria-current="true"]', bs => bs.length);
@@ -109,7 +110,8 @@ test('deelmenu: ook een app die zijn scherm pas na een fetch bouwt',
 
     // en wisselen doet echt iets: het tweede deel komt op, het eerste gaat weg
     const eerste = await page.$$eval('.rtgdeel-balk button', bs => bs[0].textContent);
-    await page.click('.rtgdeel-balk button:nth-child(2)');
+    await edgeActies(page);
+    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: knoppen[1], exact: true }).click();
     const na = await page.evaluate(() => {
       const b = [...document.querySelectorAll('.rtgdeel-balk button')];
       return { tweedeAan: b[1].getAttribute('aria-current') === 'true',
@@ -197,7 +199,7 @@ test('deelmenu: geen knop opent een leeg scherm, geen knop herhaalt zijn eigen n
     await page.goto(base + '/apps/rtgid.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     await page.goto(base + '/apps/rtgid.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.rtgdeel-balk button', { timeout: 8000 });
+    await page.waitForSelector('.rtgdeel-balk button', { state: 'attached', timeout: 8000 });
 
     /* 1. rtgid.html zoals hij op de plank ligt: vier delen, vier knoppen. */
     const id = await page.evaluate(METER, null);

@@ -10,7 +10,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -19,7 +19,10 @@ const pw = laadPlaywright();
 
 async function openDeel(page, naam) {
   const knop = page.locator('.rtgdeel-balk button', { hasText: naam });
-  if (await knop.count()) { await knop.first().click(); }
+  if (await knop.count()) {
+    await edgeActies(page);
+    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam, exact: true }).click();
+  }
 }
 
 test('Toestemming: de lijst toont wie wat mag, en intrekken raakt de bron',

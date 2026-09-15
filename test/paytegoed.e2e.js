@@ -27,7 +27,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
@@ -77,12 +77,12 @@ async function openPay(browser, base, token, fouten) {
    RTGDeel.open(): dan wordt meteen bewezen dat het nieuwe kopje ook echt een
    eigen deel is geworden. */
 async function openDeel(page, patroon) {
-  await page.waitForSelector('.rtgdeel-balk button', { timeout: 15000 });
-  for (const knop of await page.$$('.rtgdeel-balk button')) {
-    const t = ((await knop.textContent()) || '').trim();
-    if (patroon.test(t)) { await knop.click(); return t; }
-  }
-  throw new Error('geen deel gevonden voor ' + patroon);
+  await page.waitForSelector('.rtgdeel-balk button', { state: 'attached', timeout: 15000 });
+  await edgeActies(page);
+  const knop = page.locator('.rtg-adaptive-controls').getByRole('button', { name: patroon }).first();
+  const naam = (await knop.textContent()).trim();
+  await knop.click();
+  return naam;
 }
 
 test('tegoed op het scherm: klaarzetten geeft een code, verzilveren zet hem op het saldo van de ander',

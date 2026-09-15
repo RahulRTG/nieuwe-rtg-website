@@ -89,7 +89,10 @@
       });
       if (state === 'focus' || vanPeek) { var f = experience.focusable(bank); if (f.length) f[0].focus(); }
       if (oud === 'focus' && state !== 'focus' && focusTerug && d.contains(focusTerug)) { focusTerug.focus(); focusTerug = null; }
-      if (state === 'peek' && returnFocus && d.contains(returnFocus)) { returnFocus.focus(); returnFocus = null; }
+      if (state === 'peek' && oud !== 'peek') {
+        var terug = d.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]') || returnFocus;
+        if (terug && d.contains(terug)) terug.focus(); returnFocus = null;
+      }
     }
     function klik(e) {
       var t = e.target.closest('[data-ss-action],[data-ss-url],[data-ss-context-id],[data-rtg-legacy-open]');

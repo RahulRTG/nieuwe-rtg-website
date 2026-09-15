@@ -1358,6 +1358,12 @@
       "url": "/apps/rtg.html"
     },
     {
+      "label": "Bekijken",
+      "app": "Ontdekken",
+      "wereld": "FoundationOS",
+      "url": "/apps/connect.html"
+    },
+    {
       "label": "Betaalcode",
       "app": "Ontdekken",
       "wereld": "LivingOS",
@@ -1392,6 +1398,12 @@
       "app": "Ontdekken",
       "wereld": "LivingOS",
       "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Dit snap ik",
+      "app": "Ontdekken",
+      "wereld": "FoundationOS",
+      "url": "/apps/connect.html"
     },
     {
       "label": "Flits",
@@ -1436,10 +1448,22 @@
       "url": "/apps/rtg.html"
     },
     {
+      "label": "Meer hiervan",
+      "app": "Ontdekken",
+      "wereld": "FoundationOS",
+      "url": "/apps/connect.html"
+    },
+    {
       "label": "Mensen",
       "app": "Ontdekken",
       "wereld": "LivingOS",
       "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Minder",
+      "app": "Ontdekken",
+      "wereld": "FoundationOS",
+      "url": "/apps/connect.html"
     },
     {
       "label": "Nalatenschap Lifestyle",

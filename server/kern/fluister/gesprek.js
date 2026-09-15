@@ -115,7 +115,15 @@ module.exports = (ctx) => {
           system: require('../rahul').rahulLeadVoor(key) + 'je bent de persoonlijke rechterhand in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. ' + (sparHouding ? sparHouding() + ' ' : '') + 'Context: ' + ctx,
           messages: [...p.gesprek.flatMap(g => [{ role: 'user', content: g.u }, { role: 'assistant', content: g.a }]), { role: 'user', content: q }]
         });
-        return klaar(response.content[0].text);
+        /* VIA HET MODEL, EN DAT MOET HIER GEZEGD WORDEN. Van buitenaf is
+           `pakte: true` niet te lezen als goedkoop of duur: deze functie
+           antwoordt met een model AAN met een modelantwoord en met een model UIT
+           met haar eigen regels, en in beide gevallen staat er pakte=true. De
+           schaduwmeting (kern/ai/routermeting.js) telde dat eerst als "de
+           goedkope laag dekte het", en dat is precies het getal dat zij niet
+           mag verzinnen. Alleen deze plek weet het; daarom staat de vlag hier
+           en wordt hij niet in de route geraden. */
+        return Object.assign(klaar(response.content[0].text), { viaModel: true });
       } catch (e) { /* val terug op de eigen regels */ }
     }
     // de eigen regels: persoonlijk waar het kan, eerlijk waar het moet

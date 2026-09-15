@@ -73,8 +73,8 @@ Punt 29 is dat principe opschalen, niet uitvinden.
 
 ## 2. Vier namen zijn al bezet, en dat is gemeten en niet gevoeld
 
-`SEMANTIEK.json`: van de <!--getal:semantiek.namen-->124<!--/getal--> namen die in
-meer dan één domein staan, dragen er <!--getal:semantiek.betekenissen-->106<!--/getal-->
+`SEMANTIEK.json`: van de <!--getal:semantiek.namen-->125<!--/getal--> namen die in
+meer dan één domein staan, dragen er <!--getal:semantiek.betekenissen-->107<!--/getal-->
 meer dan één betekenis. `SOORTEN` staat op 45. Dat is de prijskaart waar elk nieuw
 kernbegrip langs moet.
 

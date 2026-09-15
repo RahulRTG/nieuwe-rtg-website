@@ -31,6 +31,7 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     await page.evaluate(() => { try { localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {} });
     await page.goto(base + '/apps/werkruimte.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.rtg-surface[data-actief]', { timeout: 15000 });
+    await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar', { state: 'visible' });
 
     // de ruimte begint met twee surfaces
     const begin = await page.evaluate(() => RTGSchil.surfaces.map(s => s.id));
@@ -45,23 +46,25 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
       return { scherm:{ width:innerWidth, height:innerHeight }, ruimte:pak('.rtg-werkruimte'),
         zichtbaar:[...document.querySelectorAll('.rtg-surface[data-edge-visible]')].map((e) => {
           const r=e.getBoundingClientRect(); return { x:r.x,y:r.y,width:r.width,height:r.height };
-        }), rand:{ boven:pak('.rtg-edge-top'), links:pak('.rtg-edge-side'), onder:pak('.rtg-edge-bottom') } };
+        }), rand:{ boven:pak('.rtg-edge-top'), links:pak('.rtg-edge-side'), onder:pak('.rtg-adaptive-bar') } };
     });
     const randKlopt = (m) => {
       assert.ok(Math.abs(m.ruimte.x - m.rand.links.width) < 1, JSON.stringify(m));
       assert.ok(Math.abs(m.ruimte.y - m.rand.boven.height) < 1);
       assert.ok(Math.abs(m.ruimte.width + m.rand.links.width - m.scherm.width) < 1);
-      assert.ok(Math.abs(m.ruimte.height + m.rand.boven.height + m.rand.onder.height - m.scherm.height) < 1);
+      assert.ok(m.ruimte.y + m.ruimte.height <= m.rand.onder.y + 1, 'de werkruimte blijft boven de zwevende bediening');
+      assert.ok(m.rand.onder.y + m.rand.onder.height <= m.scherm.height, 'de bediening blijft in beeld');
+      assert.ok(m.rand.onder.y - m.ruimte.y - m.ruimte.height <= 20, 'geen ongebruikte tweede navigatierij');
     };
     await page.waitForFunction(() => {
       const r = document.querySelector('.rtg-surface[data-edge-visible]').getBoundingClientRect();
       const w = document.querySelector('.rtg-werkruimte').getBoundingClientRect();
-      return Math.abs(r.width * 2 - w.width) < 1;
+      return Math.abs(r.width * 2 - w.width) < 1 && Math.abs(r.height - w.height) < 1;
     }, null, { timeout: 5000 });
     let m = await maten(); randKlopt(m);
     assert.equal(m.zichtbaar.length, 2, 'desktop toont de gekozen indeling met twee apps');
     assert.ok(Math.abs(m.zichtbaar[0].width * 2 - m.ruimte.width) < 1);
-    assert.ok(Math.abs(m.zichtbaar[0].height - m.ruimte.height) < 1);
+    assert.ok(Math.abs(m.zichtbaar[0].height - m.ruimte.height) < 1, JSON.stringify(m));
     await page.setViewportSize({ width:390, height:844 });
     /* Wacht tot Chromium de nieuwe CSS-viewport werkelijk publiceert en stuur
        daarna dezelfde resize die een echt venster geeft. Onder zware parallelle
@@ -100,7 +103,7 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
 
     /* EN NU TERUG. Dit is waar het om gaat: een klik en de hele kamer staat er,
        met dezelfde apps op dezelfde adressen. */
-    await page.click('.rtg-edge-menu'); await require('./helper').edgeCatalogus(page);
+    await page.click('.rtg-adaptive-item[data-rtg-adaptive-action="menu"]:visible, .rtg-edge-menu:visible'); await require('./helper').edgeCatalogus(page);
     await page.click('[data-edge-ruimte="Mijn Directie"]');
     await page.waitForFunction(() => RTGSchil.surfaces.length === 3, { timeout: 8000 });
     const terug = await page.evaluate(() => RTGSchil.surfaces.map(s => ({ id: s.id, url: s.url })));

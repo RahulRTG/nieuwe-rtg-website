@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '53a390d7';
+var RTG_BOUW = 'e1ecbb15';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1022,7 +1022,7 @@ var RTG_BOUW = '53a390d7';
         '#gate .ag-doos.ag-ballotage .ag-rij #agGo{width:2.55rem;height:2.55rem;}' +
         '#gate .ag-doos.ag-ballotage .ag-id-privacy{margin-top:.6rem;font-size:.54rem;}' +
       '}' +
-      '@media (max-width:899px) and (max-height:720px){' +
+      '@media (max-width:899px) and (max-height:860px){' +
         '#gate:has(.ag-doos.ag-ballotage){--klokschaal:.31;padding-top:calc(var(--edge-top,44px) + .45rem);}' +
         '#gate:has(.ag-doos.ag-ballotage)>.os-lock{width:5.3rem;height:5.3rem;margin-bottom:.25rem;}' +
         '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story p{display:none;}' +
@@ -4411,6 +4411,12 @@ var RTG_BOUW = '53a390d7';
     sessies:     { naam: 'Waar ben ik aanwezig', url: '/apps/mijn-sessies.html' },
     relaties:    { naam: 'Wie heeft toegang tot mij', url: '/apps/mijn-relaties.html' },
     gegevens:    { naam: 'Wat weet RTG van mij', url: '/apps/mijn-gegevens.html' },
+    /* RTG Neiging (NEIGING.md). NAAST `gegevens` en niet erin: die kaart
+       gaat over GEGEVENS die RTG van u heeft (naam, adres, documenten), deze
+       over NEIGINGEN die RTG van u denkt te kennen. Twee vragen die op elkaar
+       lijken en een ander antwoord hebben; samenvoegen zou van beide een
+       halve maken. */
+    neigingen:   { naam: T('app.neigingen', 'Mijn neigingen'), url: '/apps/mijn-neigingen.html' },
     post:        { naam: 'Post van RTG', url: '/apps/mijn-post.html' },
   /* Afgesplitst van app-main-23.js, dat met dit blok over de 10 KB ging
      (keuringsregel 13). De snede loopt midden door LINKS -- dat mag hier, want
@@ -4453,6 +4459,11 @@ var RTG_BOUW = '53a390d7';
     aankomst:    { naam: 'Aankomst',      url: '/apps/arrival.html' },
     routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html' },
     ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html' },
+    /* Foundation Connect (apps/connect.html): de ontdeklus. Hij heet op het
+       scherm "Ontdekken" en niet "Connect" -- een wereldnaam hoort te klinken
+       als wat een mens er doet, en de werknaam van een laag is geen productnaam
+       (zie de kop van kern/connect/). */
+    connect:     { naam: T('app.connect', 'Ontdekken'), url: '/apps/connect.html' },
     rtfbord:     { naam: 'Het bord',      url: '/apps/foundation/bord.html' },
     rtfschrift:  { naam: 'Het schrift',   url: '/apps/foundation/schrift.html' },
     /* Veiligheid en verbinding. Hier stonden VIER tegels -- Thuiswacht,
@@ -4745,7 +4756,7 @@ var RTG_BOUW = '53a390d7';
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
       'link:ik', 'link:verificatie', 'link:veilig', 'link:passkeys', 'link:bescherming',
-      'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
+      'link:sessies', 'link:relaties', 'link:gegevens', 'link:neigingen', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
        dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:
@@ -4838,6 +4849,12 @@ var RTG_BOUW = '53a390d7';
     /* `link:vrienden` is hier vandaan LivingOS gekomen: de contactenlaag van
        een gezin hoort in de wereld waar haar deur staat (zie de reden in
        app-main-24a2.js). */
+    /* Ontdekken staat VOORAAN in deze wereld en niet achteraan: het is de
+       ingang waar een mens uit zichzelf komt, en de rest van FoundationOS is
+       wat hij daarna tegenkomt. Hij hoort hier en niet in LivingOS omdat de
+       contextvraag van WERELDEN.md dat zegt -- wie iets wil ontdekken, leren of
+       doorgeven denkt niet dat hij in zijn huishouden of op zijn werk zit. */
+      'link:connect',
       'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven',
       'link:vrienden'] }
   ];

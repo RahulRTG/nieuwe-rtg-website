@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 101 delen, 10217 regels in de delen
+`public/apps/app-main/` -- 101 delen, 10234 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -812,7 +812,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 808 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 811 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -112,6 +112,27 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* STEMPELVEILIGHEID.json (npm run stempelveiligheid) telt welke generatoren
+     repo-waarheid kunnen wegschrijven die niemand heeft gevraagd. Twee schulden
+     omlaag en een bereikmeter omhoog, om exact de reden die bij STILSPOOR.json
+     en AICONTEXT.json hierboven staat: deze meter is LEXICAAL, dus wie hem stil
+     minder laat zien, ziet zijn schuld dalen zonder dat er iets is gerepareerd.
+     Een risicoklasse van nul uit een meter die geen schrijvers meer vindt, is de
+     gevaarlijkste vorm van groen.
+
+     `stempelInPoort` is de scherpste van de twee schulden en niet de grootste:
+     hij telt alleen de doorsnede -- stempelt, grendelt niet, schrijft ongevraagd
+     EN loopt mee in een commando dat een mens als controle leest. Dat is het
+     incident van 15 september; de bredere klasse is een werklijst. */
+  'STEMPELVEILIGHEID.json': { meter: ['stempelOngevraagd', 'stempelInPoort', 'stempelSchrijversGezien'] },
+  /* ONLEESBAAR IS NIET AFWEZIG (STILLEZING.json, npm run stillezing) -- de
+     spiegel van STILSPOOR hierboven. Die meet SCHRIJVERS wier falen wordt
+     opgegeten; deze meet LEZERS die een kapot bewijs als een leeg bewijs
+     behandelen, en alleen die tweede kan een poort laten opengaan. Vier tanden:
+     twee schulden omlaag (en die worden NOOIT opgeteld -- in server/ staat er
+     een handeling tegenover, in scripts/ een meting), het bereik omhoog, en het
+     aantal lezers dat het onderscheid wel maakt omhoog. */
+  'STILLEZING.json': { meter: ['stilLezing', 'stilLezingMeters', 'stilLezingBereik', 'bewijsOnderscheidt'] },
   /* IDEMIDENTITEIT.json (npm run idemidentiteit) beantwoordt wat na #269/#270
      overbleef: waar is de identiteit van een verzoek nog te smal? Drie tanden,
      een omhoog en twee omlaag -- zie de kop bij die tanden in ../norm.js. */
@@ -125,6 +146,23 @@ const REGISTER = {
      hernoemde map in plaats van door een feit, en leest de nul plotseling als
      bevestiging terwijl hij een blinde vlek is. */
   'STAGEVORM.json': { meter: ['stageDomeinenGemeten'] },
+  /* NEIGINGVORM.json meet of er een persoonlijke laag bij mag en in welke vorm
+     (NEIGING.md par. 0). Twee geratelde waarden, en met opzet geen derde over de
+     NAAMmeting: die telt sinds server/kern/neiging/ bestaat zijn eigen bestanden
+     mee, dus een ratel daarop zou alleen maar meegroeien met het werk en niets
+     bewaken.
+
+     `neigingVerwijzingRot` bewaakt meting C: elk punt van het voorstel draagt
+     een nagetrokken verwijzing naar bestaande code. Rot er een, dan is het
+     document een bewering over het verleden geworden.
+
+     `neigingVoorkeurBlind` bewaakt meting B, en hij gaat de andere kant op dan je
+     zou verwachten: hij telt de BESTAANDE affiniteitsvormen zonder grond,
+     zekerheid of verval. Deze laag slikt die veertien met opzet niet in (de
+     Asset-les), dus het getal hoort te dalen doordat een domein zijn eigen
+     voorkeuren etiketteert -- en nooit te stijgen doordat er ergens een
+     ongeetiketteerde voorkeur bij komt. */
+  'NEIGINGVORM.json': { meter: ['neigingVerwijzingRot', 'neigingVoorkeurBlind'] },
   /* NAMENSVORM.json meet of de manieren van namens-iemand-handelen een machine
      delen (REPRESENTATIE.md par. 0). Zelfde soort als STAGEVORM.json hierboven
      en om dezelfde reden is de geratelde waarde het BEREIK: de nullen zijn de
@@ -133,6 +171,18 @@ const REGISTER = {
      dalen, want dan zakt de gedeeldheid door een hernoemd bestand in plaats van
      door een feit. */
   'NAMENSVORM.json': { meter: ['namensMechanismenGemeten'] },
+  'SPOORVORM.json': { meter: ['spoorConvergent'] },
+  /* CONNECTLUS.json meet of de ontdekkingsdomeinen de lus DELEN (CONNECT.md
+     par. 1). Zelfde soort als CARRIEREVORM, STAGEVORM en NAMENSVORM hierboven,
+     en om exact dezelfde reden is de geratelde waarde het BEREIK: dat er 0 van
+     de acht werkwoorden in alle domeinen staan en dat maar twee domeinen de lus
+     rond krijgen, is de bevinding waar kern/connect/ op rust -- en een bevinding
+     die beweegt is nieuws. Wat niet stil mag bewegen is hoeveel domeinen de
+     meter heeft gezien. Die faalvorm is hier geen theorie: scripts/carrierevorm.js
+     sloeg bij een versmalling tot twee domeinen om van 0 naar 8 gedeelde velden,
+     dus een meter die minder domeinen ziet meldt niet dezelfde nul maar een
+     andere werkelijkheid, onder dezelfde naam. */
+  'CONNECTLUS.json': { meter: ['connectDomeinenGemeten'] },
   /* WEKDEKKING.json zet het BESLUIT (welke brongebeurtenis mag de publieke rail
      op, scripts/lib/wekbesluit.js) naast de METING. Geratelde is
      `wekZonderUitspraak`: publieke domeinen waarover het besluitregister
@@ -161,6 +211,7 @@ const REGISTER = {
   'GLUURRONDE.json': { meter: ['gluurGaten', 'gluurGecontroleerd'] },
   'VERSTRENGELING.json': { meter: ['verstrengelingOnverklaard'] },
   'BEWIJSLADDER.json': { meter: ['bewijsAlleenKeten'] },
+  'VERANDERBEREIK.json': { meter: ['veranderbereikZonderBereik'] },
   'ACTIVERING.json': { meter: ['activeringOndergrens'] },
   'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt', 'tredeIngangLekken'] },
   'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },
@@ -296,6 +347,30 @@ const REGISTER = {
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
+  /* KETENBEREIK.json meet welke schakel van de keten mens -> effect een echte
+     mensenzin aanraakt (EXECUTIE.md blok 6/9). De geratelde waarde is met opzet
+     NIET de uitslag maar het BEREIK VAN DE METER -- hetzelfde besluit als bij
+     CARRIEREVORM.json hierboven, en om dezelfde reden. De uitslag HOORT te
+     bewegen zodra er wordt bedraad; dat is nieuws en geen achteruitgang. Maar
+     een haak die stil minder schakels kan wikkelen (iemand hernoemt
+     kern/stuur/mandaat.js, een export wordt bevroren) meldt exact dezelfde
+     conclusie -- "mandaat wordt door geen enkele zin geraakt" -- over minder
+     bewijs, en dat is de faalvorm waar een ratel voor bestaat. */
+  'KETENBEREIK.json': { eigenRatel: 'test/ketenbereik.test.js' },
+  /* PAKTEBETEKENIS.json meet hoeveel ONDERSCHEIDEN uitkomsten er onder dezelfde
+     boolean `pakte` vallen (kern/fluister/gesprek.js). Zelfde besluit als bij
+     KETENBEREIK.json hierboven: de geratelde waarde is het BEREIK van de meter
+     en niet de uitslag. Die uitslag hoort te dalen zodra `pakte` wordt
+     gesplitst -- dat is de bedoeling van de meting. Maar een corpus dat stil
+     minder standen of minder gevallen ziet, meldt "minder betekenissen" terwijl
+     er alleen minder is gekeken, en dat is de faalvorm waar een ratel voor is. */
+  'PAKTEBETEKENIS.json': { eigenRatel: 'test/paktebetekenis.test.js' },
+  /* MANDAATPROEF.json is een PROEF en geen meting, dus hier hoort de ratel wel
+     op de uitslag: een schakel die gesloten was en opengaat, is een regressie en
+     geen nieuws. De uitzondering is `openBekend` -- die telt apart en draagt
+     zijn reden mee, zodat een bevinding niet hoeft te worden weggepoetst om
+     groen te blijven. Zelfde vorm als RITPROEF.json en MOMENTPROEF.json. */
+  'MANDAATPROEF.json': { eigenRatel: 'test/mandaatproef.test.js' },
   'REFUNDMIGRATIE.json': { eigenRatel: 'test/refundmigratie.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
   /* ONDERNEMERSLUS.json meet of de ondernemerslus EEN onderwerp draagt

@@ -81,6 +81,11 @@ module.exports = function hangRoutesOp(kern) {
      personeel, en de gast draagt de pas. Het valt in elk van die drie half
      thuis. */
   require('../routes/festival')(grens('festival'));
+  /* Foundation Connect (routes/connect.js): de ontdeklus. Naast de domeinen om
+     dezelfde reden als SSO en Concern -- hij heeft twee soorten deuren (een lid
+     en een gezinsprofiel van de RTFoundation) en hoort dus in geen van beide
+     domeinbestanden thuis. De motor zelf hangt in opzet/kernlaag7-ruimtes.js. */
+  require('../routes/connect')(grens('connect'));
   require('../routes/fout')(grens('fout'));
   require('../routes/onboarding')(grens('onboarding'));
   /* De adresopzoeker hoort bij het invullen van een adres (de intake en het

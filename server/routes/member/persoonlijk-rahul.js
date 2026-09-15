@@ -19,6 +19,14 @@ module.exports = (kern) => {
   const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, stuurLus } = kern;
   const { fluisterZeg } = kern.fluister;
   const aiStatus = () => require('../../ai-stand').beschikbaarheid(kern.anthropic);
+  const meting = require('../../kern/ai/routermeting');
+  /* HEEFT DE GOEDKOPE LAAG HET GEDEKT -- en `r.pakte` alleen is daarvoor niet
+     genoeg. kern/fluister/gesprek.js antwoordt met een model AAN met een
+     modelantwoord en met een model UIT met haar eigen regels, en zet in allebei
+     de gevallen pakte=true. Een meting op pakte alleen telt dus een
+     modelantwoord als goedkope dekking -- nagemeten gebeurde dat ook. `viaModel`
+     komt van de plek die het wel weet. */
+  const goedkoopDekte = (r) => !!(r && r.pakte && !r.viaModel);
 
   /* ---- Fluister: de persoonlijke assistent met geheugen (kern/fluister.js).
      Voor iedereen, over de eigen gegevens; alles is opvraagbaar en wisbaar. */
@@ -96,6 +104,12 @@ module.exports = (kern) => {
           aiBeschikbaar: true, modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas };
         antwoord.liveTwin = maakLiveTwin({ vraag: req.body.q, context: req.body.context, wereld: 'member',
           actor: req.session.tier || 'member', stand, gedaan: antwoord.gedaan, goedkeuringen: antwoord.goedkeuringen });
+        /* De schaduwmeting (kern/ai/routermeting.js): de stuurlus gaf het
+           antwoord. `gedekt` is de TEGENFEITELIJKE vraag -- had de goedkope laag
+           het ook gekund -- en dat weet kern/fluister zelf beter dan een proef
+           op cannedAnswer, die in deze route niet eens voorkomt. */
+        meting.meet(req.body.q, { ingang: 'fluister', pas: req.session.tier,
+          gedekt: goedkoopDekte(r), modelAntwoordde: true });
         return res.json(antwoord);
       }
     }
@@ -105,6 +119,10 @@ module.exports = (kern) => {
       verwerking: stand.verwerking, kompas: stand.kompas });
     antwoord.liveTwin = maakLiveTwin({ vraag: req.body.q, context: req.body.context, wereld: 'member',
       actor: req.session.tier || 'member', stand, gedaan: !!antwoord.gedaan, goedkeuringen: antwoord.goedkeuringen });
+    // Geen stuurlus of geen tekst: kern/fluister gaf het antwoord, of anders de
+    // algemene zin -- en dan telt dit als `nietsGafAntwoord`.
+    meting.meet(req.body.q, { ingang: 'fluister', pas: req.session.tier,
+      gedekt: goedkoopDekte(r), modelAntwoordde: !!(r && r.viaModel) });
     res.json(antwoord);
   });
   /* De uitwisseling in het doorlopende gesprek zetten, zodat de chat in de app en

@@ -188,6 +188,25 @@ const METERS = [
      er mag geen bewijs BIJKOMEN dat alleen GitHub kan leveren zonder dat iemand
      dat opschrijft. */
   { sleutel: 'bewijsAlleenKeten', richting: 'omlaag', wat: 'bewijsmechanismen die alleen in de keten draaien en niet lokaal (uit BEWIJSLADDER.json)' },
+  /* TOETSEN ZONDER VASTGESTELD BEREIK (VERANDERBEREIK.json, npm run veranderbereik).
+
+     Van hoeveel toetsbestanden weet dit huis NIET welke bronbestanden ze dekken --
+     niet statisch (geen require-kant naar server/) en niet waargenomen (geen route
+     in het journaal die naar een bestand oplost). Dat getal is de bodem onder elk
+     impactplan: zolang het niet nul is, dekt geen enkele versmalling de suite en
+     draagt elke toets erin een volle ring (KEURING.md par. 1).
+
+     EEN ABSOLUUT GETAL EN GEEN PERCENTAGE, met opzet: een percentage daalt ook als
+     er toetsen bijkomen die niets bewijzen.
+
+     WAT DEZE TAND NIET KAN, en dat hoort erbij. Het register draagt `rondeVolledig`;
+     is dat false, dan is de meting over een DEEL van de suite gedaan en telt hij te
+     veel volle ringen. Die kant is veilig (te ruim), maar het betekent dat een
+     daling ook van een grotere ronde kan komen in plaats van van meer bereik. De
+     meter weigert daarom zelf een onvolledige ronde vast te leggen zonder
+     --onvolledig, en zijn eigen --controle slaat de vergelijking over zodra een van
+     beide rondes onvolledig is. Hier telt alleen wat er in het register staat. */
+  { sleutel: 'veranderbereikZonderBereik', richting: 'omlaag', wat: 'toetsen zonder vastgesteld bronbestandbereik (uit VERANDERBEREIK.json)' },
   { sleutel: 'tredeLekken', richting: 'omlaag', wat: 'routes buiten trede 0 die tóch antwoorden (uit TREDEPROEF.json)' },
   /* WEKKERS DIE GEEN ENKELE FUNCTIE RAAKT (WEKKERS.json).
 
@@ -737,6 +756,22 @@ const METERS = [
      reden omhoog: de UITKOMST (0 gedeelde velden) mag bewegen, het aantal
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
+  /* NEIGINGVORM.json (NEIGING.md par. 0). Twee ratels en met opzet geen derde
+     over de naamsmeting: die telt sinds de laag bestaat zijn eigen bestanden
+     mee, dus een getal daarop zou alleen maar groeien met het werk.
+
+     `neigingVerwijzingRot` bewaakt meting C: elk punt van het voorstel draagt
+     een verwijzing naar bestaande code, en die wordt nagetrokken. Rot er een,
+     dan is het document een bewering over het verleden geworden.
+
+     `neigingVoorkeurBlind` bewaakt meting B, en hij gaat de ANDERE kant op dan
+     je zou denken: het telt de bestaande affiniteitsvormen die GEEN grond,
+     zekerheid of verval dragen. Vandaag zijn dat er veertien, en deze laag
+     slikt ze met opzet niet in (de Asset-les). Het getal mag dus dalen doordat
+     een domein zijn eigen voorkeuren etiketteert -- en nooit stijgen doordat er
+     ergens een ongeetiketteerde voorkeur bij komt. */
+  { sleutel: 'neigingVerwijzingRot', richting: 'omlaag', wat: 'punten in NEIGING.md waarvan de verwijzing naar code niet meer klopt' },
+  { sleutel: 'neigingVoorkeurBlind', richting: 'omlaag', wat: 'bestaande voorkeursvormen zonder grond, zekerheid of verval' },
   /* Het BEREIK van de namensvormmeter (REPRESENTATIE.md par. 0), en om exact
      dezelfde reden omhoog als de twee hierboven. De UITKOMST is daar een nul
      (0 velden gedeeld, 0 werkwoorden in alle mechanismen op naam) en daarop
@@ -745,6 +780,28 @@ const METERS = [
      diezelfde nul staan terwijl hij iets anders betekent: van "deze zeven
      delen niets" naar "we hebben er minder bekeken". */
   { sleutel: 'namensMechanismenGemeten', richting: 'omhoog', wat: 'mechanismen van namens-iemand-handelen die de namensvormmeter werkelijk heeft gezien' },
+  /* DE CONVERGENTIE VAN HET VERTEGENWOORDIGINGSSPOOR (SPOORVORM.json).
+
+     `kern/vertegenwoordiging/handelen.js` voert als enige de hele gedragsvorm:
+     toegestaan gelogd, geweigerd ook, spoor voor de uitkomst, en een spoor dat
+     niet vaststaat houdt de handeling tegen. Deze tand telt hoeveel mechanismen
+     alle VIER halen, en hij gaat met opzet OMHOOG: elk mechanisme dat naar die
+     vorm toegroeit, zet hem vast zodat hij niet stilletjes terug kan.
+
+     Waarom niet de schuldkant tellen (hoeveel er GEEN spoor hebben)? Omdat die
+     daalt zodra iemand een spoorschrijver onder een naam zet die de meter niet
+     kent -- dan lijkt er vooruitgang waar alleen het instrument blind werd. Een
+     stijgende tand op de VOLLEDIGE vorm kan dat niet: vier eigenschappen
+     tegelijk faken is geen typefout. */
+  { sleutel: 'spoorConvergent', richting: 'omhoog', wat: 'mechanismen die alle vier de spoor-eigenschappen van de referentie halen' },
+  /* Het BEREIK van de connectlusmeter (CONNECT.md par. 1), en om precies
+     dezelfde reden omhoog als de drie hierboven. De UITKOMST is daar een nul
+     (0 van 8 werkwoorden in alle 23 ontdekkingsdomeinen, 2 domeinen die de lus
+     rond krijgen) en daarop rust het besluit dat Foundation Connect een
+     PROJECTIE wordt en geen gedeeld inhoudstype. Ziet de meter stil minder
+     domeinen, dan blijft diezelfde nul staan terwijl hij iets anders betekent:
+     van "deze drieentwintig delen niets" naar "we hebben er minder bekeken". */
+  { sleutel: 'connectDomeinenGemeten', richting: 'omhoog', wat: 'ontdekkingsdomeinen die de connectlusmeter werkelijk heeft gezien' },
   /* Publieke domeinen waarover scripts/lib/wekbesluit.js geen uitspraak doet.
      Omlaag, en hij staat op nul: een domein dat publiek is en waarvan niemand
      heeft besloten of het de publieke rail op mag, hoort niet stil te kunnen
@@ -789,6 +846,30 @@ const METERS = [
   { sleutel: 'stilSpoor', richting: 'omlaag', wat: 'spoor-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilleOpslag', richting: 'omlaag', wat: 'opslag-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilSpoorAanroepen', richting: 'omhoog', wat: 'spoor-schrijvers die de stilspoormeter werkelijk heeft gevonden' },
+  /* DE STEMPELVEILIGHEID (STEMPELVEILIGHEID.json, npm run stempelveiligheid).
+     Twee schulden omlaag, het bereik omhoog -- zie de kop bij het register in
+     ./lib/metingen.js. Ze dalen door een grendel of een vlag toe te voegen, en
+     nooit doordat de meter minder ziet. */
+  { sleutel: 'stempelOngevraagd', richting: 'omlaag', wat: 'generatoren die repo-waarheid stempelen zonder grendel en zonder dat iemand erom vraagt (STEMPELVEILIGHEID.json)' },
+  { sleutel: 'stempelInPoort', richting: 'omlaag', wat: 'daarvan degene die meelopen in een commando dat als CONTROLE leest -- dit is het incident zelf' },
+  { sleutel: 'stempelSchrijversGezien', richting: 'omhoog', wat: 'schrijvers die de stempelveiligheidsmeter werkelijk heeft gevonden' },
+  /* ONLEESBAAR IS NIET AFWEZIG (STILLEZING.json, npm run stillezing). Bewijs
+     kent drie toestanden -- bestaat+geldig, bestaat+ongeldig, bestaat niet --
+     en een `catch` die op null valt maakt van de tweede de derde. Leeg betekent
+     in dit huis bijna overal "geen beperking", dus dat is fail-open.
+
+     DE TWEE SCHULDEN WORDEN NOOIT OPGETELD, en dat is geen netheid: in server/
+     laat zo'n lezing een HANDELING door, in scripts/ laat zij een METING liegen.
+     Een som van die twee zou een getal zijn waarop niemand kan sturen.
+
+     `stilLezingBereik` is de ENIGE plek waar de twee werelden wel bij elkaar
+     komen, en met reden: blindheid is een eigenschap van het INSTRUMENT en niet
+     van het huis. Zonder die tand is een dalende schuld niet te onderscheiden
+     van een meter die minder ziet. */
+  { sleutel: 'stilLezing', richting: 'omlaag', wat: 'runtime-lezers die een onleesbaar bewijs als afwezig behandelen (STILLEZING.json)' },
+  { sleutel: 'stilLezingMeters', richting: 'omlaag', wat: 'meters die een onleesbaar register als afwezig behandelen (STILLEZING.json)' },
+  { sleutel: 'stilLezingBereik', richting: 'omhoog', wat: 'bewijslezingen die de stillezingmeter werkelijk heeft gevonden' },
+  { sleutel: 'bewijsOnderscheidt', richting: 'omhoog', wat: 'lezers die ONGELDIG onderscheiden van LEEG in plaats van samen te smelten' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
      beter.
@@ -1503,14 +1584,25 @@ function meet(bronnen) {
     idemAfdrukVoegtNietsToe: leesRegister('IDEMIDENTITEIT.json', (j) => j.voegtNietsToe),
     idemHandwerkGeenVergelijking: leesRegister('IDEMIDENTITEIT.json', (j) => j.handwerkGeenVergelijking),
     stilSpoor: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorGesmoord),
+    stilLezing: leesRegister('STILLEZING.json', (j) => j.gemeten.server.smeltSamen),
+    stilLezingMeters: leesRegister('STILLEZING.json', (j) => j.gemeten.scripts.smeltSamen),
+    stilLezingBereik: leesRegister('STILLEZING.json', (j) => j.gemeten.server.bewijslezingen + j.gemeten.scripts.bewijslezingen),
+    bewijsOnderscheidt: leesRegister('STILLEZING.json', (j) => j.gemeten.server.onderscheidt + j.gemeten.scripts.onderscheidt),
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
+    stempelOngevraagd: leesRegister('STEMPELVEILIGHEID.json', (j) => j.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN),
+    stempelInPoort: leesRegister('STEMPELVEILIGHEID.json', (j) => j.inEenPoort.length),
+    stempelSchrijversGezien: leesRegister('STEMPELVEILIGHEID.json', (j) => j.schrijvers),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
+    neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
+    connectDomeinenGemeten: leesRegister('CONNECTLUS.json', (j) => j.werkwoorden.domeinen),
     /* De WERKWOORD-as en niet de vorm-as, want die telt alleen mechanismen die
        iets OPSLAAN -- en kern/stuur/mandaat.js slaat met opzet niets op. Het
        bereik van deze meter is dus het aantal mechanismen dat hij op zijn
        grammatica heeft nagelopen, en dat zijn ze alle zeven. */
     namensMechanismenGemeten: leesRegister('NAMENSVORM.json', (j) => j.gemeten.werkwoord.mechanismen),
+    spoorConvergent: leesRegister('SPOORVORM.json', (j) => j.gemeten.volledigConvergent),
     wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
     momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
@@ -1573,6 +1665,7 @@ function meet(bronnen) {
     verwijzingGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.verwijzingveiligheid.gebreken || []).length),
     mensmutatieZonderWacht: leesRegister('MENSMUTATIE.json', (j) => j.telling.geenWacht),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
+    veranderbereikZonderBereik: leesRegister('VERANDERBEREIK.json', (j) => j.gemeten.zonderBereik),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal
        geven voor een poort die inmiddels openstaat. */

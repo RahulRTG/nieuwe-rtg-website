@@ -29,6 +29,28 @@ module.exports = ({ app, officeAuth, veilig, stuur, afdelingen, kern }) => {
       stuur(res, r);
     } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+  /* DE TERUGBOEKING van een BETAALDE reis (kern/reisbureau-terugboeking.js).
+
+     Een besluit van een mens, en daarom een kantoorroute: een lid draait zijn
+     eigen betaling niet terug. Er wordt GEEN geld verplaatst -- er ontstaat een
+     teruggaveRECHT dat een mens uitvoert langs kern/pay (GELD.md), precies zoals
+     bij kern/horeca/correctie.js.
+
+     Wat er wel gebeurt is dat de WAARHEID achteruit blijft kloppen: elke
+     herkomstrij krijgt een spiegel met hetzelfde bedrag negatief en DEZELFDE
+     economische eigenaar, zodat doorbelasting en bijdragebasis meebewegen in
+     plaats van te blijven staan. `geldrijIds` laat een gedeeltelijke terugboeking
+     toe; zonder dat veld gaat de hele reis terug. */
+  app.post('/api/office/reisbureau/terugboeking', officeAuth, (req, res) => {
+    const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
+    const b = req.body || {};
+    const r = kern.reisbetaling.terugboeken(String(b.ref || ''), {
+      reden: b.reden, geldrijIds: Array.isArray(b.geldrijIds) ? b.geldrijIds : null });
+    if (r.ok) afdelingen.audit(wie, 'Reisbureau: terugboeking op ' + String(b.ref || '') +
+      ' (' + r.teruggedraaid + ' regels, ' + (r.centen / 100).toFixed(2) + ' EUR)');
+    stuur(res, r);
+  });
+
   /* DE NAZORG: wijzigen en afzeggen van een reis die al bevestigd is
      (kern/reisbureau-nazorg.js). Ook hier beslist een mens, en om dezelfde reden
      als bij /besluit: dit zijn toezeggingen aan een lid. WIE beslist komt uit de

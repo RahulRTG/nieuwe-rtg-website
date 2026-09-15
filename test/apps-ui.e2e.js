@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -304,8 +304,12 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     // het Werk-OS: alle functies staan als apps op het springboard; de zaak
     // opent (na de sector-doorverwijzing) op het startscherm met dock
     // a11y: de actieve app meldt zich als actief aan de schermlezer
-    await page.waitForSelector('.wos-dock button[data-tab="home"]', { state: 'visible', timeout: 10000 });
-    assert.equal(await page.getAttribute('.wos-dock button[data-tab="home"]', 'aria-current'), 'page', 'de actieve dock-app heeft aria-current');
+    await edgeActies(page);
+    const thuis = page.locator('.rtg-adaptive-controls [data-rtg-adaptive-tab="home"]');
+    await thuis.waitFor({ state: 'visible', timeout: 10000 });
+    assert.equal(await thuis.getAttribute('aria-current'), 'page', 'de actieve app meldt zich via de standaard Edge');
+    assert.equal(await page.locator('.wos-dock').isVisible(), false, 'geen eigen dock naast Edge');
+    await page.keyboard.press('Escape');
     // Orders opent als app vanaf het springboard
     await page.waitForSelector('.wos-grid .wos-app[aria-label="Orders"]', { state: 'visible', timeout: 10000 });
     await page.click('.wos-grid .wos-app[aria-label="Orders"]');
@@ -505,7 +509,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
        uit het brede-scherm-blok in command.css -- dan doet de deur wel iets
        maar zie je er niets van. */
     await bankDeur(page, 'Rahul');
-    await page.waitForSelector('#rtgCommand .cmd-balk.vraagt .cmd-vraagveld', { state: 'visible', timeout: 15000 });
+    await page.waitForSelector('.rtg-adaptive-question input', { state: 'visible', timeout: 15000 });
     /* De lade van de bank glijdt in 280ms weg (command.css). Meten of de balk
        vrij ligt terwijl hij nog beweegt, meet de animatie en niet de stand. */
     await page.waitForFunction(() => !document.querySelector('#rtgCommand.bank-open'), null, { timeout: 5000 });
@@ -522,7 +526,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
        stil. De teller gaat bij elke afwijkende lezing terug naar nul, dus het is
        geen verkapte klok: duurt het langer, dan wacht hij langer. */
     await wachtTot(page, () => {
-      const e = document.querySelector('#rtgCommand .cmd-balk');
+      const e = document.querySelector('.rtg-adaptive-bar');
       if (!e) { window.__balkStil = 0; return false; }
       const top = Math.round(e.getBoundingClientRect().top);
       window.__balkStil = window.__balkVorige === top ? (window.__balkStil || 0) + 1 : 0;
@@ -530,11 +534,11 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
       return window.__balkStil >= 3;
     }, null, { wat: 'een balk die stil ligt', polling: 100 });
     assert.equal(await page.evaluate(() => {
-      const e = document.querySelector('#rtgCommand .cmd-balk'), r = e.getBoundingClientRect();
+      const e = document.querySelector('.rtg-adaptive-bar'), r = e.getBoundingClientRect();
       const boven = document.elementFromPoint(Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
-      return !!(boven && boven.closest('.cmd-balk'));
+      return !!(boven && boven.closest('.rtg-adaptive-bar'));
     }), true, 'de vraagbalk van Rahul gaat open achter iets anders in plaats van erboven');
-    assert.equal(await page.evaluate(() => !!document.querySelector('#rtgCommand .cmd-mondknop canvas')), true,
+    assert.equal(await page.evaluate(() => !!document.querySelector('.rtg-adaptive-lips')), true,
       'de mond van Rahul staat niet in de balk');
 
     // en we zijn de werktafel niet kwijt: hij roepen is geen navigatie

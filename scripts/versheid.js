@@ -130,6 +130,8 @@ const REGISTERS = [
      bot zonder dat iemand het merkt. */
   ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
   ['STILSPOOR.json', 'npm run stilspoor:vast', 'schrijfacties waarvan het falen stil wordt weggevangen (LAT.md regel 21)'],
+  ['STEMPELVEILIGHEID.json', 'npm run stempelveiligheid:vast', 'welke generatoren repo-waarheid kunnen wegschrijven die niemand vroeg'],
+  ['STILLEZING.json', 'npm run stillezing:vast', 'lezers die een onleesbaar bewijs als een afwezig bewijs behandelen (BEWIJSMACHINE.md par. 6b)'],
   ['IDEMIDENTITEIT.json', 'npm run idemidentiteit', 'waaraan twee aanroepen hetzelfde verzoek heten (MUTATIECONTRACT.md par. 6e)'],
   ['LAATSTE_METING.json', 'npm run beproeving', 'de laatste stormproef, ook wanneer hij zakt'],
   ['HEAPPROEF.json', 'npm run heapproef', 'geheugengedrag onder herhaalde verzoeken'],
@@ -388,6 +390,12 @@ const REGISTERS = [
      waaraan), dan wat een schakelaar werkelijk aanzet, dan de treden zelf, dan de
      ingangen die geen route zijn, en tot slot de ene keten van begin tot eind. */
   ['VERSTRENGELING.json', 'npm run verstrengeling:vast', 'de require-graaf als laag+domein, en welke rand niemand verklaard heeft'],
+  /* HET VERANDERBEREIK hoort hier direct naast, want hij beantwoordt de andere
+     helft van dezelfde vraag: verstrengeling zegt welke BESTANDEN aan elkaar
+     hangen, dit zegt van welke TOETS het bronbestandbereik vaststaat. Zijn
+     vastlegweg draagt --onvolledig omdat een halve ronde zichzelf niet stil mag
+     vastleggen; een volle ronde heeft die vlag niet nodig. */
+  ['VERANDERBEREIK.json', 'npm run veranderbereik:vastleggen', 'van welke toets het bronbestandbereik vaststaat, langs de statische en de waargenomen as'],
   ['ACTIVERING.json', 'npm run activering:vast', 'wat een functie aanzetten werkelijk aanzet, met de graad van zekerheid erbij'],
   ['TREDEPROEF.json', 'node scripts/tredeproef.js --alle --vastleggen', 'of een trede lekt: zuiver, beproefd, de rondgang en de ingangen buiten HTTP'],
   ['WEKKERS.json', 'npm run wekkers:vast', 'de ingangen die geen route zijn (klok, bus, luisteraar, werker) en welke functie ze doen'],
@@ -424,6 +432,26 @@ const REGISTERS = [
   ['MOMENTPROEF.json', 'npm run momentproef:vast', 'of de publieke keten sluit, van een feit bij de bron tot een melding bij een volger'],
   ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],
   ['AANVOERVORM.json', 'npm run aanvoervorm:vast', 'of de vijf terreinen van de aanvoer een VORM delen -- de vraag onder het aanvoercontract'],
+
+  /* De ketenbereikmeting hoort bij deze groep en niet bij de gouden ketens: die
+     meten of een keten SLUIT, deze meet of de keten door een mensenzin wordt
+     BEREIKT. Veroudering weegt hier even zwaar als daar, en om dezelfde reden --
+     hij draait tegen een echte server, en zijn uitslag ("mandaat wordt door geen
+     enkele zin geraakt") is een uitspraak over de code van die dag. Zodra er
+     bedraad wordt, is een oude uitslag niet alleen achterhaald maar misleidend:
+     hij zegt dat er een gat is dat er dan niet meer is. */
+  ['KETENBEREIK.json', 'npm run ketenbereik:vast', 'welke schakel van de keten mens -> effect een echte mensenzin werkelijk aanraakt'],
+  /* Hoort bij de vorige: die meet WAAR de keten ophoudt, deze meet WAT de
+     boolean betekent waarop zij ophoudt. Veroudert net zo hard, en om dezelfde
+     reden -- zodra `pakte` wordt gesplitst, beschrijft een oude uitslag een
+     samenpersing die er niet meer is. */
+  ['PAKTEBETEKENIS.json', 'npm run paktebetekenis:vast', 'hoeveel onderscheiden betekenissen de boolean `pakte` samenperst'],
+  /* De proef die de twee vorige metingen afsluit: komt er een muterend effect
+     voorbij de autoriteitslaag zonder gezag? Veroudert het hardst van de drie --
+     hij draait tegen een echte server EN tegen een poort die van stand kan
+     wisselen, dus een oude uitslag beschrijft een grens die er misschien niet
+     meer zo staat. */
+  ['MANDAATPROEF.json', 'npm run mandaatproef:vast', 'of een zelfstandige mutatie zonder mandaat werkelijk zonder effect blijft'],
   /* De navigatieproef staat NAAST de vijf gouden ketens en niet ertussen: hij
      meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
      browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem
@@ -493,6 +521,12 @@ const REGISTERS = [
      besluit dat een Moment een projectie is en geen object. Een verouderde nul
      ziet er exact zo uit als een verse. */
   ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet'],
+  ['NEIGINGVORM.json', 'npm run neigingvorm:vast', 'of er een persoonlijke laag bij mag en in welke vorm -- NEIGING.md par. 0 rust erop. Twee uitslagen verouderen anders stil: de NAAMmeting (die zijn eigen laag meetelt zodra die bestaat) en de veertien voorkeursvormen zonder grond, zekerheid of verval, waar de hele bestaansgrond van de laag op staat'],
+  /* Om dezelfde reden als STAGEVORM.json hierboven: de dragende uitslag is een
+     NUL (0 van 8 werkwoorden in alle domeinen, 0 van 496 velden), en een nul
+     ziet er vers en verouderd precies hetzelfde uit. Wie hem citeert zonder
+     zijn stempel te lezen, citeert de dag dat hij is geschreven. */
+  ['CONNECTLUS.json', 'npm run connectlus:vast', 'of de ontdekkingsdomeinen de lus en zijn contentvorm DELEN -- kern/connect/ rust erop, en de uitslag is een nul'],
   /* Derde van deze soort, en de scherpste: hier staan TWEE nullen naast elkaar
      (0 gedeelde velden, 0 werkwoorden in alle mechanismen op naam) en
      REPRESENTATIE.md par. 0 draagt daarop het besluit dat er geen Representation
@@ -500,6 +534,7 @@ const REGISTERS = [
      zo uit als een verse -- en bij twee nullen naast elkaar leest hij ook nog
      eens als bevestiging. */
   ['NAMENSVORM.json', 'npm run namensvorm:vast', 'of de manieren van namens-iemand-handelen een machine delen -- REPRESENTATIE.md par. 0 rust op twee nullen, en die zien er vers en verouderd hetzelfde uit'],
+  ['SPOORVORM.json', 'npm run spoorvorm:vast', 'hoever de zes andere mechanismen van de spoorvorm van kern/vertegenwoordiging/handelen.js staan -- een matrix vol streepjes ziet er vers en verouderd hetzelfde uit, en juist die matrix hoort te veranderen'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
      elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
      alleen nog dat er destijds geen domein ontbrak. */

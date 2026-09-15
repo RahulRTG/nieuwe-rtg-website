@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ontdekken</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- De tokenlaag van ONTWERP.md. Een ontwerpsysteem dat een scherm niet
+     insluit, is voor dat scherm een document en geen systeem; de ratel
+     `schermenZonderVormtaal` in NORM.json telt precies dat, en mag alleen
+     omlaag. Deze pagina stond erbij tot hij hem laadde. -->
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<style>
+  /* Inhoudsvlakken recht (0-4px): HERITAGE.md. De afgeronde vormen wonen in de
+     systeemlagen en niet hier. */
+  .vondst{border:1px solid var(--line);border-radius:0;padding:1rem;margin:.8rem 0;}
+  .vondst h3{font-family:'Bodoni Moda',Georgia,serif;font-size:1.1rem;font-weight:600;
+    margin:0 0 .35rem;line-height:1.3;}
+  .vondst .motor{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);}
+  .vondst .waarom{color:var(--soft);font-size:.84rem;line-height:1.55;margin:.45rem 0 0;}
+  .vondst .dekt{color:var(--soft);font-size:.8rem;line-height:1.5;margin:.45rem 0 0;font-style:italic;}
+  .vondst .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.8rem;}
+  .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
+  .lbl{display:block;margin:.7rem 0 .2rem;font-size:.8rem;color:var(--soft);}
+  .schuifrij{display:flex;align-items:center;gap:.7rem;}
+  .schuifrij input[type=range]{flex:1;}
+  .schuifrij span{font-size:.78rem;color:var(--soft);white-space:nowrap;}
+  .merken{display:flex;gap:.4rem;flex-wrap:wrap;margin:.6rem 0 0;}
+  .merk{border:1px solid var(--line);padding:.3rem .6rem;font-size:.8rem;background:none;
+    color:inherit;cursor:pointer;}
+  .merk[aria-pressed=true]{border-color:var(--goldlicht);}
+  .trede{display:flex;justify-content:space-between;gap:.6rem;font-size:.85rem;
+    padding:.4rem 0;border-top:1px solid var(--line);}
+  .trede em{font-style:normal;color:var(--soft);font-size:.76rem;}
+  .stilmotor{font-size:.82rem;color:var(--soft);line-height:1.5;padding:.35rem 0;
+    border-top:1px solid var(--line);}
+  .genoeg{border-top:1px solid var(--line);margin-top:1.4rem;padding-top:1rem;
+    font-size:.88rem;line-height:1.6;color:var(--soft);}
+  .bewijs{border:1px solid var(--line);border-radius:0;padding:.75rem;margin:.6rem 0;}
+  .bewijs h4{font-family:'Bodoni Moda',Georgia,serif;font-size:1rem;font-weight:600;margin:0;}
+  .bewijs .meta{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);
+    margin:.2rem 0 .4rem;}
+  .bewijs .zegt{font-size:.84rem;line-height:1.55;margin:.2rem 0 0;}
+  .bewijs .nietzegt{font-size:.8rem;line-height:1.5;margin:.35rem 0 0;color:var(--soft);font-style:italic;}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/plek.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-edge-2-context="native-header">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>Ontdekken</h1>
+  <div class="rek"></div>
+  <span class="stil">nieuwsgierigheid, geen tijdlijn</span>
+</header>
+<main id="inhoud">
+  <p class="stil">U komt omdat het leuk is en u gaat weg met iets wat u hebt geleerd, gemaakt of
+  gedaan. Wat hier staat is samengesteld uit lagen die RTG al heeft; er wordt niets bijgemaakt om
+  de lijst vol te krijgen, en de lijst houdt op.</p>
+
+  <!-- DE SECTIES ZIJN DE NAVIGATIE, en dat is geen toeval maar de gedeelde
+       schil: shared/deelmenu.js maakt van elke <section> met een kop een
+       tabblad en toont er een tegelijk. Daar hoort de KEUZE van de koppen bij.
+
+       Het voorstel vroeg om vijf ingangen -- Ontdek, Doe, Samen, Maak, Jij.
+       Er staan er hier VIER, en drie van de vijf ontbreken met opzet: `doe`
+       is vandaag een werkwoord OP een ontdekking en geen eigen wereld, en
+       Samen en Maak hebben nog niets achter zich (CONNECT.md par. 9.3). Vijf
+       tabbladen bouwen waar drie ervan leeg zijn, is het product verzinnen om
+       de navigatie te kunnen tekenen -- en shared/deelmenu.js gooit een deel
+       dat alleen zijn eigen kop draagt er zelf uit, precies om die dode tab te
+       voorkomen. -->
+  <section aria-label="Ontdek">
+    <h2>Ontdek</h2>
+    <div id="lijst"><p class="stil">Laden...</p></div>
+    <p class="genoeg" id="genoeg" hidden></p>
+  </section>
+
+  <!-- HORIZON EN DOSSIER IN EEN SECTIE, want ze gaan over hetzelfde: wat deze
+       mens wil zien en wat hij heeft gedaan. Twee tabbladen zou de vraag "waar
+       stel ik dat in" opsplitsen over twee plekken die allebei "ik" heten. -->
+  <section aria-label="Jij">
+    <h2>Jij</h2>
+    <div class="kaart">
+      <p class="stil" id="horizonUitleg">Laden...</p>
+      <div class="schuifrij">
+        <span>Vertrouwd</span>
+        <input id="schuif" type="range" min="0" max="100" step="5" aria-label="Hoeveel onbekends wilt u zien">
+        <span>Ontdekken</span>
+      </div>
+      <button class="knop mini h-mt90" id="verras">Verras me (eenmalig)</button>
+      <label class="lbl" for="plaats">Wat gebeurt er dichtbij? Geef uw plaats op.</label>
+      <input id="plaats" maxlength="40" placeholder="Bijvoorbeeld Haarlem">
+      <p class="stil" id="plaatsNoot"></p>
+      <p class="lbl">Onderwerpen waar RTG vandaag een brug vanaf kent:</p>
+      <div class="merken" id="onderwerpen"></div>
+      <p class="lbl">Wat u zelf hebt aangegeven:</p>
+      <div id="mijnOnderwerpen"><p class="stil">Nog niets.</p></div>
+    </div>
+
+    <h3 class="h-mt90">Wat u hebt gedaan</h3>
+    <div class="kaart">
+      <div id="dossier"><p class="stil">Laden...</p></div>
+      <p class="stil" id="dossierNoot"></p>
+    </div>
+
+    <h3 class="h-mt90">Wat u kunt laten zien</h3>
+    <div class="kaart">
+      <p class="stil">Uw bewijsstukken, nieuwste eerst. Bij elk staat wat het zegt, wat het
+      <em>niet</em> zegt, en hoe hard het is: u zelf gezegd, door het systeem gezien, of door iemand
+      anders bevestigd.</p>
+      <button class="knop mini" id="werkBij">Mijn eigen werk erbij halen</button>
+      <div id="portfolio"><p class="stil">Laden...</p></div>
+      <p class="stil" id="portfolioNoot"></p>
+    </div>
+  </section>
+
+  <section aria-label="Waarom ziet u dit">
+    <h2>Waarom dit?</h2>
+    <div class="kaart">
+      <p class="stil">Er is hier niet een aanbevelingsmachine maar een aantal, die om een plek
+      dingen. Uw horizon hierboven verdeelt die plekken; er wordt niets gewogen, gescoord of
+      gesorteerd. Welke motoren er zijn en welke er vandaag naar niets kijken:</p>
+      <div id="motoren"></div>
+    </div>
+  </section>
+
+  <section aria-label="Wat hier niet staat">
+    <h2>Nog niet hier</h2>
+    <div class="kaart">
+      <p class="stil">Geen likes, geen volgers, geen streaks en geen niveau. Wat u hebt gedaan
+      staat hierboven als een lijst en nooit als cijfer; er wordt niets van u met iemand anders
+      vergeleken, ook niet verborgen als sorteervolgorde. Wat u hebt bekeken maar niet aangeraakt,
+      hoe lang u keek en wanneer u keek, wordt niet vastgelegd.</p>
+      <p class="stil">Delen, maken en samenwerken hebben hier nog geen knop. Die drie bereiken een
+      tweede mens, en zoiets wordt in dit huis klaargezet en nooit automatisch verstuurd; de
+      bevestigingsstap eromheen is nog niet gebouwd. Een knop die alvast publiceert, zou die
+      belofte breken voordat hij bestaat.</p>
+    </div>
+  </section>
+
+  <div id="grens" class="rtgdeel-vast"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => Veilig.esc(String(s == null ? '' : s));
+  let staat = { schuif: 40, verras: false };
+
+  function tekenVondst(p) {
+    const o = p.ontdekking;
+    return '<div class="vondst">' +
+      '<p class="motor">' + esc(o.soort) + ' &middot; ' + esc(o.onderwerp) + '</p>' +
+      '<h3>' + esc(o.titel) + '</h3>' +
+      '<p class="waarom">' + esc(p.waarom) + '</p>' +
+      (o.zekerheid ? '<p class="dekt">' + esc(o.zekerheid) + '</p>' : '') +
+      '<p class="dekt">' + esc(o.dektNiet) + '</p>' +
+      '<div class="rij">' +
+        '<button class="knop mini" data-open="' + esc(o.ingang) + '" data-id="' + esc(o.id) + '" ' +
+          'data-onderwerp="' + esc(o.onderwerp) + '" data-herkomst="' + esc(o.herkomst) + '">Bekijken</button>' +
+        '<button class="knop mini" data-meer="' + esc(o.onderwerp) + '">Meer hiervan</button>' +
+        '<button class="knop mini" data-minder="' + esc(o.onderwerp) + '">Minder</button>' +
+        '<button class="knop mini" data-snap="' + esc(o.onderwerp) + '">Dit snap ik</button>' +
+      '</div></div>';
+  }
+
+  function teken(d) {
+    const el = $('#lijst');
+    el.innerHTML = d.plekken.length
+      ? d.plekken.map(tekenVondst).join('')
+      : '<p class="stil">Er is nu niets voor u. Zeg hieronder waar u nieuwsgierig naar bent, ' +
+        'dan heeft de volgende keer meer om mee te werken.</p>';
+    $('#genoeg').textContent = d.genoeg || '';
+    $('#genoeg').hidden = !d.genoeg;
+    $('#plaatsNoot').textContent = d.plaatsGevraagd || '';
+
+    /* Openen brengt de mens ERHEEN en voert niets uit. De trede "gezien" wordt
+       bij het openen geschreven en niet bij het tonen: een dossier dat volloopt
+       met alles wat langskwam, meet aandacht en geen leren. */
+    el.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await Veilig.api('/api/connect/open', { id: b.dataset.id,
+          onderwerp: b.dataset.onderwerp, herkomst: b.dataset.herkomst });
+      } catch (e) { /* de ingang gaat voor: een spoor dat niet lukt, houdt de mens niet tegen */ }
+      window.location.href = b.dataset.open;
+    }));
+    for (const [attr, welk] of [['data-meer', 'meer'], ['data-minder', 'minder'], ['data-snap', 'ken']]) {
+      el.querySelectorAll('[' + attr + ']').forEach(b => b.addEventListener('click', async () => {
+        const onderwerp = b.getAttribute(attr);
+        try {
+          await Veilig.api('/api/connect/signaal', { onderwerp, signaal: welk });
+          Veilig.melding('Genoteerd. Dit stuurt wat u ziet en niets anders.');
+          laad();
+        } catch (e) { Veilig.melding(e.message); }
+      }));
+    }
+  }
+
+  function tekenMotoren(m) {
+    $('#motoren').innerHTML = m.map(x =>
+      '<p class="stilmotor"><b>' + esc(x.naam) + '</b> &mdash; ' + esc(x.grond) +
+      (x.aangesloten ? '' : '<br><i>' + esc(x.reden) + '</i>') + '</p>').join('');
+  }
+
+  function tekenHorizon(h, kandidaten) {
+    $('#horizonUitleg').textContent = h.uitleg || '';
+    $('#schuif').value = h.schuif;
+    staat.schuif = h.schuif;
+    $('#onderwerpen').innerHTML = (kandidaten || []).map(o =>
+      '<button class="merk" data-kies="' + esc(o) + '">' + esc(o) + '</button>').join('');
+    $('#onderwerpen').querySelectorAll('[data-kies]').forEach(b => b.addEventListener('click', async () => {
+      try { await Veilig.api('/api/connect/signaal', { onderwerp: b.dataset.kies, signaal: 'meer' }); laad(); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    $('#mijnOnderwerpen').innerHTML = h.onderwerpen && h.onderwerpen.length
+      ? h.onderwerpen.map(o => '<p class="trede"><span>' + esc(o.onderwerp) + '</span>' +
+          '<em>' + (o.gewicht > 0 ? 'meer' : 'minder') + '</em></p>').join('')
+      : '<p class="stil">Nog niets.</p>';
+  }
+
+  /* De graad in woorden. Hij staat op het scherm omdat het verschil tussen "ik
+     zeg dat ik het snap" en "iemand anders zei dat hij erdoor geholpen is" het
+     hele punt van deze lijst is -- zonder dat verschil is het weer een stapel
+     vinkjes. */
+  const GRAAD = { vermoed: 'u zelf gezegd', gemeten: 'door het systeem gezien',
+    bewezen: 'door iemand anders bevestigd' };
+
+  function tekenPortfolio(p) {
+    $('#portfolio').innerHTML = p.bewijzen && p.bewijzen.length
+      ? p.bewijzen.map(b => '<div class="bewijs">' +
+          '<p class="meta">' + esc(b.onderwerp) + ' &middot; ' + esc(GRAAD[b.graad] || b.graad) + '</p>' +
+          '<h4>' + esc(b.naam) + '</h4>' +
+          '<p class="zegt">' + esc(b.stelt) + '</p>' +
+          '<p class="nietzegt">Zegt niet: ' + esc(b.nietZegt) + '</p>' +
+        '</div>').join('')
+      : '<p class="stil">Hier komen uw bewijsstukken. Iets maken telt, en iets waar een ander mens ' +
+        'daadwerkelijk mee heeft gewerkt telt het zwaarst.</p>';
+    $('#portfolioNoot').textContent = (p.nietGeteld || '') + ' ' + (p.uitgang || '');
+  }
+
+  function tekenDossier(d) {
+    $('#dossier').innerHTML = d.perOnderwerp && d.perOnderwerp.length
+      ? d.perOnderwerp.map(p => '<p class="trede"><span>' + esc(p.onderwerp) + '</span>' +
+          '<span>' + esc(p.naam) + ' <em>' + esc(p.graad) + '</em></span></p>').join('')
+      : '<p class="stil">Hier komt te staan wat u hebt gezien, begrepen, geoefend, gemaakt en ' +
+        'doorgegeven. Per onderwerp, op volgorde van het alfabet en niet van hoogte.</p>';
+    $('#dossierNoot').textContent = d.nietGemeten || '';
+  }
+
+  async function laad() {
+    const plaats = ($('#plaats').value || '').trim();
+    try {
+      const d = await Veilig.api('/api/connect/ontdek', { plaats, verras: staat.verras });
+      staat.verras = false;
+      teken(d);
+      tekenMotoren(d.motoren || []);
+      /* EEN keer tekenen en niet twee. Hier stond `tekenHorizon(d.horizon)`
+         met daar direct achter dezelfde aanroep op het verse antwoord: het
+         eerste beeld werd binnen dezelfde tik overschreven. Het ontdek-antwoord
+         draagt namelijk wel de SCHUIF maar niet de onderwerpen van de mens, dus
+         de volledige stand komt van /horizon -- en dan is de eerste tekening
+         werk dat niemand ziet, met een zichtbare sprong in de schuifbalk als
+         het tweede antwoord traag is. */
+      tekenHorizon(await Veilig.api('/api/connect/horizon'), d.onderwerpenDieBruggenKennen);
+      tekenDossier(await Veilig.api('/api/connect/dossier'));
+      tekenPortfolio(await Veilig.api('/api/connect/portfolio'));
+    } catch (e) {
+      $('#lijst').innerHTML = '<p class="stil">' + esc(e.message) + '</p>';
+    }
+  }
+
+  function start() {
+    $('#schuif').addEventListener('change', async () => {
+      try { await Veilig.api('/api/connect/schuif', { schuif: Number($('#schuif').value) }); laad(); }
+      catch (e) { Veilig.melding(e.message); }
+    });
+    /* "Verras me" verzet de instelling NIET -- hij geldt voor dit ene verzoek.
+       Een knop die stilletjes je instelling verandert, is een val. */
+    $('#verras').addEventListener('click', () => { staat.verras = true; laad(); });
+    $('#plaats').addEventListener('change', laad);
+    /* Een HANDELING en geen lezing: het dossier haalt dit niet stilzwijgend op
+       bij het openen van het scherm. Zie de kop van kern/connect/werkbij.js. */
+    $('#werkBij').addEventListener('click', async () => {
+      try {
+        const r = await Veilig.api('/api/connect/werk');
+        Veilig.melding(r.nieuw && r.nieuw.length
+          ? r.nieuw.length + ' bewijsstuk(ken) erbij uit uw eigen werk.'
+          : (r.geenBron ? r.reden : 'Er kwam niets nieuws bij; wat er is, stond er al.'));
+        laad();
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    laad();
+  }
+
+  if (document.readyState !== 'loading') start();
+  else window.addEventListener('load', start);
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

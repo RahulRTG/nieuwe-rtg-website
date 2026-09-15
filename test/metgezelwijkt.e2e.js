@@ -30,7 +30,7 @@ const rahulStaat = () => {
 };
 
 const edgeStaat = () => {
-  const balk = document.querySelector('.rtg-edge-bottom');
+  const balk = document.querySelector('.rtg-adaptive-bar');
   if (!balk) return { roots: 0, balk: 'geen', venster: false };
   const stijl = getComputedStyle(balk), r = balk.getBoundingClientRect();
   const zichtbaar = stijl.display !== 'none' && stijl.visibility !== 'hidden' &&
@@ -75,6 +75,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     await page.waitForFunction(() => !!document.querySelector('.rtg-rahul-tab'), null, { timeout: 20000 });
     await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-rendered') === 'true',
       null, { timeout: 20000 });
+    await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar');
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'in rust is de centrale Rahul-tab bereikbaar');
     assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'zichtbaar', venster: false },
       'in rust staat exact het ene Edge-casco klaar');
@@ -129,6 +130,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'na de workspace blijft de tab bereikbaar');
 
     // het blad openen zoals een lid dat doet
+    await require('./helper').edgeActies(page);
     await page.click('.rtg-edge-action button');
     await page.waitForSelector('#studio.open', { timeout: 5000 });
     await page.waitForFunction(() => document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
@@ -146,6 +148,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'en daarna is Rahul direct weer bereikbaar');
     assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'zichtbaar', venster: false },
       'na sluiten komt dezelfde Edge terug');
+    await page.keyboard.press('Escape');
 
     /* Twee keer achter elkaar, want een wijk-regel die maar een keer werkt is
        net zo goed stuk -- en dan via een ANDER blad, zodat het niet aan dat
@@ -167,6 +170,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     await page.setViewportSize({ width: 390, height: 844 });
     assert.equal(await page.locator('#studioOpen').isVisible(), false,
       'ook mobiel staat de oude duimstrook niet naast de Edge-onderrand');
+    await require('./helper').edgeActies(page);
     await page.click('.rtg-edge-action button');
     await page.waitForFunction(() => document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
     assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'weg', venster: true },

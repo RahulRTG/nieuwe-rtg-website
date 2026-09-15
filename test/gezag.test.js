@@ -283,14 +283,23 @@ test('importeren is NIET genoeg: een kale trede naast de import telt gewoon mee'
   });
 });
 
-test('server/kern/stuur.js blijft ongemoeid: hij leest zijn eigen, geimporteerde schaal', () => {
+test('het stuur blijft ongemoeid: het leest zijn eigen, geimporteerde schaal', () => {
   /* Dit is de valse positieve die de eerste versie van de meter maakte, met naam
-     vastgelegd zodat hij niet terugkomt. 'verboden' staat in twee schalen. */
+     vastgelegd zodat hij niet terugkomt. 'verboden' staat in twee schalen.
+
+     DE AANNAME IS VERHUISD EN DE BEWERING NIET. De vergelijking tegen de schaal
+     woont sinds de mandaatpoort in kern/stuur/toets.js -- kern/stuur.js ging
+     door de 10 KB van keuringsregel 13 en is gesplitst op de naad
+     BESLISSEN/DOEN. Wat deze toets beweert is onveranderd (wie een schaal
+     IMPORTEERT is geen eigen schaal), dus staan nu BEIDE bestanden in de
+     bewering: het afgesplitste bestand erft de dekking in plaats van er
+     buiten te vallen. */
   const r = draai(['--lijst']);
-  assert.doesNotMatch(r.uit, /server\/kern\/stuur\.js\s/,
-    'stuur.js haalt zijn tredes uit stuur/beleid.js en hoort hier niet te staan');
-  const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/stuur.js'), 'utf8');
-  assert.ok(bron.includes("require('./stuur/beleid')"), 'de aanname onder deze toets: stuur.js haalt zijn schaal op');
+  for (const bestand of ['server/kern/stuur.js', 'server/kern/stuur/toets.js'])
+    assert.doesNotMatch(r.uit, new RegExp(bestand.replace(/[.\/]/g, '\\$&') + '\\s'),
+      bestand + ' haalt zijn tredes uit stuur/beleid.js en hoort hier niet te staan');
+  const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/stuur/toets.js'), 'utf8');
+  assert.ok(bron.includes("require('./beleid')"), 'de aanname onder deze toets: de poortwacht haalt zijn schaal op');
   assert.ok(bron.includes('niveau === NIVEAUS.verboden'), 'en vergelijkt er ook echt tegen');
 });
 

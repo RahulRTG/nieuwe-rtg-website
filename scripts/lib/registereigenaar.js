@@ -56,9 +56,35 @@ const EIGENAAR = {
      en worden door precies een script geschreven; ze staan hier zodat het getal
      van toets 4 daalt doordat er eigenaren bijkomen, en niet stijgt doordat er
      registers bijkomen zonder dat iemand zegt wie ze bezit. */
+  /* HET VERANDERBEREIK. Een schrijver, een ratel (veranderbereikZonderBereik in
+     scripts/lib/metingen.js) en een ijkproef in test/meterijk.test.js. Hij staat
+     hier om dezelfde reden als de twee hieronder: het getal van toets 4 hoort te
+     dalen doordat er eigenaren bijkomen, niet te stijgen doordat er registers
+     bijkomen zonder dat iemand zegt wie ze bezit. */
+  'VERANDERBEREIK.json': { schrijver: 'scripts/veranderbereik.js' },
   'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
+  'STEMPELVEILIGHEID.json': { schrijver: 'scripts/stempelveiligheid.js' },
+
+  /* De persoonlijke laag (NEIGING.md par. 0). Eén schrijver, en hij draagt twee
+     ratels in scripts/lib/metingen.js -- staat hij hier niet, dan stijgt het
+     getal van toets 4 doordat er een register bijkomt zonder dat iemand zegt wie
+     het bezit, en dat is precies wat die toets moet tegenhouden. */
+  'NEIGINGVORM.json': { schrijver: 'scripts/neigingvorm.js' },
+
+  /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
+     bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie
+     hieronder vindt hem niet (het doel staat in een `const DOEL` die via
+     path.join is opgebouwd) -- precies de ondergrens die de kop beschrijft. */
+  'STILLEZING.json': { schrijver: 'scripts/stillezing.js' },
+
+  /* Foundation Connect (CONNECT.md par. 1). Hij meet of de ontdekkingsdomeinen
+     de lus DELEN, en op die nul rust het besluit dat kern/connect/ een
+     projectie wordt en geen gedeeld inhoudstype. Een eigen ratel in
+     scripts/lib/metingen.js (`connectDomeinenGemeten`, het BEREIK) met een
+     ijking in test/meterijk.test.js. */
+  'CONNECTLUS.json': { schrijver: 'scripts/connectlus.js' },
 
   /* De lagen die in deze tak zijn gebouwd. */
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
@@ -99,12 +125,23 @@ const EIGENAAR = {
       'namens-iemand-handelen een vorm en een woordenschat? Geschreven met --vastleggen, ' +
       'gelezen door test/namensvorm.test.js, scripts/norm.js (de ratel namensMechanismenGemeten) ' +
       'en scripts/getallen.js (zeven levende getallen in het document).' },
+  'SPOORVORM.json': { schrijver: 'scripts/spoorvorm.js',
+    waarom: 'de convergentiematrix achter REPRESENTATIE.md par. 8.1: hoeveel van de zeven ' +
+      'mechanismen halen de vier spoor-eigenschappen die kern/vertegenwoordiging/handelen.js ' +
+      'definieert? Geschreven met --vastleggen, gelezen door test/spoorvorm.test.js en ' +
+      'scripts/norm.js (de ratel spoorConvergent, die alleen omhoog mag).' },
   /* DE ONDERNEMERSLUS. Hij staat hier omdat toets 4 dat zo bedoelt: het aantal
      registers zonder eigenaar hoort te dalen doordat er eigenaren bijkomen, en
      niet te stijgen doordat er registers bijkomen. Een nieuw register zonder
      regel hier zou die vloer optillen, en dat is precies de beweging die de
      ratel moet tegenhouden -- ook (juist) als het je eigen register is. */
   'ONDERNEMERSLUS.json': { schrijver: 'scripts/ondernemerslus.js' },
+
+  /* Om dezelfde reden als hierboven: dit register komt met de tak die hem meet,
+     dus de vloer optillen zou hier het goedkoopst zijn en het minst verdiend. */
+  'KETENBEREIK.json': { schrijver: 'scripts/ketenbereik.js' },
+  'PAKTEBETEKENIS.json': { schrijver: 'scripts/paktebetekenis.js' },
+  'MANDAATPROEF.json': { schrijver: 'scripts/mandaatproef.js' },
 };
 
 /* MEETING: welk script schrijft aantoonbaar naar een wortelregister? Ondergrens,

@@ -124,6 +124,7 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-vracht').SLEUTELS,
   require('./idemsleutels-rtgid').SLEUTELS,
   require('./idemsleutels-salon').SLEUTELS,
+  require('./idemsleutels-connect').SLEUTELS,
   /* De restbak: de laatste 27 uit de bron verklaard (89a36fcac). Deze regel
      verdween in de samenvoeging van twaalf PR's (2 september 2026) en dertig
      verklaringen lagen ongelezen naast het register; het bestand exporteert
@@ -148,6 +149,11 @@ Object.assign(SLEUTELS,
      tekst draagt. Waarom `velden` en niet `zelfdeVerzoek`, en waarom `/weg`
      hierdoor een ander ANTWOORD geeft, staat in de kop van dat bestand. */
   require('./idemsleutels-ondernemerslus').SLEUTELS,
+  /* Neiging: lezen en vastleggen. Intake speelt geen oude vraag terug;
+     het deelbestand verklaart waarom hetzelfde lege verzoek nieuw werk is. */
+  require('./idemsleutels-neiging').SLEUTELS,
+  /* Reisbetalingen verklaren hun eigen replay-antwoorden in het deelbestand. */
+  require('./idemsleutels-reisherkomst').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:

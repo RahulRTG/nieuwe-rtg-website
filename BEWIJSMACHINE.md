@@ -659,6 +659,115 @@ duwt maakt het huis slechter en de meter groener, en dat is precies de faalvorm
 waar dit hoofdstuk over gaat. Tot de verklaring per generator een besluit is, is
 `npm run meterklasse` een commando dat je draait en geen getal dat meetelt.
 
+## 6b. De eigen state van de bewijsmachine
+
+Par. 6a gaat over metingen die het verkeerde experiment uitvoeren. Dit gaat over
+iets wat een laag eronder zit en dat niemand had opgeschreven: **hoe de
+bewijsmachine haar eigen toestand publiceert en terugleest.** Twee regels, en
+allebei komen ze uit een fout die hier op 15 september 2026 echt is gemaakt.
+
+### BM-A. Een bewijsregister mag nooit in een tussenstaat waarneembaar zijn
+
+`scripts/lib/afbouw-afloop.js` schreef de afloop van een bronmuterende ronde met
+een kale `writeFileSync`. Die maakt het bestand eerst (of kapt het af op nul) en
+vult het daarna, dus er is een venster waarin de afloop **wel bestaat en niet
+parseert**. Gemeten met een schrijver en een lezer drie seconden naast elkaar, op
+een afloop van de maat die die laag echt schrijft:
+
+| | lezingen | gescheurd |
+|---|---|---|
+| kale `writeFileSync` | 133.196 | **110.390** |
+| `tmp` + `renameSync` | 34.480 | **0** |
+
+Dat is geen randgeval maar de normale toestand tijdens het schrijven. De regel
+die eruit volgt: een nieuwe toestand wordt **volledig gepubliceerd of helemaal
+niet** -- schrijven naar een buurbestand en dan hernoemen, zodat een lezer de
+oude toestand ziet of de nieuwe, nooit een halve.
+
+**Wie handhaaft hem: niemand, en dat staat hier liever dan een schijnbewaker.**
+De regel geldt namelijk niet voor alle registers. Verreweg de meeste worden
+geschreven terwijl niemand ze leest, en daar is een kale schrijf onschadelijk.
+Het bereik van BM-A is **bewijsstate die gelezen kan worden terwijl zij wordt
+geschreven** -- de afloop van het afbouwslot, de journalen, de eigenaarssleutel.
+Welke bestanden dat precies zijn, is vandaag niet gemeten, en een ratel over alle
+187 schrijvende scripts zou op het verkeerde duwen: precies de faalvorm die par.
+6a.2 bij `METERKLASSE.json` beschrijft. De verklaring per generator die daar
+openstaat, hoort deze vraag mee te beantwoorden.
+
+### BM-B. Onleesbaar is niet afwezig
+
+De tweede helft is groter, want zij gaat over de LEZER. `lees()` in datzelfde
+bestand gaf bij een parsefout `null`, en `null` betekent in die laag "er loopt
+geen ronde". Het slot dat een tweede bronmuterende ronde moet tegenhouden, ging
+dus open omdat het bewijs onleesbaar was. Bewijs- en gezagsinformatie kent drie
+toestanden en geen twee:
+
+| | |
+|---|---|
+| **BESTAAT + GELDIG** | er staat iets, en het is te vertrouwen |
+| **BESTAAT + ONGELDIG** | er staat iets, en het is stuk |
+| **BESTAAT NIET** | er staat niets |
+
+Wie de tweede op de derde laat vallen, maakt van een **kapot** register een
+**leeg** register -- en leeg betekent in dit huis bijna overal *geen beperking*:
+geen besluit, geen grens, geen lopende ronde, geen schuld. Een gescheurde lezing
+wordt dan een vrijbrief, en in de bron ziet dat eruit als zorgvuldigheid.
+
+**Dit is wel gemeten** (`npm run stillezing`, `STILLEZING.json`). De meter is de
+spiegel van `STILSPOOR.json`: die telt SCHRIJVERS wier falen wordt opgegeten,
+deze telt LEZERS die het onderscheid verliezen. De eerste verliest bewijs, de
+tweede kan een poort laten opengaan; ze worden nooit opgeteld.
+
+| | `server/` | `scripts/` |
+|---|---|---|
+| bewijslezingen (bereik) | 75 | 442 |
+| met een vanger eromheen | 9 | 95 |
+| **smelt samen** (schuld) | **5** | **61** |
+| zegt het erbij | 1 | 10 |
+| **onderscheidt ongeldig** | **0** | 3 |
+| gooit door (fail-closed) | 2 | 2 |
+| anders (vraagt een mens) | 1 | 19 |
+
+**De twee kolommen worden nooit opgeteld**, en dat is geen netheid: in `server/`
+laat zo'n lezing een HANDELING door, in `scripts/` laat zij een METING liegen.
+Een som is een getal waarop niemand kan sturen.
+
+Het scherpste getal is de nul: **in de hele runtime is er geen enkele lezer die
+een kapot bewijs onderscheidt van een afwezig bewijs.** Alle drie de
+onderscheiders wonen in `scripts/` -- in de meters, niet in de code die een
+handeling tegenhoudt.
+
+**En het is een triagelijst, geen foutenlijst.** De vijf in `server/` zijn met de
+hand nagelopen, en twee dragen hun eigen verklaring in hetzelfde bestand:
+`routes/office/dekking.js` zegt er letterlijk bij *"een onleesbaar bewijsstuk is
+geen bewijs"* en toont dan "niet gemeten" in plaats van 0% of 100%, en
+`kern/isolatie/proefmeting.js` zegt in zijn kop dat niet-gemeten in beide
+aanroepers tot de STRENGSTE uitkomst leidt. Dat zijn geen gebreken maar de juiste
+uitkomst onder dezelfde vorm. De andere drie (`kern/handelingsklasse/omkeerbaar.js`,
+`kern/stuur/gevolg.js`, `routes/office/register.js`) dragen geen verklaring.
+
+Daarbij hoort dezelfde afspraak als bij `STILSPOOR`: een besluitregister naast de
+meting, en het bestaat nog niet omdat er nog geen besluit is genomen. Een besluit
+trekt nooit van `stilLezing` af.
+
+### Wat het bouwen van die meter zelf blootlegde
+
+Drie dingen, en ze horen bij par. 6a:
+
+1. **`onderscheidt` stond op nul en dat kon niet anders.** `deelIn()` had vier
+   uitgangen en die categorie zat er niet bij, terwijl `scripts/codewereld.js`
+   hem aantoonbaar invult. De meter meldde dus een eigenschap van zichzelf als
+   een eigenschap van het huis. Er staat nu een ijking in die eist dat alle vijf
+   uitgangen bereikbaar zijn; zakt die, dan weigert de meter te tellen.
+2. **Elk gemeld adres was fout.** `zonderCommentaar()` KORT de bron in, dus een
+   regelnummer uit de gestripte tekst wijst in het echte bestand naar iets
+   anders. Dit huis had dat al opgelost (`{ regelsHeel: true }` slaat commentaar
+   plat in plaats van weg) en `stilspoor.js` gebruikte het al; ik niet.
+3. **De meter verwijst naar zichzelf en convergeert in één stap.** Zodra
+   `STILLEZING.json` bestaat, tellen de lezingen die zijn naam noemen mee: het
+   bereik ging 439 → 442 en bleef daarna over drie rondes staan. Wie hem voor het
+   eerst vastlegt, draait `--vastleggen` dus twee keer.
+
 ## 7. Wat dit niet wordt
 
 - **Geen enkel groen woord bovenaan.** `LAT.md` regel 11 en `check.js` regel 48

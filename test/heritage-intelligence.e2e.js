@@ -27,18 +27,14 @@ async function mode(page, value) {
 }
 
 async function visibleKey(page) {
+  await require('./helper').edgeActies(page);
   await page.waitForSelector(KEY, { state: 'visible', timeout: geduld(10000) });
 }
 
 async function openEdgeMenu(page) {
-  const menu = page.locator('.rtg-edge-menu');
-  if (!await menu.isVisible()) {
-    const state = await page.getAttribute('body', 'data-rtg-edge-2-state');
-    const reveal = state === 'compact' ? '.rtg-edge-2-edge-reveal--top' : '.rtg-edge-2-reveal';
-    await page.locator(reveal).click();
-    await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-state') === 'overview');
-  }
-  await menu.click();
+  const menu = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
+  if (!await menu.isVisible()) await mode(page, 'overview');
+  await menu.waitFor({ state: 'visible' }); await menu.click();
 }
 
 async function bounds(page, selector) {
@@ -303,6 +299,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
           animation.playState !== 'running' || animation.effect.getComputedTiming().iterations === Infinity),
         null, { timeout: geduld(6000) });
         for (const selector of [KEY, '.rtg-dashboard-hero-cta', '[data-paneel="alles"]']) {
+          if (selector !== KEY) await page.keyboard.press('Escape');
           await page.mouse.move(2, 500);
           const before = await bounds(page, selector);
           await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);

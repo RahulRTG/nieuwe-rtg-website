@@ -269,6 +269,9 @@
       "voorstelLees",
       "werkOverzicht"
     ],
+    "connect": [
+      "connect"
+    ],
     "consent": [
       "commercieelStand",
       "commercieelZet",
@@ -607,6 +610,7 @@
       "rampbeeld",
       "redactie",
       "reisaanbod",
+      "reisbetaling",
       "reisbureau",
       "reisuitnodiging",
       "salonUitlichten",
@@ -1130,6 +1134,7 @@
       "reisItemWeg",
       "reisWeg",
       "reisZet",
+      "reisbetaling",
       "reisbieb",
       "reisbureau",
       "reiswijzer",
@@ -1344,6 +1349,9 @@
       "navPoi",
       "navRoute",
       "navStatus"
+    ],
+    "neiging": [
+      "neiging"
     ],
     "noodkaart": [
       "noodkaartVan",

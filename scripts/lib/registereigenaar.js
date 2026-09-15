@@ -60,6 +60,12 @@ const EIGENAAR = {
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
 
+  /* De persoonlijke laag (NEIGING.md par. 0). Eén schrijver, en hij draagt twee
+     ratels in scripts/lib/metingen.js -- staat hij hier niet, dan stijgt het
+     getal van toets 4 doordat er een register bijkomt zonder dat iemand zegt wie
+     het bezit, en dat is precies wat die toets moet tegenhouden. */
+  'NEIGINGVORM.json': { schrijver: 'scripts/neigingvorm.js' },
+
   /* De lagen die in deze tak zijn gebouwd. */
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },

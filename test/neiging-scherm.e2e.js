@@ -16,7 +16,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { laadScherm, startServer, stop, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { laadScherm, startServer, stop, browserOpties, geenBrowser, letOpFouten,
+  wachtTot, wachtOpVerandering, wachtOpRust, klikEnWacht } = require('./helper');
 /* De EIGEN keuring van dit huis, dezelfde BRON die scripts/a11y.js injecteert.
    Geen tweede contrastregel ernaast: dan zeggen twee meters iets anders over
    dezelfde kleur, en de poort van de keten is degene die telt. */
@@ -49,6 +50,26 @@ async function metLid(fn, breedte = 390, hoogte = 844) {
     const fouten = letOpFouten(page, []);
     await page.goto(base + '/apps/mijn-neigingen.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.vraagkaart', { timeout: 20000 });
+    /* EN WACHTEN TOT DE SCHIL ZELF KLAAR IS, niet alleen het werkblad.
+
+       Dit is de race die de vaste wachttijden toedekten, precies zoals de kop
+       van scripts/klokwacht.js voorspelt. `.vraagkaart` is van DIT scherm; de
+       Rahul-tab komt uit de gedeelde schil en zijn kleur wordt daarna nog een
+       keer gezet door shared/rahul-tab/inkt.js -- die meet de grond en kiest de
+       inkt, want er bestaat geen vast grijs dat op een lichte en een donkere
+       balk allebei 4,5:1 haalt. Tot dat script heeft gedraaid staat er nog het
+       basisgrijs #746D67 uit style-base.js, en dat haalde op de grond van dit
+       scherm 1,63:1.
+
+       De contrasttoets keurde dus een scherm dat nog niet af was. Met
+       `waitForTimeout(600)` erin viel dat niet op omdat de schil er meestal
+       binnen die 600ms was -- meestal, en dat is precies het woord waarom een
+       vaste tijd geen wacht is. De toestand waar het echt om gaat is: heeft
+       inkt.js zijn kleur gezet? Dat is te zien, want hij zet hem INLINE. */
+    await wachtTot(page, () => {
+      const tab = document.querySelector('.rtg-rahul-tab');
+      return !!tab && !!tab.style.color;
+    }, null, { wat: 'de inkt van de Rahul-tab (shared/rahul-tab/inkt.js)' });
     await fn(page, fouten, base);
   } finally {
     if (browser) await browser.close();
@@ -56,11 +77,64 @@ async function metLid(fn, breedte = 390, hoogte = 844) {
   }
 }
 
+/* WACHTEN OP EEN TOESTAND EN NOOIT OP EEN TIJD.
+
+   Hier stond vijf keer `waitForTimeout(600)` -- en test/klokwacht.test.js zakte
+   daarop, terecht. Een vaste tijd is een gok die twee kanten op fout gaat: op
+   een trage runner is 600ms te kort en zakt de toets zonder dat er iets stuk
+   is, op een snelle is het verspilde tijd. Beide keren meet je de machine in
+   plaats van het scherm.
+
+   Wat er in de plaats komt zijn VIER wachten, en dat aantal is geen slordigheid
+   maar de uitslag: het scherm doet na een klik vier dingen, en de vaste tijd
+   dekte er drie van toe. Ze staan uitgeschreven bij `verder()` hieronder en bij
+   de schilwacht in `metLid()` hierboven. Wie ze terugbrengt tot een enkele
+   wacht, keurt een scherm dat nog niet af is. */
+async function vraagTekst(page) {
+  const el = page.locator('.vraagkaart p.vraag').first();
+  if (!(await el.count())) return '';
+  return String(await el.textContent()).replace(/\s+/g, ' ').trim();
+}
+
+/* Verder, en pas terug als het scherm werkelijk verder IS. De volgende vraag en
+   het slotscherm staan allebei in `.vraagkaart p.vraag`, dus een verandering
+   van die tekst dekt beide uitgangen -- ook de laatste ronde, waar er geen
+   volgende vraag meer komt. */
+async function verder(page) {
+  const voor = await vraagTekst(page);
+  /* DRIE WACHTEN EN NIET EEN, want een klik op Verder zet DRIE dingen in gang.
+     Dat is geen omslachtigheid maar de tweede race die de vaste wachttijd
+     toedekte, en hij staat in de bron van het scherm zelf:
+
+         const r = await api('/api/neiging/antwoord', ...);
+         toonIntake(r.body);
+         laadGeheugen();          <-- GEEN await
+
+     `laadGeheugen()` haalt /api/neiging/geheugen op en hangt dus NA de
+     vraagwissel nog in de lucht. Wie alleen op het antwoord wacht, of alleen op
+     de nieuwe vraag, kijkt naar een geheugenlijst die nog van voor de klik is.
+     Met `waitForTimeout(600)` viel dat niet op omdat die tweede aanroep er
+     meestal binnen die 600ms was -- en "meestal" is precies waarom een vaste
+     tijd geen wacht is. De toets die eronder sneuvelde was niet de contrasttoets
+     maar 'vergeten haalt de regel van het scherm': die telde nul regels op een
+     scherm waar er een hoorde te staan, en gaf als reden "voorwaarde: er staat
+     iets in het geheugen".
+
+     De tweede aanroep wordt daarom OPGEVANGEN VOORDAT er geklikt wordt -- daarna
+     is hij misschien al langs. En het opvangen van het antwoord is niet genoeg:
+     het tekenen gebeurt pas erna, dus de rust van #geheugen sluit de rij. */
+  const geheugen = page.waitForResponse(
+    (r) => r.url().includes('/api/neiging/geheugen'), { timeout: 20000 });
+  await klikEnWacht(page, '.door', '/api/neiging/antwoord');
+  await wachtOpVerandering(page, '.vraagkaart p.vraag', voor);
+  await geheugen;
+  await wachtOpRust(page, '#geheugen', { rondes: 2 });
+}
+
 /* Een ronde: kies de eerste optie en ga verder. */
 async function ronde(page) {
   await page.locator('.keuze').first().click();
-  await page.locator('.door').click();
-  await page.waitForTimeout(600);
+  await verder(page);
 }
 
 test('het scherm van RTG Neiging', { skip: geenBrowser(pw), concurrency: false }, async (t) => {
@@ -77,8 +151,7 @@ test('het scherm van RTG Neiging', { skip: geenBrowser(pw), concurrency: false }
       assert.equal(await page.locator('.keuze').first().getAttribute('aria-pressed'), 'true',
         'een tik hoort zichtbaar te blijven staan');
 
-      await page.locator('.door').click();
-      await page.waitForTimeout(600);
+      await verder(page);
       assert.equal(await page.locator('.neiging').count(), 1,
         'na het eerste antwoord hoort er een regel in het geheugen te staan');
 
@@ -163,11 +236,9 @@ test('het scherm van RTG Neiging', { skip: geenBrowser(pw), concurrency: false }
        Deze toets zakt op een span in plaats van een link. */
     await metLid(async (page) => {
       await page.locator('.keuze', { hasText: 'Eten' }).first().click();
-      await page.locator('.door').click();
-      await page.waitForTimeout(700);
+      await verder(page);
       await page.locator('.keuze', { hasText: 'Thuis laten komen' }).first().click();
-      await page.locator('.door').click();
-      await page.waitForTimeout(700);
+      await verder(page);
       while (await page.locator('.keuze').count() > 0) await ronde(page);
 
       const adressen = await page.locator('.opent a').evaluateAll(
@@ -235,7 +306,12 @@ test('het scherm van RTG Neiging', { skip: geenBrowser(pw), concurrency: false }
       const voor = await page.locator('.neiging').count();
       assert.ok(voor >= 1, 'voorwaarde: er staat iets in het geheugen');
       await page.locator('.neiging .mini', { hasText: 'Vergeet dit' }).first().click();
-      await page.waitForTimeout(600);
+      /* Op de TOESTAND wachten en niet op een tijd. De wacht draagt hier de
+         bevinding: zakt vergeet() terug naar een `ok` zonder te splicen, dan
+         blijft de regel staan en loopt deze wacht af met die tekst erbij. De
+         assert eronder blijft staan omdat hij het getal noemt waar het om gaat. */
+      await wachtTot(page, (n) => document.querySelectorAll('.neiging').length === n,
+        voor - 1, { wat: 'de vergeten regel van het scherm' });
       assert.equal(await page.locator('.neiging').count(), voor - 1,
         'vergeten hoort de regel van het scherm te halen');
     });

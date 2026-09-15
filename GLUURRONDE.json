@@ -1,24 +1,24 @@
 {
   "stempel": {
-    "op": "2026-09-15T03:32:04.921Z",
-    "commit": "282561fe",
+    "op": "2026-09-14T22:10:01.332Z",
+    "commit": "322f8914",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 0,
     "instrument": "scripts/gluurronde.js",
     "node": "v22.22.2"
   },
   "uitleg": "De gluurronde: de HORIZONTALE scheiding tussen twee leden. gaten MAG ALLEEN DALEN en proeven mag ALLEEN STIJGEN -- zie scripts/gluurronde.js. De dekking hangt aan wat lid B kan aanleggen (bezitStukken); daalt dat, dan is er minder beproefd en niet minder mis.",
-  "gedraaid": "2026-09-15T03:32:04.921Z",
+  "gedraaid": "2026-09-14T22:10:01.332Z",
   "meters": {
     "gluurGaten": 0,
-    "gluurGecontroleerd": 4848,
+    "gluurGecontroleerd": 4885,
     "gluurOnbewaakt": 0
   },
-  "verzoeken": 13750,
+  "verzoeken": 13796,
   "bezitStukken": 30,
-  "aanmaakGeprobeerd": 89,
-  "passiefBeantwoord": 652,
-  "actieveVragen": 4171,
+  "aanmaakGeprobeerd": 90,
+  "passiefBeantwoord": 649,
+  "actieveVragen": 4211,
   "vindbaarVooraf": 25,
   "onbewaakteAanmaakroutes": [
     "/api/concern/nieuw"

@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **218** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **219** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2201** |
-| App-pagina's (`public/apps/**.html`) | **309** |
-| Testbestanden | **1896** |
+| Kernmodules (`server/kern/**`) | **2192** |
+| App-pagina's (`public/apps/**.html`) | **308** |
+| Testbestanden | **1895** |
 
 ## De vier werelden
 
@@ -54,9 +54,9 @@ ook blokkeert.
 
 ---
 
-# 1. De 218 functieschakelaars
+# 1. De 219 functieschakelaars
 
-### Leden (RTG-app) — 25
+### Leden (RTG-app) — 24
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
   _voor: rtg, lifestyle, business, gast_
@@ -79,8 +79,6 @@ ook blokkeert.
 - **Bellen met RTG (in de app)** (`service-bel`) — Bellen met RTG Service binnen de app, zonder telefoonnet en zonder nummer. Hoort bij de Lifestyle en Business Pass; om een mens vragen blijft voor elk account bestaan en gaat hier niet mee uit.  
   _voor: lifestyle, business_
 - **Automatisch ondertitelen in een gesprek** (`ondertiteling`) — Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek. Uit zetten laat die baan staan -- meetypen blijft werken -- maar wie doof is is dan weer afhankelijk van de anderen.  
-  _voor: rtg, lifestyle, business_
-- **RTG Neiging (Mijn RTG)** (`neiging`) — De intake die zichzelf afkapt, en de kaart met wat RTG van je denkt te weten. Zet je dit uit, dan wordt er niets meer bijgehouden en is de kaart dicht; wat er staat blijft tot je het zelf weghaalt of de bewaartermijn verloopt.  
   _voor: rtg, lifestyle, business_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_
@@ -268,7 +266,7 @@ ook blokkeert.
 - **Tenant Control Plane (white-label)** (`tenant`) — Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt. Uit = de werkruimtes werken door onder de RTG-huisstijl, en een inlog via een provider levert geen rollen meer op.  
   _voor: intern, business_
 
-### RTFoundation — 15
+### RTFoundation — 17
 
 - **RTFoundation-app (onderwijs)** (`foundation`) — De gratis onderwijs-app: live schoolbord, leerling-schrift en de AI-bijleshulp.  
   _voor: foundation_
@@ -288,17 +286,21 @@ ook blokkeert.
   _voor: foundation_
 - **Living Lab: de bewonerskant** (`dom-livinglab-bewoner`) — Meedoen met een labpas, een onderzoeksvraag aandragen, stemmen en het labpaspoort.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Het labfonds** (`dom-labfonds`) — De financiering van onderzoeksprojecten.  
-  _voor: foundation_
-- **Samen (stadsraad)** (`dom-samen`) — De gezamenlijke uitslagen en besluiten met stadspartners.  
-  _voor: foundation_
 - **Klaslokaal (lesmaker)** (`dom-les`) — De live les: klascode, vragen en antwoorden.  
   _voor: foundation_
 - **Leerstof** (`dom-leerstof`) — Het lesmateriaal achter het onderwijs.  
-  _voor: foundation_
+  _voor: rtg, lifestyle, business, gast_
 - **Onderwijs (paspoort en ladder)** (`dom-onderwijs`) — Inschrijven, het leerpaspoort en de leerladder.  
-  _voor: foundation_
+  _voor: rtg, lifestyle, business, gast_
 - **Bijles** (`ov-bijles`) — Het bijlesgesprek met de begeleider.  
+  _voor: rtg, lifestyle, business, gast_
+- **Leerpaspoort (leerling)** (`rtf-leerpaspoort`) — De leerlingkant van onderwijs, leerstof, examen en bijles, achter de leeftijdspas.  
+  _voor: foundation_
+- **Het labfonds** (`dom-labfonds`) — De financiering van onderzoeksprojecten.  
+  _voor: rtg, lifestyle, business, gast, foundation, intern_
+- **Samen (stadsraad)** (`dom-samen`) — De gezamenlijke uitslagen en besluiten met stadspartners.  
+  _voor: rtg, lifestyle, business_
+- **Samen (gezin)** (`rtf-samen`) — De gedeelde kamer van een gezin: plek, chat en muziek achter de gezinsdeur.  
   _voor: foundation_
 
 ### Betalen & verificatie — 6

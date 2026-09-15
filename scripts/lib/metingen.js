@@ -112,6 +112,10 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* IDEMIDENTITEIT.json (npm run idemidentiteit) beantwoordt wat na #269/#270
+     overbleef: waar is de identiteit van een verzoek nog te smal? Drie tanden,
+     een omhoog en twee omlaag -- zie de kop bij die tanden in ../norm.js. */
+  'IDEMIDENTITEIT.json': { meter: ['idemVerklaard', 'idemAfdrukVoegtNietsToe', 'idemHandwerkGeenVergelijking'] },
   /* STAGEVORM.json meet of de publieke domeinen een datavorm delen (STAGE.md
      par. 0). Om dezelfde reden als bij CARRIEREVORM.json hierboven is de
      geratelde waarde het BEREIK en niet de uitkomst: dat er 0 velden gedeeld

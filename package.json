@@ -397,7 +397,8 @@
     "omzetproef": "node scripts/omzetproef.js",
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
     "neigingvorm": "node scripts/neigingvorm.js",
-    "neigingvorm:vast": "node scripts/neigingvorm.js --vastleggen"
+    "neigingvorm:vast": "node scripts/neigingvorm.js --vastleggen",
+    "idemidentiteit": "node scripts/idemidentiteit.js"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

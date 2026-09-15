@@ -26,11 +26,32 @@ const { maakBrug } = require('../server/kern/appstore/brug');
 const WORTEL = path.join(__dirname, '..');
 const lees = (p) => fs.readFileSync(path.join(WORTEL, p), 'utf8');
 
-const bouwBrug = () => {
+const bouwBrug = (opties) => {
   const staat = { opslag: {}, bakjes: {} };
-  return maakBrug({ S: () => staat, save() {}, boek() {},
-    nu: () => new Date().toISOString(), eigen: (o, k) => o[k] });
+  return maakBrug(Object.assign({ S: () => staat, save() {}, boek() {},
+    nu: () => new Date().toISOString(), eigen: (o, k) => o[k] }, opties || {}));
 };
+
+/* De brugklant met de ECHTE herhaalkaart van de brug. Een verzonnen kaart zou
+   deze toetsen laten slagen terwijl de cel in productie iets anders krijgt. */
+const bouwKlant = () => K.maakBrugklant(bouwBrug().herhaalKaart);
+
+/* Een nagebouwd venster waarin de klant draait, met de time-out APART zodat een
+   toets hem zelf kan laten afgaan. Dat is de enige weigering die in de cel
+   ontstaat, en dus de enige die je hier kunt beproeven. */
+function draaiKlant(js) {
+  const luisteraars = [];
+  const wekkers = [];
+  let verstuurd = null;
+  const venster = {
+    addEventListener: (soort, fn) => luisteraars.push(fn),
+    parent: { postMessage: (d) => { verstuurd = d; } },
+    setTimeout: (fn) => { wekkers.push(fn); return wekkers.length; }
+  };
+  const klok = (fn) => { wekkers.push(fn); return wekkers.length; };
+  new Function('window', 'setTimeout', js).call({ window: venster, setTimeout: klok, Promise, Error, String, JSON }, venster, klok);
+  return { venster, luisteraars, wekkers, bericht: () => verstuurd };
+}
 
 test('1 - een weigering draagt een code en de vier velden', () => {
   const brug = bouwBrug();
@@ -109,11 +130,12 @@ test('6 - wat er GEEN code heeft, staat er met een reden', () => {
 });
 
 test('7 - de brugklant bouwt een fout MET velden, niet een kale Error', () => {
-  assert.match(K.BRUGKLANT, /function maakFout/);
-  assert.match(K.BRUGKLANT, /e\.naam='RTGFout'/);
+  const js = bouwKlant();
+  assert.match(js, /function maakFout/);
+  assert.match(js, /e\.naam='RTGFout'/);
   // de velden worden overgezet, en niet alleen de zin
-  assert.match(K.BRUGKLANT, /for\(var i=0;i<VELDEN\.length;i\+\+\)/);
-  assert.match(K.BRUGKLANT, /if\(d\.fout\) w\.nee\(maakFout\(d\.fout\)\)/);
+  assert.match(js, /for\(var i=0;i<VELDEN\.length;i\+\+\)/);
+  assert.match(js, /if\(d\.fout\) w\.nee\(maakFout\(d\.fout\)\)/);
   for (const v of ['code', 'machtiging', 'verleend', 'hoe', 'herhaalbaar']) {
     assert.ok(K.FOUTVELDEN.includes(v), v + ' hoort mee te reizen naar de cel');
   }
@@ -124,18 +146,11 @@ test('8 - de brugklant draait, en levert een RTGFout met velden op', () => {
      nagebouwd venster uitgevoerd. Dat is geen browser, maar het is genoeg om te
      zien of een weigering met zijn velden aankomt -- en dat is precies de
      bewering die eerder niemand had nagerekend. */
-  const luisteraars = [];
-  let verstuurd = null;
-  const venster = {
-    addEventListener: (soort, fn) => luisteraars.push(fn),
-    parent: { postMessage: (d) => { verstuurd = d; } },
-    setTimeout: () => 0
-  };
-  const scope = { window: venster, setTimeout: () => 0, Promise, Error, String, JSON };
-  new Function('window', 'setTimeout', K.BRUGKLANT).call(scope, venster, () => 0);
+  const { venster, luisteraars, bericht } = draaiKlant(bouwKlant());
 
   assert.ok(venster.RTG && typeof venster.RTG.roep === 'function', 'RTG.roep hoort te bestaan');
   const belofte = venster.RTG.roep('bericht.zet', { tekst: 'hoi' });
+  const verstuurd = bericht();
   assert.ok(verstuurd && verstuurd.rtgcel === 1, 'de aanroep gaat als bericht naar boven');
 
   // het antwoord van de celpagina, met de weigering van de brug erin
@@ -200,4 +215,183 @@ test('13 - het brugscript wordt geinjecteerd, niet gevraagd', () => {
   // zonder head belandt hij vooraan, en niet nergens
   const zonder = K.metBrug('<div>hoi</div>');
   assert.match(zonder, /^<script src="\/appcel\/brug\.js"><\/script><div>/);
+});
+
+/* ============================================================================
+   DE DERDE AS: MAG EEN TAAKLOPER DIT OPNIEUW?  (14 september 2026)
+
+   `herhaalbaar` hing aan de FOUT en niet aan de HANDELING. Twee codes stonden
+   hard op `true` terwijl bij allebei onbekend is of de aanroep nog landde --
+   `RTG_BRUG_FOUT` (doe() viel halverwege om) en `RTG_GEEN_ANTWOORD` (de cel
+   hoorde vijftien seconden niets). Een taakloper van een derde die daarop netjes
+   opnieuw probeerde, zette bij `bericht.zet` een tweede bericht klaar en bij
+   `arena.zet` een tweede inzending.
+
+   Dat de mutatieklasse dat voorspelde, stond al in `brugmethodes.js`. Hij werd
+   alleen nergens gelezen: `magHerhalen()` uit kern/mutatie.js had nul
+   aanroepers buiten zijn eigen module en twee toetsbestanden.
+   ========================================================================== */
+
+test('14 - de time-out in de cel antwoordt per METHODE en niet per fout', () => {
+  const { venster, wekkers } = draaiKlant(bouwKlant());
+
+  /* Per aanroep een eigen wekker. Hem laten afgaan is de enige manier om deze
+     weigering te zien: hij ontstaat in de cel en niet op de server, dus geen
+     enkele servertoets komt er ooit bij. */
+  const naTimeout = (methode) => {
+    const voor = wekkers.length;
+    const belofte = venster.RTG.roep(methode, {});
+    assert.equal(wekkers.length, voor + 1, methode + ': elke aanroep zet zijn eigen wekker');
+    wekkers[voor]();
+    return belofte.then(() => assert.fail('een time-out hoort te weigeren'), (e) => e);
+  };
+
+  return Promise.all([
+    naTimeout('bericht.zet'), naTimeout('opslag.zet'), naTimeout('zomaar.iets')
+  ]).then(([bericht, opslag, onbekend]) => {
+    for (const e of [bericht, opslag, onbekend]) assert.equal(e.code, 'RTG_GEEN_ANTWOORD');
+
+    /* DE DRAGENDE BEWERING. Zelfde code, zelfde status, zelfde tekst -- en toch
+       een ander antwoord, want `bericht.zet` is `nietHerhaalbaar` en
+       `opslag.zet` is `idempotent`. Stond hier bij allebei hetzelfde, dan is de
+       hele reparatie weg en ziet de toets er nog steeds uit alsof hij iets
+       beproeft. */
+    assert.equal(bericht.herhaalbaar, false,
+      'bericht.zet twee keer zet twee berichten klaar; na een time-out weet niemand of de eerste landde');
+    assert.equal(opslag.herhaalbaar, true,
+      'opslag.zet twee keer laat dezelfde stand achter, dus opnieuw proberen mag');
+
+    /* Een methode die de kaart niet kent, krijgt `false` en niet `true`. Dat is
+       de veilige kant: een naam die wij niet classificeren, classificeren we
+       ook niet als veilig. */
+    assert.equal(onbekend.herhaalbaar, false, 'een onbekende methode telt als nee');
+  });
+});
+
+test('15 - RTG_BRUG_FOUT op de server hangt aan dezelfde klasse', () => {
+  /* Een echte omval, en niet een nagemaakte: `save()` gooit, en zowel
+     `opslag.zet` als `bericht.zet` roept hem aan NA het muteren. Dat is precies
+     het geval waarin niet vaststaat of er iets is weggeschreven. */
+  const brug = bouwBrug({ save() { throw new Error('de opslag is stuk'); } });
+  const ctx = { key: 'l', sleutel: 'app', codenaam: 'Havik', taal: 'nl', pas: 'rtg' };
+
+  const opslag = brug.roep(Object.assign({}, ctx, { methode: 'opslag.zet',
+    args: { sleutel: 'k', waarde: 'v' }, verleend: ['opslag.eigen'], vraagt: ['opslag.eigen'] }));
+  const bericht = brug.roep(Object.assign({}, ctx, { methode: 'bericht.zet',
+    args: { tekst: 'hallo' }, verleend: ['bericht.klaarzetten'], vraagt: ['bericht.klaarzetten'] }));
+
+  for (const r of [opslag, bericht]) {
+    assert.equal(r.code, 'RTG_BRUG_FOUT', 'een omvallende doe() geeft deze code');
+    assert.equal(r.status, 500);
+  }
+  assert.equal(opslag.herhaalbaar, true, 'idempotent: opnieuw proberen laat dezelfde stand achter');
+  assert.equal(bericht.herhaalbaar, false, 'nietHerhaalbaar: opnieuw proberen IS een tweede gebeurtenis');
+});
+
+test('16 - een code die het zelf niet weet, komt er niet stil doorheen', () => {
+  /* Vergeet een uitzender het antwoord, dan is dat een bouwfout in RTG en geen
+     toestand van een derde. Stil terugvallen op `false` (of erger: op `true`)
+     zou precies de fout herhalen die hier is weggehaald, en hem onzichtbaar
+     maken -- dus valt `maak()` om, en zegt waar het antwoord vandaan hoort te
+     komen. */
+  for (const code of ['RTG_BRUG_FOUT', 'RTG_GEEN_ANTWOORD']) {
+    assert.equal(F.CODES[code].herhaalbaar, null, code + ' hoort het zelf niet te weten');
+    assert.equal(F.CODES[code].uitvoeringBekend, false, code + ': of de aanroep is uitgevoerd, staat niet vast');
+    assert.throws(() => F.maak(code, 'stuk', { methode: 'x' }), /weet zelf niet of herhalen mag/,
+      code + ' zonder antwoord hoort om te vallen');
+    assert.throws(() => F.maak(code, 'stuk', { methode: 'x', herhaalbaar: 'ja' }), /weet zelf niet/,
+      'en een tekenreeks is geen antwoord');
+    assert.equal(F.maak(code, 'stuk', { methode: 'x', herhaalbaar: true }).herhaalbaar, true);
+    assert.equal(F.maak(code, 'stuk', { methode: 'x', herhaalbaar: false }).herhaalbaar, false);
+  }
+
+  /* En andersom: de vijf codes die het WEL weten, vragen niets van de uitzender. */
+  for (const { code, herhaalbaar } of F.overzicht().filter(c => c.herhaalbaar !== null)) {
+    assert.equal(F.maak(code, 'x', { methode: 'm' }).herhaalbaar, herhaalbaar);
+  }
+});
+
+test('17 - een uitzender kan het antwoord van de tabel niet overschrijven', () => {
+  /* Dit gat stond er: `herhaalbaar` zat in de EERSTE helft van de Object.assign,
+     dus `extra` won. Een 403 kon zichzelf herhaalbaar noemen zonder dat iets het
+     tegenhield. Nu staat het in de laatste helft. */
+  const r = F.maak('RTG_MACHTIGING_NIET_VERLEEND', 'nee', { machtiging: 'x', herhaalbaar: true });
+  assert.equal(r.herhaalbaar, false, 'de tabel wint van de uitzender');
+  const rem = F.maak('RTG_TE_VEEL_AANROEPEN', 'rustig', { herhaalbaar: false });
+  assert.equal(rem.herhaalbaar, true, 'ook de andere kant op');
+});
+
+test('18 - de kaart van de cel is AFGELEID en geen tweede lijst', () => {
+  const brug = bouwBrug();
+  const M = require('../server/kern/mutatie');
+  assert.ok(Object.keys(brug.herhaalKaart).length >= 9, 'elke methode hoort erin te staan');
+
+  /* Elke waarde komt uit magHerhalen() en nergens anders. Zou de kaart met de
+     hand worden bijgehouden, dan loopt hij een keer uit de pas met de tabel --
+     en dan is het de CEL die het oude antwoord geeft. */
+  for (const m of brug.mutaties) {
+    assert.equal(brug.herhaalKaart[m.naam], M.magHerhalen(m.mutatie, false),
+      m.naam + ' hoort het antwoord van zijn eigen mutatieklasse te dragen');
+  }
+  /* DE TRIPWIRE. `herhaalKaartVan` antwoordt voor een aanroeper ZONDER
+     idempotentiesleutel, en dat is vandaag geen keuze maar de enige stand die
+     ertoe doet: geen enkele brugmethode is `sleutelVereist`, dus de vraag komt
+     niet voor. Er stond eerst een `metSleutel`-parameter, en die was met deze
+     tabel niet te beproeven -- beide standen gaven hetzelfde antwoord, dus een
+     mutatie erop gleed door alle negentien toetsen heen.
+
+     De grendel staat daarom in de CODE en niet alleen hier: `herhaalKaartVan` weigert
+     een `sleutelVereist`-opdracht. Daardoor kan het tweede argument van
+     `magHerhalen` daarbinnen niet meer uitmaken -- voor elke klasse die de
+     regel haalt zijn `true` en `false` hetzelfde antwoord. Een mutatie erop is
+     dan geen ongemeten risico meer maar aantoonbaar een no-op. */
+  const metSleutel = brug.mutaties.filter(m => m.sleutelNodig).map(m => m.naam);
+  assert.deepEqual(metSleutel, [], 'geen enkele brugmethode is vandaag sleutelVereist');
+
+  /* En de grendel gaat ook echt dicht. Hier mag de invoer verzonnen zijn: dit
+     toetst de GRENDEL en niet de semantiek van een echte methode. */
+  assert.throws(() => M.herhaalKaartVan({ 'iets.starten': { mutatie: 'sleutelVereist' } }),
+    /idempotentiesleutel/, 'herhaalKaartVan hoort een sleutelklasse te weigeren');
+  assert.deepEqual(M.herhaalKaartVan({ a: { mutatie: 'idempotent' }, b: { mutatie: 'nietHerhaalbaar' } }),
+    { a: true, b: false }, 'en de andere klassen gewoon te beantwoorden');
+
+  /* DE REDEN WAAROM DIE GRENDEL GENOEG IS, nagerekend in plaats van beweerd.
+     `sleutelVereist` is de ENIGE klasse waarbij het tweede argument van
+     magHerhalen iets uitmaakt. Klopt dat, dan kan de `false` achter de grendel
+     niet stilletjes het verkeerde antwoord geven -- en dan is een mutatie op
+     die `false` aantoonbaar een no-op in plaats van een ongemeten risico.
+
+     Komt er ooit een tweede klasse waarbij de sleutel meetelt, dan zakt deze
+     regel en moet de grendel mee verbreed worden. */
+  const sleutelGevoelig = Object.keys(M.KLASSEN)
+    .filter(k => M.magHerhalen(k, false) !== M.magHerhalen(k, true));
+  assert.deepEqual(sleutelGevoelig, ['sleutelVereist'],
+    'alleen sleutelVereist hoort van de sleutel af te hangen; anders dekt de grendel in herhaalKaartVan niet meer alles');
+
+  assert.equal(brug.herhaalKaart['bericht.zet'], false);
+  assert.equal(brug.herhaalKaart['arena.zet'], false);
+  assert.equal(brug.herhaalKaart['opslag.zet'], true);
+
+  /* En de klant weigert zonder kaart. Een brugklant die elke methode als
+     niet-herhaalbaar afserveert, is stil verkeerd voor de zeven die het wel
+     zijn -- dus valt hij bij het BEDRADEN om en niet in de cel van een ander. */
+  assert.throws(() => K.maakBrugklant(), /herhaalkaart/);
+  assert.throws(() => K.maakBrugklant({}), /herhaalkaart/);
+});
+
+test('19 - de twee schermen die dit tonen, kennen de derde stand', () => {
+  /* `herhaalbaar` is nu drie standen en geen twee. Twee lezers renderden
+     `f.herhaalbaar ? 'ja' : 'nee'`, en die zouden allebei "nee" tonen waar
+     "hangt af van de methode" hoort te staan -- twee keer dezelfde stille fout
+     (LAT-regel 4). De zin komt daarom uit de foutentaal zelf. */
+  for (const { code, herhaalbaar, herhaalbaarTekst } of F.overzicht()) {
+    assert.equal(herhaalbaarTekst,
+      herhaalbaar === null ? 'hangt af van de methode' : (herhaalbaar ? 'ja' : 'nee'), code);
+  }
+  for (const bestand of ['scripts/rtg-sdk.js', 'public/apps/appstore-uitgever.html']) {
+    const bron = lees(bestand);
+    assert.match(bron, /herhaalbaarTekst/, bestand + ' hoort de zin uit de foutentaal te tonen');
+    assert.doesNotMatch(bron, /f\.herhaalbaar \? '/,
+      bestand + ' rekent de zin zelf uit, en toont dan "nee" waar de stand onbekend is');
+  }
 });

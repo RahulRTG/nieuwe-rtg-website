@@ -67,6 +67,7 @@ const EIGENAAR = {
   'NEIGINGVORM.json': { schrijver: 'scripts/neigingvorm.js' },
 
   /* De lagen die in deze tak zijn gebouwd. */
+  'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },
   'GELDING.json': { schrijver: 'scripts/gelding.js' },

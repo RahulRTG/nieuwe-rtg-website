@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T04:44:49.558Z",
-    "commit": "0be80f1c",
+    "op": "2026-09-15T00:31:37.703Z",
+    "commit": "92de4a23",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2932,14 +2932,6 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
-    "geldpositie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/isolatie/geldpositie.js",
-      "operator": "getal+1#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
     "geldregie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3689,6 +3681,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "idemidentiteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/idemidentiteit.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "idemproef.test.js": {
       "soort": "puur",
@@ -5359,28 +5359,6 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
-    "neiging-scherm.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "neiging.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 7,
-      "scherp": "gezakt"
-    },
-    "neiging.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/neiging/ladder.js",
-      "operator": "===->!==#0",
-      "gezakt": 6,
-      "geprobeerd": 1
-    },
     "nieuweroutes.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6736,6 +6714,13 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "rtf-labfonds-deur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "rtf-veilig.test.js": {
       "soort": "server",

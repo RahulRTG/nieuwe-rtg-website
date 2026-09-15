@@ -777,6 +777,28 @@ const METERS = [
      proef langer te maken, en dan wordt een meter beter door hem te verlengen. */
   { sleutel: 'momentOpenBekend', richting: 'omlaag', wat: 'schakels in de publieke keten die openstaan met een uitgeschreven reden (MOMENTPROEF.json)' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
+  /* WAT MAAKT TWEE AANROEPEN HETZELFDE VERZOEK (IDEMIDENTITEIT.json,
+     npm run idemidentiteit). Drie tanden, en de eerste gaat met opzet de andere
+     kant op dan de twee erna -- anders maakt "een aanroepplek erbij" de meter
+     vanzelf beter.
+
+     `idemVerklaard` telt de capabilities waarvan de identiteit uit
+     lib/idem-contract.js komt in plaats van uit een tekenreeks ter plekke. Dat
+     hoort te groeien; het staat vandaag op een.
+
+     De twee erna zijn schulden. `idemAfdrukVoegtNietsToe` telt afdrukken die
+     per constructie nooit kunnen verschillen bij een gelijke sleutel -- ze zijn
+     er wel en ze kunnen niets tegenhouden. `idemHandwerkGeenVergelijking` telt
+     de tweede familie: idempotentie die BUITEN metIdem om wordt gedaan en die
+     het oude antwoord teruggeeft zonder ook maar een veld te vergelijken. Daar
+     zat het gebrek van #270, en daar staat het er nog drie keer.
+
+     Geen van de drie is een foutenlijst: een smalle afdruk kan een uitgeschreven
+     besluit zijn (kern/pay/partner.js). Wat de ratel bewaakt is dat het aantal
+     niet stilletjes groeit. */
+  { sleutel: 'idemVerklaard', richting: 'omhoog', wat: 'capabilities waarvan de verzoek-identiteit verklaard is (IDEMIDENTITEIT.json)' },
+  { sleutel: 'idemAfdrukVoegtNietsToe', richting: 'omlaag', wat: 'afdrukken die per constructie niets kunnen tegenhouden' },
+  { sleutel: 'idemHandwerkGeenVergelijking', richting: 'omlaag', wat: 'eigen idempotentie die het oude antwoord teruggeeft zonder te vergelijken' },
   /* HET SPOOR DAT NIET KAN WEIGEREN (STILSPOOR.json, npm run stilspoor), de
      handhaver bij LAT.md regel 21. Twee schulden omlaag, het bereik omhoog;
      zie de kop bij het register in ./lib/metingen.js. */
@@ -1493,6 +1515,9 @@ function meet(bronnen) {
     carriereDomeinenGemeten: leesRegister('CARRIEREVORM.json', (j) => j.gemeten.domeinen),
     aiContextLek: leesRegister('AICONTEXT.json', (j) => j.muur.lek.length),
     aiContextVeldenGezien: leesRegister('AICONTEXT.json', (j) => j.ledenstaat.aantal),
+    idemVerklaard: leesRegister('IDEMIDENTITEIT.json', (j) => j.verklaard),
+    idemAfdrukVoegtNietsToe: leesRegister('IDEMIDENTITEIT.json', (j) => j.voegtNietsToe),
+    idemHandwerkGeenVergelijking: leesRegister('IDEMIDENTITEIT.json', (j) => j.handwerkGeenVergelijking),
     stilSpoor: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorGesmoord),
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),

@@ -134,7 +134,13 @@ function maakBrug(kern) {
     }
     let uit;
     try { uit = m.doe({ key, sleutel, codenaam, taal, pas }, args || {}); }
-    catch (e) { return fout.maak('RTG_BRUG_FOUT', 'De brug kon deze aanroep niet uitvoeren.', { methode: naam }); }
+    catch (e) {
+      /* `doe()` viel halverwege om, dus of er iets landde staat niet vast; dan
+         hangt herhalen aan de HANDELING en niet aan de fout. Waarom: zie
+         `herhaalbaarVan`, kern/platformfout.js. */
+      return fout.maak('RTG_BRUG_FOUT', 'De brug kon deze aanroep niet uitvoeren.',
+        { methode: naam, herhaalbaar: require('../mutatie').magHerhalen(m.mutatie, false) });
+    }
     if (uit && uit.fout) return fout.maak('RTG_ARGUMENT_ONGELDIG', uit.fout, { methode: naam });
     return { status: 200, ok: true, uit };
   }
@@ -150,6 +156,8 @@ function maakBrug(kern) {
      drie het opnieuw afleiden (LAT-regel 4). */
   const mutaties = require('../mutatie').overzicht(METHODES);
 
+  const herhaalKaart = require('../mutatie').herhaalKaartVan(METHODES);
+
   /* WELKE MACHTIGING BIJ WELKE METHODE HOORT, uit de draaiende tabel.
 
      Dit stond er niet, en dat had een gevolg: ./naslag.js las het door de BRON
@@ -160,7 +168,7 @@ function maakBrug(kern) {
   const machtigingen = {};
   for (const n of namen) machtigingen[n] = METHODES[n].machtiging;
 
-  return { roep, bakje, bakjeGelezen, bakjes, METHODES: namen, machtigingen, mutaties, GRENS, boek, meting, arena };
+  return { roep, bakje, bakjeGelezen, bakjes, METHODES: namen, machtigingen, mutaties, herhaalKaart, GRENS, boek, meting, arena };
 }
 
 module.exports = { maakBrug, GRENS };

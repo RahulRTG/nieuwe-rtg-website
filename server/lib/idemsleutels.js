@@ -116,6 +116,11 @@ Object.assign(SLEUTELS,
      bewijsmap (2 september 2026). Elf ervan LEZEN alleen, en dat is daar een
      besluit en geen gat; zie de kop van dat bestand. */
   require('./idemsleutels-bescherming').SLEUTELS,
+  /* De gezinsdeur van het Lab-fonds (14 september 2026): acht routes, elk
+     verklaard uit een meting in plaats van uit een gewoonte. Twee ervan
+     dedupliceren met OPZET niet -- een tweede toezegging is een tweede
+     toezegging. Zie de kop van dat bestand. */
+  require('./idemsleutels-rtflabfonds').SLEUTELS,
   require('./idemsleutels-vracht').SLEUTELS,
   require('./idemsleutels-rtgid').SLEUTELS,
   require('./idemsleutels-salon').SLEUTELS,

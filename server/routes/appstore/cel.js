@@ -31,10 +31,10 @@
    ========================================================================== */
 const zlib = require('zlib');
 
-const { BRUGKLANT, celCsp, metBrug } = require('../../kern/appstore/brugklant');
+const { maakBrugklant, celCsp, metBrug } = require('../../kern/appstore/brugklant');
 
 module.exports = (kern) => {
-  const { app, appstore, appstoreWinkel } = kern;
+  const { app, appstore, appstoreWinkel, appstoreBrug } = kern;
 
   const herkomst = (req) => (req.protocol || 'http') + '://' + (req.get('host') || 'localhost');
 
@@ -44,6 +44,12 @@ module.exports = (kern) => {
      dat ze een keer uiteenlopen, en dan is de fout "werkt lokaal, geblokkeerd in
      de cel" -- precies de ervaring die dit kanaal niet moet geven. */
   const CEL_CSP = celCsp;
+
+  /* EEN KEER GEBOUWD EN NIET PER VERZOEK. De klant draagt de herhaalkaart van
+     de brug, en die verandert niet tijdens het draaien -- hij komt uit de
+     methodetabel, die bij het starten vastligt. Per verzoek bouwen zou hetzelfde
+     antwoord opnieuw serialiseren voor elk celdocument dat opengaat. */
+  const CEL_BRUGKLANT = maakBrugklant(appstoreBrug.herhaalKaart);
 
   /* DE ENE KOP DIE HIER OMGEZET MOET WORDEN, EN WAAROM DAT GEEN VERZWAKKING IS.
 
@@ -81,7 +87,7 @@ module.exports = (kern) => {
     if (rest === '/brug.js') {
       CEL_KOPPEN(req, res);
       res.set('Cache-Control', 'public, max-age=3600');
-      return res.type('text/javascript').send(BRUGKLANT);
+      return res.type('text/javascript').send(CEL_BRUGKLANT);
     }
 
     const m = /^\/([a-z][a-z0-9-]{2,39})\/([0-9a-f]{32})\/(.+)$/.exec(rest);

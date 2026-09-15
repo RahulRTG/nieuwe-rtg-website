@@ -1629,6 +1629,30 @@ const IJKINGEN = {
       (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 2; return j; },
       () => norm.meet().momentOpenBekend - voor.momentOpenBekend)
   },
+  /* DE DRIE TANDEN VAN IDEMIDENTITEIT.json (14 september 2026,
+     MUTATIECONTRACT.md par. 6e). Elk veld een eigen verstoring, met een eigen
+     getal: zou de meter twee sleutels verwisselen, dan valt dat hier op omdat
+     de uitslagen niet dezelfde grootte hebben.
+
+     `idemVerklaard` gaat in de proef OMLAAG en de twee schulden omhoog -- dat is
+     per tand de richting die ertoe doet. Een meter die stil minder verklaarde
+     identiteiten ziet, meldt vooruitgang die er niet is; een meter die stil
+     minder schuld ziet, meldt hetzelfde. */
+  idemVerklaard: {
+    proef: (voor) => metVervangenJson('IDEMIDENTITEIT.json',
+      (j) => { j.verklaard = Math.max(0, (j.verklaard || 0) - 1); return j; },
+      () => voor.idemVerklaard - norm.meet().idemVerklaard)
+  },
+  idemAfdrukVoegtNietsToe: {
+    proef: (voor) => metVervangenJson('IDEMIDENTITEIT.json',
+      (j) => { j.voegtNietsToe = (j.voegtNietsToe || 0) + 4; return j; },
+      () => norm.meet().idemAfdrukVoegtNietsToe - voor.idemAfdrukVoegtNietsToe)
+  },
+  idemHandwerkGeenVergelijking: {
+    proef: (voor) => metVervangenJson('IDEMIDENTITEIT.json',
+      (j) => { j.handwerkGeenVergelijking = (j.handwerkGeenVergelijking || 0) + 6; return j; },
+      () => norm.meet().idemHandwerkGeenVergelijking - voor.idemHandwerkGeenVergelijking)
+  },
   /* De drie tanden van STILSPOOR.json: twee schulden omhoog en het gemeten
      bereik omlaag. Elk veld krijgt een eigen verstoring, zodat verwisselde
      sleutels niet toevallig dezelfde uitslag geven. */

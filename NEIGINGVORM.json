@@ -1,504 +1,504 @@
 {
- "stempel": {
-  "op": "2026-09-15T01:04:06.827Z",
-  "commit": "a1766558",
-  "boomVuil": true,
-  "boomAnders": 3,
-  "instrument": "scripts/neigingvorm.js",
-  "node": "v22.22.2"
- },
- "uitleg": "Gemeten met scripts/neigingvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in NEIGING.md par. 0. Drie metingen die niet hetzelfde zeggen: A de namen die het voorstel introduceert, B of er al een voorkeurslaag is en of die zijn etiketten draagt, C het voorstel tegen bestaande code met een nagetrokken verwijzing.",
- "grens": "LET OP BIJ METING A: sinds server/kern/neiging/ bestaat, telt deze meter zijn EIGEN laag mee. `adaptief` stond op 0 bestanden en 0 veldnamen toen de meting werd gedaan en de naam werd gekozen -- dat hij nu bezet is, is deze laag zelf. Een naam die vandaag 0 scoort is nog vrij; de andere veertien waren al bezet voordat hier iets is gebouwd. Wat deze meter NIET aantoont. A is lexicaal en dus een ONDERgrens; een gedeelde naam is geen gedeelde betekenis, dat beslist een mens die beide bestanden opent. B leest bewaarde vormen en veldnamen: voorkeuren in vrije tekst of onder een woord buiten de lijst ontsnappen eraan. B heeft daarbovenop een gemeten blinde vlek die eruitziet als succes -- de gedeelde lezer vormenVan() ziet alleen expliciete velden (naam:) en geen verkorte eigenschappen ({ wens }), dus juist geschreven rijen tellen vaak niet mee en seed-achtige rijen wel; dat is niet hier gerepareerd omdat een tweede parser de vergelijking met de vier eerdere vormmetingen waardeloos maakt. C trekt na dat een verwijzing KLOPT, niet dat de genoemde code volstaat -- `draagt` betekent \"er is bestaande code die dit punt raakt\", en het veld `dekt` zegt per punt welke helft ontbreekt; dat is een oordeel en geen meting.",
- "vastgelegd": "2026-09-15",
- "gemeten": {
-  "naam": [
-   {
-    "naam": "moment",
-    "plekken": 1615,
-    "domeinen": 384,
-    "alsVeld": 97,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "A11Y-INGELOGD.json",
-     "AANROEPGRAAF.json",
-     "ACTIVERING.json",
-     "AFSPRAAK.md",
-     "APPSTORE.md",
-     "APPWERKT.json"
-    ]
-   },
-   {
-    "naam": "context",
-    "plekken": 1206,
-    "domeinen": 268,
-    "alsVeld": 122,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "AANROEPGRAAF.json",
-     "ACTIVERING.json",
-     "ADAPTIEF.md",
-     "AICONTEXT.json",
-     "APPSTORE.md",
-     "APPWERKT.json"
-    ]
-   },
-   {
-    "naam": "groep",
-    "plekken": 1169,
-    "domeinen": 254,
-    "alsVeld": 242,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "A11Y-INGELOGD.json",
-     "AANROEPGRAAF.json",
-     "ACTIVERING.json",
-     "ADAMPROEF.json",
-     "ARCHITECTUUR.md",
-     "AUDITPROEF.json"
-    ]
-   },
-   {
-    "naam": "profiel",
-    "plekken": 1051,
-    "domeinen": 253,
-    "alsVeld": 178,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "A11Y-INGELOGD.json",
-     "AANROEPGRAAF.json",
-     "ACTIVERING.json",
-     "ADAMPROEF.json",
-     "APPSTORE.md",
-     "APPWERKT.json"
-    ]
-   },
-   {
-    "naam": "verval",
-    "plekken": 681,
-    "domeinen": 223,
-    "alsVeld": 115,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "A11Y-INGELOGD.json",
-     "AANROEPGRAAF.json",
-     "AFSPRAAK.md",
-     "AUDITPROEF.json",
-     "BESTUUR.md",
-     "BEWIJS.md"
-    ]
-   },
-   {
-    "naam": "geheugen",
-    "plekken": 486,
-    "domeinen": 189,
-    "alsVeld": 28,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "AANROEPGRAAF.json",
-     "ACTIVERING.json",
-     "AFSPRAAK.md",
-     "AUDITPROEF.json",
-     "BEPROEVING.json",
-     "BEWIJS.md"
-    ]
-   },
-   {
-    "naam": "signaal",
-    "plekken": 461,
-    "domeinen": 179,
-    "alsVeld": 30,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     ".github",
-     "A11Y-INGELOGD.json",
-     "AANROEPGRAAF.json",
-     "ACTIVERING.json",
-     "AUDITPROEF.json",
-     "BESTUUR.md"
-    ]
-   },
-   {
-    "naam": "zekerheid",
-    "plekken": 316,
-    "domeinen": 118,
-    "alsVeld": 26,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "AANROEPGRAAF.json",
-     "AFSPRAAK.md",
-     "BEDRADING.json",
-     "BETROUWBAARHEID.md",
-     "BEWIJS.md",
-     "BEWIJSLADDER.json"
-    ]
-   },
-   {
-    "naam": "projectie",
-    "plekken": 308,
-    "domeinen": 145,
-    "alsVeld": 22,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "AANROEPGRAAF.json",
-     "AANVOERVORM.json",
-     "ACTIVERING.json",
-     "AFSPRAAK.md",
-     "AUDITPROEF.json",
-     "BEWIJS.md"
-    ]
-   },
-   {
-    "naam": "intent",
-    "plekken": 272,
-    "domeinen": 100,
-    "alsVeld": 35,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "AANROEPGRAAF.json",
-     "AFSPRAAK.md",
-     "AUDITPROEF.json",
-     "BEWIJS.md",
-     "CLAUDE.md",
-     "CODECREDENTIALS.json"
-    ]
-   },
-   {
-    "naam": "voorkeur",
-    "plekken": 262,
-    "domeinen": 117,
-    "alsVeld": 25,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "AANROEPGRAAF.json",
-     "ACTIVERING.json",
-     "ADAPTIEF.md",
-     "AFSPRAAK.md",
-     "AUDITPROEF.json",
-     "BEWIJS.md"
-    ]
-   },
-   {
-    "naam": "situatie",
-    "plekken": 146,
-    "domeinen": 65,
-    "alsVeld": 19,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "AANROEPGRAAF.json",
-     "APPSTORE.md",
-     "BEWIJS.md",
-     "CARRIERE.md",
-     "CLAUDE.md",
-     "CONCERN.md"
-    ]
-   },
-   {
-    "naam": "interesse",
-    "plekken": 103,
-    "domeinen": 60,
-    "alsVeld": 9,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "AANROEPGRAAF.json",
-     "AUDITPROEF.json",
-     "BEWIJS.md",
-     "BUNDELS.md",
-     "DEKKING.json",
-     "DOCTRINE.json"
-    ]
-   },
-   {
-    "naam": "adaptief",
-    "plekken": 95,
-    "domeinen": 34,
-    "alsVeld": 1,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "A11Y-INGELOGD.json",
-     "ADAPTIEF.md",
-     "APPWERKT.json",
-     "BEWIJS.md",
-     "CLAUDE.md",
-     "DOCTRINE.json"
-    ]
-   },
-   {
-    "naam": "neiging",
-    "plekken": 29,
-    "domeinen": 15,
-    "alsVeld": 7,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "CLAUDE.md",
-     "GRENZEN.json",
-     "NEIGING.md",
-     "kern/appgids-data",
-     "kern/neiging",
-     "kern/stadsweefsel"
-    ]
-   },
-   {
-    "naam": "relevantie",
-    "plekken": 17,
-    "domeinen": 11,
-    "alsVeld": 1,
-    "vrij": false,
-    "voorbeeldDomeinen": [
-     "AANROEPGRAAF.json",
-     "DOCTRINE.json",
-     "FOUNDATION.md",
-     "LUSSEN.json",
-     "NEIGING.md",
-     "PROOF-INCREMENTAL.md"
-    ]
-   }
-  ],
-  "voorkeur": {
-   "vormenTotaal": 1403,
-   "metAffiniteit": 14,
-   "domeinen": [
-    "kern/gebouw-demo",
-    "kern/marina",
-    "kern/onderneming",
-    "kern/rendezvous-ontdek",
-    "kern/rtfos",
-    "kern/rtmail-draad",
-    "kern/sportclub",
-    "kern/vakwerk",
-    "kern/verzorging",
-    "school"
-   ],
-   "metGrond": 0,
-   "metZekerheid": 0,
-   "metVerval": 0,
-   "metAlledrie": 4,
-   "waar": [
-    {
-     "module": "server/kern/gebouw-demo.js",
-     "domein": "kern/gebouw-demo",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/marina.js",
-     "domein": "kern/marina",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/marina.js",
-     "domein": "kern/marina",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/onderneming/pijplijn.js",
-     "domein": "kern/onderneming",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/rendezvous-ontdek.js",
-     "domein": "kern/rendezvous-ontdek",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/rtfos/ruil.js",
-     "domein": "kern/rtfos",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/rtfos/ruil.js",
-     "domein": "kern/rtfos",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/rtmail-draad.js",
-     "domein": "kern/rtmail-draad",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/sportclub/index.js",
-     "domein": "kern/sportclub",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/sportclub/zakelijk.js",
-     "domein": "kern/sportclub",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/vakwerk/pro.js",
-     "domein": "kern/vakwerk",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/vakwerk/pro.js",
-     "domein": "kern/vakwerk",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/kern/verzorging/petcare.js",
-     "domein": "kern/verzorging",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    },
-    {
-     "module": "server/school/opvolging.js",
-     "domein": "school",
-     "grond": false,
-     "zekerheid": false,
-     "verval": false
-    }
-   ]
+  "stempel": {
+    "op": "2026-09-15T02:41:59.680Z",
+    "commit": "5c15d25b",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/neigingvorm.js",
+    "node": "v22.22.2"
   },
-  "voorstel": {
-   "punten": 15,
-   "draagt": 15,
-   "rot": 0,
-   "rijen": [
-    {
-     "nr": 1,
-     "punt": "Geen klassiek registratieformulier; passkey als eerste route",
-     "bestand": "server/webauthn/index.js",
-     "symbool": "module.exports",
-     "dekt": "De passkey-route staat en public/shared/passkey.js bedient hem. Wat ontbreekt is dat de VOORDEUR hem als eerste route toont in plaats van als instelling achteraf.",
-     "stand": "draagt"
+  "uitleg": "Gemeten met scripts/neigingvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in NEIGING.md par. 0. Drie metingen die niet hetzelfde zeggen: A de namen die het voorstel introduceert, B of er al een voorkeurslaag is en of die zijn etiketten draagt, C het voorstel tegen bestaande code met een nagetrokken verwijzing.",
+  "grens": "LET OP BIJ METING A, TWEE KEER. (1) Deze meter telt zijn EIGEN laag mee: `neiging` scoort hier niet nul omdat server/kern/neiging/ inmiddels bestaat. Gemeten op de commit VOOR deze tak stond `neiging` in 4 bestanden, alle vier als gewone Nederlandse tekst in een toelichting, en 0 keer als veldnaam -- na te rekenen met `git grep -lIi neiging <commit>`. (2) De eerste versie van deze meting las alleen server/kern en drie broers, en gaf daarmee `adaptief` vrij terwijl ADAPTIEF.md een laag van 95 bestanden draagt, inclusief test/adaptief.test.js die bij het bouwen prompt is overschreven. Die zeef is gerepareerd (de hele boom) en `vrij` betekent nu NERGENS genoemd, zonder marge. Wat deze meter NIET aantoont. A is lexicaal en dus een ONDERgrens; een gedeelde naam is geen gedeelde betekenis, dat beslist een mens die beide bestanden opent. B leest bewaarde vormen en veldnamen: voorkeuren in vrije tekst of onder een woord buiten de lijst ontsnappen eraan. B heeft daarbovenop een gemeten blinde vlek die eruitziet als succes -- de gedeelde lezer vormenVan() ziet alleen expliciete velden (naam:) en geen verkorte eigenschappen ({ wens }), dus juist geschreven rijen tellen vaak niet mee en seed-achtige rijen wel; dat is niet hier gerepareerd omdat een tweede parser de vergelijking met de vier eerdere vormmetingen waardeloos maakt. C trekt na dat een verwijzing KLOPT, niet dat de genoemde code volstaat -- `draagt` betekent \"er is bestaande code die dit punt raakt\", en het veld `dekt` zegt per punt welke helft ontbreekt; dat is een oordeel en geen meting.",
+  "vastgelegd": "2026-09-15",
+  "gemeten": {
+    "naam": [
+      {
+        "naam": "moment",
+        "plekken": 1616,
+        "domeinen": 385,
+        "alsVeld": 97,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "AFSPRAAK.md",
+          "APPSTORE.md",
+          "APPWERKT.json"
+        ]
+      },
+      {
+        "naam": "context",
+        "plekken": 1208,
+        "domeinen": 269,
+        "alsVeld": 122,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "ADAPTIEF.md",
+          "AICONTEXT.json",
+          "APPSTORE.md",
+          "APPWERKT.json"
+        ]
+      },
+      {
+        "naam": "groep",
+        "plekken": 1170,
+        "domeinen": 255,
+        "alsVeld": 242,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "ADAMPROEF.json",
+          "ARCHITECTUUR.md",
+          "AUDITPROEF.json"
+        ]
+      },
+      {
+        "naam": "profiel",
+        "plekken": 1052,
+        "domeinen": 254,
+        "alsVeld": 178,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "ADAMPROEF.json",
+          "APPSTORE.md",
+          "APPWERKT.json"
+        ]
+      },
+      {
+        "naam": "verval",
+        "plekken": 683,
+        "domeinen": 224,
+        "alsVeld": 116,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BESTUUR.md",
+          "BEWIJS.md"
+        ]
+      },
+      {
+        "naam": "geheugen",
+        "plekken": 489,
+        "domeinen": 189,
+        "alsVeld": 28,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BEPROEVING.json",
+          "BEWIJS.md"
+        ]
+      },
+      {
+        "naam": "signaal",
+        "plekken": 461,
+        "domeinen": 179,
+        "alsVeld": 30,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          ".github",
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "AUDITPROEF.json",
+          "BESTUUR.md"
+        ]
+      },
+      {
+        "naam": "zekerheid",
+        "plekken": 318,
+        "domeinen": 119,
+        "alsVeld": 26,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "AFSPRAAK.md",
+          "BEDRADING.json",
+          "BETROUWBAARHEID.md",
+          "BEWIJS.md",
+          "BEWIJSLADDER.json"
+        ]
+      },
+      {
+        "naam": "projectie",
+        "plekken": 309,
+        "domeinen": 146,
+        "alsVeld": 22,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "AANVOERVORM.json",
+          "ACTIVERING.json",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BEWIJS.md"
+        ]
+      },
+      {
+        "naam": "intent",
+        "plekken": 273,
+        "domeinen": 101,
+        "alsVeld": 35,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BEWIJS.md",
+          "CLAUDE.md",
+          "CODECREDENTIALS.json"
+        ]
+      },
+      {
+        "naam": "voorkeur",
+        "plekken": 266,
+        "domeinen": 118,
+        "alsVeld": 25,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "ADAPTIEF.md",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BEWIJS.md"
+        ]
+      },
+      {
+        "naam": "situatie",
+        "plekken": 147,
+        "domeinen": 66,
+        "alsVeld": 19,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "APPSTORE.md",
+          "BEWIJS.md",
+          "CARRIERE.md",
+          "CLAUDE.md",
+          "CONCERN.md"
+        ]
+      },
+      {
+        "naam": "interesse",
+        "plekken": 103,
+        "domeinen": 60,
+        "alsVeld": 9,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "AUDITPROEF.json",
+          "BEWIJS.md",
+          "BUNDELS.md",
+          "DEKKING.json",
+          "DOCTRINE.json"
+        ]
+      },
+      {
+        "naam": "adaptief",
+        "plekken": 92,
+        "domeinen": 33,
+        "alsVeld": 0,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "A11Y-INGELOGD.json",
+          "ADAPTIEF.md",
+          "APPWERKT.json",
+          "BEWIJS.md",
+          "CLAUDE.md",
+          "DOCTRINE.json"
+        ]
+      },
+      {
+        "naam": "neiging",
+        "plekken": 41,
+        "domeinen": 21,
+        "alsVeld": 10,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "BEWIJS.md",
+          "CLAUDE.md",
+          "GRENZEN.json",
+          "MUTATIECONTRACT.json",
+          "NEIGING.md",
+          "NEIGINGVORM.json"
+        ]
+      },
+      {
+        "naam": "relevantie",
+        "plekken": 18,
+        "domeinen": 12,
+        "alsVeld": 1,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "DOCTRINE.json",
+          "FOUNDATION.md",
+          "LUSSEN.json",
+          "NEIGING.md",
+          "NEIGINGVORM.json"
+        ]
+      }
+    ],
+    "voorkeur": {
+      "vormenTotaal": 1403,
+      "metAffiniteit": 14,
+      "domeinen": [
+        "kern/gebouw-demo",
+        "kern/marina",
+        "kern/onderneming",
+        "kern/rendezvous-ontdek",
+        "kern/rtfos",
+        "kern/rtmail-draad",
+        "kern/sportclub",
+        "kern/vakwerk",
+        "kern/verzorging",
+        "school"
+      ],
+      "metGrond": 0,
+      "metZekerheid": 0,
+      "metVerval": 0,
+      "metAlledrie": 0,
+      "waar": [
+        {
+          "module": "server/kern/gebouw-demo.js",
+          "domein": "kern/gebouw-demo",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/marina.js",
+          "domein": "kern/marina",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/marina.js",
+          "domein": "kern/marina",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/onderneming/pijplijn.js",
+          "domein": "kern/onderneming",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/rendezvous-ontdek.js",
+          "domein": "kern/rendezvous-ontdek",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/rtfos/ruil.js",
+          "domein": "kern/rtfos",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/rtfos/ruil.js",
+          "domein": "kern/rtfos",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/rtmail-draad.js",
+          "domein": "kern/rtmail-draad",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/sportclub/index.js",
+          "domein": "kern/sportclub",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/sportclub/zakelijk.js",
+          "domein": "kern/sportclub",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/vakwerk/pro.js",
+          "domein": "kern/vakwerk",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/vakwerk/pro.js",
+          "domein": "kern/vakwerk",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/kern/verzorging/petcare.js",
+          "domein": "kern/verzorging",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        },
+        {
+          "module": "server/school/opvolging.js",
+          "domein": "school",
+          "grond": false,
+          "zekerheid": false,
+          "verval": false
+        }
+      ]
     },
-    {
-     "nr": 2,
-     "punt": "Adaptieve onboarding: de volgende vraag hangt af van het vorige antwoord",
-     "bestand": "server/kern/onboarding.js",
-     "symbool": "standaardVelden",
-     "dekt": "De intake staat en is per scope instelbaar, maar de veldenlijst is VAST: iedereen krijgt dezelfde vragen in dezelfde volgorde. Er is geen motor die de volgende vraag kiest.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 3,
-     "punt": "Progressive profiling: de onboarding is nooit af",
-     "bestand": "server/kern/gegevenspoort.js",
-     "symbool": "VELDEN",
-     "dekt": "Uitgesteld uitvragen bestaat al en is streng (een veld wordt pas gevraagd als een handeling het nodig heeft, met een waarom). Dat gaat over NOODZAKELIJKE gegevens; voor voorkeuren is er geen equivalent.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 4,
-     "punt": "Personal Context Graph in plaats van een plat profiel",
-     "bestand": "server/kern/levensgraaf/graaf.js",
-     "symbool": "function knoop",
-     "dekt": "De graafVORM bestaat en is bewezen als PROJECTIE met vijf etiketten. Hij projecteert bezittingen en termijnen, niet voorkeuren -- die staan nergens.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 5,
-     "punt": "Tijd als dimensie: identity, preference, situation, intent, moment, group",
-     "bestand": "server/kern/experience/contexts.js",
-     "symbool": "function basis",
-     "dekt": "De SITUATIE is first-class en server-afgeleid (welke reis, welke werkruimte). De andere vijf assen bestaan niet; `context` betekent hier uitsluitend situatie.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 6,
-     "punt": "Adaptive content, stable controls",
-     "bestand": "server/kern/experience/projections.js",
-     "symbool": "function living",
-     "dekt": "De projectie per wereld staat en levert items met bron en versheid. Er is geen weging: de volgorde is de volgorde waarin de domeinen toevallig antwoorden.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 7,
-     "punt": "De interface anticipeert",
-     "bestand": "server/kern/experience/attention.js",
-     "symbool": "function severity",
-     "dekt": "Aandacht wordt al gekwalificeerd uit domeinsignalen, met een reden per item. Hij reageert op wat er IS (een incident, een deadline) en voorspelt niets.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 8,
-     "punt": "Rahul als menselijke ingang naar personalisatie",
-     "bestand": "server/kern/stuur/beleid.js",
-     "symbool": "toegestanePaden",
-     "dekt": "De keten taal -> intent -> toegestaan pad staat, met een bewijspoort ervoor. Er is geen intent die een VOORKEUR wijzigt, want er is geen voorkeur om te wijzigen.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 9,
-     "punt": "AI-geheugen zichtbaar maken (wijzigen, vergeten, niet hiervoor gebruiken)",
-     "bestand": "server/kern/consent-register.js",
-     "symbool": "module.exports",
-     "dekt": "Het toestemmingsregister kent lagen, termijnen en relaties. Het gaat over gegevens die een DERDE krijgt; er is geen scherm waarop een lid ziet wat RTG zelf van hem denkt te weten.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 10,
-     "punt": "Privacy-enhancing: doelbinding, dataminimalisatie, pseudonimisering",
-     "bestand": "server/kern/gastzorg-profiel.js",
-     "symbool": "zorgMee",
-     "dekt": "Doelbinding op een voorkeur bestaat AL en is streng: zonder zaak en reden geeft zorgMee niets terug. Het is gebouwd voor een domein (zorg) en niet als platformvorm.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 11,
-     "punt": "Zero-knowledge-achtige bewijzen waar ze waarde hebben",
-     "bestand": "server/kern/volwassen.js",
-     "symbool": "volwassen",
-     "dekt": "De 18+-poort geeft al een eigenschap door in plaats van een geboortedatum. Dat is de vorm die het punt vraagt; er is geen uitgiftepad naar een BUITENstaande partij.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 12,
-     "punt": "Edge + realtime: niet elke personalisatie langs een groot model",
-     "bestand": "server/kern/ai/router.js",
-     "symbool": "TECHNIEKEN",
-     "dekt": "De techniekkeuze (regels voor model) is gemeten en staat in de schaduw. Hij beslist nog niets, en er is geen relevantiemotor om naartoe te routeren.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 13,
-     "punt": "Confidence-model met decay",
-     "bestand": "server/kern/levensgraaf/termijnen.js",
-     "symbool": "module.exports",
-     "dekt": "Verval op een TERMIJN bestaat (een paspoort verloopt op een datum). Verval als AFNEMEND GEWICHT bestaat nergens, en op voorkeuren al helemaal niet.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 14,
-     "punt": "Groepspersonalisatie zonder profielen aan elkaar bloot te geven",
-     "bestand": "server/kern/levensband/inzage.js",
-     "symbool": "function mag",
-     "dekt": "De band tussen twee mensen bestaat, is wederzijds bevestigd, en bepaalt per STUK wat de ander mag zien. Dat is de goede onderbouw. Er is geen berekening die uit meerdere mensen EEN gezamenlijke uitkomst geeft zonder ieders voorkeuren aan de anderen te tonen.",
-     "stand": "draagt"
-    },
-    {
-     "nr": 15,
-     "punt": "Het onboarding-einde laat het resultaat zien",
-     "bestand": "public/apps/app-main.js",
-     "symbool": "MAPPEN",
-     "dekt": "De werelden en hun apps staan in een afgeleide lijst. De overgang bestaat; er is niets persoonlijks om erin te tonen.",
-     "stand": "draagt"
+    "voorstel": {
+      "punten": 15,
+      "draagt": 15,
+      "rot": 0,
+      "rijen": [
+        {
+          "nr": 1,
+          "punt": "Geen klassiek registratieformulier; passkey als eerste route",
+          "bestand": "server/webauthn/index.js",
+          "symbool": "module.exports",
+          "dekt": "De passkey-route staat en public/shared/passkey.js bedient hem. Wat ontbreekt is dat de VOORDEUR hem als eerste route toont in plaats van als instelling achteraf.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 2,
+          "punt": "Adaptieve onboarding: de volgende vraag hangt af van het vorige antwoord",
+          "bestand": "server/kern/onboarding.js",
+          "symbool": "standaardVelden",
+          "dekt": "De intake staat en is per scope instelbaar, maar de veldenlijst is VAST: iedereen krijgt dezelfde vragen in dezelfde volgorde. Er is geen motor die de volgende vraag kiest.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 3,
+          "punt": "Progressive profiling: de onboarding is nooit af",
+          "bestand": "server/kern/gegevenspoort.js",
+          "symbool": "VELDEN",
+          "dekt": "Uitgesteld uitvragen bestaat al en is streng (een veld wordt pas gevraagd als een handeling het nodig heeft, met een waarom). Dat gaat over NOODZAKELIJKE gegevens; voor voorkeuren is er geen equivalent.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 4,
+          "punt": "Personal Context Graph in plaats van een plat profiel",
+          "bestand": "server/kern/levensgraaf/graaf.js",
+          "symbool": "function knoop",
+          "dekt": "De graafVORM bestaat en is bewezen als PROJECTIE met vijf etiketten. Hij projecteert bezittingen en termijnen, niet voorkeuren -- die staan nergens.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 5,
+          "punt": "Tijd als dimensie: identity, preference, situation, intent, moment, group",
+          "bestand": "server/kern/experience/contexts.js",
+          "symbool": "function basis",
+          "dekt": "De SITUATIE is first-class en server-afgeleid (welke reis, welke werkruimte). De andere vijf assen bestaan niet; `context` betekent hier uitsluitend situatie.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 6,
+          "punt": "Adaptive content, stable controls",
+          "bestand": "server/kern/experience/projections.js",
+          "symbool": "function living",
+          "dekt": "De projectie per wereld staat en levert items met bron en versheid. Er is geen weging: de volgorde is de volgorde waarin de domeinen toevallig antwoorden.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 7,
+          "punt": "De interface anticipeert",
+          "bestand": "server/kern/experience/attention.js",
+          "symbool": "function severity",
+          "dekt": "Aandacht wordt al gekwalificeerd uit domeinsignalen, met een reden per item. Hij reageert op wat er IS (een incident, een deadline) en voorspelt niets.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 8,
+          "punt": "Rahul als menselijke ingang naar personalisatie",
+          "bestand": "server/kern/stuur/beleid.js",
+          "symbool": "toegestanePaden",
+          "dekt": "De keten taal -> intent -> toegestaan pad staat, met een bewijspoort ervoor. Er is geen intent die een VOORKEUR wijzigt, want er is geen voorkeur om te wijzigen.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 9,
+          "punt": "AI-geheugen zichtbaar maken (wijzigen, vergeten, niet hiervoor gebruiken)",
+          "bestand": "server/kern/consent-register.js",
+          "symbool": "module.exports",
+          "dekt": "Het toestemmingsregister kent lagen, termijnen en relaties. Het gaat over gegevens die een DERDE krijgt; er is geen scherm waarop een lid ziet wat RTG zelf van hem denkt te weten.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 10,
+          "punt": "Privacy-enhancing: doelbinding, dataminimalisatie, pseudonimisering",
+          "bestand": "server/kern/gastzorg-profiel.js",
+          "symbool": "zorgMee",
+          "dekt": "Doelbinding op een voorkeur bestaat AL en is streng: zonder zaak en reden geeft zorgMee niets terug. Het is gebouwd voor een domein (zorg) en niet als platformvorm.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 11,
+          "punt": "Zero-knowledge-achtige bewijzen waar ze waarde hebben",
+          "bestand": "server/kern/volwassen.js",
+          "symbool": "volwassen",
+          "dekt": "De 18+-poort geeft al een eigenschap door in plaats van een geboortedatum. Dat is de vorm die het punt vraagt; er is geen uitgiftepad naar een BUITENstaande partij.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 12,
+          "punt": "Edge + realtime: niet elke personalisatie langs een groot model",
+          "bestand": "server/kern/ai/router.js",
+          "symbool": "TECHNIEKEN",
+          "dekt": "De techniekkeuze (regels voor model) is gemeten en staat in de schaduw. Hij beslist nog niets, en er is geen relevantiemotor om naartoe te routeren.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 13,
+          "punt": "Confidence-model met decay",
+          "bestand": "server/kern/levensgraaf/termijnen.js",
+          "symbool": "module.exports",
+          "dekt": "Verval op een TERMIJN bestaat (een paspoort verloopt op een datum). Verval als AFNEMEND GEWICHT bestaat nergens, en op voorkeuren al helemaal niet.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 14,
+          "punt": "Groepspersonalisatie zonder profielen aan elkaar bloot te geven",
+          "bestand": "server/kern/levensband/inzage.js",
+          "symbool": "function mag",
+          "dekt": "De band tussen twee mensen bestaat, is wederzijds bevestigd, en bepaalt per STUK wat de ander mag zien. Dat is de goede onderbouw. Er is geen berekening die uit meerdere mensen EEN gezamenlijke uitkomst geeft zonder ieders voorkeuren aan de anderen te tonen.",
+          "stand": "draagt"
+        },
+        {
+          "nr": 15,
+          "punt": "Het onboarding-einde laat het resultaat zien",
+          "bestand": "public/apps/app-main.js",
+          "symbool": "MAPPEN",
+          "dekt": "De werelden en hun apps staan in een afgeleide lijst. De overgang bestaat; er is niets persoonlijks om erin te tonen.",
+          "stand": "draagt"
+        }
+      ]
     }
-   ]
   }
- }
 }

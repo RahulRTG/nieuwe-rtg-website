@@ -61,6 +61,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UIT = path.join(WORTEL, 'IDEMIDENTITEIT.json');
@@ -301,11 +302,21 @@ function meet() {
   const handwerkLijst = handwerk(alle);
   const tel = (u) => plekken.filter(p => p.uitspraak === u).length;
   return {
-    gemetenOp: new Date().toISOString().slice(0, 10),
-    commit: commit(),
-    bereik: 'elke metIdem-aanroep onder server/, lexicaal gelezen. Zegt iets over de VORM '
-      + 'van de identiteit en nooit over de bedoeling: een smalle afdruk kan een uitgeschreven '
-      + 'besluit zijn (kern/pay/partner.js) of een gat (het betaalverzoek, gerepareerd in #270).',
+    soort: 'triage',
+    uitleg: 'Waaraan ziet dit huis dat twee aanroepen hetzelfde verzoek dragen -- per plek waar '
+      + 'idempotentie wordt gedaan, in twee families: langs metIdem en met de hand ernaast.',
+    bereik: 'elke metIdem-aanroep onder server/, plus elke opzoeking op een idem-sleutel die '
+      + 'daar met de hand omheen gaat. Lexicaal gelezen.',
+    /* WAT DEZE METING NIET AANTOONT. Dit staat er even groot bij als de getallen,
+       want het is de faalvorm van dit register: geruststelling. */
+    grens: 'Deze meting toont NIET aan dat een smalle afdruk fout is -- bij kern/pay/partner.js '
+      + 'staat uitgeschreven dat een uitbetaling geen parameters buiten de partner heeft. Het is '
+      + 'een triagelijst, geen oordeel. Zij toont ook NIET aan dat een `voegtToe` in orde is: dat '
+      + 'zegt alleen dat de afdruk IETS draagt dat de sleutel niet heeft, niet dat hij alles '
+      + 'draagt waarop de handler onderscheidt -- precies het gat van #270, dat hier `voegtToe` '
+      + 'zou heten. En `geenVergelijking` in de tweede familie is een ONDERGRENS: er wordt vanaf '
+      + 'de opzoeking veertig regels vooruit gekeken, dus een vergelijking die verderop staat of '
+      + 'via een hulpfunctie loopt, ziet deze meter niet.',
     graad: 'vermoed',
     waaromVermoed: 'de argumenten worden uit de BRON gelezen en niet uitgevoerd; een naam die via '
       + 'een hulpfunctie in de afdruk belandt, telt hier als een naam en niet als de velden erachter.',
@@ -327,11 +338,6 @@ function meet() {
     plekken,
     handwerk: handwerkLijst
   };
-}
-
-function commit() {
-  try { return require('child_process').execSync('git rev-parse --short HEAD', { cwd: WORTEL }).toString().trim(); }
-  catch (e) { return null; }
 }
 
 /* ------------------------------------------------------------- de ijking */
@@ -387,7 +393,11 @@ if (require.main === module) {
     process.exit(1);
   }
 
-  const uit = meet();
+  /* Het stempel VOORAAN, en uit de gedeelde helper: hij draagt de commit, of de
+     boom vuil was, en met welk instrument er is gemeten. Een register zonder
+     stempel is een bewering zonder datum, en dan kan niemand zien of het over
+     vandaag gaat (BESTUUR.md: vervallen bewijs is geen bewijs). */
+  const uit = Object.assign({ stempel: stempel() }, meet());
   fs.writeFileSync(UIT, JSON.stringify(uit, null, 2) + '\n');
 
   console.log('\n  WAT MAAKT TWEE AANROEPEN HETZELFDE VERZOEK?  (graad: ' + uit.graad + ')\n');

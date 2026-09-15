@@ -1,7 +1,16 @@
 {
-  "gemetenOp": "2026-09-15",
-  "commit": "822e3b1f",
-  "bereik": "elke metIdem-aanroep onder server/, lexicaal gelezen. Zegt iets over de VORM van de identiteit en nooit over de bedoeling: een smalle afdruk kan een uitgeschreven besluit zijn (kern/pay/partner.js) of een gat (het betaalverzoek, gerepareerd in #270).",
+  "stempel": {
+    "op": "2026-09-15T00:39:48.620Z",
+    "commit": "92de4a23",
+    "boomVuil": true,
+    "boomAnders": 5,
+    "instrument": "scripts/idemidentiteit.js",
+    "node": "v22.22.2"
+  },
+  "soort": "triage",
+  "uitleg": "Waaraan ziet dit huis dat twee aanroepen hetzelfde verzoek dragen -- per plek waar idempotentie wordt gedaan, in twee families: langs metIdem en met de hand ernaast.",
+  "bereik": "elke metIdem-aanroep onder server/, plus elke opzoeking op een idem-sleutel die daar met de hand omheen gaat. Lexicaal gelezen.",
+  "grens": "Deze meting toont NIET aan dat een smalle afdruk fout is -- bij kern/pay/partner.js staat uitgeschreven dat een uitbetaling geen parameters buiten de partner heeft. Het is een triagelijst, geen oordeel. Zij toont ook NIET aan dat een `voegtToe` in orde is: dat zegt alleen dat de afdruk IETS draagt dat de sleutel niet heeft, niet dat hij alles draagt waarop de handler onderscheidt -- precies het gat van #270, dat hier `voegtToe` zou heten. En `geenVergelijking` in de tweede familie is een ONDERGRENS: er wordt vanaf de opzoeking veertig regels vooruit gekeken, dus een vergelijking die verderop staat of via een hulpfunctie loopt, ziet deze meter niet.",
   "graad": "vermoed",
   "waaromVermoed": "de argumenten worden uit de BRON gelezen en niet uitgevoerd; een naam die via een hulpfunctie in de afdruk belandt, telt hier als een naam en niet als de velden erachter.",
   "aanroepplekken": 38,

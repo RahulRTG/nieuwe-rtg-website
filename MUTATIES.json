@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:05:02.285Z",
-    "commit": "988494dd",
+    "op": "2026-09-15T00:31:37.703Z",
+    "commit": "92de4a23",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3681,6 +3681,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "idemidentiteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/idemidentiteit.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "idemproef.test.js": {
       "soort": "puur",

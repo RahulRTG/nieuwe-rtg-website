@@ -45,15 +45,13 @@ module.exports = [
   { id: 'dom-livinglab-bewoner', categorie: 'RTFoundation', naam: 'Living Lab: de bewonerskant', standaard: true, doelgroepen: ALLE,
     uitleg: 'Meedoen met een labpas, een onderzoeksvraag aandragen, stemmen en het labpaspoort.',
     paden: ['/api/lab2/bewoner', '/api/lab2/mijn'] },
-  { id: 'dom-labfonds', categorie: 'RTFoundation', naam: 'Het labfonds', standaard: true, doelgroepen: ['foundation'],
-    uitleg: 'De financiering van onderzoeksprojecten.', paden: ['/api/labfonds'] },
-  { id: 'dom-samen', categorie: 'RTFoundation', naam: 'Samen (stadsraad)', standaard: true, doelgroepen: ['foundation'],
-    uitleg: 'De gezamenlijke uitslagen en besluiten met stadspartners.', paden: ['/api/samen'] },
+  /* dom-labfonds en dom-samen staan in ./cat-domeinen5.js: ze kregen er een
+     gezinsdeur bij en dit bestand zat aan de bandbreedte van keuringsregel 13. */
   { id: 'dom-les', categorie: 'RTFoundation', naam: 'Klaslokaal (lesmaker)', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'De live les: klascode, vragen en antwoorden.', paden: ['/api/les'] },
-  { id: 'dom-leerstof', categorie: 'RTFoundation', naam: 'Leerstof', standaard: true, doelgroepen: ['foundation'],
+  { id: 'dom-leerstof', categorie: 'RTFoundation', naam: 'Leerstof', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Het lesmateriaal achter het onderwijs.', paden: ['/api/leerstof'] },
-  { id: 'dom-onderwijs', categorie: 'RTFoundation', naam: 'Onderwijs (paspoort en ladder)', standaard: true, doelgroepen: ['foundation'],
+  { id: 'dom-onderwijs', categorie: 'RTFoundation', naam: 'Onderwijs (paspoort en ladder)', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Inschrijven, het leerpaspoort en de leerladder.', paden: ['/api/onderwijs'] },
 
   // ---------- winkel, media en opslag ----------

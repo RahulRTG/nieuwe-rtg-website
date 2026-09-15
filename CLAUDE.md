@@ -726,12 +726,32 @@ salarisrun te lijken; een lus is een lus doordat station 11 nog weet over welk
 bedrijf station 2 het had. Uitslag: <!--getal:lus.stations-->12<!--/getal-->
 stations waarvan <!--getal:lus.stationsMetRoute-->11<!--/getal--> met routes,
 drie rollen met <!--getal:lus.deurwissels-->8<!--/getal--> deurwissels, en
-**`zaakZietOnderneming` = <!--getal:lus.zaakZietOnderneming-->0<!--/getal-->** —
-de lus loopt één kant op, want geen enkel bestand onder `routes/supplier/` of
-`routes/staff/` kent het ondernemingsobject. Dezelfde vorm als de twee
-ritwerelden, met `kern/mobiliteit/appbrug.js` als model én met de regel die daar
-geleerd is: de brug loopt één kant op, want twee lijsten die elkaar bijwerken
-hebben geen waarheid meer. Vijf dingen die het voorstel corrigeren en die je
+**`zaakZietOnderneming` = <!--getal:lus.zaakZietOnderneming-->1<!--/getal-->** —
+dat getal stond bij de eerste meting op NUL: geen enkel bestand onder
+`routes/supplier/` of `routes/staff/` kende het ondernemingsobject, dus de lus
+liep één kant op de verkeerde richting en station 11 kon niet weten waar station
+2 het over had. Dezelfde vorm als de twee ritwerelden, met
+`kern/mobiliteit/appbrug.js` als model én met de regel die daar geleerd is: de
+brug loopt één kant op, want twee lijsten die elkaar bijwerken hebben geen
+waarheid meer. **De brug staat sinds 14 september**
+(`kern/onderneming/zaakkant.js` + `routes/supplier/onderneming.js`), en vier
+dingen liggen daar vast: hij raakt ÉÉN kernnaam aan en niet twee (`grenzen.js`
+leidt het domein af uit de MAP, dus twee namen waren `kernGedeeld` 237 → 239
+geweest — nu beweegt alleen `kernBreedte`), de projectie is een POSITIEVE LIJST
+en geen beeld met velden eraf (bij een spread passeert elk nieuw veld van
+`ondernemingBeeld()` de grens vanzelf), de vloer krijgt geen eigenaar, geen
+KvK-nummer en geen klant- of personeelscijfers — mét de reden in het antwoord
+zelf — en de fabriek krijgt `save` noch `db` mee, zodat persisteren er
+structureel niet in kan. Let op wat het bouwen over de TOETS leerde: de
+eenrichtingsproef vergelijkt een PROJECTIE en was daarmee waardeloos — laat de
+zaakkant `o.naam` overschrijven en hij bleef groen, want `ondernemingNaam()`
+leest na het koppelen de naam van de ZAAK. Er staat nu een besturingsproef achter
+plus een brontoets: *zwarte doos en bron zijn hier twee helften en geen keuze.*
+En de meter zelf is drie keer blind geweest, met één les eronder: **een proxy is
+pas een meting als je weet welke kant hij op liegt** — een hernoemde collectie
+loog omhoog, de ontbrekende toegangen logen omlaag, en het meetellen van
+commentaar loog omhoog op de RATEL zelf, wat de gevaarlijkste van de drie is
+(vooruitgang melden waar niets is gebouwd). Vijf dingen die het voorstel corrigeren en die je
 nergens anders moet herhalen. **`twin` is bezet en vierdubbel** — een woning
 (`kern/bureau/twin.js`), een veld in het levensdossier, de digitale tweeling van
 `command/simulatie.js`, en het scherpst: `magnaat-partnerstudio` bouwt al een

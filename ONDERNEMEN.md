@@ -88,7 +88,7 @@ Drie assen, drie graden, nooit opgeteld:
   <!--getal:lus.stationsMetRoute-->11<!--/getal--> met routes.
 - **3 rollen** dragen de lus (`member`, `office`, `supplier`) met
   <!--getal:lus.deurwissels-->8<!--/getal--> **deurwissels**.
-- **`zaakZietOnderneming` = <!--getal:lus.zaakZietOnderneming-->0<!--/getal-->** —
+- **`zaakZietOnderneming` = <!--getal:lus.zaakZietOnderneming-->1<!--/getal-->** —
   dit getal stond bij de eerste meting op **0**; de brug eronder is de eerste stap
   die is gezet.
 - **<!--getal:lus.ketensZonderProef-->4<!--/getal--> van de 7 ketens** van de lus
@@ -113,7 +113,7 @@ hebben geen waarheid meer.**
 > **De brug staat** (14 september 2026; besluit van de eigenaar: *"juist
 > éénrichting is goed"*). `server/kern/onderneming/zaakkant.js` +
 > `routes/supplier/onderneming.js`, en `zaakZietOnderneming` ging van 0 naar
-> <!--getal:lus.zaakZietOnderneming-->0<!--/getal-->. Vier dingen liggen daar vast
+> <!--getal:lus.zaakZietOnderneming-->1<!--/getal-->. Vier dingen liggen daar vast
 > en horen nergens anders herhaald te worden.
 >
 > **Eén kernnaam en niet twee.** De route had `ondernemingVanZaak` plus
@@ -178,13 +178,32 @@ verkenningslaag van Ondernemers-OS is ongemeten"*), `offerte-factuur`,
 > meter zou dus `0` zijn blijven melden terwijl de brug er lag. Hij telt nu ook de
 > **toegangen**, afgeleid uit `kern/onderneming/index.js` zodat de lijst niet
 > achterloopt. Twee dingen daarbij niet wegpoetsen. De verbreding tilde het totaal
-> van 5 naar <!--getal:lus.kennersTotaal-->16<!--/getal--> kenners terwijl
-> `zaakZietOnderneming` **op 0 bleef** — gemeten vóór er een letter aan de brug
-> was geschreven, want een meter die zijn eigen ratel betaalt is geen meter. En de
-> besturingsproef staat **apart per helft** (toets 6 op de collectie, toets 7 op de
-> toegangen): haal de verbreding eruit en alleen 7 zakt. Eén gedeelde proef zou
-> groen blijven terwijl precies de helft stilvalt waar het kopgetal vandaan moet
-> komen.
+> van 5 naar 16 kenners terwijl `zaakZietOnderneming` **op 0 bleef** — gemeten
+> vóór er een letter aan de brug was geschreven, want een meter die zijn eigen
+> ratel betaalt is geen meter. En de besturingsproef staat **apart per helft**
+> (toets 6 op de collectie, toets 7 op de toegangen): haal de verbreding eruit en
+> alleen 7 zakt. Eén gedeelde proef zou groen blijven terwijl precies de helft
+> stilvalt waar het kopgetal vandaan moet komen.
+>
+> **En de derde zat in het lezen zelf.** De as las de bron *rauw*, dus een naam
+> die alleen in een uitleg stond telde mee als een aanraking — de fout die
+> `scripts/grenzen.js` in zijn eigen kop noteert als in dit huis al drie keer
+> gemaakt. Hier ook echt raak: `server/lib/mutatiecontracten-zaakkant.js` schrijft
+> de handler van één regel woordelijk in zijn kop op en stond daarmee in de
+> telling. Er gaat nu dezelfde wringer overheen als bij `grenzen.js`, en het
+> totaal zakte van 16 naar <!--getal:lus.kennersTotaal-->10<!--/getal-->. Bij het
+> **kopgetal** is dit erger dan een te hoog totaal: `zaakZietOnderneming` is een
+> ratel die alleen omhoog mag, dus een commentaarregel onder `routes/supplier/`
+> had hem kunnen laten stijgen zonder dat er iets was gebouwd. Toets 8 is daarom
+> de tegenproef van 6 en 7 — die twee eisen dat het getal *beweegt*, acht eist dat
+> het *stil blijft*.
+>
+> De drie samen zijn één les, en die geldt breder dan deze meter: **een proxy is
+> pas een meting als je weet welke kant hij op liegt.** De eerste loog omhoog (een
+> hernoemde collectie meldde een gat dat er niet was), de tweede omlaag (de goede
+> architectuurvorm werd niet gezien), de derde omhoog op de ratel zelf. Alleen de
+> derde kon vooruitgang melden waar niets stond, en dat is de gevaarlijkste van de
+> drie.
 
 ---
 
@@ -568,17 +587,19 @@ de gevoeligste context vandaag al niet naar buiten gaat.
 ## 14. Volgorde
 
 Niet op aantrekkelijkheid maar op wat de volgende stap mogelijk maakt. De eerste
-twee kosten samen weinig en maken de rest meetbaar.
+twee kosten samen weinig en maken de rest meetbaar — **en ze staan allebei.** De
+kolom *stand* is met opzet geen vinkje maar een datum: wie een stap afvinkt zonder
+te zeggen wanneer, maakt van deze tabel een plan in plaats van een verslag.
 
-| # | Stap | Waarom nu | Kost |
-|---|---|---|---|
-| 1 | De dagcheck-in ook op de personeelssessie | een deur, geen architectuur; sluit het grootste gat in par. 7 | klein |
-| 2 | `zaakZietOnderneming` van 0 naar 1 | zonder de terugverwijzing is elke volgende station-overgang handwerk | klein |
-| 3 | De keten `idee-inschrijving` lopen | de hele verkenningslaag is ongemeten; dit is station 1 t/m 3 | middel |
-| 4 | Het werkdruksignaal op rooster en klok | raakt geen gezondheidsgegeven, en is de helft die wél mag | middel |
-| 5 | Twee invarianten uit par. 5 in de **schaduw** zetten | je kunt niet afdwingen wat nooit in de schaduw liep | middel |
-| 6 | Station *Proberen* als experiment-object | vraagt eerst het besluit uit par. 3 | groot |
-| 7 | De processenlezer op `vertegenwoordiging` | par. 6, en alleen in de procesvorm | groot |
+| # | Stap | Waarom nu | Kost | Stand |
+|---|---|---|---|---|
+| 1 | De dagcheck-in ook op de personeelssessie | een deur, geen architectuur; sluit het grootste gat in par. 7 | klein | **staat** (13 sep) |
+| 2 | `zaakZietOnderneming` van 0 naar 1 | zonder de terugverwijzing is elke volgende station-overgang handwerk | klein | **staat** (14 sep) |
+| 3 | De keten `idee-inschrijving` lopen | de hele verkenningslaag is ongemeten; dit is station 1 t/m 3 | middel | open |
+| 4 | Het werkdruksignaal op rooster en klok | raakt geen gezondheidsgegeven, en is de helft die wél mag | middel | open |
+| 5 | Twee invarianten uit par. 5 in de **schaduw** zetten | je kunt niet afdwingen wat nooit in de schaduw liep | middel | open |
+| 6 | Station *Proberen* als experiment-object | vraagt eerst het besluit uit par. 3 | groot | open |
+| 7 | De processenlezer op `vertegenwoordiging` | par. 6, en alleen in de procesvorm | groot | open |
 
 Wat er **niet** in staat: een Business Twin, een autonome backoffice en een
 Economic Graph. Die eerste is par. 4 (een projectie, geen object), de tweede

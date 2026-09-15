@@ -21,6 +21,15 @@
 
 const OP = '2026-09-14';
 
+/* DE AFTEKENING STOND HIER WEL EN HING NERGENS AAN, en dat is een fout die het
+   register zelf heeft gevonden: `AFGETEKEND` werd gedefinieerd, geexporteerd en
+   in een tekst verwerkt, maar geen van de drie rijen droeg het VELD. Drie toetsen
+   in test/mutatiecontract.test.js zakten daarop, en een ervan viel om op een
+   TypeError in plaats van op zijn eigen melding -- die leest als een stuk toets
+   en niet als een leeg veld. Wie hier een rij bijzet, zet `afgetekend` erbij:
+   een aftekening die alleen in een constante bestaat, tekent niets af.
+
+*/
 /* DE AFTEKENING IS EERLIJK OVER WAT ZE IS. Opgesteld door Claude op grond van de
    dubbeltik-meting in toets 7, die in dezelfde sessie is gedraaid -- niet door
    een mens die de drie handlers regel voor regel heeft nagelezen. Wie dat wel
@@ -54,7 +63,8 @@ const CONTRACTEN = {
     toegang: TOEGANG,
     stand: 'NOT_APPLICABLE',
     nagekeken: AFGETEKEND.door + ' -- ' + AFGETEKEND.op,
-    bewijs: BEWIJS
+    bewijs: BEWIJS,
+    afgetekend: AFGETEKEND
   },
 
   /* SCHRIJVEN. Een dag heeft hooguit een regel: bestaat hij al, dan wordt hij
@@ -67,7 +77,8 @@ const CONTRACTEN = {
     semantiek: { klasse: 'idempotent' },
     toegang: TOEGANG,
     stand: 'PROTECTED',
-    bewijs: BEWIJS
+    bewijs: BEWIJS,
+    afgetekend: AFGETEKEND
   },
 
   /* WISSEN. Zie de kop: de stand is na twee keer dezelfde, het antwoord niet.
@@ -82,7 +93,8 @@ const CONTRACTEN = {
     waarom: 'de tweede aanroep is een TOESTANDSCONTROLE: de dag is al weg, dus er ontstaat geen tweede ' +
       'effect, maar het antwoord is 404 en niet 200. Er wordt geen dubbeltik HERKEND; er valt er geen ' +
       'te maken.',
-    bewijs: BEWIJS
+    bewijs: BEWIJS,
+    afgetekend: AFGETEKEND
   }
 };
 

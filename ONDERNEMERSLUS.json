@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:22:31.708Z",
-    "commit": "7347e7c0",
+    "op": "2026-09-15T00:24:08.030Z",
+    "commit": "82da4199",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 0,
     "instrument": "scripts/ondernemerslus.js",
     "node": "v22.22.2"
   },
@@ -271,13 +271,12 @@
     }
   ],
   "kenners": {
-    "totaal": 18,
+    "totaal": 10,
     "perKant": {
       "lid": {
-        "aantal": 4,
+        "aantal": 3,
         "bestanden": [
           "server/routes/concern.js",
-          "server/routes/concern/mensen.js",
           "server/routes/member/onderneming-verkenning.js",
           "server/routes/member/onderneming.js"
         ]
@@ -293,20 +292,13 @@
         "bestanden": []
       },
       "kern": {
-        "aantal": 13,
+        "aantal": 6,
         "bestanden": [
           "server/kern/concern/discovery.js",
-          "server/kern/concern/entiteit.js",
           "server/kern/concern/index.js",
-          "server/kern/concern/uitnodiging.js",
-          "server/kern/concern/vestiging.js",
           "server/kern/concern/voorstel.js",
-          "server/kern/economie/werelden.js",
-          "server/kern/festival/partner.js",
           "server/kern/onboarding/meebouwen.js",
           "server/kern/overheid/kantoor.js",
-          "server/kern/wereld/ai.js",
-          "server/lib/mutatiecontracten-zaakkant.js",
           "server/opzet/kernlaag4b.js"
         ]
       }
@@ -350,7 +342,7 @@
       "supplier"
     ],
     "deurwissels": 8,
-    "kennersTotaal": 18,
+    "kennersTotaal": 10,
     "zaakZietOnderneming": 1,
     "ketensVanDeLus": 7,
     "ketensZonderProef": 4

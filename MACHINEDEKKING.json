@@ -22972,6 +22972,20 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/staff/gemoed/weg",
+   "bestand": "server/routes/gemoed.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/gemoed/zet",
+   "bestand": "server/routes/gemoed.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/staff/inzetbaarheid",
    "bestand": "server/routes/staff/inzetbaarheid.js",
    "onder": [],

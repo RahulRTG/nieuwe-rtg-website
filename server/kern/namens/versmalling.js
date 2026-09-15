@@ -166,4 +166,12 @@ function overtreding(uitkomst, invoer) {
   return null;
 }
 
-module.exports = { doorsnede, mag, overtreding, BRONNEN, SLEUTELS };
+/* HET BESLUIT staat in ./versmalling-besluit.js en wordt hier doorgegeven, niet
+   nagebouwd. Die naad is dezelfde die in de kop hierboven al stond: dit bestand
+   MEET (de doorsnede plus de staat van zijn vier bronnen) en oordeelt niet;
+   `versmalNamens` oordeelt. Een aanroeper hoeft dat verschil niet te kennen en
+   haalt allebei hier op. */
+const { maakBesluit } = require('./versmalling-besluit');
+const { versmalNamens } = maakBesluit({ doorsnede });
+
+module.exports = { doorsnede, versmalNamens, mag, overtreding, BRONNEN, SLEUTELS };

@@ -149,6 +149,10 @@ Object.assign(SLEUTELS,
      -- het lichaam is `{}`, dus een replay zou binnen het venster de VORIGE
      vraag terugspelen terwijl er al een antwoord tussen zat. */
   require('./idemsleutels-neiging').SLEUTELS,
+  /* De ondernemerslus: twee lezers, en twee schrijvers waarvan er een vrije
+     tekst draagt. Waarom `velden` en niet `zelfdeVerzoek`, en waarom `/weg`
+     hierdoor een ander ANTWOORD geeft, staat in de kop van dat bestand. */
+  require('./idemsleutels-ondernemerslus').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:

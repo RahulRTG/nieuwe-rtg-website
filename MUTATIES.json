@@ -5537,6 +5537,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "ondernemerslus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ondernemerslus.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "onderneming-belasting.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5718,6 +5726,13 @@
       "operator": "===->!==#0",
       "gezakt": 14,
       "geprobeerd": 1
+    },
+    "onderneming-zaakkant.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "onderneming.test.js": {
       "soort": "server",
@@ -8041,6 +8056,13 @@
       "scherp": "gezakt"
     },
     "staff-inzet-mob.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "staffgemoed.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",

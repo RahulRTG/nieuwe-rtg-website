@@ -30,6 +30,12 @@ const MAX_PER_LID = 60;
 function maakWinkel(kern) {
   const { S, app, versie, eigen, nu, geld, noteer } = kern;
   const save = kern.save;
+  /* DE SNEDE (./gevermacht.js): wat het lid zelf mag, en wat daarvan overblijft
+     na de doorsnede van kern/namens/versmalling.js. Hij staat daar en niet hier
+     omdat `installeer` en `verleen` allebei verlenen en aantoonbaar dezelfde
+     snede moeten maken -- twee kopieën lopen bij de eerste aanpassing uiteen. */
+  const geverMacht = require('./gevermacht').maakGeverMacht(kern);
+  const { snijd, storing } = geverMacht;
   /* De leeskant (bladeren, de kaart, mijn apps) staat in ./etalage.js; dit
      bestand is de SCHRIJFkant. Die twee uit elkaar houden is hier meer dan
      opruimen: alles wat hieronder staat verandert iets aan wat een lid heeft
@@ -69,9 +75,11 @@ function maakWinkel(kern) {
         prijsCenten: prijsVan(v), moetKopen: true };
     }
     const gevraagd = v.manifest.machtigingen;
-    const lijst = (Array.isArray(gekozen) ? gekozen : []).map(String)
-      .filter(m => isMachtiging(m) && gevraagd.includes(m));
-    const uniek = [...new Set(lijst)];
+    const getikt = [...new Set((Array.isArray(gekozen) ? gekozen : []).map(String).filter(isMachtiging))];
+    const { uit: snede, gm } = snijd(key, getikt, gevraagd);
+    if (!snede.ok) return storing(snede);
+    const uniek = snede.effectief;
+    const versmald = geverMacht.versmaldeVan(gm.weg, getikt);
     /* Het DOEL wordt meegeschreven en niet later opgezocht. Zou het bij de
        versie blijven staan, dan verandert waar een lid ja op zei zodra er een
        nieuwe versie komt -- en dat is precies het stille groeien dat de
@@ -81,14 +89,28 @@ function maakWinkel(kern) {
     const t = leesTot(tot, nu());
     if (t && t.fout) return { status: 400, error: t.fout };
     const nieuw = !bestond;
-    rij[sleutel] = { machtigingen: uniek, doelen: gaf, at: nu(), versie: v.id, tot: t ? t.tot : null };
+    /* `versmald` is machtiging -> EISSLEUTEL en niet machtiging -> zin. De zin
+       woont in ./machtigingen.js; hem hier meeschrijven zou dezelfde tekst op
+       twee plekken zetten, en de opgeslagen kopie loopt achter zodra iemand de
+       uitleg verbetert (LAT-regel 4). */
+    rij[sleutel] = { machtigingen: uniek, doelen: gaf, at: nu(), versie: v.id, tot: t ? t.tot : null,
+      versmald: Object.keys(versmald).length ? versmald : null };
     save();
     /* De tijdlijn schrijft mee en beslist niets (./tijdlijn.js). Wat het lid
        GAF gaat mee, want dat is waar de vraag later over gaat. */
     noteer(key, nieuw ? 'geinstalleerd' : 'verleend', sleutel, { gaf: uniek, doelen: gaf, versie: v.manifest.versie });
+    const versmaldUit = geverMacht.toonVersmald(versmald);
     return { status: 200, ok: true, sleutel, verleend: toonbaar(uniek, gaf), vraagt: toonbaar(gevraagd, v.manifest.doelen),
       tot: t ? t.tot : null,
+      /* WAT JE PROBEERDE TE GEVEN EN NIET KON. Dit staat er apart en niet als
+         stilte: een lid dat een vinkje zet en het daarna niet terugziet, denkt
+         dat hij zich vergist heeft. */
+      versmald: versmaldUit.length ? versmaldUit : null,
       let: (t && t.tot ? 'Deze app staat er tot en met ' + t.tot + '. Daarna opent hij niet meer; wat hij voor je bewaarde blijft staan tot je de cel vernietigt. ' : '')
+        + (versmaldUit.length
+        ? 'Eén ding kon je niet geven: ' + versmaldUit.map(x => x.label.toLowerCase()).join(', ') +
+          '. ' + versmaldUit.map(x => x.waarom).filter(Boolean).join(' ') + ' '
+        : '')
         + (uniek.length < gevraagd.length
         ? 'Je hebt ' + uniek.length + ' van de ' + gevraagd.length + ' gevraagde machtigingen verleend. De app werkt; wat hij niet mag, krijgt hij niet.'
         : 'De app heeft wat hij vroeg. Je kunt elke machtiging later los intrekken zonder de app te verwijderen.') };
@@ -101,7 +123,17 @@ function maakWinkel(kern) {
     if (!huidig) return { status: 404, error: 'Deze app staat niet op je startscherm.' };
     const a = app(sleutel); const v = a && a.live ? versie(a.live) : null;
     const gevraagd = v ? v.manifest.machtigingen : huidig.machtigingen;
-    const uniek = [...new Set((Array.isArray(gekozen) ? gekozen : []).map(String).filter(m => isMachtiging(m) && gevraagd.includes(m)))];
+    const getikt = [...new Set((Array.isArray(gekozen) ? gekozen : []).map(String).filter(isMachtiging))];
+    /* DEZELFDE SNEDE ALS BIJ `installeer`, en dat is precies waarom hij in één
+       functie staat. Hier is hij bovendien de plek waar de groei-lek wordt
+       dichtgehouden: dit is de ENIGE weg waarlangs een bestaande verlening
+       groter kan worden, en hij gaat opnieuw door de doorsnede. Een gever die
+       later meer mag, verbreedt daarmee nooit vanzelf wat er al verleend is --
+       er moet een mens op drukken, en dan wordt er opnieuw gesneden. */
+    const { uit: snede, gm } = snijd(key, getikt, gevraagd);
+    if (!snede.ok) return storing(snede);
+    const uniek = snede.effectief;
+    const versmald = geverMacht.versmaldeVan(gm.weg, getikt);
     const weg = huidig.machtigingen.filter(m => !uniek.includes(m));
     const oudeDoelen = huidig.doelen || {};
     const gaf = {};
@@ -110,9 +142,12 @@ function maakWinkel(kern) {
       if (d) gaf[id] = d;
     }
     huidig.machtigingen = uniek; huidig.doelen = gaf; huidig.at = nu();
+    huidig.versmald = Object.keys(versmald).length ? versmald : null;
     save();
     noteer(key, weg.length ? 'teruggenomen' : 'verleend', sleutel, { gaf: uniek, weg, doelen: gaf });
-    return { status: 200, ok: true, verleend: toonbaar(uniek, gaf), ingetrokken: toonbaar(weg, oudeDoelen) };
+    const versmaldUit = geverMacht.toonVersmald(versmald);
+    return { status: 200, ok: true, verleend: toonbaar(uniek, gaf), ingetrokken: toonbaar(weg, oudeDoelen),
+      versmald: versmaldUit.length ? versmaldUit : null };
   }
 
   /* Weggooien -- verwijderen, wissen en de cel vernietigen -- staat in

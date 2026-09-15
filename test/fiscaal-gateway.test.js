@@ -37,8 +37,15 @@ function opzet(kanalen) {
   const { mandaat } = maakMandaat({ db, save: () => {}, nu });
   const { gateway } = maakGateway({ db, save: () => {}, crypto, nu, mandaat,
     kanalen: kanalen || { sbr } });
-  mandaat.verleen({ code: 'KIKUNOI', soort: 'btw', van: '2026-01-01', tot: '2026-12-31',
-    doorNaam: 'R. Sardjoe', doorRol: 'eigenaar' });
+  /* `geverEffectief` is sinds de versmalling VERPLICHT: wie niet opgeeft wat
+     deze gever zelf mag verlenen, krijgt geen mandaat maar een verklaarde
+     weigering (kern/namens/versmalling.js). Deze opstelling speelt de route na
+     en geeft dus op wat een manager van de zaak mag -- allebei de soorten.
+     Zonder deze regel zakken vijf toetsen in dit bestand, en dat is de
+     bedoeling: het is een aanroepcontract en geen detail. */
+  const r = mandaat.verleen({ code: 'KIKUNOI', soort: 'btw', van: '2026-01-01', tot: '2026-12-31',
+    doorNaam: 'R. Sardjoe', doorRol: 'eigenaar', geverEffectief: Object.keys(mandaat.SOORTEN) });
+  if (!r.ok) throw new Error('de opstelling kreeg geen mandaat: ' + JSON.stringify(r));
   return { db, mandaat, gateway };
 }
 

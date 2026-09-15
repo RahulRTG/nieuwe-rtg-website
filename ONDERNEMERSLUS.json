@@ -1,0 +1,350 @@
+{
+  "stempel": {
+    "op": "2026-09-15T00:24:08.030Z",
+    "commit": "82da4199",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/ondernemerslus.js",
+    "node": "v22.22.2"
+  },
+  "soort": "projectie",
+  "uitleg": "Draagt de ondernemerslus EEN onderwerp? Per station: welke sessie opent hem (uit IDEMPROEF.json), kent hij het ondernemingsobject (lexicaal), en is hij ooit als keten gelopen (uit ONDERNEMERBEWIJS.json). Dit is NIET de vormvraag van OBJECTMODEL.json -- stations mogen best verschillende velden hebben; een lus is een lus doordat het onderwerp meereist.",
+  "grens": "Drie assen, drie graden, en ze worden nooit opgeteld. De deur is GEMETEN maar alleen voor de routes die de idempotentieproef heeft bereikt -- `rolOnbepaald` telt de routes waar geen enkele rol langskwam, en dat is onbepaald en niet \"geen deur\". Het onderwerp is VERMOED: een naam is geen verwijzing, dus dit is een ONDERgrens (wie de collectie niet noemt, kent haar zeker niet). De proef is overgenomen uit ONDERNEMERBEWIJS.json en hier niet nagebouwd. En deze meter zegt NIET of de lus klopt: dat is de vraag van een ketenproef, en `ketensZonderProef` telt hoeveel daarvan ontbreken.",
+  "onderwerp": {
+    "collectie": "ondernemingen",
+    "toegangen": [
+      "ondernemingAanvraag",
+      "ondernemingAanvraagStand",
+      "ondernemingAchterZaak",
+      "ondernemingBeeld",
+      "ondernemingCaps",
+      "ondernemingDagbeeld",
+      "ondernemingEersteKlant",
+      "ondernemingFeiten",
+      "ondernemingIngeschreven",
+      "ondernemingIntakeBeeld",
+      "ondernemingIntakeZet",
+      "ondernemingKans",
+      "ondernemingKoppel",
+      "ondernemingMallProfiel",
+      "ondernemingNaam",
+      "ondernemingNieuw",
+      "ondernemingPlan",
+      "ondernemingPlanVastleggen",
+      "ondernemingSimuleer",
+      "ondernemingStress",
+      "ondernemingVanEigenaar",
+      "ondernemingVanZaak",
+      "ondernemingVerkenning",
+      "ondernemingVind"
+    ],
+    "bron": "server/kern/onderneming/index.js",
+    "let": "zowel de collectienaam als de lijst toegangen wordt uit de bezittende module GELEZEN en niet overgetypt; lukt dat niet, dan gooit de meter in plaats van nul te meten. Een bestand telt mee zodra het de collectie OF een toegang noemt -- het tweede is de architectuurvorm die de eerste versie van deze meter niet zag"
+  },
+  "stations": [
+    {
+      "id": "ontdekken",
+      "naam": "Ontdekken en leren",
+      "wat": "wat kan ik worden, en wat blokkeert dat",
+      "routes": 20,
+      "rollen": {
+        "member": 20
+      },
+      "dragendeRol": "member",
+      "rolOnbepaald": 0,
+      "keten": null,
+      "ketenDekt": "geen-keten-verklaard",
+      "ketenMist": null
+    },
+    {
+      "id": "proberen",
+      "naam": "Proberen zonder bedrijf",
+      "wat": "een idee toetsen bij echte mensen voordat er iets wordt opgericht",
+      "routes": 0,
+      "rollen": {},
+      "dragendeRol": null,
+      "rolOnbepaald": 0,
+      "keten": null,
+      "ketenDekt": "geen-keten-verklaard",
+      "ketenMist": null
+    },
+    {
+      "id": "starten",
+      "naam": "Starten",
+      "wat": "van idee naar ingeschreven onderneming",
+      "routes": 10,
+      "rollen": {
+        "member": 10
+      },
+      "dragendeRol": "member",
+      "rolOnbepaald": 0,
+      "keten": "idee-inschrijving",
+      "ketenDekt": "geen",
+      "ketenMist": "geen proef; de hele verkenningslaag van Ondernemers-OS is ongemeten"
+    },
+    {
+      "id": "toelating",
+      "naam": "Toelating tot RTG",
+      "wat": "mag deze zaak meedoen, en is het bewijs gezien",
+      "routes": 16,
+      "rollen": {
+        "openbaar": 3,
+        "eigen-poort": 1,
+        "office": 11
+      },
+      "dragendeRol": "office",
+      "rolOnbepaald": 1,
+      "keten": "toelating",
+      "ketenDekt": "sluit",
+      "ketenMist": null
+    },
+    {
+      "id": "eersteklant",
+      "naam": "Eerste klant",
+      "wat": "er moet iemand kopen",
+      "routes": 5,
+      "rollen": {
+        "member": 5
+      },
+      "dragendeRol": "member",
+      "rolOnbepaald": 0,
+      "keten": "offerte-factuur",
+      "ketenDekt": "geen",
+      "ketenMist": "geen proef"
+    },
+    {
+      "id": "bedienen",
+      "naam": "Bedienen",
+      "wat": "de dagelijkse uitvoering op de werkvloer",
+      "routes": 992,
+      "rollen": {
+        "supplier": 986,
+        "openbaar": 2,
+        "eigen-poort": 2,
+        "member": 1
+      },
+      "dragendeRol": "supplier",
+      "rolOnbepaald": 1,
+      "keten": "zaak-live",
+      "ketenDekt": "sluit",
+      "ketenMist": null
+    },
+    {
+      "id": "geld",
+      "naam": "Geld op orde",
+      "wat": "wat komt binnen, wat moet eruit, wat is niet van u",
+      "routes": 7,
+      "rollen": {
+        "member": 7
+      },
+      "dragendeRol": "member",
+      "rolOnbepaald": 0,
+      "keten": "bestelling-boekhouding",
+      "ketenDekt": "sluit",
+      "ketenMist": "de proef meet de PROJECTIE financeVoor en EEN maand; periodeafsluiting, aangifte en de weg naar een grootboekregel liggen erbuiten"
+    },
+    {
+      "id": "werkgever",
+      "naam": "Werkgever worden",
+      "wat": "mensen in dienst, en wat zij van hun werkgever mogen verwachten",
+      "routes": 46,
+      "rollen": {
+        "supplier": 46
+      },
+      "dragendeRol": "supplier",
+      "rolOnbepaald": 0,
+      "keten": "medewerker-dienst",
+      "ketenDekt": "geen",
+      "ketenMist": "de overdracht werkgever -> mens -> rooster kruist drie rollen en is nooit als keten beproefd"
+    },
+    {
+      "id": "groeien",
+      "naam": "Structureren en groeien",
+      "wat": "entiteit, vestiging, merk, registratie",
+      "routes": 53,
+      "rollen": {
+        "member": 53
+      },
+      "dragendeRol": "member",
+      "rolOnbepaald": 0,
+      "keten": "tweede-vestiging",
+      "ketenDekt": "geen",
+      "ketenMist": "geen proef; CONCERN.md waarschuwt juist dat een bedrijf niet een KvK is"
+    },
+    {
+      "id": "delegeren",
+      "naam": "Delegeren",
+      "wat": "iemand anders mag onder voorwaarden namens mij handelen",
+      "routes": 11,
+      "rollen": {
+        "member": 11
+      },
+      "dragendeRol": "member",
+      "rolOnbepaald": 0,
+      "keten": null,
+      "ketenDekt": "geen-keten-verklaard",
+      "ketenMist": null
+    },
+    {
+      "id": "besturen",
+      "naam": "Besturen",
+      "wat": "de cockpit: zien wat afwijkt en besluiten nemen",
+      "routes": 107,
+      "rollen": {
+        "office": 107
+      },
+      "dragendeRol": "office",
+      "rolOnbepaald": 0,
+      "keten": null,
+      "ketenDekt": "geen-keten-verklaard",
+      "ketenMist": null
+    },
+    {
+      "id": "overdragen",
+      "naam": "Overdragen",
+      "wat": "het bedrijf verkopen, fuseren of doorgeven",
+      "routes": 3,
+      "rollen": {
+        "member": 3
+      },
+      "dragendeRol": "member",
+      "rolOnbepaald": 0,
+      "keten": null,
+      "ketenDekt": "geen-keten-verklaard",
+      "ketenMist": null
+    }
+  ],
+  "stationsZonderRoute": [
+    {
+      "station": "proberen",
+      "reden": "geen enkele route matcht /^\\/api\\/(experiment|proefverkoop|marktproef)/"
+    }
+  ],
+  "deurwissels": [
+    {
+      "van": "starten",
+      "naar": "toelating",
+      "vanRol": "member",
+      "naarRol": "office"
+    },
+    {
+      "van": "toelating",
+      "naar": "eersteklant",
+      "vanRol": "office",
+      "naarRol": "member"
+    },
+    {
+      "van": "eersteklant",
+      "naar": "bedienen",
+      "vanRol": "member",
+      "naarRol": "supplier"
+    },
+    {
+      "van": "bedienen",
+      "naar": "geld",
+      "vanRol": "supplier",
+      "naarRol": "member"
+    },
+    {
+      "van": "geld",
+      "naar": "werkgever",
+      "vanRol": "member",
+      "naarRol": "supplier"
+    },
+    {
+      "van": "werkgever",
+      "naar": "groeien",
+      "vanRol": "supplier",
+      "naarRol": "member"
+    },
+    {
+      "van": "delegeren",
+      "naar": "besturen",
+      "vanRol": "member",
+      "naarRol": "office"
+    },
+    {
+      "van": "besturen",
+      "naar": "overdragen",
+      "vanRol": "office",
+      "naarRol": "member"
+    }
+  ],
+  "kenners": {
+    "totaal": 10,
+    "perKant": {
+      "lid": {
+        "aantal": 3,
+        "bestanden": [
+          "server/routes/concern.js",
+          "server/routes/member/onderneming-verkenning.js",
+          "server/routes/member/onderneming.js"
+        ]
+      },
+      "zaak": {
+        "aantal": 1,
+        "bestanden": [
+          "server/routes/supplier/onderneming.js"
+        ]
+      },
+      "kantoor": {
+        "aantal": 0,
+        "bestanden": []
+      },
+      "kern": {
+        "aantal": 6,
+        "bestanden": [
+          "server/kern/concern/discovery.js",
+          "server/kern/concern/index.js",
+          "server/kern/concern/voorstel.js",
+          "server/kern/onboarding/meebouwen.js",
+          "server/kern/overheid/kantoor.js",
+          "server/opzet/kernlaag4b.js"
+        ]
+      }
+    }
+  },
+  "ketensZonderProefLijst": [
+    "idee-inschrijving",
+    "offerte-factuur",
+    "medewerker-dienst",
+    "tweede-vestiging"
+  ],
+  "ratels": {
+    "zaakZietOnderneming": {
+      "waarde": 1,
+      "richting": "omhoog",
+      "wat": "bestanden onder routes/supplier of routes/staff die het ondernemingsobject kennen. Staat dit op nul, dan is de lus eenrichtingsverkeer: het bedrijfsobject ziet de werkvloer en de werkvloer ziet hem niet."
+    },
+    "stationsZonderRoute": {
+      "waarde": 1,
+      "richting": "omlaag",
+      "wat": "stations van de lus waarvoor geen enkele route bestaat"
+    },
+    "ketensZonderProef": {
+      "waarde": 4,
+      "richting": "omlaag",
+      "wat": "ketens van de lus die nooit als keten zijn gelopen (bron: ONDERNEMERBEWIJS.json)"
+    },
+    "deurwissels": {
+      "waarde": 8,
+      "richting": "geen",
+      "wat": "hoe vaak de lus van sessie wisselt. GEEN ratel: een wissel is niet per se een gebrek -- een kantoorbesluit HOORT een andere deur te hebben dan een ledenscherm. Het getal stuurt het ontwerp en beoordeelt het niet."
+    }
+  },
+  "telling": {
+    "stations": 12,
+    "stationsMetRoute": 11,
+    "routesTotaal": 1270,
+    "rollenInDeLus": [
+      "member",
+      "office",
+      "supplier"
+    ],
+    "deurwissels": 8,
+    "kennersTotaal": 10,
+    "zaakZietOnderneming": 1,
+    "ketensVanDeLus": 7,
+    "ketensZonderProef": 4
+  }
+}

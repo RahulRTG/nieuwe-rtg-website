@@ -504,7 +504,16 @@ const REGISTERS = [
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
      elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
      alleen nog dat er destijds geen domein ontbrak. */
-  ['WEKDEKKING.json', 'npm run wekdekking:vast', 'welke brongebeurtenis de publieke rail op mag -- de nul zegt dat geen publiek domein onbesproken is, en dat is alleen waar als hij vers is']
+  ['WEKDEKKING.json', 'npm run wekdekking:vast', 'welke brongebeurtenis de publieke rail op mag -- de nul zegt dat geen publiek domein onbesproken is, en dat is alleen waar als hij vers is'],
+  /* DE ONDERNEMERSLUS, en hij hoort hier om een reden die net iets anders ligt
+     dan bij de vormmeters hierboven. Die dragen een nul die vers en verouderd
+     hetzelfde oogt; deze draagt een nul die GEREPAREERD hoort te worden.
+     `zaakZietOnderneming: 0` zegt dat de werkvloer het ondernemingsobject niet
+     kent, ONDERNEMEN.md par. 14 zet daar de volgorde op, en zodra iemand die
+     brug legt is een verouderd register het enige dat nog beweert dat hij
+     ontbreekt. Een schuld die stil blijft staan nadat hij is betaald, stuurt
+     werk net zo hard verkeerd als een schuld die wordt weggepoetst. */
+  ['ONDERNEMERSLUS.json', 'npm run ondernemerslus:vast', 'of de ondernemerslus EEN onderwerp draagt -- ONDERNEMEN.md par. 1 rust erop, en zijn kopgetal is een nul die hoort te stijgen']
 ];
 
 /* De lezer van beide stempelvormen woont in ./lib/stempel.js -- hij stond hier

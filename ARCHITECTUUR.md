@@ -111,7 +111,7 @@ zie §5 -- er zijn nog 237 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 696 | 72 | 16 | 427 |
-| `supplier` | 623 | 124 | 6 | 333 |
+| `supplier` | 624 | 125 | 6 | 334 |
 | `office` | 70 | 20 | 3 | 82 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |

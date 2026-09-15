@@ -105,6 +105,12 @@ const EIGENAAR = {
       'namens-iemand-handelen een vorm en een woordenschat? Geschreven met --vastleggen, ' +
       'gelezen door test/namensvorm.test.js, scripts/norm.js (de ratel namensMechanismenGemeten) ' +
       'en scripts/getallen.js (zeven levende getallen in het document).' },
+  /* DE ONDERNEMERSLUS. Hij staat hier omdat toets 4 dat zo bedoelt: het aantal
+     registers zonder eigenaar hoort te dalen doordat er eigenaren bijkomen, en
+     niet te stijgen doordat er registers bijkomen. Een nieuw register zonder
+     regel hier zou die vloer optillen, en dat is precies de beweging die de
+     ratel moet tegenhouden -- ook (juist) als het je eigen register is. */
+  'ONDERNEMERSLUS.json': { schrijver: 'scripts/ondernemerslus.js' },
 };
 
 /* MEETING: welk script schrijft aantoonbaar naar een wortelregister? Ondergrens,

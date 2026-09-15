@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:31:37.703Z",
-    "commit": "92de4a23",
+    "op": "2026-09-15T05:42:41.670Z",
+    "commit": "99e192fe",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5358,6 +5358,28 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "neiging-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "neiging.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "neiging.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/neiging/ladder.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "nieuweroutes.test.js": {
       "soort": "puur",

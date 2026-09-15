@@ -31,7 +31,7 @@ body[data-rtg-edge-venster-open="true"] .rtg-adaptive-edge{visibility:hidden;poi
 @media print{.rtg-adaptive-edge{display:none!important}}
 
 /* Every domain uses the same Edge surface; hidden sources retain only their handlers. */
-body[data-rtg-adaptive-ready="true"] :is(#rtgCommand .cmd-balk,.wos-dock,.rv-bank,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar){display:none!important}
+body[data-rtg-adaptive-ready="true"] :is(#rtgCommand .cmd-balk,.wos-dock,.wos-rail,.rv-bank,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar){display:none!important}
 body[data-rtg-adaptive-ready="true"] #rvApp{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
 body[data-rtg-adaptive-ready="true"] #rvApp>.rv-werk{grid-column:1;grid-row:1;grid-template-rows:minmax(0,1fr)}
 .rtg-adaptive-sheet>#rvRahul{position:static;transform:none;width:100%;height:auto;min-height:58px;margin-bottom:16px}
@@ -43,6 +43,13 @@ body[data-rtg-adaptive-ready="true"] #rtgCommand .cmd-praat{bottom:0}
 .rtg-adaptive-controls .rtg-adaptive-sheet-action{overflow-wrap:anywhere;max-width:100%;min-width:0}
 .rtg-adaptive-sheet>.rtg-edge-2-context{position:static!important;inset:auto!important;width:auto!important;max-width:none!important;max-height:none!important;margin-top:12px;padding:0;border:0;box-shadow:none}
 .rtg-adaptive-sheet>.rtg-edge-2-context>.rtg-edge-2-context-head{display:none}
+.rtg-adaptive-sheet .rtg-edge-2-context-slot>[data-rtg-edge-2-contextual]{position:relative!important}
 .rtg-adaptive-question{grid-column:1/-1;display:flex;gap:8px}
 .rtg-adaptive-question input{min-width:0;min-height:44px;flex:1;background:var(--edge-bar-bg);color:var(--edge-bar-copy);border:1px solid var(--edge-bar-line);padding:8px}
 .rtg-adaptive-question button{min-width:44px;min-height:44px;color:var(--edge-bar-copy)}
+
+body[data-rtg-adaptive-ready="true"] .rtg-adaptive-sheet>.rtg-edge-action{display:flex!important;position:static;pointer-events:auto;width:100%;height:auto;min-height:48px;margin-top:12px;padding:8px!important}
+body[data-rtg-adaptive-ready="true"] .rtg-adaptive-sheet>.rtg-edge-action>button:not([hidden]){display:inline-flex!important;pointer-events:auto}
+body[data-rtg-adaptive-ready="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]) :is(.rtg-adaptive-edge,.rtg-adaptive-bar){display:none!important}
+
+body[data-rtg-adaptive-ready="true"] #feed .clip>.laag{padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px) + 1.2rem)}

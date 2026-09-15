@@ -3,22 +3,25 @@
    remain authoritative. Declared capabilities use the existing weight gate. */
 (function (w, d) {
   'use strict';
-  var ROOTS = '.cmd-balk,.wos-dock,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar';
+  var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar';
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
     for (var p = el; p; p = p.parentElement) {
       if (p.hidden || p.inert || p.getAttribute('aria-hidden') === 'true') return false;
-      if (p !== root && !root.contains(p) && w.getComputedStyle(p).display === 'none') return false;
+      if (p !== root && !root.contains(p) && !p.matches('.rtg-edge-bottom,.rtg-edge-appslot') && w.getComputedStyle(p).display === 'none') return false;
       if (p === el && !el.matches('.cmd-balkblad,.cmd-balksluit') && w.getComputedStyle(p).display === 'none') return false;
     }
     return el.isConnected;
   }
   function sourceButtons() {
-    var out = [];
+    var out = [], tabs = new Set();
     d.querySelectorAll(ROOTS).forEach(function (root) {
       root.querySelectorAll('button,a[href]').forEach(function (el) {
         if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button')) return;
-        if (label(el) && available(el, root)) out.push({ el: el, root: root });
+        var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
+        if (label(el) && available(el, root) && (!tab || !tabs.has(tab))) {
+          out.push({ el: el, root: root }); if (tab) tabs.add(tab);
+        }
       });
     });
     return out;
@@ -41,6 +44,10 @@
     container.textContent = '';
     var A = w.RTGAdaptief;
     if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;
+    var primary = d.querySelector('.rtg-edge-action');
+    if (primary && primary.parentElement !== rt.sheet) {
+      rt.primaryParent = primary.parentElement; rt.primarySlot = primary; rt.sheet.appendChild(primary);
+    }
     var panel = d.querySelector('.rtg-edge-2-context');
     if (panel && panel.parentElement !== rt.sheet) {
       rt.contextParent = panel.parentElement; rt.contextPanel = panel;
@@ -134,6 +141,7 @@
     rt.controlsStop = function () {
       observer.disconnect(); if (frame) w.cancelAnimationFrame(frame);
       if (typeof unsubscribe === 'function') unsubscribe();
+      if (rt.primarySlot && rt.primaryParent) rt.primaryParent.appendChild(rt.primarySlot);
       if (rt.contextPanel && rt.contextParent) {
         rt.contextPanel.hidden = true; rt.contextParent.appendChild(rt.contextPanel);
       }

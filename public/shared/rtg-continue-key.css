@@ -88,7 +88,7 @@ body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]::after{
 /* De plaatskiezer is een tijdelijke systeemlaag boven Edge. Hij bevat alleen
    de drie veilige ankers en ligt nooit over de onderrandbediening. */
 .rtg-continue-key-picker{
-  position:fixed;z-index:8890;left:var(--rtg-key-picker-left,calc(50vw - 80px));
+  position:fixed;z-index:8891;left:var(--rtg-key-picker-left,calc(50vw - 80px));
   bottom:calc(var(--edge-bottom,48px) + env(safe-area-inset-bottom,0px) +
     var(--rtg-key-keyboard-lift,0px) + 10px);
   display:flex;gap:4px;width:160px;padding:6px;border:1px solid var(--edge-line);

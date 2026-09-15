@@ -30,8 +30,8 @@
   }
   function execute(action) {
     if (action === 'context' || action === 'primary' || (action === 'ai' && d.querySelector('#rtgCommand .cmd-vraagvorm,#rvRahul'))) {
-      Input.prepare(rt, action);
-      setDeck(action === 'ai' ? 'rahul' : 'actions'); setState('expanded'); return true;
+      setDeck(action === 'ai' ? 'rahul' : 'actions');
+      Input.prepare(rt, action); setState('expanded'); return true;
     }
     setState('dock');
     var custom = rt.model.registry[action];
@@ -76,6 +76,7 @@
   }
   function setState(state, source) {
     if (!rt) return false;
+    if (state !== 'expanded') Input.closeContext(rt);
     rt.model.state = K.normState(state); rt.host.dataset.rtgAdaptiveState = rt.model.state;
     d.body.dataset.rtgAdaptiveState = rt.model.state; rt.sheet.hidden = rt.model.state !== 'expanded';
     rt.sheet.setAttribute('aria-hidden', String(rt.model.state !== 'expanded'));
@@ -143,7 +144,8 @@
     if (w.MutationObserver) rt.observer = new w.MutationObserver(function () {
       var state = d.body.getAttribute('data-rtg-edge-2-state');
       if (d.body.getAttribute('data-rtg-edge-venster-open') === 'true') return;
-      if (state === 'compact') setState('peek', 'auto');
+      if (state === 'focus') setState('dock', 'auto');
+      else if (state === 'compact') setState('peek', 'auto');
       else if (state === 'overview' && rt.model.state === 'peek') setState('dock', 'auto');
     });
     if (rt.observer) rt.observer.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-edge-2-state', 'data-rtg-edge-venster-open'] });

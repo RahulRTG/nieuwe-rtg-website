@@ -112,7 +112,8 @@ test('Personeels-PDA: dezelfde Regie in duimstand, met drie werkplekken',
          vertrouwde operationele scherm. */
       await page.waitForSelector('#gate', { state: 'hidden', timeout: 40000 });
       await page.locator('.trm-nav button[data-trm-diep="hulp"]').click();
-      const tegel = page.locator('nav.wos-rail button', { hasText: 'Regie' });
+      await require('./helper').edgeActies(page);
+      const tegel = page.locator('.rtg-adaptive-controls [data-rtg-adaptive-tab="regie"]');
       await tegel.first().waitFor({ state: 'visible', timeout: 25000 });
       await tegel.first().click();
       await page.waitForSelector('#pdRegieWrap .zc-rail button', { timeout: 15000 });

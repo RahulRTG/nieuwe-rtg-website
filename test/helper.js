@@ -1325,7 +1325,8 @@ async function edgeActies(page) {
   await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar', { state: 'visible' });
   if (!await page.locator('.rtg-adaptive-sheet').isVisible())
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
-  await page.waitForSelector('.rtg-adaptive-controls', { state: 'visible' });
+  await page.waitForSelector('.rtg-adaptive-sheet:not([hidden])', { state: 'visible' });
+  await page.waitForSelector('.rtg-adaptive-controls', { state: 'attached' });
 }
 
 async function edgeWerkbladen(page) {

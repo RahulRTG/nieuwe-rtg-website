@@ -111,7 +111,8 @@ function schermToestand(route) {
     const el = document.querySelector(selector), stijl = el && getComputedStyle(el);
     return { aanwezig: !!el, zichtbaar: zichtbaar(el), pointer: stijl ? stijl.pointerEvents : null,
       display: stijl ? stijl.display : null, visibility: stijl ? stijl.visibility : null,
-      achtergrond: stijl ? stijl.backgroundColor : null };
+      achtergrond: stijl ? stijl.backgroundColor : null,
+      materiaal: stijl ? stijl.getPropertyValue('--edge-bar-bg').trim() : null };
   };
   const slot = document.querySelector('.rtg-edge-2-context-slot');
   const contextueel = [...document.querySelectorAll('[data-rtg-edge-2-contextual]')];
@@ -140,7 +141,7 @@ function schermToestand(route) {
     zijkanten: document.querySelectorAll('.rtg-edge-side').length,
     bodems: document.querySelectorAll('.rtg-edge-bottom').length,
     merken: document.querySelectorAll('.rtg-edge-mark').length,
-    top: balk('.rtg-edge-top'), side: balk('.rtg-edge-side'), bottom: balk('.rtg-edge-bottom'),
+    top: balk('.rtg-edge-top'), side: balk('.rtg-edge-side'), bottom: balk('.rtg-adaptive-bar'),
     randHerstel: document.querySelectorAll('.rtg-edge-2-edge-reveal').length,
     randHerstelZichtbaar: [...document.querySelectorAll('.rtg-edge-2-edge-reveal')].filter(zichtbaar).length,
     revealAantal: reveals.length, revealZichtbaar: revealZichtbaar.length,
@@ -187,6 +188,7 @@ async function wachtOpEdge2(page, verwachtPad) {
   await page.waitForFunction(pad => pad && location.pathname !== pad || document.body &&
     document.body.getAttribute('data-rtg-edge-ready') === 'true' &&
     document.body.getAttribute('data-rtg-edge-2-rendered') === 'true' &&
+    document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
     document.querySelectorAll('.rtg-edge-chrome').length === 1 &&
     document.querySelectorAll('.rtg-edge-2-context-slot').length === 1,
   verwachtPad || null, { timeout: 15000 });
@@ -205,7 +207,7 @@ async function wachtOpStand(page, stand, verwacht) {
     return document.body.getAttribute('data-rtg-edge-2-state') === e.stand &&
       zichtbaar(document.querySelector('.rtg-edge-top')) === e.top &&
       zichtbaar(document.querySelector('.rtg-edge-side')) === e.side &&
-      zichtbaar(document.querySelector('.rtg-edge-bottom')) === e.bottom &&
+      zichtbaar(document.querySelector('.rtg-adaptive-bar')) === e.bottom &&
       zichtbaar(document.querySelector('.rtg-edge2-reveal')) === e.reveal;
   }, { stand, ...verwacht }, { timeout: 6000 });
 }
@@ -251,7 +253,7 @@ function assertInsets(overzicht, compact, focus, mobiel, label) {
 }
 
 async function controleerContextlade(page, label, route) {
-  await page.click('.rtg-edge-2-context-button');
+  await require('./helper').edgeActies(page);
   await page.waitForFunction(() => document.body.hasAttribute('data-rtg-edge-2-context-open') &&
     !document.querySelector('.rtg-edge-2-context').hidden);
   const open = await page.evaluate(() => {
@@ -286,7 +288,7 @@ async function controleerContextlade(page, label, route) {
     contrast.forEach(x => assert.ok(x.ratio >= 4.5,
       label + ': onleesbare Living-context ' + x.selector + ' (' + x.ratio.toFixed(2) + ':1)'));
   }
-  await page.click('.rtg-edge-2-context-close');
+  await page.click('[data-rtg-adaptive-close]');
   await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-edge-2-context-open') &&
     document.querySelector('.rtg-edge-2-context').hidden);
 }
@@ -307,7 +309,7 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(overzicht, label + ' · overzicht');
   assertStand(overzicht, { ...scherm.overzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
-  assert.equal(overzicht.top.achtergrond, overzicht.bottom.achtergrond,
+  assert.equal(overzicht.top.materiaal, overzicht.bottom.materiaal,
     label + ': boven- en onderbalk hebben niet hetzelfde wereldmateriaal');
   assert.equal(overzicht.randHerstel, 2, label + ': boven- en onderrand missen hun herstelzone');
   assert.equal(overzicht.randHerstelZichtbaar, 0, label + ': herstelzones zijn buiten compact zichtbaar');

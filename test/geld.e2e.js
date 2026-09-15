@@ -43,6 +43,12 @@ const OUDE_PADEN = {
   '/apps/logboek.html': 'logboek', '/apps/nalatenschap.html': 'nalatenschap'
 };
 
+async function openHoofdstand(page, id) {
+  await require('./helper').edgeActies(page);
+  const naam = { overzicht: 'Overzicht', betalen: 'Betalen', vooruit: 'Vooruit', meer: 'Meer' }[id];
+  await page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam, exact: true }).click();
+}
+
 test('RTG Geld: vier hoofdingangen en twaalf vertrouwde standen openen schoon',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geldapp-'));
@@ -69,7 +75,7 @@ test('RTG Geld: vier hoofdingangen en twaalf vertrouwde standen openen schoon',
     letOpFouten(page, fouten);
 
     await page.goto(base + '/apps/geld.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#standen button', { timeout: 15000 });
+    await page.waitForSelector('#standen button', { state: 'attached', timeout: 15000 });
 
     const knoppen = await page.evaluate(() =>
       [...document.querySelectorAll('#standen button')].map((b) => b.dataset.id));
@@ -80,9 +86,9 @@ test('RTG Geld: vier hoofdingangen en twaalf vertrouwde standen openen schoon',
        een RTG-pas toont de weigering van de server, en dat is ook iets -- een
        LEEG paneel is het enige dat altijd fout is. */
     for (const id of HOOFDSTANDEN.concat(STANDEN.filter((x) => x !== 'overzicht'))) {
-      if (HOOFDSTANDEN.includes(id)) await page.click('#standen button[data-id="' + id + '"]');
+      if (HOOFDSTANDEN.includes(id)) await openHoofdstand(page, id);
       else {
-        await page.click('#standen button[data-id="meer"]');
+        await openHoofdstand(page, 'meer');
         await page.click('.gx-more a[href="#' + id + '"]');
       }
       /* Elke stand vult zijn paneel; wachten tot het paneel iets ZEGT is precies
@@ -106,7 +112,7 @@ test('RTG Geld: vier hoofdingangen en twaalf vertrouwde standen openen schoon',
     }
 
     /* En terug naar het overzicht: het wisselen zelf mag niets kapotmaken. */
-    await page.click('#standen button[data-id="overzicht"]');
+    await openHoofdstand(page, 'overzicht');
     await wachtTot(page, () => location.hash === '#overzicht', null, { wat: 'het overzicht' });
     await wachtOpRust(page);
 
@@ -115,7 +121,7 @@ test('RTG Geld: vier hoofdingangen en twaalf vertrouwde standen openen schoon',
        veilig-omleidingen een commit lang). */
     for (const [oud, stand] of Object.entries(OUDE_PADEN)) {
       await page.goto(base + oud + '?ref=toets', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#standen button', { timeout: 15000 });
+      await page.waitForSelector('#standen button', { state: 'attached', timeout: 15000 });
       /* De omleiding zet pad EN hash; wachten tot de sprong klaar is in plaats
          van gokken hoe lang hij duurt. */
       await wachtOpRust(page);

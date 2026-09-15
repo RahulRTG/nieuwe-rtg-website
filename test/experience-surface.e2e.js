@@ -52,6 +52,7 @@ test('Experience surface: Economic Proof en bevestigde actie zijn mobiel zichtba
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/rtg.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
+    await require('./helper').edgeActies(page);
     await page.waitForFunction(() => {
       const b = document.querySelector('.rtg-edge-action .xp-trigger');
       if (!b || /Verbinden/.test(b.textContent)) return false;
@@ -82,6 +83,7 @@ test('Experience surface: Economic Proof en bevestigde actie zijn mobiel zichtba
     for (let i = 1; i < randMaat.knoppen.length; i++) assert.ok(
       randMaat.knoppen[i - 1].right <= randMaat.knoppen[i].left + .5,
       'bedieningen overlappen op 320 px: ' + JSON.stringify(randMaat));
+    await require('./helper').edgeActies(page);
     await page.click('.rtg-edge-action .xp-trigger');
     await page.waitForSelector('.xp-dialog[open]', { timeout: 5000 });
     await page.waitForSelector('.xp-proofs .xp-proof', { timeout: 5000 });

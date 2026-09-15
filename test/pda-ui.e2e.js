@@ -25,8 +25,8 @@ async function api(base, pad, body) {
 
 async function openVolledigePda(page, tab) {
   await page.locator('.trm-nav button[data-trm-diep="hulp"]').click();
-  await page.waitForSelector('.wos-dock button[data-tab="' + tab + '"]', { state: 'visible', timeout: 15000 });
-  await page.click('.wos-dock button[data-tab="' + tab + '"]');
+  await require('./helper').edgeActies(page);
+  await page.click('.rtg-adaptive-controls [data-rtg-adaptive-tab="' + tab + '"]');
 }
 
 test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voortgang werkt',

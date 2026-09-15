@@ -25,6 +25,7 @@ test('Heritage context returns through real navigation without writes', async t 
     }
     await t.test('Agenda restores view and selected week', async () => {
       await visit('/apps/agenda.html');
+      await page.keyboard.press('Escape');
       await page.click('#wWeek');
       await page.waitForFunction(() => document.querySelector('#wWeek').classList.contains('aan'));
       const previous = await page.textContent('#periode');
@@ -75,12 +76,14 @@ test('Heritage context returns through real navigation without writes', async t 
       await page.mouse.move(200,350);
       assert.equal(await page.evaluate(() => RTGEdge2.isBusy(document,false)),false);
       const key = '.rtg-edge-action>[data-rtg-continue-key]';
+      await require('./helper').edgeActies(page);
       await page.click(key); await page.waitForSelector('#afScrim.open');
       await page.keyboard.press('Escape');
       await page.waitForFunction(selector=>document.activeElement.matches(selector),key);
       assert.equal(await page.getAttribute('#afScrim','aria-modal'),'false');
       /* Maand is op telefoon bewust verborgen; Week is de zichtbare route
          naar dezelfde dagsheet die deze toets nodig heeft. */
+      await page.keyboard.press('Escape');
       await page.click('#wWeek');
       await page.click('.rtg-edge-state'); await page.click('[data-edge-2-mode="focus"]');
       await page.locator('#kal [data-dag]').first().click();

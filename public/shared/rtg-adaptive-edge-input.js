@@ -13,6 +13,15 @@
       if (context) context.click();
     }
   }
+  function closeContext(rt) {
+    var button = rt.edge.root.querySelector('.rtg-edge-2-context-button[aria-expanded="true"]');
+    if (button) button.click();
+    if (rt.contextPanel) rt.contextPanel.hidden = true;
+    if (rt.sheet.contains(rt.doc.activeElement)) {
+      var target = rt.bar.querySelector('[data-rtg-adaptive-action="context"],[data-rtg-adaptive-action="menu"]');
+      if (target) target.focus();
+    }
+  }
   function reflect(rt) {
     rt.sheet.id = 'rtgAdaptiveActions';
     rt.bar.querySelectorAll('button').forEach(function (button) {
@@ -77,5 +86,5 @@
       } else if (event.key === 'Escape') handlers.escape();
     });
   }
-  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, haptic: haptic, prepare: prepare, reflect: reflect });
+  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, haptic: haptic, prepare: prepare, closeContext: closeContext, reflect: reflect });
 }(window));

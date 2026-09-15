@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:11:54.606Z",
-    "commit": "7f4e04c9",
+    "op": "2026-09-15T00:37:34.734Z",
+    "commit": "d4d9a3a1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2132,6 +2132,14 @@
       "module": "scripts/doodspoor.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "doorbelasting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/doorbelasting.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "doorgeefjournaal.test.js": {

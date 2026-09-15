@@ -1,29 +1,14 @@
-/* DE SCHILBALK ALS COMMANDBALK: van een strook die zegt waar je bent, naar een
-   instrument dat meebeweegt met wat je doet.
+/* De contextzone van Command bewaart het actuele aanbod: werelden zonder
+   werkblad, anders apphandelingen of de selectie in het actieve blad.
+   De standaard Edge leest het volledige aanbod via root.rtgEdgeItems; de
+   verborgen bronrij bepaalt dus niet hoeveel functies de gebruiker bereikt.
 
-   WAT ER STOND. Een balk met drie zones en, bij nul bladen, de zin "Kies een
-   wereld" -- geen bediening. Naar een wereld liep via de lade: twee handelingen
-   voor de enige handeling die dat scherm heeft.
+   Het register (shared/adaptief/register.js) verklaart capabilities en hun
+   vorm. De uitvoering en gewichten blijven bij balkknop.js; deze module kent
+   geen documenten, cellen of andere appinhoud. De bestaande anker-, blad- en
+   contextwisselingen blijven dezelfde bron voor de gedeelde bediening.
 
-   WAT ER NU STAAT. Dezelfde drie zones op dezelfde plekken, maar het midden is
-   een CONTEXTZONE: de werelden als er niets openstaat, de handelingen die een
-   blad aanmeldt zodra er een openstaat, en de handelingen van een selectie zodra
-   je iets aanwijst. De tabel staat in ADAPTIEF.md.
-
-   DE STRUCTUUR BLIJFT VOORSPELBAAR, en dat is de hele voorwaarde. De bank staat
-   altijd aan de ANKERZIJDE, Rahul altijd aan de DUIMZIJDE, en het midden begint
-   altijd met waar je bent. Wat verandert is de INHOUD van het midden, nooit de
-   plekken. Welke kant dat is hangt van de hand af; het spiegelen gebeurt in
-   DOM-volgorde in shared/command/romp.js, en waarom staat daar en in
-   ADAPTIEF.md.
-
-   WAT DEZE LAAG NIET WEET. Hij kent geen documenten, cellen of dia's. Hij vraagt
-   het register (shared/adaptief/register.js) welke capabilities er nu spelen en
-   in welke vorm ze hier horen, en tekent dat. Een app die morgen bijkomt hoeft
-   dit bestand niet aan te raken -- dat is het verschil tussen een framework en
-   honderd losse uitzonderingen.
-
-   Levert window.RTGAdaptiefBalk; shared/command/werktafel.js bouwt hem. */
+   Levert RTGAdaptiefBalk; shared/command/werktafel.js bouwt hem. */
 (function (w, d) {
   'use strict';
   w.RTGAdaptiefBalk = function (o) {

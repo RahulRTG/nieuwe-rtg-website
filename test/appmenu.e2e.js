@@ -33,7 +33,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, edgeActies, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -410,8 +410,6 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
     await page.waitForFunction(() => !document.querySelector('.bdn-scrim.open'), null, { timeout: 3000 });
 
     const thuis = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');
-    assert.equal(await thuis.getAttribute('href'), '/apps/living-os.html',
-      'de LivingOS-rand wijst niet naar zijn eigen home');
     await thuis.click();
     await page.waitForURL(/\/apps\/living-os\.html/, { timeout: 8000 });
     assert.match(new URL(page.url()).pathname, /\/apps\/living-os\.html$/, 'de Edge-deur brengt je niet thuis');
@@ -1060,13 +1058,14 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
         leaf.contentDocument.querySelector('.tos-nav')].filter(zichtbaar).length;
     }), 1, 'na terugdraaien naar telefoon verschijnen de drie balken opnieuw');
 
-    /* Standalone Reizen & Veilig blijft zelf eigenaar. Zowel de merklink als
-       een lokale teruglink houden het child in embedmodus; geen app-shell en
-       geen tweede TravelOS-balk mogen ontstaan. */
+    /* Ook standalone bedient de gedeelde Edge Reizen & Veilig. Merk- en
+       teruglinks houden het child in embedmodus, zonder tweede appbalk. */
     const los = await ctx.newPage();
     await los.setViewportSize({ width: 393, height: 852 });
     await los.goto(base + '/apps/reizen-veilig.html', { waitUntil: 'domcontentloaded' });
-    await los.click('#rvApp [data-open="vervoer"]');
+    await edgeActies(los);
+    await los.locator('.rtg-adaptive-controls [data-cap="reisveilig.vervoer"]').click();
+    await los.keyboard.press('Escape');
     await los.waitForSelector('#rvPanes .rv-pane.actief iframe[src*="/apps/ov.html"][src*="embed=1"]', { timeout: 20000 });
     const losKind = los.frameLocator('#rvPanes .rv-pane.actief iframe');
     const lokaleTerug = losKind.locator('a[href="/apps/reizen.html?embed=1#reizen"]:not(.tos-mark)').first();
@@ -1089,7 +1088,8 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const f = document.querySelector('#rvPanes .rv-pane.actief iframe');
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
       return f.contentWindow.location.pathname === '/apps/reizen.html' && !f.contentDocument.querySelector('#rtgCommand') &&
-        [document.querySelector('#rvApp > .rv-bank'), f.contentDocument.querySelector('.hoofdtabs')].filter(zichtbaar).length === 1;
+        [document.querySelector('.rtg-adaptive-bar'), document.querySelector('#rvApp > .rv-bank'),
+          f.contentDocument.querySelector('.hoofdtabs')].filter(zichtbaar).length === 1;
     }, null, { timeout: 20000 });
     await los.close();
 

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-15T05:42:41.670Z",
-    "commit": "99e192fe",
+    "op": "2026-09-15T14:08:42.308Z",
+    "commit": "b59a4f42a",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -9783,6 +9783,67 @@
       "module": "scripts/bundel.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "econ01.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/waarde/omkering.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "eurodekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/waarde/dekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "handelenspoor.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "reisherkomst.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "rtg-adaptive-edge.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "rtg-adaptive-edge.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-adaptive-edge-core.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 3
+    },
+    "spoorvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/spoorvorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "stempelveiligheid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/stempelveiligheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
       "geprobeerd": 1
     }
   }

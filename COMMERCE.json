@@ -2,24 +2,24 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-15",
   "gemeten": {
-    "bestanden": 2280,
-    "domeinenTotaal": 615,
-    "koopbareVormen": 540,
-    "koopbareDomeinen": 114,
+    "bestanden": 2283,
+    "domeinenTotaal": 617,
+    "koopbareVormen": 548,
+    "koopbareDomeinen": 115,
     "envelopDrempel": 7,
     "envelop": 46,
-    "veldenDomeineigen": 739,
-    "veldenNietEnvelop": 961,
-    "gelijkendeVormparen": 8,
+    "veldenDomeineigen": 733,
+    "veldenNietEnvelop": 964,
+    "gelijkendeVormparen": 9,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 45,
+    "werkwoordCombinaties": 44,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 113,
-    "optelDomeinen": 56,
-    "optelCenten": 63,
+    "optellingen": 114,
+    "optelDomeinen": 57,
+    "optelCenten": 64,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 45
@@ -74,7 +74,7 @@
   ],
   "perWerkwoord": {
     "toon": 89,
-    "prijs": 36,
+    "prijs": 37,
     "beschikbaarheid": 51,
     "reserveer": 28,
     "bevestig": 54,
@@ -930,6 +930,26 @@
       "telt": 4
     },
     {
+      "domein": "kern/waarde",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "kijkLijst",
+        "prijs": "bereken",
+        "beschikbaarheid": "beschikbaar",
+        "reserveer": "apart"
+      },
+      "telt": 4
+    },
+    {
       "domein": "school",
       "heeft": {
         "toon": true,
@@ -1174,25 +1194,6 @@
         "toon": "overzicht",
         "bevestig": "boek",
         "annuleer": "annuleer"
-      },
-      "telt": 3
-    },
-    {
-      "domein": "kern/waarde",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "kijkLijst",
-        "beschikbaarheid": "beschikbaar",
-        "reserveer": "apart"
       },
       "telt": 3
     },
@@ -2134,6 +2135,21 @@
       "telt": 0
     },
     {
+      "domein": "kern/reisbureau-betaling",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
       "domein": "kern/reisoplosser",
       "heeft": {
         "toon": false,
@@ -2210,6 +2226,23 @@
     }
   ],
   "paren": [
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/waarde/economischeherkomst.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/waarde",
+      "gedeeld": [
+        "bewijs",
+        "bronObject",
+        "economischeEigenaar",
+        "economischeHerkomst",
+        "grond",
+        "land",
+        "naarWie",
+        "relatie"
+      ]
+    },
     {
       "gelijkenis": 0.83,
       "a": "server/kern/bank/overboeken.js",

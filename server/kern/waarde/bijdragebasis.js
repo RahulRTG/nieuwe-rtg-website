@@ -35,8 +35,8 @@
    hele reden dat deze laag bestaat. */
 'use strict';
 
-const { SOORTEN, ONBEKEND } = require('./economischeherkomst.js');
-const { naarEigenaar } = require('./herkomstsplitsing.js');
+const { SOORTEN, ONBEKEND } = require('./economischeherkomst');
+const { naarEigenaar } = require('./herkomstsplitsing');
 
 /* DE VERKLAARDE INDELING. Elke partijsoort hoort hier met een bak EN een reden;
    de reden staat erbij omdat de indeling een economisch oordeel is en geen

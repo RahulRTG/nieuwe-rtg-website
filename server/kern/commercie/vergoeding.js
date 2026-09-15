@@ -33,20 +33,12 @@
    geen enkele, dan is dat een ontwerpvraag en geen percentage.
 
    ER ZIJN ER VIJF, EN DE VIJFDE HEEFT EEN ANDERE TEGENPARTIJ. De eerste vier
-   gaan over een PARTNER: een zaak met een leverancierscontract. `RTG_OPERATING_
-   SERVICE` gaat over een EXPLOITANT: iemand die RTG in een ander land draait op
-   het operating network van RTG Amsterdam. Dat onderscheid staat als veld
-   (`tegenpartij`) en niet in een naam, want het beslist wie er mag lezen: de
-   partnervoorwaarden beloven een partner nul over zijn omzet, en die belofte
-   gaat niet over een exploitant. Wie de vijfde in de partnerweigering zou
-   meenemen, laat een zaak lezen dat RTG haar iets rekent voor een netwerk
-   waarvan zij geen gebruiker is.
-
-   EN DE VIJFDE DRAAGT GEEN PERCENTAGE. Grondslag OPEN, tarief OPEN, berekening
-   NIET ACTIEF -- een besluit van de eigenaar op 15 september 2026, en sterker dan
-   alvast een getal neerzetten: wat gemeten is, is het aandeel VORMEN met een
-   herkomst en niet het aandeel EURO'S. De rekensom staat in FRANCHISE.md par.
-   4.1a; hier staat alleen de stand.
+   gaan over een PARTNER; `rtg_operating_service` over een EXPLOITANT die RTG in
+   een ander land draait. Dat staat als veld (`tegenpartij`) en niet in een naam,
+   want het beslist wie er mag lezen: wie de vijfde in de partnerweigering
+   meeneemt, laat een zaak lezen dat RTG haar iets rekent voor een netwerk
+   waarvan zij geen gebruiker is. Hij draagt geen percentage; de rekensom staat
+   in FRANCHISE.md par. 4.1a.
 
    Het onderscheid dat dit mogelijk maakt: een PAYMENT SERVICE FEE is een prijs
    voor een verleende dienst (het afhandelen van een betaling), een COMMISSIE is
@@ -116,22 +108,16 @@ const SOORTEN = {
   },
 
   /* DE VIJFDE, EN HIJ IS MET OPZET LEEG (besluit van de eigenaar, 15 september
-     2026). Niet een commissie met een ander etiket: een exploitant betaalt voor
-     wat RTG Amsterdam LEVERT -- merk en licentie, de kernsoftware, de AI, de
-     security, de infrastructuur, de updates en de centrale ondersteuning. Dat is
-     dezelfde toets als bij de andere vier: `overOmzet: false`, want de vraag is
-     wat er geleverd wordt en niet wat de exploitant omzet.
+     2026). Geen commissie met een ander etiket: een exploitant betaalt voor wat
+     RTG Amsterdam LEVERT, dus `overOmzet: false` net als de andere vier. Juist
+     daarom raakt hij de 0%-invariant niet -- die belofte gaat over de OMZET van
+     een PARTNER.
 
-     Juist daarom raakt hij de 0%-invariant niet. Die belofte gaat over een
-     PARTNER en over diens OMZET; deze vergoeding gaat over een EXPLOITANT en
-     over een geleverd netwerk. Zou hij wel over omzet gaan, dan was het een
-     commissie en dan hoort hij hier niet.
-
-     DRIE VELDEN STAAN OP OPEN EN DAT IS DE HELE FUNCTIE VAN DEZE RIJ. De relatie
-     bestaat en is benoemd; het bedrag is niet besloten. Dat is sterker dan een
-     voorlopig percentage, want een voorlopig getal wordt de as waar de rest
-     omheen groeit -- en dan is de eerste onenigheid met een exploitant een
-     discussie over een getal dat niemand ooit heeft afgewogen. */
+     DRIE VELDEN OP OPEN IS DE HELE FUNCTIE VAN DEZE RIJ: de relatie is benoemd,
+     het bedrag is niet besloten. Sterker dan een voorlopig percentage, want een
+     voorlopig getal wordt de as waar de rest omheen groeit -- en dan gaat de
+     eerste onenigheid met een exploitant over een getal dat niemand ooit heeft
+     afgewogen. */
   rtg_operating_service: {
     label: 'Operating network',
     wat: 'de expliciete vergoeding die een RTG-exploitant aan RTG Amsterdam ' +
@@ -154,16 +140,10 @@ const SOORTEN = {
    kunnen zien zonder de geschiedenis te kennen. */
 function isOpen(v) { return v === OPEN; }
 
-/* WORDT DEZE VERGOEDING ERGENS UITGEREKEND? Elke soort draagt daarvoor een
-   EIGEN `berekening`: ofwel de plek in de code, ofwel NIET_ACTIEF. Dat is met
-   opzet een veld en geen afleiding uit de zin in `waar` -- betekenis uit de vorm
-   van proza halen is precies de klasse die METERKLASSE.md telt, en hier zou hij
-   `nog niet gebouwd` moeten herkennen naast `nergens` naast wat de volgende
-   schrijver verzint.
-
-   Van de vijf staat er vandaag EEN op actief. Dat is geen tekort van deze
-   module: drie zijn een benoemde vergoeding waar nog geen weg voor is, en de
-   vijfde is bewust open. */
+/* WORDT DEZE VERGOEDING ERGENS UITGEREKEND? Elke soort draagt een EIGEN
+   `berekening`: de plek in de code, of NIET_ACTIEF. Met opzet een veld en geen
+   afleiding uit de zin in `waar` -- betekenis uit de vorm van proza halen is de
+   klasse die METERKLASSE.md telt. Van de vijf staat er vandaag EEN op actief. */
 function isActief(soort) {
   const s = SOORTEN[soort];
   if (!s) return false;

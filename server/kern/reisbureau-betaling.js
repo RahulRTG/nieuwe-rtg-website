@@ -26,8 +26,8 @@
    als een meting en is een gok. */
 'use strict';
 
-const { geldrij } = require('./waarde/economischeherkomst.js');
-const { voorAanvraag } = require('./reisbureau-samenstelling.js');
+const { geldrij } = require('./waarde/economischeherkomst');
+const { voorAanvraag } = require('./reisbureau-samenstelling');
 
 /* De positie waar RTG de reissom int. Een eigen naam en niet `rtg:reserve`:
    die bak is van de fondsafdracht (opzet/kern-geldnaden.js), en twee

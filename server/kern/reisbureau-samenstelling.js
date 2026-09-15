@@ -50,7 +50,7 @@ const HERKOMSTEN = Object.freeze(['partner', 'rtg', 'extern']);
 /* Aan wie hij economisch toekomt. Dit zijn de partijsoorten van
    kern/waarde/economischeherkomst.js en met opzet geen eigen lijst: een tweede
    woordenlijst voor dezelfde vraag is de VERMOGENS-botsing uit SEMANTIEK.json. */
-const { isSoort } = require('./waarde/economischeherkomst.js');
+const { isSoort } = require('./waarde/economischeherkomst');
 
 const centenVanEuro = (v) => {
   const n = Number(v);

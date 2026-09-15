@@ -483,6 +483,7 @@ const REGISTERS = [
      besluit dat een Moment een projectie is en geen object. Een verouderde nul
      ziet er exact zo uit als een verse. */
   ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet'],
+  ['NEIGINGVORM.json', 'npm run neigingvorm:vast', 'of er een persoonlijke laag bij mag en in welke vorm -- NEIGING.md par. 0 rust erop. Twee uitslagen verouderen anders stil: de NAAMmeting (die zijn eigen laag meetelt zodra die bestaat) en de veertien voorkeursvormen zonder grond, zekerheid of verval, waar de hele bestaansgrond van de laag op staat'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
      elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
      alleen nog dat er destijds geen domein ontbrak. */

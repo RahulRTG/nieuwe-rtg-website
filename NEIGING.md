@@ -105,7 +105,7 @@ Elk van de vijftien punten uit het voorstel draagt in `NEIGINGVORM.json` een
 **verwijzing naar bestaande code**, en die verwijzing wordt **nagetrokken**:
 bestaat het bestand, en staat het genoemde symbool erin? Een punt waarvan de
 verwijzing rot, zakt naar `verwijzing-rot`. De meter verdiende zich meteen terug:
-punt 14 wees naar `server/kern/gezin.js`, en dat bestand bestaat niet — de
+punt 14 wees naar een `gezin`-module onder `server/kern/` die niet bestaat — de
 werkelijke onderbouw is `kern/levensband/inzage.js`.
 
 **Stand: 15 dragen, 0 rot.** Net als bij `HDI.md` par. 1 en `STAGE.md` par. 3 is
@@ -249,7 +249,7 @@ filter achteraf kan iemand vergeten.
 | `tonen` | hiermee bepaalt RTG wat hij je laat zien |
 | `helpen` | hiermee helpt RTG je met iets wat je zelf vraagt |
 
-**Wat er met opzet niet is** (`kern/neiging/neiging-besluiten.js`):
+**Wat er met opzet niet is** (`server/kern/neiging/besluiten.js`):
 
 - **`delen`** — een neiging gaat nooit naar een derde partij. Wie een voorkeur aan
   een zaak wil meegeven gebruikt `zorgMee()`, dat al een zaak, een reden en een

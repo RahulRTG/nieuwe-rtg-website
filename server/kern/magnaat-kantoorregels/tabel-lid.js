@@ -40,7 +40,23 @@ module.exports = [
      regels lopen na een hernoeming uit elkaar, en dan hangt het scherm ergens
      anders dan de deur die het bedient. */
   [/(?:^|\/)mijn[-/](?:tweefactor|sessies|herstelkanaal)/, 'intern', 'Intern & IT'],
-  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch'],
+  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties|neigingen)/, 'juridisch', 'Juridisch'],
+  /* RTG NEIGING (/api/neiging, NEIGING.md) HOORT BIJ DIEZELFDE ZEGGENSCHAP, en
+     daarom staat `neigingen` hierboven in de schermregel en het routepad hier.
+
+     Twee regels en niet een, om precies de reden die vier regels hierboven bij
+     de schermen staat: het SCHERM heet mijn-neigingen.html en past op het
+     mijn-patroon, de ROUTES heten /api/neiging/* en passen daar niet op. Ze bij
+     elkaar vegen met een losser patroon zou beide families raken die er niets
+     mee te maken hebben.
+
+     WAAROM JURIDISCH EN NIET INTERN. Dit is dezelfde familie als
+     mijn-gegevens: wat RTG van u weet, waarvoor het gebruikt mag worden, en de
+     knop om het weg te halen. `vergeet` en `niet-voor` zijn zeggenschap over
+     eigen gegevens, precies zoals /api/privacy en /api/toestemming. Het
+     verschil met mijn-gegevens is de INHOUD (neigingen tegenover
+     personalia) en niet het werk. */
+  [/(?:^|\/)api\/neiging(?:\/|$)/, 'juridisch', 'Juridisch'],
   /* EEN DERDE FAMILIE: HET EIGEN LIDMAATSCHAP (/api/mijn/abonnement).
 
      Hij viel op de restpost toen de ledenkant van het lidmaatschap erbij kwam --

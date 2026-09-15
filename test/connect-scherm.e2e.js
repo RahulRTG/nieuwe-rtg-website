@@ -38,7 +38,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
-  wachtTot, tekstVan } = require('./helper');
+  wachtTot, tekstVan, edgeActies } = require('./helper');
 
 const pw = laadPlaywright();
 const SCHERM = '/apps/connect.html';
@@ -116,8 +116,13 @@ test('Ontdekken: de deur, motoren die zeggen dat ze niet kijken, een gevraagde p
          alleen `textContent` leest, leest een verborgen tabblad en merkt nooit
          dat de knop onbereikbaar is -- zo viel de eerste versie van deze toets
          om op een klik die 56 keer opnieuw probeerde. */
-      await page.waitForSelector('nav.rtgdeel-balk button', { timeout: 30000 });
-      const tab = (naam) => page.locator('nav.rtgdeel-balk button').filter({ hasText: naam }).first();
+      await edgeActies(page);
+      assert.equal(await page.locator('nav.rtgdeel-balk').isVisible(), false,
+        'de app heeft naast de standaard Edge nog een eigen navigatiebalk');
+      const tab = async (naam) => {
+        await edgeActies(page);
+        await page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam, exact: true }).click();
+      };
 
       /* Het antwoord van de server ernaast, zodat het scherm wordt vergeleken
          met de BRON en niet met zichzelf. */
@@ -129,7 +134,7 @@ test('Ontdekken: de deur, motoren die zeggen dat ze niet kijken, een gevraagde p
       assert.ok(zonderBron.length >= 1,
         'geen enkele motor staat als niet-aangesloten; dan bewijst deze toets niets over het hardop melden');
 
-      await tab('Waarom dit?').click();
+      await tab('Waarom dit?');
       await page.locator('#motoren').waitFor({ state: 'visible', timeout: 20000 });
       assert.equal(await page.locator('#motoren .stilmotor').count(), motoren.length,
         'het scherm toont een ander aantal motoren dan de server noemt');
@@ -147,7 +152,7 @@ test('Ontdekken: de deur, motoren die zeggen dat ze niet kijken, een gevraagde p
         'de reden van een motor zonder bron staat niet letterlijk op het scherm');
 
       /* 3. DE PLAATS WORDT GEVRAAGD -- op het tabblad waar een mens hem ziet. */
-      await tab('Jij').click();
+      await tab('Jij');
       await page.locator('#plaats').waitFor({ state: 'visible', timeout: 20000 });
       assert.ok(ontdek.body.plaatsGevraagd,
         'zonder plaats hoort de server te zeggen dat hij er een nodig heeft');

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1899 bestanden en 13621 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1903 bestanden en 13658 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1899 |
-| losse beweringen (`test(...)`) | 13621 |
+| toetsbestanden | 1903 |
+| losse beweringen (`test(...)`) | 13658 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1255 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
-| alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 405 |
+| alleen in de kop *genoemd*, nog niet gemeten | 169 |
+| niets van beide | 408 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1682 bestanden, 13238 beweringen.
+1686 bestanden, 13275 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -348,6 +348,7 @@ toets omvalt.
 | `duurzaamheidskosten.test.js` | 5 | gezakt op `return-weg#0` | DE KOSTENMETING VAN DE DUURZAME COMMIT -- het oordeel, los van twee servers. De ronde zelf start twee servers en duurt minuten; daar komt niemand met een mutatie bij. |
 | `dyncode-e2e.test.js` | 5 | gezakt op `liegpoort /api/` | Dynamische RTG-code, end-to-end via de routes: alleen een app-sessie kan een code maken (/api/code/dyn) of verifieren (/api/code/scan); een generieke lezer zonder inlog komt er niet langs. npm test |
 | `dyncode.test.js` | 7 | gezakt op `!==->===` | Dynamische gesloten RTG-code (kern/dyncode.js): kort houdbare, HMAC-onder- tekende tokens die alleen ons systeem maakt en verifieert. npm test |
+| `econ01.test.js` | 6 | -- | ECON-01 -- GELDRICHTING IS NIET HETZELFDE ALS ECONOMISCHE EIGENDOM. Een EIGEN toetsbestand en niet een paragraaf in test/reisherkomst.test.js, en dat is de hele reden dat de regel een naam heeft: hij is niet van reizen. |
 | `economic-runtime.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `economie.test.js` | 10 | genoemd | RTG ECONOMIC CONTROL PLANE: vier werelden, en een firewall ertussen die standaard weigert. Deze toetsen gaan over de GRENS en niet over de rekensom -- die staat in test/kosten.test.js. |
 | `economische-boeking-isolatie.test.js` | 1 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -375,6 +376,7 @@ toets omvalt.
 | `eten-uitgaan-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `eten.test.js` | 4 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `eu-naleving.test.js` | 6 | geen bronmutatie mogelijk | De pinnen onder EU.md: elke "dit staat in de code"-bewering uit dat document staat hier als toets. Niet omdat een tekstcontrole diepgang heeft, maar omdat een nalevingsdocument dat naar de code wijst gaat LIEGEN... |
+| `eurodekking.test.js` | 6 | genoemd | HOEVEEL VAN HET GELD BEGRIJPT DEZE MACHINE -- en de vier manieren waarop dat getal kan liegen. De dragende toetsen zijn 3, 4 en 5, en geen van drieen gaat over rekenen: 3. |
 | `eventkeuken.test.js` | 7 | gezakt op `liegpoort /api/` | DE EVENTKEUKEN -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: catering, allergy, allergy/alt, mep, checkin, runsheet, runsheet/done en runsheet/ai. |
 | `eventloop.test.js` | 4 | geen bronmutatie mogelijk | DE EVENT-LOOP-VERTRAGING, EN OF DE METER HEM ECHT ZIET. Node draait alles op een lus. |
 | `excursie.test.js` | 2 | gezakt op `liegpoort /api/` | DE EXCURSIE -- waar kinderen zijn, en wie dat mag weten. WAAROM DIT DE ZWAARSTE VAN DE SCHOOL IS Van alle 199 school- en RTF-routes zonder toets is dit de enige waar het over de LOCATIE VAN EEN KIND gaat. |
@@ -1153,6 +1155,7 @@ toets omvalt.
 | `reisbureau.test.js` | 9 | gezakt op `liegpoort /api/` | De losse leverancierspagina's in de app: het RTG-reisbureau (samengestelde reizen aanvragen), RTG Verblijven (hotels/appartementen/villa's boeken via /api/verblijf) en RTG Uitgaan (bars/clubs/beachclubs, aanmelden... |
 | `reisgezelschap-routes.test.js` | 12 | gezakt op `liegpoort /api/` | HET REISGEZELSCHAP OVER DE DRAAD -- de twaalf routes uit server/routes/reis.js. WAAROM DIT BESTAND NAAST test/reisgezelschap.test.js STAAT. |
 | `reisgezelschap.test.js` | 16 | -- | HET REISGEZELSCHAP -- de tabel uit kern/reisgezelschap.js, als toets. WAAROM DIT BESTAAD ER. |
+| `reisherkomst.test.js` | 19 | -- | DE EERSTE VERTICALE SLICE VAN ECONOMIC PROVENANCE -- besluit van de eigenaar, 15 september 2026. De keten die hier wordt beproefd: reiscomponent -> herkomst -> commerciele geldgebeurtenis -> pay-geldrij -> economic... |
 | `reisoplosser.test.js` | 8 | -- | DE OPLOSSER (kern/reisoplosser.js) -- REIZEN.md fase 5: "Los het op". De gevaarlijkste belofte van deze knop is dat hij dingen REGELT. |
 | `reisplan.test.js` | 9 | gezakt op `liegpoort /api/` | De multimodale reisplanner: taxi, OV en lopen naast elkaar, en een geboekte reis waarin ze samen EEN reis zijn. Draai los: node --test test/reisplan.test.js Wat deze toetsen bewaken: 1. |
 | `reisuitnodiging.test.js` | 12 | -- | DE REISUITNODIGING (kern/reisuitnodiging.js): een klaargezette reis en een link. DRIE SCHAKELS: het kantoor zet een reis klaar voor iemand die nog geen lid is, die persoon wordt lid en neemt hem over, en hij nodigt... |
@@ -1435,6 +1438,7 @@ toets omvalt.
 | `stagevorm.test.js` | 4 | gezakt op `getal+1#0` | DE STAGEVORM-METER: kan hij nog vinden wat hij beweert niet te vinden? STAGE.md par. |
 | `startpagina.test.js` | 8 | -- | De losse GitHub Pages-voordeur: merk, routes en dagdeelbeelden. Deze pagina draait niet via de productieserver: index.html in de repositoryroot wordt rechtstreeks door GitHub Pages bediend. |
 | `stempel.test.js` | 4 | gezakt op `===->!==#0` | HET STEMPEL: WANNEER IS EEN METING ONREPRODUCEERBAAR? `boomVuil` beantwoordt een vraag met gevolgen: hoort deze uitslag bij de commit die eronder staat, of bij iets wat nergens is vastgelegd? |
+| `stempelveiligheid.test.js` | 6 | -- | KAN EEN METER REPO-WAARHEID SCHRIJVEN DIE NIEMAND HEEFT GEVRAAGD? Deze toetsen bewaken de METER en niet de scripts die hij telt. |
 | `stijlafsplitsing.test.js` | 8 | -- | HET AFGESPLITSTE STIJLBLOK: WAT ER WEG MAG, EN VOORAL WAT NIET. Over alle 258 schermen is 74% van de HTML inline CSS en JS. |
 | `stijlbundel.test.js` | 11 | gezakt op `===->!==#0` | DE STIJLBUNDEL: WAT ER SAMEN MAG, EN VOORAL WAT NIET. /apps/app.html doet 72 verzoeken. |
 | `stilalarm.test.js` | 3 | gezakt op `liegpoort /api/` | EEN NOODSIGNAAL DAT NIEMAND BEREIKT, MAG NOOIT ALS GELUKT GELDEN. WAT ER MISGING. |

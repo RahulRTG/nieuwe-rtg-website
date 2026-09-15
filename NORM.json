@@ -57,12 +57,12 @@
     "idemVerklaard": 1,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1579,
-    "kernGedeeld": 237,
+    "kernBreedte": 1580,
+    "kernGedeeld": 238,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 331,
+    "keuringOmvang": 332,
     "keuringScheef": 18,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -102,8 +102,8 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1674,
-    "toetsenNietGemeten": 624,
+    "testbestanden": 1682,
+    "toetsenNietGemeten": 628,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -119,6 +119,46 @@
     "zelfpoortendeToetsen": 28
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 331,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 331 -> 332",
+      "reden": "server/kern/reisbureau.js groeit van 8647 naar 9540 bytes en komt daarmee in de waarschuwingsband onder 10 kB; de harde grens haalt hij niet en keuringTeGroot beweegt niet. De groei is de deur van de eigenaar naar de betaallaag: aanvraagVan(), tripVan() en markeerBetaald(), plus de uitleg waarom de betaallaag NIET zelf in db.data.trips schrijft (keuringsregel 63: een verklaarde bak heeft een schrijver). WELK bestand de band binnenkwam is niet geschat maar GEMETEN: de keuring is in een worktree tegen origin/main gedraaid en de twee bevindingenlijsten zijn gedift -- erbij precies een, eraf nul. Twee andere bestanden van deze tak zitten ook in de band (server/opzet/kernlaag2.js, 10202) maar stonden daar al op main, en zonder die diff had dit blok het verkeerde bestand aangewezen.",
+      "waarheen": "reisbureau.js draagt twee onderwerpen: het reisbureau zelf en de deur naar de betaling. Splitst iemand die deur af naar kern/reisbureau-deur.js, dan valt dit getal vanzelf terug -- maar dat is een refactor op vreemd terrein en niet iets om in deze tak terloops te doen."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1579,
+      "vervalt": "2026-12-15",
+      "meter": "kernBreedte 1579 -> 1580",
+      "reden": "`reisbetaling` komt als naam in de kern en wordt door een route aangeraakt. Dat is geen sluipende groei maar de prijs van EEN nieuwe capability: de verticale slice van de economische herkomst heeft een ingang nodig, en die ingang is deze naam. Hij staat ook als verklaring in GRENZEN.json -- de domeingrens hield hem tegen tot iemand hem opschreef, precies zoals bedoeld. De eigenaar heeft bij deze tak uitdrukkelijk gezegd dat kernBreedte via zijn BESTAANDE ratel moet lopen en dat de slice daar niet voor verbreed wordt; dit blok is die weg en geen uitzondering.",
+      "waarheen": "Niets, tenzij de route verdwijnt. Dit getal hoort te dalen doordat oude namen verdwijnen en niet doordat nieuwe capabilities buiten de kern om worden bedraad."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "kernGedeeld",
+      "van": 237,
+      "vervalt": "2026-12-15",
+      "meter": "kernGedeeld 237 -> 238",
+      "reden": "Dezelfde naam als hierboven, maar een andere vraag: `reisbetaling` raakt meer dan een domein aan en telt daarom als echte koppeling. Dat is inherent aan wat de laag doet -- een betaling van een reis staat per definitie tussen het reisdomein en het gelddomein, en dat is precies de naad die deze tak zichtbaar maakt in plaats van weg te schrijven.",
+      "waarheen": "Deze daalt niet zonder dat de capability verdwijnt of dat de twee domeinen anders worden geknipt. Hij hoort hier te blijven staan als de gemeten prijs van de koppeling, niet weggepoetst te worden."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 624,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 624 -> 628",
+      "reden": "Vier toetsbestanden die main niet heeft: test/reisherkomst.test.js (19), test/econ01.test.js (6), test/eurodekking.test.js (6) en test/stempelveiligheid.test.js (6). Geen ervan staat in MUTATIES.json, en dat is de definitie van deze teller. Ze zijn wel alle vier MET DE HAND op mutaties nagetrokken en de uitslagen staan in de blokken hieronder van deze datum; samen zijn dat zeventien mutaties die alle zeventien een toets lieten zakken. Wat deze teller meet is dat de MOTOR er nog niet langs is, en dat is iets anders dan een onbeproefde toets -- daarom gaat hij gewoon omhoog en wordt de meting niet verzacht.",
+      "waarheen": "Laat scripts/mutatie.js over de vier bestanden lopen bij de eerstvolgende volle ronde; dan mag dit getal met vier omlaag. De toets die daar het hardst hoort te zakken is econ01 nr. 2: die bestaat juist om te laten zien dat een controle op het TOTAAL de fout NIET vangt."
+    },
     {
       "datum": "2026-09-15",
       "soort": "schuld",

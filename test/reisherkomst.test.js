@@ -26,8 +26,26 @@ const bb = require('../server/kern/waarde/bijdragebasis.js');
 const eh = require('../server/kern/waarde/economischeherkomst.js');
 const vergoeding = require('../server/kern/commercie/vergoeding.js');
 
+const tb = require('../server/kern/reisbureau-terugboeking.js');
+
 const TRIPS = require('../server/seed/partners.js').partnerTrips;
 const IBIZA = TRIPS.find(t => t.id === 'ibiza-jetset');
+const GSTAAD = TRIPS.find(t => t.id === 'gstaad-alpien');
+const MONACO = TRIPS.find(t => t.id === 'monaco-glamour');
+
+/* De bewaarde vorm van een herkomstrij, zoals kern/reisbureau-betaling.js hem
+   wegschrijft. Los hulpje, want de terugboeklaag werkt op BEWAARDE rijen en niet
+   op de verse uitkomst van geldrijenVoor. */
+function bewaardeRijen(trip, personen) {
+  const g = geldrijenVoor({ trip, personen: personen || 1, boekingId: 'PB-toets', valuta: 'EUR' });
+  return g.rijen.map((r, i) => ({
+    id: 'RGH-' + i, ref: 'RTG-R-TOETS', at: '2026-09-15T10:00:00.000Z',
+    bedragCenten: r.bedragCenten, valuta: r.valuta,
+    economischeHerkomst: r.economischeHerkomst, economischeEigenaar: r.economischeEigenaar,
+    naarWie: r.naarWie, grond: r.grond, bronObject: r.bronObject,
+    relatie: r.relatie, land: r.land, bewijs: r.bewijs
+  }));
+}
 
 /* ---------------------------------------------- 1-4: de commerciele bron -- */
 
@@ -42,7 +60,9 @@ test('1. de samenstelling sluit exact op de reissom, en schaalt niets bij', () =
 });
 
 test('2. een reis zonder samenstelling is ONBEKEND en nooit een lege lijst', () => {
-  for (const t of TRIPS.filter(x => x.id !== 'ibiza-jetset')) {
+  /* Sinds reis 1 t/m 3 zijn uitgesplitst, is dit de enige die nog ONBEKEND is --
+     en hij staat daar met opzet voor (zie de zaaiset). */
+  for (const t of TRIPS.filter(x => !Array.isArray(x.samenstelling))) {
     const s = sam.samenstellingVan(t);
     assert.equal(s.bekend, false, t.id + ' claimt een samenstelling die er niet is');
     assert.ok(s.waarom && s.waarom.length > 40,
@@ -239,7 +259,7 @@ test('12. een reis ZONDER samenstelling wordt geweigerd met de reden', async () 
     const token = reg.body.token;
     assert.ok(token, 'registratie mislukt: ' + JSON.stringify(reg.body).slice(0, 200));
 
-    const aanvraag = await post(srv.base, '/api/reisbureau/boek', { tripId: 'gstaad-alpien', personen: 1 }, token);
+    const aanvraag = await post(srv.base, '/api/reisbureau/boek', { tripId: 'lissabon-nieuw', personen: 1 }, token);
     assert.equal(aanvraag.status, 200, JSON.stringify(aanvraag.body).slice(0, 200));
     const ref = aanvraag.body.aanvraag.ref;
 
@@ -313,5 +333,141 @@ test('13. de hele keten op een ECHTE server: een lid betaalt een bevestigde reis
     assert.equal(weer.body.alBetaald, true, 'een tweede betaling werd niet herkend');
     const naTwee = (await post(srv.base, '/api/pay/overzicht', {}, token)).body.saldo;
     assert.equal(naTwee, na, 'de tweede aanroep boekte opnieuw af');
+
+    /* ---- EN DE WEG TERUG, op dezelfde server en dezelfde reis ----
+       Een terugboeking is een besluit van een mens, dus een kantoorroute. Er mag
+       GEEN geld bewegen: wat ontstaat is een teruggaveRECHT dat een mens
+       uitvoert (GELD.md). Zou het saldo hier oplopen, dan heeft deze laag geld
+       verplaatst en dat is precies wat zij niet mag. */
+    const zonderReden = await post(srv.base, '/api/office/reisbureau/terugboeking',
+      { ref, reden: '' }, otok);
+    assert.equal(zonderReden.status >= 400, true,
+      'een terugboeking zonder reden werd toegestaan');
+
+    const terug = await post(srv.base, '/api/office/reisbureau/terugboeking',
+      { ref, reden: 'reis afgezegd door de accommodatie' }, otok);
+    assert.equal(terug.status, 200, JSON.stringify(terug.body).slice(0, 250));
+    assert.equal(terug.body.teruggedraaid, 6, 'niet alle zes onderdelen zijn gespiegeld');
+    assert.equal(terug.body.centen, 220000);
+    assert.equal(terug.body.volledig, true);
+
+    const naTerug = (await post(srv.base, '/api/pay/overzicht', {}, token)).body.saldo;
+    assert.equal(naTerug, na,
+      'het saldo van het lid veranderde door de terugboeking. Deze laag zet een RECHT klaar en ' +
+      'verplaatst geen geld -- een mens voert de teruggave uit langs kern/pay.');
+
+    /* En twee keer terugdraaien gaat niet. */
+    const weerTerug = await post(srv.base, '/api/office/reisbureau/terugboeking',
+      { ref, reden: 'nog een keer' }, otok);
+    assert.equal(weerTerug.status >= 400, true,
+      'dezelfde reis werd twee keer teruggedraaid; dan loopt het dubbele terug');
   } finally { await stop(srv); }
+});
+
+/* ============================================================================
+   REIS 2 EN 3 -- besluit van de eigenaar, 15 september 2026. Niet drie keer
+   hetzelfde happy path, maar drie verschillende ECONOMISCHE EIGENSCHAPPEN.
+   ========================================================================== */
+
+test('14. de drie reizen hebben WEZENLIJK andere verhoudingen', () => {
+  /* Drie reizen met dezelfde verhouding zouden dezelfde eigenschap drie keer
+     toetsen. Wat hier telt is dat de bijdragebasis van ondergeschikt naar
+     dominant beweegt, want dat is de as waarop een franchisevergoeding straks
+     rekent. */
+  const deel = (trip) => {
+    const u = bb.bereken(geldrijenVoor({ trip, personen: 1, boekingId: 'PB-t', valuta: 'EUR' }).rijen);
+    assert.equal(u.sluit, true, trip.id + ' sluit niet');
+    return u.bijdragebasis / u.bruto;
+  };
+  const ibiza = deel(IBIZA), gstaad = deel(GSTAAD), monaco = deel(MONACO);
+  assert.ok(gstaad > ibiza * 2,
+    'gstaad hoort een WEZENLIJK groter eigen aandeel te hebben dan ibiza (' +
+    (gstaad * 100).toFixed(1) + '% tegen ' + (ibiza * 100).toFixed(1) + '%); anders toetsen ' +
+    'twee reizen dezelfde vorm');
+  assert.ok(monaco < ibiza,
+    'monaco hoort juist een kleiner eigen aandeel te hebben dan ibiza');
+  const uitgesplitst = TRIPS.filter(t => Array.isArray(t.samenstelling));
+  assert.equal(uitgesplitst.length, 3, 'er horen precies drie uitgesplitste reizen te zijn');
+  for (const t of uitgesplitst) assert.equal(sam.samenstellingVan(t).bekend, true, t.id + ' sluit niet');
+  assert.ok(TRIPS.some(t => !Array.isArray(t.samenstelling)),
+    'er is geen ONuitgesplitste reis meer in de zaaiset. Dan hebben de weigeringstoetsen geen ' +
+    'onderwerp en staan ze groen om de verkeerde reden.');
+});
+
+test('15. DRAGEND: na een VOLLEDIGE terugboeking klopt de waarheid achteruit', () => {
+  /* De hele vraag van reis 3. Elke bak hoort op nul te staan -- niet alleen het
+     bruto. Zou de spiegel de eigenaar `lid` dragen, dan klopte het bruto ook
+     (nul) terwijl doorbelasting op 1800 en de bijdragebasis op 120 bleef staan:
+     drie getallen die samen nul zijn en elk afzonderlijk liegen. */
+  const origineel = bewaardeRijen(MONACO, 1);
+  const voor = bb.bereken(origineel);
+  assert.equal(voor.doorbelasting, 180000);
+  assert.equal(voor.bijdragebasis, 12000);
+
+  const sp = tb.spiegelVoor({ rijen: origineel, kiesIds: null, reden: 'reis afgezegd door het hotel' });
+  assert.equal(sp.ok, true, sp.waarom || '');
+  assert.equal(sp.volledig, true);
+  assert.equal(sp.terugCenten, 195000);
+
+  const na = tb.kloptAchteruit(origineel.concat(sp.rijen.map(x => x.rij)), bb.bereken);
+  assert.equal(na.sluit, true, 'restverschil ' + na.verschil);
+  assert.equal(na.bruto, 0, 'er is bruto ' + na.bruto + ' blijven staan');
+  assert.equal(na.doorbelasting, 0,
+    'de doorbelasting staat op ' + na.doorbelasting + ' na een VOLLEDIGE terugbetaling. Dan draagt ' +
+    'de spiegel een andere bak dan zijn origineel, en zeggen de losse posten iets onwaars terwijl ' +
+    'het totaal klopt.');
+  assert.equal(na.bijdragebasis, 0);
+  assert.equal(na.overig.belasting, 0);
+  assert.equal(na.allesNul, true);
+});
+
+test('16. de spiegel draait TWEE velden om en het derde NIET', () => {
+  const origineel = bewaardeRijen(MONACO, 1);
+  const hotel = origineel.find(r => /Suite/.test(r.grond || ''));
+  const sp = tb.spiegelVoor({ rijen: [hotel], kiesIds: null, reden: 'kamer niet geleverd' });
+  const m = sp.rijen[0].rij;
+  assert.equal(m.bedragCenten, -96000);
+  assert.equal(m.economischeHerkomst, 'rtg', 'de waarde komt nu VAN RTG');
+  assert.equal(m.naarWie, 'lid', 'en gaat naar het lid');
+  assert.equal(m.economischeEigenaar, hotel.economischeEigenaar,
+    'de EIGENAAR draait niet om: een hotelnacht terugdraaien is min doorbelasting en geen ' +
+    'schuld aan de klant. Precies hier gaat het mis als iemand "het geld gaat naar het lid, ' +
+    'dus de eigenaar is het lid" redeneert.');
+  assert.equal(sp.rijen[0].spiegelVan, hotel.id, 'de spiegel wijst niet naar zijn origineel');
+});
+
+test('17. een GEDEELTELIJKE terugboeking raakt alleen wat is gekozen', () => {
+  const origineel = bewaardeRijen(MONACO, 1);
+  /* Monaco draagt met opzet TWEE activiteiten; er gaat er precies een terug. */
+  const casino = origineel.find(r => /casino/i.test(r.grond || ''));
+  const sp = tb.spiegelVoor({ rijen: origineel, kiesIds: [casino.id], reden: 'casino-avond verviel' });
+  assert.equal(sp.ok, true, sp.waarom || '');
+  assert.equal(sp.volledig, false, 'een van de zes is geen volledige terugboeking');
+  assert.equal(sp.terugCenten, 18000);
+
+  const na = bb.bereken(origineel.concat(sp.rijen.map(x => x.rij)));
+  assert.equal(na.sluit, true);
+  assert.equal(na.bruto, 195000 - 18000);
+  assert.equal(na.doorbelasting, 180000 - 18000, 'alleen de casino-avond hoort te verdwijnen');
+  assert.equal(na.bijdragebasis, 12000, 'de eigen dienst van RTG is niet teruggedraaid');
+  const tafel = origineel.find(r => /circuit/i.test(r.grond || ''));
+  assert.ok(tafel, 'de tweede activiteit ontbreekt; dan toetst dit niets');
+});
+
+test('18. een terugboeking zonder reden, of twee keer dezelfde, wordt geweigerd', () => {
+  const origineel = bewaardeRijen(MONACO, 1);
+  for (const reden of [undefined, '', '   ', 'ok']) {
+    const sp = tb.spiegelVoor({ rijen: origineel, kiesIds: null, reden });
+    assert.equal(sp.ok, false,
+      'een terugboeking met reden ' + JSON.stringify(reden) + ' werd toegestaan. Een bedrag dat ' +
+      'terugloopt zonder opgeschreven reden, ziet er bij controle hetzelfde uit als een fout.');
+  }
+  /* En niet twee keer: de spiegels van de eerste ronde reizen mee in de lijst. */
+  const eerste = tb.spiegelVoor({ rijen: origineel, kiesIds: null, reden: 'reis afgezegd' });
+  const metSpiegels = origineel.concat(eerste.rijen.map((x, i) =>
+    Object.assign({ id: 'RGH-S' + i, spiegelVan: x.spiegelVan }, x.rij)));
+  const tweede = tb.spiegelVoor({ rijen: metSpiegels, kiesIds: null, reden: 'nog een keer' });
+  assert.equal(tweede.ok, false,
+    'dezelfde reis werd twee keer teruggedraaid; dan loopt er het dubbele terug terwijl er een ' +
+    'keer is afgezegd');
 });

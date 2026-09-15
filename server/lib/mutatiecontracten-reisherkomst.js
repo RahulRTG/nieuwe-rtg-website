@@ -67,8 +67,39 @@ const CONTRACTEN = {
         '1 grootboekregel met soort `reis`. ' +
         '2e: 200 met `alBetaald: true` -> saldo blijft 80000, nog steeds 1 grootboekregel ' +
         'en geen tweede stel herkomstrijen. ' +
-        'En de weigerkant: een reis ZONDER samenstelling (gstaad-alpien) geeft 409 met de reden, ' +
-        'zonder boeking en zonder herkomstrij.',
+        'En de weigerkant: een reis ZONDER samenstelling (lissabon-nieuw) geeft 409 met de reden, ' +
+        'zonder boeking en zonder herkomstrij. (Hier stond gstaad-alpien; die is op dezelfde dag ' +
+        'uitgesplitst, en een gemeten bewering die naar het verkeerde geval wijst is geen bewijs.)',
+      op: GEMETEN_OP
+    },
+    afgetekend: AFGETEKEND
+  },
+
+  /* HET KANTOOR DRAAIT EEN BETAALDE REIS TERUG. Hier is de tweede oproep WEL een
+     409, anders dan bij /betaal hierboven -- en dat verschil is met opzet. Bij
+     /betaal staat een lid voor de knop dat net geld heeft zien weggaan; hier
+     staat een medewerker die een besluit neemt, en die hoort te LEZEN dat de reis
+     al is teruggedraaid in plaats van een stille bevestiging te krijgen.
+
+     De stand na twee oproepen is identiek aan die na een: dezelfde zes
+     spiegelrijen, hetzelfde ene teruggaveRECHT, hetzelfde saldo. De bescherming
+     zit in de spiegellaag zelf (kern/reisbureau-terugboeking.js weigert een rij
+     die al een spiegel heeft), en niet in een idempotentiesleutel -- die is er
+     niet. Een tweede ronde zou het bedrag verdubbelen terwijl er een keer is
+     afgezegd, en dat is de duurste fout die deze route kan maken. */
+  'POST /api/office/reisbureau/terugboeking': {
+    mutatieId: 'reisbureau.terugboeking.kantoor',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'PROTECTED',
+    bewijs: {
+      gemeten: 'zonder reden: geweigerd, geen spiegelrij en geen teruggaveRECHT. ' +
+        '1e met reden: 200 -> 6 spiegelrijen, 220000 cent, volledig; saldo van het lid ONVERANDERD ' +
+        '(er wordt een RECHT klaargezet en geen geld verplaatst). ' +
+        '2e met dezelfde ref: geweigerd -> nog steeds 6 spiegelrijen en hetzelfde saldo. ' +
+        'En de waarheid klopt achteruit: doorbelasting, bijdragebasis en belasting staan na de ' +
+        'volledige terugboeking alle drie op nul, niet alleen het bruto.',
       op: GEMETEN_OP
     },
     afgetekend: AFGETEKEND

@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-15T09:01:40.284Z",
-  "commit": "4a5180b87",
-  "boomVuil": false,
-  "boomAnders": 9,
+  "op": "2026-09-15T10:57:00.233Z",
+  "commit": "fc6766d7e",
+  "boomVuil": true,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4944,
-  "geclassificeerd": 4944,
+  "totaal": 4945,
+  "geclassificeerd": 4945,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3189,
    "NOT_APPLICABLE": 1181,
-   "PROTECTED": 446,
+   "PROTECTED": 447,
    "INTENTIONALLY_NON_IDEMPOTENT": 128
   },
-  "vastgesteldDoorMens": 1803,
+  "vastgesteldDoorMens": 1804,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4074,
+   "AUTHENTICATED": 4075,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 726,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4681,
-   "niet gemeten": 11
+   "niet gemeten": 12
   },
   "voorstellen": {},
   "metingVan": "2026-09-14T23:40:03.108Z"
@@ -63618,6 +63618,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reisbureau.terugboeking.kantoor",
+   "route": "POST /api/office/reisbureau/terugboeking",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->3784<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->3792<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -101,8 +101,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2787<!--/getal--> van de
-   <!--getal:machine.muterend-->3784<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2783<!--/getal--> van de
+   <!--getal:machine.muterend-->3792<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van
@@ -189,9 +189,9 @@ afgehandeld (**World Model** is bezet met zes betekenissen en heet hier
 levensgraaf, **Capability Mesh** half, **Trust Kernel** half, **Intent Engine**
 vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven die
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
-<!--getal:semantiek.namen-->123<!--/getal--> namen in meer dan één domein heeft,
-waarvan <!--getal:semantiek.betekenissen-->105<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->392<!--/getal-->
+<!--getal:semantiek.namen-->124<!--/getal--> namen in meer dan één domein heeft,
+waarvan <!--getal:semantiek.betekenissen-->106<!--/getal--> met meer dan één
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->394<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).

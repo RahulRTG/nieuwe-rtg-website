@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-14",
+  "vastgelegd": "2026-09-15",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1668,
+    "testbestanden": 1670,
     "toetsenNietGemeten": 619,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -2389,7 +2389,7 @@
   },
   "sinds": {
     "keuringOmvang": "2026-09-13",
-    "testbestanden": "2026-09-14",
+    "testbestanden": "2026-09-15",
     "toetsenNietGemeten": "2026-09-14",
     "inlineStijlAttributen": "2026-09-11",
     "ratelTanden": "2026-09-14",

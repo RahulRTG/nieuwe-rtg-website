@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T11:36:23.873Z",
-    "commit": "eae98de8",
+    "op": "2026-09-15T15:12:37.992Z",
+    "commit": "c9834f1a",
     "boomVuil": false,
     "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
@@ -5912,6 +5912,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/pakketten.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "paktebetekenis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/paktebetekenis.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1

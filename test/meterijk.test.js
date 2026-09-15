@@ -1559,6 +1559,33 @@ const IJKINGEN = {
       (j) => { j.gemeten.vorm.domeinen = Math.max(0, (j.gemeten.vorm.domeinen || 0) - 4); return j; },
       () => voor.stageDomeinenGemeten - norm.meet().stageDomeinenGemeten)
   },
+  /* DE TWEE TANDEN VAN 15 SEPTEMBER 2026, bij NEIGINGVORM.json (NEIGING.md par.
+     0). Ze staan allebei op een NUL of op een getal waar een besluit op rust, en
+     dat is precies waarom ze een ijking nodig hebben: bij zo'n meter is "hij is
+     stuk" van buiten niet te onderscheiden van "er is niets aan de hand".
+
+     neigingVerwijzingRot staat op nul: elk punt van het voorstel draagt een
+     verwijzing naar bestaande code die wordt nagetrokken. De ijking gaat daarom
+     OMHOOG -- zet er drie rotte verwijzingen in en de meter hoort er exact drie
+     te melden. Ging hij omlaag, dan zou je een nul met een nul vergelijken.
+
+     neigingVoorkeurBlind telt de bestaande affiniteitsvormen zonder grond,
+     zekerheid of verval; hij staat op veertien, en op dat getal rust de hele
+     bestaansgrond van de laag. De ijking gaat OMLAAG, want zakken is hier de
+     richting die iets betekent: een domein dat zijn voorkeuren etiketteert. De
+     meter leest metAffiniteit MIN metAlledrie, dus de proef verhoogt de tweede
+     -- een mutatie op alleen de eerste zou ook de noemer verschuiven en dan meet
+     de ijking zichzelf. */
+  neigingVerwijzingRot: {
+    proef: (voor) => metVervangenJson('NEIGINGVORM.json',
+      (j) => { j.gemeten.voorstel.rot = (j.gemeten.voorstel.rot || 0) + 3; return j; },
+      () => norm.meet().neigingVerwijzingRot - voor.neigingVerwijzingRot)
+  },
+  neigingVoorkeurBlind: {
+    proef: (voor) => metVervangenJson('NEIGINGVORM.json',
+      (j) => { j.gemeten.voorkeur.metAlledrie = (j.gemeten.voorkeur.metAlledrie || 0) + 4; return j; },
+      () => voor.neigingVoorkeurBlind - norm.meet().neigingVoorkeurBlind)
+  },
   /* DE TAND VAN 14 SEPTEMBER 2026: namensMechanismenGemeten telt de mechanismen
      van namens-iemand-handelen die scripts/namensvorm.js op zijn grammatica
      heeft nagelopen (REPRESENTATIE.md par. 0). Zelfde vorm en zelfde richting
@@ -1643,6 +1670,41 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('STILSPOOR.json',
       (j) => { j.gemeten.spoorAanroepen = Math.max(0, (j.gemeten.spoorAanroepen || 0) - 40); return j; },
       () => voor.stilSpoorAanroepen - norm.meet().stilSpoorAanroepen)
+  },
+  /* DE VIER TANDEN VAN STILLEZING.json -- de spiegel van STILSPOOR hierboven.
+     Elk veld krijgt een EIGEN verstoring en een eigen grootte, zodat twee
+     verwisselde sleutels niet toevallig dezelfde uitslag geven; die val staat
+     bij STILSPOOR al uitgeschreven.
+
+     De twee schulden worden apart geijkt en niet met een gedeelde verstoring,
+     want ze wonen in twee bakken die met opzet nooit worden opgeteld: `server`
+     (een lezing die een HANDELING doorlaat) en `scripts` (een lezing die een
+     METING laat liegen). Een meter die ze zou optellen, beweegt bij beide
+     verstoringen even hard mee en die fout zou hier onzichtbaar blijven. */
+  stilLezing: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.server.smeltSamen = (j.gemeten.server.smeltSamen || 0) + 9; return j; },
+      () => norm.meet().stilLezing - voor.stilLezing)
+  },
+  stilLezingMeters: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.scripts.smeltSamen = (j.gemeten.scripts.smeltSamen || 0) + 13; return j; },
+      () => norm.meet().stilLezingMeters - voor.stilLezingMeters)
+  },
+  /* Het bereik telt de twee werelden WEL bij elkaar op -- de enige plek waar dat
+     gebeurt, want blindheid is een eigenschap van het instrument. De verstoring
+     zit daarom in EEN van de twee: komt hij er niet doorheen, dan telt de meter
+     maar een helft. */
+  stilLezingBereik: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.scripts.bewijslezingen = Math.max(0, (j.gemeten.scripts.bewijslezingen || 0) - 55); return j; },
+      () => voor.stilLezingBereik - norm.meet().stilLezingBereik)
+  },
+  bewijsOnderscheidt: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.server.onderscheidt = Math.max(0, (j.gemeten.server.onderscheidt || 0) - 1);
+               j.gemeten.scripts.onderscheidt = Math.max(0, (j.gemeten.scripts.onderscheidt || 0) - 2); return j; },
+      () => voor.bewijsOnderscheidt - norm.meet().bewijsOnderscheidt)
   },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:

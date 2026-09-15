@@ -60,6 +60,18 @@ const EIGENAAR = {
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
 
+  /* De persoonlijke laag (NEIGING.md par. 0). Eén schrijver, en hij draagt twee
+     ratels in scripts/lib/metingen.js -- staat hij hier niet, dan stijgt het
+     getal van toets 4 doordat er een register bijkomt zonder dat iemand zegt wie
+     het bezit, en dat is precies wat die toets moet tegenhouden. */
+  'NEIGINGVORM.json': { schrijver: 'scripts/neigingvorm.js' },
+
+  /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
+     bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie
+     hieronder vindt hem niet (het doel staat in een `const DOEL` die via
+     path.join is opgebouwd) -- precies de ondergrens die de kop beschrijft. */
+  'STILLEZING.json': { schrijver: 'scripts/stillezing.js' },
+
   /* De lagen die in deze tak zijn gebouwd. */
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },

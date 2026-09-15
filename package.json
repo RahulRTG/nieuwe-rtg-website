@@ -339,6 +339,8 @@
     "aicontext:vast": "node scripts/aicontext.js --vastleggen",
     "stilspoor": "node scripts/stilspoor.js",
     "stilspoor:vast": "node scripts/stilspoor.js --vastleggen",
+    "stillezing": "node scripts/stillezing.js",
+    "stillezing:vast": "node scripts/stillezing.js --vastleggen",
     "meterklasse": "node scripts/meterklasse.js",
     "meterklasse:vast": "node scripts/meterklasse.js --vastleggen",
     "refundmigratie": "node scripts/refundmigratie.js",
@@ -398,6 +400,8 @@
     "zaakliveproef:vast": "node scripts/zaakliveproef.js --vastleggen",
     "omzetproef": "node scripts/omzetproef.js",
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
+    "neigingvorm": "node scripts/neigingvorm.js",
+    "neigingvorm:vast": "node scripts/neigingvorm.js --vastleggen",
     "idemidentiteit": "node scripts/idemidentiteit.js"
   },
   "devDependencies": {

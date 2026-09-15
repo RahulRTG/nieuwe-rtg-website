@@ -1388,6 +1388,57 @@ vestiging, per medewerker). Niet op functies — drie functies verschil dragen g
 factor driehonderd, en functies weghalen bij RTG Pass botst met "premium, ook aan
 de onderkant". Het bedrag zelf staat nergens in de code.
 
+**`NEIGING.md` is de persoonlijke laag** -- RTG Neiging: niet "onboarding +
+profiel" maar de laag die van dezelfde codebase miljoenen persoonlijke
+projecties maakt. Niet te verwarren met `ADAPTIEF.md` hieronder: dat gaat over de
+VORM (bureau, telefoon, stem), dit over de MENS -- en dat verschil is duur
+geleerd, zie hieronder. De kern in een zin: RTG bewaart niet wie je bent maar
+waar je naartoe neigt, en hij kan van elk stuk zeggen hoe hij eraan komt, hoe
+hard het is en wanneer het ophoudt te gelden. Het dragende begrip heet
+**neiging**, en dat is gemeten (`npm run neigingvorm`, `NEIGINGVORM.json`): van
+vijftien kandidaat-begrippen was er **geen enkele vrij** -- `moment` staat in 1615
+bestanden, `context` in 1206 (en betekent daar SITUATIE,
+`kern/experience/contexts.js`), dus een "Personal Context Graph" op dat woord is
+de `VERMOGENS`-botsing uit OS.md. De tweede meting is de dragende: van 1403
+vormen dragen er **14** een affiniteitsveld in tien domeinen, en daarvan **0** een
+grond, **0** een zekerheid en **0** een verval -- er werd dus al op voorkeuren
+gestuurd en niemand kon zeggen hoe hard ze waren. Die veertien worden NIET
+ingeslikt (de `Asset`-les); wat deze laag toevoegt is alleen wat nergens stond.
+Er komt **geen zesde zekerheidsladder** (AFSPRAAK.md) en **geen
+`confidence: 0.94`** (INT-04): de bestaande vier van BESTUUR.md worden
+hergebruikt, met een GROND per trede -- `gezegd` is bewezen, `gekozen` gemeten
+vanaf drie keer, `afgeleid` vermoed. Het scherpste besluit is dat **verval niet
+alles raakt**: RTG vergeet wat hij heeft GERADEN (90 dagen voor een losse
+gebeurtenis, 180 voor geteld gedrag) en nooit wat het lid hem zelf heeft VERTELD
+-- draai je dat om, dan staat de wijnsuggestie een half jaar later weer bij iemand
+die zei niet te drinken. De vraagmotor kapt zichzelf af op een REKENSOM en niet op
+een aantal stappen: een vraag wordt alleen gesteld als hij bestemmingen kan
+opendoen die nog dicht zijn, en die bestemmingen komen uit `sprongindex.json`
+(afgeleid uit MAPPEN -- er komt geen tweede lijst apps) en worden nagetrokken.
+Zeven grenzen in par. 5, waarvan de drie scherpste: de meeteenheid is de neiging
+en **nooit de mens**, de uitkomst **voegt alleen toe** (er is geen veld waarin
+"dit is niets voor jou" zou passen), en een neiging **verlaat het huis nooit** --
+er is geen doel `delen` en geen `adverteren`, en dat is geen schakelaar die
+uitstaat maar een woord dat in de gesloten lijst niet voorkomt. Er is met opzet
+**geen kantoorroute**: zolang 422 van de 590 kantoorroutes achter een gedeelde
+code hangen (KANTOORMACHT.md), hoort een laag die bijhoudt wat iemand leuk vindt
+niet als eerste zijn kantoordeur te bouwen. **Par. 7 is de duurste les en gaat
+over de meter zelf**: de eerste naammeting las alleen `server/kern` en drie broers
+-- de zeef van `scripts/objectmodel.js`, die een antwoord is op "waar wonen
+domeinvormen" en niet op "waar kan een naam bezet zijn". Hij gaf `adaptief` vrij
+terwijl ADAPTIEF.md een laag van 95 bestanden draagt, en `test/adaptief.test.js`
+plus `.e2e.js` zijn daardoor overschreven zonder dat iets klaagde -- de nieuwe
+toetsen stonden groen, de oude waren weg. *Een zeef die je overneemt van een
+andere meting, neem je over met haar aannames.* Drie andere vondsten gelden
+breder: **niet kiezen is ook een antwoord** (zonder dat komt de openingsvraag
+eeuwig terug, want de niet-gekozen opties dragen nog winst), **twee keer hetzelfde
+ZEGGEN is een uitspraak terwijl twee keer hetzelfde DOEN twee keren zijn** (een
+dubbelklik werd geboekt als een tweede gebeurtenis over een mens), en de eerste
+idempotentiemeting mat niets terwijl hij er geslaagd uitzag -- hij las een
+`db.json` dat niet bestaat (de opslag is SQLite), dus stond er zeven keer "er
+verandert niets"; vandaar dat er nu een BESTURINGSPROEF naast staat die eist dat
+de EERSTE aanroep het beeld wel verandert.
+
 **`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich
 gedraagt op bureau, tablet, telefoon en stem. In één zin: **bureau toont veel
 context tegelijk, telefoon toont één duidelijke taak met zijn handelingen binnen
@@ -2093,8 +2144,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->3794<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2785<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->3801<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2792<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele

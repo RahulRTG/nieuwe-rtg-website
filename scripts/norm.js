@@ -737,6 +737,22 @@ const METERS = [
      reden omhoog: de UITKOMST (0 gedeelde velden) mag bewegen, het aantal
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
+  /* NEIGINGVORM.json (NEIGING.md par. 0). Twee ratels en met opzet geen derde
+     over de naamsmeting: die telt sinds de laag bestaat zijn eigen bestanden
+     mee, dus een getal daarop zou alleen maar groeien met het werk.
+
+     `neigingVerwijzingRot` bewaakt meting C: elk punt van het voorstel draagt
+     een verwijzing naar bestaande code, en die wordt nagetrokken. Rot er een,
+     dan is het document een bewering over het verleden geworden.
+
+     `neigingVoorkeurBlind` bewaakt meting B, en hij gaat de ANDERE kant op dan
+     je zou denken: het telt de bestaande affiniteitsvormen die GEEN grond,
+     zekerheid of verval dragen. Vandaag zijn dat er veertien, en deze laag
+     slikt ze met opzet niet in (de Asset-les). Het getal mag dus dalen doordat
+     een domein zijn eigen voorkeuren etiketteert -- en nooit stijgen doordat er
+     ergens een ongeetiketteerde voorkeur bij komt. */
+  { sleutel: 'neigingVerwijzingRot', richting: 'omlaag', wat: 'punten in NEIGING.md waarvan de verwijzing naar code niet meer klopt' },
+  { sleutel: 'neigingVoorkeurBlind', richting: 'omlaag', wat: 'bestaande voorkeursvormen zonder grond, zekerheid of verval' },
   /* Het BEREIK van de namensvormmeter (REPRESENTATIE.md par. 0), en om exact
      dezelfde reden omhoog als de twee hierboven. De UITKOMST is daar een nul
      (0 velden gedeeld, 0 werkwoorden in alle mechanismen op naam) en daarop
@@ -789,6 +805,23 @@ const METERS = [
   { sleutel: 'stilSpoor', richting: 'omlaag', wat: 'spoor-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilleOpslag', richting: 'omlaag', wat: 'opslag-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilSpoorAanroepen', richting: 'omhoog', wat: 'spoor-schrijvers die de stilspoormeter werkelijk heeft gevonden' },
+  /* ONLEESBAAR IS NIET AFWEZIG (STILLEZING.json, npm run stillezing). Bewijs
+     kent drie toestanden -- bestaat+geldig, bestaat+ongeldig, bestaat niet --
+     en een `catch` die op null valt maakt van de tweede de derde. Leeg betekent
+     in dit huis bijna overal "geen beperking", dus dat is fail-open.
+
+     DE TWEE SCHULDEN WORDEN NOOIT OPGETELD, en dat is geen netheid: in server/
+     laat zo'n lezing een HANDELING door, in scripts/ laat zij een METING liegen.
+     Een som van die twee zou een getal zijn waarop niemand kan sturen.
+
+     `stilLezingBereik` is de ENIGE plek waar de twee werelden wel bij elkaar
+     komen, en met reden: blindheid is een eigenschap van het INSTRUMENT en niet
+     van het huis. Zonder die tand is een dalende schuld niet te onderscheiden
+     van een meter die minder ziet. */
+  { sleutel: 'stilLezing', richting: 'omlaag', wat: 'runtime-lezers die een onleesbaar bewijs als afwezig behandelen (STILLEZING.json)' },
+  { sleutel: 'stilLezingMeters', richting: 'omlaag', wat: 'meters die een onleesbaar register als afwezig behandelen (STILLEZING.json)' },
+  { sleutel: 'stilLezingBereik', richting: 'omhoog', wat: 'bewijslezingen die de stillezingmeter werkelijk heeft gevonden' },
+  { sleutel: 'bewijsOnderscheidt', richting: 'omhoog', wat: 'lezers die ONGELDIG onderscheiden van LEEG in plaats van samen te smelten' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
      beter.
@@ -1503,9 +1536,15 @@ function meet(bronnen) {
     idemAfdrukVoegtNietsToe: leesRegister('IDEMIDENTITEIT.json', (j) => j.voegtNietsToe),
     idemHandwerkGeenVergelijking: leesRegister('IDEMIDENTITEIT.json', (j) => j.handwerkGeenVergelijking),
     stilSpoor: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorGesmoord),
+    stilLezing: leesRegister('STILLEZING.json', (j) => j.gemeten.server.smeltSamen),
+    stilLezingMeters: leesRegister('STILLEZING.json', (j) => j.gemeten.scripts.smeltSamen),
+    stilLezingBereik: leesRegister('STILLEZING.json', (j) => j.gemeten.server.bewijslezingen + j.gemeten.scripts.bewijslezingen),
+    bewijsOnderscheidt: leesRegister('STILLEZING.json', (j) => j.gemeten.server.onderscheidt + j.gemeten.scripts.onderscheidt),
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
+    neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
     /* De WERKWOORD-as en niet de vorm-as, want die telt alleen mechanismen die
        iets OPSLAAN -- en kern/stuur/mandaat.js slaat met opzet niets op. Het
        bereik van deze meter is dus het aantal mechanismen dat hij op zijn

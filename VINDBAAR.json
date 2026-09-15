@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T07:02:43.261Z",
-    "commit": "65e34ee1d",
+    "op": "2026-09-15T16:13:37.728Z",
+    "commit": "8421cc78",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -10,10 +10,10 @@
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 97,
-  "woorden": 1161,
-  "gevonden": 757,
-  "dekking": 0.652,
+  "bestemmingen": 98,
+  "woorden": 1162,
+  "gevonden": 758,
+  "dekking": 0.6523,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -1092,6 +1092,13 @@
     {
       "naam": "Juridisch",
       "url": "/apps/juridisch.html",
+      "woorden": 1,
+      "gevonden": 1,
+      "mist": []
+    },
+    {
+      "naam": "Mijn neigingen",
+      "url": "/apps/mijn-neigingen.html",
       "woorden": 1,
       "gevonden": 1,
       "mist": []

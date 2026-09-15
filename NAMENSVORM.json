@@ -1,15 +1,15 @@
 {
   "stempel": {
-    "op": "2026-09-14T19:46:54.848Z",
-    "commit": "4e51af5d",
+    "op": "2026-09-15T05:28:02.146Z",
+    "commit": "711a4b10",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 0,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
   "uitleg": "Gemeten met scripts/namensvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in REPRESENTATIE.md par. 0: delen de bestaande manieren waarop iemand namens een ander handelt werkelijk een machine? Twee lijsten (smal = handelen, ruim = handelen plus kennen), zodat de uitslag niet op de lijst drijft.",
   "grens": "De eenheid is het MECHANISME en niet het domein, omdat kern/service/machtiging*.js en kern/command/bijstand*.js elk een mechanisme BINNEN een groter domein zijn. Daardoor zijn de percentages hier NIET uitwisselbaar met CARRIEREVORM.json of STAGEVORM.json, die per domein tellen; alleen de VORM van het antwoord is vergelijkbaar. Verder meet dit bewaarde VORMEN (velden van objectliteralen) en geen werkwoorden, volgorde of uitkomst: een nul zegt dat er geen gedeeld OBJECT is, niet dat er geen gedeeld PROCES is -- die tweede vraag beantwoordt een ketenproef. Een mechanisme zonder opgeslagen vormen (een regelbestand zonder db) valt uit de noemer en staat in `zonderVormen`. De woordenschat telt IDENTIFIERS na aftrek van commentaar en tekenreeksen: `bezet` is een waarschuwing met een adres en geen verbod, en samenstellingen tellen niet mee omdat een samenstelling een andere naam is.",
-  "vastgelegd": "2026-09-14",
+  "vastgelegd": "2026-09-15",
   "gemeten": {
     "smal": {
       "vormen": 10,
@@ -17,16 +17,16 @@
       "zonderVormen": [
         "ai-mandaat"
       ],
-      "velden": 50,
+      "velden": 49,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 3,
       "veldenMechanismeEigen": 45,
-      "eigenPct": 90,
+      "eigenPct": 91.8,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
-          "velden": 8
+          "velden": 7
         },
         {
           "mechanisme": "bijstand",
@@ -42,7 +42,7 @@
         },
         {
           "mechanisme": "servicemachtiging",
-          "velden": 11
+          "velden": 10
         },
         {
           "mechanisme": "vertegenwoordiging",
@@ -50,14 +50,6 @@
         }
       ],
       "gedeeld": [
-        {
-          "veld": "doel",
-          "mechanismen": 2,
-          "waar": [
-            "app-machtiging",
-            "servicemachtiging"
-          ]
-        },
         {
           "veld": "ingetrokkenDoor",
           "mechanismen": 2,
@@ -99,16 +91,16 @@
         "ai-mandaat",
         "rtgid-claims"
       ],
-      "velden": 73,
+      "velden": 72,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 5,
       "veldenMechanismeEigen": 68,
-      "eigenPct": 93.2,
+      "eigenPct": 94.4,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
-          "velden": 8
+          "velden": 7
         },
         {
           "mechanisme": "bijstand",
@@ -116,7 +108,7 @@
         },
         {
           "mechanisme": "consent-center",
-          "velden": 8
+          "velden": 7
         },
         {
           "mechanisme": "fiscaal-mandaat",
@@ -136,7 +128,7 @@
         },
         {
           "mechanisme": "servicemachtiging",
-          "velden": 11
+          "velden": 10
         },
         {
           "mechanisme": "vertegenwoordiging",
@@ -144,15 +136,6 @@
         }
       ],
       "gedeeld": [
-        {
-          "veld": "doel",
-          "mechanismen": 3,
-          "waar": [
-            "app-machtiging",
-            "consent-center",
-            "servicemachtiging"
-          ]
-        },
         {
           "veld": "ingetrokkenDoor",
           "mechanismen": 2,
@@ -608,15 +591,15 @@
         }
       ]
     },
-    "envelopVelden": 30
+    "envelopVelden": 31
   },
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 248,
-      "domeinen": 134,
-      "samengesteld": 178,
-      "samengesteldDomeinen": 83,
+      "bestanden": 252,
+      "domeinen": 135,
+      "samengesteld": 182,
+      "samengesteldDomeinen": 84,
       "stand": "bezet",
       "waar": [
         "bedrijf",
@@ -638,8 +621,8 @@
       "woord": "contract",
       "bestanden": 44,
       "domeinen": 17,
-      "samengesteld": 70,
-      "samengesteldDomeinen": 24,
+      "samengesteld": 71,
+      "samengesteldDomeinen": 25,
       "stand": "bezet",
       "waar": [
         "bedrijf",

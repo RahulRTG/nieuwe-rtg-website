@@ -144,6 +144,11 @@ Object.assign(SLEUTELS,
      uitlichting `zelfdeVerzoek`-achtig is en geen `nietIdempotent`, staat in de
      kop van dat bestand -- een 409 op de stand is een toestandscontrole. */
   require('./idemsleutels-stage').SLEUTELS,
+  /* De persoonlijke laag: twee die LEZEN en vijf die iets vastleggen. Waarom
+     `intake` met opzet GEEN `zelfdeVerzoek` is, staat in de kop van dat bestand
+     -- het lichaam is `{}`, dus een replay zou binnen het venster de VORIGE
+     vraag terugspelen terwijl er al een antwoord tussen zat. */
+  require('./idemsleutels-neiging').SLEUTELS,
   /* De ondernemerslus: twee lezers, en twee schrijvers waarvan er een vrije
      tekst draagt. Waarom `velden` en niet `zelfdeVerzoek`, en waarom `/weg`
      hierdoor een ander ANTWOORD geeft, staat in de kop van dat bestand. */

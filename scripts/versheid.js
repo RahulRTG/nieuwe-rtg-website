@@ -130,6 +130,7 @@ const REGISTERS = [
      bot zonder dat iemand het merkt. */
   ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
   ['STILSPOOR.json', 'npm run stilspoor:vast', 'schrijfacties waarvan het falen stil wordt weggevangen (LAT.md regel 21)'],
+  ['STILLEZING.json', 'npm run stillezing:vast', 'lezers die een onleesbaar bewijs als een afwezig bewijs behandelen (BEWIJSMACHINE.md par. 6b)'],
   ['IDEMIDENTITEIT.json', 'npm run idemidentiteit', 'waaraan twee aanroepen hetzelfde verzoek heten (MUTATIECONTRACT.md par. 6e)'],
   ['LAATSTE_METING.json', 'npm run beproeving', 'de laatste stormproef, ook wanneer hij zakt'],
   ['HEAPPROEF.json', 'npm run heapproef', 'geheugengedrag onder herhaalde verzoeken'],
@@ -493,6 +494,7 @@ const REGISTERS = [
      besluit dat een Moment een projectie is en geen object. Een verouderde nul
      ziet er exact zo uit als een verse. */
   ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet'],
+  ['NEIGINGVORM.json', 'npm run neigingvorm:vast', 'of er een persoonlijke laag bij mag en in welke vorm -- NEIGING.md par. 0 rust erop. Twee uitslagen verouderen anders stil: de NAAMmeting (die zijn eigen laag meetelt zodra die bestaat) en de veertien voorkeursvormen zonder grond, zekerheid of verval, waar de hele bestaansgrond van de laag op staat'],
   /* Derde van deze soort, en de scherpste: hier staan TWEE nullen naast elkaar
      (0 gedeelde velden, 0 werkwoorden in alle mechanismen op naam) en
      REPRESENTATIE.md par. 0 draagt daarop het besluit dat er geen Representation

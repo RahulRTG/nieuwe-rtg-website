@@ -112,6 +112,14 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* ONLEESBAAR IS NIET AFWEZIG (STILLEZING.json, npm run stillezing) -- de
+     spiegel van STILSPOOR hierboven. Die meet SCHRIJVERS wier falen wordt
+     opgegeten; deze meet LEZERS die een kapot bewijs als een leeg bewijs
+     behandelen, en alleen die tweede kan een poort laten opengaan. Vier tanden:
+     twee schulden omlaag (en die worden NOOIT opgeteld -- in server/ staat er
+     een handeling tegenover, in scripts/ een meting), het bereik omhoog, en het
+     aantal lezers dat het onderscheid wel maakt omhoog. */
+  'STILLEZING.json': { meter: ['stilLezing', 'stilLezingMeters', 'stilLezingBereik', 'bewijsOnderscheidt'] },
   /* IDEMIDENTITEIT.json (npm run idemidentiteit) beantwoordt wat na #269/#270
      overbleef: waar is de identiteit van een verzoek nog te smal? Drie tanden,
      een omhoog en twee omlaag -- zie de kop bij die tanden in ../norm.js. */
@@ -125,6 +133,23 @@ const REGISTER = {
      hernoemde map in plaats van door een feit, en leest de nul plotseling als
      bevestiging terwijl hij een blinde vlek is. */
   'STAGEVORM.json': { meter: ['stageDomeinenGemeten'] },
+  /* NEIGINGVORM.json meet of er een persoonlijke laag bij mag en in welke vorm
+     (NEIGING.md par. 0). Twee geratelde waarden, en met opzet geen derde over de
+     NAAMmeting: die telt sinds server/kern/neiging/ bestaat zijn eigen bestanden
+     mee, dus een ratel daarop zou alleen maar meegroeien met het werk en niets
+     bewaken.
+
+     `neigingVerwijzingRot` bewaakt meting C: elk punt van het voorstel draagt
+     een nagetrokken verwijzing naar bestaande code. Rot er een, dan is het
+     document een bewering over het verleden geworden.
+
+     `neigingVoorkeurBlind` bewaakt meting B, en hij gaat de andere kant op dan je
+     zou verwachten: hij telt de BESTAANDE affiniteitsvormen zonder grond,
+     zekerheid of verval. Deze laag slikt die veertien met opzet niet in (de
+     Asset-les), dus het getal hoort te dalen doordat een domein zijn eigen
+     voorkeuren etiketteert -- en nooit te stijgen doordat er ergens een
+     ongeetiketteerde voorkeur bij komt. */
+  'NEIGINGVORM.json': { meter: ['neigingVerwijzingRot', 'neigingVoorkeurBlind'] },
   /* NAMENSVORM.json meet of de manieren van namens-iemand-handelen een machine
      delen (REPRESENTATIE.md par. 0). Zelfde soort als STAGEVORM.json hierboven
      en om dezelfde reden is de geratelde waarde het BEREIK: de nullen zijn de

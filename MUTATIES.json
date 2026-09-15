@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:31:37.703Z",
-    "commit": "92de4a23",
+    "op": "2026-09-15T12:59:30.192Z",
+    "commit": "2cdf4e99",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -8815,6 +8815,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "veranderbereik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/veranderbereik.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "verband.test.js": {
       "soort": "puur",

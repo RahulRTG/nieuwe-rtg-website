@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T15:40:00.245Z",
-    "commit": "cb21424d",
+    "op": "2026-09-15T15:53:41.939Z",
+    "commit": "d390153f",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 4,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4865,6 +4865,14 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "mandaatproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/beleid.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 16
     },
     "marechaussee.test.js": {
       "soort": "server",

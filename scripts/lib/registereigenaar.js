@@ -65,6 +65,7 @@ const EIGENAAR = {
   'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
+  'STEMPELVEILIGHEID.json': { schrijver: 'scripts/stempelveiligheid.js' },
 
   /* De persoonlijke laag (NEIGING.md par. 0). Eén schrijver, en hij draagt twee
      ratels in scripts/lib/metingen.js -- staat hij hier niet, dan stijgt het

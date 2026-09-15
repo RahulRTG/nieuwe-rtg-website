@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T17:44:26.499Z",
-    "commit": "9de3af6d",
+    "op": "2026-09-15T19:33:06.162Z",
+    "commit": "f6cb0232",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 7,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -1860,6 +1860,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "connect-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "connect.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2281,6 +2288,14 @@
       "operator": "!==->===",
       "gezakt": 2
     },
+    "econ01.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/waarde/omkering.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "economic-runtime.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2457,6 +2472,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 5 mutaties. Deze toets vergelijkt beweringen uit EU.md met code die er nog STAAT; een operator verandert wat code doet en niet dat hij bestaat. De juiste mutatie is de code weghalen of het document laten liegen"
+    },
+    "eurodekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/waarde/dekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "eventkeuken.test.js": {
       "soort": "server",
@@ -3270,6 +3293,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "handelenspoor.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
       "scherp": "gezakt"
     },
     "handeling-massa.test.js": {
@@ -6619,6 +6649,13 @@
       "gezakt": 12,
       "scherp": "gezakt"
     },
+    "reisherkomst.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "reisplan.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6979,6 +7016,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "rtg-adaptive-edge.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "rtg-adaptive-edge.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-adaptive-edge-core.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 3
     },
     "rtg-continue-key.test.js": {
       "soort": "puur",
@@ -7993,6 +8045,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "spoorvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/spoorvorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "sportclub.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8145,6 +8205,14 @@
       "module": "scripts/lib/stempel.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "stempelveiligheid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/stempelveiligheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "stijlbundel.test.js": {
@@ -9847,82 +9915,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "econ01.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/waarde/omkering.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "eurodekking.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/waarde/dekking.js",
-      "operator": "===->!==#0",
-      "gezakt": 4,
-      "geprobeerd": 1
-    },
-    "handelenspoor.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 6,
-      "scherp": "gezakt"
-    },
-    "reisherkomst.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 2,
-      "scherp": "gezakt"
-    },
-    "rtg-adaptive-edge.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "rtg-adaptive-edge.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/rtg-adaptive-edge-core.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 3
-    },
-    "spoorvorm.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/spoorvorm.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 1
-    },
-    "stempelveiligheid.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/stempelveiligheid.js",
-      "operator": "===->!==#0",
-      "gezakt": 4,
-      "geprobeerd": 1
-    },
-    "connect.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/connect/kring.js",
-      "operator": "false->true#0",
-      "gezakt": 1,
-      "geprobeerd": 2
-    },
-    "connect-routes.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
     }
   }
 }

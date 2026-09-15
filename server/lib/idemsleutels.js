@@ -139,6 +139,11 @@ Object.assign(SLEUTELS,
      uitlichting `zelfdeVerzoek`-achtig is en geen `nietIdempotent`, staat in de
      kop van dat bestand -- een 409 op de stand is een toestandscontrole. */
   require('./idemsleutels-stage').SLEUTELS,
+  /* De persoonlijke laag: twee die LEZEN en vijf die iets vastleggen. Waarom
+     `intake` met opzet GEEN `zelfdeVerzoek` is, staat in de kop van dat bestand
+     -- het lichaam is `{}`, dus een replay zou binnen het venster de VORIGE
+     vraag terugspelen terwijl er al een antwoord tussen zat. */
+  require('./idemsleutels-neiging').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:

@@ -2134,6 +2134,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "doorbelasting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/doorbelasting.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "doorgeefjournaal.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2921,14 +2929,6 @@
       "staat": "gezakt",
       "module": "server/kern/kantoor/geldketen.js",
       "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "geldpositie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/isolatie/geldpositie.js",
-      "operator": "getal+1#0",
       "gezakt": 2,
       "geprobeerd": 1
     },
@@ -4168,6 +4168,14 @@
       "module": "server/kern/labfonds.js",
       "operator": "===->!==#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "landdekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/landdekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "landpakket.test.js": {
@@ -6707,6 +6715,13 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "rtf-labfonds-deur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
     "rtf-veilig.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7625,6 +7640,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "soeverein.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/soeverein.js",
+      "operator": "&&->||#1",
+      "gezakt": 1,
+      "geprobeerd": 9
     },
     "sparren.test.js": {
       "soort": "server",

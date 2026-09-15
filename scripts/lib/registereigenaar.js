@@ -116,6 +116,10 @@ const EIGENAAR = {
      regel hier zou die vloer optillen, en dat is precies de beweging die de
      ratel moet tegenhouden -- ook (juist) als het je eigen register is. */
   'ONDERNEMERSLUS.json': { schrijver: 'scripts/ondernemerslus.js' },
+
+  /* Om dezelfde reden als hierboven: dit register komt met de tak die hem meet,
+     dus de vloer optillen zou hier het goedkoopst zijn en het minst verdiend. */
+  'KETENBEREIK.json': { schrijver: 'scripts/ketenbereik.js' },
 };
 
 /* MEETING: welk script schrijft aantoonbaar naar een wortelregister? Ondergrens,

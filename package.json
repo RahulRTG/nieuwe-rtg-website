@@ -402,7 +402,10 @@
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
     "neigingvorm": "node scripts/neigingvorm.js",
     "neigingvorm:vast": "node scripts/neigingvorm.js --vastleggen",
-    "idemidentiteit": "node scripts/idemidentiteit.js"
+    "idemidentiteit": "node scripts/idemidentiteit.js",
+    "router": "node scripts/router.js",
+    "ketenbereik": "node scripts/ketenbereik.js",
+    "ketenbereik:vast": "node scripts/ketenbereik.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

@@ -3,7 +3,7 @@
     "op": "2026-09-15T05:42:41.670Z",
     "commit": "99e192fe",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -3989,6 +3989,14 @@
       "gezakt": 10,
       "geprobeerd": 1
     },
+    "ketenbereik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ketenbereik.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "ketenchat.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6750,6 +6758,14 @@
       "module": "server/web/routing.js",
       "operator": "===->!==#0",
       "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "routermeting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ai/routermeting.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "rtf-labfonds-deur.test.js": {

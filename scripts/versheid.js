@@ -424,6 +424,15 @@ const REGISTERS = [
   ['MOMENTPROEF.json', 'npm run momentproef:vast', 'of de publieke keten sluit, van een feit bij de bron tot een melding bij een volger'],
   ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],
   ['AANVOERVORM.json', 'npm run aanvoervorm:vast', 'of de vijf terreinen van de aanvoer een VORM delen -- de vraag onder het aanvoercontract'],
+
+  /* De ketenbereikmeting hoort bij deze groep en niet bij de gouden ketens: die
+     meten of een keten SLUIT, deze meet of de keten door een mensenzin wordt
+     BEREIKT. Veroudering weegt hier even zwaar als daar, en om dezelfde reden --
+     hij draait tegen een echte server, en zijn uitslag ("mandaat wordt door geen
+     enkele zin geraakt") is een uitspraak over de code van die dag. Zodra er
+     bedraad wordt, is een oude uitslag niet alleen achterhaald maar misleidend:
+     hij zegt dat er een gat is dat er dan niet meer is. */
+  ['KETENBEREIK.json', 'npm run ketenbereik:vast', 'welke schakel van de keten mens -> effect een echte mensenzin werkelijk aanraakt'],
   /* De navigatieproef staat NAAST de vijf gouden ketens en niet ertussen: hij
      meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
      browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem

@@ -1,0 +1,143 @@
+{
+  "stempel": {
+    "op": "2026-09-15T12:09:19.226Z",
+    "commit": "ab7d2bb3",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/spoorvorm.js",
+    "node": "v22.22.2"
+  },
+  "graad": "vermoed",
+  "hoe": "lexicaal op het lijf van een VERKLAARDE ingangsfunctie, met het commentaar eruit. Een spoorschrijver onder een onbekende naam wordt gemist en leest als afwezig.",
+  "grens": "VIER VAN VIER IS GEEN GOUDEN IMPLEMENTATIE, en dat is de zin die hier het hardst nodig is. Deze matrix meet EEN helft van het contract: beoordelen en vastleggen. De andere helft -- uitvoeren, en weten of die uitvoering landde -- meet hij niet, en de referentie HEEFT die helft niet: kern/vertegenwoordiging/handelen.js voert niets uit. Het mechanisme dat haar wel heeft is kern/appstore/brug.js (roepKaal, met m.doe() in een try/catch en uitvoeringBekend op de fout), en dat staat hier op vier streepjes. Geen enkel mechanisme is dus vandaag de referentie voor de combinatie; wie deze rij kopieert, kopieert de helft (REPRESENTATIE.md par. 9). Verder zegt deze meter NIETS over de kwaliteit van wat er wordt vastgelegd -- of de spoorregel de juiste velden draagt, of hij leesbaar is voor de mens over wie hij gaat, en of het spoor ooit wordt teruggelezen, valt er allemaal buiten. De referentie haalt vier van vier terwijl haar veld `gelukt` aantoonbaar TOEGESTAAN betekent en niet GESLAAGD (par. 8.2, beproefd in test/handelenspoor.test.js toets 4). En hij kijkt alleen in de VERKLAARDE ingangsfunctie: een mechanisme dat elders wel een spoor schrijft, telt hier niet mee.",
+  "besturing": {
+    "referentie": "vertegenwoordiging",
+    "gehaald": 4,
+    "inOrde": true,
+    "wat": "De referentie MOET vier van vier halen. Haalt zij dat niet, dan herkent deze meter de vorm niet die hij komt meten, en zegt een matrix vol nullen niets."
+  },
+  "gemeten": {
+    "mechanismen": 7,
+    "metSpoor": 2,
+    "kanTegenhouden": 1,
+    "volledigConvergent": 1
+  },
+  "rijen": [
+    {
+      "mechanisme": "vertegenwoordiging",
+      "referentie": true,
+      "ingang": "handel",
+      "waarom": "de enige functie in dit huis die een handeling ONDER een machtiging beoordeelt, vastlegt en dan pas antwoordt",
+      "bestandenGevonden": [
+        "server/kern/vertegenwoordiging/handelen.js"
+      ],
+      "ingangGevonden": true,
+      "gelezenIn": "server/kern/vertegenwoordiging/handelen.js",
+      "V1": true,
+      "V2": true,
+      "V3": true,
+      "V4": true,
+      "gehaald": 4
+    },
+    {
+      "mechanisme": "bijstand",
+      "referentie": false,
+      "ingang": "betreed",
+      "waarom": "betreden van de omgeving van een klant is hier de handeling die mag of niet mag; hij woont in bijstand-rtg.js (de RTG-kant), niet in bijstand-klant.js (waar de klant besluit)",
+      "bestandenGevonden": [
+        "server/kern/command/bijstand-rtg.js",
+        "server/kern/command/bijstand.js",
+        "server/kern/command/bijstand-klant.js"
+      ],
+      "ingangGevonden": true,
+      "gelezenIn": "server/kern/command/bijstand-rtg.js",
+      "V1": true,
+      "V2": false,
+      "V3": null,
+      "V3reden": "de spoorregel noemt geen veld dat uit een oordeelsvariabele komt, dus deze meter kan niet bepalen welke uitgang het oordeel draagt",
+      "V4": false,
+      "gehaald": 1
+    },
+    {
+      "mechanisme": "servicemachtiging",
+      "referentie": false,
+      "ingang": "magNu",
+      "waarom": "magNu() is de poort die per moment beslist of een medewerker in het dossier mag",
+      "bestandenGevonden": [
+        "server/kern/service/machtiging.js"
+      ],
+      "ingangGevonden": true,
+      "gelezenIn": "server/kern/service/machtiging.js",
+      "V1": false,
+      "V2": false,
+      "V3": false,
+      "V4": false,
+      "gehaald": 0
+    },
+    {
+      "mechanisme": "ai-mandaat",
+      "referentie": false,
+      "ingang": "magZelfstandig",
+      "waarom": "de enige plek waar een agent te horen krijgt of hij zelfstandig mag handelen",
+      "bestandenGevonden": [
+        "server/kern/stuur/mandaat.js"
+      ],
+      "ingangGevonden": true,
+      "gelezenIn": "server/kern/stuur/mandaat.js",
+      "V1": false,
+      "V2": false,
+      "V3": false,
+      "V4": false,
+      "gehaald": 0
+    },
+    {
+      "mechanisme": "fiscaal-mandaat",
+      "referentie": false,
+      "ingang": "geldt",
+      "waarom": "geldt() wordt VOOR de zending gesteld; hij is de beslissing waar de gateway op afgaat",
+      "bestandenGevonden": [
+        "server/kern/fiscaal/gateway/mandaat.js"
+      ],
+      "ingangGevonden": true,
+      "gelezenIn": "server/kern/fiscaal/gateway/mandaat.js",
+      "V1": false,
+      "V2": false,
+      "V3": false,
+      "V4": false,
+      "gehaald": 0
+    },
+    {
+      "mechanisme": "sepa-machtiging",
+      "referentie": false,
+      "ingang": "keur",
+      "waarom": "keur() is de enige beoordeling in deze laag; innen bestaat hier niet (geen incassorail)",
+      "bestandenGevonden": [
+        "server/kern/machtiging.js"
+      ],
+      "ingangGevonden": true,
+      "gelezenIn": "server/kern/machtiging.js",
+      "V1": false,
+      "V2": false,
+      "V3": false,
+      "V4": false,
+      "gehaald": 0
+    },
+    {
+      "mechanisme": "app-machtiging",
+      "referentie": false,
+      "ingang": "roepKaal",
+      "waarom": "de brug is de enige weg van een app naar RTG, en roepKaal() is waar hij doorgelaten of geweigerd wordt",
+      "bestandenGevonden": [
+        "server/kern/appstore/brug.js",
+        "server/kern/appstore/brugweigering.js"
+      ],
+      "ingangGevonden": true,
+      "gelezenIn": "server/kern/appstore/brug.js",
+      "V1": false,
+      "V2": false,
+      "V3": false,
+      "V4": false,
+      "gehaald": 0
+    }
+  ]
+}

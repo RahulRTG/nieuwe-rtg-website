@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 119,
+    "ratelTanden": 120,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1674,
-    "toetsenNietGemeten": 624,
+    "toetsenNietGemeten": 626,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -113,9 +113,20 @@
     "namensMechanismenGemeten": 7,
     "idemVerklaard": 1,
     "idemAfdrukVoegtNietsToe": 2,
-    "idemHandwerkGeenVergelijking": 3
+    "idemHandwerkGeenVergelijking": 3,
+    "spoorConvergent": 1
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 625,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 625 -> 626",
+      "reden": "test/handelenspoor.test.js komt erbij -- zes toetsen die geval 1 en 2 van REPRESENTATIE.md par. 9.1 onder RTG_VERRAAD=schrijf-verloren tegen een echte server draaien -- en staat nog niet in MUTATIES.json. De mutatiemotor kent bovendien geen mutatie voor een toets die twee servers na elkaar op dezelfde datamap start, dus deze post gaat waarschijnlijk niet vanzelf dicht. Met de hand is hij WEL nagetrokken, met twee mutaties op kern/vertegenwoordiging/handelen.js: het spoor NA de weigering zetten laat toets 2 zakken (en alleen toets 2), en de uitslag van vastleggen() weggooien laat toets 5 zakken (en alleen toets 5). Beide keren is het bestand daarna byte voor byte teruggezet.",
+      "waarheen": "Laat scripts/mutatie.js over test/handelenspoor.test.js lopen. Lukt dat niet omdat de toets een eigen serverlevenscyclus voert, dan hoort dat hier te worden vastgelegd als een EIGENSCHAP van deze toets in plaats van als openstaande schuld."
+    },
     {
       "datum": "2026-09-15",
       "soort": "schuld",
@@ -165,6 +176,16 @@
       "meter": "keuringScheef 16 -> 18",
       "reden": "server/kern/waarde/economischeherkomst.js en server/kern/waarde/herkomstsplitsing.js worden nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de PRIMITIEF uit besluit 1 en niet de migratie: van de 208 geldvormen in DOORBELASTING.json dragen er 26 een aantoonbare herkomst, en welke geldrij als EERSTE omgaat is een productbesluit op een echt betaalpad -- niet iets om terloops te kiezen om een ratel groen te krijgen. De vorm is wel volledig beproefd: de gezaaide wereld uit scripts/lib/economiewereld.js draait hem over 22 deterministische rijen (deel B1 van DOORBELASTING.json) en vond er meteen een echte fout in (de onbekende post liep negatief). Dit huis kent deze tussenstand met naam: NORM.json noteert op 14 september hetzelfde over kern/namens/versmalling.js, en INTELLIGENTIE.md over kern/stuur/mandaat.js -- nul productie-aanroepers, om precies dezelfde reden. Wat hier NIET gebeurt is de telling verlagen door de meting te verzachten: twee modules zonder aanroeper zijn twee modules zonder aanroeper, en dat hoort zichtbaar te blijven staan. AANGEPAST BIJ DE SAMENVOEGING: op de tak was de overgang 17 -> 19, op de samengevoegde boom is hij 16 -> 18. Dezelfde twee modules, hetzelfde verschil van twee -- de tak mat tegen een oudere main. Nageteld met npm run keuring: 18 bevindingen, waarvan precies deze twee \"nergens aangeroepen\" van #287 en zestien die er al stonden (presentielast.js, taaldekking.js en veertien bestanden over de 10 kB). Het getal is dus GEMETEN en niet overgenomen van een van beide kanten.",
       "waarheen": "De eerste migratieronde: laat een geldrij die vandaag AL volgbaar is (een van de 26 uit DOORBELASTING.json deel A, `volgbareModules`) zijn herkomst via geldrij() opschrijven in plaats van via een eigen veld, en laat kern/pay/poort.js die rij lezen. Dat haalt beide modules in een keer uit deze post, en het is meteen de eerste tand van de ratel volgbaar 26 -> hoger."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 624,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 624 -> 625",
+      "reden": "test/spoorvorm.test.js komt erbij -- elf toetsen op de convergentiematrix -- en staat nog niet in MUTATIES.json. Vier ervan ZIJN een mutatie (op verzonnen lijven, want op de echte boom haalt alleen de referentie vier van vier), en de meter is daarnaast met de hand gemuteerd: de V-3-regel terugzetten naar de oude fout laat toets 1, 2, 4 en 8 zakken, en `onbepaald` als NEE invullen laat toets 7 zakken. Toets 11 (het register klopt met een verse meting) is met twee mutaties nagetrokken: volledigConvergent van 1 naar 3 laat hem zakken, en `bijstand` V-2 vals op ja OOK -- die tweede beweegt geen enkele teller, en zonder de matrixregel zou het register een uitslag kunnen dragen die niet meer bij de code hoort terwijl alle vier de getallen kloppen. Eén mutatie vond een gat dat NIET is gerepareerd maar wel is opgeschreven in toets 8: het veld `besturing.inOrde` hardcoderen op true wordt door geen enkele toets gezien zolang de referentie toch vier haalt -- de inhoudelijke eigenschap is bewaakt, de vlag is een afgeleide.",
+      "waarheen": "Laat scripts/mutatie.js over test/spoorvorm.test.js lopen, samen met de namens-bestanden uit de notities hieronder. NA HET SAMENGAAN MET MAIN (#288) is deze post van 623->624 naar 624->625 gezet, en dat is geen verschuiving maar bookkeeping: main ging op dezelfde dag zelf van 623 naar 624 met een eigen post, dus twee lijnen claimden dezelfde trede. De samenvoeging nam de WAARDE een keer over terwijl de BOOM beide bestanden draagt. De twee posten blijven apart -- samenvoegen zou wissen welke bestanden de motor nog moet zien."
     },
     {
       "datum": "2026-09-15",

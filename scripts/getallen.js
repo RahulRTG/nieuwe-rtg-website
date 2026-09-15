@@ -136,6 +136,20 @@ const GETALLEN = {
     wat: 'werkwoorden per mechanisme, onder de naam van kern/vertegenwoordiging' },
   'namens.gemiddeldOpSynoniem': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.gemiddeldOpSynoniem',
     wat: 'werkwoorden per mechanisme, onder een van de namen die dit huis ervoor gebruikt' },
+  /* De spoorvorm (REPRESENTATIE.md par. 8.1), en om dezelfde reden als de
+     namensvorm hierboven -- alleen scherper. Deze matrix bestaat bijna helemaal
+     uit streepjes, en drie van de vier getallen staan op EEN. Een EEN in proza
+     veroudert net zo onzichtbaar als een nul: "1 haalt alle vier" blijft er
+     precies zo uitzien nadat er een tweede bij is gekomen. De noemer krijgt
+     daarom ook een merkteken -- "2 van 7" wordt half onwaar zodra die 7 beweegt. */
+  'spoor.mechanismen': { bron: 'SPOORVORM.json', veld: 'gemeten.mechanismen',
+    wat: 'mechanismen die langs de vier spoor-eigenschappen zijn gelegd' },
+  'spoor.metSpoor': { bron: 'SPOORVORM.json', veld: 'gemeten.metSpoor',
+    wat: 'mechanismen die een handeling ergens vastleggen' },
+  'spoor.kanTegenhouden': { bron: 'SPOORVORM.json', veld: 'gemeten.kanTegenhouden',
+    wat: 'mechanismen waar een spoor dat niet vaststaat de handeling tegenhoudt' },
+  'spoor.volledigConvergent': { bron: 'SPOORVORM.json', veld: 'gemeten.volledigConvergent',
+    wat: 'mechanismen die alle vier de eigenschappen van de referentie halen' },
   'semantiek.namen': { bron: 'SEMANTIEK.json', veld: 'namenInMeerDomeinen',
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',

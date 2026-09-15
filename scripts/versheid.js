@@ -500,6 +500,7 @@ const REGISTERS = [
      zo uit als een verse -- en bij twee nullen naast elkaar leest hij ook nog
      eens als bevestiging. */
   ['NAMENSVORM.json', 'npm run namensvorm:vast', 'of de manieren van namens-iemand-handelen een machine delen -- REPRESENTATIE.md par. 0 rust op twee nullen, en die zien er vers en verouderd hetzelfde uit'],
+  ['SPOORVORM.json', 'npm run spoorvorm:vast', 'hoever de zes andere mechanismen van de spoorvorm van kern/vertegenwoordiging/handelen.js staan -- een matrix vol streepjes ziet er vers en verouderd hetzelfde uit, en juist die matrix hoort te veranderen'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
      elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
      alleen nog dat er destijds geen domein ontbrak. */

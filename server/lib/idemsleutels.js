@@ -148,14 +148,10 @@ Object.assign(SLEUTELS,
      tekst draagt. Waarom `velden` en niet `zelfdeVerzoek`, en waarom `/weg`
      hierdoor een ander ANTWOORD geeft, staat in de kop van dat bestand. */
   require('./idemsleutels-ondernemerslus').SLEUTELS,
-  /* De persoonlijke laag: twee die LEZEN en vijf die iets vastleggen. Waarom
-     `intake` met opzet GEEN `zelfdeVerzoek` is, staat in de kop van dat bestand
-     -- het lichaam is `{}`, dus een replay zou binnen het venster de VORIGE
-     vraag terugspelen terwijl er al een antwoord tussen zat. */
+  /* Neiging: lezen en vastleggen. Intake speelt geen oude vraag terug;
+     het deelbestand verklaart waarom hetzelfde lege verzoek nieuw werk is. */
   require('./idemsleutels-neiging').SLEUTELS,
-  /* De reisherkomst-laag: twee GELDroutes die allebei op `nietIdempotent` staan
-     terwijl hun mutatiecontract `idempotent` zegt. Dat is geen tegenspraak maar
-     twee vragen -- de stand tegenover het antwoord; zie de kop van dat bestand. */
+  /* Reisbetalingen verklaren hun eigen replay-antwoorden in het deelbestand. */
   require('./idemsleutels-reisherkomst').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS);
 

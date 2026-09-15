@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -304,8 +304,12 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     // het Werk-OS: alle functies staan als apps op het springboard; de zaak
     // opent (na de sector-doorverwijzing) op het startscherm met dock
     // a11y: de actieve app meldt zich als actief aan de schermlezer
-    await page.waitForSelector('.wos-dock button[data-tab="home"]', { state: 'visible', timeout: 10000 });
-    assert.equal(await page.getAttribute('.wos-dock button[data-tab="home"]', 'aria-current'), 'page', 'de actieve dock-app heeft aria-current');
+    await edgeActies(page);
+    const thuis = page.locator('.rtg-adaptive-controls [data-rtg-adaptive-tab="home"]');
+    await thuis.waitFor({ state: 'visible', timeout: 10000 });
+    assert.equal(await thuis.getAttribute('aria-current'), 'page', 'de actieve app meldt zich via de standaard Edge');
+    assert.equal(await page.locator('.wos-dock').isVisible(), false, 'geen eigen dock naast Edge');
+    await page.keyboard.press('Escape');
     // Orders opent als app vanaf het springboard
     await page.waitForSelector('.wos-grid .wos-app[aria-label="Orders"]', { state: 'visible', timeout: 10000 });
     await page.click('.wos-grid .wos-app[aria-label="Orders"]');

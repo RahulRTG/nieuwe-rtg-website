@@ -37,6 +37,17 @@
    dat de toegang bepaalt -- de sessiesleutel IS het bereik. */
 const LID = { klasse: 'AUTHENTICATED' };
 
+/* WIE HEEFT DIT VASTGESTELD. Eerlijk over de herkomst: dit is een eigen gemeten
+   ronde en geen menselijke keuring, en dat hoort in het veld te staan en niet
+   alleen in een commit-bericht. */
+const AFGETEKEND = {
+  door: 'Claude, op grond van een eigen gemeten ronde tegen een draaiende server ' +
+    '(elke route twee keer, verschil waargenomen via de antwoorden, met een ' +
+    'besturingsproef die aantoont dat de eerste aanroep het beeld wel verandert); ' +
+    'niet door een mens nagelezen',
+  op: '2026-09-15'
+};
+
 const GEMETEN = {
   gemeten: 'ronde tegen een draaiende server (15 sep 2026, scripts in de sessie-scratchpad): elke ' +
     'route twee keer met hetzelfde lijf, verschil waargenomen via /api/neiging/geheugen en ' +
@@ -61,7 +72,8 @@ const CONTRACTEN = {
       'wel is verstreken en het gegeven er nog staat omdat een timer niet draaide. Een tweede ' +
       'aanroep heeft geen tweede effect -- wat weg is, is weg -- en de vraagmotor zelf schrijft ' +
       'niets (hij krijgt een lijst woorden en verder niets).',
-    bewijs: GEMETEN
+    bewijs: GEMETEN,
+    afgetekend: AFGETEKEND
   },
 
   'POST /api/neiging/geheugen': {
@@ -73,7 +85,8 @@ const CONTRACTEN = {
       'wat over zijn termijn is. Geen tweede effect bij een tweede aanroep. Hij staat met opzet NIET ' +
       'als NOT_APPLICABLE te boek: die stand zegt "deze route verandert niets", en dat zou hier een ' +
       'nette onwaarheid zijn.',
-    bewijs: GEMETEN
+    bewijs: GEMETEN,
+    afgetekend: AFGETEKEND
   },
 
   /* -------------------------------------------------------------- schrijven */
@@ -90,7 +103,8 @@ const CONTRACTEN = {
       'staat er al in. Let op wat hier NIET gebeurt: een onderwerp dat niet bij de meegestuurde ' +
       'vraag hoort wordt geteld als `genegeerd` en niet bewaard, zodat deze route geen vrije ' +
       'schrijfweg naar het geheugen van een lid is.',
-    bewijs: GEMETEN
+    bewijs: GEMETEN,
+    afgetekend: AFGETEKEND
   },
 
   'POST /api/neiging/overslaan': {
@@ -100,7 +114,8 @@ const CONTRACTEN = {
     stand: 'PROTECTED',
     waarom: 'Zet elke vraag op gesteld. Een tweede keer overslaan vindt ze er al in en verandert ' +
       'niets. Hij raakt geen enkele neiging aan: overslaan is niet hetzelfde als wissen.',
-    bewijs: GEMETEN
+    bewijs: GEMETEN,
+    afgetekend: AFGETEKEND
   },
 
   'POST /api/neiging/opnieuw': {
@@ -111,7 +126,8 @@ const CONTRACTEN = {
     waarom: 'Maakt de lijst gestelde vragen leeg. Twee keer leegmaken is een keer leegmaken. Ook ' +
       'deze raakt geen neiging aan: wat het lid heeft verteld blijft van hem, ook als hij de vragen ' +
       'opnieuw wil zien.',
-    bewijs: GEMETEN
+    bewijs: GEMETEN,
+    afgetekend: AFGETEKEND
   },
 
   'POST /api/neiging/vergeet': {
@@ -125,7 +141,8 @@ const CONTRACTEN = {
       'aanroepen is de neiging weg en is er niets anders veranderd. De id komt uit de eigen ' +
       'geheugenkaart van het lid, dus een id van iemand anders staat niet in zijn lijst en levert ' +
       'diezelfde 404.',
-    bewijs: GEMETEN
+    bewijs: GEMETEN,
+    afgetekend: AFGETEKEND
   },
 
   'POST /api/neiging/niet-voor': {
@@ -137,7 +154,8 @@ const CONTRACTEN = {
       'niets; het doel staat al in `afgewezenDoel` en komt ook niet terug doordat het gedrag zich ' +
       'herhaalt. Een onbekend doel wordt geweigerd met 400 en niet stil genegeerd -- de lijst is ' +
       'gesloten op tonen en helpen, en `adverteren` bestaat niet.',
-    bewijs: GEMETEN
+    bewijs: GEMETEN,
+    afgetekend: AFGETEKEND
   }
 };
 

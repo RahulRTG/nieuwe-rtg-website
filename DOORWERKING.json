@@ -4,10 +4,10 @@
     "server/kern/gastzorg-profiel.js"
   ],
   "stempel": {
-    "op": "2026-09-03T21:20:22.663Z",
-    "commit": "98f560fd",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-15T03:20:17.057Z",
+    "commit": "0fb5b459",
+    "boomVuil": true,
+    "boomAnders": 4,
     "instrument": "scripts/doorwerking.js",
     "node": "v22.22.2"
   },
@@ -26,12 +26,12 @@
   "bevroren": [],
   "gestempeld": [
     "server/kern/care/leden.js:83",
-    "server/kern/fluister/bevestig.js:98",
+    "server/kern/fluister/bevestig.js:117",
     "server/kern/fluister/gegevens.js:47",
     "server/kern/lidacties/ritten.js:79",
     "server/kern/lidacties.js:61",
     "server/routes/member/boeken.js:43",
-    "server/routes/member/kopen/bezorg.js:76",
+    "server/routes/member/kopen/bezorg.js:79",
     "server/routes/member/kopen/tickets.js:78",
     "server/routes/member/voertuigen/charter.js:72",
     "server/routes/member/voertuigen/huur.js:78"
@@ -69,7 +69,7 @@
     },
     {
       "plek": "server/kern/fluister/bevestig.js",
-      "regel": 49,
+      "regel": 68,
       "benoemd": false,
       "bewaard": false,
       "gestempeld": false,
@@ -79,7 +79,7 @@
     },
     {
       "plek": "server/kern/fluister/bevestig.js",
-      "regel": 98,
+      "regel": 117,
       "benoemd": true,
       "bewaard": true,
       "gestempeld": true,
@@ -119,7 +119,7 @@
     },
     {
       "plek": "server/kern/lidacties/bestellen.js",
-      "regel": 57,
+      "regel": 72,
       "benoemd": false,
       "bewaard": false,
       "gestempeld": false,
@@ -179,7 +179,7 @@
     },
     {
       "plek": "server/routes/member/kopen/bezorg.js",
-      "regel": 76,
+      "regel": 79,
       "benoemd": true,
       "bewaard": true,
       "gestempeld": true,

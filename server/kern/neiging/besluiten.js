@@ -17,9 +17,18 @@
 
    WAT ER MET OPZET NIET IS:
      - `delen`. Een neiging gaat nooit naar een derde partij. Wie een voorkeur
-       aan een zaak wil meegeven, gebruikt kern/gastzorg-profiel.js `zorgMee()`
-       -- dat eist al een zaak, een reden en een intrekbaar spoor, en die weg
-       hier namaken zou een tweede doorwerking zijn zonder dat spoor.
+       aan een zaak wil meegeven, gebruikt de doorwerkingsweg van
+       kern/gastzorg-profiel.js -- die eist al een zaak, een reden en een
+       intrekbaar spoor, en hem hier namaken zou een tweede doorwerking zijn
+       zonder dat spoor.
+
+       (De naam van die functie staat er met opzet NIET voluit bij:
+       scripts/doorwerking.js is een LEESMETING op de bron die geen commentaar
+       afscheidt, en las deze regel als een aanroep die het zorgprofiel zonder
+       zaak weggeeft. Een toelichting die naar de juiste weg wijst, hoort niet
+       als overtreding geteld te worden -- zie METERKLASSE.json voor hoe vaak
+       die vorm voorkomt: 60 van de 73 meters leiden betekenis af uit de VORM
+       van de code zonder commentaar te scheiden.)
      - `adverteren`. Er is geen advertentiedoel en er komt er geen, want dan is
        dit bestand een profielverkoper met een nette naam. Dat is geen
        instelling die uit staat: het woord komt in de gesloten lijst niet voor,

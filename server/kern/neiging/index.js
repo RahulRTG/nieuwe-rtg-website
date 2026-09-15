@@ -4,13 +4,13 @@
    WAT DEZE LAAG IS. Een mens vertelt RTG in een halve minuut genoeg om een
    eerste persoonlijke wereld te openen, en die wereld groeit daarna met hem
    mee. Drie bestanden dragen dat: ./ladder.js weet hoe hard iets is,
-   ./neiging.js bewaart wat er is verteld of opgemerkt, ./vraag.js beslist wat
+   ./bewaren.js bewaart wat er is verteld of opgemerkt, ./vraag.js beslist wat
    er nog gevraagd wordt. Dit bestand knoopt ze aan elkaar en is de enige plek
    waar ze samenkomen.
 
    WAT DEZE LAAG NIET IS, EN DAT IS DE HELFT VAN HET ONTWERP.
 
-   Hij is geen tweede waarheid over een mens. ADAPTIEFRTG.json meting C legde de
+   Hij is geen tweede waarheid over een mens. NEIGINGVORM.json meting C legde de
    vijftien punten van het voorstel tegen de code, en alle vijftien hadden al
    bestaande code die ze draagt. De SITUATIE (welke reis, welke werkruimte) is
    van kern/experience/contexts.js. De PROJECTIE per wereld is van
@@ -63,12 +63,12 @@
      maar de rekensom zelf is er niet -- en hij is niet te maken zonder een
      besluit over wat een deelnemer van de uitslag mag afleiden. Vier mensen en
      een uitkomst "1 persoon heeft een dieetwens" is een profieluitdraai met
-     een omweg. Dat staat in ADAPTIEFRTG.md als open besluit en hier als
+     een omweg. Dat staat in NEIGING.md als open besluit en hier als
      afwezigheid, niet als lege functie. */
 'use strict';
 
-module.exports = function maakAdaptief({ db, save, crypto, nu }) {
-  const neiging = require('./neiging')({ db, save, crypto, nu });
+module.exports = function maakNeigingLaag({ db, save, crypto, nu }) {
+  const neiging = require('./bewaren')({ db, save, crypto, nu });
   const vraag = require('./vraag');
   const ladder = require('./ladder');
 
@@ -135,17 +135,17 @@ module.exports = function maakAdaptief({ db, save, crypto, nu }) {
   const { geheugen } = require('./geheugen')({ neiging });
 
   return {
-    adaptiefIntake: intake,
-    adaptiefAntwoord: antwoord,
-    adaptiefOverslaan: overslaan,
-    adaptiefOpnieuw: opnieuw,
-    adaptiefMerkOp: merkOp,
-    adaptiefGeheugen: geheugen,
-    adaptiefVergeet: (key, id) => neiging.vergeet(key, id),
-    adaptiefNietVoor: (key, id, doel) => neiging.nietVoor(key, id, doel),
-    /* Voor lezers binnen het huis. Altijd MET een doel -- zie ./neiging.js. */
-    adaptiefNeigingen: (key, doel, opties) => neiging.neigingen(key, doel, opties),
-    adaptiefControle: () => vraag.controle(),
-    adaptiefLadder: ladder
+    neigingIntake: intake,
+    neigingAntwoord: antwoord,
+    neigingOverslaan: overslaan,
+    neigingOpnieuw: opnieuw,
+    neigingMerkOp: merkOp,
+    neigingGeheugen: geheugen,
+    neigingVergeet: (key, id) => neiging.vergeet(key, id),
+    neigingNietVoor: (key, id, doel) => neiging.nietVoor(key, id, doel),
+    /* Voor lezers binnen het huis. Altijd MET een doel -- zie ./bewaren.js. */
+    neigingLees: (key, doel, opties) => neiging.neigingen(key, doel, opties),
+    neigingControle: () => vraag.controle(),
+    neigingLadder: ladder
   };
 };

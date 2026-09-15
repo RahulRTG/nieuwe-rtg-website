@@ -16,15 +16,6 @@
       "accRollen",
       "accStart"
     ],
-    "adaptief": [
-      "adaptiefIntake",
-      "adaptiefAntwoord",
-      "adaptiefOverslaan",
-      "adaptiefOpnieuw",
-      "adaptiefGeheugen",
-      "adaptiefVergeet",
-      "adaptiefNietVoor"
-    ],
     "adres": [
       "adresZoek"
     ],
@@ -1352,6 +1343,15 @@
       "navPoi",
       "navRoute",
       "navStatus"
+    ],
+    "neiging": [
+      "neigingIntake",
+      "neigingAntwoord",
+      "neigingOverslaan",
+      "neigingOpnieuw",
+      "neigingGeheugen",
+      "neigingVergeet",
+      "neigingNietVoor"
     ],
     "noodkaart": [
       "noodkaartVan",

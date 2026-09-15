@@ -1,4 +1,4 @@
-/* De dunne HTTP-laag van Adaptief RTG (kern/adaptief/, ADAPTIEFRTG.md).
+/* De dunne HTTP-laag van RTG Neiging (kern/neiging/, NEIGING.md).
 
    ZEVEN ROUTES, EN ALLE ZEVEN VAN HET LID OVER ZICHZELF. Er is met opzet geen
    kantoorroute en geen leveranciersroute: er is geen scherm waarop een
@@ -33,34 +33,34 @@ module.exports = (kern) => {
   };
 
   /* De volgende vraag, of `klaar`. Leest alleen. */
-  app.post('/api/adaptief/intake', auth, lid, (req, res) =>
-    stuur(res, kern.adaptiefIntake(req.session.key)));
+  app.post('/api/neiging/intake', auth, lid, (req, res) =>
+    stuur(res, kern.neigingIntake(req.session.key)));
 
   /* Een antwoord. De client stuurt de vraag-id mee die hij kreeg; onderwerpen
      die niet bij die vraag horen worden geteld als `genegeerd` en niet bewaard
-     -- zie de toelichting in kern/adaptief/index.js. */
-  app.post('/api/adaptief/antwoord', auth, lid, (req, res) =>
-    stuur(res, kern.adaptiefAntwoord(req.session.key, String((req.body || {}).vraag || ''),
+     -- zie de toelichting in kern/neiging/index.js. */
+  app.post('/api/neiging/antwoord', auth, lid, (req, res) =>
+    stuur(res, kern.neigingAntwoord(req.session.key, String((req.body || {}).vraag || ''),
       (req.body || {}).onderwerpen)));
 
-  app.post('/api/adaptief/overslaan', auth, lid, (req, res) =>
-    stuur(res, kern.adaptiefOverslaan(req.session.key)));
+  app.post('/api/neiging/overslaan', auth, lid, (req, res) =>
+    stuur(res, kern.neigingOverslaan(req.session.key)));
 
-  app.post('/api/adaptief/opnieuw', auth, lid, (req, res) =>
-    stuur(res, kern.adaptiefOpnieuw(req.session.key)));
+  app.post('/api/neiging/opnieuw', auth, lid, (req, res) =>
+    stuur(res, kern.neigingOpnieuw(req.session.key)));
 
   /* Wat RTG van mij denkt te weten. */
-  app.post('/api/adaptief/geheugen', auth, lid, (req, res) =>
-    stuur(res, kern.adaptiefGeheugen(req.session.key)));
+  app.post('/api/neiging/geheugen', auth, lid, (req, res) =>
+    stuur(res, kern.neigingGeheugen(req.session.key)));
 
   /* Weghalen, en niet hiervoor gebruiken. Deze twee staan HIER en niet bij
      /api/mijn/gegevens: die kaart schrijft met opzet niets, en weghalen doe je
      waar het gegeven woont. Zouden ze daar ook staan, dan waren er twee plekken
      om hetzelfde te wissen, en binnen een jaar doet er een het net anders. */
-  app.post('/api/adaptief/vergeet', auth, lid, (req, res) =>
-    stuur(res, kern.adaptiefVergeet(req.session.key, String((req.body || {}).id || ''))));
+  app.post('/api/neiging/vergeet', auth, lid, (req, res) =>
+    stuur(res, kern.neigingVergeet(req.session.key, String((req.body || {}).id || ''))));
 
-  app.post('/api/adaptief/niet-voor', auth, lid, (req, res) =>
-    stuur(res, kern.adaptiefNietVoor(req.session.key, String((req.body || {}).id || ''),
+  app.post('/api/neiging/niet-voor', auth, lid, (req, res) =>
+    stuur(res, kern.neigingNietVoor(req.session.key, String((req.body || {}).id || ''),
       String((req.body || {}).doel || ''))));
 };

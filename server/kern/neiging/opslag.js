@@ -1,7 +1,7 @@
 /* ============================================================================
    DE OPSLAG VAN ADAPTIEF RTG -- de bak, de actor en de schoonmaak.
 
-   Apart van ./neiging.js langs de naad die kern/experience/opslag.js ook legt:
+   Apart van ./bewaren.js langs de naad die kern/experience/opslag.js ook legt:
    hierin staat WAAR iets landt en onder welke sleutel, daarin staat WAT er
    wordt bewaard en wat het betekent. Twee redenen om te veranderen, twee
    bestanden -- en samen gingen ze over de tienkilobytegrens van keuringsregel
@@ -14,10 +14,10 @@
 'use strict';
 
 module.exports = function maakOpslag({ db, crypto }) {
-  const eigen = require('../eigencollectie')({ db, domein: 'kern/adaptief',
-    bezit: { adaptieveNeigingen: 'kaart' } });
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/neiging',
+    bezit: { neigingen: 'kaart' } });
 
-  const wortel = () => eigen.bak('adaptieveNeigingen',
+  const wortel = () => eigen.bak('neigingen',
     bak => Object.assign(bak, { versie: 1, perActor: {}, gesteldPerActor: {} }));
   function bak() {
     const r = wortel();

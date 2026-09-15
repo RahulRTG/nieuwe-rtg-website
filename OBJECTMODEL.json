@@ -144,18 +144,6 @@
       ]
     },
     {
-      "veld": "onderwerp",
-      "domeinen": 13,
-      "waar": [
-        "bedrijf",
-        "kern/adaptief",
-        "kern/command",
-        "kern/commercie",
-        "kern/kantoor",
-        "kern/mailwachtrij"
-      ]
-    },
-    {
       "veld": "eenheid",
       "domeinen": 13,
       "waar": [
@@ -180,15 +168,27 @@
       ]
     },
     {
+      "veld": "onderwerp",
+      "domeinen": 13,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/kantoor",
+        "kern/mailwachtrij",
+        "kern/neiging"
+      ]
+    },
+    {
       "veld": "vervalt",
       "domeinen": 12,
       "waar": [
         "kern/aanmeldingen",
-        "kern/adaptief",
         "kern/command",
         "kern/commerce",
         "kern/koppel",
-        "kern/levensband"
+        "kern/levensband",
+        "kern/levensgraaf"
       ]
     },
     {
@@ -384,18 +384,6 @@
       ]
     },
     {
-      "veld": "laatst",
-      "domeinen": 10,
-      "waar": [
-        "kern/adaptief",
-        "kern/command",
-        "kern/fluister",
-        "kern/geldbeleid",
-        "kern/link",
-        "kern/mailsleutel"
-      ]
-    },
-    {
       "veld": "klaar",
       "domeinen": 10,
       "waar": [
@@ -477,6 +465,18 @@
         "kern/livinglab",
         "kern/magnaat-controle",
         "kern/magnaat-trainingslobby-acties"
+      ]
+    },
+    {
+      "veld": "laatst",
+      "domeinen": 10,
+      "waar": [
+        "kern/command",
+        "kern/fluister",
+        "kern/geldbeleid",
+        "kern/link",
+        "kern/mailsleutel",
+        "kern/meet"
       ]
     },
     {

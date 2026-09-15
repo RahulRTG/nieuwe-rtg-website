@@ -41,9 +41,9 @@
    Daarom staan hier geen namen van schermen en geen url's, maar sleutels die
    worden NAGETROKKEN door `controle()`. Verdwijnt een onderdeel of wordt het
    hernoemd, dan wijst een optie naar niets -- en dan zakt
-   test/adaptief-vraag.test.js in plaats van dat een lid stil een vraag krijgt
+   test/neiging.test.js in plaats van dat een lid stil een vraag krijgt
    die nergens meer toe leidt. Dat is dezelfde vorm als de nagetrokken
-   verwijzing in scripts/adaptiefrtg.js meting C.
+   verwijzing in scripts/neigingvorm.js meting C.
 
    ------------------------------------------------------------------------
    ------------------------------------------------------------------------
@@ -80,7 +80,7 @@ function sleutels() {
 }
 
 /* Wijst elke optie naar een onderdeel dat bestaat? Dit is de handhaver achter
-   de belofte in de kop; test/adaptief-vraag.test.js leest hem. */
+   de belofte in de kop; test/neiging.test.js leest hem. */
 function controle() {
   const bestaat = sleutels();
   if (!bestaat) return { ok: false, reden: 'sprongindex.json niet leesbaar', onbekend: [] };

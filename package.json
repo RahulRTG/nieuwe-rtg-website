@@ -388,8 +388,8 @@
     "zaakliveproef:vast": "node scripts/zaakliveproef.js --vastleggen",
     "omzetproef": "node scripts/omzetproef.js",
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
-    "adaptiefrtg": "node scripts/adaptiefrtg.js",
-    "adaptiefrtg:vast": "node scripts/adaptiefrtg.js --vastleggen"
+    "neigingvorm": "node scripts/neigingvorm.js",
+    "neigingvorm:vast": "node scripts/neigingvorm.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

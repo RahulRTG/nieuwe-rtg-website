@@ -2,13 +2,13 @@
    MUTATIECONTRACT -- ADAPTIEF RTG.
 
    Deel van server/lib/mutatiecontracten.js; zie de kop daar voor de vorm en de
-   regels. De routes staan in server/routes/adaptief.js, de laag in
-   server/kern/adaptief/, en de richting in ADAPTIEFRTG.md.
+   regels. De routes staan in server/routes/neiging.js, de laag in
+   server/kern/neiging/, en de richting in NEIGING.md.
 
    HOE HET IS GEMETEN, EN WAAROM NIET IN DE OPSLAG. Een ronde tegen een
    draaiende server, waarbij elke route TWEE keer met hetzelfde lijf is
    aangeroepen en het verschil is waargenomen door de ogen van het lid zelf --
-   /api/adaptief/geheugen plus /api/adaptief/intake, samen alles wat deze laag
+   /api/neiging/geheugen plus /api/neiging/intake, samen alles wat deze laag
    over iemand kan tonen.
 
    Dat is niet de eerste opzet geweest, en de eerste was fout op een manier die
@@ -22,10 +22,10 @@
    Zonder die tweede helft is "de tweede veranderde niets" geen bevinding maar
    een blinde vlek (BEWIJSMACHINE.md par. 6a).
 
-   De meting vond daarmee ook een echt gebrek: /api/adaptief/antwoord was NIET
+   De meting vond daarmee ook een echt gebrek: /api/neiging/antwoord was NIET
    idempotent. Een tweede identieke POST hoogde de teller van een `gezegd`
    neiging op, dus een dubbelklik op "Verder" werd geboekt als een tweede
-   gebeurtenis over een mens. Dat is gerepareerd in kern/adaptief/neiging.js
+   gebeurtenis over een mens. Dat is gerepareerd in kern/neiging/neiging.js
    (twee keer hetzelfde ZEGGEN is een uitspraak, twee keer hetzelfde DOEN telt
    wel) en daarna opnieuw gemeten. De contracten hieronder beschrijven de stand
    NA die reparatie.
@@ -39,8 +39,8 @@ const LID = { klasse: 'AUTHENTICATED' };
 
 const GEMETEN = {
   gemeten: 'ronde tegen een draaiende server (15 sep 2026, scripts in de sessie-scratchpad): elke ' +
-    'route twee keer met hetzelfde lijf, verschil waargenomen via /api/adaptief/geheugen en ' +
-    '/api/adaptief/intake, met een besturingsproef die aantoont dat de EERSTE aanroep het beeld ' +
+    'route twee keer met hetzelfde lijf, verschil waargenomen via /api/neiging/geheugen en ' +
+    '/api/neiging/intake, met een besturingsproef die aantoont dat de EERSTE aanroep het beeld ' +
     'wel verandert. Uitslag na de reparatie van antwoord: alle vijf de schrijfroutes 1e=verandert, ' +
     '2e=verandert niet; de twee leesroutes veranderen niets.',
   op: 'HEAD van claude/adaptive-rtg-onboarding-to5o9d'
@@ -49,13 +49,13 @@ const GEMETEN = {
 const CONTRACTEN = {
   /* --------------------------------------------------------------- lezen */
 
-  'POST /api/adaptief/intake': {
-    mutatieId: 'adaptief.intake', herkomst: 'mens',
+  'POST /api/neiging/intake': {
+    mutatieId: 'neiging.intake', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: LID,
     stand: 'PROTECTED',
     waarom: 'Hij LIJKT een leesroute en is het net niet, en dat verschil hoort hier te staan in ' +
-      'plaats van weggepoetst. Hij roept kern/adaptief/neiging.js `veeg()` aan, en die kan rijen ' +
+      'plaats van weggepoetst. Hij roept kern/neiging/neiging.js `veeg()` aan, en die kan rijen ' +
       'verwijderen waarvan de bewaartermijn is verstreken. Dat is met opzet zo: de termijn loopt ' +
       'bij het LEZEN en niet in een achtergrondtaak, zodat er nooit een dag is waarop de termijn ' +
       'wel is verstreken en het gegeven er nog staat omdat een timer niet draaide. Een tweede ' +
@@ -64,8 +64,8 @@ const CONTRACTEN = {
     bewijs: GEMETEN
   },
 
-  'POST /api/adaptief/geheugen': {
-    mutatieId: 'adaptief.geheugen', herkomst: 'mens',
+  'POST /api/neiging/geheugen': {
+    mutatieId: 'neiging.geheugen', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: LID,
     stand: 'PROTECTED',
@@ -78,13 +78,13 @@ const CONTRACTEN = {
 
   /* -------------------------------------------------------------- schrijven */
 
-  'POST /api/adaptief/antwoord': {
-    mutatieId: 'adaptief.antwoord', herkomst: 'mens',
+  'POST /api/neiging/antwoord': {
+    mutatieId: 'neiging.antwoord', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: LID,
     stand: 'PROTECTED',
     waarom: 'Het lid legt een antwoord vast. Hetzelfde antwoord nog een keer insturen is DEZELFDE ' +
-      'uitspraak en geen tweede: kern/adaptief/neiging.js laat een bestaande `gezegd` neiging ' +
+      'uitspraak en geen tweede: kern/neiging/neiging.js laat een bestaande `gezegd` neiging ' +
       'ongemoeid (geen teller, geen klok). Dat was hier eerst anders en is door de meting hierboven ' +
       'gevonden. De vraag wordt daarnaast als GESTELD genoteerd, en ook dat is idempotent -- hij ' +
       'staat er al in. Let op wat hier NIET gebeurt: een onderwerp dat niet bij de meegestuurde ' +
@@ -93,8 +93,8 @@ const CONTRACTEN = {
     bewijs: GEMETEN
   },
 
-  'POST /api/adaptief/overslaan': {
-    mutatieId: 'adaptief.overslaan', herkomst: 'mens',
+  'POST /api/neiging/overslaan': {
+    mutatieId: 'neiging.overslaan', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: LID,
     stand: 'PROTECTED',
@@ -103,8 +103,8 @@ const CONTRACTEN = {
     bewijs: GEMETEN
   },
 
-  'POST /api/adaptief/opnieuw': {
-    mutatieId: 'adaptief.opnieuw', herkomst: 'mens',
+  'POST /api/neiging/opnieuw': {
+    mutatieId: 'neiging.opnieuw', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: LID,
     stand: 'PROTECTED',
@@ -114,8 +114,8 @@ const CONTRACTEN = {
     bewijs: GEMETEN
   },
 
-  'POST /api/adaptief/vergeet': {
-    mutatieId: 'adaptief.vergeet', herkomst: 'mens',
+  'POST /api/neiging/vergeet': {
+    mutatieId: 'neiging.vergeet', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: LID,
     stand: 'PROTECTED',
@@ -128,8 +128,8 @@ const CONTRACTEN = {
     bewijs: GEMETEN
   },
 
-  'POST /api/adaptief/niet-voor': {
-    mutatieId: 'adaptief.nietVoor', herkomst: 'mens',
+  'POST /api/neiging/niet-voor': {
+    mutatieId: 'neiging.nietVoor', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: LID,
     stand: 'PROTECTED',

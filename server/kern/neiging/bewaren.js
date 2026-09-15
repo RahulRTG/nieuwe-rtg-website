@@ -1,10 +1,10 @@
 /* ============================================================================
    DE NEIGING -- het enige dat deze laag ZELF bewaart.
 
-   De volle redenering staat in ADAPTIEFRTG.md par. 2 en 5; hier staat wat de
+   De volle redenering staat in NEIGING.md par. 2 en 5; hier staat wat de
    CODE bindt.
 
-   WAAROM HET EEN NEIGING HEET. Gemeten en niet gekozen: ADAPTIEFRTG.json meting
+   WAAROM HET EEN NEIGING HEET. Gemeten en niet gekozen: NEIGINGVORM.json meting
    A legde vijftien kandidaat-begrippen tegen de bron, en veertien waren bezet --
    `context` in 77 bestanden en 39 domeinen (waar het SITUATIE betekent, zie
    kern/experience/contexts.js), `profiel` in 104, `voorkeur` in 13 met tien
@@ -35,7 +35,7 @@
                      MET een doel, en een die dat doel niet draagt komt er niet
                      uit -- geweigerd bij het lezen en niet gefilterd erna, want
                      een filter achteraf kan iemand vergeten. De lijst staat in
-                     ./neiging-besluiten.js, met de uitleg waarom `delen` en
+                     ./besluiten.js, met de uitleg waarom `delen` en
                      `adverteren` er met opzet niet in staan.
      deel            wie het mag zien. Een POORT en geen etiket, precies zoals
                      kern/levensgraaf/graaf.js dat doet.
@@ -54,12 +54,12 @@
 const klok = require('../../lib/klok');
 const { GRONDEN, graadVan, telt } = require('./ladder');
 
-const { DOELEN, KRING, BEWAARDAGEN } = require('./neiging-besluiten');
+const { DOELEN, KRING, BEWAARDAGEN } = require('./besluiten');
 const DAG = 24 * 60 * 60 * 1000;
 
-module.exports = function maakNeiging({ db, save, crypto, nu }) {
+module.exports = function maakBewaren({ db, save, crypto, nu }) {
   const tijd = () => (nu ? nu() : klok.datum().toISOString());
-  const { bak, actor, schoon, lijstVan } = require('./neiging-opslag')({ db, crypto });
+  const { bak, actor, schoon, lijstVan } = require('./opslag')({ db, crypto });
 
   /* De vorm die naar buiten gaat. De GRAAD wordt hier berekend, elke keer
      opnieuw -- zie de kop: een bewaarde graad veroudert stil. */
@@ -96,9 +96,9 @@ module.exports = function maakNeiging({ db, save, crypto, nu }) {
          geboekt als een tweede gebeurtenis over een mens.
 
          Gemeten en niet bedacht: een ronde tegen een draaiende server vond dat
-         /api/adaptief/antwoord bij een tweede identieke aanroep het beeld van
+         /api/neiging/antwoord bij een tweede identieke aanroep het beeld van
          het lid opnieuw veranderde. De volle meting staat in
-         lib/mutatiecontracten-adaptief.js. Een herhaalde uitspraak is daarom
+         lib/mutatiecontracten-neiging.js. Een herhaalde uitspraak is daarom
          een NO-OP, klok en al, zodat de route echt idempotent is en niet bijna.
          Verandert het lid van gedachten, dan is dat een ANDER onderwerp of
          `vergeet()` -- allebei een zichtbaar besluit van het lid. */
@@ -153,8 +153,8 @@ module.exports = function maakNeiging({ db, save, crypto, nu }) {
   }
 
   /* De beheerkant (vergeten, niet-hiervoor, de termijn, en welke vragen al zijn
-     gesteld) woont in ./neiging-beheer.js en krijgt de binnenkant MEE. */
-  const beheer = require('./neiging-beheer')({ bak, actor, lijstVan, toon, tijd, save });
+     gesteld) woont in ./beheer.js en krijgt de binnenkant MEE. */
+  const beheer = require('./beheer')({ bak, actor, lijstVan, toon, tijd, save });
 
   return Object.assign({ onthoud, neigingen, alles, DOELEN, KRING, BEWAARDAGEN }, beheer);
 };

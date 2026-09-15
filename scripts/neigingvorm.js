@@ -2,7 +2,7 @@
 /* ============================================================================
    DE ADAPTIEFVORM -- mag er een persoonlijke contextlaag bij, en in welke vorm?
 
-   DE VRAAG KOMT UIT ADAPTIEFRTG.md par. 0. Het voorstel voor Adaptive RTG rust
+   DE VRAAG KOMT UIT NEIGING.md par. 0. Het voorstel voor Adaptive RTG rust
    op een bewering die aantrekkelijk klinkt:
 
      "Bouw geen profiel. Bouw een Personal Context Graph."
@@ -109,39 +109,74 @@ const { stempel } = require('./lib/stempel');
 
 /* ---------------------------------------------------------------- meting A */
 
-/* De begrippen die het voorstel introduceert. Bewust ook de woorden waarvan we
-   al VERMOEDEN dat ze bezet zijn: een meter die alleen de vrije namen telt,
-   bevestigt zichzelf. */
+/* De begrippen die het voorstel introduceert, plus de naam die er uiteindelijk
+   is gekozen. Bewust ook de woorden waarvan we al VERMOEDEN dat ze bezet zijn:
+   een meter die alleen de vrije namen telt, bevestigt zichzelf.
+
+   `neiging` staat er met opzet in en niet buiten de meting. Hij is de enige die
+   laag scoort, en dat hoort NA te rekenen te zijn in plaats van geloofd -- zeker
+   omdat de vorige ronde van deze meter met een te smalle zeef precies zo een
+   naam vrijgaf die het niet was. Wat er van hem overblijft zijn plekken waar het
+   woord gewone Nederlandse tekst is ("de neiging om toch maar iets te doen"),
+   nergens een module, een scherm of een veldnaam. */
 const BEGRIPPEN = ['context', 'signaal', 'voorkeur', 'interesse', 'profiel',
   'situatie', 'intent', 'moment', 'groep', 'projectie', 'relevantie', 'geheugen',
-  'zekerheid', 'verval', 'adaptief'];
+  'zekerheid', 'verval', 'adaptief', 'neiging'];
 
 function namen() {
-  const paden = om.BRONNEN.reduce((a, m) => om.bestanden(m, a), []);
+  /* DE HELE BOOM EN NIET ALLEEN server/kern -- en dat is een REPARATIE, met een
+     prijs die echt betaald is.
+
+     Deze meting las eerst alleen `om.BRONNEN` (server/kern, server/bedrijf,
+     server/school, server/papieren), want die lijst hoort bij de VORMmeting van
+     objectmodel.js: daar gaat het over domeinvormen, en een scherm heeft er niets
+     te zoeken. Voor een NAAM klopt die zeef niet, en het verschil is niet
+     theoretisch: `adaptief` kwam er als enige vrije naam uit, en op grond daarvan
+     is de hele laag zo gedoopt. In werkelijkheid draagt `ADAPTIEF.md` een
+     bestaande laag van 97 bestanden -- `public/shared/adaptief/` met elf modules,
+     `public/shared/adaptief.css`, en test/adaptief.test.js plus .e2e.js, die bij
+     het bouwen dan ook prompt zijn overschreven.
+
+     Dat is de fout waar BEWIJSMACHINE.md par. 6a over gaat: een proef kan een
+     geldige uitslag geven en toch het verkeerde experiment zijn geweest. De
+     uitslag "0 bestanden" was waar binnen zijn eigen zeef en onwaar over het huis.
+
+     Een naam is bezet zodra IEMAND hem draagt, waar dan ook: een scherm, een
+     stylesheet, een toets, een document. Vandaar de hele boom, met alleen de
+     dingen eruit die geen naam kunnen bezetten (node_modules, git, bouwuitvoer). */
+  const paden = [];
+  const GEEN = /(^|\/)(node_modules|\.git|public\/dist|server\/data|coverage)(\/|$)/;
+  (function loop(map) {
+    for (const naam of fs.readdirSync(path.join(WORTEL, map), { withFileTypes: true })) {
+      const rel = (map ? map + '/' : '') + naam.name;
+      if (GEEN.test(rel)) continue;
+      if (naam.isDirectory()) loop(rel);
+      else if (/\.(js|json|md|html|css)$/.test(naam.name)) paden.push(rel);
+    }
+  })('');
+
   const uit = [];
   for (const begrip of BEGRIPPEN) {
-    /* Het hele woord, hoofdletterongevoelig, en ook als deel van een langere
-       naam (`zorgProfiel`, `dagContext`) -- want juist die samenstellingen zijn
-       de plek waar een tweede betekenis ongemerkt binnenkomt. */
     const woord = new RegExp(begrip, 'i');
-    /* Als VELDNAAM is strenger: `iets:` of `iets =` aan het begin van een veld.
-       Een woord dat alleen in commentaar staat, bezet geen naam. */
     const veld = new RegExp('(?:^|[,{\\s])' + begrip + '[A-Za-z]*\\s*:', 'i');
     const plekken = [], velden = [], domeinen = new Set();
     for (const p of paden) {
-      const bron = om.wring(fs.readFileSync(path.join(WORTEL, p), 'utf8'));
+      let bron;
+      try { bron = fs.readFileSync(path.join(WORTEL, p), 'utf8'); } catch (e) { continue; }
+      /* Commentaar wordt NIET weggeknipt, en dat is hier juist: in een document
+         of een kop is het woord even goed bezet. Bij de vormmeting hieronder
+         gebeurt dat wel, want daar gaat het om echte velden. */
       if (!woord.test(bron)) continue;
       plekken.push(p);
-      domeinen.add(om.domeinVan(p));
-      if (veld.test(bron)) velden.push(p);
+      domeinen.add(p.startsWith('server/') ? om.domeinVan(p) : p.split('/')[0]);
+      if (/\.(js|json)$/.test(p) && veld.test(bron)) velden.push(p);
     }
     uit.push({
       naam: begrip, plekken: plekken.length, domeinen: domeinen.size,
       alsVeld: velden.length,
-      /* Vrij betekent hier: nergens als veldnaam in gebruik EN in hoogstens twee
-         bestanden genoemd. Een woord dat in twintig bestanden staat maar nergens
-         een veld is, is niet vrij -- het is alleen nog niet vastgelegd. */
-      vrij: velden.length === 0 && plekken.length <= 2,
+      /* Vrij betekent: NERGENS genoemd. Geen marge van twee bestanden meer -- die
+         marge was precies groot genoeg om een bestaande laag te missen. */
+      vrij: plekken.length === 0,
       voorbeeldDomeinen: [...domeinen].sort().slice(0, 6)
     });
   }
@@ -268,13 +303,13 @@ if (require.main === module) {
      leegloopt: geldige tekst, kapotte JSON, exitcode 0. */
   if (process.argv.includes('--json')) { console.log(JSON.stringify(r)); process.exitCode = 0; return; }
   if (process.argv.includes('--vastleggen')) {
-    fs.writeFileSync(path.join(WORTEL, 'ADAPTIEFRTG.json'), JSON.stringify(Object.assign({
-      stempel: stempel({ instrument: 'scripts/adaptiefrtg.js' }),
-      uitleg: 'Gemeten met scripts/adaptiefrtg.js, op de lezer van scripts/objectmodel.js. De vraag staat in ADAPTIEFRTG.md par. 0. Drie metingen die niet hetzelfde zeggen: A de namen die het voorstel introduceert, B of er al een voorkeurslaag is en of die zijn etiketten draagt, C het voorstel tegen bestaande code met een nagetrokken verwijzing.',
-      grens: 'LET OP BIJ METING A: sinds server/kern/adaptief/ bestaat, telt deze meter zijn EIGEN laag mee. `adaptief` stond op 0 bestanden en 0 veldnamen toen de meting werd gedaan en de naam werd gekozen -- dat hij nu bezet is, is deze laag zelf. Een naam die vandaag 0 scoort is nog vrij; de andere veertien waren al bezet voordat hier iets is gebouwd. Wat deze meter NIET aantoont. A is lexicaal en dus een ONDERgrens; een gedeelde naam is geen gedeelde betekenis, dat beslist een mens die beide bestanden opent. B leest bewaarde vormen en veldnamen: voorkeuren in vrije tekst of onder een woord buiten de lijst ontsnappen eraan. B heeft daarbovenop een gemeten blinde vlek die eruitziet als succes -- de gedeelde lezer vormenVan() ziet alleen expliciete velden (naam:) en geen verkorte eigenschappen ({ wens }), dus juist geschreven rijen tellen vaak niet mee en seed-achtige rijen wel; dat is niet hier gerepareerd omdat een tweede parser de vergelijking met de vier eerdere vormmetingen waardeloos maakt. C trekt na dat een verwijzing KLOPT, niet dat de genoemde code volstaat -- `draagt` betekent "er is bestaande code die dit punt raakt", en het veld `dekt` zegt per punt welke helft ontbreekt; dat is een oordeel en geen meting.',
+    fs.writeFileSync(path.join(WORTEL, 'NEIGINGVORM.json'), JSON.stringify(Object.assign({
+      stempel: stempel({ instrument: 'scripts/neigingvorm.js' }),
+      uitleg: 'Gemeten met scripts/neigingvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in NEIGING.md par. 0. Drie metingen die niet hetzelfde zeggen: A de namen die het voorstel introduceert, B of er al een voorkeurslaag is en of die zijn etiketten draagt, C het voorstel tegen bestaande code met een nagetrokken verwijzing.',
+      grens: 'LET OP BIJ METING A, TWEE KEER. (1) Deze meter telt zijn EIGEN laag mee: `neiging` scoort hier niet nul omdat server/kern/neiging/ inmiddels bestaat. Gemeten op de commit VOOR deze tak stond `neiging` in 4 bestanden, alle vier als gewone Nederlandse tekst in een toelichting, en 0 keer als veldnaam -- na te rekenen met `git grep -lIi neiging <commit>`. (2) De eerste versie van deze meting las alleen server/kern en drie broers, en gaf daarmee `adaptief` vrij terwijl ADAPTIEF.md een laag van 95 bestanden draagt, inclusief test/adaptief.test.js die bij het bouwen prompt is overschreven. Die zeef is gerepareerd (de hele boom) en `vrij` betekent nu NERGENS genoemd, zonder marge. Wat deze meter NIET aantoont. A is lexicaal en dus een ONDERgrens; een gedeelde naam is geen gedeelde betekenis, dat beslist een mens die beide bestanden opent. B leest bewaarde vormen en veldnamen: voorkeuren in vrije tekst of onder een woord buiten de lijst ontsnappen eraan. B heeft daarbovenop een gemeten blinde vlek die eruitziet als succes -- de gedeelde lezer vormenVan() ziet alleen expliciete velden (naam:) en geen verkorte eigenschappen ({ wens }), dus juist geschreven rijen tellen vaak niet mee en seed-achtige rijen wel; dat is niet hier gerepareerd omdat een tweede parser de vergelijking met de vier eerdere vormmetingen waardeloos maakt. C trekt na dat een verwijzing KLOPT, niet dat de genoemde code volstaat -- `draagt` betekent "er is bestaande code die dit punt raakt", en het veld `dekt` zegt per punt welke helft ontbreekt; dat is een oordeel en geen meting.',
       vastgelegd: new Date().toISOString().slice(0, 10)
     }, r), null, 2) + '\n');
-    console.log('ADAPTIEFRTG.json geschreven.');
+    console.log('NEIGINGVORM.json geschreven.');
   }
   console.log('A. DE NAAM -- welke begrippen uit het voorstel zijn al bezet?');
   for (const k of naam) {

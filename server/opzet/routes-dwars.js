@@ -69,10 +69,10 @@ module.exports = function hangDwarseRoutersOp(grens) {
      het kantoor ziet iedereen en beslist). Zelfde domeingrens: een tweede lezer
      van dezelfde kern is geen tweede domein. */
   require('../routes/kosten-kantoor')(grens('kosten'));
-  /* Adaptief RTG (kern/adaptief/): de intake die zichzelf afkapt, en wat RTG
+  /* RTG Neiging (kern/neiging/, NEIGING.md): de intake die zichzelf afkapt, en wat RTG
      van een lid denkt te weten. Dwars omdat hij aan geen enkel domein hangt --
      hij gaat over de mens en niet over wat die mens bij RTG doet. */
-  require('../routes/adaptief')(grens('adaptief'));
+  require('../routes/neiging')(grens('neiging'));
   /* De gedeelde Experience Plane boven alle vier werelden: projections lezen,
      mutaties uitsluitend via zijn Action Broker. */
   const experienceGrens = grens('experience');

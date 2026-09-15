@@ -627,8 +627,8 @@
       "naam": "Mijn RTG",
       "wereld": "Instellingen",
       "soort": "link",
-      "sleutel": "adaptief",
-      "url": "/apps/adaptief.html"
+      "sleutel": "neigingen",
+      "url": "/apps/mijn-neigingen.html"
     },
     {
       "naam": "Passkeys",

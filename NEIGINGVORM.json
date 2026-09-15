@@ -1,230 +1,255 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:55:47.796Z",
-    "commit": "d10cc6e5",
+    "op": "2026-09-15T01:04:06.827Z",
+    "commit": "a1766558",
     "boomVuil": true,
-    "boomAnders": 9,
-    "instrument": "scripts/adaptiefrtg.js",
+    "boomAnders": 3,
+    "instrument": "scripts/neigingvorm.js",
     "node": "v22.22.2"
   },
-  "uitleg": "Gemeten met scripts/adaptiefrtg.js, op de lezer van scripts/objectmodel.js. De vraag staat in ADAPTIEFRTG.md par. 0. Drie metingen die niet hetzelfde zeggen: A de namen die het voorstel introduceert, B of er al een voorkeurslaag is en of die zijn etiketten draagt, C het voorstel tegen bestaande code met een nagetrokken verwijzing.",
-  "grens": "LET OP BIJ METING A: sinds server/kern/adaptief/ bestaat, telt deze meter zijn EIGEN laag mee. `adaptief` stond op 0 bestanden en 0 veldnamen toen de meting werd gedaan en de naam werd gekozen -- dat hij nu bezet is, is deze laag zelf. Een naam die vandaag 0 scoort is nog vrij; de andere veertien waren al bezet voordat hier iets is gebouwd. Wat deze meter NIET aantoont. A is lexicaal en dus een ONDERgrens; een gedeelde naam is geen gedeelde betekenis, dat beslist een mens die beide bestanden opent. B leest bewaarde vormen en veldnamen: voorkeuren in vrije tekst of onder een woord buiten de lijst ontsnappen eraan. B heeft daarbovenop een gemeten blinde vlek die eruitziet als succes -- de gedeelde lezer vormenVan() ziet alleen expliciete velden (naam:) en geen verkorte eigenschappen ({ wens }), dus juist geschreven rijen tellen vaak niet mee en seed-achtige rijen wel; dat is niet hier gerepareerd omdat een tweede parser de vergelijking met de vier eerdere vormmetingen waardeloos maakt. C trekt na dat een verwijzing KLOPT, niet dat de genoemde code volstaat -- `draagt` betekent \"er is bestaande code die dit punt raakt\", en het veld `dekt` zegt per punt welke helft ontbreekt; dat is een oordeel en geen meting.",
+  "uitleg": "Gemeten met scripts/neigingvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in NEIGING.md par. 0. Drie metingen die niet hetzelfde zeggen: A de namen die het voorstel introduceert, B of er al een voorkeurslaag is en of die zijn etiketten draagt, C het voorstel tegen bestaande code met een nagetrokken verwijzing.",
+  "grens": "LET OP BIJ METING A: sinds server/kern/neiging/ bestaat, telt deze meter zijn EIGEN laag mee. `adaptief` stond op 0 bestanden en 0 veldnamen toen de meting werd gedaan en de naam werd gekozen -- dat hij nu bezet is, is deze laag zelf. Een naam die vandaag 0 scoort is nog vrij; de andere veertien waren al bezet voordat hier iets is gebouwd. Wat deze meter NIET aantoont. A is lexicaal en dus een ONDERgrens; een gedeelde naam is geen gedeelde betekenis, dat beslist een mens die beide bestanden opent. B leest bewaarde vormen en veldnamen: voorkeuren in vrije tekst of onder een woord buiten de lijst ontsnappen eraan. B heeft daarbovenop een gemeten blinde vlek die eruitziet als succes -- de gedeelde lezer vormenVan() ziet alleen expliciete velden (naam:) en geen verkorte eigenschappen ({ wens }), dus juist geschreven rijen tellen vaak niet mee en seed-achtige rijen wel; dat is niet hier gerepareerd omdat een tweede parser de vergelijking met de vier eerdere vormmetingen waardeloos maakt. C trekt na dat een verwijzing KLOPT, niet dat de genoemde code volstaat -- `draagt` betekent \"er is bestaande code die dit punt raakt\", en het veld `dekt` zegt per punt welke helft ontbreekt; dat is een oordeel en geen meting.",
   "vastgelegd": "2026-09-15",
   "gemeten": {
     "naam": [
       {
-        "naam": "groep",
-        "plekken": 174,
-        "domeinen": 69,
-        "alsVeld": 80,
-        "vrij": false,
-        "voorbeeldDomeinen": [
-          "bedrijf",
-          "kern/afdelingen",
-          "kern/alpine",
-          "kern/alpine-demo",
-          "kern/bank",
-          "kern/bibliothecaris"
-        ]
-      },
-      {
-        "naam": "verval",
-        "plekken": 109,
-        "domeinen": 43,
-        "alsVeld": 63,
-        "vrij": false,
-        "voorbeeldDomeinen": [
-          "bedrijf",
-          "kern/aanmeldingen",
-          "kern/adaptief",
-          "kern/assets",
-          "kern/bureau",
-          "kern/care"
-        ]
-      },
-      {
-        "naam": "profiel",
-        "plekken": 104,
-        "domeinen": 49,
-        "alsVeld": 29,
-        "vrij": false,
-        "voorbeeldDomeinen": [
-          "kern/ai",
-          "kern/boekhoudkennis",
-          "kern/comm",
-          "kern/commercie",
-          "kern/creator",
-          "kern/fluister"
-        ]
-      },
-      {
         "naam": "moment",
-        "plekken": 79,
-        "domeinen": 38,
-        "alsVeld": 29,
+        "plekken": 1615,
+        "domeinen": 384,
+        "alsVeld": 97,
         "vrij": false,
         "voorbeeldDomeinen": [
-          "kern/autoverkoop",
-          "kern/baby",
-          "kern/bureau",
-          "kern/clubs",
-          "kern/command",
-          "kern/dagcoach"
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "AFSPRAAK.md",
+          "APPSTORE.md",
+          "APPWERKT.json"
         ]
       },
       {
         "naam": "context",
-        "plekken": 77,
-        "domeinen": 39,
-        "alsVeld": 27,
+        "plekken": 1206,
+        "domeinen": 268,
+        "alsVeld": 122,
         "vrij": false,
         "voorbeeldDomeinen": [
-          "bedrijf",
-          "kern/agent",
-          "kern/ai",
-          "kern/appstore",
-          "kern/bank",
-          "kern/betaalwaarheid"
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "ADAPTIEF.md",
+          "AICONTEXT.json",
+          "APPSTORE.md",
+          "APPWERKT.json"
         ]
       },
       {
-        "naam": "intent",
-        "plekken": 36,
-        "domeinen": 14,
-        "alsVeld": 19,
+        "naam": "groep",
+        "plekken": 1169,
+        "domeinen": 254,
+        "alsVeld": 242,
         "vrij": false,
         "voorbeeldDomeinen": [
-          "kern/betaalopdracht",
-          "kern/economie",
-          "kern/experience",
-          "kern/fluister",
-          "kern/fonds",
-          "kern/instant-reality"
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "ADAMPROEF.json",
+          "ARCHITECTUUR.md",
+          "AUDITPROEF.json"
         ]
       },
       {
-        "naam": "signaal",
-        "plekken": 26,
-        "domeinen": 18,
-        "alsVeld": 7,
+        "naam": "profiel",
+        "plekken": 1051,
+        "domeinen": 253,
+        "alsVeld": 178,
         "vrij": false,
         "voorbeeldDomeinen": [
-          "kern/clips",
-          "kern/factuurcorrectie",
-          "kern/leerstof-gen-taal",
-          "kern/levensband",
-          "kern/mobiliteit",
-          "kern/navigatie"
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "ADAMPROEF.json",
+          "APPSTORE.md",
+          "APPWERKT.json"
         ]
       },
       {
-        "naam": "zekerheid",
-        "plekken": 26,
-        "domeinen": 13,
-        "alsVeld": 16,
+        "naam": "verval",
+        "plekken": 681,
+        "domeinen": 223,
+        "alsVeld": 115,
         "vrij": false,
         "voorbeeldDomeinen": [
-          "kern/avond",
-          "kern/command",
-          "kern/commercie",
-          "kern/fiscaal",
-          "kern/frictie",
-          "kern/geloof"
-        ]
-      },
-      {
-        "naam": "projectie",
-        "plekken": 21,
-        "domeinen": 8,
-        "alsVeld": 8,
-        "vrij": false,
-        "voorbeeldDomeinen": [
-          "kern/carriereledger",
-          "kern/experience",
-          "kern/fonds",
-          "kern/kosten",
-          "kern/magnaat-kantoorregels",
-          "kern/spellen"
-        ]
-      },
-      {
-        "naam": "voorkeur",
-        "plekken": 13,
-        "domeinen": 10,
-        "alsVeld": 10,
-        "vrij": false,
-        "voorbeeldDomeinen": [
-          "kern/avond",
-          "kern/betaalregie",
-          "kern/ervaring",
-          "kern/eten",
-          "kern/levensdossier",
-          "kern/lifestyle"
-        ]
-      },
-      {
-        "naam": "interesse",
-        "plekken": 11,
-        "domeinen": 8,
-        "alsVeld": 5,
-        "vrij": false,
-        "voorbeeldDomeinen": [
-          "kern/aanmeldgesprek",
-          "kern/aanmeldgesprek-aanmeld",
-          "kern/aanmeldgesprek-hulp",
-          "kern/levensband",
-          "kern/leverancier",
-          "kern/rtfos"
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BESTUUR.md",
+          "BEWIJS.md"
         ]
       },
       {
         "naam": "geheugen",
-        "plekken": 10,
-        "domeinen": 7,
-        "alsVeld": 2,
+        "plekken": 486,
+        "domeinen": 189,
+        "alsVeld": 28,
         "vrij": false,
         "voorbeeldDomeinen": [
-          "kern/adaptief",
-          "kern/commercie",
-          "kern/festival",
-          "kern/onderwijs",
-          "kern/onderwijs-geheugen",
-          "kern/spellen"
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BEPROEVING.json",
+          "BEWIJS.md"
+        ]
+      },
+      {
+        "naam": "signaal",
+        "plekken": 461,
+        "domeinen": 179,
+        "alsVeld": 30,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          ".github",
+          "A11Y-INGELOGD.json",
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "AUDITPROEF.json",
+          "BESTUUR.md"
+        ]
+      },
+      {
+        "naam": "zekerheid",
+        "plekken": 316,
+        "domeinen": 118,
+        "alsVeld": 26,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "AFSPRAAK.md",
+          "BEDRADING.json",
+          "BETROUWBAARHEID.md",
+          "BEWIJS.md",
+          "BEWIJSLADDER.json"
+        ]
+      },
+      {
+        "naam": "projectie",
+        "plekken": 308,
+        "domeinen": 145,
+        "alsVeld": 22,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "AANVOERVORM.json",
+          "ACTIVERING.json",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BEWIJS.md"
+        ]
+      },
+      {
+        "naam": "intent",
+        "plekken": 272,
+        "domeinen": 100,
+        "alsVeld": 35,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BEWIJS.md",
+          "CLAUDE.md",
+          "CODECREDENTIALS.json"
+        ]
+      },
+      {
+        "naam": "voorkeur",
+        "plekken": 262,
+        "domeinen": 117,
+        "alsVeld": 25,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "ADAPTIEF.md",
+          "AFSPRAAK.md",
+          "AUDITPROEF.json",
+          "BEWIJS.md"
         ]
       },
       {
         "naam": "situatie",
-        "plekken": 6,
-        "domeinen": 6,
-        "alsVeld": 1,
+        "plekken": 146,
+        "domeinen": 65,
+        "alsVeld": 19,
         "vrij": false,
         "voorbeeldDomeinen": [
-          "kern/hospitality-universe",
-          "kern/onderneming",
-          "kern/pakketten",
-          "kern/planners",
-          "kern/regering",
-          "kern/vakwerk"
+          "AANROEPGRAAF.json",
+          "APPSTORE.md",
+          "BEWIJS.md",
+          "CARRIERE.md",
+          "CLAUDE.md",
+          "CONCERN.md"
         ]
       },
       {
-        "naam": "relevantie",
-        "plekken": 2,
-        "domeinen": 1,
-        "alsVeld": 1,
+        "naam": "interesse",
+        "plekken": 103,
+        "domeinen": 60,
+        "alsVeld": 9,
         "vrij": false,
         "voorbeeldDomeinen": [
-          "kern/mall"
+          "AANROEPGRAAF.json",
+          "AUDITPROEF.json",
+          "BEWIJS.md",
+          "BUNDELS.md",
+          "DEKKING.json",
+          "DOCTRINE.json"
         ]
       },
       {
         "naam": "adaptief",
-        "plekken": 1,
-        "domeinen": 1,
+        "plekken": 95,
+        "domeinen": 34,
         "alsVeld": 1,
         "vrij": false,
         "voorbeeldDomeinen": [
-          "kern/adaptief"
+          "A11Y-INGELOGD.json",
+          "ADAPTIEF.md",
+          "APPWERKT.json",
+          "BEWIJS.md",
+          "CLAUDE.md",
+          "DOCTRINE.json"
+        ]
+      },
+      {
+        "naam": "neiging",
+        "plekken": 29,
+        "domeinen": 15,
+        "alsVeld": 7,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "CLAUDE.md",
+          "GRENZEN.json",
+          "NEIGING.md",
+          "kern/appgids-data",
+          "kern/neiging",
+          "kern/stadsweefsel"
+        ]
+      },
+      {
+        "naam": "relevantie",
+        "plekken": 17,
+        "domeinen": 11,
+        "alsVeld": 1,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "DOCTRINE.json",
+          "FOUNDATION.md",
+          "LUSSEN.json",
+          "NEIGING.md",
+          "PROOF-INCREMENTAL.md"
         ]
       }
     ],

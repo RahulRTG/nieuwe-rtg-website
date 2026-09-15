@@ -1,7 +1,7 @@
 /* ============================================================================
    DE VRAGENLIJST -- wat er gevraagd kan worden, en waar elk antwoord heen wijst.
 
-   Apart van ./vraag.js langs dezelfde naad als ./neiging-besluiten.js:
+   Apart van ./vraag.js langs dezelfde naad als ./besluiten.js:
    hierin staan BESLUITEN (welke vragen bestaan, en welk onderdeel een antwoord
    opendoet), daarin staat de REKENSOM die bepaalt welke vraag aan de beurt is.
    Een register verandert zelden en leest als beleid; een motor verandert vaak

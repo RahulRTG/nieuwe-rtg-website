@@ -2,7 +2,7 @@
    WAT HET LID MET ZIJN EIGEN GEHEUGEN DOET -- vergeten, niet-hiervoor, en de
    termijn die vanzelf veegt.
 
-   Apart van ./neiging.js langs een echte naad: dat bestand schrijft OP wat er
+   Apart van ./bewaren.js langs een echte naad: dat bestand schrijft OP wat er
    is verteld of opgemerkt, dit bestand is de kant waar het LID aan de knoppen
    zit. Twee lezers, twee redenen om te veranderen -- en samen gingen ze over de
    tienkilobytegrens van keuringsregel 13, een lijst die hoort te krimpen door
@@ -15,11 +15,11 @@
    ========================================================================== */
 'use strict';
 
-/* De doelenlijst komt uit hetzelfde besluitenregister als ./neiging.js hem
+/* De doelenlijst komt uit hetzelfde besluitenregister als ./bewaren.js hem
    leest, en wordt niet doorgegeven. Twee lezers van EEN register is goed; een
    doorgegeven kopie zou betekenen dat een aanroeper kan bepalen welke doelen er
    bestaan, en dan is de gesloten lijst niet meer gesloten. */
-const { DOELEN } = require('./neiging-besluiten');
+const { DOELEN } = require('./besluiten');
 
 module.exports = function maakBeheer({ bak, actor, lijstVan, toon, tijd, save }) {
   /* VERGEET. Echt weg, en niet een vlaggetje. */

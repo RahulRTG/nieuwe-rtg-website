@@ -51,7 +51,7 @@
    in dit bestand. Wat het lid ZELF heeft gezegd, vervalt niet door tijd. RTG
    vergeet niet wat je hem verteld hebt omdat er een half jaar voorbij is; hij
    vergeet wat hij zelf heeft GERADEN. Alleen het lid haalt een uitspraak weg,
-   en daar is ./neiging.js `vergeet()` voor.
+   en daar is ./bewaren.js `vergeet()` voor.
 
    Draai je dat om, dan krijg je het gedrag waar mensen terecht boos van worden:
    je vertelt een systeem eenmalig dat je geen alcohol drinkt, en een half jaar
@@ -132,7 +132,7 @@ function graadVan({ grond, aantal, laatst, nu }) {
 }
 
 /* Telt deze neiging nog mee? `onbekend` betekent hier: hij heeft zichzelf
-   opgeheven. Hij blijft wel STAAN -- zie ./neiging.js, want stil verdwijnen is
+   opgeheven. Hij blijft wel STAAN -- zie ./bewaren.js, want stil verdwijnen is
    iets anders dan zichtbaar niet meer meetellen. */
 const telt = graad => trede(graad) > trede('onbekend');
 

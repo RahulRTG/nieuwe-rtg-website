@@ -17,13 +17,13 @@
       NIET laat zien, leest als "dit is alles". Vandaar `grenzen`, en die staan
       er even groot bij als de inhoud.
 
-   De uitleg per grond en per doel komt uit ./neiging-besluiten.js en wordt hier
+   De uitleg per grond en per doel komt uit ./besluiten.js en wordt hier
    niet overgetypt: twee schermen die dezelfde grond anders uitleggen, is de
    dubbeling die LAT-regel 4 verbiedt.
    ========================================================================== */
 'use strict';
 
-const { GRONDUITLEG, DOELUITLEG } = require('./neiging-besluiten');
+const { GRONDUITLEG, DOELUITLEG } = require('./besluiten');
 
 module.exports = function maakGeheugen({ neiging }) {
   /* WAT WEET RTG VAN MIJ. Alles, ook het vervallene en het geweigerde, met per

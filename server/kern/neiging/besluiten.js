@@ -2,7 +2,7 @@
    DE BESLUITEN ONDER EEN NEIGING -- de gesloten lijsten, en wat er met opzet
    NIET in staat.
 
-   Apart van ./neiging.js om dezelfde reden als ./gegevenssoorten.js apart staat
+   Apart van ./bewaren.js om dezelfde reden als ./gegevenssoorten.js apart staat
    van ./gegevenskaart.js in kern/identiteit/: een lijst met BESLUITEN erin
    verandert zelden en wordt gelezen als beleid, de operaties eromheen
    veranderen vaak en worden gelezen als code. Samen gingen ze bovendien over de

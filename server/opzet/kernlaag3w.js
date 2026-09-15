@@ -39,14 +39,14 @@ Object.assign(kern, require('../kern/experience').maakExperience({
   kern, db: hulp.db, save: hulp.save, crypto: hulp.crypto,
   bijeen: hulp.bijeen, inBundel: hulp.inBundel
 }));
-/* Adaptief RTG (kern/adaptief/, ADAPTIEFRTG.md): de persoonlijke laag. Hij
+/* RTG Neiging (kern/neiging/, NEIGING.md): de persoonlijke laag. Hij
    staat NAAST het Experience Platform en niet erin, want hij doet het
-   omgekeerde: experience PROJECTEERT domeinwaarheid en bezit niets, adaptief
+   omgekeerde: experience PROJECTEERT domeinwaarheid en bezit niets, neiging
    bewaart als enige het ene ding dat geen domein bezit -- wat een mens leuk
    vindt. Hij krijgt de kern met opzet NIET mee: deze laag leest geen enkel
    ander domein, en dat is een eigenschap van de bedrading en niet van de
    discipline van wie hem aanroept. */
-Object.assign(kern, require('../kern/adaptief')({
+Object.assign(kern, require('../kern/neiging')({
   db: hulp.db, save: hulp.save, crypto: hulp.crypto
 }));
 };

@@ -1,4 +1,4 @@
-# Adaptief RTG
+# RTG Neiging
 
 *Eén RTG. Voor iedereen anders.*
 
@@ -17,7 +17,7 @@ ophoudt te gelden.**
 
 ## 0. De meting gaat voor
 
-Het voorstel voor Adaptief RTG rust op een bewering die aantrekkelijk klinkt:
+Het voorstel voor RTG Neiging rust op een bewering die aantrekkelijk klinkt:
 
 > *Bouw geen profiel. Bouw een Personal Context Graph.*
 
@@ -28,23 +28,23 @@ vanzelfsprekend over vijftien talentdomeinen (`CARRIEREVORM.json`). `Moment` ove
 acht publieke domeinen (`STAGEVORM.json`), `Manier` over vijf terreinen
 (`AANVOERVORM.json`). Alle vier sneuvelden ze toen iemand ze tegen de code hield.
 
-`npm run adaptiefrtg` (`ADAPTIEFRTG.json`) draait daarom op de lezer van
+`npm run neigingvorm` (`NEIGINGVORM.json`) draait daarom op de lezer van
 `scripts/objectmodel.js` — een tweede parser zou de vergelijking met die vier
 metingen waardeloos maken. Drie metingen die niet hetzelfde zeggen.
 
-### A. De naam — veertien van de vijftien begrippen waren bezet
+### A. De naam — alle vijftien begrippen waren bezet
 
 | begrip | bestanden | domeinen | als veldnaam |
 |---|---|---|---|
-| `groep` | 174 | 69 | 80 |
-| `verval` | 109 | 43 | 63 |
-| `profiel` | 104 | 49 | 29 |
-| `moment` | 79 | 38 | 29 |
-| `context` | 77 | 39 | 27 |
-| `adaptief` | **0** | **0** | **0** |
-
-De rest (`intent`, `signaal`, `zekerheid`, `projectie`, `voorkeur`, `interesse`,
-`geheugen`, `situatie`, `relevantie`) zit ertussenin, allemaal bezet.
+| `moment` | 1615 | 384 | 97 |
+| `context` | 1206 | 268 | 122 |
+| `groep` | 1169 | 254 | 242 |
+| `profiel` | 1051 | 253 | 178 |
+| `verval` | 681 | 223 | 115 |
+| … | | | |
+| `adaptief` | 95 | 34 | 1 |
+| `relevantie` | 17 | 11 | 1 |
+| **`neiging`** | **4** | **4** | **0** |
 
 Dat is geen trivia. `context` betekent in dit huis **situatie** —
 `kern/experience/contexts.js` gebruikt het voor *welke reis, welke werkruimte*,
@@ -53,15 +53,19 @@ overneemt voor *wat iemand leuk vindt*, is exact de `VERMOGENS`-botsing uit
 `OS.md` en de `moment`-botsing uit `STAGE.md`: twee betekenissen op de centrale
 naam van een hele laag.
 
-Het centrale begrip heet daarom **neiging**. Gemeten vrij, en preciezer: een
-profiel klinkt als iets wat iemand *is*, een neiging is wat iemand *neigt te
-doen*. Dat verschil bepaalt of je het durft te laten zien aan degene over wie het
-gaat — en deze laag is gebouwd om precies dat te doen.
+Het centrale begrip heet daarom **neiging**. De vier plekken waar dat woord al
+stond, zijn alle vier gewone Nederlandse tekst in een toelichting ("de neiging om
+toch maar iets te doen is nu juist het probleem") en geen enkele een module, een
+scherm of een veldnaam. Na te rekenen met `git grep -lIi neiging <commit vóór
+deze tak>`.
 
-> Let op bij het herlezen van de meter: sinds `server/kern/adaptief/` bestaat,
-> telt hij zijn eigen laag mee. `adaptief` stond op nul toen de naam werd gekozen;
-> dat hij nu bezet is, is deze laag zelf. Dat staat ook in de `grens` van het
-> register, zodat niemand het voor een botsing aanziet.
+En het woord is preciezer: een profiel klinkt als iets wat iemand *is*, een
+neiging is wat iemand *neigt te doen*. Dat verschil bepaalt of je het durft te
+laten zien aan degene over wie het gaat — en deze laag is gebouwd om precies dat
+te doen.
+
+> **Deze tabel is de TWEEDE meting, en de eerste was fout op een manier die
+> eruitzag als een uitslag.** Zie par. 7.
 
 ### B. De voorkeurslaag — er wordt al op gestuurd, en niemand weet hoe hard
 
@@ -92,7 +96,7 @@ of zo'n voorkeur één keer is aangeklikt of tien keer bevestigd.
 
 ### C. Het voorstel tegen de code — vijftien van de vijftien bestonden al
 
-Elk van de vijftien punten uit het voorstel draagt in `ADAPTIEFRTG.json` een
+Elk van de vijftien punten uit het voorstel draagt in `NEIGINGVORM.json` een
 **verwijzing naar bestaande code**, en die verwijzing wordt **nagetrokken**:
 bestaat het bestand, en staat het genoemde symbool erin? Een punt waarvan de
 verwijzing rot, zakt naar `verwijzing-rot`. De meter verdiende zich meteen terug:
@@ -138,11 +142,11 @@ hoort, hoort daar — inclusief de doorwerking die `zorgMee()` er al omheen heef
 gezet. Een laag eroverheen die dezelfde waarheid nóg een keer opslaat, loopt
 uiteen met het origineel, en meestal zonder dat iets klaagt (LAT-regel 4).
 
-Daarom is Adaptief RTG **geen projectie van de domeinen** en ook **geen tweede
+Daarom is RTG Neiging **geen projectie van de domeinen** en ook **geen tweede
 Experience Plane**. Het spiegelbeeld is precies:
 
 - `kern/experience/` **projecteert** domeinwaarheid en bezit niets;
-- `kern/adaptief/` **bewaart** als enige het ene ding dat geen domein bezit.
+- `kern/neiging/` **bewaart** als enige het ene ding dat geen domein bezit.
 
 Hij krijgt de kern dan ook niet mee (`opzet/kernlaag3w.js`): deze laag leest geen
 enkel ander domein, en dat is een eigenschap van de bedrading en niet van de
@@ -165,7 +169,7 @@ vervalstaten, de schaduwmodi). En INT-04 verbiedt een **samengesteld cijfer**:
 is erger dan het weglaten. 0,94 tegenover 0,91 is een verschil dat nergens
 vandaan komt.
 
-`kern/adaptief/ladder.js` hergebruikt daarom de bestaande vier van `BESTUUR.md`:
+`kern/neiging/ladder.js` hergebruikt daarom de bestaande vier van `BESTUUR.md`:
 
 ```
 onbekend  ->  vermoed  ->  gemeten  ->  bewezen
@@ -206,7 +210,7 @@ Wat wél vervalt, met de reden als besluit en niet als schijnmeting:
 ### 3.3 De vraagmotor — winst is een rekensom, geen leus
 
 Het probleem met een intake van veertig velden is niet dat hij lang is, maar dat
-niemand kan zeggen wat een antwoord oplevert. `kern/adaptief/vraag.js` stelt per
+niemand kan zeggen wat een antwoord oplevert. `kern/neiging/vraag.js` stelt per
 keer één vraag:
 
 > *verandert het antwoord op deze vraag iets aan wat RTG voor jou opendoet?*
@@ -221,7 +225,7 @@ winnen valt. Gemeten in de proef: drie vragen, zeven bestemmingen open.
 De bestemmingen komen uit `public/shared/sprongindex.json` — de lijst die uit
 `MAPPEN` wordt afgeleid, en de enige lijst apps die dit huis heeft. Ze worden
 **nagetrokken** door `controle()`; verdwijnt een onderdeel, dan zakt
-`test/adaptief.test.js` in plaats van dat een lid stil een vraag krijgt die
+`test/neiging.test.js` in plaats van dat een lid stil een vraag krijgt die
 nergens meer toe leidt.
 
 De **indeling** (welke onderdelen samen "eten" heten) is mensenwerk en staat
@@ -240,7 +244,7 @@ filter achteraf kan iemand vergeten.
 | `tonen` | hiermee bepaalt RTG wat hij je laat zien |
 | `helpen` | hiermee helpt RTG je met iets wat je zelf vraagt |
 
-**Wat er met opzet niet is** (`kern/adaptief/neiging-besluiten.js`):
+**Wat er met opzet niet is** (`kern/neiging/neiging-besluiten.js`):
 
 - **`delen`** — een neiging gaat nooit naar een derde partij. Wie een voorkeur aan
   een zaak wil meegeven gebruikt `zorgMee()`, dat al een zaak, een reden en een
@@ -270,13 +274,13 @@ later bij doet, geldt niet voor wat er al ligt.
 
 ### Staat
 
-- **De neiging met grond, graad, doel, deel en termijn** — `kern/adaptief/`,
+- **De neiging met grond, graad, doel, deel en termijn** — `kern/neiging/`,
   zeven bestanden, 27 unittoetsen en 7 e2e-toetsen.
 - **De vraagmotor die zichzelf afkapt** — winst als telling, bestemmingen
   nagetrokken tegen `sprongindex.json`.
 - **Verval dat `gezegd` met rust laat.**
 - **Zeven ledenroutes**, alle zeven met een mutatiecontract op een gemeten ronde.
-- **Het scherm** `/apps/adaptief.html` ("Mijn RTG"), met per neiging *wijzigen*,
+- **Het scherm** `/apps/mijn-neigingen.html` ("Mijn RTG"), met per neiging *wijzigen*,
   *vergeet dit* en *niet hiervoor gebruiken*, en met de eigen rand erbij.
 - **De intake is nooit verplicht** — "ik doe dit later" bestaat, en wie hem nooit
   doet houdt exact het huis dat hij vandaag heeft.
@@ -287,7 +291,7 @@ later bij doet, geldt niet voor wat er al ligt.
   levert items met bron en versheid, maar zonder volgorde. De weging hoort dáár
   en niet hier (zie grens ADAPT-05).
 - **`merkOp()` een aanroeper geven.** De progressive-profiling kant bestaat
-  (`adaptiefMerkOp`) en wordt vandaag door niemand aangeroepen: er is nog geen
+  (`neigingMerkOp`) en wordt vandaag door niemand aangeroepen: er is nog geen
   plek waar gedrag wordt opgemerkt. Dat is bewust één besluit en niet twintig
   losse haakjes.
 - **De microvraag op het moment zelf** ("Vegetarisch belangrijk voor jou?"). De
@@ -304,7 +308,7 @@ later bij doet, geldt niet voor wat er al ligt.
   vergeetachtigheid maar AI-CONTEXT-01: die context komt uit een POSITIEVE lijst
   velden (`LEDENVELDEN`, vandaag `trip` en `invoices`). Iets toevoegen is een
   besluit met een eigen toets (`test/aicontext-allowlist.test.js`). Zodra het
-  valt, is `adaptiefNeigingen(key, 'helpen')` de weg — met een doel, en nooit met
+  valt, is `neigingLees(key, 'helpen')` de weg — met een doel, en nooit met
   een spread.
 - **Mag het kantoor er ooit bij?** Vandaag is er geen kantoorroute en dat is met
   opzet. `KANTOORMACHT.md` mat dat 422 van de 590 kantoorroutes achter een
@@ -340,20 +344,20 @@ niet de laag die dat oplost, maar wel een die hem niet breekt.*
 opengaan. Er is geen functie die iets dichtdoet, en dat kán ook niet — er is geen
 veld waarin dat zou passen. `FOUNDATION.md` par. 5: zo'n motor mag alleen
 tóevoegen en nooit zeggen "dit is niets voor jou".
-*Handhaver: `test/adaptief.test.js` — een extra antwoord mag nooit iets sluiten
+*Handhaver: `test/neiging.test.js` — een extra antwoord mag nooit iets sluiten
 wat open stond.*
 
 **ADAPT-03 — Personalisatie is nooit een voorwaarde.** Er is geen route die de
 intake afdwingt en geen antwoord dat een andere functie opent of sluit. Wie hem
 overslaat houdt exact het huis dat hij had. Personalisatie die je moet ondergaan
 om normaal te kunnen werken, is een tolpoort.
-*Handhaver: `test/adaptief.test.js` en `test/adaptief.e2e.js`.*
+*Handhaver: `test/neiging.test.js` en `test/neiging.e2e.js`.*
 
 **ADAPT-04 — Wat het lid zei vervalt niet vanzelf; wat RTG raadde wel.**
-*Handhaver: `test/adaptief.test.js`, met een mutatie gezien zakken.*
+*Handhaver: `test/neiging.test.js`, met een mutatie gezien zakken.*
 
 **ADAPT-05 — Deze laag beslist niet wat er op een scherm komt.** De volgorde van
-kaarten blijft van `kern/experience/projections.js`. Zou Adaptief die overnemen,
+kaarten blijft van `kern/experience/projections.js`. Zou deze laag die overnemen,
 dan zeggen twee lagen iets over hetzelfde en lopen ze uiteen (`BESTUUR.md`: de
 laag die iets toont, meet het niet).
 *Handhaver: de bedrading — deze laag krijgt de kern niet mee en kan er niet bij.*
@@ -361,13 +365,13 @@ laag die iets toont, meet het niet).
 **ADAPT-06 — Een neiging verlaat het huis nooit.** Geen `delen`, geen
 `adverteren`, geen kantoorroute. Delen met een zaak loopt langs `zorgMee()`, dat
 al een reden en een intrekbaar spoor eist.
-*Handhaver: `test/adaptief.test.js` (de gesloten doellijst weigert), en de
+*Handhaver: `test/neiging.test.js` (de gesloten doellijst weigert), en de
 afwezigheid van een route.*
 
 **ADAPT-07 — Het lid ziet alles, ook wat niet meer meetelt.** Een geheugenkaart
 die alleen het geldige toont, verzwijgt wat er is opgeslagen — en klopt dan precies
 op het moment dat iemand hem controleert. Wat stil staat, staat er mét de reden.
-*Handhaver: `test/adaptief.test.js`.*
+*Handhaver: `test/neiging.test.js`.*
 
 ---
 
@@ -390,8 +394,31 @@ afwezigheid met een reden, en geen lege functie.
 
 ## 7. Wat het bouwen blootlegde
 
-Vier dingen die geen enkele bestaande toets zag, en die je nergens anders moet
-herhalen.
+Vijf dingen die geen enkele bestaande toets zag, en die je nergens anders moet
+herhalen. De eerste is de duurste, en hij gaat over deze meter zelf.
+
+**De naammeting gaf een naam vrij die niet vrij was, en twee bestaande toetsen
+zijn daardoor overschreven.** De eerste versie las alleen `server/kern` en drie
+broers — de bronnenlijst van `scripts/objectmodel.js`. Voor een VORMmeting klopt
+die zeef (een scherm heeft daar niets te zoeken); voor een NAAM niet. `adaptief`
+kwam er als enige vrije naam uit, en de hele laag is zo gedoopt. In werkelijkheid
+draagt `ADAPTIEF.md` een bestaande laag van **95 bestanden**, met
+`public/shared/adaptief/` (elf modules), een eigen stylesheet, en —
+`test/adaptief.test.js` en `test/adaptief.e2e.js`. Die twee zijn bij het bouwen
+prompt overschreven, en niets klaagde: de nieuwe toetsen stonden groen, de oude
+waren weg.
+
+Dat is precies `BEWIJSMACHINE.md` par. 6a: *een proef kan een geldige uitslag
+geven en toch het verkeerde experiment zijn uitgevoerd.* De uitslag "0 bestanden"
+was waar binnen zijn eigen zeef en onwaar over het huis. Drie dingen zijn
+gerepareerd, en alle drie horen ze hier te blijven staan: de meter leest nu de
+hele boom, `vrij` betekent **nergens genoemd** (de oude marge van twee bestanden
+was precies groot genoeg om een laag te missen), en de laag heet `neiging`.
+
+*De les generaliseert: een zeef die je overneemt van een andere meting, neem je
+over mét zijn aannames. `BRONNEN` in objectmodel.js is een antwoord op de vraag
+"waar wonen domeinvormen", niet op "waar kan een naam bezet zijn".*
+
 
 **De openingsvraag bleef eeuwig terugkomen — want niet kiezen is ook een
 antwoord.** De eerste vraagmotor rekende winst alleen uit gekozen onderwerpen.
@@ -430,17 +457,22 @@ productdefect (`BETROUWBAARHEID.md`); een onzichtbare ingang is er ook een.
 
 | onderdeel | bestand |
 |---|---|
-| de meting | `scripts/adaptiefrtg.js`, `ADAPTIEFRTG.json`, `npm run adaptiefrtg` |
-| de ladder | `server/kern/adaptief/ladder.js` |
-| de besluiten (doelen, kring, termijn) | `server/kern/adaptief/neiging-besluiten.js` |
-| de opslag | `server/kern/adaptief/neiging-opslag.js` |
-| onthouden en lezen | `server/kern/adaptief/neiging.js` |
-| wat het lid met zijn geheugen doet | `server/kern/adaptief/neiging-beheer.js` |
-| de vragenlijst | `server/kern/adaptief/vraag-lijst.js` |
-| de vraagmotor | `server/kern/adaptief/vraag.js` |
-| de geheugenkaart | `server/kern/adaptief/geheugen.js` |
-| de laag zelf | `server/kern/adaptief/index.js` |
-| de routes | `server/routes/adaptief.js` |
-| het scherm | `public/apps/adaptief.html` |
-| de contracten | `server/lib/mutatiecontracten-adaptief.js` |
-| de toetsen | `test/adaptief.test.js`, `test/adaptief.e2e.js` |
+| de meting | `scripts/neigingvorm.js`, `NEIGINGVORM.json`, `npm run neigingvorm` |
+| de ladder | `server/kern/neiging/ladder.js` |
+| de besluiten (doelen, kring, termijn) | `server/kern/neiging/besluiten.js` |
+| de opslag | `server/kern/neiging/opslag.js` |
+| onthouden en lezen | `server/kern/neiging/bewaren.js` |
+| wat het lid met zijn geheugen doet | `server/kern/neiging/beheer.js` |
+| de vragenlijst | `server/kern/neiging/vraag-lijst.js` |
+| de vraagmotor | `server/kern/neiging/vraag.js` |
+| de geheugenkaart | `server/kern/neiging/geheugen.js` |
+| de laag zelf | `server/kern/neiging/index.js` |
+| de routes | `server/routes/neiging.js` |
+| het scherm | `public/apps/mijn-neigingen.html` ("Mijn RTG") |
+| de contracten | `server/lib/mutatiecontracten-neiging.js` |
+| de toetsen | `test/neiging.test.js`, `test/neiging.e2e.js` |
+
+> Niet te verwarren met **`ADAPTIEF.md`** en `public/shared/adaptief/`: die laag
+> gaat over de VORM waarin een capability verschijnt (bureau, tablet, telefoon,
+> stem). Deze gaat over de MENS. Zie par. 7 voor wat het kostte om dat verschil
+> te leren.

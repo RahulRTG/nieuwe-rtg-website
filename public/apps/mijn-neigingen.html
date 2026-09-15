@@ -126,7 +126,7 @@
     tekst(door, 'Verder');
     door.addEventListener('click', async () => {
       door.disabled = true;
-      const r = await api('/api/adaptief/antwoord', { vraag: v.id, onderwerpen: [...gekozen] });
+      const r = await api('/api/neiging/antwoord', { vraag: v.id, onderwerpen: [...gekozen] });
       gekozen = new Set();
       if (r.body && r.body.error) { $('#uitleg').textContent = r.body.error; return; }
       toonIntake(r.body);
@@ -140,8 +140,8 @@
     later.type = 'button';
     tekst(later, 'Ik doe dit later');
     later.addEventListener('click', async () => {
-      await api('/api/adaptief/overslaan', {});
-      const s = await api('/api/adaptief/intake', {});
+      await api('/api/neiging/overslaan', {});
+      const s = await api('/api/neiging/intake', {});
       toonIntake(s.body);
     });
     rij.appendChild(later);
@@ -177,7 +177,7 @@
     opnieuw.type = 'button';
     tekst(opnieuw, 'Stel me de vragen opnieuw');
     opnieuw.addEventListener('click', async () => {
-      const r = await api('/api/adaptief/opnieuw', {});
+      const r = await api('/api/neiging/opnieuw', {});
       toonIntake(r.body);
     });
     rij.appendChild(opnieuw);
@@ -219,20 +219,20 @@
       const b = maak('button', 'mini');
       b.type = 'button';
       tekst(b, d.id === 'tonen' ? 'Niet gebruiken om dingen te tonen' : 'Niet gebruiken om mij te helpen');
-      b.addEventListener('click', async () => { await api('/api/adaptief/niet-voor', { id: n.id, doel: d.id }); laadGeheugen(); });
+      b.addEventListener('click', async () => { await api('/api/neiging/niet-voor', { id: n.id, doel: d.id }); laadGeheugen(); });
       kn.appendChild(b);
     }
     const weg = maak('button', 'mini');
     weg.type = 'button';
     tekst(weg, 'Vergeet dit');
-    weg.addEventListener('click', async () => { await api('/api/adaptief/vergeet', { id: n.id }); laadGeheugen(); });
+    weg.addEventListener('click', async () => { await api('/api/neiging/vergeet', { id: n.id }); laadGeheugen(); });
     kn.appendChild(weg);
     el.appendChild(kn);
     return el;
   }
 
   async function laadGeheugen() {
-    const r = await api('/api/adaptief/geheugen', {});
+    const r = await api('/api/neiging/geheugen', {});
     const el = $('#geheugen'); el.textContent = '';
     const gr = $('#grenzen'); gr.textContent = '';
     if (r.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
@@ -258,7 +258,7 @@
   }
 
   async function laad() {
-    const s = await api('/api/adaptief/intake', {});
+    const s = await api('/api/neiging/intake', {});
     if (s.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
     if (s.status === 403) { $('#uitleg').textContent = s.body.error || 'Dit hoort bij een account.'; return; }
     toonIntake(s.body);

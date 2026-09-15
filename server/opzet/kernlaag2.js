@@ -143,11 +143,8 @@ Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypt
    kernlaag7) en optioneel. */
 Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic, accounts,
   visumtaakVan: () => kern.visumtaak, meldLidVan: () => kern.meldLid }));
-/* DE GELDGEBEURTENIS VAN EEN REIS (kern/reisbureau-betaling.js): de eerste
-   aanroeper van de herkomstlaag. Hij int de reissom op EEN boeking en splitst
-   die in herkomstrijen uit de commerciele samenstelling; wat aan derden toekomt
-   wordt klaargezet en nooit uitgevoerd. `pay` komt in een latere laag, dus laat
-   gebonden -- zonder pay weigert hij met een 503 in plaats van te doen alsof. */
+/* De geldgebeurtenis van een reis (kern/reisbureau-betaling.js); waarom een
+   boeking en veel herkomstrijen staat in de kop daar. `pay` is laat gebonden. */
 Object.assign(kern, require('../kern/reisbureau-betaling').maakReisbetaling({
   db, save, payVan: () => kern.pay }));
 /* Het REISAANBOD (kern/reisaanbod.js): de enige schrijver van partnerTrips, de

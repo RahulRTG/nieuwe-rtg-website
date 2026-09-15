@@ -46,12 +46,22 @@ const HERKOMSTEN = [
    geen accolade. Een verwijzing is machinetekst. */
 const VORM = /^[A-Za-z0-9:._@-]{1,160}$/;
 
+/* DE DUBBELE PUNT WORDT GEZOCHT EN NIET AANGENOMEN, en dat is geen stijl maar een
+   fout die hier echt is gemaakt. Eerst stond er `s.slice(0, s.indexOf(':'))`, en
+   zonder dubbele punt geeft `indexOf` een -1 -- waarop `slice(0, -1)` het LAATSTE
+   TEKEN afknipt in plaats van niets terug te geven. `leerstofX` werd daarmee
+   `leerstof`, en kwam er glad doorheen. De proef had vier vormen met een dubbele
+   punt en geen enkele zonder; hij stond groen op precies de gevallen die ik had
+   bedacht. Vandaar dat `knip < 1` en de lege rest nu allebei een eigen uitgang
+   hebben: een herkomst zonder verwijzing erachter wijst ook nergens heen. */
 function bronKlopt(bron) {
   const s = String(bron == null ? '' : bron);
   if (!s) return { ok: false, reden: 'leeg' };
   if (!VORM.test(s)) return { ok: false, reden: 'vorm' };
-  const herkomst = s.slice(0, s.indexOf(':'));
-  if (!herkomst || HERKOMSTEN.indexOf(herkomst) < 0) return { ok: false, reden: 'herkomst' };
+  const knip = s.indexOf(':');
+  if (knip < 1 || knip === s.length - 1) return { ok: false, reden: 'herkomst' };
+  const herkomst = s.slice(0, knip);
+  if (HERKOMSTEN.indexOf(herkomst) < 0) return { ok: false, reden: 'herkomst' };
   return { ok: true, herkomst };
 }
 

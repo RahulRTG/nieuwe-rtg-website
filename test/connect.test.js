@@ -545,3 +545,21 @@ test('36. de herkomsten worden uit de bronnen gelezen en niet overgetypt', () =>
   assert.ok(HERKOMSTEN.includes(require('../server/kern/connect/bron-leerstof').HERKOMST));
   assert.ok(HERKOMSTEN.includes(require('../server/kern/connect/bron-lokaal').HERKOMST));
 });
+
+test('37. de dubbele punt wordt gezocht en niet aangenomen', () => {
+  const { bronKlopt } = require('../server/kern/connect/verwijzing');
+  /* DE FOUT DIE HIER ECHT IS GEMAAKT. `s.slice(0, s.indexOf(':'))` geeft bij een
+     ontbrekende dubbele punt een -1 door aan slice, en dan knipt die het LAATSTE
+     TEKEN af in plaats van niets terug te geven -- `leerstofX` werd `leerstof` en
+     kwam er glad doorheen. De eerste proef had vier vormen MET een dubbele punt
+     en geen enkele zonder, en stond dus groen op precies de gevallen die waren
+     bedacht. Elk van deze zes hoort te weigeren. */
+  for (const slecht of ['leerstofX', 'mediaosZ', 'rtfos-publiekQ', 'leerstof', ':leerstof', 'leerstof:']) {
+    assert.equal(bronKlopt(slecht).ok, false, JSON.stringify(slecht) + ' wijst nergens heen');
+  }
+  /* En de tegenproef: de echte vormen komen er alle drie langs, inclusief een
+     verwijzing die zelf nog een dubbele punt draagt. */
+  for (const goed of ['leerstof:d1', 'mediaos:abc-123', 'rtfos-publiek:amsterdam:markt:2026-09-15']) {
+    assert.equal(bronKlopt(goed).ok, true, JSON.stringify(goed) + ' is een echte verwijzing');
+  }
+});

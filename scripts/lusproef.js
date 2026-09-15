@@ -286,6 +286,31 @@ async function proef(basis) {
   const s10 = await post('/api/connect/ontdek', { vandaag: '2026-09-15' }, a);
   storing(10, 'zonder plaats meldt de laag dat, in plaats van stil niets lokaals te tonen',
     !!(s10.body || {}).plaatsGevraagd, String((s10.body || {}).plaatsGevraagd || '').slice(0, 55));
+
+  /* Gevonden door scripts/gluurronde.js: `bron` nam elke vrije tekst aan,
+     bewaarde hem ongezien en gaf hem onveranderd terug -- ook de naam van iemand
+     anders, in een bak zonder bewaartermijn voor zulke gegevens. Zie de kop van
+     kern/connect/verwijzing.js. Hier op een ECHTE server, want de unittoets kent
+     de kern en niet de deur. */
+  const s11 = await post('/api/connect/noteer',
+    { trede: 'begrepen', onderwerp: 'koken', bron: 'Jan de Vries woont in Zwolle' }, a);
+  const na11 = await post('/api/connect/dossier', {}, a);
+  /* TWEE ONAFHANKELIJKE HELFTEN, en het bericht zegt welke het deed. De eerste
+     versie meldde altijd "geweigerd (200) en niets bewaard" -- ook als er niets
+     geweigerd wAs. Een proef die zakt moet vertellen WAT hij zag, anders zoekt
+     de volgende het in de verkeerde helft. */
+  const bewaard11 = JSON.stringify(na11.body || {}).includes('Zwolle');
+  storing(11, 'vrije tekst komt het dossier niet in, ook niet als eigen bron',
+    s11.status !== 200 && !bewaard11,
+    (s11.status !== 200 ? 'geweigerd (' + s11.status + ')' : 'NIET geweigerd (200)') +
+      (bewaard11 ? ' en WEL bewaard' : ' en niets bewaard'));
+
+  /* DE TEGENPROEF, want zonder deze is de goedkoopste implementatie "weiger alles
+     met een bron" en staat de proef groen terwijl het product stuk is. */
+  const s12 = await post('/api/connect/noteer',
+    { trede: 'toegepast', onderwerp: 'koken', bron: 'leerstof:rekenen.g6.omtrek-opp' }, a);
+  storing(12, 'en een ECHTE verwijzing komt er gewoon langs',
+    s12.status === 200 && s12.body.ok === true, 'status ' + s12.status);
 }
 
 (async () => {

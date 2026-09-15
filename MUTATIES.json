@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:31:37.703Z",
-    "commit": "92de4a23",
+    "op": "2026-09-15T10:35:35.000Z",
+    "commit": "938edbbf",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6728,6 +6728,14 @@
       "module": "server/web/routing.js",
       "operator": "===->!==#0",
       "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "routermeting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ai/routermeting.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "rtf-labfonds-deur.test.js": {

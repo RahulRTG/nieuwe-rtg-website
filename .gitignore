@@ -125,12 +125,3 @@ dump.rdb
 # van in de repo te belanden.
 zzijk*
 **/zzijk*
-
-# ROUTER.json: de schaduwtelling van de intelligentierouter (scripts/router.js).
-# ANDERS DAN bijna elk register in de wortel, en daarom hier en niet in de repo:
-# dit is geen AFLEIDING uit de bron maar een WAARNEMING uit server/data/ --
-# opgebouwd terwijl er op DEZE installatie mensen met Rahul praatten. De tellers
-# van een laptop zijn niet die van productie, en ze inchecken maakt van iemands
-# lokale gespreksstatistiek repo-waarheid. Het SCRIPT staat wel in de repo; de
-# uitslag hoort bij de installatie, net als server/data/ zelf.
-ROUTER.json

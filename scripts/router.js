@@ -13,11 +13,19 @@
    niet de herkomst van het getal maar de stand van de code toen het register
    werd uitgeschreven. `sinds` is wat telt.
 
-   EN DAAROM STAAT ROUTER.json IN .gitignore. Hij komt uit server/data/, dat om
-   dezelfde reden al niet wordt ingecheckt: de tellers van een laptop zijn niet
-   die van productie, en ze committen maakt van iemands lokale
-   gespreksstatistiek repo-waarheid. Het script hoort in de repo, de uitslag bij
-   de installatie. Wie een productiegetal wil, draait dit dAAr.
+   EN DAAROM SCHRIJFT HIJ IN server/data/ EN NIET IN DE WORTEL. De tellers van
+   een laptop zijn niet die van productie, en ze committen maakt van iemands
+   lokale gespreksstatistiek repo-waarheid. Het script hoort in de repo, de
+   uitslag bij de installatie -- dus staat hij bij de rest van de runtime-staat,
+   die om precies dezelfde reden al niet wordt ingecheckt.
+
+   DAT IS EEN REPARATIE EN GEEN VOORKEUR. Hij stond eerst in de wortel met een
+   regel in .gitignore, en dat brak de norm voor iedereen die deze meter draaide:
+   `metingenZonderRatel` telt meetbestanden in de WORTEL die aan geen ratel
+   hangen, en ging van 50 naar 51. Een ratel aan deze getallen hangen kan niet --
+   ze verschillen per installatie, dus hij zou op de volgende machine rood staan.
+   Een register dat niet van de repo is, hoort dus ook niet in de wortel van de
+   repo.
 
    WAAROM DIT REGISTER BESTAAT. De router loopt in de schaduw: hij beslist niets
    en de modelaanroep gaat gewoon door. De vraag die hij moet beantwoorden is of
@@ -44,7 +52,10 @@ const fs = require('fs');
 const path = require('path');
 const { stempel } = require('./lib/stempel');
 
-const DOEL = path.join(__dirname, '..', 'ROUTER.json');
+/* Bij de rest van de runtime-staat, en met RTG_DATA_DIR mee als die gezet is --
+   anders schrijft een installatie met een eigen datamap alsnog in de repo. */
+const DOEL = path.join(process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'server', 'data'),
+  'ROUTER.json');
 
 /* Dezelfde drempel als kern/commercie/schaduw.js. Overgetypt en niet
    geimporteerd, omdat die module een db en een save wil en dit script alleen
@@ -146,12 +157,13 @@ if (require.main === module) {
         'De commit hieronder is de stand van de code toen het register werd uitgeschreven, ' +
         'niet de herkomst van de getallen. Kijk naar `sinds`.'
     });
+    fs.mkdirSync(path.dirname(DOEL), { recursive: true });
     fs.writeFileSync(DOEL, JSON.stringify(Object.assign({ stempel: stamp }, uit), null, 2) + '\n');
     const t = uit.totaal;
     if (!t) {
-      console.log('\nROUTER.json geschreven: ' + uit.uitslag + '\n  ' + uit.waarom + '\n');
+      console.log('\n' + DOEL + '\n  ' + uit.uitslag + ' -- ' + uit.waarom + '\n');
     } else {
-      console.log('\nROUTER.json geschreven.\n');
+      console.log('\n' + DOEL + '\n');
       console.log('  totaal      ' + t.uitslag + ' -- ' + t.waarom);
       console.log('  gewogen     ' + t.gewogen);
       console.log('  spoor       ' + t.spoorPct + '%  (vermoeden van de router)');

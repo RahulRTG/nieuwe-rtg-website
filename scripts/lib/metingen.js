@@ -314,6 +314,12 @@ const REGISTER = {
      minder standen of minder gevallen ziet, meldt "minder betekenissen" terwijl
      er alleen minder is gekeken, en dat is de faalvorm waar een ratel voor is. */
   'PAKTEBETEKENIS.json': { eigenRatel: 'test/paktebetekenis.test.js' },
+  /* MANDAATPROEF.json is een PROEF en geen meting, dus hier hoort de ratel wel
+     op de uitslag: een schakel die gesloten was en opengaat, is een regressie en
+     geen nieuws. De uitzondering is `openBekend` -- die telt apart en draagt
+     zijn reden mee, zodat een bevinding niet hoeft te worden weggepoetst om
+     groen te blijven. Zelfde vorm als RITPROEF.json en MOMENTPROEF.json. */
+  'MANDAATPROEF.json': { eigenRatel: 'test/mandaatproef.test.js' },
   'REFUNDMIGRATIE.json': { eigenRatel: 'test/refundmigratie.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
   /* ONDERNEMERSLUS.json meet of de ondernemerslus EEN onderwerp draagt

@@ -403,7 +403,9 @@
     "ketenbereik": "node scripts/ketenbereik.js",
     "ketenbereik:vast": "node scripts/ketenbereik.js --vastleggen",
     "paktebetekenis": "node scripts/paktebetekenis.js",
-    "paktebetekenis:vast": "node scripts/paktebetekenis.js --vastleggen"
+    "paktebetekenis:vast": "node scripts/paktebetekenis.js --vastleggen",
+    "mandaatproef": "node scripts/mandaatproef.js",
+    "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

@@ -110,6 +110,7 @@ const EIGENAAR = {
      dus de vloer optillen zou hier het goedkoopst zijn en het minst verdiend. */
   'KETENBEREIK.json': { schrijver: 'scripts/ketenbereik.js' },
   'PAKTEBETEKENIS.json': { schrijver: 'scripts/paktebetekenis.js' },
+  'MANDAATPROEF.json': { schrijver: 'scripts/mandaatproef.js' },
 };
 
 /* MEETING: welk script schrijft aantoonbaar naar een wortelregister? Ondergrens,

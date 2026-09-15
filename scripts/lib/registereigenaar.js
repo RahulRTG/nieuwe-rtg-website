@@ -52,6 +52,13 @@ const EIGENAAR = {
     waarom: 'schuldlijst van schermen zonder klikroute; wordt met de hand bijgehouden en mag alleen krimpen. ' +
       'Precies daarom kon een nieuw script hem stil overschrijven zonder dat een schrijverscan iets zag.' },
 
+  /* De internationale laag. Beide hebben een eigen ratel (scripts/lib/metingen.js)
+     en worden door precies een script geschreven; ze staan hier zodat het getal
+     van toets 4 daalt doordat er eigenaren bijkomen, en niet stijgt doordat er
+     registers bijkomen zonder dat iemand zegt wie ze bezit. */
+  'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
+  'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
+
   /* De lagen die in deze tak zijn gebouwd. */
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },

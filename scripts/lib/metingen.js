@@ -205,6 +205,16 @@ const REGISTER = {
      kennis als dekking telt, meet het tegenovergestelde van wat hij moet meten. */
   'LANDDEKKING.json': { eigenRatel: 'test/landdekking.test.js' },
 
+  /* De soevereiniteitsmeter heeft twee tanden die allebei OMHOOG moeten, en dat
+     is anders dan de landdekking ernaast: daar is de schuld het aantal landen
+     zonder dekking, hier is er geen schuldgetal maar alleen bereik. Wat hij
+     bewaakt is dat de isolatielaag niet stil KRIMPT -- een drager die zijn
+     sleutel verliest of een poort die req.session niet meer zet, maakt de
+     isolatie zwakker zonder dat er een toets zakt, en dat is precies wat
+     SEC-LOCK-003 verbiedt. De toets bewaakt daarnaast dat de vier delen nooit
+     tot een cijfer worden opgeteld. */
+  'SOEVEREIN.json': { eigenRatel: 'test/soeverein.test.js' },
+
   /* De adressen die de documenten noemen. De toets bevriest het register NIET --
      ADRESSEN.json beweegt bij elke documentregel die een pad noemt, en een tand
      op gelijkheid zou zakken om een reden die niets met adressen te maken heeft.

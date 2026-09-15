@@ -408,6 +408,14 @@ const GETALLEN = {
     wat: 'landen met een aanwijsbaar ondernemingsregister' },
   'land.zonderEnige': { bron: 'LANDDEKKING.json', veld: 'telling.landenZonderEnige',
     wat: 'landen waar RTG alleen kennis heeft en geen enkele uitvoeringsas' },
+  'soeverein.dragers': { bron: 'SOEVEREIN.json', veld: 'ladder.telling.dragers',
+    wat: 'dragers in de isolatieladder (kern/isolatie/dragers.js)' },
+  'soeverein.metSleutel': { bron: 'SOEVEREIN.json', veld: 'ladder.telling.metSleutelBijVerzoek',
+    wat: 'dragers die bij een lopend verzoek werkelijk een sleutel dragen' },
+  'soeverein.stenen': { bron: 'SOEVEREIN.json', veld: 'bouwstenen.telling.aanwezig',
+    wat: 'bouwstenen uit het soevereiniteitsvoorstel die als bestand al bestaan' },
+  'soeverein.stenenGenoemd': { bron: 'SOEVEREIN.json', veld: 'bouwstenen.telling.genoemd',
+    wat: 'bouwstenen die het voorstel noemt en die de meter nagaat' },
   /* De duur van die parseronde staat MET OPZET niet in deze lijst. Een levend
      getal moet uit een register komen dat bij gelijke code hetzelfde zegt; een
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle
@@ -420,7 +428,7 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'FRANCHISE.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'FRANCHISE.md', 'SOEVEREIN.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

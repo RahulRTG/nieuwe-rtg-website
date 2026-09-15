@@ -3,20 +3,21 @@
    remain authoritative. Declared capabilities use the existing weight gate. */
 (function (w, d) {
   'use strict';
-  var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar';
+  var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar,.rtgsprong-greep';
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
     for (var p = el; p; p = p.parentElement) {
       if (p.hidden || p.inert || p.getAttribute('aria-hidden') === 'true') return false;
       if (p !== root && !root.contains(p) && !p.matches('.rtg-edge-bottom,.rtg-edge-appslot') && w.getComputedStyle(p).display === 'none') return false;
-      if (p === el && !el.matches('.cmd-balkblad,.cmd-balksluit') && w.getComputedStyle(p).display === 'none') return false;
+      if (p === el && p !== root && !el.matches('.cmd-balkblad,.cmd-balksluit') && w.getComputedStyle(p).display === 'none') return false;
     }
     return el.isConnected;
   }
   function sourceButtons() {
     var out = [], tabs = new Set();
     d.querySelectorAll(ROOTS).forEach(function (root) {
-      root.querySelectorAll('button,a[href]').forEach(function (el) {
+      var controls = root.matches('button') ? [root] : root.querySelectorAll('button,a[href]');
+      controls.forEach(function (el) {
         if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button')) return;
         var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
         if (label(el) && available(el, root) && (!tab || !tabs.has(tab))) {

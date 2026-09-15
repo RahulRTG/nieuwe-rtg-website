@@ -1,6 +1,7 @@
 /* RTG Adaptive Edge: één zwevend oppervlak boven alle zelfstandige werelden. */
 body[data-rtg-adaptive-ready="true"]{--rtg-adaptive-height:68px;--rtg-adaptive-gap:max(12px,env(safe-area-inset-bottom,0px));--rtg-adaptive-inset:calc(var(--rtg-adaptive-height) + var(--rtg-adaptive-gap) + 14px);--edge-bottom:var(--rtg-adaptive-inset)}
 body[data-rtg-adaptive-ready="true"] .rtg-edge-bottom{display:none!important}
+body[data-rtg-adaptive-ready="true"] .rtgsprong-greep{display:none!important}
 body[data-rtg-adaptive-ready="true"] .rtg-edge-index,
 body[data-rtg-adaptive-ready="true"] .rtg-edge-ai-panel{bottom:calc(var(--rtg-adaptive-inset) + env(safe-area-inset-bottom,0px))}
 body[data-rtg-adaptive-ready="true"] .rtg-edge-2-context{bottom:calc(var(--rtg-adaptive-inset) + env(safe-area-inset-bottom,0px))}

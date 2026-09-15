@@ -124,15 +124,6 @@
     },
     {
       "datum": "2026-09-15",
-      "soort": "afgelost",
-      "sleutel": "keuringScheef",
-      "van": 17,
-      "meter": "keuringScheef 17 -> 16",
-      "reden": "De schuld van 14 september is betaald. server/kern/namens/versmalling.js had geen aanroepers -- de invariant stond er en niemand liep erdoorheen. Sinds stap 2 doen twee mechanismen dat wel: kern/appstore/gevermacht.js en kern/fiscaal/gateway/mandaat.js. De norm gaat mee omlaag zodat de winst niet stilletjes weer kan weglekken.",
-      "waarheen": "niets meer; deze post is dicht."
-    },
-    {
-      "datum": "2026-09-15",
       "soort": "schuld",
       "sleutel": "keuringOmvang",
       "van": 327,
@@ -170,16 +161,6 @@
       "meter": "toetsenNietGemeten 618 -> 619",
       "reden": "test/namensvorm.test.js komt erbij -- zes toetsen op scripts/namensvorm.js (REPRESENTATIE.md par. 0) -- en staat nog niet in MUTATIES.json. Alle zes zijn met de hand gemuteerd en de dragende drie zagen zakken: `async` uit het naampatroon halen laat toets 2, 3 en 6 zakken, en alle zeven synoniemen op /./ zetten breekt toets 4. Die mutatie is niet academisch maar de fout die hier ECHT is gemaakt: zonder `async` meldde de meter dat kern/vertegenwoordiging/ geen verlenen, aanvaarden en intrekken heeft terwijl die drie er als async function staan -- een geldige uitslag van het verkeerde experiment (BEWIJSMACHINE.md par. 6a).",
       "waarheen": "Laat scripts/mutatie.js over test/namensvorm.test.js lopen, samen met railvergelijk, menselijkeuitvoering, mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hierboven."
-    },
-    {
-      "datum": "2026-09-14",
-      "soort": "schuld",
-      "sleutel": "keuringScheef",
-      "van": 16,
-      "vervalt": "2026-12-15",
-      "meter": "keuringScheef 16 -> 17",
-      "reden": "server/kern/namens/versmalling.js wordt nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de eerste helft van stap 1 uit REPRESENTATIE.md par. 6: de invariant (REP-03, effectief = gevraagd doorsnede geverEffectief doorsnede beleid doorsnede context) staat er en is met 500 gegenereerde invoeren beproefd, maar de zes mechanismen lopen er nog niet doorheen -- dat is echte gedragswijziging op onder meer SEPA-mandaten en app-rechten en hoort een eigen ronde te zijn. Dit huis kent die tussenstand met naam: INTELLIGENTIE.md noteert dat kern/stuur/mandaat.js nul productie-aanroepers heeft, om precies dezelfde reden.",
-      "waarheen": "De bedradingsronde: laat kern/appstore (winkel.js verleen) en kern/fiscaal/gateway/mandaat.js (verleen) de doorsnede aanroepen met een echte geverEffectief. Dat sluit tegelijk twee van de drie openstaande versmallen-posten uit kern/namens/verklaring.js."
     },
     {
       "datum": "2026-09-14",
@@ -2121,15 +2102,6 @@
       "meter": "kernBreedte 1559 -> 1560",
       "reden": "RTG Move (MOVE.md) voegt EEN naam aan de kern toe: `move`, een namespace met drie lezende functies erin (reis, gevolg, volgende). Dat is met opzet niet drie losse kernnamen -- de smalste vorm die deze laag kan hebben. De laag bezit geen collectie, kent geen schrijfweg (test/move.test.js toets 12 zakt op db.data of save()) en hangt aan een eigen schakelaar dom-move, zodat de boardroom hem kan sluiten zonder de navigatie mee te nemen.",
       "waarheen": "server/kern/move/ (naad, haalbaar, gevolg, index) met test/move.test.js en test/move-keten.test.js; de kern blijft een enkele naadlaag zonder eigen opslag"
-    },
-    {
-      "datum": "2026-09-10",
-      "soort": "schuld",
-      "sleutel": "keuringScheef",
-      "van": 16,
-      "vervalt": "2026-12-15",
-      "meter": "keuringScheef 16 -> 17",
-      "reden": "server/kern/navigatie/gebieden.js wordt nergens aangeroepen. Het bestand komt uit de Move-tak (#226) en droeg daar dezelfde bevinding: de keuring op die tak zelf meet 17 en niet 16, dus dit is geen artefact van de samenvoeging van zeven takken maar een schuld die de tak al had. De module is geen restant: hij houdt de catalogus en de licentiepoort van de navigatiegebieden (aangeboden / gebouwd / actief), ./gebiedkeuze.js is er van afgesplitst en test/navigatiegebieden.test.js bewaakt hem. Wat ontbreekt is de plek waar die catalogus wordt opgevraagd -- een route, of een aanroep uit de routemotor. Dat is een ontwerpbesluit van de tak en niet iets wat een samenvoeging hoort te verzinnen.\n\nVervalt op 2026-12-15: dan hangt hij ergens in, of hij is weg. Beide is beter dan blijven staan -- de eigen woorden van de keuring."
     },
     {
       "datum": "2026-09-10",

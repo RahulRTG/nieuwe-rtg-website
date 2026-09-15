@@ -1,0 +1,2792 @@
+{
+  "stempel": {
+    "op": "2026-09-15T11:44:08.154Z",
+    "commit": "a1b3ce046",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/stempelveiligheid.js",
+    "node": "v22.22.2"
+  },
+  "graad": "vermoed",
+  "wat": "welke generatoren repo-waarheid kunnen wegschrijven zonder dat iemand erom vroeg",
+  "hoe": "npm run stempelveiligheid -- leest scripts/*.js zonder commentaar, kijkt per SCHRIJFPLEK of er een vlag boven hangt, en volgt de npm-scriptgraaf transitief om te zien via welke commando's een schrijver bereikbaar is",
+  "grens": "lexicaal, dus een ONDERgrens: wie op een andere manier schrijft of grendelt, valt erbuiten. Deze meter zegt NIET of een grendel werkt, alleen of hij er staat. En hij velt geen oordeel per script: KAN_COMMITBEWIJS_ONGELDIG_MAKEN is een werklijst en geen aanklacht -- een generator die alleen worktree-lokaal schrijft hoort daar mogelijk gewoon in thuis. Wat de klasse zegt is dat er vandaag bij die scripts geen mechanisme staat dat het incident van 15 september tegenhoudt. De npm-graaf ziet alleen aanroepen die in package.json staan; een script dat een ander script met child_process start op een naam die nergens in package.json of een werkstroom staat, valt erbuiten.",
+  "incident": "npm run ci:lokaal op een vuile boom schreef ROLRONDE.json met boomVuil: true, en git add -A veegde hem mee. Een register dat naar een commit wijst die zijn eigen invoer niet bevat, heeft een geldige vorm en geen bewijskracht.",
+  "npmScripts": 392,
+  "werkstromen": 9,
+  "schrijvers": 211,
+  "klassen": {
+    "SCHONE_BOOM_VEREIST": 13,
+    "KAN_COMMITBEWIJS_ONGELDIG_MAKEN": 54,
+    "VUILE_BOOM_TOEGESTAAN": 28,
+    "SCHRIJFT_AFGELEID_REGISTER": 116,
+    "ONBEKEND": 0
+  },
+  "inEenPoort": [
+    {
+      "naam": "activering.js",
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "beproeving.js",
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "e2e.js",
+      "viaPoort": [
+        "werkstroom:ci.yml",
+        "werkstroom:release-image.yml",
+        "werkstroom:wacht.yml"
+      ]
+    },
+    {
+      "naam": "gluurronde.js",
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "heapproef.js",
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "meetronde.js",
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "pgtoetsen.js",
+      "viaPoort": [
+        "test:pg",
+        "werkstroom:ci.yml",
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "release-gate.js",
+      "viaPoort": [
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "rolronde.js",
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "sabotage.js",
+      "viaPoort": [
+        "werkstroom:ci.yml",
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "staging-repetitie.js",
+      "viaPoort": [
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "test-runner.js",
+      "viaPoort": [
+        "test",
+        "test:deel",
+        "test:coverage",
+        "test:gate",
+        "werkstroom:ci.yml",
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "tredeproef.js",
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "uitrol.js",
+      "viaPoort": [
+        "werkstroom:live-monitor.yml"
+      ]
+    },
+    {
+      "naam": "verstrengeling.js",
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "zaakwig.js",
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    }
+  ],
+  "ijking": {
+    "bekendGeval": "rolronde.js",
+    "gevondenInKlasse": true,
+    "gevondenInDoorsnede": true,
+    "drieUitCiLokaal": {
+      "bewijsladder.js": {
+        "klasse": "VUILE_BOOM_TOEGESTAAN",
+        "inDoorsnede": false
+      },
+      "rolronde.js": {
+        "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+        "inDoorsnede": true
+      },
+      "gluurronde.js": {
+        "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+        "inDoorsnede": true
+      }
+    },
+    "overZichzelf": "VUILE_BOOM_TOEGESTAAN"
+  },
+  "perKlasse": {
+    "SCHRIJFT_AFGELEID_REGISTER": [
+      "a11y.js",
+      "aanroepgraaf.js",
+      "actorvormen.js",
+      "afbouw-slot.js",
+      "appstore-a11y.js",
+      "attributie.js",
+      "belofte.js",
+      "bewijs.js",
+      "bron-release-bewijs.js",
+      "browserinstall.js",
+      "build.js",
+      "bundel.js",
+      "capabilities.js",
+      "chaos.js",
+      "ci-lokaal.js",
+      "codewereld.js",
+      "commerce.js",
+      "contextproef.js",
+      "crashas.js",
+      "crashproef.js",
+      "deelindex.js",
+      "dekking.js",
+      "doctrine.js",
+      "doodspoor.js",
+      "effectcontracten.js",
+      "eigenaar-claim.js",
+      "envelopvelden.js",
+      "executionmap.js",
+      "external-release-teken.js",
+      "functielijst.js",
+      "gc-hook.js",
+      "gelding.js",
+      "getallen.js",
+      "gezag.js",
+      "gezagshandelingen.js",
+      "gezagsnoemer.js",
+      "golive.js",
+      "graafas.js",
+      "grenslijst.js",
+      "grensmeld.js",
+      "groepen.js",
+      "grondwacht.js",
+      "handelingindex.js",
+      "handelingsklasse.js",
+      "heritage-uitrol.js",
+      "herstel.js",
+      "hulpklassen-omzet.js",
+      "icons.js",
+      "imageherkomst.js",
+      "inlinestijl-omzet.js",
+      "inlinestijl-proef.js",
+      "inlinestijl-ronde.js",
+      "isolatieproef.js",
+      "isolatieschaduw.js",
+      "kaart-import.js",
+      "kaart.js",
+      "kantoormacht.js",
+      "kernbron.js",
+      "kernherkomst.js",
+      "ketenvorm.js",
+      "keur-omgeving.js",
+      "klok.js",
+      "klokwacht.js",
+      "krimpronde.js",
+      "ladder.js",
+      "leugendetector.js",
+      "magnaatlab.js",
+      "makers.js",
+      "margeschaal.js",
+      "menselijkeuitvoering.js",
+      "momentproef.js",
+      "moveproef.js",
+      "mutatiesemantiek.js",
+      "navigatie-index.js",
+      "navigatie-nederland.js",
+      "navigatieproef.js",
+      "norm.js",
+      "objectmodel.js",
+      "omzetproef.js",
+      "outputband.js",
+      "papierwerk.js",
+      "productie-installatie.js",
+      "productie-status.js",
+      "ritmigratie.js",
+      "ritproef.js",
+      "routebron.js",
+      "rtg-sdk.js",
+      "rtg.js",
+      "ruis-canary.js",
+      "samenhang.js",
+      "schermen.js",
+      "schermgedrag.js",
+      "schermroutes.js",
+      "schrijfproef.js",
+      "semantiek.js",
+      "sleutels.js",
+      "slo.js",
+      "slotsuite.js",
+      "sonde.js",
+      "spreidingsproef.js",
+      "sprongindex.js",
+      "swcache.js",
+      "symbolen.js",
+      "tafelproef.js",
+      "toelatingsproef.js",
+      "toetsduur.js",
+      "triage.js",
+      "verband.js",
+      "wachtwijze.js",
+      "wereldlijst.js",
+      "wereldrooster.js",
+      "wetten.js",
+      "wetwacht.js",
+      "workspace-module.js",
+      "workspace-worlds.js",
+      "zaakliveproef.js"
+    ],
+    "VUILE_BOOM_TOEGESTAAN": [
+      "aanvoervorm.js",
+      "adamproef.js",
+      "adressen.js",
+      "bewijsladder.js",
+      "carrierevorm.js",
+      "doelgroepbereik.js",
+      "doorbelasting.js",
+      "doorwerking.js",
+      "gevolgdekking.js",
+      "handlerbewakers.js",
+      "handlerwacht.js",
+      "idemschuld.js",
+      "idemvoorstel.js",
+      "landdekking.js",
+      "machinedekking.js",
+      "meetleer.js",
+      "mutatieboek.js",
+      "mutatieinventaris.js",
+      "namensvorm.js",
+      "overleving.js",
+      "scherfmeter.js",
+      "schrijfanalyse.js",
+      "soeverein.js",
+      "stagevorm.js",
+      "stempelveiligheid.js",
+      "waarom.js",
+      "wekdekking.js",
+      "wekkers.js"
+    ],
+    "KAN_COMMITBEWIJS_ONGELDIG_MAKEN": [
+      "activering.js",
+      "appwerkt.js",
+      "auditproef.js",
+      "beproeving.js",
+      "bewijsmatrix.js",
+      "bewijsschuld.js",
+      "droogloop.js",
+      "duurzaamheidskosten.js",
+      "e2e.js",
+      "eersteminuut.js",
+      "factuurproef.js",
+      "gelddekking.js",
+      "geldkaart.js",
+      "gluurronde.js",
+      "heapproef.js",
+      "herstelproef.js",
+      "idemidentiteit.js",
+      "idorproef.js",
+      "inhoudskaart.js",
+      "ketenronde.js",
+      "laatspoor.js",
+      "lussen.js",
+      "meetronde.js",
+      "mensmutatie.js",
+      "menstaalproef.js",
+      "mutatie.js",
+      "mutatiecontract.js",
+      "ondernemerbewijs.js",
+      "onderzoeksketen.js",
+      "outputproef.js",
+      "pakte.js",
+      "pgtoetsen.js",
+      "railvergelijk.js",
+      "refundmigratie.js",
+      "release-bewijs.js",
+      "release-gate.js",
+      "resolverbereik.js",
+      "rolronde.js",
+      "sabotage.js",
+      "schermmutatie.js",
+      "staatproef-route.js",
+      "staging-repetitie.js",
+      "taalkwaliteit.js",
+      "taalschil.js",
+      "tekstoppervlak.js",
+      "test-runner.js",
+      "tikken.js",
+      "tredeproef.js",
+      "uitrol.js",
+      "verraadronde.js",
+      "verstrengeling.js",
+      "vindbaar.js",
+      "wereldstijl.js",
+      "zaakwig.js"
+    ],
+    "SCHONE_BOOM_VEREIST": [
+      "aicontext.js",
+      "auditproef-route.js",
+      "controls.js",
+      "faalproef.js",
+      "handelingproef-route.js",
+      "idemproef-route.js",
+      "invoerproef-route.js",
+      "meterklasse.js",
+      "onbewezen.js",
+      "rolproef-route.js",
+      "stilspoor.js",
+      "uitvoerproef-route.js",
+      "vertrouwen.js"
+    ]
+  },
+  "rijen": [
+    {
+      "naam": "a11y.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:ci.yml",
+        "werkstroom:wacht.yml"
+      ]
+    },
+    {
+      "naam": "aanroepgraaf.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "aanvoervorm.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "activering.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:ronde.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "actorvormen.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "adamproef.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "adressen.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "afbouw-slot.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "aicontext.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "appstore-a11y.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "appwerkt.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "attributie.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "auditproef-route.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "auditproef.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "belofte.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "beproeving.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:ronde.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 4,
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "bewijs.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "bewijsladder.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 3,
+      "viaPoort": []
+    },
+    {
+      "naam": "bewijsmatrix.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "bewijsschuld.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "bron-release-bewijs.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "browserinstall.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:ci.yml",
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "build.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 7,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "bundel.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "capabilities.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "carrierevorm.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "chaos.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "ci-lokaal.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 4,
+      "viaPoort": [
+        "ci:lokaal",
+        "ci:lokaal:lijst",
+        "ci:lokaal:snel",
+        "ci:lokaal:controle"
+      ]
+    },
+    {
+      "naam": "codewereld.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "commerce.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "contextproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "controls.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "crashas.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "crashproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "deelindex.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "dekking.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 3,
+      "achterVlag": 1,
+      "npmScripts": 4,
+      "viaPoort": [
+        "werkstroom:ci.yml",
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "doctrine.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 3,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "doelgroepbereik.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "doodspoor.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 3,
+      "viaPoort": []
+    },
+    {
+      "naam": "doorbelasting.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "doorwerking.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "droogloop.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "duurzaamheidskosten.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "e2e.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:ci.yml, werkstroom:release-image.yml, werkstroom:wacht.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 7,
+      "viaPoort": [
+        "werkstroom:ci.yml",
+        "werkstroom:release-image.yml",
+        "werkstroom:wacht.yml"
+      ]
+    },
+    {
+      "naam": "eersteminuut.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 3,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "effectcontracten.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "eigenaar-claim.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "envelopvelden.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "executionmap.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "external-release-teken.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "faalproef.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "factuurproef.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "functielijst.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "gc-hook.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "gelddekking.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "gelding.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "geldkaart.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "getallen.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "gevolgdekking.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 3,
+      "viaPoort": []
+    },
+    {
+      "naam": "gezag.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 4,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "gezagshandelingen.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "gezagsnoemer.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "gluurronde.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:ci.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "golive.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": [
+        "golive"
+      ]
+    },
+    {
+      "naam": "graafas.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "grenslijst.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "grensmeld.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "groepen.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "grondwacht.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:wacht.yml"
+      ]
+    },
+    {
+      "naam": "handelingindex.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "handelingproef-route.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "handelingsklasse.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "handlerbewakers.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "handlerwacht.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "heapproef.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:ronde.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 4,
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "heritage-uitrol.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "herstel.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "herstelproef.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "hulpklassen-omzet.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "icons.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "idemidentiteit.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "idemproef-route.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "idemschuld.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "idemvoorstel.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "idorproef.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "imageherkomst.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 5,
+      "viaPoort": [
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "inhoudskaart.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "inlinestijl-omzet.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "inlinestijl-proef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "inlinestijl-ronde.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "invoerproef-route.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "isolatieproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "isolatieschaduw.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "kaart-import.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "kaart.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "kantoormacht.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 3,
+      "viaPoort": []
+    },
+    {
+      "naam": "kernbron.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "kernherkomst.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "ketenronde.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "ketenvorm.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "keur-omgeving.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "klok.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "klokwacht.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "krimpronde.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "laatspoor.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "ladder.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "landdekking.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "leugendetector.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "lussen.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "machinedekking.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 3,
+      "viaPoort": []
+    },
+    {
+      "naam": "magnaatlab.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "makers.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "margeschaal.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "meetleer.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "meetronde.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:ronde.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "menselijkeuitvoering.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "mensmutatie.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 3,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "menstaalproef.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "meterklasse.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "momentproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "moveproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "mutatie.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 6,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "mutatieboek.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "mutatiecontract.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en 1 van de 2 schrijfplekken hangt niet achter een vlag",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "mutatieinventaris.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "mutatiesemantiek.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "namensvorm.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "navigatie-index.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "navigatie-nederland.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "navigatieproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "norm.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 1,
+      "npmScripts": 4,
+      "viaPoort": [
+        "norm",
+        "norm:vast",
+        "werkstroom:ci.yml",
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "objectmodel.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "omzetproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "onbewezen.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "ondernemerbewijs.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "onderzoeksketen.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "outputband.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "outputproef.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "overleving.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 5,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "pakte.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "papierwerk.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "pgtoetsen.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: test:pg, werkstroom:ci.yml, werkstroom:release-image.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": [
+        "test:pg",
+        "werkstroom:ci.yml",
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "productie-installatie.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "productie-status.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "railvergelijk.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "refundmigratie.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "release-bewijs.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": []
+    },
+    {
+      "naam": "release-gate.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:release-image.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 6,
+      "viaPoort": [
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "resolverbereik.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "ritmigratie.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "ritproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "rolproef-route.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "rolronde.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:ci.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "routebron.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "rtg-sdk.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "rtg.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "ruis-canary.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "sabotage.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:ci.yml, werkstroom:ronde.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 6,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:ci.yml",
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "samenhang.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "scherfmeter.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "schermen.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "schermgedrag.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "schermmutatie.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "schermroutes.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "schrijfanalyse.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "schrijfproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 0,
+      "viaPoort": []
+    },
+    {
+      "naam": "semantiek.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "sleutels.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": []
+    },
+    {
+      "naam": "slo.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "slotsuite.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "soeverein.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "sonde.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:live-monitor.yml"
+      ]
+    },
+    {
+      "naam": "spreidingsproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "sprongindex.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "staatproef-route.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "stagevorm.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "staging-repetitie.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:release-image.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 5,
+      "viaPoort": [
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "stempelveiligheid.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "stilspoor.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "swcache.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "symbolen.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "taalkwaliteit.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "taalschil.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "tafelproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "tekstoppervlak.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "test-runner.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: test, test:deel, test:coverage, test:gate, werkstroom:ci.yml, werkstroom:release-image.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 8,
+      "viaPoort": [
+        "test",
+        "test:deel",
+        "test:coverage",
+        "test:gate",
+        "werkstroom:ci.yml",
+        "werkstroom:release-image.yml"
+      ]
+    },
+    {
+      "naam": "tikken.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": []
+    },
+    {
+      "naam": "toelatingsproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "toetsduur.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "tredeproef.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en 2 van de 3 schrijfplekken hangt niet achter een vlag -- en hij loopt mee in: werkstroom:ronde.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 3,
+      "achterVlag": 1,
+      "npmScripts": 4,
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "triage.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:live-monitor.yml"
+      ]
+    },
+    {
+      "naam": "uitrol.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:live-monitor.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:live-monitor.yml"
+      ]
+    },
+    {
+      "naam": "uitvoerproef-route.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "verband.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "verraadronde.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "verstrengeling.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt -- en hij loopt mee in: werkstroom:ronde.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "vertrouwen.js",
+      "klasse": "SCHONE_BOOM_VEREIST",
+      "waarom": "roept eisSchoneBoom() aan en weigert dus op een vuile boom",
+      "stempelt": true,
+      "grendelt": true,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "vindbaar.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "waarom.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "wachtwijze.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "wekdekking.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "wekkers.js",
+      "klasse": "VUILE_BOOM_TOEGESTAAN",
+      "waarom": "stempelt en grendelt niet, maar schrijft alleen achter een uitdrukkelijke vlag; een mens die die vlag typt op een vuile boom neemt een besluit",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    },
+    {
+      "naam": "wereldlijst.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "wereldrooster.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "wereldstijl.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en schrijft zonder dat iemand erom vraagt",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "wetten.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": [
+        "werkstroom:ci.yml"
+      ]
+    },
+    {
+      "naam": "wetwacht.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 2,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:wacht.yml"
+      ]
+    },
+    {
+      "naam": "workspace-module.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "workspace-worlds.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 0,
+      "npmScripts": 1,
+      "viaPoort": []
+    },
+    {
+      "naam": "zaakliveproef.js",
+      "klasse": "SCHRIJFT_AFGELEID_REGISTER",
+      "waarom": "schrijft wel, maar stempelt niet -- geen claim op repo-waarheid, dus geen bewijs dat ongeldig kan worden",
+      "stempelt": false,
+      "grendelt": false,
+      "schrijfplekken": 1,
+      "achterVlag": 1,
+      "npmScripts": 2,
+      "viaPoort": []
+    },
+    {
+      "naam": "zaakwig.js",
+      "klasse": "KAN_COMMITBEWIJS_ONGELDIG_MAKEN",
+      "waarom": "stempelt (claimt repo-waarheid), grendelt niet, en 1 van de 2 schrijfplekken hangt niet achter een vlag -- en hij loopt mee in: werkstroom:ronde.yml",
+      "stempelt": true,
+      "grendelt": false,
+      "schrijfplekken": 2,
+      "achterVlag": 1,
+      "npmScripts": 3,
+      "viaPoort": [
+        "werkstroom:ronde.yml"
+      ]
+    }
+  ]
+}

@@ -34,7 +34,7 @@
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
     "keuringOmvang": 331,
-    "keuringScheef": 18,
+    "keuringScheef": 17,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
     "laatSpoorVerdacht": 3,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1674,
+    "testbestanden": 1682,
     "toetsenNietGemeten": 626,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -116,7 +116,10 @@
     "idemHandwerkGeenVergelijking": 3,
     "neigingVerwijzingRot": 0,
     "neigingVoorkeurBlind": 14,
-    "spoorConvergent": 1
+    "spoorConvergent": 1,
+    "stempelOngevraagd": 54,
+    "stempelInPoort": 16,
+    "stempelSchrijversGezien": 211
   },
   "notities": [
     {
@@ -2583,6 +2586,26 @@
       "meter": "toetsenNietGemeten 624 -> 625",
       "reden": "test/spoorvorm.test.js komt erbij -- elf toetsen op de convergentiematrix -- en staat nog niet in MUTATIES.json. Vier ervan ZIJN een mutatie (op verzonnen lijven, want op de echte boom haalt alleen de referentie vier van vier), en de meter is daarnaast met de hand gemuteerd: de V-3-regel terugzetten naar de oude fout laat toets 1, 2, 4 en 8 zakken, en `onbepaald` als NEE invullen laat toets 7 zakken. Toets 11 (het register klopt met een verse meting) is met twee mutaties nagetrokken: volledigConvergent van 1 naar 3 laat hem zakken, en `bijstand` V-2 vals op ja OOK -- die tweede beweegt geen enkele teller, en zonder de matrixregel zou het register een uitslag kunnen dragen die niet meer bij de code hoort terwijl alle vier de getallen kloppen. Eén mutatie vond een gat dat NIET is gerepareerd maar wel is opgeschreven in toets 8: het veld `besturing.inOrde` hardcoderen op true wordt door geen enkele toets gezien zolang de referentie toch vier haalt -- de inhoudelijke eigenschap is bewaakt, de vlag is een afgeleide.",
       "waarheen": "Laat scripts/mutatie.js over test/spoorvorm.test.js lopen, samen met de namens-bestanden uit de notities hieronder. NA HET SAMENGAAN MET MAIN (#288) is deze post van 623->624 naar 624->625 gezet, en dat is geen verschuiving maar bookkeeping: main ging op dezelfde dag zelf van 623 naar 624 met een eigen post, dus twee lijnen claimden dezelfde trede. De samenvoeging nam de WAARDE een keer over terwijl de BOOM beide bestanden draagt. De twee posten blijven apart -- samenvoegen zou wissen welke bestanden de motor nog moet zien."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 626,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 626 -> 627",
+      "reden": "test/stempelveiligheid.test.js komt erbij (6 toetsen) en staat nog niet in MUTATIES.json. Met de hand op zes mutaties nagetrokken, en alle zes lieten toetsen zakken: de grendel weer op het WOORD zoeken in plaats van op de aanroep, de aanroepvorm terug naar een kaal /writeFileSync/, tekst niet meer wegstrepen bij de aanroepdetectie, de vlag zoeken in regels waar de tekst al uit is, een vlag over een functiegrens heen laten dekken, en de werkstromen niet meer lezen (dan mist de doorsnede het geval waarvoor hij is gebouwd -- 2 gezakt). Twee van de drie blinde vlekken hebben vandaag geen echt voorbeeld in scripts/, dus levert toets 6 verzonnen getuigen: een grendel zonder getuige is een bewering.",
+      "waarheen": "Laat scripts/mutatie.js over test/stempelveiligheid.test.js lopen bij de eerstvolgende volle ronde; dan mag dit getal omlaag."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 624,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 624 -> 626",
+      "reden": "test/econ01.test.js (6 toetsen) en test/eurodekking.test.js (6) komen erbij en staan nog niet in MUTATIES.json. Allebei zijn ze met de hand op mutaties nagetrokken, en de uitslagen staan hier zodat niemand hoeft te geloven dat het gebeurd is. ECON-01: de eigenaar WEL mee laten draaien bij een omkering laat 5 toetsen zakken waaronder de e2e; de eigenaarscontrole uit de handhaver halen laat toets 2 zakken; de gesloten grondenlijst openzetten laat toets 4 zakken. Dekking: valuta's toch samentellen, de wereld raden in plaats van hem te laten verklaren, de noemer niet absoluut nemen, en de strenge teller versoepelen tot volgbaar() -- alle vier laten toetsen zakken, de laatste twee stuks. Herstellen gaf telkens de volle uitslag. Wat deze teller meet is dat de MOTOR er nog niet langs is, en dat is iets anders dan een onbeproefde toets; dit blok verzacht de meting niet en de teller gaat gewoon omhoog.",
+      "waarheen": "Laat scripts/mutatie.js over test/econ01.test.js en test/eurodekking.test.js lopen bij de eerstvolgende volle ronde; dan mag dit getal met twee omlaag. De toets die daar het hardst hoort te zakken is econ01 nr. 2: die bestaat juist om te laten zien dat een controle op het TOTAAL de fout NIET vangt."
     }
   ],
   "prestatie": {
@@ -2611,7 +2634,7 @@
     "toetsenOngevoeligPct": "2026-09-05",
     "endpointsZonderTest": "2026-09-13",
     "dekkingPct": "2026-09-06",
-    "keuringScheef": "2026-09-05",
+    "keuringScheef": "2026-09-15",
     "keuringTeGroot": "2026-09-05",
     "keuringDubbeling": "2026-09-07",
     "keuringDekkingAdvies": "2026-09-06",
@@ -2687,7 +2710,10 @@
     "idemAfdrukVoegtNietsToe": "2026-09-15",
     "idemHandwerkGeenVergelijking": "2026-09-15",
     "neigingVerwijzingRot": "2026-09-15",
-    "neigingVoorkeurBlind": "2026-09-15"
+    "neigingVoorkeurBlind": "2026-09-15",
+    "stempelOngevraagd": "2026-09-15",
+    "stempelInPoort": "2026-09-15",
+    "stempelSchrijversGezien": "2026-09-15"
   },
   "uitzonderingen": [
     {

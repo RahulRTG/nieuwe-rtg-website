@@ -303,10 +303,17 @@ function meet() {
   const tel = (u) => plekken.filter(p => p.uitspraak === u).length;
   return {
     soort: 'triage',
+    /* GEEN VELD `bereik` HIER, en dat is geen slordigheid maar LAT.md regel 14.
+       Die naam draagt in de bewijsregisters al drie relaties, waarvan er twee
+       elkaars tegendeel zijn (wat een wachter RAAKT tegenover waarover een
+       oordeel GELDT) -- zie scripts/lib/bewijsvelden.js. Een vierde betekenis
+       eraan hangen maakt die verwarring groter, ook als je hem netjes
+       verklaart. Wat er gelezen is staat daarom in `uitleg`, en wat dat NIET
+       aantoont in `grens`; precies de vorm van STILSPOOR.json. */
     uitleg: 'Waaraan ziet dit huis dat twee aanroepen hetzelfde verzoek dragen -- per plek waar '
-      + 'idempotentie wordt gedaan, in twee families: langs metIdem en met de hand ernaast.',
-    bereik: 'elke metIdem-aanroep onder server/, plus elke opzoeking op een idem-sleutel die '
-      + 'daar met de hand omheen gaat. Lexicaal gelezen.',
+      + 'idempotentie wordt gedaan, in twee families: langs metIdem en met de hand ernaast. '
+      + 'Gelezen is elke metIdem-aanroep onder server/, plus elke opzoeking op een idem-sleutel '
+      + 'die daar met de hand omheen gaat; lexicaal, dus zonder iets uit te voeren.',
     /* WAT DEZE METING NIET AANTOONT. Dit staat er even groot bij als de getallen,
        want het is de faalvorm van dit register: geruststelling. */
     grens: 'Deze meting toont NIET aan dat een smalle afdruk fout is -- bij kern/pay/partner.js '

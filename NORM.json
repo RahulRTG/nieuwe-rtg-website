@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 121,
+    "ratelTanden": 125,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -115,7 +115,11 @@
     "idemAfdrukVoegtNietsToe": 2,
     "idemHandwerkGeenVergelijking": 3,
     "neigingVerwijzingRot": 0,
-    "neigingVoorkeurBlind": 14
+    "neigingVoorkeurBlind": 14,
+    "stilLezing": 5,
+    "stilLezingMeters": 61,
+    "stilLezingBereik": 514,
+    "bewijsOnderscheidt": 3
   },
   "notities": [
     {
@@ -2578,7 +2582,11 @@
     "idemAfdrukVoegtNietsToe": "2026-09-15",
     "idemHandwerkGeenVergelijking": "2026-09-15",
     "neigingVerwijzingRot": "2026-09-15",
-    "neigingVoorkeurBlind": "2026-09-15"
+    "neigingVoorkeurBlind": "2026-09-15",
+    "stilLezing": "2026-09-15",
+    "stilLezingMeters": "2026-09-15",
+    "stilLezingBereik": "2026-09-15",
+    "bewijsOnderscheidt": "2026-09-15"
   },
   "uitzonderingen": [
     {

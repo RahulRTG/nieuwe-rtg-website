@@ -99,6 +99,20 @@
    is minstens dit. Maar hij maakt `bewijslezingen` onmisbaar -- wie de
    namenlijst stukmaakt, ziet de schuld dalen zonder dat er iets is gerepareerd.
 
+   ==== DEZE METER VERWIJST NAAR ZICHZELF, EN HIJ CONVERGEERT ====
+
+   Het bereik telt lezingen die de naam van een WORTELREGISTER noemen, en
+   STILLEZING.json is er zelf een. Zodra hij voor het eerst is vastgelegd,
+   bestaat die naam en tellen de lezingen die hem noemen mee: het bereik ging
+   439 -> 442 (scripts) tussen de eerste vastlegging en de meting erna, en bleef
+   daarna over drie rondes op 442 staan. Een vaste puntje na een stap, geen
+   slingering -- nagetrokken en niet aangenomen.
+
+   Dat is geen kunstje maar een eigenschap van elke meter die zijn eigen
+   uitvoer als invoer kan tegenkomen. Wie hem voor het eerst vastlegt, draait
+   `--vastleggen` dus TWEE keer; de eigen toets (test/stillezing.test.js, toets
+   2) zakt anders terecht met "het bereik loopt achter".
+
    ==== DIT IS EEN TRIAGELIJST EN GEEN BESCHULDIGING ====
 
    Niet elke samensmelting is fout. Een register dat met opzet optioneel is

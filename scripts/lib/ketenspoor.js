@@ -2,12 +2,20 @@
    mensenzin werkelijk aan?
 
    WAAROM DIT BESTAAT. "De module bestaat" en "een mens kan er komen" zijn twee
-   verschillende uitspraken, en het verschil is niet cosmetisch: kern/stuur/
-   mandaat.js is een volwaardige grammatica met nul productie-aanroepers. Een
-   perfecte module die niemand bereikt is architectonisch iets heel anders dan
-   een ontbrekende module, en statisch is dat onderscheid niet te maken --
+   verschillende uitspraken, en het verschil is niet cosmetisch. Een perfecte
+   module die niemand bereikt is architectonisch iets heel anders dan een
+   ontbrekende module, en statisch is dat onderscheid niet te maken --
    AANROEPGRAAF.json kan een op de zes aanroepen in dit huis niet herleiden,
    omdat modules via een contextobject reizen en niet via `require`.
+
+   EN "NUL AANROEPERS" IS NIET HETZELFDE ALS "NIET OP DIT PAD", wat hier bijna
+   verkeerd is opgeschreven. EXECUTIE.md blok 6 zegt dat kern/stuur/mandaat.js
+   nul productie-aanroepers heeft; dat is voor de code van vandaag ACHTERHAALD
+   (kern/stuur/plafond.js leest hem, en kern/kantoor/geldketen.js ook). Wat de
+   meting hieronder wel vindt is scherper en anders: geen van die lezers ligt op
+   het pad dat de zin van een LID aflegt -- nul aanrakingen in alle negen cellen
+   (stand x ingang). Een register citeren zonder zijn datum te lezen, is precies
+   de fout die dit huis al vaker heeft gemaakt.
 
    WAT HIJ NIET IS. Geen productiecode. Hij wordt geladen met
    NODE_OPTIONS=--require en doet zonder RTG_KETENSPOOR letterlijk niets --

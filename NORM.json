@@ -132,6 +132,15 @@
       "datum": "2026-09-15",
       "soort": "structureel",
       "sleutel": "kernBreedte",
+      "van": 1581,
+      "meter": "kernBreedte 1581 -> 1582",
+      "reden": "De gecombineerde meting telt 1582 routezichtbare kernnamen: main 1579, plus neiging uit PR 281, reisbetaling uit PR 287 en connect uit PR 296. De drie bronlijnen verklaren hun eigen toevoeging al afzonderlijk; deze notitie koppelt die verklaringen aan dezelfde gecombineerde basis. Connect gebruikt één naamruimte voor het gehele domein. De eerdere tijdelijke 1597 is aangescherpt naar de daadwerkelijk gemeten 1582; er worden geen losse Connect-functies aan de gedeelde kern toegevoegd.",
+      "waarheen": "De bestaande domeingrens en GRENZEN.json begrenzen de drie ingangen. De afzonderlijke bronnotities blijven behouden, inclusief de vervolgactie voor reisbetaling. Deze integratienotitie verandert geen meting of handhaving."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
       "van": 1579,
       "meter": "kernBreedte 1579 -> 1580 (de SOM van twee lijnen, niet een derde laag)",
       "reden": "Het samengaan met main (3f11d577). Twee lijnen verhoogden deze meter ONAFHANKELIJK van 1578 naar 1579, en allebei met een uitgeschreven notitie die hieronder gewoon blijft staan: main met `ondernemingAchterZaak` (de brug uit ONDERNEMEN.md par. 1, 14 september) en deze tak met `kern.neiging` (NEIGING.md, 15 september). In een boom zijn dat twee kernnamen en dus 1580. Er komt met deze samenvoeging GEEN derde naam bij -- het getal stijgt omdat de twee lijnen nu naast elkaar staan, en dat is exact de vorm die de notitie van `toetsenNietGemeten 623 -> 624` hieronder al beschrijft. De twee posten worden daarom NIET samengevoegd tot een: elk beschrijft een echte gebeurtenis op zijn eigen lijn, en een post die zegt `+2 door een merge` wist welke twee namen het zijn. Dat is dezelfde reden waarom `--theirs` op dit bestand eerder in deze tak twee keer een besluit weggooide: een meter kan een getal terugrekenen, een reden niet.",

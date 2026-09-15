@@ -34,7 +34,7 @@
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
     "keuringOmvang": 331,
-    "keuringScheef": 16,
+    "keuringScheef": 18,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
     "laatSpoorVerdacht": 3,
@@ -160,10 +160,10 @@
       "datum": "2026-09-15",
       "soort": "schuld",
       "sleutel": "keuringScheef",
-      "van": 17,
+      "van": 16,
       "vervalt": "2026-12-15",
-      "meter": "keuringScheef 17 -> 19",
-      "reden": "server/kern/waarde/economischeherkomst.js en server/kern/waarde/herkomstsplitsing.js worden nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de PRIMITIEF uit besluit 1 en niet de migratie: van de 208 geldvormen in DOORBELASTING.json dragen er 26 een aantoonbare herkomst, en welke geldrij als EERSTE omgaat is een productbesluit op een echt betaalpad -- niet iets om terloops te kiezen om een ratel groen te krijgen. De vorm is wel volledig beproefd: de gezaaide wereld uit scripts/lib/economiewereld.js draait hem over 22 deterministische rijen (deel B1 van DOORBELASTING.json) en vond er meteen een echte fout in (de onbekende post liep negatief). Dit huis kent deze tussenstand met naam: NORM.json noteert op 14 september hetzelfde over kern/namens/versmalling.js, en INTELLIGENTIE.md over kern/stuur/mandaat.js -- nul productie-aanroepers, om precies dezelfde reden. Wat hier NIET gebeurt is de telling verlagen door de meting te verzachten: twee modules zonder aanroeper zijn twee modules zonder aanroeper, en dat hoort zichtbaar te blijven staan.",
+      "meter": "keuringScheef 16 -> 18",
+      "reden": "server/kern/waarde/economischeherkomst.js en server/kern/waarde/herkomstsplitsing.js worden nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de PRIMITIEF uit besluit 1 en niet de migratie: van de 208 geldvormen in DOORBELASTING.json dragen er 26 een aantoonbare herkomst, en welke geldrij als EERSTE omgaat is een productbesluit op een echt betaalpad -- niet iets om terloops te kiezen om een ratel groen te krijgen. De vorm is wel volledig beproefd: de gezaaide wereld uit scripts/lib/economiewereld.js draait hem over 22 deterministische rijen (deel B1 van DOORBELASTING.json) en vond er meteen een echte fout in (de onbekende post liep negatief). Dit huis kent deze tussenstand met naam: NORM.json noteert op 14 september hetzelfde over kern/namens/versmalling.js, en INTELLIGENTIE.md over kern/stuur/mandaat.js -- nul productie-aanroepers, om precies dezelfde reden. Wat hier NIET gebeurt is de telling verlagen door de meting te verzachten: twee modules zonder aanroeper zijn twee modules zonder aanroeper, en dat hoort zichtbaar te blijven staan. AANGEPAST BIJ DE SAMENVOEGING: op de tak was de overgang 17 -> 19, op de samengevoegde boom is hij 16 -> 18. Dezelfde twee modules, hetzelfde verschil van twee -- de tak mat tegen een oudere main. Nageteld met npm run keuring: 18 bevindingen, waarvan precies deze twee \"nergens aangeroepen\" van #287 en zestien die er al stonden (presentielast.js, taaldekking.js en veertien bestanden over de 10 kB). Het getal is dus GEMETEN en niet overgenomen van een van beide kanten.",
       "waarheen": "De eerste migratieronde: laat een geldrij die vandaag AL volgbaar is (een van de 26 uit DOORBELASTING.json deel A, `volgbareModules`) zijn herkomst via geldrij() opschrijven in plaats van via een eigen veld, en laat kern/pay/poort.js die rij lezen. Dat haalt beide modules in een keer uit deze post, en het is meteen de eerste tand van de ratel volgbaar 26 -> hoger."
     },
     {

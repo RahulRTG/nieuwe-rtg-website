@@ -64,8 +64,8 @@
       foundation/speeltuin foundation/steun foundation/studie foundation/tellen foundation/toetsen \
       foundation/veilig foundation/veilig-vertrouwd foundation/verhaaltje foundation/verjaardagen \
       foundation/wegwijzer foundation/werk foundation/winkel foundation/zakgeld foundation/zorg \
-      defensie gemeente gemeenteloket gemeentepda lab lesmaker livinglab overheid overheidspda rechtbank \
-      rijksloket schoolpartner zorgbalie')
+      connect defensie gemeente gemeenteloket gemeentepda lab lesmaker livinglab overheid overheidspda \
+      rechtbank rijksloket schoolpartner zorgbalie')
   });
 
   /* Bestaande functionele materiaalgrenzen: routes kunnen geen vrij thema kiezen. */

@@ -1,9 +1,9 @@
 {
   "uitleg": "Gemeten met scripts/connectlus.js; de vraag en de methode staan in de kop van dat bestand. Een gedeelde WERKWOORDNAAM is geen gedeeld gedrag -- dit wijst kandidaten aan, een mens beslist. Lees A nooit zonder D: een domein met negentig bestanden haalt alle acht werkwoorden door zijn omvang.",
   "stempel": {
-    "op": "2026-09-15T14:12:04.882Z",
-    "commit": "3f11d577",
-    "boomVuil": true,
+    "op": "2026-09-15T16:21:47.722Z",
+    "commit": "43d4f720",
+    "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/connectlus.js",
     "node": "v22.22.2"
@@ -201,8 +201,8 @@
       },
       {
         "domein": "kern/mediaos",
-        "bestanden": 18,
-        "symbolen": 106,
+        "bestanden": 20,
+        "symbolen": 111,
         "werkwoorden": [
           "ontdek",
           "begrijp",
@@ -314,7 +314,7 @@
     ]
   },
   "vorm": {
-    "vormen": 220,
+    "vormen": 221,
     "domeinen": 18,
     "velden": 496,
     "helftDrempel": 9,
@@ -377,6 +377,15 @@
           "kern/podium",
           "kern/rtfos",
           "kern/spellen"
+        ]
+      },
+      {
+        "veld": "maker",
+        "domeinen": 3,
+        "waar": [
+          "kern/clips",
+          "kern/festival",
+          "kern/mediaos"
         ]
       },
       {
@@ -484,6 +493,48 @@
       ]
     },
     {
+      "naam": "horizon",
+      "plekken": 2,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/index.js",
+        "server/kern/connect/opslag.js"
+      ]
+    },
+    {
+      "naam": "connect",
+      "plekken": 2,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/index.js",
+        "server/kern/connect/opslag.js"
+      ]
+    },
+    {
+      "naam": "ontdekking",
+      "plekken": 1,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/ontdekking.js"
+      ]
+    },
+    {
+      "naam": "naklank",
+      "plekken": 1,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/opslag.js"
+      ]
+    },
+    {
       "naam": "vondst",
       "plekken": 1,
       "domeinen": [
@@ -494,31 +545,13 @@
       ]
     },
     {
-      "naam": "ontdekking",
-      "plekken": 0,
-      "domeinen": [],
-      "waar": []
-    },
-    {
       "naam": "lus",
       "plekken": 0,
       "domeinen": [],
       "waar": []
     },
     {
-      "naam": "naklank",
-      "plekken": 0,
-      "domeinen": [],
-      "waar": []
-    },
-    {
       "naam": "weerklank",
-      "plekken": 0,
-      "domeinen": [],
-      "waar": []
-    },
-    {
-      "naam": "horizon",
       "plekken": 0,
       "domeinen": [],
       "waar": []
@@ -543,12 +576,6 @@
     },
     {
       "naam": "mixer",
-      "plekken": 0,
-      "domeinen": [],
-      "waar": []
-    },
-    {
-      "naam": "connect",
       "plekken": 0,
       "domeinen": [],
       "waar": []

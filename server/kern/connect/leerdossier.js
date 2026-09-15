@@ -50,6 +50,8 @@
    ========================================================================== */
 'use strict';
 
+const { bronKlopt, weigering } = require('./verwijzing');
+
 const { TREDEN } = require('./tredenlijst');
 
 const OP_ID = new Map(TREDEN.map(t => [t.id, t]));
@@ -98,6 +100,15 @@ module.exports = ({ opslag, save, crypto }) => {
       return { ok: false, reden: 'Een regel "' + t.naam + '" verwijst naar het werk waar hij over gaat. ' +
         'Zonder die verwijzing is er niets aan te tonen.' };
     }
+    /* EN ALS DE MENS ZELF EEN VERWIJZING MEESTUURT, MOET HET ER EEN ZIJN.
+       Geen enkele trede met `doorWie: 'zelf'` heeft `bronNodig`, dus dit weigert
+       niets wat de tabel toestaat -- het houdt alleen vrije tekst tegen op de
+       ene plek waar een mens hem zelf kan intypen. Waarom dat moest, en wat deze
+       zeef NIET belooft, staat in de kop van ./verwijzing.js. */
+    if (door === 'zelf' && String(r.bron || '')) {
+      const v = bronKlopt(r.bron);
+      if (!v.ok) return { ok: false, reden: weigering(v.reden) };
+    }
     const onderwerp = String(r.onderwerp || '').trim().slice(0, 80);
     if (!onderwerp) return { ok: false, reden: 'Een regel hoort bij een onderwerp.' };
 
@@ -142,40 +153,10 @@ module.exports = ({ opslag, save, crypto }) => {
     return { ok: true, nieuw: true, regel, afgekapt };
   }
 
-  /* LEZEN. Een sleutel in, de regels van DIE mens uit. Er is met opzet geen
-     functie die over sleutels heen leest: dat zou de route zijn die HDI.md par.
-     5.1 verbiedt -- "alles over deze mens" zonder dat de mens zelf aanroept,
-     en in de vorm van een lijst mensen nog erger. */
-  function lees(sleutel, opties) {
-    const o = opties || {};
-    const lijst = peil(sleutel);
-    const gefilterd = o.onderwerp ? lijst.filter(r => r.onderwerp === String(o.onderwerp)) : lijst;
-    return {
-      regels: gefilterd.slice().reverse().slice(0, Math.min(Number(o.max) || 200, 500)),
-      totaal: gefilterd.length,
-      /* Per ONDERWERP de hoogste trede, afgeleid en niet bewaard. En bewust
-         geen getal eroverheen: een totaal over onderwerpen is een niveau. */
-      perOnderwerp: hoogste(sleutel),
-      nietGemeten: 'Dit dossier zegt wat er is gebeurd, niet hoe goed het ging. Er staat geen cijfer in, ' +
-        'geen niveau en geen vergelijking met iemand anders -- ook niet verborgen als sorteervolgorde.'
-    };
-  }
-
-  /* De hoogste trede PER ONDERWERP, met de graad van die trede erbij. Twee
-     onderwerpen worden nooit opgeteld en nooit gesorteerd op trap: een lijst
-     die op hoogte staat, is een ranglijst van je eigen leven. */
-  function hoogste(sleutel) {
-    const lijst = peil(sleutel);
-    const per = new Map();
-    for (const r of lijst) {
-      const t = trede(r.trede);
-      if (!t) continue;
-      const nu = per.get(r.onderwerp);
-      if (!nu || t.trap > nu.trap) per.set(r.onderwerp, { trap: t.trap, trede: t.id, naam: t.naam, graad: t.graad });
-    }
-    return [...per.entries()].sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([onderwerp, v]) => ({ onderwerp, trede: v.trede, naam: v.naam, graad: v.graad }));
-  }
+  /* Lezen woont apart, in ./dossierlezer.js en ./portfolio.js -- allebei
+     krijgen ze `peil` en `trede` en kunnen dus per constructie niet schrijven.
+     Zie de koppen daar, ook voor de regel die die twee lezers onderscheidt. */
+  const { lees, hoogste } = require('./dossierlezer')({ peil, trede });
 
   /* Het portfolio is een LEZER op deze opslag en woont apart: zie de kop van
      ./portfolio.js voor de regel die hem van `lees()` onderscheidt. Hij krijgt

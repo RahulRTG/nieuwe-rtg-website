@@ -163,8 +163,8 @@ test('12. de hoogste trede is per ONDERWERP en er komt nergens een totaal', () =
 
 test('13. gezien en begrepen zijn een feit en geen teller', () => {
   const { c } = bouw();
-  const een = c.connect.open('AB', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
-  const twee = c.connect.open('AB', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
+  const een = c.connect.open('AB', { id: 'leerstof:rekenen.g6.omtrek-opp', onderwerp: 'koken', herkomst: 'leerstof' });
+  const twee = c.connect.open('AB', { id: 'leerstof:rekenen.g6.omtrek-opp', onderwerp: 'koken', herkomst: 'leerstof' });
   assert.equal(een.nieuw, true);
   assert.equal(twee.nieuw, false, 'een tweede keer kijken is geen tweede feit');
   assert.equal(twee.ok, true, 'en het is geen fout');
@@ -400,7 +400,7 @@ test('27. bereikt staat in het dossier en NOOIT in het portfolio', () => {
   assert.ok(c.connect.dossier('MAKER').regels.some(r => r.trede === 'bereikt'), 'het dossier kent hem');
   assert.ok(!c.connect.portfolio('MAKER').bewijzen.some(b => b.trede === 'bereikt'), 'het portfolio niet');
   /* En hetzelfde voor de twee andere aandachtstreden. */
-  c.connect.open('MAKER', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
+  c.connect.open('MAKER', { id: 'leerstof:rekenen.g6.omtrek-opp', onderwerp: 'koken', herkomst: 'leerstof' });
   assert.ok(!c.connect.portfolio('MAKER').bewijzen.some(b => b.trede === 'gezien'));
 });
 
@@ -502,4 +502,46 @@ test('33. zonder werkregister verzint deze laag niets, en zegt dat', () => {
   assert.equal(r.ok, true);
   assert.equal(r.geenBron, true);
   assert.ok(r.reden && r.reden.length > 30, 'een stand met een reden, geen stilte');
+});
+
+/* ===================== DE BRON IS EEN VERWIJZING ==========================
+   Gevonden door scripts/gluurronde.js (15 september 2026), en de ronde had
+   gelijk over wat hij zag en ongelijk over wat het betekende: er lekte niets van
+   B naar A -- het dossier van B bleef leeg -- maar `bron` nam elke vrije tekst
+   aan, bewaarde hem ongezien en gaf hem onveranderd terug. Zie de kop van
+   kern/connect/verwijzing.js. */
+
+test('34. een bron die nergens vandaan komt, wordt geweigerd met de reden erbij', () => {
+  const { c } = bouw();
+  const r = c.connect.open('AB', { id: 'rtgprobe-B-abc123', onderwerp: 'koken', herkomst: 'leerstof' });
+  assert.equal(r.ok, false, 'een id zonder bekende herkomst is geen verwijzing');
+  assert.ok(/leerstof/.test(r.reden), 'de weigering noemt de herkomsten die er wel zijn');
+  assert.equal(c.connect.dossier('AB').totaal, 0, 'en er staat niets in het dossier');
+});
+
+test('35. een mens kan geen vrije tekst in zijn eigen dossier schrijven', () => {
+  const { c } = bouw();
+  /* Dit is de gevaarlijke vorm: de NAAM van iemand anders, in een bak zonder
+     bewaartermijn voor zulke gegevens (scripts/afleidbaar.js). */
+  const r = c.connect.dossierNoteer('AB', { trede: 'begrepen', onderwerp: 'koken',
+    bron: 'Jan de Vries woont in Zwolle', door: 'zelf', herkomst: 'connect' });
+  assert.equal(r.ok, false);
+  assert.equal(c.connect.dossier('AB').totaal, 0);
+
+  /* En de tegenproef, want zonder deze is de goedkoopste implementatie "weiger
+     alles met een bron" en staat de toets groen terwijl het product stuk is.
+     Geen enkele trede met doorWie 'zelf' heeft bronNodig, dus dit hoort te
+     kunnen -- en een ECHTE verwijzing hoort er ook langs te komen. */
+  assert.equal(c.connect.dossierNoteer('AB', { trede: 'begrepen', onderwerp: 'koken', door: 'zelf' }).ok,
+    true, 'begrepen zonder bron blijft gewoon mogen');
+  assert.equal(c.connect.dossierNoteer('AB', { trede: 'toegepast', onderwerp: 'koken', door: 'zelf',
+    bron: 'leerstof:rekenen.g6.omtrek-opp' }).ok, true, 'en met een echte verwijzing ook');
+});
+
+test('36. de herkomsten worden uit de bronnen gelezen en niet overgetypt', () => {
+  const { HERKOMSTEN } = require('../server/kern/connect/verwijzing');
+  /* LAT.md regel 4: een tweede lijst loopt uit de pas met de eerste. Deze toets
+     zakt zodra iemand een bron hernoemt zonder dat de zeef meebeweegt. */
+  assert.ok(HERKOMSTEN.includes(require('../server/kern/connect/bron-leerstof').HERKOMST));
+  assert.ok(HERKOMSTEN.includes(require('../server/kern/connect/bron-lokaal').HERKOMST));
 });

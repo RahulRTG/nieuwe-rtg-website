@@ -13,9 +13,18 @@
    ========================================================================== */
 'use strict';
 
+const { bronKlopt, weigering } = require('./verwijzing');
+
 module.exports = ({ noteer, makerVan }) => {
   function open(sleutel, item) {
     const i = item || {};
+
+    /* EERST DE VERWIJZING, DAN DE REGEL. `i.id` komt van een mens en wordt
+       ongezien in het dossier bewaard EN teruggegeven; zonder deze zeef is dat
+       een kladblok waar ook de naam van iemand anders in past. Zie de kop van
+       ./verwijzing.js voor wat deze controle wel en niet belooft. */
+    const v = bronKlopt(i.id);
+    if (!v.ok) return { ok: false, reden: weigering(v.reden) };
     const eigen = noteer(sleutel, { trede: 'gezien', onderwerp: i.onderwerp,
       bron: i.id, door: 'hetSysteem', werkwoord: 'ontdek', herkomst: i.herkomst });
 

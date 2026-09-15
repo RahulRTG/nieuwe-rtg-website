@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1900 bestanden en 13632 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1901 bestanden en 13638 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1900 |
-| losse beweringen (`test(...)`) | 13632 |
+| toetsbestanden | 1901 |
+| losse beweringen (`test(...)`) | 13638 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1255 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
-| alleen in de kop *genoemd*, nog niet gemeten | 169 |
+| alleen in de kop *genoemd*, nog niet gemeten | 170 |
 | niets van beide | 405 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1683 bestanden, 13249 beweringen.
+1684 bestanden, 13255 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -535,6 +535,7 @@ toets omvalt.
 | `groothandel.test.js` | 7 | gezakt op `liegpoort /api/` | Groothandel & markt: een brede B2B/B2C-marktplaats op het RTG-systeem. Een groothandel voert een assortiment, zet zijn eigen functies aan/uit, en levert aan horeca (inkoopprijs), leden (boodschappen) en... |
 | `hack.test.js` | 9 | gezakt op `liegpoort /api/` | Hack-test: een adversariële penetratietest die bewijst dat het platform bekende aanvallen afslaat. Geen exploit die MOET slagen -- juist een regressie-hek dat de bestaande verdediging vastlegt: auth-dwang,... |
 | `hand.test.js` | 6 | genoemd | LINKS- OF RECHTSHANDIG: DE HAND BEPAALT WAAR DE DINGEN LIGGEN. De duimboog van een linkshandige is het spiegelbeeld van die van een rechtshandige. |
+| `handelenspoor.test.js` | 6 | genoemd | DE REFERENTIE ONDER EEN LIEGENDE OPSLAG -- geval 1 en 2 van de vijf. REPRESENTATIE.md par. |
 | `handeling-massa.test.js` | 7 | gezakt op `false->true#0` | DE MASSA-BEWERKINGEN MELDEN HUN OMVANG (TAKEN.md 4.74). WAT HIER OP HET SPEL STAAT. |
 | `handeling.test.js` | 18 | gezakt op `true->false#0` | DE HANDELING (server/opzet/handeling.js). WAT HIER OP HET SPEL STAAT. |
 | `handelingsklasse.test.js` | 13 | gezakt op `!==->===#0` | WAT VOOR HANDELING IS DIT? (server/kern/handelingsklasse.js, TAKEN.md 4.71) WAT HIER OP HET SPEL STAAT. |

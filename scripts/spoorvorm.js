@@ -249,12 +249,18 @@ function main() {
       'spoorschrijver onder een onbekende naam wordt gemist en leest als afwezig.',
     /* WAT DEZE MATRIX NIET AANTOONT. Zonder deze zin leest een rij met vier keer
        `ja` als een garantie, en dat is zij niet. */
-    grens: 'Deze meter zegt NIETS over de kwaliteit van wat er wordt vastgelegd -- of de spoorregel de ' +
+    grens: 'VIER VAN VIER IS GEEN GOUDEN IMPLEMENTATIE, en dat is de zin die hier het hardst nodig is. ' +
+      'Deze matrix meet EEN helft van het contract: beoordelen en vastleggen. De andere helft -- ' +
+      'uitvoeren, en weten of die uitvoering landde -- meet hij niet, en de referentie HEEFT die helft ' +
+      'niet: kern/vertegenwoordiging/handelen.js voert niets uit. Het mechanisme dat haar wel heeft is ' +
+      'kern/appstore/brug.js (roepKaal, met m.doe() in een try/catch en uitvoeringBekend op de fout), en ' +
+      'dat staat hier op vier streepjes. Geen enkel mechanisme is dus vandaag de referentie voor de ' +
+      'combinatie; wie deze rij kopieert, kopieert de helft (REPRESENTATIE.md par. 9). ' +
+      'Verder zegt deze meter NIETS over de kwaliteit van wat er wordt vastgelegd -- of de spoorregel de ' +
       'juiste velden draagt, of hij leesbaar is voor de mens over wie hij gaat, en of het spoor ooit ' +
-      'wordt teruggelezen, valt er allemaal buiten. Hij zegt ook niets over de UITVOERING: de referentie ' +
-      'haalt vier van vier terwijl haar veld `gelukt` aantoonbaar TOEGESTAAN betekent en niet GESLAAGD ' +
-      '(REPRESENTATIE.md par. 8.2). Vier keer `ja` betekent dus "deze vier eigenschappen zijn herkend", ' +
-      'niet "dit mechanisme legt goed vast". En hij kijkt alleen in de VERKLAARDE ingangsfunctie: een ' +
+      'wordt teruggelezen, valt er allemaal buiten. De referentie haalt vier van vier terwijl haar veld ' +
+      '`gelukt` aantoonbaar TOEGESTAAN betekent en niet GESLAAGD (par. 8.2, beproefd in ' +
+      'test/handelenspoor.test.js toets 4). En hij kijkt alleen in de VERKLAARDE ingangsfunctie: een ' +
       'mechanisme dat elders wel een spoor schrijft, telt hier niet mee.',
     besturing,
     gemeten: {

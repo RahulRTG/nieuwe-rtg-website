@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1674,
-    "toetsenNietGemeten": 625,
+    "toetsenNietGemeten": 626,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -117,6 +117,16 @@
     "spoorConvergent": 1
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 625,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 625 -> 626",
+      "reden": "test/handelenspoor.test.js komt erbij -- zes toetsen die geval 1 en 2 van REPRESENTATIE.md par. 9.1 onder RTG_VERRAAD=schrijf-verloren tegen een echte server draaien -- en staat nog niet in MUTATIES.json. De mutatiemotor kent bovendien geen mutatie voor een toets die twee servers na elkaar op dezelfde datamap start, dus deze post gaat waarschijnlijk niet vanzelf dicht. Met de hand is hij WEL nagetrokken, met twee mutaties op kern/vertegenwoordiging/handelen.js: het spoor NA de weigering zetten laat toets 2 zakken (en alleen toets 2), en de uitslag van vastleggen() weggooien laat toets 5 zakken (en alleen toets 5). Beide keren is het bestand daarna byte voor byte teruggezet.",
+      "waarheen": "Laat scripts/mutatie.js over test/handelenspoor.test.js lopen. Lukt dat niet omdat de toets een eigen serverlevenscyclus voert, dan hoort dat hier te worden vastgelegd als een EIGENSCHAP van deze toets in plaats van als openstaande schuld."
+    },
     {
       "datum": "2026-09-15",
       "soort": "schuld",

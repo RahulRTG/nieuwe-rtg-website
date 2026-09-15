@@ -793,3 +793,151 @@ plek waar een percentage wordt opgeslagen.
    `PARTNER_COMMISSIE = 0` en RTG geen hoedanigheid is, bestaat *"RTG heeft
    financieel belang bij deze keuze"* alleen in ons hoofd — en daar mag een
    conflictmotor niet op leunen.
+
+---
+
+## 9. Twee referenties, en geen van beide is de combinatie (15 september 2026)
+
+Par. 8.1 leest makkelijk verkeerd. `vertegenwoordiging` haalt daar vier van
+vier, en over drie maanden leest iemand dat als *dit is de gouden
+implementatie, kopieer hem*. Dat is precies wat er niet moet gebeuren, en de
+reden staat hieronder.
+
+**`kern/vertegenwoordiging/handelen.js` is de referentie voor BEOORDELING +
+VERPLICHT SPOOR.** Hij oordeelt, vormt de regel, legt duurzaam vast, stopt als
+dat niet lukt, en weigert of geeft 200. Wat hij niet heeft: een uitvoering.
+`handel()` voert niets uit, en zijn enige aanroeper
+(`routes/vertegenwoordiging.js`) geeft het antwoord rechtstreeks door.
+
+**`kern/appstore/brug.js` (`roepKaal`) is de referentie voor UITVOERING +
+UITKOMSTKENNIS.** Daar staat `m.doe(...)` in een `try/catch`, en de drie
+uitkomsten zijn al uit elkaar gehaald: geweigerd, gelukt, en omgevallen met een
+landing die niet vaststaat (`RTG_BRUG_FOUT`, `uitvoeringBekend: false`, plus
+`herhaalbaar` afgeleid uit de mutatieklasse). Wat hij niet heeft: één regel
+spoor. Gemeten op `spoor`, `log.`, `noteer` en `journaal`: nul treffers in
+`brug.js` en `brugweigering.js`.
+
+> **Geen enkel mechanisme is vandaag de referentie voor de combinatie.** De twee
+> helften van het contract wonen in verschillende mechanismen, en uitgerekend de
+> helft met de echte uitvoering is de rij die in `SPOORVORM.json` op vier
+> streepjes staat.
+
+Daaruit volgt dat de splitsing van `gelukt` geen wijziging AAN `handelen.js` is —
+daar valt niets af te splitsen — maar een contract dat pas bewijsbaar wordt waar
+beide helften bestaan.
+
+### 9.1 De vijf gevallen, en welke drie hier niet kunnen
+
+| # | oordeel | spoor | uitvoering | tegen de referentie |
+|---|---|---|---|---|
+| 1 | weigert | slaagt | niet gestart | **beproefd** |
+| 2 | staat toe | faalt | niet gestart | **beproefd** |
+| 3 | staat toe | slaagt | slaagt | structureel niet: geen uitvoering |
+| 4 | staat toe | slaagt | faalt | idem |
+| 5 | uitvoering slaagt, eindspoor faalt | | | idem |
+
+Geval 1 en 2 staan sinds deze ronde in `test/handelenspoor.test.js`, en niet als
+lezing van de control flow maar onder `RTG_VERRAAD=schrijf-verloren` tegen een
+echte server. Twee mutaties op `handelen.js` zijn nagetrokken: het spoor ná de
+weigering zetten laat toets 2 zakken, en de uitslag van `vastleggen()` weggooien
+laat toets 5 zakken.
+
+**De wereld wordt eerlijk gebouwd en daarna liegt de opslag.** Een machtiging
+vraagt een cliënt die `volwassen()` haalt (A3), dus een keuring door het
+kantoor; op een server die schrijfacties weggooit lukt die opbouw niet. De proef
+bouwt daarom op een eerlijke server, stopt hem, en opent dezelfde datamap
+opnieuw met het verraad aan.
+
+### 9.2 Twee bevindingen die het bouwen van die proef opleverde
+
+**`gelogd: true` bereikt niemand.** `handelen.js` zet dat veld bij een weigering
+zodat de aanroeper weet dat zijn poging is vastgelegd. `stuur()` in
+`routes/vertegenwoordiging.js` is `(r && r.error) ? res.status(...).json({ error:
+r.error }) : res.json(r)` en gooit bij élk foutantwoord alles behalve `error`
+weg — voor alle acht de routes. Dezelfde vorm als de `res.append` uit
+`AFSPRAAK.md`: een laag zet een veld, de laag erboven laat het stil vallen. Welke
+velden op een weigering mee mogen is een besluit, dus het staat hier en niet in
+een toets.
+
+**Er is geen rollback van het geheugenmodel.** Onder `schrijf-verloren` gaf de
+route netjes 503 — en het spoor van de cliënt groeide van 5 naar 6 regels.
+`vastleggen()` draait via `bijeen()` eerst de mutatie en commit daarna; faalt de
+commit, dan keert de route terug met een fout terwijl het geheugen niet wordt
+teruggedraaid. Tussen de mislukte commit en de eerstvolgende herstart leest een
+lezer op datzelfde proces dus een regel die niet bestaat. `ROLLBACK` bestaat in
+`scripts/lib/crashtaxonomie.js` als contract, maar hier niet als handeling. De
+toets legt daarom vast wat wél hard is — na een herstart staat er niets.
+
+### 9.3 Waarom CRASHAS maar 45 routes kent, en waarom dat goed nieuws is
+
+De vraag was of `CRASHAS.json` uitbreiden naar de brug een tweede lijst zou
+maken. Nagemeten is de keten:
+
+```
+CRASHAS.json (45)
+  <- GELDDEKKING.json
+     <- GELDKAART.json  as1Kaart.geldroutes
+        <- (a) de route schreef een collectie waarvan de KLASSE in
+               server/kern/isolatie/effectcollecties.js `GELD_BEWEGEN` is
+           (b) EN de idempotentieproef kwam erbij en zag de waarde veranderen
+```
+
+Het bereik is dus **geen oordeel "is dit geld"**, maar een filter op één
+verklaarde gegevensklasse, doorsneden met wat `IDEMPROEF.json` toevallig heeft
+bereikt. En er zijn er **negen** over 80 collecties: `GELD_BEWEGEN` (30),
+`VERTROUWENSRELATIE_AANGAAN` (13), `EXTERN_BEREIKEN` (10),
+`IDENTITEIT_WIJZIGEN` (8), `SCHRIJVEN_ANDERMANS` (8), `RECHT_VERLENEN` (6),
+`BEVEILIGING_VERZWAKKEN` (3), `DERDENCODE_UITVOEREN` (1),
+`ONVERTROUWDE_BYTES` (1).
+
+Uitbreiden is daarmee **het filter verbreden en geen uitzondering toevoegen** —
+precies wat een tweede lijst voorkomt. Twee dingen vallen er meteen uit:
+
+- **`appInstallaties` is al geklasseerd**, als `VERTROUWENSRELATIE_AANGAAN` met
+  als grond *"APPSTORE.md: een machtiging die het lid verleent"* — plus zes
+  broertjes (`rtfAppInstallaties`, `beroepenInstallaties`, …). De app-machtiging
+  kan de crash-as dus vandaag in, zonder één nieuwe naam.
+- **`vertegenwoordigingen` is NERGENS geklasseerd**, net als `rugdekking` en het
+  carrièreledger. De referentie-implementatie draagt geen effectklasse, dus zij
+  komt er langs géén enkel klassefilter in. `effectcollecties.js` zegt zelf dat
+  het indelen bewust onvolledig is (*"Ingedeeld is wat een HOOG BELANG draagt:
+  geld, identiteit, rechten, blijvende koppelingen en de beveiliging zelf"*) — en
+  een machtiging IS een recht. Dit is dus een gat dat een regel verdient, geen
+  defect.
+
+Dat bestand noemt bovendien zijn eigen plafond, en dat hoort hierbij: slechts 599
+van de 4643 rol-paden hebben überhaupt een gemeten collectie. Het effectmodel komt
+niet uit de schaduw door dit register vol te maken, maar doordat `IDEMPROEF.json`
+verder reikt.
+
+### 9.4 Wat het contract wordt, en wat het niet wordt
+
+Eén semantiek met **verschillende zekerheidsprofielen**, en geen uniforme
+uitvoeringsprocedure:
+
+| transactiegrens | wat het mechanisme moet kunnen |
+|---|---|
+| in-process, zelfde database (app-machtiging: `m.doe()` is synchroon) | beoordeling, spoor en uitvoering in dezelfde bundel; valt de uitvoering om, dan doet de eindtoestand niet alsof zij slaagde |
+| externe aanbieder mét betrouwbare status/idempotency | voornemen duurzaam vastleggen → externe aanroep → reconciliatie → definitieve uitkomst |
+| externe aanbieder zónder betrouwbare status | expliciet onbekende landing: niet herhalen alsof er niets gebeurde, niet "gefaald", niet "geslaagd" — de bestaande `uitvoeringBekend: false` |
+
+Er komt **geen derde stand naast** die twee booleans. `kern/platformfout.js`
+heeft die keuze al gemaakt en de reden staat in zijn kop.
+
+En de tweede spoorregel wordt **niet automatisch ingevoerd**. Het spoor is een
+ringbuffer (`MAX_LOG`), dus twee regels per handeling halveert de
+gebeurtenishorizon. De regel is niet *elke handeling schrijft twee regels* maar
+*het spoor bevat genoeg append-only gebeurtenissen om de werkelijk bekende
+toestand eerlijk te reconstrueren*: één waar atomiciteit bestaat, meer waar er
+een tijd- of providergrens tussen zit. Retentie zelf is een apart besluit —
+`integriteit ≠ retentie`, de les van het inzagejournaal — en hoort niet stilletjes
+in deze ronde mee te liften.
+
+### 9.5 Wat `SPOORVORM` later moet gaan meten
+
+Nu: *herkent deze meter vier eigenschappen van de bestaande vorm?* Straks: *welk
+deel van het contract kan dit mechanisme aantoonbaar waarmaken?* Het doel is
+uitdrukkelijk **niet** zeven mechanismen op 7/7 — dat zou dezelfde verkeerde
+uniformiteit terugbrengen. `n.v.t.` is daar even belangrijk als `ja`: een
+mechanisme zonder uitvoering hoort niet rood te staan omdat het geen
+uitvoeringscrash kan hebben.

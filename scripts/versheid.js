@@ -433,6 +433,11 @@ const REGISTERS = [
      bedraad wordt, is een oude uitslag niet alleen achterhaald maar misleidend:
      hij zegt dat er een gat is dat er dan niet meer is. */
   ['KETENBEREIK.json', 'npm run ketenbereik:vast', 'welke schakel van de keten mens -> effect een echte mensenzin werkelijk aanraakt'],
+  /* Hoort bij de vorige: die meet WAAR de keten ophoudt, deze meet WAT de
+     boolean betekent waarop zij ophoudt. Veroudert net zo hard, en om dezelfde
+     reden -- zodra `pakte` wordt gesplitst, beschrijft een oude uitslag een
+     samenpersing die er niet meer is. */
+  ['PAKTEBETEKENIS.json', 'npm run paktebetekenis:vast', 'hoeveel onderscheiden betekenissen de boolean `pakte` samenperst'],
   /* De navigatieproef staat NAAST de vijf gouden ketens en niet ertussen: hij
      meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
      browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem

@@ -306,6 +306,14 @@ const REGISTER = {
      conclusie -- "mandaat wordt door geen enkele zin geraakt" -- over minder
      bewijs, en dat is de faalvorm waar een ratel voor bestaat. */
   'KETENBEREIK.json': { eigenRatel: 'test/ketenbereik.test.js' },
+  /* PAKTEBETEKENIS.json meet hoeveel ONDERSCHEIDEN uitkomsten er onder dezelfde
+     boolean `pakte` vallen (kern/fluister/gesprek.js). Zelfde besluit als bij
+     KETENBEREIK.json hierboven: de geratelde waarde is het BEREIK van de meter
+     en niet de uitslag. Die uitslag hoort te dalen zodra `pakte` wordt
+     gesplitst -- dat is de bedoeling van de meting. Maar een corpus dat stil
+     minder standen of minder gevallen ziet, meldt "minder betekenissen" terwijl
+     er alleen minder is gekeken, en dat is de faalvorm waar een ratel voor is. */
+  'PAKTEBETEKENIS.json': { eigenRatel: 'test/paktebetekenis.test.js' },
   'REFUNDMIGRATIE.json': { eigenRatel: 'test/refundmigratie.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
   /* ONDERNEMERSLUS.json meet of de ondernemerslus EEN onderwerp draagt

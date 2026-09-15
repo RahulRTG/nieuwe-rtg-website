@@ -80,7 +80,15 @@
         via een `const` in hetzelfde bestand te herleiden is -- dezelfde
         ondergrens als scripts/lib/registereigenaar.js, en met opzet dezelfde,
         zodat de twee getallen naast elkaar te leggen zijn.
-     2. Een lezer die zijn eigen `lees()` heeft en die elders wordt aangeroepen,
+     2. Het BEREIK kijkt maximaal 200 tekens vooruit vanaf de leesaanroep. Staat
+        de registernaam verderop, dan telt hij niet mee. Met `regelsHeel` worden
+        commentaarblokken spaties in plaats van weggehaald, dus een lang
+        commentaar tussen de aanroep en de naam duwt die naam uit het venster --
+        het bereik daalde daardoor van 88 naar 75 (server) en 470 naar 439
+        (scripts) toen die stand aanging. Dat is geen verslechtering maar een
+        andere ondergrens: de eerste telling liet tekst uit een commentaarblok
+        aan elkaar plakken. Twee metingen, en ze horen niet vergeleken te worden.
+     3. Een lezer die zijn eigen `lees()` heeft en die elders wordt aangeroepen,
         telt EEN keer (bij de lezer) en niet bij elke aanroeper. Dat onderschat
         het BEREIK van een enkele smoring en nooit het aantal plekken.
      3. Wat een "permissieve lege waarde" is, wordt op de VORM bepaald en niet
@@ -345,7 +353,7 @@ function main() {
   console.log('');
 
   if (vastleggen) {
-    eisSchoneBoom('scripts/stillezing.js');
+    eisSchoneBoom();
     fs.writeFileSync(DOEL, JSON.stringify({
       soort: 'meting',
       uitleg: 'Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand ' +
@@ -357,7 +365,7 @@ function main() {
         'worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag ' +
         'alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind ' +
         'wordt, is de gevaarlijkste vorm van vooruitgang.',
-      stempel: stempel('scripts/stillezing.js'),
+      stempel: stempel(),
       gemeten,
       plekken: { server: uit.server, scripts: uit.scripts }
     }, null, 1) + '\n');

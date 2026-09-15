@@ -104,6 +104,23 @@ module.exports = (kern) => {
   app.post('/api/connect/dossier', auth, dossier(lid));
   app.post('/api/rtf/connect/dossier', gezinsPoort, dossier(gezin));
 
+  /* HET EIGEN WERK ERBIJ -- een HANDELING en geen lezing, en daarom een eigen
+     route. Zou het dossier dit bij het LEZEN doen, dan schrijft een leesroute in
+     db.data; zie de kop van kern/connect/werkbij.js. Er wordt niets vastgesteld:
+     wat hier binnenkomt stond al in het register waar de domeinen zelf hun werk
+     hebben aangemeld. */
+  const werkBij = (wie) => (req, res) => veilig(res, () => kern.connectWerkBij(wie(req).sleutel));
+  app.post('/api/connect/werk', auth, werkBij(lid));
+  app.post('/api/rtf/connect/werk', gezinsPoort, werkBij(gezin));
+
+  /* HET PORTFOLIO -- wat een mens hiervan naar buiten zou tonen. Apart van
+     /dossier omdat er een andere REGEL geldt: alles wat aandacht is (gezien,
+     uitgelezen, bereikt) valt eruit. Wij tellen aandacht niet als ontwikkeling. */
+  const portfolio = (wie) => (req, res) => veilig(res, () =>
+    Object.assign({ ok: true }, kern.connectPortfolio(wie(req).sleutel, { onderwerp: (req.body || {}).onderwerp })));
+  app.post('/api/connect/portfolio', auth, portfolio(lid));
+  app.post('/api/rtf/connect/portfolio', gezinsPoort, portfolio(gezin));
+
   /* Zelf een trede zetten. De grendel bepaalt welke dat mogen zijn: `begrepen`
      en `toegepast` zeggen mensen over zichzelf, `onderwezen` nooit. Die
      weigering komt uit de kern en wordt hier niet nagebouwd. */

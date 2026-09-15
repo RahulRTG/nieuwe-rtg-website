@@ -125,11 +125,17 @@ test('9. de ingang is een pad en nooit een handeling', () => {
 });
 
 /* ---------------------------------------------------- 10 -- het leerdossier */
-test('10. de trede met bewijskracht kan een mens niet zelf zetten', () => {
+test('10. de treden met bewijskracht kan een mens niet zelf zetten', () => {
+  /* `gebruikt` en `doorgegeven` zijn de twee met aanspraak `overdracht` -- de
+     enige die buiten Foundation iets betekenen, en precies daarom de enige die
+     de mens zelf niet mag schrijven. */
   const { c } = bouw();
-  assert.equal(c.connectDossierNoteer('AB', { trede: 'onderwezen', onderwerp: 'koken', door: 'zelf' }).ok, false);
-  assert.equal(c.connectDossierNoteer('AB', { trede: 'onderwezen', onderwerp: 'koken',
-    door: 'eenAnder', bron: 'naklank:1' }).ok, true);
+  for (const trede of ['gebruikt', 'doorgegeven']) {
+    assert.equal(c.connectDossierNoteer('AB', { trede, onderwerp: 'koken', door: 'zelf', bron: 'w1' }).ok,
+      false, trede + ' mag niet door de mens zelf');
+    assert.equal(c.connectDossierNoteer('AB', { trede, onderwerp: 'koken',
+      door: 'eenAnder', bron: 'naklank:1:' + trede }).ok, true, trede + ' mag wel door een ander');
+  }
 });
 
 test('11. "gemaakt" zonder verwijzing naar het gemaakte wordt geweigerd', () => {
@@ -201,7 +207,7 @@ test('15. de maker komt uit een resolver en nooit uit de aanroep', () => {
   const raak = c.connectNaklank('werk:1', 'CD', 'geholpen');
   assert.equal(raak.dossier.ok, true, 'met een maker loopt de haak wel');
   const d = c.connectDossier('MAKER');
-  assert.equal(d.perOnderwerp[0].trede, 'onderwezen');
+  assert.equal(d.perOnderwerp[0].trede, 'gebruikt');
   assert.equal(d.perOnderwerp[0].graad, 'bewezen', 'wat een ander bevestigt, is bewezen');
   assert.equal(d.regels[0].onderwerp, 'koken', 'het onderwerp komt ook uit de resolver');
 
@@ -345,4 +351,151 @@ test('25. een geweigerde naklank laat geen rij achter', () => {
   assert.deepEqual(db.data, {}, 'ook daarna niets');
   c.connectNaklank('werk:1', 'JIJ', 'mooi');
   assert.ok(db.data.connect.naklank['werk:1'], 'een geldige naklank schrijft wel');
+});
+
+/* ======================= DE VIJF OVERDRACHTSTREDEN ========================
+   Besluit van de eigenaar, 15 september 2026. Ze gaan alle vijf over iets dat
+   deze mens ZELF maakte, en de regel eronder is de reden dat ze bestaan:
+   WIJ TELLEN GEEN AANDACHT ALS ONTWIKKELING. */
+
+const werkwereld = () => {
+  const db = { data: {} };
+  const wh = require('../server/kern/mediaos/werkherkomst').maakWerkherkomst({ db, save: () => {} });
+  const c = maakConnect({ db, save: () => {}, crypto, DOELEN, rtfos: null,
+    makerVan: (id) => wh.makerVanWerk(String(id || '').replace(/^mediaos:/, '')),
+    werkenVan: wh.werkenVan });
+  return { db, wh, c };
+};
+
+test('26. de ladder loopt van gemaakt tot doorgegeven, en elke trede zegt wat hij NIET zegt', () => {
+  const { wh, c } = werkwereld();
+  const w = wh.legWerk('MAKER', 'video', 'Zo maak je pasta');
+
+  c.connectWerkBij('MAKER');
+  c.connectOpen('KIJKER', { id: 'mediaos:' + w.id, onderwerp: 'video', herkomst: 'mediaos' });
+  c.connectNaklank('mediaos:' + w.id, 'KIJKER', 'geprobeerd');
+  c.connectNaklank('mediaos:' + w.id, 'DERDE', 'doorgegeven');
+
+  const treden = c.connectDossier('MAKER').regels.map(r => r.trede).sort();
+  assert.deepEqual(treden, ['aangeboden', 'bereikt', 'doorgegeven', 'gebruikt', 'gemaakt'],
+    'alle vijf de overdrachtstreden staan er, en precies een keer');
+  for (const b of c.connectPortfolio('MAKER').bewijzen) {
+    assert.ok(b.stelt && b.nietZegt, b.trede + ' draagt zijn stelt en zijn nietZegt');
+  }
+});
+
+test('27. bereikt staat in het dossier en NOOIT in het portfolio', () => {
+  /* DE DRAGENDE TOETS VAN DEZE RONDE. "Mijn werk kwam bij iemand aan" voelt als
+     een prestatie en het is bereik. Een platform dat dat meetelt, heeft binnen
+     een jaar makers die voor bereik werken. */
+  const { wh, c } = werkwereld();
+  const w = wh.legWerk('MAKER', 'video', 'x');
+  c.connectWerkBij('MAKER');
+  c.connectOpen('KIJKER', { id: 'mediaos:' + w.id, onderwerp: 'video', herkomst: 'mediaos' });
+
+  assert.ok(c.connectDossier('MAKER').regels.some(r => r.trede === 'bereikt'), 'het dossier kent hem');
+  assert.ok(!c.connectPortfolio('MAKER').bewijzen.some(b => b.trede === 'bereikt'), 'het portfolio niet');
+  /* En hetzelfde voor de twee andere aandachtstreden. */
+  c.connectOpen('MAKER', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
+  assert.ok(!c.connectPortfolio('MAKER').bewijzen.some(b => b.trede === 'gezien'));
+});
+
+test('28. het portfolio draagt nergens een aantal', () => {
+  const { wh, c } = werkwereld();
+  wh.legWerk('MAKER', 'video', 'x');
+  c.connectWerkBij('MAKER');
+  const p = c.connectPortfolio('MAKER');
+  for (const verboden of ['totaal', 'aantal', 'score', 'niveau', 'punten', 'rang', 'gemiddelde']) {
+    assert.ok(!(verboden in p), 'het portfolio draagt geen "' + verboden + '"');
+  }
+  /* Een portfolio met een getal wordt op dat getal gesorteerd zodra er twee
+     mensen naast elkaar staan; dan is het de Career Score die vijf documenten
+     afwijzen. */
+  assert.ok(p.nietGeteld && /aandacht/i.test(p.nietGeteld), 'en het zegt zelf wat het niet telt');
+});
+
+test('29. "mooi" levert de maker niets op -- aandacht is geen ontwikkeling', () => {
+  const { wh, c } = werkwereld();
+  const w = wh.legWerk('MAKER', 'video', 'x');
+  const r = c.connectNaklank('mediaos:' + w.id, 'KIJKER', 'mooi');
+  assert.equal(r.ok, true, 'de naklank telt gewoon mee');
+  assert.equal(r.trede, null);
+  assert.equal(r.dossier, null, 'maar er komt geen dossierregel');
+  assert.ok(/aandacht/i.test(r.dossierReden), 'en de gever hoort waarom');
+  assert.equal(c.connectDossier('MAKER').totaal, 0);
+});
+
+test('30. vier naklanken op EEN trede geven EEN regel, geen vier', () => {
+  /* Overgangen, nooit volumes. Met de soort in de bron zou dit vier regels
+     "gebruikt" opleveren, en dan telt het dossier hoe vaak in plaats van DAT --
+     een populariteitscijfer in het dossier van iemand anders. */
+  const { wh, c } = werkwereld();
+  const w = wh.legWerk('MAKER', 'video', 'x');
+  for (const [wie, soort] of [['A', 'geleerd'], ['B', 'geprobeerd'], ['C', 'gemaakt'], ['D', 'geholpen']]) {
+    assert.equal(c.connectNaklank('mediaos:' + w.id, wie, soort).ok, true);
+  }
+  const regels = c.connectDossier('MAKER').regels;
+  assert.equal(regels.length, 1, 'vier mensen, vier soorten, EEN overgang');
+  assert.equal(regels[0].trede, 'gebruikt');
+});
+
+test('31. bereikt wordt eenmalig geschreven en nooit door de maker zelf', () => {
+  /* DE VOLGORDE IS DE TOETS. Hier opende eerst een KIJKER en daarna de maker,
+     en dan is "de maker bereikt zichzelf niet" niet te zien: de trede is
+     eenmalig, dus de tweede aanroep geeft sowieso false. Een mutatie die de
+     zelf-uitsluiting weghaalde bleef daardoor groen -- een geldige uitslag van
+     het verkeerde experiment (BEWIJSMACHINE.md par. 6a). De maker gaat nu
+     EERST, op zijn eigen verse werk. */
+  const { wh, c } = werkwereld();
+  const eigen = 'mediaos:' + wh.legWerk('MAKER', 'video', 'x').id;
+  assert.equal(c.connectOpen('MAKER', { id: eigen, onderwerp: 'video', herkomst: 'mediaos' }).bereikteMaker,
+    false, 'wie zijn eigen werk opent, bereikt niemand');
+  assert.equal(c.connectDossier('MAKER').regels.filter(r => r.trede === 'bereikt').length, 0,
+    'en er staat dus ook niets');
+
+  const ander = 'mediaos:' + wh.legWerk('MAKER', 'muziek', 'y').id;
+  assert.equal(c.connectOpen('KIJKER', { id: ander, onderwerp: 'muziek', herkomst: 'mediaos' }).bereikteMaker, true);
+  assert.equal(c.connectOpen('TWEEDE', { id: ander, onderwerp: 'muziek', herkomst: 'mediaos' }).bereikteMaker, false,
+    'een tweede kijker schrijft geen tweede regel -- anders is het een teller');
+  assert.equal(c.connectDossier('MAKER').regels.filter(r => r.trede === 'bereikt').length, 1);
+});
+
+test('31b. de opzoeking wijst het JUISTE werk aan, ook met meerdere makers', () => {
+  /* Met EEN werk in het register is elke opzoeking toevallig goed: een mutant
+     die simpelweg het eerste werk teruggaf, bleef groen. Twee makers met elk
+     een werk is het kleinste geval waarin dat verschil zichtbaar is -- en het
+     is meteen het geval dat ertoe doet, want de fout zou een dossierregel bij
+     de VERKEERDE mens leggen. */
+  const { wh, c } = werkwereld();
+  const vanA = 'mediaos:' + wh.legWerk('MAKER-A', 'video', 'a').id;
+  const vanB = 'mediaos:' + wh.legWerk('MAKER-B', 'muziek', 'b').id;
+
+  c.connectNaklank(vanB, 'KIJKER', 'geholpen');
+  assert.equal(c.connectDossier('MAKER-B').totaal, 1, 'de regel landt bij B');
+  assert.equal(c.connectDossier('MAKER-A').totaal, 0, 'en niet bij A');
+
+  c.connectOpen('KIJKER', { id: vanA, onderwerp: 'video', herkomst: 'mediaos' });
+  assert.ok(c.connectDossier('MAKER-A').regels.some(r => r.trede === 'bereikt'), 'en andersom net zo');
+  assert.equal(c.connectDossier('MAKER-B').regels.filter(r => r.trede === 'bereikt').length, 0);
+});
+
+test('32. het eigen werk komt uit het vertrouwde register en nooit uit de aanroep', () => {
+  /* Besluit 2: Connect mag auteurschap CONSUMEREN, niet uitvinden. Er is geen
+     parameter waarmee een aanroeper zegt wat hij gemaakt heeft. */
+  const { wh, c } = werkwereld();
+  assert.deepEqual(c.connectWerkBij('LEEG').nieuw, [], 'wie niets heeft aangemeld, krijgt niets');
+  wh.legWerk('LEEG', 'muziek', 'Deuntje');
+  assert.deepEqual(c.connectWerkBij('LEEG').nieuw.map(x => x.trede), ['gemaakt', 'aangeboden']);
+  /* Tweede keer: idempotent, en de uitkomst zegt het verschil. */
+  const twee = c.connectWerkBij('LEEG');
+  assert.deepEqual(twee.nieuw, []);
+  assert.equal(twee.stond.length, 2, '"twee die al stonden" is iets anders dan "twee nieuwe"');
+});
+
+test('33. zonder werkregister verzint deze laag niets, en zegt dat', () => {
+  const { c } = bouw();
+  const r = c.connectWerkBij('AB');
+  assert.equal(r.ok, true);
+  assert.equal(r.geenBron, true);
+  assert.ok(r.reden && r.reden.length > 30, 'een stand met een reden, geen stilte');
 });

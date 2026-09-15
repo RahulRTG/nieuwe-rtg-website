@@ -283,8 +283,10 @@
       "connectNaklankWeg",
       "connectOntdek",
       "connectOpen",
+      "connectPortfolio",
       "connectSchuif",
       "connectSignaal",
+      "connectWerkBij",
       "connectWerkwoord"
     ],
     "consent": [

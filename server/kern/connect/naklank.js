@@ -34,21 +34,14 @@
       niet langs een tweede schrijver: een dossierregel die hier zou ontstaan,
       omzeilt de grendel die dat bestand juist heeft.
 
-      EN DE MAKER KOMT NOOIT UIT HET VERZOEK. Hier stond `opties.maker`, met de
-      codenaam uit het lijf van de aanroep -- en daarmee kon iedereen een regel
-      `onderwezen` in het dossier van een WILLEKEURIG ander schrijven, precies
-      in de trede die als enige bewijskracht heeft. De lusproef vond het omdat
-      de zelf-weigering niet aansloeg: `maker` was een string die de client had
-      verzonnen, dus hij was per definitie nooit gelijk aan de gever.
-
-      De maker wordt daarom OPGEZOCHT, met `makerVan(id)` die de bedrading
-      meegeeft. Kan die het ding niet thuisbrengen, dan wordt de naklank gewoon
-      geteld -- hij gaat over het DING en niet over de mens -- maar de haak
-      loopt NIET, met de reden in `dossierReden`. Dat is de eerlijke uitkomst
-      vandaag: geen van de twee aangesloten bronnen draagt een maker (leerstof
-      is van dit huis, een buurtactiviteit van een afdeling), dus er is
-      niemand om de regel bij te schrijven. Een laag die dat gat vult met wat
-      de client zegt, verzint bewijs.
+      EN DE MAKER KOMT NOOIT UIT HET VERZOEK. Hier stond `opties.maker` uit het
+      lijf van de aanroep, en daarmee kon iedereen een regel met bewijskracht in
+      het dossier van een WILLEKEURIG ander schrijven. De zelf-weigering sloeg
+      nooit aan: een verzonnen codenaam is per definitie niet gelijk aan de
+      gever. De maker wordt daarom OPGEZOCHT met `makerVan(id)`, die de
+      bedrading meegeeft uit kern/mediaos/werkherkomst.js. Brengt die het ding
+      niet thuis, dan wordt de naklank geteld -- hij gaat over het DING -- maar
+      loopt de haak NIET, met de reden in `dossierReden`.
 
    4. DE MAKER ZIET AANTALLEN EN GEEN NAMEN. Wie wat gaf, is voor de gever zelf
       (om het terug te kunnen nemen) en voor niemand anders. Een lijst namen
@@ -67,7 +60,7 @@ const { SOORTEN } = require('./naklanklijst');
 const OP_ID = new Map(SOORTEN.map(s => [s.id, s]));
 const soort = (id) => OP_ID.get(String(id == null ? '' : id)) || null;
 
-module.exports = ({ db, save, bijHelp, makerVan }) => {
+module.exports = ({ db, save, bijOverdracht, makerVan }) => {
   const bak = () => {
     const d = db.data || (db.data = {});
     if (!d.connect) d.connect = {};
@@ -128,17 +121,28 @@ module.exports = ({ db, save, bijHelp, makerVan }) => {
        had zij de schrijfgrendel van leerdossier.js omzeild en kon iedereen via
        deze weg zijn eigen `onderwezen` zetten. */
     let dossier = null, dossierReden = null;
-    if (s.id === 'geholpen') {
-      if (!werk || !werk.sleutel || !werk.onderwerp) {
-        dossierReden = 'Deze naklank is geteld, maar er kon geen regel bij een maker worden geschreven: ' +
-          'dit huis weet niet van wie dit werk is. Zolang dat zo is, ontstaat de trede "Doorgegeven" niet ' +
-          '-- en dat is beter dan hem op naam van iemand zetten die de gever heeft opgegeven.';
-      } else if (nieuw && bijHelp) {
-        dossier = bijHelp({ maker: String(werk.sleutel), onderwerp: String(werk.onderwerp),
-          bron: 'naklank:' + String(item) });
-      }
+    if (!s.trede) {
+      /* `mooi` komt hier terecht, en met opzet. Waardering is AANDACHT, en wij
+         tellen aandacht niet als ontwikkeling -- dus er ontstaat geen regel bij
+         de maker. Dat staat er hardop bij in plaats van stil te blijven: een
+         gever die dit niet leest, denkt dat hij iets voor de maker heeft
+         gedaan wat hij niet heeft gedaan. */
+      dossierReden = 'Deze naklank telt mee als waardering en niet als ontwikkeling: hij schrijft niets in ' +
+        'het dossier van de maker. Bereik en bijval zijn aandacht; wat wel telt is dat iemand er iets MEE doet.';
+    } else if (!werk || !werk.sleutel || !werk.onderwerp) {
+      dossierReden = 'Deze naklank is geteld, maar er kon geen regel bij een maker worden geschreven: ' +
+        'dit huis weet niet van wie dit werk is. Zolang dat zo is, ontstaat de trede "' + s.trede + '" niet ' +
+        '-- en dat is beter dan hem op naam van iemand zetten die de gever heeft opgegeven.';
+    } else if (nieuw && bijOverdracht) {
+      /* DE BRON DRAAGT DE TREDE EN NIET DE SOORT, en dat is de regel van
+         ./tredenlijst.js in de praktijk. Vier van de zes soorten landen op
+         `gebruikt`; met de soort in de bron zou EEN werk vier keer "gebruikt"
+         kunnen opleveren, en dan telt het dossier hoe vaak in plaats van DAT.
+         Overgangen, nooit volumes. */
+      dossier = bijOverdracht({ maker: String(werk.sleutel), onderwerp: String(werk.onderwerp),
+        trede: s.trede, bron: 'naklank:' + String(item) + ':' + s.trede });
     }
-    return { ok: true, nieuw, soort: s.id, dossier, dossierReden };
+    return { ok: true, nieuw, soort: s.id, trede: s.trede, dossier, dossierReden };
   }
 
   /* TERUGNEMEN. Werkt altijd, ook op een soort die niet meer bestaat, en geeft

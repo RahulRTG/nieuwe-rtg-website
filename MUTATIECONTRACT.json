@@ -1,29 +1,29 @@
 {
  "stempel": {
-  "op": "2026-09-15T15:00:48.543Z",
-  "commit": "3f11d577",
+  "op": "2026-09-15T15:56:57.460Z",
+  "commit": "e1921bf3",
   "boomVuil": true,
-  "boomAnders": 12,
+  "boomAnders": 4,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4969,
-  "geclassificeerd": 4969,
+  "totaal": 4973,
+  "geclassificeerd": 4973,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3189,
-   "NOT_APPLICABLE": 1195,
+   "NOT_APPLICABLE": 1197,
    "PROTECTED": 453,
-   "INTENTIONALLY_NON_IDEMPOTENT": 132
+   "INTENTIONALLY_NON_IDEMPOTENT": 134
   },
-  "vastgesteldDoorMens": 1828,
+  "vastgesteldDoorMens": 1832,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4090,
+   "AUTHENTICATED": 4092,
    "PUBLIC": 123,
-   "OBJECT_SCOPED": 735,
+   "OBJECT_SCOPED": 737,
    "(niet af te leiden -- vraagt een verklaring)": 5,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4681,
-   "niet gemeten": 36
+   "niet gemeten": 40
   },
   "voorstellen": {},
   "metingVan": "2026-09-14T23:40:03.108Z"
@@ -15435,6 +15435,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "connect.portfolio",
+   "route": "POST /api/connect/portfolio",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "connect.schuif",
    "route": "POST /api/connect/schuif",
    "semantiek": {
@@ -15493,6 +15514,27 @@
    },
    "bewijs": null,
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "connect.werk",
+   "route": "POST /api/connect/werk",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -79253,8 +79295,50 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "connect.portfolio.gezin",
+   "route": "POST /api/rtf/connect/portfolio",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinsPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "connect.signaal.gezin",
    "route": "POST /api/rtf/connect/signaal",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinsPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "connect.werk.gezin",
+   "route": "POST /api/rtf/connect/werk",
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },

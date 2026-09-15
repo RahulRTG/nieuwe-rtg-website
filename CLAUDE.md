@@ -195,12 +195,31 @@ plekken in 8 domeinen) en `weerklank` ook (KANTOOR.md), vandaar de naam. En **de
 kringladder gaat niet de kant op die hij lijkt te gaan**: de trap van een KRING
 is BEREIK en die van een RELATIE NABIJHEID, dus wie dichtbij staat ziet wat
 verder reikt -- met `kijker >= doel` kon een gezinslid het publieke werk van zijn
-eigen kind niet zien. Par. 7.1 is de eerlijke bevinding van `npm run lusproef`
-(15 schakels, 10 storingen): schakel 8 staat OPEN omdat geen van de twee
-aangesloten bronnen een maker draagt, en de eerste versie stond daar GROEN met
-`maker` uit het verzoek -- waarmee iedereen een regel `onderwezen` in het dossier
-van een willekeurig ander kon schrijven. Dat er geen maker is, is de juiste
-uitkomst; dat de lus daar nog niet sluit, is de bevinding.
+eigen kind niet zien. **Besluit 2 is genomen (15 september 2026) en de lus is rond**:
+`npm run lusproef` staat op 17 schakels en 10 storingen, alle gesloten. De regel
+die dat ontwerp stuurt is **Connect mag auteurschap CONSUMEREN, niet zelf
+uitvinden** -- en die komt uit een LEK en niet uit voorzichtigheid: de eerste
+versie liet de aanroeper zeggen wie de maker was, waarmee iedereen een regel met
+bewijskracht in andermans dossier kon schrijven. De uitweg stond er al:
+`kern/mediaos/wekken.js` heeft een haak `nieuwWerk(makerKey, soort, titel)` die
+vijf domeinen aanroepen met een echte ledensleutel op het moment dat het werk er
+is, en `kern/mediaos/werkherkomst.js` legt dat daar vast -- VOOR het wekken, want
+een maker zonder volgers maakt evengoed iets. Connect leest het en krijgt er
+precies EEN ding uit (`makerVanWerk(id)`); er is met opzet geen functie die alle
+werken van iedereen teruggeeft, want dat zou een publieke makerslijst zijn.
+**Daarbij zijn de vijf overdrachtstreden uit elkaar getrokken** -- gemaakt,
+aangeboden, bereikt, gebruikt, doorgegeven -- want als een trede die vijf
+samenvat, zijn publiceren en betekenen hetzelfde ding. De regel eronder is de
+scherpste van deze laag: **wij tellen geen aandacht als ontwikkeling.** `bereikt`
+draagt daarom `aanspraak: 'geen'` en staat WEL in het dossier en NOOIT in het
+portfolio (dat je werk ergens aankwam is bereik, en bereik is aandacht), en
+`mooi` is de enige naklank zonder trede -- juist omdat hij het vaakst gegeven
+wordt. Alle vijf zijn `eenmalig`: deze ladder legt OVERGANGEN vast en nooit
+VOLUMES, dus vier mensen met vier verschillende naklanken leveren samen EEN regel
+`gebruikt` op, en niemand kan andermans dossier laten groeien door te blijven
+drukken. De zes vragen per bewijsstuk (`stelt`, `nietZegt`, `doorWie`, `graad`,
+`werkwoord`, `herkomst`) gebruiken met opzet de woorden van
+`kern/carriereledger/regels.js` en geen tweede vocabulaire.
 
 **`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
 Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk

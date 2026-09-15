@@ -23,7 +23,7 @@
 
    - naklank krijgt de haak `bijHelp` van het LEERDOSSIER mee, en niet
      andersom. Wie iemand helpt, krijgt daar een dossierregel van -- maar de
-     schrijfgrendel (`wieSchrijft`) hoort bij het dossier. Zou naklank zelf
+     schrijfgrendel (`doorWie`) hoort bij het dossier. Zou naklank zelf
      schrijven, dan kan iedereen via die weg zijn eigen `onderwezen` zetten.
    - de mixer krijgt zijn BRONNEN mee en kiest ze niet zelf, om dezelfde reden
      als kern/levensgraaf/graaf.js: een motor die zijn eigen brandstof kiest,
@@ -68,8 +68,12 @@ function maakConnect(ctx) {
   const makerVan = ctx && ctx.makerVan ? ctx.makerVan : () => null;
 
   const naklank = require('./naklank')({ db, save, makerVan,
-    bijHelp: ({ maker, onderwerp, bron }) => dossier.noteer(maker, {
-      trede: 'onderwezen', onderwerp, bron, door: 'eenAnder', herkomst: 'connect' }) });
+    /* De trede komt van de NAKLANK en staat hier niet vast. Vroeger stond hier
+       `trede: 'onderwezen'` voor elke naklank die doorliep; sinds de ladder vijf
+       overdrachtstreden kent, beslist ./naklanklijst.js welke -- en of er
+       uberhaupt een is (`mooi` levert er geen op). */
+    bijOverdracht: ({ maker, onderwerp, trede, bron }) => dossier.noteer(maker, {
+      trede, onderwerp, bron, door: 'eenAnder', werkwoord: 'help', herkomst: 'connect' }) });
 
   const leerstofbron = maakLeerstofbron({ DOELEN });
   const lokalebron = maakLokalebron({ rtfos });
@@ -118,13 +122,42 @@ function maakConnect(ctx) {
      zijn eerste trede uitschrijft. */
   function open(sleutel, item) {
     const i = item || {};
-    return dossier.noteer(sleutel, { trede: 'gezien', onderwerp: i.onderwerp,
-      bron: i.id, door: 'hetSysteem', herkomst: i.herkomst });
+    const eigen = dossier.noteer(sleutel, { trede: 'gezien', onderwerp: i.onderwerp,
+      bron: i.id, door: 'hetSysteem', werkwoord: 'ontdek', herkomst: i.herkomst });
+
+    /* EN DE ANDERE KANT: als dit werk van IEMAND ANDERS is, is het zojuist bij
+       een mens aangekomen. Dat is de trede `bereikt` bij de MAKER, en hij is
+       met opzet `eenmalig` -- anders schrijft deze regel een teller in het
+       dossier van iemand anders, en dan is het dossier van een maker een
+       kijklog geworden waar hij zelf niets aan kan doen.
+
+       DE MAKER WORDT OPGEZOCHT EN NOOIT AANGENOMEN, net als bij de naklank.
+       `bereikt` draagt `aanspraak: 'geen'` en komt dus niet in het portfolio:
+       dat je werk ergens aankwam is BEREIK, en bereik is aandacht. Het staat er
+       omdat het het eerlijke verschil is met "aangeboden", en verder nergens
+       voor. */
+    let bereikt = null;
+    let werk = null;
+    try { werk = makerVan ? makerVan(String(i.id || '')) : null; } catch (e) { werk = null; }
+    if (werk && werk.sleutel && String(werk.sleutel) !== String(sleutel || '')) {
+      bereikt = dossier.noteer(werk.sleutel, { trede: 'bereikt', onderwerp: werk.onderwerp,
+        bron: String(i.id), door: 'hetSysteem', werkwoord: 'deel', herkomst: 'connect' });
+    }
+    return Object.assign({}, eigen, { bereikteMaker: !!(bereikt && bereikt.ok && bereikt.nieuw) });
   }
+
+  /* Het overnemen van het eigen werk staat in ./werkbij.js en is een HANDELING
+     en geen lezing -- zie de kop daar. `werkenVan` komt uit de bedrading en is
+     er vandaag alleen als kern/mediaos is gemonteerd; ontbreekt hij, dan zegt
+     de uitkomst dat, en verzint hij niets. */
+  const { werkBij } = require('./werkbij')({
+    werkenVan: ctx && ctx.werkenVan ? ctx.werkenVan : null, noteer: dossier.noteer });
 
   return {
     connectOntdek: ontdek,
     connectOpen: open,
+    connectWerkBij: werkBij,
+    connectPortfolio: dossier.portfolio,
     connectNaklank: naklank.geef,
     connectNaklankWeg: naklank.neemTerug,
     connectNaklankTel: naklank.tel,

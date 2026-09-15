@@ -141,6 +141,44 @@ de hand groeit; die prijs staat opgeschreven in plaats van weggewerkt.
 
 ---
 
+## 2a. Besluit 2 is genomen: auteurschap wordt geconsumeerd, niet uitgevonden
+
+*15 september 2026.* De regel die het ontwerp stuurt staat in één zin:
+
+> **Connect mag auteurschap CONSUMEREN, niet zelf uitvinden.**
+
+Die zin is niet uit voorzichtigheid geboren maar uit een lek. De eerste versie
+liet de aanroeper zeggen wie de maker was, en daarmee kon iedereen een regel met
+bewijskracht in het dossier van een willekeurig ander schrijven. Het
+securitygat heeft zo de architectuur bepaald: als de client het niet mag zeggen,
+en Connect het niet mag weten, dan moet het ergens anders al vaststaan.
+
+Dat deed het. `kern/mediaos/wekken.js` heeft een haak `nieuwWerk(makerKey, soort,
+titel)` die door vijf domeinen wordt aangeroepen — Klankwerk, Theater, Clips,
+Podium en de aanwezigheden — met een echte ledensleutel, op het moment dat het
+werk er werkelijk is. Die bewering is vertrouwd omdat het **domein** hem doet.
+
+`kern/mediaos/werkherkomst.js` legt hem daar vast, en Connect **leest** hem:
+
+```
+bestaand domein maakt werkelijk iets
+  -> nieuwWerk() legt vertrouwde herkomst vast
+  -> Connect projecteert alleen wat het nodig heeft
+  -> iemand anders doet er daadwerkelijk iets mee
+  -> gebruikt/doorgegeven krijgt bewijs
+  -> het leerdossier krijgt een regel
+```
+
+Drie dingen die daarbij niet mogen verwateren. De herkomst wordt vastgelegd
+**vóór** het wekken (dat dit werk bestaat staat los van de vraag of er iemand
+gewekt kon worden — een maker zonder volgers maakt evengoed iets). Het register
+kent **geen functie die alle werken van iedereen teruggeeft**; dat zou een
+publieke makerslijst zijn. En Connect krijgt er precies één ding uit —
+`makerVanWerk(id)` — zodat de leesrichting in de handtekening zit en niet in een
+afspraak.
+
+---
+
 ## 3. Het leerdossier: bewijs door doen
 
 `server/kern/connect/tredenlijst.js` + `leerdossier.js`. Zeven treden: gezien,
@@ -159,6 +197,63 @@ eerste laag die er twee krijgt.
 > die er een dragen, per onderwerp. De hoogste trede wordt afgeleid per onderwerp
 > en nergens over onderwerpen heen opgeteld: een getal over alle onderwerpen ÍS
 > een niveau, hoe je het ook noemt.
+
+### 3.0 De vijf overdrachtstreden, en de regel eronder
+
+De laatste vijf gaan over iets dat deze mens **zelf maakte**. Ze stonden er eerst
+als één trede, en daarmee waren publiceren en betekenen hetzelfde ding:
+
+| trede | wat er gebeurde | aanspraak |
+|---|---|---|
+| **gemaakt** | er bestaat iets van jou | eigen doen |
+| **aangeboden** | jij hebt toegestaan dat een ander het kan ontvangen | eigen doen |
+| **bereikt** | het kwam daadwerkelijk bij iemand anders | **geen** |
+| **gebruikt** | die ander deed er aantoonbaar iets mee | overdracht |
+| **doorgegeven** | het leidde aantoonbaar tot iets verderop | overdracht |
+
+> **WIJ TELLEN GEEN AANDACHT ALS ONTWIKKELING.** Dat is de klassieke
+> social-mediafout in een zin — *publiceren = impact* — en hij wordt hier
+> tegengehouden door een veld en niet door een voornemen. `bereikt` draagt
+> `aanspraak: 'geen'` en komt daarmee **wel** in het dossier en **nooit** in het
+> portfolio.
+
+Die derde regel is de hele kunst. *"Mijn werk kwam bij iemand aan"* voelt als een
+prestatie en het is bereik. Een platform dat dat meetelt, heeft binnen een jaar
+makers die voor bereik werken; een platform dat het weglaat, kan niet uitleggen
+waarom *aangeboden* en *er is echt iemand geweest* niet hetzelfde zijn. Daarom
+staat hij er wel, en telt hij nergens mee.
+
+**En `mooi` levert de maker niets op.** Van de zes naklanken is dat de enige
+zonder trede — en het is de soort die het vaakst gegeven wordt. Juist daarom.
+
+**Alle vijf zijn `eenmalig`.** Een trede die per gebeurtenis een regel
+bijschrijft, wordt een teller: dan staat in het dossier van de maker hoe vaak
+zijn werk is geopend, en dat is een populariteitscijfer met een ander etiket.
+Deze ladder legt **overgangen** vast en nooit **volumes** — *"iemand heeft hier
+iets mee gedaan"* is een feit, *"veertien mensen"* is een score. Dat heeft een
+tweede gevolg dat er hard bij hoort: niemand kan andermans dossier laten groeien
+door te blijven drukken. Vier mensen die vier verschillende naklanken geven,
+leveren samen **één** regel `gebruikt` op.
+
+### 3.0a De zes vragen per bewijsstuk
+
+Elk stuk in het portfolio draagt ze mee, en de eerste vijf komen uit de tabel
+zelf zodat ze niet naast de code kunnen gaan lopen:
+
+| vraag | veld |
+|---|---|
+| wat gebeurde er? | `trede` + `stelt` |
+| welk vermogen werd gebruikt? | `werkwoord` (uit de lus — níét `capability`, dat is in `OS.md` bezet) |
+| waar kwam het bewijs vandaan? | `herkomst` + `bron` |
+| wie stelde het vast? | `doorWie`: de mens zelf, het systeem, of een ander |
+| wat is feit en wat is afleiding? | `graad` + `nietZegt` |
+| mag het buiten Foundation? | `buitenFoundation`, afgeleid uit `aanspraak` |
+
+`stelt` en `nietZegt` zijn met opzet dezelfde woorden als in
+`kern/carriereledger/regels.js`: dat ledger heeft deze vraag al beantwoord, en
+een tweede vocabulaire voor *"wat zegt dit bewijs niet"* is de botsing die
+`SEMANTIEK.json` meet. Het blok `nietZegt` is daar ook geen slag om de arm maar
+de helft van de betekenis.
 
 **Elke regel draagt zijn graad, en die is niet te kiezen maar volgt uit wie hem
 schrijft.** `toegepast` zegt de mens zelf en blijft `vermoed`; `gemaakt` heeft een
@@ -277,31 +372,41 @@ sessie er een is die iemand afsluit.**
 | naklank, zes gevolgen zonder totaal | **staat** |
 | kring als poort, horizon als schuif | **staat** |
 | twee bronnen: leerstof en de buurt | **staat** |
-| **de trede `onderwezen` in de praktijk** | **een stap weg** — zie hieronder |
+| **auteurschap uit een vertrouwde bron** | **staat** — zie par. 2a |
+| de vijf overdrachtstreden, met `bereikt` buiten het portfolio | **staat** |
 | Doe, Samen en Maak als eigen ingangen | **vraagt een besluit** |
 | live, AR/Lens, wereldkaart, vertaling, mentoren | **jaren weg** |
 
-### 7.1 Het gat dat de ketenproef vond
+### 7.1 De lus is rond
 
-`npm run lusproef` loopt de hele lus over een echte server: **15 schakels, 10
-storingen**. Veertien schakels sluiten; schakel 8 staat **open met een reden**, en
-die reden is de eerlijkste zin van dit document.
+`npm run lusproef` loopt de hele lus over een echte server: **17 schakels, 10
+storingen — alle zeventien gesloten.**
 
-De eerste versie van die schakel stond op groen, met `maker` uit het verzoek.
-Daarmee kon iedereen een regel `onderwezen` schrijven in het dossier van een
-willekeurig ander — de enige trede met bewijskracht. De zelf-weigering sloeg nooit
-aan, want een verzonnen codenaam is per definitie niet gelijk aan de gever.
+Schakel 8 stond tot 15 september **open met een reden**, en de weg daarheen is
+het vermelden waard omdat hij twee keer fout ging voordat hij goed ging:
 
-De maker wordt nu **opgezocht** (`makerVan`), en vandaag geeft die niets terug:
-**geen van de twee aangesloten bronnen draagt een maker.** Leerstof is van dit
-huis, een buurtactiviteit van een afdeling. De naklank wordt dus geteld en de
-dossierregel ontstaat niet, mét de reden in het antwoord.
+1. Eerst stond hij **groen** met `maker` uit het verzoek. Daarmee kon iedereen
+   een regel met bewijskracht in het dossier van een willekeurig ander
+   schrijven. De zelf-weigering sloeg nooit aan, want een verzonnen codenaam is
+   per definitie niet gelijk aan de gever.
+2. Daarna stond hij **open**: de maker werd opgezocht, en geen enkele bron droeg
+   er een. Dat er geen maker was, was de juiste uitkomst; dat de lus daar niet
+   sloot, was de bevinding.
+3. Nu **sluit** hij, en niet door in Connect iets te bouwen dat er al was. De
+   schakel begint bij een écht domein: een lid maakt een clip langs
+   `/api/clips/maak`, `kern/clips.js` roept `nieuwWerk(key, 'flow', titel)` aan
+   zoals altijd, en `kern/mediaos/werkherkomst.js` legt vast van wie dat werk
+   is. Pas dan kan een tweede mens er iets mee — en landt de regel bij de eerste.
 
-> **Dat er geen maker is, is de juiste uitkomst. Dat de lus daar nog niet sluit,
-> is de bevinding.** Wat er moet komen is een bron met makers — en die bestaat al
-> onder een andere naam: `kern/mediaos/wekken.js` kent `nieuwWerk(key, soort,
-> titel)`, en vijf publieke domeinen roepen die haak al aan. Het werk is
-> aansluiten en niet uitvinden.
+De drie schakels daarna zijn de inhoudelijke: `bereikt` staat in het dossier en
+niet in het portfolio (9), `mooi` levert de maker niets op en `geprobeerd` wel
+(10), en vier naklanken op één trede geven één regel (toets 30).
+
+**Wat de e2e-toets onderweg vond, en wat geen unittoets kon zien.** `/api/login`
+geeft per pas *dezelfde* demo-persona terug, dus twee "verschillende" leden waren
+er één — en dan bereikt een maker zichzelf. De toets stond daarop terecht rood.
+Zo'n fout leeft precies in de naad tussen drie `opzet/`-bestanden die geen enkele
+unittoets raakt, en dat is waarom die toets bestaat.
 
 ### 7.2 Wat met opzet geen deur heeft
 
@@ -353,8 +458,12 @@ elkaar legt, geen zoekweg op makers, geen volgerslijst.
 
 1. **De publieke naam.** *Ontdekken* staat er nu; de werknaam Foundation Connect
    is geen productnaam.
-2. **Wie is de maker van een stuk werk?** Par. 7.1. Dit is het enige besluit dat
-   de lus vandaag opent, en het is aansluiten en niet bouwen.
+2. ~~**Wie is de maker van een stuk werk?**~~ **Genomen op 15 september 2026**
+   (par. 2a): Connect consumeert auteurschap uit `kern/mediaos/werkherkomst.js`
+   en stelt het nooit zelf vast. Wat hierna openstaat is de ándere kant — het
+   werk van anderen komt nog niet in de ontdeklijst. Dat vraagt een bron op de
+   mediacatalogus en niet op het herkomstregister: dat laatste kent met opzet
+   geen "alle werken van iedereen", want dat zou een publieke makerslijst zijn.
 3. **Gaan Doe, Samen en Maak eigen ingangen worden?** Vandaag zijn het
    werkwoorden op een ontdekking en geen tabbladen. Vijf tabbladen bouwen waar
    drie ervan niets achter zich hebben, is het product verzinnen om de navigatie

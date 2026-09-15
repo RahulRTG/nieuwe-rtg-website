@@ -90,15 +90,19 @@ module.exports = ({ db, save, crypto }) => {
     if (!t) return { ok: false, reden: 'Die trede bestaat niet. Kies uit: ' + TREDEN.map(x => x.id).join(', ') + '.' };
 
     const door = String(r.door || 'zelf');
-    if (door !== t.wieSchrijft) {
-      return { ok: false, reden: t.wieSchrijft === 'eenAnder'
+    if (door !== t.doorWie) {
+      return { ok: false, reden: t.doorWie === 'eenAnder'
         ? 'Deze trede zet een ander. "' + t.naam + '" ontstaat doordat iemand zegt dat hij door u geholpen is, en niet doordat u dat zelf opschrijft.'
-        : 'Deze trede wordt door ' + (t.wieSchrijft === 'zelf' ? 'de mens zelf' : 'het systeem') + ' gezet, niet door "' + door + '".' };
+        : 'Deze trede wordt door ' + (t.doorWie === 'zelf' ? 'de mens zelf' : 'het systeem') + ' gezet, niet door "' + door + '".' };
     }
-    /* `gemaakt` zonder een ding is een bewering zonder onderwerp, en dat is
-       precies de regel die een portfolio waardeloos maakt. */
-    if (t.id === 'gemaakt' && !String(r.bron || '')) {
-      return { ok: false, reden: 'Een regel "Gemaakt" verwijst naar wat er gemaakt is. Zonder die verwijzing is er niets aan te tonen.' };
+    /* DE BRON-EIS KOMT UIT DE TABEL EN NIET UIT EEN NAAM. Hier stond
+       `t.id === 'gemaakt'`, en toen de ladder van zeven naar tien treden ging
+       waren er vijf treden die een verwijzing nodig hebben -- een hardgecodeerde
+       naam dekt er dan een. Een bewering zonder onderwerp is precies wat een
+       portfolio waardeloos maakt. */
+    if (t.bronNodig && !String(r.bron || '')) {
+      return { ok: false, reden: 'Een regel "' + t.naam + '" verwijst naar het werk waar hij over gaat. ' +
+        'Zonder die verwijzing is er niets aan te tonen.' };
     }
     const onderwerp = String(r.onderwerp || '').trim().slice(0, 80);
     if (!onderwerp) return { ok: false, reden: 'Een regel hoort bij een onderwerp.' };
@@ -125,6 +129,15 @@ module.exports = ({ db, save, crypto }) => {
       id: (crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()).slice(0, 36),
       at: new Date().toISOString(),
       onderwerp, trede: t.id, graad: t.graad,
+      /* DE ASPRAAK REIST MEE EN WORDT NIET BIJ HET LEZEN AFGELEID. Zou hij
+         alleen uit de tabel komen, dan verandert de betekenis van een regel uit
+         2026 zodra iemand in 2028 een trede anders indeelt -- en een ledger
+         waarvan de oude regels meebewegen, is geen ledger. */
+      aanspraak: t.aanspraak,
+      /* Welk werkwoord van de lus hier is uitgevoerd. Dat is de vraag "welk
+         vermogen werd gebruikt" -- en met opzet niet het woord `capability`,
+         dat in OS.md al platformvermogen betekent. */
+      werkwoord: String(r.werkwoord || '') || null,
       bron: String(r.bron || '') || null,
       herkomst: String(r.herkomst || '') || null
     };
@@ -170,5 +183,10 @@ module.exports = ({ db, save, crypto }) => {
       .map(([onderwerp, v]) => ({ onderwerp, trede: v.trede, naam: v.naam, graad: v.graad }));
   }
 
-  return { noteer, lees, hoogste, TREDEN, MAX };
+  /* Het portfolio is een LEZER op deze opslag en woont apart: zie de kop van
+     ./portfolio.js voor de regel die hem van `lees()` onderscheidt. Hij krijgt
+     `peil` en `trede` mee en kan dus per constructie niet schrijven. */
+  const { portfolio } = require('./portfolio')({ peil, trede });
+
+  return { noteer, lees, hoogste, portfolio, TREDEN, MAX };
 };

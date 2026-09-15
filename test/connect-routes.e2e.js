@@ -55,7 +55,9 @@ test('Foundation Connect: elke deur is gemonteerd, en geen enkele staat open', a
       ['/api/connect/naklank/tel', { id: 'werk:1' }],
       ['/api/connect/naklank/weg', { id: 'werk:1', soort: 'geleerd' }],
       ['/api/connect/kring', { huidig: 'alleenIk', kring: 'team' }],
-      ['/api/connect/kring/keuzes', {}]
+      ['/api/connect/kring/keuzes', {}],
+      ['/api/connect/werk', {}],
+      ['/api/connect/portfolio', {}]
     ];
     for (const [pad, lijf] of ledenwegen) {
       /* ZONDER TOKEN EERST. Dit is de helft die alleen hier te zien is: een
@@ -83,7 +85,9 @@ test('Foundation Connect: elke deur is gemonteerd, en geen enkele staat open', a
       ['/api/rtf/connect/dossier', {}],
       ['/api/rtf/connect/naklank', { id: 'werk:2', soort: 'geleerd' }],
       ['/api/rtf/connect/kring', { huidig: 'alleenIk', kring: 'team' }],
-      ['/api/rtf/connect/kring/keuzes', {}]
+      ['/api/rtf/connect/kring/keuzes', {}],
+      ['/api/rtf/connect/werk', {}],
+      ['/api/rtf/connect/portfolio', {}]
     ];
     for (const [pad, lijf] of gezinswegen) {
       assert.equal((await post(pad, lijf)).status, 403, pad + ' hoort zonder gezin 403 te geven');
@@ -114,6 +118,45 @@ test('Foundation Connect: elke deur is gemonteerd, en geen enkele staat open', a
           'en hoort te horen waarom, niet alleen dat het niet mag');
       }
     }
+
+    /* DE LUS OVER TWEE MENSEN, over de echte routes. test/connect.test.js
+       bewijst dit op de modules; hier gaat het over de MONTAGE -- dat
+       kern/clips.js zijn `nieuwWerk`-haak werkelijk aan kern/mediaos hangt en
+       dat kern/connect daar werkelijk uit leest. Die drie bedradingen zitten in
+       drie verschillende opzet-bestanden en geen unittoets raakt ze. */
+    /* EEN ECHT TWEEDE MENS, en niet nog een demo-inlog. `/api/login` geeft per
+       pas DEZELFDE persona terug, dus twee aanroepen leveren een en dezelfde
+       sessiesleutel op -- en dan is de "tweede kijker" de maker zelf. De toets
+       stond daardoor rood op `bereikteMaker`, en dat was terecht: hij meette
+       twee mensen die er een waren. Registreren geeft wel een eigen account. */
+    const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+    const tweede = (await post('/api/auth/register', { name: 'Tweede lezer',
+      email: 'ct' + u + '@voorbeeld.nl', phone: '06' + u.slice(0, 8),
+      password: 'geheim12345', geboortedatum: '1990-03-03', tier: 'rtg' })).body;
+    assert.ok(tweede.token, 'tweede lid-inlog mislukt');
+    assert.notEqual(tweede.token, lid.token, 'en het is werkelijk iemand anders');
+    assert.equal((await post('/api/clips/maak', { titel: 'Pasta', duurS: 30 }, lid.token)).status, 200);
+    const over = await post('/api/connect/werk', {}, lid.token);
+    assert.deepEqual((over.body.nieuw || []).map(x => x.trede).sort(), ['aangeboden', 'gemaakt'],
+      'het auteurschap komt uit kern/mediaos/werkherkomst.js en niet uit de aanroep');
+    const werkId = 'mediaos:' + over.body.nieuw[0].werk;
+
+    /* Bereikt: het kwam bij een ander aan -- wel in het dossier, niet in het portfolio. */
+    assert.equal((await post('/api/connect/open',
+      { id: werkId, onderwerp: 'flow', herkomst: 'mediaos' }, tweede.token)).body.bereikteMaker, true);
+    const naBereik = await post('/api/connect/portfolio', {}, lid.token);
+    assert.ok(!(naBereik.body.bewijzen || []).some(b => b.trede === 'bereikt'),
+      'bereik is aandacht en komt het portfolio niet in');
+
+    /* En "mooi" levert de maker niets op; "geprobeerd" wel. */
+    assert.equal((await post('/api/connect/naklank',
+      { id: werkId, soort: 'mooi' }, tweede.token)).body.dossier, null);
+    assert.ok((await post('/api/connect/naklank',
+      { id: werkId, soort: 'geprobeerd' }, tweede.token)).body.dossier,
+      'iemand die er iets MEE doet, telt wel');
+    const eind = await post('/api/connect/portfolio', {}, lid.token);
+    assert.ok((eind.body.bewijzen || []).some(b => b.trede === 'gebruikt' && b.graad === 'bewezen'),
+      'en die regel draagt de graad bewezen, want een ANDER heeft hem gezet');
 
     /* EN DE TWEE MOTOREN ZIJN DEZELFDE. Dit is de belofte van de tweede deur --
        dezelfde vorm en dezelfde reden als /api/knelpunt naast /api/rtf/knelpunt:

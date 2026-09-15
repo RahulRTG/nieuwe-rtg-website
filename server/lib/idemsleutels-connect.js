@@ -30,6 +30,8 @@ const SLEUTELS = {
   'POST /api/connect/horizon': { leest: true },
   'POST /api/rtf/connect/horizon': { leest: true },
   'POST /api/connect/naklank/tel': { leest: true },
+  'POST /api/connect/portfolio': { leest: true },
+  'POST /api/rtf/connect/portfolio': { leest: true },
   /* De kringroutes REKENEN alleen. kern/connect/kring.js bewaart niets: hij
      krijgt een huidige en een gewenste kring mee en geeft terug of dat mag.
      Waar de kring van een gemaakt ding LANDT, is de zaak van het domein dat dat
@@ -52,6 +54,28 @@ const SLEUTELS = {
   'POST /api/connect/naklank/weg': { velden: ['id', 'soort'] },
   /* De schuif ZET een waarde; twee keer dezelfde waarde is dezelfde stand. */
   'POST /api/connect/schuif': { velden: ['schuif'] },
+  /* `werk` neemt de eigen werken over uit kern/mediaos/werkherkomst.js.
+
+     HIER STOND `zelfdeVerzoek: true` EN DAT WAS FOUT -- gevonden door
+     test/connect-routes.e2e.js, en het is precies de val die
+     ./idemsleutels-bundel.js beschrijft. Het lijf is altijd leeg, dus twee
+     aanroepen zijn voor de poort hetzelfde verzoek, en binnen het
+     dubbeltikvenster speelde hij het BEWAARDE antwoord terug. Een lid dat
+     eerst keek (leeg), daarna een clip maakte en opnieuw keek, kreeg dus
+     opnieuw "leeg" -- terwijl zijn werk gewoon in het register stond.
+
+     De EFFECTEN zijn wel degelijk idempotent: `gemaakt` en `aangeboden` zijn
+     eenmalig per werk-id, dus er komt nooit een tweede regel. Maar het
+     ANTWOORD is dat niet, want tussen twee aanroepen kan er werk bij zijn
+     gekomen. Dat is het verschil tussen idempotentie in de KERN en in de
+     POORT, en alleen de eerste hebben we hier. */
+  'POST /api/connect/werk': { nietIdempotent: true, waarom:
+    'Het lijf is leeg, dus elke aanroep ziet er voor de poort hetzelfde uit -- maar het ANTWOORD hangt af ' +
+    'van wat er sinds de vorige keer is aangemeld. Terugspelen zou een lid zijn eigen nieuwe werk laten ' +
+    'missen. De effecten zijn wel idempotent: de twee treden zijn eenmalig per werk-id, dus een tweede ' +
+    'aanroep schrijft niets en meldt dat in `stond`.' },
+  'POST /api/rtf/connect/werk': { nietIdempotent: true, waarom:
+    'Zelfde handler en zelfde reden als POST /api/connect/werk.' },
 
   /* ---- schrijven en met opzet NIET samen te vatten ---- */
   /* `noteer` is gemengd, en daarom staat er geen sleutel op: `begrepen` is

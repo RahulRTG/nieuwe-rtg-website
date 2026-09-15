@@ -24,8 +24,23 @@ module.exports = (kern, hulp) => {
      goedkoper dan de aanroepregel elke keer verlengen. */
   const { notify, sseToCustomer, crypto } = hulp;
   const { db, save, schoon, keyVanCodenaam } = kern;
+
+  /* DE WERKHERKOMST WORDT HIER GEBOUWD EN NIET IN kern/mediaos/index.js, en dat
+     is een maatregel met een reden die het waard is om te onthouden: dat bestand
+     stond op 10238 bytes, TWEE onder de grens van keuringsregel 13. Een regel
+     erbij en de keuring zakt. Dit is de bedrading, dus hier hoort een motor te
+     worden samengesteld; index.js krijgt hem als parameter en forwardt hem naar
+     ./wekken.js, waar het vastleggen zelf gebeurt.
+
+     WAT HIJ IS: het register waar vijf domeinen via `nieuwWerk(makerKey, soort,
+     titel)` zelf vertellen dat DEZE maker DIT heeft gemaakt -- met een echte
+     ledensleutel, op het moment dat het werk er is. kern/connect/ LEEST dat en
+     stelt auteurschap nooit zelf vast (besluit van de eigenaar, 15 september
+     2026). De uitleg staat in de kop van kern/mediaos/werkherkomst.js. */
+  const werkherkomst = require('../kern/mediaos/werkherkomst').maakWerkherkomst({ db, save });
+
   Object.assign(kern, require('../kern/mediaos').maakMediaOS({
-    db, save, schoon, crypto, codenaamVan: kern.codenaamVan, keyVanCodenaam, notify,
+    db, save, schoon, crypto, codenaamVan: kern.codenaamVan, keyVanCodenaam, notify, werkherkomst,
     /* Voor het delen van een lijst en voor de luisterkamer: allebei mogen ze
        alleen tussen mensen die verbonden zijn, en die relatie woont in de
        sociale laag -- er komt hier geen tweede vriendenlijst naast. */
@@ -60,4 +75,9 @@ module.exports = (kern, hulp) => {
       volgTheater: (key, kanaalId, aan) => kern.theaterAbonneer(key, kanaalId, aan)
     }
   }));
+
+  /* De twee lezers naar buiten, read-only. Er is met opzet GEEN functie die alle
+     werken van iedereen teruggeeft: dat zou een publieke makerslijst zijn. */
+  kern.mediaMakerVanWerk = werkherkomst.makerVanWerk;
+  kern.mediaWerkenVan = werkherkomst.werkenVan;
 };

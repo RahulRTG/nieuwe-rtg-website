@@ -19,7 +19,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, wachtOpNetstilte, wachtOpRust } = require('./helper');
+const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, wachtOpNetstilte, wachtOpRust, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -68,8 +68,9 @@ async function metGezin(fn) {
        is dus niet zichtbaar tot een mens erop drukt -- en dat doet deze toets
        ook, want een toets die de tabbalk overslaat meet een scherm dat niemand
        zo ziet. */
-    await pg.waitForSelector('.rtgdeel-balk button', { timeout: 15000 });
-    await pg.getByRole('button', { name: 'Toevoegen', exact: true }).click();
+    await pg.waitForSelector('.rtgdeel-balk button', { state: 'attached', timeout: 15000 });
+    await edgeActies(pg);
+    await pg.locator('.rtg-adaptive-controls').getByRole('button', { name: 'Toevoegen', exact: true }).click();
     await pg.waitForSelector('#pinIn', { state: 'visible', timeout: 15000 });
     await fn({ pg, base, g, gezegd });
   } finally {

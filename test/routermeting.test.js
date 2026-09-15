@@ -22,12 +22,23 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
-const PAD = path.join(WORTEL, 'server/kern/ai/routermeting.js');
-const RUW = fs.readFileSync(PAD, 'utf8');
+/* De bron van BEIDE helften: de beweringen over "geen mens in de tellers" en
+   "geen weg naar een effect" gaan over de laag als geheel, en die is sinds de
+   splitsing twee bestanden. Alleen de gevel lezen zou de tellers ongetoetst
+   laten -- precies waar een sessiesleutel zou landen. */
+const RUW = ['server/kern/ai/routermeting.js', 'server/kern/ai/routertellers.js']
+  .map(p => fs.readFileSync(path.join(WORTEL, p), 'utf8')).join('\n');
 
 /* Elke toets een VERSE module: de tellers zijn moduletoestand, dus zonder dit
-   lekt de ene toets in de andere en bewijst de suite iets anders dan zij zegt. */
+   lekt de ene toets in de andere en bewijst de suite iets anders dan zij zegt.
+
+   ALLEBEI de modules moeten uit de cache, en dat is geen detail. De tellers
+   wonen sinds de splitsing in ./routertellers.js; alleen routermeting.js
+   verversen levert een verse gevel op een oude staat, en dan lekt er precies
+   wat deze helper moet tegenhouden. Vijf toetsen zakten daarop toen de
+   splitsing er kwam -- de helper zelf was de fout, niet de code. */
 function vers() {
+  delete require.cache[require.resolve('../server/kern/ai/routertellers')];
   delete require.cache[require.resolve('../server/kern/ai/routermeting')];
   return require('../server/kern/ai/routermeting');
 }

@@ -941,3 +941,124 @@ uitdrukkelijk **niet** zeven mechanismen op 7/7 — dat zou dezelfde verkeerde
 uniformiteit terugbrengen. `n.v.t.` is daar even belangrijk als `ja`: een
 mechanisme zonder uitvoering hoort niet rood te staan omdat het geen
 uitvoeringscrash kan hebben.
+
+---
+
+## 10. De drie besluiten, genomen (15 september 2026)
+
+Par. 9 eindigde met drie dingen die een besluit vroegen en geen bouwwerk. Ze
+zijn genomen. Ze staan hier met hun consequentie, zodat de volgende ronde niet
+opnieuw begint bij de vraag.
+
+### 10.1 Geen verplichte tweede spoorregel
+
+**Besluit: een vertegenwoordigde handeling schrijft zoveel append-only
+gebeurtenissen als nodig zijn om de werkelijk bekende toestand ondubbelzinnig te
+reconstrueren — niet standaard één en niet standaard twee.**
+
+De ringbuffer wordt dus niet twee keer zo snel opgegeten omdat we toevallig een
+levensloop willen modelleren. Concreet:
+
+| geval | gebeurtenissen |
+|---|---|
+| weigering | **één** terminale regel (beoordeeld, geweigerd, met reden; niets uitgevoerd) |
+| lokale transactionele uitvoering | **één** definitieve toestand, mits de atomiciteit werkelijk is bewezen |
+| externe handeling | **meer**: toegestaan → uitvoering aangezet → uitkomst onbekend → gereconcilieerd |
+
+Append-only blijft intact zonder het normale geval te verdubbelen.
+
+**Retentie is een eigen probleem en wordt hier niet stilletjes meebeslist.** De
+ringbuffer mag een snelle operationele projectie zijn; hij mag niet ongemerkt de
+volledige historische garantie definiëren. Welke bewaartermijn juridisch en
+productmatig nodig is, is een apart besluit — dezelfde scheiding die het
+inzagejournaal al heeft afgedwongen: *integriteit ≠ retentie*.
+
+### 10.2 Drie zekerheidsprofielen, en geen nieuwe ladder
+
+**Besluit: één semantiek, per transactiegrens een expliciet profiel.**
+
+1. **Lokaal transactioneel.** Spoor en toestand committen samen. Geen halve
+   uitkomst: niet spoor-ja/uitvoering-nee en niet andersom.
+2. **Extern reconcileerbaar** (de aanbieder heeft idempotency, status of
+   reconciliatie): duurzame intentie → uitvoering → bevestiging of onbekend →
+   reconciliatie. **Een crash ná verzending betekent dus niet automatisch
+   opnieuw proberen.**
+3. **Extern niet-reconcileerbaar.** `uitvoeringBekend: false` blijft de waarheid
+   en er volgt menselijke of operationele afhandeling. Niet gokken, en **niet
+   opnieuw uitvoeren omdat er geen succes staat.** Dat laatste is een van de
+   scherpste economische veiligheidsregels die dit huis kan hebben.
+
+Er komt géén nieuwe zekerheidsladder: het bestaande vocabulaire van
+`kern/platformfout.js` (`uitvoeringBekend` plus `herhaalbaar`) drukt dit uit.
+
+### 10.3 Een effectklasse volgt de HANDELING, niet de vertegenwoordiging
+
+**Besluit: ja, dit mag CRASHAS niet blind houden — maar er komt geen
+`REPRESENTATION = STATE`.** Vertegenwoordiging kan ook lezen, voorstellen of
+beoordelen. De klasse hoort bij de handeling die eronder ligt:
+
+```
+vertegenwoordiging  ->  handeling  ->  effectprofiel
+```
+
+Daaruit volgt de invariant die verder reikt dan deze laag:
+
+> **Vertegenwoordiging verandert de actor en de bevoegdheid, niet de
+> effectsemantiek van de onderliggende handeling.** Mag Noah handeling X zelf
+> uitvoeren en is die `RECOVERABLE + STATE`, dan valt X niet buiten CRASHAS
+> omdat Sophie hem namens Noah uitvoert.
+
+CRASHAS hoeft dus niets over vertegenwoordiging te weten. Zijn bestaande
+klassefilter blijft staan; wat moet kloppen is dat een vertegenwoordigde
+handeling dezelfde effectwaarheid draagt als dezelfde handeling door de
+principal zelf.
+
+**En daar zit vandaag een obstakel dat gemeten hoort te zijn vóór iemand één
+regel toevoegt.** `effectcollecties.js` klasseert **per COLLECTIE** — één klasse
+en één grond per naam. De collectie `vertegenwoordigingen` draagt per lid drie
+verschillende soorten inhoud tegelijk:
+
+| veld | wat het is |
+|---|---|
+| `machtigingen` | de machtigingen zelf — een RECHT dat wordt verleend |
+| `log` | het spoor — een verantwoordingsregel OVER toegang |
+| `grens` | de staande eigen grens van de cliënt |
+
+Eén klasse kan die drie niet eerlijk dekken. `vertegenwoordigingen:
+['RECHT_VERLENEN', …]` invullen is dus niet de uitvoering van dit besluit maar
+een kortere weg eromheen.
+
+**En er is een tweede reden om hier nog niets in te vullen, en die is scherper:
+er is vandaag geen onderliggende handeling.** `handel()` voert niets uit; het
+enige dat er geschreven wordt is het spoor. De invariant van 10.3 heeft dus nog
+geen ONDERWERP in deze laag — precies de vorm van MN-03, waar de regel klopt en
+het geval nog niet bestaat. Zij wordt scherp op het moment dat één mechanisme
+werkelijk namens iemand uitvoert, en dat is dezelfde stap als 10.2.
+
+### 10.4 Twee bevindingen blijven met opzet open
+
+Beide uit par. 9.2, en beide zijn een BESLUIT en geen reparatie.
+
+**`gelogd: true` dat `stuur()` weggooit** is een projectievraag, geen
+serialisatiefout. De oplossing is niet vanzelf *laat alle interne velden door
+naar HTTP*. Misschien is `gelogd` intern bewijs en hoort de cliënt alleen 403 met
+een reden te zien; misschien is *"deze geweigerde poging is vastgelegd"* juist een
+belofte aan de gebruiker. Dat verschil hoort iemand te kiezen.
+
+**Het ontbreken van een rollback** is pas te beoordelen als vaststaat wat het
+geheugenmodel REPRESENTEERT. Is het een afgeleide projectie die na persistentie
+opnieuw wordt opgebouwd, dan is een klassieke rollback mogelijk het verkeerde
+gereedschap. Draagt het autoritatieve toestand, dan is het een ander verhaal.
+
+### 10.5 Wat de volgende ronde wordt
+
+Niet *het uniforme spoor bouwen*. Wel: **voor het eerst één mechanisme de hele
+keten laten bewijzen** — bevoegdheid → verplicht spoor → echte uitvoering →
+eerlijke uitkomst → crashgedrag. De kandidaat is `app-machtiging`, want daar is
+`m.doe()` synchroon in-process en valt profiel 1 uit 10.2 werkelijk te halen.
+
+Staat dat, dan bestaat de referentie voor de combinatie die vandaag bewust
+nergens bestaat — en pas dán verandert `SPOORVORM` van vraag. De oude meter gaat
+niet weg voordat de nieuwe bewezen is, en in de nieuwe is **`n.v.t.` geen
+tekort**: een mechanisme zonder uitvoering hoort niet rood te staan omdat het
+geen uitvoeringscrash kan hebben.

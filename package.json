@@ -380,6 +380,8 @@
     "crashproef:vast": "node scripts/crashproef.js --vastleggen",
     "stagevorm": "node scripts/stagevorm.js",
     "stagevorm:vast": "node scripts/stagevorm.js --vastleggen",
+    "namensvorm": "node scripts/namensvorm.js",
+    "namensvorm:vast": "node scripts/namensvorm.js --vastleggen",
     "wekdekking": "node scripts/wekdekking.js",
     "wekdekking:vast": "node scripts/wekdekking.js --vastleggen",
     "ondernemerbewijs": "node scripts/ondernemerbewijs.js",

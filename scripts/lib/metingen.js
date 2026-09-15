@@ -125,6 +125,14 @@ const REGISTER = {
      hernoemde map in plaats van door een feit, en leest de nul plotseling als
      bevestiging terwijl hij een blinde vlek is. */
   'STAGEVORM.json': { meter: ['stageDomeinenGemeten'] },
+  /* NAMENSVORM.json meet of de manieren van namens-iemand-handelen een machine
+     delen (REPRESENTATIE.md par. 0). Zelfde soort als STAGEVORM.json hierboven
+     en om dezelfde reden is de geratelde waarde het BEREIK: de nullen zijn de
+     bevinding waar het document op staat, en een bevinding die beweegt is
+     nieuws -- maar hoeveel mechanismen de meter heeft NAGELOPEN mag niet stil
+     dalen, want dan zakt de gedeeldheid door een hernoemd bestand in plaats van
+     door een feit. */
+  'NAMENSVORM.json': { meter: ['namensMechanismenGemeten'] },
   /* WEKDEKKING.json zet het BESLUIT (welke brongebeurtenis mag de publieke rail
      op, scripts/lib/wekbesluit.js) naast de METING. Geratelde is
      `wekZonderUitspraak`: publieke domeinen waarover het besluitregister

@@ -427,6 +427,23 @@ const GETALLEN = {
     wat: 'landen met een aanwijsbaar ondernemingsregister' },
   'land.zonderEnige': { bron: 'LANDDEKKING.json', veld: 'telling.landenZonderEnige',
     wat: 'landen waar RTG alleen kennis heeft en geen enkele uitvoeringsas' },
+  /* DE DOORBELASTINGSMETER, en let op WELKE helft welk getal levert. `vorm.*`
+     komt uit deel A (de structurele vraag: kan een geldvorm herkomst dragen),
+     `norm.*` uit deel B1 (de gezaaide wereld). Die twee worden nooit opgeteld en
+     staan daarom ook hier als aparte sleutels -- een enkel merkteken dat ze zou
+     samenvatten, bestaat met opzet niet. Deel B2 (de werkelijke opslag) levert
+     hier GEEN getal: zijn noemer is vandaag nul, en een levend getal over een
+     lege noemer leest als een meting terwijl er niemand heeft geteld. */
+  'doorbelasting.geldvormen': { bron: 'DOORBELASTING.json', veld: 'vorm.geldvormen',
+    wat: 'objectvormen in server/ die een bedrag dragen' },
+  'doorbelasting.volgbaar': { bron: 'DOORBELASTING.json', veld: 'vorm.volgbaar',
+    wat: 'geldvormen die naast het bedrag ook een herkomst dragen' },
+  'doorbelasting.nietVolgbaar': { bron: 'DOORBELASTING.json', veld: 'vorm.nietVolgbaar',
+    wat: 'geldvormen met een bedrag en geen herkomst ernaast' },
+  'doorbelasting.normRijen': { bron: 'DOORBELASTING.json', veld: 'norm.rijen',
+    wat: 'rijen in de gezaaide wereld die als norm dient' },
+  'doorbelasting.normNietVolgbaar': { bron: 'DOORBELASTING.json', veld: 'norm.nietVolgbaar',
+    wat: 'rijen in die wereld die met opzet niet te volgen zijn' },
   'soeverein.dragers': { bron: 'SOEVEREIN.json', veld: 'ladder.telling.dragers',
     wat: 'dragers in de isolatieladder (kern/isolatie/dragers.js)' },
   'soeverein.metSleutel': { bron: 'SOEVEREIN.json', veld: 'ladder.telling.metSleutelBijVerzoek',

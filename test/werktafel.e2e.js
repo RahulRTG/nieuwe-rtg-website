@@ -543,7 +543,7 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
     await page.click('#agPasskey');
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
     await page.waitForFunction(() => {
-      const b = document.querySelector('.cmd-balk');
+      const b = document.querySelector('.rtg-adaptive-bar');
       return document.styleSheets.length > 0 && b && b.getBoundingClientRect().height > 0;
     }, null, { timeout: 20000 });
 
@@ -638,7 +638,7 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
     await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
     await page.waitForFunction(() => {
-      const b = document.querySelector('.cmd-balk');
+      const b = document.querySelector('.rtg-adaptive-bar');
       return document.styleSheets.length > 0 && b && b.getBoundingClientRect().height > 0;
     }, null, { timeout: 20000 });
 
@@ -655,9 +655,9 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
         bladen: document.querySelectorAll('.cmd-pane').length,
         gateVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
         appActief: document.getElementById('app').classList.contains('active'),
-        balk: Math.round(document.querySelector('.cmd-balk').getBoundingClientRect().height),
-        balkRuw: document.querySelector('.cmd-balk').getBoundingClientRect().height,
-        balkStijl: getComputedStyle(document.querySelector('.cmd-balk')).height,
+        balk: Math.round(document.querySelector('.rtg-adaptive-bar').getBoundingClientRect().height),
+        balkRuw: document.querySelector('.rtg-adaptive-bar').getBoundingClientRect().height,
+        balkStijl: getComputedStyle(document.querySelector('.rtg-adaptive-bar')).height,
         uitnodiging: getComputedStyle(document.querySelector('.cmd-balkbladen'), '::after').content,
       };
     });
@@ -698,8 +698,8 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
        bovendien niet de taak van deze toets: die staat in scripts/raakvlakkeuring.js
        en wordt over elk scherm gemeten. Zakt hij toch nog, dan zegt de melding
        nu ook WAT er stond. */
-    assert.ok(geland.balk >= 47 && geland.balk <= 49,
-      'onderaan hoort alleen de wereldbalk te staan (48px), gemeten: ' + geland.balk +
+    assert.ok(geland.balk >= 67 && geland.balk <= 69,
+      'onderaan hoort alleen de standaard Edge-balk te staan (68px), gemeten: ' + geland.balk +
       ' (ruw ' + geland.balkRuw + ', computed ' + geland.balkStijl + ')');
     assert.match(geland.uitnodiging, /Kies een wereld/);
 

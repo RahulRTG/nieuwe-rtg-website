@@ -3,6 +3,31 @@
   function haptic(win) {
     try { if (win.navigator && win.navigator.vibrate) win.navigator.vibrate(8); } catch (e) {}
   }
+  function prepare(rt, action) {
+    ['.rtg-edge-menu', '.rtg-edge-ai', '.rtg-edge-state', '.rtg-edge-2-context-button'].forEach(function (selector) {
+      var button = rt.edge.root.querySelector(selector + '[aria-expanded="true"]');
+      if (button) button.click();
+    });
+    if (action !== 'ai') {
+      var context = rt.edge.root.querySelector('.rtg-edge-2-context-button');
+      if (context) context.click();
+    }
+  }
+  function reflect(rt) {
+    rt.sheet.id = 'rtgAdaptiveActions';
+    rt.bar.querySelectorAll('button').forEach(function (button) {
+      var action = button.dataset.rtgAdaptiveAction;
+      var selector = { menu: '.rtg-edge-menu', worlds: '.rtg-edge-menu', ai: '.rtg-edge-ai' }[action];
+      var source = selector && rt.edge.root.querySelector(selector);
+      var sheet = action === 'context' || action === 'primary' || action === 'ai' &&
+        !!rt.doc.querySelector('#rtgCommand .cmd-vraagvorm,#rvRahul');
+      if (!sheet && !source) return;
+      var expanded = sheet ? String(rt.model.state === 'expanded') : source.getAttribute('aria-expanded') || 'false';
+      var controls = sheet ? rt.sheet.id : source.getAttribute('aria-controls');
+      if (button.getAttribute('aria-expanded') !== expanded) button.setAttribute('aria-expanded', expanded);
+      if (controls && button.getAttribute('aria-controls') !== controls) button.setAttribute('aria-controls', controls);
+    });
+  }
   function bind(rt, handlers) {
     var down = false, x = 0, y = 0, timer = null, held = false, blockClickUntil = 0;
     rt.bar.addEventListener('pointerdown', function (event) {
@@ -52,5 +77,5 @@
       } else if (event.key === 'Escape') handlers.escape();
     });
   }
-  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, haptic: haptic });
+  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, haptic: haptic, prepare: prepare, reflect: reflect });
 }(window));

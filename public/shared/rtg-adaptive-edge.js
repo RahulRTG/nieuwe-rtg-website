@@ -29,9 +29,11 @@
     return false;
   }
   function execute(action) {
-    if (action === 'context' || (action === 'ai' && d.querySelector('#rtgCommand .cmd-vraagvorm'))) {
+    if (action === 'context' || action === 'primary' || (action === 'ai' && d.querySelector('#rtgCommand .cmd-vraagvorm,#rvRahul'))) {
+      Input.prepare(rt, action);
       setDeck(action === 'ai' ? 'rahul' : 'actions'); setState('expanded'); return true;
     }
+    setState('dock');
     var custom = rt.model.registry[action];
     if (custom && custom.run) { if (K.allowed(custom)) { custom.run(); return true; } return false; }
     if (action === 'home') { w.location.href = rt.edge.cfg.home; return true; }
@@ -40,8 +42,6 @@
     if (action === 'menu') return legacy('.rtg-edge-menu');
     if (action === 'status') return legacy('.rtg-edge-state');
     if (action === 'ai') return legacy('.rtg-edge-ai');
-    if (action === 'context') return legacy('.rtg-edge-2-context-button') || legacy('.rtg-edge-actions-trigger');
-    if (action === 'primary') return legacy('[data-rtg-edge-primary]:not([hidden])') || legacy('.rtg-edge-actions-trigger');
     if (action === 'presence') return rt.model.presence && rt.model.presence.action ? execute(rt.model.presence.action) : false;
     if (action === 'connect') {
       var event = new w.CustomEvent('rtg-adaptive-connect', { bubbles: true, cancelable: true });

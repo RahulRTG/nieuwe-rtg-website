@@ -840,7 +840,7 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
       return { tabs: getComputedStyle(tabs).display !== 'none' && tabs.getBoundingClientRect().height > 0,
         schil: getComputedStyle(schil).display !== 'none' && schil.getBoundingClientRect().height > 0 };
     });
-    assert.equal(bureau.tabs, true, 'op bureau hoort TravelOS zijn eigen navigatie te behouden');
+    assert.equal(bureau.tabs, false, 'ook op bureau gaat TravelOS via de gedeelde Edge');
     assert.equal(bureau.schil, true, 'de gedeelde Edge blijft ook op bureau zichtbaar');
     await page.close();
   });
@@ -1043,8 +1043,8 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
         kindnav: zichtbaar(leaf && leaf.contentDocument.querySelector('.tos-nav')),
         directeBladen: frames.length };
     });
-    assert.deepEqual(bureau, { bank: true, schil: false, kindnav: false, directeBladen: 2 },
-      'bureau herstelt niet precies de eigen Reizen & Veilig-rail');
+    assert.deepEqual(bureau, { bank: false, schil: true, kindnav: false, directeBladen: 2 },
+      'bureau moet dezelfde gedeelde Edge behouden');
 
     await page.setViewportSize({ width: 393, height: 852 });
     await page.waitForFunction(() => {
@@ -1212,7 +1212,7 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
     await page.click('#rtgCommand [data-ss-action="close"]');
     await page.waitForFunction(() => {
       const r = document.getElementById('rtgCommand');
-      const deur = document.querySelector('.rtg-edge-menu[data-rtg-command-owner="true"]') ||
+      const deur = document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]') ||
         r.querySelector('.cmd-lade');
       return r.dataset.rtgSecondScreen === 'peek' && document.activeElement === deur;
     });

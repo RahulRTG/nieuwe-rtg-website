@@ -184,7 +184,7 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
       await metDocument(page, async () => {
         const maat = await page.evaluate(() => {
           const b = document.querySelector('.rtg-adaptive-bar');
-          const r = document.querySelector('.rtg-adaptive-controls .cmd-actierij');
+          const r = document.querySelector('.rtg-adaptive-controls');
           return { balk: b.clientWidth, venster: window.innerWidth,
             rijClient: r.clientWidth, rijScroll: r.scrollWidth };
         });
@@ -289,7 +289,7 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
        weg. */
     await metLid(1440, 900, async (page) => {
       await page.waitForSelector('#rtgCommand .cmd-bank', { state: 'visible', timeout: 20000 });
-      assert.equal(await page.locator('.rtg-adaptive-controls .cmd-acties:visible').count(), 0,
+      assert.equal(await page.locator('#rtgCommand .cmd-acties:visible').count(), 0,
         'de contextzone hoort op een breed scherm niet zichtbaar te zijn');
     });
   });

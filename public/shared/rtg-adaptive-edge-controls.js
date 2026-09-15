@@ -3,7 +3,7 @@
    remain authoritative. Declared capabilities use the existing weight gate. */
 (function (w, d) {
   'use strict';
-  var ROOTS = '.cmd-balk,.wos-dock,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar';
+  var ROOTS = '.cmd-balk,.wos-dock,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar';
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
     for (var p = el; p; p = p.parentElement) {
@@ -30,6 +30,7 @@
     return items.length || A && A.context().acties.length ? items : command && command.rtgEdgeItems ? command.rtgEdgeItems() : [];
   }
   function render(rt) {
+    w.RTGAdaptiveEdgeInput.reflect(rt);
     var container = rt.controls;
     if (!container) {
       container = d.createElement('div'); container.className = 'rtg-adaptive-controls';
@@ -46,6 +47,12 @@
       rt.sheet.appendChild(panel);
     }
     if (panel && rt.model.state === 'expanded') panel.hidden = false;
+    var travelQuestion = d.getElementById('rvRahul');
+    if (travelQuestion && !rt.travelQuestion) {
+      rt.travelQuestion = travelQuestion; rt.travelQuestionParent = travelQuestion.parentElement;
+      rt.sheet.prepend(travelQuestion);
+    }
+    if (travelQuestion) travelQuestion.hidden = rt.model.deck !== 'rahul';
     var items = currentItems();
     if (items.length && w.RTGAdaptiefBalkKnoppen) {
       var buttons = w.RTGAdaptiefBalkKnoppen({ items: function () { return items; }, titel: function () { return A.context().titel; } });
@@ -110,6 +117,7 @@
       frame = w.requestAnimationFrame(function () { frame = 0; render(rt); });
     }
     var observer = new w.MutationObserver(function (records) {
+      w.RTGAdaptiveEdgeInput.reflect(rt);
       var commandBar = d.querySelector('#rtgCommand .cmd-balk');
       if (commandBar && commandBar.classList.contains('vraagt')) {
         if (rt.questionOwner !== commandBar) {
@@ -121,7 +129,7 @@
         (r.target.closest && r.target.closest(ROOTS)); })) refresh();
     });
     observer.observe(d.body, { subtree: true, childList: true, attributes: true,
-      attributeFilter: ['disabled', 'hidden', 'class', 'aria-disabled', 'aria-current', 'aria-pressed'] });
+      attributeFilter: ['disabled', 'hidden', 'class', 'aria-disabled', 'aria-current', 'aria-pressed', 'aria-expanded'] });
     var unsubscribe = w.RTGAdaptief && w.RTGAdaptief.opContext(refresh);
     rt.controlsStop = function () {
       observer.disconnect(); if (frame) w.cancelAnimationFrame(frame);
@@ -129,10 +137,11 @@
       if (rt.contextPanel && rt.contextParent) {
         rt.contextPanel.hidden = true; rt.contextParent.appendChild(rt.contextPanel);
       }
+      if (rt.travelQuestion && rt.travelQuestionParent) {
+        rt.travelQuestion.hidden = false; rt.travelQuestionParent.appendChild(rt.travelQuestion);
+      }
     };
     render(rt);
-    /* A changing inset must also reflow the existing workspace surfaces. */
-    w.requestAnimationFrame(function () { w.dispatchEvent(new Event('resize')); });
   }
   w.RTGAdaptiveEdgeControls = Object.freeze({ start: start });
 }(window, document));

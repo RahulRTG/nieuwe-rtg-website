@@ -90,7 +90,7 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
          systeemingang is nu de mond in de Edge-onderrand; die opent dezelfde
          echte werkruimte en dus dezelfde command.js-handlers. */
       await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
-      assert.equal(await page.locator('.rtg-edge-ai').count(), 1,
+      assert.equal(await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]').count(), 1,
         'er is exact één zichtbare Rahul-ingang');
       if (!lagenGetoetst) {
         /* De Werk-Rahul vervangt alleen het generieke AI-vlak; hij moet de
@@ -124,7 +124,7 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
           return x && (x.hidden || !x.classList.contains('page'));
         });
 
-        await page.click('.rtg-edge-2-context-button');
+        await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]');
         await page.waitForSelector('.rtg-edge-2-context:not([hidden])');
         await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
         await page.waitForSelector('.wk-rahul.page:not([hidden])');
@@ -135,9 +135,9 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
         /* En andersom: een Edge-laag sluit de echte Werk-Rahul vóór zij zelf
            opent. Eén richting testen liet eerder twee aangekondigde lagen toe. */
         for (const [knop, openLaag] of [
-          ['.rtg-edge-menu', '.rtg-edge-index[aria-hidden="false"]'],
+          ['.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]', '.rtg-edge-index[aria-hidden="false"]'],
           ['.rtg-edge-state', '.rtg-edge-status-panel[aria-hidden="false"]'],
-          ['.rtg-edge-2-context-button', '.rtg-edge-2-context:not([hidden])']
+          ['.rtg-adaptive-bar [data-rtg-adaptive-action="context"]', '.rtg-adaptive-sheet:not([hidden])']
         ]) {
           await page.click(knop);
           await page.waitForSelector(openLaag);
@@ -145,7 +145,7 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
             knop + ' sluit eerst de Werk-Rahul');
           assert.equal(await page.locator('.rtg-edge-ai[aria-expanded="true"]').count(), 0,
             knop + ' laat Rahul niet als open aangekondigd staan');
-          if (knop === '.rtg-edge-2-context-button') await page.click('.rtg-edge-2-context-close');
+          if (knop.includes('context')) await page.click('[data-rtg-adaptive-close]');
           else await page.click(knop);
           await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
           await page.waitForSelector('.wk-rahul.page:not([hidden])');

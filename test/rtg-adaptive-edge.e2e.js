@@ -89,6 +89,10 @@ test('Adaptive Edge is één tastbare RTG-laag op mobiel en desktop',
             assert.ok(k.width >= 43.5 && k.height >= 43.5, 'raakvlak is ' + k.width + 'x' + k.height);
             assert.ok(k.labelWeight >= 600, 'label is te licht: ' + k.labelWeight);
           });
+          await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+          await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]');
+          await page.keyboard.press('Escape');
+          await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]', { state: 'hidden' });
           if (maat.width === 390) {
             const veeg = async (dx, dy) => page.evaluate(([x, y]) => {
               const bar = document.querySelector('.rtg-adaptive-bar'), r = bar.getBoundingClientRect();
@@ -110,6 +114,69 @@ test('Adaptive Edge is één tastbare RTG-laag op mobiel en desktop',
         } finally { await page.close(); }
       });
     }
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+  }
+});
+
+test('Edge voert appbediening uit, controleert actuele beschikbaarheid en sluit werkbladen',
+  { skip: geenBrowser(pw) }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    const call = async (url, body, token) => {
+      const response = await fetch(base + url, { method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+        body: JSON.stringify(body) });
+      assert.equal(response.status, 200, url);
+      return response.json();
+    };
+    const account = await call('/api/auth/register', { name: 'Edge Proef',
+      email: 'edge' + Date.now() + '@voorbeeld.test', password: 'Edge-proef-12345',
+      geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+    await call('/api/onboarding/teken', { naam: 'Edge Proef', akkoord: true }, account.token);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(token => {
+      localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, account.token);
+    const page = await context.newPage();
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await wacht(page, '/apps/app.html');
+    await page.waitForSelector('#rtgCommand[data-stand="open"]');
+    assert.equal(await page.locator('.cmd-balk').isVisible(), false);
+
+    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]').click();
+    await page.locator('.rtg-adaptive-question input').fill('open LIFE');
+    await page.locator('.rtg-adaptive-question button').click();
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.cmd-pane iframe'))
+      .some(frame => frame.getAttribute('src') === '/apps/rtg.html'));
+    assert.equal(await page.locator('.cmd-praat').isVisible(), true, 'the existing reply remains readable above Edge');
+    await require('./helper').edgeActies(page);
+    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: 'Sluit dit werkblad', exact: true }).click();
+    await page.waitForSelector('.cmd-pane', { state: 'detached' });
+
+    // A retained proxy must recheck its original control at the moment of use.
+    await page.evaluate(() => {
+      window.__edgeExecutions = 0;
+      const root = document.createElement('nav'); root.className = 'wos-dock'; root.id = 'edgeProbe';
+      const button = document.createElement('button'); button.id = 'edgeProbeAction'; button.textContent = 'Proefhandeling';
+      button.onclick = () => window.__edgeExecutions++;
+      root.appendChild(button); document.body.appendChild(root);
+    });
+    await require('./helper').edgeActies(page);
+    const source = page.locator('[data-rtg-adaptive-source="edgeProbeAction"]');
+    await source.waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#edgeProbe').isVisible(), false);
+    await source.evaluate(proxy => { document.getElementById('edgeProbeAction').disabled = true; proxy.click(); });
+    assert.equal(await page.evaluate(() => window.__edgeExecutions), 0, 'disabled owner cannot execute through a stale proxy');
+    await page.evaluate(() => { document.getElementById('edgeProbeAction').disabled = false; });
+    await source.click();
+    assert.equal(await page.evaluate(() => window.__edgeExecutions), 1, 'the real click reaches its existing handler once');
+    await require('./helper').edgeActies(page);
+    await source.evaluate(proxy => { document.getElementById('edgeProbe').remove(); proxy.click(); });
+    assert.equal(await page.evaluate(() => window.__edgeExecutions), 1, 'removed owner cannot execute through a retained proxy');
   } finally {
     if (browser) await browser.close();
     await stop(child);

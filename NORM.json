@@ -28,12 +28,12 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1580,
+    "kernBreedte": 1581,
     "kernGedeeld": 238,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 331,
+    "keuringOmvang": 332,
     "keuringScheef": 17,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -123,6 +123,26 @@
     "veranderbereikZonderBereik": 828
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 331,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 331 -> 332",
+      "reden": "De gezamenlijke keuring meet 332 serverbestanden in de waarschuwingsband: de actuele 331 plus server/kern/reisbureau.js uit PR 287. De omvanggroei en eigendomsgrens van de drie opslagdeuren zijn in de oorspronkelijke PR-notitie verklaard (327 -> 328), die behouden blijft. De harde 10 kB-grens verandert niet.",
+      "waarheen": "De oorspronkelijke, bewaarde post uit PR 287 bepaalt de vervolgstap; de gezamenlijke merge voegt buiten die wijziging geen extra schuld toe."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1580,
+      "vervalt": "2026-12-15",
+      "meter": "kernBreedte 1580 -> 1581",
+      "reden": "De gezamenlijke routekaart meet 1581: de 1580 namen van de actuele main/Neiging-lijn plus reisbetaling uit PR 287. Die nieuwe capability was in de eigen bronlijn al expliciet verklaard (1578 -> 1579). De oorspronkelijke notitie blijft behouden; dit brengt uitsluitend de twee samenvoegbare tellingen op dezelfde basis.",
+      "waarheen": "De oorspronkelijke, bewaarde post uit PR 287 bepaalt de vervolgstap; de gezamenlijke merge voegt buiten die wijziging geen extra schuld toe."
+    },
     {
       "datum": "2026-09-15",
       "soort": "schuld",

@@ -31,7 +31,11 @@ body[data-rtg-edge-venster-open="true"] .rtg-adaptive-edge{visibility:hidden;poi
 @media print{.rtg-adaptive-edge{display:none!important}}
 
 /* Every domain uses the same Edge surface; hidden sources retain only their handlers. */
-body[data-rtg-adaptive-ready="true"] :is(#rtgCommand .cmd-balk,.wos-dock,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar){display:none!important}
+body[data-rtg-adaptive-ready="true"] :is(#rtgCommand .cmd-balk,.wos-dock,.rv-bank,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar){display:none!important}
+body[data-rtg-adaptive-ready="true"] #rvApp{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
+body[data-rtg-adaptive-ready="true"] #rvApp>.rv-werk{grid-column:1;grid-row:1;grid-template-rows:minmax(0,1fr)}
+.rtg-adaptive-sheet>#rvRahul{position:static;transform:none;width:100%;height:auto;min-height:58px;margin-bottom:16px}
+.rtg-adaptive-sheet>#rvRahul[hidden]{display:none!important}
 body[data-rtg-adaptive-ready="true"] #rtgCommand .cmd-werk{grid-template-rows:minmax(0,1fr)!important}
 body[data-rtg-adaptive-ready="true"] #rtgCommand .cmd-praat{bottom:0}
 .rtg-adaptive-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}

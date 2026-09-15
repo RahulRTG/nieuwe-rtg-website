@@ -119,14 +119,14 @@ body.amn-zwevend .rv-bank{padding-top:56px}
    woont al aan de duimzijde van de Command-balk. Alleen in dat expliciet door
    de bovenliggende werktafel gemarkeerde geval gaan de twee lokale kopieën uit.
    Standalone en bureau behouden hun eigen bank en reisassistent. */
-html.rtg-command-mobiel #rvApp{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
-html.rtg-command-mobiel #rvApp>.rv-bank,
-html.rtg-command-mobiel #rvApp>.rv-rahul{display:none!important}
-html.rtg-command-mobiel #rvApp>.rv-werk{grid-column:1;grid-row:1}
+html.rtg-command-blad #rvApp{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
+html.rtg-command-blad #rvApp>.rv-bank,
+html.rtg-command-blad #rvApp>.rv-rahul{display:none!important}
+html.rtg-command-blad #rvApp>.rv-werk{grid-column:1;grid-row:1}
 @media(max-width:760px){
-  html.rtg-command-mobiel #rvApp>.rv-werk{grid-template-rows:minmax(0,1fr)}
-  html.rtg-command-mobiel #rvApp .rv-tabs{display:none}
-  html.rtg-command-mobiel #rvApp .rv-panes{padding-bottom:0}
+  html.rtg-command-blad #rvApp>.rv-werk{grid-template-rows:minmax(0,1fr)}
+  html.rtg-command-blad #rvApp .rv-tabs{display:none}
+  html.rtg-command-blad #rvApp .rv-panes{padding-bottom:0}
 }
 
 /* TravelOS-voorplein: dezelfde fotografische grammatica als Vluchten,

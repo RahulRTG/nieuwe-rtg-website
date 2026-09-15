@@ -538,7 +538,30 @@ async function elevateTier(base, memberToken, pas, approverToken) {
    run. Hem meetellen als "JS-fout op de pagina" maakt de tests onbetrouwbaar
    zonder ook maar iets te bewaken. Alles wat WEL uit onze code komt telt
    onverkort mee -- dit filter noemt precies een bericht, geen patroon. */
-const BROWSERRUIS = ['Transition was skipped'];
+/* BROWSERRUIS: meldingen die de BROWSER over zijn EIGEN animatie doet, en die
+   niets over de app zeggen. Exact-match, met opzet: een onbekende variant hoort
+   hardop te blijven opvallen in plaats van stil door een patroon te vallen.
+
+   LET OP DE VALKUIL DIE DEZE LIJST ZELF OPLEVERDE. Er stond alleen 'Transition
+   was skipped' in, en Chromium heeft van diezelfde familie meer dan een lid. Op
+   14 september 2026 zakte `Schermtoetsen deel 3 van 4` op move.e2e.js met
+   'Transition was aborted because of invalid state. ViewTransition opt-in
+   disabled' -- dezelfde soort melding, een andere letterlijke tekst, dus de
+   exact-match liet hem door als paginafout. Dat is een toetsdefect en geen
+   productdefect, en dat is niet mijn oordeel maar dat van de app zelf:
+   public/shared/rtg-heritage-transition.js doet `transition.ready.catch(...)`
+   en slikt precies deze afwijzing expres in. Een toets die hem alsnog als fout
+   aanrekent, spreekt de code tegen die hij toetst.
+
+   Het bewijs dat het geen echte fout was: de vorige kop van diezelfde tak stond
+   op dit bestand GROEN, en het verschil tussen die twee koppen was een
+   workflowbestand, een markdown-register en een unittoets uit een andere scherf
+   -- geen byte die een browser laadt. Zelfde schermcode, andere uitslag.
+
+   Zet hier dus alleen een melding bij die de browser over zijn eigen animatie
+   doet. Alles wat de APP zegt hoort door te komen. */
+const BROWSERRUIS = ['Transition was skipped',
+  'Transition was aborted because of invalid state. ViewTransition opt-in disabled'];
 function letOpFouten(page, bak) {
   /* De eigen browserdriver (server/lib/browser.js) heeft geen .on. Vroeger stond
      bij elke aanroeper `if (page.on)` ervoor; nu staat die vraag hier, op een

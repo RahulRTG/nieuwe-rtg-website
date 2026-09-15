@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1674,
-    "toetsenNietGemeten": 624,
+    "toetsenNietGemeten": 625,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -171,11 +171,11 @@
       "datum": "2026-09-15",
       "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
-      "van": 623,
+      "van": 624,
       "vervalt": "2026-12-15",
-      "meter": "toetsenNietGemeten 623 -> 624",
+      "meter": "toetsenNietGemeten 624 -> 625",
       "reden": "test/spoorvorm.test.js komt erbij -- elf toetsen op de convergentiematrix -- en staat nog niet in MUTATIES.json. Vier ervan ZIJN een mutatie (op verzonnen lijven, want op de echte boom haalt alleen de referentie vier van vier), en de meter is daarnaast met de hand gemuteerd: de V-3-regel terugzetten naar de oude fout laat toets 1, 2, 4 en 8 zakken, en `onbepaald` als NEE invullen laat toets 7 zakken. Toets 11 (het register klopt met een verse meting) is met twee mutaties nagetrokken: volledigConvergent van 1 naar 3 laat hem zakken, en `bijstand` V-2 vals op ja OOK -- die tweede beweegt geen enkele teller, en zonder de matrixregel zou het register een uitslag kunnen dragen die niet meer bij de code hoort terwijl alle vier de getallen kloppen. Eén mutatie vond een gat dat NIET is gerepareerd maar wel is opgeschreven in toets 8: het veld `besturing.inOrde` hardcoderen op true wordt door geen enkele toets gezien zolang de referentie toch vier haalt -- de inhoudelijke eigenschap is bewaakt, de vlag is een afgeleide.",
-      "waarheen": "Laat scripts/mutatie.js over test/spoorvorm.test.js lopen, samen met de namens-bestanden uit de notities hieronder."
+      "waarheen": "Laat scripts/mutatie.js over test/spoorvorm.test.js lopen, samen met de namens-bestanden uit de notities hieronder. NA HET SAMENGAAN MET MAIN (#288) is deze post van 623->624 naar 624->625 gezet, en dat is geen verschuiving maar bookkeeping: main ging op dezelfde dag zelf van 623 naar 624 met een eigen post, dus twee lijnen claimden dezelfde trede. De samenvoeging nam de WAARDE een keer over terwijl de BOOM beide bestanden draagt. De twee posten blijven apart -- samenvoegen zou wissen welke bestanden de motor nog moet zien."
     },
     {
       "datum": "2026-09-15",

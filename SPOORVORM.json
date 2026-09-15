@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T09:10:14.404Z",
-    "commit": "de26f808",
+    "op": "2026-09-15T10:34:57.780Z",
+    "commit": "29c3aed0",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/spoorvorm.js",
@@ -128,7 +128,8 @@
       "ingang": "roepKaal",
       "waarom": "de brug is de enige weg van een app naar RTG, en roepKaal() is waar hij doorgelaten of geweigerd wordt",
       "bestandenGevonden": [
-        "server/kern/appstore/brug.js"
+        "server/kern/appstore/brug.js",
+        "server/kern/appstore/brugweigering.js"
       ],
       "ingangGevonden": true,
       "gelezenIn": "server/kern/appstore/brug.js",

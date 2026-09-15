@@ -7,7 +7,7 @@
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
     "bewijsAchterstand": 2419,
-    "bewijsAlleenKeten": 16,
+    "bewijsAlleenKeten": 17,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 342,
@@ -119,7 +119,8 @@
     "spoorConvergent": 1,
     "stempelOngevraagd": 54,
     "stempelInPoort": 16,
-    "stempelSchrijversGezien": 211
+    "stempelSchrijversGezien": 211,
+    "veranderbereikZonderBereik": 828
   },
   "notities": [
     {
@@ -2606,6 +2607,15 @@
       "meter": "toetsenNietGemeten 624 -> 626",
       "reden": "test/econ01.test.js (6 toetsen) en test/eurodekking.test.js (6) komen erbij en staan nog niet in MUTATIES.json. Allebei zijn ze met de hand op mutaties nagetrokken, en de uitslagen staan hier zodat niemand hoeft te geloven dat het gebeurd is. ECON-01: de eigenaar WEL mee laten draaien bij een omkering laat 5 toetsen zakken waaronder de e2e; de eigenaarscontrole uit de handhaver halen laat toets 2 zakken; de gesloten grondenlijst openzetten laat toets 4 zakken. Dekking: valuta's toch samentellen, de wereld raden in plaats van hem te laten verklaren, de noemer niet absoluut nemen, en de strenge teller versoepelen tot volgbaar() -- alle vier laten toetsen zakken, de laatste twee stuks. Herstellen gaf telkens de volle uitslag. Wat deze teller meet is dat de MOTOR er nog niet langs is, en dat is iets anders dan een onbeproefde toets; dit blok verzacht de meting niet en de teller gaat gewoon omhoog.",
       "waarheen": "Laat scripts/mutatie.js over test/econ01.test.js en test/eurodekking.test.js lopen bij de eerstvolgende volle ronde; dan mag dit getal met twee omlaag. De toets die daar het hardst hoort te zakken is econ01 nr. 2: die bestaat juist om te laten zien dat een controle op het TOTAAL de fout NIET vangt."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "structureel",
+      "sleutel": "bewijsAlleenKeten",
+      "van": 16,
+      "meter": "bewijsAlleenKeten 16 -> 17",
+      "waarheen": "de job `dekking` in .github/workflows/ci.yml draagt het, en hij laat VERANDERBEREIK.json achter (sport `geraakt` in BEWIJSLADDER.json). Dat register hangt aan de ratel `veranderbereikZonderBereik`, dus het bewijs valt niet in een gat: wat de keten meet, wordt hier geteld.",
+      "reden": "scripts/veranderbereik.js komt erbij als mechanisme dat alleen in de keten draait. Dat is geen omissie maar de aard van de meting: hij leest de twee routejournalen en de duurregisters van alle vier de toetsscherven, en die zijn artefacten uit ANDERE jobs. Precies de categorie die de kop van deze tand al beschrijft (\"van de zestien lezen een artefact uit een andere job en kunnen hier per definitie niet\"). De tand bestaat om te voorkomen dat zulk bewijs erbij komt ZONDER dat iemand het opschrijft; dit is dat opschrijven. Lokaal is de meter wel degelijk te draaien (`npm run veranderbereik` leest .routejournaal en .toetsduur na een gewone `npm test`), maar hij staat niet in scripts/slotsuite.js en telt daarom als ketengebonden -- net als zijn buren scripts/attributie.js en scripts/dekking.js, die op dezelfde journalen leunen. Hem in de slotsuite zetten om dit getal te drukken zou de lokale releasesuite verbouwen om een teller te laten kloppen, en dat is de verkeerde volgorde."
     }
   ],
   "prestatie": {
@@ -2713,7 +2723,8 @@
     "neigingVoorkeurBlind": "2026-09-15",
     "stempelOngevraagd": "2026-09-15",
     "stempelInPoort": "2026-09-15",
-    "stempelSchrijversGezien": "2026-09-15"
+    "stempelSchrijversGezien": "2026-09-15",
+    "veranderbereikZonderBereik": "2026-09-15"
   },
   "uitzonderingen": [
     {

@@ -56,6 +56,12 @@ const EIGENAAR = {
      en worden door precies een script geschreven; ze staan hier zodat het getal
      van toets 4 daalt doordat er eigenaren bijkomen, en niet stijgt doordat er
      registers bijkomen zonder dat iemand zegt wie ze bezit. */
+  /* HET VERANDERBEREIK. Een schrijver, een ratel (veranderbereikZonderBereik in
+     scripts/lib/metingen.js) en een ijkproef in test/meterijk.test.js. Hij staat
+     hier om dezelfde reden als de twee hieronder: het getal van toets 4 hoort te
+     dalen doordat er eigenaren bijkomen, niet te stijgen doordat er registers
+     bijkomen zonder dat iemand zegt wie ze bezit. */
+  'VERANDERBEREIK.json': { schrijver: 'scripts/veranderbereik.js' },
   'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },

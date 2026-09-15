@@ -389,6 +389,12 @@ const REGISTERS = [
      waaraan), dan wat een schakelaar werkelijk aanzet, dan de treden zelf, dan de
      ingangen die geen route zijn, en tot slot de ene keten van begin tot eind. */
   ['VERSTRENGELING.json', 'npm run verstrengeling:vast', 'de require-graaf als laag+domein, en welke rand niemand verklaard heeft'],
+  /* HET VERANDERBEREIK hoort hier direct naast, want hij beantwoordt de andere
+     helft van dezelfde vraag: verstrengeling zegt welke BESTANDEN aan elkaar
+     hangen, dit zegt van welke TOETS het bronbestandbereik vaststaat. Zijn
+     vastlegweg draagt --onvolledig omdat een halve ronde zichzelf niet stil mag
+     vastleggen; een volle ronde heeft die vlag niet nodig. */
+  ['VERANDERBEREIK.json', 'npm run veranderbereik:vastleggen', 'van welke toets het bronbestandbereik vaststaat, langs de statische en de waargenomen as'],
   ['ACTIVERING.json', 'npm run activering:vast', 'wat een functie aanzetten werkelijk aanzet, met de graad van zekerheid erbij'],
   ['TREDEPROEF.json', 'node scripts/tredeproef.js --alle --vastleggen', 'of een trede lekt: zuiver, beproefd, de rondgang en de ingangen buiten HTTP'],
   ['WEKKERS.json', 'npm run wekkers:vast', 'de ingangen die geen route zijn (klok, bus, luisteraar, werker) en welke functie ze doen'],

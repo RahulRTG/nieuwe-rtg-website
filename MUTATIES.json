@@ -8854,6 +8854,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "veranderbereik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/veranderbereik.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
     "verband.test.js": {
       "soort": "puur",
       "staat": "gezakt",

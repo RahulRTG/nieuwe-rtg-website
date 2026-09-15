@@ -2067,6 +2067,24 @@ const IJKINGEN = {
       (j) => { j.telling.alleenKeten = (j.telling.alleenKeten || 0) + 4; return j; },
       () => norm.meet().bewijsAlleenKeten - voor.bewijsAlleenKeten)
   },
+  /* DE TAND VAN 15 SEPTEMBER 2026: veranderbereikZonderBereik telt de toetsen
+     waarvan het BRONBESTANDbereik nergens uit volgt -- niet statisch (geen
+     require-kant naar server/) en niet waargenomen (geen route in het journaal
+     die naar een bestand oplost). Zelfde vorm als bewijsAlleenKeten hierboven:
+     hij leest een post uit een register, dus hij wordt geijkt door dat getal
+     tijdelijk op te hogen.
+
+     WAAROM HET VELD ERTOE DOET. VERANDERBEREIK.json draagt naast `zonderBereik`
+     ook `draaideZonderRoute` en `nietInDezeRonde`, en die twee zijn er samen
+     gelijk aan. Leest de meter per ongeluk een van die twee, dan telt hij de
+     helft en beweegt hij bij een echte verslechtering maar half mee -- precies
+     de val die hieronder bij LUSSEN.json staat beschreven (de verdeling lezen
+     in plaats van de schuld). */
+  veranderbereikZonderBereik: {
+    proef: (voor) => metVervangenJson('VERANDERBEREIK.json',
+      (j) => { j.gemeten.zonderBereik = (j.gemeten.zonderBereik || 0) + 4; return j; },
+      () => norm.meet().veranderbereikZonderBereik - voor.veranderbereikZonderBereik)
+  },
   /* DE DRIE TANDEN VAN 11 SEPTEMBER 2026 (LUSSEN.json, npm run lussen).
 
      Alle drie lezen ze een SCHULD uit `ratel` en niet uit `gemeten`, en dat is

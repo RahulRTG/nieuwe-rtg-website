@@ -72,23 +72,31 @@ werkelijkheid.js` levert de require-kanten, en `BEDRADING.json` telt er 3730
 opgelost, 3 benaderd en 2 onbekend, met een eis van nul onbekend voor identity,
 money en security.
 
-De omgekeerde graaf is uitgerekend over 5899 bestanden en 1434 toetsbestanden
-(`npm run impactbereik`, zodat dit getal na te rekenen is en niet in dit
-document blijft hangen):
+De omgekeerde graaf is uitgerekend met `npm run impactbereik`, zodat dit getal
+na te rekenen is en niet in dit document blijft hangen:
 
 | gewijzigd bestand | transitief geraakte toetsen |
 |---|---|
-| `kern/stuur/resolver.js` | 7 (0,5%) |
-| `kern/pay/poort.js` | 6 (0,4%) |
-| `kern/passen.js` | 2 (0,1%) |
-| `kern/fiscaal/tarief.js` | 40 (2,8%) |
+| `kern/stuur/resolver.js` | 11 (0,6%) |
+| `kern/pay/poort.js` | 6 (0,3%) |
+| `kern/passen.js` | 7 (0,4%) |
+| `kern/fiscaal/tarief.js` | 43 (2,3%) |
 
 Zes toetsen voor de plek waar élke betaling langskomt is geen versmalling maar
 een blinde vlek. Nagemeten:
 
-- **819 van de 1434 toetsbestanden (57,1%) hebben geen enkele require-kant naar
-  `server/`.**
-- **905 starten de server als apart proces**, 863 praten over HTTP.
+- **<!--getal:veranderbereik.blind-->1067<!--/getal--> van de
+  <!--getal:veranderbereik.toetsen-->1900<!--/getal--> toetsbestanden hebben geen
+  enkele require-kant naar `server/`.**
+- **1058 starten de server als apart proces**, 995 praten over HTTP.
+
+**DIT GETAL STOND HIER TWAALF DAGEN VERKEERD, EN DAT IS DE LES.** Er stond 819
+van 1434 (57,1%), gemeten op 31 augustus. Dat was juist op de dag dat iemand het
+opschreef, en daarna groeide de suite. `impactbereik.js` draait namelijk in geen
+enkele workflow en schrijft geen register: het getal dat versmalling tegenhoudt
+bestond alleen als proza. Sinds deze ronde staat het tussen merktekens en komt
+het uit `VERANDERBEREIK.json` (`npm run getallen`) — een verouderd getal is dan
+geen kwestie van oplettendheid meer.
 
 Die meerderheid raakt de hele oppervlakte via een `spawn`, en een require-graaf
 ziet daar niets van. Een planner op deze graaf zou ze overslaan en groen
@@ -96,6 +104,16 @@ melden — "de stilste vorm van kapot die dit huis kent" (`scripts/lib/
 bedrading.js`). Vandaar de volgorde: **eerst dekking, dan versmalling**, precies
 de les van de resolver in `EXECUTIE.md`, waar het succescriterium dekking was
 en niet compactheid.
+
+**De tweede as ligt er sinds 15 september 2026, en hij dicht een deel van die
+blinde vlek.** Het routejournaal weet WELKE toets welke route raakte
+(`test/toetsnaam.js`), en `ROUTEBRON.json` weet in welk bronbestand een route
+wordt afgehandeld — die twee waren nooit aan elkaar geknoopt.
+`scripts/veranderbereik.js` doet dat en haalt er
+<!--getal:veranderbereik.gedicht-->239<!--/getal--> toetsen mee uit de blinde vlek.
+Wat overblijft is <!--getal:veranderbereik.zonder-->828<!--/getal--> toetsbestanden
+zonder enig vastgesteld bereik, en zolang dat getal niet nul is verandert de
+volgorde hierboven niet. `VERANDERING.md` is het document eromheen.
 
 ## 2. Het CI-contract: vier regels, alle vier uit een vondst
 

@@ -60,7 +60,7 @@ async function metLid(fn) {
     const page = await ctx.newPage();
     letOpFouten(page, []);
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#rtgCommand .cmd-balk', { timeout: 20000 });
+    await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar', { timeout: 20000 });
     await page.waitForFunction(() => window.RTGCommand && window.RTGCommand.actief && window.RTGCommand.actief(),
       null, { timeout: 20000 });
     await page.waitForFunction(() => !!(window.RTGGrammatica && window.RTGGewicht && window.RTGRail),
@@ -107,7 +107,8 @@ async function zetProef(page, wat) {
       A.context({ bron: 'proef', titel: 'Memo', acties: ['proef.licht', 'proef.dicht'], rail: [] });
     }
   }, wat);
-  await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { timeout: 10000 });
+  await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { state: 'attached', timeout: 10000 });
+  await require('./helper').edgeActies(page);
 }
 
 /* Omhoog trekken, met echte aanwijzerinvoer. Elke trap krijgt zijn eigen pagina:
@@ -123,7 +124,7 @@ async function trek(page, hoogte) {
      belaste browserrunner de eerste sleep niet aan de pagina bezorgt. */
   const selector = hoogte >= 150 ? '.rtg-laag-taak.open' : '.rtg-laag-lade.open';
   for (let poging = 0; poging < 2; poging++) {
-    const b = await page.locator('#rtgCommand .cmd-balk').boundingBox();
+    const b = await page.locator('.rtg-adaptive-bar').boundingBox();
     await page.mouse.move(b.x + b.width * 0.62, b.y + b.height / 2);
     await page.mouse.down();
     await page.mouse.move(b.x + b.width * 0.62, b.y - hoogte, { steps: 12 });
@@ -167,6 +168,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        worden. */
     await metLid(async (page) => {
       await zetProef(page, 'zwaar');
+      await page.keyboard.press('Escape');
       /* EERST STILSTAND, DAN PAS METEN. De rail schuift in beeld; wie tijdens
          die beweging meet, vangt hem halverwege -- onder runnerbelasting stond
          hij op het meetmoment op 824 terwijl het dock op 796 begint, en zakte
@@ -182,7 +184,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
         window.__railVorig = y; return false;
       }, null, { timeout: 8000, polling: 250 });
       const rail = await page.locator('#rtgCommand .cmd-rail').boundingBox();
-      const dock = await page.locator('#rtgCommand .cmd-balk').boundingBox();
+      const dock = await page.locator('.rtg-adaptive-bar').boundingBox();
       assert.ok(rail && dock, 'rail en dock horen allebei te staan');
       assert.ok(Math.round(rail.y + rail.height) <= Math.round(dock.y) + 1,
         'de rail hoort boven het dock te staan (' + Math.round(rail.y) + ' vs ' + Math.round(dock.y) + ')');
@@ -206,7 +208,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        hij op de eerste tik en zakt deze toets op __gedaan. */
     await metLid(async (page) => {
       await zetProef(page, 'zwaar');
-      await page.locator('#rtgCommand .cmd-actie[data-cap="proef.zwaar"]').click();
+      await page.locator('.rtg-adaptive-controls .cmd-actie[data-cap="proef.zwaar"]').click();
       await page.waitForSelector('.rtg-laag-lade.open', { timeout: 8000 });
       assert.equal(await page.evaluate(() => window.__gedaan), null,
         'een tik hoort een zware handeling nog niet te draaien');
@@ -259,7 +261,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        verlies dat je op een scherm niet ziet. */
     await metLid(async (page) => {
       await zetProef(page, 'terug');
-      await page.locator('#rtgCommand .cmd-actie[data-cap="proef.terug"]').click();
+      await page.locator('.rtg-adaptive-controls .cmd-actie[data-cap="proef.terug"]').click();
       await wachtOpRust(page);
       assert.equal(await page.evaluate(() => window.__gedaan), 'weg', 'terug hoort meteen te gebeuren');
       await page.waitForSelector('#rtgCommand .rail-ongedaan', { timeout: 8000 });
@@ -278,7 +280,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        laat balkknop.js een verhinderde handeling gewoon uitvoeren. */
     await metLid(async (page) => {
       await zetProef(page, 'dicht');
-      const knop = page.locator('#rtgCommand .cmd-actie[data-cap="proef.dicht"]');
+      const knop = page.locator('.rtg-adaptive-controls .cmd-actie[data-cap="proef.dicht"]');
       assert.match(await knop.getAttribute('class'), /verhinderd/);
       assert.match(await knop.getAttribute('aria-label'), /niet beschikbaar/,
         'de stand hoort in de toegankelijke naam te staan');
@@ -304,7 +306,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        DE MUTATIE: zet in balkknop.js de lange druk terug op openLade(). */
     await metLid(async (page) => {
       await zetProef(page, 'dicht');
-      const selector = '#rtgCommand .cmd-actie[data-cap="proef.licht"]';
+      const selector = '.rtg-adaptive-controls .cmd-actie[data-cap="proef.licht"]';
       await wachtOpStilVak(page, selector);
       const doos = await page.locator(selector).boundingBox();
       await page.mouse.move(doos.x + doos.width / 2, doos.y + doos.height / 2);
@@ -333,7 +335,8 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        DE MUTATIE: filter in orb.js de verhinderde handelingen weg. */
     await metLid(async (page) => {
       await zetProef(page, 'dicht');
-      const selector = '#rtgCommand .cmd-mondknop';
+      await page.keyboard.press('Escape');
+      const selector = '.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]';
       /* De orb staat in dezelfde inschuivende balk als de actieknoppen. Onder
          runnerbelasting kon hij tussen boundingBox() en pointerdown nog een
          paar pixels opschuiven, waardoor de lange druk naast de knop begon en
@@ -423,7 +426,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
          eindmetingen komen uit hetzelfde frame. Geen enkele heenreis valt nog
          binnen het venster, en de toets meet weer wat hij beweert te meten. */
       const meting = await page.evaluate(async () => {
-        const balk = () => document.querySelector('#rtgCommand .cmd-balk');
+        const balk = () => document.querySelector('.rtg-adaptive-bar');
         const rail = () => document.querySelector('#rtgCommand .cmd-rail');
         const frame = () => new Promise((r) => requestAnimationFrame(() => r()));
         const ingezakt = (r) => !r || r.height < 6 || r.width === 0 ||

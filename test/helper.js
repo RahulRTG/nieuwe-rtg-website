@@ -1321,6 +1321,13 @@ async function edgeCatalogus(page) {
   }
 }
 
+async function edgeActies(page) {
+  await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar', { state: 'visible' });
+  if (!await page.locator('.rtg-adaptive-sheet').isVisible())
+    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+  await page.waitForSelector('.rtg-adaptive-controls', { state: 'visible' });
+}
+
 async function edgeWerkbladen(page) {
   if (await page.locator('.rtg-edge-faces').count())
     await page.locator('[data-edge-command-bank]:visible').click();
@@ -1340,7 +1347,7 @@ async function bankDeur(page, naam, opties) {
     await page.waitForFunction(() => !document.querySelector('.rtg-edge-menu') ||
       document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
     { timeout: 5000 }).catch(() => {});
-    const edge = page.locator('.rtg-edge-menu[data-rtg-command-brug="true"]');
+    const edge = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]:visible, .rtg-edge-menu[data-rtg-command-brug="true"]:visible');
     if (await edge.isVisible()) { await edge.click(); await edgeWerkbladen(page); } else await lade.click();
     await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
   }
@@ -1352,7 +1359,7 @@ async function bankDeur(page, naam, opties) {
   }, naam);
 }
 
-module.exports = { edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { edgeActies, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

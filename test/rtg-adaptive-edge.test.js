@@ -70,7 +70,7 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
 test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezig', () => {
   const bronnen = ['/shared/rtg-adaptive-edge-loader.js'];
   const adaptieveBronnen = ['/shared/rtg-adaptive-edge.css', '/shared/rtg-adaptive-edge-core.js',
-    '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js'];
+    '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js'];
   for (const bron of bronnen) {
     assert.ok(LOADER.includes(bron), bron + ' ontbreekt in de loader');
     assert.ok(SW.includes(bron), bron + ' ontbreekt in de offline schil');
@@ -92,7 +92,7 @@ test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezi
 });
 
 test('alle Adaptive Edge-browsermodules blijven onder de productlimiet', () => {
-  for (const naam of ['rtg-adaptive-edge-loader.js', 'rtg-adaptive-edge-core.js', 'rtg-adaptive-edge-input.js', 'rtg-adaptive-edge.js', 'rtg-adaptive-edge-signals.js']) {
+  for (const naam of ['rtg-adaptive-edge-loader.js', 'rtg-adaptive-edge-core.js', 'rtg-adaptive-edge-controls.js', 'rtg-adaptive-edge-input.js', 'rtg-adaptive-edge.js', 'rtg-adaptive-edge-signals.js']) {
     assert.ok(fs.statSync(path.join(ROOT, 'public/shared', naam)).size < 10 * 1024, naam + ' is te groot');
   }
 });

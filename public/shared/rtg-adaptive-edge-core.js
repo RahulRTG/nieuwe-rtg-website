@@ -13,7 +13,7 @@
   });
   var SPECS = Object.freeze({
     home: [['home', 'Home', 'Home', 'home'], ['worlds', 'Werelden', 'Werelden', 'grid'],
-      ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['primary', 'Volgende actie', 'Verder', 'next'],
+      ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['context', 'Acties van dit scherm', 'Acties', 'list'],
       ['menu', 'Alle functies', 'Menu', 'menu']],
     context: [['back', 'Terug', 'Terug', 'back'], ['context', 'Context van deze pagina', 'Context', 'doc'],
       ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['status', 'Veiligheid en status', 'Status', 'shield'],

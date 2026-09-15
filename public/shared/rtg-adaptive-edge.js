@@ -29,6 +29,9 @@
     return false;
   }
   function execute(action) {
+    if (action === 'context' || (action === 'ai' && d.querySelector('#rtgCommand .cmd-vraagvorm'))) {
+      setDeck(action === 'ai' ? 'rahul' : 'actions'); setState('expanded'); return true;
+    }
     var custom = rt.model.registry[action];
     if (custom && custom.run) { if (K.allowed(custom)) { custom.run(); return true; } return false; }
     if (action === 'home') { w.location.href = rt.edge.cfg.home; return true; }
@@ -49,7 +52,7 @@
   function renderSheet() {
     var items = K.actions(rt.model), continuation = rt.model.continuation;
     rt.sheetTitle.textContent = continuation && continuation.title || rt.edge.ctx.title || d.title || 'Wat wilt u doen?';
-    rt.sheetCopy.textContent = continuation && continuation.copy || 'Beschikbare acties binnen uw context en bevoegdheden.';
+    rt.sheetCopy.textContent = continuation && continuation.copy || 'Wat wilt u doen?';
     rt.sheetList.textContent = '';
     items.forEach(function (item) {
       var b = d.createElement('button'); b.type = 'button'; b.className = 'rtg-adaptive-sheet-action';
@@ -60,6 +63,7 @@
       var empty = d.createElement('p'); empty.className = 'rtg-adaptive-empty';
       empty.textContent = 'Voor deze context zijn geen veilige acties beschikbaar.'; rt.sheetList.appendChild(empty);
     }
+    if (rt.renderControls) rt.renderControls();
   }
   function renderDeck() {
     rt.bar.textContent = '';
@@ -76,6 +80,7 @@
     d.body.dataset.rtgAdaptiveState = rt.model.state; rt.sheet.hidden = rt.model.state !== 'expanded';
     rt.sheet.setAttribute('aria-hidden', String(rt.model.state !== 'expanded'));
     rt.caption.hidden = rt.model.state === 'peek';
+    if (rt.model.state === 'expanded') renderSheet();
     if (source !== 'auto') rt.manual = rt.model.state === 'deck' || rt.model.state === 'expanded';
     return true;
   }
@@ -134,16 +139,20 @@
     if (rt || doc !== d || win !== w || !K || !Input || !d.body || !w.RTGEdge || !w.RTGEdge.active) return rt;
     rt = { doc: d, win: w, edge: w.RTGEdge.active, model: K.model(), manual: false };
     defaults(); build(); d.body.dataset.rtgAdaptiveReady = 'true'; setState('dock', 'auto');
-    if (w.MutationObserver) new w.MutationObserver(function () {
+    w.RTGAdaptiveEdgeControls.start(rt);
+    if (w.MutationObserver) rt.observer = new w.MutationObserver(function () {
       var state = d.body.getAttribute('data-rtg-edge-2-state');
       if (d.body.getAttribute('data-rtg-edge-venster-open') === 'true') return;
       if (state === 'compact') setState('peek', 'auto');
       else if (state === 'overview' && rt.model.state === 'peek') setState('dock', 'auto');
-    }).observe(d.body, { attributes: true, attributeFilter: ['data-rtg-edge-2-state', 'data-rtg-edge-venster-open'] });
+    });
+    if (rt.observer) rt.observer.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-edge-2-state', 'data-rtg-edge-venster-open'] });
     return rt;
   }
   function destroy() {
     if (!rt) return;
+    if (rt.observer) rt.observer.disconnect();
+    if (rt.controlsStop) rt.controlsStop();
     if (rt.host && rt.host.parentNode) rt.host.parentNode.removeChild(rt.host);
     d.body.removeAttribute('data-rtg-adaptive-ready'); d.body.removeAttribute('data-rtg-adaptive-state'); rt = null;
   }

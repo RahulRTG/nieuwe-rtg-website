@@ -129,6 +129,8 @@
     function teken() {
       if (!zone) return;
       var b = balk(); if (!b) return;
+      // Edge reads the full current offer, independently of the hidden row's width.
+      o.root.rtgEdgeItems = function () { return laatsteRij.slice(); };
       var ctx = A ? A.context() : null;
       var items = (A && ctx && ctx.acties.length) ? A.voorNu() : [];
       var nu = blad();

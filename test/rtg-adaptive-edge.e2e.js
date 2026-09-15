@@ -11,7 +11,13 @@ const SCHERMEN = [
 
 async function wacht(page, pad) {
   await page.waitForFunction(verwacht => location.pathname !== verwacht || document.body &&
-    document.body.dataset.rtgAdaptiveReady === 'true' && window.RTGAdaptiveEdge,
+    document.body.dataset.rtgAdaptiveReady === 'true' && window.RTGAdaptiveEdge && (() => {
+      const bar = document.querySelector('.rtg-adaptive-bar');
+      if (!bar) return false;
+      const r = bar.getBoundingClientRect(), s = getComputedStyle(bar);
+      return r.width > 100 && r.height >= 44 && r.top >= 0 && r.bottom <= innerHeight &&
+        s.visibility === 'visible' && Number(s.opacity) > .99;
+    })(),
   pad, { timeout: 60000 });
 }
 

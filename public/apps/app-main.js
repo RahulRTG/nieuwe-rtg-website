@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '6a15df7b';
+var RTG_BOUW = 'f9bd8a37';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1022,7 +1022,7 @@ var RTG_BOUW = '6a15df7b';
         '#gate .ag-doos.ag-ballotage .ag-rij #agGo{width:2.55rem;height:2.55rem;}' +
         '#gate .ag-doos.ag-ballotage .ag-id-privacy{margin-top:.6rem;font-size:.54rem;}' +
       '}' +
-      '@media (max-width:899px) and (max-height:720px){' +
+      '@media (max-width:899px) and (max-height:860px){' +
         '#gate:has(.ag-doos.ag-ballotage){--klokschaal:.31;padding-top:calc(var(--edge-top,44px) + .45rem);}' +
         '#gate:has(.ag-doos.ag-ballotage)>.os-lock{width:5.3rem;height:5.3rem;margin-bottom:.25rem;}' +
         '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story p{display:none;}' +

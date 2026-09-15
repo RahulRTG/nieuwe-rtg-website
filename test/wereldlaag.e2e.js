@@ -142,7 +142,8 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
       if (i) assert.ok(navmaat.links[i - 1].right <= x.left + 0.5,
         'wereldkeuzes overlappen op 320 px: ' + JSON.stringify(navmaat.links));
     });
-    await page.click('#profielTab');
+    await require('./helper').edgeActies(page);
+    await page.click('[data-rtg-adaptive-source="profielTab"]');
     await page.waitForSelector('.laag .veld select', { timeout: 15000 });
 
     const bron = await page.evaluate(() => document.querySelector('.laag .bron').textContent);
@@ -182,7 +183,8 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
        het scherm hoort hem dan naar het beginscherm te sturen in plaats van een
        leeg paneel te tonen. Die regel komt uit /api/wereld/state en staat niet
        in de HTML -- dat is precies wat hier wordt nagetrokken. */
-    await page.click('#ontdekTab');
+    await require('./helper').edgeActies(page);
+    await page.click('[data-rtg-adaptive-source="ontdekTab"]');
     await page.waitForURL(/\/apps\/app\.html/, { timeout: 10000 });
 
     /* 7. dezelfde tab met een pas die het WEL heeft: zoeken werkt, en de
@@ -202,7 +204,8 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
       'Lifestyle hoort als Signature in het member passport te staan');
     assert.equal(await page2.locator('#lenzen [aria-disabled="true"]').count(), 0,
       'Signature krijgt alle vijf de lenzen');
-    await page2.click('#ontdekTab');
+    await require('./helper').edgeActies(page2);
+    await page2.click('[data-rtg-adaptive-source="ontdekTab"]');
     await page2.waitForSelector('#zoekform', { timeout: 10000 });
     assert.equal(await page2.evaluate(() => location.pathname), '/apps/wereld.html',
       'met het vermogen hoort Ontdek IN de app te blijven');
@@ -216,7 +219,8 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
       'de zoekuitslag zegt iets zinnigs: ' + uitslag.slice(0, 120));
 
     // 8. en "wie bekeek mijn profiel" staat op de Profiel-tab van B
-    await page2.click('#profielTab');
+    await require('./helper').edgeActies(page2);
+    await page2.click('[data-rtg-adaptive-source="profielTab"]');
     await page2.waitForSelector('#bezoekers', { timeout: 10000 });
     const bez = await page2.evaluate(() => document.getElementById('bezoekers').textContent);
     assert.match(bez, /geen onzichtbare stand/i,

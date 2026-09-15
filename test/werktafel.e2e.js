@@ -121,9 +121,9 @@ const stand = () => {
       return b ? Math.round(b.getBoundingClientRect().height) : null; })(),
     balkVanaf: (() => { const b = document.querySelector('.cmd-balk');
       return b ? Math.round(b.getBoundingClientRect().top) : null; })(),
-    edgeOnder: (() => { const b = document.querySelector('.rtg-edge-bottom');
+    edgeOnder: (() => { const b = document.querySelector('.rtg-adaptive-bar');
       return b ? Math.round(b.getBoundingClientRect().height) : null; })(),
-    edgeVanaf: (() => { const b = document.querySelector('.rtg-edge-bottom');
+    edgeVanaf: (() => { const b = document.querySelector('.rtg-adaptive-bar');
       return b ? Math.round(b.getBoundingClientRect().top) : null; })(),
     chips: [...document.querySelectorAll('.cmd-balkblad')]
       .map(x => x.textContent + (x.classList.contains('actief') ? '*' : '')),
@@ -301,12 +301,11 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        en de globale bediening onderaan. Command draagt zijn echte functies in
        diezelfde lichte onderrand; het voegt geen tweede zwarte rij meer toe. */
     assert.equal(smalBlad.bladVanaf, 44, 'de wereld hoort direct onder de enige Edge-bovenbalk te beginnen');
-    assert.equal(smalBlad.balk, 48, 'de schilbalk hoort 48px te zijn, kreeg ' + smalBlad.balk);
-    assert.equal(smalBlad.edgeOnder, 48, 'de globale Edge-onderrand hoort 48px te zijn');
-    assert.equal(smalBlad.balkVanaf, smalBlad.edgeVanaf,
-      'Command-functies en Edge horen zichtbaar dezelfde onderrand te bewonen');
-    assert.equal(smalBlad.bladTotOnder, smalBlad.edgeOnder,
-      'het blad hoort direct boven de ene gezamenlijke onderrand te eindigen');
+    assert.equal(smalBlad.balk, 0, 'Command heeft geen eigen zichtbare balk');
+    assert.equal(smalBlad.edgeOnder, 68, 'de standaard Edge-balk draagt de bediening');
+    assert.ok(smalBlad.edgeVanaf > 0, 'Edge staat binnen het scherm');
+    assert.equal(smalBlad.bladTotOnder, 94,
+      'het blad respecteert de hoogte, afstand en leesruimte van de gedeelde Edge');
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
@@ -326,7 +325,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        ertussen -- dus zijn afwezigheid hoort de bouw te laten zakken. */
     const brug = await page.$('.rtg-edge-menu[data-rtg-command-brug="true"]');
     assert.ok(brug, 'de Command-brug op de Edge-knop ontbreekt; Edge en Command zijn losgekoppeld');
-    const bankKnop = '.rtg-edge-menu[data-rtg-command-brug="true"]';
+    const bankKnop = '.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]';
     await page.click(bankKnop);
     await require('./helper').edgeWerkbladen(page);
     /* `inBeeld` is de echte vraag en niet display:none -- de bank SCHUIFT, dus

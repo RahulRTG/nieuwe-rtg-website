@@ -117,6 +117,25 @@ const GETALLEN = {
     wat: 'kantoorroutes waarvan de handler de handelende mens noemt' },
   'kantoor.bestanden': { bron: 'KANTOORMACHT.json', veld: 'gemeten.bestanden',
     wat: 'bestanden die een kantoorroute registreren' },
+  /* De namensvorm (REPRESENTATIE.md par. 0). Twee nullen dragen daar een
+     architectuurbesluit, en juist een NUL in proza veroudert onzichtbaar: hij
+     ziet er vers en achterhaald identiek uit. Vandaar dat ook de noemers een
+     merkteken krijgen -- "0 van de 50" wordt onwaar zodra die 50 beweegt, en
+     dan klopt de zin nog steeds half. */
+  'namens.mechanismen': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.mechanismen',
+    wat: 'mechanismen waarmee iemand in dit huis namens een ander handelt' },
+  'namens.velden': { bron: 'NAMENSVORM.json', veld: 'gemeten.smal.velden',
+    wat: 'velden die die mechanismen samen dragen, envelop eraf' },
+  'namens.inAlle': { bron: 'NAMENSVORM.json', veld: 'gemeten.smal.inAlleMechanismen',
+    wat: 'velden die in ALLE opslaande mechanismen staan' },
+  'namens.eigenPct': { bron: 'NAMENSVORM.json', veld: 'gemeten.smal.eigenPct',
+    wat: 'aandeel velden dat in precies EEN mechanisme staat (%)' },
+  'namens.werkwoordenInAlle': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.inAlleMechanismenOpNaam.length',
+    wat: 'werkwoorden die onder dezelfde naam in alle mechanismen staan' },
+  'namens.gemiddeldOpNaam': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.gemiddeldOpNaam',
+    wat: 'werkwoorden per mechanisme, onder de naam van kern/vertegenwoordiging' },
+  'namens.gemiddeldOpSynoniem': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.gemiddeldOpSynoniem',
+    wat: 'werkwoorden per mechanisme, onder een van de namen die dit huis ervoor gebruikt' },
   'semantiek.namen': { bron: 'SEMANTIEK.json', veld: 'namenInMeerDomeinen',
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
@@ -428,7 +447,7 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'FRANCHISE.md', 'SOEVEREIN.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

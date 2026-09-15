@@ -1,0 +1,1235 @@
+{
+  "stempel": {
+    "op": "2026-09-14T19:46:54.848Z",
+    "commit": "4e51af5d",
+    "boomVuil": false,
+    "boomAnders": 3,
+    "instrument": "scripts/namensvorm.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Gemeten met scripts/namensvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in REPRESENTATIE.md par. 0: delen de bestaande manieren waarop iemand namens een ander handelt werkelijk een machine? Twee lijsten (smal = handelen, ruim = handelen plus kennen), zodat de uitslag niet op de lijst drijft.",
+  "grens": "De eenheid is het MECHANISME en niet het domein, omdat kern/service/machtiging*.js en kern/command/bijstand*.js elk een mechanisme BINNEN een groter domein zijn. Daardoor zijn de percentages hier NIET uitwisselbaar met CARRIEREVORM.json of STAGEVORM.json, die per domein tellen; alleen de VORM van het antwoord is vergelijkbaar. Verder meet dit bewaarde VORMEN (velden van objectliteralen) en geen werkwoorden, volgorde of uitkomst: een nul zegt dat er geen gedeeld OBJECT is, niet dat er geen gedeeld PROCES is -- die tweede vraag beantwoordt een ketenproef. Een mechanisme zonder opgeslagen vormen (een regelbestand zonder db) valt uit de noemer en staat in `zonderVormen`. De woordenschat telt IDENTIFIERS na aftrek van commentaar en tekenreeksen: `bezet` is een waarschuwing met een adres en geen verbod, en samenstellingen tellen niet mee omdat een samenstelling een andere naam is.",
+  "vastgelegd": "2026-09-14",
+  "gemeten": {
+    "smal": {
+      "vormen": 10,
+      "mechanismen": 6,
+      "zonderVormen": [
+        "ai-mandaat"
+      ],
+      "velden": 50,
+      "inAlleMechanismen": 0,
+      "inMinstensDeHelft": 0,
+      "helftDrempel": 3,
+      "veldenMechanismeEigen": 45,
+      "eigenPct": 90,
+      "perMechanisme": [
+        {
+          "mechanisme": "app-machtiging",
+          "velden": 8
+        },
+        {
+          "mechanisme": "bijstand",
+          "velden": 14
+        },
+        {
+          "mechanisme": "fiscaal-mandaat",
+          "velden": 7
+        },
+        {
+          "mechanisme": "sepa-machtiging",
+          "velden": 12
+        },
+        {
+          "mechanisme": "servicemachtiging",
+          "velden": 11
+        },
+        {
+          "mechanisme": "vertegenwoordiging",
+          "velden": 3
+        }
+      ],
+      "gedeeld": [
+        {
+          "veld": "doel",
+          "mechanismen": 2,
+          "waar": [
+            "app-machtiging",
+            "servicemachtiging"
+          ]
+        },
+        {
+          "veld": "ingetrokkenDoor",
+          "mechanismen": 2,
+          "waar": [
+            "fiscaal-mandaat",
+            "sepa-machtiging"
+          ]
+        },
+        {
+          "veld": "kenmerk",
+          "mechanismen": 2,
+          "waar": [
+            "fiscaal-mandaat",
+            "sepa-machtiging"
+          ]
+        },
+        {
+          "veld": "mens",
+          "mechanismen": 2,
+          "waar": [
+            "bijstand",
+            "servicemachtiging"
+          ]
+        },
+        {
+          "veld": "minuten",
+          "mechanismen": 2,
+          "waar": [
+            "bijstand",
+            "servicemachtiging"
+          ]
+        }
+      ]
+    },
+    "ruim": {
+      "vormen": 18,
+      "mechanismen": 9,
+      "zonderVormen": [
+        "ai-mandaat",
+        "rtgid-claims"
+      ],
+      "velden": 73,
+      "inAlleMechanismen": 0,
+      "inMinstensDeHelft": 0,
+      "helftDrempel": 5,
+      "veldenMechanismeEigen": 68,
+      "eigenPct": 93.2,
+      "perMechanisme": [
+        {
+          "mechanisme": "app-machtiging",
+          "velden": 8
+        },
+        {
+          "mechanisme": "bijstand",
+          "velden": 14
+        },
+        {
+          "mechanisme": "consent-center",
+          "velden": 8
+        },
+        {
+          "mechanisme": "fiscaal-mandaat",
+          "velden": 7
+        },
+        {
+          "mechanisme": "ledenbalie-inzage",
+          "velden": 5
+        },
+        {
+          "mechanisme": "levensband",
+          "velden": 11
+        },
+        {
+          "mechanisme": "sepa-machtiging",
+          "velden": 12
+        },
+        {
+          "mechanisme": "servicemachtiging",
+          "velden": 11
+        },
+        {
+          "mechanisme": "vertegenwoordiging",
+          "velden": 3
+        }
+      ],
+      "gedeeld": [
+        {
+          "veld": "doel",
+          "mechanismen": 3,
+          "waar": [
+            "app-machtiging",
+            "consent-center",
+            "servicemachtiging"
+          ]
+        },
+        {
+          "veld": "ingetrokkenDoor",
+          "mechanismen": 2,
+          "waar": [
+            "fiscaal-mandaat",
+            "sepa-machtiging"
+          ]
+        },
+        {
+          "veld": "kenmerk",
+          "mechanismen": 2,
+          "waar": [
+            "fiscaal-mandaat",
+            "sepa-machtiging"
+          ]
+        },
+        {
+          "veld": "mens",
+          "mechanismen": 2,
+          "waar": [
+            "bijstand",
+            "servicemachtiging"
+          ]
+        },
+        {
+          "veld": "minuten",
+          "mechanismen": 2,
+          "waar": [
+            "bijstand",
+            "servicemachtiging"
+          ]
+        }
+      ]
+    },
+    "werkwoord": {
+      "mechanismen": 7,
+      "werkwoorden": 7,
+      "volledigOpSynoniem": [
+        "vertegenwoordiging",
+        "bijstand"
+      ],
+      "volledigOpNaam": [
+        "vertegenwoordiging"
+      ],
+      "inAlleMechanismenOpNaam": [],
+      "inAlleMechanismenOpSynoniem": [
+        "verlopen"
+      ],
+      "gemiddeldOpNaam": 3,
+      "gemiddeldOpSynoniem": 4.6,
+      "perWerkwoord": [
+        {
+          "werkwoord": "verlopen",
+          "wat": "verval is een BEREKENDE toestand en geen veld",
+          "opNaam": 4,
+          "opSynoniem": 7,
+          "waarOpNaam": [
+            "vertegenwoordiging",
+            "ai-mandaat",
+            "fiscaal-mandaat",
+            "app-machtiging"
+          ],
+          "waarOpSynoniem": [
+            "vertegenwoordiging",
+            "bijstand",
+            "servicemachtiging",
+            "ai-mandaat",
+            "fiscaal-mandaat",
+            "sepa-machtiging",
+            "app-machtiging"
+          ]
+        },
+        {
+          "werkwoord": "intrekken",
+          "wat": "terugnemen, waarbij de toekomst stopt en het verleden blijft",
+          "opNaam": 5,
+          "opSynoniem": 6,
+          "waarOpNaam": [
+            "vertegenwoordiging",
+            "bijstand",
+            "servicemachtiging",
+            "fiscaal-mandaat",
+            "app-machtiging"
+          ],
+          "waarOpSynoniem": [
+            "vertegenwoordiging",
+            "bijstand",
+            "servicemachtiging",
+            "fiscaal-mandaat",
+            "sepa-machtiging",
+            "app-machtiging"
+          ]
+        },
+        {
+          "werkwoord": "verlenen",
+          "wat": "iemand geeft de bevoegdheid uit",
+          "opNaam": 4,
+          "opSynoniem": 5,
+          "waarOpNaam": [
+            "vertegenwoordiging",
+            "servicemachtiging",
+            "fiscaal-mandaat",
+            "app-machtiging"
+          ],
+          "waarOpSynoniem": [
+            "vertegenwoordiging",
+            "bijstand",
+            "servicemachtiging",
+            "fiscaal-mandaat",
+            "app-machtiging"
+          ]
+        },
+        {
+          "werkwoord": "handelen",
+          "wat": "onder de bevoegdheid werkelijk iets doen",
+          "opNaam": 3,
+          "opSynoniem": 5,
+          "waarOpNaam": [
+            "vertegenwoordiging",
+            "servicemachtiging",
+            "ai-mandaat"
+          ],
+          "waarOpSynoniem": [
+            "vertegenwoordiging",
+            "bijstand",
+            "servicemachtiging",
+            "ai-mandaat",
+            "app-machtiging"
+          ]
+        },
+        {
+          "werkwoord": "aanvaarden",
+          "wat": "de ander zegt ja, en niemand anders",
+          "opNaam": 1,
+          "opSynoniem": 4,
+          "waarOpNaam": [
+            "vertegenwoordiging"
+          ],
+          "waarOpSynoniem": [
+            "vertegenwoordiging",
+            "bijstand",
+            "sepa-machtiging",
+            "app-machtiging"
+          ]
+        },
+        {
+          "werkwoord": "versmallen",
+          "wat": "de speelruimte kan alleen kleiner worden",
+          "opNaam": 2,
+          "opSynoniem": 3,
+          "waarOpNaam": [
+            "vertegenwoordiging",
+            "ai-mandaat"
+          ],
+          "waarOpSynoniem": [
+            "vertegenwoordiging",
+            "bijstand",
+            "ai-mandaat"
+          ]
+        },
+        {
+          "werkwoord": "spoor",
+          "wat": "wat er namens iemand gebeurde, blijft staan",
+          "opNaam": 2,
+          "opSynoniem": 2,
+          "waarOpNaam": [
+            "vertegenwoordiging",
+            "bijstand"
+          ],
+          "waarOpSynoniem": [
+            "vertegenwoordiging",
+            "bijstand"
+          ]
+        }
+      ],
+      "perMechanisme": [
+        {
+          "mechanisme": "vertegenwoordiging",
+          "wie": "een mens namens een mens",
+          "bestanden": 10,
+          "namen": 48,
+          "opNaam": [
+            "verlenen",
+            "aanvaarden",
+            "versmallen",
+            "intrekken",
+            "verlopen",
+            "handelen",
+            "spoor"
+          ],
+          "opSynoniem": [
+            "verlenen",
+            "aanvaarden",
+            "versmallen",
+            "intrekken",
+            "verlopen",
+            "handelen",
+            "spoor"
+          ],
+          "mist": [],
+          "treffers": {
+            "verlenen": [
+              "voorstel"
+            ],
+            "aanvaarden": [
+              "aanvaard"
+            ],
+            "versmallen": [
+              "grensZet",
+              "versmalMachtiging"
+            ],
+            "intrekken": [
+              "intrek"
+            ],
+            "verlopen": [
+              "dagenTot",
+              "stand"
+            ],
+            "handelen": [
+              "handel",
+              "magHandelen",
+              "magNamens"
+            ],
+            "spoor": [
+              "spoor"
+            ]
+          }
+        },
+        {
+          "mechanisme": "bijstand",
+          "wie": "RTG namens een zakelijke klant, op uitnodiging",
+          "bestanden": 6,
+          "namen": 38,
+          "opNaam": [
+            "intrekken",
+            "spoor"
+          ],
+          "opSynoniem": [
+            "verlenen",
+            "aanvaarden",
+            "versmallen",
+            "intrekken",
+            "verlopen",
+            "handelen",
+            "spoor"
+          ],
+          "mist": [],
+          "treffers": {
+            "verlenen": [
+              "stelVoor",
+              "vraag",
+              "vraagInhoud"
+            ],
+            "aanvaarden": [
+              "besluit"
+            ],
+            "versmallen": [
+              "ruimteVan"
+            ],
+            "intrekken": [
+              "sluit",
+              "trekIn"
+            ],
+            "verlopen": [
+              "duurVan",
+              "stand"
+            ],
+            "handelen": [
+              "betreed",
+              "voerUit"
+            ],
+            "spoor": [
+              "meld",
+              "noteer",
+              "spoor"
+            ]
+          }
+        },
+        {
+          "mechanisme": "servicemachtiging",
+          "wie": "een medewerker in het dossier van een melder",
+          "bestanden": 3,
+          "namen": 15,
+          "opNaam": [
+            "verlenen",
+            "intrekken",
+            "handelen"
+          ],
+          "opSynoniem": [
+            "verlenen",
+            "intrekken",
+            "verlopen",
+            "handelen"
+          ],
+          "mist": [
+            "aanvaarden",
+            "versmallen",
+            "spoor"
+          ],
+          "treffers": {
+            "verlenen": [
+              "verleen"
+            ],
+            "intrekken": [
+              "trekIn"
+            ],
+            "verlopen": [
+              "stand"
+            ],
+            "handelen": [
+              "magNu"
+            ]
+          }
+        },
+        {
+          "mechanisme": "ai-mandaat",
+          "wie": "een agent namens de mens die hem aanstuurt",
+          "bestanden": 1,
+          "namen": 7,
+          "opNaam": [
+            "versmallen",
+            "verlopen",
+            "handelen"
+          ],
+          "opSynoniem": [
+            "versmallen",
+            "verlopen",
+            "handelen"
+          ],
+          "mist": [
+            "verlenen",
+            "aanvaarden",
+            "intrekken",
+            "spoor"
+          ],
+          "treffers": {
+            "versmallen": [
+              "plafond",
+              "speelruimte"
+            ],
+            "verlopen": [
+              "mandaatGeldig"
+            ],
+            "handelen": [
+              "magZelfstandig"
+            ]
+          }
+        },
+        {
+          "mechanisme": "fiscaal-mandaat",
+          "wie": "RTG namens een ondernemer, richting de Belastingdienst",
+          "bestanden": 1,
+          "namen": 9,
+          "opNaam": [
+            "verlenen",
+            "intrekken",
+            "verlopen"
+          ],
+          "opSynoniem": [
+            "verlenen",
+            "intrekken",
+            "verlopen"
+          ],
+          "mist": [
+            "aanvaarden",
+            "versmallen",
+            "handelen",
+            "spoor"
+          ],
+          "treffers": {
+            "verlenen": [
+              "maakMandaat",
+              "verleen"
+            ],
+            "intrekken": [
+              "trekIn"
+            ],
+            "verlopen": [
+              "geldt"
+            ]
+          }
+        },
+        {
+          "mechanisme": "sepa-machtiging",
+          "wie": "een incassant namens een rekeninghouder",
+          "bestanden": 2,
+          "namen": 7,
+          "opNaam": [],
+          "opSynoniem": [
+            "aanvaarden",
+            "intrekken",
+            "verlopen"
+          ],
+          "mist": [
+            "verlenen",
+            "versmallen",
+            "handelen",
+            "spoor"
+          ],
+          "treffers": {
+            "aanvaarden": [
+              "keur"
+            ],
+            "intrekken": [
+              "vervang"
+            ],
+            "verlopen": [
+              "actief"
+            ]
+          }
+        },
+        {
+          "mechanisme": "app-machtiging",
+          "wie": "een app van derden namens een lid",
+          "bestanden": 5,
+          "namen": 28,
+          "opNaam": [
+            "verlenen",
+            "intrekken",
+            "verlopen"
+          ],
+          "opSynoniem": [
+            "verlenen",
+            "aanvaarden",
+            "intrekken",
+            "verlopen",
+            "handelen"
+          ],
+          "mist": [
+            "versmallen",
+            "spoor"
+          ],
+          "treffers": {
+            "verlenen": [
+              "geef",
+              "verleen",
+              "verleend"
+            ],
+            "aanvaarden": [
+              "besluit"
+            ],
+            "intrekken": [
+              "intrekkenKaal",
+              "intrekkenMetGevolgen"
+            ],
+            "verlopen": [
+              "verlopen"
+            ],
+            "handelen": [
+              "installeer"
+            ]
+          }
+        }
+      ]
+    },
+    "envelopVelden": 30
+  },
+  "woordenschat": [
+    {
+      "woord": "doel",
+      "bestanden": 248,
+      "domeinen": 134,
+      "samengesteld": 178,
+      "samengesteldDomeinen": 83,
+      "stand": "bezet",
+      "waar": [
+        "bedrijf",
+        "kern/aanmeldgesprek-hulp",
+        "kern/afdelingen",
+        "kern/agenda-pro",
+        "kern/algpin"
+      ],
+      "vormen": [
+        "DOELEN",
+        "DOELGROEPEN",
+        "DOELGROEP_IDS",
+        "DOELGROEP_LABEL",
+        "DOELGROEP_TEAM",
+        "DOELGRONDEN"
+      ]
+    },
+    {
+      "woord": "contract",
+      "bestanden": 44,
+      "domeinen": 17,
+      "samengesteld": 70,
+      "samengesteldDomeinen": 24,
+      "stand": "bezet",
+      "waar": [
+        "bedrijf",
+        "kern/aanmeldingen",
+        "kern/autoverkoop",
+        "kern/commercie",
+        "kern/experience"
+      ],
+      "vormen": [
+        "CONTRACTEN",
+        "CONTRACTEN_WAARSCHUW_DAGEN",
+        "CONTRACTSLEUTELS",
+        "CONTRACTSOORTEN",
+        "CONTRACT_VERSION",
+        "DEFAULT_CONTRACT"
+      ]
+    },
+    {
+      "woord": "risico",
+      "bestanden": 50,
+      "domeinen": 20,
+      "samengesteld": 28,
+      "samengesteldDomeinen": 15,
+      "stand": "bezet",
+      "waar": [
+        "kern/appstore",
+        "kern/assets",
+        "kern/command",
+        "kern/handelingsklasse",
+        "kern/horeca"
+      ],
+      "vormen": [
+        "RISICOLIJST",
+        "RISICOS",
+        "bvRisico",
+        "bvRisicoWeg",
+        "eigenRisico",
+        "genoteerdeRisicos"
+      ]
+    },
+    {
+      "woord": "claim",
+      "bestanden": 23,
+      "domeinen": 17,
+      "samengesteld": 37,
+      "samengesteldDomeinen": 22,
+      "stand": "bezet",
+      "waar": [
+        "kern/appstore",
+        "kern/assets",
+        "kern/commercie",
+        "kern/economie",
+        "kern/fonds"
+      ],
+      "vormen": [
+        "CLAIM_STATUS",
+        "CLAIM_TTL_MS",
+        "MAX_CLAIMS",
+        "alGeclaimd",
+        "beginClaim",
+        "beloningGeclaimd"
+      ]
+    },
+    {
+      "woord": "machtiging",
+      "bestanden": 19,
+      "domeinen": 8,
+      "samengesteld": 37,
+      "samengesteldDomeinen": 12,
+      "stand": "bezet",
+      "waar": [
+        "kern/appstore",
+        "kern/isolatie",
+        "kern/magnaat-kantoorregels",
+        "kern/rtfos",
+        "kern/rtgid-regie"
+      ],
+      "vormen": [
+        "KLASSE_VAN_MACHTIGING",
+        "MACHTIGINGEN",
+        "MACHTIGING_NOOIT",
+        "RTG_MACHTIGING_NIET_GEVRAAGD",
+        "RTG_MACHTIGING_NIET_VERLEEND",
+        "eersteMachtiging"
+      ]
+    },
+    {
+      "woord": "kans",
+      "bestanden": 21,
+      "domeinen": 8,
+      "samengesteld": 30,
+      "samengesteldDomeinen": 17,
+      "stand": "bezet",
+      "waar": [
+        "bedrijf",
+        "kern/flits",
+        "kern/ghost",
+        "kern/magnaatwereld",
+        "kern/onderneming"
+      ],
+      "vormen": [
+        "HERKANSING",
+        "KANSEN",
+        "KANS_MIN_BRONNEN",
+        "dealkansen",
+        "dealkansenVoor",
+        "foutkans"
+      ]
+    },
+    {
+      "woord": "intent",
+      "bestanden": 17,
+      "domeinen": 6,
+      "samengesteld": 31,
+      "samengesteldDomeinen": 13,
+      "stand": "bezet",
+      "waar": [
+        "kern/economie",
+        "kern/experience",
+        "kern/fluister",
+        "kern/fonds",
+        "kern/instant-reality"
+      ],
+      "vormen": [
+        "INTENTIE",
+        "INTENTIONALLY_NON_IDEMPOTENT",
+        "PIN_INTENT_TTL_MS",
+        "RTG_INTENT_RAIL",
+        "claimsVoorIntent",
+        "deelPinIntent"
+      ]
+    },
+    {
+      "woord": "capability",
+      "bestanden": 35,
+      "domeinen": 11,
+      "samengesteld": 6,
+      "samengesteldDomeinen": 6,
+      "stand": "bezet",
+      "waar": [
+        "kern/commercie",
+        "kern/concern",
+        "kern/drm",
+        "kern/fonds",
+        "kern/kantoor"
+      ],
+      "vormen": [
+        "CAPABILITY_GATED",
+        "RTG_CAPABILITY_RUST_BIN",
+        "RTG_CAPABILITY_RUST_CANARY_KEY",
+        "RTG_CAPABILITY_RUST_CANARY_PCT",
+        "RTG_CAPABILITY_RUST_MODE",
+        "capabilityGraph"
+      ]
+    },
+    {
+      "woord": "gevolg",
+      "bestanden": 12,
+      "domeinen": 9,
+      "samengesteld": 27,
+      "samengesteldDomeinen": 11,
+      "stand": "bezet",
+      "waar": [
+        "kern/command",
+        "kern/identiteit",
+        "kern/koppel",
+        "kern/livinglab",
+        "kern/mall"
+      ],
+      "vormen": [
+        "GEVOLG_STANDEN",
+        "blindVoorGevolg",
+        "gevolgLaag",
+        "gevolgRegister",
+        "gevolgVan",
+        "gevolgcontract"
+      ]
+    },
+    {
+      "woord": "vermogen",
+      "bestanden": 20,
+      "domeinen": 7,
+      "samengesteld": 17,
+      "samengesteldDomeinen": 6,
+      "stand": "bezet",
+      "waar": [
+        "kern/bevoegdheid",
+        "kern/bureau",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/pay"
+      ],
+      "vormen": [
+        "VERMOGENS",
+        "uitbetaalVermogen",
+        "uitbetaalVermogenVan",
+        "vermogenId",
+        "vermogenPk",
+        "vermogenUit"
+      ]
+    },
+    {
+      "woord": "zekerheid",
+      "bestanden": 23,
+      "domeinen": 12,
+      "samengesteld": 5,
+      "samengesteldDomeinen": 3,
+      "stand": "bezet",
+      "waar": [
+        "kern/avond",
+        "kern/command",
+        "kern/commercie",
+        "kern/fiscaal",
+        "kern/frictie"
+      ],
+      "vormen": [
+        "contractzekerheid",
+        "onzekerheid",
+        "trefzekerheid"
+      ]
+    },
+    {
+      "woord": "settlement",
+      "bestanden": 9,
+      "domeinen": 3,
+      "samengesteld": 16,
+      "samengesteldDomeinen": 5,
+      "stand": "bezet",
+      "waar": [
+        "kern/economie",
+        "kern/fonds",
+        "kern/magnaat-dekkingsmatrix"
+      ],
+      "vormen": [
+        "PARTNER_SETTLEMENT",
+        "RTG_SETTLEMENT_ENTITY_REF",
+        "SETTLEMENT_PENDING",
+        "SETTLEMENT_STATUS",
+        "economicSettlementsVoorClaim",
+        "maakSettlement"
+      ]
+    },
+    {
+      "woord": "projectie",
+      "bestanden": 13,
+      "domeinen": 5,
+      "samengesteld": 11,
+      "samengesteldDomeinen": 7,
+      "stand": "bezet",
+      "waar": [
+        "kern/kosten",
+        "kern/magnaat-kantoorregels",
+        "kern/namens",
+        "kern/spelprojectie-toegang",
+        "kern/stuur"
+      ],
+      "vormen": [
+        "maakFondsProjecties",
+        "maakProjectie",
+        "maakProjecties",
+        "projectieKoppel",
+        "projectieOpen",
+        "projectieSluit"
+      ]
+    },
+    {
+      "woord": "envelop",
+      "bestanden": 13,
+      "domeinen": 7,
+      "samengesteld": 10,
+      "samengesteldDomeinen": 8,
+      "stand": "bezet",
+      "waar": [
+        "kern/appstore",
+        "kern/envelop",
+        "kern/intreksignaal",
+        "kern/kantoor",
+        "kern/link"
+      ],
+      "vormen": [
+        "ENVELOPKLASSEN",
+        "envelopLaag",
+        "envelopWie",
+        "envelopeNaar",
+        "envelopeVan",
+        "serviceEnvelop"
+      ]
+    },
+    {
+      "woord": "bevoegdheid",
+      "bestanden": 16,
+      "domeinen": 13,
+      "samengesteld": 6,
+      "samengesteldDomeinen": 5,
+      "stand": "bezet",
+      "waar": [
+        "kern/command",
+        "kern/commercie",
+        "kern/concern",
+        "kern/isolatie",
+        "kern/levensdossier"
+      ],
+      "vormen": [
+        "behandelbevoegdheid",
+        "bevoegdheidNodig",
+        "maakBevoegdheid",
+        "zoekBevoegdheid"
+      ]
+    },
+    {
+      "woord": "deal",
+      "bestanden": 9,
+      "domeinen": 9,
+      "samengesteld": 9,
+      "samengesteldDomeinen": 5,
+      "stand": "bezet",
+      "waar": [
+        "kern/autoverkoop",
+        "kern/foodcourt",
+        "kern/lid",
+        "kern/mall",
+        "kern/markt"
+      ],
+      "vormen": [
+        "avDealerInbox",
+        "avMijnDeals",
+        "dealBetaal",
+        "dealHier",
+        "dealId",
+        "dealMaak"
+      ]
+    },
+    {
+      "woord": "mandaat",
+      "bestanden": 9,
+      "domeinen": 5,
+      "samengesteld": 6,
+      "samengesteldDomeinen": 4,
+      "stand": "bezet",
+      "waar": [
+        "kern/command",
+        "kern/concern",
+        "kern/fiscaal",
+        "kern/stadsweefsel",
+        "kern/stuur"
+      ],
+      "vormen": [
+        "maakMandaat",
+        "mandaatBron",
+        "mandaatGeldig",
+        "mandaatLaag",
+        "mandaatPlafond",
+        "mandaatUitleg"
+      ]
+    },
+    {
+      "woord": "principal",
+      "bestanden": 2,
+      "domeinen": 2,
+      "samengesteld": 11,
+      "samengesteldDomeinen": 4,
+      "stand": "bezet",
+      "waar": [
+        "kern/experience",
+        "kern/fonds"
+      ],
+      "vormen": [
+        "economicIntentsVoorPrincipal",
+        "economicPrincipalRef",
+        "intentsVoorPrincipal",
+        "principalRef",
+        "principalVoorSession"
+      ]
+    },
+    {
+      "woord": "intentie",
+      "bestanden": 6,
+      "domeinen": 4,
+      "samengesteld": 4,
+      "samengesteldDomeinen": 4,
+      "stand": "bezet",
+      "waar": [
+        "kern/link",
+        "kern/mall",
+        "kern/rtgone",
+        "kern/rtgone-projecten"
+      ],
+      "vormen": [
+        "intentieId",
+        "intentieMaak",
+        "intenties",
+        "intentiesActief",
+        "linkIntenties"
+      ]
+    },
+    {
+      "woord": "purpose",
+      "bestanden": 7,
+      "domeinen": 4,
+      "samengesteld": 2,
+      "samengesteldDomeinen": 2,
+      "stand": "bezet",
+      "waar": [
+        "kern/economie",
+        "kern/fonds",
+        "kern/gast",
+        "kern/namens"
+      ],
+      "vormen": [
+        "economicIntentsVoorPurpose",
+        "intentsVoorPurpose"
+      ]
+    },
+    {
+      "woord": "authority",
+      "bestanden": 2,
+      "domeinen": 1,
+      "samengesteld": 5,
+      "samengesteldDomeinen": 4,
+      "stand": "bezet",
+      "waar": [
+        "kern/experience"
+      ],
+      "vormen": [
+        "authorityRef",
+        "authorityScope",
+        "requiredAuthority"
+      ]
+    },
+    {
+      "woord": "commitment",
+      "bestanden": 2,
+      "domeinen": 1,
+      "samengesteld": 3,
+      "samengesteldDomeinen": 2,
+      "stand": "bezet",
+      "waar": [
+        "kern/economie"
+      ],
+      "vormen": [
+        "commitmentId",
+        "commitmentIds",
+        "createsFinancialCommitment"
+      ]
+    },
+    {
+      "woord": "consequence",
+      "bestanden": 4,
+      "domeinen": 1,
+      "samengesteld": 0,
+      "samengesteldDomeinen": 0,
+      "stand": "bezet",
+      "waar": [
+        "kern/experience"
+      ],
+      "vormen": []
+    },
+    {
+      "woord": "reconciliation",
+      "bestanden": 4,
+      "domeinen": 2,
+      "samengesteld": 0,
+      "samengesteldDomeinen": 0,
+      "stand": "bezet",
+      "waar": [
+        "kern/economie",
+        "kern/fonds"
+      ],
+      "vormen": []
+    },
+    {
+      "woord": "verplichting",
+      "bestanden": 1,
+      "domeinen": 1,
+      "samengesteld": 3,
+      "samengesteldDomeinen": 2,
+      "stand": "bezet",
+      "waar": [
+        "kern/spellen"
+      ],
+      "vormen": [
+        "maakVerplichting",
+        "verplichtingOp",
+        "verplichtingen"
+      ]
+    },
+    {
+      "woord": "assurance",
+      "bestanden": 3,
+      "domeinen": 2,
+      "samengesteld": 0,
+      "samengesteldDomeinen": 0,
+      "stand": "bezet",
+      "waar": [
+        "kern/identiteit",
+        "kern/kantoor"
+      ],
+      "vormen": []
+    },
+    {
+      "woord": "hoedanigheid",
+      "bestanden": 3,
+      "domeinen": 1,
+      "samengesteld": 0,
+      "samengesteldDomeinen": 0,
+      "stand": "bezet",
+      "waar": [
+        "kern/vertegenwoordiging"
+      ],
+      "vormen": []
+    },
+    {
+      "woord": "mechanism",
+      "bestanden": 1,
+      "domeinen": 1,
+      "samengesteld": 1,
+      "samengesteldDomeinen": 1,
+      "stand": "bezet",
+      "waar": [
+        "kern/namens"
+      ],
+      "vormen": [
+        "mechanisme"
+      ]
+    },
+    {
+      "woord": "outbox",
+      "bestanden": 1,
+      "domeinen": 1,
+      "samengesteld": 1,
+      "samengesteldDomeinen": 1,
+      "stand": "bezet",
+      "waar": [
+        "kern/intreksignaal"
+      ],
+      "vormen": [
+        "herhaalOutbox",
+        "koppelOutbox"
+      ]
+    },
+    {
+      "woord": "reconciliatie",
+      "bestanden": 1,
+      "domeinen": 1,
+      "samengesteld": 1,
+      "samengesteldDomeinen": 1,
+      "stand": "bezet",
+      "waar": [
+        "kern/economie"
+      ],
+      "vormen": [
+        "reconciliatieEngine"
+      ]
+    },
+    {
+      "woord": "obligation",
+      "bestanden": 0,
+      "domeinen": 0,
+      "samengesteld": 1,
+      "samengesteldDomeinen": 1,
+      "stand": "bezet-samengesteld",
+      "waar": [],
+      "vormen": [
+        "obligationAllocateId",
+        "obligationId",
+        "obligationIds",
+        "obligationPayId"
+      ]
+    },
+    {
+      "woord": "opportunity",
+      "bestanden": 0,
+      "domeinen": 0,
+      "samengesteld": 1,
+      "samengesteldDomeinen": 1,
+      "stand": "bezet-samengesteld",
+      "waar": [],
+      "vormen": [
+        "opportunityCost"
+      ]
+    },
+    {
+      "woord": "saga",
+      "bestanden": 0,
+      "domeinen": 0,
+      "samengesteld": 0,
+      "samengesteldDomeinen": 0,
+      "stand": "vrij",
+      "waar": [],
+      "vormen": []
+    }
+  ]
+}

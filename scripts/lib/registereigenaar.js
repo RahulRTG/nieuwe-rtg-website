@@ -87,6 +87,17 @@ const EIGENAAR = {
   'NORM.json': { schrijver: 'scripts/norm.js',
     waarom: 'de ratel is gedeeld bezit: elke meter schrijft zijn eigen getal erin (dekking, samenhang, ' +
       'schermen, wetten). norm.js is de eigenaar van de VORM, niet van elke waarde.' },
+
+  /* DEZE WACHTER BETRAPTE ZIJN EIGEN BOUWER, en dat is het punt van de vloer.
+     NAMENSVORM.json kwam er op 14 september bij zonder verklaring, en toets 4
+     zakte op 147 terwijl de vloer op 146 staat -- terwijl `npm run check`,
+     `npm run registerklopt` en `npm run norm` alle drie lokaal groen stonden.
+     LAT.md regel 17 in het klein: een poort bewijst alleen zijn eigen bereik. */
+  'NAMENSVORM.json': { schrijver: 'scripts/namensvorm.js',
+    waarom: 'de meting achter REPRESENTATIE.md par. 0: delen de zeven manieren van ' +
+      'namens-iemand-handelen een vorm en een woordenschat? Geschreven met --vastleggen, ' +
+      'gelezen door test/namensvorm.test.js, scripts/norm.js (de ratel namensMechanismenGemeten) ' +
+      'en scripts/getallen.js (zeven levende getallen in het document).' },
 };
 
 /* MEETING: welk script schrijft aantoonbaar naar een wortelregister? Ondergrens,

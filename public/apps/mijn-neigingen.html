@@ -112,6 +112,25 @@
     }
   }).catch(() => {});
 
+  /* HET ADRES VAN EEN BESTEMMING, in dezelfde vorm als public/shared/sprong.js.
+
+     Een rij met een eigen `url` wijst naar een scherm. Een `tab` of een `os`-app
+     woont IN de leden-app en heeft er geen: sprong.js opent die als
+     `/apps/app.html#tab=<sleutel>` of `#os=<sleutel>`, en dat is de vorm die dit
+     scherm overneemt in plaats van een tweede te verzinnen.
+
+     Dat het hier stond als "geen url, dus dode tekst" kostte vijf van de zeven
+     bestemmingen: werk, bestellen, salon, videobellen en zorg zijn alle vijf
+     gewoon te bereiken. Een browsertoets op een pad dat toevallig wel een url
+     had (reizen, stad), zag daar niets van. */
+  function adresVan(i, sleutel) {
+    if (!i) return null;
+    if (i.url) return i.url;
+    if (i.soort === 'tab' || i.soort === 'os')
+      return '/apps/app.html#' + (i.soort === 'tab' ? 'tab=' : 'os=') + encodeURIComponent(sleutel);
+    return null;
+  }
+
   /* ------------------------------------------------------------- de intake */
 
   let gekozen = new Set();
@@ -177,10 +196,11 @@
       const bak = maak('div', 'opent');
       for (const sleutel of s.opent) {
         const i = INDEX[sleutel];
+        const adres = adresVan(i, sleutel);
         /* Alleen een link als we het adres kennen; anders de sleutel als tekst.
            Een knop die nergens heen gaat is erger dan geen knop. */
-        if (i && i.url) {
-          const a = maak('a'); a.href = i.url; tekst(a, i.naam || sleutel); bak.appendChild(a);
+        if (adres) {
+          const a = maak('a'); a.href = adres; tekst(a, (i && i.naam) || sleutel); bak.appendChild(a);
         } else {
           /* Geen adres bekend: de naam als TEKST en geen knop die nergens heen
              gaat. Eigen klasse, want `.opent` is de container en niet de rij. */

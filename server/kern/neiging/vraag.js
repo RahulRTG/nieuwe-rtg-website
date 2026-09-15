@@ -72,22 +72,52 @@ const SPRONGINDEX = require('../../../public/shared/sprongindex.json');
 
 /* De enige lijst onderdelen die dit huis heeft, afgeleid uit MAPPEN. Hij wordt
    HIER gelezen en nergens overgetypt. Ontbreekt het bestand, dan levert
-   `controle()` dat als bevinding op in plaats van stil door te draaien. */
+   `controle()` dat als bevinding op in plaats van stil door te draaien.
+
+   TWEE VERZAMELINGEN EN NIET EEN, en dat verschil is met een browser gevonden.
+   Een sleutel kan BESTAAN zonder een adres te hebben: `reizen` staat er twee
+   keer in, eerst als TAB (een tabblad binnen de app-schil, zonder url) en daarna
+   als LINK. Beide zijn echte bestemmingen, maar alleen de tweede kan een slot-
+   scherm aanklikbaar maken. Wie alleen op bestaan toetst, laat een vraag door
+   die het lid als dode tekst te zien krijgt.
+
+   MAAR EEN TAB IS NIET ONBEREIKBAAR, en dat was de eerste lezing hier wel.
+   public/shared/sprong.js -- de bestaande korte weg door dit huis -- adresseert
+   een tab of een os-app als `/apps/app.html#tab=<sleutel>` respectievelijk
+   `#os=<sleutel>`. Adresseerbaar is dus: een eigen url, OF een soort die sprong.js
+   kan openen. Zonder dat onderscheid meldde deze controle vijf valse gebreken
+   (werk, bestellen, salon, videobellen, zorg) die alle vijf gewoon te bereiken
+   zijn. `zonderAdres` blijft bestaan voor de soort die NIEMAND kan openen. */
+const ADRESSEERBAAR = new Set(['tab', 'os']);
 function sleutels() {
   const items = SPRONGINDEX && SPRONGINDEX.items;
   if (!Array.isArray(items)) return null;
-  return new Set(items.map(i => i.sleutel).filter(Boolean));
+  const bestaat = new Set(), metAdres = new Set();
+  for (const i of items) {
+    if (!i.sleutel) continue;
+    bestaat.add(i.sleutel);
+    if (i.url || ADRESSEERBAAR.has(i.soort)) metAdres.add(i.sleutel);
+  }
+  return { bestaat, metAdres };
 }
 
-/* Wijst elke optie naar een onderdeel dat bestaat? Dit is de handhaver achter
-   de belofte in de kop; test/neiging.test.js leest hem. */
+/* Wijst elke optie naar een onderdeel dat bestaat, en is dat onderdeel ook aan
+   te klikken? Dit is de handhaver achter de belofte in de kop;
+   test/neiging.test.js leest hem.
+
+   `onbekend` is een FOUT (de vraag wijst nergens heen) en `zonderAdres` een
+   WAARSCHUWING (de vraag wijst ergens heen dat een scherm niet kan linken). Ze
+   worden niet opgeteld: de eerste is een gebrek, de tweede een keuze die iemand
+   bewust kan maken zolang hij weet wat het lid dan ziet. */
 function controle() {
-  const bestaat = sleutels();
-  if (!bestaat) return { ok: false, reden: 'sprongindex.json niet leesbaar', onbekend: [] };
-  const onbekend = [];
-  for (const v of VRAGEN) for (const o of v.opties) for (const w of o.wijst)
-    if (!bestaat.has(w)) onbekend.push({ vraag: v.id, onderwerp: o.onderwerp, wijst: w });
-  return { ok: onbekend.length === 0, onbekend, bestemmingen: bestaat.size };
+  const s = sleutels();
+  if (!s) return { ok: false, reden: 'sprongindex.json niet leesbaar', onbekend: [], zonderAdres: [] };
+  const onbekend = [], zonderAdres = [];
+  for (const v of VRAGEN) for (const o of v.opties) for (const w of o.wijst) {
+    if (!s.bestaat.has(w)) onbekend.push({ vraag: v.id, onderwerp: o.onderwerp, wijst: w });
+    else if (!s.metAdres.has(w)) zonderAdres.push({ vraag: v.id, onderwerp: o.onderwerp, wijst: w });
+  }
+  return { ok: onbekend.length === 0, onbekend, zonderAdres, bestemmingen: s.bestaat.size };
 }
 
 /* Alle bestemmingen die al opengaan door wat het lid draagt. */

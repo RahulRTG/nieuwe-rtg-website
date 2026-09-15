@@ -145,6 +145,36 @@ test('het scherm van RTG Neiging', { skip: geenBrowser(pw), concurrency: false }
     });
   });
 
+  await t.test('ook een bestemming ZONDER eigen url wordt een werkende link', async () => {
+    /* De vorige toets liep toevallig langs reizen/stad, en die hebben allebei een
+       eigen url. Vijf van de zeven openingsopties wijzen naar een TAB of een
+       OS-app die IN de leden-app woont en er geen heeft (werk, bestellen, salon,
+       videobellen, zorg). Die stonden als dode tekst op het scherm, en geen
+       enkele servertoets zag het -- de route gaf keurig de sleutel terug.
+
+       Deze toets kiest daarom expliciet "Eten" en daarna "Thuis laten komen",
+       en dat komt uit op `bestellen`: een tab zonder url.
+
+       DE MUTATIE: haal de tab/os-tak uit adresVan() in mijn-neigingen.html.
+       Deze toets zakt op een span in plaats van een link. */
+    await metLid(async (page) => {
+      await page.locator('.keuze', { hasText: 'Eten' }).first().click();
+      await page.locator('.door').click();
+      await page.waitForTimeout(700);
+      await page.locator('.keuze', { hasText: 'Thuis laten komen' }).first().click();
+      await page.locator('.door').click();
+      await page.waitForTimeout(700);
+      while (await page.locator('.keuze').count() > 0) await ronde(page);
+
+      const adressen = await page.locator('.opent a').evaluateAll(
+        els => els.map(e => e.getAttribute('href')));
+      assert.equal(await page.locator('.opent .opent-stil').count(), 0,
+        'een bestemming staat als dode tekst; links: ' + adressen.join(', '));
+      assert.ok(adressen.some(h => /app\.html#tab=bestellen/.test(h || '')),
+        'de tab-bestemming hoort de vorm van sprong.js te krijgen: ' + adressen.join(', '));
+    });
+  });
+
   await t.test('vergeten haalt de regel van het scherm', async () => {
     /* DE MUTATIE: laat vergeet() in kern/neiging/beheer.js `ok` teruggeven
        zonder te splicen. Deze toets zakt op een regel die blijft staan. */

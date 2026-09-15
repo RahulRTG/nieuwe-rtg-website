@@ -120,6 +120,20 @@ test('elke optie wijst naar een onderdeel dat werkelijk bestaat', () => {
   assert.equal(c.ok, true, 'onbekende bestemmingen: ' + JSON.stringify(c.onbekend));
 });
 
+test('elke bestemming is ook te ADRESSEREN, en niet alleen te vinden', () => {
+  /* Bestaan is niet hetzelfde als bereikbaar. Een sleutel kan in de index staan
+     als TAB zonder eigen url; shared/sprong.js opent die als
+     /apps/app.html#tab=<sleutel>. Een soort die sprong.js NIET kent, levert een
+     bestemming op die het slotscherm als dode tekst toont -- en dat is precies
+     wat een lid ziet zonder dat een servertoets iets merkt.
+
+     DE MUTATIE: haal 'tab' uit ADRESSEERBAAR in kern/neiging/vraag.js. Deze
+     toets zakt op vier bestemmingen. */
+  const c = vraag.controle();
+  assert.deepEqual(c.zonderAdres, [],
+    'bestemmingen zonder adres: ' + JSON.stringify(c.zonderAdres));
+});
+
 test('een vraag zonder winst wordt niet gesteld', () => {
   /* Alles van de openingsvraag gekozen en alle vervolgvragen gehad: dan is er
      niets meer te winnen en hoort de motor NIETS te geven. */

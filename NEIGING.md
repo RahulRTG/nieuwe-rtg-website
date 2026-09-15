@@ -462,6 +462,18 @@ al kon tekenen: een wedloop die zich als "soms werkt het" voordoet.
 `test/neiging-scherm.e2e.js` bewaakt nu beide, en vergelijkt met wat de SERVER
 zegt in plaats van met een getal.
 
+En de reparatie vond er meteen **vijf meer**, die de browsertoets zelf niet zag
+omdat hij toevallig langs `reizen`/`stad` liep — twee bestemmingen die wél een
+eigen url hebben. `werk`, `bestellen`, `salon`, `videobellen` en `zorg` zijn een
+**tab** of een **os-app**: die wonen ín de leden-app en hebben geen eigen adres.
+Ze stonden alle vijf als dode tekst op het slotscherm. De vorm om ze te openen
+bestond al en staat in `public/shared/sprong.js`
+(`/apps/app.html#tab=<sleutel>`); het scherm neemt die nu over in plaats van er
+een tweede te verzinnen, en `controle()` in de laag kent het verschil tussen
+*bestaat* en *is te adresseren*. Een toets die één pad loopt, bewijst dat pad —
+en een pad kiezen dat toevallig de makkelijke helft raakt, is hoe dit soort
+gebreken blijft staan.
+
 **`public/apps/app-main.js` is bouwuitvoer.** De eerste registratie van het scherm
 ging naar het gebundelde bestand in plaats van naar
 `public/apps/app-main/app-main-23a.js` en `-24a2.js`. De index bleef stil op 114

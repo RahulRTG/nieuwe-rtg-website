@@ -154,3 +154,63 @@ test('het corpus dwingt de keten op verschillende plekken te stoppen', () => {
       'elk geval zegt WAAROM het erin staat; anders is het corpus een verzameling zinnen');
   }
 });
+
+/* ---- DE RATEL: het bereik van de METER, niet de uitslag ------------------- */
+
+/* WAAROM HIER GEEN UITSLAG WORDT VASTGEZET. Deze meting bestaat om te BEWEGEN:
+   vandaag raakt geen enkele zin `mandaat`, en de hele bedoeling van het register
+   is dat dat verandert. Een ratel op de uitslag zou het repareren bestraffen.
+
+   Wat wel alleen een kant op mag, is hoeveel de meter KAN ZIEN. Valt een schakel
+   uit de haak (iemand hernoemt kern/stuur/mandaat.js, een export wordt bevroren),
+   dan meldt dit register exact dezelfde conclusie -- "mandaat wordt door geen
+   enkele zin geraakt" -- over minder bewijs. Dat is dezelfde faalvorm als een
+   schuld die daalt doordat het instrument blind wordt, en dat is precies waar
+   een ratel voor bestaat. Het besluit staat ook in scripts/lib/metingen.js,
+   naast dat van CARRIEREVORM.json, dat om dezelfde reden het BEREIK ratelt.
+
+   MUTATIE GEZIEN ZAKKEN: een schakel uit SCHAKELS in scripts/lib/ketenspoor.js
+   gehaald -> toets zakt op de vloer van negen, met de naam van de schakel erbij.
+   En andersom: een schakel in `nietGeinstrumenteerd` gezet -> zakt daarop. */
+const REGISTER = path.join(WORTEL, 'KETENBEREIK.json');
+
+test('de haak verklaart negen schakels, en die vloer mag niet dalen', () => {
+  const ruw = fs.readFileSync(HAAK, 'utf8');
+  const namen = [...ruw.matchAll(/\{\s*id:\s*'([a-z]+)'/g)].map(m => m[1]);
+  assert.ok(namen.length >= 9,
+    'de haak verklaart nog ' + namen.length + ' schakels van de negen; een keten met minder schakels ' +
+    'meet minder en concludeert hetzelfde. Wat eraf ging: ' + namen.join(', '));
+  for (const nodig of ['menscontext', 'resolver', 'beleid', 'plan', 'gevolg', 'mandaat',
+    'executor', 'lus', 'nacontrole'])
+    assert.ok(namen.includes(nodig), 'de schakel "' + nodig + '" staat niet meer in de haak');
+});
+
+test('KETENBEREIK.json bestaat, en elke stand zag alle negen schakels', () => {
+  assert.ok(fs.existsSync(REGISTER),
+    'KETENBEREIK.json ontbreekt. Draai `npm run ketenbereik:vast`; een ratel zonder register ' +
+    'is geen ratel maar een toets die altijd groen staat');
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+
+  assert.ok(Array.isArray(j.haakstand) && j.haakstand.length >= 3,
+    'het register meet minder dan drie standen; met minder standen is BEREIKBAAR niet vast te stellen');
+
+  for (const s of j.haakstand) {
+    assert.strictEqual(s.nietGeinstrumenteerd.length, 0,
+      'in de stand "' + s.stand + '" kon de haak een schakel niet wikkelen: ' +
+      s.nietGeinstrumenteerd.map(n => n.schakel + ' (' + n.reden + ')').join('; ') +
+      ' -- die schakel staat daardoor als NIET_GEINSTRUMENTEERD en niet als "niet bereikt". ' +
+      'Repareer de haak; een lege schakel zonder meetdekking leest als een gat in de architectuur.');
+    assert.ok(s.geinstrumenteerd.length >= 9,
+      'de stand "' + s.stand + '" zag ' + s.geinstrumenteerd.length + ' schakels in plaats van negen');
+  }
+
+  /* En de uitspraak draagt altijd haar eigen leesaanwijzing -- of er nu wel of
+     niet iets is uitgevoerd. Zonder die zin is `buitenMandaat: 0` een
+     geruststelling over een vraag die niemand heeft gesteld. */
+  const u = j.onomzeilbaarheid.uitspraak;
+  assert.ok(/^(NIET_BEPROEFD|BEPROEFD|BYPASS GEVONDEN)/.test(u),
+    'de uitspraak opent niet met een van de drie standen: ' + u);
+  if (u.startsWith('NIET_BEPROEFD'))
+    assert.match(u, /NIET als "mandaat is onomzeilbaar"/,
+      'de NIET_BEPROEFD-uitslag moet zelf zeggen hoe hij niet gelezen mag worden');
+});

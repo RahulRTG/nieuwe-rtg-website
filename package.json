@@ -400,7 +400,8 @@
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
     "idemidentiteit": "node scripts/idemidentiteit.js",
     "router": "node scripts/router.js",
-    "ketenbereik": "node scripts/ketenbereik.js"
+    "ketenbereik": "node scripts/ketenbereik.js",
+    "ketenbereik:vast": "node scripts/ketenbereik.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

@@ -36,7 +36,8 @@
    server/; de waarneming komt van scripts/lib/ketenspoor.js, een preload die
    zonder RTG_KETENSPOOR letterlijk niets doet.
 
-   Draai: npm run ketenbereik */
+   Draai: npm run ketenbereik        (meet en rapporteert)
+          npm run ketenbereik:vast   (schrijft KETENBEREIK.json) */
 'use strict';
 
 const fs = require('fs');
@@ -271,9 +272,16 @@ async function main() {
 
 if (require.main === module) {
   main().then((uit) => {
-    fs.writeFileSync(DOEL, JSON.stringify(Object.assign({ stempel: stempel() }, uit), null, 2) + '\n');
+    /* SCHRIJVEN ALLEEN MET --vastleggen, dezelfde vorm als de vier ketenproeven
+       ernaast (momentproef, ritproef, toelatingsproef, adamproef). Reden: een
+       meting die zichzelf altijd wegschrijft, maakt de boom vuil tijdens een
+       meetronde en stempelt de VOLGENDE meter als onreproduceerbaar -- precies
+       de fout die in de kop van scripts/lib/stempel.js staat uitgeschreven. */
+    const vast = process.argv.includes('--vastleggen');
+    if (vast) fs.writeFileSync(DOEL, JSON.stringify(Object.assign({ stempel: stempel() }, uit), null, 2) + '\n');
     const b = uit.onomzeilbaarheid;
-    console.log('\nKETENBEREIK.json geschreven.\n');
+    console.log(vast ? '\nKETENBEREIK.json geschreven.\n'
+      : '\nGEMETEN, NIET GESCHREVEN (draai `npm run ketenbereik:vast` om vast te leggen).\n');
     for (const [standId, perIngang] of Object.entries(uit.keten)) {
       console.log('  ' + standId);
       for (const [ingang, schakels] of Object.entries(perIngang)) {

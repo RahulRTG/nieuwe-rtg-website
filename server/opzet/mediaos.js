@@ -37,7 +37,8 @@ module.exports = (kern, hulp) => {
      ledensleutel, op het moment dat het werk er is. kern/connect/ LEEST dat en
      stelt auteurschap nooit zelf vast (besluit van de eigenaar, 15 september
      2026). De uitleg staat in de kop van kern/mediaos/werkherkomst.js. */
-  const werkherkomst = require('../kern/mediaos/werkherkomst').maakWerkherkomst({ db, save });
+  const werkherkomst = require('../kern/mediaos/werkherkomst').maakWerkherkomst({
+    opslag: require('../kern/mediaos/opslag')({ db, save }) });
 
   Object.assign(kern, require('../kern/mediaos').maakMediaOS({
     db, save, schoon, crypto, codenaamVan: kern.codenaamVan, keyVanCodenaam, notify, werkherkomst,

@@ -131,25 +131,25 @@ test('10. de treden met bewijskracht kan een mens niet zelf zetten', () => {
      de mens zelf niet mag schrijven. */
   const { c } = bouw();
   for (const trede of ['gebruikt', 'doorgegeven']) {
-    assert.equal(c.connectDossierNoteer('AB', { trede, onderwerp: 'koken', door: 'zelf', bron: 'w1' }).ok,
+    assert.equal(c.connect.dossierNoteer('AB', { trede, onderwerp: 'koken', door: 'zelf', bron: 'w1' }).ok,
       false, trede + ' mag niet door de mens zelf');
-    assert.equal(c.connectDossierNoteer('AB', { trede, onderwerp: 'koken',
+    assert.equal(c.connect.dossierNoteer('AB', { trede, onderwerp: 'koken',
       door: 'eenAnder', bron: 'naklank:1:' + trede }).ok, true, trede + ' mag wel door een ander');
   }
 });
 
 test('11. "gemaakt" zonder verwijzing naar het gemaakte wordt geweigerd', () => {
   const { c } = bouw();
-  assert.equal(c.connectDossierNoteer('AB', { trede: 'gemaakt', onderwerp: 'koken', door: 'hetSysteem' }).ok, false);
-  assert.equal(c.connectDossierNoteer('AB', { trede: 'gemaakt', onderwerp: 'koken',
+  assert.equal(c.connect.dossierNoteer('AB', { trede: 'gemaakt', onderwerp: 'koken', door: 'hetSysteem' }).ok, false);
+  assert.equal(c.connect.dossierNoteer('AB', { trede: 'gemaakt', onderwerp: 'koken',
     door: 'hetSysteem', bron: 'foto:9' }).ok, true);
 });
 
 test('12. de hoogste trede is per ONDERWERP en er komt nergens een totaal', () => {
   const { c } = bouw();
-  c.connectDossierNoteer('AB', { trede: 'gezien', onderwerp: 'breuken', door: 'hetSysteem' });
-  c.connectDossierNoteer('AB', { trede: 'gemaakt', onderwerp: 'koken', door: 'hetSysteem', bron: 'f:1' });
-  const d = c.connectDossier('AB');
+  c.connect.dossierNoteer('AB', { trede: 'gezien', onderwerp: 'breuken', door: 'hetSysteem' });
+  c.connect.dossierNoteer('AB', { trede: 'gemaakt', onderwerp: 'koken', door: 'hetSysteem', bron: 'f:1' });
+  const d = c.connect.dossier('AB');
   assert.equal(d.perOnderwerp.length, 2);
   /* Geen niveau, geen score, geen totaal over onderwerpen heen: een getal over
      alle onderwerpen IS een niveau, hoe je het ook noemt. */
@@ -163,23 +163,23 @@ test('12. de hoogste trede is per ONDERWERP en er komt nergens een totaal', () =
 
 test('13. gezien en begrepen zijn een feit en geen teller', () => {
   const { c } = bouw();
-  const een = c.connectOpen('AB', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
-  const twee = c.connectOpen('AB', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
+  const een = c.connect.open('AB', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
+  const twee = c.connect.open('AB', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
   assert.equal(een.nieuw, true);
   assert.equal(twee.nieuw, false, 'een tweede keer kijken is geen tweede feit');
   assert.equal(twee.ok, true, 'en het is geen fout');
   /* De vijf andere treden herhalen WEL: twee keer oefenen zijn twee
      oefeningen, en twee mensen die zeggen dat u hen hielp zijn twee mensen. */
-  c.connectDossierNoteer('AB', { trede: 'geoefend', onderwerp: 'koken', door: 'hetSysteem' });
-  c.connectDossierNoteer('AB', { trede: 'geoefend', onderwerp: 'koken', door: 'hetSysteem' });
-  assert.equal(c.connectDossier('AB').totaal, 3);
+  c.connect.dossierNoteer('AB', { trede: 'geoefend', onderwerp: 'koken', door: 'hetSysteem' });
+  c.connect.dossierNoteer('AB', { trede: 'geoefend', onderwerp: 'koken', door: 'hetSysteem' });
+  assert.equal(c.connect.dossier('AB').totaal, 3);
 });
 
 /* ------------------------------------------------------------ 14 -- naklank */
 test('14. de zes naklanken worden nooit tot een cijfer verwerkt', () => {
   const { c } = bouw();
-  c.connectNaklank('werk:1', 'CD', 'geleerd');
-  const t = c.connectNaklankTel('werk:1', 'CD');
+  c.connect.naklank('werk:1', 'CD', 'geleerd');
+  const t = c.connect.naklankTel('werk:1', 'CD');
   assert.equal(t.soorten.length, 6);
   for (const verboden of ['totaal', 'score', 'gemiddelde', 'rang']) {
     assert.ok(!(verboden in t), 'de teller draagt geen "' + verboden + '"');
@@ -199,21 +199,21 @@ test('15. de maker komt uit een resolver en nooit uit de aanroep', () => {
      want een verzonnen codenaam is per definitie niet gelijk aan de gever. */
   const { c } = bouw({ makerVan: (id) => id === 'werk:1' ? { sleutel: 'MAKER', onderwerp: 'koken' } : null });
 
-  const los = c.connectNaklank('werk:onbekend', 'CD', 'geholpen');
+  const los = c.connect.naklank('werk:onbekend', 'CD', 'geholpen');
   assert.equal(los.ok, true, 'de naklank wordt geteld -- hij gaat over het DING');
   assert.equal(los.dossier, null, 'maar er komt geen regel bij een maker');
   assert.ok(los.dossierReden, 'en de reden staat erbij');
 
-  const raak = c.connectNaklank('werk:1', 'CD', 'geholpen');
+  const raak = c.connect.naklank('werk:1', 'CD', 'geholpen');
   assert.equal(raak.dossier.ok, true, 'met een maker loopt de haak wel');
-  const d = c.connectDossier('MAKER');
+  const d = c.connect.dossier('MAKER');
   assert.equal(d.perOnderwerp[0].trede, 'gebruikt');
   assert.equal(d.perOnderwerp[0].graad, 'bewezen', 'wat een ander bevestigt, is bewezen');
   assert.equal(d.regels[0].onderwerp, 'koken', 'het onderwerp komt ook uit de resolver');
 
   /* En op je eigen werk telt hij niet -- nu pas echt toetsbaar, want de maker
      staat vast. */
-  assert.equal(c.connectNaklank('werk:1', 'MAKER', 'geholpen').ok, false);
+  assert.equal(c.connect.naklank('werk:1', 'MAKER', 'geholpen').ok, false);
 });
 
 /* --------------------------------------------------- 16 -- lezen is stil */
@@ -224,14 +224,14 @@ test('16. lezen laat de opslag volledig met rust', async () => {
      `leest: true` heet en de opslag laat groeien, klopt niet met zijn eigen
      mutatiecontract en niemand zou het merken. */
   const { db, c, saves } = bouw();
-  c.connectHorizon('AB');
-  c.connectDossier('AB');
-  c.connectNaklankTel('werk:1', 'AB');
-  await c.connectOntdek('AB', { vandaag: '2026-09-15' });
+  c.connect.horizon('AB');
+  c.connect.dossier('AB');
+  c.connect.naklankTel('werk:1', 'AB');
+  await c.connect.ontdek('AB', { vandaag: '2026-09-15' });
   assert.deepEqual(db.data, {}, 'na alleen lezen staat er niets in de opslag');
   assert.equal(saves(), 0, 'en er is niet eens geprobeerd op te slaan');
 
-  c.connectSignaal('AB', 'koken', 'meer');
+  c.connect.signaal('AB', 'koken', 'meer');
   assert.ok(db.data.connect.horizon.AB, 'schrijven doet het wel');
 });
 
@@ -239,30 +239,30 @@ test('16. lezen laat de opslag volledig met rust', async () => {
 test('17. de horizon weigert een contactgegeven als voorkeur', () => {
   const { c } = bouw();
   for (const niet of ['iemand@ergens.nl', '06 12345678', '2011 AB']) {
-    assert.equal(c.connectSignaal('AB', niet, 'meer').ok, false, niet + ' is geen onderwerp');
+    assert.equal(c.connect.signaal('AB', niet, 'meer').ok, false, niet + ' is geen onderwerp');
   }
-  assert.equal(c.connectSignaal('AB', 'fotografie', 'meer').ok, true);
+  assert.equal(c.connect.signaal('AB', 'fotografie', 'meer').ok, true);
 });
 
 test('18. "verras me" verzet de instelling van de mens niet', () => {
   const { c } = bouw();
-  c.connectSchuif('AB', 10);
-  const r = c.connectSignaal('AB', null, 'verras');
+  c.connect.schuif('AB', 10);
+  const r = c.connect.signaal('AB', null, 'verras');
   assert.equal(r.eenmalig, true);
   assert.equal(r.bewaard, false);
-  assert.equal(c.connectHorizon('AB').schuif, 10, 'de schuif van de mens staat er nog');
+  assert.equal(c.connect.horizon('AB').schuif, 10, 'de schuif van de mens staat er nog');
 });
 
 test('19. een voorkeur kan niet onbeperkt groeien', () => {
   const { c } = bouw();
-  for (let i = 0; i < 20; i++) c.connectSignaal('AB', 'koken', 'meer');
-  assert.equal(c.connectHorizon('AB').onderwerpen[0].gewicht, 3,
+  for (let i = 0; i < 20; i++) c.connect.signaal('AB', 'koken', 'meer');
+  assert.equal(c.connect.horizon('AB').onderwerpen[0].gewicht, 3,
     'honderd keer drukken betekent hetzelfde als drie keer; anders wordt een voorkeur vanzelf de enige');
 });
 
 test('20. een motor zonder bron zegt dat hij niet kijkt', () => {
   const { c } = bouw();
-  const m = c.connectMotoren();
+  const m = c.connect.motoren();
   assert.equal(m.length, 8);
   const stil = m.filter(x => !x.aangesloten);
   assert.ok(stil.length > 0);
@@ -274,11 +274,11 @@ test('20. een motor zonder bron zegt dat hij niet kijkt', () => {
 
 test('21. de schuif van de mens verdeelt de plekken, en niets anders doet dat', async () => {
   const { c } = bouw();
-  c.connectSignaal('AB', 'voetbal', 'meer');
-  c.connectSchuif('AB', 0);
-  const vertrouwd = await c.connectOntdek('AB', { vandaag: '2026-09-15' });
-  c.connectSchuif('AB', 100);
-  const ontdekkend = await c.connectOntdek('AB', { vandaag: '2026-09-15' });
+  c.connect.signaal('AB', 'voetbal', 'meer');
+  c.connect.schuif('AB', 0);
+  const vertrouwd = await c.connect.ontdek('AB', { vandaag: '2026-09-15' });
+  c.connect.schuif('AB', 100);
+  const ontdekkend = await c.connect.ontdek('AB', { vandaag: '2026-09-15' });
   assert.equal(vertrouwd.verdeling.ontdekken, 0);
   assert.equal(ontdekkend.verdeling.vertrouwd, 0);
   /* Geen plek draagt een score: er is niets om later op te optimaliseren. */
@@ -292,10 +292,10 @@ test('22. dezelfde dag geeft hetzelfde, een andere dag iets anders', async () =>
   /* Een lijst die bij elke aanraking verandert, is een gokkast -- en hij is
      bovendien niet na te rekenen, wat elke toets hierover waardeloos maakt. */
   const { c } = bouw();
-  c.connectSignaal('AB', 'koken', 'meer');
-  const a = await c.connectOntdek('AB', { vandaag: '2026-09-15' });
-  const b = await c.connectOntdek('AB', { vandaag: '2026-09-15' });
-  const c2 = await c.connectOntdek('AB', { vandaag: '2026-10-02' });
+  c.connect.signaal('AB', 'koken', 'meer');
+  const a = await c.connect.ontdek('AB', { vandaag: '2026-09-15' });
+  const b = await c.connect.ontdek('AB', { vandaag: '2026-09-15' });
+  const c2 = await c.connect.ontdek('AB', { vandaag: '2026-10-02' });
   const ids = (r) => r.plekken.map(p => p.ontdekking.id).join('|');
   assert.equal(ids(a), ids(b), 'twee keer verversen op dezelfde dag geeft hetzelfde');
   assert.notEqual(ids(a), ids(c2), 'een andere dag geeft iets anders');
@@ -303,8 +303,8 @@ test('22. dezelfde dag geeft hetzelfde, een andere dag iets anders', async () =>
 
 test('23. de lus komt van een alledaags onderwerp bij een vak waar niet om gevraagd is', async () => {
   const { c } = bouw();
-  c.connectSignaal('AB', 'voetbal', 'meer');
-  const r = await c.connectOntdek('AB', { vandaag: '2026-09-15' });
+  c.connect.signaal('AB', 'voetbal', 'meer');
+  const r = await c.connect.ontdek('AB', { vandaag: '2026-09-15' });
   const brug = r.plekken.find(p => p.ontdekking.soort === 'vraag');
   assert.ok(brug, 'er is een brug');
   assert.notEqual(brug.ontdekking.onderwerp, 'voetbal', 'en hij komt ergens anders uit');
@@ -322,20 +322,20 @@ test('24. een maker die MEEGESTUURD wordt, wordt genegeerd', () => {
      Wat hier wordt uitgesloten is het lek zelf: een gever die een codenaam
      meestuurt, schrijft daarmee geen regel in het dossier van die mens. */
   const { c } = bouw({ makerVan: () => null });
-  const r = c.connectNaklank('werk:van-niemand', 'AANVALLER', 'geholpen',
+  const r = c.connect.naklank('werk:van-niemand', 'AANVALLER', 'geholpen',
     { maker: 'SLACHTOFFER', onderwerp: 'ik ben hier nooit geweest' });
   assert.equal(r.ok, true, 'de naklank zelf mag gewoon geteld worden');
   assert.equal(r.dossier, null, 'maar er ontstaat geen dossierregel');
-  assert.equal(c.connectDossier('SLACHTOFFER').totaal, 0,
+  assert.equal(c.connect.dossier('SLACHTOFFER').totaal, 0,
     'en in het dossier van de genoemde mens staat niets');
 
   /* En ook niet als er WEL een resolver is die iemand anders aanwijst: dan
      wint de resolver, niet de aanroep. */
   const twee = bouw({ makerVan: () => ({ sleutel: 'ECHTE-MAKER', onderwerp: 'koken' }) });
-  twee.c.connectNaklank('werk:1', 'AANVALLER', 'geholpen', { maker: 'SLACHTOFFER', onderwerp: 'x' });
-  assert.equal(twee.c.connectDossier('SLACHTOFFER').totaal, 0);
-  assert.equal(twee.c.connectDossier('ECHTE-MAKER').totaal, 1);
-  assert.equal(twee.c.connectDossier('ECHTE-MAKER').regels[0].onderwerp, 'koken',
+  twee.c.connect.naklank('werk:1', 'AANVALLER', 'geholpen', { maker: 'SLACHTOFFER', onderwerp: 'x' });
+  assert.equal(twee.c.connect.dossier('SLACHTOFFER').totaal, 0);
+  assert.equal(twee.c.connect.dossier('ECHTE-MAKER').totaal, 1);
+  assert.equal(twee.c.connect.dossier('ECHTE-MAKER').regels[0].onderwerp, 'koken',
     'ook het onderwerp komt uit de resolver en niet uit de aanroep');
 });
 
@@ -345,11 +345,11 @@ test('25. een geweigerde naklank laat geen rij achter', () => {
      werd netjes geweigerd en liet toch een lege rij in db.data achter. De
      opslag groeit dan door aanroepen die niets mochten -- en niets klaagt. */
   const { db, c } = bouw({ makerVan: () => ({ sleutel: 'MIJ', onderwerp: 'koken' }) });
-  assert.equal(c.connectNaklank('werk:1', 'MIJ', 'geholpen').ok, false, 'op je eigen werk: geweigerd');
+  assert.equal(c.connect.naklank('werk:1', 'MIJ', 'geholpen').ok, false, 'op je eigen werk: geweigerd');
   assert.deepEqual(db.data, {}, 'en er staat niets in de opslag');
-  assert.equal(c.connectNaklank('werk:1', 'JIJ', 'bestaatniet').ok, false, 'onbekende soort: geweigerd');
+  assert.equal(c.connect.naklank('werk:1', 'JIJ', 'bestaatniet').ok, false, 'onbekende soort: geweigerd');
   assert.deepEqual(db.data, {}, 'ook daarna niets');
-  c.connectNaklank('werk:1', 'JIJ', 'mooi');
+  c.connect.naklank('werk:1', 'JIJ', 'mooi');
   assert.ok(db.data.connect.naklank['werk:1'], 'een geldige naklank schrijft wel');
 });
 
@@ -360,7 +360,11 @@ test('25. een geweigerde naklank laat geen rij achter', () => {
 
 const werkwereld = () => {
   const db = { data: {} };
-  const wh = require('../server/kern/mediaos/werkherkomst').maakWerkherkomst({ db, save: () => {} });
+  /* Door de ECHTE opslagdeur en niet met een eigen db-greep: die deur is de
+     enige plek die weet hoe de bak heet, en een toets die hem overslaat toetst
+     een vorm die in productie niet bestaat (LAT.md regel 2). */
+  const wh = require('../server/kern/mediaos/werkherkomst').maakWerkherkomst({
+    opslag: require('../server/kern/mediaos/opslag')({ db, save: () => {} }) });
   const c = maakConnect({ db, save: () => {}, crypto, DOELEN, rtfos: null,
     makerVan: (id) => wh.makerVanWerk(String(id || '').replace(/^mediaos:/, '')),
     werkenVan: wh.werkenVan });
@@ -371,15 +375,15 @@ test('26. de ladder loopt van gemaakt tot doorgegeven, en elke trede zegt wat hi
   const { wh, c } = werkwereld();
   const w = wh.legWerk('MAKER', 'video', 'Zo maak je pasta');
 
-  c.connectWerkBij('MAKER');
-  c.connectOpen('KIJKER', { id: 'mediaos:' + w.id, onderwerp: 'video', herkomst: 'mediaos' });
-  c.connectNaklank('mediaos:' + w.id, 'KIJKER', 'geprobeerd');
-  c.connectNaklank('mediaos:' + w.id, 'DERDE', 'doorgegeven');
+  c.connect.werkBij('MAKER');
+  c.connect.open('KIJKER', { id: 'mediaos:' + w.id, onderwerp: 'video', herkomst: 'mediaos' });
+  c.connect.naklank('mediaos:' + w.id, 'KIJKER', 'geprobeerd');
+  c.connect.naklank('mediaos:' + w.id, 'DERDE', 'doorgegeven');
 
-  const treden = c.connectDossier('MAKER').regels.map(r => r.trede).sort();
+  const treden = c.connect.dossier('MAKER').regels.map(r => r.trede).sort();
   assert.deepEqual(treden, ['aangeboden', 'bereikt', 'doorgegeven', 'gebruikt', 'gemaakt'],
     'alle vijf de overdrachtstreden staan er, en precies een keer');
-  for (const b of c.connectPortfolio('MAKER').bewijzen) {
+  for (const b of c.connect.portfolio('MAKER').bewijzen) {
     assert.ok(b.stelt && b.nietZegt, b.trede + ' draagt zijn stelt en zijn nietZegt');
   }
 });
@@ -390,21 +394,21 @@ test('27. bereikt staat in het dossier en NOOIT in het portfolio', () => {
      een jaar makers die voor bereik werken. */
   const { wh, c } = werkwereld();
   const w = wh.legWerk('MAKER', 'video', 'x');
-  c.connectWerkBij('MAKER');
-  c.connectOpen('KIJKER', { id: 'mediaos:' + w.id, onderwerp: 'video', herkomst: 'mediaos' });
+  c.connect.werkBij('MAKER');
+  c.connect.open('KIJKER', { id: 'mediaos:' + w.id, onderwerp: 'video', herkomst: 'mediaos' });
 
-  assert.ok(c.connectDossier('MAKER').regels.some(r => r.trede === 'bereikt'), 'het dossier kent hem');
-  assert.ok(!c.connectPortfolio('MAKER').bewijzen.some(b => b.trede === 'bereikt'), 'het portfolio niet');
+  assert.ok(c.connect.dossier('MAKER').regels.some(r => r.trede === 'bereikt'), 'het dossier kent hem');
+  assert.ok(!c.connect.portfolio('MAKER').bewijzen.some(b => b.trede === 'bereikt'), 'het portfolio niet');
   /* En hetzelfde voor de twee andere aandachtstreden. */
-  c.connectOpen('MAKER', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
-  assert.ok(!c.connectPortfolio('MAKER').bewijzen.some(b => b.trede === 'gezien'));
+  c.connect.open('MAKER', { id: 'les:1', onderwerp: 'koken', herkomst: 'leerstof' });
+  assert.ok(!c.connect.portfolio('MAKER').bewijzen.some(b => b.trede === 'gezien'));
 });
 
 test('28. het portfolio draagt nergens een aantal', () => {
   const { wh, c } = werkwereld();
   wh.legWerk('MAKER', 'video', 'x');
-  c.connectWerkBij('MAKER');
-  const p = c.connectPortfolio('MAKER');
+  c.connect.werkBij('MAKER');
+  const p = c.connect.portfolio('MAKER');
   for (const verboden of ['totaal', 'aantal', 'score', 'niveau', 'punten', 'rang', 'gemiddelde']) {
     assert.ok(!(verboden in p), 'het portfolio draagt geen "' + verboden + '"');
   }
@@ -417,12 +421,12 @@ test('28. het portfolio draagt nergens een aantal', () => {
 test('29. "mooi" levert de maker niets op -- aandacht is geen ontwikkeling', () => {
   const { wh, c } = werkwereld();
   const w = wh.legWerk('MAKER', 'video', 'x');
-  const r = c.connectNaklank('mediaos:' + w.id, 'KIJKER', 'mooi');
+  const r = c.connect.naklank('mediaos:' + w.id, 'KIJKER', 'mooi');
   assert.equal(r.ok, true, 'de naklank telt gewoon mee');
   assert.equal(r.trede, null);
   assert.equal(r.dossier, null, 'maar er komt geen dossierregel');
   assert.ok(/aandacht/i.test(r.dossierReden), 'en de gever hoort waarom');
-  assert.equal(c.connectDossier('MAKER').totaal, 0);
+  assert.equal(c.connect.dossier('MAKER').totaal, 0);
 });
 
 test('30. vier naklanken op EEN trede geven EEN regel, geen vier', () => {
@@ -432,9 +436,9 @@ test('30. vier naklanken op EEN trede geven EEN regel, geen vier', () => {
   const { wh, c } = werkwereld();
   const w = wh.legWerk('MAKER', 'video', 'x');
   for (const [wie, soort] of [['A', 'geleerd'], ['B', 'geprobeerd'], ['C', 'gemaakt'], ['D', 'geholpen']]) {
-    assert.equal(c.connectNaklank('mediaos:' + w.id, wie, soort).ok, true);
+    assert.equal(c.connect.naklank('mediaos:' + w.id, wie, soort).ok, true);
   }
-  const regels = c.connectDossier('MAKER').regels;
+  const regels = c.connect.dossier('MAKER').regels;
   assert.equal(regels.length, 1, 'vier mensen, vier soorten, EEN overgang');
   assert.equal(regels[0].trede, 'gebruikt');
 });
@@ -448,16 +452,16 @@ test('31. bereikt wordt eenmalig geschreven en nooit door de maker zelf', () => 
      EERST, op zijn eigen verse werk. */
   const { wh, c } = werkwereld();
   const eigen = 'mediaos:' + wh.legWerk('MAKER', 'video', 'x').id;
-  assert.equal(c.connectOpen('MAKER', { id: eigen, onderwerp: 'video', herkomst: 'mediaos' }).bereikteMaker,
+  assert.equal(c.connect.open('MAKER', { id: eigen, onderwerp: 'video', herkomst: 'mediaos' }).bereikteMaker,
     false, 'wie zijn eigen werk opent, bereikt niemand');
-  assert.equal(c.connectDossier('MAKER').regels.filter(r => r.trede === 'bereikt').length, 0,
+  assert.equal(c.connect.dossier('MAKER').regels.filter(r => r.trede === 'bereikt').length, 0,
     'en er staat dus ook niets');
 
   const ander = 'mediaos:' + wh.legWerk('MAKER', 'muziek', 'y').id;
-  assert.equal(c.connectOpen('KIJKER', { id: ander, onderwerp: 'muziek', herkomst: 'mediaos' }).bereikteMaker, true);
-  assert.equal(c.connectOpen('TWEEDE', { id: ander, onderwerp: 'muziek', herkomst: 'mediaos' }).bereikteMaker, false,
+  assert.equal(c.connect.open('KIJKER', { id: ander, onderwerp: 'muziek', herkomst: 'mediaos' }).bereikteMaker, true);
+  assert.equal(c.connect.open('TWEEDE', { id: ander, onderwerp: 'muziek', herkomst: 'mediaos' }).bereikteMaker, false,
     'een tweede kijker schrijft geen tweede regel -- anders is het een teller');
-  assert.equal(c.connectDossier('MAKER').regels.filter(r => r.trede === 'bereikt').length, 1);
+  assert.equal(c.connect.dossier('MAKER').regels.filter(r => r.trede === 'bereikt').length, 1);
 });
 
 test('31b. de opzoeking wijst het JUISTE werk aan, ook met meerdere makers', () => {
@@ -470,31 +474,31 @@ test('31b. de opzoeking wijst het JUISTE werk aan, ook met meerdere makers', () 
   const vanA = 'mediaos:' + wh.legWerk('MAKER-A', 'video', 'a').id;
   const vanB = 'mediaos:' + wh.legWerk('MAKER-B', 'muziek', 'b').id;
 
-  c.connectNaklank(vanB, 'KIJKER', 'geholpen');
-  assert.equal(c.connectDossier('MAKER-B').totaal, 1, 'de regel landt bij B');
-  assert.equal(c.connectDossier('MAKER-A').totaal, 0, 'en niet bij A');
+  c.connect.naklank(vanB, 'KIJKER', 'geholpen');
+  assert.equal(c.connect.dossier('MAKER-B').totaal, 1, 'de regel landt bij B');
+  assert.equal(c.connect.dossier('MAKER-A').totaal, 0, 'en niet bij A');
 
-  c.connectOpen('KIJKER', { id: vanA, onderwerp: 'video', herkomst: 'mediaos' });
-  assert.ok(c.connectDossier('MAKER-A').regels.some(r => r.trede === 'bereikt'), 'en andersom net zo');
-  assert.equal(c.connectDossier('MAKER-B').regels.filter(r => r.trede === 'bereikt').length, 0);
+  c.connect.open('KIJKER', { id: vanA, onderwerp: 'video', herkomst: 'mediaos' });
+  assert.ok(c.connect.dossier('MAKER-A').regels.some(r => r.trede === 'bereikt'), 'en andersom net zo');
+  assert.equal(c.connect.dossier('MAKER-B').regels.filter(r => r.trede === 'bereikt').length, 0);
 });
 
 test('32. het eigen werk komt uit het vertrouwde register en nooit uit de aanroep', () => {
   /* Besluit 2: Connect mag auteurschap CONSUMEREN, niet uitvinden. Er is geen
      parameter waarmee een aanroeper zegt wat hij gemaakt heeft. */
   const { wh, c } = werkwereld();
-  assert.deepEqual(c.connectWerkBij('LEEG').nieuw, [], 'wie niets heeft aangemeld, krijgt niets');
+  assert.deepEqual(c.connect.werkBij('LEEG').nieuw, [], 'wie niets heeft aangemeld, krijgt niets');
   wh.legWerk('LEEG', 'muziek', 'Deuntje');
-  assert.deepEqual(c.connectWerkBij('LEEG').nieuw.map(x => x.trede), ['gemaakt', 'aangeboden']);
+  assert.deepEqual(c.connect.werkBij('LEEG').nieuw.map(x => x.trede), ['gemaakt', 'aangeboden']);
   /* Tweede keer: idempotent, en de uitkomst zegt het verschil. */
-  const twee = c.connectWerkBij('LEEG');
+  const twee = c.connect.werkBij('LEEG');
   assert.deepEqual(twee.nieuw, []);
   assert.equal(twee.stond.length, 2, '"twee die al stonden" is iets anders dan "twee nieuwe"');
 });
 
 test('33. zonder werkregister verzint deze laag niets, en zegt dat', () => {
   const { c } = bouw();
-  const r = c.connectWerkBij('AB');
+  const r = c.connect.werkBij('AB');
   assert.equal(r.ok, true);
   assert.equal(r.geenBron, true);
   assert.ok(r.reden && r.reden.length > 30, 'een stand met een reden, geen stilte');

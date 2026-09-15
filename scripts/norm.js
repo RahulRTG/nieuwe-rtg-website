@@ -745,6 +745,14 @@ const METERS = [
      diezelfde nul staan terwijl hij iets anders betekent: van "deze zeven
      delen niets" naar "we hebben er minder bekeken". */
   { sleutel: 'namensMechanismenGemeten', richting: 'omhoog', wat: 'mechanismen van namens-iemand-handelen die de namensvormmeter werkelijk heeft gezien' },
+  /* Het BEREIK van de connectlusmeter (CONNECT.md par. 1), en om precies
+     dezelfde reden omhoog als de drie hierboven. De UITKOMST is daar een nul
+     (0 van 8 werkwoorden in alle 23 ontdekkingsdomeinen, 2 domeinen die de lus
+     rond krijgen) en daarop rust het besluit dat Foundation Connect een
+     PROJECTIE wordt en geen gedeeld inhoudstype. Ziet de meter stil minder
+     domeinen, dan blijft diezelfde nul staan terwijl hij iets anders betekent:
+     van "deze drieentwintig delen niets" naar "we hebben er minder bekeken". */
+  { sleutel: 'connectDomeinenGemeten', richting: 'omhoog', wat: 'ontdekkingsdomeinen die de connectlusmeter werkelijk heeft gezien' },
   /* Publieke domeinen waarover scripts/lib/wekbesluit.js geen uitspraak doet.
      Omlaag, en hij staat op nul: een domein dat publiek is en waarvan niemand
      heeft besloten of het de publieke rail op mag, hoort niet stil te kunnen
@@ -1506,6 +1514,7 @@ function meet(bronnen) {
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    connectDomeinenGemeten: leesRegister('CONNECTLUS.json', (j) => j.werkwoorden.domeinen),
     /* De WERKWOORD-as en niet de vorm-as, want die telt alleen mechanismen die
        iets OPSLAAN -- en kern/stuur/mandaat.js slaat met opzet niets op. Het
        bereik van deze meter is dus het aantal mechanismen dat hij op zijn

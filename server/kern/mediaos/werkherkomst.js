@@ -20,9 +20,21 @@
    het; een laag die het van de client aanneemt, wordt voorgelogen. Dus wordt
    het vastgelegd waar het wordt beweerd, en leest Connect het alleen.
 
-   EERST VASTLEGGEN, DAN WEKKEN -- dezelfde volgorde en dezelfde reden als bij
-   `nieuwMoment` hiernaast: dat dit werk bestaat staat los van de vraag of er
-   iemand gewekt kon worden. Een maker zonder volgers maakt evengoed iets.
+   DE AANROEPPLEK -- eerst vastleggen, dan wekken. Dezelfde volgorde en dezelfde
+   reden als bij `nieuwMoment` hiernaast: dat dit werk bestaat staat los van de
+   vraag of er iemand gewekt kon worden. Een maker zonder volgers maakt evengoed
+   iets, en een register dat pas na de eerste volger begint, mist precies de
+   makers die deze laag het hardst nodig heeft.
+
+   De aanroep in ./wekken.js staat in een try, en dat is geen slordigheid: een
+   register dat omvalt mag een PUBLICATIE niet tegenhouden. Wat er dan niet
+   gebeurt is stil, en dat is hier uitzonderlijk de goede kant op -- zonder
+   herkomst ontstaat er later geen dossierregel, en geen regel is beter dan een
+   geraden regel. Dat is de omgekeerde afweging van het inzagejournaal
+   (MENSNETWERK.md par. 0.6a: geen aantoonbaar spoor, geen inzage), en het
+   verschil zit hem in wie de schade draagt: daar verliest de betrokkene zijn
+   bewijs OVER toegang, hier verliest de maker hooguit een aanspraak die hij
+   nooit heeft geclaimd.
 
    WAT HIER STAAT EN WAT NIET. Hier staat een GEBEURTENIS: dat op dit tijdstip
    deze maker dit soort werk heeft voortgebracht, met de titel die er TOEN bij
@@ -45,16 +57,12 @@
 
 const MAX = 20000;
 
-function maakWerkherkomst({ db, save }) {
-  const lijst = () => {
-    if (!db || !db.data) return null;
-    if (!Array.isArray(db.data.mediaWerkherkomst)) db.data.mediaWerkherkomst = [];
-    return db.data.mediaWerkherkomst;
-  };
-  /* Peilen maakt niets aan -- dezelfde correctie als in kern/connect/horizon.js:
-     een lezer die zijn eigen bak aanlegt, laat de opslag groeien door ernaar te
-     kijken. */
-  const peil = () => (db && db.data && Array.isArray(db.data.mediaWerkherkomst)) ? db.data.mediaWerkherkomst : [];
+function maakWerkherkomst({ opslag }) {
+  /* PAKKEN en PEILEN staan in ./opslag.js, de enige deur van dit domein naar
+     db.data. Peilen maakt niets aan: een lezer die zijn eigen bak aanlegt, laat
+     de opslag groeien door ernaar te kijken. */
+  const lijst = () => opslag.werken();
+  const peil = () => opslag.peilWerken();
 
   /* VASTLEGGEN. Alleen aan te roepen vanuit ./wekken.js, met een sleutel die
      het DOMEIN heeft aangeleverd. Geeft het vastgelegde werk terug, of null als
@@ -67,7 +75,7 @@ function maakWerkherkomst({ db, save }) {
        als de lezers die hun rij aanmaakten: de opslag groeit door aanroepen die
        niets mochten, en niets klaagt. Gevonden door test/werkherkomst.test.js 5. */
     const sleutel = String(makerKey || '');
-    if (!sleutel || !String(soort || '') || !db || !db.data) return null;
+    if (!sleutel || !String(soort || '')) return null;
     const rij = lijst();
     if (!rij) return null;
     const werk = {
@@ -78,9 +86,8 @@ function maakWerkherkomst({ db, save }) {
       at: new Date().toISOString()
     };
     rij.push(werk);
-    let afgekapt = 0;
-    if (rij.length > MAX) { afgekapt = rij.length - MAX; db.data.mediaWerkherkomst = rij.slice(afgekapt); }
-    if (save) save();
+    const afgekapt = opslag.begrensWerken(MAX);
+    opslag.bewaar();
     return afgekapt ? Object.assign({ afgekapt }, werk) : werk;
   }
 

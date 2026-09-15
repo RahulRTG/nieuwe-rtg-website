@@ -16,7 +16,11 @@ const { maakWerkherkomst, MAX } = require('../server/kern/mediaos/werkherkomst')
 const wereld = () => {
   const db = { data: {} };
   let saves = 0;
-  return { db, saves: () => saves, wh: maakWerkherkomst({ db, save: () => { saves++; } }) };
+  /* Door de ECHTE opslagdeur van het domein en niet langs een nagebouwde: die
+     deur is precies waar het onderscheid tussen pakken en peilen woont, en dat
+     is wat toets 3 bewijst. Een eigen stub zou die grens wegtoetsen. */
+  const opslag = require('../server/kern/mediaos/opslag')({ db, save: () => { saves++; } });
+  return { db, saves: () => saves, wh: maakWerkherkomst({ opslag }) };
 };
 
 test('1. wat een domein aanmeldt, is precies terug te vinden', () => {

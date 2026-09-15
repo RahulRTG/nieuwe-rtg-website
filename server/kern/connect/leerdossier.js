@@ -59,25 +59,19 @@ const trede = (id) => OP_ID.get(String(id == null ? '' : id)) || null;
    jaren maakt; bijt hij toch, dan hoort dat te KLINKEN en niet te gebeuren. */
 const MAX = 2000;
 
-module.exports = ({ db, save, crypto }) => {
-  const bak = () => {
-    const d = db.data || (db.data = {});
-    if (!d.connect) d.connect = {};
-    if (!d.connect.dossier) d.connect.dossier = {};
-    return d.connect.dossier;
-  };
+module.exports = ({ opslag, save, crypto }) => {
   const lijstVan = (sleutel) => {
-    const b = bak(), s = String(sleutel || '');
+    const b = opslag.bak('dossier'), s = String(sleutel || '');
     if (!s) return null;
     if (!Array.isArray(b[s])) b[s] = [];
     return b[s];
   };
-  /* De LEZER maakt niets aan -- zie dezelfde correctie in ./horizon.js. Een
-     dossier dat ontstaat doordat iemand ernaar kijkt, is een dossier dat bij
-     iedereen bestaat zodra een scherm een keer is geopend. */
+  /* De LEZER maakt niets aan -- zie de kop van ./opslag.js. Een dossier dat
+     ontstaat doordat iemand ernaar kijkt, is een dossier dat bij iedereen
+     bestaat zodra een scherm een keer is geopend. */
   const peil = (sleutel) => {
     const s = String(sleutel || '');
-    const rij = s ? (db.data && db.data.connect && db.data.connect.dossier || {})[s] : null;
+    const rij = s ? (opslag.peil('dossier') || {})[s] : null;
     return Array.isArray(rij) ? rij : [];
   };
 

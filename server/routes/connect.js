@@ -44,7 +44,7 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, auth, rtf } = kern;
+  const { app, auth, rtf, connect } = kern;
 
   const stuur = (res, r) => r && (r.error || r.ok === false)
     ? res.status(r.status || 400).json({ error: r.error || r.reden }) : res.json(r);
@@ -60,7 +60,7 @@ module.exports = (kern) => {
   /* ------------------------------------------------------------------ ONTDEK */
   const ontdek = (wie) => (req, res) => veilig(res, () => {
     const b = req.body || {};
-    return kern.connectOntdek(wie(req).sleutel, {
+    return connect.ontdek(wie(req).sleutel, {
       plaats: b.plaats, verras: !!b.verras, gezien: b.gezien, vandaag: b.vandaag });
   });
   app.post('/api/connect/ontdek', auth, ontdek(lid));
@@ -70,7 +70,7 @@ module.exports = (kern) => {
      tonen: zie de kop van kern/connect/index.js. */
   const open = (wie) => (req, res) => veilig(res, () => {
     const b = req.body || {};
-    return kern.connectOpen(wie(req).sleutel, { id: b.id, onderwerp: b.onderwerp, herkomst: b.herkomst });
+    return connect.open(wie(req).sleutel, { id: b.id, onderwerp: b.onderwerp, herkomst: b.herkomst });
   });
   app.post('/api/connect/open', auth, open(lid));
   app.post('/api/rtf/connect/open', gezinsPoort, open(gezin));
@@ -83,24 +83,24 @@ module.exports = (kern) => {
      de haak als hij het ding niet thuis kan brengen (kern/connect/naklank.js). */
   const naklank = (wie) => (req, res) => veilig(res, () => {
     const b = req.body || {};
-    return kern.connectNaklank(b.id, wie(req).sleutel, b.soort);
+    return connect.naklank(b.id, wie(req).sleutel, b.soort);
   });
   app.post('/api/connect/naklank', auth, naklank(lid));
   app.post('/api/rtf/connect/naklank', gezinsPoort, naklank(gezin));
 
   app.post('/api/connect/naklank/weg', auth, (req, res) => veilig(res, () => {
     const b = req.body || {};
-    return kern.connectNaklankWeg(b.id, lid(req).sleutel, b.soort);
+    return connect.naklankWeg(b.id, lid(req).sleutel, b.soort);
   }));
   app.post('/api/connect/naklank/tel', auth, (req, res) => veilig(res, () =>
-    kern.connectNaklankTel((req.body || {}).id, lid(req).sleutel)));
+    connect.naklankTel((req.body || {}).id, lid(req).sleutel)));
 
   /* -------------------------------------------------------------- LEERDOSSIER */
   /* Alleen het EIGEN dossier. Er is geen parameter waarmee je een ander opgeeft,
      en dat is geen vergeten functie maar HDI.md par. 5.1: geen route die "alles
      over deze mens" teruggeeft zonder dat de mens zelf die aanroep doet. */
   const dossier = (wie) => (req, res) => veilig(res, () =>
-    kern.connectDossier(wie(req).sleutel, { onderwerp: (req.body || {}).onderwerp }));
+    connect.dossier(wie(req).sleutel, { onderwerp: (req.body || {}).onderwerp }));
   app.post('/api/connect/dossier', auth, dossier(lid));
   app.post('/api/rtf/connect/dossier', gezinsPoort, dossier(gezin));
 
@@ -109,7 +109,7 @@ module.exports = (kern) => {
      db.data; zie de kop van kern/connect/werkbij.js. Er wordt niets vastgesteld:
      wat hier binnenkomt stond al in het register waar de domeinen zelf hun werk
      hebben aangemeld. */
-  const werkBij = (wie) => (req, res) => veilig(res, () => kern.connectWerkBij(wie(req).sleutel));
+  const werkBij = (wie) => (req, res) => veilig(res, () => connect.werkBij(wie(req).sleutel));
   app.post('/api/connect/werk', auth, werkBij(lid));
   app.post('/api/rtf/connect/werk', gezinsPoort, werkBij(gezin));
 
@@ -117,7 +117,7 @@ module.exports = (kern) => {
      /dossier omdat er een andere REGEL geldt: alles wat aandacht is (gezien,
      uitgelezen, bereikt) valt eruit. Wij tellen aandacht niet als ontwikkeling. */
   const portfolio = (wie) => (req, res) => veilig(res, () =>
-    Object.assign({ ok: true }, kern.connectPortfolio(wie(req).sleutel, { onderwerp: (req.body || {}).onderwerp })));
+    Object.assign({ ok: true }, connect.portfolio(wie(req).sleutel, { onderwerp: (req.body || {}).onderwerp })));
   app.post('/api/connect/portfolio', auth, portfolio(lid));
   app.post('/api/rtf/connect/portfolio', gezinsPoort, portfolio(gezin));
 
@@ -126,23 +126,23 @@ module.exports = (kern) => {
      weigering komt uit de kern en wordt hier niet nagebouwd. */
   const noteer = (wie) => (req, res) => veilig(res, () => {
     const b = req.body || {};
-    return kern.connectDossierNoteer(wie(req).sleutel, {
+    return connect.dossierNoteer(wie(req).sleutel, {
       trede: b.trede, onderwerp: b.onderwerp, bron: b.bron, door: 'zelf', herkomst: 'connect' });
   });
   app.post('/api/connect/noteer', auth, noteer(lid));
   app.post('/api/rtf/connect/noteer', gezinsPoort, noteer(gezin));
 
   /* ----------------------------------------------------------------- HORIZON */
-  const horizon = (wie) => (req, res) => veilig(res, () => kern.connectHorizon(wie(req).sleutel));
+  const horizon = (wie) => (req, res) => veilig(res, () => connect.horizon(wie(req).sleutel));
   app.post('/api/connect/horizon', auth, horizon(lid));
   app.post('/api/rtf/connect/horizon', gezinsPoort, horizon(gezin));
 
   app.post('/api/connect/schuif', auth, (req, res) => veilig(res, () =>
-    kern.connectSchuif(lid(req).sleutel, (req.body || {}).schuif)));
+    connect.schuif(lid(req).sleutel, (req.body || {}).schuif)));
 
   const signaal = (wie) => (req, res) => veilig(res, () => {
     const b = req.body || {};
-    return kern.connectSignaal(wie(req).sleutel, b.onderwerp, b.signaal);
+    return connect.signaal(wie(req).sleutel, b.onderwerp, b.signaal);
   });
   app.post('/api/connect/signaal', auth, signaal(lid));
   app.post('/api/rtf/connect/signaal', gezinsPoort, signaal(gezin));
@@ -153,13 +153,13 @@ module.exports = (kern) => {
   const kringZet = (wie) => (req, res) => veilig(res, () => {
     const b = req.body || {};
     const w = wie(req);
-    return kern.connectKringZet(b.huidig, b.kring, { beschermd: w.beschermd });
+    return connect.kringZet(b.huidig, b.kring, { beschermd: w.beschermd });
   });
   app.post('/api/connect/kring', auth, kringZet(lid));
   app.post('/api/rtf/connect/kring', gezinsPoort, kringZet(gezin));
 
   const kringKeuzes = (wie) => (req, res) => veilig(res, () =>
-    ({ ok: true, keuzes: kern.connectKringKeuzes({ beschermd: wie(req).beschermd }) }));
+    ({ ok: true, keuzes: connect.kringKeuzes({ beschermd: wie(req).beschermd }) }));
   app.post('/api/connect/kring/keuzes', auth, kringKeuzes(lid));
   app.post('/api/rtf/connect/kring/keuzes', gezinsPoort, kringKeuzes(gezin));
 
@@ -171,9 +171,9 @@ module.exports = (kern) => {
   app.post('/api/connect/uitleg', auth, (req, res) => veilig(res, () => {
     const b = req.body || {};
     return { ok: true,
-      werkwoord: b.werkwoord ? kern.connectWerkwoord(b.werkwoord) : null,
-      bruggen: b.onderwerp ? kern.connectBruggen(b.onderwerp, 5) : [],
-      motoren: kern.connectMotoren(),
-      lijsten: kern.CONNECT };
+      werkwoord: b.werkwoord ? connect.werkwoord(b.werkwoord) : null,
+      bruggen: b.onderwerp ? connect.bruggen(b.onderwerp, 5) : [],
+      motoren: connect.motoren(),
+      lijsten: connect.LIJSTEN };
   }));
 };

@@ -103,20 +103,10 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn,
     const codenaam = codenaamVan ? codenaamVan(makerKey) : null;
     if (!codenaam) return { gewekt: [], overgeslagen: [] };
 
-    /* EERST DE HERKOMST VASTLEGGEN, DAN WEKKEN -- dezelfde volgorde en dezelfde
-       reden als bij `nieuwMoment` hieronder: dat dit werk bestaat staat los van
-       de vraag of er iemand gewekt kon worden. Dit is de plek waar auteurschap
-       wordt BEWEERD en daarom de plek waar het wordt vastgelegd; waarom dat
-       elders niet mag, staat in de kop van ./werkherkomst.js.
-
-       In een try, want een register dat omvalt mag een publicatie niet
-       tegenhouden. Wat er dan niet gebeurt is stil, en dat is hier de goede
-       kant: zonder herkomst ontstaat er later geen dossierregel, en dat is
-       beter dan er een verzinnen. */
+    /* Eerst vastleggen, dan wekken: ./werkherkomst.js, DE AANROEPPLEK. */
     let werk = null;
-    if (werkherkomst && werkherkomst.legWerk) {
-      try { werk = werkherkomst.legWerk(makerKey, soort, titel); } catch (e) { werk = null; }
-    }
+    try { werk = werkherkomst ? werkherkomst.legWerk(makerKey, soort, titel) : null; }
+    catch (e) { werk = null; }
 
     const gewekt = [], overgeslagen = [];
     for (const volger of volgersVan(makerKey)) {

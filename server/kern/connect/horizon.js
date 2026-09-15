@@ -55,22 +55,15 @@ const GEEN_SIGNAAL = {
    e-mailadres hoog. */
 const VERDACHT = /[@]|\+?\d[\d\s.-]{6,}|\b\d{4}\s?[A-Za-z]{2}\b/;
 
-module.exports = ({ db, save }) => {
-  const bak = () => {
-    const d = db.data || (db.data = {});
-    if (!d.connect) d.connect = {};
-    if (!d.connect.horizon) d.connect.horizon = {};
-    return d.connect.horizon;
-  };
-  /* TWEE LEZERS, EN DAT IS GEEN DUBBELING. `van` maakt de rij aan omdat er
-     zo meteen in geschreven wordt; `peil` kijkt alleen. Hier stond alleen de
+module.exports = ({ opslag, save }) => {
+  /* TWEE LEZERS, EN DAT IS GEEN DUBBELING. `van` maakt de rij aan omdat er zo
+     meteen in geschreven wordt; `peil` kijkt alleen. Hier stond alleen de
      eerste, en daarmee SCHREEF elke leesroute in db.data -- zonder save(), dus
-     onzichtbaar tot een andere handeling toevallig opsloeg. Dat is precies de
-     stille faalvorm waar MUTATIECONTRACT.md over gaat: een route die `leest:
-     true` heet en een effect op de opslag heeft, klopt niet met zijn eigen
-     contract, en niemand zou het merken. */
+     onzichtbaar tot een andere handeling toevallig opsloeg. Het onderscheid
+     woont sinds die vondst in ./opslag.js, zodat het voor alle drie de
+     collecties op EEN plek staat in plaats van drie keer overgetypt. */
   const van = (sleutel) => {
-    const b = bak(), k = String(sleutel || '');
+    const b = opslag.bak('horizon'), k = String(sleutel || '');
     if (!k) return null;
     if (!b[k]) b[k] = { schuif: STANDAARD, onderwerpen: {} };
     if (typeof b[k].schuif !== 'number') b[k].schuif = STANDAARD;
@@ -79,7 +72,7 @@ module.exports = ({ db, save }) => {
   };
   const peil = (sleutel) => {
     const k = String(sleutel || '');
-    const rij = k ? (db.data && db.data.connect && db.data.connect.horizon || {})[k] : null;
+    const rij = k ? (opslag.peil('horizon') || {})[k] : null;
     return rij ? { schuif: typeof rij.schuif === 'number' ? rij.schuif : STANDAARD,
       onderwerpen: rij.onderwerpen || {} } : null;
   };

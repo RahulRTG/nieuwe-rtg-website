@@ -60,19 +60,13 @@ const { SOORTEN } = require('./naklanklijst');
 const OP_ID = new Map(SOORTEN.map(s => [s.id, s]));
 const soort = (id) => OP_ID.get(String(id == null ? '' : id)) || null;
 
-module.exports = ({ db, save, bijOverdracht, makerVan }) => {
-  const bak = () => {
-    const d = db.data || (db.data = {});
-    if (!d.connect) d.connect = {};
-    if (!d.connect.naklank) d.connect.naklank = {};
-    return d.connect.naklank;
-  };
+module.exports = ({ opslag, save, bijOverdracht, makerVan }) => {
   /* EEN plek waar staat wie wat gaf, en de aantallen worden eruit AFGELEID.
      Twee plekken (een teller plus een lijst) lopen uiteen zodra een terugname
      de ene wel en de andere niet raakt -- LAT-regel 4, en hier zou het gevolg
      een maker zijn die naar een getal kijkt dat nergens meer op slaat. */
   const van = (item) => {
-    const b = bak(), k = String(item || '');
+    const b = opslag.bak('naklank'), k = String(item || '');
     if (!k) return null;
     if (!b[k]) b[k] = {};
     return b[k];
@@ -157,12 +151,11 @@ module.exports = ({ db, save, bijOverdracht, makerVan }) => {
      er even groot bij, want een leeg vak wordt gevuld met iemands eigen indruk
      (SERVICE.md par. 12). */
   function tel(item, sleutel) {
-    /* Peilen en niet aanmaken -- zelfde correctie als in ./horizon.js. Een
-       tellerrij die ontstaat doordat iemand kijkt, laat de opslag groeien met
-       een rij per bekeken ding. */
+    /* Peilen en niet aanmaken -- zie de kop van ./opslag.js. Een tellerrij die
+       ontstaat doordat iemand kijkt, laat de opslag groeien met een rij per
+       bekeken ding. */
     const k = String(item || '');
-    const rij = (k && db.data && db.data.connect && db.data.connect.naklank
-      && db.data.connect.naklank[k]) || {};
+    const rij = (k && (opslag.peil('naklank') || {})[k]) || {};
     const key = String(sleutel || '');
     return {
       soorten: SOORTEN.map(s => ({

@@ -47,8 +47,14 @@ const { maakLokalebron } = require('./bron-lokaal');
 function maakConnect(ctx) {
   const { db, save, crypto, DOELEN, rtfos } = ctx || {};
 
-  const dossier = require('./leerdossier')({ db, save, crypto });
-  const horizon = require('./horizon')({ db, save });
+  /* EEN DEUR NAAR db.data, en niet vier. ./opslag.js draagt het register van de
+     drie collecties die deze laag bezit, en het onderscheid tussen PAKKEN (dat
+     aanmaakt) en PEILEN (dat niets aanmaakt). Dat verschil stond eerst drie keer
+     overgetypt, en precies daar ging het drie keer mis. */
+  const opslag = require('./opslag')({ db, save });
+
+  const dossier = require('./leerdossier')({ opslag, save, crypto });
+  const horizon = require('./horizon')({ opslag, save });
 
   /* De haak: een `geholpen` van iemand anders wordt bij de MAKER een regel op
      de trede `onderwezen`. `door: 'eenAnder'` is geen formaliteit -- het is
@@ -67,7 +73,7 @@ function maakConnect(ctx) {
      leeg is -- zelfde vorm als een motor zonder bron in ./mixer.js. */
   const makerVan = ctx && ctx.makerVan ? ctx.makerVan : () => null;
 
-  const naklank = require('./naklank')({ db, save, makerVan,
+  const naklank = require('./naklank')({ opslag, save, makerVan,
     /* De trede komt van de NAKLANK en staat hier niet vast. Vroeger stond hier
        `trede: 'onderwezen'` voor elke naklank die doorliep; sinds de ladder vijf
        overdrachtstreden kent, beslist ./naklanklijst.js welke -- en of er
@@ -116,76 +122,39 @@ function maakConnect(ctx) {
     });
   }
 
-  /* IETS OPENEN. Dit is de enige plek waar de trede `gezien` ontstaat, en met
-     opzet NIET bij het tonen: een dossier dat volloopt met alles wat langskwam,
-     meet aandacht en geen leren. Precies het verschil dat ./leerdossier.js in
-     zijn eerste trede uitschrijft. */
-  function open(sleutel, item) {
-    const i = item || {};
-    const eigen = dossier.noteer(sleutel, { trede: 'gezien', onderwerp: i.onderwerp,
-      bron: i.id, door: 'hetSysteem', werkwoord: 'ontdek', herkomst: i.herkomst });
-
-    /* EN DE ANDERE KANT: als dit werk van IEMAND ANDERS is, is het zojuist bij
-       een mens aangekomen. Dat is de trede `bereikt` bij de MAKER, en hij is
-       met opzet `eenmalig` -- anders schrijft deze regel een teller in het
-       dossier van iemand anders, en dan is het dossier van een maker een
-       kijklog geworden waar hij zelf niets aan kan doen.
-
-       DE MAKER WORDT OPGEZOCHT EN NOOIT AANGENOMEN, net als bij de naklank.
-       `bereikt` draagt `aanspraak: 'geen'` en komt dus niet in het portfolio:
-       dat je werk ergens aankwam is BEREIK, en bereik is aandacht. Het staat er
-       omdat het het eerlijke verschil is met "aangeboden", en verder nergens
-       voor. */
-    let bereikt = null;
-    let werk = null;
-    try { werk = makerVan ? makerVan(String(i.id || '')) : null; } catch (e) { werk = null; }
-    if (werk && werk.sleutel && String(werk.sleutel) !== String(sleutel || '')) {
-      bereikt = dossier.noteer(werk.sleutel, { trede: 'bereikt', onderwerp: werk.onderwerp,
-        bron: String(i.id), door: 'hetSysteem', werkwoord: 'deel', herkomst: 'connect' });
-    }
-    return Object.assign({}, eigen, { bereikteMaker: !!(bereikt && bereikt.ok && bereikt.nieuw) });
-  }
-
-  /* Het overnemen van het eigen werk staat in ./werkbij.js en is een HANDELING
-     en geen lezing -- zie de kop daar. `werkenVan` komt uit de bedrading en is
-     er vandaag alleen als kern/mediaos is gemonteerd; ontbreekt hij, dan zegt
-     de uitkomst dat, en verzint hij niets. */
+  /* Openen en het overnemen van eigen werk staan in ./openen.js en ./werkbij.js
+     -- twee HANDELINGEN die een dossierregel schrijven, geen lezingen. Zie de
+     koppen daar. `werkenVan` komt uit de bedrading en is er vandaag alleen als
+     kern/mediaos gemonteerd is; ontbreekt hij, dan zegt de uitkomst dat en
+     verzint hij niets. */
+  const { open } = require('./openen')({ noteer: dossier.noteer, makerVan });
   const { werkBij } = require('./werkbij')({
     werkenVan: ctx && ctx.werkenVan ? ctx.werkenVan : null, noteer: dossier.noteer });
 
-  return {
-    connectOntdek: ontdek,
-    connectOpen: open,
-    connectWerkBij: werkBij,
-    connectPortfolio: dossier.portfolio,
-    connectNaklank: naklank.geef,
-    connectNaklankWeg: naklank.neemTerug,
-    connectNaklankTel: naklank.tel,
-    connectDossier: dossier.lees,
-    connectDossierNoteer: dossier.noteer,
-    connectHorizon: horizon.lees,
-    connectSchuif: horizon.schuifNaar,
-    connectSignaal: horizon.signaal,
-    connectKringZet: kring.zet,
-    connectKringKeuzes: kring.keuzes,
-    connectMagZien: kring.magZien,
-    connectLus: lus.verklaar,
-    connectWerkwoord: lus.uitleg,
-    connectMotoren: mixer.motoren,
-    connectBruggen: bruggen.vanaf,
+  /* EEN NAAM IN DE KERN-TAS EN GEEN ACHTTIEN, in de vorm van
+     kern/carriereledger (`const { app, carriereledger, auth } = kern`). De kop
+     van scripts/grenzen.js zegt waarom dat meer is dan netjes: van de 1597
+     namen in de gedeelde tas raken er 1360 maar EEN domein aan, en die horen
+     in dat domein zelf. Wat het NIET oplost is verstrengeling -- `kernGedeeld`
+     bewoog hier geen streep. Smallere tas, niet lossere koppeling; grenzen.js
+     telt die twee met opzet apart. */
+  return { connect: {
+    ontdek, open, werkBij,
+    portfolio: dossier.portfolio, dossier: dossier.lees, dossierNoteer: dossier.noteer,
+    naklank: naklank.geef, naklankWeg: naklank.neemTerug, naklankTel: naklank.tel,
+    horizon: horizon.lees, schuif: horizon.schuifNaar, signaal: horizon.signaal,
+    kringZet: kring.zet, kringKeuzes: kring.keuzes, magZien: kring.magZien,
+    lus: lus.verklaar, werkwoord: lus.uitleg,
+    motoren: mixer.motoren, bruggen: bruggen.vanaf,
     /* De vaste lijsten, zodat een scherm ze niet overtypt. Een tweede kopie op
        de client loopt uiteen met deze, en dan staat er op het scherm iets
        anders dan wat de server afdwingt (LAT-regel 4). */
-    CONNECT: {
+    LIJSTEN: {
       werkwoorden: require('./werkwoordlijst').WERKWOORDEN,
-      treden: dossier.TREDEN,
-      naklanken: naklank.SOORTEN,
-      kringen: kring.KRINGEN,
-      signalen: horizon.SIGNALEN,
-      motoren: mixer.MOTOREN,
-      plekken: mixer.PLEKKEN
+      treden: dossier.TREDEN, naklanken: naklank.SOORTEN, kringen: kring.KRINGEN,
+      signalen: horizon.SIGNALEN, motoren: mixer.MOTOREN, plekken: mixer.PLEKKEN
     }
-  };
+  } };
 }
 
 module.exports = { maakConnect, lus, kring, ontdekking, bruggen };

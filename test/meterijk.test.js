@@ -1574,6 +1574,20 @@ const IJKINGEN = {
       (j) => { j.gemeten.werkwoord.mechanismen = Math.max(0, (j.gemeten.werkwoord.mechanismen || 0) - 3); return j; },
       () => voor.namensMechanismenGemeten - norm.meet().namensMechanismenGemeten)
   },
+  /* DE TAND VAN 15 SEPTEMBER 2026: connectDomeinenGemeten telt de
+     ontdekkingsdomeinen die scripts/connectlus.js werkelijk heeft gezien
+     (CONNECT.md par. 1). Zelfde vorm en zelfde richting als zijn drie zusters
+     hierboven, en de faalvorm is hier GEMETEN in plaats van bedacht:
+     scripts/carrierevorm.js sloeg bij een versmalling tot twee domeinen om van
+     0 naar 8 gedeelde velden. Een meter die stil minder domeinen ziet meldt dus
+     niet dezelfde nul over minder bewijs -- hij meldt een andere werkelijkheid
+     onder dezelfde naam, en daarop rust het besluit dat kern/connect/ een
+     projectie is en geen gedeeld inhoudstype. */
+  connectDomeinenGemeten: {
+    proef: (voor) => metVervangenJson('CONNECTLUS.json',
+      (j) => { j.werkwoorden.domeinen = Math.max(0, (j.werkwoorden.domeinen || 0) - 6); return j; },
+      () => voor.connectDomeinenGemeten - norm.meet().connectDomeinenGemeten)
+  },
   /* DE TAND VAN 13 SEPTEMBER 2026 (tweede): wekZonderUitspraak telt de publieke
      domeinen waarover het wekbesluitregister zwijgt. Hij staat op NUL, en dat
      maakt hem een ander geval dan de meters hierboven: bij een nul is "de meter

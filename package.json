@@ -387,7 +387,9 @@
     "zaakliveproef": "node scripts/zaakliveproef.js",
     "zaakliveproef:vast": "node scripts/zaakliveproef.js --vastleggen",
     "omzetproef": "node scripts/omzetproef.js",
-    "omzetproef:vast": "node scripts/omzetproef.js --vastleggen"
+    "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
+    "adaptiefrtg": "node scripts/adaptiefrtg.js",
+    "adaptiefrtg:vast": "node scripts/adaptiefrtg.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

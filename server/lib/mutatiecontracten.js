@@ -87,6 +87,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-salon').CONTRACTEN,
   require('./mutatiecontracten-hardening-checkpoint').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
+  require('./mutatiecontracten-adaptief').CONTRACTEN,
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
   /* De naleesronde van 13 september 2026 -- zie de kop van het eerste bestand. */
   require('./mutatiecontracten-naleesronde').CONTRACTEN,

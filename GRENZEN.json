@@ -16,6 +16,15 @@
       "accRollen",
       "accStart"
     ],
+    "adaptief": [
+      "adaptiefIntake",
+      "adaptiefAntwoord",
+      "adaptiefOverslaan",
+      "adaptiefOpnieuw",
+      "adaptiefGeheugen",
+      "adaptiefVergeet",
+      "adaptiefNietVoor"
+    ],
     "adres": [
       "adresZoek"
     ],

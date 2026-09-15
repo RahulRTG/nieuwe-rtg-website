@@ -4411,6 +4411,12 @@ var RTG_BOUW = '53a390d7';
     sessies:     { naam: 'Waar ben ik aanwezig', url: '/apps/mijn-sessies.html' },
     relaties:    { naam: 'Wie heeft toegang tot mij', url: '/apps/mijn-relaties.html' },
     gegevens:    { naam: 'Wat weet RTG van mij', url: '/apps/mijn-gegevens.html' },
+    /* Adaptief RTG (ADAPTIEFRTG.md). NAAST `gegevens` en niet erin: die kaart
+       gaat over GEGEVENS die RTG van u heeft (naam, adres, documenten), deze
+       over NEIGINGEN die RTG van u denkt te kennen. Twee vragen die op elkaar
+       lijken en een ander antwoord hebben; samenvoegen zou van beide een
+       halve maken. */
+    adaptief:    { naam: T('app.adaptief', 'Mijn RTG'), url: '/apps/adaptief.html' },
     post:        { naam: 'Post van RTG', url: '/apps/mijn-post.html' },
   /* Afgesplitst van app-main-23.js, dat met dit blok over de 10 KB ging
      (keuringsregel 13). De snede loopt midden door LINKS -- dat mag hier, want
@@ -4745,7 +4751,7 @@ var RTG_BOUW = '53a390d7';
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
       'link:ik', 'link:verificatie', 'link:veilig', 'link:passkeys', 'link:bescherming',
-      'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
+      'link:sessies', 'link:relaties', 'link:gegevens', 'link:adaptief', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
        dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:

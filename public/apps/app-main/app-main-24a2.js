@@ -100,7 +100,7 @@
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
       'link:ik', 'link:verificatie', 'link:veilig', 'link:passkeys', 'link:bescherming',
-      'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
+      'link:sessies', 'link:relaties', 'link:gegevens', 'link:adaptief', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
        dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:

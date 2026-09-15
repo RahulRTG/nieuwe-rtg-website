@@ -217,6 +217,17 @@ function naamVan(gat) {
   return (gat.doel || gat.opdracht).replace(/^(?:scripts|test)\//, '').replace(/\.js$/, '');
 }
 
+/* DE BESLISREGEL VAN HET OORDEEL, apart en zonder bijwerkingen.
+
+   Hij staat los omdat hij anders alleen te beproeven is door een volle ronde te
+   draaien -- en een regel die je niet goedkoop kunt zien zakken, wordt niet
+   beproefd. De drie standen staan uitgeschreven bij de aanroeper. */
+function oordeelVan(gezakt, nietGedraaid, alleenInDeKeten) {
+  if (gezakt > 0) return 'GEZAKT';
+  if ((nietGedraaid || 0) + (alleenInDeKeten || 0) > 0) return 'ONBEWEZEN';
+  return 'BEWEZEN';
+}
+
 function register() {
   try { return JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { return { poorten: {} }; }
 }
@@ -448,8 +459,65 @@ function ronde() {
     console.log('                  wegwerpcheckout, hier blijft het staan. Bewaren of terugzetten is een keuze:');
     for (const p of geschreven) console.log('      ' + K.dim + p + K.uit);
   }
-  console.log('  OORDEEL       : ' + (gezakt === 0 ? K.groen + 'geen poort gezakt' : K.rood + gezakt + ' POORT(EN) GEZAKT') + K.uit + '\n');
-  return gezakt === 0 ? 0 : 1;
+  /* HET OORDEEL HEEFT DRIE UITKOMSTEN EN NIET TWEE, en dat verschil komt uit een
+     fout die hier op 15 september 2026 echt is gemaakt -- door een lezer van deze
+     uitvoer, niet door de code.
+
+     Hierboven staat al "niet gedraaid: N -- en dat is geen groen". Maar het
+     OORDEEL eronder keek alleen naar `gezakt`, dus een ronde waarin twintig
+     poorten niet draaiden en nul zakten meldde "geen poort gezakt" en gaf exit 0.
+     Het proza zei het goede en de exitcode zei het tegenovergestelde; wie het
+     laatste leest, leest afwezigheid van falen als bewijs.
+
+     Dat is dezelfde fout die de keten die dag maakte: een geannuleerde CI-run
+     heeft geen enkele gezakte job, en las daardoor als "niets rood". Niet
+     gemeten is geen goede uitslag (LAT.md regel 12), en een poort bewijst alleen
+     zijn eigen bereik (regel 17).
+
+       GEZAKT      een poort is gevallen. Er is iets kapot.
+       ONBEWEZEN   niets viel om, maar niet alles is gedraaid. Dit is GEEN groen
+                   en ook geen rood -- het is de afwezigheid van een uitspraak.
+       BEWEZEN     elke poort die hier hoort te draaien, draaide en staat.
+
+     WAAROM ONBEWEZEN STANDAARD GEEN EXIT 1 GEEFT. Deze draaier is ook het
+     gereedschap van een ontwikkelaar die met opzet versmalt (--alleen, --snel).
+     Zou hij daarop zakken, dan leert iedereen binnen een week de exitcode te
+     negeren, en dan is de strengere stand minder waard dan de oude. Met
+     --eis-bewezen zakt hij wel: dat is de stand voor een release-oordeel, waar
+     "we hebben het niet gemeten" hetzelfde gewicht hoort te hebben als "het is
+     gezakt". */
+  const eisBewezen = process.argv.includes('--eis-bewezen');
+  const onbewezenPoorten = nietGedraaid.length + extern.length;
+  const stand = oordeelVan(gezakt, nietGedraaid.length, extern.length);
+
+  boek.oordeel = {
+    stand, gezakt, gedraaid,
+    nietGedraaid: nietGedraaid.length,
+    alleenInDeKeten: extern.length,
+    gedekt: rijen.filter(r => r.stand === 'gedekt').length,
+    /* Aan WELKE code dit oordeel hangt. Zonder dit is "de ronde stond groen" een
+       uitspraak zonder onderwerp -- precies wat scripts/lib/stempel.js voor de
+       registers al oplost. */
+    commit: (() => { try { return require('./lib/stempel').stempel(); } catch (e) { return null; } })()
+  };
+
+  const kleur = stand === 'GEZAKT' ? K.rood : stand === 'ONBEWEZEN' ? K.geel : K.groen;
+  console.log('  OORDEEL       : ' + kleur + stand + K.uit +
+    (stand === 'GEZAKT' ? K.rood + '  (' + gezakt + ' poort(en))' + K.uit : '') +
+    (stand === 'ONBEWEZEN'
+      ? K.dim + '  geen poort gezakt, maar ' + onbewezenPoorten + ' poort(en) leverden hier geen uitspraak' + K.uit
+      : ''));
+  if (stand === 'ONBEWEZEN') {
+    console.log('                  ' + K.dim + 'Afwezigheid van falen is geen bewijs. Draai met --eis-bewezen' +
+      '\n                  om hier ook op te zakken.' + K.uit);
+  }
+  console.log('');
+
+  try { fs.writeFileSync(REGISTER, JSON.stringify(boek, null, 2) + '\n'); } catch (e) {}
+
+  if (stand === 'GEZAKT') return 1;
+  if (stand === 'ONBEWEZEN' && eisBewezen) return 1;
+  return 0;
 }
 
 /* ==========================================================================
@@ -487,4 +555,4 @@ function controle() {
 
 if (require.main === module) process.exitCode = CONTROLE ? controle() : ronde();
 
-module.exports = { plan, gewoneRonde, slotsuiteRoeptOns, woorden, argsVan, controle, REGISTER };
+module.exports = { plan, gewoneRonde, slotsuiteRoeptOns, woorden, argsVan, controle, oordeelVan, REGISTER };

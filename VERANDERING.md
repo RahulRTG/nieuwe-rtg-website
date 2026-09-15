@@ -314,6 +314,111 @@ even iets toe.
    de 28 dat echt afwezig is, goedkoop te beginnen, en het past op de bestaande
    invarianten (`lib/idemsleutels.js`, `kern/waarde/policy.js`).
 
+## 7a. De drie besluiten zijn genomen (15 september 2026)
+
+De eigenaar heeft de drie vragen van par. 7 beantwoord. Ze staan hier met wat er
+al van gebouwd is en wat er nog niet is — en met één correctie, want een van de
+drie botst met een ladder die dit huis al heeft.
+
+**1. Register en waarneming worden uit elkaar getrokken.** Eén bestand mag geen
+twee betekenissen dragen. Er komt een **VERANDERBEREIK-REGISTER** (stabiele
+kennis: toets → claims → afhankelijkheden, versioneerbaar, in de repo) naast een
+**VERANDERBEREIK-RUN** (een waarneming: commit X raakte Y, daarom liep Z). Dat
+lost precies de ongemakkelijke stand op waarin het huidige bestand tegelijk
+waarheid moet zijn én `rondeVolledig: false` draagt. **Nog niet gebouwd.**
+
+**2. De sport `geraakt` mag geen `staat` heten** zolang twee van zijn vier
+mechanismen hun uitslag niet dragen. Besloten, **en hier hoort een correctie
+bij**: de voorgestelde ladder `ONTDEKT → BEDRAAD → BEWEZEN` zou de **zesde**
+gezagsladder van dit huis zijn, en `BEWIJSMACHINE.md` houdt precies dat tegen.
+De ladder bestaat al en staat in `BESTUUR.md` par. 3 als huisregel: **onbekend,
+vermoed, gemeten, bewezen**. Die vier dekken het voorstel een-op-een — *ontdekt*
+is `vermoed`, *bedraad* is `gemeten`, *bewezen* is `bewezen` — en ze hebben al
+lezers. De sport hoort dus een **bewijsgraad** te krijgen en geen nieuwe
+woordenlijst. **Bewust nog niet gebouwd**: het verandert de standen van
+`BEWIJSLADDER.json`, en daarmee de normtand `bewijsAlleenKeten` en zijn toetsen.
+Dat vóór de correctie bouwen zou het verkeerde bouwen.
+
+**3. Property-based testing komt er, en begint bij de wetten.** Niet willekeurige
+invoer op een scherm, maar de invarianten waar de hoogste veiligheidswinst zit:
+*geen actor zonder geldige bevoegdheid veroorzaakt ooit een geslaagde mutatie*,
+en *dezelfde idempotentiesleutel met dezelfde betekenis en dezelfde toestand geeft
+nooit twee economische gevolgen*. **Nog niet gebouwd.** Let bij de bouw op één
+ding: `fast-check` toevoegen is een dependency-besluit dat langs de job *Nieuwe
+dependencies beoordelen* gaat; de generatoren zijn ook met de hand te schrijven,
+en dat is voor deze twee wetten waarschijnlijk genoeg.
+
+## 7b. De vondst die uit het CI-incident zelf kwam
+
+Tijdens deze tak werd een CI-run op de head **geannuleerd** — geen enkele job
+gezakt. Dat las als "niets rood", en dat is precies verkeerd: een geannuleerde
+run heeft geen uitspraak gedaan. De eigenaar trok daaruit de goede conclusie:
+tussen `PASS` en `FAIL` liggen minstens `CANCELLED`, `NOT_RUN`, `RUNNING`,
+`STALE`, `SUPERSEDED` en `INFRA_ERROR`, en maar één daarvan betekent *bewezen op
+deze head*.
+
+**En dat gat zat ook lokaal.** `scripts/ci-lokaal.js` drukte al netjes af *"niet
+gedraaid: N — en dat is geen groen"*, en liet daaronder het oordeel luiden
+`gezakt === 0 ? 'geen poort gezakt' : ...` met exit 0. Het proza zei het goede en
+de exitcode zei het tegenovergestelde; een ronde waarin dertig poorten niet
+draaiden en nul zakten, meldde groen. Dat is gerepareerd:
+
+| stand | betekenis |
+|---|---|
+| `GEZAKT` | een poort is gevallen |
+| `ONBEWEZEN` | niets viel om, maar niet alles is gedraaid — geen groen én geen rood |
+| `BEWEZEN` | elke poort die hier hoort te draaien, draaide en staat |
+
+Drie dingen die daar niet mogen sneuvelen. **Een poort die alleen bij GitHub
+bestaat telt óók als onbewezen** — zou die niet meetellen, dan heet een lokale
+ronde "bewezen" terwijl de halve keten er niet in zat. **`ONBEWEZEN` geeft
+standaard geen exit 1**, want deze draaier is ook het gereedschap van iemand die
+met opzet versmalt (`--alleen`, `--snel`); zou hij daarop zakken, dan leert
+iedereen binnen een week de exitcode te negeren en is de strengere stand minder
+waard dan de oude. Met `--eis-bewezen` zakt hij wél, en dát is de stand voor een
+release-oordeel. En het oordeel wordt **met de commit** in `.cilokaal` gelegd:
+zonder die commit is "de ronde stond groen" een uitspraak zonder onderwerp.
+
+## 7c. De richting daarboven, en wat er eerst gemeten moet worden
+
+De eigenaar heeft de architectuur uitgeschreven: Change Compiler → Semantic Delta
+→ Change Graph → Risk Engine → Proof Planner → Proof Executor → **Proof Ledger**,
+met een attestatie die aan `head + plan + omgeving + dependencies` hangt in plaats
+van aan "de PR". Vier dingen daaruit zijn hier de moeite van het vastleggen waard,
+omdat ze de volgorde bepalen.
+
+**De 333 worden niet met de hand gelabeld.** Er komt een instrumentatieronde die
+per toets vastlegt welke modules, routes, capabilities, toestand en wetten hij
+raakt — en het resultaat draagt een **herkomst** (`declared`, `static`,
+`observed`, `inferred`, `proven`), want waargenomen bereik is geen bewezen
+volledig bereik. Alleen bepaalde combinaties mogen later versmalling toestaan.
+
+**De selector wordt zelf getoetst, in de schaduw.** Eerst kiest hij, dan draait
+alles alsnog, en elke failure die hij niet had gekozen is een **false negative**
+en een ontbrekende rand in de graaf. Pas na honderden van die rondes mag hij werk
+besparen. Dat is de vorm die `CONTROLPLANE.md` al voorschrijft: je kunt niet
+afdwingen wat nooit in de schaduw heeft gelopen.
+
+**Recall gaat vóór precisie, en dat is geen voorkeur maar rekenkunde.** Kiest hij
+45 toetsen waar er 37 nodig waren, dan kost dat seconden. Kiest hij er 36 terwijl
+nummer 37 een dubbele betaling tegenhoudt, dan is het een veiligheidsprobleem.
+Let bij het meten wel op de noemer: *alle toetsen die hadden kunnen breken* is
+niet kenbaar zonder ze te draaien, dus recall wordt gemeten tegen de
+WAARGENOMEN failures van de schaduwronde — een ondergrens, en hij hoort zo te
+worden opgeschreven.
+
+**CCC en Proof Efficiency blijven twee assen.** Ze mogen naast elkaar staan en
+nooit tot één cijfer worden vermenigvuldigd; dat is `INT-04` en `LAT.md` regel 11
+(zie ook correctie A hierboven). En de regel die erboven hangt, is de scherpste
+zin van het hele voorstel:
+
+> **Nooit veiligheid verwijderen om sneller te worden. Verwijder opnieuw
+> uitgevoerd bewijs waarvan aantoonbaar vaststaat dat het niets nieuws kan
+> bewijzen.**
+
+Het doel is dus niet minder toetsen, maar meer zekerheid per seconde — en zolang
+er 333 volle ringen staan, is er nog niets aantoonbaar overbodig.
+
 ## 8. De maatstaf
 
 Niet *"wanneer heeft RTG een bewijsmachine"* maar:

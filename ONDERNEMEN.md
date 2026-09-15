@@ -88,24 +88,63 @@ Drie assen, drie graden, nooit opgeteld:
   <!--getal:lus.stationsMetRoute-->11<!--/getal--> met routes.
 - **3 rollen** dragen de lus (`member`, `office`, `supplier`) met
   <!--getal:lus.deurwissels-->8<!--/getal--> **deurwissels**.
-- **`zaakZietOnderneming` = <!--getal:lus.zaakZietOnderneming-->0<!--/getal-->.**
+- **`zaakZietOnderneming` = <!--getal:lus.zaakZietOnderneming-->0<!--/getal-->** —
+  dit getal stond bij de eerste meting op **0**; de brug eronder is de eerste stap
+  die is gezet.
 - **<!--getal:lus.ketensZonderProef-->4<!--/getal--> van de 7 ketens** van de lus
   zijn nooit als keten gelopen.
 - **1 station zonder enkele route**: *Proberen*.
 
 ### Wat die vier getallen betekenen
 
-**1. De lus loopt één kant op.** `kern/onderneming` kent de zaak — hij heeft
-`vanZaak` en `/api/onderneming/koppel`. Het omgekeerde is nul: geen enkel bestand
-onder `routes/supplier/` of `routes/staff/` noemt de ondernemingscollectie **of
-roept een toegang aan die het object teruggeeft** (`ondernemingVanZaak` voorop).
-Die tweede helft telt sinds 14 september mee — zonder haar mat de meter juist de
-vorm niet die de brug hoort te hebben; zie het kader hieronder. De
-werkvloer weet niet dat hij een onderneming heeft. Dat is dezelfde vorm die
+**1. De lus liep één kant op — en dat is de eerste reparatie.** `kern/onderneming`
+kent de zaak (hij heeft `vanZaak` en `/api/onderneming/koppel`); het omgekeerde
+was nul. Geen enkel bestand onder `routes/supplier/` of `routes/staff/` noemde de
+ondernemingscollectie **of riep een toegang aan die het object teruggeeft**
+(`ondernemingVanZaak` voorop) — die tweede helft telt sinds 14 september mee, want
+zonder haar mat de meter juist de vorm niet die de brug hoort te hebben; zie het
+kader hieronder. De werkvloer wist dus niet dat hij een onderneming *had*, en
+station 11 kon niet weten waar station 2 het over had. Dezelfde vorm die
 `scripts/ritmigratie.js` in de twee ritwerelden vond, en de reparatie daar
 (`kern/mobiliteit/appbrug.js`) is hier het model — inclusief de regel die daar
 geleerd is: **de brug loopt één kant op, want twee lijsten die elkaar bijwerken
 hebben geen waarheid meer.**
+
+> **De brug staat** (14 september 2026; besluit van de eigenaar: *"juist
+> éénrichting is goed"*). `server/kern/onderneming/zaakkant.js` +
+> `routes/supplier/onderneming.js`, en `zaakZietOnderneming` ging van 0 naar
+> <!--getal:lus.zaakZietOnderneming-->0<!--/getal-->. Vier dingen liggen daar vast
+> en horen nergens anders herhaald te worden.
+>
+> **Eén kernnaam en niet twee.** De route had `ondernemingVanZaak` plus
+> `ondernemingBeeld` kunnen aanraken — maar `scripts/grenzen.js` leidt het domein
+> af uit de **map**, dus dat waren twee namen geweest die `member` en `supplier`
+> daarna samen aanraken: `kernGedeeld` 237 → 239. Met één eigen toegang
+> (`ondernemingAchterZaak`) beweegt alleen `kernBreedte`, en staat de versmalling
+> bovendien in de module die het object *bezit* — daar hoort het besluit over wat
+> gedeeld wordt, niet in een route.
+>
+> **De projectie is een positieve lijst en geen beeld met velden eraf.** Dat gaat
+> over richting en niet over stijl: bij een spread passeert elk nieuw veld van
+> `ondernemingBeeld()` deze grens vanzelf. De vloer krijgt de trede, de
+> rechtsvorm, de caps, wat de rechtsvorm weghoudt en de werkvormen — geen
+> eigenaar, geen KvK-nummer, geen klant- of personeelscijfers. Wat er *niet* in
+> zit staat mét de reden in het antwoord zelf, want een leeg vak wordt gevuld met
+> iemands eigen indruk. Er komt geen rolonderscheid bij: de view is versmald tot
+> wat veilig is voor de minst bevoegde mens die binnenkomt, en de eigenaar heeft
+> zijn eigen ledenroutes.
+>
+> **De eenrichtingstoets was waardeloos, en dat is met een mutatie gevonden.** Hij
+> vergelijkt een *projectie*, dus hij ziet alleen schrijfacties die dáárin
+> opduiken: laat de zaakkant `o.naam` overschrijven en hij bleef groen, want
+> `ondernemingNaam()` leest na het koppelen de naam van de **zaak**. Er staat nu
+> een besturingsproef achter (de onderneming verandert langs een gewone ledenroute
+> en hetzelfde venster moet dat wél zien) plus een brontoets die zegt dat de
+> module niet schrijft. *Zwarte doos en bron zijn hier twee helften en geen
+> keuze* — dezelfde vorm als bewering D in `STAGE.md` par. 6.
+>
+> **En de fabriek krijgt `save` noch `db` mee.** Persisteren kan er structureel
+> niet in, in plaats van dat het er niet in staat.
 
 **2. Acht deurwissels zijn geen defect.** Een kantoorbesluit *hoort* een andere
 deur te hebben dan een ledenscherm; daarom staat er bij `deurwissels` met opzet

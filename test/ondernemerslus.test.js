@@ -17,7 +17,7 @@
         bewering over het verleden -- die les kostte dit huis zeven "gezakte"
         routes die allang gerepareerd waren (KANTOORMACHT.md).
 
-   5-7  de BESTURINGSPROEF. Een instrument dat niet kan uitslaan is geen
+   5-8  de BESTURINGSPROEF. Een instrument dat niet kan uitslaan is geen
         instrument. Toets 5 laat de meter zijn onderwerp kwijtraken en eist dat
         hij GOOIT; toets 6 en 7 laten een zaak-bestand de onderneming noemen en
         eisen dat het kopgetal beweegt. Zonder die drie kan deze hele meter
@@ -33,6 +33,13 @@
         Een besturingsproef op alleen de collectienaam zou groen blijven terwijl
         precies die helft stilvalt, en dan is de meter weer blind op de enige
         plek waar het kopgetal vandaan moet komen.
+
+        EN ACHT IS DE TEGENPROEF VAN ZES EN ZEVEN. Die twee eisen dat het
+        kopgetal BEWEEGT; acht eist dat het STIL blijft wanneer de naam alleen in
+        een commentaarregel staat. Zonder die derde kan de meter het getal laten
+        stijgen op een zin die niemand uitvoert -- en juist bij een ratel is dat
+        erger dan een te laag getal: dan meldt hij vooruitgang waar niets is
+        gebouwd.
 
    Draai los: node --test test/ondernemerslus.test.js
    De meting:  npm run ondernemerslus */
@@ -141,5 +148,26 @@ test('7. BESTURINGSPROEF: een zaak-bestand dat een TOEGANG aanroept, beweegt het
       'de brug hoort te hebben -- de meter meldt dan een gat dat er niet is.');
   } finally {
     if (fs.existsSync(PROEFBESTAND_TOEGANG)) fs.unlinkSync(PROEFBESTAND_TOEGANG);
+  }
+});
+
+test('8. BESTURINGSPROEF: een naam die alleen in COMMENTAAR staat, beweegt het kopgetal NIET', () => {
+  const voor = versMeten().meet().telling.zaakZietOnderneming;
+  try {
+    /* Twee vormen, want een wringer die er maar een kent is een halve wringer:
+       een blokcommentaar, een regelcommentaar en een tekenreeks. Precies de
+       vorm waarin server/lib/mutatiecontracten-zaakkant.js de handler citeert --
+       daar kwam deze proef vandaan. */
+    fs.writeFileSync(PROEFBESTAND,
+      '/* tijdelijke besturingsproef: db.data.ondernemingen wordt hier alleen GENOEMD */\n' +
+      '// ook ondernemingVanZaak staat hier alleen in een uitleg\n' +
+      "const uitleg = 'roept ondernemingAchterZaak aan';\n");
+    const na = versMeten().meet().telling.zaakZietOnderneming;
+    assert.equal(na, voor,
+      'het kopgetal steeg door een bestand dat de onderneming alleen NOEMT. Dan kan deze ratel worden ' +
+      'gehaald met een commentaarregel, en meldt hij vooruitgang waar niets is gebouwd -- dezelfde fout ' +
+      'die scripts/grenzen.js noteert als al drie keer gemaakt in een meter van dit huis.');
+  } finally {
+    if (fs.existsSync(PROEFBESTAND)) fs.unlinkSync(PROEFBESTAND);
   }
 });

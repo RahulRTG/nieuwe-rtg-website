@@ -188,13 +188,32 @@ function toegangen() {
   return [...namen].sort();
 }
 
+/* COMMENTAAR EN TEKENREEKSEN ERUIT VOORDAT ER IETS GETELD WORDT. Zonder deze
+   wringer telt een naam die in een UITLEG wordt genoemd mee als een echte
+   aanraking, en dat is geen theorie: server/lib/mutatiecontracten-zaakkant.js
+   schrijft de handler van een regel woordelijk in zijn kop op, en stond daarmee
+   in de telling als een bestand dat de onderneming "kent". Bij het KOPGETAL is
+   dat erger dan een te hoog totaal -- een commentaarregel onder routes/supplier/
+   zou `zaakZietOnderneming` kunnen laten stijgen zonder dat er iets is gebouwd,
+   en dat is precies de ratel die dit register moet bewaken.
+
+   Dezelfde vorm als scripts/grenzen.js, en om dezelfde reden: die noteert dat
+   dit huis deze fout al drie keer in een meter heeft gehad. Tekenreeksen gaan
+   mee eruit, want een routepad in een register is ook geen aanraking. De regels
+   blijven staan (alles wordt door spaties vervangen), zodat een latere lezer nog
+   op regelnummer kan zoeken. */
+const wring = (t) => t
+  .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+  .replace(/(^|[^:'"\\/])\/\/[^\n]*/g, (m, p) => p)
+  .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, m => m.replace(/[^\n]/g, ' '));
+
 function collectieNaam() {
   const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/onderneming/index.js'), 'utf8');
   const m = bron.match(/bezit:\s*\{\s*([A-Za-z0-9_]+)\s*:/);
   if (!m) throw new Error('ondernemerslus: de collectienaam is niet uit kern/onderneming/index.js te lezen; ' +
     'zonder onderwerp meet deze meter niets en een nul zou als bevinding gelezen worden.');
   const naam = m[1];
-  const ijk = fs.readFileSync(path.join(WORTEL, IJKBESTAND), 'utf8');
+  const ijk = wring(fs.readFileSync(path.join(WORTEL, IJKBESTAND), 'utf8'));
   if (!new RegExp('\\b' + naam + '\\b').test(ijk))
     throw new Error('ondernemerslus: de collectie "' + naam + '" komt niet voor in ' + IJKBESTAND +
       ', terwijl juist die laag hem leest. Waarschijnlijk is de collectie hernoemd en loopt deze meter ' +
@@ -270,7 +289,7 @@ function meet() {
   const alle = bestanden(path.join(WORTEL, 'server'));
   const noemt = alle.filter((f) => !f.startsWith('server/kern/onderneming/'))
     .filter((f) => {
-      try { return woorden.test(fs.readFileSync(path.join(WORTEL, f), 'utf8')); }
+      try { return woorden.test(wring(fs.readFileSync(path.join(WORTEL, f), 'utf8'))); }
       catch { return false; }
     });
   const kant = (f) => f.startsWith('server/routes/supplier/') || f.startsWith('server/routes/staff/') ? 'zaak'

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T23:30:01.058Z",
-    "commit": "08dcb0b4",
+    "op": "2026-09-15T00:22:31.708Z",
+    "commit": "7347e7c0",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 4,
     "instrument": "scripts/ondernemerslus.js",
     "node": "v22.22.2"
   },
@@ -15,6 +15,7 @@
     "toegangen": [
       "ondernemingAanvraag",
       "ondernemingAanvraagStand",
+      "ondernemingAchterZaak",
       "ondernemingBeeld",
       "ondernemingCaps",
       "ondernemingDagbeeld",
@@ -270,7 +271,7 @@
     }
   ],
   "kenners": {
-    "totaal": 16,
+    "totaal": 18,
     "perKant": {
       "lid": {
         "aantal": 4,
@@ -282,15 +283,17 @@
         ]
       },
       "zaak": {
-        "aantal": 0,
-        "bestanden": []
+        "aantal": 1,
+        "bestanden": [
+          "server/routes/supplier/onderneming.js"
+        ]
       },
       "kantoor": {
         "aantal": 0,
         "bestanden": []
       },
       "kern": {
-        "aantal": 12,
+        "aantal": 13,
         "bestanden": [
           "server/kern/concern/discovery.js",
           "server/kern/concern/entiteit.js",
@@ -303,6 +306,7 @@
           "server/kern/onboarding/meebouwen.js",
           "server/kern/overheid/kantoor.js",
           "server/kern/wereld/ai.js",
+          "server/lib/mutatiecontracten-zaakkant.js",
           "server/opzet/kernlaag4b.js"
         ]
       }
@@ -316,7 +320,7 @@
   ],
   "ratels": {
     "zaakZietOnderneming": {
-      "waarde": 0,
+      "waarde": 1,
       "richting": "omhoog",
       "wat": "bestanden onder routes/supplier of routes/staff die het ondernemingsobject kennen. Staat dit op nul, dan is de lus eenrichtingsverkeer: het bedrijfsobject ziet de werkvloer en de werkvloer ziet hem niet."
     },
@@ -346,8 +350,8 @@
       "supplier"
     ],
     "deurwissels": 8,
-    "kennersTotaal": 16,
-    "zaakZietOnderneming": 0,
+    "kennersTotaal": 18,
+    "zaakZietOnderneming": 1,
     "ketensVanDeLus": 7,
     "ketensZonderProef": 4
   }

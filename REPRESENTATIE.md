@@ -1062,3 +1062,98 @@ nergens bestaat — en pas dán verandert `SPOORVORM` van vraag. De oude meter g
 niet weg voordat de nieuwe bewezen is, en in de nieuwe is **`n.v.t.` geen
 tekort**: een mechanisme zonder uitvoering hoort niet rood te staan omdat het
 geen uitvoeringscrash kan hebben.
+
+---
+
+## 11. De slice is gemeten vóór hij werd gebouwd, en hij heeft geen onderwerp
+
+Par. 10.5 wees `app-machtiging` aan als het eerste mechanisme dat de hele keten
+zou bewijzen. Dat is nagemeten vóór er een regel is geschreven, en de premisse
+houdt niet. Dit is de derde keer in deze reeks dat een regel klopt terwijl het
+geval nog niet bestaat — en dat is geen toeval maar een eigenschap van het huis.
+
+### 11.1 Wat de proef nodig heeft
+
+De dragende toets van besluit 3 is:
+
+```
+effect(X door de principal zelf)  ==  effect(X namens hem, door een ander)
+```
+
+Daarvoor moet er een X bestaan die van **beide kanten** bereikbaar is: de mens
+kan hem zelf uitvoeren, én het mechanisme kan hem namens hem uitvoeren. Zonder
+zo'n X is er niets te vergelijken.
+
+### 11.2 De brug heeft negen methodes, en geen enkele raakt gedeelde grond
+
+`kern/appstore/brugmethodes.js` draagt er negen, en ze schrijven alle drie de
+soorten opslag in een **doos per app**:
+
+| methode | schrijft naar | gedeeld met RTG? |
+|---|---|---|
+| `profiel.wieBenIk` | niets (leest) | — |
+| `opslag.lees/lijst/zet/wis` | `bak('opslag', app, lid)` | nee: een kladblok per app per lid |
+| `bericht.zet` | `bak('bakjes', lid, app)` | nee: het bakje van díé app |
+| `arena.zet/bord/mijn` | het bord van díé app | nee, en uitgeschreven |
+
+Die laatste staat er met zoveel woorden: *"EEN BORD PER APP, NOOIT DAT VAN DE
+ARENA"*, met als reden dat een ranglijst waar een derde het getal instuurt precies
+zo betrouwbaar is als de minst betrouwbare app erin.
+
+Dat is geen omissie maar **de cel** (`APPSTORE.md`: derdencode draait nooit op de
+RTG-herkomst). Een lid kan `opslag.zet` voor app Y niet zelf doen — die
+sleutelruimte bestaat alleen omdát de app bestaat. Er is dus geen X met twee
+kanten, en de vergelijking van 11.1 heeft hier geen onderwerp.
+
+### 11.3 En het geldt voor alle zeven
+
+De vraag is daarna breder gesteld: is er érgens een mechanisme dat namens iemand
+een onderliggende capability UITVOERT?
+
+| mechanisme | wat het werkelijk doet |
+|---|---|
+| `vertegenwoordiging` | oordeelt en legt vast — `handel()` voert niets uit |
+| `app-machtiging` | voert uit, maar uitsluitend binnen de cel van de app |
+| `bijstand` | `voerUit()` zet `status = 'uitgevoerd'` en schrijft een uitslag: het **registreert dat een mens het deed** |
+| `servicemachtiging` | `magNu()` heeft twee aanroepers, en die openen een BEELD (`organisatie.stand`) |
+| `ai-mandaat` | `magZelfstandig()` heeft één aanroeper, in `kantoor/geldketen/klaarzet.js` — klaarzetten |
+| `sepa-machtiging` | keurt |
+| `fiscaal-mandaat` | beoordeelt geldigheid |
+
+> **In dit huis betekent *namens iemand handelen* vandaag: beoordelen, openen,
+> klaarzetten en vastleggen — nooit uitvoeren.** De uitvoering doet een mens, of
+> de principal zelf.
+
+Dat is volledig in lijn met wat dit huis elders hardop kiest (`GELD.md`: geld
+wordt klaargezet en een mens voert uit; `FABRIC.md`: wat een tweede persoon
+bereikt bevestigt een mens). De keten uit 10.5 vraagt dus niet om een
+implementatie maar om een **product- en architectuurbesluit dat er nog niet is**.
+
+### 11.4 Drie wegen, en geen ervan is een slice
+
+1. **De cel openen** — de brug een methode geven die gedeelde grond raakt. Dat
+   doorbreekt de grens waar de hele App Store op staat, inclusief de zes
+   machtigingen die met opzet niet bestaan. Groot besluit, geen slice.
+2. **`vertegenwoordiging` laten uitvoeren** — `handel()` een echte onderliggende
+   capability laten aanroepen. Dan bestaat de vergelijking van 11.1 meteen (de
+   cliënt kan die capability zelf ook), en profiel 1 uit 10.2 is haalbaar omdat
+   alles in-process is. Dit is de kortste weg naar een echt onderwerp, en het
+   raakt geen bestaande grens — maar het verandert wel wat een machtiging IS:
+   van een vastgelegde toestemming naar een uitvoerbare.
+3. **Wachten tot een domein er zelf om vraagt.** Niets bouwen; de invariant staat
+   opgeschreven en wordt scherp zodra er ergens een uitvoerend mechanisme
+   ontstaat.
+
+Wat er **niet** moet gebeuren is een `X_TEST_VERTEGENWOORDIGING` — een werkwoord
+dat alleen bestaat om de keten groen te krijgen. Dan is er een prachtige keten
+die niets bewijst over echte capabilities, en dat is precies de vorm die
+`BEWIJSMACHINE.md` par. 6a een geldige uitslag van het verkeerde experiment
+noemt.
+
+### 11.5 Wat deze meting wél heeft opgeleverd
+
+De drie besluiten van par. 10 staan, en ze zijn nu preciezer geadresseerd:
+besluit 1 en 2 wachten op een uitvoerende levensloop, besluit 3 op een
+onderliggende handeling — en alle drie wachten op hetzelfde, namelijk op weg 1
+of weg 2 hierboven. Dat is geen vertraging maar het verschil tussen een besluit
+dat af is en een besluit dat nog een onderwerp moet krijgen.

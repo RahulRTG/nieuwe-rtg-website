@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1895 |
 | losse beweringen (`test(...)`) | 13580 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1248 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1252 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
-| alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 408 |
+| alleen in de kop *genoemd*, nog niet gemeten | 167 |
+| niets van beide | 405 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -330,7 +330,7 @@ toets omvalt.
 | `domeinalleen.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `domeingrens.test.js` | 8 | gezakt op `===->!==#0` | DE DOMEINGRENS: laat hij door wat mag, en houdt hij tegen wat niet mag? Waar dit over gaat: server.js geeft elke router hetzelfde object `kern` met ruim negenhonderd eigenschappen, dus kan elk domein bij alles van... |
 | `doodspoor.test.js` | 19 | gezakt op `===->!==#0` | DE DOODSPOORMETER (scripts/doodspoor.js) -- ziet hij een dood spoor? MAATSTAF.md par. |
-| `doorbelasting.test.js` | 8 | -- | DE DOORBELASTINGSMETER (scripts/doorbelasting.js, DOORBELASTING.json). De dragende toets is nummer 3 en niet de ratel: `onbekend` moet een UITKOMST zijn en nooit een aanname. |
+| `doorbelasting.test.js` | 8 | gezakt op `===->!==#0` | DE DOORBELASTINGSMETER (scripts/doorbelasting.js, DOORBELASTING.json). De dragende toets is nummer 3 en niet de ratel: `onbekend` moet een UITKOMST zijn en nooit een aanname. |
 | `doorgeefjournaal.test.js` | 7 | gezakt op `liegpoort /api/` | HET DOORGEEFJOURNAAL: zien wat er binnenkwam en wat de deur uitging. WAAROM DIT ER IS. |
 | `doorwerking.test.js` | 7 | gezakt op `===->!==#0` | DE DOORWERKING VAN HET ZORGPROFIEL (scripts/doorwerking.js). MAATSTAF.md U10: een gegeven wordt één keer gevraagd en alleen hergebruikt met doel, toestemming, bron en actualiteit. |
 | `doos-journaal.test.js` | 3 | gezakt op `true->false` | Zaakdoos-journaal, beveiliging: het journaal wordt na herstel nagespeeld naar de cloud met de inlog van de doos. Daarom is het gezegeld (HMAC), genummerd (seq) en padgebonden. |
@@ -714,7 +714,7 @@ toets omvalt.
 | `lab2-werk.test.js` | 14 | gezakt op `liegpoort /api/` | Het KANTOORWERK van het RTF Living Lab: het bestuur van een lab (budget, partners), het stafbeeld op een lab, het vraagstuk, "wat nu", de deelnemers en hun rollen, de werkplaats (taken, agenda, documenten, logboek,... |
 | `labfonds-onderzoek.test.js` | 8 | -- | DE SCHAKEL TUSSEN HET LAB-FONDS EN HET ONDERZOEK -- wat is er met mijn bijdrage onderzocht? Het fonds haalde geld op VOOR onderzoek en wist niet WELK; een lid kon zien dat het aan de pot van Amsterdam had bijgedragen... |
 | `labfonds.test.js` | 4 | gezakt op `===->!==#0` | Het Lab-fonds (kern/labfonds.js): leden zamelen in voor het RTF Onderzoekslab, per locatie verdeeld, en beslissen gezamenlijk met de AI-scheidsrechter. |
-| `landdekking.test.js` | 7 | -- | DE LANDDEKKING (scripts/landdekking.js, LANDDEKKING.json). WAT DEZE TOETS BEWAAKT, en wat met opzet niet. |
+| `landdekking.test.js` | 7 | gezakt op `===->!==#0` | DE LANDDEKKING (scripts/landdekking.js, LANDDEKKING.json). WAT DEZE TOETS BEWAAKT, en wat met opzet niet. |
 | `landpakket.test.js` | 6 | gezakt op `===->!==#0` | Landpakketten (kern/command/landpakket.js): een land aanzetten als configuratiebundel. WAT DEZE TOETS VOORAL BEWAAKT is dat "geactiveerd" nooit gaat lezen als "in orde". |
 | `lcov.test.js` | 12 | genoemd | HET REGRESSIECORPUS VAN DE LCOV-SAMENVOEGING. Deze code bepaalt of de dekkingsvloer wordt gehaald wanneer de suite over parallelle scherven is verdeeld. |
 | `leden-gids-pg.test.js` | 1 | slaat zichzelf over | Integratietest voor de Postgres-ledengids (member_dir): met DATABASE_URL gezet staat de codenaam/pas-gids als GEINDEXEERDE RIJEN in Postgres in plaats van als object in het geheugen. Een nieuw lid dat zich meldt... |
@@ -1190,7 +1190,7 @@ toets omvalt.
 | `routerindex.test.js` | 9 | gezakt op `===->!==#0` | DE DISPATCH-INDEX VAN DE ROUTER (server/web/routing.js). De router liep bij elk verzoek de hele lagenlijst af. |
 | `routesbron.test.js` | 5 | genoemd | WAAR STAAT DEZE ROUTE? -- de bronverrijking van scripts/lib/routes.js. |
 | `rtdocs-voorzijde.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `rtf-labfonds-deur.test.js` | 10 | genoemd | DE GEZINSDEUR VAN HET LABFONDS -- wie komt er door, en wat doet een TWEEDE aanroep. WAAROM DEZE TOETS BESTAAT. |
+| `rtf-labfonds-deur.test.js` | 10 | gezakt op `liegpoort /api/` | DE GEZINSDEUR VAN HET LABFONDS -- wie komt er door, en wat doet een TWEEDE aanroep. WAAROM DEZE TOETS BESTAAT. |
 | `rtf-samen-credential.pg.test.js` | 1 | -- | Echte PostgreSQL-proef voor FoundationOS Samen. Twee onafhankelijke app- instances delen alleen de kamercollectie; uitgifte, capaciteit, gebruik, rotatie en intrekking moeten onder hetzelfde advisory slot serialiseren. |
 | `rtf-samen-credential.test.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtf-samen-routes-failclosed.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1374,7 +1374,7 @@ toets omvalt.
 | `socialelijn.test.js` | 12 | gezakt op `===->!==#0` | De momentlijn (LIFE.md fase 4): leven in plaats van posts. Wat deze toetsen bewaken is niet dat er regels uitkomen, maar de vier besluiten waar de lijn op staat: 1. |
 | `socialewereld.test.js` | 9 | gezakt op `===->!==#0` | RTG Sociaal, de samenhanglaag. Zelfde belofte als de twee andere werelden: hij bezit niets, hij verzint niets, en hij doet nooit alsof hij compleet is terwijl een bron zweeg. |
 | `societeit.test.js` | 2 | gezakt op `liegpoort /api/` | Integratietests voor De Societeit (18-21): het Quizduel (tien dezelfde vragen, oplossing blijft op de server tot er geantwoord is) en het Schatduel (vijf ronden, het dichtstbij pakt het punt). Jong-profielen zijn... |
-| `soeverein.test.js` | 7 | -- | DE SOEVEREINITEITSMETER (scripts/soeverein.js, SOEVEREIN.json). WAT DEZE TOETS BEWAAKT. |
+| `soeverein.test.js` | 7 | gezakt op `&&->||#1` | DE SOEVEREINITEITSMETER (scripts/soeverein.js, SOEVEREIN.json). WAT DEZE TOETS BEWAAKT. |
 | `sparren.test.js` | 3 | gezakt op `liegpoort /api/` | Sparren: Rahul denkt mee (niet om zijn gelijk te halen) en komt op een geparkeerde gedachte terug als je rustig thuis bent met een lege agenda. Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in... |
 | `spelaandeel.test.js` | 13 | gezakt op `===->!==#0` | MAGNAAT FASE B: DEELNEMINGEN -- verdienen aan een zaak waar je niet aan de knoppen zit. Het derde stuk van fase B. |
 | `spelbank.test.js` | 21 | gezakt op `===->!==#0` | MAGNAAT: DE BANK -- de eerste laag waar geld de wereld verlaat. Alles hiervoor VERPLAATSTE: een contract betaalt de een en verrijkt de ander, een veiling verschuift een zaak, een deelneming splitst een resultaat. |

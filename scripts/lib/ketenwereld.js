@@ -130,7 +130,14 @@ async function stuurZin(basis, token, ingang, zin) {
   const tekst = await r.text();
   let d = null;
   try { d = JSON.parse(tekst); } catch (e) {}
-  return { status: r.status, lijf: d, rauw: tekst.slice(0, 300) };
+  /* De KOPPEN gaan mee, want server/effectmeter.js zet met RTG_STAATLOG zijn
+     uitslag in X-RTG-Effect en niet in het lijf. Een ONTBREKENDE kop is daar
+     iets anders dan `geen` (een stromend antwoord heeft zijn koppen al
+     verstuurd), dus hij wordt doorgegeven als null en niet als lege tekst. */
+  const koppen = {};
+  r.headers.forEach((v, k) => { koppen[k.toLowerCase()] = v; });
+  return { status: r.status, lijf: d, rauw: tekst.slice(0, 300), koppen,
+    kop: (naam) => { const v = koppen[String(naam).toLowerCase()]; return v === undefined ? null : v; } };
 }
 
 module.exports = { vrijePoort, startNepModel, startServer, logIn, stuurZin, INGANGEN, WORTEL };

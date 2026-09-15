@@ -1,0 +1,2620 @@
+{
+  "stempel": {
+    "op": "2026-09-15T15:12:27.700Z",
+    "commit": "c9834f1a",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/paktebetekenis.js",
+    "node": "v22.22.2"
+  },
+  "soort": "meting",
+  "uitleg": "Hoeveel ONDERSCHEIDEN betekenissen draagt de boolean `pakte` van kern/fluister/gesprek.js, gemeten aan een echte server. De poort die erop beslist staat in server/routes/member/persoonlijk-rahul.js:66.",
+  "grens": "Vijf dingen die dit NIET zegt. (0) EFFECT_BEREIKT kent DRIE uitkomsten: bewezen wel, bewezen niet, en ONBEPAALD. Dat laatste is geen slordigheid maar de uitslag zelf -- `fluister` draagt het gespreksgeheugen EN de weetjes van het lid in EEN collectie, dus \"ik onthield deze beurt\", \"ik sloeg jouw weetje op\" en \"ik wiste al je gegevens\" zien er op dit meetniveau identiek uit. Lezen van de code zegt dat onthoud en vergeet wel degelijk muteren; dat is graad `vermoed` en staat hier bewust niet als `gemeten`. (1) TAAL_BEGREPEN is AFGELEID uit het antwoord en niet uit de handler zelf -- graad `vermoed`, de andere vijf zijn gemeten. (2) De opslagvloer komt van EEN ijkzin per stand; een antwoord dat toevallig meer gespreksgeheugen wegschrijft, zou als effect kunnen lezen. (3) server/effectmeter.js telt met opzet geen bestandsschrijfacties en geen externe aanroepen -- die staan in `effectNietGemeten` en niet als nul. (4) Dit is het corpus van EEN route (/api/fluister); over /api/ai en /api/chat/send zegt het niets.",
+  "basislijn": {
+    "zonder-model": [
+      "apiSpoor",
+      "fluister",
+      "handelingLog",
+      "routerschaduw"
+    ],
+    "met-lokaal-model": [
+      "apiSpoor",
+      "fluister",
+      "handelingLog",
+      "routerschaduw"
+    ]
+  },
+  "corpus": [
+    {
+      "id": "ijk0",
+      "zin": "zzq onbestaanbare wartaal zzq",
+      "plek": "basislijn: alleen om de beginstand vast te leggen"
+    },
+    {
+      "id": "ijk",
+      "zin": "zzq onbestaanbare wartaal zzq",
+      "plek": "gesprek.js: r.pakte = false (algemene terugval)"
+    },
+    {
+      "id": "onthoud",
+      "zin": "onthoud dat ik van sushi hou",
+      "plek": "gesprek.js: geleerd, pakte: true"
+    },
+    {
+      "id": "watweetje",
+      "zin": "wat weet je over mij",
+      "plek": "gesprek.js: pakte: true (opsomming)"
+    },
+    {
+      "id": "watkunje",
+      "zin": "wat kun je",
+      "plek": "gesprek.js: pakte: true (helptekst)"
+    },
+    {
+      "id": "sparren",
+      "zin": "spar even met me over mijn idee voor een nieuwe dienst",
+      "plek": "gesprek.js: klaar(...) in sparmodus"
+    },
+    {
+      "id": "zoeken",
+      "zin": "zoek sushi",
+      "plek": "intent.js -> bevestig.zoek, via klaar()"
+    },
+    {
+      "id": "bestellen",
+      "zin": "bestel 2 sangria bij Sunset Ibiza",
+      "plek": "intent.js -> betalen.bestel, drempel -> voorstel"
+    },
+    {
+      "id": "bevestig",
+      "zin": "ja",
+      "plek": "intent.js -> bevestig.ja (voert het voorstel uit)"
+    },
+    {
+      "id": "stand",
+      "zin": "hoe staat het ervoor",
+      "plek": "gesprek.js: klaar(stand/seintjes)"
+    },
+    {
+      "id": "vergeet",
+      "zin": "vergeet alles",
+      "plek": "gesprek.js: geleerd, pakte: true (wist alles)"
+    }
+  ],
+  "telling": {
+    "waarnemingenMetPakte": 20,
+    "onderscheiden": 4,
+    "betekenissen": [
+      {
+        "sleutel": "TAAL_BEGREPEN=J ANTWOORD_GEMAAKT=J PLAN_GEMAAKT=n UITVOERING_GESTART=n EFFECT_BEREIKT=? NACONTROLE_GESLAAGD=n",
+        "lagen": {
+          "TAAL_BEGREPEN": true,
+          "ANTWOORD_GEMAAKT": true,
+          "PLAN_GEMAAKT": false,
+          "UITVOERING_GESTART": false,
+          "EFFECT_BEREIKT": null,
+          "NACONTROLE_GESLAAGD": false,
+          "_collecties": [],
+          "_binnenBasislijn": [
+            "apiSpoor",
+            "fluister",
+            "handelingLog",
+            "routerschaduw"
+          ],
+          "_schrijfacties": 2
+        },
+        "zinnen": [
+          {
+            "id": "onthoud",
+            "stand": "zonder-model",
+            "plek": "gesprek.js: geleerd, pakte: true"
+          },
+          {
+            "id": "watweetje",
+            "stand": "zonder-model",
+            "plek": "gesprek.js: pakte: true (opsomming)"
+          },
+          {
+            "id": "watkunje",
+            "stand": "zonder-model",
+            "plek": "gesprek.js: pakte: true (helptekst)"
+          },
+          {
+            "id": "sparren",
+            "stand": "zonder-model",
+            "plek": "gesprek.js: klaar(...) in sparmodus"
+          },
+          {
+            "id": "zoeken",
+            "stand": "zonder-model",
+            "plek": "intent.js -> bevestig.zoek, via klaar()"
+          },
+          {
+            "id": "stand",
+            "stand": "zonder-model",
+            "plek": "gesprek.js: klaar(stand/seintjes)"
+          },
+          {
+            "id": "vergeet",
+            "stand": "zonder-model",
+            "plek": "gesprek.js: geleerd, pakte: true (wist alles)"
+          },
+          {
+            "id": "onthoud",
+            "stand": "met-lokaal-model",
+            "plek": "gesprek.js: geleerd, pakte: true"
+          },
+          {
+            "id": "watweetje",
+            "stand": "met-lokaal-model",
+            "plek": "gesprek.js: pakte: true (opsomming)"
+          },
+          {
+            "id": "watkunje",
+            "stand": "met-lokaal-model",
+            "plek": "gesprek.js: pakte: true (helptekst)"
+          },
+          {
+            "id": "sparren",
+            "stand": "met-lokaal-model",
+            "plek": "gesprek.js: klaar(...) in sparmodus"
+          },
+          {
+            "id": "zoeken",
+            "stand": "met-lokaal-model",
+            "plek": "intent.js -> bevestig.zoek, via klaar()"
+          },
+          {
+            "id": "stand",
+            "stand": "met-lokaal-model",
+            "plek": "gesprek.js: klaar(stand/seintjes)"
+          },
+          {
+            "id": "vergeet",
+            "stand": "met-lokaal-model",
+            "plek": "gesprek.js: geleerd, pakte: true (wist alles)"
+          }
+        ]
+      },
+      {
+        "sleutel": "TAAL_BEGREPEN=J ANTWOORD_GEMAAKT=J PLAN_GEMAAKT=J UITVOERING_GESTART=n EFFECT_BEREIKT=? NACONTROLE_GESLAAGD=n",
+        "lagen": {
+          "TAAL_BEGREPEN": true,
+          "ANTWOORD_GEMAAKT": true,
+          "PLAN_GEMAAKT": true,
+          "UITVOERING_GESTART": false,
+          "EFFECT_BEREIKT": null,
+          "NACONTROLE_GESLAAGD": false,
+          "_collecties": [],
+          "_binnenBasislijn": [
+            "apiSpoor",
+            "fluister",
+            "handelingLog",
+            "routerschaduw"
+          ],
+          "_schrijfacties": 3
+        },
+        "zinnen": [
+          {
+            "id": "bestellen",
+            "stand": "zonder-model",
+            "plek": "intent.js -> betalen.bestel, drempel -> voorstel"
+          },
+          {
+            "id": "bestellen",
+            "stand": "met-lokaal-model",
+            "plek": "intent.js -> betalen.bestel, drempel -> voorstel"
+          }
+        ]
+      },
+      {
+        "sleutel": "TAAL_BEGREPEN=J ANTWOORD_GEMAAKT=J PLAN_GEMAAKT=n UITVOERING_GESTART=J EFFECT_BEREIKT=J NACONTROLE_GESLAAGD=n",
+        "lagen": {
+          "TAAL_BEGREPEN": true,
+          "ANTWOORD_GEMAAKT": true,
+          "PLAN_GEMAAKT": false,
+          "UITVOERING_GESTART": true,
+          "EFFECT_BEREIKT": true,
+          "NACONTROLE_GESLAAGD": false,
+          "_collecties": [
+            "betaalIdem",
+            "commBerichten",
+            "commGesprekken",
+            "commStand",
+            "facturen",
+            "geldbeleid",
+            "notifications",
+            "orders",
+            "payBoekingen",
+            "payIdem",
+            "payIdemAfdruk",
+            "paySaldi",
+            "punten",
+            "rtmail",
+            "rtmailRegels",
+            "rtmailSchrijf",
+            "supplierNotifications",
+            "suppliers"
+          ],
+          "_binnenBasislijn": [
+            "apiSpoor",
+            "fluister",
+            "handelingLog",
+            "routerschaduw"
+          ],
+          "_schrijfacties": 21
+        },
+        "zinnen": [
+          {
+            "id": "bevestig",
+            "stand": "zonder-model",
+            "plek": "intent.js -> bevestig.ja (voert het voorstel uit)"
+          },
+          {
+            "id": "bevestig",
+            "stand": "met-lokaal-model",
+            "plek": "intent.js -> bevestig.ja (voert het voorstel uit)"
+          }
+        ]
+      },
+      {
+        "sleutel": "TAAL_BEGREPEN=n ANTWOORD_GEMAAKT=J PLAN_GEMAAKT=n UITVOERING_GESTART=n EFFECT_BEREIKT=? NACONTROLE_GESLAAGD=n",
+        "lagen": {
+          "TAAL_BEGREPEN": false,
+          "ANTWOORD_GEMAAKT": true,
+          "PLAN_GEMAAKT": false,
+          "UITVOERING_GESTART": false,
+          "EFFECT_BEREIKT": null,
+          "NACONTROLE_GESLAAGD": false,
+          "_collecties": null,
+          "_binnenBasislijn": null,
+          "_schrijfacties": 2
+        },
+        "zinnen": [
+          {
+            "id": "ijk0",
+            "stand": "met-lokaal-model",
+            "plek": "basislijn: alleen om de beginstand vast te leggen"
+          },
+          {
+            "id": "ijk",
+            "stand": "met-lokaal-model",
+            "plek": "gesprek.js: r.pakte = false (algemene terugval)"
+          }
+        ]
+      }
+    ]
+  },
+  "waarnemingen": [
+    {
+      "id": "ijk0",
+      "zin": "zzq onbestaanbare wartaal zzq",
+      "plek": "basislijn: alleen om de beginstand vast te leggen",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik ben Rahul. Leer me kennen met \"onthoud dat...\" en vraag \"wat weet je over mij\" wanneer u wilt; wissen kan altijd. Ik kan ook zoeken en regelen: reserveren, uw 24 uur plannen, een Tik of een betaalverzoek.",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": false,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "6a5c2c86761e",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5432438c,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,geldregie=3:e1cd2265,handelingLog=2:b385063c,apiSpoor=2:3b545593,veilig=1:484ab44e,fluister=1:8cf9e7e0,routerschaduw=3:660294e2",
+      "veranderd": null,
+      "schakels": [
+        "lus"
+      ],
+      "lagen": {
+        "TAAL_BEGREPEN": false,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": null,
+        "_binnenBasislijn": null,
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "ijk",
+      "zin": "zzq onbestaanbare wartaal zzq",
+      "plek": "gesprek.js: r.pakte = false (algemene terugval)",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik ben Rahul. Leer me kennen met \"onthoud dat...\" en vraag \"wat weet je over mij\" wanneer u wilt; wissen kan altijd. Ik kan ook zoeken en regelen: reserveren, uw 24 uur plannen, een Tik of een betaalverzoek.",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": false,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "6a5c2c86761e",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5432438c,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,geldregie=3:e1cd2265,handelingLog=3:b3983f0c,apiSpoor=2:130180c5,veilig=1:484ab44e,fluister=1:80859423,routerschaduw=3:420be3bc",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [
+        "lus"
+      ],
+      "lagen": {
+        "TAAL_BEGREPEN": false,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "onthoud",
+      "zin": "onthoud dat ik van sushi hou",
+      "plek": "gesprek.js: geleerd, pakte: true",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Onthouden: \"ik van sushi hou\". U kunt dit altijd terugzien of wissen met \"wat weet je over mij\".",
+        "geleerd": true,
+        "pakte": true,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "27dd2dd669a1",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5432438c,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,geldregie=3:e1cd2265,handelingLog=4:c8510369,apiSpoor=2:59e89e1d,veilig=1:484ab44e,fluister=1:799d9b05,routerschaduw=3:c35cb71d",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "watweetje",
+      "zin": "wat weet je over mij",
+      "plek": "gesprek.js: pakte: true (opsomming)",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "U vertelde me: \"ik van sushi hou\". Verder onthoud ik alleen de laatste 2 beurt(en) van ons gesprek. Wissen kan per weetje of in een keer (\"vergeet alles\").",
+        "pakte": true,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "2dbb74c89739",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=1",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5432438c,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,geldregie=3:e1cd2265,handelingLog=5:7206380d,apiSpoor=2:66b8098e,veilig=1:484ab44e,fluister=1:799d9b05,routerschaduw=3:e4880817",
+      "veranderd": [
+        "apiSpoor",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 1
+      }
+    },
+    {
+      "id": "watkunje",
+      "zin": "wat kun je",
+      "plek": "gesprek.js: pakte: true (helptekst)",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik onthoud wat u vertelt (\"onthoud dat...\"), vertel precies wat ik weet (\"wat weet je over mij\"), wis alles op verzoek en geef seintjes bij alles wat nadert. En ik regel het ook: zoeken door het hele aanbod (\"zoek sushi\"), uw dag plannen (\"plan mijn dag\"), een tafel reserveren of annuleren, bestellen en afrekenen (\"bestel 2 sangria bij Sunset Ibiza\"), tickets boeken (\"boek 2 tickets voor de sunset cruise morgen\"), een behandeling in de spa of kliniek boeken (\"boek een massage bij Zenith morgen om 15:00\"), een taxi of transfer regelen, uw 24-uursblok plannen, uw saldo opvragen, een Tik sturen, en betaalverzoeken maken, tonen en betalen. Alles met geld of een poolclaim vraagt altijd eerst uw \"ja\".",
+        "pakte": true,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "9ef23a831a87",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=1",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5432438c,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,geldregie=3:e1cd2265,handelingLog=6:02d1e7a1,apiSpoor=2:638c4915,veilig=1:484ab44e,fluister=1:799d9b05,routerschaduw=3:becac0f2",
+      "veranderd": [
+        "apiSpoor",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 1
+      }
+    },
+    {
+      "id": "sparren",
+      "zin": "spar even met me over mijn idee voor een nieuwe dienst",
+      "plek": "gesprek.js: klaar(...) in sparmodus",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Goed, laten we samen sparren. Ik denk mee om het beter te maken, niet om mijn gelijk te halen. Wat wil je met dit idee bereiken, en waar zit nu je grootste twijfel? Dan noem ik een kans en een risico. Ben je nu druk? Ik heb het geparkeerd en kom er op een rustig moment op terug.",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": true,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "3c2a77d9af3b",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=3",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5432438c,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,geldregie=3:e1cd2265,handelingLog=7:6770f066,apiSpoor=2:e20b70fd,veilig=1:484ab44e,fluister=1:b4d6b3a8,routerschaduw=3:3062add9",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 3
+      }
+    },
+    {
+      "id": "zoeken",
+      "zin": "zoek sushi",
+      "plek": "intent.js -> bevestig.zoek, via klaar()",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik vond niets over \"sushi\" in het aanbod. Probeer een ander woord, of vraag het de zaak via de gastchat.",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": true,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "0f0282cd0ad2",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5432438c,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,geldregie=3:e1cd2265,handelingLog=8:7fd169af,apiSpoor=2:eb0ba4c9,veilig=1:484ab44e,fluister=1:e9c7b39a,routerschaduw=3:04e55e8c",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "bestellen",
+      "zin": "bestel 2 sangria bij Sunset Ibiza",
+      "plek": "intent.js -> betalen.bestel, drempel -> voorstel",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Even checken: 2x Sangria blanca bij Sunset Ibiza, samen ongeveer € 30,00. Ik plaats de bestelling en reken hem direct af via RTG Pay. Zeg \"ja\" en het staat in gang; \"nee\" en het gaat niet door.",
+        "gedaan": false,
+        "voorstel": true,
+        "pakte": true,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "89b6e822e00d",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=3",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5432438c,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,geldregie=3:e1cd2265,handelingLog=9:3ef49eab,apiSpoor=2:342dac52,veilig=1:484ab44e,fluister=1:33846653,routerschaduw=3:847f6d3b",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": true,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 3
+      }
+    },
+    {
+      "id": "bevestig",
+      "zin": "ja",
+      "plek": "intent.js -> bevestig.ja (voert het voorstel uit)",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Besteld en betaald bij Sunset Ibiza: 2x Sangria blanca, samen € 30,00. Uw ophaalcode is 75N6; de zaak gaat er direct mee aan de slag.",
+        "gedaan": true,
+        "voorstel": false,
+        "pakte": true,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "98710af806d4",
+          "status": "uitgevoerd-en-gelogd",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Opdracht uitgevoerd via de toegestane workflow",
+            "straks": "Controleer het logboek en het resultaat",
+            "letOp": "Alleen de gemelde workflow is uitgevoerd"
+          },
+          "reden": "De applicatie bevestigt dat de toegestane workflow is afgerond.",
+          "gevolg": "De uitvoering is door de server bevestigd en hoort in het logboek.",
+          "voorgesteldeActie": "Bekijk het resultaat",
+          "mensBeslist": false,
+          "uitvoering": {
+            "status": "bevestigd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=21",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5236a3bb,orders=1:addedf42,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=2:ac5b3ed2,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:a8492cea,pushSubs=3:7ffc6b38,supplierNotifications=1:536c722a,punten=1:c8cc7e30,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,payBoekingen=2:d2753dcc,geldregie=3:e1cd2265,handelingLog=10:88e0431f,apiSpoor=2:e00082cf,veilig=1:484ab44e,fluister=1:a4f2beda,routerschaduw=3:821ca7ce,commGesprekken=1:8ccd7783,commBerichten=1:9aad87ea,commStand=1:413c25fc,payIdem=3:bae82fc3,payIdemAfdruk=2:8c488fa6,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:28827e6c,rtmail=1:12ebf184,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "veranderd": [
+        "apiSpoor",
+        "betaalIdem",
+        "commBerichten",
+        "commGesprekken",
+        "commStand",
+        "facturen",
+        "fluister",
+        "geldbeleid",
+        "handelingLog",
+        "notifications",
+        "orders",
+        "payBoekingen",
+        "payIdem",
+        "payIdemAfdruk",
+        "paySaldi",
+        "punten",
+        "routerschaduw",
+        "rtmail",
+        "rtmailRegels",
+        "rtmailSchrijf",
+        "supplierNotifications",
+        "suppliers"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": true,
+        "EFFECT_BEREIKT": true,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [
+          "betaalIdem",
+          "commBerichten",
+          "commGesprekken",
+          "commStand",
+          "facturen",
+          "geldbeleid",
+          "notifications",
+          "orders",
+          "payBoekingen",
+          "payIdem",
+          "payIdemAfdruk",
+          "paySaldi",
+          "punten",
+          "rtmail",
+          "rtmailRegels",
+          "rtmailSchrijf",
+          "supplierNotifications",
+          "suppliers"
+        ],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 21
+      }
+    },
+    {
+      "id": "stand",
+      "zin": "hoe staat het ervoor",
+      "plek": "gesprek.js: klaar(stand/seintjes)",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik denk aan uw 1 weetje(s). Dit speelt er nu voor u: 1 lopende bestelling(en). Vraag gerust door, of leer me iets met \"onthoud dat...\".",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": true,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "1b5891024eac",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5236a3bb,orders=1:addedf42,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=2:ac5b3ed2,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:a8492cea,pushSubs=3:7ffc6b38,supplierNotifications=1:536c722a,punten=1:c8cc7e30,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,payBoekingen=2:d2753dcc,geldregie=3:e1cd2265,handelingLog=11:3bbe789a,apiSpoor=2:5b1e3041,veilig=1:484ab44e,fluister=1:193d5718,routerschaduw=3:734f6c8a,commGesprekken=1:8ccd7783,commBerichten=1:9aad87ea,commStand=1:413c25fc,payIdem=3:bae82fc3,payIdemAfdruk=2:8c488fa6,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:28827e6c,rtmail=1:12ebf184,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "vergeet",
+      "zin": "vergeet alles",
+      "plek": "gesprek.js: geleerd, pakte: true (wist alles)",
+      "stand": "zonder-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Alles gewist: uw weetjes, ons gesprek en de gebruikstellers. We beginnen met een schone lei.",
+        "geleerd": true,
+        "pakte": true,
+        "aiBeschikbaar": false,
+        "modus": "handmatig",
+        "verwerking": "geen-model",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "regels",
+          "privacy": "Geen inhoud naar een model",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "4021770ad0aa",
+          "status": "voorbereid",
+          "route": "regels",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Geen inhoud naar een model",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=3",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5236a3bb,orders=1:addedf42,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:092fd5be,supplierNet=2:b64e5962,betaalIdem=2:ac5b3ed2,muntIdem=1:189d6c1a,payrollRegels=1:c39071bf,gemeenteBekend=2:9457a545,rijkBekend=2:65d7a71e,rijkVerkiezing=7:2ad03ee2,luchthaven=8:fe29bf4f,kmar=3:2278382f,sportclubs=1:d343ebc8,schaduwregels=6:62a0d585,rechtsvormRegels=4:a3139701,fiscaalRegels=4:2bf14986,fiscaalJaargangen=1:507509a0,mobMatching=3:d27ab4c2,magnaatWereld=8:6db4dd54,integratiekamer=6:2f0824e5,sessions=2:edbf5317,notifications=3:a8492cea,pushSubs=3:7ffc6b38,supplierNotifications=1:536c722a,punten=1:c8cc7e30,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:7a636184,hulp=2:ae1198c9,defensie=1:788c4d85,vakbewijzen=27:1a7be2b3,payBoekingen=2:d2753dcc,geldregie=3:e1cd2265,handelingLog=12:c7cc8ee3,apiSpoor=2:31589c88,veilig=1:484ab44e,fluister=1:b380883f,routerschaduw=3:11cf967f,commGesprekken=1:8ccd7783,commBerichten=1:9aad87ea,commStand=1:413c25fc,payIdem=3:bae82fc3,payIdemAfdruk=2:8c488fa6,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:28827e6c,rtmail=1:12ebf184,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 3
+      }
+    },
+    {
+      "id": "ijk0",
+      "zin": "zzq onbestaanbare wartaal zzq",
+      "plek": "basislijn: alleen om de beginstand vast te leggen",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik kijk ernaar.",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": true,
+        "viaModel": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "785a7825fe40",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64e5a603,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,geldregie=3:e1cd2265,handelingLog=2:d645ef1c,apiSpoor=2:273c8efa,veilig=1:484ab44e,fluister=1:3d7b01b6,kosten=1:c728550c,routerschaduw=3:8485d009",
+      "veranderd": null,
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": false,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": null,
+        "_binnenBasislijn": null,
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "ijk",
+      "zin": "zzq onbestaanbare wartaal zzq",
+      "plek": "gesprek.js: r.pakte = false (algemene terugval)",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik kijk ernaar.",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": true,
+        "viaModel": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "785a7825fe40",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64e5a603,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,geldregie=3:e1cd2265,handelingLog=3:a50b7e47,apiSpoor=2:e956fff6,veilig=1:484ab44e,fluister=1:fad3b888,kosten=1:c728550c,routerschaduw=3:a8f3ed9e",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": false,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "onthoud",
+      "zin": "onthoud dat ik van sushi hou",
+      "plek": "gesprek.js: geleerd, pakte: true",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Onthouden: \"ik van sushi hou\". U kunt dit altijd terugzien of wissen met \"wat weet je over mij\".",
+        "geleerd": true,
+        "pakte": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "f165d569eb04",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64e5a603,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,geldregie=3:e1cd2265,handelingLog=4:99fd7a26,apiSpoor=2:9dd16822,veilig=1:484ab44e,fluister=1:6432f800,kosten=1:c728550c,routerschaduw=3:3b124fc8",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "watweetje",
+      "zin": "wat weet je over mij",
+      "plek": "gesprek.js: pakte: true (opsomming)",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "U vertelde me: \"ik van sushi hou\". Verder onthoud ik alleen de laatste 2 beurt(en) van ons gesprek. Wissen kan per weetje of in een keer (\"vergeet alles\").",
+        "pakte": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "30044d1b165c",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=1",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64e5a603,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,geldregie=3:e1cd2265,handelingLog=5:fc6dba05,apiSpoor=2:f26eca76,veilig=1:484ab44e,fluister=1:6432f800,kosten=1:c728550c,routerschaduw=3:b00da824",
+      "veranderd": [
+        "apiSpoor",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 1
+      }
+    },
+    {
+      "id": "watkunje",
+      "zin": "wat kun je",
+      "plek": "gesprek.js: pakte: true (helptekst)",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik onthoud wat u vertelt (\"onthoud dat...\"), vertel precies wat ik weet (\"wat weet je over mij\"), wis alles op verzoek en geef seintjes bij alles wat nadert. En ik regel het ook: zoeken door het hele aanbod (\"zoek sushi\"), uw dag plannen (\"plan mijn dag\"), een tafel reserveren of annuleren, bestellen en afrekenen (\"bestel 2 sangria bij Sunset Ibiza\"), tickets boeken (\"boek 2 tickets voor de sunset cruise morgen\"), een behandeling in de spa of kliniek boeken (\"boek een massage bij Zenith morgen om 15:00\"), een taxi of transfer regelen, uw 24-uursblok plannen, uw saldo opvragen, een Tik sturen, en betaalverzoeken maken, tonen en betalen. Alles met geld of een poolclaim vraagt altijd eerst uw \"ja\".",
+        "pakte": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "1be4fc003c08",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=1",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64e5a603,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,geldregie=3:e1cd2265,handelingLog=6:1cc6f058,apiSpoor=2:550bcd2c,veilig=1:484ab44e,fluister=1:6432f800,kosten=1:c728550c,routerschaduw=3:d97bb3ec",
+      "veranderd": [
+        "apiSpoor",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 1
+      }
+    },
+    {
+      "id": "sparren",
+      "zin": "spar even met me over mijn idee voor een nieuwe dienst",
+      "plek": "gesprek.js: klaar(...) in sparmodus",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik kijk ernaar.",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": true,
+        "viaModel": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "b49f5d1833f0",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=3",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64e5a603,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,geldregie=3:e1cd2265,handelingLog=7:de74a75d,apiSpoor=2:c218f201,veilig=1:484ab44e,fluister=1:3d93a867,kosten=1:c728550c,routerschaduw=3:6556725a",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 3
+      }
+    },
+    {
+      "id": "zoeken",
+      "zin": "zoek sushi",
+      "plek": "intent.js -> bevestig.zoek, via klaar()",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik vond niets over \"sushi\" in het aanbod. Probeer een ander woord, of vraag het de zaak via de gastchat.",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "8618b0104e7d",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64e5a603,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,geldregie=3:e1cd2265,handelingLog=8:6b50d2ad,apiSpoor=2:35c0ebf3,veilig=1:484ab44e,fluister=1:7c2615b7,kosten=1:c728550c,routerschaduw=3:09fdebb7",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "bestellen",
+      "zin": "bestel 2 sangria bij Sunset Ibiza",
+      "plek": "intent.js -> betalen.bestel, drempel -> voorstel",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Even checken: 2x Sangria blanca bij Sunset Ibiza, samen ongeveer € 30,00. Ik plaats de bestelling en reken hem direct af via RTG Pay. Zeg \"ja\" en het staat in gang; \"nee\" en het gaat niet door.",
+        "gedaan": false,
+        "voorstel": true,
+        "pakte": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "2a25e591f521",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=3",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64e5a603,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,geldregie=3:e1cd2265,handelingLog=9:8832a7a7,apiSpoor=2:8d439a60,veilig=1:484ab44e,fluister=1:499d8591,kosten=1:c728550c,routerschaduw=3:7d784d60",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": true,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 3
+      }
+    },
+    {
+      "id": "bevestig",
+      "zin": "ja",
+      "plek": "intent.js -> bevestig.ja (voert het voorstel uit)",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Besteld en betaald bij Sunset Ibiza: 2x Sangria blanca, samen € 30,00. Uw ophaalcode is P9MA; de zaak gaat er direct mee aan de slag.",
+        "gedaan": true,
+        "voorstel": false,
+        "pakte": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "dd5af22969c4",
+          "status": "uitgevoerd-en-gelogd",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Opdracht uitgevoerd via de toegestane workflow",
+            "straks": "Controleer het logboek en het resultaat",
+            "letOp": "Alleen de gemelde workflow is uitgevoerd"
+          },
+          "reden": "De applicatie bevestigt dat de toegestane workflow is afgerond.",
+          "gevolg": "De uitvoering is door de server bevestigd en hoort in het logboek.",
+          "voorgesteldeActie": "Bekijk het resultaat",
+          "mensBeslist": false,
+          "uitvoering": {
+            "status": "bevestigd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=21",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:d7933f80,orders=1:612d6423,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=2:5d86940b,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:61315f4d,pushSubs=3:7ffc6b38,supplierNotifications=1:1c9338fc,punten=1:e5dd2a50,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,payBoekingen=2:ce852926,geldregie=3:e1cd2265,handelingLog=10:8e7ba457,apiSpoor=2:396d41be,veilig=1:484ab44e,fluister=1:39d3f797,kosten=1:c728550c,routerschaduw=3:8a4bffb5,commGesprekken=1:9cd5a9de,commBerichten=1:8e2b4888,commStand=1:d0dea782,payIdem=3:8d268c8e,payIdemAfdruk=2:cb56419f,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:c3fc38ee,rtmail=1:30df5c1a,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "veranderd": [
+        "apiSpoor",
+        "betaalIdem",
+        "commBerichten",
+        "commGesprekken",
+        "commStand",
+        "facturen",
+        "fluister",
+        "geldbeleid",
+        "handelingLog",
+        "notifications",
+        "orders",
+        "payBoekingen",
+        "payIdem",
+        "payIdemAfdruk",
+        "paySaldi",
+        "punten",
+        "routerschaduw",
+        "rtmail",
+        "rtmailRegels",
+        "rtmailSchrijf",
+        "supplierNotifications",
+        "suppliers"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": true,
+        "EFFECT_BEREIKT": true,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [
+          "betaalIdem",
+          "commBerichten",
+          "commGesprekken",
+          "commStand",
+          "facturen",
+          "geldbeleid",
+          "notifications",
+          "orders",
+          "payBoekingen",
+          "payIdem",
+          "payIdemAfdruk",
+          "paySaldi",
+          "punten",
+          "rtmail",
+          "rtmailRegels",
+          "rtmailSchrijf",
+          "supplierNotifications",
+          "suppliers"
+        ],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 21
+      }
+    },
+    {
+      "id": "stand",
+      "zin": "hoe staat het ervoor",
+      "plek": "gesprek.js: klaar(stand/seintjes)",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Ik kijk ernaar.",
+        "gedaan": false,
+        "voorstel": false,
+        "pakte": true,
+        "viaModel": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "fb8e4f0e2ea7",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=2",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:d7933f80,orders=1:612d6423,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=2:5d86940b,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:61315f4d,pushSubs=3:7ffc6b38,supplierNotifications=1:1c9338fc,punten=1:e5dd2a50,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,payBoekingen=2:ce852926,geldregie=3:e1cd2265,handelingLog=11:19bb5f9f,apiSpoor=2:d90efa3f,veilig=1:484ab44e,fluister=1:4f7ba4e3,kosten=1:c728550c,routerschaduw=3:17f8b598,commGesprekken=1:9cd5a9de,commBerichten=1:8e2b4888,commStand=1:d0dea782,payIdem=3:8d268c8e,payIdemAfdruk=2:cb56419f,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:c3fc38ee,rtmail=1:30df5c1a,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 2
+      }
+    },
+    {
+      "id": "vergeet",
+      "zin": "vergeet alles",
+      "plek": "gesprek.js: geleerd, pakte: true (wist alles)",
+      "stand": "met-lokaal-model",
+      "status": 200,
+      "lijf": {
+        "ok": true,
+        "antwoord": "Alles gewist: uw weetjes, ons gesprek en de gebruikstellers. We beginnen met een schone lei.",
+        "geleerd": true,
+        "pakte": true,
+        "aiBeschikbaar": true,
+        "modus": "lokaal",
+        "verwerking": "op-dit-apparaat",
+        "kompas": {
+          "naam": "RTG Kompas",
+          "route": "op-dit-apparaat",
+          "privacy": "Inhoud blijft op deze Mac",
+          "ritme": [
+            "nu",
+            "straks",
+            "let-op"
+          ],
+          "uitleg": "bron-en-grens-zichtbaar",
+          "autoriteit": "mens",
+          "menselijkAkkoord": [
+            "geld",
+            "publicatie",
+            "toegang",
+            "definitieve-toezegging"
+          ]
+        },
+        "liveTwin": {
+          "schema": "rtg.live-twin/1",
+          "pakketId": "bbebd3e1dd0f",
+          "status": "voorbereid",
+          "route": "op-dit-apparaat",
+          "autoriteit": "mens",
+          "ritme": {
+            "nu": "Antwoord en veilige route zijn voorbereid",
+            "straks": "Kies zelf of een vervolgstap nodig is",
+            "letOp": "Er is niets gewijzigd of definitief toegezegd"
+          },
+          "reden": "Voorbereiden en adviseren kan zonder een onomkeerbare stap te zetten.",
+          "gevolg": "Geen wijziging, betaling, publicatie of toezegging is uitgevoerd.",
+          "voorgesteldeActie": "Beslis of u verder wilt",
+          "mensBeslist": true,
+          "uitvoering": {
+            "status": "niet-uitgevoerd",
+            "voorstellen": 0
+          },
+          "bronnen": [
+            {
+              "id": "rolgrens",
+              "soort": "serverregel",
+              "label": "Bevoegdheidsgrens",
+              "detail": "Alleen toegang van rtg",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "modelroute",
+              "soort": "runtime",
+              "label": "Verwerkingsroute",
+              "detail": "Inhoud blijft op deze Mac",
+              "status": "server-bepaald"
+            },
+            {
+              "id": "minimale-context",
+              "soort": "rtg-beleid",
+              "label": "Minimale context",
+              "detail": "Alleen de actieve werkcontext en de gegevens binnen de huidige rol worden gecombineerd.",
+              "status": "server-bepaald"
+            }
+          ]
+        }
+      },
+      "effectKop": "opslag=3",
+      "effectNietGemeten": "bestand,externe-aanroep",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=3:e14dd6be,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:d7933f80,orders=1:612d6423,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:a32a14de,supplierNet=2:562a56f3,betaalIdem=2:5d86940b,muntIdem=1:189d6c1a,payrollRegels=1:076f7a39,gemeenteBekend=2:369a2153,rijkBekend=2:8de16a9e,rijkVerkiezing=7:ec6ad2a3,luchthaven=8:e6e3e1cd,kmar=3:2278382f,sportclubs=1:bc75d1ae,schaduwregels=6:4927ae0f,rechtsvormRegels=4:a3139701,fiscaalRegels=4:08ed3765,fiscaalJaargangen=1:f38682a3,mobMatching=3:d27ab4c2,magnaatWereld=8:a3e0e88e,integratiekamer=6:2f0824e5,sessions=2:0be0cd5c,notifications=3:61315f4d,pushSubs=3:7ffc6b38,supplierNotifications=1:1c9338fc,punten=1:e5dd2a50,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:4513c5e9,hulp=2:ae1198c9,defensie=1:580ef34f,vakbewijzen=27:7ad8797c,payBoekingen=2:ce852926,geldregie=3:e1cd2265,handelingLog=12:dc112ccf,apiSpoor=2:a594e961,veilig=1:484ab44e,fluister=1:695ff1ed,kosten=1:c728550c,routerschaduw=3:376c7197,commGesprekken=1:9cd5a9de,commBerichten=1:8e2b4888,commStand=1:d0dea782,payIdem=3:8d268c8e,payIdemAfdruk=2:cb56419f,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:c3fc38ee,rtmail=1:30df5c1a,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "veranderd": [
+        "apiSpoor",
+        "fluister",
+        "handelingLog",
+        "routerschaduw"
+      ],
+      "schakels": [],
+      "lagen": {
+        "TAAL_BEGREPEN": true,
+        "ANTWOORD_GEMAAKT": true,
+        "PLAN_GEMAAKT": false,
+        "UITVOERING_GESTART": false,
+        "EFFECT_BEREIKT": null,
+        "NACONTROLE_GESLAAGD": false,
+        "_collecties": [],
+        "_binnenBasislijn": [
+          "apiSpoor",
+          "fluister",
+          "handelingLog",
+          "routerschaduw"
+        ],
+        "_schrijfacties": 3
+      }
+    }
+  ]
+}

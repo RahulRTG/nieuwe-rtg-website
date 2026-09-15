@@ -410,7 +410,9 @@
     "idemidentiteit": "node scripts/idemidentiteit.js",
     "router": "node scripts/router.js",
     "ketenbereik": "node scripts/ketenbereik.js",
-    "ketenbereik:vast": "node scripts/ketenbereik.js --vastleggen"
+    "ketenbereik:vast": "node scripts/ketenbereik.js --vastleggen",
+    "paktebetekenis": "node scripts/paktebetekenis.js",
+    "paktebetekenis:vast": "node scripts/paktebetekenis.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

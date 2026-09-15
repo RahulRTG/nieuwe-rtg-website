@@ -47,10 +47,13 @@ module.exports = {
           'mandaat werkt richting een INSTANTIE en niet richting een tweede mens, dus er is niemand ' +
           'die ja hoeft te zeggen behalve de gever zelf. Wat hier wél hoort en apart staat, is dat ' +
           'de gever aantoonbaar iemand van de zaak is -- dat controleert de route.' },
-      versmallen: { stand: 'ontbreekt',
-        wat: 'het mandaat wordt niet gesneden tegen wat de gever zelf mag. Een bestuurder zonder ' +
-          'fiscale bevoegdheid kan er in beginsel een afgeven die verder reikt dan hijzelf. Dit is ' +
-          'één van de twee plekken waar REP-03 vandaag echt open staat.' },
+      versmallen: { stand: 'voert', waar: 'verleen() -- de doorsnede uit kern/namens/versmalling.js',
+        opmerking: 'de snede is GROF en dat is een eigenschap van dit huis en geen tekort van deze ' +
+          'laag: de zaakrol is een boolean (manager of staff) en er bestaat geen fiscaal recht per ' +
+          'medewerker. Er wordt met OPZET niet gesneden op aangifteplicht -- daar is geen register ' +
+          'voor, en zo\'n snede zou een fiscale positie innemen die RTG niet mag innemen. Wat de ' +
+          'doorsnede hier wél afdwingt is dat de aanroeper MOET opgeven wat de gever zelf mag: wie ' +
+          'zwijgt krijgt een verklaarde weigering in plaats van een mandaat.' },
       intrekken: { stand: 'voert', waar: 'trekIn()' },
       verlopen: { stand: 'voert', waar: 'geldt() rekent per datum' },
       handelen: { stand: 'voert', waar: 'de gateway vraagt het mandaat VOOR de zending wordt opgemaakt',
@@ -111,10 +114,13 @@ module.exports = {
           welkBewijs: 'de tijdlijn van het lid in het inkoopdossier -- groeit aan, wordt nooit herschreven',
           bijIntrekking: 'intrekkenMetGevolgen(); bij een gekochte app blijft een teruggaveRECHT achter dat een mens afhandelt'
         } },
-      versmallen: { stand: 'ontbreekt',
-        wat: 'er wordt niet gesneden tegen wat het LID zelf mag. Vandaag is dat beperkt doordat de ' +
-          'lijst maar drie machtigingen telt en alle drie worden uitgevoerd, maar de snede zelf ' +
-          'bestaat niet -- en dit is de tweede plek waar REP-03 open staat.' },
+      versmallen: { stand: 'voert',
+        waar: 'kern/appstore/gevermacht.js snijd() -- aangeroepen door installeer() en verleen()',
+        opmerking: 'de snede snijdt op wat het LID zelf mag: `arena.meedoen` draagt ' +
+          '`eistVanLid: \'progressie\'`, want wie zelf geen score bewaard krijgt kan dat ook niet ' +
+          'uitlenen. Het gat was er een van EERLIJKHEID en niet van lekkage -- de arena weigerde al ' +
+          'bij de uitvoering -- maar het lid werd wel om toestemming gevraagd voor iets dat ' +
+          'structureel niet kon gebeuren, en bereik.js rekende zijn app op de zwaarste klasse.' },
       intrekken: { stand: 'voert', waar: 'besluit.js intrekkenKaal() en naad.js intrekkenMetGevolgen()' },
       verlopen: { stand: 'nietVanToepassing',
         grond: 'een appmachtiging loopt tot het lid hem intrekt of de app wordt teruggetrokken. Een ' +

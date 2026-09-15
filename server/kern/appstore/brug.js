@@ -45,6 +45,11 @@ function maakBrug(kern) {
      opzet NIET welk lid er aanroept -- deze functie geeft hem alleen de
      appsleutel en de foutcode mee (kern/appstore/meting.js). */
   const meting = require('./meting').maakMeting({ S, save, nu });
+  /* De weigering die uitlegt (./brugweigering.js). `uitleg` gaat mee zodat een
+     versmalde machtiging de ECHTE reden kan noemen; deze module beslist daar
+     niets mee -- wat er verleend is, staat in `verleend`. */
+  const weigerMachtiging = require('./brugweigering')
+    .maakWeigering({ uitleg: require('./gevermacht').maakGeverMacht(kern).uitleg });
 
   /* De rem staat in het geheugen en niet in de database: een teller die per
      aanroep wordt weggeschreven, maakt van een rem een schrijfstorm. Hij gaat bij
@@ -96,39 +101,20 @@ function maakBrug(kern) {
   }
 
   function roep(opdracht) {
-    const { key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt } = opdracht;
-    return uitkomst(sleutel, roepKaal({ key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt }));
+    const { key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt, versmald } = opdracht;
+    return uitkomst(sleutel, roepKaal({ key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt, versmald }));
   }
 
-  function roepKaal({ key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt }) {
+  function roepKaal({ key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt, versmald }) {
     const naam = String(methode || '');
     const m = Object.prototype.hasOwnProperty.call(METHODES, naam) ? METHODES[naam] : null;
     if (!m) return fout.maak('RTG_METHODE_ONBEKEND', 'De methode "' + naam + '" bestaat niet. Er zijn er ' + namen.length + ': ' + namen.join(', ') + '.', { methode: naam, methodes: namen });
+    /* DE WEIGERING STAAT IN ./brugweigering.js. Drie gevallen met drie
+       verschillende uitwegen, en dat is het contract met een derde; deze
+       functie is de poort en beslist alleen OF er iets doorkomt. */
     const heeft = Array.isArray(verleend) ? verleend : [];
-    if (!heeft.includes(m.machtiging)) {
-      /* EEN WEIGERING DIE UITLEGT, en dat is geen vriendelijkheid maar
-         gereedschap. "403 Forbidden" laat een uitgever raden tussen vier
-         oorzaken: vroeg ik het verkeerde, vroeg ik het niet, gaf het lid het
-         niet, of trok hij het terug? Elk van die vier heeft een andere
-         oplossing, en drie ervan zijn niets waar hij iets aan kan doen.
-
-         Daarom staat er wat er nodig was, wat dit lid WEL heeft gegeven, en waar
-         hij het kan veranderen. Dat laatste is het belangrijkste: het lid, niet
-         de uitgever, en niet RTG. */
-      const gevraagdMaarNietGegeven = Array.isArray(vraagt) && vraagt.includes(m.machtiging);
-      return fout.maak(gevraagdMaarNietGegeven ? 'RTG_MACHTIGING_NIET_VERLEEND' : 'RTG_MACHTIGING_NIET_GEVRAAGD',
-        'De methode "' + naam + '" vraagt de machtiging "' + m.machtiging + '". '
-          + (gevraagdMaarNietGegeven
-              ? 'Je app vraagt hem in zijn manifest, maar dit lid heeft hem niet verleend of weer ingetrokken.'
-              : 'Je app vraagt hem niet in zijn manifest, dus het lid heeft hem ook nooit kunnen geven.'),
-        { methode: naam,
-        machtiging: m.machtiging,
-        verleend: heeft,
-        gevraagd: Array.isArray(vraagt) ? vraagt : null,
-        hoe: gevraagdMaarNietGegeven
-          ? 'Alleen het lid kan dit aanzetten, in de App Store onder "wat mag deze app". Vraag het niet nog eens via de brug; werk zonder deze machtiging verder.'
-          : 'Zet hem in het manifest van een volgende versie, met een doel. Die versie gaat opnieuw langs de keuring, en het lid beslist opnieuw.' });
-    }
+    const nee = weigerMachtiging({ naam, machtiging: m.machtiging, heeft, vraagt, versmald });
+    if (nee) return nee;
     if (rem('roep:' + sleutel + ':' + key, GRENS.roepenPerMinuut, 60000)) {
       return fout.maak('RTG_TE_VEEL_AANROEPEN', 'Meer dan ' + GRENS.roepenPerMinuut + ' aanroepen per minuut houdt de brug tegen.', { methode: naam, perMinuut: GRENS.roepenPerMinuut });
     }

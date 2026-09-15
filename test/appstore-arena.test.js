@@ -78,22 +78,68 @@ test.before(async () => {
 });
 test.after(() => stop(srv));
 
-test('1. een gewoon lid bewaart NIETS: de poort staat standaard dicht', async () => {
-  /* Dit is de belangrijkste HTTP-toets van dit bestand. Een vers geregistreerd
-     lid heeft wel een geboortedatum opgegeven maar geen gekeurd identiteits-
-     bewijs, en `volwassen()` vraagt allebei. De arena hoort dan niets te
-     bewaren -- en geen fout te geven, want het spel speelt door. Zou hier
-     `bewaard: true` staan, dan is de 18+-poort van dit huis omzeild via de App
-     Store, en dat is precies het gat dat kern/volwassen.js een keer eerder had. */
-  const r = await brug(lid, 'arena.zet', { score: 90 });
-  assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(r.body.uit.bewaard, false);
-  assert.equal(r.body.uit.ranglijst, false);
-  assert.ok(r.body.uit.reden, 'de reden staat erbij');
+test('1. een gewoon lid krijgt de machtiging NIET, en bewaart dus niets', async () => {
+  /* Dit is de belangrijkste HTTP-toets van dit bestand, en hij is op 14
+     september 2026 van laag VERSCHOVEN -- niet verzwakt. Lees dat verschil
+     goed, want het is precies het soort wijziging waarmee een toets stilletjes
+     minder gaat bewijzen.
 
-  const b = await brug(lid, 'arena.bord', {});
-  assert.deepEqual(b.body.uit.bord, []);
-  assert.equal(b.body.uit.ranglijst, false);
+     WAT ER GELIJK BLIJFT, en dat is de eigenschap waar het om gaat: een vers
+     geregistreerd lid heeft wel een geboortedatum opgegeven maar geen gekeurd
+     identiteitsbewijs, en `volwassen()` vraagt allebei. Er wordt van zo'n lid
+     NIETS bewaard. Zou dat wel gebeuren, dan is de 18+-poort van dit huis
+     omzeild via de App Store -- het gat dat kern/volwassen.js een keer eerder
+     had.
+
+     WAT ER VERANDERT, is waar dat wordt tegengehouden. Hiervoor werd de
+     machtiging gewoon verleend en weigerde de ARENA bij de uitvoering
+     (`bewaard: false`). Sinds de versmalling (kern/namens/versmalling.js) wordt
+     hij niet meer verleend: een lid kan niet weggeven wat hij zelf niet mag, en
+     `arena.meedoen` draagt daarom `eistVanLid: 'progressie'`. Het lid werd
+     hiervoor gevraagd ja te zeggen tegen "andere spelers zien uw codenaam en uw
+     score op het bord" terwijl dat structureel niet kon gebeuren, en zijn app
+     werd op de ZWAARSTE bereikklasse gerekend.
+
+     DE DIEPERE POORT BLIJFT BEWEZEN en is niet ingeruild voor deze: toets 7
+     draait de arena rechtstreeks met `progressieMag: () => false` en eist dat
+     `staat.arena` leeg blijft. Zonder die toets zou deze wijziging een echte
+     grendel vervangen door een papieren.
+
+     EN GRENS 3 VAN ./arena.js SNEUVELT NIET. Het spel speelt door; wat er niet
+     meer gebeurt is het BEWAREN, en dat gebeurde al niet. Een app die stukgaat
+     op een ontbrekende `arena.meedoen` was al stuk: elk lid mag dat vinkje
+     gewoon weglaten, en `installeer` zegt met zoveel woorden "de app werkt; wat
+     hij niet mag, krijgt hij niet". */
+  const open = await api('/api/appstore/open', { sleutel: 'arena-proef' }, lid);
+  assert.equal(open.status, 200, JSON.stringify(open.body));
+  /* De vulcontrole staat vóór de bewering, want "de lijst bevat hem niet" is op
+     een lege lijst gratis waar -- ook als er iets heel anders stukging. */
+  assert.ok((open.body.vraagt || []).some(m => m.id === 'arena.meedoen'),
+    'de app VRAAGT hem in zijn manifest; zonder dat bewijst de regel hieronder niets');
+  assert.ok(Array.isArray(open.body.machtigingen) && !open.body.machtigingen.includes('arena.meedoen'),
+    'het lid vinkte hem aan bij het installeren en hij is toch niet verleend');
+  assert.equal((open.body.versmald || {})['arena.meedoen'], 'progressie',
+    'en er staat bij WAAROM hij wegviel -- de eissleutel, niet de zin');
+
+  const r = await brug(lid, 'arena.zet', { score: 90 });
+  assert.equal(r.status, 403, JSON.stringify(r.body));
+  assert.equal(r.body.code, 'RTG_MACHTIGING_VERSMALD',
+    'een eigen code, want de uitweg is een andere dan bij "niet verleend"');
+  assert.ok(r.body.waarom, 'de weigering draagt de reden');
+  assert.doesNotMatch(String(r.body.hoe || ''), /Alleen het lid kan dit aanzetten/,
+    'en stuurt het lid NIET naar een knop die zijn probleem niet oplost');
+
+  /* Het tweede lid is net zo vers en loopt dus tegen dezelfde muur. Wat deze
+     regel WEL toevoegt is dat het geen eigenaardigheid van één sessie is.
+
+     Wat hij NIET bewijst, en dat staat er liever dan dat het eruitziet als
+     dekking: dat er niets is BEWAARD. Geen enkel lid in deze opstelling haalt
+     de poort, dus zwart-doos is er niets te zien; een leeg bord achter een
+     geweigerde aanroep bewijst niets. Die eigenschap staat in toets 7, op de
+     module, met `staat.arena` erbij. */
+  const b = await brug(lid2, 'arena.bord', {});
+  assert.equal(b.status, 403, 'ook het tweede lid haalt de poort niet');
+  assert.equal(b.body.code, 'RTG_MACHTIGING_VERSMALD');
 });
 
 /* De rest van het bord wordt op de MODULE getoetst, met de poort als stub. Dat

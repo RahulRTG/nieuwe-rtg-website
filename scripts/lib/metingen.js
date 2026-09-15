@@ -298,6 +298,12 @@ const REGISTER = {
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'REFUNDMIGRATIE.json': { eigenRatel: 'test/refundmigratie.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
+  /* ONDERNEMERSLUS.json meet of de ondernemerslus EEN onderwerp draagt
+     (ONDERNEMEN.md par. 1). Drie tanden die verschillende kanten op staan --
+     `zaakZietOnderneming` alleen omhoog, de twee schulden alleen omlaag -- plus
+     twee besturingsproeven, want deze meter kan blind worden en zou dat dan als
+     bevinding melden. Zie de kop van test/ondernemerslus.test.js. */
+  'ONDERNEMERSLUS.json': { eigenRatel: 'test/ondernemerslus.test.js' },
   'HEAPPROEF.json': { eigenRatel: 'test/heapproef.test.js' },
   'DOORWERKING.json': { eigenRatel: 'test/doorwerking.test.js' },
   /* De gedeelde namespace van handelingen (TAKEN.md 4.54). Drie getallen, en

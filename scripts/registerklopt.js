@@ -37,6 +37,23 @@
    nieuwe zijn poort. Hij wordt gevonden op de zin die deze toetsen delen --
    dezelfde zin die ze aan de gebruiker tonen.
 
+   EN HIJ DRAAIDE ZIJN TOETSEN NAAST ELKAAR TERWIJL SOMMIGE ALLEEN MOETEN.
+   Gevonden op 15 september 2026. `node --test` met negenentwintig bestanden
+   draait ze CONCURRENT, en in die lijst zitten toetsen die echte bron muteren
+   (scripts/lib/geisoleerd.js kent ze: capabilities.test.js zet een bestand in
+   server/kern/, ondernemerslus.test.js een in server/routes/supplier/). Een
+   meter die op dat moment de bronboom afloopt, ziet het bestand in de LIJST en
+   is het bij het LEZEN alweer kwijt -- exact de vorm die scripts/keuring.js in
+   zijn kop optekent, en die daar met een ENOENT-uitzondering is opgelost.
+
+   Hier viel scripts/semantiek.js erover, en de fout wees de verkeerde kant op:
+   de melding zei dat een REGISTER achterliep terwijl er een bestand was
+   verdwenen. Dat is de duurste soort rood.
+
+   De reparatie is niet nog een ENOENT-uitzondering maar de OORZAAK: deze poort
+   respecteert nu dezelfde isolatielijst als de gewone loper. Wie een toets aan
+   die lijst toevoegt, hoeft hem dus niet op twee plekken te melden.
+
    Draai: npm run registerklopt
    ========================================================================== */
 'use strict';
@@ -122,22 +139,52 @@ if (require.main === module) {
   for (const n of namen) console.log('  ' + K.grijs + n + K.uit);
   console.log('');
 
-  const uit = spawnSync(process.execPath,
-    ['--test', ...namen.map(n => path.join('test', n))],
+  /* DE ISOLATIELIJST IS VAN DE LOPER EN WORDT HIER NIET OVERGETYPT (LAT.md
+     regel 4). Wat daar alleen moet draaien, moet dat hier ook: deze poort start
+     dezelfde toetsen, alleen met een andere selectie. */
+  const { GEISOLEERD } = require('./lib/geisoleerd');
+  const alleen = namen.filter(n => GEISOLEERD.includes(n));
+  const samen = namen.filter(n => !GEISOLEERD.includes(n));
+  if (alleen.length) console.log('  ' + K.grijs + alleen.length +
+    ' toets(en) draaien apart (scripts/lib/geisoleerd.js)' + K.uit + '\n');
+
+  const draai = (lijst) => spawnSync(process.execPath,
+    ['--test', ...lijst.map(n => path.join('test', n))],
     { cwd: WORTEL, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
 
-  const tekst = String(uit.stdout || '') + String(uit.stderr || '');
+  const rondes = [];
+  for (const n of alleen) rondes.push(draai([n]));
+  if (samen.length) rondes.push(draai(samen));
+
+  const tekst = rondes.map(u => String(u.stdout || '') + String(u.stderr || '')).join('\n');
+  const uit = { status: rondes.some(u => u.status !== 0) ? 1 : 0 };
   /* Alleen de regels die zeggen WELK register achterloopt en HOE het te
      herstellen is. De volle testuitvoer is duizenden regels; wie moet
      handelen, heeft deze twee nodig. */
+  /* ALLEEN REGELS DIE OVER EEN GEZAKTE TOETS GAAN. Zonder die tweede eis kwam
+     hier een OK-regel als bewijs onder "een register loopt achter" te staan --
+     de melding stond in de naam van een geslaagde subtest. Een poort die een
+     groene regel als bewijs van rood toont, stuurt de lezer de verkeerde kant
+     op, en dat is precies wat deze poort moet voorkomen. */
   const meldingen = tekst.split('\n').filter(r =>
-    MERKEN.some(m => r.includes(m.merk)) || /draai: npm run/.test(r));
+    !/^\s*(ok|# Subtest:)/.test(r) &&
+    (MERKEN.some(m => r.includes(m.merk)) || /draai: npm run/.test(r)));
   if (uit.status === 0) {
     console.log('  ' + K.groen + 'Alle registers kloppen met een verse meting.' + K.uit + '\n');
     process.exit(0);
   }
   console.error('  ' + K.rood + K.vet + 'EEN OF MEER REGISTERS LOPEN ACHTER.' + K.uit);
-  for (const m of [...new Set(meldingen)]) console.error('    ' + m.trim());
+  const regels = [...new Set(meldingen)];
+  /* NIETS TE MELDEN IS GEEN LEGE LIJST MAAR EEN ANDER SOORT FOUT. Zakte er een
+     toets zonder dat hij over een register ging (een verdwenen bestand, een
+     stukke meter), dan hoort daar de NAAM van die toets te staan in plaats van
+     een stilte onder een kop die zegt dat een register achterloopt. */
+  if (regels.length) for (const m of regels) console.error('    ' + m.trim());
+  else {
+    console.error('    ' + K.grijs + 'geen register meldde dat het achterloopt; er zakte iets anders:' + K.uit);
+    for (const r of tekst.split('\n').filter(r => /^not ok /.test(r)).slice(0, 10))
+      console.error('    ' + r.trim());
+  }
   console.error('\n  ' + K.grijs + 'Draai de genoemde opdracht(en), commit het register, en draai dit opnieuw.' + K.uit + '\n');
   process.exit(1);
 }

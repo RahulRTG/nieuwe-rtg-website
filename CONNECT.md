@@ -370,7 +370,7 @@ sessie er een is die iemand afsluit.**
 | de projectie met zeven etiketten | **staat** |
 | de mixer, 3 van 8 motoren aangesloten | **staat** (5 melden dat ze niet kijken) |
 | bruggen van een onderwerp naar een vak | **staat** (28 bruggen, graad `vermoed`) |
-| leerdossier, zeven treden, met de vier voorwaarden in code | **staat** |
+| leerdossier, tien treden, met de vier voorwaarden in code | **staat** |
 | naklank, zes gevolgen zonder totaal | **staat** |
 | kring als poort, horizon als schuif | **staat** |
 | twee bronnen: leerstof en de buurt | **staat** |

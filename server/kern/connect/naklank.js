@@ -1,52 +1,16 @@
-/* ============================================================================
-   DE NAKLANK -- wat iets bij iemand heeft NAGELATEN, in plaats van een like.
-
-   Zes soorten: mooi, geleerd, geholpen, geprobeerd, gemaakt, doorgegeven. Een
-   maker ziet dus niet "81.204 likes" maar dat 17.841 mensen zeggen iets geleerd
-   te hebben, 4.211 het probeerden en 117 daarna iemand anders hielpen. Die
-   laatste vier zeggen iets; een duim zegt alleen dat er is gescrold.
-
+/* NAKLANK: mooi, geleerd, geholpen, geprobeerd, gemaakt of doorgegeven.
    CONNECTLUS.json onderbouwt de naam; CONNECT.md bewaart de besluiten.
 
-   VIER REGELS, EN DE EERSTE IS DE HELE REDEN DAT DE LAAG BESTAAT.
+   De zes aantallen blijven apart, zonder totaalscore of ranglijst. Naklank
+   hangt aan een werk, nooit aan een persoon. De maker ziet aantallen; alleen
+   de gever ziet zijn eigen keuzes en kan die terugnemen.
 
-   1. ER KOMT NOOIT EEN TOTAAL. De zes worden niet opgeteld, niet gewogen en
-      niet tot een cijfer verwerkt -- ook niet intern om iets op te sorteren.
-      Een samengesteld getal verbergt welke van de zes bewoog, en dat is precies
-      wat BEWIJSMACHINE.md en INT-04 verbieden. Wie hier `score` toevoegt, heeft
-      de like teruggebouwd met zes ingangen.
-
-   2. EEN NAKLANK HANGT AAN EEN DING, NOOIT AAN EEN MENS. Je kunt een uitleg
-      waarderen; je kunt de maker niet waarderen. Zodra dit op een persoon kan
-      staan, is het een reputatiecijfer -- en de reputatielaag die dit huis wel
-      toestaat is contextgebonden en per vaardigheid, niet een getal per mens.
-
-   3. `geholpen` IS DE ENIGE MET EEN GEVOLG BUITEN DEZE MODULE. Wie hem geeft,
-      zegt: ik ben hierdoor geholpen. Dat schrijft een regel in het dossier van
-      de MAKER op een OVERDRACHTStrede -- treden die een mens niet zelf kan
-      zetten (./leerdossier.js). Daarom loopt hij langs de haak `bijHelp` en
-      niet langs een tweede schrijver: een dossierregel die hier zou ontstaan,
-      omzeilt de grendel die dat bestand juist heeft.
-
-      EN DE MAKER KOMT NOOIT UIT HET VERZOEK. Hier stond `opties.maker` uit het
-      lijf van de aanroep, en daarmee kon iedereen een regel met bewijskracht in
-      het dossier van een WILLEKEURIG ander schrijven. De zelf-weigering sloeg
-      nooit aan: een verzonnen codenaam is per definitie niet gelijk aan de
-      gever. De maker wordt daarom OPGEZOCHT met `makerVan(id)`, die de
-      bedrading meegeeft uit kern/mediaos/werkherkomst.js. Brengt die het ding
-      niet thuis, dan wordt de naklank geteld -- hij gaat over het DING -- maar
-      loopt de haak NIET, met de reden in `dossierReden`.
-
-   4. DE MAKER ZIET AANTALLEN EN GEEN NAMEN. Wie wat gaf, is voor de gever zelf
-      (om het terug te kunnen nemen) en voor niemand anders. Een lijst namen
-      onder een bijdrage is een volgerslijst met een ander etiket, en STAGE.md
-      houdt de fanladder tegen om dezelfde reden.
-
-   TERUGNEMEN KAN ALTIJD EN LAAT NIETS ACHTER. Wat wel achterblijft is een
-   dossierregel bij de maker die al bestond -- die wordt niet teruggedraaid, en
-   dat is geen slordigheid: dat iemand ooit door dit werk geholpen is, is een
-   feit over het verleden en geen stand die meebeweegt.
-   ========================================================================== */
+   Maker en onderwerp komen uitsluitend uit makerVan(id), gekoppeld aan
+   mediaos/werkherkomst.js. Onbekend werk kan waardering krijgen, maar geen
+   dossierregel; dossierReden legt uit waarom. De bijOverdracht-haak bewaakt
+   de dossiergrendel: deze module schrijft nooit zelf in het leerdossier.
+   Een al bestaande dossierregel blijft staan na terugname van waardering,
+   omdat hij een gebeurtenis vastlegt en geen actuele waarderingsstand. */
 'use strict';
 
 const { SOORTEN } = require('./naklanklijst');

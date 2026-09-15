@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-15",
   "gemeten": {
-    "bestanden": 2283,
-    "domeinenTotaal": 617,
-    "koopbareVormen": 548,
-    "koopbareDomeinen": 115,
+    "bestanden": 2284,
+    "domeinenTotaal": 618,
+    "koopbareVormen": 549,
+    "koopbareDomeinen": 116,
     "envelopDrempel": 7,
     "envelop": 46,
-    "veldenDomeineigen": 733,
-    "veldenNietEnvelop": 964,
-    "gelijkendeVormparen": 9,
+    "veldenDomeineigen": 734,
+    "veldenNietEnvelop": 965,
+    "gelijkendeVormparen": 11,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 44,
@@ -2150,6 +2150,21 @@
       "telt": 0
     },
     {
+      "domein": "kern/reisbureau-geldrijen",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
       "domein": "kern/reisoplosser",
       "heeft": {
         "toon": false,
@@ -2229,8 +2244,42 @@
     {
       "gelijkenis": 1,
       "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/reisbureau-geldrijen.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/reisbureau-geldrijen",
+      "gedeeld": [
+        "bewijs",
+        "bronObject",
+        "economischeEigenaar",
+        "economischeHerkomst",
+        "grond",
+        "land",
+        "naarWie",
+        "relatie"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/reisbureau-betaling.js",
       "b": "server/kern/waarde/economischeherkomst.js",
       "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/waarde",
+      "gedeeld": [
+        "bewijs",
+        "bronObject",
+        "economischeEigenaar",
+        "economischeHerkomst",
+        "grond",
+        "land",
+        "naarWie",
+        "relatie"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/reisbureau-geldrijen.js",
+      "b": "server/kern/waarde/economischeherkomst.js",
+      "domeinA": "kern/reisbureau-geldrijen",
       "domeinB": "kern/waarde",
       "gedeeld": [
         "bewijs",

@@ -477,6 +477,22 @@ const GETALLEN = {
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle
      die willekeurig zakt leert mensen hem te negeren. Hij staat in
      CODEWERELD.json en in CODE.md als orde van grootte. */
+  'veranderbereik.toetsen': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.toetsbestanden',
+    wat: 'toetsbestanden die er zijn -- de noemer komt uit de map, niet uit een journaal' },
+  'veranderbereik.statisch': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.statischBereik',
+    wat: 'toetsen waarvan de require-graaf het bronbestandbereik bepaalt' },
+  'veranderbereik.blind': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.blindeVlekStatisch',
+    wat: 'toetsen die de statische graaf NIET ziet -- de blinde vlek van KEURING.md par. 1' },
+  'veranderbereik.waargenomen': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.waargenomenBereik',
+    wat: 'toetsen waarvan het journaal routes kent die naar een bronbestand oplossen' },
+  'veranderbereik.gedicht': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.gedichtDoorWaarneming',
+    wat: 'toetsen die de waargenomen as uit de statische blinde vlek haalt' },
+  'veranderbereik.zonder': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.zonderBereik',
+    wat: 'toetsen zonder enig vastgesteld bereik -- de schuld, en de volle ring' },
+  'veranderbereik.ronde': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.toetsenInDezeRonde',
+    wat: 'toetsbestanden die in de gelezen ronde werkelijk hebben gedraaid' },
+  'veranderbereik.routesZonderBestand': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.routesZonderBronbestand',
+    wat: 'waargenomen routes die ROUTEBRON.json niet naar een bestand brengt' },
 };
 
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over
@@ -484,7 +500,8 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md',
+  'KEURING.md', 'VERANDERING.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

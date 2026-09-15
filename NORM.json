@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1674,
-    "toetsenNietGemeten": 624,
+    "toetsenNietGemeten": 626,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -116,6 +116,16 @@
     "idemHandwerkGeenVergelijking": 3
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 624,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 624 -> 626",
+      "reden": "test/econ01.test.js (6 toetsen) en test/eurodekking.test.js (6) komen erbij en staan nog niet in MUTATIES.json. Allebei zijn ze met de hand op mutaties nagetrokken, en de uitslagen staan hier zodat niemand hoeft te geloven dat het gebeurd is. ECON-01: de eigenaar WEL mee laten draaien bij een omkering laat 5 toetsen zakken waaronder de e2e; de eigenaarscontrole uit de handhaver halen laat toets 2 zakken; de gesloten grondenlijst openzetten laat toets 4 zakken. Dekking: valuta's toch samentellen, de wereld raden in plaats van hem te laten verklaren, de noemer niet absoluut nemen, en de strenge teller versoepelen tot volgbaar() -- alle vier laten toetsen zakken, de laatste twee stuks. Herstellen gaf telkens de volle uitslag. Wat deze teller meet is dat de MOTOR er nog niet langs is, en dat is iets anders dan een onbeproefde toets; dit blok verzacht de meting niet en de teller gaat gewoon omhoog.",
+      "waarheen": "Laat scripts/mutatie.js over test/econ01.test.js en test/eurodekking.test.js lopen bij de eerstvolgende volle ronde; dan mag dit getal met twee omlaag. De toets die daar het hardst hoort te zakken is econ01 nr. 2: die bestaat juist om te laten zien dat een controle op het TOTAAL de fout NIET vangt."
+    },
     {
       "datum": "2026-09-15",
       "soort": "schuld",

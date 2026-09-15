@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-15",
   "gemeten": {
-    "bestanden": 2285,
+    "bestanden": 2287,
     "domeinenTotaal": 619,
-    "koopbareVormen": 553,
-    "koopbareDomeinen": 117,
-    "envelopDrempel": 8,
-    "envelop": 40,
-    "veldenDomeineigen": 736,
-    "veldenNietEnvelop": 973,
-    "gelijkendeVormparen": 18,
+    "koopbareVormen": 555,
+    "koopbareDomeinen": 116,
+    "envelopDrempel": 7,
+    "envelop": 46,
+    "veldenDomeineigen": 740,
+    "veldenNietEnvelop": 972,
+    "gelijkendeVormparen": 16,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 45,
@@ -34,6 +34,8 @@
     "centen",
     "codenaam",
     "datum",
+    "doel",
+    "domein",
     "door",
     "id",
     "idem",
@@ -43,11 +45,14 @@
     "naam",
     "naar",
     "notitie",
+    "nr",
     "ok",
     "oms",
     "omschrijving",
+    "open",
     "opties",
     "pagina",
+    "paginas",
     "prijs",
     "reden",
     "ref",
@@ -64,7 +69,8 @@
     "valuta",
     "van",
     "vraag",
-    "wat"
+    "wat",
+    "zaak"
   ],
   "perWerkwoord": {
     "toon": 89,
@@ -2162,21 +2168,6 @@
       "telt": 0
     },
     {
-      "domein": "kern/reisbureau-terugboeking",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {},
-      "telt": 0
-    },
-    {
       "domein": "kern/reisoplosser",
       "heeft": {
         "toon": false,
@@ -2273,9 +2264,9 @@
     {
       "gelijkenis": 1,
       "a": "server/kern/reisbureau-betaling.js",
-      "b": "server/kern/reisbureau-terugboeking.js",
+      "b": "server/kern/waarde/economischeherkomst.js",
       "domeinA": "kern/reisbureau-betaling",
-      "domeinB": "kern/reisbureau-terugboeking",
+      "domeinB": "kern/waarde",
       "gedeeld": [
         "bewijs",
         "bronObject",
@@ -2290,7 +2281,7 @@
     {
       "gelijkenis": 1,
       "a": "server/kern/reisbureau-betaling.js",
-      "b": "server/kern/waarde/economischeherkomst.js",
+      "b": "server/kern/waarde/omkering.js",
       "domeinA": "kern/reisbureau-betaling",
       "domeinB": "kern/waarde",
       "gedeeld": [
@@ -2307,23 +2298,6 @@
     {
       "gelijkenis": 1,
       "a": "server/kern/reisbureau-geldrijen.js",
-      "b": "server/kern/reisbureau-terugboeking.js",
-      "domeinA": "kern/reisbureau-geldrijen",
-      "domeinB": "kern/reisbureau-terugboeking",
-      "gedeeld": [
-        "bewijs",
-        "bronObject",
-        "economischeEigenaar",
-        "economischeHerkomst",
-        "grond",
-        "land",
-        "naarWie",
-        "relatie"
-      ]
-    },
-    {
-      "gelijkenis": 1,
-      "a": "server/kern/reisbureau-geldrijen.js",
       "b": "server/kern/waarde/economischeherkomst.js",
       "domeinA": "kern/reisbureau-geldrijen",
       "domeinB": "kern/waarde",
@@ -2340,9 +2314,9 @@
     },
     {
       "gelijkenis": 1,
-      "a": "server/kern/reisbureau-terugboeking.js",
-      "b": "server/kern/waarde/economischeherkomst.js",
-      "domeinA": "kern/reisbureau-terugboeking",
+      "a": "server/kern/reisbureau-geldrijen.js",
+      "b": "server/kern/waarde/omkering.js",
+      "domeinA": "kern/reisbureau-geldrijen",
       "domeinB": "kern/waarde",
       "gedeeld": [
         "bewijs",
@@ -2375,23 +2349,6 @@
     {
       "gelijkenis": 0.89,
       "a": "server/kern/reisbureau-betaling.js",
-      "b": "server/kern/reisbureau-terugboeking.js",
-      "domeinA": "kern/reisbureau-betaling",
-      "domeinB": "kern/reisbureau-terugboeking",
-      "gedeeld": [
-        "bewijs",
-        "bronObject",
-        "economischeEigenaar",
-        "economischeHerkomst",
-        "grond",
-        "land",
-        "naarWie",
-        "relatie"
-      ]
-    },
-    {
-      "gelijkenis": 0.89,
-      "a": "server/kern/reisbureau-betaling.js",
       "b": "server/kern/waarde/economischeherkomst.js",
       "domeinA": "kern/reisbureau-betaling",
       "domeinB": "kern/waarde",
@@ -2407,18 +2364,20 @@
       ]
     },
     {
-      "gelijkenis": 0.86,
-      "a": "server/kern/command/register.js",
-      "b": "server/kern/zaakcommand/register.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
+      "gelijkenis": 0.89,
+      "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/waarde/omkering.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/waarde",
       "gedeeld": [
-        "collectie",
-        "domein",
-        "meervoud",
-        "sleutel",
-        "sub",
-        "zoek"
+        "bewijs",
+        "bronObject",
+        "economischeEigenaar",
+        "economischeHerkomst",
+        "grond",
+        "land",
+        "naarWie",
+        "relatie"
       ]
     },
     {
@@ -2447,6 +2406,20 @@
         "idemSleutel",
         "ledgerRef",
         "rail"
+      ]
+    },
+    {
+      "gelijkenis": 0.83,
+      "a": "server/kern/command/register.js",
+      "b": "server/kern/zaakcommand/register.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "collectie",
+        "meervoud",
+        "sleutel",
+        "sub",
+        "zoek"
       ]
     },
     {
@@ -2494,20 +2467,6 @@
         "betaalwijze",
         "codename",
         "providerId"
-      ]
-    },
-    {
-      "gelijkenis": 0.63,
-      "a": "server/kern/command/register.js",
-      "b": "server/kern/werkcommand/soorten.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/werkcommand",
-      "gedeeld": [
-        "domein",
-        "meervoud",
-        "sleutel",
-        "sub",
-        "zoek"
       ]
     },
     {

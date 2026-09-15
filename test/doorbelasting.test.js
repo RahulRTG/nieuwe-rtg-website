@@ -233,7 +233,7 @@ test('14. een bedrag dat geen getal is, is ONBEKEND en geen nul', () => {
 });
 
 test('15. valuta worden nooit bij elkaar opgeteld', () => {
-  const s = hs.splits([
+  const s = hs.naarEigenaar([
     eh.geldrij({ bedragCenten: 1000, valuta: 'EUR', economischeHerkomst: 'lid', economischeEigenaar: 'rtg' }),
     eh.geldrij({ bedragCenten: 5000, valuta: 'JPY', economischeHerkomst: 'lid', economischeEigenaar: 'rtg' })
   ]);
@@ -243,7 +243,7 @@ test('15. valuta worden nooit bij elkaar opgeteld', () => {
   /* De yen heeft geen honderdsten (kern/payroll/valuta.js). 5000 JPY bij 1000
      EUR optellen is een factor honderd mis, en dat is niet met een komma te
      repareren. */
-  const eenSoort = hs.splits([
+  const eenSoort = hs.naarEigenaar([
     eh.geldrij({ bedragCenten: 1000, valuta: 'EUR', economischeHerkomst: 'lid', economischeEigenaar: 'rtg' })
   ]);
   assert.equal(eenSoort.eenValuta, 'EUR');

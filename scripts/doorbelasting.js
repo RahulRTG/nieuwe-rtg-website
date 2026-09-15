@@ -167,11 +167,11 @@ function norm() {
   const { wereld, VERWACHT } = require('./lib/economiewereld.js');
   const { volgbaar, waaromNietVolgbaar } = require(
     path.join(WORTEL, 'server/kern/waarde/economischeherkomst.js'));
-  const { splits } = require(path.join(WORTEL, 'server/kern/waarde/herkomstsplitsing.js'));
+  const { naarEigenaar } = require(path.join(WORTEL, 'server/kern/waarde/herkomstsplitsing.js'));
 
   const rijen = wereld();
   const nietVolgbaar = rijen.filter(r => !volgbaar(r));
-  const s = splits(rijen);
+  const s = naarEigenaar(rijen);
 
   return {
     rijen: rijen.length,

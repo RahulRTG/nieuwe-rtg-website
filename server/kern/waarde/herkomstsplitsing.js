@@ -12,7 +12,16 @@
    Deze module telt en rekent niet af. Zodra er een tarief in zou staan, is de
    waarheid en het beleid hetzelfde bestand, en dan is bij een geschil niet meer
    uit elkaar te halen of een getal verkeerd GEMETEN of verkeerd BEDACHT is.
-   test/doorbelasting.test.js toets 17 houdt dat vast over beide bestanden. */
+   test/doorbelasting.test.js toets 17 houdt dat vast over beide bestanden.
+
+   WAAROM DE FUNCTIE NIET `splits` HEET. Dat was de eerste naam en hij is bezet:
+   kern/commercie/subsidie.js en kern/pdf-bouw.js dragen hem allebei al, met een
+   andere betekenis (een subsidie verdelen, en een document opdelen). Een derde
+   betekenis op dezelfde naam is de botsing waar SEMANTIEK.json over gaat -- 105
+   van de 123 gedeelde namen dragen daar meer dan een betekenis -- en de keuring
+   telde hem meteen als dubbeling. `naarEigenaar` zegt bovendien iets wat `splits`
+   niet zei: LANGS WELKE AS er wordt gesplitst. Dat is hier het hele punt, want
+   langs de herkomst zou een andere uitkomst geven. */
 'use strict';
 
 const { ONBEKEND } = require('./economischeherkomst.js');
@@ -27,7 +36,7 @@ const { ONBEKEND } = require('./economischeherkomst.js');
    `onbekend` staat er als EIGEN post en wordt nergens in verrekend. Dat is de
    hele reden dat deze functie bestaat: een basis waarin de onbekende helft
    stilzwijgend is meegeteld, ziet er precies zo uit als een basis die klopt. */
-function splits(rijen) {
+function naarEigenaar(rijen) {
   /* `lid` en `gast` hebben een EIGEN bak en vallen niet in de restpost. Dat
      klinkt als een detail en het is de hele regel: een terugbetaling komt toe
      aan het LID, en die is bekend. Zonder deze bak liep de onbekende post
@@ -76,4 +85,4 @@ function splits(rijen) {
   };
 }
 
-module.exports = { splits };
+module.exports = { naarEigenaar };

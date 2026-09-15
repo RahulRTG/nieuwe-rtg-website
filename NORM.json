@@ -34,7 +34,7 @@
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
     "keuringOmvang": 327,
-    "keuringScheef": 17,
+    "keuringScheef": 19,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
     "laatSpoorVerdacht": 3,
@@ -116,6 +116,16 @@
     "idemHandwerkGeenVergelijking": 3
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "keuringScheef",
+      "van": 17,
+      "vervalt": "2026-12-15",
+      "meter": "keuringScheef 17 -> 19",
+      "reden": "server/kern/waarde/economischeherkomst.js en server/kern/waarde/herkomstsplitsing.js worden nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de PRIMITIEF uit besluit 1 en niet de migratie: van de 208 geldvormen in DOORBELASTING.json dragen er 26 een aantoonbare herkomst, en welke geldrij als EERSTE omgaat is een productbesluit op een echt betaalpad -- niet iets om terloops te kiezen om een ratel groen te krijgen. De vorm is wel volledig beproefd: de gezaaide wereld uit scripts/lib/economiewereld.js draait hem over 22 deterministische rijen (deel B1 van DOORBELASTING.json) en vond er meteen een echte fout in (de onbekende post liep negatief). Dit huis kent deze tussenstand met naam: NORM.json noteert op 14 september hetzelfde over kern/namens/versmalling.js, en INTELLIGENTIE.md over kern/stuur/mandaat.js -- nul productie-aanroepers, om precies dezelfde reden. Wat hier NIET gebeurt is de telling verlagen door de meting te verzachten: twee modules zonder aanroeper zijn twee modules zonder aanroeper, en dat hoort zichtbaar te blijven staan.",
+      "waarheen": "De eerste migratieronde: laat een geldrij die vandaag AL volgbaar is (een van de 26 uit DOORBELASTING.json deel A, `volgbareModules`) zijn herkomst via geldrij() opschrijven in plaats van via een eigen veld, en laat kern/pay/poort.js die rij lezen. Dat haalt beide modules in een keer uit deze post, en het is meteen de eerste tand van de ratel volgbaar 26 -> hoger."
+    },
     {
       "datum": "2026-09-15",
       "soort": "schuld",

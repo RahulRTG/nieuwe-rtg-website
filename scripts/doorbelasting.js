@@ -162,7 +162,37 @@ function vorm() {
   };
 }
 
-/* ---------- B. de euro's ---------- */
+/* ---------- B1. de norm: de gezaaide wereld ---------- */
+function norm() {
+  const { wereld, VERWACHT } = require('./lib/economiewereld.js');
+  const { volgbaar, waaromNietVolgbaar } = require(
+    path.join(WORTEL, 'server/kern/waarde/economischeherkomst.js'));
+  const { splits } = require(path.join(WORTEL, 'server/kern/waarde/herkomstsplitsing.js'));
+
+  const rijen = wereld();
+  const nietVolgbaar = rijen.filter(r => !volgbaar(r));
+  const s = splits(rijen);
+
+  return {
+    rijen: rijen.length,
+    volgbaar: rijen.length - nietVolgbaar.length,
+    nietVolgbaar: nietVolgbaar.length,
+    /* Elke niet-volgbare rij draagt zijn REDEN mee naar buiten. Een telling
+       zonder redenen leest als een restpost; met redenen is het een werklijst. */
+    gaten: nietVolgbaar.map(r => ({
+      bedragCenten: r.bedragCenten, valuta: r.valuta,
+      grond: r.grond, waarom: waaromNietVolgbaar(r)
+    })),
+    splitsing: s,
+    verwacht: VERWACHT,
+    klopt: rijen.length === VERWACHT.rijen && nietVolgbaar.length === VERWACHT.nietVolgbaar,
+    grens: 'Dit is de NORM en geen waarneming: deze wereld is verzonnen en deterministisch. ' +
+      'Hij bewijst dat de machine niet gaat raden, en zegt NIETS over wat RTG werkelijk verdient. ' +
+      'Dat staat in B2, en die twee worden nooit opgeteld.'
+  };
+}
+
+/* ---------- B2. de werkelijkheid ---------- */
 function euros() {
   const bron = path.join(WORTEL, 'server/data/store.db');
   if (!fs.existsSync(bron)) {
@@ -237,6 +267,7 @@ function meet() {
       'wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en ' +
       'komen allebei iemand goed uit',
     vorm: a,
+    norm: norm(),
     euros: b
   };
 }
@@ -253,7 +284,22 @@ function druk(u) {
     console.log('\n    de vormen die het WEL kunnen:');
     for (const m of a.volgbareModules.slice(0, 12)) console.log('      ' + m);
   }
-  console.log('\n  B. DE EURO\'S -- elk bedrag ingedeeld');
+  const n = u.norm;
+  console.log('\n  B1. DE NORM -- de gezaaide wereld (deterministisch, in de keuring)');
+  console.log('    rijen            ' + String(n.rijen).padStart(5) +
+    (n.klopt ? '' : '   WERELD WIJKT AF VAN WAT ZIJ ZELF VERKLAART'));
+  console.log('    volgbaar         ' + String(n.volgbaar).padStart(5));
+  console.log('    NIET volgbaar    ' + String(n.nietVolgbaar).padStart(5) + '   (met opzet -- ziet de meter het gat?)');
+  for (const g of n.gaten) {
+    console.log('      ' + String((g.bedragCenten / 100).toFixed(2)).padStart(10) + ' ' + (g.valuta || '???') +
+      '  ' + String(g.grond || '').slice(0, 58));
+  }
+  const pe = n.splitsing.perEigenaar;
+  console.log('    splitsing (centen, NIET opgeteld over valuta):');
+  for (const [k, v] of Object.entries(pe)) console.log('      ' + k.padEnd(12) + String(v).padStart(10));
+  if (n.splitsing.waaromGeenTotaal) console.log('    geen totaal: ' + n.splitsing.waaromGeenTotaal);
+
+  console.log('\n  B2. DE WERKELIJKHEID -- elk bedrag in de echte opslag');
   if (b.waaromGeen) {
     console.log('    NOEMER NUL. ' + b.waaromGeen);
   } else {

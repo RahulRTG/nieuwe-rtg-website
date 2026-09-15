@@ -1644,6 +1644,37 @@ const IJKINGEN = {
       (j) => { j.gemeten.spoorAanroepen = Math.max(0, (j.gemeten.spoorAanroepen || 0) - 40); return j; },
       () => voor.stilSpoorAanroepen - norm.meet().stilSpoorAanroepen)
   },
+  /* DE DRIE TANDEN VAN STEMPELVEILIGHEID.json (15 september 2026). Dezelfde vorm
+     als STILSPOOR.json hierboven -- twee schulden omhoog, het bereik omlaag --
+     en elk met een EIGEN getal, want drie meters die naar hetzelfde register
+     kijken kunnen stilletjes hetzelfde veld lezen.
+
+     `stempelInPoort` is de enige die niet uit `klassen` komt maar uit de LENGTE
+     van de doorsnedelijst. Dat is precies de plek waar een meter kan afglijden
+     naar het grotere getal ernaast: de klasse is een werklijst, de doorsnede is
+     het incident. Vandaar dat de proef er rijen BIJ zet in plaats van een getal
+     op te hogen. */
+  stempelOngevraagd: {
+    proef: (voor) => metVervangenJson('STEMPELVEILIGHEID.json',
+      (j) => { j.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN = (j.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN || 0) + 9; return j; },
+      () => norm.meet().stempelOngevraagd - voor.stempelOngevraagd)
+  },
+  stempelInPoort: {
+    proef: (voor) => metVervangenJson('STEMPELVEILIGHEID.json',
+      (j) => {
+        j.inEenPoort = (j.inEenPoort || []).concat(
+          [{ naam: 'verzonnen-a.js', viaPoort: ['werkstroom:ci.yml'] },
+           { naam: 'verzonnen-b.js', viaPoort: ['check'] },
+           { naam: 'verzonnen-c.js', viaPoort: ['norm'] }]);
+        return j;
+      },
+      () => norm.meet().stempelInPoort - voor.stempelInPoort)
+  },
+  stempelSchrijversGezien: {
+    proef: (voor) => metVervangenJson('STEMPELVEILIGHEID.json',
+      (j) => { j.schrijvers = Math.max(0, (j.schrijvers || 0) - 30); return j; },
+      () => voor.stempelSchrijversGezien - norm.meet().stempelSchrijversGezien)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

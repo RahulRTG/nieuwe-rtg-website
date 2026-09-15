@@ -112,6 +112,19 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* STEMPELVEILIGHEID.json (npm run stempelveiligheid) telt welke generatoren
+     repo-waarheid kunnen wegschrijven die niemand heeft gevraagd. Twee schulden
+     omlaag en een bereikmeter omhoog, om exact de reden die bij STILSPOOR.json
+     en AICONTEXT.json hierboven staat: deze meter is LEXICAAL, dus wie hem stil
+     minder laat zien, ziet zijn schuld dalen zonder dat er iets is gerepareerd.
+     Een risicoklasse van nul uit een meter die geen schrijvers meer vindt, is de
+     gevaarlijkste vorm van groen.
+
+     `stempelInPoort` is de scherpste van de twee schulden en niet de grootste:
+     hij telt alleen de doorsnede -- stempelt, grendelt niet, schrijft ongevraagd
+     EN loopt mee in een commando dat een mens als controle leest. Dat is het
+     incident van 15 september; de bredere klasse is een werklijst. */
+  'STEMPELVEILIGHEID.json': { meter: ['stempelOngevraagd', 'stempelInPoort', 'stempelSchrijversGezien'] },
   /* IDEMIDENTITEIT.json (npm run idemidentiteit) beantwoordt wat na #269/#270
      overbleef: waar is de identiteit van een verzoek nog te smal? Drie tanden,
      een omhoog en twee omlaag -- zie de kop bij die tanden in ../norm.js. */

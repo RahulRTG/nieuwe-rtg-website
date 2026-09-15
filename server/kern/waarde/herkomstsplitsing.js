@@ -24,7 +24,7 @@
    langs de herkomst zou een andere uitkomst geven. */
 'use strict';
 
-const { ONBEKEND } = require('./economischeherkomst.js');
+const { ONBEKEND } = require('./economischeherkomst');
 
 /* ---------- de bijdragebasis, en waarom hij hier NIET wordt uitgerekend ----------
    Wat hier wel staat is de SPLITSING van een stel rijen naar wie de waarde

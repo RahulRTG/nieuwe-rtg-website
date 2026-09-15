@@ -148,6 +148,10 @@ Object.assign(SLEUTELS,
      tekst draagt. Waarom `velden` en niet `zelfdeVerzoek`, en waarom `/weg`
      hierdoor een ander ANTWOORD geeft, staat in de kop van dat bestand. */
   require('./idemsleutels-ondernemerslus').SLEUTELS,
+  /* De reisherkomst-laag: twee GELDroutes die allebei op `nietIdempotent` staan
+     terwijl hun mutatiecontract `idempotent` zegt. Dat is geen tegenspraak maar
+     twee vragen -- de stand tegenover het antwoord; zie de kop van dat bestand. */
+  require('./idemsleutels-reisherkomst').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:

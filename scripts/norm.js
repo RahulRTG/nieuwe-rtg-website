@@ -789,6 +789,13 @@ const METERS = [
   { sleutel: 'stilSpoor', richting: 'omlaag', wat: 'spoor-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilleOpslag', richting: 'omlaag', wat: 'opslag-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilSpoorAanroepen', richting: 'omhoog', wat: 'spoor-schrijvers die de stilspoormeter werkelijk heeft gevonden' },
+  /* DE STEMPELVEILIGHEID (STEMPELVEILIGHEID.json, npm run stempelveiligheid).
+     Twee schulden omlaag, het bereik omhoog -- zie de kop bij het register in
+     ./lib/metingen.js. Ze dalen door een grendel of een vlag toe te voegen, en
+     nooit doordat de meter minder ziet. */
+  { sleutel: 'stempelOngevraagd', richting: 'omlaag', wat: 'generatoren die repo-waarheid stempelen zonder grendel en zonder dat iemand erom vraagt (STEMPELVEILIGHEID.json)' },
+  { sleutel: 'stempelInPoort', richting: 'omlaag', wat: 'daarvan degene die meelopen in een commando dat als CONTROLE leest -- dit is het incident zelf' },
+  { sleutel: 'stempelSchrijversGezien', richting: 'omhoog', wat: 'schrijvers die de stempelveiligheidsmeter werkelijk heeft gevonden' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
      beter.
@@ -1505,6 +1512,9 @@ function meet(bronnen) {
     stilSpoor: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorGesmoord),
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
+    stempelOngevraagd: leesRegister('STEMPELVEILIGHEID.json', (j) => j.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN),
+    stempelInPoort: leesRegister('STEMPELVEILIGHEID.json', (j) => j.inEenPoort.length),
+    stempelSchrijversGezien: leesRegister('STEMPELVEILIGHEID.json', (j) => j.schrijvers),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
     /* De WERKWOORD-as en niet de vorm-as, want die telt alleen mechanismen die
        iets OPSLAAN -- en kern/stuur/mandaat.js slaat met opzet niets op. Het

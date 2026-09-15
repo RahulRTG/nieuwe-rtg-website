@@ -31,9 +31,19 @@ module.exports = (kern) => {
     const naam = managerOf(req, res); if (naam === null) return;
     if (!naam) return res.status(403).json({ error: 'Een mandaat wordt op naam verleend; deze sessie draagt er geen.' });
     const b = req.body || {};
+    /* WAT DEZE GEVER ZELF MAG VERLENEN -- de bron `geverEffectief` van de
+       doorsnede in kern/namens/versmalling.js. Hij komt uit de SESSIE en
+       nooit uit het lichaam, en hij is grof omdat de zaakrol dat is: dit huis
+       kent op een zaak precies twee rollen (manager en staff, zie
+       kern/onderneming/toegang.js) en geen fiscaal recht per medewerker.
+       `managerOf` hierboven houdt een staff-lid al tegen; deze regel maakt van
+       die ambiente `if` een OPGEGEVEN BRON, zodat een tweede aanroeper die de
+       controle vergeet geen mandaat krijgt maar een weigering. */
+    const magVerlenen = req.actor && req.actor.manager ? Object.keys(mandaat.SOORTEN) : [];
     stuur(res, mandaat.verleen({ code: req.supplier.code, soort: schoon(b.soort, 20),
       van: schoon(b.van, 10), tot: schoon(b.tot, 10) || null,
-      doorNaam: naam, doorRol: schoon(b.rol, 60), kenmerk: schoon(b.kenmerk, 60) }));
+      doorNaam: naam, doorRol: schoon(b.rol, 60), kenmerk: schoon(b.kenmerk, 60),
+      geverEffectief: magVerlenen }));
   });
 
   app.post('/api/supplier/gateway/mandaten', supplierAuth, (req, res) => {

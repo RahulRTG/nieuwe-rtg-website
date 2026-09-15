@@ -65,6 +65,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   const { ondernemingNaam, ondernemingFeiten, ondernemingCaps, ondernemingBeeld } =
     require('./beeld')({ db, findSupplier, ordersVanZaak, boekingenVanZaak, vanEigenaar });
 
+  /* DE ZAAKKANT (./zaakkant.js): de onderneming zoals de WERKVLOER haar mag
+     kennen -- ./beeld.js gaat over WAT zij is, dat over wat ervan de brug over
+     mag. De brug loopt een kant op; zie de kop daar. */
+  const { ondernemingAchterZaak } = require('./zaakkant')({ vanZaak, ondernemingBeeld });
+
   /* Het bestuur hangt aan de ONDERNEMING en niet aan de zaak: wie beslist en
      wie bezit is een juridisch feit, geen operationeel. Hij staat hier en niet
      in ./lagen.js omdat hij de samengevoegde capslijst van ./beeld.js leest, en
@@ -128,6 +133,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     ondernemingNaam,
     ondernemingFeiten,
     ondernemingBeeld,
+    ondernemingAchterZaak,
     ondernemingNieuw,
     ondernemingRechtsvorm,
     ondernemingKoppel,

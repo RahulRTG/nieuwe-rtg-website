@@ -427,6 +427,23 @@ const GETALLEN = {
     wat: 'landen met een aanwijsbaar ondernemingsregister' },
   'land.zonderEnige': { bron: 'LANDDEKKING.json', veld: 'telling.landenZonderEnige',
     wat: 'landen waar RTG alleen kennis heeft en geen enkele uitvoeringsas' },
+  /* DE DOORBELASTINGSMETER, en let op WELKE helft welk getal levert. `vorm.*`
+     komt uit deel A (de structurele vraag: kan een geldvorm herkomst dragen),
+     `norm.*` uit deel B1 (de gezaaide wereld). Die twee worden nooit opgeteld en
+     staan daarom ook hier als aparte sleutels -- een enkel merkteken dat ze zou
+     samenvatten, bestaat met opzet niet. Deel B2 (de werkelijke opslag) levert
+     hier GEEN getal: zijn noemer is vandaag nul, en een levend getal over een
+     lege noemer leest als een meting terwijl er niemand heeft geteld. */
+  'doorbelasting.geldvormen': { bron: 'DOORBELASTING.json', veld: 'vorm.geldvormen',
+    wat: 'objectvormen in server/ die een bedrag dragen' },
+  'doorbelasting.volgbaar': { bron: 'DOORBELASTING.json', veld: 'vorm.volgbaar',
+    wat: 'geldvormen die naast het bedrag ook een herkomst dragen' },
+  'doorbelasting.nietVolgbaar': { bron: 'DOORBELASTING.json', veld: 'vorm.nietVolgbaar',
+    wat: 'geldvormen met een bedrag en geen herkomst ernaast' },
+  'doorbelasting.normRijen': { bron: 'DOORBELASTING.json', veld: 'norm.rijen',
+    wat: 'rijen in de gezaaide wereld die als norm dient' },
+  'doorbelasting.normNietVolgbaar': { bron: 'DOORBELASTING.json', veld: 'norm.nietVolgbaar',
+    wat: 'rijen in die wereld die met opzet niet te volgen zijn' },
   'soeverein.dragers': { bron: 'SOEVEREIN.json', veld: 'ladder.telling.dragers',
     wat: 'dragers in de isolatieladder (kern/isolatie/dragers.js)' },
   'soeverein.metSleutel': { bron: 'SOEVEREIN.json', veld: 'ladder.telling.metSleutelBijVerzoek',
@@ -435,6 +452,26 @@ const GETALLEN = {
     wat: 'bouwstenen uit het soevereiniteitsvoorstel die als bestand al bestaan' },
   'soeverein.stenenGenoemd': { bron: 'SOEVEREIN.json', veld: 'bouwstenen.telling.genoemd',
     wat: 'bouwstenen die het voorstel noemt en die de meter nagaat' },
+  /* DE ONDERNEMERSLUS (ONDERNEMEN.md par. 1). Vier getallen, en ze staan hier
+     omdat juist deze in een document verouderen: het zijn de getallen waarop de
+     volgorde in par. 14 rust, en een verouderde volgorde stuurt werk verkeerd.
+
+     `zaakZietOnderneming` is de scherpste van de vier. Hij staat vandaag op nul
+     en hoort te STIJGEN; wie hem in het document overtypt, schrijft over een
+     half jaar een gat op dat misschien allang gedicht is -- of erger, een brug
+     die weer is afgebroken. */
+  'lus.stations': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.stations',
+    wat: 'stations van de ondernemerslus' },
+  'lus.stationsMetRoute': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.stationsMetRoute',
+    wat: 'stations waarvoor werkelijk een route bestaat' },
+  'lus.deurwissels': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.deurwissels',
+    wat: 'keren dat de lus van sessie wisselt' },
+  'lus.zaakZietOnderneming': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.zaakZietOnderneming',
+    wat: 'bestanden aan de zaakkant die het ondernemingsobject kennen' },
+  'lus.ketensZonderProef': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.ketensZonderProef',
+    wat: 'ketens van de lus die nooit als keten zijn gelopen' },
+  'lus.kennersTotaal': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.kennersTotaal',
+    wat: 'bestanden buiten kern/onderneming die het ondernemingsobject kennen' },
   /* De duur van die parseronde staat MET OPZET niet in deze lijst. Een levend
      getal moet uit een register komen dat bij gelijke code hetzelfde zegt; een
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle
@@ -447,7 +484,7 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

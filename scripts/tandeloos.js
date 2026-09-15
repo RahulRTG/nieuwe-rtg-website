@@ -162,8 +162,14 @@ const BEOORDEELD = new Map([
     'een uitnodiging bevestigt zichzelf niet: meereizen hoort leeg te zijn tot het ja; dat hij daarna vult staat in het blok erna (meereizen.length 1 na het antwoord)'],
   ['rtfos-gift-ruil-routes.test.js::mijn.body.bestellingen',
     'de knop staat dicht en er hoort GEEN bestelling klaar te staan; dat de lijst kan vullen bewijst de winkelronde in hetzelfde bestand (bestellingen.length 2 na twee aankopen)'],
-  ['appstore-arena.test.js::b.body.uit.bord',
-    'een gewoon lid bewaart niets: de leegte is hier de grens uit CLAUDE.md (progressie stopt onder 18+); dat het bord kan vullen staat in hetzelfde bestand met een gekeurd lid (bord[0].score)'],
+  /* De regel voor appstore-arena.test.js::b.body.uit.bord is op 15 september
+     2026 vervallen en niet verplaatst: die bewering BESTAAT niet meer. Sinds de
+     versmalling (kern/namens/versmalling.js) krijgt zo'n lid `arena.meedoen`
+     niet meer verleend, dus de brug weigert vóór het bord en er valt geen lege
+     lijst meer na te kijken. Een beoordeelde regel die zijn bewering overleeft,
+     is een vrijstelling voor iets wat niemand meer kan lezen. */
+  ['namensversmalling-bedrading.test.js::r.body.verleend',
+    'de vulcontrole staat VOOR de bewering in hetzelfde blok en op dezelfde variabele: `r` krijgt eerst ["arena.meedoen","opslag.eigen"] en levert dan aantoonbaar ["opslag.eigen"], en pas daarna wordt met alleen arena.meedoen op lengte nul getoetst. De heuristiek ziet dat niet omdat de eerste bewering via .map() loopt en niet via .length of some()'],
   ['geven-scherm.e2e.js::overzicht.body.plannen',
     'de hele tocht over het scherm vertrekt met opzet GEEN bevestiging (GIFT.md: er is geen doneerknop), dus de lege plannenlijst IS de bewering; dat die lijst kan vullen staat op de route in test/rtfos-gift-ruil-routes.test.js (plannen.length >= 1 na plan/maak)'],
   ['webauthn.test.js::lijst.body.sleutels',

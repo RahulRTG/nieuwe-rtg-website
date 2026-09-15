@@ -1079,6 +1079,13 @@
       ]
     },
     {
+      "naam": "Ontdekken",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "connect",
+      "url": "/apps/connect.html"
+    },
+    {
       "naam": "RTFoundation in jouw buurt",
       "wereld": "FoundationOS",
       "soort": "link",

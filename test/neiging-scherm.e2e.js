@@ -17,6 +17,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { laadScherm, startServer, stop, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+/* De EIGEN keuring van dit huis, dezelfde BRON die scripts/a11y.js injecteert.
+   Geen tweede contrastregel ernaast: dan zeggen twee meters iets anders over
+   dezelfde kleur, en de poort van de keten is degene die telt. */
+const { BRON } = require('../scripts/a11ykeuring');
 
 const pw = laadScherm();
 
@@ -172,6 +176,54 @@ test('het scherm van RTG Neiging', { skip: geenBrowser(pw), concurrency: false }
         'een bestemming staat als dode tekst; links: ' + adressen.join(', '));
       assert.ok(adressen.some(h => /app\.html#tab=bestellen/.test(h || '')),
         'de tab-bestemming hoort de vorm van sprong.js te krijgen: ' + adressen.join(', '));
+    });
+  });
+
+  await t.test('geen contrastfout, in BEIDE standen van het scherm', async () => {
+    /* DIT IS DE TOETS DIE ER NIET WAS, en dat kostte een rode CI.
+
+       De vorige toets hierboven meet raakvlakmaat en overloop -- allebei
+       zichtbaar met een liniaal. Kleurcontrast is dat niet, en juist daar ging
+       het mis: `.door` zette `background: var(--gold); color: #0C0C0B`, met een
+       `--gold` die de pagina zelf op #C9A24B zette. De Heritage-laag
+       overschrijft dat token in LivingOS naar rgb(103,75,18), en bijna-zwart
+       daarop haalt 2,42:1. De a11y-poort van de keten vond het; deze toets niet.
+
+       TWEE STANDEN EN NIET EEN. De intake en de geheugenkaart tonen ANDERE
+       elementen (de graad-badge, de mini-knoppen, de bestemmingen), en een
+       ronde die alleen de eerste meet ziet de helft van het scherm nooit --
+       dezelfde les als bij de bestemmingen twee toetsen hierboven.
+
+       DE MUTATIE, EN LET OP DAT DE VOOR DE HAND LIGGENDE NIET BIJT: alleen
+       `background:var(--gold);color:#0C0C0B` terug op `.door` zetten verandert
+       NIETS, want `body.rtg-stijl .knop.vol` in rtg-ui.css heeft een hogere
+       soortelijkheid en wint. Dat is bij het schrijven van deze toets echt
+       gebeurd -- de mutatie draaide, de toets bleef groen, en dat leest als een
+       toets die niets bewaakt.
+
+       De mutatie die WEL bijt is de oorspronkelijke fout in zijn geheel: haal
+       `knop vol` uit de klasse van de knop EN zet de eigen kleuren terug. Dan
+       zakt deze toets op exact de melding die de keten vond:
+       `button.door "Verder" -- rgb(12,12,11) op rgb(103,75,18)`, 2,42:1. */
+    const KEUR = '(function(){' + BRON + '\nreturn window.__a11yKeur()})()';
+    await metLid(async (page) => {
+      const intake = await page.evaluate(KEUR);
+      assert.deepEqual(intake.contrast, [],
+        'contrast in de intake-stand: ' + JSON.stringify(intake.contrast));
+      assert.deepEqual(intake.overtredingen, [],
+        'structureel in de intake-stand: ' + JSON.stringify(intake.overtredingen));
+
+      while (await page.locator('.keuze').count() > 0) await ronde(page);
+
+      const klaar = await page.evaluate(KEUR);
+      assert.deepEqual(klaar.contrast, [],
+        'contrast in de klaar-stand: ' + JSON.stringify(klaar.contrast));
+      assert.deepEqual(klaar.overtredingen, [],
+        'structureel in de klaar-stand: ' + JSON.stringify(klaar.overtredingen));
+      /* Besturingsproef: de keuring moet WEL iets gezien hebben. Een keuring die
+         op een lege pagina draait meldt ook nul (scripts/tandeloos.js). */
+      assert.ok(await page.locator('.neiging').count() > 0,
+         'voorwaarde: er staat iets op het scherm om te keuren');
     });
   });
 

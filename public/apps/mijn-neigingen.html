@@ -41,8 +41,20 @@
     font:inherit;font-size:0.88rem;padding:0.6rem 0.95rem;min-height:44px;cursor:pointer;text-align:left;}
   .keuze[aria-pressed="true"]{border-color:var(--gold);background:var(--bg);box-shadow:inset 0 0 0 1px var(--gold);}
   .doorrij{display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center;margin-top:1.1rem;}
-  .door{border:1px solid var(--gold);background:var(--gold);color:#0C0C0B;font:inherit;font-weight:600;
-    font-size:0.88rem;padding:0.65rem 1.3rem;min-height:44px;cursor:pointer;}
+  /* DE KLEUR KOMT UIT `.knop.vol` IN rtg-ui.css EN NIET VAN HIER, en dat is een
+     reparatie. Hier stond `background: var(--gold); color: #0C0C0B` -- een
+     eigen paar, met een `--gold` die deze pagina zelf op #C9A24B zette. De
+     Heritage-laag overschrijft dat token in de LivingOS-wereld naar een veel
+     dieper goud (gemeten: rgb(103,75,18)), en bijna-zwart daarop haalt 2,42:1
+     waar 4,5 nodig is. De a11y-poort van de keten vond het; mijn eigen
+     schermtoets keek naar raakvlakmaat en overloop en niet naar contrast.
+
+     rtg-ui.css houdt daar een PAAR voor bij: `--rtg-goud` met `--rtg-opgoud`
+     als de tekstkleur die erop hoort. Wie zijn eigen knop verft, verft buiten
+     dat paar om -- en merkt het pas als een poort het meet. Hier blijft dus
+     alleen de MAAT staan (44px voor de duim, ADAPTIEF.md), en de kleur komt
+     van de gedeelde klasse. */
+  .door{font-size:0.88rem;padding:0.65rem 1.3rem;min-height:44px;}
   .later{background:none;border:none;color:var(--soft);font:inherit;font-size:0.82rem;
     text-decoration:underline;cursor:pointer;min-height:44px;padding:0 0.3rem;}
 
@@ -160,7 +172,7 @@
     el.appendChild(keuzes);
 
     const rij = maak('div', 'doorrij');
-    const door = maak('button', 'door');
+    const door = maak('button', 'knop vol door');
     door.type = 'button';
     tekst(door, 'Verder');
     door.addEventListener('click', async () => {

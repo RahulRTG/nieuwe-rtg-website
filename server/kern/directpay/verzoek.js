@@ -26,10 +26,27 @@ module.exports = (ctx) => {
        hetzelfde verzoek versturen, sturen hetzelfde verzoek. Gemeten met
        npm run idemproef; stond als TAKEN 3.8 op de lijst. */
     const idemSleutel = idem ? ('bv:' + s.code + ':' + String(idem).slice(0, 60)) : null;
+    /* DE ONTVANGER HOORT BIJ DE IDENTITEIT, en dat heeft hier gaten gehad.
+       Tot september 2026 werd alleen het BEDRAG vergeleken. Dezelfde sleutel met
+       hetzelfde bedrag maar een ANDERE codenaam gaf dus 200 met `herhaald: true`
+       en het verzoek van de EERSTE ontvanger terug -- gemeten tegen een echte
+       server, zelfde `ref`, zelfde `naarCodename`. De tweede ontvanger kreeg
+       niets en de balie las "gelukt". Een ander bedrag weigerde wel.
+
+       Twee dingen om niet te laten sneuvelen. De vergelijking gebruikt EXACT de
+       normalisatie van de schrijfregel hieronder (`schoon(x, 40)` of `null`);
+       doet ze dat niet, dan wordt een tweede klik met een spatie erbij een 409
+       op een verzoek dat woordelijk hetzelfde is. En de twee weigeringen dragen
+       elk hun EIGEN reden: "een ander bedrag" en "een andere ontvanger" zijn
+       voor de balie twee verschillende vergissingen, en een gedeelde tekst laat
+       de medewerker naar het verkeerde veld kijken. */
+    const ontvangerVan = x => (x ? schoon(x, 40) : null);
     if (idemSleutel) {
       const al = verzoekIdemZoek(idemSleutel);
       if (al && al.bedrag !== cent)
         return { status: 409, error: 'Deze idempotentiesleutel hoort al bij een ander bedrag.' };
+      if (al && al.naarCodename !== ontvangerVan(naarCodename))
+        return { status: 409, error: 'Deze idempotentiesleutel hoort al bij een andere ontvanger.' };
       if (al) return { status: 200, ok: true, verzoek: verzoekPubliek(al), herhaald: true };
     }
     const v = {

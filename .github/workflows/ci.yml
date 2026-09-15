@@ -262,7 +262,32 @@ jobs:
   ijkingen:
     name: De ijking - ${{ matrix.ijking }}
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # EEN GEDEELDE GRENS OVER ZES ONGELIJKE JOBS IS DE GRENS VAN DE LANGSTE.
+    #
+    # Vijf van de zes zijn in enkele minuten klaar; `meterijk` niet. Gemeten op
+    # 14 september 2026, dezelfde stap op drie runs:
+    #
+    #   #269 76235a3e            43 min 27 s   geslaagd
+    #   #270 07876924 poging 1   44 min 56 s   AFGEKAPT op 45
+    #   #270 07876924 poging 2   43 min 24 s   geslaagd
+    #
+    # Dezelfde commit, twee pogingen, 92 seconden verschil. Op 96% van de grens
+    # is de uitslag dus een muntworp en zegt een afkapping niets over de diff.
+    #
+    # WAAROM HIJ ZO LANG DUURT, en waarom dat niet vanzelf overgaat: de ijking
+    # voedt elke meter een bekend-foute invoer en kijkt of hij uitslaat. 75 van
+    # de 115 proeven meten daarvoor de VOLLEDIGE norm opnieuw, en een volledige
+    # norm spawnt de hele keuring (lokaal gemeten: 57,6 s). De kosten zijn dus
+    # ruwweg (aantal proeven dat hermeet) x (kosten van een hele keuring), en
+    # BEIDE groeien met elke meter die dit huis erbij krijgt.
+    #
+    # DE GRENS IS DAAROM PER IJKING EN NIET GEDEELD: de vijf snelle houden hun
+    # strakke 45 minuten -- daar is een overschrijding wel een signaal -- en
+    # meterijk krijgt de ruimte die hij aantoonbaar nodig heeft. Dit is
+    # RUIMTE en geen oplossing: de structurele vraag (de proef laten meten wat
+    # hij ijkt in plaats van alles) staat open, en zolang die openstaat schuift
+    # deze grens mee met een meting en niet met een gevoel.
+    timeout-minutes: ${{ matrix.ijking == 'meterijk' && 90 || 45 }}
     strategy:
       fail-fast: false
       matrix:

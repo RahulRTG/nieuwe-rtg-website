@@ -1,0 +1,15 @@
+{
+  "_let_op": "ONGECONTROLEERD. Deze wijziging is NIET tegen de primaire tekst gelegd: de uitgaande proxy van de bouwomgeving weigert overheidsdomeinen, dus is zij via secundaire bronnen gelezen. Zij wordt geprojecteerd zoals elke bronwijziging, maar draagt stand `ongecontroleerd` tot een mens haar tegen par. 12 Abs. 2 UStG heeft gelegd en aanmerkt (kern/fiscaal/jaargangen.js: merkAan). Dat is dezelfde afspraak als bij de meegeleverde loonjaargang (kern/payroll/jaargangen/nl-2026.json).",
+  "_waarom": "Tot 31 december 2025 viel een restaurantmaaltijd in Duitsland onder het standaardtarief van 19%; alleen afhaal was 7%. Per 1 januari 2026 zijn spijzen in de horeca op 7% gezet en zijn ter plaatse, afhaal en bezorging gelijkgetrokken. Dranken blijven 19%. De basistabel (kern/fiscaal/landen.js) draagt het PEILJAAR 2025 en dus terecht nog 19%; deze jaargang zet de wijziging erbovenop met haar ingangsdatum, zodat een verkoop van vOOr 2026 op 19% blijft staan en een verkoop erna op 7% uitkomt.",
+  "_niet_meegenomen": "De uitzondering voor dranken met meer dan 75% melk (7%) staat hier NIET in: de RTG-tabel kent geen categorie waarin die past, en een tarief neerzetten waar geen enkele rekenplek naar kijkt is erger dan het ontbreken ervan. Ook de BMF-vereenvoudiging voor een vaste combiprijs (30% van het totaal als drankdeel) is een rekenregel en geen tarief; die hoort niet in een landentabel.",
+
+  "land": "DE",
+  "versie": "de-2026.0-ongecontroleerd",
+  "geldigVanaf": "2026-01-01",
+  "bekendgemaaktOp": "2025-12-30",
+  "rechtsgrond": "Par. 12 Abs. 2 UStG, zoals gewijzigd door het Steueraenderungsgesetz 2025",
+  "wijzigingen": {
+    "tarieven": { "eten": 7 },
+    "extra": "Spijzen in de horeca 7% sinds 1 januari 2026 -- ter plaatse, afhaal en bezorging gelijk. Dranken 19%. Hotelovernachting 7%, ontbijt apart."
+  }
+}

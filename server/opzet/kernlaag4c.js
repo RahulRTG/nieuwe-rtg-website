@@ -23,6 +23,11 @@ module.exports = (kern, hulp) => {
 Object.assign(kern, require('../kern/fiscaal/bronnen').maakBronnen({ db, save, LANDEN }));
 Object.assign(kern, require('../kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR, bronnen: kern.bronnen }));
 kern.regelwacht.herstelOverlay();
+/* De meegeleverde wetswijzigingen erbij: de basistabel draagt het peiljaar, en
+   een wet die daarna veranderde staat als jaargang met haar ingangsdatum in
+   kern/fiscaal/meegeleverd/. NA herstelOverlay, want pasToe vergelijkt met wat er
+   dan geldt en stapelt zo geen tweede jaargang op een herstart. */
+kern.regelwacht.laadMeegeleverd();
 /* De zzp-wacht (kern/fiscaal/zzpwacht.js): de ondernemersregimes per
    ingangsdatum, zodat een berekening over een ander jaar met de regels van dat
    jaar rekent in plaats van met die van nu. Zelfde mechaniek als de Regelwacht,

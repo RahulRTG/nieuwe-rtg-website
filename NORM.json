@@ -7,7 +7,7 @@
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
     "bewijsAchterstand": 2419,
-    "bewijsAlleenKeten": 16,
+    "bewijsAlleenKeten": 17,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 341,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 119,
+    "ratelTanden": 120,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1674,
+    "testbestanden": 1683,
     "toetsenNietGemeten": 624,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -113,9 +113,19 @@
     "namensMechanismenGemeten": 7,
     "idemVerklaard": 1,
     "idemAfdrukVoegtNietsToe": 2,
-    "idemHandwerkGeenVergelijking": 3
+    "idemHandwerkGeenVergelijking": 3,
+    "veranderbereikZonderBereik": 828
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "structureel",
+      "sleutel": "bewijsAlleenKeten",
+      "van": 16,
+      "meter": "bewijsAlleenKeten 16 -> 17",
+      "waarheen": "de job `dekking` in .github/workflows/ci.yml draagt het, en hij laat VERANDERBEREIK.json achter (sport `geraakt` in BEWIJSLADDER.json). Dat register hangt aan de ratel `veranderbereikZonderBereik`, dus het bewijs valt niet in een gat: wat de keten meet, wordt hier geteld.",
+      "reden": "scripts/veranderbereik.js komt erbij als mechanisme dat alleen in de keten draait. Dat is geen omissie maar de aard van de meting: hij leest de twee routejournalen en de duurregisters van alle vier de toetsscherven, en die zijn artefacten uit ANDERE jobs. Precies de categorie die de kop van deze tand al beschrijft (\"van de zestien lezen een artefact uit een andere job en kunnen hier per definitie niet\"). De tand bestaat om te voorkomen dat zulk bewijs erbij komt ZONDER dat iemand het opschrijft; dit is dat opschrijven. Lokaal is de meter wel degelijk te draaien (`npm run veranderbereik` leest .routejournaal en .toetsduur na een gewone `npm test`), maar hij staat niet in scripts/slotsuite.js en telt daarom als ketengebonden -- net als zijn buren scripts/attributie.js en scripts/dekking.js, die op dezelfde journalen leunen. Hem in de slotsuite zetten om dit getal te drukken zou de lokale releasesuite verbouwen om een teller te laten kloppen, en dat is de verkeerde volgorde."
+    },
     {
       "datum": "2026-09-15",
       "soort": "schuld",
@@ -2556,7 +2566,8 @@
     "namensMechanismenGemeten": "2026-09-15",
     "idemVerklaard": "2026-09-15",
     "idemAfdrukVoegtNietsToe": "2026-09-15",
-    "idemHandwerkGeenVergelijking": "2026-09-15"
+    "idemHandwerkGeenVergelijking": "2026-09-15",
+    "veranderbereikZonderBereik": "2026-09-15"
   },
   "uitzonderingen": [
     {

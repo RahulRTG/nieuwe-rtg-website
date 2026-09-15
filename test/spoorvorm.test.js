@@ -117,7 +117,17 @@ test('7. ONBEPAALD is geen NEE: zonder oordeelsvariabele geeft V-3 null met een 
 
 test('8. BESTURINGSPROEF: de referentie haalt vier van vier op de ECHTE boom', () => {
   /* Zonder deze regel bewijzen de verzonnen lijven hierboven alleen dat de
-     regexen werken, en niets over het huis. */
+     regexen werken, en niets over het huis.
+
+     WAT DEZE TOETS WEL EN NIET BEWAAKT, en dat staat er omdat een mutatie het
+     heeft laten zien. De inhoudelijke eigenschap -- de referentie scoort vier
+     van vier -- wordt hieronder hard getoetst. Het VELD `besturing.inOrde` is
+     een gemak voor de opdrachtregel (het bepaalt de foutcode), en wie dat veld
+     hardcodeert op `true` wordt door geen enkele toets gezien zolang de
+     referentie toch vier haalt. Dat is aanvaard en niet gerepareerd: de
+     eigenschap is bewaakt, de vlag is een afgeleide ervan. Wordt de vlag ooit
+     de enige plek waar het oordeel valt, dan hoort hier een proef bij die hem
+     ziet omslaan. */
   const uit = S.meet();
   const ref = uit.rijen.find(r => r.referentie);
   assert.ok(ref, 'er is een referentierij');

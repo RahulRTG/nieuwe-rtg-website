@@ -133,6 +133,7 @@ const REGISTER = {
      dalen, want dan zakt de gedeeldheid door een hernoemd bestand in plaats van
      door een feit. */
   'NAMENSVORM.json': { meter: ['namensMechanismenGemeten'] },
+  'SPOORVORM.json': { meter: ['spoorConvergent'] },
   /* WEKDEKKING.json zet het BESLUIT (welke brongebeurtenis mag de publieke rail
      op, scripts/lib/wekbesluit.js) naast de METING. Geratelde is
      `wekZonderUitspraak`: publieke domeinen waarover het besluitregister

@@ -99,6 +99,11 @@ const EIGENAAR = {
       'namens-iemand-handelen een vorm en een woordenschat? Geschreven met --vastleggen, ' +
       'gelezen door test/namensvorm.test.js, scripts/norm.js (de ratel namensMechanismenGemeten) ' +
       'en scripts/getallen.js (zeven levende getallen in het document).' },
+  'SPOORVORM.json': { schrijver: 'scripts/spoorvorm.js',
+    waarom: 'de convergentiematrix achter REPRESENTATIE.md par. 8.1: hoeveel van de zeven ' +
+      'mechanismen halen de vier spoor-eigenschappen die kern/vertegenwoordiging/handelen.js ' +
+      'definieert? Geschreven met --vastleggen, gelezen door test/spoorvorm.test.js en ' +
+      'scripts/norm.js (de ratel spoorConvergent, die alleen omhoog mag).' },
   /* DE ONDERNEMERSLUS. Hij staat hier omdat toets 4 dat zo bedoelt: het aantal
      registers zonder eigenaar hoort te dalen doordat er eigenaren bijkomen, en
      niet te stijgen doordat er registers bijkomen. Een nieuw register zonder

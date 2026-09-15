@@ -247,6 +247,15 @@ function main() {
     graad: 'vermoed',
     hoe: 'lexicaal op het lijf van een VERKLAARDE ingangsfunctie, met het commentaar eruit. Een ' +
       'spoorschrijver onder een onbekende naam wordt gemist en leest als afwezig.',
+    /* WAT DEZE MATRIX NIET AANTOONT. Zonder deze zin leest een rij met vier keer
+       `ja` als een garantie, en dat is zij niet. */
+    grens: 'Deze meter zegt NIETS over de kwaliteit van wat er wordt vastgelegd -- of de spoorregel de ' +
+      'juiste velden draagt, of hij leesbaar is voor de mens over wie hij gaat, en of het spoor ooit ' +
+      'wordt teruggelezen, valt er allemaal buiten. Hij zegt ook niets over de UITVOERING: de referentie ' +
+      'haalt vier van vier terwijl haar veld `gelukt` aantoonbaar TOEGESTAAN betekent en niet GESLAAGD ' +
+      '(REPRESENTATIE.md par. 8.2). Vier keer `ja` betekent dus "deze vier eigenschappen zijn herkend", ' +
+      'niet "dit mechanisme legt goed vast". En hij kijkt alleen in de VERKLAARDE ingangsfunctie: een ' +
+      'mechanisme dat elders wel een spoor schrijft, telt hier niet mee.',
     besturing,
     gemeten: {
       mechanismen: rijen.length,

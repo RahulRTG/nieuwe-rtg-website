@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1674,
-    "toetsenNietGemeten": 623,
+    "toetsenNietGemeten": 624,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -113,9 +113,20 @@
     "namensMechanismenGemeten": 7,
     "idemVerklaard": 1,
     "idemAfdrukVoegtNietsToe": 2,
-    "idemHandwerkGeenVergelijking": 3
+    "idemHandwerkGeenVergelijking": 3,
+    "spoorConvergent": 1
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 623,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 623 -> 624",
+      "reden": "test/spoorvorm.test.js komt erbij -- tien toetsen op de convergentiematrix -- en staat nog niet in MUTATIES.json. Vier ervan ZIJN een mutatie (op verzonnen lijven, want op de echte boom haalt alleen de referentie vier van vier), en de meter is daarnaast met de hand gemuteerd: de V-3-regel terugzetten naar de oude fout laat toets 1, 2, 4 en 8 zakken, en `onbepaald` als NEE invullen laat toets 7 zakken. Eén mutatie vond een gat dat NIET is gerepareerd maar wel is opgeschreven in toets 8: het veld `besturing.inOrde` hardcoderen op true wordt door geen enkele toets gezien zolang de referentie toch vier haalt -- de inhoudelijke eigenschap is bewaakt, de vlag is een afgeleide.",
+      "waarheen": "Laat scripts/mutatie.js over test/spoorvorm.test.js lopen, samen met de namens-bestanden uit de notities hieronder."
+    },
     {
       "datum": "2026-09-15",
       "soort": "schuld",

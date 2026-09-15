@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1674,
-    "toetsenNietGemeten": 626,
+    "toetsenNietGemeten": 627,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -116,6 +116,16 @@
     "idemHandwerkGeenVergelijking": 3
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 626,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 626 -> 627",
+      "reden": "test/stempelveiligheid.test.js komt erbij (6 toetsen) en staat nog niet in MUTATIES.json. Met de hand op zes mutaties nagetrokken, en alle zes lieten toetsen zakken: de grendel weer op het WOORD zoeken in plaats van op de aanroep, de aanroepvorm terug naar een kaal /writeFileSync/, tekst niet meer wegstrepen bij de aanroepdetectie, de vlag zoeken in regels waar de tekst al uit is, een vlag over een functiegrens heen laten dekken, en de werkstromen niet meer lezen (dan mist de doorsnede het geval waarvoor hij is gebouwd -- 2 gezakt). Twee van de drie blinde vlekken hebben vandaag geen echt voorbeeld in scripts/, dus levert toets 6 verzonnen getuigen: een grendel zonder getuige is een bewering.",
+      "waarheen": "Laat scripts/mutatie.js over test/stempelveiligheid.test.js lopen bij de eerstvolgende volle ronde; dan mag dit getal omlaag."
+    },
     {
       "datum": "2026-09-15",
       "soort": "schuld",

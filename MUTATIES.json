@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T05:42:41.670Z",
-    "commit": "99e192fe",
+    "op": "2026-09-15T17:44:26.499Z",
+    "commit": "9de3af6d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -8114,6 +8114,14 @@
       "operator": "&&->||#6",
       "gezakt": 1,
       "geprobeerd": 16
+    },
+    "stillezing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/stillezing.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "storingen-bezorging.test.js": {
       "soort": "puur",

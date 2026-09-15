@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1579,
+    "kernBreedte": 1580,
     "kernGedeeld": 237,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -2461,9 +2461,9 @@
       "datum": "2026-09-15",
       "soort": "structureel",
       "sleutel": "kernBreedte",
-      "van": 1578,
-      "meter": "kernBreedte 1578 -> 1579",
-      "reden": "STRUCTUREEL en geen schuld: er is een LAAG bijgekomen, en dat is een verandering in wat er gemeten wordt -- niet iets wat we even niet konden. RTG Neiging (NEIGING.md) voegt EEN kern-eigenschap toe: `kern.neiging`, een object met zeven functies erachter. Dat is het minimum dat een laag met een eigen router kan kosten. De eerste versie legde elf LOSSE namen op de kern en duwde deze meter met zeven omhoog; dat is hersteld naar de vorm die kern/socialewereld.js en kern/geldwereld.js al gebruiken (kern.neiging.intake(...)), en GRENZEN.json laat voor het domein `neiging` precies die ene naam door. Deze plus-een hoort per LAAG te worden betaald en niet per functie -- zou de meter met het aantal routes meegroeien, dan meet hij niets meer. Daarom ook geen vervaldatum: hij daalt weer zodra de laag verdwijnt, en niet doordat iemand hem aflost.",
+      "van": 1579,
+      "meter": "kernBreedte 1579 -> 1580",
+      "reden": "STRUCTUREEL en geen schuld: er is een LAAG bijgekomen, en dat is een verandering in wat er gemeten wordt -- niet iets wat we even niet konden. RTG Neiging (NEIGING.md) voegt EEN kern-eigenschap toe: `kern.neiging`, een object met zeven functies erachter. Dat is het minimum dat een laag met een eigen router kan kosten. De eerste versie legde elf LOSSE namen op de kern en duwde deze meter met zeven omhoog; dat is hersteld naar de vorm die kern/socialewereld.js en kern/geldwereld.js al gebruiken (kern.neiging.intake(...)), en GRENZEN.json laat voor het domein `neiging` precies die ene naam door. Deze plus-een hoort per LAAG te worden betaald en niet per functie -- zou de meter met het aantal routes meegroeien, dan meet hij niets meer. Daarom ook geen vervaldatum: hij daalt weer zodra de laag verdwijnt, en niet doordat iemand hem aflost. AANGEPAST BIJ DE SAMENVOEGING: op de tak was de overgang 1578 -> 1579, op de samengevoegde boom 1579 -> 1580. De reden is ongewijzigd -- het blijft die ENE kern-eigenschap van deze laag -- maar de basis is verschoven doordat main intussen zelf een naam had gekregen (de ondernemerslus van #275). Gemeten: main staat op 1579, de samengevoegde boom op 1580, verschil precies een.",
       "waarheen": "GRENZEN.json (domein `neiging`, precies EEN naam) plus server/opzet/domeingrens.js, die bij een naam buiten die lijst GOOIT in plaats van undefined te geven. Wat kernBreedte meet is koppeling: hoeveel van de kern een route kan aanraken. Voor deze laag draagt de domeingrens dat nu HARDER dan een telling ooit deed -- de zeven routes kunnen aantoonbaar bij precies een naam, en een achtste erbij zetten vraagt een regel in GRENZEN.json die iemand moet schrijven. De plus-een in de telling is dus de prijs van een laag, en de belofte eronder is verhuisd naar de poort die hem afdwingt in plaats van telt."
     }
   ],

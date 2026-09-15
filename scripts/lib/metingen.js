@@ -296,6 +296,30 @@ const REGISTER = {
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
+  /* KETENBEREIK.json meet welke schakel van de keten mens -> effect een echte
+     mensenzin aanraakt (EXECUTIE.md blok 6/9). De geratelde waarde is met opzet
+     NIET de uitslag maar het BEREIK VAN DE METER -- hetzelfde besluit als bij
+     CARRIEREVORM.json hierboven, en om dezelfde reden. De uitslag HOORT te
+     bewegen zodra er wordt bedraad; dat is nieuws en geen achteruitgang. Maar
+     een haak die stil minder schakels kan wikkelen (iemand hernoemt
+     kern/stuur/mandaat.js, een export wordt bevroren) meldt exact dezelfde
+     conclusie -- "mandaat wordt door geen enkele zin geraakt" -- over minder
+     bewijs, en dat is de faalvorm waar een ratel voor bestaat. */
+  'KETENBEREIK.json': { eigenRatel: 'test/ketenbereik.test.js' },
+  /* PAKTEBETEKENIS.json meet hoeveel ONDERSCHEIDEN uitkomsten er onder dezelfde
+     boolean `pakte` vallen (kern/fluister/gesprek.js). Zelfde besluit als bij
+     KETENBEREIK.json hierboven: de geratelde waarde is het BEREIK van de meter
+     en niet de uitslag. Die uitslag hoort te dalen zodra `pakte` wordt
+     gesplitst -- dat is de bedoeling van de meting. Maar een corpus dat stil
+     minder standen of minder gevallen ziet, meldt "minder betekenissen" terwijl
+     er alleen minder is gekeken, en dat is de faalvorm waar een ratel voor is. */
+  'PAKTEBETEKENIS.json': { eigenRatel: 'test/paktebetekenis.test.js' },
+  /* MANDAATPROEF.json is een PROEF en geen meting, dus hier hoort de ratel wel
+     op de uitslag: een schakel die gesloten was en opengaat, is een regressie en
+     geen nieuws. De uitzondering is `openBekend` -- die telt apart en draagt
+     zijn reden mee, zodat een bevinding niet hoeft te worden weggepoetst om
+     groen te blijven. Zelfde vorm als RITPROEF.json en MOMENTPROEF.json. */
+  'MANDAATPROEF.json': { eigenRatel: 'test/mandaatproef.test.js' },
   'REFUNDMIGRATIE.json': { eigenRatel: 'test/refundmigratie.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
   /* ONDERNEMERSLUS.json meet of de ondernemerslus EEN onderwerp draagt

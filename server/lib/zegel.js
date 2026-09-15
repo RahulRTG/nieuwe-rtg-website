@@ -44,6 +44,61 @@ function controleer(token, publiekeSleutelB64u, nu) {
   } catch (e) { return { geldig: false, reden: 'fout' }; }
 }
 
+/* EEN SLEUTEL PUBLICEREN, EN DAT IS IETS ANDERS DAN HEM SCHRIJVEN.
+
+   Hier stond `existsSync` gevolgd door `writeFileSync`. Dat is kijken-dan-doen
+   over PROCESSEN, en in de vloot (server/vloot.js) komen er vier tegelijk op
+   dezelfde datamap:
+
+     1 proces A: existsSync -> false, begint te schrijven
+     2 proces B: existsSync -> TRUE  (het bestand bestaat, de inhoud nog niet)
+     3 proces B: leest leeg, en createPrivateKey gooit
+        error:1E08010C:DECODER routines::unsupported
+
+   Dat is geen hypothese: op 15 september 2026 viel er in CI een servergroep op
+   om, in test/eigenaar-wedloop.test.js -- een toets die over het eigenaars-
+   ACCOUNT gaat en deze fout dus bij toeval vond. test/zegel-wedloop.test.js
+   lokt hem gericht uit.
+
+   WAAROM link() EN NIET rename(). De voor de hand liggende reparatie is
+   volledig naar een tijdelijk bestand schrijven en dat hernoemen. Die is wel
+   atomair, maar de LAATSTE schrijver wint -- en dan draagt elk proces een
+   andere sleutel en verifieert het ene de tokens van het andere niet meer. Er
+   valt dan niets meer om; er klopt alleen niets meer, en dat faalt stiller dan
+   de wedloop zelf. link() faalt met EEXIST in plaats van te overschrijven, dus
+   de EERSTE schrijver wint en iedereen leest daarna dezelfde sleutel.
+
+   EN HIJ REGENEREERT NOOIT STIL. Staat er iets dat niet te lezen is, dan gooit
+   deze functie met de naam van het bestand erbij. Een onleesbare sleutel
+   vervangen zou elk bestaand token ongeldig maken zonder dat iemand erom
+   vroeg -- dat is een besluit van een mens, niet van een opstartpad. */
+function publiceer(pad, inhoud) {
+  const tmp = pad + '.' + process.pid + '.tmp';
+  fs.writeFileSync(tmp, inhoud, { mode: 0o600 });
+  try {
+    fs.linkSync(tmp, pad);
+  } catch (e) {
+    /* EEXIST is de normale uitkomst van een verloren wedloop: een ander proces
+       was ons voor, en we lezen hieronder gewoon zijn sleutel. Elke andere fout
+       betekent dat er NIET atomair gepubliceerd kon worden, en dan hoort het
+       opstarten hardop te stoppen: stil terugvallen op een gewone schrijfactie
+       zet de wedloop terug die deze functie juist weghaalt. */
+    if (e.code !== 'EEXIST') {
+      try { fs.unlinkSync(tmp); } catch (e2) { /* opruimen mag de fout niet maskeren */ }
+      throw new Error('de sleutel ' + path.basename(pad) + ' kon niet atomair worden gepubliceerd: ' +
+        (e && e.message || e));
+    }
+  }
+  try { fs.unlinkSync(tmp); } catch (e) { /* het tijdelijke bestand is klaar met zijn werk */ }
+}
+
+/* Lees wat er staat, of publiceer en lees dan wat er staat -- want bij een
+   verloren wedloop is dat de sleutel van een ander proces en niet de onze. */
+function leesOfPubliceer(pad, maak, lees) {
+  if (!fs.existsSync(pad)) publiceer(pad, maak());
+  return lees(pad);
+}
+
 /* De uitgevende kant: houdt de geheime Ed25519-sleutel en de HMAC-master vast
    (in de datamap, 0600, staat in .gitignore -- net als de andere sleutels). */
 function maakZegel({ dataDir }) {
@@ -51,16 +106,19 @@ function maakZegel({ dataDir }) {
   const masterPad = path.join(dataDir, 'zegel-master.key');
   let priv, pubDer, master;
 
-  if (fs.existsSync(sleutelPad)) {
-    priv = crypto.createPrivateKey(fs.readFileSync(sleutelPad, 'utf8'));
-  } else {
-    priv = crypto.generateKeyPairSync('ed25519').privateKey;
-    fs.writeFileSync(sleutelPad, priv.export({ type: 'pkcs8', format: 'pem' }), { mode: 0o600 });
+  const pem = leesOfPubliceer(sleutelPad,
+    () => crypto.generateKeyPairSync('ed25519').privateKey.export({ type: 'pkcs8', format: 'pem' }),
+    (p) => fs.readFileSync(p, 'utf8'));
+  try {
+    priv = crypto.createPrivateKey(pem);
+  } catch (e) {
+    throw new Error('de zegelsleutel in ' + sleutelPad + ' is niet te lezen (' + (e && e.message || e) +
+      '). Hij wordt met opzet NIET vervangen: dat zou elk bestaand token ongeldig maken. ' +
+      'Zet hem terug uit een reservekopie, of verwijder hem bewust om een nieuwe te laten maken.');
   }
   pubDer = crypto.createPublicKey(priv).export({ type: 'spki', format: 'der' });
 
-  if (fs.existsSync(masterPad)) master = fs.readFileSync(masterPad);
-  else { master = crypto.randomBytes(32); fs.writeFileSync(masterPad, master, { mode: 0o600 }); }
+  master = leesOfPubliceer(masterPad, () => crypto.randomBytes(32), (p) => fs.readFileSync(p));
 
   function publiekeSleutel() { return b64u(pubDer); }
 

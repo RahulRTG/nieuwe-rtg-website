@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:31:37.703Z",
-    "commit": "92de4a23",
+    "op": "2026-09-15T17:17:49.929Z",
+    "commit": "01cd07d3",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 4,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -3989,6 +3989,14 @@
       "gezakt": 10,
       "geprobeerd": 1
     },
+    "ketenbereik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ketenbereik.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "ketenchat.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4849,6 +4857,22 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "mandaatpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "mandaatproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/beleid.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 16
     },
     "marechaussee.test.js": {
       "soort": "server",
@@ -5908,6 +5932,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "paktebetekenis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/paktebetekenis.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "papieren-boardroom.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6728,6 +6760,14 @@
       "module": "server/web/routing.js",
       "operator": "===->!==#0",
       "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "routermeting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ai/routermeting.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "rtf-labfonds-deur.test.js": {
@@ -9661,6 +9701,14 @@
       "module": "server/kern/command/register.js",
       "operator": "===->!==#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "zegel-wedloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/zegel.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "zegel.test.js": {

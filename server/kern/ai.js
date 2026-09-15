@@ -20,7 +20,7 @@ const { dagContext } = require('./context');
 // Geen AI-taal: de schrobber gaat over alles wat Rahul zegt, ook over de vaste
 // regelantwoorden (die komen niet langs een model, dus een prompt helpt daar niet).
 const { schrob } = require('./rahul/taal');
-const router = require('./ai/router');
+const meting = require('./ai/routermeting');
 /* De overnameregel woont in de servicelaag en niet hier: welke pas een mens
    kent, is geen eigenschap van de AI. Pure module, geen state -- zie
    kern/service/mens.js. */
@@ -51,24 +51,28 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     while (history.length && history[0].role !== 'user') history.shift();
     const last = history.length ? history[history.length - 1].content : '';
 
-    /* DE INTELLIGENTIEROUTER, IN DE SCHADUW (EXECUTIE.md blok 8). Hij zegt welke
-       techniek bij deze vraag hoort -- een regel, een algoritme, een voorspeller
-       of toch een model -- en hij BESLIST NIETS: de aanroep hieronder gaat
-       gewoon door. Eerst meten hoe vaak een goedkopere techniek het gedekt zou
-       hebben; pas met dat getal is het omdraaien van de volgorde een besluit in
-       plaats van een gok. De keuze reist mee met het antwoord, zodat achteraf
-       narekenbaar is waarom er een model aan te pas kwam. */
-    const keuze = router.schaduw(last);
+    // de eigen reis mee: zonder reis noemt Rahul geen bestemming. Staat hier
+    // omdat de schaduwmeting hem ook nodig heeft; tweemaal opzoeken is twee
+    // waarheden.
+    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(key) || {}) : {}).trip || null;
 
+    let modelTekst = null;
     if (anthropic && history.length && history[history.length - 1].role === 'user') {
       try {
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 1024, system: aiSystemPrompt(tier, lang, key), messages: history });
         const reply = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
-        if (reply) return { text: schrob(reply), lang, techniek: 'ai', waarom: keuze.reden, schaduw: keuze.techniek };
+        if (reply) modelTekst = reply;
       } catch (e) { console.error('Claude-fout (rahul):', e.message); }
     }
-    // de eigen reis van het lid mee: zonder reis noemt Rahul geen bestemming
-    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(key) || {}) : {}).trip || null;
+
+    /* DE SCHADUWMETING (kern/ai/routermeting.js, EXECUTIE.md blok 8). Beslist
+       niets -- het antwoord hierboven is al gevormd. Staat NA de modelpoging,
+       anders is `modelNodig` bij het tellen nog niet bekend. */
+    const keuze = meting.meet(last, { ingang: 'chat', pas: tier, reis: eigenReis,
+      modelAntwoordde: modelTekst !== null });
+
+    if (modelTekst !== null)
+      return { text: schrob(modelTekst), lang, techniek: 'ai', waarom: keuze.reden, schaduw: keuze.techniek };
     const canned = schrob(cannedAnswer(last, tier, eigenReis));
     if (lang !== 'nl' && i18n) {
       try {

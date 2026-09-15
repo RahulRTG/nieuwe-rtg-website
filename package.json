@@ -398,7 +398,14 @@
     "zaakliveproef:vast": "node scripts/zaakliveproef.js --vastleggen",
     "omzetproef": "node scripts/omzetproef.js",
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
-    "idemidentiteit": "node scripts/idemidentiteit.js"
+    "idemidentiteit": "node scripts/idemidentiteit.js",
+    "router": "node scripts/router.js",
+    "ketenbereik": "node scripts/ketenbereik.js",
+    "ketenbereik:vast": "node scripts/ketenbereik.js --vastleggen",
+    "paktebetekenis": "node scripts/paktebetekenis.js",
+    "paktebetekenis:vast": "node scripts/paktebetekenis.js --vastleggen",
+    "mandaatproef": "node scripts/mandaatproef.js",
+    "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

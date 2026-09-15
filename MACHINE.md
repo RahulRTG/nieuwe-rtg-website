@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->3784<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->3786<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -101,8 +101,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2787<!--/getal--> van de
-   <!--getal:machine.muterend-->3784<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2789<!--/getal--> van de
+   <!--getal:machine.muterend-->3786<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van
@@ -144,6 +144,42 @@ op `origin/main` en neemt het verschil.
 Dezelfde behandeling als `OPEN_MAX` in `SERVICE.md` par. 13 en de acht
 schuldnotities in `NORM.json`: wie een ratel omzeilt zonder het te zeggen, sloopt
 de ratel zelf.
+
+**En op 15 september 2026 nog eens van 2787 naar
+<!--getal:machine.zonderAs-->2789<!--/getal-->**, om dezelfde reden uitgeschreven.
+De oorzaak is deze keer klein en precies aanwijsbaar: de dagcheck-in kreeg een
+tweede deur voor personeel (`ONDERNEMEN.md` par. 7), en de twee SCHRIJVENDE routes
+daarvan raken geen enkele as -- `POST /api/staff/gemoed/zet` en
+`POST /api/staff/gemoed/weg`.
+
+Dat de meter hier wél een lijst levert en hierboven niet, komt doordat de twee
+rondes naast elkaar zijn gelegd zoals de vorige alinea voorschrijft. Het tekort
+van het instrument blijft staan; wat eraan te doen was, is gedaan.
+
+**Waarom er geen as op is geplakt, en dat is hier de eigenlijke vraag.** De twee
+LEDEN-routes van dezelfde laag (`/api/gemoed/zet` en `/api/gemoed/weg`) raken al
+sinds hun bouw óók nul assen -- gemeten, niet aangenomen. Deze laag ligt dus in
+haar geheel buiten de machine, en er is een tweede deur op gezet. Per as nagelopen:
+
+- **`mensAanDeDeur`** komt uit de ROUTER en niet uit een token, en `supplierAuth`
+  is per definitie van die as een gedeelde deur. De route eist wél een bewezen
+  mens (`req.actor.staffId`, het bedrijfsaccount krijgt 403) -- die eis zit alleen
+  in de handler en niet in de bewaker, en deze as kijkt naar de bewaker.
+- **`envelop`** zou de grens van de laag tegenspreken. Een dagboek van één mens
+  hoort niet op de bus: er is geen lezer, geen melding en geen kantoorkant, en dat
+  is het ontwerp en geen omissie.
+- **`idempotentie`** meet het MECHANISME (een idem-sleutel). Deze routes zijn
+  idempotent door hun vorm -- een dag heeft hooguit één regel en die wordt
+  overschreven -- en dat is gemeten en vastgelegd in
+  `lib/mutatiecontracten-staffgemoed.js`. Een sleutelmechanisme erbij bouwen zou
+  de as laten oplichten zonder dat er iets veiliger wordt.
+- De overige assen gaan over geld, gezag of simulatie en raken deze laag niet.
+
+**Een as aanplakken om een teller te laten dalen is erger dan de teller laten
+stijgen**: dan staat er een groen vinkje op een motor die niets doet, en is de
+meter zijn betekenis kwijt. De weg omlaag loopt hier langs de laag zelf en niet
+langs deze twee routes -- wie de dagcheck-in ooit ONDER de machine brengt, brengt
+alle vier de deuren tegelijk mee.
 
 Dat is de meetkundige vorm van de stelling: **niet te weinig motoren, te weinig
 handelingen die erlangs gaan.** De prijs van de sprong is dus bedrading en geen

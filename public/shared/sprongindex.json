@@ -624,6 +624,13 @@
       "url": "/apps/juridisch.html"
     },
     {
+      "naam": "Mijn RTG",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "neigingen",
+      "url": "/apps/mijn-neigingen.html"
+    },
+    {
       "naam": "Passkeys",
       "wereld": "Instellingen",
       "soort": "link",

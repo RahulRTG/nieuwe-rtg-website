@@ -737,6 +737,22 @@ const METERS = [
      reden omhoog: de UITKOMST (0 gedeelde velden) mag bewegen, het aantal
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
+  /* NEIGINGVORM.json (NEIGING.md par. 0). Twee ratels en met opzet geen derde
+     over de naamsmeting: die telt sinds de laag bestaat zijn eigen bestanden
+     mee, dus een getal daarop zou alleen maar groeien met het werk.
+
+     `neigingVerwijzingRot` bewaakt meting C: elk punt van het voorstel draagt
+     een verwijzing naar bestaande code, en die wordt nagetrokken. Rot er een,
+     dan is het document een bewering over het verleden geworden.
+
+     `neigingVoorkeurBlind` bewaakt meting B, en hij gaat de ANDERE kant op dan
+     je zou denken: het telt de bestaande affiniteitsvormen die GEEN grond,
+     zekerheid of verval dragen. Vandaag zijn dat er veertien, en deze laag
+     slikt ze met opzet niet in (de Asset-les). Het getal mag dus dalen doordat
+     een domein zijn eigen voorkeuren etiketteert -- en nooit stijgen doordat er
+     ergens een ongeetiketteerde voorkeur bij komt. */
+  { sleutel: 'neigingVerwijzingRot', richting: 'omlaag', wat: 'punten in NEIGING.md waarvan de verwijzing naar code niet meer klopt' },
+  { sleutel: 'neigingVoorkeurBlind', richting: 'omlaag', wat: 'bestaande voorkeursvormen zonder grond, zekerheid of verval' },
   /* Het BEREIK van de namensvormmeter (REPRESENTATIE.md par. 0), en om exact
      dezelfde reden omhoog als de twee hierboven. De UITKOMST is daar een nul
      (0 velden gedeeld, 0 werkwoorden in alle mechanismen op naam) en daarop
@@ -1506,6 +1522,8 @@ function meet(bronnen) {
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
+    neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
     /* De WERKWOORD-as en niet de vorm-as, want die telt alleen mechanismen die
        iets OPSLAAN -- en kern/stuur/mandaat.js slaat met opzet niets op. Het
        bereik van deze meter is dus het aantal mechanismen dat hij op zijn

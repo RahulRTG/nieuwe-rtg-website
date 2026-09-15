@@ -113,6 +113,43 @@ Stand op deze tak:
 | toetsen die in deze ronde draaiden | <!--getal:veranderbereik.ronde-->769<!--/getal--> |
 | waargenomen routes zonder bronbestand | <!--getal:veranderbereik.routesZonderBestand-->80<!--/getal--> |
 
+### 2.2 Wat de VOLLE ronde zegt, en waarom dat hier apart staat
+
+De tabel hierboven komt uit het ingecheckte register, en dat register draagt
+`rondeVolledig: false`: de lokale ronde haalde 769 van de 1900 toetsbestanden.
+Op 15 september 2026 heeft de keten hem voor het eerst op een VOLLEDIGE ronde
+gedraaid (run `34974276733`, job *Waargenomen endpoint-dekking*), en die uitslag
+staat hier als PROZA en niet tussen merktekens — een getal uit een artefact van
+vijf dagen is geen repo-waarheid, en de merktekens horen bij het register dat er
+werkelijk ligt.
+
+| | lokaal (769 van 1900) | keten (volledig) |
+|---|---|---|
+| waargenomen as | 337 | **970** |
+| gedicht door waarneming | 239 | **734** |
+| zonder bereik | 828 (43,6%) | **333 (17,5%)** |
+| draaide, raakte geen route | 150 | **333** |
+| draaide niet in deze ronde | 678 | **0** |
+| routes waargenomen | 3388 | **5070** |
+
+Twee dingen die dat verandert. **De schuld is kleiner en scherper dan de halve
+ronde suggereerde**: van de 1067 toetsen die de statische graaf niet ziet, haalt
+de waarneming er 734 binnen. En **wat overblijft is volledig gekarakteriseerd**:
+alle 333 zijn `draaideZonderRoute` — in-proces toetsen, een EIGENSCHAP — en
+`nietInDezeRonde` staat op nul. Er is dus geen enkele toets meer waarover deze
+meter moet zeggen "niemand heeft gekeken". Dat is precies het verschil dat par.
+2.1 beschrijft, nu met een getal eronder.
+
+**En de volle ronde legde een defect in deze meter zelf bloot.** Hij meldde
+"ronde: 1901 van 1900 toetsbestanden gedraaid" — de duurregisters dragen een naam
+die niet op schijf staat, want `test/meterijk.test.js` zet tijdens zijn ijking een
+toetsbestand neer en haalt het weer weg. De volledigheidstoets vroeg
+`ronde.size >= toetsen.length`, dus een ronde kon een ECHT bestand missen en toch
+volledig heten zolang er maar een vreemde naam tegenover stond. Nu telt
+lidmaatschap. Een gelijkheidstoets op aantallen heeft een blinde vlek die eruitziet
+als succes, en dat is dezelfde vorm die `MENSNETWERK.md` par. 4c al beschreef bij
+de AI-contextproef.
+
 ### 2.1 Drie dingen die niet mogen sneuvelen
 
 **Een afwezige toets is geen nul.** `ongemeten` betekent dat er niets over bewezen

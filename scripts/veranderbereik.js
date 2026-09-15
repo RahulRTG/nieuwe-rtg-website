@@ -298,7 +298,20 @@ function meet(paden, rondePaden) {
       toetsenInDezeRonde: ronde ? ronde.size : null,
       /* HEEFT DE RONDE DE HELE SUITE GEDRAAID? Zonder dit kan niemand zien of
          `zonderBereik` een schuld is of een tekort van de ronde. */
-      rondeVolledig: ronde ? ronde.size >= toetsen.length : false,
+      /* LIDMAATSCHAP EN NIET AANTAL, en dat verschil is echt gebleken. De eerste
+         versie vroeg `ronde.size >= toetsen.length`, en de keten meldde daarop
+         "1901 van 1900 toetsbestanden gedraaid": de duurregisters dragen een naam
+         die niet op schijf staat (test/meterijk.test.js zet tijdens zijn ijking
+         een toetsbestand neer en haalt het weer weg). Met een teller kan een
+         ronde dus een ECHT bestand missen en toch volledig heten, zolang er maar
+         een vreemde naam tegenover staat. Een gelijkheidstoets op aantallen heeft
+         een blinde vlek die eruitziet als succes. */
+      rondeVolledig: ronde ? toetsen.every((t) => ronde.has(t)) : false,
+      /* Namen in de ronde die geen toetsbestand op schijf zijn. Hoort klein te
+         zijn en verklaarbaar; een groeiend getal betekent dat de ronde over iets
+         anders gaat dan deze meter denkt. */
+      rondeVreemdeNamen: ronde ? [...ronde].filter((n) => !toetsen.includes(n)).length : null,
+      rondeGemist: ronde ? toetsen.filter((t) => !ronde.has(t)).length : null,
       draaideZonderRoute,
       nietInDezeRonde
     },
@@ -396,8 +409,10 @@ function toon(u) {
       '   -> een in-proces toets; dat is een eigenschap');
     console.log('      draaide niet in deze ronde ' + String(g.nietInDezeRonde).padStart(5) +
       '   -> hierover is niets gemeten');
-    console.log('    ' + K.grijs + 'ronde: ' + g.toetsenInDezeRonde + ' van ' + g.toetsbestanden +
-      ' toetsbestanden gedraaid' + K.reset);
+    console.log('    ' + K.grijs + 'ronde: ' + (g.toetsbestanden - g.rondeGemist) + ' van ' +
+      g.toetsbestanden + ' toetsbestanden gedraaid' +
+      (g.rondeVreemdeNamen ? ', plus ' + g.rondeVreemdeNamen + ' naam/namen die niet op schijf staan' : '') +
+      K.reset);
   }
   console.log('\n  routes waargenomen          ' + String(g.routesWaargenomen).padStart(5));
   console.log('  waarvan zonder bronbestand  ' + String(g.routesZonderBronbestand).padStart(5) +

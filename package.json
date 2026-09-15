@@ -389,6 +389,8 @@
     "stagevorm": "node scripts/stagevorm.js",
     "stagevorm:vast": "node scripts/stagevorm.js --vastleggen",
     "namensvorm": "node scripts/namensvorm.js",
+    "spoorvorm": "node scripts/spoorvorm.js",
+    "spoorvorm:vast": "node scripts/spoorvorm.js --vastleggen",
     "namensvorm:vast": "node scripts/namensvorm.js --vastleggen",
     "wekdekking": "node scripts/wekdekking.js",
     "wekdekking:vast": "node scripts/wekdekking.js --vastleggen",

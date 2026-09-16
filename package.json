@@ -50,6 +50,7 @@
     "papierwerk": "node scripts/papierwerk.js",
     "beproeving:streng": "STRENG=1 node scripts/beproeving.js",
     "groepen": "node scripts/groepen.js",
+    "eigenaar": "node scripts/eigenaar-aanmaken.js",
     "tikken": "node scripts/tikken.js",
     "appwerkt": "node scripts/appwerkt.js",
     "appwerkt:controle": "node scripts/appwerkt.js --controle",

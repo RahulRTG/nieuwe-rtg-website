@@ -7,6 +7,8 @@
    Geeft een object terug: { status, error } als de aanmelding niet door mag, en
    anders de schoongemaakte velden. De route doet de HTTP; hier staat de regel. */
 const eigenaar = require('../../eigenaar'); // een bron van waarheid over wie de eigenaar is
+// de leeftijdsgrenzen staan in lib/leeftijd.js, want het aanmeldgesprek toetst ze ook
+const { LID_MIN_LEEFTIJD, LID_MAX_LEEFTIJD } = require('../../lib/leeftijd');
 
 module.exports = ({ accounts, crypto, schoon, leeftijdVan, pasAppOk, PAS_FOUT }) => {
   return function keurAanmelding(req) {
@@ -31,8 +33,8 @@ module.exports = ({ accounts, crypto, schoon, leeftijdVan, pasAppOk, PAS_FOUT })
     const geboren = String(req.body.geboortedatum || '').slice(0, 10);
     const lftNieuw = leeftijdVan(geboren);
     if (lftNieuw == null) return { status: 400, error: 'Vul uw geboortedatum in.' };
-    if (lftNieuw < 15) return { status: 400, error: 'Het RTG-lidmaatschap kan vanaf 15 jaar.' };
-    if (lftNieuw > 120) return { status: 400, error: 'Controleer uw geboortedatum.' };
+    if (lftNieuw < LID_MIN_LEEFTIJD) return { status: 400, error: 'Het RTG-lidmaatschap kan vanaf 15 jaar.' };
+    if (lftNieuw > LID_MAX_LEEFTIJD) return { status: 400, error: 'Controleer uw geboortedatum.' };
     if (accounts.findByLogin(email)) return { status: 409, error: 'Er bestaat al een account met dit e-mailadres.' };
     /* HET EIGENAARSACCOUNT ONTSTAAT UIT EEN BEWUSTE HANDELING, NIET UIT EEN FORMULIER.
 

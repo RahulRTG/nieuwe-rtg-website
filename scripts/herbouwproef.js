@@ -375,10 +375,31 @@ function main() {
     process.exit(2);
   }
 
-  const eerder = (() => {
-    try { return JSON.parse(fs.readFileSync(UIT, 'utf8')).artefacten || []; }
-    catch (e) { return []; }
-  })();
+  /* ONLEESBAAR IS NIET AFWEZIG (BEWIJSMACHINE.md par. 6b, BM-B). Hier stond een
+     `try { ... } catch { return []; }`, en die maakt van een STUK register een
+     LEEG register: de proef zou dan vrolijk opnieuw beginnen en bij het
+     vastleggen alles overschrijven wat er stond. Drie standen, en ze worden uit
+     elkaar gehouden:
+
+       bestaat niet      eerste ronde, begin met een lege lijst
+       bestaat + geldig  voeg samen
+       bestaat + stuk    STOP, en zeg het -- de mens beslist of hij hem weggooit
+
+     (Deze regel is hier verdiend en niet overgeschreven: de eerste versie van
+     dit bestand liet `stilLezingMeters` met een tand stijgen.) */
+  let eerder = [];
+  if (fs.existsSync(UIT)) {
+    let rauw;
+    try { rauw = JSON.parse(fs.readFileSync(UIT, 'utf8')); }
+    catch (e) {
+      console.error('\n  HERBOUWPROEF.json BESTAAT en is ONLEESBAAR (' + e.message + ').\n' +
+        '  Dat is iets anders dan "er is nog niets gemeten", en de proef gokt niet welke van\n' +
+        '  de twee het is: opnieuw beginnen zou de vorige ronde overschrijven. Kijk ernaar,\n' +
+        '  en verwijder hem met de hand als hij echt weg mag.\n');
+      process.exit(2);
+    }
+    eerder = rauw.artefacten || [];
+  }
   const gekend = new Map(eerder.map(r => [r.naam, r]));
 
   if (!namen.length) {

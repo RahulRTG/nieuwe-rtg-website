@@ -38,7 +38,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, elevateTier, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
+const { startServer, letOpFouten, elevateTier, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, edgeActies } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lsscherm-'));
@@ -206,11 +206,12 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
       /* Waar de lijst achter een tabblad zit: erop tikken, zoals een gebruiker
          ook doet. Een tab die niet te vinden is, is zelf een bevinding. */
       if (a.tab) {
+        await edgeActies(page);
         /* Zoek expliciet naar een knop. De Hangar-voorpagina gebruikt "VLOOT"
            ook als kop in de servicelijn; een vrije tekstzoeker tikte daardoor
            het eerste, niet-interactieve woord aan en liet het tabblad dicht. */
         const naam = new RegExp('^' + a.tab.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|$)', 'i');
-        const knop = page.getByRole('button', { name: naam }).first();
+        const knop = page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam }).first();
         if (!await knop.count()) { stuk.push(a.app + ': tabblad "' + a.tab + '" staat er niet'); continue; }
         try { await knop.click({ timeout: 4000 }); } catch (e) { stuk.push(a.app + ': tabblad "' + a.tab + '" is niet aan te tikken'); continue; }
         await wachtOpRust(page);

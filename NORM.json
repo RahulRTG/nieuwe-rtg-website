@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1704,
-    "toetsenNietGemeten": 624,
+    "toetsenNietGemeten": 625,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -134,6 +134,16 @@
     "veranderbereikStatisch": 1155
   },
   "notities": [
+    {
+      "datum": "2026-09-16",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 624,
+      "vervalt": "2026-12-16",
+      "meter": "toetsenNietGemeten 624 -> 625",
+      "reden": "test/eigenaar-aanmaken.test.js komt erbij -- vier toetsen op scripts/eigenaar-aanmaken.js, het opstartscript dat het eigenaarsaccount maakt nu zetEigenaarsAccount() alleen nog in demostand draait -- en staat nog niet in MUTATIES.json. Drie mutaties zijn met de hand gedraaid op de gecommitte boom en alle drie laten ze precies de toets zakken die erover gaat: het script een Business Pass laten uitdelen laat toets 2 zakken (de merkregel dat Lifestyle en Business uitsluitend uit kern/aanmeldingen/besluit.js komen); een bestaand eigenaarsaccount 'handig' bijwerken in plaats van weigeren -- renameUser plus setPassword, precies wat de demo-bootstrap deed -- laat toets 3 zakken; en de eigenaarscontrole uit kern/eenaccount/afgeleid.js halen laat toets 4 zakken, de tegenproef waarin een gewoon lid 404 hoort te krijgen op /api/account/start. Een vierde poging telt hier NIET als bewijs en staat er voor de eerlijkheid bij: de weigering op een bestaand account uitzetten met `if (false && bestaand)` liet alle vier de toetsen staan, omdat de kluis zelf dan op UNIQUE afketst. Die mutatie bewijst dus een tweede laag en niet deze toets.",
+      "waarheen": "Laat scripts/mutatie.js over test/eigenaar-aanmaken.test.js lopen (servertoets, dus de liegpoort) en leg de uitslag vast in MUTATIES.json; dan zakt deze meter vanzelf terug naar 624."
+    },
     {
       "datum": "2026-09-15",
       "soort": "structureel",

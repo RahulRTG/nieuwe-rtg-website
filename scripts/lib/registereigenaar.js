@@ -85,6 +85,17 @@ const EIGENAAR = {
      en zichzelf overslaat, is de eerste plek waar het contract scheurt. */
   'AFGELEID.json': { schrijver: 'scripts/afgeleid.js' },
 
+  /* DE EERSTE MOMENTOPNAME, en die stand bestond tot nu toe alleen op papier.
+
+     BEWIJSKOSTEN.json meet wat een correcte verandering kost over een BEREIK
+     (standaard het aftakpunt van main tot HEAD). Opnieuw draaien op een ander
+     bereik geeft terecht een andere uitslag, dus "loopt achter" is er geen
+     zinnig oordeel over -- en een ratel eroverheen zou verbeteren door het
+     bereik te verkleinen, precies de faalvorm waar `afgeleidMetEigenaar` voor
+     bestaat. Daarom MOMENTOPNAME en niet AFGELEID: hij heeft wel een eigenaar
+     en geen versheid. */
+  'BEWIJSKOSTEN.json': { soort: 'MOMENTOPNAME', schrijver: 'scripts/bewijskosten.js' },
+
   /* De lagen die in deze tak zijn gebouwd. */
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },

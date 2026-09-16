@@ -50,6 +50,17 @@ const GEEN_METING = new Set([
      en de weging is in delen.js hersteld -- twee verdelers met elk een eigen
      duurregister is LAT.md regel 4 op de plek waar hij het duurst is. */
   'TOETSDUUR.json',
+  /* BEWIJSKOSTEN.json is een MOMENTOPNAME over een BEREIK (zie EIGENAAR in
+     scripts/lib/registereigenaar.js). Een ratel eroverheen zou verbeteren door
+     het bereik te verkleinen -- meet een tak van drie commits en elk getal is
+     laag -- en dat is exact de faalvorm waar `afgeleidMetEigenaar` en
+     `stilLezingBereik` voor bestaan. Wat hem wel bewaakt is
+     test/bewijskosten.test.js: dat de twee helften (gemeten, verklaard) elkaar
+     nooit raken, en dat een versterkingsfactor zonder noemer ONBEPAALD blijft.
+
+     De tand die hier WEL hoort te komen -- mensVersterking naar nul -- vraagt
+     eerst een STABIEL bereik, en dat is een besluit en geen bouwtaak. */
+  'BEWIJSKOSTEN.json',
   /* SCHERFMETER.json rapporteert vier getallen over de scherfverdeling (balans,
      churn, ongemeten, prijsbron). Drie ervan HOREN geen ratel te hebben: churn
      hangt af van hoeveel toetsen er sinds de vorige vastlegging bij kwamen,

@@ -171,7 +171,12 @@ const BUITEN = {
      juist geen te hebben -- een tand die daarop duwt maakt het huis slechter en
      de meter groener. Zie BEWIJSMACHINE.md par. 6a.2; zodra de verklaring per
      generator een besluit is, verhuist hij hiervandaan naar REGISTERS. */
-  'METERKLASSE.json': 'wordt met opzet niet in de repo gezet: een commando dat je draait, geen register dat meetelt (BEWIJSMACHINE.md par. 6a.2)'
+  'METERKLASSE.json': 'wordt met opzet niet in de repo gezet: een commando dat je draait, geen register dat meetelt (BEWIJSMACHINE.md par. 6a.2)',
+  /* Een MOMENTOPNAME kan niet verouderen: hij is gebonden aan het BEREIK waarop
+     hij is gedraaid. `npm run bewijskosten` op het aftakpunt van gisteren geeft
+     terecht iets anders dan op dat van vandaag, en "loopt achter" is er dus geen
+     zinnig oordeel over. Zie AFGELEID.json, waar hij als enige die stand draagt. */
+  'BEWIJSKOSTEN.json': 'een MOMENTOPNAME over een bereik: opnieuw draaien HOORT iets anders te geven, dus veroudering is er geen zinnig oordeel over (AFGELEID.json, soort MOMENTOPNAME)'
 };
 
 function schrijvers() {

@@ -343,6 +343,8 @@
     "stillezing:vast": "node scripts/stillezing.js --vastleggen",
     "afgeleid": "node scripts/afgeleid.js",
     "afgeleid:vast": "node scripts/afgeleid.js --vastleggen",
+    "bewijskosten": "node scripts/bewijskosten.js",
+    "bewijskosten:vast": "node scripts/bewijskosten.js --vastleggen",
     "herbouwproef": "node scripts/herbouwproef.js",
     "herbouwproef:vast": "node scripts/herbouwproef.js --vastleggen",
     "meterklasse": "node scripts/meterklasse.js",

@@ -52,6 +52,11 @@
     });
     return out;
   }
+  function defaults(state) {
+    var labels = { primary: 'Volgende stap', worlds: 'Uw werelden', context: 'Context en opties',
+      status: 'Veiligheid en status', connect: 'Open Connect', presence: 'Bekijk actuele status', ai: 'Rahul vragen' };
+    Object.keys(labels).forEach(function (id) { register(state, { id: id, label: labels[id], allowed: true }); });
+  }
   function model() {
     return { state: 'dock', deck: 'home', registry: Object.create(null),
       projections: Object.create(null), presence: null, identity: null, continuation: null };
@@ -76,5 +81,5 @@
   }
   return Object.freeze({ STATES: STATES, DECKS: DECKS, SPECS: SPECS, normState: normState,
     normDeck: normDeck, nextDeck: nextDeck, allowed: allowed, project: project,
-    model: model, register: register, setProjection: setProjection, actions: actions });
+    model: model, defaults: defaults, register: register, setProjection: setProjection, actions: actions });
 }));

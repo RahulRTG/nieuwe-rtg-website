@@ -18,7 +18,7 @@ const HTML = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 
 test('de nieuwe voordeur draagt het RTG-merk en niet het vervangen scherm', () => {
   assert.match(HTML, /data-page="rtg-landing"/);
-  assert.match(HTML, /Vier werelden\.<br>Één visie\./);
+  assert.match(HTML, /Vier werelden\.<br>Één samenhangend geheel\./);
   assert.ok((HTML.match(/EXPERIENCE THE ELITE CLASS/g) || []).length >= 2,
     'de exacte slogan staat in de kop én de voet');
   assert.doesNotMatch(HTML, /Uw RTG-omgeving begint|Geen voorbeelddata|Nog geen eigen informatie/,

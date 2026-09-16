@@ -26,6 +26,12 @@
     rt.sheet.id = 'rtgAdaptiveActions';
     rt.bar.querySelectorAll('button').forEach(function (button) {
       var action = button.dataset.rtgAdaptiveAction;
+      if (rt.edge.onEdgeAction && /^(menu|worlds|context|primary|connect)$/.test(action)) {
+        var open = String(!!rt.customPanel && rt.customPanel.focus === button);
+        if (button.getAttribute('aria-expanded') !== open) button.setAttribute('aria-expanded', open);
+        if (button.getAttribute('aria-controls') !== rt.sheet.id) button.setAttribute('aria-controls', rt.sheet.id);
+        return;
+      }
       var selector = { menu: '.rtg-edge-menu', worlds: '.rtg-edge-menu', ai: '.rtg-edge-ai' }[action];
       var source = selector && rt.edge.root.querySelector(selector);
       var sheet = action === 'context' || action === 'primary' || action === 'ai' &&
@@ -86,5 +92,29 @@
       } else if (event.key === 'Escape') handlers.escape();
     });
   }
-  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, haptic: haptic, prepare: prepare, closeContext: closeContext, reflect: reflect });
+  // Public stories can use the same sheet without constructing a second bar.
+  function closePanel(rt) {
+    if (!rt || !rt.customPanel) return;
+    var panel = rt.customPanel;
+    panel.node.hidden = true; panel.parent.insertBefore(panel.node, panel.next && panel.next.parentNode === panel.parent ? panel.next : null);
+    rt.customPanel = null; reflect(rt); rt.sheetList.hidden = false;
+    if (rt.controls) rt.controls.hidden = false;
+    if (panel.focus && panel.focus.isConnected) panel.focus.focus({ preventScroll: true });
+  }
+  function openPanel(rt, node, options, setState) {
+    if (!rt || !node || node.ownerDocument !== rt.doc || !node.parentNode) return false;
+    if (rt.customPanel && rt.customPanel.node === node) { setState('dock'); return true; }
+    if (rt.host.contains(node)) return false;
+    closePanel(rt); setState('expanded');
+    rt.customPanel = { node: node, parent: node.parentNode, next: node.nextSibling, focus: rt.doc.activeElement };
+    rt.sheetList.hidden = true; if (rt.controls) rt.controls.hidden = true;
+    rt.sheetTitle.textContent = String(options && options.title || 'RTG');
+    rt.sheetCopy.textContent = String(options && options.copy || '');
+    node.hidden = false; rt.sheet.appendChild(node);
+    reflect(rt);
+    var focus = node.querySelector('input:not(:disabled),button:not(:disabled),a,select:not(:disabled),summary') || rt.sheet.querySelector('[data-rtg-adaptive-close]');
+    if (focus) focus.focus({ preventScroll: true });
+    return true;
+  }
+  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, openPanel: openPanel, closePanel: closePanel, haptic: haptic, prepare: prepare, closeContext: closeContext, reflect: reflect });
 }(window));

@@ -1,4 +1,4 @@
-@import url("/shared/rtg-intelligence-shell.css");
+@import url("./rtg-intelligence-shell.css");
 /* Bronwissels houden hun eigen ruimte; bedieningsankers verschuiven niet. */
 .rtg-edge-chrome .rtg-edge-state{width:144px;min-width:144px;max-width:144px}
 .rtg-edge-chrome .rtg-edge-state span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

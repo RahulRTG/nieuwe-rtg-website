@@ -1,0 +1,587 @@
+{
+  "stempel": {
+    "op": "2026-09-16T07:33:02.861Z",
+    "commit": "ff4d0325",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/bewijskosten.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Waar ging het werk heen bij een verandering die door alle poorten kwam? De helft `gemeten` volgt uit git, AFGELEID.json en HERBOUWPROEF.json. De helft `verklaard` is een oordeel van een mens en komt in geen enkele som voor.",
+  "grens": "machineversterking en mensversterking worden nooit opgeteld: de eerste mag groeien (een generator schrijft die regels in seconden), de tweede hoort naar nul. Een versterkingsfactor over nul bronregels is ONBEPAALD en geen nul. En `onbewezen` is geen `handwerk`: niet bewezen herbouwbaar is iets anders dan bewezen niet-herbouwbaar.",
+  "gemeten": {
+    "bereik": "3f11d577e566de3a3137b6e79666cf5084f95c05..HEAD",
+    "commits": 61,
+    "samenvoegingen": 3,
+    "omvang": {
+      "intentie": {
+        "bestanden": 32,
+        "erbij": 1756,
+        "eraf": 48
+      },
+      "bewijs": {
+        "bestanden": 21,
+        "erbij": 3494,
+        "eraf": 28
+      },
+      "afgeleid": {
+        "bestanden": 30,
+        "erbij": 6338,
+        "eraf": 322
+      },
+      "document": {
+        "bestanden": 1,
+        "erbij": 525,
+        "eraf": 0
+      },
+      "overig": {
+        "bestanden": 1,
+        "erbij": 10,
+        "eraf": 0
+      }
+    },
+    "bronRegels": 1804,
+    "bewijsRegels": 3522,
+    "afgeleideRegels": 6660,
+    "machineVersterking": 3.69,
+    "bewijsVersterking": 1.95,
+    "versterkingOnbepaald": null,
+    "driftConflicten": 44,
+    "driftHandmatig": 6,
+    "driftHerbouwplicht": 29,
+    "mensVersterking": 9,
+    "herbouwproefGelezen": true,
+    "drift": [
+      {
+        "merge": "998a2843",
+        "conflicten": 19,
+        "paden": [
+          {
+            "pad": "ARCHITECTUUR.md",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "BEWIJS.md",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "CAPABILITEIT.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "CLAUDE.md",
+            "soort": "afgeleid",
+            "afhandeling": "onbewezen"
+          },
+          {
+            "pad": "COMMERCE.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "DEKKING.json",
+            "soort": "afgeleid",
+            "afhandeling": "onbewezen"
+          },
+          {
+            "pad": "FUNCTIES.md",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "LADDER.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MACHINE.md",
+            "soort": "afgeleid",
+            "afhandeling": "onbewezen"
+          },
+          {
+            "pad": "MACHINEDEKKING.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MAGNAATLAB.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MUTATIECONTRACT.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MUTATIEINVENTARIS.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MUTATIESEMANTIEK.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "NORM.json",
+            "soort": "afgeleid",
+            "afhandeling": "onbewezen"
+          },
+          {
+            "pad": "OBJECTMODEL.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "ROLRONDE.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "VINDBAAR.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "server/lib/idemsleutels.js",
+            "soort": "intentie",
+            "afhandeling": "handmatig"
+          }
+        ]
+      },
+      {
+        "merge": "179ea881",
+        "conflicten": 12,
+        "paden": [
+          {
+            "pad": "ARCHITECTUUR.md",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "BEWIJS.md",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "CAPABILITEIT.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "FUNCTIES.md",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "GLUURRONDE.json",
+            "soort": "afgeleid",
+            "afhandeling": "onbewezen"
+          },
+          {
+            "pad": "MACHINEDEKKING.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MUTATIECONTRACT.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MUTATIEINVENTARIS.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MUTATIES.json",
+            "soort": "afgeleid",
+            "afhandeling": "onbewezen"
+          },
+          {
+            "pad": "MUTATIESEMANTIEK.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "NORM.json",
+            "soort": "afgeleid",
+            "afhandeling": "onbewezen"
+          },
+          {
+            "pad": "package.json",
+            "soort": "overig",
+            "afhandeling": "handmatig"
+          }
+        ]
+      },
+      {
+        "merge": "aa6854d4",
+        "conflicten": 13,
+        "paden": [
+          {
+            "pad": "ARCHITECTUUR.md",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "BEWIJS.md",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "CAPABILITEIT.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "COMMERCE.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "FUNCTIES.md",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MAGNAATLAB.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "MUTATIES.json",
+            "soort": "afgeleid",
+            "afhandeling": "onbewezen"
+          },
+          {
+            "pad": "NORM.json",
+            "soort": "afgeleid",
+            "afhandeling": "onbewezen"
+          },
+          {
+            "pad": "OBJECTMODEL.json",
+            "soort": "afgeleid",
+            "afhandeling": "herbouwplicht"
+          },
+          {
+            "pad": "scripts/lib/metingen.js",
+            "soort": "bewijs",
+            "afhandeling": "handmatig"
+          },
+          {
+            "pad": "scripts/norm.js",
+            "soort": "bewijs",
+            "afhandeling": "handmatig"
+          },
+          {
+            "pad": "scripts/versheid.js",
+            "soort": "bewijs",
+            "afhandeling": "handmatig"
+          },
+          {
+            "pad": "test/meterijk.test.js",
+            "soort": "bewijs",
+            "afhandeling": "handmatig"
+          }
+        ]
+      }
+    ]
+  },
+  "nulmeting": {
+    "commit": "fcf44574",
+    "waarom": "de eerste commit van deze campagne die groen door de hele keten kwam (CI-ronde 4593); een latere ronde is pas duurder of goedkoper als je weet waartegen",
+    "gemeten": {
+      "bereik": "3f11d577e566de3a3137b6e79666cf5084f95c05..fcf44574",
+      "commits": 40,
+      "samenvoegingen": 3,
+      "omvang": {
+        "intentie": {
+          "bestanden": 32,
+          "erbij": 1756,
+          "eraf": 48
+        },
+        "bewijs": {
+          "bestanden": 12,
+          "erbij": 1179,
+          "eraf": 11
+        },
+        "afgeleid": {
+          "bestanden": 26,
+          "erbij": 1024,
+          "eraf": 198
+        },
+        "document": {
+          "bestanden": 1,
+          "erbij": 525,
+          "eraf": 0
+        },
+        "overig": {
+          "bestanden": 1,
+          "erbij": 2,
+          "eraf": 0
+        }
+      },
+      "bronRegels": 1804,
+      "bewijsRegels": 1190,
+      "afgeleideRegels": 1222,
+      "machineVersterking": 0.68,
+      "bewijsVersterking": 0.66,
+      "versterkingOnbepaald": null,
+      "driftConflicten": 44,
+      "driftHandmatig": 6,
+      "driftHerbouwplicht": 29,
+      "mensVersterking": 9,
+      "herbouwproefGelezen": true,
+      "drift": [
+        {
+          "merge": "998a2843",
+          "conflicten": 19,
+          "paden": [
+            {
+              "pad": "ARCHITECTUUR.md",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "BEWIJS.md",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "CAPABILITEIT.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "CLAUDE.md",
+              "soort": "afgeleid",
+              "afhandeling": "onbewezen"
+            },
+            {
+              "pad": "COMMERCE.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "DEKKING.json",
+              "soort": "afgeleid",
+              "afhandeling": "onbewezen"
+            },
+            {
+              "pad": "FUNCTIES.md",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "LADDER.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MACHINE.md",
+              "soort": "afgeleid",
+              "afhandeling": "onbewezen"
+            },
+            {
+              "pad": "MACHINEDEKKING.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MAGNAATLAB.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MUTATIECONTRACT.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MUTATIEINVENTARIS.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MUTATIESEMANTIEK.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "NORM.json",
+              "soort": "afgeleid",
+              "afhandeling": "onbewezen"
+            },
+            {
+              "pad": "OBJECTMODEL.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "ROLRONDE.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "VINDBAAR.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "server/lib/idemsleutels.js",
+              "soort": "intentie",
+              "afhandeling": "handmatig"
+            }
+          ]
+        },
+        {
+          "merge": "179ea881",
+          "conflicten": 12,
+          "paden": [
+            {
+              "pad": "ARCHITECTUUR.md",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "BEWIJS.md",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "CAPABILITEIT.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "FUNCTIES.md",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "GLUURRONDE.json",
+              "soort": "afgeleid",
+              "afhandeling": "onbewezen"
+            },
+            {
+              "pad": "MACHINEDEKKING.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MUTATIECONTRACT.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MUTATIEINVENTARIS.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MUTATIES.json",
+              "soort": "afgeleid",
+              "afhandeling": "onbewezen"
+            },
+            {
+              "pad": "MUTATIESEMANTIEK.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "NORM.json",
+              "soort": "afgeleid",
+              "afhandeling": "onbewezen"
+            },
+            {
+              "pad": "package.json",
+              "soort": "overig",
+              "afhandeling": "handmatig"
+            }
+          ]
+        },
+        {
+          "merge": "aa6854d4",
+          "conflicten": 13,
+          "paden": [
+            {
+              "pad": "ARCHITECTUUR.md",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "BEWIJS.md",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "CAPABILITEIT.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "COMMERCE.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "FUNCTIES.md",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MAGNAATLAB.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "MUTATIES.json",
+              "soort": "afgeleid",
+              "afhandeling": "onbewezen"
+            },
+            {
+              "pad": "NORM.json",
+              "soort": "afgeleid",
+              "afhandeling": "onbewezen"
+            },
+            {
+              "pad": "OBJECTMODEL.json",
+              "soort": "afgeleid",
+              "afhandeling": "herbouwplicht"
+            },
+            {
+              "pad": "scripts/lib/metingen.js",
+              "soort": "bewijs",
+              "afhandeling": "handmatig"
+            },
+            {
+              "pad": "scripts/norm.js",
+              "soort": "bewijs",
+              "afhandeling": "handmatig"
+            },
+            {
+              "pad": "scripts/versheid.js",
+              "soort": "bewijs",
+              "afhandeling": "handmatig"
+            },
+            {
+              "pad": "test/meterijk.test.js",
+              "soort": "bewijs",
+              "afhandeling": "handmatig"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "verklaard": {
+    "waarom": "ontdekkingen -- defecten die onderweg opdoken en die geen enkele toets zag -- hebben geen reproduceerbare detectieregel. Ze staan hier omdat ze ertoe doen, en NERGENS in een som omdat een half gemeten cijfer als gemeten leest.",
+    "hoeGroeitDit": "met de hand, door wie de ronde draaide",
+    "ontdekkingen": []
+  }
+}

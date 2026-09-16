@@ -1728,6 +1728,24 @@ const IJKINGEN = {
       (j) => { j.gemeten.metEigenaar = Math.max(0, (j.gemeten.metEigenaar || 0) - 23); return j; },
       () => voor.afgeleidMetEigenaar - norm.meet().afgeleidMetEigenaar)
   },
+  /* DE TWEE TANDEN VAN HERBOUWPROEF.json -- eigenaarschap is geen bewijs.
+
+     Ze lezen allebei uit `gemeten` van hetzelfde register, en dat is precies
+     wat hier misgaan kan: twee meters die stilletjes hetzelfde veld lezen. Elk
+     krijgt daarom zijn EIGEN veld verstoord, in de richting waarin het gevaar
+     zit -- `herbouwVerschilt` omhoog (een artefact dat inhoudelijk anders
+     terugkomt is geen herbouwplicht meer) en `herbouwBewezen` omlaag (een proef
+     die minder aanraakt meldt vooruitgang die er niet is). */
+  herbouwVerschilt: {
+    proef: (voor) => metVervangenJson('HERBOUWPROEF.json',
+      (j) => { j.gemeten.verschilt = (j.gemeten.verschilt || 0) + 4; return j; },
+      () => norm.meet().herbouwVerschilt - voor.herbouwVerschilt)
+  },
+  herbouwBewezen: {
+    proef: (voor) => metVervangenJson('HERBOUWPROEF.json',
+      (j) => { j.gemeten.herbouwbaar = Math.max(0, (j.gemeten.herbouwbaar || 0) - 9); return j; },
+      () => voor.herbouwBewezen - norm.meet().herbouwBewezen)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

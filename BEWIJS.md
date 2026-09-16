@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1905 |
 | losse beweringen (`test(...)`) | 13682 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 141 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1260 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1261 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 406 |
+| niets van beide | 405 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -550,7 +550,7 @@ toets omvalt.
 | `heapproef.test.js` | 11 | gezakt op `===->!==#0` | DE HEAPPROEF ALS INSTRUMENT -- en HEAPPROEF.json als ratel. scripts/heapproef.js meet of deze server geheugen vasthoudt. |
 | `heapstat.test.js` | 12 | gezakt op `===->!==#0` | HET OORDEEL VAN DE HEAPPROEF -- KAN HET ALLE DRIE ZEGGEN? De rekenkant van scripts/heapproef.js staat apart (scripts/lib/heapstat.js) zodat hij te beproeven is met reeksen waarvan we het antwoord al weten. |
 | `helikopter.test.js` | 4 | gezakt op `liegpoort /api/` | Helikopter transfers: het nieuwe vervoersgenre. Een lid vraagt een helikoptervlucht aan bij Ibiza Sky Charter, betaalt vooraf, en de zaak (Operations + piloot) wijst piloot en toestel toe en rijdt de ritketen af. |
-| `herbouwproef.test.js` | 9 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `herbouwproef.test.js` | 9 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `heritage-truth.test.js` | 4 | geen bronmutatie mogelijk | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `herkomst.test.js` | 7 | gezakt op `===->!==#0` | DE HERKOMST VAN INVOER -- onvertrouwde inhoud vergroot nooit de capabilities. WAAROM DIT ER MOEST KOMEN. |
 | `herkomstlus.test.js` | 5 | genoemd | DE HERKOMSTPOORT IN DE LUS -- de regel stond, en werkte nergens. WAT HIER GEREPAREERD IS EN WAAROM HET DE ERGSTE SOORT FOUT WAS. |

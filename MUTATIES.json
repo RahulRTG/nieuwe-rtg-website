@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-16T05:57:13.822Z",
-    "commit": "c306f96d",
+    "op": "2026-09-16T06:49:16.681Z",
+    "commit": "516c8f92",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3340,6 +3340,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "herbouwproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/herbouwproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
     },
     "heritage-truth.test.js": {
       "soort": "puur",

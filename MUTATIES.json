@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T17:44:26.499Z",
-    "commit": "9de3af6d",
+    "op": "2026-09-16T05:49:17.116Z",
+    "commit": "589ad6e6",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -218,6 +218,11 @@
       "operator": "===->!==#3",
       "gezakt": 3,
       "geprobeerd": 17
+    },
+    "afgeleid.test.js": {
+      "soort": "puur",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "afleidbaar.test.js": {
       "soort": "puur",

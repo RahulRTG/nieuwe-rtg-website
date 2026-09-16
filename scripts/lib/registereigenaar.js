@@ -95,7 +95,12 @@ const EIGENAAR = {
   'WETTEN.json': { handmatig: true, lezer: 'scripts/wetten.js',
     waarom: 'een wet is een BESLUIT en geen berekening; scripts/wetten.js leest en keurt, hij schrijft niet' },
   'SABOTAGE.json': { schrijver: 'scripts/sabotage.js' },
-  'MUTATIES.json': { schrijver: 'scripts/mutatie.js' },
+  'MUTATIES.json': { schrijver: 'scripts/mutatie.js',
+    waarom: 'de detectie ziet hem NIET, en dat is een eigenschap van de meter en niet van de motor: ' +
+      'scripts/mutatie.js schrijft via een eigen helper (`schrijf(UITSLAG)`) en niet met een ' +
+      'writeFileSync waar de naam bij staat. Precies de ondergrens die in de kop hierboven staat. ' +
+      'De verklaring is hier dus leidend, en het bestand zelf noemt MUTATIES.json op vier plekken ' +
+      'in zijn kop als de uitslag die het bijhoudt.' },
   'GRENZEN.json': { schrijver: 'scripts/grenslijst.js',
     waarom: 'scripts/grensmeld.js schrijft er ook naar, maar alleen om een geknelde naam BIJ te schrijven; ' +
       'de lijst zelf is een besluit dat grenslijst.js opstelt' },

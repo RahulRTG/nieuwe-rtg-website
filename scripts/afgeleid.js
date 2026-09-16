@@ -203,8 +203,17 @@ function meet() {
     if (soort === 'AFGELEID' || soort === 'MOMENTOPNAME' || soort === 'FRAGMENTEN') {
       if (verklaard && verklaard.schrijver) { eigenaar = verklaard.schrijver; graad = 'verklaard'; }
       else if (schrijvers.length === 1) { eigenaar = schrijvers[0]; graad = 'gemeten'; }
-      else if (uitVersheid) { eigenaar = uitVersheid; graad = 'versheid'; }
+      /* DE VERSHEIDSOPDRACHT IS PAS BEWIJS ALS ER NIETS GEMETEN IS, en die
+         volgorde is een reparatie. Hier stond versheid VOOR de meervoudige
+         schrijvers, en dat koos stilletjes een winnaar: OUTPUTPROEF.json heeft
+         twee gemeten schrijvers (outputband en outputproef) en zijn
+         versheidsopdracht is `npm run meetronde -- --alleen=outputproef`. Dat
+         leverde scripts/meetronde.js op -- een DERDE script, de orkestrator, die
+         het bestand helemaal niet schrijft. Een opdrachtregel noemt een INGANG
+         en niet noodzakelijk de schrijver, dus hij mag nooit een botsing
+         beslechten. */
       else if (schrijvers.length > 1) { eigenaar = null; graad = 'meerdere'; }
+      else if (uitVersheid) { eigenaar = uitVersheid; graad = 'versheid'; }
       /* De fragmenteigenaar wordt pas gebruikt als er niets specifiekers is:
          een document dat ZELF wordt gegenereerd en daarnaast merktekens draagt,
          hoort bij zijn eigen generator te staan. */

@@ -300,3 +300,43 @@ test('een aan-waarde is geen pad: RTG_ROUTELOG=1 schrijft naar het gewone journa
     try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* DE MEDEDELING STAAT OP stderr, EN DAAR HANGT MEER VAN AF DAN NETHEID.
+
+   routelog wordt geladen door elk proces dat de server aanraakt, en
+   scripts/dekking.js schrijft zijn uitslag als JSON naar stdout. Stond de
+   mededeling hierboven op stdout, dan krijgt een lezer van die uitslag
+   `[routelog] ...` voor de openingsaccolade en komt terug met null.
+
+   ZO IS HET ECHT MISGEGAAN (16 september 2026). `RTG_ROUTELOG=1 npm test` --
+   de voor de hand liggende manier om in een ronde een routejournaal te
+   krijgen -- liet DRIE toetsen zakken: twee in test/dekking.test.js en de
+   ijking in test/meterijk.test.js, alle drie op een meter die "geen JSON
+   terug" meldde. Met een PAD, de vorm die ci.yml gebruikt, zijn ze groen. CI
+   kon dit dus per constructie niet zien.
+
+   De regel eronder is algemener dan dit bestand: stdout draagt de UITKOMST,
+   stderr draagt wat je erover wilt zeggen. Een diagnostische regel op een
+   stroom die een machine parseert, is een defect en geen hulp.
+
+   MUTATIE: console.error terugzetten naar console.log in server/routelog.js ->
+   deze toets zakt, gedraaid. */
+test('de "geen pad maar aan"-mededeling gaat naar stderr, zodat stdout JSON blijft', () => {
+  const { spawnSync } = require('node:child_process');
+  const path = require('node:path');
+
+  /* Een kaal kindproces: laad routelog, zet hem met een AAN-waarde aan, en
+     schrijf daarna zelf JSON naar stdout -- precies wat dekking.js doet. */
+  const r = spawnSync(process.execPath, ['-e',
+    'const l = require(' + JSON.stringify(path.join(__dirname, '..', 'server', 'routelog.js')) + ');' +
+    'l.begin("1");' +
+    'process.stdout.write(JSON.stringify({ uitslag: 42 }));'
+  ], { encoding: 'utf8', cwd: require('node:fs').mkdtempSync(
+    path.join(require('node:os').tmpdir(), 'rtg-routelog-uit-')) });
+
+  assert.equal(r.status, 0, 'het kindproces hoort gewoon af te lopen');
+  assert.deepEqual(JSON.parse(r.stdout), { uitslag: 42 },
+    'stdout hoort ALLEEN de uitslag te dragen; staat de mededeling erbij, dan is dit geen JSON meer');
+  assert.match(r.stderr, /\[routelog\].*geen pad maar/,
+    'en de mededeling hoort niet te verdwijnen -- hij verhuist naar stderr, hij gaat niet weg');
+});

@@ -618,6 +618,65 @@ uit een echte meting AFGELEID. Dat is dezelfde les als bij de AI-contextproef
 instrument* — en een fixture die zijn eigenschap aan een index ontleent, verliest
 die zonder iets te zeggen.
 
+## 7g. Een volle ronde is de UNIE van twee banen (16 september 2026)
+
+Om een ronde met `rondeVolledig: true` te krijgen zonder de geblokkeerde
+CI-baan, is de suite lokaal gedraaid. Dat leverde twee dingen op die geen enkele
+bestaande toets kon vinden.
+
+**De ronde is met opzet gesplitst, en dat is exact te tellen:**
+
+| baan | bestanden |
+|---|---|
+| `npm test` | 1684 `.test.js` |
+| de schermbaan | 217 `.e2e.js` |
+| samen | **1901** |
+
+`npm test` kan dus per constructie nooit een volle ronde opleveren -- en dat is
+geen tekort maar de reden dat `ci.yml` in de job `dekking` BEIDE journalen leest
+(`journalen/test/routejournaal.log` én `journalen/scherm/.schermjournaal`). Wie
+één baan leest, noemt de andere ongedraaid en blaast de schuld op met zijn eigen
+tekort. Op de lokale ronde van 1684 bestanden:
+
+| | halve ronde | deze ronde |
+|---|---|---|
+| waargenomen as | 337 | **758** |
+| gedicht door waarneming | 236 | **520** |
+| zonder bereik (volle ring) | 530 | **246** (12,9%) |
+
+Die 246 zijn 200 `nietInDezeRonde` (de schermbaan) plus 46 `draaideZonderRoute`
+(een eigenschap, geen meetgat). Dat die twee apart staan, is hier precies wat het
+getal leesbaar maakt.
+
+**En er zat een defect onder dat drie toetsen liet zakken zonder dat CI het ooit
+kon zien.** `RTG_ROUTELOG=1 npm test` -- de voor de hand liggende manier om in
+een ronde een journaal te krijgen -- liet drie toetsen zakken: twee in
+`test/dekking.test.js` en de ijking in `test/meterijk.test.js`, alle drie met
+"de meter gaf geen JSON terug". De oorzaak is één regel: `server/routelog.js`
+meldt op **stdout** dat `1` geen pad is maar "aan", die melding erft elk
+kindproces, en `scripts/dekking.js` schrijft zijn uitslag als JSON naar diezelfde
+stdout. De lezer krijgt `[routelog] ...` vóór de accolade en komt terug met
+`null`.
+
+`ci.yml` zet `RTG_ROUTELOG` op een PAD, en dan komt die regel er niet. CI kon dit
+dus per constructie niet zien -- en wie de suite met de vlag aan draait, kreeg
+drie raadsels. Gemeten met drie aanroepen: zonder vlag groen, met `=1` rood, met
+een pad groen.
+
+De regel eronder is algemener dan dit bestand en hoort naast regel 13 van
+`LAT.md` gelezen te worden:
+
+> **stdout draagt de UITKOMST, stderr draagt wat je erover wilt zeggen.** Een
+> diagnostische regel op een stroom die een machine parseert, is een defect en
+> geen hulp.
+
+Let ook op de foutmelding die het onderzoek bijna de verkeerde kant op stuurde:
+`journaalMetGat` in `test/meterijk.test.js` drukt bij een mislukte parse
+`r.stderr || r.stdout` af. Er stonden onschuldige WARN-regels op stderr, dus de
+melding wees naar de config terwijl de vervuiling op stdout zat. **Een
+foutmelding die een ANDERE stroom laat zien dan de stroom die stuk is, verbergt
+zijn eigen oorzaak.**
+
 ## 8. De maatstaf
 
 Niet *"wanneer heeft RTG een bewijsmachine"* maar:

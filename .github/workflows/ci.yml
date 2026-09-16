@@ -1229,9 +1229,15 @@ jobs:
       # ongedraaid en blaast de schuld op met zijn eigen tekort.
       #
       # GEEN POORT, met opzet. De normtand (--controle) kan pas scherp staan als
-      # VERANDERBEREIK.json in de repo staat; vandaag zou hij bijna elke toets
-      # als volle ring weigeren. Meten eerst, handhaven als het getal er staat --
-      # dezelfde volgorde als bij de attributie hierboven.
+      # VERANDERBEREIK-RONDE.json in de repo staat; vandaag zou hij bijna elke
+      # toets als volle ring weigeren. Meten eerst, handhaven als het getal er
+      # staat -- dezelfde volgorde als bij de attributie hierboven.
+      #
+      # TWEE REGISTERS EN NIET EEN. KENNIS draagt wat uit de code alleen volgt
+      # en geldt tot de code verandert; RONDE draagt wat DEZE uitvoering heeft
+      # waargenomen en geldt alleen voor deze ronde. Ze worden allebei bewaard,
+      # want het verschil IS de uitslag: een halve ronde mag nooit als duurzame
+      # waarheid worden gelezen.
       - name: Het veranderbereik (van welke toets weten we welke BESTANDEN hij dekt)
         if: always()
         run: |
@@ -1247,7 +1253,9 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: veranderbereik
-          path: VERANDERBEREIK.json
+          path: |
+            VERANDERBEREIK-KENNIS.json
+            VERANDERBEREIK-RONDE.json
           if-no-files-found: error
           retention-days: 5
       # EERST METEN, DAN OVERSCHRIJVEN. De drift vergelijkt het GECOMMITTE

@@ -2170,9 +2170,28 @@ const IJKINGEN = {
      de val die hieronder bij LUSSEN.json staat beschreven (de verdeling lezen
      in plaats van de schuld). */
   veranderbereikZonderBereik: {
-    proef: (voor) => metVervangenJson('VERANDERBEREIK.json',
+    proef: (voor) => metVervangenJson('VERANDERBEREIK-RONDE.json',
       (j) => { j.gemeten.zonderBereik = (j.gemeten.zonderBereik || 0) + 4; return j; },
       () => norm.meet().veranderbereikZonderBereik - voor.veranderbereikZonderBereik)
+  },
+  /* DE TWEEDE TAND VAN DIE SPLITSING, EN HIJ GAAT DE ANDERE KANT OP. De
+     statische as volgt uit de code alleen: dezelfde commit geeft altijd
+     hetzelfde getal. Krimpt hij, dan ziet de require-graaf MINDER dan gisteren,
+     en dat hoort niet stil te gebeuren -- vandaar richting `omhoog`.
+
+     DE IJKING GAAT DAAROM OOK DE ANDERE KANT OP: hij VERLAAGT het getal in het
+     register. Een tand die alleen op een verhoging is geijkt, bewijst niet dat
+     hij een DALING ziet, en juist die daling is wat hij moet tegenhouden.
+
+     EN HIJ LEEST EEN ANDER BESTAND DAN ZIJN BUURMAN HIERBOVEN, met opzet. Wie
+     `statischBereik` uit VERANDERBEREIK-RONDE.json zou lezen, leest een getal
+     dat daar niet staat en krijgt stil nul -- dan meldt de tand elke dag een
+     vrije val. Dat de twee registers uit elkaar zijn gehaald, is precies waarom
+     deze proef het bestand bij naam noemt. */
+  veranderbereikStatisch: {
+    proef: (voor) => metVervangenJson('VERANDERBEREIK-KENNIS.json',
+      (j) => { j.gemeten.statischBereik = (j.gemeten.statischBereik || 0) - 4; return j; },
+      () => voor.veranderbereikStatisch - norm.meet().veranderbereikStatisch)
   },
   /* DE DRIE TANDEN VAN 11 SEPTEMBER 2026 (LUSSEN.json, npm run lussen).
 

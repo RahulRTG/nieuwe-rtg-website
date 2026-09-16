@@ -31,7 +31,7 @@ tegengehouden, en met een getal in plaats van een gevoel.
 
 `scripts/impactbereik.js` keert de require-graaf om en vraagt: als dit bestand
 verandert, welke toetsen hangen eraan? Vers gemeten over
-<!--getal:veranderbereik.toetsen-->1900<!--/getal--> toetsbestanden:
+<!--getal:veranderbereik.toetsen-->1901<!--/getal--> toetsbestanden:
 
 | gewijzigd bestand | transitief geraakte toetsen |
 |---|---|
@@ -42,7 +42,7 @@ verandert, welke toetsen hangen eraan? Vers gemeten over
 
 Zes toetsen voor de plek waar élke betaling langskomt is geen versmalling maar
 een blinde vlek, en die is
-<!--getal:veranderbereik.blind-->1067<!--/getal--> toetsbestanden groot: ruim de
+<!--getal:veranderbereik.blind-->766<!--/getal--> toetsbestanden groot: ruim de
 helft heeft **geen enkele require-kant naar `server/`**. Ze starten de server als
 apart proces en raken de oppervlakte over HTTP (1058 starten een proces, 995
 praten HTTP). Een planner op deze graaf slaat ze over en meldt groen — "de
@@ -54,8 +54,8 @@ stilste vorm van kapot die dit huis kent" (`scripts/lib/bedrading.js`).
 workflow** en schrijft **geen register** (nul `writeFileSync`). Het getal dat
 versmalling tegenhoudt bestond dus alleen als proza in `KEURING.md` par. 1 — en
 dat proza stond op 819 van 1434 (57,1%) terwijl de verse meting
-<!--getal:veranderbereik.blind-->1067<!--/getal--> van
-<!--getal:veranderbereik.toetsen-->1900<!--/getal--> zegt. Niet fout opgeschreven;
+<!--getal:veranderbereik.blind-->766<!--/getal--> van
+<!--getal:veranderbereik.toetsen-->1901<!--/getal--> zegt. Niet fout opgeschreven;
 gewoon ouder dan de code. *Een register dat niet is hergedraaid is een bewering
 over het verleden* (`MENSNETWERK.md` par. 4) — en een getal zónder register is
 dat ook, alleen merkt niemand het.
@@ -104,12 +104,12 @@ Stand op deze tak:
 
 | | |
 |---|---|
-| toetsbestanden | <!--getal:veranderbereik.toetsen-->1900<!--/getal--> |
-| statische as | <!--getal:veranderbereik.statisch-->833<!--/getal--> |
+| toetsbestanden | <!--getal:veranderbereik.toetsen-->1901<!--/getal--> |
+| statische as | <!--getal:veranderbereik.statisch-->1135<!--/getal--> |
 | waargenomen as | <!--getal:veranderbereik.waargenomen-->337<!--/getal--> |
-| blinde vlek statisch alleen | <!--getal:veranderbereik.blind-->1067<!--/getal--> |
-| **gedicht door waarneming** | <!--getal:veranderbereik.gedicht-->239<!--/getal--> |
-| **zonder enig bereik (volle ring)** | <!--getal:veranderbereik.zonder-->828<!--/getal--> |
+| blinde vlek statisch alleen | <!--getal:veranderbereik.blind-->766<!--/getal--> |
+| **gedicht door waarneming** | <!--getal:veranderbereik.gedicht-->236<!--/getal--> |
+| **zonder enig bereik (volle ring)** | <!--getal:veranderbereik.zonder-->530<!--/getal--> |
 | toetsen die in deze ronde draaiden | <!--getal:veranderbereik.ronde-->769<!--/getal--> |
 | waargenomen routes zonder bronbestand | <!--getal:veranderbereik.routesZonderBestand-->80<!--/getal--> |
 
@@ -197,7 +197,7 @@ Het meeste bestaat al, en bijna nooit onder de voorgestelde naam.
 | 2 | Change Intelligence vooraf | **stap** | de bouwstenen staan; par. 2 is de eerste helft |
 | 3 | één Change Graph | **stap** | `AANROEPGRAAF.json` (23716 kanten), `SYMBOLEN.json` (19652), `ROUTEBRON.json`, `SCHERMROUTES.json`, `CODEWERELD.json` — de graaf bestaat, de ontbrekende kant was toets → bestand |
 | 4 | registers als projectie | **staat** | `scripts/lib/stempel.js`, `npm run registerklopt`; het openstaande stuk staat al benoemd in `METERKLASSE.json` (67 generatoren zonder verklaard grendelcontract) |
-| 5 | Incremental Proof Engine | **besluit** | geblokkeerd op <!--getal:veranderbereik.zonder-->828<!--/getal--> volle ringen — zie par. 5 |
+| 5 | Incremental Proof Engine | **besluit** | geblokkeerd op <!--getal:veranderbereik.zonder-->530<!--/getal--> volle ringen — zie par. 5 |
 | 6 | P0–P4 escalatieladder | **stap** | `BEWIJSLADDER.json` heeft 12 sporten (6 staat, 6 stap, 0 jaren) — maar naar SOORT bewijs, niet naar TIJDBUDGET; zie correctie C |
 | 7 | risico bepaalt bewijs | **stap** | `kern/frictie/motor.js` (score mét opbouw), `scripts/lib/risico.js` |
 | 8 | bewijs met houdbaarheid | **staat** | `versheid()` en `sluiting()` in `scripts/lib/stempel.js` — per instrument, nog niet per toets |
@@ -517,6 +517,107 @@ breken* is geen waarneembare noemer. Waargenomen failures binnen de selectie
 gedeeld door alle waargenomen failures — en zo hoort het op een scherm te staan,
 anders leest 100% als een garantie die niemand kan geven.
 
+## 7e. Stap 2: kennis en waarneming zijn twee objecten (16 september 2026)
+
+`VERANDERBEREIK.json` droeg twee soorten waarheid door elkaar, en dat was pas te
+zien toen het getal een keer verkeerd werd gelezen. Er staat in hetzelfde bestand:
+
+| | wat het is | hoe lang het geldt |
+|---|---|---|
+| `statischBereik` | wat de require-graaf ziet | tot de code verandert |
+| `zonderBereik` | hoeveel toetsen deze ronde geen bereik opleverden | **alleen voor die ronde** |
+
+Het tweede getal is bij een halve ronde te hoog — niet een beetje, maar met de
+helft van de suite. Wie dat in een document als *"zoveel weet dit huis niet"*
+leest, leest een tekort van de METING als een uitspraak over de toetsen. Dat is
+dezelfde fout als `geen-effect-gemeten` tegenover `onbekend` in
+`kern/stuur/gevolg.js`, nu een laag hoger.
+
+Vandaar twee registers:
+
+- **`VERANDERBEREIK-KENNIS.json`** — wat een toets KAN raken, afgeleid uit de
+  code alleen. Geen journaal, geen ronde. Dezelfde commit geeft hier altijd
+  hetzelfde.
+- **`VERANDERBEREIK-RONDE.json`** — wat er bij ÉÉN uitvoering is waargenomen,
+  inclusief de schuld, met `bronnen` erbij zodat te lezen is wélke ronde het was.
+
+Drie dingen daar niet wegpoetsen.
+
+**De schuld hoort bij de RONDE en niet bij de kennis**, hoe graag je hem ook
+duurzaam zou willen noemen. Zonder te weten welke ronde er liep, betekent
+`zonderBereik` niets — dus staat hij in de bak die zijn eigen bronnen noemt. De
+volledigheidspoort (`--onvolledig` is verplicht bij een halve ronde) hangt om
+dezelfde reden alleen aan RONDE.
+
+**De tweede normtand gaat de andere kant op.** `veranderbereikZonderBereik` mag
+alleen omlaag (RONDE); `veranderbereikStatisch` mag alleen **omhoog** (KENNIS),
+want een require-graaf die minder ziet dan gisteren hoort niet stil te gebeuren.
+De ijking in `test/meterijk.test.js` VERLAAGT dat getal daarom in plaats van het
+op te hogen: een tand die alleen op een verhoging is geijkt, bewijst niet dat hij
+een daling ziet.
+
+**Een lijst velden nakijken is niet genoeg, en dat is met twee mutaties gemeten.**
+`return { ...u, soort: 'kennis' }` laat twee toetsen zakken — die vorm schrijft
+niemand. De vorm die je in het echt krijgt is dat iemand het dichtstbijzijnde
+getal pakt: `toetsbestanden: u.gemeten.toetsenInDezeRonde` houdt de lijst velden
+precies goed en laat alleen de proef zakken die twee verschillende rondes over
+dezelfde code vergelijkt en een byte voor byte gelijke KENNIS eist. Dat is de
+dragende toets; de veldenlijst ernaast vangt alleen de grove vorm.
+
+## 7f. De blinde vlek was voor 28% de meter zelf (16 september 2026)
+
+Bij het splitsen viel op dat een nieuw toetsbestand de schuld met 1 liet stijgen.
+Dat leek een eerlijke post — een toets zonder bekend bereik — tot de vraag werd
+gesteld wáárom hij geen bereik had. Het antwoord stond in de meter:
+
+```js
+if (b.kanten.opgelost.some((d) => d.startsWith('server/'))) statisch.add(t);
+```
+
+De vraag die dit register beantwoordt is *als DIT bestand verandert, welk bewijs
+moet dan opnieuw?* Die gaat over elk bestand dat kan wijzigen. De as vroeg alleen
+naar `server/`, en telde daardoor als **blind** wat volstrekt bepaalbaar is:
+
+| klasse | toetsen |
+|---|---|
+| require-kant naar `server/` | 833 |
+| **alleen naar `scripts/`** (elke metertoets in dit huis) | **224** |
+| **alleen naar `public/`** (de schermtoetsen) | **78** |
+| geen opgeloste kant (start de server, praat HTTP) | 766 |
+
+302 van de 1068 gemelde blinde toetsen — **28%** — waren niet blind. En juist dat
+getal werd geciteerd als de schuld die Affected Proof Selection tegenhoudt.
+
+Met `BRONMAPPEN = ['server/', 'scripts/', 'public/']` op dezelfde halve ronde:
+
+| | voor | na |
+|---|---|---|
+| statische as | 833 | **1135** |
+| blinde vlek statisch alleen | 1068 | **766** |
+| zonder enig bereik (volle ring) | 829 | **530** |
+
+Drie dingen daar niet wegpoetsen.
+
+**De fout zat in de METER en niet in de code** — dezelfde klasse als de 118 "dode
+paden" van `SCHERMROUTES.json` en de 587 onbekende doelen van de aanroepgraaf, die
+allebei op nul eindigden (`CODE.md`). Een meter die te weinig weet, laat een huis
+denken dat het ondoorgrondelijk is.
+
+**De verbreding verzint geen bereik.** Er komen drie mappen bij die eigen,
+wijzigbare bron bevatten; een kant naar `node_modules/` of naar een ander
+toetsbestand zegt niets over dekking en telt niet mee. `test/veranderbereik.test.js`
+houdt vast dat een toets die nergens aan hangt eerlijk blind blijft.
+
+**De besturingsproef leunde op een sorteervolgorde, en dat was bijna een stil
+gat.** Hij gebruikte `TOETSEN[0]` als "toets zonder bereik". Door de verbreding
+kreeg juist die toets bereik, waarmee de proef niet meer kon aantonen dat de
+schuld stijgt als de waarneming wegvalt — hij zou groen zijn gebleven omdat de
+schuld niet meer kón stijgen, niet omdat de meter werkte. De blinde toets wordt nu
+uit een echte meting AFGELEID. Dat is dezelfde les als bij de AI-contextproef
+(`MENSNETWERK.md` par. 4c): *een instrument dat niet kan uitslaan, is geen
+instrument* — en een fixture die zijn eigenschap aan een index ontleent, verliest
+die zonder iets te zeggen.
+
 ## 8. De maatstaf
 
 Niet *"wanneer heeft RTG een bewijsmachine"* maar:
@@ -532,7 +633,7 @@ niet om iets over te slaan. Dat is precies de goede volgorde, en het is geen
 tegenvaller: een selector die vandaag zou versmallen, zou het op deze band doen.
 
 Vandaag is dat antwoord: van
-<!--getal:veranderbereik.statisch-->833<!--/getal--> toetsen langs de statische as,
-plus <!--getal:veranderbereik.gedicht-->239<!--/getal--> die de waarneming erbij
-haalt, en <!--getal:veranderbereik.zonder-->828<!--/getal--> waarover dit huis niets
+<!--getal:veranderbereik.statisch-->1135<!--/getal--> toetsen langs de statische as,
+plus <!--getal:veranderbereik.gedicht-->236<!--/getal--> die de waarneming erbij
+haalt, en <!--getal:veranderbereik.zonder-->530<!--/getal--> waarover dit huis niets
 weet. Dat laatste getal is het werk.

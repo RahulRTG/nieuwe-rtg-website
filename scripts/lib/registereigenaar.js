@@ -69,7 +69,8 @@ const EIGENAAR = {
      hier om dezelfde reden als de twee hieronder: het getal van toets 4 hoort te
      dalen doordat er eigenaren bijkomen, niet te stijgen doordat er registers
      bijkomen zonder dat iemand zegt wie ze bezit. */
-  'VERANDERBEREIK.json': { schrijver: 'scripts/veranderbereik.js' },
+  'VERANDERBEREIK-KENNIS.json': { schrijver: 'scripts/veranderbereik.js' },
+  'VERANDERBEREIK-RONDE.json': { schrijver: 'scripts/veranderbereik.js' },
   'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },

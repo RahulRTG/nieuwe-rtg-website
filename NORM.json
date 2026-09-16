@@ -120,7 +120,7 @@
     "stempelOngevraagd": 54,
     "stempelInPoort": 16,
     "stempelSchrijversGezien": 211,
-    "veranderbereikZonderBereik": 828,
+    "veranderbereikZonderBereik": 530,
     "stilLezing": 5,
     "stilLezingMeters": 61,
     "stilLezingBereik": 543,
@@ -130,7 +130,8 @@
     "afgeleidOnbeslist": 106,
     "afgeleidMetEigenaar": 174,
     "herbouwVerschilt": 0,
-    "herbouwBewezen": 14
+    "herbouwBewezen": 14,
+    "veranderbereikStatisch": 1135
   },
   "notities": [
     {
@@ -2850,7 +2851,7 @@
     "idemHandwerkGeenVergelijking": "2026-09-15",
     "neigingVerwijzingRot": "2026-09-15",
     "neigingVoorkeurBlind": "2026-09-15",
-    "veranderbereikZonderBereik": "2026-09-15",
+    "veranderbereikZonderBereik": "2026-09-16",
     "stilLezing": "2026-09-15",
     "stilLezingMeters": "2026-09-15",
     "stilLezingBereik": "2026-09-15",
@@ -2860,7 +2861,8 @@
     "afgeleidOnbeslist": "2026-09-16",
     "afgeleidMetEigenaar": "2026-09-16",
     "herbouwVerschilt": "2026-09-16",
-    "herbouwBewezen": "2026-09-16"
+    "herbouwBewezen": "2026-09-16",
+    "veranderbereikStatisch": "2026-09-16"
   },
   "uitzonderingen": [
     {

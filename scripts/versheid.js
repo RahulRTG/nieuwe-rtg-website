@@ -397,7 +397,8 @@ const REGISTERS = [
      hangen, dit zegt van welke TOETS het bronbestandbereik vaststaat. Zijn
      vastlegweg draagt --onvolledig omdat een halve ronde zichzelf niet stil mag
      vastleggen; een volle ronde heeft die vlag niet nodig. */
-  ['VERANDERBEREIK.json', 'npm run veranderbereik:vastleggen', 'van welke toets het bronbestandbereik vaststaat, langs de statische en de waargenomen as'],
+  ['VERANDERBEREIK-KENNIS.json', 'npm run veranderbereik:vastleggen', 'wat een toets KAN raken, afgeleid uit de code alleen -- duurzaam'],
+  ['VERANDERBEREIK-RONDE.json', 'npm run veranderbereik:vastleggen', 'wat er bij EEN uitvoering is waargenomen -- geen duurzame waarheid'],
   ['ACTIVERING.json', 'npm run activering:vast', 'wat een functie aanzetten werkelijk aanzet, met de graad van zekerheid erbij'],
   ['TREDEPROEF.json', 'node scripts/tredeproef.js --alle --vastleggen', 'of een trede lekt: zuiver, beproefd, de rondgang en de ingangen buiten HTTP'],
   ['WEKKERS.json', 'npm run wekkers:vast', 'de ingangen die geen route zijn (klok, bus, luisteraar, werker) en welke functie ze doen'],

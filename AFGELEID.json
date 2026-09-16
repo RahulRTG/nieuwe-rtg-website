@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-16T06:47:01.322Z",
-  "commit": "a1482931",
+  "op": "2026-09-16T07:33:30.586Z",
+  "commit": "42dcaf59",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 283,
+  "artefacten": 284,
   "bron": 2,
   "afgeleid": 157,
   "fragmenten": 18,
-  "momentopname": 0,
+  "momentopname": 1,
   "onbeslist": 106,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 173,
+  "metEigenaar": 174,
   "afgeleidEigenaarHard": 155,
   "afgeleidGrendelt": 16,
-  "metStempel": 85,
+  "metStempel": 86,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -323,6 +323,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEWIJSKOSTEN.json",
+   "soort": "MOMENTOPNAME",
+   "eigenaar": "scripts/bewijskosten.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/bewijskosten.js"
+   ],
+   "stempelInstrument": "scripts/bewijskosten.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {

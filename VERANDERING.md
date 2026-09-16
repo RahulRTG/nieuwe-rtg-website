@@ -440,6 +440,83 @@ zin van het hele voorstel:
 Het doel is dus niet minder toetsen, maar meer zekerheid per seconde — en zolang
 er 333 volle ringen staan, is er nog niets aantoonbaar overbodig.
 
+## 7d. De gezagspoort: alleen BEWEZEN mag door (16 september 2026)
+
+`b5053189` was de eerste commit met een correcte betekenis van BEWEZEN. Maar een
+juiste waarheid zonder harde consequentie is nog steeds te omzeilen, en daarom
+staat deze stap vóór alle andere: zolang een uitrolpoort niet mechanisch eist dat
+het oordeel BEWEZEN is, kan ONBEWEZEN er langs een verkeerd aangeroepen pad
+doorheen.
+
+**En dat pad bestond met naam en toenaam.** `afbouw:software` is de softwarepoort
+voor een uitrol — volledige suite, schermsuite, releasepoort, stagingrepetitie —
+aan elkaar geregen met `&&`. Dat is binair: hij stopt bij de eerste die valt en is
+anders klaar. Wat hij niet kon zeggen is of alle vier er ook wáren. En
+`afbouw:snel` heet bijna hetzelfde en draait er **twee**: de releasepoort en de
+stagingrepetitie, zonder de suite en zonder de schermsuite. Wie die voor een
+uitrol gebruikte, kreeg een groen dat de halve oppervlakte oversloeg.
+
+`scripts/afbouwoordeel.js` sluit dat. Hij draait geen enkele toets: hij LEEST per
+vereist bewijs of het er is, of het bij **deze commit** hoort en of het niet
+gezakt is, en hij hergebruikt `oordeelVan` uit `ci-lokaal.js` — die beslisregel
+krijgt hier geen tweede huis, want twee plekken die allebei bepalen wat BEWEZEN
+betekent, zeggen op een dag iets anders.
+
+| | |
+|---|---|
+| `npm run afbouw:oordeel` | leest en drukt af, altijd exit 0 |
+| `npm run afbouw:software` | eindigt op `afbouw:oordeel -- --eis-bewezen` |
+| `npm run afbouw:snel` | eindigt op `afbouw:oordeel` zónder vlag, en meldt dus eerlijk ONBEWEZEN |
+
+Drie dingen die daar niet mogen sneuvelen. **Een bewijs van gisteren is geen
+bewijs van vandaag**: een bewijsbestand dat bij een andere commit hoort telt als
+ontbrekend, en een bestand zónder commit ook — anders passeert een bewijs van een
+onbekend moment. **GEZAKT sluit de poort ook zonder de vlag**, want tegenbewijs
+telt altijd. En **de vlag staat in `package.json` en niet in een handleiding**:
+een release-, merge- of uitrolpoort mag de vrijblijvende stand niet gebruiken, en
+dat hoort mechanisch te zijn en geen afspraak.
+
+De negatieve proef hoort erbij en is de eigenlijke toets: `test/afbouwoordeel.test.js`
+zet een kunstmatige ronde neer en kijkt of de poort DICHT gaat — bij een
+ontbrekend bewijs, bij een gezakt bewijs, bij bewijs van een andere commit en bij
+bewijs zonder commit. Een poort waarvan niemand de gesloten stand heeft gezien, is
+geen poort. Twee mutaties nagetrokken: de vlag negeren laat er drie zakken, een
+vreemde commit laten meetellen laat er een zakken.
+
+### De regel die hierboven hangt
+
+> **Een bewijsoptimalisatie mag nooit zelf de enige reden zijn waarom haar eigen
+> onjuistheid niet meer waarneembaar is.**
+
+Dat is geen stijlregel maar de grens onder alles wat hierna komt. Zegt een
+selector straks dat toetsen A–Z niet hoeven te draaien, en was juist toets Q de
+enige die had kunnen aantonen dát die selector ernaast zat, dan heeft de
+optimalisatie haar eigen tegenbewijs opgeruimd. Daarom blijft er ook ná activering
+een onafhankelijke steekproef die de volle ronde draait — niet als
+zekerheidshalve-extra, maar omdat het de enige plek is waar een fout van de
+selector nog zichtbaar kan worden.
+
+Daaruit volgen drie onafhankelijke lagen, en de derde is degene die vaak wordt
+vergeten: bereik voorspellen → gericht bewijzen → **gezagspoort** → uitrol, met
+daarnaast een onafhankelijke shadow- of volledige controle die bij een
+**BEREIKGAT** het bewijs van de selector DEGRADEERT. Een false negative hoort geen
+statistiekje slechter te maken; hij hoort de bewijsgraad van die selector te laten
+zakken en versmalling voor dat bereik te stoppen tot het gat verklaard en opnieuw
+bewezen is. Dat is een zelfcorrigerend systeem in plaats van een eenmalig
+gecertificeerde selector — en het is de reden dat stap 7 (de selector laten
+promoveren) vóór stap 8 (versmallen) staat.
+
+### De nulmeting waartegen dit alles gemeten wordt
+
+Op `b5053189`, de eerste volledig doorgemeten commit: **734 toetsen uit de blinde
+vlek, 333 volle ringen over, 0 `nietInDezeRonde`, 1900 van 1900 toetsbestanden
+werkelijk gedraaid.** Vanaf hier is te meten of een optimalisatie de onbekendheid
+verlaagt zónder de waargenomen failure-capture te verslechteren. Let op de naam
+van dat tweede getal: het is **geen recall**, want *alle toetsen die hadden kunnen
+breken* is geen waarneembare noemer. Waargenomen failures binnen de selectie
+gedeeld door alle waargenomen failures — en zo hoort het op een scherm te staan,
+anders leest 100% als een garantie die niemand kan geven.
+
 ## 8. De maatstaf
 
 Niet *"wanneer heeft RTG een bewijsmachine"* maar:

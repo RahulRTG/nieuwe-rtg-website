@@ -377,8 +377,8 @@ if (require.main === module) {
   /* GEEN process.exit NA EEN GROTE UITVOER. Naar een BESTAND gaat dat goed
      (node schrijft dan synchroon), naar een PIPE niet: de poortwacht verloor zo
      twee derde van 484 KB -- geldige tekst, kapotte JSON, exitcode 0. Met
-     exitCode loopt de pijp eerst leeg. Zie test/meetkeuring.test.js, regel
-     `pipe`, die deze meter er prompt op betrapte. */
+     exitCode loopt de pijp eerst leeg. De proef in test/meetkeuring.test.js
+     met de naam `pipe` betrapte deze meter daar prompt op. */
   if (argv.includes('--json')) { console.log(JSON.stringify(uitslag, null, 2)); return; }
 
   if (argv.includes('--controle')) {

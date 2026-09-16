@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-16T07:45:06.522Z",
-    "commit": "80a92111",
+    "op": "2026-09-16T07:51:13.942Z",
+    "commit": "ab17bdf5",
     "boomVuil": true,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/bewijskosten.js",
     "node": "v22.22.2"
   },
@@ -11,6 +11,7 @@
   "grens": "machineversterking en mensversterking worden nooit opgeteld: de eerste mag groeien (een generator schrijft die regels in seconden), de tweede hoort naar nul. Een versterkingsfactor over nul bronregels is ONBEPAALD en geen nul. En `onbewezen` is geen `handwerk`: niet bewezen herbouwbaar is iets anders dan bewezen niet-herbouwbaar.",
   "gemeten": {
     "bereik": "3f11d577e566de3a3137b6e79666cf5084f95c05..HEAD",
+    "bereikOpgelost": "3f11d577e566de3a3137b6e79666cf5084f95c05..ab17bdf5436a24c9745922a48e71276c9674089c",
     "zekerheid": {
       "ratelTanden": {
         "bron": "NORM.json",
@@ -51,17 +52,17 @@
     },
     "opbrengst": {
       "geenEnkelCijfer": "de soorten zekerheid hebben verschillende eenheden en worden niet opgeteld; twee van de vier registers ontstonden in dit bereik en een sprong vanaf \"bestond niet\" is geen vooruitgang op een schaal maar een nieuwe schaal",
-      "menselijkGetypteRegels": 5861,
+      "menselijkGetypteRegels": 6047,
       "perSoort": {
         "ratelTanden": {
           "delta": 11,
           "eenheid": "tand(en)",
-          "menselijkeRegelsPerEenheid": 533
+          "menselijkeRegelsPerEenheid": 550
         },
         "toetsenBewezenGevoelig": {
           "delta": 7,
           "eenheid": "toetsbestand(en)",
-          "menselijkeRegelsPerEenheid": 837
+          "menselijkeRegelsPerEenheid": 864
         },
         "artefactenMetEigenaar": {
           "delta": null,
@@ -73,7 +74,7 @@
         }
       }
     },
-    "commits": 65,
+    "commits": 66,
     "samenvoegingen": 3,
     "omvang": {
       "intentie": {
@@ -83,12 +84,12 @@
       },
       "bewijs": {
         "bestanden": 21,
-        "erbij": 3494,
+        "erbij": 3680,
         "eraf": 28
       },
       "afgeleid": {
         "bestanden": 31,
-        "erbij": 7045,
+        "erbij": 7169,
         "eraf": 322
       },
       "document": {
@@ -103,10 +104,10 @@
       }
     },
     "bronRegels": 1804,
-    "bewijsRegels": 3522,
-    "afgeleideRegels": 7367,
-    "machineVersterking": 4.08,
-    "bewijsVersterking": 1.95,
+    "bewijsRegels": 3708,
+    "afgeleideRegels": 7491,
+    "machineVersterking": 4.15,
+    "bewijsVersterking": 2.06,
     "versterkingOnbepaald": null,
     "driftConflicten": 44,
     "driftHandmatig": 6,
@@ -359,6 +360,7 @@
     "waarom": "de eerste commit van deze campagne die groen door de hele keten kwam (CI-ronde 4593); een latere ronde is pas duurder of goedkoper als je weet waartegen",
     "gemeten": {
       "bereik": "3f11d577e566de3a3137b6e79666cf5084f95c05..fcf44574",
+      "bereikOpgelost": "3f11d577e566de3a3137b6e79666cf5084f95c05..fcf44574dc5d2550877d67a99f9311c19f162962",
       "zekerheid": {
         "ratelTanden": {
           "bron": "NORM.json",

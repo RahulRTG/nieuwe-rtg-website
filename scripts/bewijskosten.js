@@ -312,6 +312,14 @@ function meet(bereik) {
 
   return {
     bereik,
+    /* HET BEREIK OPGELOST NAAR TWEE SHA'S, en dat is wat een MOMENTOPNAME
+       bruikbaar maakt. `3f11d577..HEAD` betekent morgen iets anders dan vandaag;
+       een uitslag die niemand kan herhalen is geen meting. Let op het gevolg dat
+       je niet moet wegpoetsen: de commit die DIT register toevoegt zit per
+       definitie niet in het bereik dat het beschrijft. Dat is geen achterstand
+       maar de vorm van een momentopname -- hem najagen tot hij zichzelf bevat,
+       convergeert nooit. */
+    bereikOpgelost: git('rev-parse', basis).trim() + '..' + git('rev-parse', top || 'HEAD').trim(),
     zekerheid,
     opbrengst: {
       geenEnkelCijfer: 'de soorten zekerheid hebben verschillende eenheden en worden niet opgeteld; ' +

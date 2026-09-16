@@ -121,6 +121,14 @@ test('8. de besturingsproef: een opdracht die niets schrijft heet nietGeschreven
   }
 });
 
+test('een time-out ruimt de eigen procesgroep op', () => {
+  const r = beproef('AFGELEID.json', {
+    opdracht: 'exec node -e "setInterval(() => {}, 1000)"', herkomst: 'toets'
+  }, 100);
+  assert.equal(r.uitslag, 'nietGedraaid');
+  assert.equal(r.kringWeg, true, 'de procesgroep mag na de time-out niet blijven draaien');
+});
+
 test('9. de aanroep wordt afgeleid en nergens als vierde lijst verklaard', () => {
   const npmScripts = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8')).scripts;
   /* versheid wint van package.json ... */

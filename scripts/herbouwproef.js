@@ -235,7 +235,7 @@ function beproef(naam, aanroep, wachtMs) {
   const voor = fs.readFileSync(pad, 'utf8');
   const mtimeVoor = fs.statSync(pad).mtimeMs;
   const begon = Date.now();
-  /* VIA setsid, EN DAT IS GEEN NETHEID MAAR EEN GEMETEN LEK.
+  /* EEN EIGEN PROCESGROEP, EN DAT IS GEEN NETHEID MAAR EEN GEMETEN LEK.
 
      Met `shell: true` doodt de wachttijd alleen de schil. Nagemeten op
      DEKKING.json: `npm run dekking:vast` liep af op 240s, de proef noteerde
@@ -246,12 +246,13 @@ function beproef(naam, aanroep, wachtMs) {
      met een tussenpoos die niemand kan reproduceren. Precies de opstapeling die
      scripts/mutatie.js beschrijft.
 
-     `setsid` exect hier in de plaats van het kind (het is nog geen
-     groepsleider), dus `r.pid` IS de sessie- en groepsleider en `kill(-pid)`
-     haalt de hele kring om. Dat gebeurt ALTIJD en niet alleen na een
+     Node maakt met detached een eigen sessie en procesgroep op Linux en macOS;
+     een los setsid-programma ontbreekt op macOS. `r.pid` is de groepsleider en
+     `kill(-pid)` haalt de hele kring om. Dat gebeurt ALTIJD en niet alleen na een
      wachttijd -- een generator die een dienst achterlaat, is net zo goed een
      wees. */
-  const r = spawnSync('setsid', ['sh', '-c', aanroep.opdracht], {
+  const r = spawnSync('sh', ['-c', aanroep.opdracht], {
+    detached: true,
     cwd: WORTEL, encoding: 'utf8', timeout: wachtMs, killSignal: 'SIGKILL',
     maxBuffer: 64 * 1024 * 1024, env: Object.assign({}, process.env, { RTG_HERBOUWPROEF: '1' })
   });
@@ -262,6 +263,8 @@ function beproef(naam, aanroep, wachtMs) {
       reden: 'over de wachttijd van ' + Math.round(wachtMs / 1000) + 's heen' +
         (kringWeg ? '' : ' -- EN DE PROCESKRING LEEFT NOG') };
   }
+  if (r.error) return { uitslag: 'nietGedraaid', duurMs, kringWeg,
+    reden: 'de opdracht kon niet starten: ' + r.error.message };
   const na = fs.readFileSync(pad, 'utf8');
   const mtimeNa = fs.statSync(pad).mtimeMs;
   /* DE BESTURINGSPROEF. Niet aangeraakt is niet hetzelfde als hetzelfde

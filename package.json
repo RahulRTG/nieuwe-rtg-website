@@ -377,6 +377,8 @@
     "soeverein:vast": "node scripts/soeverein.js --vastleggen",
     "doorbelasting": "node scripts/doorbelasting.js",
     "doorbelasting:vast": "node scripts/doorbelasting.js --vastleggen",
+    "planvorm": "node scripts/planvorm.js",
+    "planvorm:vast": "node scripts/planvorm.js --vastleggen",
     "aanvoervorm": "node scripts/aanvoervorm.js",
     "aanvoervorm:vast": "node scripts/aanvoervorm.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",

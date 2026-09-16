@@ -153,35 +153,6 @@
     if (klok && klok.unref) klok.unref();
     d.addEventListener('visibilitychange', function () { if (!d.hidden) kijkNaarKlok(); });
 
-    var menu = d.getElementById('mobileNav');
-    var menuKnop = d.getElementById('menuButton');
-    var sluitKnop = d.getElementById('menuClose');
-    var achtergrond = d.getElementById('menuBackdrop');
-    var vorigeFocus = null;
-    function sluitMenu() {
-      if (!menu || menu.hidden) return;
-      menu.hidden = true;
-      achtergrond.hidden = true;
-      d.body.classList.remove('menu-open');
-      menuKnop.setAttribute('aria-expanded', 'false');
-      if (vorigeFocus) vorigeFocus.focus();
-    }
-    function openMenu() {
-      if (!menu) return;
-      vorigeFocus = d.activeElement;
-      menu.hidden = false;
-      achtergrond.hidden = false;
-      d.body.classList.add('menu-open');
-      menuKnop.setAttribute('aria-expanded', 'true');
-      var eerste = menu.querySelector('a,button');
-      if (eerste) eerste.focus();
-    }
-    if (menuKnop) menuKnop.addEventListener('click', openMenu);
-    if (sluitKnop) sluitKnop.addEventListener('click', sluitMenu);
-    if (achtergrond) achtergrond.addEventListener('click', sluitMenu);
-    if (menu) menu.querySelectorAll('a').forEach(function (link) { link.addEventListener('click', sluitMenu); });
-    d.addEventListener('keydown', function (event) { if (event.key === 'Escape') sluitMenu(); });
-
     d.querySelectorAll('[data-language-button],#languageButton').forEach(function (knop) {
       knop.addEventListener('click', function () {
         if (w.RTGi18n && typeof w.RTGi18n.openModal === 'function') w.RTGi18n.openModal();

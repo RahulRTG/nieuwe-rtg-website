@@ -822,6 +822,18 @@ const METERS = [
   { sleutel: 'stilLezingMeters', richting: 'omlaag', wat: 'meters die een onleesbaar register als afwezig behandelen (STILLEZING.json)' },
   { sleutel: 'stilLezingBereik', richting: 'omhoog', wat: 'bewijslezingen die de stillezingmeter werkelijk heeft gevonden' },
   { sleutel: 'bewijsOnderscheidt', richting: 'omhoog', wat: 'lezers die ONGELDIG onderscheiden van LEEG in plaats van samen te smelten' },
+  /* GENERATOR-EIGENAARSCHAP (AFGELEID.json, npm run afgeleid). Het contract:
+     elk artefact dat repo-waarheid claimt en niet door een mens is geschreven,
+     heeft PRECIES EEN machinaal vindbare generator-eigenaar.
+
+     `afgeleidOnbeslist` is de tand die een VERDWENEN generator vangt: valt
+     scripts/kaart.js weg, dan zakt ARCHITECTUUR.md van AFGELEID naar ONBESLIST
+     en stijgt dit getal. Daarom mag hij alleen dalen -- en daarom staat
+     `afgeleidMetEigenaar` ernaast, want een dalende onbesliste stand kan ook
+     betekenen dat het bereik is gekrompen. */
+  { sleutel: 'afgeleidZonderEigenaar', richting: 'omlaag', wat: 'afgeleide artefacten zonder canonieke generator-eigenaar (AFGELEID.json)' },
+  { sleutel: 'afgeleidOnbeslist', richting: 'omlaag', wat: 'wortelartefacten waarvan niemand heeft gezegd of ze bron of afgeleid zijn' },
+  { sleutel: 'afgeleidMetEigenaar', richting: 'omhoog', wat: 'artefacten die een eigenaar horen te hebben en er aantoonbaar een hebben' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
      beter.
@@ -1540,6 +1552,9 @@ function meet(bronnen) {
     stilLezingMeters: leesRegister('STILLEZING.json', (j) => j.gemeten.scripts.smeltSamen),
     stilLezingBereik: leesRegister('STILLEZING.json', (j) => j.gemeten.server.bewijslezingen + j.gemeten.scripts.bewijslezingen),
     bewijsOnderscheidt: leesRegister('STILLEZING.json', (j) => j.gemeten.server.onderscheidt + j.gemeten.scripts.onderscheidt),
+    afgeleidZonderEigenaar: leesRegister('AFGELEID.json', (j) => j.gemeten.afgeleidZonderEigenaar),
+    afgeleidOnbeslist: leesRegister('AFGELEID.json', (j) => j.gemeten.onbeslist),
+    afgeleidMetEigenaar: leesRegister('AFGELEID.json', (j) => j.gemeten.metEigenaar),
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),

@@ -131,6 +131,7 @@ const REGISTERS = [
   ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
   ['STILSPOOR.json', 'npm run stilspoor:vast', 'schrijfacties waarvan het falen stil wordt weggevangen (LAT.md regel 21)'],
   ['STILLEZING.json', 'npm run stillezing:vast', 'lezers die een onleesbaar bewijs als een afwezig bewijs behandelen (BEWIJSMACHINE.md par. 6b)'],
+  ['AFGELEID.json', 'npm run afgeleid:vast', 'welk artefact bron is en welk afgeleid, en wie het opnieuw mag afleiden'],
   ['IDEMIDENTITEIT.json', 'npm run idemidentiteit', 'waaraan twee aanroepen hetzelfde verzoek heten (MUTATIECONTRACT.md par. 6e)'],
   ['LAATSTE_METING.json', 'npm run beproeving', 'de laatste stormproef, ook wanneer hij zakt'],
   ['HEAPPROEF.json', 'npm run heapproef', 'geheugengedrag onder herhaalde verzoeken'],

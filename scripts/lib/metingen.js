@@ -120,6 +120,12 @@ const REGISTER = {
      een handeling tegenover, in scripts/ een meting), het bereik omhoog, en het
      aantal lezers dat het onderscheid wel maakt omhoog. */
   'STILLEZING.json': { meter: ['stilLezing', 'stilLezingMeters', 'stilLezingBereik', 'bewijsOnderscheidt'] },
+  /* WIE MAG DIT ARTEFACT OPNIEUW AFLEIDEN (AFGELEID.json, npm run afgeleid).
+     Drie tanden: geen enkel AFGELEID artefact zonder canonieke eigenaar, de
+     onbesliste stand omlaag, en de dekking omhoog. Die derde is niet optioneel:
+     `onbeslist` daalt ook als het BEREIK krimpt, en dan leest een verdwenen
+     generator als vooruitgang. */
+  'AFGELEID.json': { meter: ['afgeleidZonderEigenaar', 'afgeleidOnbeslist', 'afgeleidMetEigenaar'] },
   /* IDEMIDENTITEIT.json (npm run idemidentiteit) beantwoordt wat na #269/#270
      overbleef: waar is de identiteit van een verzoek nog te smal? Drie tanden,
      een omhoog en twee omlaag -- zie de kop bij die tanden in ../norm.js. */

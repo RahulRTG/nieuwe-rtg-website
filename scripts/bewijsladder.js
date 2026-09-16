@@ -72,7 +72,12 @@ const LADDER = [
     patronen: [/check\.js$/, /ast-scan\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /ci-lokaal\.js$/,
       /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /^git diff$/] },
   { id: 'geraakt', naam: 'Wat kan deze wijziging raken', wat: 'de affected-graaf: welk bewijs moet opnieuw',
-    patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /verstrengeling\.js$/, /activering\.js$/] },
+    patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /verstrengeling\.js$/, /activering\.js$/,
+      /* De Evidence Engine is dezelfde sport op bewijsniveau: basisbewijs
+         vinden, impact classificeren, geselecteerd herbewijzen en fail-closed
+         het eindoordeel vellen. Eén familiepatroon voorkomt een nieuwe restbak
+         zodra hier nog een smalle evidence-poort bijkomt. */
+      /evidence(?:-base|-gate)?\.js$/] },
   { id: 'eenheid', naam: 'Eenheid, contract en bevoegdheid', wat: 'de toetssuite zelf, plus de as-proeven per route',
     patronen: [/test-runner\.js$/, /pgtoetsen\.js$/, /isolatiepoort\.test\.js$/, /mutatiecontract\.js$/,
       /(rolproef|invoerproef|idemproef|staatproef|uitvoerproef|auditproef|handelingproef)-route\.js$/, /mutatie\.js$/,

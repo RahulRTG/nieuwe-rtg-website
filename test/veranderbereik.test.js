@@ -376,3 +376,43 @@ test('een toets die nergens aan hangt blijft eerlijk blind', () => {
   assert.equal(u.per[BLIND].volleRing, true,
     'de verbreding mag geen bereik VERZINNEN waar geen require-kant is');
 });
+
+/* ---- 10. EEN GESCHEURD PAAR IS ZICHTBAAR ---------------------------------
+   `ronde` en het journaal zijn twee bestanden met een EIGEN levensduur:
+   `.toetsduur` groeit aan over rondes heen, een journaal wordt per ronde
+   geschreven. Komen ze uit verschillende uitvoeringen, dan zegt de ronde dat
+   alles draaide terwijl het journaal vrijwel niets kent -- en de meter noemt al
+   die toetsen `draaideZonderRoute`. Dat is precies de stand die leest als
+   "prima, een in-proces toets": een MEETGAT wordt stilletjes een EIGENSCHAP.
+
+   ZO IS HET ECHT MISGEGAAN (16 september 2026). Een afgekapte ronde liet
+   `.toetsduur` van een EERDERE volle ronde staan. De meter las 1685 gedraaid
+   tegen 160 in het journaal, telde 454 `draaideZonderRoute`, en meldde 654
+   volle ringen waar de echte ronde er 246 had.
+
+   `toetsenMetJournaalregel` zet het paar op tafel. GEEN drempel en geen oordeel:
+   er is geen ronde-identiteit om twee bestanden mee te vergelijken, dus de meter
+   verzint er geen -- hij toont 160 naast 1685 en de lezer ziet het.
+
+   MUTATIE: het veld vullen met `ronde.size` in plaats van met de doorsnede ->
+   deze toets zakt, gedraaid. */
+test('een ronde en een journaal uit verschillende uitvoeringen zijn te zien aan het paar', () => {
+  /* Een journaal dat maar EEN toets noemt, tegen een ronde die de hele suite
+     claimt -- de vorm van een afgekapte ronde naast een oude .toetsduur. */
+  const gescheurd = meet([journaal(['TOETS ' + ECHTE.route + ' ' + A])], ronde(TOETSEN));
+
+  assert.equal(gescheurd.gemeten.toetsenInDezeRonde, TOETSEN.length,
+    'de ronde beweert dat de hele suite draaide');
+  assert.equal(gescheurd.gemeten.toetsenMetJournaalregel, 1,
+    'terwijl het journaal er precies een kent -- en juist dat verschil is het signaal');
+  assert.ok(gescheurd.gemeten.draaideZonderRoute > 1,
+    'zonder dat paar leest deze berg als een eigenschap van de suite');
+
+  /* En de tegenproef: bij een journaal dat WEL bij de ronde hoort, lopen de
+     twee getallen samen op. Anders zou het veld altijd "gescheurd" roepen. */
+  const heel = meet([journaal(TOETSEN.slice(0, 3).map(
+    (t) => 'TOETS ' + ECHTE.route + ' ' + t))], ronde(TOETSEN.slice(0, 3)));
+  assert.equal(heel.gemeten.toetsenInDezeRonde, 3);
+  assert.equal(heel.gemeten.toetsenMetJournaalregel, 3,
+    'een ronde en een journaal uit DEZELFDE uitvoering lopen gelijk op');
+});

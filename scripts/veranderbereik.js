@@ -352,6 +352,24 @@ function meet(paden, rondePaden) {
       /* DE RONDE. Zonder dit getal leest 'zonderBereik' als een uitspraak over
          de hele suite, terwijl een halve ronde hem vanzelf opblaast. */
       toetsenInDezeRonde: ronde ? ronde.size : null,
+      /* HOEVEEL VAN DIE TOETSEN HET JOURNAAL UBERHAUPT KENT -- en dit getal is
+         er omdat het hier echt is misgegaan (16 september 2026).
+
+         `ronde` en het journaal zijn TWEE bestanden met een eigen levensduur.
+         `.toetsduur` groeit aan over rondes heen; een journaal wordt per ronde
+         geschreven. Draai je een suite die halverwege wordt afgekapt zonder
+         `.toetsduur` eerst te wissen, dan zegt de ronde "1684 gedraaid" terwijl
+         het journaal er 160 kent -- en de meter noemt de overige 1524 keurig
+         `draaideZonderRoute`. Dat is precies de stand die leest als "prima, een
+         in-proces toets": een MEETGAT wordt stilletjes een EIGENSCHAP, en de
+         schuld sprong van 246 naar 654 zonder dat er iets mis was met de code.
+
+         GEEN DREMPEL EN GEEN OORDEEL. De meter kan niet weten of twee bestanden
+         uit dezelfde ronde komen -- er is geen ronde-identiteit om op te
+         vergelijken -- dus hij verzint er geen. Hij zet het PAAR op tafel
+         (1684 tegen 160) en laat de lezer zien dat de waarneming dun is. Een
+         drempel zou een gok zijn die op een dag de verkeerde kant op valt. */
+      toetsenMetJournaalregel: ronde ? [...ronde].filter((t) => perToets.has(t)).length : null,
       /* HEEFT DE RONDE DE HELE SUITE GEDRAAID? Zonder dit kan niemand zien of
          `zonderBereik` een schuld is of een tekort van de ronde. */
       /* LIDMAATSCHAP EN NIET AANTAL, en dat verschil is echt gebleken. De eerste
@@ -495,6 +513,7 @@ function rondeVan(u) {
       journaalregels: g.journaalregels,
       kantenZonderEigenaar: g.kantenZonderEigenaar,
       toetsenInDezeRonde: g.toetsenInDezeRonde,
+      toetsenMetJournaalregel: g.toetsenMetJournaalregel,
       rondeVolledig: g.rondeVolledig,
       rondeVreemdeNamen: g.rondeVreemdeNamen,
       rondeGemist: g.rondeGemist,
@@ -526,6 +545,14 @@ function toon(u) {
   } else {
     console.log('      draaide, raakte geen route' + String(g.draaideZonderRoute).padStart(5) +
       '   -> een in-proces toets; dat is een eigenschap');
+    /* HET PAAR OP TAFEL. Staat hier 1685 tegen 160, dan is de regel hierboven
+       niet waar: dan komen ronde en journaal uit verschillende uitvoeringen en
+       is een MEETGAT als EIGENSCHAP geteld. Geen drempel, geen oordeel -- de
+       twee getallen naast elkaar en de lezer ziet het. */
+    console.log('    ' + K.grijs + 'van die ronde kent het journaal er ' +
+      g.toetsenMetJournaalregel + ' van ' + g.toetsenInDezeRonde +
+      '; loopt dat ver uiteen, dan komen ronde en journaal niet uit dezelfde uitvoering' +
+      K.reset);
     console.log('      draaide niet in deze ronde ' + String(g.nietInDezeRonde).padStart(5) +
       '   -> hierover is niets gemeten');
     console.log('    ' + K.grijs + 'ronde: ' + (g.toetsbestanden - g.rondeGemist) + ' van ' +

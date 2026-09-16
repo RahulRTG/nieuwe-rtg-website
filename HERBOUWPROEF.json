@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-16T06:44:07.296Z",
-    "commit": "b87ebd5d",
+    "op": "2026-09-16T06:45:18.524Z",
+    "commit": "b10def58",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/herbouwproef.js",
@@ -160,7 +160,7 @@
         "npm run mutatiecontract -- --vastleggen"
       ],
       "raakteOok": [],
-      "duurMs": 4455,
+      "duurMs": 4950,
       "exitcode": 0,
       "uitslag": "alleenStempel",
       "verschilIn": [
@@ -178,7 +178,7 @@
         "npm run mutatieinventaris -- --vastleggen"
       ],
       "raakteOok": [],
-      "duurMs": 3994,
+      "duurMs": 4039,
       "exitcode": 0,
       "uitslag": "alleenStempel",
       "verschilIn": [
@@ -189,15 +189,15 @@
       "naam": "MUTATIESEMANTIEK.json",
       "soort": "AFGELEID",
       "eigenaar": "scripts/mutatiesemantiek.js",
-      "opdracht": "node scripts/mutatiesemantiek.js -- --vastleggen",
+      "opdracht": "node scripts/mutatiesemantiek.js --vastleggen",
       "opdrachtHerkomst": "eigenaar+vlag",
       "geprobeerd": [
         "node scripts/mutatiesemantiek.js",
-        "node scripts/mutatiesemantiek.js -- --json",
-        "node scripts/mutatiesemantiek.js -- --vastleggen"
+        "node scripts/mutatiesemantiek.js --json",
+        "node scripts/mutatiesemantiek.js --vastleggen"
       ],
       "raakteOok": [],
-      "duurMs": 129,
+      "duurMs": 115,
       "exitcode": 0,
       "uitslag": "alleenStempel",
       "verschilIn": [

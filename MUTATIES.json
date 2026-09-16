@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-15T19:33:06.162Z",
-    "commit": "f6cb0232",
+    "op": "2026-09-16T06:19:23.560Z",
+    "commit": "45096c5c0",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -210,6 +210,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "idem, met echte processen; de vijf handmutaties vonden er twee echte gaten mee (hartslag, PASSED-only)"
+    },
+    "afbouwoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/afbouwoordeel.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
     },
     "afbouwpoort.test.js": {
       "soort": "puur",
@@ -9915,14 +9923,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "afbouwoordeel.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/afbouwoordeel.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 2
     }
   }
 }

@@ -451,7 +451,9 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     /* EEN WERELD AANRAKEN OPENT GEEN DEUR. Dit is de kern van de keuze: de bank
        is voor het inloggen een uitnodiging, geen menu. Zonder deze stap zou een
        gesloten werktafel met werkende knoppen erdoorheen glippen. */
-    await page.click('.cmd-nav button');
+    // The retired bank is hidden; test its authorization handler directly.
+    // Visible navigation is exclusively through the shared Edge (portal suite).
+    await page.locator('.cmd-nav button').first().evaluate(button => button.click());
     /* Hij hoort GEEN blad te openen maar de cursor op de deur te zetten; dat is
        de toestand om op te wachten -- en die komt, of de bewering zakt. */
     await wachtTot(page, () => document.activeElement && document.activeElement.id === 'agPasskey',
@@ -523,7 +525,9 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
     });
     await page.route('**/api/webauthn/login', async route => {
       loginBody = route.request().postDataJSON();
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token }) });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token, ...(await (await fetch(srv.base + '/api/state', {
+        method: 'POST', headers: { 'Content-Type':'application/json', Authorization:'Bearer '+token }, body:'{}'
+      })).json()) }) });
     });
 
     /* `waitUntil: 'domcontentloaded'` wacht op ELK subverzoek -- elk plaatje, elk lettertype

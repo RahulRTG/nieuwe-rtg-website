@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '247b12c2';
+var RTG_BOUW = 'dc4421c0';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -404,11 +404,8 @@ var RTG_BOUW = '247b12c2';
   // meteen: de poort spreekt de taal van de gekozen ingang (?pas=...)
   stemKoppen();
 
-  /* De poort is een gesprek met Rahul (zie app-main-06): inloggen, aanmelden en
-     wachtwoord-herstel gaan alle drie via dat gesprek. De oude formulieren
-     (loginForm/regForm/forgotForm/resetForm met hun wisselknoppen) staan niet
-     meer in app.html; hun afhandeling hoort hier dus ook niet meer te staan. Wat
-     blijft, zijn de LINKS uit de e-mail: die komen los van de poort binnen. */
+  /* The account portal submits to the existing login, registration and recovery
+     routes. Verification links still enter independently of the visible step. */
   (function bevestigEmailLink(){
     const token = new URLSearchParams(location.search).get('verify');
     if (!token) return;
@@ -433,10 +430,12 @@ var RTG_BOUW = '247b12c2';
     if (cred){
       if (API.enabled){
         try {
-          const data = cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: vastePas || undefined,
+          const data = cred.response || (cred.register
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: cred.portal ? 'rtg' : vastePas || undefined,
                 wervingscode: wervingscode || undefined })
-            : await API.call('/auth/login', { login: cred.u, password: cred.p, pasApp: vastePas || undefined });
+            : await API.call('/auth/login', { login: cred.u, password: cred.p, pasApp: vastePas || undefined }));
+          if (data.tweedeFactorNodig) return data;
+          if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
           API.token = data.token;
           applyState(data.state);           // user = het echte account
           tier = user.tier;
@@ -460,9 +459,9 @@ var RTG_BOUW = '247b12c2';
           if (!magHier.includes(user.tier) && ['rtg', 'lifestyle', 'business'].includes(doelPas)){
             try { localStorage.setItem('rtg_member_token', API.token); } catch (e2) {}
             location.replace(pasAdres(doelPas));
-            return;
+            return true;
           }
-        } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
+        } catch (e) { throw e; }
       } else {
         /* HIER STOND EEN WACHTWOORD IN DE CLIENT. De tak controleerde
            letterlijk op een naam en een wachtwoord en gaf daarna de
@@ -497,6 +496,7 @@ var RTG_BOUW = '247b12c2';
     }
     loadSocial();
     checkOnboarding(); laadAgendaLid();
+    return true;
   }
 
   // Blijf ingelogd: met een bewaard token slaat de app het startscherm over.
@@ -547,889 +547,257 @@ var RTG_BOUW = '247b12c2';
     location.reload();
   }
 
-  /* De poort is van Rahul: inloggen, aanmelden EN wachtwoord-herstel als een
-     gesprek. Er zijn geen ouderwetse formulieren meer; Rahul is de enige poort.
-     Hij ontdekt zelf of je terugkomt of nieuw bent, vraagt subtiel wat hij
-     nodig heeft en legt op "waarom?" uit waarvoor iets dient. Alle paden
-     eindigen op de bestaande routes: aanmelden via login() -> /auth/register,
-     inloggen via login() -> /auth/login, herstel via /auth/reset. Het
-     wachtwoord van een terugkerend lid gaat NOOIT door het gespreks-endpoint
-     maar rechtstreeks naar de inlogroute. In beeld: de klok, Rahuls
-     signatuurmond van bewegende lichtpuntjes, zijn zin en de ene regel van de
-     gebruiker. Deelt de IIFE-scope met 00-kern-03.js (login, restoreSession,
-     API, T). */
-  (function aanmeldGesprek(){
+  /* One access portal, using the existing authentication and onboarding routes.
+     Draft details stay in memory; passwords go directly to auth, never to chat. */
+  (function aanmeldPortaal(){
     const gate = document.getElementById('gate');
     if (!gate || !API.enabled) return;
-    const st = document.createElement('style');
-    st.textContent =
-      '.ag-doos{display:flex;flex-direction:column;width:100%;}' +
-      // geen chatbubbels: alleen Rahuls zin, groot en stil in Bodoni, en
-      // daaronder de ene regel van de gebruiker; verder niets
-      /* VASTE KLEUR, GEEN MEEBEWEGENDE. Deze zin is het enige wat je aan de
-         poort te lezen krijgt, op een donkere sterrenhemel. Hij stond op
-         var(--txt), en die schuift mee met de dagkleur: afhankelijk van het
-         tijdstip werd hij warmer en doffer, en een gebruiker meldde dat de
-         letters bij hem niet zo wit waren. Leesbaarheid van de enige tekst op
-         het scherm hoort niet van het uur van de dag af te hangen. CLAUDE.md
-         is hier ook duidelijk over: op zwart is de tekstkleur wit. */
-      ".ag-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.12rem;line-height:1.65;color:#FBFAF8;" +
-        'text-align:center;min-height:4.6rem;display:flex;align-items:center;justify-content:center;' +
-        'padding:0.9rem 0.4rem 1.1rem;text-wrap:balance;animation:agZin 0.5s ease;}' +
-      '@keyframes agZin{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}' +
-      '.ag-rij{display:flex;align-items:center;border-bottom:1px solid var(--line);margin:0 0.6rem;transition:border-color 0.2s;}' +
-      '.ag-rij[hidden]{display:none;}' +
-      '.ag-rij:focus-within{border-color:var(--burgundy);}' +
-      '.ag-rij input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--txt);' +
-        "font-family:'Inter',sans-serif;font-size:0.95rem;text-align:center;padding:0.75rem 0.4rem;}" +
-      '.ag-rij input::placeholder{color:var(--soft);}' +
-      '.ag-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;' +
-        'padding:0.4rem 0.2rem;opacity:0;transition:opacity 0.2s;font-family:inherit;}' +
-      '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}' +
-      '.ag-mond{display:block;margin:0.15rem auto 0.3rem;width:220px;height:100px;}' +
-      // De passkey is de voordeur: groot genoeg als eerste handeling, maar nog
-      // steeds in de stille horlogetaal van het huis.
-      '.ag-passkey{margin:0.95rem auto 0;background:color-mix(in srgb,var(--gold,#857007) 10%,transparent);' +
-        'border:1px solid color-mix(in srgb,var(--gold,#857007) 48%,transparent);border-radius:0;color:var(--gold,#857007);' +
-        'font-family:inherit;font-size:0.82rem;letter-spacing:0.03em;cursor:pointer;min-height:44px;padding:0.65rem 1.15rem;' +
-        'display:flex;align-items:center;justify-content:center;gap:0.48rem;min-width:min(18rem,82vw);}' +
-      '.ag-passkey[hidden]{display:none;}' +
-      '.ag-passkey svg{width:17px;height:17px;stroke:currentColor;fill:none;}' +
-      '.ag-anders{margin:0.65rem auto 0;padding:0.4rem 0.7rem;background:none;border:0;color:var(--soft);' +
-        'font:inherit;font-size:0.72rem;letter-spacing:0.025em;cursor:pointer;text-decoration:underline;text-underline-offset:0.22rem;}' +
-      '.ag-anders[hidden]{display:none;}' +
-      /* De ballotage-regalia: pas zichtbaar zodra de vier vragen beginnen.
-         Een stille kopregel met haarlijnen (de horlogetaal van het huis), en
-         daaronder vier Romeinse cijfers als plaatsbepaling -- een uitnodiging,
-         geen formulierbalk. Bij vertrouwelijke vragen (geboortedatum,
-         wachtwoord) verschijnt een gedempte kluisregel onder het veld. */
-      '.ag-kop{display:none;align-items:center;gap:0.8rem;justify-content:center;margin:0 0 0.35rem;' +
-        "font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:500;letter-spacing:0.34em;" +
-        'text-transform:uppercase;color:var(--gold,#857007);opacity:0;transition:opacity var(--rtg-royaal,560ms) var(--rtg-ease,ease);}' +
-      '.ag-kop::before,.ag-kop::after{content:"";flex:0 0 2.2rem;height:1px;' +
-        'background:color-mix(in srgb, var(--gold,#857007) 45%, transparent);}' +
-      '.ag-doos.ag-ballotage .ag-kop{display:flex;opacity:1;}' +
-      '.ag-stappen:empty{display:none !important;}' +
-      ".ag-stappen{display:none;justify-content:center;gap:1.6rem;margin:1.05rem 0 0;font-family:'Bodoni Moda',serif;" +
-        'font-size:0.8rem;color:var(--soft);opacity:0;transition:opacity var(--rtg-royaal,560ms) var(--rtg-ease,ease);}' +
-      '.ag-doos.ag-ballotage .ag-stappen{display:flex;opacity:1;}' +
-      '.ag-stappen span{transition:color var(--rtg-tempo,340ms) var(--rtg-ease,ease);}' +
-      '.ag-stappen span.nu{color:var(--gold,#857007);}' +
-      '.ag-stappen span.gehad{color:color-mix(in srgb, var(--gold,#857007) 55%, var(--soft));}' +
-      ".ag-kluis{display:none;justify-content:center;margin:0.7rem 0 0;font-family:'Inter',sans-serif;" +
-        'font-size:0.68rem;letter-spacing:0.06em;color:var(--soft);opacity:0;transition:opacity var(--rtg-tempo,340ms) var(--rtg-ease,ease);}' +
-      '.ag-doos.ag-kluis-aan .ag-kluis{display:flex;opacity:1;}' +
-      // de sterrenhemel gaat achter alles; de poort-inhoud eroverheen
-      '#gate > *:not(canvas){position:relative;z-index:1;}' +
-      /* OP DESKTOP VULT DE HEMEL HET SCHERM. De poort was een kaart van 662px
-         midden op een venster van 1600: de sterren stonden opgesloten in een
-         rechthoek met afgeronde hoeken en daarbuiten was het vlak zwart. Een
-         inlogscherm hoort geen venster in een venster te zijn.
-         De inhoud houdt zijn eigen breedte -- alleen de HEMEL wordt groot. */
-    /* Vervolg van app-main-04: de compositieregels van de poort (een kolom:
-       klok, lippen, aanspreking, veld). Geknipt omdat deel 04 opnieuw over de
-       10 KB-grens ging. De knip ligt midden in een stringconcatenatie -- deel
-       04 eindigt op een + en dit deel maakt hem af.
-
-       DE VOLGORDE IS DE BESTANDSNAAM. bundel.js plakt de delen in de volgorde
-       van readdirSync().sort(), dus puur alfabetisch: 04, 04a, 04ab, 04b. Deze
-       regels stonden een commit lang in 04ab, DUS na de `document.head
-       .appendChild(st);` die 04a afsloot -- waarmee ze een losse expressie
-       werden die JavaScript netjes uitrekent en weggooit. Geen syntaxfout,
-       geen consolemelding, en de halo, de klokschaal en de uitlijning van de
-       zin waren simpelweg weg terwijl de code er nog stond.
-       controleer() kon dat niet zien: die vergelijkt de bundel met dezelfde
-       som van dezelfde delen en is dus per definitie consistent met zichzelf.
-       Wat het nu wel ziet, is toets 43 in scripts/check.js. */
-      /* DE COMPOSITIE. Dit scherm had vijf objecten die allemaal ongeveer even
-         belangrijk waren -- klok, lippen, zin, invoerveld, koekjesmelding --
-         met grote lege vlakken ertussen die niets deden. Leegte in een premium
-         ontwerp is bewust; dit was leegte omdat de inhoud niet wist waar hij
-         moest staan.
-         Nu is het EEN verticale kolom met een duidelijke rangorde: de klok is
-         de identiteit en de held, Rahul komt er direct onder uit, en daaronder
-         staat de actie. Alles daaronder is bijzaak. */
-      '#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;' +
-        'gap:0;padding:6vh 1.1rem;}' +
-      /* DE POORT IS ALTIJD NACHT, ook onder een licht thema.
-         Dit scherm is een sterrenhemel; dat is niet een van de vier smaken
-         maar wat het scherm IS. Toen de thema's platformbreed gingen, zette
-         champagne netjes zijn donkere inkt op de body -- en die inkt landde op
-         een invoerveld dat op een zwarte hemel ligt. Gemeten: 1,11:1. Niet
-         "wat flets": onzichtbaar.
-         De poort verklaart daarom zijn eigen materiaal (onyx) en laat het
-         thema alleen los op wat er OP die hemel ligt: de wijzerplaat van de
-         klok. Een lichte wijzerplaat tegen een nachthemel is precies wat een
-         horloge met een wit blad 's avonds doet. */
-      '#gate{color:var(--op-onyx);' +
-        '--rtg-txt:var(--op-onyx);--txt:var(--op-onyx);' +
-        '--rtg-muted:rgba(244,240,233,0.72);--rtg-soft:rgba(244,240,233,0.56);' +
-        '--muted:rgba(244,240,233,0.72);--soft:rgba(244,240,233,0.56);}' +
-      '#gate input,#gate textarea{color:inherit;}' +
-      /* DE HALO. De sterren waren overal even druk, ook precies daar waar de
-         klok en de tekst staan -- en dan moet het oog zelf uitzoeken wat het
-         onderwerp is. Een zachte donkere ovaal achter de kolom maakt het daar
-         stil, zodat de klok vanzelf naar voren komt. Geen vlak en geen kader:
-         een verloop dat aan de randen volledig verdwijnt, zodat je hem niet
-         als vorm ziet maar alleen als rust. */
-      '#gate::after{content:"";position:absolute;left:50%;top:50%;' +
-        'width:min(150vw,1100px);height:min(120vh,1000px);' +
-        'transform:translate(-50%,-50%);pointer-events:none;z-index:0;' +
-        'background:radial-gradient(ellipse at center,' +
-          'rgba(0,0,0,0.62) 0%,rgba(0,0,0,0.45) 32%,rgba(0,0,0,0.18) 58%,rgba(0,0,0,0) 78%);}' +
-      /* de klok groeit: hij is letterlijk het merk, en stond op een zesde van
-         de hoogte alsof hij een illustratie was */
-      '#gate .os-lock{margin:0;}' +
-      /* SCHALEN MET TRANSFORM, niet met width/height. De klok tekent zijn
-         wijzers, het merkje en de datumvensters op VASTE posities binnen zijn
-         eigen maat; zet je die maat om, dan verschuift het draaipunt en staat
-         alles scheef -- precies wat er gebeurde toen ik hem groter maakte.
-         transform schaalt het hele beeld uniform, dus de geometrie blijft heel. */
-      /* Schaal op de telefoon: 1,2. Hij stond op 1 omdat elke vergroting het
-         invoerveld uit beeld duwde -- maar dat was toen de koekjesmelding nog
-         een kaart van 160px was. Nu die een regel van 26px is, past het wel,
-         en de kolom vulde met schaal 1 maar 51% van de hoogte terwijl de
-         opzet 70 a 80% vraagt. Gemeten op 430 en op 375 breed. */
-      '#gate{--klokschaal:1;}' +
-      /* En de indeling moet de GESCHAALDE maat reserveren. Een transform tekent
-         groter maar verandert de doos niet: op 1,5x groeide de klok 73px naar
-         boven en 73px naar beneden buiten zijn eigen vak, en de lippen -- die
-         netjes 10px onder de rand horen te zitten, en dat op een telefoon ook
-         deden -- kwamen op een breed scherm midden op de wijzerplaat te liggen.
-         Gemeten, niet gegokt: telefoon klok 201-494 met mond op 484 (goed),
-         breed klok 98-537 met mond op 454 (83px de plaat in).
-         Daarom draagt het vak zelf de hoogte, en schaalt de ring erin. */
-      '#gate .os-lock{display:flex;align-items:center;justify-content:center;padding:0;margin:0;' +
-        'height:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1));transform:none;}' +
-      '#gate .os-lock > .rtg-ring{transform:scale(var(--klokschaal,1));transform-origin:center;}' +
-      /* DE MOND HOORT BIJ DE KLOK, dus meet hij zich aan de klok en niet aan
-         het venster. Met min(52vw,240px) was hij op een telefoon 224 breed
-         onder een klok van 256 (verhouding 0,87) en op een breed scherm 240
-         onder een klok van 384 (0,63) -- dezelfde mond, twee verhoudingen.
-
-         DE HOOGTE IS TWEE KEER MISGEGAAN, EEN KEER NAAR ELKE KANT.
-
-         Eerst zweefde de mond tientallen pixels onder de klok. Toen werd hij
-         opgetrokken tot hij "aansloot" -- en dat is te ver de andere kant op:
-         gemeten op vijf schermmaten begon de INKT op 0 tot -1 pixel van de
-         onderrand van de wijzerplaat. De lippen lagen dus tegen de gouden rand
-         en middenin de contactschaduw van de kast (zie .rtg-ring::before in
-         shared/klok.js, die zo'n 30px naar onderen reikt). Op een afdruk zie je
-         dat meteen; in de code niet, want er stond alleen een getal.
-
-         Daarom staat de rekensom er nu uit elkaar gehaald, met de twee
-         eigenschappen van het doek als eigen maat. Het doek is 440 bij 200, dus
-         0,4545 keer zo hoog als breed, en de tekening begint pas op 27,9% van
-         die hoogte -- boven de inkt zit ruim een kwart niets. Wie de lippen
-         ergens wil hebben, moet die leegte meerekenen; wie alleen de doos
-         verschuift, verschuift de tekening net niet.
-
-         --lipgat is het enige getal dat over SMAAK gaat: hoeveel lucht er
-         tussen de wijzerplaat en de lippen hoort. 0,126 mondbreed is 0,11 klok,
-         net voorbij de schaduw. De rest volgt eruit. */
-      '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.62);' +
-        '--doekhoog:calc(var(--mondbreed) * 0.4545);' +
-        '--doekleeg:calc(var(--doekhoog) * 0.279);' +
-        '--lipgat:calc(var(--mondbreed) * 0.25);' +
-        'width:var(--mondbreed);height:auto;opacity:0.82;' +
-        'margin:calc(var(--lipgat) - var(--doekleeg)) auto 0.9rem;}' +
-      // de zin is de aanspreking en geen onderschrift
-      /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
-         is een flexkolom met align-items:stretch, dus een kind met een
-         max-width blijft aan de linkerrand plakken -- gemeten, niet gegokt. */
-      '#gate .ag-experience{font-size:.78rem;line-height:1.6;margin:.75rem auto;max-width:42ch;color:inherit;}' +
-      '#gate .ag-zin{font-size:clamp(1.35rem,5.2vw,1.9rem);line-height:1.3;' +
-        'min-height:0;padding:1rem 0 1.6rem;max-width:22ch;margin-inline:auto;}' +
-      // het invoerveld is de actie: breed en royaal, geen streepje
-      /* EEN rand, niet twee. De rij had al een border-bottom uit de basisstijl;
-         daar een volledige rand overheen leggen gaf een dubbele doos met een
-         verspringende binnenrand. Eerst de oude weg, dan de nieuwe. */
-      /* EEN doos, en symmetrisch. De rij droeg mijn ring en het invoerveld
-         binnenin had zijn EIGEN achtergrond, rand en radius -- vandaar de
-         dubbele doos met een binnenvlak dat 8px uit het midden lag. De rij
-         draagt nu het kader, het veld erin is kaal. De padding was ook
-         asymmetrisch (0,9rem links tegen 0,5rem rechts). */
-      '#gate .ag-rij{width:min(100%,30rem);min-height:58px;border:0;' +
-        'background:color-mix(in srgb,var(--onyx-basis) 82%,transparent);' +
-        'box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 34%,transparent),' +
-          'inset 0 1px 0 color-mix(in srgb,var(--gold-hoog) 15%,transparent);border-radius:0;' +
-        'margin-inline:auto;padding:0.35rem 0.45rem 0.35rem 0.9rem;}' +
-      '#gate .ag-rij:focus-within{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 70%,transparent);}' +
-      '#gate .ag-rij input{background:none;border:0;border-radius:0;box-shadow:none;}' +
-      '#gate .ag-rij input{font-size:1rem;padding:1rem 0.4rem;text-align:left;}' +
-      '#gate .ag-rij #agGo{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;' +
-        'padding:0;border:1px solid color-mix(in srgb,var(--gold-tekst) 62%,transparent);' +
-        'border-radius:50%;background:var(--gold-tekst);color:var(--onyx-diep);' +
-        'font-size:1.2rem;line-height:1;opacity:1;}' +
-      '#gate .ag-rij #agGo:hover{background:var(--gold-hoog);}' +
-      /* De koekjesmelding hoort niet midden in de kennismaking. Hij zweeft
-         onderaan, buiten de kolom, waar hij de compositie niet meer breekt.
-
-         Deze regel stond er als `.rtgcookie`, een klasse die nergens bestaat.
-         Het element heet `#rtg-cookie` en ligt anders met z-index 9999 over
-         het enige invoerveld. De kolom houdt daarom alleen ruimte vrij zolang
-         de melding er werkelijk staat. */
-      'body:has(#rtg-cookie) #gate{padding-bottom:calc(6vh + 3rem);}' +
-      /* RTG ACCESS COMPOSITIE.
-
-         De klok, Rahul en passkey bestonden al. Wat ontbrak was de formele
-         producthierarchie uit het goedgekeurde ontwerp: identificatie boven,
-         een vaste begroeting, een duidelijke beveiligde handeling en op
-         telefoon een rustige vooruitblik op de vier werelden. Deze regels
-         veranderen geen authenticatie; ze ordenen uitsluitend de bestaande
-         toegangspoort. */
-      '#gate{overflow-y:auto;overscroll-behavior:contain;' +
-        'padding:calc(env(safe-area-inset-top,0px) + 4.25rem) 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.5rem);}' +
-      '#gate>.rtg-toegang-signatuur{position:absolute;top:calc(env(safe-area-inset-top,0px) + 1rem);' +
-        'left:50%;right:auto;width:min(calc(100% - 2rem),50rem);transform:translateX(-50%);' +
-        'margin:0;padding-bottom:.7rem;}' +
-      '#gate .os-lock{flex:0 0 auto;}' +
-      '#gate .ag-doos{align-items:center;max-width:36rem;margin:0 auto;}' +
-      '#gate .ag-mond{margin-bottom:.1rem;}' +
-      '#gate .ag-rahul-label{margin:-.15rem 0 .45rem;color:var(--gold-hoog,#E1C77B);' +
-        "font:italic 500 .72rem/1 'Bodoni Moda',serif;letter-spacing:.04em;}" +
-      '#gate .ag-intro{display:flex;flex-direction:column;align-items:center;width:100%;}' +
-      '#gate .ag-welkom{margin:0;color:#F5EFE6;text-align:center;' +
-        "font:400 clamp(2.05rem,4.4vw,3rem)/1.04 'Bodoni Moda',serif;letter-spacing:-.025em;}" +
-      '#gate .ag-zin{min-height:1.8rem;max-width:38ch;margin:.45rem auto .8rem;padding:0;' +
-        "font:400 .72rem/1.45 'Inter',sans-serif;color:var(--rtg-soft);letter-spacing:.02em;}" +
-      '#gate .ag-passkey-kaart{width:min(100%,30rem);padding:1.05rem 1.15rem 1.15rem;' +
-        'border:1px solid color-mix(in srgb,var(--gold-tekst) 48%,transparent);' +
-        'background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.008));' +
-        'box-shadow:0 24px 70px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.035);}' +
-      '#gate .ag-passkey-kaart[hidden]{display:none;}' +
-      '#gate .ag-passkey-embleem{display:grid;place-items:center;width:2.35rem;height:2.35rem;' +
-        'margin:0 auto .35rem;color:var(--gold-hoog,#E1C77B);}' +
-      '#gate .ag-passkey-embleem svg{display:block;width:100%;height:100%;}' +
-      '#gate .ag-passkey-kaart p{margin:0 0 .75rem;text-align:center;color:#E7E0D7;' +
-        "font:400 .82rem/1.4 'Inter',sans-serif;letter-spacing:.015em;}" +
-      '#gate .ag-passkey{width:100%;min-width:0;min-height:54px;margin:0;padding:.8rem 1rem;' +
-        'border-color:color-mix(in srgb,var(--gold-hoog,#E1C77B) 72%,transparent);' +
-        'background:linear-gradient(180deg,rgba(201,162,75,.14),rgba(201,162,75,.065));' +
-        'color:var(--gold-hoog,#E1C77B);font-size:.86rem;letter-spacing:.045em;}' +
-      '#gate .ag-passkey:hover{background:linear-gradient(180deg,rgba(201,162,75,.21),rgba(201,162,75,.1));}' +
-      '#gate .ag-passkey svg{width:22px;height:22px;}' +
-      '#gate .ag-anders{display:flex;align-items:center;gap:.85rem;width:min(100%,26rem);' +
-        'margin:.75rem auto 0;padding:.45rem 0;text-decoration:none;color:var(--rtg-muted);' +
-        'font-size:.72rem;letter-spacing:.035em;}' +
-      '#gate .ag-anders::before,#gate .ag-anders::after{content:"";height:1px;flex:1;' +
-        'background:color-mix(in srgb,var(--gold-tekst) 42%,transparent);}' +
-      '#gate .ag-anders span{white-space:nowrap;}' +
-      '#gate .ag-anders[hidden]{display:none!important;}' +
-      '#gate .ag-werelden{display:none;width:100%;margin-top:1.1rem;color:var(--rtg-soft);' +
-        "font:500 .56rem/1 'Inter',sans-serif;letter-spacing:.11em;text-transform:uppercase;}" +
-      '#gate .ag-werelden span{min-width:0;padding:.15rem .35rem;text-align:center;}' +
-      '#gate .ag-werelden span+span{border-left:1px solid color-mix(in srgb,var(--gold-tekst) 28%,transparent);}' +
-      /* Zodra iemand de gesprekspoort kiest, wordt de vaste begroeting weer
-         Rahuls levende zin. Een herkende gebruiker houdt de passkey als
-         compacte tweede route naast het wachtwoordveld. */
-      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-welkom{display:none;}' +
-      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-zin{font-family:\'Bodoni Moda\',serif;' +
-        'font-size:clamp(1.25rem,4.6vw,1.7rem);line-height:1.3;color:#FBFAF8;' +
-        'min-height:3.6rem;max-width:24ch;margin:.4rem auto 1rem;}' +
-      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-passkey-kaart{margin-top:.75rem;padding:0;border:0;' +
-        'background:none;box-shadow:none;}' +
-      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-passkey-embleem,' +
-      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-passkey-kaart p{display:none;}' +
-      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-werelden{display:none;}' +
-      '@media (max-width:999px){' +
-        '#gate{--klokschaal:.84;padding-inline:.9rem;}' +
-        '#gate .ag-werelden:not(:empty){display:grid;grid-template-columns:repeat(4,minmax(0,1fr));}' +
-      '}' +
-      '@media (max-height:760px){' +
-        '#gate{--klokschaal:.76;padding-top:3.6rem;padding-bottom:.75rem;}' +
-        '#gate>.rtg-toegang-signatuur{top:.65rem;}' +
-        '#gate .ag-mond{--lipgat:calc(var(--mondbreed) * .18);}' +
-        '#gate .ag-rahul-label{margin-top:-.3rem;}' +
-        '#gate .ag-welkom{font-size:1.8rem;}' +
-        '#gate .ag-zin{margin-bottom:.55rem;}' +
-        '#gate .ag-passkey-kaart{padding:.75rem .9rem .85rem;}' +
-        '#gate .ag-passkey-embleem{display:none;}' +
-        '#gate .ag-passkey-kaart p{margin-bottom:.5rem;font-size:.76rem;}' +
-        '#gate .ag-passkey{min-height:48px;}' +
-        '#gate .ag-anders{margin-top:.45rem;}' +
-        '#gate .ag-werelden{margin-top:.65rem;}' +
-      '}' +
-      /* RTG ID BALLOTAGE.
-
-         Geen losse klok, vraag en invoerbalk meer, maar één toegangsmoment:
-         identiteit en verhaal links, het beveiligde gesprek op ivoor rechts.
-         Op telefoon worden dezelfde onderdelen verticaal gezet. De echte
-         klok, Rahul-mond, servervragen en Edge-bediening blijven intact. */
-
-      /* Het woordmerk is typografie IN de Edge. Beide delen zijn transparant,
-         zodat achter het logo exact hetzelfde bordeaux staat als achter de
-         wereldknoppen, status en profiel -- geen afwijkend logovlak. */
-      'body:has(#gate .ag-doos.ag-ballotage){--rtg-id-edge-brand:clamp(13rem,19vw,15.5rem);}' +
-      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-top{' +
-        'grid-template-columns:var(--rtg-id-edge-brand) minmax(7rem,1fr) auto auto 44px 44px 44px;' +
-        'background:var(--edge-bar-bg)!important;}' +
-      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-bottom{background:var(--edge-bar-bg)!important;}' +
-      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark{' +
-        'place-items:center;padding:.2rem .8rem;background:transparent!important;border-right-color:var(--edge-bar-line);}' +
-      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-short{display:none;}' +
-      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup{' +
-        'display:grid;grid-template-rows:auto auto;align-content:center;width:100%;height:100%;gap:.08rem;background:transparent!important;}' +
-      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup strong{' +
-        'display:block;min-width:0;padding:0;background:transparent!important;color:#fff8ed;text-align:center;' +
-        "font:400 clamp(.86rem,1.35vw,1.12rem)/1 'Bodoni Moda',Didot,Georgia,serif;" +
-        'letter-spacing:-.035em;white-space:nowrap;}' +
-      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup small{' +
-        'padding-bottom:.1rem;background:transparent!important;color:#d8bd6b;text-align:center;text-transform:uppercase;' +
-        "font:400 .4rem/1 'Bodoni Moda',Didot,Georgia,serif;letter-spacing:.1em;white-space:nowrap;}" +
-      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-side{' +
-        'transform:translateX(-101%)!important;visibility:hidden;}' +
-      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-bank,' +
-      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-tabs,' +
-      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-toevoeg,' +
-      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-kiezer,' +
-      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-praat,' +
-      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-balk{display:none!important;}' +
-
-      /* `display:contents` laat verhaal en klok samen de linkerhelft vormen
-         zonder een tweede klok of een los decoratief instrument te maken. */
-      '#gate .rtg-id-intro{display:none;}' +
-      '#gate:has(.ag-doos.ag-ballotage){' +
-        '--klokschaal:.56;display:grid;grid-template-columns:minmax(20rem,1fr) minmax(27rem,.88fr);' +
-        'grid-template-rows:auto auto auto;align-content:center;column-gap:clamp(3rem,7vw,7rem);' +
-        'overflow-y:auto;padding:calc(var(--edge-top,44px) + 2rem) clamp(3rem,7vw,7rem) ' +
-        'calc(var(--edge-bottom,48px) + 2rem);background:' +
-        'radial-gradient(circle at 12% 40%,rgba(126,18,54,.15),transparent 27%),' +
-        'radial-gradient(circle at 82% 74%,rgba(197,158,69,.09),transparent 25%),var(--bg);}' +
-      '#gate:has(.ag-doos.ag-ballotage)>.rtg-toegang-signatuur{display:none;}' +
-      '#gate:has(.ag-doos.ag-ballotage)>.rtg-id-intro{display:contents;}' +
-      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-kicker{' +
-        'position:relative;z-index:2;grid-column:1;grid-row:1;align-self:end;margin-bottom:.9rem;color:#dfca8c;' +
-        "font:700 .62rem/1 'Inter',sans-serif;letter-spacing:.28em;text-transform:uppercase;}" +
-      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-kicker span{' +
-        'display:inline-block;width:1.7rem;height:1px;margin:0 .7rem .2rem 0;background:#c8a959;}' +
-      '#gate:has(.ag-doos.ag-ballotage)>.os-lock{' +
-        'grid-column:1;grid-row:2;align-self:center;justify-self:start;width:11rem;height:11rem;' +
-        'margin:0 0 1.1rem clamp(4.5rem,8.5vw,8rem);padding:0;}' +
-      '#gate:has(.ag-doos.ag-ballotage)>.os-lock>.rtg-ring{' +
-        'flex:0 0 var(--rtg-klok-maat,16rem);}' +
-      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story{' +
-        'position:relative;z-index:2;grid-column:1;grid-row:3;align-self:start;max-width:35rem;}' +
-      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story p{' +
-        'margin:0 0 .8rem;color:#dfca8c;font-size:.61rem;font-weight:650;letter-spacing:.28em;text-transform:uppercase;}' +
-      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story h1{' +
-        'max-width:12ch;margin:0;color:#f7f0e5;' +
-        "font:400 clamp(2.8rem,4.5vw,4.6rem)/.98 'Bodoni Moda',Didot,Georgia,serif;letter-spacing:-.045em;}" +
-      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story div{' +
-        'max-width:38rem;margin-top:1rem;color:#b8aaa0;font-size:.84rem;line-height:1.65;}' +
-      /* De ballotagekaart en haar mobiele herschikking. */
-      '#gate:has(.ag-doos.ag-ballotage)>.ag-doos{' +
-        'position:relative;grid-column:2;grid-row:1/4;align-self:center;align-items:stretch;' +
-        'width:100%;max-width:38rem;min-height:31rem;margin:0;padding:2.5rem 2.65rem 2.1rem;' +
-        'overflow:hidden;color:#241711;background:#f4ede1;' +
-        'border:1px solid rgba(200,169,89,.85);border-radius:0;' +
-        'box-shadow:0 2rem 5rem rgba(0,0,0,.42);}' +
-      '#gate .ag-doos.ag-ballotage::after{' +
-        'content:attr(data-stap) " / " attr(data-van);position:absolute;top:2.3rem;right:2.45rem;color:#9a7f39;' +
-        "font:400 1.45rem/1 'Bodoni Moda',serif;letter-spacing:.02em;}" +
-      '#gate .ag-doos.ag-ballotage .ag-kop{' +
-        'display:block;width:calc(100% - 5.5rem);margin:0 0 1.35rem;color:#8d1238;text-align:left;opacity:1;}' +
-      '#gate .ag-doos.ag-ballotage .ag-kop::before,' +
-      '#gate .ag-doos.ag-ballotage .ag-kop::after{display:none;}' +
-      '#gate .ag-doos.ag-ballotage .ag-kop span{' +
-        'display:block;margin-bottom:.42rem;font-size:.56rem;font-weight:750;letter-spacing:.28em;text-transform:uppercase;}' +
-      '#gate .ag-doos.ag-ballotage .ag-kop strong{' +
-        'display:block;color:#241711;text-transform:none;' +
-        "font:400 1.75rem/1 'Bodoni Moda',serif;letter-spacing:-.025em;}" +
-      '#gate .ag-doos.ag-ballotage .ag-mond{' +
-        '--mondbreed:5.6rem;--doekhoog:2.55rem;--doekleeg:.72rem;--lipgat:.72rem;' +
-        'width:var(--mondbreed);height:auto;margin:calc(var(--lipgat) - var(--doekleeg)) auto .2rem;opacity:.8;}' +
-      '#gate .ag-doos.ag-ballotage .ag-rahul-label{' +
-        'margin:0 0 .55rem;color:#8d1238;text-align:left;' +
-        "font:italic 500 .88rem/1 'Bodoni Moda',serif;letter-spacing:.01em;}" +
-      '#gate .ag-doos.ag-ballotage .ag-intro{' +
-        'align-items:flex-start;background:#f4ede1!important;background-image:none!important;box-shadow:none!important;}' +
-      '#gate .ag-doos.ag-ballotage .ag-zin{' +
-        'display:block;width:100%;max-width:17ch;min-height:0;margin:0;padding:0;color:#241711!important;' +
-        'background:#f4ede1!important;background-image:none!important;border:0!important;box-shadow:none!important;' +
-        'filter:none!important;backdrop-filter:none!important;text-align:left;text-wrap:balance;' +
-        "font:400 clamp(2.15rem,3vw,3.25rem)/1.02 'Bodoni Moda',serif!important;letter-spacing:-.04em;}" +
-      '#gate .ag-doos.ag-ballotage .ag-vraag-hint{' +
-        'display:block;max-width:34rem;margin:.6rem 0 0;color:#776a60;font-size:.72rem;line-height:1.45;}' +
-      '#gate .ag-doos:not(.ag-ballotage) .ag-vraag-hint,#gate .ag-doos:not(.ag-ballotage) .ag-veld-label,' +
-      '#gate .ag-doos:not(.ag-ballotage) .ag-id-privacy{display:none;}' +
-      '#gate .ag-doos.ag-ballotage .ag-rij{' +
-        'position:relative;width:100%;min-height:4.35rem;margin:1.55rem 0 0;padding:1.3rem 4rem .25rem .95rem;' +
-        'background:transparent;border:1px solid #b79540;border-radius:0;box-shadow:none;}' +
-      '#gate .ag-doos.ag-ballotage .ag-rij:focus-within{border-color:#8d1238;box-shadow:0 0 0 3px rgba(141,18,56,.09);}' +
-      '#gate .ag-doos.ag-ballotage .ag-veld-label{' +
-        'position:absolute;top:.62rem;left:.95rem;color:#8d1238;font-size:.48rem;font-weight:750;' +
-        'letter-spacing:.2em;text-transform:uppercase;pointer-events:none;}' +
-      '#gate .ag-doos.ag-ballotage .ag-rij input{' +
-        'width:100%;padding:.25rem 0;background:transparent;color:#241711;text-align:left;font-size:.92rem;}' +
-      '#gate .ag-doos.ag-ballotage .ag-rij input::placeholder{color:#978b81;}' +
-      '#gate .ag-doos.ag-ballotage .ag-rij #agGo{' +
-        'position:absolute;top:50%;right:.55rem;display:grid;place-items:center;width:2.85rem;height:2.85rem;' +
-        'transform:translateY(-50%);padding:0;border:0;border-radius:50%;background:#b39033;color:#160f0c;opacity:1;}' +
-      '#gate .ag-doos.ag-ballotage .ag-stappen{' +
-        'display:grid;width:100%;grid-template-columns:repeat(4,1fr);gap:.35rem;margin:.8rem 0 0;' +
-        'background:none!important;border:0;box-shadow:none!important;opacity:1;}' +
-      '#gate .ag-doos.ag-ballotage .ag-stappen span{' +
-        'height:2px;padding:0;overflow:hidden;background:#d7ccbd;color:transparent;font-size:0;}' +
-      '#gate .ag-doos.ag-ballotage .ag-stappen span.nu{background:#8d1238;color:transparent;}' +
-      '#gate .ag-doos.ag-ballotage .ag-stappen span.gehad{background:rgba(141,18,56,.48);color:transparent;}' +
-      '#gate .ag-doos.ag-ballotage .ag-id-privacy{' +
-        'display:flex;align-items:center;gap:.35rem;margin:.75rem 0 0;color:#75685e;font-size:.59rem;line-height:1.3;}' +
-      '#gate .ag-doos.ag-ballotage .ag-id-privacy i{' +
-        'width:.35rem;height:.35rem;flex:0 0 auto;border-radius:50%;background:#2e9b68;box-shadow:0 0 0 3px rgba(46,155,104,.08);}' +
-      '#gate .ag-doos.ag-ballotage .ag-kluis{' +
-        'justify-content:flex-start;margin:.55rem 0 0;color:#75685e;font-size:.59rem;letter-spacing:.02em;}' +
-      '#gate .ag-doos.ag-ballotage .ag-passkey-kaart,' +
-      '#gate .ag-doos.ag-ballotage .ag-anders,#gate .ag-doos.ag-ballotage .ag-werelden{display:none!important;}' +
-
-      '@media (max-width:899px){' +
-        'body:has(#gate .ag-doos.ag-ballotage){--rtg-id-edge-brand:min(11.2rem,48vw);}' +
-        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-top{' +
-          'grid-template-columns:var(--rtg-id-edge-brand) minmax(0,1fr) 44px 44px;}' +
-        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-crumbs,' +
-        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-worldbar,' +
-        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-state,' +
-        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-search{display:none!important;}' +
-        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark{padding:.2rem .55rem;}' +
-        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup strong{font-size:.82rem;}' +
-        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup small{font-size:.35rem;}' +
-        '#gate:has(.ag-doos.ag-ballotage){' +
-          '--klokschaal:.42;display:grid;grid-template-columns:1fr;grid-template-rows:auto auto auto auto;' +
-          'align-content:start;gap:0;overflow-x:hidden;overflow-y:auto;padding:' +
-          'calc(var(--edge-top,44px) + .9rem) 1rem calc(var(--edge-bottom,48px) + .8rem);}' +
-        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-kicker{' +
-          'grid-column:1;grid-row:1;margin:0 0 .35rem;padding-left:.5rem;}' +
-        '#gate:has(.ag-doos.ag-ballotage)>.os-lock{' +
-          'grid-column:1;grid-row:2;justify-self:center;width:7.4rem;height:7.4rem;margin:0 0 .55rem;}' +
-        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story{' +
-          'grid-column:1;grid-row:3;justify-self:center;width:100%;max-width:23rem;min-height:6.4rem;text-align:center;}' +
-        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story p{margin-bottom:.5rem;font-size:.52rem;letter-spacing:.22em;}' +
-        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story h1{' +
-          'max-width:13ch;margin:auto;font-size:clamp(2rem,9vw,2.55rem);line-height:1;}' +
-        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story div{display:none;}' +
-        '#gate:has(.ag-doos.ag-ballotage)>.ag-doos{' +
-          'grid-column:1;grid-row:4;width:100%;max-width:31rem;min-height:25rem;margin:1.05rem 0 0;' +
-          'padding:1.45rem 1.3rem 1.15rem;border-radius:0;}' +
-        '#gate .ag-doos.ag-ballotage::after{top:1.45rem;right:1.3rem;font-size:1.35rem;}' +
-        '#gate .ag-doos.ag-ballotage .ag-kop{width:calc(100% - 4.7rem);margin-bottom:.7rem;}' +
-        '#gate .ag-doos.ag-ballotage .ag-kop span{font-size:.5rem;}' +
-        '#gate .ag-doos.ag-ballotage .ag-kop strong{font-size:1.35rem;}' +
-        '#gate .ag-doos.ag-ballotage .ag-mond{' +
-          '--mondbreed:4.6rem;--doekhoog:2.1rem;--doekleeg:.58rem;--lipgat:.58rem;margin-bottom:0;}' +
-        '#gate .ag-doos.ag-ballotage .ag-rahul-label{margin-bottom:.45rem;font-size:.78rem;}' +
-        '#gate .ag-doos.ag-ballotage .ag-zin{max-width:16ch;font-size:clamp(1.65rem,7.1vw,2rem)!important;}' +
-        '#gate .ag-doos.ag-ballotage .ag-vraag-hint{margin-top:.4rem;font-size:.65rem;}' +
-        '#gate .ag-doos.ag-ballotage .ag-rij{min-height:3.9rem;margin-top:1.05rem;padding-right:3.6rem;}' +
-        '#gate .ag-doos.ag-ballotage .ag-rij #agGo{width:2.55rem;height:2.55rem;}' +
-        '#gate .ag-doos.ag-ballotage .ag-id-privacy{margin-top:.6rem;font-size:.54rem;}' +
-      '}' +
-      '@media (max-width:899px) and (max-height:860px){' +
-        '#gate:has(.ag-doos.ag-ballotage){--klokschaal:.31;padding-top:calc(var(--edge-top,44px) + .45rem);}' +
-        '#gate:has(.ag-doos.ag-ballotage)>.os-lock{width:5.3rem;height:5.3rem;margin-bottom:.25rem;}' +
-        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story p{display:none;}' +
-        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story h1{font-size:1.7rem;}' +
-        '#gate:has(.ag-doos.ag-ballotage)>.ag-doos{margin-top:.65rem;padding-top:1.15rem;}' +
-        '#gate .ag-doos.ag-ballotage::after{top:1.15rem;}' +
-        '#gate .ag-doos.ag-ballotage .ag-mond,#gate .ag-doos.ag-ballotage .ag-rahul-label{display:none;}' +
-        '#gate .ag-doos.ag-ballotage .ag-zin{font-size:1.65rem;}' +
-      '}' +
-    /* Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het
-       insluiten van het blad. Dit deel MOET het laatste van de reeks 04.. zijn
-       dat aan de stijlstring bijdraagt, want het sluit hem af met een `;` en
-       hangt hem in de kop. Alles wat na deze regel nog `'...' +` schrijft,
-       staat buiten de string en doet niets.
-
-       De brede-schermregels komen bewust NA de compositie in 04a: bij gelijke
-       specificiteit wint de laatste, en op een breed scherm hoort de poort het
-       hele venster te vullen in plaats van de kolompadding van 04a te houden. */
-      /* Bordeauxfluweel boven en onder, een rustig onyx midden. */
-      '#gate{background:' +
-        'radial-gradient(ellipse 115% 52% at 50% -8%,color-mix(in srgb,var(--bordeaux-basis) 44%,var(--onyx-diep)) 0%,color-mix(in srgb,var(--bordeaux-diep) 24%,var(--onyx-basis)) 44%,transparent 76%),' +
-        'radial-gradient(ellipse 120% 54% at 50% 108%,color-mix(in srgb,var(--bordeaux-basis) 46%,var(--onyx-diep)) 0%,color-mix(in srgb,var(--bordeaux-diep) 26%,var(--onyx-basis)) 45%,transparent 76%),' +
-        'linear-gradient(180deg,var(--onyx-diep),var(--onyx-basis) 31%,var(--onyx-diep) 50%,var(--onyx-basis) 69%,var(--onyx-diep));}' +
-      '@media (min-width:900px){' +
-        /* op #gate en niet op .os-lock: de mond meet zich aan de klok en
-           moet die schaal dus ook kunnen erven. Stond hij op .os-lock, dan
-           bleef de mond op een breed scherm 224 breed onder een klok van 384. */
-        '#gate{--klokschaal:1.08;}' +
-        '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
-          'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
-          'justify-content:center;flex-direction:column;}' +
-        '#gate canvas:not(.ag-mond){position:absolute;inset:0;width:100vw;height:100vh;}' +
-        '#gate .ag-doos{max-width:34rem;}' +
-      '}';
-    document.head.appendChild(st);
-    /* Vervolg van app-main-04: de poort-inhoud (mond, zin, invoerveld,
-       passkey) en het gesprek erachter. Geknipt omdat deel 04 met de
-       schermvullende sterrenhemel over de 10 KB-grens ging die het
-       modulebeleid stelt; de bundel plakt 04 en 04b weer aaneen tot exact
-       hetzelfde bestand. De cut ligt op een statement-grens binnen dezelfde
-       gesloten scope, dus er verandert niets aan het gedrag. */
-
-    // Een dicht maar fluisterzacht starlight-veld over het hele scherm. Meer
-    // lichtpunten geeft de indruk van ontelbaar veel vezels; de lagere
-    // helderheid voorkomt dat de poort glitterig of onrustig wordt.
-    (function sterrenhemel(){
-      var hang = function(){ if (window.RTGSterren) window.RTGSterren.hang(gate, { dichtheid: 1.35, helderheid: 0.72 }); };
-      if (window.RTGSterren) return hang();
-      var s = document.createElement('script'); s.src = '/shared/sterren.js'; s.async = true;
-      s.onload = hang; document.head.appendChild(s);
-    })();
-
-    /* Het RTG ID-verhaal hoort bij de ballotage, maar niet bij de gewone
-       terugkeerroute. CSS toont deze inhoud pas zodra de server de ballotage
-       activeert; de bestaande, echte klok blijft het identiteitsanker. */
-    const idIntro = document.createElement('section');
-    idIntro.className = 'rtg-id-intro';
-    idIntro.setAttribute('aria-label', T('ag.id.naam','RTG ID'));
-    idIntro.innerHTML =
-      '<div class="rtg-id-kicker"><span></span>' + T('ag.id.naam','RTG ID') + '</div>' +
-      '<div class="rtg-id-story"><p>' + T('ag.id.waarden','Persoonlijk · zorgvuldig · vertrouwd') + '</p>' +
-      '<h1>' + T('ag.id.kop','Uw toegang begint met een gesprek.') + '</h1>' +
-      '<div>' + T('ag.id.uitleg','Vier korte vragen. Geen formuliergevoel, wel de aandacht waarmee RTG u leert kennen.') + '</div></div>';
-    gate.insertBefore(idIntro, gate.querySelector('.os-lock'));
-
-    const doos = document.createElement('div');
-    doos.className = 'ag-doos';
-    doos.innerHTML =
-      '<div class="ag-kop" id="agKop"><span id="agKopLabel"></span><strong>' + T('ag.kennismaking','Kennismaking') + '</strong></div>' +
-      '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
-      '<div class="ag-rahul-label" aria-hidden="true">' + T('ag.log','Rahul') + '</div>' +
-      '<div class="ag-intro"><h1 class="ag-welkom">' + T('ag.welkom.kop','Welkom terug') + '</h1>' +
-      '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
-      '<p class="ag-vraag-hint">' + T('ag.id.hint','U bepaalt zelf wat u deelt. Uw antwoord blijft binnen uw beveiligde RTG ID.') + '</p></div>' +
-      '<div class="ag-rij" hidden><span class="ag-veld-label">' + T('ag.antwoord','Uw antwoord') + '</span>' +
-      '<input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
-      '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
-      '<div class="ag-stappen" id="agStappen" role="status" aria-live="polite"></div>' +
-      '<p class="ag-id-privacy"><i></i>' + T('ag.id.privacy','Alleen gebruikt voor uw persoonlijke RTG ID.') + '</p>' +
-      '<div class="ag-kluis" id="agKluis"></div>' +
-      '<div class="ag-passkey-kaart"><div class="ag-passkey-embleem" aria-hidden="true">' +
-        '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.35"><circle cx="13" cy="10" r="4"/><path d="M5 23c.8-5 3.4-7 8-7 3.4 0 5.8 1.3 7 4"/><circle cx="23" cy="19" r="3"/><path d="M26 19h5m-2 0v3m-2-3v2"/></svg></div>' +
-        '<p>' + T('ag.pk.uitleg','Ga verder met je passkey') + '</p>' +
-      '<button type="button" class="ag-passkey" id="agPasskey">' +
-        '<svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a2 2 0 0 0-2 2c0 2-.4 3.6-1 5"/><path d="M8 9a4 4 0 0 1 7 2c0 3-.5 5.4-1.5 7.5"/><path d="M12 13c0 3-.6 5.6-1.6 7.7"/><path d="M5.5 8a7 7 0 0 1 12 3c0 3.4-.5 6.4-1.5 9"/></svg>' +
-        '<span>' + T('ag.pk.veilig','Veilig openen') + '</span></button></div>' +
-      '<button type="button" class="ag-anders" id="agAnders"><span>' + T('ag.anders','Andere manier') + '</span></button>' +
-      '<div class="ag-werelden" id="agWerelden" aria-label="' + T('ag.werelden','Beschikbare RTG-werelden') + '"></div>';
-    gate.appendChild(doos);
-    // Only explicit, allowlisted world interests can cross from the public demo.
-    // They are a welcome hint, never an account permission or saved profile.
-    const verkenning = window.RTGExperienceHandoff && window.RTGExperienceHandoff.consume();
-    if (verkenning && verkenning.length) {
-      const welkom = document.createElement('p'); welkom.className = 'ag-experience';
-      welkom.textContent = 'Uw verkenning: ' + verkenning.join(', ') + '. Alleen hier getoond; niet opgeslagen in uw account.';
-      doos.querySelector('.ag-intro').appendChild(welkom);
+    const tx = (nl, en) => lang() === 'en' ? en : nl;
+    gate.dataset.rtgAccess = 'true';
+    gate.innerHTML =
+      '<div class="access-brand" aria-label="RTG">RTG<small>' + tx('VEILIGE TOEGANG','SECURE ACCESS') + '</small></div>' +
+      '<div class="access-content">' +
+        '<button class="access-secondary access-back" id="agBack" type="button" hidden>' + tx('Terug','Back') + '</button>' +
+        '<p class="access-progress" id="agStappen" role="status" aria-live="polite" hidden></p>' +
+        '<h1 class="access-title" id="agTitle" tabindex="-1"></h1>' +
+        '<p class="access-description" id="agZin"></p>' +
+        '<p class="ag-experience" id="agExperience" hidden></p>' +
+        '<div id="agWelcome">' +
+          '<button class="access-primary" id="agPasskey" type="button">' +
+            '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 11a2 2 0 0 0-2 2c0 2-.4 3.6-1 5M8 9a4 4 0 0 1 7 2c0 3-.5 5.4-1.5 7.5M12 13c0 3-.6 5.6-1.6 7.7M5.5 8a7 7 0 0 1 12 3c0 3.4-.5 6.4-1.5 9"/></svg>' +
+            '<span>' + tx('Verder met passkey','Continue with a passkey') + '</span></button>' +
+          '<p class="access-hint">' + tx('U gebruikt de beveiliging van uw apparaat.','You use your device’s security.') + '</p>' +
+          '<button class="access-link" id="agAnders" type="button"><span>' + tx('Andere manier','Another way') + '</span><span aria-hidden="true">→</span></button>' +
+          '<p class="access-new">' + tx('Bent u nieuw bij RTG?','Are you new to RTG?') +
+            ' <button id="agNieuw" type="button">' + tx('Maak uw RTG','Create your RTG') + '</button></p>' +
+        '</div>' +
+        '<form id="agForm" hidden novalidate>' +
+          '<label class="access-field" id="agLabel"><span id="agFieldLabel"></span><input id="agIn" aria-describedby="agZin agError" required></label>' +
+          '<label class="access-field" id="agCodeLabel" hidden>' + tx('Sms-code, als u die heeft ontvangen','Text message code, if you received one') +
+            '<input id="agCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></label>' +
+          '<button id="agShowPassword" class="access-secondary" type="button" hidden aria-pressed="false">' + tx('Toon wachtwoord','Show password') + '</button>' +
+          '<details class="access-summary" id="agSummary" hidden><summary>' + tx('Controleer uw gegevens','Review your details') + '</summary><div id="agReview"></div></details>' +
+          '<button class="access-primary" id="agGo" type="submit"></button>' +
+          '<button class="access-secondary" id="agForgot" type="button" hidden>' + tx('Wachtwoord vergeten','Forgot your password') + '</button>' +
+        '</form>' +
+        '<p class="access-status" id="agStatus" role="status" aria-live="polite"></p>' +
+        '<p class="access-error" id="agError" role="alert"></p>' +
+        '<a class="access-foundation" id="agFoundation" href="/apps/foundation/os-publiek.html" hidden>' +
+          tx('Ontdek FoundationOS. Dit is en blijft altijd 100% gratis.','Explore FoundationOS. It is and always will be 100% free.') + '</a>' +
+      '</div>';
+    const el = id => gate.querySelector('#' + id);
+    const inp = el('agIn'), form = el('agForm'), title = el('agTitle');
+    const draft = { name: '', email: '', geboortedatum: '' };
+    let view = 'welcome', step = 0, busy = false, accountName = '', secondProof = '';
+    let passkeyAbort = null, passkeyAttempt = 0;
+    let resetToken = new URLSearchParams(location.search).get('reset') || '';
+    const interests = window.RTGExperienceHandoff && window.RTGExperienceHandoff.consume();
+    if (interests && interests.length) {
+      el('agExperience').textContent = tx('U verkende ', 'You explored ') + interests.join(', ') +
+        tx('. Dit wordt hier getoond en niet in uw account opgeslagen.','. This is shown here and is not saved to your account.');
+      el('agExperience').hidden = false;
     }
-    /* Op telefoon vervangt deze rail de ingeklapte command-bank. De namen
-       komen uit dezelfde navigatiebron; dit is dus geen tweede wereldregister
-       dat later los van LivingOS, WorkOS, TravelOS of FoundationOS kan raken. */
-    let wereldPogingen = 0, wereldWachter = null;
-    function vulWerelden(){
-      const rail = doos.querySelector('#agWerelden');
-      if (!rail || rail.children.length) return;
-      const knoppen = document.querySelectorAll('#rtgCommand .cmd-nav button');
-      const namen = Array.from(knoppen).slice(0, 4).map(function(knop){
-        return knop.textContent.trim();
-      }).filter(Boolean);
-      if (namen.length < 4){
-        if (!wereldWachter && window.MutationObserver){
-          wereldWachter = new MutationObserver(vulWerelden);
-          wereldWachter.observe(document.body, { childList: true, subtree: true });
-        } else if (!window.MutationObserver && wereldPogingen++ < 100) setTimeout(vulWerelden, 100);
-        return;
+    function message(text, error){
+      el(error ? 'agStatus' : 'agError').textContent = '';
+      el(error ? 'agError' : 'agStatus').textContent = text || '';
+      if (error) inp.setAttribute('aria-invalid', 'true');
+    }
+    function waiting(on){
+      busy = on; form.setAttribute('aria-busy', String(on));
+      gate.querySelectorAll('button,input').forEach(button => { button.disabled = on; });
+    }
+    /* Each question is a full sentence; labels and keyboard hints stay explicit. */
+    const steps = [
+      { key:'name', type:'text', auto:'name', label:tx('Volledige naam','Full name'),
+        title:tx('Hoe mogen we u noemen?','What is your name?'),
+        text:tx('Vul uw volledige naam in. We gebruiken deze voor uw account en de overeenkomst.','Enter your full name. We use it for your account and the agreement.') },
+      { key:'email', type:'email', auto:'email', label:tx('E-mailadres','Email address'),
+        title:tx('Op welk adres kunnen we u bereiken?','Which email address can we reach you at?'),
+        text:tx('U gebruikt dit e-mailadres om in te loggen en uw account te herstellen.','You use this email address to sign in and recover your account.') },
+      { key:'geboortedatum', type:'date', auto:'bday', label:tx('Geboortedatum','Date of birth'),
+        title:tx('Wat is uw geboortedatum?','What is your date of birth?'),
+        text:tx('Uw leeftijd bepaalt welke onderdelen u kunt gebruiken. Voor dit account moet u minimaal 15 jaar zijn.','Your age determines which features you can use. You must be at least 15 to create this account.') },
+      { key:'password', type:'password', auto:'new-password', label:tx('Wachtwoord','Password'),
+        title:tx('Hoe wilt u uw account beveiligen?','How would you like to secure your account?'),
+        text:tx('Kies een uniek wachtwoord van minstens zes tekens. U maakt een gratis account aan; een betaalde pas kiest u apart. Daarna leest en bevestigt u de overeenkomst.','Choose a unique password of at least six characters. You are creating a free account; paid passes are a separate choice. You will then read and confirm the agreement.') }
+    ];
+    function field(type, label, auto, value){
+      inp.type = type; inp.value = value || ''; inp.name = auto || 'answer';
+      inp.autocomplete = auto || 'off'; inp.inputMode = type === 'email' ? 'email' : 'text';
+      inp.autocapitalize = auto === 'name' ? 'words' : 'none'; inp.spellcheck = false;
+      inp.maxLength = type === 'password' ? 200 : type === 'email' ? 254 : 80;
+      inp.removeAttribute('min'); inp.removeAttribute('max'); inp.removeAttribute('minlength');
+      if (type === 'date') {
+        const now = new Date(), oldest = new Date(now.getFullYear()-120, now.getMonth(), now.getDate());
+        const iso = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        inp.max = iso(now); inp.min = iso(oldest);
       }
-      if (wereldWachter){ wereldWachter.disconnect(); wereldWachter = null; }
-      namen.forEach(function(naam){
-        const item = document.createElement('span'); item.textContent = naam; rail.appendChild(item);
-      });
+      if (type === 'password' && auto === 'new-password') inp.minLength = 6;
+      inp.placeholder = ''; inp.setAttribute('aria-label', label);
+      el('agFieldLabel').textContent = label;
+      el('agShowPassword').hidden = type !== 'password';
+      el('agShowPassword').textContent = tx('Toon wachtwoord','Show password');
+      el('agShowPassword').setAttribute('aria-pressed','false');
     }
-    vulWerelden();
-    // een wachtwoord-herstel-link uit de e-mail (?reset=): Rahul regelt het herstel zelf
-    const herstel = new URLSearchParams(location.search).get('reset');
-
-    const zin = doos.querySelector('#agZin');
-    const inp = doos.querySelector('#agIn');
-    let gesprek = null, bezig = false, loginU = null;
-
-    /* De RTG-signatuur: de mond bestaat uit duizenden bewegende lichtpuntjes
-       (eigen canvas, geen extern beeld). Bordeaux als basis, goud erdoorheen
-       geweven, een enkel wit puntje als glinstering, en een gouden lichtgolf
-       die om de paar seconden door de lippen trekt. De onderlip beweegt mee
-       als Rahul praat. Wie minder beweging wil, krijgt een stilstaand beeld. */
-    const mond = doos.querySelector('#agMond');
-    /* EEN mond voor het hele systeem: shared/mond.js. Hier stond een eigen,
-       tweede kopie van dezelfde puntenwolk -- met een eigen tekenlus die na
-       het inloggen eeuwig bleef pollen (het canvas en 2820 objecten werden
-       nooit vrijgegeven) en met een sinus in plaats van echte spraak. Die
-       kopie is weg; de gedeelde motor doet kaak, spreiding en tuit, en stopt
-       vanzelf zodra de poort uit beeld is. */
-    /* mond.js laadt met defer en is er dus nog NIET wanneer de poort bouwt:
-       meteen aanhaken zou een stille mond geven. Vandaar de na-lading op
-       DOMContentLoaded (uitgestelde scripts draaien daarvoor al). */
-    let mondje = { praat: function(){} };
-    function mondStart(){
-      if (window.RTGMond && mond && !mond.dataset.rtgMondActief) mondje = RTGMond.maak(mond);
-    }
-    mondStart();
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mondStart);
-    const praat = ms => mondje.praat(ms);
-
-    // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
-    function zeg(wie, tekst){
-      if (wie !== 'rahul') return;
-      /* De hele zin verschijnt meteen; alleen Rahuls mond blijft bewegen. */
-      zin.style.animation = 'none';
-      void zin.offsetWidth;              // de fade opnieuw laten lopen
-      zin.style.animation = '';
-      zin.textContent = tekst;
-      praat(Math.min(2600, 500 + tekst.length * 28));
-    }
-    /* Servermetadata bestuurt stap, teller en kluisregel; zonder metadata
-       keert de poort terug naar haar gewone entree. */
-    const kopEl = doos.querySelector('#agKop');
-    const kopLabel = doos.querySelector('#agKopLabel');
-    const stappenEl = doos.querySelector('#agStappen');
-    const kluisEl = doos.querySelector('#agKluis');
-    const ROMEINS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
-    function toonVoortgang(d){
-      const v = d && d.voortgang;
-      const entree = d && (d.entree || d.login) && !d.ingelogd;
-      if (v && v.nr && !d.klaar){
-        if (kopLabel) kopLabel.textContent = T('ag.ballotage','De ballotage');
-        else if (kopEl) kopEl.textContent = T('ag.ballotage','De ballotage');
-        doos.dataset.stap = String(v.nr).padStart(2, '0');
-        doos.dataset.van = String(v.van || 4).padStart(2, '0');
-        if (stappenEl){
-          stappenEl.textContent = '';
-          stappenEl.setAttribute('aria-label', T('ag.stap','Stap') + ' ' + v.nr + ' ' +
-            T('ag.van','van') + ' ' + (v.van || 4));
-          for (let i = 1; i <= (v.van || 4); i++){
-            const s = document.createElement('span');
-            s.textContent = ROMEINS[i - 1] || String(i);
-            if (i === v.nr) s.className = 'nu';
-            else if (i < v.nr) s.className = 'gehad';
-            stappenEl.appendChild(s);
-          }
+    function render(next, focus){
+      if (passkeyAbort) { passkeyAbort.abort(); passkeyAbort = null; passkeyAttempt++; }
+      view = next; gate.dataset.accessView = view;
+      inp.value = ''; el('agCode').value = ''; inp.removeAttribute('aria-invalid');
+      el('agError').textContent = ''; el('agStatus').textContent = '';
+      el('agWelcome').hidden = view !== 'welcome'; form.hidden = view === 'welcome' || view === 'sent';
+      el('agBack').hidden = view === 'welcome'; el('agStappen').hidden = view !== 'register';
+      el('agSummary').hidden = view !== 'register' || step !== 3;
+      el('agCodeLabel').hidden = view !== 'reset'; el('agForgot').hidden = view !== 'password';
+      el('agFoundation').hidden = true;
+      el('agGo').textContent = tx('Ga verder','Continue');
+      if (view === 'welcome') {
+        title.innerHTML = tx('Welkom<br>in uw<br><em>RTG.</em>','Welcome<br>to your<br><em>RTG.</em>');
+        el('agZin').textContent = tx('Eén toegang tot uw leven, reizen, werk en kansen.','One place for life, travel, work and opportunity.');
+      } else if (view === 'register') {
+        const s = steps[step]; title.textContent = s.title; el('agZin').textContent = s.text;
+        el('agStappen').textContent = tx('Stap ','Step ') + (step + 1) + tx(' van 4',' of 4');
+        field(s.type, s.label, s.auto, draft[s.key]);
+        if (step === 3) {
+          el('agGo').textContent = tx('Maak mijn account aan','Create my account');
+          const review = el('agReview'); review.textContent = '';
+          steps.slice(0,3).forEach((s,i) => {
+            const button = document.createElement('button'); button.type = 'button'; button.className = 'access-secondary';
+            button.textContent = s.label + ': ' + draft[s.key] + tx(', wijzigen',', edit');
+            button.addEventListener('click', () => { step=i; render('register',true); });
+            review.appendChild(button);
+          });
         }
-        doos.classList.add('ag-ballotage');
-      } else if (entree){
-        // het spiegelbeeld voor wie al lid is: dezelfde kopregel-taal,
-        // zonder stappen (thuiskomen is geen procedure)
-        if (kopLabel) kopLabel.textContent = T('ag.entree','De entree');
-        else if (kopEl) kopEl.textContent = T('ag.entree','De entree');
-        delete doos.dataset.stap; delete doos.dataset.van;
-        if (stappenEl){ stappenEl.textContent = ''; stappenEl.removeAttribute('aria-label'); }
-        doos.classList.add('ag-ballotage');
       } else {
-        doos.classList.remove('ag-ballotage');
-        delete doos.dataset.stap; delete doos.dataset.van;
-        if (stappenEl) stappenEl.removeAttribute('aria-label');
+        const copy = {
+          login:[tx('Welkom terug.','Welcome back.'),tx('Vul uw e-mailadres of gebruikersnaam in. Daarna vragen we om uw wachtwoord.','Enter your email address or username. We will then ask for your password.'),'text',tx('E-mailadres of gebruikersnaam','Email address or username'),'username',accountName],
+          password:[tx('Open uw RTG.','Open your RTG.'),tx('Vul uw wachtwoord in om veilig verder te gaan.','Enter your password to continue securely.'),'password',tx('Wachtwoord','Password'),'current-password',''],
+          second:[tx('Bevestig dat u het bent.','Confirm it is you.'),tx('Vul de code uit uw authenticator-app of een van uw herstelcodes in.','Enter the code from your authenticator app or one of your recovery codes.'),'text',tx('Verificatiecode','Verification code'),'one-time-code',''],
+          forgot:[tx('We helpen u weer op weg.','Let us help you get back in.'),tx('Vul het e-mailadres van uw account in. Als herstel mogelijk is, ontvangt u daar de vervolgstappen.','Enter your account email address. If recovery is available, you will receive the next steps there.'),'email',tx('E-mailadres','Email address'),'email',accountName.includes('@')?accountName:''],
+          reset:[tx('Kies een nieuw wachtwoord.','Choose a new password.'),tx('Gebruik minstens zes tekens. Heeft u ook een sms-code ontvangen? Vul die dan hieronder in. Zonder ontvangen sms-code laat u dat veld leeg.','Use at least six characters. If you also received a text message code, enter it below. Otherwise, leave that field empty.'),'password',tx('Nieuw wachtwoord','New password'),'new-password',''],
+          sent:[tx('Controleer uw e-mail.','Check your email.'),tx('Als dit adres bij een account hoort en herstel mogelijk is, ontvangt u de vervolgstappen per e-mail. Kijk ook in uw ongewenste e-mail.','If this address belongs to an account and recovery is available, you will receive the next steps by email. Please also check your spam folder.'),'email','','off','']
+        }[view];
+        title.textContent = copy[0]; el('agZin').textContent = copy[1]; field(copy[2],copy[3],copy[4],copy[5]);
+        if (view === 'password' || view === 'second') el('agGo').textContent = tx('Log in','Sign in');
+        if (view === 'forgot') el('agGo').textContent = tx('Vraag herstel aan','Request recovery');
+        if (view === 'reset') el('agGo').textContent = tx('Sla mijn wachtwoord op','Save my password');
       }
-      const kluisTekst = d && d.login ? T('ag.kluisdirect','Rechtstreeks naar de kluis, niet door dit gesprek')
-        : (d && d.vertrouwelijk ? T('ag.kluis','Versleuteld · rechtstreeks de kluis in') : null);
-      if (kluisEl && kluisTekst && !d.klaar){
-        kluisEl.textContent = kluisTekst;
-        doos.classList.add('ag-kluis-aan');
-      } else {
-        doos.classList.remove('ag-kluis-aan');
+      if (focus) { if (!form.hidden) inp.focus({preventScroll:true}); else title.focus({preventScroll:true}); gate.scrollTop=0; }
+    }
+    /* WebAuthn uses the existing challenge, signature check and session path. */
+    async function passkeyLogin(){
+      if (busy || passkeyAbort) return;
+      if (!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get)) {
+        message(tx('Uw browser ondersteunt hier geen passkey. U kunt inloggen via Andere manier.','This browser cannot use a passkey here. You can sign in using Another way.'),true); return;
       }
-    }
-    const pkKnop = doos.querySelector('#agPasskey');
-    const pkKaart = doos.querySelector('.ag-passkey-kaart');
-    const andersKnop = doos.querySelector('#agAnders');
-    const antwoordRij = inp.closest('.ag-rij');
-    let passkeyBezig = false, passkeyAbort = null;
-    function toonPasskey(aan){
-      if (!pkKnop) return;
-      pkKnop.hidden = !aan;
-      if (pkKaart) pkKaart.hidden = !aan;
-      // het label pas hier vertalen: bij het bouwen van de poort is de i18n
-      // soms nog niet geladen
-      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.veilig','Veilig openen'); }
-    }
-    function wachtwoordVeld(placeholder){
-      inp.type = 'password';
-      inp.placeholder = placeholder || T('ag.ww','Je wachtwoord');
-      // wie herkend is (loginU) mag ook met Face ID / vingerafdruk / sleutel
-      toonPasskey(!!loginU);
-    }
-    function tekstVeld(){
-      inp.type = 'text';
-      inp.placeholder = T('ag.plho','Ik wil zeggen dat..');
-      toonPasskey(false);
-    }
-
-    /* RTG Deur: eerst bewijst het toestel wie er staat; pas daarna zoekt de
-       server het account bij de credential. Na "Andere manier" kan dezelfde
-       functie ook de oude, gerichte passkey van een genoemd account gebruiken. */
-    async function passkeyInlog(automatisch){
-      if (passkeyBezig) return;
-      if (!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get)){
-        zeg('rahul', T('ag.pk.geen','Dit toestel kent geen passkey. Kies Andere manier.')); return;
-      }
-      const b2u = s => Uint8Array.from(atob(String(s).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
-      const u2b = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-      passkeyBezig = true;
-      passkeyAbort = window.AbortController ? new AbortController() : null;
+      const attempt = ++passkeyAttempt;
+      const controller = new AbortController(); passkeyAbort = controller;
+      el('agPasskey').disabled = true;
+      const b2u = s => Uint8Array.from(atob(String(s).replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+      const u2b = buf => btoa(String.fromCharCode.apply(null,new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
       try {
-        zeg('rahul', T('ag.pk.vraag','Je toestel vraagt nu om je Face ID, vingerafdruk of sleutel.'));
-        const o = await API.call('/webauthn/opties', loginU ? { login: loginU } : {});
+        message(tx('Bevestig op uw apparaat dat u wilt inloggen.','Confirm on your device that you want to sign in.'));
+        const o = await API.call('/webauthn/opties',{});
+        if (attempt !== passkeyAttempt) return;
         const pub = o.opties; pub.challenge = b2u(pub.challenge);
-        pub.allowCredentials = (pub.allowCredentials || []).map(c => Object.assign({}, c, { id: b2u(c.id) }));
-        const vraag = { publicKey: pub };
-        if (passkeyAbort) vraag.signal = passkeyAbort.signal;
-        const cred = await navigator.credentials.get(vraag);
-        const antwoord = { id: cred.id, rawId: u2b(cred.rawId), type: cred.type,
-          clientExtensionResults: cred.getClientExtensionResults(),
-          response: { authenticatorData: u2b(cred.response.authenticatorData), clientDataJSON: u2b(cred.response.clientDataJSON),
-            signature: u2b(cred.response.signature), userHandle: cred.response.userHandle ? u2b(cred.response.userHandle) : null } };
-        const r = await API.call('/webauthn/login', { login: loginU || undefined, ceremonie: o.ceremonie, antwoord,
-          pasApp: vastePas || undefined, lang: document.documentElement.lang || 'nl' });
-        passkeyBezig = false; passkeyAbort = null;
-        if (r && r.token){
-          API.token = r.token; try { localStorage.setItem('rtg_member_token', r.token); } catch(e){}
-          zeg('rahul', T('ag.welkom','Daar ben je weer. Welkom terug.'));
-          if (typeof restoreSession === 'function') await restoreSession();
-        }
-      } catch(e){
-        passkeyBezig = false; passkeyAbort = null;
-        if (e && (e.name === 'NotAllowedError' || e.name === 'AbortError')){
-          if (!automatisch && e.name !== 'AbortError') zeg('rahul', T('ag.pk.afgebroken','Niet geopend. Probeer opnieuw of kies Andere manier.'));
-          return;
-        }
-        zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.pk.mis','Dat lukte niet met de passkey. Kies Andere manier.'));
+        pub.allowCredentials = (pub.allowCredentials || []).map(c=>Object.assign({},c,{id:b2u(c.id)}));
+        const cred = await navigator.credentials.get({publicKey:pub,signal:controller.signal});
+        if (attempt !== passkeyAttempt) return;
+        const antwoord = { id:cred.id,rawId:u2b(cred.rawId),type:cred.type,
+          clientExtensionResults:cred.getClientExtensionResults(),
+          response:{authenticatorData:u2b(cred.response.authenticatorData),clientDataJSON:u2b(cred.response.clientDataJSON),
+            signature:u2b(cred.response.signature),userHandle:cred.response.userHandle?u2b(cred.response.userHandle):null} };
+        // Once the signed proof is submitted, do not offer a competing route.
+        waiting(true);
+        const result = await API.call('/webauthn/login',{ceremonie:o.ceremonie,antwoord,pasApp:vastePas||undefined});
+        await login('rtg',{response:result});
+      } catch(e) {
+        if (attempt !== passkeyAttempt) return;
+        message(e.name === 'NotAllowedError' || e.name === 'AbortError'
+          ? tx('Het inloggen is geannuleerd. Probeer het opnieuw of kies Andere manier.','Sign-in was cancelled. Try again or choose Another way.')
+          : tx('Inloggen met uw passkey is niet gelukt. Probeer het opnieuw of kies Andere manier.','Passkey sign-in failed. Try again or choose Another way.'),true);
+      } finally {
+        if (attempt === passkeyAttempt) { passkeyAbort=null; waiting(false); }
+        el('agPasskey').disabled=false;
       }
     }
-    function andereManier(stil){
-      if (passkeyAbort) passkeyAbort.abort();
-      antwoordRij.hidden = false;
-      toonPasskey(false);
-      if (andersKnop) andersKnop.hidden = true;
-      if (!stil){ start(); inp.focus(); }
+    /* Account access: validate the current step and submit through the existing auth routes. */
+    function invalid(text){
+      message(text,true); inp.focus();
     }
-    if (pkKnop) pkKnop.addEventListener('click', () => passkeyInlog(false));
-    if (andersKnop) andersKnop.addEventListener('click', () => andereManier(false));
-
-    /* ---------- wachtwoord-herstel, geheel in het gesprek ----------
-       Rahul vraagt de zescijferige code (tweede kanaal, per SMS) en daarna het
-       nieuwe wachtwoord, en zet het via de bestaande /auth/reset-route (die de
-       herstel-link uit de e-mail plus de code samen eist). Daarna gaat het
-       gewone inloggesprek verder. */
-    let resetStap = 0, resetCode = '';
-    function resetStart(){
-      resetStap = 1;
-      inp.type = 'text'; inp.inputMode = 'numeric';
-      inp.placeholder = T('ag.reset.codeph','De zes cijfers');
-      zeg('rahul', T('ag.reset.hoi','Je stelt een nieuw wachtwoord in. Uit veiligheid stuurde ik een code van zes cijfers naar je telefoon. Wat is die code?'));
-    }
-    async function resetStuur(tekst){
-      if (resetStap === 1){
-        resetCode = tekst.replace(/\D/g, '').slice(0, 6);
-        if (resetCode.length !== 6){ zeg('rahul', T('ag.reset.code6','Het zijn zes cijfers; kijk nog even in het bericht op je telefoon.')); return; }
-        resetStap = 2;
-        wachtwoordVeld(T('ag.wwnieuw','Kies een wachtwoord'));
-        zeg('rahul', T('ag.reset.ww','Dank je. En wat wordt je nieuwe wachtwoord? Minstens zes tekens.'));
-      } else if (resetStap === 2){
-        if (tekst.length < 6){ zeg('rahul', T('ag.reset.ww6','Minstens zes tekens graag.')); return; }
-        try {
-          await API.call('/auth/reset', { token: herstel, code: resetCode, password: tekst });
-          resetStap = 3; resetCode = ''; tekstVeld(); inp.inputMode = 'text';
-          zeg('rahul', T('ag.reset.klaar','Klaar, je nieuwe wachtwoord staat. Zeg "inloggen" en ik laat je binnen.'));
-        } catch(e){
-          resetStap = 1; resetCode = ''; inp.type = 'text';
-          zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.reset.mis','Zeg "opnieuw" en dan proberen we het nog eens.'));
+    async function submit(){
+      if (busy) return;
+      const value = inp.type === 'password' || el('agShowPassword').getAttribute('aria-pressed') === 'true' ? inp.value : inp.value.trim();
+      inp.removeAttribute('aria-invalid'); el('agError').textContent='';
+      if (!value || !inp.checkValidity()) return invalid(tx('Controleer dit veld en vul het volledig in.','Please check this field and complete it.'));
+      if (view === 'register' && step < 3) {
+        const s=steps[step];
+        if (step === 1 && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) return invalid(tx('Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.nl.','Enter a valid email address, such as name@example.com.'));
+        if (step === 2) {
+          const date=new Date(value+'T12:00:00'), now=new Date();
+          let age=now.getFullYear()-date.getFullYear();
+          if (now.getMonth()<date.getMonth() || (now.getMonth()===date.getMonth() && now.getDate()<date.getDate())) age--;
+          if (!Number.isFinite(age) || age>120 || age<0) return invalid(tx('Controleer uw geboortedatum.','Please check your date of birth.'));
+          if (age<15) {
+            invalid(tx('U kunt dit account vanaf 15 jaar aanmaken. U kunt wel FoundationOS ontdekken.','You can create this account from age 15. You can explore FoundationOS.'));
+            el('agFoundation').hidden=false; return;
+          }
         }
-      } else {
-        // klaar: over naar het gewone inloggesprek, ?reset uit de URL halen
-        resetStap = 0;
-        const pas = new URLSearchParams(location.search).get('pas');
-        try { history.replaceState(null, '', location.pathname + (pas ? '?pas=' + pas : '')); } catch(e){}
-        gesprek = null; start();
+        draft[s.key]=value; step++; render('register',true); return;
       }
-    }
-
-    async function start(){
-      if (gesprek || bezig) return;
-      bezig = true;
-      try { const d = await API.call('/aanmeld/start', { lang: document.documentElement.lang || 'nl' }); gesprek = d.id; zeg('rahul', d.tekst); }
-      catch(e){ zeg('rahul', T('ag.mis','Het gesprek wil even niet starten; zeg iets, dan probeer ik het opnieuw.')); gesprek = null; }
-      bezig = false;
-    }
-/* het gesprek met Rahul: versturen, wachten en het antwoord tonen */
-    async function stuur(){
-      const tekst = inp.value.trim();
-      if (!tekst || bezig) return;
-      inp.value = '';
-      inp.closest('.ag-rij').classList.remove('vol');
-      // wachtwoord-herstel loopt via zijn eigen kleine gesprek
-      if (resetStap){ bezig = true; try { await resetStuur(tekst); } catch(e){ zeg('rahul', e.message || T('ag.mis2','Dat ging even mis; zeg het nog eens.')); } bezig = false; inp.focus(); return; }
-      bezig = true;
+      if (view === 'login') { accountName=value; render('password',true); return; }
+      if ((view === 'register' || view === 'reset') && value.length<6) return invalid(tx('Gebruik een wachtwoord van minstens zes tekens.','Use a password of at least six characters.'));
+      if (view === 'reset' && el('agCode').value && !el('agCode').checkValidity()) {
+        message(tx('De sms-code bestaat uit zes cijfers.','The text message code has six digits.'),true); el('agCode').focus(); return;
+      }
+      waiting(true);
+      message(tx('Een ogenblik, we verwerken uw verzoek.','One moment, we are processing your request.'));
       try {
-        // "opnieuw" en "wachtwoord vergeten" zijn commando's voor het gesprek,
-        // ook midden in het wachtwoordstadium; al het andere is daar een
-        // wachtwoordpoging, rechtstreeks naar de ene inlogroute
-        const commando = loginU && tekst.length <= 40 && /\b(opnieuw|vergeten)\b/i.test(tekst);
-        if (loginU && !commando){
-          try {
-            await login('rtg', { u: loginU, p: tekst });
-            zeg('rahul', T('ag.welkom','Daar ben je weer: welkom terug in het huis.'));
-            toonVoortgang({});
-          } catch(e){
-            zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.wwmis','Probeer het nog eens, zeg "opnieuw", of zeg "wachtwoord vergeten" en dan regel ik een herstel-link.'));
-          }
-        } else {
-          const d = await API.call('/aanmeld/zeg', { id: gesprek, tekst, lang: document.documentElement.lang || 'nl' });
-          zeg('rahul', d.tekst);
-          toonVoortgang(d);
-          // ingelogd via de sleutelwoorden: de server heeft server-side
-          // geverifieerd en een echte token gemunt; wij bewaren hem en
-          // herstellen de sessie precies zoals na een gewone inlog
-          if (d.ingelogd && d.token){
-            try { API.token = d.token; localStorage.setItem('rtg_member_token', d.token); } catch(e2){}
-            bezig = false;
-            if (typeof restoreSession === 'function') await restoreSession();
-            return;
-          }
-          // wachtwoord vergeten: Rahul belooft de herstel-link, de app vraagt
-          // hem stil aan op de bestaande route (die nooit een bestaan lekt)
-          if (d.vergeten && d.vergeten.u){
-            API.call('/auth/forgot', { email: d.vergeten.u }).catch(() => {});
-          }
-          if (d.login && d.login.u){
-            loginU = d.login.u;
-            wachtwoordVeld();
-          } else if (/wachtwoord/i.test(d.tekst) && !d.klaar){
-            // de aanmeld-wachtwoordstap: niemand kijkt mee, ook op het scherm niet
-            wachtwoordVeld(T('ag.wwnieuw','Kies een wachtwoord'));
-          } else {
-            tekstVeld();
-          }
-          if (d.klaar && d.velden){
-            if (d.werkgever) { try { localStorage.setItem('rtg_ag_werkgever', JSON.stringify(d.werkgever)); } catch(e2){} }
-            if (d.woonplaats) { try { localStorage.setItem('rtg_ag_woonplaats', d.woonplaats); } catch(e2){} }
-            // dezelfde ene registratieroute als het formulier
-            await login('rtg', { register: true, name: d.velden.name, u: d.velden.email, phone: d.velden.phone,
-              geboortedatum: d.velden.geboortedatum, p: d.velden.password, tier: d.velden.tier });
-          }
+        if (view === 'register') {
+          const result=await login('rtg',{register:true,name:draft.name,u:draft.email,geboortedatum:draft.geboortedatum,p:value,tier:'guest',portal:true});
+          if (result) { Object.keys(draft).forEach(key=>{draft[key]='';}); inp.value=''; }
+        } else if (view === 'password') {
+          const result=await login('rtg',{u:accountName,p:value});
+          inp.value='';
+          if (result && result.tweedeFactorNodig) { secondProof=result.bewijs; render('second',true); }
+        } else if (view === 'second') {
+          const result=await API.call('/auth/tweede',{bewijs:secondProof,code:value});
+          secondProof=''; inp.value=''; await login('rtg',{response:result});
+        } else if (view === 'forgot') {
+          await API.call('/auth/forgot',{email:value}); render('sent',true);
+        } else if (view === 'reset') {
+          await API.call('/auth/reset',{token:resetToken,code:el('agCode').value.trim(),password:value});
+          resetToken=''; const url=new URL(location.href); url.searchParams.delete('reset');
+          history.replaceState(null,'',url.pathname+url.search+url.hash);
+          render('login',true); message(tx('Uw wachtwoord is gewijzigd. U kunt nu inloggen.','Your password has been changed. You can now sign in.'));
         }
-      } catch(e){ zeg('rahul', e.message || T('ag.mis2','Dat ging even mis; zeg het nog eens.')); }
-      // zei de gebruiker "opnieuw", dan verlaat de motor het inlogpad;
-      // de app volgt door het wachtwoordveld weer een tekstveld te maken
-      if (loginU && /\bopnieuw\b/i.test(tekst)){ loginU = null; tekstVeld(); }
-      bezig = false;
-      inp.focus();
+      } catch(e) {
+        el('agStatus').textContent='';
+        message(e && e.status ? e.message : tx('We konden geen verbinding maken. Uw ingevulde gegevens blijven staan. Probeer het opnieuw.','We could not connect. Your details are still here. Please try again.'),true);
+      } finally {
+        waiting(false);
+        if (!form.hidden && gate.style.display !== 'none') inp.focus({preventScroll:true});
+      }
     }
-    doos.querySelector('#agGo').addEventListener('click', stuur);
-    inp.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); stuur(); } });
-    inp.addEventListener('input', () => inp.closest('.ag-rij').classList.toggle('vol', !!inp.value.trim()));
-    // Herstel uit de e-mail begint meteen. Een gewone bezoeker krijgt eerst de
-    // zichtbare passkeydeur en opent die zelf: biometrie of een accountsleutel
-    // hoort nooit zonder een bewuste handeling van de mens te verschijnen.
-    let onthouden = null;
-    try { onthouden = localStorage.getItem('rtg_member_token'); } catch(e){}
-    if (herstel){ andereManier(true); setTimeout(resetStart, 400); }
-    inp.addEventListener('focus', () => { if (!herstel && !resetStap) start(); }, { once: true });
+    form.addEventListener('submit',event=>{event.preventDefault();submit();});
+    el('agPasskey').addEventListener('click',passkeyLogin);
+    el('agAnders').addEventListener('click',()=>render('login',true));
+    el('agNieuw').addEventListener('click',()=>{step=0;render('register',true);});
+    el('agForgot').addEventListener('click',()=>render('forgot',true));
+    el('agShowPassword').addEventListener('click',()=>{
+      const shown=inp.type==='password'; inp.type=shown?'text':'password';
+      el('agShowPassword').setAttribute('aria-pressed',String(shown));
+      el('agShowPassword').textContent=shown?tx('Verberg wachtwoord','Hide password'):tx('Toon wachtwoord','Show password');
+    });
+    el('agBack').addEventListener('click',()=>{
+      if (busy) return;
+      if (view==='register' && step>0) {
+        if (step<3) draft[steps[step].key]=inp.value;
+        step--; render('register',true);
+      } else if (view==='password' || view==='second' || view==='forgot' || view==='sent') {
+        secondProof=''; render('login',true);
+      } else { Object.keys(draft).forEach(key=>{draft[key]='';}); render('welcome',true); }
+    });
+    render(resetToken?'reset':'welcome',false);
   })();
   /* ================= SALON-CONNECTIES =================
      Leden voegen elkaar toe op codenaam, chatten 1-op-1, delen posts
@@ -1588,10 +956,9 @@ var RTG_BOUW = '247b12c2';
     onbSt = st; onbMondMaak();
     onbRij = onbOpenVelden();
     onbStap = onbRij.length ? 'veld' : 'teken';
-    const eerste = !onbGeopend; onbGeopend = true;
+    onbGeopend = true;
     g.hidden = false;
-    if (eerste) onbZeg(T('onb.intro','Fijn dat je er bent. Nog een paar dingen en je kunt op reis.'));
-    setTimeout(onbVolgende, eerste ? 750 : 0);
+    onbVolgende();
   }
   function onbVolgende(){
     if (onbStap === 'veld' && onbRij.length){
@@ -1604,29 +971,33 @@ var RTG_BOUW = '247b12c2';
   }
   function onbVraagTekst(v){
     const M = {
-      adres: T('onb.q.adres','Wat is je straat en huisnummer?'),
-      postcode: T('onb.q.postcode','En je postcode?'),
-      woonplaats: T('onb.q.woonplaats','In welke plaats woon je?'),
-      land: T('onb.q.land','En in welk land?'),
-      geboortedatum: T('onb.q.geboortedatum','Wat is je geboortedatum?'),
-      nationaliteit: T('onb.q.nationaliteit','Wat is je nationaliteit?'),
-      naam: T('onb.q.naam','Hoe heet je voluit?'),
-      email: T('onb.q.email','Wat is je e-mailadres?'),
-      telefoon: T('onb.q.telefoon','En je telefoonnummer?')
+      adres: T('onb.q.adres','Wat zijn uw straatnaam en huisnummer?'),
+      postcode: T('onb.q.postcode','Wat is uw postcode?'),
+      woonplaats: T('onb.q.woonplaats','In welke plaats woont u?'),
+      land: T('onb.q.land','In welk land woont u?'),
+      geboortedatum: T('onb.q.geboortedatum','Wat is uw geboortedatum?'),
+      nationaliteit: T('onb.q.nationaliteit','Wat is uw nationaliteit?'),
+      naam: T('onb.q.naam','Wat is uw volledige naam?'),
+      email: T('onb.q.email','Wat is uw e-mailadres?'),
+      telefoon: T('onb.q.telefoon','Op welk telefoonnummer kunnen we u bereiken?')
     };
-    return M[v.id] || (T('onb.q.veld','Wat is je ') + String(v.label || '').toLowerCase() + '?');
+    return M[v.id] || (T('onb.q.veld','Wat is uw ') + String(v.label || '').toLowerCase() + '?');
   }
   function onbVraagVeld(v){
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');
     if (rij) rij.style.display = '';
-    if (inp){ inp.type = onbInputType(v.type); inp.value = ''; inp.placeholder = T('onb.typ','Typ je antwoord'); }
+    if (inp){ inp.type = onbInputType(v.type); inp.value = ''; inp.placeholder = T('onb.typ','Vul uw antwoord in'); }
+    onbEl('onbConsentLabel').hidden = true;
+    onbEl('onbGo').dataset.i18n = 'access.onb.next';
+    onbEl('onbGo').textContent = T('access.onb.next','Ga verder');
+    if (inp) inp.setAttribute('aria-label', v.label || 'Uw antwoord');
     onbActies([]);
     onbZeg(onbVraagTekst(v));
     if (inp) inp.focus();
   }
   function onbVraagPaspoort(){
     const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
-    onbZeg(T('onb.q.paspoort','Tot slot je paspoort, zodat ik zeker weet dat jij het bent. Scan het met de RTG-scanner of kies een foto.'));
+    onbZeg(T('onb.q.paspoort','Voor deze toegang is een identiteitscontrole nodig. Scan uw paspoort of kies een duidelijke foto van de voorkant.'));
 /* de onboarding: het paspoort scannen of een bestand kiezen */
     onbActies([
       { txt: T('onb.scan','Scan je paspoort'), prim: true, doe: function(){
@@ -1675,50 +1046,40 @@ var RTG_BOUW = '247b12c2';
   function onbTekenVraag(){
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');
     if (rij) rij.style.display = '';
-    if (inp){ inp.type = 'text'; inp.value = ''; inp.placeholder = T('onb.naamph','Typ je volledige naam'); }
+    if (inp){
+      inp.type = 'text'; inp.value = ((onbSt.velden || []).find(v => v.id === 'naam') || {}).waarde || ''; inp.autocomplete = 'name';
+      inp.placeholder = T('access.onb.name','Vul uw volledige naam in');
+      inp.setAttribute('aria-label', T('access.onb.nameLabel','Volledige naam voor ondertekening'));
+    }
     const c = (onbSt && onbSt.contract) || {};
-    onbZeg(T('onb.teken','Laatste stap: de ') + (c.titel || T('onb.overeenkomst','overeenkomst')) + T('onb.teken2','. Typ je volledige naam om te tekenen; daarmee ga je akkoord. Wil je hem eerst lezen?'));
-    onbActies([{ txt: T('onb.lees','Lees de overeenkomst'), doe: onbToonLees }]);
-    if (inp) inp.focus();
+    onbZeg(T('access.onb.review','Lees de overeenkomst en controleer uw naam hieronder. Bevestig dat u akkoord gaat voordat u verdergaat.'));
+    const l = onbEl('onbLees');
+    if (l){ l.textContent = c.tekst || c.titel || ''; l.hidden = true; l.tabIndex = 0; }
+    onbEl('onbConsentLabel').hidden = false;
+    onbEl('onbConsent').checked = false;
+    onbEl('onbGo').dataset.i18n = 'access.onb.finish';
+    onbEl('onbGo').textContent = T('access.onb.finish','Bevestig en open mijn RTG');
+    onbActies([{ txt: T('access.onb.read','Lees de overeenkomst'), doe: onbToonLees }]);
+    onbEl('onbGate').scrollTop = 0;
   }
   function onbToonLees(){
     const l = onbEl('onbLees'); if (!l) return;
     if (l.hidden){ l.textContent = ((onbSt && onbSt.contract) || {}).tekst || ''; l.hidden = false; }
     else l.hidden = true;
+    const toggle = onbEl('onbActies').querySelector('[aria-controls="onbLees"]');
+    if (toggle) toggle.setAttribute('aria-expanded', String(!l.hidden));
   }
   function onbActies(lijst){
     const box = onbEl('onbActies'); if (!box) return;
     box.textContent = '';
     (lijst || []).forEach(function(a){
       const b = document.createElement('button'); b.type = 'button'; b.textContent = a.txt;
+      if (a.doe === onbToonLees){ b.setAttribute('aria-controls','onbLees'); b.setAttribute('aria-expanded','false'); }
       if (a.prim) b.className = 'prim'; b.addEventListener('click', a.doe); box.appendChild(b);
     });
   }
-  /* NA HET TEKENEN IS HET LID BINNEN, EN VERDER NIETS.
-
-     Hier stonden drie vragen tussen de handtekening en de app: vul alvast je
-     bezorggegevens in, wil je meteen iets in De Salon zetten, en heb je een
-     bedrijf. Alle drie vrijwillig, alle drie met een uitweg -- en samen alsnog
-     drie schermen voordat een mens ook maar iets van RTG had gezien.
-
-     De regel die dit terugdringt staat in MENS.md par. 5 en komt uit punt 7:
-     een stroom mag alleen blokkeren op wat NU NODIG is. De overeenkomst is dat
-     -- zonder handtekening bestaat het lidmaatschap niet. De andere drie zijn
-     dat niet: ze worden gesteld omdat het antwoord OOIT van pas komt.
-
-     ER GAAT GEEN FUNCTIE WEG, en dat is nagekeken voordat dit werd geschrapt:
-
-       - de gegevens vraagt de gegevenspoort zelf, op het moment dat er
-         werkelijk iets bezorgd of besteld wordt. Dat is precies wat het oude
-         commentaar hier al zei ("wat de gegevenspoort anders per keer komt
-         vragen") -- alleen vooruit gesteld in plaats van op zijn moment;
-       - een bericht in De Salon plaatst een lid op /apps/salon.html;
-       - een bedrijf aanmelden gaat via /apps/partner-worden.html, en
-         server/kern/onboarding/meebouwen.js blijft ongemoeid: die deur is er
-         nog, alleen staat hij niet meer in de gang naar binnen.
-
-     `npm run eersteminuut` telt deze poorten; komt er ooit weer een vraag vóór
-     de eerste waarde, dan zakt de toets geen-onnodige-vragen. */
+  /* Optional profile, social and business questions remain available in their
+     own domains. Only required fields and explicit agreement block entry. */
   let onbInr = [], onbInrHuidig = null;
   async function onbInrichtenAanbod(){ return onbKlaar(); }
   function onbInrVolgende(){
@@ -1744,12 +1105,12 @@ var RTG_BOUW = '247b12c2';
     onbStap = null; onbGeopend = false; onbSt = null; onbRij = []; onbInr = []; onbInrHuidig = null; onbMb = []; onbMbHuidig = null;
     onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
     naarWereldkeuze();
-    toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
+    toast(T('access.onb.welcome','Welkom bij RTG. Uw account is klaar voor gebruik.'));
   }
   async function onbInvoer(tekst){
     if (onbBezig || !onbStap) return;
     tekst = String(tekst == null ? '' : tekst).trim();
-    const inp = onbEl('onbIn'); if (inp) inp.value = '';
+    const inp = onbEl('onbIn');
     const fout = onbEl('onbFout'); if (fout) fout.textContent = '';
     if (onbStap === 'veld'){
       if (!tekst || !onbHuidig) return;
@@ -1769,8 +1130,12 @@ var RTG_BOUW = '247b12c2';
       if (!tekst || !onbMbHuidig) return;
       return onbMbOpslaan(tekst);
     } else if (onbStap === 'teken'){
-      if (tekst.length < 2){ if (fout) fout.textContent = T('onb.naamkort','Typ je volledige naam om te tekenen.'); return; }
-      onbBezig = true;
+      if (!onbEl('onbConsent').checked){
+        if (fout) fout.textContent = T('access.onb.consent','Bevestig dat u de overeenkomst heeft gelezen en ermee akkoord gaat.');
+        onbEl('onbConsent').focus(); return;
+      }
+      if (tekst.length < 2){ if (fout) fout.textContent = T('access.onb.nameShort','Vul uw volledige naam in om de overeenkomst te ondertekenen.'); return; }
+      onbBezig = true; onbEl('onbGo').disabled = true;
       try {
         const r = await API.call('/onboarding/teken', { naam: tekst, akkoord: true });
         onbBezig = false; onbSt = r;
@@ -1778,7 +1143,8 @@ var RTG_BOUW = '247b12c2';
         onbRij = onbOpenVelden();
         onbStap = onbRij.length ? 'veld' : 'teken';
         onbVolgende();
-      } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet, probeer het nog eens.'); }
+      } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet. Probeer het opnieuw.'); }
+      finally { onbEl('onbGo').disabled = false; }
     }
   }
   async function onbPaspoortGekozen(file){

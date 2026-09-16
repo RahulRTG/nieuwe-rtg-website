@@ -100,10 +100,9 @@
     onbSt = st; onbMondMaak();
     onbRij = onbOpenVelden();
     onbStap = onbRij.length ? 'veld' : 'teken';
-    const eerste = !onbGeopend; onbGeopend = true;
+    onbGeopend = true;
     g.hidden = false;
-    if (eerste) onbZeg(T('onb.intro','Fijn dat je er bent. Nog een paar dingen en je kunt op reis.'));
-    setTimeout(onbVolgende, eerste ? 750 : 0);
+    onbVolgende();
   }
   function onbVolgende(){
     if (onbStap === 'veld' && onbRij.length){
@@ -116,26 +115,30 @@
   }
   function onbVraagTekst(v){
     const M = {
-      adres: T('onb.q.adres','Wat is je straat en huisnummer?'),
-      postcode: T('onb.q.postcode','En je postcode?'),
-      woonplaats: T('onb.q.woonplaats','In welke plaats woon je?'),
-      land: T('onb.q.land','En in welk land?'),
-      geboortedatum: T('onb.q.geboortedatum','Wat is je geboortedatum?'),
-      nationaliteit: T('onb.q.nationaliteit','Wat is je nationaliteit?'),
-      naam: T('onb.q.naam','Hoe heet je voluit?'),
-      email: T('onb.q.email','Wat is je e-mailadres?'),
-      telefoon: T('onb.q.telefoon','En je telefoonnummer?')
+      adres: T('onb.q.adres','Wat zijn uw straatnaam en huisnummer?'),
+      postcode: T('onb.q.postcode','Wat is uw postcode?'),
+      woonplaats: T('onb.q.woonplaats','In welke plaats woont u?'),
+      land: T('onb.q.land','In welk land woont u?'),
+      geboortedatum: T('onb.q.geboortedatum','Wat is uw geboortedatum?'),
+      nationaliteit: T('onb.q.nationaliteit','Wat is uw nationaliteit?'),
+      naam: T('onb.q.naam','Wat is uw volledige naam?'),
+      email: T('onb.q.email','Wat is uw e-mailadres?'),
+      telefoon: T('onb.q.telefoon','Op welk telefoonnummer kunnen we u bereiken?')
     };
-    return M[v.id] || (T('onb.q.veld','Wat is je ') + String(v.label || '').toLowerCase() + '?');
+    return M[v.id] || (T('onb.q.veld','Wat is uw ') + String(v.label || '').toLowerCase() + '?');
   }
   function onbVraagVeld(v){
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');
     if (rij) rij.style.display = '';
-    if (inp){ inp.type = onbInputType(v.type); inp.value = ''; inp.placeholder = T('onb.typ','Typ je antwoord'); }
+    if (inp){ inp.type = onbInputType(v.type); inp.value = ''; inp.placeholder = T('onb.typ','Vul uw antwoord in'); }
+    onbEl('onbConsentLabel').hidden = true;
+    onbEl('onbGo').dataset.i18n = 'access.onb.next';
+    onbEl('onbGo').textContent = T('access.onb.next','Ga verder');
+    if (inp) inp.setAttribute('aria-label', v.label || 'Uw antwoord');
     onbActies([]);
     onbZeg(onbVraagTekst(v));
     if (inp) inp.focus();
   }
   function onbVraagPaspoort(){
     const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
-    onbZeg(T('onb.q.paspoort','Tot slot je paspoort, zodat ik zeker weet dat jij het bent. Scan het met de RTG-scanner of kies een foto.'));
+    onbZeg(T('onb.q.paspoort','Voor deze toegang is een identiteitscontrole nodig. Scan uw paspoort of kies een duidelijke foto van de voorkant.'));

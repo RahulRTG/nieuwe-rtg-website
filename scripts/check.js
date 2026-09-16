@@ -4719,6 +4719,8 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
     ['public/shared/rtg-simple.css', new Set([
       'var(--rtg-radius-system)!important'
     ])],
+    // The approved access portal uses the same Heritage content corners.
+    ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)'])],
     ['public/shared/interface/second-screen-personal.css', new Set([
       'var(--rtg-radius-system)'
     ])]

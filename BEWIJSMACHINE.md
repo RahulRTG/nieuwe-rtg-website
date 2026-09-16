@@ -915,6 +915,124 @@ Drie keer in twee dagen, en elke keer in een nieuwe vorm:
 Commentaar scheiden hielp bij de derde niet, want de string stond in de code.
 Wat helpt is de regel zelf.
 
+## 6d. Van conflict naar herbouwplicht
+
+Par. 6c geeft elk afgeleid artefact een eigenaar. Dat is **eigenaarschap en geen
+bewijs** — dat de map zegt wie de sleutel heeft, betekent niet dat de sleutel
+past. `scripts/herbouwproef.js` (`HERBOUWPROEF.json`) stelt de vraag erachter:
+draai die eigenaar, en komt er hetzelfde uit?
+
+Daar hangt een architectonisch gevolg aan. Een afgeleid artefact waarvan de
+herbouw vaststaat, is bij een samenvoeging **geen conflict maar een
+herbouwplicht**: je neemt geen van beide kanten over en je lost niets met de
+hand op, je draait de generator. Een artefact waarvan dat níét vaststaat, moet
+met de hand worden samengevoegd — en dan ontstaat er een waarheid die geen
+enkele bron heeft geproduceerd.
+
+### De aanroep wordt afgeleid, niet verklaard
+
+Er komt geen vierde lijst bij (zelfde regel als in par. 6c). De aanroep wordt
+gezocht in de bronnen die er al zijn, en de **herkomst** staat per artefact in
+de uitslag: eerst de opdracht die `scripts/versheid.js` per register al noemt,
+anders de npm-opdracht die de eigenaar aanroept, anders `node <eigenaar>` — want
+de eigenaar ís het script. Een `--controle`- of `--toon`-variant nooit: die
+schrijft met opzet niet, en wie die kiest meet gegarandeerd "niet geschreven" en
+noemt dat dan een eigenschap van het artefact.
+
+### Vijf uitslagen, en twee ervan gaan niet over het artefact
+
+| | |
+|---|---|
+| `gelijk` | byte voor byte hetzelfde |
+| `alleenStempel` | alleen het meetmoment bewoog; de inhoud kwam terug zoals hij stond |
+| `verschilt` | de inhoud kwam anders terug — een bevinding, geen fout van de proef |
+| `nietGeschreven` | de opdracht liep en raakte het bestand niet aan |
+| `nietGedraaid` | kon hier niet draaien, mét de reden |
+
+**`gelijk` en `alleenStempel` worden nooit opgeteld tot een cijfer
+determinisme.** Een stempel *hoort* te bewegen; zou je ze samentellen, dan wordt
+een register dat zijn eigen meetmoment niet opschrijft de beste leerling. Ze
+tellen alleen samen op in `herbouwbaar`, en dat woord draagt geen percentage —
+`LAT.md` regel 11 en `check.js` regel 48 staan erboven.
+
+`nietGeschreven` is de **besturingsproef**. Zonder die stand leest elke leesloze
+opdracht als een perfecte reproductie: het bestand is niet veranderd, dus het is
+"gelijk". De proef kijkt daarom naar de mtime en niet alleen naar de bytes — een
+instrument dat niet kan uitslaan, is geen instrument.
+
+### De uitslag over de achttien conflicten van 15 september
+
+| | |
+|---|---|
+| `gelijk` | 5 |
+| `alleenStempel` | 9 |
+| **`verschilt`** | **0** |
+| `nietGeschreven` | 1 |
+| `nietGedraaid` | 3 |
+| **herbouwbaar** | **14 van 18** |
+
+**Nul artefacten kwamen inhoudelijk anders terug.** De vier die niet bewezen
+zijn, zijn dat elk om een andere soort reden, en die vier soorten horen niet op
+een hoop:
+
+- **`CLAUDE.md` en `MACHINE.md`** zijn FRAGMENTEN. Ze in hun geheel herbouwen
+  bestaat niet — een eigenschap van het artefact, geen tekort.
+- **`DEKKING.json`** liep over de wachttijd: zijn generator draait de hele
+  toetsmap. Een oordeel over deze machine en niet over het register.
+- **`NORM.json`** schrijft alleen als er iets beweegt. Dat is correct gedrag van
+  een ratelregister, en het betekent dat de herbouw hier niet te *observeren*
+  is — niet dat hij niet klopt.
+
+Het samenvoegmodel verschuift daarmee van *19 conflicten, 18 met de hand* naar
+*1 bronconflict plus 18 herbouwplichten, waarvan er 14 bewezen zijn*.
+
+### Drie dingen die de eerste ronde in de proef zelf vond
+
+**Een meetmoment wordt op vorm herkend en niet op naam.** Er lopen twee
+stempelconventies naast elkaar: de meeste registers dragen een `stempel`-object,
+`COMMERCE.json` en `OBJECTMODEL.json` een kale `vastgelegd: "2026-09-15"`. Een
+lijst toegestane veldnamen zou de derde vorm morgen missen en vandaag al een
+echt verschil wegpoetsen dat toevallig zo heet. De regel is nu structureel: een
+top-level veld waarvan de oude en de nieuwe waarde allebei een ISO-datum zijn,
+is een meetmoment — en wat er is weggestreept staat **met naam** in de uitslag.
+
+**Regels op positie vergelijken gaf een geldig getal uit het verkeerde
+experiment.** `BEWIJS.md` kwam terug als *1413 regels anders van 1958*, terwijl
+`git diff --stat` 7 toevoegingen en 6 verwijderingen telt: één ingevoegde regel
+schuift alles erna op, en dan verschilt de rest van het bestand per definitie.
+Dat is par. 6a op deze proef zelf. De vergelijking gaat nu over regels als
+verzameling.
+
+**De wachttijd doodde alleen de schil.** `npm run dekking:vast` liep af op 240
+seconden, de proef noteerde netjes `nietGedraaid` — en drie minuten later stonden
+`npm`, het generatorscript én een `node --test` over de hele toetsmap nog te
+draaien. Die schrijven hun register af terwijl de proef allang bij het volgende
+artefact is, dus meet artefact *n+1* op de uitvoer van artefact *n* met een
+tussenpoos die niemand kan reproduceren. Dezelfde opstapeling die
+`scripts/mutatie.js` beschrijft. De opdracht loopt nu via `setsid`, zodat de
+kindpid de groepsleider is en de hele kring omgaat; daarna wordt er **gepeild**
+of hij echt weg is, want een signaal sturen is niet hetzelfde als opgeruimd
+zijn.
+
+En een vierde, die geen fout van de proef was maar een vondst: vier van de
+achttien heetten eerst `nietGeschreven` terwijl ze prima schrijven. Hun
+npm-opdracht is de kale variant en de `writeFileSync` staat achter
+`process.argv.includes('--vastleggen')`; `mutatiecontract` heeft daarnaast
+`--afleiden`, een vlag die in geen enkele naamconventie past. De vlaggen worden
+nu **gelezen uit de bron van de eigenaar** en een voor een geprobeerd, en het
+register noteert de opdracht die aantoonbaar heeft geschreven.
+
+### Wat deze proef niet zegt
+
+Hij zegt niet dat een generator deterministisch is: hij draait één keer. Twee
+keer draaien zou het wel zeggen, en dat is een aparte meting. Hij zegt ook niet
+dat het ingecheckte artefact klopt met de bron van gisteren — `verschilt`
+betekent *of de generator is niet deterministisch, of het artefact loopt achter*,
+en welke van de twee is met deze proef alleen niet uit te maken. In de eerste
+ronde was het driemaal het tweede, en daarmee deed hij precies waar hij voor is:
+`ARCHITECTUUR.md`, `BEWIJS.md` en `FUNCTIES.md` liepen één bestand achter omdat
+deze proef zelf erbij was gekomen.
+
 ## 7. Wat dit niet wordt
 
 - **Geen enkel groen woord bovenaan.** `LAT.md` regel 11 en `check.js` regel 48

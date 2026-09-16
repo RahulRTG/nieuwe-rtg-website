@@ -53,7 +53,11 @@
 
    Elke generator schrijft in de werkboom. De proef begint daarom alleen op een
    schone boom, legt na elke opdracht elk gewijzigd tracked bestand terug, en
-   controleert aan het EIND dat de boom weer schoon is. Lukt dat laatste niet,
+   controleert aan het EIND dat de boom weer schoon is. LET OP WAT DAT BETEKENT
+   VOOR JEZELF: terwijl hij draait moet je NIETS in de boom veranderen -- dat
+   terugleggen kent geen onderscheid tussen de uitvoer van een generator en jouw
+   werk, en gooit allebei weg. (Hier woordelijk verdiend: een halve paragraaf
+   BEWIJSMACHINE.md verdween op de eerste schone ronde.) Lukt dat laatste niet,
    dan meldt hij dat hardop in plaats van een uitslag te leveren over een
    werkboom die hij zelf heeft veranderd.
 
@@ -314,7 +318,10 @@ function meet(namen, opties) {
     if (r.uitslag === 'nietGeschreven' && a.eigenaar) {
       for (const vlag of vlaggenVan(a.eigenaar)) {
         if (aanroep.opdracht.includes(vlag)) continue;
-        const met = { opdracht: aanroep.opdracht + ' -- ' + vlag, herkomst: aanroep.herkomst + '+vlag' };
+        /* `npm run x` heeft een `--` nodig om de vlag door te geven, `node x.js`
+           niet -- daar zou het scheidingsteken gewoon in argv belanden. */
+        const scheiding = /^npm\b/.test(aanroep.opdracht) ? ' -- ' : ' ';
+        const met = { opdracht: aanroep.opdracht + scheiding + vlag, herkomst: aanroep.herkomst + '+vlag' };
         geprobeerd.push(met.opdracht);
         const t = beproef(naam, met, opties.wachtMs);
         if (t.uitslag !== 'nietGeschreven') { r = t; aanroep = met; break; }

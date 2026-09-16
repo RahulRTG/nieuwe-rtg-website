@@ -1154,6 +1154,109 @@ noemt.
 
 De drie besluiten van par. 10 staan, en ze zijn nu preciezer geadresseerd:
 besluit 1 en 2 wachten op een uitvoerende levensloop, besluit 3 op een
-onderliggende handeling — en alle drie wachten op hetzelfde, namelijk op weg 1
-of weg 2 hierboven. Dat is geen vertraging maar het verschil tussen een besluit
-dat af is en een besluit dat nog een onderwerp moet krijgen.
+onderliggende handeling — en alle drie wachten op hetzelfde. Waarop precies, is
+in 11.6 besloten: niet op een van de wegen uit 11.4, maar op een echte
+domeinbehoefte. Dat is geen vertraging maar het verschil tussen een besluit dat
+af is en een besluit dat nog een onderwerp moet krijgen.
+
+### 11.6 Het besluit: weg 3, en een niet-bouwregel (16 september 2026)
+
+**Gekozen is weg 3 — wachten tot een echt domein uitvoering namens iemand nodig
+heeft.** Weg 1 is afgewezen, weg 2 gereserveerd. De redenen zijn belangrijker dan
+de keuze.
+
+**Weg 1 valt af omdat hij de verkeerde kant op redeneert.** De cel van de App
+Store openen om een representation-invariant bewijsbaar te maken, verzwakt een
+BEWEZEN isolatie-eigenschap voor een use-case die nog niet bestaat. De grens
+*"één bord per app, nooit dat van de arena"* staat er met een reden; dan past de
+vertegenwoordiging zich aan de App Store aan, en niet andersom.
+
+**Weg 2 wordt niet verboden maar ook niet nu genomen.** Er kan een moment komen
+waarop een principal wil dat een ander iets definitiefs kan doen — *"Noah geeft
+zijn manager bevoegdheid om hotelboekingen tot € 500 definitief te maken"*. Dán
+is er een echte behoefte, en pas dan zijn de tien vragen te beantwoorden die
+erbij horen: welke capability, welke grens, welk bedrag, welke looptijd,
+intrekbaar, welk spoor, welke idempotentie, welke crashsemantiek, welke
+bevestiging, welke NOOIT-regels. Dat is execution-by-representation ontworpen
+vanuit een handeling in plaats van vanuit architectonische symmetrie.
+
+### 11.7 De niet-bouwregel
+
+> **RTG creëert geen uitvoerbare vertegenwoordiging om de
+> vertegenwoordigingsarchitectuur compleet te maken. Een uitvoeringsrecht
+> ontstaat uitsluitend vanuit een concrete domeincapability waarvoor uitvoering
+> door een andere actor een productbehoefte is.**
+>
+> Het eerste echte geval ACTIVEERT de latente invarianten voor effectbehoud,
+> spoor, zekerheid, crashgedrag en menselijke controle. Vóór dat geval hoeven ze
+> geen implementatie te hebben.
+
+Deze regel staat hier omdat een volgende sessie anders `uitvoering namens
+principal: 0` leest en enthousiast een generieke `executeAs()` bouwt. Dat zou
+precies de verkeerde conclusie zijn: de nul is geen tekort maar een grens.
+
+**En zelfs als weg 2 ooit nodig wordt, hoort er waarschijnlijk geen generieke
+uitvoeringsmotor in `kern/vertegenwoordiging/`.** Krijgt TravelOS ooit
+`BOOK_HOTEL`, dan kan die capability zélf de vier etiketten dragen (actor,
+principal, grond, capability) en bij de representatiekern navragen of deze actor
+dit namens deze principal mag. Dan blijft het domein eigenaar van de UITVOERING
+en blijft vertegenwoordiging eigenaar van *wie mag namens wie wat* — dezelfde
+scheiding die `OS.md` trekt tussen domeinvermogen en platformvermogen.
+
+### 11.8 Wat de nul werkelijk betekent
+
+**De menselijke uitvoeringsgrens is voorlopig een architectuureigenschap en geen
+featuregap.** Software mag namens een mens beoordelen, voorbereiden, begrenzen,
+openen en vastleggen; zodra de werkelijkheid van een tweede persoon of een
+gevoelige handeling echt verandert, komt er opnieuw een mens in de keten.
+
+*Gemeten* is dat over de zeven mechanismen van par. 11.3. Dat het ook elders zo
+is, is **niet** gemeten maar wel wat twee documenten hardop kiezen (`GELD.md`:
+geld wordt klaargezet en een mens voert uit; `FABRIC.md`: wat een tweede persoon
+bereikt bevestigt een mens). De grens gaat bovendien over *namens een ander* en
+niet over automatisering in het algemeen: een lid dat zijn eigen automatisering
+aanzet, valt hier niet onder.
+
+Daaruit volgt de vorm van besluit 3, en die is preciezer dan hij in par. 10
+stond. De invariant is **latent, met een activeringsvoorwaarde**:
+
+> Zodra een capability uitvoering door een andere actor namens een principal
+> toestaat, moet haar effectsemantiek identiek zijn aan directe uitvoering door
+> de principal zelf.
+
+Vandaag: **0 toepasselijke gevallen** — en dat is iets anders dan 0% dekking. Een
+register dat hier een dekkingspercentage van nul zou melden, meldt een tekort
+waar een grens staat. Bij het eerste echte geval hoort de poort te eisen dat deze
+invariant bewezen is vóórdat die capability wordt toegelaten.
+
+**Hetzelfde geldt voor de drie zekerheidsprofielen van 10.2.** Ze horen bij de
+capability die wordt uitgevoerd en niet bij vertegenwoordiging als geheel:
+`BOOK_HOTEL` is extern reconcileerbaar, een profielwijziging lokaal
+transactioneel, een SEPA-opdracht extern met onzekere landing. Of de principal
+zelf of een ander namens hem de opdracht start, verandert dat profiel niet.
+
+### 11.9 Vijf verantwoordelijkheden, en met opzet geen zesde ladder
+
+De meting laat zien dat dit huis al onderscheid maakt tussen dingen die makkelijk
+allemaal "uitvoering" gaan heten:
+
+| | wie | wat |
+|---|---|---|
+| voorbereiden | software of vertegenwoordiger | maakt iets gereed |
+| beoordelen | machine | bepaalt of het binnen de bevoegdheid valt |
+| voorstellen | de tweede persoon | brengt het naar de principal |
+| bevestigen | de principal | aanvaardt de stap |
+| uitvoeren | de capability | verandert de werkelijkheid |
+
+**Dit is nadrukkelijk geen nieuwe ladder.** Het zijn semantische verschillen die
+al in de architectuur zitten, en `AFSPRAAK.md` verbiedt een zesde uitkomst- of
+zekerheidsladder terwijl `GEZAGSNOEMER.json` op vijf schalen met 21 treden staat.
+Ze staan hier zodat het woord *uitvoering* niet vier andere dingen gaat
+opslokken — niet om er treden van te maken.
+
+Voor een toekomstig ManagementOS is dat geen zwakte maar de kern. Een manager kan
+enorm ver komen — contract ophalen, rechten controleren, agenda's vergelijken,
+een reisconflict signaleren, de commissie berekenen, het team laten meekijken,
+alles klaarzetten — zonder dat RTG stil overgaat van *"zij mag dit voorbereiden"*
+naar *"zij mag zijn werkelijkheid definitief veranderen"*. Wat de principal ziet
+is één betekenisvol controlemoment in plaats van vijftien bevestigingsschermen.

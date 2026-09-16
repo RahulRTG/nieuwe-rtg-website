@@ -2252,14 +2252,9 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.ran
    die draagt ze mee in elke system prompt. */
 const stemming = require('./kern/rahul/stemming')({ db, save, crypto });
 const geloof = require('./kern/geloof')({ accounts });
-/* DE ROUTERSCHADUW KRIJGT EEN BEWAARPLEK (kern/ai/routermeting.js). Zonder deze
-   regel telt hij in het geheugen van dit proces en zegt hij dat ook eerlijk --
-   maar dan draagt het getal geen besluit, en dat is juist waarvoor hij bestaat.
-   Hij verandert geen enkel antwoord; zie de kop van die module. */
-require('./kern/ai/routermeting').onthoud(require('./kern/ai/routeropslag')({ db, save }));
 const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox, zetServiceOverdracht } =
-  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan,
-    stemmingVoor: (c) => stemming.stemmingVoor(c), geloofRegel: (key) => {
+  maakAi({ db, save, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan,
+    stemmingVoor: stemming.stemmingVoor, geloofRegel: (key) => {
       const id = idVanKey(key);
       return id != null ? geloof.promptRegel(id, null) : null;
     } });

@@ -239,6 +239,24 @@ test('de drie ingangen roepen de meter werkelijk aan', () => {
 
 /* ---- de derde uitkomst --------------------------------------------------- */
 
+test('de AI-opzet bewaart een chatmeting en leest die na een herstart terug', async () => {
+  const db = { data: {} };
+  let saves = 0;
+  const start = () => {
+    const meter = vers();
+    delete require.cache[require.resolve('../server/kern/ai')];
+    const ai = require('../server/kern/ai').maakAi({ db, save: () => saves++, PERSONAS: {} });
+    return { ai, meter };
+  };
+  const eerste = start();
+  await eerste.ai.generateAiReply('rtg', [{ from: 'member', text: 'Wat moet ik inpakken?' }], 'nl');
+  assert.strictEqual(eerste.meter.stand().duurzaam, true);
+  assert.strictEqual(db.data.routerschaduw.per.chat.gewogen, 1);
+  assert.ok(saves > 0, 'de bewaarfunctie hoort werkelijk aangeroepen te worden');
+  const volgende = start();
+  assert.strictEqual(volgende.meter.stand().per.chat.gewogen, 1);
+});
+
 test('geen dekking en geen model is een eigen teller en geen aftreksom', () => {
   const m = vers();
   m.meet('a', { ingang: 'fluister', pas: 'rtg', gedekt: true, modelAntwoordde: false });

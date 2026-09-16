@@ -26,7 +26,9 @@ const meting = require('./ai/routermeting');
    kern/service/mens.js. */
 const mensLaag = require('./service/mens');
 
-function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan, stemmingVoor, geloofRegel }) {
+function maakAi({ db, save, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan, stemmingVoor, geloofRegel }) {
+  // De AI-laag bindt haar schaduwmeting aan dezelfde opslag als haar gesprekken.
+  meting.onthoud(require('./ai/routeropslag')({ db, save }));
   /* DE HAAK NAAR RTG SERVICE, LAAT GEBONDEN. maakAi() draait in server.js
      ruim voordat kern/service in kernlaag7 wordt opgehangen, dus de laag kan
      hier niet gewoon worden meegegeven. Zelfde vorm als zetRtgai elders: een

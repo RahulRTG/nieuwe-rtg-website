@@ -50,6 +50,17 @@ const GEEN_METING = new Set([
      en de weging is in delen.js hersteld -- twee verdelers met elk een eigen
      duurregister is LAT.md regel 4 op de plek waar hij het duurst is. */
   'TOETSDUUR.json',
+  /* BEWIJSKOSTEN.json is een MOMENTOPNAME over een BEREIK (zie EIGENAAR in
+     scripts/lib/registereigenaar.js). Een ratel eroverheen zou verbeteren door
+     het bereik te verkleinen -- meet een tak van drie commits en elk getal is
+     laag -- en dat is exact de faalvorm waar `afgeleidMetEigenaar` en
+     `stilLezingBereik` voor bestaan. Wat hem wel bewaakt is
+     test/bewijskosten.test.js: dat de twee helften (gemeten, verklaard) elkaar
+     nooit raken, en dat een versterkingsfactor zonder noemer ONBEPAALD blijft.
+
+     De tand die hier WEL hoort te komen -- mensVersterking naar nul -- vraagt
+     eerst een STABIEL bereik, en dat is een besluit en geen bouwtaak. */
+  'BEWIJSKOSTEN.json',
   /* SCHERFMETER.json rapporteert vier getallen over de scherfverdeling (balans,
      churn, ongemeten, prijsbron). Drie ervan HOREN geen ratel te hebben: churn
      hangt af van hoeveel toetsen er sinds de vorige vastlegging bij kwamen,
@@ -133,6 +144,21 @@ const REGISTER = {
      een handeling tegenover, in scripts/ een meting), het bereik omhoog, en het
      aantal lezers dat het onderscheid wel maakt omhoog. */
   'STILLEZING.json': { meter: ['stilLezing', 'stilLezingMeters', 'stilLezingBereik', 'bewijsOnderscheidt'] },
+  /* WIE MAG DIT ARTEFACT OPNIEUW AFLEIDEN (AFGELEID.json, npm run afgeleid).
+     Drie tanden: geen enkel AFGELEID artefact zonder canonieke eigenaar, de
+     onbesliste stand omlaag, en de dekking omhoog. Die derde is niet optioneel:
+     `onbeslist` daalt ook als het BEREIK krimpt, en dan leest een verdwenen
+     generator als vooruitgang. */
+  'AFGELEID.json': { meter: ['afgeleidZonderEigenaar', 'afgeleidOnbeslist', 'afgeleidMetEigenaar'] },
+  /* DRAAIT DIE EIGENAAR OOK WERKELIJK HETZELFDE UIT (HERBOUWPROEF.json, npm run
+     herbouwproef)? AFGELEID.json zegt wie de sleutel heeft; deze zegt of hij
+     past. Twee tanden, en ze meten twee verschillende dingen: `herbouwVerschilt`
+     is een DEFECT (de inhoud kwam anders terug -- of de generator is niet
+     deterministisch, of het ingecheckte artefact loopt achter) en hoort op nul
+     te blijven; `herbouwBewezen` is DEKKING en mag alleen groeien, anders leest
+     een krimpende proef als vooruitgang. Wat er NIET komt is een tand op
+     `nietGedraaid`: dat is een oordeel over de machine waarop de proef liep. */
+  'HERBOUWPROEF.json': { meter: ['herbouwVerschilt', 'herbouwBewezen'] },
   /* IDEMIDENTITEIT.json (npm run idemidentiteit) beantwoordt wat na #269/#270
      overbleef: waar is de identiteit van een verzoek nog te smal? Drie tanden,
      een omhoog en twee omlaag -- zie de kop bij die tanden in ../norm.js. */

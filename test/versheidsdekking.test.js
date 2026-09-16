@@ -34,6 +34,7 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const { REGISTERS } = require('../scripts/versheid.js');
+const { zonderCommentaar } = require('../scripts/lib/bron.js');
 
 /* Registers die WEL door een script worden geschreven maar bewust niet onder de
    versheid vallen, met de reden. Elke regel hier is een besluit; een lege reden
@@ -170,7 +171,12 @@ const BUITEN = {
      juist geen te hebben -- een tand die daarop duwt maakt het huis slechter en
      de meter groener. Zie BEWIJSMACHINE.md par. 6a.2; zodra de verklaring per
      generator een besluit is, verhuist hij hiervandaan naar REGISTERS. */
-  'METERKLASSE.json': 'wordt met opzet niet in de repo gezet: een commando dat je draait, geen register dat meetelt (BEWIJSMACHINE.md par. 6a.2)'
+  'METERKLASSE.json': 'wordt met opzet niet in de repo gezet: een commando dat je draait, geen register dat meetelt (BEWIJSMACHINE.md par. 6a.2)',
+  /* Een MOMENTOPNAME kan niet verouderen: hij is gebonden aan het BEREIK waarop
+     hij is gedraaid. `npm run bewijskosten` op het aftakpunt van gisteren geeft
+     terecht iets anders dan op dat van vandaag, en "loopt achter" is er dus geen
+     zinnig oordeel over. Zie AFGELEID.json, waar hij als enige die stand draagt. */
+  'BEWIJSKOSTEN.json': 'een MOMENTOPNAME over een bereik: opnieuw draaien HOORT iets anders te geven, dus veroudering is er geen zinnig oordeel over (AFGELEID.json, soort MOMENTOPNAME)'
 };
 
 function schrijvers() {
@@ -181,9 +187,23 @@ function schrijvers() {
       const p = path.join(m, naam.name);
       if (naam.isDirectory()) { loop(p); continue; }
       if (!naam.name.endsWith('.js')) continue;
-      const code = fs.readFileSync(p, 'utf8');
-      /* Alleen een pad dat SAMEN met de wortel wordt gebouwd: path.join(WORTEL,
-         'X.json'). Een losse tekenreeks in een uitleg telt niet mee. */
+      /* ZONDER COMMENTAAR, en dat is geen netheid maar een gemaakte fout.
+         Deze wacht las de RUWE bron, dus een generator die in zijn uitleg
+         beschrijft welke vorm hij herkent -- scripts/afgeleid.js doet dat, met
+         een voorbeeldpad tussen aanhalingstekens -- kreeg hier een register
+         toegeschreven dat niet bestaat. De wacht eiste vervolgens dat iemand de
+         veroudering van dat spookregister zou melden. Erger nog: de uitleg die
+         hier stond ("een losse tekenreeks in een uitleg telt niet mee") was zelf
+         een treffer voor de regexp eronder, want \\s* loopt over een
+         regeleinde heen -- de wacht las dus zijn eigen commentaar en beweerde
+         tegelijk dat hij dat niet deed.
+
+         Dezelfde klasse als BEWIJSMACHINE.md par. 6a.1 en dezelfde reparatie
+         als in scripts/lib/registereigenaar.js: code en commentaar zijn twee
+         dingen. `regelsHeel` houdt de regelnummers gelijk aan de echte bron,
+         zodat een vondst hier nog steeds naar de juiste regel wijst. */
+      const code = zonderCommentaar(fs.readFileSync(p, 'utf8'), { regelsHeel: true });
+      /* Alleen een pad dat SAMEN met de wortel wordt gebouwd, in ECHTE code. */
       for (const m2 of code.matchAll(/WORTEL,\s*'([A-Z][A-Z0-9_.-]*\.json)'/g)) {
         if (!uit.has(m2[1])) uit.set(m2[1], []);
         uit.get(m2[1]).push(path.relative(WORTEL, p));

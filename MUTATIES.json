@@ -9923,6 +9923,30 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "afgeleid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/afgeleid.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "bewijskosten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijskosten.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "herbouwproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/herbouwproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
     }
   }
 }

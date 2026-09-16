@@ -1,0 +1,266 @@
+{
+  "stempel": {
+    "op": "2026-09-16T06:45:18.524Z",
+    "commit": "b10def58",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/herbouwproef.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Per afgeleid artefact: draai zijn generator-eigenaar uit AFGELEID.json, en komt er hetzelfde uit? Wat herbouwbaar is, is bij een samenvoeging een HERBOUWPLICHT en geen handmatig conflict.",
+  "grens": "gelijk en alleenStempel worden nooit opgeteld tot een cijfer over determinisme: een stempel HOORT te bewegen. nietGedraaid is geen oordeel over het artefact maar over deze machine, en nietGeschreven is de besturingsproef -- zonder die stand leest elke leesloze opdracht als een perfecte reproductie.",
+  "gemeten": {
+    "beproefd": 18,
+    "gelijk": 5,
+    "alleenStempel": 9,
+    "verschilt": 0,
+    "nietGeschreven": 1,
+    "nietGedraaid": 3,
+    "herbouwbaar": 14
+  },
+  "artefacten": [
+    {
+      "naam": "ARCHITECTUUR.md",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/kaart.js",
+      "opdracht": "npm run kaart",
+      "opdrachtHerkomst": "package.json",
+      "raakteOok": [],
+      "duurMs": 4237,
+      "exitcode": 0,
+      "uitslag": "gelijk",
+      "verschilIn": []
+    },
+    {
+      "naam": "BEWIJS.md",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/bewijs.js",
+      "opdracht": "npm run bewijs",
+      "opdrachtHerkomst": "package.json",
+      "raakteOok": [],
+      "duurMs": 307,
+      "exitcode": 0,
+      "uitslag": "gelijk",
+      "verschilIn": []
+    },
+    {
+      "naam": "CAPABILITEIT.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/capabilities.js",
+      "opdracht": "npm run capabilities:vast",
+      "opdrachtHerkomst": "package.json",
+      "raakteOok": [],
+      "duurMs": 597,
+      "exitcode": 0,
+      "uitslag": "gelijk",
+      "verschilIn": []
+    },
+    {
+      "naam": "CLAUDE.md",
+      "soort": "FRAGMENTEN",
+      "eigenaar": "scripts/getallen.js",
+      "uitslag": "nietGedraaid",
+      "reden": "soort FRAGMENTEN: in zijn geheel herbouwen bestaat niet"
+    },
+    {
+      "naam": "COMMERCE.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/commerce.js",
+      "opdracht": "npm run commerce:vast",
+      "opdrachtHerkomst": "package.json",
+      "raakteOok": [],
+      "duurMs": 1627,
+      "exitcode": 0,
+      "uitslag": "alleenStempel",
+      "verschilIn": [
+        "vastgelegd"
+      ]
+    },
+    {
+      "naam": "DEKKING.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/dekking.js",
+      "opdracht": "npm run dekking:vast",
+      "opdrachtHerkomst": "versheid",
+      "raakteOok": [
+        "BEWIJSMACHINE.md"
+      ],
+      "uitslag": "nietGedraaid",
+      "duurMs": 180099,
+      "kringWeg": true,
+      "reden": "over de wachttijd van 180s heen"
+    },
+    {
+      "naam": "FUNCTIES.md",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/functielijst.js",
+      "opdracht": "npm run functielijst",
+      "opdrachtHerkomst": "package.json",
+      "raakteOok": [],
+      "duurMs": 3761,
+      "exitcode": 0,
+      "uitslag": "gelijk",
+      "verschilIn": []
+    },
+    {
+      "naam": "LADDER.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/ladder.js",
+      "opdracht": "npm run ladder",
+      "opdrachtHerkomst": "package.json",
+      "raakteOok": [],
+      "duurMs": 12492,
+      "exitcode": 0,
+      "uitslag": "alleenStempel",
+      "verschilIn": [
+        "gedraaid"
+      ]
+    },
+    {
+      "naam": "MACHINE.md",
+      "soort": "FRAGMENTEN",
+      "eigenaar": "scripts/getallen.js",
+      "uitslag": "nietGedraaid",
+      "reden": "soort FRAGMENTEN: in zijn geheel herbouwen bestaat niet"
+    },
+    {
+      "naam": "MACHINEDEKKING.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/machinedekking.js",
+      "opdracht": "npm run machinedekking:vastleggen",
+      "opdrachtHerkomst": "versheid",
+      "raakteOok": [],
+      "duurMs": 5555,
+      "exitcode": 0,
+      "uitslag": "alleenStempel",
+      "verschilIn": [
+        "stempel"
+      ]
+    },
+    {
+      "naam": "MAGNAATLAB.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/magnaatlab.js",
+      "opdracht": "npm run magnaatlab:vast",
+      "opdrachtHerkomst": "package.json",
+      "raakteOok": [],
+      "duurMs": 1529,
+      "exitcode": 0,
+      "uitslag": "gelijk",
+      "verschilIn": []
+    },
+    {
+      "naam": "MUTATIECONTRACT.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/mutatiecontract.js",
+      "opdracht": "npm run mutatiecontract -- --vastleggen",
+      "opdrachtHerkomst": "package.json+vlag",
+      "geprobeerd": [
+        "npm run mutatiecontract",
+        "npm run mutatiecontract -- --vastleggen"
+      ],
+      "raakteOok": [],
+      "duurMs": 4950,
+      "exitcode": 0,
+      "uitslag": "alleenStempel",
+      "verschilIn": [
+        "stempel"
+      ]
+    },
+    {
+      "naam": "MUTATIEINVENTARIS.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/mutatieinventaris.js",
+      "opdracht": "npm run mutatieinventaris -- --vastleggen",
+      "opdrachtHerkomst": "package.json+vlag",
+      "geprobeerd": [
+        "npm run mutatieinventaris",
+        "npm run mutatieinventaris -- --vastleggen"
+      ],
+      "raakteOok": [],
+      "duurMs": 4039,
+      "exitcode": 0,
+      "uitslag": "alleenStempel",
+      "verschilIn": [
+        "stempel"
+      ]
+    },
+    {
+      "naam": "MUTATIESEMANTIEK.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/mutatiesemantiek.js",
+      "opdracht": "node scripts/mutatiesemantiek.js --vastleggen",
+      "opdrachtHerkomst": "eigenaar+vlag",
+      "geprobeerd": [
+        "node scripts/mutatiesemantiek.js",
+        "node scripts/mutatiesemantiek.js --json",
+        "node scripts/mutatiesemantiek.js --vastleggen"
+      ],
+      "raakteOok": [],
+      "duurMs": 115,
+      "exitcode": 0,
+      "uitslag": "alleenStempel",
+      "verschilIn": [
+        "vastgelegd"
+      ]
+    },
+    {
+      "naam": "NORM.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/norm.js",
+      "opdracht": "npm run norm:vast",
+      "opdrachtHerkomst": "package.json",
+      "geprobeerd": [
+        "npm run norm:vast",
+        "npm run norm:vast -- --vastleggen"
+      ],
+      "raakteOok": [],
+      "uitslag": "nietGeschreven",
+      "duurMs": 41788,
+      "reden": "de opdracht liep (exitcode 1) maar raakte het bestand niet aan"
+    },
+    {
+      "naam": "OBJECTMODEL.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/objectmodel.js",
+      "opdracht": "npm run objectmodel:vast",
+      "opdrachtHerkomst": "package.json",
+      "raakteOok": [],
+      "duurMs": 655,
+      "exitcode": 0,
+      "uitslag": "alleenStempel",
+      "verschilIn": [
+        "vastgelegd"
+      ]
+    },
+    {
+      "naam": "ROLRONDE.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/rolronde.js",
+      "opdracht": "node scripts/rolronde.js",
+      "opdrachtHerkomst": "versheid",
+      "raakteOok": [],
+      "duurMs": 47886,
+      "exitcode": 0,
+      "uitslag": "alleenStempel",
+      "verschilIn": [
+        "stempel",
+        "gedraaid"
+      ]
+    },
+    {
+      "naam": "VINDBAAR.json",
+      "soort": "AFGELEID",
+      "eigenaar": "scripts/vindbaar.js",
+      "opdracht": "npm run vindbaar",
+      "opdrachtHerkomst": "versheid",
+      "raakteOok": [],
+      "duurMs": 427,
+      "exitcode": 0,
+      "uitslag": "alleenStempel",
+      "verschilIn": [
+        "stempel"
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-15",
+  "vastgelegd": "2026-09-16",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -124,8 +124,13 @@
     "stilLezing": 5,
     "stilLezingMeters": 61,
     "stilLezingBereik": 543,
-    "bewijsOnderscheidt": 3,
-    "connectDomeinenGemeten": 23
+    "bewijsOnderscheidt": 5,
+    "connectDomeinenGemeten": 23,
+    "afgeleidZonderEigenaar": 2,
+    "afgeleidOnbeslist": 106,
+    "afgeleidMetEigenaar": 174,
+    "herbouwVerschilt": 0,
+    "herbouwBewezen": 14
   },
   "notities": [
     {
@@ -2849,8 +2854,13 @@
     "stilLezing": "2026-09-15",
     "stilLezingMeters": "2026-09-15",
     "stilLezingBereik": "2026-09-15",
-    "bewijsOnderscheidt": "2026-09-15",
-    "connectDomeinenGemeten": "2026-09-15"
+    "bewijsOnderscheidt": "2026-09-16",
+    "connectDomeinenGemeten": "2026-09-15",
+    "afgeleidZonderEigenaar": "2026-09-16",
+    "afgeleidOnbeslist": "2026-09-16",
+    "afgeleidMetEigenaar": "2026-09-16",
+    "herbouwVerschilt": "2026-09-16",
+    "herbouwBewezen": "2026-09-16"
   },
   "uitzonderingen": [
     {

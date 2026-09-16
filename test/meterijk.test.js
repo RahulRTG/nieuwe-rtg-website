@@ -1559,6 +1559,25 @@ const IJKINGEN = {
       (j) => { j.gemeten.vorm.domeinen = Math.max(0, (j.gemeten.vorm.domeinen || 0) - 4); return j; },
       () => voor.stageDomeinenGemeten - norm.meet().stageDomeinenGemeten)
   },
+  /* DE TAND VAN 16 SEPTEMBER 2026: planDomeinenGemeten telt de plandomeinen die
+     scripts/planvorm.js werkelijk heeft gezien -- de meting onder het besluit of
+     roosteren EEN motor is of zeven. Dezelfde vorm, dezelfde richting en om
+     exact dezelfde reden OMLAAG als bij zijn twee zusters hierboven: de uitkomst
+     is een NUL (0 velden in alle plandomeinen), en op die nul rust de keuze
+     tussen een gedeeld objecttype en een projectie. Ziet de meter stil minder
+     domeinen, dan blijft diezelfde nul staan terwijl hij van "deze domeinen
+     delen niets" verandert in "we hebben minder gekeken".
+
+     DE MUTATIE ZIT OP DE LIJST EN NIET OP EEN GETAL, want dat is hoe dit
+     register het bereik draagt: `domeinen` is de lijst gevulde plandomeinen en
+     norm.js leest er de LENGTE van. Een mutatie op een verzonnen telveld zou
+     langs de echte leesweg heen gaan -- en dan is de ijking zelf het verkeerde
+     experiment (BEWIJSMACHINE.md par. 6a). */
+  planDomeinenGemeten: {
+    proef: (voor) => metVervangenJson('PLANVORM.json',
+      (j) => { j.rondes.ruim.vorm.domeinen = (j.rondes.ruim.vorm.domeinen || []).slice(0, -3); return j; },
+      () => voor.planDomeinenGemeten - norm.meet().planDomeinenGemeten)
+  },
   /* DE TWEE TANDEN VAN 15 SEPTEMBER 2026, bij NEIGINGVORM.json (NEIGING.md par.
      0). Ze staan allebei op een NUL of op een getal waar een besluit op rust, en
      dat is precies waarom ze een ijking nodig hebben: bij zo'n meter is "hij is

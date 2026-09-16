@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 137,
+    "ratelTanden": 138,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -131,7 +131,8 @@
     "afgeleidMetEigenaar": 185,
     "herbouwVerschilt": 0,
     "herbouwBewezen": 14,
-    "veranderbereikStatisch": 1155
+    "veranderbereikStatisch": 1155,
+    "planDomeinenGemeten": 7
   },
   "notities": [
     {
@@ -2862,7 +2863,8 @@
     "afgeleidMetEigenaar": "2026-09-16",
     "herbouwVerschilt": "2026-09-16",
     "herbouwBewezen": "2026-09-16",
-    "veranderbereikStatisch": "2026-09-16"
+    "veranderbereikStatisch": "2026-09-16",
+    "planDomeinenGemeten": "2026-09-16"
   },
   "uitzonderingen": [
     {

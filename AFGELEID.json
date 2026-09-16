@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-16T07:33:30.586Z",
-  "commit": "42dcaf59",
+  "op": "2026-09-16T08:34:09.279Z",
+  "commit": "3e7648694",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 4,
   "instrument": "scripts/afgeleid.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "gemeten": {
-  "artefacten": 284,
+  "artefacten": 294,
   "bron": 2,
-  "afgeleid": 157,
-  "fragmenten": 18,
+  "afgeleid": 165,
+  "fragmenten": 21,
   "momentopname": 1,
-  "onbeslist": 106,
+  "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 174,
-  "afgeleidEigenaarHard": 155,
-  "afgeleidGrendelt": 16,
-  "metStempel": 86,
+  "metEigenaar": 185,
+  "afgeleidEigenaarHard": 163,
+  "afgeleidGrendelt": 18,
+  "metStempel": 94,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -557,6 +557,32 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONNECT.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONNECTLUS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/connectlus.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/connectlus.js"
+   ],
+   "stempelInstrument": "scripts/connectlus.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run connectlus:vast",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -1317,7 +1343,7 @@
    "naam": "HERBOUWPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/herbouwproef.js",
-   "graad": "stempel",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/herbouwproef.js"
    ],
@@ -1640,6 +1666,20 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "KETENBEREIK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/ketenbereik.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/ketenbereik.js"
+   ],
+   "stempelInstrument": "scripts/ketenbereik.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run ketenbereik:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "KETENS.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/ketenronde.js",
@@ -1669,14 +1709,14 @@
   },
   {
    "naam": "KEURING.md",
-   "soort": "ONBESLIST",
-   "eigenaar": null,
-   "graad": null,
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -1960,6 +2000,20 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MANDAATPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/mandaatproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/mandaatproef.js"
+   ],
+   "stempelInstrument": "scripts/mandaatproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run mandaatproef:vast",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -2550,6 +2604,20 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "PAKTEBETEKENIS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/paktebetekenis.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/paktebetekenis.js"
+   ],
+   "stempelInstrument": "scripts/paktebetekenis.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run paktebetekenis:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "PLAATS.md",
    "soort": "ONBESLIST",
    "eigenaar": null,
@@ -3104,6 +3172,20 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "SPOORVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/spoorvorm.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/spoorvorm.js"
+   ],
+   "stempelInstrument": "scripts/spoorvorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run spoorvorm:vast",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "STAATPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/staatproef-route.js",
@@ -3153,6 +3235,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "STEMPELVEILIGHEID.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/stempelveiligheid.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/stempelveiligheid.js"
+   ],
+   "stempelInstrument": "scripts/stempelveiligheid.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run stempelveiligheid:vast",
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -3431,6 +3527,46 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=uitvoerproef",
    "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERANDERBEREIK-KENNIS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/veranderbereik.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/veranderbereik.js"
+   ],
+   "stempelInstrument": "scripts/veranderbereik.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run veranderbereik:vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERANDERBEREIK-RONDE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/veranderbereik.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/veranderbereik.js"
+   ],
+   "stempelInstrument": "scripts/veranderbereik.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run veranderbereik:vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERANDERING.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {

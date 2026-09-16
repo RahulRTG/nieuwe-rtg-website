@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-16T06:19:23.560Z",
-    "commit": "45096c5c0",
+    "op": "2026-09-16T08:42:27.906Z",
+    "commit": "2b1a1621f",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 7,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -226,6 +226,14 @@
       "operator": "===->!==#3",
       "gezakt": 3,
       "geprobeerd": 17
+    },
+    "afgeleid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/afgeleid.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "afleidbaar.test.js": {
       "soort": "puur",
@@ -1041,6 +1049,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/bewijsboek.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "bewijskosten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijskosten.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
@@ -3385,6 +3401,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "herbouwproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/herbouwproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
     },
     "heritage-truth.test.js": {
       "soort": "puur",
@@ -9923,30 +9947,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "afgeleid.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/afgeleid.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 2
-    },
-    "bewijskosten.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/bewijskosten.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "herbouwproef.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/herbouwproef.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 3
     }
   }
 }

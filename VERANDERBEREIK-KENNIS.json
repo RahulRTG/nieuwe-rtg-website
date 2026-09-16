@@ -3,17 +3,17 @@
  "uitleg": "Wat een toets KAN raken, afgeleid uit de code alleen: heeft hij een require-kant die in server/ uitkomt. Dezelfde commit geeft hier altijd hetzelfde -- er komt geen journaal aan te pas. Wat er bij EEN uitvoering werkelijk is waargenomen staat in VERANDERBEREIK-RONDE.json.",
  "hoe": "npm run veranderbereik:vastleggen",
  "stempel": {
-  "op": "2026-09-16T08:05:52.027Z",
-  "commit": "fd011cc0",
+  "op": "2026-09-16T08:41:50.649Z",
+  "commit": "2b1a1621f",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 5,
   "instrument": "scripts/veranderbereik.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "gemeten": {
-  "toetsbestanden": 1901,
-  "statischBereik": 1135,
-  "blindeVlekStatisch": 766
+  "toetsbestanden": 1926,
+  "statischBereik": 1155,
+  "blindeVlekStatisch": 771
  },
  "nietGemeten": {
   "waargenomenBereik": "wat een toets werkelijk raakte is een WAARNEMING en hoort niet in dit bestand: die hangt af van welke ronde er liep. Zie VERANDERBEREIK-RONDE.json."
@@ -113,6 +113,9 @@
    "statisch": true
   },
   "afbouwpoort.test.js": {
+   "statisch": true
+  },
+  "afgeleid.test.js": {
    "statisch": true
   },
   "afleidbaar.test.js": {
@@ -520,6 +523,9 @@
   "bewijsboek.test.js": {
    "statisch": true
   },
+  "bewijskosten.test.js": {
+   "statisch": true
+  },
   "bewijsladder.test.js": {
    "statisch": true
   },
@@ -886,6 +892,15 @@
   "concern.test.js": {
    "statisch": true
   },
+  "connect-routes.e2e.js": {
+   "statisch": false
+  },
+  "connect-scherm.e2e.js": {
+   "statisch": false
+  },
+  "connect.test.js": {
+   "statisch": true
+  },
   "consent-dekking.test.js": {
    "statisch": true
   },
@@ -1084,6 +1099,9 @@
   "dyncode.test.js": {
    "statisch": true
   },
+  "econ01.test.js": {
+   "statisch": true
+  },
   "economic-runtime.test.js": {
    "statisch": true
   },
@@ -1166,6 +1184,9 @@
    "statisch": true
   },
   "eu-naleving.test.js": {
+   "statisch": true
+  },
+  "eurodekking.test.js": {
    "statisch": true
   },
   "eventkeuken.test.js": {
@@ -1699,6 +1720,9 @@
   "hand.test.js": {
    "statisch": true
   },
+  "handelenspoor.test.js": {
+   "statisch": false
+  },
   "handeling-massa.test.js": {
    "statisch": true
   },
@@ -1746,6 +1770,9 @@
   },
   "helikopter.test.js": {
    "statisch": false
+  },
+  "herbouwproef.test.js": {
+   "statisch": true
   },
   "heritage-context.e2e.js": {
    "statisch": false
@@ -2186,6 +2213,9 @@
    "statisch": true
   },
   "keten.test.js": {
+   "statisch": true
+  },
+  "ketenbereik.test.js": {
    "statisch": true
   },
   "ketenchat.test.js": {
@@ -2716,6 +2746,12 @@
   "malwarescan-dicht.test.js": {
    "statisch": true
   },
+  "mandaatpoort.test.js": {
+   "statisch": true
+  },
+  "mandaatproef.test.js": {
+   "statisch": true
+  },
   "marechaussee.test.js": {
    "statisch": false
   },
@@ -3061,6 +3097,15 @@
   "negenplus.test.js": {
    "statisch": true
   },
+  "neiging-scherm.e2e.js": {
+   "statisch": true
+  },
+  "neiging.e2e.js": {
+   "statisch": false
+  },
+  "neiging.test.js": {
+   "statisch": true
+  },
   "nieuwe-endpoints.test.js": {
    "statisch": false
   },
@@ -3365,6 +3410,9 @@
    "statisch": false
   },
   "pakket.test.js": {
+   "statisch": true
+  },
+  "paktebetekenis.test.js": {
    "statisch": true
   },
   "papieren-boardroom.test.js": {
@@ -3793,6 +3841,9 @@
   "reisgezelschap.test.js": {
    "statisch": true
   },
+  "reisherkomst.test.js": {
+   "statisch": true
+  },
   "reisoplosser.test.js": {
    "statisch": true
   },
@@ -3920,6 +3971,9 @@
    "statisch": true
   },
   "routerindex.test.js": {
+   "statisch": true
+  },
+  "routermeting.test.js": {
    "statisch": true
   },
   "routesbron.test.js": {
@@ -4076,6 +4130,12 @@
    "statisch": true
   },
   "rtg-a11y.test.js": {
+   "statisch": true
+  },
+  "rtg-adaptive-edge.e2e.js": {
+   "statisch": false
+  },
+  "rtg-adaptive-edge.test.js": {
    "statisch": true
   },
   "rtg-continue-key.test.js": {
@@ -4675,6 +4735,9 @@
   "spelverzekering.test.js": {
    "statisch": true
   },
+  "spoorvorm.test.js": {
+   "statisch": true
+  },
   "sport-voorzijde.test.js": {
    "statisch": true
   },
@@ -4759,6 +4822,9 @@
   "stempel.test.js": {
    "statisch": true
   },
+  "stempelveiligheid.test.js": {
+   "statisch": true
+  },
   "stijlafsplitsing.test.js": {
    "statisch": true
   },
@@ -4769,6 +4835,9 @@
    "statisch": false
   },
   "stillepost.test.js": {
+   "statisch": true
+  },
+  "stillezing.test.js": {
    "statisch": true
   },
   "storingen-bezorging.test.js": {
@@ -5494,6 +5563,9 @@
   "werkhandeling.test.js": {
    "statisch": false
   },
+  "werkherkomst.test.js": {
+   "statisch": true
+  },
   "werkindienst.test.js": {
    "statisch": false
   },
@@ -5691,6 +5763,9 @@
   },
   "zegel-ui.e2e.js": {
    "statisch": false
+  },
+  "zegel-wedloop.test.js": {
+   "statisch": true
   },
   "zegel.test.js": {
    "statisch": true

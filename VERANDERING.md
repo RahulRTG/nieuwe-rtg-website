@@ -31,7 +31,7 @@ tegengehouden, en met een getal in plaats van een gevoel.
 
 `scripts/impactbereik.js` keert de require-graaf om en vraagt: als dit bestand
 verandert, welke toetsen hangen eraan? Vers gemeten over
-<!--getal:veranderbereik.toetsen-->1901<!--/getal--> toetsbestanden:
+<!--getal:veranderbereik.toetsen-->1926<!--/getal--> toetsbestanden:
 
 | gewijzigd bestand | transitief geraakte toetsen |
 |---|---|
@@ -42,7 +42,7 @@ verandert, welke toetsen hangen eraan? Vers gemeten over
 
 Zes toetsen voor de plek waar élke betaling langskomt is geen versmalling maar
 een blinde vlek, en die is
-<!--getal:veranderbereik.blind-->766<!--/getal--> toetsbestanden groot: ruim de
+<!--getal:veranderbereik.blind-->771<!--/getal--> toetsbestanden groot: ruim de
 helft heeft **geen enkele require-kant naar `server/`**. Ze starten de server als
 apart proces en raken de oppervlakte over HTTP (1058 starten een proces, 995
 praten HTTP). Een planner op deze graaf slaat ze over en meldt groen — "de
@@ -54,8 +54,8 @@ stilste vorm van kapot die dit huis kent" (`scripts/lib/bedrading.js`).
 workflow** en schrijft **geen register** (nul `writeFileSync`). Het getal dat
 versmalling tegenhoudt bestond dus alleen als proza in `KEURING.md` par. 1 — en
 dat proza stond op 819 van 1434 (57,1%) terwijl de verse meting
-<!--getal:veranderbereik.blind-->766<!--/getal--> van
-<!--getal:veranderbereik.toetsen-->1901<!--/getal--> zegt. Niet fout opgeschreven;
+<!--getal:veranderbereik.blind-->771<!--/getal--> van
+<!--getal:veranderbereik.toetsen-->1926<!--/getal--> zegt. Niet fout opgeschreven;
 gewoon ouder dan de code. *Een register dat niet is hergedraaid is een bewering
 over het verleden* (`MENSNETWERK.md` par. 4) — en een getal zónder register is
 dat ook, alleen merkt niemand het.
@@ -104,10 +104,10 @@ Stand op deze tak:
 
 | | |
 |---|---|
-| toetsbestanden | <!--getal:veranderbereik.toetsen-->1901<!--/getal--> |
-| statische as | <!--getal:veranderbereik.statisch-->1135<!--/getal--> |
+| toetsbestanden | <!--getal:veranderbereik.toetsen-->1926<!--/getal--> |
+| statische as | <!--getal:veranderbereik.statisch-->1155<!--/getal--> |
 | waargenomen as | <!--getal:veranderbereik.waargenomen-->337<!--/getal--> |
-| blinde vlek statisch alleen | <!--getal:veranderbereik.blind-->766<!--/getal--> |
+| blinde vlek statisch alleen | <!--getal:veranderbereik.blind-->771<!--/getal--> |
 | **gedicht door waarneming** | <!--getal:veranderbereik.gedicht-->236<!--/getal--> |
 | **zonder enig bereik (volle ring)** | <!--getal:veranderbereik.zonder-->530<!--/getal--> |
 | toetsen die in deze ronde draaiden | <!--getal:veranderbereik.ronde-->769<!--/getal--> |
@@ -633,7 +633,7 @@ niet om iets over te slaan. Dat is precies de goede volgorde, en het is geen
 tegenvaller: een selector die vandaag zou versmallen, zou het op deze band doen.
 
 Vandaag is dat antwoord: van
-<!--getal:veranderbereik.statisch-->1135<!--/getal--> toetsen langs de statische as,
+<!--getal:veranderbereik.statisch-->1155<!--/getal--> toetsen langs de statische as,
 plus <!--getal:veranderbereik.gedicht-->236<!--/getal--> die de waarneming erbij
 haalt, en <!--getal:veranderbereik.zonder-->530<!--/getal--> waarover dit huis niets
 weet. Dat laatste getal is het werk.

@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1929 |
 | losse beweringen (`test(...)`) | 13912 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 147 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1284 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1285 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 406 |
+| niets van beide | 405 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -383,7 +383,7 @@ toets omvalt.
 | `eurodekking.test.js` | 6 | gezakt op `===->!==#0` | HOEVEEL VAN HET GELD BEGRIJPT DEZE MACHINE -- en de vier manieren waarop dat getal kan liegen. De dragende toetsen zijn 3, 4 en 5, en geen van drieen gaat over rekenen: 3. |
 | `eventkeuken.test.js` | 7 | gezakt op `liegpoort /api/` | DE EVENTKEUKEN -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: catering, allergy, allergy/alt, mep, checkin, runsheet, runsheet/done en runsheet/ai. |
 | `eventloop.test.js` | 4 | geen bronmutatie mogelijk | DE EVENT-LOOP-VERTRAGING, EN OF DE METER HEM ECHT ZIET. Node draait alles op een lus. |
-| `evidence-engine.test.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `evidence-engine.test.js` | 7 | gezakt op `getal+1#4` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `excursie.test.js` | 2 | gezakt op `liegpoort /api/` | DE EXCURSIE -- waar kinderen zijn, en wie dat mag weten. WAAROM DIT DE ZWAARSTE VAN DE SCHOOL IS Van alle 199 school- en RTF-routes zonder toets is dit de enige waar het over de LOCATIE VAN EEN KIND gaat. |
 | `executionmap.test.js` | 12 | al rood | DE CAPABILITY-COMPILER (scripts/executionmap.js, EXECUTIE.md blok 1). EXECUTION_MAP.json is een PROJECTIE en geen bron. |
 | `experience-platform.e2e.test.js` | 3 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-16T06:49:16.681Z",
-    "commit": "516c8f92",
+    "op": "2026-09-16T07:34:26.404Z",
+    "commit": "0daf9c58",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1041,6 +1041,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/bewijsboek.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "bewijskosten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijskosten.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1

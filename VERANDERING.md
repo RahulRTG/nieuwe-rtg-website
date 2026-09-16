@@ -677,6 +677,55 @@ melding wees naar de config terwijl de vervuiling op stdout zat. **Een
 foutmelding die een ANDERE stroom laat zien dan de stroom die stuk is, verbergt
 zijn eigen oorzaak.**
 
+## 7h. Een gescheurd paar telde een meetgat als eigenschap (16 september 2026)
+
+Bij een poging om de volle ronde lokaal te krijgen werd de suite drie keer
+afgekapt. Bij de derde keer bleef `.toetsduur` van de EERDERE volle ronde staan
+terwijl het journaal vers en afgeknot was. De meter las:
+
+| | |
+|---|---|
+| ronde zegt gedraaid | **1685** |
+| journaal kent ervan | **160** |
+| `draaideZonderRoute` | **454** |
+| volle ring | **654** (de echte ronde had er 246) |
+
+De 1524 toetsen waar het journaal niets van wist, kregen de stand
+`draaideZonderRoute` -- en dat is precies de stand die leest als *"prima, een
+in-proces toets"*. Een **meetgat** werd stilletjes een **eigenschap**, en de
+schuld verdubbelde zonder dat er iets mis was met de code.
+
+De oorzaak is structureel en niet incidenteel: `ronde` en journaal zijn twee
+bestanden met een **eigen levensduur**. `.toetsduur` groeit aan over rondes heen,
+een journaal wordt per ronde geschreven. Er is geen ronde-identiteit om ze aan
+elkaar te binden, dus de meter kán niet weten of ze bij elkaar horen.
+
+**Daarom een feit en geen drempel.** `toetsenMetJournaalregel` staat nu naast
+`toetsenInDezeRonde` in het RONDE-register en in de uitslag op het scherm: 160
+naast 1685, en de lezer ziet het. Een drempel ("meer dan zoveel procent verschil
+is verdacht") zou een gok zijn die op een dag de verkeerde kant op valt; twee
+getallen naast elkaar zijn dat nooit. Dezelfde vorm als `zonderBereik` naast
+`toetsenInDezeRonde` een paragraaf hoger -- het getal betekent niets zonder zijn
+noemer.
+
+Let op wat dit NIET oplost: de meter weigert nog steeds niet. Hij kan dat ook
+niet zonder te raden. Wat hij nu wel doet is de scheur tonen in plaats van hem te
+vertalen naar een geruststellende stand.
+
+### En waarom de volle ronde er nog niet is
+
+Drie rondes, drie keer afgekapt (na 40, 2,5 en 6 minuten). De container wordt bij
+sessie-inactiviteit opgeschort en neemt alles mee -- ook een met `setsid`
+losgekoppelde procesgroep. **Losgekoppeld van de SESSIE is niet losgekoppeld van
+de CONTAINER.** Een volle suite duurt hier ruim veertig minuten, en de sessie is
+in die tijd per definitie stil.
+
+De plek waar die ronde wél kan ontstaan is de CI-job `dekking`, die beide
+journalen samenvoegt. Die job wordt geskipt zolang `keuringen` rood staat op de
+twintig verlopen uitzonderingen. Het beste getal dat dit huis vandaag heeft over
+een bijna volle ronde is daarom **246 volle ringen op 1684 bestanden**, gemeten
+in par. 7g, en het register draagt eerlijk `rondeVolledig: false`.
+
 ## 8. De maatstaf
 
 Niet *"wanneer heeft RTG een bewijsmachine"* maar:

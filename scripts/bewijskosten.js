@@ -90,8 +90,14 @@ function git(...args) {
    die vraag, en een tweede indeling ernaast zou binnen een maand uiteenlopen. */
 function indeler() {
   const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'AFGELEID.json'), 'utf8'));
+  /* MOMENTOPNAME telt hier MEE als afgeleid, en dat is geen detail: die regels
+     typt een generator, net als bij AFGELEID en FRAGMENTEN. Zonder hem viel
+     BEWIJSKOSTEN.json zelf in `overig` en telden zijn 587 regels als MENSELIJK
+     getypt werk -- de meter zou zijn eigen uitvoer als arbeid van een mens
+     opschrijven, en dat is precies het cijfer dat hij moet meten. (De reden dat
+     hij een andere STAND heeft is zijn versheid, niet zijn schrijver.) */
   const afgeleid = new Set(reg.artefacten
-    .filter(r => (r.soort === 'AFGELEID' || r.soort === 'FRAGMENTEN') && r.eigenaar)
+    .filter(r => ['AFGELEID', 'FRAGMENTEN', 'MOMENTOPNAME'].includes(r.soort) && r.eigenaar)
     .map(r => r.naam));
   return (pad) => {
     if (afgeleid.has(pad)) return 'afgeleid';
@@ -198,7 +204,73 @@ function herbouwbareSet() {
   }
 }
 
+/* ==== DE ANDERE HELFT: WAT LEVERDE HET OP? ====
+
+   De kosten alleen zeggen niets. De stuurmaat is "dezelfde of sterkere zekerheid
+   voor minder werk", dus er hoort een tweede meting naast: hoeveel zekerheid is
+   er in dit bereik BIJ gekomen?
+
+   Dat wordt gelezen uit de registers die dit huis al bijhoudt, bij de BASIS en
+   bij de TOP van het bereik. Vier soorten, elk met een eigen eenheid -- en die
+   eenheden worden nooit bij elkaar opgeteld (zie `opbrengst` hieronder).
+
+   DRIE STANDEN EN NIET TWEE, en dat is hier geen theorie: `AFGELEID.json` en
+   `HERBOUWPROEF.json` BESTONDEN NIET bij de basis. Een register dat er niet was,
+   is iets anders dan een register dat nul mat -- de eerste is een nieuw SOORT
+   zekerheid, de tweede een getal dat niet bewoog. Wie die twee samenvoegt, ziet
+   `0 -> 174` en noteert een spectaculaire vooruitgang op een schaal die daarvoor
+   niet bestond. Daarom `voor: null` met de reden, en `delta: null`. */
+const ZEKERHEID = [
+  { naam: 'ratelTanden', bron: 'NORM.json', eenheid: 'tand(en)',
+    wat: 'getallen die niet meer stil mogen verslechteren',
+    uit: (j) => j.meters && j.meters.ratelTanden },
+  { naam: 'toetsenBewezenGevoelig', bron: 'MUTATIES.json', eenheid: 'toetsbestand(en)',
+    wat: 'toetsen die iemand heeft zien zakken op een mutatie',
+    uit: (j) => Object.values(j.toetsen || {}).filter(t => t && t.staat === 'gezakt').length },
+  { naam: 'artefactenMetEigenaar', bron: 'AFGELEID.json', eenheid: 'artefact(en)',
+    wat: 'afgeleide waarheid met een machinaal vindbare generator-eigenaar',
+    uit: (j) => j.gemeten && j.gemeten.metEigenaar },
+  { naam: 'herbouwBewezen', bron: 'HERBOUWPROEF.json', eenheid: 'artefact(en)',
+    wat: 'artefacten waarvan de herbouw aantoonbaar hetzelfde oplevert',
+    uit: (j) => j.gemeten && j.gemeten.herbouwbaar }
+];
+
+function registerBij(commit, naam) {
+  let rauw;
+  try { rauw = git('show', commit + ':' + naam); }
+  catch (e) { return { bestond: false }; }
+  try { return { bestond: true, json: JSON.parse(rauw) }; }
+  catch (e) {
+    /* ONLEESBAAR IS NIET AFWEZIG (par. 6b). Een stuk register bij de basis mag
+       nooit als "bestond niet" langskomen: dan leest een defect als een nieuw
+       soort zekerheid. */
+    return { bestond: true, json: null, stuk: e.message };
+  }
+}
+
+function zekerheidVan(basis, top) {
+  const uit = {};
+  for (const z of ZEKERHEID) {
+    const v = registerBij(basis, z.bron);
+    const n = registerBij(top, z.bron);
+    const waarde = (r) => (r.bestond && r.json) ? (z.uit(r.json) ?? null) : null;
+    const voor = waarde(v), na = waarde(n);
+    uit[z.naam] = {
+      bron: z.bron, eenheid: z.eenheid, wat: z.wat, voor, na,
+      delta: (typeof voor === 'number' && typeof na === 'number') ? na - voor : null,
+      reden: !v.bestond
+        ? z.bron + ' bestond niet bij de basis: dit is een NIEUW soort zekerheid en geen toename van een bestaand getal'
+        : v.stuk ? z.bron + ' bij de basis is onleesbaar (' + String(v.stuk).slice(0, 80) + ')'
+        : (typeof voor !== 'number' || typeof na !== 'number')
+          ? 'het veld staat niet (meer) in het register; een ontbrekend veld is geen nul'
+          : null
+    };
+  }
+  return uit;
+}
+
 function meet(bereik) {
+  const [basis, top] = bereik.includes('..') ? bereik.split('..') : [bereik, 'HEAD'];
   const deel = indeler();
   const herbouwbaar = herbouwbareSet();
   const omvang = omvangVan(bereik, deel);
@@ -214,8 +286,43 @@ function meet(bereik) {
   /* EEN FACTOR OVER NUL IS ONBEPAALD EN GEEN NUL. */
   const factor = (teller, noemer) => noemer > 0 ? Math.round(100 * teller / noemer) / 100 : null;
 
+  const zekerheid = zekerheidVan(basis, top || 'HEAD');
+
+  /* ==== DE OPBRENGST, EN WAAROM HET ER GEEN EEN IS ====
+
+     De verleiding is een getal: "zoveel zekerheid per regel werk". Dat mag hier
+     niet, en om twee redenen die allebei al in dit huis staan.
+
+     Ten eerste zijn de eenheden niet optelbaar. Een ratelTAND, een bewezen
+     TOETS en een herbouwd ARTEFACT zijn drie dingen; ze bij elkaar optellen
+     vraagt een weging, en die weegt niemand -- dan staat er een verzonnen getal
+     in een register dat over eerlijkheid gaat (INT-04, LAT.md regel 11,
+     scripts/check.js regel 48).
+
+     Ten tweede zou zo'n getal de twee registers die in dit bereik ZIJN ONTSTAAN
+     moeten meetellen als een sprong van nul. Dat is geen vooruitgang op een
+     schaal, het is een nieuwe schaal.
+
+     Wat er dus staat is de opbrengst PER SOORT, met de eenheid erbij en met het
+     menselijke werk ernaast -- de lezer kan delen, het register doet het niet.
+     En `verklaard` blijft er buiten: ontdekkingen zijn de grootste opbrengst van
+     een ronde en de enige die niet te meten is. */
+  const mensRegels = bronRegels + bewijsRegels +
+    omvang.document.erbij + omvang.document.eraf + omvang.overig.erbij + omvang.overig.eraf;
+
   return {
     bereik,
+    zekerheid,
+    opbrengst: {
+      geenEnkelCijfer: 'de soorten zekerheid hebben verschillende eenheden en worden niet opgeteld; ' +
+        'twee van de vier registers ontstonden in dit bereik en een sprong vanaf "bestond niet" is ' +
+        'geen vooruitgang op een schaal maar een nieuwe schaal',
+      menselijkGetypteRegels: mensRegels,
+      perSoort: Object.fromEntries(Object.entries(zekerheid).map(([k, z]) => [k,
+        z.delta === null ? { delta: null, reden: z.reden }
+          : { delta: z.delta, eenheid: z.eenheid,
+              menselijkeRegelsPerEenheid: z.delta > 0 ? Math.round(mensRegels / z.delta) : null }]))
+    },
     commits: git('log', '--format=%H', bereik).split('\n').filter(Boolean).length,
     samenvoegingen: drift.length,
     omvang,
@@ -262,6 +369,20 @@ function main() {
     ' afgeleid conflict(en) zonder bewezen herbouw\x1b[2m  (hoort nul te zijn)\x1b[0m');
   console.log('\n  drift: ' + nu.driftConflicten + ' conflict(en) -- ' + nu.driftHandmatig + ' in de bron, ' +
     nu.driftHerbouwplicht + ' herbouwplicht, ' + nu.mensVersterking + ' onbewezen');
+
+  console.log('\n  \x1b[1mWAT HET OPLEVERDE\x1b[0m\x1b[2m -- per soort, want de eenheden zijn niet optelbaar\x1b[0m');
+  for (const [naam, z] of Object.entries(nu.zekerheid)) {
+    const p = nu.opbrengst.perSoort[naam];
+    if (p.delta === null) {
+      console.log('  ' + naam.padEnd(24) + '\x1b[33mONBEPAALD\x1b[0m\x1b[2m  ' + z.reden + '\x1b[0m');
+    } else {
+      console.log('  ' + naam.padEnd(24) + (p.delta >= 0 ? '+' : '') + p.delta + ' ' + z.eenheid +
+        '\x1b[2m  (' + (p.menselijkeRegelsPerEenheid === null ? 'geen toename' :
+          p.menselijkeRegelsPerEenheid + ' menselijk getypte regels per stuk') + ')\x1b[0m');
+    }
+  }
+  console.log('\n  \x1b[2mmenselijk getypte regels in dit bereik: ' + nu.opbrengst.menselijkGetypteRegels +
+    '.  Er staat met opzet GEEN enkel opbrengstcijfer: ' + nu.opbrengst.geenEnkelCijfer + '\x1b[0m');
   if (!nu.herbouwproefGelezen) console.log('  \x1b[33mHERBOUWPROEF.json bestaat nog niet; elk afgeleid conflict heet daarom onbewezen.\x1b[0m');
 
   if (vastleggen) {

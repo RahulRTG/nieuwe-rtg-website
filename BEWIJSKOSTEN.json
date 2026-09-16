@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-16T07:33:02.861Z",
-    "commit": "ff4d0325",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-16T07:45:06.522Z",
+    "commit": "80a92111",
+    "boomVuil": true,
+    "boomAnders": 1,
     "instrument": "scripts/bewijskosten.js",
     "node": "v22.22.2"
   },
@@ -11,7 +11,69 @@
   "grens": "machineversterking en mensversterking worden nooit opgeteld: de eerste mag groeien (een generator schrijft die regels in seconden), de tweede hoort naar nul. Een versterkingsfactor over nul bronregels is ONBEPAALD en geen nul. En `onbewezen` is geen `handwerk`: niet bewezen herbouwbaar is iets anders dan bewezen niet-herbouwbaar.",
   "gemeten": {
     "bereik": "3f11d577e566de3a3137b6e79666cf5084f95c05..HEAD",
-    "commits": 61,
+    "zekerheid": {
+      "ratelTanden": {
+        "bron": "NORM.json",
+        "eenheid": "tand(en)",
+        "wat": "getallen die niet meer stil mogen verslechteren",
+        "voor": 119,
+        "na": 130,
+        "delta": 11,
+        "reden": null
+      },
+      "toetsenBewezenGevoelig": {
+        "bron": "MUTATIES.json",
+        "eenheid": "toetsbestand(en)",
+        "wat": "toetsen die iemand heeft zien zakken op een mutatie",
+        "voor": 1255,
+        "na": 1262,
+        "delta": 7,
+        "reden": null
+      },
+      "artefactenMetEigenaar": {
+        "bron": "AFGELEID.json",
+        "eenheid": "artefact(en)",
+        "wat": "afgeleide waarheid met een machinaal vindbare generator-eigenaar",
+        "voor": null,
+        "na": 174,
+        "delta": null,
+        "reden": "AFGELEID.json bestond niet bij de basis: dit is een NIEUW soort zekerheid en geen toename van een bestaand getal"
+      },
+      "herbouwBewezen": {
+        "bron": "HERBOUWPROEF.json",
+        "eenheid": "artefact(en)",
+        "wat": "artefacten waarvan de herbouw aantoonbaar hetzelfde oplevert",
+        "voor": null,
+        "na": 14,
+        "delta": null,
+        "reden": "HERBOUWPROEF.json bestond niet bij de basis: dit is een NIEUW soort zekerheid en geen toename van een bestaand getal"
+      }
+    },
+    "opbrengst": {
+      "geenEnkelCijfer": "de soorten zekerheid hebben verschillende eenheden en worden niet opgeteld; twee van de vier registers ontstonden in dit bereik en een sprong vanaf \"bestond niet\" is geen vooruitgang op een schaal maar een nieuwe schaal",
+      "menselijkGetypteRegels": 5861,
+      "perSoort": {
+        "ratelTanden": {
+          "delta": 11,
+          "eenheid": "tand(en)",
+          "menselijkeRegelsPerEenheid": 533
+        },
+        "toetsenBewezenGevoelig": {
+          "delta": 7,
+          "eenheid": "toetsbestand(en)",
+          "menselijkeRegelsPerEenheid": 837
+        },
+        "artefactenMetEigenaar": {
+          "delta": null,
+          "reden": "AFGELEID.json bestond niet bij de basis: dit is een NIEUW soort zekerheid en geen toename van een bestaand getal"
+        },
+        "herbouwBewezen": {
+          "delta": null,
+          "reden": "HERBOUWPROEF.json bestond niet bij de basis: dit is een NIEUW soort zekerheid en geen toename van een bestaand getal"
+        }
+      }
+    },
+    "commits": 65,
     "samenvoegingen": 3,
     "omvang": {
       "intentie": {
@@ -25,8 +87,8 @@
         "eraf": 28
       },
       "afgeleid": {
-        "bestanden": 30,
-        "erbij": 6338,
+        "bestanden": 31,
+        "erbij": 7045,
         "eraf": 322
       },
       "document": {
@@ -42,8 +104,8 @@
     },
     "bronRegels": 1804,
     "bewijsRegels": 3522,
-    "afgeleideRegels": 6660,
-    "machineVersterking": 3.69,
+    "afgeleideRegels": 7367,
+    "machineVersterking": 4.08,
     "bewijsVersterking": 1.95,
     "versterkingOnbepaald": null,
     "driftConflicten": 44,
@@ -297,6 +359,68 @@
     "waarom": "de eerste commit van deze campagne die groen door de hele keten kwam (CI-ronde 4593); een latere ronde is pas duurder of goedkoper als je weet waartegen",
     "gemeten": {
       "bereik": "3f11d577e566de3a3137b6e79666cf5084f95c05..fcf44574",
+      "zekerheid": {
+        "ratelTanden": {
+          "bron": "NORM.json",
+          "eenheid": "tand(en)",
+          "wat": "getallen die niet meer stil mogen verslechteren",
+          "voor": 119,
+          "na": 121,
+          "delta": 2,
+          "reden": null
+        },
+        "toetsenBewezenGevoelig": {
+          "bron": "MUTATIES.json",
+          "eenheid": "toetsbestand(en)",
+          "wat": "toetsen die iemand heeft zien zakken op een mutatie",
+          "voor": 1255,
+          "na": 1258,
+          "delta": 3,
+          "reden": null
+        },
+        "artefactenMetEigenaar": {
+          "bron": "AFGELEID.json",
+          "eenheid": "artefact(en)",
+          "wat": "afgeleide waarheid met een machinaal vindbare generator-eigenaar",
+          "voor": null,
+          "na": null,
+          "delta": null,
+          "reden": "AFGELEID.json bestond niet bij de basis: dit is een NIEUW soort zekerheid en geen toename van een bestaand getal"
+        },
+        "herbouwBewezen": {
+          "bron": "HERBOUWPROEF.json",
+          "eenheid": "artefact(en)",
+          "wat": "artefacten waarvan de herbouw aantoonbaar hetzelfde oplevert",
+          "voor": null,
+          "na": null,
+          "delta": null,
+          "reden": "HERBOUWPROEF.json bestond niet bij de basis: dit is een NIEUW soort zekerheid en geen toename van een bestaand getal"
+        }
+      },
+      "opbrengst": {
+        "geenEnkelCijfer": "de soorten zekerheid hebben verschillende eenheden en worden niet opgeteld; twee van de vier registers ontstonden in dit bereik en een sprong vanaf \"bestond niet\" is geen vooruitgang op een schaal maar een nieuwe schaal",
+        "menselijkGetypteRegels": 3521,
+        "perSoort": {
+          "ratelTanden": {
+            "delta": 2,
+            "eenheid": "tand(en)",
+            "menselijkeRegelsPerEenheid": 1761
+          },
+          "toetsenBewezenGevoelig": {
+            "delta": 3,
+            "eenheid": "toetsbestand(en)",
+            "menselijkeRegelsPerEenheid": 1174
+          },
+          "artefactenMetEigenaar": {
+            "delta": null,
+            "reden": "AFGELEID.json bestond niet bij de basis: dit is een NIEUW soort zekerheid en geen toename van een bestaand getal"
+          },
+          "herbouwBewezen": {
+            "delta": null,
+            "reden": "HERBOUWPROEF.json bestond niet bij de basis: dit is een NIEUW soort zekerheid en geen toename van een bestaand getal"
+          }
+        }
+      },
       "commits": 40,
       "samenvoegingen": 3,
       "omvang": {

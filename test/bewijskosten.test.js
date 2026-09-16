@@ -114,3 +114,68 @@ test('8. de nulmeting staat erbij, met waarom zij het ijkpunt is', () => {
   assert.equal(REGISTER.nulmeting.commit, NULMETING);
   assert.ok(REGISTER.nulmeting.waarom.length > 40, 'de nulmeting draagt geen uitgeschreven reden');
 });
+
+test('9. een register dat bij de basis NIET BESTOND geeft geen delta', () => {
+  /* Drie standen en niet twee, en dit is de plek waar dat geld kost:
+     AFGELEID.json en HERBOUWPROEF.json bestonden niet bij het aftakpunt. Wie
+     "bestond niet" als nul leest, noteert `0 -> 174` en schrijft een
+     spectaculaire vooruitgang op een schaal die daarvoor niet bestond. */
+  /* VERS GEMETEN EN NIET UIT HET REGISTER, en dat is een gemaakte fout. De
+     eerste versie las alleen REGISTER.gemeten.zekerheid, en toen bleef hij
+     GROEN op een mutatie die "bestond niet" als nul ging lezen -- het
+     ingecheckte register was immers nog met de goede code geschreven. Een toets
+     die alleen de vastgelegde uitslag leest, beproeft de vastlegging en niet de
+     meter (LAT.md regel 10). Het register wordt hieronder nog steeds
+     gecontroleerd; de EIGENSCHAP wordt vers gemeten. */
+  const vers = meet(REGISTER.gemeten.bereik).zekerheid;
+  const bestondNiet = Object.values(vers).filter(r => r.voor === null);
+  assert.ok(bestondNiet.length >= 1,
+    'geen enkel register ontbrak bij de basis; dan beproeft deze toets niets -- kies een bereik ' +
+    'waarin er een is ontstaan, of haal hem weg');
+  for (const [naam, r] of Object.entries(vers)) {
+    if (r.voor === null) assert.equal(r.delta, null, naam + ' (vers): geen "voor" en toch een delta');
+  }
+
+  const z = REGISTER.gemeten.zekerheid;
+  assert.ok(z && Object.keys(z).length >= 4, 'de zekerheidshelft is gevuld');
+  for (const [naam, r] of Object.entries(z)) {
+    if (r.voor === null) {
+      assert.equal(r.delta, null, naam + ' heeft geen "voor" en toch een delta');
+      assert.ok(r.reden && r.reden.length > 30, naam + ' is onbepaald zonder uitgeschreven reden');
+    } else {
+      assert.equal(r.delta, r.na - r.voor, naam + ': delta klopt niet met voor en na');
+    }
+    assert.ok(r.eenheid && r.eenheid.length > 2, naam + ' draagt geen eenheid');
+  }
+});
+
+test('10. er staat geen enkel opbrengstcijfer, en dat staat er met de reden bij', () => {
+  /* De verleiding is "zoveel zekerheid per regel werk". Dat vraagt een weging
+     over drie eenheden die niemand weegt -- INT-04, LAT.md regel 11 en
+     scripts/check.js regel 48 verbieden precies dat. */
+  const o = REGISTER.gemeten.opbrengst;
+  assert.ok(o.geenEnkelCijfer.length > 60, 'de weigering draagt geen uitgeschreven reden');
+  assert.equal(typeof o.menselijkGetypteRegels, 'number');
+  const tekst = JSON.stringify(o);
+  assert.ok(!/opbrengstCijfer|yield|zekerheidsScore|totaleOpbrengst/i.test(tekst),
+    'er staat een samengesteld opbrengstcijfer in: ' + tekst.slice(0, 200));
+  /* En de opbrengst PER SOORT mag alleen een verhouding dragen waar er iets is
+     gewonnen: delen door nul of door een negatieve winst is geen kengetal. */
+  for (const [naam, p] of Object.entries(o.perSoort)) {
+    if (p.delta === null) { assert.equal(p.menselijkeRegelsPerEenheid, undefined); continue; }
+    if (p.delta > 0) assert.equal(typeof p.menselijkeRegelsPerEenheid, 'number', naam);
+    else assert.equal(p.menselijkeRegelsPerEenheid, null, naam + ' deelt door een niet-positieve winst');
+  }
+});
+
+test('11. de uitvoer van een generator telt nooit als menselijk getypt werk', () => {
+  /* De meter schrijft zelf een MOMENTOPNAME weg. Telt die stand niet mee als
+     afgeleid, dan valt BEWIJSKOSTEN.json in `overig` en schrijft de meter zijn
+     eigen uitvoer op als arbeid van een mens -- precies het getal dat hij moet
+     meten. */
+  const deel = indeler();
+  const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'AFGELEID.json'), 'utf8'));
+  const moment = reg.artefacten.filter(r => r.soort === 'MOMENTOPNAME' && r.eigenaar);
+  assert.ok(moment.length >= 1, 'er is minstens een MOMENTOPNAME om dit op te toetsen');
+  for (const r of moment) assert.equal(deel(r.naam), 'afgeleid', r.naam);
+});

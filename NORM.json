@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-15",
+  "vastgelegd": "2026-09-16",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 120,
+    "ratelTanden": 121,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1683,
+    "testbestanden": 1684,
     "toetsenNietGemeten": 624,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -114,7 +114,8 @@
     "idemVerklaard": 1,
     "idemAfdrukVoegtNietsToe": 2,
     "idemHandwerkGeenVergelijking": 3,
-    "veranderbereikZonderBereik": 828
+    "veranderbereikZonderBereik": 530,
+    "veranderbereikStatisch": 1135
   },
   "notities": [
     {
@@ -2483,10 +2484,10 @@
   },
   "sinds": {
     "keuringOmvang": "2026-09-13",
-    "testbestanden": "2026-09-15",
+    "testbestanden": "2026-09-16",
     "toetsenNietGemeten": "2026-09-14",
     "inlineStijlAttributen": "2026-09-11",
-    "ratelTanden": "2026-09-15",
+    "ratelTanden": "2026-09-16",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-14",
     "toetsenOngevoeligPct": "2026-09-05",
@@ -2567,7 +2568,8 @@
     "idemVerklaard": "2026-09-15",
     "idemAfdrukVoegtNietsToe": "2026-09-15",
     "idemHandwerkGeenVergelijking": "2026-09-15",
-    "veranderbereikZonderBereik": "2026-09-15"
+    "veranderbereikZonderBereik": "2026-09-16",
+    "veranderbereikStatisch": "2026-09-16"
   },
   "uitzonderingen": [
     {

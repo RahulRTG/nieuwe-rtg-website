@@ -31,7 +31,7 @@ tegengehouden, en met een getal in plaats van een gevoel.
 
 `scripts/impactbereik.js` keert de require-graaf om en vraagt: als dit bestand
 verandert, welke toetsen hangen eraan? Vers gemeten over
-<!--getal:veranderbereik.toetsen-->1900<!--/getal--> toetsbestanden:
+<!--getal:veranderbereik.toetsen-->1901<!--/getal--> toetsbestanden:
 
 | gewijzigd bestand | transitief geraakte toetsen |
 |---|---|
@@ -42,7 +42,7 @@ verandert, welke toetsen hangen eraan? Vers gemeten over
 
 Zes toetsen voor de plek waar élke betaling langskomt is geen versmalling maar
 een blinde vlek, en die is
-<!--getal:veranderbereik.blind-->1067<!--/getal--> toetsbestanden groot: ruim de
+<!--getal:veranderbereik.blind-->766<!--/getal--> toetsbestanden groot: ruim de
 helft heeft **geen enkele require-kant naar `server/`**. Ze starten de server als
 apart proces en raken de oppervlakte over HTTP (1058 starten een proces, 995
 praten HTTP). Een planner op deze graaf slaat ze over en meldt groen — "de
@@ -54,8 +54,8 @@ stilste vorm van kapot die dit huis kent" (`scripts/lib/bedrading.js`).
 workflow** en schrijft **geen register** (nul `writeFileSync`). Het getal dat
 versmalling tegenhoudt bestond dus alleen als proza in `KEURING.md` par. 1 — en
 dat proza stond op 819 van 1434 (57,1%) terwijl de verse meting
-<!--getal:veranderbereik.blind-->1067<!--/getal--> van
-<!--getal:veranderbereik.toetsen-->1900<!--/getal--> zegt. Niet fout opgeschreven;
+<!--getal:veranderbereik.blind-->766<!--/getal--> van
+<!--getal:veranderbereik.toetsen-->1901<!--/getal--> zegt. Niet fout opgeschreven;
 gewoon ouder dan de code. *Een register dat niet is hergedraaid is een bewering
 over het verleden* (`MENSNETWERK.md` par. 4) — en een getal zónder register is
 dat ook, alleen merkt niemand het.
@@ -104,12 +104,12 @@ Stand op deze tak:
 
 | | |
 |---|---|
-| toetsbestanden | <!--getal:veranderbereik.toetsen-->1900<!--/getal--> |
-| statische as | <!--getal:veranderbereik.statisch-->833<!--/getal--> |
+| toetsbestanden | <!--getal:veranderbereik.toetsen-->1901<!--/getal--> |
+| statische as | <!--getal:veranderbereik.statisch-->1135<!--/getal--> |
 | waargenomen as | <!--getal:veranderbereik.waargenomen-->337<!--/getal--> |
-| blinde vlek statisch alleen | <!--getal:veranderbereik.blind-->1067<!--/getal--> |
-| **gedicht door waarneming** | <!--getal:veranderbereik.gedicht-->239<!--/getal--> |
-| **zonder enig bereik (volle ring)** | <!--getal:veranderbereik.zonder-->828<!--/getal--> |
+| blinde vlek statisch alleen | <!--getal:veranderbereik.blind-->766<!--/getal--> |
+| **gedicht door waarneming** | <!--getal:veranderbereik.gedicht-->236<!--/getal--> |
+| **zonder enig bereik (volle ring)** | <!--getal:veranderbereik.zonder-->530<!--/getal--> |
 | toetsen die in deze ronde draaiden | <!--getal:veranderbereik.ronde-->769<!--/getal--> |
 | waargenomen routes zonder bronbestand | <!--getal:veranderbereik.routesZonderBestand-->80<!--/getal--> |
 
@@ -197,7 +197,7 @@ Het meeste bestaat al, en bijna nooit onder de voorgestelde naam.
 | 2 | Change Intelligence vooraf | **stap** | de bouwstenen staan; par. 2 is de eerste helft |
 | 3 | één Change Graph | **stap** | `AANROEPGRAAF.json` (23716 kanten), `SYMBOLEN.json` (19652), `ROUTEBRON.json`, `SCHERMROUTES.json`, `CODEWERELD.json` — de graaf bestaat, de ontbrekende kant was toets → bestand |
 | 4 | registers als projectie | **staat** | `scripts/lib/stempel.js`, `npm run registerklopt`; het openstaande stuk staat al benoemd in `METERKLASSE.json` (67 generatoren zonder verklaard grendelcontract) |
-| 5 | Incremental Proof Engine | **besluit** | geblokkeerd op <!--getal:veranderbereik.zonder-->828<!--/getal--> volle ringen — zie par. 5 |
+| 5 | Incremental Proof Engine | **besluit** | geblokkeerd op <!--getal:veranderbereik.zonder-->530<!--/getal--> volle ringen — zie par. 5 |
 | 6 | P0–P4 escalatieladder | **stap** | `BEWIJSLADDER.json` heeft 12 sporten (6 staat, 6 stap, 0 jaren) — maar naar SOORT bewijs, niet naar TIJDBUDGET; zie correctie C |
 | 7 | risico bepaalt bewijs | **stap** | `kern/frictie/motor.js` (score mét opbouw), `scripts/lib/risico.js` |
 | 8 | bewijs met houdbaarheid | **staat** | `versheid()` en `sluiting()` in `scripts/lib/stempel.js` — per instrument, nog niet per toets |
@@ -633,7 +633,7 @@ niet om iets over te slaan. Dat is precies de goede volgorde, en het is geen
 tegenvaller: een selector die vandaag zou versmallen, zou het op deze band doen.
 
 Vandaag is dat antwoord: van
-<!--getal:veranderbereik.statisch-->833<!--/getal--> toetsen langs de statische as,
-plus <!--getal:veranderbereik.gedicht-->239<!--/getal--> die de waarneming erbij
-haalt, en <!--getal:veranderbereik.zonder-->828<!--/getal--> waarover dit huis niets
+<!--getal:veranderbereik.statisch-->1135<!--/getal--> toetsen langs de statische as,
+plus <!--getal:veranderbereik.gedicht-->236<!--/getal--> die de waarneming erbij
+haalt, en <!--getal:veranderbereik.zonder-->530<!--/getal--> waarover dit huis niets
 weet. Dat laatste getal is het werk.

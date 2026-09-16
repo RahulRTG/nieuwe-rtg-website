@@ -85,8 +85,8 @@ na te rekenen is en niet in dit document blijft hangen:
 Zes toetsen voor de plek waar élke betaling langskomt is geen versmalling maar
 een blinde vlek. Nagemeten:
 
-- **<!--getal:veranderbereik.blind-->1067<!--/getal--> van de
-  <!--getal:veranderbereik.toetsen-->1900<!--/getal--> toetsbestanden hebben geen
+- **<!--getal:veranderbereik.blind-->766<!--/getal--> van de
+  <!--getal:veranderbereik.toetsen-->1901<!--/getal--> toetsbestanden hebben geen
   enkele require-kant naar `server/`.**
 - **1058 starten de server als apart proces**, 995 praten over HTTP.
 
@@ -121,8 +121,8 @@ blinde vlek.** Het routejournaal weet WELKE toets welke route raakte
 (`test/toetsnaam.js`), en `ROUTEBRON.json` weet in welk bronbestand een route
 wordt afgehandeld — die twee waren nooit aan elkaar geknoopt.
 `scripts/veranderbereik.js` doet dat en haalt er
-<!--getal:veranderbereik.gedicht-->239<!--/getal--> toetsen mee uit de blinde vlek.
-Wat overblijft is <!--getal:veranderbereik.zonder-->828<!--/getal--> toetsbestanden
+<!--getal:veranderbereik.gedicht-->236<!--/getal--> toetsen mee uit de blinde vlek.
+Wat overblijft is <!--getal:veranderbereik.zonder-->530<!--/getal--> toetsbestanden
 zonder enig vastgesteld bereik, en zolang dat getal niet nul is verandert de
 volgorde hierboven niet. `VERANDERING.md` is het document eromheen.
 

@@ -126,6 +126,15 @@ const REGISTER = {
      `onbeslist` daalt ook als het BEREIK krimpt, en dan leest een verdwenen
      generator als vooruitgang. */
   'AFGELEID.json': { meter: ['afgeleidZonderEigenaar', 'afgeleidOnbeslist', 'afgeleidMetEigenaar'] },
+  /* DRAAIT DIE EIGENAAR OOK WERKELIJK HETZELFDE UIT (HERBOUWPROEF.json, npm run
+     herbouwproef)? AFGELEID.json zegt wie de sleutel heeft; deze zegt of hij
+     past. Twee tanden, en ze meten twee verschillende dingen: `herbouwVerschilt`
+     is een DEFECT (de inhoud kwam anders terug -- of de generator is niet
+     deterministisch, of het ingecheckte artefact loopt achter) en hoort op nul
+     te blijven; `herbouwBewezen` is DEKKING en mag alleen groeien, anders leest
+     een krimpende proef als vooruitgang. Wat er NIET komt is een tand op
+     `nietGedraaid`: dat is een oordeel over de machine waarop de proef liep. */
+  'HERBOUWPROEF.json': { meter: ['herbouwVerschilt', 'herbouwBewezen'] },
   /* IDEMIDENTITEIT.json (npm run idemidentiteit) beantwoordt wat na #269/#270
      overbleef: waar is de identiteit van een verzoek nog te smal? Drie tanden,
      een omhoog en twee omlaag -- zie de kop bij die tanden in ../norm.js. */

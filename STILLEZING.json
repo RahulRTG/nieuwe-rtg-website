@@ -3,10 +3,10 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-09-16T06:05:35.094Z",
-  "commit": "125d689d",
+  "op": "2026-09-16T06:47:02.800Z",
+  "commit": "a1482931",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/stillezing.js",
   "node": "v22.22.2"
  },
@@ -21,11 +21,11 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 444,
-   "metVanger": 95,
+   "bewijslezingen": 451,
+   "metVanger": 96,
    "smeltSamen": 61,
    "zegtHet": 10,
-   "onderscheidt": 3,
+   "onderscheidt": 4,
    "gooit": 2,
    "anders": 19
   }
@@ -451,6 +451,14 @@
      "MUTATIECONTRACT.json"
     ],
     "soort": "smeltSamen"
+   },
+   {
+    "bestand": "scripts/herbouwproef.js",
+    "regel": 394,
+    "leest": [
+     "HERBOUWPROEF.json"
+    ],
+    "soort": "onderscheidt"
    },
    {
     "bestand": "scripts/herstel.js",

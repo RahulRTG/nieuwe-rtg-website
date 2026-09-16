@@ -809,7 +809,9 @@ eigenschap, alle negen groen, en twee keer met een mutatie zien zakken.
 **FRAGMENTEN is niet uit het model afgeleid maar uit de meting gevallen.**
 CLAUDE.md en MACHINE.md waren de laatste twee van de achttien die niemand kon
 aanwijzen, en dat is terecht: ze wórden niet gegenereerd. `scripts/getallen.js`
-herschrijft alleen de stukken tussen `<!--getal:...-->`. Dat is niet AFGELEID
+herschrijft alleen de stukken tussen de merktekens `<!--getal:…-->`
+(met een echte naam in plaats van het beletselteken -- een puntje meer en deze
+regel is zelf een openend merkteken zonder sluittag). Dat is niet AFGELEID
 (het document regenereren bestaat niet) en niet BRON (die stukken horen nooit
 met de hand te worden samengevoegd). Zeventien documenten, en hun eigenaar is
 niet aangewezen maar **gevonden**: het enige script dat de merkteken-conventie

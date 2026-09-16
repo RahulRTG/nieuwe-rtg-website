@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-15",
+  "vastgelegd": "2026-09-16",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 125,
+    "ratelTanden": 128,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1684,
+    "testbestanden": 1685,
     "toetsenNietGemeten": 624,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -119,7 +119,10 @@
     "stilLezing": 5,
     "stilLezingMeters": 61,
     "stilLezingBereik": 517,
-    "bewijsOnderscheidt": 3
+    "bewijsOnderscheidt": 3,
+    "afgeleidZonderEigenaar": 2,
+    "afgeleidOnbeslist": 106,
+    "afgeleidMetEigenaar": 172
   },
   "notities": [
     {
@@ -2497,10 +2500,10 @@
   },
   "sinds": {
     "keuringOmvang": "2026-09-13",
-    "testbestanden": "2026-09-15",
+    "testbestanden": "2026-09-16",
     "toetsenNietGemeten": "2026-09-14",
     "inlineStijlAttributen": "2026-09-11",
-    "ratelTanden": "2026-09-15",
+    "ratelTanden": "2026-09-16",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-14",
     "toetsenOngevoeligPct": "2026-09-05",
@@ -2586,129 +2589,12 @@
     "stilLezing": "2026-09-15",
     "stilLezingMeters": "2026-09-15",
     "stilLezingBereik": "2026-09-15",
-    "bewijsOnderscheidt": "2026-09-15"
+    "bewijsOnderscheidt": "2026-09-15",
+    "afgeleidZonderEigenaar": "2026-09-16",
+    "afgeleidOnbeslist": "2026-09-16",
+    "afgeleidMetEigenaar": "2026-09-16"
   },
   "uitzonderingen": [
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/app-main/app-main-08b.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 5 stijlattributen in de reisbureau-schermen (PR #75/#78)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/backoffice/backoffice-01.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 2 attributen erbij in de kantoorschermen (PR #81)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/backoffice/backoffice-03.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 1 attribuut erbij (PR #81)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/backoffice/backoffice-03c.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; nieuw kantoordeel met 2 attributen (PR #81)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/kantoren.html",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 30 attributen erbij op het kantorenscherm (PR #75/#80)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/overheid.html",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 2 attributen erbij (PR #81)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/reisbureau.html",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 3 attributen erbij op het reisbureauscherm (PR #75)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/reisuitnodiging.html",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; nieuw scherm met 12 attributen (PR #75)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/reizen.html",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 22 attributen op het vernieuwde reizenscherm (PR #75)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/rtgid.html",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 3 attributen erbij (PR #70)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/bewaarbeleid.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; het handelingsspoor-bewaarbeleid (PR #70) duwt hem net over de grens; de naad is de takkenlijst apart",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/db/ledengids.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; groei door de contactpin-velden (PR #77, al op main) plus de consent-kant (PR #81); stond al met reden in de NOG-lijst van check.js",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/functies/register/index.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; het functieregister verdubbelt door de persoonseis (PR #74); de naad is de eisenkant los van het register",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/kern/appgids-data/deel1.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; gids-ingangen van de nieuwe schermen; de geplande verhuizing naar deel1b staat al in check.js aangetekend",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/kern/command/uitrolregie.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; nieuw uit PR #74 (13 kB); de naad is de canary-kant los van de uitrolstappen",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/kern/pay/index.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; groei door de idem-poort-aansluiting (PR #70)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/lib/idem-poort.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; nieuw uit PR #70 (11,3 kB); de naad is de afdruk-kant (BUITEN_AFDRUK) los van het venster",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/lib/keten.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; groei door de handelingssporen (PR #70/#74)",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/opzet/kernlaag4b.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; draagt sinds de ronde ook de reisuitnodiging en het lidstand-koppelpunt; de 10 kB-knip naar 4c bestaat al en de volgende kamer kan erheen",
-      "vervalt": "2026-09-15"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/server.js",
-      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; de monoliet groeit met elke tak mee; het afbouwplan staat in TAKEN.md en elke nieuwe kamer hoort in kern/ of routes/ te landen, niet hier",
-      "vervalt": "2026-09-15"
-    },
     {
       "regel": "inline-stijl",
       "pad": "public/apps/app-main/app-main-56c.js",

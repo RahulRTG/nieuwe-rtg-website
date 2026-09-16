@@ -1033,6 +1033,95 @@ ronde was het driemaal het tweede, en daarmee deed hij precies waar hij voor is:
 `ARCHITECTUUR.md`, `BEWIJS.md` en `FUNCTIES.md` liepen één bestand achter omdat
 deze proef zelf erbij was gekomen.
 
+## 6e. Wat kost een correcte verandering
+
+Par. 6d maakt van een samenvoegconflict een herbouwplicht. De vraag daarboven is
+de stuurmaat van dit hele hoofdstuk:
+
+> Verlaag niet de hoeveelheid zekerheid. Verlaag de hoeveelheid **werk** die
+> nodig is om dezelfde of sterkere zekerheid te produceren.
+
+`scripts/bewijskosten.js` (`BEWIJSKOSTEN.json`) meet waar het werk heen ging bij
+een verandering die door alle poorten kwam.
+
+### Twee helften die elkaar nooit raken
+
+`gemeten` volgt uit git, `AFGELEID.json` en `HERBOUWPROEF.json` — reproduceerbaar,
+en iedereen die de opdracht draait krijgt hetzelfde. `verklaard` is een **oordeel
+van een mens**: ontdekkingen, defecten die onderweg opdoken en die geen enkele
+toets zag. Die zijn het waardevolste van een ronde en het minst meetbare, en
+precies daarom komen ze in geen enkele som. Er is geen reproduceerbare
+detectieregel voor een ontdekking, dus een cijfer waarin ze meetellen is half
+gemeten en half geschat — en dat leest als gemeten.
+
+Toets 1 handhaaft dat **op de bron en niet op een getal**: in de code van
+`meet()` mag het woord `verklaard` niet voorkomen.
+
+### Twee versterkingsfactoren, en de ene mag groeien
+
+Eén regel bron sleept regels mee in de rest van de boom. Dat is geen probleem —
+het is wat een huis vol meters hoort te doen. Het gaat erom **wie** die regels
+schrijft.
+
+| | |
+|---|---|
+| `machineVersterking` | afgeleide regels per bronregel. Een generator doet dit in seconden; deze mag gerust groeien. |
+| `mensVersterking` | afgeleide artefacten die bij een samenvoeging in conflict kwamen en waarvan de herbouw **niet** bewezen is. Precies die moest een mens met de hand samenvoegen. Deze hoort naar nul. |
+
+Ze worden nooit opgeteld. Een bronconflict telt met opzet **niet** in de tweede
+mee: dat is werk aan echte inhoud en geen versterking. Vandaar drie
+afhandelingen en niet twee — `herbouwplicht`, `onbewezen`, `handmatig` — en
+`onbewezen` is geen `handwerk`: niet bewezen herbouwbaar is iets anders dan
+bewezen niet-herbouwbaar.
+
+### De eerste meting, over het bereik van deze tak
+
+| | |
+|---|---|
+| intentie (`server/`, `public/`) | 32 bestanden, 1804 regels |
+| bewijs (`test/`, `scripts/`) | 19 bestanden, 3519 regels |
+| afgeleid (door een generator) | 30 bestanden, 6660 regels |
+| document | 1 bestand, 525 regels |
+| **machineversterking** | **3,69** afgeleide regels per bronregel |
+| **mensversterking** | **9** |
+| drift | 44 conflicten: 6 in de bron, 29 herbouwplicht, 9 onbewezen |
+
+De negen zijn het getal dat ertoe doet, en ze zijn met naam te noemen:
+`NORM.json` in alle drie de samenvoegingen, `MUTATIES.json` in twee, en verder
+`CLAUDE.md`, `MACHINE.md`, `DEKKING.json` en `GLUURRONDE.json`. Twee daarvan zijn
+FRAGMENTEN en de rest is nog niet door de herbouwproef gekomen. **De weg omlaag
+loopt dus via het verbreden van die proef en niet via beter met de hand
+samenvoegen** — en dat is precies het verschil dat dit register zichtbaar maakt.
+
+De uitslag over de samenvoeging van 15 september komt exact uit op wat
+`HERBOUWPROEF.json` langs een andere weg vond: 14 herbouwplicht, 4 onbewezen, 1
+bron. Twee metingen die elkaar bevestigen zonder elkaars invoer te zijn.
+
+### De duurste fout van de eerste ronde zat in een exitcode
+
+`git merge-tree` geeft exitcode **1 als er conflicten zijn**. `execFileSync`
+gooit op elke niet-nul uitgang, mijn vanger noteerde `conflicten: null`, en de
+uitslag las als *drift: 0 conflicten* — terwijl de samenvoeging er negentien had.
+Een stille nul waar een negentien hoorde, en hij zag er rustig uit.
+
+Dat is **BM-B in een derde gedaante**: niet een onleesbaar bestand dat als
+afwezig leest, maar een *geslaagde* meting die als een mislukte leest omdat haar
+sein een foutcode is. Toets 7 bewaakt dat de bron die exitcode uitdrukkelijk als
+uitslag leest.
+
+### De eerste MOMENTOPNAME
+
+Die stand stond in par. 6c op papier met **nul** leden. `BEWIJSKOSTEN.json` meet
+over een *bereik*, dus opnieuw draaien geeft terecht iets anders en "loopt
+achter" is er geen zinnig oordeel over. Hij staat daarom in de `BUITEN`-lijst van
+de versheidswacht en in `GEEN_METING`, allebei met de reden: **een ratel over een
+bewegend bereik verbetert door het bereik te verkleinen.** Meet een tak van drie
+commits, en elk getal is laag. Dat is exact de faalvorm waarvoor
+`afgeleidMetEigenaar` en `stilLezingBereik` bestaan.
+
+De tand die er wél hoort te komen — `mensVersterking` naar nul — vraagt eerst een
+**stabiel bereik**, en dat is een besluit en geen bouwtaak.
+
 ## 7. Wat dit niet wordt
 
 - **Geen enkel groen woord bovenaan.** `LAT.md` regel 11 en `check.js` regel 48

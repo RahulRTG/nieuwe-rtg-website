@@ -969,6 +969,23 @@ async function binnenEenDag(werk) {
    en geen nepmedia, dus een toets die twee losse sessies naast elkaar zet heeft
    er niets aan. Dat verschil hoort een KEUZE te zijn met een naam, niet een
    regel die per ongeluk in de ene kopie ontbreekt. */
+function metGedeeldeBrowser(mod, endpoint) {
+  return { ...mod, chromium: new Proxy(mod.chromium, {
+    get(doel, eigenschap) {
+      if (eigenschap !== 'launch') {
+        const waarde = Reflect.get(doel, eigenschap);
+        return typeof waarde === 'function' ? waarde.bind(doel) : waarde;
+      }
+      /* Playwright maakt bij `connect()` een clientverbinding. `close()` ruimt
+         de contexten van die client op en verbreekt zijn WebSocket, terwijl de
+         BrowserServer voor de volgende test blijft leven. Dit oorspronkelijke
+         close-gedrag is ook nodig om de event-loop van het toetsproces leeg te
+         maken; alleen contexten sluiten laat de socket open en hangt de shard. */
+      return async () => mod.chromium.connect(endpoint);
+    }
+  }) };
+}
+
 function laadPlaywright(opties) {
   for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
     try {
@@ -978,7 +995,14 @@ function laadPlaywright(opties) {
          met "Executable doesn't exist", en dat is rood dat niets over de code
          zegt. Deze controle komt uit scripts/lib/scherm.js en staat sinds de
          samenvoeging van 20 augustus 2026 hier, op de ene plek. */
-      if (mod && mod.chromium && fs.existsSync(mod.chromium.executablePath())) return mod;
+      if (mod && mod.chromium && fs.existsSync(mod.chromium.executablePath())) {
+        const endpoint = process.env.RTG_SHARED_BROWSER_ENDPOINT;
+        if (!endpoint) return mod;
+        /* Een verbonden client ruimt bij `browser.close()` zijn eigen
+           contexten op en verbreekt zijn verbinding. Het hostproces bezit
+           Chromium en sluit hem pas na de volledige shard. */
+        return metGedeeldeBrowser(mod, endpoint);
+      }
     } catch (e) { /* volgende */ }
   }
   if (opties && opties.eigenDriver === false) return null;
@@ -1361,7 +1385,7 @@ async function bankDeur(page, naam, opties) {
 }
 
 module.exports = { edgeActies, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
-  installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, letOpFouten,
+  installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
   wachtOpNetstilte, wachtOpBestand, klikEnWacht, tekstVan, postJson,

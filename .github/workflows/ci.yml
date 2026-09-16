@@ -32,6 +32,7 @@ on:
 # Geen workflowstap krijgt stilzwijgend schrijfrechten op de repository.
 permissions:
   contents: read
+  actions: read
 
 # VIER DINGEN DIE IN ELKE JOB HETZELFDE ZIJN, EN WAAROM.
 #
@@ -103,6 +104,63 @@ concurrency:
 # ============================================================================
 
 jobs:
+  # DE EERSTE BETROUWBARE UITSPRAAK. Deze job bouwt in seconden één snapshot,
+  # haalt alleen bewijs op van de exact gelijke merge-base op main en bepaalt
+  # daarna REUSED / REPROVE / UNKNOWN. Alle dure runners wachten hierop; een
+  # kapotte basispoort verbrandt daardoor geen honderden runner-minuten meer.
+  preflight:
+    name: Bewijs-preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+      reused: ${{ steps.plan.outputs.reused }}
+      reprove: ${{ steps.plan.outputs.reprove }}
+      unknown: ${{ steps.plan.outputs.unknown }}
+      unit: ${{ steps.plan.outputs.unit }}
+      e2e: ${{ steps.plan.outputs.e2e }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: De goedkope harde poorten
+        run: |
+          npm run ci-keten
+          npm run check
+      - name: Exacte groene main-basis zoeken
+        id: basis
+        run: node scripts/evidence-base.js
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Bewijsboek van exact die main-run ophalen
+        if: steps.basis.outputs.found == 'true'
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: evidence-book
+          path: .evidence-base
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.basis.outputs.run_id }}
+      - name: Alleen een integer bewijsboek installeren
+        if: hashFiles('.evidence-base/BEWIJSBOEK.json') != ''
+        run: node scripts/evidence.js install --from=.evidence-base/BEWIJSBOEK.json
+      - name: Eén snapshot, één Evidence DAG, één plan
+        id: plan
+        run: npm run evidence:plan -- --out=.evidence/plan.json
+      - name: Het plan voor de uitvoerder bewaren
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: evidence-plan
+          path: .evidence/plan.json
+          if-no-files-found: error
+          retention-days: 5
+
   # ==========================================================================
   # DE TOETSSCHERVEN.
   #
@@ -127,6 +185,8 @@ jobs:
   toetsscherf:
     name: Toetsscherf ${{ matrix.scherf }} van 4
     runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'full'
     timeout-minutes: 120
     strategy:
       fail-fast: false
@@ -262,6 +322,8 @@ jobs:
   ijkingen:
     name: De ijking - ${{ matrix.ijking }}
     runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'full'
     # EEN GEDEELDE GRENS OVER ZES ONGELIJKE JOBS IS DE GRENS VAN DE LANGSTE.
     #
     # Vijf van de zes zijn in enkele minuten klaar; `meterijk` niet. Gemeten op
@@ -283,11 +345,12 @@ jobs:
     #
     # DE GRENS IS DAAROM PER IJKING EN NIET GEDEELD: de vijf snelle houden hun
     # strakke 45 minuten -- daar is een overschrijding wel een signaal -- en
-    # meterijk krijgt de ruimte die hij aantoonbaar nodig heeft. Dit is
-    # RUIMTE en geen oplossing: de structurele vraag (de proef laten meten wat
-    # hij ijkt in plaats van alles) staat open, en zolang die openstaat schuift
-    # deze grens mee met een meting en niet met een gevoel.
-    timeout-minutes: ${{ matrix.ijking == 'meterijk' && 90 || 45 }}
+    # meterijk deelt nu één immutable keuringssnapshot voor alle
+    # registermutaties en herkeurt alleen de zes proeven die de bronboom zelf
+    # veranderen. Lokaal volledig gemeten op 16 september: 9m23s in plaats van
+    # 43–45 minuten. Dertig minuten houdt ruime runner-marge zonder een echte
+    # hang weer anderhalf uur te laten kosten.
+    timeout-minutes: ${{ matrix.ijking == 'meterijk' && 30 || 45 }}
     strategy:
       fail-fast: false
       matrix:
@@ -363,6 +426,8 @@ jobs:
   zware:
     name: De zware toets - ${{ matrix.zwaar }}
     runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'full'
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -412,6 +477,7 @@ jobs:
   keuringen:
     name: De keuringen (statisch) en PostgreSQL
     runs-on: ubuntu-latest
+    needs: preflight
     # Vijf tot tien minuten in de praktijk; twintig geeft ruimte voor een trage
     # runner zonder dat een echte vastloper er een half uur onder wegzakt.
     timeout-minutes: 20
@@ -553,8 +619,60 @@ jobs:
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
 
-  test:
-    name: Tests, checks en build
+  # De incrementele weg draait alleen het opnieuw vereiste en lokale UNKNOWN
+  # bewijs. Een impactgat maakt het plan `full`, dus deze job kan nooit zelf een
+  # onzeker plan smaller interpreteren.
+  incremental:
+    name: Incrementeel bewijs
+    runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'incremental'
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rtgtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: Het vastgezette bewijsplan ophalen
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: evidence-plan
+          path: .evidence
+      - name: Playwright + Chromium uit de lockfile
+        if: needs.preflight.outputs.e2e != '0'
+        run: node scripts/browserinstall.js --meting=browsermeting/incremental.json
+      - name: Alleen REPROVE en UNKNOWN opnieuw bewijzen
+        run: npm run evidence:run -- --plan=.evidence/plan.json
+        env:
+          RTG_E2E_STRICT: '1'
+          REDIS_URL: redis://localhost:6379
+
+  test-volledig:
+    name: Volledige tests, checks en build
     # DEZE NAAM STAAT IN DE TAKBESCHERMING VAN main en verandert dus niet.
     # Wat eronder gebeurt is wel veranderd. Eerst verhuisde de zware toetsstap
     # naar `toetsscherf`; nu zijn ook de keuringen eruit die van die scherven
@@ -570,7 +688,8 @@ jobs:
     # die regel zou een gezakte zware toets de BESCHERMDE check groen laten: het
     # bestand draait dan nergens meer waar dit oordeel naar kijkt. Een toets
     # verplaatsen mag nooit betekenen dat hij ophoudt te tellen.
-    needs: [toetsscherf, ijkingen, keuringen, zware]
+    needs: [preflight, toetsscherf, ijkingen, keuringen, zware]
+    if: needs.preflight.outputs.mode == 'full'
     runs-on: ubuntu-latest
     # GEEN POSTGRES EN GEEN REDIS MEER. Die stonden hier voor de
     # PostgreSQL-integratietests, en die zijn mee verhuisd. Het opstarten van
@@ -667,9 +786,25 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  # De naam van deze check staat in branch protection. Hij velt hetzelfde
+  # oordeel over twee bewijsroutes en accepteert nooit een skipped gekozen weg.
+  test:
+    name: Tests, checks en build
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [preflight, incremental, test-volledig]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: De gekozen bewijsroute moet groen zijn
+        run: node scripts/evidence-gate.js --mode=${{ needs.preflight.outputs.mode }} --incremental=${{ needs.incremental.result }} --full=${{ needs.test-volledig.result }}
+
   norm:
     name: De norm, de instroom en de build
     runs-on: ubuntu-latest
+    needs: preflight
     timeout-minutes: 30
     steps:
       # fetch-depth: 0 EN GEEN LATERE `git fetch`. Hier stond een ondiepe
@@ -741,6 +876,7 @@ jobs:
   security:
     name: Kwetsbare dependencies (npm audit)
     runs-on: ubuntu-latest
+    needs: preflight
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -761,6 +897,7 @@ jobs:
 
   dependency-review:
     name: Nieuwe dependencies beoordelen
+    needs: preflight
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -789,6 +926,7 @@ jobs:
     # NORM.json) -- nul bevindingen is anders te halen door niets meer te doen.
     name: De ladder (aanvalsproef tegen een echte server)
     runs-on: ubuntu-latest
+    needs: preflight
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -822,6 +960,7 @@ jobs:
     # nul gaten is anders te halen door minder te onderzoeken.
     name: De rolronde (welke rol komt waar binnen)
     runs-on: ubuntu-latest
+    needs: preflight
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -860,6 +999,7 @@ jobs:
     # scherpste controle niets meet, is groen zonder betekenis.
     name: De gluurronde (mag A bij de spullen van B)
     runs-on: ubuntu-latest
+    needs: preflight
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -893,6 +1033,7 @@ jobs:
   container:
     name: De container komt op
     runs-on: ubuntu-latest
+    needs: preflight
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -916,6 +1057,8 @@ jobs:
     # afrekenen; die toets heeft geen browser nodig.
     name: Toegankelijkheid deel ${{ matrix.deel }} van 4
     runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'full'
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -992,6 +1135,8 @@ jobs:
   schermen:
     name: Schermtoetsen deel ${{ matrix.deel }} van 4
     runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'full'
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -1133,7 +1278,8 @@ jobs:
   dekking:
     name: Waargenomen endpoint-dekking (beide journalen)
     runs-on: ubuntu-latest
-    needs: [test, schermen-oordeel]
+    needs: [preflight, test, test-volledig, schermen-oordeel]
+    if: needs.preflight.outputs.mode == 'full'
     timeout-minutes: 20
     # De enige job in deze keten die iets mag wegschrijven, en alleen om een
     # VOORSTEL te doen: een tak plus een pull request met het opnieuw gemeten
@@ -1310,3 +1456,33 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/gewichtvoorstel.js --oordeel gewichtdrift.json
 
+  # Alleen de volledige groene hoofdlijn mag bewijs uitgeven. Een PR schrijft
+  # nooit zijn eigen vrijbrief; hij kan uitsluitend het artefact van zijn
+  # exacte merge-base consumeren.
+  evidence-publish:
+    name: Vertrouwd bewijsboek publiceren
+    runs-on: ubuntu-latest
+    needs: [preflight, test, dekking, norm, security, ladder, rolronde, gluurronde, container, a11y-oordeel]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.preflight.outputs.mode == 'full'
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: Content-addressed bewijs met clean-room-herkomst vastleggen
+        run: npm run evidence:record
+        env:
+          RTG_FULL_PROOF: '1'
+      - name: Bewijsboek voor PRs op deze exacte commit bewaren
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: evidence-book
+          path: BEWIJSBOEK.json
+          if-no-files-found: error
+          retention-days: 30

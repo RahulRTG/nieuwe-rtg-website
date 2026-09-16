@@ -161,7 +161,11 @@ const REGISTER = {
   'GLUURRONDE.json': { meter: ['gluurGaten', 'gluurGecontroleerd'] },
   'VERSTRENGELING.json': { meter: ['verstrengelingOnverklaard'] },
   'BEWIJSLADDER.json': { meter: ['bewijsAlleenKeten'] },
-  'VERANDERBEREIK.json': { meter: ['veranderbereikZonderBereik'] },
+  /* TWEE BESTANDEN, TWEE SOORTEN WAARHEID. De schuld is een WAARNEMING en hangt
+     dus aan de ronde; de kennis volgt uit de code alleen en heeft zijn eigen
+     tand, zodat een krimpende statische as niet ongemerkt kan wegzakken. */
+  'VERANDERBEREIK-RONDE.json': { meter: ['veranderbereikZonderBereik'] },
+  'VERANDERBEREIK-KENNIS.json': { meter: ['veranderbereikStatisch'] },
   'ACTIVERING.json': { meter: ['activeringOndergrens'] },
   'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt', 'tredeIngangLekken'] },
   'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },

@@ -95,10 +95,21 @@ van 1434 (57,1%), gemeten op 31 augustus. Dat was juist op de dag dat iemand het
 opschreef, en daarna groeide de suite. `impactbereik.js` draait namelijk in geen
 enkele workflow en schrijft geen register: het getal dat versmalling tegenhoudt
 bestond alleen als proza. Sinds deze ronde staat het tussen merktekens en komt
-het uit `VERANDERBEREIK.json` (`npm run getallen`) — een verouderd getal is dan
-geen kwestie van oplettendheid meer.
+het uit `VERANDERBEREIK-KENNIS.json` (`npm run getallen`) — een verouderd getal
+is dan geen kwestie van oplettendheid meer. Dat register draagt alleen wat uit de
+code volgt; wat één uitvoering heeft waargenomen staat in
+`VERANDERBEREIK-RONDE.json`, en die twee worden nooit door elkaar gelezen
+(`VERANDERING.md` par. 7e).
 
-Die meerderheid raakt de hele oppervlakte via een `spawn`, en een require-graaf
+**Van die blinde vlek bleek 28% de meter zelf te zijn** (16 september 2026). De
+statische as vroeg naar een require-kant die in `server/` uitkomt, terwijl de
+vraag *als dit bestand verandert, welk bewijs moet dan opnieuw* over elk
+wijzigbaar bestand gaat: 224 toetsen hangen aan `scripts/` en 78 aan `public/`,
+en die telden allemaal als blind. Met de bronmappen verbreed gaat de statische as
+van 833 naar 1135 en de volle ring van 829 naar 530 op dezelfde ronde
+(`VERANDERING.md` par. 7f). De getallen hierboven zijn de verse.
+
+De rest raakt de hele oppervlakte via een `spawn`, en een require-graaf
 ziet daar niets van. Een planner op deze graaf zou ze overslaan en groen
 melden — "de stilste vorm van kapot die dit huis kent" (`scripts/lib/
 bedrading.js`). Vandaar de volgorde: **eerst dekking, dan versmalling**, precies

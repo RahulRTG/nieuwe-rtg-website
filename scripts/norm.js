@@ -188,7 +188,8 @@ const METERS = [
      er mag geen bewijs BIJKOMEN dat alleen GitHub kan leveren zonder dat iemand
      dat opschrijft. */
   { sleutel: 'bewijsAlleenKeten', richting: 'omlaag', wat: 'bewijsmechanismen die alleen in de keten draaien en niet lokaal (uit BEWIJSLADDER.json)' },
-  /* TOETSEN ZONDER VASTGESTELD BEREIK (VERANDERBEREIK.json, npm run veranderbereik).
+  /* TOETSEN ZONDER VASTGESTELD BEREIK (VERANDERBEREIK-RONDE.json,
+     npm run veranderbereik).
 
      Van hoeveel toetsbestanden weet dit huis NIET welke bronbestanden ze dekken --
      niet statisch (geen require-kant naar server/) en niet waargenomen (geen route
@@ -206,7 +207,11 @@ const METERS = [
      meter weigert daarom zelf een onvolledige ronde vast te leggen zonder
      --onvolledig, en zijn eigen --controle slaat de vergelijking over zodra een van
      beide rondes onvolledig is. Hier telt alleen wat er in het register staat. */
-  { sleutel: 'veranderbereikZonderBereik', richting: 'omlaag', wat: 'toetsen zonder vastgesteld bronbestandbereik (uit VERANDERBEREIK.json)' },
+  { sleutel: 'veranderbereikZonderBereik', richting: 'omlaag', wat: 'toetsen zonder vastgesteld bronbestandbereik (uit VERANDERBEREIK-RONDE.json)' },
+  /* DE ANDERE KANT OP, en met opzet. De statische as volgt uit de code alleen:
+     dezelfde commit geeft altijd hetzelfde. Krimpt hij, dan ziet de
+     require-graaf MINDER dan gisteren -- en dat hoort niet stil te gebeuren. */
+  { sleutel: 'veranderbereikStatisch', richting: 'omhoog', wat: 'toetsen waarvan de require-graaf het bereik bepaalt (uit VERANDERBEREIK-KENNIS.json)' },
   { sleutel: 'tredeLekken', richting: 'omlaag', wat: 'routes buiten trede 0 die tóch antwoorden (uit TREDEPROEF.json)' },
   /* WEKKERS DIE GEEN ENKELE FUNCTIE RAAKT (WEKKERS.json).
 
@@ -1592,7 +1597,8 @@ function meet(bronnen) {
     verwijzingGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.verwijzingveiligheid.gebreken || []).length),
     mensmutatieZonderWacht: leesRegister('MENSMUTATIE.json', (j) => j.telling.geenWacht),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
-    veranderbereikZonderBereik: leesRegister('VERANDERBEREIK.json', (j) => j.gemeten.zonderBereik),
+    veranderbereikZonderBereik: leesRegister('VERANDERBEREIK-RONDE.json', (j) => j.gemeten.zonderBereik),
+    veranderbereikStatisch: leesRegister('VERANDERBEREIK-KENNIS.json', (j) => j.gemeten.statischBereik),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal
        geven voor een poort die inmiddels openstaat. */

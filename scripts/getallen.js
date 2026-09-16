@@ -477,21 +477,29 @@ const GETALLEN = {
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle
      die willekeurig zakt leert mensen hem te negeren. Hij staat in
      CODEWERELD.json en in CODE.md als orde van grootte. */
-  'veranderbereik.toetsen': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.toetsbestanden',
+  /* TWEE BRONNEN, EN DAT IS HET HELE PUNT. Wat uit de code alleen volgt
+     (hoeveel toetsbestanden er zijn, wat de require-graaf ziet) komt uit
+     VERANDERBEREIK-KENNIS.json en geldt tot de code verandert. Wat bij EEN
+     uitvoering is waargenomen komt uit VERANDERBEREIK-RONDE.json en geldt
+     alleen voor die ronde. Een getal uit de tweede bak dat in een document
+     als duurzame waarheid wordt gelezen, is precies de fout waarvoor de
+     splitsing bestaat -- zet een waarnemingsgetal dus nooit om naar KENNIS
+     omdat het daar "stabieler" oogt. */
+  'veranderbereik.toetsen': { bron: 'VERANDERBEREIK-KENNIS.json', veld: 'gemeten.toetsbestanden',
     wat: 'toetsbestanden die er zijn -- de noemer komt uit de map, niet uit een journaal' },
-  'veranderbereik.statisch': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.statischBereik',
+  'veranderbereik.statisch': { bron: 'VERANDERBEREIK-KENNIS.json', veld: 'gemeten.statischBereik',
     wat: 'toetsen waarvan de require-graaf het bronbestandbereik bepaalt' },
-  'veranderbereik.blind': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.blindeVlekStatisch',
+  'veranderbereik.blind': { bron: 'VERANDERBEREIK-KENNIS.json', veld: 'gemeten.blindeVlekStatisch',
     wat: 'toetsen die de statische graaf NIET ziet -- de blinde vlek van KEURING.md par. 1' },
-  'veranderbereik.waargenomen': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.waargenomenBereik',
+  'veranderbereik.waargenomen': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.waargenomenBereik',
     wat: 'toetsen waarvan het journaal routes kent die naar een bronbestand oplossen' },
-  'veranderbereik.gedicht': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.gedichtDoorWaarneming',
+  'veranderbereik.gedicht': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.gedichtDoorWaarneming',
     wat: 'toetsen die de waargenomen as uit de statische blinde vlek haalt' },
-  'veranderbereik.zonder': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.zonderBereik',
+  'veranderbereik.zonder': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.zonderBereik',
     wat: 'toetsen zonder enig vastgesteld bereik -- de schuld, en de volle ring' },
-  'veranderbereik.ronde': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.toetsenInDezeRonde',
+  'veranderbereik.ronde': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.toetsenInDezeRonde',
     wat: 'toetsbestanden die in de gelezen ronde werkelijk hebben gedraaid' },
-  'veranderbereik.routesZonderBestand': { bron: 'VERANDERBEREIK.json', veld: 'gemeten.routesZonderBronbestand',
+  'veranderbereik.routesZonderBestand': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.routesZonderBronbestand',
     wat: 'waargenomen routes die ROUTEBRON.json niet naar een bestand brengt' },
 };
 

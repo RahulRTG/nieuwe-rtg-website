@@ -77,7 +77,33 @@ const { stempel } = require('./lib/stempel');
 const { bouw, ISTOETS } = require('./impactbereik');
 
 const WORTEL = path.join(__dirname, '..');
-const DOEL = path.join(WORTEL, 'VERANDERBEREIK.json');
+/* TWEE BESTANDEN, EN DAT IS GEEN OPMAAK MAAR EEN GRENS.
+
+   Dit register droeg tot 16 september 2026 twee soorten waarheid door elkaar, en
+   daaraan was te zien dat het mis was: er stond `rondeVolledig: false` IN iets dat
+   waarheid hoorde te zijn. Een halve meetronde werd zo duurzame kennis.
+
+     KENNIS   wat een toets KAN raken, af te leiden uit de code alleen. Dezelfde
+              commit geeft hier altijd hetzelfde; er komt geen journaal aan te
+              pas. Dit is het register dat je mag citeren.
+     RONDE    wat er bij EEN uitvoering werkelijk is waargenomen: welke journalen,
+              welke toetsen draaiden, wat daaruit volgde. Zonder te weten welke
+              ronde het was, betekent dit niets.
+
+   De as `statisch` hoort bij de eerste, de as `waargenomen` bij de tweede, en de
+   stand per toets is een MENGSEL -- daarom staat hij in de ronde en niet in de
+   kennis. Wie die twee weer samenvoegt, krijgt vanzelf opnieuw een schuld die
+   afhangt van hoe ver de suite die dag toevallig kwam. */
+/* WAAR ZE LANDEN. De map is te verleggen met RTG_VERANDERBEREIK_MAP -- dezelfde
+   naadvorm als RTG_AFBOUW_BEWIJSMAP -- zodat test/veranderbereik.test.js kan
+   nagaan of de poort hieronder werkelijk EEN van de twee bestanden tegenhoudt
+   zonder de echte registers te overschrijven. Alle LEZERS (scripts/norm.js,
+   scripts/getallen.js, scripts/versheid.js) kijken onveranderd in de wortel:
+   een verlegde schrijver levert dus een ZICHTBAAR verouderd register en nooit
+   een stil goedgekeurde meting. */
+const UIT = process.env.RTG_VERANDERBEREIK_MAP || WORTEL;
+const KENNIS = path.join(UIT, 'VERANDERBEREIK-KENNIS.json');
+const RONDE = path.join(UIT, 'VERANDERBEREIK-RONDE.json');
 /* DE MONTAGEWORTEL, en waarom hij apart geteld wordt.
 
    server/server.js en server/opzet/ MONTEREN de code; ze gebruiken hem niet.
@@ -198,6 +224,37 @@ function afhankelijken(omgekeerd, start) {
   return gezien;
 }
 
+/* WAT TELT ALS BRONBESTAND, en dat was tot 16 september 2026 te smal.
+
+   De vraag die dit register beantwoordt is: *als DIT bestand verandert, welk
+   bewijs moet dan opnieuw?* Die vraag gaat over elk bestand dat kan wijzigen,
+   niet alleen over server/. De as vroeg toch naar een kant die in `server/`
+   uitkomt, en daardoor telde hij 302 toetsen als BLIND die een volstrekt
+   bepaalbaar bereik hebben: 224 hangen aan scripts/ (elke metertoets in dit
+   huis) en 78 aan public/ (de schermtoetsen). Dat is geen randgeval maar 28%
+   van de gemelde blinde vlek -- en dat getal werd geciteerd als de schuld die
+   Affected Proof Selection tegenhoudt.
+
+   De fout zat dus in de METER en niet in de code; zelfde klasse als de 118
+   "dode paden" van SCHERMROUTES.json en de 587 onbekende doelen van de
+   aanroepgraaf, allebei uit CODE.md.
+
+   WAAROM DEZE DRIE EN NIET "ALLES". Een kant naar node_modules/ of naar een
+   ander toetsbestand zegt niets over dekking van dit huis. Dit zijn de drie
+   mappen die eigen, wijzigbare bron bevatten. */
+const BRONMAPPEN = ['server/', 'scripts/', 'public/'];
+const isBron = (d) => BRONMAPPEN.some((m) => d.startsWith(m));
+
+function meetStatisch(ix, toetsen) {
+  const statisch = new Set();
+  for (const t of toetsen) {
+    const b = ix.bestanden.get('test/' + t);
+    if (b && b.kanten.opgelost.some(isBron)) statisch.add(t);
+  }
+  return statisch;
+}
+
+
 function meet(paden, rondePaden) {
   const aanwezig = (paden || []).filter((p) => fs.existsSync(p));
   const { perToets, zonderEigenaar, regels } = leesJournalen(aanwezig);
@@ -206,12 +263,8 @@ function meet(paden, rondePaden) {
   const toetsen = alleToetsen();
   const ronde = leesRonde(rondePaden);
 
-  /* AS 1 -- statisch. Heeft deze toets een require-kant die in server/ uitkomt? */
-  const statisch = new Set();
-  for (const t of toetsen) {
-    const b = ix.bestanden.get('test/' + t);
-    if (b && b.kanten.opgelost.some((d) => d.startsWith('server/'))) statisch.add(t);
-  }
+  /* AS 1 -- statisch. Zie BRONMAPPEN hierboven. */
+  const statisch = meetStatisch(ix, toetsen);
 
   /* AS 2 -- waargenomen. Route -> bestand, per toets. */
   const routesGezien = new Set();
@@ -249,6 +302,9 @@ function meet(paden, rondePaden) {
     }
 
     per[t] = {
+      /* De statische as staat hier apart omdat hij de DUURZAME helft is: hij
+         volgt uit de code en niet uit een ronde. kennisVan() leest dit veld. */
+      statisch: heeftStatisch,
       stand,
       routes: routes.size,
       bronbestanden: bestanden.size,
@@ -387,6 +443,69 @@ function raakt(u, bestand) {
   };
 }
 
+/* DE DUURZAME HELFT. Alleen wat uit de code volgt: welke toetsen de
+   require-graaf ziet. Geen journaal, geen ronde, geen schuld die van een
+   uitvoering afhangt. */
+function kennisVan(u) {
+  const per = {};
+  for (const [t, r] of Object.entries(u.per)) per[t] = { statisch: r.statisch === true };
+  return {
+    soort: 'kennis',
+    uitleg: 'Wat een toets KAN raken, afgeleid uit de code alleen: heeft hij een ' +
+      'require-kant die in server/ uitkomt. Dezelfde commit geeft hier altijd ' +
+      'hetzelfde -- er komt geen journaal aan te pas. Wat er bij EEN uitvoering ' +
+      'werkelijk is waargenomen staat in VERANDERBEREIK-RONDE.json.',
+    hoe: 'npm run veranderbereik:vastleggen',
+    stempel: u.stempel,
+    gemeten: {
+      toetsbestanden: u.gemeten.toetsbestanden,
+      statischBereik: u.gemeten.statischBereik,
+      blindeVlekStatisch: u.gemeten.blindeVlekStatisch
+    },
+    nietGemeten: {
+      waargenomenBereik: 'wat een toets werkelijk raakte is een WAARNEMING en hoort ' +
+        'niet in dit bestand: die hangt af van welke ronde er liep. Zie ' +
+        'VERANDERBEREIK-RONDE.json.'
+    },
+    per
+  };
+}
+
+/* DE WAARNEMENDE HELFT. Alles wat van deze ene uitvoering afhangt, inclusief de
+   schuld -- want die is zonder de ronde niet te lezen. */
+function rondeVan(u) {
+  const g = u.gemeten;
+  return {
+    soort: 'waarneming',
+    uitleg: 'Wat er bij EEN uitvoering is waargenomen. Zonder te weten welke ronde ' +
+      'het was betekenen deze getallen niets: een halve ronde telt te veel volle ' +
+      'ringen. Wat uit de code alleen volgt staat in VERANDERBEREIK-KENNIS.json.',
+    hoe: 'npm run veranderbereik -- --lees <journaal> --ronde <duurregister>',
+    stempel: u.stempel,
+    bronnen: u.bronnen,
+    gemeten: {
+      toetsbestanden: g.toetsbestanden,
+      waargenomenBereik: g.waargenomenBereik,
+      beideAssen: g.beideAssen,
+      zonderBereik: g.zonderBereik,
+      zonderBereikPct: g.zonderBereikPct,
+      gedichtDoorWaarneming: g.gedichtDoorWaarneming,
+      routesWaargenomen: g.routesWaargenomen,
+      routesZonderBronbestand: g.routesZonderBronbestand,
+      journaalregels: g.journaalregels,
+      kantenZonderEigenaar: g.kantenZonderEigenaar,
+      toetsenInDezeRonde: g.toetsenInDezeRonde,
+      rondeVolledig: g.rondeVolledig,
+      rondeVreemdeNamen: g.rondeVreemdeNamen,
+      rondeGemist: g.rondeGemist,
+      draaideZonderRoute: g.draaideZonderRoute,
+      nietInDezeRonde: g.nietInDezeRonde
+    },
+    nietGemeten: u.nietGemeten,
+    per: u.per
+  };
+}
+
 function toon(u) {
   const g = u.gemeten;
   console.log('\nVERANDERBEREIK  (' + g.toetsbestanden + ' toetsbestanden, ' +
@@ -483,17 +602,30 @@ function main() {
        toont is exact de bewering-over-het-verleden die deze meter moest
        repareren. Wie het toch wil, zegt het hardop met --onvolledig; dan staat
        het in het register en niet alleen in iemands hoofd. */
+    /* DE KENNIS GAAT ER EERST UIT, EN DE POORT HIERONDER RAAKT HEM NIET. Hij
+       hangt niet van het journaal af: dezelfde commit geeft dezelfde uitslag,
+       ook als de suite die dag halverwege stopte. Zou de poort hem meenemen,
+       dan kon een DUURZAAM register niet worden bijgewerkt omdat een
+       UITVOERING niet af was -- en dan gaat de volgende lezer het verouderde
+       bestand citeren, precies de vorm die deze splitsing moest opheffen. */
+    fs.writeFileSync(KENNIS, JSON.stringify(kennisVan(u), null, 1) + '\n');
+    console.log('  vastgelegd in VERANDERBEREIK-KENNIS.json (duurzaam, hangt niet aan de ronde)');
+
+    /* EEN HALVE RONDE LEGT ZICHZELF NIET STIL VAST -- maar de weigering gaat nu
+       over EEN bestand en niet over allebei, en de melding zegt dus ook welk
+       deel er wel staat. Een foutcode die niet vertelt wat er is gelukt, laat
+       iemand een geslaagd register weggooien. */
     if (!u.gemeten.rondeVolledig && !argv.includes('--onvolledig')) {
-      console.error(K.rood + '\n  GEWEIGERD: de ronde dekte ' +
+      console.error(K.rood + '\n  GEWEIGERD voor VERANDERBEREIK-RONDE.json: de ronde dekte ' +
         (u.gemeten.toetsenInDezeRonde === null ? 'geen enkel' : u.gemeten.toetsenInDezeRonde) +
         ' van ' + u.gemeten.toetsbestanden + ' toetsbestanden.' + K.reset +
         '\n  zonderBereik is dan geen schuld maar een tekort van deze ronde.' +
+        '\n  De KENNIS hierboven staat er wel: die hangt niet aan de ronde.' +
         '\n  Draai de hele suite, of leg het bewust vast met --onvolledig.\n');
       return 1;
     }
-    const kaal = { ...u }; delete kaal._intern;
-    fs.writeFileSync(DOEL, JSON.stringify(kaal, null, 1) + '\n');
-    console.log('  vastgelegd in VERANDERBEREIK.json' +
+    fs.writeFileSync(RONDE, JSON.stringify(rondeVan(u), null, 1) + '\n');
+    console.log('  vastgelegd in VERANDERBEREIK-RONDE.json' +
       (u.gemeten.rondeVolledig ? '' : K.geel + '  (ONVOLLEDIGE ronde -- rondeVolledig: false)' + K.reset) + '\n');
     return 0;
   }
@@ -502,9 +634,10 @@ function main() {
      percentage daalt ook als er toetsen bijkomen die niets bewijzen. */
   if (argv.includes('--controle')) {
     let oud;
-    try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')); }
+    /* DE SCHULD IS EEN WAARNEMING en staat dus in de ronde, niet in de kennis. */
+    try { oud = JSON.parse(fs.readFileSync(RONDE, 'utf8')); }
     catch (e) {
-      console.error('GEZAKT: VERANDERBEREIK.json ontbreekt. Draai eerst --vastleggen.');
+      console.error('GEZAKT: VERANDERBEREIK-RONDE.json ontbreekt. Draai eerst --vastleggen.');
       return 1;
     }
     /* TWEE RONDES VAN VERSCHILLENDE OMVANG ZIJN NIET TE VERGELIJKEN. Een kleinere
@@ -531,4 +664,5 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, raakt, alleToetsen, afhankelijken, routeKaart };
+module.exports = { meet, raakt, alleToetsen, afhankelijken, routeKaart,
+  kennisVan, rondeVan, KENNIS, RONDE };

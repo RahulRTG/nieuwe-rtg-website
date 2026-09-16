@@ -99,16 +99,22 @@ test('bewijsbasis kiest alleen een groene push-run van exact dezelfde commit', (
 });
 
 test('warme browserfabriek ruimt contexten op zonder het gedeelde proces te sluiten', async () => {
-  let verbonden = null, browserDicht = 0;
+  let verbonden = null, browserDicht = 0, geisoleerd = 0;
   const browser = {
     close: async () => { browserDicht++; },
     newContext: async () => 'context'
   };
-  const mod = { chromium: { connect: async (endpoint) => { verbonden = endpoint; return browser; } } };
+  const mod = { chromium: {
+    connect: async (endpoint) => { verbonden = endpoint; return browser; },
+    launch: async () => { geisoleerd++; return browser; }
+  } };
   const gedeeld = metGedeeldeBrowser(mod, 'ws://bewijs');
   const client = await Reflect.get(gedeeld.chromium, 'launch')({ headless: true });
   assert.equal(await client.newContext(), 'context');
   await client.close();
   assert.equal(verbonden, 'ws://bewijs');
   assert.equal(browserDicht, 1, 'een testbestand moet zijn clientverbinding afsluiten');
+  const apart = await Reflect.get(gedeeld.chromium, 'launch')({ args: ['--use-fake-device-for-media-stream'] });
+  await apart.close();
+  assert.equal(geisoleerd, 1, 'procesvlaggen krijgen een eigen browserproces');
 });

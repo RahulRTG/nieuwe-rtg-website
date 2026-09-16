@@ -976,12 +976,18 @@ function metGedeeldeBrowser(mod, endpoint) {
         const waarde = Reflect.get(doel, eigenschap);
         return typeof waarde === 'function' ? waarde.bind(doel) : waarde;
       }
-      /* Playwright maakt bij `connect()` een clientverbinding. `close()` ruimt
+      /* Procesvlaggen (zoals de nep-camera van Meet) kunnen niet achteraf aan
+         een reeds gestarte BrowserServer worden toegevoegd. Zulke expliciete
+         launch-contracten houden daarom hun eigen proces; de gewone schermtest
+         deelt de warme host. Playwright maakt bij `connect()` een
+         clientverbinding. `close()` ruimt
          de contexten van die client op en verbreekt zijn WebSocket, terwijl de
          BrowserServer voor de volgende test blijft leven. Dit oorspronkelijke
          close-gedrag is ook nodig om de event-loop van het toetsproces leeg te
          maken; alleen contexten sluiten laat de socket open en hangt de shard. */
-      return async () => mod.chromium.connect(endpoint);
+      return async (opties) => opties && Array.isArray(opties.args) && opties.args.length
+        ? mod.chromium.launch(opties)
+        : mod.chromium.connect(endpoint);
     }
   }) };
 }

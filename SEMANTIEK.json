@@ -1,11 +1,11 @@
 {
-  "catalogi": 1083,
-  "verschillendeNamen": 637,
-  "namenInMeerDomeinen": 124,
-  "woordenMetMeerBetekenissen": 106,
-  "betekenissenTotaal": 394,
+  "catalogi": 1095,
+  "verschillendeNamen": 645,
+  "namenInMeerDomeinen": 125,
+  "woordenMetMeerBetekenissen": 107,
+  "betekenissenTotaal": 399,
   "ergsteWoord": "SOORTEN",
-  "ergsteAantal": 48,
+  "ergsteAantal": 49,
   "dubbelingen": 33,
   "dubbelingLijst": [
     {
@@ -143,7 +143,7 @@
     },
     {
       "naam": "SIGNALEN",
-      "betekenissenVanDitWoord": 2,
+      "betekenissenVanDitWoord": 3,
       "waar": [
         "server/kern/clips.js",
         "server/kern/podium/index.js",
@@ -222,7 +222,7 @@
     },
     {
       "naam": "NIET_GEBOUWD",
-      "betekenissenVanDitWoord": 6,
+      "betekenissenVanDitWoord": 7,
       "waar": [
         "server/kern/command/opslag-register.js",
         "server/kern/concern/opslag.js",
@@ -257,7 +257,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 48,
+      "betekenissenVanDitWoord": 49,
       "waar": [
         "server/kern/avond/plan.js",
         "server/kern/invoer.js"
@@ -485,7 +485,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 48,
+      "betekenissenVanDitWoord": 49,
       "waar": [
         "server/kern/bank/index.js",
         "server/kern/koppel.js"
@@ -832,8 +832,8 @@
   "top": [
     {
       "naam": "SOORTEN",
-      "domeinen": 50,
-      "betekenissen": 48,
+      "domeinen": 51,
+      "betekenissen": 49,
       "hoogsteOverlap": 0.2,
       "soort": "gemengd",
       "waar": [
@@ -925,7 +925,7 @@
           "bestanden": [
             "server/kern/commercie/vergoeding.js"
           ],
-          "leden": 4,
+          "leden": 5,
           "voorbeeld": [
             "payment_service",
             "marketplace_service",
@@ -943,6 +943,18 @@
             "handelsnaam",
             "rechtsvorm",
             "zetel"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/connect/naklanklijst.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "mooi",
+            "geleerd",
+            "geprobeerd",
+            "gemaakt"
           ]
         },
         {
@@ -2566,6 +2578,105 @@
       ]
     },
     {
+      "naam": "NIET_GEBOUWD",
+      "domeinen": 13,
+      "betekenissen": 7,
+      "hoogsteOverlap": 1,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/appstore/machtigingen.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "betalen",
+            "agenda",
+            "bestanden",
+            "locatie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/command/opslag-register.js",
+            "server/kern/concern/opslag.js",
+            "server/kern/isolatie/opslag.js",
+            "server/kern/levensdossier/velden.js",
+            "server/kern/mobiliteit/opslag.js",
+            "server/kern/payroll/opslag.js",
+            "server/kern/veiligheid/opslag.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "schema",
+            "validatie",
+            "bevoegdheid",
+            "gebeurtenissen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/commerce/retourlijst.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "ruilen-tegen-ander-artikel",
+            "retourlabel",
+            "automatisch-terugboeken",
+            "retourpercentage"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/connect/werkwoordlijst.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "beoordeel",
+            "rangschik",
+            "beloon",
+            "voorspel"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/factuurcorrectie-gronden.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "de-factuur-weer-openzetten",
+            "gedeeltelijk-corrigeren",
+            "correctie-door-het-lid",
+            "de-afdracht-terugboeken"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/horeca/correctielijst.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "automatisch-terugboeken",
+            "correctie-door-de-gast",
+            "voorraad-afboeken",
+            "correctiepercentage-per-medewerker"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/livinglab/instrumentsoorten.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "foto",
+            "locatie",
+            "audio",
+            "doorlopend"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "RANG",
       "domeinen": 7,
       "betekenissen": 7,
@@ -2837,96 +2948,9 @@
       ]
     },
     {
-      "naam": "NIET_GEBOUWD",
-      "domeinen": 12,
-      "betekenissen": 6,
-      "hoogsteOverlap": 1,
-      "soort": "gemengd",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/appstore/machtigingen.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "betalen",
-            "agenda",
-            "bestanden",
-            "locatie"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/command/opslag-register.js",
-            "server/kern/concern/opslag.js",
-            "server/kern/isolatie/opslag.js",
-            "server/kern/levensdossier/velden.js",
-            "server/kern/mobiliteit/opslag.js",
-            "server/kern/payroll/opslag.js",
-            "server/kern/veiligheid/opslag.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "schema",
-            "validatie",
-            "bevoegdheid",
-            "gebeurtenissen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/commerce/retourlijst.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "ruilen-tegen-ander-artikel",
-            "retourlabel",
-            "automatisch-terugboeken",
-            "retourpercentage"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/factuurcorrectie-gronden.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "de-factuur-weer-openzetten",
-            "gedeeltelijk-corrigeren",
-            "correctie-door-het-lid",
-            "de-afdracht-terugboeken"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/horeca/correctielijst.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "automatisch-terugboeken",
-            "correctie-door-de-gast",
-            "voorraad-afboeken",
-            "correctiepercentage-per-medewerker"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/livinglab/instrumentsoorten.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "foto",
-            "locatie",
-            "audio",
-            "doorlopend"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "REGISTER",
-      "domeinen": 5,
-      "betekenissen": 5,
+      "domeinen": 6,
+      "betekenissen": 6,
       "hoogsteOverlap": 0,
       "soort": "botsing",
       "waar": [
@@ -2952,6 +2976,17 @@
             "entiteiten",
             "vestigingen",
             "employments"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/connect/opslag.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "horizon",
+            "dossier",
+            "naklank"
           ]
         },
         {
@@ -3573,5 +3608,5 @@
       ]
     }
   ],
-  "bestanden": 3481
+  "bestanden": 3553
 }

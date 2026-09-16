@@ -89,7 +89,8 @@ test('RTG Move weegt twee echte boekingen tot een oordeel en brengt de reiziger 
     assert.match(label, /airport|luchthaven/i, 'de verderknop noemt de luchthaven: "' + label + '"');
     assert.doesNotMatch(label, /parijs|bourget/i, 'en niet de bestemming: "' + label + '"');
 
-    await page.locator('#verder').click();
+    await require('./helper').edgeActies(page);
+    await page.locator('.rtg-adaptive-sheet #verder').click();
     await page.waitForURL(/navigatie\.html/, { timeout: 15000 });
     const naar = String(new URL(page.url()).searchParams.get('naar') || '').split(',').map(Number);
     assert.equal(naar.length, 2, 'Navigatie krijgt een plek mee: ' + page.url());

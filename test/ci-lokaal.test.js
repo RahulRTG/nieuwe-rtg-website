@@ -200,3 +200,36 @@ test('elke poort van de merge-keten draait hier of zegt waarom niet', () => {
       gat.werkstroom + ':' + gat.regel + ' (' + gat.opdracht + ') kan hier niet draaien en zegt niet waarom');
   }
 });
+
+/* ============================================================================
+   HET OORDEEL HEEFT DRIE UITKOMSTEN, EN DE DERDE IS DE REDEN DAT HIJ ER IS.
+
+   Op 15 september 2026 las een lezer van deze uitvoer "geen poort gezakt" als
+   bewijs, terwijl er een stapel poorten niet had gedraaid. De uitvoer zei het
+   goede ("niet gedraaid: N -- en dat is geen groen") en de exitcode zei het
+   tegenovergestelde. Dezelfde fout maakte de keten die dag met een GEANNULEERDE
+   run: nul gezakte jobs, en dus "niets rood".
+
+   Afwezigheid van falen is geen bewijs. Niet gemeten is geen goede uitslag
+   (LAT.md regel 12), en een poort bewijst alleen zijn eigen bereik (regel 17).
+   ========================================================================== */
+test('een gezakte poort wint van alles: de stand is GEZAKT', () => {
+  assert.equal(lokaal.oordeelVan(1, 0, 0), 'GEZAKT');
+  assert.equal(lokaal.oordeelVan(1, 9, 9), 'GEZAKT', 'ook als er van alles niet draaide');
+});
+
+test('niets gezakt maar niet alles gedraaid is ONBEWEZEN -- niet groen en niet rood', () => {
+  assert.equal(lokaal.oordeelVan(0, 1, 0), 'ONBEWEZEN');
+  assert.equal(lokaal.oordeelVan(0, 33, 0), 'ONBEWEZEN');
+});
+
+/* Een poort die alleen bij GitHub bestaat, is hier net zo goed geen uitspraak.
+   Zou die niet meetellen, dan heet een lokale ronde "bewezen" terwijl de helft
+   van de keten er niet in zat. */
+test('een poort die alleen in de keten draait telt ook als ONBEWEZEN', () => {
+  assert.equal(lokaal.oordeelVan(0, 0, 1), 'ONBEWEZEN');
+});
+
+test('BEWEZEN is alleen BEWEZEN als er niets ontbreekt en niets viel', () => {
+  assert.equal(lokaal.oordeelVan(0, 0, 0), 'BEWEZEN');
+});

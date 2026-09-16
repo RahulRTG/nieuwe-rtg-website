@@ -105,6 +105,21 @@ const GETALLEN = {
     wat: 'compromis-scenario\'s waarover niemand heeft gemeten' },
   'overleving.rijen': { bron: 'OVERLEVING.json', veld: 'telling.rijen',
     wat: 'compromis-scenario\'s in de overlevingsmeter' },
+  /* De lus van Foundation Connect (CONNECT.md par. 0). Drie van de vier zijn
+     een NUL of een bijna-nul, en dat is precies waarom ze hier staan: een nul
+     ziet er vers en verouderd hetzelfde uit, dus een getal dat met de hand in
+     een document is overgetypt blijft kloppen lang nadat hij dat niet meer doet.
+     Zelfde reden als bij de stagevorm hieronder. */
+  'connectlus.domeinen': { bron: 'CONNECTLUS.json', veld: 'werkwoorden.domeinen',
+    wat: 'ontdekkingsdomeinen waarover de lus is gemeten' },
+  'connectlus.combinaties': { bron: 'CONNECTLUS.json', veld: 'werkwoorden.combinaties',
+    wat: 'verschillende combinaties van werkwoorden over die domeinen' },
+  'connectlus.begrijp': { bron: 'CONNECTLUS.json', veld: 'werkwoorden.zeldzaamste.domeinen',
+    wat: 'domeinen die het zeldzaamste werkwoord (begrijp) uitvoeren' },
+  'connectlus.domeineigenPct': { bron: 'CONNECTLUS.json', veld: 'vorm.domeineigenPct',
+    wat: 'percentage velden dat in precies EEN ontdekkingsdomein staat' },
+  'connectlus.inAlle': { bron: 'CONNECTLUS.json', veld: 'vorm.inAlleDomeinen',
+    wat: 'velden die in ALLE ontdekkingsdomeinen staan' },
   'kantoor.routes': { bron: 'KANTOORMACHT.json', veld: 'gemeten.routes',
     wat: 'kantoorroutes achter /api/office en /api/boardroom' },
   'kantoor.deurEistMens': { bron: 'KANTOORMACHT.json', veld: 'gemeten.deurEistMens',
@@ -136,6 +151,20 @@ const GETALLEN = {
     wat: 'werkwoorden per mechanisme, onder de naam van kern/vertegenwoordiging' },
   'namens.gemiddeldOpSynoniem': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.gemiddeldOpSynoniem',
     wat: 'werkwoorden per mechanisme, onder een van de namen die dit huis ervoor gebruikt' },
+  /* De spoorvorm (REPRESENTATIE.md par. 8.1), en om dezelfde reden als de
+     namensvorm hierboven -- alleen scherper. Deze matrix bestaat bijna helemaal
+     uit streepjes, en drie van de vier getallen staan op EEN. Een EEN in proza
+     veroudert net zo onzichtbaar als een nul: "1 haalt alle vier" blijft er
+     precies zo uitzien nadat er een tweede bij is gekomen. De noemer krijgt
+     daarom ook een merkteken -- "2 van 7" wordt half onwaar zodra die 7 beweegt. */
+  'spoor.mechanismen': { bron: 'SPOORVORM.json', veld: 'gemeten.mechanismen',
+    wat: 'mechanismen die langs de vier spoor-eigenschappen zijn gelegd' },
+  'spoor.metSpoor': { bron: 'SPOORVORM.json', veld: 'gemeten.metSpoor',
+    wat: 'mechanismen die een handeling ergens vastleggen' },
+  'spoor.kanTegenhouden': { bron: 'SPOORVORM.json', veld: 'gemeten.kanTegenhouden',
+    wat: 'mechanismen waar een spoor dat niet vaststaat de handeling tegenhoudt' },
+  'spoor.volledigConvergent': { bron: 'SPOORVORM.json', veld: 'gemeten.volledigConvergent',
+    wat: 'mechanismen die alle vier de eigenschappen van de referentie halen' },
   'semantiek.namen': { bron: 'SEMANTIEK.json', veld: 'namenInMeerDomeinen',
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
@@ -477,6 +506,30 @@ const GETALLEN = {
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle
      die willekeurig zakt leert mensen hem te negeren. Hij staat in
      CODEWERELD.json en in CODE.md als orde van grootte. */
+  /* TWEE BRONNEN, EN DAT IS HET HELE PUNT. Wat uit de code alleen volgt
+     (hoeveel toetsbestanden er zijn, wat de require-graaf ziet) komt uit
+     VERANDERBEREIK-KENNIS.json en geldt tot de code verandert. Wat bij EEN
+     uitvoering is waargenomen komt uit VERANDERBEREIK-RONDE.json en geldt
+     alleen voor die ronde. Een getal uit de tweede bak dat in een document
+     als duurzame waarheid wordt gelezen, is precies de fout waarvoor de
+     splitsing bestaat -- zet een waarnemingsgetal dus nooit om naar KENNIS
+     omdat het daar "stabieler" oogt. */
+  'veranderbereik.toetsen': { bron: 'VERANDERBEREIK-KENNIS.json', veld: 'gemeten.toetsbestanden',
+    wat: 'toetsbestanden die er zijn -- de noemer komt uit de map, niet uit een journaal' },
+  'veranderbereik.statisch': { bron: 'VERANDERBEREIK-KENNIS.json', veld: 'gemeten.statischBereik',
+    wat: 'toetsen waarvan de require-graaf het bronbestandbereik bepaalt' },
+  'veranderbereik.blind': { bron: 'VERANDERBEREIK-KENNIS.json', veld: 'gemeten.blindeVlekStatisch',
+    wat: 'toetsen die de statische graaf NIET ziet -- de blinde vlek van KEURING.md par. 1' },
+  'veranderbereik.waargenomen': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.waargenomenBereik',
+    wat: 'toetsen waarvan het journaal routes kent die naar een bronbestand oplossen' },
+  'veranderbereik.gedicht': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.gedichtDoorWaarneming',
+    wat: 'toetsen die de waargenomen as uit de statische blinde vlek haalt' },
+  'veranderbereik.zonder': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.zonderBereik',
+    wat: 'toetsen zonder enig vastgesteld bereik -- de schuld, en de volle ring' },
+  'veranderbereik.ronde': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.toetsenInDezeRonde',
+    wat: 'toetsbestanden die in de gelezen ronde werkelijk hebben gedraaid' },
+  'veranderbereik.routesZonderBestand': { bron: 'VERANDERBEREIK-RONDE.json', veld: 'gemeten.routesZonderBronbestand',
+    wat: 'waargenomen routes die ROUTEBRON.json niet naar een bestand brengt' },
 };
 
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over
@@ -484,7 +537,8 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md',
+  'KEURING.md', 'VERANDERING.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

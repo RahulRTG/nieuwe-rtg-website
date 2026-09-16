@@ -1,0 +1,82 @@
+{
+  "stempel": {
+    "op": "2026-09-15T15:50:21.700Z",
+    "commit": "d390153f",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/mandaatproef.js",
+    "node": "v22.22.2"
+  },
+  "soort": "proef",
+  "uitleg": "Komt er een muterend effect voorbij de autoriteitslaag zonder gezag? Gemeten tegen een echte server over /api/member/doe, met het effect afgelezen aan de opslag (X-RTG-Staat) en niet aan wat de route zegt.",
+  "grens": "Drie dingen die dit NIET zegt. (1) De mandaattak is in PROCES beproefd, want een mandaat is vandaag niet te verlenen -- schakel 6 draagt die reden. (2) Het effect wordt gemeten op COLLECTIENIVEAU, min de vier collecties die elk verzoek al aanraakt; een mutatie binnen precies die vier zou onzichtbaar zijn. (3) Dit is EEN wereld (member) en EEN ingang (/api/member/doe); over /api/fluister, /api/ai en /api/chat/send zegt deze proef niets -- dat doet KETENBEREIK.json.",
+  "schakels": [
+    {
+      "id": "agenda-vraagt-mens",
+      "wat": "de agenda-handeling (`voorstel`) komt terug als bevestiging en wordt niet zelfstandig uitgevoerd",
+      "stand": "gesloten",
+      "gemeten": {
+        "status": 428,
+        "bevestigNodig": true
+      }
+    },
+    {
+      "id": "mens-tak-raakt-poort-niet",
+      "wat": "bij een handeling die een mens bevestigt gaat de mandaatpoort er niet over",
+      "stand": "gesloten",
+      "gemeten": {
+        "soort": "nvt",
+        "reden": "dit niveau vraagt een menselijke bevestiging, en die bevestiging IS het gezag"
+      }
+    },
+    {
+      "id": "meelopend-laat-door",
+      "wat": "zonder RTG_MANDAAT_AFDWINGEN houdt de poort niets tegen",
+      "stand": "gesloten",
+      "gemeten": {
+        "status": 200,
+        "ok": true,
+        "effect": [
+          "leerstofSessies"
+        ]
+      }
+    },
+    {
+      "id": "afdwingend-weigert",
+      "wat": "met RTG_MANDAAT_AFDWINGEN=1 wordt een zelfstandige mutatie zonder mandaat geweigerd",
+      "stand": "gesloten",
+      "gemeten": {
+        "status": 403,
+        "lijf": {
+          "error": "Deze handeling verandert iets en is niet door een mens bevestigd, en er is geen mandaat dat haar dekt."
+        }
+      }
+    },
+    {
+      "id": "afdwingend-geen-effect",
+      "wat": "de geweigerde handeling liet geen spoor in de opslag achter",
+      "stand": "gesloten",
+      "gemeten": {
+        "veranderd": []
+      }
+    },
+    {
+      "id": "mandaat-tak",
+      "wat": "met een dekkend mandaat laat de poort dezelfde handeling door",
+      "stand": "openBekend",
+      "gemeten": {
+        "metMandaat": "toegestaan",
+        "zonderMandaat": "geweigerd"
+      },
+      "waarom": "IN PROCES beproefd en niet over de lijn: er is vandaag geen enkele manier om een mandaat te VERLENEN. Niemand kent er een toe, en kern/stuur/plafond.js -- die zichzelf de eerste productie-lezer van de mandaatlaag noemt -- wordt vanuit de route nooit met een mandaat aangeroepen. Wie dat bouwt neemt vier besluiten (wie verleent, welke capabilities, hoe lang, welk plafond) en dat is een productvraag en geen bouwtaak."
+    }
+  ],
+  "telling": {
+    "schakels": 6,
+    "gesloten": 5,
+    "open": 0,
+    "openBekend": 1
+  },
+  "sluit": true,
+  "sluitMetBevinding": true
+}

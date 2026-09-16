@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 
 const pw = laadPlaywright();
 const BROWSER = process.env.RTG_CHROMIUM || undefined;
@@ -82,7 +82,8 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
     /* De rustige voorzijde is nu de echte ingang. De veeg hoort in Alle post:
        ga erheen via dezelfde zichtbare knop als het lid, zodat deze proef niet
        door aria-hidden heen in het oude postvak probeert te grijpen. */
-    await page.locator('[data-rtm-diep="inbox"]').first().click();
+    await edgeActies(page);
+    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: /Alle post$/i }).click();
     await page.waitForFunction(() => !document.body.classList.contains('rtm-voorzijde-actief') &&
       document.getElementById('main') && document.getElementById('main').getAttribute('aria-hidden') === 'false',
     null, { timeout: 5000 });
@@ -90,6 +91,7 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
 
     // 1. doorvegen bergt het bericht ECHT op, en opent het NIET
     const rij = page.locator('#main .rij[data-i]').first();
+    await rij.scrollIntoViewIfNeeded();
     await veegDoor(page, await rij.boundingBox(), { kiezer: '#main .rij[data-i]' });
     await wachtTot(() => mapVan(onderwerp), (m) => m === 'archief',
       'doorvegen hoort het bericht bij de server in het archief te zetten');

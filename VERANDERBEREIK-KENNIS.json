@@ -1,0 +1,5801 @@
+{
+ "soort": "kennis",
+ "uitleg": "Wat een toets KAN raken, afgeleid uit de code alleen: heeft hij een require-kant die in server/ uitkomt. Dezelfde commit geeft hier altijd hetzelfde -- er komt geen journaal aan te pas. Wat er bij EEN uitvoering werkelijk is waargenomen staat in VERANDERBEREIK-RONDE.json.",
+ "hoe": "npm run veranderbereik:vastleggen",
+ "stempel": {
+  "op": "2026-09-16T08:41:50.649Z",
+  "commit": "2b1a1621f",
+  "boomVuil": false,
+  "boomAnders": 5,
+  "instrument": "scripts/veranderbereik.js",
+  "node": "v24.18.0"
+ },
+ "gemeten": {
+  "toetsbestanden": 1926,
+  "statischBereik": 1155,
+  "blindeVlekStatisch": 771
+ },
+ "nietGemeten": {
+  "waargenomenBereik": "wat een toets werkelijk raakte is een WAARNEMING en hoort niet in dit bestand: die hangt af van welke ronde er liep. Zie VERANDERBEREIK-RONDE.json."
+ },
+ "per": {
+  "a11y-hermeet.e2e.js": {
+   "statisch": true
+  },
+  "a11ykeuring.test.js": {
+   "statisch": true
+  },
+  "a11yoordeel.test.js": {
+   "statisch": true
+  },
+  "aankomst-chauffeur-voorzijde.test.js": {
+   "statisch": true
+  },
+  "aanmeldbesluit.test.js": {
+   "statisch": false
+  },
+  "aanmeldgesprek.test.js": {
+   "statisch": false
+  },
+  "aanmeldingen.test.js": {
+   "statisch": true
+  },
+  "aanvoer.test.js": {
+   "statisch": true
+  },
+  "aanwezig.test.js": {
+   "statisch": false
+  },
+  "aanwezigheid-routes.e2e.js": {
+   "statisch": false
+  },
+  "aanwezigheid.test.js": {
+   "statisch": true
+  },
+  "accountroutes.test.js": {
+   "statisch": true
+  },
+  "accounts-os.test.js": {
+   "statisch": true
+  },
+  "accounts-productie-hardclose.test.js": {
+   "statisch": true
+  },
+  "accounts.test.js": {
+   "statisch": true
+  },
+  "achtergrondcollecties.test.js": {
+   "statisch": true
+  },
+  "activering.test.js": {
+   "statisch": true
+  },
+  "activiteiten.test.js": {
+   "statisch": false
+  },
+  "actorvormen.test.js": {
+   "statisch": true
+  },
+  "adamproef.test.js": {
+   "statisch": true
+  },
+  "adaptief.e2e.js": {
+   "statisch": false
+  },
+  "adaptief.test.js": {
+   "statisch": true
+  },
+  "administratie.test.js": {
+   "statisch": true
+  },
+  "adresopzoek.test.js": {
+   "statisch": true
+  },
+  "adressen.test.js": {
+   "statisch": true
+  },
+  "advocaat-lezer.test.js": {
+   "statisch": true
+  },
+  "adyen-config.test.js": {
+   "statisch": true
+  },
+  "adyen-eigen.test.js": {
+   "statisch": true
+  },
+  "afbouwafloop.test.js": {
+   "statisch": false
+  },
+  "afbouwketen.test.js": {
+   "statisch": false
+  },
+  "afbouwoordeel.test.js": {
+   "statisch": true
+  },
+  "afbouwpoort.test.js": {
+   "statisch": true
+  },
+  "afgeleid.test.js": {
+   "statisch": true
+  },
+  "afleidbaar.test.js": {
+   "statisch": true
+  },
+  "afleidrest-dubbeltik.test.js": {
+   "statisch": true
+  },
+  "agenda-pro.test.js": {
+   "statisch": false
+  },
+  "agenda.e2e.js": {
+   "statisch": false
+  },
+  "agenda.test.js": {
+   "statisch": false
+  },
+  "agent.test.js": {
+   "statisch": false
+  },
+  "ai-budget.test.js": {
+   "statisch": true
+  },
+  "ai-cache.test.js": {
+   "statisch": true
+  },
+  "ai-meter.test.js": {
+   "statisch": true
+  },
+  "ai-oproepen.test.js": {
+   "statisch": true
+  },
+  "ai-optioneel.test.js": {
+   "statisch": true
+  },
+  "ai-regie.test.js": {
+   "statisch": true
+  },
+  "ai-rem.test.js": {
+   "statisch": true
+  },
+  "ai-router.test.js": {
+   "statisch": true
+  },
+  "ai-uitwijk.test.js": {
+   "statisch": true
+  },
+  "aicontext-allowlist.test.js": {
+   "statisch": true
+  },
+  "aidata.test.js": {
+   "statisch": false
+  },
+  "aikosten-route.test.js": {
+   "statisch": true
+  },
+  "aipoort.test.js": {
+   "statisch": true
+  },
+  "alarm.test.js": {
+   "statisch": true
+  },
+  "alarmweg.test.js": {
+   "statisch": true
+  },
+  "algpin.test.js": {
+   "statisch": false
+  },
+  "allergie.test.js": {
+   "statisch": false
+  },
+  "allocatie.test.js": {
+   "statisch": true
+  },
+  "alpine.test.js": {
+   "statisch": false
+  },
+  "ankerdienst-echt.test.js": {
+   "statisch": false
+  },
+  "ankerdienst.test.js": {
+   "statisch": true
+  },
+  "ankerpost.test.js": {
+   "statisch": true
+  },
+  "anthropic.test.js": {
+   "statisch": true
+  },
+  "antivirus.test.js": {
+   "statisch": true
+  },
+  "api-contract.test.js": {
+   "statisch": false
+  },
+  "apipoort.test.js": {
+   "statisch": true
+  },
+  "appbieb.test.js": {
+   "statisch": true
+  },
+  "appbrug.test.js": {
+   "statisch": true
+  },
+  "appmenu.e2e.js": {
+   "statisch": false
+  },
+  "apps-ui.e2e.js": {
+   "statisch": false
+  },
+  "appstore-arena.test.js": {
+   "statisch": true
+  },
+  "appstore-bereik.test.js": {
+   "statisch": true
+  },
+  "appstore-cel.test.js": {
+   "statisch": true
+  },
+  "appstore-context.test.js": {
+   "statisch": true
+  },
+  "appstore-doel.test.js": {
+   "statisch": true
+  },
+  "appstore-dossier.test.js": {
+   "statisch": false
+  },
+  "appstore-eersteapps.test.js": {
+   "statisch": true
+  },
+  "appstore-geld.test.js": {
+   "statisch": true
+  },
+  "appstore-identifiers.test.js": {
+   "statisch": true
+  },
+  "appstore-lab-toestemming-routes.test.js": {
+   "statisch": false
+  },
+  "appstore-meting.test.js": {
+   "statisch": true
+  },
+  "appstore-persoon.test.js": {
+   "statisch": true
+  },
+  "appstore-tijdelijk.test.js": {
+   "statisch": true
+  },
+  "appstore-toegankelijk.test.js": {
+   "statisch": true
+  },
+  "appstore-vierogen.test.js": {
+   "statisch": true
+  },
+  "appstore.e2e.js": {
+   "statisch": true
+  },
+  "appstore.test.js": {
+   "statisch": true
+  },
+  "appwereldcatalogus.test.js": {
+   "statisch": true
+  },
+  "archief.test.js": {
+   "statisch": false
+  },
+  "architect.test.js": {
+   "statisch": false
+  },
+  "arena.test.js": {
+   "statisch": false
+  },
+  "arrival-security.test.js": {
+   "statisch": true
+  },
+  "assets.test.js": {
+   "statisch": false
+  },
+  "ast-grens.test.js": {
+   "statisch": true
+  },
+  "ast-scan.test.js": {
+   "statisch": true
+  },
+  "atelier.test.js": {
+   "statisch": false
+  },
+  "attributie.test.js": {
+   "statisch": true
+  },
+  "auditspoor.test.js": {
+   "statisch": true
+  },
+  "auth-rol.test.js": {
+   "statisch": false
+  },
+  "automatisering.test.js": {
+   "statisch": true
+  },
+  "autonomiegrens.test.js": {
+   "statisch": false
+  },
+  "autoverkoop.test.js": {
+   "statisch": false
+  },
+  "avond-scherm.e2e.js": {
+   "statisch": false
+  },
+  "avond.test.js": {
+   "statisch": false
+  },
+  "b2b2c-tenantgrens.test.js": {
+   "statisch": false
+  },
+  "baby.test.js": {
+   "statisch": false
+  },
+  "backupstand.test.js": {
+   "statisch": true
+  },
+  "backupvolledig.test.js": {
+   "statisch": true
+  },
+  "balans.test.js": {
+   "statisch": true
+  },
+  "balkkleur.test.js": {
+   "statisch": true
+  },
+  "bank-beheer.test.js": {
+   "statisch": false
+  },
+  "bank-eigendom.test.js": {
+   "statisch": true
+  },
+  "bank.test.js": {
+   "statisch": false
+  },
+  "bankbeveiliging.test.js": {
+   "statisch": true
+  },
+  "bankdeuren.test.js": {
+   "statisch": false
+  },
+  "bankduurzaam.test.js": {
+   "statisch": false
+  },
+  "bankhart.test.js": {
+   "statisch": true
+  },
+  "bankkamer.e2e.js": {
+   "statisch": false
+  },
+  "banknood-idem.test.js": {
+   "statisch": true
+  },
+  "bankscherm.e2e.js": {
+   "statisch": false
+  },
+  "bedrading.test.js": {
+   "statisch": true
+  },
+  "bedrijfbeeld.test.js": {
+   "statisch": false
+  },
+  "bedrijfbouw.test.js": {
+   "statisch": false
+  },
+  "bedrijfeigenaar.test.js": {
+   "statisch": false
+  },
+  "bedrijfkern.test.js": {
+   "statisch": false
+  },
+  "bedrijfklant.test.js": {
+   "statisch": false
+  },
+  "bedrijfrecht.test.js": {
+   "statisch": false
+  },
+  "bedrijfscontrole.test.js": {
+   "statisch": true
+  },
+  "bedrijfsintake.test.js": {
+   "statisch": false
+  },
+  "bedrijfwerk.test.js": {
+   "statisch": false
+  },
+  "beginscherm.test.js": {
+   "statisch": true
+  },
+  "begroting.test.js": {
+   "statisch": true
+  },
+  "begrotingroute.test.js": {
+   "statisch": false
+  },
+  "begrotingsgrenzen.test.js": {
+   "statisch": true
+  },
+  "belasting-groothandels.test.js": {
+   "statisch": false
+  },
+  "belasting.test.js": {
+   "statisch": true
+  },
+  "belastingkantoor.test.js": {
+   "statisch": false
+  },
+  "belofte.test.js": {
+   "statisch": true
+  },
+  "beproeving-contract.test.js": {
+   "statisch": true
+  },
+  "bereikbaar.test.js": {
+   "statisch": true
+  },
+  "berichten.e2e.js": {
+   "statisch": false
+  },
+  "berichten.test.js": {
+   "statisch": false
+  },
+  "beroepenbieb.test.js": {
+   "statisch": false
+  },
+  "beschermd.test.js": {
+   "statisch": false
+  },
+  "beschermstand.test.js": {
+   "statisch": true
+  },
+  "beschermzaak.test.js": {
+   "statisch": false
+  },
+  "besluit.test.js": {
+   "statisch": true
+  },
+  "bestand-binding.test.js": {
+   "statisch": true
+  },
+  "bestanden.e2e.js": {
+   "statisch": false
+  },
+  "bestanden.test.js": {
+   "statisch": false
+  },
+  "bestellen-scherm.e2e.js": {
+   "statisch": false
+  },
+  "betaaldienst.test.js": {
+   "statisch": false
+  },
+  "betaaldienstfee.test.js": {
+   "statisch": true
+  },
+  "betaalopdracht.test.js": {
+   "statisch": true
+  },
+  "betaalproviders.test.js": {
+   "statisch": true
+  },
+  "betaalregie.test.js": {
+   "statisch": true
+  },
+  "betaalstore.test.js": {
+   "statisch": true
+  },
+  "betaalwaarheid.test.js": {
+   "statisch": true
+  },
+  "betaalwebhook-fouten.test.js": {
+   "statisch": true
+  },
+  "betrouwbaarheid.test.js": {
+   "statisch": true
+  },
+  "beveiliging.test.js": {
+   "statisch": true
+  },
+  "beveiligingsteam.test.js": {
+   "statisch": false
+  },
+  "bewaartermijnen.test.js": {
+   "statisch": true
+  },
+  "bewaarveger.test.js": {
+   "statisch": true
+  },
+  "bewaarwacht.test.js": {
+   "statisch": true
+  },
+  "bewakers.test.js": {
+   "statisch": true
+  },
+  "bewakersketen.test.js": {
+   "statisch": true
+  },
+  "bewijs.test.js": {
+   "statisch": false
+  },
+  "bewijsboek.test.js": {
+   "statisch": true
+  },
+  "bewijskosten.test.js": {
+   "statisch": true
+  },
+  "bewijsladder.test.js": {
+   "statisch": true
+  },
+  "bewijsmapscherm.e2e.js": {
+   "statisch": false
+  },
+  "bewijsmatrix-audit.test.js": {
+   "statisch": true
+  },
+  "bewijsmatrix.test.js": {
+   "statisch": true
+  },
+  "bewijsregister.test.js": {
+   "statisch": true
+  },
+  "bewijsschuld.test.js": {
+   "statisch": true
+  },
+  "bewijstoken.test.js": {
+   "statisch": true
+  },
+  "bewijsveld.test.js": {
+   "statisch": true
+  },
+  "bezitsbewijs.test.js": {
+   "statisch": true
+  },
+  "bezorg.test.js": {
+   "statisch": false
+  },
+  "bezorging.test.js": {
+   "statisch": false
+  },
+  "bezorgketen.test.js": {
+   "statisch": false
+  },
+  "bezorgvolgen.test.js": {
+   "statisch": true
+  },
+  "bibliotheek.test.js": {
+   "statisch": true
+  },
+  "bijles.test.js": {
+   "statisch": false
+  },
+  "bijstand.test.js": {
+   "statisch": true
+  },
+  "bijstandbericht.test.js": {
+   "statisch": true
+  },
+  "bijstandketen.test.js": {
+   "statisch": false
+  },
+  "bijstandscherm.e2e.js": {
+   "statisch": false
+  },
+  "blindevlek.test.js": {
+   "statisch": false
+  },
+  "blokafsplitsing.test.js": {
+   "statisch": true
+  },
+  "boarding-pass-credential.test.js": {
+   "statisch": true
+  },
+  "boarding-pass.pg.test.js": {
+   "statisch": true
+  },
+  "boardlog-keten.test.js": {
+   "statisch": true
+  },
+  "boardroom-poort.test.js": {
+   "statisch": false
+  },
+  "boardroom.test.js": {
+   "statisch": true
+  },
+  "boeken.e2e.js": {
+   "statisch": false
+  },
+  "boeken.test.js": {
+   "statisch": false
+  },
+  "boekhoud.test.js": {
+   "statisch": true
+  },
+  "boerderij.test.js": {
+   "statisch": false
+  },
+  "bon.test.js": {
+   "statisch": true
+  },
+  "boot-smoke.test.js": {
+   "statisch": false
+  },
+  "borden.test.js": {
+   "statisch": false
+  },
+  "bouw.test.js": {
+   "statisch": false
+  },
+  "bron-release-bewijs.test.js": {
+   "statisch": true
+  },
+  "bron.test.js": {
+   "statisch": true
+  },
+  "bronblind.test.js": {
+   "statisch": true
+  },
+  "bronmutanten.test.js": {
+   "statisch": true
+  },
+  "browser-id-contract.test.js": {
+   "statisch": true
+  },
+  "browserpoort.e2e.js": {
+   "statisch": false
+  },
+  "brugklant.test.js": {
+   "statisch": true
+  },
+  "bruikbaarheid.test.js": {
+   "statisch": true
+  },
+  "btw-aangifte.test.js": {
+   "statisch": true
+  },
+  "btw-aansluiting-scherm.e2e.js": {
+   "statisch": false
+  },
+  "btw-naheffing-keten.test.js": {
+   "statisch": false
+  },
+  "btw-naheffing-scherm.e2e.js": {
+   "statisch": false
+  },
+  "btw-naheffing.test.js": {
+   "statisch": true
+  },
+  "btw-scherm.e2e.js": {
+   "statisch": false
+  },
+  "btw-toezicht.test.js": {
+   "statisch": true
+  },
+  "btw-waarom-scherm.e2e.js": {
+   "statisch": false
+  },
+  "budgetterugname.test.js": {
+   "statisch": true
+  },
+  "bugjacht.test.js": {
+   "statisch": true
+  },
+  "bundeldelen.test.js": {
+   "statisch": true
+  },
+  "bundelprijs.test.js": {
+   "statisch": true
+  },
+  "bureau.test.js": {
+   "statisch": true
+  },
+  "bureaupda.e2e.js": {
+   "statisch": false
+  },
+  "buurtruil-scherm.e2e.js": {
+   "statisch": false
+  },
+  "ca.test.js": {
+   "statisch": true
+  },
+  "cache.test.js": {
+   "statisch": true
+  },
+  "camerascherm.e2e.js": {
+   "statisch": false
+  },
+  "campus-scherm.e2e.js": {
+   "statisch": false
+  },
+  "canary.test.js": {
+   "statisch": true
+  },
+  "canvas.test.js": {
+   "statisch": true
+  },
+  "capabilities.test.js": {
+   "statisch": true
+  },
+  "capabilitycallers.test.js": {
+   "statisch": true
+  },
+  "capgezondheid.test.js": {
+   "statisch": true
+  },
+  "care.test.js": {
+   "statisch": false
+  },
+  "carriereledger.e2e.test.js": {
+   "statisch": false
+  },
+  "carriereledger.test.js": {
+   "statisch": true
+  },
+  "catalogus-wensen.test.js": {
+   "statisch": false
+  },
+  "cdt.test.js": {
+   "statisch": true
+  },
+  "chaos.pg.test.js": {
+   "statisch": true
+  },
+  "chaos.test.js": {
+   "statisch": true
+  },
+  "charter.test.js": {
+   "statisch": false
+  },
+  "chauffeur-scherm.e2e.js": {
+   "statisch": false
+  },
+  "ci-keten.test.js": {
+   "statisch": true
+  },
+  "ci-lokaal.test.js": {
+   "statisch": true
+  },
+  "cijferopmens.test.js": {
+   "statisch": true
+  },
+  "claims-btw.test.js": {
+   "statisch": true
+  },
+  "clipdeler.e2e.js": {
+   "statisch": false
+  },
+  "clipdeler.test.js": {
+   "statisch": true
+  },
+  "clips-studio.e2e.js": {
+   "statisch": false
+  },
+  "clips.test.js": {
+   "statisch": false
+  },
+  "clubdorp.test.js": {
+   "statisch": false
+  },
+  "clubs.test.js": {
+   "statisch": false
+  },
+  "codecredentials.test.js": {
+   "statisch": true
+  },
+  "codegrens.test.js": {
+   "statisch": true
+  },
+  "codewereld.test.js": {
+   "statisch": false
+  },
+  "collectie-transactie-sqlite.test.js": {
+   "statisch": false
+  },
+  "collega-namen.test.js": {
+   "statisch": false
+  },
+  "collegachat.test.js": {
+   "statisch": false
+  },
+  "comm-actor.test.js": {
+   "statisch": true
+  },
+  "comm-collega.test.js": {
+   "statisch": true
+  },
+  "comm-deelnemer.test.js": {
+   "statisch": true
+  },
+  "comm-dm.test.js": {
+   "statisch": true
+  },
+  "comm-gast.test.js": {
+   "statisch": true
+  },
+  "comm-vergeten.test.js": {
+   "statisch": true
+  },
+  "comm-werk.test.js": {
+   "statisch": true
+  },
+  "comm-zaak.e2e.js": {
+   "statisch": false
+  },
+  "comm.e2e.js": {
+   "statisch": false
+  },
+  "command-router.test.js": {
+   "statisch": false
+  },
+  "command-routes-bestuur.test.js": {
+   "statisch": false
+  },
+  "command-routes-herstel.test.js": {
+   "statisch": false
+  },
+  "command.e2e.js": {
+   "statisch": false
+  },
+  "command.test.js": {
+   "statisch": true
+  },
+  "commandlagen.test.js": {
+   "statisch": false
+  },
+  "commerce-kern.test.js": {
+   "statisch": true
+  },
+  "commerce-mand-scherm.e2e.js": {
+   "statisch": false
+  },
+  "commerce-overdracht.test.js": {
+   "statisch": true
+  },
+  "commerce-prijsvraag.test.js": {
+   "statisch": true
+  },
+  "commerce-publiek.test.js": {
+   "statisch": true
+  },
+  "commerce-retour.test.js": {
+   "statisch": true
+  },
+  "commerce-scherm.e2e.js": {
+   "statisch": false
+  },
+  "commerce-verkoopweg.test.js": {
+   "statisch": true
+  },
+  "commerce.test.js": {
+   "statisch": true
+  },
+  "commercie-ronde.e2e.js": {
+   "statisch": false
+  },
+  "commercie.test.js": {
+   "statisch": true
+  },
+  "commercieel.test.js": {
+   "statisch": true
+  },
+  "concern-routes.e2e.js": {
+   "statisch": false
+  },
+  "concern-scherm.e2e.js": {
+   "statisch": false
+  },
+  "concern-voorstel.test.js": {
+   "statisch": true
+  },
+  "concern.test.js": {
+   "statisch": true
+  },
+  "connect-routes.e2e.js": {
+   "statisch": false
+  },
+  "connect-scherm.e2e.js": {
+   "statisch": false
+  },
+  "connect.test.js": {
+   "statisch": true
+  },
+  "consent-dekking.test.js": {
+   "statisch": true
+  },
+  "consent-doel-termijn.test.js": {
+   "statisch": true
+  },
+  "consent-relaties.test.js": {
+   "statisch": true
+  },
+  "consent.test.js": {
+   "statisch": true
+  },
+  "contact.test.js": {
+   "statisch": false
+  },
+  "contactpin-live.pg.test.js": {
+   "statisch": true
+  },
+  "contactpin.e2e.js": {
+   "statisch": false
+  },
+  "contactpin.test.js": {
+   "statisch": true
+  },
+  "context-lijn.test.js": {
+   "statisch": true
+  },
+  "contextspoor.test.js": {
+   "statisch": false
+  },
+  "contract.test.js": {
+   "statisch": true
+  },
+  "controlekamer.test.js": {
+   "statisch": false
+  },
+  "controls.test.js": {
+   "statisch": true
+  },
+  "crashas.test.js": {
+   "statisch": true
+  },
+  "crashproef.test.js": {
+   "statisch": true
+  },
+  "crashtaxonomie.test.js": {
+   "statisch": true
+  },
+  "creator-portfolio.test.js": {
+   "statisch": false
+  },
+  "creator.test.js": {
+   "statisch": false
+  },
+  "credential-log-hygiene.test.js": {
+   "statisch": true
+  },
+  "csp.e2e.js": {
+   "statisch": false
+  },
+  "dagcoach.test.js": {
+   "statisch": true
+  },
+  "dagplan.test.js": {
+   "statisch": true
+  },
+  "db-redis-mirror.test.js": {
+   "statisch": true
+  },
+  "dealkans.test.js": {
+   "statisch": true
+  },
+  "deavond.test.js": {
+   "statisch": false
+  },
+  "decision-room.test.js": {
+   "statisch": true
+  },
+  "deelindex.test.js": {
+   "statisch": true
+  },
+  "deelmenu.e2e.js": {
+   "statisch": true
+  },
+  "deelmenuronde.e2e.js": {
+   "statisch": true
+  },
+  "deelmenuwacht.e2e.js": {
+   "statisch": false
+  },
+  "defensie.test.js": {
+   "statisch": false
+  },
+  "dekking.test.js": {
+   "statisch": false
+  },
+  "delen.test.js": {
+   "statisch": true
+  },
+  "deltapoort.test.js": {
+   "statisch": true
+  },
+  "demokosten.test.js": {
+   "statisch": true
+  },
+  "demostand.test.js": {
+   "statisch": true
+  },
+  "demozaken.test.js": {
+   "statisch": false
+  },
+  "denkfout.test.js": {
+   "statisch": true
+  },
+  "deur.e2e.js": {
+   "statisch": false
+  },
+  "directpay.test.js": {
+   "statisch": false
+  },
+  "doctrine.test.js": {
+   "statisch": true
+  },
+  "doelbinding.test.js": {
+   "statisch": true
+  },
+  "doelen-scherm.e2e.js": {
+   "statisch": false
+  },
+  "doelen.test.js": {
+   "statisch": true
+  },
+  "doelgroepbereik.test.js": {
+   "statisch": true
+  },
+  "domeinalleen.test.js": {
+   "statisch": false
+  },
+  "domeingrens.test.js": {
+   "statisch": true
+  },
+  "doodspoor.test.js": {
+   "statisch": true
+  },
+  "doorbelasting.test.js": {
+   "statisch": true
+  },
+  "doorgeefjournaal.test.js": {
+   "statisch": true
+  },
+  "doorwerking.test.js": {
+   "statisch": true
+  },
+  "doos-journaal.test.js": {
+   "statisch": true
+  },
+  "doos-regie.test.js": {
+   "statisch": true
+  },
+  "drie.test.js": {
+   "statisch": true
+  },
+  "drm.test.js": {
+   "statisch": false
+  },
+  "droogloop.test.js": {
+   "statisch": true
+  },
+  "dubbelemelding.test.js": {
+   "statisch": true
+  },
+  "dubbeltik.test.js": {
+   "statisch": true
+  },
+  "dubbeltikgzip.test.js": {
+   "statisch": true
+  },
+  "duels2.test.js": {
+   "statisch": false
+  },
+  "duurprijs.test.js": {
+   "statisch": true
+  },
+  "duurzaamheid-kill.test.js": {
+   "statisch": false
+  },
+  "duurzaamheid-pg.test.js": {
+   "statisch": true
+  },
+  "duurzaamheidskosten.test.js": {
+   "statisch": true
+  },
+  "dyncode-e2e.test.js": {
+   "statisch": false
+  },
+  "dyncode.test.js": {
+   "statisch": true
+  },
+  "econ01.test.js": {
+   "statisch": true
+  },
+  "economic-runtime.test.js": {
+   "statisch": true
+  },
+  "economie.test.js": {
+   "statisch": true
+  },
+  "economische-boeking-isolatie.test.js": {
+   "statisch": true
+  },
+  "edge-system.test.js": {
+   "statisch": true
+  },
+  "eenaccount-werkruimte.test.js": {
+   "statisch": false
+  },
+  "eenaccount.test.js": {
+   "statisch": false
+  },
+  "effectbon.test.js": {
+   "statisch": true
+  },
+  "effectdekking.test.js": {
+   "statisch": true
+  },
+  "effectmeter.test.js": {
+   "statisch": true
+  },
+  "eigen-website.test.js": {
+   "statisch": false
+  },
+  "eigenaar-wedloop.test.js": {
+   "statisch": true
+  },
+  "eigenaar.test.js": {
+   "statisch": true
+  },
+  "eigenaarbevestiging.test.js": {
+   "statisch": true
+  },
+  "eigenaarherstel-routes.test.js": {
+   "statisch": false
+  },
+  "eigenaarherstel.test.js": {
+   "statisch": true
+  },
+  "eigenaarschap.test.js": {
+   "statisch": false
+  },
+  "eigenaarwerkplek.test.js": {
+   "statisch": false
+  },
+  "eigenip.test.js": {
+   "statisch": false
+  },
+  "eigenpoort.test.js": {
+   "statisch": true
+  },
+  "eigensessieschermen.e2e.js": {
+   "statisch": false
+  },
+  "eindpoort.test.js": {
+   "statisch": true
+  },
+  "envelop.test.js": {
+   "statisch": true
+  },
+  "envelopvelden.test.js": {
+   "statisch": true
+  },
+  "envelopvorm.test.js": {
+   "statisch": true
+  },
+  "ervaring.test.js": {
+   "statisch": false
+  },
+  "eten-uitgaan-voorzijde.test.js": {
+   "statisch": true
+  },
+  "eten.test.js": {
+   "statisch": true
+  },
+  "eu-naleving.test.js": {
+   "statisch": true
+  },
+  "eurodekking.test.js": {
+   "statisch": true
+  },
+  "eventkeuken.test.js": {
+   "statisch": false
+  },
+  "eventloop.test.js": {
+   "statisch": true
+  },
+  "excursie.test.js": {
+   "statisch": false
+  },
+  "executionmap.test.js": {
+   "statisch": true
+  },
+  "experience-platform.e2e.test.js": {
+   "statisch": false
+  },
+  "experience-platform.test.js": {
+   "statisch": true
+  },
+  "experience-surface.e2e.js": {
+   "statisch": false
+  },
+  "faalproefklasse.test.js": {
+   "statisch": true
+  },
+  "faalproefvorm.test.js": {
+   "statisch": true
+  },
+  "facturatie.test.js": {
+   "statisch": false
+  },
+  "factuur.test.js": {
+   "statisch": true
+  },
+  "factuurbevroren.test.js": {
+   "statisch": true
+  },
+  "factuurcorrectie.test.js": {
+   "statisch": true
+  },
+  "factuurproef.test.js": {
+   "statisch": true
+  },
+  "factuursaldo.test.js": {
+   "statisch": false
+  },
+  "fases.test.js": {
+   "statisch": false
+  },
+  "festival-dienst.test.js": {
+   "statisch": true
+  },
+  "festival-gast.test.js": {
+   "statisch": true
+  },
+  "festival-geheugen.test.js": {
+   "statisch": true
+  },
+  "festival-gereed.test.js": {
+   "statisch": true
+  },
+  "festival-groep-routes-failclosed.test.js": {
+   "statisch": true
+  },
+  "festival-groep.test.js": {
+   "statisch": true
+  },
+  "festival-partner.test.js": {
+   "statisch": true
+  },
+  "festival-podium.test.js": {
+   "statisch": true
+  },
+  "festival-routes.test.js": {
+   "statisch": false
+  },
+  "festival-tijdlijn.test.js": {
+   "statisch": true
+  },
+  "festival-verkoop.test.js": {
+   "statisch": true
+  },
+  "festival-vooruit.test.js": {
+   "statisch": true
+  },
+  "festival.test.js": {
+   "statisch": true
+  },
+  "fiscaal-aansluiting.test.js": {
+   "statisch": true
+  },
+  "fiscaal-bronnen.test.js": {
+   "statisch": true
+  },
+  "fiscaal-gateway.test.js": {
+   "statisch": true
+  },
+  "fiscaal-herkomst.test.js": {
+   "statisch": true
+  },
+  "fiscaal-jaargangen.test.js": {
+   "statisch": true
+  },
+  "fiscaal-meegeleverd.test.js": {
+   "statisch": true
+  },
+  "fiscaal-preflight.test.js": {
+   "statisch": true
+  },
+  "fiscaal-scenario.test.js": {
+   "statisch": true
+  },
+  "fiscaal-terugrekenen.test.js": {
+   "statisch": true
+  },
+  "fiscaal-verbintenis.test.js": {
+   "statisch": true
+  },
+  "fiscaal-zekerheid.test.js": {
+   "statisch": true
+  },
+  "fiscaal-zzpwacht.test.js": {
+   "statisch": true
+  },
+  "flits.test.js": {
+   "statisch": false
+  },
+  "fluister.test.js": {
+   "statisch": false
+  },
+  "fonds.test.js": {
+   "statisch": true
+  },
+  "foodcourt.test.js": {
+   "statisch": false
+  },
+  "foundation-geld-later.test.js": {
+   "statisch": true
+  },
+  "foundation-gezondheid-welzijn.test.js": {
+   "statisch": true
+  },
+  "foundation-hulp-zorg.test.js": {
+   "statisch": true
+  },
+  "foundation-leren-groei.test.js": {
+   "statisch": true
+  },
+  "foundation-lesrem.test.js": {
+   "statisch": false
+  },
+  "foundation-markt.test.js": {
+   "statisch": false
+  },
+  "foundation-meedoen-ontdekken.test.js": {
+   "statisch": true
+  },
+  "foundation-persoonscodes.pg.test.js": {
+   "statisch": true
+  },
+  "foundation-persoonscodes.test.js": {
+   "statisch": true
+  },
+  "foundation-premium-ui.test.js": {
+   "statisch": false
+  },
+  "foundation-productiepoort.test.js": {
+   "statisch": true
+  },
+  "foundation-reisrem.test.js": {
+   "statisch": false
+  },
+  "foundation-rest.test.js": {
+   "statisch": false
+  },
+  "foundation-samen-thuis.test.js": {
+   "statisch": true
+  },
+  "foundation-veilig-vertrouwd.test.js": {
+   "statisch": true
+  },
+  "foundation-voorzijde.test.js": {
+   "statisch": true
+  },
+  "foundation-vrijgave.test.js": {
+   "statisch": true
+  },
+  "foundation.test.js": {
+   "statisch": false
+  },
+  "foundationmailscherm.e2e.js": {
+   "statisch": false
+  },
+  "foundationregistratie.test.js": {
+   "statisch": false
+  },
+  "foundationschil.test.js": {
+   "statisch": false
+  },
+  "fout-aggregatie.test.js": {
+   "statisch": true
+  },
+  "fout-client-route.test.js": {
+   "statisch": false
+  },
+  "fout-client.test.js": {
+   "statisch": false
+  },
+  "foutisolatie.test.js": {
+   "statisch": true
+  },
+  "foutmelder-dekking.test.js": {
+   "statisch": false
+  },
+  "foutmelder.test.js": {
+   "statisch": true
+  },
+  "frictiebodem.test.js": {
+   "statisch": true
+  },
+  "frictieschaduw.test.js": {
+   "statisch": true
+  },
+  "functielijst.test.js": {
+   "statisch": true
+  },
+  "functieplaats.test.js": {
+   "statisch": false
+  },
+  "functies.test.js": {
+   "statisch": true
+  },
+  "galerij.e2e.js": {
+   "statisch": false
+  },
+  "galerij.test.js": {
+   "statisch": false
+  },
+  "gast-qr-lifecycle.test.js": {
+   "statisch": true
+  },
+  "gastbezorging.test.js": {
+   "statisch": false
+  },
+  "gastfoodcourt.test.js": {
+   "statisch": false
+  },
+  "gastorder.test.js": {
+   "statisch": false
+  },
+  "gastregels.test.js": {
+   "statisch": true
+  },
+  "gastroomservice.test.js": {
+   "statisch": false
+  },
+  "gastscherm.e2e.js": {
+   "statisch": false
+  },
+  "gastverzoek.test.js": {
+   "statisch": true
+  },
+  "gastzorg.test.js": {
+   "statisch": false
+  },
+  "gebaar-bestanden.e2e.js": {
+   "statisch": false
+  },
+  "gebaar-notities.e2e.js": {
+   "statisch": false
+  },
+  "gebaar-rtmail.e2e.js": {
+   "statisch": false
+  },
+  "gebaar-salon.e2e.js": {
+   "statisch": false
+  },
+  "gebaar.e2e.js": {
+   "statisch": false
+  },
+  "gebaar.test.js": {
+   "statisch": true
+  },
+  "gebouw.test.js": {
+   "statisch": false
+  },
+  "gebouwplus.test.js": {
+   "statisch": false
+  },
+  "gedachten-scherm.e2e.js": {
+   "statisch": false
+  },
+  "gedachten.test.js": {
+   "statisch": true
+  },
+  "geen-demo.test.js": {
+   "statisch": false
+  },
+  "geenlek.test.js": {
+   "statisch": true
+  },
+  "gegevenskaart-scherm.e2e.js": {
+   "statisch": false
+  },
+  "gegevenskaart.test.js": {
+   "statisch": true
+  },
+  "gegevenspoort.test.js": {
+   "statisch": true
+  },
+  "geheugen.test.js": {
+   "statisch": true
+  },
+  "geld-conservatie-last.test.js": {
+   "statisch": false
+  },
+  "geld-rollen-buiten-bank.test.js": {
+   "statisch": false
+  },
+  "geld-rollen-gezin.test.js": {
+   "statisch": false
+  },
+  "geld-rollen-school.test.js": {
+   "statisch": false
+  },
+  "geld-rollen-werkruimte.test.js": {
+   "statisch": false
+  },
+  "geld-rollen-zaken.test.js": {
+   "statisch": false
+  },
+  "geld-rollen.test.js": {
+   "statisch": false
+  },
+  "geld-voorzijde.test.js": {
+   "statisch": true
+  },
+  "geld.e2e.js": {
+   "statisch": false
+  },
+  "geldbeleid.test.js": {
+   "statisch": false
+  },
+  "gelddekking.test.js": {
+   "statisch": true
+  },
+  "geldeenheid.test.js": {
+   "statisch": true
+  },
+  "geldgraaf.test.js": {
+   "statisch": true
+  },
+  "geldgrens.test.js": {
+   "statisch": false
+  },
+  "gelding.test.js": {
+   "statisch": true
+  },
+  "geldkaart.test.js": {
+   "statisch": true
+  },
+  "geldketen.test.js": {
+   "statisch": true
+  },
+  "geldregie.test.js": {
+   "statisch": false
+  },
+  "geldroutes.test.js": {
+   "statisch": true
+  },
+  "geldveilig.test.js": {
+   "statisch": true
+  },
+  "geldwereld.test.js": {
+   "statisch": true
+  },
+  "geloofbieb.test.js": {
+   "statisch": true
+  },
+  "gemeente.test.js": {
+   "statisch": false
+  },
+  "genootschap-beheer.test.js": {
+   "statisch": false
+  },
+  "genootschap.e2e.js": {
+   "statisch": false
+  },
+  "genootschap.test.js": {
+   "statisch": false
+  },
+  "genrecap.test.js": {
+   "statisch": true
+  },
+  "genredekking.test.js": {
+   "statisch": true
+  },
+  "genreplan.test.js": {
+   "statisch": false
+  },
+  "genrepuls.test.js": {
+   "statisch": false
+  },
+  "genreregister.test.js": {
+   "statisch": true
+  },
+  "genretoegang.test.js": {
+   "statisch": true
+  },
+  "genrezaken.test.js": {
+   "statisch": true
+  },
+  "gerechtkennis.test.js": {
+   "statisch": false
+  },
+  "gereedschap.e2e.js": {
+   "statisch": false
+  },
+  "gereedschap.test.js": {
+   "statisch": true
+  },
+  "gesprekdraad.test.js": {
+   "statisch": false
+  },
+  "getallen.test.js": {
+   "statisch": true
+  },
+  "geven-scherm.e2e.js": {
+   "statisch": false
+  },
+  "gevolgcontract.test.js": {
+   "statisch": true
+  },
+  "gewichtdrift.test.js": {
+   "statisch": true
+  },
+  "gewichtvoorstel.test.js": {
+   "statisch": true
+  },
+  "gewoonten.test.js": {
+   "statisch": true
+  },
+  "gezag.test.js": {
+   "statisch": true
+  },
+  "gezagshandelingen.test.js": {
+   "statisch": true
+  },
+  "gezagsnoemer.test.js": {
+   "statisch": true
+  },
+  "gezakte-toetsen.test.js": {
+   "statisch": true
+  },
+  "gezelschap.test.js": {
+   "statisch": false
+  },
+  "gezin-weghalen.test.js": {
+   "statisch": false
+  },
+  "gezinenleren.test.js": {
+   "statisch": false
+  },
+  "gezinhuishouden.test.js": {
+   "statisch": false
+  },
+  "gezinleven.test.js": {
+   "statisch": false
+  },
+  "gezinskeuken.test.js": {
+   "statisch": false
+  },
+  "gezinsregistratie.test.js": {
+   "statisch": false
+  },
+  "gezinsuitnodiging-verval.test.js": {
+   "statisch": false
+  },
+  "gezinzorg.test.js": {
+   "statisch": false
+  },
+  "gezondheid.test.js": {
+   "statisch": false
+  },
+  "gezondheidskaart.test.js": {
+   "statisch": true
+  },
+  "ghost.test.js": {
+   "statisch": false
+  },
+  "gidswacht.test.js": {
+   "statisch": true
+  },
+  "golive-uitgangen.test.js": {
+   "statisch": true
+  },
+  "golive.test.js": {
+   "statisch": true
+  },
+  "gpsschakelaar.e2e.js": {
+   "statisch": false
+  },
+  "graafas.test.js": {
+   "statisch": true
+  },
+  "grafsteen.pg.test.js": {
+   "statisch": true
+  },
+  "grammatica.e2e.js": {
+   "statisch": false
+  },
+  "grammatica.test.js": {
+   "statisch": true
+  },
+  "grand-integratie.pg.test.js": {
+   "statisch": false
+  },
+  "grens-sweep.test.js": {
+   "statisch": false
+  },
+  "grondwacht.test.js": {
+   "statisch": true
+  },
+  "groothandel.test.js": {
+   "statisch": true
+  },
+  "hack.test.js": {
+   "statisch": false
+  },
+  "hand.test.js": {
+   "statisch": true
+  },
+  "handelenspoor.test.js": {
+   "statisch": false
+  },
+  "handeling-massa.test.js": {
+   "statisch": true
+  },
+  "handeling.test.js": {
+   "statisch": true
+  },
+  "handelingsklasse.test.js": {
+   "statisch": true
+  },
+  "handelingsspoor-echt.test.js": {
+   "statisch": true
+  },
+  "handelingsspoor.test.js": {
+   "statisch": true
+  },
+  "handelscherm.e2e.js": {
+   "statisch": false
+  },
+  "handelsketen.test.js": {
+   "statisch": true
+  },
+  "handelsregelwacht.test.js": {
+   "statisch": true
+  },
+  "handenvrij.e2e.js": {
+   "statisch": false
+  },
+  "handenvrij.test.js": {
+   "statisch": true
+  },
+  "handlerpoorten.test.js": {
+   "statisch": true
+  },
+  "handlerwacht.test.js": {
+   "statisch": true
+  },
+  "hardware.test.js": {
+   "statisch": false
+  },
+  "heapproef.test.js": {
+   "statisch": true
+  },
+  "heapstat.test.js": {
+   "statisch": true
+  },
+  "helikopter.test.js": {
+   "statisch": false
+  },
+  "herbouwproef.test.js": {
+   "statisch": true
+  },
+  "heritage-context.e2e.js": {
+   "statisch": false
+  },
+  "heritage-intelligence.e2e.js": {
+   "statisch": false
+  },
+  "heritage-truth.test.js": {
+   "statisch": true
+  },
+  "herkomst.test.js": {
+   "statisch": true
+  },
+  "herkomstlus.test.js": {
+   "statisch": true
+  },
+  "herkomstwereld.test.js": {
+   "statisch": true
+  },
+  "herrekenbaar.test.js": {
+   "statisch": true
+  },
+  "herstel-sandbox.test.js": {
+   "statisch": false
+  },
+  "herstel.test.js": {
+   "statisch": true
+  },
+  "herstel2fa.test.js": {
+   "statisch": false
+  },
+  "herstelgat.test.js": {
+   "statisch": false
+  },
+  "herstelkanaal.test.js": {
+   "statisch": true
+  },
+  "herstelproef.test.js": {
+   "statisch": true
+  },
+  "herstelquorum.test.js": {
+   "statisch": true
+  },
+  "hersteltransactie.test.js": {
+   "statisch": true
+  },
+  "herstelzondertelefoon.test.js": {
+   "statisch": false
+  },
+  "homekit.test.js": {
+   "statisch": false
+  },
+  "horeca-bar.e2e.js": {
+   "statisch": false
+  },
+  "horeca-bar.test.js": {
+   "statisch": true
+  },
+  "horeca-bezorg-club.test.js": {
+   "statisch": true
+  },
+  "horeca-cadans.test.js": {
+   "statisch": true
+  },
+  "horeca-correctie.test.js": {
+   "statisch": true
+  },
+  "horeca-dienstmeting.test.js": {
+   "statisch": true
+  },
+  "horeca-edge.e2e.js": {
+   "statisch": false
+  },
+  "horeca-edge.test.js": {
+   "statisch": false
+  },
+  "horeca-gezelschap.test.js": {
+   "statisch": false
+  },
+  "horeca-host.test.js": {
+   "statisch": true
+  },
+  "horeca-hotel-event.test.js": {
+   "statisch": false
+  },
+  "horeca-journey.test.js": {
+   "statisch": false
+  },
+  "horeca-kaart.test.js": {
+   "statisch": false
+  },
+  "horeca-keuken.test.js": {
+   "statisch": false
+  },
+  "horeca-pas.test.js": {
+   "statisch": false
+  },
+  "horeca-pda.e2e.js": {
+   "statisch": false
+  },
+  "horeca-rahul.e2e.js": {
+   "statisch": false
+  },
+  "horeca-rahul.test.js": {
+   "statisch": false
+  },
+  "horeca-rekening.test.js": {
+   "statisch": false
+  },
+  "horeca-samenvoegen.test.js": {
+   "statisch": false
+  },
+  "horeca-stappen.test.js": {
+   "statisch": false
+  },
+  "horeca-verdeling.test.js": {
+   "statisch": false
+  },
+  "horeca-vloer.e2e.js": {
+   "statisch": false
+  },
+  "horeca-vloer.test.js": {
+   "statisch": false
+  },
+  "horeca-werklijst-modus.test.js": {
+   "statisch": false
+  },
+  "horeca-werklijst.test.js": {
+   "statisch": true
+  },
+  "horeca-wijk.test.js": {
+   "statisch": false
+  },
+  "horecascherm.e2e.js": {
+   "statisch": false
+  },
+  "horecaschermen.e2e.js": {
+   "statisch": false
+  },
+  "horlogewerk.test.js": {
+   "statisch": true
+  },
+  "hospitality-universe.test.js": {
+   "statisch": true
+  },
+  "housekeeping.test.js": {
+   "statisch": false
+  },
+  "hrplus.test.js": {
+   "statisch": false
+  },
+  "http1.test.js": {
+   "statisch": true
+  },
+  "http2.test.js": {
+   "statisch": true
+  },
+  "huis.e2e.js": {
+   "statisch": false
+  },
+  "huis.test.js": {
+   "statisch": false
+  },
+  "huisdb.test.js": {
+   "statisch": true
+  },
+  "huisstijl.test.js": {
+   "statisch": false
+  },
+  "hulpdienst.test.js": {
+   "statisch": false
+  },
+  "hulpdiensten-bord.test.js": {
+   "statisch": false
+  },
+  "hulpklassen.test.js": {
+   "statisch": true
+  },
+  "human-reality.test.js": {
+   "statisch": true
+  },
+  "i18n-auto.test.js": {
+   "statisch": true
+  },
+  "ideeen.test.js": {
+   "statisch": false
+  },
+  "idem-poort-echt.test.js": {
+   "statisch": true
+  },
+  "idem-poort.test.js": {
+   "statisch": true
+  },
+  "idembundel.test.js": {
+   "statisch": true
+  },
+  "idemcontract.test.js": {
+   "statisch": true
+  },
+  "idemidentiteit-velden.test.js": {
+   "statisch": true
+  },
+  "idemidentiteit.test.js": {
+   "statisch": true
+  },
+  "idemmeting.test.js": {
+   "statisch": true
+  },
+  "idempotentie.test.js": {
+   "statisch": true
+  },
+  "idemproef.test.js": {
+   "statisch": true
+  },
+  "idemschuld.test.js": {
+   "statisch": true
+  },
+  "idemtoerekening.test.js": {
+   "statisch": true
+  },
+  "idemvoorziening.test.js": {
+   "statisch": true
+  },
+  "idemwereld-voorvoegsel.test.js": {
+   "statisch": true
+  },
+  "idemwereld.test.js": {
+   "statisch": true
+  },
+  "identiteit-opvraag.test.js": {
+   "statisch": true
+  },
+  "identiteitschermen.e2e.js": {
+   "statisch": false
+  },
+  "idor.test.js": {
+   "statisch": true
+  },
+  "idperdeel.test.js": {
+   "statisch": true
+  },
+  "imageherkomst.test.js": {
+   "statisch": true
+  },
+  "imap.test.js": {
+   "statisch": true
+  },
+  "incident.test.js": {
+   "statisch": true
+  },
+  "incidentcontrole-route.test.js": {
+   "statisch": false
+  },
+  "incidentcontrole.test.js": {
+   "statisch": true
+  },
+  "inhoudswacht.test.js": {
+   "statisch": true
+  },
+  "inkoopketen.test.js": {
+   "statisch": false
+  },
+  "inlinestijl.test.js": {
+   "statisch": false
+  },
+  "inlogrem.test.js": {
+   "statisch": false
+  },
+  "inlogspoor.test.js": {
+   "statisch": false
+  },
+  "instant-reality.test.js": {
+   "statisch": true
+  },
+  "instap.test.js": {
+   "statisch": true
+  },
+  "instellingsweg.test.js": {
+   "statisch": false
+  },
+  "integratie-routes.test.js": {
+   "statisch": true
+  },
+  "intrekking-multi-instance.pg.test.js": {
+   "statisch": false
+  },
+  "intrekkingbus-realtime.test.js": {
+   "statisch": true
+  },
+  "intreklijst-failclosed.test.js": {
+   "statisch": true
+  },
+  "invoer.test.js": {
+   "statisch": true
+  },
+  "invoerbalie.e2e.js": {
+   "statisch": false
+  },
+  "invoerproef.test.js": {
+   "statisch": true
+  },
+  "inzagebewaring.test.js": {
+   "statisch": true
+  },
+  "inzagekaart.test.js": {
+   "statisch": true
+  },
+  "inzagelog.test.js": {
+   "statisch": true
+  },
+  "ioslaag.e2e.js": {
+   "statisch": false
+  },
+  "isolatie-cockpit.e2e.js": {
+   "statisch": false
+  },
+  "isolatie-lid.test.js": {
+   "statisch": true
+  },
+  "isolatie-passkey.test.js": {
+   "statisch": true
+  },
+  "isolatie-productiepad.test.js": {
+   "statisch": false
+  },
+  "isolatie-realtime.test.js": {
+   "statisch": true
+  },
+  "isolatie-techniek.test.js": {
+   "statisch": false
+  },
+  "isolatie.test.js": {
+   "statisch": true
+  },
+  "isolatiedragers.test.js": {
+   "statisch": true
+  },
+  "isolatiepoort.test.js": {
+   "statisch": true
+  },
+  "isolatieregisters.test.js": {
+   "statisch": false
+  },
+  "jeugdbestuur.e2e.test.js": {
+   "statisch": false
+  },
+  "journaalbestand.test.js": {
+   "statisch": true
+  },
+  "journaalschrijf.test.js": {
+   "statisch": true
+  },
+  "journalistiek-redactie.test.js": {
+   "statisch": true
+  },
+  "juridischeschermen.e2e.js": {
+   "statisch": false
+  },
+  "kaart.test.js": {
+   "statisch": true
+  },
+  "kantoor.e2e.js": {
+   "statisch": false
+  },
+  "kantoorawait.test.js": {
+   "statisch": false
+  },
+  "kantoorbank.test.js": {
+   "statisch": true
+  },
+  "kantoordeur.e2e.js": {
+   "statisch": false
+  },
+  "kantoordeuren.e2e.js": {
+   "statisch": false
+  },
+  "kantoordienst.test.js": {
+   "statisch": true
+  },
+  "kantoorgesprek.e2e.js": {
+   "statisch": false
+  },
+  "kantoorgesprek.test.js": {
+   "statisch": false
+  },
+  "kantoorkamer.test.js": {
+   "statisch": true
+  },
+  "kantoormacht.test.js": {
+   "statisch": true
+  },
+  "kantoorpakket-alle.test.js": {
+   "statisch": false
+  },
+  "kantoorregisters.e2e.js": {
+   "statisch": false
+  },
+  "kantoorroutes.test.js": {
+   "statisch": true
+  },
+  "kantoorwereld.test.js": {
+   "statisch": true
+  },
+  "kantoren-uitbreiding.test.js": {
+   "statisch": false
+  },
+  "kantoren.test.js": {
+   "statisch": false
+  },
+  "kappen.test.js": {
+   "statisch": true
+  },
+  "kassa-herhaling.test.js": {
+   "statisch": false
+  },
+  "kassa-modus.test.js": {
+   "statisch": false
+  },
+  "kassa-premium.test.js": {
+   "statisch": false
+  },
+  "kassawachtrij.e2e.js": {
+   "statisch": false
+  },
+  "kern-afgeleid.test.js": {
+   "statisch": true
+  },
+  "kern-events.test.js": {
+   "statisch": true
+  },
+  "kern-fiscaal.test.js": {
+   "statisch": true
+  },
+  "kern-live.test.js": {
+   "statisch": true
+  },
+  "kern-util.test.js": {
+   "statisch": true
+  },
+  "keten.test.js": {
+   "statisch": true
+  },
+  "ketenbereik.test.js": {
+   "statisch": true
+  },
+  "ketenchat.test.js": {
+   "statisch": false
+  },
+  "ketenproef.test.js": {
+   "statisch": true
+  },
+  "keuken.test.js": {
+   "statisch": false
+  },
+  "keuring-werkboom.test.js": {
+   "statisch": true
+  },
+  "keuring.test.js": {
+   "statisch": true
+  },
+  "keuringsindex.test.js": {
+   "statisch": true
+  },
+  "kijken.test.js": {
+   "statisch": true
+  },
+  "kijkplicht.test.js": {
+   "statisch": false
+  },
+  "klankwerk.e2e.js": {
+   "statisch": false
+  },
+  "klantnaad.test.js": {
+   "statisch": true
+  },
+  "kleef-readyourwrites.test.js": {
+   "statisch": true
+  },
+  "kleine-grendels.test.js": {
+   "statisch": false
+  },
+  "klets.test.js": {
+   "statisch": true
+  },
+  "klimaatfonds-scherm.e2e.js": {
+   "statisch": false
+  },
+  "klok.test.js": {
+   "statisch": true
+  },
+  "klokwacht.test.js": {
+   "statisch": true
+  },
+  "kluis-binding.test.js": {
+   "statisch": true
+  },
+  "kluis-rotatie.test.js": {
+   "statisch": true
+  },
+  "kluispoort.test.js": {
+   "statisch": false
+  },
+  "knelpunt-openingen.test.js": {
+   "statisch": true
+  },
+  "knelpunt.test.js": {
+   "statisch": true
+  },
+  "koppels.test.js": {
+   "statisch": false
+  },
+  "kosten.e2e.js": {
+   "statisch": false
+  },
+  "kosten.test.js": {
+   "statisch": false
+  },
+  "kostengrens.test.js": {
+   "statisch": true
+  },
+  "kostenherkomst.test.js": {
+   "statisch": false
+  },
+  "kostenketen.test.js": {
+   "statisch": false
+  },
+  "kostenklant.e2e.js": {
+   "statisch": false
+  },
+  "kostenmeters.test.js": {
+   "statisch": true
+  },
+  "kostenperiode.test.js": {
+   "statisch": false
+  },
+  "kostenvooruitblik.test.js": {
+   "statisch": true
+  },
+  "kostenzaak.test.js": {
+   "statisch": false
+  },
+  "krimpronde.test.js": {
+   "statisch": true
+  },
+  "kruisscan.test.js": {
+   "statisch": true
+  },
+  "kwaliteit.test.js": {
+   "statisch": true
+  },
+  "kwijtschelding-scherm.e2e.js": {
+   "statisch": false
+  },
+  "kycspoor.test.js": {
+   "statisch": false
+  },
+  "laatste-negen.test.js": {
+   "statisch": false
+  },
+  "laatste-twee-endpoints.test.js": {
+   "statisch": false
+  },
+  "laatstedrie.e2e.js": {
+   "statisch": false
+  },
+  "lab-geheim.test.js": {
+   "statisch": true
+  },
+  "lab2-bewoner.test.js": {
+   "statisch": false
+  },
+  "lab2-werk.test.js": {
+   "statisch": false
+  },
+  "labfonds-onderzoek.test.js": {
+   "statisch": true
+  },
+  "labfonds.test.js": {
+   "statisch": true
+  },
+  "landdekking.test.js": {
+   "statisch": true
+  },
+  "landpakket.test.js": {
+   "statisch": true
+  },
+  "lcov.test.js": {
+   "statisch": true
+  },
+  "leden-gids-pg.test.js": {
+   "statisch": false
+  },
+  "leden-teller.test.js": {
+   "statisch": false
+  },
+  "ledenaflopen.test.js": {
+   "statisch": false
+  },
+  "ledenbalie.test.js": {
+   "statisch": false
+  },
+  "ledenbaliespoor.test.js": {
+   "statisch": false
+  },
+  "ledengids-race.test.js": {
+   "statisch": true
+  },
+  "ledenladder.test.js": {
+   "statisch": false
+  },
+  "ledenregister.test.js": {
+   "statisch": true
+  },
+  "ledenschermen.e2e.js": {
+   "statisch": false
+  },
+  "leegtemeting.e2e.js": {
+   "statisch": true
+  },
+  "leerfabric.test.js": {
+   "statisch": true
+  },
+  "leerpaspoort-scherm.e2e.js": {
+   "statisch": false
+  },
+  "leerstof.test.js": {
+   "statisch": false
+  },
+  "leerstofbreed.test.js": {
+   "statisch": true
+  },
+  "leerstofvo.test.js": {
+   "statisch": false
+  },
+  "leespad-schrijft-niet.test.js": {
+   "statisch": true
+  },
+  "leeszonderscheppen.test.js": {
+   "statisch": true
+  },
+  "legacy-codeportaal-productiepoort.test.js": {
+   "statisch": true
+  },
+  "leren-leden.test.js": {
+   "statisch": false
+  },
+  "leren.test.js": {
+   "statisch": false
+  },
+  "lescode-rem.test.js": {
+   "statisch": false
+  },
+  "letters.test.js": {
+   "statisch": true
+  },
+  "leven.e2e.js": {
+   "statisch": false
+  },
+  "levenbandroutes.test.js": {
+   "statisch": false
+  },
+  "levensband.test.js": {
+   "statisch": true
+  },
+  "levensbeleid.test.js": {
+   "statisch": true
+  },
+  "levensgraafleven.test.js": {
+   "statisch": true
+  },
+  "levenslijn.test.js": {
+   "statisch": true
+  },
+  "levensloop.test.js": {
+   "statisch": false
+  },
+  "levenspas.e2e.js": {
+   "statisch": false
+  },
+  "leverancierpoort.test.js": {
+   "statisch": true
+  },
+  "lib.test.js": {
+   "statisch": true
+  },
+  "lidabonnement-deur.test.js": {
+   "statisch": false
+  },
+  "lidabonnement.test.js": {
+   "statisch": true
+  },
+  "lidboard.test.js": {
+   "statisch": true
+  },
+  "lidfactuur.test.js": {
+   "statisch": true
+  },
+  "lidmaatschap.test.js": {
+   "statisch": true
+  },
+  "lidpoort.test.js": {
+   "statisch": true
+  },
+  "lidsleutel.test.js": {
+   "statisch": true
+  },
+  "liegend-scherm.e2e.js": {
+   "statisch": true
+  },
+  "liegpoort.test.js": {
+   "statisch": true
+  },
+  "life-lagen.test.js": {
+   "statisch": true
+  },
+  "life-schakelbaar.test.js": {
+   "statisch": true
+  },
+  "life-scherm.e2e.js": {
+   "statisch": false
+  },
+  "life.test.js": {
+   "statisch": true
+  },
+  "lifecommand.e2e.js": {
+   "statisch": false
+  },
+  "lifestyle.test.js": {
+   "statisch": false
+  },
+  "lifestyleschermen.e2e.js": {
+   "statisch": false
+  },
+  "lijfsleutels.test.js": {
+   "statisch": true
+  },
+  "link.test.js": {
+   "statisch": true
+  },
+  "linkcap.test.js": {
+   "statisch": true
+  },
+  "linkgezin.e2e.js": {
+   "statisch": false
+  },
+  "linkgezin.test.js": {
+   "statisch": false
+  },
+  "linkkaart.test.js": {
+   "statisch": true
+  },
+  "linkkassa.test.js": {
+   "statisch": true
+  },
+  "linkkoppelingen.test.js": {
+   "statisch": false
+  },
+  "linkkoppelingenui.test.js": {
+   "statisch": true
+  },
+  "linkscan.e2e.js": {
+   "statisch": false
+  },
+  "live-kandidaat.test.js": {
+   "statisch": true
+  },
+  "livegang-pakket.test.js": {
+   "statisch": true
+  },
+  "livegang.test.js": {
+   "statisch": true
+  },
+  "livinglab-capsule.test.js": {
+   "statisch": true
+  },
+  "livinglab-instrument.test.js": {
+   "statisch": true
+  },
+  "livinglab-ledger.test.js": {
+   "statisch": true
+  },
+  "livinglab-nummer.test.js": {
+   "statisch": true
+  },
+  "livinglab-observatorium.test.js": {
+   "statisch": true
+  },
+  "livinglab-publicatie.test.js": {
+   "statisch": true
+  },
+  "livinglab-routes.test.js": {
+   "statisch": false
+  },
+  "livinglab-terugtrekken.test.js": {
+   "statisch": false
+  },
+  "livinglab-uitleen.test.js": {
+   "statisch": false
+  },
+  "livinglab-vraagbesluit.test.js": {
+   "statisch": true
+  },
+  "livinglab.e2e.js": {
+   "statisch": false
+  },
+  "livinglab.test.js": {
+   "statisch": true
+  },
+  "loghygiene.test.js": {
+   "statisch": true
+  },
+  "logstroom.test.js": {
+   "statisch": true
+  },
+  "lokaal-eerst.test.js": {
+   "statisch": true
+  },
+  "lokaal-tls.test.js": {
+   "statisch": true
+  },
+  "lokaaladres.test.js": {
+   "statisch": true
+  },
+  "lokale-ai-poort.test.js": {
+   "statisch": true
+  },
+  "lokale-taal.test.js": {
+   "statisch": true
+  },
+  "loonstrook-portaal.test.js": {
+   "statisch": false
+  },
+  "loopbaan.e2e.js": {
+   "statisch": false
+  },
+  "luchthaven-vip.test.js": {
+   "statisch": false
+  },
+  "luchthaven.test.js": {
+   "statisch": false
+  },
+  "luchtzijde-taal.test.js": {
+   "statisch": false
+  },
+  "lussen.test.js": {
+   "statisch": true
+  },
+  "machinedekking.test.js": {
+   "statisch": true
+  },
+  "magnaat-capabilities.test.js": {
+   "statisch": true
+  },
+  "magnaat-controle.test.js": {
+   "statisch": true
+  },
+  "magnaat-economenlab.test.js": {
+   "statisch": true
+  },
+  "magnaat-economie.test.js": {
+   "statisch": true
+  },
+  "magnaat-hospitality.test.js": {
+   "statisch": true
+  },
+  "magnaat-leerkring.test.js": {
+   "statisch": true
+  },
+  "magnaat-motorklant.test.js": {
+   "statisch": true
+  },
+  "magnaat-partnerstudio-routes.test.js": {
+   "statisch": false
+  },
+  "magnaat-partnerstudio.e2e.js": {
+   "statisch": false
+  },
+  "magnaat-partnerstudio.test.js": {
+   "statisch": true
+  },
+  "magnaat-rtgketen.test.js": {
+   "statisch": true
+  },
+  "magnaat-rust-integratie.test.js": {
+   "statisch": true
+  },
+  "magnaat-teamkamer-productie.test.js": {
+   "statisch": true
+  },
+  "magnaat-trainingslobby.test.js": {
+   "statisch": true
+  },
+  "magnaat-voorzijde.test.js": {
+   "statisch": true
+  },
+  "magnaat-werkroutefabriek.test.js": {
+   "statisch": true
+  },
+  "magnaatlab.test.js": {
+   "statisch": true
+  },
+  "magnaatwereld.test.js": {
+   "statisch": true
+  },
+  "mail-eigen.test.js": {
+   "statisch": true
+  },
+  "mail-publiek.test.js": {
+   "statisch": true
+  },
+  "mail-uitgang.test.js": {
+   "statisch": true
+  },
+  "mailauth.test.js": {
+   "statisch": true
+  },
+  "mailbijlage.test.js": {
+   "statisch": true
+  },
+  "maildns.test.js": {
+   "statisch": true
+  },
+  "mailpost-kantoor.test.js": {
+   "statisch": false
+  },
+  "mailpost.test.js": {
+   "statisch": true
+  },
+  "makers.test.js": {
+   "statisch": true
+  },
+  "mall-bestellingen.test.js": {
+   "statisch": true
+  },
+  "mall-bewaard.test.js": {
+   "statisch": true
+  },
+  "mall-collecties.test.js": {
+   "statisch": true
+  },
+  "mall-concierge.test.js": {
+   "statisch": true
+  },
+  "mall-context.test.js": {
+   "statisch": true
+  },
+  "mall-extern.test.js": {
+   "statisch": true
+  },
+  "mall-kaart.test.js": {
+   "statisch": true
+  },
+  "mall-lijsten.test.js": {
+   "statisch": true
+  },
+  "mall-supplieros.test.js": {
+   "statisch": true
+  },
+  "mall-vestigingen.test.js": {
+   "statisch": true
+  },
+  "mall-vindlaag.test.js": {
+   "statisch": true
+  },
+  "mall-vraagbeeld.test.js": {
+   "statisch": true
+  },
+  "mall.test.js": {
+   "statisch": false
+  },
+  "malwarescan-dicht.test.js": {
+   "statisch": true
+  },
+  "mandaatpoort.test.js": {
+   "statisch": true
+  },
+  "mandaatproef.test.js": {
+   "statisch": true
+  },
+  "marechaussee.test.js": {
+   "statisch": false
+  },
+  "margeschaal.test.js": {
+   "statisch": true
+  },
+  "marina.test.js": {
+   "statisch": false
+  },
+  "markt-zaak.test.js": {
+   "statisch": false
+  },
+  "markt.test.js": {
+   "statisch": false
+  },
+  "materiaal.test.js": {
+   "statisch": true
+  },
+  "mdm.test.js": {
+   "statisch": true
+  },
+  "media-gedeelde-proef.test.js": {
+   "statisch": true
+  },
+  "media-productieconfig.test.js": {
+   "statisch": true
+  },
+  "media-voorzijde.test.js": {
+   "statisch": true
+  },
+  "media.e2e.js": {
+   "statisch": false
+  },
+  "media.test.js": {
+   "statisch": true
+  },
+  "mediadelen.test.js": {
+   "statisch": false
+  },
+  "medialijst.e2e.js": {
+   "statisch": false
+  },
+  "medialijstdelen.test.js": {
+   "statisch": false
+  },
+  "medialijsten.test.js": {
+   "statisch": false
+  },
+  "mediaos.test.js": {
+   "statisch": true
+  },
+  "mediasamen.test.js": {
+   "statisch": false
+  },
+  "mediazaak.e2e.js": {
+   "statisch": false
+  },
+  "mediazaak.test.js": {
+   "statisch": false
+  },
+  "medicatie.test.js": {
+   "statisch": false
+  },
+  "medicijnen-scherm.e2e.js": {
+   "statisch": false
+  },
+  "meelezen.test.js": {
+   "statisch": true
+  },
+  "meet-credential.test.js": {
+   "statisch": true
+  },
+  "meet-routes-failclosed.test.js": {
+   "statisch": true
+  },
+  "meet.e2e.js": {
+   "statisch": false
+  },
+  "meet.test.js": {
+   "statisch": false
+  },
+  "meetbron.test.js": {
+   "statisch": true
+  },
+  "meetketen.test.js": {
+   "statisch": true
+  },
+  "meetkeuring.test.js": {
+   "statisch": true
+  },
+  "meetserver-schorspoort.test.js": {
+   "statisch": true
+  },
+  "memo.e2e.js": {
+   "statisch": false
+  },
+  "memo.test.js": {
+   "statisch": false
+  },
+  "menscontext.test.js": {
+   "statisch": true
+  },
+  "mensdeur-route.test.js": {
+   "statisch": false
+  },
+  "mensdeur.test.js": {
+   "statisch": true
+  },
+  "menselijkebanen.test.js": {
+   "statisch": true
+  },
+  "menselijkeuitvoering.test.js": {
+   "statisch": true
+  },
+  "menselijkverkeer.test.js": {
+   "statisch": false
+  },
+  "mensmutatie.test.js": {
+   "statisch": true
+  },
+  "menstaal.test.js": {
+   "statisch": true
+  },
+  "merge3.property.test.js": {
+   "statisch": true
+  },
+  "merkkern.test.js": {
+   "statisch": true
+  },
+  "meterijk.test.js": {
+   "statisch": true
+  },
+  "meterwet.test.js": {
+   "statisch": true
+  },
+  "metgezelwijkt.e2e.js": {
+   "statisch": false
+  },
+  "metier.e2e.js": {
+   "statisch": false
+  },
+  "metier.test.js": {
+   "statisch": true
+  },
+  "meting.test.js": {
+   "statisch": true
+  },
+  "metingcapaciteit.test.js": {
+   "statisch": true
+  },
+  "metingen.test.js": {
+   "statisch": true
+  },
+  "metingpoort.test.js": {
+   "statisch": true
+  },
+  "metingtenant.test.js": {
+   "statisch": true
+  },
+  "middleware.test.js": {
+   "statisch": true
+  },
+  "migratierace.test.js": {
+   "statisch": true
+  },
+  "migraties.test.js": {
+   "statisch": true
+  },
+  "mijn-isolatie.e2e.js": {
+   "statisch": false
+  },
+  "mijn-relaties-scherm.e2e.js": {
+   "statisch": false
+  },
+  "mijn-sessies-scherm.e2e.js": {
+   "statisch": false
+  },
+  "mijnrtg-routes.test.js": {
+   "statisch": true
+  },
+  "mijnsessies.test.js": {
+   "statisch": true
+  },
+  "minify.test.js": {
+   "statisch": true
+  },
+  "mn01-bevoegdheidsvoordeel.test.js": {
+   "statisch": true
+  },
+  "mn02-hoedanigheidsscheiding.test.js": {
+   "statisch": false
+  },
+  "mn02ai-contextbesmetting.test.js": {
+   "statisch": false
+  },
+  "mn03-commercieelvoordeel.test.js": {
+   "statisch": true
+  },
+  "mobiel.test.js": {
+   "statisch": true
+  },
+  "mobiliteit-werkkant-routes.test.js": {
+   "statisch": false
+  },
+  "mobiliteit.test.js": {
+   "statisch": false
+  },
+  "mobiliteitscherm.e2e.js": {
+   "statisch": false
+  },
+  "modebezorg.test.js": {
+   "statisch": false
+  },
+  "modelkeuze.test.js": {
+   "statisch": true
+  },
+  "moedertaal.test.js": {
+   "statisch": false
+  },
+  "mollie-config.test.js": {
+   "statisch": true
+  },
+  "mollie-eigen.test.js": {
+   "statisch": true
+  },
+  "momentproef.test.js": {
+   "statisch": false
+  },
+  "mond.test.js": {
+   "statisch": true
+  },
+  "money-credential-productiepoort.test.js": {
+   "statisch": true
+  },
+  "motor-initialisatie.test.js": {
+   "statisch": true
+  },
+  "motor-vingerafdruk.test.js": {
+   "statisch": true
+  },
+  "motorverbinding.test.js": {
+   "statisch": true
+  },
+  "motorzekering.test.js": {
+   "statisch": true
+  },
+  "move-keten.test.js": {
+   "statisch": false
+  },
+  "move.e2e.js": {
+   "statisch": false
+  },
+  "move.test.js": {
+   "statisch": true
+  },
+  "moveproef.test.js": {
+   "statisch": false
+  },
+  "mrz.test.js": {
+   "statisch": true
+  },
+  "multi-instance-sqlite.test.js": {
+   "statisch": false
+  },
+  "munten.test.js": {
+   "statisch": true
+  },
+  "mutatie.test.js": {
+   "statisch": true
+  },
+  "mutatieboek.test.js": {
+   "statisch": true
+  },
+  "mutatiecontract.test.js": {
+   "statisch": true
+  },
+  "mutatiedekking.test.js": {
+   "statisch": true
+  },
+  "mutatiesemantiek.test.js": {
+   "statisch": true
+  },
+  "mutatiewacht.test.js": {
+   "statisch": true
+  },
+  "muziek-lied.test.js": {
+   "statisch": true
+  },
+  "muziek-uitgave.test.js": {
+   "statisch": false
+  },
+  "muziek.test.js": {
+   "statisch": true
+  },
+  "naamlaag.test.js": {
+   "statisch": false
+  },
+  "naarkassa.test.js": {
+   "statisch": false
+  },
+  "namensprojectie.test.js": {
+   "statisch": true
+  },
+  "namensverklaring.test.js": {
+   "statisch": true
+  },
+  "namensversmalling-bedrading.test.js": {
+   "statisch": true
+  },
+  "namensversmalling.test.js": {
+   "statisch": true
+  },
+  "namensvorm.test.js": {
+   "statisch": true
+  },
+  "naslag.test.js": {
+   "statisch": true
+  },
+  "navigatie-index.test.js": {
+   "statisch": true
+  },
+  "navigatie.test.js": {
+   "statisch": true
+  },
+  "navigatiegebieden.test.js": {
+   "statisch": true
+  },
+  "navigatiegebiednet.test.js": {
+   "statisch": true
+  },
+  "navigatiekaarten.e2e.js": {
+   "statisch": true
+  },
+  "navigatiemijnkaarten.test.js": {
+   "statisch": true
+  },
+  "navigatieproef.test.js": {
+   "statisch": true
+  },
+  "navigatietoestelpakket.test.js": {
+   "statisch": true
+  },
+  "negenplus.test.js": {
+   "statisch": true
+  },
+  "neiging-scherm.e2e.js": {
+   "statisch": true
+  },
+  "neiging.e2e.js": {
+   "statisch": false
+  },
+  "neiging.test.js": {
+   "statisch": true
+  },
+  "nieuwe-endpoints.test.js": {
+   "statisch": false
+  },
+  "nieuwe-schermen.e2e.js": {
+   "statisch": false
+  },
+  "nieuweroutes.test.js": {
+   "statisch": true
+  },
+  "nieuwlid-leeg.test.js": {
+   "statisch": false
+  },
+  "noodkaart.test.js": {
+   "statisch": false
+  },
+  "noodrem-bron.test.js": {
+   "statisch": false
+  },
+  "normbasis.test.js": {
+   "statisch": true
+  },
+  "normprestatie.test.js": {
+   "statisch": true
+  },
+  "normverval.test.js": {
+   "statisch": true
+  },
+  "notities.e2e.js": {
+   "statisch": false
+  },
+  "notities.test.js": {
+   "statisch": false
+  },
+  "notitiesduurzaam.test.js": {
+   "statisch": true
+  },
+  "objectlaag.test.js": {
+   "statisch": true
+  },
+  "objectlaagroutes.test.js": {
+   "statisch": false
+  },
+  "objectmodel.test.js": {
+   "statisch": true
+  },
+  "objectoogst.test.js": {
+   "statisch": true
+  },
+  "objectpagina.test.js": {
+   "statisch": true
+  },
+  "objectpaneel.e2e.js": {
+   "statisch": false
+  },
+  "objectpool.test.js": {
+   "statisch": true
+  },
+  "objectveld.test.js": {
+   "statisch": true
+  },
+  "ochtend.test.js": {
+   "statisch": false
+  },
+  "office-bank.test.js": {
+   "statisch": false
+  },
+  "office-blad.e2e.js": {
+   "statisch": false
+  },
+  "office-blad.test.js": {
+   "statisch": false
+  },
+  "office-enterprise.test.js": {
+   "statisch": false
+  },
+  "office-formschets.e2e.js": {
+   "statisch": false
+  },
+  "office-payroll-dekking.test.js": {
+   "statisch": false
+  },
+  "office-suite.e2e.js": {
+   "statisch": false
+  },
+  "office-tweede-helft.test.js": {
+   "statisch": false
+  },
+  "office.test.js": {
+   "statisch": false
+  },
+  "officebord.test.js": {
+   "statisch": false
+  },
+  "ogen.test.js": {
+   "statisch": true
+  },
+  "omzetproef.test.js": {
+   "statisch": false
+  },
+  "onbewezen.test.js": {
+   "statisch": true
+  },
+  "onboarding-inrichten.test.js": {
+   "statisch": false
+  },
+  "onboarding-meebouwen.test.js": {
+   "statisch": true
+  },
+  "onboarding.test.js": {
+   "statisch": true
+  },
+  "onderhoud.test.js": {
+   "statisch": true
+  },
+  "ondernemerbewijs.test.js": {
+   "statisch": false
+  },
+  "ondernemerpoort-e2e.test.js": {
+   "statisch": false
+  },
+  "ondernemerpoort.test.js": {
+   "statisch": true
+  },
+  "ondernemerslus.test.js": {
+   "statisch": true
+  },
+  "onderneming-belasting.test.js": {
+   "statisch": true
+  },
+  "onderneming-bestuur.test.js": {
+   "statisch": true
+  },
+  "onderneming-capaciteit.test.js": {
+   "statisch": true
+  },
+  "onderneming-contracten.test.js": {
+   "statisch": true
+  },
+  "onderneming-crediteuren.test.js": {
+   "statisch": true
+  },
+  "onderneming-dagbeeld.test.js": {
+   "statisch": true
+  },
+  "onderneming-debiteuren.test.js": {
+   "statisch": true
+  },
+  "onderneming-eersteklant.test.js": {
+   "statisch": true
+  },
+  "onderneming-kas.test.js": {
+   "statisch": true
+  },
+  "onderneming-klussen.test.js": {
+   "statisch": true
+  },
+  "onderneming-mallprofiel.test.js": {
+   "statisch": true
+  },
+  "onderneming-offertebouw.test.js": {
+   "statisch": true
+  },
+  "onderneming-ontwerper.test.js": {
+   "statisch": true
+  },
+  "onderneming-oprichting.test.js": {
+   "statisch": true
+  },
+  "onderneming-pijplijn.test.js": {
+   "statisch": true
+  },
+  "onderneming-rechtsvormen.test.js": {
+   "statisch": true
+  },
+  "onderneming-regie.test.js": {
+   "statisch": true
+  },
+  "onderneming-relaties.test.js": {
+   "statisch": true
+  },
+  "onderneming-routes.test.js": {
+   "statisch": false
+  },
+  "onderneming-scherm.e2e.js": {
+   "statisch": false
+  },
+  "onderneming-toegang.test.js": {
+   "statisch": true
+  },
+  "onderneming-verkenning.test.js": {
+   "statisch": true
+  },
+  "onderneming-voorraad.test.js": {
+   "statisch": true
+  },
+  "onderneming-werving.test.js": {
+   "statisch": true
+  },
+  "onderneming-zaakkant.test.js": {
+   "statisch": false
+  },
+  "onderneming.test.js": {
+   "statisch": true
+  },
+  "ondertitels.test.js": {
+   "statisch": true
+  },
+  "onderwijs.test.js": {
+   "statisch": false
+  },
+  "onderwijsstuur.test.js": {
+   "statisch": false
+  },
+  "onderzoeker.test.js": {
+   "statisch": false
+  },
+  "onderzoekslab.test.js": {
+   "statisch": false
+  },
+  "onnozel.test.js": {
+   "statisch": false
+  },
+  "ontmoeting-leeg.test.js": {
+   "statisch": false
+  },
+  "ontmoeting.test.js": {
+   "statisch": false
+  },
+  "ontvanger.test.js": {
+   "statisch": true
+  },
+  "ontwerp.test.js": {
+   "statisch": true
+  },
+  "ontwerpbank.test.js": {
+   "statisch": true
+  },
+  "oog.test.js": {
+   "statisch": false
+  },
+  "oplaadgat.test.js": {
+   "statisch": true
+  },
+  "opslag-voorcheck.test.js": {
+   "statisch": true
+  },
+  "opslagblokkade.test.js": {
+   "statisch": true
+  },
+  "opslagpoort.test.js": {
+   "statisch": true
+  },
+  "opvangleden.test.js": {
+   "statisch": true
+  },
+  "opvangroute.test.js": {
+   "statisch": false
+  },
+  "opvolging.test.js": {
+   "statisch": true
+  },
+  "outputaudit.test.js": {
+   "statisch": true
+  },
+  "ov-operatie.test.js": {
+   "statisch": true
+  },
+  "ov-regie.test.js": {
+   "statisch": true
+  },
+  "ov.test.js": {
+   "statisch": false
+  },
+  "overdracht.test.js": {
+   "statisch": true
+  },
+  "overheid.test.js": {
+   "statisch": false
+  },
+  "overheidschermen.e2e.js": {
+   "statisch": false
+  },
+  "overleving.test.js": {
+   "statisch": true
+  },
+  "overname.test.js": {
+   "statisch": true
+  },
+  "ovkaart.test.js": {
+   "statisch": false
+  },
+  "padgrens.test.js": {
+   "statisch": true
+  },
+  "paginaroutes.test.js": {
+   "statisch": false
+  },
+  "paginas.e2e.js": {
+   "statisch": false
+  },
+  "paginascripts.test.js": {
+   "statisch": false
+  },
+  "pakket.test.js": {
+   "statisch": true
+  },
+  "paktebetekenis.test.js": {
+   "statisch": true
+  },
+  "papieren-boardroom.test.js": {
+   "statisch": false
+  },
+  "papieren.test.js": {
+   "statisch": true
+  },
+  "partner.test.js": {
+   "statisch": false
+  },
+  "partnerpas.test.js": {
+   "statisch": true
+  },
+  "partnertypes.test.js": {
+   "statisch": false
+  },
+  "pas-apps.test.js": {
+   "statisch": false
+  },
+  "pas-escalatie.test.js": {
+   "statisch": false
+  },
+  "pasladder.test.js": {
+   "statisch": true
+  },
+  "paspoort.test.js": {
+   "statisch": false
+  },
+  "pasprijs.test.js": {
+   "statisch": true
+  },
+  "pasroutes.test.js": {
+   "statisch": true
+  },
+  "passkeys-eerste.test.js": {
+   "statisch": false
+  },
+  "pay-grootboek.test.js": {
+   "statisch": true
+  },
+  "pay.test.js": {
+   "statisch": false
+  },
+  "paybudget.test.js": {
+   "statisch": true
+  },
+  "payout-terugboeking.pg.test.js": {
+   "statisch": true
+  },
+  "payout-terugboeking.sqlite.test.js": {
+   "statisch": false
+  },
+  "payout-terugboeking.test.js": {
+   "statisch": true
+  },
+  "payroll-aangifte.test.js": {
+   "statisch": true
+  },
+  "payroll-dekking.test.js": {
+   "statisch": true
+  },
+  "payroll-dossier.test.js": {
+   "statisch": true
+  },
+  "payroll-herkomst.test.js": {
+   "statisch": true
+  },
+  "payroll-journaal.test.js": {
+   "statisch": true
+  },
+  "payroll-loonheffing.test.js": {
+   "statisch": true
+  },
+  "payroll-motor.test.js": {
+   "statisch": true
+  },
+  "payroll-register-verzuim.test.js": {
+   "statisch": true
+  },
+  "payroll-routes.test.js": {
+   "statisch": false
+  },
+  "payroll-run.test.js": {
+   "statisch": true
+  },
+  "payroll-samenstellen.test.js": {
+   "statisch": true
+  },
+  "payroll-uren-controles.test.js": {
+   "statisch": true
+  },
+  "payroll-valuta.test.js": {
+   "statisch": true
+  },
+  "payroll.test.js": {
+   "statisch": true
+  },
+  "payrollkeur.e2e.js": {
+   "statisch": false
+  },
+  "paytegoed.e2e.js": {
+   "statisch": false
+  },
+  "paytegoed.test.js": {
+   "statisch": true
+  },
+  "payterug.test.js": {
+   "statisch": true
+  },
+  "payvooraf.test.js": {
+   "statisch": false
+  },
+  "pda-aanmelden.test.js": {
+   "statisch": false
+  },
+  "pda-netwerk.test.js": {
+   "statisch": false
+  },
+  "pda-ui.e2e.js": {
+   "statisch": false
+  },
+  "pdamodules.test.js": {
+   "statisch": true
+  },
+  "pdf.test.js": {
+   "statisch": true
+  },
+  "perimeter-risico.test.js": {
+   "statisch": false
+  },
+  "persistentiestand.test.js": {
+   "statisch": false
+  },
+  "persoonseis.test.js": {
+   "statisch": true
+  },
+  "persoonsroutes.test.js": {
+   "statisch": true
+  },
+  "pestgrens.test.js": {
+   "statisch": true
+  },
+  "pg-snapshot.test.js": {
+   "statisch": false
+  },
+  "pg-wachten.test.js": {
+   "statisch": true
+  },
+  "pg.test.js": {
+   "statisch": true
+  },
+  "pgaccounts.test.js": {
+   "statisch": true
+  },
+  "pgsync-voorrang.test.js": {
+   "statisch": true
+  },
+  "pgwire.test.js": {
+   "statisch": true
+  },
+  "pinherstel.e2e.js": {
+   "statisch": false
+  },
+  "pinvergeten.test.js": {
+   "statisch": false
+  },
+  "plaats.test.js": {
+   "statisch": true
+  },
+  "plaatsdienstbrug.e2e.js": {
+   "statisch": false
+  },
+  "plaatsdienstbrug.test.js": {
+   "statisch": false
+  },
+  "plaatsmotor.e2e.js": {
+   "statisch": false
+  },
+  "plaatsnadering.e2e.js": {
+   "statisch": false
+  },
+  "plaatspost.test.js": {
+   "statisch": false
+  },
+  "plaatsprikklok.test.js": {
+   "statisch": false
+  },
+  "plafonds.test.js": {
+   "statisch": true
+  },
+  "planners.test.js": {
+   "statisch": false
+  },
+  "platformregister.test.js": {
+   "statisch": false
+  },
+  "podium.test.js": {
+   "statisch": false
+  },
+  "podiumhandel.test.js": {
+   "statisch": false
+  },
+  "podiumzaak.test.js": {
+   "statisch": false
+  },
+  "podiumzones.test.js": {
+   "statisch": false
+  },
+  "pols.test.js": {
+   "statisch": true
+  },
+  "poortgesprek.e2e.js": {
+   "statisch": false
+  },
+  "poortrace.test.js": {
+   "statisch": false
+  },
+  "poortwacht-oordeel.test.js": {
+   "statisch": true
+  },
+  "poortwacht.test.js": {
+   "statisch": true
+  },
+  "portemonnee.test.js": {
+   "statisch": false
+  },
+  "post-scherm.e2e.js": {
+   "statisch": false
+  },
+  "postdatum.test.js": {
+   "statisch": true
+  },
+  "postgres-requestcommit.pg.test.js": {
+   "statisch": true
+  },
+  "postgres-requestcommit.test.js": {
+   "statisch": true
+  },
+  "postgres-transport.test.js": {
+   "statisch": true
+  },
+  "pragmavolgorde.test.js": {
+   "statisch": true
+  },
+  "premium.e2e.js": {
+   "statisch": false
+  },
+  "presentiemeting.test.js": {
+   "statisch": true
+  },
+  "prijsgarantie.e2e.js": {
+   "statisch": false
+  },
+  "prijsmelding.test.js": {
+   "statisch": true
+  },
+  "productie-communicatie.test.js": {
+   "statisch": true
+  },
+  "productie-installatie.test.js": {
+   "statisch": true
+  },
+  "productie-motor.test.js": {
+   "statisch": true
+  },
+  "productie-promotie.test.js": {
+   "statisch": true
+  },
+  "productie-status.test.js": {
+   "statisch": true
+  },
+  "productie-vrijgave.test.js": {
+   "statisch": true
+  },
+  "productie.test.js": {
+   "statisch": true
+  },
+  "productieseed.test.js": {
+   "statisch": true
+  },
+  "proefsleutels.test.js": {
+   "statisch": true
+  },
+  "project-room.test.js": {
+   "statisch": true
+  },
+  "provider-sandbox.test.js": {
+   "statisch": true
+  },
+  "proxykop.test.js": {
+   "statisch": true
+  },
+  "prplus.test.js": {
+   "statisch": false
+  },
+  "publieke-adressen.test.js": {
+   "statisch": false
+  },
+  "publieke-rand.test.js": {
+   "statisch": false
+  },
+  "publieke-tls-proef.test.js": {
+   "statisch": true
+  },
+  "pulse.test.js": {
+   "statisch": true
+  },
+  "punten.test.js": {
+   "statisch": true
+  },
+  "qr.test.js": {
+   "statisch": true
+  },
+  "qrscan.test.js": {
+   "statisch": true
+  },
+  "raakvlak.test.js": {
+   "statisch": true
+  },
+  "rahul-eerlijk.test.js": {
+   "statisch": true
+  },
+  "rahul-hart.test.js": {
+   "statisch": true
+  },
+  "rahul-mens.test.js": {
+   "statisch": true
+  },
+  "rahul-omgang.test.js": {
+   "statisch": true
+  },
+  "rahul-regie.test.js": {
+   "statisch": false
+  },
+  "rahul-reis.test.js": {
+   "statisch": false
+  },
+  "rahulscherm.e2e.js": {
+   "statisch": false
+  },
+  "railvergelijk.test.js": {
+   "statisch": true
+  },
+  "rampbeeld.test.js": {
+   "statisch": false
+  },
+  "randen.test.js": {
+   "statisch": true
+  },
+  "rechtbank.test.js": {
+   "statisch": false
+  },
+  "rechten.test.js": {
+   "statisch": true
+  },
+  "rechterhand-huis.test.js": {
+   "statisch": false
+  },
+  "rechterhand-reis.test.js": {
+   "statisch": false
+  },
+  "rechterhand-wissen.test.js": {
+   "statisch": false
+  },
+  "rechterhand.test.js": {
+   "statisch": false
+  },
+  "redactie.test.js": {
+   "statisch": false
+  },
+  "redis.test.js": {
+   "statisch": true
+  },
+  "redisbus-failclosed.test.js": {
+   "statisch": true
+  },
+  "refundmigratie.test.js": {
+   "statisch": true
+  },
+  "regelwacht-scherm.e2e.js": {
+   "statisch": false
+  },
+  "regexmutatie.test.js": {
+   "statisch": true
+  },
+  "regie.test.js": {
+   "statisch": false
+  },
+  "registereigenaar.test.js": {
+   "statisch": true
+  },
+  "registerklopt.test.js": {
+   "statisch": true
+  },
+  "reisaanbod.test.js": {
+   "statisch": false
+  },
+  "reisactiviteiten.test.js": {
+   "statisch": false
+  },
+  "reisagenda.test.js": {
+   "statisch": false
+  },
+  "reisbalie.e2e.js": {
+   "statisch": false
+  },
+  "reisbieb.test.js": {
+   "statisch": true
+  },
+  "reisboek-voorzijde.test.js": {
+   "statisch": true
+  },
+  "reisbureau-genre.test.js": {
+   "statisch": true
+  },
+  "reisbureau-nazorg.test.js": {
+   "statisch": false
+  },
+  "reisbureau.test.js": {
+   "statisch": false
+  },
+  "reisgezelschap-routes.test.js": {
+   "statisch": false
+  },
+  "reisgezelschap.test.js": {
+   "statisch": true
+  },
+  "reisherkomst.test.js": {
+   "statisch": true
+  },
+  "reisoplosser.test.js": {
+   "statisch": true
+  },
+  "reisplan.test.js": {
+   "statisch": false
+  },
+  "reisschermen.e2e.js": {
+   "statisch": false
+  },
+  "reisuitnodiging.e2e.js": {
+   "statisch": false
+  },
+  "reisuitnodiging.test.js": {
+   "statisch": true
+  },
+  "reiswacht.e2e.js": {
+   "statisch": false
+  },
+  "reiswacht.test.js": {
+   "statisch": true
+  },
+  "reiswereld.test.js": {
+   "statisch": true
+  },
+  "reiswijzer.test.js": {
+   "statisch": true
+  },
+  "reizen.test.js": {
+   "statisch": true
+  },
+  "reizenscherm.e2e.js": {
+   "statisch": false
+  },
+  "rekening.test.js": {
+   "statisch": false
+  },
+  "rekenmotor.test.js": {
+   "statisch": true
+  },
+  "rekenschuif.test.js": {
+   "statisch": true
+  },
+  "release-bewijs.test.js": {
+   "statisch": true
+  },
+  "release-hardening.test.js": {
+   "statisch": true
+  },
+  "rem.test.js": {
+   "statisch": true
+  },
+  "remduurzaam.test.js": {
+   "statisch": false
+  },
+  "rendezvous.test.js": {
+   "statisch": true
+  },
+  "reservering-beleid.test.js": {
+   "statisch": true
+  },
+  "residentie.test.js": {
+   "statisch": true
+  },
+  "residentie2.test.js": {
+   "statisch": false
+  },
+  "residentie3.test.js": {
+   "statisch": false
+  },
+  "residentie4.test.js": {
+   "statisch": true
+  },
+  "resolverbereik.test.js": {
+   "statisch": true
+  },
+  "resync-licht.test.js": {
+   "statisch": true
+  },
+  "retail-annulering.test.js": {
+   "statisch": true
+  },
+  "retail-prijs.test.js": {
+   "statisch": true
+  },
+  "retail.test.js": {
+   "statisch": false
+  },
+  "rijksles.test.js": {
+   "statisch": false
+  },
+  "risico.test.js": {
+   "statisch": true
+  },
+  "ritmigratie.test.js": {
+   "statisch": true
+  },
+  "ritproef.test.js": {
+   "statisch": true
+  },
+  "rollbackbesluit.test.js": {
+   "statisch": true
+  },
+  "rollenmatrix.test.js": {
+   "statisch": false
+  },
+  "rolproef.test.js": {
+   "statisch": true
+  },
+  "ronde.test.js": {
+   "statisch": true
+  },
+  "routebron.test.js": {
+   "statisch": true
+  },
+  "routedekking.e2e.js": {
+   "statisch": false
+  },
+  "routedekking.test.js": {
+   "statisch": true
+  },
+  "routedossier.test.js": {
+   "statisch": false
+  },
+  "routelog.test.js": {
+   "statisch": true
+  },
+  "routerindex.test.js": {
+   "statisch": true
+  },
+  "routermeting.test.js": {
+   "statisch": true
+  },
+  "routesbron.test.js": {
+   "statisch": true
+  },
+  "rtdocs-voorzijde.test.js": {
+   "statisch": true
+  },
+  "rtf-labfonds-deur.test.js": {
+   "statisch": false
+  },
+  "rtf-samen-credential.pg.test.js": {
+   "statisch": true
+  },
+  "rtf-samen-credential.test.js": {
+   "statisch": true
+  },
+  "rtf-samen-routes-failclosed.test.js": {
+   "statisch": true
+  },
+  "rtf-veilig.test.js": {
+   "statisch": false
+  },
+  "rtfagenda.e2e.js": {
+   "statisch": false
+  },
+  "rtfagenda.test.js": {
+   "statisch": false
+  },
+  "rtfalbum.e2e.js": {
+   "statisch": false
+  },
+  "rtfalbum.test.js": {
+   "statisch": false
+  },
+  "rtfbieb.test.js": {
+   "statisch": true
+  },
+  "rtfcampus.test.js": {
+   "statisch": true
+  },
+  "rtfcoderem.test.js": {
+   "statisch": false
+  },
+  "rtfcurve.e2e.js": {
+   "statisch": false
+  },
+  "rtfcurve.test.js": {
+   "statisch": false
+  },
+  "rtfgeld.e2e.js": {
+   "statisch": false
+  },
+  "rtfgeld.test.js": {
+   "statisch": false
+  },
+  "rtfhulpwijzer.e2e.js": {
+   "statisch": false
+  },
+  "rtfkantoor.test.js": {
+   "statisch": false
+  },
+  "rtfkinderschermen.e2e.js": {
+   "statisch": false
+  },
+  "rtfkosten.e2e.js": {
+   "statisch": false
+  },
+  "rtfleerlingtoegang.test.js": {
+   "statisch": true
+  },
+  "rtfos-afmaak.test.js": {
+   "statisch": false
+  },
+  "rtfos-bestuur.test.js": {
+   "statisch": false
+  },
+  "rtfos-context.test.js": {
+   "statisch": true
+  },
+  "rtfos-doelgroepen.test.js": {
+   "statisch": false
+  },
+  "rtfos-gift-ruil-routes.test.js": {
+   "statisch": true
+  },
+  "rtfos-gift.test.js": {
+   "statisch": true
+  },
+  "rtfos-governance.test.js": {
+   "statisch": false
+  },
+  "rtfos-netwerk.test.js": {
+   "statisch": false
+  },
+  "rtfos-portalen.test.js": {
+   "statisch": false
+  },
+  "rtfos-routes.test.js": {
+   "statisch": false
+  },
+  "rtfos-ruil.test.js": {
+   "statisch": true
+  },
+  "rtfos-uitvoering.test.js": {
+   "statisch": false
+  },
+  "rtfos-winkel.test.js": {
+   "statisch": true
+  },
+  "rtfos.test.js": {
+   "statisch": false
+  },
+  "rtfosafmaak.e2e.js": {
+   "statisch": false
+  },
+  "rtfosdoelgroepen.e2e.js": {
+   "statisch": false
+  },
+  "rtfosgovernance.e2e.js": {
+   "statisch": false
+  },
+  "rtfosschermen.e2e.js": {
+   "statisch": false
+  },
+  "rtfrust.e2e.js": {
+   "statisch": false
+  },
+  "rtfschool.test.js": {
+   "statisch": false
+  },
+  "rtfschool2.e2e.js": {
+   "statisch": false
+  },
+  "rtfschool2.test.js": {
+   "statisch": false
+  },
+  "rtfspeelhoek.e2e.js": {
+   "statisch": false
+  },
+  "rtfwallet.test.js": {
+   "statisch": true
+  },
+  "rtfwelzijn.e2e.js": {
+   "statisch": false
+  },
+  "rtfwelzijn.test.js": {
+   "statisch": false
+  },
+  "rtfwelzijn2.test.js": {
+   "statisch": false
+  },
+  "rtg-a11y.e2e.js": {
+   "statisch": true
+  },
+  "rtg-a11y.test.js": {
+   "statisch": true
+  },
+  "rtg-adaptive-edge.e2e.js": {
+   "statisch": false
+  },
+  "rtg-adaptive-edge.test.js": {
+   "statisch": true
+  },
+  "rtg-continue-key.test.js": {
+   "statisch": true
+  },
+  "rtg-dev.e2e.js": {
+   "statisch": true
+  },
+  "rtg-edge-2-pilots.test.js": {
+   "statisch": true
+  },
+  "rtg-edge-2.e2e.js": {
+   "statisch": false
+  },
+  "rtg-edge-2.test.js": {
+   "statisch": true
+  },
+  "rtg-edge-accessibility.test.js": {
+   "statisch": true
+  },
+  "rtg-edge-appbar.test.js": {
+   "statisch": true
+  },
+  "rtg-edge-boot.test.js": {
+   "statisch": false
+  },
+  "rtg-edge-uitrol.test.js": {
+   "statisch": false
+  },
+  "rtg-heritage-first-paint.test.js": {
+   "statisch": true
+  },
+  "rtg-heritage-motion.test.js": {
+   "statisch": true
+  },
+  "rtg-heritage-operational.test.js": {
+   "statisch": true
+  },
+  "rtg-heritage-order.test.js": {
+   "statisch": true
+  },
+  "rtg-heritage-transition.test.js": {
+   "statisch": false
+  },
+  "rtg-heritage.test.js": {
+   "statisch": true
+  },
+  "rtg-id-family.e2e.js": {
+   "statisch": true
+  },
+  "rtg-operation.test.js": {
+   "statisch": true
+  },
+  "rtg-route-memory.test.js": {
+   "statisch": true
+  },
+  "rtg-world-identity.test.js": {
+   "statisch": true
+  },
+  "rtg.test.js": {
+   "statisch": true
+  },
+  "rtgai.test.js": {
+   "statisch": false
+  },
+  "rtgcode.test.js": {
+   "statisch": true
+  },
+  "rtghorloge.test.js": {
+   "statisch": true
+  },
+  "rtgid-bewijs.test.js": {
+   "statisch": true
+  },
+  "rtgid-credential.pg.test.js": {
+   "statisch": true
+  },
+  "rtgid-credential.test.js": {
+   "statisch": true
+  },
+  "rtgid.test.js": {
+   "statisch": false
+  },
+  "rtgjson.test.js": {
+   "statisch": true
+  },
+  "rtgone-voorzijde.test.js": {
+   "statisch": true
+  },
+  "rtgone.test.js": {
+   "statisch": true
+  },
+  "rtmail-ai.test.js": {
+   "statisch": false
+  },
+  "rtmail-bestuur.test.js": {
+   "statisch": false
+  },
+  "rtmail-lid.test.js": {
+   "statisch": true
+  },
+  "rtmail-schrijf.test.js": {
+   "statisch": false
+  },
+  "rtmail-team.e2e.js": {
+   "statisch": false
+  },
+  "rtmail-team.test.js": {
+   "statisch": false
+  },
+  "rtmail-vak.e2e.js": {
+   "statisch": false
+  },
+  "rtmail-vak.test.js": {
+   "statisch": false
+  },
+  "rtmail-voorzijde.test.js": {
+   "statisch": true
+  },
+  "rtmail-werk.test.js": {
+   "statisch": false
+  },
+  "rtmail-zaak.test.js": {
+   "statisch": false
+  },
+  "rtmail.test.js": {
+   "statisch": true
+  },
+  "rugdekking.e2e.test.js": {
+   "statisch": false
+  },
+  "runtime-release-stempel.test.js": {
+   "statisch": true
+  },
+  "rust-migraties.test.js": {
+   "statisch": true
+  },
+  "rust-noodstop.test.js": {
+   "statisch": true
+  },
+  "rust.test.js": {
+   "statisch": false
+  },
+  "salon-app.e2e.js": {
+   "statisch": false
+  },
+  "salon-app.test.js": {
+   "statisch": false
+  },
+  "salon-claimcode-log.test.js": {
+   "statisch": true
+  },
+  "salon-claimcode.pg.test.js": {
+   "statisch": true
+  },
+  "salon-claimcode.test.js": {
+   "statisch": true
+  },
+  "salon-curatie.test.js": {
+   "statisch": true
+  },
+  "salon-verplicht.test.js": {
+   "statisch": false
+  },
+  "salonbeeld.test.js": {
+   "statisch": true
+  },
+  "salonbron-fotobank.test.js": {
+   "statisch": false
+  },
+  "salonviraal.test.js": {
+   "statisch": true
+  },
+  "samen-credential.test.js": {
+   "statisch": true
+  },
+  "samen-routes-failclosed.test.js": {
+   "statisch": true
+  },
+  "samen.test.js": {
+   "statisch": false
+  },
+  "samendelen.test.js": {
+   "statisch": false
+  },
+  "samenvoeging-routes.test.js": {
+   "statisch": false
+  },
+  "samenwerking.test.js": {
+   "statisch": false
+  },
+  "samlacs.test.js": {
+   "statisch": false
+  },
+  "samlc14n.test.js": {
+   "statisch": true
+  },
+  "samlpoort.test.js": {
+   "statisch": true
+  },
+  "samlxsw.test.js": {
+   "statisch": true
+  },
+  "satelliet.test.js": {
+   "statisch": false
+  },
+  "saveduurzaam.test.js": {
+   "statisch": false
+  },
+  "scan-tafel.e2e.js": {
+   "statisch": false
+  },
+  "scanner.e2e.js": {
+   "statisch": false
+  },
+  "scanner.test.js": {
+   "statisch": true
+  },
+  "scannerpdf.test.js": {
+   "statisch": true
+  },
+  "schaduw.test.js": {
+   "statisch": true
+  },
+  "schaduwtelling.test.js": {
+   "statisch": true
+  },
+  "schakelaar-zwijgt.test.js": {
+   "statisch": true
+  },
+  "schakelaarsdekking.test.js": {
+   "statisch": true
+  },
+  "schakelkast-dekking.test.js": {
+   "statisch": true
+  },
+  "scheiding.test.js": {
+   "statisch": false
+  },
+  "scherfmeter.test.js": {
+   "statisch": true
+  },
+  "schermleugen.test.js": {
+   "statisch": true
+  },
+  "schermmutatie.test.js": {
+   "statisch": true
+  },
+  "schermronde.test.js": {
+   "statisch": true
+  },
+  "schermsuite-bewijs.test.js": {
+   "statisch": true
+  },
+  "schild.test.js": {
+   "statisch": false
+  },
+  "schoneboom.test.js": {
+   "statisch": true
+  },
+  "school.test.js": {
+   "statisch": false
+  },
+  "schoolaanwezig.test.js": {
+   "statisch": false
+  },
+  "schooladvies.test.js": {
+   "statisch": true
+  },
+  "schoolbeeld.test.js": {
+   "statisch": false
+  },
+  "schoolbel.test.js": {
+   "statisch": false
+  },
+  "schooldirectie.test.js": {
+   "statisch": false
+  },
+  "schoolenterprise.test.js": {
+   "statisch": false
+  },
+  "schoolexcursie.test.js": {
+   "statisch": false
+  },
+  "schoolgeld.test.js": {
+   "statisch": false
+  },
+  "schoolhulplijn.test.js": {
+   "statisch": false
+  },
+  "schoolkoppel.test.js": {
+   "statisch": false
+  },
+  "schoolniveau.test.js": {
+   "statisch": false
+  },
+  "schoolpersoneelregistratie.test.js": {
+   "statisch": false
+  },
+  "schoolrest.test.js": {
+   "statisch": false
+  },
+  "schoolschermen.test.js": {
+   "statisch": false
+  },
+  "schooltaal.test.js": {
+   "statisch": false
+  },
+  "schooltoets.test.js": {
+   "statisch": false
+  },
+  "schoolverbonden.test.js": {
+   "statisch": false
+  },
+  "schorspoort.test.js": {
+   "statisch": true
+  },
+  "schrijfanalyse.test.js": {
+   "statisch": true
+  },
+  "schrijfproef.test.js": {
+   "statisch": true
+  },
+  "schuif.e2e.js": {
+   "statisch": false
+  },
+  "scim-deprovisioning-failclosed.test.js": {
+   "statisch": true
+  },
+  "scim-user-outbox.test.js": {
+   "statisch": true
+  },
+  "scim.test.js": {
+   "statisch": true
+  },
+  "scimgroepen.test.js": {
+   "statisch": false
+  },
+  "scriptafsplitsing.test.js": {
+   "statisch": true
+  },
+  "scriptbundel.test.js": {
+   "statisch": true
+  },
+  "seclock.test.js": {
+   "statisch": true
+  },
+  "second-screen-personal.test.js": {
+   "statisch": true
+  },
+  "securitylog-keten.test.js": {
+   "statisch": true
+  },
+  "selfhost.test.js": {
+   "statisch": true
+  },
+  "semantiek.test.js": {
+   "statisch": true
+  },
+  "semdiff.test.js": {
+   "statisch": true
+  },
+  "sentinel.test.js": {
+   "statisch": true
+  },
+  "server.test.js": {
+   "statisch": false
+  },
+  "service-routes.test.js": {
+   "statisch": false
+  },
+  "service.test.js": {
+   "statisch": false
+  },
+  "servicebel.e2e.js": {
+   "statisch": false
+  },
+  "servicecaps-releasepoort.test.js": {
+   "statisch": false
+  },
+  "servicecockpit.e2e.js": {
+   "statisch": false
+  },
+  "servicegesprek.test.js": {
+   "statisch": false
+  },
+  "servicehulp.e2e.js": {
+   "statisch": true
+  },
+  "servicekwaliteit.test.js": {
+   "statisch": true
+  },
+  "servicemachtiging.test.js": {
+   "statisch": true
+  },
+  "servicemens.test.js": {
+   "statisch": true
+  },
+  "servicepatroon.test.js": {
+   "statisch": false
+  },
+  "servicepost.test.js": {
+   "statisch": true
+  },
+  "servicewerkplek.e2e.js": {
+   "statisch": false
+  },
+  "servicezaak.test.js": {
+   "statisch": true
+  },
+  "ses-ontvangst.test.js": {
+   "statisch": true
+  },
+  "sessie-herstart.test.js": {
+   "statisch": false
+  },
+  "sessiecontext.test.js": {
+   "statisch": true
+  },
+  "sessiegrens.test.js": {
+   "statisch": false
+  },
+  "sessies.test.js": {
+   "statisch": true
+  },
+  "sessieverfijning.test.js": {
+   "statisch": true
+  },
+  "sessiewacht.test.js": {
+   "statisch": true
+  },
+  "signatureroutes.test.js": {
+   "statisch": true
+  },
+  "simulatiebank.test.js": {
+   "statisch": true
+  },
+  "simulatiebrug-productiepoort.test.js": {
+   "statisch": true
+  },
+  "skipwacht.test.js": {
+   "statisch": false
+  },
+  "sleutelwoorden.test.js": {
+   "statisch": true
+  },
+  "slo-routes.test.js": {
+   "statisch": false
+  },
+  "slo.test.js": {
+   "statisch": true
+  },
+  "sloophamer.pg.test.js": {
+   "statisch": false
+  },
+  "smtp-in.test.js": {
+   "statisch": true
+  },
+  "smtp.test.js": {
+   "statisch": true
+  },
+  "sni.test.js": {
+   "statisch": true
+  },
+  "sociaal-index.test.js": {
+   "statisch": true
+  },
+  "social-elite.test.js": {
+   "statisch": true
+  },
+  "socialebeleid-volgorde.test.js": {
+   "statisch": false
+  },
+  "socialebeleid.test.js": {
+   "statisch": true
+  },
+  "socialecommand.test.js": {
+   "statisch": true
+  },
+  "socialegraaf.test.js": {
+   "statisch": true
+  },
+  "socialelijn.test.js": {
+   "statisch": true
+  },
+  "socialewereld.test.js": {
+   "statisch": true
+  },
+  "societeit.test.js": {
+   "statisch": false
+  },
+  "soeverein.test.js": {
+   "statisch": true
+  },
+  "sparren.test.js": {
+   "statisch": true
+  },
+  "spelaandeel.test.js": {
+   "statisch": true
+  },
+  "spelbank.test.js": {
+   "statisch": true
+  },
+  "spelbeleid.test.js": {
+   "statisch": true
+  },
+  "speldag.test.js": {
+   "statisch": true
+  },
+  "spelhandel.test.js": {
+   "statisch": true
+  },
+  "spelkijken.test.js": {
+   "statisch": true
+  },
+  "spelklok.test.js": {
+   "statisch": true
+  },
+  "spellen.test.js": {
+   "statisch": true
+  },
+  "spelmaatje.test.js": {
+   "statisch": true
+  },
+  "spelmagnaat.test.js": {
+   "statisch": true
+  },
+  "spelnabespreking.test.js": {
+   "statisch": true
+  },
+  "spelnaspelen.test.js": {
+   "statisch": true
+  },
+  "spelpoort.test.js": {
+   "statisch": false
+  },
+  "spelpraat.e2e.js": {
+   "statisch": false
+  },
+  "spelpraat.test.js": {
+   "statisch": true
+  },
+  "spelpresence.test.js": {
+   "statisch": true
+  },
+  "spelprestaties.test.js": {
+   "statisch": true
+  },
+  "spelprojectie.pg.test.js": {
+   "statisch": true
+  },
+  "spelprojectie.test.js": {
+   "statisch": true
+  },
+  "spelquiz.test.js": {
+   "statisch": true
+  },
+  "spelregels-drift.test.js": {
+   "statisch": true
+  },
+  "spelregister.test.js": {
+   "statisch": true
+  },
+  "spelreplay.test.js": {
+   "statisch": true
+  },
+  "spelscherm.e2e.js": {
+   "statisch": false
+  },
+  "spelsudoku.e2e.js": {
+   "statisch": false
+  },
+  "spelsudoku.test.js": {
+   "statisch": true
+  },
+  "spelteams.e2e.js": {
+   "statisch": false
+  },
+  "spelteams.test.js": {
+   "statisch": true
+  },
+  "speltelling.test.js": {
+   "statisch": true
+  },
+  "speltoernooi.test.js": {
+   "statisch": true
+  },
+  "speluitslagen.test.js": {
+   "statisch": true
+  },
+  "spelvariant.test.js": {
+   "statisch": true
+  },
+  "spelveiling.test.js": {
+   "statisch": true
+  },
+  "spelverzekering.test.js": {
+   "statisch": true
+  },
+  "spoorvorm.test.js": {
+   "statisch": true
+  },
+  "sport-voorzijde.test.js": {
+   "statisch": true
+  },
+  "sportclub.test.js": {
+   "statisch": false
+  },
+  "spraaktekst.test.js": {
+   "statisch": true
+  },
+  "spreidingsoordeel.test.js": {
+   "statisch": true
+  },
+  "sprong.e2e.js": {
+   "statisch": true
+  },
+  "sprongindex.test.js": {
+   "statisch": false
+  },
+  "sso-werksync-failclosed.test.js": {
+   "statisch": true
+  },
+  "sso.test.js": {
+   "statisch": true
+  },
+  "ssrf.test.js": {
+   "statisch": true
+  },
+  "staatlog.test.js": {
+   "statisch": true
+  },
+  "staatproef.test.js": {
+   "statisch": true
+  },
+  "stad.test.js": {
+   "statisch": false
+  },
+  "stadsbesluit.test.js": {
+   "statisch": false
+  },
+  "stadsbestuur.test.js": {
+   "statisch": true
+  },
+  "stadshardware.test.js": {
+   "statisch": false
+  },
+  "stadskansen.test.js": {
+   "statisch": true
+  },
+  "stadsraad.test.js": {
+   "statisch": false
+  },
+  "stadstart.test.js": {
+   "statisch": true
+  },
+  "stadsweefsel-steden.test.js": {
+   "statisch": true
+  },
+  "stadsweefsel.test.js": {
+   "statisch": false
+  },
+  "staff-account-scherm.e2e.js": {
+   "statisch": false
+  },
+  "staff-inzet-mob.test.js": {
+   "statisch": false
+  },
+  "staff-pin-productie.test.js": {
+   "statisch": true
+  },
+  "staffgemoed.test.js": {
+   "statisch": false
+  },
+  "staffinvite.test.js": {
+   "statisch": false
+  },
+  "stagevorm.test.js": {
+   "statisch": true
+  },
+  "startpagina.test.js": {
+   "statisch": true
+  },
+  "stempel.test.js": {
+   "statisch": true
+  },
+  "stempelveiligheid.test.js": {
+   "statisch": true
+  },
+  "stijlafsplitsing.test.js": {
+   "statisch": true
+  },
+  "stijlbundel.test.js": {
+   "statisch": true
+  },
+  "stilalarm.test.js": {
+   "statisch": false
+  },
+  "stillepost.test.js": {
+   "statisch": true
+  },
+  "stillezing.test.js": {
+   "statisch": true
+  },
+  "storingen-bezorging.test.js": {
+   "statisch": true
+  },
+  "storingen-webhook.test.js": {
+   "statisch": true
+  },
+  "streng-poorten.test.js": {
+   "statisch": false
+  },
+  "strenge-poort.test.js": {
+   "statisch": false
+  },
+  "stripe-eigen.test.js": {
+   "statisch": true
+  },
+  "studio.test.js": {
+   "statisch": false
+  },
+  "stun.test.js": {
+   "statisch": true
+  },
+  "stuur-aanval.test.js": {
+   "statisch": true
+  },
+  "stuur-gevolg.test.js": {
+   "statisch": true
+  },
+  "stuur-mandaat.test.js": {
+   "statisch": true
+  },
+  "stuur-niveaus.test.js": {
+   "statisch": true
+  },
+  "stuur-plan.test.js": {
+   "statisch": true
+  },
+  "stuur-resolver-taal.test.js": {
+   "statisch": true
+  },
+  "stuur-resolver.test.js": {
+   "statisch": true
+  },
+  "stuur.test.js": {
+   "statisch": true
+  },
+  "stuurplafond.test.js": {
+   "statisch": true
+  },
+  "stuurrail.test.js": {
+   "statisch": true
+  },
+  "stuurspoor.test.js": {
+   "statisch": true
+  },
+  "supplier-activity.test.js": {
+   "statisch": true
+  },
+  "supplier-comm-mob-payroll.test.js": {
+   "statisch": false
+  },
+  "supplier-comm-routes.test.js": {
+   "statisch": false
+  },
+  "supplier-contract-teken.test.js": {
+   "statisch": false
+  },
+  "supplier-contract.test.js": {
+   "statisch": false
+  },
+  "supplier-notificaties.test.js": {
+   "statisch": false
+  },
+  "supplier-post-drive.test.js": {
+   "statisch": false
+  },
+  "svgpaden.test.js": {
+   "statisch": true
+  },
+  "synergie.test.js": {
+   "statisch": false
+  },
+  "syntaxproef.test.js": {
+   "statisch": true
+  },
+  "taalcheck.test.js": {
+   "statisch": true
+  },
+  "taaldekking.test.js": {
+   "statisch": true
+  },
+  "taalkast.e2e.js": {
+   "statisch": false
+  },
+  "taalkeuring.test.js": {
+   "statisch": true
+  },
+  "taallaag.test.js": {
+   "statisch": true
+  },
+  "taaloordeel.test.js": {
+   "statisch": true
+  },
+  "taalschil.test.js": {
+   "statisch": true
+  },
+  "taalschrift.test.js": {
+   "statisch": true
+  },
+  "tafeldek.test.js": {
+   "statisch": false
+  },
+  "tafelproef.test.js": {
+   "statisch": false
+  },
+  "tafelticket.test.js": {
+   "statisch": false
+  },
+  "takenlijst.test.js": {
+   "statisch": true
+  },
+  "takken.test.js": {
+   "statisch": true
+  },
+  "talen.test.js": {
+   "statisch": true
+  },
+  "talen114.test.js": {
+   "statisch": false
+  },
+  "tariefindeling.test.js": {
+   "statisch": true
+  },
+  "teacherflow.test.js": {
+   "statisch": true
+  },
+  "team-room-voorzijde.test.js": {
+   "statisch": true
+  },
+  "techniek-functies.test.js": {
+   "statisch": false
+  },
+  "techniek-sso-scim.test.js": {
+   "statisch": false
+  },
+  "techniek.test.js": {
+   "statisch": true
+  },
+  "tegenfeit.test.js": {
+   "statisch": true
+  },
+  "tegoed.test.js": {
+   "statisch": true
+  },
+  "tenant.test.js": {
+   "statisch": false
+  },
+  "tenantbewijs.test.js": {
+   "statisch": false
+  },
+  "tenantcontract.test.js": {
+   "statisch": true
+  },
+  "tenantherstelproef.test.js": {
+   "statisch": true
+  },
+  "tenantspine.test.js": {
+   "statisch": true
+  },
+  "tenantuitgang.test.js": {
+   "statisch": true
+  },
+  "terrein-en-panden.test.js": {
+   "statisch": false
+  },
+  "terugstortstand.test.js": {
+   "statisch": false
+  },
+  "theater-thuis.test.js": {
+   "statisch": false
+  },
+  "theater.test.js": {
+   "statisch": false
+  },
+  "thema.test.js": {
+   "statisch": true
+  },
+  "thuis-zaak.test.js": {
+   "statisch": false
+  },
+  "thuis.test.js": {
+   "statisch": false
+  },
+  "thuiszakelijk.test.js": {
+   "statisch": false
+  },
+  "tiener.test.js": {
+   "statisch": false
+  },
+  "tijdlijn-scherm.e2e.js": {
+   "statisch": false
+  },
+  "tijdlijn.test.js": {
+   "statisch": true
+  },
+  "tls-acme-boot.test.js": {
+   "statisch": true
+  },
+  "tls-acme.test.js": {
+   "statisch": true
+  },
+  "tls-boot.test.js": {
+   "statisch": false
+  },
+  "tls-native.test.js": {
+   "statisch": true
+  },
+  "tls-x509.test.js": {
+   "statisch": true
+  },
+  "toegang-contract.test.js": {
+   "statisch": true
+  },
+  "toegangprefix.test.js": {
+   "statisch": true
+  },
+  "toegankelijk-scherm.e2e.js": {
+   "statisch": false
+  },
+  "toegankelijk.test.js": {
+   "statisch": false
+  },
+  "toelatingsproef.test.js": {
+   "statisch": true
+  },
+  "toestelbinding.test.js": {
+   "statisch": true
+  },
+  "toestellen.test.js": {
+   "statisch": false
+  },
+  "toestemming-scherm.e2e.js": {
+   "statisch": false
+  },
+  "toetsduur-opruim.test.js": {
+   "statisch": true
+  },
+  "toetskeuring.test.js": {
+   "statisch": true
+  },
+  "training.test.js": {
+   "statisch": true
+  },
+  "trainingsschema-scherm.e2e.js": {
+   "statisch": false
+  },
+  "trainingsschema.test.js": {
+   "statisch": true
+  },
+  "transfer.test.js": {
+   "statisch": false
+  },
+  "travel-bearer-productiepoort.test.js": {
+   "statisch": true
+  },
+  "treasury.test.js": {
+   "statisch": false
+  },
+  "tredeproef.test.js": {
+   "statisch": true
+  },
+  "trio-kleef.test.js": {
+   "statisch": true
+  },
+  "trio-wees.test.js": {
+   "statisch": true
+  },
+  "trio-werkers.test.js": {
+   "statisch": true
+  },
+  "tweedehandtekening.test.js": {
+   "statisch": true
+  },
+  "tweefactor.test.js": {
+   "statisch": true
+  },
+  "txgeld.test.js": {
+   "statisch": true
+  },
+  "txindex.test.js": {
+   "statisch": true
+  },
+  "txkap.test.js": {
+   "statisch": true
+  },
+  "txledger-sqlite.test.js": {
+   "statisch": false
+  },
+  "txledger.pg.test.js": {
+   "statisch": false
+  },
+  "uitgeven-inwisselen.test.js": {
+   "statisch": false
+  },
+  "uitgifte.test.js": {
+   "statisch": false
+  },
+  "uitloggen.test.js": {
+   "statisch": false
+  },
+  "uitrol.test.js": {
+   "statisch": true
+  },
+  "uitrolregie-echt.test.js": {
+   "statisch": false
+  },
+  "uitrolregie.test.js": {
+   "statisch": true
+  },
+  "uitvoerproef.test.js": {
+   "statisch": true
+  },
+  "upload-poort.test.js": {
+   "statisch": false
+  },
+  "uploadquarantaine.test.js": {
+   "statisch": true
+  },
+  "vakbewijs-kluis.test.js": {
+   "statisch": true
+  },
+  "vakbewijs-routes.test.js": {
+   "statisch": true
+  },
+  "vakbewijs-scherm.e2e.js": {
+   "statisch": true
+  },
+  "vakken.test.js": {
+   "statisch": false
+  },
+  "vakpro.test.js": {
+   "statisch": false
+  },
+  "vakpro2.test.js": {
+   "statisch": false
+  },
+  "vakschema.e2e.test.js": {
+   "statisch": true
+  },
+  "vakschema.test.js": {
+   "statisch": true
+  },
+  "vakwerk-pro.test.js": {
+   "statisch": false
+  },
+  "vakwerk.test.js": {
+   "statisch": false
+  },
+  "vandaag-luxe.test.js": {
+   "statisch": true
+  },
+  "vandaag-surface-pilots.test.js": {
+   "statisch": true
+  },
+  "vastgoed-keyless-productie.test.js": {
+   "statisch": true
+  },
+  "vastgoed.test.js": {
+   "statisch": false
+  },
+  "vastleggen.test.js": {
+   "statisch": false
+  },
+  "veer.test.js": {
+   "statisch": true
+  },
+  "veilig-voorzijde.test.js": {
+   "statisch": true
+  },
+  "veiligadres.test.js": {
+   "statisch": true
+  },
+  "veiligheid-kring-rust.test.js": {
+   "statisch": false
+  },
+  "veiligheid-moment.test.js": {
+   "statisch": true
+  },
+  "veiligheid.e2e.js": {
+   "statisch": false
+  },
+  "veiligheid.test.js": {
+   "statisch": false
+  },
+  "veiligheidgrens.test.js": {
+   "statisch": true
+  },
+  "veiligheidskern.test.js": {
+   "statisch": true
+  },
+  "veranderbereik.test.js": {
+   "statisch": true
+  },
+  "verband.test.js": {
+   "statisch": true
+  },
+  "verblijf.test.js": {
+   "statisch": false
+  },
+  "verblijven-voorzijde.test.js": {
+   "statisch": true
+  },
+  "verdiepende-appflows.test.js": {
+   "statisch": true
+  },
+  "verdiepende-schermen.e2e.js": {
+   "statisch": false
+  },
+  "vergeten-gezelschap.test.js": {
+   "statisch": true
+  },
+  "vergeten.test.js": {
+   "statisch": false
+  },
+  "verhuur.test.js": {
+   "statisch": false
+  },
+  "verificatie.e2e.js": {
+   "statisch": false
+  },
+  "verjaardagen.test.js": {
+   "statisch": false
+  },
+  "verkoop-etalage.test.js": {
+   "statisch": false
+  },
+  "verraad.test.js": {
+   "statisch": true
+  },
+  "verraadfase.test.js": {
+   "statisch": true
+  },
+  "verraadtelling.test.js": {
+   "statisch": true
+  },
+  "versheid-uitvoer.test.js": {
+   "statisch": false
+  },
+  "versheidsdekking.test.js": {
+   "statisch": true
+  },
+  "versheidspoort.test.js": {
+   "statisch": true
+  },
+  "versieadres.test.js": {
+   "statisch": true
+  },
+  "verstrengeling.test.js": {
+   "statisch": true
+  },
+  "vertaal.test.js": {
+   "statisch": false
+  },
+  "vertaalkast.test.js": {
+   "statisch": true
+  },
+  "vertaler.e2e.js": {
+   "statisch": false
+  },
+  "vertegenwoordiging.e2e.js": {
+   "statisch": true
+  },
+  "vertegenwoordiging.e2e.test.js": {
+   "statisch": false
+  },
+  "vertegenwoordiging.test.js": {
+   "statisch": true
+  },
+  "vertrouwen.test.js": {
+   "statisch": true
+  },
+  "vertrouwenbronnen.test.js": {
+   "statisch": true
+  },
+  "vervalstaten.test.js": {
+   "statisch": true
+  },
+  "verzadiging.test.js": {
+   "statisch": true
+  },
+  "verzoek-intrekken.test.js": {
+   "statisch": false
+  },
+  "verzoekcontext-wikkel.test.js": {
+   "statisch": true
+  },
+  "verzorging-leden.test.js": {
+   "statisch": false
+  },
+  "verzorging-scherm.e2e.js": {
+   "statisch": false
+  },
+  "verzorging.test.js": {
+   "statisch": false
+  },
+  "vijandigerand.test.js": {
+   "statisch": true
+  },
+  "villa.test.js": {
+   "statisch": false
+  },
+  "vingerafdruk.test.js": {
+   "statisch": true
+  },
+  "vloerwerk.test.js": {
+   "statisch": false
+  },
+  "vloot.test.js": {
+   "statisch": false
+  },
+  "vlootbeeld.test.js": {
+   "statisch": true
+  },
+  "vlucht-voorzijde.test.js": {
+   "statisch": true
+  },
+  "voeding-scherm.e2e.js": {
+   "statisch": false
+  },
+  "voeding.test.js": {
+   "statisch": true
+  },
+  "voertuigscherm.e2e.js": {
+   "statisch": true
+  },
+  "vonk.test.js": {
+   "statisch": true
+  },
+  "voornemen.test.js": {
+   "statisch": true
+  },
+  "voorspel.test.js": {
+   "statisch": true
+  },
+  "voorspelplaats.test.js": {
+   "statisch": true
+  },
+  "voorstel.test.js": {
+   "statisch": true
+  },
+  "voorstelintrek.test.js": {
+   "statisch": true
+  },
+  "vooruitscherm.e2e.js": {
+   "statisch": false
+  },
+  "vracht-credential.test.js": {
+   "statisch": true
+  },
+  "vracht.test.js": {
+   "statisch": false
+  },
+  "vrienden-blok.e2e.js": {
+   "statisch": false
+  },
+  "vrijenamen.test.js": {
+   "statisch": true
+  },
+  "vuurplan.test.js": {
+   "statisch": true
+  },
+  "waarde.test.js": {
+   "statisch": true
+  },
+  "waardegraaf.test.js": {
+   "statisch": true
+  },
+  "waarom.test.js": {
+   "statisch": true
+  },
+  "wacht.test.js": {
+   "statisch": true
+  },
+  "wachtdeur.test.js": {
+   "statisch": false
+  },
+  "wachter.test.js": {
+   "statisch": true
+  },
+  "wachtlijst.test.js": {
+   "statisch": false
+  },
+  "wachtwijze.test.js": {
+   "statisch": true
+  },
+  "wachtwoordkosten.test.js": {
+   "statisch": true
+  },
+  "wauw.test.js": {
+   "statisch": false
+  },
+  "wbw.test.js": {
+   "statisch": false
+  },
+  "web.test.js": {
+   "statisch": true
+  },
+  "webauthn-ceremonie.test.js": {
+   "statisch": false
+  },
+  "webauthn-eigen.test.js": {
+   "statisch": true
+  },
+  "webauthn.test.js": {
+   "statisch": false
+  },
+  "webplatform.test.js": {
+   "statisch": false
+  },
+  "webpush.test.js": {
+   "statisch": true
+  },
+  "website-aanvraag-handoff.test.js": {
+   "statisch": false
+  },
+  "wegwijzerscherm.e2e.js": {
+   "statisch": false
+  },
+  "weigering-laat-niets-achter.test.js": {
+   "statisch": false
+  },
+  "wekdekking.test.js": {
+   "statisch": true
+  },
+  "wekkers.test.js": {
+   "statisch": true
+  },
+  "wereld.test.js": {
+   "statisch": false
+  },
+  "wereldbreedte.e2e.js": {
+   "statisch": false
+  },
+  "wereldcontrole.test.js": {
+   "statisch": true
+  },
+  "wereldhoreca.test.js": {
+   "statisch": true
+  },
+  "wereldkern.test.js": {
+   "statisch": true
+  },
+  "wereldlaag.e2e.js": {
+   "statisch": false
+  },
+  "wereldlaag.test.js": {
+   "statisch": true
+  },
+  "wereldlab2.test.js": {
+   "statisch": true
+  },
+  "wereldprofiel.test.js": {
+   "statisch": false
+  },
+  "wereldregels.test.js": {
+   "statisch": true
+  },
+  "wereldregister.test.js": {
+   "statisch": true
+  },
+  "wereldrooster.e2e.js": {
+   "statisch": true
+  },
+  "wereldroutes.test.js": {
+   "statisch": false
+  },
+  "wereldrtf.test.js": {
+   "statisch": true
+  },
+  "wereldrtmail.test.js": {
+   "statisch": true
+  },
+  "wereldschool.test.js": {
+   "statisch": true
+  },
+  "wereldtaal.test.js": {
+   "statisch": true
+  },
+  "wereldvermogens.test.js": {
+   "statisch": true
+  },
+  "wereldwortels.test.js": {
+   "statisch": true
+  },
+  "werk-bij-inloggen.test.js": {
+   "statisch": false
+  },
+  "werkbeleid-dienst.test.js": {
+   "statisch": false
+  },
+  "werkblad.e2e.js": {
+   "statisch": false
+  },
+  "werkcommandbalk.e2e.js": {
+   "statisch": false
+  },
+  "werkgebeurtenis.test.js": {
+   "statisch": true
+  },
+  "werkgeheugen.test.js": {
+   "statisch": false
+  },
+  "werkgevolg.test.js": {
+   "statisch": false
+  },
+  "werkgezondheid.test.js": {
+   "statisch": false
+  },
+  "werkgrens.test.js": {
+   "statisch": true
+  },
+  "werkhandeling.test.js": {
+   "statisch": false
+  },
+  "werkherkomst.test.js": {
+   "statisch": true
+  },
+  "werkindienst.test.js": {
+   "statisch": false
+  },
+  "werkmail.test.js": {
+   "statisch": false
+  },
+  "werkmerk.e2e.js": {
+   "statisch": false
+  },
+  "werkos-schil.e2e.js": {
+   "statisch": false
+  },
+  "werkplaats-uitgifte.test.js": {
+   "statisch": true
+  },
+  "werkplek-wijzigen.test.js": {
+   "statisch": false
+  },
+  "werkplek.test.js": {
+   "statisch": true
+  },
+  "werkregels.test.js": {
+   "statisch": false
+  },
+  "werkregister.test.js": {
+   "statisch": true
+  },
+  "werkruimte-kantoor.test.js": {
+   "statisch": true
+  },
+  "werkruimte-objecten.e2e.js": {
+   "statisch": false
+  },
+  "werkruimte.e2e.js": {
+   "statisch": false
+  },
+  "werkscherm.e2e.js": {
+   "statisch": false
+  },
+  "werkschermen.e2e.js": {
+   "statisch": false
+  },
+  "werkstatus.e2e.js": {
+   "statisch": false
+  },
+  "werktafel.e2e.js": {
+   "statisch": false
+  },
+  "werktafelgeheugen.test.js": {
+   "statisch": false
+  },
+  "werktoen.test.js": {
+   "statisch": false
+  },
+  "werkvenster.test.js": {
+   "statisch": true
+  },
+  "werkvloer.test.js": {
+   "statisch": true
+  },
+  "werkvormen.test.js": {
+   "statisch": true
+  },
+  "werkwaarom.test.js": {
+   "statisch": false
+  },
+  "werving-link.test.js": {
+   "statisch": false
+  },
+  "wervingcode-lifecycle.test.js": {
+   "statisch": true
+  },
+  "wetrelatie.test.js": {
+   "statisch": true
+  },
+  "wetten.test.js": {
+   "statisch": true
+  },
+  "winkel-scherm.e2e.js": {
+   "statisch": false
+  },
+  "winkel-voorzijde.test.js": {
+   "statisch": true
+  },
+  "wiring-contract.test.js": {
+   "statisch": true
+  },
+  "wisselen-en-historie.test.js": {
+   "statisch": false
+  },
+  "wonen-flow.test.js": {
+   "statisch": true
+  },
+  "woonplaats-poort.test.js": {
+   "statisch": true
+  },
+  "work-doelgroepen.test.js": {
+   "statisch": true
+  },
+  "workos-legacy-token-productiepoort.test.js": {
+   "statisch": true
+  },
+  "workruimte-credential-register.test.js": {
+   "statisch": true
+  },
+  "workspace-contract.test.js": {
+   "statisch": true
+  },
+  "workspace-platform.test.js": {
+   "statisch": true
+  },
+  "workspace-server-platform.test.js": {
+   "statisch": true
+  },
+  "workspace-voorkeur.test.js": {
+   "statisch": true
+  },
+  "world-dashboard.e2e.js": {
+   "statisch": true
+  },
+  "writehealth-lus.test.js": {
+   "statisch": true
+  },
+  "zaaihash.test.js": {
+   "statisch": true
+  },
+  "zaak-balie.test.js": {
+   "statisch": false
+  },
+  "zaak-en-mensen.test.js": {
+   "statisch": false
+  },
+  "zaak-export.test.js": {
+   "statisch": true
+  },
+  "zaak-inrichting.test.js": {
+   "statisch": false
+  },
+  "zaak-kantoor.test.js": {
+   "statisch": false
+  },
+  "zaak-loket-en-dossier.test.js": {
+   "statisch": false
+  },
+  "zaak-vloot-en-facturen.test.js": {
+   "statisch": false
+  },
+  "zaak.test.js": {
+   "statisch": false
+  },
+  "zaakabonnement.test.js": {
+   "statisch": true
+  },
+  "zaakbetaling.test.js": {
+   "statisch": true
+  },
+  "zaakcommand-routes.test.js": {
+   "statisch": false
+  },
+  "zaakcommand.test.js": {
+   "statisch": true
+  },
+  "zaakdoos.test.js": {
+   "statisch": false
+  },
+  "zaakinlog.test.js": {
+   "statisch": true
+  },
+  "zaakpay.e2e.js": {
+   "statisch": false
+  },
+  "zaakregie.e2e.js": {
+   "statisch": false
+  },
+  "zaaktools.test.js": {
+   "statisch": false
+  },
+  "zaaktransactie.test.js": {
+   "statisch": true
+  },
+  "zaakwig.test.js": {
+   "statisch": true
+  },
+  "zaal.e2e.js": {
+   "statisch": false
+  },
+  "zakelijk.test.js": {
+   "statisch": false
+  },
+  "zakelijkvervoer.test.js": {
+   "statisch": false
+  },
+  "zandbak.test.js": {
+   "statisch": true
+  },
+  "zegel-ui.e2e.js": {
+   "statisch": false
+  },
+  "zegel-wedloop.test.js": {
+   "statisch": true
+  },
+  "zegel.test.js": {
+   "statisch": true
+  },
+  "zegelcheck.test.js": {
+   "statisch": true
+  },
+  "zegelroute.test.js": {
+   "statisch": true
+  },
+  "zelfzorg.test.js": {
+   "statisch": false
+  },
+  "ziekmelding-privacy.test.js": {
+   "statisch": false
+  },
+  "zinnencache.test.js": {
+   "statisch": true
+  },
+  "zorgketen.test.js": {
+   "statisch": true
+  },
+  "zorgniveau.test.js": {
+   "statisch": true
+  },
+  "zorgwallet.test.js": {
+   "statisch": false
+  },
+  "zware-bundels.test.js": {
+   "statisch": true
+  }
+ }
+}

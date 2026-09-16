@@ -53,7 +53,7 @@
      ze alleen door aan de buitenste Command-balk. Daardoor kan de lokale bank
      in een mobiel werkblad verdwijnen zonder functies weg te nemen. */
   function startAdaptief(){
-    var A=window.RTGAdaptief;if(!A||window.parent===window)return;
+    var A=window.RTGAdaptief;if(!A)return;
     bank.forEach(function(item){A.declareer({id:'reisveilig.'+item[0],naam:item[1],label:item[1],groep:'Reizen & Veilig',telefoon:['balk','lade'],tablet:['balk','lade'],bureau:['werkbalk'],doe:function(){open(item[0],false)}})});
     meldAdaptief=function(){
       var id=panes[actief]&&panes[actief].id;if(id==='reizen')id='reisblad';

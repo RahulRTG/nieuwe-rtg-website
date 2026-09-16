@@ -10,7 +10,6 @@
   if (!b.hasAttribute('data-rtg-edge-2-state')) b.setAttribute('data-rtg-edge-2-state', 'overview');
   if (!b.hasAttribute('data-rtg-edge-2-auto')) b.setAttribute('data-rtg-edge-2-auto', 'true');
 
-  /* Alleen expliciete, niet-destructieve hoofdacties. */
   function vind(q) { return d.querySelector(q); }
   function klik(q) { var n = vind(q); if (n) n.click(); }
   function focus(q) {
@@ -29,7 +28,6 @@
     b.setAttribute('data-rtg-edge-2-hoofdactie', 'edge');
   }
 
-  /* Verplaats de echte knop; geen kloon. */
   function neemRandknop(q) {
     var e = w.RTGEdge && w.RTGEdge.active;
     var slot = e && e.root.querySelector('.rtg-edge-action');
@@ -46,7 +44,6 @@
     setTimeout(function () { wacht.disconnect(); }, 10000);
   }
 
-  /* Werk gebruikt zijn bestaande Rahul-werkruimte. */
   function koppelWerkRahul() {
     var e = w.RTGEdge && w.RTGEdge.active;
     var rand = e && e.root.querySelector('.rtg-edge-ai');
@@ -63,14 +60,12 @@
       if (!werk.hidden && werk.classList.contains('page') && sluit) sluit.click();
       sync();
     };
-    /* Delegatie op het casco houdt beide richtingen exclusief, ook na herbouw. */
     e.root.addEventListener('click', function (ev) {
       var doel = ev.target && ev.target.closest && ev.target.closest(
         '.rtg-edge-menu,.rtg-edge-state,.rtg-edge-2-context-button');
       if (doel && e.root.contains(doel)) sluitWerk();
     }, true);
     rand.onclick = function (ev) {
-      /* Sluit context en generieke lagen vóór de bestaande Werkruimte opent. */
       var context = e.root.querySelector('.rtg-edge-2-context-button[aria-expanded="true"]');
       if (context) context.click();
       if (sluitEdge) sluitEdge.call(rand, ev);
@@ -86,13 +81,10 @@
     sync();
   }
 
-  /* WorkOS geeft zijn geneste scrollstroom aan dezelfde Edge-state door. */
   function koppelWerkScroll() {
     var stage = vind('.wk-stage');
     if (!stage) return;
     var laatste = stage.scrollTop || 0, gepland = false, gebaarTijd = 0;
-    /* Alleen een scroll van de mens schakelt; een scroll die de software zelf
-       veroorzaakt laat de stand staan (dezelfde regel als in rtg-edge-2.js). */
     ['wheel', 'touchmove', 'keydown'].forEach(function (t) {
       stage.addEventListener(t, function (e) {
         if (w.RTGEdge2 && w.RTGEdge2.scrollGesture(e)) gebaarTijd = Date.now();
@@ -117,7 +109,6 @@
     }, { passive: true });
   }
 
-  /* Een zichtbaar modaal venster laat hetzelfde casco tijdelijk wijken. */
   var VENSTER_ATTR = 'data-rtg-edge-venster-open';
   function zichtbaarVenster(el) {
     if (!el || el.hidden || (el.closest && el.closest('.rtg-edge-chrome'))) return false;
@@ -196,7 +187,6 @@
     wacht(css, '', klaar);
     if (nieuw) h.appendChild(css);
   }
-
   var over = 4, mislukt = false;
   function afhankelijk(ok) {
     if (!ok) mislukt = true;
@@ -205,6 +195,9 @@
       if (!klaar || !w.RTGEdge2) return;
       try {
         w.RTGEdge2.start(d, w); w.RTGEdge2Reveal.start(d, w); bewaakVensters(); w.RTGEdgeCommand.koppel(d, w);
+        script('/shared/rtg-adaptive-edge-loader.js', 'RTGAdaptiveEdgeLoader', function (adaptief) {
+          if (adaptief) w.RTGAdaptiveEdgeLoader.start(d, w);
+        });
         script('/shared/rtg-edge-appbar.js', 'RTGEdgeAppBar', function (appbar) {
           if (appbar) w.RTGEdgeAppBar.start(d);
           script('/shared/rtg-edge-smart-menu.js', 'RTGEdgeSmartMenu', function (slim) {

@@ -160,13 +160,13 @@ test('Clips draagt zijn hoofdhandeling over zonder een tweede duimbalk', () => {
   assert.match(CSS, /\[data-rtg-edge-2-hoofdactie="edge"\]>\.rtg-duimbalk\{display:none!important\}/);
 });
 
-test('TravelOS heeft per Command-maat precies één eigenaar van zijn reisbladen', () => {
+test('TravelOS biedt op mobiel en bureau zijn reisbladen aan de gedeelde Edge aan', () => {
   assert.ok(BLADHAAK.includes('html.rtg-command-mobiel body[data-rtg-world="travel"] .hoofdtabs'),
-    'mobiel moeten de lokale tabs wijken voor de Command-balk');
-  assert.ok(BLADHAAK.includes('html.rtg-command-blad:not(.rtg-command-mobiel) body[data-rtg-world="travel"] .hoofdtabs'),
-    'op bureau moeten de lokale tabs terugkeren wanneer de mobiele Command-balk weg is');
+    'mobiel wijken de lokale tabs voor de gedeelde bediening');
+  assert.ok(BLADHAAK.includes('html.rtg-command-blad body[data-rtg-world="travel"] .hoofdtabs{display:none!important}'),
+    'ook ingebed op bureau verschijnt geen eigen appbalk');
   assert.equal((BLADHAAK.match(/body\[data-rtg-world="travel"\] \.hoofdtabs/g) || []).length, 2,
-    'alleen de exclusieve mobiele en bureaucontracten mogen de tabs bezitten');
+    'alleen de mobiele en gedeelde inbeddingsregels bezitten de tabs');
 });
 
 test('opt-in zonder ready-commit kan geen legacy bediening onderdrukken', () => {

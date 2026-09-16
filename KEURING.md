@@ -72,30 +72,65 @@ werkelijkheid.js` levert de require-kanten, en `BEDRADING.json` telt er 3730
 opgelost, 3 benaderd en 2 onbekend, met een eis van nul onbekend voor identity,
 money en security.
 
-De omgekeerde graaf is uitgerekend over 5899 bestanden en 1434 toetsbestanden
-(`npm run impactbereik`, zodat dit getal na te rekenen is en niet in dit
-document blijft hangen):
+De omgekeerde graaf is uitgerekend met `npm run impactbereik`, zodat dit getal
+na te rekenen is en niet in dit document blijft hangen:
 
 | gewijzigd bestand | transitief geraakte toetsen |
 |---|---|
-| `kern/stuur/resolver.js` | 7 (0,5%) |
-| `kern/pay/poort.js` | 6 (0,4%) |
-| `kern/passen.js` | 2 (0,1%) |
-| `kern/fiscaal/tarief.js` | 40 (2,8%) |
+| `kern/stuur/resolver.js` | 11 (0,6%) |
+| `kern/pay/poort.js` | 6 (0,3%) |
+| `kern/passen.js` | 7 (0,4%) |
+| `kern/fiscaal/tarief.js` | 43 (2,3%) |
 
 Zes toetsen voor de plek waar élke betaling langskomt is geen versmalling maar
 een blinde vlek. Nagemeten:
 
-- **819 van de 1434 toetsbestanden (57,1%) hebben geen enkele require-kant naar
-  `server/`.**
-- **905 starten de server als apart proces**, 863 praten over HTTP.
+- **<!--getal:veranderbereik.blind-->771<!--/getal--> van de
+  <!--getal:veranderbereik.toetsen-->1926<!--/getal--> toetsbestanden hebben geen
+  enkele require-kant naar `server/`.**
+- **1058 starten de server als apart proces**, 995 praten over HTTP.
 
-Die meerderheid raakt de hele oppervlakte via een `spawn`, en een require-graaf
+**DIT GETAL STOND HIER TWAALF DAGEN VERKEERD, EN DAT IS DE LES.** Er stond 819
+van 1434 (57,1%), gemeten op 31 augustus. Dat was juist op de dag dat iemand het
+opschreef, en daarna groeide de suite. `impactbereik.js` draait namelijk in geen
+enkele workflow en schrijft geen register: het getal dat versmalling tegenhoudt
+bestond alleen als proza. Sinds deze ronde staat het tussen merktekens en komt
+het uit `VERANDERBEREIK-KENNIS.json` (`npm run getallen`) — een verouderd getal
+is dan geen kwestie van oplettendheid meer. Dat register draagt alleen wat uit de
+code volgt; wat één uitvoering heeft waargenomen staat in
+`VERANDERBEREIK-RONDE.json`, en die twee worden nooit door elkaar gelezen
+(`VERANDERING.md` par. 7e).
+
+**Van die blinde vlek bleek 28% de meter zelf te zijn** (16 september 2026). De
+statische as vroeg naar een require-kant die in `server/` uitkomt, terwijl de
+vraag *als dit bestand verandert, welk bewijs moet dan opnieuw* over elk
+wijzigbaar bestand gaat: 224 toetsen hangen aan `scripts/` en 78 aan `public/`,
+en die telden allemaal als blind. Met de bronmappen verbreed gaat de statische as
+van 833 naar 1135 en de volle ring van 829 naar 530 op dezelfde ronde
+(`VERANDERING.md` par. 7f). De getallen hierboven zijn de verse.
+
+De rest raakt de hele oppervlakte via een `spawn`, en een require-graaf
 ziet daar niets van. Een planner op deze graaf zou ze overslaan en groen
 melden — "de stilste vorm van kapot die dit huis kent" (`scripts/lib/
 bedrading.js`). Vandaar de volgorde: **eerst dekking, dan versmalling**, precies
 de les van de resolver in `EXECUTIE.md`, waar het succescriterium dekking was
 en niet compactheid.
+
+**De tweede as ligt er sinds 15 september 2026, en hij dicht een deel van die
+blinde vlek.** Het routejournaal weet WELKE toets welke route raakte
+(`test/toetsnaam.js`), en `ROUTEBRON.json` weet in welk bronbestand een route
+wordt afgehandeld — die twee waren nooit aan elkaar geknoopt.
+`scripts/veranderbereik.js` doet dat en haalt er
+<!--getal:veranderbereik.gedicht-->236<!--/getal--> toetsen mee uit de blinde vlek.
+Wat overblijft is <!--getal:veranderbereik.zonder-->530<!--/getal--> toetsbestanden
+zonder enig vastgesteld bereik, en zolang dat getal niet nul is verandert de
+volgorde hierboven niet. `VERANDERING.md` is het document eromheen.
+
+Die twee getallen komen uit een register van een HALVE ronde (769 van 1900). Op
+een volledige ronde in de keten (15 september 2026, run `34974276733`) dicht de
+waarneming er **734** en blijven er **333** over -- en die 333 zijn dan allemaal
+in-proces toetsen, met `nietInDezeRonde` op nul. De volgorde verandert daar niet
+van: 333 volle ringen is nog steeds geen impactplan.
 
 ## 2. Het CI-contract: vier regels, alle vier uit een vondst
 

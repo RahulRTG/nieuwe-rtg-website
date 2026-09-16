@@ -137,7 +137,17 @@ const STANDAARD = '.routejournaal';
 
 function begin(pad) {
   if (pad && AAN_WOORDEN.has(String(pad).trim().toLowerCase())) {
-    console.log('[routelog] RTG_ROUTELOG="' + pad + '" is geen pad maar "aan"; ' +
+    /* OP stderr EN NIET OP stdout, en dat is geen smaakkwestie. Deze regel gaat
+       mee met ELK proces dat routelog laadt, en scripts/dekking.js schrijft zijn
+       uitslag als JSON naar stdout. Een mens ziet dan een nette mededeling; een
+       toets die die uitslag parseert krijgt `[routelog] ...` voor de accolade en
+       komt terug met null. Gemeten op 16 september 2026: `RTG_ROUTELOG=1 npm test`
+       liet drie toetsen zakken (twee in test/dekking.test.js, een in
+       test/meterijk.test.js) die met een PAD -- de vorm die ci.yml gebruikt --
+       alle drie groen zijn. CI zag het daarom nooit, en wie de suite met de vlag
+       aan draait om een journaal te krijgen, kreeg drie raadsels.
+       stdout is voor de UITKOMST, stderr voor wat je erover wilt zeggen. */
+    console.error('[routelog] RTG_ROUTELOG="' + pad + '" is geen pad maar "aan"; ' +
       'het journaal gaat naar ' + STANDAARD + '.');
     pad = STANDAARD;
   }

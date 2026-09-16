@@ -11,7 +11,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -47,7 +47,8 @@ test('postvak op het scherm: mappen, opbergen, ster, zoeken en het gesprek',
     /* RTMail opent nu op de rustige betekenisvolle voorzijde. De volledige
        mappenwerkplek blijft via ‘Alle post’ bereikbaar; deze toets volgt die
        echte gebruikersroute voordat hij het postvak controleert. */
-    await page.locator('.rtm-nav [data-rtm-diep="inbox"]').click();
+    await edgeActies(page);
+    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: /Alle post$/i }).click();
     await page.waitForSelector('.mapbalk', { timeout: 15000 });
 
     // de vier mappen staan er, en "Postvak in" is de open map

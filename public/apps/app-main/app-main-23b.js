@@ -39,5 +39,10 @@
     aankomst:    { naam: 'Aankomst',      url: '/apps/arrival.html' },
     routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html' },
     ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html' },
+    /* Foundation Connect (apps/connect.html): de ontdeklus. Hij heet op het
+       scherm "Ontdekken" en niet "Connect" -- een wereldnaam hoort te klinken
+       als wat een mens er doet, en de werknaam van een laag is geen productnaam
+       (zie de kop van kern/connect/). */
+    connect:     { naam: T('app.connect', 'Ontdekken'), url: '/apps/connect.html' },
     rtfbord:     { naam: 'Het bord',      url: '/apps/foundation/bord.html' },
     rtfschrift:  { naam: 'Het schrift',   url: '/apps/foundation/schrift.html' },

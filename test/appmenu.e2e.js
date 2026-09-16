@@ -33,7 +33,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, edgeActies, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -190,9 +190,9 @@ async function openEdge(page, gezicht) {
     document.querySelectorAll('.rtg-edge-chrome').length === 1, null, { timeout: 10000 });
   const greep = page.locator('.rtg-edge-2-reveal');
   if (await greep.isVisible()) await greep.click();
-  const menu = page.locator('.rtg-edge-menu');
+  const menu = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
   await menu.waitFor({ state: 'visible', timeout: 5000 });
-  if (await menu.getAttribute('aria-expanded') !== 'true') await menu.click();
+  if (await page.locator('.rtg-edge-menu').getAttribute('aria-expanded') !== 'true') await menu.click();
   await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]', { timeout: 5000 });
   if (gezicht) await page.locator('[role="tab"][data-edge-face="' + gezicht + '"]').click();
 }
@@ -214,7 +214,8 @@ async function openLade(page) {
   await page.waitForFunction(() => !document.querySelector('.rtg-edge-menu') ||
     document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
   { timeout: 5000 }).catch(() => {});
-  const edge = page.locator('.rtg-edge-menu[data-rtg-command-brug="true"]');
+  const edge = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
+  await edge.waitFor({ state: 'visible', timeout: 10000 });
   if (await edge.isVisible()) {
     await edge.click();
     if (await page.evaluate(() => !!document.querySelector('#rtgCommand').__rtgSecondScreen)) {
@@ -313,6 +314,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
                 '.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal')].some(zichtbaar);
               return zichtbaar(document.getElementById('osMenuBtn')) ||
                 zichtbaar(document.querySelector('.rtg-edge-menu')) ||
+                zichtbaar(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]')) ||
                 edgeGreep ||
                 zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]'));
             }, null, { timeout: 8000 });
@@ -324,6 +326,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
                   Number(s.opacity || 1) > 0 && r.width > 0 && r.height > 0;
               };
               return {
+                adaptive: zichtbaar(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]')),
                 legacy: zichtbaar(document.getElementById('osMenuBtn')),
                 edge: zichtbaar(document.querySelector('.rtg-edge-menu')),
                 edgeGreep: [...document.querySelectorAll(
@@ -333,8 +336,8 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
               };
             });
             gemeten++;
-            if (deuren.edge && deuren.legacy) dubbeleDeuren.push(pad + ': oude hamburger naast Edge-menu');
-            if (deuren.edge && deuren.roots !== 1) dubbeleDeuren.push(pad + ': ' + deuren.roots + ' Edge-casco\'s');
+            if ([deuren.edge, deuren.adaptive, deuren.legacy].filter(Boolean).length > 1) dubbeleDeuren.push(pad + ': oude hamburger naast Edge-menu');
+            if ((deuren.edge || deuren.adaptive) && deuren.roots !== 1) dubbeleDeuren.push(pad + ': ' + deuren.roots + ' Edge-casco\'s');
           } catch (e) {
             if (new URL(page.url()).pathname === pad) menuFouten.push(pad);
           }
@@ -377,7 +380,7 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
         return !!(menu && getComputedStyle(menu).visibility !== 'hidden' && menu.getBoundingClientRect().width > 0);
       }, null, { timeout: 5000 });
     }
-    await page.click('.rtg-edge-menu');
+    await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
     await page.waitForFunction(() => document.querySelector('.rtg-edge-index')
       .getAttribute('aria-hidden') === 'false', null, { timeout: 5000 });
 
@@ -409,9 +412,7 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.querySelector('.bdn-scrim.open'), null, { timeout: 3000 });
 
-    const thuis = page.locator('.rtg-edge-bottom > a[aria-label="Naar home"]');
-    assert.equal(await thuis.getAttribute('href'), '/apps/living-os.html',
-      'de LivingOS-rand wijst niet naar zijn eigen home');
+    const thuis = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');
     await thuis.click();
     await page.waitForURL(/\/apps\/living-os\.html/, { timeout: 8000 });
     assert.match(new URL(page.url()).pathname, /\/apps\/living-os\.html$/, 'de Edge-deur brengt je niet thuis');
@@ -724,7 +725,8 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
       return !!(h && h.classList.contains('rtg-command-mobiel') &&
         f.contentDocument.querySelector('.prestatiekop'));
     }, null, { timeout: 20000 });
-    await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { timeout: 20000 });
+    await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { state: 'attached', timeout: 20000 });
+    await require('./helper').edgeActies(page);
 
     /* Chromium heeft geen iPhone-notch. De bronregel gebruikt daarom een
        overschrijfbare variabele met env() als echte terugval; zo meet deze toets
@@ -736,7 +738,7 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     const maat = await page.evaluate(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       const doc = f.contentDocument;
-      const balk = document.querySelector('#rtgCommand .cmd-balk');
+      const balk = document.querySelector('.rtg-adaptive-bar');
       const eigen = doc.querySelector('.hoofdtabs');
       const werelden = doc.querySelector('.os-switcher');
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
@@ -748,7 +750,7 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
         wereldbalk: zichtbaar(werelden),
         onderbalken: [balk, eigen].filter(zichtbaar).length,
         navRuimte: getComputedStyle(doc.documentElement).getPropertyValue('--nav').trim(),
-        acties: [...document.querySelectorAll('#rtgCommand .cmd-actie')].map(b => b.dataset.cap),
+        acties: [...document.querySelectorAll('.rtg-adaptive-controls .cmd-actie')].map(b => b.dataset.cap),
         heeftMeer: zichtbaar(document.querySelector('#rtgCommand .cmd-meer'))
       };
     });
@@ -762,15 +764,8 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     assert.ok(maat.acties.length || maat.heeftMeer, 'de TravelOS-tabhandelingen bereikten de ene balk niet');
 
     async function kies(id, label, blad) {
-      const direct = page.locator('#rtgCommand .cmd-actie[data-cap="' + id + '"]');
-      if (await direct.count() && await direct.first().isVisible()) {
-        await direct.first().click();
-      } else {
-        const meer = page.locator('#rtgCommand .cmd-meer');
-        assert.equal(await meer.isVisible(), true, label + ' is niet zichtbaar en ook niet bereikbaar via Meer');
-        await meer.click();
-        await page.locator('.rtg-laag .lg-rij', { hasText: label }).click();
-      }
+      await require('./helper').edgeActies(page);
+      await page.locator('.rtg-adaptive-controls [data-cap="' + id + '"]').click();
       await page.waitForFunction((naam) => {
         const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
         const b = f && f.contentDocument && f.contentDocument.querySelector('[data-blad="' + naam + '"]');
@@ -783,13 +778,13 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
       return !!(s && s['reizen.reizen'] && s['reizen.reizen'].aan &&
         !document.querySelector('.rtg-laag'));
     }, null, { timeout: 10000 });
-    const toetsenbord = page.locator('#rtgCommand .cmd-actie[data-cap="reizen.vandaag"]');
+    const toetsenbord = page.locator('.rtg-adaptive-controls .cmd-actie[data-cap="reizen.vandaag"]');
     assert.equal(await toetsenbord.isVisible(), true, 'Vandaag hoort direct met het toetsenbord bereikbaar te zijn');
     await toetsenbord.focus();
     assert.deepEqual(await page.evaluate(() => ({ tag: document.activeElement && document.activeElement.tagName,
-      klasse: document.activeElement && document.activeElement.className,
+      klasse: document.activeElement && document.activeElement.classList.contains('cmd-actie'),
       cap: document.activeElement && document.activeElement.dataset.cap })),
-    { tag: 'BUTTON', klasse: 'cmd-actie', cap: 'reizen.vandaag' },
+    { tag: 'BUTTON', klasse: true, cap: 'reizen.vandaag' },
     'de TravelOS-handeling moet focus kunnen ontvangen');
     await toetsenbord.press('Enter');
     await page.waitForFunction(() => {
@@ -832,6 +827,7 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
 
     /* Dezelfde pagina mag op bureau niet kaal worden: daar bestaat de mobiele
        schilbalk niet en blijft de eigen TravelOS-navigatie dus eigenaar. */
+    await page.keyboard.press('Escape');
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
@@ -841,12 +837,12 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     const bureau = await page.evaluate(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       const tabs = f.contentDocument.querySelector('.hoofdtabs');
-      const schil = document.querySelector('#rtgCommand .cmd-balk');
+      const schil = document.querySelector('.rtg-adaptive-bar');
       return { tabs: getComputedStyle(tabs).display !== 'none' && tabs.getBoundingClientRect().height > 0,
         schil: getComputedStyle(schil).display !== 'none' && schil.getBoundingClientRect().height > 0 };
     });
-    assert.equal(bureau.tabs, true, 'op bureau hoort TravelOS zijn eigen navigatie te behouden');
-    assert.equal(bureau.schil, false, 'de mobiele schilbalk hoort niet naar bureau te lekken');
+    assert.equal(bureau.tabs, false, 'ook op bureau gaat TravelOS via de gedeelde Edge');
+    assert.equal(bureau.schil, true, 'de gedeelde Edge blijft ook op bureau zichtbaar');
     await page.close();
   });
 });
@@ -890,7 +886,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const doc = f.contentDocument;
       return {
         acties: window.RTGAdaptief.context().acties,
-        schil: zichtbaar(document.querySelector('#rtgCommand .cmd-balk')),
+        schil: zichtbaar(document.querySelector('.rtg-adaptive-bar')),
         bank: zichtbaar(doc.querySelector('#rvApp > .rv-bank')),
         rahul: zichtbaar(doc.querySelector('#rvApp > .rv-rahul')),
         rasterrijen: getComputedStyle(doc.querySelector('#rvApp')).gridTemplateRows.trim().split(/\s+/).length
@@ -919,7 +915,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     assert.deepEqual(await page.evaluate(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe'), doc = f.contentDocument;
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
-      return { eigenaren: [document.querySelector('#rtgCommand .cmd-balk'), doc.querySelector('.tos-nav')].filter(zichtbaar).length,
+      return { eigenaren: [document.querySelector('.rtg-adaptive-bar'), doc.querySelector('.tos-nav')].filter(zichtbaar).length,
         travel: zichtbaar(doc.querySelector('.tos-nav')),
         onderruimte: getComputedStyle(doc.documentElement).getPropertyValue('--tos-bottom').trim() };
     }), { eigenaren: 1, travel: false, onderruimte: '0px' },
@@ -932,63 +928,8 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     }, null, { timeout: 20000 });
 
     async function kies(id, label) {
-      /* DRIE POGINGEN OP DE DIRECTE KNOP, en dat is geen dobbelsteen wegpoetsen
-         maar een race benoemen. De actiebalk van RTG Command wordt opnieuw
-         getekend zodra het blad van context wisselt; klikt de toets precies
-         daartussen, dan verdwijnt de knop onder zijn handen ("element was
-         detached from the DOM"). Dat is gedrag dat er hoort te zijn -- de balk
-         volgt het blad -- en het is geen fout die een gebruiker treft: die
-         drukt op wat hij ziet, en ziet de nieuwe balk.
-
-         Gemeten op 30 augustus 2026: deze toets zakte zo ongeveer twee van de
-         vijf keer, met en zonder de wijzigingen van die dag. Opnieuw pakken is
-         hier dus de juiste reparatie; een langere wachttijd zou de race alleen
-         onzichtbaar maken. */
-      /* EN EERST WACHTEN TOT DE BALK BIJ HET BLAD IS. De lus hieronder pakt de
-         knop opnieuw als hij ONDER je handen verdwijnt; hij dekt niet het geval
-         dat hij er nog helemaal niet IS. Dan telt `count()` nul, breekt de lus
-         meteen af, en valt de toets terug op Meer -- die op dat moment nog
-         verborgen is omdat er niets overloopt in de OUDE rij. De uitslag was
-         dan "Gaan is ook niet via Meer bereikbaar", en dat leest als een
-         onbereikbare functie terwijl de balk simpelweg nog de vorige stand
-         toonde (CI-ronde 34766353782, schermdeel 1; dezelfde toets liep in
-         dezelfde boom lokaal wel door).
-
-         Wachten op de balk en niet op een klok, om de reden die twintig regels
-         hierboven staat: de balk volgt het blad, dus we wachten tot hij dit
-         vermogen toont OF tot Meer zichtbaar wordt -- die twee samen zijn
-         precies "de balk is bij". */
-      const balkBij = await page.waitForFunction((cap) => {
-        const wortel = document.querySelector('#rtgCommand');
-        if (!wortel) return false;
-        const knop = wortel.querySelector('.cmd-actie[data-cap="' + cap + '"]');
-        if (knop && knop.getBoundingClientRect().height > 0) return true;
-        const m = wortel.querySelector('.cmd-meer');
-        return !!(m && !m.hidden && m.getBoundingClientRect().height > 0);
-      }, id, { timeout: 20000 }).then(() => true, () => false);
-      assert.equal(balkBij, true,
-        label + ': de actiebalk toonde binnen 20 s noch de knop zelf noch Meer');
-
-      const directeKnop = () => page.locator('#rtgCommand .cmd-actie[data-cap="' + id + '"]');
-      for (let poging = 0; poging < 3; poging++) {
-        const direct = directeKnop();
-        if (!(await direct.count()) || !(await direct.first().isVisible())) break;
-        try { await direct.first().click({ timeout: 7000 }); return; }
-        catch (e) {
-          if (poging === 2) throw e;
-          /* Op de knop wachten en niet op een klok (test/klokwacht.test.js):
-             de balk is opnieuw aan het tekenen, dus we wachten tot er weer een
-             knop met dit vermogen IN de balk staat. */
-          await page.waitForSelector('#rtgCommand .cmd-actie[data-cap="' + id + '"]',
-            { state: 'attached', timeout: 7000 }).catch(() => {});
-        }
-      }
-      {
-        const meer = page.locator('#rtgCommand .cmd-meer');
-        assert.equal(await meer.isVisible(), true, label + ' is ook niet via Meer bereikbaar');
-        await meer.click();
-        await page.locator('.rtg-laag .lg-rij', { hasText: label }).click();
-      }
+      await require('./helper').edgeActies(page);
+      await page.locator('.rtg-adaptive-controls [data-cap="' + id + '"]').click();
     }
 
     await kies('reisveilig.vervoer', 'Gaan');
@@ -1003,7 +944,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     const vervoer = await page.evaluate(() => {
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
         el.getBoundingClientRect().height > 0);
-      const buiten = document.querySelector('#rtgCommand .cmd-balk');
+      const buiten = document.querySelector('.rtg-adaptive-bar');
       const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/ov.html');
@@ -1085,6 +1026,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
 
     /* Op bureau staan twee directe werkbladen naast elkaar. Reizen & Veilig
        herstelt zijn lokale rail; het ingebedde moduleblad bouwt er geen bij. */
+    await page.keyboard.press('Escape');
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.waitForFunction(() => {
       const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
@@ -1098,12 +1040,12 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/navigatie.html');
       return { bank: zichtbaar(rv.contentDocument.querySelector('#rvApp > .rv-bank')),
-        schil: zichtbaar(document.querySelector('#rtgCommand .cmd-balk')),
+        schil: zichtbaar(document.querySelector('.rtg-adaptive-bar')),
         kindnav: zichtbaar(leaf && leaf.contentDocument.querySelector('.tos-nav')),
         directeBladen: frames.length };
     });
-    assert.deepEqual(bureau, { bank: true, schil: false, kindnav: false, directeBladen: 2 },
-      'bureau herstelt niet precies de eigen Reizen & Veilig-rail');
+    assert.deepEqual(bureau, { bank: false, schil: true, kindnav: false, directeBladen: 2 },
+      'bureau moet dezelfde gedeelde Edge behouden');
 
     await page.setViewportSize({ width: 393, height: 852 });
     await page.waitForFunction(() => {
@@ -1115,17 +1057,18 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/navigatie.html');
-      return [document.querySelector('#rtgCommand .cmd-balk'), rv.contentDocument.querySelector('#rvApp > .rv-bank'),
+      return [document.querySelector('.rtg-adaptive-bar'), rv.contentDocument.querySelector('#rvApp > .rv-bank'),
         leaf.contentDocument.querySelector('.tos-nav')].filter(zichtbaar).length;
     }), 1, 'na terugdraaien naar telefoon verschijnen de drie balken opnieuw');
 
-    /* Standalone Reizen & Veilig blijft zelf eigenaar. Zowel de merklink als
-       een lokale teruglink houden het child in embedmodus; geen app-shell en
-       geen tweede TravelOS-balk mogen ontstaan. */
+    /* Ook standalone bedient de gedeelde Edge Reizen & Veilig. Merk- en
+       teruglinks houden het child in embedmodus, zonder tweede appbalk. */
     const los = await ctx.newPage();
     await los.setViewportSize({ width: 393, height: 852 });
     await los.goto(base + '/apps/reizen-veilig.html', { waitUntil: 'domcontentloaded' });
-    await los.click('#rvApp [data-open="vervoer"]');
+    await edgeActies(los);
+    await los.locator('.rtg-adaptive-controls [data-cap="reisveilig.vervoer"]').click();
+    await los.keyboard.press('Escape');
     await los.waitForSelector('#rvPanes .rv-pane.actief iframe[src*="/apps/ov.html"][src*="embed=1"]', { timeout: 20000 });
     const losKind = los.frameLocator('#rvPanes .rv-pane.actief iframe');
     const lokaleTerug = losKind.locator('a[href="/apps/reizen.html?embed=1#reizen"]:not(.tos-mark)').first();
@@ -1148,7 +1091,8 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const f = document.querySelector('#rvPanes .rv-pane.actief iframe');
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
       return f.contentWindow.location.pathname === '/apps/reizen.html' && !f.contentDocument.querySelector('#rtgCommand') &&
-        [document.querySelector('#rvApp > .rv-bank'), f.contentDocument.querySelector('.hoofdtabs')].filter(zichtbaar).length === 1;
+        [document.querySelector('.rtg-adaptive-bar'), document.querySelector('#rvApp > .rv-bank'),
+          f.contentDocument.querySelector('.hoofdtabs')].filter(zichtbaar).length === 1;
     }, null, { timeout: 20000 });
     await los.close();
 
@@ -1213,7 +1157,7 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
       return { state: r.dataset.rtgSecondScreen, top: Math.round(rect.top), bottom: Math.round(innerHeight - rect.bottom),
         width: Math.round(rect.width), modules: r.querySelectorAll('[data-ss-module]').length,
-        balken: [r.querySelector('.cmd-balk')].filter(zichtbaar).length,
+        balken: [document.querySelector('.rtg-adaptive-bar')].filter(zichtbaar).length,
         overloop: b.scrollWidth > b.clientWidth,
         personal: document.body.hasAttribute('data-rtg-personal-surface'),
         quick: [...r.querySelectorAll('.rtg-ss-quick > .rtg-ss-quick-door')].map(x => x.textContent.replace('›', '').trim()),
@@ -1271,7 +1215,7 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
     await page.click('#rtgCommand [data-ss-action="close"]');
     await page.waitForFunction(() => {
       const r = document.getElementById('rtgCommand');
-      const deur = document.querySelector('.rtg-edge-menu[data-rtg-command-owner="true"]') ||
+      const deur = document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]') ||
         r.querySelector('.cmd-lade');
       return r.dataset.rtgSecondScreen === 'peek' && document.activeElement === deur;
     });
@@ -1293,9 +1237,10 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
     }, null, { timeout: 10000 });
     assert.equal(await page.evaluate(() => {
       const r = document.getElementById('rtgCommand');
-      return [...r.querySelectorAll('.cmd-balk')].filter(x => getComputedStyle(x).display !== 'none').length;
+      return [...document.querySelectorAll('.rtg-adaptive-bar')].filter(x => getComputedStyle(x).display !== 'none').length;
     }), 1, 'na een moduleactie hoort nog steeds één onderdock zichtbaar te zijn');
     await page.click('#rtgCommand [data-ss-action="close"]');
+    await page.keyboard.press('Escape');
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.waitForFunction(() => document.getElementById('rtgCommand').dataset.rtgSecondScreen === 'workspace');
     assert.equal(await page.locator('#rtgCommand .cmd-bank').isVisible(), true,

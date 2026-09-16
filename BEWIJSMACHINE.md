@@ -659,6 +659,555 @@ duwt maakt het huis slechter en de meter groener, en dat is precies de faalvorm
 waar dit hoofdstuk over gaat. Tot de verklaring per generator een besluit is, is
 `npm run meterklasse` een commando dat je draait en geen getal dat meetelt.
 
+## 6b. De eigen state van de bewijsmachine
+
+Par. 6a gaat over metingen die het verkeerde experiment uitvoeren. Dit gaat over
+iets wat een laag eronder zit en dat niemand had opgeschreven: **hoe de
+bewijsmachine haar eigen toestand publiceert en terugleest.** Twee regels, en
+allebei komen ze uit een fout die hier op 15 september 2026 echt is gemaakt.
+
+### BM-A. Een bewijsregister mag nooit in een tussenstaat waarneembaar zijn
+
+`scripts/lib/afbouw-afloop.js` schreef de afloop van een bronmuterende ronde met
+een kale `writeFileSync`. Die maakt het bestand eerst (of kapt het af op nul) en
+vult het daarna, dus er is een venster waarin de afloop **wel bestaat en niet
+parseert**. Gemeten met een schrijver en een lezer drie seconden naast elkaar, op
+een afloop van de maat die die laag echt schrijft:
+
+| | lezingen | gescheurd |
+|---|---|---|
+| kale `writeFileSync` | 133.196 | **110.390** |
+| `tmp` + `renameSync` | 34.480 | **0** |
+
+Dat is geen randgeval maar de normale toestand tijdens het schrijven. De regel
+die eruit volgt: een nieuwe toestand wordt **volledig gepubliceerd of helemaal
+niet** -- schrijven naar een buurbestand en dan hernoemen, zodat een lezer de
+oude toestand ziet of de nieuwe, nooit een halve.
+
+**Wie handhaaft hem: niemand, en dat staat hier liever dan een schijnbewaker.**
+De regel geldt namelijk niet voor alle registers. Verreweg de meeste worden
+geschreven terwijl niemand ze leest, en daar is een kale schrijf onschadelijk.
+Het bereik van BM-A is **bewijsstate die gelezen kan worden terwijl zij wordt
+geschreven** -- de afloop van het afbouwslot, de journalen, de eigenaarssleutel.
+Welke bestanden dat precies zijn, is vandaag niet gemeten, en een ratel over alle
+187 schrijvende scripts zou op het verkeerde duwen: precies de faalvorm die par.
+6a.2 bij `METERKLASSE.json` beschrijft. De verklaring per generator die daar
+openstaat, hoort deze vraag mee te beantwoorden.
+
+### BM-B. Onleesbaar is niet afwezig
+
+De tweede helft is groter, want zij gaat over de LEZER. `lees()` in datzelfde
+bestand gaf bij een parsefout `null`, en `null` betekent in die laag "er loopt
+geen ronde". Het slot dat een tweede bronmuterende ronde moet tegenhouden, ging
+dus open omdat het bewijs onleesbaar was. Bewijs- en gezagsinformatie kent drie
+toestanden en geen twee:
+
+| | |
+|---|---|
+| **BESTAAT + GELDIG** | er staat iets, en het is te vertrouwen |
+| **BESTAAT + ONGELDIG** | er staat iets, en het is stuk |
+| **BESTAAT NIET** | er staat niets |
+
+Wie de tweede op de derde laat vallen, maakt van een **kapot** register een
+**leeg** register -- en leeg betekent in dit huis bijna overal *geen beperking*:
+geen besluit, geen grens, geen lopende ronde, geen schuld. Een gescheurde lezing
+wordt dan een vrijbrief, en in de bron ziet dat eruit als zorgvuldigheid.
+
+**Dit is wel gemeten** (`npm run stillezing`, `STILLEZING.json`). De meter is de
+spiegel van `STILSPOOR.json`: die telt SCHRIJVERS wier falen wordt opgegeten,
+deze telt LEZERS die het onderscheid verliezen. De eerste verliest bewijs, de
+tweede kan een poort laten opengaan; ze worden nooit opgeteld.
+
+| | `server/` | `scripts/` |
+|---|---|---|
+| bewijslezingen (bereik) | 75 | 442 |
+| met een vanger eromheen | 9 | 95 |
+| **smelt samen** (schuld) | **5** | **61** |
+| zegt het erbij | 1 | 10 |
+| **onderscheidt ongeldig** | **0** | 3 |
+| gooit door (fail-closed) | 2 | 2 |
+| anders (vraagt een mens) | 1 | 19 |
+
+**De twee kolommen worden nooit opgeteld**, en dat is geen netheid: in `server/`
+laat zo'n lezing een HANDELING door, in `scripts/` laat zij een METING liegen.
+Een som is een getal waarop niemand kan sturen.
+
+Het scherpste getal is de nul: **in de hele runtime is er geen enkele lezer die
+een kapot bewijs onderscheidt van een afwezig bewijs.** Alle drie de
+onderscheiders wonen in `scripts/` -- in de meters, niet in de code die een
+handeling tegenhoudt.
+
+**En het is een triagelijst, geen foutenlijst.** De vijf in `server/` zijn met de
+hand nagelopen, en twee dragen hun eigen verklaring in hetzelfde bestand:
+`routes/office/dekking.js` zegt er letterlijk bij *"een onleesbaar bewijsstuk is
+geen bewijs"* en toont dan "niet gemeten" in plaats van 0% of 100%, en
+`kern/isolatie/proefmeting.js` zegt in zijn kop dat niet-gemeten in beide
+aanroepers tot de STRENGSTE uitkomst leidt. Dat zijn geen gebreken maar de juiste
+uitkomst onder dezelfde vorm. De andere drie (`kern/handelingsklasse/omkeerbaar.js`,
+`kern/stuur/gevolg.js`, `routes/office/register.js`) dragen geen verklaring.
+
+Daarbij hoort dezelfde afspraak als bij `STILSPOOR`: een besluitregister naast de
+meting, en het bestaat nog niet omdat er nog geen besluit is genomen. Een besluit
+trekt nooit van `stilLezing` af.
+
+### Wat het bouwen van die meter zelf blootlegde
+
+Drie dingen, en ze horen bij par. 6a:
+
+1. **`onderscheidt` stond op nul en dat kon niet anders.** `deelIn()` had vier
+   uitgangen en die categorie zat er niet bij, terwijl `scripts/codewereld.js`
+   hem aantoonbaar invult. De meter meldde dus een eigenschap van zichzelf als
+   een eigenschap van het huis. Er staat nu een ijking in die eist dat alle vijf
+   uitgangen bereikbaar zijn; zakt die, dan weigert de meter te tellen.
+2. **Elk gemeld adres was fout.** `zonderCommentaar()` KORT de bron in, dus een
+   regelnummer uit de gestripte tekst wijst in het echte bestand naar iets
+   anders. Dit huis had dat al opgelost (`{ regelsHeel: true }` slaat commentaar
+   plat in plaats van weg) en `stilspoor.js` gebruikte het al; ik niet.
+3. **De meter verwijst naar zichzelf en convergeert in één stap.** Zodra
+   `STILLEZING.json` bestaat, tellen de lezingen die zijn naam noemen mee: het
+   bereik ging 439 → 442 en bleef daarna over drie rondes staan. Wie hem voor het
+   eerst vastlegt, draait `--vastleggen` dus twee keer.
+
+## 6c. Wie mag dit artefact opnieuw afleiden
+
+Par. 6b gaat over hoe de bewijsmachine haar toestand publiceert en terugleest.
+Dit gaat over de vraag die daar onmiddellijk naast ligt en die niemand had
+gesteld: **het huis kan een afgeleid artefact vaak wel produceren, maar kan niet
+altijd bewijzen wie bevoegd is het opnieuw te produceren.**
+
+### De aanleiding is een gemeten reeks, geen gevoel
+
+Bij de samenvoeging met main van 15 september 2026 waren er negentien
+conflicten: één in de bron en achttien in afgeleide artefacten. Alle achttien
+zijn opnieuw afgeleid — per stuk, met de hand, door de juiste opdracht te
+kiezen. Machinaal aanwijsbaar waren er toen **acht**.
+
+Dat verschil is het hele probleem. Het is niet dat de generatoren ontbreken; het
+is dat de machine ze niet kan noemen, en dus kan een gegenereerd conflict nooit
+automatisch een **rebuild-verplichting** worden in plaats van menselijk
+mergewerk.
+
+### Het contract
+
+> Elk artefact dat repo-waarheid claimt en niet door een mens is geschreven,
+> heeft **precies één machinaal vindbare generator-eigenaar.**
+
+`AFGELEID.json` (`npm run afgeleid`) legt dat per wortelartefact vast, en
+`test/afgeleid.test.js` handhaaft de acht eigenschappen — één toets per
+eigenschap, alle negen groen, en twee keer met een mutatie zien zakken.
+
+### Vijf standen, en ONBESLIST is er één van
+
+| | |
+|---|---|
+| **BRON** | door een mens of externe waarheid geschreven; geen generator vereist |
+| **AFGELEID** | volledig reproduceerbaar; precies één eigenaar |
+| **FRAGMENTEN** | een BRON-document waarin een generator alleen afgebakende stukken herschrijft |
+| **MOMENTOPNAME** | afgeleid maar bewust gebonden aan één ronde, commit of tijdstip |
+| **ONBESLIST** | niemand heeft het gezegd — en dit mag nooit stil een van de andere vier worden |
+
+**FRAGMENTEN is niet uit het model afgeleid maar uit de meting gevallen.**
+CLAUDE.md en MACHINE.md waren de laatste twee van de achttien die niemand kon
+aanwijzen, en dat is terecht: ze wórden niet gegenereerd. `scripts/getallen.js`
+herschrijft alleen de stukken tussen de merktekens `<!--getal:…-->`
+(met een echte naam in plaats van het beletselteken -- een puntje meer en deze
+regel is zelf een openend merkteken zonder sluittag). Dat is niet AFGELEID
+(het document regenereren bestaat niet) en niet BRON (die stukken horen nooit
+met de hand te worden samengevoegd). Zeventien documenten, en hun eigenaar is
+niet aangewezen maar **gevonden**: het enige script dat de merkteken-conventie
+kent.
+
+### De verklaringen lagen er al, op drie plekken
+
+Voordat er een vierde lijst bij kwam is geteld wat er is:
+
+| bron | verklaringen |
+|---|---|
+| `scripts/versheid.js` — per register de opdracht die hem schrijft | 112 |
+| `EIGENAAR` in `scripts/lib/registereigenaar.js` | 18 |
+| `detecteer()` — gemeten `writeFileSync` | 99 |
+
+Eén tegenspraak over het hele huis, en die stond al als onverklaarde botsing
+genoteerd. `AFGELEID.json` is dus een **samenvoeging** en geen uitvinding.
+
+### De detector kon 63 bestaande generatoren niet aanwijzen
+
+Van 99 naar 162 gevonden schrijvers, zonder dat er één verklaring bij kwam.
+Vier fouten, en alle vier lieten ze een generator die er gewoon is onzichtbaar:
+
+1. de constante moest in **hoofdletters** staan — `scripts/capabilities.js`
+   schrijft naar `doel`;
+2. het eerste argument werd op de eerste **komma** afgekapt, en die staat bij
+   `writeFileSync(path.join(WORTEL, 'X.json'), ...)` binnen het argument;
+3. het bereik was alleen `.json`, terwijl ARCHITECTUUR.md, BEWIJS.md en
+   FUNCTIES.md net zo goed worden gegenereerd;
+4. `const UIT = 'X.json'; const pad = path.join(WORTEL, UIT)` vroeg om
+   herleiding **twee schakels** diep. Dat is de grens: dieper wordt het een
+   halve interpreter en bewijst een treffer niets meer.
+
+Daarmee ging de dekking op de achttien conflicten van 8 naar **16**.
+
+### Het sterkste bewijs lag in het artefact zelf
+
+`stempel()` schrijft bij elke meting het **instrument** mee: het script dat hem
+op dat moment produceerde. Dat is geen lexicale gok maar een verklaring van de
+schrijver, gedaan op het moment van schrijven — en **84 van de 165**
+wortelregisters dragen hem, alle 84 wijzend naar een bestand dat bestaat.
+
+Hij staat boven de gemeten schrijvers en onder de menselijke verklaring: een
+mens die iets vastlegt weet meer dan een stempel, een stempel weet meer dan een
+regex over de bron. En de kruiscontrole is de reden dat hij te vertrouwen is:
+**waar stempel en bronmeting elkaar overlappen, spreken ze elkaar nul keer
+tegen** (toets 7a). Twee onafhankelijke methodes die het overal eens zijn.
+
+Dat dit er niet eerder in zat heeft een simpele oorzaak: `registereigenaar.js`
+ging over *scripts die schrijven* en keek daarom in `scripts/` en nooit in het
+artefact. De vraag "wie heeft dit geschreven" heeft twee kanten, en de ene stond
+al opgeschreven.
+
+### De stand, over 282 wortelartefacten
+
+| | |
+|---|---|
+| BRON | 2 |
+| AFGELEID | 156 |
+| FRAGMENTEN | 17 |
+| MOMENTOPNAME | 0 |
+| ONBESLIST | 107 (16 `.json`, 91 `.md`) |
+| **zonder canonieke eigenaar** | **2** — en beide staan al in `ONVERKLAARDE_BOTSING` |
+| eigenaar uit een harde bron | 85 |
+| grendelt op een schone boom | 15 |
+
+**ONBESLIST is de tand die een verdwenen generator vangt.** Valt
+`scripts/kaart.js` weg, dan zakt ARCHITECTUUR.md van AFGELEID naar ONBESLIST en
+*stijgt* dit getal — dat is eigenschap 4 van het contract, en daarom mag hij
+alleen dalen. De 91 handgeschreven documenten hoeven dus niet stuk voor stuk
+verklaard te worden; wat ze nodig hebben is een ratel die groei vangt.
+`afgeleidMetEigenaar` staat ernaast omdat een dalende onbesliste stand ook een
+**krimpend bereik** kan zijn.
+
+De grendelregel (eigenschap 7) is met opzet **gemeten en niet geëist**: par.
+6a.2 heeft dat besluit openstaan, en een deel van de generatoren hoort juist
+niet te grendelen. Dit register levert het getal waarop dat besluit genomen kan
+worden; het neemt het niet.
+
+### Een opdrachtregel noemt een ingang, geen schrijver
+
+De contracttoets vond binnen een minuut een fout in de classificatie zelf.
+`OUTPUTPROEF.json` heeft twee gemeten schrijvers en zijn versheidsopdracht is
+`npm run meetronde -- --alleen=outputproef`. Mijn eerste volgorde zette versheid
+vóór de meervoudige schrijvers, en gaf het register `scripts/meetronde.js` als
+eigenaar — een **derde** script, de orkestrator, die het bestand niet eens
+schrijft. Versheid telt nu pas als er niets gemeten is.
+
+### Een instrument is nooit onderwerp van zijn eigen meting
+
+Drie keer in twee dagen, en elke keer in een nieuwe vorm:
+
+- de stillezingmeter telde lezingen van zijn **eigen registernaam** zodra dat
+  register bestond (convergeert in één stap, uitgeschreven in par. 6b);
+- `registereigenaar.js` las de **ruwe bron** en dus zijn eigen toelichting: mijn
+  uitleg over COMMERCE.json maakte hem prompt een tweede schrijver van
+  COMMERCE.json (par. 6a.1, nu op de detector zelf);
+- `afgeleid.js` telde **zichzelf** als kandidaat voor de merkteken-conventie,
+  waardoor alle zeventien fragmenten als "geen eigenaar" uitkwamen.
+
+Commentaar scheiden hielp bij de derde niet, want de string stond in de code.
+Wat helpt is de regel zelf.
+
+## 6d. Van conflict naar herbouwplicht
+
+Par. 6c geeft elk afgeleid artefact een eigenaar. Dat is **eigenaarschap en geen
+bewijs** — dat de map zegt wie de sleutel heeft, betekent niet dat de sleutel
+past. `scripts/herbouwproef.js` (`HERBOUWPROEF.json`) stelt de vraag erachter:
+draai die eigenaar, en komt er hetzelfde uit?
+
+Daar hangt een architectonisch gevolg aan. Een afgeleid artefact waarvan de
+herbouw vaststaat, is bij een samenvoeging **geen conflict maar een
+herbouwplicht**: je neemt geen van beide kanten over en je lost niets met de
+hand op, je draait de generator. Een artefact waarvan dat níét vaststaat, moet
+met de hand worden samengevoegd — en dan ontstaat er een waarheid die geen
+enkele bron heeft geproduceerd.
+
+### De aanroep wordt afgeleid, niet verklaard
+
+Er komt geen vierde lijst bij (zelfde regel als in par. 6c). De aanroep wordt
+gezocht in de bronnen die er al zijn, en de **herkomst** staat per artefact in
+de uitslag: eerst de opdracht die `scripts/versheid.js` per register al noemt,
+anders de npm-opdracht die de eigenaar aanroept, anders `node <eigenaar>` — want
+de eigenaar ís het script. Een `--controle`- of `--toon`-variant nooit: die
+schrijft met opzet niet, en wie die kiest meet gegarandeerd "niet geschreven" en
+noemt dat dan een eigenschap van het artefact.
+
+### Vijf uitslagen, en twee ervan gaan niet over het artefact
+
+| | |
+|---|---|
+| `gelijk` | byte voor byte hetzelfde |
+| `alleenStempel` | alleen het meetmoment bewoog; de inhoud kwam terug zoals hij stond |
+| `verschilt` | de inhoud kwam anders terug — een bevinding, geen fout van de proef |
+| `nietGeschreven` | de opdracht liep en raakte het bestand niet aan |
+| `nietGedraaid` | kon hier niet draaien, mét de reden |
+
+**`gelijk` en `alleenStempel` worden nooit opgeteld tot een cijfer
+determinisme.** Een stempel *hoort* te bewegen; zou je ze samentellen, dan wordt
+een register dat zijn eigen meetmoment niet opschrijft de beste leerling. Ze
+tellen alleen samen op in `herbouwbaar`, en dat woord draagt geen percentage —
+`LAT.md` regel 11 en `check.js` regel 48 staan erboven.
+
+`nietGeschreven` is de **besturingsproef**. Zonder die stand leest elke leesloze
+opdracht als een perfecte reproductie: het bestand is niet veranderd, dus het is
+"gelijk". De proef kijkt daarom naar de mtime en niet alleen naar de bytes — een
+instrument dat niet kan uitslaan, is geen instrument.
+
+### De uitslag over de achttien conflicten van 15 september
+
+| | |
+|---|---|
+| `gelijk` | 5 |
+| `alleenStempel` | 9 |
+| **`verschilt`** | **0** |
+| `nietGeschreven` | 1 |
+| `nietGedraaid` | 3 |
+| **herbouwbaar** | **14 van 18** |
+
+**Nul artefacten kwamen inhoudelijk anders terug.** De vier die niet bewezen
+zijn, zijn dat elk om een andere soort reden, en die vier soorten horen niet op
+een hoop:
+
+- **`CLAUDE.md` en `MACHINE.md`** zijn FRAGMENTEN. Ze in hun geheel herbouwen
+  bestaat niet — een eigenschap van het artefact, geen tekort.
+- **`DEKKING.json`** liep over de wachttijd: zijn generator draait de hele
+  toetsmap. Een oordeel over deze machine en niet over het register.
+- **`NORM.json`** schrijft alleen als er iets beweegt. Dat is correct gedrag van
+  een ratelregister, en het betekent dat de herbouw hier niet te *observeren*
+  is — niet dat hij niet klopt.
+
+Het samenvoegmodel verschuift daarmee van *19 conflicten, 18 met de hand* naar
+*1 bronconflict plus 18 herbouwplichten, waarvan er 14 bewezen zijn*.
+
+### Drie dingen die de eerste ronde in de proef zelf vond
+
+**Een meetmoment wordt op vorm herkend en niet op naam.** Er lopen twee
+stempelconventies naast elkaar: de meeste registers dragen een `stempel`-object,
+`COMMERCE.json` en `OBJECTMODEL.json` een kale `vastgelegd: "2026-09-15"`. Een
+lijst toegestane veldnamen zou de derde vorm morgen missen en vandaag al een
+echt verschil wegpoetsen dat toevallig zo heet. De regel is nu structureel: een
+top-level veld waarvan de oude en de nieuwe waarde allebei een ISO-datum zijn,
+is een meetmoment — en wat er is weggestreept staat **met naam** in de uitslag.
+
+**Regels op positie vergelijken gaf een geldig getal uit het verkeerde
+experiment.** `BEWIJS.md` kwam terug als *1413 regels anders van 1958*, terwijl
+`git diff --stat` 7 toevoegingen en 6 verwijderingen telt: één ingevoegde regel
+schuift alles erna op, en dan verschilt de rest van het bestand per definitie.
+Dat is par. 6a op deze proef zelf. De vergelijking gaat nu over regels als
+verzameling.
+
+**De wachttijd doodde alleen de schil.** `npm run dekking:vast` liep af op 240
+seconden, de proef noteerde netjes `nietGedraaid` — en drie minuten later stonden
+`npm`, het generatorscript én een `node --test` over de hele toetsmap nog te
+draaien. Die schrijven hun register af terwijl de proef allang bij het volgende
+artefact is, dus meet artefact *n+1* op de uitvoer van artefact *n* met een
+tussenpoos die niemand kan reproduceren. Dezelfde opstapeling die
+`scripts/mutatie.js` beschrijft. De opdracht loopt nu via `setsid`, zodat de
+kindpid de groepsleider is en de hele kring omgaat; daarna wordt er **gepeild**
+of hij echt weg is, want een signaal sturen is niet hetzelfde als opgeruimd
+zijn.
+
+En een vierde, die geen fout van de proef was maar een vondst: vier van de
+achttien heetten eerst `nietGeschreven` terwijl ze prima schrijven. Hun
+npm-opdracht is de kale variant en de `writeFileSync` staat achter
+`process.argv.includes('--vastleggen')`; `mutatiecontract` heeft daarnaast
+`--afleiden`, een vlag die in geen enkele naamconventie past. De vlaggen worden
+nu **gelezen uit de bron van de eigenaar** en een voor een geprobeerd, en het
+register noteert de opdracht die aantoonbaar heeft geschreven.
+
+### Wat deze proef niet zegt
+
+Hij zegt niet dat een generator deterministisch is: hij draait één keer. Twee
+keer draaien zou het wel zeggen, en dat is een aparte meting. Hij zegt ook niet
+dat het ingecheckte artefact klopt met de bron van gisteren — `verschilt`
+betekent *of de generator is niet deterministisch, of het artefact loopt achter*,
+en welke van de twee is met deze proef alleen niet uit te maken. In de eerste
+ronde was het driemaal het tweede, en daarmee deed hij precies waar hij voor is:
+`ARCHITECTUUR.md`, `BEWIJS.md` en `FUNCTIES.md` liepen één bestand achter omdat
+deze proef zelf erbij was gekomen.
+
+## 6e. Wat kost een correcte verandering
+
+Par. 6d maakt van een samenvoegconflict een herbouwplicht. De vraag daarboven is
+de stuurmaat van dit hele hoofdstuk:
+
+> Verlaag niet de hoeveelheid zekerheid. Verlaag de hoeveelheid **werk** die
+> nodig is om dezelfde of sterkere zekerheid te produceren.
+
+`scripts/bewijskosten.js` (`BEWIJSKOSTEN.json`) meet waar het werk heen ging bij
+een verandering die door alle poorten kwam.
+
+### Twee helften die elkaar nooit raken
+
+`gemeten` volgt uit git, `AFGELEID.json` en `HERBOUWPROEF.json` — reproduceerbaar,
+en iedereen die de opdracht draait krijgt hetzelfde. `verklaard` is een **oordeel
+van een mens**: ontdekkingen, defecten die onderweg opdoken en die geen enkele
+toets zag. Die zijn het waardevolste van een ronde en het minst meetbare, en
+precies daarom komen ze in geen enkele som. Er is geen reproduceerbare
+detectieregel voor een ontdekking, dus een cijfer waarin ze meetellen is half
+gemeten en half geschat — en dat leest als gemeten.
+
+Toets 1 handhaaft dat **op de bron en niet op een getal**: in de code van
+`meet()` mag het woord `verklaard` niet voorkomen.
+
+### Twee versterkingsfactoren, en de ene mag groeien
+
+Eén regel bron sleept regels mee in de rest van de boom. Dat is geen probleem —
+het is wat een huis vol meters hoort te doen. Het gaat erom **wie** die regels
+schrijft.
+
+| | |
+|---|---|
+| `machineVersterking` | afgeleide regels per bronregel. Een generator doet dit in seconden; deze mag gerust groeien. |
+| `mensVersterking` | afgeleide artefacten die bij een samenvoeging in conflict kwamen en waarvan de herbouw **niet** bewezen is. Precies die moest een mens met de hand samenvoegen. Deze hoort naar nul. |
+
+Ze worden nooit opgeteld. Een bronconflict telt met opzet **niet** in de tweede
+mee: dat is werk aan echte inhoud en geen versterking. Vandaar drie
+afhandelingen en niet twee — `herbouwplicht`, `onbewezen`, `handmatig` — en
+`onbewezen` is geen `handwerk`: niet bewezen herbouwbaar is iets anders dan
+bewezen niet-herbouwbaar.
+
+### De eerste meting, over het bereik van deze tak
+
+| | |
+|---|---|
+| intentie (`server/`, `public/`) | 32 bestanden, 1804 regels |
+| bewijs (`test/`, `scripts/`) | 19 bestanden, 3519 regels |
+| afgeleid (door een generator) | 30 bestanden, 6660 regels |
+| document | 1 bestand, 525 regels |
+| **machineversterking** | **3,69** afgeleide regels per bronregel |
+| **mensversterking** | **9** |
+| drift | 44 conflicten: 6 in de bron, 29 herbouwplicht, 9 onbewezen |
+
+De negen zijn het getal dat ertoe doet, en ze zijn met naam te noemen:
+`NORM.json` in alle drie de samenvoegingen, `MUTATIES.json` in twee, en verder
+`CLAUDE.md`, `MACHINE.md`, `DEKKING.json` en `GLUURRONDE.json`. Twee daarvan zijn
+FRAGMENTEN en de rest is nog niet door de herbouwproef gekomen. **De weg omlaag
+loopt dus via het verbreden van die proef en niet via beter met de hand
+samenvoegen** — en dat is precies het verschil dat dit register zichtbaar maakt.
+
+De uitslag over de samenvoeging van 15 september komt exact uit op wat
+`HERBOUWPROEF.json` langs een andere weg vond: 14 herbouwplicht, 4 onbewezen, 1
+bron. Twee metingen die elkaar bevestigen zonder elkaars invoer te zijn.
+
+### De duurste fout van de eerste ronde zat in een exitcode
+
+`git merge-tree` geeft exitcode **1 als er conflicten zijn**. `execFileSync`
+gooit op elke niet-nul uitgang, mijn vanger noteerde `conflicten: null`, en de
+uitslag las als *drift: 0 conflicten* — terwijl de samenvoeging er negentien had.
+Een stille nul waar een negentien hoorde, en hij zag er rustig uit.
+
+Dat is **BM-B in een derde gedaante**: niet een onleesbaar bestand dat als
+afwezig leest, maar een *geslaagde* meting die als een mislukte leest omdat haar
+sein een foutcode is. Toets 7 bewaakt dat de bron die exitcode uitdrukkelijk als
+uitslag leest.
+
+### De andere helft: wat leverde het op?
+
+De kosten alleen zeggen niets. Naast de vier soorten werk staat daarom een
+tweede meting: hoeveel zekerheid is er in dit bereik **bij** gekomen? Vier
+soorten, gelezen uit registers die dit huis al bijhoudt, bij de basis én bij de
+top van het bereik.
+
+| | |
+|---|---|
+| `ratelTanden` | **+11** — 551 menselijk getypte regels per tand |
+| `toetsenBewezenGevoelig` | **+7** — 866 menselijk getypte regels per toets |
+| `artefactenMetEigenaar` | **ONBEPAALD** |
+| `herbouwBewezen` | **ONBEPAALD** |
+
+Die twee laatste zijn de scherpste regel van dit register, en hij kostte
+onmiddellijk geld: **`AFGELEID.json` en `HERBOUWPROEF.json` bestónden niet bij
+het aftakpunt.** Een register dat er niet was is iets anders dan een register dat
+nul mat — de eerste is een nieuw *soort* zekerheid, de tweede een getal dat niet
+bewoog. Wie die twee samenvoegt noteert `0 → 174` en schrijft een spectaculaire
+vooruitgang op een schaal die daarvoor niet bestond. Dus `voor: null`,
+`delta: null`, en de reden erbij. Drie standen, weer.
+
+### Er komt geen enkel opbrengstcijfer
+
+De verleiding is één getal: *zoveel zekerheid per regel werk.* Dat mag hier niet,
+om twee gronden die allebei al in dit huis staan.
+
+De eenheden zijn **niet optelbaar**. Een ratel*tand*, een bewezen *toets* en een
+herbouwd *artefact* zijn drie dingen; ze bij elkaar optellen vraagt een weging
+die niemand weegt — en dan staat er een verzonnen getal in een register dat over
+eerlijkheid gaat (INT-04, `LAT.md` regel 11, `check.js` regel 48). En zo'n getal
+zou de twee registers die in dit bereik *zijn ontstaan* moeten meetellen als een
+sprong vanaf nul.
+
+Wat er dus staat is de opbrengst **per soort**, met de eenheid erbij en met het
+menselijke werk ernaast. De lezer kan delen; het register doet het niet.
+
+### Twee dingen die het bouwen van de opbrengstkant blootlegde
+
+**De meter schreef zijn eigen uitvoer op als arbeid van een mens.**
+`MOMENTOPNAME` stond niet in de klasse `afgeleid`, dus `BEWIJSKOSTEN.json` viel
+in `overig` en zijn 587 regels telden als menselijk getypt — precies het getal
+dat hij moet meten. De stand verschilt om zijn *versheid* en niet om zijn
+schrijver.
+
+**En de toets die de drie standen moest bewaken, bleef groen op de mutatie die
+hem moest vangen.** Hij las alleen het ingecheckte register, en dat was nog met
+de goede code geschreven. Een toets die de vastgelegde uitslag leest, beproeft de
+**vastlegging** en niet de meter (`LAT.md` regel 10). Hij meet de eigenschap nu
+vers — tegen het *opgeloste* bereik, twee volle sha's, want `..HEAD` verschuift
+met elke commit — en zakt dan wel. Er staat een uitgeschreven eis bij dat er in
+het bereik minstens één register moet zijn ontstaan; anders beproeft hij niets.
+
+Daaruit volgt nog iets wat je niet moet wegpoetsen: **de commit die dit register
+toevoegt zit per definitie niet in het bereik dat het beschrijft.** Dat is geen
+achterstand maar de vorm van een momentopname — hem najagen tot hij zichzelf
+bevat, convergeert nooit.
+
+### Twee huisregels vingen dit werk binnen één CI-ronde
+
+Beide gaten kwamen van mijn eigen hand, en beide werden gevangen door een regel
+die hier al stond.
+
+**Toets 4 van `test/registereigenaar.test.js` ging van 146 naar 147.**
+`HERBOUWPROEF.json` kwam erbij als wortelregister zonder dat iemand in `EIGENAAR`
+zei wie het bezit — zijn eigenaar werd alleen *gemeten* uit het stempel. Dat is
+letterlijk wat die tand moet vangen ("het getal hoort te dalen doordat er
+eigenaren bijkomen, niet te stijgen doordat er registers bijkomen"), nu op de
+laag die zelf over eigenaarschap gaat. De vloer is niet verhoogd; de verklaring
+is erbij gezet.
+
+**En `BEWIJSKOSTEN.json` droeg een veld `bereik`** — LAT.md regel 14. Die naam
+draagt in de bewijsregisters al drie relaties waarvan er twee elkaars tegendeel
+zijn: wat een wachter *raakt* tegenover waarover een oordeel *geldt*. Bij mij
+betekende het een vierde ding, een reeks commits. Technisch correct en semantisch
+onjuist: het type klopt, de waarde klopt, en de vraag die beantwoord wordt is een
+andere dan de gestelde. De uitweg is niet een vierde relatie verklaren maar
+**hernoemen** — zelfde keuze als bij `Pulse`, `moment` en `envelop`. Het veld
+heet nu `commitreeks`, gemeten vrij.
+
+Let op waar deze twee **niet** door zijn gevangen: `check`, `registerklopt`,
+`norm`, `normverval`, `deltapoort` en `getallen --controle` stonden alle zes
+groen. Het waren gewone unittoetsen in de scherven. `LAT.md` regel 17 op zijn
+scherpst — een poort bewijst alleen zijn eigen bereik, en "mijn gebruikelijke
+controles" is niet "het oordeel van de keten".
+
+### De eerste MOMENTOPNAME
+
+Die stand stond in par. 6c op papier met **nul** leden. `BEWIJSKOSTEN.json` meet
+over een *bereik*, dus opnieuw draaien geeft terecht iets anders en "loopt
+achter" is er geen zinnig oordeel over. Hij staat daarom in de `BUITEN`-lijst van
+de versheidswacht en in `GEEN_METING`, allebei met de reden: **een ratel over een
+bewegend bereik verbetert door het bereik te verkleinen.** Meet een tak van drie
+commits, en elk getal is laag. Dat is exact de faalvorm waarvoor
+`afgeleidMetEigenaar` en `stilLezingBereik` bestaan.
+
+De tand die er wél hoort te komen — `mensVersterking` naar nul — vraagt eerst een
+**stabiel bereik**, en dat is een besluit en geen bouwtaak.
+
 ## 7. Wat dit niet wordt
 
 - **Geen enkel groen woord bovenaan.** `LAT.md` regel 11 en `check.js` regel 48

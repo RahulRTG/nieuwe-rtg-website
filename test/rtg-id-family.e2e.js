@@ -175,11 +175,11 @@ test('RTG ID vormt op telefoon en bureau een familie met de ene Edge',
       await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
 
       if (maat.width < 900) {
-        await page.waitForSelector('.rtg-edge-mouth canvas', { state: 'visible', timeout: 15000 });
+        await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-lips', { state: 'visible', timeout: 15000 });
         const eersteBalk = await page.evaluate(() => {
-          const onder = document.querySelector('.rtg-edge-bottom');
-          const mond = document.querySelector('.rtg-edge-mouth');
-          const canvas = mond && mond.querySelector('canvas');
+          const onder = document.querySelector('.rtg-adaptive-bar');
+          const mond = document.querySelector('.rtg-adaptive-item[data-rtg-adaptive-action="ai"]');
+          const canvas = mond && mond.querySelector('.rtg-adaptive-lips');
           const rect = (el) => {
             const r = el && el.getBoundingClientRect();
             return r ? { left: r.left, right: r.right, top: r.top, bottom: r.bottom,
@@ -188,22 +188,22 @@ test('RTG ID vormt op telefoon en bureau een familie met de ene Edge',
           return {
             onder: rect(onder), mond: rect(mond), canvas: rect(canvas),
             zichtbaar: onder && getComputedStyle(onder).display !== 'none',
-            homeZichtbaar: !!(onder && Array.from(onder.querySelectorAll(':scope > a')).some((el) =>
+            homeZichtbaar: !!(onder && Array.from(onder.querySelectorAll('[data-rtg-adaptive-action="home"]')).some((el) =>
               getComputedStyle(el).display !== 'none')),
-            wereldenZichtbaar: !!(onder && getComputedStyle(onder.querySelector('.rtg-edge-worlds-trigger')).display !== 'none'),
-            actiesZichtbaar: !!(onder && getComputedStyle(onder.querySelector('.rtg-edge-actions-trigger')).display !== 'none'),
-            menuZichtbaar: !!(onder && getComputedStyle(onder.querySelector('.rtg-edge-menu')).display !== 'none'),
-            labelOnderMond: !!(mond && mond.parentElement.querySelector('small'))
+            wereldenZichtbaar: !!(onder && getComputedStyle(onder.querySelector('[data-rtg-adaptive-action="worlds"]')).display !== 'none'),
+            actiesZichtbaar: !!(onder && getComputedStyle(onder.querySelector('[data-rtg-adaptive-action="context"]')).display !== 'none'),
+            menuZichtbaar: !!(onder && getComputedStyle(onder.querySelector('[data-rtg-adaptive-action="menu"]')).display !== 'none'),
+            labelOnderMond: !!(mond && getComputedStyle(mond.querySelector('small')).display !== 'none')
           };
         });
         assert.ok(eersteBalk.zichtbaar && eersteBalk.onder && eersteBalk.onder.height >= 48,
           'telefoon: de gedeelde balk staat ook op het eerste inlogscherm');
-        assert.ok(eersteBalk.onder.left <= 1 && eersteBalk.onder.right >= maat.width - 1,
-          'telefoon: de balk vult de hele onderrand');
+        assert.ok(eersteBalk.onder.left >= 0 && eersteBalk.onder.right <= maat.width && eersteBalk.onder.width >= maat.width - 30,
+          'telefoon: de zwevende balk blijft breed en volledig binnen het scherm');
         assert.ok(eersteBalk.homeZichtbaar && eersteBalk.wereldenZichtbaar &&
           eersteBalk.actiesZichtbaar && eersteBalk.menuZichtbaar,
         'telefoon: Home, Werelden, Acties en Menu staan in dezelfde balk');
-        assert.ok(eersteBalk.canvas && eersteBalk.canvas.width >= 60 && eersteBalk.canvas.height >= 28,
+        assert.ok(eersteBalk.canvas && eersteBalk.canvas.width >= 44 && eersteBalk.canvas.height >= 28,
           'telefoon: de officiële AI-lippen zijn duidelijk en groot');
         assert.equal(eersteBalk.labelOnderMond, false,
           'telefoon: onder de AI-lippen staat geen Vraag-label');
@@ -226,7 +226,7 @@ test('RTG ID vormt op telefoon en bureau een familie met de ene Edge',
             width: r.width, height: r.height } : null;
         };
         const top = document.querySelector('.rtg-edge-top');
-        const onder = document.querySelector('.rtg-edge-bottom');
+        const onder = document.querySelector('.rtg-adaptive-bar');
         const vraag = document.getElementById('agZin');
         const rij = document.querySelector('.ag-doos.ag-ballotage .ag-rij');
         const stappen = document.getElementById('agStappen');
@@ -254,8 +254,8 @@ test('RTG ID vormt op telefoon en bureau een familie met de ene Edge',
           rijKleur: rij && getComputedStyle(rij).backgroundColor,
           railZichtbaar: rail && getComputedStyle(rail).visibility !== 'hidden',
           commandZichtbaar: [commandBank, commandBar].some(el => el && getComputedStyle(el).display !== 'none'),
-          bovenkleur: top && getComputedStyle(top).backgroundColor,
-          onderkleur: onder && getComputedStyle(onder).backgroundColor,
+          bovenkleur: top && getComputedStyle(top).getPropertyValue('--edge-bar-bg').trim(),
+          onderkleur: onder && getComputedStyle(onder).getPropertyValue('--edge-bar-bg').trim(),
           label: stappen && stappen.getAttribute('aria-label'),
           randen: document.querySelectorAll('.rtg-edge-chrome').length
         };
@@ -282,7 +282,7 @@ test('RTG ID vormt op telefoon en bureau een familie met de ene Edge',
       assert.ok(stand.vraag.top > stand.top.bottom - 1, maat.width + ': de vraag blijft onder Edge');
       assert.ok(stand.vraag.bottom <= stand.rij.top + 1, maat.width + ': de handeling volgt de vraag');
       assert.ok(stand.rij.bottom <= stand.stappen.top + 1, maat.width + ': voortgang volgt de handeling');
-      assert.ok(stand.stappen.bottom < stand.onder.top + 1, maat.width + ': voortgang blijft boven Edge');
+      assert.ok(stand.stappen.bottom < stand.onder.top + 1, maat.width + ': voortgang blijft boven Edge ' + JSON.stringify(stand));
       if (maat.width < 900) {
         assert.ok(stand.vraag.left >= 12 && stand.vraag.right <= maat.width - 12,
           'telefoon: de vraag blijft binnen het leesvlak');

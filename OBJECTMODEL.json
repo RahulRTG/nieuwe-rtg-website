@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-15",
   "gemeten": {
-    "bestanden": 2284,
-    "vormen": 1401,
-    "velden": 2026,
-    "modules": 768,
-    "domeinen": 275,
+    "bestanden": 2327,
+    "vormen": 1418,
+    "velden": 2046,
+    "modules": 781,
+    "domeinen": 278,
     "envelopDrempel": 17,
-    "envelop": 30,
-    "veldenDomeineigen": 1428,
-    "veldenGedeeldVanafVier": 202,
+    "envelop": 31,
+    "veldenDomeineigen": 1441,
+    "veldenGedeeldVanafVier": 203,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -21,6 +21,7 @@
     "code",
     "codenaam",
     "datum",
+    "doel",
     "door",
     "gemaakt",
     "id",
@@ -56,18 +57,6 @@
         "kern/command",
         "kern/commercie",
         "kern/ledenbalie-inzage"
-      ]
-    },
-    {
-      "veld": "doel",
-      "domeinen": 16,
-      "waar": [
-        "kern/appstore",
-        "kern/codelevenscyclus",
-        "kern/commercie",
-        "kern/consent-register",
-        "kern/defensie",
-        "kern/labfonds"
       ]
     },
     {
@@ -131,6 +120,18 @@
       ]
     },
     {
+      "veld": "onderwerp",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/connect",
+        "kern/kantoor",
+        "kern/mailwachtrij"
+      ]
+    },
+    {
       "veld": "open",
       "domeinen": 14,
       "waar": [
@@ -179,6 +180,30 @@
       ]
     },
     {
+      "veld": "vervalt",
+      "domeinen": 12,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/command",
+        "kern/commerce",
+        "kern/koppel",
+        "kern/levensband",
+        "kern/levensgraaf"
+      ]
+    },
+    {
+      "veld": "aan",
+      "domeinen": 12,
+      "waar": [
+        "kern/afdelingen",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/klok",
+        "kern/lidboard",
+        "kern/pay"
+      ]
+    },
+    {
       "veld": "categorie",
       "domeinen": 12,
       "waar": [
@@ -203,15 +228,15 @@
       ]
     },
     {
-      "veld": "onderwerp",
+      "veld": "land",
       "domeinen": 12,
       "waar": [
         "bedrijf",
-        "kern/command",
         "kern/commercie",
-        "kern/kantoor",
-        "kern/mailwachtrij",
-        "kern/postdatum"
+        "kern/concern",
+        "kern/labfonds",
+        "kern/ledenbalie-inzage",
+        "kern/livinglab"
       ]
     },
     {
@@ -224,30 +249,6 @@
         "kern/gemeente",
         "kern/labfonds",
         "kern/ledenbalie-zaken"
-      ]
-    },
-    {
-      "veld": "vervalt",
-      "domeinen": 11,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/command",
-        "kern/commerce",
-        "kern/koppel",
-        "kern/levensband",
-        "kern/levensgraaf"
-      ]
-    },
-    {
-      "veld": "aan",
-      "domeinen": 11,
-      "waar": [
-        "kern/afdelingen",
-        "kern/command",
-        "kern/geldbeleid",
-        "kern/klok",
-        "kern/lidboard",
-        "kern/pay"
       ]
     },
     {
@@ -335,6 +336,18 @@
       ]
     },
     {
+      "veld": "bewijs",
+      "domeinen": 11,
+      "waar": [
+        "kern/betaalwaarheid",
+        "kern/horeca",
+        "kern/invoer",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties"
+      ]
+    },
+    {
       "veld": "voor",
       "domeinen": 11,
       "waar": [
@@ -380,18 +393,6 @@
         "kern/envelop",
         "kern/experience",
         "kern/luchthaven"
-      ]
-    },
-    {
-      "veld": "land",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/commercie",
-        "kern/concern",
-        "kern/labfonds",
-        "kern/ledenbalie-inzage",
-        "kern/livinglab"
       ]
     },
     {
@@ -467,15 +468,15 @@
       ]
     },
     {
-      "veld": "bewijs",
+      "veld": "laatst",
       "domeinen": 10,
       "waar": [
-        "kern/betaalwaarheid",
-        "kern/horeca",
-        "kern/invoer",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
+        "kern/command",
+        "kern/fluister",
+        "kern/geldbeleid",
+        "kern/link",
+        "kern/mailsleutel",
+        "kern/meet"
       ]
     },
     {

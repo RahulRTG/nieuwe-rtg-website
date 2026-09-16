@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn neigingen</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- De tokenlaag van ONTWERP.md. Hij staat hier omdat een scherm dat hem niet
+     laadt er zeker niets mee kan; scripts/norm.js telt dat als ondergrens van
+     adoptie, en die ratel mag alleen omlaag. -->
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);
+    --txt:var(--rtg-txt);--soft:var(--rtg-soft);--gold:#C9A24B;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;min-width:24px;min-height:24px;
+    display:inline-flex;align-items:center;justify-content:center;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:660px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.7rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.6;}
+
+  /* EIGEN KLASSENAMEN EN GEEN .rij, en dat is een botsing en geen smaak: in
+     rtg-ui.css is `body.rtg-stijl .rij` een FLEXRIJ, en die regel (0,2,0) wint
+     van een pagina-eigen .rij (0,1,0). Dezelfde valkuil staat uitgeschreven in
+     mijn-gegevens.html; hier is hij vooraf vermeden. */
+  .vraagkaart{border:1px solid var(--line);background:var(--card);padding:1.15rem;margin-top:0.9rem;}
+  .vraagkaart p.vraag{font-family:'Bodoni Moda',serif;font-size:1.25rem;font-weight:600;line-height:1.3;}
+  .keuzes{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;}
+  /* Minstens 24x24 op telefoonformaat -- de a11y-poort meet elk raakvlak. */
+  .keuze{border:1px solid var(--line);background:var(--card2);color:var(--txt);
+    font:inherit;font-size:0.88rem;padding:0.6rem 0.95rem;min-height:44px;cursor:pointer;text-align:left;}
+  .keuze[aria-pressed="true"]{border-color:var(--gold);background:var(--bg);box-shadow:inset 0 0 0 1px var(--gold);}
+  .doorrij{display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center;margin-top:1.1rem;}
+  /* DE KLEUR KOMT UIT `.knop.vol` IN rtg-ui.css EN NIET VAN HIER, en dat is een
+     reparatie. Hier stond `background: var(--gold); color: #0C0C0B` -- een
+     eigen paar, met een `--gold` die deze pagina zelf op #C9A24B zette. De
+     Heritage-laag overschrijft dat token in de LivingOS-wereld naar een veel
+     dieper goud (gemeten: rgb(103,75,18)), en bijna-zwart daarop haalt 2,42:1
+     waar 4,5 nodig is. De a11y-poort van de keten vond het; mijn eigen
+     schermtoets keek naar raakvlakmaat en overloop en niet naar contrast.
+
+     rtg-ui.css houdt daar een PAAR voor bij: `--rtg-goud` met `--rtg-opgoud`
+     als de tekstkleur die erop hoort. Wie zijn eigen knop verft, verft buiten
+     dat paar om -- en merkt het pas als een poort het meet. Hier blijft dus
+     alleen de MAAT staan (44px voor de duim, ADAPTIEF.md), en de kleur komt
+     van de gedeelde klasse. */
+  .door{font-size:0.88rem;padding:0.65rem 1.3rem;min-height:44px;}
+  .later{background:none;border:none;color:var(--soft);font:inherit;font-size:0.82rem;
+    text-decoration:underline;cursor:pointer;min-height:44px;padding:0 0.3rem;}
+
+  .neiging{border:1px solid var(--line);background:var(--card);padding:0.95rem 1.1rem;margin-bottom:0.6rem;}
+  .neiging.stilgezet{opacity:0.62;}
+  .neiging b{font-size:0.98rem;}
+  .neiging .meta{display:block;color:var(--soft);font-size:0.76rem;line-height:1.6;margin-top:0.25rem;}
+  /* De graad is een WOORD en geen balkje: een balk suggereert een schaal met
+     tussenwaarden, en die zijn er niet -- het zijn vier treden. */
+  .graad{display:inline-block;font-size:0.63rem;letter-spacing:0.13em;text-transform:uppercase;
+    border:1px solid var(--line);padding:0.16rem 0.45rem;margin-left:0.45rem;color:var(--soft);vertical-align:middle;}
+  .graad.bewezen{border-color:var(--gold);color:var(--gold);}
+  .knoppen{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.7rem;}
+  .mini{border:1px solid var(--line);background:none;color:var(--soft);font:inherit;font-size:0.76rem;
+    padding:0.4rem 0.7rem;min-height:36px;cursor:pointer;}
+  .mini:hover{color:var(--txt);}
+  .grens{border-left:2px solid var(--line);padding:0.15rem 0 0.15rem 0.8rem;margin-bottom:0.75rem;}
+  .grens b{display:block;font-size:0.85rem;}
+  .grens span{display:block;color:var(--soft);font-size:0.78rem;line-height:1.6;margin-top:0.15rem;}
+  .opent{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.7rem;}
+  .opent a{border:1px solid var(--line);background:var(--card2);color:var(--txt);text-decoration:none;
+    font-size:0.82rem;padding:0.5rem 0.8rem;min-height:36px;display:inline-flex;align-items:center;}
+  .opent .opent-stil{border:1px dashed var(--line);color:var(--soft);
+    font-size:0.82rem;padding:0.5rem 0.8rem;min-height:36px;display:inline-flex;align-items:center;}
+</style>
+<link href="/shared/ios.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage">
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>Mijn neigingen</h1>
+  <span class="rek"></span>
+</header>
+<main>
+  <p class="stil" id="uitleg">Bezig met ophalen&#8230;</p>
+  <div id="intake"></div>
+  <div id="geheugen"></div>
+  <div id="grenzen"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch(pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  const maak = (tag, klas) => { const e = document.createElement(tag); if (klas) e.className = klas; return e; };
+  const tekst = (el, t) => { el.textContent = t; return el; };
+
+  /* Wat er per bestemming te zien is. De NAMEN komen uit de sprongindex -- de
+     lijst die uit MAPPEN wordt afgeleid -- zodat dit scherm geen tweede lijst
+     apps wordt. Lukt het laden niet, dan tonen we de sleutel zelf en verzinnen
+     we geen naam.
+
+     EEN SLEUTEL IS NIET UNIEK, EN DE EERSTE IS NIET DE BESTE. Hier stond
+     `if (!INDEX[i.sleutel])` -- wie het eerst komt wint -- en dat viel meteen
+     verkeerd: `reizen` staat twee keer in de index, eerst als TAB (zonder url)
+     en daarna als LINK (/apps/reizen-veilig.html). Het lid kreeg dus dode tekst
+     te zien terwijl er een prima adres bestond. Een winnaar op volgorde is
+     precies de fout die KAARTEN.md bij `gebiedkeuze.js` beschrijft: de sortering
+     beslist iets waar zij niets van weet.
+
+     De regel is nu inhoudelijk: een rij MET adres verslaat een rij zonder. */
+  let INDEX = {};
+  const indexKlaar = fetch('/shared/sprongindex.json').then(r => r.json()).then(j => {
+    for (const i of (j.items || [])) {
+      if (!i.sleutel) continue;
+      const staand = INDEX[i.sleutel];
+      if (!staand || (!staand.url && i.url)) INDEX[i.sleutel] = i;
+    }
+  }).catch(() => {});
+
+  /* HET ADRES VAN EEN BESTEMMING, in dezelfde vorm als public/shared/sprong.js.
+
+     Een rij met een eigen `url` wijst naar een scherm. Een `tab` of een `os`-app
+     woont IN de leden-app en heeft er geen: sprong.js opent die als
+     `/apps/app.html#tab=<sleutel>` of `#os=<sleutel>`, en dat is de vorm die dit
+     scherm overneemt in plaats van een tweede te verzinnen.
+
+     Dat het hier stond als "geen url, dus dode tekst" kostte vijf van de zeven
+     bestemmingen: werk, bestellen, salon, videobellen en zorg zijn alle vijf
+     gewoon te bereiken. Een browsertoets op een pad dat toevallig wel een url
+     had (reizen, stad), zag daar niets van. */
+  function adresVan(i, sleutel) {
+    if (!i) return null;
+    if (i.url) return i.url;
+    if (i.soort === 'tab' || i.soort === 'os')
+      return '/apps/app.html#' + (i.soort === 'tab' ? 'tab=' : 'os=') + encodeURIComponent(sleutel);
+    return null;
+  }
+
+  /* ------------------------------------------------------------- de intake */
+
+  let gekozen = new Set();
+
+  function vraagKaart(v) {
+    const el = maak('div', 'vraagkaart');
+    el.appendChild(tekst(maak('p', 'vraag'), v.tekst));
+    el.appendChild(tekst(maak('p', 'stil'),
+      v.meerdere ? 'Kies er zoveel als je wilt. Overslaan mag ook.' : 'Kies er een.'));
+
+    const keuzes = maak('div', 'keuzes');
+    for (const o of v.opties) {
+      const b = maak('button', 'keuze');
+      b.type = 'button';
+      b.setAttribute('aria-pressed', 'false');
+      tekst(b, o.label);
+      b.addEventListener('click', () => {
+        if (gekozen.has(o.onderwerp)) { gekozen.delete(o.onderwerp); b.setAttribute('aria-pressed', 'false'); }
+        else { gekozen.add(o.onderwerp); b.setAttribute('aria-pressed', 'true'); }
+      });
+      keuzes.appendChild(b);
+    }
+    el.appendChild(keuzes);
+
+    const rij = maak('div', 'doorrij');
+    const door = maak('button', 'knop vol door');
+    door.type = 'button';
+    tekst(door, 'Verder');
+    door.addEventListener('click', async () => {
+      door.disabled = true;
+      const r = await api('/api/neiging/antwoord', { vraag: v.id, onderwerpen: [...gekozen] });
+      gekozen = new Set();
+      if (r.body && r.body.error) { $('#uitleg').textContent = r.body.error; return; }
+      toonIntake(r.body);
+      laadGeheugen();
+    });
+    rij.appendChild(door);
+
+    /* "Ik doe dit later" staat er altijd, en het is geen vriendelijkheid: deze
+       laag mag nooit een voorwaarde worden om RTG te gebruiken. */
+    const later = maak('button', 'later');
+    later.type = 'button';
+    tekst(later, 'Ik doe dit later');
+    later.addEventListener('click', async () => {
+      await api('/api/neiging/overslaan', {});
+      const s = await api('/api/neiging/intake', {});
+      toonIntake(s.body);
+    });
+    rij.appendChild(later);
+    el.appendChild(rij);
+    return el;
+  }
+
+  function klaarKaart(s) {
+    const el = maak('div', 'vraagkaart');
+    el.appendChild(tekst(maak('p', 'vraag'), 'Dit is jouw RTG.'));
+    el.appendChild(tekst(maak('p', 'stil'),
+      (s.opent && s.opent.length)
+        ? 'Hij groeit met je mee. Wat je hebt gekozen, staat hieronder -- en je kunt het altijd veranderen.'
+        : 'Je hebt nog niets verteld, en dat hoeft ook niet. RTG werkt gewoon.'));
+
+    if (s.opent && s.opent.length) {
+      const bak = maak('div', 'opent');
+      for (const sleutel of s.opent) {
+        const i = INDEX[sleutel];
+        const adres = adresVan(i, sleutel);
+        /* Alleen een link als we het adres kennen; anders de sleutel als tekst.
+           Een knop die nergens heen gaat is erger dan geen knop. */
+        if (adres) {
+          const a = maak('a'); a.href = adres; tekst(a, (i && i.naam) || sleutel); bak.appendChild(a);
+        } else {
+          /* Geen adres bekend: de naam als TEKST en geen knop die nergens heen
+             gaat. Eigen klasse, want `.opent` is de container en niet de rij. */
+          bak.appendChild(tekst(maak('span', 'opent-stil'), (i && i.naam) || sleutel));
+        }
+      }
+      el.appendChild(bak);
+    }
+
+    const rij = maak('div', 'doorrij');
+    const opnieuw = maak('button', 'later');
+    opnieuw.type = 'button';
+    tekst(opnieuw, 'Stel me de vragen opnieuw');
+    opnieuw.addEventListener('click', async () => {
+      const r = await api('/api/neiging/opnieuw', {});
+      toonIntake(r.body);
+    });
+    rij.appendChild(opnieuw);
+    el.appendChild(rij);
+    return el;
+  }
+
+  function toonIntake(s) {
+    const el = $('#intake'); el.textContent = '';
+    if (!s || s.error) { $('#uitleg').textContent = (s && s.error) || 'Dit lukte niet.'; return; }
+    $('#uitleg').textContent = s.klaar
+      ? 'RTG past zich aan jou aan -- niet andersom. Hieronder staat wat hij van je denkt te weten.'
+      : 'Een halve minuut is genoeg om te beginnen.';
+    el.appendChild(s.klaar ? klaarKaart(s) : vraagKaart(s.vraag));
+  }
+
+  /* ----------------------------------------------------------- het geheugen */
+
+  function neigingKaart(n) {
+    const el = maak('article', 'neiging' + (n.telt ? '' : ' stilgezet'));
+    const kop = maak('div');
+    kop.appendChild(tekst(maak('b'), n.onderwerp));
+    kop.appendChild(tekst(maak('span', 'graad ' + n.graad), n.graad));
+    el.appendChild(kop);
+
+    const meta = maak('span', 'meta');
+    meta.appendChild(document.createTextNode(n.grondUitleg));
+    if (n.grond === 'gekozen' && n.aantal > 1)
+      meta.appendChild(document.createTextNode(' (' + n.aantal + ' keer)'));
+    if (n.doelen.length) {
+      meta.appendChild(maak('br'));
+      meta.appendChild(document.createTextNode('Waarvoor: ' + n.doelen.map(d => d.uitleg).join(' ')));
+    }
+    if (n.stil) { meta.appendChild(maak('br')); meta.appendChild(document.createTextNode(n.stil)); }
+    el.appendChild(meta);
+
+    const kn = maak('div', 'knoppen');
+    for (const d of n.doelen) {
+      const b = maak('button', 'mini');
+      b.type = 'button';
+      tekst(b, d.id === 'tonen' ? 'Niet gebruiken om dingen te tonen' : 'Niet gebruiken om mij te helpen');
+      b.addEventListener('click', async () => { await api('/api/neiging/niet-voor', { id: n.id, doel: d.id }); laadGeheugen(); });
+      kn.appendChild(b);
+    }
+    const weg = maak('button', 'mini');
+    weg.type = 'button';
+    tekst(weg, 'Vergeet dit');
+    weg.addEventListener('click', async () => { await api('/api/neiging/vergeet', { id: n.id }); laadGeheugen(); });
+    kn.appendChild(weg);
+    el.appendChild(kn);
+    return el;
+  }
+
+  async function laadGeheugen() {
+    const r = await api('/api/neiging/geheugen', {});
+    const el = $('#geheugen'); el.textContent = '';
+    const gr = $('#grenzen'); gr.textContent = '';
+    if (r.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
+    if (r.body.error) return;
+
+    el.appendChild(tekst(maak('h2'), 'Wat RTG van mij denkt te weten'));
+    if (!r.body.neigingen.length) {
+      el.appendChild(tekst(maak('p', 'stil'), 'Nog niets. Dat is geen gebrek -- RTG werkt gewoon.'));
+    } else {
+      for (const n of r.body.neigingen) el.appendChild(neigingKaart(n));
+      el.appendChild(tekst(maak('p', 'stil'),
+        'RTG bewaart dit maximaal ' + Math.round(r.body.bewaardagen / 365) +
+        ' jaar na de laatste keer dat het voorkwam. Wat je zelf hebt gezegd, blijft staan tot jij het weghaalt.'));
+    }
+
+    gr.appendChild(tekst(maak('h2'), 'Wat hier niet staat'));
+    for (const g of r.body.grenzen) {
+      const d = maak('div', 'grens');
+      d.appendChild(tekst(maak('b'), g.naam));
+      d.appendChild(tekst(maak('span'), g.reden));
+      gr.appendChild(d);
+    }
+  }
+
+  async function laad() {
+    /* Wachten op de index voordat er iets wordt getekend. Zonder dit is de
+       slotkaart een wedloop: is de fetch nog niet terug, dan staat elke
+       bestemming als dode tekst terwijl er adressen bestaan. */
+    await indexKlaar;
+    const s = await api('/api/neiging/intake', {});
+    if (s.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
+    if (s.status === 403) { $('#uitleg').textContent = s.body.error || 'Dit hoort bij een account.'; return; }
+    toonIntake(s.body);
+    laadGeheugen();
+  }
+
+  laad();
+})();
+</script>
+<script src="/shared/toestelsleutel.js"></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

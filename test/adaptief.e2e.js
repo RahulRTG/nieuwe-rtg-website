@@ -80,7 +80,8 @@ async function metDocument(page, fn) {
   const fr = page.frameLocator('#rtgCommand .cmd-pane.actief iframe');
   await fr.locator('text=Zakelijke brief').first().waitFor({ timeout: 25000 });
   await fr.locator('text=Zakelijke brief').first().click();
-  await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { timeout: 20000 });
+  await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { state: 'attached', timeout: 20000 });
+  await require('./helper').edgeActies(page);
   await fn(fr);
 }
 
@@ -100,7 +101,7 @@ async function selecteerAlles(fr) {
 
 test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, async (t) => {
 
-  await t.test('op het beginscherm staan de werelden IN de balk, niet twee tikken diep', async () => {
+  await t.test('het Edge-paneel biedt alle werelden van de bestaande bank', async () => {
     /* WAT DIT MEET. De balk zei "Kies een wereld" -- een zin, geen bediening --
        en de enige weg naar een wereld liep via de lade: twee handelingen voor het
        enige wat dat scherm te doen heeft.
@@ -109,8 +110,9 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
        teruggeven. De zone valt dan terug op de bladenrij en deze toets zakt op
        nul handelingen. */
     await metLid(390, 844, async (page) => {
-      await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { timeout: 20000 });
-      const acties = page.locator('#rtgCommand .cmd-actie');
+      await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { state: 'attached', timeout: 20000 });
+  await require('./helper').edgeActies(page);
+      const acties = page.locator('.rtg-adaptive-controls .cmd-actie');
       assert.ok(await acties.count() >= 1, 'de werelden horen als knop in de balk te staan');
       /* HIER STOND /RTG/i, EN DAT WAS EEN PROXY DIE VERLIEP. De werelden heetten
          ROS, RTG Kantoor en RTFoundation, dus "er zit RTG in" leek een goede
@@ -148,8 +150,9 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
 
        DE MUTATIE: zet .cmd-actie{min-width:24px;min-height:24px}. */
     await metLid(390, 844, async (page) => {
-      await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { timeout: 20000 });
-      const dozen = await page.locator('#rtgCommand .cmd-actie, #rtgCommand .cmd-meer:visible')
+      await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { state: 'attached', timeout: 20000 });
+  await require('./helper').edgeActies(page);
+      const dozen = await page.locator('.rtg-adaptive-controls .cmd-actie, .rtg-adaptive-bar button:visible')
         .evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; }));
       assert.ok(dozen.length, 'er horen raakvlakken te staan');
       /* EEN HALVE PIXEL SPELING, EN WAAROM DAT DE POORT NIET BOT MAAKT.
@@ -180,8 +183,8 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
     await metLid(390, 844, async (page) => {
       await metDocument(page, async () => {
         const maat = await page.evaluate(() => {
-          const b = document.querySelector('#rtgCommand .cmd-balk');
-          const r = document.querySelector('#rtgCommand .cmd-actierij');
+          const b = document.querySelector('.rtg-adaptive-bar');
+          const r = document.querySelector('.rtg-adaptive-controls');
           return { balk: b.clientWidth, venster: window.innerWidth,
             rijClient: r.clientWidth, rijScroll: r.scrollWidth };
         });
@@ -204,24 +207,27 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
        DE MUTATIE: haal herstel() weg uit de doe() in apps/office/adaptief.js. */
     await metLid(390, 844, async (page) => {
       await metDocument(page, async (fr) => {
-        const inRust = await page.locator('#rtgCommand .cmd-actie')
+        const inRust = await page.locator('.rtg-adaptive-controls .cmd-actie')
           .evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));
-        assert.ok(await page.locator('#rtgCommand .cmd-anker').isVisible(),
-          'zonder selectie draagt de balk het anker: waar je bent');
+        assert.ok((await page.locator('.rtg-adaptive-sheet h2').textContent()).trim(),
+          'het Edge-paneel benoemt de context');
+        await page.keyboard.press('Escape');
 
+        await page.keyboard.press('Escape');
         await selecteerAlles(fr);
+        await require('./helper').edgeActies(page);
         await page.waitForFunction(() => {
-          const b = document.querySelector('#rtgCommand .cmd-actie');
+          const b = document.querySelector('.rtg-adaptive-controls .cmd-actie');
           return b && /vet/i.test(b.getAttribute('aria-label') || '');
         }, null, { timeout: 10000 });
 
-        const bijSelectie = await page.locator('#rtgCommand .cmd-actie')
+        const bijSelectie = await page.locator('.rtg-adaptive-controls .cmd-actie')
           .evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));
         assert.notDeepEqual(bijSelectie, inRust, 'een selectie hoort de balk te veranderen');
         assert.ok(/vet/i.test(bijSelectie[0] || ''), 'vet hoort vooraan te staan: ' + bijSelectie.join(', '));
 
         const voor = await fr.locator('#tekst').innerHTML();
-        await page.locator('#rtgCommand .cmd-actie').first().click();
+        await page.locator('.rtg-adaptive-controls .cmd-actie').first().click();
         await wachtOpRust(page);
         const na = await fr.locator('#tekst').innerHTML();
         assert.notEqual(na, voor, 'een tik in de balk hoort het document te veranderen');
@@ -238,16 +244,16 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
        DE MUTATIE: laat openLade() alleen de weggevallen handelingen tonen. */
     await metLid(390, 844, async (page) => {
       await metDocument(page, async (fr) => {
-        await selecteerAlles(fr);
-        await page.waitForSelector('#rtgCommand .cmd-meer:visible', { timeout: 10000 });
-        const inBalk = await page.locator('#rtgCommand .cmd-actie').count();
-        await page.locator('#rtgCommand .cmd-meer').click();
-        await page.waitForSelector('.rtg-laag-lade.open', { timeout: 10000 });
-        const inLade = await page.locator('.rtg-laag .lg-rij').count();
-        assert.ok(inLade > inBalk, 'de lade hoort meer te dragen dan de balk (' + inLade + ' vs ' + inBalk + ')');
-
         await page.keyboard.press('Escape');
-        await page.waitForFunction(() => !document.querySelector('.rtg-laag'), null, { timeout: 10000 });
+        await selecteerAlles(fr);
+        await require('./helper').edgeActies(page);
+        const verwacht = await page.evaluate(() => RTGAdaptief.voorNu().map(x => x.id));
+        const getoond = await page.locator('.rtg-adaptive-controls [data-cap]')
+          .evaluateAll(els => els.map(x => x.dataset.cap));
+        assert.ok(verwacht.length > 5, 'voorwaarde: meer handelingen dan in de vaste balk passen');
+        assert.deepEqual(getoond, verwacht, 'het Edge-paneel draagt het volledige actuele aanbod');
+        await page.keyboard.press('Escape');
+        await page.waitForSelector('.rtg-adaptive-sheet', { state: 'hidden' });
       });
     });
   });
@@ -274,7 +280,7 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
     });
   });
 
-  await t.test('op een breed scherm bestaat de contextzone niet', async () => {
+  await t.test('op een breed scherm staan de handelingen ook uitsluitend in Edge', async () => {
     /* Dezelfde capability, een andere presentatie: op bureau doen de werkbalk en
        het contextvlak van het scherm zelf dit werk, en een tweede rij knoppen
        onderin zou een tweede bediening naast een bestaande zijn.

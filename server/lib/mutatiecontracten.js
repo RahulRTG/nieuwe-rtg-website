@@ -90,7 +90,12 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-salon').CONTRACTEN,
   require('./mutatiecontracten-hardening-checkpoint').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
+  require('./mutatiecontracten-neiging').CONTRACTEN,
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
+  require('./mutatiecontracten-connect').CONTRACTEN,
+  require('./mutatiecontracten-connect2').CONTRACTEN,
+  require('./mutatiecontracten-connect3').CONTRACTEN,
+  require('./mutatiecontracten-connect4').CONTRACTEN,
   /* De naleesronde van 13 september 2026 -- zie de kop van het eerste bestand. */
   require('./mutatiecontracten-naleesronde').CONTRACTEN,
   require('./mutatiecontracten-naleesronde-b').CONTRACTEN,
@@ -100,6 +105,7 @@ const CONTRACTEN = Object.assign({},
   /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
+  require('./mutatiecontracten-reisherkomst').CONTRACTEN,
   /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen
      bestand omdat het indelen er een defect uit haalde -- zie de kop. */
   require('./mutatiecontracten-lidabonnement').CONTRACTEN,

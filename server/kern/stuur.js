@@ -18,7 +18,6 @@
 const MAX_BODY = 30000;   // een actie-body hoeft nooit groter dan dit
 const TIMEOUT_MS = 15000; // een interne aanroep die langer duurt is stuk
 const INTERNE_GOEDKEURING = Symbol('stuur-goedgekeurd');
-const { beleidVoor, toegestanePaden, NIVEAUS } = require('./stuur/beleid');
 
 
 /* De verbodslijst, de licht/zwaar-classificatie en de deeltakenparser wonen in
@@ -34,47 +33,12 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
   // De gewone handmatige schermen blijven dan beschikbaar.
   function stuurUit() { return process.env.RTG_AI_STUUR_UIT === '1'; }
 
-  /* DE SCHADUW LAADT LUI, en dat is een gemeten keuze: zie de kop van
-     ./stuur/frictieschaduw.js. Kort: hij wordt alleen binnen stuurToets
-     gebruikt, en een require bovenaan dit bestand trok kern/frictie/ het
-     bedraden in. */
-  let WEGER = null;
-  let SCHADUW = null;
-  function schaduw() { return (SCHADUW = SCHADUW || require('./stuur/frictieschaduw')); }
-  function weger() { return (WEGER = WEGER || schaduw().maakSchaduw({})); }
-
-  /* ---- de poortwachter: mag dit pad überhaupt via het stuur? ---- */
-  function stuurToets(pad, body, opties) {
-    const o = opties || {};
-    if (stuurUit())
-      return { status: 503, error: 'Het AI-stuur staat tijdelijk uit via de centrale noodrem.' };
-    if (typeof pad !== 'string' || !pad.startsWith('/api/') || pad.includes('..') || /[?#\s]/.test(pad))
-      return { status: 400, error: 'Geef een geldig API-pad (begint met /api/, zonder query).' };
-    if (VERBODEN.some(re => re.test(pad)))
-      return { status: 403, error: 'Dit pad bedient het stuur bewust niet (accounts, techniek of het stuur zelf).' };
-    let tekst;
-    try { tekst = JSON.stringify(body == null ? {} : body); } catch (e) { return { status: 400, error: 'De body moet JSON zijn.' }; }
-    if (tekst.length > MAX_BODY) return { status: 413, error: 'De actie-body is te groot.' };
-    const beleid = beleidVoor(pad, o.wereld);
-    if (beleid.niveau === NIVEAUS.verboden)
-      return { status: 403, error: beleid.reden || 'Deze actie is niet beschikbaar voor het AI-stuur.' };
-    /* DE FRICTIESCHADUW -- wat zou de motor van dit GEVAL zeggen?
-
-       ./beleid.js antwoordt uit een statische lijst plus de bodem; de
-       frictiemotor rekent met bedrag en aantal, en die staan hier in de body.
-       CONTROLPLANE.md: eerst meelopen, dan pas afdwingen. Deze regel BESLIST
-       DUS NIETS -- `beleid.niveau` hieronder is onaangeraakt.
-
-       Alles achter een vangnet: een schaduw die de aanroeper kan laten klappen
-       is erger dan geen schaduw, en de levering gaat voor (kern/envelop.js). */
-    try { schaduw().noteer(o.wereld, pad, weger().weeg(beleid.niveau, body)); }
-    catch (e) { /* een gemiste tel is geen geweigerde actie */ }
-
-    if (beleid.niveau === NIVEAUS.voorstel && o.goedgekeurd !== INTERNE_GOEDKEURING)
-      return { status: 428, bevestigNodig: true, menselijkAkkoord: true, pad,
-        vraag: 'Deze actie verandert gegevens of heeft externe gevolgen. Controleer het voorstel en bevestig het zelf.' };
-    return null;
-  }
+  /* De poortwacht woont in ./stuur/toets.js: dat bestand BESLIST of een
+     handeling mag (vier poorten, waaronder de mandaatpoort), dit bestand DOET de
+     aanroep. Zie de kop daar voor de volgorde en waarom die gedrag is. */
+  const { stuurToets } = require('./stuur/toets')({
+    stuurUit, VERBODEN, MAX_BODY, INTERNE_GOEDKEURING
+  });
 
   /* ---- de eigenlijke aanroep: intern, met de inlog van de gebruiker ----
      req levert de poort (waar dit proces echt op luistert) en de

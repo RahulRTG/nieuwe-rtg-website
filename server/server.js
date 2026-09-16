@@ -2253,8 +2253,8 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.ran
 const stemming = require('./kern/rahul/stemming')({ db, save, crypto });
 const geloof = require('./kern/geloof')({ accounts });
 const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox, zetServiceOverdracht } =
-  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan,
-    stemmingVoor: (c) => stemming.stemmingVoor(c), geloofRegel: (key) => {
+  maakAi({ db, save, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan,
+    stemmingVoor: stemming.stemmingVoor, geloofRegel: (key) => {
       const id = idVanKey(key);
       return id != null ? geloof.promptRegel(id, null) : null;
     } });

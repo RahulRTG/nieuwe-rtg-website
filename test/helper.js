@@ -1321,6 +1321,14 @@ async function edgeCatalogus(page) {
   }
 }
 
+async function edgeActies(page) {
+  await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar', { state: 'visible' });
+  if (!await page.locator('.rtg-adaptive-sheet').isVisible())
+    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+  await page.waitForSelector('.rtg-adaptive-sheet:not([hidden])', { state: 'visible' });
+  await page.waitForSelector('.rtg-adaptive-controls', { state: 'attached' });
+}
+
 async function edgeWerkbladen(page) {
   if (await page.locator('.rtg-edge-faces').count())
     await page.locator('[data-edge-command-bank]:visible').click();
@@ -1331,7 +1339,6 @@ async function bankDeur(page, naam, opties) {
   /* Tijdens login wordt de gesloten Command-root door de echte werktafel
      vervangen. Een kort zichtbare gesloten root is nog geen bedienbare deur. */
   await page.waitForSelector('#rtgCommand[data-stand="open"]', { state: 'visible', timeout: 10000 });
-  const lade = page.locator('#rtgCommand .cmd-lade');
   const mobielDicht = await page.evaluate(() => matchMedia('(max-width:999px)').matches &&
     !document.getElementById('rtgCommand').classList.contains('bank-open'));
   if (mobielDicht) {
@@ -1340,8 +1347,9 @@ async function bankDeur(page, naam, opties) {
     await page.waitForFunction(() => !document.querySelector('.rtg-edge-menu') ||
       document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
     { timeout: 5000 }).catch(() => {});
-    const edge = page.locator('.rtg-edge-menu[data-rtg-command-brug="true"]');
-    if (await edge.isVisible()) { await edge.click(); await edgeWerkbladen(page); } else await lade.click();
+    const edge = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
+    await edge.waitFor({ state: 'visible', timeout: 10000 });
+    await edge.click(); await edgeWerkbladen(page);
     await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
   }
   await page.waitForFunction((n) => [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
@@ -1352,7 +1360,7 @@ async function bankDeur(page, naam, opties) {
   }, naam);
 }
 
-module.exports = { edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { edgeActies, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

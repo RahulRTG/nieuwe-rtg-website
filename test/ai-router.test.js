@@ -6,8 +6,10 @@
 
    VANDAAG STAAT DIE VOLGORDE OMGEKEERD in kern/ai.js: is er een sleutel, dan
    antwoordt het model altijd, en het regelantwoord vangt alleen een storing op.
-   Deze router draait daarom in de SCHADUW -- hij meet welke techniek erbij zou
-   horen en beslist niets. Dat is een besluit van de eigenaar en geen halfheid:
+   Deze router draait daarom in de SCHADUW -- hij zegt welke techniek erbij zou
+   horen en beslist niets. Het METEN is sinds 15 september 2026 een eigen laag
+   (./routermeting.test.js), omdat wat hij kiest en wat er werkelijk uitkomt
+   aantoonbaar uiteenliepen. Dat is een besluit van de eigenaar en geen halfheid:
    de volgorde omdraaien betekent dat een matig regelantwoord een goed
    modelantwoord kan verdringen, en dat merkt niemand omdat er gewoon een
    antwoord komt.
@@ -24,15 +26,6 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 const router = require('../server/kern/ai/router');
-
-/* Een verse kopie van de module, zodat tellers van de ene toets niet in de
-   andere doorlopen. */
-function requireVers() {
-  delete require.cache[require.resolve('../server/kern/ai/router')];
-  const m = require('../server/kern/ai/router');
-  delete require.cache[require.resolve('../server/kern/ai/router')];
-  return m;
-}
 
 const WORTEL = path.join(__dirname, '..');
 const RUW = fs.readFileSync(path.join(WORTEL, 'server/kern/ai/router.js'), 'utf8');
@@ -107,47 +100,21 @@ test('8. de volgorde is de regel: het goedkoopste spoor wint van het duurdere', 
   assert.equal(r.techniek, 'regels');
 });
 
-test('9. de stand telt en zegt erbij wat hij NIET is', () => {
-  const voor = router.stand().totaal;
-  router.schaduw('wat kost de RTG Pass');
-  const na = router.stand();
-  assert.equal(na.totaal, voor + 1, 'de teller loopt niet');
-  assert.match(na.grens, /BESLIST NIETS/);
-  assert.match(na.grens, /herstart/, 'de uitslag verzwijgt dat de tellers in dit proces leven');
-});
-
-test('9b. DE TELLERS KUNNEN DUURZAAM: zonder bewaarplek zegt de stand dat zelf', () => {
-  /* Een schaduwmeting bestaat om een besluit te dragen -- draaien we de volgorde
-     om? Tellers die bij elke herstart op nul springen dragen dat niet, en dan is
-     "60% had goedkoper gekund" een indruk van deze middag. De stand moet daarom
-     zeggen wat hij is: `duurzaam` true of false, met de grens erbij. */
-  const verse = requireVers();
-  assert.equal(verse.stand().duurzaam, false, 'zonder bewaarplek noemt de stand zich duurzaam');
-  assert.match(verse.stand().grens, /DIT PROCES|geen besluit/i);
-
-  let opslag = null;
-  assert.equal(verse.onthoud({ lees: () => opslag, schrijf: o => { opslag = o; } }), true);
-  verse.schaduw('wat kost de RTG Pass');
-  assert.ok(opslag && opslag.totaal >= 1, 'de teller is niet weggeschreven');
-  assert.equal(verse.stand().duurzaam, true);
-  assert.match(verse.stand().grens, /herstart overleven/i);
-
-  /* En hij LEEST terug: een nieuwe start met dezelfde plek begint niet op nul. */
-  const tweede = requireVers();
-  tweede.onthoud({ lees: () => opslag, schrijf: () => {} });
-  assert.equal(tweede.stand().totaal, opslag.totaal, 'een herstart begint toch op nul');
-});
-
-test('9c. een kapotte bewaarplek maakt de meting niet stuk', () => {
-  const verse = requireVers();
-  assert.equal(verse.onthoud({ lees: 1, schrijf: 2 }), false, 'een onbruikbare plek wordt geaccepteerd');
-  verse.onthoud({ lees: () => { throw new Error('stuk'); }, schrijf: () => { throw new Error('stuk'); } });
-  assert.doesNotThrow(() => verse.schaduw('wat kost de pas'), 'een schrijffout laat de meting klappen');
-});
+/* 9, 9b EN 9c ZIJN VERHUISD naar test/routermeting.test.js, samen met de
+   tellers zelf (server/kern/ai/routermeting.js, 15 september 2026). Ze staan
+   hier niet meer omdat de API die zij toetsten hier niet meer bestaat -- en ze
+   zijn niet weggelaten maar overgenomen: duurzaamheid, terugleesbaarheid, een
+   onbruikbare bewaarplek en een bewaarplek die gooit worden daar alle vier
+   getoetst, plus wat hier niet te toetsen viel (dekking tegenover spoor, en de
+   telling per ingang). Dit bestand gaat nu over EEN ding: classificeren. */
 
 test('10. de chat draagt de keuze mee, zodat achteraf narekenbaar is waarom er een model kwam', () => {
   const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/ai.js'), 'utf8');
-  assert.match(bron, /router\.schaduw\(/, 'kern/ai.js raadpleegt de router niet');
+  /* De bedrading is verhuisd van router.schaduw() naar meting.meet(): de chat
+     raadpleegt nu de schaduwMETING, die de router ONDER zich heeft. De bewering
+     is dezelfde -- achteraf moet narekenbaar zijn waarom er een model kwam. */
+  assert.match(bron, /meting\.meet\(/, 'kern/ai.js raadpleegt de schaduwmeting niet');
+  assert.match(bron, /ingang: 'chat'/, 'de chat telt niet onder zijn eigen ingang');
   assert.match(bron, /techniek: 'ai'/, 'het modelantwoord draagt zijn techniek niet');
   assert.match(bron, /techniek: 'regels'/, 'het regelantwoord draagt zijn techniek niet');
 });

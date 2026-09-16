@@ -104,7 +104,7 @@
         '#gate .ag-doos.ag-ballotage .ag-rij #agGo{width:2.55rem;height:2.55rem;}' +
         '#gate .ag-doos.ag-ballotage .ag-id-privacy{margin-top:.6rem;font-size:.54rem;}' +
       '}' +
-      '@media (max-width:899px) and (max-height:720px){' +
+      '@media (max-width:899px) and (max-height:860px){' +
         '#gate:has(.ag-doos.ag-ballotage){--klokschaal:.31;padding-top:calc(var(--edge-top,44px) + .45rem);}' +
         '#gate:has(.ag-doos.ag-ballotage)>.os-lock{width:5.3rem;height:5.3rem;margin-bottom:.25rem;}' +
         '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story p{display:none;}' +

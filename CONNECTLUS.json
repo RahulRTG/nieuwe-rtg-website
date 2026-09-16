@@ -1,0 +1,584 @@
+{
+  "uitleg": "Gemeten met scripts/connectlus.js; de vraag en de methode staan in de kop van dat bestand. Een gedeelde WERKWOORDNAAM is geen gedeeld gedrag -- dit wijst kandidaten aan, een mens beslist. Lees A nooit zonder D: een domein met negentig bestanden haalt alle acht werkwoorden door zijn omvang.",
+  "stempel": {
+    "op": "2026-09-15T20:23:59.707Z",
+    "commit": "d4c190d4f",
+    "boomVuil": false,
+    "boomAnders": 11,
+    "instrument": "scripts/connectlus.js",
+    "node": "v24.18.0"
+  },
+  "werkwoorden": {
+    "domeinen": 23,
+    "rondeLus": [
+      "kern/rtfos",
+      "kern/spellen"
+    ],
+    "inAlleDomeinen": [],
+    "combinaties": 22,
+    "zeldzaamste": {
+      "werkwoord": "begrijp",
+      "domeinen": 5
+    },
+    "perWerkwoord": [
+      {
+        "werkwoord": "ontdek",
+        "domeinen": 17
+      },
+      {
+        "werkwoord": "begrijp",
+        "domeinen": 5
+      },
+      {
+        "werkwoord": "doe",
+        "domeinen": 8
+      },
+      {
+        "werkwoord": "maak",
+        "domeinen": 21
+      },
+      {
+        "werkwoord": "deel",
+        "domeinen": 9
+      },
+      {
+        "werkwoord": "verbind",
+        "domeinen": 14
+      },
+      {
+        "werkwoord": "help",
+        "domeinen": 9
+      },
+      {
+        "werkwoord": "groei",
+        "domeinen": 13
+      }
+    ],
+    "rijen": [
+      {
+        "domein": "kern/beroepenbieb",
+        "bestanden": 2,
+        "symbolen": 16,
+        "werkwoorden": [
+          "ontdek",
+          "doe",
+          "maak"
+        ]
+      },
+      {
+        "domein": "kern/bijles",
+        "bestanden": 1,
+        "symbolen": 7,
+        "werkwoorden": [
+          "maak",
+          "help"
+        ]
+      },
+      {
+        "domein": "kern/boeken",
+        "bestanden": 1,
+        "symbolen": 7,
+        "werkwoorden": [
+          "maak",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/boekhoudkennis",
+        "bestanden": 2,
+        "symbolen": 9,
+        "werkwoorden": []
+      },
+      {
+        "domein": "kern/carriereledger",
+        "bestanden": 4,
+        "symbolen": 29,
+        "werkwoorden": [
+          "doe",
+          "maak",
+          "deel",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/clips",
+        "bestanden": 3,
+        "symbolen": 31,
+        "werkwoorden": [
+          "ontdek",
+          "maak",
+          "verbind"
+        ]
+      },
+      {
+        "domein": "kern/clubs",
+        "bestanden": 3,
+        "symbolen": 19,
+        "werkwoorden": [
+          "ontdek",
+          "maak",
+          "verbind",
+          "help"
+        ]
+      },
+      {
+        "domein": "kern/ervaring",
+        "bestanden": 12,
+        "symbolen": 73,
+        "werkwoorden": [
+          "ontdek",
+          "maak",
+          "deel",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/events",
+        "bestanden": 3,
+        "symbolen": 23,
+        "werkwoorden": [
+          "maak"
+        ]
+      },
+      {
+        "domein": "kern/festival",
+        "bestanden": 27,
+        "symbolen": 180,
+        "werkwoorden": [
+          "ontdek",
+          "maak",
+          "deel",
+          "verbind",
+          "help",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/geloofbieb",
+        "bestanden": 4,
+        "symbolen": 16,
+        "werkwoorden": [
+          "ontdek",
+          "maak"
+        ]
+      },
+      {
+        "domein": "kern/knelpunt",
+        "bestanden": 11,
+        "symbolen": 32,
+        "werkwoorden": [
+          "ontdek",
+          "begrijp",
+          "maak"
+        ]
+      },
+      {
+        "domein": "kern/leerstof",
+        "bestanden": 39,
+        "symbolen": 71,
+        "werkwoorden": [
+          "ontdek",
+          "begrijp",
+          "doe",
+          "maak",
+          "verbind",
+          "help",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/leren",
+        "bestanden": 7,
+        "symbolen": 47,
+        "werkwoorden": [
+          "ontdek",
+          "doe",
+          "maak",
+          "verbind",
+          "help",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/mediaos",
+        "bestanden": 20,
+        "symbolen": 111,
+        "werkwoorden": [
+          "ontdek",
+          "begrijp",
+          "doe",
+          "maak",
+          "deel",
+          "verbind",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/podium",
+        "bestanden": 8,
+        "symbolen": 64,
+        "werkwoorden": [
+          "ontdek",
+          "maak",
+          "deel",
+          "verbind"
+        ]
+      },
+      {
+        "domein": "kern/rtfos",
+        "bestanden": 64,
+        "symbolen": 251,
+        "werkwoorden": [
+          "ontdek",
+          "begrijp",
+          "doe",
+          "maak",
+          "deel",
+          "verbind",
+          "help",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/salon",
+        "bestanden": 8,
+        "symbolen": 76,
+        "werkwoorden": [
+          "ontdek",
+          "maak",
+          "deel",
+          "verbind",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/sociaal",
+        "bestanden": 16,
+        "symbolen": 98,
+        "werkwoorden": [
+          "ontdek",
+          "doe",
+          "maak",
+          "deel",
+          "verbind",
+          "help"
+        ]
+      },
+      {
+        "domein": "kern/socialegraaf",
+        "bestanden": 6,
+        "symbolen": 27,
+        "werkwoorden": [
+          "verbind",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/spellen",
+        "bestanden": 92,
+        "symbolen": 459,
+        "werkwoorden": [
+          "ontdek",
+          "begrijp",
+          "doe",
+          "maak",
+          "deel",
+          "verbind",
+          "help",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/sportclub",
+        "bestanden": 5,
+        "symbolen": 42,
+        "werkwoorden": [
+          "ontdek",
+          "maak",
+          "verbind",
+          "help",
+          "groei"
+        ]
+      },
+      {
+        "domein": "kern/theater",
+        "bestanden": 7,
+        "symbolen": 54,
+        "werkwoorden": [
+          "ontdek",
+          "maak",
+          "verbind",
+          "groei"
+        ]
+      }
+    ]
+  },
+  "vorm": {
+    "vormen": 221,
+    "domeinen": 18,
+    "velden": 495,
+    "helftDrempel": 9,
+    "inAlleDomeinen": 0,
+    "inMinstensDeHelft": 0,
+    "veldenDomeineigen": 435,
+    "domeineigenPct": 87.9,
+    "gedeeld": [
+      {
+        "veld": "capaciteit",
+        "domeinen": 5,
+        "waar": [
+          "kern/clubs",
+          "kern/festival",
+          "kern/rtfos",
+          "kern/spellen",
+          "kern/sportclub"
+        ]
+      },
+      {
+        "veld": "betaald",
+        "domeinen": 3,
+        "waar": [
+          "kern/festival",
+          "kern/rtfos",
+          "kern/spellen"
+        ]
+      },
+      {
+        "veld": "categorie",
+        "domeinen": 3,
+        "waar": [
+          "kern/geloofbieb",
+          "kern/rtfos",
+          "kern/sportclub"
+        ]
+      },
+      {
+        "veld": "ingetrokken",
+        "domeinen": 3,
+        "waar": [
+          "kern/carriereledger",
+          "kern/festival",
+          "kern/salon"
+        ]
+      },
+      {
+        "veld": "kanaal",
+        "domeinen": 3,
+        "waar": [
+          "kern/podium",
+          "kern/rtfos",
+          "kern/theater"
+        ]
+      },
+      {
+        "veld": "koper",
+        "domeinen": 3,
+        "waar": [
+          "kern/podium",
+          "kern/rtfos",
+          "kern/spellen"
+        ]
+      },
+      {
+        "veld": "maker",
+        "domeinen": 3,
+        "waar": [
+          "kern/clips",
+          "kern/festival",
+          "kern/mediaos"
+        ]
+      },
+      {
+        "veld": "prijsCenten",
+        "domeinen": 3,
+        "waar": [
+          "kern/beroepenbieb",
+          "kern/geloofbieb",
+          "kern/sportclub"
+        ]
+      },
+      {
+        "veld": "sinds",
+        "domeinen": 3,
+        "waar": [
+          "kern/clubs",
+          "kern/rtfos",
+          "kern/spellen"
+        ]
+      },
+      {
+        "veld": "spelers",
+        "domeinen": 3,
+        "waar": [
+          "kern/leren",
+          "kern/spellen",
+          "kern/sportclub"
+        ]
+      },
+      {
+        "veld": "vanMij",
+        "domeinen": 3,
+        "waar": [
+          "kern/salon",
+          "kern/sociaal",
+          "kern/spellen"
+        ]
+      }
+    ]
+  },
+  "namen": [
+    {
+      "naam": "signalen",
+      "plekken": 13,
+      "domeinen": [
+        "kern/festival",
+        "kern/fiscaal",
+        "kern/hospitality",
+        "kern/life",
+        "kern/luchthaven",
+        "kern/magnaat",
+        "kern/marechaussee",
+        "kern/overdracht",
+        "kern/overheid",
+        "kern/schild",
+        "kern/sportclub",
+        "kern/stadsweefsel"
+      ],
+      "waar": [
+        "server/kern/festival/podium.js",
+        "server/kern/fiscaal/bronnen/index.js",
+        "server/kern/fiscaal/bronnen/tedb.js",
+        "server/kern/hospitality-universe/human-reality.js",
+        "server/kern/life.js",
+        "server/kern/luchthaven/cockpit.js",
+        "server/kern/magnaat-dekkingsmatrix.js",
+        "server/kern/marechaussee.js"
+      ]
+    },
+    {
+      "naam": "spoor",
+      "plekken": 8,
+      "domeinen": [
+        "kern/command",
+        "kern/isolatie",
+        "kern/namens",
+        "kern/veiligheid",
+        "kern/vracht",
+        "kern/webmaker",
+        "papieren"
+      ],
+      "waar": [
+        "server/kern/command/bijstand-klant.js",
+        "server/kern/isolatie/opslag.js",
+        "server/kern/namens/verklaring-lijst-a.js",
+        "server/kern/namens/verklaring-lijst-b.js",
+        "server/kern/veiligheid/plek.js",
+        "server/kern/vracht.js",
+        "server/kern/webmaker-spoor.js",
+        "server/papieren/index.js"
+      ]
+    },
+    {
+      "naam": "kring",
+      "plekken": 3,
+      "domeinen": [
+        "kern/bureau",
+        "kern/spellen",
+        "kern/veiligheid"
+      ],
+      "waar": [
+        "server/kern/bureau/keten.js",
+        "server/kern/spellen/presence.js",
+        "server/kern/veiligheid/opslag.js"
+      ]
+    },
+    {
+      "naam": "horizon",
+      "plekken": 2,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/index.js",
+        "server/kern/connect/opslag.js"
+      ]
+    },
+    {
+      "naam": "connect",
+      "plekken": 2,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/index.js",
+        "server/kern/connect/opslag.js"
+      ]
+    },
+    {
+      "naam": "ontdekking",
+      "plekken": 1,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/ontdekking.js"
+      ]
+    },
+    {
+      "naam": "naklank",
+      "plekken": 1,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/opslag.js"
+      ]
+    },
+    {
+      "naam": "vondst",
+      "plekken": 1,
+      "domeinen": [
+        "kern/knelpunt"
+      ],
+      "waar": [
+        "server/kern/knelpunt/aanvoer.js"
+      ]
+    },
+    {
+      "naam": "lus",
+      "plekken": 0,
+      "domeinen": [],
+      "waar": []
+    },
+    {
+      "naam": "weerklank",
+      "plekken": 0,
+      "domeinen": [],
+      "waar": []
+    },
+    {
+      "naam": "trede",
+      "plekken": 0,
+      "domeinen": [],
+      "waar": []
+    },
+    {
+      "naam": "treden",
+      "plekken": 0,
+      "domeinen": [],
+      "waar": []
+    },
+    {
+      "naam": "leerdossier",
+      "plekken": 0,
+      "domeinen": [],
+      "waar": []
+    },
+    {
+      "naam": "mixer",
+      "plekken": 0,
+      "domeinen": [],
+      "waar": []
+    }
+  ]
+}

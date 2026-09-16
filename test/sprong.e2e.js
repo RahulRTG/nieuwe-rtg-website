@@ -1,4 +1,4 @@
-/* DE SPRONG: een tik naar elke functie, vanaf elk scherm.
+/* DE SPRONG: via Edge naar elke functie, vanaf elk scherm.
 
    Deze toets bewaakt de belofte die scripts/tikken.js meet. De meter zegt
    HOEVEEL tikken het huis diep is; deze toets zegt of het instrument dat die
@@ -11,8 +11,8 @@
       opent hoort niet op een inlogscherm.
    2) DE GREEP IS EEN DUIM GROOT. TOEGANKELIJK.md eist minstens 24x24 op
       telefoonformaat; deze is met opzet ruimer.
-   3) EEN TIK OPENT DE LIJST, EEN TWEEDE OPENT DE FUNCTIE. Dat is de hele
-      belofte: twee tikken, waar u ook staat.
+   3) DE EDGE-ACTIE OPENT DE LIJST, EEN BESTEMMING OPENT DE FUNCTIE.
+      De zoekingang deelt de bediening met de andere schermhandelingen.
    4) DE RIJEN DRAGEN HUN ADRES. Zonder data-url ziet scripts/tikken.js de korte
       weg niet, en dan meet het huis zich dieper dan het is -- en erger: dan kan
       iemand de korte weg weghalen zonder dat een meting zakt.
@@ -21,7 +21,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, wachtTot } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, wachtTot, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -45,18 +45,18 @@ async function opzet() {
 
 /* Telefoonformaat, want een tik is een duim. Op een breed scherm zou deze toets
    iets anders meten dan de belofte belooft. */
-/* WACHTEN OP DE GREEP, EN NIET MET wachtOpZichtbaar. Die helper vraagt naar
-   offsetParent, en dat is bij een `position: fixed` element altijd null -- de
-   greep zou dus nooit "zichtbaar" heten terwijl hij er gewoon staat. Vandaar
-   dezelfde vraag als de laag zelf stelt: staat hij er, en heeft hij maat? */
-const wachtOpGreep = (page) => wachtTot(page, () => {
-  const g = document.querySelector('.rtgsprong-greep');
-  return !!g && g.getBoundingClientRect().width > 10;
-}, null, { wat: 'de greep van de sprong' });
+/* De sprong gebruikt dezelfde Edge als de andere schermhandelingen. */
+const greepVan = (page) => page.locator('.rtg-adaptive-controls')
+  .getByRole('button', { name: 'Spring naar een functie', exact: true });
+const wachtOpGreep = async (page) => {
+  await page.locator('.rtgsprong-greep').waitFor({ state: 'attached' });
+  await edgeActies(page);
+  await greepVan(page).waitFor({ state: 'visible' });
+};
 
 const TELEFOON = { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: 'block' };
 
-test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrowser(pw) }, async (t) => {
+test('de sprong: via Edge naar elke functie, vanaf elk scherm', { skip: geenBrowser(pw) }, async (t) => {
   const { srv, token, dataDir } = await opzet();
   const browser = await pw.chromium.launch(browserOpties());
   const opruimen = () => { try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {} };
@@ -86,15 +86,17 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
     await wachtOpGreep(page);
 
     await t.test('de greep staat er en is een duim groot', async () => {
-      const greep = page.locator('.rtgsprong-greep');
+      const greep = greepVan(page);
+      assert.equal(await page.locator('.rtgsprong-greep').isVisible(), false,
+        'de sprong hoort geen losse bedieningsknop naast Edge te hebben');
       assert.equal(await greep.count(), 1, 'de greep hoort op elk ledenscherm te staan');
       const doos = await greep.boundingBox();
       assert.ok(doos && doos.width >= 24 && doos.height >= 24,
         'een raakvlak is minstens 24x24 (TOEGANKELIJK.md), gemeten: ' + JSON.stringify(doos));
     });
 
-    await t.test('een tik opent de lijst, en die lijst is niet leeg', async () => {
-      await page.locator('.rtgsprong-greep').click();
+    await t.test('de Edge-actie opent de lijst, en die lijst is niet leeg', async () => {
+      await greepVan(page).click();
       await wachtTot(page, () => document.querySelectorAll('.rtgsprong-rij').length > 20,
         null, { wat: 'de lijst met bestemmingen' });
       const rijen = await page.locator('.rtgsprong-rij:visible').count();
@@ -150,14 +152,14 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
         'een handeling brengt je naar het scherm waar hij woont');
       await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
       await wachtOpGreep(page);
-      await page.locator('.rtgsprong-greep').click();
+      await greepVan(page).click();
       await wachtTot(page, () => {
         const v = document.querySelector('.rtgsprong-kop input');
         return !!v && v.getBoundingClientRect().width > 0;
       }, null, { wat: 'het zoekveld van de sprong' });
     });
 
-    await t.test('de tweede tik opent de functie', async () => {
+    await t.test('een bestemming opent de functie', async () => {
       await page.fill('.rtgsprong-kop input', 'pay');
       await wachtTot(page, () => {
         const r = document.querySelectorAll('.rtgsprong-rij');
@@ -175,7 +177,7 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
          voordat de lijst bestond, en toen tekende de lade helemaal niets meer. */
       await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
       await wachtOpGreep(page);
-      await page.locator('.rtgsprong-greep').click();
+      await greepVan(page).click();
       await wachtTot(page, () => {
         const v = document.querySelector('.rtgsprong-kop input');
         return !!v && v.getBoundingClientRect().width > 0;

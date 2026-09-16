@@ -23,6 +23,13 @@ module.exports = [
      bereiken, niet over wat ik ermee doe. */
   '/apps/mijn-gegevens.html',
   '/apps/mijn-isolatie.html',
+  /* Mijn neigingen hoort hier en niet in LIFE, om precies de reden die twee
+     regels hierboven staat: het gaat niet over wat ik doe maar over wat RTG van
+     mij DENKT te weten, en waarvoor hij dat mag gebruiken. De kaart draagt per
+     regel "Wijzigen", "Vergeet dit" en "Niet hiervoor gebruiken" -- dat is
+     toestemming en inzage, dezelfde familie als mijn-gegevens hierboven.
+     NEIGING.md noemt het scherm dan ook de geheugenkaart en niet een werkblad. */
+  '/apps/mijn-neigingen.html',
   '/apps/mijn-post.html',
   '/apps/mijn-relaties.html',
   '/apps/mijn-sessies.html',

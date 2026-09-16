@@ -16,7 +16,7 @@
    Draai los: node --experimental-sqlite --test test/routedekking.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 const pw = laadPlaywright();
@@ -91,7 +91,10 @@ test('het dekkingsscherm toont het cijfer van de server, en de routes zijn door 
        klik zou deze toets alleen bewijzen dat de rijen in de HTML staan, en dat
        is niet hetzelfde als kunnen inzien. */
     const tab = page.locator('.rtgdeel-balk button', { hasText: /alle routes/i });
-    if (await tab.count()) await tab.first().click();
+    if (await tab.count()) {
+      await edgeActies(page);
+      await page.locator('.rtg-adaptive-controls').getByRole('button', { name: /alle routes/i }).click();
+    }
     await page.waitForSelector('#lijst .rij', { state: 'visible', timeout: 10000 });
     assert.equal(await page.locator('#lijst .rij').count(), api.lijst.resultaten.length,
       'evenveel rijen op het scherm als in het antwoord');

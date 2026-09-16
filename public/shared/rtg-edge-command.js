@@ -14,6 +14,10 @@
       return !!(root && (root.classList.contains('bank-open') ||
         (root.dataset.rtgSecondScreen && root.dataset.rtgSecondScreen !== 'peek')));
     }
+    function focusMenu() {
+      var visible = e.root.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
+      (visible || menu).focus();
+    }
     function herstelDeur() {
       if (!deur) return;
       deur.removeAttribute('data-rtg-edge-owned');
@@ -38,6 +42,7 @@
     function secondOpen() { return !!(root && root.dataset.rtgSecondScreen && root.dataset.rtgSecondScreen !== 'peek'); }
     function sync() {
       vindDeur();
+      if (!bankOpen() && d.activeElement && d.activeElement.closest('.rtg-edge-index[aria-hidden="true"]')) focusMenu();
       if (!media.matches || !deur) {
         herstelDeur();
         menu.removeAttribute('data-rtg-command-owner');
@@ -57,14 +62,14 @@
         menu.setAttribute('aria-label', indexOpen() ? 'Menu sluiten' : 'Menu openen');
         menu.setAttribute('aria-controls', index.id);
         menu.setAttribute('aria-expanded', String(indexOpen()));
-        if (!bankOpen() && d.activeElement === deur) menu.focus();
+        if (!bankOpen() && d.activeElement === deur) focusMenu();
         return;
       }
       menu.setAttribute('aria-label', 'Werelden en systeem');
       if (bank) menu.setAttribute('aria-controls', bank.id + (index ? ' ' + index.id : ''));
       if (indexOpen() && bankOpen()) deur.click();
       menu.setAttribute('aria-expanded', String(indexOpen() || bankOpen()));
-      if (!bankOpen() && d.activeElement === deur) menu.focus();
+      if (!bankOpen() && d.activeElement === deur) focusMenu();
     }
     function sluitAndereLagen() {
       ['.rtg-edge-ai', '.rtg-edge-state', '.rtg-edge-2-context-button'].forEach(function (q) {

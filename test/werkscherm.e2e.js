@@ -133,7 +133,7 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     /* ---- uitloggen sluit de inhoud weer ---- */
     await page.goto(base + '/apps/werk.html#projecten', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
-    await page.click('.rtg-edge-2-context-button');
+    await require('./helper').edgeActies(page);
     await page.click('#inlogUit');
     await wachtOpZichtbaar(page, '#inhoud', { weg: true });
     const naUit = await page.evaluate(() => !document.getElementById('inhoud').hidden);
@@ -317,9 +317,9 @@ test('de handelingen staan op het scherm, en een weigering komt voluit in beeld'
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
     await wachtOpZichtbaar(page, '#inhoud');
     await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
-    await page.click('.rtg-edge-2-context-button');
+    await require('./helper').edgeActies(page);
     await page.click('[data-wk="projecten"]');
-    await page.click('.rtg-edge-2-context-close');
+    await page.click('[data-rtg-adaptive-close]');
     await wachtOpZichtbaar(page, '#a_h0_naam');
     await wachtOpRust(page);
 

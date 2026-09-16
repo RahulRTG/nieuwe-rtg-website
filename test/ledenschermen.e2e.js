@@ -27,7 +27,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, edgeActies } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ledenscherm-'));
@@ -41,7 +41,7 @@ const OPEN = [
   { app: 'krant', eist: /kranten|titel/i },
   { app: 'pulse', eist: /volgend|ontdek|mijn plank/i },
   { app: 'thuis', eist: /van lid aan lid|logeren bij leden/i },
-  { app: 'stad', eist: /voor bewoners|hoe de stad/i },
+  { app: 'stad', eist: /voor bewoners|hoe de stad/i, deel: 'Hoe de stad er nu bij staat' },
   /* horloge en uitzicht stonden hier tot 19 augustus 2026. Commit 261f1f83
      ("Elf schermen waren nergens vandaan te bereiken; twee zijn weg") haalde die
      twee pagina's weg maar liet deze lijst staan, en dan eist een toets een
@@ -152,6 +152,12 @@ test(OPEN.length + ' ledenschermen tonen waar ze voor zijn',
     const stuk = [];
     for (const s of OPEN) {
       const r = await toon(o.page, base, s.app, token);
+      if (s.deel) {
+        await edgeActies(o.page);
+        r.tekst = await o.page.locator('body').innerText();
+        await o.page.locator('.rtg-adaptive-controls').getByRole('button', { name: s.deel, exact: true }).click();
+        await o.page.locator('#app .dom').first().waitFor({ state: 'visible' });
+      }
       if (r.pad !== '/apps/' + s.app + '.html') { stuk.push(s.app + ': stuurt weg naar ' + r.pad); continue; }
       if (r.tekst.trim().length < 60) { stuk.push(s.app + ': bijna leeg (' + r.tekst.trim().length + ' tekens)'); continue; }
       if (!s.eist.test(r.tekst)) stuk.push(s.app + ': zegt niet waar het voor is -- ' + r.tekst.slice(0, 130));

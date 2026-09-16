@@ -61,6 +61,7 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
     const zichtbareHoofdactie = hoofdactie + ' [data-rtg-action-copy-for="idle"][aria-hidden="false"]';
     assert.equal(await page.textContent(zichtbareHoofdactie), 'Nieuwe afspraak',
       'de enige onderrand biedt de echte Agenda-hoofdactie aan');
+    await require('./helper').edgeActies(page);
     await page.click(hoofdactie);
     await page.waitForSelector('#afScrim.open', { timeout: 5000 });
     await page.fill('#afTitel', 'Padel');
@@ -109,7 +110,7 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
     await page.waitForFunction(() => /komt(?! niet)/.test(document.querySelector('#afDeelnemers').textContent),
       null, { timeout: 8000 });
     await page.click('#afDicht');
-    await page.click('.rtg-edge-2-context-button');
+    await require('./helper').edgeActies(page);
     await page.click('#icsBtn');
     await page.waitForFunction(() => /rtg-agenda\.ics/.test(document.querySelector('#melding').textContent),
       null, { timeout: 8000 });

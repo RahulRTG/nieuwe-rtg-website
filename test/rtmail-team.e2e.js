@@ -6,7 +6,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -42,7 +42,8 @@ test('RTMAIL-teams: oprichten, iemand erbij, oppakken en afhandelen op het scher
 
     // De rustige voorzijde toont alleen wat aandacht vraagt. Teambeheer blijft
     // bewust in het volledige postvak bereikbaar, zonder een tweede mail-app.
-    await page.click('.rtm-nav [data-rtm-diep="inbox"]');
+    await edgeActies(page);
+    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: /Alle post$/i }).click();
 
     // het teams-blok verschijnt onder je eigen postvak
     await page.waitForFunction(() => /Teams/.test(document.body.textContent), null, { timeout: 15000 });

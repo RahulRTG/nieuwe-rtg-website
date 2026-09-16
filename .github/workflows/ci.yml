@@ -1210,6 +1210,54 @@ jobs:
         with:
           pattern: toetsduur-*
           path: duurmetingen
+
+      # HET VERANDERBEREIK, EN HIJ BLOKKEERT NIETS. `attributie` hierboven zegt
+      # welke ROUTES een toets raakte; deze stap legt ROUTEBRON.json ernaast en
+      # komt zo bij het BRONBESTAND uit -- precies de schakel die attributie.js
+      # zelf in `nietGemeten` als tekort noemt. Pas met die schakel is de vraag
+      # "welk bewijs moet opnieuw als dit bestand verandert" te beantwoorden.
+      #
+      # WAAROM HIJ IN DEZE JOB HOORT: de twee journalen EN de duurregisters van
+      # alle scherven liggen hier al. Een eigen job zou de hele suite opnieuw
+      # moeten draaien om aan dezelfde regels te komen.
+      #
+      # WAAROM NA DE DUURMETINGEN: zonder die registers kan de meter niet zien
+      # of een toets geen route raakte (een EIGENSCHAP -- een in-proces toets)
+      # of niet meedraaide (een MEETGAT). Die twee mogen nooit op een hoop; dan
+      # leest een tekort van de meting als een uitspraak over de toets. En de
+      # ronde is de UNIE van de scherven: wie er een leest, noemt de rest
+      # ongedraaid en blaast de schuld op met zijn eigen tekort.
+      #
+      # GEEN POORT, met opzet. De normtand (--controle) kan pas scherp staan als
+      # VERANDERBEREIK-RONDE.json in de repo staat; vandaag zou hij bijna elke
+      # toets als volle ring weigeren. Meten eerst, handhaven als het getal er
+      # staat -- dezelfde volgorde als bij de attributie hierboven.
+      #
+      # TWEE REGISTERS EN NIET EEN. KENNIS draagt wat uit de code alleen volgt
+      # en geldt tot de code verandert; RONDE draagt wat DEZE uitvoering heeft
+      # waargenomen en geldt alleen voor deze ronde. Ze worden allebei bewaard,
+      # want het verschil IS de uitslag: een halve ronde mag nooit als duurzame
+      # waarheid worden gelezen.
+      - name: Het veranderbereik (van welke toets weten we welke BESTANDEN hij dekt)
+        if: always()
+        run: |
+          set -o pipefail
+          rondes=$(find duurmetingen -name .toetsduur -type f | sed 's/^/--ronde /' | tr '\n' ' ')
+          test -n "$rondes"
+          node scripts/veranderbereik.js \
+            --lees journalen/test/routejournaal.log \
+            --lees journalen/scherm/.schermjournaal \
+            $rondes --vastleggen
+      - name: De veranderbereikmeting bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: veranderbereik
+          path: |
+            VERANDERBEREIK-KENNIS.json
+            VERANDERBEREIK-RONDE.json
+          if-no-files-found: error
+          retention-days: 5
       # EERST METEN, DAN OVERSCHRIJVEN. De drift vergelijkt het GECOMMITTE
       # register met deze verse meting; de stap hieronder schrijft dat register
       # weg. In de omgekeerde volgorde vergelijkt hij het nieuwe bestand met

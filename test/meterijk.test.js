@@ -1559,6 +1559,33 @@ const IJKINGEN = {
       (j) => { j.gemeten.vorm.domeinen = Math.max(0, (j.gemeten.vorm.domeinen || 0) - 4); return j; },
       () => voor.stageDomeinenGemeten - norm.meet().stageDomeinenGemeten)
   },
+  /* DE TWEE TANDEN VAN 15 SEPTEMBER 2026, bij NEIGINGVORM.json (NEIGING.md par.
+     0). Ze staan allebei op een NUL of op een getal waar een besluit op rust, en
+     dat is precies waarom ze een ijking nodig hebben: bij zo'n meter is "hij is
+     stuk" van buiten niet te onderscheiden van "er is niets aan de hand".
+
+     neigingVerwijzingRot staat op nul: elk punt van het voorstel draagt een
+     verwijzing naar bestaande code die wordt nagetrokken. De ijking gaat daarom
+     OMHOOG -- zet er drie rotte verwijzingen in en de meter hoort er exact drie
+     te melden. Ging hij omlaag, dan zou je een nul met een nul vergelijken.
+
+     neigingVoorkeurBlind telt de bestaande affiniteitsvormen zonder grond,
+     zekerheid of verval; hij staat op veertien, en op dat getal rust de hele
+     bestaansgrond van de laag. De ijking gaat OMLAAG, want zakken is hier de
+     richting die iets betekent: een domein dat zijn voorkeuren etiketteert. De
+     meter leest metAffiniteit MIN metAlledrie, dus de proef verhoogt de tweede
+     -- een mutatie op alleen de eerste zou ook de noemer verschuiven en dan meet
+     de ijking zichzelf. */
+  neigingVerwijzingRot: {
+    proef: (voor) => metVervangenJson('NEIGINGVORM.json',
+      (j) => { j.gemeten.voorstel.rot = (j.gemeten.voorstel.rot || 0) + 3; return j; },
+      () => norm.meet().neigingVerwijzingRot - voor.neigingVerwijzingRot)
+  },
+  neigingVoorkeurBlind: {
+    proef: (voor) => metVervangenJson('NEIGINGVORM.json',
+      (j) => { j.gemeten.voorkeur.metAlledrie = (j.gemeten.voorkeur.metAlledrie || 0) + 4; return j; },
+      () => voor.neigingVoorkeurBlind - norm.meet().neigingVoorkeurBlind)
+  },
   /* DE TAND VAN 14 SEPTEMBER 2026: namensMechanismenGemeten telt de mechanismen
      van namens-iemand-handelen die scripts/namensvorm.js op zijn grammatica
      heeft nagelopen (REPRESENTATIE.md par. 0). Zelfde vorm en zelfde richting
@@ -1573,6 +1600,42 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('NAMENSVORM.json',
       (j) => { j.gemeten.werkwoord.mechanismen = Math.max(0, (j.gemeten.werkwoord.mechanismen || 0) - 3); return j; },
       () => voor.namensMechanismenGemeten - norm.meet().namensMechanismenGemeten)
+  },
+  /* DE TAND VAN 15 SEPTEMBER 2026: spoorConvergent telt de mechanismen die alle
+     VIER de spoor-eigenschappen van kern/vertegenwoordiging/handelen.js halen
+     (SPOORVORM.json, REPRESENTATIE.md par. 8.1).
+
+     DE IJKING GAAT OMHOOG, en dat is hier de richting die iets bewijst. De tand
+     staat op ÉÉN, en bij zo'n laag getal is "de meter herkent de vorm niet" van
+     buiten bijna niet te onderscheiden van "er is er pas één". Zet er in het
+     register twee convergente mechanismen bij en de meter hoort er exact twee
+     meer te melden; leest hij het verkeerde veld -- `gemeten.metSpoor` in plaats
+     van `gemeten.volledigConvergent`, en die twee staan naast elkaar met een
+     ander getal -- dan beweegt hij niet mee en zakt deze proef.
+
+     Dat de meter ook OMLAAG kan slaan, staat elders en beter: de meter draagt
+     zijn eigen besturingsproef (de referentie moet vier van vier halen, anders
+     eindigt hij met een foutcode), en test/spoorvorm.test.js laat hem op vier
+     verzonnen lijven uitslaan. Deze ijking dekt de KOPPELING tussen register en
+     tand; die toetsen dekken het oordeel zelf. */
+  spoorConvergent: {
+    proef: (voor) => metVervangenJson('SPOORVORM.json',
+      (j) => { j.gemeten.volledigConvergent = (j.gemeten.volledigConvergent || 0) + 2; return j; },
+      () => norm.meet().spoorConvergent - voor.spoorConvergent)
+  },
+  /* DE TAND VAN 15 SEPTEMBER 2026: connectDomeinenGemeten telt de
+     ontdekkingsdomeinen die scripts/connectlus.js werkelijk heeft gezien
+     (CONNECT.md par. 1). Zelfde vorm en zelfde richting als zijn drie zusters
+     hierboven, en de faalvorm is hier GEMETEN in plaats van bedacht:
+     scripts/carrierevorm.js sloeg bij een versmalling tot twee domeinen om van
+     0 naar 8 gedeelde velden. Een meter die stil minder domeinen ziet meldt dus
+     niet dezelfde nul over minder bewijs -- hij meldt een andere werkelijkheid
+     onder dezelfde naam, en daarop rust het besluit dat kern/connect/ een
+     projectie is en geen gedeeld inhoudstype. */
+  connectDomeinenGemeten: {
+    proef: (voor) => metVervangenJson('CONNECTLUS.json',
+      (j) => { j.werkwoorden.domeinen = Math.max(0, (j.werkwoorden.domeinen || 0) - 6); return j; },
+      () => voor.connectDomeinenGemeten - norm.meet().connectDomeinenGemeten)
   },
   /* DE TAND VAN 13 SEPTEMBER 2026 (tweede): wekZonderUitspraak telt de publieke
      domeinen waarover het wekbesluitregister zwijgt. Hij staat op NUL, en dat
@@ -1643,6 +1706,112 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('STILSPOOR.json',
       (j) => { j.gemeten.spoorAanroepen = Math.max(0, (j.gemeten.spoorAanroepen || 0) - 40); return j; },
       () => voor.stilSpoorAanroepen - norm.meet().stilSpoorAanroepen)
+  },
+  /* DE DRIE TANDEN VAN STEMPELVEILIGHEID.json (15 september 2026). Dezelfde vorm
+     als STILSPOOR.json hierboven -- twee schulden omhoog, het bereik omlaag --
+     en elk met een EIGEN getal, want drie meters die naar hetzelfde register
+     kijken kunnen stilletjes hetzelfde veld lezen.
+
+     `stempelInPoort` is de enige die niet uit `klassen` komt maar uit de LENGTE
+     van de doorsnedelijst. Dat is precies de plek waar een meter kan afglijden
+     naar het grotere getal ernaast: de klasse is een werklijst, de doorsnede is
+     het incident. Vandaar dat de proef er rijen BIJ zet in plaats van een getal
+     op te hogen. */
+  stempelOngevraagd: {
+    proef: (voor) => metVervangenJson('STEMPELVEILIGHEID.json',
+      (j) => { j.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN = (j.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN || 0) + 9; return j; },
+      () => norm.meet().stempelOngevraagd - voor.stempelOngevraagd)
+  },
+  stempelInPoort: {
+    proef: (voor) => metVervangenJson('STEMPELVEILIGHEID.json',
+      (j) => {
+        j.inEenPoort = (j.inEenPoort || []).concat(
+          [{ naam: 'verzonnen-a.js', viaPoort: ['werkstroom:ci.yml'] },
+           { naam: 'verzonnen-b.js', viaPoort: ['check'] },
+           { naam: 'verzonnen-c.js', viaPoort: ['norm'] }]);
+        return j;
+      },
+      () => norm.meet().stempelInPoort - voor.stempelInPoort)
+  },
+  stempelSchrijversGezien: {
+    proef: (voor) => metVervangenJson('STEMPELVEILIGHEID.json',
+      (j) => { j.schrijvers = Math.max(0, (j.schrijvers || 0) - 30); return j; },
+      () => voor.stempelSchrijversGezien - norm.meet().stempelSchrijversGezien)
+  },
+  /* DE VIER TANDEN VAN STILLEZING.json -- de spiegel van STILSPOOR hierboven.
+     Elk veld krijgt een EIGEN verstoring en een eigen grootte, zodat twee
+     verwisselde sleutels niet toevallig dezelfde uitslag geven; die val staat
+     bij STILSPOOR al uitgeschreven.
+
+     De twee schulden worden apart geijkt en niet met een gedeelde verstoring,
+     want ze wonen in twee bakken die met opzet nooit worden opgeteld: `server`
+     (een lezing die een HANDELING doorlaat) en `scripts` (een lezing die een
+     METING laat liegen). Een meter die ze zou optellen, beweegt bij beide
+     verstoringen even hard mee en die fout zou hier onzichtbaar blijven. */
+  stilLezing: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.server.smeltSamen = (j.gemeten.server.smeltSamen || 0) + 9; return j; },
+      () => norm.meet().stilLezing - voor.stilLezing)
+  },
+  stilLezingMeters: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.scripts.smeltSamen = (j.gemeten.scripts.smeltSamen || 0) + 13; return j; },
+      () => norm.meet().stilLezingMeters - voor.stilLezingMeters)
+  },
+  /* Het bereik telt de twee werelden WEL bij elkaar op -- de enige plek waar dat
+     gebeurt, want blindheid is een eigenschap van het instrument. De verstoring
+     zit daarom in EEN van de twee: komt hij er niet doorheen, dan telt de meter
+     maar een helft. */
+  stilLezingBereik: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.scripts.bewijslezingen = Math.max(0, (j.gemeten.scripts.bewijslezingen || 0) - 55); return j; },
+      () => voor.stilLezingBereik - norm.meet().stilLezingBereik)
+  },
+  bewijsOnderscheidt: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.server.onderscheidt = Math.max(0, (j.gemeten.server.onderscheidt || 0) - 1);
+               j.gemeten.scripts.onderscheidt = Math.max(0, (j.gemeten.scripts.onderscheidt || 0) - 2); return j; },
+      () => voor.bewijsOnderscheidt - norm.meet().bewijsOnderscheidt)
+  },
+  /* DE DRIE TANDEN VAN AFGELEID.json -- generator-eigenaarschap.
+
+     `afgeleidOnbeslist` is de tand die een VERDWENEN generator vangt: valt
+     scripts/kaart.js weg, dan zakt ARCHITECTUUR.md van AFGELEID naar ONBESLIST
+     en stijgt dit getal. De ijking verstoort hem daarom OMHOOG -- de richting
+     waarin het echte gevaar zit. `afgeleidMetEigenaar` gaat omlaag, want een
+     meter die stil minder eigenaren ziet meldt vooruitgang die er niet is. */
+  afgeleidZonderEigenaar: {
+    proef: (voor) => metVervangenJson('AFGELEID.json',
+      (j) => { j.gemeten.afgeleidZonderEigenaar = (j.gemeten.afgeleidZonderEigenaar || 0) + 6; return j; },
+      () => norm.meet().afgeleidZonderEigenaar - voor.afgeleidZonderEigenaar)
+  },
+  afgeleidOnbeslist: {
+    proef: (voor) => metVervangenJson('AFGELEID.json',
+      (j) => { j.gemeten.onbeslist = (j.gemeten.onbeslist || 0) + 11; return j; },
+      () => norm.meet().afgeleidOnbeslist - voor.afgeleidOnbeslist)
+  },
+  afgeleidMetEigenaar: {
+    proef: (voor) => metVervangenJson('AFGELEID.json',
+      (j) => { j.gemeten.metEigenaar = Math.max(0, (j.gemeten.metEigenaar || 0) - 23); return j; },
+      () => voor.afgeleidMetEigenaar - norm.meet().afgeleidMetEigenaar)
+  },
+  /* DE TWEE TANDEN VAN HERBOUWPROEF.json -- eigenaarschap is geen bewijs.
+
+     Ze lezen allebei uit `gemeten` van hetzelfde register, en dat is precies
+     wat hier misgaan kan: twee meters die stilletjes hetzelfde veld lezen. Elk
+     krijgt daarom zijn EIGEN veld verstoord, in de richting waarin het gevaar
+     zit -- `herbouwVerschilt` omhoog (een artefact dat inhoudelijk anders
+     terugkomt is geen herbouwplicht meer) en `herbouwBewezen` omlaag (een proef
+     die minder aanraakt meldt vooruitgang die er niet is). */
+  herbouwVerschilt: {
+    proef: (voor) => metVervangenJson('HERBOUWPROEF.json',
+      (j) => { j.gemeten.verschilt = (j.gemeten.verschilt || 0) + 4; return j; },
+      () => norm.meet().herbouwVerschilt - voor.herbouwVerschilt)
+  },
+  herbouwBewezen: {
+    proef: (voor) => metVervangenJson('HERBOUWPROEF.json',
+      (j) => { j.gemeten.herbouwbaar = Math.max(0, (j.gemeten.herbouwbaar || 0) - 9); return j; },
+      () => voor.herbouwBewezen - norm.meet().herbouwBewezen)
   },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
@@ -1986,6 +2155,43 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('BEWIJSLADDER.json',
       (j) => { j.telling.alleenKeten = (j.telling.alleenKeten || 0) + 4; return j; },
       () => norm.meet().bewijsAlleenKeten - voor.bewijsAlleenKeten)
+  },
+  /* DE TAND VAN 15 SEPTEMBER 2026: veranderbereikZonderBereik telt de toetsen
+     waarvan het BRONBESTANDbereik nergens uit volgt -- niet statisch (geen
+     require-kant naar server/) en niet waargenomen (geen route in het journaal
+     die naar een bestand oplost). Zelfde vorm als bewijsAlleenKeten hierboven:
+     hij leest een post uit een register, dus hij wordt geijkt door dat getal
+     tijdelijk op te hogen.
+
+     WAAROM HET VELD ERTOE DOET. VERANDERBEREIK.json draagt naast `zonderBereik`
+     ook `draaideZonderRoute` en `nietInDezeRonde`, en die twee zijn er samen
+     gelijk aan. Leest de meter per ongeluk een van die twee, dan telt hij de
+     helft en beweegt hij bij een echte verslechtering maar half mee -- precies
+     de val die hieronder bij LUSSEN.json staat beschreven (de verdeling lezen
+     in plaats van de schuld). */
+  veranderbereikZonderBereik: {
+    proef: (voor) => metVervangenJson('VERANDERBEREIK-RONDE.json',
+      (j) => { j.gemeten.zonderBereik = (j.gemeten.zonderBereik || 0) + 4; return j; },
+      () => norm.meet().veranderbereikZonderBereik - voor.veranderbereikZonderBereik)
+  },
+  /* DE TWEEDE TAND VAN DIE SPLITSING, EN HIJ GAAT DE ANDERE KANT OP. De
+     statische as volgt uit de code alleen: dezelfde commit geeft altijd
+     hetzelfde getal. Krimpt hij, dan ziet de require-graaf MINDER dan gisteren,
+     en dat hoort niet stil te gebeuren -- vandaar richting `omhoog`.
+
+     DE IJKING GAAT DAAROM OOK DE ANDERE KANT OP: hij VERLAAGT het getal in het
+     register. Een tand die alleen op een verhoging is geijkt, bewijst niet dat
+     hij een DALING ziet, en juist die daling is wat hij moet tegenhouden.
+
+     EN HIJ LEEST EEN ANDER BESTAND DAN ZIJN BUURMAN HIERBOVEN, met opzet. Wie
+     `statischBereik` uit VERANDERBEREIK-RONDE.json zou lezen, leest een getal
+     dat daar niet staat en krijgt stil nul -- dan meldt de tand elke dag een
+     vrije val. Dat de twee registers uit elkaar zijn gehaald, is precies waarom
+     deze proef het bestand bij naam noemt. */
+  veranderbereikStatisch: {
+    proef: (voor) => metVervangenJson('VERANDERBEREIK-KENNIS.json',
+      (j) => { j.gemeten.statischBereik = (j.gemeten.statischBereik || 0) - 4; return j; },
+      () => voor.veranderbereikStatisch - norm.meet().veranderbereikStatisch)
   },
   /* DE DRIE TANDEN VAN 11 SEPTEMBER 2026 (LUSSEN.json, npm run lussen).
 

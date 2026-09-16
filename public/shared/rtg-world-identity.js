@@ -26,7 +26,7 @@
       app avond bestellen concierge doelen festival-gast festival galerij gast gedachten genootschap \
       gereedschap home ik isolatie juridisch juridisch/partnervoorwaarden juridisch/privacy \
       juridisch/voorwaarden klankwerk labpas life medicijnen meet memo mijn-gegevens mijn-isolatie \
-      mijn-post mijn-relaties mijn-sessies notities oog passkeys rtgid salon scanner service-bel service \
+      mijn-neigingen mijn-post mijn-relaties mijn-sessies notities oog passkeys rtgid salon scanner service-bel service \
       sociaal-prive tijdlijn toestemming training vertaler voeding zaal'),
     travel: routes('\
       arrival boeken chauffeur flits hangar hotels move navigatie ov reisboek reisbureau reizen-veilig reizen \
@@ -64,8 +64,8 @@
       foundation/speeltuin foundation/steun foundation/studie foundation/tellen foundation/toetsen \
       foundation/veilig foundation/veilig-vertrouwd foundation/verhaaltje foundation/verjaardagen \
       foundation/wegwijzer foundation/werk foundation/winkel foundation/zakgeld foundation/zorg \
-      defensie gemeente gemeenteloket gemeentepda lab lesmaker livinglab overheid overheidspda rechtbank \
-      rijksloket schoolpartner zorgbalie')
+      connect defensie gemeente gemeenteloket gemeentepda lab lesmaker livinglab overheid overheidspda \
+      rechtbank rijksloket schoolpartner zorgbalie')
   });
 
   /* Bestaande functionele materiaalgrenzen: routes kunnen geen vrij thema kiezen. */

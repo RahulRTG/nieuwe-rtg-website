@@ -1,0 +1,3727 @@
+{
+ "soort": "meting",
+ "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
+ "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
+ "stempel": {
+  "op": "2026-09-16T05:46:12.359Z",
+  "commit": "c82ced7e",
+  "boomVuil": true,
+  "boomAnders": 4,
+  "instrument": "scripts/afgeleid.js",
+  "node": "v22.22.2"
+ },
+ "gemeten": {
+  "artefacten": 282,
+  "bron": 2,
+  "afgeleid": 156,
+  "fragmenten": 17,
+  "momentopname": 0,
+  "onbeslist": 107,
+  "afgeleidZonderEigenaar": 2,
+  "metEigenaar": 171,
+  "afgeleidEigenaarHard": 154,
+  "afgeleidGrendelt": 15,
+  "metStempel": 84,
+  "stempelAnders": 0
+ },
+ "artefacten": [
+  {
+   "naam": "A11Y-INGELOGD.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AANROEPGRAAF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/aanroepgraaf.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/aanroepgraaf.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/aanroepgraaf.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AANVOERVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/aanvoervorm.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/aanvoervorm.js"
+   ],
+   "stempelInstrument": "scripts/aanvoervorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run aanvoervorm:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ACTIVERING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/activering.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/activering.js"
+   ],
+   "stempelInstrument": "scripts/activering.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run activering:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ADAMPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/adamproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/adamproef.js"
+   ],
+   "stempelInstrument": "scripts/adamproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run adamproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ADAPTIEF.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ADRESSEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/adressen.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/adressen.js"
+   ],
+   "stempelInstrument": "scripts/adressen.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AFGELEID.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/afgeleid.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/afgeleid.js"
+   ],
+   "stempelInstrument": "scripts/afgeleid.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run afgeleid:vast",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AFSPRAAK.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AICONTEXT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/aicontext.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/aicontext.js"
+   ],
+   "stempelInstrument": "scripts/aicontext.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run aicontext:vast",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "APPSTORE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "APPWERKT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/appwerkt.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/appwerkt.js"
+   ],
+   "stempelInstrument": "scripts/appwerkt.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run appwerkt",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ARCHITECTUUR.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/kaart.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/kaart.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AUDITPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/auditproef-route.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/auditproef-route.js"
+   ],
+   "stempelInstrument": "scripts/auditproef-route.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=auditproef",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEDRADING.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEGROTING.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BELOFTE.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BELOFTE.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/belofte.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/belofte.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEPROEVING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/beproeving.js",
+   "graad": "stempel",
+   "schrijvers": [],
+   "stempelInstrument": "scripts/beproeving.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run beproeving",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEREIK.json",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BESTUUR.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BETROUWBAARHEID.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEWIJS.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/bewijs.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/bewijs.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEWIJSLADDER.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/bewijsladder.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/bewijsladder.js"
+   ],
+   "stempelInstrument": "scripts/bewijsladder.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run bewijsladder:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEWIJSMACHINE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEWIJSMATRIX.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/bewijsmatrix.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/bewijsmatrix.js"
+   ],
+   "stempelInstrument": "scripts/bewijsmatrix.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run bewijsmatrix:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEWIJSSCHULD.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/bewijsschuld.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/bewijsschuld.js"
+   ],
+   "stempelInstrument": "scripts/bewijsschuld.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/bewijsschuld.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BUNDELS.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/deelindex.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/deelindex.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CANVAS.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CAPABILITEIT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/capabilities.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/capabilities.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CARRIERE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CARRIEREVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/carrierevorm.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/carrierevorm.js"
+   ],
+   "stempelInstrument": "scripts/carrierevorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/carrierevorm.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CLAUDE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CODE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CODECREDENTIALS.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CODEWERELD.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/codewereld.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/codewereld.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/codewereld.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "COMMERCE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/commerce.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/commerce.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "COMMERCE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "COMMERCIE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONCERN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONTEXTPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/contextproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/contextproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/contextproef.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONTRACTEN-TE-TEKENEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONTROLPLANE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONTROLS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/controls.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/controls.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CORRECTIES.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CRASHAS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/crashas.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/crashas.js"
+   ],
+   "stempelInstrument": "scripts/crashas.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run crashas:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CRASHPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/crashproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/crashproef.js"
+   ],
+   "stempelInstrument": "scripts/crashproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run crashproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CREATE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DATALEK.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DEKKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/dekking.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/dekking.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run dekking:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DEVELOPERCLOUD.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DOCTRINE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/doctrine.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/doctrine.js"
+   ],
+   "stempelInstrument": "scripts/doctrine.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run doctrine",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DOELGROEPBEREIK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/doelgroepbereik.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/doelgroepbereik.js"
+   ],
+   "stempelInstrument": "scripts/doelgroepbereik.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run doelgroepbereik:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DOODSPOOR.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/doodspoor.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/doodspoor.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run doodspoor:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DOORBELASTING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/doorbelasting.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/doorbelasting.js"
+   ],
+   "stempelInstrument": "scripts/doorbelasting.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run doorbelasting:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DOORWERKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/doorwerking.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/doorwerking.js"
+   ],
+   "stempelInstrument": "scripts/doorwerking.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run doorwerking:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DPIA.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DROOGLOOP.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/droogloop.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/droogloop.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run droogloop",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DUURZAAMHEIDSKOSTEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/duurzaamheidskosten.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/duurzaamheidskosten.js"
+   ],
+   "stempelInstrument": "scripts/duurzaamheidskosten.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/duurzaamheidskosten.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ECONOMIE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EERSTEMINUUT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/eersteminuut.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/eersteminuut.js"
+   ],
+   "stempelInstrument": "scripts/eersteminuut.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run eersteminuut",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EIGENAAR.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ENVELOP.json",
+   "soort": "AFGELEID",
+   "eigenaar": null,
+   "graad": "meerdere",
+   "schrijvers": [
+    "scripts/actorvormen.js",
+    "scripts/envelopvelden.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": false
+  },
+  {
+   "naam": "EU.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EXECUTIE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EXECUTION_MAP.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/executionmap.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/executionmap.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EXPERIENCE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "FAALPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/faalproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/faalproef.js"
+   ],
+   "stempelInstrument": "scripts/faalproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/faalproef.js --vastleggen",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "FABRIC.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "FACTUURPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/factuurproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/factuurproef.js"
+   ],
+   "stempelInstrument": "scripts/factuurproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run factuurproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "FESTIVAL.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "FILMSCRIPT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "FOUNDATION.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "FRANCHISE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "FUNCTIES.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/functielijst.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/functielijst.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GAMEHALL.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GELD.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GELDDEKKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/gelddekking.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/gelddekking.js"
+   ],
+   "stempelInstrument": "scripts/gelddekking.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run gelddekking",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GELDING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/gelding.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/gelding.js"
+   ],
+   "stempelInstrument": "scripts/gelding.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run gelding",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GELDKAART.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/geldkaart.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/geldkaart.js"
+   ],
+   "stempelInstrument": "scripts/geldkaart.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run geldkaart",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GELDLAT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GEVOLGDEKKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/gevolgdekking.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/gevolgdekking.js"
+   ],
+   "stempelInstrument": "scripts/gevolgdekking.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run gevolgdekking:vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GEZAG.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/gezag.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/gezag.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GEZAGSHANDELINGEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/gezagshandelingen.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/gezagshandelingen.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GEZAGSNOEMER.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/gezagsnoemer.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/gezagsnoemer.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GIFT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GLUURRONDE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/gluurronde.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/gluurronde.js"
+   ],
+   "stempelInstrument": "scripts/gluurronde.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/gluurronde.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GRAAFAS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/graafas.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/graafas.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GRAMMATICA.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GRENZEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/grenslijst.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/grenslijst.js",
+    "scripts/grensmeld.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": true
+  },
+  {
+   "naam": "GROEPEN.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/groepen.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/groepen.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HANDELINGPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/handelingproef-route.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/handelingproef-route.js"
+   ],
+   "stempelInstrument": "scripts/handelingproef-route.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=handelingproef",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HANDELINGSKLASSE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/handelingsklasse.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/handelingsklasse.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HANDLERBEWAKERS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/handlerbewakers.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/handlerbewakers.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HANDLERWACHT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/handlerwacht.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/handlerwacht.js"
+   ],
+   "stempelInstrument": "scripts/handlerwacht.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run handlerwacht:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HDI.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HEAPPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/heapproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/heapproef.js"
+   ],
+   "stempelInstrument": "scripts/heapproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run heapproef",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HERITAGE-INTELLIGENCE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HERITAGE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HERREKENBAAR.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HERSTEL.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/herstel.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/herstel.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HERSTELBESLUIT.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HERSTELPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/herstelproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/herstelproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run herstelproef",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "HORECA.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "IDEMBESLUIT.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "IDEMIDENTITEIT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/idemidentiteit.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/idemidentiteit.js"
+   ],
+   "stempelInstrument": "scripts/idemidentiteit.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run idemidentiteit",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "IDEMPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/idemproef-route.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/idemproef-route.js"
+   ],
+   "stempelInstrument": "scripts/idemproef-route.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=idemproef",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "IDEMSCHULD.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/idemschuld.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/idemschuld.js"
+   ],
+   "stempelInstrument": "scripts/idemschuld.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run idemschuld:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "IDOR.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/idorproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/idorproef.js"
+   ],
+   "stempelInstrument": "scripts/idorproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/idorproef.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "INHOUDSKAART.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/inhoudskaart.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/inhoudskaart.js"
+   ],
+   "stempelInstrument": "scripts/inhoudskaart.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/inhoudskaart.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "INTELLIGENTIE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "INTERFACE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "INVOERPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/invoerproef-route.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/invoerproef-route.js"
+   ],
+   "stempelInstrument": "scripts/invoerproef-route.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=invoerproef",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ISOLATIE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ISOLATIEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/isolatieproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/isolatieproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ISOLATIESCHADUW.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/isolatieschaduw.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/isolatieschaduw.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run isolatieschaduw:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KAARTEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KANTOOR.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KANTOORMACHT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/kantoormacht.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/kantoormacht.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run kantoormacht:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KANTOORMACHT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KERNHERKOMST.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/kernherkomst.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/kernherkomst.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/kernherkomst.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KETENS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/ketenronde.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/ketenronde.js"
+   ],
+   "stempelInstrument": "scripts/ketenronde.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=ketenronde",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KETENVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/ketenvorm.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/ketenvorm.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run ketenvorm:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KEURING.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KLOK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/klok.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/klok.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KLOKWACHT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/klokwacht.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/klokwacht.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KOSTEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KRIMP.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/krimpronde.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/krimpronde.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LAATSPOOR.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/laatspoor.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/laatspoor.js"
+   ],
+   "stempelInstrument": "scripts/laatspoor.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/laatspoor.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LAATSTE_METING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/beproeving.js",
+   "graad": "stempel",
+   "schrijvers": [],
+   "stempelInstrument": "scripts/beproeving.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run beproeving",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LADDER.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/ladder.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/ladder.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LANDDEKKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/landdekking.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/landdekking.js"
+   ],
+   "stempelInstrument": "scripts/landdekking.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run landdekking:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LANDEN.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LAT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LAUNCH.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LEVEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LIFE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LINK.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LIVEGANG.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LUSSEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/lussen.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/lussen.js"
+   ],
+   "stempelInstrument": "scripts/lussen.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run lussen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MAATSTAF.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MACHINE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MACHINEDEKKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/machinedekking.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/machinedekking.js"
+   ],
+   "stempelInstrument": "scripts/machinedekking.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run machinedekking:vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MAGNAATLAB.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/magnaatlab.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/magnaatlab.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MAGNAATLAB.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MAKERS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/makers.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/makers.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MARKT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MATERIAAL.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MEETLEER.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/meetleer.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/meetleer.js"
+   ],
+   "stempelInstrument": "scripts/meetleer.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetleer:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MELDBESLUIT.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MENS.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MENSELIJKE_UITVOERING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/menselijkeuitvoering.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/menselijkeuitvoering.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MENSMUTATIE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/mensmutatie.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/mensmutatie.js"
+   ],
+   "stempelInstrument": "scripts/mensmutatie.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run mensmutatie",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MENSNETWERK.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MENSTAALPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/menstaalproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/menstaalproef.js"
+   ],
+   "stempelInstrument": "scripts/menstaalproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run menstaalproef",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MIJNRTG.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MODULAIR.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MOMENTPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/momentproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/momentproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run momentproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MOVE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MOVEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/moveproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/moveproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run moveproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MUTATIEBOEK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/mutatieboek.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/mutatieboek.js"
+   ],
+   "stempelInstrument": "scripts/mutatieboek.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run mutatieboek:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MUTATIECONTRACT-AFGELEID.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/mutatiecontract.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/mutatiecontract.js"
+   ],
+   "stempelInstrument": "scripts/mutatiecontract.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MUTATIECONTRACT-VOORSTEL.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/effectcontracten.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/effectcontracten.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MUTATIECONTRACT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/mutatiecontract.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/mutatiecontract.js"
+   ],
+   "stempelInstrument": "scripts/mutatiecontract.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MUTATIECONTRACT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MUTATIEINVENTARIS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/mutatieinventaris.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/mutatieinventaris.js"
+   ],
+   "stempelInstrument": "scripts/mutatieinventaris.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MUTATIES.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/mutatie.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": "scripts/mutatie.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run mutatie",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MUTATIESEMANTIEK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/mutatiesemantiek.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/mutatiesemantiek.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "NAMENSVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/namensvorm.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/namensvorm.js"
+   ],
+   "stempelInstrument": "scripts/namensvorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run namensvorm:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "NAVIGATIEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/navigatieproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/navigatieproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run navigatieproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "NEDERLAND-WEGENNET.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "NEIGING.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "NEIGINGVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/neigingvorm.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/neigingvorm.js"
+   ],
+   "stempelInstrument": "scripts/neigingvorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run neigingvorm:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "NORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/norm.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/dekking.js",
+    "scripts/gluurronde.js",
+    "scripts/ladder.js",
+    "scripts/norm.js",
+    "scripts/rolronde.js",
+    "scripts/samenhang.js",
+    "scripts/schermen.js",
+    "scripts/wetten.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": true
+  },
+  {
+   "naam": "NORM.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "OBJECTMODEL.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/objectmodel.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/objectmodel.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "OMZETPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/omzetproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/omzetproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run omzetproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONBEWEZEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/onbewezen.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/onbewezen.js"
+   ],
+   "stempelInstrument": "scripts/onbewezen.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run onbewezen:vast",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONDERHOUD.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONDERNEMEN.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONDERNEMERBEWIJS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/ondernemerbewijs.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/ondernemerbewijs.js"
+   ],
+   "stempelInstrument": "scripts/ondernemerbewijs.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run ondernemerbewijs:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONDERNEMERSLUS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/ondernemerslus.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/ondernemerslus.js"
+   ],
+   "stempelInstrument": "scripts/ondernemerslus.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run ondernemerslus:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONDERZOEK.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONDERZOEKSKETEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/onderzoeksketen.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/onderzoeksketen.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run onderzoeksketen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONTMOETEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ONTWERP.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "OS.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "OUTPUTPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": null,
+   "graad": "meerdere",
+   "schrijvers": [
+    "scripts/outputband.js",
+    "scripts/outputproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=outputproef",
+   "grendelt": null,
+   "botsingVerklaard": false
+  },
+  {
+   "naam": "OVERLEVING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/overleving.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/overleving.js"
+   ],
+   "stempelInstrument": "scripts/overleving.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run overleving:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "PAKTE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/pakte.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/pakte.js"
+   ],
+   "stempelInstrument": "scripts/pakte.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/pakte.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "PLAATS.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "PLATFORM.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "POORTWACHT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/meetronde.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/meetronde.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=poortwacht",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "PRESTATIES.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "PRIJZEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "PRODUCTION.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "PROOF-INCREMENTAL.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "PROOF.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RAILVERGELIJK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/railvergelijk.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/railvergelijk.js"
+   ],
+   "stempelInstrument": "scripts/railvergelijk.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run railvergelijk",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RAPPORT-SLOTSUITE.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/slotsuite.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/slotsuite.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "README.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "REFUNDMIGRATIE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/refundmigratie.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/refundmigratie.js"
+   ],
+   "stempelInstrument": "scripts/refundmigratie.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run refundmigratie:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "REIZEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "REPRESENTATIE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RESOLVERBEREIK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/resolverbereik.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/resolverbereik.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run resolverbereik",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RITMIGRATIE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/ritmigratie.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/ritmigratie.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run ritmigratie:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RITPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/ritproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/ritproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run ritproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ROLLBACKBESLUIT.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ROLPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/rolproef-route.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/rolproef-route.js"
+   ],
+   "stempelInstrument": "scripts/rolproef-route.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=rolproef",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ROLRONDE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/rolronde.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/rolronde.js"
+   ],
+   "stempelInstrument": "scripts/rolronde.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/rolronde.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ROUTEBRON.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/routebron.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/routebron.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/routebron.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-WORKSPACE-RUNTIME.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RUGDEKKING.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RUNBOOK.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RUNTIME.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RUST-MIGRATIES.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SABOTAGE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/sabotage.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": "scripts/sabotage.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/sabotage.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERFMETER.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/scherfmeter.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/scherfmeter.js"
+   ],
+   "stempelInstrument": "scripts/scherfmeter.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run scherfmeter:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMGEDRAG.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schermgedrag.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/schermgedrag.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/schermgedrag.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMLEUGEN.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node --test test/liegend-scherm.e2e.js",
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMMUTATIES.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schermmutatie.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/schermmutatie.js"
+   ],
+   "stempelInstrument": "scripts/schermmutatie.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run mutatie:scherm",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMROUTES.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schermroutes.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/schermroutes.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/schermroutes.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHOOL.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHRIJFANALYSE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schrijfanalyse.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/schrijfanalyse.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHRIJFPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schrijfproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/schrijfproef.js"
+   ],
+   "stempelInstrument": "scripts/schrijfproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/schrijfproef.js --vastleggen",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SECURITY.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SEMANTIEK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/semantiek.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/semantiek.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SERVICE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SLO.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SLO.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/slo.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/slo.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SOEVEREIN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/soeverein.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/soeverein.js"
+   ],
+   "stempelInstrument": "scripts/soeverein.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run soeverein:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SOEVEREIN.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SOFTWAREMARKT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "STAATPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/staatproef-route.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/staatproef-route.js"
+   ],
+   "stempelInstrument": "scripts/staatproef-route.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=staatproef",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "STAGE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "STAGEVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/stagevorm.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/stagevorm.js"
+   ],
+   "stempelInstrument": "scripts/stagevorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run stagevorm:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "STANDAARD.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "STILLEZING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/stillezing.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/stillezing.js"
+   ],
+   "stempelInstrument": "scripts/stillezing.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run stillezing:vast",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "STILSPOOR.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/stilspoor.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/stilspoor.js"
+   ],
+   "stempelInstrument": "scripts/stilspoor.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run stilspoor:vast",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SUITE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/test-runner.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/test-runner.js"
+   ],
+   "stempelInstrument": "scripts/test-runner.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm test",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SYMBOLEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/symbolen.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/symbolen.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/symbolen.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TAALKWALITEIT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/taalkwaliteit.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/taalkwaliteit.js"
+   ],
+   "stempelInstrument": "scripts/taalkwaliteit.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run taalkwaliteit",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TAALOORDEEL.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TAALSCHIL.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/taalschil.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/taalschil.js"
+   ],
+   "stempelInstrument": "scripts/taalschil.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run taalschil",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TAFELPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/tafelproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/tafelproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run tafelproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TAKEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TEKSTOPPERVLAK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/tekstoppervlak.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/tekstoppervlak.js"
+   ],
+   "stempelInstrument": "scripts/tekstoppervlak.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run tekstoppervlak",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TENANT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TIKKEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/tikken.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/tikken.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run tikken",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TIKKEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TOEGANKELIJK.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TOELATINGSPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/toelatingsproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/toelatingsproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run toelatingsproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TOETSDUUR.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/toetsduur.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/toetsduur.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TOEZICHT.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TOKEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TRAVELCOMMERCE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TREDEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/tredeproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/tredeproef.js"
+   ],
+   "stempelInstrument": "scripts/tredeproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/tredeproef.js --alle --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "UITVOERPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/uitvoerproef-route.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/uitvoerproef-route.js"
+   ],
+   "stempelInstrument": "scripts/uitvoerproef-route.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run meetronde -- --alleen=uitvoerproef",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERBAND.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/verband.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/verband.js"
+   ],
+   "stempelInstrument": "scripts/verband.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run verband",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERRAAD.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/verraadronde.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/verraadronde.js"
+   ],
+   "stempelInstrument": "scripts/verraadronde.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/verraadronde.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERSTRENGELING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/verstrengeling.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/verstrengeling.js"
+   ],
+   "stempelInstrument": "scripts/verstrengeling.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run verstrengeling:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERTROUWEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/vertrouwen.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/vertrouwen.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERVOLG.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERWERKERS.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERWERKINGSREGISTER.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VINDBAAR.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/vindbaar.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/vindbaar.js"
+   ],
+   "stempelInstrument": "scripts/vindbaar.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run vindbaar",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WAARDE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WAAROM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/waarom.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/waarom.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "node scripts/waarom.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WACHTWIJZE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/wachtwijze.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/wachtwijze.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WEERBAARHEID.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WEKDEKKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/wekdekking.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/wekdekking.js"
+   ],
+   "stempelInstrument": "scripts/wekdekking.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run wekdekking:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WEKKERS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/wekkers.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/wekkers.js"
+   ],
+   "stempelInstrument": "scripts/wekkers.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run wekkers:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WERELD.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WERELDEN.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WERELDLIJST.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/wereldlijst.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/wereldlijst.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WERELDSTIJL.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/wereldstijl.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/wereldstijl.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run wereldstijl",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WERKRUIMTE.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WETBRONNEN.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/wetwacht.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/wetwacht.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WETTEN.json",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WETWACHT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/wetwacht.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/wetwacht.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ZAAKLIVEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/zaakliveproef.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/zaakliveproef.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run zaakliveproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ZAAKWIG.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/zaakwig.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/zaakwig.js"
+   ],
+   "stempelInstrument": "scripts/zaakwig.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run zaakwig:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  }
+ ]
+}

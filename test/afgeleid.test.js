@@ -55,9 +55,20 @@ test('3. de eigenaar schrijft aantoonbaar, of de verklaring zegt waarom niet', (
     const gemeten = r.schrijvers.includes(r.eigenaar);
     if (gemeten) continue;
     const e = EIGENAAR[r.naam];
-    const uitMerkteken = r.graad === 'merkteken';
-    const uitVersheid = r.graad === 'versheid';
-    assert.ok((e && String(e.waarom || '').length > 20) || uitMerkteken || uitVersheid,
+    /* `stempel` is de verklaring van de SCHRIJVER zelf, op het moment van
+       schrijven -- sterker bewijs dan een regex over de bron, en het enige
+       signaal dat een generator geeft die via een eigen helper schrijft
+       (scripts/mutatie.js, scripts/sabotage.js). Daarom telt hij hier mee. */
+    const zacht = ['merkteken', 'versheid', 'stempel'].includes(r.graad);
+    /* EEN VERKLARING DIE HET ARTEFACT ZELF ONDERSCHRIJFT, HEEFT GEEN PROZA
+       NODIG. SABOTAGE.json draagt `stempel.instrument: scripts/sabotage.js` --
+       door die generator geschreven op het moment van schrijven -- terwijl de
+       menselijke verklaring hetzelfde script noemt. Twee bronnen die het eens
+       zijn is sterker bewijs dan een zin erbij, en een reden EISEN zou dan een
+       formaliteit afdwingen die niets toevoegt. Waar ze elkaar tegenspreken
+       zakt toets 7a. */
+    const stempelBevestigt = r.stempelInstrument === r.eigenaar;
+    assert.ok((e && String(e.waarom || '').length > 20) || zacht || stempelBevestigt,
       r.naam + ': eigenaar ' + r.eigenaar + ' is niet gemeten als schrijver (graad ' + r.graad +
       ') en er staat geen verklaring bij. De detectie is een ondergrens, dus dat MAG -- maar dan ' +
       'met een reden in EIGENAAR.');
@@ -95,6 +106,17 @@ test('6. het register loopt achter op de bron noch op zichzelf', () => {
       ' vastgelegd, ' + vers[sleutel] + ' gemeten) -- draai npm run afgeleid:vast');
   }
   assert.equal(REGISTER.artefacten.length, vers.artefacten);
+});
+
+test('7a. het stempel van de schrijver spreekt de bronmeting nergens tegen', () => {
+  /* Twee onafhankelijke methodes: `stempel.instrument` is door de generator
+     geschreven, `schrijvers` komt uit een lexicale scan van de bron. Waar ze
+     elkaar overlappen horen ze het eens te zijn; zijn ze dat niet, dan is of het
+     register door een ander script overschreven of wijst de meting de verkeerde
+     aan. Vandaag nul, en dat is de kruiscontrole die dit signaal draagt. */
+  const oneens = REGISTER.artefacten.filter(r => r.stempelAnders);
+  assert.deepEqual(oneens.map(r => r.naam + ': ' + r.schrijvers[0] + ' vs ' + r.stempelInstrument), [],
+    'het stempel van de schrijver en de bronmeting wijzen verschillende scripts aan');
 });
 
 test('7. de grendelregel is GEMETEN en nergens als eis verkleed', () => {

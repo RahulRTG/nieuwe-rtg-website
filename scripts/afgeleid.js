@@ -164,6 +164,30 @@ function merktekeneigenaar() {
   return kandidaten.length === 1 ? 'scripts/' + kandidaten[0] : null;
 }
 
+/* HET STERKSTE BEWIJS LAG IN HET ARTEFACT ZELF. `stempel()` schrijft bij elke
+   meting het INSTRUMENT mee: het script dat hem op dat moment produceerde. Dat
+   is geen lexicale gok over de bron maar een verklaring van de schrijver, gedaan
+   op het moment van schrijven -- en 84 van de 165 wortelregisters dragen hem, en
+   alle 84 wijzen naar een bestand dat bestaat.
+
+   Hij staat BOVEN de gemeten schrijvers en ONDER de menselijke verklaring: een
+   mens die iets vastlegt weet meer dan een stempel, een stempel weet meer dan
+   een regex over de bron. Spreekt hij een enkele gemeten schrijver tegen, dan is
+   dat een bevinding en geen detail -- `stempelAnders` telt die gevallen.
+
+   Waarom dit er niet eerder in zat: `registereigenaar.js` ging over SCRIPTS die
+   schrijven, en keek daarom in scripts/ en nooit in het artefact. De vraag "wie
+   heeft dit geschreven" heeft twee kanten, en de ene stond al opgeschreven. */
+function uitStempel(naam) {
+  if (!naam.endsWith('.json')) return null;
+  let d;
+  try { d = JSON.parse(fs.readFileSync(path.join(WORTEL, naam), 'utf8')); }
+  catch (e) { return null; }
+  const i = d && d.stempel && d.stempel.instrument;
+  if (typeof i !== 'string' || !i) return null;
+  return fs.existsSync(path.join(WORTEL, i)) ? i : null;
+}
+
 /* Draagt dit artefact merktekens die een generator per stuk herschrijft? */
 function heeftFragmenten(naam) {
   if (!naam.endsWith('.md')) return false;
@@ -190,18 +214,20 @@ function meet() {
     const verklaard = EIGENAAR[naam] || null;
     const schrijvers = [...(gemeten.get(naam) || [])];
     const uitVersheid = versheid.has(naam) ? scriptVanOpdracht(versheid.get(naam)) : null;
+    const stempelbaas = uitStempel(naam);
 
     let soort, eigenaar = null, graad = null;
 
     if (verklaard && verklaard.soort) soort = verklaard.soort;
     else if (verklaard && verklaard.handmatig) soort = 'BRON';
     else if (verklaard && verklaard.schrijver) soort = 'AFGELEID';
-    else if (schrijvers.length || uitVersheid) soort = 'AFGELEID';
+    else if (schrijvers.length || uitVersheid || stempelbaas) soort = 'AFGELEID';
     else if (heeftFragmenten(naam)) soort = 'FRAGMENTEN';
     else soort = 'ONBESLIST';
 
     if (soort === 'AFGELEID' || soort === 'MOMENTOPNAME' || soort === 'FRAGMENTEN') {
       if (verklaard && verklaard.schrijver) { eigenaar = verklaard.schrijver; graad = 'verklaard'; }
+      else if (stempelbaas) { eigenaar = stempelbaas; graad = 'stempel'; }
       else if (schrijvers.length === 1) { eigenaar = schrijvers[0]; graad = 'gemeten'; }
       /* DE VERSHEIDSOPDRACHT IS PAS BEWIJS ALS ER NIETS GEMETEN IS, en die
          volgorde is een reparatie. Hier stond versheid VOOR de meervoudige
@@ -223,6 +249,11 @@ function meet() {
     rijen.push({
       naam, soort, eigenaar, graad,
       schrijvers,
+      stempelInstrument: stempelbaas,
+      /* Het stempel zegt iets anders dan de bron. Zelden, en dan is het een
+         bevinding: of het register is door een ander script overschreven, of
+         de meting wijst de verkeerde aan. */
+      stempelAnders: Boolean(stempelbaas && schrijvers.length === 1 && schrijvers[0] !== stempelbaas),
       versheidOpdracht: versheid.get(naam) || null,
       grendelt: grendelt(eigenaar),
       botsingVerklaard: Object.prototype.hasOwnProperty.call(ONVERKLAARDE_BOTSING, naam) ? false
@@ -247,8 +278,14 @@ function samenvatting(rijen) {
        alleen stijgen: het is de dekking van het contract, en zonder hem is een
        dalende `onbeslist` niet te onderscheiden van een krimpend bereik. */
     metEigenaar: rijen.filter(r => ['AFGELEID', 'FRAGMENTEN', 'MOMENTOPNAME'].includes(r.soort) && r.eigenaar).length,
-    afgeleidEigenaarGemeten: afgeleid.filter(r => r.graad === 'gemeten' || r.graad === 'verklaard').length,
-    afgeleidGrendelt: afgeleid.filter(r => r.grendelt === true).length
+    /* Eigenaar uit een HARDE bron: een menselijke verklaring, het stempel van
+       de schrijver zelf, of een gemeten writeFileSync. `versheid` telt hier niet
+       mee -- die noemt een INGANG en dat is zwakker bewijs (zie de volgorde in
+       meet()). */
+    afgeleidEigenaarHard: afgeleid.filter(r => ['verklaard', 'stempel', 'gemeten'].includes(r.graad)).length,
+    afgeleidGrendelt: afgeleid.filter(r => r.grendelt === true).length,
+    metStempel: rijen.filter(r => r.stempelInstrument).length,
+    stempelAnders: rijen.filter(r => r.stempelAnders).length
   };
 }
 
@@ -267,7 +304,7 @@ function main() {
   console.log('  van de AFGELEIDE artefacten:');
   console.log('    ' + (g.afgeleidZonderEigenaar ? K.rood : K.groen) + 'zonder eigenaar        ' +
     String(g.afgeleidZonderEigenaar).padStart(4) + K.reset);
-  console.log('    eigenaar gemeten of verklaard ' + String(g.afgeleidEigenaarGemeten).padStart(4));
+  console.log('    eigenaar uit een harde bron  ' + String(g.afgeleidEigenaarHard).padStart(4));
   console.log('    grendelt op een schone boom   ' + String(g.afgeleidGrendelt).padStart(4) +
     K.grijs + '  (gemeten, niet geeist -- BEWIJSMACHINE.md par. 6a.2)' + K.reset + '\n');
 

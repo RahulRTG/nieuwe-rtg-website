@@ -1706,6 +1706,28 @@ const IJKINGEN = {
                j.gemeten.scripts.onderscheidt = Math.max(0, (j.gemeten.scripts.onderscheidt || 0) - 2); return j; },
       () => voor.bewijsOnderscheidt - norm.meet().bewijsOnderscheidt)
   },
+  /* DE DRIE TANDEN VAN AFGELEID.json -- generator-eigenaarschap.
+
+     `afgeleidOnbeslist` is de tand die een VERDWENEN generator vangt: valt
+     scripts/kaart.js weg, dan zakt ARCHITECTUUR.md van AFGELEID naar ONBESLIST
+     en stijgt dit getal. De ijking verstoort hem daarom OMHOOG -- de richting
+     waarin het echte gevaar zit. `afgeleidMetEigenaar` gaat omlaag, want een
+     meter die stil minder eigenaren ziet meldt vooruitgang die er niet is. */
+  afgeleidZonderEigenaar: {
+    proef: (voor) => metVervangenJson('AFGELEID.json',
+      (j) => { j.gemeten.afgeleidZonderEigenaar = (j.gemeten.afgeleidZonderEigenaar || 0) + 6; return j; },
+      () => norm.meet().afgeleidZonderEigenaar - voor.afgeleidZonderEigenaar)
+  },
+  afgeleidOnbeslist: {
+    proef: (voor) => metVervangenJson('AFGELEID.json',
+      (j) => { j.gemeten.onbeslist = (j.gemeten.onbeslist || 0) + 11; return j; },
+      () => norm.meet().afgeleidOnbeslist - voor.afgeleidOnbeslist)
+  },
+  afgeleidMetEigenaar: {
+    proef: (voor) => metVervangenJson('AFGELEID.json',
+      (j) => { j.gemeten.metEigenaar = Math.max(0, (j.gemeten.metEigenaar || 0) - 23); return j; },
+      () => voor.afgeleidMetEigenaar - norm.meet().afgeleidMetEigenaar)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

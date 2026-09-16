@@ -768,6 +768,151 @@ Drie dingen, en ze horen bij par. 6a:
    bereik ging 439 → 442 en bleef daarna over drie rondes staan. Wie hem voor het
    eerst vastlegt, draait `--vastleggen` dus twee keer.
 
+## 6c. Wie mag dit artefact opnieuw afleiden
+
+Par. 6b gaat over hoe de bewijsmachine haar toestand publiceert en terugleest.
+Dit gaat over de vraag die daar onmiddellijk naast ligt en die niemand had
+gesteld: **het huis kan een afgeleid artefact vaak wel produceren, maar kan niet
+altijd bewijzen wie bevoegd is het opnieuw te produceren.**
+
+### De aanleiding is een gemeten reeks, geen gevoel
+
+Bij de samenvoeging met main van 15 september 2026 waren er negentien
+conflicten: één in de bron en achttien in afgeleide artefacten. Alle achttien
+zijn opnieuw afgeleid — per stuk, met de hand, door de juiste opdracht te
+kiezen. Machinaal aanwijsbaar waren er toen **acht**.
+
+Dat verschil is het hele probleem. Het is niet dat de generatoren ontbreken; het
+is dat de machine ze niet kan noemen, en dus kan een gegenereerd conflict nooit
+automatisch een **rebuild-verplichting** worden in plaats van menselijk
+mergewerk.
+
+### Het contract
+
+> Elk artefact dat repo-waarheid claimt en niet door een mens is geschreven,
+> heeft **precies één machinaal vindbare generator-eigenaar.**
+
+`AFGELEID.json` (`npm run afgeleid`) legt dat per wortelartefact vast, en
+`test/afgeleid.test.js` handhaaft de acht eigenschappen — één toets per
+eigenschap, alle negen groen, en twee keer met een mutatie zien zakken.
+
+### Vijf standen, en ONBESLIST is er één van
+
+| | |
+|---|---|
+| **BRON** | door een mens of externe waarheid geschreven; geen generator vereist |
+| **AFGELEID** | volledig reproduceerbaar; precies één eigenaar |
+| **FRAGMENTEN** | een BRON-document waarin een generator alleen afgebakende stukken herschrijft |
+| **MOMENTOPNAME** | afgeleid maar bewust gebonden aan één ronde, commit of tijdstip |
+| **ONBESLIST** | niemand heeft het gezegd — en dit mag nooit stil een van de andere vier worden |
+
+**FRAGMENTEN is niet uit het model afgeleid maar uit de meting gevallen.**
+CLAUDE.md en MACHINE.md waren de laatste twee van de achttien die niemand kon
+aanwijzen, en dat is terecht: ze wórden niet gegenereerd. `scripts/getallen.js`
+herschrijft alleen de stukken tussen `<!--getal:...-->`. Dat is niet AFGELEID
+(het document regenereren bestaat niet) en niet BRON (die stukken horen nooit
+met de hand te worden samengevoegd). Zeventien documenten, en hun eigenaar is
+niet aangewezen maar **gevonden**: het enige script dat de merkteken-conventie
+kent.
+
+### De verklaringen lagen er al, op drie plekken
+
+Voordat er een vierde lijst bij kwam is geteld wat er is:
+
+| bron | verklaringen |
+|---|---|
+| `scripts/versheid.js` — per register de opdracht die hem schrijft | 112 |
+| `EIGENAAR` in `scripts/lib/registereigenaar.js` | 18 |
+| `detecteer()` — gemeten `writeFileSync` | 99 |
+
+Eén tegenspraak over het hele huis, en die stond al als onverklaarde botsing
+genoteerd. `AFGELEID.json` is dus een **samenvoeging** en geen uitvinding.
+
+### De detector kon 63 bestaande generatoren niet aanwijzen
+
+Van 99 naar 162 gevonden schrijvers, zonder dat er één verklaring bij kwam.
+Vier fouten, en alle vier lieten ze een generator die er gewoon is onzichtbaar:
+
+1. de constante moest in **hoofdletters** staan — `scripts/capabilities.js`
+   schrijft naar `doel`;
+2. het eerste argument werd op de eerste **komma** afgekapt, en die staat bij
+   `writeFileSync(path.join(WORTEL, 'X.json'), ...)` binnen het argument;
+3. het bereik was alleen `.json`, terwijl ARCHITECTUUR.md, BEWIJS.md en
+   FUNCTIES.md net zo goed worden gegenereerd;
+4. `const UIT = 'X.json'; const pad = path.join(WORTEL, UIT)` vroeg om
+   herleiding **twee schakels** diep. Dat is de grens: dieper wordt het een
+   halve interpreter en bewijst een treffer niets meer.
+
+Daarmee ging de dekking op de achttien conflicten van 8 naar **16**.
+
+### Het sterkste bewijs lag in het artefact zelf
+
+`stempel()` schrijft bij elke meting het **instrument** mee: het script dat hem
+op dat moment produceerde. Dat is geen lexicale gok maar een verklaring van de
+schrijver, gedaan op het moment van schrijven — en **84 van de 165**
+wortelregisters dragen hem, alle 84 wijzend naar een bestand dat bestaat.
+
+Hij staat boven de gemeten schrijvers en onder de menselijke verklaring: een
+mens die iets vastlegt weet meer dan een stempel, een stempel weet meer dan een
+regex over de bron. En de kruiscontrole is de reden dat hij te vertrouwen is:
+**waar stempel en bronmeting elkaar overlappen, spreken ze elkaar nul keer
+tegen** (toets 7a). Twee onafhankelijke methodes die het overal eens zijn.
+
+Dat dit er niet eerder in zat heeft een simpele oorzaak: `registereigenaar.js`
+ging over *scripts die schrijven* en keek daarom in `scripts/` en nooit in het
+artefact. De vraag "wie heeft dit geschreven" heeft twee kanten, en de ene stond
+al opgeschreven.
+
+### De stand, over 282 wortelartefacten
+
+| | |
+|---|---|
+| BRON | 2 |
+| AFGELEID | 156 |
+| FRAGMENTEN | 17 |
+| MOMENTOPNAME | 0 |
+| ONBESLIST | 107 (16 `.json`, 91 `.md`) |
+| **zonder canonieke eigenaar** | **2** — en beide staan al in `ONVERKLAARDE_BOTSING` |
+| eigenaar uit een harde bron | 85 |
+| grendelt op een schone boom | 15 |
+
+**ONBESLIST is de tand die een verdwenen generator vangt.** Valt
+`scripts/kaart.js` weg, dan zakt ARCHITECTUUR.md van AFGELEID naar ONBESLIST en
+*stijgt* dit getal — dat is eigenschap 4 van het contract, en daarom mag hij
+alleen dalen. De 91 handgeschreven documenten hoeven dus niet stuk voor stuk
+verklaard te worden; wat ze nodig hebben is een ratel die groei vangt.
+`afgeleidMetEigenaar` staat ernaast omdat een dalende onbesliste stand ook een
+**krimpend bereik** kan zijn.
+
+De grendelregel (eigenschap 7) is met opzet **gemeten en niet geëist**: par.
+6a.2 heeft dat besluit openstaan, en een deel van de generatoren hoort juist
+niet te grendelen. Dit register levert het getal waarop dat besluit genomen kan
+worden; het neemt het niet.
+
+### Een opdrachtregel noemt een ingang, geen schrijver
+
+De contracttoets vond binnen een minuut een fout in de classificatie zelf.
+`OUTPUTPROEF.json` heeft twee gemeten schrijvers en zijn versheidsopdracht is
+`npm run meetronde -- --alleen=outputproef`. Mijn eerste volgorde zette versheid
+vóór de meervoudige schrijvers, en gaf het register `scripts/meetronde.js` als
+eigenaar — een **derde** script, de orkestrator, die het bestand niet eens
+schrijft. Versheid telt nu pas als er niets gemeten is.
+
+### Een instrument is nooit onderwerp van zijn eigen meting
+
+Drie keer in twee dagen, en elke keer in een nieuwe vorm:
+
+- de stillezingmeter telde lezingen van zijn **eigen registernaam** zodra dat
+  register bestond (convergeert in één stap, uitgeschreven in par. 6b);
+- `registereigenaar.js` las de **ruwe bron** en dus zijn eigen toelichting: mijn
+  uitleg over COMMERCE.json maakte hem prompt een tweede schrijver van
+  COMMERCE.json (par. 6a.1, nu op de detector zelf);
+- `afgeleid.js` telde **zichzelf** als kandidaat voor de merkteken-conventie,
+  waardoor alle zeventien fragmenten als "geen eigenaar" uitkwamen.
+
+Commentaar scheiden hielp bij de derde niet, want de string stond in de code.
+Wat helpt is de regel zelf.
+
 ## 7. Wat dit niet wordt
 
 - **Geen enkel groen woord bovenaan.** `LAT.md` regel 11 en `check.js` regel 48

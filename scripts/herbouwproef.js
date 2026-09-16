@@ -299,7 +299,10 @@ function meet(namen, opties) {
       uit.push(meld({ naam, soort: a.soort, eigenaar: null, uitslag: 'nietGedraaid', reden }, reden));
       continue;
     }
-    process.stdout.write('  ' + naam.padEnd(26) + aanroep.opdracht.padEnd(42));
+    /* De regel wordt NA de vlagzoektocht geprint en niet ervoor: anders staat
+       er de eerste poging op het scherm met de uitslag van de laatste, en dan
+       leest MUTATIECONTRACT.json als "npm run mutatiecontract schrijft" terwijl
+       het `-- --afleiden` was. */
     let r = beproef(naam, aanroep, opties.wachtMs);
     /* Schreef hij niets, dan is de VLAG de eerste verdachte en niet de
        generator. Elke kandidaat uit zijn eigen bron krijgt een beurt; de eerste
@@ -317,7 +320,8 @@ function meet(namen, opties) {
         if (t.uitslag !== 'nietGeschreven') { r = t; aanroep = met; break; }
       }
     }
-    console.log(r.uitslag + (r.duurMs ? '  (' + Math.round(r.duurMs / 100) / 10 + 's)' : ''));
+    console.log('  ' + naam.padEnd(26) + aanroep.opdracht.padEnd(42) +
+      r.uitslag + (r.duurMs ? '  (' + Math.round(r.duurMs / 100) / 10 + 's)' : ''));
     /* TERUGLEGGEN, NA ELK ARTEFACT. Een generator schrijft vaak meer dan zijn
        eigen register (norm.js raakt NORM.json, bewijs.js leest MUTATIES.json);
        wat er ook is bewogen, het gaat terug voor de volgende opdracht begint.

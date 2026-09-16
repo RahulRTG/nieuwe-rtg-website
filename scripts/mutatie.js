@@ -451,6 +451,10 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // De openbare demonstratie leest haar scenario's lokaal. Een liegende API
+  // verandert die niet; deze schermtoets moet de echte browserbron beproeven.
+  ['experience-rtg.e2e.js', ['public/site/start/experience-core.js',
+    'public/site/start/experience.js', 'public/shared/experience-handoff.js']],
   /* DE VERSHEIDSPOORT wordt als SUBPROCES gestart en niet gerequired: de toets
      meet juist wat er door een PIJP naar buiten komt, en daar hoort geen
      require bij. Zonder deze regel meldt de motor "geen module gevonden" en

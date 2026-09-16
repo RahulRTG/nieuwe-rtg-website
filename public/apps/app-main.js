@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'e1ecbb15';
+var RTG_BOUW = '247b12c2';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -737,6 +737,7 @@ var RTG_BOUW = 'e1ecbb15';
       /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
          is een flexkolom met align-items:stretch, dus een kind met een
          max-width blijft aan de linkerrand plakken -- gemeten, niet gegokt. */
+      '#gate .ag-experience{font-size:.78rem;line-height:1.6;margin:.75rem auto;max-width:42ch;color:inherit;}' +
       '#gate .ag-zin{font-size:clamp(1.35rem,5.2vw,1.9rem);line-height:1.3;' +
         'min-height:0;padding:1rem 0 1.6rem;max-width:22ch;margin-inline:auto;}' +
       // het invoerveld is de actie: breed en royaal, geen streepje
@@ -1112,6 +1113,14 @@ var RTG_BOUW = 'e1ecbb15';
       '<button type="button" class="ag-anders" id="agAnders"><span>' + T('ag.anders','Andere manier') + '</span></button>' +
       '<div class="ag-werelden" id="agWerelden" aria-label="' + T('ag.werelden','Beschikbare RTG-werelden') + '"></div>';
     gate.appendChild(doos);
+    // Only explicit, allowlisted world interests can cross from the public demo.
+    // They are a welcome hint, never an account permission or saved profile.
+    const verkenning = window.RTGExperienceHandoff && window.RTGExperienceHandoff.consume();
+    if (verkenning && verkenning.length) {
+      const welkom = document.createElement('p'); welkom.className = 'ag-experience';
+      welkom.textContent = 'Uw verkenning: ' + verkenning.join(', ') + '. Alleen hier getoond; niet opgeslagen in uw account.';
+      doos.querySelector('.ag-intro').appendChild(welkom);
+    }
     /* Op telefoon vervangt deze rail de ingeklapte command-bank. De namen
        komen uit dezelfde navigatiebron; dit is dus geen tweede wereldregister
        dat later los van LivingOS, WorkOS, TravelOS of FoundationOS kan raken. */

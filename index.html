@@ -3,183 +3,163 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#140d0a">
-  <meta name="description" content="Rahul Travel Group verbindt reizen, wonen, werken en maatschappelijke impact in één persoonlijke omgeving.">
+  <meta name="theme-color" content="#171310">
+  <meta name="description" content="Ervaar RTG. Ontdek hoe leven, reizen, werk en kansen samenkomen. Probeer een situatie, verken uw werelden en houd zelf de regie. FoundationOS is altijd 100% gratis.">
   <meta name="rtg-api-base" content="https://app.rahultravelgroup.com">
   <meta name="rtg-app-base" content="https://app.rahultravelgroup.com/">
   <meta name="rtg-asset-base" content="./public">
-  <meta name="color-scheme" content="dark">
-  <title>Rahul Travel Group | Experience the Elite Class</title>
+  <title>Experience RTG · Uw leven, verbonden</title>
   <link rel="icon" href="./public/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./public/site/start/start-base.css">
-  <link rel="stylesheet" href="./public/site/start/start-layout.css">
-  <link rel="stylesheet" href="./public/site/start/start-responsive.css">
+  <link rel="stylesheet" href="./public/shared/rtg-heritage.css">
+  <link rel="stylesheet" href="./public/shared/rtg-adaptive-edge.css">
+  <link rel="stylesheet" href="./public/site/start/experience.css">
+  <link rel="stylesheet" href="./public/site/start/experience-responsive.css">
 </head>
-<body data-page="rtg-landing">
-  <a class="skip-link" href="#hoofdtitel">Ga naar de inhoud</a>
-
-  <section class="hero" id="top" aria-labelledby="hoofdtitel">
-    <div class="hero-media" aria-hidden="true">
-      <img class="hero-photo is-active" id="heroPhotoA" alt="" fetchpriority="high">
-      <img class="hero-photo" id="heroPhotoB" alt="">
-    </div>
-
-    <header class="site-header">
-      <a class="brand" href="#top" aria-label="Rahul Travel Group, naar boven">
-        <span class="brand-name">Rahul Travel Group</span>
-        <span class="brand-slogan">EXPERIENCE THE ELITE CLASS</span>
-      </a>
-
-      <nav class="desktop-nav" aria-label="Hoofdnavigatie">
-        <a href="#werelden">Wat RTG doet</a>
-        <a href="#passen">Passen &amp; prijzen</a>
-        <a href="#bedrijven">Voor bedrijven</a>
-        <a href="#foundation">RTFoundation</a>
-      </nav>
-
-      <div class="header-actions">
-        <button class="language-button" id="languageButton" type="button" aria-label="Taal kiezen">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.3 2.5 3.5 5.5 3.5 9S14.3 18.5 12 21M12 3C9.7 5.5 8.5 8.5 8.5 12S9.7 18.5 12 21"/></svg>
-          <span>NL</span>
-          <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
-        </button>
-        <a class="login-link" data-app-path="/apps/app.html" href="https://app.rahultravelgroup.com/apps/app.html">Inloggen</a>
-        <button class="menu-button" id="menuButton" type="button" aria-controls="mobileNav" aria-expanded="false">
-          <span class="sr-only">Menu openen</span>
-          <span></span><span></span>
-        </button>
-      </div>
-    </header>
-
-    <div class="hero-body">
-      <div class="hero-copy">
-        <p class="eyebrow">Welkom bij RTG</p>
-        <h1 id="hoofdtitel">Vier werelden.<br>Één visie.</h1>
-        <span class="gold-rule" aria-hidden="true"></span>
-        <p class="hero-intro">Reizen, werken, leven en bijdragen.<br>Eén omgeving die zich aan u aanpast.</p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#werelden">Ontdek RTG</a>
-          <a class="button button-ghost" href="#passen">Bekijk passen &amp; prijzen</a>
-        </div>
-      </div>
-
-      <blockquote class="hero-quote">
-        <p>“A more meaningful world<br>through exceptional experiences.”</p>
-      </blockquote>
-    </div>
-
-    <div class="worlds" id="werelden" aria-label="De vier werelden van RTG">
-      <a class="world-card world-living" data-app-path="/apps/rtg.html" href="https://app.rahultravelgroup.com/apps/rtg.html" data-world="living">
-        <img alt="" data-world-photo="living">
-        <span class="world-shade" aria-hidden="true"></span>
-        <span class="world-card-content">
-          <svg class="world-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15.5 16 5l12 10.5M7.5 14v13h17V14M12 27v-8h8v8"/></svg>
-          <strong>LivingOS</strong>
-          <small>Leef. Verbind.<br>Ervaar het bijzondere.</small>
-          <span class="round-arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
-
-      <a class="world-card world-travel" data-app-path="/apps/reizen.html" href="https://app.rahultravelgroup.com/apps/reizen.html" data-world="travel">
-        <img alt="" data-world-photo="travel">
-        <span class="world-shade" aria-hidden="true"></span>
-        <span class="world-card-content">
-          <svg class="world-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="m4 17 24-11-9 21-4-8-11-2Z"/><path d="m15 19-5 6"/></svg>
-          <strong>TravelOS</strong>
-          <small>Uw reis.<br>Naadloos verbonden.</small>
-          <span class="round-arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
-
-      <a class="world-card world-work" data-app-path="/apps/kantoor.html" href="https://app.rahultravelgroup.com/apps/kantoor.html" data-world="work">
-        <img alt="" data-world-photo="work">
-        <span class="world-shade" aria-hidden="true"></span>
-        <span class="world-card-content">
-          <svg class="world-icon" viewBox="0 0 32 32" aria-hidden="true"><rect x="3.5" y="9" width="25" height="18" rx="2"/><path d="M11 9V6h10v3M3.5 17h25M13 17v2h6v-2"/></svg>
-          <strong>WorkOS</strong>
-          <small>Uw organisatie.<br>Gealigneerd.</small>
-          <span class="round-arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
-
-      <a class="world-card world-foundation" data-app-path="/apps/foundation/index.html" href="https://app.rahultravelgroup.com/apps/foundation/index.html" data-world="foundation">
-        <img alt="" data-world-photo="foundation">
-        <span class="world-shade" aria-hidden="true"></span>
-        <span class="world-card-content">
-          <svg class="world-icon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="8" r="3.5"/><circle cx="7.5" cy="13" r="3"/><circle cx="24.5" cy="13" r="3"/><path d="M10.5 27v-4.5c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5V27M2.5 27v-3.5c0-2.5 2-4.5 4.5-4.5 1.6 0 3 .8 3.8 2M29.5 27v-3.5c0-2.5-2-4.5-4.5-4.5-1.6 0-3 .8-3.8 2"/></svg>
-          <strong>FoundationOS</strong>
-          <small>Samen bouwen aan<br>een betere toekomst.</small>
-          <span class="round-arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
-    </div>
-
-    <ul class="trust-strip" aria-label="Waar RTG voor staat">
-      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h7"/></svg>Transparante prijzen</li>
-      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v11H5zM12 14v3"/></svg>Veilige toegang</li>
-      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5h3v-6H4M20 13v5h-3v-6h3M17 19c-1 1-2.7 1.5-5 1.5"/></svg>Menselijke service</li>
-    </ul>
-  </section>
-
+<body data-page="rtg-landing" class="rtg-experience" data-rtg-skin="heritage" data-rtg-world="living">
+  <a class="skip-link" href="#moment">Direct een situatie proberen</a>
+  <header class="experience-header">
+    <a href="#top" class="experience-brand" aria-label="Rahul Travel Group, naar het begin">RTG<span>EXPERIENCE THE ELITE CLASS</span></a>
+    <span class="edition">EEN PERSOONLIJKE VERKENNING <i aria-hidden="true"></i></span>
+  </header>
   <main id="inhoud">
-    <section class="statement section-wrap" aria-labelledby="statement-title">
-      <p class="section-kicker">Eén verbonden omgeving</p>
-      <h2 id="statement-title">Uw leven bestaat niet uit losse apps.<br>Uw digitale omgeving dus ook niet.</h2>
-      <p>RTG brengt persoonlijke regie, reizen, werk en maatschappelijke vooruitgang samen. Iedere wereld staat op zichzelf en werkt tegelijk met de andere werelden mee.</p>
+    <section class="scene opening" id="top" data-scene="Uw leven, verbonden" data-tone="living" aria-labelledby="hoofdtitel">
+      <div class="hero-media" aria-hidden="true"><img id="heroPhotoA" class="hero-photo is-active" src="./public/images/start/dagdelen/hero-avond.jpg" alt="" fetchpriority="high"><img id="heroPhotoB" class="hero-photo" alt=""></div>
+      <div class="opening-copy"><p class="overline">EXPERIENCE RTG · 01 / 07</p><h1 id="hoofdtitel" data-rtg-type="display">Uw leven bestaat<br> niet uit <em>losse apps.</em></h1><p class="opening-sub">Uw digitale omgeving dus ook niet.</p><a class="text-journey" href="#versnippering" data-go="versnippering">Ontdek hoe alles samenkomt <span aria-hidden="true">↗</span></a></div>
+      <div class="opening-foot"><span>LEVEN · REIZEN · WERKEN · BIJDRAGEN</span><span>SCROLL OM TE ONTDEKKEN <span aria-hidden="true">↓</span></span></div>
     </section>
 
-    <section class="world-detail-section" aria-label="Meer over de vier werelden">
-      <article class="world-detail" id="livingos"><span class="detail-index">01</span><p class="section-kicker">LivingOS</p><h2>Alles wat uw dagelijks leven lichter maakt.</h2><p>Van wonen en welzijn tot uw netwerk en persoonlijke planning. LivingOS brengt samen wat bij u hoort, met u aan het stuur.</p><a class="world-detail-link" href="./public/site/werelden/livingos.html">Ontdek LivingOS <span aria-hidden="true">→</span></a></article>
-      <article class="world-detail" id="travelos"><span class="detail-index">02</span><p class="section-kicker">TravelOS</p><h2>Voor, tijdens en na uw reis vóór zijn.</h2><p>Vluchten, verblijf, vervoer en bijzondere ervaringen in één reisbeeld. RTG ziet de samenhang en houdt menselijke service dichtbij.</p><a class="world-detail-link" href="./public/site/werelden/travelos.html">Ontdek TravelOS <span aria-hidden="true">→</span></a></article>
-      <article class="world-detail" id="workos"><span class="detail-index">03</span><p class="section-kicker">WorkOS</p><h2>Werk dat als één organisatie beweegt.</h2><p>Van zelfstandige tot organisatie: processen, mensen, geld en beslissingen krijgen een gedeelde, controleerbare werkruimte.</p><a class="world-detail-link" href="./public/site/werelden/workos.html">Ontdek WorkOS <span aria-hidden="true">→</span></a></article>
-      <article class="world-detail" id="foundationos"><span class="detail-index">04</span><p class="section-kicker">FoundationOS</p><h2>Technologie die niemand uit beeld laat verdwijnen.</h2><p>De RTFoundation verbindt onderwijs, gezin, buurt en publieke partners rond echte vooruitgang, nooit rond een score op een mens.</p><a class="world-detail-link" href="./public/site/werelden/foundationos.html">Ontdek FoundationOS <span aria-hidden="true">→</span></a></article>
+    <section class="scene fragmentation ivory" id="versnippering" data-scene="Van losse delen naar samenhang" data-tone="living" aria-labelledby="fragmentTitle">
+      <div class="scene-heading"><p class="overline">01 · HET LEVEN VANDAAG</p><h2 id="fragmentTitle" data-rtg-type="display">Alles hangt samen.<br>Behalve uw <em>apps.</em></h2><p>Die ene wijziging raakt uw hele dag. Toch bent u steeds degene die de verbindingen moet leggen.</p></div>
+      <div class="fragment-field" aria-label="Voorbeelden van losse informatie">
+        <span class="fragment"><i aria-hidden="true">↗</i><span>Vlucht gewijzigd<small>Travel · vrijdag</small></span></span>
+        <span class="fragment"><i aria-hidden="true">◷</i><span>19:30 · Aan tafel<small>Reservering · 8 personen</small></span></span>
+        <span class="fragment"><i aria-hidden="true">€</i><span>Een nieuwe factuur<small>Werk · nog te bekijken</small></span></span>
+        <span class="fragment"><i aria-hidden="true">↳</i><span>Een schoolbericht<small>Gezin · morgen</small></span></span>
+        <span class="fragment"><i aria-hidden="true">◌</i><span>Taxi om 06:45<small>Vervoer · ophalen</small></span></span>
+        <span class="fragment"><i aria-hidden="true">⌁</i><span>Het rooster verandert<small>Team · vrijdag</small></span></span>
+        <span class="connection-center" aria-hidden="true">RTG</span>
+      </div><p class="quiet-caption">Voorbeelden uit het dagelijks leven. Geen persoonlijke gegevens.</p>
     </section>
 
-    <section class="pricing section-wrap" id="passen" aria-labelledby="pricing-title">
-      <div class="section-heading">
-        <div><p class="section-kicker">Passen &amp; prijzen</p><h2 id="pricing-title">Helder vooraf.<br>Passend bij uw wereld.</h2></div>
-        <p>Vijf heldere toegangsniveaus, van kosteloze maatschappelijke basis tot persoonlijke regie op maat. Bedragen zijn per maand en exclusief btw.</p>
+    <section class="scene origin wine" id="verhaal" data-scene="Waarom RTG bestaat" data-tone="travel" aria-labelledby="originTitle">
+      <div class="story-number" aria-hidden="true">02</div><div class="origin-copy"><p class="overline">WAAROM RTG BESTAAT</p><h2 id="originTitle" data-rtg-type="display">Een reis begint<br>nooit bij een <em>boeking.</em></h2><p>Er is een agenda. Een gezin. Werk dat doorgaat. Iemand die u ophaalt. Een tafel waar u wordt verwacht.</p><p>Dat is de gedachte achter RTG: leven, reizen, werken en bijdragen samenbrengen rond de persoon.</p><div class="story-chain" aria-label="De samenhang rond een reis"><span>Reis</span><span>Agenda</span><span>Gezin</span><span>Werk</span><span>Vervoer</span><span>Herinneringen</span></div><p class="story-principle">Vier werelden.<br>Één samenhangend geheel.</p></div>
+    </section>
+
+    <section class="scene playground ivory" id="moment" data-scene="Probeer een moment" data-tone="living" aria-labelledby="momentTitle">
+      <div class="scene-heading"><p class="overline">03 · RTG PLAYGROUND</p><h2 id="momentTitle" data-rtg-type="display">Begin met iets<br>uit <em>uw leven.</em></h2><p>Kies een situatie. Verander het voorstel. Ontdek wat er met elkaar meebeweegt.</p></div>
+      <fieldset class="scenario-choices"><legend class="sr-only">Welke situatie wilt u proberen?</legend>
+        <label><input type="radio" name="scenario" value="travel" checked><span><small>01 / REIZEN</small>Ik ga op reis <b aria-hidden="true">↗</b></span></label>
+        <label><input type="radio" name="scenario" value="dinner"><span><small>02 / SAMEN</small>Ik organiseer een etentje <b aria-hidden="true">↗</b></span></label>
+        <label><input type="radio" name="scenario" value="work"><span><small>03 / WERKEN</small>Ik run een bedrijf <b aria-hidden="true">↗</b></span></label>
+        <label><input type="radio" name="scenario" value="family"><span><small>04 / GEZIN</small>Ik regel iets voor mijn gezin <b aria-hidden="true">↗</b></span></label>
+      </fieldset>
+      <div class="simulation" id="voorstel" aria-labelledby="demoTitle">
+        <div class="simulation-head"><span class="overline">RTG · EEN VERBONDEN MOMENT</span><span class="demo-label">DEMONSTRATIE</span></div>
+        <div class="simulation-main"><div><p class="overline" id="demoWorld">TravelOS</p><h3 id="demoTitle" data-rtg-type="display">Amsterdam <span aria-hidden="true">↗</span> Ibiza</h3><p id="demoIntro">Vrijdag. Twee personen. Eén plan waarin alles samenkomt.</p><label class="demo-choice" for="demoOption"><span id="demoOptionLabel">Vertrek in dit voorbeeld</span><select id="demoOption"><option value="early">Vrijdagmiddag</option><option value="late">Vrijdagavond</option></select></label></div><ol class="connection-steps" id="demoSteps"><li><small>TRAVELOS</small><strong>Een voorbeeldreis staat klaar</strong></li><li><small>WORKOS</small><strong>Uw voorbeeldrooster loopt tot 16:00</strong></li><li><small>LIVINGOS</small><strong>Uw agenda beweegt mee</strong></li></ol></div>
+        <div class="rahul-note"><span class="rahul-mark" aria-hidden="true">⌁</span><p id="demoResult" role="status">Kies een vertrektijd om te zien wat er verandert.</p></div>
+        <p class="simulation-disclaimer">Voorbeeldgegevens. Er wordt niets geboekt, betaald of gedeeld. Uw echte agenda en locatie worden niet gebruikt.</p>
       </div>
-
-      <div class="price-grid">
-        <article class="price-card"><p class="price-audience">Maatschappelijke basis</p><h3>RTG Community</h3><p class="price">Kosteloos</p><p class="price-description">De minimale ingang tot het RTG OS en de maatschappelijke laag.</p><a class="price-detail-link" href="./public/site/passen/community.html">Ontdek Community <span aria-hidden="true">→</span></a></article>
-        <article class="price-card is-featured"><span class="price-badge">Meest gekozen</span><p class="price-audience">Persoonlijk</p><h3>RTG Pass</h3><p class="price">€ 65 <small>/ maand</small></p><p class="price-description">Uw verbonden persoonlijke omgeving, reizen en ledenvoordelen.</p><a class="price-detail-link" href="./public/site/passen/rtg-pass.html">Ontdek de RTG Pass <span aria-hidden="true">→</span></a></article>
-        <article class="price-card"><p class="price-audience">Zelfstandig &amp; klein MKB</p><h3>Business Lite</h3><p class="price">€ 150 <small>/ maand</small></p><p class="price-description">Professionele software zonder omzetcommissie.</p><a class="price-detail-link" href="./public/site/passen/business-lite.html">Ontdek Business Lite <span aria-hidden="true">→</span></a></article>
-        <article class="price-card"><p class="price-audience">Organisaties</p><h3>Business Pass</h3><p class="price">Vanaf € 5.000</p><p class="price-description">Een enterprise-relatie met inrichting en verantwoordelijkheid op maat.</p><a class="price-detail-link" href="./public/site/passen/business-pass.html">Ontdek de Business Pass <span aria-hidden="true">→</span></a></article>
-        <article class="price-card"><p class="price-audience">High-touch</p><h3>Lifestyle Pass</h3><p class="price">Vanaf € 20.000</p><p class="price-description">Volledige regie en persoonlijke concierge, met een mens erachter.</p><a class="price-detail-link" href="./public/site/passen/lifestyle-pass.html">Ontdek de Lifestyle Pass <span aria-hidden="true">→</span></a></article>
-      </div>
-
-      <div class="pricing-action">
-        <p>Bij iedere betaalde pas is 30% bestemd voor de RTFoundation.</p>
-        <a class="button button-primary" data-app-path="/apps/app.html" href="https://app.rahultravelgroup.com/apps/app.html">Bespreek uw toegang</a>
-      </div>
+      <noscript><p>De interactieve voorbeelden werken met JavaScript. De werelden, passen, FAQ en toegang tot de app blijven hieronder beschikbaar.</p></noscript>
     </section>
 
-    <section class="split-section" id="bedrijven" aria-labelledby="business-title">
-      <div class="split-visual split-business" aria-hidden="true"></div>
-      <div class="split-copy"><p class="section-kicker">Voor bedrijven</p><h2 id="business-title">Eén werkruimte. Meer grip. Minder overdracht.</h2><p>WorkOS verbindt de operatie met de mensen die haar dragen. Geen extra dashboard naast het werk, maar een omgeving waarin het werk zelf zichtbaar en bestuurbaar wordt.</p><a class="text-link" href="mailto:roellie.i@gmail.com?subject=Kennismaking%20RTG%20WorkOS">Plan een kennismaking <span aria-hidden="true">→</span></a></div>
+    <section class="scene rahul-section charcoal" id="rahul" data-scene="Vertel Rahul wat u wilt" data-tone="work" aria-labelledby="rahulTitle">
+      <div class="scene-heading"><p class="overline">04 · ONTMOET RAHUL</p><h2 id="rahulTitle" data-rtg-type="display">Uw wens is<br>het <em>beginpunt.</em></h2><p>U hoeft niet te weten waar een functie zit. Vertel wat u wilt bereiken en onderzoek hoe een voorstel ontstaat.</p></div>
+      <form id="intentForm" class="intent-form"><label for="intent">Wat wilt u organiseren?</label><div><input id="intent" maxlength="240" placeholder="Een etentje voor acht personen…" autocomplete="off"><button type="submit" aria-label="Verken mijn voorbeeld">↗</button></div><small>Probeer een reis, etentje, werkdag of gezinsmoment. Uw invoer blijft in deze pagina.</small></form>
+      <p id="intentFeedback" role="status">Een lokale demonstratie met vaste situaties. Er wordt geen opdracht verstuurd.</p>
+      <ol class="intent-steps"><li><span>01</span><strong>Begrijpen</strong><p>Wat is uw bedoeling?</p></li><li><span>02</span><strong>Voorbereiden</strong><p>De relevante werelden samenbrengen.</p></li><li><span>03</span><strong>Controleren</strong><p>Conflicten en toestemming in het voorbeeld.</p></li><li><span>04</span><strong>Voorstellen</strong><p>Een keuze die u kunt bekijken en veranderen.</p></li></ol>
+      <p class="large-principle" data-rtg-type="display">Rahul bereidt voor.<br><em>U houdt de regie.</em></p>
     </section>
 
-    <section class="split-section split-reverse" id="foundation" aria-labelledby="foundation-title">
-      <div class="split-visual split-foundation" aria-hidden="true"></div>
-      <div class="split-copy"><p class="section-kicker">RTFoundation</p><h2 id="foundation-title">Bijdragen wordt onderdeel van de ervaring.</h2><p>Dertig procent van de bijdrage aan iedere betaalde pas gaat naar de RTFoundation. Zo groeit persoonlijke kwaliteit samen met perspectief voor gezinnen, buurten en onderwijs.</p><a class="text-link" data-app-path="/apps/foundation/index.html" href="https://app.rahultravelgroup.com/apps/foundation/index.html">Ontdek de RTFoundation <span aria-hidden="true">→</span></a></div>
+    <section class="scene yours ivory" id="uw-rtg" data-scene="Uw persoonlijke verkenning" data-tone="living" aria-labelledby="yoursTitle">
+      <div class="scene-heading"><p class="overline">05 · UW RTG</p><h2 id="yoursTitle" data-rtg-type="display">Dezelfde wereld.<br>Een <em>eigen ingang.</em></h2><p id="personalSummary">Ontdek een situatie hierboven. De wereld die daarbij hoort krijgt hier een plek vooraan.</p></div>
+      <div class="personal-home"><div class="personal-heading"><span class="mini-brand">RTG</span><span>UW VERKENNING <i aria-hidden="true">◌</i></span></div><div id="personalWorlds" class="personal-worlds"></div><p class="personal-foot">Uw keuzes in deze pagina · geen accountprofiel</p></div>
+      <details class="explanation" id="personalWhy"><summary>Waarom zie ik dit?</summary><p>Alleen situaties en werelden die u zelf kiest bepalen de volgorde. Leestijd wordt niet gebruikt. Deze keuzes blijven in het geheugen van deze pagina, worden niet aan een account gekoppeld en verdwijnen bij opnieuw laden.</p><ul id="personalReasons"><li>U heeft nog geen voorkeur aangegeven.</li></ul><p>Via Acties in de Edge kunt u de verkenning volledig resetten.</p></details>
     </section>
+
+    <section class="scene worlds-section charcoal" id="werelden" data-scene="Vier werelden, één RTG" data-tone="living" aria-labelledby="worldsTitle">
+      <div class="scene-heading"><p class="overline">06 · VIER WERELDEN</p><h2 id="worldsTitle" data-rtg-type="display">Ruimte voor<br>uw hele <em>leven.</em></h2><p>Verken de werelden. Veeg over de compositie of kies een wereld via de Edge.</p></div>
+      <div class="world-stage" id="worldStage">
+        <article class="world-room" data-room="living"><img src="./public/images/worlds/heritage/living-heritage-v2.jpg" loading="lazy" alt="Een lichte, warme leefomgeving"><div><span class="overline">01 / LIVINGOS</span><h3 data-rtg-type="display">Alles wat uw<br>dagelijks leven verbindt.</h3><p>Uw mensen. Uw plannen. De momenten ertussen.</p><ul><li>Agenda &amp; gezin</li><li>Berichten &amp; contacten</li><li>Dagelijkse diensten</li></ul><a href="./public/site/werelden/livingos.html">Het verhaal van LivingOS ↗</a><a data-app-path="/apps/rtg.html" href="https://app.rahultravelgroup.com/apps/rtg.html" data-world="living">Open LivingOS ↗</a></div></article>
+        <article class="world-room" data-room="travel"><img src="./public/images/worlds/heritage/travel-heritage-v2.jpg" loading="lazy" alt="Een warme omgeving om op reis tot rust te komen"><div><span class="overline">02 / TRAVELOS</span><h3 data-rtg-type="display">De wereld in.<br>Alles reist mee.</h3><p>Van het eerste idee tot het moment waarop u weer thuiskomt.</p><ul><li>Reis &amp; verblijf</li><li>Vervoer &amp; mobiliteit</li><li>Ervaringen &amp; gastvrijheid</li></ul><a href="./public/site/werelden/travelos.html">Het verhaal van TravelOS ↗</a><a data-app-path="/apps/reizen.html" href="https://app.rahultravelgroup.com/apps/reizen.html" data-world="travel">Open TravelOS ↗</a></div></article>
+        <article class="world-room" data-room="work"><img src="./public/images/worlds/heritage/work-heritage-v2.jpg" loading="lazy" alt="Een rustige werkruimte"><div><span class="overline">03 / WORKOS</span><h3 data-rtg-type="display">Bouwen.<br>Samen verder.</h3><p>Uw organisatie als één geheel, met duidelijke verantwoordelijkheden.</p><ul><li>Mensen &amp; teams</li><li>Operatie &amp; klanten</li><li>Financiën &amp; beslissingen</li></ul><a href="./public/site/werelden/workos.html">Het verhaal van WorkOS ↗</a><a data-app-path="/apps/kantoor.html" href="https://app.rahultravelgroup.com/apps/kantoor.html" data-world="work">Open WorkOS ↗</a></div></article>
+        <article class="world-room" data-room="foundation"><img src="./public/images/worlds/heritage/foundation-heritage-v2.jpg" loading="lazy" alt="Een omgeving voor samen leren en ontwikkelen"><div><span class="overline">04 / FOUNDATIONOS</span><h3 data-rtg-type="display">Kansen horen<br>bij iedereen.</h3><p>Gezin, onderwijs, ontwikkeling en maatschappelijke deelname.</p><ul><li>Altijd 100% gratis</li><li>Geen betaalde pas nodig</li><li>Geen betaalde upgrades</li></ul><a href="./public/site/werelden/foundationos.html">Het verhaal van FoundationOS ↗</a><a data-app-path="/apps/foundation/index.html" href="https://app.rahultravelgroup.com/apps/foundation/index.html" data-world="foundation">Open FoundationOS ↗</a></div></article>
+      </div><p class="world-position" id="worldPosition" aria-live="polite">01 / 04 · LivingOS</p>
+    </section>
+
+    <section class="scene foundation-section" id="foundation" data-scene="Foundation is altijd gratis" data-tone="foundation" aria-labelledby="foundationTitle"><div class="foundation-photo" aria-hidden="true"></div><div class="foundation-copy"><p class="overline">EEN VAST PRINCIPE</p><h2 id="foundationTitle" data-rtg-type="display">Niet alles hoeft<br>geld te <em>verdienen.</em></h2><p class="foundation-promise">FoundationOS is en blijft<br><strong>altijd 100% gratis.</strong></p><p>Voor gezin, onderwijs, ontwikkeling en kansen. Geen betaalde niveaus. Geen upgrades. Geen verplichte betaalde pas.</p><div class="foundation-possibilities" aria-label="Wat FoundationOS verbindt">
+        <details><summary>Voor een gezin <span>01</span></summary><p>Een eigen gezinsomgeving, afspraken en contact met uw kring. U bepaalt per band wat iemand mag zien.</p><a data-app-path="/apps/foundation/index.html" href="https://app.rahultravelgroup.com/apps/foundation/index.html">Ontdek de gezinsomgeving ↗</a></details>
+        <details><summary>Voor een kind <span>02</span></summary><p>Een eigen profiel binnen de gezinsomgeving. In de Campus komen school, leren en spelen samen.</p><a data-app-path="/apps/foundation/campus.html" href="https://app.rahultravelgroup.com/apps/foundation/campus.html">Ontdek de Campus ↗</a></details>
+        <details><summary>Voor onderwijs en talent <span>03</span></summary><p>Verdergaan met een les, talent ontdekken of oefenen met een eigen onderneming. De Campus brengt die ingangen bij elkaar.</p><a data-app-path="/apps/foundation/campus.html" href="https://app.rahultravelgroup.com/apps/foundation/campus.html">Verken leren en ontwikkelen ↗</a></details>
+        <details><summary>Voor kansen in uw buurt <span>04</span></summary><p>Bekijk lokale projecten en activiteiten, vind ondersteuning of ontdek hoe u als vrijwilliger kunt meedoen. Het actuele aanbod ziet u in de omgeving.</p><a data-app-path="/apps/foundation/os-publiek.html" href="https://app.rahultravelgroup.com/apps/foundation/os-publiek.html">Verken de buurt ↗</a></details>
+      </div><a href="./public/site/werelden/foundationos.html">Ontdek wat FoundationOS verbindt ↗</a><details><summary>Hoe verhoudt dit zich tot RTFoundation?</summary><p>FoundationOS is de gratis maatschappelijke omgeving. RTFoundation is de maatschappelijke organisatie. De bijdrage vanuit betaalde passen maakt FoundationOS niet betaald. Informatie over besteding en resultaten hoort bij controleerbare verantwoording; we tonen hier geen onbevestigde impactcijfers.</p></details></div></section>
+
+    <section class="scene trust ivory" id="regie" data-scene="U bepaalt de grenzen" data-tone="living" aria-labelledby="trustTitle"><div class="scene-heading"><p class="overline">07 · VERTROUWEN &amp; DEELNEMEN</p><h2 id="trustTitle" data-rtg-type="display">Hoeveel mag RTG<br>eigenlijk <em>weten?</em></h2><p>Verander de toegang in dit voorbeeld. U ziet meteen wat er nog kan worden voorbereid.</p></div>
+      <div class="permission-demo"><div class="permission-identity"><span aria-hidden="true">U</span><p>Uw voorbeeld.<br>Uw grenzen.</p><small>Dit verandert geen echte accounttoestemmingen.</small></div><fieldset><legend>Toegang in de demonstratie</legend><label><span><strong>Agenda</strong><small>Een moment kunnen vergelijken</small></span><input id="allowCalendar" type="checkbox" checked role="switch"></label><label><span><strong>Werktijden</strong><small>Alleen beschikbaarheid</small></span><input id="allowWork" type="checkbox" checked role="switch"></label><label><span><strong>Voorbeeldlocatie</strong><small>Een vertrekpunt gebruiken</small></span><input id="allowLocation" type="checkbox" checked role="switch"></label><div class="permission-fixed"><strong>Betalen &amp; boeken</strong><span>Niet mogelijk in deze demo</span></div></fieldset></div>
+      <p id="permissionResult" class="permission-result" role="status">De voorbeeldagenda, werktijden en vertrekplek kunnen worden meegenomen.</p><p class="trust-principle" data-rtg-type="display">Slim genoeg om te helpen.<br>Begrensd genoeg om van u te blijven.</p>
+    </section>
+
+    <section class="scene human charcoal" id="mensen" data-scene="De mensen achter de service" data-tone="work" aria-labelledby="humanTitle"><p class="overline">MENSELIJKE SERVICE</p><h2 id="humanTitle" data-rtg-type="display">Soms wilt u<br><em>iemand.</em></h2><div class="human-copy"><p>Als een reis anders loopt. Een beslissing meer vraagt. Of u iets liever samen bespreekt.</p><p>Persoonlijke uitvoering en concierge maken deel uit van de Lifestyle-dienstverlening; zakelijke begeleiding hangt samen met de afspraken voor uw organisatie. Bespreek vooraf welke hulp bij uw situatie hoort.</p><a href="mailto:roellie.i@gmail.com?subject=Kennismaking%20RTG">Praat met iemand ↗</a><small>U opent uw e-mailprogramma. Er wordt niets automatisch verzonden.</small></div></section>
+
+    <section class="scene access ivory" id="passen" data-scene="Welke toegang past bij u?" data-tone="living" aria-labelledby="accessTitle"><div class="scene-heading"><p class="overline">UW TOEGANG</p><h2 id="accessTitle" data-rtg-type="display">Begin waar<br>het bij u <em>past.</em></h2><p>Het gebruik bepaalt de ingang. FoundationOS blijft voor iedereen 100% gratis.</p></div>
+      <label class="access-choice" for="accessGoal">Hoe wilt u RTG gebruiken?<select id="accessGoal"><option value="explore">Eerst ontdekken</option><option value="personal">Persoonlijk of met mijn gezin</option><option value="business">Voor mijn bedrijf</option><option value="service">Met persoonlijke uitvoering</option></select></label><p id="passSuggestion" role="status">Begin met de kosteloze Community of FoundationOS. Vergelijk rustig de mogelijkheden.</p>
+      <div class="pass-table-wrap" tabindex="0" role="region" aria-label="Alle vijf passen vergelijken"><table class="pass-table"><caption>Alle passen · bestaande tarieven, bedragen per maand exclusief btw</caption><thead><tr><th scope="col">Toegang</th><th scope="col">Prijs</th><th scope="col">Waarvoor</th><th scope="col">Dienstverlening &amp; grenzen</th></tr></thead><tbody>
+        <tr><th scope="row"><a href="./public/site/passen/community.html">Community ↗</a></th><td>Kosteloos</td><td>Ontdekken en deelnemen</td><td>De publieke en maatschappelijke basis. FoundationOS is volledig gratis.</td></tr>
+        <tr><th scope="row"><a href="./public/site/passen/rtg-pass.html">RTG Pass ↗</a></th><td>€ 65</td><td>Persoonlijk platform</td><td>Extra AI-verbruik alleen met bundel, toestemming of ingesteld maximum. Menselijke uitvoering hoort bij Lifestyle.</td></tr>
+        <tr><th scope="row"><a href="./public/site/passen/business-lite.html">Business Lite ↗</a></th><td>€ 150</td><td>Zelfstandigen en klein MKB</td><td>Zakelijke software zonder omzetcommissie. Enterprise-inrichting valt onder Business.</td></tr>
+        <tr><th scope="row"><a href="./public/site/passen/business-pass.html">Business Pass ↗</a></th><td>Vanaf € 5.000</td><td>Organisaties en vestigingen</td><td>Inrichting, omvang en dienstverlening volgens de organisatieafspraken.</td></tr>
+        <tr><th scope="row"><a href="./public/site/passen/lifestyle-pass.html">Lifestyle Pass ↗</a></th><td>Vanaf € 20.000</td><td>Persoonlijke uitvoering</td><td>Rechterhand en concierge. Persoonlijke afspraken en menselijke goedkeuring of uitnodiging.</td></tr>
+      </tbody></table></div>
+      <details class="access-terms"><summary>Kosten, looptijd, opzeggen en Foundation-bijdrage</summary><p>Bekijk de paspagina voor de omschrijving en de <a data-app-path="/apps/juridisch/voorwaarden.html" href="https://app.rahultravelgroup.com/apps/juridisch/voorwaarden.html">voorwaarden</a> voor de geldende afspraken. De huidige voorwaarden noemen voor het lidmaatschap een minimale looptijd van 12 maanden. Controleer vóór uw keuze de afspraken voor uw pas, totale kosten, eventuele inrichting, gebruikslimieten en opzegging. Deze verkenning sluit geen abonnement af.</p><p>De bestaande pasinformatie noemt een bijdrage van 30% aan RTFoundation. De exacte berekening en besteding horen bij de bijbehorende verantwoording. FoundationOS is en blijft onafhankelijk van uw paskeuze 100% gratis.</p></details>
+    </section>
+
+    <section class="scene questions ivory" id="vragen" data-scene="Wat wilt u weten?" data-tone="living" aria-labelledby="faqTitle"><div class="scene-heading"><p class="overline">RUIMTE VOOR VRAGEN</p><h2 id="faqTitle" data-rtg-type="display">Wat wilt u<br>nog <em>weten?</em></h2><p>Heldere antwoorden. Ook over wat deze demonstratie wel en niet doet.</p></div><label class="faq-search" for="faqSearch">Zoek een vraag<input type="search" id="faqSearch" placeholder="Bijvoorbeeld: gratis, gegevens of passen"></label><p class="quiet-caption" id="faqCount" role="status"></p><div id="faqList" class="faq-list">
+      <details data-faq="algemeen"><summary>Wat is RTG precies?</summary><p>RTG brengt leven, reizen, werk en maatschappelijke deelname samen in één omgeving. LivingOS, TravelOS, WorkOS en FoundationOS zijn de vier werelden. De Playground laat met voorbeeldgegevens zien hoe die samenhang werkt.</p></details>
+      <details data-faq="algemeen"><summary>Is RTG alleen voor reizen?</summary><p>Nee. Reizen is één van de vier werelden. RTG omvat ook uw dagelijks leven, werk en maatschappelijke mogelijkheden.</p></details>
+      <details data-faq="algemeen"><summary>Moet ik alle vier werelden gebruiken?</summary><p>U kunt beginnen bij wat voor u relevant is. U hoeft geen belangstelling voor alle werelden aan te geven. Alle werelden blijven tijdens deze verkenning bereikbaar.</p></details>
+      <details data-faq="foundation"><summary>Is FoundationOS echt helemaal gratis, en blijft dat zo?</summary><p>Ja. FoundationOS is en blijft altijd 100% gratis. U heeft geen betaalde pas nodig. Er zijn geen betaalde Foundation-niveaus of upgrades.</p></details>
+      <details data-faq="passen"><summary>Wat is het verschil tussen werelden en passen?</summary><p>De werelden organiseren de inhoud: leven, reizen, werk en maatschappelijke deelname. De passen beschrijven uw toegang en dienstverlening. FoundationOS staat los van een betaalde pas en blijft volledig gratis.</p></details>
+      <details data-faq="passen"><summary>Welke pas past bij mij?</summary><p>Community is een kosteloze ingang. RTG Pass is bedoeld voor het persoonlijke platform, Business Lite voor een zakelijke basis, Business voor organisaties en Lifestyle voor persoonlijke uitvoering. Vergelijk de beschrijvingen en afspraken; deze verkenning kiest geen abonnement voor u.</p></details>
+      <details data-faq="passen"><summary>Welke kosten kunnen erbij komen?</summary><p>Dat hangt af van de pas en de afgesproken dienstverlening. De RTG Pass-pagina beschrijft aanvullende AI-bundels en toestemming voor extra verbruik. Vraag bij zakelijke of persoonlijke uitvoering vooraf om de totale prijs, inbegrepen inzet en eventuele inrichting.</p></details>
+      <details data-faq="passen"><summary>Hoe werken wisselen van pas en opzeggen?</summary><p>De huidige voorwaarden noemen voor het lidmaatschap een minimale looptijd van 12 maanden. Wisselen van pas en opzeggen volgen uw overeenkomst en de geldende voorwaarden. Bespreek de afspraken voor uw pas vóór aanmelding.</p></details>
+      <details data-faq="start"><summary>Hoe begin ik?</summary><p>Via Maak mijn RTG gaat u naar de bestaande RTG-aanmeldomgeving. Daar worden toegang en onboarding afgehandeld. U kunt eerst de volledige demonstratie bekijken, zonder account of betaling.</p></details>
+      <details data-faq="demo"><summary>Is er iets echt geboekt of betaald in de Playground?</summary><p>Nee. Alle scenario’s gebruiken voorbeeldgegevens. Ook na het bevestigen van een voorbeeld wordt er niets geboekt, betaald, verzonden of gedeeld.</p></details>
+      <details data-faq="demo"><summary>Gebruikt de demonstratie mijn echte agenda of locatie?</summary><p>Nee. Agenda, werktijden en locatie in de Playground zijn fictief. De schakelaars veranderen alleen wat het voorbeeldvoorstel kan laten zien.</p></details>
+      <details data-faq="demo"><summary>Is het invoerveld een live gesprek met AI?</summary><p>In deze verkenning herkent het invoerveld vier soorten voorbeelden: reizen, etentjes, werk en gezin. Het stelt daar lokaal een demonstratie bij samen. Uw invoer wordt niet naar een AI-dienst gestuurd.</p></details>
+      <details data-faq="privacy"><summary>Waarom zie ik een persoonlijke volgorde?</summary><p>Omdat u zelf een situatie of wereld heeft gekozen. Onder Waarom zie ik dit? ziet u welke keuzes zijn gebruikt. Leestijd wordt niet gebruikt en er ontstaat geen accountprofiel.</p></details>
+      <details data-faq="privacy"><summary>Wat gebeurt er als ik de verkenning reset?</summary><p>De gekozen situaties, wereldvoorkeuren, invoer en voorbeeldtoestemmingen worden teruggezet. De pagina toont daarna weer de algemene volgorde. Ook opnieuw laden begint met een lege verkenning.</p></details>
+      <details data-faq="privacy"><summary>Welke gegevens gaan mee als ik een account maak?</summary><p>Alleen als u dat aanvinkt, gaat een korte lijst van gekozen wereldnamen mee naar het welkomstscherm in de app. Uw vrije invoer en voorbeeldgegevens gaan niet mee. Die lijst wordt niet automatisch als accountprofiel opgeslagen.</p></details>
+      <details data-faq="privacy"><summary>Wat kan Rahul zelfstandig doen?</summary><p>In deze demonstratie voert Rahul niets uit. In het product bepalen de betreffende bevoegdheden en eventuele mandaten wat mag worden voorbereid of uitgevoerd. Bekijk de concrete handeling en toestemming voordat u die verleent.</p></details>
+      <details data-faq="privacy"><summary>Waar lees ik over mijn gegevens en verwijdering?</summary><p>De privacyverklaring beschrijft hoe gegevens worden verwerkt en hoe u uw rechten kunt uitoefenen. De demonstratie gebruikt geen accountgegevens. Uw echte account en gegevens beheert u in de app volgens de daar geldende mogelijkheden.</p></details>
+      <details data-faq="service"><summary>Wanneer kan ik een mens spreken?</summary><p>Via Praat met iemand kunt u contact opnemen. Persoonlijke uitvoering en concierge horen bij de Lifestyle-afspraken; zakelijke begeleiding bij de betreffende organisatieafspraken. Spreek de bereikbaarheid en inzet vooraf af.</p></details>
+      <details data-faq="work"><summary>Kan mijn team RTG gebruiken?</summary><p>WorkOS en de zakelijke passen zijn bedoeld voor werk en organisaties. Welke accounts, rollen, vestigingen en inrichting passen bij uw team, volgt uit uw gekozen toegang en afspraken.</p></details>
+      <details data-faq="work"><summary>Kan ik bestaande systemen of gegevens meenemen?</summary><p>Dat hangt af van het systeem, de beschikbare koppeling en de inrichting. Bespreek uw concrete situatie. De demonstratie maakt geen verbinding met uw bestaande systemen.</p></details>
+      <details data-faq="start"><summary>Op welke apparaten en in welke landen werkt RTG?</summary><p>Deze webverkenning is geschikt voor telefoon, tablet en computer. De beschikbaarheid van afzonderlijke diensten kan per functie en land verschillen. Controleer de dienst die u wilt gebruiken; een zichtbaar voorbeeld is geen beschikbaarheidsgarantie.</p></details>
+      <details data-faq="foundation"><summary>Hoe werkt de bijdrage aan RTFoundation?</summary><p>De bestaande pasinformatie noemt een bijdrage van 30% vanuit betaalde passen. Berekening, besteding en resultaten horen bij controleerbare verantwoording. FoundationOS blijft altijd 100% gratis, ongeacht uw paskeuze.</p></details>
+      <details data-faq="service"><summary>Wat gebeurt er als iets niet werkt?</summary><p>Deze verkenning kan geen echte boeking of betaling uitvoeren. Bij vragen over een echte dienst gebruikt u de ondersteuning in de app of de contactmogelijkheid. Een demonstratie is geen bewijs van historische uptime of een servicegarantie.</p></details>
+    </div><p id="faqEmpty" hidden>Geen vraag gevonden. Probeer een ander woord of neem contact op via het Edge-menu.</p></section>
+
+    <section class="scene create-section wine" id="begin" data-scene="Uw RTG begint hier" data-tone="travel" aria-labelledby="createTitle"><p class="overline">VAN ONTDEKKEN NAAR DEELNEMEN</p><h2 id="createTitle" data-rtg-type="display">Uw RTG<br>begint <em>hier.</em></h2><p>Neem de volgende stap op uw eigen moment.</p><div class="handoff-choice"><label><input id="carryInterests" type="checkbox"><span>Neem mijn gekozen werelden mee naar het welkomstscherm.</span></label><p id="handoffSummary">Er zijn nog geen gekozen werelden. Vrije invoer en voorbeeldgegevens gaan nooit mee.</p></div><a class="create-link" id="createAccount" data-app-path="/apps/app.html" href="https://app.rahultravelgroup.com/apps/app.html">Maak mijn RTG <span aria-hidden="true">↗</span></a><p class="create-note">U gaat naar de beveiligde aanmeldomgeving. Een account ontstaat pas na uw bewuste aanmelding.</p><a href="#moment" data-go="moment">Verder ontdekken ↗</a></section>
   </main>
+  <footer class="experience-footer"><div><span class="mini-brand">RTG</span><span>EXPERIENCE THE ELITE CLASS</span></div><p>Leven. Reizen. Werken. Bijdragen.</p><nav aria-label="Praktische informatie"><a href="#passen">Passen</a><a href="#vragen">Veelgestelde vragen</a><a href="mailto:roellie.i@gmail.com">Contact</a><a data-app-path="/apps/juridisch/privacy.html" href="https://app.rahultravelgroup.com/apps/juridisch/privacy.html">Privacy</a><a data-app-path="/apps/juridisch/voorwaarden.html" href="https://app.rahultravelgroup.com/apps/juridisch/voorwaarden.html">Voorwaarden</a><a data-app-path="/apps/app.html" href="https://app.rahultravelgroup.com/apps/app.html">Inloggen</a></nav><small>© <span id="currentYear">2026</span> Rahul Travel Group</small></footer>
 
-  <footer class="site-footer" id="contact">
-    <div class="footer-brand"><span class="brand-name">Rahul Travel Group</span><span class="brand-slogan">EXPERIENCE THE ELITE CLASS</span></div>
-    <p class="footer-belief">A more meaningful world<br>through exceptional experiences.</p>
-    <nav aria-label="Voettekst"><a href="mailto:roellie.i@gmail.com">Contact</a><a data-app-path="/apps/juridisch/privacy.html" href="https://app.rahultravelgroup.com/apps/juridisch/privacy.html">Privacy</a><a data-app-path="/apps/juridisch/voorwaarden.html" href="https://app.rahultravelgroup.com/apps/juridisch/voorwaarden.html">Voorwaarden</a><a data-app-path="/apps/app.html" href="https://app.rahultravelgroup.com/apps/app.html">Inloggen</a></nav>
-    <p class="copyright">© <span id="currentYear">2026</span> Rahul Travel Group</p>
-  </footer>
-
-  <nav class="mobile-nav" id="mobileNav" aria-label="Mobiele navigatie" hidden>
-    <div class="mobile-nav-top"><span>Menu</span><button id="menuClose" type="button" aria-label="Menu sluiten">×</button></div>
-    <a href="#werelden">Wat RTG doet</a><a href="#passen">Passen &amp; prijzen</a><a href="#bedrijven">Voor bedrijven</a><a href="#foundation">RTFoundation</a><a class="mobile-login" data-app-path="/apps/app.html" href="https://app.rahultravelgroup.com/apps/app.html">Inloggen</a>
-  </nav>
-  <div class="menu-backdrop" id="menuBackdrop" hidden></div>
-
-  <script src="./public/shared/i18n.js" defer></script>
+  <div id="experiencePanels">
+    <div class="experience-panel" id="explorePanel" hidden><nav aria-label="Experience RTG"><a href="#verhaal" data-go="verhaal">Het verhaal <span>01</span></a><a href="#moment" data-go="moment">Playground <span>02</span></a><a href="#uw-rtg" data-go="uw-rtg">Uw RTG <span>03</span></a><a href="#werelden" data-go="werelden">Vier werelden <span>04</span></a><a href="#foundation" data-go="foundation">Foundation · altijd gratis <span>05</span></a><a href="#regie" data-go="regie">Privacy &amp; regie <span>06</span></a><a href="#passen" data-go="passen">Alle passen &amp; prijzen <span>07</span></a><a href="#vragen" data-all-questions>Alle vragen <span>08</span></a><a href="#begin" data-go="begin">Maak mijn RTG <span>↗</span></a><a href="mailto:roellie.i@gmail.com?subject=Kennismaking%20RTG">Praat met iemand <span>↗</span></a><a data-app-path="/apps/app.html" href="https://app.rahultravelgroup.com/apps/app.html">Inloggen <span>↗</span></a><button type="button" id="experienceLanguage">Taal kiezen</button><button type="button" data-reset>Reset mijn verkenning</button></nav></div>
+    <div class="experience-panel" id="worldPanel" hidden><nav aria-label="Kies uw wereld"><button type="button" data-select-world="living">01 · LivingOS <small>Leven &amp; verbinding</small></button><button type="button" data-select-world="travel">02 · TravelOS <small>Reizen &amp; ervaringen</small></button><button type="button" data-select-world="work">03 · WorkOS <small>Werk &amp; organisaties</small></button><button type="button" data-select-world="foundation">04 · FoundationOS <small>Altijd 100% gratis</small></button></nav></div>
+    <div class="experience-panel" id="actionsPanel" hidden><nav id="contextActions" aria-label="Acties van dit moment"></nav></div>
+    <div class="experience-panel" id="summaryPanel" hidden><p class="demo-label">DEMONSTRATIE · GEEN ECHTE OPDRACHT</p><div id="proposalSummary"></div><button type="button" id="confirmExample">Bevestig dit voorbeeld</button><p id="exampleReceipt" role="status">Deze bevestiging heeft uitsluitend effect in de demonstratie.</p></div>
+  </div>
+  <p id="experienceStatus" class="sr-only" role="status"></p>
   <script src="./public/site/start/start.js" defer></script>
+  <script src="./public/shared/i18n.js" defer></script>
+  <script src="./public/shared/rtg-edge-icons.js" defer></script>
+  <script src="./public/shared/rtg-adaptive-edge-core.js" defer></script>
+  <script src="./public/shared/rtg-adaptive-edge-input.js" defer></script>
+  <script src="./public/shared/rtg-adaptive-edge-controls.js" defer></script>
+  <script src="./public/shared/rtg-adaptive-edge.js" defer></script>
+  <script src="./public/site/start/experience-core.js" defer></script>
+  <script src="./public/site/start/experience-discovery.js" defer></script>
+  <script src="./public/site/start/experience.js" defer></script>
+  <script src="./public/site/start/experience-edge.js" defer></script>
 </body>
 </html>

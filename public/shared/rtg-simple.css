@@ -24,7 +24,7 @@ body[data-rtg-skin="heritage"][data-rtg-world]{
 /* Werelden zijn kamers in hetzelfde huis. De compositie blijft gelijk; kleur,
    metaal en een heel lichte gloed geven elke kamer haar eigen materiaal. */
 body[data-rtg-skin="heritage"][data-rtg-world="living"]:not([data-rtg-eigenvlak]){
-  --rtg-world-photo:url('/images/worlds/heritage/living-heritage-v2.jpg')!important;
+  --rtg-world-photo:url('../images/worlds/heritage/living-heritage-v2.jpg')!important;
   --rtg-world-photo-position:68% center!important;
   --rtg-world-photo-mask:linear-gradient(108deg,rgba(244,240,232,.97) 0%,rgba(244,240,232,.89) 48%,rgba(244,240,232,.66) 100%)!important;
 }
@@ -37,7 +37,7 @@ body[data-rtg-skin="heritage"][data-rtg-world="living"]{
   --edge-bar-line:rgba(231,199,143,.2)!important;--edge-bar-accent:#ebcc94!important;--edge-bar-metal:#ebcc94!important;
 }
 body[data-rtg-skin="heritage"][data-rtg-world="travel"]:not([data-rtg-eigenvlak]){
-  --rtg-world-photo:url('/images/worlds/heritage/travel-heritage-v2.jpg')!important;
+  --rtg-world-photo:url('../images/worlds/heritage/travel-heritage-v2.jpg')!important;
   --rtg-world-photo-position:68% center!important;
   --rtg-world-photo-mask:linear-gradient(108deg,rgba(12,6,8,.97) 0%,rgba(12,6,8,.83) 48%,rgba(12,6,8,.52) 100%)!important;
 }
@@ -50,7 +50,7 @@ body[data-rtg-skin="heritage"][data-rtg-world="travel"]{
   --edge-bar-line:rgba(190,72,108,.23)!important;--edge-bar-accent:#a82c51!important;--edge-bar-metal:#ddb5ad!important;
 }
 body[data-rtg-skin="heritage"][data-rtg-world="work"]:not([data-rtg-eigenvlak]){
-  --rtg-world-photo:url('/images/worlds/heritage/work-heritage-v2.jpg')!important;
+  --rtg-world-photo:url('../images/worlds/heritage/work-heritage-v2.jpg')!important;
   --rtg-world-photo-position:70% center!important;
   --rtg-world-photo-mask:linear-gradient(108deg,rgba(4,4,4,.97) 0%,rgba(4,4,4,.84) 48%,rgba(4,4,4,.5) 100%)!important;
 }
@@ -63,7 +63,7 @@ body[data-rtg-skin="heritage"][data-rtg-world="work"]{
   --edge-bar-line:rgba(218,210,197,.16)!important;--edge-bar-accent:#c8bda9!important;--edge-bar-metal:#d8cebc!important;
 }
 body[data-rtg-skin="heritage"][data-rtg-world="foundation"]:not([data-rtg-eigenvlak]){
-  --rtg-world-photo:url('/images/worlds/heritage/foundation-heritage-v2.jpg')!important;
+  --rtg-world-photo:url('../images/worlds/heritage/foundation-heritage-v2.jpg')!important;
   --rtg-world-photo-position:72% center!important;
   --rtg-world-photo-mask:linear-gradient(108deg,rgba(5,8,15,.97) 0%,rgba(5,8,15,.84) 48%,rgba(5,8,15,.5) 100%)!important;
 }
@@ -325,16 +325,16 @@ body[data-rtg-skin="heritage"] .cmd-startwereld{
   text-shadow:0 2px 12px rgba(0,0,0,.78)
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="living"]{
-  --rtg-card-photo:url('/images/worlds/heritage/living-heritage-v2.jpg');background-position:center,62% center,center!important
+  --rtg-card-photo:url('../images/worlds/heritage/living-heritage-v2.jpg');background-position:center,62% center,center!important
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="travel"]{
-  --rtg-card-photo:url('/images/worlds/heritage/travel-heritage-v2.jpg');background-position:center,68% center,center!important
+  --rtg-card-photo:url('../images/worlds/heritage/travel-heritage-v2.jpg');background-position:center,68% center,center!important
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="work"]{
-  --rtg-card-photo:url('/images/worlds/heritage/work-heritage-v2.jpg');background-position:center,70% center,center!important
+  --rtg-card-photo:url('../images/worlds/heritage/work-heritage-v2.jpg');background-position:center,70% center,center!important
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="foundation"]{
-  --rtg-card-photo:url('/images/worlds/heritage/foundation-heritage-v2.jpg');background-position:center,66% center,center!important
+  --rtg-card-photo:url('../images/worlds/heritage/foundation-heritage-v2.jpg');background-position:center,66% center,center!important
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld::before{
   content:"";position:absolute;top:16px;left:16px;width:9px;height:9px;border-radius:50%;

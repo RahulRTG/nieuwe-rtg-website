@@ -99,7 +99,7 @@ test('de server boot met de publieke landing op root en de OS-poort onder /apps'
     assert.equal(r.status, 200, 'root gaf status ' + r.status + ' i.p.v. 200');
     // 2) root is de canonieke publieke compositie met alle vier werelden
     assert.ok(/data-page="rtg-landing"/.test(r.body) &&
-      /Vier werelden[\s\S]*[ÉE]én visie/.test(r.body) &&
+      /Vier werelden[\s\S]*[ÉE]én samenhangend geheel/.test(r.body) &&
       /LivingOS/.test(r.body) && /TravelOS/.test(r.body) &&
       /WorkOS/.test(r.body) && /FoundationOS/.test(r.body),
     'root serveert niet de publieke vier-wereldenlanding');

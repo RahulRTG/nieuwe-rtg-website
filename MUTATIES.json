@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-16T08:42:27.906Z",
-    "commit": "2b1a1621f",
+    "op": "2026-09-16T18:09:56.654Z",
+    "commit": "1b220b6ce",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -2541,6 +2541,22 @@
       "staat": "gezakt",
       "module": "server/kern/experience/contract.js",
       "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "experience-rtg.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/start/experience-core.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "experience-rtg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/start/experience-core.js",
+      "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
     },

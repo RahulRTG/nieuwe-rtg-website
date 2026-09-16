@@ -69,7 +69,7 @@ test('de voordeur: / is de goedgekeurde landing, zonder omleiding', async () => 
   assert.equal(d.status, 200);
   assert.match(d.type, /text\/html/);
   assert.match(d.tekst, /data-page="rtg-landing"/);
-  assert.match(d.tekst, /Vier werelden\.<br>Één visie\./,
+  assert.match(d.tekst, /Vier werelden\.<br>Één samenhangend geheel\./,
     'GET / levert de goedgekeurde merkvoordeur');
   assert.doesNotMatch(d.tekst, /href="https:\/\/app\.rahultravelgroup\.com\/apps\//,
     'app-links blijven in de interne testomgeving');

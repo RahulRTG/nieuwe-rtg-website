@@ -109,6 +109,7 @@
       /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
          is een flexkolom met align-items:stretch, dus een kind met een
          max-width blijft aan de linkerrand plakken -- gemeten, niet gegokt. */
+      '#gate .ag-experience{font-size:.78rem;line-height:1.6;margin:.75rem auto;max-width:42ch;color:inherit;}' +
       '#gate .ag-zin{font-size:clamp(1.35rem,5.2vw,1.9rem);line-height:1.3;' +
         'min-height:0;padding:1rem 0 1.6rem;max-width:22ch;margin-inline:auto;}' +
       // het invoerveld is de actie: breed en royaal, geen streepje

@@ -120,7 +120,8 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
 });
 
 test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
-  assert.match(TOKENS, /@import url\('\/shared\/rtg-simple\.css\?v=17'\);/);
+  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-simple.css',
+    'last import is shared and project-relative; no query that the CSS bundler would discard');
   assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
 });
 

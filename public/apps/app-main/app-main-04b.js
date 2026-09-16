@@ -52,6 +52,14 @@
       '<button type="button" class="ag-anders" id="agAnders"><span>' + T('ag.anders','Andere manier') + '</span></button>' +
       '<div class="ag-werelden" id="agWerelden" aria-label="' + T('ag.werelden','Beschikbare RTG-werelden') + '"></div>';
     gate.appendChild(doos);
+    // Only explicit, allowlisted world interests can cross from the public demo.
+    // They are a welcome hint, never an account permission or saved profile.
+    const verkenning = window.RTGExperienceHandoff && window.RTGExperienceHandoff.consume();
+    if (verkenning && verkenning.length) {
+      const welkom = document.createElement('p'); welkom.className = 'ag-experience';
+      welkom.textContent = 'Uw verkenning: ' + verkenning.join(', ') + '. Alleen hier getoond; niet opgeslagen in uw account.';
+      doos.querySelector('.ag-intro').appendChild(welkom);
+    }
     /* Op telefoon vervangt deze rail de ingeklapte command-bank. De namen
        komen uit dezelfde navigatiebron; dit is dus geen tweede wereldregister
        dat later los van LivingOS, WorkOS, TravelOS of FoundationOS kan raken. */

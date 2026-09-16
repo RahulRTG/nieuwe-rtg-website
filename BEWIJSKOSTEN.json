@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-16T07:51:13.942Z",
-    "commit": "ab17bdf5",
-    "boomVuil": true,
-    "boomAnders": 2,
+    "op": "2026-09-16T07:51:30.360Z",
+    "commit": "53626d57",
+    "boomVuil": false,
+    "boomAnders": 0,
     "instrument": "scripts/bewijskosten.js",
     "node": "v22.22.2"
   },
@@ -11,7 +11,7 @@
   "grens": "machineversterking en mensversterking worden nooit opgeteld: de eerste mag groeien (een generator schrijft die regels in seconden), de tweede hoort naar nul. Een versterkingsfactor over nul bronregels is ONBEPAALD en geen nul. En `onbewezen` is geen `handwerk`: niet bewezen herbouwbaar is iets anders dan bewezen niet-herbouwbaar.",
   "gemeten": {
     "bereik": "3f11d577e566de3a3137b6e79666cf5084f95c05..HEAD",
-    "bereikOpgelost": "3f11d577e566de3a3137b6e79666cf5084f95c05..ab17bdf5436a24c9745922a48e71276c9674089c",
+    "bereikOpgelost": "3f11d577e566de3a3137b6e79666cf5084f95c05..53626d57f18196eaaab6e9a0f62bdfbc956e2d4c",
     "zekerheid": {
       "ratelTanden": {
         "bron": "NORM.json",
@@ -52,17 +52,17 @@
     },
     "opbrengst": {
       "geenEnkelCijfer": "de soorten zekerheid hebben verschillende eenheden en worden niet opgeteld; twee van de vier registers ontstonden in dit bereik en een sprong vanaf \"bestond niet\" is geen vooruitgang op een schaal maar een nieuwe schaal",
-      "menselijkGetypteRegels": 6047,
+      "menselijkGetypteRegels": 6060,
       "perSoort": {
         "ratelTanden": {
           "delta": 11,
           "eenheid": "tand(en)",
-          "menselijkeRegelsPerEenheid": 550
+          "menselijkeRegelsPerEenheid": 551
         },
         "toetsenBewezenGevoelig": {
           "delta": 7,
           "eenheid": "toetsbestand(en)",
-          "menselijkeRegelsPerEenheid": 864
+          "menselijkeRegelsPerEenheid": 866
         },
         "artefactenMetEigenaar": {
           "delta": null,
@@ -74,7 +74,7 @@
         }
       }
     },
-    "commits": 66,
+    "commits": 67,
     "samenvoegingen": 3,
     "omvang": {
       "intentie": {
@@ -84,12 +84,12 @@
       },
       "bewijs": {
         "bestanden": 21,
-        "erbij": 3680,
+        "erbij": 3693,
         "eraf": 28
       },
       "afgeleid": {
         "bestanden": 31,
-        "erbij": 7169,
+        "erbij": 7171,
         "eraf": 322
       },
       "document": {
@@ -104,8 +104,8 @@
       }
     },
     "bronRegels": 1804,
-    "bewijsRegels": 3708,
-    "afgeleideRegels": 7491,
+    "bewijsRegels": 3721,
+    "afgeleideRegels": 7493,
     "machineVersterking": 4.15,
     "bewijsVersterking": 2.06,
     "versterkingOnbepaald": null,

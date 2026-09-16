@@ -1109,6 +1109,64 @@ afwezig leest, maar een *geslaagde* meting die als een mislukte leest omdat haar
 sein een foutcode is. Toets 7 bewaakt dat de bron die exitcode uitdrukkelijk als
 uitslag leest.
 
+### De andere helft: wat leverde het op?
+
+De kosten alleen zeggen niets. Naast de vier soorten werk staat daarom een
+tweede meting: hoeveel zekerheid is er in dit bereik **bij** gekomen? Vier
+soorten, gelezen uit registers die dit huis al bijhoudt, bij de basis én bij de
+top van het bereik.
+
+| | |
+|---|---|
+| `ratelTanden` | **+11** — 551 menselijk getypte regels per tand |
+| `toetsenBewezenGevoelig` | **+7** — 866 menselijk getypte regels per toets |
+| `artefactenMetEigenaar` | **ONBEPAALD** |
+| `herbouwBewezen` | **ONBEPAALD** |
+
+Die twee laatste zijn de scherpste regel van dit register, en hij kostte
+onmiddellijk geld: **`AFGELEID.json` en `HERBOUWPROEF.json` bestónden niet bij
+het aftakpunt.** Een register dat er niet was is iets anders dan een register dat
+nul mat — de eerste is een nieuw *soort* zekerheid, de tweede een getal dat niet
+bewoog. Wie die twee samenvoegt noteert `0 → 174` en schrijft een spectaculaire
+vooruitgang op een schaal die daarvoor niet bestond. Dus `voor: null`,
+`delta: null`, en de reden erbij. Drie standen, weer.
+
+### Er komt geen enkel opbrengstcijfer
+
+De verleiding is één getal: *zoveel zekerheid per regel werk.* Dat mag hier niet,
+om twee gronden die allebei al in dit huis staan.
+
+De eenheden zijn **niet optelbaar**. Een ratel*tand*, een bewezen *toets* en een
+herbouwd *artefact* zijn drie dingen; ze bij elkaar optellen vraagt een weging
+die niemand weegt — en dan staat er een verzonnen getal in een register dat over
+eerlijkheid gaat (INT-04, `LAT.md` regel 11, `check.js` regel 48). En zo'n getal
+zou de twee registers die in dit bereik *zijn ontstaan* moeten meetellen als een
+sprong vanaf nul.
+
+Wat er dus staat is de opbrengst **per soort**, met de eenheid erbij en met het
+menselijke werk ernaast. De lezer kan delen; het register doet het niet.
+
+### Twee dingen die het bouwen van de opbrengstkant blootlegde
+
+**De meter schreef zijn eigen uitvoer op als arbeid van een mens.**
+`MOMENTOPNAME` stond niet in de klasse `afgeleid`, dus `BEWIJSKOSTEN.json` viel
+in `overig` en zijn 587 regels telden als menselijk getypt — precies het getal
+dat hij moet meten. De stand verschilt om zijn *versheid* en niet om zijn
+schrijver.
+
+**En de toets die de drie standen moest bewaken, bleef groen op de mutatie die
+hem moest vangen.** Hij las alleen het ingecheckte register, en dat was nog met
+de goede code geschreven. Een toets die de vastgelegde uitslag leest, beproeft de
+**vastlegging** en niet de meter (`LAT.md` regel 10). Hij meet de eigenschap nu
+vers — tegen het *opgeloste* bereik, twee volle sha's, want `..HEAD` verschuift
+met elke commit — en zakt dan wel. Er staat een uitgeschreven eis bij dat er in
+het bereik minstens één register moet zijn ontstaan; anders beproeft hij niets.
+
+Daaruit volgt nog iets wat je niet moet wegpoetsen: **de commit die dit register
+toevoegt zit per definitie niet in het bereik dat het beschrijft.** Dat is geen
+achterstand maar de vorm van een momentopname — hem najagen tot hij zichzelf
+bevat, convergeert nooit.
+
 ### De eerste MOMENTOPNAME
 
 Die stand stond in par. 6c op papier met **nul** leden. `BEWIJSKOSTEN.json` meet

@@ -9915,6 +9915,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "afbouwoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/afbouwoordeel.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
     }
   }
 }

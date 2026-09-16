@@ -311,7 +311,20 @@ function meet(bereik) {
     omvang.document.erbij + omvang.document.eraf + omvang.overig.erbij + omvang.overig.eraf;
 
   return {
-    bereik,
+    /* HET VELD HEET GEEN `bereik`, EN DAT IS LAT.md REGEL 14.
+
+       `bereik` draagt in de bewijsregisters al DRIE relaties waarvan er twee
+       elkaars tegendeel zijn (wat een wachter RAAKT tegenover waarover een
+       oordeel GELDT -- scripts/lib/bewijsvelden.js). Hier betekende het een
+       vierde ding, een reeks commits, en dan is het technisch correct en
+       semantisch onjuist: het type klopt, de waarde klopt, en de vraag die
+       beantwoord wordt is een andere dan de gestelde.
+
+       test/bewijsveld.test.js ving dat in de CI-ronde. De uitweg is niet een
+       vierde relatie verklaren maar HERNOEMEN -- zelfde keuze als bij `Pulse`,
+       `moment` en `envelop`: een naam die al drie betekenissen draagt, krijgt
+       er geen vierde bij. */
+    commitreeks: bereik,
     /* HET BEREIK OPGELOST NAAR TWEE SHA'S, en dat is wat een MOMENTOPNAME
        bruikbaar maakt. `3f11d577..HEAD` betekent morgen iets anders dan vandaag;
        een uitslag die niemand kan herhalen is geen meting. Let op het gevolg dat
@@ -319,7 +332,7 @@ function meet(bereik) {
        definitie niet in het bereik dat het beschrijft. Dat is geen achterstand
        maar de vorm van een momentopname -- hem najagen tot hij zichzelf bevat,
        convergeert nooit. */
-    bereikOpgelost: git('rev-parse', basis).trim() + '..' + git('rev-parse', top || 'HEAD').trim(),
+    commitreeksOpgelost: git('rev-parse', basis).trim() + '..' + git('rev-parse', top || 'HEAD').trim(),
     zekerheid,
     opbrengst: {
       geenEnkelCijfer: 'de soorten zekerheid hebben verschillende eenheden en worden niet opgeteld; ' +
@@ -359,11 +372,11 @@ function main() {
   const nu = meet(bereik);
   let nul = null;
   try { nul = meet(basis + '..' + NULMETING); }
-  catch (e) { nul = { bereik: basis + '..' + NULMETING, reden: 'de nulmeting is hier niet te herhalen: ' + String(e.message).slice(0, 120) }; }
+  catch (e) { nul = { commitreeks: basis + '..' + NULMETING, reden: 'de nulmeting is hier niet te herhalen: ' + String(e.message).slice(0, 120) }; }
 
   console.log('\nDE KOSTEN VAN EEN CORRECTE VERANDERING' +
     '\x1b[2m -- gemeten, en strikt gescheiden van wat verklaard is\x1b[0m\n');
-  console.log('  bereik  ' + bereik + '  (' + nu.commits + ' commits, ' + nu.samenvoegingen + ' samenvoeging(en))\n');
+  console.log('  commitreeks  ' + bereik + '  (' + nu.commits + ' commits, ' + nu.samenvoegingen + ' samenvoeging(en))\n');
   for (const k of KLASSEN) {
     const o = nu.omvang[k];
     console.log('  ' + k.padEnd(11) + String(o.bestanden).padStart(4) + ' bestand(en)  ' +

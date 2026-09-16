@@ -85,6 +85,15 @@ const EIGENAAR = {
      en zichzelf overslaat, is de eerste plek waar het contract scheurt. */
   'AFGELEID.json': { schrijver: 'scripts/afgeleid.js' },
 
+  /* De proef die bij dat eigenaarschap hoort: draai die eigenaar, en komt er
+     hetzelfde uit? Hij hoort hier om dezelfde reden als AFGELEID.json hierboven
+     -- een laag die over eigenaarschap gaat en haar eigen uitvoer niet verklaart,
+     is de eerste plek waar het contract scheurt. Toets 4 van
+     test/registereigenaar.test.js ving dat binnen een CI-ronde: het getal ging
+     van 146 naar 147 doordat er een register bijkwam zonder dat iemand zei wie
+     het bezit -- precies wat die tand moet vangen, nu op mijn eigen werk. */
+  'HERBOUWPROEF.json': { schrijver: 'scripts/herbouwproef.js' },
+
   /* DE EERSTE MOMENTOPNAME, en die stand bestond tot nu toe alleen op papier.
 
      BEWIJSKOSTEN.json meet wat een correcte verandering kost over een BEREIK

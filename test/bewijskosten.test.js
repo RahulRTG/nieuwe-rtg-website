@@ -112,9 +112,10 @@ test('7. een samenvoeging die niet te herspelen is telt niet als nul conflicten'
 
 test('8. de nulmeting staat erbij, met waarom zij het ijkpunt is', () => {
   assert.equal(REGISTER.nulmeting.commit, NULMETING);
-  /* En het bereik is opgelost naar twee sha's: een momentopname die niemand kan
-     herhalen is geen meting. */
-  assert.match(REGISTER.gemeten.bereikOpgelost, /^[0-9a-f]{40}\.\.[0-9a-f]{40}$/);
+  /* En de commitreeks is opgelost naar twee sha's: een momentopname die niemand
+     kan herhalen is geen meting. Het veld heet met opzet geen `bereik` -- die
+     naam draagt in de bewijsregisters al drie relaties (LAT.md regel 14). */
+  assert.match(REGISTER.gemeten.commitreeksOpgelost, /^[0-9a-f]{40}\.\.[0-9a-f]{40}$/);
   assert.ok(REGISTER.nulmeting.waarom.length > 40, 'de nulmeting draagt geen uitgeschreven reden');
 });
 
@@ -132,7 +133,7 @@ test('9. een register dat bij de basis NIET BESTOND geeft geen delta', () => {
      gecontroleerd; de EIGENSCHAP wordt vers gemeten. */
   /* Het OPGELOSTE bereik en niet `..HEAD`: dat laatste verschuift met elke
      commit, en dan meet de toets iets anders dan het register beschrijft. */
-  const vers = meet(REGISTER.gemeten.bereikOpgelost).zekerheid;
+  const vers = meet(REGISTER.gemeten.commitreeksOpgelost).zekerheid;
   const bestondNiet = Object.values(vers).filter(r => r.voor === null);
   assert.ok(bestondNiet.length >= 1,
     'geen enkel register ontbrak bij de basis; dan beproeft deze toets niets -- kies een bereik ' +

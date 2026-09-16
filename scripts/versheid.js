@@ -537,6 +537,16 @@ const REGISTERS = [
      zo uit als een verse -- en bij twee nullen naast elkaar leest hij ook nog
      eens als bevestiging. */
   ['NAMENSVORM.json', 'npm run namensvorm:vast', 'of de manieren van namens-iemand-handelen een machine delen -- REPRESENTATIE.md par. 0 rust op twee nullen, en die zien er vers en verouderd hetzelfde uit'],
+  /* Vierde van deze soort, en hij deelt hun faalvorm: PLANVORM.json draagt twee
+     nullen (0 velden in alle plandomeinen, 0 domeinen die de planlus rond maken)
+     en daarop rust de keuze tussen een gedeelde planningsgrond als OBJECT en een
+     projectie met een verklaring van werkwoorden. Hij veroudert bovendien met de
+     CODE en niet met de klok: een plandomein erbij, een map hernoemd of een
+     nieuwe roostermotor verandert de uitslag onmiddellijk, en een verouderde nul
+     ziet er precies zo uit als een verse -- met als extra valkuil dat hij dan
+     van "deze domeinen delen niets" in "we hebben minder gekeken" verandert
+     zonder dat het getal beweegt. */
+  ['PLANVORM.json', 'npm run planvorm:vast', 'of de plandomeinen een datavorm en een planlus DELEN -- het besluit over een universele planningsgrond rust erop, en de uitslag is twee nullen'],
   ['SPOORVORM.json', 'npm run spoorvorm:vast', 'hoever de zes andere mechanismen van de spoorvorm van kern/vertegenwoordiging/handelen.js staan -- een matrix vol streepjes ziet er vers en verouderd hetzelfde uit, en juist die matrix hoort te veranderen'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
      elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul

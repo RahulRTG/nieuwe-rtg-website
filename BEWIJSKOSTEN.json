@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-16T07:51:30.360Z",
-    "commit": "53626d57",
+    "op": "2026-09-16T08:06:34.097Z",
+    "commit": "cf56837e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijskosten.js",
@@ -10,8 +10,8 @@
   "uitleg": "Waar ging het werk heen bij een verandering die door alle poorten kwam? De helft `gemeten` volgt uit git, AFGELEID.json en HERBOUWPROEF.json. De helft `verklaard` is een oordeel van een mens en komt in geen enkele som voor.",
   "grens": "machineversterking en mensversterking worden nooit opgeteld: de eerste mag groeien (een generator schrijft die regels in seconden), de tweede hoort naar nul. Een versterkingsfactor over nul bronregels is ONBEPAALD en geen nul. En `onbewezen` is geen `handwerk`: niet bewezen herbouwbaar is iets anders dan bewezen niet-herbouwbaar.",
   "gemeten": {
-    "bereik": "3f11d577e566de3a3137b6e79666cf5084f95c05..HEAD",
-    "bereikOpgelost": "3f11d577e566de3a3137b6e79666cf5084f95c05..53626d57f18196eaaab6e9a0f62bdfbc956e2d4c",
+    "commitreeks": "3f11d577e566de3a3137b6e79666cf5084f95c05..HEAD",
+    "commitreeksOpgelost": "3f11d577e566de3a3137b6e79666cf5084f95c05..cf56837ea1a75ad200ccad83fc565b80e66dd32a",
     "zekerheid": {
       "ratelTanden": {
         "bron": "NORM.json",
@@ -52,17 +52,17 @@
     },
     "opbrengst": {
       "geenEnkelCijfer": "de soorten zekerheid hebben verschillende eenheden en worden niet opgeteld; twee van de vier registers ontstonden in dit bereik en een sprong vanaf \"bestond niet\" is geen vooruitgang op een schaal maar een nieuwe schaal",
-      "menselijkGetypteRegels": 6060,
+      "menselijkGetypteRegels": 6083,
       "perSoort": {
         "ratelTanden": {
           "delta": 11,
           "eenheid": "tand(en)",
-          "menselijkeRegelsPerEenheid": 551
+          "menselijkeRegelsPerEenheid": 553
         },
         "toetsenBewezenGevoelig": {
           "delta": 7,
           "eenheid": "toetsbestand(en)",
-          "menselijkeRegelsPerEenheid": 866
+          "menselijkeRegelsPerEenheid": 869
         },
         "artefactenMetEigenaar": {
           "delta": null,
@@ -74,7 +74,7 @@
         }
       }
     },
-    "commits": 67,
+    "commits": 70,
     "samenvoegingen": 3,
     "omvang": {
       "intentie": {
@@ -84,12 +84,12 @@
       },
       "bewijs": {
         "bestanden": 21,
-        "erbij": 3693,
+        "erbij": 3716,
         "eraf": 28
       },
       "afgeleid": {
         "bestanden": 31,
-        "erbij": 7171,
+        "erbij": 7229,
         "eraf": 322
       },
       "document": {
@@ -104,10 +104,10 @@
       }
     },
     "bronRegels": 1804,
-    "bewijsRegels": 3721,
-    "afgeleideRegels": 7493,
-    "machineVersterking": 4.15,
-    "bewijsVersterking": 2.06,
+    "bewijsRegels": 3744,
+    "afgeleideRegels": 7551,
+    "machineVersterking": 4.19,
+    "bewijsVersterking": 2.08,
     "versterkingOnbepaald": null,
     "driftConflicten": 44,
     "driftHandmatig": 6,
@@ -359,8 +359,8 @@
     "commit": "fcf44574",
     "waarom": "de eerste commit van deze campagne die groen door de hele keten kwam (CI-ronde 4593); een latere ronde is pas duurder of goedkoper als je weet waartegen",
     "gemeten": {
-      "bereik": "3f11d577e566de3a3137b6e79666cf5084f95c05..fcf44574",
-      "bereikOpgelost": "3f11d577e566de3a3137b6e79666cf5084f95c05..fcf44574dc5d2550877d67a99f9311c19f162962",
+      "commitreeks": "3f11d577e566de3a3137b6e79666cf5084f95c05..fcf44574",
+      "commitreeksOpgelost": "3f11d577e566de3a3137b6e79666cf5084f95c05..fcf44574dc5d2550877d67a99f9311c19f162962",
       "zekerheid": {
         "ratelTanden": {
           "bron": "NORM.json",

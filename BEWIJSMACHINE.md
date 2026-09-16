@@ -1167,6 +1167,34 @@ toevoegt zit per definitie niet in het bereik dat het beschrijft.** Dat is geen
 achterstand maar de vorm van een momentopname — hem najagen tot hij zichzelf
 bevat, convergeert nooit.
 
+### Twee huisregels vingen dit werk binnen één CI-ronde
+
+Beide gaten kwamen van mijn eigen hand, en beide werden gevangen door een regel
+die hier al stond.
+
+**Toets 4 van `test/registereigenaar.test.js` ging van 146 naar 147.**
+`HERBOUWPROEF.json` kwam erbij als wortelregister zonder dat iemand in `EIGENAAR`
+zei wie het bezit — zijn eigenaar werd alleen *gemeten* uit het stempel. Dat is
+letterlijk wat die tand moet vangen ("het getal hoort te dalen doordat er
+eigenaren bijkomen, niet te stijgen doordat er registers bijkomen"), nu op de
+laag die zelf over eigenaarschap gaat. De vloer is niet verhoogd; de verklaring
+is erbij gezet.
+
+**En `BEWIJSKOSTEN.json` droeg een veld `bereik`** — LAT.md regel 14. Die naam
+draagt in de bewijsregisters al drie relaties waarvan er twee elkaars tegendeel
+zijn: wat een wachter *raakt* tegenover waarover een oordeel *geldt*. Bij mij
+betekende het een vierde ding, een reeks commits. Technisch correct en semantisch
+onjuist: het type klopt, de waarde klopt, en de vraag die beantwoord wordt is een
+andere dan de gestelde. De uitweg is niet een vierde relatie verklaren maar
+**hernoemen** — zelfde keuze als bij `Pulse`, `moment` en `envelop`. Het veld
+heet nu `commitreeks`, gemeten vrij.
+
+Let op waar deze twee **niet** door zijn gevangen: `check`, `registerklopt`,
+`norm`, `normverval`, `deltapoort` en `getallen --controle` stonden alle zes
+groen. Het waren gewone unittoetsen in de scherven. `LAT.md` regel 17 op zijn
+scherpst — een poort bewijst alleen zijn eigen bereik, en "mijn gebruikelijke
+controles" is niet "het oordeel van de keten".
+
 ### De eerste MOMENTOPNAME
 
 Die stand stond in par. 6c op papier met **nul** leden. `BEWIJSKOSTEN.json` meet

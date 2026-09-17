@@ -237,10 +237,10 @@ function assertInsets(overzicht, compact, focus, mobiel, label) {
   assert.ok(overzicht.padding.top - compact.padding.top >= 30,
     label + ': compact geeft de ruimte van de bovenrand niet terug');
   assert.ok(overzicht.padding.bottom >= 40, label + ': overzicht reserveert de onderrand niet');
-  assert.ok(compact.padding.bottom <= 4, label + ': compact geeft de ruimte van de onderrand niet terug');
+  assert.ok(compact.padding.bottom <= 4, label + ': compact houdt onnodig vaste onderruimte vast');
   assert.ok(overzicht.padding.bottom - compact.padding.bottom >= 38,
-    label + ': compact maakt het werkvlak onderaan niet vrij');
-  assert.ok(focus.padding.bottom <= 4, label + ': focus houdt onderaan nog Edge-ruimte vast');
+    label + ': compact maakt het werkvlak onder de zwevende Edge niet vrij');
+  assert.ok(focus.padding.bottom <= 4, label + ': focus houdt onnodig vaste onderruimte vast');
   if (mobiel) {
     assert.ok(overzicht.padding.left <= 4 && compact.padding.left <= 4 && focus.padding.left <= 4,
       label + ': mobiel reserveert nog ruimte voor de verborgen zijrand');
@@ -309,28 +309,29 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(overzicht, label + ' · overzicht');
   assertStand(overzicht, { ...scherm.overzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
-  assert.equal(overzicht.top.materiaal, overzicht.bottom.materiaal,
-    label + ': boven- en onderbalk hebben niet hetzelfde wereldmateriaal');
+  assert.equal(overzicht.bottom.materiaal, '#0a0805',
+    label + ': de adaptieve Edge gebruikt niet het vaste marketingmateriaal');
   assert.equal(overzicht.randHerstel, 2, label + ': boven- en onderrand missen hun herstelzone');
   assert.equal(overzicht.randHerstelZichtbaar, 0, label + ': herstelzones zijn buiten compact zichtbaar');
   assertContext(overzicht, route, label);
   if (scherm.naam === 'desktop') await controleerContextlade(page, label, route);
 
-  await zetStand(page, 'compact', { top: false, side: false, bottom: false, reveal: false });
+  await zetStand(page, 'compact', { top: false, side: false, bottom: true, reveal: false });
   const compact = await page.evaluate(schermToestand, route);
   assertEenRand(compact, label + ' · compact');
-  assertStand(compact, { top: false, side: false, bottom: false, reveal: false }, label + ' · compact');
-  assert.equal(compact.randHerstelZichtbaar, 2, label + ': compacte randseinen zijn niet allebei raakbaar');
+  assertStand(compact, { top: false, side: false, bottom: true, reveal: false }, label + ' · compact');
+  assert.equal(compact.randHerstelZichtbaar, 1,
+    label + ': alleen de bovenrandgreep hoort naast de vaste adaptieve Edge raakbaar te zijn');
   assert.deepEqual(compact.oudZichtbaar, [], label + ' · compact: oude chrome keert terug');
 
-  await page.click('.rtg-edge-2-edge-reveal--bottom');
+  await page.click('.rtg-edge-2-edge-reveal--top');
   await wachtOpStand(page, 'overview', { ...scherm.overzicht, reveal: false });
-  await zetStand(page, 'compact', { top: false, side: false, bottom: false, reveal: false });
+  await zetStand(page, 'compact', { top: false, side: false, bottom: true, reveal: false });
 
-  await zetStand(page, 'focus', { top: false, side: false, bottom: false, reveal: true });
+  await zetStand(page, 'focus', { top: false, side: false, bottom: true, reveal: true });
   const focus = await page.evaluate(schermToestand, route);
   assertEenRand(focus, label + ' · focus');
-  assertStand(focus, { top: false, side: false, bottom: false, reveal: true }, label + ' · focus');
+  assertStand(focus, { top: false, side: false, bottom: true, reveal: true }, label + ' · focus');
   assert.deepEqual(focus.oudZichtbaar, [], label + ' · focus: oude chrome keert terug');
   assertInsets(overzicht, compact, focus, scherm.naam === 'mobiel', label);
 
@@ -342,7 +343,7 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(hersteld, label + ' · herstelklik');
   assertStand(hersteld, { ...scherm.overzicht, reveal: false }, label + ' · herstelklik');
 
-  await zetStand(page, 'focus', { top: false, side: false, bottom: false, reveal: true });
+  await zetStand(page, 'focus', { top: false, side: false, bottom: true, reveal: true });
   await page.keyboard.press('Escape');
   await wachtOpStand(page, 'overview', { ...scherm.overzicht, reveal: false });
   hersteld = await page.evaluate(schermToestand, route);

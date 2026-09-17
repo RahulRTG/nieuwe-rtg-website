@@ -13,10 +13,12 @@ const MAIN_PATH = path.join(ROOT, 'public/shared/rtg-edge-2.js');
 const CONTEXT_PATH = path.join(ROOT, 'public/shared/rtg-edge-2-context.js');
 const REVEAL_PATH = path.join(ROOT, 'public/shared/rtg-edge-2-reveal.js');
 const CSS_PATH = path.join(ROOT, 'public/shared/rtg-edge-2.css');
+const ADAPTIVE_CSS_PATH = path.join(ROOT, 'public/shared/rtg-adaptive-edge.css');
 const MAIN = fs.readFileSync(MAIN_PATH, 'utf8');
 const CONTEXT = fs.readFileSync(CONTEXT_PATH, 'utf8');
 const REVEAL = fs.readFileSync(REVEAL_PATH, 'utf8');
 const CSS = fs.readFileSync(CSS_PATH, 'utf8');
+const ADAPTIVE_CSS = fs.readFileSync(ADAPTIVE_CSS_PATH, 'utf8');
 
 test('het declaratieve contract en de drie renderstates zijn vast', () => {
   assert.deepEqual(edge.CONTRACT, {
@@ -206,12 +208,14 @@ test('CSS toont per state alleen de bedoelde bestaande randen', () => {
   assert.doesNotMatch(CSS, /\.rtg-edge-chrome\s*\{[^}]*display:none/);
 });
 
-test('boven- en onderbalk delen één wereldmateriaal en compact kan via beide randen terug', () => {
+test('de oude randen houden hun wereldmateriaal en de adaptieve Edge vervangt de onderste herstelgreep', () => {
   for (const wereld of ['living', 'travel', 'work', 'foundation']) {
     const blok = CSS.match(new RegExp('data-rtg-world="' + wereld + '"\\]\\{([^}]+)\\}'));
     assert.ok(blok && blok[1].includes('--edge-bar-bg:#'), wereld + ' mist een eigen balkkleur');
   }
   assert.match(CSS, /\.rtg-edge-top,[\s\S]*\.rtg-edge-bottom\{[\s\S]*background:var\(--edge-bar-bg\)!important/);
+  assert.match(ADAPTIVE_CSS,
+    /data-rtg-adaptive-ready="true"\] \.rtg-edge-2-edge-reveal--bottom\{display:none!important\}/);
   assert.equal((REVEAL
     .match(/rtg-edge-2-edge-reveal--/g) || []).length, 1,
   'de herstelmodule bouwt de twee kanten uit één begrensde lus');

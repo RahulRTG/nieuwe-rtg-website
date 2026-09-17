@@ -116,31 +116,35 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
     assert.equal(await page.locator('.rtg-edge-chrome').count(), 1,
       'de wereld heeft exact één Edge-schil');
+    // De standaard Edge Bar vervangt de app-eigen navigatie. Wacht tot die
+    // overdracht af is; de oude balk kan tijdens het opstarten nog kort bestaan.
+    await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar', { state: 'visible' });
     const navmaat = await page.evaluate(() => {
-      const nav = document.querySelector('body > nav.balk[aria-label="Hoofdnavigatie"]');
-      const rand = document.querySelector('.rtg-edge-bottom');
-      const r = nav.getBoundingClientRect(), onder = rand.getBoundingClientRect();
-      const links = [...nav.querySelectorAll('a')].map(a => {
+      const nav = document.querySelector('.rtg-adaptive-bar');
+      const oud = document.querySelector('body > nav.balk');
+      const r = nav.getBoundingClientRect();
+      const links = [...nav.querySelectorAll('button')].map(a => {
         const x = a.getBoundingClientRect();
-        return { naam: a.getAttribute('aria-label'), left: x.left, right: x.right,
+        return { naam: a.dataset.rtgAdaptiveAction, left: x.left, right: x.right,
           top: x.top, bottom: x.bottom, width: x.width, height: x.height };
       });
       return { nav: { left: r.left, right: r.right, top: r.top, bottom: r.bottom,
         width: r.width, height: r.height, scrollWidth: nav.scrollWidth },
-      onder: { left: onder.left, right: onder.right, top: onder.top, bottom: onder.bottom }, links };
+      oudeBalkVerborgen: getComputedStyle(oud).display === 'none', links };
     });
-    assert.deepEqual(navmaat.links.map(x => x.naam), ['Home', 'Zoeken', 'Maken', 'Berichten', 'Wereld']);
-    assert.ok(navmaat.nav.left >= navmaat.onder.left && navmaat.nav.right <= navmaat.onder.right + 1,
-      'de vijf wereldkeuzes horen volledig in de ene Edge-onderrand: ' + JSON.stringify(navmaat));
-    assert.ok(navmaat.nav.top >= navmaat.onder.top - 1 && navmaat.nav.bottom <= navmaat.onder.bottom + 1,
-      'de wereldnav vormt geen tweede rij boven of onder Edge: ' + JSON.stringify(navmaat));
+    assert.equal(navmaat.oudeBalkVerborgen, true, 'er hoort geen tweede app-eigen bedieningsbalk te blijven staan');
+    assert.deepEqual(navmaat.links.map(x => x.naam), ['home', 'worlds', 'ai', 'context', 'menu']);
+    assert.ok(navmaat.nav.left >= 0 && navmaat.nav.right <= 321,
+      'de vijf gedeelde knoppen passen binnen het scherm: ' + JSON.stringify(navmaat));
+    assert.ok(navmaat.nav.top >= 0 && navmaat.nav.bottom <= 721,
+      'de gedeelde bediening ligt binnen de viewport: ' + JSON.stringify(navmaat));
     assert.ok(navmaat.nav.scrollWidth <= navmaat.nav.width + 1,
-      'de wereldnav mag op 320 px niet horizontaal afknippen: ' + JSON.stringify(navmaat));
+      'de Edge Bar mag op 320 px niet horizontaal afknippen: ' + JSON.stringify(navmaat));
     navmaat.links.forEach((x, i) => {
-      assert.ok(x.width >= 24 && x.height >= 24,
+      assert.ok(x.width >= 44 && x.height >= 44,
         x.naam + ' heeft op 320 px geen bruikbaar raakvlak: ' + JSON.stringify(x));
       if (i) assert.ok(navmaat.links[i - 1].right <= x.left + 0.5,
-        'wereldkeuzes overlappen op 320 px: ' + JSON.stringify(navmaat.links));
+        'gedeelde knoppen overlappen op 320 px: ' + JSON.stringify(navmaat.links));
     });
     await require('./helper').edgeActies(page);
     await page.click('[data-rtg-adaptive-source="profielTab"]');

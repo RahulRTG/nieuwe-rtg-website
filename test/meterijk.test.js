@@ -70,6 +70,17 @@ if (process.env.RTG_AFBOUW_SLOT_ACTIEF !== '1') require('../scripts/afbouw-slot'
   }
 })();
 const norm = require('../scripts/norm.js');
+/* EEN IMMUTABLE KEURINGSSNAPSHOT VOOR REGISTERPROEVEN. Verreweg de meeste
+   ijkingen veranderen alleen één JSON-register. Daarvoor 75 keer dezelfde
+   volledige keuring starten leverde geen extra bewijs, alleen circa 43 minuten
+   wachttijd. Bronmutaties die de keuring zelf ijken gebruiken hieronder
+   expliciet `meetVolledig`; alle andere metingen delen deze ene nulmeting. */
+let KEURINGSSNAPSHOT = null;
+function meet() {
+  if (!KEURINGSSNAPSHOT) KEURINGSSNAPSHOT = norm.keuringRapport();
+  return norm.meet({ keuring: KEURINGSSNAPSHOT });
+}
+const meetVolledig = () => norm.meet();
 const deuren = require('../scripts/deuren');
 const VERBOSE = process.env.RTG_METERIJK_VERBOSE === '1';
 const meld = (tekst) => { if (VERBOSE) process.stderr.write('[meterijk] ' + tekst + '\n'); };
@@ -134,7 +145,7 @@ function metIjkRoutes(voor) {
     extra += "  kern.app.post('" + IJKSTAM + 'n' + i + "', (req, res) => res.json({ ok: true }));\n";
   }
   extra += '};\n';
-  const na = metAanbouw('server/routes/klok.js', extra, () => norm.meet());
+  const na = metAanbouw('server/routes/klok.js', extra, () => meetVolledig());
   _routeGat = { zonderTest: na.endpointsZonderTest - voor.endpointsZonderTest,
     pctVal: voor.dekkingPct - na.dekkingPct,
     /* De honderd ijkroutes zitten onder /api/zzijkproef/, dus ze vormen een NIEUW
@@ -244,7 +255,7 @@ const IJKINGEN = {
       return uit.bewijsAchterstand;
     }
   },
-  /* DE TWEE DEURMETERS, EN WAAROM ER MAAR EEN VAN ZE norm.meet() AANROEPT.
+  /* DE TWEE DEURMETERS, EN WAAROM ER MAAR EEN VAN ZE meet() AANROEPT.
 
      dbDeuren telt de bestanden buiten server/db/ die db.data rechtstreeks
      aanraken; dbDeurenSchrijvend het deel daarvan dat er ook IN schrijft. Ze
@@ -257,7 +268,7 @@ const IJKINGEN = {
      proeven netjes omhoog en ziet de ijking niets. Daarom kijkt elke proef ook
      naar de ANDERE meter.
 
-     DE KOSTEN. norm.meet() doet de hele ronde en duurt minuten. Twee proeven die
+     DE KOSTEN. meet() doet de hele ronde en duurt minuten. Twee proeven die
      hem allebei aanroepen kosten dat twee keer, bij elke draai van de suite, voor
      altijd. Dat is niet gratis en het levert hier niets extra's op: beide meters
      komen in scripts/norm.js uit EEN aanroep van deuren.meet(). Dus roept
@@ -286,7 +297,7 @@ const IJKINGEN = {
       '/* ijking: schrijft rechtstreeks IN db.data, langs de datalaag heen */\n' +
       'module.exports = (db) => { db.data.zzIjkTeller = (db.data.zzIjkTeller || 0) + 1; };\n',
       () => {
-        const na = norm.meet();
+        const na = meet();
         assert.equal(na.dbDeuren - voor.dbDeuren, 1,
           'een schrijver is ook een deur en hoort in BEIDE meters te tellen');
         /* De bedrading, voor allebei: norm.js hoort deze twee velden uit dezelfde
@@ -302,7 +313,7 @@ const IJKINGEN = {
   testbestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
-      () => norm.meet().testbestanden - voor.testbestanden)
+      () => meet().testbestanden - voor.testbestanden)
   },
   schermenZonderVormtaal: {
     /* TWEE KANTEN, want een meter die maar EEN kant beweegt zegt de helft. Een
@@ -313,12 +324,12 @@ const IJKINGEN = {
     proef: (voor) => {
       const zonder = metTijdelijkBestand('public/apps/zz-ijk-tijdelijk.html',
         '<!doctype html><html lang="nl"><head><title>ijk</title></head><body></body></html>\n',
-        () => norm.meet().schermenZonderVormtaal - voor.schermenZonderVormtaal);
+        () => meet().schermenZonderVormtaal - voor.schermenZonderVormtaal);
       assert.equal(zonder, 1, 'een pagina zonder de tokenlaag telt mee als gat');
       const met = metTijdelijkBestand('public/apps/zz-ijk-tijdelijk.html',
         '<!doctype html><html lang="nl"><head><link href="/shared/rtg-ontwerp.css" rel="stylesheet">' +
         '</head><body></body></html>\n',
-        () => norm.meet().schermenZonderVormtaal - voor.schermenZonderVormtaal);
+        () => meet().schermenZonderVormtaal - voor.schermenZonderVormtaal);
       assert.equal(met, 0, 'dezelfde pagina MET de tokenlaag telt niet mee');
       return zonder;
     }
@@ -326,7 +337,7 @@ const IJKINGEN = {
   e2eBestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.e2e.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
-      () => norm.meet().e2eBestanden - voor.e2eBestanden)
+      () => meet().e2eBestanden - voor.e2eBestanden)
   },
   zelfpoortendeToetsen: {
     // een toets die zichzelf overslaat MOET meetellen; de vorm met een
@@ -334,7 +345,7 @@ const IJKINGEN = {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\nconst aan = false;\n" +
       "test('ijk', { skip: aan ? false : 'geen dienst' }, () => {});\n",
-      () => norm.meet().zelfpoortendeToetsen - voor.zelfpoortendeToetsen)
+      () => meet().zelfpoortendeToetsen - voor.zelfpoortendeToetsen)
   },
   browserpoortToetsen: {
     /* DE TWEEDE HELFT VAN DEZELFDE TELLING, en de proef staat er vooral om de
@@ -358,7 +369,7 @@ const IJKINGEN = {
     // een productbestand vlak onder de 10 kB-grens hoort opgemerkt te worden
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
       '/* ijkbestand */\n' + 'const x = "' + 'y'.repeat(9900) + '";\nmodule.exports = { x };\n',
-      () => norm.meet().keuringOmvang - voor.keuringOmvang)
+      () => meetVolledig().keuringOmvang - voor.keuringOmvang)
   },
   keuringTeGroot: {
     /* HETZELFDE BESTAND, MAAR DAN ECHT TE GROOT. En dat is niet zomaar een
@@ -372,7 +383,7 @@ const IJKINGEN = {
        andere wegvalt. */
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
       '/* ijkbestand */\n' + 'const x = "' + 'y'.repeat(12000) + '";\nmodule.exports = { x };\n',
-      () => norm.meet().keuringTeGroot - voor.keuringTeGroot)
+      () => meetVolledig().keuringTeGroot - voor.keuringTeGroot)
   },
   inlineStijlAttributen: {
     /* DE RATEL OP DE LAATSTE unsafe-inline. Twee kanten geijkt, want dit getal
@@ -678,7 +689,7 @@ const IJKINGEN = {
      Beide zijn in dit huis al gebeurd (eerlijkheidspunt 6.4 en, deze sessie,
      server/lokaal-tls.js dat gemuteerd bleef staan na een kill).
 
-     norm.meet() neemt nu een LEZER aan. De verzonnen uitslag gaat er als tekst
+     meet() neemt nu een LEZER aan. De verzonnen uitslag gaat er als tekst
      in, dus de meter doet nog steeds alles zelf: lezen, parsen, tellen. Wat er
      niet meer gebeurt, is op schijf schrijven -- en dus is er ook niets meer om
      terug te zetten of te verliezen. */
@@ -734,7 +745,7 @@ const IJKINGEN = {
         const j = JSON.parse(oud);
         j.dependencies = Object.assign({}, j.dependencies, { 'zz-ijk-tijdelijk': '^1.0.0' });
         fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
-        return norm.meet().dependencies - voor.dependencies;
+        return meet().dependencies - voor.dependencies;
       } finally { fs.writeFileSync(p, oud); }
     }
   },
@@ -752,7 +763,7 @@ const IJKINGEN = {
         const j = JSON.parse(oud);
         j.devDependencies = Object.assign({}, j.devDependencies, { 'zz-ijk-dev': '^1.0.0' });
         fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
-        const na = norm.meet();
+        const na = meet();
         assert.equal(na.dependencies, voor.dependencies,
           'een dev-pakket hoort de RUNTIME-meter met rust te laten, anders is de scheiding er alleen op papier');
         return na.devPakketten - voor.devPakketten;
@@ -831,7 +842,7 @@ const IJKINGEN = {
        bewaakt een ongeijkte meter het ijken. Hij krijgt twee verzonnen
        registraties: in de ene draagt een ECHTE metersleutel een reden, in de
        andere dezelfde sleutel een proef. Het verschil hoort exact 1 te zijn.
-       Geen norm.meet() nodig, en dat is geen luiheid: telOngeijkt() neemt zijn
+       Geen meet() nodig, en dat is geen luiheid: telOngeijkt() neemt zijn
        bron als invoer juist zodat deze ijking kan bestaan. */
     proef: () => {
       const bouw = (regel) => 'const IJKINGEN = {\n  ' + regel + '\n};\n';
@@ -874,7 +885,7 @@ const IJKINGEN = {
       '  const { app } = kern;\n' +
       '  app.post(\'/api/zz-ijk/proef\', (req, res) => res.json({ realName: \'Jan Jansen\' }));\n' +
       '};\n',
-      () => norm.meet().keuringStuk - voor.keuringStuk)
+      () => meetVolledig().keuringStuk - voor.keuringStuk)
   },
   keuringScheef: {
     /* Een tekst die zegt dat een boeking bevestigd is. Dat mag dit huis nooit
@@ -889,7 +900,7 @@ const IJKINGEN = {
          dat te zien. */
       '/* tijdelijk ijkbestand */\n' +
       'module.exports = () => ({ melding: \'Uw boeking is bevestigd en staat klaar.\' });\n',
-      () => norm.meet().keuringScheef - voor.keuringScheef)
+      () => meetVolledig().keuringScheef - voor.keuringScheef)
   },
   keuringDubbeling: {
     /* DRIE KERNMODULES MET DEZELFDE FUNCTIENAAM. De reden die hier stond
@@ -903,7 +914,7 @@ const IJKINGEN = {
         'function zzIjkTijdelijkeNaam(x) { return x; }\n' +
         'module.exports = { zzIjkTijdelijkeNaam };\n';
       const ga = (i) => i === paden.length
-        ? norm.meet().keuringDubbeling - voor.keuringDubbeling
+        ? meetVolledig().keuringDubbeling - voor.keuringDubbeling
         : metTijdelijkBestand(paden[i], inhoud, () => ga(i + 1));
       return ga(0);
     }
@@ -1188,7 +1199,7 @@ const IJKINGEN = {
        niet beweegbaar is, terwijl hij precies deed wat hij hoort te doen. */
     proef: (voor) => metTijdelijkBestand('server/kern/zzijkbron.js',
       "const doel = require('./zzijkdoel');\nmodule.exports = () => doel;\n",
-      () => norm.meet().verstrengelingOnverklaard - voor.verstrengelingOnverklaard)
+      () => meet().verstrengelingOnverklaard - voor.verstrengelingOnverklaard)
   },
   routesNietSchakelbaar: {
     /* Een route die nergens in het schakelbord staat. Dat is precies wat deze
@@ -1209,7 +1220,7 @@ const IJKINGEN = {
       '  const { app } = kern;\n' +
       '  app.post(\'/api/zz-ijk/proef\', (req, res) => res.json({ ok: true }));\n' +
       '};\n',
-      () => norm.meet().routesNietSchakelbaar - voor.routesNietSchakelbaar)
+      () => meet().routesNietSchakelbaar - voor.routesNietSchakelbaar)
   },
   onbewaakt: {
     /* EEN REGEL IN LAT.md ZONDER HANDHAVER. De reden die hier stond ("gaat over
@@ -1345,7 +1356,7 @@ const IJKINGEN = {
   ratelTanden: {
     proef: (voor) => metTijdelijkBestand('scripts/zz-ijk-tijdelijk.js',
       "'use strict';\nconst METER = 'zzIjkTand';\nmodule.exports = { METER };\n",
-      () => norm.meet().ratelTanden - voor.ratelTanden)
+      () => meet().ratelTanden - voor.ratelTanden)
   },
 
   /* `metingenZonderRatel` telt de meetbestanden in de wortel waar geen ratel
@@ -1469,7 +1480,7 @@ const IJKINGEN = {
   metingenZonderRatel: {
     proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
       '{ "uitleg": "verzonnen meting zonder ratel, alleen tijdens de ijking" }\n',
-      () => norm.meet().metingenZonderRatel - voor.metingenZonderRatel)
+      () => meet().metingenZonderRatel - voor.metingenZonderRatel)
   },
   /* HET BEWIJSPASPOORT (STANDAARD.md par. 5). Dezelfde tijdelijke naam als de
      meter hierboven, want hij staat al in de opruimcontrole -- alleen met een
@@ -1481,7 +1492,7 @@ const IJKINGEN = {
   registersUitVuileBoom: {
     proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
       '{ "stempel": { "commit": "0000000", "boomVuil": true } }\n',
-      () => norm.meet().registersUitVuileBoom - voor.registersUitVuileBoom)
+      () => meet().registersUitVuileBoom - voor.registersUitVuileBoom)
   },
 
   /* DE TWEE VAN 3 SEPTEMBER 2026. Allebei lezen ze een register dat er AL is,
@@ -1495,12 +1506,12 @@ const IJKINGEN = {
   laatSpoorVerdacht: {
     proef: (voor) => metVervangenJson('LAATSPOOR.json',
       (j) => { j.gemeten.verdacht = (j.gemeten.verdacht || 0) + 7; return j; },
-      () => norm.meet().laatSpoorVerdacht - voor.laatSpoorVerdacht)
+      () => meet().laatSpoorVerdacht - voor.laatSpoorVerdacht)
   },
   rollbackUitzonderingen: {
     proef: (voor) => metVervangenJson('ROLLBACKBESLUIT.json',
       (j) => { j.routes['/api/zz-ijk-verzonnen'] = { klasse: 'veilige-kant', reden: 'ijking' }; return j; },
-      () => norm.meet().rollbackUitzonderingen - voor.rollbackUitzonderingen)
+      () => meet().rollbackUitzonderingen - voor.rollbackUitzonderingen)
   },
   /* Zelfde vorm, en om dezelfde reden: deze meter telt een POST in een register.
      Leest hij het verkeerde veld -- of een ontbrekend bestand als nul -- dan
@@ -1510,7 +1521,7 @@ const IJKINGEN = {
   faalproefGezakt: {
     proef: (voor) => metVervangenJson('FAALPROEF.json',
       (j) => { j.gemeten.gezakt = (j.gemeten.gezakt || 0) + 5; return j; },
-      () => norm.meet().faalproefGezakt - voor.faalproefGezakt)
+      () => meet().faalproefGezakt - voor.faalproefGezakt)
   },
   /* DE TAND VAN 11 SEPTEMBER 2026: carriereDomeinenGemeten telt de
      talentdomeinen die scripts/carrierevorm.js werkelijk heeft gezien
@@ -1522,7 +1533,7 @@ const IJKINGEN = {
   carriereDomeinenGemeten: {
     proef: (voor) => metVervangenJson('CARRIEREVORM.json',
       (j) => { j.gemeten.domeinen = Math.max(0, (j.gemeten.domeinen || 0) - 3); return j; },
-      () => voor.carriereDomeinenGemeten - norm.meet().carriereDomeinenGemeten)
+      () => voor.carriereDomeinenGemeten - meet().carriereDomeinenGemeten)
   },
   /* DE TWEE TANDEN VAN 13 SEPTEMBER 2026: de ledencontext van Rahul
      (AICONTEXT.json, MENSNETWERK.md par. 4c). Twee meters op EEN register, en
@@ -1538,12 +1549,12 @@ const IJKINGEN = {
   aiContextLek: {
     proef: (voor) => metVervangenJson('AICONTEXT.json',
       (j) => { j.muur.lek = (j.muur.lek || []).concat(['bewaarVerzoek', 'conversation']); return j; },
-      () => norm.meet().aiContextLek - voor.aiContextLek)
+      () => meet().aiContextLek - voor.aiContextLek)
   },
   aiContextVeldenGezien: {
     proef: (voor) => metVervangenJson('AICONTEXT.json',
       (j) => { j.ledenstaat.aantal = Math.max(0, (j.ledenstaat.aantal || 0) - 4); return j; },
-      () => voor.aiContextVeldenGezien - norm.meet().aiContextVeldenGezien)
+      () => voor.aiContextVeldenGezien - meet().aiContextVeldenGezien)
   },
   /* DE TAND VAN 13 SEPTEMBER 2026: stageDomeinenGemeten telt de publieke
      domeinen die scripts/stagevorm.js werkelijk heeft gezien (STAGE.md par. 0).
@@ -1557,7 +1568,7 @@ const IJKINGEN = {
   stageDomeinenGemeten: {
     proef: (voor) => metVervangenJson('STAGEVORM.json',
       (j) => { j.gemeten.vorm.domeinen = Math.max(0, (j.gemeten.vorm.domeinen || 0) - 4); return j; },
-      () => voor.stageDomeinenGemeten - norm.meet().stageDomeinenGemeten)
+      () => voor.stageDomeinenGemeten - meet().stageDomeinenGemeten)
   },
   /* DE TWEE TANDEN VAN 15 SEPTEMBER 2026, bij NEIGINGVORM.json (NEIGING.md par.
      0). Ze staan allebei op een NUL of op een getal waar een besluit op rust, en
@@ -1579,12 +1590,12 @@ const IJKINGEN = {
   neigingVerwijzingRot: {
     proef: (voor) => metVervangenJson('NEIGINGVORM.json',
       (j) => { j.gemeten.voorstel.rot = (j.gemeten.voorstel.rot || 0) + 3; return j; },
-      () => norm.meet().neigingVerwijzingRot - voor.neigingVerwijzingRot)
+      () => meet().neigingVerwijzingRot - voor.neigingVerwijzingRot)
   },
   neigingVoorkeurBlind: {
     proef: (voor) => metVervangenJson('NEIGINGVORM.json',
       (j) => { j.gemeten.voorkeur.metAlledrie = (j.gemeten.voorkeur.metAlledrie || 0) + 4; return j; },
-      () => voor.neigingVoorkeurBlind - norm.meet().neigingVoorkeurBlind)
+      () => voor.neigingVoorkeurBlind - meet().neigingVoorkeurBlind)
   },
   /* DE TAND VAN 14 SEPTEMBER 2026: namensMechanismenGemeten telt de mechanismen
      van namens-iemand-handelen die scripts/namensvorm.js op zijn grammatica
@@ -1599,7 +1610,7 @@ const IJKINGEN = {
   namensMechanismenGemeten: {
     proef: (voor) => metVervangenJson('NAMENSVORM.json',
       (j) => { j.gemeten.werkwoord.mechanismen = Math.max(0, (j.gemeten.werkwoord.mechanismen || 0) - 3); return j; },
-      () => voor.namensMechanismenGemeten - norm.meet().namensMechanismenGemeten)
+      () => voor.namensMechanismenGemeten - meet().namensMechanismenGemeten)
   },
   /* DE TAND VAN 15 SEPTEMBER 2026: spoorConvergent telt de mechanismen die alle
      VIER de spoor-eigenschappen van kern/vertegenwoordiging/handelen.js halen
@@ -1621,7 +1632,7 @@ const IJKINGEN = {
   spoorConvergent: {
     proef: (voor) => metVervangenJson('SPOORVORM.json',
       (j) => { j.gemeten.volledigConvergent = (j.gemeten.volledigConvergent || 0) + 2; return j; },
-      () => norm.meet().spoorConvergent - voor.spoorConvergent)
+      () => meet().spoorConvergent - voor.spoorConvergent)
   },
   /* DE TAND VAN 15 SEPTEMBER 2026: connectDomeinenGemeten telt de
      ontdekkingsdomeinen die scripts/connectlus.js werkelijk heeft gezien
@@ -1635,7 +1646,7 @@ const IJKINGEN = {
   connectDomeinenGemeten: {
     proef: (voor) => metVervangenJson('CONNECTLUS.json',
       (j) => { j.werkwoorden.domeinen = Math.max(0, (j.werkwoorden.domeinen || 0) - 6); return j; },
-      () => voor.connectDomeinenGemeten - norm.meet().connectDomeinenGemeten)
+      () => voor.connectDomeinenGemeten - meet().connectDomeinenGemeten)
   },
   /* DE TAND VAN 13 SEPTEMBER 2026 (tweede): wekZonderUitspraak telt de publieke
      domeinen waarover het wekbesluitregister zwijgt. Hij staat op NUL, en dat
@@ -1646,7 +1657,7 @@ const IJKINGEN = {
   wekZonderUitspraak: {
     proef: (voor) => metVervangenJson('WEKDEKKING.json',
       (j) => { j.gemeten.zonderUitspraak = (j.gemeten.zonderUitspraak || 0) + 3; return j; },
-      () => norm.meet().wekZonderUitspraak - voor.wekZonderUitspraak)
+      () => meet().wekZonderUitspraak - voor.wekZonderUitspraak)
   },
   /* DE TAND VAN 13 SEPTEMBER 2026 (derde): momentOpenBekend telt de schakels in
      de publieke keten die aantoonbaar OPENSTAAN met een uitgeschreven reden
@@ -1663,7 +1674,7 @@ const IJKINGEN = {
   momentOpenBekend: {
     proef: (voor) => metVervangenJson('MOMENTPROEF.json',
       (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 2; return j; },
-      () => norm.meet().momentOpenBekend - voor.momentOpenBekend)
+      () => meet().momentOpenBekend - voor.momentOpenBekend)
   },
   /* DE DRIE TANDEN VAN IDEMIDENTITEIT.json (14 september 2026,
      MUTATIECONTRACT.md par. 6e). Elk veld een eigen verstoring, met een eigen
@@ -1677,17 +1688,17 @@ const IJKINGEN = {
   idemVerklaard: {
     proef: (voor) => metVervangenJson('IDEMIDENTITEIT.json',
       (j) => { j.verklaard = Math.max(0, (j.verklaard || 0) - 1); return j; },
-      () => voor.idemVerklaard - norm.meet().idemVerklaard)
+      () => voor.idemVerklaard - meet().idemVerklaard)
   },
   idemAfdrukVoegtNietsToe: {
     proef: (voor) => metVervangenJson('IDEMIDENTITEIT.json',
       (j) => { j.voegtNietsToe = (j.voegtNietsToe || 0) + 4; return j; },
-      () => norm.meet().idemAfdrukVoegtNietsToe - voor.idemAfdrukVoegtNietsToe)
+      () => meet().idemAfdrukVoegtNietsToe - voor.idemAfdrukVoegtNietsToe)
   },
   idemHandwerkGeenVergelijking: {
     proef: (voor) => metVervangenJson('IDEMIDENTITEIT.json',
       (j) => { j.handwerkGeenVergelijking = (j.handwerkGeenVergelijking || 0) + 6; return j; },
-      () => norm.meet().idemHandwerkGeenVergelijking - voor.idemHandwerkGeenVergelijking)
+      () => meet().idemHandwerkGeenVergelijking - voor.idemHandwerkGeenVergelijking)
   },
   /* De drie tanden van STILSPOOR.json: twee schulden omhoog en het gemeten
      bereik omlaag. Elk veld krijgt een eigen verstoring, zodat verwisselde
@@ -1695,17 +1706,17 @@ const IJKINGEN = {
   stilSpoor: {
     proef: (voor) => metVervangenJson('STILSPOOR.json',
       (j) => { j.gemeten.spoorGesmoord = (j.gemeten.spoorGesmoord || 0) + 5; return j; },
-      () => norm.meet().stilSpoor - voor.stilSpoor)
+      () => meet().stilSpoor - voor.stilSpoor)
   },
   stilleOpslag: {
     proef: (voor) => metVervangenJson('STILSPOOR.json',
       (j) => { j.gemeten.opslagGesmoord = (j.gemeten.opslagGesmoord || 0) + 7; return j; },
-      () => norm.meet().stilleOpslag - voor.stilleOpslag)
+      () => meet().stilleOpslag - voor.stilleOpslag)
   },
   stilSpoorAanroepen: {
     proef: (voor) => metVervangenJson('STILSPOOR.json',
       (j) => { j.gemeten.spoorAanroepen = Math.max(0, (j.gemeten.spoorAanroepen || 0) - 40); return j; },
-      () => voor.stilSpoorAanroepen - norm.meet().stilSpoorAanroepen)
+      () => voor.stilSpoorAanroepen - meet().stilSpoorAanroepen)
   },
   /* DE DRIE TANDEN VAN STEMPELVEILIGHEID.json (15 september 2026). Dezelfde vorm
      als STILSPOOR.json hierboven -- twee schulden omhoog, het bereik omlaag --
@@ -1720,7 +1731,7 @@ const IJKINGEN = {
   stempelOngevraagd: {
     proef: (voor) => metVervangenJson('STEMPELVEILIGHEID.json',
       (j) => { j.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN = (j.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN || 0) + 9; return j; },
-      () => norm.meet().stempelOngevraagd - voor.stempelOngevraagd)
+      () => meet().stempelOngevraagd - voor.stempelOngevraagd)
   },
   stempelInPoort: {
     proef: (voor) => metVervangenJson('STEMPELVEILIGHEID.json',
@@ -1731,12 +1742,12 @@ const IJKINGEN = {
            { naam: 'verzonnen-c.js', viaPoort: ['norm'] }]);
         return j;
       },
-      () => norm.meet().stempelInPoort - voor.stempelInPoort)
+      () => meet().stempelInPoort - voor.stempelInPoort)
   },
   stempelSchrijversGezien: {
     proef: (voor) => metVervangenJson('STEMPELVEILIGHEID.json',
       (j) => { j.schrijvers = Math.max(0, (j.schrijvers || 0) - 30); return j; },
-      () => voor.stempelSchrijversGezien - norm.meet().stempelSchrijversGezien)
+      () => voor.stempelSchrijversGezien - meet().stempelSchrijversGezien)
   },
   /* DE VIER TANDEN VAN STILLEZING.json -- de spiegel van STILSPOOR hierboven.
      Elk veld krijgt een EIGEN verstoring en een eigen grootte, zodat twee
@@ -1751,12 +1762,12 @@ const IJKINGEN = {
   stilLezing: {
     proef: (voor) => metVervangenJson('STILLEZING.json',
       (j) => { j.gemeten.server.smeltSamen = (j.gemeten.server.smeltSamen || 0) + 9; return j; },
-      () => norm.meet().stilLezing - voor.stilLezing)
+      () => meet().stilLezing - voor.stilLezing)
   },
   stilLezingMeters: {
     proef: (voor) => metVervangenJson('STILLEZING.json',
       (j) => { j.gemeten.scripts.smeltSamen = (j.gemeten.scripts.smeltSamen || 0) + 13; return j; },
-      () => norm.meet().stilLezingMeters - voor.stilLezingMeters)
+      () => meet().stilLezingMeters - voor.stilLezingMeters)
   },
   /* Het bereik telt de twee werelden WEL bij elkaar op -- de enige plek waar dat
      gebeurt, want blindheid is een eigenschap van het instrument. De verstoring
@@ -1765,13 +1776,13 @@ const IJKINGEN = {
   stilLezingBereik: {
     proef: (voor) => metVervangenJson('STILLEZING.json',
       (j) => { j.gemeten.scripts.bewijslezingen = Math.max(0, (j.gemeten.scripts.bewijslezingen || 0) - 55); return j; },
-      () => voor.stilLezingBereik - norm.meet().stilLezingBereik)
+      () => voor.stilLezingBereik - meet().stilLezingBereik)
   },
   bewijsOnderscheidt: {
     proef: (voor) => metVervangenJson('STILLEZING.json',
       (j) => { j.gemeten.server.onderscheidt = Math.max(0, (j.gemeten.server.onderscheidt || 0) - 1);
                j.gemeten.scripts.onderscheidt = Math.max(0, (j.gemeten.scripts.onderscheidt || 0) - 2); return j; },
-      () => voor.bewijsOnderscheidt - norm.meet().bewijsOnderscheidt)
+      () => voor.bewijsOnderscheidt - meet().bewijsOnderscheidt)
   },
   /* DE DRIE TANDEN VAN AFGELEID.json -- generator-eigenaarschap.
 
@@ -1783,17 +1794,17 @@ const IJKINGEN = {
   afgeleidZonderEigenaar: {
     proef: (voor) => metVervangenJson('AFGELEID.json',
       (j) => { j.gemeten.afgeleidZonderEigenaar = (j.gemeten.afgeleidZonderEigenaar || 0) + 6; return j; },
-      () => norm.meet().afgeleidZonderEigenaar - voor.afgeleidZonderEigenaar)
+      () => meet().afgeleidZonderEigenaar - voor.afgeleidZonderEigenaar)
   },
   afgeleidOnbeslist: {
     proef: (voor) => metVervangenJson('AFGELEID.json',
       (j) => { j.gemeten.onbeslist = (j.gemeten.onbeslist || 0) + 11; return j; },
-      () => norm.meet().afgeleidOnbeslist - voor.afgeleidOnbeslist)
+      () => meet().afgeleidOnbeslist - voor.afgeleidOnbeslist)
   },
   afgeleidMetEigenaar: {
     proef: (voor) => metVervangenJson('AFGELEID.json',
       (j) => { j.gemeten.metEigenaar = Math.max(0, (j.gemeten.metEigenaar || 0) - 23); return j; },
-      () => voor.afgeleidMetEigenaar - norm.meet().afgeleidMetEigenaar)
+      () => voor.afgeleidMetEigenaar - meet().afgeleidMetEigenaar)
   },
   /* DE TWEE TANDEN VAN HERBOUWPROEF.json -- eigenaarschap is geen bewijs.
 
@@ -1806,12 +1817,12 @@ const IJKINGEN = {
   herbouwVerschilt: {
     proef: (voor) => metVervangenJson('HERBOUWPROEF.json',
       (j) => { j.gemeten.verschilt = (j.gemeten.verschilt || 0) + 4; return j; },
-      () => norm.meet().herbouwVerschilt - voor.herbouwVerschilt)
+      () => meet().herbouwVerschilt - voor.herbouwVerschilt)
   },
   herbouwBewezen: {
     proef: (voor) => metVervangenJson('HERBOUWPROEF.json',
       (j) => { j.gemeten.herbouwbaar = Math.max(0, (j.gemeten.herbouwbaar || 0) - 9); return j; },
-      () => voor.herbouwBewezen - norm.meet().herbouwBewezen)
+      () => voor.herbouwBewezen - meet().herbouwBewezen)
   },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
@@ -1821,7 +1832,7 @@ const IJKINGEN = {
   appwerktDefecten: {
     proef: (voor) => metVervangenJson('APPWERKT.json',
       (j) => { j.gemeten.defecten = (j.gemeten.defecten || 0) + 3; return j; },
-      () => norm.meet().appwerktDefecten - voor.appwerktDefecten)
+      () => meet().appwerktDefecten - voor.appwerktDefecten)
   },
   /* DE VIER TANDEN VAN 12 SEPTEMBER 2026: de economische dekking
      (GELDDEKKING.json). Elk van de vier leest EEN veld uit `ratel`, en dat is
@@ -1836,32 +1847,32 @@ const IJKINGEN = {
   geldRoutesPubliek: {
     proef: (voor) => metVervangenJson('GELDDEKKING.json',
       (j) => { j.ratel.geldRoutesPubliek = (j.ratel.geldRoutesPubliek || 0) + 2; return j; },
-      () => norm.meet().geldRoutesPubliek - voor.geldRoutesPubliek)
+      () => meet().geldRoutesPubliek - voor.geldRoutesPubliek)
   },
   geldRoutesZonderSemantiek: {
     proef: (voor) => metVervangenJson('GELDDEKKING.json',
       (j) => { j.ratel.geldRoutesZonderSemantiek = (j.ratel.geldRoutesZonderSemantiek || 0) + 3; return j; },
-      () => norm.meet().geldRoutesZonderSemantiek - voor.geldRoutesZonderSemantiek)
+      () => meet().geldRoutesZonderSemantiek - voor.geldRoutesZonderSemantiek)
   },
   geldRoutesZonderIdemBewijs: {
     proef: (voor) => metVervangenJson('GELDDEKKING.json',
       (j) => { j.ratel.geldRoutesZonderIdemBewijs = (j.ratel.geldRoutesZonderIdemBewijs || 0) + 4; return j; },
-      () => norm.meet().geldRoutesZonderIdemBewijs - voor.geldRoutesZonderIdemBewijs)
+      () => meet().geldRoutesZonderIdemBewijs - voor.geldRoutesZonderIdemBewijs)
   },
   geldRoutesZonderTerugweg: {
     proef: (voor) => metVervangenJson('GELDDEKKING.json',
       (j) => { j.ratel.geldRoutesZonderTerugweg = (j.ratel.geldRoutesZonderTerugweg || 0) + 5; return j; },
-      () => norm.meet().geldRoutesZonderTerugweg - voor.geldRoutesZonderTerugweg)
+      () => meet().geldRoutesZonderTerugweg - voor.geldRoutesZonderTerugweg)
   },
   geldRoutesHerstelOnbesloten: {
     proef: (voor) => metVervangenJson('GELDDEKKING.json',
       (j) => { j.ratel.geldRoutesHerstelOnbesloten = (j.ratel.geldRoutesHerstelOnbesloten || 0) + 6; return j; },
-      () => norm.meet().geldRoutesHerstelOnbesloten - voor.geldRoutesHerstelOnbesloten)
+      () => meet().geldRoutesHerstelOnbesloten - voor.geldRoutesHerstelOnbesloten)
   },
   geldRoutesHerstelTegenspraak: {
     proef: (voor) => metVervangenJson('GELDDEKKING.json',
       (j) => { j.ratel.geldRoutesHerstelTegenspraak = (j.ratel.geldRoutesHerstelTegenspraak || 0) + 7; return j; },
-      () => norm.meet().geldRoutesHerstelTegenspraak - voor.geldRoutesHerstelTegenspraak)
+      () => meet().geldRoutesHerstelTegenspraak - voor.geldRoutesHerstelTegenspraak)
   },
   /* De meldplicht-tand, met een EIGEN ophoging (8) en niet dezelfde als zijn
      buren hierboven: alle drie lezen ze uit `j.ratel` van hetzelfde register,
@@ -1871,12 +1882,12 @@ const IJKINGEN = {
   geldRoutesMeldOnbesloten: {
     proef: (voor) => metVervangenJson('GELDDEKKING.json',
       (j) => { j.ratel.geldRoutesMeldOnbesloten = (j.ratel.geldRoutesMeldOnbesloten || 0) + 8; return j; },
-      () => norm.meet().geldRoutesMeldOnbesloten - voor.geldRoutesMeldOnbesloten)
+      () => meet().geldRoutesMeldOnbesloten - voor.geldRoutesMeldOnbesloten)
   },
   geldRoutesValsSucces: {
     proef: (voor) => metVervangenJson('SCHRIJFPROEF.json',
       (j) => { j.telling.VALS_SUCCES = (j.telling.VALS_SUCCES || 0) + 9; return j; },
-      () => norm.meet().geldRoutesValsSucces - voor.geldRoutesValsSucces)
+      () => meet().geldRoutesValsSucces - voor.geldRoutesValsSucces)
   },
   /* DE TWEE TANDEN VAN DE VERTICALE GELDPROEF (FACTUURPROEF.json). Ze lezen
      verschillende velden uit dezelfde `telling`, en juist dat is hier de
@@ -1887,13 +1898,13 @@ const IJKINGEN = {
   geldpadGezakt: {
     proef: (voor) => metVervangenJson('FACTUURPROEF.json',
       (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 4; return j; },
-      () => norm.meet().geldpadGezakt - voor.geldpadGezakt)
+      () => meet().geldpadGezakt - voor.geldpadGezakt)
   },
   geldpadOnbewezen: {
     proef: (voor) => metVervangenJson('FACTUURPROEF.json',
       (j) => { j.telling.BLOCKED = (j.telling.BLOCKED || 0) + 2;
         j.telling.UNKNOWN = (j.telling.UNKNOWN || 0) + 3; return j; },
-      () => norm.meet().geldpadOnbewezen - voor.geldpadOnbewezen)
+      () => meet().geldpadOnbewezen - voor.geldpadOnbewezen)
   },
   /* DE TWEE TANDEN VAN 13 SEPTEMBER 2026 (CRASHAS.json), en ze worden apart
      geijkt omdat ze apart bestaan.
@@ -1910,12 +1921,12 @@ const IJKINGEN = {
   crashasOnbekend: {
     proef: (voor) => metVervangenJson('CRASHAS.json',
       (j) => { j.telling.onbekend = (j.telling.onbekend || 0) + 7; return j; },
-      () => norm.meet().crashasOnbekend - voor.crashasOnbekend)
+      () => meet().crashasOnbekend - voor.crashasOnbekend)
   },
   crashasNietMeetbaar: {
     proef: (voor) => metVervangenJson('CRASHAS.json',
       (j) => { j.telling.meetbaar = (j.telling.meetbaar || 0) - 5; return j; },
-      () => norm.meet().crashasNietMeetbaar - voor.crashasNietMeetbaar)
+      () => meet().crashasNietMeetbaar - voor.crashasNietMeetbaar)
   },
   /* DE TWEE TANDEN VAN DE CRASHPROEF (CRASHPROEF.json), en ze worden apart
      geijkt om dezelfde reden als hierboven: ze tellen verschillende dingen en
@@ -1933,7 +1944,7 @@ const IJKINGEN = {
   crashproefGezakt: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
       (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 6; return j; },
-      () => norm.meet().crashproefGezakt - voor.crashproefGezakt)
+      () => meet().crashproefGezakt - voor.crashproefGezakt)
   },
   /* DEZE VIER IJKEN OP `per` EN NIET OP `telling`, en dat verschil is met een
      RODE IJKING geleerd. De tanden telden RIJEN en lazen daarvoor
@@ -1951,22 +1962,22 @@ const IJKINGEN = {
   crashproefGeenLijf: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
       (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_BODY', 9)); return j; },
-      () => norm.meet().crashproefGeenLijf - voor.crashproefGeenLijf)
+      () => meet().crashproefGeenLijf - voor.crashproefGeenLijf)
   },
   crashproefGeenWereld: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
       (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_WORLD', 7)); return j; },
-      () => norm.meet().crashproefGeenWereld - voor.crashproefGeenWereld)
+      () => meet().crashproefGeenWereld - voor.crashproefGeenWereld)
   },
   crashproefGeenRol: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
       (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_ROLE', 5)); return j; },
-      () => norm.meet().crashproefGeenRol - voor.crashproefGeenRol)
+      () => meet().crashproefGeenRol - voor.crashproefGeenRol)
   },
   crashproefOnbepaald: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
       (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_ONBEPAALD', 4)); return j; },
-      () => norm.meet().crashproefOnbepaald - voor.crashproefOnbepaald)
+      () => meet().crashproefOnbepaald - voor.crashproefOnbepaald)
   },
   /* DE DRIE TANDEN VAN DE GEVOLGDEKKING (GEVOLGDEKKING.json, 13 september 2026).
 
@@ -1984,17 +1995,17 @@ const IJKINGEN = {
   gevolgPadenOnbekend: {
     proef: (voor) => metVervangenJson('GEVOLGDEKKING.json',
       (j) => { j.tellers.onbekendeEffectpaden = (j.tellers.onbekendeEffectpaden || 0) + 3; return j; },
-      () => norm.meet().gevolgPadenOnbekend - voor.gevolgPadenOnbekend)
+      () => meet().gevolgPadenOnbekend - voor.gevolgPadenOnbekend)
   },
   gevolgContractVolledig: {
     proef: (voor) => metVervangenJson('GEVOLGDEKKING.json',
       (j) => { j.tellers.contractVolledig = (j.tellers.contractVolledig || 0) - 5; return j; },
-      () => voor.gevolgContractVolledig - norm.meet().gevolgContractVolledig)
+      () => voor.gevolgContractVolledig - meet().gevolgContractVolledig)
   },
   gevolgContractenGezakt: {
     proef: (voor) => metVervangenJson('GEVOLGDEKKING.json',
       (j) => { j.tellers.contractenGezakt = (j.tellers.contractenGezakt || 0) + 7; return j; },
-      () => norm.meet().gevolgContractenGezakt - voor.gevolgContractenGezakt)
+      () => meet().gevolgContractenGezakt - voor.gevolgContractenGezakt)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de
      eerste minuut die ZAKKEN (EERSTEMINUUT.json, telling.gezakt). Zelfde vorm
@@ -2009,7 +2020,7 @@ const IJKINGEN = {
   eersteMinuutGezakt: {
     proef: (voor) => metVervangenJson('EERSTEMINUUT.json',
       (j) => { j.telling.gezakt = (j.telling.gezakt || 0) + 3; return j; },
-      () => norm.meet().eersteMinuutGezakt - voor.eersteMinuutGezakt)
+      () => meet().eersteMinuutGezakt - voor.eersteMinuutGezakt)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026 (tweede): pakteMisgelopen telt de
      OPERATIONELE vragen die de antwoordrail claimt (PAKTE.json,
@@ -2024,7 +2035,7 @@ const IJKINGEN = {
   pakteMisgelopen: {
     proef: (voor) => metVervangenJson('PAKTE.json',
       (j) => { j.telling.misgelopen = (j.telling.misgelopen || 0) + 3; return j; },
-      () => norm.meet().pakteMisgelopen - voor.pakteMisgelopen)
+      () => meet().pakteMisgelopen - voor.pakteMisgelopen)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026 (derde): menstaalTeVer telt de zinnen die
      verder kwamen dan hun eigen `sideEffectMax` (MENSTAALPROEF.json,
@@ -2040,7 +2051,7 @@ const IJKINGEN = {
   menstaalTeVer: {
     proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
       (j) => { j.telling.teVer = (j.telling.teVer || 0) + 2; return j; },
-      () => norm.meet().menstaalTeVer - voor.menstaalTeVer)
+      () => meet().menstaalTeVer - voor.menstaalTeVer)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026 (vierde): goudenPlakGebreken telt wat er
      mankeert aan de ene keten die van begin tot eind is nagelopen
@@ -2054,7 +2065,7 @@ const IJKINGEN = {
   goudenPlakGebreken: {
     proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
       (j) => { j.goudenPlak.gebreken = (j.goudenPlak.gebreken || []).concat(['ijkproef', 'ijkproef']); return j; },
-      () => norm.meet().goudenPlakGebreken - voor.goudenPlakGebreken)
+      () => meet().goudenPlakGebreken - voor.goudenPlakGebreken)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026 (vijfde): samenhangGebreken telt wat er
      mankeert aan de drie toestanden van "liever later" (MENSTAALPROEF.json,
@@ -2068,7 +2079,7 @@ const IJKINGEN = {
   samenhangGebreken: {
     proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
       (j) => { j.gesprekssamenhang.gebreken = (j.gesprekssamenhang.gebreken || []).concat(['ijk', 'ijk']); return j; },
-      () => norm.meet().samenhangGebreken - voor.samenhangGebreken)
+      () => meet().samenhangGebreken - voor.samenhangGebreken)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026 (zesde): referentGebreken telt wat er mankeert
      aan de vier vormen van "die andere" (MENSTAALPROEF.json,
@@ -2081,7 +2092,7 @@ const IJKINGEN = {
   referentGebreken: {
     proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
       (j) => { j.referentveiligheid.gebreken = (j.referentveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
-      () => norm.meet().referentGebreken - voor.referentGebreken)
+      () => meet().referentGebreken - voor.referentGebreken)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026 (tiende): verwijzingGebreken telt wat er
      mankeert aan drie zinnen op dezelfde context (MENSTAALPROEF.json,
@@ -2093,7 +2104,7 @@ const IJKINGEN = {
   verwijzingGebreken: {
     proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
       (j) => { j.verwijzingveiligheid.gebreken = (j.verwijzingveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
-      () => norm.meet().verwijzingGebreken - voor.verwijzingGebreken)
+      () => meet().verwijzingGebreken - voor.verwijzingGebreken)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026 (negende): bevestigGebreken telt wat er
      mankeert aan de vraag of een instemming in het gesprek een klaargezette
@@ -2108,7 +2119,7 @@ const IJKINGEN = {
   bevestigGebreken: {
     proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
       (j) => { j.bevestigveiligheid.gebreken = (j.bevestigveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
-      () => norm.meet().bevestigGebreken - voor.bevestigGebreken)
+      () => meet().bevestigGebreken - voor.bevestigGebreken)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026 (achtste): geldGebreken telt wat er mankeert
      aan de drie toestanden van "betaal die" (MENSTAALPROEF.json,
@@ -2124,7 +2135,7 @@ const IJKINGEN = {
   geldGebreken: {
     proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
       (j) => { j.geldveiligheid.gebreken = (j.geldveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
-      () => norm.meet().geldGebreken - voor.geldGebreken)
+      () => meet().geldGebreken - voor.geldGebreken)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026 (zevende): mensmutatieZonderWacht telt de
      garanties die je uit de bron kunt HALEN zonder dat een wacht afgaat
@@ -2144,7 +2155,7 @@ const IJKINGEN = {
   mensmutatieZonderWacht: {
     proef: (voor) => metVervangenJson('MENSMUTATIE.json',
       (j) => { j.telling.geenWacht = (j.telling.geenWacht || 0) + 2; return j; },
-      () => norm.meet().mensmutatieZonderWacht - voor.mensmutatieZonderWacht)
+      () => meet().mensmutatieZonderWacht - voor.mensmutatieZonderWacht)
   },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
@@ -2154,7 +2165,7 @@ const IJKINGEN = {
   bewijsAlleenKeten: {
     proef: (voor) => metVervangenJson('BEWIJSLADDER.json',
       (j) => { j.telling.alleenKeten = (j.telling.alleenKeten || 0) + 4; return j; },
-      () => norm.meet().bewijsAlleenKeten - voor.bewijsAlleenKeten)
+      () => meet().bewijsAlleenKeten - voor.bewijsAlleenKeten)
   },
   /* DE TAND VAN 15 SEPTEMBER 2026: veranderbereikZonderBereik telt de toetsen
      waarvan het BRONBESTANDbereik nergens uit volgt -- niet statisch (geen
@@ -2172,7 +2183,7 @@ const IJKINGEN = {
   veranderbereikZonderBereik: {
     proef: (voor) => metVervangenJson('VERANDERBEREIK-RONDE.json',
       (j) => { j.gemeten.zonderBereik = (j.gemeten.zonderBereik || 0) + 4; return j; },
-      () => norm.meet().veranderbereikZonderBereik - voor.veranderbereikZonderBereik)
+      () => meet().veranderbereikZonderBereik - voor.veranderbereikZonderBereik)
   },
   /* DE TWEEDE TAND VAN DIE SPLITSING, EN HIJ GAAT DE ANDERE KANT OP. De
      statische as volgt uit de code alleen: dezelfde commit geeft altijd
@@ -2191,7 +2202,7 @@ const IJKINGEN = {
   veranderbereikStatisch: {
     proef: (voor) => metVervangenJson('VERANDERBEREIK-KENNIS.json',
       (j) => { j.gemeten.statischBereik = (j.gemeten.statischBereik || 0) - 4; return j; },
-      () => voor.veranderbereikStatisch - norm.meet().veranderbereikStatisch)
+      () => voor.veranderbereikStatisch - meet().veranderbereikStatisch)
   },
   /* DE DRIE TANDEN VAN 11 SEPTEMBER 2026 (LUSSEN.json, npm run lussen).
 
@@ -2207,17 +2218,17 @@ const IJKINGEN = {
   lussenGeenUitweg: {
     proef: (voor) => metVervangenJson('LUSSEN.json',
       (j) => { j.ratel.geenUitwegGevonden = (j.ratel.geenUitwegGevonden || 0) + 7; return j; },
-      () => norm.meet().lussenGeenUitweg - voor.lussenGeenUitweg)
+      () => meet().lussenGeenUitweg - voor.lussenGeenUitweg)
   },
   lussenKritiek: {
     proef: (voor) => metVervangenJson('LUSSEN.json',
       (j) => { j.ratel.kritiek = (j.ratel.kritiek || 0) + 6; return j; },
-      () => norm.meet().lussenKritiek - voor.lussenKritiek)
+      () => meet().lussenKritiek - voor.lussenKritiek)
   },
   lussenZonderOverlapRem: {
     proef: (voor) => metVervangenJson('LUSSEN.json',
       (j) => { j.ratel.wekkersAsyncZonderRem = (j.ratel.wekkersAsyncZonderRem || 0) + 5; return j; },
-      () => norm.meet().lussenZonderOverlapRem - voor.lussenZonderOverlapRem)
+      () => meet().lussenZonderOverlapRem - voor.lussenZonderOverlapRem)
   }
 };
 
@@ -2270,7 +2281,7 @@ function prestatieIjking(sleutel) {
 }
 
 test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
-  const voor = norm.meet();
+  const voor = meet();
   const geijkt = Object.keys(IJKINGEN).filter(k => IJKINGEN[k].proef);
   assert.ok(geijkt.length >= 5, 'er zijn ijkingen om te draaien (' + geijkt.length + ')');
 
@@ -2290,7 +2301,7 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
     meld('start ' + sleutel);
     let verschil = IJKINGEN[sleutel].proef(voor);
     if (!(verschil > 0)) {
-      const versNul = norm.meet();
+      const versNul = meet();
       verschil = IJKINGEN[sleutel].proef(versNul);
       meld('herijking ' + sleutel + ' tegen een verse nulmeting: verschil ' + verschil);
     }
@@ -2387,17 +2398,17 @@ test('een onbruikbaar MUTATIES.json laat de meter ZAKKEN en niet stil nul melden
     ['alleen niet-gemeten uitslagen', () => JSON.stringify({ toetsen: { 'a11ykeuring.test.js': { staat: 'geen module gevonden' } } })]
   ]) {
     assert.throws(() => norm.meet({ leesMutaties: lezer }), /MUTATIES\.json/,
-      'met "' + wat + '" hoort norm.meet() te gooien in plaats van een getal te geven');
+      'met "' + wat + '" hoort meet() te gooien in plaats van een getal te geven');
   }
 });
 
 test('DE TEGENPROEF: een BRUIKBARE lezer laat de meter gewoon meten', () => {
-  /* Zonder deze zou de toets hierboven ook groen blijven als norm.meet() ALTIJD
+  /* Zonder deze zou de toets hierboven ook groen blijven als meet() ALTIJD
      gooit, en dan bewijst hij dat een kapotte meter goed gebouwd is. */
   const echt = fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8');
   const na = norm.meet({ leesMutaties: () => echt });
   assert.equal(typeof na.toetsenOngevoeligPct, 'number');
-  assert.equal(na.toetsenNietGemeten, norm.meet().toetsenNietGemeten,
+  assert.equal(na.toetsenNietGemeten, meet().toetsenNietGemeten,
     'dezelfde inhoud via de lezer hoort hetzelfde getal te geven als van schijf');
 });
 

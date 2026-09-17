@@ -147,14 +147,14 @@ test('elke ijking heeft een eigen job in de keten', () => {
    terwijl er niets mis is met de wijziging. Erger nog: hij leest ook als rood
    als er WEL iets mis is, dus het signaal is aan beide kanten bedorven.
 
-   Deze toets houdt vast dat meterijk meer ruimte heeft dan de rest. Niet
-   hoeveel -- dat is een meting die mag schuiven -- maar DAT hij het heeft. Zet
-   iemand de grens terug op een gedeeld getal, dan is meterijk weer een
-   muntworp en zakt deze toets in plaats van een willekeurige PR.
+   Sinds 16 september delen de registerproeven één keuringssnapshot en meet de
+   volledige ijking 9m23s. Deze toets houdt nu vast dat de eigen grens met die
+   nieuwe werkelijkheid meeschuift: genoeg marge, maar geen 90 minuten waarin
+   een echte hang capaciteit kan vasthouden.
 
-   MUTATIE (LAT.md regel 2): de expressie vervangen door een vaste
-   `timeout-minutes: 45` -> deze toets ZAKT (RAAK). */
-test('meterijk heeft een eigen tijdgrens, ruimer dan de vijf snelle ijkingen', () => {
+   MUTATIE (LAT.md regel 2): de expressie terugzetten op 90/45 of vervangen door
+   één vaste grens -> deze toets ZAKT (RAAK). */
+test('meterijk heeft na snapshotdeling een eigen, gemeten tijdgrens', () => {
   const yml = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'ci.yml'), 'utf8');
   const blok = yml.slice(yml.indexOf('  ijkingen:'));
   const regel = /^\s*timeout-minutes:\s*(.+)$/m.exec(blok);
@@ -169,11 +169,12 @@ test('meterijk heeft een eigen tijdgrens, ruimer dan de vijf snelle ijkingen', (
   const [ruim, strak] = getallen;
   assert.ok(waarde.includes('meterijk'),
     'de ruimere grens hoort aan meterijk te hangen en niet aan een willekeurige matrixwaarde');
-  assert.ok(ruim > strak,
-    'meterijk hoort de RUIMERE grens te krijgen (' + ruim + ' vs ' + strak + ')');
-  assert.ok(ruim >= 60,
-    'meterijk duurde op 14 september 2026 gemeten 43 minuten; onder de 60 is er geen ruimte om ' +
-    'te groeien en staat de muntworp er morgen weer');
+  assert.ok(ruim < strak,
+    'na het delen van de keuringssnapshot hoort meterijk niet opnieuw de ruimste grens te krijgen (' +
+    ruim + ' vs ' + strak + ')');
+  assert.ok(ruim >= 20 && ruim <= 35,
+    'de volledige groene meting van 16 september is 9m23s; de grens hoort ruime marge te geven ' +
+    'zonder een hang weer 90 minuten te laten kosten (gevonden ' + ruim + ')');
 });
 
 /* DE VIJFDE MANIER: EEN RUISFILTER DAT TE VEEL WEGVANGT.

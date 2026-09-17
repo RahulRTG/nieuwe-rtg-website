@@ -2524,6 +2524,14 @@
       "staat": "geen bronmutatie mogelijk",
       "reden": "ijkt zichzelf met een echte blokkade van 200 ms, met onder- en bovengrens en de eis dat de mediaan niet meebeweegt. Nagetrokken: lusVertraging() nul laten melden laat drie van de vier toetsen zakken"
     },
+    "evidence-engine.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/evidence-dag.js",
+      "operator": "getal+1#4",
+      "gezakt": 1,
+      "geprobeerd": 5
+    },
     "excursie.test.js": {
       "soort": "server",
       "staat": "gezakt",

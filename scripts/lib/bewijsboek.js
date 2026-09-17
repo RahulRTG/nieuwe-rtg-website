@@ -63,6 +63,10 @@ function bestandsHash(rel) {
    ontbrekend werk maar een gedragen feit: het verkort de houdbaarheid. */
 function omgeving() {
   const pkg = (() => { try { return JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8')); } catch (e) { return {}; } })();
+  const lock = (() => { try { return JSON.parse(fs.readFileSync(path.join(WORTEL, 'package-lock.json'), 'utf8')); } catch (e) { return {}; } })();
+  const playwright = lock.packages && (lock.packages['node_modules/playwright-core'] || lock.packages['node_modules/playwright']);
+  const vlaggen = Object.keys(process.env).filter((naam) => /^RTG_/.test(naam)).sort()
+    .map((naam) => naam + '=' + process.env[naam]);
 
   const delen = [
     { naam: 'node', waarde: process.version, bron: 'process.version' },
@@ -75,13 +79,21 @@ function omgeving() {
     { naam: 'scripts', waarde: kort(JSON.stringify(pkg.scripts || {})), bron: 'package.json' },
     { naam: 'werkstromen', waarde: mapHash('.github/workflows'), bron: '.github/workflows' },
     { naam: 'keuringen', waarde: mapHash('scripts'), bron: 'scripts/' },
+    { naam: 'bewijsmachine', waarde: kort([
+      'scripts/plan.js', 'scripts/evidence.js', 'scripts/lib/bewijsboek.js',
+      'scripts/lib/evidence-dag.js', 'scripts/lib/repository-snapshot.js',
+      'scripts/lib/werkelijkheid.js', 'scripts/lib/risico.js', 'scripts/lib/semdiff.js'
+    ].map((f) => f + ':' + bestandsHash(f)).join('|')), bron: 'de code die bewijs selecteert' },
     { naam: 'ratels', waarde: kort(['NORM.json', 'BEREIK.json', 'IDEMSCHULD.json', 'BEWIJSSCHULD.json',
       'KLOKWACHT.json', 'KLOK.json', 'BEDRADING.json'].map((f) => f + ':' + bestandsHash(f)).join('|')),
     bron: 'de ratelregisters' },
-    /* En dan het eerlijke deel. */
-    { naam: 'browser', waarde: null, bron: 'de vloot draait Playwright met een eigen binary; die versie staat hier niet' },
-    { naam: 'databasemotor', waarde: null, bron: 'node:sqlite reist met Node mee, maar een productieadres kan een andere motor hebben' },
-    { naam: 'vlaggen', waarde: null, bron: 'RTG_-omgevingsvariabelen verschillen per draaiplek en zijn hier niet af te lezen' },
+    /* De browsermetadata staat in dezelfde lockfile als de runner. De binary
+       wordt door browserinstall.js uit exact deze versie gehaald. */
+    { naam: 'browser', waarde: playwright && playwright.version || null,
+      bron: 'package-lock.json: playwright(-core)' },
+    { naam: 'databasemotor', waarde: process.versions.sqlite || null,
+      bron: 'process.versions.sqlite (PostgreSQL wordt per bewijsprofiel apart onbekend gehouden)' },
+    { naam: 'vlaggen', waarde: kort(vlaggen.join('\n')), bron: 'hash van namen en waarden van RTG_-omgevingsvariabelen' },
     { naam: 'externe diensten', waarde: null, bron: 'AI, betaaldienst en post: hun gedrag verandert zonder onze commit' }
   ];
 
@@ -92,6 +104,38 @@ function omgeving() {
     hash: kort(gemeten.map((d) => d.naam + '=' + d.waarde).join('\n')),
     dekking: Math.round((gemeten.length / delen.length) * 100)
   };
+}
+
+/* Niet iedere toets hangt van iedere omgevingsdimensie af. Een pure parsertoets
+   vervalt niet omdat Chromium wijzigde; een schermtoets juist wel. Het profiel
+   mag uitsluitend dimensies WEGHALEN als de toetsvorm die dependency uitsluit.
+   Onbekende namen krijgen daarom het brede profiel. */
+function omgevingVoor(toets, volledig) {
+  const basis = volledig || omgeving();
+  const naam = String(toets || '').toLowerCase();
+  const browser = /(?:\.e2e\.js$|a11y|browser|scherm|playwright)/.test(naam);
+  const postgres = /(?:postgres|\bpg\b|database|opslag|migratie)/.test(naam);
+  const extern = /(?:extern|webhook|stripe|twilio|openai|provider)/.test(naam);
+  const altijd = new Set(['node', 'nvmrc', 'os', 'os-versie', 'tijdzone', 'taal',
+    'afhankelijkheden', 'bewijsmachine']);
+  if (browser) altijd.add('browser');
+  if (postgres) altijd.add('databasemotor');
+  if (extern) altijd.add('externe diensten');
+  const delen = basis.delen.filter((d) => altijd.has(d.naam)).map((d) => {
+    /* De lokaal gemeten SQLite-versie is geen bewijs over PostgreSQL. Alleen
+       een expliciet door de databasejob gemeten motorcontract mag een
+       databasebewijs verlengen; zonder die meting blijft dit fail-closed. */
+    if (postgres && d.naam === 'databasemotor') return { ...d,
+      waarde: process.env.RTG_DB_ENGINE_VERSION || null,
+      bron: 'RTG_DB_ENGINE_VERSION uit de databasejob (anders onbekend)' };
+    return d;
+  });
+  const gemeten = delen.filter((d) => d.waarde != null);
+  const ongemeten = delen.filter((d) => d.waarde == null);
+  return { profiel: browser ? 'browser' : postgres ? 'database' : extern ? 'extern' : 'unit',
+    delen, ongemeten: ongemeten.map((d) => d.naam),
+    hash: kort(gemeten.map((d) => d.naam + '=' + d.waarde).join('\n')),
+    dekking: Math.round((gemeten.length / Math.max(1, delen.length)) * 100) };
 }
 
 function mapHash(rel) {
@@ -154,12 +198,50 @@ function stempel(ix, toetsPaden, omg) {
 /* --------------------------------------------------------------- het boek */
 
 function lees() {
-  try { return JSON.parse(fs.readFileSync(BOEK, 'utf8')); }
-  catch (e) { return { versie: 1, bewijzen: {} }; }
+  try {
+    const boek = JSON.parse(fs.readFileSync(BOEK, 'utf8'));
+    if (boek.versie >= 2 && boek.integriteit && boek.integriteit !== boekHash(boek)) {
+      return { versie: 2, bewijzen: {}, ongeldig: 'integriteit van het bewijsboek klopt niet' };
+    }
+    return boek;
+  } catch (e) { return nieuwBoek(); }
 }
 
 function schrijf(boek) {
-  fs.writeFileSync(BOEK, JSON.stringify(boek, null, 2) + '\n');
+  const uit = { ...boek, versie: 2 };
+  uit.integriteit = boekHash(uit);
+  const tijdelijk = BOEK + '.tmp-' + process.pid;
+  fs.writeFileSync(tijdelijk, JSON.stringify(uit, null, 2) + '\n', { mode: 0o600 });
+  fs.renameSync(tijdelijk, BOEK);
+}
+
+function nieuwBoek() {
+  return { versie: 2, formaat: 'rtg-content-addressed-evidence-v2', bewijzen: {},
+    gemaakt: new Date(0).toISOString(), integriteit: null };
+}
+
+function boekHash(boek) {
+  const schoon = { ...boek };
+  delete schoon.integriteit;
+  return kort(JSON.stringify(schoon));
+}
+
+function bewijsSleutel(toets, stempelHash, omgevingHash) {
+  return kort(['rtg-proof-v2', toets, stempelHash, omgevingHash].join('\n'));
+}
+
+function bewijsRecord(toets, st, omg, uitkomst, provenance, tijdstip) {
+  const sleutel = bewijsSleutel(toets, st.hash, omg.hash);
+  return {
+    sleutel, toets, stempel: st.hash, invoerHash: st.invoerHash || st.hash,
+    uitkomst: uitkomst || 'groen', tijdstip: tijdstip || Date.now(),
+    leest: st.aantal, omgeving: omg.hash, profiel: omg.profiel || 'breed',
+    onbegrensd: st.onbegrensd || null,
+    provenance: { vertrouwd: Boolean(provenance && provenance.vertrouwd),
+      commit: provenance && provenance.commit || null,
+      run: provenance && provenance.run || null,
+      bron: provenance && provenance.bron || 'onbekend' }
+  };
 }
 
 /* HOELANG GAAT EEN BEWIJS MEE? Basis dertig dagen, en voor elk ONGEMETEN
@@ -189,8 +271,12 @@ function inSteekproef(hash, dagnummer, deel) {
    een van -- en elk "nee" draagt zijn reden, want een overgeslagen toets zonder
    uitleg is niet te betwisten. */
 function geldig(boek, sleutel, stempelHash, omg, nu) {
+  if (boek.ongeldig) return { erven: false, status: 'UNKNOWN', reden: boek.ongeldig };
   const b = boek.bewijzen[sleutel];
-  if (!b) return { erven: false, reden: 'geen bewijs in het boek' };
+  if (!b) return { erven: false, status: 'REPROVE', reden: 'geen bewijs in het boek' };
+  if (boek.versie >= 2 && (!b.provenance || !b.provenance.vertrouwd)) {
+    return { erven: false, status: 'UNKNOWN', reden: 'bewijs heeft geen vertrouwde clean-room-herkomst' };
+  }
   if (b.uitkomst !== 'groen') return { erven: false, reden: 'het laatste bewijs was ' + b.uitkomst };
   if (b.stempel !== stempelHash) return { erven: false, reden: 'invoer of omgeving is veranderd' };
   if (b.onbegrensd) return { erven: false, reden: 'de invoer is onbegrensd: ' + b.onbegrensd };
@@ -204,8 +290,9 @@ function geldig(boek, sleutel, stempelHash, omg, nu) {
   if (inSteekproef(stempelHash, dag)) {
     return { erven: false, reden: 'steekproef: een op de ' + STEEKPROEFDEEL + ' draait tóch, om de erfenis zelf te betrappen' };
   }
-  return { erven: true, reden: 'zelfde invoer, zelfde omgeving, ' + Math.round(leeftijd / 3600000) + 'u oud' };
+  return { erven: true, status: 'REUSED', reden: 'zelfde invoer, zelfde omgeving, ' + Math.round(leeftijd / 3600000) + 'u oud' };
 }
 
 module.exports = { omgeving, sluiting, stempel, lees, schrijf, geldig, houdbaarheid,
+  omgevingVoor, nieuwBoek, boekHash, bewijsSleutel, bewijsRecord,
   inSteekproef, BOEK, BASISDAGEN, STEEKPROEFDEEL, kort };

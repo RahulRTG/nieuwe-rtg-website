@@ -1,210 +1,190 @@
 #!/usr/bin/env node
 'use strict';
-/* DE INCREMENTELE ZEKERHEIDSPLANNER -- wat moet er draaien, en waarom?
 
-   Dit is de plek waar de vier lagen bij elkaar komen:
+/* ============================================================================
+   HET INCREMENTELE BEWIJSPLAN
 
-     lib/werkelijkheid.js   wat er is        (index, graaf, omkering)
-     lib/semdiff.js         wat er veranderde (ondergrens per bestand)
-     lib/risico.js          wie dat raakt     (propagatie, eindklasse)
-     lib/bewijsboek.js      wat al bewezen is (stempel, verval, steekproef)
+   git diff -> RepositorySnapshot -> Evidence DAG -> REUSED / REPROVE / UNKNOWN
 
-   DE REGEL WAAR ALLES OP RUST (PROOF-INCREMENTAL.md par. 0):
-     snelheid mag alleen voortkomen uit bewezen irrelevantie, nooit uit
-     overgeslagen zekerheid -- en wat het systeem niet kan bewijzen als
-     irrelevant, behandelt het als relevant.
-
-   Vertaald naar wat hieronder gebeurt: een toets wordt alleen overgeslagen als
-   GEEN ENKEL bestand dat hij leest is veranderd, de omgeving dezelfde is, het
-   bewijs niet verlopen is en hij niet in de steekproef valt. Alles wat daar ook
-   maar iets van mist, draait.
-
-   WAT DIT NIET DOET, EN WAT HET NOOIT MAG GAAN DOEN. Het zet geen toets uit, het
-   verlaagt geen eis en het geeft geen oordeel over de code. Het beantwoordt
-   uitsluitend de vraag welk bewijs er AL is. Wie de uitkomst niet vertrouwt,
-   draait de hele suite -- en dat moet altijd kunnen blijven.
-
-   GEBRUIK
-     node scripts/plan.js              het plan, met de redenen
-     node scripts/plan.js --json       hetzelfde, machinaal leesbaar
-     node scripts/plan.js --alles      toon ook de toetsen die zouden erven
-     node scripts/plan.js --basis <ref>  meet tegen een andere basis
-     node scripts/plan.js --vastleggen leg de huidige stand vast als bewijs
-                                       (alleen draaien NA een volledig groene ronde)
+   REUSED   alle content-addressed bewijsinvoer is gelijk en de herkomst is een
+            vertrouwde, volledige groene ronde.
+   REPROVE  de bewijsgrond veranderde of er is nog geen bewijs.
+   UNKNOWN  de impact of invoer is niet aantoonbaar begrensd; fail-closed.
    ========================================================================== */
 const fs = require('fs');
 const path = require('path');
-const { index } = require('./lib/werkelijkheid');
+const { execFileSync } = require('child_process');
+const snapshotModule = require('./lib/repository-snapshot');
+const evidenceDag = require('./lib/evidence-dag');
 const semdiff = require('./lib/semdiff');
 const risico = require('./lib/risico');
 const bb = require('./lib/bewijsboek');
 
 const WORTEL = path.join(__dirname, '..');
-const ARG = process.argv.slice(2);
-const heeft = (v) => ARG.includes(v);
-
-/* WAT ER GEINDEXEERD WORDT. De '.' aan het eind zijn de LOSSE bestanden in de
-   wortel -- de ratelregisters en de merkdocumenten. Zonder die staat een
-   gewijzigde NORM.json buiten de index, en dan is elk oordeel onbetrouwbaar;
-   dat is eerlijk maar het levert ook niets op. */
-const MAPPEN = ['server', 'public', 'test', 'scripts', '.github', 'docs', '.'];
+const MAPPEN = snapshotModule.STANDAARDMAPPEN;
 
 function toetsbestanden() {
-  const uit = [];
-  for (const n of fs.readdirSync(path.join(WORTEL, 'test'))) {
-    if (/\.(?:test|e2e)\.js$/.test(n)) uit.push('test/' + n);
-  }
-  return uit.sort();
+  return fs.readdirSync(path.join(WORTEL, 'test'))
+    .filter((n) => /\.(?:test|e2e)\.js$/.test(n)).map((n) => 'test/' + n).sort();
 }
 
-function plan() {
-  const nu = Date.now();
-  const iBasis = ARG.indexOf('--basis');
-  const ix = index(MAPPEN);
-  const omg = bb.omgeving();
-  const boek = bb.lees();
-
-  const wijziging = semdiff.diff(iBasis >= 0 ? ARG[iBasis + 1] : null);
+function plan(opties) {
+  const o = opties || {};
+  const nu = o.nu || Date.now();
+  const snapshot = o.snapshot || snapshotModule.maak(MAPPEN);
+  const toetsenlijst = o.toetsen || toetsbestanden();
+  const dag = evidenceDag.bouw(snapshot, toetsenlijst);
+  const volledigOmgeving = o.omgeving || bb.omgeving();
+  const boek = o.boek || bb.lees();
+  const wijziging = o.wijziging || semdiff.diff(o.basis || null);
   const gewijzigd = wijziging.bestanden.map((b) => b.pad);
   const ondergrens = wijziging.bestanden.reduce(
     (a, b) => semdiff.zwaarste(a, b.klasse), 'documentatie');
-
-  const impact = risico.raak(ix, gewijzigd, {
+  const impact = risico.raak(snapshot.index, gewijzigd, {
     verwijderd: new Set(wijziging.bestanden.filter((b) => b.verwijderd).map((b) => b.pad)) });
   const oordeel = risico.klasseVan(impact, ondergrens);
+  const bewijsMachineGewijzigd = gewijzigd.some((pad) =>
+    /^(?:\.github\/workflows\/ci\.yml|\.nvmrc|package-lock\.json|scripts\/(?:plan|evidence|evidence-base|evidence-gate|browser-host|test-runner|e2e)\.js|scripts\/lib\/(?:bewijsboek|evidence-dag|repository-snapshot|werkelijkheid|risico|semdiff)\.js|test\/helper\.js)$/.test(pad));
 
-  /* Waar een gewijzigd bestand niet in de index staat, is de impactverzameling
-     niet compleet. Dan is er niets te erven -- niet minder, niets. */
-  const alles = !impact.volledig;
+  const toetsen = toetsenlijst.map((toets) => {
+    const omgeving = bb.omgevingVoor(toets, volledigOmgeving);
+    const stempel = bb.stempel(snapshot.index, [toets], omgeving);
+    const invoer = dag.bewijsInvoer(toets);
+    stempel.invoerHash = invoer.hash;
+    const geraakt = stempel.paden.filter((p) => impact.geraakt.has(p));
+    let status, reden;
 
-  const toetsen = [];
-  for (const t of toetsbestanden()) {
-    const st = bb.stempel(ix, [t], omg);
-    const sleutel = t;
-
-    /* RAAKT DEZE TOETS IETS DAT VERANDERDE? Dat is de goedkope vraag en hij
-       wordt eerst gesteld: als geen enkel bestand uit zijn leesbereik in de
-       impactverzameling zit, is er niets gebeurd waar hij iets over zegt. */
-    const geraakt = st.paden.filter((p) => impact.geraakt.has(p));
-
-    let besluit;
-    if (alles) {
-      besluit = { draaien: true, reden: 'de impactverzameling is onvolledig: ' + oordeel.waarom };
-    } else if (st.onbegrensd) {
-      besluit = { draaien: true, reden: 'leest door een onoplosbare require heen (' + st.onbegrensd + ')' };
+    if (bewijsMachineGewijzigd) {
+      status = 'REPROVE'; reden = 'de bewijsmachine of haar runtime-contract veranderde';
+    } else if (!impact.volledig) {
+      status = 'UNKNOWN'; reden = 'impactverzameling is onvolledig: ' + oordeel.waarom;
+    } else if (stempel.onbegrensd || invoer.onbekend) {
+      status = 'UNKNOWN'; reden = 'bewijsinvoer is onbegrensd' + (stempel.onbegrensd ? ': ' + stempel.onbegrensd : '');
     } else if (geraakt.length) {
-      const wat = geraakt.slice(0, 3).join(', ') + (geraakt.length > 3 ? ' en ' + (geraakt.length - 3) + ' meer' : '');
-      besluit = { draaien: true, reden: 'leest wat er veranderde: ' + wat };
+      status = 'REPROVE';
+      reden = 'bewijsgrond veranderde: ' + geraakt.slice(0, 3).join(', ') +
+        (geraakt.length > 3 ? ' en ' + (geraakt.length - 3) + ' meer' : '');
     } else {
-      const g = bb.geldig(boek, sleutel, st.hash, omg, nu);
-      besluit = { draaien: !g.erven, reden: g.reden };
+      const geldig = bb.geldig(boek, toets, stempel.hash, omgeving, nu);
+      status = geldig.status || (geldig.erven ? 'REUSED' : 'REPROVE');
+      reden = geldig.reden;
     }
-    toetsen.push({ toets: t, stempel: st.hash, leest: st.aantal, geraakt: geraakt.length, ...besluit });
-  }
+    return { toets, status, draaien: status !== 'REUSED', reden,
+      bewijsSleutel: bb.bewijsSleutel(toets, stempel.hash, omgeving.hash),
+      stempel: stempel.hash, invoerHash: invoer.hash, omgeving: omgeving.hash,
+      profiel: omgeving.profiel, leest: stempel.aantal, geraakt: geraakt.length,
+      onbegrensd: stempel.onbegrensd || null };
+  });
 
-  return { nu, ix, omg, boek, wijziging, gewijzigd, ondergrens, impact, oordeel, toetsen };
+  const telling = { REUSED: 0, REPROVE: 0, UNKNOWN: 0 };
+  for (const toets of toetsen) telling[toets.status]++;
+  /* UNKNOWN maakt alleen ZIJN EIGEN bewijs verplicht. Pas als de impactvraag
+     zelf onvolledig is, zijn alle toetsen UNKNOWN en wordt dit vanzelf full.
+     Zo dwingt één toets met een dynamische loader niet 1.926 onafhankelijke
+     bewijzen opnieuw af. */
+  const mode = !impact.volledig || telling.UNKNOWN === toetsen.length || !telling.REUSED
+    ? 'full' : 'incremental';
+  return { formaat: 'rtg-evidence-plan-v2', gemaakt: new Date(nu).toISOString(),
+    basis: wijziging.basis, snapshot: { rootHash: snapshot.rootHash,
+      bestanden: snapshot.aantalBestanden, duurMs: Math.round(snapshot.duurMs) },
+    wijziging, gewijzigd, ondergrens, impact, oordeel, bewijsMachineGewijzigd, omgeving: volledigOmgeving,
+    boek: { versie: boek.versie || 1, ongeldig: boek.ongeldig || null },
+    telling, mode, toetsen };
 }
 
-/* ------------------------------------------------------------- vastleggen */
-/* ALLEEN NA EEN VOLLEDIG GROENE RONDE. Er is met opzet geen manier om één toets
-   met de hand op groen te zetten: een bewijsboek waar je in kunt schrijven zonder
-   te draaien, is een verhaal en geen bewijs (PROOF.md par. 9). */
-function vastleggen() {
-  const nu = Date.now();
-  const ix = index(MAPPEN);
-  const omg = bb.omgeving();
-  const boek = bb.lees();
-  let bij = 0, over = 0;
-  for (const t of toetsbestanden()) {
-    const st = bb.stempel(ix, [t], omg);
-    if (st.onbegrensd) { over++; continue; }        // hier valt niets te bewijzen
-    boek.bewijzen[t] = { stempel: st.hash, uitkomst: 'groen', tijdstip: nu,
-      leest: st.aantal, omgeving: omg.hash, onbegrensd: null };
+function commit() {
+  try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: WORTEL, encoding: 'utf8' }).trim(); }
+  catch (e) { return null; }
+}
+
+function vastleggen(opties) {
+  const o = opties || {};
+  if (!o.vertrouwd && process.env.RTG_FULL_PROOF !== '1') {
+    throw new Error('bewijs vastleggen vereist --trusted na een volledige groene clean-room-ronde');
+  }
+  const snapshot = o.snapshot || snapshotModule.maak(MAPPEN);
+  const volledigOmgeving = o.omgeving || bb.omgeving();
+  const boek = bb.nieuwBoek();
+  const provenance = { vertrouwd: true, commit: commit(), run: process.env.GITHUB_RUN_ID || null,
+    bron: process.env.GITHUB_ACTIONS ? 'github-main-clean-room' : 'lokale-clean-room' };
+  let bij = 0, onbekend = 0;
+  const lijst = toetsbestanden();
+  const dag = evidenceDag.bouw(snapshot, lijst);
+  for (const toets of lijst) {
+    const omgeving = bb.omgevingVoor(toets, volledigOmgeving);
+    const stempel = bb.stempel(snapshot.index, [toets], omgeving);
+    stempel.invoerHash = dag.bewijsInvoer(toets).hash;
+    if (stempel.onbegrensd) { onbekend++; continue; }
+    boek.bewijzen[toets] = bb.bewijsRecord(toets, stempel, omgeving, 'groen', provenance);
     bij++;
   }
-  boek.omgeving = { hash: omg.hash, dekking: omg.dekking, ongemeten: omg.ongemeten };
+  boek.gemaakt = new Date().toISOString();
+  boek.snapshot = snapshot.rootHash;
+  boek.omgeving = { hash: volledigOmgeving.hash, dekking: volledigOmgeving.dekking,
+    ongemeten: volledigOmgeving.ongemeten };
+  boek.provenance = provenance;
   bb.schrijf(boek);
-  console.log('bewijsboek bijgewerkt: ' + bij + ' toets(en) vastgelegd, ' + over +
-    ' overgeslagen (onbegrensde invoer).');
-  console.log('omgeving ' + omg.hash + ', dekking ' + omg.dekking + '%, houdbaar ' +
-    Math.round(bb.houdbaarheid(omg) / 3600000) + 'u.');
+  return { vastgelegd: bij, onbekend, pad: bb.BOEK, snapshot: snapshot.rootHash, provenance };
 }
 
-/* ------------------------------------------------------------------ tonen */
-const dik = (t) => '\x1b[1m' + t + '\x1b[0m';
-const zacht = (t) => '\x1b[2m' + t + '\x1b[0m';
+function serialiseer(p) {
+  return {
+    formaat: p.formaat, gemaakt: p.gemaakt, basis: p.basis,
+    snapshot: p.snapshot, gewijzigd: p.gewijzigd, ondergrens: p.ondergrens,
+    klasse: p.oordeel.klasse, betrouwbaar: p.oordeel.betrouwbaar,
+    geraakt: p.impact.geraakt.size, impactTelling: p.impact.telling,
+    omgeving: { hash: p.omgeving.hash, dekking: p.omgeving.dekking,
+      ongemeten: p.omgeving.ongemeten }, boek: p.boek, mode: p.mode,
+    telling: p.telling,
+    reused: p.toetsen.filter((t) => t.status === 'REUSED').map((t) => t.toets),
+    reprove: p.toetsen.filter((t) => t.status === 'REPROVE').map((t) => t.toets),
+    unknown: p.toetsen.filter((t) => t.status === 'UNKNOWN').map((t) => t.toets),
+    toetsen: p.toetsen
+  };
+}
 
-function toon(p) {
-  const draaien = p.toetsen.filter((t) => t.draaien);
-  const erven = p.toetsen.filter((t) => !t.draaien);
-
-  console.log(dik('\nHET PLAN') + zacht('  (basis ' + p.wijziging.basis.slice(0, 8) + ')'));
-
-  console.log('\n  gewijzigd  ' + p.gewijzigd.length + ' bestand(en), ondergrens uit de vorm: ' + p.ondergrens);
-  const perKlasse = {};
-  for (const b of p.wijziging.bestanden) perKlasse[b.klasse] = (perKlasse[b.klasse] || 0) + 1;
-  console.log(zacht('             ' + Object.entries(perKlasse).sort((a, b) =>
-    semdiff.GEWICHT.indexOf(b[0]) - semdiff.GEWICHT.indexOf(a[0]))
-    .map(([k, n]) => n + ' ' + k).join(', ')));
-
-  console.log('\n  geraakt    ' + p.impact.geraakt.size + ' module(s) -- ' +
-    p.impact.telling.zeker + ' zeker, ' + p.impact.telling.mogelijk + ' mogelijk, ' +
-    p.impact.telling.onopgelost + ' onopgelost');
-  console.log('  gebied     ' + p.impact.gebied + '  ->  klasse ' + dik(p.oordeel.klasse) +
-    (p.oordeel.betrouwbaar ? '' : '  ' + zacht('(ONBETROUWBAAR: ' + p.oordeel.waarom + ')')));
-
-  console.log('\n  omgeving   ' + p.omg.hash + ', dekking ' + p.omg.dekking + '% -- ' +
-    p.omg.ongemeten.length + ' ongemeten (' + p.omg.ongemeten.join(', ') + ')');
-  console.log(zacht('             daardoor is een bewijs ' +
-    Math.round(bb.houdbaarheid(p.omg) / 3600000) + 'u houdbaar in plaats van ' +
-    (bb.BASISDAGEN * 24) + 'u'));
-
-  console.log('\n  ' + dik('toetsen    ' + draaien.length + ' draaien, ' + erven.length + ' geërfd') +
-    '  (' + p.toetsen.length + ' totaal)');
-
-  const per = {};
-  for (const t of draaien) {
-    const kop = t.reden.split(':')[0].split('(')[0].trim();
-    (per[kop] = per[kop] || []).push(t);
+function toon(p, alles) {
+  console.log('\nHET BEWIJSPLAN  ' + String(p.basis).slice(0, 8) + ' -> ' + p.mode.toUpperCase());
+  console.log('  snapshot  ' + p.snapshot.bestanden + ' bestanden in ' + p.snapshot.duurMs + 'ms, ' + p.snapshot.rootHash.slice(0, 16));
+  console.log('  wijziging ' + p.gewijzigd.length + ' bestand(en), klasse ' + p.oordeel.klasse);
+  console.log('  bewijs    ' + p.telling.REUSED + ' REUSED · ' + p.telling.REPROVE +
+    ' REPROVE · ' + p.telling.UNKNOWN + ' UNKNOWN');
+  for (const status of ['UNKNOWN', 'REPROVE', 'REUSED']) {
+    const rij = p.toetsen.filter((t) => t.status === status);
+    if (!rij.length) continue;
+    console.log('\n  ' + status + ' (' + rij.length + ')');
+    for (const t of rij.slice(0, alles ? rij.length : 5)) console.log('    ' + t.toets + ' :: ' + t.reden);
+    if (!alles && rij.length > 5) console.log('    … en ' + (rij.length - 5) + ' meer');
   }
-  for (const [kop, rij] of Object.entries(per).sort((a, b) => b[1].length - a[1].length)) {
-    console.log('\n    ' + rij.length + '  ' + kop);
-    for (const t of rij.slice(0, heeft('--alles') ? 999 : 3)) {
-      console.log(zacht('       ' + t.toets.replace(/^test\//, '') + ' -- ' + t.reden));
+}
+
+function schrijfUitvoer(p, bestand) {
+  fs.mkdirSync(path.dirname(path.resolve(bestand)), { recursive: true });
+  fs.writeFileSync(bestand, JSON.stringify(serialiseer(p), null, 2) + '\n');
+}
+
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  const waarde = (naam) => {
+    const gelijk = args.find((a) => a.startsWith(naam + '='));
+    if (gelijk) return gelijk.slice(naam.length + 1);
+    const i = args.indexOf(naam); return i >= 0 ? args[i + 1] : null;
+  };
+  try {
+    if (args.includes('--vastleggen')) {
+      const uit = vastleggen({ vertrouwd: args.includes('--trusted') });
+      console.log('bewijsboek: ' + uit.vastgelegd + ' vertrouwde bewijzen, ' + uit.onbekend + ' onbegrensd; ' + uit.pad);
+    } else {
+      const p = plan({ basis: waarde('--basis') });
+      const out = waarde('--out');
+      if (out) schrijfUitvoer(p, out);
+      if (args.includes('--json')) console.log(JSON.stringify(serialiseer(p), null, 2));
+      else toon(p, args.includes('--alles'));
     }
-    if (!heeft('--alles') && rij.length > 3) console.log(zacht('       ... en nog ' + (rij.length - 3)));
-  }
-
-  if (erven.length) {
-    console.log('\n    ' + erven.length + '  geërfd (zelfde invoer, zelfde omgeving)');
-    for (const t of erven.slice(0, heeft('--alles') ? 999 : 5)) {
-      console.log(zacht('       ' + t.toets.replace(/^test\//, '') + ' -- ' + t.reden));
-    }
-    if (!heeft('--alles') && erven.length > 5) console.log(zacht('       ... en nog ' + (erven.length - 5)));
-  }
-
-  /* HET SLOTOORDEEL, en het is met opzet somber gesteld: alleen wanneer er
-     niets onbeoordeelbaars overblijft mag hier BEWEZEN staan. */
-  const winst = p.toetsen.length ? Math.round((erven.length / p.toetsen.length) * 100) : 0;
-  console.log('\n  ' + (erven.length && p.oordeel.betrouwbaar
-    ? dik('\x1b[32mDEELS BEWEZEN\x1b[0m') + ' -- ' + winst + '% van de toetsen hoeft niet opnieuw'
-    : dik('\x1b[33mNIETS TE ERVEN\x1b[0m') + ' -- alles draait') + '\n');
-}
-
-if (heeft('--vastleggen')) {
-  vastleggen();
-} else {
-  const p = plan();
-  if (heeft('--json')) {
-    console.log(JSON.stringify({
-      basis: p.wijziging.basis, gewijzigd: p.gewijzigd.length, ondergrens: p.ondergrens,
-      klasse: p.oordeel.klasse, betrouwbaar: p.oordeel.betrouwbaar,
-      geraakt: p.impact.geraakt.size, telling: p.impact.telling,
-      omgeving: { hash: p.omg.hash, dekking: p.omg.dekking, ongemeten: p.omg.ongemeten },
-      draaien: p.toetsen.filter((t) => t.draaien).map((t) => t.toets),
-      erven: p.toetsen.filter((t) => !t.draaien).map((t) => t.toets)
-    }, null, 2));
-  } else {
-    toon(p);
+  } catch (e) {
+    console.error('[bewijsplan] ' + e.message);
+    process.exitCode = 1;
   }
 }
+
+module.exports = { plan, vastleggen, serialiseer, schrijfUitvoer, toetsbestanden, MAPPEN };

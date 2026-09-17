@@ -26,18 +26,21 @@
    Gebruik:
      node scripts/e2e.js                 alles, zoals altijd
      node scripts/e2e.js --deel=2/4      alleen deel 2 van vier
+     node scripts/e2e.js --bestanden=a.e2e.js,b.e2e.js
      RTG_SCHERMJOURNAAL=x node scripts/e2e.js    schrijf het journaal daar
    ========================================================================== */
 
 const fs = require('fs');
 const path = require('path');
-const { spawnSync } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const { ontleedDeel, verdeel } = require('./lib/delen');
 
 const WORTEL = path.join(__dirname, '..');
 const TESTMAP = path.join(WORTEL, 'test');
 const argv = process.argv.slice(2);
 const BEWIJS = argv.includes('--bewijs');
+const selectie = (argv.find((a) => a.startsWith('--bestanden=')) || '').slice(12)
+  .split(',').map((s) => path.basename(s.trim())).filter(Boolean);
 const BEWIJSPAD = path.join(WORTEL, '.release', 'schermsuite-bewijs.json');
 const begonnen = new Date().toISOString();
 if (BEWIJS) {
@@ -54,8 +57,8 @@ const deel = (() => {
   }
   return d;
 })();
-if (BEWIJS && deel) {
-  console.error('[e2e] releasebewijs kan alleen uit één volledige, onverdeelde schermronde komen.');
+if (BEWIJS && (deel || selectie.length)) {
+  console.error('[e2e] releasebewijs kan alleen uit één volledige, ongeselecteerde schermronde komen.');
   process.exit(2);
 }
 
@@ -76,7 +79,8 @@ try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 require('./lib/meetbron').zetModus(false);
 
 const alle = fs.readdirSync(TESTMAP).filter(n => n.endsWith('.e2e.js')).sort();
-const mijn = verdeel(alle, deel);   // dezelfde verdeelregel als de unit-toetsen
+const gekozen = selectie.length ? alle.filter((n) => new Set(selectie).has(n)) : alle;
+const mijn = verdeel(gekozen, deel);   // dezelfde verdeelregel als de unit-toetsen
 const bewijsHulp = BEWIJS ? require('./lib/schermsuite-bewijs') : null;
 const inventarisVoor = BEWIJS ? bewijsHulp.inventaris(WORTEL) : null;
 const bronVoor = BEWIJS ? require('./lib/stempel').exactStempel() : null;
@@ -86,7 +90,8 @@ if (!mijn.length) {
   process.exit(2);
 }
 console.log('[e2e] ' + (deel ? 'deel ' + deel.nr + ' van ' + deel.totaal + ': ' : '') +
-  mijn.length + ' van ' + alle.length + ' schermbestanden, een tegelijk');
+  mijn.length + ' van ' + alle.length + ' schermbestanden' +
+  (selectie.length ? ' (incrementeel geselecteerd)' : '') + ', een tegelijk');
 
 const tapPad = path.join(WORTEL, '.release', '.schermsuite-' + process.pid + '.tap');
 if (BEWIJS) fs.mkdirSync(path.dirname(tapPad), { recursive: true, mode: 0o700 });
@@ -96,6 +101,26 @@ const nodeArgs = [
 if (BEWIJS) nodeArgs.push('--test-reporter=spec', '--test-reporter-destination=stdout',
   '--test-reporter=tap', '--test-reporter-destination=' + tapPad);
 nodeArgs.push(...mijn.map(n => path.join('test', n)));
+/* DE WARME FABRIEK. Eén host per shard, verse browsercontexten per toets. Kan
+   met RTG_SHARED_BROWSER=0 onmiddellijk worden uitgezet; als starten mislukt
+   valt de suite terug op haar bestaande per-bestandstart en blijft strict mode
+   zelf bewaken dat er werkelijk een browser is. */
+let browserHost = null, browserEndpoint = null, browserEndpointPad = null;
+if (process.env.RTG_SHARED_BROWSER !== '0') {
+  browserEndpointPad = path.join(require('os').tmpdir(), 'rtg-browser-' + process.pid + '.endpoint');
+  try { fs.rmSync(browserEndpointPad, { force: true }); } catch (e) {}
+  browserHost = spawn(process.execPath, [path.join(__dirname, 'browser-host.js')], {
+    cwd: WORTEL, stdio: 'inherit', env: { ...process.env, RTG_BROWSER_ENDPOINT_FILE: browserEndpointPad }
+  });
+  browserHost.unref();
+  const einde = Date.now() + 20000;
+  while (Date.now() < einde && !fs.existsSync(browserEndpointPad)) {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+  }
+  try { browserEndpoint = fs.readFileSync(browserEndpointPad, 'utf8').trim(); } catch (e) { browserEndpoint = null; }
+  console.log(browserEndpoint ? '[e2e] warme browserfabriek actief (één Chromium voor deze shard)'
+    : '[e2e] browserfabriek niet gestart; veilige terugval naar geïsoleerde browsers');
+}
 const r = spawnSync(process.execPath, nodeArgs, {
   cwd: WORTEL,
   /* Zelfde voorlading als in scripts/test-runner.js, en om dezelfde reden: de
@@ -107,10 +132,13 @@ const r = spawnSync(process.execPath, nodeArgs, {
        een gewicht nodig. Zelfde meting, zelfde bestand. */
     RTG_TOETSDUUR: process.env.RTG_TOETSDUUR || path.join(WORTEL, '.toetsduur'),
     RTG_TOETSBRON: require('./lib/meetbron').bron(),
+    ...(browserEndpoint ? { RTG_SHARED_BROWSER_ENDPOINT: browserEndpoint } : {}),
     NODE_OPTIONS: (process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : '') +
       '--require ' + JSON.stringify(path.join(WORTEL, 'test', 'toetsnaam.js')) },
   stdio: 'inherit'
 });
+if (browserHost) { try { browserHost.kill('SIGTERM'); } catch (e) {} }
+if (browserEndpointPad) { try { fs.rmSync(browserEndpointPad, { force: true }); } catch (e) {} }
 
 if (r.error) {
   console.error('[e2e] runnerfout: ' + r.error.message);

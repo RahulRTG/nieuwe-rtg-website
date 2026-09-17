@@ -72,7 +72,12 @@ const LADDER = [
     patronen: [/check\.js$/, /ast-scan\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /ci-lokaal\.js$/,
       /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /^git diff$/] },
   { id: 'geraakt', naam: 'Wat kan deze wijziging raken', wat: 'de affected-graaf: welk bewijs moet opnieuw',
-    patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /verstrengeling\.js$/, /activering\.js$/] },
+    patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /verstrengeling\.js$/, /activering\.js$/,
+      /* De Evidence Engine is dezelfde sport op bewijsniveau: basisbewijs
+         vinden, impact classificeren, geselecteerd herbewijzen en fail-closed
+         het eindoordeel vellen. Eén familiepatroon voorkomt een nieuwe restbak
+         zodra hier nog een smalle evidence-poort bijkomt. */
+      /evidence(?:-base|-gate)?\.js$/] },
   { id: 'eenheid', naam: 'Eenheid, contract en bevoegdheid', wat: 'de toetssuite zelf, plus de as-proeven per route',
     patronen: [/test-runner\.js$/, /pgtoetsen\.js$/, /isolatiepoort\.test\.js$/, /mutatiecontract\.js$/,
       /(rolproef|invoerproef|idemproef|staatproef|uitvoerproef|auditproef|handelingproef)-route\.js$/, /mutatie\.js$/,
@@ -372,8 +377,8 @@ if (require.main === module) {
   /* GEEN process.exit NA EEN GROTE UITVOER. Naar een BESTAND gaat dat goed
      (node schrijft dan synchroon), naar een PIPE niet: de poortwacht verloor zo
      twee derde van 484 KB -- geldige tekst, kapotte JSON, exitcode 0. Met
-     exitCode loopt de pijp eerst leeg. Zie test/meetkeuring.test.js, regel
-     `pipe`, die deze meter er prompt op betrapte. */
+     exitCode loopt de pijp eerst leeg. De proef in test/meetkeuring.test.js
+     met de naam `pipe` betrapte deze meter daar prompt op. */
   if (argv.includes('--json')) { console.log(JSON.stringify(uitslag, null, 2)); return; }
 
   if (argv.includes('--controle')) {

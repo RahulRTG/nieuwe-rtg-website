@@ -16,7 +16,7 @@
 const { veiligeFout } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, express, auth, geenGast, db, findSupplier, zijnVrienden,
-    salon, salonProfiel, salonReacties, salonAI, salonInzicht } = kern;
+    salon, salonProfiel, salonReacties, salonInzicht } = kern;
   const zichtbaarheid = require('../../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden });
   // veiligeFout: laat de melding staan, haalt er alleen ons bestandssysteem uit
   const fout = (res, e) => res.status(400).json({ error: veiligeFout(e) });
@@ -128,7 +128,7 @@ module.exports = (kern) => {
   app.post('/api/salon/ai/bijschrift', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     try {
-      const r = await salonAI.bijschrift(req.body.steekwoorden, req.body.plaats);
+      const r = await salon.ai.bijschrift(req.body.steekwoorden, req.body.plaats);
       res.status(r.ok ? 200 : (r.status || 400)).json(r);
     } catch (e) { fout(res, e); }
   });
@@ -136,12 +136,12 @@ module.exports = (kern) => {
   app.post('/api/salon/ai/reacties', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     try {
-      const r = await salonAI.reactiesSamen(req.session, req.body.id);
+      const r = await salon.ai.reactiesSamen(req.session, req.body.id);
       res.status(r.ok ? 200 : (r.status || 400)).json(r);
     } catch (e) { fout(res, e); }
   });
 
   app.post('/api/salon/ai/waarover', auth, async (req, res) => {
-    try { res.json(await salonAI.waarOverGaatHet()); } catch (e) { fout(res, e); }
+    try { res.json(await salon.ai.waarOverGaatHet()); } catch (e) { fout(res, e); }
   });
 };

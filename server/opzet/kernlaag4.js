@@ -46,7 +46,7 @@ kern.salonProfiel = require('../kern/salon/profiel')({ db, save, codenaamVan: ke
   keyVanCodenaam: kern.keyVanCodenaam, liveCodename, salon: kern.salon });
 kern.salonReacties = require('../kern/salon/reacties')({ db, save, liveCodename, codenaamVan: kern.codenaamVan,
   keyVanCodenaam: kern.keyVanCodenaam, zijnVrienden: kern.zijnVrienden, salon: kern.salon, notify });
-kern.salonAI = require('../kern/salon/ai')({ anthropic, salon: kern.salon });
+kern.salon.ai = require('../kern/salon/ai')({ anthropic, salon: kern.salon });
 kern.salonInzicht = require('../kern/salon/inzicht')({ db, save, salon: kern.salon });
 /* UITLICHTEN is een redactiehandeling en geen vinkje (kern/salon/uitlichten.js).
    De twee haken naar de Media OS zijn LAAT GEBONDEN: die laag wordt pas in

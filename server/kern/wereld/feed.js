@@ -100,8 +100,7 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
        mijne. Wie geen lid is, krijgt een lege lijst -- geen 403, want "er is
        hier niets voor jou" is de eerlijke uitkomst. */
     genootschap: (mij) => {
-      /* Lees alleen de eigen groepen en hun echte prikbordopslag. Lidmaatschap
-         begrenst ook geheime groepen; verwijderde berichten blijven weg. */
+      /* Lidmaatschap begrenst ook geheime groepen. Lees hun echte prikbord. */
       const G = db.data.genootschap || {};
       const isLid = (gr) => (gr.leden || []).some(l => (typeof l === 'string' ? l : l && l.key) === mij);
       const uit = [];

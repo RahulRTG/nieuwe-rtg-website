@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-09-17T18:35:27.892Z",
-  "completedAt": "2026-09-17T18:35:47.433Z",
+  "startedAt": "2026-09-17T18:40:27.348Z",
+  "completedAt": "2026-09-17T18:40:47.012Z",
   "node": "v24.18.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "a75fcf49b0af5d3a115a6961f1d80f4665c8d5711001b4081520cc3c5e27c531",
+  "testOutputSha256": "ac6c29b6b9f657ef90225288a4f5327dc8a395f64996c7c38921cc3fc5632c7c",
   "sources": {
     "public/apps/access/meaning.js": "34aada4780c1e2e836d3e6b5d9e0839ccd51d5f75078ef0aca7a4a49499fbedd",
     "public/apps/access/portal.css": "50a4099d085813b3b8e00021f62e0e8a30e5170779f1613c5d3dc9f2d0b34b90",
@@ -27,7 +27,7 @@
     "test/helper.js": "f42fbb2acd395ffd178b8ee6a897b9b1ca71e9d05fef8ab207c03a803d7df292",
     "scripts/lib/scherm.js": "9bb3c9eb5390baabb2c69dc798a1e88cfe9d07238f394273221548f53685eb5b",
     "server/translate/batch-model.js": "4a2af8ee253efac0e73ee9af284e5aa7bf1ac201ca80d40e97f7bcb441a6787f",
-    "server/translate.js": "2656d20787a39a520f742c608e3ea20966ab5a3a529f448cde6d42b8f7dc232e",
+    "server/translate.js": "52ba4a9541e7c54eabba632b576615bd7e4d25f5d14c73f3a161ae7240f58afb",
     "server/translate/cache.js": "51fb8ae3cfe124f8da256f9ef20378990f290a85f24c32c49e59a01fb8a1f32a",
     "server/translate/uitslag.js": "98446b05189312cdda8e60a56685d2f2affad1d226fcc6a3bafad6845c7346dd",
     "server/kern/taalkeuring.js": "0110a0f1fa1e5a23a1676210778a148c3589fe38361197cbe29b73c518c7b271",

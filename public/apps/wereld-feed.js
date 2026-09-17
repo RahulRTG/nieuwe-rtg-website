@@ -27,8 +27,10 @@
           + (guest ? text('login', 'Open uw LivingOS') : text('create', 'Leg uw eerste moment vast')) + '</a>')
       + '<p class="living-note">' + text('editorial', 'Sfeerbeeld van RTG. Uw eigen berichten verschijnen hier.') + '</p></div></section>';
   }
-  function item(i, source, time) {
+  function item(i, source, time, starts) {
     var image = i.beeld && i.beeld[0], src = image && photo(image.src);
+    var details = [i.plaats, starts].filter(Boolean);
+    var offer = i.offer;
     var initials = Array.from(String(i.auteur || 'RTG')).slice(0, 2).join('').toUpperCase();
     return '<div class="living-post-head"><span class="living-avatar" aria-hidden="true" translate="no">' + esc(initials) + '</span>'
       + '<div class="living-author"><span class="auteur" data-user-content>' + esc(i.auteur) + '</span>'
@@ -36,9 +38,17 @@
       + (src ? '<figure class="living-post-media"><img src="' + esc(src) + '" alt="' + esc(image.alt || '')
         + '" data-user-content loading="lazy" decoding="async">'
         + (i.beeld.length > 1 ? '<figcaption>' + text('morePhotos', 'Open het bericht om alle beelden te bekijken.') + '</figcaption>' : '') + '</figure>' : '')
-      + '<div class="living-post-copy"><p data-user-content>' + esc(i.tekst) + '</p></div>'
+      + '<div class="living-post-copy">'
+      + (details.length ? '<div class="objectregel" data-user-content>' + details.map(function (d) {
+        return '<span>' + esc(d) + '</span>'; }).join('') + '</div>' : '')
+      + '<p data-user-content>' + esc(i.tekst) + '</p>'
+      + (offer ? '<div class="offer"><b data-user-content>' + esc(offer.titel || '') + '</b><span>'
+        + (offer.capaciteit != null ? esc(offer.capaciteit) + ' ' + text('available', 'beschikbaar') + ' · ' : '')
+        + (offer.geldigTot ? text('until', 'Geldig tot') + ' <span data-user-content>' + esc(offer.geldigTot) + '</span> · ' : '')
+        + '<span data-user-content>' + esc(offer.actie || '') + '</span></span></div>' : '') + '</div>'
       + '<div class="acties"><button type="button" data-open="' + esc(i.open) + '">' + text('open', 'Bekijk het bericht') + '</button>'
-      + '<button type="button" data-chat="' + esc(i.auteur) + '" data-over="' + esc(i.open) + '">' + text('message', 'Stuur een bericht') + '</button>'
+      + (!i.partner && i.bron !== 'zakelijk' && i.bron !== 'genootschap'
+        ? '<button type="button" data-chat="' + esc(i.auteur) + '" data-over="' + esc(i.open) + '">' + text('message', 'Stuur een bericht') + '</button>' : '')
       + '<span class="tel"><span>' + esc(i.likes || 0) + ' ' + text('likes', 'waarderingen') + '</span><span>'
       + esc(i.reacties || 0) + ' ' + text('comments', 'reacties') + '</span></span></div>';
   }
@@ -46,7 +56,7 @@
   w.I18N.en = Object.assign(w.I18N.en || {}, {
     'living.moments': 'People, places and moments', 'living.promise': 'A more meaningful life',
     'living.story': 'Your story', 'living.travel': 'Travel', 'living.table': 'At the table', 'living.friends': 'Friends',
-    'living.feed': 'Your moments', 'living.order': 'The newest moments appear first.',
+    'living.feed': 'Your moments', 'living.order': 'The newest moments appear first within each group.',
     'living.welcome': 'Life is better when you share it.',
     'living.empty': 'Your story starts here. When there are posts for you, they appear here, with the newest first.',
     'living.guest': 'Open your LivingOS. The moments from your people, journeys and places come together here.',
@@ -54,7 +64,7 @@
     'living.retry': 'Please try again', 'living.login': 'Open your LivingOS', 'living.create': 'Capture your first moment',
     'living.editorial': 'An RTG atmosphere image. Your own posts will appear here.',
     'living.morePhotos': 'Open the post to see all the images.', 'living.open': 'View the post',
-    'living.message': 'Send a message', 'living.likes': 'appreciations', 'living.comments': 'comments'
+    'living.available': 'available', 'living.until': 'Valid until', 'living.message': 'Send a message', 'living.likes': 'appreciations', 'living.comments': 'comments'
   });
   Object.assign(w.I18N.en, {
     'living.brand': 'RTG LivingOS', 'living.LivingOS': 'LivingOS', 'living.WorkOS': 'WorkOS',
@@ -85,6 +95,6 @@
   }
   w.addEventListener('rtglang', labels);
   labels();
-  function photoCard(i) { return i.beeld && i.beeld.length === 1 && photo(i.beeld[0].src) && String(i.tekst || '').length < 220; }
+  function photoCard(i) { return !i.offer && !i.plaats && !i.begint && i.beeld && i.beeld.length === 1 && photo(i.beeld[0].src) && String(i.tekst || '').length < 220; }
   w.RTGLivingFeed = { welcome: welcome, item: item, text: text, T: T, photoCard: photoCard };
 }(window));

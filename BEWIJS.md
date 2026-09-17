@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1935 bestanden en 13943 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1935 bestanden en 13945 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1935 |
-| losse beweringen (`test(...)`) | 13943 |
+| losse beweringen (`test(...)`) | 13945 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 150 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1291 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1710 bestanden, 13548 beweringen.
+1710 bestanden, 13550 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1663,7 +1663,7 @@ toets omvalt.
 | `wereldcontrole.test.js` | 9 | -- | De wereldcontrole en de wereldwacht. Waarom ze bestaan staat in de kop van scripts/lib/wereldcontrole.js: de proef roept elke route aan, en er staan sloopachtige routes BINNEN de werelden die zij zelf opzet. |
 | `wereldhoreca.test.js` | 4 | -- | DE HORECAWERELD -- een open rekening op een tafel. Zesenveertig horecaroutes stonden op 404, en twintig zeggen hetzelfde: "Deze rekening kennen we niet." De rekening is het scharnier van dit domein -- bestellen,... |
 | `wereldkern.test.js` | 9 | gezakt op `===->!==#0` | DE WERELDKERN: spreken de vier samenhanglagen ECHT dezelfde taal? Er bestond al een toets met die naam, in test/geldwereld.test.js -- maar die keek alleen naar geldwereld. |
-| `wereldlaag.test.js` | 15 | gezakt op `liegpoort /api/` | Integratietests voor RTG Wereld: de laag die van De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen één app maakt met één schakelaar. Wat hier bewust WEL wordt getoetst en waarom (LAT-regel 9): niet "de... |
+| `wereldlaag.test.js` | 17 | gezakt op `liegpoort /api/` | Integratietests voor RTG Wereld: de laag die van De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen één app maakt met één schakelaar. Wat hier bewust WEL wordt getoetst en waarom (LAT-regel 9): niet "de... |
 | `wereldlab2.test.js` | 4 | -- | De livinglab-wereld: een veldnaam, drie betekenissen. |
 | `wereldprofiel.test.js` | 6 | gezakt op `liegpoort /api/` | Het profiel met lagen, en de kern ervan: WIE WAT MAG ZIEN, per veld. Waarom de zichtbaarheden hier op DEZELFDE vier mensen naast elkaar staan: dat is de enige manier om te bewijzen dat ze echt iets verschillends doen. |
 | `wereldregels.test.js` | 4 | gezakt op `liegpoort /api/` | De wereldtabel: alle landen van de wereld in de fiscale tabel, in dezelfde structuur als de rijke kernlanden, en de Regelwacht die elk land automatisch kan bijwerken. Getest: dekking en veldkwaliteit (alles binnen de... |

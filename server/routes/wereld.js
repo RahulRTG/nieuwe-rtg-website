@@ -43,11 +43,14 @@
 
 module.exports = (kern) => {
   const { app, auth, db, save, liveCodename, codenaamVan, zijnVrienden, keyVanCodenaam,
-    gidsHaal, openVacatures, anthropic } = kern;
+    gidsHaal, openVacatures, anthropic, findSupplier, pulseFeed } = kern;
   const rechten = require('../kern/wereld/rechten');
   const lidmaatschap = require('../kern/lidmaatschap');
   const koppel = require('../kern/wereld/koppel');
-  const { feed } = require('../kern/wereld/feed')({ db, codenaamVan, zijnVrienden });
+  const salonZicht = require('../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden });
+  const { feed } = require('../kern/wereld/feed')({ db, codenaamVan, zijnVrienden,
+    salonToegang: (sess, post) => salonZicht.magZien(sess, post),
+    pulseLezen: key => ((pulseFeed(key, 'volgend') || {}).feed || []) });
   const profiel = require('../kern/wereld/profiel')({ db, zijnVrienden });
   const netwerk = require('../kern/wereld/netwerk')({ db, codenaamVan, profiel });
   const bezoek = require('../kern/wereld/bezoek')({ db, codenaamVan });
@@ -90,6 +93,7 @@ module.exports = (kern) => {
       ik: { codenaam: liveCodename(req.session) || 'Een lid', pas: tier },
       lidmaatschap: lidmaatschap.voorSessie(req.session),
       lenzen: lidmaatschap.lenzenVoor(tier),
+      lens: 'friends',
       modus: mijnModus(req),
       modi: rechten.modiVoor(tier),
       lagen: rechten.lagenVoor(tier),
@@ -123,7 +127,14 @@ module.exports = (kern) => {
     if (!rechten.TRAP.includes(tier))
       return res.status(403).json({ error: 'RTG Wereld is er voor leden met een pas.' });
     const modus = req.body.modus ? String(req.body.modus) : mijnModus(req);
-    const uit = feed({ tier, key: req.session.key, modus, vanaf: req.body.vanaf, hoeveel: req.body.hoeveel });
+    const lens = req.body.lens ? String(req.body.lens) : 'all';
+    if (lens !== 'all') {
+      const gekozen = lidmaatschap.lenzenVoor(tier).find(x => x.id === lens);
+      if (!gekozen || !gekozen.open)
+        return res.status(403).json({ error: (gekozen && gekozen.reden) || 'Deze lens is niet beschikbaar.' });
+    }
+    const uit = feed({ tier, key: req.session.key, modus, lens,
+      vanaf: req.body.vanaf, hoeveel: req.body.hoeveel });
     if (uit.error) return res.status(403).json(uit);
     res.json(uit);
   });

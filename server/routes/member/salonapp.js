@@ -13,12 +13,11 @@
    zelf uitvoeren via het stuur (kern/stuur.js). De AI plaatst nooit zelf: een
    bijschrift komt terug als tekst, de mens drukt op plaatsen.
    Gemount vanuit routes/member.js. */
-const salonviraal = require('../../kern/salonviraal');
-
 const { veiligeFout } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, express, auth, geenGast, db, findSupplier, zijnVrienden,
     salon, salonProfiel, salonReacties, salonAI, salonInzicht } = kern;
+  const zichtbaarheid = require('../../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden });
   // veiligeFout: laat de melding staan, haalt er alleen ons bestandssysteem uit
   const fout = (res, e) => res.status(400).json({ error: veiligeFout(e) });
   const uit = (res, r) => r && r.error ? res.status(400).json(r) : res.json(r);
@@ -26,18 +25,7 @@ module.exports = (kern) => {
   /* De kijker: waarom mag ik deze post zien? Partner-volgen (bestond al),
      vriendschap (bestond al) en lid-volgen (nieuw). */
   function poortVoor(sess) {
-    const volgtLid = ((db.data.salon || {}).volgtLid || {})[sess.key] || [];
-    const kijker = {
-      volgt: (p) => {
-        if (p.partnerCode) {
-          const s = findSupplier(p.partnerCode);
-          return !!(s && s.salon && Array.isArray(s.salon.volgers) && s.salon.volgers.includes(sess.key));
-        }
-        return !!(p.authorKey && volgtLid.includes(p.authorKey));
-      },
-      bevriend: (p) => !!(p.authorKey && sess.tier !== 'guest' && sess.key && zijnVrienden(sess.key, p.authorKey))
-    };
-    return (p) => (p.authorKey && p.authorKey === sess.key) || salonviraal.toonInSalon(p, kijker);
+    return (p) => zichtbaarheid.magZien(sess, p);
   }
 
   // ---- plaatsen en de feed ----

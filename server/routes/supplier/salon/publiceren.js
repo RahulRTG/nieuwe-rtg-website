@@ -24,7 +24,7 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
     id: Date.now(),
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
     place: req.supplier.city, visual: null, photo,
-    text, lang: talen.taalVan(req.body.lang),
+    text, lang: talen.taalVan(req.body.lang), momentType: 'moment', publiek: 'iedereen',
     at: new Date().toISOString(),
     baseLikes: 0, likedBy: {}, comments: []
   };
@@ -38,19 +38,27 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
   res.json({ ok: true, postId: post.id });
 });
 
-app.post('/api/supplier/salon/deal', supplierAuth, (req, res) => {
+const publiceerOffer = (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
   if (!eisSalonProfiel(req, res)) return;
   const titel = schoon(req.body.titel, 80);
   const text = schoon(req.body.text, 400);
   if (!titel || !text) return res.status(400).json({ error: 'Geef de aanbieding een titel en een tekst.' });
   const geldigTot = /^\d{4}-\d{2}-\d{2}$/.test(String(req.body.geldigTot || '')) ? req.body.geldigTot : null;
+  const capaciteitRuw = Number(req.body.capaciteit);
+  const capaciteit = Number.isInteger(capaciteitRuw) && capaciteitRuw > 0 && capaciteitRuw <= 100000
+    ? capaciteitRuw : null;
+  const actie = schoon(req.body.actie, 40) || 'Bekijk aanbod';
   const post = {
     id: Date.now(),
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
     place: req.supplier.city, visual: null, photo: null,
-    text, lang: 'nl', at: new Date().toISOString(), baseLikes: 0, likedBy: {}, comments: [],
-    deal: { titel, geldigTot, claims: [] }
+    text, lang: talen.taalVan(req.body.lang), at: new Date().toISOString(),
+    momentType: 'offer', publiek: 'iedereen', baseLikes: 0, likedBy: {}, comments: [],
+    /* `deal` blijft staan voor oudere schermen en claimcodes; `offer` is de
+       gedeelde sociale vorm die Saloon en LivingOS lezen. */
+    deal: { titel, geldigTot, claims: [] },
+    offer: { titel, geldigTot, capaciteit, actie }
   };
   db.data.posts.unshift(post);
   salon.kap();   // het venster: een grens, op een plek (kern/salon)
@@ -58,8 +66,10 @@ app.post('/api/supplier/salon/deal', supplierAuth, (req, res) => {
   logActivity(req.supplier.code, req.actor, 'zette een aanbieding op De Salon: "' + titel + '"');
   salonNaarVolgers(req.supplier, '' + titel);
   broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
-  res.json({ ok: true, postId: post.id });
-});
+  res.json({ ok: true, postId: post.id, offer: salon.publiek(post, null).offer });
+};
+
+app.post('/api/supplier/salon/deal', supplierAuth, publiceerOffer);
 
 app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
@@ -71,7 +81,8 @@ app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
     id: Date.now(),
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
     place: req.supplier.city, visual: null, photo: null,
-    text: vraag, lang: 'nl', at: new Date().toISOString(), baseLikes: 0, likedBy: {}, comments: [],
+    text: vraag, lang: talen.taalVan(req.body.lang), at: new Date().toISOString(),
+    momentType: 'question', publiek: 'iedereen', baseLikes: 0, likedBy: {}, comments: [],
     poll: { vraag, opties: opties.map(t2 => ({ tekst: t2, stemmen: [] })) }
   };
   db.data.posts.unshift(post);

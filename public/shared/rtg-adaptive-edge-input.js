@@ -45,6 +45,7 @@
   }
   function bind(rt, handlers) {
     var down = false, x = 0, y = 0, timer = null, held = false, blockClickUntil = 0;
+    var scrollTimer = null, lastScroll = rt.win.scrollY || 0;
     rt.bar.addEventListener('pointerdown', function (event) {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       down = true; held = false; x = event.clientX; y = event.clientY;
@@ -87,10 +88,20 @@
     }, true);
     rt.doc.addEventListener('keydown', function (event) {
       var input = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target && event.target.tagName || '');
-      if (!input && event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+      if (!input && (event.metaKey || event.ctrlKey) && String(event.key).toLowerCase() === 'k') {
+        event.preventDefault(); handlers.rahul();
+      } else if (!input && event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
         event.preventDefault(); handlers.deck(event.key === 'ArrowRight' ? 1 : -1);
       } else if (event.key === 'Escape') handlers.escape();
     });
+    rt.win.addEventListener('scroll', function () {
+      var now = rt.win.scrollY || 0, moved = Math.abs(now - lastScroll); lastScroll = now;
+      if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;
+      handlers.state('peek', 'auto'); rt.win.clearTimeout(scrollTimer);
+      scrollTimer = rt.win.setTimeout(function () {
+        if (!rt.manual && rt.model.state === 'peek') handlers.state('dock', 'auto');
+      }, 520);
+    }, { passive: true });
   }
   // Public stories can use the same sheet without constructing a second bar.
   function closePanel(rt) {

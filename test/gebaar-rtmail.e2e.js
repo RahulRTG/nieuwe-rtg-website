@@ -36,6 +36,27 @@ async function wachtTot(lees, klopt, wat, grens = 8000) {
   assert.fail(wat + ' -- na ' + grens + 'ms stond er: ' + JSON.stringify(laatst));
 }
 
+/* De postlijst ververst zichzelf zodra de eerste serverreactie binnenkomt. Op
+   een trage CI-run kan precies tijdens scrollIntoView een oude regel verdwijnen.
+   Meet daarom een verse, zichtbare regel en probeer alleen die vluchtige
+   DOM-overgang opnieuw; een echte Playwright-fout blijft gewoon rood. */
+async function meetVerseRij(page, kiezer, wat, grens = 8000) {
+  const eind = Date.now() + grens;
+  let laatst;
+  while (Date.now() < eind) {
+    const rij = page.locator(kiezer).first();
+    try {
+      await rij.waitFor({ state: 'visible', timeout: Math.min(1000, Math.max(1, eind - Date.now())) });
+      const vak = await rij.boundingBox();
+      if (vak) return vak;
+    } catch (fout) {
+      if (!/not attached|detached|Timeout/i.test(String(fout && fout.message))) throw fout;
+      laatst = fout;
+    }
+  }
+  assert.fail(wat + (laatst ? ' -- ' + laatst.message : ''));
+}
+
 
 test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook',
   { skip: geenBrowser(pw) }, async () => {
@@ -90,9 +111,9 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
     await page.waitForSelector('#main .rij[data-i].gb-rij', { timeout: 20000 });
 
     // 1. doorvegen bergt het bericht ECHT op, en opent het NIET
-    const rij = page.locator('#main .rij[data-i]').first();
-    await rij.scrollIntoViewIfNeeded();
-    await veegDoor(page, await rij.boundingBox(), { kiezer: '#main .rij[data-i]' });
+    const eersteVak = await meetVerseRij(page, '#main .rij[data-i]',
+      'de eerste postregel hoort stabiel zichtbaar te worden');
+    await veegDoor(page, eersteVak, { kiezer: '#main .rij[data-i]' });
     await wachtTot(() => mapVan(onderwerp), (m) => m === 'archief',
       'doorvegen hoort het bericht bij de server in het archief te zetten');
     assert.equal(await page.locator('#terug').count(), 0,
@@ -117,8 +138,8 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
        bedoeling. */
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForSelector('#main .rij[data-i].gb-rij');
-    const weer = page.locator('#main .rij[data-i]').first();
-    const d2 = await weer.boundingBox();
+    const d2 = await meetVerseRij(page, '#main .rij[data-i]',
+      'de teruggezette postregel hoort stabiel zichtbaar te worden');
     await page.mouse.move(d2.x + d2.width * 0.15, d2.y + d2.height / 2);
     await page.mouse.down();
     for (let i = 1; i <= 16; i++) await page.mouse.move(d2.x + d2.width * 0.15 + i * 11, d2.y + d2.height / 2);

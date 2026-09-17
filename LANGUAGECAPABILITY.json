@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-09-17T05:48:12.059Z",
-  "completedAt": "2026-09-17T05:48:33.312Z",
+  "startedAt": "2026-09-17T06:24:31.241Z",
+  "completedAt": "2026-09-17T06:24:52.065Z",
   "node": "v24.18.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "afa588436ee49bc8e108a4ef08c0a11c4d16b0ffb74f8b262a15022e4b187ca2",
+  "testOutputSha256": "859b9995602dd6637718b25ba26322beef2fb5788be2aa1435d930fdf33bf8cf",
   "sources": {
     "public/apps/access/meaning.js": "34aada4780c1e2e836d3e6b5d9e0839ccd51d5f75078ef0aca7a4a49499fbedd",
     "public/apps/access/portal.css": "50a4099d085813b3b8e00021f62e0e8a30e5170779f1613c5d3dc9f2d0b34b90",
@@ -17,7 +17,7 @@
     "public/shared/rtg-edge-appbar.js": "59de3b2e49addd8a5a708969a3d0399f3dd53cb39a5666f8bd2f4525ea998c7c",
     "public/shared/verbinding.js": "68360e7729f19f512c01fdee4cd3bebb5f7f21f057065e88da536a146cb80289",
     "public/shared/i18n.js": "93dcd895770fa7e95a2c3e522dddb1a337fa9cbc0fac8f1e492cb5b99956034e",
-    "public/shared/rtg-edge-smart-menu.js": "5a7bdc64ad26433ef15a8e0b23e05233665e2396f9a60d35fdc5d28f4649f966",
+    "public/shared/rtg-edge-smart-menu.js": "ace12eb9ac031c6b8453799c21bb7a14f465ca644b10738e3c86bda120b96560",
     "public/shared/rtg-edge-library.js": "40ba9d5825c38e00077ee1047592b09fb248cf5e73d02b720a90eeead571f6a9",
     "public/shared/rtg-adaptive-edge-controls.js": "0a7daa0ec2b1e57988856391c9845667474fe4eded12cb0c3a5d8d6e858abbb8",
     "public/shared/appshell.js": "fab1e3c6e0dcfbc4cf0347c245c14a7f29e6ff17a059e0a79eef178c3ba54fdc",
@@ -34,7 +34,7 @@
     "server/local-ai.js": "9967c1c5622236cdcb0ef7c10152ce17a80888d64637006a2a515ec2b4d65c89",
     "server/ai.js": "8b58be71828752ac9adb14a4f8fc03e03e2668369596fb5293702d16db867644",
     "scripts/language-proof.js": "11f028a86830a21676f0b182281b8a1ac9e88d43595d07dc5027eaa7a83c1f90",
-    "test/access-language.e2e.js": "3fb02d2421084be925297a8ddcc1ccfa257ad30c3d7e150a33daf15652954f3c",
+    "test/access-language.e2e.js": "d551d6fa268fee1b4aed87c2dee3b077b2bfd3a98d05414dba6dc10ec87ab7e9",
     "test/i18n-dictionary.test.js": "8ed617d432e4baa2518d7180ba459668bf9beb83e5617564ef318c49d4e6423e",
     "test/language-foundations.test.js": "ca8bea3d19284ca768e970b990d7698095c65cd217b27924221f40635b6f6b2b",
     "test/onboarding.test.js": "ed42e70414a48fee52d0ca7b55487413c946e174fab73d79ae68613822161138"

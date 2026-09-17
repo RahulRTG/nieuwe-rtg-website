@@ -14,6 +14,7 @@
       '<p>Alles van Rahul Travel Group</p><div class="rtg-edge-smart-worlds"></div><nav class="rtg-edge-smart-doors" aria-label="Heel RTG">' +
       deur('/apps/app.html', 'Alle apps', 'grid') +
       '<button type="button" class="rtg-edge-smart-door" data-edge-smart-search>' + icoon('search') + '<span>Zoeken</span><em aria-hidden="true">›</em></button>' +
+      '<button type="button" class="rtg-edge-smart-door" data-edge-smart-language>' + icoon('grid') + '<span>Taal kiezen</span><em aria-hidden="true">›</em></button>' +
       deur('/apps/mijn-gegevens.html', 'Profiel &amp; veiligheid', 'people') + '</nav><div class="rtg-edge-global-original"></div></section>';
     index.textContent = ''; index.appendChild(schaal);
     rt.hier = schaal.querySelector('.rtg-edge-face-here');
@@ -42,6 +43,12 @@
     schaal.querySelector('[data-edge-smart-search]').addEventListener('click', function () {
       rt.alles.setAttribute('data-catalogus-open', 'true');
       var invoer = rt.alles.querySelector('.rtg-edge-find input'); if (invoer) invoer.focus();
+    });
+    schaal.querySelector('[data-edge-smart-language]').addEventListener('click', function () {
+      if (!w.RTGi18n) return;
+      var menu = rt.root.querySelector('.rtg-edge-menu');
+      if (menu.getAttribute('aria-expanded') === 'true') menu.click();
+      w.RTGi18n.openModal();
     });
     schaal.querySelector('.rtg-edge-smart-doors a').addEventListener('click', function (ev) {
       var groepen = rt.alles.querySelector('.rtg-edge-global-original');

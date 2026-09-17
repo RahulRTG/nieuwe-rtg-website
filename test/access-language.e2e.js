@@ -35,7 +35,15 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
       assert.deepEqual(codes,TALEN.map(t=>t.code));await offline.close();
     });
     await t.test('welkom, alle vier vragen en foutmeldingen volgen Nederlands en Engels',async()=>{
-      await change('en');assert.match(await page.locator('#agTitle').innerText(),/Welcome/);
+      // The actual Edge route must remain usable when the portal hides the top bar.
+      await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+      await page.locator('[data-edge-face="all"]').click();
+      await page.locator('[data-edge-smart-language]').click();
+      await page.locator('#rtg-lang-zoek').fill('English');
+      await page.locator('#rtg-lang-hint[data-lang="en"]').click();
+      assert.equal(await page.locator('#rtg-lang-modal').isVisible(),false);
+      assert.equal(await page.locator('.rtg-edge-index').getAttribute('aria-hidden'),'true');
+      assert.match(await page.locator('#agTitle').innerText(),/Welcome/);
       assert.equal(await page.locator('#agNieuw').innerText(),'Create your RTG');
       await page.waitForFunction(()=>!!window.RTGNet);
       await page.evaluate(()=>RTGNet.satelliet.zetStand('aan'));

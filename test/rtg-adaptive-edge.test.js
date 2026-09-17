@@ -59,7 +59,7 @@ test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(CSS, /data-rtg-adaptive-state="peek"[^}]*width:136px;height:50px/);
   assert.match(VIEW, /Mandaat gecontroleerd/);
   assert.match(CSS, /\.rtg-adaptive-sheet \.rtg-edge-2-context-slot :is\([^}]+grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/);
-  assert.match(CSS, /\[role="dialog"\]\.open/);
+  assert.match(CSS, /\.scrim\.open\[role="dialog"\]/);
 });
 
 test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-16T22:15:57.909Z",
-    "commit": "4a9e7138",
+    "op": "2026-09-17T00:39:26.524Z",
+    "commit": "bee95977",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 2,
     "instrument": "scripts/planvorm.js",
     "node": "v22.22.2"
   },

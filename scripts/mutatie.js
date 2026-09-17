@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-/* ============================================================================
-   DE MUTATIEMOTOR -- kan deze toets eigenlijk zakken?
+/* =====================================================================   DE MUTATIEMOTOR -- kan deze toets eigenlijk zakken?
 
    WAAROM. LAT.md regel 9: een toets die niet kan zakken is erger dan geen toets,
    want hij geeft dekking zonder dekking te leveren. BEWIJS.md legde bloot hoe
@@ -451,6 +450,8 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // This test executes the browser language loader in a VM, not through require.
+  ['i18n-dictionary.test.js', ['public/shared/i18n.js']],
   /* De Evidence Engine-toets importeert ook test/helper.js om het gedrag van
      een verbonden browserclient te isoleren. Zonder deze expliciete bron wint
      daardoor de serverheuristiek en krijgt hij een liegende API die niets met

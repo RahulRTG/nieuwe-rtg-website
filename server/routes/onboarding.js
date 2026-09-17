@@ -55,7 +55,9 @@ module.exports = (kern) => {
     res.json(onboarding.bewaarPaspoort(req.session, req.body || {}));
   });
   app.post('/api/onboarding/teken', auth, (req, res) => {
-    const r = onboarding.teken('rtg', req.session, req.body.naam, req.body.akkoord === true);
+    if (!Number.isSafeInteger(req.body.contractVersion) || req.body.contractVersion<1)
+      return res.status(409).json({error:'Open de actuele overeenkomst voordat u tekent.'});
+    const r = onboarding.teken('rtg', req.session, req.body.naam, req.body.akkoord === true,req.body.contractVersion);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });

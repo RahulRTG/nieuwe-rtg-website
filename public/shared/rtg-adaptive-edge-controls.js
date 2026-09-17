@@ -3,7 +3,7 @@
    remain authoritative. Declared capabilities use the existing weight gate. */
 (function (w, d) {
   'use strict';
-  var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav';
+  var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav';
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
     for (var p = el; p; p = p.parentElement) {

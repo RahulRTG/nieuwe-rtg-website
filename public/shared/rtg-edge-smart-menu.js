@@ -7,7 +7,7 @@
   var actief = null, teller = 0, OPSLAG = 'rtg.edge.recent.v1';
 
   function tekst(el) {
-    var label = el.getAttribute('aria-label') || el.textContent || '';
+    var label = el.getAttribute('aria-label') || (el.querySelector('b') && el.querySelector('b').textContent) || el.textContent || '';
     return label.replace(/\s+/g, ' ').trim();
   }
 
@@ -71,7 +71,7 @@
     if (bank) {
       var werk = d.createElement('button'); werk.type = 'button';
       werk.className = 'rtg-edge-here-action'; werk.setAttribute('data-edge-command-bank', '');
-      werk.textContent = 'Werelden en werkbladen';
+      werk.innerHTML = icoon('grid') + '<span>Werelden en werkbladen</span><em aria-hidden="true">›</em>';
       werk.addEventListener('click', function () { openWerkbladen(rt); });
       nav.appendChild(werk);
     }
@@ -129,6 +129,7 @@
       '<p>Alles van Rahul Travel Group</p><div class="rtg-edge-smart-worlds"></div><nav class="rtg-edge-smart-doors" aria-label="Heel RTG">' +
       deur('/apps/app.html', 'Alle apps', 'grid') +
       '<button type="button" class="rtg-edge-smart-door" data-edge-smart-search>' + icoon('search') + '<span>Zoeken</span><em aria-hidden="true">›</em></button>' +
+      '<button type="button" class="rtg-edge-smart-door" data-edge-smart-language>' + icoon('grid') + '<span>Taal kiezen</span><em aria-hidden="true">›</em></button>' +
       deur('/apps/mijn-gegevens.html', 'Profiel &amp; veiligheid', 'people') + '</nav><div class="rtg-edge-global-original"></div></section>';
     index.textContent = ''; index.appendChild(schaal);
     rt.hier = schaal.querySelector('.rtg-edge-face-here');
@@ -150,13 +151,19 @@
     });
     if (d.querySelector('#rtgCommand .cmd-lade')) {
       var werk = d.createElement('button'); werk.type = 'button'; werk.className = 'rtg-edge-smart-door';
-      werk.setAttribute('data-edge-command-bank', ''); werk.textContent = 'Werelden en werkbladen';
+      werk.setAttribute('data-edge-command-bank', ''); werk.innerHTML = icoon('grid') + '<span>Werelden en werkbladen</span><em aria-hidden="true">›</em>';
       werk.addEventListener('click', function () { openWerkbladen(rt); });
       rt.alles.querySelector('.rtg-edge-smart-doors').appendChild(werk);
     }
     schaal.querySelector('[data-edge-smart-search]').addEventListener('click', function () {
       rt.alles.setAttribute('data-catalogus-open', 'true');
       var invoer = rt.alles.querySelector('.rtg-edge-find input'); if (invoer) invoer.focus();
+    });
+    schaal.querySelector('[data-edge-smart-language]').addEventListener('click', function () {
+      if (!w.RTGi18n) return;
+      var menu = rt.root.querySelector('.rtg-edge-menu');
+      if (menu.getAttribute('aria-expanded') === 'true') menu.click();
+      w.RTGi18n.openModal();
     });
     schaal.querySelector('.rtg-edge-smart-doors a').addEventListener('click', function (ev) {
       var groepen = rt.alles.querySelector('.rtg-edge-global-original');

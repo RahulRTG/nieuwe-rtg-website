@@ -47,9 +47,10 @@ async function opzet() {
 }
 
 async function tekenOnboarding(base, token) {
+  const status=await fetch(base+'/api/onboarding/status',{method:'POST',headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
   const r = await fetch(base + '/api/onboarding/teken', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-    body: JSON.stringify({ naam: 'Werktafel Proef', akkoord: true })
+    body: JSON.stringify({ naam: 'Werktafel Proef', akkoord: true,contractVersion:status.contract.versie })
   });
   const d = await r.json().catch(() => ({}));
   assert.equal(r.status, 200, 'onboarding tekenen: ' + JSON.stringify(d).slice(0, 200));
@@ -106,8 +107,7 @@ const stand = () => {
        die knop dus ook niet. Wat de belofte eronder was -- er is vanaf de
        werktafel altijd een zichtbare weg naar uitloggen, de pin, je Zegel --
        leeft door in de voet van de bank. */
-    paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
-      .some(b => /^Instellingen$/i.test(b.textContent.trim())),
+    paneelIngang: !!document.querySelector('.cmd-bankvoet button[data-deur="instellingen"]'),
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
     // hoeveel er onder het blad overblijft: dat hoort precies de gezamenlijke
@@ -451,7 +451,9 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     /* EEN WERELD AANRAKEN OPENT GEEN DEUR. Dit is de kern van de keuze: de bank
        is voor het inloggen een uitnodiging, geen menu. Zonder deze stap zou een
        gesloten werktafel met werkende knoppen erdoorheen glippen. */
-    await page.click('.cmd-nav button');
+    // The retired bank is hidden; test its authorization handler directly.
+    // Visible navigation is exclusively through the shared Edge (portal suite).
+    await page.locator('.cmd-nav button').first().evaluate(button => button.click());
     /* Hij hoort GEEN blad te openen maar de cursor op de deur te zetten; dat is
        de toestand om op te wachten -- en die komt, of de bewering zakt. */
     await wachtTot(page, () => document.activeElement && document.activeElement.id === 'agPasskey',
@@ -523,7 +525,9 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
     });
     await page.route('**/api/webauthn/login', async route => {
       loginBody = route.request().postDataJSON();
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token }) });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token, ...(await (await fetch(srv.base + '/api/state', {
+        method: 'POST', headers: { 'Content-Type':'application/json', Authorization:'Bearer '+token }, body:'{}'
+      })).json()) }) });
     });
 
     /* `waitUntil: 'domcontentloaded'` wacht op ELK subverzoek -- elk plaatje, elk lettertype

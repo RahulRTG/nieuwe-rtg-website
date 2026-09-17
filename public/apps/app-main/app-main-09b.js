@@ -27,7 +27,7 @@
   }
   function dmBubbel(m){
     const mijn = m.from === social.me;
-    const tijd = new Date(m.at).toLocaleTimeString(lang()==='en'?'en-GB':'nl-NL',{hour:'2-digit',minute:'2-digit'});
+    const tijd = new Date(m.at).toLocaleTimeString(lang(),{hour:'2-digit',minute:'2-digit'});
     const emo = s => window.RTGEmoji ? RTGEmoji.render(escT(s)) : escT(s);
     const txt = mijn ? emo(m.text) : '<span class="xlate">' + escT(m.text) + '</span>';
     return '<div class="dm-m' + (mijn ? ' mine' : '') + '">' + txt +

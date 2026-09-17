@@ -1,115 +1,37 @@
-    /* Vervolg van app-main-04: de poort-inhoud (mond, zin, invoerveld,
-       passkey) en het gesprek erachter. Geknipt omdat deel 04 met de
-       schermvullende sterrenhemel over de 10 KB-grens ging die het
-       modulebeleid stelt; de bundel plakt 04 en 04b weer aaneen tot exact
-       hetzelfde bestand. De cut ligt op een statement-grens binnen dezelfde
-       gesloten scope, dus er verandert niets aan het gedrag. */
-
-    // Een dicht maar fluisterzacht starlight-veld over het hele scherm. Meer
-    // lichtpunten geeft de indruk van ontelbaar veel vezels; de lagere
-    // helderheid voorkomt dat de poort glitterig of onrustig wordt.
-    (function sterrenhemel(){
-      var hang = function(){ if (window.RTGSterren) window.RTGSterren.hang(gate, { dichtheid: 1.35, helderheid: 0.72 }); };
-      if (window.RTGSterren) return hang();
-      var s = document.createElement('script'); s.src = '/shared/sterren.js'; s.async = true;
-      s.onload = hang; document.head.appendChild(s);
-    })();
-
-    /* Het RTG ID-verhaal hoort bij de ballotage, maar niet bij de gewone
-       terugkeerroute. CSS toont deze inhoud pas zodra de server de ballotage
-       activeert; de bestaande, echte klok blijft het identiteitsanker. */
-    const idIntro = document.createElement('section');
-    idIntro.className = 'rtg-id-intro';
-    idIntro.setAttribute('aria-label', T('ag.id.naam','RTG ID'));
-    idIntro.innerHTML =
-      '<div class="rtg-id-kicker"><span></span>' + T('ag.id.naam','RTG ID') + '</div>' +
-      '<div class="rtg-id-story"><p>' + T('ag.id.waarden','Persoonlijk · zorgvuldig · vertrouwd') + '</p>' +
-      '<h1>' + T('ag.id.kop','Uw toegang begint met een gesprek.') + '</h1>' +
-      '<div>' + T('ag.id.uitleg','Vier korte vragen. Geen formuliergevoel, wel de aandacht waarmee RTG u leert kennen.') + '</div></div>';
-    gate.insertBefore(idIntro, gate.querySelector('.os-lock'));
-
-    const doos = document.createElement('div');
-    doos.className = 'ag-doos';
-    doos.innerHTML =
-      '<div class="ag-kop" id="agKop"><span id="agKopLabel"></span><strong>' + T('ag.kennismaking','Kennismaking') + '</strong></div>' +
-      '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
-      '<div class="ag-rahul-label" aria-hidden="true">' + T('ag.log','Rahul') + '</div>' +
-      '<div class="ag-intro"><h1 class="ag-welkom">' + T('ag.welkom.kop','Welkom terug') + '</h1>' +
-      '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
-      '<p class="ag-vraag-hint">' + T('ag.id.hint','U bepaalt zelf wat u deelt. Uw antwoord blijft binnen uw beveiligde RTG ID.') + '</p></div>' +
-      '<div class="ag-rij" hidden><span class="ag-veld-label">' + T('ag.antwoord','Uw antwoord') + '</span>' +
-      '<input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
-      '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
-      '<div class="ag-stappen" id="agStappen" role="status" aria-live="polite"></div>' +
-      '<p class="ag-id-privacy"><i></i>' + T('ag.id.privacy','Alleen gebruikt voor uw persoonlijke RTG ID.') + '</p>' +
-      '<div class="ag-kluis" id="agKluis"></div>' +
-      '<div class="ag-passkey-kaart"><div class="ag-passkey-embleem" aria-hidden="true">' +
-        '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.35"><circle cx="13" cy="10" r="4"/><path d="M5 23c.8-5 3.4-7 8-7 3.4 0 5.8 1.3 7 4"/><circle cx="23" cy="19" r="3"/><path d="M26 19h5m-2 0v3m-2-3v2"/></svg></div>' +
-        '<p>' + T('ag.pk.uitleg','Ga verder met je passkey') + '</p>' +
-      '<button type="button" class="ag-passkey" id="agPasskey">' +
-        '<svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a2 2 0 0 0-2 2c0 2-.4 3.6-1 5"/><path d="M8 9a4 4 0 0 1 7 2c0 3-.5 5.4-1.5 7.5"/><path d="M12 13c0 3-.6 5.6-1.6 7.7"/><path d="M5.5 8a7 7 0 0 1 12 3c0 3.4-.5 6.4-1.5 9"/></svg>' +
-        '<span>' + T('ag.pk.veilig','Veilig openen') + '</span></button></div>' +
-      '<button type="button" class="ag-anders" id="agAnders"><span>' + T('ag.anders','Andere manier') + '</span></button>' +
-      '<div class="ag-werelden" id="agWerelden" aria-label="' + T('ag.werelden','Beschikbare RTG-werelden') + '"></div>';
-    gate.appendChild(doos);
-    // Only explicit, allowlisted world interests can cross from the public demo.
-    // They are a welcome hint, never an account permission or saved profile.
-    const verkenning = window.RTGExperienceHandoff && window.RTGExperienceHandoff.consume();
-    if (verkenning && verkenning.length) {
-      const welkom = document.createElement('p'); welkom.className = 'ag-experience';
-      welkom.textContent = 'Uw verkenning: ' + verkenning.join(', ') + '. Alleen hier getoond; niet opgeslagen in uw account.';
-      doos.querySelector('.ag-intro').appendChild(welkom);
-    }
-    /* Op telefoon vervangt deze rail de ingeklapte command-bank. De namen
-       komen uit dezelfde navigatiebron; dit is dus geen tweede wereldregister
-       dat later los van LivingOS, WorkOS, TravelOS of FoundationOS kan raken. */
-    let wereldPogingen = 0, wereldWachter = null;
-    function vulWerelden(){
-      const rail = doos.querySelector('#agWerelden');
-      if (!rail || rail.children.length) return;
-      const knoppen = document.querySelectorAll('#rtgCommand .cmd-nav button');
-      const namen = Array.from(knoppen).slice(0, 4).map(function(knop){
-        return knop.textContent.trim();
-      }).filter(Boolean);
-      if (namen.length < 4){
-        if (!wereldWachter && window.MutationObserver){
-          wereldWachter = new MutationObserver(vulWerelden);
-          wereldWachter.observe(document.body, { childList: true, subtree: true });
-        } else if (!window.MutationObserver && wereldPogingen++ < 100) setTimeout(vulWerelden, 100);
-        return;
+    /* WebAuthn uses the existing challenge, signature check and session path. */
+    async function passkeyLogin(){
+      if (busy || passkeyAbort) return;
+      if (!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get)) {
+        message(()=>T('access.portal.this_browser_cannot_use_a_passkey_here_you_can_sign_in_using_anot','Uw browser ondersteunt hier geen passkey. U kunt inloggen via Andere manier.'),true); return;
       }
-      if (wereldWachter){ wereldWachter.disconnect(); wereldWachter = null; }
-      namen.forEach(function(naam){
-        const item = document.createElement('span'); item.textContent = naam; rail.appendChild(item);
-      });
+      const attempt = ++passkeyAttempt;
+      const controller = new AbortController(); passkeyAbort = controller;
+      el('agPasskey').disabled = true;
+      const b2u = s => Uint8Array.from(atob(String(s).replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+      const u2b = buf => btoa(String.fromCharCode.apply(null,new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+      try {
+        message(()=>T('access.portal.confirm_on_your_device_that_you_want_to_sign_in','Bevestig op uw apparaat dat u wilt inloggen.'));
+        const o = await accessRequest('identity.passkey.challenge',{});
+        if (attempt !== passkeyAttempt) return;
+        const pub = o.opties; pub.challenge = b2u(pub.challenge);
+        pub.allowCredentials = (pub.allowCredentials || []).map(c=>Object.assign({},c,{id:b2u(c.id)}));
+        const cred = await navigator.credentials.get({publicKey:pub,signal:controller.signal});
+        if (attempt !== passkeyAttempt) return;
+        const antwoord = { id:cred.id,rawId:u2b(cred.rawId),type:cred.type,
+          clientExtensionResults:cred.getClientExtensionResults(),
+          response:{authenticatorData:u2b(cred.response.authenticatorData),clientDataJSON:u2b(cred.response.clientDataJSON),
+            signature:u2b(cred.response.signature),userHandle:cred.response.userHandle?u2b(cred.response.userHandle):null} };
+        // Once the signed proof is submitted, do not offer a competing route.
+        waiting(true);
+        const result = await accessRequest('identity.passkey.verify',{ceremonie:o.ceremonie,antwoord,pasApp:vastePas||undefined});
+        await login('rtg',{response:result});
+      } catch(e) {
+        if (attempt !== passkeyAttempt) return;
+        message(()=>e.name === 'NotAllowedError' || e.name === 'AbortError'
+          ? T('access.portal.sign_in_was_cancelled_try_again_or_choose_another_way','Het inloggen is geannuleerd. Probeer het opnieuw of kies Andere manier.')
+          : T('access.portal.passkey_sign_in_failed_try_again_or_choose_another_way','Inloggen met uw passkey is niet gelukt. Probeer het opnieuw of kies Andere manier.'),true);
+      } finally {
+        if (attempt === passkeyAttempt) { passkeyAbort=null; waiting(false); }
+        el('agPasskey').disabled=false;
+      }
     }
-    vulWerelden();
-    // een wachtwoord-herstel-link uit de e-mail (?reset=): Rahul regelt het herstel zelf
-    const herstel = new URLSearchParams(location.search).get('reset');
-
-    const zin = doos.querySelector('#agZin');
-    const inp = doos.querySelector('#agIn');
-    let gesprek = null, bezig = false, loginU = null;
-
-    /* De RTG-signatuur: de mond bestaat uit duizenden bewegende lichtpuntjes
-       (eigen canvas, geen extern beeld). Bordeaux als basis, goud erdoorheen
-       geweven, een enkel wit puntje als glinstering, en een gouden lichtgolf
-       die om de paar seconden door de lippen trekt. De onderlip beweegt mee
-       als Rahul praat. Wie minder beweging wil, krijgt een stilstaand beeld. */
-    const mond = doos.querySelector('#agMond');
-    /* EEN mond voor het hele systeem: shared/mond.js. Hier stond een eigen,
-       tweede kopie van dezelfde puntenwolk -- met een eigen tekenlus die na
-       het inloggen eeuwig bleef pollen (het canvas en 2820 objecten werden
-       nooit vrijgegeven) en met een sinus in plaats van echte spraak. Die
-       kopie is weg; de gedeelde motor doet kaak, spreiding en tuit, en stopt
-       vanzelf zodra de poort uit beeld is. */
-    /* mond.js laadt met defer en is er dus nog NIET wanneer de poort bouwt:
-       meteen aanhaken zou een stille mond geven. Vandaar de na-lading op
-       DOMContentLoaded (uitgestelde scripts draaien daarvoor al). */
-    let mondje = { praat: function(){} };
-    function mondStart(){
-      if (window.RTGMond && mond && !mond.dataset.rtgMondActief) mondje = RTGMond.maak(mond);
-    }
-    mondStart();
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mondStart);
-    const praat = ms => mondje.praat(ms);

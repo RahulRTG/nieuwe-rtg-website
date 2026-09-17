@@ -43,11 +43,8 @@
   // meteen: de poort spreekt de taal van de gekozen ingang (?pas=...)
   stemKoppen();
 
-  /* De poort is een gesprek met Rahul (zie app-main-06): inloggen, aanmelden en
-     wachtwoord-herstel gaan alle drie via dat gesprek. De oude formulieren
-     (loginForm/regForm/forgotForm/resetForm met hun wisselknoppen) staan niet
-     meer in app.html; hun afhandeling hoort hier dus ook niet meer te staan. Wat
-     blijft, zijn de LINKS uit de e-mail: die komen los van de poort binnen. */
+  /* The account portal submits to the existing login, registration and recovery
+     routes. Verification links still enter independently of the visible step. */
   (function bevestigEmailLink(){
     const token = new URLSearchParams(location.search).get('verify');
     if (!token) return;
@@ -68,14 +65,20 @@
     creatorLikes = Number(MAGNAAT.creatorLikes || 0);
   }
 
+  function accessRequest(meaningId,parameters){
+    const intent=RTGAccessMeaning.plan(meaningId,parameters,1);
+    return API.call(intent.route,intent.parameters);
+  }
   async function login(tier, cred){
     if (cred){
       if (API.enabled){
         try {
-          const data = cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: vastePas || undefined,
-                wervingscode: wervingscode || undefined })
-            : await API.call('/auth/login', { login: cred.u, password: cred.p, pasApp: vastePas || undefined });
+          const data = cred.response || (cred.register
+            ? await accessRequest('identity.account.create', { name:cred.name,email:cred.u,geboortedatum:cred.geboortedatum,password:cred.p,
+                wervingscode:wervingscode || undefined })
+            : await accessRequest('identity.session.open', {login:cred.u,password:cred.p,pasApp:vastePas || undefined}));
+          if (data.tweedeFactorNodig) return data;
+          if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
           API.token = data.token;
           applyState(data.state);           // user = het echte account
           tier = user.tier;
@@ -99,9 +102,9 @@
           if (!magHier.includes(user.tier) && ['rtg', 'lifestyle', 'business'].includes(doelPas)){
             try { localStorage.setItem('rtg_member_token', API.token); } catch (e2) {}
             location.replace(pasAdres(doelPas));
-            return;
+            return true;
           }
-        } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
+        } catch (e) { throw e; }
       } else {
         /* HIER STOND EEN WACHTWOORD IN DE CLIENT. De tak controleerde
            letterlijk op een naam en een wachtwoord en gaf daarna de
@@ -136,6 +139,7 @@
     }
     loadSocial();
     checkOnboarding(); laadAgendaLid();
+    return true;
   }
 
   // Blijf ingelogd: met een bewaard token slaat de app het startscherm over.

@@ -1,182 +1,80 @@
-
-    // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
-    function zeg(wie, tekst){
-      if (wie !== 'rahul') return;
-      /* De hele zin verschijnt meteen; alleen Rahuls mond blijft bewegen. */
-      zin.style.animation = 'none';
-      void zin.offsetWidth;              // de fade opnieuw laten lopen
-      zin.style.animation = '';
-      zin.textContent = tekst;
-      praat(Math.min(2600, 500 + tekst.length * 28));
+    /* Account access: validate the current step and submit through the existing auth routes. */
+    function invalid(text){
+      message(text,true); inp.focus();
     }
-    /* Servermetadata bestuurt stap, teller en kluisregel; zonder metadata
-       keert de poort terug naar haar gewone entree. */
-    const kopEl = doos.querySelector('#agKop');
-    const kopLabel = doos.querySelector('#agKopLabel');
-    const stappenEl = doos.querySelector('#agStappen');
-    const kluisEl = doos.querySelector('#agKluis');
-    const ROMEINS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
-    function toonVoortgang(d){
-      const v = d && d.voortgang;
-      const entree = d && (d.entree || d.login) && !d.ingelogd;
-      if (v && v.nr && !d.klaar){
-        if (kopLabel) kopLabel.textContent = T('ag.ballotage','De ballotage');
-        else if (kopEl) kopEl.textContent = T('ag.ballotage','De ballotage');
-        doos.dataset.stap = String(v.nr).padStart(2, '0');
-        doos.dataset.van = String(v.van || 4).padStart(2, '0');
-        if (stappenEl){
-          stappenEl.textContent = '';
-          stappenEl.setAttribute('aria-label', T('ag.stap','Stap') + ' ' + v.nr + ' ' +
-            T('ag.van','van') + ' ' + (v.van || 4));
-          for (let i = 1; i <= (v.van || 4); i++){
-            const s = document.createElement('span');
-            s.textContent = ROMEINS[i - 1] || String(i);
-            if (i === v.nr) s.className = 'nu';
-            else if (i < v.nr) s.className = 'gehad';
-            stappenEl.appendChild(s);
+    async function submit(){
+      if (busy) return;
+      const value = inp.type === 'password' || el('agShowPassword').getAttribute('aria-pressed') === 'true' ? inp.value : inp.value.trim();
+      inp.removeAttribute('aria-invalid'); el('agError').textContent='';
+      if (!value || !inp.checkValidity()) return invalid(()=>T('access.portal.please_check_this_field_and_complete_it','Controleer dit veld en vul het volledig in.'));
+      if (view === 'register' && step < 3) {
+        const s=steps()[step];
+        if (step === 1 && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) return invalid(()=>T('access.portal.enter_a_valid_email_address_such_as_name_example_com','Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.nl.'));
+        if (step === 2) {
+          const date=new Date(value+'T12:00:00'), now=new Date();
+          let age=now.getFullYear()-date.getFullYear();
+          if (now.getMonth()<date.getMonth() || (now.getMonth()===date.getMonth() && now.getDate()<date.getDate())) age--;
+          if (!Number.isFinite(age) || age>120 || age<0) return invalid(()=>T('access.portal.please_check_your_date_of_birth','Controleer uw geboortedatum.'));
+          if (age<15) {
+            invalid(()=>T('access.portal.you_can_create_this_account_from_age_15_you_can_explore_foundatio','U kunt dit account vanaf 15 jaar aanmaken. U kunt wel FoundationOS ontdekken.'));
+            el('agFoundation').hidden=false; return;
           }
         }
-        doos.classList.add('ag-ballotage');
-      } else if (entree){
-        // het spiegelbeeld voor wie al lid is: dezelfde kopregel-taal,
-        // zonder stappen (thuiskomen is geen procedure)
-        if (kopLabel) kopLabel.textContent = T('ag.entree','De entree');
-        else if (kopEl) kopEl.textContent = T('ag.entree','De entree');
-        delete doos.dataset.stap; delete doos.dataset.van;
-        if (stappenEl){ stappenEl.textContent = ''; stappenEl.removeAttribute('aria-label'); }
-        doos.classList.add('ag-ballotage');
-      } else {
-        doos.classList.remove('ag-ballotage');
-        delete doos.dataset.stap; delete doos.dataset.van;
-        if (stappenEl) stappenEl.removeAttribute('aria-label');
+        draft[s.key]=value; step++; render('register',true); return;
       }
-      const kluisTekst = d && d.login ? T('ag.kluisdirect','Rechtstreeks naar de kluis, niet door dit gesprek')
-        : (d && d.vertrouwelijk ? T('ag.kluis','Versleuteld · rechtstreeks de kluis in') : null);
-      if (kluisEl && kluisTekst && !d.klaar){
-        kluisEl.textContent = kluisTekst;
-        doos.classList.add('ag-kluis-aan');
-      } else {
-        doos.classList.remove('ag-kluis-aan');
+      if (view === 'login') { accountName=value; render('password',true); return; }
+      if ((view === 'register' || view === 'reset') && value.length<6) return invalid(()=>T('access.portal.use_a_password_of_at_least_six_characters','Gebruik een wachtwoord van minstens zes tekens.'));
+      if (view === 'reset' && el('agCode').value && !el('agCode').checkValidity()) {
+        message(()=>T('access.portal.the_text_message_code_has_six_digits','De sms-code bestaat uit zes cijfers.'),true); el('agCode').focus(); return;
       }
-    }
-    const pkKnop = doos.querySelector('#agPasskey');
-    const pkKaart = doos.querySelector('.ag-passkey-kaart');
-    const andersKnop = doos.querySelector('#agAnders');
-    const antwoordRij = inp.closest('.ag-rij');
-    let passkeyBezig = false, passkeyAbort = null;
-    function toonPasskey(aan){
-      if (!pkKnop) return;
-      pkKnop.hidden = !aan;
-      if (pkKaart) pkKaart.hidden = !aan;
-      // het label pas hier vertalen: bij het bouwen van de poort is de i18n
-      // soms nog niet geladen
-      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.veilig','Veilig openen'); }
-    }
-    function wachtwoordVeld(placeholder){
-      inp.type = 'password';
-      inp.placeholder = placeholder || T('ag.ww','Je wachtwoord');
-      // wie herkend is (loginU) mag ook met Face ID / vingerafdruk / sleutel
-      toonPasskey(!!loginU);
-    }
-    function tekstVeld(){
-      inp.type = 'text';
-      inp.placeholder = T('ag.plho','Ik wil zeggen dat..');
-      toonPasskey(false);
-    }
-
-    /* RTG Deur: eerst bewijst het toestel wie er staat; pas daarna zoekt de
-       server het account bij de credential. Na "Andere manier" kan dezelfde
-       functie ook de oude, gerichte passkey van een genoemd account gebruiken. */
-    async function passkeyInlog(automatisch){
-      if (passkeyBezig) return;
-      if (!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get)){
-        zeg('rahul', T('ag.pk.geen','Dit toestel kent geen passkey. Kies Andere manier.')); return;
-      }
-      const b2u = s => Uint8Array.from(atob(String(s).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
-      const u2b = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-      passkeyBezig = true;
-      passkeyAbort = window.AbortController ? new AbortController() : null;
+      waiting(true);
+      message(()=>T('access.portal.one_moment_we_are_processing_your_request','Een ogenblik, we verwerken uw verzoek.'));
       try {
-        zeg('rahul', T('ag.pk.vraag','Je toestel vraagt nu om je Face ID, vingerafdruk of sleutel.'));
-        const o = await API.call('/webauthn/opties', loginU ? { login: loginU } : {});
-        const pub = o.opties; pub.challenge = b2u(pub.challenge);
-        pub.allowCredentials = (pub.allowCredentials || []).map(c => Object.assign({}, c, { id: b2u(c.id) }));
-        const vraag = { publicKey: pub };
-        if (passkeyAbort) vraag.signal = passkeyAbort.signal;
-        const cred = await navigator.credentials.get(vraag);
-        const antwoord = { id: cred.id, rawId: u2b(cred.rawId), type: cred.type,
-          clientExtensionResults: cred.getClientExtensionResults(),
-          response: { authenticatorData: u2b(cred.response.authenticatorData), clientDataJSON: u2b(cred.response.clientDataJSON),
-            signature: u2b(cred.response.signature), userHandle: cred.response.userHandle ? u2b(cred.response.userHandle) : null } };
-        const r = await API.call('/webauthn/login', { login: loginU || undefined, ceremonie: o.ceremonie, antwoord,
-          pasApp: vastePas || undefined, lang: document.documentElement.lang || 'nl' });
-        passkeyBezig = false; passkeyAbort = null;
-        if (r && r.token){
-          API.token = r.token; try { localStorage.setItem('rtg_member_token', r.token); } catch(e){}
-          zeg('rahul', T('ag.welkom','Daar ben je weer. Welkom terug.'));
-          if (typeof restoreSession === 'function') await restoreSession();
+        if (view === 'register') {
+          const result=await login('rtg',{register:true,name:draft.name,u:draft.email,geboortedatum:draft.geboortedatum,p:value,tier:'guest',portal:true});
+          if (result) { Object.keys(draft).forEach(key=>{draft[key]='';}); inp.value=''; }
+        } else if (view === 'password') {
+          const result=await login('rtg',{u:accountName,p:value});
+          inp.value='';
+          if (result && result.tweedeFactorNodig) { secondProof=result.bewijs; render('second',true); }
+        } else if (view === 'second') {
+          const result=await accessRequest('identity.second_factor.verify',{bewijs:secondProof,code:value});
+          secondProof=''; inp.value=''; await login('rtg',{response:result});
+        } else if (view === 'forgot') {
+          await accessRequest('identity.recovery.request',{email:value}); render('sent',true);
+        } else if (view === 'reset') {
+          await accessRequest('identity.password.replace',{token:resetToken,code:el('agCode').value.trim(),password:value});
+          resetToken=''; const url=new URL(location.href); url.searchParams.delete('reset');
+          history.replaceState(null,'',url.pathname+url.search+url.hash);
+          render('login',true); message(()=>T('access.portal.your_password_has_been_changed_you_can_now_sign_in','Uw wachtwoord is gewijzigd. U kunt nu inloggen.'));
         }
-      } catch(e){
-        passkeyBezig = false; passkeyAbort = null;
-        if (e && (e.name === 'NotAllowedError' || e.name === 'AbortError')){
-          if (!automatisch && e.name !== 'AbortError') zeg('rahul', T('ag.pk.afgebroken','Niet geopend. Probeer opnieuw of kies Andere manier.'));
-          return;
-        }
-        zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.pk.mis','Dat lukte niet met de passkey. Kies Andere manier.'));
+      } catch(e) {
+        el('agStatus').textContent='';
+        message(()=>e && e.status ? e.message : T('access.portal.we_could_not_connect_your_details_are_still_here_please_try_again','We konden geen verbinding maken. Uw ingevulde gegevens blijven staan. Probeer het opnieuw.'),true);
+      } finally {
+        waiting(false);
+        if (!form.hidden && gate.style.display !== 'none') inp.focus({preventScroll:true});
       }
     }
-    function andereManier(stil){
-      if (passkeyAbort) passkeyAbort.abort();
-      antwoordRij.hidden = false;
-      toonPasskey(false);
-      if (andersKnop) andersKnop.hidden = true;
-      if (!stil){ start(); inp.focus(); }
-    }
-    if (pkKnop) pkKnop.addEventListener('click', () => passkeyInlog(false));
-    if (andersKnop) andersKnop.addEventListener('click', () => andereManier(false));
-
-    /* ---------- wachtwoord-herstel, geheel in het gesprek ----------
-       Rahul vraagt de zescijferige code (tweede kanaal, per SMS) en daarna het
-       nieuwe wachtwoord, en zet het via de bestaande /auth/reset-route (die de
-       herstel-link uit de e-mail plus de code samen eist). Daarna gaat het
-       gewone inloggesprek verder. */
-    let resetStap = 0, resetCode = '';
-    function resetStart(){
-      resetStap = 1;
-      inp.type = 'text'; inp.inputMode = 'numeric';
-      inp.placeholder = T('ag.reset.codeph','De zes cijfers');
-      zeg('rahul', T('ag.reset.hoi','Je stelt een nieuw wachtwoord in. Uit veiligheid stuurde ik een code van zes cijfers naar je telefoon. Wat is die code?'));
-    }
-    async function resetStuur(tekst){
-      if (resetStap === 1){
-        resetCode = tekst.replace(/\D/g, '').slice(0, 6);
-        if (resetCode.length !== 6){ zeg('rahul', T('ag.reset.code6','Het zijn zes cijfers; kijk nog even in het bericht op je telefoon.')); return; }
-        resetStap = 2;
-        wachtwoordVeld(T('ag.wwnieuw','Kies een wachtwoord'));
-        zeg('rahul', T('ag.reset.ww','Dank je. En wat wordt je nieuwe wachtwoord? Minstens zes tekens.'));
-      } else if (resetStap === 2){
-        if (tekst.length < 6){ zeg('rahul', T('ag.reset.ww6','Minstens zes tekens graag.')); return; }
-        try {
-          await API.call('/auth/reset', { token: herstel, code: resetCode, password: tekst });
-          resetStap = 3; resetCode = ''; tekstVeld(); inp.inputMode = 'text';
-          zeg('rahul', T('ag.reset.klaar','Klaar, je nieuwe wachtwoord staat. Zeg "inloggen" en ik laat je binnen.'));
-        } catch(e){
-          resetStap = 1; resetCode = ''; inp.type = 'text';
-          zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.reset.mis','Zeg "opnieuw" en dan proberen we het nog eens.'));
-        }
-      } else {
-        // klaar: over naar het gewone inloggesprek, ?reset uit de URL halen
-        resetStap = 0;
-        const pas = new URLSearchParams(location.search).get('pas');
-        try { history.replaceState(null, '', location.pathname + (pas ? '?pas=' + pas : '')); } catch(e){}
-        gesprek = null; start();
-      }
-    }
-
-    async function start(){
-      if (gesprek || bezig) return;
-      bezig = true;
-      try { const d = await API.call('/aanmeld/start', { lang: document.documentElement.lang || 'nl' }); gesprek = d.id; zeg('rahul', d.tekst); }
-      catch(e){ zeg('rahul', T('ag.mis','Het gesprek wil even niet starten; zeg iets, dan probeer ik het opnieuw.')); gesprek = null; }
-      bezig = false;
-    }
+    form.addEventListener('submit',event=>{event.preventDefault();submit();});
+    el('agPasskey').addEventListener('click',passkeyLogin);
+    el('agAnders').addEventListener('click',()=>render('login',true));
+    el('agNieuw').addEventListener('click',()=>{step=0;render('register',true);});
+    el('agForgot').addEventListener('click',()=>render('forgot',true));
+    el('agShowPassword').addEventListener('click',()=>{
+      const shown=inp.type==='password'; inp.type=shown?'text':'password';
+      el('agShowPassword').setAttribute('aria-pressed',String(shown));
+      el('agShowPassword').textContent=shown?T('access.portal.hide_password','Verberg wachtwoord'):T('access.portal.show_password','Toon wachtwoord');
+    });
+    el('agBack').addEventListener('click',()=>{
+      if (busy) return;
+      if (view==='register' && step>0) {
+        if (step<3) draft[steps()[step].key]=inp.value;
+        step--; render('register',true);
+      } else if (view==='password' || view==='second' || view==='forgot' || view==='sent') {
+        secondProof=''; render('login',true);
+      } else { Object.keys(draft).forEach(key=>{draft[key]='';}); render('welcome',true); }
+    });
+    window.addEventListener('rtglang',()=>{ if (gate.style.display !== 'none') render(view,false,true); });
+    render(resetToken?'reset':'welcome',false);
+  })();

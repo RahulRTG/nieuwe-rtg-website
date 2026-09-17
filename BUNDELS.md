@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 478 delen, 0 zonder onderwerp.**
+**60 bundels, 477 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 101 delen, 10243 regels in de delen
+`public/apps/app-main/` -- 98 delen, 9698 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -24,16 +24,13 @@ omlaag.
 | `app-main-02b.js` | pas-thema (kleuren van de website) |
 | `app-main-03.js` | de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen |
 | `app-main-04.js` | inloggen en de staat binnenhalen: token, pas en het eerste scherm |
-| `app-main-04a.js` | Vervolg van app-main-04: de compositieregels van de poort (een kolom: klok, lippen, aanspreking, veld) |
-| `app-main-04aa.js` | De koekjesmelding hoort niet midden in de kennismaking |
-| `app-main-04aaa.js` | RTG ACCESS COMPOSITIE |
-| `app-main-04aaaa.js` | RTG ID BALLOTAGE |
-| `app-main-04aaaaa.js` | De ballotagekaart en haar mobiele herschikking |
-| `app-main-04ab.js` | Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het insluiten van het blad |
-| `app-main-04b.js` | Vervolg van app-main-04: de poort-inhoud (mond, zin, invoerveld, passkey) en het gesprek erachter |
-| `app-main-05.js` | een zin, geen logboek: Rahuls woorden vervangen elkaar rustig |
-| `app-main-06.js` | het gesprek met Rahul: versturen, wachten en het antwoord tonen |
+| `app-main-04a.js` | Each question is a full sentence; labels and keyboard hints stay explicit |
+| `app-main-04ab.js` | Refresh only presentation during a language change; identity stays in memory |
+| `app-main-04b.js` | WebAuthn uses the existing challenge, signature check and session path |
+| `app-main-05.js` | Account access: validate the current step and submit through the existing auth routes |
+| `app-main-06.js` | SALON-CONNECTIES |
 | `app-main-07.js` | het contactenblok op het beginscherm, met de lege staat |
+| `app-main-07a.js` | Language changes only presentation; agreement, identity and focus are preserved |
 | `app-main-08.js` | de onboarding: het paspoort scannen of een bestand kiezen |
 | `app-main-08a.js` | Vervolg van app-main-08: het meebouwen aan het eind van de onboarding |
 | `app-main-08b.js` | Vervolg van app-main-08: de snaps- en verhalenstrip boven de contactenkaart |
@@ -695,12 +692,14 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 7 delen, 1041 regels in de delen
+`public/shared/i18n/` -- 9 delen, 1737 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `i18n-00.js` | De vertaalkast van de browser: vertaalde interface die een NAVIGATIE overleeft |
 | `i18n-00a.js` | DE MEEGELEVERDE TAALSCHIL -- vertaling zonder netwerk |
+| `i18n-00aa.js` | Generated from server/talen.js |
+| `i18n-00ab.js` | Code-controlled shared UI copy |
 | `i18n-00b.js` | De LEZER van de automatische UI-vertaling voor de volledige RTG-schermfamilie |
 | `i18n-00c.js` | De SCHRIJVER van de automatische vertaallaag: tonen, herstellen, groeperen, opvragen en de taalwissel |
 | `i18n-01.js` | RTG i18n, taalkeuze + automatische detectie voor de website en alle apps |
@@ -803,7 +802,7 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 214 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 221 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -877,7 +876,7 @@ omlaag.
 
 ## `shared/verbinding.js`
 
-`public/shared/verbinding/` -- 2 delen, 345 regels in de delen
+`public/shared/verbinding/` -- 2 delen, 347 regels in de delen
 
 | deel | onderwerp |
 |---|---|

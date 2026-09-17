@@ -121,9 +121,11 @@ test('plaats: een lopende dienst wordt aangeboden, en pas na de tik gaat er iets
       'zonder tik is er niets waargenomen');
 
     // 2. NA DE TIK: venster open, motor aan, waarneming binnen
+    const waargenomen = page.waitForResponse(r => r.url().includes('/api/plaats/waarneem') && r.status()===200);
     await page.click('.rtgdienst .ja');
     await page.waitForFunction(() => window.RTGPlaats && window.RTGPlaats.stand().binnen.length > 0,
       null, { timeout: 15000 });
+    await waargenomen; // Local GPS state precedes the persisted server observation.
     const na = await api(base, '/api/plaats/stand', {}, reg.token);
     assert.equal(na.vensters.length, 1, 'de toestemming ligt er nu');
     assert.equal(na.vensters[0].bron, 'dienst bij ' + ZAAK, 'met de reden erbij');

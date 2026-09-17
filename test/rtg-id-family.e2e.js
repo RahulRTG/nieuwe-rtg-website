@@ -1,7 +1,6 @@
-/* De RTG ID-ballotage in haar echte browserstand: op een telefoon blijft de
-   vraag boven de Edge-onderrand; op een breed scherm gebruikt identiteit links
-   en gesprek rechts de ruimte. De proef vult uitsluitend twee niet-persoonlijke
-   voorbeeldzinnen in en maakt geen account aan. */
+/* RTG access in a real browser: one shared Edge, four concise registration
+   steps, explicit agreement and existing password/WebAuthn/2FA recovery routes.
+   All identities and credentials belong to isolated local test fixtures. */
 'use strict';
 
 const test = require('node:test');
@@ -105,202 +104,184 @@ test('de universele laadketen bouwt exact een Edge-casco', () => {
   }
 });
 
-const VORM = lees('public/apps/app-main/app-main-04aaaa.js') +
-  lees('public/apps/app-main/app-main-04aaaaa.js');
-const INHOUD = lees('public/apps/app-main/app-main-04b.js');
-const GEDRAG = lees('public/apps/app-main/app-main-05.js');
-const EDGE = lees('public/shared/rtg-edge-library.js');
-
-test('RTG ID gebruikt op breed en klein scherm dezelfde Edge-insets', () => {
-  assert.match(VORM, /#gate:has\(\.ag-doos\.ag-ballotage\)/);
-  assert.match(VORM, /var\(--edge-top,44px\)/);
-  assert.match(VORM, /var\(--edge-bottom,48px\)/);
-  assert.match(VORM, /grid-template-columns:minmax\(20rem,1fr\) minmax\(27rem,\.88fr\)/);
-  assert.match(VORM, /@media \(max-width:899px\)/);
-  assert.match(VORM, /--klokschaal:\.42/);
-});
-
-test('het officiële RTG-woordmerk ligt zonder eigen kleurvlak in de Edge-balk', () => {
-  assert.match(EDGE, /rtg-edge-mark-lockup/);
-  assert.match(EDGE, /Rahul Travel Group/);
-  assert.match(EDGE, /Experience the elite class/);
-  assert.match(VORM, /\.rtg-edge-mark-lockup strong/);
-  assert.match(VORM, /\.rtg-edge-top\{[^}]*background:var\(--edge-bar-bg\)!important/);
-  assert.match(VORM, /\.rtg-edge-mark\{[^}]*background:transparent!important/);
-  assert.match(VORM, /\.rtg-edge-mark-lockup strong\{[^}]*background:transparent!important/);
-  assert.match(VORM, /color:#d8bd6b/);
-});
-
-test('de ballotage gebruikt geen tweede functierail of Command-laag', () => {
-  assert.match(VORM, /\.rtg-edge-side\{[^}]*transform:translateX\(-101%\)!important;visibility:hidden/);
-  assert.match(VORM, /#rtgCommand \.cmd-bank/);
-  assert.match(VORM, /#rtgCommand \.cmd-balk\{display:none!important/);
-});
-
-test('de ballotage geeft de vraag prioriteit en behoudt Rahuls signatuur', () => {
-  assert.match(VORM, /\.ag-doos\.ag-ballotage \.ag-zin/);
-  assert.match(VORM, /text-align:left/);
-  assert.match(VORM, /\.ag-doos\.ag-ballotage \.ag-mond/);
-  assert.doesNotMatch(VORM, /\.ag-doos\.ag-ballotage \.ag-mond\{[^}]*display:none/);
-  assert.match(VORM, /#f4ede1/);
-  assert.match(VORM, /\.rtg-id-story h1/);
-  assert.match(INHOUD, /Uw toegang begint met een gesprek/);
-  assert.match(INHOUD, /ag-id-privacy/);
-});
-
-test('de vier stappen zijn ook voor hulptechnologie betekenisvol', () => {
-  assert.match(INHOUD, /id="agStappen" role="status" aria-live="polite"/);
-  assert.match(GEDRAG, /T\('ag\.stap','Stap'\)/);
-  assert.match(GEDRAG, /T\('ag\.van','van'\)/);
-  assert.match(GEDRAG, /removeAttribute\('aria-label'\)/);
-});
-
-test('RTG ID vormt op telefoon en bureau een familie met de ene Edge',
-  { skip: geenBrowser(pw) }, async () => {
-  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-id-vorm-'));
+test('het inlogportaal en de aanmelding werken met de bestaande beveiligde routes',
+  { skip: geenBrowser(pw), timeout: 240000 }, async t => {
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-access-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dataDir } });
-  let browser;
-  try {
-    browser = await pw.chromium.launch(browserOpties(pw));
-    for (const maat of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
-      const context = await browser.newContext({ viewport: maat });
-      await context.addInitScript(() => {
-        try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-      });
-      const page = await context.newPage();
-      const fouten = [];
-      letOpFouten(page, fouten);
-      await page.goto(srv.base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#agAnders', { state: 'visible', timeout: 15000 });
-      await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
-
-      if (maat.width < 900) {
-        await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-lips', { state: 'visible', timeout: 15000 });
-        const eersteBalk = await page.evaluate(() => {
-          const onder = document.querySelector('.rtg-adaptive-bar');
-          const mond = document.querySelector('.rtg-adaptive-item[data-rtg-adaptive-action="ai"]');
-          const canvas = mond && mond.querySelector('.rtg-adaptive-lips');
-          const rect = (el) => {
-            const r = el && el.getBoundingClientRect();
-            return r ? { left: r.left, right: r.right, top: r.top, bottom: r.bottom,
-              width: r.width, height: r.height } : null;
-          };
-          return {
-            onder: rect(onder), mond: rect(mond), canvas: rect(canvas),
-            zichtbaar: onder && getComputedStyle(onder).display !== 'none',
-            homeZichtbaar: !!(onder && Array.from(onder.querySelectorAll('[data-rtg-adaptive-action="home"]')).some((el) =>
-              getComputedStyle(el).display !== 'none')),
-            wereldenZichtbaar: !!(onder && getComputedStyle(onder.querySelector('[data-rtg-adaptive-action="worlds"]')).display !== 'none'),
-            actiesZichtbaar: !!(onder && getComputedStyle(onder.querySelector('[data-rtg-adaptive-action="context"]')).display !== 'none'),
-            menuZichtbaar: !!(onder && getComputedStyle(onder.querySelector('[data-rtg-adaptive-action="menu"]')).display !== 'none'),
-            labelOnderMond: !!(mond && getComputedStyle(mond.querySelector('small')).display !== 'none')
-          };
-        });
-        assert.ok(eersteBalk.zichtbaar && eersteBalk.onder && eersteBalk.onder.height >= 48,
-          'telefoon: de gedeelde balk staat ook op het eerste inlogscherm');
-        assert.ok(eersteBalk.onder.left >= 0 && eersteBalk.onder.right <= maat.width && eersteBalk.onder.width >= maat.width - 30,
-          'telefoon: de zwevende balk blijft breed en volledig binnen het scherm');
-        assert.ok(eersteBalk.homeZichtbaar && eersteBalk.wereldenZichtbaar &&
-          eersteBalk.actiesZichtbaar && eersteBalk.menuZichtbaar,
-        'telefoon: Home, Werelden, Acties en Menu staan in dezelfde balk');
-        assert.ok(eersteBalk.canvas && eersteBalk.canvas.width >= 44 && eersteBalk.canvas.height >= 28,
-          'telefoon: de officiële AI-lippen zijn duidelijk en groot');
-        assert.equal(eersteBalk.labelOnderMond, false,
-          'telefoon: onder de AI-lippen staat geen Vraag-label');
-      }
-
-      await page.click('#agAnders');
-      await page.waitForSelector('#agIn', { state: 'visible' });
-      await page.fill('#agIn', 'ik wil me aanmelden');
-      await page.click('#agGo');
-      await page.waitForFunction(() => /Hoe gaat het vandaag/i.test(document.getElementById('agZin')?.textContent || ''));
-      await page.fill('#agIn', 'goed');
-      await page.click('#agGo');
-      await page.waitForSelector('.ag-doos.ag-ballotage', { state: 'visible' });
-      await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
-
-      const stand = await page.evaluate(() => {
-        const rect = (el) => {
-          const r = el && el.getBoundingClientRect();
-          return r ? { left: r.left, right: r.right, top: r.top, bottom: r.bottom,
-            width: r.width, height: r.height } : null;
-        };
-        const top = document.querySelector('.rtg-edge-top');
-        const onder = document.querySelector('.rtg-adaptive-bar');
-        const vraag = document.getElementById('agZin');
-        const rij = document.querySelector('.ag-doos.ag-ballotage .ag-rij');
-        const stappen = document.getElementById('agStappen');
-        const klok = document.querySelector('#gate>.os-lock .rtg-ring');
-        const merk = document.querySelector('.rtg-edge-mark-lockup');
-        const merkLink = document.querySelector('.rtg-edge-mark');
-        const merkWoord = document.querySelector('.rtg-edge-mark-lockup strong');
-        const verhaal = document.querySelector('.rtg-id-story');
-        const verhaalKop = document.querySelector('.rtg-id-story h1');
-        const intro = document.querySelector('.ag-doos.ag-ballotage .ag-intro');
-        const kaart = document.querySelector('.ag-doos.ag-ballotage');
-        const rail = document.querySelector('.rtg-edge-side');
-        const commandBank = document.querySelector('#rtgCommand .cmd-bank');
-        const commandBar = document.querySelector('#rtgCommand .cmd-balk');
-        return {
-          top: rect(top), onder: rect(onder), vraag: rect(vraag), rij: rect(rij),
-          stappen: rect(stappen), klok: rect(klok),
-          merk: rect(merk), merkTekst: merk && merk.textContent.replace(/\s+/g, ' ').trim(),
-          verhaal: rect(verhaal), verhaalKop: rect(verhaalKop), kaart: rect(kaart),
-          merkVlak: merkLink && getComputedStyle(merkLink).backgroundColor,
-          woordVlak: merkWoord && getComputedStyle(merkWoord).backgroundColor,
-          kaartKleur: kaart && getComputedStyle(kaart).backgroundColor,
-          vraagKleur: vraag && getComputedStyle(vraag).backgroundColor,
-          introKleur: intro && getComputedStyle(intro).backgroundColor,
-          rijKleur: rij && getComputedStyle(rij).backgroundColor,
-          railZichtbaar: rail && getComputedStyle(rail).visibility !== 'hidden',
-          commandZichtbaar: [commandBank, commandBar].some(el => el && getComputedStyle(el).display !== 'none'),
-          bovenkleur: top && getComputedStyle(top).getPropertyValue('--edge-bar-bg').trim(),
-          onderkleur: onder && getComputedStyle(onder).getPropertyValue('--edge-bar-bg').trim(),
-          label: stappen && stappen.getAttribute('aria-label'),
-          randen: document.querySelectorAll('.rtg-edge-chrome').length
-        };
-      });
-
-      assert.equal(stand.randen, 1, maat.width + ': precies een Edge-casco');
-      assert.equal(stand.bovenkleur, stand.onderkleur, maat.width + ': boven en onder delen LivingOS-kleur');
-      assert.equal(stand.label, 'Stap 1 van 4', maat.width + ': voortgang heeft betekenis');
-      assert.ok(stand.merk && /Rahul Travel Group/i.test(stand.merkTekst),
-        maat.width + ': het officiële woordmerk staat in de Edge-link');
-      assert.equal(stand.merkVlak, 'rgba(0, 0, 0, 0)', maat.width + ': logo heeft geen eigen kleurvlak');
-      assert.equal(stand.woordVlak, 'rgba(0, 0, 0, 0)', maat.width + ': woordmerk erft de balkkleur');
-      assert.ok(stand.verhaal && stand.kaart && /244, 237, 225/.test(stand.kaartKleur),
-        maat.width + ': verhaal en ivoorkleurige ballotagekaart staan in beeld');
-      assert.equal(stand.vraagKleur, stand.kaartKleur,
-        maat.width + ': achter de vraag ligt exact hetzelfde ivoor als op de kaart');
-      assert.equal(stand.introKleur, stand.kaartKleur,
-        maat.width + ': de vraagzone vormt geen lichter tekstvak');
-      assert.equal(stand.rijKleur, 'rgba(0, 0, 0, 0)',
-        maat.width + ': ook het antwoordveld voegt geen tweede vulkleur toe');
-      assert.equal(stand.railZichtbaar, false, maat.width + ': geen tweede functierail tijdens RTG ID');
-      assert.equal(stand.commandZichtbaar, false, maat.width + ': geen oude Command-laag tijdens RTG ID');
-      assert.ok(stand.vraag && stand.rij && stand.stappen && stand.klok, maat.width + ': alle onderdelen staan in beeld');
-      assert.ok(stand.vraag.top > stand.top.bottom - 1, maat.width + ': de vraag blijft onder Edge');
-      assert.ok(stand.vraag.bottom <= stand.rij.top + 1, maat.width + ': de handeling volgt de vraag');
-      assert.ok(stand.rij.bottom <= stand.stappen.top + 1, maat.width + ': voortgang volgt de handeling');
-      assert.ok(stand.stappen.bottom < stand.onder.top + 1, maat.width + ': voortgang blijft boven Edge ' + JSON.stringify(stand));
-      if (maat.width < 900) {
-        assert.ok(stand.vraag.left >= 12 && stand.vraag.right <= maat.width - 12,
-          'telefoon: de vraag blijft binnen het leesvlak');
-      } else {
-        assert.ok(stand.klok.right < stand.vraag.left,
-          'bureau: identiteit staat links en het gesprek rechts');
-        const optischeTekstas = stand.verhaalKop.left + stand.verhaalKop.width * .43;
-        assert.ok(Math.abs((stand.klok.left + stand.klok.right) / 2 - optischeTekstas) < 16,
-        'bureau: de klok staat op het optische midden van de tekst (' +
-          ((stand.klok.left + stand.klok.right) / 2).toFixed(1) + ' tegenover ' +
-          optischeTekstas.toFixed(1) + ')');
-      }
-      assert.deepEqual(fouten, [], maat.width + ': geen paginof beloftefouten');
-      await context.close();
-    }
-  } finally {
-    if (browser) await browser.close();
-    await stop(srv.child);
-    try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
+  const base = srv.base.replace('127.0.0.1','localhost');
+  const browser = await pw.chromium.launch(browserOpties(pw));
+  const secret = 'Synthetisch portal wachtwoord 26';
+  const email = 'portal@voorbeeld.test';
+  async function api(pad, data, token) {
+    const response = await fetch(base+pad,{method:'POST',headers:{'Content-Type':'application/json',
+      ...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(data)});
+    const body=await response.json(); assert.ok(response.ok, pad+': '+JSON.stringify(body)); return body;
   }
+  async function context(viewport={width:390,height:844}) {
+    const c=await browser.newContext({viewport,reducedMotion:'reduce'});
+    await c.addInitScript(()=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');});
+    return c;
+  }
+  async function open(c, route='/apps/app.html?pas=rtg'){
+    const page=await c.newPage(); page.setDefaultTimeout(20000);
+    await page.goto(base+route,{waitUntil:'domcontentloaded'});
+    await page.waitForSelector('#agPasskey');
+    await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+    return page;
+  }
+  async function enter(page,value){await page.locator('#agIn').fill(value);await page.locator('#agGo').click();}
+  async function ready(page){await page.waitForFunction(()=>!document.getElementById('agGo').disabled);}
+  let accountToken;
+  try {
+    await t.test('mobiel en desktop tonen de nieuwe compositie met precies één standaard Edge',async()=>{
+      for(const viewport of [{width:320,height:680},{width:390,height:844},{width:1440,height:900}]){
+        const c=await context(viewport),p=await open(c);
+        const errors=[];letOpFouten(p,errors);
+        const geometry=await p.evaluate(()=>{
+          const g=document.getElementById('gate'),bar=document.querySelector('.rtg-adaptive-bar');
+          const b=bar.getBoundingClientRect(),pass=document.getElementById('agPasskey').getBoundingClientRect();
+          return {bars:document.querySelectorAll('.rtg-adaptive-bar').length,
+            overflow:document.documentElement.scrollWidth>innerWidth,
+            edgeInside:b.left>=0&&b.right<=innerWidth&&b.bottom<=innerHeight,
+            passHeight:pass.height,clocks:g.querySelectorAll('[data-rtg-klok]').length,
+            color:getComputedStyle(g).backgroundColor};
+        });
+        assert.equal(geometry.bars,1);assert.equal(geometry.overflow,false);
+        assert.equal(geometry.edgeInside,true);assert.ok(geometry.passHeight>=48);assert.equal(geometry.clocks,0);
+        assert.equal(geometry.color,'rgb(57, 9, 25)');
+        await p.locator('#agNieuw').click();
+        assert.match(await p.locator('#agZin').innerText(),/Vul uw volledige naam in\./);
+        assert.equal(await p.locator('#agStappen').innerText(),'STAP 1 VAN 4');
+        await p.keyboard.press('Tab');assert.notEqual(await p.evaluate(()=>document.activeElement.tagName),'BODY');
+        assert.deepEqual(errors,[]);await c.close();
+      }
+    });
+    await t.test('vier vragen, corrigeren, foutafhandeling, gratis account en bewust akkoord',async()=>{
+      const c=await context(),p=await open(c),calls=[];
+      p.on('request',r=>{if(r.method()==='POST')calls.push({path:new URL(r.url()).pathname,body:r.postData()});});
+      await p.locator('#agNieuw').click();await enter(p,'Portal Proefpersoon');
+      await enter(p,'geen-mailadres');
+      assert.equal(await p.locator('#agIn').getAttribute('aria-invalid'),'true');
+      await enter(p,email);await enter(p,'1992-03-14');
+      await p.locator('#agSummary summary').click();
+      await p.locator('#agReview button').first().click();
+      assert.equal(await p.locator('#agIn').inputValue(),'Portal Proefpersoon');
+      await enter(p,'Portal Testpersoon');assert.equal(await p.locator('#agIn').inputValue(),email);
+      await p.locator('#agGo').click();await p.locator('#agGo').click();
+      let failOnce=true;
+      await p.route('**/api/auth/register',async route=>{
+        if(failOnce){failOnce=false;await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Aanmelden is tijdelijk niet mogelijk. Probeer het opnieuw.'})});}
+        else await route.continue();
+      });
+      await enter(p,secret);
+      await p.waitForFunction(()=>document.getElementById('agError').textContent.includes('tijdelijk'));
+      assert.equal(await p.locator('#agIn').inputValue(),secret);
+      assert.equal(await p.locator('#gate').isVisible(),true);
+      await ready(p);await p.locator('#agGo').click();
+      await p.waitForSelector('#onbGate:not([hidden])');
+      await p.waitForSelector('#onbConsent');
+      assert.equal(await p.locator('#onbConsent').isChecked(),false);
+      await p.locator('#onbActies button').click();
+      assert.equal(await p.locator('#onbLees').isVisible(),true);
+      assert.ok((await p.locator('#onbLees').innerText()).length>100);
+      await p.locator('#onbActies button').click();
+      await p.locator('#onbIn').fill('Portal Testpersoon');
+      await p.locator('#onbGo').click();
+      assert.match(await p.locator('#onbFout').innerText(),/Bevestig dat u/);
+      assert.equal(calls.filter(r=>r.path==='/api/onboarding/teken').length,0);
+      await p.locator('#onbConsent').check();await p.locator('#onbGo').click();
+      await p.waitForSelector('#onbGate',{state:'hidden'});
+      accountToken=await p.evaluate(()=>localStorage.getItem('rtg_member_token'));
+      assert.ok(accountToken);
+      const state=await api('/api/state',{},accountToken);
+      assert.equal(state.state.user.tier,'guest','account creation cannot silently buy a paid pass');
+      assert.equal((state.state.invoices || []).length,0,'no contribution invoice for the free account');
+      assert.equal((await api('/api/onboarding/status',{},accountToken)).klaar,true);
+      assert.equal(calls.filter(r=>r.path==='/api/auth/register').length,2,'one failure, one explicit retry');
+      assert.ok(calls.every(r=>!r.path.startsWith('/api/aanmeld/')),'credentials do not travel through a conversation');
+      assert.ok(calls.filter(r=>r.body&&r.body.includes(secret)).every(r=>r.path==='/api/auth/register'));
+      const stored=await p.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}));
+      assert.ok(!stored.includes(secret)&&!stored.includes(email),'draft identity and password are not stored');
+      await c.close();
+    });
+    await t.test('wachtwoordfouten openen geen sessie; geldige inlog en herladen herstellen de echte sessie',async()=>{
+      const c=await context(),p=await open(c);
+      await p.locator('#agAnders').click();await enter(p,email);await enter(p,'Onjuist wachtwoord');
+      await p.waitForFunction(()=>!!document.getElementById('agError').textContent);
+      assert.equal(await p.locator('#gate').isVisible(),true);await ready(p);
+      await enter(p,secret);await p.waitForSelector('#gate',{state:'hidden'});
+      await p.reload();await p.waitForSelector('#gate',{state:'hidden'});await c.close();
+    });
+    await t.test('leeftijdsgrens geeft een concrete gratis Foundation-route zonder account aan te maken',async()=>{
+      const c=await context(),p=await open(c);
+      await p.locator('#agNieuw').click();await enter(p,'Jonge Testpersoon');await enter(p,'jong@voorbeeld.test');
+      const now=new Date(),birth=(now.getFullYear()-10)+'-01-01';
+      await enter(p,birth);
+      assert.match(await p.locator('#agError').innerText(),/vanaf 15 jaar/);
+      assert.match(await p.locator('#agFoundation').innerText(),/altijd 100% gratis/);
+      assert.equal(await p.locator('#agFoundation').getAttribute('href'),'/apps/foundation/os-publiek.html');
+      await c.close();
+    });
+    await t.test('herstel zonder telefoon vraagt geen verplichte code en de link is eenmalig',async()=>{
+      const recovery=await api('/api/auth/forgot',{email});
+      assert.ok(recovery.devResetUrl);assert.equal(recovery.devCode,null);
+      const route=new URL(recovery.devResetUrl);
+      const c=await context(),p=await c.newPage();
+      await p.goto(base+route.pathname+route.search,{waitUntil:'domcontentloaded'});
+      await p.waitForSelector('#agIn');
+      assert.equal(await p.locator('#agCode').getAttribute('required'),null);
+      await enter(p,'Vernieuwd portal wachtwoord 26');
+      await p.waitForFunction(()=>document.getElementById('gate').dataset.accessView==='login');
+      assert.ok(!new URL(p.url()).searchParams.has('reset'));
+      assert.match(await p.locator('#agStatus').innerText(),/wachtwoord is gewijzigd/);
+      await c.close();
+      await api('/api/auth/login',{login:email,password:'Vernieuwd portal wachtwoord 26'});
+    });
+    await t.test('een echte WebAuthn-handtekening opent de juiste sessie vanuit de browser',async()=>{
+      const member=await api('/api/auth/register',{name:'Passkey Testpersoon',email:'passkey@voorbeeld.test',password:secret,geboortedatum:'1992-03-14',tier:'guest'});
+      const {maakAuthenticator}=require('./webauthn-authenticator');
+      const auth=maakAuthenticator('localhost');
+      const options=await api('/api/webauthn/registreer/opties',{},member.token);
+      await api('/api/webauthn/registreer',{naam:'Virtuele browsertest',antwoord:auth.registratieAntwoord(options.opties.challenge,base)},member.token);
+      const c=await context(),p=await open(c);
+      const cdp=await c.newCDPSession(p);await cdp.send('WebAuthn.enable');
+      const {authenticatorId}=await cdp.send('WebAuthn.addVirtualAuthenticator',{options:{protocol:'ctap2',transport:'internal',hasResidentKey:true,hasUserVerification:true,isUserVerified:true,automaticPresenceSimulation:true}});
+      await cdp.send('WebAuthn.addCredential',{authenticatorId,credential:{
+        credentialId:auth.credId.toString('base64'),isResidentCredential:true,rpId:'localhost',
+        privateKey:auth.privateKey.export({format:'der',type:'pkcs8'}).toString('base64'),
+        userHandle:Buffer.from(options.opties.user.id,'base64url').toString('base64'),signCount:0}});
+      const response=p.waitForResponse(r=>new URL(r.url()).pathname==='/api/webauthn/login');
+      await p.locator('#agPasskey').click();assert.equal((await response).status(),200);
+      await p.waitForSelector('#gate',{state:'hidden'});
+      const token=await p.evaluate(()=>localStorage.getItem('rtg_member_token'));
+      assert.ok(token);assert.equal((await api('/api/state',{},token)).state.user.tier,'guest');
+      await c.close();
+    });
+    await t.test('een tweede factor vraagt om bewijs voordat er een sessie ontstaat',async()=>{
+      const member=await api('/api/auth/register',{name:'Tweefactor Testpersoon',email:'factor@voorbeeld.test',password:secret,geboortedatum:'1992-03-14',tier:'rtg'});
+      const options=await api('/api/mijn/tweefactor/begin',{huidig:secret},member.token);
+      const {totpCode}=require('../server/kern/totp');
+      const confirm=await api('/api/mijn/tweefactor/bevestig',{code:totpCode(options.geheim)},member.token);
+      const c=await context(),p=await open(c);
+      await p.locator('#agAnders').click();await enter(p,'factor@voorbeeld.test');await enter(p,secret);
+      await p.waitForFunction(()=>document.getElementById('gate').dataset.accessView==='second');
+      assert.equal(await p.evaluate(()=>localStorage.getItem('rtg_member_token')),null);
+      await ready(p);await enter(p,'ongeldige-code');
+      await p.waitForFunction(()=>!!document.getElementById('agError').textContent);
+      assert.equal(await p.evaluate(()=>localStorage.getItem('rtg_member_token')),null);
+      await ready(p);await enter(p,confirm.herstelcodes[0]);
+      await p.waitForSelector('#gate',{state:'hidden'});await c.close();
+    });
+    await t.test('een passkey kan worden geannuleerd zonder de alternatieve route te blokkeren',async()=>{
+      const c=await context();
+      await c.addInitScript(()=>{
+        Object.defineProperty(navigator,'credentials',{value:{get:async()=>{throw new DOMException('Cancelled','NotAllowedError');}}});
+      });
+      const p=await open(c);await p.locator('#agPasskey').click();
+      await p.waitForFunction(()=>!!document.getElementById('agError').textContent);
+      await p.locator('#agAnders').click();
+      assert.equal(await p.locator('#agIn').isVisible(),true);
+      assert.equal(await p.locator('#agGo').isDisabled(),false);await c.close();
+    });
+  } finally {await browser.close();await stop(srv.child);fs.rmSync(dataDir,{recursive:true,force:true});}
 });

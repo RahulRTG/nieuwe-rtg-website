@@ -1,136 +1,98 @@
-    /* Vervolg van app-main-04: de compositieregels van de poort (een kolom:
-       klok, lippen, aanspreking, veld). Geknipt omdat deel 04 opnieuw over de
-       10 KB-grens ging. De knip ligt midden in een stringconcatenatie -- deel
-       04 eindigt op een + en dit deel maakt hem af.
-
-       DE VOLGORDE IS DE BESTANDSNAAM. bundel.js plakt de delen in de volgorde
-       van readdirSync().sort(), dus puur alfabetisch: 04, 04a, 04ab, 04b. Deze
-       regels stonden een commit lang in 04ab, DUS na de `document.head
-       .appendChild(st);` die 04a afsloot -- waarmee ze een losse expressie
-       werden die JavaScript netjes uitrekent en weggooit. Geen syntaxfout,
-       geen consolemelding, en de halo, de klokschaal en de uitlijning van de
-       zin waren simpelweg weg terwijl de code er nog stond.
-       controleer() kon dat niet zien: die vergelijkt de bundel met dezelfde
-       som van dezelfde delen en is dus per definitie consistent met zichzelf.
-       Wat het nu wel ziet, is toets 43 in scripts/check.js. */
-      /* DE COMPOSITIE. Dit scherm had vijf objecten die allemaal ongeveer even
-         belangrijk waren -- klok, lippen, zin, invoerveld, koekjesmelding --
-         met grote lege vlakken ertussen die niets deden. Leegte in een premium
-         ontwerp is bewust; dit was leegte omdat de inhoud niet wist waar hij
-         moest staan.
-         Nu is het EEN verticale kolom met een duidelijke rangorde: de klok is
-         de identiteit en de held, Rahul komt er direct onder uit, en daaronder
-         staat de actie. Alles daaronder is bijzaak. */
-      '#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;' +
-        'gap:0;padding:6vh 1.1rem;}' +
-      /* DE POORT IS ALTIJD NACHT, ook onder een licht thema.
-         Dit scherm is een sterrenhemel; dat is niet een van de vier smaken
-         maar wat het scherm IS. Toen de thema's platformbreed gingen, zette
-         champagne netjes zijn donkere inkt op de body -- en die inkt landde op
-         een invoerveld dat op een zwarte hemel ligt. Gemeten: 1,11:1. Niet
-         "wat flets": onzichtbaar.
-         De poort verklaart daarom zijn eigen materiaal (onyx) en laat het
-         thema alleen los op wat er OP die hemel ligt: de wijzerplaat van de
-         klok. Een lichte wijzerplaat tegen een nachthemel is precies wat een
-         horloge met een wit blad 's avonds doet. */
-      '#gate{color:var(--op-onyx);' +
-        '--rtg-txt:var(--op-onyx);--txt:var(--op-onyx);' +
-        '--rtg-muted:rgba(244,240,233,0.72);--rtg-soft:rgba(244,240,233,0.56);' +
-        '--muted:rgba(244,240,233,0.72);--soft:rgba(244,240,233,0.56);}' +
-      '#gate input,#gate textarea{color:inherit;}' +
-      /* DE HALO. De sterren waren overal even druk, ook precies daar waar de
-         klok en de tekst staan -- en dan moet het oog zelf uitzoeken wat het
-         onderwerp is. Een zachte donkere ovaal achter de kolom maakt het daar
-         stil, zodat de klok vanzelf naar voren komt. Geen vlak en geen kader:
-         een verloop dat aan de randen volledig verdwijnt, zodat je hem niet
-         als vorm ziet maar alleen als rust. */
-      '#gate::after{content:"";position:absolute;left:50%;top:50%;' +
-        'width:min(150vw,1100px);height:min(120vh,1000px);' +
-        'transform:translate(-50%,-50%);pointer-events:none;z-index:0;' +
-        'background:radial-gradient(ellipse at center,' +
-          'rgba(0,0,0,0.62) 0%,rgba(0,0,0,0.45) 32%,rgba(0,0,0,0.18) 58%,rgba(0,0,0,0) 78%);}' +
-      /* de klok groeit: hij is letterlijk het merk, en stond op een zesde van
-         de hoogte alsof hij een illustratie was */
-      '#gate .os-lock{margin:0;}' +
-      /* SCHALEN MET TRANSFORM, niet met width/height. De klok tekent zijn
-         wijzers, het merkje en de datumvensters op VASTE posities binnen zijn
-         eigen maat; zet je die maat om, dan verschuift het draaipunt en staat
-         alles scheef -- precies wat er gebeurde toen ik hem groter maakte.
-         transform schaalt het hele beeld uniform, dus de geometrie blijft heel. */
-      /* Schaal op de telefoon: 1,2. Hij stond op 1 omdat elke vergroting het
-         invoerveld uit beeld duwde -- maar dat was toen de koekjesmelding nog
-         een kaart van 160px was. Nu die een regel van 26px is, past het wel,
-         en de kolom vulde met schaal 1 maar 51% van de hoogte terwijl de
-         opzet 70 a 80% vraagt. Gemeten op 430 en op 375 breed. */
-      '#gate{--klokschaal:1;}' +
-      /* En de indeling moet de GESCHAALDE maat reserveren. Een transform tekent
-         groter maar verandert de doos niet: op 1,5x groeide de klok 73px naar
-         boven en 73px naar beneden buiten zijn eigen vak, en de lippen -- die
-         netjes 10px onder de rand horen te zitten, en dat op een telefoon ook
-         deden -- kwamen op een breed scherm midden op de wijzerplaat te liggen.
-         Gemeten, niet gegokt: telefoon klok 201-494 met mond op 484 (goed),
-         breed klok 98-537 met mond op 454 (83px de plaat in).
-         Daarom draagt het vak zelf de hoogte, en schaalt de ring erin. */
-      '#gate .os-lock{display:flex;align-items:center;justify-content:center;padding:0;margin:0;' +
-        'height:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1));transform:none;}' +
-      '#gate .os-lock > .rtg-ring{transform:scale(var(--klokschaal,1));transform-origin:center;}' +
-      /* DE MOND HOORT BIJ DE KLOK, dus meet hij zich aan de klok en niet aan
-         het venster. Met min(52vw,240px) was hij op een telefoon 224 breed
-         onder een klok van 256 (verhouding 0,87) en op een breed scherm 240
-         onder een klok van 384 (0,63) -- dezelfde mond, twee verhoudingen.
-
-         DE HOOGTE IS TWEE KEER MISGEGAAN, EEN KEER NAAR ELKE KANT.
-
-         Eerst zweefde de mond tientallen pixels onder de klok. Toen werd hij
-         opgetrokken tot hij "aansloot" -- en dat is te ver de andere kant op:
-         gemeten op vijf schermmaten begon de INKT op 0 tot -1 pixel van de
-         onderrand van de wijzerplaat. De lippen lagen dus tegen de gouden rand
-         en middenin de contactschaduw van de kast (zie .rtg-ring::before in
-         shared/klok.js, die zo'n 30px naar onderen reikt). Op een afdruk zie je
-         dat meteen; in de code niet, want er stond alleen een getal.
-
-         Daarom staat de rekensom er nu uit elkaar gehaald, met de twee
-         eigenschappen van het doek als eigen maat. Het doek is 440 bij 200, dus
-         0,4545 keer zo hoog als breed, en de tekening begint pas op 27,9% van
-         die hoogte -- boven de inkt zit ruim een kwart niets. Wie de lippen
-         ergens wil hebben, moet die leegte meerekenen; wie alleen de doos
-         verschuift, verschuift de tekening net niet.
-
-         --lipgat is het enige getal dat over SMAAK gaat: hoeveel lucht er
-         tussen de wijzerplaat en de lippen hoort. 0,126 mondbreed is 0,11 klok,
-         net voorbij de schaduw. De rest volgt eruit. */
-      '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.62);' +
-        '--doekhoog:calc(var(--mondbreed) * 0.4545);' +
-        '--doekleeg:calc(var(--doekhoog) * 0.279);' +
-        '--lipgat:calc(var(--mondbreed) * 0.25);' +
-        'width:var(--mondbreed);height:auto;opacity:0.82;' +
-        'margin:calc(var(--lipgat) - var(--doekleeg)) auto 0.9rem;}' +
-      // de zin is de aanspreking en geen onderschrift
-      /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
-         is een flexkolom met align-items:stretch, dus een kind met een
-         max-width blijft aan de linkerrand plakken -- gemeten, niet gegokt. */
-      '#gate .ag-experience{font-size:.78rem;line-height:1.6;margin:.75rem auto;max-width:42ch;color:inherit;}' +
-      '#gate .ag-zin{font-size:clamp(1.35rem,5.2vw,1.9rem);line-height:1.3;' +
-        'min-height:0;padding:1rem 0 1.6rem;max-width:22ch;margin-inline:auto;}' +
-      // het invoerveld is de actie: breed en royaal, geen streepje
-      /* EEN rand, niet twee. De rij had al een border-bottom uit de basisstijl;
-         daar een volledige rand overheen leggen gaf een dubbele doos met een
-         verspringende binnenrand. Eerst de oude weg, dan de nieuwe. */
-      /* EEN doos, en symmetrisch. De rij droeg mijn ring en het invoerveld
-         binnenin had zijn EIGEN achtergrond, rand en radius -- vandaar de
-         dubbele doos met een binnenvlak dat 8px uit het midden lag. De rij
-         draagt nu het kader, het veld erin is kaal. De padding was ook
-         asymmetrisch (0,9rem links tegen 0,5rem rechts). */
-      '#gate .ag-rij{width:min(100%,30rem);min-height:58px;border:0;' +
-        'background:color-mix(in srgb,var(--onyx-basis) 82%,transparent);' +
-        'box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 34%,transparent),' +
-          'inset 0 1px 0 color-mix(in srgb,var(--gold-hoog) 15%,transparent);border-radius:0;' +
-        'margin-inline:auto;padding:0.35rem 0.45rem 0.35rem 0.9rem;}' +
-      '#gate .ag-rij:focus-within{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 70%,transparent);}' +
-      '#gate .ag-rij input{background:none;border:0;border-radius:0;box-shadow:none;}' +
-      '#gate .ag-rij input{font-size:1rem;padding:1rem 0.4rem;text-align:left;}' +
-      '#gate .ag-rij #agGo{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;' +
-        'padding:0;border:1px solid color-mix(in srgb,var(--gold-tekst) 62%,transparent);' +
-        'border-radius:50%;background:var(--gold-tekst);color:var(--onyx-diep);' +
-        'font-size:1.2rem;line-height:1;opacity:1;}' +
-      '#gate .ag-rij #agGo:hover{background:var(--gold-hoog);}' +
+    /* Each question is a full sentence; labels and keyboard hints stay explicit. */
+    const steps = () => [
+      { key:'name', type:'text', auto:'name', label:T('access.portal.full_name','Volledige naam'),
+        title:T('access.portal.what_is_your_name','Hoe mogen we u noemen?'),
+        text:T('access.portal.enter_your_full_name_we_use_it_for_your_account_and_the_agreement','Vul uw volledige naam in. We gebruiken deze voor uw account en de overeenkomst.') },
+      { key:'email', type:'email', auto:'email', label:T('access.portal.email_address','E-mailadres'),
+        title:T('access.portal.which_email_address_can_we_reach_you_at','Op welk adres kunnen we u bereiken?'),
+        text:T('access.portal.you_use_this_email_address_to_sign_in_and_recover_your_account','U gebruikt dit e-mailadres om in te loggen en uw account te herstellen.') },
+      { key:'geboortedatum', type:'date', auto:'bday', label:T('access.portal.date_of_birth','Geboortedatum'),
+        title:T('access.portal.what_is_your_date_of_birth','Wat is uw geboortedatum?'),
+        text:T('access.portal.your_age_determines_which_features_you_can_use_you_must_be_at_lea','Uw leeftijd bepaalt welke onderdelen u kunt gebruiken. Voor dit account moet u minimaal 15 jaar zijn.') },
+      { key:'password', type:'password', auto:'new-password', label:T('access.portal.password','Wachtwoord'),
+        title:T('access.portal.how_would_you_like_to_secure_your_account','Hoe wilt u uw account beveiligen?'),
+        text:T('access.portal.choose_a_unique_password_of_at_least_six_characters_you_are_creat','Kies een uniek wachtwoord van minstens zes tekens. U maakt een gratis account aan; een betaalde pas kiest u apart. Daarna leest en bevestigt u de overeenkomst.') }
+    ];
+    let presentationOnly=false;
+    function field(type, label, auto, value){
+      if(!presentationOnly){inp.type = type; inp.value = value || '';} inp.name = auto || 'answer';
+      inp.autocomplete = auto || 'off'; inp.inputMode = type === 'email' ? 'email' : 'text';
+      inp.autocapitalize = auto === 'name' ? 'words' : 'none'; inp.spellcheck = false;
+      inp.maxLength = type === 'password' ? 200 : type === 'email' ? 254 : 80;
+      inp.removeAttribute('min'); inp.removeAttribute('max'); inp.removeAttribute('minlength');
+      if (type === 'date') {
+        const now = new Date(), oldest = new Date(now.getFullYear()-120, now.getMonth(), now.getDate());
+        const iso = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        inp.max = iso(now); inp.min = iso(oldest);
+      }
+      if (type === 'password' && auto === 'new-password') inp.minLength = 6;
+      inp.placeholder = ''; inp.setAttribute('aria-label', label);
+      el('agFieldLabel').textContent = label;
+      el('agShowPassword').hidden = type !== 'password';
+      el('agShowPassword').textContent = T('access.portal.show_password','Toon wachtwoord');
+      el('agShowPassword').setAttribute('aria-pressed','false');
+    }
+    function render(next, focus, preserve){
+      const saved = preserve ? {value:inp.value,code:el('agCode').value,type:inp.type,shown:el('agShowPassword').getAttribute('aria-pressed'),invalid:inp.getAttribute('aria-invalid'),foundation:!el('agFoundation').hidden} : null;
+      if (!preserve && passkeyAbort) { passkeyAbort.abort(); passkeyAbort = null; passkeyAttempt++; }
+      presentationOnly=!!preserve;
+      view = next; gate.dataset.accessView = view;
+      refreshChrome();
+      if (!preserve) lastMessage = null;
+      if(!preserve){inp.value = ''; el('agCode').value = ''; inp.removeAttribute('aria-invalid');}
+      el('agError').textContent = ''; el('agStatus').textContent = '';
+      el('agWelcome').hidden = view !== 'welcome'; form.hidden = view === 'welcome' || view === 'sent';
+      el('agBack').hidden = view === 'welcome'; el('agStappen').hidden = view !== 'register';
+      el('agSummary').hidden = view !== 'register' || step !== 3;
+      el('agCodeLabel').hidden = view !== 'reset'; el('agForgot').hidden = view !== 'password';
+      el('agFoundation').hidden = true;
+      el('agGo').textContent = T('access.portal.continue','Ga verder');
+      if (view === 'welcome') {
+        title.textContent = T('access.portal.welcome_intro','Welkom in uw');
+        title.appendChild(document.createElement('br'));
+        const brand = document.createElement('em'); brand.textContent=T('access.portal.brand','RTG.'); title.appendChild(brand);
+        el('agZin').textContent = T('access.portal.one_place_for_life_travel_work_and_opportunity','Eén toegang tot uw leven, reizen, werk en kansen.');
+      } else if (view === 'register') {
+        const s = steps()[step]; title.textContent = s.title; el('agZin').textContent = s.text;
+        el('agStappen').textContent = T('access.portal.progress','Stap {step} van 4').replace('{step}',String(step+1));
+        field(s.type, s.label, s.auto, draft[s.key]);
+        if (step === 3) {
+          el('agGo').textContent = T('access.portal.create_my_account','Maak mijn account aan');
+          const review = el('agReview'); review.textContent = '';
+          steps().slice(0,3).forEach((s,i) => {
+            const button = document.createElement('button'); button.type = 'button'; button.className = 'access-secondary';
+            button.setAttribute('data-user-content','');
+            button.textContent = s.label + ': ';
+            const value=document.createElement('bdi'); value.textContent=draft[s.key]; button.appendChild(value);
+            button.appendChild(document.createTextNode(T('access.portal.edit',', wijzigen')));
+            button.addEventListener('click', () => { step=i; render('register',true); });
+            review.appendChild(button);
+          });
+        }
+      } else {
+        const copy = {
+          login:[T('access.portal.welcome_back','Welkom terug.'),T('access.portal.enter_your_email_address_or_username_we_will_then_ask_for_your_pa','Vul uw e-mailadres of gebruikersnaam in. Daarna vragen we om uw wachtwoord.'),'text',T('access.portal.email_address_or_username','E-mailadres of gebruikersnaam'),'username',accountName],
+          password:[T('access.portal.open_your_rtg','Open uw RTG.'),T('access.portal.enter_your_password_to_continue_securely','Vul uw wachtwoord in om veilig verder te gaan.'),'password',T('access.portal.password','Wachtwoord'),'current-password',''],
+          second:[T('access.portal.confirm_it_is_you','Bevestig dat u het bent.'),T('access.portal.enter_the_code_from_your_authenticator_app_or_one_of_your_recover','Vul de code uit uw authenticator-app of een van uw herstelcodes in.'),'text',T('access.portal.verification_code','Verificatiecode'),'one-time-code',''],
+          forgot:[T('access.portal.let_us_help_you_get_back_in','We helpen u weer op weg.'),T('access.portal.enter_your_account_email_address_if_recovery_is_available_you_wil','Vul het e-mailadres van uw account in. Als herstel mogelijk is, ontvangt u daar de vervolgstappen.'),'email',T('access.portal.email_address','E-mailadres'),'email',accountName.includes('@')?accountName:''],
+          reset:[T('access.portal.choose_a_new_password','Kies een nieuw wachtwoord.'),T('access.portal.use_at_least_six_characters_if_you_also_received_a_text_message_c','Gebruik minstens zes tekens. Heeft u ook een sms-code ontvangen? Vul die dan hieronder in. Zonder ontvangen sms-code laat u dat veld leeg.'),'password',T('access.portal.new_password','Nieuw wachtwoord'),'new-password',''],
+          sent:[T('access.portal.check_your_email','Controleer uw e-mail.'),T('access.portal.if_this_address_belongs_to_an_account_and_recovery_is_available_y','Als dit adres bij een account hoort en herstel mogelijk is, ontvangt u de vervolgstappen per e-mail. Kijk ook in uw ongewenste e-mail.'),'email','','off','']
+        }[view];
+        title.textContent = copy[0]; el('agZin').textContent = copy[1]; field(copy[2],copy[3],copy[4],copy[5]);
+        if (view === 'password' || view === 'second') el('agGo').textContent = T('access.portal.sign_in','Log in');
+        if (view === 'forgot') el('agGo').textContent = T('access.portal.request_recovery','Vraag herstel aan');
+        if (view === 'reset') el('agGo').textContent = T('access.portal.save_my_password','Sla mijn wachtwoord op');
+      }
+      const action={password:'identity.session.open',second:'identity.second_factor.verify',forgot:'identity.recovery.request',reset:'identity.password.replace'}[view] || (view==='register' && step===3?'identity.account.create':'');
+      el('agGo').dataset.rtgMeaning=action;
+      if (saved) {
+        // Do not rewrite a focused input: it would collapse its selection or IME composition.
+        el('agShowPassword').setAttribute('aria-pressed',saved.shown);
+        el('agShowPassword').textContent=saved.shown==='true'?T('access.portal.hide_password','Verberg wachtwoord'):T('access.portal.show_password','Toon wachtwoord');
+        if(saved.invalid) inp.setAttribute('aria-invalid',saved.invalid);
+        el('agFoundation').hidden=!saved.foundation;
+        if(lastMessage) message(lastMessage.text,lastMessage.error);
+      }
+      presentationOnly=false;
+      if (focus) { if (!form.hidden) inp.focus({preventScroll:true}); else title.focus({preventScroll:true}); gate.scrollTop=0; }
+    }

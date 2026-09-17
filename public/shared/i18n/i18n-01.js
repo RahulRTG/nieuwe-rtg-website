@@ -41,7 +41,7 @@
   /* Wereldtalen: de Boardroom bepaalt welke talen aanstaan; de kiezer toont ze
      allemaal. UI-teksten vallen voor andere talen terug op Engels; chats en
      berichten worden door de server echt per taal vertaald. */
-  let WERELD = null; // [{code, naam, en}] uit /api/talen
+  let WERELD = window.RTGWereldTalen || null; // [{code, naam, en}] uit /api/talen
   function supported() { return WERELD ? WERELD.map(t => t.code) : Object.keys(LANGS); }
   const orig = new WeakMap(); // element -> { text, html, ph }
 
@@ -97,12 +97,12 @@
     zuidafrika: 'af', kenia: 'sw', kenya: 'sw', tanzania: 'sw', ethiopie: 'am', ethiopia: 'am', nigeria: 'yo'
   };
 
-  function detectDevice() {
+  function detectDevice(codes) {
     const list = (navigator.languages && navigator.languages.length)
       ? navigator.languages : [navigator.language || 'nl'];
     for (const raw of list) {
       const code = String(raw || '').toLowerCase().slice(0, 2);
-      if (supported().includes(code)) return code;
+      if ((codes || supported()).includes(code)) return code;
     }
     return 'en'; // geen match: standaard Engels
   }
@@ -114,12 +114,17 @@
     // terugval); Nederlands staat gewoon in de HTML zelf.
     dict(lang) {
       const all = window.I18N || {};
-      return all[lang] || (lang !== 'nl' ? all.en : null) || {};
+      return lang === 'nl' ? (all.nl || {}) : Object.assign({}, all.en || {}, all[lang] || {});
     },
+    _usedKeys: new Set(),
     t(key, fallback) {
+      this._usedKeys.add(key);
       if (this.lang === 'nl') return fallback != null ? fallback : key;
       const v = this.dict(this.lang)[key];
-      return v != null ? v : (fallback != null ? fallback : key);
+      if(v!=null)return v;
+      const known=window.RTGUiBronTekst && window.RTGUiBronTekst(fallback);
+      if(known!=null)return (this.lang!=='en' && window.RTGVertaalKast && window.RTGVertaalKast.lees(this.lang,fallback)) || known;
+      return fallback != null ? fallback : key;
     },
 
     apply(lang) {
@@ -132,9 +137,14 @@
       document.querySelectorAll('[data-i18n]').forEach(el => {
         if (!orig.has(el)) orig.set(el, {});
         const o = orig.get(el);
-        if (o.text == null) o.text = el.textContent;
+        const key=el.getAttribute('data-i18n');
+        if (o.text == null || o.key !== key) { o.text=el.getAttribute('data-i18n-source') || el.textContent; o.key=key; }
         const val = d[el.getAttribute('data-i18n')];
-        el.textContent = (val != null && lang !== 'nl') ? val : o.text;
+        const policy=window.RTGAccessMeaning;
+        if(policy && (key.startsWith('access.') || key.startsWith('onb.'))) {
+          const projection=policy.projection(key,o.text,(window.I18N || {}).en && window.I18N.en[key],lang,val);
+          el.textContent=projection.text; if(projection.fallback) el.setAttribute('lang',projection.language); else el.removeAttribute('lang');
+        } else el.textContent = (val != null && lang !== 'nl') ? val : o.text;
       });
 
       document.querySelectorAll('[data-i18n-html]').forEach(el => {
@@ -144,6 +154,15 @@
         const val = d[el.getAttribute('data-i18n-html')];
         el.innerHTML = (val != null && lang !== 'nl') ? val : o.html;
       });
+
+      for (const [binding,attribute] of [['data-i18n-aria','aria-label'],['data-i18n-title','title']]) {
+        document.querySelectorAll('['+binding+']').forEach(el=>{
+          if(!orig.has(el)) orig.set(el,{});
+          const o=orig.get(el); if(o[attribute]==null) o[attribute]=el.getAttribute(attribute) || '';
+          const value=d[el.getAttribute(binding)];
+          el.setAttribute(attribute,lang!=='nl' && value!=null ? value:o[attribute]);
+        });
+      }
 
       document.querySelectorAll('[data-i18n-ph]').forEach(el => {
         if (!orig.has(el)) orig.set(el, {});
@@ -166,6 +185,8 @@
 
     set(lang, remember) {
       if (remember !== false) { try { localStorage.setItem(STORE, lang); } catch (e) {} this.chosen = true; }
+      const state=this._wereldDict[lang];
+      if (state && !state.pending) state.tried.clear();
       this.apply(lang);
     },
 
@@ -186,42 +207,61 @@
        EN HIJ VRAAGT ALLEEN WAT HIJ MIST. Van vierhonderd sleutels zijn er op de
        tweede pagina meestal een handvol nieuw; de rest komt uit de kast. */
     _wereldDict: {},
-    laadWereldDict(lang) {
-      if (lang === 'nl' || lang === 'en' || this._wereldDict[lang]) return;
-      const all = window.I18N || {};
-      if (all[lang]) return; // de pagina bracht dit woordenboek zelf mee
-      const en = all.en || {};
-      const keys = Object.keys(en).slice(0, 400);
-      if (!keys.length) return;
-      this._wereldDict[lang] = true;
+    async laadWereldDict(lang) {
+      if (lang === 'nl' || lang === 'en') return;
+      const state = this._wereldDict[lang] || (this._wereldDict[lang] = { pending:false, tried:new Map() });
+      if (state.pending) return;
+      const en = (window.I18N || {}).en || {};
+      const own = (window.I18N || {})[lang] || {};
       const kast = window.RTGVertaalKast;
-      const zet = (d) => {
-        window.I18N = window.I18N || {};
-        window.I18N[lang] = d;
-        if (this.lang === lang) this.apply(lang); // opnieuw toepassen zodra hij er is
-      };
-      const uit = {};
-      const missend = [];
+      const keys = Object.keys(en).filter(k => typeof en[k] === 'string' && en[k].length <= 300 &&
+        !(window.RTGAccessMeaning && (k.startsWith('access.') || k.startsWith('onb.')) &&
+          ['decision','legal'].includes(window.RTGAccessMeaning.risk(k))) &&
+        own[k] == null && state.tried.get(k) !== en[k]);
+      if (!keys.length) return;
+      // The visible screen is first; every remaining key still has a bounded batch.
+      keys.sort((a,b)=>Number(this._usedKeys.has(b))-Number(this._usedKeys.has(a)));
+      state.pending = true;
+      const out = {}, groups = [];
+      let group = [], size = 0;
       keys.forEach(k => {
-        const bron = en[k];
-        const bekend = kast ? kast.lees(lang, bron) : null;
-        if (bekend != null) uit[k] = bekend; else missend.push(k);
+        const known = kast ? kast.lees(lang,en[k]) : null;
+        if (known != null) { out[k]=known; return; }
+        if (group.length && (group.length >= 100 || size + en[k].length > 18000)) {
+          groups.push(group); group=[]; size=0;
+        }
+        group.push(k); size+=en[k].length;
       });
-      if (!missend.length) return zet(uit);          // volledig uit het toestel: geen netwerk
-      if (Object.keys(uit).length) zet(uit);          // toon vast wat we al weten
-      fetch(apiPad('/api/vertaal/ui'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ naar: lang, teksten: missend.map(k => en[k]) }) })
-        .then(r => r.json())
-        .then(d => {
-          if (!d || d.naar !== lang || !Array.isArray(d.teksten)) return;
-          missend.forEach((k, i) => {
-            const v = d.teksten[i] || en[k];
-            uit[k] = v;
-            if (kast) kast.zet(lang, en[k], v);       // de kast weigert v === bron zelf
+      if (group.length) groups.push(group);
+      const publish = () => {
+        window.I18N=window.I18N || {};
+        window.I18N[lang]=Object.assign({},window.I18N[lang] || {},out);
+        if (this.lang === lang) this.apply(lang);
+      };
+      if (Object.keys(out).length) publish();
+      try {
+        for (const batch of groups) {
+          if (this.lang !== lang) break;
+          const response = await fetch(apiPad('/api/vertaal/ui'), {method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({naar:lang,teksten:batch.map(k=>en[k])})});
+          if (!response.ok) throw new Error('UI translation '+response.status);
+          const data=await response.json();
+          if (!data || data.naar!==lang || !Array.isArray(data.teksten) || data.teksten.length!==batch.length)
+            throw new Error('Incomplete UI translation');
+          batch.forEach((k,i)=>{
+            state.tried.set(k,en[k]);
+            const value=data.teksten[i];
+            // An unchanged source is a fallback, never a completed translation.
+            if(typeof value==='string' && value && value!==en[k]) {
+              out[k]=value; if(kast) kast.zet(lang,en[k],value);
+            }
           });
-          zet(uit);
-        })
-        .catch(() => { this._wereldDict[lang] = false; });
+          publish();
+        }
+      } catch (e) {
+        // Keep the complete fallback. An explicit language choice can retry.
+      } finally { state.pending=false; }
     },
 
     /* ---------- taalkeuze: de wereld in RTG-stijl ----------

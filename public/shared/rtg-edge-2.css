@@ -377,27 +377,27 @@ body[data-rtg-edge-2-rendered="true"]>.wos-dock button{flex:0 0 44px;min-width:4
 /* RTG Wereld heeft vijf echte, reeds gebonden hoofdkeuzes. Zij delen de
    actieruimte van de ene Edge-onderrand; de oorspronkelijke nav blijft dus de
    eigenaar van links, focus en aria-current, zonder een tweede balk of kloon. */
-body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-action{pointer-events:none;padding:0!important}
-body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-action::before,
-body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-action>button{display:none!important}
-body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+body[data-rtg-edge-2-rendered="true"]:has(>nav.balk) .rtg-edge-action{pointer-events:none;padding:0!important}
+body[data-rtg-edge-2-rendered="true"]:has(>nav.balk) .rtg-edge-action::before,
+body[data-rtg-edge-2-rendered="true"]:has(>nav.balk) .rtg-edge-action>button{display:none!important}
+body[data-rtg-edge-2-rendered="true"]>nav.balk{
   z-index:8801!important;top:auto!important;left:calc(var(--edge-side) + 176px)!important;right:68px!important;
   bottom:env(safe-area-inset-bottom,0px)!important;width:auto!important;max-width:none!important;
   height:var(--edge-bottom)!important;padding:0!important;transform:none!important;
   overflow:hidden!important;border:0!important;background:transparent!important;
   box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important
 }
-body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{
+body[data-rtg-edge-2-rendered="true"]>nav.balk a{
   min-width:44px;min-height:44px;height:var(--edge-bottom)!important;padding:3px 2px!important;pointer-events:auto
 }
 
 /* Focus en een modaal werkvlak trekken ook app-eigen bediening mee. Anders
    zou de Edge-rand verdwijnen terwijl precies dezelfde balk erbuiten bleef. */
 body[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"])>.wos-dock,
-body[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"])>nav.balk[aria-label="Hoofdnavigatie"],
+body[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"])>nav.balk,
 body.rtg-command[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] #rtgCommand .cmd-balk,
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"]>.wos-dock,
-body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"]>nav.balk{
   transform:translateY(101%)!important;visibility:hidden!important;pointer-events:none!important
 }
 
@@ -424,19 +424,19 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data
   /* Op een telefoon vervangt de wereldnav de dubbele Edge-home, maar behoudt
      zij menu, terug/vooruit en Rahul. Zo krijgen de vijf keuzes samen ook op
      320 px echte raakruimte binnen dezelfde enkele onderrand. */
-  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-bottom{
+  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk) .rtg-edge-bottom{
     grid-template-columns:var(--edge-side) 88px minmax(0,1fr) 44px!important
   }
-  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-bottom>a{
+  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk) .rtg-edge-bottom>a{
     display:none!important
   }
-  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+  body[data-rtg-edge-2-rendered="true"]>nav.balk{
     left:calc(var(--edge-side) + 88px)!important;right:44px!important;
     display:grid!important;grid-template-columns:repeat(5,minmax(44px,1fr));
     overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none
   }
-  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"]::-webkit-scrollbar{display:none}
-  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{
+  body[data-rtg-edge-2-rendered="true"]>nav.balk::-webkit-scrollbar{display:none}
+  body[data-rtg-edge-2-rendered="true"]>nav.balk a{
     box-sizing:border-box;min-width:44px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.6875rem!important
   }
   .rtg-edge-2-context{left:0}
@@ -460,21 +460,21 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data
      browsergeschiedenisknoppen. Op dit smalle formaat blijft teruggaan via de
      browser- of toestelbediening beschikbaar; de onderrand geeft de
      primaire wereldnavigatie haar volledige, niet-scrollende raakruimte. */
-  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-bottom{
+  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk) .rtg-edge-bottom{
     grid-template-columns:var(--edge-side) minmax(0,1fr) 44px!important
   }
-  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-history{
+  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk) .rtg-edge-history{
     display:none!important
   }
-  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+  body[data-rtg-edge-2-rendered="true"]>nav.balk{
     left:var(--edge-side)!important;right:44px!important
   }
 }
 @media(max-width:340px){
   /* De toegankelijke naam blijft op de link; alleen het herhaalde tekstlabel
      wijkt op het allerkleinste scherm voor het herkenningsteken. */
-  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{font-size:0!important}
-  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a span{font-size:.9rem!important}
+  body[data-rtg-edge-2-rendered="true"]>nav.balk a{font-size:0!important}
+  body[data-rtg-edge-2-rendered="true"]>nav.balk a span{font-size:.9rem!important}
   /* Op 320 px verdwijnt de dubbele home-ingang uit de onderrand. Buiten RTG
      Wereld houden menu, terug/vooruit en Rahul hun vaste plek; de vrijgekomen
      44 px geven de drie Living-acties ieder een echt 44 px raakvlak. */
@@ -485,10 +485,10 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data
   body[data-rtg-edge-appbar="true"] .rtg-edge-bottom{grid-template-columns:var(--edge-side) minmax(0,1fr) 44px!important}
   body[data-rtg-edge-appbar="true"] .rtg-edge-appslot{grid-column:2}
   body[data-rtg-edge-appbar="true"] .rtg-edge-ai{grid-column:3}
-  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-bottom{
+  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk) .rtg-edge-bottom{
     grid-template-columns:var(--edge-side) minmax(0,1fr) 44px!important
   }
-  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+  body[data-rtg-edge-2-rendered="true"]>nav.balk{
     left:var(--edge-side)!important;right:44px!important
   }
   body[data-rtg-edge-2-rendered="true"]>.wos-dock{

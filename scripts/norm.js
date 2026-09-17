@@ -761,6 +761,7 @@ const METERS = [
      reden omhoog: de UITKOMST (0 gedeelde velden) mag bewegen, het aantal
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
+  { sleutel: 'planDomeinenGemeten', richting: 'omhoog', wat: 'plandomeinen die de planvormmeter werkelijk heeft gezien' },
   /* NEIGINGVORM.json (NEIGING.md par. 0). Twee ratels en met opzet geen derde
      over de naamsmeting: die telt sinds de laag bestaat zijn eigen bestanden
      mee, dus een getal daarop zou alleen maar groeien met het werk.
@@ -1635,6 +1636,7 @@ function meet(bronnen) {
     stempelInPoort: leesRegister('STEMPELVEILIGHEID.json', (j) => j.inEenPoort.length),
     stempelSchrijversGezien: leesRegister('STEMPELVEILIGHEID.json', (j) => j.schrijvers),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    planDomeinenGemeten: leesRegister('PLANVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
     neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
     neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
     connectDomeinenGemeten: leesRegister('CONNECTLUS.json', (j) => j.werkwoorden.domeinen),

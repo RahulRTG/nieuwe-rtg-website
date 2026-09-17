@@ -72,7 +72,10 @@
     if (!groepen.size) return;
     var gekozenTaal = taal, gekozenBeurt = beurt;
     groepenVan(Array.from(groepen.keys()), groepen).forEach(function (groep) {
-      keten = keten.then(function () { return vraag(groep, gekozenTaal, gekozenBeurt); })
+      keten = keten.then(function () {
+        if (taal !== gekozenTaal || beurt !== gekozenBeurt) return;
+        return vraag(groep, gekozenTaal, gekozenBeurt);
+      })
         .catch(function () { /* de brontekst blijft heel; een volgende DOM-wijziging probeert opnieuw */ });
     });
   }
@@ -103,6 +106,7 @@
   }
 
   function pasToe(nieuweTaal) {
+    if (taal !== nieuweTaal) herstel();
     taal = /^[a-z]{2}$/.test(String(nieuweTaal || '')) ? nieuweTaal : 'nl';
     beurt++;
     if (RTL.has(taal)) document.documentElement.setAttribute('dir', 'rtl');

@@ -17,7 +17,7 @@
       document.body.appendChild(ov);
       ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
     }
-    const eur2 = n => '€ ' + Number(n||0).toLocaleString('nl-NL');
+    const eur2 = n => '€ ' + Number(n||0).toLocaleString(lang());
     const items = d.items || [];
     const html =
       '<div style="width:100%;max-width:560px;max-height:88vh;overflow-y:auto;background:var(--bg);border-radius:0;border:1px solid var(--line);">' +

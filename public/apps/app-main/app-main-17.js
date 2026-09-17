@@ -53,7 +53,7 @@
 
   /* ---------- vastgoed: aanbod, interesse, bod, keyless ---------- */
   let vgOpen = null;
-  const vgGeld = n => '\u20AC ' + Number(n||0).toLocaleString('nl-NL');
+  const vgGeld = n => '\u20AC ' + Number(n||0).toLocaleString(lang());
   async function laadVastgoed(){
     if (!API.live) return;
     let d = { panden: [], bezichtigingen: [], biedingen: [] };

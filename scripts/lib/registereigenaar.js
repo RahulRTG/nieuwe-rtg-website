@@ -54,6 +54,19 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  /* De taalproef schrijft alle drie rapporten via dezelfde begrensde namenlijst,
+     pas na geslaagde tests en een vergelijking van de bronafdrukken. De lexicale
+     schrijverscan kan die dynamische writeFileSync niet tot een naam herleiden. */
+  'LANGUAGECAPABILITY.json': { schrijver: 'scripts/language-proof.js',
+    waarom: 'language-proof.js schrijft de namenlijst pas na browserbewijs; --check weigert afwijkende bronafdrukken. Dit is werkboombewijs, geen productieattest.' },
+  'MEANINGPARITY.json': { schrijver: 'scripts/language-proof.js',
+    waarom: 'language-proof.js schrijft de namenlijst pas na geslaagde betekenisproeven; --check bewaakt de bronafdrukken en de gemeten reikwijdte blijft expliciet.' },
+  'LANGUAGEFAILOVER.json': { schrijver: 'scripts/language-proof.js',
+    waarom: 'language-proof.js schrijft de namenlijst pas na de geisoleerde HTTP-uitvalproef; --check bewaakt de bronafdrukken. Dit simuleert geen productiebewijs.' },
+  'LANGUAGE.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden architectuur- en bereikbeschrijving; de drie taalrapporten dragen het afzonderlijke uitvoerbare bewijs.' },
+  'LANGUAGE-AUDIT.md': { soort: 'BRON',
+    waarom: 'Handmatig beoordeelde bevindingen en resterende taalgrenzen; geen automatisch gegenereerd register.' },
   /* De aanleiding zelf. Er is geen schrijvend script: de lijst wordt met de hand
      onderhouden en mag alleen krimpen. */
   'BEREIK.json': { handmatig: true, lezer: 'test/bereikbaar.test.js',
@@ -81,6 +94,17 @@ const EIGENAAR = {
      getal van toets 4 doordat er een register bijkomt zonder dat iemand zegt wie
      het bezit, en dat is precies wat die toets moet tegenhouden. */
   'NEIGINGVORM.json': { schrijver: 'scripts/neigingvorm.js' },
+
+  /* De planvorm: delen de plandomeinen een datavorm en een planlus? Eén
+     schrijver, één ratel in scripts/lib/metingen.js (`planDomeinenGemeten`, het
+     BEREIK) met een ijking in test/meterijk.test.js, en een regel in de
+     versheidslijst van scripts/versheid.js. Hij staat hier om precies de reden
+     die bij NEIGINGVORM.json hierboven staat -- en dat is hier geen theorie: hij
+     is er bij het bouwen op omgevallen. Toets 4 ging van 146 naar 147 en zei
+     erbij wat de bedoeling is: het getal hoort te dalen doordat er eigenaren
+     bijkomen, niet te stijgen doordat er registers bijkomen zonder eigenaar. De
+     vloer oprekken zou die zin precies omdraaien. */
+  'PLANVORM.json': { schrijver: 'scripts/planvorm.js' },
 
   /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
      bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie

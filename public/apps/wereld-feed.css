@@ -85,3 +85,6 @@ body.rtg-social-experience #feed .living-photo{display:grid}
   .living-feed-heading h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
   .living-feed-heading p{max-width:none;font-size:9px}
 }
+
+/* In een werkvlak blijft de bediening bij de Edge van het bovenliggende scherm. */
+body.rtg-social-experience.rtg-edge-embed > .social-nav{display:none!important}

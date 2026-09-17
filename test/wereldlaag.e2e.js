@@ -263,6 +263,14 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     await page2.evaluate(() => RTGi18n.set('nl'));
     assert.match(await page2.locator('#livingWelcomeTitle').innerText(), /Het leven is mooier/);
 
+    // Dezelfde route in een werkvlak houdt de inhoud, maar geen tweede balk.
+    // Voor deze regel verscheen hier aantoonbaar nog de oude social-nav.
+    await page2.goto(base + '/apps/wereld.html?embed=1', { waitUntil: 'domcontentloaded' });
+    await page2.waitForSelector('body.rtg-edge-embed');
+    await page2.waitForSelector('.living-welcome');
+    assert.equal(await page2.locator('.social-nav').isVisible(), false);
+    assert.equal(await page2.locator('main .living-intro').isVisible(), true);
+    assert.equal(await page2.locator('.rtg-adaptive-bar').count(), 0);
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();

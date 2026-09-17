@@ -32,7 +32,7 @@ body[data-rtg-edge-venster-open="true"] .rtg-adaptive-edge{visibility:hidden;poi
 @media print{.rtg-adaptive-edge{display:none!important}}
 
 /* Every domain uses the same Edge surface; hidden sources retain only their handlers. */
-body[data-rtg-adaptive-ready="true"] :is(#rtgCommand .cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-bank,.rv-tabs,body>nav.balk[aria-label="Hoofdnavigatie"],.rtg-edge-owned-bar){display:none!important}
+body[data-rtg-adaptive-ready="true"] :is(#rtgCommand .cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-bank,.rv-tabs,body>nav.balk,.rtg-edge-owned-bar){display:none!important}
 body[data-rtg-adaptive-ready="true"] #rvApp{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
 body[data-rtg-adaptive-ready="true"] #rvApp>.rv-werk{grid-column:1;grid-row:1;grid-template-rows:minmax(0,1fr)}
 .rtg-adaptive-sheet>#rvRahul{position:static;transform:none;width:100%;height:auto;min-height:58px;margin-bottom:16px}

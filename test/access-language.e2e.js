@@ -40,6 +40,9 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
       await page.waitForFunction(()=>!!window.RTGNet);
       await page.evaluate(()=>RTGNet.satelliet.zetStand('aan'));
       assert.equal(await page.locator('#rtg-sat-tekst').innerText(),'Slow connection: data-saving mode is on');
+      const notification=await page.locator('#rtg-sat-balkje').boundingBox();
+      const edge=await page.locator('.rtg-adaptive-bar').boundingBox();
+      assert.ok(notification.y+notification.height<=edge.y,'connection notice must leave Edge controls accessible');
       await page.evaluate(()=>RTGNet.satelliet.zetStand('uit'));
       await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"] small')?.textContent==='Worlds');
       assert.equal(await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').getAttribute('aria-label'),'Actions for this screen');

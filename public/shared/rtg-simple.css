@@ -390,7 +390,7 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
   :root{--edge-top:44px;--edge-side:0px;--edge-bottom:48px}
   body.rtg-command,
   body[data-rtg-edge-appbar="true"],
-  body:has(>nav.balk[aria-label="Hoofdnavigatie"]),
+  body:has(>nav.balk),
   body:has(>.wos-dock){--edge-side:44px}
   body.rtg-edge-host{
     padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;
@@ -440,34 +440,34 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
       0 0 34px color-mix(in srgb,var(--edge-bar-accent) 12%,transparent)!important;
     overflow:visible!important;backdrop-filter:blur(22px)!important
   }
-  body[data-rtg-edge-2-rendered="true"]:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-bottom{
+  body[data-rtg-edge-2-rendered="true"]:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-bottom{
     grid-template-columns:minmax(44px,.85fr) minmax(44px,.85fr) 64px minmax(72px,1.4fr) minmax(44px,.85fr)!important
   }
   .rtg-edge-bottom>a,.rtg-edge-bottom>button{
     width:100%!important;min-width:44px!important;height:calc(var(--edge-bottom) - 2px)!important;border:0!important
   }
-  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-bottom>a{
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-bottom>a{
     grid-column:1;grid-row:1
   }
-  body[data-rtg-edge-2-rendered="true"]:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-bottom>a{
+  body[data-rtg-edge-2-rendered="true"]:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-bottom>a{
     display:flex!important
   }
-  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-worlds-trigger{
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-worlds-trigger{
     display:flex!important;grid-column:2;grid-row:1
   }
-  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-ai{
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-ai{
     grid-column:3;grid-row:1;position:relative!important;color:var(--edge-bar-accent)!important
   }
-  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-action{
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-action{
     grid-column:4;grid-row:1;display:flex!important;min-width:0!important;
     width:100%!important;height:calc(var(--edge-bottom) - 2px)!important;
     padding:0 4px!important;align-items:center;justify-content:center;overflow:hidden
   }
-  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-action::before{
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-action::before{
     display:none!important
   }
-  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-action>button,
-  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-action>a{
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-action>button,
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-action>a{
     width:100%!important;min-width:44px!important;max-width:100%!important;
     min-height:44px!important;height:calc(var(--edge-bottom) - 2px)!important;
     padding:0 3px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
@@ -493,7 +493,7 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
   body.rtg-stijl.rtg-edge-host[data-rtg-world][data-rtg-screen="world-home"][data-rtg-skin="heritage"][data-rtg-world-dashboard-ready="true"][data-rtg-edge-2-rendered="true"] .rtg-edge-chrome .rtg-edge-menu{
     grid-column:4
   }
-  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-menu{
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk)):not(:has(>.wos-dock)) .rtg-edge-menu{
     grid-column:5;grid-row:1
   }
 

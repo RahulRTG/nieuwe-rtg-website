@@ -53,7 +53,7 @@ test('zichtbare Edge-bediening gebruikt minstens 44 bij 44 pixels', () => {
     /\.rtg-edge-2-context-button\{[^}]*min-width:44px!important;min-height:44px!important/,
     /\.rtg-edge-2-context-close\{[^}]*min-width:44px;min-height:44px/,
     />\.wos-dock button\{[^}]*min-width:44px;min-height:44px/,
-    />nav\.balk\[aria-label="Hoofdnavigatie"\] a\{[^}]*min-width:44px;min-height:44px/
+    />nav\.balk a\{[^}]*min-width:44px;min-height:44px/
   ]) assert.match(EDGE2, contract);
 });
 

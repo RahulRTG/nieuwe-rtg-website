@@ -452,6 +452,16 @@ function draaiToets(bestand, env, wacht, forceer) {
 const EIGEN_MODULE = new Map([
   // This test executes the browser language loader in a VM, not through require.
   ['i18n-dictionary.test.js', ['public/shared/i18n.js']],
+  /* De contrastvangst start een server om een PAGINA te krijgen, en laadt
+     daarvoor ./helper -- waarmee de serverheuristiek hem de liegpoort geeft.
+     Die proef zegt hier niets: de toets bouwt zijn eigen bevinding in de DOM en
+     leest wat de keuring erover schrijft; de enige route die hij aanraakt is
+     /site/404.html en /shared/rtg-heritage.css, en die zijn geen /api/. Zijn
+     werkelijke onderwerp is de keuring zelf, en een bronmutatie DAARIN laat hem
+     wel zakken -- met de hand nagetrokken op alle vier de assen (de context
+     weglaten, de tokens niet lezen, de grondketen niet opbouwen, en
+     contrastContext uit BRON halen). */
+  ['contrastcontext.e2e.js', ['scripts/a11ykeuring.js']],
   /* De Evidence Engine-toets importeert ook test/helper.js om het gedrag van
      een verbonden browserclient te isoleren. Zonder deze expliciete bron wint
      daardoor de serverheuristiek en krijgt hij een liegende API die niets met

@@ -40,6 +40,14 @@ test('een tweede pagina vraagt niet nog eens wat het toestel al weet', { skip: g
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
 
+    /* Het cachecontract heeft een afgebakend scherm nodig: vijf woorden die
+       de echte server zonder model volledig kan vertalen. Een half vertaalde
+       marketingpagina is sinds het atomische taalcontract terecht verboden.
+       Browserbundel, opslag, navigatie en vertaaleindpunt blijven echt. */
+    await page.route('**' + PAGINA, route => route.fulfill({ contentType: 'text/html', body:
+      '<!doctype html><html lang="nl"><head><meta charset="utf-8"><title translate="no">RTG cacheproef</title>'
+      + '<script src="/shared/i18n.js"></script></head><body></body></html>' }));
+
     /* De lichamen van elk UI-vertaalverzoek, zodat we kunnen aanwijzen WAT er
        gevraagd is en niet alleen hoe vaak. */
     const gevraagd = [];

@@ -1137,6 +1137,15 @@ window.RTGUiBronTekst = function(source){
     var gekozenTaal = taal, gekozenBeurt = beurt;
     var atomair = KERN.has(gekozenTaal) && gekozenTaal !== 'nl' && gekozenTaal !== 'en';
     var ontbrekend = Array.from(groepen.keys()).filter(function (bron) { return !voorraad.has(bron); });
+    /* Een volledig bekende ronde kan direct en in één taak op het scherm.
+       Daarvoor is geen netwerk of asynchrone modelketen nodig. */
+    if (atomair && !ontbrekend.length) {
+      groepen.forEach(function (doelen, bron) {
+        doelen.forEach(function (st) { if (st.bron === bron) toon(st, voorraad.get(bron)); });
+      });
+      document.documentElement.setAttribute('data-rtg-taal-volledig', 'true');
+      return;
+    }
     var batches = groepenVan(ontbrekend, groepen);
     batches.forEach(function (groep) { groep.atomair = atomair; });
     keten = keten.then(async function () {

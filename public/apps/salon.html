@@ -89,6 +89,9 @@
   .reactie.antwoord{padding-left:2rem;color:var(--muted);}
   .reactie .wie{font-weight:600;}
   .reactie .mini{background:none;border:none;color:var(--rtg-leesgoud,var(--gold));font-size:.7rem;cursor:pointer;padding:0 .3rem;}
+.salon-contextdetail{padding-top:.25rem;color:var(--soft);font-size:.72rem;}
+.salon-offer{margin:.15rem .9rem .7rem;padding:.75rem;}
+.salon-offer-detail{color:var(--soft);font-size:.72rem;}
 </style>
 <link href="/shared/social-elite.css" rel="stylesheet">
 <link href="/shared/salon-elite.css" rel="stylesheet">
@@ -218,12 +221,12 @@ function postHtml(p){
       (p.place?'<span class="plek">'+esc(p.place)+'</span>':'')+'</span>'+
       (p.partner?'<span class="merk">partner</span>':(p.featured?'<span class="merk">uitgelicht</span>':''))+
       '<span class="soort">'+esc(soorten[p.momentType]||'Moment')+'</span></div>'+
-    (details.length?'<div class="tekst" style="padding-top:.25rem;color:var(--soft);font-size:.72rem;">'+esc(details.join(' · '))+'</div>':'')+
+    (details.length?'<div class="tekst salon-contextdetail">'+esc(details.join(' · '))+'</div>':'')+
     (media.length?'<div class="kar"><div class="strip">'+media.map(m=>
         '<img src="'+esc(m.src)+'" alt="'+esc(m.alt||'Foto uit De Salon')+'" loading="lazy">').join('')+'</div>'+
         (media.length>1?'<span class="tel">'+media.length+' foto\'s</span>':'')+'</div>':'')+
     (p.text?'<div class="tekst">'+esc(p.text)+'</div>':'')+
-    (p.offer?'<div class="kaart" style="margin:.15rem .9rem .7rem;padding:.75rem;"><h2>'+esc(p.offer.titel||'Aanbod')+'</h2><p style="color:var(--soft);font-size:.72rem;">'+esc([p.offer.capaciteit?p.offer.capaciteit+' beschikbaar':'',p.offer.geldigTot?'tot '+p.offer.geldigTot:'',p.offer.actie||''].filter(Boolean).join(' · '))+'</p></div>':'')+
+    (p.offer?'<div class="kaart salon-offer"><h2>'+esc(p.offer.titel||'Aanbod')+'</h2><p class="salon-offer-detail">'+esc([p.offer.capaciteit?p.offer.capaciteit+' beschikbaar':'',p.offer.geldigTot?'tot '+p.offer.geldigTot:'',p.offer.actie||''].filter(Boolean).join(' · '))+'</p></div>':'')+
     ((p.onderwerpen||[]).length?'<div class="onderw">'+p.onderwerpen.map(o=>
         '<button type="button" data-onderwerp="'+esc(o)+'">#'+esc(o)+'</button>').join('')+'</div>':'')+
     '<div class="rij">'+

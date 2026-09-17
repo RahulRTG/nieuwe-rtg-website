@@ -1502,24 +1502,8 @@ const uiBronnen = require('./lib/ui-bronnen').maakUiBronnen(PUBLIC_DIR, [path.jo
    /api/vertaal en komt dus nooit op schijf te staan. Zie lib/vertaalkast.js. */
 const vertaalkast = require('./lib/vertaalkast').maakVertaalkast({ dir: DATA_DIR });
 i18n.setVertaalkast(vertaalkast);
-app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {
-  try {
-    const naar = talen.taalVan(req.body && req.body.naar);
-    let totaal = 0;
-    const teksten = (Array.isArray(req.body && req.body.teksten) ? req.body.teksten : []).slice(0, 400)
-      .map(t => String(t == null ? '' : t).slice(0, 300))
-      .filter(t => { totaal += t.length; return totaal <= 24000; });
-    const regels = await i18n.translateBatch(teksten, naar, undefined, { ai: uiBronnen.toegestaan, bewaar: true });
-    const uit = regels.map(r => r.text);
-    const vertaald = uit.reduce((n, tekst, i) => n + (tekst !== teksten[i] ? 1 : 0), 0);
-    const voltooid = regels.map(r => r.resolved === true);
-    /* De client gebruikt `volledig` om een kerntaalscherm atomair te wisselen.
-       Een gedeeltelijk modelantwoord mag nooit opnieuw Nederlands, Duits en
-       Engels op een scherm mengen. */
-    res.json({ ok: true, naar, teksten: uit, voltooid, vertaald, totaal: teksten.length,
-      volledig: voltooid.every(Boolean) });
-  } catch (e) { res.status(500).json({ error: 'Vertalen lukte even niet. Probeer het opnieuw.' }); }
-});
+app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal,
+  require('./lib/ui-vertaling')({ talen, i18n, uiBronnen }));
 
 /* ---------- partnerkanaal: boeken zonder pas ----------
    Publieke endpoints (geen login): partner opzoeken, reizen ophalen en

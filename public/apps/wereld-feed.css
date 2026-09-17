@@ -51,7 +51,7 @@ body.rtg-social-experience .kaart .tel{display:flex;gap:12px;font-size:11px;colo
 .living-membership{padding:28px 0 0}
 body.rtg-social-experience .living-membership .passport{background:transparent;border:0;border-block:1px solid var(--rtg-line);padding:20px 0;margin:0 0 16px}
 .living-membership .lenzen{display:flex;flex-wrap:wrap;gap:8px;padding:0;border:0}
-.living-membership .lenzen a,.living-membership .lenzen span{flex:1 0 auto;min-height:44px;box-sizing:border-box;display:grid;place-content:center;font-size:11px;padding:8px;color:#c9c0b6}
+.living-membership .lenzen a,.living-membership .lenzen button,.living-membership .lenzen span{flex:1 0 auto;min-height:44px;box-sizing:border-box;display:grid;place-content:center;font-size:11px;padding:8px;color:#c9c0b6}
 .living-membership .lenzen span{opacity:.7}
 body.rtg-social-experience .meer{min-height:48px;margin:16px 0;border-color:var(--rtg-line);color:#f4f0e9}
 body.rtg-social-experience .balk a{min-height:44px;box-sizing:border-box}

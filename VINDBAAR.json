@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T20:24:01.748Z",
-    "commit": "d4c190d4f",
-    "boomVuil": false,
-    "boomAnders": 14,
+    "op": "2026-09-17T18:32:46.255Z",
+    "commit": "e2e315140",
+    "boomVuil": true,
+    "boomAnders": 4,
     "instrument": "scripts/vindbaar.js",
     "node": "v24.18.0"
   },
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 99,
-  "woorden": 1170,
-  "gevonden": 766,
-  "dekking": 0.6547,
+  "woorden": 1172,
+  "gevonden": 767,
+  "dekking": 0.6544,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -112,7 +112,7 @@
     {
       "naam": "Mall",
       "url": "/apps/mall.html",
-      "woorden": 44,
+      "woorden": 45,
       "gevonden": 29,
       "mist": [
         "gevonden",
@@ -129,7 +129,8 @@
         "dienstenplein",
         "tussen",
         "leveranciers",
-        "bestellen"
+        "bestellen",
+        "openen"
       ]
     },
     {
@@ -477,8 +478,8 @@
     {
       "naam": "RTMail",
       "url": "/apps/rtmail.html",
-      "woorden": 23,
-      "gevonden": 17,
+      "woorden": 24,
+      "gevonden": 18,
       "mist": [
         "daarna",
         "externe",
@@ -848,8 +849,8 @@
     {
       "naam": "Alles bij elkaar",
       "url": "/apps/wereld.html",
-      "woorden": 6,
-      "gevonden": 5,
+      "woorden": 5,
+      "gevonden": 4,
       "mist": [
         "bekeek"
       ]
@@ -965,8 +966,8 @@
     {
       "naam": "RTFoundation portaal",
       "url": "/apps/foundation/os-portaal.html",
-      "woorden": 6,
-      "gevonden": 5,
+      "woorden": 7,
+      "gevonden": 6,
       "mist": [
         "bedrijf"
       ]

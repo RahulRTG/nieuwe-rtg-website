@@ -40,8 +40,11 @@ async function meet(page) {
       bars: [...document.querySelectorAll('.rtg-adaptive-bar')].filter(zichtbaar).length,
       oudeBalkZichtbaar: zichtbaar(document.querySelector('.rtg-edge-bottom')),
       binnen: br.left >= 0 && br.right <= innerWidth && br.bottom <= innerHeight,
+      barBreedte: br.width,
       midden: Math.abs((br.left + br.width / 2) - (lr.left + lr.width / 2)),
       lipBreedte: lr.width,
+      richting: getComputedStyle(bar.querySelector('button')).flexDirection,
+      aiKopieZichtbaar: zichtbaar(bar.querySelector('[data-rtg-adaptive-action="ai"] .rtg-adaptive-item-copy')),
       knoppen: [...bar.querySelectorAll('button')].map(el => {
         const r = el.getBoundingClientRect(), s = getComputedStyle(el), small = el.querySelector('small');
         return { width: r.width, height: r.height, color: s.color,
@@ -84,6 +87,14 @@ test('Adaptive Edge is één tastbare RTG-laag op mobiel en desktop',
           assert.equal(m.binnen, true);
           assert.ok(m.midden <= 1, 'lippen staan ' + m.midden + 'px uit het midden');
           assert.ok(m.lipBreedte >= 44, 'lippen zijn te klein: ' + m.lipBreedte);
+          if (maat.width >= 900) {
+            assert.ok(m.barBreedte >= maat.width - 120, 'desktop Edge is niet lang genoeg: ' + m.barBreedte);
+            assert.equal(m.richting, 'row');
+            assert.equal(m.aiKopieZichtbaar, true);
+          } else {
+            assert.equal(m.richting, 'column');
+            assert.equal(m.aiKopieZichtbaar, false);
+          }
           assert.equal(m.knoppen.length, 5);
           m.knoppen.forEach(k => {
             assert.ok(k.width >= 43.5 && k.height >= 43.5, 'raakvlak is ' + k.width + 'x' + k.height);

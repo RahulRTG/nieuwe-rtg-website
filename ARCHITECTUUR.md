@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5102 |
-| servermodules (`server/**/*.js`) | 3576 |
+| servermodules (`server/**/*.js`) | 3580 |
 | routebestanden (`server/routes/**`) | 596 |
-| kernmodules (`server/kern/**`) | 2241 |
+| kernmodules (`server/kern/**`) | 2245 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 362 |
 | toetsbestanden (`test/*.test.js`) | 1708 |
@@ -105,7 +105,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 238 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 239 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -136,8 +136,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | Meting | Nu |
 |---|---|
 | kern-namen die routes aanraken | 1582 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 238 |
-| daarvan door precies één domein | 1344 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 239 |
+| daarvan door precies één domein | 1343 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -151,7 +151,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 ```
 app(207) auth(128) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) status(31)
 accounts(27) schoon(23) managerOnly(18) codenaamVan(18) rtf(18) boardroomWie(17)
-save(17) tooManyTries(14) geenGast(14) crypto(12) express(12) findSupplier(12)
+save(17) tooManyTries(14) geenGast(14) findSupplier(13) crypto(12) express(12)
 appUrl(11) pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10) keyVanCodenaam(10)
 rtmail(10) kern(9) gegevensStop(9) logActivity(9) sseToOffice(9) payrollOS(9)
 loginFails(8) stuur(8) mail(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6)

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-17T13:21:31.154Z",
-    "commit": "dd0e2d9a",
+    "op": "2026-09-17T13:23:11.891Z",
+    "commit": "716dfab1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5974,9 +5974,12 @@
       "scherp": "gezakt"
     },
     "openbare-bouwstand.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/openbaar.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "oplaadgat.test.js": {
       "soort": "puur",

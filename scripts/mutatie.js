@@ -452,6 +452,17 @@ function draaiToets(bestand, env, wacht, forceer) {
 const EIGEN_MODULE = new Map([
   // This test executes the browser language loader in a VM, not through require.
   ['i18n-dictionary.test.js', ['public/shared/i18n.js']],
+  /* De grendel op een openbare Magnaat Test-installatie draait VOOR er ook maar
+     een route bestaat: server/config.js weigert de start. Tien van de twaalf
+     rijen doen daarom nooit een verzoek, en de twee die wel een proces starten
+     kijken naar de EXITCODE en naar /api/health -- de liveness-route, die de
+     liegpoort met opzet niet raakt omdat de toetshelper erop wacht. De
+     serverheuristiek (de toets laadt ./helper voor de laatste rij) stuurt hem
+     dus een liegende API die niets met zijn beweringen te maken heeft. Zijn
+     werkelijke onderwerp is de adresbeslissing; een bronmutatie daarin laat hem
+     wel zakken, en dat is met de hand nagetrokken op alle drie de assen
+     (de middenbak `onbekend`, de harde fout, en de schaduwronde). */
+  ['openbare-bouwstand.test.js', ['server/config/openbaar.js']],
   /* De Evidence Engine-toets importeert ook test/helper.js om het gedrag van
      een verbonden browserclient te isoleren. Zonder deze expliciete bron wint
      daardoor de serverheuristiek en krijgt hij een liegende API die niets met

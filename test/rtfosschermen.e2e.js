@@ -176,6 +176,23 @@ test('het gemeentenportaal toont cijfers en geen enkele persoon',
     assert.match(await page.textContent('.melder'), /kennen we niet/, 'een onbekende code gaf geen duidelijke zin');
 
     await page.fill('#code', d.gemeenteCode);
+    // Een stilstaande aanwijzer op de onderrand mag het klikvlak niet laten
+    // pendelen tussen hover en rust. Dat blokkeerde ook de tweede gewone klik.
+    await page.evaluate(() => document.fonts.ready);
+    await page.mouse.move(0, 0);
+    const knop = await page.locator('#open').boundingBox();
+    await page.mouse.move(knop.x + knop.width / 2, knop.y + knop.height - .25);
+    const beweging = await page.evaluate(async () => {
+      const vakken = [];
+      for (let i = 0; i < 30; i++) {
+        await new Promise(requestAnimationFrame);
+        const r = document.querySelector('#open').getBoundingClientRect();
+        vakken.push([r.x, r.y, r.width, r.height]);
+      }
+      return vakken;
+    });
+    assert.ok(beweging.every(r => r.every((v, i) => Math.abs(v - beweging[0][i]) < .1)),
+      'het klikvlak bleef bewegen onder een stilstaande aanwijzer');
     await page.click('#open');
     await page.waitForSelector('#uit .kaart', { timeout: 15000 });
     const tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));

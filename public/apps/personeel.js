@@ -257,63 +257,34 @@
     if (vast) stepWie(null, vast);
     else stepLogin();
   }
-  // de klok en de datum op het inlogscherm (de naam van de app staat in de badge)
-  function gateTik(){ if (window.RTGKlok) RTGKlok.alles(); }
-  /* De hoofd-ingang is een GESPREK met Rahul, net als in de leden-app: hij
-     vraagt wie u bent, daarna uw wachtwoord, en pas dan gaat hij aanbellen bij
-     dezelfde inlogroute als voorheen (mijnLogin -> /api/auth/login). Er gaat
-     niets van dit gesprek naar een taalmodel, en Rahul beslist niets: de server
-     zegt ja of nee, precies als eerst. De zijpaden (aanmelden, wachtwoord
-     vergeten, vast apparaat) staan er rustig onder.
-     Is shared/rahulpoort.js er niet, dan valt hij terug op het oude formulier;
-     zonder inlogscherm zou de app onbruikbaar zijn en dat risico nemen we niet. */
+  // The shared access canvas changes presentation, never account authority.
   function stepLogin(){
     kantoorStop();
-    if (window.RTGPoort && window.RTGPoort.gesprek) return poortGesprek();
+    teamAccessView('login', 'pd.access.welcome', 'Welkom bij uw team.',
+      'pd.access.loginhelp', 'Log in met uw persoonlijke RTG-account om verder te gaan naar uw werkplek.');
     formulierLogin();
-  }
-  function poortGesprek(){
-    window.RTGPoort.gesprek($('#gateStep'), {
-      groet: () => T('pd.rp.groet','Welkom terug bij RTG Personeel.'),
-      wacht: () => T('pd.rp.wacht','Een ogenblik, ik kijk het na.'),
-      stuurLabel: T('pd.rp.stuur','Stuur'),
-      stappen: [
-        { sleutel:'user', vraag: () => T('pd.rp.wie','Met wie heb ik het genoegen?'),
-          plho: () => T('pd.li.user','E-mail of gebruikersnaam'), type:'text', autocomplete:'username' },
-        { sleutel:'pass', vraag: () => T('pd.rp.pass','Dank u. En uw wachtwoord?'),
-          plho: () => T('pd.li.pass','Wachtwoord'), type:'password', autocomplete:'current-password' }
-      ],
-      klaar: async (a) => {
-        try { await mijnLogin(a.user, a.pass); }
-        catch(err){ throw new Error(err && err.message || T('pd.badlogin','Onjuiste inloggegevens.')); }
-      },
-      zijpaden: [
-        { tekst: () => T('pd.aanmelden','Aanmelden bij een bedrijf'), doe: stepAanmelden },
-        { tekst: () => T('pd.forgot','Wachtwoord vergeten?'), doe: stepForgot },
-        { tekst: () => T('pd.ondevice','Vast apparaat? Inloggen met naam en pincode'), doe: stepSector }
-      ]
-    });
   }
   // Aanmelden bij een bedrijf: bedrijfsnaam + kassacode (van de werkgever) +
   // het eigen RTG-account + een zelfgekozen pincode. Daarna landt u meteen.
   function stepAanmelden(){
-    $('#gateStep').innerHTML =
-      '<button class="gback" id="jaBack">← '+T('pd.back','Terug')+'</button>'+
+    teamAccessView('join', 'pd.access.join', 'Sluit u aan bij uw team.',
+      'pd.access.joinhelp', 'Gebruik de gegevens van uw werkgever en uw eigen RTG-account. Kies daarna een pincode voor het apparaat op uw werkplek.');
+    $('#gateStep').innerHTML = teamBack('jaBack')+
       '<form class="lform" id="joinForm" autocomplete="on">'+
-        '<input id="jaBedrijf" type="text" placeholder="'+T('pd.ja.bedrijf','Bedrijfsnaam')+'" aria-label="'+T('pd.ja.bedrijf','Bedrijfsnaam')+'">'+
-        '<input id="jaCode" type="text" autocapitalize="characters" placeholder="'+T('pd.ja.code','Kassacode van uw werkgever')+'" aria-label="'+T('pd.ja.code','Kassacode van uw werkgever')+'">'+
-        '<input id="jaUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
-        '<input id="jaPass" type="password" autocomplete="current-password" placeholder="'+T('pd.ja.rtgpass','Wachtwoord van uw RTG-account')+'" aria-label="'+T('pd.ja.rtgpass','Wachtwoord van uw RTG-account')+'">'+
-        '<input id="jaPin" type="password" inputmode="numeric" maxlength="4" placeholder="'+T('pd.ja.pin','Kies een pincode (4 cijfers)')+'" aria-label="'+T('pd.ja.pin','Kies een pincode van 4 cijfers')+'">'+
-        '<div class="err" id="jaErr" role="alert"></div>'+
-        '<button class="prim" type="submit">'+T('pd.aanmelden.go','Aanmelden')+'</button>'+
-      '</form>'+
-      '<div class="lhint">'+T('pd.ja.hint','Nog geen RTG-account? Maak er gratis een aan in de leden-app; daarna meldt u zich hier aan met de kassacode van uw werkgever.')+'</div>';
+        teamField('jaBedrijf', 'pd.ja.bedrijf', 'Bedrijfsnaam', 'text', 'autocomplete="organization" required')+
+        teamField('jaCode', 'pd.ja.code', 'Kassacode van uw werkgever', 'text', 'autocapitalize="characters" spellcheck="false" required')+
+        teamField('jaUser', 'pd.li.user', 'E-mail of gebruikersnaam', 'text', 'autocomplete="username" autocapitalize="none" spellcheck="false" required')+
+        teamField('jaPass', 'pd.ja.rtgpass', 'Wachtwoord van uw RTG-account', 'password', 'autocomplete="current-password" required')+
+        teamField('jaPin', 'pd.ja.pin', 'Kies een pincode van 4 cijfers', 'password', 'inputmode="numeric" minlength="4" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required')+
+        '<div class="access-error" id="jaErr" role="alert" data-i18n-ignore></div>'+
+        '<button class="access-primary" type="submit">'+teamText('pd.access.joingo', 'Ik meld mij aan bij mijn team.')+'</button>'+
+      '</form><p class="lhint">'+teamText('pd.access.accounthelp', 'Heeft u nog geen RTG-account? Maak dit eerst aan. Daarna kunt u zich hier bij uw team aanmelden.')+'</p>'+
+      '<a class="access-secondary" href="/apps/app.html">'+teamText('pd.access.account', 'Ik wil een RTG-account aanmaken.')+'</a>';
     $('#jaBack').addEventListener('click', stepLogin);
     $('#joinForm').addEventListener('submit', async e => {
       e.preventDefault();
       $('#jaErr').textContent = '';
-      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
       try {
         await API.call('/supplier/staff/join', { bedrijf: $('#jaBedrijf').value.trim(), kassacode: $('#jaCode').value.trim(),
           login: $('#jaUser').value.trim(), password: $('#jaPass').value, pin: $('#jaPin').value.trim() });
@@ -321,100 +292,34 @@
         await mijnLogin($('#jaUser').value.trim(), $('#jaPass').value);
       } catch(err){ $('#jaErr').textContent = err.message || T('pd.mis','Er ging iets mis.'); btn.disabled = false; }
     });
-    $('#jaBedrijf').focus();
+
   }
   // Wachtwoord vergeten: stuurt de herstelmail; verder gaat het via de leden-app.
   function stepForgot(){
-    $('#gateStep').innerHTML =
-      '<button class="gback" id="fgBack">← '+T('pd.back','Terug')+'</button>'+
+    teamAccessView('recovery', 'pd.access.recovery', 'We helpen u verder.',
+      'pd.access.recoveryhelp', 'Vul het e-mailadres van uw RTG-account in. U ontvangt een link waarmee u uw wachtwoord opnieuw kunt instellen.');
+    $('#gateStep').innerHTML = teamBack('fgBack')+
       '<form class="lform" id="forgotForm" autocomplete="on">'+
-        '<input id="fgEmail" type="email" autocomplete="email" placeholder="'+T('pd.fg.email','Uw e-mailadres')+'" aria-label="'+T('pd.fg.email','Uw e-mailadres')+'">'+
-        '<div class="err" id="fgErr" role="alert"></div>'+
-        '<button class="prim" type="submit">'+T('pd.fg.go','Stuur herstel-link')+'</button>'+
-      '</form>'+
-      '<div class="lhint">'+T('pd.fg.hint','We sturen een link en een code om uw wachtwoord opnieuw in te stellen. Dat rondt u af in de leden-app.')+'</div>';
+        teamField('fgEmail', 'pd.fg.email', 'Uw e-mailadres', 'email', 'autocomplete="email" autocapitalize="none" required')+
+        '<div class="access-error" id="fgErr" role="alert" data-i18n-ignore></div>'+
+        '<button class="access-primary" type="submit">'+teamText('pd.access.recovergo', 'Stuur mij een herstellink.')+'</button>'+
+      '</form><p class="access-status" id="fgStatus" role="status"></p>';
     $('#fgBack').addEventListener('click', stepLogin);
     $('#forgotForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
       try { await API.call('/auth/forgot', { email: $('#fgEmail').value.trim() });
-        toast(T('pd.fg.ok','Als dit adres bij ons bekend is, is de herstel-link onderweg.'));
-        stepLogin();
+        $('#fgStatus').innerHTML = teamText('pd.fg.ok','Als dit adres bij ons bekend is, is de herstel-link onderweg.');
       } catch(err){ $('#fgErr').textContent = err.message || T('pd.mis','Er ging iets mis.'); btn.disabled = false; }
     });
-    $('#fgEmail').focus();
+
   }
   // Inloggen met het RTG-account en landen op de juiste bedrijfspagina.
   async function mijnLogin(login, password, bedrijf){
     const d = await API.call('/supplier/mijn/login', { login, password, bedrijf: bedrijf || '' });
     await landMijn(d);
   }
-/* DIT SLUITHAAKJE HOORT HIER, EN NIET EEN BESTAND VERDEROP.
 
-   Het stond bovenaan 04.js, waardoor mijnLogin() pas daar dichtging -- en
-   deel 3b, het oude inlogFORMULIER, kwam daarmee BINNEN die functie te liggen.
-   Gevolg: stepLogin() riep formulierLogin() aan terwijl die naam daar niet
-   bestond. Dat vangnet stond er juist "voor het geval de poort er niet is,
-   zonder inlogscherm zou de app onbruikbaar zijn" -- en het was zelf stuk.
-
-   Gevonden door regel 42 van scripts/check.js, die op dezelfde fout in de
-   Vooruit-kaart is gebouwd. */
-  /* De vaste-PDA-ingang kent niet alleen de geseede demonstratiezaken. Nieuwe
-     partners worden na de eerste geldige roster-opvraag aan de lokale
-     schermcatalogus toegevoegd; de server blijft de enige bron van waarheid. */
-  const DEMO_BEDRIJVEN = new Set(Object.keys(BEDRIJVEN));
-  let demoOmgeving = false;
-  const geldigeBedrijfscode = c => /^[A-Z0-9_-]{2,32}$/.test(String(c || '').toUpperCase());
-
-  async function laadOmgeving() {
-    if (!(location.protocol === 'http:' || location.protocol === 'https:')) return;
-    try {
-      const r = await fetch('/api/health');
-      const h = r.ok ? await r.json() : null;
-      demoOmgeving = !!(h && h.omgeving === 'magnaat-test' && h.testomgeving === true);
-    } catch (e) { demoOmgeving = false; }
-  }
-
-  function onthoudBedrijf(s) {
-    if (!s || !geldigeBedrijfscode(s.code)) return null;
-    const c = String(s.code).toUpperCase();
-    BEDRIJVEN[c] = Object.assign({}, BEDRIJVEN[c] || {}, {
-      name: String(s.name || s.naam || c),
-      icon: (BEDRIJVEN[c] && BEDRIJVEN[c].icon) || '', type: s.type || ''
-    });
-    return c;
-  }
-/* Personeel, deel 3b: het oude inlogFORMULIER, nog als vangnet.
-   De gewone ingang is het gesprek met Rahul (deel 3). Dit blok staat er
-   voor het geval shared/rahulpoort.js niet geladen is; zonder inlogscherm
-   zou de app onbruikbaar zijn en dat risico nemen we niet. Deelt de
-   IIFE-scope met de andere delen. */
-  // Het oude formulier, nog als vangnet (zie stepLogin).
-  function formulierLogin(){
-    $('#gateStep').innerHTML =
-      '<form class="lform" id="loginForm" autocomplete="on">'+
-        '<input id="liUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
-        '<input id="liPass" type="password" autocomplete="current-password" placeholder="'+T('pd.li.pass','Wachtwoord')+'" aria-label="'+T('pd.li.pass','Wachtwoord')+'">'+
-        '<div class="err" id="liErr" role="alert"></div>'+
-        '<button class="prim" type="submit">'+T('pd.login','Inloggen')+'</button>'+
-      '</form>'+
-      '<div class="llinks">'+
-        '<button class="llink" id="toJoin" type="button">'+T('pd.aanmelden','Aanmelden bij een bedrijf')+'</button>'+
-        '<button class="llink" id="toForgot" type="button">'+T('pd.forgot','Wachtwoord vergeten?')+'</button>'+
-        '<button class="llink" id="toDevice" type="button">'+T('pd.ondevice','Vast apparaat? Inloggen met naam en pincode')+'</button>'+
-      '</div>';
-    $('#loginForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      $('#liErr').textContent = '';
-      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
-      try { await mijnLogin($('#liUser').value.trim(), $('#liPass').value); }
-      catch(err){ $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.'); btn.disabled = false; }
-    });
-    $('#toJoin').addEventListener('click', stepAanmelden);
-    $('#toForgot').addEventListener('click', stepForgot);
-    $('#toDevice').addEventListener('click', stepSector);
-    $('#liUser').focus();
-  }
   // Land (of wissel) naar een van de eigen werkplekken: sessie zetten en de app openen.
   async function landMijn(d){
     onthoudBedrijf(d.supplier);
@@ -442,19 +347,87 @@
     if (!rijen.length) return null;
     return { naam: 'rooster', kolommen: ['datum','dag','naam','rol','dienst'], rijen: rijen };
   });
+  /* De vaste-PDA-ingang kent niet alleen de geseede demonstratiezaken. Nieuwe
+     partners worden na de eerste geldige roster-opvraag aan de lokale
+     schermcatalogus toegevoegd; de server blijft de enige bron van waarheid. */
+  const DEMO_BEDRIJVEN = new Set(Object.keys(BEDRIJVEN));
+  let demoOmgeving = false;
+  const geldigeBedrijfscode = c => /^[A-Z0-9_-]{2,32}$/.test(String(c || '').toUpperCase());
 
+  async function laadOmgeving() {
+    if (!(location.protocol === 'http:' || location.protocol === 'https:')) return;
+    try {
+      const r = await fetch('/api/health');
+      const h = r.ok ? await r.json() : null;
+      demoOmgeving = !!(h && h.omgeving === 'magnaat-test' && h.testomgeving === true);
+    } catch (e) { demoOmgeving = false; }
+  }
+
+  function onthoudBedrijf(s) {
+    if (!s || !geldigeBedrijfscode(s.code)) return null;
+    const c = String(s.code).toUpperCase();
+    BEDRIJVEN[c] = Object.assign({}, BEDRIJVEN[c] || {}, {
+      name: String(s.name || s.naam || c),
+      icon: (BEDRIJVEN[c] && BEDRIJVEN[c].icon) || '', type: s.type || ''
+    });
+    return c;
+  }
+/* Team access uses the same canvas and Edge as the member portal. Labels are
+   translated in place: no rerender may erase credentials or repeat a request. */
+  function teamText(key, source){
+    return '<span data-i18n="'+esc(key)+'" data-i18n-source="'+esc(source)+'">'+esc(T(key, source))+'</span>';
+  }
+  function teamField(id, key, source, type, attributes){
+    return '<label class="access-field" for="'+id+'">'+teamText(key, source)+
+      '<input id="'+id+'" type="'+type+'" '+attributes+'></label>';
+  }
+  function teamBack(id){
+    return '<button class="access-secondary access-back" id="'+id+'" type="button">'+teamText('pd.back','Terug')+'</button>';
+  }
+  function teamAccessView(view, key, title, descriptionKey, description){
+    $('#gate').dataset.accessView = view;
+    $('#teamAccessTitle').innerHTML = teamText(key, title);
+    $('#teamAccessDescription').innerHTML = teamText(descriptionKey, description);
+    $('#gate').scrollTop = 0;
+  }
+  function formulierLogin(){
+    $('#gateStep').innerHTML =
+      '<form class="lform" id="loginForm" autocomplete="on">'+
+        teamField('liUser', 'pd.li.user', 'E-mail of gebruikersnaam', 'text', 'autocomplete="username" autocapitalize="none" spellcheck="false" required')+
+        teamField('liPass', 'pd.li.pass', 'Wachtwoord', 'password', 'autocomplete="current-password" required')+
+        '<div class="access-error" id="liErr" role="alert" data-i18n-ignore></div>'+
+        '<button class="access-primary" type="submit">'+teamText('pd.access.logingo','Ga verder naar mijn werkplek.')+'</button>'+
+      '</form><div class="llinks">'+
+        '<button class="access-link" id="toJoin" type="button">'+teamText('pd.access.joinlink','Ik wil mij aanmelden bij een bedrijf.')+'</button>'+
+        '<button class="access-link" id="toForgot" type="button">'+teamText('pd.access.forgotlink','Ik ben mijn wachtwoord vergeten.')+'</button>'+
+        '<button class="access-link" id="toDevice" type="button">'+teamText('pd.access.devicelink','Ik gebruik een apparaat op mijn werkplek.')+'</button>'+
+      '</div>';
+    $('#loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      $('#liErr').textContent = '';
+      const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
+      try { await mijnLogin($('#liUser').value.trim(), $('#liPass').value); }
+      catch(err){ $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.'); btn.disabled = false; }
+    });
+    $('#toJoin').addEventListener('click', stepAanmelden);
+    $('#toForgot').addEventListener('click', stepForgot);
+    $('#toDevice').addEventListener('click', stepSector);
+  }
+/* De apparaatpoort: bedrijf, medewerker en pincode; daarna de kantoorpoort. */
   function stepSector(){
     kantoorStop();
-    const direct = '<form class="lform" id="vastBedrijf" autocomplete="off">' +
-      '<input id="vastCode" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="'+T('pd.code','Bedrijfscode')+'" aria-label="'+T('pd.code','Bedrijfscode')+'">' +
-      '<button class="prim" type="submit">'+T('pd.openbedrijf','Open bedrijf')+'</button></form>' +
-      '<div class="lhint">'+T('pd.codehint','Gebruik de code van uw werkgever. Nieuwe RTG-partners werken hier direct, zonder dat deze app hoeft te worden aangepast.')+'</div>';
+    teamAccessView('device','pd.access.device','Uw werkplek.', 'pd.access.devicehelp','Vul de bedrijfscode van uw werkgever in. Daarna kunt u met uw naam en pincode inloggen.');
+    const direct = teamBack('deviceBack')+'<form class="lform" id="vastBedrijf" autocomplete="off">' +
+      teamField('vastCode','pd.code','Bedrijfscode','text','autocapitalize="characters" spellcheck="false" maxlength="32" required') +
+      '<button class="prim" type="submit">'+teamText('pd.openbedrijf','Open bedrijf')+'</button></form>' +
+      '<div class="lhint">'+teamText('pd.codehint','Gebruik de code van uw werkgever. Nieuwe RTG-partners werken hier direct, zonder dat deze app hoeft te worden aangepast.')+'</div>';
     const voorbeelden = demoOmgeving ? '<div class="glist compact">' + SECTORS.map(s =>
       '<button class="gbtn" data-sec="'+s.id+'"><span class="ic">'+(window.RTGGlyf?RTGGlyf.svgHTML(s.icon):'')+'</span><span><b>'+(lang()==='en'?s.en:s.nl)+'</b><span>'+s.sub+'</span></span></button>'
     ).join('') +
       '</div>' : '';
     $('#gateStep').innerHTML = direct + voorbeelden +
-      '<div class="glist compact"><button class="gbtn" id="gKantoor"><span class="ic"></span><span><b>'+T('pd.kantoor','RTG Kantoor')+'</b><span>'+T('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button></div>';
+      '<div class="glist compact"><button class="gbtn" id="gKantoor"><span class="ic"></span><span><b>'+teamText('pd.kantoor','RTG Kantoor')+'</b><span>'+teamText('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button></div>';
+    $('#deviceBack').addEventListener('click',stepLogin);
     $('#vastBedrijf').addEventListener('submit', e => {
       e.preventDefault(); const c = String($('#vastCode').value || '').trim().toUpperCase();
       if (!geldigeBedrijfscode(c)) { toast(T('pd.badcode','Controleer de bedrijfscode.')); return; }
@@ -465,8 +438,8 @@
   }
   function stepBedrijf(secId){
     const sec = SECTORS.find(s => s.id === secId);
-    $('#gateStep').innerHTML = '<button class="gback" id="gb1">← '+T('pd.back','Terug')+'</button><div class="glist">' + sec.codes.map(c =>
-      '<button class="gbtn" data-bedrijf="'+c+'"><span class="ic">'+(window.RTGGlyf?RTGGlyf.svgHTML(sec.icon):'')+'</span><span><b>'+BEDRIJVEN[c].name+'</b><span>'+T('pd.choose','Kies uw bedrijf')+'</span></span></button>'
+    $('#gateStep').innerHTML = '<button class="gback" id="gb1">← '+teamText('pd.back','Terug')+'</button><div class="glist">' + sec.codes.map(c =>
+      '<button class="gbtn" data-bedrijf="'+c+'"><span class="ic">'+(window.RTGGlyf?RTGGlyf.svgHTML(sec.icon):'')+'</span><span><b>'+BEDRIJVEN[c].name+'</b><span>'+teamText('pd.choose','Kies uw bedrijf')+'</span></span></button>'
     ).join('') + '</div>';
     $('#gb1').addEventListener('click', stepSector);
     document.querySelectorAll('[data-bedrijf]').forEach(b => b.addEventListener('click', () => stepWie(secId, b.dataset.bedrijf)));
@@ -478,14 +451,15 @@
     onthoudBedrijf(roster.supplier || { code: c, name: c });
     // dit apparaat staat nu vast op dit bedrijf
     try { localStorage.setItem('rtg_pda_bedrijf', c); } catch(e){}
+    teamAccessView('team','pd.access.team','Kies uw naam.', 'pd.access.teamhelp','Kies uw eigen account om veilig verder te gaan met uw pincode.');
     $('#gateStep').innerHTML =
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;margin-bottom:0.25rem;">'+
-        '<div style="font-size:0.9rem;"><b>'+BEDRIJVEN[c].icon+' '+esc(BEDRIJVEN[c].name)+'</b><div style="font-size:0.68rem;color:var(--soft);">'+T('pd.vast','Deze PDA staat op dit bedrijf')+'</div></div>'+
-        '<button class="gback" id="gbSwitch" style="margin:0;">'+T('pd.switch','Ander bedrijf')+'</button>'+
+        '<div style="font-size:0.9rem;"><b>'+BEDRIJVEN[c].icon+' '+esc(BEDRIJVEN[c].name)+'</b><div style="font-size:0.68rem;color:var(--soft);">'+teamText('pd.vast','Deze PDA staat op dit bedrijf')+'</div></div>'+
+        '<button class="gback" id="gbSwitch" style="margin:0;">'+teamText('pd.switch','Ander bedrijf')+'</button>'+
       '</div><div class="glist">' + (roster.staff||[]).map(m =>
-      '<button class="gbtn" data-wie="'+m.id+'" data-nm="'+esc(m.name)+'"><span class="ic">'+(m.role==='manager'?'':'')+'</span><span><b>'+m.name+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+'</span></span></button>'
+      '<button class="gbtn" data-wie="'+m.id+'" data-nm="'+esc(m.name)+'"><span class="ic">'+(m.role==='manager'?'':'')+'</span><span><b>'+m.name+'</b><span>'+(m.role==='manager'?'Manager':teamText('pd.staff','Medewerker'))+'</span></span></button>'
     ).join('') + '</div>'+
-      '<div style="margin-top:0.75rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.nieuw','Nieuw? Vraag uw werkgever om een kassacode en meld u eenmalig aan in de leverancier-app.')+'</div>';
+      '<div style="margin-top:0.75rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+teamText('pd.nieuw','Nieuw? Vraag uw werkgever om een kassacode en meld u eenmalig aan in de leverancier-app.')+'</div>';
     $('#gbSwitch').addEventListener('click', () => {
       try { localStorage.removeItem('rtg_pda_bedrijf'); } catch(e){}
       stepSector();
@@ -493,9 +467,10 @@
     document.querySelectorAll('[data-wie]').forEach(b => b.addEventListener('click', () => stepPin(secId, c, Number(b.dataset.wie), b.dataset.nm)));
   }
   function stepPin(secId, c, staffId, nm){
-    $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+T('pd.back','Terug')+'</button>'+
+    teamAccessView('pin','pd.access.pin','Welkom terug.', 'pd.access.pinhelp','Vul uw persoonlijke pincode in om uw werkplek te openen.');
+    $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+teamText('pd.back','Terug')+'</button>'+
       '<div style="margin-top:0.5rem;font-size:0.9rem;"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
-      '<div class="pinrow"><input id="pinInp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+T('pd.login','Inloggen')+'</button></div>'+
+      '<div class="pinrow"><input id="pinInp" aria-label="'+T('pd.access.pinlabel','Uw viercijferige pincode')+'" data-i18n-aria="pd.access.pinlabel" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+teamText('pd.login','Inloggen')+'</button></div>'+
       (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div class="pd-demo-hint">'+T('pd.pinhint','Magnaat Test: manager 1234, medewerker 5678.')+'</div>' : '');
     $('#gb3').addEventListener('click', () => stepWie(secId, c));
     // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
@@ -554,13 +529,14 @@
     toonKantoorLogin();
   }
   function toonKantoorLogin(){
-    $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.back','Terug')+'</button>'+
-      '<div class="card"><div class="k">'+T('pd.ka.code','Kantoorcode')+'</div>'+
-      '<div class="pinrow h-mt60 rtg-duimeind"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
+    teamAccessView('office','pd.access.office','Welkom bij RTG Kantoor.', 'pd.access.officehelp','Gebruik uw toegangscode voor kantoor. Is tweestapsverificatie ingesteld? Vul dan ook de code uit uw authenticator in.');
+    $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+teamText('pd.back','Terug')+'</button>'+
+      '<div class="card"><div class="k">'+teamText('pd.ka.code','Kantoorcode')+'</div>'+
+      '<div class="pinrow h-mt60 rtg-duimeind"><input id="kaCode" data-i18n-aria="pd.ka.code" aria-label="Kantoorcode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
       /* Binnenkomen is de hoofdhandeling (GRAMMATICA.md), voor vier poorten. */
-      '<button id="kaGo" class="hoofd" data-hoofdactie>'+T('pd.ka.binnen','Binnen')+'</button></div>'+
-      '<div class="k h-mt70">'+T('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
-      '<input class="hin h-mt40" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456">'+
+      '<button id="kaGo" class="hoofd" data-hoofdactie>'+teamText('pd.ka.binnen','Binnen')+'</button></div>'+
+      '<div class="k h-mt70">'+teamText('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
+      '<input class="hin h-mt40" id="kaTotp" data-i18n-aria="pd.ka.totp" aria-label="TOTP-code (alleen als die is ingesteld)" inputmode="numeric" autocomplete="one-time-code" placeholder="123456">'+
       '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
     $('#kaTerug').addEventListener('click', stepSector);
 /* aanmelden met de kassacode */
@@ -3041,9 +3017,8 @@
     } catch(e){}
   }
 
-  window.addEventListener('rtglang', () => { if (state) renderAll(); else stepStart(); gateTik(); });
+  window.addEventListener('rtglang', () => { if (state) renderAll(); });
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  gateTik(); setInterval(gateTik, 15000);
   async function startPersoneel(){
     await laadOmgeving();
     stepStart();

@@ -26,3 +26,6 @@ Alle 114 talen zijn technisch selecteerbaar; volledige vertaal- en betekenispari
 ## Gecontroleerd gedrag
 
 De reproduceerbare taalproef doorloopt de werkelijke browser en accountserver, alle 114 selecties, RTL, Unicode-invoer, behoud van toestand, Edge-labels, menuzoeken en een contractwijziging tijdens de aanmelding. Een aparte foutproef stopt een geïsoleerde lokale modeladapter. De bestaande project-, aanmeld-, Edge- en toegankelijkheidscontroles blijven daarnaast van toepassing.
+
+De aparte medewerkersingang `/apps/personeel.html` had nog de oude klokpoort en begon bij iedere taalwissel opnieuw. Deze gebruikt nu hetzelfde toegangscanvas. De browserproef `test/pda-ui.e2e.js` controleert de eigen login, bedrijfsaanmelding, herstel, apparaat- en kantoorroute op 320, 390 en 1440 pixels, met behoud van invoer bij Nederlands/Engels en bediening via de gedeelde Edge. De proef voert een echte testlogin, werkgeversuitnodiging en herstelaanvraag uit tegen een geïsoleerde server; zij bewijst geen fysieke e-mailbezorging of vertaalpariteit voor de overige talen.
+De bestaande Team Room-navigatie is tevens aangemeld bij de gedeelde Edge-projectie. De personeelstests bedienen deze via Acties; zij klikken niet langer op de oude balk achter de Edge.

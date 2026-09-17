@@ -375,7 +375,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 31 delen, 3087 regels in de delen
+`public/apps/personeel/` -- 31 delen, 3062 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -383,8 +383,8 @@ omlaag.
 | `personeel-02.js` | de gebeurtenissen van vandaag: valet, jetset en bevestigingen |
 | `personeel-03.js` | de pas-controle |
 | `personeel-03a.js` | De vaste-PDA-ingang kent niet alleen de geseede demonstratiezaken |
-| `personeel-03b.js` | Personeel, deel 3b: het oude inlogFORMULIER, nog als vangnet |
-| `personeel-04.js` | Land (of wissel) naar een van de eigen werkplekken: sessie zetten en de app openen |
+| `personeel-03b.js` | Team access uses the same canvas and Edge as the member portal |
+| `personeel-04.js` | De apparaatpoort: bedrijf, medewerker en pincode; daarna de kantoorpoort |
 | `personeel-05.js` | aanmelden met de kassacode |
 | `personeel-05a.js` | de dienstkeuze en de sectorstap |
 | `personeel-06.js` | de borden van dit personeelslid |

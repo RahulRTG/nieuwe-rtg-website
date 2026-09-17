@@ -24,7 +24,8 @@ async function api(base, pad, body) {
 }
 
 async function openVolledigePda(page, tab) {
-  await page.locator('.trm-nav button[data-trm-diep="hulp"]').click();
+  await require('./helper').edgeActies(page);
+  await page.locator('.rtg-adaptive-controls [data-rtg-adaptive-source="trmMeer"]').click();
   await require('./helper').edgeActies(page);
   await page.click('.rtg-adaptive-controls [data-rtg-adaptive-tab="' + tab + '"]');
 }
@@ -199,4 +200,42 @@ test('PDA in de browser: een gast vraagt aandacht, het personeel ziet het op Van
     stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
+});
+
+const {probe}=require('./lib/team-access-probe');
+test('team portal: shared canvas, Edge language control and intact drafts on every access route',{skip:geenBrowser(pw),timeout:180000},async()=>{
+  const srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});const browser=await pw.chromium.launch(browserOpties(pw));
+  try{for(const width of [320,390,1440])await probe(browser,srv.base,width,process.env.RTG_TEAM_SCREENSHOTS?process.env.RTG_TEAM_SCREENSHOTS+'/team-local-'+width+'.png':null);
+    const page=await browser.newPage();
+    await page.addInitScript(()=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');});
+    await page.goto(srv.base+'/apps/personeel.html');
+    await page.locator('#liUser').fill('nora@rtg.example');await page.locator('#liPass').fill('werk');
+    const login=page.waitForResponse(r=>r.url().endsWith('/api/supplier/mijn/login'));
+    await page.locator('#loginForm button[type="submit"]').click();assert.equal((await login).status(),200);
+    await page.waitForSelector('#gate',{state:'hidden'});
+    assert.ok(await page.evaluate(()=>localStorage.getItem('rtg_pda_token')),'Existing personal account opens its authorized team');
+    assert.equal(await page.locator('#teamRoomVoorzijde').isVisible(),true);
+
+    // A real employer invitation and personal account go through the browser.
+    const api=async(pad,body,token)=>{const res=await fetch(srv.base+'/api'+pad,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body)});assert.equal(res.ok,true,pad);return res.json();};
+    const roster=await api('/supplier/roster',{code:'KIKUNOI'});
+    const manager=roster.staff.find(x=>x.role==='manager');
+    const managerLogin=await api('/supplier/login',{code:'KIKUNOI',staffId:manager.id,pin:'1234'});
+    const email='team-portal@example.test',password='Team-portal-473!';
+    await api('/auth/register',{name:'Team Portal Test',email,password,phone:'0612345670',geboortedatum:'1995-03-03',tier:'guest',pasApp:'rtg'});
+    const invite=await api('/supplier/staff/invite',{name:'Team Portal Test',func:'Bediening'},managerLogin.token);
+    const joinPage=await browser.newPage();
+    await joinPage.addInitScript(()=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');});
+    await joinPage.goto(srv.base+'/apps/personeel.html');await joinPage.locator('#toJoin').click();
+    for(const [id,value] of Object.entries({jaBedrijf:roster.supplier.name,jaCode:invite.invite.kassacode,jaUser:email,jaPass:password,jaPin:'2468'}))await joinPage.locator('#'+id).fill(value);
+    const joined=joinPage.waitForResponse(r=>r.url().endsWith('/api/supplier/staff/join'));
+    await joinPage.locator('#joinForm button[type="submit"]').click();assert.equal((await joined).ok(),true);
+    await joinPage.waitForSelector('#gate',{state:'hidden'});
+    assert.ok(await joinPage.evaluate(()=>localStorage.getItem('rtg_pda_token')));
+    const recovery=await browser.newPage();
+    await recovery.addInitScript(()=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');});
+    await recovery.goto(srv.base+'/apps/personeel.html');await recovery.locator('#toForgot').click();await recovery.locator('#fgEmail').fill(email);
+    await recovery.locator('#forgotForm button[type="submit"]').click();
+    await recovery.waitForFunction(()=>document.querySelector('#fgStatus').textContent.includes('onderweg'));
+  }finally{await browser.close();stop(srv);}
 });

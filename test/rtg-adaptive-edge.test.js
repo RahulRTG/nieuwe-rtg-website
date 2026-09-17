@@ -60,6 +60,7 @@ test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(VIEW, /Mandaat gecontroleerd/);
   assert.match(CSS, /\.rtg-adaptive-sheet \.rtg-edge-2-context-slot :is\([^}]+grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/);
   assert.match(CSS, /\.scrim\.open\[role="dialog"\]/);
+  assert.match(CSS, /\.hv-balk:not\(\.hv-weg\)/);
   assert.match(CSS, /@media\(min-width:900px\)/);
   assert.match(CSS, /left:calc\(var\(--edge-side\) \+ 24px\);right:24px;width:auto;max-width:none/);
   assert.match(CSS, /grid-template-columns:minmax\(108px,1fr\) minmax\(128px,1\.1fr\) minmax\(300px,2\.25fr\)/);

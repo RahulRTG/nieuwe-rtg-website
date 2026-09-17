@@ -136,7 +136,77 @@ test('een onleesbare kluiswaarde geeft NEE met de kluis als reden, niet een geru
   const r = draai(map, []);
   assert.match(r.tekst, /isEigenaar\(\)\s+NEE/, 'de diagnose beweert eigenaarschap dat er niet is');
   assert.match(r.tekst, /NIET UIT DE KLUIS TE LEZEN/, 'de reden wordt niet genoemd');
-  assert.match(r.tekst, /vault\.key/, 'de lezer wordt niet naar de sleutel gewezen');
+  /* HIER STOND /vault\.key/, EN DAT WAS EEN ASSERTIE DIE MEELIEP MET ELKE TEKST.
+
+     Het script zegt over die sleutel inmiddels precies het tegenovergestelde
+     ("een veranderde vault.key verklaart dit dus NIET"), en de oude assertie
+     bleef daar gewoon groen op staan -- ze toetste dat het WOORD er stond, niet
+     wat erover beweerd werd. Nu wordt de redenering zelf getoetst.
+
+     Met een account in de kluis kan de telling de twee oorzaken niet uit elkaar
+     houden, en dat hoort het script te ZEGGEN in plaats van er een te kiezen. */
+  assert.match(r.tekst, /op zijn E-MAILADRES gevonden/, 'de vindweg wordt niet gemeld, terwijl de hele redenering eraan hangt');
+  assert.match(r.tekst, /veranderde vault\.key verklaart dit dus NIET/, 'de lezer wordt nog steeds naar de gepinde sleutel gestuurd');
+  assert.match(r.tekst, /1 rijen -- 0 gebonden, 0 ongebonden, 1 ONLEESBAAR/, 'de stand van de kluis wordt niet geteld');
+  assert.match(r.tekst, /kan de twee mogelijke\n\s+oorzaken NIET uit elkaar houden/, 'met een rij wordt er alsnog een oorzaak gekozen');
+});
+
+/* DE TWEE OORZAKEN UIT ELKAAR, EN DIT IS HET BEELD VAN DE ECHTE STORING.
+
+   Inloggen blijft werken terwijl de kantoordeur dichtgaat -- dat klinkt als een
+   tegenspraak en het is een ontwerp: email_hash is een HMAC met de GEPINDE
+   sleutel en loopt niet mee in een rotatie (accounts/onderhoud.js roteer),
+   terwijl enc_email met de RING wordt geopend. Raakt de ring kwijt, dan blijft
+   de voordeur open en gaat de kluis dicht.
+
+   Twee toetsen omdat het twee oorzaken zijn met hetzelfde symptoom, en een
+   diagnose die ze niet scheidt stuurt de lezer de verkeerde kant op. */
+test('een verdwenen sleutelring wijst naar de ring en niet naar deze ene rij', async () => {
+  const map = versDatamap();
+  assert.equal(draai(map, ['--maak', '--naam=Rahul Imran Ismail', '--geboren=1990-01-31']).code, 0);
+
+  const accounts = kluisVan(map);
+  await accounts.createUser({ email: 'iemand.anders@example.com', username: 'anders',
+    password: 'ZeerGeheim123!', tier: 'rtg', realName: 'Iemand Anders' });
+  const S = require('../server/accounts/state');
+  require('../server/accounts/onderhoud').roteer(S.huidigeDb(), { schrijfRing: accounts.schrijfKluisRing });
+  await accounts.flushBijAfsluiten();
+  // de deploy die de datamap niet bewaart: de sleutels blijven, de ring niet
+  fs.unlinkSync(path.join(map, 'vault.ring'));
+
+  const r = draai(map, []);
+  assert.match(r.tekst, /isEigenaar\(\)\s+NEE/);
+  assert.match(r.tekst, /2 rijen -- 0 gebonden, 0 ongebonden, 2 ONLEESBAAR \(1 sleutel in de ring\)/,
+    'de telling ziet de verdwenen ring niet');
+  assert.match(r.tekst, /op zijn E-MAILADRES gevonden/, 'de vindweg wordt niet gemeld');
+  assert.match(r.tekst, /Dat wijst op de RING en niet op deze rij/, 'de diagnose wijst de ring niet aan');
+  assert.doesNotMatch(r.tekst, /Alleen DEZE rij staat dicht/, 'de diagnose wijst de verkeerde oorzaak aan');
+});
+
+test('een verplaatste kluiswaarde wijst naar de binding en niet naar de ring', async () => {
+  const map = versDatamap();
+  assert.equal(draai(map, ['--maak', '--naam=Rahul Imran Ismail', '--geboren=1990-01-31']).code, 0);
+
+  const accounts = kluisVan(map);
+  await accounts.createUser({ email: 'iemand.anders@example.com', username: 'anders',
+    password: 'ZeerGeheim123!', tier: 'rtg', realName: 'Iemand Anders' });
+  await accounts.flushBijAfsluiten();
+
+  const { DatabaseSync } = require('node:sqlite');
+  const d = new DatabaseSync(path.join(map, 'rtg.db'));
+  /* Geen kapotte blob maar een ECHTE: die van de andere rij. Dat is precies
+     waar de AAD voor is (accounts/gebonden.js), en het is de vorm die een
+     herimport of een spiegel die rijen opnieuw invoegt achterlaat. */
+  const twee = d.prepare('SELECT enc_email FROM users WHERE id = 2').get();
+  d.prepare('UPDATE users SET enc_email = ? WHERE id = 1').run(twee.enc_email);
+  d.close();
+
+  const r = draai(map, []);
+  assert.match(r.tekst, /isEigenaar\(\)\s+NEE/);
+  assert.match(r.tekst, /2 rijen -- 1 gebonden, 0 ongebonden, 1 ONLEESBAAR/, 'de telling ziet de andere rij niet staan');
+  assert.match(r.tekst, /op zijn E-MAILADRES gevonden/, 'de vindweg wordt niet gemeld');
+  assert.match(r.tekst, /Alleen DEZE rij staat dicht/, 'de diagnose wijst de binding niet aan');
+  assert.doesNotMatch(r.tekst, /Dat wijst op de RING/, 'de diagnose wijst de verkeerde oorzaak aan');
 });
 
 test('--maak levert een eigenaarsaccount op de RTG Pass, en nooit een betaalde pas', () => {

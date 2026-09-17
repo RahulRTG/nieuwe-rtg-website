@@ -56,6 +56,17 @@
      dan stopt dit script. De weg terug naar een account zonder toestel is
      eigenaarherstel (server/kern/eigenaarherstel.js), met quorum en wachttijd.
 
+   DE DIAGNOSE MEET, EN DAT KWAM UIT EEN VERKEERDE RAAD IN DIT BESTAND ZELF.
+   Bij "isEigenaar() zegt nee terwijl het account er staat" stuurde dit script de
+   lezer naar vault.key. Dat is juist de oorzaak die zijn eigen waarneming al
+   bijna uitsluit: inloggen gaat op email_hash (een HMAC met de GEPINDE sleutel,
+   die met opzet niet meeroteert -- accounts/onderhoud.js roteer), eigenaarschap
+   op enc_email (dat met de RING wordt geopend). Werkt de inlog op het ADRES, dan
+   klopt de gepinde sleutel dus nog. Wat er dan stuk is, zit in de ring of in de
+   binding aan de rij -- en welke van die twee is te TELLEN (onderhoud.stand) in
+   plaats van te raden. Kan de telling het niet onderscheiden, met een enkele rij
+   in de kluis, dan zegt het script dat en kiest het er geen.
+
    Draai: npm run eigenaar            -- toont de stand, verandert niets
           npm run eigenaar -- --maak --naam="..." --geboren=1990-01-31 */
 'use strict';
@@ -79,6 +90,48 @@ const openKluis = () => (kluis || (kluis = require('../server/accounts')));
 
 const zeg = (s) => console.log(s === undefined ? '' : s);
 const regel = (kop, waarde) => zeg('  ' + kop.padEnd(17) + waarde);
+
+/* HOE IS DIT ACCOUNT GEVONDEN? Dat is geen weetje maar de scharniervraag van de
+   diagnose hieronder.
+
+   accounts.findByLogin() zoekt eerst op `email_hash`, en pas als dat niets geeft
+   op de inlognaam. Die hash is een HMAC met de GEPINDE kluissleutel (S.VAULT) en
+   loopt met opzet NIET mee in een sleutelrotatie -- anders kon niemand na een
+   rotatie nog op zijn e-mailadres inloggen (zie accounts/onderhoud.js roteer).
+
+   Daaruit volgt precies een ding, en het scheelt de lezer een verkeerde
+   zoektocht: is het account op zijn E-MAILADRES gevonden, dan is de gepinde
+   sleutel nog dezelfde als die waarmee de hash ooit is gemaakt. Een "de
+   vault.key is veranderd" verklaart dan NIETS -- dan was dit account op zijn
+   adres helemaal niet meer te vinden en zou inloggen ook niet meer werken. */
+function hoeGevonden(accounts, adres, bestaand) {
+  if (!bestaand) return null;
+  try {
+    const opAdres = accounts.findByLogin(adres);
+    if (opAdres && opAdres.id === bestaand.id) {
+      const opNaam = accounts.findByLogin(String(bestaand.username || ''));
+      // alleen "op de hash" als de naam-terugval het niet ook al verklaart
+      if (!(opNaam && opNaam.id === bestaand.id && String(bestaand.username || '').includes('@'))) return 'e-mailhash';
+    }
+  } catch (e) { return null; }
+  return 'inlognaam';
+}
+
+/* De stand van de identiteitskluis: hoeveel rijen gaan open, hoeveel niet, en
+   hoeveel sleutels zitten er in de ring. Dat onderscheidt een storing die de
+   HELE tabel raakt (een verdwenen vault.ring na een rotatie) van een die alleen
+   DEZE rij raakt (een blob die niet meer bij zijn rij-id hoort).
+
+   Geen eigen crypto en geen eigen telling: dit is accounts/onderhoud.js stand(),
+   dezelfde functie die het onderhoud zelf gebruikt. */
+function kluisStand() {
+  try {
+    const S = require('../server/accounts/state');
+    const db = S.huidigeDb();
+    if (!db) return null;
+    return require('../server/accounts/onderhoud').stand(db);
+  } catch (e) { return null; }
+}
 
 function argumenten(argv) {
   const uit = { maak: false, hulp: false };
@@ -188,6 +241,10 @@ function diagnose(accounts, adres, bestaand) {
 
   const gelezen = (() => { try { return accounts.emailOf(bestaand); } catch (e) { return null; } })();
   const klopt = eigenaar.isEigenaar(accounts, bestaand);
+  /* Twee metingen die alleen de NEE-tak nodig heeft, maar die hier worden gedaan
+     omdat ze over dit account gaan en niet over de uitleg eronder. */
+  const gevonden = hoeGevonden(accounts, adres, bestaand);
+  const stand = kluisStand();
   /* `verified` is een TEKSTkolom met 'unverified' als standaard, dus een ja/nee-test
      erop is ALTIJD ja -- die stond hier even en meldde elk vers account als
      geverifieerd. De waarde zelf tonen is korter en het liegt niet. */
@@ -232,8 +289,69 @@ function diagnose(accounts, adres, bestaand) {
   if (gelezen == null) {
     zeg('   - De e-mail van dit account is NIET UIT DE KLUIS TE LEZEN. Het inloggen werkt');
     zeg('     nog (dat gaat op een hash), maar het huis kan niet meer zien wie u bent.');
-    zeg('     Kijk naar vault.key / RTG_VAULT_KEY en de sleutelring: is die veranderd,');
-    zeg('     of verschilt hij tussen instances?');
+    zeg('');
+    /* WAAROM HIER NIET GEWOON "KIJK NAAR VAULT.KEY" STAAT.
+
+       Dat stond er wel, en het wees de lezer naar de ene oorzaak die door zijn
+       eigen waarneming al bijna is uitgesloten. Het inloggen gaat op email_hash,
+       een HMAC met de GEPINDE sleutel; het eigenaarschap gaat op enc_email, dat
+       met de RING wordt geopend. Die twee zijn met opzet losgekoppeld, zodat een
+       sleutelrotatie niemand buitensluit (accounts/onderhoud.js, roteer).
+
+       Dus: is dit account op zijn adres gevonden, dan klopt de gepinde sleutel
+       nog. Wat er dan stuk is, zit in de RING of in de BINDING -- en welke van
+       die twee is te meten in plaats van te raden. */
+    if (gevonden === 'e-mailhash') {
+      zeg('     Dit account is op zijn E-MAILADRES gevonden. Daaruit volgt dat de gepinde');
+      zeg('     kluissleutel nog dezelfde is als die waarmee de hash is gemaakt -- anders');
+      zeg('     was het op dat adres niet te vinden en kon u ook niet meer inloggen.');
+      zeg('     Een veranderde vault.key verklaart dit dus NIET.');
+    } else {
+      zeg('     Dit account is op zijn INLOGNAAM gevonden en niet op het adres. Dan kan de');
+      zeg('     gepinde kluissleutel wel degelijk zijn veranderd; kijk naar vault.key en');
+      zeg('     RTG_VAULT_KEY, en of die tussen instances gelijk is.');
+    }
+    zeg('');
+    if (stand) {
+      zeg('     De kluis, geteld: ' + stand.rijen + ' rijen -- ' + stand.gebonden + ' gebonden, '
+        + stand.ongebonden + ' ongebonden, ' + stand.onleesbaar + ' ONLEESBAAR'
+        + ' (' + stand.sleutels + ' sleutel' + (stand.sleutels === 1 ? '' : 's') + ' in de ring).');
+      /* EEN ONDERSCHEID DAT JE MET EEN RIJ NIET KUNT MAKEN, MAAK JE NIET.
+
+         "Meer rijen dan deze staan dicht" wijst naar de ring, "alleen deze rij"
+         naar de binding -- maar op een installatie met precies EEN account zien
+         die twee er identiek uit: onleesbaar is dan hoe dan ook 1. Hier iets
+         kiezen zou een gok zijn met de toon van een meting. */
+      if (stand.rijen <= 1) {
+        zeg('     Er staat maar een rij in de kluis, dus deze telling kan de twee mogelijke');
+        zeg('     oorzaken NIET uit elkaar houden. Ze zijn allebei nog open:');
+        zeg('       * de RING: na een sleutelrotatie wordt er met een nieuwe sleutel verzegeld,');
+        zeg('         en die staat in vault.ring (of RTG_VAULT_RING). Raakt dat kwijt, dan');
+        zeg('         blijft inloggen werken en gaat de kluis dicht -- precies dit beeld.');
+        zeg('       * de BINDING: een RTGV2-waarde hoort bij (tabel, kolom, rij-id), dus een');
+        zeg('         rij die een ander id kreeg (herimport, restore, opnieuw ingevoegd) gaat');
+        zeg('         niet meer open terwijl de hash blijft werken.');
+        zeg('     Kijk eerst of vault.ring bestaat en of RTG_VAULT_RING gezet is.');
+      } else if (stand.onleesbaar > 1) {
+        zeg('     Meer rijen dan deze staan dicht. Dat wijst op de RING en niet op deze rij:');
+        zeg('     na een sleutelrotatie wordt er met een NIEUWE sleutel verzegeld, en die');
+        zeg('     staat in vault.ring (of RTG_VAULT_RING). Raakt dat bestand kwijt -- een');
+        zeg('     datamap die per deploy verdwijnt, een tweede instance zonder de ring --');
+        zeg('     dan blijft inloggen werken en gaat de kluis dicht. Precies dit beeld.');
+        zeg('     Zet de ring terug; herzegelen repareert dit NIET (accounts/onderhoud.js');
+        zeg('     laat een onleesbare kolom met opzet staan, want overschrijven zou de');
+        zeg('     gegevens vernietigen zodra de sleutel later alsnog terugkomt).');
+      } else {
+        zeg('     Alleen DEZE rij staat dicht. Dan is het de BINDING en niet de sleutel: een');
+        zeg('     RTGV2-waarde is verzegeld aan (tabel, kolom, rij-id), dus een rij die een');
+        zeg('     ander id heeft gekregen -- een herimport, een restore, een spiegel die de');
+        zeg('     rij opnieuw heeft ingevoegd -- gaat niet meer open, terwijl de hash en dus');
+        zeg('     het inloggen gewoon blijven werken.');
+      }
+    } else {
+      zeg('     De stand van de kluis was hier niet op te nemen, dus welke van de twee het');
+      zeg('     is (de ring, of de binding van deze ene rij) staat hier niet vast.');
+    }
   } else if (gelezen.trim().toLowerCase() !== String(adres).trim().toLowerCase()) {
     zeg('   - Het account dat op dit adres gevonden wordt, draagt in de kluis een ANDER');
     zeg('     adres. Inloggen gaat op de e-mailhash, eigenaarschap op de kluiswaarde;');
@@ -374,8 +492,9 @@ async function hoofd() {
   if (!klopt) {
     zeg('');
     zeg('  eigenaar.isEigenaar() zegt nee over het account dat zojuist op dat adres is');
-    zeg('  gemaakt. Dat kan niet kloppen; kijk naar RTG_OWNER_EMAIL en de kluissleutel');
-    zeg('  (vault.key) voordat u verder gaat. Het account staat er, de deur niet open.');
+    zeg('  gemaakt. Dat kan niet kloppen. Draai `npm run eigenaar` zonder argumenten');
+    zeg('  voordat u verder gaat: die telt de kluis en noemt de oorzaak, in plaats van');
+    zeg('  u een sleutel te laten zoeken. Het account staat er, de deur niet open.');
     process.exitCode = 1;
   }
 

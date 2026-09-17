@@ -11,6 +11,9 @@
     home: ['primary', 'worlds', 'presence'], context: ['context', 'status', 'worlds'],
     actions: ['primary', 'context'], connect: ['connect', 'presence'], rahul: ['ai', 'context']
   });
+  var DETAILS = Object.freeze({ home: 'Eerste Minuut', worlds: 'Uw werelden', ai: 'Pagina, taak en mandaat',
+    context: 'Veilig voorbereid', menu: 'Alle functies', back: 'Vorige ruimte', status: 'Vertrouwd en veilig',
+    primary: 'Volgende stap', connect: 'Mensen en gesprekken', presence: 'Actuele voortgang' });
   var SPECS = Object.freeze({
     home: [['home', 'Home', 'Home', 'home'], ['worlds', 'Werelden', 'Werelden', 'grid'],
       ['ai', 'Praat met Rahul', 'Rahul', 'spark'], ['context', 'Acties van dit scherm', 'Acties', 'list'],
@@ -33,6 +36,7 @@
     return list.indexOf(value) >= 0 ? value : fallback;
   }
   function normState(value, fallback) { return norm(STATES, value, fallback || 'dock'); }
+  function detail(action) { return DETAILS[action] || 'RTG'; }
   function normDeck(value, fallback) { return norm(DECKS, value, fallback || 'home'); }
   function nextDeck(value, delta) {
     var index = DECKS.indexOf(normDeck(value));
@@ -80,7 +84,7 @@
   function actions(state) {
     return project((state.projections[state.deck] || []).concat(DEFAULTS[state.deck] || []), state.registry, 4);
   }
-  return Object.freeze({ STATES: STATES, DECKS: DECKS, SPECS: SPECS, normState: normState,
+  return Object.freeze({ STATES: STATES, DECKS: DECKS, SPECS: SPECS, normState: normState, detail: detail,
     normDeck: normDeck, nextDeck: nextDeck, allowed: allowed, project: project,
     model: model, defaults: defaults, register: register, setProjection: setProjection, actions: actions });
 }));

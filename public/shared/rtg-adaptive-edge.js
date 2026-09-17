@@ -1,6 +1,6 @@
 (function (w, d) {
   'use strict';
-  if (w.RTGAdaptiveEdge) return;
+  if(w.RTGAdaptiveEdge)return;
   var K = w.RTGAdaptiveEdgeCore, Input = w.RTGAdaptiveEdgeInput, rt = null;
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
@@ -16,11 +16,12 @@
   }
   function button(spec, slot) {
     var b = d.createElement('button');
-    b.type = 'button'; b.className = 'rtg-adaptive-item';
-    b.dataset.rtgAdaptiveSlot = String(slot); b.dataset.rtgAdaptiveAction = spec[0];
-    b.setAttribute('aria-label', spec[1]);
-    b.innerHTML = (spec[0] === 'ai' ? lips() : icon(spec[3])) + '<small>' + esc(spec[2] || spec[1]) + '</small>';
-    b.addEventListener('click', function () { execute(spec[0]); });
+    b.type='button'; b.className='rtg-adaptive-item';
+    b.dataset.rtgAdaptiveSlot=slot; b.dataset.rtgAdaptiveAction=spec[0];
+    b.setAttribute('aria-label',spec[1]);
+    b.innerHTML=(spec[0]==='ai'?lips():icon(spec[3]))+'<span class="rtg-adaptive-item-copy"><small>'+
+      esc(spec[0]==='ai'?'Vraag of regel iets':spec[2]||spec[1])+'</small><b>'+esc(K.detail(spec[0]))+'</b></span>';
+    b.onclick=function(){execute(spec[0]);};
     return b;
   }
   function legacy(selector) {

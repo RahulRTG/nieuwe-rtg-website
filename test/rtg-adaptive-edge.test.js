@@ -60,6 +60,11 @@ test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(VIEW, /Mandaat gecontroleerd/);
   assert.match(CSS, /\.rtg-adaptive-sheet \.rtg-edge-2-context-slot :is\([^}]+grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/);
   assert.match(CSS, /\.scrim\.open\[role="dialog"\]/);
+  assert.match(CSS, /@media\(min-width:900px\)/);
+  assert.match(CSS, /left:calc\(var\(--edge-side\) \+ 24px\);right:24px;width:auto;max-width:none/);
+  assert.match(CSS, /grid-template-columns:minmax\(108px,1fr\) minmax\(128px,1\.1fr\) minmax\(300px,2\.25fr\)/);
+  assert.match(VIEW, /rtg-adaptive-item-copy/);
+  assert.match(VIEW, /Vraag of regel iets/);
 });
 
 test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
@@ -71,6 +76,8 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
   assert.match(INPUT, /620/);
   assert.match(INPUT, /handlers\.rahul\(\)/);
   assert.match(INPUT, /Alt|altKey/);
+  assert.match(INPUT, /metaKey \|\| event\.ctrlKey/);
+  assert.match(INPUT, /toLowerCase\(\) === 'k'/);
   assert.match(INPUT, /navigator\.vibrate\(8\)/);
   assert.match(INPUT, /addEventListener\('scroll'/);
   assert.match(INPUT, /handlers\.state\('peek', 'auto'\)/);

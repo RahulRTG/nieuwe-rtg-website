@@ -77,7 +77,7 @@ test('Experience RTG: real public route, one Edge, interactive demos and explici
       await page.getByRole('button', { name: 'Verken mijn voorbeeld', exact: true }).click();
       assert.match(await page.locator('#intentFeedback').innerText(), /Een zaak, één overzicht/);
       await go(page, /Uw RTG/);
-      await page.getByText('Waarom zie ik dit?', { exact: true }).click();
+      await page.locator('summary').getByText('Waarom zie ik dit?', { exact: true }).click();
       assert.match(await page.locator('#personalReasons').innerText(), /WorkOS/);
       await page.getByRole('button', { name: 'Werelden', exact: true }).click();
       await page.locator('#worldPanel [data-select-world="foundation"]').click();

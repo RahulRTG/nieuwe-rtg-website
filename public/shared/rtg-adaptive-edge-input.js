@@ -88,7 +88,9 @@
     }, true);
     rt.doc.addEventListener('keydown', function (event) {
       var input = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target && event.target.tagName || '');
-      if (!input && event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+      if (!input && (event.metaKey || event.ctrlKey) && String(event.key).toLowerCase() === 'k') {
+        event.preventDefault(); handlers.rahul();
+      } else if (!input && event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
         event.preventDefault(); handlers.deck(event.key === 'ArrowRight' ? 1 : -1);
       } else if (event.key === 'Escape') handlers.escape();
     });

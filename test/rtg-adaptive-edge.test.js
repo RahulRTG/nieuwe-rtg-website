@@ -50,9 +50,12 @@ test('voorspelde acties verdringen geen veilige terugval en blijven begrensd', (
 
 test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(CSS, /data-rtg-adaptive-ready="true"\] \.rtg-edge-bottom\{display:none!important\}/);
-  assert.match(CSS, /grid-template-columns:repeat\(5,minmax\(48px,1fr\)\)/);
-  assert.match(CSS, /\.rtg-adaptive-item\{[^}]*min-width:48px;min-height:64px/);
-  assert.match(CSS, /backdrop-filter:blur\(28px\) saturate\(1\.32\)/);
+  assert.match(CSS, /width:min\(720px,calc\(100vw - var\(--edge-side\) - 28px\)\)/);
+  assert.match(CSS, /grid-template-columns:repeat\(5,minmax\(44px,1fr\)\)/);
+  assert.match(CSS, /\.rtg-adaptive-item\{[^}]*min-width:44px;min-height:54px/);
+  assert.match(CSS, /backdrop-filter:blur\(24px\) saturate\(1\.3\)/);
+  assert.match(CSS, /linear-gradient\(135deg,rgba\(255,255,255,\.09\),transparent 31%\),rgba\(10,8,5,\.86\)/);
+  assert.match(CSS, /--edge-bar-accent:#ebcc94/);
   assert.match(VIEW, /class="rtg-adaptive-lips"/);
   assert.doesNotMatch(VIEW, /rtg-adaptive-lips[^\n]+(?:circle|ellipse)/);
   assert.doesNotMatch(VIEW, /rtg-adaptive-caption/);
@@ -61,9 +64,8 @@ test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(CSS, /\.rtg-adaptive-sheet \.rtg-edge-2-context-slot :is\([^}]+grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/);
   assert.match(CSS, /\.scrim\.open\[role="dialog"\]/);
   assert.match(CSS, /\.hv-balk:not\(\.hv-weg\)/);
-  assert.match(CSS, /@media\(min-width:900px\)/);
-  assert.match(CSS, /left:calc\(var\(--edge-side\) \+ 24px\);right:24px;width:auto;max-width:none/);
-  assert.match(CSS, /grid-template-columns:minmax\(108px,1fr\) minmax\(128px,1\.1fr\) minmax\(300px,2\.25fr\)/);
+  assert.doesNotMatch(CSS, /grid-template-columns:minmax\(108px,1fr\)/,
+    'desktop krijgt geen tweede Edge-geometrie');
   assert.match(VIEW, /rtg-adaptive-item-copy/);
   assert.match(VIEW, /Vraag of regel iets/);
 });
@@ -72,6 +74,8 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
   assert.match(INPUT, /pointerdown/);
   assert.match(INPUT, /pointermove/);
   assert.match(INPUT, /pointerup/);
+  assert.match(INPUT, /lastX = event\.clientX; lastY = event\.clientY/);
+  assert.match(INPUT, /event \? event\.clientY : lastY/);
   assert.match(INPUT, /dy < -36/);
   assert.match(INPUT, /dy > 36/);
   assert.match(INPUT, /620/);

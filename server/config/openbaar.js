@@ -36,7 +36,15 @@
    open internet uitkomt maar ook geen privaat netwerkadres is. RFC 6761 (.test,
    .invalid, .example, .localhost) plus de twee achtervoegsels die dit huis zelf
    in zijn eigen documenten gebruikt. */
-const ONBESLIST_ACHTERVOEGSEL = ['.test', '.invalid', '.example', '.localhost', '.internal', '.intern'];
+const ONBESLIST_ACHTERVOEGSEL = ['.test', '.invalid', '.example', '.localhost', '.internal', '.intern',
+  /* RFC 2606 reserveert niet alleen die TLD's maar OOK drie tweede-niveau-domeinen,
+     en die stonden er eerst niet bij. Gevolg: `rtg.example.com` -- dat twee
+     bestaande toetsen als APP_URL gebruiken (golive, poortwacht) -- werd als
+     `openbaar` aangemerkt. Vandaag brak dat niets omdat die toetsen met
+     NODE_ENV=production draaien, waar de bestaande grendel het al afvangt; de
+     CLASSIFICATIE was er niet minder fout om, en hij zou bij de eerste toets
+     zonder die vlag alsnog bijten. */
+  '.example.com', '.example.net', '.example.org'];
 
 function priveIPv4(host) {
   if (/^10\./.test(host) || /^192\.168\./.test(host)) return true;
@@ -52,6 +60,7 @@ function adresSoort(host) {
   if (h === 'localhost' || h === '127.0.0.1' || h === '::1' || h === '[::1]') return 'lokaal';
   if (h.endsWith('.local')) return 'lokaal';
   if (priveIPv4(h)) return 'lokaal';
+  if (h === 'example.com' || h === 'example.net' || h === 'example.org') return 'onbekend';
   if (ONBESLIST_ACHTERVOEGSEL.some(s => h.endsWith(s))) return 'onbekend';
   /* Een naam zonder punt is een hostnaam op het eigen netwerk (een
      containernaam, een servicenaam), geen publiek domein. */

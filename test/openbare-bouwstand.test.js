@@ -28,7 +28,13 @@ const { adresSoort, installatieSoort, valideer } = (() => {
 test('een adres is lokaal, openbaar of onbekend -- en nooit stilzwijgend het een of het ander', () => {
   for (const h of ['localhost', '127.0.0.1', '::1', 'rtg.local', '10.1.2.3', '192.168.1.9', '172.20.0.5'])
     assert.equal(adresSoort(h), 'lokaal', h + ' hoort lokaal te zijn');
-  for (const h of ['app.rtg.test', 'iets.invalid', 'x.example', 'db.internal', 'anker.rtg.intern', 'webserver', ''])
+  /* RFC 2606 reserveert vier TLD's EN drie tweede-niveau-domeinen. Die laatste
+     drie stonden er eerst niet bij, waardoor `rtg.example.com` -- dat
+     golive.test.js en poortwacht.test.js als APP_URL gebruiken -- als openbaar
+     gold. Dat brak niets omdat die toetsen op NODE_ENV=production draaien, maar
+     een classificatie die toevallig niet bijt is nog steeds fout. */
+  for (const h of ['app.rtg.test', 'iets.invalid', 'x.example', 'db.internal', 'anker.rtg.intern', 'webserver', '',
+    'rtg.example.com', 'example.com', 'example.net', 'example.org', 'iets.example.org'])
     assert.equal(adresSoort(h), 'onbekend', h + ' hoort onbekend te zijn, niet openbaar');
   for (const h of ['app.rahultravelgroup.com', 'rtg.nl', 'www.voorbeeld.org'])
     assert.equal(adresSoort(h), 'openbaar', h + ' hoort openbaar te zijn');

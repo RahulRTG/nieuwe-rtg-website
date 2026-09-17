@@ -64,10 +64,79 @@ test('zonder --maak verandert er niets en zegt het script dat er geen eigenaar i
   const map = versDatamap();
   const r = draai(map, []);
   assert.equal(r.code, 0, r.tekst);
-  assert.match(r.tekst, /GEEN eigenaarsaccount/);
+  assert.match(r.tekst, /GEEN -- er staat niets op dit adres/);
   assert.match(r.tekst, /0 in de kluis/);
   // en na afloop nog steeds nul: een toonstand die schrijft is geen toonstand
   assert.match(draai(map, []).tekst, /0 in de kluis/);
+});
+
+/* DE DIAGNOSE MOET HET OORDEEL VAN DE DEUR HERHALEN, NIET EEN EIGEN VERSIE.
+
+   Deze twee toetsen bestaan omdat het script anders een geruststelling wordt: met
+   een account op het adres zegt hij JA, en met een overgedragen eigenaarschap --
+   de stille manier waarop de eigenaar zichzelf buitensluit, want die overdracht
+   overleeft een herstart en wint van RTG_OWNER_EMAIL -- hoort hij NEE te zeggen
+   MET de herkomst erbij. Zonder die tweede is de eerste een dooddoener. */
+test('de diagnose bevestigt het eigenaarschap op een account dat er hoort te zijn', () => {
+  const map = versDatamap();
+  assert.equal(draai(map, ['--maak', '--naam=Rahul Imran Ismail', '--geboren=1990-01-31']).code, 0);
+  const r = draai(map, []);
+  assert.match(r.tekst, /isEigenaar\(\)\s+JA/);
+  assert.match(r.tekst, /kantoorsleutel\s+afgeleid/);
+  // de pas staat er los van, en dat hoort het scherm te zeggen
+  assert.match(r.tekst, /uw PAS is rtg en niet business of lifestyle/);
+  // en nooit een ja/nee op een tekstkolom: `verified` is standaard 'unverified'
+  assert.match(r.tekst, /identiteit unverified/);
+});
+
+test('een overgedragen eigenaarschap wint, en de diagnose wijst het aan', async () => {
+  const map = versDatamap();
+  assert.equal(draai(map, ['--maak', '--naam=Rahul Imran Ismail', '--geboren=1990-01-31']).code, 0);
+
+  // de overdracht zetten zoals de boardroom dat doet: in de operationele opslag
+  const zet = execFileSync(process.execPath, ['-e', `
+    const dbm = require(${JSON.stringify(path.join(__dirname, '..', 'server', 'db'))});
+    (async () => { await dbm.load();
+      dbm.db.data.techniek = dbm.db.data.techniek || {};
+      dbm.db.data.techniek.eigenaarEmail = 'iemand.anders@example.com';
+      await dbm.save(); process.exit(0); })();
+  `], { encoding: 'utf8', env: { ...process.env, RTG_DATA_DIR: map, NODE_ENV: '', DATABASE_URL: '', PG_URL: '' } });
+  assert.equal(typeof zet, 'string');
+
+  const r = draai(map, []);
+  assert.match(r.tekst, /iemand\.anders@example\.com/, 'het overgedragen adres wordt niet gelezen');
+  assert.match(r.tekst, /overgedragen vanuit de boardroom/, 'de herkomst wordt niet gemeld');
+  assert.match(r.tekst, /GEEN -- er staat niets op dit adres/);
+  // en het account van de oude eigenaar staat er nog gewoon
+  assert.equal(kluisVan(map).count(), 1);
+});
+
+/* DE NEE-KANT MET EEN BESTAAND ACCOUNT, en die ontbrak.
+
+   Zonder deze toets overleeft de goedkoopste fout van een diagnose: `klopt = true`
+   hardcoderen. De twee toetsen hierboven vangen dat niet -- de ene loopt over de
+   JA-kant en de andere over een adres waar helemaal geen account staat.
+
+   Wat hier wordt nagebootst is de storing die het verraderlijkst is: de e-mail in
+   de kluis is niet meer te lezen terwijl INLOGGEN nog werkt. Dat kan echt, want
+   inloggen zoekt op `email_hash` en het eigenaarschap leest `enc_email`; bij een
+   kluissleutel die niet meer bij de waarde past valt alleen dat tweede weg. Het
+   huis weet dan niet meer wie u bent terwijl u gewoon binnenkomt. */
+test('een onleesbare kluiswaarde geeft NEE met de kluis als reden, niet een geruststelling', () => {
+  const map = versDatamap();
+  assert.equal(draai(map, ['--maak', '--naam=Rahul Imran Ismail', '--geboren=1990-01-31']).code, 0);
+
+  const { DatabaseSync } = require('node:sqlite');
+  const d = new DatabaseSync(path.join(map, 'rtg.db'));
+  // RTGV2: is het merk van een aan zijn rij gebonden kluiswaarde; de rest is
+  // onleesbaar, precies zoals bij een sleutel die niet meer past.
+  d.prepare('UPDATE users SET enc_email = ? WHERE id = 1').run('RTGV2:' + 'a'.repeat(64));
+  d.close();
+
+  const r = draai(map, []);
+  assert.match(r.tekst, /isEigenaar\(\)\s+NEE/, 'de diagnose beweert eigenaarschap dat er niet is');
+  assert.match(r.tekst, /NIET UIT DE KLUIS TE LEZEN/, 'de reden wordt niet genoemd');
+  assert.match(r.tekst, /vault\.key/, 'de lezer wordt niet naar de sleutel gewezen');
 });
 
 test('--maak levert een eigenaarsaccount op de RTG Pass, en nooit een betaalde pas', () => {

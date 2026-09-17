@@ -64,6 +64,7 @@ const crypto = require('node:crypto');
 
 const eigenaar = require('../server/eigenaar');
 const duurzaamheid = require('../server/accounts/duurzaamheid');
+const testomgeving = require('../server/testomgeving');
 const { leeftijdVan, LID_MIN_LEEFTIJD, LID_MAX_LEEFTIJD } = require('../server/lib/leeftijd');
 const { schoon } = require('../server/kern/util');
 
@@ -77,7 +78,7 @@ let kluis = null;
 const openKluis = () => (kluis || (kluis = require('../server/accounts')));
 
 const zeg = (s) => console.log(s === undefined ? '' : s);
-const regel = (kop, waarde) => zeg('  ' + kop.padEnd(14) + waarde);
+const regel = (kop, waarde) => zeg('  ' + kop.padEnd(17) + waarde);
 
 function argumenten(argv) {
   const uit = { maak: false, hulp: false };
@@ -145,38 +146,149 @@ function grendelUitleg() {
   ];
 }
 
+/* Waar het eigenaarsadres vandaan komt. Begint op de ingebouwde standaard en
+   wordt hieronder bijgesteld; hij staat op modulehoogte omdat hoofd() hem zet en
+   diagnose() hem leest. */
+let herkomst = 'de standaard uit server/eigenaar.js';
+
+/* De overdrachtswaarde uit de OPERATIONELE opslag, los van de kluis. Faalt dit,
+   dan zeggen we dat -- een diagnose die stilletjes 'geen overdracht' meldt
+   terwijl hij niet kon kijken, wijst de verkeerde kant op. */
+async function leesOverdracht() {
+  try {
+    const dbm = require('../server/db');
+    if (typeof dbm.load === 'function') await dbm.load();
+    const t = dbm.db && dbm.db.data && dbm.db.data.techniek;
+    return (t && t.eigenaarEmail) || null;
+  } catch (e) {
+    herkomst = 'ONBEKEND -- de opslag kon niet gelezen worden (' + (e && e.message ? e.message : e) + ')';
+    return null;
+  }
+}
+
+/* DE DIAGNOSE. Hij stelt precies de vraag die de kantoordeur en de boardroom
+   stellen -- eigenaar.isEigenaar() -- en niet een eigen benadering daarvan. Zegt
+   die nee terwijl er wel een account staat, dan zoekt hij UIT waarom, in plaats
+   van de lezer te laten raden.
+
+   Wat hij NOOIT doet is andermans identiteit tonen. Er komt precies een adres op
+   het scherm: dat van de eigenaar, en dat kent degene die dit draait al. */
+function diagnose(accounts, adres, bestaand) {
+  if (!bestaand) {
+    regel('account', 'GEEN -- er staat niets op dit adres');
+    zeg('');
+    zeg('  De backoffice en de boardroom blijven dicht zolang dit account niet bestaat:');
+    zeg('  eigenaar.isEigenaar() vergelijkt het adres van een BESTAAND account.');
+    zeg('');
+    zeg('  Aanmaken doet:');
+    zeg('    npm run eigenaar -- --maak --naam="Uw naam" --geboren=JJJJ-MM-DD');
+    zeg('');
+    return;
+  }
+
+  const gelezen = (() => { try { return accounts.emailOf(bestaand); } catch (e) { return null; } })();
+  const klopt = eigenaar.isEigenaar(accounts, bestaand);
+  /* `verified` is een TEKSTkolom met 'unverified' als standaard, dus een ja/nee-test
+     erop is ALTIJD ja -- die stond hier even en meldde elk vers account als
+     geverifieerd. De waarde zelf tonen is korter en het liegt niet. */
+  regel('account', '#' + bestaand.id + '  pas ' + bestaand.tier +
+    '  identiteit ' + (bestaand.verified || 'onbekend') +
+    (accounts.isActief(bestaand) ? '' : '  NIET ACTIEF'));
+  regel('isEigenaar()', klopt
+    ? 'JA -- backoffice en boardroom staan open op dit account'
+    : 'NEE -- en dat is precies waarom de deur dichtblijft');
+
+  /* De sleutelbos, want "het kantoor gaat niet open" kan hier ook vandaan komen.
+     De afgeleide sleutel van de eigenaar wordt op dezelfde plek berekend als in
+     de app (kern/eenaccount/afgeleid.js), niet nagebouwd. */
+  try {
+    const dbm = require('../server/db');
+    const afgeleid = require('../server/kern/eenaccount/afgeleid')({ db: dbm.db, accounts });
+    const bos = ((dbm.db.data || {}).accountRollen || {})['user-' + bestaand.id] || [];
+    const gekoppeld = bos.filter(r => r && r.rol === 'kantoor').length > 0;
+    regel('kantoorsleutel', afgeleid.eigenaarKantoor('user-' + bestaand.id)
+      ? 'afgeleid (via het eigenaarschap)'
+      : (gekoppeld ? 'gekoppeld met de backoffice-code' : 'GEEN -- geen afgeleide en geen gekoppelde'));
+  } catch (e) { regel('kantoorsleutel', 'niet vast te stellen (' + (e && e.message ? e.message : e) + ')'); }
+
+  if (klopt) {
+    zeg('');
+    zeg('  De deur staat open op dit account. Komt u er tóch niet in, dan zit het niet');
+    zeg('  in het eigenaarschap maar in de weg ernaartoe: log in als lid en open de');
+    zeg('  werk-kiezer (/api/account/rollen toont de rol, /api/account/start opent hem).');
+    if (bestaand.tier !== 'business' && bestaand.tier !== 'lifestyle') {
+      zeg('');
+      zeg('  Let op: uw PAS is ' + bestaand.tier + ' en niet business of lifestyle. Eigenaarschap');
+      zeg('  en pas zijn twee dingen -- het eerste opent het kantoor, het tweede de');
+      zeg('  betaalde functies. Een pas ontstaat in kern/aanmeldingen/besluit.js, na een');
+      zeg('  besluit van een herleidbaar mens; dat mag u nu zelf zijn.');
+    }
+    zeg('');
+    return;
+  }
+
+  zeg('');
+  zeg('  WAAROM isEigenaar() NEE ZEGT -- gemeten, niet geraden:');
+  if (gelezen == null) {
+    zeg('   - De e-mail van dit account is NIET UIT DE KLUIS TE LEZEN. Het inloggen werkt');
+    zeg('     nog (dat gaat op een hash), maar het huis kan niet meer zien wie u bent.');
+    zeg('     Kijk naar vault.key / RTG_VAULT_KEY en de sleutelring: is die veranderd,');
+    zeg('     of verschilt hij tussen instances?');
+  } else if (gelezen.trim().toLowerCase() !== String(adres).trim().toLowerCase()) {
+    zeg('   - Het account dat op dit adres gevonden wordt, draagt in de kluis een ANDER');
+    zeg('     adres. Inloggen gaat op de e-mailhash, eigenaarschap op de kluiswaarde;');
+    zeg('     die twee lopen hier uiteen.');
+  } else {
+    zeg('   - Adres en kluiswaarde komen overeen en toch zegt isEigenaar() nee. Dat hoort');
+    zeg('     niet te kunnen; noteer deze uitslag voordat u iets verandert.');
+  }
+  zeg('');
+  zeg('   Staat er hierboven een ander eigenaarsadres dan u verwacht, kijk dan eerst naar');
+  zeg('   de herkomst: een overdracht vanuit de boardroom wint van RTG_OWNER_EMAIL, en');
+  zeg('   die overdracht overleeft een herstart.');
+  zeg('');
+}
+
 async function hoofd() {
   const arg = argumenten(process.argv.slice(2));
   if (arg.hulp) return toonHulp();
 
-  const adres = eigenaar.eigenaarEmail();
   const accounts = openKluis();
   /* init() opent rtg.db, draait de schemamigraties EN laadt de sleutels
      (secret.key, vault.key, de ring). Zonder die aanroep staat de kluissleutel op
      null en valt de eerste emailHash om -- dezelfde volgorde als server.js. */
   accounts.init();
   await accounts.startPostgres();   // zonder DATABASE_URL een no-op
+
+  /* HET OVERGEDRAGEN EIGENAARSCHAP, en dat is geen bijzaak.
+
+     server.js leest bij het opstarten `db.data.techniek.eigenaarEmail` en zet dat
+     in de eigenaar-module VOOR de routers laden (de overdracht vanuit de
+     boardroom). Staat daar een ander adres, dan is de eigenaar van dit platform
+     iemand anders -- en dan gaan de kantoordeur en de boardroom voor u dicht
+     terwijl u gewoon kunt inloggen. Dit script moet in dezelfde volgorde lezen,
+     anders diagnosticeert het een platform dat niet draait. */
+  const overdracht = await leesOverdracht();
+  if (overdracht && eigenaar.zetEigenaarEmail(overdracht)) herkomst = 'overgedragen vanuit de boardroom';
+  else if (process.env.RTG_OWNER_EMAIL) herkomst = 'uit RTG_OWNER_EMAIL';
+
+  const adres = eigenaar.eigenaarEmail();
   const bestaand = accounts.findByLogin(adres);
+  const stand = testomgeving.status(process.env);
 
   zeg('');
   zeg('RTG -- eigenaarsaccount');
-  regel('adres', adres + (process.env.RTG_OWNER_EMAIL ? '  (uit RTG_OWNER_EMAIL)' : '  (standaard uit server/eigenaar.js)'));
+  regel('eigenaarsadres', adres);
+  regel('  herkomst', herkomst);
   regel('datamap', process.env.RTG_DATA_DIR || 'server/data');
+  regel('omgeving', stand.omgeving + (stand.testomgeving
+    ? '  (MAGNAAT TEST: synthetische leden, zaken en een wachtwoord uit de repo)' : ''));
   regel('accounts', String(accounts.count()) + ' in de kluis');
   regel('mutaties', duurzaamheid.gesloten() ? 'DICHT (productie + Postgres)' : 'open');
-  regel('stand', bestaand
-    ? 'account #' + bestaand.id + ' bestaat, pas ' + bestaand.tier
-    : 'GEEN eigenaarsaccount -- de backoffice en de boardroom blijven dicht');
+  regel('kantoorcode', process.env.OFFICE_CODE
+    ? 'gezet' : 'NIET gezet -- willekeurig en na elke herstart anders');
 
-  if (!arg.maak) {
-    zeg('');
-    zeg(bestaand
-      ? 'Er valt hier niets aan te maken. Kwijt geraakt? Dat is eigenaarherstel, niet dit script.'
-      : 'Dit script toont alleen. Aanmaken doet:');
-    if (!bestaand) zeg('  npm run eigenaar -- --maak --naam="Uw naam" --geboren=JJJJ-MM-DD');
-    zeg('');
-    return;
-  }
+  if (!arg.maak) { diagnose(accounts, adres, bestaand); return; }
 
   if (duurzaamheid.gesloten()) return stop('accountmutaties zijn gesloten in deze modus.', grendelUitleg());
   if (bestaand) {

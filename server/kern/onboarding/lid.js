@@ -150,15 +150,18 @@ module.exports = (ctx) => {
      naam staat al in de kluis en het geslacht heeft hier geen lezer.
      Nationaliteit en geboortedatum gaan ook naar het ledendossier, want daar
      kijkt de gegevenspoort. */
-  function teken(scope, sess, naam, akkoord) {
+  function teken(scope, sess, naam, akkoord, expectedVersion) {
     if (!akkoord) return { status: 400, error: 'Zet een vinkje dat u akkoord bent met de overeenkomst.' };
     naam = schoon(String(naam || ''), 80);
     if (naam.length < 2) return { status: 400, error: 'Typ uw volledige naam om digitaal te ondertekenen.' };
     const sc = scopeVan(scope);
     const pid = profielId(sess);
     const p = profielVan(pid);
+    if (expectedVersion!==undefined && expectedVersion!==sc.contract.versie)
+      return {status:409,error:'De overeenkomst is gewijzigd. Lees de nieuwe versie voordat u tekent.'};
     const hash = crypto.createHash('sha256').update(sc.contract.versie + '|' + sc.contract.tekst + '|' + naam + '|' + pid).digest('hex');
-    p.ondertekend[scope] = { versie: sc.contract.versie, naam, at: nu(), hash };
+    p.ondertekend[scope] = { versie: sc.contract.versie, naam, at: nu(), hash,
+      meaningId:'identity.agreement.accept',meaningVersion:1 };
     save();
     return { status: 200, ok: true, ...status(scope, sess) };
   }

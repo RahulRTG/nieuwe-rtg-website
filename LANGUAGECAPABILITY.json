@@ -1,0 +1,5434 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-09-17T10:38:10.437Z",
+  "completedAt": "2026-09-17T10:38:33.896Z",
+  "node": "v24.18.0",
+  "command": "npm run language:proof",
+  "testExitCode": 0,
+  "testOutputSha256": "fef5e0204ab35409997e85f0f2487ca8e7b134a4a3fed942be6edd32f52965c4",
+  "sources": {
+    "public/apps/access/meaning.js": "34aada4780c1e2e836d3e6b5d9e0839ccd51d5f75078ef0aca7a4a49499fbedd",
+    "public/apps/access/portal.css": "50a4099d085813b3b8e00021f62e0e8a30e5170779f1613c5d3dc9f2d0b34b90",
+    "public/apps/app.html": "b2c75f52aa5bf6862977ae98bbcf952fa901ae029e5ededc171bb2d03fbb30a5",
+    "public/apps/app-main.js": "a0d9e0dc7ddff0ca8b13f72c7f63279adecc99755e16bc45665a4b72a79311a7",
+    "public/shared/rtg-edge-2.css": "2700ea360f01d73bb4c0fc906e08cdcb00ec43a2183b867e26d9a3a2f00075c4",
+    "public/shared/rtg-adaptive-edge.css": "cad248e9117db248c3085350c76929ceb994f280529ab5b8488bd1400867341d",
+    "public/shared/rtg-simple.css": "4ff1b4790c987556a34ed8d59fd00e626411af52250da3ec26491a9842e16148",
+    "public/shared/rtg-edge-appbar.js": "59de3b2e49addd8a5a708969a3d0399f3dd53cb39a5666f8bd2f4525ea998c7c",
+    "public/shared/verbinding.js": "68360e7729f19f512c01fdee4cd3bebb5f7f21f057065e88da536a146cb80289",
+    "public/shared/i18n.js": "93dcd895770fa7e95a2c3e522dddb1a337fa9cbc0fac8f1e492cb5b99956034e",
+    "public/shared/rtg-edge-smart-menu.js": "ace12eb9ac031c6b8453799c21bb7a14f465ca644b10738e3c86bda120b96560",
+    "public/shared/rtg-edge-library.js": "40ba9d5825c38e00077ee1047592b09fb248cf5e73d02b720a90eeead571f6a9",
+    "public/shared/rtg-adaptive-edge-controls.js": "0a7daa0ec2b1e57988856391c9845667474fe4eded12cb0c3a5d8d6e858abbb8",
+    "public/shared/appshell.js": "fab1e3c6e0dcfbc4cf0347c245c14a7f29e6ff17a059e0a79eef178c3ba54fdc",
+    "server/talen.js": "063b27bedf9e766068de922d8f21b5789c83132a7f04847cbe057e7c73516f43",
+    "server/routes/onboarding.js": "08d74042f7846b0cd177e2dfca7d25f9bea7b1103774e85a4616b3f61d09d2dd",
+    "server/kern/onboarding/lid.js": "9a725122b4ee6ada6434479bd99aa68d19026355dc2eebfc3c1a4f9f9d469bc6",
+    "test/helper.js": "f42fbb2acd395ffd178b8ee6a897b9b1ca71e9d05fef8ab207c03a803d7df292",
+    "scripts/lib/scherm.js": "9bb3c9eb5390baabb2c69dc798a1e88cfe9d07238f394273221548f53685eb5b",
+    "server/translate/batch-model.js": "4a2af8ee253efac0e73ee9af284e5aa7bf1ac201ca80d40e97f7bcb441a6787f",
+    "server/translate.js": "adc9817769695d27efeee8832ba35d09b6c4a31451df70053e57f7ac8811954d",
+    "server/translate/cache.js": "51fb8ae3cfe124f8da256f9ef20378990f290a85f24c32c49e59a01fb8a1f32a",
+    "server/translate/uitslag.js": "98446b05189312cdda8e60a56685d2f2affad1d226fcc6a3bafad6845c7346dd",
+    "server/kern/taalkeuring.js": "0110a0f1fa1e5a23a1676210778a148c3589fe38361197cbe29b73c518c7b271",
+    "server/local-ai.js": "9967c1c5622236cdcb0ef7c10152ce17a80888d64637006a2a515ec2b4d65c89",
+    "server/ai.js": "8b58be71828752ac9adb14a4f8fc03e03e2668369596fb5293702d16db867644",
+    "scripts/language-proof.js": "11f028a86830a21676f0b182281b8a1ac9e88d43595d07dc5027eaa7a83c1f90",
+    "test/access-language.e2e.js": "d551d6fa268fee1b4aed87c2dee3b077b2bfd3a98d05414dba6dc10ec87ab7e9",
+    "test/i18n-dictionary.test.js": "8ed617d432e4baa2518d7180ba459668bf9beb83e5617564ef318c49d4e6423e",
+    "test/language-foundations.test.js": "ca8bea3d19284ca768e970b990d7698095c65cd217b27924221f40635b6f6b2b",
+    "test/onboarding.test.js": "ed42e70414a48fee52d0ca7b55487413c946e174fab73d79ae68613822161138"
+  },
+  "productionReady114Languages": false,
+  "scope": "RTG member account portal and shared language loader; mobile Chromium, synthetic input.",
+  "browser": "153.0.8010.12",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "screenCoverage": {
+    "nlEn": [
+      "welcome",
+      "name",
+      "email",
+      "date of birth",
+      "password",
+      "agreement",
+      "login",
+      "recovery",
+      "recovery sent"
+    ],
+    "all114": [
+      "signup password step, same input and focus across language changes"
+    ],
+    "otherScreens": "NOT_MEASURED",
+    "physicalDevices": "NOT_MEASURED"
+  },
+  "languages": [
+    {
+      "code": "nl",
+      "render": {
+        "status": "PASS",
+        "requested": "nl",
+        "actual": "nl",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "nl",
+        "date": "17-9-2026",
+        "dateLocale": "nl"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Werelden",
+        "sourceFallback": false
+      },
+      "criticalCopy": {
+        "source": "nl",
+        "modelGenerated": false,
+        "fallbackNotice": false,
+        "legalConfirmationEnabled": true
+      },
+      "translationReadiness": "CODE_CONTROLLED_SOURCE_COPY"
+    },
+    {
+      "code": "en",
+      "render": {
+        "status": "PASS",
+        "requested": "en",
+        "actual": "en",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en",
+        "date": "9/17/2026",
+        "dateLocale": "en"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": false
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": false,
+        "legalConfirmationEnabled": true
+      },
+      "translationReadiness": "CODE_CONTROLLED_SOURCE_COPY"
+    },
+    {
+      "code": "de",
+      "render": {
+        "status": "PASS",
+        "requested": "de",
+        "actual": "de",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "de",
+        "date": "17.9.2026",
+        "dateLocale": "de"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "fr",
+      "render": {
+        "status": "PASS",
+        "requested": "fr",
+        "actual": "fr",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "fr",
+        "date": "17/09/2026",
+        "dateLocale": "fr"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "es",
+      "render": {
+        "status": "PASS",
+        "requested": "es",
+        "actual": "es",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "es",
+        "date": "17/9/2026",
+        "dateLocale": "es"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "pt",
+      "render": {
+        "status": "PASS",
+        "requested": "pt",
+        "actual": "pt",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "pt",
+        "date": "17/09/2026",
+        "dateLocale": "pt"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "it",
+      "render": {
+        "status": "PASS",
+        "requested": "it",
+        "actual": "it",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "it",
+        "date": "17/09/2026",
+        "dateLocale": "it"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ca",
+      "render": {
+        "status": "PASS",
+        "requested": "ca",
+        "actual": "ca",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "ca",
+        "date": "17/9/2026",
+        "dateLocale": "ca"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "gl",
+      "render": {
+        "status": "PASS",
+        "requested": "gl",
+        "actual": "gl",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "eu",
+      "render": {
+        "status": "PASS",
+        "requested": "eu",
+        "actual": "eu",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ro",
+      "render": {
+        "status": "PASS",
+        "requested": "ro",
+        "actual": "ro",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "ro",
+        "date": "17.09.2026",
+        "dateLocale": "ro"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "el",
+      "render": {
+        "status": "PASS",
+        "requested": "el",
+        "actual": "el",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "el",
+        "date": "17/9/2026",
+        "dateLocale": "el"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "tr",
+      "render": {
+        "status": "PASS",
+        "requested": "tr",
+        "actual": "tr",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "tr",
+        "date": "17.09.2026",
+        "dateLocale": "tr"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ru",
+      "render": {
+        "status": "PASS",
+        "requested": "ru",
+        "actual": "ru",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "ru",
+        "date": "17.09.2026",
+        "dateLocale": "ru"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "uk",
+      "render": {
+        "status": "PASS",
+        "requested": "uk",
+        "actual": "uk",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "uk",
+        "date": "17.09.2026",
+        "dateLocale": "uk"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "be",
+      "render": {
+        "status": "PASS",
+        "requested": "be",
+        "actual": "be",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "pl",
+      "render": {
+        "status": "PASS",
+        "requested": "pl",
+        "actual": "pl",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "pl",
+        "date": "17.09.2026",
+        "dateLocale": "pl"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "cs",
+      "render": {
+        "status": "PASS",
+        "requested": "cs",
+        "actual": "cs",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "cs",
+        "date": "17. 9. 2026",
+        "dateLocale": "cs"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "sk",
+      "render": {
+        "status": "PASS",
+        "requested": "sk",
+        "actual": "sk",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "sk",
+        "date": "17. 9. 2026",
+        "dateLocale": "sk"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "hu",
+      "render": {
+        "status": "PASS",
+        "requested": "hu",
+        "actual": "hu",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "hu",
+        "date": "2026. 09. 17.",
+        "dateLocale": "hu"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "bg",
+      "render": {
+        "status": "PASS",
+        "requested": "bg",
+        "actual": "bg",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "bg",
+        "date": "17.09.2026 г.",
+        "dateLocale": "bg"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "sr",
+      "render": {
+        "status": "PASS",
+        "requested": "sr",
+        "actual": "sr",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "sr",
+        "date": "17. 9. 2026.",
+        "dateLocale": "sr"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "hr",
+      "render": {
+        "status": "PASS",
+        "requested": "hr",
+        "actual": "hr",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "hr",
+        "date": "17. 09. 2026.",
+        "dateLocale": "hr"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "bs",
+      "render": {
+        "status": "PASS",
+        "requested": "bs",
+        "actual": "bs",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "bs",
+        "date": "2026-09-17",
+        "dateLocale": "bs"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "sl",
+      "render": {
+        "status": "PASS",
+        "requested": "sl",
+        "actual": "sl",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "sl",
+        "date": "17. 9. 2026",
+        "dateLocale": "sl"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "mk",
+      "render": {
+        "status": "PASS",
+        "requested": "mk",
+        "actual": "mk",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "sq",
+      "render": {
+        "status": "PASS",
+        "requested": "sq",
+        "actual": "sq",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "lt",
+      "render": {
+        "status": "PASS",
+        "requested": "lt",
+        "actual": "lt",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "lt",
+        "date": "2026-09-17",
+        "dateLocale": "lt"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "lv",
+      "render": {
+        "status": "PASS",
+        "requested": "lv",
+        "actual": "lv",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "lv",
+        "date": "17.09.2026.",
+        "dateLocale": "lv"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "et",
+      "render": {
+        "status": "PASS",
+        "requested": "et",
+        "actual": "et",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "et",
+        "date": "17.9.2026",
+        "dateLocale": "et"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "fi",
+      "render": {
+        "status": "PASS",
+        "requested": "fi",
+        "actual": "fi",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "fi",
+        "date": "17.9.2026",
+        "dateLocale": "fi"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "sv",
+      "render": {
+        "status": "PASS",
+        "requested": "sv",
+        "actual": "sv",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "sv",
+        "date": "2026-09-17",
+        "dateLocale": "sv"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "no",
+      "render": {
+        "status": "PASS",
+        "requested": "no",
+        "actual": "no",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "no",
+        "date": "17.9.2026",
+        "dateLocale": "no"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "da",
+      "render": {
+        "status": "PASS",
+        "requested": "da",
+        "actual": "da",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "da",
+        "date": "17.9.2026",
+        "dateLocale": "da"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "is",
+      "render": {
+        "status": "PASS",
+        "requested": "is",
+        "actual": "is",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ga",
+      "render": {
+        "status": "PASS",
+        "requested": "ga",
+        "actual": "ga",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "cy",
+      "render": {
+        "status": "PASS",
+        "requested": "cy",
+        "actual": "cy",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "mt",
+      "render": {
+        "status": "PASS",
+        "requested": "mt",
+        "actual": "mt",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "lb",
+      "render": {
+        "status": "PASS",
+        "requested": "lb",
+        "actual": "lb",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "fy",
+      "render": {
+        "status": "PASS",
+        "requested": "fy",
+        "actual": "fy",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "yi",
+      "render": {
+        "status": "PASS",
+        "requested": "yi",
+        "actual": "yi",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "rtl",
+        "expected": "rtl"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ar",
+      "render": {
+        "status": "PASS",
+        "requested": "ar",
+        "actual": "ar",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "ar",
+        "date": "17‏/9‏/2026",
+        "dateLocale": "ar"
+      },
+      "rtl": {
+        "actual": "rtl",
+        "expected": "rtl"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "he",
+      "render": {
+        "status": "PASS",
+        "requested": "he",
+        "actual": "he",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "he",
+        "date": "17.9.2026",
+        "dateLocale": "he"
+      },
+      "rtl": {
+        "actual": "rtl",
+        "expected": "rtl"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "fa",
+      "render": {
+        "status": "PASS",
+        "requested": "fa",
+        "actual": "fa",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "۱۲٬۳۴۵٫۶۷",
+        "numberLocale": "fa",
+        "date": "۱۴۰۵/۶/۲۶",
+        "dateLocale": "fa"
+      },
+      "rtl": {
+        "actual": "rtl",
+        "expected": "rtl"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ku",
+      "render": {
+        "status": "PASS",
+        "requested": "ku",
+        "actual": "ku",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "az",
+      "render": {
+        "status": "PASS",
+        "requested": "az",
+        "actual": "az",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "az",
+        "date": "2026-09-17",
+        "dateLocale": "az"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "hy",
+      "render": {
+        "status": "PASS",
+        "requested": "hy",
+        "actual": "hy",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ka",
+      "render": {
+        "status": "PASS",
+        "requested": "ka",
+        "actual": "ka",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "kk",
+      "render": {
+        "status": "PASS",
+        "requested": "kk",
+        "actual": "kk",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "kk",
+        "date": "2026-09-17",
+        "dateLocale": "kk"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "uz",
+      "render": {
+        "status": "PASS",
+        "requested": "uz",
+        "actual": "uz",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "uz",
+        "date": "2026-09-17",
+        "dateLocale": "uz"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ky",
+      "render": {
+        "status": "PASS",
+        "requested": "ky",
+        "actual": "ky",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "tg",
+      "render": {
+        "status": "PASS",
+        "requested": "tg",
+        "actual": "tg",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "tk",
+      "render": {
+        "status": "PASS",
+        "requested": "tk",
+        "actual": "tk",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "mn",
+      "render": {
+        "status": "PASS",
+        "requested": "mn",
+        "actual": "mn",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "tt",
+      "render": {
+        "status": "PASS",
+        "requested": "tt",
+        "actual": "tt",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "hi",
+      "render": {
+        "status": "PASS",
+        "requested": "hi",
+        "actual": "hi",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "hi",
+        "date": "17/9/2026",
+        "dateLocale": "hi"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ur",
+      "render": {
+        "status": "PASS",
+        "requested": "ur",
+        "actual": "ur",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "ur",
+        "date": "17/9/2026",
+        "dateLocale": "ur"
+      },
+      "rtl": {
+        "actual": "rtl",
+        "expected": "rtl"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "bn",
+      "render": {
+        "status": "PASS",
+        "requested": "bn",
+        "actual": "bn",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "১২,৩৪৫.৬৭",
+        "numberLocale": "bn",
+        "date": "১৭/৯/২০২৬",
+        "dateLocale": "bn"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "pa",
+      "render": {
+        "status": "PASS",
+        "requested": "pa",
+        "actual": "pa",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "pa",
+        "date": "2026-09-17",
+        "dateLocale": "pa"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "gu",
+      "render": {
+        "status": "PASS",
+        "requested": "gu",
+        "actual": "gu",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "gu",
+        "date": "17/9/2026",
+        "dateLocale": "gu"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "mr",
+      "render": {
+        "status": "PASS",
+        "requested": "mr",
+        "actual": "mr",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "१२,३४५.६७",
+        "numberLocale": "mr",
+        "date": "१७/९/२०२६",
+        "dateLocale": "mr"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ta",
+      "render": {
+        "status": "PASS",
+        "requested": "ta",
+        "actual": "ta",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "ta",
+        "date": "17/9/2026",
+        "dateLocale": "ta"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "te",
+      "render": {
+        "status": "PASS",
+        "requested": "te",
+        "actual": "te",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "te",
+        "date": "17/9/2026",
+        "dateLocale": "te"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "kn",
+      "render": {
+        "status": "PASS",
+        "requested": "kn",
+        "actual": "kn",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "kn",
+        "date": "17/9/2026",
+        "dateLocale": "kn"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ml",
+      "render": {
+        "status": "PASS",
+        "requested": "ml",
+        "actual": "ml",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "ml",
+        "date": "17/9/2026",
+        "dateLocale": "ml"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "si",
+      "render": {
+        "status": "PASS",
+        "requested": "si",
+        "actual": "si",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ne",
+      "render": {
+        "status": "PASS",
+        "requested": "ne",
+        "actual": "ne",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ps",
+      "render": {
+        "status": "PASS",
+        "requested": "ps",
+        "actual": "ps",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "rtl",
+        "expected": "rtl"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "sd",
+      "render": {
+        "status": "PASS",
+        "requested": "sd",
+        "actual": "sd",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "sd",
+        "date": "2026-09-17",
+        "dateLocale": "sd"
+      },
+      "rtl": {
+        "actual": "rtl",
+        "expected": "rtl"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "or",
+      "render": {
+        "status": "PASS",
+        "requested": "or",
+        "actual": "or",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "as",
+      "render": {
+        "status": "PASS",
+        "requested": "as",
+        "actual": "as",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "dv",
+      "render": {
+        "status": "PASS",
+        "requested": "dv",
+        "actual": "dv",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "rtl",
+        "expected": "rtl"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "bo",
+      "render": {
+        "status": "PASS",
+        "requested": "bo",
+        "actual": "bo",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "zh",
+      "render": {
+        "status": "PASS",
+        "requested": "zh",
+        "actual": "zh",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "zh",
+        "date": "2026/9/17",
+        "dateLocale": "zh"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ja",
+      "render": {
+        "status": "PASS",
+        "requested": "ja",
+        "actual": "ja",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "ja",
+        "date": "2026/9/17",
+        "dateLocale": "ja"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ko",
+      "render": {
+        "status": "PASS",
+        "requested": "ko",
+        "actual": "ko",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "ko",
+        "date": "2026. 9. 17.",
+        "dateLocale": "ko"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "th",
+      "render": {
+        "status": "PASS",
+        "requested": "th",
+        "actual": "th",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "th",
+        "date": "17/9/2569",
+        "dateLocale": "th"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "vi",
+      "render": {
+        "status": "PASS",
+        "requested": "vi",
+        "actual": "vi",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "vi",
+        "date": "17/9/2026",
+        "dateLocale": "vi"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "id",
+      "render": {
+        "status": "PASS",
+        "requested": "id",
+        "actual": "id",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12.345,67",
+        "numberLocale": "id",
+        "date": "17/9/2026",
+        "dateLocale": "id"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "jv",
+      "render": {
+        "status": "PASS",
+        "requested": "jv",
+        "actual": "jv",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "su",
+      "render": {
+        "status": "PASS",
+        "requested": "su",
+        "actual": "su",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ms",
+      "render": {
+        "status": "PASS",
+        "requested": "ms",
+        "actual": "ms",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "ms",
+        "date": "17/9/2026",
+        "dateLocale": "ms"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "tl",
+      "render": {
+        "status": "PASS",
+        "requested": "tl",
+        "actual": "tl",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "fil",
+        "date": "9/17/2026",
+        "dateLocale": "fil"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "km",
+      "render": {
+        "status": "PASS",
+        "requested": "km",
+        "actual": "km",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "lo",
+      "render": {
+        "status": "PASS",
+        "requested": "lo",
+        "actual": "lo",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "my",
+      "render": {
+        "status": "PASS",
+        "requested": "my",
+        "actual": "my",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ug",
+      "render": {
+        "status": "PASS",
+        "requested": "ug",
+        "actual": "ug",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "rtl",
+        "expected": "rtl"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "sw",
+      "render": {
+        "status": "PASS",
+        "requested": "sw",
+        "actual": "sw",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "sw",
+        "date": "17/9/2026",
+        "dateLocale": "sw"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "am",
+      "render": {
+        "status": "PASS",
+        "requested": "am",
+        "actual": "am",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "am",
+        "date": "17/9/2026",
+        "dateLocale": "am"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ti",
+      "render": {
+        "status": "PASS",
+        "requested": "ti",
+        "actual": "ti",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "om",
+      "render": {
+        "status": "PASS",
+        "requested": "om",
+        "actual": "om",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "so",
+      "render": {
+        "status": "PASS",
+        "requested": "so",
+        "actual": "so",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ha",
+      "render": {
+        "status": "PASS",
+        "requested": "ha",
+        "actual": "ha",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "yo",
+      "render": {
+        "status": "PASS",
+        "requested": "yo",
+        "actual": "yo",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ig",
+      "render": {
+        "status": "PASS",
+        "requested": "ig",
+        "actual": "ig",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "zu",
+      "render": {
+        "status": "PASS",
+        "requested": "zu",
+        "actual": "zu",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "xh",
+      "render": {
+        "status": "PASS",
+        "requested": "xh",
+        "actual": "xh",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "af",
+      "render": {
+        "status": "PASS",
+        "requested": "af",
+        "actual": "af",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12 345,67",
+        "numberLocale": "af",
+        "date": "2026-09-17",
+        "dateLocale": "af"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "st",
+      "render": {
+        "status": "PASS",
+        "requested": "st",
+        "actual": "st",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "sn",
+      "render": {
+        "status": "PASS",
+        "requested": "sn",
+        "actual": "sn",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "rw",
+      "render": {
+        "status": "PASS",
+        "requested": "rw",
+        "actual": "rw",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "mg",
+      "render": {
+        "status": "PASS",
+        "requested": "mg",
+        "actual": "mg",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "wo",
+      "render": {
+        "status": "PASS",
+        "requested": "wo",
+        "actual": "wo",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ln",
+      "render": {
+        "status": "PASS",
+        "requested": "ln",
+        "actual": "ln",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ny",
+      "render": {
+        "status": "PASS",
+        "requested": "ny",
+        "actual": "ny",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "lg",
+      "render": {
+        "status": "PASS",
+        "requested": "lg",
+        "actual": "lg",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ht",
+      "render": {
+        "status": "PASS",
+        "requested": "ht",
+        "actual": "ht",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "qu",
+      "render": {
+        "status": "PASS",
+        "requested": "qu",
+        "actual": "qu",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "gn",
+      "render": {
+        "status": "PASS",
+        "requested": "gn",
+        "actual": "gn",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "ay",
+      "render": {
+        "status": "PASS",
+        "requested": "ay",
+        "actual": "ay",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "mi",
+      "render": {
+        "status": "PASS",
+        "requested": "mi",
+        "actual": "mi",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "sm",
+      "render": {
+        "status": "PASS",
+        "requested": "sm",
+        "actual": "sm",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "to",
+      "render": {
+        "status": "PASS",
+        "requested": "to",
+        "actual": "to",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    },
+    {
+      "code": "fj",
+      "render": {
+        "status": "PASS",
+        "requested": "fj",
+        "actual": "fj",
+        "overflow": false
+      },
+      "input": {
+        "status": "PASS",
+        "method": "programmatic Unicode fill and exact read-back",
+        "nativeKeyboardAndIME": "NOT_MEASURED"
+      },
+      "fonts": {
+        "family": "\"Bodoni Moda\", Georgia, serif",
+        "completeGlyphCoverage": "NOT_MEASURED"
+      },
+      "formatting": {
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
+      },
+      "rtl": {
+        "actual": "ltr",
+        "expected": "ltr"
+      },
+      "switching": {
+        "statePreserved": true,
+        "focusPreserved": true
+      },
+      "dynamicText": {
+        "present": true,
+        "quality": "NOT_REVIEWED"
+      },
+      "edge": {
+        "worldsLabel": "Worlds",
+        "sourceFallback": true
+      },
+      "criticalCopy": {
+        "source": "en",
+        "modelGenerated": false,
+        "fallbackNotice": true,
+        "legalConfirmationEnabled": false
+      },
+      "translationReadiness": "MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK"
+    }
+  ],
+  "limitations": [
+    "No native-speaker certification for all 114 languages.",
+    "The agreement remains its Dutch source text.",
+    "Browser Intl may resolve to another locale; resolved locales are recorded, not hidden.",
+    "Long dictionary strings over 300 characters and uncatalogued domain/server text are not proven translated.",
+    "Payment, mandate and other application domains have not been migrated by this account-portal change."
+  ]
+}

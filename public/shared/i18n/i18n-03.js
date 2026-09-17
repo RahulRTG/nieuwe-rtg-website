@@ -189,6 +189,9 @@
     }
   };
 
+  window.addEventListener('storage',event=>{
+    if(event.key===STORE && /^[a-z]{2}$/.test(event.newValue || '')) { RTGi18n.chosen=true; RTGi18n.set(event.newValue,false); }
+  });
   window.RTGi18n = RTGi18n;
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => RTGi18n.init());

@@ -111,6 +111,8 @@
   }
 
   /* ---------- taal gewijzigd: dynamische schermen opnieuw opbouwen ---------- */
+  let renderedLanguage = lang();
   window.addEventListener('rtglang', async () => {
-    if (!user) return;
+    const changed = renderedLanguage !== lang(); renderedLanguage = lang();
+    if (!user || !API.live || !onbEl('onbGate').hidden) return;
     const active = (document.querySelector('.tabbar button.active') || {}).dataset;

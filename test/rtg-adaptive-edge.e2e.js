@@ -146,7 +146,8 @@ test('Edge voert appbediening uit, controleert actuele beschikbaarheid en sluit 
     const account = await call('/api/auth/register', { name: 'Edge Proef',
       email: 'edge' + Date.now() + '@voorbeeld.test', password: 'Edge-proef-12345',
       geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
-    await call('/api/onboarding/teken', { naam: 'Edge Proef', akkoord: true }, account.token);
+    const agreement=await call('/api/onboarding/status',{},account.token);
+    await call('/api/onboarding/teken', { naam: 'Edge Proef', akkoord: true,contractVersion:agreement.contract.versie }, account.token);
     browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(token => {

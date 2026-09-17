@@ -28,7 +28,7 @@
     el.removeAttribute('aria-busy');
     const d = vooruitData;
     if (d.fout){ el.innerHTML = ''; return; }
-    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };
+    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang(),{day:'numeric',month:'short'}); } catch(e){ return x; } };
     const regel = r => '<div class="vo-rij">'
       + '<span>' + esc((r.waarvan ? r.waarvan + ' · ' : '') + r.naam) + '</span>'
       + '<span class="vo-dag">' + esc(dagLbl(r.datum)) + '</span></div>';

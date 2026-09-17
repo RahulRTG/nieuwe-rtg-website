@@ -19,18 +19,18 @@ function controleer(wortel = ROOT) {
   const basis = fs.readFileSync(path.join(wortel, 'public', 'shared', 'basis', 'basis-01.js'), 'utf8');
   const gedrag = fs.readFileSync(path.join(wortel, 'public', 'shared', 'toegang.js'), 'utf8');
   const stijl = fs.readFileSync(path.join(wortel, 'public', 'shared', 'toegang.css'), 'utf8');
-  const ledenPoort = fs.readFileSync(path.join(wortel, 'public', 'apps', 'app-main', 'app-main-04b.js'), 'utf8');
-  const ledenStart = fs.readFileSync(path.join(wortel, 'public', 'apps', 'app-main', 'app-main-06.js'), 'utf8');
+  const ledenPoort = fs.readFileSync(path.join(wortel, 'public', 'apps', 'app-main', 'app-main-04.js'), 'utf8');
+  const ledenStart = fs.readFileSync(path.join(wortel, 'public', 'apps', 'app-main', 'app-main-05.js'), 'utf8');
   if (!/\/shared\/toegang\.js/.test(basis)) fouten.push('basis.js laadt RTG Access Experience niet');
   if (!/\/shared\/toegang\.css/.test(gedrag)) fouten.push('RTG Access Experience laadt haar ontwerpcontract niet');
   if (/fetch\s*\(|localStorage|sessionStorage|Authorization|document\.cookie/.test(gedrag))
     fouten.push('de pre-auth ervaringslaag probeert identiteit of transport te bezitten');
   if (!/RTGAccessExperience/.test(gedrag) || !/data-rtg-toegang/.test(stijl))
     fouten.push('toegangslaag mist haar publieke ingang of afgeschermde stijlselector');
-  for (const onderdeel of ['ag-welkom', 'ag-passkey-kaart', 'ag-werelden']) {
+  for (const onderdeel of ['access-title', 'agPasskey', 'agAnders', 'agNieuw', 'agForm', 'agError']) {
     if (!ledenPoort.includes(onderdeel)) fouten.push('de officiële ledeningang mist ' + onderdeel);
   }
-  if (/setTimeout\s*\(\s*\(\)\s*=>\s*passkeyInlog/.test(ledenStart))
+  if (!ledenStart.includes("addEventListener('click',passkeyLogin)") || /setTimeout\s*\([^;]*passkeyLogin/.test(ledenStart))
     fouten.push('de ledeningang opent biometrie zonder bewuste handeling');
 
   const schermen = [];

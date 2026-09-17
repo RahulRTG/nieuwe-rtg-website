@@ -233,7 +233,7 @@ test('de app neemt het wervingsfragment vóór andere scripts alleen in geheugen
     'het geheim is geschrobd voordat een ander script of verzoek start');
   assert.match(html, /name="referrer" content="no-referrer"/);
   assert.match(html, /history\.replaceState\(null, '', location\.pathname \+ location\.search\)/);
-  assert.match(bron, /wervingscode: wervingscode \|\| undefined/,
+  assert.match(bron, /wervingscode:\s*wervingscode \|\| undefined/,
     'een nieuwe registratie wisselt de geheugencredential in');
   assert.match(bron, /\/werving\/verbind/,
     'een bestaand of reeds ingelogd lid gebruikt dezelfde server-side claim');

@@ -87,14 +87,9 @@ test('Adaptive Edge is één tastbare RTG-laag op mobiel en desktop',
           assert.equal(m.binnen, true);
           assert.ok(m.midden <= 1, 'lippen staan ' + m.midden + 'px uit het midden');
           assert.ok(m.lipBreedte >= 44, 'lippen zijn te klein: ' + m.lipBreedte);
-          if (maat.width >= 900) {
-            assert.ok(m.barBreedte >= maat.width - 120, 'desktop Edge is niet lang genoeg: ' + m.barBreedte);
-            assert.equal(m.richting, 'row');
-            assert.equal(m.aiKopieZichtbaar, true);
-          } else {
-            assert.equal(m.richting, 'column');
-            assert.equal(m.aiKopieZichtbaar, false);
-          }
+          assert.ok(m.barBreedte <= 721, 'Edge wijkt af van de vaste marketingmaat: ' + m.barBreedte);
+          assert.equal(m.richting, 'column');
+          assert.equal(m.aiKopieZichtbaar, false);
           assert.equal(m.knoppen.length, 5);
           m.knoppen.forEach(k => {
             assert.ok(k.width >= 43.5 && k.height >= 43.5, 'raakvlak is ' + k.width + 'x' + k.height);

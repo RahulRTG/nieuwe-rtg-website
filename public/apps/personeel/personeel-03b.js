@@ -1,31 +1,41 @@
-/* Personeel, deel 3b: het oude inlogFORMULIER, nog als vangnet.
-   De gewone ingang is het gesprek met Rahul (deel 3). Dit blok staat er
-   voor het geval shared/rahulpoort.js niet geladen is; zonder inlogscherm
-   zou de app onbruikbaar zijn en dat risico nemen we niet. Deelt de
-   IIFE-scope met de andere delen. */
-  // Het oude formulier, nog als vangnet (zie stepLogin).
+/* Team access uses the same canvas and Edge as the member portal. Labels are
+   translated in place: no rerender may erase credentials or repeat a request. */
+  function teamText(key, source){
+    return '<span data-i18n="'+esc(key)+'" data-i18n-source="'+esc(source)+'">'+esc(T(key, source))+'</span>';
+  }
+  function teamField(id, key, source, type, attributes){
+    return '<label class="access-field" for="'+id+'">'+teamText(key, source)+
+      '<input id="'+id+'" type="'+type+'" '+attributes+'></label>';
+  }
+  function teamBack(id){
+    return '<button class="access-secondary access-back" id="'+id+'" type="button">'+teamText('pd.back','Terug')+'</button>';
+  }
+  function teamAccessView(view, key, title, descriptionKey, description){
+    $('#gate').dataset.accessView = view;
+    $('#teamAccessTitle').innerHTML = teamText(key, title);
+    $('#teamAccessDescription').innerHTML = teamText(descriptionKey, description);
+    $('#gate').scrollTop = 0;
+  }
   function formulierLogin(){
     $('#gateStep').innerHTML =
       '<form class="lform" id="loginForm" autocomplete="on">'+
-        '<input id="liUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
-        '<input id="liPass" type="password" autocomplete="current-password" placeholder="'+T('pd.li.pass','Wachtwoord')+'" aria-label="'+T('pd.li.pass','Wachtwoord')+'">'+
-        '<div class="err" id="liErr" role="alert"></div>'+
-        '<button class="prim" type="submit">'+T('pd.login','Inloggen')+'</button>'+
-      '</form>'+
-      '<div class="llinks">'+
-        '<button class="llink" id="toJoin" type="button">'+T('pd.aanmelden','Aanmelden bij een bedrijf')+'</button>'+
-        '<button class="llink" id="toForgot" type="button">'+T('pd.forgot','Wachtwoord vergeten?')+'</button>'+
-        '<button class="llink" id="toDevice" type="button">'+T('pd.ondevice','Vast apparaat? Inloggen met naam en pincode')+'</button>'+
+        teamField('liUser', 'pd.li.user', 'E-mail of gebruikersnaam', 'text', 'autocomplete="username" autocapitalize="none" spellcheck="false" required')+
+        teamField('liPass', 'pd.li.pass', 'Wachtwoord', 'password', 'autocomplete="current-password" required')+
+        '<div class="access-error" id="liErr" role="alert" data-i18n-ignore></div>'+
+        '<button class="access-primary" type="submit">'+teamText('pd.access.logingo','Ga verder naar mijn werkplek.')+'</button>'+
+      '</form><div class="llinks">'+
+        '<button class="access-link" id="toJoin" type="button">'+teamText('pd.access.joinlink','Ik wil mij aanmelden bij een bedrijf.')+'</button>'+
+        '<button class="access-link" id="toForgot" type="button">'+teamText('pd.access.forgotlink','Ik ben mijn wachtwoord vergeten.')+'</button>'+
+        '<button class="access-link" id="toDevice" type="button">'+teamText('pd.access.devicelink','Ik gebruik een apparaat op mijn werkplek.')+'</button>'+
       '</div>';
     $('#loginForm').addEventListener('submit', async e => {
       e.preventDefault();
       $('#liErr').textContent = '';
-      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
       try { await mijnLogin($('#liUser').value.trim(), $('#liPass').value); }
       catch(err){ $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.'); btn.disabled = false; }
     });
     $('#toJoin').addEventListener('click', stepAanmelden);
     $('#toForgot').addEventListener('click', stepForgot);
     $('#toDevice').addEventListener('click', stepSector);
-    $('#liUser').focus();
   }

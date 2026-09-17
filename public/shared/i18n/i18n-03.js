@@ -153,6 +153,10 @@
             WERELD = d.talen; // de actieve set (voor de vertaling)
             // de matcher kent meteen de HELE wereld (alle 114) voor typen/spreken
             this._alleTalen = (Array.isArray(d.alle) && d.alle.length) ? d.alle : d.talen;
+            // Dezelfde 24 kerntalen als op www staan vooraan; de overige
+            // wereldtalen blijven vindbaar via land- of taalnaam.
+            this._alleTalen = this._alleTalen.slice().sort((a, b) =>
+              Number(!!b.kern) - Number(!!a.kern));
             this._lijst = this._alleTalen;
             // De site volgt de telefooninstelling: nu de hele wereld bekend is,
             // kiezen we alsnog de toesteltaal (bijv. Duits of Japans), tenzij het

@@ -122,7 +122,7 @@ test('een vertaling overleeft een navigatie', () => {
   const een = autoLaag(opslag);
   een.kast.zet('ja', 'Boek deze reis', 'この旅行を予約する');
   een.kast.bewaarNu();
-  assert.ok(opslag.getItem('rtg_tr_ja'), 'de kast schrijft naar het toestel');
+  assert.ok(opslag.getItem('rtg_tr_v2_ja'), 'de kast schrijft naar het toestel');
 
   // een tweede autoLaag() is een tweede paginabezoek: niets in het geheugen
   const twee = autoLaag(opslag);
@@ -141,12 +141,12 @@ test('een volle opslag kost de kasten van andere talen, niet het scherm', () => 
   /* De weg die alleen bij een volle opslag loopt, en die je daarom nooit ziet
      tot hij ertoe doet. Een mens leest in EEN taal, dus de kasten van talen
      waar hij doorheen klikte zijn de goedkoopste ruimte om op te geven. */
-  const opslag = opslagDubbel({ 'rtg_tr_fr': '{"a":"b"}', 'rtg_tr_es': '{"a":"b"}', 'rtg_lang': 'ja' });
+  const opslag = opslagDubbel({ 'rtg_tr_v2_fr': '{"a":"b"}', 'rtg_tr_v2_es': '{"a":"b"}', 'rtg_lang': 'ja' });
   let vol = true;
   const echt = opslag.setItem;
   opslag.setItem = (k, v) => {
     // vol blijft het tot de andere taalkasten weg zijn
-    if (vol && k.indexOf('rtg_tr_') === 0 && (opslag.getItem('rtg_tr_fr') || opslag.getItem('rtg_tr_es'))) {
+    if (vol && k.indexOf('rtg_tr_v2_') === 0 && (opslag.getItem('rtg_tr_v2_fr') || opslag.getItem('rtg_tr_v2_es'))) {
       const e = new Error('QuotaExceededError'); e.name = 'QuotaExceededError'; throw e;
     }
     echt(k, v);
@@ -155,9 +155,9 @@ test('een volle opslag kost de kasten van andere talen, niet het scherm', () => 
   kast.zet('ja', 'Boek deze reis', 'この旅行を予約する');
   kast.bewaarNu();
 
-  assert.equal(opslag.getItem('rtg_tr_fr'), null, 'de kast van een taal die niet gelezen wordt is opgegeven');
-  assert.equal(opslag.getItem('rtg_tr_es'), null);
-  assert.ok(opslag.getItem('rtg_tr_ja'), 'en de taal die NU gelezen wordt is alsnog bewaard');
+  assert.equal(opslag.getItem('rtg_tr_v2_fr'), null, 'de kast van een taal die niet gelezen wordt is opgegeven');
+  assert.equal(opslag.getItem('rtg_tr_v2_es'), null);
+  assert.ok(opslag.getItem('rtg_tr_v2_ja'), 'en de taal die NU gelezen wordt is alsnog bewaard');
   assert.equal(opslag.getItem('rtg_lang'), 'ja', 'wat niet van de kast is blijft staan');
   assert.equal(kast.lees('ja', 'Boek deze reis'), 'この旅行を予約する', 'het scherm verliest niets');
   vol = false;
@@ -167,12 +167,22 @@ test('de kast ruimt de oude opslag-per-pagina eenmalig op', () => {
   const opslag = opslagDubbel({
     'rtg_ui_ja_appsgeldhtml_400': '{"a":"b"}',
     'rtg_ui_ja_appsreizenhtml_400': '{"a":"b"}',
+    'rtg_tr_de': '{"oud":"Alt"}',
     'rtg_lang': 'ja'
   });
   autoLaag(opslag);
   assert.equal(opslag.getItem('rtg_ui_ja_appsgeldhtml_400'), null, 'de opslag-per-pagina is weg');
+  assert.equal(opslag.getItem('rtg_tr_de'), null, 'de oude gedeeltelijke taalvoorraad is weg');
   assert.equal(opslag.getItem('rtg_lang'), 'ja', 'en de rest blijft ongemoeid');
-  assert.equal(opslag.getItem('rtg_tr_opgeruimd'), '1', 'en het gebeurt maar een keer');
+  assert.equal(opslag.getItem('rtg_tr_v2_opgeruimd'), '1', 'en het gebeurt maar een keer');
+});
+
+test('de 24 kerntalen wisselen atomair en markeren onvolledige schermen', () => {
+  const lezer = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-00b.js'), 'utf8');
+  const schrijver = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-00c.js'), 'utf8');
+  assert.match(lezer, /var KERN = new Set/);
+  assert.match(schrijver, /data-rtg-taal-volledig/);
+  assert.match(schrijver, /herstel\(\)/, 'een mislukte kernvertaling herstelt de volledige brontaal');
 });
 
 test('de sleutelweg deelt de kast van de vangnetlaag', () => {

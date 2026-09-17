@@ -38,9 +38,13 @@
     nl: { label: 'Nederlands', native: 'Nederlands' },
     en: { label: 'Engels', native: 'English' }
   };
+  const KERN = new Set([
+    'nl', 'en', 'de', 'fr', 'es', 'pt', 'it', 'pl', 'ru', 'uk', 'tr',
+    'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'zh', 'ja', 'ko', 'id', 'vi', 'th', 'sw'
+  ]);
   /* Wereldtalen: de Boardroom bepaalt welke talen aanstaan; de kiezer toont ze
-     allemaal. UI-teksten vallen voor andere talen terug op Engels; chats en
-     berichten worden door de server echt per taal vertaald. */
+     allemaal. De 24 kerntalen wisselen atomair: een onvolledig woordenboek
+     blijft volledig Engels in plaats van meerdere talen op een scherm te mengen. */
   let WERELD = window.RTGWereldTalen || null; // [{code, naam, en}] uit /api/talen
   function supported() { return WERELD ? WERELD.map(t => t.code) : Object.keys(LANGS); }
   const orig = new WeakMap(); // element -> { text, html, ph }
@@ -110,11 +114,19 @@
   const RTGi18n = {
     lang: 'nl',
     chosen: false,
-    // UI-woordenboek: eigen taal als die er is, anders Engels (internationale
-    // terugval); Nederlands staat gewoon in de HTML zelf.
+    // UI-woordenboek: Nederlands staat in de HTML. Een kerntaal wordt pas
+    // zichtbaar als elke Engelse woordenboeksleutel een echte vertaling heeft.
     dict(lang) {
       const all = window.I18N || {};
-      return lang === 'nl' ? (all.nl || {}) : Object.assign({}, all.en || {}, all[lang] || {});
+      if (lang === 'nl') return all.nl || {};
+      const en = all.en || {};
+      const own = all[lang] || {};
+      if (lang !== 'en' && KERN.has(lang)) {
+        const compleet = Object.keys(en).every(key => typeof en[key] !== 'string' ||
+          (Object.prototype.hasOwnProperty.call(own, key) && typeof own[key] === 'string' && own[key].length > 0));
+        if (!compleet) return Object.assign({}, en);
+      }
+      return Object.assign({}, en, own);
     },
     _usedKeys: new Set(),
     t(key, fallback) {
@@ -233,12 +245,12 @@
         group.push(k); size+=en[k].length;
       });
       if (group.length) groups.push(group);
-      const publish = () => {
+      const publish = klaar => {
         window.I18N=window.I18N || {};
         window.I18N[lang]=Object.assign({},window.I18N[lang] || {},out);
-        if (this.lang === lang) this.apply(lang);
+        if (this.lang === lang && (!KERN.has(lang) || klaar)) this.apply(lang);
       };
-      if (Object.keys(out).length) publish();
+      if (Object.keys(out).length && !KERN.has(lang)) publish(false);
       try {
         for (const batch of groups) {
           if (this.lang !== lang) break;
@@ -247,21 +259,29 @@
             body:JSON.stringify({naar:lang,teksten:batch.map(k=>en[k])})});
           if (!response.ok) throw new Error('UI translation '+response.status);
           const data=await response.json();
-          if (!data || data.naar!==lang || !Array.isArray(data.teksten) || data.teksten.length!==batch.length)
+          if (!data || data.naar!==lang || !Array.isArray(data.teksten) || data.teksten.length!==batch.length ||
+            !Array.isArray(data.voltooid) || data.voltooid.length!==batch.length)
             throw new Error('Incomplete UI translation');
           batch.forEach((k,i)=>{
             state.tried.set(k,en[k]);
             const value=data.teksten[i];
-            // An unchanged source is a fallback, never a completed translation.
-            if(typeof value==='string' && value && value!==en[k]) {
-              out[k]=value; if(kast) kast.zet(lang,en[k],value);
+            // Een provider kan een merknaam terecht ongewijzigd laten; daarom
+            // bepaalt de server per regel of hij is afgehandeld.
+            if(data.voltooid[i] && typeof value==='string' && value) {
+              out[k]=value; if(kast && value!==en[k]) kast.zet(lang,en[k],value);
             }
           });
-          publish();
+          if (!KERN.has(lang)) publish(false);
         }
       } catch (e) {
         // Keep the complete fallback. An explicit language choice can retry.
-      } finally { state.pending=false; }
+      } finally {
+        state.pending=false;
+        const klaar = Object.assign({}, own, out);
+        const compleet = Object.keys(en).every(key => typeof en[key] !== 'string' ||
+          (Object.prototype.hasOwnProperty.call(klaar, key) && typeof klaar[key] === 'string' && klaar[key].length > 0));
+        if (compleet) publish(true);
+      }
     },
 
     /* ---------- taalkeuze: de wereld in RTG-stijl ----------

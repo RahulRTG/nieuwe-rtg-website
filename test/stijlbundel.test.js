@@ -114,14 +114,19 @@ test('8. relatieve url() wordt absoluut gemaakt tegen de eigen map', () => {
   assert.ok(uit.includes('url(https://x.example/y.png)'), 'een volledige URL blijft heel');
 });
 
-test('9. de echte app-pagina: zes bladen samen, en er raakt geen script zoek', () => {
+test('9. de echte app-pagina: bundelen bewaart de portal-cascade en alle scripts', () => {
   const fs = require('fs');
   const path = require('path');
   const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'app.html'), 'utf8');
   const uit = herschrijfHtml(bron);
   const b = bundelHrefs(uit);
-  assert.equal(b.length, 1, 'een bundel op deze pagina');
+  assert.equal(b.length, 2, 'de basisschil en de portal staan aan weerszijden van inline stijlen');
   assert.ok(b[0].length >= 5, 'met minstens vijf bladen erin: ' + b[0].join(', '));
+  assert.deepEqual(b[1], ['/shared/ios.css', '/apps/access/portal.css'],
+    'de portal blijft na de inline stijlen, met dezelfde volgorde');
+  const portalBundel = uit.lastIndexOf('/stijlbundel.css?');
+  assert.ok(portalBundel > uit.lastIndexOf('</style>'), 'de late portalregels mogen niet vóór de inline regels komen');
+  assert.ok(portalBundel < uit.indexOf('id="rtgHeritageCss"'), 'de heritage-laag blijft als laatste geladen');
   assert.equal((bron.match(/<script/g) || []).length, (uit.match(/<script/g) || []).length,
     'evenveel scripts voor als na -- er verdwijnt niets tussen de links vandaan');
   const voor = (bron.match(/<link[^>]*rel="stylesheet"/g) || []).length;

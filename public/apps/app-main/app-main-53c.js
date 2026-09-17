@@ -31,7 +31,7 @@
         : '';
       return;
     }
-    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };
+    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang(),{day:'numeric',month:'short'}); } catch(e){ return x; } };
     let h = '<div class="zak-kaart"><b class="vo-kop">' + T('po.titel','Uit uw post')
       + ' <span class="vo-let">(' + d.voorstellen.length + ')</span></b>'
       + '<div class="fineprint vo-mt">' + T('po.uitleg','Dit vonden wij in uw eigen post. Er gaat niets vanzelf in uw agenda; u bevestigt.') + '</div>';

@@ -7,7 +7,7 @@
   var actief = null, teller = 0, OPSLAG = 'rtg.edge.recent.v1';
 
   function tekst(el) {
-    var label = el.getAttribute('aria-label') || el.textContent || '';
+    var label = el.getAttribute('aria-label') || (el.querySelector('b') && el.querySelector('b').textContent) || el.textContent || '';
     return label.replace(/\s+/g, ' ').trim();
   }
 
@@ -71,7 +71,7 @@
     if (bank) {
       var werk = d.createElement('button'); werk.type = 'button';
       werk.className = 'rtg-edge-here-action'; werk.setAttribute('data-edge-command-bank', '');
-      werk.textContent = 'Werelden en werkbladen';
+      werk.innerHTML = icoon('grid') + '<span>Werelden en werkbladen</span><em aria-hidden="true">›</em>';
       werk.addEventListener('click', function () { openWerkbladen(rt); });
       nav.appendChild(werk);
     }

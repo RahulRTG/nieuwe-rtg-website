@@ -3,23 +3,23 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-17T00:39:25.794Z",
-  "commit": "bee95977",
+  "op": "2026-09-17T06:07:05.308Z",
+  "commit": "fc32b147f",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "gemeten": {
-  "artefacten": 296,
-  "bron": 2,
-  "afgeleid": 166,
+  "artefacten": 301,
+  "bron": 4,
+  "afgeleid": 169,
   "fragmenten": 22,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 187,
-  "afgeleidEigenaarHard": 164,
+  "metEigenaar": 190,
+  "afgeleidEigenaarHard": 167,
   "afgeleidGrendelt": 18,
   "metStempel": 95,
   "stempelAnders": 0
@@ -1840,6 +1840,54 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "LANGUAGE-AUDIT.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LANGUAGE.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LANGUAGECAPABILITY.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/language-proof.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LANGUAGEFAILOVER.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/language-proof.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "LAT.md",
    "soort": "ONBESLIST",
    "eigenaar": null,
@@ -2039,6 +2087,18 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MEANINGPARITY.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/language-proof.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {

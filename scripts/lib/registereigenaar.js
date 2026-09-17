@@ -54,6 +54,19 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  /* De taalproef schrijft alle drie rapporten via dezelfde begrensde namenlijst,
+     pas na geslaagde tests en een vergelijking van de bronafdrukken. De lexicale
+     schrijverscan kan die dynamische writeFileSync niet tot een naam herleiden. */
+  'LANGUAGECAPABILITY.json': { schrijver: 'scripts/language-proof.js',
+    waarom: 'language-proof.js schrijft de namenlijst pas na browserbewijs; --check weigert afwijkende bronafdrukken. Dit is werkboombewijs, geen productieattest.' },
+  'MEANINGPARITY.json': { schrijver: 'scripts/language-proof.js',
+    waarom: 'language-proof.js schrijft de namenlijst pas na geslaagde betekenisproeven; --check bewaakt de bronafdrukken en de gemeten reikwijdte blijft expliciet.' },
+  'LANGUAGEFAILOVER.json': { schrijver: 'scripts/language-proof.js',
+    waarom: 'language-proof.js schrijft de namenlijst pas na de geisoleerde HTTP-uitvalproef; --check bewaakt de bronafdrukken. Dit simuleert geen productiebewijs.' },
+  'LANGUAGE.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden architectuur- en bereikbeschrijving; de drie taalrapporten dragen het afzonderlijke uitvoerbare bewijs.' },
+  'LANGUAGE-AUDIT.md': { soort: 'BRON',
+    waarom: 'Handmatig beoordeelde bevindingen en resterende taalgrenzen; geen automatisch gegenereerd register.' },
   /* De aanleiding zelf. Er is geen schrijvend script: de lijst wordt met de hand
      onderhouden en mag alleen krimpen. */
   'BEREIK.json': { handmatig: true, lezer: 'test/bereikbaar.test.js',

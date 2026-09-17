@@ -227,7 +227,7 @@
       satEl.id = 'rtg-sat-balkje';
       satEl.setAttribute('role', 'status');
       satEl.setAttribute('aria-live', 'polite');
-      satEl.style.cssText = 'position:fixed;left:50%;bottom:.7rem;transform:translateX(-50%);z-index:99999;' +
+      satEl.style.cssText = 'position:fixed;left:50%;bottom:calc(var(--edge-bottom,0px) + env(safe-area-inset-bottom,0px) + .7rem);transform:translateX(-50%);z-index:99999;' +
         'display:flex;gap:.6rem;align-items:center;background:#14202b;color:#cfe0ee;border:1px solid #2c3f52;' +
         'border-radius:0;padding:.42rem .9rem;font:600 .78rem/1.2 system-ui,-apple-system,sans-serif;' +
         'box-shadow:0 4px 16px rgba(0,0,0,.35);max-width:92vw;';
@@ -243,6 +243,7 @@
       satEl.appendChild(tekst); satEl.appendChild(uit);
       document.body.appendChild(satEl);
     }
+    satEl.querySelector('button').setAttribute('aria-label',T('net.satUit','Zuinige stand uitzetten'));
     var delen = [];
     if (aan) delen.push(T('net.sat', 'Trage verbinding: zuinige stand aan'));
     if (rij) delen.push(rij + T('net.rijWacht', ' in de wachtrij'));
@@ -306,7 +307,7 @@
       if (!el) {
         el = document.createElement(soort === 'beschikbaar' ? 'button' : 'div');
         el.id = 'rtg-doos-pill';
-        el.style.cssText = 'position:fixed;left:.7rem;bottom:.7rem;z-index:99998;display:flex;gap:.4rem;align-items:center;' +
+        el.style.cssText = 'position:fixed;left:.7rem;bottom:calc(var(--edge-bottom,0px) + env(safe-area-inset-bottom,0px) + .7rem);z-index:99998;display:flex;gap:.4rem;align-items:center;' +
           'border-radius:0;padding:.4rem .8rem;font:600 .76rem/1.2 system-ui,-apple-system,sans-serif;border:1px solid;' +
           'box-shadow:0 4px 16px rgba(0,0,0,.35);' + (soort === 'beschikbaar' ? 'cursor:pointer;' : '');
         if (soort === 'beschikbaar') { el.type = 'button'; el.addEventListener('click', naarDoos); }
@@ -341,5 +342,6 @@
     };
   })();
 
+  w.addEventListener('rtglang',function(){status();satTeken();});
   w.RTGNet = { toon: toonBanner, verberg: verbergBanner, fout: fout, haal: haal, status: status, satelliet: w.Satelliet, doos: w.RTGdoos };
 })(window);

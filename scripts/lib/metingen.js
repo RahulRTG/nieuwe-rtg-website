@@ -96,6 +96,9 @@ const GEEN_METING = new Set([
 ]);
 
 const REGISTER = {
+  'LANGUAGECAPABILITY.json': { eigenRatel: 'scripts/language-proof.js' },
+  'MEANINGPARITY.json': { eigenRatel: 'scripts/language-proof.js' },
+  'LANGUAGEFAILOVER.json': { eigenRatel: 'scripts/language-proof.js' },
   'LAATSPOOR.json': { meter: ['laatSpoorVerdacht'] },
   'ROLLBACKBESLUIT.json': { meter: ['rollbackUitzonderingen'] },
   'FAALPROEF.json': { meter: ['faalproefGezakt'] },

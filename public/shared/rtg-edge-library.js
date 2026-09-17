@@ -98,7 +98,7 @@
     e.root.querySelectorAll('.rtg-edge-group').forEach(function (groep) {
       var raak = 0;
       groep.querySelectorAll('a[data-search]').forEach(function (a) {
-        var toon = !q || a.dataset.search.indexOf(q) >= 0;
+        var toon = !q || (a.dataset.search+' '+a.textContent.toLowerCase()).indexOf(q) >= 0;
         a.hidden = !toon; if (toon) { raak++; aantal++; }
       });
       groep.hidden = !raak;

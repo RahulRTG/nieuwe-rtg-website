@@ -75,6 +75,6 @@
        Het paneel is wat een lid instellingen noemt, dus krijgt het die naam.
        De ander heet nu Pagina-instellingen, precies zoals zijn eigen blad zich
        al noemde (shared/command/werktafel.js). */
-    RTGCommand.systeem(knop ? [{ naam: T('os.instellingen', 'Instellingen'), teken: 'instel',
+    RTGCommand.systeem(knop ? [{ sleutel: 'instellingen', naam: T('os.instellingen', 'Instellingen'), teken: 'instel',
       doe: function () { knop.click(); } }] : []);
   }

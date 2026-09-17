@@ -106,5 +106,5 @@
     const muntAan = !!(muntOpties && muntOpties.aan && user && user.tier !== 'guest');
     // Business Pass: de volledige, boekhoudklare specificatie onder elke factuur
     // (incl. afboekcode en btw). RTG en Lifestyle houden de rustige weergave.
-    const eurC = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const eurC = n => '€ ' + Number(n).toLocaleString(lang(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const specRow = (l, v, strong) => '<div style="display:flex;justify-content:space-between;gap:1rem;"><span>' + l + '</span><span style="text-align:right;flex-shrink:0;' + (strong ? 'color:var(--txt);font-weight:600;' : '') + '">' + v + '</span></div>';

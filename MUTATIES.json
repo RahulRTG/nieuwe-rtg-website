@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-17T00:06:32.622Z",
-    "commit": "cb1665ec3",
+    "op": "2026-09-16T20:46:00.782Z",
+    "commit": "3c742449c",
     "boomVuil": true,
-    "boomAnders": 6,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -2523,6 +2523,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "ijkt zichzelf met een echte blokkade van 200 ms, met onder- en bovengrens en de eis dat de mediaan niet meebeweegt. Nagetrokken: lusVertraging() nul laten melden laat drie van de vier toetsen zakken"
+    },
+    "evidence-engine.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/evidence-dag.js",
+      "operator": "getal+1#4",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "excursie.test.js": {
       "soort": "server",

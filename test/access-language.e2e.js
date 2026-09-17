@@ -37,6 +37,10 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
     await t.test('welkom, alle vier vragen en foutmeldingen volgen Nederlands en Engels',async()=>{
       await change('en');assert.match(await page.locator('#agTitle').innerText(),/Welcome/);
       assert.equal(await page.locator('#agNieuw').innerText(),'Create your RTG');
+      await page.waitForFunction(()=>!!window.RTGNet);
+      await page.evaluate(()=>RTGNet.satelliet.zetStand('aan'));
+      assert.equal(await page.locator('#rtg-sat-tekst').innerText(),'Slow connection: data-saving mode is on');
+      await page.evaluate(()=>RTGNet.satelliet.zetStand('uit'));
       await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"] small')?.textContent==='Worlds');
       assert.equal(await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').getAttribute('aria-label'),'Actions for this screen');
       await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();

@@ -87,6 +87,12 @@ const SAMEN_RE = /require\(\s*(['"])([^'"]+)\1\s*\+\s*([A-Za-z_$][\w$]*)\s*\)/g;
 const JOIN_RE = /require\(\s*path\.join\(\s*[^,)]+,\s*(['"])([^'"]+)\1\s*\)\s*\)/g;
 const LIJST_RE = /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*\[([^\]]*)\]/g;
 const SAMENGESTELD_RE = /require\(\s*[^'")\s]/;
+/* `require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright')`
+   kiest een zoekpad voor hetzelfde EXTERNE, lockfile-gepinde pakket. Het kiest
+   geen repositorybestand en hoort de interne bewijssluiting dus niet
+   onbegrensd te maken. Alleen bare package-namen mogen door deze uitzondering;
+   een relatief pad in require.resolve blijft terecht onbekend. */
+const EXTERNE_RESOLVE_RE = /require\(\s*[^\n;]*require\.resolve\(\s*['"][^./'"][^'"]*['"]/;
 
 /* LEZEN IS OOK EEN KANT. Een require is niet de enige manier waarop een bestand
    van een ander afhangt: de keuringen lezen WERELDLIJST.md, de schermtoetsen
@@ -217,6 +223,7 @@ function kantenUit(bron, code, absPad, rel) {
     for (const [lijn, r] of code) {
       if (beantwoord.has(lijn)) continue;          // deze regel is al opgelost
       if (!SAMENGESTELD_RE.test(r)) continue;
+      if (EXTERNE_RESOLVE_RE.test(r)) continue;    // extern pakket, geen interne rand
       uit.onbekend.push({ bestand: rel, lijn, vorm: vormVan(r),
         code: r.trim().slice(0, 90), reden: redenVan(r) });
     }
@@ -310,4 +317,5 @@ function index(mappen) {
   return { bestanden, graaf, omgekeerd, gebiedVan, WORTEL };
 }
 
-module.exports = { index, gebiedVan, TEKST_RE, CODE_RE, codeRegelsUit, kantenUit, los, vormVan, redenVan, GEBIEDEN };
+module.exports = { index, gebiedVan, TEKST_RE, CODE_RE, codeRegelsUit, kantenUit, los, vormVan, redenVan, GEBIEDEN,
+  EXTERNE_RESOLVE_RE };

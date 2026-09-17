@@ -121,7 +121,10 @@
       this._usedKeys.add(key);
       if (this.lang === 'nl') return fallback != null ? fallback : key;
       const v = this.dict(this.lang)[key];
-      return v != null ? v : (fallback != null ? fallback : key);
+      if(v!=null)return v;
+      const known=window.RTGUiBronTekst && window.RTGUiBronTekst(fallback);
+      if(known!=null)return (this.lang!=='en' && window.RTGVertaalKast && window.RTGVertaalKast.lees(this.lang,fallback)) || known;
+      return fallback != null ? fallback : key;
     },
 
     apply(lang) {

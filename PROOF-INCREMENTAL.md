@@ -360,16 +360,15 @@ bij de bouw heeft blootgelegd -- want dat laatste is de eigenlijke opbrengst.
 | 7 | Bewijsboek | `scripts/lib/bewijsboek.js` | 11 omgevingsdelen gemeten, 4 niet, 9 mutaties |
 | 8 | Planner | `scripts/plan.js` | de vier lagen achter elkaar, met redenen |
 | 9 | Werkrij | *(opgeruimd 1 sep 2026)* | ging met `scripts/scherf.js` mee toen `test:deel` de scherven overnam; de weging staat nu in `scripts/lib/delen.js` |
-| 10 | Persistente runners | -- | **op slot**, zie hieronder |
+| 10 | Warme browserfabriek | `scripts/browser-host.js`, `scripts/e2e.js`, `test/helper.js` | één Chromium per shard, verse context per toets; appservers blijven geïsoleerd |
 
-**Stap tien blijft dicht, en dat is een besluit en geen achterstand.** Par. 8.1
-en 11 zeggen het al: een runner die blijft staan, deelt zijn staat met de
-volgende toets. Alles wat vandaag de klok direct aanroept -- 1303 plekken in 689
-bestanden, waarvan 105 modules die hun eigen tijd bijhouden (`KLOK.json`) --
-gedraagt zich dan anders dan in een verse start, en dat verschil komt eruit als
-een toets die op de vierde ronde zakt zonder dat er iets is veranderd. Dat is
-precies het soort rood dat mensen afleert naar rood te kijken. Eerst die 1303,
-dan pas dit.
+**De appserver blijft per toets geïsoleerd.** Par. 8.1 en 11 blijven dus staan:
+geen warme applicatierunner die klok-, opslag- of lidstaat aan de volgende toets
+doorgeeft. Alleen Chromium leeft gedurende één shard. Iedere toets maakt een
+verse browsercontext en `browser.close()` ruimt alleen die contexten op; de host
+sluit na de shard. `RTG_SHARED_BROWSER=0` is de onmiddellijke terugweg. Daarmee
+verdwijnt processtartwerk zonder de 1303 directe tijdsaanroepen tussen tests te
+laten lekken.
 
 **Wat het bouwen zelf heeft opgeleverd**, en dat weegt zwaarder dan de tabel:
 
@@ -387,16 +386,34 @@ dan pas dit.
 - **Een classificator die 540 van de 2542 bestanden "beveiliging" noemde** omdat
   hij codepatronen op proza losliet. Een etiket dat overal op zit, draagt geen
   informatie.
-- **Eén regel die 797 van de 1237 toetsen blokkeert**: `test/helper.js:810`
-  laadt Playwright met een pad uit een variabele. Dat is geen gebrek van die
-  regel -- hij zoekt de browser op vier plekken, en dat is op sommige machines
-  de enige weg -- maar het is wel de duurste onbekende kant van het huis. Zolang
-  hij er staat, kan tweederde van de suite niets erven.
+- **Eén verkeerd geclassificeerde externe zoekrand die 993 extra UNKNOWNs
+  maakte**: de helper kiest uit vier zoekpaden, maar laadt in alle gevallen
+  hetzelfde lockfile-gepinde `playwright`-pakket. De reality-index herkent deze
+  vorm nu als extern en nooit als interne repositoryrand. In de actuele boom
+  daalde UNKNOWN daardoor van 1044 naar 51, zonder een intern dynamisch pad als
+  veilig te verklaren.
 
 En het scherpste: de planner zegt over de huidige samenvoegtak **NIETS TE ERVEN
 -- alles draait**. Dat is geen storing maar het juiste antwoord. Deze tak
 verandert 1113 bestanden in de bewijsmachinerie zelf en verwijdert er elf; over
 zo'n tak valt niets over te dragen. De winst begint bij de volgende tak.
+
+### 10.2 Wat er staat (16 september 2026)
+
+- `repository-snapshot.js` indexeert de actuele 7877 tekstbronnen in ongeveer
+  2,3 seconden en memoizet transitieve vragen.
+- `evidence-dag.js` legt bestand, route, capability, wet, register en bewijs als
+  expliciete knopen vast; invalidatie loopt over omgekeerde kanten.
+- `plan.js` levert per toets precies `REUSED`, `REPROVE` of `UNKNOWN` en schrijft
+  een uitvoerbaar v2-plan.
+- `BEWIJSBOEK.json` v2 is content-addressed, heeft een integriteitsafdruk en
+  accepteert alleen clean-room-herkomst van een volledige groene main-run.
+- CI zoekt het boek van de **exacte merge-base**. Geen boek, netwerkstoring,
+  vreemde herkomst of onvolledige impact betekent automatisch `full`.
+- De beschermde check `Tests, checks en build` blijft dezelfde naam houden en
+  accepteert uitsluitend een groene gekozen bewijsroute.
+- `meterijk` deelt één keuringssnapshot voor registermutaties. De volledige
+  ijking bleef groen en daalde lokaal van 43–45 minuten naar 9m23s.
 
 ## 11. De grenzen
 

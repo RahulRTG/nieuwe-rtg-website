@@ -48,6 +48,7 @@
       satEl.appendChild(tekst); satEl.appendChild(uit);
       document.body.appendChild(satEl);
     }
+    satEl.querySelector('button').setAttribute('aria-label',T('net.satUit','Zuinige stand uitzetten'));
     var delen = [];
     if (aan) delen.push(T('net.sat', 'Trage verbinding: zuinige stand aan'));
     if (rij) delen.push(rij + T('net.rijWacht', ' in de wachtrij'));
@@ -146,5 +147,6 @@
     };
   })();
 
+  w.addEventListener('rtglang',function(){status();satTeken();});
   w.RTGNet = { toon: toonBanner, verberg: verbergBanner, fout: fout, haal: haal, status: status, satelliet: w.Satelliet, doos: w.RTGdoos };
 })(window);

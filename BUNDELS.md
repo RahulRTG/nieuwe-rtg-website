@@ -692,7 +692,7 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 9 delen, 1730 regels in de delen
+`public/shared/i18n/` -- 9 delen, 1737 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -876,7 +876,7 @@ omlaag.
 
 ## `shared/verbinding.js`
 
-`public/shared/verbinding/` -- 2 delen, 345 regels in de delen
+`public/shared/verbinding/` -- 2 delen, 347 regels in de delen
 
 | deel | onderwerp |
 |---|---|

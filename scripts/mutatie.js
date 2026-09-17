@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-/* ============================================================================
-   DE MUTATIEMOTOR -- kan deze toets eigenlijk zakken?
+/* =====================================================================   DE MUTATIEMOTOR -- kan deze toets eigenlijk zakken?
 
    WAAROM. LAT.md regel 9: een toets die niet kan zakken is erger dan geen toets,
    want hij geeft dekking zonder dekking te leveren. BEWIJS.md legde bloot hoe
@@ -453,6 +452,14 @@ function draaiToets(bestand, env, wacht, forceer) {
 const EIGEN_MODULE = new Map([
   // This test executes the browser language loader in a VM, not through require.
   ['i18n-dictionary.test.js', ['public/shared/i18n.js']],
+  /* De Evidence Engine-toets importeert ook test/helper.js om het gedrag van
+     een verbonden browserclient te isoleren. Zonder deze expliciete bron wint
+     daardoor de serverheuristiek en krijgt hij een liegende API die niets met
+     zijn beweringen te maken heeft. De DAG is zijn centrale beslislaag:
+     omgekeerde kanten bepalen welk bewijs een bronwijziging ongeldig maakt.
+     Deze koppeling telt pas als bewijs nadat de gerichte mutatieronde hieronder
+     haar werkelijk rood heeft gekregen. */
+  ['evidence-engine.test.js', ['scripts/lib/evidence-dag.js']],
   // De openbare demonstratie leest haar scenario's lokaal. Een liegende API
   // verandert die niet; deze schermtoets moet de echte browserbron beproeven.
   ['experience-rtg.e2e.js', ['public/site/start/experience-core.js',

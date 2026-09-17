@@ -1263,7 +1263,7 @@ function leesRegister(naam, uit) {
   catch (e) { return undefined; }
 }
 
-function meet(bronnen) {
+function keuringRapport() {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
      moment dat er iets te meten viel -- de meetketen brak als de meting niet
@@ -1284,6 +1284,16 @@ function meet(bronnen) {
     throw new Error('de keuring gaf geen leesbaar rapport (exit ' + r.status + '): ' +
       String(r.stderr || r.stdout || '').trim().split('\n').slice(0, 3).join(' | ').slice(0, 300));
   }
+  return k;
+}
+
+function meet(bronnen) {
+  /* meterijk voedt tientallen registermutaties aan dezelfde norm. Die
+     mutaties veranderen de keuring NIET; hem daarvoor telkens opnieuw starten
+     maakte 84 kleine oordelen tot bijna een uur werk. Een expliciet snapshot
+     mag worden hergebruikt, maar alleen door de aanroeper die weet dat de
+     bronboom niet wijzigde. De gewone norm gebruikt altijd een verse keuring. */
+  const k = bronnen && bronnen.keuring ? bronnen.keuring : keuringRapport();
 
   /* De dependencies tellen we uit package.json zelf en niet uit een rapport:
      dit is de meter waar je bij twijfel de bron van wilt zien.
@@ -2100,6 +2110,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesMeetleer,
+module.exports = { meet, keuringRapport, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesMeetleer,
   PRESTATIEMETERS, leesPrestatie, leesMeting, prestatiePad, bron, PRESTATIEBESTAND, METINGBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

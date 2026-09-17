@@ -94,9 +94,8 @@
     } catch(e){}
   }
 
-  window.addEventListener('rtglang', () => { if (state) renderAll(); else stepStart(); gateTik(); });
+  window.addEventListener('rtglang', () => { if (state) renderAll(); });
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  gateTik(); setInterval(gateTik, 15000);
   async function startPersoneel(){
     await laadOmgeving();
     stepStart();

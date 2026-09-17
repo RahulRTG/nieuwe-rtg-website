@@ -111,7 +111,8 @@ test('Personeels-PDA: dezelfde Regie in duimstand, met drie werkplekken',
          deze toets zowel de rustige voorzijde als de bereikbaarheid van het
          vertrouwde operationele scherm. */
       await page.waitForSelector('#gate', { state: 'hidden', timeout: 40000 });
-      await page.locator('.trm-nav button[data-trm-diep="hulp"]').click();
+      await require('./helper').edgeActies(page);
+      await page.locator('.rtg-adaptive-controls [data-rtg-adaptive-source="trmMeer"]').click();
       await require('./helper').edgeActies(page);
       const tegel = page.locator('.rtg-adaptive-controls [data-rtg-adaptive-tab="regie"]');
       await tegel.first().waitFor({ state: 'visible', timeout: 25000 });

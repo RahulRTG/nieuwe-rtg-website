@@ -212,6 +212,8 @@
 <link href="/shared/workos-premium.css" rel="stylesheet">
 <link href="/shared/rtg-team-room-2026.css" rel="stylesheet">
 <link href="/shared/rtg-team-room-profiel-2026.css" rel="stylesheet">
+<link href="/apps/access/portal.css" rel="stylesheet">
+<link href="/apps/access/team.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-workos-premium data-rtg-world="work" data-rtg-skin="heritage">
@@ -264,22 +266,22 @@
     </main>
   </div>
 
-  <nav class="trm-nav" aria-label="Team Room-menu">
+  <nav class="trm-nav rtg-edge-owned-bar" aria-label="Team Room-menu">
     <button type="button" data-trm-open="vandaag" aria-current="page"><i aria-hidden="true">&#9788;</i>Vandaag</button>
     <button type="button" data-trm-open="team"><i aria-hidden="true">&#9675;&#9675;</i>Team</button>
     <button type="button" data-trm-diep="rooster"><i aria-hidden="true">&#9634;</i>Rooster</button>
-    <button type="button" data-trm-diep="hulp"><i aria-hidden="true">&#9776;</i>Meer</button>
+    <button type="button" id="trmMeer" data-trm-diep="hulp"><i aria-hidden="true">&#9776;</i>Meer</button>
   </nav>
 </section>
 <div id="shell">
 
-  <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
-    <!-- inlogscherm: de naam van de app, de klok en de datum; daaronder inloggen -->
-    <div class="gate-top">
-      <div class="badge">RTG Team Room</div>
-      <div class="gate-klok" id="gateKlok" data-rtg-klok="ring">--:--</div>
+  <div id="gate" role="main" aria-label="Inloggen" data-i18n-aria="pd.login" data-rtg-access="team" data-access-view="login">
+    <div class="access-brand" aria-label="Rahul Travel Group">RTG<small data-i18n="pd.brand">RAHUL TRAVEL GROUP</small></div>
+    <div class="access-content">
+      <h1 id="teamAccessTitle" class="access-title"></h1>
+      <p id="teamAccessDescription" class="access-description"></p>
+      <div id="gateStep"></div>
     </div>
-    <div id="gateStep"></div>
   </div>
 
   <div id="app">
@@ -515,6 +517,42 @@
 <script src="/apps/personeel-voorzijde.js"></script>
 <script>
 window.I18N = { en: {
+  "pd.li.user":"Email or username",
+  "pd.li.pass":"Password",
+  "pd.ja.bedrijf":"Company name",
+  "pd.ja.code":"Invitation code from your employer",
+  "pd.ja.rtgpass":"Your RTG account password",
+  "pd.ja.pin":"Choose a four-digit PIN",
+  "pd.fg.email":"Your email address",
+  "pd.fg.ok":"If we recognise this address, a recovery link is on its way.",
+  "pd.code":"Company code",
+  "pd.openbedrijf":"Open my company.",
+  "pd.codehint":"Use the code provided by your employer.",
+
+  "pd.access.welcome":"Welcome to your team.",
+  "pd.access.loginhelp":"Sign in with your personal RTG account to continue to your workspace.",
+  "pd.access.logingo":"Continue to my workspace.",
+  "pd.access.joinlink":"I would like to join a company.",
+  "pd.access.forgotlink":"I have forgotten my password.",
+  "pd.access.devicelink":"I am using a device at my workplace.",
+  "pd.access.join":"Join your team.",
+  "pd.access.joinhelp":"Use the details from your employer and your own RTG account. Then choose a PIN for the device at your workplace.",
+  "pd.access.joingo":"Join my team.",
+  "pd.access.accounthelp":"Do you need an RTG account? Create one first, then return here to join your team.",
+  "pd.access.account":"Create my RTG account.",
+  "pd.access.recovery":"We will help you get back in.",
+  "pd.access.recoveryhelp":"Enter the email address of your RTG account. You will receive a link to reset your password.",
+  "pd.access.recovergo":"Send me a recovery link.",
+  "pd.access.device":"Your workplace.",
+  "pd.access.devicehelp":"Enter the company code provided by your employer. You can then sign in with your name and PIN.",
+  "pd.access.team":"Choose your name.",
+  "pd.access.teamhelp":"Select your own account to continue securely with your PIN.",
+  "pd.access.pin":"Welcome back.",
+  "pd.access.pinhelp":"Enter your personal PIN to open your workspace.",
+  "pd.access.office":"Welcome to RTG Office.",
+  "pd.access.officehelp":"Use your office access code. If two-step verification is enabled, enter your authenticator code as well.",
+  "pd.access.pinlabel":"Your four-digit PIN",
+
   'pd.title':'Your shift, <em>in your pocket</em>.',
   'pd.deck':'Schedule, tasks, team chat and the work of your business. Pick your sector, your company and sign in with your PIN.',
   'pd.back':'Back', 'pd.choose':'Choose your company', 'pd.staff':'Staff member', 'pd.login':'Sign in',

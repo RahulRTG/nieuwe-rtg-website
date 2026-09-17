@@ -2,7 +2,7 @@
    Boardroom-schakelaars en de actieve lijst voor alle taalkiezers. */
 'use strict';
 
-module.exports = function bouwTalenBeheer({ TALEN, BASIS, STANDAARD, STANDAARD_VERSIE, bestaat }) {
+module.exports = function bouwTalenBeheer({ TALEN, BASIS, STANDAARD, STANDAARD_VERSIE, bestaat, isKerntaal }) {
   return function maakTalen({ db, save }) {
     const eigen = require('./kern/eigencollectie')({ db, domein: 'talen-beheer', bezit: { talen: 'kaart' } });
     function actieveSet() {
@@ -30,11 +30,13 @@ module.exports = function bouwTalenBeheer({ TALEN, BASIS, STANDAARD, STANDAARD_V
     function isActief(code) { return actieveSet().includes(String(code || '').toLowerCase()); }
     function alle() {
       const set = new Set(actieveSet());
-      return TALEN.map(t => ({ code: t.code, naam: t.naam, en: t.en, aan: set.has(t.code), basis: BASIS.includes(t.code) }));
+      return TALEN.map(t => ({ code: t.code, naam: t.naam, en: t.en, aan: set.has(t.code),
+        basis: BASIS.includes(t.code), kern: !!(isKerntaal && isKerntaal(t.code)) }));
     }
     function actieve() {
       const set = new Set(actieveSet());
-      return TALEN.filter(t => set.has(t.code)).map(t => ({ code: t.code, naam: t.naam, en: t.en }));
+      return TALEN.filter(t => set.has(t.code)).map(t => ({ code: t.code, naam: t.naam, en: t.en,
+        kern: !!(isKerntaal && isKerntaal(t.code)) }));
     }
     function handtekening() { return actieveSet().slice().sort().join(','); }
     function zet(code, aan) {

@@ -17,7 +17,8 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
   await ctx.addInitScript(()=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');});
   await ctx.route('**/api/vertaal/ui',async route=>{
     const body=route.request().postDataJSON();translateBodies.push(body);
-    await route.fulfill({json:{naar:body.naar,teksten:body.teksten}});
+    await route.fulfill({json:{naar:body.naar,teksten:body.teksten,
+      voltooid:body.teksten.map(()=>false),volledig:false}});
   });
   const page=await ctx.newPage(),errors=[];
   letOpFouten(page,errors);
@@ -116,7 +117,7 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
       }
       await page.locator('#agIn').fill('Synthetisch testwachtwoord 2026');
       // A curated fixture verifies Arabic layout; the live provider is tested separately.
-      await page.evaluate(()=>{I18N.ar=Object.assign({},I18N.ar,{
+      await page.evaluate(()=>{I18N.ar=Object.assign({},I18N.en,I18N.ar,{
         'access.portal.how_would_you_like_to_secure_your_account':'كيف تريد تأمين حسابك؟',
         'access.portal.create_my_account':'أنشئ حسابي'
       });});

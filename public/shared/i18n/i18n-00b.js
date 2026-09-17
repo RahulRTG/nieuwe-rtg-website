@@ -15,6 +15,7 @@
   if (w.RTGAutoVertaling) return;
 
   var RTL = new Set(['ar', 'dv', 'fa', 'he', 'ps', 'sd', 'ug', 'ur', 'yi']);
+  var KERN = new Set(['nl','en','de','fr','es','pt','it','pl','ru','uk','tr','ar','fa','he','hi','bn','ur','zh','ja','ko','id','vi','th','sw']);
   var ATTRS = ['placeholder', 'title', 'aria-label', 'aria-description', 'alt'];
   var NEGEER = 'script,style,noscript,template,code,pre,kbd,samp,svg,canvas,textarea,' +
     '[translate="no"],[data-i18n-ignore],[data-user-content],[contenteditable="true"],' +
@@ -84,25 +85,28 @@
     return st;
   }
 
-  function voeg(groepen, st) {
+  function voeg(groepen, voorraad, st) {
     if (!kandidaat(st.bron)) return;
+    var atomair = KERN.has(taal) && taal !== 'nl' && taal !== 'en';
     var known=w.RTGUiBronTekst && w.RTGUiBronTekst(st.bron);
     if(taal==='en' && known!=null) return toon(st,known);
     var uitKast = KAST.van(taal).get(st.bron);
-    if (uitKast != null) return toon(st, uitKast);
+    if (uitKast != null && !atomair) return toon(st, uitKast);
     /* Kast, dan schil, dan net. De kast is verser (hij kent ook schermen buiten
        de schil), de schil is breder bij een koude start, het net kost geld. */
     var uitSchil = SCHIL.van(taal).get(st.bron);
-    if (uitSchil != null) return toon(st, uitSchil);
-    if(known!=null) toon(st,known); // Explicit source copy remains usable while a target translation is pending.
+    if (uitSchil != null && !atomair) return toon(st, uitSchil);
+    if(!atomair && known!=null) toon(st,known); // Explicit source copy remains usable while a target translation is pending.
     if (!groepen.has(st.bron)) groepen.set(st.bron, new Set());
     groepen.get(st.bron).add(st);
+    if (atomair && uitKast != null) voorraad.set(st.bron, uitKast);
+    else if (atomair && uitSchil != null) voorraad.set(st.bron, uitSchil);
   }
-  function verzamelTekst(root, groepen) {
+  function verzamelTekst(root, groepen, voorraad) {
     if (!root) return;
     var bekijk = function (node) {
       if (!node || node.nodeType !== 3 || uitgesloten(node.parentElement)) return;
-      voeg(groepen, tekstStaat(node));
+      voeg(groepen, voorraad, tekstStaat(node));
     };
     if (root.nodeType === 3) bekijk(root);
     if (root.nodeType !== 1 && root.nodeType !== 9) return;
@@ -110,18 +114,18 @@
     var node;
     while ((node = walker.nextNode())) bekijk(node);
   }
-  function verzamelAttributen(root, groepen) {
+  function verzamelAttributen(root, groepen, voorraad) {
     if (!root || (root.nodeType !== 1 && root.nodeType !== 9)) return;
     var els = [];
     if (root.nodeType === 1) els.push(root);
     try { els = els.concat(Array.from(root.querySelectorAll('[' + ATTRS.join('],[') + ']'))); } catch (e) {}
     els.forEach(function (el) {
       ATTRS.forEach(function (naam) {
-        if (el.hasAttribute(naam) && !uitgesloten(el, naam)) voeg(groepen, attribStaat(el, naam));
+        if (el.hasAttribute(naam) && !uitgesloten(el, naam)) voeg(groepen, voorraad, attribStaat(el, naam));
       });
       var type = String(el.getAttribute('type') || '').toLowerCase();
       if (el.tagName === 'INPUT' && /^(button|submit|reset)$/.test(type) && el.hasAttribute('value') && !uitgesloten(el, 'value'))
-        voeg(groepen, attribStaat(el, 'value'));
+        voeg(groepen, voorraad, attribStaat(el, 'value'));
     });
   }
 

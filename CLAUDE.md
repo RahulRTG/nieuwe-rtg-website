@@ -773,6 +773,44 @@ rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
 concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
 begrippen en geen zes velden.
 
+**`PLANNING.md` is de tijd- en capaciteitslaag** -- het voorstel om roosteren geen
+personeelsfunctie te laten zijn maar een universele motor, met als basiseenheid
+`resource + tijd + plaats + activiteit + capaciteit + regels`. Lees die vóór je
+aan een rooster, een dienst, bezetting of beschikbaarheid werkt. De dragende
+bewering is eerst **gemeten** en niet aangenomen (`npm run planvorm`,
+`PLANVORM.json`, op de lezer van `scripts/objectmodel.js`), want dat is exact de
+vorm waarin `Asset`, `Koopbaar`, `Career`, `Moment` en `Manier` alle vijf al
+sneuvelden. Uitslag over <!--getal:planvorm.domeinen-->7<!--/getal-->
+plandomeinen: **<!--getal:planvorm.inAlle-->0<!--/getal--> van
+<!--getal:planvorm.velden-->269<!--/getal--> velden in álle domeinen**,
+<!--getal:planvorm.domeineigenPct-->91.8<!--/getal-->% in precies één
+(platformbreed 70,4%, dus de plandomeinen zijn MÍNDER verwant dan een
+willekeurige doorsnede), en op de lus-as
+<!--getal:planvorm.lusRond-->0<!--/getal--> van zeven domeinen die de keten rond
+maken met <!--getal:planvorm.combinaties-->7<!--/getal--> verschillende
+combinaties. Er komt dus **geen `resources`- en geen `roosters`-tabel**; wat
+overleeft is een verklaring van werkwoorden boven een projectie, waarbij de grond
+rekent en niets bezit. **Het getal dat het product stuurt is `reistijd`:
+<!--getal:planvorm.reistijd-->0<!--/getal--> van zeven** -- geen enkel
+plandomein definieert transitietijd, en dat is het enige dat een zzp'er, een
+schoonmaakteam, een taxi en een beveiliger delen. Vier dingen die je nergens
+anders moet herhalen. **`plan`, `beschikbaarheid`, `simulatie` en `SOORTEN` zijn
+bezet** -- `kern/stuur/plan.js` gaat over capabilities en niet over tijd,
+`kern/beschikbaar.js` is dating-beschikbaarheid die met zoveel woorden GEEN
+kalender is, en `SOORTEN` draagt 49 betekenissen over 51 domeinen. **`mandaat` is
+geen botsing maar een geschenk**: `kern/stuur/mandaat.js` heeft de grammatica al
+(*een mandaat verleent nooit vermogen, het versmalt alleen*), dus er komt geen
+tweede. **De optimizer heeft al een verklaarde lege plek**: `kern/ai/router.js`
+routeert `rooster`, `inplannen` en `bezetting` naar de techniek `optimalisatie`
+en zegt erbij dat er geen constraint solver is. En de scherpste grens: **een mens
+is geen resource** -- een optimizer die op geschiktheid rangschikt maakt een
+cijfer op een mens (CAR-05), en de uitweg staat al in
+`kern/beveiliging/rooster/aanvragen.js`: sorteren op de minste uren, dus op wat
+iemand TOEKOMT en nooit op wat hij waard is. Par. 6 zet per onderdeel of het
+staat, een stap weg is, een besluit vraagt of jaren weg is; het eerste dat vandaag
+écht fout kan gaan staat bovenaan par. 7: **géén roostermotor leest verzuim**,
+dus een zieke medewerker kan gewoon worden ingepland.
+
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
 PIN), waarachter het platform per context tijdelijke, begrensde bevoegdheden

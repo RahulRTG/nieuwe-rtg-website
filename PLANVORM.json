@@ -1,0 +1,834 @@
+{
+  "stempel": {
+    "op": "2026-09-17T00:39:26.524Z",
+    "commit": "bee95977",
+    "boomVuil": false,
+    "boomAnders": 2,
+    "instrument": "scripts/planvorm.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Is roosteren EEN motor of zeven? Twee assen over zeven plandomeinen (horeca, beveiliging, festival, taxi, ov, verblijf, school): DE LUS (voert een domein de negen stations van de voorgestelde keten uit) en DE VORM (delen ze velden -- de Asset-vraag). Gemeten met de lezer van scripts/objectmodel.js, dezelfde als bij de Asset-, Koopbaar-, Career-, Moment- en Manier-metingen.",
+  "grens": "DE TWEE ASSEN WORDEN NOOIT OPGETELD: de lus zegt of het WERK overal hetzelfde is, de vorm of de GEGEVENS dat zijn, en een samengesteld cijfer verbergt welke van de twee beweegt (INT-04). De lus-as is LEXICAAL over gedefinieerde symboolnamen en dus een ONDERgrens -- graad `vermoed`; de conclusie hangt daarom aan de vorm-as. Dit meet de vorm van de DATA en niet of planning als PROCES bestaat (dat is een ketenproef). Envelopvelden vallen eruit: die meten de verpakking. En de lezer kijkt alleen in server/kern, server/bedrijf, server/school en server/papieren -- een planner die in een ROUTE woont is hier onzichtbaar, en dat is geen nul maar een blinde vlek.",
+  "conclusie": "GEEN GEDEELDE VORM: geen enkel veld staat in alle gemeten plandomeinen, onder geen van beide domeinlijsten. Een planningsgrond met een VERPLICHTE basiseenheid (resource + tijd + plaats + activiteit + capaciteit + regels) is daarmee niet gerechtvaardigd als OBJECT. Wat overleeft is de vorm die dit huis al vier keer heeft gekozen: een VERKLARING VAN WERKWOORDEN (COMMERCE.md, `Koopbaar`) boven een PROJECTIE met etiketten (kern/levensgraaf/graaf.js) -- het plandomein stelt zijn eigen behoefte samen, de grond rekent en bezit niets.",
+  "geenGedeeldeVorm": true,
+  "eensgezind": true,
+  "stations": [
+    "vraag",
+    "capaciteit",
+    "resource",
+    "beperking",
+    "plan",
+    "reistijd",
+    "uitvoering",
+    "werkelijk",
+    "herplan"
+  ],
+  "rondes": {
+    "ruim": {
+      "lus": {
+        "domeinen": 7,
+        "rondeLus": [],
+        "inAlleDomeinen": [],
+        "combinaties": 7,
+        "zeldzaamste": {
+          "station": "reistijd",
+          "domeinen": 0
+        },
+        "perStation": [
+          {
+            "station": "vraag",
+            "domeinen": 4
+          },
+          {
+            "station": "capaciteit",
+            "domeinen": 3
+          },
+          {
+            "station": "resource",
+            "domeinen": 6
+          },
+          {
+            "station": "beperking",
+            "domeinen": 4
+          },
+          {
+            "station": "plan",
+            "domeinen": 6
+          },
+          {
+            "station": "reistijd",
+            "domeinen": 0
+          },
+          {
+            "station": "uitvoering",
+            "domeinen": 6
+          },
+          {
+            "station": "werkelijk",
+            "domeinen": 3
+          },
+          {
+            "station": "herplan",
+            "domeinen": 4
+          }
+        ],
+        "rijen": [
+          {
+            "domein": "beveiliging",
+            "bestanden": 5,
+            "symbolen": 31,
+            "stations": [
+              "vraag",
+              "capaciteit",
+              "resource",
+              "plan",
+              "uitvoering",
+              "herplan"
+            ]
+          },
+          {
+            "domein": "festival",
+            "bestanden": 27,
+            "symbolen": 180,
+            "stations": [
+              "vraag",
+              "capaciteit",
+              "resource",
+              "beperking",
+              "plan",
+              "uitvoering",
+              "werkelijk"
+            ]
+          },
+          {
+            "domein": "horeca",
+            "bestanden": 2,
+            "symbolen": 21,
+            "stations": [
+              "resource",
+              "beperking",
+              "plan",
+              "uitvoering"
+            ]
+          },
+          {
+            "domein": "ov",
+            "bestanden": 5,
+            "symbolen": 39,
+            "stations": [
+              "uitvoering",
+              "werkelijk",
+              "herplan"
+            ]
+          },
+          {
+            "domein": "school",
+            "bestanden": 59,
+            "symbolen": 216,
+            "stations": [
+              "capaciteit",
+              "resource",
+              "beperking",
+              "plan"
+            ]
+          },
+          {
+            "domein": "taxi",
+            "bestanden": 34,
+            "symbolen": 186,
+            "stations": [
+              "vraag",
+              "resource",
+              "beperking",
+              "plan",
+              "uitvoering",
+              "werkelijk",
+              "herplan"
+            ]
+          },
+          {
+            "domein": "verblijf",
+            "bestanden": 3,
+            "symbolen": 24,
+            "stations": [
+              "vraag",
+              "resource",
+              "plan",
+              "uitvoering",
+              "herplan"
+            ]
+          }
+        ]
+      },
+      "vorm": {
+        "domeinen": [
+          "horeca",
+          "beveiliging",
+          "festival",
+          "taxi",
+          "ov",
+          "verblijf",
+          "school"
+        ],
+        "domeinenLeeg": [],
+        "vormen": 122,
+        "velden": 269,
+        "perDomein": {
+          "horeca": {
+            "velden": 6,
+            "modules": [
+              "server/kern/agent.js",
+              "server/kern/personeel.js"
+            ]
+          },
+          "beveiliging": {
+            "velden": 24,
+            "modules": [
+              "server/kern/beveiliging/pda/index.js",
+              "server/kern/beveiliging/pda/patrouille.js",
+              "server/kern/beveiliging/rooster/planning.js"
+            ]
+          },
+          "festival": {
+            "velden": 36,
+            "modules": [
+              "server/kern/festival/artiest.js",
+              "server/kern/festival/bezetting.js",
+              "server/kern/festival/gast.js",
+              "server/kern/festival/gereedheid.js",
+              "server/kern/festival/groep.js",
+              "server/kern/festival/model.js",
+              "server/kern/festival/partner.js",
+              "server/kern/festival/podium.js",
+              "server/kern/festival/rechten.js",
+              "server/kern/festival/toegang.js",
+              "server/kern/festival/verkoop.js",
+              "server/kern/festival/voorspelling.js"
+            ]
+          },
+          "taxi": {
+            "velden": 60,
+            "modules": [
+              "server/kern/mobiliteit/abonnement.js",
+              "server/kern/mobiliteit/assets.js",
+              "server/kern/mobiliteit/cdt-export.js",
+              "server/kern/mobiliteit/dispatch.js",
+              "server/kern/mobiliteit/modulecatalogus.js",
+              "server/kern/mobiliteit/overeenkomst.js",
+              "server/kern/mobiliteit/pendel-rooster.js",
+              "server/kern/mobiliteit/pendel.js",
+              "server/kern/mobiliteit/plekken.js",
+              "server/kern/mobiliteit/reis.js",
+              "server/kern/mobiliteit/reisplan-etappe.js",
+              "server/kern/mobiliteit/storing.js"
+            ]
+          },
+          "ov": {
+            "velden": 24,
+            "modules": [
+              "server/kern/ov/dienst.js",
+              "server/kern/ov/index.js",
+              "server/kern/ov/operatie.js",
+              "server/kern/ov/reizen.js"
+            ]
+          },
+          "verblijf": {
+            "velden": 22,
+            "modules": [
+              "server/kern/verblijf/gast.js",
+              "server/kern/verblijf/receptie.js"
+            ]
+          },
+          "school": {
+            "velden": 123,
+            "modules": [
+              "server/school/aanwezigheid.js",
+              "server/school/beheer.js",
+              "server/school/bijdrage.js",
+              "server/school/directie.js",
+              "server/school/dossier.js",
+              "server/school/excursie.js",
+              "server/school/financien-beheer.js",
+              "server/school/financien.js",
+              "server/school/gezin.js",
+              "server/school/hr-verlof.js",
+              "server/school/hr.js",
+              "server/school/hulplijn.js",
+              "server/school/inschrijving.js",
+              "server/school/klas.js",
+              "server/school/koppelingen.js",
+              "server/school/machtiging.js",
+              "server/school/omroep.js",
+              "server/school/opvolging.js",
+              "server/school/ouderportaal-mijn.js",
+              "server/school/ouderportaal.js",
+              "server/school/peiling-antwoord.js",
+              "server/school/peiling.js",
+              "server/school/personeel-inlog.js",
+              "server/school/personeelstoegang.js",
+              "server/school/planner.js",
+              "server/school/rapport.js",
+              "server/school/rollen.js",
+              "server/school/toets.js",
+              "server/school/toetsbieb.js",
+              "server/school/veiligheid-incident.js",
+              "server/school/veiligheid.js",
+              "server/school/verbonden.js",
+              "server/school/verlof.js",
+              "server/school/zorg.js"
+            ]
+          }
+        },
+        "inAlleDomeinen": [],
+        "inMinstensHelft": [],
+        "inEenDomeinPct": 91.8,
+        "paren": [
+          {
+            "paar": [
+              "taxi",
+              "ov"
+            ],
+            "gedeeld": 5,
+            "overlap": 0.063,
+            "velden": [
+              "km",
+              "lat",
+              "lijnId",
+              "lng",
+              "naar"
+            ]
+          },
+          {
+            "paar": [
+              "ov",
+              "verblijf"
+            ],
+            "gedeeld": 2,
+            "overlap": 0.045,
+            "velden": [
+              "personen",
+              "vertrek"
+            ]
+          },
+          {
+            "paar": [
+              "beveiliging",
+              "ov"
+            ],
+            "gedeeld": 2,
+            "overlap": 0.043,
+            "velden": [
+              "lat",
+              "lng"
+            ]
+          },
+          {
+            "paar": [
+              "festival",
+              "taxi"
+            ],
+            "gedeeld": 4,
+            "overlap": 0.043,
+            "velden": [
+              "capaciteit",
+              "geldigTot",
+              "ingetrokken",
+              "product"
+            ]
+          },
+          {
+            "paar": [
+              "horeca",
+              "beveiliging"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.034,
+            "velden": [
+              "shift"
+            ]
+          },
+          {
+            "paar": [
+              "festival",
+              "school"
+            ],
+            "gedeeld": 5,
+            "overlap": 0.032,
+            "velden": [
+              "betaald",
+              "geldigTot",
+              "ingetrokken",
+              "open",
+              "plek"
+            ]
+          },
+          {
+            "paar": [
+              "beveiliging",
+              "taxi"
+            ],
+            "gedeeld": 2,
+            "overlap": 0.024,
+            "velden": [
+              "lat",
+              "lng"
+            ]
+          },
+          {
+            "paar": [
+              "beveiliging",
+              "verblijf"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.022,
+            "velden": [
+              "supplierCode"
+            ]
+          },
+          {
+            "paar": [
+              "taxi",
+              "school"
+            ],
+            "gedeeld": 4,
+            "overlap": 0.022,
+            "velden": [
+              "geldigTot",
+              "ingetrokken",
+              "organisatie",
+              "terugbetaald"
+            ]
+          },
+          {
+            "paar": [
+              "ov",
+              "school"
+            ],
+            "gedeeld": 2,
+            "overlap": 0.014,
+            "velden": [
+              "rollen",
+              "uitAt"
+            ]
+          },
+          {
+            "paar": [
+              "taxi",
+              "verblijf"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.012,
+            "velden": [
+              "totaal"
+            ]
+          },
+          {
+            "paar": [
+              "beveiliging",
+              "school"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.007,
+            "velden": [
+              "actief"
+            ]
+          },
+          {
+            "paar": [
+              "horeca",
+              "festival"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "horeca",
+              "taxi"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "horeca",
+              "ov"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "horeca",
+              "verblijf"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "horeca",
+              "school"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "beveiliging",
+              "festival"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "festival",
+              "ov"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "festival",
+              "verblijf"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "verblijf",
+              "school"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          }
+        ]
+      }
+    },
+    "smal": {
+      "lus": {
+        "domeinen": 7,
+        "rondeLus": [],
+        "inAlleDomeinen": [],
+        "combinaties": 7,
+        "zeldzaamste": {
+          "station": "reistijd",
+          "domeinen": 0
+        },
+        "perStation": [
+          {
+            "station": "vraag",
+            "domeinen": 1
+          },
+          {
+            "station": "capaciteit",
+            "domeinen": 1
+          },
+          {
+            "station": "resource",
+            "domeinen": 3
+          },
+          {
+            "station": "beperking",
+            "domeinen": 2
+          },
+          {
+            "station": "plan",
+            "domeinen": 3
+          },
+          {
+            "station": "reistijd",
+            "domeinen": 0
+          },
+          {
+            "station": "uitvoering",
+            "domeinen": 3
+          },
+          {
+            "station": "werkelijk",
+            "domeinen": 1
+          },
+          {
+            "station": "herplan",
+            "domeinen": 1
+          }
+        ],
+        "rijen": [
+          {
+            "domein": "beveiliging",
+            "bestanden": 2,
+            "symbolen": 17,
+            "stations": [
+              "vraag",
+              "capaciteit",
+              "plan",
+              "herplan"
+            ]
+          },
+          {
+            "domein": "festival",
+            "bestanden": 1,
+            "symbolen": 9,
+            "stations": []
+          },
+          {
+            "domein": "horeca",
+            "bestanden": 1,
+            "symbolen": 11,
+            "stations": [
+              "resource",
+              "beperking",
+              "plan",
+              "uitvoering"
+            ]
+          },
+          {
+            "domein": "ov",
+            "bestanden": 1,
+            "symbolen": 13,
+            "stations": [
+              "werkelijk"
+            ]
+          },
+          {
+            "domein": "school",
+            "bestanden": 1,
+            "symbolen": 13,
+            "stations": [
+              "resource"
+            ]
+          },
+          {
+            "domein": "taxi",
+            "bestanden": 3,
+            "symbolen": 21,
+            "stations": [
+              "beperking",
+              "uitvoering"
+            ]
+          },
+          {
+            "domein": "verblijf",
+            "bestanden": 1,
+            "symbolen": 14,
+            "stations": [
+              "resource",
+              "plan",
+              "uitvoering"
+            ]
+          }
+        ]
+      },
+      "vorm": {
+        "domeinen": [
+          "horeca",
+          "beveiliging",
+          "taxi",
+          "ov",
+          "verblijf",
+          "school"
+        ],
+        "domeinenLeeg": [
+          {
+            "domein": "festival",
+            "reden": "geen enkele objectvorm gevonden onder /^server\\/kern\\/festival\\/dienst\\.js$/"
+          }
+        ],
+        "vormen": 15,
+        "velden": 48,
+        "perDomein": {
+          "horeca": {
+            "velden": 3,
+            "modules": [
+              "server/kern/personeel.js"
+            ]
+          },
+          "beveiliging": {
+            "velden": 12,
+            "modules": [
+              "server/kern/beveiliging/rooster/planning.js"
+            ]
+          },
+          "taxi": {
+            "velden": 4,
+            "modules": [
+              "server/kern/mobiliteit/cdt-export.js"
+            ]
+          },
+          "ov": {
+            "velden": 8,
+            "modules": [
+              "server/kern/ov/dienst.js"
+            ]
+          },
+          "verblijf": {
+            "velden": 16,
+            "modules": [
+              "server/kern/verblijf/receptie.js"
+            ]
+          },
+          "school": {
+            "velden": 6,
+            "modules": [
+              "server/school/klas.js"
+            ]
+          }
+        },
+        "inAlleDomeinen": [],
+        "inMinstensHelft": [],
+        "inEenDomeinPct": 97.9,
+        "paren": [
+          {
+            "paar": [
+              "horeca",
+              "beveiliging"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.071,
+            "velden": [
+              "shift"
+            ]
+          },
+          {
+            "paar": [
+              "horeca",
+              "taxi"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "horeca",
+              "ov"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "horeca",
+              "verblijf"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "horeca",
+              "school"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "beveiliging",
+              "taxi"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "beveiliging",
+              "ov"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "beveiliging",
+              "verblijf"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "beveiliging",
+              "school"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "taxi",
+              "ov"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "taxi",
+              "verblijf"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "taxi",
+              "school"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "ov",
+              "verblijf"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "ov",
+              "school"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "verblijf",
+              "school"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          }
+        ]
+      }
+    }
+  }
+}

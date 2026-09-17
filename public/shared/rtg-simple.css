@@ -208,7 +208,7 @@ body[data-rtg-world-dashboard-ready="true"] :where(
 }
 body[data-rtg-world-dashboard-ready="true"] :where(
   .standen button,.doelgroepnav a,.hoofdtabs button,.wereldtab){
-  min-height:44px!important;border:1px solid var(--rtg-world-line)!important;
+  min-height:48px!important;border:1px solid var(--rtg-world-line)!important;
   background:transparent!important;color:var(--rtg-world-muted)!important
 }
 body[data-rtg-world-dashboard-ready="true"] :where(

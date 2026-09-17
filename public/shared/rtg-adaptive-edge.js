@@ -12,7 +12,7 @@
     return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (paths[name] || paths.spark || '') + '</svg>';
   }
   function lips() {
-    return '<svg class="rtg-adaptive-lips" viewBox="0 0 100 58" aria-hidden="true"><path d="M3 31C20 26 31 6 49 17C67 5 79 26 97 31C79 52 66 57 49 47C32 57 19 52 3 31Z"/><path d="M13 31C29 34 39 29 49 29C61 29 71 34 87 31"/></svg>';
+    return '<svg class="rtg-adaptive-lips" viewBox="0 0 100 58" aria-hidden="true"><path d="M2 30C18 28 30 18 43 10C48 7 52 13 56 15C60 13 65 7 70 10C82 18 91 27 98 30C80 34 68 34 55 31C42 34 23 35 2 30Z"/><path d="M3 31C22 34 39 33 55 31C71 34 84 34 97 31C85 42 73 51 55 52C36 50 17 42 3 31Z"/><path d="M8 31C25 35 40 33 55 31C70 34 83 34 92 31"/></svg>';
   }
   function button(spec, slot) {
     var b = d.createElement('button');
@@ -36,7 +36,11 @@
     }
     setState('dock');
     var custom = rt.model.registry[action];
-    if (custom && custom.run) { if (K.allowed(custom)) { custom.run(); return true; } return false; }
+    if (custom && custom.run) {
+      if (!K.allowed(custom)) return false;
+      if (custom.confirm && !w.confirm(custom.confirm)) return false;
+      custom.run(); return true;
+    }
     if (action === 'home') { w.location.href = rt.edge.cfg.home; return true; }
     if (action === 'back') { w.history.back(); return true; }
     if (action === 'worlds') return legacy('.rtg-edge-worlds-trigger');
@@ -71,8 +75,6 @@
     rt.bar.textContent = '';
     K.SPECS[rt.model.deck].forEach(function (spec, index) { rt.bar.appendChild(button(spec, index)); });
     rt.host.dataset.rtgAdaptiveDeck = rt.model.deck;
-    rt.caption.textContent = rt.model.deck === 'home' ? rt.edge.cfg.kaart || 'Home' :
-      ({ context: 'Context', actions: 'Acties', connect: 'Connect', rahul: 'Rahul' })[rt.model.deck];
     rt.bar.children[2].setAttribute('aria-current', rt.model.deck === 'rahul' ? 'page' : 'false');
     renderSheet();
   }
@@ -82,7 +84,6 @@
     rt.model.state = K.normState(state); rt.host.dataset.rtgAdaptiveState = rt.model.state;
     d.body.dataset.rtgAdaptiveState = rt.model.state; rt.sheet.hidden = rt.model.state !== 'expanded';
     rt.sheet.setAttribute('aria-hidden', String(rt.model.state !== 'expanded'));
-    rt.caption.hidden = rt.model.state === 'peek';
     if (rt.model.state === 'expanded') renderSheet();
     if (source !== 'auto') rt.manual = rt.model.state === 'deck' || rt.model.state === 'expanded';
     return true;
@@ -122,12 +123,12 @@
   function build() {
     var host = d.createElement('section'); host.className = 'rtg-adaptive-edge'; host.setAttribute('aria-label', 'RTG Adaptive Edge');
     host.innerHTML = '<button class="rtg-adaptive-presence" type="button" hidden><i></i><span></span></button><div class="rtg-adaptive-identity" hidden></div>' +
-      '<section class="rtg-adaptive-sheet" hidden aria-hidden="true"><div class="rtg-adaptive-sheet-head"><div><small>VEILIGE VOLGENDE STAP</small><h2></h2><p></p></div><button type="button" data-rtg-adaptive-close aria-label="Sluiten">×</button></div><div class="rtg-adaptive-sheet-list"></div></section>' +
-      '<div class="rtg-adaptive-caption"></div><nav class="rtg-adaptive-bar" aria-label="Home, Context, Acties, Connect en Rahul"></nav>';
+      '<section class="rtg-adaptive-sheet" hidden aria-hidden="true"><div class="rtg-adaptive-sheet-head"><div><small>VEILIGE VOLGENDE STAP</small><h2></h2><p></p></div><button type="button" data-rtg-adaptive-close aria-label="Sluiten">×</button></div><div class="rtg-adaptive-guard"><i></i><span>Alleen toegestane acties</span><b>Mandaat gecontroleerd</b></div><div class="rtg-adaptive-sheet-list"></div></section>' +
+      '<nav class="rtg-adaptive-bar" aria-label="Home, Context, Acties, Connect en Rahul"></nav>';
     rt.edge.root.appendChild(host); rt.host = host; rt.bar = host.querySelector('.rtg-adaptive-bar');
     rt.sheet = host.querySelector('.rtg-adaptive-sheet'); rt.sheetTitle = host.querySelector('h2');
     rt.sheetCopy = host.querySelector('.rtg-adaptive-sheet-head p'); rt.sheetList = host.querySelector('.rtg-adaptive-sheet-list');
-    rt.caption = host.querySelector('.rtg-adaptive-caption'); rt.identity = host.querySelector('.rtg-adaptive-identity');
+    rt.identity = host.querySelector('.rtg-adaptive-identity');
     rt.presenceButton = host.querySelector('.rtg-adaptive-presence'); rt.presenceText = rt.presenceButton.querySelector('span');
     host.querySelector('[data-rtg-adaptive-close]').addEventListener('click', function () { setState('dock'); });
     rt.presenceButton.addEventListener('click', function () { execute('presence'); });

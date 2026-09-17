@@ -65,7 +65,8 @@
     var id = String(item && item.id || '');
     if (!state || !/^[a-z][a-z0-9-]{1,39}$/.test(id)) return false;
     state.registry[id] = { id: id, label: String(item.label || id).slice(0, 80),
-      allowed: item.allowed, run: typeof item.run === 'function' ? item.run : null };
+      allowed: item.allowed, confirm: item.confirm ? String(item.confirm).slice(0, 160) : '',
+      run: typeof item.run === 'function' ? item.run : null };
     return true;
   }
   function setProjection(state, input) {

@@ -34,6 +34,8 @@ test('intentprojectie toont uitsluitend geregistreerde en toegestane acties', ()
     .map(x => x.id), ['reis', 'hotel']);
   toegestaan = false;
   assert.deepEqual(kern.project(['reis'], model.registry, 4), []);
+  kern.register(model, { id: 'boeken', label: 'Boeken', confirm: 'Boeking bevestigen?', allowed: true });
+  assert.equal(model.registry.boeken.confirm, 'Boeking bevestigen?');
 });
 
 test('voorspelde acties verdringen geen veilige terugval en blijven begrensd', () => {
@@ -48,11 +50,15 @@ test('voorspelde acties verdringen geen veilige terugval en blijven begrensd', (
 
 test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(CSS, /data-rtg-adaptive-ready="true"\] \.rtg-edge-bottom\{display:none!important\}/);
-  assert.match(CSS, /grid-template-columns:repeat\(5,minmax\(44px,1fr\)\)/);
-  assert.match(CSS, /\.rtg-adaptive-item\{[^}]*min-width:44px;min-height:54px/);
-  assert.match(CSS, /backdrop-filter:blur\(24px\) saturate\(1\.3\)/);
+  assert.match(CSS, /grid-template-columns:repeat\(5,minmax\(48px,1fr\)\)/);
+  assert.match(CSS, /\.rtg-adaptive-item\{[^}]*min-width:48px;min-height:64px/);
+  assert.match(CSS, /backdrop-filter:blur\(28px\) saturate\(1\.32\)/);
   assert.match(VIEW, /class="rtg-adaptive-lips"/);
   assert.doesNotMatch(VIEW, /rtg-adaptive-lips[^\n]+(?:circle|ellipse)/);
+  assert.doesNotMatch(VIEW, /rtg-adaptive-caption/);
+  assert.match(CSS, /data-rtg-adaptive-state="peek"[^}]*width:136px;height:50px/);
+  assert.match(VIEW, /Mandaat gecontroleerd/);
+  assert.match(CSS, /\.rtg-adaptive-sheet \.rtg-edge-2-context-slot :is\([^}]+grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/);
 });
 
 test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
@@ -65,6 +71,8 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
   assert.match(INPUT, /handlers\.rahul\(\)/);
   assert.match(INPUT, /Alt|altKey/);
   assert.match(INPUT, /navigator\.vibrate\(8\)/);
+  assert.match(INPUT, /addEventListener\('scroll'/);
+  assert.match(INPUT, /handlers\.state\('peek', 'auto'\)/);
 });
 
 test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezig', () => {

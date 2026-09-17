@@ -15,6 +15,9 @@
    het eerlijke antwoord uit WAAROM (./aanmeldgesprek-hulp.js); daar mag het iets
    langer, want dan is er om uitleg gevraagd. */
 
+// dezelfde leeftijdsgrenzen als de registratieroute; ze wonen in lib/leeftijd.js
+const { LID_MIN_LEEFTIJD, LID_MAX_LEEFTIJD } = require('../lib/leeftijd');
+
 module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
   const { schoon, leeftijdVan, toon, gesprekken } = ctx;
   /* De ballotage kent vier vragen, en wie aanklopt mag weten waar hij staat:
@@ -57,8 +60,8 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
       if (m) d = m[1] + '-' + m[2] + '-' + m[3];
       else if ((m = /(\d{1,2})[-/](\d{1,2})[-/](\d{4})/.exec(tekst))) d = m[3] + '-' + String(m[2]).padStart(2, '0') + '-' + String(m[1]).padStart(2, '0');
       const lft = d ? leeftijdVan(d) : null;
-      if (lft == null || lft > 120) return stap(3, { vertrouwelijk: true, tekst: 'Die datum kan ik niet plaatsen. Als dag-maand-jaar, bijvoorbeeld 14-03-1992?' });
-      if (lft < 15) return { tekst: 'RTG kan vanaf 15 jaar. Tot die tijd is er de RTFoundation-wereld; die is er juist voor jou.' };
+      if (lft == null || lft > LID_MAX_LEEFTIJD) return stap(3, { vertrouwelijk: true, tekst: 'Die datum kan ik niet plaatsen. Als dag-maand-jaar, bijvoorbeeld 14-03-1992?' });
+      if (lft < LID_MIN_LEEFTIJD) return { tekst: 'RTG kan vanaf 15 jaar. Tot die tijd is er de RTFoundation-wereld; die is er juist voor jou.' };
       g.velden.geboortedatum = d;
       g.stap = 'wachtwoord';
       const jong = lft < 18 ? 'Voor jouw leeftijd gelden beschermende regels; die regel ik. ' : '';

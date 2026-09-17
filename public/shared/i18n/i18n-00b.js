@@ -86,12 +86,15 @@
 
   function voeg(groepen, st) {
     if (!kandidaat(st.bron)) return;
+    var known=w.RTGUiBronTekst && w.RTGUiBronTekst(st.bron);
+    if(taal==='en' && known!=null) return toon(st,known);
     var uitKast = KAST.van(taal).get(st.bron);
     if (uitKast != null) return toon(st, uitKast);
     /* Kast, dan schil, dan net. De kast is verser (hij kent ook schermen buiten
        de schil), de schil is breder bij een koude start, het net kost geld. */
     var uitSchil = SCHIL.van(taal).get(st.bron);
     if (uitSchil != null) return toon(st, uitSchil);
+    if(known!=null) toon(st,known); // Explicit source copy remains usable while a target translation is pending.
     if (!groepen.has(st.bron)) groepen.set(st.bron, new Set());
     groepen.get(st.bron).add(st);
   }

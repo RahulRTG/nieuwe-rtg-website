@@ -21,6 +21,11 @@ function api(base, pad, body, token) {
 }
 
 let srv, base, lid, brand;
+async function sign(token,body){
+  const current=await api(base,'/api/onboarding/status',{},token);
+  return api(base,'/api/onboarding/teken',{...body,contractVersion:current.body.contract.versie},token);
+}
+
 
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-onb-'));
@@ -64,7 +69,14 @@ test('1. een vers lid wordt bij het inloggen alleen naar naam, e-mail en geboort
 
 test('2. tekenen alleen maakt de onboarding rond; later aanvullen kan gewoon', async () => {
   // ZONDER adres, postcode, woonplaats of paspoort: alleen het contract
-  const t0 = await api(base, '/api/onboarding/teken', { naam: 'Reiziger Test', akkoord: true }, lid);
+  const before=(await api(base,'/api/onboarding/status',{},lid)).body;
+  for(const contractVersion of [undefined, before.contract.versie+1, String(before.contract.versie)]){
+    const rejected=await api(base,'/api/onboarding/teken',{naam:'Reiziger Test',akkoord:true,contractVersion},lid);
+    assert.equal(rejected.status,409);
+    const unchanged=(await api(base,'/api/onboarding/status',{},lid)).body;
+    assert.equal(unchanged.contract.ondertekend,false,'unseen or stale agreement cannot be signed');
+  }
+  const t0 = await sign(lid, { naam: 'Reiziger Test', akkoord: true });
   assert.equal(t0.status, 200);
   assert.equal(t0.body.klaar, true, 'een vers lid is binnen zodra hij tekent');
 
@@ -75,8 +87,8 @@ test('2. tekenen alleen maakt de onboarding rond; later aanvullen kan gewoon', a
   assert.equal(st.ontbrekend.length, 0, 'alle gevraagde velden ingevuld');
   assert.ok((st.laterVelden || []).find(v => v.id === 'adres').ingevuld, 'het adres staat er nu wel bij');
   // tekenen zonder akkoord/naam faalt
-  assert.equal((await api(base, '/api/onboarding/teken', { naam: '', akkoord: false }, lid)).status, 400);
-  const t = await api(base, '/api/onboarding/teken', { naam: 'Reiziger Test', akkoord: true }, lid);
+  assert.equal((await sign(lid, { naam: '', akkoord: false })).status, 400);
+  const t = await sign(lid, { naam: 'Reiziger Test', akkoord: true });
   assert.equal(t.status, 200);
   assert.equal(t.body.klaar, true, 'na tekenen is de onboarding rond');
   assert.equal(t.body.contract.ondertekend, true);
@@ -150,7 +162,7 @@ test('7. de gratis RTG Pass hoeft geen paspoort, tenzij hij RTG Pay gebruikt', a
   const velden = {};
   st.velden.forEach(v => { if (v.type !== 'kyc' && !v.ingevuld) velden[v.id] = v.id === 'email' ? 'vrij@x.nl' : v.id === 'land' ? 'NL' : 'Vrijwaarde'; });
   await api(base, '/api/onboarding/opslaan', { velden }, vrij);
-  await api(base, '/api/onboarding/teken', { naam: 'Vrij Lid', akkoord: true }, vrij);
+  await sign(vrij, { naam: 'Vrij Lid', akkoord: true });
   st = (await api(base, '/api/onboarding/status', {}, vrij)).body;
   assert.equal(st.klaar, true, 'zonder paspoort is de gratis onboarding rond');
 

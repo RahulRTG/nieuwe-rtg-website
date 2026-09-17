@@ -451,6 +451,8 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // This test executes the browser language loader in a VM, not through require.
+  ['i18n-dictionary.test.js', ['public/shared/i18n.js']],
   // De openbare demonstratie leest haar scenario's lokaal. Een liegende API
   // verandert die niet; deze schermtoets moet de echte browserbron beproeven.
   ['experience-rtg.e2e.js', ['public/site/start/experience-core.js',

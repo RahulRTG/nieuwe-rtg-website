@@ -35,7 +35,7 @@
     });
     if (d.querySelector('#rtgCommand .cmd-lade')) {
       var werk = d.createElement('button'); werk.type = 'button'; werk.className = 'rtg-edge-smart-door';
-      werk.setAttribute('data-edge-command-bank', ''); werk.textContent = 'Werelden en werkbladen';
+      werk.setAttribute('data-edge-command-bank', ''); werk.innerHTML = icoon('grid') + '<span>Werelden en werkbladen</span><em aria-hidden="true">›</em>';
       werk.addEventListener('click', function () { openWerkbladen(rt); });
       rt.alles.querySelector('.rtg-edge-smart-doors').appendChild(werk);
     }

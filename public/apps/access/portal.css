@@ -36,9 +36,9 @@ body[data-ios-home][data-rtg-skin="heritage"] #onbGate{
 }
 #gate[data-rtg-access] .access-primary svg{width:25px;height:28px;fill:none;stroke:currentColor;flex-shrink:0}
 #gate[data-rtg-access] .access-hint{font-size:12px;line-height:1.6;color:#dacbd0;margin:10px 0 24px;text-align:center}
-#gate[data-rtg-access] .access-link{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 0;background:none;border:0;border-bottom:1px solid #a27c89;border-radius:0;color:#f4eddc;font-size:15px;text-align:left}
+#gate[data-rtg-access] .access-link{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 0;background:none;border:0;border-bottom:1px solid #a27c89;border-radius:0;color:#f4eddc;font-size:15px;text-align:start}
 #gate[data-rtg-access] .access-new{margin:24px 0 0;font-size:14px;line-height:1.6}
-#gate[data-rtg-access] .access-new button{display:inline;padding:0 4px;background:none;border:0;color:#f4eddc;font-size:inherit;text-decoration:underline;text-underline-offset:4px}
+#gate[data-rtg-access] .access-new button{display:inline-flex;align-items:center;padding:0 4px;background:none;border:0;color:#f4eddc;font-size:inherit;text-decoration:underline;text-underline-offset:4px}
 #gate[data-rtg-access] .ag-experience{margin:16px 0;color:#dacbd0;font-size:12px;line-height:1.6}
 #gate[data-rtg-access] .access-progress{font-size:11px;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;color:#dacbd0;margin:0 0 20px}
 #gate[data-rtg-access][data-access-view]:not([data-access-view="welcome"]) .access-title{font-size:clamp(36px,9.5vw,52px);line-height:1.1;letter-spacing:-.04em;margin-bottom:16px}
@@ -46,7 +46,7 @@ body[data-ios-home][data-rtg-skin="heritage"] #onbGate{
 #gate[data-rtg-access] .access-field input,#onbGate #onbIn{
   display:block;width:100%;max-width:100%;min-width:0;min-height:56px;box-sizing:border-box;margin:8px 0 0;padding:14px;
   font:400 16px/1.5 Inter,sans-serif;color:#f4eddc;background:#ffffff08;border:1px solid #ad8792;border-radius:var(--rtg-radius-content);
-  text-align:left;color-scheme:dark;box-shadow:none;
+  text-align:start;color-scheme:dark;box-shadow:none;
 }
 #gate[data-rtg-access] input::placeholder,#onbGate #onbIn::placeholder{color:#c5aeb7;opacity:1}
 #gate[data-rtg-access] input[aria-invalid="true"]{border-color:#ffd0d7}
@@ -60,7 +60,7 @@ body[data-ios-home][data-rtg-skin="heritage"] #onbGate{
 #gate[data-rtg-access] .access-summary summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
 #gate[data-rtg-access] .access-summary button{display:block;font-size:13px;min-height:44px;padding:4px 0}
 #gate[data-rtg-access] .access-foundation{display:block;color:#f4eddc;margin:16px 0;font-size:14px;line-height:1.6;text-underline-offset:4px}
-#onbGate .onb-card{max-width:520px;text-align:left;color:#f4eddc;margin:0 auto}
+#onbGate .onb-card{max-width:520px;text-align:start;color:#f4eddc;margin:0 auto}
 #onbGate .onb-mond{display:none}
 #onbGate .onb-zin{color:#f4eddc;font:400 clamp(30px,7.5vw,42px)/1.25 "Bodoni Moda",Georgia,serif;margin:20px 0;text-wrap:pretty}
 #onbGate .onb-rij{display:flex;flex-wrap:wrap;border:0;margin:0;gap:14px}
@@ -69,7 +69,7 @@ body[data-ios-home][data-rtg-skin="heritage"] #onbGate{
 #onbGate .onb-acties button{color:#f4eddc;background:none;border:0;border-bottom:1px solid #ad8792;min-height:48px;padding:8px 0;margin:10px 0;font:400 14px/1.5 Inter,sans-serif}
 #onbGate .onb-lees{max-height:38dvh;overflow:auto;padding:18px;margin:16px 0;border:1px solid #ad8792;border-radius:var(--rtg-radius-content);background:#270813;color:#f4eddc;font:400 14px/1.7 Inter,sans-serif;white-space:pre-wrap}
 #onbGate .onb-consent{display:flex;align-items:flex-start;gap:12px;margin:20px 0;color:#f4eddc;font-size:14px;line-height:1.6}
-#onbGate .onb-consent input{width:22px;height:22px;flex:0 0 22px;accent-color:#b93561;margin:2px 0}
+#onbGate .onb-consent input{width:24px;height:24px;flex:0 0 24px;accent-color:#b93561;margin:2px 0}
 #onbGate .onb-consent[hidden]{display:none}
 #onbGate .onb-fout{color:#ffd9dd;font-size:14px;line-height:1.6}
 @media(min-width:900px){
@@ -93,3 +93,11 @@ body:has(#onbGate:not([hidden])) .rtg-adaptive-edge{
 #onbGate .onb-zin{font:400 16px/1.6 Inter,sans-serif;margin:16px 0;min-height:0}
 #onbGate .onb-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 16px;font:400 13px/1.6 Inter,sans-serif}
 #onbGate .onb-links a{display:inline-flex;align-items:center;min-height:44px;color:#dacbd0;text-underline-offset:4px}
+
+/* Scripts and longer translations follow the document direction and keep room. */
+#gate[data-rtg-access] :is(.access-title,.access-description,.access-primary),#onbGate :is(.onb-heading,.onb-zin,#onbGo){overflow-wrap:anywhere;hyphens:auto}
+[dir="rtl"] #gate[data-rtg-access] .access-link>span[aria-hidden="true"]{transform:scaleX(-1)}
+#gate[data-rtg-access] input:is([type="email"],[type="password"]){direction:ltr;text-align:start}
+#gate[data-rtg-access] .access-summary bdi{unicode-bidi:isolate}
+
+#gate .access-language-notice,#onbGate .access-language-notice{font:400 13px/1.6 Inter,sans-serif;color:#e3d1d7;border-inline-start:2px solid #c63565;padding-inline-start:12px;margin:14px 0}

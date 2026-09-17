@@ -127,18 +127,16 @@
     };
     return M[v.id] || (T('onb.q.veld','Wat is uw ') + String(v.label || '').toLowerCase() + '?');
   }
-  function onbVraagVeld(v){
+  function onbVraagVeld(v,preserve){
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');
     if (rij) rij.style.display = '';
-    if (inp){ inp.type = onbInputType(v.type); inp.value = ''; inp.placeholder = T('onb.typ','Vul uw antwoord in'); }
+    if (inp){ if(!preserve){inp.type = onbInputType(v.type); inp.value = '';} inp.placeholder = T('onb.typ','Vul uw antwoord in'); }
     onbEl('onbConsentLabel').hidden = true;
     onbEl('onbGo').dataset.i18n = 'access.onb.next';
+    onbEl('onbGo').dataset.i18nSource = 'Ga verder';
     onbEl('onbGo').textContent = T('access.onb.next','Ga verder');
     if (inp) inp.setAttribute('aria-label', v.label || 'Uw antwoord');
     onbActies([]);
     onbZeg(onbVraagTekst(v));
-    if (inp) inp.focus();
+    if (inp && !preserve) inp.focus();
   }
-  function onbVraagPaspoort(){
-    const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
-    onbZeg(T('onb.q.paspoort','Voor deze toegang is een identiteitscontrole nodig. Scan uw paspoort of kies een duidelijke foto van de voorkant.'));

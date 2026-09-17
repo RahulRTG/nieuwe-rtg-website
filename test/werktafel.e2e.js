@@ -47,9 +47,10 @@ async function opzet() {
 }
 
 async function tekenOnboarding(base, token) {
+  const status=await fetch(base+'/api/onboarding/status',{method:'POST',headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
   const r = await fetch(base + '/api/onboarding/teken', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-    body: JSON.stringify({ naam: 'Werktafel Proef', akkoord: true })
+    body: JSON.stringify({ naam: 'Werktafel Proef', akkoord: true,contractVersion:status.contract.versie })
   });
   const d = await r.json().catch(() => ({}));
   assert.equal(r.status, 200, 'onboarding tekenen: ' + JSON.stringify(d).slice(0, 200));

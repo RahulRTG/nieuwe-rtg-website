@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-16T18:09:56.654Z",
-    "commit": "1b220b6ce",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-17T00:06:32.622Z",
+    "commit": "cb1665ec3",
+    "boomVuil": true,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -80,6 +80,13 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "access-language.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "accountroutes.test.js": {
       "soort": "puur",
@@ -3753,6 +3760,14 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "i18n-dictionary.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/i18n.js",
+      "operator": ">=->>#3",
+      "gezakt": 1,
+      "geprobeerd": 34
+    },
     "ideeen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4285,6 +4300,14 @@
       "module": "server/kern/command/landpakket.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "language-foundations.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/access/meaning.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "leden-gids-pg.test.js": {

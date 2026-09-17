@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'dc4421c0';
+var RTG_BOUW = '6d831fac';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -29,9 +29,13 @@ var RTG_BOUW = 'dc4421c0';
   } catch (e) { /* geen sessionStorage: dan liever doorgaan dan omvallen */ }
 })();
   const $ = s => document.querySelector(s);
-  const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  const T = (k, nl) => {
+    const translated=window.RTGi18n ? RTGi18n.t(k,nl):nl;
+    if (!window.RTGAccessMeaning || (!k.startsWith('access.') && !k.startsWith('onb.'))) return translated;
+    return RTGAccessMeaning.projection(k,nl,(window.I18N && I18N.en || {})[k],lang(),translated).text;
+  };
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
-  const nfmt = n => Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+  const nfmt = n => Number(n).toLocaleString(lang());
   const eur = n => '€ ' + nfmt(n);
   const STATUS = { 'wacht-op-betaling':'awaiting payment', 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded' };
   const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
@@ -426,14 +430,18 @@ var RTG_BOUW = 'dc4421c0';
     creatorLikes = Number(MAGNAAT.creatorLikes || 0);
   }
 
+  function accessRequest(meaningId,parameters){
+    const intent=RTGAccessMeaning.plan(meaningId,parameters,1);
+    return API.call(intent.route,intent.parameters);
+  }
   async function login(tier, cred){
     if (cred){
       if (API.enabled){
         try {
           const data = cred.response || (cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: cred.portal ? 'rtg' : vastePas || undefined,
-                wervingscode: wervingscode || undefined })
-            : await API.call('/auth/login', { login: cred.u, password: cred.p, pasApp: vastePas || undefined }));
+            ? await accessRequest('identity.account.create', { name:cred.name,email:cred.u,geboortedatum:cred.geboortedatum,password:cred.p,
+                wervingscode:wervingscode || undefined })
+            : await accessRequest('identity.session.open', {login:cred.u,password:cred.p,pasApp:vastePas || undefined}));
           if (data.tweedeFactorNodig) return data;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
           API.token = data.token;
@@ -552,38 +560,39 @@ var RTG_BOUW = 'dc4421c0';
   (function aanmeldPortaal(){
     const gate = document.getElementById('gate');
     if (!gate || !API.enabled) return;
-    const tx = (nl, en) => lang() === 'en' ? en : nl;
     gate.dataset.rtgAccess = 'true';
+    gate.setAttribute('data-i18n-ignore','');
     gate.innerHTML =
-      '<div class="access-brand" aria-label="RTG">RTG<small>' + tx('VEILIGE TOEGANG','SECURE ACCESS') + '</small></div>' +
+      '<div class="access-brand" aria-label="RTG">RTG<small>' + 'VEILIGE TOEGANG' + '</small></div>' +
       '<div class="access-content">' +
-        '<button class="access-secondary access-back" id="agBack" type="button" hidden>' + tx('Terug','Back') + '</button>' +
+        '<button class="access-secondary access-back" id="agBack" type="button" hidden>' + 'Terug' + '</button>' +
         '<p class="access-progress" id="agStappen" role="status" aria-live="polite" hidden></p>' +
         '<h1 class="access-title" id="agTitle" tabindex="-1"></h1>' +
         '<p class="access-description" id="agZin"></p>' +
+        '<p class="access-language-notice" id="agLanguageNotice" lang="en" hidden></p>' +
         '<p class="ag-experience" id="agExperience" hidden></p>' +
         '<div id="agWelcome">' +
           '<button class="access-primary" id="agPasskey" type="button">' +
             '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 11a2 2 0 0 0-2 2c0 2-.4 3.6-1 5M8 9a4 4 0 0 1 7 2c0 3-.5 5.4-1.5 7.5M12 13c0 3-.6 5.6-1.6 7.7M5.5 8a7 7 0 0 1 12 3c0 3.4-.5 6.4-1.5 9"/></svg>' +
-            '<span>' + tx('Verder met passkey','Continue with a passkey') + '</span></button>' +
-          '<p class="access-hint">' + tx('U gebruikt de beveiliging van uw apparaat.','You use your device’s security.') + '</p>' +
-          '<button class="access-link" id="agAnders" type="button"><span>' + tx('Andere manier','Another way') + '</span><span aria-hidden="true">→</span></button>' +
-          '<p class="access-new">' + tx('Bent u nieuw bij RTG?','Are you new to RTG?') +
-            ' <button id="agNieuw" type="button">' + tx('Maak uw RTG','Create your RTG') + '</button></p>' +
+            '<span>' + 'Verder met passkey' + '</span></button>' +
+          '<p class="access-hint">' + 'U gebruikt de beveiliging van uw apparaat.' + '</p>' +
+          '<button class="access-link" id="agAnders" type="button"><span>' + 'Andere manier' + '</span><span aria-hidden="true">→</span></button>' +
+          '<p class="access-new"><span>' + 'Bent u nieuw bij RTG?' +
+            '</span> <button id="agNieuw" type="button">' + 'Maak uw RTG' + '</button></p>' +
         '</div>' +
         '<form id="agForm" hidden novalidate>' +
           '<label class="access-field" id="agLabel"><span id="agFieldLabel"></span><input id="agIn" aria-describedby="agZin agError" required></label>' +
-          '<label class="access-field" id="agCodeLabel" hidden>' + tx('Sms-code, als u die heeft ontvangen','Text message code, if you received one') +
-            '<input id="agCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></label>' +
-          '<button id="agShowPassword" class="access-secondary" type="button" hidden aria-pressed="false">' + tx('Toon wachtwoord','Show password') + '</button>' +
-          '<details class="access-summary" id="agSummary" hidden><summary>' + tx('Controleer uw gegevens','Review your details') + '</summary><div id="agReview"></div></details>' +
+          '<label class="access-field" id="agCodeLabel" hidden><span>' + 'Sms-code, als u die heeft ontvangen' +
+            '</span><input id="agCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></label>' +
+          '<button id="agShowPassword" class="access-secondary" type="button" hidden aria-pressed="false">' + 'Toon wachtwoord' + '</button>' +
+          '<details class="access-summary" id="agSummary" hidden><summary>' + 'Controleer uw gegevens' + '</summary><div id="agReview"></div></details>' +
           '<button class="access-primary" id="agGo" type="submit"></button>' +
-          '<button class="access-secondary" id="agForgot" type="button" hidden>' + tx('Wachtwoord vergeten','Forgot your password') + '</button>' +
+          '<button class="access-secondary" id="agForgot" type="button" hidden>' + 'Wachtwoord vergeten' + '</button>' +
         '</form>' +
         '<p class="access-status" id="agStatus" role="status" aria-live="polite"></p>' +
         '<p class="access-error" id="agError" role="alert"></p>' +
         '<a class="access-foundation" id="agFoundation" href="/apps/foundation/os-publiek.html" hidden>' +
-          tx('Ontdek FoundationOS. Dit is en blijft altijd 100% gratis.','Explore FoundationOS. It is and always will be 100% free.') + '</a>' +
+          'Ontdek FoundationOS. Dit is en blijft altijd 100% gratis.' + '</a>' +
       '</div>';
     const el = id => gate.querySelector('#' + id);
     const inp = el('agIn'), form = el('agForm'), title = el('agTitle');
@@ -592,37 +601,35 @@ var RTG_BOUW = 'dc4421c0';
     let passkeyAbort = null, passkeyAttempt = 0;
     let resetToken = new URLSearchParams(location.search).get('reset') || '';
     const interests = window.RTGExperienceHandoff && window.RTGExperienceHandoff.consume();
-    if (interests && interests.length) {
-      el('agExperience').textContent = tx('U verkende ', 'You explored ') + interests.join(', ') +
-        tx('. Dit wordt hier getoond en niet in uw account opgeslagen.','. This is shown here and is not saved to your account.');
-      el('agExperience').hidden = false;
-    }
+    let lastMessage = null;
     function message(text, error){
+      lastMessage = { text, error:!!error };
       el(error ? 'agStatus' : 'agError').textContent = '';
-      el(error ? 'agError' : 'agStatus').textContent = text || '';
-      if (error) inp.setAttribute('aria-invalid', 'true');
+      el(error ? 'agError' : 'agStatus').textContent = typeof text === 'function' ? text() : (text || '');
+      if (error && !form.hidden) inp.setAttribute('aria-invalid', 'true');
     }
     function waiting(on){
       busy = on; form.setAttribute('aria-busy', String(on));
       gate.querySelectorAll('button,input').forEach(button => { button.disabled = on; });
     }
     /* Each question is a full sentence; labels and keyboard hints stay explicit. */
-    const steps = [
-      { key:'name', type:'text', auto:'name', label:tx('Volledige naam','Full name'),
-        title:tx('Hoe mogen we u noemen?','What is your name?'),
-        text:tx('Vul uw volledige naam in. We gebruiken deze voor uw account en de overeenkomst.','Enter your full name. We use it for your account and the agreement.') },
-      { key:'email', type:'email', auto:'email', label:tx('E-mailadres','Email address'),
-        title:tx('Op welk adres kunnen we u bereiken?','Which email address can we reach you at?'),
-        text:tx('U gebruikt dit e-mailadres om in te loggen en uw account te herstellen.','You use this email address to sign in and recover your account.') },
-      { key:'geboortedatum', type:'date', auto:'bday', label:tx('Geboortedatum','Date of birth'),
-        title:tx('Wat is uw geboortedatum?','What is your date of birth?'),
-        text:tx('Uw leeftijd bepaalt welke onderdelen u kunt gebruiken. Voor dit account moet u minimaal 15 jaar zijn.','Your age determines which features you can use. You must be at least 15 to create this account.') },
-      { key:'password', type:'password', auto:'new-password', label:tx('Wachtwoord','Password'),
-        title:tx('Hoe wilt u uw account beveiligen?','How would you like to secure your account?'),
-        text:tx('Kies een uniek wachtwoord van minstens zes tekens. U maakt een gratis account aan; een betaalde pas kiest u apart. Daarna leest en bevestigt u de overeenkomst.','Choose a unique password of at least six characters. You are creating a free account; paid passes are a separate choice. You will then read and confirm the agreement.') }
+    const steps = () => [
+      { key:'name', type:'text', auto:'name', label:T('access.portal.full_name','Volledige naam'),
+        title:T('access.portal.what_is_your_name','Hoe mogen we u noemen?'),
+        text:T('access.portal.enter_your_full_name_we_use_it_for_your_account_and_the_agreement','Vul uw volledige naam in. We gebruiken deze voor uw account en de overeenkomst.') },
+      { key:'email', type:'email', auto:'email', label:T('access.portal.email_address','E-mailadres'),
+        title:T('access.portal.which_email_address_can_we_reach_you_at','Op welk adres kunnen we u bereiken?'),
+        text:T('access.portal.you_use_this_email_address_to_sign_in_and_recover_your_account','U gebruikt dit e-mailadres om in te loggen en uw account te herstellen.') },
+      { key:'geboortedatum', type:'date', auto:'bday', label:T('access.portal.date_of_birth','Geboortedatum'),
+        title:T('access.portal.what_is_your_date_of_birth','Wat is uw geboortedatum?'),
+        text:T('access.portal.your_age_determines_which_features_you_can_use_you_must_be_at_lea','Uw leeftijd bepaalt welke onderdelen u kunt gebruiken. Voor dit account moet u minimaal 15 jaar zijn.') },
+      { key:'password', type:'password', auto:'new-password', label:T('access.portal.password','Wachtwoord'),
+        title:T('access.portal.how_would_you_like_to_secure_your_account','Hoe wilt u uw account beveiligen?'),
+        text:T('access.portal.choose_a_unique_password_of_at_least_six_characters_you_are_creat','Kies een uniek wachtwoord van minstens zes tekens. U maakt een gratis account aan; een betaalde pas kiest u apart. Daarna leest en bevestigt u de overeenkomst.') }
     ];
+    let presentationOnly=false;
     function field(type, label, auto, value){
-      inp.type = type; inp.value = value || ''; inp.name = auto || 'answer';
+      if(!presentationOnly){inp.type = type; inp.value = value || '';} inp.name = auto || 'answer';
       inp.autocomplete = auto || 'off'; inp.inputMode = type === 'email' ? 'email' : 'text';
       inp.autocapitalize = auto === 'name' ? 'words' : 'none'; inp.spellcheck = false;
       inp.maxLength = type === 'password' ? 200 : type === 'email' ? 254 : 80;
@@ -636,58 +643,100 @@ var RTG_BOUW = 'dc4421c0';
       inp.placeholder = ''; inp.setAttribute('aria-label', label);
       el('agFieldLabel').textContent = label;
       el('agShowPassword').hidden = type !== 'password';
-      el('agShowPassword').textContent = tx('Toon wachtwoord','Show password');
+      el('agShowPassword').textContent = T('access.portal.show_password','Toon wachtwoord');
       el('agShowPassword').setAttribute('aria-pressed','false');
     }
-    function render(next, focus){
-      if (passkeyAbort) { passkeyAbort.abort(); passkeyAbort = null; passkeyAttempt++; }
+    function render(next, focus, preserve){
+      const saved = preserve ? {value:inp.value,code:el('agCode').value,type:inp.type,shown:el('agShowPassword').getAttribute('aria-pressed'),invalid:inp.getAttribute('aria-invalid'),foundation:!el('agFoundation').hidden} : null;
+      if (!preserve && passkeyAbort) { passkeyAbort.abort(); passkeyAbort = null; passkeyAttempt++; }
+      presentationOnly=!!preserve;
       view = next; gate.dataset.accessView = view;
-      inp.value = ''; el('agCode').value = ''; inp.removeAttribute('aria-invalid');
+      refreshChrome();
+      if (!preserve) lastMessage = null;
+      if(!preserve){inp.value = ''; el('agCode').value = ''; inp.removeAttribute('aria-invalid');}
       el('agError').textContent = ''; el('agStatus').textContent = '';
       el('agWelcome').hidden = view !== 'welcome'; form.hidden = view === 'welcome' || view === 'sent';
       el('agBack').hidden = view === 'welcome'; el('agStappen').hidden = view !== 'register';
       el('agSummary').hidden = view !== 'register' || step !== 3;
       el('agCodeLabel').hidden = view !== 'reset'; el('agForgot').hidden = view !== 'password';
       el('agFoundation').hidden = true;
-      el('agGo').textContent = tx('Ga verder','Continue');
+      el('agGo').textContent = T('access.portal.continue','Ga verder');
       if (view === 'welcome') {
-        title.innerHTML = tx('Welkom<br>in uw<br><em>RTG.</em>','Welcome<br>to your<br><em>RTG.</em>');
-        el('agZin').textContent = tx('Eén toegang tot uw leven, reizen, werk en kansen.','One place for life, travel, work and opportunity.');
+        title.textContent = T('access.portal.welcome_intro','Welkom in uw');
+        title.appendChild(document.createElement('br'));
+        const brand = document.createElement('em'); brand.textContent=T('access.portal.brand','RTG.'); title.appendChild(brand);
+        el('agZin').textContent = T('access.portal.one_place_for_life_travel_work_and_opportunity','Eén toegang tot uw leven, reizen, werk en kansen.');
       } else if (view === 'register') {
-        const s = steps[step]; title.textContent = s.title; el('agZin').textContent = s.text;
-        el('agStappen').textContent = tx('Stap ','Step ') + (step + 1) + tx(' van 4',' of 4');
+        const s = steps()[step]; title.textContent = s.title; el('agZin').textContent = s.text;
+        el('agStappen').textContent = T('access.portal.progress','Stap {step} van 4').replace('{step}',String(step+1));
         field(s.type, s.label, s.auto, draft[s.key]);
         if (step === 3) {
-          el('agGo').textContent = tx('Maak mijn account aan','Create my account');
+          el('agGo').textContent = T('access.portal.create_my_account','Maak mijn account aan');
           const review = el('agReview'); review.textContent = '';
-          steps.slice(0,3).forEach((s,i) => {
+          steps().slice(0,3).forEach((s,i) => {
             const button = document.createElement('button'); button.type = 'button'; button.className = 'access-secondary';
-            button.textContent = s.label + ': ' + draft[s.key] + tx(', wijzigen',', edit');
+            button.setAttribute('data-user-content','');
+            button.textContent = s.label + ': ';
+            const value=document.createElement('bdi'); value.textContent=draft[s.key]; button.appendChild(value);
+            button.appendChild(document.createTextNode(T('access.portal.edit',', wijzigen')));
             button.addEventListener('click', () => { step=i; render('register',true); });
             review.appendChild(button);
           });
         }
       } else {
         const copy = {
-          login:[tx('Welkom terug.','Welcome back.'),tx('Vul uw e-mailadres of gebruikersnaam in. Daarna vragen we om uw wachtwoord.','Enter your email address or username. We will then ask for your password.'),'text',tx('E-mailadres of gebruikersnaam','Email address or username'),'username',accountName],
-          password:[tx('Open uw RTG.','Open your RTG.'),tx('Vul uw wachtwoord in om veilig verder te gaan.','Enter your password to continue securely.'),'password',tx('Wachtwoord','Password'),'current-password',''],
-          second:[tx('Bevestig dat u het bent.','Confirm it is you.'),tx('Vul de code uit uw authenticator-app of een van uw herstelcodes in.','Enter the code from your authenticator app or one of your recovery codes.'),'text',tx('Verificatiecode','Verification code'),'one-time-code',''],
-          forgot:[tx('We helpen u weer op weg.','Let us help you get back in.'),tx('Vul het e-mailadres van uw account in. Als herstel mogelijk is, ontvangt u daar de vervolgstappen.','Enter your account email address. If recovery is available, you will receive the next steps there.'),'email',tx('E-mailadres','Email address'),'email',accountName.includes('@')?accountName:''],
-          reset:[tx('Kies een nieuw wachtwoord.','Choose a new password.'),tx('Gebruik minstens zes tekens. Heeft u ook een sms-code ontvangen? Vul die dan hieronder in. Zonder ontvangen sms-code laat u dat veld leeg.','Use at least six characters. If you also received a text message code, enter it below. Otherwise, leave that field empty.'),'password',tx('Nieuw wachtwoord','New password'),'new-password',''],
-          sent:[tx('Controleer uw e-mail.','Check your email.'),tx('Als dit adres bij een account hoort en herstel mogelijk is, ontvangt u de vervolgstappen per e-mail. Kijk ook in uw ongewenste e-mail.','If this address belongs to an account and recovery is available, you will receive the next steps by email. Please also check your spam folder.'),'email','','off','']
+          login:[T('access.portal.welcome_back','Welkom terug.'),T('access.portal.enter_your_email_address_or_username_we_will_then_ask_for_your_pa','Vul uw e-mailadres of gebruikersnaam in. Daarna vragen we om uw wachtwoord.'),'text',T('access.portal.email_address_or_username','E-mailadres of gebruikersnaam'),'username',accountName],
+          password:[T('access.portal.open_your_rtg','Open uw RTG.'),T('access.portal.enter_your_password_to_continue_securely','Vul uw wachtwoord in om veilig verder te gaan.'),'password',T('access.portal.password','Wachtwoord'),'current-password',''],
+          second:[T('access.portal.confirm_it_is_you','Bevestig dat u het bent.'),T('access.portal.enter_the_code_from_your_authenticator_app_or_one_of_your_recover','Vul de code uit uw authenticator-app of een van uw herstelcodes in.'),'text',T('access.portal.verification_code','Verificatiecode'),'one-time-code',''],
+          forgot:[T('access.portal.let_us_help_you_get_back_in','We helpen u weer op weg.'),T('access.portal.enter_your_account_email_address_if_recovery_is_available_you_wil','Vul het e-mailadres van uw account in. Als herstel mogelijk is, ontvangt u daar de vervolgstappen.'),'email',T('access.portal.email_address','E-mailadres'),'email',accountName.includes('@')?accountName:''],
+          reset:[T('access.portal.choose_a_new_password','Kies een nieuw wachtwoord.'),T('access.portal.use_at_least_six_characters_if_you_also_received_a_text_message_c','Gebruik minstens zes tekens. Heeft u ook een sms-code ontvangen? Vul die dan hieronder in. Zonder ontvangen sms-code laat u dat veld leeg.'),'password',T('access.portal.new_password','Nieuw wachtwoord'),'new-password',''],
+          sent:[T('access.portal.check_your_email','Controleer uw e-mail.'),T('access.portal.if_this_address_belongs_to_an_account_and_recovery_is_available_y','Als dit adres bij een account hoort en herstel mogelijk is, ontvangt u de vervolgstappen per e-mail. Kijk ook in uw ongewenste e-mail.'),'email','','off','']
         }[view];
         title.textContent = copy[0]; el('agZin').textContent = copy[1]; field(copy[2],copy[3],copy[4],copy[5]);
-        if (view === 'password' || view === 'second') el('agGo').textContent = tx('Log in','Sign in');
-        if (view === 'forgot') el('agGo').textContent = tx('Vraag herstel aan','Request recovery');
-        if (view === 'reset') el('agGo').textContent = tx('Sla mijn wachtwoord op','Save my password');
+        if (view === 'password' || view === 'second') el('agGo').textContent = T('access.portal.sign_in','Log in');
+        if (view === 'forgot') el('agGo').textContent = T('access.portal.request_recovery','Vraag herstel aan');
+        if (view === 'reset') el('agGo').textContent = T('access.portal.save_my_password','Sla mijn wachtwoord op');
       }
+      const action={password:'identity.session.open',second:'identity.second_factor.verify',forgot:'identity.recovery.request',reset:'identity.password.replace'}[view] || (view==='register' && step===3?'identity.account.create':'');
+      el('agGo').dataset.rtgMeaning=action;
+      if (saved) {
+        // Do not rewrite a focused input: it would collapse its selection or IME composition.
+        el('agShowPassword').setAttribute('aria-pressed',saved.shown);
+        el('agShowPassword').textContent=saved.shown==='true'?T('access.portal.hide_password','Verberg wachtwoord'):T('access.portal.show_password','Toon wachtwoord');
+        if(saved.invalid) inp.setAttribute('aria-invalid',saved.invalid);
+        el('agFoundation').hidden=!saved.foundation;
+        if(lastMessage) message(lastMessage.text,lastMessage.error);
+      }
+      presentationOnly=false;
       if (focus) { if (!form.hidden) inp.focus({preventScroll:true}); else title.focus({preventScroll:true}); gate.scrollTop=0; }
+    }
+/* Refresh only presentation during a language change; identity stays in memory. */
+    function refreshChrome(){
+      el('agLanguageNotice').textContent=T('access.portal.language_notice','Sommige bevestigingen worden in het Engels getoond. Uw acties en bevoegdheden blijven gelijk.');
+      el('agLanguageNotice').hidden=RTGAccessMeaning.criticalLanguages.includes(lang());
+      el('agPasskey').dataset.rtgMeaning='identity.passkey.verify';
+      gate.setAttribute('aria-label',T('access.portal.sign_in','Log in'));
+      gate.querySelector(".access-brand small").textContent=T("access.portal.secure_access","VEILIGE TOEGANG");
+      gate.querySelector("#agBack").textContent=T("access.portal.back","Terug");
+      gate.querySelector("#agPasskey span").textContent=T("access.portal.continue_with_a_passkey","Verder met passkey");
+      gate.querySelector(".access-hint").textContent=T("access.portal.you_use_your_device_s_security","U gebruikt de beveiliging van uw apparaat.");
+      gate.querySelector("#agAnders span").textContent=T("access.portal.another_way","Andere manier");
+      gate.querySelector(".access-new>span").textContent=T("access.portal.are_you_new_to_rtg","Bent u nieuw bij RTG?");
+      gate.querySelector("#agNieuw").textContent=T("access.portal.create_your_rtg","Maak uw RTG");
+      gate.querySelector("#agCodeLabel>span").textContent=T("access.portal.text_message_code_if_you_received_one","Sms-code, als u die heeft ontvangen");
+      gate.querySelector("#agSummary summary").textContent=T("access.portal.review_your_details","Controleer uw gegevens");
+      gate.querySelector("#agForgot").textContent=T("access.portal.forgot_your_password","Wachtwoord vergeten");
+      gate.querySelector("#agFoundation").textContent=T("access.portal.explore_foundationos_it_is_and_always_will_be_100_free","Ontdek FoundationOS. Dit is en blijft altijd 100% gratis.");
+      if (interests && interests.length) {
+        el('agExperience').textContent=T('access.portal.explored','U verkende {worlds}. Dit wordt hier getoond en niet in uw account opgeslagen.').replace('{worlds}',interests.join(', '));
+        el('agExperience').hidden=false;
+      }
     }
     /* WebAuthn uses the existing challenge, signature check and session path. */
     async function passkeyLogin(){
       if (busy || passkeyAbort) return;
       if (!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get)) {
-        message(tx('Uw browser ondersteunt hier geen passkey. U kunt inloggen via Andere manier.','This browser cannot use a passkey here. You can sign in using Another way.'),true); return;
+        message(()=>T('access.portal.this_browser_cannot_use_a_passkey_here_you_can_sign_in_using_anot','Uw browser ondersteunt hier geen passkey. U kunt inloggen via Andere manier.'),true); return;
       }
       const attempt = ++passkeyAttempt;
       const controller = new AbortController(); passkeyAbort = controller;
@@ -695,8 +744,8 @@ var RTG_BOUW = 'dc4421c0';
       const b2u = s => Uint8Array.from(atob(String(s).replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
       const u2b = buf => btoa(String.fromCharCode.apply(null,new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
       try {
-        message(tx('Bevestig op uw apparaat dat u wilt inloggen.','Confirm on your device that you want to sign in.'));
-        const o = await API.call('/webauthn/opties',{});
+        message(()=>T('access.portal.confirm_on_your_device_that_you_want_to_sign_in','Bevestig op uw apparaat dat u wilt inloggen.'));
+        const o = await accessRequest('identity.passkey.challenge',{});
         if (attempt !== passkeyAttempt) return;
         const pub = o.opties; pub.challenge = b2u(pub.challenge);
         pub.allowCredentials = (pub.allowCredentials || []).map(c=>Object.assign({},c,{id:b2u(c.id)}));
@@ -708,13 +757,13 @@ var RTG_BOUW = 'dc4421c0';
             signature:u2b(cred.response.signature),userHandle:cred.response.userHandle?u2b(cred.response.userHandle):null} };
         // Once the signed proof is submitted, do not offer a competing route.
         waiting(true);
-        const result = await API.call('/webauthn/login',{ceremonie:o.ceremonie,antwoord,pasApp:vastePas||undefined});
+        const result = await accessRequest('identity.passkey.verify',{ceremonie:o.ceremonie,antwoord,pasApp:vastePas||undefined});
         await login('rtg',{response:result});
       } catch(e) {
         if (attempt !== passkeyAttempt) return;
-        message(e.name === 'NotAllowedError' || e.name === 'AbortError'
-          ? tx('Het inloggen is geannuleerd. Probeer het opnieuw of kies Andere manier.','Sign-in was cancelled. Try again or choose Another way.')
-          : tx('Inloggen met uw passkey is niet gelukt. Probeer het opnieuw of kies Andere manier.','Passkey sign-in failed. Try again or choose Another way.'),true);
+        message(()=>e.name === 'NotAllowedError' || e.name === 'AbortError'
+          ? T('access.portal.sign_in_was_cancelled_try_again_or_choose_another_way','Het inloggen is geannuleerd. Probeer het opnieuw of kies Andere manier.')
+          : T('access.portal.passkey_sign_in_failed_try_again_or_choose_another_way','Inloggen met uw passkey is niet gelukt. Probeer het opnieuw of kies Andere manier.'),true);
       } finally {
         if (attempt === passkeyAttempt) { passkeyAbort=null; waiting(false); }
         el('agPasskey').disabled=false;
@@ -728,29 +777,29 @@ var RTG_BOUW = 'dc4421c0';
       if (busy) return;
       const value = inp.type === 'password' || el('agShowPassword').getAttribute('aria-pressed') === 'true' ? inp.value : inp.value.trim();
       inp.removeAttribute('aria-invalid'); el('agError').textContent='';
-      if (!value || !inp.checkValidity()) return invalid(tx('Controleer dit veld en vul het volledig in.','Please check this field and complete it.'));
+      if (!value || !inp.checkValidity()) return invalid(()=>T('access.portal.please_check_this_field_and_complete_it','Controleer dit veld en vul het volledig in.'));
       if (view === 'register' && step < 3) {
-        const s=steps[step];
-        if (step === 1 && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) return invalid(tx('Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.nl.','Enter a valid email address, such as name@example.com.'));
+        const s=steps()[step];
+        if (step === 1 && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) return invalid(()=>T('access.portal.enter_a_valid_email_address_such_as_name_example_com','Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.nl.'));
         if (step === 2) {
           const date=new Date(value+'T12:00:00'), now=new Date();
           let age=now.getFullYear()-date.getFullYear();
           if (now.getMonth()<date.getMonth() || (now.getMonth()===date.getMonth() && now.getDate()<date.getDate())) age--;
-          if (!Number.isFinite(age) || age>120 || age<0) return invalid(tx('Controleer uw geboortedatum.','Please check your date of birth.'));
+          if (!Number.isFinite(age) || age>120 || age<0) return invalid(()=>T('access.portal.please_check_your_date_of_birth','Controleer uw geboortedatum.'));
           if (age<15) {
-            invalid(tx('U kunt dit account vanaf 15 jaar aanmaken. U kunt wel FoundationOS ontdekken.','You can create this account from age 15. You can explore FoundationOS.'));
+            invalid(()=>T('access.portal.you_can_create_this_account_from_age_15_you_can_explore_foundatio','U kunt dit account vanaf 15 jaar aanmaken. U kunt wel FoundationOS ontdekken.'));
             el('agFoundation').hidden=false; return;
           }
         }
         draft[s.key]=value; step++; render('register',true); return;
       }
       if (view === 'login') { accountName=value; render('password',true); return; }
-      if ((view === 'register' || view === 'reset') && value.length<6) return invalid(tx('Gebruik een wachtwoord van minstens zes tekens.','Use a password of at least six characters.'));
+      if ((view === 'register' || view === 'reset') && value.length<6) return invalid(()=>T('access.portal.use_a_password_of_at_least_six_characters','Gebruik een wachtwoord van minstens zes tekens.'));
       if (view === 'reset' && el('agCode').value && !el('agCode').checkValidity()) {
-        message(tx('De sms-code bestaat uit zes cijfers.','The text message code has six digits.'),true); el('agCode').focus(); return;
+        message(()=>T('access.portal.the_text_message_code_has_six_digits','De sms-code bestaat uit zes cijfers.'),true); el('agCode').focus(); return;
       }
       waiting(true);
-      message(tx('Een ogenblik, we verwerken uw verzoek.','One moment, we are processing your request.'));
+      message(()=>T('access.portal.one_moment_we_are_processing_your_request','Een ogenblik, we verwerken uw verzoek.'));
       try {
         if (view === 'register') {
           const result=await login('rtg',{register:true,name:draft.name,u:draft.email,geboortedatum:draft.geboortedatum,p:value,tier:'guest',portal:true});
@@ -760,19 +809,19 @@ var RTG_BOUW = 'dc4421c0';
           inp.value='';
           if (result && result.tweedeFactorNodig) { secondProof=result.bewijs; render('second',true); }
         } else if (view === 'second') {
-          const result=await API.call('/auth/tweede',{bewijs:secondProof,code:value});
+          const result=await accessRequest('identity.second_factor.verify',{bewijs:secondProof,code:value});
           secondProof=''; inp.value=''; await login('rtg',{response:result});
         } else if (view === 'forgot') {
-          await API.call('/auth/forgot',{email:value}); render('sent',true);
+          await accessRequest('identity.recovery.request',{email:value}); render('sent',true);
         } else if (view === 'reset') {
-          await API.call('/auth/reset',{token:resetToken,code:el('agCode').value.trim(),password:value});
+          await accessRequest('identity.password.replace',{token:resetToken,code:el('agCode').value.trim(),password:value});
           resetToken=''; const url=new URL(location.href); url.searchParams.delete('reset');
           history.replaceState(null,'',url.pathname+url.search+url.hash);
-          render('login',true); message(tx('Uw wachtwoord is gewijzigd. U kunt nu inloggen.','Your password has been changed. You can now sign in.'));
+          render('login',true); message(()=>T('access.portal.your_password_has_been_changed_you_can_now_sign_in','Uw wachtwoord is gewijzigd. U kunt nu inloggen.'));
         }
       } catch(e) {
         el('agStatus').textContent='';
-        message(e && e.status ? e.message : tx('We konden geen verbinding maken. Uw ingevulde gegevens blijven staan. Probeer het opnieuw.','We could not connect. Your details are still here. Please try again.'),true);
+        message(()=>e && e.status ? e.message : T('access.portal.we_could_not_connect_your_details_are_still_here_please_try_again','We konden geen verbinding maken. Uw ingevulde gegevens blijven staan. Probeer het opnieuw.'),true);
       } finally {
         waiting(false);
         if (!form.hidden && gate.style.display !== 'none') inp.focus({preventScroll:true});
@@ -786,17 +835,18 @@ var RTG_BOUW = 'dc4421c0';
     el('agShowPassword').addEventListener('click',()=>{
       const shown=inp.type==='password'; inp.type=shown?'text':'password';
       el('agShowPassword').setAttribute('aria-pressed',String(shown));
-      el('agShowPassword').textContent=shown?tx('Verberg wachtwoord','Hide password'):tx('Toon wachtwoord','Show password');
+      el('agShowPassword').textContent=shown?T('access.portal.hide_password','Verberg wachtwoord'):T('access.portal.show_password','Toon wachtwoord');
     });
     el('agBack').addEventListener('click',()=>{
       if (busy) return;
       if (view==='register' && step>0) {
-        if (step<3) draft[steps[step].key]=inp.value;
+        if (step<3) draft[steps()[step].key]=inp.value;
         step--; render('register',true);
       } else if (view==='password' || view==='second' || view==='forgot' || view==='sent') {
         secondProof=''; render('login',true);
       } else { Object.keys(draft).forEach(key=>{draft[key]='';}); render('welcome',true); }
     });
+    window.addEventListener('rtglang',()=>{ if (gate.style.display !== 'none') render(view,false,true); });
     render(resetToken?'reset':'welcome',false);
   })();
   /* ================= SALON-CONNECTIES =================
@@ -983,17 +1033,52 @@ var RTG_BOUW = 'dc4421c0';
     };
     return M[v.id] || (T('onb.q.veld','Wat is uw ') + String(v.label || '').toLowerCase() + '?');
   }
-  function onbVraagVeld(v){
+  function onbVraagVeld(v,preserve){
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');
     if (rij) rij.style.display = '';
-    if (inp){ inp.type = onbInputType(v.type); inp.value = ''; inp.placeholder = T('onb.typ','Vul uw antwoord in'); }
+    if (inp){ if(!preserve){inp.type = onbInputType(v.type); inp.value = '';} inp.placeholder = T('onb.typ','Vul uw antwoord in'); }
     onbEl('onbConsentLabel').hidden = true;
     onbEl('onbGo').dataset.i18n = 'access.onb.next';
+    onbEl('onbGo').dataset.i18nSource = 'Ga verder';
     onbEl('onbGo').textContent = T('access.onb.next','Ga verder');
     if (inp) inp.setAttribute('aria-label', v.label || 'Uw antwoord');
     onbActies([]);
     onbZeg(onbVraagTekst(v));
-    if (inp) inp.focus();
+    if (inp && !preserve) inp.focus();
+  }
+/* Language changes only presentation; agreement, identity and focus are preserved. */
+  window.addEventListener('rtglang',()=>{
+    if(!onbSt || onbEl('onbGate').hidden) return;
+    const inp=onbEl('onbIn');
+    const consent=onbEl('onbConsent').checked, open=!onbEl('onbLees').hidden;
+    const active=document.activeElement, scroll=onbEl('onbGate').scrollTop;
+    if(onbStap==='teken') { onbTekenVraag(true); if(open) onbToonLees(); }
+    else if(onbStap==='veld' && onbHuidig) onbVraagVeld(onbHuidig,true);
+    onbEl('onbConsent').checked=consent;
+    onbLanguagePolicy();
+    if(active && active.isConnected && document.activeElement!==active) active.focus({preventScroll:true});
+    onbEl('onbGate').scrollTop=scroll;
+  });
+  function onbLanguagePolicy(){
+    const supported=RTGAccessMeaning.criticalLanguages.includes(lang());
+    onbEl('onbLanguageNotice').hidden=supported && lang()==='nl';
+    onbEl('onbLanguageNotice').textContent=supported
+      ? T('access.onb.sourceNotice','De overeenkomst hieronder is de Nederlandse brontekst. Geef alleen uw akkoord als u deze begrijpt.')
+      : T('access.onb.languageNotice','Deze overeenkomst is in het Nederlands. De bevestiging is beschikbaar in het Nederlands en Engels. Kies een van deze talen via de Edge Bar.');
+    if(onbStap==='teken') onbEl('onbGo').disabled=onbBezig || !supported;
+    return supported;
+  }
+  async function onbSignError(error,name){
+    if(error && error.status===409){
+      try {
+        onbSt=await API.call('/onboarding/status');
+        onbTekenVraag(); onbEl('onbIn').value=name;
+        onbToonLees(); // A different contract always needs a fresh, explicit choice.
+      } catch(e) { /* Keep the old version blocked by the server until it can reload. */ }
+    }
+    onbEl('onbFout').textContent=error && error.status===409
+      ? T('access.onb.changed','De overeenkomst is gewijzigd. Lees de actuele versie en geef opnieuw uw akkoord.')
+      : (error && error.message) || T('onb.mis','Dat lukte niet. Probeer het opnieuw.');
   }
   function onbVraagPaspoort(){
     const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
@@ -1043,11 +1128,11 @@ var RTG_BOUW = 'dc4421c0';
     try { onbSt = await API.call('/onboarding/opslaan', { velden }); } catch(e){ return ''; }
     return stukjes.join(', ');
   }
-  function onbTekenVraag(){
+  function onbTekenVraag(preserve){
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');
     if (rij) rij.style.display = '';
     if (inp){
-      inp.type = 'text'; inp.value = ((onbSt.velden || []).find(v => v.id === 'naam') || {}).waarde || ''; inp.autocomplete = 'name';
+      if(!preserve){inp.type = 'text'; inp.value = ((onbSt.velden || []).find(v => v.id === 'naam') || {}).waarde || '';} inp.autocomplete = 'name';
       inp.placeholder = T('access.onb.name','Vul uw volledige naam in');
       inp.setAttribute('aria-label', T('access.onb.nameLabel','Volledige naam voor ondertekening'));
     }
@@ -1056,11 +1141,13 @@ var RTG_BOUW = 'dc4421c0';
     const l = onbEl('onbLees');
     if (l){ l.textContent = c.tekst || c.titel || ''; l.hidden = true; l.tabIndex = 0; }
     onbEl('onbConsentLabel').hidden = false;
-    onbEl('onbConsent').checked = false;
+    if(!preserve) onbEl('onbConsent').checked = false;
     onbEl('onbGo').dataset.i18n = 'access.onb.finish';
+    onbEl('onbGo').dataset.i18nSource = 'Bevestig en open mijn RTG';
     onbEl('onbGo').textContent = T('access.onb.finish','Bevestig en open mijn RTG');
     onbActies([{ txt: T('access.onb.read','Lees de overeenkomst'), doe: onbToonLees }]);
-    onbEl('onbGate').scrollTop = 0;
+    onbLanguagePolicy();
+    if(!preserve) onbEl('onbGate').scrollTop = 0;
   }
   function onbToonLees(){
     const l = onbEl('onbLees'); if (!l) return;
@@ -1130,6 +1217,7 @@ var RTG_BOUW = 'dc4421c0';
       if (!tekst || !onbMbHuidig) return;
       return onbMbOpslaan(tekst);
     } else if (onbStap === 'teken'){
+      if (!onbLanguagePolicy()) return;
       if (!onbEl('onbConsent').checked){
         if (fout) fout.textContent = T('access.onb.consent','Bevestig dat u de overeenkomst heeft gelezen en ermee akkoord gaat.');
         onbEl('onbConsent').focus(); return;
@@ -1137,14 +1225,14 @@ var RTG_BOUW = 'dc4421c0';
       if (tekst.length < 2){ if (fout) fout.textContent = T('access.onb.nameShort','Vul uw volledige naam in om de overeenkomst te ondertekenen.'); return; }
       onbBezig = true; onbEl('onbGo').disabled = true;
       try {
-        const r = await API.call('/onboarding/teken', { naam: tekst, akkoord: true });
+        const r = await accessRequest('identity.agreement.accept', {naam:tekst,akkoord:true,contractVersion:onbSt.contract.versie});
         onbBezig = false; onbSt = r;
         if (r && r.klaar) return onbInrichtenAanbod();
         onbRij = onbOpenVelden();
         onbStap = onbRij.length ? 'veld' : 'teken';
         onbVolgende();
-      } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet. Probeer het opnieuw.'); }
-      finally { onbEl('onbGo').disabled = false; }
+      } catch(e){ onbBezig = false; await onbSignError(e,tekst); }
+      finally { onbLanguagePolicy(); }
     }
   }
   async function onbPaspoortGekozen(file){
@@ -1180,7 +1268,6 @@ var RTG_BOUW = 'dc4421c0';
     const kf = document.getElementById('onbKycFile');
     if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();
-
   /* Vervolg van app-main-08: het meebouwen aan het eind van de onboarding.
      Apart bestand omdat deel 08 over de 10 kB van het modulebeleid ging; de
      naad ligt op een top-niveau-grens, dus de functies staan nog gewoon in
@@ -1767,7 +1854,7 @@ var RTG_BOUW = 'dc4421c0';
   }
   function dmBubbel(m){
     const mijn = m.from === social.me;
-    const tijd = new Date(m.at).toLocaleTimeString(lang()==='en'?'en-GB':'nl-NL',{hour:'2-digit',minute:'2-digit'});
+    const tijd = new Date(m.at).toLocaleTimeString(lang(),{hour:'2-digit',minute:'2-digit'});
     const emo = s => window.RTGEmoji ? RTGEmoji.render(escT(s)) : escT(s);
     const txt = mijn ? emo(m.text) : '<span class="xlate">' + escT(m.text) + '</span>';
     return '<div class="dm-m' + (mijn ? ' mine' : '') + '">' + txt +
@@ -3087,7 +3174,7 @@ var RTG_BOUW = 'dc4421c0';
 
   /* ---------- vastgoed: aanbod, interesse, bod, keyless ---------- */
   let vgOpen = null;
-  const vgGeld = n => '\u20AC ' + Number(n||0).toLocaleString('nl-NL');
+  const vgGeld = n => '\u20AC ' + Number(n||0).toLocaleString(lang());
   async function laadVastgoed(){
     if (!API.live) return;
     let d = { panden: [], bezichtigingen: [], biedingen: [] };
@@ -3205,12 +3292,12 @@ var RTG_BOUW = 'dc4421c0';
     let h = '<h3 style="margin:1.25rem 0 0.25rem;font-size:1rem;">' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.5rem;">' + T('vk.sub','Exclusieve occasions. Proefrit, bod of inruil.') + '</p>';
     for (const d2 of deals){
       h += '<div style="border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">' + (d2.soort==='koop'?''+T('vk.koop','Koop'):''+T('vk.proefritk','Proefrit')) + ' · ' + escT(d2.status) + '</div>' +
-        '<div style="font-size:0.86rem;margin-top:0.2rem;">' + escT(d2.autoNaam) + (d2.prijs?' · € ' + d2.prijs.toLocaleString('nl-NL'):'') + (d2.moment?' · ' + escT(d2.moment):'') + '</div>' +
+        '<div style="font-size:0.86rem;margin-top:0.2rem;">' + escT(d2.autoNaam) + (d2.prijs?' · € ' + d2.prijs.toLocaleString(lang()):'') + (d2.moment?' · ' + escT(d2.moment):'') + '</div>' +
         (d2.soort==='koop' && d2.status==='aanvaard' ? '<button class="js-vkteken" data-ref="' + d2.ref + '" style="margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.5rem 0.9rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('vk.teken','Koopcontract tekenen') + '</button>' : '') + '</div>';
     }
     h += autos.slice(0,20).map(a => '<div style="border:1px solid var(--line);border-radius:0;padding:0.85rem;margin-bottom:0.7rem;" data-av="' + a.id + '">' +
-      '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.95rem;">' + (a.vip?'':'') + escT(a.naam) + '</b><span style="font-weight:600;">€ ' + a.prijs.toLocaleString('nl-NL') + '</span></div>' +
-      '<div class="sub">' + a.km.toLocaleString('nl-NL') + ' km · ' + escT(a.brandstof) + ' · ' + escT(a.transmissie) + (a.vermogenPk?' · ' + a.vermogenPk + ' pk':'') + (a.garantieMnd?' · ' + a.garantieMnd + ' mnd garantie':'') + '</div>' +
+      '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.95rem;">' + (a.vip?'':'') + escT(a.naam) + '</b><span style="font-weight:600;">€ ' + a.prijs.toLocaleString(lang()) + '</span></div>' +
+      '<div class="sub">' + a.km.toLocaleString(lang()) + ' km · ' + escT(a.brandstof) + ' · ' + escT(a.transmissie) + (a.vermogenPk?' · ' + a.vermogenPk + ' pk':'') + (a.garantieMnd?' · ' + a.garantieMnd + ' mnd garantie':'') + '</div>' +
       (a.opties && a.opties.length ? '<div class="sub h-mt20">' + a.opties.slice(0,4).map(escT).join(' · ') + '</div>' : '') +
       '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;">' +
       '<button class="js-vkproef" data-code="' + a.supplierCode + '" data-id="' + a.id + '" style="flex:1;background:none;border:1px solid var(--gold);border-radius:0;padding:0.45rem;color:var(--gold);font-weight:600;font-family:inherit;cursor:pointer;">' + T('vk.proefritk','Proefrit') + '</button>' +
@@ -7307,7 +7394,7 @@ var RTG_BOUW = 'dc4421c0';
   function onGrtChat(m){ if(grtActief && m.van===grtActief){ var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:m.tekst,vanMij:false})); vertaalBubbels(el); scrollGrt(); } } }
   const telHref = t => 'tel:' + String(t||'').replace(/[^0-9+]/g,'');
   function geleden(iso){ const s=Math.floor((Date.now()-new Date(iso).getTime())/1000); if(s<60)return 'net nu'; if(s<3600)return Math.floor(s/60)+' min geleden'; if(s<86400)return Math.floor(s/3600)+' uur geleden'; return Math.floor(s/86400)+' dag(en) geleden'; }
-  function datumKort(d){ try{ const dt=new Date(d+'T00:00:00'); const vd=new Date(); vd.setHours(0,0,0,0); const mo=new Date(vd); mo.setDate(mo.getDate()+1); if(dt.getTime()===vd.getTime())return 'Vandaag'; if(dt.getTime()===mo.getTime())return 'Morgen'; return dt.toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } }
+  function datumKort(d){ try{ const dt=new Date(d+'T00:00:00'); const vd=new Date(); vd.setHours(0,0,0,0); const mo=new Date(vd); mo.setDate(mo.getDate()+1); if(dt.getTime()===vd.getTime())return 'Vandaag'; if(dt.getTime()===mo.getTime())return 'Morgen'; return dt.toLocaleDateString(lang(),{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } }
   async function laadGezinInfo(){
     const box = $('#gezinInfo'); if(!box) return;
     let d; try{ d = await API.call('/rtf/overzicht'); }catch(e){ box.innerHTML=''; return; }
@@ -7420,7 +7507,7 @@ var RTG_BOUW = 'dc4421c0';
     let dagen = [];
     try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch(e){ return; }
     if (!dagen.length){ wrap.innerHTML = ''; return; }
-    const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang() === 'en' ? 'en-GB' : 'nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+    const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang(), { weekday: 'long', day: 'numeric', month: 'long' });
     wrap.innerHTML = '<div class="sec-label h-mt120">' + T('erv.agenda','Mijn programma') + '</div>' +
       dagen.map(d =>
         '<div style="font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:0.7rem 0 0.35rem;">' + dagNaam(d.datum) + '</div>' +
@@ -7631,7 +7718,7 @@ var RTG_BOUW = 'dc4421c0';
     const muntAan = !!(muntOpties && muntOpties.aan && user && user.tier !== 'guest');
     // Business Pass: de volledige, boekhoudklare specificatie onder elke factuur
     // (incl. afboekcode en btw). RTG en Lifestyle houden de rustige weergave.
-    const eurC = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const eurC = n => '€ ' + Number(n).toLocaleString(lang(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const specRow = (l, v, strong) => '<div style="display:flex;justify-content:space-between;gap:1rem;"><span>' + l + '</span><span style="text-align:right;flex-shrink:0;' + (strong ? 'color:var(--txt);font-weight:600;' : '') + '">' + v + '</span></div>';
 /* de zakelijke specificatie op een factuur */
     const bizSpec = inv => {
@@ -8438,7 +8525,7 @@ var RTG_BOUW = 'dc4421c0';
     const el = document.getElementById('boAgendaCard'); if (!el) return;
     if (!memberAgenda){ el.innerHTML = '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('ag.titel','Agenda') + '</b><div class="fineprint">…</div></div>'; laadAgendaLid().then(renderAgendaLid); return; }
     const o = memberAgenda, items = o.items || [];
-    const dagLbl = d => { try { return new Date(d+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{weekday:'short',day:'numeric',month:'short'}); } catch(e){ return d; } };
+    const dagLbl = d => { try { return new Date(d+'T12:00:00').toLocaleDateString(lang(),{weekday:'short',day:'numeric',month:'short'}); } catch(e){ return d; } };
     const inp = 'style="background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.45rem 0.55rem;color:var(--txt);font-family:inherit;font-size:0.76rem;"';
     let h = '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('ag.titel','Agenda') + (o.telling?' <span style="color:#E0736A;">('+o.telling+')</span>':'') + '</b>';
     h += items.length ? items.map(i => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.78rem;margin-top:0.45rem;opacity:'+(i.gedaan?'0.55':'1')+';"><span>'+(i.gedaan?'✓ ':'')+esc(i.titel)+'<span style="color:var(--muted);"> · '+esc(dagLbl(i.datum))+(i.tijd?' '+esc(i.tijd):'')+'</span></span><span style="white-space:nowrap;">'+(!i.gedaan?'<button class="ag-done" data-agdone="'+i.id+'" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.15rem 0.45rem;color:var(--txt);font-size:0.68rem;cursor:pointer;">✓</button> ':'')+'<button class="ag-del" data-agdel="'+i.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">✕</button></span></div>').join('') : '<div class="fineprint h-mt40">'+T('ag.leeg','Nog niets gepland. Typ het of laat de AI het inplannen.')+'</div>'+
@@ -8516,7 +8603,7 @@ var RTG_BOUW = 'dc4421c0';
     el.removeAttribute('aria-busy');
     const d = vooruitData;
     if (d.fout){ el.innerHTML = ''; return; }
-    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };
+    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang(),{day:'numeric',month:'short'}); } catch(e){ return x; } };
     const regel = r => '<div class="vo-rij">'
       + '<span>' + esc((r.waarvan ? r.waarvan + ' · ' : '') + r.naam) + '</span>'
       + '<span class="vo-dag">' + esc(dagLbl(r.datum)) + '</span></div>';
@@ -8576,7 +8663,7 @@ var RTG_BOUW = 'dc4421c0';
         : '';
       return;
     }
-    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };
+    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang(),{day:'numeric',month:'short'}); } catch(e){ return x; } };
     let h = '<div class="zak-kaart"><b class="vo-kop">' + T('po.titel','Uit uw post')
       + ' <span class="vo-let">(' + d.voorstellen.length + ')</span></b>'
       + '<div class="fineprint vo-mt">' + T('po.uitleg','Dit vonden wij in uw eigen post. Er gaat niets vanzelf in uw agenda; u bevestigt.') + '</div>';
@@ -8947,7 +9034,7 @@ var RTG_BOUW = 'dc4421c0';
       document.body.appendChild(ov);
       ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
     }
-    const eur2 = n => '€ ' + Number(n||0).toLocaleString('nl-NL');
+    const eur2 = n => '€ ' + Number(n||0).toLocaleString(lang());
     const items = d.items || [];
     const html =
       '<div style="width:100%;max-width:560px;max-height:88vh;overflow-y:auto;background:var(--bg);border-radius:0;border:1px solid var(--line);">' +
@@ -9426,16 +9513,18 @@ var RTG_BOUW = 'dc4421c0';
   }
 
   /* ---------- taal gewijzigd: dynamische schermen opnieuw opbouwen ---------- */
+  let renderedLanguage = lang();
   window.addEventListener('rtglang', async () => {
-    if (!user) return;
+    const changed = renderedLanguage !== lang(); renderedLanguage = lang();
+    if (!user || !API.live || !onbEl('onbGate').hidden) return;
     const active = (document.querySelector('.tabbar button.active') || {}).dataset;
 /* van taal wisselen: alles opnieuw ophalen */
     const tab = active ? active.tab : 'home';
     // inhoud opnieuw ophalen in de nieuwe taal (facturen, reis, menu's)
-    if (API.live){ try { applyState((await API.call('/state')).state); } catch (e) {} }
+    if (changed && API.live){ try { applyState((await API.call('/state')).state); } catch (e) {} }
     renderAll();
     renderBell();
-    openTab(tab);
+    if (changed) openTab(tab);
   });
 
   /* ---------- PWA ---------- */

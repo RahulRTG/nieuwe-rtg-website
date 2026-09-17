@@ -603,29 +603,9 @@ test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
   });
 });
 
-/* De klok is rond, en zijn vak hoort dat ook te zijn.
-
-   DEZE TOETS IS MEEVERHUISD MET DE KLOK. Hij mat de klok op het beginscherm;
-   dat beginscherm is de werktafel geworden en de klok is er af (WERELD.md).
-   Het horloge staat nog op een plek -- de inlogpoort -- en de belofte die deze
-   toets bewaakt is precies dezelfde gebleven, want het is dezelfde kast uit
-   shared/klok.js. Weghalen zou de wachter kwijtmaken samen met het scherm.
-
-   Waarom dit een toets verdient. De schaduw van de klok zit op een
-   pseudo-element met border-radius:50% over het VAK van .rtg-ring. Zolang dat
-   vak vierkant is, is die schaduw een cirkel om de kast. Werd het vak
-   uitgerekt, dan werd de schaduw een ellips die ver boven en onder de
-   wijzerplaat uitliep: het donkere ei dat maandenlang voor een verkeerd
-   gekozen schaduwkleur werd aangezien, terwijl de kleur er niets mee te maken
-   had. De wijzerplaat zelf verraadt het niet, want de SVG houdt zijn
-   verhouding en blijft netjes rond.
-
-   Zo raakte het vak uitgerekt: height:100% met aspect-ratio:1 rekent de
-   breedte uit de hoogte, en als max-width die breedte daarna afknijpt, laat de
-   browser de hoogte staan. Beide bovengrenzen moeten dus gelijk zijn. Deze
-   toets meet het vak, niet de CSS-regel: hij zakt bij elke manier waarop het
-   vak alsnog scheef wordt getrokken. */
-test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
+/* The shared clock still has a circular shadow. Account access intentionally has
+   no clock; mount the real component in a fixture so its geometry remains covered. */
+test('Gedeelde klok: het vak is vierkant, dus de schaduw is rond',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -639,12 +619,17 @@ test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
     });
     const page = await ctx.newPage();
     await volgVerzoeken(page);
-    // zonder token: dan staat de poort er, en daar hangt de klok
+    // De klok wordt apart gemonteerd; de toegangspoort gebruikt hem niet.
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
 
-    await page.waitForSelector('#gate .rtg-ring svg', { timeout: 15000 });
+    await page.waitForFunction(()=>!!window.RTGKlok);
+    await page.evaluate(()=>{
+      const host=document.createElement('div'); host.id='klokFixture'; host.style.cssText='width:240px;height:240px;position:fixed;inset:20px;z-index:999999'; document.body.appendChild(host);
+      host.dataset.rtgKlok='ring'; RTGKlok.maakKlok(host);
+    });
+    await page.waitForSelector('#klokFixture.rtg-ring svg', { timeout: 15000 });
     const vak = await page.evaluate(() => {
-      const k = document.querySelector('#gate .rtg-ring');
+      const k = document.querySelector('#klokFixture.rtg-ring');
       const b = k.getBoundingClientRect();
       return { breed: Math.round(b.width), hoog: Math.round(b.height) };
     });
@@ -659,82 +644,28 @@ test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
   }
 });
 
-test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
+test('Inlogportaal: inhoud en standaard Edge overlappen niet',
   { skip: geenBrowser(pw) }, async () => {
-  /* DIT IS TWEE KEER MISGEGAAN, EEN KEER NAAR ELKE KANT, en allebei de keren
-     zag je het pas op een afdruk. Eerst zweefde de mond tientallen pixels onder
-     de klok; daarna werd hij opgetrokken tot hij "aansloot", en toen begon de
-     INKT op 0 tot -1 pixel van de onderrand van de wijzerplaat -- de lippen
-     lagen tegen de gouden rand en middenin de contactschaduw van de kast.
-
-     Een meting op de DOOS zou allebei die standen goedkeuren: het doek is 440
-     bij 200 en de tekening begint pas op 27,9% van die hoogte, dus de doos zegt
-     niets over waar de lippen liggen. Deze toets leest daarom de echte inkt uit
-     het doek en rekent de afstand in KLOKKEN, niet in pixels -- want de klok
-     schaalt mee met het scherm en een vaste pixelmaat zou op de ene telefoon
-     kloppen en op de andere niet.
-
-     DE MUTATIE: zet --lipgat in app-main-04a.js op 0. De lippen raken de klok
-     weer, en deze toets zakt. */
-  const TMP = verseDataDir();
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  const TMP=verseDataDir();
+  const {child,base}=await startServer({env:{SMTP_URL:'',RTG_DATA_DIR:TMP}});
   let browser;
   try {
-    browser = await pw.chromium.launch(browserOpties(pw));
-    // twee maten: de verhouding hoort op allebei dezelfde te zijn
-    for (const maat of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
-      const ctx = await browser.newContext({ viewport: maat });
-      await ctx.addInitScript(() => {
-        try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-      });
-      const page = await ctx.newPage();
-      await volgVerzoeken(page);
-      // zonder token: dan staat de poort er, en die is wat we meten
-      await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#gate .ag-mond', { timeout: 15000 });
-      await wachtOpRust(page);
-
-      const r = await page.evaluate(() => {
-        const klok = document.querySelector('#gate .os-lock .rtg-ring');
-        const cv = document.querySelector('#gate .ag-mond');
-        if (!klok || !cv) return null;
-        /* Het doek kan van WebGL zijn (shared/mond.js), en dan geeft
-           getContext('2d') null. Overtekenen naar een eigen doek werkt altijd. */
-        const kopie = document.createElement('canvas');
-        kopie.width = cv.width; kopie.height = cv.height;
-        const c = kopie.getContext('2d');
-        c.drawImage(cv, 0, 0);
-        const dt = c.getImageData(0, 0, kopie.width, kopie.height).data;
-        let eerste = -1;
-        for (let y = 0; y < kopie.height && eerste < 0; y++) {
-          for (let x = 0; x < kopie.width; x++) {
-            if (dt[(y * kopie.width + x) * 4 + 3] > 12) { eerste = y; break; }
-          }
-        }
-        const kb = klok.getBoundingClientRect(), mb = cv.getBoundingClientRect();
-        return {
-          klokMaat: Math.round(kb.width),
-          inktTop: eerste < 0 ? null : mb.top + mb.height * eerste / kopie.height,
-          klokBodem: kb.bottom
-        };
-      });
-
-      assert.ok(r && r.inktTop != null,
-        'de lippen horen getekend te zijn op ' + maat.width + ' breed');
-      const gat = (r.inktTop - r.klokBodem) / r.klokMaat;
-      assert.ok(gat > 0.05,
-        'de lippen raken de wijzerplaat op ' + maat.width + ' breed (afstand ' +
-        gat.toFixed(3) + ' klok); ze horen eronder te hangen, niet erin');
-      assert.ok(gat < 0.25,
-        'de lippen zweven te ver onder de klok op ' + maat.width + ' breed (afstand ' +
-        gat.toFixed(3) + ' klok); Rahul komt uit de klok, hij hangt er niet los onder');
+    browser=await pw.chromium.launch(browserOpties(pw));
+    for(const viewport of [{width:390,height:844},{width:1440,height:900}]) {
+      const ctx=await browser.newContext({viewport});
+      await ctx.addInitScript(()=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');});
+      const page=await ctx.newPage(); await page.goto(base+'/apps/app.html');
+      await page.waitForSelector('.rtg-adaptive-bar');
+      const shape=await page.evaluate(()=>({
+        bars:document.querySelectorAll('.rtg-adaptive-bar').length,
+        legacy:document.querySelectorAll('#gate .rtg-ring,#gate .ag-mond').length,
+        end:document.querySelector('#agNieuw').getBoundingClientRect().bottom,
+        edge:document.querySelector('.rtg-adaptive-bar').getBoundingClientRect().top
+      }));
+      assert.equal(shape.bars,1); assert.equal(shape.legacy,0); assert.ok(shape.end<shape.edge);
       await ctx.close();
     }
-  } finally {
-    if (browser) await browser.close();
-    stop(child);
-    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
-  }
+  } finally { if(browser) await browser.close(); stop(child); fs.rmSync(TMP,{recursive:true,force:true}); }
 });
 
 /* Het beginscherm mag niet verdwijnen doordat de app je plek onthoudt.

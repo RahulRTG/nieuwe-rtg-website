@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1928 bestanden en 13900 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1931 bestanden en 13911 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1928 |
-| losse beweringen (`test(...)`) | 13900 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 146 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1284 |
+| toetsbestanden | 1931 |
+| losse beweringen (`test(...)`) | 13911 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 149 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1287 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1705 bestanden, 13508 beweringen.
+1707 bestanden, 13518 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -609,6 +609,7 @@ toets omvalt.
 | `hulpklassen.test.js` | 13 | gezakt op `true->false#0` | ELKE HULPKLASSE DRAAGT PRECIES DE WAARDE DIE HIJ VERVANGT. scripts/hulpklassen-omzet.js ruilt een style="margin-top:0.6rem" in voor class="h-mt60". |
 | `human-reality.test.js` | 9 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `i18n-auto.test.js` | 13 | gezakt op `false->true#0` | Het universele 114-talige vangnet. De browserlaag is bewust dependency-vrij; met een klein DOM-dubbel bewijzen we de selectie en RTL-richting, en met de paginascan dat ieder blijvend appscherm de gedeelde taalrail... |
+| `i18n-dictionary.test.js` | 6 | gezakt op `>=->>#3` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ideeen.test.js` | 4 | gezakt op `liegpoort /api/` | De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier ontwerpbureaus. Een idee met bureau-tags, reacties, AI-uitwerking per bureau en een spin-off die echt een concept in het gekozen bureau aanmaakt. |
 | `idem-poort-echt.test.js` | 4 | -- | De idem-poort op een ECHTE server, langs een ECHTE route. test/idem-poort.test.js toetst de regel; dit toetst dat hij ook werkelijk in de keten hangt en dat er niets onder hem doorglipt. |
 | `idem-poort.test.js` | 23 | -- | De idem-poort: hetzelfde verzoek twee keer sturen mag nooit twee keer werken. Deze toets draait op de middleware zelf, met een nagebootst verzoek/antwoord. |
@@ -726,6 +727,7 @@ toets omvalt.
 | `labfonds.test.js` | 4 | gezakt op `===->!==#0` | Het Lab-fonds (kern/labfonds.js): leden zamelen in voor het RTF Onderzoekslab, per locatie verdeeld, en beslissen gezamenlijk met de AI-scheidsrechter. |
 | `landdekking.test.js` | 7 | gezakt op `===->!==#0` | DE LANDDEKKING (scripts/landdekking.js, LANDDEKKING.json). WAT DEZE TOETS BEWAAKT, en wat met opzet niet. |
 | `landpakket.test.js` | 6 | gezakt op `===->!==#0` | Landpakketten (kern/command/landpakket.js): een land aanzetten als configuratiebundel. WAT DEZE TOETS VOORAL BEWAAKT is dat "geactiveerd" nooit gaat lezen als "in orde". |
+| `language-foundations.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `lcov.test.js` | 12 | genoemd | HET REGRESSIECORPUS VAN DE LCOV-SAMENVOEGING. Deze code bepaalt of de dekkingsvloer wordt gehaald wanneer de suite over parallelle scherven is verdeeld. |
 | `leden-gids-pg.test.js` | 1 | slaat zichzelf over | Integratietest voor de Postgres-ledengids (member_dir): met DATABASE_URL gezet staat de codenaam/pas-gids als GEINDEXEERDE RIJEN in Postgres in plaats van als object in het geheugen. Een nieuw lid dat zich meldt... |
 | `leden-teller.test.js` | 1 | gezakt op `liegpoort /api/` | De kantoor-totalen tellen de leden met een goedkope, onderhouden teller (ledenAantal) i.p.v. Object.keys(memberDir).length, dat O(N) is en bij miljoenen leden seconden per verzoek kost. |
@@ -1745,12 +1747,13 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-223 bestanden, 392 beweringen.
+224 bestanden, 393 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
 | `a11y-hermeet.e2e.js` | 1 | -- | DE TWEEDE METING VAN DE A11Y-POORT (scripts/a11y-hermeet.js). Een poort die af en toe zomaar rood wordt, leert mensen om hem te negeren -- en dan is hij erger dan geen poort. |
 | `aanwezigheid-routes.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE ZES ROUTES VAN DE PUBLIEKE LAAG, tegen een echte server. test/aanwezigheid.test.js beproeft de MODULES; deze toets beproeft de weg ernaartoe. |
+| `access-language.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `adaptief.e2e.js` | 1 | genoemd | DE ADAPTIEVE LAAG IN EEN ECHTE BROWSER. De regels staan in ADAPTIEF.md, de statische kant in test/adaptief.test.js. |
 | `agenda.e2e.js` | 1 | -- | Scherm-test voor RTG Agenda: het maandraster, Rahul die in gewone taal plant, een afspraak met het paneel, uitnodigen op codenaam en het ja-zeggen door de ander, en de ICS-export. Echte namen horen nergens in beeld... |
 | `appmenu.e2e.js` | 10 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |

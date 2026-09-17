@@ -65,14 +65,18 @@
     creatorLikes = Number(MAGNAAT.creatorLikes || 0);
   }
 
+  function accessRequest(meaningId,parameters){
+    const intent=RTGAccessMeaning.plan(meaningId,parameters,1);
+    return API.call(intent.route,intent.parameters);
+  }
   async function login(tier, cred){
     if (cred){
       if (API.enabled){
         try {
           const data = cred.response || (cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: cred.portal ? 'rtg' : vastePas || undefined,
-                wervingscode: wervingscode || undefined })
-            : await API.call('/auth/login', { login: cred.u, password: cred.p, pasApp: vastePas || undefined }));
+            ? await accessRequest('identity.account.create', { name:cred.name,email:cred.u,geboortedatum:cred.geboortedatum,password:cred.p,
+                wervingscode:wervingscode || undefined })
+            : await accessRequest('identity.session.open', {login:cred.u,password:cred.p,pasApp:vastePas || undefined}));
           if (data.tweedeFactorNodig) return data;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
           API.token = data.token;

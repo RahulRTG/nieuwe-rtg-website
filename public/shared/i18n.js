@@ -256,6 +256,648 @@
 
   w.RTGTaalSchil = { van: van, laad: laad, stand: stand, MAP: MAP };
 })(window, document);
+/* Generated from server/talen.js. The shared picker remains available before the API responds. */
+window.RTGWereldTalen = [
+  {
+    "code": "nl",
+    "naam": "Nederlands",
+    "en": "Dutch"
+  },
+  {
+    "code": "en",
+    "naam": "English",
+    "en": "English"
+  },
+  {
+    "code": "de",
+    "naam": "Deutsch",
+    "en": "German"
+  },
+  {
+    "code": "fr",
+    "naam": "Français",
+    "en": "French"
+  },
+  {
+    "code": "es",
+    "naam": "Español",
+    "en": "Spanish"
+  },
+  {
+    "code": "pt",
+    "naam": "Português",
+    "en": "Portuguese"
+  },
+  {
+    "code": "it",
+    "naam": "Italiano",
+    "en": "Italian"
+  },
+  {
+    "code": "ca",
+    "naam": "Català",
+    "en": "Catalan"
+  },
+  {
+    "code": "gl",
+    "naam": "Galego",
+    "en": "Galician"
+  },
+  {
+    "code": "eu",
+    "naam": "Euskara",
+    "en": "Basque"
+  },
+  {
+    "code": "ro",
+    "naam": "Română",
+    "en": "Romanian"
+  },
+  {
+    "code": "el",
+    "naam": "Ελληνικά",
+    "en": "Greek"
+  },
+  {
+    "code": "tr",
+    "naam": "Türkçe",
+    "en": "Turkish"
+  },
+  {
+    "code": "ru",
+    "naam": "Русский",
+    "en": "Russian"
+  },
+  {
+    "code": "uk",
+    "naam": "Українська",
+    "en": "Ukrainian"
+  },
+  {
+    "code": "be",
+    "naam": "Беларуская",
+    "en": "Belarusian"
+  },
+  {
+    "code": "pl",
+    "naam": "Polski",
+    "en": "Polish"
+  },
+  {
+    "code": "cs",
+    "naam": "Čeština",
+    "en": "Czech"
+  },
+  {
+    "code": "sk",
+    "naam": "Slovenčina",
+    "en": "Slovak"
+  },
+  {
+    "code": "hu",
+    "naam": "Magyar",
+    "en": "Hungarian"
+  },
+  {
+    "code": "bg",
+    "naam": "Български",
+    "en": "Bulgarian"
+  },
+  {
+    "code": "sr",
+    "naam": "Српски",
+    "en": "Serbian"
+  },
+  {
+    "code": "hr",
+    "naam": "Hrvatski",
+    "en": "Croatian"
+  },
+  {
+    "code": "bs",
+    "naam": "Bosanski",
+    "en": "Bosnian"
+  },
+  {
+    "code": "sl",
+    "naam": "Slovenščina",
+    "en": "Slovenian"
+  },
+  {
+    "code": "mk",
+    "naam": "Македонски",
+    "en": "Macedonian"
+  },
+  {
+    "code": "sq",
+    "naam": "Shqip",
+    "en": "Albanian"
+  },
+  {
+    "code": "lt",
+    "naam": "Lietuvių",
+    "en": "Lithuanian"
+  },
+  {
+    "code": "lv",
+    "naam": "Latviešu",
+    "en": "Latvian"
+  },
+  {
+    "code": "et",
+    "naam": "Eesti",
+    "en": "Estonian"
+  },
+  {
+    "code": "fi",
+    "naam": "Suomi",
+    "en": "Finnish"
+  },
+  {
+    "code": "sv",
+    "naam": "Svenska",
+    "en": "Swedish"
+  },
+  {
+    "code": "no",
+    "naam": "Norsk",
+    "en": "Norwegian"
+  },
+  {
+    "code": "da",
+    "naam": "Dansk",
+    "en": "Danish"
+  },
+  {
+    "code": "is",
+    "naam": "Íslenska",
+    "en": "Icelandic"
+  },
+  {
+    "code": "ga",
+    "naam": "Gaeilge",
+    "en": "Irish"
+  },
+  {
+    "code": "cy",
+    "naam": "Cymraeg",
+    "en": "Welsh"
+  },
+  {
+    "code": "mt",
+    "naam": "Malti",
+    "en": "Maltese"
+  },
+  {
+    "code": "lb",
+    "naam": "Lëtzebuergesch",
+    "en": "Luxembourgish"
+  },
+  {
+    "code": "fy",
+    "naam": "Frysk",
+    "en": "West Frisian"
+  },
+  {
+    "code": "yi",
+    "naam": "ייִדיש",
+    "en": "Yiddish"
+  },
+  {
+    "code": "ar",
+    "naam": "العربية",
+    "en": "Arabic"
+  },
+  {
+    "code": "he",
+    "naam": "עברית",
+    "en": "Hebrew"
+  },
+  {
+    "code": "fa",
+    "naam": "فارسی",
+    "en": "Persian"
+  },
+  {
+    "code": "ku",
+    "naam": "Kurdî",
+    "en": "Kurdish"
+  },
+  {
+    "code": "az",
+    "naam": "Azərbaycanca",
+    "en": "Azerbaijani"
+  },
+  {
+    "code": "hy",
+    "naam": "Հայերեն",
+    "en": "Armenian"
+  },
+  {
+    "code": "ka",
+    "naam": "ქართული",
+    "en": "Georgian"
+  },
+  {
+    "code": "kk",
+    "naam": "Қазақша",
+    "en": "Kazakh"
+  },
+  {
+    "code": "uz",
+    "naam": "Oʻzbekcha",
+    "en": "Uzbek"
+  },
+  {
+    "code": "ky",
+    "naam": "Кыргызча",
+    "en": "Kyrgyz"
+  },
+  {
+    "code": "tg",
+    "naam": "Тоҷикӣ",
+    "en": "Tajik"
+  },
+  {
+    "code": "tk",
+    "naam": "Türkmençe",
+    "en": "Turkmen"
+  },
+  {
+    "code": "mn",
+    "naam": "Монгол",
+    "en": "Mongolian"
+  },
+  {
+    "code": "tt",
+    "naam": "Татарча",
+    "en": "Tatar"
+  },
+  {
+    "code": "hi",
+    "naam": "हिन्दी",
+    "en": "Hindi"
+  },
+  {
+    "code": "ur",
+    "naam": "اردو",
+    "en": "Urdu"
+  },
+  {
+    "code": "bn",
+    "naam": "বাংলা",
+    "en": "Bengali"
+  },
+  {
+    "code": "pa",
+    "naam": "ਪੰਜਾਬੀ",
+    "en": "Punjabi"
+  },
+  {
+    "code": "gu",
+    "naam": "ગુજરાતી",
+    "en": "Gujarati"
+  },
+  {
+    "code": "mr",
+    "naam": "मराठी",
+    "en": "Marathi"
+  },
+  {
+    "code": "ta",
+    "naam": "தமிழ்",
+    "en": "Tamil"
+  },
+  {
+    "code": "te",
+    "naam": "తెలుగు",
+    "en": "Telugu"
+  },
+  {
+    "code": "kn",
+    "naam": "ಕನ್ನಡ",
+    "en": "Kannada"
+  },
+  {
+    "code": "ml",
+    "naam": "മലയാളം",
+    "en": "Malayalam"
+  },
+  {
+    "code": "si",
+    "naam": "සිංහල",
+    "en": "Sinhala"
+  },
+  {
+    "code": "ne",
+    "naam": "नेपाली",
+    "en": "Nepali"
+  },
+  {
+    "code": "ps",
+    "naam": "پښتو",
+    "en": "Pashto"
+  },
+  {
+    "code": "sd",
+    "naam": "سنڌي",
+    "en": "Sindhi"
+  },
+  {
+    "code": "or",
+    "naam": "ଓଡ଼ିଆ",
+    "en": "Odia"
+  },
+  {
+    "code": "as",
+    "naam": "অসমীয়া",
+    "en": "Assamese"
+  },
+  {
+    "code": "dv",
+    "naam": "ދިވެހި",
+    "en": "Dhivehi"
+  },
+  {
+    "code": "bo",
+    "naam": "བོད་སྐད་",
+    "en": "Tibetan"
+  },
+  {
+    "code": "zh",
+    "naam": "中文",
+    "en": "Chinese"
+  },
+  {
+    "code": "ja",
+    "naam": "日本語",
+    "en": "Japanese"
+  },
+  {
+    "code": "ko",
+    "naam": "한국어",
+    "en": "Korean"
+  },
+  {
+    "code": "th",
+    "naam": "ไทย",
+    "en": "Thai"
+  },
+  {
+    "code": "vi",
+    "naam": "Tiếng Việt",
+    "en": "Vietnamese"
+  },
+  {
+    "code": "id",
+    "naam": "Bahasa Indonesia",
+    "en": "Indonesian"
+  },
+  {
+    "code": "jv",
+    "naam": "Basa Jawa",
+    "en": "Javanese"
+  },
+  {
+    "code": "su",
+    "naam": "Basa Sunda",
+    "en": "Sundanese"
+  },
+  {
+    "code": "ms",
+    "naam": "Bahasa Melayu",
+    "en": "Malay"
+  },
+  {
+    "code": "tl",
+    "naam": "Filipino",
+    "en": "Filipino"
+  },
+  {
+    "code": "km",
+    "naam": "ខ្មែរ",
+    "en": "Khmer"
+  },
+  {
+    "code": "lo",
+    "naam": "ລາວ",
+    "en": "Lao"
+  },
+  {
+    "code": "my",
+    "naam": "မြန်မာ",
+    "en": "Burmese"
+  },
+  {
+    "code": "ug",
+    "naam": "ئۇيغۇرچە",
+    "en": "Uyghur"
+  },
+  {
+    "code": "sw",
+    "naam": "Kiswahili",
+    "en": "Swahili"
+  },
+  {
+    "code": "am",
+    "naam": "አማርኛ",
+    "en": "Amharic"
+  },
+  {
+    "code": "ti",
+    "naam": "ትግርኛ",
+    "en": "Tigrinya"
+  },
+  {
+    "code": "om",
+    "naam": "Afaan Oromoo",
+    "en": "Oromo"
+  },
+  {
+    "code": "so",
+    "naam": "Soomaali",
+    "en": "Somali"
+  },
+  {
+    "code": "ha",
+    "naam": "Hausa",
+    "en": "Hausa"
+  },
+  {
+    "code": "yo",
+    "naam": "Yorùbá",
+    "en": "Yoruba"
+  },
+  {
+    "code": "ig",
+    "naam": "Igbo",
+    "en": "Igbo"
+  },
+  {
+    "code": "zu",
+    "naam": "isiZulu",
+    "en": "Zulu"
+  },
+  {
+    "code": "xh",
+    "naam": "isiXhosa",
+    "en": "Xhosa"
+  },
+  {
+    "code": "af",
+    "naam": "Afrikaans",
+    "en": "Afrikaans"
+  },
+  {
+    "code": "st",
+    "naam": "Sesotho",
+    "en": "Sotho"
+  },
+  {
+    "code": "sn",
+    "naam": "chiShona",
+    "en": "Shona"
+  },
+  {
+    "code": "rw",
+    "naam": "Kinyarwanda",
+    "en": "Kinyarwanda"
+  },
+  {
+    "code": "mg",
+    "naam": "Malagasy",
+    "en": "Malagasy"
+  },
+  {
+    "code": "wo",
+    "naam": "Wolof",
+    "en": "Wolof"
+  },
+  {
+    "code": "ln",
+    "naam": "Lingála",
+    "en": "Lingala"
+  },
+  {
+    "code": "ny",
+    "naam": "Chichewa",
+    "en": "Chichewa"
+  },
+  {
+    "code": "lg",
+    "naam": "Luganda",
+    "en": "Ganda"
+  },
+  {
+    "code": "ht",
+    "naam": "Kreyòl ayisyen",
+    "en": "Haitian Creole"
+  },
+  {
+    "code": "qu",
+    "naam": "Runasimi",
+    "en": "Quechua"
+  },
+  {
+    "code": "gn",
+    "naam": "Avañeʼẽ",
+    "en": "Guarani"
+  },
+  {
+    "code": "ay",
+    "naam": "Aymar aru",
+    "en": "Aymara"
+  },
+  {
+    "code": "mi",
+    "naam": "Te reo Māori",
+    "en": "Maori"
+  },
+  {
+    "code": "sm",
+    "naam": "Gagana Sāmoa",
+    "en": "Samoan"
+  },
+  {
+    "code": "to",
+    "naam": "Lea faka-Tonga",
+    "en": "Tongan"
+  },
+  {
+    "code": "fj",
+    "naam": "Vosa Vakaviti",
+    "en": "Fijian"
+  }
+];
+/* Code-controlled shared UI copy. These words never select an action: Edge
+   keeps its existing action IDs, handlers and server permissions. */
+window.RTGUiBronnen = Object.freeze({
+  'Hier':'Here','Heel RTG':'All RTG','Recent bezocht':'Recently visited','Uw ruimte':'Your space',
+  'Relevant op deze plek':'Relevant here','Functies op deze plek':'Features for this context',
+  'Uw vier werelden':'Your four worlds','Alles van Rahul Travel Group':'Everything from Rahul Travel Group',
+  'Alle apps':'All apps','Profiel & veiligheid':'Profile and security','Menuweergave':'Menu view','Menu sluiten':'Close menu',
+  'Home':'Home','HOME':'HOME','Menu':'Menu','MENU':'MENU','Werelden':'Worlds','WERELDEN':'WORLDS',
+  'Acties':'Actions','ACTIES':'ACTIONS','Terug':'Back','Vooruit':'Forward','Sluiten':'Close',
+  'Openen':'Open','Opslaan':'Save','Annuleren':'Cancel','Doorgaan':'Continue','Ga verder':'Continue',
+  'Volgende stap':'Next step','Uw werelden':'Your worlds','Context en opties':'Context and options',
+  'Veiligheid en status':'Security and status','Open Connect':'Open Connect','Bekijk actuele status':'View current status',
+  'Rahul vragen':'Ask Rahul','Praat met Rahul':'Talk to Rahul','Vraag Rahul':'Ask Rahul','Vraag Rahul…':'Ask Rahul…',
+  'Gesprek met Rahul':'Conversation with Rahul','Open gesprek met Rahul':'Open conversation with Rahul',
+  'Geef Rahul context':'Give Rahul context','Gesprek':'Conversation','Versturen':'Send',
+  'Acties van dit scherm':'Actions for this screen','Alle functies':'All features','ALLE FUNCTIES':'ALL FEATURES',
+  'Context van deze pagina':'Context for this page','Context van dit scherm':'Context for this screen',
+  'Dit scherm':'This screen','Hoofdactie':'Main action','Doen':'Act','Meer acties':'More actions','Meer':'More',
+  'Connect openen':'Open Connect','Actuele activiteit':'Current activity','Actueel':'Current',
+  'Wat wilt u doen?':'What would you like to do?','VEILIGE VOLGENDE STAP':'SAFE NEXT STEP',
+  'Voor deze context zijn geen veilige acties beschikbaar.':'No safe actions are available for this context.',
+  'Home, Context, Acties, Connect en Rahul':'Home, Context, Actions, Connect and Rahul',
+  'Handelingen van dit scherm':'Actions for this screen','Hoofdnavigatie':'Main navigation',
+  'Menu en alle functies':'Menu and all features','Naar home':'Go home','Werelden openen':'Open worlds',
+  'Aantal schermen':'Number of screens','Functies van dit scherm':'Features for this screen',
+  'Vier RTG werelden':'Four RTG worlds','Functies':'Features','Functies zoeken':'Search features',
+  'Geen functie gevonden.':'No matching feature was found.','Werelden en werkbladen':'Worlds and workspaces',
+  'Werelden en systeem':'Worlds and system','Slim menu':'Smart menu','Menu openen':'Open menu',
+  'Bediening en weergave':'Controls and display','Taal kiezen':'Choose your language',
+  'Mijn profiel':'My profile','Zoeken':'Search','Informatiedichtheid':'Information density',
+  'Compact':'Compact','Ruim':'Comfortable','Weergavestand':'Display mode','Weergave':'Display',
+  'Bediening tonen':'Show controls','Context sluiten':'Close context','Automatisch':'Automatic',
+  'Overzicht':'Overview','Focus':'Focus','LIVE SYSTEEMSTATUS':'LIVE SYSTEM STATUS','Status ophalen…':'Loading status…',
+  'Lokale controle':'Local check','Beveiligd':'Secure','Niet beveiligd':'Not secure','Netwerk':'Network',
+  'Controleren…':'Checking…','Datalaag':'Data layer','Boeken, betalen en goedkeuren blijven menselijke handelingen.':'Booking, payment and approval remain human decisions.',
+  'Magnaat Test gereed':'Magnaat Test ready','Systemen gereed':'Systems ready','Controle nodig':'Review needed',
+  'Beperkt':'Limited','Gereed':'Ready','Niet gereed':'Not ready','Server niet bereikbaar':'Server unavailable',
+  'Onbekend':'Unknown','Wacht op bron':'Waiting for source','niet beschikbaar':'unavailable',
+  'Afgeschermde Magnaat-testomgeving. Geen klantdata of productieacties. Boeken, betalen en goedkeuren blijven menselijke handelingen.':'Isolated Magnaat test environment. No customer data or production actions. Booking, payment and approval remain human decisions.',
+  'Dag & team':'Day and team','Vandaag':'Today','Morgen':'Tomorrow','Gisteren':'Yesterday',
+  'Afdelingen':'Departments','Personeel':'Staff','Agenda':'Calendar','Mijn loon':'My pay',
+  'Maken & delen':'Create and share','Presentaties & Office':'Presentations and Office','Bestanden':'Files',
+  'Ondernemen':'Business','Onderneming':'Company','Regie':'Control','Plannen':'Planning',
+  'Reizen & Veilig':'Travel and safety','Vluchten':'Flights','Verblijven':'Stays','Reisbureau':'Travel agency',
+  'Onderweg':'On the move','Navigatie':'Navigation','Openbaar vervoer':'Public transport','Verkeer':'Traffic',
+  'Ritstatus':'Ride status','Stad':'City','Residentie':'Residence','Reisboek':'Travel journal',
+  'Leefmodel':'Life overview','Voornemen':'Intent','Routes vergelijken':'Compare routes',
+  'Beslissingen':'Decisions','Terugkijken':'Review','Uw leven':'Your life','Mijn leven':'My life',
+  'RTG Geld':'RTG Money','Wonen':'Home and living','Gezondheid':'Health','RTG Veilig':'RTG Safety',
+  'Start & leren':'Start and learn','Leren & Groei':'Learning and growth','Presenteren & Office':'Presentations and Office',
+  'Bibliotheek':'Library','Geloofsbibliotheek':'Faith library','Schoolbibliotheek':'School library','Beroepen':'Careers',
+  'Overhoren':'Practice questions','Schrijven':'Writing','Projecten':'Projects','Toetsen':'Tests','Presenteren':'Presentations',
+  'Klein beginnen':'Start small','De Speeltuin':'The playground','Tellen tot tien':'Count to ten',
+  'Ondersteuning':'Support','Instellingen':'Settings','Meldingen':'Notifications','Berichten':'Messages',
+  'Profiel':'Profile','Uitloggen':'Sign out','Inloggen':'Sign in','Aanmelden':'Sign up',
+  'Alles':'All','Kies uw taal':'Choose your language','Hulp':'Help','Zoek':'Search',
+  'Alle werelden':'All worlds','Verder ontdekken':'Keep exploring','Licht':'Light','Donker':'Dark',
+  'Welkom':'Welcome','Welkom terug':'Welcome back','Opslaan gelukt':'Saved successfully'
+});
+/* Exact interface templates only. Values, identifiers and user input are never parsed as commands. */
+window.RTGUiBronTekst = function(source){
+  if(Object.hasOwn(window.RTGUiBronnen,source))return window.RTGUiBronnen[source];
+  var count=/^Zoek in (\d+) functies$/.exec(source);
+  if(count)return 'Search '+count[1]+' features';
+  var world=/^(LIVING OS|TRAVEL OS|WORK OS|RTFOUNDATION) · ALLE FUNCTIES$/.exec(source);
+  if(world)return world[1]+' · ALL FEATURES';
+  var store=/^(sqlite|postgres|memory|opslag) · (schrijfbaar|alleen-lezen)$/.exec(source);
+  if(store)return store[1]+' · '+(store[2]==='schrijfbaar'?'writable':'read only');
+};
 /* De LEZER van de automatische UI-vertaling voor de volledige RTG-schermfamilie.
    (Het tonen, opvragen en wisselen staat in i18n-00c.js: een IIFE, twee helften.)
 
@@ -344,12 +986,15 @@
 
   function voeg(groepen, st) {
     if (!kandidaat(st.bron)) return;
+    var known=w.RTGUiBronTekst && w.RTGUiBronTekst(st.bron);
+    if(taal==='en' && known!=null) return toon(st,known);
     var uitKast = KAST.van(taal).get(st.bron);
     if (uitKast != null) return toon(st, uitKast);
     /* Kast, dan schil, dan net. De kast is verser (hij kent ook schermen buiten
        de schil), de schil is breder bij een koude start, het net kost geld. */
     var uitSchil = SCHIL.van(taal).get(st.bron);
     if (uitSchil != null) return toon(st, uitSchil);
+    if(known!=null) toon(st,known); // Explicit source copy remains usable while a target translation is pending.
     if (!groepen.has(st.bron)) groepen.set(st.bron, new Set());
     groepen.get(st.bron).add(st);
   }
@@ -458,7 +1103,10 @@
     if (!groepen.size) return;
     var gekozenTaal = taal, gekozenBeurt = beurt;
     groepenVan(Array.from(groepen.keys()), groepen).forEach(function (groep) {
-      keten = keten.then(function () { return vraag(groep, gekozenTaal, gekozenBeurt); })
+      keten = keten.then(function () {
+        if (taal !== gekozenTaal || beurt !== gekozenBeurt) return;
+        return vraag(groep, gekozenTaal, gekozenBeurt);
+      })
         .catch(function () { /* de brontekst blijft heel; een volgende DOM-wijziging probeert opnieuw */ });
     });
   }
@@ -489,6 +1137,7 @@
   }
 
   function pasToe(nieuweTaal) {
+    if (taal !== nieuweTaal) herstel();
     taal = /^[a-z]{2}$/.test(String(nieuweTaal || '')) ? nieuweTaal : 'nl';
     beurt++;
     if (RTL.has(taal)) document.documentElement.setAttribute('dir', 'rtl');
@@ -565,7 +1214,7 @@
   /* Wereldtalen: de Boardroom bepaalt welke talen aanstaan; de kiezer toont ze
      allemaal. UI-teksten vallen voor andere talen terug op Engels; chats en
      berichten worden door de server echt per taal vertaald. */
-  let WERELD = null; // [{code, naam, en}] uit /api/talen
+  let WERELD = window.RTGWereldTalen || null; // [{code, naam, en}] uit /api/talen
   function supported() { return WERELD ? WERELD.map(t => t.code) : Object.keys(LANGS); }
   const orig = new WeakMap(); // element -> { text, html, ph }
 
@@ -621,12 +1270,12 @@
     zuidafrika: 'af', kenia: 'sw', kenya: 'sw', tanzania: 'sw', ethiopie: 'am', ethiopia: 'am', nigeria: 'yo'
   };
 
-  function detectDevice() {
+  function detectDevice(codes) {
     const list = (navigator.languages && navigator.languages.length)
       ? navigator.languages : [navigator.language || 'nl'];
     for (const raw of list) {
       const code = String(raw || '').toLowerCase().slice(0, 2);
-      if (supported().includes(code)) return code;
+      if ((codes || supported()).includes(code)) return code;
     }
     return 'en'; // geen match: standaard Engels
   }
@@ -638,9 +1287,11 @@
     // terugval); Nederlands staat gewoon in de HTML zelf.
     dict(lang) {
       const all = window.I18N || {};
-      return all[lang] || (lang !== 'nl' ? all.en : null) || {};
+      return lang === 'nl' ? (all.nl || {}) : Object.assign({}, all.en || {}, all[lang] || {});
     },
+    _usedKeys: new Set(),
     t(key, fallback) {
+      this._usedKeys.add(key);
       if (this.lang === 'nl') return fallback != null ? fallback : key;
       const v = this.dict(this.lang)[key];
       return v != null ? v : (fallback != null ? fallback : key);
@@ -656,9 +1307,14 @@
       document.querySelectorAll('[data-i18n]').forEach(el => {
         if (!orig.has(el)) orig.set(el, {});
         const o = orig.get(el);
-        if (o.text == null) o.text = el.textContent;
+        const key=el.getAttribute('data-i18n');
+        if (o.text == null || o.key !== key) { o.text=el.getAttribute('data-i18n-source') || el.textContent; o.key=key; }
         const val = d[el.getAttribute('data-i18n')];
-        el.textContent = (val != null && lang !== 'nl') ? val : o.text;
+        const policy=window.RTGAccessMeaning;
+        if(policy && (key.startsWith('access.') || key.startsWith('onb.'))) {
+          const projection=policy.projection(key,o.text,(window.I18N || {}).en && window.I18N.en[key],lang,val);
+          el.textContent=projection.text; if(projection.fallback) el.setAttribute('lang',projection.language); else el.removeAttribute('lang');
+        } else el.textContent = (val != null && lang !== 'nl') ? val : o.text;
       });
 
       document.querySelectorAll('[data-i18n-html]').forEach(el => {
@@ -668,6 +1324,15 @@
         const val = d[el.getAttribute('data-i18n-html')];
         el.innerHTML = (val != null && lang !== 'nl') ? val : o.html;
       });
+
+      for (const [binding,attribute] of [['data-i18n-aria','aria-label'],['data-i18n-title','title']]) {
+        document.querySelectorAll('['+binding+']').forEach(el=>{
+          if(!orig.has(el)) orig.set(el,{});
+          const o=orig.get(el); if(o[attribute]==null) o[attribute]=el.getAttribute(attribute) || '';
+          const value=d[el.getAttribute(binding)];
+          el.setAttribute(attribute,lang!=='nl' && value!=null ? value:o[attribute]);
+        });
+      }
 
       document.querySelectorAll('[data-i18n-ph]').forEach(el => {
         if (!orig.has(el)) orig.set(el, {});
@@ -690,6 +1355,8 @@
 
     set(lang, remember) {
       if (remember !== false) { try { localStorage.setItem(STORE, lang); } catch (e) {} this.chosen = true; }
+      const state=this._wereldDict[lang];
+      if (state && !state.pending) state.tried.clear();
       this.apply(lang);
     },
 
@@ -710,42 +1377,61 @@
        EN HIJ VRAAGT ALLEEN WAT HIJ MIST. Van vierhonderd sleutels zijn er op de
        tweede pagina meestal een handvol nieuw; de rest komt uit de kast. */
     _wereldDict: {},
-    laadWereldDict(lang) {
-      if (lang === 'nl' || lang === 'en' || this._wereldDict[lang]) return;
-      const all = window.I18N || {};
-      if (all[lang]) return; // de pagina bracht dit woordenboek zelf mee
-      const en = all.en || {};
-      const keys = Object.keys(en).slice(0, 400);
-      if (!keys.length) return;
-      this._wereldDict[lang] = true;
+    async laadWereldDict(lang) {
+      if (lang === 'nl' || lang === 'en') return;
+      const state = this._wereldDict[lang] || (this._wereldDict[lang] = { pending:false, tried:new Map() });
+      if (state.pending) return;
+      const en = (window.I18N || {}).en || {};
+      const own = (window.I18N || {})[lang] || {};
       const kast = window.RTGVertaalKast;
-      const zet = (d) => {
-        window.I18N = window.I18N || {};
-        window.I18N[lang] = d;
-        if (this.lang === lang) this.apply(lang); // opnieuw toepassen zodra hij er is
-      };
-      const uit = {};
-      const missend = [];
+      const keys = Object.keys(en).filter(k => typeof en[k] === 'string' && en[k].length <= 300 &&
+        !(window.RTGAccessMeaning && (k.startsWith('access.') || k.startsWith('onb.')) &&
+          ['decision','legal'].includes(window.RTGAccessMeaning.risk(k))) &&
+        own[k] == null && state.tried.get(k) !== en[k]);
+      if (!keys.length) return;
+      // The visible screen is first; every remaining key still has a bounded batch.
+      keys.sort((a,b)=>Number(this._usedKeys.has(b))-Number(this._usedKeys.has(a)));
+      state.pending = true;
+      const out = {}, groups = [];
+      let group = [], size = 0;
       keys.forEach(k => {
-        const bron = en[k];
-        const bekend = kast ? kast.lees(lang, bron) : null;
-        if (bekend != null) uit[k] = bekend; else missend.push(k);
+        const known = kast ? kast.lees(lang,en[k]) : null;
+        if (known != null) { out[k]=known; return; }
+        if (group.length && (group.length >= 100 || size + en[k].length > 18000)) {
+          groups.push(group); group=[]; size=0;
+        }
+        group.push(k); size+=en[k].length;
       });
-      if (!missend.length) return zet(uit);          // volledig uit het toestel: geen netwerk
-      if (Object.keys(uit).length) zet(uit);          // toon vast wat we al weten
-      fetch(apiPad('/api/vertaal/ui'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ naar: lang, teksten: missend.map(k => en[k]) }) })
-        .then(r => r.json())
-        .then(d => {
-          if (!d || d.naar !== lang || !Array.isArray(d.teksten)) return;
-          missend.forEach((k, i) => {
-            const v = d.teksten[i] || en[k];
-            uit[k] = v;
-            if (kast) kast.zet(lang, en[k], v);       // de kast weigert v === bron zelf
+      if (group.length) groups.push(group);
+      const publish = () => {
+        window.I18N=window.I18N || {};
+        window.I18N[lang]=Object.assign({},window.I18N[lang] || {},out);
+        if (this.lang === lang) this.apply(lang);
+      };
+      if (Object.keys(out).length) publish();
+      try {
+        for (const batch of groups) {
+          if (this.lang !== lang) break;
+          const response = await fetch(apiPad('/api/vertaal/ui'), {method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({naar:lang,teksten:batch.map(k=>en[k])})});
+          if (!response.ok) throw new Error('UI translation '+response.status);
+          const data=await response.json();
+          if (!data || data.naar!==lang || !Array.isArray(data.teksten) || data.teksten.length!==batch.length)
+            throw new Error('Incomplete UI translation');
+          batch.forEach((k,i)=>{
+            state.tried.set(k,en[k]);
+            const value=data.teksten[i];
+            // An unchanged source is a fallback, never a completed translation.
+            if(typeof value==='string' && value && value!==en[k]) {
+              out[k]=value; if(kast) kast.zet(lang,en[k],value);
+            }
           });
-          zet(uit);
-        })
-        .catch(() => { this._wereldDict[lang] = false; });
+          publish();
+        }
+      } catch (e) {
+        // Keep the complete fallback. An explicit language choice can retry.
+      } finally { state.pending=false; }
     },
 
     /* ---------- taalkeuze: de wereld in RTG-stijl ----------
@@ -1032,6 +1718,9 @@
     }
   };
 
+  window.addEventListener('storage',event=>{
+    if(event.key===STORE && /^[a-z]{2}$/.test(event.newValue || '')) { RTGi18n.chosen=true; RTGi18n.set(event.newValue,false); }
+  });
   window.RTGi18n = RTGi18n;
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => RTGi18n.init());

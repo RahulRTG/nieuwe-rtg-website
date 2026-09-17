@@ -181,8 +181,8 @@ test('de sleutelweg deelt de kast van de vangnetlaag', () => {
     'laadWereldDict leest uit dezelfde kast als de automatische laag');
   assert.doesNotMatch(bron, /'rtg_ui_' \+ lang/,
     'geen tweede opslag per PAD: dezelfde knop op twee schermen is een vertaling');
-  assert.match(bron, /teksten: missend\.map/,
-    'alleen de ontbrekende regels gaan over de lijn, niet telkens alle vierhonderd');
+  assert.match(bron, /teksten:batch\.map/,
+    'alleen de ontbrekende regels gaan over de lijn, niet telkens alle woorden');
 });
 
 test('alleen aantoonbare code-interface mag naar een externe UI-vertaler', () => {

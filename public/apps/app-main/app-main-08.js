@@ -43,11 +43,11 @@
     try { onbSt = await API.call('/onboarding/opslaan', { velden }); } catch(e){ return ''; }
     return stukjes.join(', ');
   }
-  function onbTekenVraag(){
+  function onbTekenVraag(preserve){
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');
     if (rij) rij.style.display = '';
     if (inp){
-      inp.type = 'text'; inp.value = ((onbSt.velden || []).find(v => v.id === 'naam') || {}).waarde || ''; inp.autocomplete = 'name';
+      if(!preserve){inp.type = 'text'; inp.value = ((onbSt.velden || []).find(v => v.id === 'naam') || {}).waarde || '';} inp.autocomplete = 'name';
       inp.placeholder = T('access.onb.name','Vul uw volledige naam in');
       inp.setAttribute('aria-label', T('access.onb.nameLabel','Volledige naam voor ondertekening'));
     }
@@ -56,11 +56,13 @@
     const l = onbEl('onbLees');
     if (l){ l.textContent = c.tekst || c.titel || ''; l.hidden = true; l.tabIndex = 0; }
     onbEl('onbConsentLabel').hidden = false;
-    onbEl('onbConsent').checked = false;
+    if(!preserve) onbEl('onbConsent').checked = false;
     onbEl('onbGo').dataset.i18n = 'access.onb.finish';
+    onbEl('onbGo').dataset.i18nSource = 'Bevestig en open mijn RTG';
     onbEl('onbGo').textContent = T('access.onb.finish','Bevestig en open mijn RTG');
     onbActies([{ txt: T('access.onb.read','Lees de overeenkomst'), doe: onbToonLees }]);
-    onbEl('onbGate').scrollTop = 0;
+    onbLanguagePolicy();
+    if(!preserve) onbEl('onbGate').scrollTop = 0;
   }
   function onbToonLees(){
     const l = onbEl('onbLees'); if (!l) return;
@@ -130,6 +132,7 @@
       if (!tekst || !onbMbHuidig) return;
       return onbMbOpslaan(tekst);
     } else if (onbStap === 'teken'){
+      if (!onbLanguagePolicy()) return;
       if (!onbEl('onbConsent').checked){
         if (fout) fout.textContent = T('access.onb.consent','Bevestig dat u de overeenkomst heeft gelezen en ermee akkoord gaat.');
         onbEl('onbConsent').focus(); return;
@@ -137,14 +140,14 @@
       if (tekst.length < 2){ if (fout) fout.textContent = T('access.onb.nameShort','Vul uw volledige naam in om de overeenkomst te ondertekenen.'); return; }
       onbBezig = true; onbEl('onbGo').disabled = true;
       try {
-        const r = await API.call('/onboarding/teken', { naam: tekst, akkoord: true });
+        const r = await accessRequest('identity.agreement.accept', {naam:tekst,akkoord:true,contractVersion:onbSt.contract.versie});
         onbBezig = false; onbSt = r;
         if (r && r.klaar) return onbInrichtenAanbod();
         onbRij = onbOpenVelden();
         onbStap = onbRij.length ? 'veld' : 'teken';
         onbVolgende();
-      } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet. Probeer het opnieuw.'); }
-      finally { onbEl('onbGo').disabled = false; }
+      } catch(e){ onbBezig = false; await onbSignError(e,tekst); }
+      finally { onbLanguagePolicy(); }
     }
   }
   async function onbPaspoortGekozen(file){
@@ -180,4 +183,3 @@
     const kf = document.getElementById('onbKycFile');
     if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();
-

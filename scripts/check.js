@@ -4716,11 +4716,9 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
     ['public/shared/rtg-adaptive-edge.css', new Set([
       'var(--rtg-radius-system,22px)'
     ])],
-    ['public/shared/rtg-simple.css', new Set([
+    ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)'])], ['public/shared/rtg-simple.css', new Set([
       'var(--rtg-radius-system)!important'
     ])],
-    // The approved access portal uses the same Heritage content corners.
-    ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)'])],
     ['public/shared/interface/second-screen-personal.css', new Set([
       'var(--rtg-radius-system)'
     ])]
@@ -5864,6 +5862,12 @@ console.log('\n71) de vorige bronmuterende ronde is netjes afgelopen en heeft ni
     }
   }
 }
+
+console.log('\n72) taalbewijs hoort bij de geteste bron en noemt zijn grenzen');
+try {
+  require('child_process').execFileSync(process.execPath,[path.join(ROOT,'scripts/language-proof.js'),'--check'],{stdio:'pipe'});
+  ok('LANGUAGECAPABILITY, MEANINGPARITY en LANGUAGEFAILOVER horen bij deze bron');
+} catch(e) { fout('taalbewijs ontbreekt of is verouderd; draai npm run language:proof'); }
 
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
 

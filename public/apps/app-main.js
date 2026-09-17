@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '6d831fac';
+var RTG_BOUW = 'd471a82c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -5772,7 +5772,7 @@ var RTG_BOUW = '6d831fac';
        Het paneel is wat een lid instellingen noemt, dus krijgt het die naam.
        De ander heet nu Pagina-instellingen, precies zoals zijn eigen blad zich
        al noemde (shared/command/werktafel.js). */
-    RTGCommand.systeem(knop ? [{ naam: T('os.instellingen', 'Instellingen'), teken: 'instel',
+    RTGCommand.systeem(knop ? [{ sleutel: 'instellingen', naam: T('os.instellingen', 'Instellingen'), teken: 'instel',
       doe: function () { knop.click(); } }] : []);
   }
 /* de app-regie van de boardroom: uitgezette apps verdwijnen van het springboard */

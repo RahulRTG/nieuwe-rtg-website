@@ -1369,6 +1369,10 @@ async function bankDeur(page, naam, opties) {
   /* Tijdens login wordt de gesloten Command-root door de echte werktafel
      vervangen. Een kort zichtbare gesloten root is nog geen bedienbare deur. */
   await page.waitForSelector('#rtgCommand[data-stand="open"]', { state: 'visible', timeout: 10000 });
+  if (naam === 'Rahul') {
+    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]').click({ timeout: ms });
+    return;
+  }
   const mobielDicht = await page.evaluate(() => matchMedia('(max-width:999px)').matches &&
     !document.getElementById('rtgCommand').classList.contains('bank-open'));
   if (mobielDicht) {
@@ -1382,12 +1386,12 @@ async function bankDeur(page, naam, opties) {
     await edge.click(); await edgeWerkbladen(page);
     await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
   }
-  await page.waitForFunction((n) => [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
-    .some((b) => b.textContent.trim() === n), naam, { timeout: ms });
-  await page.evaluate((n) => {
-    [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
-      .find((b) => b.textContent.trim() === n).click();
-  }, naam);
+  // Een deur heeft dezelfde betekenis wanneer de browser een andere taal kiest.
+  const sleutel = { Instellingen: 'instellingen', Rahul: 'rahul' }[naam];
+  if (!sleutel) throw new Error('Onbekende bankdeur: ' + naam);
+  const deur = page.locator('#rtgCommand .cmd-bankvoet [data-deur="' + sleutel + '"]');
+  await deur.waitFor({ state: 'visible', timeout: ms });
+  await deur.click();
 }
 
 module.exports = { edgeActies, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,

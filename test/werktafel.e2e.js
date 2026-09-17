@@ -107,8 +107,7 @@ const stand = () => {
        die knop dus ook niet. Wat de belofte eronder was -- er is vanaf de
        werktafel altijd een zichtbare weg naar uitloggen, de pin, je Zegel --
        leeft door in de voet van de bank. */
-    paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
-      .some(b => /^Instellingen$/i.test(b.textContent.trim())),
+    paneelIngang: !!document.querySelector('.cmd-bankvoet button[data-deur="instellingen"]'),
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
     // hoeveel er onder het blad overblijft: dat hoort precies de gezamenlijke

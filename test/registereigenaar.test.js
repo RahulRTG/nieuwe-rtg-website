@@ -75,7 +75,13 @@ test('3. een verklaarde eigenaar bestaat, en een handmatig register heeft een le
     assert.ok(fs.existsSync(path.join(WORTEL, register)),
       'het register ' + register + ' heeft een verklaarde eigenaar maar bestaat niet');
 
-    if (e.handmatig) {
+    if (e.soort === 'BRON') {
+      // A maintained architecture document has no generator. JSON registers
+      // still require their existing writer or explicit manual reader contract.
+      assert.match(register, /\.md$/, 'BRON-document mag geen registercontrole omzeilen');
+      assert.equal(e.schrijver, undefined, register + ' is bron maar noemt toch een generator');
+      assert.ok(String(e.waarom || '').length > 20, register + ' mist een bronverklaring');
+    } else if (e.handmatig) {
       assert.ok(e.lezer && fs.existsSync(path.join(WORTEL, e.lezer)),
         register + ' wordt met de hand onderhouden zonder bestaande lezer; een register dat niemand leest ' +
         'is geen register maar een bestand');

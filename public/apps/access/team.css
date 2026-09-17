@@ -1,0 +1,26 @@
+/* The operational account keeps its own authentication and shares the portal
+   canvas. Only the gate is styled; the authenticated Team Room stays intact. */
+body[data-rtg-skin="heritage"] #gate[data-rtg-access="team"]{
+  position:fixed!important;inset:0!important;z-index:140;width:100%!important;max-width:none!important;
+  height:100dvh!important;min-height:0!important;margin:0!important;border:0!important;border-radius:0!important;
+  padding:calc(env(safe-area-inset-top,0px) + 28px) 28px calc(var(--rtg-adaptive-inset,100px) + 42px)!important;
+  overflow:auto;overscroll-behavior:contain;display:block;box-sizing:border-box;
+  background:radial-gradient(ellipse at 90% 85%,#501028,transparent 68%),#390919!important;
+  color:#f4eddc!important;--txt:#f4eddc;--rtg-txt:#f4eddc;--muted:#dacbd0;--soft:#dacbd0;
+  --line:#ad8792;--card:#390919;--card2:#501028;--knop:#f4eddc;--knop-txt:#390919;
+  scroll-padding-block:24px 140px;
+}
+body[data-rtg-skin="heritage"] #gate[data-rtg-access="team"][style*="display: none"]{display:none!important}
+#gate[data-rtg-access="team"] #gateStep{margin:0}
+#gate[data-rtg-access="team"] .lform{margin:0;gap:0}
+#gate[data-rtg-access="team"] .access-field{margin-bottom:18px;text-align:start}
+#gate[data-rtg-access="team"] .llinks{margin-top:22px;gap:0}
+#gate[data-rtg-access="team"] .lhint{font-size:13px;line-height:1.6;color:#dacbd0}
+#gate[data-rtg-access="team"] .access-secondary{display:inline-flex;align-items:center;min-height:44px}
+#gate[data-rtg-access="team"] :is(.gbtn,.card){background:#ffffff08;color:#f4eddc;border-color:#ad8792;box-shadow:none}
+#gate[data-rtg-access="team"] :is(.gback,.k,.gbtn span){color:#dacbd0}
+#gate[data-rtg-access="team"] .pinrow{flex-wrap:wrap;gap:12px}
+#gate[data-rtg-access="team"] .pinrow input{flex-basis:100%;min-height:56px;color:#f4eddc;background:#ffffff08;border-color:#ad8792}
+#gate[data-rtg-access="team"] :is(.pinrow button,.prim){width:100%;min-height:56px;background:#f4eddc;color:#390919;border:0;line-height:1.4;font-size:16px}
+body:has(#gate[data-rtg-access="team"]:not([style*="display: none"])) #toast{position:fixed;z-index:150;bottom:calc(var(--rtg-adaptive-inset,100px) + 20px)}
+html[data-rtg-oppervlak="1"] #gate[data-rtg-access="team"]{padding-bottom:36px!important}

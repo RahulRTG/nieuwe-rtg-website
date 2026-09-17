@@ -43,63 +43,34 @@
     if (vast) stepWie(null, vast);
     else stepLogin();
   }
-  // de klok en de datum op het inlogscherm (de naam van de app staat in de badge)
-  function gateTik(){ if (window.RTGKlok) RTGKlok.alles(); }
-  /* De hoofd-ingang is een GESPREK met Rahul, net als in de leden-app: hij
-     vraagt wie u bent, daarna uw wachtwoord, en pas dan gaat hij aanbellen bij
-     dezelfde inlogroute als voorheen (mijnLogin -> /api/auth/login). Er gaat
-     niets van dit gesprek naar een taalmodel, en Rahul beslist niets: de server
-     zegt ja of nee, precies als eerst. De zijpaden (aanmelden, wachtwoord
-     vergeten, vast apparaat) staan er rustig onder.
-     Is shared/rahulpoort.js er niet, dan valt hij terug op het oude formulier;
-     zonder inlogscherm zou de app onbruikbaar zijn en dat risico nemen we niet. */
+  // The shared access canvas changes presentation, never account authority.
   function stepLogin(){
     kantoorStop();
-    if (window.RTGPoort && window.RTGPoort.gesprek) return poortGesprek();
+    teamAccessView('login', 'pd.access.welcome', 'Welkom bij uw team.',
+      'pd.access.loginhelp', 'Log in met uw persoonlijke RTG-account om verder te gaan naar uw werkplek.');
     formulierLogin();
-  }
-  function poortGesprek(){
-    window.RTGPoort.gesprek($('#gateStep'), {
-      groet: () => T('pd.rp.groet','Welkom terug bij RTG Personeel.'),
-      wacht: () => T('pd.rp.wacht','Een ogenblik, ik kijk het na.'),
-      stuurLabel: T('pd.rp.stuur','Stuur'),
-      stappen: [
-        { sleutel:'user', vraag: () => T('pd.rp.wie','Met wie heb ik het genoegen?'),
-          plho: () => T('pd.li.user','E-mail of gebruikersnaam'), type:'text', autocomplete:'username' },
-        { sleutel:'pass', vraag: () => T('pd.rp.pass','Dank u. En uw wachtwoord?'),
-          plho: () => T('pd.li.pass','Wachtwoord'), type:'password', autocomplete:'current-password' }
-      ],
-      klaar: async (a) => {
-        try { await mijnLogin(a.user, a.pass); }
-        catch(err){ throw new Error(err && err.message || T('pd.badlogin','Onjuiste inloggegevens.')); }
-      },
-      zijpaden: [
-        { tekst: () => T('pd.aanmelden','Aanmelden bij een bedrijf'), doe: stepAanmelden },
-        { tekst: () => T('pd.forgot','Wachtwoord vergeten?'), doe: stepForgot },
-        { tekst: () => T('pd.ondevice','Vast apparaat? Inloggen met naam en pincode'), doe: stepSector }
-      ]
-    });
   }
   // Aanmelden bij een bedrijf: bedrijfsnaam + kassacode (van de werkgever) +
   // het eigen RTG-account + een zelfgekozen pincode. Daarna landt u meteen.
   function stepAanmelden(){
-    $('#gateStep').innerHTML =
-      '<button class="gback" id="jaBack">← '+T('pd.back','Terug')+'</button>'+
+    teamAccessView('join', 'pd.access.join', 'Sluit u aan bij uw team.',
+      'pd.access.joinhelp', 'Gebruik de gegevens van uw werkgever en uw eigen RTG-account. Kies daarna een pincode voor het apparaat op uw werkplek.');
+    $('#gateStep').innerHTML = teamBack('jaBack')+
       '<form class="lform" id="joinForm" autocomplete="on">'+
-        '<input id="jaBedrijf" type="text" placeholder="'+T('pd.ja.bedrijf','Bedrijfsnaam')+'" aria-label="'+T('pd.ja.bedrijf','Bedrijfsnaam')+'">'+
-        '<input id="jaCode" type="text" autocapitalize="characters" placeholder="'+T('pd.ja.code','Kassacode van uw werkgever')+'" aria-label="'+T('pd.ja.code','Kassacode van uw werkgever')+'">'+
-        '<input id="jaUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
-        '<input id="jaPass" type="password" autocomplete="current-password" placeholder="'+T('pd.ja.rtgpass','Wachtwoord van uw RTG-account')+'" aria-label="'+T('pd.ja.rtgpass','Wachtwoord van uw RTG-account')+'">'+
-        '<input id="jaPin" type="password" inputmode="numeric" maxlength="4" placeholder="'+T('pd.ja.pin','Kies een pincode (4 cijfers)')+'" aria-label="'+T('pd.ja.pin','Kies een pincode van 4 cijfers')+'">'+
-        '<div class="err" id="jaErr" role="alert"></div>'+
-        '<button class="prim" type="submit">'+T('pd.aanmelden.go','Aanmelden')+'</button>'+
-      '</form>'+
-      '<div class="lhint">'+T('pd.ja.hint','Nog geen RTG-account? Maak er gratis een aan in de leden-app; daarna meldt u zich hier aan met de kassacode van uw werkgever.')+'</div>';
+        teamField('jaBedrijf', 'pd.ja.bedrijf', 'Bedrijfsnaam', 'text', 'autocomplete="organization" required')+
+        teamField('jaCode', 'pd.ja.code', 'Kassacode van uw werkgever', 'text', 'autocapitalize="characters" spellcheck="false" required')+
+        teamField('jaUser', 'pd.li.user', 'E-mail of gebruikersnaam', 'text', 'autocomplete="username" autocapitalize="none" spellcheck="false" required')+
+        teamField('jaPass', 'pd.ja.rtgpass', 'Wachtwoord van uw RTG-account', 'password', 'autocomplete="current-password" required')+
+        teamField('jaPin', 'pd.ja.pin', 'Kies een pincode van 4 cijfers', 'password', 'inputmode="numeric" minlength="4" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required')+
+        '<div class="access-error" id="jaErr" role="alert" data-i18n-ignore></div>'+
+        '<button class="access-primary" type="submit">'+teamText('pd.access.joingo', 'Ik meld mij aan bij mijn team.')+'</button>'+
+      '</form><p class="lhint">'+teamText('pd.access.accounthelp', 'Heeft u nog geen RTG-account? Maak dit eerst aan. Daarna kunt u zich hier bij uw team aanmelden.')+'</p>'+
+      '<a class="access-secondary" href="/apps/app.html">'+teamText('pd.access.account', 'Ik wil een RTG-account aanmaken.')+'</a>';
     $('#jaBack').addEventListener('click', stepLogin);
     $('#joinForm').addEventListener('submit', async e => {
       e.preventDefault();
       $('#jaErr').textContent = '';
-      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
       try {
         await API.call('/supplier/staff/join', { bedrijf: $('#jaBedrijf').value.trim(), kassacode: $('#jaCode').value.trim(),
           login: $('#jaUser').value.trim(), password: $('#jaPass').value, pin: $('#jaPin').value.trim() });
@@ -107,41 +78,58 @@
         await mijnLogin($('#jaUser').value.trim(), $('#jaPass').value);
       } catch(err){ $('#jaErr').textContent = err.message || T('pd.mis','Er ging iets mis.'); btn.disabled = false; }
     });
-    $('#jaBedrijf').focus();
+
   }
   // Wachtwoord vergeten: stuurt de herstelmail; verder gaat het via de leden-app.
   function stepForgot(){
-    $('#gateStep').innerHTML =
-      '<button class="gback" id="fgBack">← '+T('pd.back','Terug')+'</button>'+
+    teamAccessView('recovery', 'pd.access.recovery', 'We helpen u verder.',
+      'pd.access.recoveryhelp', 'Vul het e-mailadres van uw RTG-account in. U ontvangt een link waarmee u uw wachtwoord opnieuw kunt instellen.');
+    $('#gateStep').innerHTML = teamBack('fgBack')+
       '<form class="lform" id="forgotForm" autocomplete="on">'+
-        '<input id="fgEmail" type="email" autocomplete="email" placeholder="'+T('pd.fg.email','Uw e-mailadres')+'" aria-label="'+T('pd.fg.email','Uw e-mailadres')+'">'+
-        '<div class="err" id="fgErr" role="alert"></div>'+
-        '<button class="prim" type="submit">'+T('pd.fg.go','Stuur herstel-link')+'</button>'+
-      '</form>'+
-      '<div class="lhint">'+T('pd.fg.hint','We sturen een link en een code om uw wachtwoord opnieuw in te stellen. Dat rondt u af in de leden-app.')+'</div>';
+        teamField('fgEmail', 'pd.fg.email', 'Uw e-mailadres', 'email', 'autocomplete="email" autocapitalize="none" required')+
+        '<div class="access-error" id="fgErr" role="alert" data-i18n-ignore></div>'+
+        '<button class="access-primary" type="submit">'+teamText('pd.access.recovergo', 'Stuur mij een herstellink.')+'</button>'+
+      '</form><p class="access-status" id="fgStatus" role="status"></p>';
     $('#fgBack').addEventListener('click', stepLogin);
     $('#forgotForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
       try { await API.call('/auth/forgot', { email: $('#fgEmail').value.trim() });
-        toast(T('pd.fg.ok','Als dit adres bij ons bekend is, is de herstel-link onderweg.'));
-        stepLogin();
+        $('#fgStatus').innerHTML = teamText('pd.fg.ok','Als dit adres bij ons bekend is, is de herstel-link onderweg.');
       } catch(err){ $('#fgErr').textContent = err.message || T('pd.mis','Er ging iets mis.'); btn.disabled = false; }
     });
-    $('#fgEmail').focus();
+
   }
   // Inloggen met het RTG-account en landen op de juiste bedrijfspagina.
   async function mijnLogin(login, password, bedrijf){
     const d = await API.call('/supplier/mijn/login', { login, password, bedrijf: bedrijf || '' });
     await landMijn(d);
   }
-/* DIT SLUITHAAKJE HOORT HIER, EN NIET EEN BESTAND VERDEROP.
 
-   Het stond bovenaan 04.js, waardoor mijnLogin() pas daar dichtging -- en
-   deel 3b, het oude inlogFORMULIER, kwam daarmee BINNEN die functie te liggen.
-   Gevolg: stepLogin() riep formulierLogin() aan terwijl die naam daar niet
-   bestond. Dat vangnet stond er juist "voor het geval de poort er niet is,
-   zonder inlogscherm zou de app onbruikbaar zijn" -- en het was zelf stuk.
+  // Land (of wissel) naar een van de eigen werkplekken: sessie zetten en de app openen.
+  async function landMijn(d){
+    onthoudBedrijf(d.supplier);
+    API.token = d.token; state = d.state; code = d.supplier.code;
+    me = { name: d.actor.name, role: d.actor.role, staffId: d.actor.staffId };
+    mijnPosities = d.posities || [];
+    try { localStorage.setItem('rtg_pda_token', API.token); localStorage.setItem('rtg_pda_code', code); } catch(e){}
+    week = await API.call('/supplier/schedule', {}).catch(()=>null);
+    enter();
+  }
 
-   Gevonden door regel 42 van scripts/check.js, die op dezelfde fout in de
-   Vooruit-kaart is gebouwd. */
+  /* Meenemen (shared/uitvoer.js): het weekrooster dat onder Rooster op het
+     scherm staat, met de velden LOS -- datum, dag, naam, rol en dienst -- in
+     plaats van de regel "Carla Vidal 09:00-17:00" die er staat. Dit is precies
+     wat /supplier/schedule teruggeeft; er wordt niets bij verzonnen, en er
+     staat niemand in die niet ook op het rooster te zien is. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(function(){
+    if (!week || !(week.days || []).length) return null;
+    const rijen = [];
+    week.days.forEach(function(dag){
+      (dag.staff || []).forEach(function(m){
+        rijen.push([dag.date, dag.label, m.name || '', m.role || '', m.shift || '']);
+      });
+    });
+    if (!rijen.length) return null;
+    return { naam: 'rooster', kolommen: ['datum','dag','naam','rol','dienst'], rijen: rijen };
+  });

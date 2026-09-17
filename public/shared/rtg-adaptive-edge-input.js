@@ -44,11 +44,11 @@
     });
   }
   function bind(rt, handlers) {
-    var down = false, x = 0, y = 0, timer = null, held = false, blockClickUntil = 0;
+    var down = false, x = 0, y = 0, lastX = 0, lastY = 0, timer = null, held = false, blockClickUntil = 0;
     var scrollTimer = null, lastScroll = rt.win.scrollY || 0;
     rt.bar.addEventListener('pointerdown', function (event) {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
-      down = true; held = false; x = event.clientX; y = event.clientY;
+      down = true; held = false; x = lastX = event.clientX; y = lastY = event.clientY;
       timer = rt.win.setTimeout(function () {
         if (!down) return;
         held = true;
@@ -58,6 +58,7 @@
     });
     rt.bar.addEventListener('pointermove', function (event) {
       if (!down) return;
+      lastX = event.clientX; lastY = event.clientY;
       if (Math.abs(event.clientX - x) + Math.abs(event.clientY - y) > 8) {
         rt.win.clearTimeout(timer);
         try { rt.bar.setPointerCapture(event.pointerId); } catch (e) {}
@@ -68,8 +69,8 @@
     function stop(event) {
       if (!down) return;
       down = false; rt.win.clearTimeout(timer); rt.bar.style.removeProperty('--rtg-adaptive-drag');
-      if (held || !event) { blockClickUntil = Date.now() + 400; return; }
-      var dx = event.clientX - x, dy = event.clientY - y;
+      if (held) { blockClickUntil = Date.now() + 400; return; }
+      var dx = (event ? event.clientX : lastX) - x, dy = (event ? event.clientY : lastY) - y;
       if (Math.max(Math.abs(dx), Math.abs(dy)) > 36) blockClickUntil = Date.now() + 400;
       if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 36) handlers.deck(dx < 0 ? 1 : -1);
       else if (dy < -36) {

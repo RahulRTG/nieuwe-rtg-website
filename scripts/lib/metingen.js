@@ -175,6 +175,16 @@ const REGISTER = {
      hernoemde map in plaats van door een feit, en leest de nul plotseling als
      bevestiging terwijl hij een blinde vlek is. */
   'STAGEVORM.json': { meter: ['stageDomeinenGemeten'] },
+  /* PLANVORM.json meet of de plandomeinen een datavorm delen, en of ze de negen
+     stations van de voorgestelde planningsketen uitvoeren. Om dezelfde reden
+     als bij CARRIEREVORM.json en STAGEVORM.json hierboven is de geratelde
+     waarde het BEREIK en niet de uitkomst: dat er 0 velden gedeeld worden is de
+     bevinding waar het besluit op staat, en een bevinding die beweegt is nieuws.
+     Wat NIET mag bewegen is hoeveel plandomeinen de meter heeft gezien -- zakt
+     dat stil (iemand hernoemt kern/beveiliging/rooster/), dan daalt de
+     gedeeldheid door een regex in plaats van door een feit, en leest de nul als
+     bevestiging terwijl hij een blinde vlek is. */
+  'PLANVORM.json': { meter: ['planDomeinenGemeten'] },
   /* NEIGINGVORM.json meet of er een persoonlijke laag bij mag en in welke vorm
      (NEIGING.md par. 0). Twee geratelde waarden, en met opzet geen derde over de
      NAAMmeting: die telt sinds server/kern/neiging/ bestaat zijn eigen bestanden

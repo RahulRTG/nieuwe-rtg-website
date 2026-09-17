@@ -82,6 +82,17 @@ const EIGENAAR = {
      het bezit, en dat is precies wat die toets moet tegenhouden. */
   'NEIGINGVORM.json': { schrijver: 'scripts/neigingvorm.js' },
 
+  /* De planvorm: delen de plandomeinen een datavorm en een planlus? Eén
+     schrijver, één ratel in scripts/lib/metingen.js (`planDomeinenGemeten`, het
+     BEREIK) met een ijking in test/meterijk.test.js, en een regel in de
+     versheidslijst van scripts/versheid.js. Hij staat hier om precies de reden
+     die bij NEIGINGVORM.json hierboven staat -- en dat is hier geen theorie: hij
+     is er bij het bouwen op omgevallen. Toets 4 ging van 146 naar 147 en zei
+     erbij wat de bedoeling is: het getal hoort te dalen doordat er eigenaren
+     bijkomen, niet te stijgen doordat er registers bijkomen zonder eigenaar. De
+     vloer oprekken zou die zin precies omdraaien. */
+  'PLANVORM.json': { schrijver: 'scripts/planvorm.js' },
+
   /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
      bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie
      hieronder vindt hem niet (het doel staat in een `const DOEL` die via

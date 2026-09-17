@@ -120,6 +120,35 @@ const GETALLEN = {
     wat: 'percentage velden dat in precies EEN ontdekkingsdomein staat' },
   'connectlus.inAlle': { bron: 'CONNECTLUS.json', veld: 'vorm.inAlleDomeinen',
     wat: 'velden die in ALLE ontdekkingsdomeinen staan' },
+  /* De planvorm (PLANNING.md par. 0). Zes van de tien zijn een NUL of een
+     bijna-nul, en dat is precies waarom ze hier staan -- zelfde reden als bij de
+     connectlus hierboven: een nul ziet er vers en verouderd hetzelfde uit, en op
+     deze nullen rust het besluit dat er geen `resources`-tabel komt. Er is een
+     valkuil bij die de andere vormmeters niet hebben: als de meter stil minder
+     plandomeinen ziet, blijft dezelfde nul staan terwijl hij van "deze domeinen
+     delen niets" verandert in "we hebben minder gekeken". Daarom staat
+     `planvorm.domeinen` hier als eerste: het BEREIK reist mee met de uitslag in
+     het proza, en niet alleen in de ratel. */
+  'planvorm.domeinen': { bron: 'PLANVORM.json', veld: 'rondes.ruim.vorm.domeinen.length',
+    wat: 'plandomeinen waarover de vorm is gemeten' },
+  'planvorm.velden': { bron: 'PLANVORM.json', veld: 'rondes.ruim.vorm.velden',
+    wat: 'velden over de plandomeinen (ruime lijst), envelop eruit' },
+  'planvorm.inAlle': { bron: 'PLANVORM.json', veld: 'rondes.ruim.vorm.inAlleDomeinen.length',
+    wat: 'velden die in ALLE plandomeinen staan' },
+  'planvorm.domeineigenPct': { bron: 'PLANVORM.json', veld: 'rondes.ruim.vorm.inEenDomeinPct',
+    wat: 'percentage velden dat in precies EEN plandomein staat (ruime lijst)' },
+  'planvorm.smalVelden': { bron: 'PLANVORM.json', veld: 'rondes.smal.vorm.velden',
+    wat: 'velden over de plandomeinen (smalle lijst: alleen de roostermodule zelf)' },
+  'planvorm.smalDomeineigenPct': { bron: 'PLANVORM.json', veld: 'rondes.smal.vorm.inEenDomeinPct',
+    wat: 'percentage velden dat in precies EEN plandomein staat (smalle lijst)' },
+  'planvorm.lusRond': { bron: 'PLANVORM.json', veld: 'rondes.ruim.lus.rondeLus.length',
+    wat: 'plandomeinen die alle negen stations van de planketen uitvoeren' },
+  'planvorm.stationsInAlle': { bron: 'PLANVORM.json', veld: 'rondes.ruim.lus.inAlleDomeinen.length',
+    wat: 'stations die in ALLE plandomeinen staan' },
+  'planvorm.combinaties': { bron: 'PLANVORM.json', veld: 'rondes.ruim.lus.combinaties',
+    wat: 'verschillende combinaties van stations over de plandomeinen' },
+  'planvorm.reistijd': { bron: 'PLANVORM.json', veld: 'rondes.ruim.lus.zeldzaamste.domeinen',
+    wat: 'plandomeinen die het zeldzaamste station (reistijd) uitvoeren' },
   'kantoor.routes': { bron: 'KANTOORMACHT.json', veld: 'gemeten.routes',
     wat: 'kantoorroutes achter /api/office en /api/boardroom' },
   'kantoor.deurEistMens': { bron: 'KANTOORMACHT.json', veld: 'gemeten.deurEistMens',
@@ -538,7 +567,7 @@ const GETALLEN = {
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
   'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md',
-  'KEURING.md', 'VERANDERING.md'];
+  'KEURING.md', 'VERANDERING.md', 'PLANNING.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

@@ -2555,10 +2555,9 @@
       "welzijn"
     ],
     "wereld": [
-      "findSupplier",
       "gidsHaal",
       "openVacatures",
-      "pulseFeed",
+      "wereldFeed",
       "zijnVrienden"
     ],
     "werkbeleid": [

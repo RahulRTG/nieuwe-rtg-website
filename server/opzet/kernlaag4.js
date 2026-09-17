@@ -1,34 +1,5 @@
-/* DE KERN SAMENSTELLEN -- deel 4a.
-   Waarom er op positie is geknipt en wat `kern` en `hulp` zijn: zie de kop van
-   ./kernlaag1.js. Wat er in dit deel zit, in deze volgorde:
-     huis
-     rendezvous
-     wauw
-     pulse
-     salon
-     salon/profiel
-     salon/reacties
-     salon/ai
-     salon/inzicht
-     metier
-     metier/zoek
-     metier/bewijs
-     metier/netwerk
-     metier/ai
-     metier/loon
-     genootschap
-     genootschap/beheer
-     genootschap/prikbord
-     genootschap/bijeenkomst
-     genootschap/ai
-     genootschap/inzicht
-     genootschap/uitvoer
-     berichten
-     care
-     geldregie
-     ledenregister
-     economie
-     kosten */
+/* Sociale kernen samenstellen. De positionele splitsing en de contracten van
+   kern/hulp staan in kernlaag1.js; volgorde volgt de gebruikte afhankelijkheden. */
 'use strict';
 
 module.exports = (kern, hulp) => {
@@ -45,9 +16,7 @@ kern.huis = require('../kern/huis')({
     : (sess && sess.tier !== 'guest' ? db.data.trip : null)) || null,
   entourageVan: (sess) => { try { return kern.entourage(sess.key); } catch (e) { return null; } }
 });
-/* Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass (match -> jetset-date).
-   accounts + leeftijdVan zijn er voor de ontmoetpoort (18+ en KYC, kern/ontmoetpoort.js),
-   die Rendez-vous deelt met Vonk. De pas-eis blijft op routes/member/rendezvous.js. */
+// Rendez-vous deelt zijn 18+/KYC-poort met Vonk; de route bewaakt de pas.
 Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic, notify, accounts, leeftijdVan,
   /* codenaamVan en niet liveCodename: zie de kop van kern/rendezvous.js. Laat
      gebonden, want de sociale laag wordt later samengesteld. */
@@ -63,11 +32,14 @@ Object.assign(kern, require('../kern/wauw')({ db, save, accounts, socialConnecti
 // RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)
 Object.assign(kern, require('../kern/pulse')({ db, save, crypto, liveCodename, notify,
   stemmingVan: kern.stemmingVan, jarigVan: kern.jarigVan }));
-/* De Salon als volwaardige app: leden die zelf plaatsen (karrousel, onderwerpen),
-   een feed met echte paginering in plaats van het oude plafond van 60, profielen
-   op codenaam met volgen tussen leden, reacties met antwoorden en vermeldingen,
-   bewaren, de veiligheidsknoppen, en drie AI-taken die voorstellen maar nooit
-   plaatsen. De zichtbaarheidspoort blijft kern/salonviraal.js. */
+/* De leeslaag wordt hier samengesteld. De HTTP-router krijgt één wereldfeed,
+   geen toegang tot de losse Pulse- en Salon-domeinen. Hun privacyregels blijven
+   bij de bron; er wordt geen tweede opslag of selectiebeleid gemaakt. */
+const salonZicht = require('../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden: kern.zijnVrienden });
+kern.wereldFeed = require('../kern/wereld/feed')({ db, codenaamVan: kern.codenaamVan,
+  zijnVrienden: kern.zijnVrienden, salonToegang: salonZicht.magZien,
+  pulseLezen: key => ((kern.pulseFeed(key, 'volgend') || {}).feed || []) }).feed;
+// De Salon bewaart zijn eigen posts en publicatierechten.
 kern.salon = require('../kern/salon')({ db, save, media, liveCodename, codenaamVan: kern.codenaamVan,
   crypto, broadcastSync });
 kern.salonProfiel = require('../kern/salon/profiel')({ db, save, codenaamVan: kern.codenaamVan,

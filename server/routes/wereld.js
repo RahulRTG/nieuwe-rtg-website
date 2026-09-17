@@ -43,14 +43,10 @@
 
 module.exports = (kern) => {
   const { app, auth, db, save, liveCodename, codenaamVan, zijnVrienden, keyVanCodenaam,
-    gidsHaal, openVacatures, anthropic, findSupplier, pulseFeed } = kern;
+    gidsHaal, openVacatures, anthropic, wereldFeed: feed } = kern;
   const rechten = require('../kern/wereld/rechten');
   const lidmaatschap = require('../kern/lidmaatschap');
   const koppel = require('../kern/wereld/koppel');
-  const salonZicht = require('../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden });
-  const { feed } = require('../kern/wereld/feed')({ db, codenaamVan, zijnVrienden,
-    salonToegang: (sess, post) => salonZicht.magZien(sess, post),
-    pulseLezen: key => ((pulseFeed(key, 'volgend') || {}).feed || []) });
   const profiel = require('../kern/wereld/profiel')({ db, zijnVrienden });
   const netwerk = require('../kern/wereld/netwerk')({ db, codenaamVan, profiel });
   const bezoek = require('../kern/wereld/bezoek')({ db, codenaamVan });

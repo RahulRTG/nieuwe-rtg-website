@@ -1,15 +1,6 @@
-/* ============================================================================
-   Vertaallaag voor de RTG-backend.
-
-   Twee taken:
-   1) localize(text, lang): vaste seed-inhoud (Nederlands als basis) omzetten
-      naar de taal van de bezoeker. Werkt volledig offline via een woordenboek.
-   2) translate(text, to, from): losse berichten (reacties, DM's) vertalen naar
-      de taal van de ontvanger. Gebruikt de echte Claude-API als die beschikbaar
-      is (lokaal of extern), anders een woordenboek dat alleen antwoordt op een
-      bericht dat het HELEMAAL dekt. Is dat er niet, dan komt de brontaal terug
-      met translated:false -- nooit een half vertaalde zin.
-   ========================================================================== */
+/* Backendvertaling: seed-inhoud uit het vaste woordenboek, losse berichten
+   via de beschikbare modelprovider. Zonder volledig antwoord blijft de bron
+   intact en is translated false. Interfacevertaling bewijst tevens resolved. */
 
 /* De woordenboeken (seed-inhoud en volledige-boodschaptabellen) staan als
    pure data in een deelmodule. */

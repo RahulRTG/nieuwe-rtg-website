@@ -16,7 +16,7 @@ const salonviraal = require('../salonviraal');
 const vorm = require('./vorm');
 
 module.exports = ({ db, findSupplier, zijnVrienden }) => {
-  function relaties(sess) {
+  function salonRelaties(sess) {
     const key = sess && sess.key;
     const volgtLid = ((((db.data || {}).salon || {}).volgtLid || {})[key]) || [];
     const volgt = (p) => {
@@ -32,12 +32,12 @@ module.exports = ({ db, findSupplier, zijnVrienden }) => {
     return { volgt, bevriend };
   }
 
-  function magZien(sess, post) {
+  function magSalonPostZien(sess, post) {
     if (!post) return false;
     const key = sess && sess.key;
     if (key && post.authorKey === key) return true;
 
-    const r = relaties(sess || {});
+    const r = salonRelaties(sess || {});
     const publiek = vorm.publiek(post.publiek);
     if (publiek === 'alleenik') return false;
     if (publiek === 'vrienden' && !r.bevriend(post)) return false;
@@ -50,5 +50,5 @@ module.exports = ({ db, findSupplier, zijnVrienden }) => {
     return salonviraal.toonInSalon(post, r);
   }
 
-  return { magZien, PUBLIEKEN: vorm.PUBLIEKEN };
+  return { magZien: magSalonPostZien, PUBLIEKEN: vorm.PUBLIEKEN };
 };

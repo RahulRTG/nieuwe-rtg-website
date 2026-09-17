@@ -100,14 +100,8 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
        mijne. Wie geen lid is, krijgt een lege lijst -- geen 403, want "er is
        hier niets voor jou" is de eerlijke uitkomst. */
     genootschap: (mij) => {
-      /* De vorm hier is met zorg overgenomen uit kern/genootschap/index.js en
-         niet geraden: de groepen staan in `db.data.genootschap.groepen` (een
-         array) en de berichten in `db.data.genootschap.prikbord[groepId]` (een
-         map per groep). Dat stond hier eerst fout -- ik las het als een map van
-         groepen met hun prikbord erin -- en het gaf geen enkele fout: gewoon
-         altijd nul berichten. Precies de stille soort. Dat het bleef staan lag
-         aan de toets: die keek of de bron MEEDEED, niet of er inhoud uitkwam.
-         Nu staat er een toets die een echt prikbordbericht terugverwacht. */
+      /* Lees alleen de eigen groepen en hun echte prikbordopslag. Lidmaatschap
+         begrenst ook geheime groepen; verwijderde berichten blijven weg. */
       const G = db.data.genootschap || {};
       const isLid = (gr) => (gr.leden || []).some(l => (typeof l === 'string' ? l : l && l.key) === mij);
       const uit = [];

@@ -4,7 +4,7 @@
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Elite · Private Society</title>
+<title>RTG</title>
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -209,47 +209,40 @@
   }
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
-<link href="/shared/rtg-experience-2026.css" rel="stylesheet">
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
-</head>
-<body class="rtg-social-experience" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 
-<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
-  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/apps/wereld-feed.css" rel="stylesheet">
+</head>
+<body class="rtg-social-experience" data-rtg-world="living" data-rtg-eigenvlak="onyx" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+
+<div class="os-switcher" role="navigation" data-living-label="worldNav">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span data-i18n="living.worldsLine">Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
-    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
-    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
-    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
-    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+    <a href="/apps/rtg.html" aria-current="page"><span>01</span><span data-i18n="living.LivingOS" translate="no">LivingOS</span></a>
+    <a href="/apps/kantoor.html"><span>02</span><span data-i18n="living.WorkOS" translate="no">WorkOS</span></a>
+    <a href="/apps/reizen.html"><span>03</span><span data-i18n="living.TravelOS" translate="no">TravelOS</span></a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span><span data-i18n="living.FoundationOS" translate="no">FoundationOS</span></a>
   </div>
-  <span class="os-switcher__state">Kern verbonden</span>
+  <span class="os-switcher__state" data-i18n="living.connected">Kern verbonden</span>
 </div>
-<header class="kop">
+<main>
+<section class="living-intro" aria-labelledby="livingTitle">
   <div class="kopinhoud" id="eliteKop">
     <div class="elite-merk">
-      <div><p class="eyebrow">People · places · moments</p><div class="elite-titel" role="heading" aria-level="1">RTG</div></div>
-      <div class="belofte">Een betekenisvoller leven</div>
+      <div><h1 id="livingTitle" class="living-sr" translate="no" data-i18n="living.brand">RTG LivingOS</h1><p class="eyebrow" data-i18n="living.moments">Mensen, plekken en momenten</p></div>
+      <div class="belofte" data-i18n="living.promise">Een betekenisvoller leven</div>
     </div>
-    <nav class="momenten" aria-label="Verhalen en snelle ingangen">
-      <a class="moment" href="/apps/camera.html"><i aria-hidden="true"></i>Jouw verhaal</a>
-      <a class="moment" href="/apps/reisboek.html"><i aria-hidden="true"></i>Reizen</a>
-      <a class="moment" href="/apps/table.html"><i aria-hidden="true"></i>Aan tafel</a>
-      <a class="moment" href="/apps/foundation/vrienden.html"><i aria-hidden="true"></i>Vrienden</a>
-      <a class="moment" href="/apps/rtg.html"><i aria-hidden="true"></i>LivingOS</a>
+    <nav class="momenten" data-living-label="storyNav">
+      <a class="moment" href="/apps/camera.html"><i aria-hidden="true">+</i><span data-i18n="living.story">Uw verhaal</span></a>
+      <a class="moment" href="/apps/reisboek.html"><i aria-hidden="true"><img src="/images/start/dagdelen/hero-avond.jpg" alt="" width="68" height="68"></i><span data-i18n="living.travel">Reizen</span></a>
+      <a class="moment" href="/apps/table.html"><i aria-hidden="true"><img src="/images/worlds/heritage/living-heritage-v2.jpg" alt="" width="68" height="68"></i><span data-i18n="living.table">Aan tafel</span></a>
+      <a class="moment" href="/apps/foundation/vrienden.html"><i aria-hidden="true"><img src="/images/worlds/heritage/foundation-heritage-v2.jpg" alt="" width="68" height="68"></i><span data-i18n="living.friends">Vrienden</span></a>
+      <a class="moment" href="/apps/rtg.html"><i aria-hidden="true"><img src="/images/worlds/heritage/living-heritage-v2.jpg" alt="" width="68" height="68"></i><span data-i18n="living.LivingOS" translate="no">LivingOS</span></a>
     </nav>
-    <section class="passport" id="passport" aria-label="Member passport" hidden>
-      <div class="passportkop">
-        <div><p class="passportlabel">Member passport</p><p class="wie" id="wie">Bezig met laden…</p></div>
-        <div class="badges" id="badges"></div>
-      </div>
-      <div class="pasvoet" id="identiteit"></div>
-    </section>
-    <nav class="lenzen" id="lenzen" aria-label="Kies je intentie"></nav>
-    <nav class="werelden" id="werelden" aria-label="Kies je wereld"></nav>
+    <nav class="werelden" id="werelden" data-living-label="worldFilter"></nav>
   </div>
-</header>
-
-<main>
+</section>
+  <div class="living-feed-heading" id="feedHeading"><h2 data-i18n="living.feed">Uw momenten</h2><p data-i18n="living.order">De nieuwste momenten staan bovenaan.</p></div>
   <div id="fout" hidden></div>
   <!-- EEN SCHERM DAT WACHT, HOORT TE ZEGGEN DAT HET WACHT.
 
@@ -265,26 +258,37 @@
        a11y-ronde vond hem twee keer omdat die eerst 510 bureaupagina's laadt en
        de server dan traag genoeg is; in zijn eentje haalde dit scherm het altijd
        en leek er niets aan de hand. -->
-  <div id="feed"><p class="leeg">Bezig met laden&#8230;</p></div>
+  <div id="feed"><p class="leeg" data-i18n="living.loading">Uw momenten worden geladen.</p></div>
   <div id="profiel" hidden></div>
   <div id="ontdek" hidden>
     <form id="zoekform" autocomplete="off">
-      <input id="zoekq" type="search" placeholder="Zoek op naam, functie, sector of vaardigheid">
-      <button type="submit">Zoeken</button>
+      <input id="zoekq" type="search" data-living-search>
+      <button type="submit" data-i18n="living.search">Zoeken</button>
     </form>
     <div id="zoekuit"></div>
   </div>
+<aside class="living-membership" id="membership">
+    <section class="passport" id="passport" data-living-label="passport" hidden>
+      <div class="passportkop">
+        <div><p class="passportlabel" data-i18n="living.passport">Member passport</p><p class="wie" id="wie" data-i18n="living.loading">Uw momenten worden geladen.</p></div>
+        <div class="badges" id="badges"></div>
+      </div>
+      <div class="pasvoet" id="identiteit"></div>
+    </section>
+    <nav class="lenzen" id="lenzen" data-living-label="intentNav"></nav>
+</aside>
 </main>
 
-<nav class="social-nav balk" aria-label="Hoofdnavigatie">
-  <a href="/apps/wereld.html" id="homeTab" aria-label="Home" aria-current="page"><span>⌂</span>Home</a>
-  <a href="#ontdek" id="ontdekTab" aria-label="Zoeken"><span>⌕</span>Zoeken</a>
-  <a href="/apps/camera.html" aria-label="Maken"><span>＋</span>Maken</a>
-  <a href="/apps/comm.html" aria-label="Berichten"><span>◇</span>Berichten</a>
-  <a href="#profiel" id="profielTab" aria-label="Wereld"><span>◎</span>Wereld</a>
+<nav class="social-nav balk" data-living-label="mainNav">
+  <a href="/apps/wereld.html" id="homeTab" aria-current="page"><span>⌂</span><span class="nav-label" data-i18n="living.home">Home</span></a>
+  <a href="#ontdek" id="ontdekTab"><span>⌕</span><span class="nav-label" data-i18n="living.search">Zoeken</span></a>
+  <a href="/apps/camera.html"><span>＋</span><span class="nav-label" data-i18n="living.make">Maken</span></a>
+  <a href="/apps/comm.html"><span>◇</span><span class="nav-label" data-i18n="living.messages">Berichten</span></a>
+  <a href="#profiel" id="profielTab"><span>◎</span><span class="nav-label" data-i18n="living.world">Wereld</span></a>
 </nav>
 
 <script src="/shared/glyf.js"></script>
+<script src="/apps/wereld-feed.js"></script>
 <script>
 (function () {
   'use strict';
@@ -324,6 +328,7 @@
     var lid = d.lidmaatschap;
     if (!lid) return;
     $('#passport').hidden = false;
+    $('#wie').removeAttribute('data-i18n');
     $('#wie').innerHTML = esc(d.ik.codenaam) + ' <span>· ' + esc(lid.pas.naam) + '</span>';
     $('#badges').innerHTML = '<span class="lidbadge member">' + esc(lid.member.naam) + '</span>'
       + '<span class="lidbadge lidstatus ' + esc(lid.status.id) + '">' + esc(lid.status.naam) + '</span>';
@@ -379,29 +384,18 @@
     var n = $('#feed');
     n.textContent = '';
     if (!staat.items.length) {
-      n.innerHTML = '<p class="leeg">Hier is het nog stil.<br>'
-        + 'Wat je plaatst in De Salon, op Pulse of op het zakelijke prikbord komt hier samen.</p>';
+      n.innerHTML = RTGLivingFeed.welcome('empty');
       return;
     }
     staat.items.forEach(function (i) {
       var k = document.createElement('article');
-      k.className = 'kaart';
-      k.innerHTML =
-        '<div class="r1"><span class="auteur">' + esc(i.auteur) + '</span>'
-        + '<span class="bron">' + esc(BRONNAAM[i.bron] || i.bron) + '</span>'
-        + '<span class="tijd">' + esc(klok(i.at)) + '</span></div>'
-        + (i.tekst ? '<p>' + esc(i.tekst) + '</p>' : '')
-        + (i.beeld && i.beeld.length ? '<img src="' + esc(i.beeld[0].src) + '" alt="' + esc(i.beeld[0].alt || '') + '">' : '')
-        + '<div class="acties">'
-        + '<button type="button" data-open="' + esc(i.open) + '">Openen</button>'
-        + '<button type="button" data-chat="' + esc(i.auteur) + '" data-over="' + esc(i.open) + '">Bericht</button>'
-        + '<span class="tel">' + (i.likes || 0) + ' · ' + (i.reacties || 0) + '</span>'
-        + '</div>';
+      k.className = 'kaart' + (RTGLivingFeed.photoCard(i) ? ' living-photo' : '');
+      k.innerHTML = RTGLivingFeed.item(i, BRONNAAM[i.bron] || i.bron, klok(i.at));
       n.appendChild(k);
     });
     if (meer) {
       var b = document.createElement('button');
-      b.type = 'button'; b.className = 'meer'; b.textContent = 'Meer laden';
+      b.type = 'button'; b.className = 'meer'; b.innerHTML = RTGLivingFeed.text('more', 'Bekijk meer momenten');
       b.addEventListener('click', function () { staat.vanaf = staat.items.length; laad(true); });
       n.appendChild(b);
     }
@@ -574,6 +568,8 @@
     $('#ontdek').hidden = welke !== 'ontdek';
     $('#werelden').hidden = welke !== 'feed';
     $('#lenzen').hidden = welke !== 'feed';
+    $('#feedHeading').hidden = welke !== 'feed';
+    $('#membership').hidden = welke !== 'feed';
     var bij = { feed: 'homeTab', profiel: 'profielTab', ontdek: 'ontdekTab' };
     document.querySelectorAll('.social-nav a').forEach(function (a) {
       a.setAttribute('aria-current', a.id === bij[welke] ? 'page' : 'false');
@@ -599,10 +595,10 @@
         toon(null);
         tekenFeed(d.meer);
       })
-      .catch(function (e) { toon(e.message); tekenFeed(false); });
+      .catch(function (e) { toon(e.message); if (!staat.items.length) $('#feed').innerHTML = RTGLivingFeed.welcome('error'); });
   }
 
-  api('/state', {})
+  function start() { return api('/state', {})
     .then(function (d) {
       staat.modus = d.modus; staat.modi = d.modi; staat.kaart = d.koppelkaart || {};
       staat.vermogens = d.vermogens || []; staat.lenzen = d.lenzen || [];
@@ -619,14 +615,20 @@
     })
     .catch(function (e) {
       $('#passport').hidden = false;
-      $('#wie').textContent = 'Niet ingelogd';
+      $('#wie').removeAttribute('data-i18n');
+      $('#wie').textContent = RTGLivingFeed.T('signedOut', 'U bent niet ingelogd.');
       /* De wachtregel weghalen, anders staat er "Bezig met laden..." ONDER een
          foutmelding: het scherm zou dan tegelijk zeggen dat het stuk is en dat
          het nog bezig is. De melding is het antwoord; verder hoort dit vlak
          leeg te zijn. */
-      $('#feed').innerHTML = '<article class="kaart"><div class="r1"><span class="auteur">Uw LivingOS</span><span class="bron">Privé</span></div><p>De momenten van uw mensen, reizen en plekken komen hier rustig samen.</p><div class="acties"><a class="wereld-inlog-link" href="/apps/app.html">Log in om uw wereld te openen</a></div></article>';
-      toon(e.message + ' Log opnieuw in via de app.');
+      $('#feed').innerHTML = RTGLivingFeed.welcome(token ? 'error' : 'guest');
+      if (token) toon(e.message + ' Log opnieuw in via de app.');
     });
+  }
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-living-retry]')) start();
+  });
+  start();
 })();
 </script>
 <script src="/shared/basis.js" defer></script>

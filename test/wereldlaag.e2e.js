@@ -47,10 +47,13 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     await api(base, '/api/member/connect', { key: mijB.me }, a);
     await api(base, '/api/member/connect/respond', { key: mijA.me, action: 'accept' }, b);
     // B plaatst iets in De Salon; dat hoort in de wereldfeed van A te komen
-    await api(base, '/api/salon/plaats', { tekst: 'De boot vertrekt om negen uur' }, b);
+    const foto = fs.readFileSync(path.join(__dirname, '../public/images/start/dagdelen/hero-avond.jpg'));
+    const geplaatst = await api(base, '/api/salon/plaats', { tekst: 'De boot vertrekt om negen uur',
+      media: [{ beeld: 'data:image/jpeg;base64,' + foto.toString('base64'), alt: 'Een terras aan zee in het avondlicht.' }] }, b);
+    assert.ok(!geplaatst.error, 'de foto is via de bestaande Salon opgeslagen');
 
     browser = await pw.chromium.launch(browserOpties(pw));
-    const page = await browser.newPage();
+    let page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript((tok) => {
@@ -62,6 +65,10 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     // 1. de vijf werelden staan er, en Business is voor de gratis pas DICHT --
     //    zichtbaar, want wegstoppen wat je niet hebt is oneerlijk naar beide kanten
     await page.waitForSelector('#werelden button', { timeout: 15000 });
+    await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+    assert.equal(await page.locator('main .living-intro').isVisible(), true,
+      'het verhaal en de fotografische ingangen blijven inhoud, ook nadat de Edge de bediening overneemt');
+    assert.equal(await page.locator('.moment img').count(), 4, 'de snelle ingangen dragen echte fotografie');
     await page.waitForSelector('#passport:not([hidden])', { timeout: 15000 });
     assert.match(await page.locator('#passport').innerText(), /Member passport/i);
     assert.match(await page.locator('#passport').innerText(), /Verified/i,
@@ -86,6 +93,10 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     const feed = await page.evaluate(() => document.getElementById('feed').textContent);
     assert.ok(/boot vertrekt/.test(feed), 'de Salon-post staat niet in de wereldfeed: ' + feed.slice(0, 160));
     assert.ok(/DE SALON|De Salon/.test(feed), 'de bron staat niet op de kaart');
+    await page.waitForFunction(() => document.querySelector('#feed .living-post-media img')?.naturalWidth > 0);
+    assert.equal(await page.locator('#feed .living-welcome').count(), 0, 'echte berichten vervangen het welkom');
+    assert.match(await page.locator('#feed .living-photo').first().innerText(), /De boot vertrekt om negen uur/,
+      'de opgeslagen foto en oorspronkelijke tekst vormen samen de fotokaart');
 
     // 3. schakelen verandert de wereld zonder de app te verlaten
     await page.click('#werelden button:nth-child(2)');           // Lifestyle
@@ -110,6 +121,15 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
 
     // 5. het profiel: de lagen staan er, en de zichtbaarheid die je in het
     //    scherm kiest komt ECHT op de server terecht (niet alleen in de select)
+    // A fresh visit measures the full mobile dock. The preceding photo/chat
+    // journey can legitimately leave the shared Edge in its scroll state.
+    await page.close();
+    page = await browser.newPage();
+    letOpFouten(page, fouten);
+    await page.addInitScript((tok) => {
+      localStorage.setItem('rtg_member_token', tok);
+      localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, a);
     await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#werelden button', { timeout: 15000 });
@@ -229,6 +249,19 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     const bez = await page2.evaluate(() => document.getElementById('bezoekers').textContent);
     assert.match(bez, /geen onzichtbare stand/i,
       'het scherm zegt niet dat er geen sluipstand is: ' + bez.slice(0, 120));
+
+    // Ook een lege wereld is inhoud. Taalwissel behoudt context en vertaalt
+    // de projectie, nooit een eigen bericht of iemands identiteit.
+    await api(base, '/api/wereld/modus', { modus: 'prive' }, b);
+    await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
+    await page2.waitForSelector('.living-welcome', { timeout: 15000 });
+    assert.match(await page2.locator('.living-note').innerText(), /Sfeerbeeld/);
+    assert.equal(await page2.locator('.living-welcome .tel,.living-welcome .auteur').count(), 0);
+    await page2.evaluate(() => RTGi18n.set('en'));
+    await page2.waitForFunction(() => document.getElementById('livingWelcomeTitle').textContent === 'Life is better when you share it.');
+    assert.equal((await api(base, '/api/wereld/state', {}, b)).modus, 'prive');
+    await page2.evaluate(() => RTGi18n.set('nl'));
+    assert.match(await page2.locator('#livingWelcomeTitle').innerText(), /Het leven is mooier/);
 
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {

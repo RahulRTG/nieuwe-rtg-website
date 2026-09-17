@@ -8,7 +8,7 @@ const files=['test/access-language.e2e.js','test/i18n-dictionary.test.js','test/
 const sources=['public/apps/access/meaning.js','public/apps/access/portal.css','public/apps/app.html','public/apps/app-main.js',
   'public/shared/rtg-edge-2.css','public/shared/rtg-adaptive-edge.css','public/shared/rtg-simple.css','public/shared/rtg-edge-appbar.js','public/shared/verbinding.js','public/shared/i18n.js','public/shared/rtg-edge-smart-menu.js','public/shared/rtg-edge-library.js','public/shared/rtg-adaptive-edge-controls.js','public/shared/appshell.js','server/talen.js','server/routes/onboarding.js','server/kern/onboarding/lid.js',
   'test/helper.js','scripts/lib/scherm.js','server/translate/batch-model.js','server/translate.js','server/translate/cache.js','server/translate/uitslag.js','server/kern/taalkeuring.js',
-  'server/local-ai.js','server/ai.js','scripts/language-proof.js',...files];
+  'server/server.js','server/lib/ui-vertaling.js','server/local-ai.js','server/ai.js','scripts/language-proof.js',...files];
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 const fingerprints=()=>Object.fromEntries(sources.map(file=>[file,hash(fs.readFileSync(path.join(root,file)))]));
 const names=['LANGUAGECAPABILITY.json','MEANINGPARITY.json','LANGUAGEFAILOVER.json'];

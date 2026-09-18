@@ -32,6 +32,17 @@
       ruimte die een weggehaalde balk reserveerde gaat wel mee: anders staat er
       geen tweede bediening meer, maar wel het gat waar zij stond.
 
+   WAAR DEZE TOETS OP WACHT, EN WAAROM DAT HIER EXTRA NAUW LUISTERT. Een toets
+   die bewijst dat iets WEG is, slaagt vanzelf zolang het er nog niet IS. Een
+   vaste wachttijd na het laden zou dus precies de verkeerde kant op liegen: te
+   kort, en de suitebalk was simpelweg nog niet ingevoegd. Daarom wordt er nooit
+   op de klok gewacht (KLOKWACHT.json houdt dat op nul) maar op de TOESTAND, en
+   die toestand is met opzet streng: elke balk die weg hoort te zijn, moet eerst
+   AANWEZIG zijn in de DOM van het kind. Pas dan zegt "niet zichtbaar" iets. De
+   marker verbergt namelijk met CSS en sloopt niets, dus het element hoort er te
+   staan -- staat het er niet, dan is er iets anders aan de hand dan een geslaagde
+   onderdrukking, en dan hoort deze toets te wachten en om te vallen.
+
    Draait alleen waar een browser beschikbaar is. Draai: npm run e2e
    ========================================================================== */
 const test = require('node:test');
@@ -39,7 +50,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, elevateTier } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, elevateTier, wachtTot } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -72,86 +83,104 @@ const SCHERMEN = [
    pagina leidt zelf door, en dan verdwijnt de uitvoeringscontext onder de
    meting vandaan. */
 const GASTHEER = '/site/404.html';
+const KADER = 'rtg-embedproef';
+const INHOUD_STANDAARD = 'main, #inhoud, .salon-werkveld, .comm, .private-world';
 
-/* Laadt een scherm in een ECHT iframe en meet het van binnenuit. Alleen
-   `self !== top` bewijst de embed-stand die de werktafel en de vensters maken;
-   `?embed=1` is de tweede weg en wordt hieronder apart beproefd. */
-const inKader = function (opdracht) {
-  return new Promise(function (klaar) {
-    var oud = document.getElementById('rtg-embedproef');
-    if (oud) oud.remove();
-    var f = document.createElement('iframe');
-    f.id = 'rtg-embedproef';
-    f.title = 'Proefkader ingebedde chrome';
-    f.style.cssText = 'position:fixed;inset:0;width:1280px;height:860px;border:0';
-    var af = false;
-    var meet = function () {
-      if (af) return;
-      af = true;
-      setTimeout(function () {
-        var doc, win;
-        try { doc = f.contentDocument; win = f.contentWindow; } catch (e) { return klaar({ fout: 'geen toegang' }); }
-        if (!doc || !doc.body || !win) return klaar({ fout: 'geen document' });
-        var zichtbaar = function (el) {
-          var s = win.getComputedStyle(el), r = el.getBoundingClientRect();
-          return s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) !== 0 &&
-            r.width > 0 && r.height > 0;
-        };
-        var lijst = function (selectors) {
-          var uit = [];
-          selectors.forEach(function (sel) {
-            doc.querySelectorAll(sel).forEach(function (el) { if (zichtbaar(el)) uit.push(sel); });
-          });
-          return uit;
-        };
-        var gemarkeerd = [];
-        doc.querySelectorAll('[data-rtg-platform-chrome]').forEach(function (el) {
-          if (zichtbaar(el)) gemarkeerd.push(el.getAttribute('data-rtg-platform-chrome'));
-        });
-        var hoofd = doc.querySelector(opdracht.inhoud || 'main, #inhoud, .salon-werkveld, .comm, .private-world');
-        klaar({
-          pad: win.location.pathname,
-          embed: doc.body.classList.contains('rtg-edge-embed'),
-          eigenEdge: doc.querySelectorAll('.rtg-edge-chrome').length,
-          gemarkeerdZichtbaar: gemarkeerd,
-          wegZichtbaar: lijst(opdracht.weg),
-          blijftZichtbaar: lijst(opdracht.blijft || []),
-          padTop: win.getComputedStyle(doc.body).paddingTop,
-          hoofdZichtbaar: !!(hoofd && zichtbaar(hoofd))
-        });
-      }, 700);
-    };
-    f.addEventListener('load', meet, { once: true });
-    setTimeout(meet, 12000);
-    f.src = opdracht.url;
-    document.body.appendChild(f);
-  });
-};
+/* --------------------------------------------------------------- het kader --
+   Een ECHT iframe, want alleen `self !== top` maakt de embed-stand die de
+   werktafel en de vensters maken; `?embed=1` is de tweede weg en wordt
+   hieronder apart beproefd. */
+function zetKader(gegeven) {
+  const oud = document.getElementById(gegeven.id);
+  if (oud) oud.remove();
+  const f = document.createElement('iframe');
+  f.id = gegeven.id;
+  f.title = 'Proefkader ingebedde chrome';
+  f.style.cssText = 'position:fixed;inset:0;width:1280px;height:860px;border:0';
+  f.addEventListener('load', () => f.setAttribute('data-geladen', '1'), { once: true });
+  f.src = gegeven.url;
+  document.body.appendChild(f);
+}
 
-/* Dezelfde vraag op een pagina die GEWOON open staat. */
-const opPagina = function (opdracht) {
-  var zichtbaar = function (el) {
-    var s = getComputedStyle(el), r = el.getBoundingClientRect();
-    return s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) !== 0 && r.width > 0 && r.height > 0;
+/* De toestand waarop gewacht wordt. Zie de kop: de balken moeten GEBOUWD zijn
+   voordat "niet zichtbaar" iets bewijst. */
+function kaderKlaar(gegeven) {
+  const f = document.getElementById(gegeven.id);
+  if (!f || f.getAttribute('data-geladen') !== '1') return false;
+  let d;
+  try { d = f.contentDocument; } catch (e) { return false; }
+  if (!d || !d.body || d.readyState !== 'complete') return false;
+  if (!d.body.classList.contains('rtg-edge-embed')) return false;
+  if (!d.querySelector(gegeven.inhoud)) return false;
+  return gegeven.weg.concat(gegeven.blijft).every(s => !!d.querySelector(s));
+}
+
+function meetKader(gegeven) {
+  const f = document.getElementById(gegeven.id);
+  const d = f.contentDocument, w = f.contentWindow;
+  const zichtbaar = (el) => {
+    const s = w.getComputedStyle(el), r = el.getBoundingClientRect();
+    return s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) !== 0 &&
+      r.width > 0 && r.height > 0;
   };
-  var lijst = function (selectors) {
-    var uit = [];
-    selectors.forEach(function (sel) {
-      document.querySelectorAll(sel).forEach(function (el) { if (zichtbaar(el)) uit.push(sel); });
-    });
+  const lijst = (selectors) => {
+    const uit = [];
+    selectors.forEach(sel => d.querySelectorAll(sel).forEach(el => { if (zichtbaar(el)) uit.push(sel); }));
     return uit;
   };
-  var gemarkeerd = [];
-  document.querySelectorAll('[data-rtg-platform-chrome]').forEach(function (el) {
+  const gemarkeerd = [];
+  d.querySelectorAll('[data-rtg-platform-chrome]').forEach(el => {
+    if (zichtbaar(el)) gemarkeerd.push(el.getAttribute('data-rtg-platform-chrome'));
+  });
+  const hoofd = d.querySelector(gegeven.inhoud);
+  return {
+    pad: w.location.pathname,
+    eigenEdge: d.querySelectorAll('.rtg-edge-chrome').length,
+    gemarkeerdZichtbaar: gemarkeerd,
+    wegZichtbaar: lijst(gegeven.weg),
+    blijftZichtbaar: lijst(gegeven.blijft),
+    padTop: w.getComputedStyle(d.body).paddingTop,
+    hoofdZichtbaar: !!(hoofd && zichtbaar(hoofd))
+  };
+}
+
+/* --------------------------------------------------------- zonder het kader */
+function paginaKlaar(gegeven) {
+  if (document.readyState !== 'complete' || !document.body) return false;
+  if (gegeven.embed !== document.body.classList.contains('rtg-edge-embed')) return false;
+  /* Zonder kader: wachten tot de balken er ECHT staan. Met kader: tot ze
+     gebouwd zijn, want pas dan is onzichtbaar een uitspraak. */
+  const bestaat = gegeven.weg.concat(gegeven.blijft).every(s => !!document.querySelector(s));
+  if (!bestaat) return false;
+  return gegeven.embed || gegeven.weg.every(s => {
+    const el = document.querySelector(s);
+    const st = getComputedStyle(el), r = el.getBoundingClientRect();
+    return st.display !== 'none' && st.visibility !== 'hidden' && r.width > 0 && r.height > 0;
+  });
+}
+
+function meetPagina(gegeven) {
+  const zichtbaar = (el) => {
+    const s = getComputedStyle(el), r = el.getBoundingClientRect();
+    return s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) !== 0 &&
+      r.width > 0 && r.height > 0;
+  };
+  const lijst = (selectors) => {
+    const uit = [];
+    selectors.forEach(sel => document.querySelectorAll(sel).forEach(el => { if (zichtbaar(el)) uit.push(sel); }));
+    return uit;
+  };
+  const gemarkeerd = [];
+  document.querySelectorAll('[data-rtg-platform-chrome]').forEach(el => {
     if (zichtbaar(el)) gemarkeerd.push(el.getAttribute('data-rtg-platform-chrome'));
   });
   return {
     embed: document.body.classList.contains('rtg-edge-embed'),
     gemarkeerdZichtbaar: gemarkeerd,
-    wegZichtbaar: lijst(opdracht.weg),
-    blijftZichtbaar: lijst(opdracht.blijft || [])
+    wegZichtbaar: lijst(gegeven.weg),
+    blijftZichtbaar: lijst(gegeven.blijft)
   };
-};
+}
 
 test('ingebedde schermen tonen geen tweede platformbediening, en zonder kader wel',
   { skip: geenBrowser(pw) }, async (t) => {
@@ -182,13 +211,15 @@ test('ingebedde schermen tonen geen tweede platformbediening, en zonder kader we
     page.on('dialog', d => d.dismiss().catch(() => {}));
 
     for (const scherm of SCHERMEN) {
+      const opdracht = { id: KADER, weg: scherm.weg, blijft: scherm.blijft || [],
+        inhoud: scherm.inhoud || INHOUD_STANDAARD };
       await t.test(scherm.pad, async () => {
         await page.goto(base + GASTHEER, { waitUntil: 'domcontentloaded' });
-        const m = await page.evaluate(inKader, { url: base + scherm.pad, weg: scherm.weg,
-          blijft: scherm.blijft || [], inhoud: scherm.inhoud || '' });
-        assert.equal(m.fout, undefined, scherm.pad + ': het kader liet zich niet meten (' + m.fout + ')');
+        await page.evaluate(zetKader, { id: KADER, url: base + scherm.pad });
+        await wachtTot(page, kaderKlaar, opdracht,
+          { wat: 'het kader van ' + scherm.pad + ' met zijn eigen chrome gebouwd' });
+        const m = await page.evaluate(meetKader, opdracht);
         assert.equal(m.pad, scherm.pad, scherm.pad + ': het kader landde op ' + m.pad);
-        assert.equal(m.embed, true, scherm.pad + ': een echt iframe is niet als embed gemarkeerd');
         assert.equal(m.eigenEdge, 0, scherm.pad + ': het kind bouwt een tweede Edge-casco');
         assert.deepEqual(m.gemarkeerdZichtbaar, [],
           scherm.pad + ': platformchrome staat er nog: ' + m.gemarkeerdZichtbaar.join(', '));
@@ -203,10 +234,12 @@ test('ingebedde schermen tonen geen tweede platformbediening, en zonder kader we
         }
 
         /* DE BESTURINGSPROEF. Zonder kader hoort dezelfde balk er gewoon te
-           staan; anders bewaakt deze toets een verwijdering. */
+           staan; anders bewaakt deze toets een verwijdering. De wacht eist
+           hier ZICHTBAAR en niet alleen aanwezig -- dat is de hele bewering. */
         await page.goto(base + scherm.pad, { waitUntil: 'domcontentloaded' });
-        await page.waitForTimeout(600);
-        const open = await page.evaluate(opPagina, { weg: scherm.weg, blijft: scherm.blijft || [] });
+        await wachtTot(page, paginaKlaar, { weg: scherm.weg, blijft: scherm.blijft || [], embed: false },
+          { wat: scherm.pad + ' zonder kader met zijn eigen bediening in beeld' });
+        const open = await page.evaluate(meetPagina, { weg: scherm.weg, blijft: scherm.blijft || [] });
         assert.equal(open.embed, false, scherm.pad + ': een gewoon geopende pagina noemt zichzelf ingebed');
         if (scherm.weg.length) {
           assert.deepEqual(open.wegZichtbaar.slice().sort(), scherm.weg.slice().sort(),
@@ -222,8 +255,9 @@ test('ingebedde schermen tonen geen tweede platformbediening, en zonder kader we
     await t.test('?embed=1 doet hetzelfde als een echt kader', async () => {
       for (const scherm of SCHERMEN.filter(s => s.weg.length).slice(0, 4)) {
         await page.goto(base + scherm.pad + '?embed=1', { waitUntil: 'domcontentloaded' });
-        await page.waitForTimeout(600);
-        const m = await page.evaluate(opPagina, { weg: scherm.weg, blijft: [] });
+        await wachtTot(page, paginaKlaar, { weg: scherm.weg, blijft: [], embed: true },
+          { wat: scherm.pad + '?embed=1 met zijn eigen chrome gebouwd' });
+        const m = await page.evaluate(meetPagina, { weg: scherm.weg, blijft: [] });
         assert.equal(m.embed, true, scherm.pad + '?embed=1: de embed-stand wordt niet gezet');
         assert.deepEqual(m.gemarkeerdZichtbaar, [],
           scherm.pad + '?embed=1: platformchrome staat er nog: ' + m.gemarkeerdZichtbaar.join(', '));

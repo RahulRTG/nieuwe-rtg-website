@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-18T05:57:31.036Z",
-    "commit": "cc35c418",
+    "op": "2026-09-18T09:22:44.255Z",
+    "commit": "41225655",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2350,6 +2350,13 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "edge-enige-balk.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "edge-system.test.js": {
       "soort": "puur",

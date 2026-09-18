@@ -41,6 +41,12 @@
     var target = d.getElementById(b.dataset.dailyTarget);
     if (target && !target.disabled) target.click();
   });
+  d.addEventListener('DOMContentLoaded', function () {
+    if (!w.RTGUitvoer) return;
+    var host = d.createElement('div'); host.id = 'dailyExport';
+    host.setAttribute('data-rtg-edge-bar', ''); d.body.appendChild(host);
+    w.RTGUitvoer.mount(host, null);
+  }, { once: true });
   w.RTGDaily = { render: render, action: button };
   render(d.body.dataset.rtgDaily, 'loading');
 })(window, document);

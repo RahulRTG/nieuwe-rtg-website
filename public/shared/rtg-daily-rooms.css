@@ -45,3 +45,8 @@ body.rtg-daily[data-rtg-daily="agenda"][data-daily-view="dag"] #periode{display:
 
 body.rtg-daily[data-rtg-daily="agenda"][data-daily-state="empty"] .daily-foot{display:none}
 body.rtg-daily[data-rtg-daily="agenda"][data-daily-view="dag"] #kal .ldag>h3{display:none}
+
+body.rtg-daily .schrijf textarea{min-height:78px;height:78px}
+body.rtg-daily .schrijf .voet{gap:8px;flex-wrap:wrap}
+body.rtg-daily .schrijf .voet .knop{font-size:12px;padding:8px 10px}
+body.rtg-daily .schrijf .voet #plaats{flex:0 0 auto;margin-inline-start:auto}

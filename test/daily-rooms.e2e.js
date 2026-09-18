@@ -133,6 +133,7 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     // The semantic action must not depend on the translated button text.
     await language(page, 'nl', 'Nederlands');
     assert.equal((await post(srv.base, '/api/member/pulse/feed', {}, reg.token)).feed.length, 1);
+    await page.waitForFunction(() => { const b = document.querySelector('.rtguitvoer-knop'); return b && !!b.closest('.rtg-edge-chrome'); });
     await screenshot('pulse-filled');
 
     for (const [app, route] of [['pulse','member/pulse/feed'], ['agenda','agenda/bereik'], ['bestanden','bestanden/mijn'], ['notities','notities/mijn']]) {

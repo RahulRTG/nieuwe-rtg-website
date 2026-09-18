@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-18T14:58:38.597Z",
-    "commit": "c8360ca82",
+    "op": "2026-09-18T22:52:54.580Z",
+    "commit": "49a112a57",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2045,6 +2045,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "daily-rooms.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "db-redis-mirror.test.js": {

@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1936 |
 | losse beweringen (`test(...)`) | 13946 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 150 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1291 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1292 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 406 |
+| niets van beide | 405 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1833,7 +1833,7 @@ toets omvalt.
 | `horecaschermen.e2e.js` | 4 | -- | DE ZEVEN WERKSCHERMEN VAN HET HORECA OS, IN EEN ECHTE BROWSER. /apps/horeca.html (zaal en keuken) heeft zijn eigen toets. |
 | `huis.e2e.js` | 1 | -- | Scherm-test voor Het Huis: het reisdossier op blad 02 van het magazine. test/huis.test.js bewijst de server-kant; deze bewijst dat het blad de reis toont, elke stand als woord draagt, en dat "wat er nog moet"... |
 | `identiteitschermen.e2e.js` | 2 | -- | DRIE SCHERMEN DIE OVER IDENTITEIT EN RUST GAAN. Uit de 104 schermen waar geen enkele toets de weg aflegt (TAKEN 4.9) zijn dit er drie waar het duurste misverstand mogelijk is: ze gaan over wie u bent en over hoe dit... |
-| `ingebedde-chrome.e2e.js` | 1 | -- | EEN INGEBED SCHERM HEEFT EEN BEDIENING, EN DAT IS DIE VAN ZIJN OUDER. ONTWERP.md legt dat al vast: "In een iframe, ?embed=1 of Command-oppervlak wordt geen tweede Edge gestart en wordt de lokale vaste chrome van het... |
+| `ingebedde-chrome.e2e.js` | 1 | gezakt op `liegpoort /api/` | EEN INGEBED SCHERM HEEFT EEN BEDIENING, EN DAT IS DIE VAN ZIJN OUDER. ONTWERP.md legt dat al vast: "In een iframe, ?embed=1 of Command-oppervlak wordt geen tweede Edge gestart en wordt de lokale vaste chrome van het... |
 | `invoerbalie.e2e.js` | 1 | -- | Scherm-toets op DE INVOERBALIE in /apps/reizen.html (REIZEN.md fase 2). WAAROM DIT BESTAND ER IS. |
 | `ioslaag.e2e.js` | 3 | genoemd | De iOS-laag (public/shared/ios.js): gooit hij niets weg dat de app nog nodig heeft, en ruimt hij op wat er weg moest? WAAROM DEZE TOETS BESTAAT. |
 | `isolatie-cockpit.e2e.js` | 1 | -- | SCHERM-TEST: de isolatiecockpit van het kantoor (/apps/isolatie.html). WAAROM DEZE TOETS BESTAAT, en waarom hij meer doet dan de pagina openen. |

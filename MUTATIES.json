@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-17T14:10:30.858Z",
-    "commit": "2d4a48e6",
+    "op": "2026-09-18T05:32:23.967Z",
+    "commit": "43bd6bcd",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3890,6 +3890,13 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "ingebedde-chrome.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "inkoopketen.test.js": {
       "soort": "server",

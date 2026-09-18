@@ -21,14 +21,11 @@
   };
 
   var vandaag = K.iso(new Date());
-  /* Op telefoon opent de agenda als rustige tijdlijn, zoals het LivingOS-
-     dagbeeld. Op een breder scherm blijft het maandraster de beste ingang. */
-  var smal = window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
-  var stand = { weergave: smal ? 'lijst' : 'maand', anker: vandaag };
+  var stand = { weergave: 'dag', anker: vandaag };
   window.RTGRouteMemory.register('agenda', {
     capture: function () { return { weergave: stand.weergave, anker: stand.anker }; },
     restore: function (value) {
-      if (['maand','week','lijst'].indexOf(value.weergave) >= 0) stand.weergave = value.weergave;
+      if (['dag','maand','week','lijst'].indexOf(value.weergave) >= 0) stand.weergave = value.weergave;
       if (/^\d{4}-\d{2}-\d{2}$/.test(value.anker || '') && Number.isFinite(Date.parse(value.anker))) stand.anker = value.anker;
       return true;
     }
@@ -40,11 +37,11 @@
      raster (inclusief de randen van de buurmaanden), de week zijn zeven
      dagen, de lijst dertig dagen vooruit */
   function venster() {
-    if (stand.weergave === 'week') {
+    if (stand.weergave === 'week' || stand.weergave === 'dag') {
       var ma = K.maandagVan(stand.anker);
       return { van: ma, tot: K.plusDagen(ma, 6) };
     }
-    if (stand.weergave === 'lijst') return { van: vandaag, tot: K.plusDagen(vandaag, 30) };
+    if (stand.weergave === 'lijst') return { van: stand.anker, tot: K.plusDagen(stand.anker, 30) };
     var eerste = stand.anker.slice(0, 8) + '01';
     var start = K.maandagVan(eerste);
     return { van: start, tot: K.plusDagen(start, 41) };
@@ -55,23 +52,28 @@
     var v = venster(), versie = ++laadVersie;
     api('bereik', v).then(function (r) {
       if (versie !== laadVersie) return;
-      if (r.status !== 200) return meld(r.body.error || 'Log eerst in op de leden-app.');
+      if (r.status !== 200) { window.RTGDaily.render('agenda', 'error', { retry: laad }); return meld(r.body.error || window.RTGDailyCopy.value('failed')); }
       var alles = (r.body.items || []).concat(r.body.ecosysteem || []);
       alles.sort(function (a, b) {
         return a.datum.localeCompare(b.datum) || String(a.tijd || '').localeCompare(String(b.tijd || ''));
       });
       stand.items = alles;
-      var acties = {
-        item: function (x) { paneel.toon(x); },
-        dag: function (dag) { paneel.toon({ datum: dag }); }
-      };
-      $('#periode').textContent = K[stand.weergave]($('#kal'), stand.anker, alles, acties, vandaag);
+      teken();
       window.RTGRouteMemory.ready('agenda');
-      ['wMaand', 'wWeek', 'wLijst'].forEach(function (id) {
-        $('#' + id).classList.toggle('aan', id.slice(1).toLowerCase() === stand.weergave);
-      });
     });
   }
+  function teken() {
+    if (!stand.items) return;
+    var acties = { item: function (x) { paneel.toon(x); }, dag: function (dag) { paneel.toon({ datum: dag }); } };
+    window.RTGAgendaEditorial(stand, function (dag) { stand.anker = dag; stand.weergave = 'dag'; laad(); }, laad);
+    $('#periode').textContent = K[stand.weergave]($('#kal'), stand.anker, stand.items, acties, vandaag);
+    ['wDag', 'wMaand', 'wWeek', 'wLijst'].forEach(function (id) {
+      var active = id.slice(1).toLowerCase() === stand.weergave;
+      $('#' + id).classList.toggle('aan', active);
+      $('#' + id).setAttribute('aria-pressed', String(active));
+    });
+  }
+  window.addEventListener('rtglang', teken);
 
   /* Meenemen: de agenda kent zijn eigen model, dus geeft hij dat door in
      plaats van de gedeelde laag naar het scherm te laten raden -- daar staan
@@ -92,8 +94,7 @@
   }
 
   function stap(n) {
-    if (stand.weergave === 'week') stand.anker = K.plusDagen(stand.anker, n * 7);
-    else if (stand.weergave === 'lijst') return; // de lijst kijkt altijd vooruit
+    if (stand.weergave === 'week' || stand.weergave === 'dag' || stand.weergave === 'lijst') stand.anker = K.plusDagen(stand.anker, n * 7);
     else {
       var d = new Date(stand.anker.slice(0, 8) + '15T12:00:00Z');
       d.setUTCMonth(d.getUTCMonth() + n);
@@ -104,7 +105,7 @@
   $('#vorige').addEventListener('click', function () { stap(-1); });
   $('#volgendeK').addEventListener('click', function () { stap(1); });
   $('#vandaagBtn').addEventListener('click', function () { stand.anker = vandaag; laad(); });
-  [['wMaand', 'maand'], ['wWeek', 'week'], ['wLijst', 'lijst']].forEach(function (p) {
+  [['wDag', 'dag'], ['wMaand', 'maand'], ['wWeek', 'week'], ['wLijst', 'lijst']].forEach(function (p) {
     $('#' + p[0]).addEventListener('click', function () { stand.weergave = p[1]; laad(); });
   });
   $('#nieuwBtn').addEventListener('click', function () { paneel.toon({ datum: stand.anker }); });
@@ -183,5 +184,5 @@
     });
   });
 
-  if (!token) meld('Log eerst in op de leden-app.'); else laad();
+  if (!token) window.RTGDaily.render('agenda', 'guest'); else laad();
 })();

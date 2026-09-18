@@ -41,7 +41,7 @@
 
   function laad() {
     return api('mijn').then(function (r) {
-      if (r.status !== 200) return meld(r.body.error || 'Log eerst in op de leden-app.');
+      if (r.status !== 200) { window.RTGDaily.render('bestanden', 'error', { retry: laad }); return meld(r.body.error || window.RTGDailyCopy.value('failed')); }
       stand = r.body;
       window.RTGRouteMemory.ready('bestanden');
       teken();
@@ -63,7 +63,7 @@
   }
   function rijtje(it) {
     var meta = [maat(it.bytes)];
-    if (it.gewijzigd) meta.push(it.gewijzigd.slice(0, 10));
+    if (it.gewijzigd) meta.push('<span translate="no">' + esc(window.RTGDailyCopy.date(it.gewijzigd)) + '</span>');
     if (it.ster) meta.push('<span class="goud">ster</span>');
     if (it.versies) meta.push(it.versies + (it.versies === 1 ? ' versie' : ' versies'));
     if ((it.gedeeldMet || []).length) meta.push('gedeeld met ' + it.gedeeldMet.length);
@@ -71,7 +71,7 @@
     if (it.weg) meta.push('<span class="goud">in de prullenbak</span>');
     return '<div class="item' + (it.weg ? ' weg' : '') + '" data-open="' + it.id + '" role="button" tabindex="0">' +
       '<span class="ext" aria-hidden="true">' + esc(extVan(it.naam, it.mime)) + '</span>' +
-      '<span class="wat"><b>' + esc(it.naam) + '</b><span>' + meta.join(' · ') + '</span></span></div>';
+      '<span class="wat"><b data-user-content>' + esc(it.naam) + '</b><span>' + meta.join(' · ') + '</span></span></div>';
   }
   function teken() {
     if (!stand) return;
@@ -90,18 +90,17 @@
       return String(b.gewijzigd).localeCompare(String(a.gewijzigd));
     };
     var mappen = bak || q ? [] : (stand.mappen || []).filter(function (m) { return (m.ouder || null) === (hier || null); });
+    $('#dailyFolders').hidden = !mappen.length;
     $('#mappen').innerHTML = mappen.map(function (m) {
       return '<span class="mapkaart" data-map="' + m.id + '" role="button" tabindex="0">' +
-        '<span class="mp" aria-hidden="true"></span>' + esc(m.naam) + '</span>';
+        '<span class="mp" aria-hidden="true"></span><span data-user-content>' + esc(m.naam) + '</span>' + '</span>';
     }).join('');
     Array.prototype.forEach.call(document.querySelectorAll('[data-map]'), function (el) {
       el.addEventListener('click', function () { hier = el.dataset.map; teken(); });
     });
     var eigen = (stand.items || []).filter(zeef).sort(orde);
-    $('#lijst').innerHTML = eigen.map(rijtje).join('') ||
-      '<p class="stil">' + (bak ? 'De prullenbak is leeg; zo hoort een prullenbak erbij te staan.'
-        : 'Nog geen bestanden hier. Sleep iets naar dit scherm of druk op Upload.') + '</p>' +
-      (bak ? '' : '');
+    $('#lijst').innerHTML = eigen.map(rijtje).join('') || '<p class="stil">' +
+      (bak ? 'De prullenbak is leeg.' : window.RTGDailyCopy.text(q ? 'noResults' : 'noFiles')) + '</p>';
     if (bak && eigen.length) {
       $('#lijst').innerHTML += '<div class="rij h-mt50">' +
         '<button class="knop" id="leegAlles" type="button">Prullenbak leegmaken</button></div>';
@@ -114,12 +113,14 @@
     var gedeeld = bak ? [] : (stand.gedeeld || []).filter(function (it) { return !q || it.naam.toLowerCase().indexOf(q) >= 0; });
     $('#gedeeldKop').style.display = gedeeld.length ? '' : 'none';
     $('#gedeeldLijst').innerHTML = gedeeld.map(rijtje).join('');
-    var office = bak ? [] : (stand.office || []);
+    var office = bak ? [] : (stand.office || []).filter(function (it) { return !q || (it.titel || '').toLowerCase().indexOf(q) >= 0; });
+    var first = !bak && !hier && !q && !(stand.items || []).length && !(stand.mappen || []).length && !(stand.gedeeld || []).length && !(stand.office || []).length;
+    window.RTGDaily.render('bestanden', first ? 'empty' : 'ready', { retry: laad });
     $('#officeKop').style.display = office.length ? '' : 'none';
     $('#officeLijst').innerHTML = office.map(function (d) {
       return '<a class="item" href="/apps/office.html" style="text-decoration:none;color:inherit;">' +
         '<span class="ext" aria-hidden="true">' + esc(d.soort) + '</span>' +
-        '<span class="wat"><b>' + esc(d.titel) + '</b><span>RTG Office · ' + esc(String(d.gewijzigd || '').slice(0, 10)) + '</span></span></a>';
+        '<span class="wat"><b data-user-content>' + esc(d.titel) + '</b><span>RTG Office · ' + esc(String(d.gewijzigd || '').slice(0, 10)) + '</span></span></a>';
     }).join('');
     $('#quotumTekst').textContent = maat(stand.gebruik) + ' van ' + maat(stand.quotum) + ' gebruikt';
     $('#quotumBalk').style.width = Math.min(100, 100 * stand.gebruik / stand.quotum) + '%';
@@ -170,5 +171,6 @@
 
   window.RTGBestanden = { api: api, meld: meld, laad: laad, maat: maat, stuur: stuur,
     stand: function () { return stand; }, bak: function () { return bak; } };
-  if (!token) meld('Log eerst in op de leden-app.'); else laad();
+  window.addEventListener('rtglang', teken);
+  if (!token) window.RTGDaily.render('bestanden', 'guest'); else laad();
 })();

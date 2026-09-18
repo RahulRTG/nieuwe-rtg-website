@@ -342,7 +342,7 @@ omlaag.
 
 ## `apps/notities/app.js`
 
-`public/apps/notities/app/` -- 2 delen, 218 regels in de delen
+`public/apps/notities/app/` -- 2 delen, 224 regels in de delen
 
 | deel | onderwerp |
 |---|---|

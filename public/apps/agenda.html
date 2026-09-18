@@ -128,56 +128,58 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/kantoor-tools.css?v=enterprise1" rel="stylesheet">
-<link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
-<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
+
+
+
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-daily.css" rel="stylesheet">
+<link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-living-flow" data-kantoor-tool="agenda" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-vandaag-luxe="surface" data-rtg-vandaag-surface="agenda" data-rtg-vandaag-surface-title="Uw agenda" data-rtg-edge-2-context="native-header,duimbalk" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-daily rtg-living-flow" data-kantoor-tool="agenda" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-edge-2-context="native-header,duimbalk" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-daily="agenda" data-rtg-editorial-room="agenda">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG · LivingOS</span><h1>Uw dag</h1></span>
   <span class="rij" style="margin-left:auto;">
-    <button class="knop" id="icsBtn" type="button" title="Exporteer als .ics; opent in elke agenda ter wereld">Exporteer</button>
+    <button class="knop" id="icsBtn" aria-label="Agenda exporteren" data-rtg-edge-bar type="button" title="Exporteer als .ics; opent in elke agenda ter wereld">Exporteer</button>
   </span>
 </header>
 <!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
      "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
      een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
      rij onder de kop. -->
-<div class="rtg-duimbalk"><button class="knop vol" id="nieuwBtn" type="button" data-hoofdactie>+ Afspraak</button></div>
+<div class="rtg-duimbalk"><button class="knop vol" id="nieuwBtn" data-rtg-edge-bar type="button" data-hoofdactie>+ Afspraak</button></div>
 <main>
-  <section class="kantoor-intro" aria-labelledby="agendaIntro">
-    <span class="ey">Vandaag · samen gepland</span>
-    <div><h2 id="agendaIntro">Uw dag, zonder ruis.</h2><p>Afspraken, reistijd en de mensen die erbij horen in één rustige tijdlijn.</p></div>
-  </section>
+<section id="dailyIntro" aria-label="Agenda"></section>
+  <div class="daily-content">
   <div id="agendaStatus" class="rtg-operation-status" role="status" aria-live="polite"></div>
+  <div class="stuur">
+    <button class="knop" id="vorige" data-rtg-edge-bar type="button" aria-label="Vorige">&#8249;</button>
+    <button class="knop" id="volgendeK" data-rtg-edge-bar type="button" aria-label="Volgende">&#8250;</button>
+    <h2 id="periode"></h2>
+    <span class="rek"></span>
+    <button class="knop" id="vandaagBtn" data-rtg-edge-bar type="button">Vandaag</button>
+    <button class="knop" id="wDag" type="button" data-rtg-edge-bar>Dag</button>
+    <button class="knop" id="wMaand" data-rtg-edge-bar type="button">Maand</button>
+    <button class="knop" id="wWeek" data-rtg-edge-bar type="button">Week</button>
+    <button class="knop" id="wLijst" data-rtg-edge-bar type="button">Lijst</button>
+  </div>
+  <div id="dailyWeek" class="daily-week"></div>
+  <div id="kal" data-rtg-scroll="agenda-calendar" aria-live="polite"></div>
+  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="nieuwBtn">Plan een afspraak <span aria-hidden="true">→</span></button></div>
+  <details class="daily-planner"><summary>Plan met Rahul in uw eigen woorden</summary>
   <div class="rahulbalk">
     <input class="veld" id="rahulIn" maxlength="300" placeholder='Zeg het gewoon: "lunch met de notaris vrijdag om 12:30"'
       aria-label="Plan in gewone taal">
     <button class="knop" id="rahulBtn" type="button">Plan</button>
   </div>
-  <div class="stuur">
-    <button class="knop" id="vorige" type="button" aria-label="Vorige">&#8249;</button>
-    <button class="knop" id="volgendeK" type="button" aria-label="Volgende">&#8250;</button>
-    <h2 id="periode"></h2>
-    <span class="rek"></span>
-    <button class="knop" id="vandaagBtn" type="button">Vandaag</button>
-    <button class="knop" id="wMaand" type="button">Maand</button>
-    <button class="knop" id="wWeek" type="button">Week</button>
-    <button class="knop" id="wLijst" type="button">Lijst</button>
-  </div>
-  <div id="kal" data-rtg-scroll="agenda-calendar" aria-live="polite"></div>
+  </details>
   <p class="stil h-mt80">Goud is wat uit RTG zelf komt (boekingen); dat leest de agenda alleen.
     Gestippeld is een uitnodiging die nog op uw ja of nee wacht. Herinneringen komen als seintje op het toestel.</p>
+  </div>
 </main>
 
-<nav class="rtg-deep-nav rtg-deep-nav--3" aria-label="LivingOS dagflow">
-  <a href="/apps/agenda.html" aria-current="page"><b>01</b>Uw dag</a>
-  <a href="/apps/attenties.html"><b>02</b>Aandacht</a>
-  <a href="/apps/vandaag.html"><b>03</b>Vandaag</a>
-</nav>
+
 
 <!-- de afspraak -->
 <div class="scrim" id="afScrim" role="dialog" aria-label="Afspraak">
@@ -236,6 +238,8 @@
   </div>
 </div>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/rtg-daily-copy.js"></script>
+<script src="/shared/rtg-daily.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/rtg-route-memory-core.js"></script>
 <script src="/shared/rtg-route-memory.js"></script>
@@ -243,8 +247,9 @@
 <script src="/shared/rtg-side-sheet.js"></script>
 <script src="/apps/agenda/kalender.js"></script>
 <script src="/apps/agenda/paneel.js"></script>
+<script src="/apps/agenda/editorial.js"></script>
 <script src="/apps/agenda/app.js"></script>
-<script src="/shared/rtg-vandaag-luxe.js" defer></script>
+
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

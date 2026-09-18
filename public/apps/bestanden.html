@@ -98,17 +98,19 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/adaptief.css" rel="stylesheet">
 <link href="/shared/grammatica.css" rel="stylesheet">
-<link href="/shared/kantoor-tools.css?v=enterprise1" rel="stylesheet">
+
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-daily.css" rel="stylesheet">
+<link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-kantoor-tool="bestanden" data-rtg-world="work" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-daily" data-kantoor-tool="bestanden" data-rtg-eigenvlak="onyx" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-daily="bestanden" data-rtg-editorial-room="bestanden">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG</span><h1>Bestanden</h1></span>
   <span class="rij" style="margin-left:auto;">
-    <button class="knop" id="toonBak" type="button">Prullenbak</button>
-    <button class="knop" id="nieuwMap" type="button">+ Map</button>
+    <button class="knop" id="toonBak" data-rtg-edge-bar type="button">Prullenbak</button>
+    <button class="knop" id="nieuwMap" data-rtg-edge-bar type="button">+ Map</button>
     <input type="file" id="bestandkiezer" multiple hidden aria-label="Bestanden kiezen">
   </span>
 </header>
@@ -116,13 +118,24 @@
      "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
      een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
      rij onder de kop. -->
-<div class="rtg-duimbalk"><button class="knop vol" id="kies" type="button" data-hoofdactie>Upload</button></div>
+<div class="rtg-duimbalk"><button class="knop vol" id="kies" data-rtg-edge-bar type="button" data-hoofdactie>Upload</button></div>
 <main>
-  <section class="kantoor-intro" aria-labelledby="bestandenIntro">
-    <span class="ey">Kantoor · beveiligde kluis</span>
-    <div><h2 id="bestandenIntro">Alles op zijn vaste plek.</h2><p>Bestanden, versies en gedeeld werk in een rustige, controleerbare omgeving.</p></div>
-  </section>
-  <div class="rij" style="justify-content:space-between;">
+<section id="dailyIntro" aria-label="Bestanden"></section>
+  <div class="daily-content">
+  <input class="veld" id="zoek" type="search" placeholder="Zoek in uw bestanden" aria-label="Zoeken"
+    style="width:100%;margin-bottom:0.75rem;">
+  <div class="sleep">Laat los om te uploaden</div>
+  <nav id="pad" aria-label="Mappenpad"></nav>
+  <h2 id="dailyFolders" class="kop">Uw mappen</h2>
+  <div id="mappen"></div>
+  <h2 class="kop">Uw documenten</h2>
+  <div id="lijst" aria-live="polite"></div>
+  <div id="gedeeldKop" class="kop" style="display:none;">Met mij gedeeld</div>
+  <div id="gedeeldLijst"></div>
+  <div id="officeKop" class="kop" style="display:none;">Uit RTG Office · werken doet u daar</div>
+  <div id="officeLijst"></div>
+  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="kies">Bestand toevoegen <span aria-hidden="true">→</span></button></div>
+<div class="daily-storage">  <div class="rij" style="justify-content:space-between;">
     <span class="stil" id="quotumTekst">&nbsp;</span>
     <select class="veld" id="sorteer" aria-label="Sorteren">
       <option value="nieuw">Nieuwste eerst</option>
@@ -131,18 +144,9 @@
     </select>
   </div>
   <div class="meter" aria-hidden="true"><i id="quotumBalk"></i></div>
-  <input class="veld" id="zoek" type="search" placeholder="Zoek in de kluis" aria-label="Zoeken"
-    style="width:100%;margin-bottom:0.75rem;">
-  <div class="sleep">Laat los om te uploaden</div>
-  <nav id="pad" aria-label="Mappenpad"></nav>
-  <div id="mappen"></div>
-  <div id="lijst" aria-live="polite"></div>
-  <div id="gedeeldKop" class="kop" style="display:none;">Met mij gedeeld</div>
-  <div id="gedeeldLijst"></div>
-  <div id="officeKop" class="kop" style="display:none;">Uit RTG Office · werken doet u daar</div>
-  <div id="officeLijst"></div>
-  <p class="stil h-mt80">Alles in de kluis staat versleuteld opgeslagen. De prullenbak bewaart
-    30 dagen en telt mee voor het quotum; delen op codenaam laat de ander kijken en nieuwe versies plaatsen.</p>
+</div>
+  <p class="stil h-mt80">Verwijderde bestanden blijven dertig dagen in de prullenbak en tellen mee voor uw opslagruimte. Als u een bestand deelt op codenaam, kan de ander het bekijken en nieuwe versies toevoegen.</p>
+  </div>
 </main>
 
 <div class="scrim" id="bkScrim" role="dialog" aria-label="Bestand">
@@ -178,6 +182,8 @@
   </div>
 </div>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/rtg-daily-copy.js"></script>
+<script src="/shared/rtg-daily.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/rtg-route-memory-core.js"></script>
 <script src="/shared/rtg-route-memory.js"></script>

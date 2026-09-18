@@ -43,11 +43,14 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
         localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       }, token);
       await page.goto(base + '/apps/agenda.html', { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+      await require('./helper').edgeBediening(page, 'Maand');
       await page.waitForSelector('.mgrid', { timeout: 15000 });
     };
 
     /* ---- A: Rahul plant in gewone taal ---- */
     await als(regA.token);
+    await page.locator('.daily-planner summary').click();
     await page.fill('#rahulIn', 'proeverij morgen om 15:00');
     await page.click('#rahulBtn');
     await page.waitForFunction(() => /Ingepland/.test(document.querySelector('#melding').textContent),

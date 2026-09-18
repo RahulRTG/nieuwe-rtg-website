@@ -54,14 +54,17 @@
     this.value = '';
     tekenTaken();
   });
+  var saving = false;
   function bewaar(extra) {
+    if (saving) return Promise.resolve(null);
+    saving = true;
     var b = Object.assign({ id: open.id, soort: open.soort, titel: $('#ntTitel').value,
       tekst: $('#ntTekst').value, items: open.items,
       herinnerOp: $('#ntDatum').value || null, herinnerTijd: $('#ntTijd').value || null }, extra || {});
     return api('bewaar', b).then(function (r) {
-      if (r.body.error) { meld(r.body.error); return null; }
+      if (r.status !== 200 || r.body.error || !r.body.id) { meld(r.body.error || window.RTGDailyCopy.value('failed')); return null; }
       return r.body.id;
-    });
+    }).finally(function () { saving = false; });
   }
   $('#ntBewaar').addEventListener('click', function () {
     bewaar().then(function (id) { if (id) { meld('Bewaard.'); dicht(); laad(); } });
@@ -74,13 +77,13 @@
   });
   $('#ntWeg').addEventListener('click', function () {
     if (!confirm(open.vanMij ? 'Deze notitie verwijderen?' : 'Uzelf van deze gedeelde notitie halen?')) return;
-    api('weg', { id: open.id }).then(function () { dicht(); laad(); });
+    api('weg', { id: open.id }).then(function (r) { if (r.status !== 200 || r.body.error) return meld(r.body.error || window.RTGDailyCopy.value('failed')); dicht(); laad(); });
   });
   $('#ntDeel').addEventListener('click', function () {
     var code = $('#ntCode').value.trim();
     if (!code || !open.id) return;
     api('deel', { id: open.id, codenaam: code }).then(function (r) {
-      if (r.body.error) return meld(r.body.error);
+      if (r.status !== 200 || r.body.error) return meld(r.body.error || window.RTGDailyCopy.value('failed'));
       $('#ntCode').value = '';
       open.gedeeldMet = r.body.gedeeldMet || [];
       $('#ntGedeeld').textContent = 'Samen met: ' + open.gedeeldMet.join(', ');
@@ -102,5 +105,5 @@
     notitie: function (id) {
       return (stand && (stand.eigen || []).filter(function (n) { return n.id === id; })[0]) || null;
     } };
-  if (!token) meld('Log eerst in op de leden-app.'); else laad();
+  if (!token) window.RTGDaily.render('notities', 'guest'); else laad();
 })();

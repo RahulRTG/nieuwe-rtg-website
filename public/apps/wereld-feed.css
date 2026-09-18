@@ -49,6 +49,7 @@ body.rtg-social-experience .kaart .tel{display:flex;gap:12px;font-size:11px;colo
 .living-welcome a::after{content:'↗';font-size:24px}
 .living-welcome .living-note{font-size:10px;color:#d5c9be;margin:18px 0 0}
 .living-membership{padding:28px 0 0}
+.living-membership .lenscontext a{display:inline-flex;align-items:center;min-height:44px;padding-block:4px;box-sizing:border-box}
 body.rtg-social-experience .living-membership .passport{background:transparent;border:0;border-block:1px solid var(--rtg-line);padding:20px 0;margin:0 0 16px}
 .living-membership .lenzen{display:flex;flex-wrap:wrap;gap:8px;padding:0;border:0}
 .living-membership .lenzen a,.living-membership .lenzen button,.living-membership .lenzen span{flex:1 0 auto;min-height:44px;box-sizing:border-box;display:grid;place-content:center;font-size:11px;padding:8px;color:#c9c0b6}

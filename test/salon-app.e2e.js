@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { edgeBediening, startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -87,7 +87,7 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     assert.ok(/Je bent bij/.test(slot), 'de app zegt eerlijk wanneer je bij bent');
 
     // 3. zelf plaatsen vanaf het tabblad
-    await page.click('[data-t="plaats"]');
+    await edgeBediening(page, 'Plaatsen');
     await page.waitForSelector('#ptekst', { timeout: 10000 });
     await page.evaluate(() => {
       const t = document.querySelector('#ptekst');
@@ -98,13 +98,13 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     await page.waitForFunction(() => /kade/.test(document.querySelector('#main').textContent), null, { timeout: 15000 });
 
     // 4. de post staat in je eigen profiel (het raster van "Ik")
-    await page.click('[data-t="ik"]');
+    await edgeBediening(page, 'Mijn profiel');
     await page.waitForSelector('[data-open]', { timeout: 10000 });
     const raster = await page.evaluate(() => document.querySelector('#main').textContent);
     assert.ok(/kade/.test(raster), 'je eigen post staat in je eigen raster');
 
     // 5. reageren in de app zelf, zonder weg te navigeren
-    await page.click('[data-t="feed"]');
+    await edgeBediening(page, 'Feed');
     await page.waitForSelector('[data-reacties]', { timeout: 10000 });
     await page.click('[data-reacties]');
     await page.waitForSelector('#rtekst', { timeout: 10000 });
@@ -115,7 +115,7 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     assert.equal(pad, '/apps/salon.html', 'we zijn nergens heen genavigeerd');
 
     // 6. inzicht: je eigen cijfers, met de reactie die we net plaatsten erin
-    await page.click('[data-t="inzicht"]');
+    await edgeBediening(page, 'Inzicht');
     await page.waitForFunction(() => /Wat jouw posts deden/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
     const cijfers = await page.evaluate(() => document.querySelector('#main').textContent);
     assert.ok(/1 reacties/.test(cijfers), 'de reactie is geteld in je eigen spiegel: ' + cijfers.slice(0, 120));
@@ -124,10 +124,10 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     // 7. archiveren vanuit het inzicht: de post verlaat je raster maar blijft bestaan
     await page.click('[data-arch]');
     await page.waitForFunction(() => /terugzetten/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
-    await page.click('[data-t="ik"]');
+    await edgeBediening(page, 'Mijn profiel');
     await page.waitForSelector('[data-open]', { timeout: 10000 });
     await page.waitForFunction(() => !/kade/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
-    await page.click('[data-t="inzicht"]');
+    await edgeBediening(page, 'Inzicht');
     await page.waitForFunction(() => /archief/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
     await page.click('#archknop');
     await page.waitForFunction(() => /Je archief/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });

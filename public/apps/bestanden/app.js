@@ -129,32 +129,8 @@
   }
 
   /* ---- uploaden: kiezen of slepen; groot gaat in stukken ---- */
-  var STUK = 4 * 1024 * 1024; // base64-tekens per stuk; ruim onder de bodygrens
   function stuur(file, bid) {
-    return new Promise(function (af) {
-      var r = new FileReader();
-      r.onload = function () {
-        var dataUrl = String(r.result || '');
-        var b64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
-        if (b64.length <= STUK) {
-          af(api('upload', bid ? { id: bid, dataUrl: dataUrl } : { naam: file.name, map: hier, dataUrl: dataUrl }));
-          return;
-        }
-        // in stukken: start, delen, klaar -- dezelfde poort, hetzelfde quotum
-        af(api('upstart', { naam: file.name, map: hier, id: bid || undefined, mime: file.type || 'application/octet-stream' })
-          .then(function (s) {
-            if (s.body.error) return s;
-            var ket = Promise.resolve({ status: 200, body: {} });
-            for (var i = 0; i < b64.length; i += STUK) {
-              (function (stuk) {
-                ket = ket.then(function (v) { return v.body.error ? v : api('updeel', { uploadId: s.body.uploadId, stuk: stuk }); });
-              })(b64.slice(i, i + STUK));
-            }
-            return ket.then(function (v) { return v.body.error ? v : api('upklaar', { uploadId: s.body.uploadId }); });
-          }));
-      };
-      r.readAsDataURL(file);
-    });
+    return window.RTGBestandUpload(file, api, { id: bid, map: hier });
   }
   function uploadAlles(files) {
     var lijst = Array.prototype.slice.call(files || []);
@@ -164,7 +140,7 @@
     lijst.forEach(function (f) {
       ket = ket.then(function () { return stuur(f).then(function (r) { if (r.body.error) meld(r.body.error); }); });
     });
-    ket.then(function () { laad(); });
+    ket.then(function () { laad(); }).catch(function (e) { meld(e.message); });
   }
   $('#kies').addEventListener('click', function () { $('#bestandkiezer').click(); });
   $('#bestandkiezer').addEventListener('change', function () { uploadAlles(this.files); this.value = ''; });

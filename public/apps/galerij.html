@@ -83,21 +83,24 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-first-steps.css" rel="stylesheet">
+<script src="/shared/rtg-first-steps.js"></script>
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage">
+<body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-rtg-editorial-room data-rtg-world="living" data-rtg-skin="heritage">
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG</span><h1>Galerij</h1></span>
-  <span class="rij" style="margin-left:auto;">
-    <button class="knop" id="toonFav" type="button">Favorieten</button>
-    <button class="knop" id="toonAlbums" type="button">Albums</button>
+  <span class="rij">
+    <button class="knop" id="toonFav" data-rtg-edge-bar type="button">Favorieten</button>
+    <button class="knop" id="toonAlbums" data-rtg-edge-bar type="button">Albums</button>
   </span>
 </header>
 <!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
      "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
      een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
      rij onder de kop. -->
-<div class="rtg-duimbalk"><button class="knop vol" id="nieuwAlbum" type="button" data-hoofdactie>+ Album</button></div>
+<div class="rtg-duimbalk"><button class="knop vol" id="nieuwAlbum" data-rtg-edge-bar type="button" data-hoofdactie>+ Album</button></div>
+<input type="file" id="eersteFoto" accept="image/*" hidden aria-label="Kies een foto voor uw galerij">
 <main>
   <div id="terugblikWrap" style="display:none;">
     <div class="kop">Dezelfde maand, eerdere jaren</div>
@@ -106,7 +109,7 @@
   <div id="albumPad" class="kop" style="display:none;"></div>
   <div id="albums" style="display:none;"></div>
   <div id="tijdlijn" aria-live="polite"></div>
-  <p class="stil h-mt90">De galerij leest je eigen Salon-posts en de beelden in RTG Bestanden;
+  <p class="stil h-mt90 gallery-explanation">De galerij leest je eigen Salon-posts en de beelden in RTG Bestanden;
     er wordt niets dubbel opgeslagen. Geen gezichtsherkenning, geen slimme sortering: de tijdlijn is de kalender.</p>
 </main>
 
@@ -126,7 +129,9 @@
 <div class="melding" id="melding" role="status"></div>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/bestand-upload.js"></script>
 <script src="/apps/galerij/app.js"></script>
+<script src="/apps/galerij/eerste-stappen.js"></script>
 <script src="/apps/galerij/kijker.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

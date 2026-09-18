@@ -3,7 +3,7 @@
    bouwen. Draait alleen waar een browser beschikbaar is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { edgeBediening, startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -59,22 +59,22 @@ test('Galerij: tijdlijn uit twee bronnen, favoriet in de kijker en een album',
     /* ---- een album maken en het beeld erin zetten ---- */
     await page.evaluate(() => { window.prompt = function () { return 'Zomer'; }; });
     await page.click('#kkDicht');
-    await page.click('#nieuwAlbum');
+    await edgeBediening(page, '+ Album');
     await page.waitForFunction(() => /Zomer/.test(document.querySelector('#albums').textContent),
       null, { timeout: 8000 });
-    await page.click('#toonAlbums'); // terug naar de tijdlijn
+    await edgeBediening(page, 'Albums'); // terug naar de tijdlijn
     await page.evaluate(() => { document.querySelector('#tijdlijn [data-open]').click(); });
     await page.waitForSelector('#kkScrim.open', { timeout: 5000 });
     await page.click('#kkZet');
     await page.waitForFunction(() => /In het album gezet/.test(document.querySelector('#melding').textContent),
       null, { timeout: 8000 });
     await page.click('#kkDicht');
-    await page.click('#toonAlbums');
+    await edgeBediening(page, 'Albums');
     await page.waitForFunction(() => /Zomer/.test(document.querySelector('#albums').textContent) &&
       /1 beeld/.test(document.querySelector('#albums').textContent), null, { timeout: 8000 });
 
     /* ---- favorieten-weergave toont het gemarkeerde beeld ---- */
-    await page.click('#toonFav');
+    await edgeBediening(page, 'Favorieten');
     await page.waitForFunction(() => document.querySelectorAll('#tijdlijn .thumb').length === 1,
       null, { timeout: 8000 });
 

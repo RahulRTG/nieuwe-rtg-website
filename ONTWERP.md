@@ -364,6 +364,54 @@ waar zij stond.
 wél tonen. Zonder die tweede helft slaagt de toets ook wanneer iemand de balken
 gewoon sloopt, en dan bewaakt hij een verwijdering in plaats van een contract.
 
+#### De Edge neemt een balk over, en meet dat hij er een is
+
+*Vastgelegd op 18 september 2026.*
+
+Buiten een kader gold hetzelfde probleem, alleen groter. **Gemeten over 291
+schermen, wachtend op `data-rtg-adaptive-ready` en niet op een klok**: op 135
+schermen stond naast de Edge nog een eigen vaste balk -- de gedeelde app-kop
+`.ios-nav` op 108, de suitebalk en suitenavigatie op tien, de ops-navigatie van
+Travel op vier, de sociale commandobalk op drie, de statusstrook op een.
+
+De Edge **claimt** zo'n balk nu: `public/shared/rtg-adaptive-edge-claim.js` geeft
+hem `rtg-edge-owned-bar`, `rtg-adaptive-edge.css` verbergt hem, en de `ROOTS` van
+`rtg-adaptive-edge-controls.js` oogsten zijn knoppen naar het Edge-blad. Eén
+klasse, twee gevolgen, geen tweede lijst die uit de pas loopt. De bron blijft in
+de DOM met haar eigen handlers en rechten; de Edge klikt haar aan.
+
+Vier regels houden dat eerlijk, en alle vier komen uit een fout die tijdens het
+bouwen echt is gemaakt:
+
+1. **Een naam is geen balk.** `ios.js` plakt `ios-nav` ook op `header.ritkop` van
+   rit.html, en dat is een hero van 430px met een foto. De claim meet daarom of
+   het ding op dat moment werkelijk een balk is -- vast of plakkend, over de
+   breedte, niet hoger dan een balk. Een hero zakt op de eerste voorwaarde.
+2. **Wat de Edge niet kan dragen, neemt hij niet over.** Het blad oogst `button`
+   en `a[href]`; een invoerveld kan het niet. De adresbalk van browser.html
+   staat in die kop, en claimen betekende de browser zijn adres kwijt. Een balk
+   met bedienbare invoer blijft staan. `hidden` telt daarbij als verklaring:
+   bestanden.html heeft een `hidden` bestandskiezer die door een stijlregel toch
+   388x36 groot wordt getekend, en die hoort de claim niet tegen te houden.
+3. **Eerst alles meten, dan pas markeren.** Claimen verandert de maat: zodra
+   `.rtg-suitebar` de klasse kreeg, ging `--suite-nav` naar nul en was
+   `.rtg-suitenav` in dezelfde lus "geen balk" meer. Die stond daarna onzichtbaar
+   én ongeclaimd op het scherm -- opgeruimd in beeld, functie weg.
+4. **De ruimte gaat mee met de balk.** Nul is daarbij niet altijd het goede
+   getal: `.comm` staat `position:fixed; inset:var(--suite-stack)` en werd door
+   die 116px ook vrijgehouden van de casco-bovenbalk. Op nul liep de titel van
+   Berichten eronder door. De stapel wordt de inzet van de Edge zelf.
+
+`test/edge-enige-balk.e2e.js` bewaakt de uitkomst, met twee grendelproeven
+ernaast: de hero van rit.html blijft staan en de adresbalk van browser.html
+blijft bedienbaar. Zonder die twee zou de toets groen staan bij een regel die
+inhoud opruimt.
+
+Wat na deze ronde overblijft is geen dubbele bediening meer maar schermeigen
+inhoud: de speler van Media, de golfvorm van Muziek, de knoppenrij van Camera,
+het briefingpaneel van Salon. Die dragen de klasse niet en horen dat ook niet te
+doen.
+
 De declaratieve ingang is:
 
 ```html

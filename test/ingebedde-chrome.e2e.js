@@ -148,12 +148,16 @@ function meetKader(gegeven) {
 function paginaKlaar(gegeven) {
   if (document.readyState !== 'complete' || !document.body) return false;
   if (gegeven.embed !== document.body.classList.contains('rtg-edge-embed')) return false;
-  /* Zonder kader: wachten tot de balken er ECHT staan. Met kader: tot ze
-     gebouwd zijn, want pas dan is onzichtbaar een uitspraak. */
+  /* De balken moeten GEBOUWD zijn; pas dan is onzichtbaar een uitspraak.
+     Zonder kader wachten we bovendien tot de Edge zijn claim heeft gedaan --
+     zie de besturingsproef hieronder voor waarom dat niet meer "zichtbaar" is. */
   const bestaat = gegeven.weg.concat(gegeven.blijft).every(s => !!document.querySelector(s));
   if (!bestaat) return false;
-  return gegeven.embed || gegeven.weg.every(s => {
+  if (gegeven.embed) return true;
+  if (document.body.getAttribute('data-rtg-adaptive-ready') !== 'true') return false;
+  return gegeven.weg.every(s => {
     const el = document.querySelector(s);
+    if (el.classList.contains('rtg-edge-owned-bar')) return true;
     const st = getComputedStyle(el), r = el.getBoundingClientRect();
     return st.display !== 'none' && st.visibility !== 'hidden' && r.width > 0 && r.height > 0;
   });
@@ -178,6 +182,11 @@ function meetPagina(gegeven) {
     embed: document.body.classList.contains('rtg-edge-embed'),
     gemarkeerdZichtbaar: gemarkeerd,
     wegZichtbaar: lijst(gegeven.weg),
+    wegAanwezig: gegeven.weg.filter(sel => !!document.querySelector(sel)),
+    wegEigenaar: gegeven.weg.filter(sel => {
+      const el = document.querySelector(sel);
+      return el && el.classList.contains('rtg-edge-owned-bar');
+    }),
     blijftZichtbaar: lijst(gegeven.blijft)
   };
 }
@@ -242,10 +251,19 @@ test('ingebedde schermen tonen geen tweede platformbediening, en zonder kader we
         const open = await page.evaluate(meetPagina, { weg: scherm.weg, blijft: scherm.blijft || [] });
         assert.equal(open.embed, false, scherm.pad + ': een gewoon geopende pagina noemt zichzelf ingebed');
         if (scherm.weg.length) {
-          assert.deepEqual(open.wegZichtbaar.slice().sort(), scherm.weg.slice().sort(),
-            scherm.pad + ': zonder kader ontbreekt de eigen bediening, dus de embed-proef bewijst niets');
-          assert.ok(open.gemarkeerdZichtbaar.length > 0,
-            scherm.pad + ': zonder kader draagt geen enkele zichtbare balk de marker');
+          /* DEZE PROEF IS VAN VORM VERANDERD, en de reden hoort erbij. Hij stond
+             op "zonder kader is die balk gewoon zichtbaar", en dat was waar tot
+             de Edge diezelfde balken ook buiten een kader ging overnemen
+             (rtg-adaptive-edge-claim.js). Zichtbaarheid is daarmee geen
+             besturingsproef meer; AANWEZIGHEID wel. Wie de balk sloopt, zakt
+             hier nog steeds -- en wie hem alleen verbergt zonder eigenaar, ook,
+             want dan staat hij er wel maar draagt niemand hem. */
+          assert.deepEqual(open.wegAanwezig.slice().sort(), scherm.weg.slice().sort(),
+            scherm.pad + ': zonder kader ontbreekt de eigen bediening in de DOM, dus de embed-proef bewijst niets');
+          const gedekt = open.wegZichtbaar.concat(open.wegEigenaar);
+          scherm.weg.forEach(sel => assert.ok(gedekt.includes(sel),
+            scherm.pad + ': ' + sel + ' is buiten een kader onzichtbaar en niet door de Edge geclaimd -- ' +
+            'verborgen zonder eigenaar is een functie kwijt'));
         }
       });
     }

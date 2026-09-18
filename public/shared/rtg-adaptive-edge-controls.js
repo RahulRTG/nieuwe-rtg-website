@@ -4,6 +4,7 @@
 (function (w, d) {
   'use strict';
   var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav';
+
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
     for (var p = el; p; p = p.parentElement) {
@@ -118,6 +119,7 @@
     }
   }
   function start(rt) {
+    w.RTGAdaptiveEdgeClaim.claim(d, w);
     rt.renderControls = function () { render(rt); };
     var frame = 0;
     function refresh() {
@@ -126,6 +128,10 @@
     }
     var observer = new w.MutationObserver(function (records) {
       w.RTGAdaptiveEdgeInput.reflect(rt);
+      /* Een scherm dat zijn balk later pas tekent, hoort er niet buiten te
+         vallen. claim() is stil als er niets te claimen valt en voegt een
+         klasse die er al staat niet opnieuw toe, dus dit wekt zichzelf niet. */
+      w.RTGAdaptiveEdgeClaim.claim(d, w);
       var commandBar = d.querySelector('#rtgCommand .cmd-balk');
       if (commandBar && commandBar.classList.contains('vraagt')) {
         if (rt.questionOwner !== commandBar) {

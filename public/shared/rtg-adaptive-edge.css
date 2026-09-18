@@ -35,6 +35,23 @@ body[data-rtg-adaptive-ready="true"]:has(:is(dialog[open],.scrim.open[role="dial
 
 /* Every domain uses the same Edge surface; hidden sources retain only their handlers. */
 body[data-rtg-adaptive-ready="true"] :is(#rtgCommand .cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-bank,.rv-tabs,body>nav.balk,.rtg-edge-owned-bar){display:none!important}
+
+/* DE RUIMTE GAAT MEE MET DE BALK. Een balk die zijn eigen hoogte op de body
+   reserveert, laat anders geen tweede bediening achter maar wel het gat waar hij
+   stond -- op comm.html was dat een lege band van 116px. Deze regels hangen aan
+   `:has(... .rtg-edge-owned-bar)` en niet aan de klasse van het scherm: ze geven
+   de ruimte alleen vrij als de Edge die balk ook werkelijk heeft overgenomen.
+   Claimt hij hem niet (een hero die toevallig `ios-nav` heet, een scherm zonder
+   adaptieve rand), dan blijft de reservering staan en blijft de maat kloppen. */
+/* NUL IS HIER HET VERKEERDE GETAL, en dat kostte een ronde. `.comm` staat
+   `position:fixed; inset:var(--suite-stack) 0 0`, dus die 116px hield het
+   scherm per ongeluk ook vrij van de casco-bovenbalk. Op nul liep de titel
+   eronder door. De stapel wordt daarom de inzet van de Edge zelf: de eigen
+   balk is weg, de rand van het huis blijft gerespecteerd. */
+body[data-rtg-adaptive-ready="true"]:has(.rtg-suitebar.rtg-edge-owned-bar){--suite-top:0px;--suite-nav:0px;--suite-stack:calc(var(--edge-top) + env(safe-area-inset-top,0px))}
+body[data-rtg-adaptive-ready="true"]:has(.rtg-intel-strip.rtg-edge-owned-bar){--rtg-intel-height:0px}
+body[data-rtg-adaptive-ready="true"]:has(.rtg-social-commandbar.rtg-edge-owned-bar){--rtg-social-top:0px}
+body[data-rtg-adaptive-ready="true"]:has(.salon-socialnav.rtg-edge-owned-bar) .salon-werkveld{padding-top:0!important}
 body[data-rtg-adaptive-ready="true"] #rvApp{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
 body[data-rtg-adaptive-ready="true"] #rvApp>.rv-werk{grid-column:1;grid-row:1;grid-template-rows:minmax(0,1fr)}
 .rtg-adaptive-sheet>#rvRahul{position:static;transform:none;width:100%;height:auto;min-height:58px;margin-bottom:16px}

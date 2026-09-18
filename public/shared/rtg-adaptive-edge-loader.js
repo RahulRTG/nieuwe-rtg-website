@@ -20,6 +20,8 @@
           if (!invoer) return;
           add('script', '/shared/adaptief/balkknop.js', 'RTGAdaptiefBalkKnoppen', function (knoppen) {
           if (!knoppen) return;
+          add('script', '/shared/rtg-adaptive-edge-claim.js', 'RTGAdaptiveEdgeClaim', function (claim) {
+          if (!claim) return;
           add('script', '/shared/rtg-adaptive-edge-controls.js', 'RTGAdaptiveEdgeControls', function (bediening) {
           if (!bediening) return;
           add('script', '/shared/rtg-adaptive-edge.js', 'RTGAdaptiveEdge', function (klaar) {
@@ -28,6 +30,7 @@
             add('script', '/shared/rtg-adaptive-edge-signals.js', 'RTGAdaptiveEdgeSignals', function (brug) {
               if (brug) w.RTGAdaptiveEdgeSignals.start(d, w);
             });
+          });
           });
           });
           });

@@ -321,6 +321,49 @@ de lokale vaste chrome van het kind onderdrukt. De hoofdactie in de onderbalk
 is per route expliciet en niet-destructief; een willekeurige eerste knop uit
 `main` is nooit een geldige systeemactie.
 
+#### Platformchrome draagt een marker, en geen selectorlijst
+
+*Vastgelegd op 18 september 2026.*
+
+"De lokale vaste chrome van het kind wordt onderdrukt" stond hierboven als
+belofte en werd waargemaakt door een lijst selectors in
+`public/shared/rtg-edge-system.css`: elke balk bij naam. Dat houdt stand zolang
+iemand eraan denkt een nieuwe balk toe te voegen. **Gemeten in een echt kader
+over 291 unieke schermen** (17 september 2026) stonden er nog zes soorten balk
+in: tien sociale schermen droegen hun eigen suitebalk en suitenavigatie, vier
+ops-schermen hun eigen opsnavigatie, Salon en Sociaal hun eigen commandobalk, en
+Berichten daarbovenop een statusstrook met een eigen commandoknop. In een
+werkvlak stond de bediening daar dus twee keer.
+
+De regel is daarom een **verklaring op de plek waar de chrome gebouwd wordt**:
+
+```html
+<div class="rtg-suitebar" data-rtg-platform-chrome="suite-merkbalk">
+```
+
+```css
+body.rtg-edge-embed [data-rtg-platform-chrome]{display:none!important}
+```
+
+Twee dingen mogen daarbij niet verwateren.
+
+**De marker is voor PLATFORMchrome en niet voor bediening.** Merk, wereld- of
+suitenavigatie en statusstroken komen van de ouder en staan in een embed voor de
+tweede keer. Schermeigen bediening -- de mappen van RTMail, de speler van Media,
+de tabbladen van Rendez-vous -- wordt door de ouder *niet* vervangen; die draagt
+de marker niet, want wegnemen zou de functie onbereikbaar maken en verbergen
+bestaat niet (`ADAPTIEF.md`).
+
+**De ruimte gaat met de balk mee.** Een balk die zijn hoogte op de body
+reserveert (`--suite-top`, `--suite-nav`, `--suite-stack`, `--rtg-intel-height`,
+`--rtg-social-top`) laat anders geen tweede bediening achter maar wel het gat
+waar zij stond.
+
+`test/ingebedde-chrome.e2e.js` bewaakt de uitkomst in een echt iframe, met een
+**besturingsproef** ernaast: dezelfde schermen zonder kader moeten die balken
+wél tonen. Zonder die tweede helft slaagt de toets ook wanneer iemand de balken
+gewoon sloopt, en dan bewaakt hij een verwijdering in plaats van een contract.
+
 De declaratieve ingang is:
 
 ```html

@@ -196,6 +196,31 @@ body.rtg-edge-embed>.wereldtabs,body.rtg-edge-embed>.wereldapps,body.rtg-edge-em
 body.rtg-edge-embed>.ios-nav,body.rtg-edge-embed>.ios-thuis,body.rtg-edge-embed #osMenuBtn,
 body.rtg-edge-embed .rtg-duimbalk,body.rtg-edge-embed .wk-bank,body.rtg-edge-embed .wk-top{display:none!important}
 body.rtg-edge-embed[data-rtg-vandaag-surface]>header:not(.rtg-edge-top){display:none!important}
+/* PLATFORMCHROME IS VAN DE OUDER, EN DAT IS EEN VERKLARING EN GEEN SELECTORLIJST.
+   De regels hierboven noemen elke balk bij naam. Dat hield stand zolang het er
+   een handvol waren, maar een nieuwe wereld- of suitebalk staat er pas in als
+   iemand eraan denkt, en tot die tijd toont een ingebed scherm zijn bediening
+   gewoon nog een keer. Gemeten in een ECHT kader over 291 schermen: tien
+   sociale schermen droegen hun eigen suitebalk en suitenavigatie, vier
+   ops-schermen hun eigen opsnavigatie, Salon en Sociaal hun eigen commandobalk
+   en Berichten daarbovenop een statusstrook.
+   Wat PLATFORMchrome is -- merk, wereld- of suitenavigatie, statusstrook --
+   draagt daarom `data-rtg-platform-chrome` op de plek waar het gebouwd wordt,
+   en verdwijnt hier in EEN regel. Schermeigen bediening draagt die marker
+   NIET: de mappen van RTMail, de speler van Media en de tabbladen van
+   Rendez-vous worden door de ouder niet vervangen, en wegnemen zou ze
+   onbereikbaar maken -- verbergen bestaat niet (ADAPTIEF.md). */
+body.rtg-edge-embed [data-rtg-platform-chrome]{display:none!important}
+/* De ruimte die zo'n balk reserveerde gaat met hem mee. Anders staat er geen
+   tweede bediening meer, maar wel het gat waar zij stond: de suite reserveert
+   haar hoogte in drie maten op de body en de statusstrook in een vierde. */
+body.rtg-edge-embed.rtg-suite-page{--suite-top:0px;--suite-nav:0px;--suite-stack:0px}
+body.rtg-edge-embed.rtg-intel-messages{--rtg-intel-height:0px}
+body.rtg-edge-embed.rtg-social-elite{--rtg-social-top:0px}
+/* Salon telt de hoogte van zijn suitenavigatie er als vast getal bij op, in
+   drie varianten (52, 54 en nul). Een variabele op nul haalt die 52 niet
+   weg, dus staat hier de opvulling zelf. */
+body.rtg-edge-embed .salon-werkveld{padding-top:0!important}
 body.rtg-edge-embed .schil,body.rtg-edge-embed .wk-shell{grid-template-columns:1fr!important;grid-template-rows:1fr!important}
 body.rtg-edge-embed .schil>.werk{grid-column:1!important}body.rtg-edge-embed .wk-main{grid-row:1!important;grid-template-rows:1fr!important}
 

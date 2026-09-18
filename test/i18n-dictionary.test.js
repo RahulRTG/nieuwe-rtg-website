@@ -18,7 +18,8 @@ function languageLayer(en,request){
   vm.runInNewContext(bundle,sandbox);
   return {i18n:window.RTGi18n,window,calls,cache,events};
 }
-const response=(body,prefix)=>({ok:true,json:async()=>({naar:body.naar,teksten:body.teksten.map(t=>prefix+t)})});
+const response=(body,prefix)=>({ok:true,json:async()=>({naar:body.naar,
+  teksten:body.teksten.map(t=>prefix+t),voltooid:body.teksten.map(()=>true),volledig:true})});
 test('all dictionary keys beyond 400 arrive in bounded batches and share the cache',async()=>{
   const en=Object.fromEntries(Array.from({length:713},(_,i)=>['key.'+i,'Source message '+i]));
   const layer=languageLayer(en,async b=>response(b,'DE: '));
@@ -45,15 +46,16 @@ test('partial dictionaries use whole English fallback and can retry failed deliv
     if(fails)return {ok:false,status:503};return response(b,'FR: ');
   });
   layer.window.I18N.fr={one:'Un'};layer.i18n.lang='fr';await layer.i18n.laadWereldDict('fr');
-  assert.equal(layer.i18n.t('one'),'Un');assert.equal(layer.i18n.t('two'),'Two');
+  assert.equal(layer.i18n.t('one'),'One');assert.equal(layer.i18n.t('two'),'Two');
   fails=false;await layer.i18n.laadWereldDict('fr');
+  assert.equal(layer.i18n.t('one'),'Un');
   assert.equal(layer.i18n.t('two'),'FR: Two');
   assert.deepEqual(layer.calls[0].teksten,['Two']);
 });
-test('an unchanged response is not saved as a completed translation',async()=>{
+test('an unchanged but server-approved brand name completes without polluting the cache',async()=>{
   const layer=languageLayer({hello:'Hello'},async b=>response(b,''));
   layer.i18n.lang='ja';await layer.i18n.laadWereldDict('ja');
-  assert.equal(layer.window.I18N.ja.hello,undefined);assert.equal(layer.cache.size,0);
+  assert.equal(layer.window.I18N.ja.hello,'Hello');assert.equal(layer.cache.size,0);
 });
 test('the offline language register exactly matches all 114 server languages',()=>{
   const sandbox={window:{}};

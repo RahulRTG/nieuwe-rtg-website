@@ -12,6 +12,11 @@ function isProductie(env) { return env.NODE_ENV === 'production'; }
 function valideer(env) {
   const fouten = [];
   const waarschuwingen = [];
+  /* Fouten die de start afbreken ONGEACHT NODE_ENV. Die bak bestaat omdat de
+     rest van dit bestand aan precies een vraag hangt -- staat NODE_ENV op
+     production? -- en dat is nu juist de vraag die op een verkeerd ingerichte
+     server het verkeerde antwoord geeft. Zie ./config/openbaar.js. */
+  const hardeFouten = [];
   const prod = isProductie(env);
 
   // PORT moet een geldig poortnummer zijn als hij is gezet.
@@ -29,7 +34,12 @@ function valideer(env) {
     if (!env.RTG_ENC_KEY) waarschuwingen.push('RTG_ENC_KEY niet gezet: versleuteling-at-rest is uit (prima voor lokaal, niet voor productie).');
   }
 
-  return { fouten, waarschuwingen, productie: prod };
+  /* BUITEN de productietak, en dat is de hele bedoeling: deze keuring vraagt of
+     de installatie zichzelf als openbaar OPGEEFT, in plaats van te vertrouwen
+     op de variabele die iemand kan vergeten. */
+  require('./config/openbaar').keurOpenbareBouwstand(env, { fouten, waarschuwingen, hardeFouten, productie: prod });
+
+  return { fouten, waarschuwingen, hardeFouten, productie: prod };
 }
 
 /* Draai de controle en handel ernaar: waarschuwingen loggen, en bij fouten in
@@ -41,6 +51,18 @@ function pasToe(env, log) {
   log = log || console;
   const r = valideer(env);
   for (const w of r.waarschuwingen) (log.warn || log.log).call(log, '[config] ' + w);
+  /* EERST DE HARDE FOUTEN, EN ZONDER TE KIJKEN NAAR NODE_ENV.
+
+     Ze staan vóór de bestaande tak omdat ze er anders doorheen zouden vallen:
+     buiten productie degradeert die tak elke fout tot een waarschuwing, en dan
+     is een grendel weer een gele regel in een logboek dat niemand leest. */
+  if (r.hardeFouten.length) {
+    for (const f of r.hardeFouten) (log.error || log.log).call(log, '[config] ' + f);
+    (log.error || log.log).call(log,
+      '[config] ' + r.hardeFouten.length + ' configuratiefout(en) die op geen enkele installatie mogen; start afgebroken. '
+      + 'Dit hangt NIET aan NODE_ENV.');
+    process.exit(1);
+  }
   if (r.fouten.length) {
     for (const f of r.fouten) (log.error || log.log).call(log, '[config] ' + f);
     if (r.productie) {

@@ -1,15 +1,6 @@
-/* ============================================================================
-   Vertaallaag voor de RTG-backend.
-
-   Twee taken:
-   1) localize(text, lang): vaste seed-inhoud (Nederlands als basis) omzetten
-      naar de taal van de bezoeker. Werkt volledig offline via een woordenboek.
-   2) translate(text, to, from): losse berichten (reacties, DM's) vertalen naar
-      de taal van de ontvanger. Gebruikt de echte Claude-API als die beschikbaar
-      is (lokaal of extern), anders een woordenboek dat alleen antwoordt op een
-      bericht dat het HELEMAAL dekt. Is dat er niet, dan komt de brontaal terug
-      met translated:false -- nooit een half vertaalde zin.
-   ========================================================================== */
+/* Backendvertaling: seed-inhoud uit het vaste woordenboek, losse berichten
+   via de beschikbare modelprovider. Zonder volledig antwoord blijft de bron
+   intact en is translated false. Interfacevertaling bewijst tevens resolved. */
 
 /* De woordenboeken (seed-inhoud en volledige-boodschaptabellen) staan als
    pure data in een deelmodule. */
@@ -122,24 +113,24 @@ async function translateBatch(teksten, to, from, opties) {
     const text = teksten[i];
     const bron = bestaat(from) ? String(from).toLowerCase() : detect(text);
     if (!text.trim() || bron === to) {
-      uit[i] = { text, translated: false, from: bron };
+      uit[i] = { text, translated: false, resolved: true, from: bron };
       continue;
     }
     const key = to + '|' + text;
     const hit = cacheLees(key);
     if (hit != null) {
-      uit[i] = { text: hit, translated: hit !== text, from: bron };
+      uit[i] = { text: hit, translated: hit !== text, resolved: hit !== text, from: bron };
       continue;
     }
     const uitKast = kastLees(leesKastMag, to, text);
     if (uitKast != null) {
-      uit[i] = { text: uitKast, translated: uitKast !== text, from: bron };
+      uit[i] = { text: uitKast, translated: uitKast !== text, resolved: true, from: bron };
       continue;
     }
     let vast = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
     if (vast) {
       cacheSchrijf(key, vast);
-      uit[i] = { text: vast, translated: vast !== text, from: bron };
+      uit[i] = { text: vast, translated: vast !== text, resolved: true, from: bron };
     } else wacht.push({ i, text, bron, key, ai: !!magAiVoor(text) });
   }
 
@@ -162,9 +153,10 @@ async function translateBatch(teksten, to, from, opties) {
       }
       groep.forEach((item, j) => {
         /* Welke bron wint, en mag zij blijven: ./translate/uitslag.js. */
-        const { tekst, magBewaren } = beslis({
+        const lokaal = volledigeBoodschap(item.text, to);
+        const { tekst, magBewaren, uitspraak } = beslis({
           bron: item.text, modelRegel: model ? model[j] : null,
-          lokaal: volledigeBoodschap(item.text, to), naar: to, tel: gekeurd
+          lokaal, naar: to, tel: gekeurd
         });
         /* Een tijdelijke modelstoring mag geen onvertaalde zin als blijvend
            cacheantwoord vastzetten. Alleen echte vertaling is een cache-hit. */
@@ -172,7 +164,9 @@ async function translateBatch(teksten, to, from, opties) {
           cacheSchrijf(item.key, tekst);
           if (magBewaren) kastSchrijf(bewaarMag && item.ai, to, item.text, tekst);
         }
-        uit[item.i] = { text: tekst, translated: tekst !== item.text, from: item.bron };
+        const modelAanvaard = !!(uitspraak && uitspraak.oordeel !== 'afgewezen');
+        uit[item.i] = { text: tekst, translated: tekst !== item.text,
+          resolved: !!lokaal || modelAanvaard, from: item.bron };
       });
     }
   }

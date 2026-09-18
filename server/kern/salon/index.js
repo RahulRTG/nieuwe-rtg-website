@@ -20,6 +20,7 @@
    De zichtbaarheidspoort blijft waar hij hoort: kern/salonviraal.js bepaalt wat
    iemand te zien krijgt, kern/veilig.js is de 9+-keuring op elke tekst. */
 const { keur } = require('../veilig');
+const vorm = require('./vorm');
 
 module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcastSync }) => {
   /* Valt een post uit het venster, of haalt de auteur hem weg, dan gaan zijn
@@ -56,6 +57,7 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
     for (const k of ['bewaard', 'volgtLid', 'verborgen', 'bio']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
     return s;
   }
+  const publiek = require('./publiek')({ S, vorm });
 
   /* Onderwerpen uit de tekst. Bewust simpel en zichtbaar: wat je typt is wat je
      krijgt. Geen verborgen categorisering, geen profiel dat meegroeit. */
@@ -98,6 +100,10 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
       visual: null, photo: beeld.length ? beeld[0].src : null,   // photo: wat oudere schermen lezen
       media: beeld, onderwerpen: onderwerpenUit(tekst),
       text: tekst, lang: (invoer && invoer.lang) || 'nl', at: nu(),
+      momentType: vorm.soort(invoer && invoer.momentType),
+      publiek: vorm.publiek(invoer && invoer.publiek),
+      startsAt: datumTijd(invoer && invoer.startsAt),
+      endsAt: datumTijd(invoer && invoer.endsAt),
       baseLikes: 0, likedBy: {}, comments: [],
       reactiesVan: ['iedereen', 'vrienden', 'niemand'].includes(invoer && invoer.reactiesVan) ? invoer.reactiesVan : 'iedereen',
       promoMag: (invoer && invoer.promoMag) === true,
@@ -112,6 +118,12 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
     return { ok: true, post: publiek(post, sess) };
   }
 
+  function datumTijd(waarde) {
+    if (!waarde) return null;
+    const d = new Date(waarde);
+    return Number.isNaN(d.getTime()) ? null : d.toISOString();
+  }
+
   function verwijder(sess, postId) {
     S();
     const i = db.data.posts.findIndex(p => String(p.id) === String(postId));
@@ -122,27 +134,6 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
     // en de foto's van die post; anders blijft de /media-url gewoon opvraagbaar
     opruim.wis(opruim.refsVanPosts([weg]));
     return { ok: true };
-  }
-
-  // Wat een kijker van een post te zien krijgt. Nooit sleutels, altijd codenaam.
-  function publiek(p, sess) {
-    const s = S();
-    const mij = sess && sess.key;
-    return {
-      id: p.id, author: p.author, tier: p.tier, place: p.place || null, at: p.at || null,
-      partner: !!p.partner, partnerCode: p.partnerCode || null,
-      text: p.text, lang: p.lang || 'nl', featured: !!p.featured,
-      media: Array.isArray(p.media) && p.media.length ? p.media
-        : (p.photo ? [{ src: p.photo, alt: '' }] : []),
-      onderwerpen: p.onderwerpen || [],
-      likes: (p.baseLikes || 0) + Object.keys(p.likedBy || {}).length,
-      liked: !!(p.likedBy && mij && p.likedBy[mij]),
-      reacties: (p.comments || []).length,
-      bewaard: !!(mij && (s.bewaard[mij] || []).includes(p.id)),
-      vanMij: !!(mij && p.authorKey === mij),
-      gearchiveerd: !!p.archief,
-      reactiesVan: p.reactiesVan || 'iedereen'
-    };
   }
 
   /* De feed, met echte paginering. `na` is de id van de laatste post die je al

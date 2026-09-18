@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1932 bestanden en 13919 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1935 bestanden en 13945 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1932 |
-| losse beweringen (`test(...)`) | 13919 |
+| toetsbestanden | 1935 |
+| losse beweringen (`test(...)`) | 13945 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 150 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1288 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1291 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1708 bestanden, 13525 beweringen.
+1710 bestanden, 13550 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -363,6 +363,7 @@ toets omvalt.
 | `effectdekking.test.js` | 6 | gezakt op `&&->||#0` | HET EFFECTMODEL EN ZIJN DERDE BRON -- de collecties die de proef zag bewegen. WAAR DIT VANDAAN KOMT. |
 | `effectmeter.test.js` | 12 | gezakt op `false->true#0` | DE EFFECTMETER: heeft dit verzoek werkelijk iets aangeraakt? De staatmeter (server/staatlog.js) kijkt naar de collecties in de database en ziet daarom een mail niet, een sms niet en een schrijfactie buiten die... |
 | `eigen-website.test.js` | 6 | gezakt op `liegpoort /api/` | DE EIGEN WEBSITE VAN EEN LID -- 5 endpoints van de Website-maker. Deze vijf wees de waargenomen dekkingsmeting aan als nooit aangeroepen: site/haal, site/publiceer, site/offline, site/fotos en site/foto-weg. |
+| `eigenaar-aanmaken.test.js` | 9 | gezakt op `liegpoort /api/` | scripts/eigenaar-aanmaken.js: maakt het script het eigenaarsaccount, en gaat de kantoordeur daar werkelijk van open? DE TWEEDE HELFT IS HET PUNT. |
 | `eigenaar-wedloop.test.js` | 1 | gezakt op `&&->||#0` | TWEE SERVERS DIE TEGELIJK OPKOMEN OP DEZELFDE DATABASE. In de vloot (server/vloot.js) draait elke groep als eigen proces, maar ze delen een database. |
 | `eigenaar.test.js` | 4 | gezakt op `liegpoort /api/` | De eigenaar (Roellie) heeft overal toegang tot de BEHEER-omgevingen met zijn eigen accountlogin, maar de juridische grenzen (kinderdata, privé tussen personen, ruwe identiteitsbewijzen, platte wachtwoorden) blijven... |
 | `eigenaarbevestiging.test.js` | 11 | -- | DE ZWARE POORT: vraagt een eigenaarshandeling opnieuw om de passkey? Dit bestand bestaat omdat de vorige twee niet genoeg zijn. |
@@ -609,7 +610,7 @@ toets omvalt.
 | `hulpdiensten-bord.test.js` | 5 | gezakt op `liegpoort /api/` | HET BORD VAN DE HULPDIENSTEN -- 5 endpoints uit de supplier-groep. def/eenheid/maak, def/materieel/maak, def/gewonde/zet, hulp/eenheid/maak en hulp/eenheid/zet stonden als nooit aangeroepen in de waargenomen... |
 | `hulpklassen.test.js` | 13 | gezakt op `true->false#0` | ELKE HULPKLASSE DRAAGT PRECIES DE WAARDE DIE HIJ VERVANGT. scripts/hulpklassen-omzet.js ruilt een style="margin-top:0.6rem" in voor class="h-mt60". |
 | `human-reality.test.js` | 9 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `i18n-auto.test.js` | 13 | gezakt op `false->true#0` | Het universele 114-talige vangnet. De browserlaag is bewust dependency-vrij; met een klein DOM-dubbel bewijzen we de selectie en RTL-richting, en met de paginascan dat ieder blijvend appscherm de gedeelde taalrail... |
+| `i18n-auto.test.js` | 14 | gezakt op `false->true#0` | Het universele 114-talige vangnet. De browserlaag is bewust dependency-vrij; met een klein DOM-dubbel bewijzen we de selectie en RTL-richting, en met de paginascan dat ieder blijvend appscherm de gedeelde taalrail... |
 | `i18n-dictionary.test.js` | 6 | gezakt op `>=->>#3` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ideeen.test.js` | 4 | gezakt op `liegpoort /api/` | De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier ontwerpbureaus. Een idee met bureau-tags, reacties, AI-uitwerking per bureau en een spin-off die echt een concept in het gekozen bureau aanmaakt. |
 | `idem-poort-echt.test.js` | 4 | -- | De idem-poort op een ECHTE server, langs een ECHTE route. test/idem-poort.test.js toetst de regel; dit toetst dat hij ook werkelijk in de keten hangt en dat er niets onder hem doorglipt. |
@@ -1021,6 +1022,7 @@ toets omvalt.
 | `ontwerp.test.js` | 9 | geen module gevonden | RTG Interface Operating Standard: de visuele regels uit ONTWERP.md, machinaal gehandhaafd. Waarom deze toets bestaat. |
 | `ontwerpbank.test.js` | 5 | gezakt op `+->-#0` | DE GEDEELDE REKENKERN VAN DE VIER ONTWERPBANKEN. hash, kies en palet stonden byte voor byte gelijk in kern/architect/bank.js, kern/atelier/bank.js, kern/hardwarelab/bank.js en kern/studio/bank.js. |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
+| `openbare-bouwstand.test.js` | 12 | gezakt op `true->false#0` | De grendel op een OPENBARE installatie die in Magnaat Test draait. WAAR HIJ VANDAAN KOMT. |
 | `oplaadgat.test.js` | 4 | gezakt op `===->!==#0` | AFGESCHREVEN MOET BIJGESCHREVEN WORDEN. WAT ER MISGING. |
 | `opslag-voorcheck.test.js` | 9 | gezakt op `!==->===#0` | De goedkope voorcheck van de SQLite-opslag (server/db/sqlite.js). Verandering opsporen kostte een JSON.stringify van ELKE collectie bij ELKE save; op de echte store (164 collecties, 1,0 MB, waarvan `sessions` 780 KB)... |
 | `opslagblokkade.test.js` | 6 | gezakt op `true->false#0` | DE OPSLAGBLOKKADE: START DEZE PRODUCTIESTAND WEL OP EEN GROOTBOEK? WAAROM DEZE TOETS ER IS TAKEN 4.7 zegt dat de json- en geheugenstand geen transactiegrootboek hebben, en dat dat "klaar" is zodra die standen in... |
@@ -1502,8 +1504,8 @@ toets omvalt.
 | `tafelticket.test.js` | 3 | gezakt op `liegpoort /api/` | Tafelticket: de bonnen van dezelfde tafel op EEN gezegeld ticket, en in EEN keer afrekenen aan de kassa. Getoetst: het samenvoegen (uitsplitsing per gast + totaal + zegel), en de ingebouwde beveiliging: een... |
 | `takenlijst.test.js` | 9 | gezakt op `&&->||#0` | DE TAKENLIJST MOET AANWIJSBAAR ZIJN. LAT.md verwijst op drie plekken naar TAKEN.md ("die lijst staat in de takenlijst, niet in iemands hoofd"), en vijftien plekken in de code en de documenten halen een regel aan bij... |
 | `takken.test.js` | 9 | gezakt op `===->!==#0` | DE TAKKENOPRUIMER -- wanneer zegt hij "deze mag weg", en vooral: wanneer niet. Dit is het enige gereedschap in dit huis dat iets WEGGOOIT op eigen houtje (scripts/takken.js, gestart door .github/workflows/takken.yml). |
-| `talen.test.js` | 10 | gezakt op `liegpoort /api/` | Wereldtalen: het register, de Boardroom-schakelaars en het overal-in-je-eigen- taal-chatten. Iedereen schrijft in de eigen taal; de ander leest alles in de zijne (vertaling per bericht, gecachet). |
-| `talen114.test.js` | 6 | gezakt op `liegpoort /api/` | 114 wereldtalen: het register telt er 114, en de app kan in ELKE actieve taal draaien. Het publieke /api/vertaal/ui vertaalt het UI-woordenboek van een pagina in een keer naar een actieve wereldtaal (shared/i18n.js... |
+| `talen.test.js` | 11 | gezakt op `liegpoort /api/` | Wereldtalen: het register, de Boardroom-schakelaars en het overal-in-je-eigen- taal-chatten. Iedereen schrijft in de eigen taal; de ander leest alles in de zijne (vertaling per bericht, gecachet). |
+| `talen114.test.js` | 6 | gezakt op `liegpoort /api/` | 114 wereldtalen: het register telt er 114. De 24 kerntalen delen met www een expliciet kwaliteitscontract; overige talen blijven technisch beschikbaar. |
 | `tariefindeling.test.js` | 7 | genoemd | HOUDT BEVINDING B1 VAN DE OMZETPROEF VAST -- en houdt het register eerlijk. `scripts/omzetproef.js` vond dat de btw-categorie uit de WERKPLEK wordt afgeleid. |
 | `teacherflow.test.js` | 6 | -- | Teacher Flow en het Attention OS: administratie als bijproduct. De beloftes die hier hard worden gemaakt: - de aandachtslijst staat in drie bakken met een REGEL erachter, en er staat een regel per SOORT met een... |
 | `team-room-voorzijde.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1661,7 +1663,7 @@ toets omvalt.
 | `wereldcontrole.test.js` | 9 | -- | De wereldcontrole en de wereldwacht. Waarom ze bestaan staat in de kop van scripts/lib/wereldcontrole.js: de proef roept elke route aan, en er staan sloopachtige routes BINNEN de werelden die zij zelf opzet. |
 | `wereldhoreca.test.js` | 4 | -- | DE HORECAWERELD -- een open rekening op een tafel. Zesenveertig horecaroutes stonden op 404, en twintig zeggen hetzelfde: "Deze rekening kennen we niet." De rekening is het scharnier van dit domein -- bestellen,... |
 | `wereldkern.test.js` | 9 | gezakt op `===->!==#0` | DE WERELDKERN: spreken de vier samenhanglagen ECHT dezelfde taal? Er bestond al een toets met die naam, in test/geldwereld.test.js -- maar die keek alleen naar geldwereld. |
-| `wereldlaag.test.js` | 15 | gezakt op `liegpoort /api/` | Integratietests voor RTG Wereld: de laag die van De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen één app maakt met één schakelaar. Wat hier bewust WEL wordt getoetst en waarom (LAT-regel 9): niet "de... |
+| `wereldlaag.test.js` | 17 | gezakt op `liegpoort /api/` | Integratietests voor RTG Wereld: de laag die van De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen één app maakt met één schakelaar. Wat hier bewust WEL wordt getoetst en waarom (LAT-regel 9): niet "de... |
 | `wereldlab2.test.js` | 4 | -- | De livinglab-wereld: een veldnaam, drie betekenissen. |
 | `wereldprofiel.test.js` | 6 | gezakt op `liegpoort /api/` | Het profiel met lagen, en de kern ervan: WIE WAT MAG ZIEN, per veld. Waarom de zichtbaarheden hier op DEZELFDE vier mensen naast elkaar staan: dat is de enige manier om te bewijzen dat ze echt iets verschillends doen. |
 | `wereldregels.test.js` | 4 | gezakt op `liegpoort /api/` | De wereldtabel: alle landen van de wereld in de fiscale tabel, in dezelfde structuur als de rijke kernlanden, en de Regelwacht die elk land automatisch kan bijwerken. Getest: dekking en veldkwaliteit (alles binnen de... |
@@ -1748,7 +1750,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-224 bestanden, 394 beweringen.
+225 bestanden, 395 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1792,6 +1794,7 @@ toets omvalt.
 | `connect-routes.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE TWEEENTWINTIG ROUTES VAN FOUNDATION CONNECT, tegen een echte server. test/connect.test.js beproeft de MODULES; deze toets beproeft de weg ernaartoe. |
 | `connect-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | ONTDEKKEN (/apps/connect.html) IN EEN ECHTE BROWSER. test/connect.test.js beproeft de MODULES, test/connect-routes.e2e.js de DEUREN. |
 | `contactpin.e2e.js` | 4 | -- | DE CONTACTPIN OP HET SCHERM (apps/app.html, sociale balk in De Salon). test/contactpin.test.js bewijst dat de kern en de routes kloppen. |
+| `contrastcontext.e2e.js` | 1 | gezakt op `>=->>#0` | DRAAGT EEN CONTRASTMELDING GENOEG OM HEM TE KUNNEN REPAREREN? Deze toets bestaat door een rode CI die achteraf niet meer te herleiden was. |
 | `csp.e2e.js` | 1 | -- | DE CSP ZOALS EEN BROWSER HEM ERVAART. Een Content-Security-Policy is de enige beveiliging in dit huis die je niet kunt aantonen door de code te lezen. |
 | `deelmenu.e2e.js` | 3 | genoemd | Scherm-test voor het deelmenu (shared/deelmenu.js): een app met veel delen wordt een menu met een deel tegelijk, in plaats van een lange rol. Het contract, op de eerste pagina die meedoet (rtgschool.html): 1. |
 | `deelmenuronde.e2e.js` | 5 | genoemd | DE TWEEDE RONDE VAN HET DEELMENU: WAT ER GEBEURT ALS DE APP HERTEKENT. test/deelmenuwacht.e2e.js bewaakt de EERSTE ronde: komt er een menu zodra de app zijn schermen neerzet. |

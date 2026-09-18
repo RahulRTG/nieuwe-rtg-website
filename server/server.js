@@ -1502,18 +1502,8 @@ const uiBronnen = require('./lib/ui-bronnen').maakUiBronnen(PUBLIC_DIR, [path.jo
    /api/vertaal en komt dus nooit op schijf te staan. Zie lib/vertaalkast.js. */
 const vertaalkast = require('./lib/vertaalkast').maakVertaalkast({ dir: DATA_DIR });
 i18n.setVertaalkast(vertaalkast);
-app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {
-  try {
-    const naar = talen.taalVan(req.body && req.body.naar);
-    let totaal = 0;
-    const teksten = (Array.isArray(req.body && req.body.teksten) ? req.body.teksten : []).slice(0, 400)
-      .map(t => String(t == null ? '' : t).slice(0, 300))
-      .filter(t => { totaal += t.length; return totaal <= 24000; });
-    const regels = await i18n.translateBatch(teksten, naar, undefined, { ai: uiBronnen.toegestaan, bewaar: true });
-    const uit = regels.map(r => r.text);
-    res.json({ ok: true, naar, teksten: uit });
-  } catch (e) { res.status(500).json({ error: 'Vertalen lukte even niet. Probeer het opnieuw.' }); }
-});
+app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal,
+  require('./lib/ui-vertaling')({ talen, i18n, uiBronnen }));
 
 /* ---------- partnerkanaal: boeken zonder pas ----------
    Publieke endpoints (geen login): partner opzoeken, reizen ophalen en

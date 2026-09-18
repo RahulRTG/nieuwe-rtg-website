@@ -333,6 +333,59 @@ function adres(el) {
   const tekst = (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40);
   return tag + id + kl + (tekst ? ' "' + tekst + '"' : '');
 }
+/* DE CONTEXT BIJ EEN CONTRASTMELDING -- want een verhouding zegt niet wie er
+   fout zit.
+
+   Dit komt uit een rode CI die achteraf nergens meer te herleiden was: 2,09:1 op
+   een scherm dat lokaal vijf rondes achter elkaar groen bleef. Uit de melding
+   was niet op te maken of de TEKSTKLEUR ergens vandaan kwam waar hij niet hoorde
+   of dat de ONDERGROND van een andere wereld was -- en zonder dat onderscheid
+   valt er niets te repareren, alleen te gokken. De wereldtokens hangen aan TWEE
+   attributen tegelijk (`[data-rtg-skin][data-rtg-world]`), er zijn drie plekken
+   die de wereld schrijven, en welke stand er gold op het moment van meten is
+   achteraf niet meer te zien.
+
+   Drie dingen beslissen dat wel, en alle drie zijn ze alleen TIJDENS de meting
+   te lezen:
+     - welke wereld en skin er op de body stonden;
+     - wat de wereldtokens op DIT element opleveren (staat de inkt van de ene
+       wereld op de kaart van de andere?);
+     - welke elementen erboven een eigen ondergrond zetten.
+
+   Het blijft een string in dezelfde lijst: de VORM van de uitslag verandert
+   niet, alleen wat erin staat. Een poort die zijn eigen uitslagvorm verbouwt om
+   meer te kunnen zeggen, breekt elke lezer die erop wacht. */
+function contrastContext(el) {
+  const uit = [];
+  try {
+    const b = el.ownerDocument && el.ownerDocument.body;
+    if (b) {
+      const ev = b.getAttribute('data-rtg-eigenvlak');
+      uit.push('wereld=' + (b.getAttribute('data-rtg-world') || 'geen') +
+        ' skin=' + (b.getAttribute('data-rtg-skin') || 'geen') + (ev ? ' eigenvlak=' + ev : ''));
+    }
+    const s = getComputedStyle(el);
+    const tok = [];
+    for (const naam of ['--rtg-world-muted', '--rtg-world-ink', '--rtg-world-card', '--rtg-world-bg']) {
+      const v = (s.getPropertyValue(naam) || '').trim();
+      if (v) tok.push(naam.slice('--rtg-world-'.length) + '=' + v);
+    }
+    if (tok.length) uit.push('tokens: ' + tok.join(' '));
+    /* Hoogstens drie ondergronden omhoog: genoeg om te zien op wélk vlak de
+       tekst staat, niet zoveel dat de melding onleesbaar wordt. Zelfde grens
+       als bij het aantal voorbeelden. */
+    const keten = [];
+    let p = el.parentElement;
+    while (p && p.nodeType === 1 && keten.length < 3) {
+      const ps = getComputedStyle(p);
+      const c = kleur(ps.backgroundColor);
+      if ((ps.backgroundImage && ps.backgroundImage !== 'none') || (c && c[3] > 0)) keten.push(adres(p).slice(0, 44));
+      p = p.parentElement;
+    }
+    if (keten.length) uit.push('grond van: ' + keten.join(' < '));
+  } catch (e) { uit.push('context niet te lezen: ' + (e && e.message ? e.message : e)); }
+  return uit.length ? '  [' + uit.join(' | ') + ']' : '';
+}
 function keurInPagina() {
   const structureel = {};
   const contrast = {};
@@ -471,15 +524,26 @@ function keurInPagina() {
       if (contrast.contrast.waar.length < 3)
         contrast.contrast.waar.push(adres(el) + ' -- ' + s.color +
           ((fg[3] == null || fg[3] >= 1) ? '' : ' = rgb(' + voor.join(', ') + ')') +
-          ' op rgb(' + bg.slice(0, 3).join(', ') + ')');
+          ' op rgb(' + bg.slice(0, 3).join(', ') + ')' + contrastContext(el));
     }
   });
 
   return { overtredingen: Object.values(structureel), contrast: Object.values(contrast), dekking };
 }
 
+/* DE LIJST IS DE ENIGE PLEK WAAR EEN FUNCTIE 'IN DE BROWSER BESTAAT'.
+
+   Een functie die keurInPagina aanroept en hier NIET in staat, bestaat in Node
+   (de unittoetsen zien hem, `npm run check` ziet hem) en niet in de pagina --
+   en dat merk je pas bij de eerste ECHTE bevinding, want tot dan wordt de regel
+   nooit bereikt. Bij contrastContext is dat precies gebeurd: de a11y-poort zou
+   in CI zijn omgevallen met `ReferenceError: contrastContext is not defined`,
+   op het moment dat hij iets vond -- de poort dus stuk op exact de dag dat hij
+   nodig was. test/contrastcontext.e2e.js vond het, omdat die de keuring in een
+   echte pagina draait op een bevinding die hij zelf veroorzaakt. */
 const BRON = [kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, zichtbaar,
-  mengOver, laagStukken, verloopStops, uitersten, pseudoLagen, gronden, opGrond, achtergrond, adres, keurInPagina]
+  mengOver, laagStukken, verloopStops, uitersten, pseudoLagen, gronden, opGrond, achtergrond, adres,
+  contrastContext, keurInPagina]
   .concat([]) // dektHelemaal is een pijlfunctie en gaat als tekst mee, hieronder
   .map(f => f.toString()).join('\n\n') +
   '\nconst dektHelemaal = ' + dektHelemaal.toString() + ';\n' +

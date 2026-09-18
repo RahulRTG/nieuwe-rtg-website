@@ -34,6 +34,21 @@
     });
   }
 
+  function engelseTerugval() {
+    herstel();
+    /* De sleutelweg valt voor een ontbrekende doelvertaling ook op Engels
+       terug. Doe dat hier voor alle geregistreerde losse UI-tekst, zodat de
+       twee lagen samen nooit een Nederlands/Engels mengsel maken. */
+    tekstStaten.forEach(function (st) {
+      var known = w.RTGUiBronTekst && w.RTGUiBronTekst(st.bron);
+      if (known != null) toon(st, known);
+    });
+    attribStaten.forEach(function (st) {
+      var known = w.RTGUiBronTekst && w.RTGUiBronTekst(st.bron);
+      if (known != null) toon(st, known);
+    });
+  }
+
   function groepenVan(bronnen, groepen) {
     var uit = [], nu = [], tekens = 0;
     bronnen.forEach(function (bron) {
@@ -52,13 +67,18 @@
       body: JSON.stringify({ naar: gekozenTaal, bron: location.pathname, teksten: groep.regels }) })
       .then(function (r) { if (!r.ok) throw new Error('ui-vertaling ' + r.status); return r.json(); })
       .then(function (d) {
-        if (!d || d.naar !== gekozenTaal || !Array.isArray(d.teksten)) return;
+        if (!d || d.naar !== gekozenTaal || !Array.isArray(d.teksten) || d.teksten.length !== groep.regels.length ||
+          !Array.isArray(d.voltooid) || d.voltooid.length !== groep.regels.length)
+          return { volledig: false, waarden: [] };
+        var waarden = [];
         groep.regels.forEach(function (bron, i) {
           var vertaling = d.teksten[i] || bron;
-          if (vertaling !== bron) KAST.zet(gekozenTaal, bron, vertaling);
-          if (taal === gekozenTaal && beurt === gekozenBeurt)
+          waarden.push(vertaling);
+          if (d.voltooid[i] && vertaling !== bron) KAST.zet(gekozenTaal, bron, vertaling);
+          if (!groep.atomair && d.voltooid[i] && taal === gekozenTaal && beurt === gekozenBeurt)
             groep.doelen[i].forEach(function (st) { if (st.bron === bron) toon(st, vertaling); });
         });
+        return { volledig: d.volledig === true, waarden: waarden, voltooid: d.voltooid };
       });
   }
 
@@ -66,17 +86,53 @@
     timer = null;
     eersteRonde = false;
     if (taal === 'nl') return;
-    var groepen = new Map(), lijst = Array.from(wortels); wortels.clear();
+    var groepen = new Map(), voorraad = new Map(), lijst = Array.from(wortels); wortels.clear();
     if (!lijst.length) lijst = [document.documentElement];
-    lijst.forEach(function (root) { verzamelTekst(root, groepen); verzamelAttributen(root, groepen); });
+    lijst.forEach(function (root) { verzamelTekst(root, groepen, voorraad); verzamelAttributen(root, groepen, voorraad); });
     if (!groepen.size) return;
     var gekozenTaal = taal, gekozenBeurt = beurt;
-    groepenVan(Array.from(groepen.keys()), groepen).forEach(function (groep) {
-      keten = keten.then(function () {
+    var atomair = KERN.has(gekozenTaal) && gekozenTaal !== 'nl' && gekozenTaal !== 'en';
+    var ontbrekend = Array.from(groepen.keys()).filter(function (bron) { return !voorraad.has(bron); });
+    /* Een volledig bekende ronde kan direct en in één taak op het scherm.
+       Daarvoor is geen netwerk of asynchrone modelketen nodig. */
+    if (atomair && !ontbrekend.length) {
+      groepen.forEach(function (doelen, bron) {
+        doelen.forEach(function (st) { if (st.bron === bron) toon(st, voorraad.get(bron)); });
+      });
+      document.documentElement.setAttribute('data-rtg-taal-volledig', 'true');
+      return;
+    }
+    var batches = groepenVan(ontbrekend, groepen);
+    batches.forEach(function (groep) { groep.atomair = atomair; });
+    keten = keten.then(async function () {
+      var volledig = true;
+      for (var i = 0; i < batches.length; i++) {
         if (taal !== gekozenTaal || beurt !== gekozenBeurt) return;
-        return vraag(groep, gekozenTaal, gekozenBeurt);
-      })
-        .catch(function () { /* de brontekst blijft heel; een volgende DOM-wijziging probeert opnieuw */ });
+        var antwoord = await vraag(batches[i], gekozenTaal, gekozenBeurt);
+        if (!antwoord || !antwoord.volledig) volledig = false;
+        if (antwoord && antwoord.waarden) batches[i].regels.forEach(function (bron, j) {
+          var waarde = antwoord.waarden[j];
+          if (antwoord.voltooid && antwoord.voltooid[j] && waarde) voorraad.set(bron, waarde);
+        });
+      }
+      if (!atomair || taal !== gekozenTaal || beurt !== gekozenBeurt) return;
+      volledig = volledig && Array.from(groepen.keys()).every(function (bron) { return voorraad.has(bron); });
+      if (!volledig) {
+        /* Geen lappendeken: de hele automatische laag blijft in de brontaal.
+           Een volgende expliciete keuze mag opnieuw proberen. */
+        engelseTerugval();
+        document.documentElement.setAttribute('data-rtg-taal-volledig', 'false');
+        return;
+      }
+      groepen.forEach(function (doelen, bron) {
+        doelen.forEach(function (st) { if (st.bron === bron) toon(st, voorraad.get(bron)); });
+      });
+      document.documentElement.setAttribute('data-rtg-taal-volledig', 'true');
+    }).catch(function () {
+      if (atomair && taal === gekozenTaal && beurt === gekozenBeurt) {
+        engelseTerugval();
+        document.documentElement.setAttribute('data-rtg-taal-volledig', 'false');
+      }
     });
   }
   /* De 80 ms bundelt een uitbarsting van DOM-wijzigingen tot EEN aanvraag. Bij
@@ -113,6 +169,7 @@
     else if (taal === 'nl' && oorspronkelijkeRichting == null) document.documentElement.removeAttribute('dir');
     else document.documentElement.setAttribute('dir', oorspronkelijkeRichting || 'ltr');
     document.documentElement.setAttribute('data-rtg-taal', taal);
+    document.documentElement.removeAttribute('data-rtg-taal-volledig');
     if (taal !== 'nl') {
       KAST.van(taal);   // de kast van deze taal alvast van het toestel halen
       /* En de meegeleverde schil erbij. Die komt van schijf of uit de

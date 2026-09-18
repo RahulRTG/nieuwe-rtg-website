@@ -137,6 +137,15 @@ const TALEN = [
 
 const OP_CODE = new Map(TALEN.map(t => [t.code, t]));
 const BASIS = ['nl', 'en']; // altijd aan; kan niet uit
+/* De publieke website en de app voeren voor de grootste wereldtalen hetzelfde
+   kwaliteitscontract. De overige wereldtalen blijven beschikbaar, maar mogen
+   niet stil als gelijkwaardig aan de redactioneel onderhouden kernset worden
+   gepresenteerd. */
+const KERN_TAALCODES = Object.freeze([
+  'nl', 'en', 'de', 'fr', 'es', 'pt', 'it', 'pl', 'ru', 'uk', 'tr',
+  'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'zh', 'ja', 'ko', 'id', 'vi', 'th', 'sw'
+]);
+const KERN_SET = new Set(KERN_TAALCODES);
 /* Een verse RTG-installatie spreekt de hele wereld. De Boardroom kan talen
    daarna bewust uitzetten, maar beschikbaarheid is opt-out en niet langer
    opt-in. De versie maakt de eenmalige migratie van de oude nl/en-stand
@@ -147,6 +156,12 @@ const STANDAARD_VERSIE = 2;
 function bestaat(code) { return OP_CODE.has(String(code || '').toLowerCase()); }
 function taal(code) { return OP_CODE.get(String(code || '').toLowerCase()) || null; }
 function naamEn(code) { const t = taal(code); return t ? t.en : 'English'; }
-const maakTalen = require('./talen-beheer')({ TALEN, BASIS, STANDAARD, STANDAARD_VERSIE, bestaat });
+function isKerntaal(code) { return KERN_SET.has(String(code || '').toLowerCase()); }
+const maakTalen = require('./talen-beheer')({
+  TALEN, BASIS, STANDAARD, STANDAARD_VERSIE, bestaat, isKerntaal
+});
 
-module.exports = { TALEN, BASIS, STANDAARD, STANDAARD_VERSIE, bestaat, taal, naamEn, maakTalen };
+module.exports = {
+  TALEN, BASIS, KERN_TAALCODES, STANDAARD, STANDAARD_VERSIE,
+  bestaat, taal, naamEn, isKerntaal, maakTalen
+};

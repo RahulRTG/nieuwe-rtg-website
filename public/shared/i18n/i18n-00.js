@@ -27,7 +27,11 @@
   'use strict';
   if (w.RTGVertaalKast) return;
 
-  var SLEUTEL = 'rtg_tr_';
+  /* v2 verbreekt bewust met de oude, gedeeltelijk gevulde taalvoorraad. Juist
+     die voorraad liet een Nederlands scherm Duitse knoppen behouden nadat een
+     vertaalronde halverwege faalde. */
+  var SLEUTEL = 'rtg_tr_v2_';
+  var OUD_SLEUTEL = 'rtg_tr_';
   var MAX_REGELS = 4000, MAX_BYTES = 300000;
   var kast = new Map();                 // taal -> Map(bron -> vertaling)
   var vuil = new Set(), opgegeven = new Set(), timer = null;
@@ -128,14 +132,15 @@
     var s = opslag();
     if (!s) return;
     try {
-      if (s.getItem('rtg_tr_opgeruimd')) return;
+      if (s.getItem(SLEUTEL + 'opgeruimd')) return;
       var oud = [];
       for (var i = 0; i < s.length; i++) {
         var k = s.key(i);
-        if (k && k.indexOf('rtg_ui_') === 0) oud.push(k);
+        if (k && (k.indexOf('rtg_ui_') === 0 ||
+          (k.indexOf(OUD_SLEUTEL) === 0 && k.indexOf(SLEUTEL) !== 0))) oud.push(k);
       }
       oud.forEach(function (k) { s.removeItem(k); });
-      s.setItem('rtg_tr_opgeruimd', '1');
+      s.setItem(SLEUTEL + 'opgeruimd', '1');
     } catch (e) {}
   })();
 

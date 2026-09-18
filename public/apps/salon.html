@@ -48,6 +48,8 @@
   .post .naam{font-weight:600;font-size:.9rem;cursor:pointer;background:none;border:none;color:inherit;padding:0;text-align:left;min-height:24px;}
   .post .plek{font-size:.72rem;color:var(--soft);}
   .post .merk{font-size:.6rem;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--line);border-radius:0;padding:.02rem .4rem;margin-left:auto;}
+  .post .soort{font-size:.56rem;color:var(--soft);letter-spacing:.1em;text-transform:uppercase;margin-left:auto;}
+  .post .merk+.soort{margin-left:.2rem;}
   .kar{position:relative;background:#000;}
   .kar .strip{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;}
   .kar img{width:100%;flex:0 0 100%;scroll-snap-align:center;display:block;object-fit:cover;max-height:26rem;}
@@ -87,6 +89,9 @@
   .reactie.antwoord{padding-left:2rem;color:var(--muted);}
   .reactie .wie{font-weight:600;}
   .reactie .mini{background:none;border:none;color:var(--rtg-leesgoud,var(--gold));font-size:.7rem;cursor:pointer;padding:0 .3rem;}
+.salon-contextdetail{padding-top:.25rem;color:var(--soft);font-size:.72rem;}
+.salon-offer{margin:.15rem .9rem .7rem;padding:.75rem;}
+.salon-offer-detail{color:var(--soft);font-size:.72rem;}
 </style>
 <link href="/shared/social-elite.css" rel="stylesheet">
 <link href="/shared/salon-elite.css" rel="stylesheet">
@@ -209,14 +214,19 @@ function tekenTabs(){
 function postHtml(p){
   const media=(p.media||[]).filter(m=>m&&m.src);
   const initialen=String(p.author||'Lid').split(/\s+/).filter(Boolean).slice(0,2).map(n=>n[0]).join('').toUpperCase();
+  const soorten={moment:'Moment',story:'Story',place:'Plek',plan:'Plan',event:'Event',travel:'Reis',food:'Aan tafel',activity:'Activiteit',question:'Vraag',offer:'Aanbod',live:'Live'};
+  const details=[p.place,p.startsAt?new Date(p.startsAt).toLocaleString(document.documentElement.lang||undefined,{dateStyle:'medium',timeStyle:'short'}):''].filter(Boolean);
   return '<article class="post" data-post="'+p.id+'" data-media="'+(media.length?'ja':'nee')+'">'+
     '<div class="top"><span class="salon-avatar" aria-hidden="true">'+esc(initialen)+'</span><span class="salon-auteur"><button class="naam" data-profiel="'+esc(p.author)+'">'+esc(p.author)+'</button>'+
       (p.place?'<span class="plek">'+esc(p.place)+'</span>':'')+'</span>'+
-      (p.partner?'<span class="merk">partner</span>':(p.featured?'<span class="merk">uitgelicht</span>':''))+'</div>'+
+      (p.partner?'<span class="merk">partner</span>':(p.featured?'<span class="merk">uitgelicht</span>':''))+
+      '<span class="soort">'+esc(soorten[p.momentType]||'Moment')+'</span></div>'+
+    (details.length?'<div class="tekst salon-contextdetail">'+esc(details.join(' · '))+'</div>':'')+
     (media.length?'<div class="kar"><div class="strip">'+media.map(m=>
         '<img src="'+esc(m.src)+'" alt="'+esc(m.alt||'Foto uit De Salon')+'" loading="lazy">').join('')+'</div>'+
         (media.length>1?'<span class="tel">'+media.length+' foto\'s</span>':'')+'</div>':'')+
     (p.text?'<div class="tekst">'+esc(p.text)+'</div>':'')+
+    (p.offer?'<div class="kaart salon-offer"><h2>'+esc(p.offer.titel||'Aanbod')+'</h2><p class="salon-offer-detail">'+esc([p.offer.capaciteit?p.offer.capaciteit+' beschikbaar':'',p.offer.geldigTot?'tot '+p.offer.geldigTot:'',p.offer.actie||''].filter(Boolean).join(' · '))+'</p></div>':'')+
     ((p.onderwerpen||[]).length?'<div class="onderw">'+p.onderwerpen.map(o=>
         '<button type="button" data-onderwerp="'+esc(o)+'">#'+esc(o)+'</button>').join('')+'</div>':'')+
     '<div class="rij">'+
@@ -314,9 +324,12 @@ async function tekenOntdek(){
 /* ---------- plaatsen, met karrousel en alt-tekst ---------- */
 function tekenPlaats(){
   toon('<div class="kaart"><h2>Iets delen</h2>'+
+    '<label for="psoort">Wat voor moment is dit?</label><select id="psoort"><option value="moment">Moment</option><option value="place">Plek</option><option value="plan">Plan</option><option value="event">Event</option><option value="travel">Reis</option><option value="food">Aan tafel</option><option value="activity">Activiteit</option><option value="question">Vraag</option><option value="live">Live</option></select>'+
     '<label for="ptekst">Wat wil je delen? Gebruik #onderwerp om het terugvindbaar te maken.</label>'+
     '<textarea id="ptekst" rows="4" maxlength="600" placeholder="Schrijf iets"></textarea>'+
     '<label for="pplaats">Plaats (mag leeg)</label><input id="pplaats" maxlength="60">'+
+    '<label for="pbegint">Wanneer (optioneel)</label><input id="pbegint" type="datetime-local">'+
+    '<label for="ppubliek">Voor wie is dit bedoeld?</label><select id="ppubliek"><option value="salon">Mijn Saloon</option><option value="contacten">Vrienden en volgers</option><option value="vrienden">Alleen vrienden</option><option value="volgers">Alleen volgers</option><option value="alleenik">Alleen ik</option><option value="iedereen">Openbaar als het voor ontdekking geschikt is</option></select>'+
     '<label for="pfotos">Foto\'s (maximaal 6)</label><input id="pfotos" type="file" accept="image/*" multiple>'+
     '<div class="miniatuur" id="mini"></div>'+
     '<label for="preacties">Wie mag reageren</label>'+
@@ -347,7 +360,8 @@ function tekenPlaats(){
     const knop=$('#plaatsknop');
     werk(knop,async()=>{
       await api('/api/salon/plaats',{tekst:$('#ptekst').value,plaats:$('#pplaats').value,
-        media:NIEUW.media,reactiesVan:$('#preacties').value});
+        media:NIEUW.media,reactiesVan:$('#preacties').value,momentType:$('#psoort').value,
+        startsAt:$('#pbegint').value,publiek:$('#ppubliek').value});
       TAB='feed'; NA=null; teken(); meld('Geplaatst.');
     });
   };

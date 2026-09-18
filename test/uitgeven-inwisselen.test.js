@@ -99,9 +99,13 @@ test('3. een aanbieding op De Salon: van het management, met titel en tekst', as
   assert.equal((await api('/api/supplier/salon/deal', { titel: '', text: 'Zonder titel.' }, zaak)).status, 400);
 
   const d = await api('/api/supplier/salon/deal',
-    { titel: 'Zomerproeverij', text: 'Twee gangen met een glas wijn, de hele maand juli.', geldigTot: '2027-07-31' }, zaak);
+    { titel: 'Zomerproeverij', text: 'Twee gangen met een glas wijn, de hele maand juli.',
+      geldigTot: '2027-07-31', capaciteit: 12, actie: 'Reserveer' }, zaak);
   assert.equal(d.status, 200);
   postId = d.body.postId;
+  assert.deepEqual(d.body.offer, {
+    titel: 'Zomerproeverij', geldigTot: '2027-07-31', capaciteit: 12, actie: 'Reserveer'
+  }, 'de bestaande dealroute publiceert ook de gedeelde Offer-vorm');
 
   const st = await api('/api/supplier/salon/stats', {}, zaak);
   assert.equal(st.status, 200);

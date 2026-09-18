@@ -1166,7 +1166,6 @@
       "rvTafelAntwoord",
       "rvTafels",
       "salon",
-      "salonAI",
       "salonClaimcode",
       "salonInzicht",
       "salonProfiel",
@@ -2557,6 +2556,7 @@
     "wereld": [
       "gidsHaal",
       "openVacatures",
+      "wereldFeed",
       "zijnVrienden"
     ],
     "werkbeleid": [

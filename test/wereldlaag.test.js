@@ -125,6 +125,55 @@ test('een Salon-post komt in de wereldfeed, en de bron staat erbij', async () =>
   assert.equal(mijn.open, 'rtg://salon/' + mijn.id.split(':')[1], 'en een verwijzing terug naar de Salon');
 });
 
+test('de vijf intentielenzen blijven in één feed en lezen getypeerde momenten', async () => {
+  const l = await lid('Lens Lid', 'lens@x.nl', 'rtg');
+  await post('/api/salon/plaats', {
+    tekst: 'Barcelona in oktober.', momentType: 'travel', plaats: 'Barcelona',
+    startsAt: '2099-10-12T10:00:00Z'
+  }, l.token);
+  await post('/api/salon/plaats', {
+    tekst: 'Padel op zondag.', momentType: 'event', plaats: 'Haarlem',
+    startsAt: '2099-10-14T14:00:00Z'
+  }, l.token);
+  await post('/api/salon/plaats', { tekst: 'Een gewone notitie.', momentType: 'moment' }, l.token);
+
+  const travel = await json(await post('/api/wereld/feed', { modus: 'alles', lens: 'travel' }, l.token));
+  assert.equal(travel.context.naam, 'Travel');
+  assert.ok(travel.items.some(x => x.type === 'travel' && x.plaats === 'Barcelona'));
+  assert.ok(travel.items.every(x => x.type === 'travel' || /reis|travel|trip|ibiza|hotel|vlucht|bestemming/i.test(x.tekst)),
+    'de Travel-lens haalt geen gewone post naar binnen');
+  assert.ok(travel.items.some(x => x.sectie === 'binnenkort'), 'een toekomstig reismoment krijgt een feitelijk contextvak');
+
+  const events = await json(await post('/api/wereld/feed', { modus: 'alles', lens: 'events' }, l.token));
+  assert.equal(events.context.naam, 'Events');
+  assert.ok(events.items.some(x => x.type === 'event' && x.plaats === 'Haarlem'));
+  assert.ok(events.items.every(x => ['event', 'activity', 'live', 'offer'].includes(x.type)
+    || /event|festival|concert|feest|bijeenkomst|ticket/i.test(x.tekst)));
+
+  const friends = await json(await post('/api/wereld/feed', { modus: 'alles', lens: 'friends' }, l.token));
+  assert.equal(friends.context.naam, 'Friends');
+  assert.ok(friends.items.some(x => x.tekst === 'Een gewone notitie.'), 'Friends blijft de brede sociale lens');
+
+  const dating = await post('/api/wereld/feed', { modus: 'alles', lens: 'dating' }, l.token);
+  assert.equal(dating.status, 403, 'Dating blijft achter de bestaande Signature-poort');
+});
+
+test('een doelgebonden Salon-publiek geldt ook in de samengestelde Wereld-feed', async () => {
+  const a = await lid('Privé Maker', 'prive-maker@x.nl', 'rtg');
+  const b = await lid('Privé Volger', 'prive-volger@x.nl', 'rtg');
+  const geplaatst = await json(await post('/api/salon/plaats', {
+    tekst: 'Alleen voor mij.', publiek: 'alleenik', momentType: 'plan'
+  }, a.token));
+  await post('/api/salon/volg-lid', { wie: a.codenaam, aan: true }, b.token);
+
+  const eigen = await json(await post('/api/wereld/feed', { modus: 'alles', lens: 'friends' }, a.token));
+  assert.ok(eigen.items.some(x => x.tekst === 'Alleen voor mij.'), 'de maker houdt zijn eigen moment');
+
+  const ander = await json(await post('/api/wereld/feed', { modus: 'alles', lens: 'friends' }, b.token));
+  assert.ok(!ander.items.some(x => x.id === 'salon:' + geplaatst.post.id),
+    'volgen omzeilt Alleen ik niet via de samengestelde feed');
+});
+
 test('een zakelijke post blijft uit de feed van de gratis pas -- ook in "Alles"', async () => {
   const b = await lid('Zakelijk Baas', 'zbaas@x.nl', 'business');
   const g = await lid('Zakelijk Gratis', 'zgratis@x.nl', 'rtg');

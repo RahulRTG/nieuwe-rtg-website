@@ -27,7 +27,11 @@
   'use strict';
   if (w.RTGVertaalKast) return;
 
-  var SLEUTEL = 'rtg_tr_';
+  /* v2 verbreekt bewust met de oude, gedeeltelijk gevulde taalvoorraad. Juist
+     die voorraad liet een Nederlands scherm Duitse knoppen behouden nadat een
+     vertaalronde halverwege faalde. */
+  var SLEUTEL = 'rtg_tr_v2_';
+  var OUD_SLEUTEL = 'rtg_tr_';
   var MAX_REGELS = 4000, MAX_BYTES = 300000;
   var kast = new Map();                 // taal -> Map(bron -> vertaling)
   var vuil = new Set(), opgegeven = new Set(), timer = null;
@@ -128,14 +132,15 @@
     var s = opslag();
     if (!s) return;
     try {
-      if (s.getItem('rtg_tr_opgeruimd')) return;
+      if (s.getItem(SLEUTEL + 'opgeruimd')) return;
       var oud = [];
       for (var i = 0; i < s.length; i++) {
         var k = s.key(i);
-        if (k && k.indexOf('rtg_ui_') === 0) oud.push(k);
+        if (k && (k.indexOf('rtg_ui_') === 0 ||
+          (k.indexOf(OUD_SLEUTEL) === 0 && k.indexOf(SLEUTEL) !== 0))) oud.push(k);
       }
       oud.forEach(function (k) { s.removeItem(k); });
-      s.setItem('rtg_tr_opgeruimd', '1');
+      s.setItem(SLEUTEL + 'opgeruimd', '1');
     } catch (e) {}
   })();
 
@@ -919,6 +924,7 @@ window.RTGUiBronTekst = function(source){
   if (w.RTGAutoVertaling) return;
 
   var RTL = new Set(['ar', 'dv', 'fa', 'he', 'ps', 'sd', 'ug', 'ur', 'yi']);
+  var KERN = new Set(['nl','en','de','fr','es','pt','it','pl','ru','uk','tr','ar','fa','he','hi','bn','ur','zh','ja','ko','id','vi','th','sw']);
   var ATTRS = ['placeholder', 'title', 'aria-label', 'aria-description', 'alt'];
   var NEGEER = 'script,style,noscript,template,code,pre,kbd,samp,svg,canvas,textarea,' +
     '[translate="no"],[data-i18n-ignore],[data-user-content],[contenteditable="true"],' +
@@ -988,25 +994,28 @@ window.RTGUiBronTekst = function(source){
     return st;
   }
 
-  function voeg(groepen, st) {
+  function voeg(groepen, voorraad, st) {
     if (!kandidaat(st.bron)) return;
+    var atomair = KERN.has(taal) && taal !== 'nl' && taal !== 'en';
     var known=w.RTGUiBronTekst && w.RTGUiBronTekst(st.bron);
     if(taal==='en' && known!=null) return toon(st,known);
     var uitKast = KAST.van(taal).get(st.bron);
-    if (uitKast != null) return toon(st, uitKast);
+    if (uitKast != null && !atomair) return toon(st, uitKast);
     /* Kast, dan schil, dan net. De kast is verser (hij kent ook schermen buiten
        de schil), de schil is breder bij een koude start, het net kost geld. */
     var uitSchil = SCHIL.van(taal).get(st.bron);
-    if (uitSchil != null) return toon(st, uitSchil);
-    if(known!=null) toon(st,known); // Explicit source copy remains usable while a target translation is pending.
+    if (uitSchil != null && !atomair) return toon(st, uitSchil);
+    if(!atomair && known!=null) toon(st,known); // Explicit source copy remains usable while a target translation is pending.
     if (!groepen.has(st.bron)) groepen.set(st.bron, new Set());
     groepen.get(st.bron).add(st);
+    if (atomair && uitKast != null) voorraad.set(st.bron, uitKast);
+    else if (atomair && uitSchil != null) voorraad.set(st.bron, uitSchil);
   }
-  function verzamelTekst(root, groepen) {
+  function verzamelTekst(root, groepen, voorraad) {
     if (!root) return;
     var bekijk = function (node) {
       if (!node || node.nodeType !== 3 || uitgesloten(node.parentElement)) return;
-      voeg(groepen, tekstStaat(node));
+      voeg(groepen, voorraad, tekstStaat(node));
     };
     if (root.nodeType === 3) bekijk(root);
     if (root.nodeType !== 1 && root.nodeType !== 9) return;
@@ -1014,18 +1023,18 @@ window.RTGUiBronTekst = function(source){
     var node;
     while ((node = walker.nextNode())) bekijk(node);
   }
-  function verzamelAttributen(root, groepen) {
+  function verzamelAttributen(root, groepen, voorraad) {
     if (!root || (root.nodeType !== 1 && root.nodeType !== 9)) return;
     var els = [];
     if (root.nodeType === 1) els.push(root);
     try { els = els.concat(Array.from(root.querySelectorAll('[' + ATTRS.join('],[') + ']'))); } catch (e) {}
     els.forEach(function (el) {
       ATTRS.forEach(function (naam) {
-        if (el.hasAttribute(naam) && !uitgesloten(el, naam)) voeg(groepen, attribStaat(el, naam));
+        if (el.hasAttribute(naam) && !uitgesloten(el, naam)) voeg(groepen, voorraad, attribStaat(el, naam));
       });
       var type = String(el.getAttribute('type') || '').toLowerCase();
       if (el.tagName === 'INPUT' && /^(button|submit|reset)$/.test(type) && el.hasAttribute('value') && !uitgesloten(el, 'value'))
-        voeg(groepen, attribStaat(el, 'value'));
+        voeg(groepen, voorraad, attribStaat(el, 'value'));
     });
   }
 
@@ -1069,6 +1078,21 @@ window.RTGUiBronTekst = function(source){
     });
   }
 
+  function engelseTerugval() {
+    herstel();
+    /* De sleutelweg valt voor een ontbrekende doelvertaling ook op Engels
+       terug. Doe dat hier voor alle geregistreerde losse UI-tekst, zodat de
+       twee lagen samen nooit een Nederlands/Engels mengsel maken. */
+    tekstStaten.forEach(function (st) {
+      var known = w.RTGUiBronTekst && w.RTGUiBronTekst(st.bron);
+      if (known != null) toon(st, known);
+    });
+    attribStaten.forEach(function (st) {
+      var known = w.RTGUiBronTekst && w.RTGUiBronTekst(st.bron);
+      if (known != null) toon(st, known);
+    });
+  }
+
   function groepenVan(bronnen, groepen) {
     var uit = [], nu = [], tekens = 0;
     bronnen.forEach(function (bron) {
@@ -1087,13 +1111,18 @@ window.RTGUiBronTekst = function(source){
       body: JSON.stringify({ naar: gekozenTaal, bron: location.pathname, teksten: groep.regels }) })
       .then(function (r) { if (!r.ok) throw new Error('ui-vertaling ' + r.status); return r.json(); })
       .then(function (d) {
-        if (!d || d.naar !== gekozenTaal || !Array.isArray(d.teksten)) return;
+        if (!d || d.naar !== gekozenTaal || !Array.isArray(d.teksten) || d.teksten.length !== groep.regels.length ||
+          !Array.isArray(d.voltooid) || d.voltooid.length !== groep.regels.length)
+          return { volledig: false, waarden: [] };
+        var waarden = [];
         groep.regels.forEach(function (bron, i) {
           var vertaling = d.teksten[i] || bron;
-          if (vertaling !== bron) KAST.zet(gekozenTaal, bron, vertaling);
-          if (taal === gekozenTaal && beurt === gekozenBeurt)
+          waarden.push(vertaling);
+          if (d.voltooid[i] && vertaling !== bron) KAST.zet(gekozenTaal, bron, vertaling);
+          if (!groep.atomair && d.voltooid[i] && taal === gekozenTaal && beurt === gekozenBeurt)
             groep.doelen[i].forEach(function (st) { if (st.bron === bron) toon(st, vertaling); });
         });
+        return { volledig: d.volledig === true, waarden: waarden, voltooid: d.voltooid };
       });
   }
 
@@ -1101,17 +1130,53 @@ window.RTGUiBronTekst = function(source){
     timer = null;
     eersteRonde = false;
     if (taal === 'nl') return;
-    var groepen = new Map(), lijst = Array.from(wortels); wortels.clear();
+    var groepen = new Map(), voorraad = new Map(), lijst = Array.from(wortels); wortels.clear();
     if (!lijst.length) lijst = [document.documentElement];
-    lijst.forEach(function (root) { verzamelTekst(root, groepen); verzamelAttributen(root, groepen); });
+    lijst.forEach(function (root) { verzamelTekst(root, groepen, voorraad); verzamelAttributen(root, groepen, voorraad); });
     if (!groepen.size) return;
     var gekozenTaal = taal, gekozenBeurt = beurt;
-    groepenVan(Array.from(groepen.keys()), groepen).forEach(function (groep) {
-      keten = keten.then(function () {
+    var atomair = KERN.has(gekozenTaal) && gekozenTaal !== 'nl' && gekozenTaal !== 'en';
+    var ontbrekend = Array.from(groepen.keys()).filter(function (bron) { return !voorraad.has(bron); });
+    /* Een volledig bekende ronde kan direct en in één taak op het scherm.
+       Daarvoor is geen netwerk of asynchrone modelketen nodig. */
+    if (atomair && !ontbrekend.length) {
+      groepen.forEach(function (doelen, bron) {
+        doelen.forEach(function (st) { if (st.bron === bron) toon(st, voorraad.get(bron)); });
+      });
+      document.documentElement.setAttribute('data-rtg-taal-volledig', 'true');
+      return;
+    }
+    var batches = groepenVan(ontbrekend, groepen);
+    batches.forEach(function (groep) { groep.atomair = atomair; });
+    keten = keten.then(async function () {
+      var volledig = true;
+      for (var i = 0; i < batches.length; i++) {
         if (taal !== gekozenTaal || beurt !== gekozenBeurt) return;
-        return vraag(groep, gekozenTaal, gekozenBeurt);
-      })
-        .catch(function () { /* de brontekst blijft heel; een volgende DOM-wijziging probeert opnieuw */ });
+        var antwoord = await vraag(batches[i], gekozenTaal, gekozenBeurt);
+        if (!antwoord || !antwoord.volledig) volledig = false;
+        if (antwoord && antwoord.waarden) batches[i].regels.forEach(function (bron, j) {
+          var waarde = antwoord.waarden[j];
+          if (antwoord.voltooid && antwoord.voltooid[j] && waarde) voorraad.set(bron, waarde);
+        });
+      }
+      if (!atomair || taal !== gekozenTaal || beurt !== gekozenBeurt) return;
+      volledig = volledig && Array.from(groepen.keys()).every(function (bron) { return voorraad.has(bron); });
+      if (!volledig) {
+        /* Geen lappendeken: de hele automatische laag blijft in de brontaal.
+           Een volgende expliciete keuze mag opnieuw proberen. */
+        engelseTerugval();
+        document.documentElement.setAttribute('data-rtg-taal-volledig', 'false');
+        return;
+      }
+      groepen.forEach(function (doelen, bron) {
+        doelen.forEach(function (st) { if (st.bron === bron) toon(st, voorraad.get(bron)); });
+      });
+      document.documentElement.setAttribute('data-rtg-taal-volledig', 'true');
+    }).catch(function () {
+      if (atomair && taal === gekozenTaal && beurt === gekozenBeurt) {
+        engelseTerugval();
+        document.documentElement.setAttribute('data-rtg-taal-volledig', 'false');
+      }
     });
   }
   /* De 80 ms bundelt een uitbarsting van DOM-wijzigingen tot EEN aanvraag. Bij
@@ -1148,6 +1213,7 @@ window.RTGUiBronTekst = function(source){
     else if (taal === 'nl' && oorspronkelijkeRichting == null) document.documentElement.removeAttribute('dir');
     else document.documentElement.setAttribute('dir', oorspronkelijkeRichting || 'ltr');
     document.documentElement.setAttribute('data-rtg-taal', taal);
+    document.documentElement.removeAttribute('data-rtg-taal-volledig');
     if (taal !== 'nl') {
       KAST.van(taal);   // de kast van deze taal alvast van het toestel halen
       /* En de meegeleverde schil erbij. Die komt van schijf of uit de
@@ -1215,9 +1281,13 @@ window.RTGUiBronTekst = function(source){
     nl: { label: 'Nederlands', native: 'Nederlands' },
     en: { label: 'Engels', native: 'English' }
   };
+  const KERN = new Set([
+    'nl', 'en', 'de', 'fr', 'es', 'pt', 'it', 'pl', 'ru', 'uk', 'tr',
+    'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'zh', 'ja', 'ko', 'id', 'vi', 'th', 'sw'
+  ]);
   /* Wereldtalen: de Boardroom bepaalt welke talen aanstaan; de kiezer toont ze
-     allemaal. UI-teksten vallen voor andere talen terug op Engels; chats en
-     berichten worden door de server echt per taal vertaald. */
+     allemaal. De 24 kerntalen wisselen atomair: een onvolledig woordenboek
+     blijft volledig Engels in plaats van meerdere talen op een scherm te mengen. */
   let WERELD = window.RTGWereldTalen || null; // [{code, naam, en}] uit /api/talen
   function supported() { return WERELD ? WERELD.map(t => t.code) : Object.keys(LANGS); }
   const orig = new WeakMap(); // element -> { text, html, ph }
@@ -1287,11 +1357,19 @@ window.RTGUiBronTekst = function(source){
   const RTGi18n = {
     lang: 'nl',
     chosen: false,
-    // UI-woordenboek: eigen taal als die er is, anders Engels (internationale
-    // terugval); Nederlands staat gewoon in de HTML zelf.
+    // UI-woordenboek: Nederlands staat in de HTML. Een kerntaal wordt pas
+    // zichtbaar als elke Engelse woordenboeksleutel een echte vertaling heeft.
     dict(lang) {
       const all = window.I18N || {};
-      return lang === 'nl' ? (all.nl || {}) : Object.assign({}, all.en || {}, all[lang] || {});
+      if (lang === 'nl') return all.nl || {};
+      const en = all.en || {};
+      const own = all[lang] || {};
+      if (lang !== 'en' && KERN.has(lang)) {
+        const compleet = Object.keys(en).every(key => typeof en[key] !== 'string' ||
+          (Object.prototype.hasOwnProperty.call(own, key) && typeof own[key] === 'string' && own[key].length > 0));
+        if (!compleet) return Object.assign({}, en);
+      }
+      return Object.assign({}, en, own);
     },
     _usedKeys: new Set(),
     t(key, fallback) {
@@ -1410,12 +1488,12 @@ window.RTGUiBronTekst = function(source){
         group.push(k); size+=en[k].length;
       });
       if (group.length) groups.push(group);
-      const publish = () => {
+      const publish = klaar => {
         window.I18N=window.I18N || {};
         window.I18N[lang]=Object.assign({},window.I18N[lang] || {},out);
-        if (this.lang === lang) this.apply(lang);
+        if (this.lang === lang && (!KERN.has(lang) || klaar)) this.apply(lang);
       };
-      if (Object.keys(out).length) publish();
+      if (Object.keys(out).length && !KERN.has(lang)) publish(false);
       try {
         for (const batch of groups) {
           if (this.lang !== lang) break;
@@ -1424,21 +1502,29 @@ window.RTGUiBronTekst = function(source){
             body:JSON.stringify({naar:lang,teksten:batch.map(k=>en[k])})});
           if (!response.ok) throw new Error('UI translation '+response.status);
           const data=await response.json();
-          if (!data || data.naar!==lang || !Array.isArray(data.teksten) || data.teksten.length!==batch.length)
+          if (!data || data.naar!==lang || !Array.isArray(data.teksten) || data.teksten.length!==batch.length ||
+            !Array.isArray(data.voltooid) || data.voltooid.length!==batch.length)
             throw new Error('Incomplete UI translation');
           batch.forEach((k,i)=>{
             state.tried.set(k,en[k]);
             const value=data.teksten[i];
-            // An unchanged source is a fallback, never a completed translation.
-            if(typeof value==='string' && value && value!==en[k]) {
-              out[k]=value; if(kast) kast.zet(lang,en[k],value);
+            // Een provider kan een merknaam terecht ongewijzigd laten; daarom
+            // bepaalt de server per regel of hij is afgehandeld.
+            if(data.voltooid[i] && typeof value==='string' && value) {
+              out[k]=value; if(kast && value!==en[k]) kast.zet(lang,en[k],value);
             }
           });
-          publish();
+          if (!KERN.has(lang)) publish(false);
         }
       } catch (e) {
         // Keep the complete fallback. An explicit language choice can retry.
-      } finally { state.pending=false; }
+      } finally {
+        state.pending=false;
+        const klaar = Object.assign({}, own, out);
+        const compleet = Object.keys(en).every(key => typeof en[key] !== 'string' ||
+          (Object.prototype.hasOwnProperty.call(klaar, key) && typeof klaar[key] === 'string' && klaar[key].length > 0));
+        if (compleet) publish(true);
+      }
     },
 
     /* ---------- taalkeuze: de wereld in RTG-stijl ----------
@@ -1689,6 +1775,10 @@ window.RTGUiBronTekst = function(source){
             WERELD = d.talen; // de actieve set (voor de vertaling)
             // de matcher kent meteen de HELE wereld (alle 114) voor typen/spreken
             this._alleTalen = (Array.isArray(d.alle) && d.alle.length) ? d.alle : d.talen;
+            // Dezelfde 24 kerntalen als op www staan vooraan; de overige
+            // wereldtalen blijven vindbaar via land- of taalnaam.
+            this._alleTalen = this._alleTalen.slice().sort((a, b) =>
+              Number(!!b.kern) - Number(!!a.kern));
             this._lijst = this._alleTalen;
             // De site volgt de telefooninstelling: nu de hele wereld bekend is,
             // kiezen we alsnog de toesteltaal (bijv. Duits of Japans), tenzij het

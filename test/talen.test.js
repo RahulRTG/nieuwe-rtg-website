@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { TALEN, STANDAARD, STANDAARD_VERSIE, bestaat, naamEn, maakTalen } = require('../server/talen');
+const { TALEN, KERN_TAALCODES, STANDAARD, STANDAARD_VERSIE, bestaat, naamEn, isKerntaal, maakTalen } = require('../server/talen');
 const vertaal = require('../server/translate');
 const { startServer, stop } = require('./helper');
 
@@ -26,6 +26,24 @@ test('register: dekt de wereld, kent endoniemen en Engelse namen', () => {
   assert.ok(bestaat('zh') && bestaat('ar') && bestaat('sw') && bestaat('fy'), 'van Chinees tot Fries');
   assert.equal(naamEn('ja'), 'Japanese');
   assert.ok(!bestaat('xx'), 'onzin-codes bestaan niet');
+});
+
+test('register: www en app delen exact dezelfde 24 kerntalen', () => {
+  assert.deepEqual(KERN_TAALCODES, [
+    'nl', 'en', 'de', 'fr', 'es', 'pt', 'it', 'pl', 'ru', 'uk', 'tr',
+    'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'zh', 'ja', 'ko', 'id', 'vi', 'th', 'sw'
+  ]);
+  assert.ok(KERN_TAALCODES.every(code => bestaat(code) && isKerntaal(code)));
+  const t = maakTalen({ db: { data: {} }, save: () => {} });
+  assert.deepEqual(t.alle().filter(x => x.kern).map(x => x.code).sort(),
+    KERN_TAALCODES.slice().sort());
+  for (const bestand of ['i18n-00b.js', 'i18n-01.js']) {
+    const bron = fs.readFileSync(path.join(__dirname, '../public/shared/i18n', bestand), 'utf8');
+    const blok = bron.match(/(?:var|const) KERN = new Set\(\[([\s\S]*?)\]\)/);
+    assert.ok(blok, bestand + ' bevat de browser-kernset');
+    assert.deepEqual([...blok[1].matchAll(/'([a-z]{2})'/g)].map(m => m[1]), KERN_TAALCODES,
+      bestand + ' mag niet van het servercontract afwijken');
+  }
 });
 
 test('register: basistalen altijd aan, schakelen werkt, taalVan valt veilig terug', () => {

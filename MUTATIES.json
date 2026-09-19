@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-19T07:31:21.234Z",
-    "commit": "eb21490d3",
+    "op": "2026-09-19T08:39:44.778Z",
+    "commit": "523520876",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3484,6 +3484,20 @@
       "gezakt": 2,
       "geprobeerd": 3
     },
+    "heritage-context.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "heritage-intelligence.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "heritage-truth.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -4417,6 +4431,13 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "ledenschermen.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "leerpaspoort-scherm.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4481,6 +4502,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "leven.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "levenbandroutes.test.js": {
@@ -6521,6 +6549,13 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "premium.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
     "productie-installatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6798,6 +6833,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "reisschermen.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
       "scherp": "gezakt"
     },
     "reiswereld.test.js": {

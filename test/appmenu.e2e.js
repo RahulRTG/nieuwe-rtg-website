@@ -414,8 +414,10 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
 
     const thuis = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');
     await thuis.click();
-    await page.waitForURL(/\/apps\/living-os\.html/, { timeout: 8000 });
-    assert.match(new URL(page.url()).pathname, /\/apps\/living-os\.html$/, 'de Edge-deur brengt je niet thuis');
+    await page.waitForURL(/\/apps\/wereld\.html$/, { timeout: 8000 });
+    assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', 'Home opent de vernieuwde momentenfeed');
+    await page.waitForSelector('.living-intro');
+    assert.equal(await page.locator('#feed').isVisible(), true, 'de momentenfeed is zichtbaar voor het ingelogde lid');
     await page.close();
   });
 });

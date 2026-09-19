@@ -9,6 +9,68 @@ const SCHERMEN = [
   ['/apps/foundation/os-publiek.html', 'foundation', { width: 1366, height: 900 }]
 ];
 
+test('LivingOS Home keert vanuit de routevergelijker en een app terug naar de vernieuwde momentenfeed',
+  { skip: geenBrowser(pw) }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const context = await browser.newContext();
+    await context.addInitScript(() => localStorage.setItem('rtg_cookieinfo_v1', '1'));
+    const page = await context.newPage();
+    for (const width of [320, 390, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const source of ['/apps/living-os.html?view=worlds', '/apps/notities.html']) {
+        await page.goto(base + source, { waitUntil: 'domcontentloaded' });
+        await wacht(page, new URL(page.url()).pathname);
+        await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
+        await page.waitForLoadState('domcontentloaded');
+        assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', source + ' op ' + width);
+        await wacht(page, '/apps/wereld.html');
+        await page.waitForSelector('.living-intro');
+        assert.equal(await page.locator('#feed').count(), 1, 'de vernieuwde momentenfeed staat er');
+        assert.equal(await page.locator('.lo-rail').count(), 0, 'geen routevergelijker als home');
+        assert.equal((await meet(page)).bars, 1);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
+        assert.equal(await page.locator('.rtg-edge-mark').getAttribute('href'), '/apps/wereld.html');
+      }
+    }
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+  }
+});
+
+test('het RTG-beeldmerk blijft intact bij een eerder opgeslagen foutieve Engelse vertaling',
+  { skip: geenBrowser(pw) }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(() => {
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      localStorage.setItem('rtg_lang', 'en');
+      localStorage.setItem('rtg_tr_v2_en', JSON.stringify({
+        RTG: 'RTG (No Translation Needed)', 'Rahul Travel Group': 'A wrong brand name'
+      }));
+    });
+    const page = await context.newPage();
+    for (const pad of ['/apps/living-os.html', '/apps/wereld.html']) {
+      await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
+      await wacht(page, pad);
+      await page.waitForFunction(() => !!window.RTGi18n);
+      await page.evaluate(() => window.RTGi18n.set('en'));
+      await page.waitForFunction(() => document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"] small')?.textContent === 'Worlds');
+      assert.equal(await page.locator('.rtg-edge-mark-short').textContent(), 'RTG');
+      assert.equal(await page.locator('.rtg-edge-mark-lockup strong').textContent(), 'Rahul Travel Group');
+    }
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+  }
+});
+
 async function wacht(page, pad) {
   await page.waitForFunction(verwacht => location.pathname !== verwacht || document.body &&
     document.body.dataset.rtgAdaptiveReady === 'true' && window.RTGAdaptiveEdge && (() => {

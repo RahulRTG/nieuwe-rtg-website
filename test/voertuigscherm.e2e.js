@@ -117,7 +117,7 @@ test('5. het ritscherm toont de ledendeur, verbergt vreemde refs en verzint geen
     const rit = await post('/api/mob/vraag', { ritsoort: 'direct', categorie: 'taxi',
       van: { lat: 38.908, lng: 1.432, label: 'Vertrek' },
       naar: { lat: 38.92, lng: 1.45, label: 'Bestemming' }, reizigers: 2, bagage: 1 }, tokens[0]);
-    assert.ok(rit.opdracht.ref);
+    assert.ok(rit.opdracht && rit.opdracht.ref, 'de echte mobiliteitskern geeft een ritreferentie terug');
     await page.evaluate(t => localStorage.setItem('rtg_member_token', t), tokens[1]);
     const redenen = [];
     for (const ref of ['BESTAAT-NIET', rit.opdracht.ref]) {

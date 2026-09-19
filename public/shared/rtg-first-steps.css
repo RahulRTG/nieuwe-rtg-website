@@ -4,6 +4,7 @@ body.rtg-first-page{background:#0C0C0B!important;color:#f4f0e9;--bg:#0C0C0B;--tx
 body.rtg-first-page main{max-width:1100px!important;padding:0!important;margin:0 auto!important;width:100%;min-width:0}
 body.rtg-first-page .salon-werkveld{max-width:none;padding:0;margin:0;display:block}
 body.rtg-first-page .salon-stage{display:block;margin:0;padding:0}
+body[data-rtg-editorial-room] .salon-kringlink{display:inline-flex;align-items:center;min-height:44px;padding-block:10px}
 body.rtg-first-page :is(.salon-briefing,.salon-socialnav,.rtg-social-commandbar,.salon-werkveld>header> .kop,.gallery-explanation){display:none!important}
 body.rtg-first-page>header,body.rtg-first-page .salon-werkveld>header{background:#0C0C0B;border:0;padding:0;position:static;min-height:0}
 body.rtg-first-page>header>:not(.tabs){display:none}

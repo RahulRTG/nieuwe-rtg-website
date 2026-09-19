@@ -68,13 +68,14 @@ test('de standaard schil draagt navigatie over aan Edge System en geeft apps het
     'de ene melding hoort boven de vaste onderbalk te staan');
 });
 
-test('Agenda, Notities en Bestanden dragen dezelfde kantoorlaag in en buiten Work OS',()=>{
+test('Agenda, Notities en Bestanden dragen dezelfde editorial inhoud in en buiten Work OS',()=>{
   for(const [naam,pagina] of [['Agenda',agenda],['Notities',notities],['Bestanden',bestanden]]){
-    assert.match(pagina,/kantoor-tools\.css/,naam+' mist de gedeelde enterprise-laag');
+    assert.match(pagina,/rtg-daily-rooms\.css/,naam+' mist de gedeelde editorial laag');
     assert.match(pagina,/data-kantoor-tool=/,naam+' mist zijn toolcontext');
     assert.match(pagina,/dataset\.rtgOppervlak='1'/,naam+' verbergt dubbele chrome niet');
     assert.match(pagina,/body\.setAttribute\('data-ios-uit',''\)/,naam+' mag geen tweede mobiele appbalk maken');
-    assert.match(pagina,/class="kantoor-intro"/,naam+' mist de rustige werkhiërarchie');
+    assert.match(pagina,/id="dailyIntro"/,naam+' mist zijn inhoudelijke introductie');
+    assert.doesNotMatch(pagina,/class="kantoor-intro"/,naam+' krijgt geen dubbele introductie');
   }
   assert.match(office,/presentation-enterprise\.css/,
     'Presentatie hoort zijn eigen responsive regietafel te laden');

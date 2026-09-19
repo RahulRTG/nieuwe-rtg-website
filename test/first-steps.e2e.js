@@ -133,6 +133,9 @@ test('Four editorial first visits: responsive, language, shared Edge and real fi
     await action(page, 'Feed');
     await page.waitForSelector('[data-post]');
     assert.equal(await page.locator('.rtg-first-steps').count(), 0, 'real posts replace the welcome');
+    const circleLink = await page.locator('.salon-kringlink').boundingBox();
+    assert.ok(circleLink && circleLink.width >= 44 && circleLink.height >= 44,
+      'Beheer uw kringen blijft ook na het eerste bericht goed aanraakbaar');
 
     // An outage must not turn into the claim that the member has no photos.
     await page.route('**/api/galerij/mijn', r => r.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'Tijdelijk niet beschikbaar.' }) }));

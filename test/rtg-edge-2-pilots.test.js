@@ -69,7 +69,7 @@ test('vier homes zijn native dashboards; drie subroutes houden alleen hun wereld
       new RegExp('data-rtg-world-dashboard="' + wereld + '"[^>]+data-rtg-vandaag-luxe(?:\\s|>)'), bestand);
   }
   assert.match(bodyVan(lees('public/apps/agenda.html')),
-    /data-rtg-vandaag-luxe="surface"[^>]*data-rtg-vandaag-surface="agenda"/);
+    /data-rtg-world="living"[^>]*data-rtg-daily="agenda"[^>]*data-rtg-editorial-room="agenda"/);
   assert.match(bodyVan(lees('public/apps/reisboek.html')),
     /data-rtg-vandaag-luxe="surface"[^>]*data-rtg-vandaag-surface="reisboek"/);
   assert.match(bodyVan(lees('public/apps/werk.html')), /data-rtg-vandaag-surface="projecten"/);

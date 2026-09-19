@@ -1,7 +1,7 @@
 /* Functies van de vier RTG-werelden. */
 (function (w) {
   'use strict';
-  /* home is de werkplek; huis is het publieke wereldscherm. */
+  /* home is het beginscherm van de wereld; huis is de publieke wereldingang. */
   function wereld(meta, groepen, rail) {
     var alles = [];
     groepen.forEach(function (groep) { groep[1].forEach(function (functie) { alles.push(functie); }); });
@@ -47,7 +47,7 @@
       ]]
     ], ['vandaag', 'vluchten', 'hotels', 'reisbureau', 'mobiliteit', 'navigatie', 'rit', 'reisboek', 'hangar']),
 
-    living: wereld({ naam: 'LIVING OS', kort: 'LIVING', kaart: 'LivingOS', huis: '/apps/rtg.html', home: '/apps/living-os.html', workspace: '/apps/werkruimte.html?gebied=living', actie: 'Vergelijk werelden' }, [
+    living: wereld({ naam: 'LIVING OS', kort: 'LIVING', kaart: 'LivingOS', huis: '/apps/rtg.html', home: '/apps/rtg.html', workspace: '/apps/werkruimte.html?gebied=living', actie: 'Vergelijk werelden' }, [
       /* Nederlandse namen, afgeleid uit de panelen van living-os.html zelf
          ("ROUTES VERGELIJKEN", "DECISION GRAPH") en niet verzonnen. Hier stond
          Universe / Intent / Worlds / Decisions / Replay: interne view-namen die

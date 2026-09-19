@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-19T06:26:10.315Z",
-    "commit": "82511175f",
+    "op": "2026-09-19T07:31:21.234Z",
+    "commit": "eb21490d3",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -8646,6 +8646,14 @@
       "module": "server/techniek.js",
       "operator": "!==->===#0",
       "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "tekstbinding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/tekstoppervlak.js",
+      "operator": "false->true#0",
+      "gezakt": 3,
       "geprobeerd": 2
     },
     "tenant.test.js": {

@@ -29,8 +29,24 @@
      Edge-blad. Een klasse, twee gevolgen, geen tweede lijst die uit de pas gaat
      lopen. De bron blijft in de DOM staan met zijn eigen handlers en rechten;
      de Edge klikt hem aan. */
-  var CLAIM = '.ios-nav,.rtg-suitebar,.rtg-suitenav,.tos-opsnav,.rtg-social-commandbar,' +
+  var CLAIM = '.rtg-suitebar,.rtg-suitenav,.tos-opsnav,.rtg-social-commandbar,' +
     '.salon-socialnav,.rtg-intel-strip,.rtd-nav,.one-nav';
+
+  /* `.ios-nav` STOND HIER EN IS ERUIT GEHAALD, en dat is een besluit met een
+     prijs: het was 108 van de 135 schermen. De reden staat in wat de keten
+     vond. Die gedeelde app-kop draagt namelijk niet alleen navigatie maar ook
+     de HOOFDHANDELING van een scherm: `#bewaar` op klankwerk.html is de
+     opslaan-knop, `#nieuwLijst` op notities.html maakt een lijst. Geoogst in
+     het Edge-blad zijn ze bereikbaar, maar wel een tik verder -- en opslaan
+     achter een blad zetten is geen opruiming, dat is een functie verplaatsen
+     waar niemand om vroeg.
+
+     Wat hier overblijft is wat onmiskenbaar DUBBELE platformbediening is:
+     wereld- en suitenavigatie, een merkbalk, een statusstrook. Die vervangt de
+     Edge werkelijk. Of `.ios-nav` er alsnog bij hoort, is een productbesluit
+     van de eigenaar en geen bouwtaak -- en wie hem terugzet, hoort eerst te
+     regelen dat de hoofdhandeling van een scherm in de Edge zelf landt en niet
+     alleen in het blad. */
   var EIGEN = 'rtg-edge-owned-bar';
   /* WAT DE EDGE NIET KAN DRAGEN, NEEMT HIJ NIET OVER. Het blad oogst `button`
      en `a[href]` en klikt het origineel aan; een invoerveld kan het niet

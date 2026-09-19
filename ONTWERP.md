@@ -380,19 +380,34 @@ hem `rtg-edge-owned-bar`, `rtg-adaptive-edge.css` verbergt hem, en de `ROOTS` va
 klasse, twee gevolgen, geen tweede lijst die uit de pas loopt. De bron blijft in
 de DOM met haar eigen handlers en rechten; de Edge klikt haar aan.
 
-Vier regels houden dat eerlijk, en alle vier komen uit een fout die tijdens het
-bouwen echt is gemaakt:
+**Maar niet `.ios-nav`, en dat is de duurste regel van deze ronde.** Die kop
+stond in de eerste versie in de lijst -- 108 van de 135 schermen -- en de keten
+zelf liet zien waarom dat niet mag: hij draagt niet alleen navigatie maar ook de
+HOOFDHANDELING van een scherm. `#bewaar` op klankwerk.html is de opslaan-knop,
+`#nieuwLijst` op notities.html maakt een lijst. Geoogst in het blad zijn ze
+bereikbaar, maar wel een tik verder, en opslaan achter een blad zetten is geen
+opruiming maar een functie verplaatsen waar niemand om vroeg. Wat de Edge
+overneemt is daarom wat onmiskenbaar DUBBELE platformbediening is: wereld- en
+suitenavigatie, een merkbalk, een statusstrook. Of `.ios-nav` er alsnog bij
+hoort is een besluit van de eigenaar en geen bouwtaak; wie hem terugzet, regelt
+eerst dat de hoofdhandeling van een scherm in de Edge zelf landt en niet alleen
+in het blad.
+
+Vier regels houden de rest eerlijk, en alle vier komen uit een fout die tijdens
+het bouwen echt is gemaakt:
 
 1. **Een naam is geen balk.** `ios.js` plakt `ios-nav` ook op `header.ritkop` van
    rit.html, en dat is een hero van 430px met een foto. De claim meet daarom of
    het ding op dat moment werkelijk een balk is -- vast of plakkend, over de
-   breedte, niet hoger dan een balk. Een hero zakt op de eerste voorwaarde.
+   breedte, niet hoger dan een balk. Een hero zakt op de eerste voorwaarde. (Deze
+   grendel is geschreven toen `.ios-nav` nog in de lijst stond; hij blijft staan
+   omdat hij de REGEL bewaakt en niet de lijst -- wie de kop er ooit weer bij
+   zet, vindt hem meteen terug.)
 2. **Wat de Edge niet kan dragen, neemt hij niet over.** Het blad oogst `button`
-   en `a[href]`; een invoerveld kan het niet. De adresbalk van browser.html
-   staat in die kop, en claimen betekende de browser zijn adres kwijt. Een balk
-   met bedienbare invoer blijft staan. `hidden` telt daarbij als verklaring:
-   bestanden.html heeft een `hidden` bestandskiezer die door een stijlregel toch
-   388x36 groot wordt getekend, en die hoort de claim niet tegen te houden.
+   en `a[href]`; een invoerveld kan het niet. Een balk met bedienbare invoer
+   blijft dus staan, en `hidden` telt daarbij als verklaring van de auteur --
+   een veld dat op `hidden` staat maar door een stijlregel toch getekend wordt,
+   hoort de claim niet tegen te houden.
 3. **Eerst alles meten, dan pas markeren.** Claimen verandert de maat: zodra
    `.rtg-suitebar` de klasse kreeg, ging `--suite-nav` naar nul en was
    `.rtg-suitenav` in dezelfde lus "geen balk" meer. Die stond daarna onzichtbaar
@@ -404,13 +419,16 @@ bouwen echt is gemaakt:
 
 `test/edge-enige-balk.e2e.js` bewaakt de uitkomst, met twee grendelproeven
 ernaast: de hero van rit.html blijft staan en de adresbalk van browser.html
-blijft bedienbaar. Zonder die twee zou de toets groen staan bij een regel die
-inhoud opruimt.
+blijft bedienbaar (die tweede is intussen minder scherp dan hij was toen
+`.ios-nav` nog geclaimd werd, maar hij bewaakt dezelfde regel). Zonder die twee
+zou de toets groen staan bij een regel die inhoud opruimt.
 
-Wat na deze ronde overblijft is geen dubbele bediening meer maar schermeigen
-inhoud: de speler van Media, de golfvorm van Muziek, de knoppenrij van Camera,
-het briefingpaneel van Salon. Die dragen de klasse niet en horen dat ook niet te
-doen.
+Wat na deze ronde overblijft is dus geen dubbele bediening meer op de plekken
+waar de Edge werkelijk vervangt -- de suitebalk, de suitenavigatie, de
+ops-navigatie, de sociale commandobalk, de statusstrook -- plus schermeigen
+inhoud die dat nooit was: de speler van Media, de golfvorm van Muziek, de
+knoppenrij van Camera, het briefingpaneel van Salon, en `.ios-nav` op 122
+schermen, met opzet ongemoeid tot het besluit over de hoofdhandeling is genomen.
 
 De declaratieve ingang is:
 

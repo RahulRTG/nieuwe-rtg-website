@@ -44,9 +44,8 @@ const pw = laadPlaywright();
    label: die teksten zijn vertaalbaar, en een toets die op een volledige zin
    staat, zakt bij de eerste taalronde zonder dat er iets stuk is. */
 const SCHERMEN = [
-  { pad: '/apps/bestanden.html', balk: '.ios-nav', knop: 'Prullenbak' },
-  { pad: '/apps/boeken.html', balk: '.ios-nav' },
-  { pad: '/apps/comm.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav', '.rtg-intel-strip'], vrijVan: '.comm' },
+  { pad: '/apps/comm.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav', '.rtg-intel-strip'],
+    knop: 'Salon', vrijVan: '.comm' },
   { pad: '/apps/vonk.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav'] },
   { pad: '/apps/genootschap.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav'] },
   { pad: '/apps/salon.html', balk: '.rtg-social-commandbar', ook: ['.salon-socialnav'] },

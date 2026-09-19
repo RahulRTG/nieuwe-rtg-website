@@ -9,7 +9,7 @@ const SCHERMEN = [
   ['/apps/foundation/os-publiek.html', 'foundation', { width: 1366, height: 900 }]
 ];
 
-test('LivingOS Home keert vanuit de routevergelijker en een app terug naar het dagelijkse beginscherm',
+test('LivingOS Home keert vanuit de routevergelijker en een app terug naar de vernieuwde momentenfeed',
   { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
@@ -25,14 +25,14 @@ test('LivingOS Home keert vanuit de routevergelijker en een app terug naar het d
         await wacht(page, new URL(page.url()).pathname);
         await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
         await page.waitForLoadState('domcontentloaded');
-        assert.equal(new URL(page.url()).pathname, '/apps/rtg.html', source + ' op ' + width);
-        await wacht(page, '/apps/rtg.html');
-        await page.waitForSelector('[data-rtg-world-dashboard-ready="true"]');
-        assert.equal(await page.locator('#momentenrij').count(), 1, 'het bestaande LivingOS-dashboard staat er');
+        assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', source + ' op ' + width);
+        await wacht(page, '/apps/wereld.html');
+        await page.waitForSelector('.living-intro');
+        assert.equal(await page.locator('#feed').count(), 1, 'de vernieuwde momentenfeed staat er');
         assert.equal(await page.locator('.lo-rail').count(), 0, 'geen routevergelijker als home');
         assert.equal((await meet(page)).bars, 1);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
-        assert.equal(await page.locator('.rtg-edge-mark').getAttribute('href'), '/apps/rtg.html');
+        assert.equal(await page.locator('.rtg-edge-mark').getAttribute('href'), '/apps/wereld.html');
       }
     }
   } finally {
@@ -56,7 +56,7 @@ test('het RTG-beeldmerk blijft intact bij een eerder opgeslagen foutieve Engelse
       }));
     });
     const page = await context.newPage();
-    for (const pad of ['/apps/living-os.html', '/apps/rtg.html']) {
+    for (const pad of ['/apps/living-os.html', '/apps/wereld.html']) {
       await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
       await wacht(page, pad);
       await page.waitForFunction(() => !!window.RTGi18n);

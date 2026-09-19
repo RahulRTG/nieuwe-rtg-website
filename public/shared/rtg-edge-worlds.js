@@ -47,7 +47,7 @@
       ]]
     ], ['vandaag', 'vluchten', 'hotels', 'reisbureau', 'mobiliteit', 'navigatie', 'rit', 'reisboek', 'hangar']),
 
-    living: wereld({ naam: 'LIVING OS', kort: 'LIVING', kaart: 'LivingOS', huis: '/apps/rtg.html', home: '/apps/rtg.html', workspace: '/apps/werkruimte.html?gebied=living', actie: 'Vergelijk werelden' }, [
+    living: wereld({ naam: 'LIVING OS', kort: 'LIVING', kaart: 'LivingOS', huis: '/apps/rtg.html', home: '/apps/wereld.html', workspace: '/apps/werkruimte.html?gebied=living', actie: 'Vergelijk werelden' }, [
       /* Nederlandse namen, afgeleid uit de panelen van living-os.html zelf
          ("ROUTES VERGELIJKEN", "DECISION GRAPH") en niet verzonnen. Hier stond
          Universe / Intent / Worlds / Decisions / Replay: interne view-namen die

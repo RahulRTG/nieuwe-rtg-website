@@ -1707,10 +1707,14 @@ herhaalbaarheid uit `IDEMPROEF.json` -- met risico, herstel en kosten als
 handhavingen, alle drie zakken ze: met de hand gewijzigd is rood (byte voor byte
 hercompileren), een generator die iets anders doet zonder bronwijziging is
 hetzelfde rood, en waar twee bronnen elkaar tegenspreken staat `ONBEPAALD` en
-nooit stil een winnaar. Die derde was meteen nodig: `IDEMPROEF.json` spreekt
-zichzelf 28 keer tegen over dezelfde route (`beschermd` naast `ongemeten`) -- een
-vondst in de bron, op te lossen in blok 5 en hier niet weg te poetsen. **Blok 5 is half een vondst en half een negatief.** De
-HERHALING-kant bestond al: `IDEMBESLUIT.json` verklaart 126 routes in zeven
+nooit stil een winnaar. Die derde was meteen nodig: `IDEMPROEF.json` sprak
+zichzelf 28 keer tegen over dezelfde route (`beschermd` naast `ongemeten`). **Die
+staan sinds 19 september 2026 op nul**, en niet doordat er iets is gladgestreken:
+het register was sinds 14 september niet meer gedraaid, en een verse meting plus
+twintig besluiten erbij haalden de tegenspraak weg. De regel blijft staan -- een
+tegenspraak die terugkomt hoort weer `ONBEPAALD` te worden en geen winnaar te
+krijgen. **Blok 5 is half een vondst en half een negatief.** De
+HERHALING-kant bestond al: `IDEMBESLUIT.json` verklaart 148 routes in zeven
 klassen (met het eerlijke `tebeslissen`), dus die is GEKOPPELD aan de kaart in
 plaats van nagebouwd -- meting en besluit staan er naast elkaar en de toets
 bewaakt dat het besluit de meting niet wegdrukt. De HERSTEL-kant is gemeten

@@ -430,6 +430,25 @@ inhoud die dat nooit was: de speler van Media, de golfvorm van Muziek, de
 knoppenrij van Camera, het briefingpaneel van Salon, en `.ios-nav` op 122
 schermen, met opzet ongemoeid tot het besluit over de hoofdhandeling is genomen.
 
+**Drie schermen zijn onderweg naar een ANDERE, al bestaande overnameweg
+verhuisd, en dat is geen gebrek in de claim maar een tweede route ernaast.**
+salon.html, genootschap.html en pulse.html droegen hun suitebalk en
+suitenavigatie (of sociale commandobalk) toen deze ronde begon; een latere
+wijziging verving die op alle drie door een eigen `.tabs[data-rtg-edge-bar]` of
+`[data-rtg-edge-bar]`-blok, geoogst door het al bestaande
+`public/shared/rtg-edge-appbar.js` naar de casco-appslot (`.rtg-edge-appslot`)
+in plaats van naar het Adaptive-blad. Dat is dezelfde soort overname met een
+andere bestemming, bewaakt door zijn eigen `test/rtg-edge-appbar.test.js`. Op
+salon.html en genootschap.html bleef de oude balk als dode opmaak achter
+(op salon.html letterlijk in de HTML, op genootschap.html zelfs dat niet meer)
+en wordt onvoorwaardelijk verborgen zodra de pagina adaptive-ready is
+(`rtg-first-steps.css`) -- niet meer via een claim met een eigenaar. Voor de
+proeven in deze paragraaf telt dat als: geen platformchrome-contract meer op
+die drie schermen, dus `test/edge-enige-balk.e2e.js` en
+`test/ingebedde-chrome.e2e.js` toetsen ze niet langer; comm.html, vonk.html,
+sociaal.html, cercle.html, meet.html en entourage.html dekken dezelfde
+selectors al.
+
 De declaratieve ingang is:
 
 ```html

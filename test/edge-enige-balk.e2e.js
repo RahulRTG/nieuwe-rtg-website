@@ -29,6 +29,14 @@
       regel te grof is -- en dat is precies het geval dat je niet ziet aankomen.
 
    Draait alleen waar een browser beschikbaar is. Draai: npm run e2e
+
+   genootschap.html, salon.html en pulse.html stonden hier eerder ook in, met
+   dezelfde `.rtg-suitebar`/`.rtg-social-commandbar`. Een latere ronde verving
+   hun sociale-suite-inclusie door `data-rtg-edge-bar`, dat een ANDERE, al
+   bestaande overname-weg volgt (`rtg-edge-appbar.js`, naar de casco-appslot
+   in plaats van het Adaptive-blad) -- bewaakt door `test/rtg-edge-appbar.test.js`
+   en niet door deze proef. Ze zijn hier weggehaald en niet vervangen: vonk.html
+   en sociaal.html dekken dezelfde CLAIM-selectors al.
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -47,8 +55,6 @@ const SCHERMEN = [
   { pad: '/apps/comm.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav', '.rtg-intel-strip'],
     knop: 'Salon', vrijVan: '.comm' },
   { pad: '/apps/vonk.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav'] },
-  { pad: '/apps/genootschap.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav'] },
-  { pad: '/apps/salon.html', balk: '.rtg-social-commandbar', ook: ['.salon-socialnav'] },
   { pad: '/apps/sociaal.html', balk: '.rtg-social-commandbar' },
   { pad: '/apps/luchthaven.html', balk: '.tos-opsnav' },
   { pad: '/apps/ovcontrol.html', balk: '.tos-opsnav' }

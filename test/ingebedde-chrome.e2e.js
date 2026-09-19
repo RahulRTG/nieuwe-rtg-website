@@ -54,17 +54,22 @@ const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, elevateTi
 
 const pw = laadPlaywright();
 
-/* Per scherm: de balken die PLATFORMchrome zijn en dus van de ouder komen. */
+/* Per scherm: de balken die PLATFORMchrome zijn en dus van de ouder komen.
+   salon.html, genootschap.html en pulse.html stonden hier eerder ook in. Een
+   latere ronde (het "eerste stappen"-onboardingsysteem, rtg-first-steps.css)
+   verving hun suitebalk/commandobalk door een eigen `.tabs[data-rtg-edge-bar]`
+   en verbergt de oude balk voortaan ONVOORWAARDELIJK zodra de pagina
+   adaptive-ready is -- niet meer via een claim met een eigenaar. Die drie
+   schermen bewijzen dus geen platformchrome-contract meer en zijn hier
+   weggehaald; comm.html, sociaal.html, vonk.html, cercle.html, meet.html en
+   entourage.html dekken dezelfde SUITE- en commandobalk-selectors al. */
 const SUITE = ['.rtg-suitebar', '.rtg-suitenav'];
 const SCHERMEN = [
   { pad: '/apps/comm.html', weg: SUITE.concat(['.rtg-intel-strip']) },
-  { pad: '/apps/salon.html', weg: ['.rtg-social-commandbar', '.salon-socialnav'] },
   { pad: '/apps/sociaal.html', weg: ['.rtg-social-commandbar'] },
   { pad: '/apps/vonk.html', weg: SUITE },
   { pad: '/apps/cercle.html', weg: SUITE },
   { pad: '/apps/meet.html', weg: SUITE },
-  { pad: '/apps/pulse.html', weg: SUITE },
-  { pad: '/apps/genootschap.html', weg: SUITE },
   { pad: '/apps/entourage.html', weg: SUITE },
   { pad: '/apps/attenties.html', weg: SUITE },
   { pad: '/apps/sociaal-prive.html', weg: SUITE },

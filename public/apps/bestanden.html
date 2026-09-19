@@ -122,19 +122,19 @@
 <main>
 <section id="dailyIntro" aria-label="Bestanden"></section>
   <div class="daily-content">
-  <input class="veld" id="zoek" type="search" placeholder="Zoek in uw bestanden" aria-label="Zoeken"
+  <input class="veld" id="zoek" type="search" placeholder="Zoek in uw bestanden" data-i18n-ph="daily.fileSearch" aria-label="Zoeken"
     style="width:100%;margin-bottom:0.75rem;">
   <div class="sleep">Laat los om te uploaden</div>
   <nav id="pad" aria-label="Mappenpad"></nav>
-  <h2 id="dailyFolders" class="kop">Uw mappen</h2>
+  <h2 id="dailyFolders" data-i18n="daily.folders" class="kop">Uw mappen</h2>
   <div id="mappen"></div>
-  <h2 class="kop">Uw documenten</h2>
+  <h2 class="kop" data-i18n="daily.files">Uw documenten</h2>
   <div id="lijst" aria-live="polite"></div>
   <div id="gedeeldKop" class="kop" style="display:none;">Met mij gedeeld</div>
   <div id="gedeeldLijst"></div>
   <div id="officeKop" class="kop" style="display:none;">Uit RTG Office · werken doet u daar</div>
   <div id="officeLijst"></div>
-  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="kies">Bestand toevoegen <span aria-hidden="true">→</span></button></div>
+  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="kies"><span data-i18n="daily.addFile">Bestand toevoegen</span> <span aria-hidden="true">→</span></button></div>
 <div class="daily-storage">  <div class="rij" style="justify-content:space-between;">
     <span class="stil" id="quotumTekst">&nbsp;</span>
     <select class="veld" id="sorteer" aria-label="Sorteren">
@@ -145,7 +145,7 @@
   </div>
   <div class="meter" aria-hidden="true"><i id="quotumBalk"></i></div>
 </div>
-  <p class="stil h-mt80">Verwijderde bestanden blijven dertig dagen in de prullenbak en tellen mee voor uw opslagruimte. Als u een bestand deelt op codenaam, kan de ander het bekijken en nieuwe versies toevoegen.</p>
+  <p class="stil h-mt80" data-i18n="daily.fileHelp">Verwijderde bestanden blijven dertig dagen in de prullenbak en tellen mee voor uw opslagruimte. Als u een bestand deelt op codenaam, kan de ander het bekijken en nieuwe versies toevoegen.</p>
   </div>
 </main>
 

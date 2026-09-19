@@ -12,6 +12,9 @@
     options = options || {}; retry = options.retry || retry;
     var host = d.getElementById('dailyIntro'); if (!host) return;
     d.body.dataset.dailyState = state;
+    if (state === 'guest') d.querySelectorAll('[data-rtg-edge-bar]').forEach(function (bar) {
+      (bar.matches('button') ? [bar] : bar.querySelectorAll('button')).forEach(function (b) { b.disabled = true; });
+    });
     var signature = [kind, state, options.title || '', d.documentElement.lang].join('|');
     if (last === signature) return; last = signature;
     var empty = state === 'empty' || state === 'guest', label = kind + 'Label';

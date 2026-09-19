@@ -1,5 +1,5 @@
 /* Approved daily rooms, proven with a real empty account and real mutations.
-   A failed read or empty search must never impersonate a first visit. */
+   Failed reads and empty searches are distinct. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -28,10 +28,11 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
       phone: '0612345678', password: 'geheim123', geboortedatum: '1990-02-02', tier: 'rtg' });
     assert.ok(reg.token);
     browser = await pw.chromium.launch(browserOpties(pw));
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block', reducedMotion: 'reduce', timezoneId: 'Europe/Amsterdam' });
     await context.addInitScript(token => { localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     const page = await context.newPage(), errors = [];
     letOpFouten(page, errors);
+    await page.clock.setFixedTime(new Date('2026-09-18T22:30:00Z'));
     async function open(app, state = 'empty') {
       await page.goto(srv.base + '/apps/' + app + '.html', { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('body[data-daily-state="' + state + '"]');
@@ -63,7 +64,6 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), app + ': RTL');
       await page.evaluate(() => document.documentElement.dir = 'ltr');
     }
-    // A new note stays a draft on language switches and failed writes.
     await page.locator('#dailyIntro [data-daily-target="nieuwNotitie"]').click();
     await page.locator('#ntTitel').fill('Voor het weekend');
     await page.locator('#ntTekst').fill('Maak ruimte voor een lange wandeling.');
@@ -79,6 +79,10 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     await page.locator('#ntVast').click();
     await page.waitForSelector('#bord .nkaart.vast');
     assert.equal((await post(srv.base, '/api/notities/mijn', {}, reg.token)).eigen.length, 1);
+    await language(page, 'en', 'English');
+    assert.equal(await page.locator('#zoek').getAttribute('placeholder'), 'Search your notes');
+    assert.match(await page.locator('.daily-foot').textContent(), /New note/);
+    await language(page, 'nl', 'Nederlands');
     await screenshot('notities-filled');
     await page.locator('#zoek').fill('niets-met-deze-naam');
     assert.match(await page.locator('#bord').textContent(), /geen resultaten/);
@@ -104,7 +108,8 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     await open('agenda');
     await page.locator('#dailyIntro [data-daily-target="nieuwBtn"]').click();
     await page.locator('#afTitel').fill('Samen aan tafel');
-    const today = new Date().toISOString().slice(0, 10);
+    const today = '2026-09-19'; // Amsterdam is already on the next civil day.
+    assert.equal(await page.locator('#afDatum').inputValue(), today);
     await page.locator('#afDatum').fill(today);
     await page.locator('#afTijd').fill('19:30');
     await page.locator('#afPlek').fill('Aan het water');
@@ -130,7 +135,6 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     page.once('dialog', d => d.accept('Bewaard'));
     await page.locator('[data-bewaar]').click();
     await page.waitForSelector('[data-saved="true"]');
-    // The semantic action must not depend on the translated button text.
     await language(page, 'nl', 'Nederlands');
     assert.equal((await post(srv.base, '/api/member/pulse/feed', {}, reg.token)).feed.length, 1);
     await page.waitForFunction(() => { const b = document.querySelector('.rtguitvoer-knop'); return b && !!b.closest('.rtg-edge-chrome'); });

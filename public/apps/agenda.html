@@ -141,7 +141,7 @@
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG · LivingOS</span><h1>Uw dag</h1></span>
   <span class="rij" style="margin-left:auto;">
-    <button class="knop" id="icsBtn" aria-label="Agenda exporteren" data-rtg-edge-bar type="button" title="Exporteer als .ics; opent in elke agenda ter wereld">Exporteer</button>
+    <button class="knop" id="icsBtn" aria-label="Agenda exporteren" data-i18n-aria="daily.exportAgenda" data-rtg-edge-bar type="button" title="Exporteer als .ics; opent in elke agenda ter wereld">Exporteer</button>
   </span>
 </header>
 <!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
@@ -159,15 +159,15 @@
     <h2 id="periode"></h2>
     <span class="rek"></span>
     <button class="knop" id="vandaagBtn" data-rtg-edge-bar type="button">Vandaag</button>
-    <button class="knop" id="wDag" type="button" data-rtg-edge-bar>Dag</button>
+    <button class="knop" id="wDag" data-i18n="daily.dayView" type="button" data-rtg-edge-bar>Dag</button>
     <button class="knop" id="wMaand" data-rtg-edge-bar type="button">Maand</button>
     <button class="knop" id="wWeek" data-rtg-edge-bar type="button">Week</button>
     <button class="knop" id="wLijst" data-rtg-edge-bar type="button">Lijst</button>
   </div>
   <div id="dailyWeek" class="daily-week"></div>
   <div id="kal" data-rtg-scroll="agenda-calendar" aria-live="polite"></div>
-  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="nieuwBtn">Plan een afspraak <span aria-hidden="true">→</span></button></div>
-  <details class="daily-planner"><summary>Plan met Rahul in uw eigen woorden</summary>
+  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="nieuwBtn"><span data-i18n="daily.agendaAction">Plan een afspraak</span> <span aria-hidden="true">→</span></button></div>
+  <details class="daily-planner"><summary data-i18n="daily.planner">Plan met Rahul in uw eigen woorden</summary>
   <div class="rahulbalk">
     <input class="veld" id="rahulIn" maxlength="300" placeholder='Zeg het gewoon: "lunch met de notaris vrijdag om 12:30"'
       aria-label="Plan in gewone taal">

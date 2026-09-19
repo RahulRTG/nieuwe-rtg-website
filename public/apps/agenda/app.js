@@ -20,7 +20,8 @@
     clearTimeout(meldT); meldT = setTimeout(function () { m.classList.remove('zie'); }, 3200);
   };
 
-  var vandaag = K.iso(new Date());
+  var nu = new Date();
+  var vandaag = [nu.getFullYear(), String(nu.getMonth() + 1).padStart(2, '0'), String(nu.getDate()).padStart(2, '0')].join('-');
   var stand = { weergave: 'dag', anker: vandaag };
   window.RTGRouteMemory.register('agenda', {
     capture: function () { return { weergave: stand.weergave, anker: stand.anker }; },

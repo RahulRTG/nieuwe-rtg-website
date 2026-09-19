@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-17T18:34:19.157Z",
-    "commit": "f97606414",
+    "op": "2026-09-19T09:26:12.315Z",
+    "commit": "bfcd8be17",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 99,
-  "woorden": 1172,
-  "gevonden": 767,
-  "dekking": 0.6544,
+  "woorden": 1171,
+  "gevonden": 764,
+  "dekking": 0.6524,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -112,7 +112,7 @@
     {
       "naam": "Mall",
       "url": "/apps/mall.html",
-      "woorden": 45,
+      "woorden": 46,
       "gevonden": 29,
       "mist": [
         "gevonden",
@@ -130,6 +130,7 @@
         "tussen",
         "leveranciers",
         "bestellen",
+        "plaatsen",
         "openen"
       ]
     },
@@ -391,8 +392,8 @@
     {
       "naam": "RTDocs",
       "url": "/apps/office.html",
-      "woorden": 28,
-      "gevonden": 21,
+      "woorden": 27,
+      "gevonden": 20,
       "mist": [
         "daarna",
         "gedeeld",
@@ -574,8 +575,8 @@
     {
       "naam": "Video",
       "url": "/apps/clips.html",
-      "woorden": 17,
-      "gevonden": 12,
+      "woorden": 16,
+      "gevonden": 11,
       "mist": [
         "bewerken",
         "knippen",
@@ -672,8 +673,8 @@
     {
       "naam": "Films en series",
       "url": "/apps/theater.html",
-      "woorden": 10,
-      "gevonden": 7,
+      "woorden": 9,
+      "gevonden": 6,
       "mist": [
         "abonnementen",
         "zaal",
@@ -883,6 +884,15 @@
       ]
     },
     {
+      "naam": "Vandaag",
+      "url": "/apps/pulse.html",
+      "woorden": 6,
+      "gevonden": 5,
+      "mist": [
+        "savedheading"
+      ]
+    },
+    {
       "naam": "RTG Veilig",
       "url": "/apps/veilig.html",
       "woorden": 9,
@@ -1038,8 +1048,8 @@
     {
       "naam": "Mijn bestellingen",
       "url": "/apps/mijnmall.html",
-      "woorden": 5,
-      "gevonden": 5,
+      "woorden": 6,
+      "gevonden": 6,
       "mist": []
     },
     {
@@ -1073,13 +1083,6 @@
     {
       "naam": "Uitgaan",
       "url": "/apps/uitgaan.html",
-      "woorden": 7,
-      "gevonden": 7,
-      "mist": []
-    },
-    {
-      "naam": "Vandaag",
-      "url": "/apps/pulse.html",
       "woorden": 7,
       "gevonden": 7,
       "mist": []
@@ -1150,8 +1153,8 @@
     {
       "naam": "Buurtruil",
       "url": "/apps/foundation/buurtruil.html",
-      "woorden": 7,
-      "gevonden": 7,
+      "woorden": 8,
+      "gevonden": 8,
       "mist": []
     },
     {

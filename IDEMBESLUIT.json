@@ -19,9 +19,9 @@
  },
  "telling": {
   "creatie": 45,
-  "berekening": 43,
-  "instelling": 19,
   "beschermd": 15,
+  "berekening": 58,
+  "instelling": 25,
   "code-maker": 4,
   "teller": 1
  },
@@ -447,6 +447,86 @@
   "/api/bank/spaardoel": {
    "klasse": "instelling",
    "reden": "Het spaardoel van een spaarrekening zetten. spaardoelZet() in kern/bank/sparen.js doet `m.doelCenten = centen` en verder niets: twee keer hetzelfde doel zetten laat exact dezelfde stand achter. Gevonden op 30 augustus 2026, en de MANIER waarop is de moeite waard. De opslagmeter noemde hem onbeschermd met als grond \"de eerste oproep gaf een wijziging in bankRekeningen en de herhaling opnieuw +1 in techniek, +6 in wacht\". Lees dat nog eens: de herhaling raakte bankRekeningen NIET. Wat er bewoog waren het techniekjournaal en de wachtrij -- collecties die van het KIJKEN groeien, niet van het werk. Zelfde valstrik als bij de drie routes in lib/mutatiecontracten-wachtrij.js, nu aan de meetkant. De ruisijking van scripts/idemproef-route.js kan ze niet vinden, want die zoekt wat bij ELKE oproep groeit en deze twee tikken alleen op bepaalde poorten -- precies de reden die daar bij `kosten` staat. Ze hier tot ruis verklaren zou echt werk kunnen verbergen: een wachtrij waar een baan in wordt gezet IS werk. Dus blijft de meter tellen en staat het oordeel hier, gelezen uit de handler."
+  },
+  "/api/connect/dossier": {
+   "klasse": "berekening",
+   "reden": "Leest het eigen leerdossier (kern/connect/index.js -> dossier.lees in leerdossier.js). Geen enkele schrijfweg: er is ook geen parameter waarmee je een ander opgeeft, want HDI.md par. 5.1 verbiedt een route die \"alles over deze mens\" teruggeeft zonder dat die mens zelf de aanroep doet."
+  },
+  "/api/connect/horizon": {
+   "klasse": "berekening",
+   "reden": "Leest de horizon via horizon.lees, en die gebruikt `peil` en niet `van`. Dat onderscheid is er met reden: `van` maakt de rij aan, en toen de lezer die gebruikte SCHREEF elke leesroute in db.data -- zonder save(), dus onzichtbaar tot een andere handeling toevallig opsloeg. Schuiven en signalen zijn eigen routes (/schuif, /signaal) en staan hier los van."
+  },
+  "/api/connect/kring/keuzes": {
+   "klasse": "berekening",
+   "reden": "Geeft de lijst kringen die deze mens mag kiezen (kring.keuzes). Zuivere functie over de beschermd-vlag uit de sessie; kern/connect/kring.js raakt db.data nergens aan."
+  },
+  "/api/connect/naklank/tel": {
+   "klasse": "berekening",
+   "reden": "Telt de naklanken van een item (naklank.tel). Peilt en maakt niet aan -- met zoveel woorden in de bron: een tellerrij die ontstaat doordat iemand kijkt, laat de opslag groeien met een rij per bekeken ding."
+  },
+  "/api/connect/ontdek": {
+   "klasse": "berekening",
+   "reden": "De ontdekmixer. Leest de horizon en stelt plekken samen; de trede `gezien` ontstaat hier NIET maar in /api/connect/open -- zie de kop van kern/connect/index.js. Een tweede oproep hoort een verse mix te geven, en dat is de bedoeling van de laag."
+  },
+  "/api/connect/portfolio": {
+   "klasse": "berekening",
+   "reden": "Leest wat een mens naar buiten zou tonen (dossier.portfolio). Apart van /dossier om een inhoudelijke reden -- alles wat aandacht is valt eruit -- en niet omdat het anders schrijft: kern/connect/portfolio.js raakt db.data niet aan."
+  },
+  "/api/connect/uitleg": {
+   "klasse": "berekening",
+   "reden": "De begrijp-kant: werkwoord, bruggen, de motoren en de lijsten. Stelt samen uit vaste lijsten en leest verder niets blijvends. Staat achter auth omdat een open route die de motoren opsomt een gratis kaart van de mixer is, niet omdat er iets te beschermen valt aan een herhaling."
+  },
+  "/api/connect/werk": {
+   "klasse": "instelling",
+   "reden": "Haalt het eigen werk erbij (kern/connect/werkbij.js). Schrijft wel, maar levert bij een tweede oproep geen tweede regel: de treden `gemaakt` en `aangeboden` dragen allebei `eenmalig: true` en hun bron is het werk-id. De module houdt daarom met opzet geen eigen \"tot hier bijgewerkt\"-stand bij, die kan verschuiven en dan stilletjes werk overslaan."
+  },
+  "/api/connect/naklank/weg": {
+   "klasse": "instelling",
+   "reden": "Neemt een naklank terug (naklank.neemTerug). Staat hij er nog, dan wordt hij verwijderd en opgeslagen; staat hij er niet meer, dan komt er `{ ok: true, weg: false }` terug. Twee keer weghalen geeft dus dezelfde eindstand."
+  },
+  "/api/neiging/intake": {
+   "klasse": "berekening",
+   "reden": "De volgende vraag of `klaar`. De route zegt het zelf in de bron: \"Leest alleen.\" Antwoorden loopt over /api/neiging/antwoord en staat hier los van."
+  },
+  "/api/neiging/geheugen": {
+   "klasse": "berekening",
+   "reden": "Geeft terug wat RTG van dit lid denkt te weten. Alleen lezen; wijzigen en wissen lopen over /antwoord en /vergeet."
+  },
+  "/api/neiging/overslaan": {
+   "klasse": "instelling",
+   "reden": "Markeert alle vragen als gesteld (noteerGesteld over VRAGEN). Een tweede oproep markeert dezelfde vragen nog eens en komt op dezelfde eindstand uit; er ontstaat geen tweede overslag."
+  },
+  "/api/neiging/opnieuw": {
+   "klasse": "instelling",
+   "reden": "Zet de lijst gestelde vragen terug op leeg (beheer.opnieuw: gesteldPerActor[actor] = []) en geeft daarna de intake. Twee keer resetten geeft dezelfde eindstand -- een lege lijst nog eens leegmaken verandert niets."
+  },
+  "/api/supplier/onderneming": {
+   "klasse": "berekening",
+   "reden": "De werkvloer kijkt naar de onderneming erachter. De kop van routes/supplier/onderneming.js is er stellig over: deze route LEEST en schrijft niets, en de brug loopt met opzet een kant op -- twee lijsten die elkaar bijwerken hebben geen waarheid meer."
+  },
+  "/api/rtf/connect/dossier": {
+   "klasse": "berekening",
+   "reden": "De gezinsdeur naar dezelfde functie als /api/connect/dossier: dezelfde handler, een andere poort en een andere sleutel (rtf:CODE:profiel). Zou er een tweede motor \"voor gezinnen\" komen, dan kan een kind een ander antwoord krijgen dan een lid zonder dat iemand dat heeft besloten."
+  },
+  "/api/rtf/connect/horizon": {
+   "klasse": "berekening",
+   "reden": "Gezinsdeur naar dezelfde handler als /api/connect/horizon; leest via `peil`."
+  },
+  "/api/rtf/connect/kring/keuzes": {
+   "klasse": "berekening",
+   "reden": "Gezinsdeur naar dezelfde handler als /api/connect/kring/keuzes. De beschermd-vlag komt uit de gezinssessie en nooit uit het lijf -- anders zet een kind hem zelf op false."
+  },
+  "/api/rtf/connect/ontdek": {
+   "klasse": "berekening",
+   "reden": "Gezinsdeur naar dezelfde handler als /api/connect/ontdek."
+  },
+  "/api/rtf/connect/portfolio": {
+   "klasse": "berekening",
+   "reden": "Gezinsdeur naar dezelfde handler als /api/connect/portfolio."
+  },
+  "/api/rtf/connect/werk": {
+   "klasse": "instelling",
+   "reden": "Gezinsdeur naar dezelfde handler als /api/connect/werk; idempotent om dezelfde reden -- de treden dragen `eenmalig: true`."
   }
  }
 }

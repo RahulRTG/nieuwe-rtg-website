@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-09-13",
+  "stempel": "2026-09-19",
   "uitleg": "Wat drie onafhankelijk geschreven ketenproeven werkelijk delen, geteld uit hun registers. De vorm is per definitie gelijk (beide proeven zijn zo geschreven) en zegt dus niets; de actoren en de beloften zeggen wel iets. Zie de kop van scripts/ketenvorm.js.",
   "grens": "Drie ketens is een kleine steekproef, en ze zijn door dezelfde hand geschreven -- gedeelde beloften kunnen dus ook gedeelde gewoonte zijn. Een derde keten van een andere hand zou dat scheiden. De thema-indeling gebruikt een gesloten woordenlijst; wat er niet in past staat in nietIngedeeld en verdwijnt niet.",
   "ketens": [
@@ -45,8 +45,8 @@
       "proef": "scripts/momentproef.js",
       "schakels": 10,
       "storingen": 13,
-      "sluit": false,
-      "bevindingen": 3
+      "sluit": true,
+      "bevindingen": 0
     },
     {
       "naam": "zaaklive",
@@ -62,9 +62,9 @@
       "domein": "fiscaal",
       "proef": "scripts/omzetproef.js",
       "schakels": 7,
-      "storingen": 8,
+      "storingen": 9,
       "sluit": false,
-      "bevindingen": 2
+      "bevindingen": 1
     }
   ],
   "vorm": {
@@ -362,6 +362,11 @@
       },
       {
         "keten": "moment",
+        "storing": "hooguit een keer uitgelicht",
+        "belofte": "een woordelijk gelijk verzoek is een herhaling, een ander verzoek stuit op de toestandscontrole, en er loopt precies EEN uitlichting"
+      },
+      {
+        "keten": "moment",
         "storing": "een wek wordt niet met terugwerkende kracht gewist",
         "belofte": "de ingetrokken uitlichting staat met haar reden in de geschiedenis, de andere loopt door, en de al verstuurde melding blijft staan"
       },
@@ -413,7 +418,7 @@
       {
         "keten": "omzet",
         "storing": "een betaalde bestelling terugstorten",
-        "belofte": "het geld gaat terug EN de boekhouding blijft navolgbaar"
+        "belofte": "de verkoop blijft staan, de terugstorting krijgt een eigen datum, en netto daalt de maand met het bedrag"
       },
       {
         "keten": "omzet",
@@ -440,6 +445,6 @@
     "themasGedeeld": 2,
     "themasBijna": 3,
     "themasTotaal": 10,
-    "nietIngedeeld": 28
+    "nietIngedeeld": 29
   }
 }

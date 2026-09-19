@@ -321,6 +321,134 @@ de lokale vaste chrome van het kind onderdrukt. De hoofdactie in de onderbalk
 is per route expliciet en niet-destructief; een willekeurige eerste knop uit
 `main` is nooit een geldige systeemactie.
 
+#### Platformchrome draagt een marker, en geen selectorlijst
+
+*Vastgelegd op 18 september 2026.*
+
+"De lokale vaste chrome van het kind wordt onderdrukt" stond hierboven als
+belofte en werd waargemaakt door een lijst selectors in
+`public/shared/rtg-edge-system.css`: elke balk bij naam. Dat houdt stand zolang
+iemand eraan denkt een nieuwe balk toe te voegen. **Gemeten in een echt kader
+over 291 unieke schermen** (17 september 2026) stonden er nog zes soorten balk
+in: tien sociale schermen droegen hun eigen suitebalk en suitenavigatie, vier
+ops-schermen hun eigen opsnavigatie, Salon en Sociaal hun eigen commandobalk, en
+Berichten daarbovenop een statusstrook met een eigen commandoknop. In een
+werkvlak stond de bediening daar dus twee keer.
+
+De regel is daarom een **verklaring op de plek waar de chrome gebouwd wordt**:
+
+```html
+<div class="rtg-suitebar" data-rtg-platform-chrome="suite-merkbalk">
+```
+
+```css
+body.rtg-edge-embed [data-rtg-platform-chrome]{display:none!important}
+```
+
+Twee dingen mogen daarbij niet verwateren.
+
+**De marker is voor PLATFORMchrome en niet voor bediening.** Merk, wereld- of
+suitenavigatie en statusstroken komen van de ouder en staan in een embed voor de
+tweede keer. Schermeigen bediening -- de mappen van RTMail, de speler van Media,
+de tabbladen van Rendez-vous -- wordt door de ouder *niet* vervangen; die draagt
+de marker niet, want wegnemen zou de functie onbereikbaar maken en verbergen
+bestaat niet (`ADAPTIEF.md`).
+
+**De ruimte gaat met de balk mee.** Een balk die zijn hoogte op de body
+reserveert (`--suite-top`, `--suite-nav`, `--suite-stack`, `--rtg-intel-height`,
+`--rtg-social-top`) laat anders geen tweede bediening achter maar wel het gat
+waar zij stond.
+
+`test/ingebedde-chrome.e2e.js` bewaakt de uitkomst in een echt iframe, met een
+**besturingsproef** ernaast: dezelfde schermen zonder kader moeten die balken
+wél tonen. Zonder die tweede helft slaagt de toets ook wanneer iemand de balken
+gewoon sloopt, en dan bewaakt hij een verwijdering in plaats van een contract.
+
+#### De Edge neemt een balk over, en meet dat hij er een is
+
+*Vastgelegd op 18 september 2026.*
+
+Buiten een kader gold hetzelfde probleem, alleen groter. **Gemeten over 291
+schermen, wachtend op `data-rtg-adaptive-ready` en niet op een klok**: op 135
+schermen stond naast de Edge nog een eigen vaste balk -- de gedeelde app-kop
+`.ios-nav` op 108, de suitebalk en suitenavigatie op tien, de ops-navigatie van
+Travel op vier, de sociale commandobalk op drie, de statusstrook op een.
+
+De Edge **claimt** zo'n balk nu: `public/shared/rtg-adaptive-edge-claim.js` geeft
+hem `rtg-edge-owned-bar`, `rtg-adaptive-edge.css` verbergt hem, en de `ROOTS` van
+`rtg-adaptive-edge-controls.js` oogsten zijn knoppen naar het Edge-blad. Eén
+klasse, twee gevolgen, geen tweede lijst die uit de pas loopt. De bron blijft in
+de DOM met haar eigen handlers en rechten; de Edge klikt haar aan.
+
+**Maar niet `.ios-nav`, en dat is de duurste regel van deze ronde.** Die kop
+stond in de eerste versie in de lijst -- 108 van de 135 schermen -- en de keten
+zelf liet zien waarom dat niet mag: hij draagt niet alleen navigatie maar ook de
+HOOFDHANDELING van een scherm. `#bewaar` op klankwerk.html is de opslaan-knop,
+`#nieuwLijst` op notities.html maakt een lijst. Geoogst in het blad zijn ze
+bereikbaar, maar wel een tik verder, en opslaan achter een blad zetten is geen
+opruiming maar een functie verplaatsen waar niemand om vroeg. Wat de Edge
+overneemt is daarom wat onmiskenbaar DUBBELE platformbediening is: wereld- en
+suitenavigatie, een merkbalk, een statusstrook. Of `.ios-nav` er alsnog bij
+hoort is een besluit van de eigenaar en geen bouwtaak; wie hem terugzet, regelt
+eerst dat de hoofdhandeling van een scherm in de Edge zelf landt en niet alleen
+in het blad.
+
+Vier regels houden de rest eerlijk, en alle vier komen uit een fout die tijdens
+het bouwen echt is gemaakt:
+
+1. **Een naam is geen balk.** `ios.js` plakt `ios-nav` ook op `header.ritkop` van
+   rit.html, en dat is een hero van 430px met een foto. De claim meet daarom of
+   het ding op dat moment werkelijk een balk is -- vast of plakkend, over de
+   breedte, niet hoger dan een balk. Een hero zakt op de eerste voorwaarde. (Deze
+   grendel is geschreven toen `.ios-nav` nog in de lijst stond; hij blijft staan
+   omdat hij de REGEL bewaakt en niet de lijst -- wie de kop er ooit weer bij
+   zet, vindt hem meteen terug.)
+2. **Wat de Edge niet kan dragen, neemt hij niet over.** Het blad oogst `button`
+   en `a[href]`; een invoerveld kan het niet. Een balk met bedienbare invoer
+   blijft dus staan, en `hidden` telt daarbij als verklaring van de auteur --
+   een veld dat op `hidden` staat maar door een stijlregel toch getekend wordt,
+   hoort de claim niet tegen te houden.
+3. **Eerst alles meten, dan pas markeren.** Claimen verandert de maat: zodra
+   `.rtg-suitebar` de klasse kreeg, ging `--suite-nav` naar nul en was
+   `.rtg-suitenav` in dezelfde lus "geen balk" meer. Die stond daarna onzichtbaar
+   én ongeclaimd op het scherm -- opgeruimd in beeld, functie weg.
+4. **De ruimte gaat mee met de balk.** Nul is daarbij niet altijd het goede
+   getal: `.comm` staat `position:fixed; inset:var(--suite-stack)` en werd door
+   die 116px ook vrijgehouden van de casco-bovenbalk. Op nul liep de titel van
+   Berichten eronder door. De stapel wordt de inzet van de Edge zelf.
+
+`test/edge-enige-balk.e2e.js` bewaakt de uitkomst, met twee grendelproeven
+ernaast: de hero van rit.html blijft staan en de adresbalk van browser.html
+blijft bedienbaar (die tweede is intussen minder scherp dan hij was toen
+`.ios-nav` nog geclaimd werd, maar hij bewaakt dezelfde regel). Zonder die twee
+zou de toets groen staan bij een regel die inhoud opruimt.
+
+Wat na deze ronde overblijft is dus geen dubbele bediening meer op de plekken
+waar de Edge werkelijk vervangt -- de suitebalk, de suitenavigatie, de
+ops-navigatie, de sociale commandobalk, de statusstrook -- plus schermeigen
+inhoud die dat nooit was: de speler van Media, de golfvorm van Muziek, de
+knoppenrij van Camera, het briefingpaneel van Salon, en `.ios-nav` op 122
+schermen, met opzet ongemoeid tot het besluit over de hoofdhandeling is genomen.
+
+**Drie schermen zijn onderweg naar een ANDERE, al bestaande overnameweg
+verhuisd, en dat is geen gebrek in de claim maar een tweede route ernaast.**
+salon.html, genootschap.html en pulse.html droegen hun suitebalk en
+suitenavigatie (of sociale commandobalk) toen deze ronde begon; een latere
+wijziging verving die op alle drie door een eigen `.tabs[data-rtg-edge-bar]` of
+`[data-rtg-edge-bar]`-blok, geoogst door het al bestaande
+`public/shared/rtg-edge-appbar.js` naar de casco-appslot (`.rtg-edge-appslot`)
+in plaats van naar het Adaptive-blad. Dat is dezelfde soort overname met een
+andere bestemming, bewaakt door zijn eigen `test/rtg-edge-appbar.test.js`. Op
+salon.html en genootschap.html bleef de oude balk als dode opmaak achter
+(op salon.html letterlijk in de HTML, op genootschap.html zelfs dat niet meer)
+en wordt onvoorwaardelijk verborgen zodra de pagina adaptive-ready is
+(`rtg-first-steps.css`) -- niet meer via een claim met een eigenaar. Voor de
+proeven in deze paragraaf telt dat als: geen platformchrome-contract meer op
+die drie schermen, dus `test/edge-enige-balk.e2e.js` en
+`test/ingebedde-chrome.e2e.js` toetsen ze niet langer; comm.html, vonk.html,
+sociaal.html, cercle.html, meet.html en entourage.html dekken dezelfde
+selectors al.
+
 De declaratieve ingang is:
 
 ```html

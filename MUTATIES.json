@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-19T08:39:44.778Z",
-    "commit": "523520876",
+    "op": "2026-09-19T13:11:57.462Z",
+    "commit": "8af5be08",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -2372,6 +2372,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "edge-enige-balk.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "edge-system.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3932,6 +3939,13 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "ingebedde-chrome.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "inkoopketen.test.js": {
       "soort": "server",

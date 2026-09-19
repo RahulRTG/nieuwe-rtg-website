@@ -4,6 +4,7 @@
 (function (w, d) {
   'use strict';
   var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav';
+
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
     for (var p = el; p; p = p.parentElement) {
@@ -118,6 +119,14 @@
     }
   }
   function start(rt) {
+    /* NIET ELK BUNDEL LAADT rtg-adaptive-edge-claim.js. index.html -- de oude
+       statische marketingpagina, die zelfstandig blijft draaien naast de
+       app-schil -- somt zijn scripts letterlijk op en mist deze. Zonder de
+       wacht hieronder gooide dat een TypeError die start() halverwege afbrak,
+       en dan komt er nooit een `#contextActions` -- de keten ving dat op
+       experience-rtg.e2e.js. Ontbreekt de module, dan is er ook niets te
+       claimen op die pagina, en dat is geen gebrek maar de eerlijke stand. */
+    if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
     rt.renderControls = function () { render(rt); };
     var frame = 0;
     function refresh() {
@@ -126,6 +135,12 @@
     }
     var observer = new w.MutationObserver(function (records) {
       w.RTGAdaptiveEdgeInput.reflect(rt);
+      /* Een scherm dat zijn balk later pas tekent, hoort er niet buiten te
+         vallen. claim() is stil als er niets te claimen valt en voegt een
+         klasse die er al staat niet opnieuw toe, dus dit wekt zichzelf niet.
+         Dezelfde afwezigheidswacht als in start(): niet elk bundel laadt de
+         module. */
+      if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
       var commandBar = d.querySelector('#rtgCommand .cmd-balk');
       if (commandBar && commandBar.classList.contains('vraagt')) {
         if (rt.questionOwner !== commandBar) {

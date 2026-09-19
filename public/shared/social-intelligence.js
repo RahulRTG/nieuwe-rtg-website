@@ -77,6 +77,9 @@
   function telemetry() {
     var strip = make('section', 'rtg-intel-strip');
     strip.setAttribute('aria-label', 'RTG Intelligence status');
+    /* Statusstrook met een eigen commandoknop: platformchrome. In een
+       werkvlak draagt de rand van de ouder die status al. */
+    strip.setAttribute('data-rtg-platform-chrome', 'intelligence-status');
     var identity = make('div', 'rtg-intel-identity');
     identity.appendChild(make('span', '', 'REALITY ENGINE'));
     identity.appendChild(make('b', '', 'SOCIAL / CONTEXTUAL OS'));

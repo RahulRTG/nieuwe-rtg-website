@@ -33,8 +33,13 @@
     return el;
   }
 
+  /* MERKBALK EN SUITENAVIGATIE ZIJN PLATFORMCHROME. Staat dit scherm in een
+     werkvlak, een venster of een Command-oppervlak, dan heeft de ouder die
+     bediening al en staat zij hier voor de tweede keer. De marker zegt dat
+     hardop; de ene regel in rtg-edge-system.css neemt hem dan weg. */
   var balk = maak('div', 'rtg-suitebar');
   balk.setAttribute('aria-label', 'Sociale commandobalk');
+  balk.setAttribute('data-rtg-platform-chrome', 'suite-merkbalk');
   var merk = maak('a', 'rtg-suitebrand');
   merk.href = '/apps/sociaal.html';
   merk.appendChild(maak('span', 'rtg-suitebrand-mark', 'RTG'));
@@ -51,6 +56,7 @@
 
   var nav = maak('nav', 'rtg-suitenav');
   nav.setAttribute('aria-label', 'Sociale ruimtes');
+  nav.setAttribute('data-rtg-platform-chrome', 'suite-navigatie');
   routes.forEach(function (route) {
     var link = maak('a', 'rtg-suitenav-link');
     link.href = route.href;

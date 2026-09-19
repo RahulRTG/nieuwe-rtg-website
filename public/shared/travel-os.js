@@ -82,6 +82,12 @@
   if (module.operations) {
     var ops = maak('nav', 'tos-opsnav');
     ops.setAttribute('aria-label', 'Travel OS operations');
+    /* SUITENAVIGATIE, DUS PLATFORMCHROME. De ledennavigatie hieronder kijkt
+       naar `ingebed`, maar die leest alleen `?embed=1` en weet dus niets van
+       een gewoon iframe; in een werkvlak zonder dat vlaggetje stond deze
+       balk er nog. De marker hangt aan `rtg-edge-embed`, en die wordt wel
+       door `self !== top` gezet. */
+    ops.setAttribute('data-rtg-platform-chrome', 'travel-opsnavigatie');
     [
       ['Reiziger', '/apps/ov.html'], ['Chauffeur', '/apps/chauffeur.html'],
       ['Luchthaven', '/apps/luchthaven.html'], ['Regie', '/apps/ovcontrol.html']

@@ -1,12 +1,12 @@
 {
   "uitleg": "Gemeten met scripts/connectlus.js; de vraag en de methode staan in de kop van dat bestand. Een gedeelde WERKWOORDNAAM is geen gedeeld gedrag -- dit wijst kandidaten aan, een mens beslist. Lees A nooit zonder D: een domein met negentig bestanden haalt alle acht werkwoorden door zijn omvang.",
   "stempel": {
-    "op": "2026-09-15T20:23:59.707Z",
-    "commit": "d4c190d4f",
+    "op": "2026-09-19T19:08:09.143Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 11,
+    "boomAnders": 54,
     "instrument": "scripts/connectlus.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "werkwoorden": {
     "domeinen": 23,
@@ -241,8 +241,8 @@
       },
       {
         "domein": "kern/salon",
-        "bestanden": 8,
-        "symbolen": 76,
+        "bestanden": 11,
+        "symbolen": 82,
         "werkwoorden": [
           "ontdek",
           "maak",

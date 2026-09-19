@@ -984,9 +984,9 @@ KANTOORMACHT.md) maar wie hij IS, hoe hij binnenkomt en wanneer het systeem juis
 niets moet zeggen. Lees die vóór je aan onboarding, personeelsidentiteit,
 werktoewijzing of een kantoormelding werkt. Blok 0 van KANTOORMACHT.md staat er
 inmiddels als meter (`npm run kantoormacht`, `KANTOORMACHT.json`) en die vervangt
-de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->590<!--/getal-->
-kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->168<!--/getal--> een bewezen mens eisen en
-<!--getal:kantoor.deurGedeeld-->422<!--/getal--> achter de gedeelde code hangen — en
+de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->605<!--/getal-->
+kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->178<!--/getal--> een bewezen mens eisen en
+<!--getal:kantoor.deurGedeeld-->427<!--/getal--> achter de gedeelde code hangen — en
 <!--getal:kantoor.anoniem-->365<!--/getal--> zijn er anoniem uitvoerbaar. Let op de graden: de
 deur-assen komen uit de ROUTER en zijn hard, `anoniem` is lexicaal en dus een
 ONDERgrens — daarom hangt `npm run kantoormacht:controle` (die alleen mag dalen)
@@ -1177,8 +1177,8 @@ in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
-par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4191<!--/getal--> routes met een rol
-zijn er <!--getal:idem.beoordeeld-->1697<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3236<!--/getal--> ongemeten (`IDEMPROEF.json`,
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4219<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->1716<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3256<!--/getal--> ongemeten (`IDEMPROEF.json`,
 levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
@@ -1206,8 +1206,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1697<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1696<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1716<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1715<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -1472,7 +1472,7 @@ de mens mee. `test/wereldregister.test.js` houdt het register fail-closed en
 vergelijkt de kaart met de code, zodat een document dat niet meer klopt de bouw
 laat zakken in plaats van stil verkeerd te blijven staan.
 
-**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — 76
+**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — 101
 onderdelen met hun adres, geschreven uit `MAPPEN` met `npm run wereldlijst` en
 bewaakt door regel 50 van `scripts/check.js`. Wat daar bewust NIET in staat is de
 laag ertussen: welke onderdelen samen "het huishouden" of "zorg en gezin" heten
@@ -1680,7 +1680,7 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3236<!--/getal--> randen,
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3256<!--/getal--> randen,
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
 aantal randen), de activering per functie, de deltapoort die er niets bij laat
 komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
@@ -1707,10 +1707,14 @@ herhaalbaarheid uit `IDEMPROEF.json` -- met risico, herstel en kosten als
 handhavingen, alle drie zakken ze: met de hand gewijzigd is rood (byte voor byte
 hercompileren), een generator die iets anders doet zonder bronwijziging is
 hetzelfde rood, en waar twee bronnen elkaar tegenspreken staat `ONBEPAALD` en
-nooit stil een winnaar. Die derde was meteen nodig: `IDEMPROEF.json` spreekt
-zichzelf 28 keer tegen over dezelfde route (`beschermd` naast `ongemeten`) -- een
-vondst in de bron, op te lossen in blok 5 en hier niet weg te poetsen. **Blok 5 is half een vondst en half een negatief.** De
-HERHALING-kant bestond al: `IDEMBESLUIT.json` verklaart 126 routes in zeven
+nooit stil een winnaar. Die derde was meteen nodig: `IDEMPROEF.json` sprak
+zichzelf 28 keer tegen over dezelfde route (`beschermd` naast `ongemeten`). **Die
+staan sinds 19 september 2026 op nul**, en niet doordat er iets is gladgestreken:
+het register was sinds 14 september niet meer gedraaid, en een verse meting plus
+twintig besluiten erbij haalden de tegenspraak weg. De regel blijft staan -- een
+tegenspraak die terugkomt hoort weer `ONBEPAALD` te worden en geen winnaar te
+krijgen. **Blok 5 is half een vondst en half een negatief.** De
+HERHALING-kant bestond al: `IDEMBESLUIT.json` verklaart 148 routes in zeven
 klassen (met het eerlijke `tebeslissen`), dus die is GEKOPPELD aan de kaart in
 plaats van nagebouwd -- meting en besluit staan er naast elkaar en de toets
 bewaakt dat het besluit de meting niet wegdrukt. De HERSTEL-kant is gemeten
@@ -1803,7 +1807,7 @@ overslaat), en een brug als `taxi -> ride` wordt getoetst tegen de echte routes 
 
 **De doodspoormeter** (`scripts/doodspoor.js`, `DOODSPOOR.json`) vraagt of een
 handeling ergens AANKOMT: van de gemeten bronroutes staan er
-<!--getal:doodspoor.open-->85<!--/getal--> open. Dat is een triagelijst en
+<!--getal:doodspoor.open-->130<!--/getal--> open. Dat is een triagelijst en
 geen beschuldiging (drie betekenissen lopen erin door elkaar, par. 3.3), en
 daarom een meting en nog geen poort. **De eerste gouden keten staat**
 (`scripts/tafelproef.js`, `npm run tafelproef`): de horecaketen van het openen
@@ -2111,14 +2115,14 @@ het meten: de sluiting van het stuur is klein en precies één module leest van
 schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
-in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->5207<!--/getal--> van
-<!--getal:codewereld.paden-->5835<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->5490<!--/getal--> van
+<!--getal:codewereld.paden-->6288<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->19652<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->4727<!--/getal--> require-kanten heen en terug, met de eigen parser
-en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->303<!--/getal--> niet-gelezen bestanden staan er MET reden in
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->22665<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->5742<!--/getal--> require-kanten heen en terug, met de eigen parser
+en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->309<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
 aanroeppositie is geen verwijzing), en iets beweren over welk symbool een route
@@ -2126,22 +2130,22 @@ afhandelt. Twee dingen daar niet wegpoetsen: de brug route -> bestand rustte
 op ÉÉN register, dus de nul tegenspraken erin was `niet vast te stellen` en geen
 groen -- er ligt sinds 3 september een tweede bron naast (`ROUTEBRON.json`, uit de
 ROUTER in plaats van uit de bronboom), de dekking staat op
-<!--getal:codewereld.brugDekkingPct-->88.6<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->1<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
+<!--getal:codewereld.brugDekkingPct-->94.1<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
 dat die meting afdwong: een verschil tussen twee registers van VERSCHILLENDE
 leeftijd is een leeftijdsverschil en geen tegenspraak, en die twee worden nooit
 opgeteld. Verder is het bronbereik voor gedrag
-<!--getal:codewereld.bronGedragPct-->36.9<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
+<!--getal:codewereld.bronGedragPct-->51.4<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
 register iets over gedrag, dus een "80-95% zonder bron te beantwoorden" haalt die
 grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
-<!--getal:codewereld.bronServerPct-->41.9<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->21<!--/getal-->%: over de schermen wisten de registers
+<!--getal:codewereld.bronServerPct-->58.7<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->27.5<!--/getal-->%: over de schermen wisten de registers
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->23716<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
-(<!--getal:graaf.routesMetSymbool-->2987<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+<!--getal:graaf.kanten-->26489<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->3137<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
 <!--getal:graaf.opgelostPct-->25.8<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->14395<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->15706<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
@@ -2149,14 +2153,14 @@ domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> rout
 BEDRADEN worden opgehaald. Het gat is dus grotendeels statisch en niet runtime -- de meting
 keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.json`
 (`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
-zak legt: <!--getal:kern.namen-->1190<!--/getal--> namen over <!--getal:kern.vulplekken-->280<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->28<!--/getal--> plekken die
+zak legt: <!--getal:kern.namen-->1246<!--/getal--> namen over <!--getal:kern.vulplekken-->300<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->29<!--/getal--> plekken die
 niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
-<!--getal:graaf.viaKern-->5660<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.8<!--/getal-->%; de restbak
-van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->361<!--/getal--> aanroepen (0,27%), en
+<!--getal:graaf.viaKern-->5885<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.8<!--/getal-->%; de restbak
+van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->402<!--/getal--> aanroepen (0,27%), en
 daar zat geen raadsel in maar vijf BEKENDE vormen die de meter niet herkende --
 een restbak vol bekende vormen laat je denken dat je code ondoorgrondelijk is
 terwijl je meter te weinig weet. Twee
-dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->3960<!--/getal--> van die kanten wijzen alleen het BESTAND
+dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4079<!--/getal--> van die kanten wijzen alleen het BESTAND
 aan en niet de functie (een fabriek mag `{ walletVoeg: voeg }` teruggeven, en dan
 is de zaknaam niet de symboolnaam), en een parameter die `save` heet wordt NIET
 op zijn naam als kernnaam herkend maar op zijn functie -- alleen de fabrieken die
@@ -2164,16 +2168,16 @@ het register aanwijst leveren zaknamen. Ten tweede telt CODEWERELD.json sinds
 die dag DRIE dingen apart (structuur, relatie, gedrag), omdat een index die elk
 bestand noemt elke dekkingsvraag triviaal waar maakt: dat gebeurde twee keer op
 rij, en het zag er beide keren uit als vooruitgang. Alleen de gedragsteller
-(<!--getal:codewereld.bronGedragPct-->36.9<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
+(<!--getal:codewereld.bronGedragPct-->51.4<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
 voor de schermen pas op gang met `SCHERMGEDRAG.json`, dat per scherm SAMENSTELT
 wat de routes eronder al gemeten hadden (schrijft het, welke rol, wat is het
 bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus
 `schrijft: nee` betekent "verandert niets aan de SERVERKANT" en niet "verandert
-niets"; en de <!--getal:schermgedrag.zonderGrond-->137<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
+niets"; en de <!--getal:schermgedrag.zonderGrond-->141<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
 in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
 dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
-op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
-doelen en eindigde op <!--getal:graaf.doelOnbekend-->0<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
+op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->27<!--/getal-->; de aanroepgraaf begon op 587 onbekende
+doelen en eindigde op <!--getal:graaf.doelOnbekend-->1<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
 in de code. Wat ertussen zat zijn regels die overal gelden -- een pad kan VERDERGAAN (`'/api/agenda/' + id`),
 een pad kan een GEGEVEN zijn in plaats van een doel (in een `.replace()`), en
 vindbaar zijn is niet hetzelfde als BESTAAN (een route zonder vindbaar bestand
@@ -2261,7 +2265,8 @@ het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
 
 ## Structuur en starten (kort)
 
-- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 182 schermen), `apps/foundation/` (de RTFoundation, 71), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html` en geen marketingsite**: wie naar `/` gaat krijgt `/apps/app.html` via een interne herschrijving in `server/middleware/voordeur.js` (bewust geen 302, zodat de nonce-laag er gewoon overheen gaat), en die pagina draagt de inlogpoort zelf. Je komt dus direct bij de inlog
+- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 222 schermen), `apps/foundation/` (de RTFoundation, 85), `apps/juridisch/` (3), `site/` (`404.html`, `passen/` met vijf paspagina's, `werelden/` met vier wereldpagina's, en `start/` met de stijl en het script van de landing), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). Tellingen gemeten op 19 september 2026.
+- **De voordeur is een openbare landing, en `index.html` staat in de REPOSITORYROOT en niet onder `public/`.** Dat is één bron voor twee omgevingen: dat bestand is de canonieke GitHub Pages-pagina, en de Node-server levert hetzelfde bestand uit op `/` via `server/middleware/landing.js`, dat alleen de adressen aanpast die per webroot verschillen (`./public/site/…` wordt `/site/…`, en het productiedomein wordt dezelfde origin). Twee HTML-bestanden zouden na de eerstvolgende ontwerpwijziging uiteenlopen; vandaar één bron. `test/startpagina.test.js` bewaakt de statische Pages-variant. De landing draagt de ankers `#passen` en `#werelden` waar de negen pagina's onder `public/site/` aan hangen, en die pagina's linken er ook naar terug. **De inlog woont op `/apps/app.html`**; de oude bureau-URL's komen daar zonder 302 op uit via `server/middleware/voordeur.js`, zodat de nonce-laag er gewoon overheen gaat
 - `server/` — Node/Express-backend: `server.js`, `accounts.js` (identiteitskluis + codenamen), `db.js`/`seed.js`, `data/` (runtime: db.json, rtg.db, sleutels — **staat in .gitignore, nooit committen**)
 - Starten: `npm start` (vereist Node 22.13+; `node:sqlite` laadt sinds die versie zonder vlag, dus `--experimental-sqlite` is overal weg) → http://localhost:3000
 - AI is optioneel en lokaal-eerst: regelwerk en controleerbare extractie gebruiken geen model; vrije verrijking loopt bij voorkeur via `LOCAL_AI_URL`. `RTG_EXTERNE_AI_UIT=1` sluit externe modellen hard af. Zonder model blijven alle kernprocessen in handmatige werkmodus beschikbaar. Sleutels nooit in de repo of client-side JS zetten.
@@ -2323,7 +2328,7 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 
 ## Wat NIET te doen
 
-- **Geen marketingsite terugbouwen.** De publieke marketingpagina's zijn er bewust uit; `/` komt direct op de inlog uit. Een landingspagina, "over ons", een prijzenpagina of een publieke homepage is dus geen ontbrekend stuk dat je even aanvult — het is een besluit. Alleen terugbouwen als daar expliciet om gevraagd wordt
+- **Geen TWEEDE marketingsite ernaast bouwen.** Er is er één, en het is `index.html` in de repositoryroot plus de negen pagina's onder `public/site/` — zie de structuurparagraaf hierboven. Maak daar dus geen kopie van onder `public/`: twee HTML-voordeuren lopen na de eerstevolgende ontwerpwijziging uiteen, en dat is precies waarom `server/middleware/landing.js` bestaat. Een nieuwe losse landingspagina, "over ons" of prijzenpagina is geen ontbrekend stuk dat je even aanvult — het hoort in de bestaande landing of het is een besluit
 - Geen "verslavende" engagement-patronen (kunstmatige urgentie, oneindige scroll-tricks)
 - **De progressielaag stopt bij 18+.** Alles wat een prestatie bewaart búiten het potje — highscores, ranglijsten, niveaus, prestaties, toernooien, seizoenen — bestaat alleen voor leden die de 18+-poort halen (`volwassen()` in `server/kern/volwassen.js`: een eigen account, door RTG gekeurd — betrouwbaarheidsniveau A3, het identiteitsbewijs is gezien — én 18 of ouder). Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De Arena belooft tieners met zoveel woorden "alles telt alleen binnen het potje; er bestaat geen ranglijst", en School houdt vast aan "leren is geen wedstrijd". De grens staat op één plek in de code (`progressieMag` in `server/kern/spellen/grens.js`, die `volwassen()` leest); nieuwe progressievormen hangen daaraan en krijgen geen eigen kopie van de regel. **Wat hier onder valt is de COMPETITIEVE laag — bewaren om te vergelijken of als stand te laten gelden — en niet een leerdossier** (besluit van 14 september 2026, uitgeschreven in `FOUNDATION.md` par. 5.5 en `SCHOOL.md` par. 11.1): de letterlijke lezing zou betekenen dat School van een kind niets vastlegt, en dat is niet de bescherming die deze grens bedoelt maar het tegenovergestelde. Een leerdossier mag op elke leeftijd bestaan zolang het over de persoon zelf gaat en nooit vergelijkt, geen blijvend niveau-label draagt, alleen leesbaar is voor de leerling en wie al een rechtmatige verhouding tot hem heeft, en aan de codenaam hangt; valt er een van die vier weg, dan geldt `progressieMag` weer. Let op de tweede helft: de gecontroleerde geboortedatum komt pas van het document als de keurder hem bij de goedkeuring overneemt (`server/routes/office/verificaties.js`). Doet hij dat niet, dan is de identiteit wél gezien maar staat de datum nog zoals het lid hem opgaf; RTG iD en de stempoort tonen dat verschil met `leeftijdBron`.
 - Geen nieuwe kleuren of fonts zonder de merkregels hierboven te checken

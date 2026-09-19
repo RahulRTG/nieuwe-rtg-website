@@ -1,13 +1,13 @@
 {
   "stempel": {
-    "op": "2026-09-13T13:59:27.748Z",
-    "commit": "1b5b464c",
+    "op": "2026-09-19T18:56:33.686Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/aicontext.js",
     "node": "v22.22.2"
   },
-  "gemeten": "2026-09-13T13:59:27.788Z",
+  "gemeten": "2026-09-19T18:56:33.740Z",
   "graad": "vermoed",
   "grens": "dit meet de LEDENcontext van Rahul (kern/ai/prompt.js) en verder niets: de werkcontexten (zaak, personeel, kantoor) hebben eigen samenstellers en zijn hier niet gemeten. Het zegt ook niets over wat een model met de context DOET, niets over andere wegen waarlangs gegevens het huis verlaten, en de veldinventaris is lexicaal -- een ledenstaat onder een naam die deze meter niet kent, valt erbuiten. Een lege doorsnede betekent dus \"niet gevonden\", niet \"kan niet bestaan\".",
   "waarom": "de veldinventaris is lexicaal en dus een ONDERgrens: een ledenstaat onder een andere naam valt erbuiten. De muur is hoogstens dunner dan hier staat, nooit dikker.",

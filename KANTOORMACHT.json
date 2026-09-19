@@ -13,21 +13,21 @@
     }
   ],
   "stempel": {
-    "op": "2026-09-09T08:08:39.577Z",
-    "commit": "dee1586f",
+    "op": "2026-09-19T19:03:57.663Z",
+    "commit": "6083f652",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 590,
-    "deurEistMens": 168,
-    "deurGedeeld": 422,
+    "routes": 605,
+    "deurEistMens": 178,
+    "deurGedeeld": 427,
     "zonderBewakerslaag": 3,
-    "handlerKentMens": 130,
+    "handlerKentMens": 141,
     "anoniemUitvoerbaar": 365,
-    "metSpoor": 146,
-    "metReden": 261,
-    "bestanden": 90,
-    "zwaar": 13,
+    "metSpoor": 147,
+    "metReden": 280,
+    "bestanden": 95,
+    "zwaar": 14,
     "zwaarZonderMens": 0,
     "zwaarLezend": 4,
     "zwaarLezendZonderMens": 4,
@@ -51,16 +51,23 @@
     "bron": "IDEMPROEF.json",
     "graad": "vermoed",
     "dekking": {
-      "gemeten": 62,
-      "geenWerk": 273,
+      "gemeten": 81,
+      "geenWerk": 302,
       "geenOpslag": 203,
-      "nietInProef": 52,
-      "totaal": 590
+      "nietInProef": 19,
+      "totaal": 605
     },
-    "dekkingPct": 10.5,
+    "dekkingPct": 13.4,
     "raakt": [
       {
-        "pad": "/api/office/payroll/dekking/land",
+        "pad": "/api/office/bank/rekening/open",
+        "collecties": [
+          "bankRekeningen"
+        ],
+        "opNaam": true
+      },
+      {
+        "pad": "/api/office/payroll/dekking",
         "collecties": [
           "payrollRegels"
         ],
@@ -74,7 +81,7 @@
         "opNaam": false
       },
       {
-        "pad": "/api/office/rechtsvormwacht",
+        "pad": "/api/office/rechten",
         "collecties": [
           "aiTegoed"
         ],
@@ -82,30 +89,18 @@
       }
     ],
     "raaktZonderMens": [
-      "/api/office/payroll/dekking/land",
+      "/api/office/payroll/dekking",
       "/api/office/payroll/regels/haal",
-      "/api/office/rechtsvormwacht"
+      "/api/office/rechten"
     ],
     "blindVoor": [
       {
-        "pad": "/api/office/aidata/export",
-        "waarom": "de route deed werk maar raakte geen gemeten collectie aan"
-      },
-      {
-        "pad": "/api/office/bank/incasso",
+        "pad": "/api/office/bank/incasso/dossier",
         "waarom": "de route deed werk maar raakte geen gemeten collectie aan"
       },
       {
         "pad": "/api/office/bank/krediet/besluit",
         "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 404))"
-      },
-      {
-        "pad": "/api/office/bank/rekening/open",
-        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 400))"
-      },
-      {
-        "pad": "/api/office/bank/rekening/rood",
-        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 400))"
       },
       {
         "pad": "/api/office/bank/salaris/run",
@@ -125,15 +120,15 @@
       },
       {
         "pad": "/api/office/service/machtiging/intrek",
-        "waarom": "staat niet in de proefronde"
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 404))"
       },
       {
         "pad": "/api/office/service/machtiging/tekenbij",
-        "waarom": "staat niet in de proefronde"
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 404))"
       },
       {
         "pad": "/api/office/service/machtigingen",
-        "waarom": "staat niet in de proefronde"
+        "waarom": "de route deed werk maar raakte geen gemeten collectie aan"
       }
     ],
     "grens": "Deze as ziet alleen wat de idempotentieproef WERKELIJK heeft uitgevoerd. Zij wordt nooit opgeteld bij de padas: twee ondergrenzen die verschillende dingen missen, geven samen geen bovengrens. `blindVoor` noemt de zware routes waarover zij zwijgt."
@@ -162,18 +157,18 @@
   "machinerie": {
     "voornemen": {
       "wat": "execution plan: plan, keuring, uitvoeren",
-      "aanKantoorroute": 0,
-      "aanroepersInServer": 2
+      "aanKantoorroute": 2,
+      "aanroepersInServer": 11
     },
     "vierogen": {
       "wat": "tweede handtekening, met de graad van de scheiding",
       "aanKantoorroute": 0,
-      "aanroepersInServer": 4
+      "aanroepersInServer": 5
     },
     "bevoegdheid": {
       "wat": "vier dimensies; delegatie versmalt structureel",
       "aanKantoorroute": 0,
-      "aanroepersInServer": 0
+      "aanroepersInServer": 2
     },
     "simulatie": {
       "wat": "impact vooraf, met de aannames in de uitslag",
@@ -188,7 +183,7 @@
     "schaduw": {
       "wat": "een nieuwe regel loopt eerst mee zonder te blokkeren",
       "aanKantoorroute": 1,
-      "aanroepersInServer": 6
+      "aanroepersInServer": 7
     },
     "rechten": {
       "wat": "machtskaart: nominaal naast effectief",
@@ -324,11 +319,11 @@
     }
   ],
   "deuren": {
-    "officeAuth": 444,
-    "boardroomAuth": 109,
+    "officeAuth": 449,
+    "boardroomAuth": 112,
     "balieAuth": 31,
+    "kluisAuth": 22,
     "techAuth": 16,
-    "kluisAuth": 15,
     "eigenaarAlleen": 10,
     "alleenBaas": 6,
     "naamAuth": 3

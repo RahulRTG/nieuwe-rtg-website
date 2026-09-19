@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-09-02T21:52:50.448Z",
-    "commit": "26d33620",
+    "op": "2026-09-19T19:06:20.794Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 32,
     "instrument": "scripts/zaakwig.js",
     "node": "v22.22.2"
   },
   "hoe": "npm run zaakwig:vast",
   "grens": "Dit is EEN scenario in EEN zaak op drie treden, geen dekking. Het bewijst dat deze keten rondkomt en dat deze invarianten houden -- niet dat elke bestelweg, elk genre of elke betaalvorm klopt. `niet-gedraaid` is hier met opzet geen geslaagde uitslag.",
-  "gemetenOp": "2026-09-02",
+  "gemetenOp": "2026-09-19",
   "treden": [
     {
       "trede": "bestellen",
       "tredeNaam": "Trede 3 · De vloer draait",
       "geldAan": false,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-47EF90",
-      "pickup": "X4LX",
+      "ref": "RTG-O-C5CA58",
+      "pickup": "5UPJ",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -97,8 +97,8 @@
       "tredeNaam": "Trede 4 · Het fundament (de wig)",
       "geldAan": true,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-3ABBE9",
-      "pickup": "WCEF",
+      "ref": "RTG-O-95B6E4",
+      "pickup": "AFAB",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -161,13 +161,13 @@
         },
         {
           "wat": "de betaling hoort bij DEZELFDE bon",
-          "uitleg": "betaald: RTG-O-3ABBE9",
+          "uitleg": "betaald: RTG-O-95B6E4",
           "uitkomst": "ok",
           "goed": true
         },
         {
           "wat": "de zaak ziet DEZELFDE bon",
-          "uitleg": "op ref RTG-O-3ABBE9",
+          "uitleg": "op ref RTG-O-95B6E4",
           "uitkomst": "ok",
           "goed": true
         },
@@ -198,8 +198,8 @@
       "tredeNaam": "Trede 6 · Alles open",
       "geldAan": true,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-C8B121",
-      "pickup": "A4P3",
+      "ref": "RTG-O-FDB186",
+      "pickup": "J6A9",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -262,13 +262,13 @@
         },
         {
           "wat": "de betaling hoort bij DEZELFDE bon",
-          "uitleg": "betaald: RTG-O-C8B121",
+          "uitleg": "betaald: RTG-O-FDB186",
           "uitkomst": "ok",
           "goed": true
         },
         {
           "wat": "de zaak ziet DEZELFDE bon",
-          "uitleg": "op ref RTG-O-C8B121",
+          "uitleg": "op ref RTG-O-FDB186",
           "uitkomst": "ok",
           "goed": true
         },

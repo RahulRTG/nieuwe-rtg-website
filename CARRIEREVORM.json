@@ -1,24 +1,24 @@
 {
   "stempel": {
-    "op": "2026-09-11T20:42:33.209Z",
-    "commit": "7f0359591",
+    "op": "2026-09-19T19:08:01.515Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 51,
     "instrument": "scripts/carrierevorm.js",
     "node": "v22.22.2"
   },
   "uitleg": "Gemeten met scripts/carrierevorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in CARRIERE.md par. 0. Dit meet of de talentdomeinen een DATAVORM delen; of zij een PROCES delen is een andere vraag, waarvoor de ketenproef de vorm is.",
   "grens": "Wat deze meter NIET aantoont: dat de talentdomeinen geen gedeelde LUS hebben -- hij kijkt naar bewaarde VORMEN (velden van objectliteralen) en niet naar werkwoorden, volgorde of uitkomst. Een nul hier zegt dus dat er geen gedeeld OBJECT is, niet dat er geen gedeeld PROCES is; die tweede vraag beantwoordt een ketenproef (scripts/ketenvorm.js). Hij zegt ook niets over de vraag of een domein TERECHT in de lijst staat: DOMEINEN is met opzet ruim, en een domein dat er ten onrechte bij staat verlaagt hooguit de gedeeldheid. En hij leest alleen wat er in de bron STAAT -- een veld dat pas bij runtime ontstaat, ziet hij niet.",
-  "vastgelegd": "2026-09-11",
+  "vastgelegd": "2026-09-19",
   "gemeten": {
-    "vormen": 162,
+    "vormen": 165,
     "domeinen": 15,
-    "velden": 372,
+    "velden": 373,
     "inAlleDomeinen": 0,
     "inMinstensDeHelft": 0,
     "helftDrempel": 8,
     "veldenDomeineigen": 328,
-    "domeineigenPct": 88.2
+    "domeineigenPct": 87.9
   },
   "perDomein": [
     {
@@ -51,7 +51,7 @@
     },
     {
       "domein": "kern/mediaos",
-      "velden": 13
+      "velden": 18
     },
     {
       "domein": "kern/muziek",
@@ -67,7 +67,7 @@
     },
     {
       "domein": "kern/rtfos",
-      "velden": 198
+      "velden": 196
     },
     {
       "domein": "kern/sportclub",
@@ -118,6 +118,15 @@
         "kern/atelier",
         "kern/festival",
         "kern/studio"
+      ]
+    },
+    {
+      "veld": "maker",
+      "domeinen": 3,
+      "waar": [
+        "kern/clips",
+        "kern/festival",
+        "kern/mediaos"
       ]
     },
     {
@@ -235,14 +244,6 @@
     },
     {
       "veld": "huis",
-      "domeinen": 2,
-      "waar": [
-        "kern/atelier",
-        "kern/studio"
-      ]
-    },
-    {
-      "veld": "icon",
       "domeinen": 2,
       "waar": [
         "kern/atelier",

@@ -85,8 +85,8 @@ na te rekenen is en niet in dit document blijft hangen:
 Zes toetsen voor de plek waar élke betaling langskomt is geen versmalling maar
 een blinde vlek. Nagemeten:
 
-- **<!--getal:veranderbereik.blind-->771<!--/getal--> van de
-  <!--getal:veranderbereik.toetsen-->1926<!--/getal--> toetsbestanden hebben geen
+- **<!--getal:veranderbereik.blind-->776<!--/getal--> van de
+  <!--getal:veranderbereik.toetsen-->1940<!--/getal--> toetsbestanden hebben geen
   enkele require-kant naar `server/`.**
 - **1058 starten de server als apart proces**, 995 praten over HTTP.
 

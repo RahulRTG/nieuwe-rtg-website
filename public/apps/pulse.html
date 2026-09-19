@@ -4,7 +4,7 @@
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pulse · RTG</title>
+<title data-i18n="dailyField.pulsePage">Pulse · RTG</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
@@ -85,55 +85,52 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/social-suite.css" rel="stylesheet">
-<link href="/shared/social-intelligence.css" rel="stylesheet">
-<script src="/shared/social-suite.js" defer></script>
-<script src="/shared/social-intelligence.js" defer></script>
-<script src="/shared/social-intelligence-deck.js" defer></script>
-<script src="/shared/social-intelligence-runtime.js" defer></script>
-<script src="/shared/social-intelligence-data.js" defer></script>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/rtg-daily.css" rel="stylesheet">
+<link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="pearl" data-rtg-skin="heritage">
-<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
-  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
-  <div class="os-switcher__links">
-    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
-    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
-    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
-    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
-  </div>
-  <span class="os-switcher__state">Kern verbonden</span>
-</div>
-<header><div><div class="ey">RTG Pulse</div><h1>Pulse</h1></div><span class="negen">9+</span></header>
-<main id="main"><div class="leeg">Laden…</div></main>
-<div class="melding" id="melding"></div>
+<body class="rtg-stijl rtg-daily" data-rtg-daily="pulse" data-rtg-editorial-room="pulse" data-rtg-world="living" data-rtg-eigenvlak="onyx" data-rtg-skin="heritage">
+<header><div><div class="ey" data-i18n="dailyField.pulseBrand">RTG Pulse</div><h1 data-i18n="dailyField.pulse">Pulse</h1></div><span class="negen">9+</span><div data-rtg-edge-bar><button type="button" id="dailyCompose" data-i18n="daily.postNew">Plaats een bericht</button><button type="button" id="dailyFollowing" data-i18n="daily.following" data-s="volgend">Volgend</button><button type="button" id="dailyDiscover" data-i18n="daily.discover" data-s="ontdek">Ontdek mensen</button><button type="button" id="profielKnop" data-i18n="daily.myProfile">Mijn profiel</button><button type="button" id="plankKnop" data-i18n="daily.mySaved">Mijn plank</button></div></header>
+<main id="main"><section id="dailyIntro" aria-label="Pulse" data-i18n-aria="dailyField.pulse"></section><div id="pulseContent" class="daily-content"></div></main>
+<div class="melding" id="melding" role="status"></div>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
      zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
+<script src="/shared/rtg-daily-copy.js"></script>
+<script src="/shared/rtg-daily-fields.js"></script>
+<script src="/shared/rtg-daily.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pulseEnglish={"failed":"Something went wrong.","moodFailed":"We could not load the moods.","deletePost":"Would you like to delete this post?","reportReason":"Why would you like to report this post?","reported":"Thank you. Your report has been received.","editPrompt":"Edit your post. The previous version will remain visible to everyone who can read it.","editedMessage":"Your post is marked as edited. Its previous version remains available.","saveFolder":"In which folder would you like to save this post?","savedFolder":"Saved","mood":"Mood","moodHint":"Your mood today","myWeek":"My week","publish":"Post","replies":"replies","likes":"appreciations","codenameProfile":"CODENAME PROFILE","followers":"followers","unfollow":"Unfollow","follow":"Follow","ownProfile":"This is your profile.","backFeed":"Back to the feed","noPosts":"This codename has not posted yet.","weekMoment":"Moment of the week","saved":"Saved","save":"Save","history":"History","edit":"Edit","delete":"Delete","report":"Report","edited":"edited","none":"None","moodToday":"Your mood today:","moodRemoved":"Your mood has been removed.","birthday":"Happy birthday!","followed":"You are now following this codename.","unfollowed":"You have unfollowed this codename.","version":"Version","now":"Now","savedIn":"Saved in","unsaved":"The post has been removed from your saved posts.","savedHeading":"My saved posts","emptySaved":"You have not saved any posts yet.","privateSaved":"Your saved posts are private. Their authors are not notified."};
+Object.keys(pulseEnglish).forEach(key=>{window.I18N.en['pulse.'+key]=pulseEnglish[key];});
+function T(key,nl){return window.RTGi18n?window.RTGi18n.t('pulse.'+key,nl):nl;}
+function L(key,nl){return '<span data-i18n="pulse.'+esc(key)+'" data-i18n-source="'+esc(nl)+'">'+esc(T(key,nl))+'</span>';}
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
-const roep=(url,body)=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+const roep=(url,body)=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||T('failed','Er ging iets mis.'));e.status=r.status;throw e;}return d;});
 const api=(pad,body)=>roep('/api/member/pulse/'+pad,body);
 const wauw=(pad,body)=>roep('/api/member/wauw/'+pad,body);
-const tijd=iso=>{ const d=new Date(iso), s=(Date.now()-d)/1000; if(s<60)return 'nu'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'u'; return d.getDate()+'/'+(d.getMonth()+1); };
+const tijd=iso=>window.RTGDailyCopy.date(iso,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 const mooi=t=>esc(t).replace(/#([a-z0-9_]{2,30})/gi,'<span class="tag">#$1</span>');
 // de wauw-laag naast de codenaam: de dag-stemming en de verjaardagsglans
 const glans=p=>(p.stemming?' '+esc(p.stemming):'')+(p.jarig?' ':'');
-let SOORT='volgend';
+let SOORT='volgend', DRAFT='', loadVersion=0, composing=false;
+function rememberDraft(){const field=$('#nw');if(field)DRAFT=field.value;}
+function heading(state,options){window.RTGDaily.render('pulse',state,Object.assign({retry:laad},options));}
+window.addEventListener('rtglang',()=>{heading(document.body.dataset.dailyState||'ready');document.querySelectorAll('[data-daily-time]').forEach(el=>el.textContent=tijd(el.dataset.dailyTime));});
+$('#dailyCompose').onclick=async()=>{if(!TOKEN){heading('guest');return;}composing=true;if(!$('#nw'))await laad();heading('ready');const field=$('#nw');if(field){field.closest('.schrijf').hidden=false;field.focus();field.scrollIntoView({block:'center'});}};
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{SOORT=b.dataset.s;composing=false;laad();});
 
 async function toonProfiel(key){
   let p; try{ p=await api('profiel',key?{key}:{}) }catch(e){ return meld(e.message); }
-  FEED=null; PLANK=null;
-  const post=(x)=>'<div class="post"><div class="kop"><span class="wie">'+esc(p.codenaam)+glans(x)+'</span><span class="tijd">'+tijd(x.at)+'</span></div><div class="tekst">'+mooi(x.tekst)+'</div><div class="acts"><button class="knop stil" data-profiel-open="'+x.id+'">'+x.reacties.length+' reacties</button><span class="profiel-waarderingen">'+x.likes+' waarderingen</span></div><div class="reacties" id="pr-'+x.id+'" hidden>'+x.reacties.map(r=>'<div class="reactie"><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+'</div></div>';
-  $('#main').innerHTML='<div class="post profiel-post"><div class="kop"><div><div class="profiel-label">CODENAAMPROFIEL</div><h2 class="profiel-naam">'+esc(p.codenaam)+'</h2></div><span class="tijd">'+p.volgers+' volgers</span></div><div class="acts">'+
-    (!p.zelf?'<button class="knop" id="profielVolg">'+(p.volgIk?'Ontvolgen':'Volgen')+'</button>':'<span class="profiel-eigen">Dit is uw profiel.</span>')+
-    '<button class="knop stil" id="profielTerug">Terug naar de feed</button></div></div>'+
-    (p.posts.length?p.posts.map(post).join(''):'<div class="leeg">Deze codenaam heeft nog niets geplaatst.</div>');
+  rememberDraft(); loadVersion++; heading('ready'); FEED=null; PLANK=null;
+  const post=(x)=>'<div class="post"><div class="kop"><span class="wie" data-user-content>'+esc(p.codenaam)+glans(x)+'</span><span class="tijd" translate="no" data-daily-time="'+esc(x.at)+'">'+tijd(x.at)+'</span></div><div class="tekst" data-user-content>'+mooi(x.tekst)+'</div><div class="acts"><button class="knop stil" data-profiel-open="'+x.id+'">'+x.reacties.length+' '+L('replies','reacties')+'</button><span class="profiel-waarderingen">'+x.likes+' '+L('likes','waarderingen')+'</span></div><div class="reacties" id="pr-'+x.id+'" hidden>'+x.reacties.map(r=>'<div class="reactie" data-user-content><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+'</div></div>';
+  $('#pulseContent').innerHTML='<div class="post profiel-post"><div class="kop"><div><div class="profiel-label">'+L('codenameProfile','CODENAAMPROFIEL')+'</div><h2 class="profiel-naam" data-user-content>'+esc(p.codenaam)+'</h2></div><span class="tijd">'+p.volgers+' '+L('followers','volgers')+'</span></div><div class="acts">'+
+    (!p.zelf?'<button class="knop" id="profielVolg">'+(p.volgIk?L('unfollow','Ontvolgen'):L('follow','Volgen'))+'</button>':'<span class="profiel-eigen">'+L('ownProfile','Dit is uw profiel.')+'</span>')+
+    '<button class="knop stil" id="profielTerug">'+L('backFeed','Terug naar de feed')+'</button></div></div>'+
+    (p.posts.length?p.posts.map(post).join(''):'<div class="leeg">'+L('noPosts','Deze codenaam heeft nog niets geplaatst.')+'</div>');
   $('#profielTerug').onclick=laad;
   const volg=$('#profielVolg'); if(volg) volg.onclick=async()=>{ try{ await api('volg',{key}); toonProfiel(key); }catch(e){ meld(e.message); } };
   document.querySelectorAll('[data-profiel-open]').forEach(b=>b.onclick=()=>{ const el=$('#pr-'+b.dataset.profielOpen); el.hidden=!el.hidden; });
@@ -161,75 +158,79 @@ if(window.RTGUitvoer) RTGUitvoer.bron(function(){
 });
 
 async function laad(){
-  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:0.5rem;font-size:.9rem;">Pulse is de ledenfeed van RTG, op codenaam.</p></div>'; return; }
-  let d; try{ d=await api('feed',{soort:SOORT}); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  if(!TOKEN){ heading('guest'); return; }
+  rememberDraft(); const version=++loadVersion;
+  let d; try{ d=await api('feed',{soort:SOORT}); }catch(e){ if(version===loadVersion){heading('error');meld(e.message);} return; }
+  if(version!==loadVersion)return;
+  rememberDraft();
+  const first=!d.feed.length&&!d.volgend&&SOORT==='volgend'&&!composing;
+  heading(first?'empty':'ready');
+  document.querySelectorAll('[data-s]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.s===SOORT)));
   FEED=d; PLANK=null;
-  let h='<div class="schrijf"><textarea id="nw" maxlength="280" placeholder="Wat wil je delen? (op je codenaam, 9+)"></textarea><div class="voet"><button class="knop stil" id="stemKnop" title="Je stemming van vandaag">stemming</button><button class="knop stil" id="terugKnop">mijn week</button><span class="teller" id="teller">280</span><button class="knop" id="plaats" data-hoofdactie>Plaatsen</button></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden style="margin-top:.6rem;font-size:.88rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
-  h+='<div class="tabs"><button class="tab'+(SOORT==='volgend'?' aan':'')+'" data-s="volgend">Volgend ('+d.volgend+')</button><button class="tab'+(SOORT==='ontdek'?' aan':'')+'" data-s="ontdek">Ontdek</button><button class="tab" id="profielKnop">Mijn profiel</button><button class="tab" id="plankKnop">Mijn plank</button></div>';
+  let h='<div class="schrijf"'+(first?' hidden':'')+'><textarea id="nw" maxlength="280" aria-label="Wat wilt u delen?" data-i18n-aria="daily.postPrompt" data-i18n-ph="daily.postPrompt" placeholder="Wat wilt u delen?"></textarea><div class="voet"><button class="knop stil" id="stemKnop" title="Je stemming van vandaag" data-i18n-title="pulse.moodHint">'+L('mood','Stemming')+'</button><button class="knop stil" id="terugKnop">'+L('myWeek','Mijn week')+'</button><span class="teller" id="teller">280</span><button class="knop" id="plaats">'+L('publish','Plaatsen')+'</button></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden style="margin-top:.6rem;font-size:.88rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
   if(d.trending.length) h+='<div class="trend">'+d.trending.map(t=>'<span>#'+esc(t.tag)+' · '+t.n+'</span>').join('')+'</div>';
   // het Moment van de week: een enkel lichtpunt, geen ranglijst
-  if(SOORT==='ontdek'&&d.moment) h+='<div class="post" style="border-color:var(--gold);"><div class="kop"><button class="wie" data-profiel="'+esc(d.moment.eigen?'':d.moment.van)+'">Moment van de week · '+esc(d.moment.codenaam)+glans(d.moment)+'</button><span class="tijd">'+d.moment.likes+'</span></div><div class="tekst">'+mooi(d.moment.tekst)+'</div></div>';
+  if(SOORT==='ontdek'&&d.moment) h+='<div class="post" style="border-color:var(--gold);"><div class="kop"><button class="wie" data-user-content data-profiel="'+esc(d.moment.eigen?'':d.moment.van)+'">'+L('weekMoment','Moment van de week')+' · '+esc(d.moment.codenaam)+glans(d.moment)+'</button><span class="tijd" translate="no">'+d.moment.likes+'</span></div><div class="tekst" data-user-content>'+mooi(d.moment.tekst)+'</div></div>';
   h+= d.feed.length ? d.feed.map(p=>{
     const acts='<div class="acts">'+
-      '<button class="knop stil'+(p.mijnLike?' aan':'')+'" data-like="'+p.id+'">'+p.likes+'</button>'+
-      '<button class="knop stil" data-open="'+p.id+'">'+p.reacties.length+'</button>'+
-      '<button class="knop stil" data-bewaar="'+p.id+'">'+(p.bewaard?'bewaard':'bewaar')+'</button>'+(p.versies?'<button class="knop stil" data-hist="'+p.id+'">geschiedenis ('+p.versies+')</button>':'')+(p.eigen?'<button class="knop stil" data-bew="'+p.id+'">bewerken</button><button class="knop stil" data-weg="'+p.id+'">verwijderen</button>'
-        :(SOORT==='ontdek'?'<button class="knop stil" data-volg="'+p.van+'">+ volgen</button>':'')+'<button class="knop stil" data-meld="'+p.id+'">melden</button>')+'</div>';
-    const reacties='<div class="reacties" id="re-'+p.id+'" hidden>'+p.reacties.map(r=>'<div class="reactie"><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+
-      '<div class="rrij"><input id="ri-'+p.id+'" maxlength="280" placeholder="Reageer (9+)"><button class="knop" data-re="'+p.id+'">→</button></div></div>';
-    return '<div class="post"><div class="kop"><button class="wie" data-profiel="'+esc(p.eigen?'':p.van)+'">'+esc(p.codenaam)+glans(p)+'</button><span class="tijd">'+tijd(p.at)+(p.bewerkt?' · bewerkt':'')+'</span></div><div class="tekst">'+mooi(p.tekst)+'</div>'+acts+reacties+'</div>';
-  }).join('')+'<div class="klaar">Je bent bij. Meer is er niet - en dat is precies de bedoeling.</div>'
-  : '<div class="leeg">'+(SOORT==='volgend'?'Je volgt nog niemand.<br>Kijk bij Ontdek en volg een paar codenamen.':'Nog geen berichten. Wees de eerste!')+'</div>';
-  $('#main').innerHTML=h;
-  const nw=$('#nw'), teller=$('#teller');
-  nw.addEventListener('input',()=>{ const n=280-nw.value.length; teller.textContent=n; teller.classList.toggle('vol',n<20); });
-  $('#plaats').onclick=async()=>{ const t=nw.value.trim(); if(!t) return; try{ await api('post',{tekst:t}); laad(); }catch(e){ meld(e.message); } };
+      '<button aria-label="Waarderen" data-i18n-aria="daily.appreciate" aria-pressed="'+p.mijnLike+'" class="knop stil'+(p.mijnLike?' aan':'')+'" data-like="'+p.id+'"><span aria-hidden="true">♡ </span>'+p.likes+'</button>'+
+      '<button aria-label="Reacties bekijken" data-i18n-aria="daily.viewReplies" class="knop stil" data-open="'+p.id+'"><span aria-hidden="true">↳ </span>'+p.reacties.length+'</button>'+
+      '<button class="knop stil" data-bewaar="'+p.id+'" data-saved="'+p.bewaard+'">'+(p.bewaard?L('saved','bewaard'):L('save','bewaar'))+'</button>'+(p.versies?'<button class="knop stil" data-hist="'+p.id+'">'+L('history','geschiedenis')+' ('+p.versies+')</button>':'')+(p.eigen?'<button class="knop stil" data-bew="'+p.id+'">'+L('edit','bewerken')+'</button><button class="knop stil" data-weg="'+p.id+'">'+L('delete','verwijderen')+'</button>'
+        :(SOORT==='ontdek'?'<button class="knop stil" data-volg="'+p.van+'">+ '+L('follow','volgen')+'</button>':'')+'<button class="knop stil" data-meld="'+p.id+'">'+L('report','melden')+'</button>')+'</div>';
+    const reacties='<div class="reacties" id="re-'+p.id+'" hidden>'+p.reacties.map(r=>'<div class="reactie" data-user-content><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+
+      '<div class="rrij"><input id="ri-'+p.id+'" maxlength="280" placeholder="Schrijf een reactie" aria-label="Schrijf een reactie" data-i18n-ph="daily.replyPrompt" data-i18n-aria="daily.replyPrompt"><button class="knop" aria-label="Reactie plaatsen" data-i18n-aria="daily.sendReply" data-re="'+p.id+'">→</button></div></div>';
+    return '<article class="post"><div class="kop"><span class="daily-avatar" aria-hidden="true" data-user-content>'+esc(Array.from(p.codenaam||'·')[0])+'</span><button class="wie" data-user-content data-profiel="'+esc(p.eigen?'':p.van)+'">'+esc(p.codenaam)+glans(p)+'</button><span class="tijd"><span translate="no" data-daily-time="'+esc(p.at)+'">'+tijd(p.at)+'</span>'+(p.bewerkt?' · '+L('edited','bewerkt'):'')+'</span></div><div class="tekst" data-user-content>'+mooi(p.tekst)+'</div>'+acts+reacties+'</article>';
+  }).join('')+'<div class="klaar">'+window.RTGDailyCopy.text('feedEnd')+'</div>'
+  : (first?'':'<p class="leeg">'+window.RTGDailyCopy.text(SOORT==='volgend'?'emptyFeed':'emptyDiscover')+'</p>');
+  $('#pulseContent').innerHTML=h;
+  const nw=$('#nw'), teller=$('#teller'); nw.value=DRAFT; teller.textContent=280-nw.value.length;
+  nw.addEventListener('input',()=>{ DRAFT=nw.value; const n=280-nw.value.length; teller.textContent=n; teller.classList.toggle('vol',n<20); });
+  $('#plaats').onclick=async()=>{const t=nw.value.trim(),button=$('#plaats');if(!t||button.disabled)return;button.disabled=true;nw.disabled=true;try{await api('post',{tekst:t});DRAFT='';nw.value='';composing=false;await laad();}catch(e){meld(e.message);}finally{button.disabled=false;nw.disabled=false;}};
   // de stemmingkiezer: een dag-emoji uit de vaste 9+-lijst, overal zichtbaar naast je codenaam
   $('#stemKnop').onclick=async()=>{ const rij=$('#stemRij');
     if(rij.hidden){ try{ const s=await wauw('stemming',{});
-      rij.innerHTML=(s.keuzes||[]).map(e=>'<button class="knop stil" data-stem="'+e+'">'+e+'</button>').join('')+'<button class="knop stil" data-stem="">geen</button>';
-      rij.querySelectorAll('[data-stem]').forEach(b=> b.onclick=async()=>{ try{ await wauw('stemming/zet',{emoji:b.dataset.stem}); meld(b.dataset.stem?'Je stemming van vandaag: '+b.dataset.stem:'Stemming weggehaald.'); laad(); }catch(e){ meld(e.message); } });
-    }catch(e){ meld('Kon de stemmingen niet laden.'); } }
+      rij.innerHTML=(s.keuzes||[]).map(e=>'<button class="knop stil" data-stem="'+e+'">'+e+'</button>').join('')+'<button class="knop stil" data-stem="">'+L('none','Geen')+'</button>';
+      rij.querySelectorAll('[data-stem]').forEach(b=> b.onclick=async()=>{ try{ await wauw('stemming/zet',{emoji:b.dataset.stem}); meld(b.dataset.stem?T('moodToday','Uw stemming vandaag:')+' '+b.dataset.stem:T('moodRemoved','Uw stemming is weggehaald.')); laad(); }catch(e){ meld(e.message); } });
+    }catch(e){ meld(T('moodFailed','Kon de stemmingen niet laden.')); } }
     rij.hidden=!rij.hidden; };
   // De Terugblik: jouw sociale week, om te vieren -- geen ranglijst
   $('#terugKnop').onclick=async()=>{ const box=$('#terugBox');
     if(box.hidden){ try{ const t=await wauw('terugblik',{});
-      box.innerHTML=''+esc(t.zin)+(t.jarig?' En...  van harte gefeliciteerd!':'');
+      box.innerHTML=''+esc(t.zin)+(t.jarig?' '+esc(T('birthday','Van harte gefeliciteerd!')):'');
     }catch(e){ box.textContent=e.message; } }
     box.hidden=!box.hidden; };
-  document.querySelectorAll('.tab').forEach(b=> b.onclick=()=>{ SOORT=b.dataset.s; laad(); });
   document.querySelectorAll('[data-profiel]').forEach(b=> b.onclick=()=>toonProfiel(b.dataset.profiel||null));
   document.querySelectorAll('[data-like]').forEach(b=> b.onclick=async()=>{ try{ await api('like',{id:b.dataset.like}); laad(); }catch(e){ meld(e.message); } });
   document.querySelectorAll('[data-open]').forEach(b=> b.onclick=()=>{ const el=$('#re-'+b.dataset.open); el.hidden=!el.hidden; });
   document.querySelectorAll('[data-re]').forEach(b=> b.onclick=async()=>{ const i=$('#ri-'+b.dataset.re); const t=i.value.trim(); if(!t)return; try{ await api('reactie',{id:b.dataset.re,tekst:t}); laad(); }catch(e){ meld(e.message); } });
-  document.querySelectorAll('[data-weg]').forEach(b=> b.onclick=async()=>{ if(!confirm('Dit bericht verwijderen?'))return; try{ await api('weg',{id:b.dataset.weg}); laad(); }catch(e){ meld(e.message); } });
-  document.querySelectorAll('[data-volg]').forEach(b=> b.onclick=async()=>{ try{ const r=await api('volg',{key:b.dataset.volg}); meld(r.volgIk?'Je volgt deze codenaam nu.':'Ontvolgd.'); laad(); }catch(e){ meld(e.message); } });
-  document.querySelectorAll('[data-meld]').forEach(b=> b.onclick=async()=>{ const reden=prompt('Waarom meld je dit bericht?',''); if(reden==null)return; try{ await api('meld',{id:b.dataset.meld,reden}); meld('Gemeld. Dank je; zo blijft Pulse 9+.'); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-weg]').forEach(b=> b.onclick=async()=>{ if(!confirm(T('deletePost','Dit bericht verwijderen?')))return; try{ await api('weg',{id:b.dataset.weg}); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-volg]').forEach(b=> b.onclick=async()=>{ try{ const r=await api('volg',{key:b.dataset.volg}); meld(r.volgIk?T('followed','U volgt deze codenaam nu.'):T('unfollowed','U volgt deze codenaam niet meer.')); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-meld]').forEach(b=> b.onclick=async()=>{ const reden=prompt(T('reportReason','Waarom meld je dit bericht?'),''); if(reden==null)return; try{ await api('meld',{id:b.dataset.meld,reden}); meld(T('reported','Dank u. Uw melding is ontvangen.')); }catch(e){ meld(e.message); } });
   /* Bewerken en bewaren: elders de betaalde functies van een microblog.
      Een bewerking is nooit onzichtbaar -- de vorige versie blijft leesbaar
      voor iedereen die het bericht mag zien. */
   document.querySelectorAll('[data-bew]').forEach(b=> b.onclick=async()=>{
     const post=d.feed.find(x=>x.id===b.dataset.bew); if(!post) return;
-    const t=prompt('Pas je bericht aan. De vorige versie blijft leesbaar voor iedereen.',post.tekst);
+    const t=prompt(T('editPrompt','Pas uw bericht aan. De vorige versie blijft leesbaar voor iedereen die het bericht kan bekijken.'),post.tekst);
     if(t==null) return;
-    try{ await api('bewerk',{id:b.dataset.bew,tekst:t}); meld('Aangepast. Er staat nu "bewerkt" bij, en de vorige versie blijft te lezen.'); laad(); }catch(e){ meld(e.message); } });
+    try{ await api('bewerk',{id:b.dataset.bew,tekst:t}); meld(T('editedMessage','Uw bericht is als bewerkt gemarkeerd. De vorige versie blijft beschikbaar.')); laad(); }catch(e){ meld(e.message); } });
   document.querySelectorAll('[data-hist]').forEach(b=> b.onclick=async()=>{
     try{ const h=await api('versies',{id:b.dataset.hist});
-      meld(h.versies.map((v,i)=>'Versie '+(i+1)+': '+v.tekst).join('  |  ')+'  |  Nu: '+h.nu);
+      meld(h.versies.map((v,i)=>T('version','Versie')+' '+(i+1)+': '+v.tekst).join('  |  ')+'  |  '+T('now','Nu')+': '+h.nu);
     }catch(e){ meld(e.message); } });
   document.querySelectorAll('[data-bewaar]').forEach(b=> b.onclick=async()=>{
-    const aan=b.textContent==='bewaar';
-    const map=aan?(prompt('In welke map? (leeg = Bewaard)','Bewaard')||'Bewaard'):null;
-    try{ const r=await api('bewaar',{id:b.dataset.bewaar,map}); meld(r.bewaard?'Op je plank, in "'+r.map+'".':'Van je plank af.'); laad(); }catch(e){ meld(e.message); } });
+    const aan=b.dataset.saved!=='true';
+    let map=null;if(aan){map=prompt(T('saveFolder','In welke map wilt u dit bericht bewaren?'),T('savedFolder','Bewaard'));if(map===null)return;map=map.trim()||T('savedFolder','Bewaard');}
+    try{ const r=await api('bewaar',{id:b.dataset.bewaar,map}); meld(r.bewaard?T('savedIn','Bewaard in')+' "'+r.map+'".':T('unsaved','Het bericht is uit uw bewaarde berichten verwijderd.')); laad(); }catch(e){ meld(e.message); } });
   $('#plankKnop').onclick=async()=>{
     try{ const pl=await api('bewaard',{});
-      PLANK=pl;
-      $('#main').innerHTML='<div class="post" style="padding:1rem;"><h2>Mijn plank</h2>'+
+      rememberDraft(); loadVersion++; heading('ready'); PLANK=pl;
+      $('#pulseContent').innerHTML='<div class="post" style="padding:1rem;"><h2>'+L('savedHeading','Mijn plank')+'</h2>'+
         (pl.mappen.length?'<div class="trend">'+pl.mappen.map(m=>'<span>'+esc(m.naam)+' · '+m.aantal+'</span>').join('')+'</div>':'')+
-        (pl.bewaard.length?pl.bewaard.map(x=>'<div class="post"><div class="kop"><span class="wie">'+esc(x.codenaam)+'</span><span class="tijd">'+esc(x.map)+'</span></div><div class="tekst">'+mooi(x.tekst)+'</div></div>').join('')
-          :'<div class="leeg">Je plank is nog leeg.</div>')+
-        '<div class="h-mt80"><button class="knop" id="plankTerug">Terug naar de feed</button></div>'+
-        '<p style="color:var(--muted);font-size:.8rem;margin-top:0.5rem;">Wat je bewaart is prive: de schrijver merkt er niets van.</p></div>';
+        (pl.bewaard.length?pl.bewaard.map(x=>'<div class="post"><div class="kop"><span class="wie" data-user-content>'+esc(x.codenaam)+'</span><span class="tijd" translate="no">'+esc(x.map)+'</span></div><div class="tekst" data-user-content>'+mooi(x.tekst)+'</div></div>').join('')
+          :'<div class="leeg">'+L('emptySaved','U heeft nog geen berichten bewaard.')+'</div>')+
+        '<div class="h-mt80"><button class="knop" id="plankTerug">'+L('backFeed','Terug naar de feed')+'</button></div>'+
+        '<p style="color:var(--muted);font-size:.8rem;margin-top:0.5rem;">'+L('privateSaved','Uw bewaarde berichten zijn prive. De schrijver krijgt geen melding.')+'</p></div>';
       $('#plankTerug').onclick=()=>laad();
     }catch(e){ meld(e.message); } };
   $('#profielKnop').onclick=()=>toonProfiel(null);

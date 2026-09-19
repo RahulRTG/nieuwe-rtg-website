@@ -41,12 +41,12 @@ test('Notities: lijst bouwen, afvinken op de kaart, delen en samen bijwerken',
         localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       }, token);
       await page.goto(base + '/apps/notities.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#nieuwLijst', { timeout: 15000 });
+      await page.waitForSelector('body[data-rtg-adaptive-ready="true"]', { timeout: 15000 });
     };
 
     /* ---- A bouwt een lijst met Enter ---- */
     await als(regA.token);
-    await page.click('#nieuwLijst');
+    await require('./helper').edgeBediening(page, '+ Lijst');
     await page.waitForSelector('#ntScrim.open', { timeout: 5000 });
     await page.fill('#ntTitel', 'Weekend');
     for (const punt of ['Citroenen', 'IJs', 'Bloemen']) {

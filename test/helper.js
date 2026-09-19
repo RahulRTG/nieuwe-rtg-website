@@ -1359,6 +1359,11 @@ async function edgeActies(page) {
   await page.waitForSelector('.rtg-adaptive-controls', { state: 'attached' });
 }
 
+async function edgeBediening(page, naam) {
+  await edgeActies(page);
+  await page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam, exact: true }).click();
+}
+
 async function edgeWerkbladen(page) {
   if (await page.locator('.rtg-edge-faces').count())
     await page.locator('[data-edge-command-bank]:visible').click();
@@ -1394,7 +1399,7 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { edgeActies, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

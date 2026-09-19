@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-17T14:10:30.858Z",
-    "commit": "2d4a48e6",
+    "op": "2026-09-19T08:39:44.778Z",
+    "commit": "523520876",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -255,6 +255,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "agenda.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "agenda.test.js": {
@@ -916,6 +923,13 @@
       "operator": "+->-#1",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "bestanden.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bestanden.test.js": {
       "soort": "server",
@@ -2047,6 +2061,13 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "daily-rooms.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "db-redis-mirror.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2753,6 +2774,13 @@
       "gezakt": 20,
       "geprobeerd": 2
     },
+    "first-steps.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "fiscaal-aansluiting.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3455,6 +3483,20 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 3
+    },
+    "heritage-context.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "heritage-intelligence.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "heritage-truth.test.js": {
       "soort": "puur",
@@ -4389,6 +4431,13 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "ledenschermen.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "leerpaspoort-scherm.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4453,6 +4502,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "leven.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "levenbandroutes.test.js": {
@@ -5575,6 +5631,13 @@
       "gezakt": 1,
       "geprobeerd": 10
     },
+    "notities.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "notities.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6486,6 +6549,13 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "premium.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
     "productie-installatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6763,6 +6833,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "reisschermen.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
       "scherp": "gezakt"
     },
     "reiswereld.test.js": {
@@ -8611,6 +8688,14 @@
       "module": "server/techniek.js",
       "operator": "!==->===#0",
       "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "tekstbinding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/tekstoppervlak.js",
+      "operator": "false->true#0",
+      "gezakt": 3,
       "geprobeerd": 2
     },
     "tenant.test.js": {

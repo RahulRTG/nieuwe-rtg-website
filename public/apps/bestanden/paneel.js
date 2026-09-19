@@ -40,7 +40,7 @@
     ['bkDeelWrap'].forEach(function (i) { $('#' + i).style.display = open.vanMij ? '' : 'none'; });
     $('#bkMap').style.display = open.vanMij ? '' : 'none';
     $('#bkGedeeld').textContent = (open.gedeeldMet || []).length ? 'Gedeeld met: ' + open.gedeeldMet.join(', ') : '';
-    $('#bkSter').textContent = open.ster ? 'Ster eraf' : 'Ster';
+    window.RTGDailyFields.set($('#bkSter'), open.ster ? 'unstar' : 'star');
     $('#bkSter').style.display = open.vanMij ? '' : 'none';
     $('#bkBewaar').style.display = open.vanMij ? '' : 'none';
     $('#bkWeg').textContent = !open.vanMij ? 'Haal mij eraf' : (open.weg ? 'Voorgoed weg' : 'Verwijder');

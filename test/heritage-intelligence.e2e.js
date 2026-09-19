@@ -81,6 +81,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         await page.goto(server.base + '/apps/agenda.html', { waitUntil: 'domcontentloaded' });
         await ready(page);
         await page.waitForFunction(() => document.querySelector('#periode').textContent.trim());
+        await page.locator('.daily-planner summary').click();
         const opdracht = 'Lunch met de notaris vrijdag om 12:30, bespreek de overdracht.';
         await page.fill('#rahulIn', opdracht);
         const before = await page.textContent('#melding');

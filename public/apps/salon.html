@@ -93,19 +93,14 @@
 .salon-offer{margin:.15rem .9rem .7rem;padding:.75rem;}
 .salon-offer-detail{color:var(--soft);font-size:.72rem;}
 </style>
-<link href="/shared/social-elite.css" rel="stylesheet">
-<link href="/shared/salon-elite.css" rel="stylesheet">
-<link href="/shared/social-intelligence.css" rel="stylesheet">
-<script src="/shared/social-intelligence.js" defer></script>
-<script src="/shared/social-intelligence-deck.js" defer></script>
-<script src="/shared/social-intelligence-runtime.js" defer></script>
-<script src="/shared/social-intelligence-data.js" defer></script>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/rtg-first-steps.css" rel="stylesheet">
+<script src="/shared/rtg-first-steps.js"></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-social-elite rtg-salon-elite" data-rtg-world="living" data-rtg-skin="heritage">
+<body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-rtg-editorial-room data-rtg-world="living" data-rtg-skin="heritage">
 <a class="skip" href="#main">Naar de inhoud</a>
 <div class="rtg-social-commandbar topbar cmd-tabs" aria-label="Sociale commandobalk">
   <a class="rtg-social-commandbar-brand" href="/apps/sociaal.html"><span>RTG</span><small>LivingOS · De Salon</small></a>
@@ -124,7 +119,7 @@
     <div><div class="ey">Private member journal</div><h1>De Salon</h1><p class="salon-belofte">Momenten van mensen die u kent, in een omgeving die niets van u probeert te winnen.</p></div>
     <a class="salon-terug" href="/apps/sociaal.html">Terug naar Social →</a>
   </div>
-  <div class="tabs" id="tabs" role="group" aria-label="Onderdelen"></div>
+  <div class="tabs" id="tabs" data-rtg-edge-bar role="group" aria-label="Onderdelen"></div>
 </header>
 <div class="salon-stage">
   <main id="main"><div class="leeg">Laden…</div></main>
@@ -184,7 +179,7 @@ async function api(pad,body){
   if(!r.ok) throw new Error(d.error||d.reden||'Er ging iets mis.');
   return d;
 }
-const toon=h=>{ $('#main').innerHTML=h; };
+const toon=h=>{ $('#main').innerHTML=h; RTGFirstSteps.sync(); };
 function sluitMelding(){ clearTimeout(MELD_TIMER); $('#salonMelding').hidden=true; }
 function meld(t){
   const tekst=String(t||'');
@@ -291,7 +286,7 @@ async function tekenFeed(){
     : TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:0.75rem;">Wat je bewaarde</h2>'
     : ZOEK ? '<div class="kaart salon-selectie">Resultaten voor <b>“'+esc(ZOEK)+'”</b> <button class="mini" id="wisZoek" type="button">wissen</button></div>'
     : ONDERWERP ? '<div class="kaart" style="padding:.7rem .9rem;">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini" id="wisOnderwerp" style="background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer;">wissen</button></div>' : '';
-  toon(kop + (POSTS.length ? POSTS.map(postHtml).join('') : '<div class="leeg">'+(ARCHIEF?'Je archief is leeg.':TAB==='bewaard'?'Je hebt nog niets bewaard.':'Nog niets te zien. Plaats zelf iets, of volg iemand.')+'</div>')
+  toon(kop + (POSTS.length ? POSTS.map(postHtml).join('') : !ARCHIEF && TAB==='feed' && !ZOEK && !ONDERWERP ? RTGFirstSteps.welcome('salon') : '<div class="leeg">'+(ARCHIEF?'Je archief is leeg.':TAB==='bewaard'?'Je hebt nog niets bewaard.':'Er zijn geen momenten gevonden die bij uw zoekopdracht passen.')+'</div>')
     + (d.meer ? '<button class="meer" id="meer">Meer laden</button>'
               : (POSTS.length?'<div class="leeg" style="padding:1.2rem;">Je bent bij.</div>':'')));
   const momentStand=$('#salonMomenten'), mensenStand=$('#salonMensen');
@@ -491,7 +486,7 @@ function teken(){
   tekenFeed();
 }
 if(!TOKEN){
-  toon('<div class="leeg"><h2>Log eerst in</h2><p class="h-mt60">Open de RTG-app en log in; De Salon staat daarna voor je klaar.</p></div>');
+  toon(RTGFirstSteps.welcome('salon', true));
 }else{
   /* De AI-balk stond hier permanent onderaan. Hij blijft weggelegd tot je hem
      van de onderrand omhoog haalt (shared/randen.js), net als overal elders. */
@@ -512,6 +507,12 @@ if(!TOKEN){
 window.RTGSalon = { api: api, herlaad: herlaad,
   archief: () => ARCHIEF,
   post: (id) => POSTS.filter((p) => String(p.id) === String(id))[0] || null };
+
+document.querySelector('#main').addEventListener('click', e=>{
+  const b=e.target.closest('[data-first-action]'); if(!b) return;
+  TAB=b.dataset.firstAction==='share'?'plaats':'ontdek'; ONDERWERP=''; ZOEK=''; NA=null; ARCHIEF=false; teken();
+  const field=document.querySelector(TAB==='plaats'?'#ptekst':'#zoekveld'); if(field) field.focus();
+});
 
 document.querySelectorAll('[data-salon-jump]').forEach(b=>b.addEventListener('click',()=>{
   TAB=b.dataset.salonJump; ONDERWERP=''; ZOEK=''; NA=null; ARCHIEF=false; TERUG_PROFIEL=''; teken();

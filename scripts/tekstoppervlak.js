@@ -323,7 +323,7 @@ function scanHtml(bron, herkomst, vangst) {
      MET vangst houdt de tags in de reeks, zodat een tekstbrok weet waar hij
      onder hangt. Een element met data-i18n draagt zijn vertaling al; die tekst
      is de Nederlandse bron bij een sleutel en geen los hardcoded label. */
-  const stukken = schoon.split(/(<[^>]+>)/);
+  const stukken = schoon.split(/(<(?:[^<>"']|"[^"]*"|'[^']*')+>)/);
   let sleutelDiep = 0;
   for (const stuk of stukken) {
     if (stuk.startsWith('<')) {
@@ -343,12 +343,26 @@ function scanHtml(bron, herkomst, vangst) {
      inclusief de aria-label die een schermlezer voorleest. En het maakte het
      normaliseren van quotes tot een wijziging die de poort liet zakken zonder
      dat er een letter tekst bijkwam. */
-  for (const attr of ATTRIBUTEN) {
-    const re = new RegExp(attr + '\\s*=\\s*(?:"([^"]{2,3000})"|\'([^\']{2,3000})\'|([^\\s>]{2,120}))', 'gi');
+  /* De runtime bindt attributen afzonderlijk. Een data-i18n op het element
+     vertaalt zijn tekst, niet zijn placeholder; alleen de bijbehorende
+     attribuutsleutel geldt hier als gebonden. Lees per tag en quote-bewust,
+     zodat een sleutel op een buur of in een attribuutwaarde niet meetelt. */
+  const bindingen = { placeholder: 'data-i18n-ph', title: 'data-i18n-title', 'aria-label': 'data-i18n-aria' };
+  const tags = schoon.match(/<[a-z][a-z0-9:-]*\b(?:[^<>"']|"[^"]*"|'[^']*')*>/gi) || [];
+  for (const tag of tags) {
+    const attrs = new Map();
+    const re = /([^\s=<>/]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g;
+    const begin = tag.search(/\s/);
     let m;
-    while ((m = re.exec(schoon))) {
-      const waarde = m[1] != null ? m[1] : (m[2] != null ? m[2] : m[3]);
-      if (menselijk(waarde)) vangst.voeg(waarde.trim(), 'html-attribuut:' + attr, herkomst, 0);
+    while ((m = re.exec(tag.slice(begin < 0 ? tag.length : begin, -1)))) {
+      const naam = m[1].toLowerCase();
+      if (!attrs.has(naam)) attrs.set(naam, m[2] != null ? m[2] : m[3] != null ? m[3] : m[4] || '');
+    }
+    for (const attr of ATTRIBUTEN) {
+      const waarde = attrs.get(attr);
+      if (!waarde || !menselijk(waarde)) continue;
+      const sleutel = bindingen[attr] && attrs.get(bindingen[attr]);
+      vangst.voeg(waarde.trim(), sleutel && sleutel.trim() ? 'html-gesleuteld' : 'html-attribuut:' + attr, herkomst, 0);
     }
   }
   /* de titel van het scherm en de omschrijving */

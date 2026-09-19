@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1940 bestanden en 13952 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1940 bestanden en 13954 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1940 |
-| losse beweringen (`test(...)`) | 13952 |
+| losse beweringen (`test(...)`) | 13954 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 151 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1305 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -1751,7 +1751,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-229 bestanden, 399 beweringen.
+229 bestanden, 401 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1928,7 +1928,7 @@ toets omvalt.
 | `rtfspeelhoek.e2e.js` | 1 | -- | Scherm-test voor de speelhoek van de kleintjes (RTF-golf 7): het nieuwe Pakken-spel bij tellen, Welke is anders? bij kleuren, samen om de beurt bij memorie en de napraatvraag aan het eind van een voorleesverhaaltje. |
 | `rtfwelzijn.e2e.js` | 1 | -- | Scherm-test voor het gevoelsdagboek op gevoel.html: gezichtje aantikken blijft vluchtig (de belofte van de pagina), bewaren is een eigen keuze, het dagboekje toont wat het kind zelf bewaarde, en herzien kan. |
 | `rtg-a11y.e2e.js` | 2 | -- | DE TOEGANKELIJKHEIDSADAPTER IN EEN ECHTE BROWSER. test/rtg-a11y.test.js toetst het VERTAALSTUK met de echte uitvoervorm van de keuring. |
-| `rtg-adaptive-edge.e2e.js` | 2 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rtg-adaptive-edge.e2e.js` | 4 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-dev.e2e.js` | 1 | -- | RTG DEV IN EEN ECHTE BROWSER -- want dit is de bewering die alleen daar valt na te rekenen. Alles wat `rtg dev` belooft, hangt aan drie dingen die je met curl niet ziet: 1. |
 | `rtg-edge-2.e2e.js` | 1 | -- | DE ENE RAND ROND DE ACHT EERSTE VANDAAG-SCHERMEN. Deze proef telt niet alleen dat Edge bestaat. |
 | `rtg-id-family.e2e.js` | 3 | gezakt op `liegpoort /api/` | RTG access in a real browser: one shared Edge, four concise registration steps, explicit agreement and existing password/WebAuthn/2FA recovery routes. All identities and credentials belong to isolated local test... |

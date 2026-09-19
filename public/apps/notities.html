@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <script>try{if(window.self!==window.top)document.documentElement.dataset.rtgOppervlak='1'}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Notities &amp; Taken</title>
+<title data-i18n="dailyField.notesTasksPage">RTG Notities &amp; Taken</title>
 <link rel="icon" href="/icon.svg">
 <meta name="theme-color" content="#0C0C0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -84,70 +84,75 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/kantoor-tools.css?v=enterprise1" rel="stylesheet">
+
+<link href="/shared/rtg-daily.css" rel="stylesheet">
+<link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-kantoor-tool="notities" data-rtg-world="living" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-daily" data-kantoor-tool="notities" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-daily="notities" data-rtg-editorial-room="notities">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <span><span class="ey">RTG</span><h1>Notities &amp; Taken</h1></span>
+  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
+  <span><span class="ey">RTG</span><h1 data-i18n="dailyField.notesTasks">Notities &amp; Taken</h1></span>
   <span class="rij" style="margin-left:auto;">
-    <button class="knop" id="toonArchief" type="button">Archief</button>
-    <button class="knop" id="nieuwLijst" type="button">+ Lijst</button>
+    <button class="knop" id="toonArchief" data-rtg-edge-bar type="button" data-i18n="dailyField.archive">Archief</button>
+    <button class="knop" id="nieuwLijst" data-rtg-edge-bar type="button" data-i18n="dailyField.newList">+ Lijst</button>
   </span>
 </header>
 <!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
      "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
      een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
      rij onder de kop. -->
-<div class="rtg-duimbalk"><button class="knop vol" id="nieuwNotitie" type="button" data-hoofdactie>+ Notitie</button></div>
+<div class="rtg-duimbalk"><button class="knop vol" id="nieuwNotitie" data-rtg-edge-bar type="button" data-hoofdactie data-i18n="dailyField.newNote">+ Notitie</button></div>
 <main>
-  <section class="kantoor-intro" aria-labelledby="notitiesIntro">
-    <span class="ey">Kantoor · notities &amp; acties</span>
-    <div><h2 id="notitiesIntro">Gedachten die door kunnen.</h2><p>Leg besluiten, aandachtspunten en taken vast zonder dat uw bord onrustig wordt.</p></div>
-  </section>
-  <input class="veld" id="zoek" type="search" placeholder="Zoek op het bord" aria-label="Zoeken"
-    style="width:100%;margin-bottom:0.75rem;">
+<section id="dailyIntro" aria-label="Notities" data-i18n-aria="dailyField.notes"></section>
+  <div class="daily-content">
+  <input class="veld" id="zoek" type="search" placeholder="Zoek in uw notities" data-i18n-ph="daily.noteSearch" aria-label="Zoeken"
+    style="width:100%;margin-bottom:0.75rem;" data-i18n-aria="dailyField.search">
   <div id="bord" aria-live="polite"></div>
-  <div id="gedeeldKop" class="kop" style="display:none;">Met mij gedeeld · samen bewerken</div>
+  <div id="gedeeldKop" class="kop" style="display:none;" data-i18n="dailyField.sharedEditing">Met mij gedeeld · samen bewerken</div>
   <div id="gedeeldBord"></div>
-  <p class="stil h-mt80">Een notitie met datum en tijd krijgt vanzelf een gekoppelde afspraak
+  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="nieuwNotitie"><span data-i18n="daily.newNote">Nieuwe notitie</span> <span aria-hidden="true">→</span></button></div>
+  <p class="stil h-mt80" data-i18n="dailyField.noteHelp">Een notitie met datum en tijd krijgt vanzelf een gekoppelde afspraak
     in RTG Agenda; daar komt ook het seintje vandaan. Delen op codenaam is samen werken: de ander kan afvinken
     en aanvullen.</p>
+  </div>
 </main>
 
-<div class="scrim" id="ntScrim" role="dialog" aria-label="Notitie">
+<div class="scrim" id="ntScrim" role="dialog" aria-label="Notitie" data-i18n-aria="dailyField.note">
   <div class="paneel">
-    <input class="titel" id="ntTitel" maxlength="120" placeholder="Titel">
-    <div id="ntTekstWrap"><textarea id="ntTekst" rows="7" maxlength="4000" placeholder="Schrijf hier."></textarea></div>
+    <input class="titel" id="ntTitel" maxlength="120" placeholder="Titel" data-i18n-ph="dailyField.title">
+    <div id="ntTekstWrap"><textarea id="ntTekst" rows="7" maxlength="4000" placeholder="Schrijf hier." data-i18n-ph="dailyField.writeHere"></textarea></div>
     <div id="ntLijstWrap" style="display:none;">
       <div id="ntTaken"></div>
       <div class="rij h-mt50">
-        <input class="gewoon h-flex1" id="ntNieuwTaak" maxlength="200" placeholder="Nieuw punt; Enter voegt toe">
+        <input class="gewoon h-flex1" id="ntNieuwTaak" maxlength="200" placeholder="Nieuw punt; Enter voegt toe" data-i18n-ph="dailyField.newItem">
       </div>
     </div>
     <div class="twee">
-      <span><label for="ntDatum">Herinner op</label><input type="date" id="ntDatum"></span>
-      <span><label for="ntTijd">Om</label><input type="time" id="ntTijd"></span>
+      <span><label for="ntDatum" data-i18n="dailyField.remindOn">Herinner op</label><input type="date" id="ntDatum"></span>
+      <span><label for="ntTijd" data-i18n="dailyField.at">Om</label><input type="time" id="ntTijd"></span>
     </div>
     <div id="ntDeelWrap">
-      <label for="ntCode">Delen op codenaam (samen bewerken)</label>
-      <div class="rij"><input class="gewoon h-flex1" id="ntCode" maxlength="60" placeholder="Codenaam">
-        <button class="knop" id="ntDeel" type="button">Deel</button></div>
+      <label for="ntCode" data-i18n="dailyField.shareNote">Delen op codenaam (samen bewerken)</label>
+      <div class="rij"><input class="gewoon h-flex1" id="ntCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
+        <button class="knop" id="ntDeel" type="button" data-i18n="dailyField.share">Deel</button></div>
       <p class="stil" id="ntGedeeld"></p>
     </div>
     <div class="rij h-mt90">
-      <button class="knop vol" id="ntBewaar" type="button">Bewaar</button>
-      <button class="knop" id="ntVast" type="button">Vastpinnen</button>
-      <button class="knop" id="ntArchief" type="button">Archiveer</button>
-      <button class="knop" id="ntWeg" type="button">Verwijder</button>
+      <button class="knop vol" id="ntBewaar" type="button" data-i18n="dailyField.save">Bewaar</button>
+      <button class="knop" id="ntVast" type="button" data-i18n="dailyField.pin">Vastpinnen</button>
+      <button class="knop" id="ntArchief" type="button" data-i18n="dailyField.archiveAction">Archiveer</button>
+      <button class="knop" id="ntWeg" type="button" data-i18n="dailyField.delete">Verwijder</button>
       <span class="h-flex1"></span>
-      <button class="knop" id="ntDicht" type="button">Sluit</button>
+      <button class="knop" id="ntDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
   </div>
 </div>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/rtg-daily-copy.js"></script>
+<script src="/shared/rtg-daily-fields.js"></script>
+<script src="/shared/rtg-daily.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/notities/app.js"></script>
 <script src="/apps/notities/gebaren.js"></script>

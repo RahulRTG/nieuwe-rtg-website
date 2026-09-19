@@ -7,7 +7,7 @@
    Draait alleen waar een browser beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopNet, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -99,7 +99,7 @@ test('RTG Leven maakt één controleerbaar Moment zonder score of aansporing',
     assert.deepEqual(echteFouten, [], 'het scherm hoort zonder consolefouten te draaien');
   } finally {
     if (browser) await browser.close().catch(() => {});
-    child.kill();
+    await stopNet(child);
     fs.rmSync(TMP, { recursive: true, force: true });
   }
 });

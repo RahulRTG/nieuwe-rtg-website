@@ -28,11 +28,15 @@ test('oude production-cover modules en alle includes zijn volledig weg', () => {
   assert.doesNotMatch(CSS, /\.rtg-vandaag-luxe|rtg-vandaag-surface-cover/);
 });
 
-test('Agenda, Reisboek en Projecten behouden alleen hun wereldpalet', () => {
-  assert.match(AGENDA, /<body[^>]+data-rtg-world="living"[^>]+data-rtg-vandaag-luxe="surface"/);
+test('Agenda gebruikt de editorial kamer; Reisboek en Projecten behouden hun wereldpalet', () => {
+  assert.match(AGENDA, /<body[^>]+data-rtg-world="living"[^>]+data-rtg-daily="agenda"/);
+  for (const asset of ['rtg-daily.css', 'rtg-daily-rooms.css', 'rtg-daily.js']) {
+    assert.equal(AGENDA.split('/shared/' + asset).length - 1, 1, asset + ' wordt één keer geladen');
+  }
+  assert.doesNotMatch(AGENDA, /data-rtg-world-dashboard=|rtg-vandaag-luxe\.(?:css|js)/);
   assert.match(REISBOEK, /<body[^>]+data-rtg-world="travel"[^>]+data-rtg-vandaag-luxe="surface"/);
   assert.match(WORK, /<body[^>]+data-rtg-world="work"[^>]+data-rtg-vandaag-surface="projecten"/);
-  for (const html of [AGENDA, REISBOEK, WORK]) {
+  for (const html of [REISBOEK, WORK]) {
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.css/g) || []).length, 1);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.js/g) || []).length, 1);
     assert.doesNotMatch(html, /data-rtg-world-dashboard=/);

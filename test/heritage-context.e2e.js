@@ -1,16 +1,18 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, postJson, laadPlaywright, browserOpties, geduld } = require('./helper');
+const { startServer, stop, postJson, laadPlaywright, browserOpties, geduld, edgeBediening } = require('./helper');
 
 test('Heritage context returns through real navigation without writes', async t => {
   const server = await startServer({env:{SMTP_URL:''}}), pw = laadPlaywright();
   let browser;
   try {
     const login = await postJson(server.base)('/api/auth/login', { login:'roellie.i@gmail.com', password:'Imran', pasApp:'business' });
+    const folder = await postJson(server.base)('/api/bestanden/map', { naam:'Rapporten' }, login.token);
+    assert.ok(!folder.error, 'the context test starts with a real folder');
     browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});
-    await context.addInitScript(token => { localStorage.setItem('rtg_member_token',token);localStorage.setItem('rtg_cookieinfo_v1','1'); },login.token);
+    await context.addInitScript(token => { localStorage.setItem('rtg_member_token',token);localStorage.setItem('rtg_cookieinfo_v1','1');localStorage.setItem('rtg_lang','nl'); },login.token);
     const page = await context.newPage();
     async function visit(path) {
       await page.goto(server.base + path);
@@ -26,10 +28,10 @@ test('Heritage context returns through real navigation without writes', async t 
     await t.test('Agenda restores view and selected week', async () => {
       await visit('/apps/agenda.html');
       await page.keyboard.press('Escape');
-      await page.click('#wWeek');
+      await edgeBediening(page, 'Week');
       await page.waitForFunction(() => document.querySelector('#wWeek').classList.contains('aan'));
       const previous = await page.textContent('#periode');
-      await page.click('#volgendeK');
+      await edgeBediening(page, 'Volgende');
       await page.waitForFunction(value => document.querySelector('#periode').textContent !== value, previous);
       const period = await page.textContent('#periode');
       await returnTo('/apps/agenda.html');
@@ -38,7 +40,7 @@ test('Heritage context returns through real navigation without writes', async t 
     });
     await t.test('Files restore search, sorting and trash without mutations', async () => {
       await visit('/apps/bestanden.html');
-      await page.fill('#zoek','rapport'); await page.selectOption('#sorteer','naam'); await page.click('#toonBak');
+      await page.fill('#zoek','rapport'); await page.selectOption('#sorteer','naam'); await edgeBediening(page, 'Prullenbak');
       await page.evaluate(() => RTGRouteMemory.save());
       await visit('/apps/agenda.html');
       const writes = [];
@@ -84,7 +86,7 @@ test('Heritage context returns through real navigation without writes', async t 
       /* Maand is op telefoon bewust verborgen; Week is de zichtbare route
          naar dezelfde dagsheet die deze toets nodig heeft. */
       await page.keyboard.press('Escape');
-      await page.click('#wWeek');
+      await edgeBediening(page, 'Week');
       await page.click('.rtg-edge-state'); await page.click('[data-edge-2-mode="focus"]');
       await page.locator('#kal [data-dag]').first().click();
       await page.waitForSelector('#afScrim.open');

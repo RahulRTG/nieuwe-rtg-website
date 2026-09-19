@@ -1,30 +1,30 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-09-19T12:27:12.070Z",
-  "completedAt": "2026-09-19T12:27:47.047Z",
-  "node": "v22.22.2",
+  "startedAt": "2026-09-18T12:54:32.185Z",
+  "completedAt": "2026-09-18T12:54:53.303Z",
+  "node": "v24.18.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "d29d94e32581ffeed70b94f9b19af105e4e93534e07f87186427c60c1a2a7f6b",
+  "testOutputSha256": "984ea4487423e88ccb6a5446856e6b950a954c80f812bac04159436193a6db2b",
   "sources": {
     "public/apps/access/meaning.js": "34aada4780c1e2e836d3e6b5d9e0839ccd51d5f75078ef0aca7a4a49499fbedd",
     "public/apps/access/portal.css": "50a4099d085813b3b8e00021f62e0e8a30e5170779f1613c5d3dc9f2d0b34b90",
     "public/apps/app.html": "b2c75f52aa5bf6862977ae98bbcf952fa901ae029e5ededc171bb2d03fbb30a5",
     "public/apps/app-main.js": "a0d9e0dc7ddff0ca8b13f72c7f63279adecc99755e16bc45665a4b72a79311a7",
     "public/shared/rtg-edge-2.css": "2700ea360f01d73bb4c0fc906e08cdcb00ec43a2183b867e26d9a3a2f00075c4",
-    "public/shared/rtg-adaptive-edge.css": "9218051292931d7b49383a5c604026e5552947edc67dc235ea80c99546a9e592",
+    "public/shared/rtg-adaptive-edge.css": "8591c4f15d781fe2ebfb87c09a7f988c84512b6a1b5486aad27cabd654695ae8",
     "public/shared/rtg-simple.css": "4ff1b4790c987556a34ed8d59fd00e626411af52250da3ec26491a9842e16148",
     "public/shared/rtg-edge-appbar.js": "59de3b2e49addd8a5a708969a3d0399f3dd53cb39a5666f8bd2f4525ea998c7c",
     "public/shared/verbinding.js": "68360e7729f19f512c01fdee4cd3bebb5f7f21f057065e88da536a146cb80289",
     "public/shared/i18n.js": "cdb245f5d9585c641467b2aeddbefe5f368117a4f981f74ee348e19a41a38513",
     "public/shared/rtg-edge-smart-menu.js": "ace12eb9ac031c6b8453799c21bb7a14f465ca644b10738e3c86bda120b96560",
     "public/shared/rtg-edge-library.js": "40ba9d5825c38e00077ee1047592b09fb248cf5e73d02b720a90eeead571f6a9",
-    "public/shared/rtg-adaptive-edge-controls.js": "b720987449bbd1b3976ff513e8344e5b7c49787d2012611a470e603f35c729cd",
+    "public/shared/rtg-adaptive-edge-controls.js": "0a7daa0ec2b1e57988856391c9845667474fe4eded12cb0c3a5d8d6e858abbb8",
     "public/shared/appshell.js": "fab1e3c6e0dcfbc4cf0347c245c14a7f29e6ff17a059e0a79eef178c3ba54fdc",
     "server/talen.js": "41dc947790a19efb47f1804c79f542a7f05349e2b21c83322800731a2065d79e",
     "server/routes/onboarding.js": "08d74042f7846b0cd177e2dfca7d25f9bea7b1103774e85a4616b3f61d09d2dd",
     "server/kern/onboarding/lid.js": "9a725122b4ee6ada6434479bd99aa68d19026355dc2eebfc3c1a4f9f9d469bc6",
-    "test/helper.js": "f42fbb2acd395ffd178b8ee6a897b9b1ca71e9d05fef8ab207c03a803d7df292",
+    "test/helper.js": "82d144310d964d0cf1294776b95d43ea9fd3efdddffee2826cfa2ba98bd9ce28",
     "scripts/lib/scherm.js": "9bb3c9eb5390baabb2c69dc798a1e88cfe9d07238f394273221548f53685eb5b",
     "server/translate/batch-model.js": "4a2af8ee253efac0e73ee9af284e5aa7bf1ac201ca80d40e97f7bcb441a6787f",
     "server/translate.js": "52ba4a9541e7c54eabba632b576615bd7e4d25f5d14c73f3a161ae7240f58afb",
@@ -43,7 +43,7 @@
   },
   "productionReady114Languages": false,
   "scope": "RTG member account portal and shared language loader; mobile Chromium, synthetic input.",
-  "browser": "141.0.7390.37",
+  "browser": "151.0.7922.34",
   "viewport": {
     "width": 390,
     "height": 844
@@ -2342,9 +2342,9 @@
       },
       "formatting": {
         "number": "12,345.67",
-        "numberLocale": "en-US",
-        "date": "9/17/2026",
-        "dateLocale": "en-US"
+        "numberLocale": "kk",
+        "date": "2026-09-17",
+        "dateLocale": "kk"
       },
       "rtl": {
         "actual": "ltr",
@@ -3282,7 +3282,7 @@
       },
       "formatting": {
         "number": "12,345.67",
-        "numberLocale": "en-US",
+        "numberLocale": "sd",
         "date": "2026-09-17",
         "dateLocale": "sd"
       },

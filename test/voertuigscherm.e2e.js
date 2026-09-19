@@ -18,7 +18,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, stopNet, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const pw = laadPlaywright();
 const koppel = require('../server/kern/wereld/koppel');
 
 let BASE, child;
@@ -28,7 +29,7 @@ test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
 });
 test.after(async () => {
-  if (child) try { child.kill('SIGKILL'); } catch (e) {}
+  if (child) await stopNet(child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
@@ -82,16 +83,57 @@ test('3. zonder sleutel zegt het scherm WAAROM er niets staat', async () => {
   assert.match(js.tekst, /personeelssleutel/i, 'en wat er nodig is');
 });
 
-test('5. het ritscherm zegt hetzelfde over een ref die niet van u is', async () => {
-  const html = await haal('/apps/rit.html');
-  assert.equal(html.status, 200, 'het ritscherm wordt uitgeserveerd');
-  const js = await haal('/apps/rit.js');
-  assert.equal(js.status, 200);
-  assert.match(js.tekst, /gesloten deur/i, 'zonder sessie is het een gesloten deur');
-  assert.match(js.tekst, /welke van de twee zegt dit scherm bewust niet/i,
-    'en er wordt niet verklapt of een ref van een ander is of niet bestaat');
-  assert.match(js.tekst, /nog niet toegewezen/i,
-    '"nog niet toegewezen" is een stand en geen ontbrekend gegeven');
+/* Deze ritproef opent de uitgeserveerde (ook geminificeerde) pagina. Een zin
+   in commentaar bewijst niets over de gesloten deur die een bezoeker ziet. */
+test('5. het ritscherm toont de ledendeur, verbergt vreemde refs en verzint geen chauffeur',
+  { skip: geenBrowser(pw), timeout: 90000 }, async () => {
+  const browser = await pw.chromium.launch(browserOpties(pw));
+  try {
+    const context = await browser.newContext({ serviceWorkers: 'block' });
+    await context.addInitScript(() => {
+      localStorage.setItem('rtg_lang', 'nl');
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+    });
+    const page = await context.newPage();
+    await page.goto(BASE + '/apps/rit.html?rit=BESTAAT-NIET');
+    await page.waitForSelector('#inhoud .rit-leeg a[href="/apps/app.html"]');
+    assert.match(await page.locator('#inhoud').innerText(), /log in via de RTG-app/i,
+      'zonder sessie wordt de benodigde ledendeur zichtbaar uitgelegd');
+    assert.equal(await page.locator('#transferForm,.chauffeur-kaart').count(), 0);
+    async function post(route, body, token) {
+      const r = await fetch(BASE + route, { method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+        body: JSON.stringify(body) });
+      const data = await r.json();
+      assert.equal(r.status, 200, route + ': ' + JSON.stringify(data));
+      return data;
+    }
+    const tokens = [];
+    for (const id of ['eigenaar', 'bezoeker']) {
+      const lid = await post('/api/auth/register', { name: id, email: id + Date.now() + '@rit.test',
+        phone: '0612345678', password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg' });
+      assert.ok(lid.token); tokens.push(lid.token);
+    }
+    const rit = await post('/api/mob/vraag', { ritsoort: 'direct', categorie: 'taxi',
+      van: { lat: 38.908, lng: 1.432, label: 'Vertrek' },
+      naar: { lat: 38.92, lng: 1.45, label: 'Bestemming' }, reizigers: 2, bagage: 1 }, tokens[0]);
+    assert.ok(rit.opdracht && rit.opdracht.ref, 'de echte mobiliteitskern geeft een ritreferentie terug');
+    await page.evaluate(t => localStorage.setItem('rtg_member_token', t), tokens[1]);
+    const redenen = [];
+    for (const ref of ['BESTAAT-NIET', rit.opdracht.ref]) {
+      await page.goto(BASE + '/apps/rit.html?rit=' + encodeURIComponent(ref));
+      await page.waitForSelector('#inhoud [data-terug-ritten]');
+      redenen.push(await page.locator('#inhoud').innerText());
+      assert.match(redenen.at(-1), /welke van de twee zegt dit scherm bewust niet/i);
+      assert.equal(await page.locator('.chauffeur-kaart').count(), 0);
+    }
+    assert.equal(redenen[0], redenen[1], 'een vreemde en onbekende ref onthullen hetzelfde');
+    await page.evaluate(t => localStorage.setItem('rtg_member_token', t), tokens[0]);
+    await page.goto(BASE + '/apps/rit.html?rit=' + encodeURIComponent(rit.opdracht.ref));
+    await page.waitForSelector('.chauffeur-profiel h3');
+    assert.equal(await page.locator('.chauffeur-profiel h3').innerText(), 'Nog niet toegewezen',
+      'de eigen aangevraagde rit toont de werkelijke stand, zonder verzonnen chauffeur');
+  } finally { await browser.close(); }
 });
 
 /* 6. DE SLEUTEL MOET VAN DE DEUR ZIJN WAAR HET SCHERM OP KLOPT.

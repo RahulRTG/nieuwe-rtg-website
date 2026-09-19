@@ -97,6 +97,8 @@
   }
   function teken() {
     if (!stand) return;
+    var eerste = weergave === 'tijdlijn' && !openAlbum && !(stand.beelden || []).length;
+    document.body.classList.toggle('rtg-first-page', eerste);
     $('#albums').style.display = weergave === 'albums' ? '' : 'none';
     $('#tijdlijn').style.display = weergave === 'albums' ? 'none' : '';
     $('#albumPad').style.display = openAlbum ? '' : 'none';
@@ -119,7 +121,7 @@
         var a = (stand.albums || []).find(function (x) { return x.id === openAlbum; });
         $('#albumPad').innerHTML = 'Album · ' + esc(a ? a.naam : '') +
           ' &nbsp;<button class="knop" id="albumTerug" type="button">Terug</button>';
-        $('#tijdlijn').innerHTML = '<div class="raster">' + lijst.map(thumb).join('') + '</div>' ||
+        $('#tijdlijn').innerHTML = lijst.length ? '<div class="raster">' + lijst.map(thumb).join('') + '</div>' :
           '<p class="stil">Dit album is nog leeg.</p>';
       } else {
         // per maand een kop; de tijdlijn is de kalender, meer niet
@@ -132,9 +134,7 @@
           var naam = /^\d{4}-\d{2}$/.test(k) ? MAANDEN[+k.slice(5, 7) - 1] + ' ' + k.slice(0, 4) : k;
           return '<div class="kop">' + esc(naam) + '</div><div class="raster">' +
             perMaand[k].map(thumb).join('') + '</div>';
-        }).join('') || '<p class="stil">' + (weergave === 'fav'
-          ? 'Nog geen favorieten. Open een beeld en druk op Favoriet.'
-          : 'Nog geen beelden. Plaats iets in De Salon of zet een foto in RTG Bestanden; hij verschijnt hier vanzelf.') + '</p>';
+        }).join('') || (weergave === 'fav' ? '<p class="stil">Nog geen favorieten. Open een beeld en druk op Favoriet.</p>' : RTGFirstSteps.welcome('galerij'));
       }
     }
     Array.prototype.forEach.call(document.querySelectorAll('.thumb[data-bid]'), function (el) { kijkt.observe(el); });
@@ -165,9 +165,12 @@
   }
   function laad() {
     return api('galerij/mijn').then(function (r) {
-      if (r.status !== 200) return meld(r.body.error || 'Log eerst in op de leden-app.');
+      if (r.status !== 200) throw new Error(r.body.error || 'We konden uw galerij niet laden.');
       stand = r.body;
       teken();
+    }).catch(function (e) {
+      meld(e.message);
+      if (!stand) $('#tijdlijn').innerHTML = '<p class="stil">' + RTGFirstSteps.text('failed') + '</p><button class="knop" type="button" data-first-retry>' + RTGFirstSteps.text('retry') + '</button>';
     });
   }
   $('#toonFav').addEventListener('click', function () {
@@ -187,5 +190,5 @@
 
   window.RTGGalerij = { api: api, meld: meld, laad: laad, thumbData: thumbData,
     stand: function () { return stand; } };
-  if (!token) meld('Log eerst in op de leden-app.'); else laad();
+  if (!token) { $('#tijdlijn').innerHTML = RTGFirstSteps.welcome('galerij', true); RTGFirstSteps.sync(); } else laad();
 })();

@@ -298,7 +298,7 @@ console.log('\n10) de 9+-keuring op alle app-pagina\'s');
     const htmlTag = s.match(/<html[^>]*>/i);
     if (!htmlTag || !/\blang\s*=/.test(htmlTag[0])) { np++; fout('9+: geen lang op <html> in ' + rel); }
     if (!/name="viewport"/.test(s)) { np++; fout('9+: geen viewport in ' + rel); }
-    if (!/<title>[^<]+<\/title>/.test(s)) { np++; fout('9+: lege of ontbrekende titel in ' + rel); }
+    if (!/<title\b(?:[^>"']|"[^"]*"|'[^']*')*>\s*[^\s<][^<]*<\/title\s*>/i.test(s)) { np++; fout('9+: lege of ontbrekende titel in ' + rel); }
     if (!/rel="icon"/.test(s)) { np++; fout('9+: geen favicon in ' + rel); }
     if (!/<main\b/i.test(s) && !/role="main"/.test(s)) { np++; fout('9+: geen main-landmark in ' + rel); }
     if (!s.includes('/shared/basis.js')) { np++; fout('9+: basis-laag (shared/basis.js) ontbreekt in ' + rel); }

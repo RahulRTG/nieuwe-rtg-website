@@ -14,11 +14,11 @@ test('de gedeelde commandotoets vraagt altijd een bewuste sneltoets', () => {
   assert.equal(realityRuntime.isCommandKey({ ctrlKey:false, metaKey:false, key:'k' }), false);
 });
 
-test('Sociaal en De Salon delen dezelfde elite-schil zonder hun functies samen te voegen', () => {
+test('Sociaal en de editorial Salon houden hun eigen inhoud en de gedeelde Edge', () => {
   const sociaal = lees('public/apps/sociaal.html');
   const salon = lees('public/apps/salon.html');
 
-  for (const html of [sociaal, salon]) {
+  for (const html of [sociaal]) {
     assert.match(html, /rtg-social-elite/);
     assert.match(html, /\/shared\/social-elite\.css/);
     assert.match(html, /rtg-social-commandbar topbar cmd-tabs/);
@@ -28,7 +28,9 @@ test('Sociaal en De Salon delen dezelfde elite-schil zonder hun functies samen t
   assert.match(sociaal, /\/shared\/sociaal-elite\.css/);
   assert.match(salon, /class="salon-werkveld"/);
   assert.match(salon, /class="salon-stage"/);
-  assert.match(salon, /\/shared\/salon-elite\.css/);
+  assert.match(salon, /\/shared\/rtg-first-steps\.css/);
+  assert.match(salon, /\/shared\/randen\.js/);
+  assert.doesNotMatch(salon, /\/shared\/(?:salon-elite|social-elite)\.css/);
   assert.match(salon, /const TABS=\[\['feed','Feed'\].*\['ik','Mijn profiel'\]\]/);
 });
 
@@ -57,8 +59,14 @@ test('Social OS heeft overal dezelfde vijf primaire ruimtes', () => {
   }
   for (const app of ['comm', 'genootschap', 'pulse', 'meet', 'vonk', 'rendezvous', 'cercle', 'entourage', 'attenties']) {
     const html = lees('public/apps/' + app + '.html');
-    assert.match(html, /\/shared\/social-suite\.css/);
-    assert.match(html, /\/shared\/social-suite\.js/);
+    if (['genootschap', 'pulse'].includes(app)) {
+      assert.match(html, /\/shared\/randen\.js/);
+      assert.doesNotMatch(html, /\/shared\/social-suite\.(?:css|js)/,
+        app + ' krijgt geen tweede suitebalk naast de gedeelde Edge');
+    } else {
+      assert.match(html, /\/shared\/social-suite\.css/);
+      assert.match(html, /\/shared\/social-suite\.js/);
+    }
   }
 });
 
@@ -145,6 +153,13 @@ test('Reality Engine is in elke Social-ruimte dezelfde werkende systeemlaag', ()
   const apps = ['sociaal', 'salon', 'comm', 'genootschap', 'sociaal-prive', 'pulse',
     'meet', 'vonk', 'rendezvous', 'cercle', 'entourage', 'attenties'];
   for (const app of apps) {
+    if (['salon', 'genootschap', 'pulse'].includes(app)) {
+      const html = lees('public/apps/' + app + '.html');
+      assert.match(html, /\/shared\/randen\.js/);
+      assert.doesNotMatch(html, /\/shared\/social-intelligence(?:-(?:deck|runtime|data))?\.(?:css|js)/,
+        app + ' gebruikt de gedeelde Edge zonder afzonderlijk Reality-commandodeck');
+      continue;
+    }
     assert.match(lees('public/apps/' + app + '.html'),
       /<link href="\/shared\/social-intelligence\.css" rel="stylesheet">/,
       app + ' laadt de Intelligence-stijl zonder visuele flits');

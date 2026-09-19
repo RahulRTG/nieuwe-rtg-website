@@ -2840,24 +2840,6 @@
       "url": "/apps/uitgaan.html"
     },
     {
-      "label": "bewerken",
-      "app": "Vandaag",
-      "wereld": "LivingOS",
-      "url": "/apps/pulse.html"
-    },
-    {
-      "label": "geen",
-      "app": "Vandaag",
-      "wereld": "LivingOS",
-      "url": "/apps/pulse.html"
-    },
-    {
-      "label": "melden",
-      "app": "Vandaag",
-      "wereld": "LivingOS",
-      "url": "/apps/pulse.html"
-    },
-    {
       "label": "Mijn plank",
       "app": "Vandaag",
       "wereld": "LivingOS",
@@ -2870,25 +2852,19 @@
       "url": "/apps/pulse.html"
     },
     {
-      "label": "mijn week",
+      "label": "Ontdek mensen",
       "app": "Vandaag",
       "wereld": "LivingOS",
       "url": "/apps/pulse.html"
     },
     {
-      "label": "Ontdek",
+      "label": "Plaats een bericht",
       "app": "Vandaag",
       "wereld": "LivingOS",
       "url": "/apps/pulse.html"
     },
     {
-      "label": "Plaatsen",
-      "app": "Vandaag",
-      "wereld": "LivingOS",
-      "url": "/apps/pulse.html"
-    },
-    {
-      "label": "stemming",
+      "label": "Volgend",
       "app": "Vandaag",
       "wereld": "LivingOS",
       "url": "/apps/pulse.html"

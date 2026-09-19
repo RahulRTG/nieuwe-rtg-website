@@ -31,7 +31,7 @@
       var eco = open.bron === 'boeking';
       var uitnodiging = !!open.van && !eco;
       $('#afBewaar').setAttribute('data-rtg-action-state', 'idle');
-      $('#afKop').textContent = eco ? 'Uit RTG (alleen-lezen)' : open.id ? 'Afspraak' : 'Nieuwe afspraak';
+      window.RTGDailyFields.set($('#afKop'), eco ? 'readOnlyAppointment' : open.id ? 'appointment' : 'newAppointmentHeading');
       $('#afTitel').value = open.titel || '';
       $('#afDatum').value = open.datum || '';
       $('#afPlek').value = open.plek || '';

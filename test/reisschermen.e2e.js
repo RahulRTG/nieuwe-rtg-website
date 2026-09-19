@@ -42,7 +42,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reis-'));
 const VOOR_DE_REIZIGER = [
   { app: 'ov', eist: /inchecken|live gps|oplichtende code/i },
   { app: 'vluchten', eist: /het bord|mijn reizen|security/i },
-  { app: 'reisbureau', eist: /nettoprijs|zonder opslag/i },
+  { app: 'reisbureau', eist: /samengestelde reizen/i },
   { app: 'hotels', eist: /hotels|appartementen|villa/i },
   { app: 'uitgaan', eist: /gastenlijst/i },
   { app: 'sport', eist: /uitslagen|stand|tickets/i },
@@ -78,6 +78,7 @@ async function toon(page, base, app, token) {
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   await page.evaluate(t => {
     localStorage.setItem('rtg_cookieinfo_v1', '1');
+    localStorage.setItem('rtg_lang', 'nl');
     if (t) localStorage.setItem('rtg_member_token', t); else localStorage.removeItem('rtg_member_token');
     localStorage.removeItem('rtg_sup_token');
     localStorage.removeItem('rtg_office_token');

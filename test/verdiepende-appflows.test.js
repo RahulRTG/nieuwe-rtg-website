@@ -19,15 +19,20 @@ test('de vier werelden gebruiken dezelfde verdiepende stijl op hun echte routes'
   };
   for (const [route, klasse] of Object.entries(routes)) {
     const html = lees(route);
-    assert.match(html, /\/shared\/rtg-deep-flows-2026\.css/);
+    const stijl = route === 'public/apps/agenda.html' ? 'rtg-daily-rooms.css' : 'rtg-deep-flows-2026.css';
+    assert.ok(html.includes('/shared/' + stijl), route + ' laadt zijn huidige gedeelde stijl');
     assert.match(html, new RegExp(`class="[^"]*${klasse}`));
   }
 });
 
 test('LivingOS en TravelOS houden de vervolgstappen onder de duim', () => {
   const agenda = lees('public/apps/agenda.html');
-  assert.match(agenda, /href="\/apps\/attenties\.html"/);
-  assert.match(agenda, />Uw dag</);
+  assert.match(agenda, /\/shared\/randen\.js/);
+  assert.doesNotMatch(agenda, /class="rtg-deep-nav"/, 'Agenda krijgt geen tweede navigatie naast de Edge');
+  const sprongen = JSON.parse(lees('public/shared/sprongindex.json'));
+  assert.ok(JSON.stringify(sprongen).includes('"url":"/apps/attenties.html"'),
+    'Attenties blijft via het centrale navigatieregister bereikbaar');
+  assert.match(lees('public/shared/rtg-edge-2-loader.js'), /pad === '\/apps\/agenda\.html'\) hoofdactie\('Nieuwe afspraak'/);
 
   const vlucht = lees('public/apps/vluchten.html');
   assert.match(vlucht, /view=mijn/);

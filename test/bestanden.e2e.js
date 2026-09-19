@@ -94,7 +94,7 @@ test('Bestanden: uploaden, delen, een versie van de ander en de prullenbak',
     await page.click('#bkWeg');
     await page.waitForFunction(() => /prullenbak/.test(document.querySelector('#melding').textContent),
       null, { timeout: 8000 });
-    await page.click('#toonBak');
+    await require('./helper').edgeBediening(page, 'Prullenbak');
     await page.waitForFunction(() => /paklijst\.txt/.test(document.querySelector('#lijst').textContent),
       null, { timeout: 8000 });
     await page.evaluate(() => { document.querySelector('#lijst [data-open]').click(); });

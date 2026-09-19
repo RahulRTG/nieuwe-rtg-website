@@ -82,6 +82,7 @@ async function toon(page, base, app, token, wachtOp) {
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   await page.evaluate(t => {
     localStorage.setItem('rtg_cookieinfo_v1', '1');
+    localStorage.setItem('rtg_lang', 'nl');
     if (t) localStorage.setItem('rtg_member_token', t); else localStorage.removeItem('rtg_member_token');
   }, token || null);
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });

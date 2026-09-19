@@ -6,7 +6,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { edgeBediening, startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -39,10 +39,10 @@ test('Genootschap: oprichten, een bijeenkomst uitroepen en een peiling houden',
     await page.goto(base + '/apps/genootschap.html', { waitUntil: 'domcontentloaded' });
 
     // 1. leeg begin
-    await page.waitForFunction(() => /Je zit nog nergens in/.test(document.querySelector('#main').textContent), null, { timeout: 15000 });
+    await page.waitForFunction(() => /U bent nog niet aangesloten bij een genootschap/.test(document.querySelector('#main').textContent), null, { timeout: 15000 });
 
     // 2. oprichten
-    await page.click('[data-t="nieuw"]');
+    await edgeBediening(page, 'Oprichten');
     await page.waitForSelector('#nnaam', { timeout: 10000 });
     await page.evaluate(() => {
       document.querySelector('#nnaam').value = 'Het Zeilgezelschap';
@@ -84,7 +84,7 @@ test('Genootschap: oprichten, een bijeenkomst uitroepen en een peiling houden',
     assert.ok(/1 stemmen/.test(bord), 'de peiling telt de stem: ' + bord.slice(0, 80));
 
     // 7. de agenda bundelt het over genootschappen heen
-    await page.click('[data-t="agenda"]');
+    await edgeBediening(page, 'Mijn agenda');
     await page.waitForFunction(() => /Proefvaart/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
     const agenda = await page.evaluate(() => document.querySelector('#main').textContent);
     assert.ok(/Zeilgezelschap/.test(agenda), 'de groepsnaam staat bij de bijeenkomst');

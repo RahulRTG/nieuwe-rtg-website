@@ -21,6 +21,11 @@
   // maandag als eerste dag, zoals een agenda hoort
   var maandagVan = function (s) { var d = vanIso(s); var w = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - w); return iso(d); };
 
+  function datum(s, opts) { return new Intl.DateTimeFormat(document.documentElement.lang || 'nl', Object.assign({ timeZone: 'UTC' }, opts)).format(vanIso(s)); }
+  function taal() {
+    DAGEN = Array.from({ length: 7 }, function (_, i) { return datum(plusDagen('2026-09-14', i), { weekday: 'short' }); });
+    MAANDEN = Array.from({ length: 12 }, function (_, i) { return datum('2026-' + String(i + 1).padStart(2, '0') + '-01', { month: 'long' }); });
+  }
   function chip(x, klik) {
     var klas = 'chip' + (x.bron === 'boeking' || x.bron === 'school' ? ' eco' : '') +
       (x.status === 'uitgenodigd' ? ' uit' : '') + (x.status === 'nee' ? ' nee' : '');
@@ -40,6 +45,7 @@
   }
 
   function maand(host, anker, alles, opDag, vandaag) {
+    taal();
     var d = vanIso(anker); d.setUTCDate(1);
     var eerste = iso(d);
     var start = maandagVan(eerste);
@@ -64,6 +70,7 @@
   }
 
   function week(host, anker, alles, opDag, vandaag) {
+    taal();
     var start = maandagVan(anker);
     var kaart = perDag(alles);
     var h = '<div class="wgrid">';
@@ -82,18 +89,17 @@
   }
 
   function lijst(host, anker, alles, opDag, vandaag) {
+    taal();
     var kaart = perDag(alles);
     var dagen = Object.keys(kaart).sort();
     var h = dagen.map(function (dag) {
       var d = vanIso(dag);
-      var kop = (dag === vandaag ? 'vandaag · ' : '') +
-        ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'][(d.getUTCDay() + 6) % 7] +
-        ' ' + d.getUTCDate() + ' ' + MAANDEN[d.getUTCMonth()];
-      return '<div class="ldag"><h3>' + kop + '</h3>' + kaart[dag].map(function (x) {
+      var kop = datum(dag, { weekday: 'long', day: 'numeric', month: 'long' });
+      return '<div class="ldag"><h3 translate="no">' + kop + '</h3>' + kaart[dag].map(function (x) {
         return '<div class="litem' + (x.bron === 'boeking' || x.bron === 'school' ? ' eco' : '') + '" data-klik="' + x._i + '" role="button" tabindex="0">' +
           '<span class="tijd">' + (x.tijd ? x.tijd + (x.eind ? '&ndash;' + x.eind : '') : 'hele dag') + '</span>' +
-          '<span class="wat"><b>' + esc(x.titel) + '</b><small>' +
-          (x.plek ? esc(x.plek) + ' · ' : '') +
+          '<span class="wat"><b data-user-content>' + esc(x.titel) + '</b><small>' +
+          (x.plek ? '<span data-user-content>' + esc(x.plek) + '</span> · ' : '') +
           (x.van ? 'uitnodiging van ' + esc(x.van) + ' · ' : '') +
           (x.status && x.bron !== 'boeking' ? 'u zei: ' + esc(x.status === 'uitgenodigd' ? 'nog niets' : x.status) : '') +
           '</small></span>' +

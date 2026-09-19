@@ -14,7 +14,7 @@
         $('#zoek').value = typeof value.zoek === 'string' ? value.zoek.slice(0, 256) : '';
         if (Array.from($('#sorteer').options).some(function (o) { return o.value === value.sorteer; })) $('#sorteer').value = value.sorteer;
         $('#toonBak').classList.toggle('aan', bak);
-        $('#toonBak').textContent = bak ? 'Terug naar de kluis' : 'Prullenbak';
+        window.RTGDailyFields.set($('#toonBak'), bak ? 'backVault' : 'bin');
         apply({ hier: hier, bak: bak }); return true;
       }
     });

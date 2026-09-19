@@ -1,0 +1,52 @@
+/* Content-specific projections of the four daily rooms. */
+body.rtg-daily #mappen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+body.rtg-daily .mapkaart{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:18px;margin:0;padding:20px;min-height:106px;background:#131310;font:400 14px/1.5 Inter,sans-serif;overflow-wrap:anywhere}
+body.rtg-daily .mapkaart .mp{width:26px;height:20px;border-color:#d7bd8b}
+body.rtg-daily .item{border:0;border-bottom:1px solid var(--line);background:transparent;margin:0;padding:20px 0;gap:16px}
+body.rtg-daily .item .wat b{font:500 14px/1.5 Inter,sans-serif;white-space:normal;overflow-wrap:anywhere}
+body.rtg-daily .item .wat span{font-size:11px;line-height:1.8;margin-top:4px}
+body.rtg-daily .item .ext{width:38px;height:46px;background:none;color:#dfc491}
+body.rtg-daily .daily-foot{margin-top:26px}
+body.rtg-daily .daily-storage{margin-block:24px;font-size:11px}
+body.rtg-daily :is(#bord,#gedeeldBord){columns:auto;display:grid;grid-template-columns:1fr;gap:14px}
+body.rtg-daily .nkaart{padding:24px;margin:0;background:#191815;border:1px solid var(--line);overflow-wrap:anywhere}
+body.rtg-daily .nkaart h3{font:400 26px/1.2 'Bodoni Moda',Georgia,serif;margin-bottom:14px}
+body.rtg-daily .nkaart :is(p,.taak){font:400 14px/1.8 Inter,sans-serif;color:#dbd4c9}
+body.rtg-daily .nkaart .meta{font:400 11px/1.8 Inter,sans-serif;margin-top:18px;color:#c3b9a9}
+body.rtg-daily .nkaart.vast{background:#eae3d6;border-color:#eae3d6;color:#24231f}
+body.rtg-daily .nkaart.vast :is(h3,p,.taak,.meta,.goud){color:#423d33}
+body.rtg-daily .post{padding:24px 0;background:transparent;border:0;border-bottom:1px solid var(--line);margin:0}
+body.rtg-daily .post .kop{margin:0 0 18px;gap:12px;letter-spacing:normal;flex-wrap:wrap}
+body.rtg-daily .post .wie{font:500 14px/1.4 Inter,sans-serif;color:#f4f0e9}
+.daily-avatar{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #b69b6a;border-radius:50%;color:#e8cea0;background:#221c14;font:400 22px/1 'Bodoni Moda',Georgia,serif}
+body.rtg-daily .post .tekst{font:400 22px/1.5 'Bodoni Moda',Georgia,serif;white-space:pre-wrap;color:#f4f0e9}
+body.rtg-daily .post .acts{gap:8px;margin-top:20px}
+body.rtg-daily .post .acts .knop{font-size:12px;padding:8px 12px;color:#dbd4c9;background:none}
+body.rtg-daily .post .acts .aan{background:#39202a;color:#f4f0e9;border-color:#bc8293}
+body.rtg-daily .schrijf{padding:0 0 24px;background:none;border:0;border-bottom:1px solid var(--line);margin:0}
+body.rtg-daily .schrijf textarea{width:100%;min-height:120px}
+body.rtg-daily .rrij{flex-wrap:wrap}
+body.rtg-daily .rrij input{min-width:0}
+.daily-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-bottom:28px}
+.daily-week button{min-width:0;min-height:66px;padding:8px 0;border:0;background:transparent;color:#dbd4c9;font:400 11px/1.5 Inter,sans-serif}
+.daily-week button b{display:block;margin-top:7px;font-size:17px;font-weight:400}
+.daily-week button[aria-pressed="true"]{background:#d7bd8b;color:#0C0C0B}
+body.rtg-daily .ldag h3{margin-block:24px;font:500 11px/1.6 Inter,sans-serif;letter-spacing:.15em;color:#dfc491}
+body.rtg-daily .litem{position:relative;border:0;border-inline-start:1px solid #9d8357;background:transparent;padding:12px 0 26px 18px;margin:0 0 0 3px;align-items:flex-start;gap:18px}
+[dir="rtl"] body.rtg-daily .litem{padding:12px 18px 26px 0;margin:0 3px 0 0}
+body.rtg-daily .litem::before{content:'';width:5px;height:5px;background:#d7bd8b;position:absolute;inset-inline-start:-3px;top:20px}
+body.rtg-daily .litem .tijd{min-width:46px;max-width:80px;font:400 12px/1.8 Inter,sans-serif;flex-shrink:0}
+body.rtg-daily .litem .wat b{font:400 23px/1.25 'Bodoni Moda',Georgia,serif;margin-bottom:8px;overflow-wrap:anywhere}
+body.rtg-daily .litem .wat small{font:400 12px/1.6 Inter,sans-serif}
+body.rtg-daily .rahulbalk{flex-wrap:wrap;padding:20px 0;margin:0;gap:12px}
+body.rtg-daily .daily-planner{margin-block:26px;border-block:1px solid var(--line);padding:18px 0;color:#dbd4c9;font-size:13px}
+body.rtg-daily #periode{font:400 24px/1.4 'Bodoni Moda',Georgia,serif;margin-block:12px 24px}
+body.rtg-daily[data-rtg-daily="agenda"][data-daily-view="dag"] #periode{display:none}
+
+body.rtg-daily[data-rtg-daily="agenda"][data-daily-state="empty"] .daily-foot{display:none}
+body.rtg-daily[data-rtg-daily="agenda"][data-daily-view="dag"] #kal .ldag>h3{display:none}
+
+body.rtg-daily .schrijf textarea{min-height:78px;height:78px}
+body.rtg-daily .schrijf .voet{gap:8px;flex-wrap:wrap}
+body.rtg-daily .schrijf .voet .knop{font-size:12px;padding:8px 10px}
+body.rtg-daily .schrijf .voet #plaats{flex:0 0 auto;margin-inline-start:auto}

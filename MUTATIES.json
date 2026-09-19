@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-18T22:52:54.580Z",
-    "commit": "49a112a57",
+    "op": "2026-09-18T23:05:59.872Z",
+    "commit": "600a8dc26",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -255,6 +255,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "agenda.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "agenda.test.js": {
@@ -916,6 +923,13 @@
       "operator": "+->-#1",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "bestanden.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bestanden.test.js": {
       "soort": "server",
@@ -5588,6 +5602,13 @@
       "operator": "return-weg#1",
       "gezakt": 1,
       "geprobeerd": 10
+    },
+    "notities.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "notities.test.js": {
       "soort": "server",

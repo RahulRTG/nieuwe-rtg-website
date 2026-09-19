@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1936 bestanden en 13946 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1937 bestanden en 13947 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1936 |
-| losse beweringen (`test(...)`) | 13946 |
+| toetsbestanden | 1937 |
+| losse beweringen (`test(...)`) | 13947 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 150 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1292 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1296 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 405 |
+| niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1750,7 +1750,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-226 bestanden, 396 beweringen.
+227 bestanden, 397 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1758,7 +1758,7 @@ toets omvalt.
 | `aanwezigheid-routes.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE ZES ROUTES VAN DE PUBLIEKE LAAG, tegen een echte server. test/aanwezigheid.test.js beproeft de MODULES; deze toets beproeft de weg ernaartoe. |
 | `access-language.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `adaptief.e2e.js` | 1 | genoemd | DE ADAPTIEVE LAAG IN EEN ECHTE BROWSER. De regels staan in ADAPTIEF.md, de statische kant in test/adaptief.test.js. |
-| `agenda.e2e.js` | 1 | -- | Scherm-test voor RTG Agenda: het maandraster, Rahul die in gewone taal plant, een afspraak met het paneel, uitnodigen op codenaam en het ja-zeggen door de ander, en de ICS-export. Echte namen horen nergens in beeld... |
+| `agenda.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Agenda: het maandraster, Rahul die in gewone taal plant, een afspraak met het paneel, uitnodigen op codenaam en het ja-zeggen door de ander, en de ICS-export. Echte namen horen nergens in beeld... |
 | `appmenu.e2e.js` | 10 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
 | `apps-ui.e2e.js` | 12 | genoemd | Scherm-tests voor de overige vlaggenschip-apps: leverancier, lid en backoffice. Elk logt in via een API-token in localStorage (net als de PDA- test), opent de app in een echte browser en controleert dat de beveiligde... |
 | `appstore.e2e.js` | 3 | -- | DE CEL IN EEN ECHTE BROWSER -- het enige bewijs dat telt voor deze laag. test/appstore.test.js bewijst wat de SERVER doet. |
@@ -1766,7 +1766,7 @@ toets omvalt.
 | `bankkamer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |
 | `bankscherm.e2e.js` | 3 | -- | Scherm-toets op de bank: legt een toets de weg van deze app werkelijk af? WAAROM JUIST DEZE APP EERST scripts/schermen.js telde 105 van de 188 schermen waar geen enkele toets de weg aflegt -- ze worden wel geopend... |
 | `berichten.e2e.js` | 1 | -- | Scherm-test voor de communicatie-app. De unit-toetsen (test/berichten.test.js, test/comm-dm.test.js) bewijzen de server-kant; deze bewijst dat de APP het ook echt doet in een browser: de lijst komt op, een gesprek... |
-| `bestanden.e2e.js` | 1 | -- | Scherm-test voor RTG Bestanden: uploaden via de kiezer, het paneel met voorvertoning, delen op codenaam, de nieuwe versie van de andere kant, en de prullenbak met herstel. Draait alleen waar een browser is. |
+| `bestanden.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Bestanden: uploaden via de kiezer, het paneel met voorvertoning, delen op codenaam, de nieuwe versie van de andere kant, en de prullenbak met herstel. Draait alleen waar een browser is. |
 | `bestellen-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET BESTELSCHERM (/apps/bestellen.html) IN EEN ECHTE BROWSER. test/gastfoodcourt.test.js bewijst dat een mandje bij twee loketten twee rekeningen wordt, elk bij zijn eigen zaak. |
 | `bewijsmapscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERMTOETS VOOR /apps/bewijsmap.html -- wat een lid met RTG kan aantonen. WAAROM DIT EEN BROWSER NODIG HEEFT. |
 | `bijstandscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERMTOETS VOOR RTG BIJSTAND, DE KLANTKANT -- de kaart in het Werk OS waarmee een organisatie ons binnenlaat en er weer uitzet. WAAROM DIT EEN SCHERMTOETS NODIG HEEFT. |
@@ -1796,6 +1796,7 @@ toets omvalt.
 | `contactpin.e2e.js` | 4 | -- | DE CONTACTPIN OP HET SCHERM (apps/app.html, sociale balk in De Salon). test/contactpin.test.js bewijst dat de kern en de routes kloppen. |
 | `contrastcontext.e2e.js` | 1 | gezakt op `>=->>#0` | DRAAGT EEN CONTRASTMELDING GENOEG OM HEM TE KUNNEN REPAREREN? Deze toets bestaat door een rode CI die achteraf niet meer te herleiden was. |
 | `csp.e2e.js` | 1 | -- | DE CSP ZOALS EEN BROWSER HEM ERVAART. Een Content-Security-Policy is de enige beveiliging in dit huis die je niet kunt aantonen door de code te lezen. |
+| `daily-rooms.e2e.js` | 1 | gezakt op `liegpoort /api/` | Approved daily rooms, proven with a real empty account and real mutations. A failed read or empty search must never impersonate a first visit. |
 | `deelmenu.e2e.js` | 3 | genoemd | Scherm-test voor het deelmenu (shared/deelmenu.js): een app met veel delen wordt een menu met een deel tegelijk, in plaats van een lange rol. Het contract, op de eerste pagina die meedoet (rtgschool.html): 1. |
 | `deelmenuronde.e2e.js` | 5 | genoemd | DE TWEEDE RONDE VAN HET DEELMENU: WAT ER GEBEURT ALS DE APP HERTEKENT. test/deelmenuwacht.e2e.js bewaakt de EERSTE ronde: komt er een menu zodra de app zijn schermen neerzet. |
 | `deelmenuwacht.e2e.js` | 2 | genoemd | DE WACHT VAN HET DEELMENU, OP EEN PAGINA DIE VERDER NIETS DOET. WAAROM DEZE TOETS ER IS -- eerlijkheidspunt 6.2 `shared/deelmenu.js` kijkt met een MutationObserver of een app zijn schermen alsnog neerzet. |
@@ -1881,7 +1882,7 @@ toets omvalt.
 | `neiging-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET SCHERM VAN RTG NEIGING IN EEN ECHTE BROWSER (NEIGING.md par. 4). |
 | `neiging.e2e.js` | 7 | gezakt op `liegpoort /api/` | RTG Neiging tegen een ECHTE server: de deur en de montage. test/neiging.test.js bewijst het gedrag van de laag. |
 | `nieuwe-schermen.e2e.js` | 3 | -- | DRIE SCHERMEN DIE MET DE VERZAMELING MEEKWAMEN, EN DIE NOG NOOIT EEN BROWSER HADDEN GEZIEN. RTG Festival bracht twee schermen mee (het organisatiescherm en de gastenkant) en RTG Reizen een derde (de klaargezette reis). |
-| `notities.e2e.js` | 1 | -- | Scherm-test voor Notities & Taken: een lijst bouwen met Enter, bewaren, afvinken op de kaart zelf (zonder de editor te openen), delen op codenaam en de andere kant die meteen mee kan doen. |
+| `notities.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor Notities & Taken: een lijst bouwen met Enter, bewaren, afvinken op de kaart zelf (zonder de editor te openen), delen op codenaam en de andere kant die meteen mee kan doen. |
 | `objectpaneel.e2e.js` | 1 | genoemd | Schermtoets voor het objectpaneel op RTG Sociaal (LIFE.md fase 2). Deze toets bewaakt EEN ding, en het is de reden dat de objectlaag bestaat: het scherm kent geen enkele cap bij naam. |
 | `office-blad.e2e.js` | 1 | -- | Scherm-test voor het rekenblad van RTG Office. test/rekenmotor.test.js bewijst dat de motor rekent; deze bewijst dat een mens er ook bij kan. |
 | `office-formschets.e2e.js` | 1 | -- | Scherm-test voor de twee nieuwe officesoorten: het formulier en de schets. Wat hier bewezen wordt, door de echte schermen heen: - A bouwt een formulier (open vraag + schaal) en deelt het met B als meelezer, op... |

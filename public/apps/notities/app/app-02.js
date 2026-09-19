@@ -20,8 +20,8 @@
     $('#ntTekst').value = open.tekst || '';
     $('#ntDatum').value = open.herinnerOp || '';
     $('#ntTijd').value = open.herinnerTijd || '';
-    $('#ntVast').textContent = open.vast ? 'Losmaken' : 'Vastpinnen';
-    $('#ntArchief').textContent = open.archief ? 'Terug op het bord' : 'Archiveer';
+    window.RTGDailyFields.set($('#ntVast'), open.vast ? 'unpin' : 'pin');
+    window.RTGDailyFields.set($('#ntArchief'), open.archief ? 'restoreNote' : 'archiveAction');
     // vastpinnen, archief en delen zijn van de eigenaar; samen bewerken niet
     ['ntVast', 'ntArchief'].forEach(function (id) { $('#' + id).style.display = open.vanMij ? '' : 'none'; });
     $('#ntDeelWrap').style.display = open.vanMij && open.id ? '' : 'none';

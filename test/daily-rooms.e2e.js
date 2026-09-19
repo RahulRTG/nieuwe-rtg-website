@@ -69,6 +69,8 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     await page.locator('#ntTekst').fill('Maak ruimte voor een lange wandeling.');
     await page.evaluate(() => window.RTGi18n.set('en')); // shared language event, also used by the embedding shell
     assert.equal(await page.locator('#ntTitel').inputValue(), 'Voor het weekend');
+    assert.equal(await page.locator('#ntTitel').getAttribute('placeholder'), 'Title');
+    assert.equal(await page.locator('#ntBewaar').textContent(), 'Save');
     await page.evaluate(() => window.RTGi18n.set('nl'));
     await page.route('**/api/notities/bewaar', r => r.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"Tijdelijk niet beschikbaar."}' }));
     await page.locator('#ntBewaar').click();
@@ -83,6 +85,13 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     assert.equal(await page.locator('#zoek').getAttribute('placeholder'), 'Search your notes');
     assert.match(await page.locator('.daily-foot').textContent(), /New note/);
     await language(page, 'nl', 'Nederlands');
+    await page.locator('#bord .nkaart.vast').click();
+    await page.waitForSelector('#ntScrim.open');
+    await page.evaluate(() => window.RTGi18n.set('en'));
+    assert.equal(await page.locator('#ntVast').textContent(), 'Unpin', 'a language switch keeps the pin state');
+    await page.evaluate(() => window.RTGi18n.set('nl'));
+    assert.equal(await page.locator('#ntVast').textContent(), 'Losmaken');
+    await page.locator('#ntDicht').click();
     await screenshot('notities-filled');
     await page.locator('#zoek').fill('niets-met-deze-naam');
     assert.match(await page.locator('#bord').textContent(), /geen resultaten/);
@@ -98,6 +107,14 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     await page.waitForSelector('#mappen .mapkaart');
     const files = await post(srv.base, '/api/bestanden/mijn', {}, reg.token);
     assert.equal(files.items.length, 1); assert.equal(files.mappen.length, 1);
+    await page.locator('#lijst .item').click();
+    await page.waitForSelector('#bkScrim.open');
+    await page.evaluate(() => window.RTGi18n.set('en'));
+    assert.equal(await page.locator('#bkNaam').getAttribute('aria-label'), 'File name');
+    assert.equal(await page.locator('#bkDeel').textContent(), 'Share');
+    assert.equal(await page.locator('#bkNaam').inputValue(), 'Reisplanning.txt');
+    await page.evaluate(() => window.RTGi18n.set('nl'));
+    await page.locator('#bkDicht').click();
     await screenshot('bestanden-filled');
     await page.locator('#mappen .mapkaart').click();
     assert.match(await page.locator('#lijst').textContent(), /geen bestanden in deze map/);
@@ -113,6 +130,12 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     await page.locator('#afDatum').fill(today);
     await page.locator('#afTijd').fill('19:30');
     await page.locator('#afPlek').fill('Aan het water');
+    await page.evaluate(() => window.RTGi18n.set('en'));
+    assert.equal(await page.locator('#afKop').textContent(), 'New appointment');
+    assert.equal(await page.locator('#afHerhaal option[value="week"]').textContent(), 'Every week');
+    assert.equal(await page.locator('#afTitel').inputValue(), 'Samen aan tafel');
+    assert.equal(await page.locator('#afDatum').inputValue(), today);
+    await page.evaluate(() => window.RTGi18n.set('nl'));
     await page.locator('#afBewaar').click();
     await page.waitForSelector('#kal .litem');
     assert.match(await page.locator('#kal').textContent(), /Samen aan tafel/);
@@ -130,11 +153,13 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     await page.locator('#nw').fill('Een kleine wandeling maakt ruimte voor een goed gesprek.');
     await language(page, 'en', 'English');
     assert.equal(await page.locator('#nw').inputValue(), 'Een kleine wandeling maakt ruimte voor een goed gesprek.');
+    assert.equal(await page.locator('#plaats').textContent(), 'Post');
     await page.locator('#plaats').click();
     await page.waitForSelector('article.post');
     page.once('dialog', d => d.accept('Bewaard'));
     await page.locator('[data-bewaar]').click();
     await page.waitForSelector('[data-saved="true"]');
+    await page.waitForFunction(() => document.querySelector('[data-saved="true"]').textContent === 'Saved');
     await language(page, 'nl', 'Nederlands');
     assert.equal((await post(srv.base, '/api/member/pulse/feed', {}, reg.token)).feed.length, 1);
     await page.waitForFunction(() => { const b = document.querySelector('.rtguitvoer-knop'); return b && !!b.closest('.rtg-edge-chrome'); });

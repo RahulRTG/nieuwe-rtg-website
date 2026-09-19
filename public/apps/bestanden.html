@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <script>try{if(window.self!==window.top)document.documentElement.dataset.rtgOppervlak='1'}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Bestanden</title>
+<title data-i18n="dailyField.filesPage">RTG Bestanden</title>
 <link rel="icon" href="/icon.svg">
 <meta name="theme-color" content="#0C0C0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -106,41 +106,41 @@
 <body class="rtg-stijl rtg-daily" data-kantoor-tool="bestanden" data-rtg-eigenvlak="onyx" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-daily="bestanden" data-rtg-editorial-room="bestanden">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <span><span class="ey">RTG</span><h1>Bestanden</h1></span>
+  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
+  <span><span class="ey">RTG</span><h1 data-i18n="dailyField.files">Bestanden</h1></span>
   <span class="rij" style="margin-left:auto;">
-    <button class="knop" id="toonBak" data-rtg-edge-bar type="button">Prullenbak</button>
-    <button class="knop" id="nieuwMap" data-rtg-edge-bar type="button">+ Map</button>
-    <input type="file" id="bestandkiezer" multiple hidden aria-label="Bestanden kiezen">
+    <button class="knop" id="toonBak" data-rtg-edge-bar type="button" data-i18n="dailyField.bin">Prullenbak</button>
+    <button class="knop" id="nieuwMap" data-rtg-edge-bar type="button" data-i18n="dailyField.newFolder">+ Map</button>
+    <input type="file" id="bestandkiezer" multiple hidden aria-label="Bestanden kiezen" data-i18n-aria="dailyField.chooseFiles">
   </span>
 </header>
 <!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
      "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
      een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
      rij onder de kop. -->
-<div class="rtg-duimbalk"><button class="knop vol" id="kies" data-rtg-edge-bar type="button" data-hoofdactie>Upload</button></div>
+<div class="rtg-duimbalk"><button class="knop vol" id="kies" data-rtg-edge-bar type="button" data-hoofdactie data-i18n="dailyField.upload">Upload</button></div>
 <main>
-<section id="dailyIntro" aria-label="Bestanden"></section>
+<section id="dailyIntro" aria-label="Bestanden" data-i18n-aria="dailyField.files"></section>
   <div class="daily-content">
   <input class="veld" id="zoek" type="search" placeholder="Zoek in uw bestanden" data-i18n-ph="daily.fileSearch" aria-label="Zoeken"
-    style="width:100%;margin-bottom:0.75rem;">
-  <div class="sleep">Laat los om te uploaden</div>
-  <nav id="pad" aria-label="Mappenpad"></nav>
+    style="width:100%;margin-bottom:0.75rem;" data-i18n-aria="dailyField.search">
+  <div class="sleep" data-i18n="dailyField.dropUpload">Laat los om te uploaden</div>
+  <nav id="pad" aria-label="Mappenpad" data-i18n-aria="dailyField.folderPath"></nav>
   <h2 id="dailyFolders" data-i18n="daily.folders" class="kop">Uw mappen</h2>
   <div id="mappen"></div>
   <h2 class="kop" data-i18n="daily.files">Uw documenten</h2>
   <div id="lijst" aria-live="polite"></div>
-  <div id="gedeeldKop" class="kop" style="display:none;">Met mij gedeeld</div>
+  <div id="gedeeldKop" class="kop" style="display:none;" data-i18n="dailyField.sharedWithMe">Met mij gedeeld</div>
   <div id="gedeeldLijst"></div>
-  <div id="officeKop" class="kop" style="display:none;">Uit RTG Office · werken doet u daar</div>
+  <div id="officeKop" class="kop" style="display:none;" data-i18n="dailyField.officeSource">Uit RTG Office · werken doet u daar</div>
   <div id="officeLijst"></div>
   <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="kies"><span data-i18n="daily.addFile">Bestand toevoegen</span> <span aria-hidden="true">→</span></button></div>
 <div class="daily-storage">  <div class="rij" style="justify-content:space-between;">
     <span class="stil" id="quotumTekst">&nbsp;</span>
-    <select class="veld" id="sorteer" aria-label="Sorteren">
-      <option value="nieuw">Nieuwste eerst</option>
-      <option value="naam">Op naam</option>
-      <option value="groot">Grootste eerst</option>
+    <select class="veld" id="sorteer" aria-label="Sorteren" data-i18n-aria="dailyField.sort">
+      <option value="nieuw" data-i18n="dailyField.newest">Nieuwste eerst</option>
+      <option value="naam" data-i18n="dailyField.byName">Op naam</option>
+      <option value="groot" data-i18n="dailyField.largest">Grootste eerst</option>
     </select>
   </div>
   <div class="meter" aria-hidden="true"><i id="quotumBalk"></i></div>
@@ -149,40 +149,41 @@
   </div>
 </main>
 
-<div class="scrim" id="bkScrim" role="dialog" aria-label="Bestand">
+<div class="scrim" id="bkScrim" role="dialog" aria-label="Bestand" data-i18n-aria="dailyField.file">
   <div class="paneel">
-    <input class="titel" id="bkNaam" maxlength="120" aria-label="Bestandsnaam">
+    <input class="titel" id="bkNaam" maxlength="120" aria-label="Bestandsnaam" data-i18n-aria="dailyField.filename">
     <p class="stil h-mt40" id="bkMeta"></p>
     <div id="bkKijk" style="display:none;"></div>
-    <label for="bkMap">In map</label>
+    <label for="bkMap" data-i18n="dailyField.inFolder">In map</label>
     <select class="veld" id="bkMap" style="width:100%;"></select>
     <div id="bkDeelWrap">
-      <label for="bkCode">Delen op codenaam (kijken en nieuwe versies)</label>
-      <div class="rij"><input class="veld h-flex1" id="bkCode" maxlength="60" placeholder="Codenaam">
-        <button class="knop" id="bkDeel" type="button">Deel</button></div>
+      <label for="bkCode" data-i18n="dailyField.shareFile">Delen op codenaam (kijken en nieuwe versies)</label>
+      <div class="rij"><input class="veld h-flex1" id="bkCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
+        <button class="knop" id="bkDeel" type="button" data-i18n="dailyField.share">Deel</button></div>
       <p class="stil" id="bkGedeeld"></p>
     </div>
     <div id="bkVersieWrap" style="display:none;">
-      <label>Versies</label>
+      <label data-i18n="dailyField.versions">Versies</label>
       <div id="bkVersies"></div>
     </div>
     <div class="rij h-mt90">
-      <button class="knop vol" id="bkBewaar" type="button">Bewaar</button>
-      <button class="knop" id="bkHaal" type="button">Download</button>
-      <button class="knop" id="bkNieuwVersie" type="button">Nieuwe versie</button>
-      <button class="knop" id="bkSter" type="button">Ster</button>
-      <button class="knop" id="bkWeg" type="button">Verwijder</button>
+      <button class="knop vol" id="bkBewaar" type="button" data-i18n="dailyField.save">Bewaar</button>
+      <button class="knop" id="bkHaal" type="button" data-i18n="dailyField.download">Download</button>
+      <button class="knop" id="bkNieuwVersie" type="button" data-i18n="dailyField.newVersion">Nieuwe versie</button>
+      <button class="knop" id="bkSter" type="button" data-i18n="dailyField.star">Ster</button>
+      <button class="knop" id="bkWeg" type="button" data-i18n="dailyField.delete">Verwijder</button>
       <span class="h-flex1"></span>
-      <button class="knop" id="bkDicht" type="button">Sluit</button>
+      <button class="knop" id="bkDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
     <div class="rij h-mt50">
-      <button class="knop" id="bkHerstel" type="button" style="display:none;">Herstel</button>
-      <input type="file" id="versiekiezer" hidden aria-label="Nieuwe versie kiezen">
+      <button class="knop" id="bkHerstel" type="button" style="display:none;" data-i18n="dailyField.restore">Herstel</button>
+      <input type="file" id="versiekiezer" hidden aria-label="Nieuwe versie kiezen" data-i18n-aria="dailyField.chooseVersion">
     </div>
   </div>
 </div>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/rtg-daily-copy.js"></script>
+<script src="/shared/rtg-daily-fields.js"></script>
 <script src="/shared/rtg-daily.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/rtg-route-memory-core.js"></script>

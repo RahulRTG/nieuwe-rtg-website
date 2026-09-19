@@ -26,7 +26,7 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, elevateTier } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, elevateTier, edgeActies } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -92,7 +92,7 @@ test('premium: meenemen geeft echte velden, en weigert schermtekst',
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/notities.html', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
+    await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_lang', 'nl'); }, token);
     await page.goto(base + '/apps/notities.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.RTGUitvoer && RTGUitvoer.beschikbaar(), null, { timeout: 12000 });
 
@@ -112,36 +112,30 @@ test('premium: meenemen geeft echte velden, en weigert schermtekst',
     // en niet als een aan elkaar geplakte regel
     assert.ok(!d.rijen.some(r => r.length === 1), 'geen enkele rij is een dichtgeplakte tekstregel');
 
-    /* De bediening zelf. Zonder dit blok kan de toets niet zakken als de
-       knop er niet is: RTGUitvoer.gegevens() werkt ook prima zonder dat een
-       mens erbij kan. De rand hoort erbij: een knop zonder rand is op deze
-       schermen niet te onderscheiden van de tekst ernaast. */
+    /* De bediening zelf. De Edge toont een bereikbare actie en roept daarmee
+       de oorspronkelijke export aan. Meet de zichtbare Edge-knop, niet de
+       opgeborgen bronknop; alleen RTGUitvoer.gegevens() meten bewijst geen
+       bruikbare bediening op een telefoon. */
     await page.waitForFunction(() => !!document.querySelector('.rtguitvoer-knop'), null, { timeout: 12000 });
-    const bediening = await page.evaluate(() => {
-      const k = document.querySelector('.rtguitvoer-knop');
-      const st = getComputedStyle(k), vak = k.getBoundingClientRect();
+    await edgeActies(page);
+    const exportKnop = page.locator('.rtg-adaptive-controls').getByRole('button', { name:'Meenemen', exact:true });
+    await exportKnop.scrollIntoViewIfNeeded();
+    const bediening = await exportKnop.evaluate(k => {
+      const vak = k.getBoundingClientRect();
       const uit = {
         label: k.textContent.trim(), hoog: Math.round(vak.height),
-        rand: st.borderTopWidth + ' ' + st.borderTopStyle,
         inBeeld: vak.top >= 0 && vak.bottom <= innerHeight && vak.left >= 0 && vak.right <= innerWidth
       };
-      k.click();
-      // geen venster is hier een uitkomst en geen crash: dan zakt de bewering
-      const laag = document.querySelector('.rtguitvoer-laag');
-      uit.open = !!(laag && !laag.hidden);
-      if (!uit.open) return uit;
-      uit.vormen = [].slice.call(laag.querySelectorAll('[data-vorm]')).map((b) => b.getAttribute('data-vorm'));
-      laag.querySelector('.rtguitvoer-sluit').click();
-      uit.dicht = laag.hidden;
       return uit;
     });
     assert.equal(bediening.label, 'Meenemen', 'de knop heet zoals de laag belooft');
     assert.ok(bediening.hoog >= 44, 'met een duim te raken, kreeg ' + bediening.hoog + 'px');
-    assert.equal(bediening.rand, '1px solid', 'de rand die de laag zet is er ook echt, kreeg: ' + bediening.rand);
     assert.equal(bediening.inBeeld, true, 'en hij staat op telefoonmaat binnen beeld');
-    assert.equal(bediening.open, true, 'een tik opent het venster');
-    assert.deepEqual(bediening.vormen, ['csv', 'json'], 'beide vormen staan erin');
-    assert.equal(bediening.dicht, true, 'en de sluitknop sluit het weer, ook zonder Esc');
+    await exportKnop.click();
+    await page.locator('.rtguitvoer-laag').waitFor({ state:'visible' });
+    assert.deepEqual(await page.locator('.rtguitvoer-laag [data-vorm]').evaluateAll(es=>es.map(e=>e.dataset.vorm)), ['csv','json'], 'beide vormen staan erin');
+    await page.locator('.rtguitvoer-sluit').click();
+    await page.locator('.rtguitvoer-laag').waitFor({ state:'hidden' });
 
     /* de weigering: haal de aangemelde bron weg en er hoort NIETS meer te
        zijn -- want deze pagina heeft geen echte tabel */

@@ -50,7 +50,8 @@ test('voorspelde acties verdringen geen veilige terugval en blijven begrensd', (
 
 test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(CSS, /data-rtg-adaptive-ready="true"\] \.rtg-edge-bottom\{display:none!important\}/);
-  assert.match(CSS, /width:min\(720px,calc\(100vw - var\(--edge-side\) - 28px\)\)/);
+  assert.match(CSS, /width:min\(720px,calc\(100% - var\(--edge-side\) - var\(--rtg-safe-left\) - var\(--rtg-safe-right\) - 28px\)\)/);
+  assert.match(CSS, /max-height:min\(620px,calc\(100dvh - var\(--rtg-adaptive-inset\) - var\(--rtg-safe-top\) - 16px\)\)/);
   assert.match(CSS, /grid-template-columns:repeat\(5,minmax\(44px,1fr\)\)/);
   assert.match(CSS, /\.rtg-adaptive-item\{[^}]*min-width:44px;min-height:54px/);
   assert.match(CSS, /backdrop-filter:blur\(24px\) saturate\(1\.3\)/);

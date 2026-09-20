@@ -7,7 +7,7 @@
           if (e.key === 'Escape' && m && m.classList.contains('open')) { this.set(this.lang); this.closeModal(); }
         });
       }
-      if (stondOpen) { scrim.classList.add('open'); this._startMond(); }
+      if (stondOpen) scrim.classList.add('open');
     },
     // spreken -> tekst (Web Speech API, geen afhankelijkheden). Lukt het niet,
     // dan gebeurt er gewoon niets bijzonders; typen blijft altijd werken.
@@ -27,45 +27,35 @@
         rec.start();
       } catch (e) { mic.classList.remove('luistert'); }
     },
-    // de signatuurlippen: pas laden/tekenen zodra de kiezer echt getoond wordt
-    _startMond() {
-      const c = document.getElementById('rtg-lang-mond');
-      if (!c || this._mond) return;
-      const go = () => { if (window.RTGMond && !this._mond) this._mond = window.RTGMond.maak(c); };
-      if (window.RTGMond) go();
-      else if (!this._mondLaadt) {
-        this._mondLaadt = true;
-        const s = document.createElement('script'); s.src = assetPad('/shared/mond.js'); s.async = true;
-        s.onload = go; document.head.appendChild(s);
-      }
-      this._startSterren();
-    },
-    // een heel subtiele 3D-sterrenhemel achter de kaart, in RTG-stijl
-    _startSterren() {
-      const scrim = document.getElementById('rtg-lang-modal');
-      if (!scrim || this._sterren) return;
-      const go = () => { if (window.RTGSterren && !this._sterren) this._sterren = window.RTGSterren.hang(scrim, { helderheid: 0.85 }); };
-      if (window.RTGSterren) return go();
-      if (this._sterLaadt) return;
-      this._sterLaadt = true;
-      const s = document.createElement('script'); s.src = assetPad('/shared/sterren.js'); s.async = true;
-      s.onload = go; document.head.appendChild(s);
-    },
     openModal() {
-      if (!document.getElementById('rtg-lang-modal')) this.buildModal(this.chosen ? this.lang : (this._aanbevolen || detectDevice()));
+      this._taalTerug = document.activeElement;
+      const bestaand = document.getElementById('rtg-lang-modal');
+      if (bestaand) bestaand.remove();
+      this.buildModal(this.chosen ? this.lang : (this._aanbevolen || detectDevice()));
       const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.add('open');
-      this._startMond();
       const z = document.getElementById('rtg-lang-zoek');
       if (z) setTimeout(() => { try { z.focus(); } catch (e) {} }, 80);
     },
-    closeModal() { const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.remove('open'); },
+    closeModal() {
+      const m = document.getElementById('rtg-lang-modal');
+      if (m) m.classList.remove('open');
+      const terug = this._taalTerug;
+      if (terug && typeof terug.focus === 'function') setTimeout(() => { try { terug.focus(); } catch (e) {} }, 0);
+    },
 
     /* ---------- de taalkeuze heropenen ----------
        De taalknop zweefde linksonder op elk scherm, boven op de themakiezer en
        het vraagteken. Taal is een instelling, dus hij staat nu waar de andere
        instellingen staan: in het bedieningspaneel (shared/bediening.js), dat
        openModal() aanroept. Het leden-OS deed dit al met de tegel "Taal". */
-    buildSwitch() { /* geen zwevende knop meer; zie het bedieningspaneel */ },
+    buildSwitch() {
+      const self = this;
+      document.querySelectorAll('[data-language-picker]').forEach(function (button) {
+        if (button.hasAttribute('data-language-picker-ready')) return;
+        button.setAttribute('data-language-picker-ready', 'true');
+        button.addEventListener('click', function () { self.openModal(); });
+      });
+    },
     /* updateSwitch bijgewerkt de knop die er niet meer is. Hij zocht nog naar
        #rtg-lang-switch, en dat element staat sinds de verhuizing naar het
        bedieningspaneel op geen enkele pagina meer -- de blindevlek-toets ving
@@ -80,48 +70,77 @@
       const s = document.createElement('style');
       s.id = 'rtg-i18n-styles';
       s.textContent = `
-      .rtg-lang-scrim{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;
-        background:radial-gradient(120% 90% at 50% 0%,rgba(62,20,32,0.6),rgba(12,12,11,0.92) 60%);
-        backdrop-filter:blur(10px);padding:1.1rem;-webkit-font-smoothing:antialiased;}
+      .rtg-lang-scrim{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;overflow:auto;
+        background:rgba(7,7,6,0.76);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+        padding:max(1rem,env(safe-area-inset-top,0px)) max(1rem,env(safe-area-inset-right,0px))
+          max(1rem,env(safe-area-inset-bottom,0px)) max(1rem,env(safe-area-inset-left,0px));-webkit-font-smoothing:antialiased;}
       .rtg-lang-scrim.open{display:flex;}
-      .rtg-lang-card{width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;
-        background:linear-gradient(180deg,#141110,#0C0C0B);color:#F5F3EF;border:1px solid rgba(201,162,75,0.22);
-        border-radius:0;padding:1.2rem 1.3rem 1rem;text-align:center;box-shadow:0 40px 120px rgba(0,0,0,0.6);
-        font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-        animation:rtgLangIn .4s cubic-bezier(.2,.8,.2,1);}
+      .rtg-lang-card,.rtg-lang-card *{box-sizing:border-box;}
+      .rtg-lang-card{position:relative;isolation:isolate;width:100%;max-width:560px;max-height:min(92vh,760px);overflow:auto;
+        display:flex;flex-direction:column;background:linear-gradient(155deg,#191712 0%,#0C0B09 68%);color:#F5F0E7;
+        border:1px solid rgba(225,192,122,0.48);border-radius:var(--rtg-radius-system,22px);padding:1.4rem 1.45rem 1.5rem;text-align:left;
+        box-shadow:0 32px 90px rgba(0,0,0,0.58),inset 0 1px 0 rgba(255,255,255,0.05);
+        font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;animation:rtgLangIn .4s cubic-bezier(.2,.8,.2,1);}
       @keyframes rtgLangIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:none;}}
-      .rtg-lang-mond{display:block;width:200px;height:90px;margin:0.1rem auto -0.15rem;}
-      .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.55rem;margin:0.1rem 0 0.1rem;letter-spacing:-0.01em;color:#F7F3EC;}
-      .rtg-lang-card p{color:#B8B2A8;font-size:0.8rem;margin:0 0 0.85rem;}
-      .rtg-lang-ai{display:flex;align-items:center;gap:0.45rem;background:rgba(255,255,255,0.05);
-        border:1px solid rgba(222,219,213,0.16);border-radius:0;padding:0.1rem 0.1rem 0.1rem 0.9rem;
-        margin:0 auto 0.5rem;max-width:520px;width:100%;transition:border-color .18s;}
-      .rtg-lang-ai:focus-within{border-color:#C9A24B;}
-      .rtg-lang-ai input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;
-        font-family:inherit;font-size:0.92rem;padding:0.7rem 0;}
-      .rtg-lang-ai input::placeholder{color:#8A8680;}
-      .rtg-lang-ai button{flex:none;background:linear-gradient(180deg,#9E1C40,#7F1634);color:#fff;border:none;cursor:pointer;
-        border-radius:0;padding:0.55rem 0.72rem;font-size:1rem;line-height:1;transition:filter .18s,transform .12s;}
-      .rtg-lang-ai button:hover{filter:brightness(1.14);}
-      .rtg-lang-ai button:active{transform:scale(0.95);}
-      #rtg-lang-mic{background:rgba(255,255,255,0.08);}
-      #rtg-lang-mic.luistert{background:linear-gradient(180deg,#C23A5E,#9E1C40);animation:rtgMic 1.1s ease-in-out infinite;}
-      @keyframes rtgMic{0%,100%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}50%{box-shadow:0 0 0 6px rgba(194,58,94,0);}}
-      /* Rahuls voorstel: geen knoppenlijst, maar een enkele aantikbare regel */
-      .rtg-lang-hint{display:flex;align-items:center;gap:0.7rem;width:100%;max-width:520px;margin:0.1rem auto 0.2rem;
-        background:rgba(201,162,75,0.08);border:1px solid rgba(201,162,75,0.3);border-radius:0;
-        padding:0.55rem 0.9rem;cursor:pointer;text-align:left;font-family:inherit;color:#EDE9E2;
-        transition:border-color .16s,background .16s,transform .12s;}
-      .rtg-lang-hint:hover{border-color:#F5E6B8;background:rgba(201,162,75,0.14);}
+      .rtg-lang-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:0.85rem;}
+      .rtg-lang-eyebrow{font-size:0.64rem;font-weight:650;line-height:1;letter-spacing:0.19em;text-transform:uppercase;color:#D8B873;}
+      .rtg-lang-close{display:grid;place-items:center;width:2.45rem;height:2.45rem;flex:0 0 auto;padding:0;color:#F5F0E7;
+        background:rgba(255,255,255,0.035);border:1px solid rgba(245,240,231,0.2);border-radius:50%;cursor:pointer;}
+      .rtg-lang-close:hover{border-color:#D8B873;background:rgba(216,184,115,0.09);}
+      .rtg-lang-close:focus-visible,.rtg-lang-search button:focus-visible,.rtg-lang-hint:focus-visible,.rtg-lang-quick:focus-visible{outline:2px solid #F2D99E;outline-offset:3px;}
+      .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:clamp(2rem,6vw,3rem);line-height:0.98;
+        margin:0;letter-spacing:-0.025em;color:#FAF6EF;}
+      .rtg-lang-card>p{max-width:29rem;color:#B9B2A6;font-size:0.86rem;line-height:1.55;margin:0.65rem 0 1.25rem;}
+      .rtg-lang-label{display:block;margin-bottom:0.42rem;color:#D8B873;font-size:0.62rem;font-weight:650;letter-spacing:0.14em;text-transform:uppercase;}
+      .rtg-lang-search{display:flex;align-items:center;gap:0.4rem;width:100%;min-height:3.55rem;background:rgba(255,255,255,0.035);
+        border:1px solid rgba(245,240,231,0.22);border-radius:var(--rtg-radius-content,2px);padding:0.3rem 0.32rem 0.3rem 0.75rem;margin:0 0 0.7rem;
+        transition:border-color .18s,background .18s;}
+      .rtg-lang-search:focus-within{border-color:#D8B873;background:rgba(216,184,115,0.055);}
+      .rtg-lang-search input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;font-family:inherit;font-size:0.88rem;padding:0.7rem 0;}
+      .rtg-lang-search input::placeholder{color:#817C74;}
+      .rtg-lang-search button{flex:none;min-height:2.8rem;background:#D8B873;color:#17140F;border:1px solid #D8B873;cursor:pointer;
+        border-radius:var(--rtg-radius-content,2px);padding:0.65rem 0.9rem;font-family:inherit;font-size:0.73rem;font-weight:700;line-height:1;letter-spacing:0.05em;
+        transition:filter .18s,transform .12s,background .18s;}
+      .rtg-lang-search button:hover{background:#E8CE95;filter:none;}
+      .rtg-lang-search button:active{transform:scale(0.95);}
+      #rtg-lang-mic{display:grid;place-items:center;min-width:2.8rem;padding:0;background:rgba(255,255,255,0.045);color:#E9DFCC;
+        border-color:rgba(245,240,231,0.17);}
+      #rtg-lang-mic.luistert{background:#D8B873;color:#17140F;animation:rtgMic 1.1s ease-in-out infinite;}
+      @keyframes rtgMic{0%,100%{box-shadow:0 0 0 0 rgba(216,184,115,0.46);}50%{box-shadow:0 0 0 6px rgba(216,184,115,0);}}
+      .rtg-lang-hint{display:flex;align-items:center;gap:0.75rem;width:100%;margin:0 0 0.9rem;background:rgba(216,184,115,0.08);
+        border:1px solid rgba(216,184,115,0.62);border-radius:var(--rtg-radius-content,2px);padding:0.75rem 0.85rem;cursor:pointer;text-align:left;
+        font-family:inherit;color:#EDE9E2;transition:border-color .16s,background .16s,transform .12s;}
+      .rtg-lang-hint:hover{border-color:#F2D99E;background:rgba(216,184,115,0.14);}
       .rtg-lang-hint:active{transform:scale(0.99);}
       .rtg-lang-hint[hidden]{display:none;}
-      .rtg-lang-flag{font-size:1.7rem;line-height:1;}
+      .rtg-lang-hint:disabled{cursor:default;border-color:rgba(245,240,231,0.16);background:rgba(255,255,255,0.025);}
       .rtg-lang-sug{display:flex;flex-direction:column;line-height:1.2;}
-      .rtg-lang-sug b{color:#F7F3EC;font-weight:600;font-size:0.98rem;}
-      .rtg-lang-go{font-size:0.66rem;letter-spacing:0.04em;color:#C9A24B;}
-      .rtg-lang-mis{color:#8A8680;font-size:0.82rem;}
-      .rtg-lang-code{display:inline-block;min-width:1.7rem;font-size:0.6rem;font-weight:700;letter-spacing:0.05em;
-        color:#C9A24B;border:1px solid rgba(201,162,75,0.4);border-radius:0;padding:0.3rem 0.2rem;text-align:center;}
+      .rtg-lang-sug b{color:#FAF6EF;font-weight:600;font-size:0.95rem;}
+      .rtg-lang-go{margin-top:0.16rem;font-size:0.62rem;letter-spacing:0.09em;text-transform:uppercase;color:#D8B873;}
+      .rtg-lang-mis{color:#A8A198;font-size:0.8rem;line-height:1.4;}
+      .rtg-lang-quick-wrap{margin-top:0.15rem;padding-top:0.95rem;border-top:1px solid rgba(245,240,231,0.12);}
+      .rtg-lang-quick-wrap>span{display:block;margin-bottom:0.55rem;color:#918B82;font-size:0.61rem;font-weight:650;letter-spacing:0.14em;text-transform:uppercase;}
+      .rtg-lang-quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.55rem;}
+      .rtg-lang-quick{display:flex;align-items:center;gap:0.65rem;min-width:0;min-height:3.55rem;padding:0.65rem 0.75rem;color:#EDE8DF;
+        background:rgba(255,255,255,0.025);border:1px solid rgba(245,240,231,0.16);border-radius:var(--rtg-radius-content,2px);font-family:inherit;text-align:left;
+        cursor:pointer;transition:border-color .16s,background .16s,transform .12s;}
+      .rtg-lang-quick:hover,.rtg-lang-quick.is-active{border-color:#D8B873;background:rgba(216,184,115,0.09);}
+      .rtg-lang-quick:active{transform:scale(0.985);}
+      .rtg-lang-quick>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:0.82rem;font-weight:560;white-space:nowrap;}
+      .rtg-lang-code{display:inline-grid;place-items:center;min-width:2rem;height:2rem;flex:0 0 auto;font-size:0.58rem;font-weight:750;
+        letter-spacing:0.08em;color:#D8B873;border:1px solid rgba(216,184,115,0.46);border-radius:var(--rtg-radius-content,2px);padding:0 0.3rem;text-align:center;}
+      [dir="rtl"] .rtg-lang-card,[dir="rtl"] .rtg-lang-hint,[dir="rtl"] .rtg-lang-quick{text-align:right;}
+      @media(max-width:600px){
+        .rtg-lang-scrim{align-items:flex-end;padding:0.75rem max(0.75rem,env(safe-area-inset-right,0px)) max(0.75rem,env(safe-area-inset-bottom,0px)) max(0.75rem,env(safe-area-inset-left,0px));}
+        .rtg-lang-card{max-height:calc(100dvh - 1.5rem);border-radius:var(--rtg-radius-system,22px);padding:1.15rem 1rem 1.05rem;}
+        .rtg-lang-card h2{font-size:2.1rem;}
+        .rtg-lang-card>p{font-size:0.8rem;margin-bottom:1rem;}
+        .rtg-lang-search{min-height:3.3rem;padding-left:0.55rem;}
+        .rtg-lang-search input{font-size:0.82rem;}
+        .rtg-lang-search button{min-height:2.55rem;padding:0.55rem 0.65rem;}
+        #rtg-lang-mic{min-width:2.55rem;}
+        .rtg-lang-quick{min-height:3.25rem;padding:0.55rem 0.6rem;}
+      }
       .rtg-lang-switch{position:fixed;left:14px;bottom:14px;z-index:9990;display:inline-flex;align-items:center;gap:0.35rem;
         background:rgba(12,12,11,0.82);color:#fff;border:1px solid rgba(255,255,255,0.16);border-radius:0;
         padding:0.42rem 0.8rem;font-family:'Inter',-apple-system,sans-serif;font-size:0.72rem;font-weight:600;

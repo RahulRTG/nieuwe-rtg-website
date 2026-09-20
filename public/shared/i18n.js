@@ -893,7 +893,11 @@ window.RTGUiBronnen = Object.freeze({
   'Klein beginnen':'Start small','De Speeltuin':'The playground','Tellen tot tien':'Count to ten',
   'Ondersteuning':'Support','Instellingen':'Settings','Meldingen':'Notifications','Berichten':'Messages',
   'Profiel':'Profile','Uitloggen':'Sign out','Inloggen':'Sign in','Aanmelden':'Sign up',
-  'Alles':'All','Kies uw taal':'Choose your language','Hulp':'Help','Zoek':'Search',
+  'Alles':'All','Kies uw taal':'Choose your language','Taal':'Language','Hulp':'Help','Zoek':'Search',
+  'Zoek op taal of land. RTG onthoudt uw keuze op dit apparaat.':'Search by language or country. RTG remembers your choice on this device.',
+  'Taal of land':'Language or country','Bijvoorbeeld Nederlands of Nederland':'For example English or United Kingdom',
+  'Spreek uw taal in':'Speak your language','Kiezen':'Choose','Direct kiezen':'Quick choice','Verder':'Continue',
+  'Taal niet gevonden. Probeer een andere naam.':'Language not found. Try another name.','Taalkeuze sluiten':'Close language chooser',
   'Alle werelden':'All worlds','Verder ontdekken':'Keep exploring','Licht':'Light','Donker':'Dark',
   'Welkom':'Welcome','Welkom terug':'Welcome back','Opslaan gelukt':'Saved successfully'
 });
@@ -1316,32 +1320,30 @@ window.RTGUiBronTekst = function(source){
   function vlag(code) {
     return '<span class="rtg-lang-code">' + String(code || '').toUpperCase() + '</span>';
   }
-  // kleine, in huisstijl getekende tekens (geen emoji), currentColor volgend
+  // Kleine, functionele lijntekening voor spraakinvoer.
   const ICOON = {
-    mic: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v3.5"/></svg>',
-    spark: '<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M12 2c.5 4.6 2.4 6.5 7 7-4.6.5-6.5 2.4-7 7-.5-4.6-2.4-6.5-7-7 4.6-.5 6.5-2.4 7-7z"/></svg>',
-    globe: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>'
+    mic: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v3.5"/></svg>'
   };
   // veelgebruikte land-/taalnamen die Rahul moet herkennen (genormaliseerd:
   // kleine letters, accenten eraf). De rest matcht op de eigen naam + Engelse naam.
   const ALIAS = {
     nederland: 'nl', holland: 'nl', netherlands: 'nl', vlaanderen: 'nl', belgie: 'nl', belgium: 'nl', suriname: 'nl',
-    engeland: 'en', england: 'en', britain: 'en', uk: 'en', amerika: 'en', america: 'en', usa: 'en', australie: 'en', australia: 'en', canada: 'en', ierland: 'en', ireland: 'en',
-    duitsland: 'de', germany: 'de', deutschland: 'de', oostenrijk: 'de', austria: 'de', zwitserland: 'de', switzerland: 'de',
-    frankrijk: 'fr', france: 'fr',
-    spanje: 'es', spain: 'es', espana: 'es', mexico: 'es', argentinie: 'es', argentina: 'es', colombia: 'es', chili: 'es', peru: 'es',
-    portugal: 'pt', brazilie: 'pt', brazil: 'pt', brasil: 'pt',
-    italie: 'it', italy: 'it', italia: 'it',
+    engels: 'en', engeland: 'en', england: 'en', britain: 'en', uk: 'en', amerika: 'en', america: 'en', usa: 'en', australie: 'en', australia: 'en', canada: 'en', ierland: 'en', ireland: 'en',
+    duits: 'de', duitsland: 'de', germany: 'de', deutschland: 'de', oostenrijk: 'de', austria: 'de', zwitserland: 'de', switzerland: 'de',
+    frans: 'fr', frankrijk: 'fr', france: 'fr',
+    spaans: 'es', spanje: 'es', spain: 'es', espana: 'es', mexico: 'es', argentinie: 'es', argentina: 'es', colombia: 'es', chili: 'es', peru: 'es',
+    portugees: 'pt', portugal: 'pt', brazilie: 'pt', brazil: 'pt', brasil: 'pt',
+    italiaans: 'it', italie: 'it', italy: 'it', italia: 'it',
     griekenland: 'el', greece: 'el',
-    turkije: 'tr', turkey: 'tr', turkiye: 'tr',
-    rusland: 'ru', russia: 'ru', oekraine: 'uk', ukraine: 'uk', polen: 'pl', poland: 'pl',
-    japan: 'ja', nippon: 'ja', china: 'zh', chinees: 'zh', chinese: 'zh', mandarijn: 'zh', mandarin: 'zh', taiwan: 'zh',
-    korea: 'ko', india: 'hi', bharat: 'hi', pakistan: 'ur',
+    turks: 'tr', turkije: 'tr', turkey: 'tr', turkiye: 'tr',
+    russisch: 'ru', rusland: 'ru', russia: 'ru', oekraiens: 'uk', oekraine: 'uk', ukraine: 'uk', pools: 'pl', polen: 'pl', poland: 'pl',
+    japans: 'ja', japan: 'ja', nippon: 'ja', china: 'zh', chinees: 'zh', chinese: 'zh', mandarijn: 'zh', mandarin: 'zh', taiwan: 'zh',
+    koreaans: 'ko', korea: 'ko', hindi: 'hi', india: 'hi', bharat: 'hi', urdu: 'ur', pakistan: 'ur', bengali: 'bn',
     marokko: 'ar', morocco: 'ar', egypte: 'ar', egypt: 'ar', dubai: 'ar', arabisch: 'ar', arabic: 'ar', saoedi: 'ar',
-    iran: 'fa', perzie: 'fa', persia: 'fa', israel: 'he', hebreeuws: 'he', hebrew: 'he',
-    indonesie: 'id', indonesia: 'id', bali: 'id', thailand: 'th', vietnam: 'vi', filipijnen: 'tl', philippines: 'tl', maleisie: 'ms', malaysia: 'ms',
+    perzisch: 'fa', iran: 'fa', perzie: 'fa', persia: 'fa', israel: 'he', hebreeuws: 'he', hebrew: 'he',
+    indonesisch: 'id', indonesie: 'id', indonesia: 'id', bali: 'id', thais: 'th', thailand: 'th', vietnamees: 'vi', vietnam: 'vi', filipijns: 'tl', filipijnen: 'tl', philippines: 'tl', maleis: 'ms', maleisie: 'ms', malaysia: 'ms',
     zweden: 'sv', sweden: 'sv', noorwegen: 'no', norway: 'no', denemarken: 'da', denmark: 'da', finland: 'fi', ijsland: 'is', iceland: 'is',
-    zuidafrika: 'af', kenia: 'sw', kenya: 'sw', tanzania: 'sw', ethiopie: 'am', ethiopia: 'am', nigeria: 'yo'
+    swahili: 'sw', zuidafrika: 'af', kenia: 'sw', kenya: 'sw', tanzania: 'sw', ethiopie: 'am', ethiopia: 'am', nigeria: 'yo'
   };
 
   function detectDevice(codes) {
@@ -1527,10 +1529,9 @@ window.RTGUiBronTekst = function(source){
       }
     },
 
-    /* ---------- taalkeuze: de wereld in RTG-stijl ----------
-       Rahuls signatuurlippen in het midden, alle landvlaggen eromheen, en een
-       AI-zoekje: zeg waar je vandaan komt of welke taal je spreekt, en Rahul
-       kiest mee. Dezelfde donkere, ingetogen huisstijl als de app-poort. */
+    /* ---------- taalkeuze in de RTG-huisstijl ----------
+       Een rustige zoekingang, enkele directe keuzes en dezelfde donkere,
+       gouden systeemlaag als de rest van de website. */
     zoekTaal(q) {
       const lijst = this._lijst || [];
       const n = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -1563,50 +1564,81 @@ window.RTGUiBronTekst = function(source){
       const oud = document.getElementById('rtg-lang-modal');
       const stondOpen = oud && oud.classList.contains('open');
       if (oud) oud.remove(); // opnieuw opbouwen zodra de wereldtalen binnen zijn
-      this._mond = null; // het oude canvas is weg
       const scrim = document.createElement('div');
       scrim.id = 'rtg-lang-modal';
       scrim.className = 'rtg-lang-scrim';
       scrim.setAttribute('data-i18n-ignore', '');
       // de matcher kent de HELE wereld (alle 114) als die binnen is; anders de
-      // actieve set. Er staan geen vlagknoppen meer: je kiest door te typen of
-      // te spreken, Rahul herkent je land of taal en stelt hem voor.
+      // actieve set. De bezoeker kiest door een land of taal te typen of uit te
+      // spreken. Daarna verschijnt één duidelijke keuze.
       this._lijst = this._alleTalen || WERELD || Object.keys(LANGS).map(c => ({ code: c, naam: LANGS[c].native, en: LANGS[c].label }));
       this._aanbevolen = recommended || 'en';
       const kanSpreken = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+      const tekst = {
+        aria: this.t('language.chooser.aria', 'Kies uw taal'),
+        label: this.t('language.chooser.label', 'Taal'),
+        titel: this.t('language.chooser.title', 'Kies uw taal'),
+        uitleg: this.t('language.chooser.explanation', 'Zoek op taal of land. RTG onthoudt uw keuze op dit apparaat.'),
+        veld: this.t('language.chooser.field', 'Taal of land'),
+        placeholder: this.t('language.chooser.placeholder', 'Bijvoorbeeld Nederlands of Nederland'),
+        spreek: this.t('language.chooser.speak', 'Spreek uw taal in'),
+        kies: this.t('language.chooser.choose', 'Kiezen'),
+        snel: this.t('language.chooser.quick', 'Direct kiezen'),
+        verder: this.t('language.chooser.continue', 'Verder'),
+        nietGevonden: this.t('language.chooser.not_found', 'Taal niet gevonden. Probeer een andere naam.'),
+        sluit: this.t('language.chooser.close', 'Taalkeuze sluiten')
+      };
+      const veilig = value => String(value || '').replace(/[&<>\"]/g, teken => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;' })[teken]);
+      const snelCodes = [this._aanbevolen, this.lang, 'nl', 'en', 'de', 'fr', 'es', 'ar']
+        .filter((code, index, all) => code && all.indexOf(code) === index)
+        .filter(code => this._lijst.some(taal => taal.code === code))
+        .slice(0, 4);
+      const snelleKeuzes = snelCodes.map(code => {
+        const taal = this._lijst.find(item => item.code === code) || {};
+        return '<button type="button" class="rtg-lang-quick' + (code === this._aanbevolen ? ' is-active' : '') + '" data-lang="' + code + '">' +
+          vlag(code) + '<span>' + veilig(taal.naam || taal.en || code) + '</span></button>';
+      }).join('');
       scrim.innerHTML =
-        '<div class="rtg-lang-card" role="dialog" aria-modal="true" aria-label="Choose your language / Kies je taal">' +
-          '<canvas class="rtg-lang-mond" id="rtg-lang-mond" width="440" height="200" aria-hidden="true"></canvas>' +
-          '<h2>Where in the world are you?</h2>' +
-          '<p>Type or say your language &middot; Rahul switches for you</p>' +
-          '<div class="rtg-lang-ai">' +
-            (kanSpreken ? '<button type="button" id="rtg-lang-mic" aria-label="Speak your language / Spreek je taal">' + ICOON.mic + '</button>' : '') +
+        '<div class="rtg-lang-card" role="dialog" aria-modal="true" aria-label="' + tekst.aria + '">' +
+          '<div class="rtg-lang-head"><span class="rtg-lang-eyebrow">RTG ' + tekst.label + '</span>' +
+            '<button type="button" class="rtg-lang-close" aria-label="' + tekst.sluit + '">' +
+              '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+            '</button></div>' +
+          '<h2>' + tekst.titel + '</h2>' +
+          '<p>' + tekst.uitleg + '</p>' +
+          '<label class="rtg-lang-label" for="rtg-lang-zoek">' + tekst.veld + '</label>' +
+          '<div class="rtg-lang-search">' +
+            (kanSpreken ? '<button type="button" id="rtg-lang-mic" aria-label="' + tekst.spreek + '">' + ICOON.mic + '</button>' : '') +
             '<input id="rtg-lang-zoek" autocomplete="off" enterkeyhint="go" ' +
-              'aria-label="Type your country or language / Typ je land of taal" ' +
-              'placeholder="Say or type where you&rsquo;re from&hellip;">' +
-            '<button type="button" id="rtg-lang-rahul" aria-label="Let Rahul choose / Laat Rahul kiezen">' + ICOON.spark + '</button>' +
+              'aria-label="' + tekst.veld + '" placeholder="' + tekst.placeholder + '">' +
+            '<button type="button" id="rtg-lang-submit">' + tekst.kies + '</button>' +
           '</div>' +
           '<button type="button" class="rtg-lang-hint" id="rtg-lang-hint" hidden></button>' +
+          (snelleKeuzes ? '<div class="rtg-lang-quick-wrap"><span>' + tekst.snel + '</span><div class="rtg-lang-quick-grid">' + snelleKeuzes + '</div></div>' : '') +
         '</div>';
       document.body.appendChild(scrim);
 
       const zoek = scrim.querySelector('#rtg-lang-zoek');
       const hint = scrim.querySelector('#rtg-lang-hint');
       const self = this;
-      // toon Rahuls voorstel (geen knoppenlijst): een vlag + de naam, aantikbaar
+      // Toon één passende taalnaam die de bezoeker kan aantikken.
       const stelVoor = () => {
         const res = self.zoekTaal(zoek.value.trim());
         if (!zoek.value.trim() || !res.code) {
           hint.hidden = true; hint.removeAttribute('data-lang');
-          if (zoek.value.trim()) { hint.hidden = false; hint.removeAttribute('data-lang'); hint.innerHTML = '<span class="rtg-lang-mis">Hmm, not sure yet &mdash; try a country or language.</span>'; }
+          hint.disabled = false;
+          if (zoek.value.trim()) {
+            hint.hidden = false; hint.disabled = true; hint.removeAttribute('data-lang');
+            hint.innerHTML = '<span class="rtg-lang-mis">' + tekst.nietGevonden + '</span>';
+          }
           return;
         }
         const t = self._lijst.find(x => x.code === res.code) || {};
-        hint.hidden = false;
+        hint.hidden = false; hint.disabled = false;
         hint.setAttribute('data-lang', res.code);
         hint.innerHTML = vlag(res.code) +
-          '<span class="rtg-lang-sug"><b>' + String(t.naam || res.code).replace(/[<>]/g, '') + '</b>' +
-          '<span class="rtg-lang-go">tap to continue &middot; tik om verder te gaan</span></span>';
+          '<span class="rtg-lang-sug"><b>' + veilig(t.naam || res.code) + '</b>' +
+          '<span class="rtg-lang-go">' + tekst.verder + '</span></span>';
       };
       const kies = (code) => {
         code = code || self.zoekTaal(zoek.value.trim()).code || self._aanbevolen;
@@ -1614,8 +1646,12 @@ window.RTGUiBronTekst = function(source){
       };
       zoek.addEventListener('input', stelVoor);
       zoek.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); kies(); } });
-      scrim.querySelector('#rtg-lang-rahul').addEventListener('click', () => kies());
+      scrim.querySelector('#rtg-lang-submit').addEventListener('click', () => kies());
       hint.addEventListener('click', () => kies(hint.getAttribute('data-lang')));
+      scrim.querySelectorAll('.rtg-lang-quick').forEach(button => {
+        button.addEventListener('click', () => kies(button.getAttribute('data-lang')));
+      });
+      scrim.querySelector('.rtg-lang-close').addEventListener('click', () => self.closeModal());
       // spreken: de eigen stem invullen en meteen laten herkennen
       const mic = scrim.querySelector('#rtg-lang-mic');
       if (mic) mic.addEventListener('click', () => self._luister(zoek, stelVoor, kies, mic));
@@ -1629,7 +1665,7 @@ window.RTGUiBronTekst = function(source){
           if (e.key === 'Escape' && m && m.classList.contains('open')) { this.set(this.lang); this.closeModal(); }
         });
       }
-      if (stondOpen) { scrim.classList.add('open'); this._startMond(); }
+      if (stondOpen) scrim.classList.add('open');
     },
     // spreken -> tekst (Web Speech API, geen afhankelijkheden). Lukt het niet,
     // dan gebeurt er gewoon niets bijzonders; typen blijft altijd werken.
@@ -1649,45 +1685,35 @@ window.RTGUiBronTekst = function(source){
         rec.start();
       } catch (e) { mic.classList.remove('luistert'); }
     },
-    // de signatuurlippen: pas laden/tekenen zodra de kiezer echt getoond wordt
-    _startMond() {
-      const c = document.getElementById('rtg-lang-mond');
-      if (!c || this._mond) return;
-      const go = () => { if (window.RTGMond && !this._mond) this._mond = window.RTGMond.maak(c); };
-      if (window.RTGMond) go();
-      else if (!this._mondLaadt) {
-        this._mondLaadt = true;
-        const s = document.createElement('script'); s.src = assetPad('/shared/mond.js'); s.async = true;
-        s.onload = go; document.head.appendChild(s);
-      }
-      this._startSterren();
-    },
-    // een heel subtiele 3D-sterrenhemel achter de kaart, in RTG-stijl
-    _startSterren() {
-      const scrim = document.getElementById('rtg-lang-modal');
-      if (!scrim || this._sterren) return;
-      const go = () => { if (window.RTGSterren && !this._sterren) this._sterren = window.RTGSterren.hang(scrim, { helderheid: 0.85 }); };
-      if (window.RTGSterren) return go();
-      if (this._sterLaadt) return;
-      this._sterLaadt = true;
-      const s = document.createElement('script'); s.src = assetPad('/shared/sterren.js'); s.async = true;
-      s.onload = go; document.head.appendChild(s);
-    },
     openModal() {
-      if (!document.getElementById('rtg-lang-modal')) this.buildModal(this.chosen ? this.lang : (this._aanbevolen || detectDevice()));
+      this._taalTerug = document.activeElement;
+      const bestaand = document.getElementById('rtg-lang-modal');
+      if (bestaand) bestaand.remove();
+      this.buildModal(this.chosen ? this.lang : (this._aanbevolen || detectDevice()));
       const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.add('open');
-      this._startMond();
       const z = document.getElementById('rtg-lang-zoek');
       if (z) setTimeout(() => { try { z.focus(); } catch (e) {} }, 80);
     },
-    closeModal() { const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.remove('open'); },
+    closeModal() {
+      const m = document.getElementById('rtg-lang-modal');
+      if (m) m.classList.remove('open');
+      const terug = this._taalTerug;
+      if (terug && typeof terug.focus === 'function') setTimeout(() => { try { terug.focus(); } catch (e) {} }, 0);
+    },
 
     /* ---------- de taalkeuze heropenen ----------
        De taalknop zweefde linksonder op elk scherm, boven op de themakiezer en
        het vraagteken. Taal is een instelling, dus hij staat nu waar de andere
        instellingen staan: in het bedieningspaneel (shared/bediening.js), dat
        openModal() aanroept. Het leden-OS deed dit al met de tegel "Taal". */
-    buildSwitch() { /* geen zwevende knop meer; zie het bedieningspaneel */ },
+    buildSwitch() {
+      const self = this;
+      document.querySelectorAll('[data-language-picker]').forEach(function (button) {
+        if (button.hasAttribute('data-language-picker-ready')) return;
+        button.setAttribute('data-language-picker-ready', 'true');
+        button.addEventListener('click', function () { self.openModal(); });
+      });
+    },
     /* updateSwitch bijgewerkt de knop die er niet meer is. Hij zocht nog naar
        #rtg-lang-switch, en dat element staat sinds de verhuizing naar het
        bedieningspaneel op geen enkele pagina meer -- de blindevlek-toets ving
@@ -1702,48 +1728,77 @@ window.RTGUiBronTekst = function(source){
       const s = document.createElement('style');
       s.id = 'rtg-i18n-styles';
       s.textContent = `
-      .rtg-lang-scrim{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;
-        background:radial-gradient(120% 90% at 50% 0%,rgba(62,20,32,0.6),rgba(12,12,11,0.92) 60%);
-        backdrop-filter:blur(10px);padding:1.1rem;-webkit-font-smoothing:antialiased;}
+      .rtg-lang-scrim{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;overflow:auto;
+        background:rgba(7,7,6,0.76);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+        padding:max(1rem,env(safe-area-inset-top,0px)) max(1rem,env(safe-area-inset-right,0px))
+          max(1rem,env(safe-area-inset-bottom,0px)) max(1rem,env(safe-area-inset-left,0px));-webkit-font-smoothing:antialiased;}
       .rtg-lang-scrim.open{display:flex;}
-      .rtg-lang-card{width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;
-        background:linear-gradient(180deg,#141110,#0C0C0B);color:#F5F3EF;border:1px solid rgba(201,162,75,0.22);
-        border-radius:0;padding:1.2rem 1.3rem 1rem;text-align:center;box-shadow:0 40px 120px rgba(0,0,0,0.6);
-        font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-        animation:rtgLangIn .4s cubic-bezier(.2,.8,.2,1);}
+      .rtg-lang-card,.rtg-lang-card *{box-sizing:border-box;}
+      .rtg-lang-card{position:relative;isolation:isolate;width:100%;max-width:560px;max-height:min(92vh,760px);overflow:auto;
+        display:flex;flex-direction:column;background:linear-gradient(155deg,#191712 0%,#0C0B09 68%);color:#F5F0E7;
+        border:1px solid rgba(225,192,122,0.48);border-radius:var(--rtg-radius-system,22px);padding:1.4rem 1.45rem 1.5rem;text-align:left;
+        box-shadow:0 32px 90px rgba(0,0,0,0.58),inset 0 1px 0 rgba(255,255,255,0.05);
+        font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;animation:rtgLangIn .4s cubic-bezier(.2,.8,.2,1);}
       @keyframes rtgLangIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:none;}}
-      .rtg-lang-mond{display:block;width:200px;height:90px;margin:0.1rem auto -0.15rem;}
-      .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.55rem;margin:0.1rem 0 0.1rem;letter-spacing:-0.01em;color:#F7F3EC;}
-      .rtg-lang-card p{color:#B8B2A8;font-size:0.8rem;margin:0 0 0.85rem;}
-      .rtg-lang-ai{display:flex;align-items:center;gap:0.45rem;background:rgba(255,255,255,0.05);
-        border:1px solid rgba(222,219,213,0.16);border-radius:0;padding:0.1rem 0.1rem 0.1rem 0.9rem;
-        margin:0 auto 0.5rem;max-width:520px;width:100%;transition:border-color .18s;}
-      .rtg-lang-ai:focus-within{border-color:#C9A24B;}
-      .rtg-lang-ai input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;
-        font-family:inherit;font-size:0.92rem;padding:0.7rem 0;}
-      .rtg-lang-ai input::placeholder{color:#8A8680;}
-      .rtg-lang-ai button{flex:none;background:linear-gradient(180deg,#9E1C40,#7F1634);color:#fff;border:none;cursor:pointer;
-        border-radius:0;padding:0.55rem 0.72rem;font-size:1rem;line-height:1;transition:filter .18s,transform .12s;}
-      .rtg-lang-ai button:hover{filter:brightness(1.14);}
-      .rtg-lang-ai button:active{transform:scale(0.95);}
-      #rtg-lang-mic{background:rgba(255,255,255,0.08);}
-      #rtg-lang-mic.luistert{background:linear-gradient(180deg,#C23A5E,#9E1C40);animation:rtgMic 1.1s ease-in-out infinite;}
-      @keyframes rtgMic{0%,100%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}50%{box-shadow:0 0 0 6px rgba(194,58,94,0);}}
-      /* Rahuls voorstel: geen knoppenlijst, maar een enkele aantikbare regel */
-      .rtg-lang-hint{display:flex;align-items:center;gap:0.7rem;width:100%;max-width:520px;margin:0.1rem auto 0.2rem;
-        background:rgba(201,162,75,0.08);border:1px solid rgba(201,162,75,0.3);border-radius:0;
-        padding:0.55rem 0.9rem;cursor:pointer;text-align:left;font-family:inherit;color:#EDE9E2;
-        transition:border-color .16s,background .16s,transform .12s;}
-      .rtg-lang-hint:hover{border-color:#F5E6B8;background:rgba(201,162,75,0.14);}
+      .rtg-lang-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:0.85rem;}
+      .rtg-lang-eyebrow{font-size:0.64rem;font-weight:650;line-height:1;letter-spacing:0.19em;text-transform:uppercase;color:#D8B873;}
+      .rtg-lang-close{display:grid;place-items:center;width:2.45rem;height:2.45rem;flex:0 0 auto;padding:0;color:#F5F0E7;
+        background:rgba(255,255,255,0.035);border:1px solid rgba(245,240,231,0.2);border-radius:50%;cursor:pointer;}
+      .rtg-lang-close:hover{border-color:#D8B873;background:rgba(216,184,115,0.09);}
+      .rtg-lang-close:focus-visible,.rtg-lang-search button:focus-visible,.rtg-lang-hint:focus-visible,.rtg-lang-quick:focus-visible{outline:2px solid #F2D99E;outline-offset:3px;}
+      .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:clamp(2rem,6vw,3rem);line-height:0.98;
+        margin:0;letter-spacing:-0.025em;color:#FAF6EF;}
+      .rtg-lang-card>p{max-width:29rem;color:#B9B2A6;font-size:0.86rem;line-height:1.55;margin:0.65rem 0 1.25rem;}
+      .rtg-lang-label{display:block;margin-bottom:0.42rem;color:#D8B873;font-size:0.62rem;font-weight:650;letter-spacing:0.14em;text-transform:uppercase;}
+      .rtg-lang-search{display:flex;align-items:center;gap:0.4rem;width:100%;min-height:3.55rem;background:rgba(255,255,255,0.035);
+        border:1px solid rgba(245,240,231,0.22);border-radius:var(--rtg-radius-content,2px);padding:0.3rem 0.32rem 0.3rem 0.75rem;margin:0 0 0.7rem;
+        transition:border-color .18s,background .18s;}
+      .rtg-lang-search:focus-within{border-color:#D8B873;background:rgba(216,184,115,0.055);}
+      .rtg-lang-search input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;font-family:inherit;font-size:0.88rem;padding:0.7rem 0;}
+      .rtg-lang-search input::placeholder{color:#817C74;}
+      .rtg-lang-search button{flex:none;min-height:2.8rem;background:#D8B873;color:#17140F;border:1px solid #D8B873;cursor:pointer;
+        border-radius:var(--rtg-radius-content,2px);padding:0.65rem 0.9rem;font-family:inherit;font-size:0.73rem;font-weight:700;line-height:1;letter-spacing:0.05em;
+        transition:filter .18s,transform .12s,background .18s;}
+      .rtg-lang-search button:hover{background:#E8CE95;filter:none;}
+      .rtg-lang-search button:active{transform:scale(0.95);}
+      #rtg-lang-mic{display:grid;place-items:center;min-width:2.8rem;padding:0;background:rgba(255,255,255,0.045);color:#E9DFCC;
+        border-color:rgba(245,240,231,0.17);}
+      #rtg-lang-mic.luistert{background:#D8B873;color:#17140F;animation:rtgMic 1.1s ease-in-out infinite;}
+      @keyframes rtgMic{0%,100%{box-shadow:0 0 0 0 rgba(216,184,115,0.46);}50%{box-shadow:0 0 0 6px rgba(216,184,115,0);}}
+      .rtg-lang-hint{display:flex;align-items:center;gap:0.75rem;width:100%;margin:0 0 0.9rem;background:rgba(216,184,115,0.08);
+        border:1px solid rgba(216,184,115,0.62);border-radius:var(--rtg-radius-content,2px);padding:0.75rem 0.85rem;cursor:pointer;text-align:left;
+        font-family:inherit;color:#EDE9E2;transition:border-color .16s,background .16s,transform .12s;}
+      .rtg-lang-hint:hover{border-color:#F2D99E;background:rgba(216,184,115,0.14);}
       .rtg-lang-hint:active{transform:scale(0.99);}
       .rtg-lang-hint[hidden]{display:none;}
-      .rtg-lang-flag{font-size:1.7rem;line-height:1;}
+      .rtg-lang-hint:disabled{cursor:default;border-color:rgba(245,240,231,0.16);background:rgba(255,255,255,0.025);}
       .rtg-lang-sug{display:flex;flex-direction:column;line-height:1.2;}
-      .rtg-lang-sug b{color:#F7F3EC;font-weight:600;font-size:0.98rem;}
-      .rtg-lang-go{font-size:0.66rem;letter-spacing:0.04em;color:#C9A24B;}
-      .rtg-lang-mis{color:#8A8680;font-size:0.82rem;}
-      .rtg-lang-code{display:inline-block;min-width:1.7rem;font-size:0.6rem;font-weight:700;letter-spacing:0.05em;
-        color:#C9A24B;border:1px solid rgba(201,162,75,0.4);border-radius:0;padding:0.3rem 0.2rem;text-align:center;}
+      .rtg-lang-sug b{color:#FAF6EF;font-weight:600;font-size:0.95rem;}
+      .rtg-lang-go{margin-top:0.16rem;font-size:0.62rem;letter-spacing:0.09em;text-transform:uppercase;color:#D8B873;}
+      .rtg-lang-mis{color:#A8A198;font-size:0.8rem;line-height:1.4;}
+      .rtg-lang-quick-wrap{margin-top:0.15rem;padding-top:0.95rem;border-top:1px solid rgba(245,240,231,0.12);}
+      .rtg-lang-quick-wrap>span{display:block;margin-bottom:0.55rem;color:#918B82;font-size:0.61rem;font-weight:650;letter-spacing:0.14em;text-transform:uppercase;}
+      .rtg-lang-quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.55rem;}
+      .rtg-lang-quick{display:flex;align-items:center;gap:0.65rem;min-width:0;min-height:3.55rem;padding:0.65rem 0.75rem;color:#EDE8DF;
+        background:rgba(255,255,255,0.025);border:1px solid rgba(245,240,231,0.16);border-radius:var(--rtg-radius-content,2px);font-family:inherit;text-align:left;
+        cursor:pointer;transition:border-color .16s,background .16s,transform .12s;}
+      .rtg-lang-quick:hover,.rtg-lang-quick.is-active{border-color:#D8B873;background:rgba(216,184,115,0.09);}
+      .rtg-lang-quick:active{transform:scale(0.985);}
+      .rtg-lang-quick>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:0.82rem;font-weight:560;white-space:nowrap;}
+      .rtg-lang-code{display:inline-grid;place-items:center;min-width:2rem;height:2rem;flex:0 0 auto;font-size:0.58rem;font-weight:750;
+        letter-spacing:0.08em;color:#D8B873;border:1px solid rgba(216,184,115,0.46);border-radius:var(--rtg-radius-content,2px);padding:0 0.3rem;text-align:center;}
+      [dir="rtl"] .rtg-lang-card,[dir="rtl"] .rtg-lang-hint,[dir="rtl"] .rtg-lang-quick{text-align:right;}
+      @media(max-width:600px){
+        .rtg-lang-scrim{align-items:flex-end;padding:0.75rem max(0.75rem,env(safe-area-inset-right,0px)) max(0.75rem,env(safe-area-inset-bottom,0px)) max(0.75rem,env(safe-area-inset-left,0px));}
+        .rtg-lang-card{max-height:calc(100dvh - 1.5rem);border-radius:var(--rtg-radius-system,22px);padding:1.15rem 1rem 1.05rem;}
+        .rtg-lang-card h2{font-size:2.1rem;}
+        .rtg-lang-card>p{font-size:0.8rem;margin-bottom:1rem;}
+        .rtg-lang-search{min-height:3.3rem;padding-left:0.55rem;}
+        .rtg-lang-search input{font-size:0.82rem;}
+        .rtg-lang-search button{min-height:2.55rem;padding:0.55rem 0.65rem;}
+        #rtg-lang-mic{min-width:2.55rem;}
+        .rtg-lang-quick{min-height:3.25rem;padding:0.55rem 0.6rem;}
+      }
       .rtg-lang-switch{position:fixed;left:14px;bottom:14px;z-index:9990;display:inline-flex;align-items:center;gap:0.35rem;
         background:rgba(12,12,11,0.82);color:#fff;border:1px solid rgba(255,255,255,0.16);border-radius:0;
         padding:0.42rem 0.8rem;font-family:'Inter',-apple-system,sans-serif;font-size:0.72rem;font-weight:600;

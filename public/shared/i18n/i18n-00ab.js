@@ -57,7 +57,11 @@ window.RTGUiBronnen = Object.freeze({
   'Klein beginnen':'Start small','De Speeltuin':'The playground','Tellen tot tien':'Count to ten',
   'Ondersteuning':'Support','Instellingen':'Settings','Meldingen':'Notifications','Berichten':'Messages',
   'Profiel':'Profile','Uitloggen':'Sign out','Inloggen':'Sign in','Aanmelden':'Sign up',
-  'Alles':'All','Kies uw taal':'Choose your language','Hulp':'Help','Zoek':'Search',
+  'Alles':'All','Kies uw taal':'Choose your language','Taal':'Language','Hulp':'Help','Zoek':'Search',
+  'Zoek op taal of land. RTG onthoudt uw keuze op dit apparaat.':'Search by language or country. RTG remembers your choice on this device.',
+  'Taal of land':'Language or country','Bijvoorbeeld Nederlands of Nederland':'For example English or United Kingdom',
+  'Spreek uw taal in':'Speak your language','Kiezen':'Choose','Direct kiezen':'Quick choice','Verder':'Continue',
+  'Taal niet gevonden. Probeer een andere naam.':'Language not found. Try another name.','Taalkeuze sluiten':'Close language chooser',
   'Alle werelden':'All worlds','Verder ontdekken':'Keep exploring','Licht':'Light','Donker':'Dark',
   'Welkom':'Welcome','Welkom terug':'Welcome back','Opslaan gelukt':'Saved successfully'
 });

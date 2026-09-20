@@ -12,21 +12,7 @@
       return u.protocol === 'https:' || (u.protocol === 'http:' && u.origin === w.location.origin) ? u.href : '';
     } catch (e) { return ''; }
   }
-  function welcome(kind) {
-    var guest = kind === 'guest', failed = kind === 'error';
-    return '<section class="living-welcome" aria-labelledby="livingWelcomeTitle">'
-      + '<img src="/images/start/dagdelen/hero-avond.jpg" alt="" width="1536" height="1024" fetchpriority="high">'
-      + '<div><p class="living-kicker">LivingOS · ' + text('moments', 'Mensen, plekken en momenten') + '</p>'
-      + '<h2 id="livingWelcomeTitle">' + text('welcome', 'Het leven is mooier wanneer u het deelt.') + '</h2></div>'
-      + '<div class="living-welcome-copy"><p>'
-      + (failed ? text('failed', 'Uw momenten konden niet worden geladen. Probeer het opnieuw; uw gegevens blijven bewaard.')
-        : guest ? text('guest', 'Open uw LivingOS. Hier komen de momenten van uw mensen, reizen en plekken samen.')
-          : text('empty', 'Hier begint uw verhaal. Zodra er berichten voor u zijn, komen ze hier samen, met de nieuwste bovenaan.'))
-      + '</p>' + (failed ? '<button type="button" data-living-retry>' + text('retry', 'Probeer het opnieuw') + '</button>'
-        : '<a href="' + (guest ? '/apps/app.html' : '/apps/camera.html') + '">'
-          + (guest ? text('login', 'Open uw LivingOS') : text('create', 'Leg uw eerste moment vast')) + '</a>')
-      + '<p class="living-note">' + text('editorial', 'Sfeerbeeld van RTG. Uw eigen berichten verschijnen hier.') + '</p></div></section>';
-  }
+  function welcome(kind) { return w.RTGLivingWelcome(kind, text); }
   function item(i, source, time, starts) {
     var image = i.beeld && i.beeld[0], src = image && photo(image.src);
     var details = [i.plaats, starts].filter(Boolean);
@@ -55,6 +41,9 @@
   w.I18N = w.I18N || {};
   w.I18N.en = Object.assign(w.I18N.en || {}, {
     'living.moments': 'People, places and moments', 'living.promise': 'A more meaningful life',
+    'living.nearby': 'Nearby', 'living.onTheWay': 'On the way',
+    'living.together': 'Life, together.', 'living.discoverNearby': 'Discover what is nearby.',
+    'living.nextMoment': 'Find a place for your next moment.',
     'living.story': 'Your story', 'living.travel': 'Travel', 'living.table': 'At the table', 'living.friends': 'Friends',
     'living.feed': 'Your moments', 'living.order': 'The newest moments appear first within each group.',
     'living.welcome': 'Life is better when you share it.',

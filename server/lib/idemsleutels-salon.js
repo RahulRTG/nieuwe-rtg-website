@@ -1,9 +1,12 @@
 /* Salon claimt en verzilvert binnen de eigen posts-transactie. Uitgifte en
    rotatie staan in idemsleutels-nooit omdat hun kale antwoord niet cachebaar
    is; deze twee mutaties moeten eveneens altijd het actuele domeinoordeel
-   krijgen in plaats van een generiek oud antwoord. */
+   krijgen in plaats van een generiek oud antwoord. Ondertitelen is anders: een
+   woordelijk gelijke retry voor hetzelfde upload-id hoort niet tweemaal door
+   het lokale model te gaan en zet exact dezelfde tijdregels. */
 'use strict';
 const SLEUTELS = {
+  'POST /api/salon/ondertitels': { zelfdeVerzoek: true },
   'POST /api/salon/deal/claim/intrek': { nietIdempotent: true,
     waarom: 'de Salon-kern bindt lid, claim en expliciete sleutel duurzaam en moet de actuele ingetrokken stand beoordelen' },
   'POST /api/supplier/salon/deal/redeem': { nietIdempotent: true,

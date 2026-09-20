@@ -39,7 +39,7 @@ test('de vier wereldkaarten en inloggen wijzen naar de echte app', () => {
     living: '/apps/rtg.html',
     travel: '/apps/reizen.html',
     work: '/apps/kantoor.html',
-    foundation: '/apps/foundation/index.html'
+    foundation: '/apps/foundation/os-publiek.html'
   };
   for (const [wereld, doel] of Object.entries(verwacht)) {
     const patroon = new RegExp('data-app-path="' + doel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +

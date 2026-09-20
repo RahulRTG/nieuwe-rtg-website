@@ -23,7 +23,7 @@ test('Sociaal en de editorial Salon houden hun eigen inhoud en de gedeelde Edge'
     assert.match(html, /\/shared\/social-elite\.css/);
     assert.match(html, /rtg-social-commandbar topbar cmd-tabs/);
   }
-  assert.match(sociaal, /Uw wereld, zorgvuldig dichtbij\./);
+  assert.match(sociaal, /Mensen maken uw wereld\./);
   assert.match(sociaal, /class="sociaal-stage"/);
   assert.match(sociaal, /\/shared\/sociaal-elite\.css/);
   assert.match(salon, /class="salon-werkveld"/);
@@ -229,4 +229,55 @@ test('Reality Engine blijft bruikbaar, leesbaar en rustig op mobiel', () => {
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)[\s\S]*animation:none/);
   assert.match(css, /\.rtg-suitehero\.rtg-intel-host[\s\S]*min-height:330px/);
   assert.match(css, /body\.rtg-intel-messages \.comm\{inset:calc\(var\(--suite-stack\) \+ var\(--rtg-intel-height\)\)/);
+});
+
+test('Adaptive Edge vervangt de oude dubbele Social-randen', () => {
+  const css = lees('public/shared/rtg-adaptive-edge.css');
+  assert.match(css, /body\[data-rtg-adaptive-ready="true"\]:has\(\.rtg-suitebar\.rtg-edge-owned-bar\)\{--suite-top:0px/,
+    'de oude suite-inzet wordt opgeheven zodra Edge gereed is');
+  assert.match(css, /:is\([^}]*\.rtg-edge-owned-bar\)\{display:none!important/,
+    'oude navigatie en technische telemetrie mogen niet naast Edge zichtbaar blijven');
+  assert.match(css, /:has\(\.rtg-intel-strip\.rtg-edge-owned-bar\)\{--rtg-intel-height:0px\}/,
+    'ook Social en De Salon tonen techniek pas op verzoek');
+  const claim = lees('public/shared/rtg-adaptive-edge-claim.js');
+  assert.match(claim, /CLAIM = '[^']*\.rtg-suitebar[^;]*\.salon-socialnav[^;]*\.rtg-intel-strip/,
+    'de oude vaste Social-navigatie blijft niet achter de nieuwe Edge staan');
+  assert.match(css, /:has\(\.salon-socialnav\.rtg-edge-owned-bar\) \.salon-werkveld\{padding-top:0!important/,
+    'een verborgen commandobalk laat geen lege strook boven De Salon achter');
+  assert.match(css, /body\.rtg-social-messages\[data-rtg-adaptive-ready="true"\] \.comm\{[\s\S]*var\(--rtg-adaptive-inset\)/,
+    'Berichten reserveert de werkelijke ruimte van de nieuwe zwevende rand');
+  const runtime = lees('public/shared/social-intelligence-runtime.js');
+  assert.match(runtime, /id: 'social-context'[\s\S]*run: openDeck/,
+    'de verborgen technische laag blijft via Acties bereikbaar');
+  const social = lees('public/apps/sociaal.html');
+  assert.match(social, /<section class="sociaal-briefing"/,
+    'de menselijke briefing is hoofdinhoud en geen terzijde');
+  assert.doesNotMatch(social, /<aside class="sociaal-briefing"/);
+});
+
+test('De Salon plaatst foto en video via de mediastore en toont beide in de feed', () => {
+  const salon = lees('public/apps/salon.html');
+  assert.match(salon, /accept="image\/\*,video\/mp4,video\/webm,video\/quicktime/,
+    'de bestandskiezer biedt beeld en video aan');
+  assert.match(salon, /fetch\('\/api\/salon\/media'/,
+    'grote bestanden reizen rauw en niet als base64 in de JSON-post');
+  assert.match(salon, /<video src=/,
+    'de feed heeft een echte videospeler');
+  assert.match(salon, /normaliseerFoto/,
+    'grote telefoonfoto\'s en door de browser leesbare HEIC-foto\'s worden voorbereid');
+  assert.match(salon, /\/shared\/ondertitelband\.js/);
+  assert.match(salon, /\/api\/salon\/ondertitels/);
+  assert.match(salon, /Maak automatisch/);
+  assert.match(salon, /Geen gesproken tekst/,
+    'een stille video hoeft geen verzonnen ondertiteling te krijgen');
+
+  const route = lees('server/routes/member/salonapp.js');
+  assert.match(route, /app\.post\('\/api\/salon\/media'/);
+  assert.match(route, /app\.post\('\/api\/salon\/ondertitels'/);
+  const kern = lees('server/kern/salon/media.js');
+  assert.match(kern, /MAX_VIDEO_BYTES = 60 \* 1024 \* 1024/);
+  assert.match(kern, /item\.key === sess\.key/,
+    'een tijdelijk upload-id blijft aan de uploader gebonden');
+  assert.match(kern, /transcribeerOpname/,
+    'dezelfde lokale spraakgrens maakt de tijdregels voor een opname');
 });

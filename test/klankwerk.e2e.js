@@ -50,6 +50,9 @@ test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
     await page.click('#nieuw');
     await page.waitForFunction(() => document.querySelectorAll('#rack .kanaal').length >= 3,
       null, { timeout: 8000 });
+    assert.equal(await page.locator('#rack .kanaal:first-child .ksolo').count(), 1, 'elk kanaal heeft solo');
+    assert.equal(await page.locator('#rack .kanaal:first-child .kmix input').count(), 7,
+      'volume, pan, driebands-EQ, ruimte en delay zijn echt bedienbaar');
 
     // een stap aanzetten in het raster
     const eerste = '#rack .kanaal:first-child .cel:nth-child(3)';
@@ -95,12 +98,17 @@ test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
         const v = Math.abs(dv.getInt16(i, true));
         if (v > piek) piek = v;
       }
-      return { merk, type, bytes: buf.byteLength, piek };
+      const pro = await window.RTGStudioWav.render(track, { rondes: 1, sampleRate: 48000, bitDepth: 24 });
+      const proDv = new DataView(await pro.arrayBuffer());
+      return { merk, type, bytes: buf.byteLength, piek,
+        proSampleRate: proDv.getUint32(24, true), proBitDepth: proDv.getUint16(34, true) };
     });
     assert.equal(meting.merk, 'RIFF', 'het is een echt WAV-bestand');
     assert.equal(meting.type, 'WAVE');
     assert.ok(meting.bytes > 44 + 44100, 'er staat meer dan een kop in: ' + meting.bytes);
     assert.ok(meting.piek > 3000, 'er zit hoorbaar signaal in (piek ' + meting.piek + ' van 32767)');
+    assert.equal(meting.proSampleRate, 48000, 'de professionele sample rate staat in de WAV-kop');
+    assert.equal(meting.proBitDepth, 24, '24-bit export is echte PCM en geen label');
 
     // Rahul zet iets neer, en het landt pas als je het plaatst
     await openDeel(page, 'rahul-zet-iets-neer');

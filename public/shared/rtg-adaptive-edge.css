@@ -53,6 +53,7 @@ body[data-rtg-adaptive-ready="true"]:has(.rtg-suitebar.rtg-edge-owned-bar){--sui
 body[data-rtg-adaptive-ready="true"]:has(.rtg-intel-strip.rtg-edge-owned-bar){--rtg-intel-height:0px}
 body[data-rtg-adaptive-ready="true"]:has(.rtg-social-commandbar.rtg-edge-owned-bar){--rtg-social-top:0px}
 body[data-rtg-adaptive-ready="true"]:has(.salon-socialnav.rtg-edge-owned-bar) .salon-werkveld{padding-top:0!important}
+body.rtg-social-messages[data-rtg-adaptive-ready="true"] .comm{bottom:calc(var(--rtg-adaptive-inset) + env(safe-area-inset-bottom,0px))!important}
 body[data-rtg-adaptive-ready="true"] #rvApp{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
 body[data-rtg-adaptive-ready="true"] #rvApp>.rv-werk{grid-column:1;grid-row:1;grid-template-rows:minmax(0,1fr)}
 .rtg-adaptive-sheet>#rvRahul{position:static;transform:none;width:100%;height:auto;min-height:58px;margin-bottom:16px}

@@ -180,6 +180,7 @@ function stempelServiceWorkers() {
 (async () => {
   require('./workspace-worlds').schrijf();
   require('./world-widgets').schrijf();
+  require('./websitewaarheid').schrijf();
   const gebundeld = schrijfBundels();
   console.log('[build] gebundeld: ' + (gebundeld.length ? gebundeld.join(', ') : 'bundels al actueel'));
   await minifyGedeeld();

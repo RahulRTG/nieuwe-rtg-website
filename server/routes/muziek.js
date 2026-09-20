@@ -2,15 +2,63 @@
    de sessie: een stuk-id uit de body wordt altijd tegen de eigenaar getoetst, in
    de kern, zodat een geraden id niets oplevert. */
 module.exports = (kern) => {
-  const { app, auth, muziekMaak, muziekMijn, muziekOpen, muziekBewaar, muziekWeg,
+  const { app, express, auth, muziekMaak, muziekMijn, muziekOpen, muziekBewaar, muziekWeg,
     muziekRahul, anthropic } = kern;
+  const { wie: envelopWie } = require('../opzet/envelop');
+  const bestanden = muziekMaak && muziekMaak.bestanden;
   if (!muziekMaak) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Studio is voor leden.' }); return true; }
     return false;
   };
-  const k = (req) => req.session.key;
+  /* De poort zet de actor al in de centrale verzoekenvelop. Gebruik die ene
+     identiteit door de hele muziekhandeling en val alleen terug voor oude
+     proefopstellingen die nog geen envelop bouwen. */
+  const k = (req) => envelopWie(req) || req.session.key;
+
+  /* De persoonlijke bibliotheek van RTG Sound. De upload is rauw, zodat 60 MB
+     muziek niet als base64 door JSON en db.data reist. Afspelen gaat met een
+     korte luisterkaart; daardoor staat het permanente ledentoken nooit in src. */
+  if (bestanden) {
+    app.post('/api/muziek/bestand', auth, express.raw({ type: () => true, limit: '61mb' }), async (req, res) => {
+      if (geenGast(req, res)) return;
+      const kop = naam => { const v = String(req.get(naam) || ''); try { return decodeURIComponent(v); } catch (e) { return v; } };
+      try { stuur(res, await bestanden.upload(k(req), req.body,
+        req.get('Content-Type') || '', kop('X-RTG-Bestandsnaam') || 'Muziek', req.get('X-RTG-Duur'),
+        kop('X-RTG-Titel'), kop('X-RTG-Beschrijving'), req.get('X-RTG-Eigenwerk') === 'ja',
+        req.get('Idempotency-Key'))); }
+      catch (e) { res.status(500).json({ error: 'Het muziekbestand kon niet worden bewaard.' }); }
+    });
+    app.post('/api/muziek/bestanden', auth, (req, res) => {
+      if (geenGast(req, res)) return;
+      stuur(res, bestanden.mijn(k(req)));
+    });
+    app.post('/api/muziek/feed', auth, (req, res) => {
+      if (geenGast(req, res)) return;
+      stuur(res, bestanden.feed(k(req)));
+    });
+    app.post('/api/muziek/bestand-ticket', auth, (req, res) => {
+      if (geenGast(req, res)) return;
+      stuur(res, bestanden.ticket(k(req), req.body && req.body.id));
+    });
+    app.post('/api/muziek/bestand-weg', auth, (req, res) => {
+      if (geenGast(req, res)) return;
+      stuur(res, bestanden.weg(k(req), req.body && req.body.id));
+    });
+    app.post('/api/muziek/mooi', auth, (req, res) => {
+      if (geenGast(req, res)) return;
+      stuur(res, bestanden.mooi(k(req), req.body && req.body.id, req.body && req.body.aan));
+    });
+    app.get('/api/muziek/luister/:ticket', async (req, res) => {
+      try {
+        const item = await bestanden.luister(req.params.ticket);
+        if (!item) return res.status(404).end();
+        res.set('Content-Disposition', "inline; filename*=UTF-8''" + encodeURIComponent(item.naam));
+        require('../media/bestand').stuurBuffer(req, res, item.bytes, item.mime, 'private, no-store');
+      } catch (e) { if (!res.headersSent) res.status(500).end(); }
+    });
+  }
 
   app.post('/api/muziek/mijn', auth, (req, res) => {
     if (geenGast(req, res)) return;

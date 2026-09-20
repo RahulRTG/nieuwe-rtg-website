@@ -176,6 +176,12 @@
       "url": "/apps/camera.html"
     },
     {
+      "label": "Camera opnieuw openen",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
       "label": "Fijnregelaars",
       "app": "Camera",
       "wereld": "LivingOS",
@@ -1226,6 +1232,12 @@
       "url": "/apps/vertegenwoordiging.html"
     },
     {
+      "label": "Deel uw muziek",
+      "app": "Muziek",
+      "wereld": "LivingOS",
+      "url": "/apps/muziek.html"
+    },
+    {
       "label": "Doe mee",
       "app": "Muziek",
       "wereld": "LivingOS",
@@ -1238,7 +1250,13 @@
       "url": "/apps/muziek.html"
     },
     {
-      "label": "Start een sessie",
+      "label": "Publiceer voor anderen",
+      "app": "Muziek",
+      "wereld": "LivingOS",
+      "url": "/apps/muziek.html"
+    },
+    {
+      "label": "Start samen",
       "app": "Muziek",
       "wereld": "LivingOS",
       "url": "/apps/muziek.html"
@@ -2102,19 +2120,73 @@
       "url": "/apps/foundation/os-portaal.html"
     },
     {
+      "label": "Afspelen",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
       "label": "Bibliotheek",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"
     },
     {
-      "label": "Controle starten",
+      "label": "Cinema",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"
     },
     {
-      "label": "In lijst",
+      "label": "Clean",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Editorial",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Export",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Geluid",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Golden",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Kader",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Keyframe toevoegen",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Kleur",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Lagen",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"
@@ -2126,7 +2198,7 @@
       "url": "/apps/media.html"
     },
     {
-      "label": "Maken",
+      "label": "Lokaal transcriberen",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"
@@ -2138,37 +2210,67 @@
       "url": "/apps/media.html"
     },
     {
+      "label": "Monochroom",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
       "label": "Nieuwe productie",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"
     },
     {
-      "label": "Ontdekken",
+      "label": "Ondertitels toepassen",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"
     },
     {
-      "label": "Review Niemand typt",
+      "label": "Ongedaan",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"
     },
     {
-      "label": "Samen kijken",
+      "label": "Opnieuw",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"
     },
     {
-      "label": "Stop",
+      "label": "Origineel",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Rahul afwerking",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Rechten",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Spiegelen",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"
     },
     {
       "label": "Studio nieuwe productie",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Veilige zones",
       "app": "RTG Media",
       "wereld": "LivingOS",
       "url": "/apps/media.html"

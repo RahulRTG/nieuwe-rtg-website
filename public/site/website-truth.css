@@ -1,0 +1,17 @@
+/* Website en app delen dezelfde Heritage-materialen. Deze kleine laag geeft de
+   actuele appfeiten een vaste, rustige plek zonder een vijfde stijl te maken. */
+.app-truth-detail,.app-truth-panel{
+  border:1px solid var(--rtg-world-line,rgba(180,153,108,.34));
+  border-radius:var(--rtg-radius-editorial);
+  background:color-mix(in srgb,var(--rtg-world-card,#171310) 88%,transparent);
+  color:var(--rtg-world-ink,#f4f0e9);
+}
+.app-truth-detail{margin-top:1rem;padding:.85rem 1rem}
+.app-truth-detail summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:650}
+.app-truth-detail p,.app-truth-detail ul{margin:.5rem 0;color:var(--rtg-world-muted,#c9c0b6);font-size:.88rem;line-height:1.55}
+.app-truth-detail ul{padding-inline-start:1.15rem}
+.app-truth-panel{margin-top:clamp(1.25rem,3vw,2rem);padding:clamp(1rem,2.5vw,1.45rem);max-width:42rem}
+.app-truth-panel strong{display:block;font:400 clamp(1.2rem,2.2vw,1.55rem)/1.2 "Bodoni Moda",Georgia,serif}
+.app-truth-panel p{margin:.55rem 0 .8rem;color:var(--rtg-world-muted,#c9c0b6);line-height:1.6}
+.app-truth-panel a{display:inline-flex;min-height:44px;align-items:center;color:var(--rtg-world-metal,#d9bb82);text-underline-offset:.3em}
+@media(max-width:520px){.app-truth-detail,.app-truth-panel{max-width:100%;overflow-wrap:anywhere}}

@@ -42,7 +42,7 @@
       + text(kind === 'guest' ? 'guest' : 'empty', kind === 'guest'
         ? 'Open uw LivingOS. Hier komen de momenten van uw mensen, reizen en plekken samen.'
         : 'Hier begint uw verhaal. Zodra er berichten voor u zijn, komen ze hier samen, met de nieuwste bovenaan.')
-      + '</p><a href="/apps/salon.html">' + text('openSalon', 'Ontdek De Salon') + ' <span aria-hidden="true">↗</span></a></div>'
+      + '</p><a href="/apps/salon.html">' + text('openSalon', 'Ontdek De Salon') + '</a></div>'
       + '<p class="living-note living-sr">' + text('editorial', 'Sfeerbeeld van RTG. Uw eigen berichten verschijnen hier.') + '</p></section>';
   };
   d.addEventListener('click', function (e) {

@@ -1,0 +1,253 @@
+/* RTG BERICHTEN
+   De mens komt voor de techniek. De bestaande inbox en gespreksmotor blijven
+   onaangeraakt; dit blad geeft hun de filmische LivingOS-voorzijde. */
+:root{
+  --comm-ink:#120d0a;
+  --comm-ivory:#f4ecdf;
+  --comm-soft:#c9bdb0;
+  --comm-gold:#ddbd78;
+  --comm-line:rgba(232,201,137,.25);
+}
+
+body.rtg-social-messages{
+  background:var(--comm-ink)!important;
+  color:var(--comm-ivory)!important;
+}
+
+body.rtg-social-messages .comm{
+  background:var(--comm-ink)!important;
+}
+
+body.rtg-social-messages .lijst{
+  isolation:isolate;
+  background:#120d0a!important;
+  border-color:var(--comm-line)!important;
+}
+
+body.rtg-social-messages .lijst::before{display:none!important}
+
+body.rtg-social-messages .lijst-kop{
+  position:relative;
+  isolation:isolate;
+  display:flex;
+  min-height:clamp(25rem,61dvh,36rem);
+  flex-direction:column;
+  justify-content:flex-end;
+  padding:clamp(8rem,22dvh,13rem) 1.25rem 1.3rem!important;
+  overflow:hidden;
+  border:0!important;
+  background:
+    linear-gradient(180deg,rgba(8,6,5,.06) 0%,rgba(8,6,5,.12) 30%,rgba(12,8,6,.72) 68%,#120d0a 100%),
+    linear-gradient(90deg,rgba(9,6,5,.35),transparent 70%),
+    url('/images/worlds/heritage/living-berichten-hero-v1.jpg') center 42%/cover no-repeat;
+}
+
+body.rtg-social-messages .lijst-kop::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent 49.8%,rgba(255,255,255,.025) 50%,transparent 50.2%);
+}
+
+body.rtg-social-messages .lijst-kicker{
+  margin:0 0 .7rem;
+  color:var(--comm-gold);
+  font:650 .58rem/1 Inter,system-ui,sans-serif;
+  letter-spacing:.21em;
+  text-transform:uppercase;
+}
+
+body.rtg-social-messages .lijst-kop h1{
+  max-width:8ch;
+  margin:0;
+  color:var(--comm-ivory)!important;
+  font:500 clamp(2.75rem,13vw,4.25rem)/.88 'Bodoni Moda',Georgia,serif!important;
+  letter-spacing:-.045em;
+  text-wrap:balance;
+}
+
+body.rtg-social-messages .lijst-intro{
+  max-width:28rem;
+  margin:.9rem 0 0;
+  color:rgba(244,236,223,.78);
+  font-size:.82rem;
+  line-height:1.6;
+}
+
+body.rtg-social-messages .zoekrij{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:.55rem;
+  margin-top:1.3rem;
+}
+
+body.rtg-social-messages .zoekrij input{
+  width:100%!important;
+  min-height:50px;
+  padding:.72rem .9rem!important;
+  border:1px solid rgba(238,213,159,.34)!important;
+  border-radius:0!important;
+  background:rgba(10,7,5,.57)!important;
+  color:var(--comm-ivory)!important;
+  backdrop-filter:blur(14px);
+}
+
+body.rtg-social-messages .zoekrij input::placeholder{color:rgba(244,236,223,.58)!important}
+
+body.rtg-social-messages .nieuwknop{
+  width:50px!important;
+  min-width:50px!important;
+  height:50px!important;
+  min-height:50px!important;
+  padding:0!important;
+  border:1px solid rgba(238,213,159,.5)!important;
+  border-radius:50%!important;
+  background:rgba(10,7,5,.57)!important;
+  color:var(--comm-gold)!important;
+  backdrop-filter:blur(14px);
+}
+
+body.rtg-social-messages .nieuwknop span:last-child{display:none!important}
+
+body.rtg-social-messages .laden{
+  min-height:54px;
+  gap:1.25rem!important;
+  padding:0 1.25rem!important;
+  border-top:1px solid rgba(255,255,255,.06)!important;
+  border-bottom:1px solid rgba(238,213,159,.15)!important;
+  background:#120d0a;
+}
+
+body.rtg-social-messages .laden button{
+  min-height:54px!important;
+  padding:0!important;
+  color:#968b81!important;
+  letter-spacing:.16em!important;
+}
+
+body.rtg-social-messages .laden button[aria-current="true"]{
+  color:var(--comm-ivory)!important;
+  border-bottom-color:var(--comm-gold)!important;
+}
+
+body.rtg-social-messages .gesprekken{
+  padding:0 1.25rem calc(6.5rem + env(safe-area-inset-bottom,0px))!important;
+  background:linear-gradient(180deg,#120d0a,#18100d)!important;
+}
+
+body.rtg-social-messages .gsp{
+  min-height:82px;
+  gap:.85rem;
+  padding:1rem 0!important;
+  border-bottom:1px solid rgba(238,213,159,.14)!important;
+  color:var(--comm-ivory)!important;
+}
+
+body.rtg-social-messages .gsp[aria-current="true"]{
+  padding-left:.7rem!important;
+  box-shadow:inset 1px 0 var(--comm-gold)!important;
+  background:linear-gradient(90deg,rgba(221,189,120,.11),transparent)!important;
+}
+
+body.rtg-social-messages .gsp .rond{
+  width:3.1rem;
+  height:3.1rem;
+  border:1px solid rgba(238,213,159,.4)!important;
+  border-radius:50%!important;
+  background:linear-gradient(145deg,#4d2530,#1b1713)!important;
+  color:var(--comm-gold)!important;
+  font-family:'Bodoni Moda',Georgia,serif;
+  font-size:1rem;
+  font-weight:500;
+}
+
+body.rtg-social-messages .gsp .mid b{font-size:.95rem;font-weight:500}
+body.rtg-social-messages .gsp .mid span{margin-top:.18rem;color:#9f948a!important}
+body.rtg-social-messages .gsp time{color:#8f8378!important}
+
+body.rtg-social-messages .gesprekken>.rtg-leeg{
+  margin:0!important;
+  padding:1.8rem 0!important;
+  border:0!important;
+  border-bottom:1px solid var(--comm-line)!important;
+  background:transparent!important;
+  color:var(--comm-ivory)!important;
+  box-shadow:none!important;
+}
+
+body.rtg-social-messages .gesprekken>.rtg-leeg h2{
+  max-width:12ch;
+  color:var(--comm-ivory)!important;
+  font:500 1.65rem/1.08 'Bodoni Moda',Georgia,serif!important;
+}
+
+body.rtg-social-messages .gesprekken>.rtg-leeg p{color:#aa9e94!important}
+body.rtg-social-messages .gesprekken>.rtg-leeg a{color:var(--comm-gold)!important}
+
+body.rtg-social-messages .draad{
+  color:#28231e;
+  background:#eee6d8!important;
+}
+
+body.rtg-social-messages .draad::before{color:rgba(78,61,35,.08)!important}
+
+body.rtg-social-messages .draad-kop{
+  color:#28231e;
+  background:rgba(247,240,227,.94)!important;
+  backdrop-filter:blur(18px);
+}
+
+body.rtg-social-messages .bubbels{
+  background:
+    linear-gradient(135deg,rgba(150,113,55,.045) 0 1px,transparent 1px 24px),
+    linear-gradient(180deg,#eee6d8,#f5efe5)!important;
+}
+
+body.rtg-social-messages .bub.van-mij{
+  background:#ded0b6!important;
+  border-color:rgba(104,76,31,.23)!important;
+}
+
+body.rtg-social-messages .bub.van-ander{
+  background:rgba(255,252,245,.8)!important;
+  border-color:rgba(72,57,35,.16)!important;
+}
+
+body.rtg-social-messages .invoer{background:#17110e!important}
+
+body.rtg-social-messages .blad{
+  color:var(--comm-ivory)!important;
+  background:linear-gradient(160deg,#17110e,#25161a)!important;
+  border-color:var(--comm-line)!important;
+}
+
+@media(max-width:899px){
+  body.rtg-social-messages .comm{
+    inset:0!important;
+    height:100dvh!important;
+  }
+
+  body.rtg-social-messages .lijst{
+    padding-top:0!important;
+  }
+
+  body.rtg-social-messages .lijst-kop{
+    min-height:min(62dvh,34rem);
+    padding-top:8rem!important;
+  }
+
+  body.rtg-social-messages[data-pane="draad"] .draad{
+    padding-top:var(--rtg-topbar-h,48px);
+  }
+}
+
+@media(min-width:900px){
+  body.rtg-social-messages .comm{grid-template-columns:minmax(22rem,31vw) minmax(0,1fr)!important}
+  body.rtg-social-messages .lijst-kop{min-height:27rem}
+}
+
+@media(min-width:1280px){
+  body.rtg-social-messages .comm{grid-template-columns:minmax(23rem,28vw) minmax(0,1fr) 285px!important}
+}

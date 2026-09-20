@@ -1,4 +1,4 @@
-/* Menselijk nagekeken contract van de Salon-claimcredential. */
+/* Nagekeken contracten van de Salon-claimcredential en ledenmedia. */
 'use strict';
 const AUTH = { klasse: 'AUTHENTICATED' };
 const AF = { door: 'Codex, Salon-credentialkern en routeflow gelezen en beproefd', op: '2026-09-05' };
@@ -9,6 +9,20 @@ const contract = (id, bewijs) => ({
   afgetekend: AF
 });
 const CONTRACTEN = {
+  'POST /api/salon/media': {
+    mutatieId: 'salon.media.upload', herkomst: 'mens',
+    semantiek: { klasse: 'nietHerhaalbaar' }, toegang: AUTH,
+    stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'Een tweede rauwe upload is een tweede gekozen bestand, ook als de bytes gelijk zijn; elk krijgt een eigen tijdelijk upload-id en verlaten uploads verlopen vanzelf.',
+    bewijs: { gemeten: 'test/salon-app.test.js uploadt afzonderlijke foto- en videobestanden en ontvangt voor elk een eigen upload-id', op: '2026-09-19' },
+    afgetekend: { door: 'Codex, Salon-mediaflow gelezen en beproefd', op: '2026-09-19' }
+  },
+  'POST /api/salon/ondertitels': {
+    mutatieId: 'salon.media.ondertitels', herkomst: 'mens',
+    semantiek: { klasse: 'sleutelVereist' }, toegang: AUTH, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/salon-app.test.js bewaart tijdregels bij één sessiegebonden upload en blokkeert een andere uploader', op: '2026-09-19' },
+    afgetekend: { door: 'Codex, Salon-media- en ondertitelflow gelezen en beproefd', op: '2026-09-19' }
+  },
   'POST /api/salon/deal/claim': contract('salon.deal.claim',
     'geeft één 128-bit code uit en herhaalt haar niet'),
   'POST /api/salon/deal/claim/roteer': contract('salon.deal.claim.roteren',

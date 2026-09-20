@@ -33,6 +33,20 @@
       document.body.classList.remove('rtg-intel-open');
       if (lastFocus && lastFocus.focus) lastFocus.focus();
     }
+    /* Adaptive Edge is de zichtbare systeemrand. De technische context blijft
+       beschikbaar, maar pas nadat iemand er bij Acties bewust om vraagt; hij
+       hoeft daarom niet meer als permanente balk boven iedere sociale pagina
+       te staan. Edge wordt later geladen dan deze runtime, dus we wachten kort
+       op zijn publieke API zonder een tweede knop of gegevenslaag te maken. */
+    function exposeInEdge(attempt) {
+      var edge = window.RTGAdaptiveEdge;
+      if (edge && edge.registerAction && edge.setProjection) {
+        edge.registerAction({ id: 'social-context', label: 'Sociale context bekijken', allowed: true, run: openDeck });
+        edge.setProjection({ deck: 'actions', actions: ['social-context'] });
+        return;
+      }
+      if (attempt < 40) window.setTimeout(function () { exposeInEdge(attempt + 1); }, 100);
+    }
     function update() {
       var time = document.getElementById('rtgIntelTime');
       var signals = document.getElementById('rtgIntelSignals');
@@ -70,6 +84,7 @@
       attributeFilter: ['hidden', 'aria-hidden', 'class']
     });
     update();
+    exposeInEdge(0);
     window.setInterval(update, 1000);
 
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

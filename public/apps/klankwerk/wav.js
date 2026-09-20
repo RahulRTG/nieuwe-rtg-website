@@ -21,9 +21,9 @@
   if (window.RTGStudioWav) return;
 
   /* De RIFF/WAVE-kop, met de hand geschreven. 44 bytes, en elk veld staat in de
-     norm; er valt hier niets te verzinnen. 16-bits PCM, want dat leest alles. */
-  function riff(kanalen, aantalFrames, sampleRate) {
-    var bytesPerSample = 2;
+     norm; 16-bit voor overal openen of 24-bit voor verdere studiobewerking. */
+  function riff(kanalen, aantalFrames, sampleRate, bitDepth) {
+    var bytesPerSample = bitDepth === 24 ? 3 : 2;
     var blockAlign = kanalen * bytesPerSample;
     var dataLengte = aantalFrames * blockAlign;
     var buf = new ArrayBuffer(44 + dataLengte);
@@ -44,18 +44,26 @@
      weggeschreven (links, rechts, links, ...) en we knippen netjes af op -1..1;
      zonder die begrenzing slaat een luide piek om naar het tegenovergestelde
      teken en hoort u een tik. */
-  function naarWav(audio) {
+  function naarWav(audio, opties) {
+    var bitDepth = opties && Number(opties.bitDepth) === 24 ? 24 : 16;
     var kanalen = Math.min(2, audio.numberOfChannels);
     var frames = audio.length;
-    var w = riff(kanalen, frames, audio.sampleRate);
+    var w = riff(kanalen, frames, audio.sampleRate, bitDepth);
     var data = [];
     for (var c = 0; c < kanalen; c++) data.push(audio.getChannelData(c));
     var p = w.begin;
     for (var i = 0; i < frames; i++) {
       for (var k = 0; k < kanalen; k++) {
         var v = Math.max(-1, Math.min(1, data[k][i]));
-        w.dv.setInt16(p, v < 0 ? v * 0x8000 : v * 0x7FFF, true);
-        p += 2;
+        if (bitDepth === 24) {
+          var n = Math.round(v < 0 ? v * 0x800000 : v * 0x7FFFFF);
+          if (n < 0) n += 0x1000000;
+          w.dv.setUint8(p, n & 255); w.dv.setUint8(p + 1, (n >> 8) & 255);
+          w.dv.setUint8(p + 2, (n >> 16) & 255); p += 3;
+        } else {
+          w.dv.setInt16(p, v < 0 ? v * 0x8000 : v * 0x7FFF, true);
+          p += 2;
+        }
       }
     }
     return new Blob([w.buffer], { type: 'audio/wav' });
@@ -76,11 +84,11 @@
     var duur = stappen * M.stapDuur(track.bpm) * rondes;
     var staart = 2;
     var ctx = new Offline(2, Math.ceil((duur + staart) * sr), sr);
-    var master = M.bus(ctx);
+    var master = M.bus(ctx, track);
     for (var r = 0; r < rondes; r++) {
       M.plan(ctx, master, track, r * (duur / rondes));
     }
-    return ctx.startRendering().then(naarWav);
+    return ctx.startRendering().then(function (audio) { return naarWav(audio, o); });
   }
 
   window.RTGStudioWav = { render: render, naarWav: naarWav };

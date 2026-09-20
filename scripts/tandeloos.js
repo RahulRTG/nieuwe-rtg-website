@@ -178,6 +178,8 @@ const BEOORDEELD = new Map([
     'de echte bewering staat eronder: na het intrekken geeft de boardroom 403. Die zakt wel als het intrekken niets doet'],
   ['eigen-website.test.js::leeg.body.fotos',
     'de bibliotheek van de buurman hoort leeg te zijn -- dat is de scheiding zelf, en de eigen kant staat ernaast op 1'],
+  ['muziek-bestanden.test.js::ander.body.nummers',
+    'de leegte IS hier de privacybewering: in hetzelfde blok publiceert lid A een nummer, ziet A exact dat id in zijn bibliotheek en ziet lid B niets; daarna ziet B hetzelfde nummer juist wel via de openbare feed'],
   ['galerij.test.js::gb.body.beelden',
     'de galerij van B hoort leeg te zijn: beelden zijn van het lid zelf. De leegte IS hier de bewering, en de kant van A staat ernaast met een find()'],
   ['synergie.test.js::p.body.pakketten',

@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-15T20:24:03.530Z",
-    "commit": "d4c190d4f",
-    "routesToen": 5102
+    "op": "2026-09-20T09:13:59.997Z",
+    "commit": "0ac230f4a",
+    "routesToen": 5111
   },
   "aangeraakt": [
     "GET /",
@@ -2036,9 +2036,16 @@
     "POST /api/munt/opties",
     "POST /api/munt/verzoek",
     "POST /api/munt/webhook",
+    "POST /api/muziek/bestand",
+    "POST /api/muziek/bestand-ticket",
+    "POST /api/muziek/bestand-weg",
+    "POST /api/muziek/bestanden",
     "POST /api/muziek/bewaar",
+    "POST /api/muziek/feed",
+    "GET /api/muziek/luister/:ticket",
     "POST /api/muziek/maak",
     "POST /api/muziek/mijn",
+    "POST /api/muziek/mooi",
     "POST /api/muziek/open",
     "POST /api/muziek/rahul",
     "POST /api/muziek/samen",
@@ -3518,7 +3525,9 @@
     "POST /api/salon/feed",
     "POST /api/salon/inzicht",
     "POST /api/salon/lid",
+    "POST /api/salon/media",
     "POST /api/salon/meld",
+    "POST /api/salon/ondertitels",
     "POST /api/salon/onderwerpen",
     "POST /api/salon/plaats",
     "POST /api/salon/poll/stem",

@@ -108,6 +108,7 @@
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/rtg-media-2026.css" rel="stylesheet">
+<link href="/apps/media/studio-pro.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-media-experience" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-skin="heritage">
@@ -134,8 +135,8 @@
 </aside>
 <div class="media-werk">
 <header class="kop">
-  <a class="media-brand" href="/apps/rtg.html" aria-label="RTG LivingOS"><span>RTG</span><b>LivingOS</b><small>Film · video · muziek · live</small></a>
-  <div class="media-titel"><span>Vandaag · voor u</span><h1>Minder zoeken.<br>Meer beleven.</h1><p>Alles wat u wilt zien en horen, rustig bij elkaar.</p></div>
+  <a class="media-brand" href="/apps/rtg.html" aria-label="RTG LivingOS"><span>RTG</span><b>LivingOS</b><small>Film, video, muziek en live</small></a>
+  <div class="media-titel"><span>Vandaag voor u</span><h1>Minder zoeken.<br>Meer beleven.</h1><p>Alles wat u wilt zien en horen, rustig bij elkaar.</p></div>
   <span class="rek"></span>
   <button class="knop" id="lijstKnop" type="button">Lijsten</button>
   <button class="knop" id="samenKnop" type="button">Samen</button>
@@ -162,7 +163,7 @@
     <span aria-hidden="true">✦</span>
     <p><b>Uw keuze blijft van u.</b> Deze volgorde gebruikt alleen makers die u volgt en voorkeuren die u zelf geeft. Geen verborgen kijkprofiel.</p>
   </section>
-  <p class="stil" id="uitleg">De wereld laadt…</p>
+  <p class="stil" id="uitleg">De wereld laadt...</p>
   <div class="stukken" id="stukken"></div>
 
   <!-- DE SPECIALISTEN. Muziek, Kijk en Flow zijn STANDEN van deze wereld; de
@@ -198,24 +199,131 @@
 </main>
 
 <section class="media-studio" id="mediaStudio" hidden aria-labelledby="studioTitel">
-  <header class="media-studio-kop"><div><span>Studio · concept</span><h2 id="studioTitel">Nieuwe productie</h2><p id="studioMeta">Begin met één bestand. De professionele ruimte groeit vanzelf mee.</p></div><button class="knop" id="studioSluit" type="button">Sluiten</button></header>
+  <header class="media-studio-kop"><div><span>Studio, concept</span><h2 id="studioTitel">Nieuwe productie</h2><p id="studioMeta">Begin met één bestand. De professionele ruimte groeit vanzelf mee.</p></div><button class="knop" id="studioSluit" type="button">Sluiten</button></header>
   <div class="media-studio-vlak" id="studioVlak">
-    <label class="media-upload" for="mediaBestand"><strong>Sleep uw productie hierheen</strong><span>Video, audio, foto’s, een script of een complete productiemap</span><input id="mediaBestand" type="file" accept="video/*,audio/*,image/*,.pdf,.txt,.doc,.docx" multiple></label>
+    <label class="media-upload" for="mediaBestand"><strong>Sleep uw productie hierheen</strong><span>Video, audio, foto's, een script of een complete productiemap</span><input id="mediaBestand" type="file" accept="video/*,audio/*,image/*,.pdf,.txt,.doc,.docx" multiple></label>
   </div>
   <div class="media-productie" id="mediaProductie" hidden>
-    <div class="media-preview"><button type="button" aria-label="Voorbeeld afspelen">▷</button><span id="mediaScene">VOORBEELD · 00:00</span></div>
-    <div class="media-tijdlijn" aria-label="Productietijdlijn"><i></i><i></i><b></b></div>
-    <div class="media-controles">
-      <button type="button"><b>Rahul-controle</b><span>Technische analyse voorbereiden</span></button>
-      <button type="button"><b>Review</b><span id="mediaTypt">Niemand typt</span></button>
-      <button type="button" id="rechtenKnop"><b>Rechten</b><span>Controleer publicatiegebied</span></button>
-      <button type="button"><b>Ondertiteling</b><span>Transcript en talen</span></button>
+    <div class="pro-opdrachtbalk" aria-label="Studio opdrachten">
+      <div><span class="pro-statuspunt" aria-hidden="true"></span><b>RTG Studio Pro</b><small id="proStatus" role="status">Bron wordt voorbereid</small></div>
+      <span class="pro-rek"></span>
+      <button class="knop" id="proUndo" type="button" disabled>Ongedaan</button>
+      <button class="knop" id="proRedo" type="button" disabled>Opnieuw</button>
+      <button class="knop" id="proVergelijk" type="button">Origineel</button>
+      <button class="knop" id="rechtenKnop" type="button">Rechten</button>
     </div>
+
+    <div class="pro-werkbank">
+      <section class="pro-monitor" aria-label="Voorbeeld">
+        <div class="pro-doek" id="proDoek">
+          <canvas id="proCanvas" aria-label="Voorbeeld van de bewerking"></canvas>
+          <video id="proVideo" playsinline preload="metadata" hidden></video>
+          <audio id="proMuziek" preload="metadata"></audio>
+          <div class="pro-safe" id="proSafe" hidden aria-hidden="true"><i></i></div>
+        </div>
+        <div class="pro-transport">
+          <button id="proSpeel" type="button" aria-label="Afspelen of pauzeren">Afspelen</button>
+          <output id="proTijd">00:00.0 / 00:00.0</output>
+          <label><span class="vis-verborgen">Positie</span><input id="proScrub" type="range" min="0" max="1" value="0" step="0.01"></label>
+          <select id="proKwaliteit" aria-label="Voorbeeldkwaliteit"><option value="720">HD voorbeeld</option><option value="1080">Full HD voorbeeld</option><option value="2160">4K voorbeeld</option><option value="source">Bronkwaliteit</option></select>
+        </div>
+      </section>
+
+      <aside class="pro-inspector" aria-label="Bewerkingsgereedschap">
+        <nav class="pro-tabs" aria-label="Gereedschap">
+          <button type="button" data-pro-tab="kleur" aria-current="true">Kleur</button>
+          <button type="button" data-pro-tab="kader">Kader</button>
+          <button type="button" data-pro-tab="lagen">Lagen</button>
+          <button type="button" data-pro-tab="geluid">Geluid</button>
+          <button type="button" data-pro-tab="export">Export</button>
+        </nav>
+
+        <div class="pro-paneel" data-pro-paneel="kleur">
+          <header><div><span>Color suite</span><h3>Professionele grading</h3></div><button id="proAuto" type="button">Rahul afwerking</button></header>
+          <div class="pro-presets" role="group" aria-label="Kleurstijlen">
+            <button type="button" data-pro-preset="clean">Clean</button><button type="button" data-pro-preset="cinema">Cinema</button><button type="button" data-pro-preset="golden">Golden</button><button type="button" data-pro-preset="editorial">Editorial</button><button type="button" data-pro-preset="mono">Monochroom</button>
+          </div>
+          <div class="pro-regelaars">
+            <label>Belichting <input data-pro-waarde="belichting" type="range" min="-100" max="100" value="0"><output>0</output></label>
+            <label>Contrast <input data-pro-waarde="contrast" type="range" min="-100" max="100" value="0"><output>0</output></label>
+            <label>Hooglichten <input data-pro-waarde="hooglichten" type="range" min="-100" max="100" value="0"><output>0</output></label>
+            <label>Schaduwen <input data-pro-waarde="schaduwen" type="range" min="-100" max="100" value="0"><output>0</output></label>
+            <label>Warmte <input data-pro-waarde="warmte" type="range" min="-100" max="100" value="0"><output>0</output></label>
+            <label>Verzadiging <input data-pro-waarde="verzadiging" type="range" min="-100" max="100" value="0"><output>0</output></label>
+            <label>Vervaging <input data-pro-waarde="fade" type="range" min="0" max="100" value="0"><output>0</output></label>
+            <label>Vignet <input data-pro-waarde="vignet" type="range" min="0" max="100" value="0"><output>0</output></label>
+            <label>Korrel <input data-pro-waarde="korrel" type="range" min="0" max="100" value="0"><output>0</output></label>
+            <label>Detail <input data-pro-waarde="scherpte" type="range" min="0" max="100" value="0"><output>0</output></label>
+          </div>
+        </div>
+
+        <div class="pro-paneel" data-pro-paneel="kader" hidden>
+          <header><div><span>Canvas</span><h3>Uitsnede en beweging</h3></div></header>
+          <div class="pro-keuzes" role="group" aria-label="Beeldverhouding">
+            <button type="button" data-pro-ratio="bron" aria-pressed="true">Origineel</button><button type="button" data-pro-ratio="1">1:1</button><button type="button" data-pro-ratio="0.8">4:5</button><button type="button" data-pro-ratio="1.7778">16:9</button><button type="button" data-pro-ratio="0.5625">9:16</button>
+          </div>
+          <div class="pro-regelaars">
+            <label>Inzoomen <input data-pro-waarde="zoom" type="range" min="100" max="300" value="100"><output>100</output></label>
+            <label>Horizontaal <input data-pro-waarde="x" type="range" min="-100" max="100" value="0"><output>0</output></label>
+            <label>Verticaal <input data-pro-waarde="y" type="range" min="-100" max="100" value="0"><output>0</output></label>
+            <label>Draaien <input data-pro-waarde="hoek" type="range" min="-180" max="180" value="0"><output>0</output></label>
+            <label>Snelheid <input data-pro-waarde="snelheid" type="range" min="25" max="400" value="100" step="25"><output>100</output></label>
+          </div>
+          <div class="pro-keuzes"><button id="proSpiegel" type="button" aria-pressed="false">Spiegelen</button><button id="proSafeKnop" type="button" aria-pressed="false">Veilige zones</button><button id="proKeyframe" type="button">Keyframe toevoegen</button></div>
+          <p class="pro-hulp" id="proKeyframeStand">Geen keyframes. Voeg er een toe om beweging of grading door de tijd te laten verlopen.</p>
+        </div>
+
+        <div class="pro-paneel" data-pro-paneel="lagen" hidden>
+          <header><div><span>Compositie</span><h3>Tekst, beeld en ondertiteling</h3></div></header>
+          <label class="pro-veld">Titel of tekstlaag<input id="proTekst" type="text" maxlength="160" placeholder="Vertel wat dit moment betekent"></label>
+          <div class="pro-regelaars">
+            <label>Tekstgrootte <input data-pro-waarde="tekstGrootte" type="range" min="18" max="140" value="52"><output>52</output></label>
+            <label>Tekstpositie <input data-pro-waarde="tekstY" type="range" min="10" max="92" value="78"><output>78</output></label>
+          </div>
+          <div class="pro-dubbel"><label class="pro-veld">Tekstkleur<input id="proTekstKleur" type="color" value="#ffffff"></label><label class="pro-veld">Achtergrond<input id="proTekstAchter" type="color" value="#130d09"></label></div>
+          <label class="pro-upload-klein">Beeldlaag toevoegen<input id="proLaagBestand" type="file" accept="image/*"></label>
+          <textarea id="proOndertitels" rows="6" placeholder="00:00 - 00:03 Welkom in mijn verhaal&#10;00:03 - 00:06 Dit is de volgende regel"></textarea>
+          <div class="pro-keuzes"><button id="proOndertitelPas" type="button">Ondertitels toepassen</button><button id="proOndertitelAuto" type="button">Lokaal transcriberen</button></div>
+          <p class="pro-hulp">Automatische transcriptie gebruikt alleen het lokale RTG-spraakmodel. Zonder lokaal model blijft handmatige ondertiteling volledig werken.</p>
+        </div>
+
+        <div class="pro-paneel" data-pro-paneel="geluid" hidden>
+          <header><div><span>Audio suite</span><h3>Mix zonder beperkingen</h3></div></header>
+          <label class="pro-upload-klein">Eigen muziek toevoegen<input id="proMuziekBestand" type="file" accept="audio/*"></label>
+          <div class="pro-regelaars">
+            <label>Brongeluid <input data-pro-waarde="bronVolume" type="range" min="0" max="100" value="100"><output>100</output></label>
+            <label>Muziek <input data-pro-waarde="muziekVolume" type="range" min="0" max="100" value="35"><output>35</output></label>
+            <label>Fade in <input data-pro-waarde="fadeIn" type="range" min="0" max="10" value="0" step="0.5"><output>0</output></label>
+            <label>Fade uit <input data-pro-waarde="fadeUit" type="range" min="0" max="10" value="0" step="0.5"><output>0</output></label>
+          </div>
+          <div class="pro-keuzes"><button id="proDucking" type="button" aria-pressed="false">Automatische ducking</button><button id="proDempen" type="button" aria-pressed="false">Bron dempen</button></div>
+          <p class="pro-hulp" id="proMuziekStand">Nog geen muzieklaag. Toegevoegde bestanden blijven lokaal.</p>
+        </div>
+
+        <div class="pro-paneel" data-pro-paneel="export" hidden>
+          <header><div><span>Mastering</span><h3>Watermerkvrij exporteren</h3></div></header>
+          <label class="pro-veld">Bestandsnaam<input id="proExportNaam" type="text" value="RTG-productie" maxlength="90"></label>
+          <label class="pro-veld">Exportprofiel<select id="proProfiel"><option value="source">Bronkwaliteit</option><option value="2160">4K Ultra HD</option><option value="1080">Full HD</option><option value="720">HD</option></select></label>
+          <label class="pro-veld">Fotoformaat<select id="proFotoFormaat"><option value="image/jpeg">JPEG hoge kwaliteit</option><option value="image/png">PNG verliesvrij</option><option value="image/webp">WebP</option></select></label>
+          <div class="pro-exportkaart"><b>Vrij exporteren</b><span>Geen RTG-watermerk, geen betaalmuur, geen kunstmatige lengte- of resolutiebeperking. De grens is alleen wat uw toestel en browser technisch aankunnen.</span></div>
+          <button class="pro-export" id="proExport" type="button">Exporteer master</button>
+          <button class="knop" id="proProjectBewaar" type="button">Project lokaal bewaren</button>
+        </div>
+      </aside>
+    </div>
+
+    <section class="pro-tijdlijn" aria-label="Tijdlijn">
+      <header><span id="mediaScene">TIJDLIJN, NIET-DESTRUCTIEF</span><div><label>Van <input id="proVan" type="number" min="0" value="0" step="0.1"></label><label>Tot <input id="proTot" type="number" min="0" value="0" step="0.1"></label></div></header>
+      <div class="pro-spoor pro-spoor-video"><b>Beeld</b><div><i id="proClip"></i><em id="proKop"></em><span id="proKeys"></span></div></div>
+      <div class="pro-spoor"><b>Tekst</b><div class="pro-laag" id="proTekstSpoor">Titel en ondertiteling</div></div>
+      <div class="pro-spoor"><b>Audio</b><div class="pro-laag pro-audio" id="proAudioSpoor">Brongeluid</div></div>
+      <p>Alle bewerkingen zijn niet-destructief. Uw oorspronkelijke bestand wordt nooit overschreven.</p>
+    </section>
   </div>
 </section>
 
 <aside class="media-rechten" id="mediaRechten" hidden aria-labelledby="rechtenTitel">
-  <header><div><span>Rechten · publicatie</span><h2 id="rechtenTitel">Releasecontrole</h2></div><button class="knop" id="rechtenSluit" type="button">Sluiten</button></header>
+  <header><div><span>Rechten en publicatie</span><h2 id="rechtenTitel">Releasecontrole</h2></div><button class="knop" id="rechtenSluit" type="button">Sluiten</button></header>
   <p class="stil">Deze tweede ruimte verschijnt alleen wanneer een productie een beslissing nodig heeft.</p>
   <div class="media-besluit"><b>Menselijke goedkeuring vereist</b><p>Controleer makers, herkenbare personen, muziekgebruik, sponsoring en beschikbare markten vóór publicatie.</p><button class="knop vol" type="button">Controle starten</button></div>
   <div class="media-rechten-regel"><b>Makers en medewerkers</b><span>Nog in te vullen</span></div>
@@ -281,6 +389,10 @@
 <script src="/apps/media/blad.js"></script>
 <script src="/apps/media/lijst.js"></script>
 <script src="/apps/media/samen.js"></script>
+<script src="/apps/media/studio-pro-engine.js"></script>
+<script src="/apps/media/studio-pro-grading.js"></script>
+<script src="/apps/media/studio-pro-export.js"></script>
+<script src="/apps/media/studio-pro.js"></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

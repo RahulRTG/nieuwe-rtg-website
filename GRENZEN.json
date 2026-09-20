@@ -1309,6 +1309,13 @@
       "move"
     ],
     "muziek": [
+      "muziekBestandLuister",
+      "muziekBestandMooi",
+      "muziekBestandTicket",
+      "muziekBestandUpload",
+      "muziekBestandWeg",
+      "muziekBestandenFeed",
+      "muziekBestandenMijn",
       "muziekBewaar",
       "muziekMaak",
       "muziekMijn",

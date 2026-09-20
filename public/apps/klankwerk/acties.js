@@ -23,7 +23,7 @@
     var inst = $('#nieuwInstrument').value;
     if (!inst) return;
     track.kanalen = track.kanalen || [];
-    if (track.kanalen.length >= 12) return B.zeg('Twaalf kanalen is het maximum.');
+    if (track.kanalen.length >= 16) return B.zeg('Zestien kanalen is het maximum.');
     var k = { instrument: inst, naam: (instrumenten[inst] || {}).naam, volume: 0.8, pan: 0, stil: false };
     if ((instrumenten[inst] || {}).soort === 'slag') k.stappen = []; else k.noten = [];
     track.kanalen.push(k);
@@ -55,7 +55,7 @@
     if (!track) return;
     var k = lied ? $('#rLiedKnop') : $('#rVraagKnop');
     var woord = k.textContent;
-    k.disabled = true; k.textContent = 'Rahul denkt na…';
+    k.disabled = true; k.textContent = 'Antwoord wordt voorbereid...';
     B.api('rahul', { vraag: $('#rVraag').value, maten: lied ? undefined : track.maten,
       lied: lied, tekst: lied ? $('#rTekst').value : '', zaad: Date.now() }).then(function (d) {
       k.disabled = false; k.textContent = woord;
@@ -101,13 +101,16 @@
     var track = B.track();
     if (!track) return;
     B.leesVelden();
-    var k = $('#exportWav'); k.disabled = true; k.textContent = 'Uitrekenen…';
-    window.RTGStudioWav.render(track, { rondes: 2 }).then(function (blob) {
+    var k = $('#exportWav'); k.disabled = true; k.textContent = 'Master wordt gerenderd...';
+    var kwaliteit = ($('#exportKwaliteit') || {}).value || '48000-24';
+    var delen = kwaliteit.split('-');
+    var rondes = Number(($('#exportRondes') || {}).value) || 2;
+    window.RTGStudioWav.render(track, { rondes: rondes, sampleRate: Number(delen[0]), bitDepth: Number(delen[1]) }).then(function (blob) {
       B.download((track.naam || 'stuk').replace(/[^\w -]/g, '') + '.wav', blob);
-      k.disabled = false; k.textContent = 'Als geluidsbestand (WAV)';
-      B.zeg('Klaar. Twee rondes, zodat u er iets mee kunt.');
+      k.disabled = false; k.textContent = 'Exporteer WAV-master';
+      B.zeg('Master klaar: ' + delen[0] / 1000 + ' kHz / ' + delen[1] + '-bit, zonder watermerk.');
     }).catch(function (e) {
-      k.disabled = false; k.textContent = 'Als geluidsbestand (WAV)';
+      k.disabled = false; k.textContent = 'Exporteer WAV-master';
       B.fout(e.message || 'Uitrekenen lukte niet.');
     });
   });
@@ -117,7 +120,28 @@
     B.leesVelden();
     B.download((track.naam || 'stuk').replace(/[^\w -]/g, '') + '.json',
       new Blob([JSON.stringify({ naam: track.naam, bpm: track.bpm, maten: track.maten,
-        kanalen: track.kanalen }, null, 2)], { type: 'application/json' }));
+        swing: track.swing, masterGain: track.masterGain, masterLaag: track.masterLaag,
+        masterMidden: track.masterMidden, masterHoog: track.masterHoog,
+        masterDrive: track.masterDrive, kanalen: track.kanalen, secties: track.secties || []
+      }, null, 2)], { type: 'application/json' }));
+  });
+  $('#exportStem').addEventListener('click', function () {
+    var track = B.track(), gekozen = B.raster().gekozen();
+    if (!track || gekozen == null || !track.kanalen[gekozen]) return B.zeg('Kies eerst een kanaal in het raster.');
+    B.leesVelden();
+    var stem = JSON.parse(JSON.stringify(track));
+    stem.kanalen.forEach(function (k, i) { k.stil = i !== gekozen; k.solo = false; });
+    var kwaliteit = ($('#exportKwaliteit') || {}).value || '48000-24';
+    var delen = kwaliteit.split('-'), k = $('#exportStem');
+    k.disabled = true; k.textContent = 'Stem wordt gerenderd...';
+    window.RTGStudioWav.render(stem, { rondes: Number(($('#exportRondes') || {}).value) || 2,
+      sampleRate: Number(delen[0]), bitDepth: Number(delen[1]) }).then(function (blob) {
+      var kanaal = track.kanalen[gekozen];
+      B.download((track.naam + ' - ' + (kanaal.naam || kanaal.instrument)).replace(/[^\w -]/g, '') + '.wav', blob);
+      k.disabled = false; k.textContent = 'Exporteer gekozen stem'; B.zeg('Losse stem klaar, zonder watermerk.');
+    }).catch(function (e) {
+      k.disabled = false; k.textContent = 'Exporteer gekozen stem'; B.fout(e.message || 'De stem kon niet worden gerenderd.');
+    });
   });
   $('#stukWeg').addEventListener('click', function () {
     var track = B.track();

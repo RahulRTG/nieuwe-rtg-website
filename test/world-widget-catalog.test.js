@@ -5,6 +5,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const widget = require('../scripts/world-widgets');
 const identity = require('../public/shared/rtg-world-identity');
+test('widget titles decode each HTML entity exactly once', () => {
+  assert.equal(widget.clean('<b>Life&nbsp;&amp; Work</b>'), 'Life & Work');
+  assert.equal(widget.clean('&amp;nbsp; &amp;amp;'), '&nbsp; &amp;');
+});
 test('widget catalog stays derived, covers the approved atlas and points only to existing app routes', () => {
   assert.equal(fs.readFileSync(widget.DOEL, 'utf8'), widget.bouw());
   const apps = widget.gegevens();

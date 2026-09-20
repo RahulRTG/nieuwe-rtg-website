@@ -214,6 +214,13 @@ async function dashboardMeting(page, route) {
     const runtimeError = /\b(?:[A-Za-z_$][\w$]* is not defined|Cannot read properties of|TypeError:|ReferenceError:)/.test(document.body.innerText);
     const html = document.documentElement, body = document.body;
     const canvas = rechthoek(hoofd);
+    const desktopShell = body.hasAttribute('data-rtg-desktop') && innerWidth >= 1024
+      ? document.querySelector('.wd-shell') : null;
+    const werkruimte = desktopShell ? rechthoek(desktopShell) : canvas;
+    const rails = desktopShell ? ['.wd-people', '.wd-favorites'].map(sel => {
+      const el = desktopShell.querySelector(sel);
+      return el && layoutZichtbaar(el) ? rechthoek(el) : null;
+    }) : [];
 
     return {
       wereld: body.getAttribute('data-rtg-world'),
@@ -234,7 +241,7 @@ async function dashboardMeting(page, route) {
       controlOverlap, smallControls, runtimeError,
       contextTokens: contextueel.map((el) => el.getAttribute('data-rtg-edge-2-contextual')),
       contextBuiten, oudZichtbaar,
-      canvas, panelen: panelen.length, ontbrekend, paneelBuiten, kopAfgesneden, tekstBotsingen,
+      canvas, werkruimte, rails, panelen: panelen.length, ontbrekend, paneelBuiten, kopAfgesneden, tekstBotsingen,
       viewport: html.clientWidth,
       documentOverloop: Math.max(html.scrollWidth, body.scrollWidth) - html.clientWidth,
       canvasOverloop: hoofd.scrollWidth - hoofd.clientWidth
@@ -264,9 +271,15 @@ function keurDashboard(m, route, maat) {
     label + ': oude balk buiten Edge-context zichtbaar:\n' + m.oudZichtbaar.join('\n'));
   assert.deepEqual(m.ontbrekend, [], label + ': native panelen ontbreken: ' + m.ontbrekend.join(', '));
   assert.ok(m.panelen >= 3, label + ': dashboard toont geen meervoudige native panelen');
-  assert.ok(m.canvas.width >= Math.min(route.maxCanvas || Infinity,
+  assert.ok(m.werkruimte.width >= Math.min(m.rails.length ? Infinity : route.maxCanvas || Infinity,
     maat.width >= 1000 ? maat.width * .72 : maat.width * .84),
-    label + ': canvas is geen brede werkruimte: ' + JSON.stringify(m.canvas));
+    label + ': canvas en zijpanelen vormen geen brede werkruimte: ' + JSON.stringify(m.werkruimte));
+  if (m.rails.length) {
+    assert.ok(m.canvas.width >= 300, label + ': de centrale inhoud is te smal');
+    assert.ok(m.rails.every(Boolean), label + ': een desktopzijpaneel ontbreekt');
+    assert.ok(m.rails[0].right <= m.canvas.left && m.canvas.right <= m.rails[1].left,
+      label + ': de zijpanelen overlappen de centrale inhoud');
+  }
   assert.ok(m.canvas.left >= -1 && m.canvas.right <= m.viewport + 1,
     label + ': canvas valt buiten het kijkvlak: ' + JSON.stringify(m.canvas));
   assert.ok(m.documentOverloop <= 1,

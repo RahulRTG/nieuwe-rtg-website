@@ -8,7 +8,10 @@ const identity = require('../public/shared/rtg-world-identity');
 const { APPS } = require('../server/kern/appcatalogus-data');
 const { R } = require('../server/kern/rtfappcatalogus-data');
 const DOEL = path.join(ROOT, 'public/shared/interface/world-widget-catalog.json');
-const clean = s => String(s || '').replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+// Decode once: &amp;nbsp; is literal text, not another entity to decode.
+const clean = s => String(s || '').replace(/<[^>]*>/g, ' ')
+  .replace(/&(?:amp|nbsp);/g, entity => entity === '&amp;' ? '&' : ' ')
+  .replace(/\s+/g, ' ').trim();
 function gegevens() {
   const design = JSON.parse(fs.readFileSync(path.join(__dirname, 'world-widget-design.json'), 'utf8'));
   const meta = new Map();
@@ -40,4 +43,4 @@ function gegevens() {
 function bouw() { return JSON.stringify({ version: 1, apps: gegevens() }, null, 2) + '\n'; }
 function schrijf() { fs.writeFileSync(DOEL, bouw()); }
 if (require.main === module) schrijf();
-module.exports = { gegevens, bouw, schrijf, DOEL };
+module.exports = { gegevens, bouw, schrijf, DOEL, clean };

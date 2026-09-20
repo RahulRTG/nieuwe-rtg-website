@@ -304,10 +304,15 @@ async function controleerRoute(page, route, scherm) {
   if (naOpstart.pathname !== verwachtPad) return { omgeleid: naOpstart.pathname };
 
   const label = route.naam + ' · ' + scherm.naam;
-  await zetStand(page, 'overview', { ...scherm.overzicht, reveal: false });
+  // Desktopwereldhomes gebruiken de horizontale Edge met mensen/widgets ernaast.
+  // Andere apps behouden de zijrand; compact, focus en herstel blijven gelijk.
+  const desktopHome = scherm.naam === 'desktop' &&
+    await page.locator('body').getAttribute('data-rtg-desktop') !== null;
+  const verwachtOverzicht = { ...scherm.overzicht, ...(desktopHome ? { side: false } : {}) };
+  await zetStand(page, 'overview', { ...verwachtOverzicht, reveal: false });
   const overzicht = await page.evaluate(schermToestand, route);
   assertEenRand(overzicht, label + ' · overzicht');
-  assertStand(overzicht, { ...scherm.overzicht, reveal: false }, label + ' · overzicht');
+  assertStand(overzicht, { ...verwachtOverzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
   assert.equal(overzicht.bottom.materiaal, '#0a0805',
     label + ': de adaptieve Edge gebruikt niet het vaste marketingmateriaal');
@@ -325,7 +330,7 @@ async function controleerRoute(page, route, scherm) {
   assert.deepEqual(compact.oudZichtbaar, [], label + ' · compact: oude chrome keert terug');
 
   await page.click('.rtg-edge-2-edge-reveal--top');
-  await wachtOpStand(page, 'overview', { ...scherm.overzicht, reveal: false });
+  await wachtOpStand(page, 'overview', { ...verwachtOverzicht, reveal: false });
   await zetStand(page, 'compact', { top: false, side: false, bottom: true, reveal: false });
 
   await zetStand(page, 'focus', { top: false, side: false, bottom: true, reveal: true });
@@ -333,22 +338,22 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(focus, label + ' · focus');
   assertStand(focus, { top: false, side: false, bottom: true, reveal: true }, label + ' · focus');
   assert.deepEqual(focus.oudZichtbaar, [], label + ' · focus: oude chrome keert terug');
-  assertInsets(overzicht, compact, focus, scherm.naam === 'mobiel', label);
+  assertInsets(overzicht, compact, focus, scherm.naam === 'mobiel' || desktopHome, label);
 
   /* Beide beloofde uitwegen uit focus zijn echte invoerwegen. Na elke weg is
      dezelfde Edge hersteld; er wordt dus geen tweede casco opgebouwd. */
   await page.click('.rtg-edge2-reveal');
-  await wachtOpStand(page, 'overview', { ...scherm.overzicht, reveal: false });
+  await wachtOpStand(page, 'overview', { ...verwachtOverzicht, reveal: false });
   let hersteld = await page.evaluate(schermToestand, route);
   assertEenRand(hersteld, label + ' · herstelklik');
-  assertStand(hersteld, { ...scherm.overzicht, reveal: false }, label + ' · herstelklik');
+  assertStand(hersteld, { ...verwachtOverzicht, reveal: false }, label + ' · herstelklik');
 
   await zetStand(page, 'focus', { top: false, side: false, bottom: true, reveal: true });
   await page.keyboard.press('Escape');
-  await wachtOpStand(page, 'overview', { ...scherm.overzicht, reveal: false });
+  await wachtOpStand(page, 'overview', { ...verwachtOverzicht, reveal: false });
   hersteld = await page.evaluate(schermToestand, route);
   assertEenRand(hersteld, label + ' · Escape');
-  assertStand(hersteld, { ...scherm.overzicht, reveal: false }, label + ' · Escape');
+  assertStand(hersteld, { ...verwachtOverzicht, reveal: false }, label + ' · Escape');
   return { omgeleid: null };
 }
 

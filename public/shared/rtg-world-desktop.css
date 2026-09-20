@@ -30,6 +30,12 @@ body[data-world-home] .wd-shell [hidden]{display:none!important}
   body[data-rtg-desktop] .living-feed-heading h2{font-size:2.3rem;margin:.5rem 0 1rem}
   body[data-rtg-desktop] .wd-home .wh-travel-layout{display:block}
   body[data-rtg-desktop] .wd-home .wh-travel-help{margin-top:1.5rem}
+  /* The expanded trip details now occupy one central column, not the viewport. */
+  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .dagdek{grid-template-columns:minmax(0,1fr)!important}
+  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .daghoofd{display:flex!important;flex-direction:column}
+  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .dagtitel{padding:1.25rem!important;align-self:stretch;pointer-events:auto}
+  body[data-rtg-desktop="travel"] .wd-home .travel-hero-actie{position:static!important;margin-top:1rem}
+  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .kaartraster{min-height:18rem!important}
   body[data-rtg-desktop] .wd-home :is(.wh-photo,.wh-card){border-color:var(--wd-line)}
   body[data-rtg-desktop] .wd-home .wh-home h1{font-size:clamp(2.6rem,3.3vw,4.2rem)}
   body[data-rtg-desktop] .wd-home .wh-work-hero,body[data-rtg-desktop] .wd-home .wh-foundation-hero{min-height:31rem}

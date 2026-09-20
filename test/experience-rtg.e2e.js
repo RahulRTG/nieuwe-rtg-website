@@ -7,118 +7,79 @@ const http = require('node:http');
 const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, letOpFouten } = require('./helper');
 const pw = laadPlaywright();
 const root = path.resolve(__dirname, '..');
-const menu = page => page.getByRole('button', { name: 'Alle functies', exact: true }).click();
-async function go(page, name) {
-  await menu(page);
-  await page.locator('#explorePanel').getByRole('link', { name }).click();
-}
-async function ready(page) {
-  await page.waitForSelector('body.experience-ready[data-rtg-adaptive-ready="true"]');
-}
-async function actions(page, name) {
-  await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
-  await page.locator('#contextActions').getByRole('button', { name, exact: true }).click();
-}
+const menu = page => page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+async function go(page,id){await menu(page);await page.locator('[data-public-target="'+id+'"]:visible').click();}
+async function ready(page){await page.waitForSelector('body[data-public-platform="app"][data-rtg-adaptive-ready="true"]');}
+async function actions(page,name){await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();await page.getByRole('button',{name,exact:true}).click();}
 
-test('Experience RTG: real public route, one Edge, interactive demos and explicit welcome handoff',
-  { skip: geenBrowser(pw), timeout: 180000 }, async t => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
-  let browser;
-  try {
-    browser = await pw.chromium.launch(browserOpties(pw));
-    for (const width of [320, 390, 1440]) await t.test('viewport ' + width, async () => {
-      const context = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
-      const page = await context.newPage(), errors = [], failed = [], mutations = [];
-      letOpFouten(page, errors);
-      page.on('response', r => { if (r.status() >= 400 && !r.url().includes('/api/')) failed.push(r.url()); });
-      page.on('request', r => {
-        // The shared language catalogue is a read using POST with an empty body.
-        if (new URL(r.url()).pathname === '/api/talen' && r.method() === 'POST' && r.postData() === '{}') return;
-        if (r.method() !== 'GET' && r.method() !== 'HEAD') mutations.push(r.url());
-      });
-      await page.goto(base + '/', { waitUntil: 'networkidle' }); await ready(page);
-      assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
-      assert.equal(await page.locator('.rtg-edge-bottom').count(), 0);
-      const geometry = await page.evaluate(() => {
-        const bar = document.querySelector('.rtg-adaptive-bar'), r = bar.getBoundingClientRect();
-        return { overflow: document.documentElement.scrollWidth > innerWidth + 1,
-          inside: r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight,
-          token: getComputedStyle(bar).getPropertyValue('--edge-bar-bg').trim(),
-          targets: [...bar.querySelectorAll('button')].every(b => b.clientWidth >= 44 && b.clientHeight >= 44) };
-      });
-      assert.deepEqual(geometry, { overflow: false, inside: true, token: '#0a0805', targets: true });
-      await go(page, /Alle passen/);
-      assert.equal(new URL(page.url()).hash, '#passen');
-      await go(page, /Alle vragen/);
-      assert.equal(await page.locator('[data-faq]:visible').count(), 23);
-      await page.locator('#faqSearch').fill('FoundationOS echt');
-      assert.equal(await page.locator('[data-faq]:visible').count(), 1);
-      await page.locator('[data-faq]:visible summary').click();
-      assert.match(await page.locator('[data-faq]:visible').innerText(), /altijd 100% gratis/);
-      await page.locator('#faqSearch').fill('geen-vraag-met-dit-woord');
-      assert.equal(await page.locator('#faqEmpty').isVisible(), true);
-      await go(page, /Playground/);
-      assert.match(await page.locator('#demoResult').innerText(), /conflict/);
-      await page.locator('#demoOption').selectOption('late');
-      assert.match(await page.locator('#demoSteps').innerText(), /Avondvertrek past/);
-      await actions(page, 'Bekijk het voorbeeldvoorstel');
-      await page.locator('#confirmExample').click();
-      assert.match(await page.locator('#exampleReceipt').innerText(), /niets geboekt, betaald, verstuurd of gedeeld/);
-      await page.keyboard.press('Escape');
-      await go(page, /Privacy en regie/);
-      await page.locator('#allowCalendar').uncheck();
-      await page.locator('#allowLocation').uncheck();
-      await actions(page, 'Bekijk het veranderde voorstel');
-      assert.match(await page.locator('#proposalSummary').innerText(), /Agenda niet gedeeld/);
-      assert.match(await page.locator('#proposalSummary').innerText(), /vervoer blijft een open vraag/);
-      await page.keyboard.press('Escape');
-      await page.getByRole('button', { name: 'Praat met Rahul', exact: true }).click();
-      await page.locator('#intent').fill('Ik heb een strandtent met 40 medewerkers');
-      await page.getByRole('button', { name: 'Verken mijn voorbeeld', exact: true }).click();
-      assert.match(await page.locator('#intentFeedback').innerText(), /Een zaak, één overzicht/);
-      await go(page, /Uw RTG/);
-      await page.locator('summary').getByText('Waarom zie ik dit?', { exact: true }).click();
-      assert.match(await page.locator('#personalReasons').innerText(), /WorkOS/);
-      await page.getByRole('button', { name: 'Werelden', exact: true }).click();
-      await page.locator('#worldPanel [data-select-world="foundation"]').click();
-      assert.equal(await page.locator('[data-room]:visible').getAttribute('data-room'), 'foundation');
-      await actions(page, 'Volgende wereld');
-      assert.equal(await page.locator('[data-room]:visible').getAttribute('data-room'), 'living');
-      await page.locator('#worldStage').scrollIntoViewIfNeeded();
-      const stage = await page.locator('#worldStage').boundingBox();
-      await page.mouse.move(stage.x + stage.width * .8, stage.y + 100);
-      await page.mouse.down();
-      await page.mouse.move(stage.x + stage.width * .2, stage.y + 100, { steps: 5 });
-      await page.mouse.up();
-      assert.equal(await page.locator('[data-room]:visible').getAttribute('data-room'), 'travel');
-      await go(page, /Maak mijn RTG/);
-      assert.equal(new URL(await page.locator('#createAccount').getAttribute('href')).hash, '');
-      await page.locator('#carryInterests').check();
-      const handoff = new URL(await page.locator('#createAccount').getAttribute('href'));
-      assert.equal(handoff.origin, base);
-      assert.equal(handoff.hash, '#rtg-experience=living,travel,work,foundation');
-      assert.deepEqual(mutations, [], 'public simulations send no mutations');
-      assert.deepEqual(errors, []); assert.deepEqual(failed, []);
-      // Real click into the existing isolated app. No fake account is created.
-      await page.locator('#createAccount').click();
-      await page.waitForSelector('#gate .ag-experience', { timeout: 60000 });
-      assert.match(await page.locator('#gate .ag-experience').innerText(), /TravelOS, WorkOS, FoundationOS/);
-      assert.equal(new URL(page.url()).hash, '');
-      await page.goto(base + '/'); await ready(page);
-      assert.match(await page.locator('#personalSummary').innerText(), /Ontdek een situatie/);
-      await go(page, /Playground/);
-      await page.locator('label:has(input[value="work"])').click();
-      await menu(page);
-      await page.locator('#explorePanel [data-reset]').click();
-      assert.match(await page.locator('#personalSummary').innerText(), /Ontdek een situatie/);
-      assert.equal(await page.locator('#carryInterests').isDisabled(), true);
-      assert.equal(await page.locator('#intent').inputValue(), '');
-      await menu(page); await page.keyboard.press('Escape');
-      assert.equal(await page.locator('#explorePanel').isVisible(), false);
-      assert.equal(await page.evaluate(() => document.activeElement.getAttribute('data-rtg-adaptive-action')), 'menu');
-      await context.close();
-    });
-  } finally { if (browser) await browser.close(); await stop(child); }
+test('Public app projection: native layout, effects, language failover and explicit onboarding handoff',
+ {skip:geenBrowser(pw),timeout:180000},async t=>{
+ const srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});let browser;
+ try{
+  browser=await pw.chromium.launch(browserOpties(pw));
+  for(const width of [320,390,1440])await t.test('viewport '+width,async()=>{
+   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce',serviceWorkers:'block'});
+   await context.addInitScript(()=>localStorage.setItem('rtg_lang','nl'));
+   await context.route('**/api/vertaal/ui',r=>r.fulfill({status:503,body:'Deliberate translation outage'}));
+   const page=await context.newPage(),errors=[],failed=[],mutations=[];
+   letOpFouten(page,errors);
+   page.on('response',r=>{if(r.status()>=400&&!r.url().includes('/api/'))failed.push(r.url());});
+   page.on('request',r=>{if(!['GET','HEAD'].includes(r.method())&&!['/api/talen','/api/vertaal/ui'].includes(new URL(r.url()).pathname))mutations.push(r.url());});
+   await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
+   assert.equal(await page.locator('.rtg-adaptive-bar').count(),1);
+   assert.equal(await page.locator('.wd-catalog>.pp-widget').count(),9);
+   assert.equal(await page.evaluate(()=>{const r=document.querySelector('.rtg-adaptive-bar').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight}),true);
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
+   await page.locator('#platform-search').fill('Foundation');
+   assert.equal(await page.locator('.wd-catalog>.pp-widget:visible').count(),1);
+   await page.locator('#platform-search').fill('no-matching-topic');
+   assert.equal(await page.locator('.pp-empty').isVisible(),true);
+   await page.locator('#platform-search').fill('');
+   await page.locator('.wd-favorites [data-public-calendar]').check();
+   await page.locator('.pp-feature .pp-button').click();
+   assert.equal(await page.locator('#moment').isVisible(),true);
+   assert.match(await page.locator('#demoResult').innerText(),/conflict/);
+   await page.locator('#demoOption').selectOption('late');
+   assert.match(await page.locator('#demoSteps').innerText(),/Avondvertrek past/);
+   await actions(page,'Bekijk het voorstel');
+   await page.locator('#confirmExample').click();
+   assert.match(await page.locator('#exampleReceipt').innerText(),/niets geboekt, betaald, verstuurd of gedeeld/);
+   await page.keyboard.press('Escape');
+   await go(page,'regie');await page.locator('#allowCalendar').uncheck();await page.locator('#allowLocation').uncheck();
+   await go(page,'moment');assert.match(await page.locator('#demoSteps').innerText(),/Agenda niet gedeeld/);
+   const before=await page.evaluate(()=>RTGExperience.snapshot());
+   await page.evaluate(()=>RTGi18n.set('en',false));
+   assert.equal(await page.locator('.pp-header .pp-context').innerText(),'Explore RTG');
+   assert.equal(await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"] small').innerText(),'Worlds');
+   assert.deepEqual(await page.evaluate(()=>RTGExperience.snapshot()),before);
+   assert.equal(await page.locator('#demoOption').inputValue(),'late');
+   await page.evaluate(()=>RTGi18n.set('ar',false));await page.waitForFunction(()=>document.documentElement.dir==='rtl');
+   assert.equal(await page.locator('.pp-language-notice').isVisible(),true);
+   assert.deepEqual(await page.evaluate(()=>RTGExperience.snapshot()),before);
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
+   await page.evaluate(()=>RTGi18n.set('nl',false));
+   await go(page,'vragen');assert.equal(await page.locator('[data-faq]:visible').count(),23);
+   await page.locator('#faqSearch').fill('FoundationOS echt');assert.equal(await page.locator('[data-faq]:visible').count(),1);
+   await page.locator('[data-faq]:visible summary').click();assert.match(await page.locator('[data-faq]:visible').innerText(),/altijd 100% gratis/);
+   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]').click();
+   await page.locator('#intent').fill('Ik heb een strandtent met 40 medewerkers');await page.getByRole('button',{name:'Verken mijn voorbeeld',exact:true}).click();
+   assert.match(await page.locator('#intentFeedback').innerText(),/Een zaak, één overzicht/);
+   await go(page,'world:work');assert.equal(await page.locator('[data-room]:visible').getAttribute('data-room'),'work');
+   await go(page,'begin');assert.equal(new URL(await page.locator('#createAccount').getAttribute('href')).hash,'');
+   await page.locator('#carryInterests').check();const handoff=new URL(await page.locator('#createAccount').getAttribute('href'));
+   assert.equal(handoff.origin,srv.base);assert.match(handoff.hash,/work/);assert.equal(handoff.hash.includes('strandtent'),false);
+   assert.deepEqual(mutations,[]);assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
+   await page.locator('#createAccount').click();await page.waitForSelector('#gate .ag-experience',{timeout:60000});
+   assert.match(await page.locator('#gate .ag-experience').innerText(),/WorkOS/);assert.equal(new URL(page.url()).hash,'');
+   await page.goto(srv.base+'/');await ready(page);
+   await actions(page,'Wis mijn demokeuzes');
+   assert.equal(await page.evaluate(()=>RTGExperience.snapshot().permissions.calendar),false);
+   assert.equal(await page.locator('#carryInterests').isDisabled(),true);
+   await menu(page);await page.keyboard.press('Escape');
+   assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('data-rtg-adaptive-action')),'menu');
+   await context.close();
+  });
+ }finally{if(browser)await browser.close();await stop(srv);}
 });
 
 test('static project path and JavaScript-disabled visitors retain content and relative assets',
@@ -147,7 +108,7 @@ test('static project path and JavaScript-disabled visitors retain content and re
       if (javaScriptEnabled) {
         await ready(page);
         assert.equal(await page.locator('#createAccount').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/app.html');
-        assert.equal(await page.evaluate(() => getComputedStyle(document.body).getPropertyValue('--edge-bar-bg').trim()), '#0a0805');
+        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#0a0805');
       } else {
         assert.equal(await page.locator('[data-room]:visible').count(), 4);
         assert.equal(await page.locator('[data-faq]:visible').count(), 23);

@@ -31,15 +31,22 @@
 
     <section class="scene fragmentation ivory" id="versnippering" data-scene="Van losse delen naar samenhang" data-tone="living" aria-labelledby="fragmentTitle">
       <div class="scene-heading"><p class="overline">01 · HET LEVEN VANDAAG</p><h2 id="fragmentTitle" data-rtg-type="display">Alles hangt samen.<br>Behalve uw <em>apps.</em></h2><p>Die ene wijziging raakt uw hele dag. Toch bent u steeds degene die de verbindingen moet leggen.</p></div>
-      <div class="fragment-field" aria-label="Voorbeelden van losse informatie">
-        <span class="fragment"><i aria-hidden="true">↗</i><span>Vlucht gewijzigd<small>Travel · vrijdag</small></span></span>
-        <span class="fragment"><i aria-hidden="true">◷</i><span>19:30 · Aan tafel<small>Reservering · 8 personen</small></span></span>
-        <span class="fragment"><i aria-hidden="true">€</i><span>Een nieuwe factuur<small>Werk · nog te bekijken</small></span></span>
-        <span class="fragment"><i aria-hidden="true">↳</i><span>Een schoolbericht<small>Gezin · morgen</small></span></span>
-        <span class="fragment"><i aria-hidden="true">◌</i><span>Taxi om 06:45<small>Vervoer · ophalen</small></span></span>
-        <span class="fragment"><i aria-hidden="true">⌁</i><span>Het rooster verandert<small>Team · vrijdag</small></span></span>
+      <div class="fragment-field" aria-label="Voorbeelden van losse informatie. Kies een blok voor de codebasis erachter.">
+        <button type="button" class="fragment" data-code-proof data-proof-title="Een vluchtwijziging in de reiscontext" data-proof-body="De code bevat een reisdossier, reisstatus en aparte veiligheids- en samenreisschermen. Wijzigingen kunnen daardoor bij dezelfde reis worden getoond. Dit voorbeeld controleert geen luchtvaartmaatschappij en wijzigt zelf geen boeking." data-proof-source="public/apps/reisboek.html · server/routes/reis.js"><i aria-hidden="true">↗</i><span>Vlucht gewijzigd<small>Travel · vrijdag · bekijk basis</small></span></button>
+        <button type="button" class="fragment" data-code-proof data-proof-title="Reservering, gasten en rekening horen bij horeca" data-proof-body="RTG heeft code voor reserveringen, tafel- en gastrekeningen en de bediening. De demonstratie op deze pagina gebruikt alleen vaste voorbeeldgegevens; er wordt geen echte tafel vastgelegd." data-proof-source="public/apps/gast.html · public/apps/horeca/"><i aria-hidden="true">◷</i><span>19:30 · Aan tafel<small>Reservering · 8 personen · bekijk basis</small></span></button>
+        <button type="button" class="fragment" data-code-proof data-proof-title="Facturen staan achter bevoegdheden en betaalroutes" data-proof-body="De zakelijke omgeving bevat facturen, rekeningen, betaalroutes en afzonderlijke bevoegdheidscontroles. Dit publieke blok leest geen saldo en voert geen betaling uit." data-proof-source="server/routes/pay.js · server/functies/register/cat-geld.js"><i aria-hidden="true">€</i><span>Een nieuwe factuur<small>Werk · nog te bekijken · bekijk basis</small></span></button>
+        <button type="button" class="fragment" data-code-proof data-proof-title="Schoolberichten hebben een eigen afzender en toegang" data-proof-body="FoundationOS bevat onderwijs, gezinstoegang en schoolcommunicatie als afzonderlijke onderdelen. Een bericht wordt niet automatisch een besluit en de publieke website opent geen kind- of gezinsdossier." data-proof-source="server/foundation/onderwijs.js · server/foundation/gezinstoegang.js"><i aria-hidden="true">↳</i><span>Een schoolbericht<small>Gezin · morgen · bekijk basis</small></span></button>
+        <button type="button" class="fragment" data-code-proof data-proof-title="Vervoer is een onderdeel van dezelfde reis" data-proof-body="De mobiliteitslaag bevat reisplanning, vervoerbewijzen en zakelijke ritregels. Een ophaaltijd kan in de reiscontext staan, maar boeken en betalen blijven een aparte, bevestigde handeling." data-proof-source="server/routes/mobiliteit/ · server/kern/mobiliteit/"><i aria-hidden="true">◌</i><span>Taxi om 06:45<small>Vervoer · ophalen · bekijk basis</small></span></button>
+        <button type="button" class="fragment" data-code-proof data-proof-title="Roosterwijzigingen blijven bij het teamwerk" data-proof-body="WorkOS bevat personeelsplanning, roosters, loonprocessen en teamtoegang. De code houdt die verantwoordelijkheden gescheiden; dit voorbeeld past geen werkelijk rooster aan." data-proof-source="public/apps/personeel.html · server/routes/payroll.js"><i aria-hidden="true">⌁</i><span>Het rooster verandert<small>Team · vrijdag · bekijk basis</small></span></button>
         <span class="connection-center" aria-hidden="true">RTG</span>
-      </div><p class="quiet-caption">Voorbeelden uit het dagelijks leven. Geen persoonlijke gegevens.</p>
+      </div><p class="quiet-caption">Voorbeelden uit het dagelijks leven. Geen persoonlijke gegevens. Kies een blok om te zien welk bestaand codeonderdeel de uitleg draagt.</p>
+      <dialog class="code-proof-dialog" id="codeProofDialog" aria-labelledby="codeProofTitle">
+        <form method="dialog"><button type="submit" class="code-proof-close" aria-label="Sluiten">×</button></form>
+        <p class="overline">AANTOONBAAR IN DE HUIDIGE CODE</p>
+        <h3 id="codeProofTitle" data-rtg-type="display"></h3>
+        <p id="codeProofBody"></p>
+        <p class="code-proof-source"><strong>Code-ankers</strong><code id="codeProofSource"></code></p>
+      </dialog>
     </section>
 
     <section class="scene origin wine" id="verhaal" data-scene="Waarom RTG bestaat" data-tone="travel" aria-labelledby="originTitle">
@@ -159,6 +166,7 @@
   <script src="./public/shared/rtg-adaptive-edge.js" defer></script>
   <script src="./public/site/start/experience-core.js" defer></script>
   <script src="./public/site/start/experience-discovery.js" defer></script>
+  <script src="./public/site/start/experience-proof.js" defer></script>
   <script src="./public/site/start/experience.js" defer></script>
   <script src="./public/site/start/experience-edge.js" defer></script>
 </body>

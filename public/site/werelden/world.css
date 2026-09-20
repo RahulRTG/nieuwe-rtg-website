@@ -40,6 +40,7 @@ body.world-story{background:#0b0908;color:var(--ivory)}
 .outcome-number{color:var(--world);font-family:var(--serif);font-size:1.15rem}
 .outcome h3{margin:3rem 0 1rem;font-family:var(--serif);font-size:1.8rem;font-weight:500;line-height:1.1}
 .outcome p{margin:0;color:#6a6058;font-size:.9rem;line-height:1.75}
+.proof-detail{margin-top:1.35rem;border-top:1px solid rgba(23,18,15,.15);padding-top:1rem}.proof-detail summary{position:relative;padding-right:1.7rem;color:var(--world);font-size:.72rem;font-weight:700;letter-spacing:.04em;line-height:1.5;list-style:none;cursor:pointer}.proof-detail summary::-webkit-details-marker{display:none}.proof-detail summary::after{position:absolute;right:0;top:-.1rem;font-family:var(--serif);font-size:1.25rem;font-weight:400;content:"+"}.proof-detail[open] summary::after{content:"−"}.proof-detail>p{margin:.9rem 0 0!important;color:#544a42!important;font-size:.79rem!important;line-height:1.72!important}.proof-source{display:block;margin-top:.8rem;color:#766a60;font:500 .62rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.proof-source::before{display:block;margin-bottom:.2rem;color:var(--world);font:700 .58rem/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;content:"Code-ankers"}
 
 .moment{display:grid;grid-template-columns:1fr 1fr;min-height:650px;background:#0d0b0a}
 .moment-visual{min-height:520px;background:linear-gradient(0deg,rgba(8,7,6,.24),rgba(8,7,6,.08)),var(--world-image) center/cover no-repeat}
@@ -55,6 +56,7 @@ body.world-story{background:#0b0908;color:var(--ivory)}
 .capability{padding:2rem;background:#f4f0e9}
 .capability h3{margin:0 0 .75rem;color:var(--world);font-family:var(--serif);font-size:1.45rem;font-weight:550}
 .capability p{margin:0;color:#665c54;font-size:.9rem;line-height:1.75}
+.capability .proof-detail{margin-top:1.2rem}
 
 .principle{padding:clamp(5rem,9vw,9rem) 5vw;background:radial-gradient(circle at 80% 20%,var(--world-soft),transparent 42%),#0b0908;text-align:center}
 .principle h2{max-width:970px;margin:1rem auto 1.7rem;color:var(--ivory)}

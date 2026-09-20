@@ -41,7 +41,7 @@ kern.wereldFeed = require('../kern/wereld/feed')({ db, codenaamVan: kern.codenaa
   pulseLezen: key => ((kern.pulseFeed(key, 'volgend') || {}).feed || []) }).feed;
 // De Salon bewaart zijn eigen posts en publicatierechten.
 kern.salon = require('../kern/salon')({ db, save, media, liveCodename, codenaamVan: kern.codenaamVan,
-  crypto, broadcastSync });
+  crypto, broadcastSync, spraaktekst: kern.spraaktekst });
 kern.salonProfiel = require('../kern/salon/profiel')({ db, save, codenaamVan: kern.codenaamVan,
   keyVanCodenaam: kern.keyVanCodenaam, liveCodename, salon: kern.salon });
 kern.salonReacties = require('../kern/salon/reacties')({ db, save, liveCodename, codenaamVan: kern.codenaamVan,

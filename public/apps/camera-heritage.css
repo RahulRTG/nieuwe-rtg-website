@@ -1,0 +1,198 @@
+/* RTG CAMERA
+   De camera blijft een camera. Materialen, ritme en taal sluiten aan op de
+   warme LivingOS-wereld zonder het beeldvlak in een dashboard te veranderen. */
+:root{
+  --camera-ivory:#f4ecdf;
+  --camera-gold:#ddbd78;
+  --camera-line:rgba(238,213,159,.3);
+}
+
+body[data-rtg-world="living"] .zoeker{
+  background:#0d0907 url('/images/worlds/heritage/living-sociaal-hero-v1.jpg') center/cover no-repeat!important;
+}
+
+body[data-rtg-world="living"] .zoeker::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,4,3,.28),transparent 25%,transparent 58%,rgba(7,4,3,.62));
+}
+
+body[data-rtg-world="living"] .zoeker video{position:relative;z-index:1}
+body[data-rtg-world="living"] .raster,body[data-rtg-world="living"] .waterpas,body[data-rtg-world="living"] .foodring{z-index:2}
+
+body[data-rtg-world="living"] .boven{
+  min-height:calc(var(--rtg-topbar-h,48px) + 3.6rem);
+  align-items:flex-end;
+  padding:calc(var(--rtg-topbar-h,48px) + .65rem) 1rem .75rem!important;
+  gap:.55rem;
+  color:var(--camera-ivory);
+  background:linear-gradient(180deg,rgba(8,5,4,.86),rgba(8,5,4,.52) 70%,transparent)!important;
+}
+
+.camera-merk{
+  display:flex;
+  align-items:baseline;
+  gap:.55rem;
+  min-width:max-content;
+  color:var(--camera-ivory);
+}
+
+.camera-merk b{font:500 1.5rem/1 'Bodoni Moda',Georgia,serif}
+.camera-merk span{font-size:.65rem;letter-spacing:.16em;text-transform:uppercase}
+
+body[data-rtg-world="living"] .knopje{
+  width:44px;
+  min-width:44px;
+  height:44px;
+  border:1px solid var(--camera-line)!important;
+  border-radius:50%!important;
+  background:rgba(10,7,5,.48)!important;
+  color:var(--camera-ivory)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(14px);
+}
+
+body[data-rtg-world="living"] .knopje[aria-pressed="true"]{border-color:var(--camera-gold)!important;color:var(--camera-gold)!important}
+
+body[data-rtg-world="living"] .onder{
+  bottom:calc(var(--edge-bottom,64px) + env(safe-area-inset-bottom,0px))!important;
+  gap:.75rem!important;
+  padding:4.2rem 1rem 1rem!important;
+  background:linear-gradient(transparent,rgba(8,5,4,.78) 32%,rgba(8,5,4,.96))!important;
+}
+
+body[data-rtg-world="living"] .rahul{
+  margin:0!important;
+  padding:.85rem .95rem!important;
+  border:1px solid var(--camera-line)!important;
+  border-radius:0!important;
+  background:rgba(15,10,7,.68)!important;
+  color:rgba(244,236,223,.8)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(16px);
+}
+
+body[data-rtg-world="living"] .rahul b{color:var(--camera-gold)!important}
+
+body[data-rtg-world="living"] .standen{
+  justify-content:flex-start!important;
+  gap:0!important;
+  overflow-x:auto;
+  border-bottom:1px solid rgba(238,213,159,.18);
+}
+
+body[data-rtg-world="living"] .standen button{
+  min-height:46px;
+  padding:0 1rem!important;
+  border:0!important;
+  border-bottom:1px solid transparent!important;
+  border-radius:0!important;
+  color:#a99c91!important;
+}
+
+body[data-rtg-world="living"] .standen button:first-child{padding-left:0!important}
+body[data-rtg-world="living"] .standen button[aria-pressed="true"]{border-bottom-color:var(--camera-gold)!important;color:var(--camera-ivory)!important}
+
+body[data-rtg-world="living"] .rij{
+  min-height:82px;
+  display:grid!important;
+  grid-template-columns:1fr auto 1fr!important;
+  align-items:center!important;
+}
+
+body[data-rtg-world="living"] .duimpje[hidden]{display:block!important;visibility:hidden}
+body[data-rtg-world="living"] .rij>.knopje{justify-self:end}
+
+body[data-rtg-world="living"] .sluiter{
+  width:76px!important;
+  min-width:76px!important;
+  height:76px!important;
+  flex:0 0 76px!important;
+  border:2px solid var(--camera-ivory)!important;
+  border-radius:50%!important;
+  background:rgba(244,236,223,.16)!important;
+  box-shadow:inset 0 0 0 6px rgba(10,7,5,.75),0 0 0 1px rgba(221,189,120,.42);
+}
+
+body[data-rtg-world="living"] .duimpje{
+  width:52px;
+  height:52px;
+  border:1px solid var(--camera-line)!important;
+  border-radius:50%!important;
+  background:#17100d!important;
+}
+
+body[data-rtg-world="living"] .geen-cam{
+  z-index:3;
+  align-items:flex-start;
+  justify-content:flex-end;
+  padding:0 1.25rem 17rem;
+  text-align:left;
+  color:var(--camera-ivory);
+  background:linear-gradient(180deg,rgba(7,5,4,.16),rgba(7,5,4,.9)),url('/images/worlds/heritage/living-sociaal-hero-v1.jpg') center/cover no-repeat!important;
+}
+
+body[data-rtg-world="living"] .geen-cam b{max-width:12ch;font:500 2.25rem/.98 'Bodoni Moda',Georgia,serif}
+body[data-rtg-world="living"] .geen-cam span{color:rgba(244,236,223,.7)!important;line-height:1.6}
+
+body[data-rtg-world="living"] .camera-probeer{
+  min-height:46px;
+  margin-top:.55rem;
+  padding:.65rem .9rem;
+  border:1px solid rgba(238,213,159,.48)!important;
+  border-radius:0!important;
+  background:rgba(10,7,5,.54)!important;
+  color:var(--camera-gold)!important;
+  font:650 .62rem/1 Inter,system-ui,sans-serif;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  backdrop-filter:blur(14px);
+}
+
+body[data-rtg-world="living"] .camera-probeer:disabled{opacity:.55}
+body[data-rtg-world="living"] .sluiter:disabled{opacity:.5;cursor:wait}
+
+body[data-rtg-world="living"] .studio{color:var(--camera-ivory)!important;background:#100b09!important}
+body[data-rtg-world="living"] .studio-kop,body[data-rtg-world="living"] .studio-voet{background:rgba(16,11,9,.94)!important}
+
+@media(max-width:520px){
+  .camera-merk{order:-1;margin-right:auto}
+  body[data-rtg-world="living"] .boven>.rek{display:none}
+  body[data-rtg-world="living"] #terug{order:-2}
+  body[data-rtg-world="living"] header.boven{
+    min-height:calc(var(--rtg-topbar-h,48px) + 3.7rem)!important;
+    height:auto!important;
+    padding:calc(var(--rtg-topbar-h,48px) + .45rem) 1rem .55rem!important;
+  }
+  body[data-rtg-world="living"] header.boven .ios-nav-rij{
+    width:100%!important;
+    min-height:48px!important;
+    display:grid!important;
+    grid-template-columns:48px minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:.4rem!important;
+  }
+  body[data-rtg-world="living"] header.boven .ios-nav-links{display:block!important}
+  body[data-rtg-world="living"] header.boven #osMenuBtn,
+  body[data-rtg-world="living"] header.boven .ios-nav-extra,
+  body[data-rtg-world="living"] header.boven .rtg-rahul-tab{display:none!important}
+  body[data-rtg-world="living"] header.boven .ios-terug{
+    width:44px!important;
+    min-width:44px!important;
+    height:44px!important;
+    padding:0!important;
+  }
+  body[data-rtg-world="living"] header.boven .ios-terug span{display:none!important}
+  body[data-rtg-world="living"] header.boven .ios-nav-titel{
+    display:flex!important;
+    align-items:baseline!important;
+    gap:.5rem!important;
+    color:var(--camera-ivory)!important;
+  }
+  body[data-rtg-world="living"] header.boven .ios-nav-titel::before{content:"RTG";font:500 1.55rem/1 'Bodoni Moda',Georgia,serif}
+  body[data-rtg-world="living"] header.boven .ios-nav-titel::after{content:"Camera";font:600 .58rem/1 Inter,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase}
+  body[data-rtg-world="living"] header.boven .ios-nav-acties{display:flex!important;gap:.35rem!important}
+  body[data-rtg-world="living"] .geen-cam{padding-bottom:21.5rem}
+}

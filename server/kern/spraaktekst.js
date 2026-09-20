@@ -24,9 +24,9 @@
        tekstantwoord bij de derde aanbieder net zo goed is. Geluid is dat niet:
        dat is de stem van een lid. Ontbreekt het lokale model, dan is het antwoord
        "dit kan hier niet" en nooit een andere aanbieder.
-     - GEEN BEWAREN. Het geluid gaat naar het model en verder nergens heen; er
-       wordt geen bestand geschreven en geen fragment in de database gezet. Wat
-       overblijft is de tekst, en die staat al in de meeleesbaan van het gesprek.
+     - GEEN EXTRA GELUIDSKOPIE. Live fragmenten worden niet bewaard. Bij een
+       al opgeslagen Salon-video bewaart de Salon alleen de teruggegeven
+       tijdregels naast het origineel; deze laag schrijft zelf niets weg.
      - GEEN STIL "HET WERKT". Is er geen model, dan zegt `beschikbaar()` dat met
        de reden. Een ondertitelknop die niets doet is erger dan geen knop: hij
        laat iemand aan een gesprek beginnen in de veronderstelling dat hij het
@@ -116,4 +116,9 @@ async function transcribeer(bytes, { soort, taal, env, fetchImpl } = {}) {
   return { ok: true, tekst: tekst.replace(/\s+/g, ' ').trim().slice(0, 400) };
 }
 
-module.exports = { beschikbaar, transcribeer, modelNaam, MAX_BYTES, SOORTEN };
+const opname = require('./spraaktekst-opname');
+const transcribeerOpname = opname({ beschikbaar });
+
+module.exports = { beschikbaar, transcribeer, transcribeerOpname, modelNaam,
+  MAX_BYTES, MAX_OPNAME_BYTES: opname.MAX_OPNAME_BYTES, SOORTEN,
+  OPNAME_SOORTEN: opname.OPNAME_SOORTEN };

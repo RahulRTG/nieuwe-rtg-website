@@ -86,6 +86,40 @@
   #samenStatus{font-size:0.82rem;color:var(--txt);line-height:1.4;}
   #samenStatus b{color:var(--gold,#C9A24B);letter-spacing:0.14em;}
   #samenWeg{background:transparent;color:var(--soft);border:1px solid var(--line);font-weight:600;flex-shrink:0;}
+  .eigen-muziek{margin:0.9rem 0 1.25rem;border:1px solid var(--line);background:var(--card2);padding:0.9rem;}
+  .eigen-muziek__kop{display:flex;align-items:flex-start;justify-content:space-between;gap:0.8rem;margin-bottom:0.75rem;}
+  .eigen-muziek__kop h2{margin:0 0 0.25rem;color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.25rem;letter-spacing:0;text-transform:none;}
+  .eigen-muziek__kop p{font-size:0.74rem;line-height:1.45;color:var(--soft);max-width:34rem;}
+  .muziek-toevoegen{flex-shrink:0;background:transparent;border:1px solid var(--gold);color:var(--txt);padding:0.58rem 0.8rem;font:600 0.76rem Inter,sans-serif;cursor:pointer;}
+  .muziek-toevoegen:disabled{opacity:0.45;cursor:not-allowed;}
+  .muziek-deelvel{display:grid;gap:0.55rem;margin:0 0 0.8rem;padding:0.75rem;border:1px solid var(--line);background:var(--bg);}
+  .muziek-deelvel label{font-size:0.68rem;color:var(--soft);letter-spacing:0.08em;text-transform:uppercase;}
+  .muziek-deelvel input[type="text"],.muziek-deelvel textarea{width:100%;margin-top:0.3rem;background:var(--card);border:1px solid var(--line);color:var(--txt);font:inherit;padding:0.58rem 0.65rem;resize:vertical;}
+  .muziek-deelvel__bestand{color:var(--gold);font-size:0.74rem;overflow-wrap:anywhere;}
+  .muziek-eigenwerk{display:flex;gap:0.5rem;align-items:flex-start;color:var(--txt)!important;letter-spacing:0!important;text-transform:none!important;line-height:1.4;}
+  .muziek-deelacties{display:flex;gap:0.5rem;justify-content:flex-end;}
+  .muziek-deelacties button{border:1px solid var(--line);background:transparent;color:var(--txt);padding:0.55rem 0.8rem;font:600 0.75rem Inter,sans-serif;cursor:pointer;}
+  .muziek-deelacties .primair{background:var(--gold);border-color:var(--gold);color:#0c0c0b;}
+  .muziek-status{display:block;min-height:1.2rem;margin:0.15rem 0 0.55rem;color:var(--soft);font-size:0.72rem;line-height:1.4;}
+  .muziek-feedkop{display:flex;justify-content:space-between;align-items:baseline;gap:0.7rem;margin-top:0.55rem;}
+  .muziek-feedkop h3{font-family:'Bodoni Moda',serif;font-size:1.08rem;font-weight:600;}
+  .muziek-feedkop span{color:var(--soft);font-size:0.68rem;}
+  .muziek-lijst{display:flex;flex-direction:column;border-top:1px solid var(--line);}
+  .eigen-nummer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0.65rem;align-items:center;border-bottom:1px solid var(--line);padding:0.65rem 0;}
+  .eigen-nummer__speel{display:flex;align-items:center;gap:0.7rem;min-width:0;background:none;border:0;color:var(--txt);text-align:left;font:inherit;cursor:pointer;padding:0;}
+  .eigen-nummer__icoon{width:2.35rem;height:2.35rem;border:1px solid rgba(201,162,75,0.45);display:grid;place-items:center;color:var(--gold);flex:0 0 auto;}
+  .eigen-nummer__tekst{min-width:0;}
+  .eigen-nummer__naam{display:block;font-size:0.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .eigen-nummer__meta{display:block;margin-top:0.15rem;color:var(--soft);font-size:0.67rem;}
+  .eigen-nummer__maker{color:var(--gold);}
+  .eigen-nummer__beschrijving{grid-column:1/-1;color:var(--soft);font-size:0.74rem;line-height:1.5;padding-left:3.05rem;white-space:pre-wrap;}
+  .eigen-nummer__acties{display:flex;align-items:center;gap:0.1rem;}
+  .eigen-nummer__mooi{border:0;background:none;color:var(--soft);font:600 0.72rem Inter,sans-serif;padding:0.45rem;cursor:pointer;white-space:nowrap;}
+  .eigen-nummer__mooi[data-aan="true"]{color:var(--gold);}
+  .eigen-nummer__weg{border:0;background:none;color:var(--soft);font-size:1rem;padding:0.45rem;cursor:pointer;}
+  .eigen-nummer[data-actief="true"] .eigen-nummer__icoon{background:var(--gold);color:#0c0c0b;}
+  .muziek-leeg{padding:0.75rem 0 0.15rem;color:var(--soft);font-size:0.76rem;line-height:1.5;}
+  @media(max-width:520px){.eigen-muziek__kop{flex-direction:column}.muziek-toevoegen{width:100%}.eigen-muziek{padding:0.8rem}.eigen-nummer__beschrijving{padding-left:0}.muziek-deelacties{justify-content:stretch}.muziek-deelacties button{flex:1}}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -94,9 +128,11 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/rtg-experience-2026.css" rel="stylesheet">
+<link href="/apps/muziek-heritage.css" rel="stylesheet">
+<link href="/apps/muziek-heritage-kop.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-music-experience" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-music-experience" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-edge-2-context="none" data-rtg-skin="heritage">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -108,30 +144,60 @@
   <span class="os-switcher__state">Kern verbonden</span>
 </div>
 <header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
-  <h1>RTG Sound</h1>
-  <span class="badge">Ongecomprimeerd · eigen studio</span>
+  <a class="sound-brand" href="/apps/app.html" aria-label="Naar LivingOS">RTG</a>
+  <h1>Sound</h1>
+  <span class="badge">LivingOS</span>
   <span class="rek"></span>
+  <a class="sound-profiel" href="/apps/mijn-gegevens.html" aria-label="Mijn profiel"><span>R</span></a>
 </header>
 <div class="zoek"><input id="zoek" type="search" placeholder="Zoek een station of sfeer…" aria-label="Zoeken"></div>
 
 <section class="muziek-hero" aria-labelledby="muziekBelofte">
-  <img class="muziek-hero__beeld" src="/images/worlds/heritage/living-heritage-v2.jpg" alt="Avondlicht bij een huis aan zee">
+  <img class="muziek-hero__beeld" src="/images/music/rtg-sound-hero-v1.jpg" alt="Drie mensen maken samen muziek in warm avondlicht">
   <div class="muziek-hero__inhoud">
-    <p class="eyebrow">Muziek voor elk moment</p>
-    <h2 id="muziekBelofte">Meer dan<br>muziek.</h2>
-    <p>Thuis, onderweg of samen op afstand. LivingOS laat de juiste sfeer met u meebewegen.</p>
-    <button class="hero-speel" id="heroSpeel" type="button"><span aria-hidden="true">▶</span> Verder luisteren</button>
+    <p class="eyebrow">Uw geluid, bij elkaar</p>
+    <h2 id="muziekBelofte">Muziek van mensen.</h2>
+    <p>Luister, maak en deel. Eén plek waar muziek mensen dichter bij elkaar brengt.</p>
+    <div class="hero-acties">
+      <button class="hero-speel" id="heroSpeel" type="button"><span aria-hidden="true">▶</span> Begin met luisteren</button>
+      <a class="hero-studio" href="/apps/klankwerk.html">Open Studio Pro <span aria-hidden="true">↗</span></a>
+    </div>
   </div>
 </section>
 
 <main>
+  <section class="sound-stations" aria-labelledby="stationsTitel">
+    <div class="sound-sectiekop">
+      <div><span>Voor dit moment</span><h2 id="stationsTitel">Uw wereld in geluid.</h2></div>
+      <p>Kies een sfeer. De muziek ontstaat live in RTG Sound.</p>
+    </div>
+    <div class="stations" id="stations" role="group" aria-label="Stations"><span class="stil">De stations laden…</span></div>
+  </section>
+  <section class="eigen-muziek" id="eigenMuziek" aria-labelledby="eigenMuziekTitel">
+    <div class="eigen-muziek__kop">
+      <div><span>Door de gemeenschap</span><h2 id="eigenMuziekTitel">Ontdek muziek van mensen.</h2>
+        <p>Luister naar wat anderen maken en geef uw eigen geluid de ruimte.</p></div>
+      <button class="muziek-toevoegen" id="muziekKies" type="button">Deel uw muziek <i aria-hidden="true">↗</i></button>
+    </div>
+    <input class="vis-verborgen" id="muziekBestand" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/ogg,audio/flac,audio/webm,.mp3,.m4a,.aac,.wav,.ogg,.flac,.webm">
+    <div class="muziek-deelvel" id="muziekDeelvel" hidden>
+      <span class="muziek-deelvel__bestand" id="muziekBestandsnaam"></span>
+      <label>Titel<input id="muziekTitel" type="text" maxlength="100" autocomplete="off"></label>
+      <label>Het verhaal bij dit nummer<textarea id="muziekBeschrijving" maxlength="500" rows="3" placeholder="Vertel iets over wat u gemaakt heeft…"></textarea></label>
+      <label class="muziek-eigenwerk"><input id="muziekEigenwerk" type="checkbox"> <span>Dit is mijn eigen muziek en ik mag haar met anderen delen.</span></label>
+      <div class="muziek-deelacties"><button id="muziekAnnuleer" type="button">Annuleren</button><button class="primair" id="muziekPubliceer" type="button">Publiceer voor anderen</button></div>
+    </div>
+    <span class="muziek-status" id="muziekStatus" role="status" aria-live="polite"></span>
+    <div class="muziek-feedkop"><h3>Nieuw van makers</h3><span id="muziekAantal"></span></div>
+    <div class="muziek-lijst" id="muziekLijst"><p class="muziek-leeg">De muziekfeed wordt geladen…</p></div>
+  </section>
   <section class="samen" id="samen" aria-label="Samen luisteren">
-    <div class="samen-kop"><b>Samen luisteren</b>
-      <span class="samen-uit">Van afstand of samen in de kamer: iedereen hoort exact hetzelfde, tegelijk.</span></div>
+    <span class="samen-beeld" aria-hidden="true">◎</span>
+    <div class="samen-kop"><span>Met de mensen om u heen</span><b>Samen luisteren.</b>
+      <span class="samen-uit">Start dezelfde muziek, op hetzelfde moment, waar iedereen ook is.</span></div>
     <div class="samen-start" id="samenStart">
-      <button type="button" id="samenMaak">Start een sessie</button>
-      <form id="samenMeeForm"><input id="samenCode" maxlength="48" autocomplete="off" placeholder="Code van een vriend" aria-label="Samen-code" style="text-transform:uppercase;"><button type="submit">Doe mee</button></form>
+      <button type="button" id="samenMaak">Start samen</button>
+      <form id="samenMeeForm"><input id="samenCode" maxlength="48" autocomplete="off" placeholder="Deelcode" aria-label="Samen-code" style="text-transform:uppercase;"><button type="submit">Doe mee</button></form>
     </div>
     <div class="samen-in" id="samenIn" hidden>
       <span id="samenStatus"></span>
@@ -139,10 +205,10 @@
       <button type="button" id="samenWeg">Stoppen</button>
     </div>
   </section>
-  <h2>Stations</h2>
-  <div class="stations" id="stations" role="group" aria-label="Stations"><span class="stil">De stations laden…</span></div>
-  <h2>Straks in de wachtrij</h2>
-  <ul class="wachtrij" id="wachtrij"><li>Kies een station en de wachtrij vult zichzelf.</li></ul>
+  <section class="sound-wachtrij" aria-labelledby="wachtrijTitel">
+    <div class="sound-sectiekop sound-sectiekop--klein"><div><span>Blijf in de sfeer</span><h2 id="wachtrijTitel">Hierna.</h2></div></div>
+    <ul class="wachtrij" id="wachtrij"><li>Kies een station en de wachtrij vult zichzelf.</li></ul>
+  </section>
 </main>
 
 <div class="rahul"><span aria-hidden="true">✦</span>
@@ -151,6 +217,7 @@
 </div>
 
 <canvas class="golf" id="golf" aria-hidden="true"></canvas>
+<audio id="eigenAudio" preload="metadata"></audio>
 <footer class="speler" aria-label="Speler">
   <div class="balk"><i id="voortgang"></i></div>
   <div class="rij">
@@ -216,6 +283,7 @@
   // de UI volgt de motor: titel, knop, actief station, wachtrij, en de sessie
   G.opStand(function (s) {
     if (!s) return;
+    document.querySelector('.speler').dataset.actief = 'true';
     $('#spTitel').textContent = s.titel;
     $('#spSub').textContent = s.station + ' · eigen studio · ' + Math.round(s.sampleRate / 1000) + ' kHz';
     $('#knopSpeel').textContent = s.speelt ? '⏸' : '▶';
@@ -409,6 +477,9 @@
   window.RTGSound = { staat: () => { const s = G.stand(); return { speelt: !!(s && s.speelt), station: s && s.stationId, titel: $('#spTitel').textContent }; }, kiesOpZin };
 })();
 </script>
+<script src="/apps/muziek-bestanden.js"></script>
+<script src="/apps/muziek-feed.js"></script>
+<script src="/apps/muziek-bestanden-bediening.js"></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

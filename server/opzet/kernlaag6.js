@@ -21,7 +21,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, anthropic, app, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, log, logActivity, loginFails, noteFailedTry, notify, pinSlot, rememberSession, save, sessieregister, schoon, sseToCustomer, sseToOffice, supplierState } = hulp;
+  const { accounts, anthropic, app, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, log, logActivity, loginFails, media, noteFailedTry, notify, pinSlot, rememberSession, save, sessieregister, schoon, sseToCustomer, sseToOffice, supplierState } = hulp;
 
 /* RTG OV (kern/ov.js): al het vervoer in een app. Lijnen met haltes, live
    voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS) en
@@ -92,6 +92,10 @@ Object.assign(kern, require('../kern/muziek')({ db, save, crypto, schoon,
   stempel: (t, key) => { if (kern.muziekSamen) kern.muziekSamen.muziekStempel(t, key); } }));
 kern.muziekSamen = require('../kern/muziek-samen')({ save,
   trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan });
+/* Eigen audiobytes hangen aan de bestaande muziekpoort, niet aan zeven nieuwe
+   namen in de gedeelde kern. */
+kern.muziekMaak.bestanden = require('../kern/muziek-bestanden')({ db, save, crypto, schoon,
+  media, codenaamVan: kern.codenaamVan });
 Object.assign(kern, kern.muziekSamen);
 Object.assign(kern, require('../kern/muziek-uitgave')({ db, save, crypto, schoon,
   trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan,

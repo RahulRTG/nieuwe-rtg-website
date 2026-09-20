@@ -1,0 +1,240 @@
+/* RTG SOCIAAL
+   Een menselijke voorzijde voor momenten, gesprekken en kringen. */
+:root{
+  --social-ink:#120d0a;
+  --social-panel:#1b1310;
+  --social-ivory:#f4ecdf;
+  --social-soft:#bcaea1;
+  --social-gold:#ddbd78;
+  --social-line:rgba(232,201,137,.22);
+}
+
+body.rtg-social-elite{
+  background:var(--social-ink)!important;
+  color:var(--social-ivory)!important;
+}
+
+.rtg-social-elite:not(.rtg-salon-elite) main#inhoud{
+  width:100%!important;
+  max-width:none!important;
+  min-height:100dvh;
+  margin:0!important;
+  padding:0 0 calc(7rem + env(safe-area-inset-bottom,0px))!important;
+  color:var(--social-ivory)!important;
+  background:
+    radial-gradient(circle at 90% 18%,rgba(109,24,48,.16),transparent 28rem),
+    linear-gradient(180deg,#120d0a,#18100d 48%,#100b09)!important;
+}
+
+.rtg-social-elite .merkkop{
+  position:relative!important;
+  isolation:isolate;
+  display:block!important;
+  min-height:clamp(34rem,74dvh,47rem)!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden;
+  border:0!important;
+  color:var(--social-ivory)!important;
+  background:
+    linear-gradient(180deg,rgba(7,5,4,.06),rgba(7,5,4,.12) 34%,rgba(12,8,6,.7) 70%,#120d0a 100%),
+    linear-gradient(90deg,rgba(9,6,5,.38),transparent 72%),
+    url('/images/worlds/heritage/living-sociaal-hero-v1.jpg') center 44%/cover no-repeat!important;
+}
+
+.rtg-social-elite .merkkop::after{
+  content:"SOCIAL / UW KRING"!important;
+  position:absolute!important;
+  z-index:1;
+  top:calc(var(--rtg-topbar-h,48px) + 1rem)!important;
+  right:1.25rem!important;
+  color:rgba(244,236,223,.58)!important;
+  font:600 .5rem/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.2em!important;
+}
+
+.rtg-social-elite .merkkop>div:first-child{
+  position:absolute;
+  z-index:2;
+  right:1.25rem;
+  bottom:2rem;
+  left:1.25rem;
+  display:block!important;
+}
+
+.rtg-social-elite .sociaal-boven{
+  display:block!important;
+  margin:0 0 .75rem!important;
+  color:var(--social-gold)!important;
+  font:650 .58rem/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.22em!important;
+  text-transform:uppercase;
+}
+
+.rtg-social-elite .merkkop h1{
+  max-width:9ch!important;
+  margin:0!important;
+  color:var(--social-ivory)!important;
+  font:500 clamp(3rem,13vw,5rem)/.9 'Bodoni Moda',Georgia,serif!important;
+  letter-spacing:-.05em!important;
+}
+
+.rtg-social-elite .sociaal-inleiding{
+  max-width:32rem!important;
+  margin:1rem 0 0!important;
+  color:rgba(244,236,223,.76)!important;
+  font:400 .85rem/1.62 Inter,system-ui,sans-serif!important;
+}
+
+.rtg-social-elite .sociaal-filter{
+  position:absolute!important;
+  z-index:4;
+  top:calc(var(--rtg-topbar-h,48px) + 2.5rem)!important;
+  right:auto!important;
+  left:1.25rem!important;
+  min-width:104px!important;
+  min-height:44px!important;
+  margin:0!important;
+  border:1px solid rgba(238,213,159,.48)!important;
+  border-radius:0!important;
+  background:rgba(10,7,5,.48)!important;
+  color:var(--social-ivory)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(14px);
+}
+
+.sociaal-filtermenu{
+  top:calc(var(--rtg-topbar-h,48px) + 5.45rem)!important;
+  right:auto!important;
+  bottom:auto!important;
+  left:1.25rem!important;
+  border:1px solid var(--social-line)!important;
+  border-radius:0!important;
+  background:rgba(24,16,12,.97)!important;
+  color:var(--social-ivory)!important;
+}
+
+.sociaal-filtermenu button{color:var(--social-ivory)!important}
+.sociaal-filtermenu button:hover,.sociaal-filtermenu button[aria-checked="true"]{background:rgba(221,189,120,.1)!important;color:var(--social-gold)!important}
+.sociaal-filtermenu small{color:#a99d92!important}
+
+.rtg-social-elite .sociaal-ruimtes{
+  position:static!important;
+  display:flex!important;
+  min-height:66px;
+  margin:0!important;
+  padding:0 1.25rem!important;
+  overflow-x:auto;
+  border:0!important;
+  border-top:1px solid rgba(255,255,255,.05)!important;
+  border-bottom:1px solid var(--social-line)!important;
+  border-radius:0!important;
+  background:#120d0a!important;
+  box-shadow:none!important;
+  scrollbar-width:none;
+}
+
+.rtg-social-elite .sociaal-ruimtes a{
+  min-width:max-content!important;
+  min-height:66px!important;
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:0 1.2rem!important;
+  border:0!important;
+  background:transparent!important;
+  color:#94887e!important;
+  font-size:.61rem!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase;
+}
+
+.rtg-social-elite .sociaal-ruimtes a:first-child{padding-left:0!important}
+.rtg-social-elite .sociaal-ruimtes a small{display:none!important}
+.rtg-social-elite .sociaal-ruimtes a.actief{color:var(--social-ivory)!important}
+.rtg-social-elite .sociaal-ruimtes a.actief::after{right:1.2rem!important;bottom:0!important;left:1.2rem!important;height:1px!important;background:var(--social-gold)!important}
+.rtg-social-elite .sociaal-ruimtes a:first-child::after{left:0!important}
+
+.sociaal-stage{
+  display:flex!important;
+  min-height:0!important;
+  flex-direction:column!important;
+  gap:1px!important;
+  margin:0!important;
+  border:0!important;
+  background:var(--social-line)!important;
+}
+
+#vandaagVak{
+  order:1;
+  min-height:32rem!important;
+  padding:1.4rem!important;
+  border-radius:0!important;
+  background:
+    linear-gradient(180deg,rgba(8,6,5,.08),rgba(8,6,5,.72)),
+    url('/images/worlds/heritage/living-sociaal-hero-v1.jpg') center 58%/cover no-repeat!important;
+  color:var(--social-ivory)!important;
+}
+
+.sociaal-briefing,.sociaal-kringpaneel{
+  min-width:0!important;
+  padding:1.45rem 1.25rem!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+
+.sociaal-briefing{
+  order:2;
+  background:linear-gradient(150deg,#19120f,#27171b)!important;
+  color:var(--social-ivory)!important;
+}
+
+.sociaal-briefing .sociaal-paneelkop{border-color:var(--social-line)!important;color:var(--social-gold)!important}
+.sociaal-briefing .cv-rust h2,.sociaal-briefing .cv-woord,.sociaal-briefing .cv-cijfers b{color:var(--social-ivory)!important}
+.sociaal-briefing .cv-rust p,.sociaal-briefing .cv-cijfers span,.sociaal-briefing .klaarkop{color:#a99d92!important}
+
+.sociaal-kringpaneel{
+  order:3;
+  background:#201713!important;
+  color:var(--social-ivory)!important;
+}
+
+.sociaal-kringpaneel .regkop h2,.sociaal-kringpaneel .reis .kern h3{color:var(--social-ivory)!important}
+.sociaal-kringpaneel #kring{color:#aa9d92!important}
+.sociaal-kringactie{border-color:var(--social-line)!important;color:var(--social-gold)!important}
+
+.sociaal-register,.sociaal-poorten{
+  margin:0!important;
+  padding:2rem 1.25rem 0!important;
+  background:var(--social-ink)!important;
+}
+
+.sociaal-register .regkop h2,.sociaal-poorten .regkop h2{color:var(--social-ivory)!important;font:500 2rem/1 'Bodoni Moda',Georgia,serif!important}
+.sociaal-register #lijn,.sociaal-poorten .poorten{display:grid!important;grid-template-columns:1fr!important;gap:1px!important;background:var(--social-line)!important}
+.sociaal-register .vak,.sociaal-poorten .poort{margin:0!important;border:0!important;border-radius:0!important;background:#1d1512!important;color:var(--social-ivory)!important;box-shadow:none!important}
+.sociaal-register .vak .mom,.sociaal-poorten .poort{color:var(--social-ivory)!important}
+.sociaal-poorten .poort .ic{color:var(--social-gold)!important}
+
+@media(min-width:760px){
+  .rtg-social-elite .merkkop>div:first-child{right:clamp(2rem,6vw,6rem);bottom:3rem;left:clamp(2rem,6vw,6rem)}
+  .rtg-social-elite .sociaal-filter{left:clamp(2rem,6vw,6rem)!important}
+  .rtg-social-elite .sociaal-ruimtes{padding-inline:clamp(2rem,6vw,6rem)!important}
+  .sociaal-stage{display:grid!important;grid-template-columns:minmax(0,1.7fr) minmax(20rem,.7fr)!important}
+  .sociaal-stage>#vandaagVak{grid-row:1/3!important}
+  .sociaal-stage>.sociaal-briefing,.sociaal-stage>.sociaal-kringpaneel{grid-column:2!important}
+  .sociaal-register,.sociaal-poorten{padding-inline:clamp(2rem,6vw,6rem)!important}
+  .sociaal-register #lijn{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .sociaal-poorten .poorten{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+}
+
+/* Adaptive Edge wordt na de route geladen. Deze twee regels houden de eigen
+   Sociaal-voorzijde leidend, terwijl Edge zelf de boven- en onderrand beheert. */
+html body.rtg-social-elite:not(.rtg-salon-elite).rtg-edge-host[data-rtg-adaptive-ready="true"] .merkkop{
+  min-height:clamp(34rem,74dvh,47rem)!important;
+  padding:0!important;
+}
+
+html body.rtg-social-elite.rtg-edge-host[data-rtg-adaptive-ready="true"] .sociaal-ruimtes{
+  display:flex!important;
+}

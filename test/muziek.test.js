@@ -101,6 +101,21 @@ test('wat niet kan spelen, wordt eruit gehaald in plaats van het stuk te weigere
   assert.equal(bas.noten.every(n => n.toon >= I.TOON_MIN && n.toon <= I.TOON_MAX && n.stap <= laatste), true);
 });
 
+test('de professionele mix en master blijven bewerkbare trackdata', async () => {
+  const r = await api('/api/muziek/bewaar', { id: trackId, swing: .35, masterGain: 1.1,
+    masterLaag: 3, masterMidden: -2, masterHoog: 4, masterDrive: .7, kanalen: [
+      { instrument: 'kick', stappen: [0, 4, 8, 12], volume: .9, pan: -.2, solo: true,
+        eqLaag: 5, eqMidden: -3, eqHoog: 2, reverb: .25, delay: .4 }
+    ] }, maker);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.track.swing, .35);
+  assert.equal(r.body.track.masterHoog, 4);
+  assert.equal(r.body.track.masterDrive, .7);
+  const k = r.body.track.kanalen[0];
+  assert.equal(k.solo, true); assert.equal(k.pan, -.2); assert.equal(k.eqLaag, 5);
+  assert.equal(k.reverb, .25); assert.equal(k.delay, .4);
+});
+
 test('een stuk is van jou: een ander komt er niet in', async () => {
   assert.equal((await api('/api/muziek/open', { id: trackId }, ander)).status, 404);
   assert.equal((await api('/api/muziek/bewaar', { id: trackId, naam: 'Gekaapt' }, ander)).status, 404);

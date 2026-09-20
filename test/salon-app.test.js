@@ -7,23 +7,38 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
+const http = require('http');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
 
-let BASE, child;
+let BASE, child, spraakModel, spraakAanroepen = 0;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-salonapp-'));
 const raw = (pad, body, token) => fetch(BASE + '/api' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 });
+const bestand = (body, type, token) => fetch(BASE + '/api/salon/media', {
+  method: 'POST', headers: { 'Content-Type': type, Authorization: 'Bearer ' + token }, body
+});
 const json = r => r.json();
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  spraakModel = http.createServer((req, res) => {
+    spraakAanroepen++;
+    req.resume(); req.on('end', () => { res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ text: 'Welkom in De Salon.', segments: [
+        { start: 0, end: 2.5, text: 'Welkom in De Salon.' }
+      ] })); });
+  });
+  await new Promise(resolve => spraakModel.listen(0, '127.0.0.1', resolve));
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '',
+    LOCAL_AI_URL: 'http://127.0.0.1:' + spraakModel.address().port,
+    LOCAL_AI_MODEL_SPRAAK: 'salon-whisper' } }));
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
+  if (spraakModel) try { spraakModel.close(); } catch (e) {}
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
@@ -52,6 +67,66 @@ test('een lid plaatst zelf, met meerdere foto\'s en onderwerpen', async () => {
   // een lege post is geen post
   const leeg = await json(await raw('/salon/plaats', { tekst: '   ' }, a.token));
   assert.ok(leeg.error, 'zonder tekst en zonder foto komt er niets in de Salon');
+});
+
+test('foto en video worden als echte media geupload, geplaatst en in de feed uitgeleverd', async () => {
+  const a = await lid(), b = await lid();
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+  const webm = Buffer.concat([Buffer.from([0x1a, 0x45, 0xdf, 0xa3]), Buffer.alloc(256, 7)]);
+
+  const fotoAntwoord = await bestand(png, 'image/png', a.token);
+  const foto = await json(fotoAntwoord);
+  assert.equal(fotoAntwoord.status, 200, foto.error);
+  assert.equal(foto.type, 'image');
+
+  const videoAntwoord = await bestand(webm, 'video/webm', a.token);
+  const video = await json(videoAntwoord);
+  assert.equal(videoAntwoord.status, 200, video.error);
+  assert.equal(video.type, 'video');
+
+  const zonderTekst = await raw('/salon/plaats', { tekst: 'Nog niet klaar',
+    media: [{ uploadId: video.uploadId, alt: 'Een korte testvideo' }] }, a.token);
+  assert.equal(zonderTekst.status, 400, 'een video zonder ondertitels of stilverklaring wordt niet geplaatst');
+
+  const andermansOndertitels = await raw('/salon/ondertitels', { uploadId: video.uploadId, duurS: 8 }, b.token);
+  assert.equal(andermansOndertitels.status, 404, 'een ander lid kan de tijdelijke video niet laten uitlezen');
+  const ondertitelBody = { uploadId: video.uploadId, duurS: 8, taal: 'nl' };
+  const voorAanroepen = spraakAanroepen;
+  const ondertitelAntwoord = await raw('/salon/ondertitels', ondertitelBody, a.token);
+  const ondertiteld = await json(ondertitelAntwoord);
+  assert.equal(ondertitelAntwoord.status, 200, ondertiteld.error);
+  assert.equal(ondertiteld.status, 'automatisch');
+  assert.deepEqual(ondertiteld.ondertitels, [{ van: 0, tot: 2.5, tekst: 'Welkom in De Salon.' }]);
+  const dubbel = await json(await raw('/salon/ondertitels', ondertitelBody, a.token));
+  assert.equal(dubbel.herhaald, true, 'een dubbeltik krijgt het eerste antwoord terug');
+  assert.equal(spraakAanroepen, voorAanroepen + 1, 'de lokale modelserver hoort een dubbeltik maar één keer');
+
+  const vreemd = await raw('/salon/plaats', { tekst: 'Niet van mij', media: [{ uploadId: foto.uploadId }] }, b.token);
+  assert.equal(vreemd.status, 400, 'een ander lid kan het tijdelijke upload-id niet gebruiken');
+
+  const geplaatst = await json(await raw('/salon/plaats', {
+    tekst: 'Beeld en beweging in dezelfde feed. #media',
+    media: [{ uploadId: foto.uploadId, alt: 'Een klein testbeeld' },
+      { uploadId: video.uploadId, alt: 'Een korte testvideo' }]
+  }, a.token));
+  assert.ok(geplaatst.ok, geplaatst.error);
+  assert.deepEqual(geplaatst.post.media.map(m => m.type), ['image', 'video']);
+  assert.deepEqual(geplaatst.post.media[1].ondertitels,
+    [{ van: 0, tot: 2.5, tekst: 'Welkom in De Salon.' }], 'de tijdregels reizen met de video mee');
+  assert.ok(geplaatst.post.media.every(m => /^\/media\//.test(m.src)), 'de databasevorm bevat alleen mediaverwijzingen');
+
+  const feed = await json(await raw('/salon/feed', { onderwerp: 'media' }, a.token));
+  const post = feed.posts.find(p => p.id === geplaatst.post.id);
+  assert.ok(post, 'de nieuwe post staat meteen in de feed');
+  assert.deepEqual(post.media.map(m => m.type), ['image', 'video']);
+
+  const fotoUit = await fetch(BASE + post.media[0].src);
+  assert.equal(fotoUit.status, 200);
+  assert.equal(fotoUit.headers.get('content-type'), 'image/png');
+  const videoUit = await fetch(BASE + post.media[1].src, { headers: { Range: 'bytes=0-3' } });
+  assert.equal(videoUit.status, 206, 'video ondersteunt range-verzoeken voor mobiel afspelen en spoelen');
+  assert.equal(videoUit.headers.get('content-type'), 'video/webm');
+  assert.deepEqual(Buffer.from(await videoUit.arrayBuffer()), webm.subarray(0, 4));
 });
 
 test('je eigen post staat altijd in je eigen profiel', async () => {

@@ -9,6 +9,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { edgeBediening, startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
+const http = require('http');
 const os = require('os');
 const path = require('path');
 
@@ -21,7 +22,15 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
 test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de feed',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-salon-e2e-'));
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  const spraakModel = http.createServer((req, res) => {
+    req.resume(); req.on('end', () => { res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ text: 'Welkom aan het water.',
+        segments: [{ start: 0, end: 2.5, text: 'Welkom aan het water.' }] })); });
+  });
+  await new Promise(resolve => spraakModel.listen(0, '127.0.0.1', resolve));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
+    LOCAL_AI_URL: 'http://127.0.0.1:' + spraakModel.address().port,
+    LOCAL_AI_MODEL_SPRAAK: 'salon-whisper' } });
   let browser;
   try {
     const maak = async (n) => {
@@ -86,22 +95,61 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     const slot = await page.evaluate(() => document.querySelector('#main').textContent);
     assert.ok(/Je bent bij/.test(slot), 'de app zegt eerlijk wanneer je bij bent');
 
-    // 3. zelf plaatsen vanaf het tabblad
+    // 3. zelf een foto EN video plaatsen vanaf het tabblad. De browser geeft
+    // echte bestanden aan het invoerveld; dit bewijst dus ook de change-handler,
+    // de rauwe upload, het plaatsverzoek en de twee feed-elementen samen.
     await edgeBediening(page, 'Plaatsen');
     await page.waitForSelector('#ptekst', { timeout: 10000 });
+    const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+    const webm = Buffer.concat([Buffer.from([0x1a, 0x45, 0xdf, 0xa3]), Buffer.alloc(256, 7)]);
+    await page.setInputFiles('#pfotos', [
+      { name: 'avond.png', mimeType: 'image/png', buffer: png },
+      { name: 'avond.webm', mimeType: 'video/webm', buffer: webm }
+    ]);
+    await page.waitForFunction(() => document.querySelectorAll('#mini figure').length === 2, null, { timeout: 10000 });
     await page.evaluate(() => {
       const t = document.querySelector('#ptekst');
       t.value = 'Een avond aan de kade, geschreven vanaf het scherm. #kade';
       document.querySelector('#pplaats').value = 'Ibiza';
+      const beschrijvingen = document.querySelectorAll('[data-alt]');
+      beschrijvingen[0].value = 'Avondlicht aan de kade'; beschrijvingen[0].dispatchEvent(new Event('input'));
+      beschrijvingen[1].value = 'Korte beweging aan het water'; beschrijvingen[1].dispatchEvent(new Event('input'));
     });
+    await page.click('[data-auto="1"]');
+    await page.waitForFunction(() => /ondertitels staan klaar/i.test(document.querySelector('#mediaStatus').textContent), null, { timeout: 15000 });
+    assert.match(await page.inputValue('[data-ond="1"]'), /Welkom aan het water/,
+      'het lokale spraakmodel heeft de tijdregel in het bewerkbare veld gezet');
     await page.click('#plaatsknop');
     await page.waitForFunction(() => /kade/.test(document.querySelector('#main').textContent), null, { timeout: 15000 });
+    await page.waitForSelector('[data-post][data-media="ja"] video', { timeout: 10000 });
+    const mediaInFeed = await page.evaluate(() => {
+      const post = document.querySelector('[data-post][data-media="ja"]');
+      const vlak = post.querySelector('.salon-video');
+      return { fotos: post.querySelectorAll('img').length, videos: post.querySelectorAll('video').length,
+        foto: post.querySelector('img')?.getAttribute('src'), video: post.querySelector('video')?.getAttribute('src'),
+        videoControls: post.querySelector('video')?.controls,
+        ondertitels: JSON.parse(decodeURIComponent(vlak?.dataset.ondertitels || '%5B%5D')),
+        band: !!vlak?.querySelector('.ondert') };
+    });
+    assert.equal(mediaInFeed.fotos, 1, 'de foto staat in de feed');
+    assert.equal(mediaInFeed.videos, 1, 'de video staat in de feed');
+    assert.match(mediaInFeed.foto || '', /^\/media\//);
+    assert.match(mediaInFeed.video || '', /^\/media\//);
+    assert.equal(mediaInFeed.videoControls, true, 'de video is bedienbaar en start niet vanzelf');
+    assert.equal(mediaInFeed.band, true, 'de gedeelde ondertitelband is aan de speler gekoppeld');
+    assert.equal(mediaInFeed.ondertitels[0].tekst, 'Welkom aan het water.');
+    const mediaPostId = await page.evaluate(() => document.querySelector('[data-post][data-media="ja"]')?.getAttribute('data-post'));
+    assert.ok(mediaPostId, 'de mediapost heeft een adres voor profiel en archief');
 
     // 4. de post staat in je eigen profiel (het raster van "Ik")
     await edgeBediening(page, 'Mijn profiel');
     await page.waitForSelector('[data-open]', { timeout: 10000 });
-    const raster = await page.evaluate(() => document.querySelector('#main').textContent);
-    assert.ok(/kade/.test(raster), 'je eigen post staat in je eigen raster');
+    const rasterMedia = await page.evaluate((id) => {
+      const tegel = document.querySelector('[data-open="' + id + '"]');
+      return { bestaat: !!tegel, beeld: tegel?.querySelector('img')?.getAttribute('alt') || '' };
+    }, mediaPostId);
+    assert.equal(rasterMedia.bestaat, true, 'je eigen mediapost staat in je eigen raster');
+    assert.match(rasterMedia.beeld, /Avondlicht/, 'het raster bewaart ook de beschrijving');
 
     // 5. reageren in de app zelf, zonder weg te navigeren
     await edgeBediening(page, 'Feed');
@@ -122,11 +170,11 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     assert.ok(/#kade/.test(cijfers), 'en je onderwerp staat erbij');
 
     // 7. archiveren vanuit het inzicht: de post verlaat je raster maar blijft bestaan
-    await page.click('[data-arch]');
+    await page.click('[data-arch="' + mediaPostId + '"]');
     await page.waitForFunction(() => /terugzetten/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
     await edgeBediening(page, 'Mijn profiel');
     await page.waitForSelector('[data-open]', { timeout: 10000 });
-    await page.waitForFunction(() => !/kade/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    await page.waitForFunction((id) => !document.querySelector('[data-open="' + id + '"]'), mediaPostId, { timeout: 10000 });
     await edgeBediening(page, 'Inzicht');
     await page.waitForFunction(() => /archief/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
     await page.click('#archknop');
@@ -142,6 +190,7 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
   } finally {
     if (browser) await browser.close();
     stop(child);
+    await new Promise(resolve => spraakModel.close(resolve));
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

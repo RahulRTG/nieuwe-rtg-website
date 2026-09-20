@@ -37,6 +37,7 @@ const PUBLIEK = new Map([
      begrenst: de code verloopt, het lid kan hem stoppen, hij toont EEN feit en
      nooit het ledger, en de deurrem van 300/minuut hangt ervoor. */
   ['/api/carriere/regel/toon', 'een deelbewijs wordt getoond aan iemand zonder RTG-account; de deelcode is de sleutel, verloopt en is te stoppen'],
+  ['/api/muziek/luister/:ticket', 'de tijdelijke luisterkaart IS de geloofsbrief: 192 willekeurige bits, vijftien minuten geldig en alleen uitgegeven aan een ingelogd lid voor een gepubliceerd nummer'],
   ['/api/herstel/eigenaar/start', 'herstel zonder toestel: er kan per definitie geen sessie zijn; het quorum, de wachttijd en de afbreekbaarheid doen het werk'],
   ['/api/herstel/eigenaar/voltooien', 'zelfde ceremonie, tweede helft: opnieuw twee delen en de wachttijd moet om zijn'],
   /* De twee passkey-loketten van dezelfde ceremonie staan hier NIET: de

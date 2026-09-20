@@ -1,5 +1,5 @@
 /* ============================================================================
-   DE BEDOELING PER SCHRIJFROUTE -- het enige mensenwerk in het contractregister.
+   DE BEDOELING PER SCHRIJFROUTE -- mensenwerk in het contractregister.
 
    scripts/mutatiecontract.js leidt vier van de vijf assen af uit een bron: de
    routes en hun deur uit de draaiende router, het duplicaatgedrag uit
@@ -88,6 +88,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-vracht').CONTRACTEN,
   require('./mutatiecontracten-rtgid').CONTRACTEN,
   require('./mutatiecontracten-salon').CONTRACTEN,
+  require('./mutatiecontracten-muziekfeed').CONTRACTEN,
   require('./mutatiecontracten-hardening-checkpoint').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
   require('./mutatiecontracten-neiging').CONTRACTEN,

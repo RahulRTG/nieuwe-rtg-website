@@ -1,0 +1,17 @@
+/* De iOS-laag bouwt de bronheader om. Deze laatste laag houdt RTG Sound als
+   merkheader op het beeld, in plaats van er opnieuw een generieke balk van te maken. */
+html body.rtg-music-experience header.kop.ios-nav,body.rtg-music-experience .kop{position:absolute!important;top:0!important;left:0!important;right:0!important;z-index:12!important;height:auto!important;min-height:5.2rem!important;display:flex!important;align-items:center!important;gap:.55rem!important;padding:calc(env(safe-area-inset-top,0px) + 1.1rem) 1.25rem .8rem!important;background:linear-gradient(180deg,rgba(7,4,3,.72),transparent)!important;border:0!important;color:var(--sound-ivory)!important;box-shadow:none!important}
+body.rtg-music-experience .kop .ios-nav-rij{width:100%;height:auto!important;display:flex!important;align-items:center!important;gap:.65rem!important;padding:0!important}
+body.rtg-music-experience .kop .ios-nav-links{display:flex!important;align-items:center!important;gap:0!important}
+body.rtg-music-experience .kop .amn-knop,body.rtg-music-experience .kop .rtg-rahul-tab{display:none!important}
+body.rtg-music-experience .kop .sound-brand svg,body.rtg-music-experience .kop .sound-brand span{display:none!important}
+body.rtg-music-experience .kop .sound-brand::before{content:"RTG";display:block}
+body.rtg-music-experience .kop .ios-nav-titel{position:static!important;inset:auto!important;transform:none!important;clip:auto!important;clip-path:none!important;order:2!important;flex:none!important;display:block!important;visibility:visible!important;opacity:1!important;overflow:visible!important;width:auto!important;height:auto!important;color:var(--sound-ivory)!important;font:500 1rem Inter,system-ui,sans-serif!important;text-align:left!important;white-space:nowrap!important}
+body.rtg-music-experience .kop .ios-nav-titel::after{content:"LivingOS";margin-left:.65rem;padding-left:.65rem;border-left:1px solid rgba(255,255,255,.34);color:#e0c88f;font-size:.5rem;letter-spacing:.15em;text-transform:uppercase}
+body.rtg-music-experience .kop .ios-nav-acties{order:3!important;margin-left:auto!important;display:flex!important}
+body.rtg-music-experience .sound-brand{order:1!important;width:auto!important;height:auto!important;min-width:0!important;padding:0!important;font:400 2rem/1 'Bodoni Moda',Georgia,serif!important;color:var(--sound-ivory)!important;text-decoration:none!important;letter-spacing:-.04em}
+body.rtg-music-experience .kop h1{font:500 1rem Inter,system-ui,sans-serif!important;color:var(--sound-ivory)!important;margin:0!important}
+body.rtg-music-experience .kop .badge{display:inline!important;margin-left:.15rem!important;padding-left:.65rem!important;border-left:1px solid rgba(255,255,255,.35)!important;color:#e0c88f!important;font-size:.56rem!important;letter-spacing:.15em!important;text-transform:uppercase!important}
+body.rtg-music-experience .sound-profiel{width:2.7rem;height:2.7rem;display:grid!important;place-items:center;border:1px solid var(--sound-gold);border-radius:50%;padding:3px;color:var(--sound-ivory)!important;text-decoration:none;background:rgba(9,6,4,.45);backdrop-filter:blur(10px)}
+body.rtg-music-experience .sound-profiel span{width:100%;height:100%;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#a33b52,#25110e);font:500 .9rem 'Bodoni Moda',serif}
+body.rtg-music-experience main>.ios-groot,body.rtg-music-experience main>.ios-onder{display:none!important}

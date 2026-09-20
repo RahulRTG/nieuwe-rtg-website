@@ -68,7 +68,7 @@ test('iedere wereld heeft vanaf de startpagina een eigen verhaalpagina', () => {
     const wereldHtml = fs.readFileSync(bestand, 'utf8');
     assert.match(wereldHtml, /href="\.\.\/start\/start-base\.css"/,
       wereld + ' gebruikt de gedeelde merkbasis');
-    assert.match(wereldHtml, /href="\.\/world\.css\?v=\d+"/,
+    assert.match(wereldHtml, /href="\.\/world\.css\?v=[A-Za-z0-9._-]+"/,
       wereld + ' gebruikt het gedeelde wereldontwerp');
     assert.match(wereldHtml, /href="\.\.\/\.\.\/\.\.\/#werelden"/,
       wereld + ' wijst terug naar het wereldenoverzicht');
@@ -96,9 +96,9 @@ test('iedere pas heeft vanaf de startpagina een eigen verhaalpagina', () => {
     const pasHtml = fs.readFileSync(bestand, 'utf8');
     assert.match(pasHtml, /href="\.\.\/start\/start-base\.css"/,
       pas + ' gebruikt de gedeelde merkbasis');
-    assert.match(pasHtml, /href="\.\.\/werelden\/world\.css\?v=\d+"/,
+    assert.match(pasHtml, /href="\.\.\/werelden\/world\.css\?v=[A-Za-z0-9._-]+"/,
       pas + ' gebruikt het gedeelde verhaalontwerp');
-    assert.match(pasHtml, /href="\.\/pass\.css\?v=\d+"/,
+    assert.match(pasHtml, /href="\.\/pass\.css\?v=[A-Za-z0-9._-]+"/,
       pas + ' gebruikt het gedeelde pasontwerp');
     assert.match(pasHtml, /href="\.\.\/\.\.\/\.\.\/#passen"/,
       pas + ' wijst terug naar het passenoverzicht');

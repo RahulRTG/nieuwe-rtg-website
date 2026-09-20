@@ -73,32 +73,30 @@
   function vlag(code) {
     return '<span class="rtg-lang-code">' + String(code || '').toUpperCase() + '</span>';
   }
-  // kleine, in huisstijl getekende tekens (geen emoji), currentColor volgend
+  // Kleine, functionele lijntekening voor spraakinvoer.
   const ICOON = {
-    mic: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v3.5"/></svg>',
-    spark: '<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M12 2c.5 4.6 2.4 6.5 7 7-4.6.5-6.5 2.4-7 7-.5-4.6-2.4-6.5-7-7 4.6-.5 6.5-2.4 7-7z"/></svg>',
-    globe: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>'
+    mic: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v3.5"/></svg>'
   };
   // veelgebruikte land-/taalnamen die Rahul moet herkennen (genormaliseerd:
   // kleine letters, accenten eraf). De rest matcht op de eigen naam + Engelse naam.
   const ALIAS = {
     nederland: 'nl', holland: 'nl', netherlands: 'nl', vlaanderen: 'nl', belgie: 'nl', belgium: 'nl', suriname: 'nl',
-    engeland: 'en', england: 'en', britain: 'en', uk: 'en', amerika: 'en', america: 'en', usa: 'en', australie: 'en', australia: 'en', canada: 'en', ierland: 'en', ireland: 'en',
-    duitsland: 'de', germany: 'de', deutschland: 'de', oostenrijk: 'de', austria: 'de', zwitserland: 'de', switzerland: 'de',
-    frankrijk: 'fr', france: 'fr',
-    spanje: 'es', spain: 'es', espana: 'es', mexico: 'es', argentinie: 'es', argentina: 'es', colombia: 'es', chili: 'es', peru: 'es',
-    portugal: 'pt', brazilie: 'pt', brazil: 'pt', brasil: 'pt',
-    italie: 'it', italy: 'it', italia: 'it',
+    engels: 'en', engeland: 'en', england: 'en', britain: 'en', uk: 'en', amerika: 'en', america: 'en', usa: 'en', australie: 'en', australia: 'en', canada: 'en', ierland: 'en', ireland: 'en',
+    duits: 'de', duitsland: 'de', germany: 'de', deutschland: 'de', oostenrijk: 'de', austria: 'de', zwitserland: 'de', switzerland: 'de',
+    frans: 'fr', frankrijk: 'fr', france: 'fr',
+    spaans: 'es', spanje: 'es', spain: 'es', espana: 'es', mexico: 'es', argentinie: 'es', argentina: 'es', colombia: 'es', chili: 'es', peru: 'es',
+    portugees: 'pt', portugal: 'pt', brazilie: 'pt', brazil: 'pt', brasil: 'pt',
+    italiaans: 'it', italie: 'it', italy: 'it', italia: 'it',
     griekenland: 'el', greece: 'el',
-    turkije: 'tr', turkey: 'tr', turkiye: 'tr',
-    rusland: 'ru', russia: 'ru', oekraine: 'uk', ukraine: 'uk', polen: 'pl', poland: 'pl',
-    japan: 'ja', nippon: 'ja', china: 'zh', chinees: 'zh', chinese: 'zh', mandarijn: 'zh', mandarin: 'zh', taiwan: 'zh',
-    korea: 'ko', india: 'hi', bharat: 'hi', pakistan: 'ur',
+    turks: 'tr', turkije: 'tr', turkey: 'tr', turkiye: 'tr',
+    russisch: 'ru', rusland: 'ru', russia: 'ru', oekraiens: 'uk', oekraine: 'uk', ukraine: 'uk', pools: 'pl', polen: 'pl', poland: 'pl',
+    japans: 'ja', japan: 'ja', nippon: 'ja', china: 'zh', chinees: 'zh', chinese: 'zh', mandarijn: 'zh', mandarin: 'zh', taiwan: 'zh',
+    koreaans: 'ko', korea: 'ko', hindi: 'hi', india: 'hi', bharat: 'hi', urdu: 'ur', pakistan: 'ur', bengali: 'bn',
     marokko: 'ar', morocco: 'ar', egypte: 'ar', egypt: 'ar', dubai: 'ar', arabisch: 'ar', arabic: 'ar', saoedi: 'ar',
-    iran: 'fa', perzie: 'fa', persia: 'fa', israel: 'he', hebreeuws: 'he', hebrew: 'he',
-    indonesie: 'id', indonesia: 'id', bali: 'id', thailand: 'th', vietnam: 'vi', filipijnen: 'tl', philippines: 'tl', maleisie: 'ms', malaysia: 'ms',
+    perzisch: 'fa', iran: 'fa', perzie: 'fa', persia: 'fa', israel: 'he', hebreeuws: 'he', hebrew: 'he',
+    indonesisch: 'id', indonesie: 'id', indonesia: 'id', bali: 'id', thais: 'th', thailand: 'th', vietnamees: 'vi', vietnam: 'vi', filipijns: 'tl', filipijnen: 'tl', philippines: 'tl', maleis: 'ms', maleisie: 'ms', malaysia: 'ms',
     zweden: 'sv', sweden: 'sv', noorwegen: 'no', norway: 'no', denemarken: 'da', denmark: 'da', finland: 'fi', ijsland: 'is', iceland: 'is',
-    zuidafrika: 'af', kenia: 'sw', kenya: 'sw', tanzania: 'sw', ethiopie: 'am', ethiopia: 'am', nigeria: 'yo'
+    swahili: 'sw', zuidafrika: 'af', kenia: 'sw', kenya: 'sw', tanzania: 'sw', ethiopie: 'am', ethiopia: 'am', nigeria: 'yo'
   };
 
   function detectDevice(codes) {
@@ -284,10 +282,9 @@
       }
     },
 
-    /* ---------- taalkeuze: de wereld in RTG-stijl ----------
-       Rahuls signatuurlippen in het midden, alle landvlaggen eromheen, en een
-       AI-zoekje: zeg waar je vandaan komt of welke taal je spreekt, en Rahul
-       kiest mee. Dezelfde donkere, ingetogen huisstijl als de app-poort. */
+    /* ---------- taalkeuze in de RTG-huisstijl ----------
+       Een rustige zoekingang, enkele directe keuzes en dezelfde donkere,
+       gouden systeemlaag als de rest van de website. */
     zoekTaal(q) {
       const lijst = this._lijst || [];
       const n = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -320,50 +317,81 @@
       const oud = document.getElementById('rtg-lang-modal');
       const stondOpen = oud && oud.classList.contains('open');
       if (oud) oud.remove(); // opnieuw opbouwen zodra de wereldtalen binnen zijn
-      this._mond = null; // het oude canvas is weg
       const scrim = document.createElement('div');
       scrim.id = 'rtg-lang-modal';
       scrim.className = 'rtg-lang-scrim';
       scrim.setAttribute('data-i18n-ignore', '');
       // de matcher kent de HELE wereld (alle 114) als die binnen is; anders de
-      // actieve set. Er staan geen vlagknoppen meer: je kiest door te typen of
-      // te spreken, Rahul herkent je land of taal en stelt hem voor.
+      // actieve set. De bezoeker kiest door een land of taal te typen of uit te
+      // spreken. Daarna verschijnt één duidelijke keuze.
       this._lijst = this._alleTalen || WERELD || Object.keys(LANGS).map(c => ({ code: c, naam: LANGS[c].native, en: LANGS[c].label }));
       this._aanbevolen = recommended || 'en';
       const kanSpreken = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+      const tekst = {
+        aria: this.t('language.chooser.aria', 'Kies uw taal'),
+        label: this.t('language.chooser.label', 'Taal'),
+        titel: this.t('language.chooser.title', 'Kies uw taal'),
+        uitleg: this.t('language.chooser.explanation', 'Zoek op taal of land. RTG onthoudt uw keuze op dit apparaat.'),
+        veld: this.t('language.chooser.field', 'Taal of land'),
+        placeholder: this.t('language.chooser.placeholder', 'Bijvoorbeeld Nederlands of Nederland'),
+        spreek: this.t('language.chooser.speak', 'Spreek uw taal in'),
+        kies: this.t('language.chooser.choose', 'Kiezen'),
+        snel: this.t('language.chooser.quick', 'Direct kiezen'),
+        verder: this.t('language.chooser.continue', 'Verder'),
+        nietGevonden: this.t('language.chooser.not_found', 'Taal niet gevonden. Probeer een andere naam.'),
+        sluit: this.t('language.chooser.close', 'Taalkeuze sluiten')
+      };
+      const veilig = value => String(value || '').replace(/[&<>\"]/g, teken => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;' })[teken]);
+      const snelCodes = [this._aanbevolen, this.lang, 'nl', 'en', 'de', 'fr', 'es', 'ar']
+        .filter((code, index, all) => code && all.indexOf(code) === index)
+        .filter(code => this._lijst.some(taal => taal.code === code))
+        .slice(0, 4);
+      const snelleKeuzes = snelCodes.map(code => {
+        const taal = this._lijst.find(item => item.code === code) || {};
+        return '<button type="button" class="rtg-lang-quick' + (code === this._aanbevolen ? ' is-active' : '') + '" data-lang="' + code + '">' +
+          vlag(code) + '<span>' + veilig(taal.naam || taal.en || code) + '</span></button>';
+      }).join('');
       scrim.innerHTML =
-        '<div class="rtg-lang-card" role="dialog" aria-modal="true" aria-label="Choose your language / Kies je taal">' +
-          '<canvas class="rtg-lang-mond" id="rtg-lang-mond" width="440" height="200" aria-hidden="true"></canvas>' +
-          '<h2>Where in the world are you?</h2>' +
-          '<p>Type or say your language &middot; Rahul switches for you</p>' +
-          '<div class="rtg-lang-ai">' +
-            (kanSpreken ? '<button type="button" id="rtg-lang-mic" aria-label="Speak your language / Spreek je taal">' + ICOON.mic + '</button>' : '') +
+        '<div class="rtg-lang-card" role="dialog" aria-modal="true" aria-label="' + tekst.aria + '">' +
+          '<div class="rtg-lang-head"><span class="rtg-lang-eyebrow">RTG ' + tekst.label + '</span>' +
+            '<button type="button" class="rtg-lang-close" aria-label="' + tekst.sluit + '">' +
+              '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+            '</button></div>' +
+          '<h2>' + tekst.titel + '</h2>' +
+          '<p>' + tekst.uitleg + '</p>' +
+          '<label class="rtg-lang-label" for="rtg-lang-zoek">' + tekst.veld + '</label>' +
+          '<div class="rtg-lang-search">' +
+            (kanSpreken ? '<button type="button" id="rtg-lang-mic" aria-label="' + tekst.spreek + '">' + ICOON.mic + '</button>' : '') +
             '<input id="rtg-lang-zoek" autocomplete="off" enterkeyhint="go" ' +
-              'aria-label="Type your country or language / Typ je land of taal" ' +
-              'placeholder="Say or type where you&rsquo;re from&hellip;">' +
-            '<button type="button" id="rtg-lang-rahul" aria-label="Let Rahul choose / Laat Rahul kiezen">' + ICOON.spark + '</button>' +
+              'aria-label="' + tekst.veld + '" placeholder="' + tekst.placeholder + '">' +
+            '<button type="button" id="rtg-lang-submit">' + tekst.kies + '</button>' +
           '</div>' +
           '<button type="button" class="rtg-lang-hint" id="rtg-lang-hint" hidden></button>' +
+          (snelleKeuzes ? '<div class="rtg-lang-quick-wrap"><span>' + tekst.snel + '</span><div class="rtg-lang-quick-grid">' + snelleKeuzes + '</div></div>' : '') +
         '</div>';
       document.body.appendChild(scrim);
 
       const zoek = scrim.querySelector('#rtg-lang-zoek');
       const hint = scrim.querySelector('#rtg-lang-hint');
       const self = this;
-      // toon Rahuls voorstel (geen knoppenlijst): een vlag + de naam, aantikbaar
+      // Toon één passende taalnaam die de bezoeker kan aantikken.
       const stelVoor = () => {
         const res = self.zoekTaal(zoek.value.trim());
         if (!zoek.value.trim() || !res.code) {
           hint.hidden = true; hint.removeAttribute('data-lang');
-          if (zoek.value.trim()) { hint.hidden = false; hint.removeAttribute('data-lang'); hint.innerHTML = '<span class="rtg-lang-mis">Hmm, not sure yet &mdash; try a country or language.</span>'; }
+          hint.disabled = false;
+          if (zoek.value.trim()) {
+            hint.hidden = false; hint.disabled = true; hint.removeAttribute('data-lang');
+            hint.innerHTML = '<span class="rtg-lang-mis">' + tekst.nietGevonden + '</span>';
+          }
           return;
         }
         const t = self._lijst.find(x => x.code === res.code) || {};
-        hint.hidden = false;
+        hint.hidden = false; hint.disabled = false;
         hint.setAttribute('data-lang', res.code);
         hint.innerHTML = vlag(res.code) +
-          '<span class="rtg-lang-sug"><b>' + String(t.naam || res.code).replace(/[<>]/g, '') + '</b>' +
-          '<span class="rtg-lang-go">tap to continue &middot; tik om verder te gaan</span></span>';
+          '<span class="rtg-lang-sug"><b>' + veilig(t.naam || res.code) + '</b>' +
+          '<span class="rtg-lang-go">' + tekst.verder + '</span></span>';
       };
       const kies = (code) => {
         code = code || self.zoekTaal(zoek.value.trim()).code || self._aanbevolen;
@@ -371,5 +399,9 @@
       };
       zoek.addEventListener('input', stelVoor);
       zoek.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); kies(); } });
-      scrim.querySelector('#rtg-lang-rahul').addEventListener('click', () => kies());
+      scrim.querySelector('#rtg-lang-submit').addEventListener('click', () => kies());
       hint.addEventListener('click', () => kies(hint.getAttribute('data-lang')));
+      scrim.querySelectorAll('.rtg-lang-quick').forEach(button => {
+        button.addEventListener('click', () => kies(button.getAttribute('data-lang')));
+      });
+      scrim.querySelector('.rtg-lang-close').addEventListener('click', () => self.closeModal());

@@ -35,7 +35,7 @@
     $('personalWorlds').replaceChildren();
     C.ordered(s).forEach(function (key, i) {
       var a = d.createElement('a'); a.href = '#werelden'; a.dataset.selectWorld = key;
-      a.append(text('small', '0' + (i + 1)), text('strong', C.WORLDS[key].name), text('span', '↗'));
+      a.append(text('small', '0' + (i + 1)), text('strong', C.WORLDS[key].name));
       a.setAttribute('aria-label', C.WORLDS[key].name + ': ' + C.WORLDS[key].description); $('personalWorlds').appendChild(a);
     });
     var keys = Object.keys(s.interests); $('personalReasons').replaceChildren();
@@ -60,7 +60,7 @@
   function renderWorld() {
     d.querySelectorAll('[data-room]').forEach(function (room) { room.hidden = room.dataset.room !== currentWorld; });
     var index = Object.keys(C.WORLDS).indexOf(currentWorld);
-    $('worldPosition').textContent = '0' + (index + 1) + ' / 04 · ' + C.WORLDS[currentWorld].name;
+    $('worldPosition').textContent = '0' + (index + 1) + ' / 04 ' + C.WORLDS[currentWorld].name;
     if ($('werelden').getBoundingClientRect().top < innerHeight && $('werelden').getBoundingClientRect().bottom > 0) d.body.dataset.rtgWorld = currentWorld;
   }
   function permissions() {
@@ -100,7 +100,7 @@
     e.preventDefault(); var scenario = C.recognise($('intent').value);
     if (!scenario) { $('intentFeedback').textContent = 'Kies voor deze demonstratie een reis, etentje, werkdag of gezinsmoment. Er is niets verstuurd.'; return; }
     choose(scenario, false);
-    $('intentFeedback').textContent = 'Uw wens past bij het voorbeeld ‘' + C.SCENARIOS[scenario].title + '’. In de Playground staat nu dat voorstel. U kunt het via de Edge bekijken en veranderen.';
+    $('intentFeedback').textContent = 'Uw wens past bij het voorbeeld "' + C.SCENARIOS[scenario].title + '". In de Playground staat nu dat voorstel. U kunt het via de Edge bekijken en veranderen.';
     announce('Het voorbeeldvoorstel is aangepast.');
   });
   $('confirmExample').addEventListener('click', function () { if (C.proposal(s).conflict) return; s.confirmed = true; renderProposal(); });

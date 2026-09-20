@@ -76,11 +76,16 @@ test('MediaOS Studio Pro bewerkt en exporteert een echte foto en video',
     assert.equal(videoBron.soort, 'video');
     assert.ok(videoBron.duur > 0, 'de videobron heeft een echte tijdlijn');
     await page.click('[data-pro-tab="kader"]');
-    await page.evaluate(async () => {
+    const keyframeDoel = await page.evaluate(() => {
       RTGMediaEditor.zoek(0); RTGMediaEditor.key(); RTGMediaEditor.zet('zoom', 135, true);
-      RTGMediaEditor.zoek(Math.min(.3, RTGMediaEditor.bron().duur / 2));
-      await new Promise(r => setTimeout(r, 80)); RTGMediaEditor.key();
+      const doel = Math.min(.3, RTGMediaEditor.bron().duur / 2);
+      RTGMediaEditor.zoek(doel);
+      return doel;
     });
+    await page.waitForFunction(doel =>
+      Math.abs(RTGMediaEditor.onderdelen().video.currentTime - doel) < .03,
+    keyframeDoel, { timeout: 5000 });
+    await page.evaluate(() => RTGMediaEditor.key());
     assert.equal(await page.evaluate(() => RTGMediaEditor.staat().keys.length), 2,
       'de video bewaart meerdere keyframes op de tijdlijn');
     await page.locator('[data-pro-waarde="snelheid"]').fill('200');

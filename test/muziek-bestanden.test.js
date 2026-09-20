@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, wachtOpWaarde } = require('./helper');
 const { soortVanBuffer } = require('../server/media/bestand');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-muziek-bestand-'));
@@ -143,8 +143,9 @@ test('verwijderen trekt bestaande luisterkaarten in en ruimt de bytes op', async
   assert.equal((await post('/api/muziek/bestand-weg', { id: nummer.id }, a)).status, 200);
   assert.deepEqual((await post('/api/muziek/bestanden', {}, a)).body.nummers, []);
   assert.equal((await fetch(base + luister)).status, 404);
-  const eind = Date.now() + 3000;
-  while (fs.existsSync(path.join(TMP, 'media', opslagNaam)) && Date.now() < eind)
-    await new Promise(resolve => setTimeout(resolve, 10));
+  await wachtOpWaarde(() => !fs.existsSync(path.join(TMP, 'media', opslagNaam)), {
+    ms: 3000,
+    wat: 'het verwijderde muziekbestand uit de privé-opslag'
+  });
   assert.equal(fs.existsSync(path.join(TMP, 'media', opslagNaam)), false);
 });

@@ -55,7 +55,7 @@
     if (!track) return;
     var k = lied ? $('#rLiedKnop') : $('#rVraagKnop');
     var woord = k.textContent;
-    k.disabled = true; k.textContent = 'Rahul denkt na…';
+    k.disabled = true; k.textContent = 'Antwoord wordt voorbereid...';
     B.api('rahul', { vraag: $('#rVraag').value, maten: lied ? undefined : track.maten,
       lied: lied, tekst: lied ? $('#rTekst').value : '', zaad: Date.now() }).then(function (d) {
       k.disabled = false; k.textContent = woord;
@@ -101,7 +101,7 @@
     var track = B.track();
     if (!track) return;
     B.leesVelden();
-    var k = $('#exportWav'); k.disabled = true; k.textContent = 'Master wordt gerenderd…';
+    var k = $('#exportWav'); k.disabled = true; k.textContent = 'Master wordt gerenderd...';
     var kwaliteit = ($('#exportKwaliteit') || {}).value || '48000-24';
     var delen = kwaliteit.split('-');
     var rondes = Number(($('#exportRondes') || {}).value) || 2;
@@ -133,7 +133,7 @@
     stem.kanalen.forEach(function (k, i) { k.stil = i !== gekozen; k.solo = false; });
     var kwaliteit = ($('#exportKwaliteit') || {}).value || '48000-24';
     var delen = kwaliteit.split('-'), k = $('#exportStem');
-    k.disabled = true; k.textContent = 'Stem wordt gerenderd…';
+    k.disabled = true; k.textContent = 'Stem wordt gerenderd...';
     window.RTGStudioWav.render(stem, { rondes: Number(($('#exportRondes') || {}).value) || 2,
       sampleRate: Number(delen[0]), bitDepth: Number(delen[1]) }).then(function (blob) {
       var kanaal = track.kanalen[gekozen];

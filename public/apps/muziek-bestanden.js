@@ -42,8 +42,8 @@
     if (!actief) return;
     $('.speler').dataset.actief = 'true';
     $('#spTitel').textContent = actief.naam;
-    $('#spSub').textContent = actief.maker + ' · muziek van mensen' +
-      (Number.isFinite(audio.duration) ? ' · ' + duur(audio.duration) : '');
+    $('#spSub').textContent = actief.maker + ', muziek van mensen' +
+      (Number.isFinite(audio.duration) ? ', ' + duur(audio.duration) : '');
     $('#knopSpeel').textContent = audio.paused ? '▶' : '⏸';
     var p = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.currentTime / audio.duration * 100 : 0;
     $('#voortgang').style.width = Math.max(0, Math.min(100, p)) + '%';
@@ -59,7 +59,7 @@
     for (var stap = 1; stap <= Math.min(3, nummers.length - 1); stap++) {
       var n = nummers[(index + stap) % nummers.length];
       var li = document.createElement('li'), b = document.createElement('b');
-      b.textContent = n.naam; li.appendChild(b); li.appendChild(document.createTextNode(' · ' + n.maker)); ul.appendChild(li);
+      b.textContent = n.naam; li.appendChild(b); li.appendChild(document.createTextNode(', ' + n.maker)); ul.appendChild(li);
     }
   }
   function mediaSessie() {
@@ -78,12 +78,12 @@
       if (audio.paused) await audio.play(); else audio.pause(); return;
     }
     try {
-      status('“' + nummer.naam + '” wordt klaargezet…');
+      status(nummer.naam + ' wordt klaargezet...');
       var toegang = await api('bestand-ticket', { id: nummer.id });
       if (G && G.stand()) G.pauze();
       actief = nummer; index = nummers.findIndex(function (n) { return n.id === nummer.id; });
       audio.src = toegang.src; audio.load(); wachtrij(); mediaSessie(); werkSpelerBij(true);
-      await audio.play(); status('Nu speelt: ' + nummer.naam + ' · ' + nummer.maker);
+      await audio.play(); status('Nu speelt: ' + nummer.naam + ', ' + nummer.maker);
     } catch (e) { status(e.message || 'Dit nummer kon niet worden afgespeeld.', true); }
   }
   function stop() {

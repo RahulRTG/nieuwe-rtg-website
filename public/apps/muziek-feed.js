@@ -44,7 +44,7 @@
       var naam = document.createElement('span'); naam.className = 'eigen-nummer__naam'; naam.textContent = nummer.naam;
       var meta = document.createElement('span'); meta.className = 'eigen-nummer__meta';
       var maker = document.createElement('span'); maker.className = 'eigen-nummer__maker'; maker.textContent = nummer.maker;
-      meta.appendChild(maker); meta.appendChild(document.createTextNode(' · ' + grootte(nummer.bytes)));
+      meta.appendChild(maker); meta.appendChild(document.createTextNode(', ' + grootte(nummer.bytes)));
       tekst.appendChild(naam); tekst.appendChild(meta); speel.appendChild(icoon); speel.appendChild(tekst);
       speel.addEventListener('click', function () { B.speelNummer(nummer); });
       var acties = document.createElement('div'); acties.className = 'eigen-nummer__acties';
@@ -58,7 +58,7 @@
       if (nummer.vanMij) {
         var weg = knop('eigen-nummer__weg', '×', 'Verwijder ' + nummer.naam);
         weg.addEventListener('click', async function () {
-          if (!confirm('“' + nummer.naam + '” verwijderen uit de muziekfeed?')) return;
+          if (!confirm(nummer.naam + ' verwijderen uit de muziekfeed?')) return;
           try { await api('bestand-weg', { id: nummer.id }); nummers = nummers.filter(function (n) { return n.id !== nummer.id; }); teken(); status('Het nummer is verwijderd.'); }
           catch (e) { status(e.message, true); }
         }); acties.appendChild(weg);
@@ -81,7 +81,7 @@
     if (!gekozen) return status('Kies eerst een muziekbestand.', true);
     if (!$('#muziekEigenwerk').checked) return status('Bevestig dat dit uw eigen muziek is en dat u haar mag delen.', true);
     var titel = $('#muziekTitel').value.trim(); if (!titel) return status('Geef het nummer een titel.', true);
-    var publiceer = $('#muziekPubliceer'); publiceer.disabled = true; status('Uw muziek wordt veilig gepubliceerd…');
+    var publiceer = $('#muziekPubliceer'); publiceer.disabled = true; status('Uw muziek wordt veilig gepubliceerd...');
     try {
       var r = await fetch('/api/muziek/bestand', { method: 'POST', headers: {
         Authorization: 'Bearer ' + token, 'Content-Type': gekozen.type || 'application/octet-stream',
@@ -91,7 +91,7 @@
       }, body: gekozen });
       var j = await r.json().catch(function () { return {}; });
       if (!r.ok) throw new Error(j.error || 'Uw muziek kon niet worden gepubliceerd.');
-      nummers.unshift(j.nummer); sluitDelen(); teken(); status('“' + j.nummer.naam + '” staat nu klaar voor andere luisteraars.');
+      nummers.unshift(j.nummer); sluitDelen(); teken(); status(j.nummer.naam + ' staat nu klaar voor andere luisteraars.');
     } catch (e) { status(e.message, true); } finally { publiceer.disabled = false; }
   });
 

@@ -233,17 +233,18 @@ test('Reality Engine blijft bruikbaar, leesbaar en rustig op mobiel', () => {
 
 test('Adaptive Edge vervangt de oude dubbele Social-randen', () => {
   const css = lees('public/shared/rtg-adaptive-edge.css');
-  assert.match(css, /body\.rtg-suite-page\.rtg-edge-host\[data-rtg-adaptive-ready="true"\][\s\S]*--suite-top:0px/,
+  assert.match(css, /body\[data-rtg-adaptive-ready="true"\]:has\(\.rtg-suitebar\.rtg-edge-owned-bar\)\{--suite-top:0px/,
     'de oude suite-inzet wordt opgeheven zodra Edge gereed is');
-  assert.match(css, /:is\(\.rtg-suitebar,\.rtg-suitenav,\.rtg-intel-strip,\.rtg-reality-graph\)[\s\S]*display:none!important/,
+  assert.match(css, /:is\([^}]*\.rtg-edge-owned-bar\)\{display:none!important/,
     'oude navigatie en technische telemetrie mogen niet naast Edge zichtbaar blijven');
-  assert.match(css, /body\.rtg-social-elite\.rtg-edge-host\[data-rtg-adaptive-ready="true"\] :is\(\.rtg-intel-strip,\.rtg-reality-graph\)/,
+  assert.match(css, /:has\(\.rtg-intel-strip\.rtg-edge-owned-bar\)\{--rtg-intel-height:0px\}/,
     'ook Social en De Salon tonen techniek pas op verzoek');
-  assert.match(css, /:is\(\.sociaal-ruimtes,\.salon-socialnav\)[\s\S]*display:none!important/,
+  const claim = lees('public/shared/rtg-adaptive-edge-claim.js');
+  assert.match(claim, /CLAIM = '[^']*\.rtg-suitebar[^;]*\.salon-socialnav[^;]*\.rtg-intel-strip/,
     'de oude vaste Social-navigatie blijft niet achter de nieuwe Edge staan');
-  assert.match(css, /body\.rtg-salon-elite\.rtg-edge-host\[data-rtg-adaptive-ready="true"\] \.salon-werkveld\{[\s\S]*padding-top:0!important/,
+  assert.match(css, /:has\(\.salon-socialnav\.rtg-edge-owned-bar\) \.salon-werkveld\{padding-top:0!important/,
     'een verborgen commandobalk laat geen lege strook boven De Salon achter');
-  assert.match(css, /body\.rtg-social-messages\.rtg-edge-host\[data-rtg-adaptive-ready="true"\] \.comm\{[\s\S]*var\(--rtg-adaptive-inset\)/,
+  assert.match(css, /body\.rtg-social-messages\[data-rtg-adaptive-ready="true"\] \.comm\{[\s\S]*var\(--rtg-adaptive-inset\)/,
     'Berichten reserveert de werkelijke ruimte van de nieuwe zwevende rand');
   const runtime = lees('public/shared/social-intelligence-runtime.js');
   assert.match(runtime, /id: 'social-context'[\s\S]*run: openDeck/,

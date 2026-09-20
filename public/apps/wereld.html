@@ -90,7 +90,7 @@
   .lenzen a:hover,.lenzen button:hover,.lenzen a[aria-current="page"],.lenzen button[aria-current="page"]{color:var(--rtg-txt);
     border-color:var(--rtg-acc);}
   .lenzen span{opacity:0.42;cursor:not-allowed;}
-  .lenzen span::after{content:'  ·  Signature';font-size:0.52rem;}
+  .lenzen span::after{content:'  Signature';font-size:0.52rem;}
 
   /* DE WERELDSCHAKELAAR. Een rij, horizontaal scrollend op een telefoon.
      Een wereld die dicht is verdwijnt niet: hij staat er, gedimd, met een slotje.
@@ -111,7 +111,7 @@
   .werelden button[aria-current="true"]{background:var(--rtg-acc);
     border-color:var(--rtg-acc);color:var(--rtg-acc-inkt);}
   .werelden button[disabled]{opacity:0.42;cursor:not-allowed;}
-  .werelden button[disabled]::after{content:' ·';}
+  .werelden button[disabled]::after{content:'';}
 
   /* de feed */
   main{padding:1.1rem 1.1rem 5.5rem;max-width:640px;margin:0 auto;}
@@ -139,7 +139,7 @@
   .kaart p{margin:0 0 0.7rem;font-size:0.9rem;line-height:1.55;
     color:var(--rtg-txt);white-space:pre-wrap;overflow-wrap:anywhere;}
   .kaart .objectregel{display:flex;gap:.5rem;flex-wrap:wrap;margin:-.15rem 0 .7rem;color:var(--rtg-muted);font-size:.68rem;}
-  .kaart .objectregel span+span::before{content:'·';margin-right:.5rem;color:var(--rtg-soft);}
+  .kaart .objectregel span+span::before{content:',';margin-right:.5rem;color:var(--rtg-soft);}
   .kaart .offer{margin:.2rem 0 .8rem;padding:.72rem .8rem;border:1px solid var(--rtg-line);background:var(--rtg-card2);}
   .kaart .offer b{display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1rem;font-weight:500;}
   .kaart .offer span{display:block;margin-top:.28rem;color:var(--rtg-muted);font-size:.68rem;}
@@ -280,7 +280,6 @@
   <a class="living-nearby" id="livingNearby" href="/apps/foodcourt.html">
     <img src="/images/world-homes/living-coast.webp" alt="" width="180" height="120" loading="lazy">
     <span><strong data-i18n="living.discoverNearby">Ontdek wat dichtbij is.</strong><span data-i18n="living.nextMoment">Vind een plek voor uw volgende moment.</span></span>
-    <span aria-hidden="true">→</span>
   </a>
   <p class="living-access" id="livingAccess" hidden><a href="/apps/app.html" data-i18n="living.login">Open uw LivingOS</a></p>
   <div id="profiel" hidden></div>
@@ -356,7 +355,7 @@
     if (!lid) return;
     $('#passport').hidden = false;
     $('#wie').removeAttribute('data-i18n');
-    $('#wie').innerHTML = esc(d.ik.codenaam) + ' <span>· ' + esc(lid.pas.naam) + '</span>';
+    $('#wie').innerHTML = esc(d.ik.codenaam) + ' <span>' + esc(lid.pas.naam) + '</span>';
     $('#badges').innerHTML = '<span class="lidbadge member">' + esc(lid.member.naam) + '</span>'
       + '<span class="lidbadge lidstatus ' + esc(lid.status.id) + '">' + esc(lid.status.naam) + '</span>';
     var identiteit = $('#identiteit');
@@ -390,7 +389,7 @@
     var n = $('#lensContext'), c = staat.context;
     if (!c) { n.hidden = true; return; }
     n.hidden = false;
-    n.innerHTML = '<span class="eyebrow">Saloon · ' + esc(c.naam || staat.lens) + '</span>'
+    n.innerHTML = '<span class="eyebrow">Saloon, ' + esc(c.naam || staat.lens) + '</span>'
       + '<h2>' + esc(c.titel || '') + '</h2><p>' + esc(c.uitleg || '') + '</p>'
       + (c.url ? '<a href="' + esc(c.url) + '">Open volledige ruimte &rarr;</a>' : '');
   }
@@ -456,7 +455,7 @@
     k.className = 'kaart' + (RTGLivingFeed.photoCard(i) ? ' living-photo' : '');
     k.dataset.type = i.type || 'moment';
     k.innerHTML = RTGLivingFeed.item(i,
-      (TYPENAAM[i.type] || 'Moment') + ' · ' + (BRONNAAM[i.bron] || i.bron),
+      (TYPENAAM[i.type] || 'Moment') + ', ' + (BRONNAAM[i.bron] || i.bron),
       klok(i.at), i.begint ? klok(i.begint) : '');
     n.appendChild(k);
   }

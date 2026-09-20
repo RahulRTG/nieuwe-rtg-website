@@ -150,7 +150,7 @@
   <span class="rek"></span>
   <a class="sound-profiel" href="/apps/mijn-gegevens.html" aria-label="Mijn profiel"><span>R</span></a>
 </header>
-<div class="zoek"><input id="zoek" type="search" placeholder="Zoek een station of sfeer…" aria-label="Zoeken"></div>
+<div class="zoek"><input id="zoek" type="search" placeholder="Zoek een station of sfeer..." aria-label="Zoeken"></div>
 
 <section class="muziek-hero" aria-labelledby="muziekBelofte">
   <img class="muziek-hero__beeld" src="/images/music/rtg-sound-hero-v1.jpg" alt="Drie mensen maken samen muziek in warm avondlicht">
@@ -160,7 +160,7 @@
     <p>Luister, maak en deel. Eén plek waar muziek mensen dichter bij elkaar brengt.</p>
     <div class="hero-acties">
       <button class="hero-speel" id="heroSpeel" type="button"><span aria-hidden="true">▶</span> Begin met luisteren</button>
-      <a class="hero-studio" href="/apps/klankwerk.html">Open Studio Pro <span aria-hidden="true">↗</span></a>
+      <a class="hero-studio" href="/apps/klankwerk.html">Open Studio Pro</a>
     </div>
   </div>
 </section>
@@ -171,25 +171,25 @@
       <div><span>Voor dit moment</span><h2 id="stationsTitel">Uw wereld in geluid.</h2></div>
       <p>Kies een sfeer. De muziek ontstaat live in RTG Sound.</p>
     </div>
-    <div class="stations" id="stations" role="group" aria-label="Stations"><span class="stil">De stations laden…</span></div>
+    <div class="stations" id="stations" role="group" aria-label="Stations"><span class="stil">De stations laden...</span></div>
   </section>
   <section class="eigen-muziek" id="eigenMuziek" aria-labelledby="eigenMuziekTitel">
     <div class="eigen-muziek__kop">
       <div><span>Door de gemeenschap</span><h2 id="eigenMuziekTitel">Ontdek muziek van mensen.</h2>
         <p>Luister naar wat anderen maken en geef uw eigen geluid de ruimte.</p></div>
-      <button class="muziek-toevoegen" id="muziekKies" type="button">Deel uw muziek <i aria-hidden="true">↗</i></button>
+      <button class="muziek-toevoegen" id="muziekKies" type="button">Deel uw muziek</button>
     </div>
     <input class="vis-verborgen" id="muziekBestand" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/ogg,audio/flac,audio/webm,.mp3,.m4a,.aac,.wav,.ogg,.flac,.webm">
     <div class="muziek-deelvel" id="muziekDeelvel" hidden>
       <span class="muziek-deelvel__bestand" id="muziekBestandsnaam"></span>
       <label>Titel<input id="muziekTitel" type="text" maxlength="100" autocomplete="off"></label>
-      <label>Het verhaal bij dit nummer<textarea id="muziekBeschrijving" maxlength="500" rows="3" placeholder="Vertel iets over wat u gemaakt heeft…"></textarea></label>
+      <label>Het verhaal bij dit nummer<textarea id="muziekBeschrijving" maxlength="500" rows="3" placeholder="Vertel iets over wat u gemaakt heeft..."></textarea></label>
       <label class="muziek-eigenwerk"><input id="muziekEigenwerk" type="checkbox"> <span>Dit is mijn eigen muziek en ik mag haar met anderen delen.</span></label>
       <div class="muziek-deelacties"><button id="muziekAnnuleer" type="button">Annuleren</button><button class="primair" id="muziekPubliceer" type="button">Publiceer voor anderen</button></div>
     </div>
     <span class="muziek-status" id="muziekStatus" role="status" aria-live="polite"></span>
     <div class="muziek-feedkop"><h3>Nieuw van makers</h3><span id="muziekAantal"></span></div>
-    <div class="muziek-lijst" id="muziekLijst"><p class="muziek-leeg">De muziekfeed wordt geladen…</p></div>
+    <div class="muziek-lijst" id="muziekLijst"><p class="muziek-leeg">De muziekfeed wordt geladen...</p></div>
   </section>
   <section class="samen" id="samen" aria-label="Samen luisteren">
     <span class="samen-beeld" aria-hidden="true">◎</span>
@@ -212,7 +212,7 @@
 </main>
 
 <div class="rahul"><span aria-hidden="true">✦</span>
-  <span class="tekst"><b>Rahul</b> · <span id="rahulTekst">Zeg wat u wilt horen ("iets voor bij het diner") en ik zet het juiste station op.</span></span>
+  <span class="tekst"><b>Rahul</b>, <span id="rahulTekst">Zeg wat u wilt horen ("iets voor bij het diner") en ik zet het juiste station op.</span></span>
   <button id="micKnop" aria-label="Spraaksturing: zeg wat u wilt horen"></button>
 </div>
 
@@ -276,7 +276,7 @@
     for (let i = 1; i <= 3; i++) {
       const li = document.createElement('li');
       const b = document.createElement('b'); b.textContent = trackNaam(s.seed + i);
-      li.appendChild(b); li.appendChild(document.createTextNode(' · ' + s.station));
+      li.appendChild(b); li.appendChild(document.createTextNode(', ' + s.station));
       ul.appendChild(li);
     }
   }
@@ -285,7 +285,7 @@
     if (!s) return;
     document.querySelector('.speler').dataset.actief = 'true';
     $('#spTitel').textContent = s.titel;
-    $('#spSub').textContent = s.station + ' · eigen studio · ' + Math.round(s.sampleRate / 1000) + ' kHz';
+    $('#spSub').textContent = s.station + ', eigen studio, ' + Math.round(s.sampleRate / 1000) + ' kHz';
     $('#knopSpeel').textContent = s.speelt ? '⏸' : '▶';
     document.querySelectorAll('.station').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === s.stationId)));
     wachtrij(s);
@@ -436,7 +436,7 @@
       sesGastheer = !!k.benGastheer;
       if (elSamenStatus) {
         var n = k.leden ? k.leden.length : 1;
-        elSamenStatus.innerHTML = samenBasis() + ' · ' + n + ' luisteraar' + (n === 1 ? '' : 's');
+        elSamenStatus.innerHTML = samenBasis() + ', ' + n + ' luisteraar' + (n === 1 ? '' : 's');
       }
       if (!sesGastheer) samenSync(k.muziek, k.now);
     }).catch(function (e) { if (/bestaat niet|zit je niet/.test(e.message)) samenStop(false); });

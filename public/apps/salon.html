@@ -4,7 +4,7 @@
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>De Salon · RTG</title>
+<title>De Salon | RTG</title>
 <link rel="icon" href="/icons/partners.svg">
 <link rel="manifest" href="/manifests/salon.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -112,7 +112,7 @@
 <body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-rtg-editorial-room data-rtg-world="living" data-rtg-skin="heritage">
 <a class="skip" href="#main">Naar de inhoud</a>
 <div class="rtg-social-commandbar topbar cmd-tabs" aria-label="Sociale commandobalk" data-rtg-platform-chrome="social-commandobalk">
-  <a class="rtg-social-commandbar-brand" href="/apps/sociaal.html"><span>RTG</span><small>LivingOS · De Salon</small></a>
+  <a class="rtg-social-commandbar-brand" href="/apps/sociaal.html"><span>RTG</span><small>LivingOS, De Salon</small></a>
   <span class="rtg-social-commandbar-state">Alleen zichtbaar voor uw kring</span>
 </div>
 <nav class="salon-socialnav" aria-label="Sociale ruimtes" data-rtg-platform-chrome="suite-navigatie">
@@ -126,24 +126,24 @@
 <header>
   <div class="kop">
     <div><div class="ey">Private member journal</div><h1>De Salon</h1><p class="salon-belofte">Momenten van mensen die u kent, in een omgeving die niets van u probeert te winnen.</p></div>
-    <a class="salon-terug" href="/apps/sociaal.html">Terug naar Social →</a>
+    <a class="salon-terug" href="/apps/sociaal.html">Terug naar Social</a>
   </div>
   <div class="tabs" id="tabs" data-rtg-edge-bar role="group" aria-label="Onderdelen"></div>
 </header>
 <div class="salon-stage">
-  <main id="main"><div class="leeg">Laden…</div></main>
+  <main id="main"><div class="leeg">Laden...</div></main>
   <aside class="salon-briefing" aria-label="Salon briefing">
     <span class="salon-paneelkop">Private briefing</span>
     <h2>Alleen wat van betekenis is.</h2>
     <p>Rustig gerangschikt, zonder verslavende stroom, advertentiemodel of verborgen profielscore.</p>
     <dl>
-      <div><dt>In beeld</dt><dd id="salonMomenten">Laden…</dd></div>
+      <div><dt>In beeld</dt><dd id="salonMomenten">Laden...</dd></div>
       <div><dt>Bronnen</dt><dd id="salonMensen">Uw kring</dd></div>
       <div><dt>Privacy</dt><dd>Codenamen</dd></div>
     </dl>
     <div class="salon-briefingacties">
-      <button type="button" data-salon-jump="plaats">Deel een moment <span aria-hidden="true">→</span></button>
-      <button type="button" data-salon-jump="ik">Open uw profiel <span aria-hidden="true">→</span></button>
+      <button type="button" data-salon-jump="plaats">Deel een moment</button>
+      <button type="button" data-salon-jump="ik">Open uw profiel</button>
     </div>
     <a class="salon-kringlink" href="/apps/genootschap.html">Beheer uw kringen</a>
   </aside>
@@ -237,13 +237,13 @@ function postHtml(p){
       (p.place?'<span class="plek">'+esc(p.place)+'</span>':'')+'</span>'+
       (p.partner?'<span class="merk">partner</span>':(p.featured?'<span class="merk">uitgelicht</span>':''))+
       '<span class="soort">'+esc(soorten[p.momentType]||'Moment')+'</span></div>'+
-    (details.length?'<div class="tekst salon-contextdetail">'+esc(details.join(' · '))+'</div>':'')+
+    (details.length?'<div class="tekst salon-contextdetail">'+esc(details.join(', '))+'</div>':'')+
     (media.length?'<div class="kar"><div class="strip">'+media.map(m=>m.type==='video'
         ? videoHtml(m)
         : '<img src="'+esc(m.src)+'" alt="'+esc(m.alt||'Foto uit De Salon')+'" loading="lazy">').join('')+'</div>'+
         (media.length>1?'<span class="tel">'+media.length+' momenten</span>':'')+'</div>':'')+
     (p.text?'<div class="tekst">'+esc(p.text)+'</div>':'')+
-    (p.offer?'<div class="kaart salon-offer"><h2>'+esc(p.offer.titel||'Aanbod')+'</h2><p class="salon-offer-detail">'+esc([p.offer.capaciteit?p.offer.capaciteit+' beschikbaar':'',p.offer.geldigTot?'tot '+p.offer.geldigTot:'',p.offer.actie||''].filter(Boolean).join(' · '))+'</p></div>':'')+
+    (p.offer?'<div class="kaart salon-offer"><h2>'+esc(p.offer.titel||'Aanbod')+'</h2><p class="salon-offer-detail">'+esc([p.offer.capaciteit?p.offer.capaciteit+' beschikbaar':'',p.offer.geldigTot?'tot '+p.offer.geldigTot:'',p.offer.actie||''].filter(Boolean).join(', '))+'</p></div>':'')+
     ((p.onderwerpen||[]).length?'<div class="onderw">'+p.onderwerpen.map(o=>
         '<button type="button" data-onderwerp="'+esc(o)+'">#'+esc(o)+'</button>').join('')+'</div>':'')+
     '<div class="rij">'+
@@ -306,7 +306,7 @@ async function tekenFeed(){
   });
   const kop = ARCHIEF ? '<h2 style="font-size:1rem;margin-bottom:0.75rem;">Je archief</h2>'
     : TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:0.75rem;">Wat je bewaarde</h2>'
-    : ZOEK ? '<div class="kaart salon-selectie">Resultaten voor <b>“'+esc(ZOEK)+'”</b> <button class="mini" id="wisZoek" type="button">wissen</button></div>'
+    : ZOEK ? '<div class="kaart salon-selectie">Resultaten voor <b>'+esc(ZOEK)+'</b> <button class="mini" id="wisZoek" type="button">wissen</button></div>'
     : ONDERWERP ? '<div class="kaart" style="padding:.7rem .9rem;">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini" id="wisOnderwerp" style="background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer;">wissen</button></div>' : '';
   toon(kop + (POSTS.length ? POSTS.map(postHtml).join('') : !ARCHIEF && TAB==='feed' && !ZOEK && !ONDERWERP ? RTGFirstSteps.welcome('salon') : '<div class="leeg">'+(ARCHIEF?'Je archief is leeg.':TAB==='bewaard'?'Je hebt nog niets bewaard.':'Er zijn geen momenten gevonden die bij uw zoekopdracht passen.')+'</div>')
     + (d.meer ? '<button class="meer" id="meer">Meer laden</button>'
@@ -324,7 +324,7 @@ async function tekenFeed(){
 
 /* ---------- ontdekken: onderwerpen, niet een motor die voor jou kiest ---------- */
 async function tekenOntdek(){
-  toon('<div class="kaart"><label for="zoekveld">Zoeken in De Salon</label><input id="zoekveld" type="search" value="'+esc(ZOEK)+'" placeholder="Zoek op woord, plaats of codenaam"><div class="knoppen"><button class="knop" id="zoekknop" type="button">Zoeken</button></div></div><div id="onderwerpen" class="kaart"><h2>Waar het over gaat</h2><p style="color:var(--soft);font-size:.85rem;">Laden…</p></div>');
+  toon('<div class="kaart"><label for="zoekveld">Zoeken in De Salon</label><input id="zoekveld" type="search" value="'+esc(ZOEK)+'" placeholder="Zoek op woord, plaats of codenaam"><div class="knoppen"><button class="knop" id="zoekknop" type="button">Zoeken</button></div></div><div id="onderwerpen" class="kaart"><h2>Waar het over gaat</h2><p style="color:var(--soft);font-size:.85rem;">Laden...</p></div>');
   const voerZoek=()=>{ ZOEK=$('#zoekveld').value.trim(); ONDERWERP=''; TAB='feed'; NA=null; teken(); };
   $('#zoekknop').onclick=voerZoek;
   $('#zoekveld').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); voerZoek(); } };
@@ -383,7 +383,7 @@ async function uploadMedia(item){
   if(item.uploadId) return item.uploadId;
   let bestand=item.bestand;
   if(item.type==='image') bestand=await normaliseerFoto(bestand);
-  if(item.type==='video'&&bestand.size>60*1024*1024) throw new Error('Video’s mogen maximaal 60 MB zijn.');
+  if(item.type==='video'&&bestand.size>60*1024*1024) throw new Error("Video's mogen maximaal 60 MB zijn.");
   const r=await fetch('/api/salon/media',{method:'POST',headers:{Authorization:'Bearer '+TOKEN,
     'Content-Type':bestand.type||(item.type==='video'?'video/mp4':'image/jpeg')},body:bestand});
   const d=await r.json().catch(()=>({}));
@@ -401,7 +401,7 @@ async function ondertitelVideo(item,automatisch){
   item.ondertitels=r.ondertitels||[]; item.stil=!!r.stil;
   item.ondertitelTekst=cuesNaarVel(item.ondertitels);
   item.ondertitelStatus=r.stil?'Geen gesproken tekst':
-    (r.status==='automatisch'?(r.precies?'Automatisch ondertiteld':'Automatisch ondertiteld · tijden bij benadering'):'Ondertitels klaar');
+    (r.status==='automatisch'?(r.precies?'Automatisch ondertiteld':'Automatisch ondertiteld, tijden bij benadering'):'Ondertitels klaar');
   return r;
 }
 function tekenMediaKeuze(){
@@ -417,7 +417,7 @@ function tekenMediaKeuze(){
   $('#mini').querySelectorAll('[data-ond]').forEach(inp=>inp.oninput=()=>{ NIEUW.media[Number(inp.dataset.ond)].ondertitelTekst=inp.value; });
   $('#mini').querySelectorAll('[data-stil]').forEach(inp=>inp.onchange=()=>{ const m=NIEUW.media[Number(inp.dataset.stil)]; m.stil=inp.checked; m.ondertitelStatus=inp.checked?'Geen gesproken tekst':''; tekenMediaKeuze(); });
   $('#mini').querySelectorAll('[data-auto]').forEach(b=>b.onclick=()=>werk(b,async()=>{
-    $('#mediaStatus').textContent='Ondertitels maken…'; await ondertitelVideo(NIEUW.media[Number(b.dataset.auto)],true);
+    $('#mediaStatus').textContent='Ondertitels maken...'; await ondertitelVideo(NIEUW.media[Number(b.dataset.auto)],true);
     tekenMediaKeuze(); $('#mediaStatus').textContent='De ondertitels staan klaar. Lees ze even na.';
   }));
   $('#mini').querySelectorAll('[data-duur]').forEach(v=>{ const zet=()=>{ if(Number.isFinite(v.duration)) NIEUW.media[Number(v.dataset.duur)].duurS=v.duration; }; v.onloadedmetadata=zet; if(v.readyState) zet(); });
@@ -430,9 +430,9 @@ function tekenPlaats(){
     '<label for="pplaats">Plaats (mag leeg)</label><input id="pplaats" maxlength="60">'+
     '<label for="pbegint">Wanneer (optioneel)</label><input id="pbegint" type="datetime-local">'+
     '<label for="ppubliek">Voor wie is dit bedoeld?</label><select id="ppubliek"><option value="salon">Mijn Saloon</option><option value="contacten">Vrienden en volgers</option><option value="vrienden">Alleen vrienden</option><option value="volgers">Alleen volgers</option><option value="alleenik">Alleen ik</option><option value="iedereen">Openbaar als het voor ontdekking geschikt is</option></select>'+
-    '<label for="pfotos">Foto’s en video’s (samen maximaal 6)</label><input id="pfotos" type="file" accept="image/*,video/mp4,video/webm,video/quicktime,.heic,.heif,.mov" multiple>'+
+    '<label for="pfotos">Foto\'s en video\'s (samen maximaal 6)</label><input id="pfotos" type="file" accept="image/*,video/mp4,video/webm,video/quicktime,.heic,.heif,.mov" multiple>'+
     '<div class="miniatuur" id="mini"></div>'+
-    '<div class="media-status" id="mediaStatus" role="status" aria-live="polite">Foto maximaal 12 MB · video maximaal 60 MB · video met ondertitels</div>'+
+    '<div class="media-status" id="mediaStatus" role="status" aria-live="polite">Foto maximaal 12 MB, video maximaal 60 MB, video met ondertitels</div>'+
     '<label for="preacties">Wie mag reageren</label>'+
     '<select id="preacties"><option value="iedereen">Iedereen</option><option value="vrienden">Alleen vrienden</option><option value="niemand">Niemand</option></select>'+
     '<div class="knoppen"><button class="knop" id="plaatsknop" type="button">Plaatsen</button>'+
@@ -451,7 +451,7 @@ function tekenPlaats(){
   $('#bijschriftknop').onclick=()=>{
     const w=$('#ptekst').value.trim()||prompt('Een paar steekwoorden?')||'';
     if(!w) return;
-    werk($('#bijschriftknop'),async()=>{ meld('Rahul schrijft…');
+    werk($('#bijschriftknop'),async()=>{ meld('Bijschrift wordt voorbereid...');
       const r=await api('/api/salon/ai/bijschrift',{steekwoorden:w,plaats:$('#pplaats').value});
       $('#ptekst').value=r.bijschrift; meld('Voorstel staat in het veld. Lees het na en plaats het zelf.'); });
   };
@@ -460,10 +460,10 @@ function tekenPlaats(){
     werk(knop,async()=>{
       const media=[];
       for(let i=0;i<NIEUW.media.length;i++){
-        $('#mediaStatus').textContent='Uploaden '+(i+1)+' van '+NIEUW.media.length+'…';
+        $('#mediaStatus').textContent='Uploaden '+(i+1)+' van '+NIEUW.media.length+'...';
         const item=NIEUW.media[i], uploadId=await uploadMedia(item);
         if(item.type==='video'){
-          $('#mediaStatus').textContent='Ondertitels maken voor video '+(i+1)+'…';
+          $('#mediaStatus').textContent='Ondertitels maken voor video '+(i+1)+'...';
           await ondertitelVideo(item,false);
         }
         media.push({uploadId,alt:item.alt});
@@ -491,14 +491,14 @@ async function tekenInzicht(){
     '<p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:0.5rem;">Alleen van jou, en alleen voor jou. Je ziet dat iets bewaard is, nooit door wie.</p>'+
     '<div class="knoppen"><button class="knop stil" id="archknop" type="button">Toon je archief</button></div></div>'+
     ((d.onderwerpen||[]).length?'<div class="kaart"><h2>Wat aansloeg</h2><div class="onderw" style="padding:.4rem 0 0;">'+
-      d.onderwerpen.map(o=>'<button type="button" data-onderwerp="'+esc(o.onderwerp)+'">#'+esc(o.onderwerp)+' · '+(o.mooi+o.reacties+o.bewaard)+'</button>').join('')+
+      d.onderwerpen.map(o=>'<button type="button" data-onderwerp="'+esc(o.onderwerp)+'">#'+esc(o.onderwerp)+', '+(o.mooi+o.reacties+o.bewaard)+'</button>').join('')+
       '</div><p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:0.5rem;">Je onderwerpen, op wat ze losmaakten. Over de inhoud, niet over hoe vaak je plaatst.</p></div>':'')+
     '<div class="kaart"><h2>Per post</h2>'+
       ((d.posts||[]).length? d.posts.map(p=>
         '<div class="reactie"><span class="wie">'+esc(p.tekst||'(zonder tekst)')+'</span>'+
         (p.gearchiveerd?' <span style="font-size:.6rem;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--line);border-radius:0;padding:.02rem .4rem;">archief</span>':'')+
         '<div style="color:var(--soft);font-size:.74rem;margin-top:.2rem;">'+
-          p.mooi+' mooi · '+p.reacties+' reacties · '+p.bewaard+' bewaard'+
+          p.mooi+' mooi, '+p.reacties+' reacties, '+p.bewaard+' bewaard'+
           '<button class="mini" data-arch="'+p.id+'" data-aan="'+(p.gearchiveerd?'0':'1')+'">'+(p.gearchiveerd?'terugzetten':'archiveren')+'</button>'+
           '<button class="mini" data-reacties="'+p.id+'">openen</button></div></div>').join('')
         : '<p style="color:var(--soft);font-size:.85rem;">Je hebt nog niets geplaatst.</p>')+'</div>');
@@ -571,7 +571,7 @@ async function toonReacties(id, alleen){
     werk($('#rknop'),async()=>{ await api('/api/salon/reageer',{id,tekst:t,op:opId}); toonReacties(id,alleen); });
   };
   if($('#rsamen')) $('#rsamen').onclick=()=>werk($('#rsamen'),async()=>{
-    meld('Rahul leest de reacties…'); const r=await api('/api/salon/ai/reacties',{id}); meld(r.samenvatting); });
+    meld('Reacties worden samengevat...'); const r=await api('/api/salon/ai/reacties',{id}); meld(r.samenvatting); });
   $('#rterug').onclick=()=>{
     if(alleen&&TERUG_PROFIEL) return toonProfiel(TERUG_PROFIEL);
     TAB='feed'; NA=null; teken();
@@ -582,7 +582,7 @@ async function toonReacties(id, alleen){
 $('#aiform').onsubmit=async ev=>{
   ev.preventDefault();
   const t=$('#aiin').value.trim(); if(!t) return;
-  $('#aiform').classList.add('wacht'); meld('Rahul denkt na…');
+  $('#aiform').classList.add('wacht'); meld('Antwoord wordt voorbereid...');
   try{
     const d=await api('/api/chat/send',{text:t});
     const m=(d.messages||[]).filter(x=>x.from==='rahul').pop();

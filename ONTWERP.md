@@ -469,7 +469,12 @@ integratie- en browserproeven staan in `test/rtg-edge-2.test.js`,
 - Geen grote massieve rode knoppen. Bordeaux is een signatuur, selectie of
   dunne actielijn; primaire acties blijven rustig omlijnd.
 - Fotografie geeft context en sfeer, nooit een verzonnen status of cijfer.
-- Rechte hoeken, dunne lijnen en één duidelijke hiërarchie blijven verplicht.
+- Operationele inhoud houdt rechte hoeken en dunne lijnen. De op 20 september
+  2026 goedgekeurde fotografische homes van TravelOS, WorkOS en FoundationOS
+  gebruiken de centrale rol `--rtg-radius-editorial` (16px) voor hun fotokaarten
+  en begeleidende inhoud. Alleen `rtg-world-home.css` mag deze rol toepassen;
+  de gewone inhoudsrol en systeemrol blijven ongewijzigd. Eén duidelijke
+  hiërarchie blijft verplicht.
 - Een status blijft woord plus teken plus, als derde laag, kleur.
 
 De oudere toewijzingen in `rtg-worlds-2026.css` blijven uitsluitend bestaan

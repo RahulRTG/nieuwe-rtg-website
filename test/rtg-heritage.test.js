@@ -40,7 +40,7 @@ test('vier vaste werelden delen één volledige token- en dieptegrammatica', () 
     assert.match(blok[1], /--rtg-world-photo:url\(/, wereld + ' mist wereldfotografie');
   }
   for (const token of ['--rtg-depth-content:', '--rtg-depth-focus:', '--rtg-depth-system:',
-    '--rtg-radius-content:2px', '--rtg-radius-system:22px', '--rtg-target:48px']) {
+    '--rtg-radius-content:2px', '--rtg-radius-editorial:16px', '--rtg-radius-system:22px', '--rtg-target:48px']) {
     assert.ok(TOKENS.includes(token), token + ' ontbreekt');
   }
 });

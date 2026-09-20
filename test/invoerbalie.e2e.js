@@ -50,6 +50,7 @@ test('de invoerbalie leest voor, zegt wat onzeker is, en voegt pas toe na bevest
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
+    await page.locator('#worldTravelImport > summary').click();
     await page.waitForSelector('#invLees', { timeout: 20000 });
 
     await page.fill('#invTekst', PAS);

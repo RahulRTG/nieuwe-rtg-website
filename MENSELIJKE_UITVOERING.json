@@ -23,13 +23,13 @@
   "server/kern/stuur/menstaal.json": "a5d240eb89cff875",
   "MENSTAALPROEF.json": "caa68eed7e367159",
   "MENSMUTATIE.json": "4c4b63bd6cda5bf4",
-  "PAKTE.json": "b6b6c84ac29f7ad7",
+  "PAKTE.json": "ee5850fbdedbe1ef",
   "scripts/menselijkeuitvoering.js": "b211632b87591468"
  },
  "gemetenOp": {
   "MENSTAALPROEF.json": "c0ff8b2c",
   "MENSMUTATIE.json": "5283e3ac",
-  "PAKTE.json": "c933e406"
+  "PAKTE.json": "6083f652"
  },
  "eenLeeftijd": false,
  "telling": {

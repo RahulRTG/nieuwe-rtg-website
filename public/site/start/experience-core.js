@@ -13,7 +13,7 @@
     foundation: { name: 'FoundationOS', description: 'Altijd 100% gratis' }
   });
   var SCENARIOS = Object.freeze({
-    travel: { world: 'travel', title: 'Amsterdam ↗ Ibiza', intro: 'Vrijdag. Twee personen. Eén plan waarin alles samenkomt.', label: 'Vertrek in dit voorbeeld', options: [['early', 'Vrijdagmiddag'], ['late', 'Vrijdagavond']] },
+    travel: { world: 'travel', title: 'Amsterdam naar Ibiza', intro: 'Vrijdag. Twee personen. Eén plan waarin alles samenkomt.', label: 'Vertrek in dit voorbeeld', options: [['early', 'Vrijdagmiddag'], ['late', 'Vrijdagavond']] },
     dinner: { world: 'living', title: 'Samen aan tafel', intro: 'Acht personen. Een avond om bij elkaar te zijn.', label: 'Eten in dit voorbeeld', options: [['standard', 'Gedeeld menu'], ['vegetarian', 'Vegetarisch menu']] },
     work: { world: 'work', title: 'Een zaak, één overzicht', intro: 'Een restaurant. Veertig medewerkers. Een vrijdag die om afstemming vraagt.', label: 'Bezetting in dit voorbeeld', options: [['busy', 'Een teamlid valt uit'], ['covered', 'Een vervanger is beschikbaar']] },
     family: { world: 'foundation', title: 'Ruimte voor uw gezin', intro: 'Een schoolmoment, een werkdag en vervoer dat moet aansluiten.', label: 'Schoolmoment in dit voorbeeld', options: [['afternoon', 'Vrijdag om 15:00'], ['evening', 'Vrijdag om 18:00']] }

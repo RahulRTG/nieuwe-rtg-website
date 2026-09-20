@@ -212,7 +212,9 @@ test('de publieke verhaalpagina\'s dragen de taalrail', () => {
     for (const naam of fs.readdirSync(path.join(ROOT, map))) {
       if (!naam.endsWith('.html')) continue;
       const html = fs.readFileSync(path.join(ROOT, map, naam), 'utf8');
-      if (!/<script[^>]+src="[^"]*shared\/i18n\.js"/.test(html)) zonder.push(map + '/' + naam);
+      if (!/<script[^>]+src="[^"]*shared\/i18n\.js(?:\?v=[A-Za-z0-9._-]+)?"/.test(html)) {
+        zonder.push(map + '/' + naam);
+      }
     }
   }
   assert.deepEqual(zonder, []);

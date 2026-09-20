@@ -9,7 +9,7 @@
   <title>FoundationOS | Rahul Travel Group</title>
   <link rel="icon" href="../../icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../start/start-base.css">
-  <link rel="stylesheet" href="./world.css?v=20260907">
+  <link rel="stylesheet" href="./world.css?v=20260920-text3">
 </head>
 <body class="world-story" data-world="foundation">
   <a class="skip-link" href="#verhaal">Ga naar de inhoud</a>
@@ -17,13 +17,13 @@
     <section class="world-hero" aria-labelledby="wereldtitel">
       <header class="world-header">
         <a class="brand" href="../../../" aria-label="Rahul Travel Group, naar de startpagina"><span class="brand-name">Rahul Travel Group</span><span class="brand-slogan">EXPERIENCE THE ELITE CLASS</span></a>
-        <div class="world-header-actions"><a class="world-back" href="../../../#werelden">← Vier werelden</a><a class="login-link" href="https://app.rahultravelgroup.com/apps/foundation/index.html">Open FoundationOS</a></div>
+        <div class="world-header-actions"><a class="world-back" href="../../../#werelden">Vier werelden</a><button type="button" class="login-link language-link" data-language-picker aria-label="Taal kiezen">Taal</button><a class="login-link" href="https://app.rahultravelgroup.com/apps/foundation/index.html">Open FoundationOS</a></div>
       </header>
       <div class="world-hero-inner">
         <div class="world-hero-copy">
           <p class="world-label">FoundationOS <span>04</span></p>
           <h1 id="wereldtitel">Vooruitgang die niemand uit beeld laat verdwijnen.</h1>
-          <p class="world-lead">FoundationOS verbindt gezin, onderwijs, buurt en maatschappelijke organisaties rond wat een mens of gemeenschap werkelijk nodig heeft. Met waardigheid, menselijke beoordeling en zichtbaar resultaat als uitgangspunt.</p><p class="world-lead"><strong>FoundationOS is en blijft altijd 100% gratis.</strong> Alle onderdelen, zonder betaalde laag, upgrade of verplichte betaalde pas.</p>
+          <p class="world-lead">FoundationOS verbindt gezin, onderwijs, buurt en maatschappelijke organisaties rond wat een mens of gemeenschap nodig heeft. Waardigheid, menselijke beoordeling en zichtbaar resultaat staan voorop.</p><p class="world-lead"><strong>FoundationOS is en blijft altijd 100% gratis.</strong> Alle onderdelen zijn gratis, zonder upgrade of verplichte betaalde pas.</p>
           <div class="world-actions"><a class="button button-primary" href="https://app.rahultravelgroup.com/apps/foundation/index.html">Open FoundationOS</a><a class="button button-ghost" href="#verhaal">Lees het verhaal</a></div>
         </div>
       </div>
@@ -40,9 +40,9 @@
             </div>
           </div>
           <div class="outcomes">
-            <article class="outcome"><span class="outcome-number">01</span><h3>Hulp dichterbij</h3><p>Gezinnen, scholen, vrijwilligers en organisaties vinden sneller de juiste route en weten wat de volgende stap is.</p></article>
-            <article class="outcome"><span class="outcome-number">02</span><h3>Waardigheid voorop</h3><p>Ondersteuning vertrekt vanuit context en toestemming, niet vanuit automatische etiketten of een verborgen mensscore.</p></article>
-            <article class="outcome"><span class="outcome-number">03</span><h3>Resultaat zichtbaar</h3><p>Projecten, middelen en afspraken kunnen aantoonbaar worden gevolgd zonder de mensen achter het doel uit het oog te verliezen.</p></article>
+            <article class="outcome"><span class="outcome-number">01</span><h3>Hulp dichterbij</h3><p>Gezinnen, scholen, vrijwilligers en organisaties vinden sneller de juiste ingang en weten wat de volgende stap is.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>FoundationOS heeft aparte ingangen voor gezin, onderwijs, zorg en plaatselijke hulp. De app kan een mogelijkheid tonen, maar de betrokken persoon of organisatie beslist of hulp beschikbaar is.</p><span class="proof-source">server/foundation/gezin.js; server/foundation/onderwijs.js; server/foundation/zorg.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">02</span><h3>Waardigheid voorop</h3><p>Ondersteuning begint bij de situatie en toestemming van een mens, niet bij automatische etiketten of een verborgen score.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>De toegang voor gezinnen bepaalt per rol welke gegevens zichtbaar zijn. De code bevat geen algemene score die zelfstandig hulp of rechten toekent.</p><span class="proof-source">server/foundation/gezinstoegang.js; server/middleware/foundation-veilige-uitgangen.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">03</span><h3>Resultaat zichtbaar</h3><p>Projecten, middelen en afspraken kunnen aantoonbaar worden gevolgd zonder de mensen achter het doel uit het oog te verliezen.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Foundation heeft onderdelen voor kosten, projecten en voortgang. We tonen geen resultaatcijfer zonder meting en controleerbare registratie.</p><span class="proof-source">server/foundation/kosten.js; server/foundation/vooruit.js</span></details></article>
           </div>
         </div>
       </section>
@@ -63,10 +63,10 @@
             <p>FoundationOS brengt maatschappelijke mogelijkheden samen rond gezinnen, buurten en projecten, met passende toegang voor iedere rol.</p>
           </div>
           <div class="capability-grid">
-            <article class="capability"><h3>Gezin &amp; leren</h3><p>Onderwijs, ontwikkeling, gezinsafspraken en passende ondersteuning in een begrijpelijke gezamenlijke context.</p></article>
-            <article class="capability"><h3>Veiligheid &amp; welzijn</h3><p>Signalen, hulpvragen en opvolging zorgvuldig organiseren met menselijke beoordeling en duidelijke bevoegdheden.</p></article>
-            <article class="capability"><h3>Buurt &amp; initiatief</h3><p>Lokale projecten, samenwerking, buurtruil en praktische hulp zichtbaar en toegankelijk maken.</p></article>
-            <article class="capability"><h3>Onderzoek &amp; verantwoording</h3><p>Vrijwilligers, donateurs, klimaat, onderzoek en middelen verbinden aan doelen waarvan de voortgang controleerbaar is.</p></article>
+            <article class="capability"><h3>Gezin en leren</h3><p>Onderwijs, ontwikkeling, gezinsafspraken en passende ondersteuning in een begrijpelijk gezamenlijk overzicht.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Gezin, onderwijs en leeftijdsgroepen hebben elk hun eigen onderdeel. School en gezin krijgen alleen toegang tot de informatie die zij voor hun rol nodig hebben.</p><span class="proof-source">server/foundation/gezin.js; server/foundation/onderwijs.js; server/foundation/leeftijdsgroepen.js</span></details></article>
+            <article class="capability"><h3>Veiligheid en welzijn</h3><p>Signalen, hulpvragen en opvolging zorgvuldig organiseren met menselijke beoordeling en duidelijke bevoegdheden.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Veiligheidsmeldingen, zorg en gezinsondersteuning worden apart verwerkt. Een signaal kan worden vastgelegd en opgevolgd, maar een bevoegde persoon maakt de uiteindelijke beoordeling.</p><span class="proof-source">server/school/veiligheid-incident.js; server/foundation/zorg.js</span></details></article>
+            <article class="capability"><h3>Buurt en initiatief</h3><p>Lokale projecten, samenwerking, buurtruil en praktische hulp zichtbaar en toegankelijk maken.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>De Foundation-markt en gezinshulp kunnen aanbod en hulpvragen tonen. Een publicatie of reactie is nog geen bevestigde match, levering of professionele hulp.</p><span class="proof-source">server/foundation/markt.js; server/foundation/gezinshulp.js</span></details></article>
+            <article class="capability"><h3>Onderzoek en verantwoording</h3><p>Vrijwilligers, donateurs, klimaat, onderzoek en middelen verbinden aan doelen waarvan de voortgang controleerbaar is.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Kosten, bijdragen en voortgang kunnen apart worden geregistreerd. De website trekt daar niet zelf een conclusie over maatschappelijke gevolgen uit. Onbekende resultaten blijven onbekend.</p><span class="proof-source">server/foundation/kosten.js; server/foundation/kostenpoort.js</span></details></article>
           </div>
         </div>
       </section>
@@ -86,6 +86,6 @@
        pagina is die een bezoeker van buiten Nederland ziet. Dezelfde laag als
        de voordeur (index.html) en als elk appscherm; hij vraagt de server pas
        iets zodra er werkelijk een andere taal is gekozen. -->
-  <script src="../../shared/i18n.js" defer></script>
+  <script src="../../shared/i18n.js?v=20260920-language-panel" defer></script>
 </body>
 </html>

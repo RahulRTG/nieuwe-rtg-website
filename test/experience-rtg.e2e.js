@@ -65,7 +65,7 @@ test('Experience RTG: real public route, one Edge, interactive demos and explici
       await page.locator('#confirmExample').click();
       assert.match(await page.locator('#exampleReceipt').innerText(), /niets geboekt, betaald, verstuurd of gedeeld/);
       await page.keyboard.press('Escape');
-      await go(page, /Privacy & regie/);
+      await go(page, /Privacy en regie/);
       await page.locator('#allowCalendar').uncheck();
       await page.locator('#allowLocation').uncheck();
       await actions(page, 'Bekijk het veranderde voorstel');

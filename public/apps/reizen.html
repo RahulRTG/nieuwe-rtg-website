@@ -17,16 +17,19 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
-<link href="/images/worlds/heritage/travel-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
+<link href="/images/world-homes/travel.webp" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
 <link href="/shared/rtg-anchor-experiences-2026.css" rel="stylesheet">
 <link rel="stylesheet" href="/shared/rtg-world-start.css">
 <script src="/shared/rtg-world-start.js" defer></script>
 
 <script>setTimeout(function(){var b=document.body;if(b&&b.getAttribute("data-rtg-world-start")==="loading"){b.setAttribute("data-rtg-world-start","ready");b.removeAttribute("aria-busy");var l=b.querySelector(".rtg-world-start");if(l)l.hidden=true;}},12500);</script>
+<link href="/shared/rtg-world-home.css" rel="stylesheet">
+<script src="/shared/rtg-world-home-copy.js"></script>
+<script src="/shared/rtg-world-home.js"></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-travel-experience" data-rtg-world="travel" data-rtg-world-dashboard="travel" data-rtg-eigenvlak="bordeaux" data-rtg-vandaag-luxe data-rtg-edge-2-context="travel-header,hoofdtabs" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
+<body data-world-home="travel" class="rtg-stijl rtg-travel-experience" data-rtg-world="travel" data-rtg-world-dashboard="travel" data-rtg-eigenvlak="bordeaux" data-rtg-vandaag-luxe data-rtg-edge-2-context="travel-header,hoofdtabs" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
 <div class="rtg-world-start" role="status" aria-live="polite"><span class="rtg-world-start-brand" aria-hidden="true"><strong>Rahul Travel Group</strong><span>Experience the elite class</span></span><span class="rtg-world-start-status">TravelOS wordt klaargezet…</span></div>
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
@@ -61,7 +64,30 @@
   </nav>
 
   <main id="inhoud">
-    <section class="appblad actief" data-blad="vandaag" aria-labelledby="travelBelofte">
+    <section class="appblad actief" data-blad="vandaag" aria-labelledby="worldTravelTitle">
+      <div class="wh-home">
+        <p class="wh-eyebrow" data-wh-copy="yourJourneys">Uw reizen, bij elkaar</p>
+        <div class="wh-stories" aria-label="Ideeën voor uw reis">
+          <a class="wh-story" href="/apps/reisbureau.html"><img src="/images/world-homes/travel.webp" alt="" width="1056" height="1408"><span data-wh-copy="inspiration">Reisinspiratie</span></a>
+          <a class="wh-story" href="/apps/hotels.html"><img src="/images/travelos/ibiza-villa.jpg" alt="" width="960" height="720" loading="lazy"><span data-wh-copy="stays">Verblijven</span></a>
+          <a class="wh-story" href="/apps/ov.html"><img src="/images/travelos/coastal-train.jpg" alt="" width="960" height="720" loading="lazy"><span data-wh-copy="onTheWay">Onderweg</span></a>
+          <a class="wh-story" href="/apps/reisboek.html"><img src="/images/travelos/travel-documents.jpg" alt="" width="960" height="720" loading="lazy"><span data-wh-copy="travelBook">Uw reisboek</span></a>
+        </div>
+        <div class="wh-travel-layout">
+          <section class="wh-photo wh-travel-hero" aria-labelledby="worldTravelTitle">
+            <img src="/images/world-homes/travel.webp" alt="" width="1056" height="1408" fetchpriority="high">
+            <div class="wh-photo-copy"><p class="wh-eyebrow" data-wh-copy="nextTrip">Uw volgende reis</p><h1 id="worldTravelTitle" data-wh-copy="travelTitle">Even helemaal ergens anders.</h1></div>
+            <div class="wh-travel-bottom"><div id="worldTravelDetail" hidden></div><p id="worldTravelMessage" role="status" data-wh-copy="loading">Uw gegevens worden opgehaald.</p><a id="worldTravelAction" class="wh-link" href="/apps/reisbureau.html">Bespreek uw reiswens <span aria-hidden="true">↗</span></a></div>
+            <span class="wh-caption" data-wh-copy="atmosphere">Sfeerbeeld</span>
+          </section>
+          <section class="wh-travel-help" aria-labelledby="worldTravelHelp"><h2 id="worldTravelHelp" data-wh-copy="travelHelp">Alles voor onderweg.</h2>
+            <a class="wh-service" href="/apps/reisboek.html"><div><h3 data-wh-copy="travelBook">Uw reisboek</h3><p data-wh-copy="documents">Bewaar uw plannen en documenten bij elkaar.</p></div><span aria-hidden="true">›</span></a>
+            <a class="wh-service" href="#reizen"><div><h3 data-wh-copy="nextStep">Uw volgende stap</h3><p data-wh-copy="prepare">Bekijk wat u voor vertrek wilt regelen.</p></div><span aria-hidden="true">›</span></a>
+            <a class="wh-service" href="/apps/reisbureau.html"><div><h3 data-wh-copy="whereNext">Waar wilt u hierna naartoe?</h3><p data-wh-copy="ideas">Ontdek nieuwe mogelijkheden die bij u passen.</p></div><span aria-hidden="true">↗</span></a>
+          </section>
+        </div>
+      </div>
+      <details class="wh-details"><summary data-wh-copy="travelDetails">Uw reismomenten en reisstatus</summary>
       <div class="bladbinnen vandaagblad">
         <!-- HET DEK. Twee kolommen: links de reis, rechts de klok in een EIGEN
              paneel. Dat is geen opmaakvoorkeur maar de reparatie van een fout:
@@ -151,6 +177,7 @@
           </aside>
         </div>
       </div>
+      </details>
     </section>
 
     <section class="appblad" data-blad="reizen" aria-labelledby="titelReizen" hidden>
@@ -356,16 +383,6 @@
       </div>
     </section>
 
-    <!-- DEZE DRIE BLOKKEN STONDEN BUITEN DE SCHIL, en dat was geen opmaakdetail.
-         Ze kwamen met de samenvoeging mee en werden ACHTER de tabbalk geplakt,
-         achter </main> en achter </div> van .reisapp -- dus als kinderen van
-         <body>. De tweede </main> onderaan werd door de browser genegeerd.
-         Gevolg: ze misten de 104 pixels die .reisapp links vrijhoudt voor de
-         vaste tabbalk, en die balk (position:fixed, z-index 25) lag eroverheen.
-         Gemeten op 1280: #invoer stond op x 0 met breedte 1280 en de knop "Voeg
-         toe aan mijn reizen" ving zijn klik niet meer op -- een hoofdhandeling
-         die niet werkt. Ze staan nu IN main, na de vier tabbladen, dus zichtbaar
-         ongeacht welke tab actief is; dat is hoe de toets ze ook gebruikt. -->
   <!-- DE REISWACHT (REIZEN.md fase 3). Uitzonderingsgestuurd: alleen wat
        aandacht vraagt staat erin, en rust is een uitkomst -- die wordt dan ook
        gewoon gezegd. Onderaan staan de bronnen, INCLUSIEF de bronnen die er
@@ -377,6 +394,9 @@
   <div id="wacht"><p class="stil">Laden...</p></div>
   </section>
 
+  </div>
+  <details class="wh-details" id="worldTravelImport">
+  <summary data-wh-copy="addBooking">Voeg uw eigen boeking toe</summary>
   <section class="dagkaart">
 
   <!-- DE INVOERBALIE (REIZEN.md fase 2). Hier komt een reis binnen die ergens
@@ -405,8 +425,9 @@
       <a href="/apps/reisuitnodiging.html">Bekijk of trek uw uitnodigingen in</a>.</p>
   </div>
   </section>
-  </div>
+  </details>
 
+  <details class="wh-details"><summary data-wh-copy="travelCatalogue">Verken alle reismogelijkheden</summary>
   <div class="regkop"><h2>De reiswereld</h2></div>
   <div class="poorten" id="poorten"></div>
   <!-- ALLES IN DEZE WERELD, uit de bron (scripts/wereldrooster.js uit
@@ -429,6 +450,7 @@
     <a class="wrooster-kaart" href="/apps/flits.html"><span>Verkeer</span></a>
     <a class="wrooster-kaart" href="/apps/vluchten.html"><span>Vluchten</span></a>
   <!-- /WERELDROOSTER --></div>
+  </details>
   </main>
 
 </div>
@@ -666,6 +688,7 @@
      wanneer zij uit hetzelfde reisdossier komt dat het register tekent. Bij
      leegte of een mislukte bron blijft de kop expliciet neutraal. */
   function zetReisdek(reizen, toestand) {
+    RTGWorldHome.travel(reizen, toestand === 'fout' ? (token() ? 'error' : 'guest') : 'ready');
     const eerste = (reizen || [])[0];
     if (eerste) {
       const bestemming = String(eerste.bestemming || '').trim();
@@ -800,6 +823,7 @@
     }
   }
   laad();
+  $('[data-ververs-reizen]').addEventListener('click', laad);
 
   /* DE REISWACHT. Drie stukken, in deze volgorde: de signalen (alleen die),
      de rustzin als er niets is, en ALTIJD de bronnenregel eronder -- ook de

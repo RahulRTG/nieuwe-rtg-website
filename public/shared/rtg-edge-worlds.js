@@ -10,7 +10,7 @@
     return meta;
   }
   w.RTGEdgeWorlds = {
-    work: wereld({ naam: 'WORK OS', kort: 'WORK', kaart: 'WorkOS', huis: '/apps/kantoor.html', home: '/apps/werkruimte.html?gebied=kantoor', workspace: '/apps/werkruimte.html?gebied=kantoor', actie: 'Open werkbank' }, [
+    work: wereld({ naam: 'WORK OS', kort: 'WORK', kaart: 'WorkOS', huis: '/apps/kantoor.html', home: '/apps/kantoor.html', workspace: '/apps/werkruimte.html?gebied=kantoor', actie: 'Open werkbank' }, [
       ['Dag & team', [
         ['vandaag', 'Vandaag', 'home', '/apps/kantoor.html'], ['afdelingen', 'Afdelingen', 'grid', '/apps/kantoren.html'],
         ['personeel', 'Personeel', 'people', '/apps/personeel.html?kantoor=1'], ['agenda', 'Agenda', 'calendar', '/apps/agenda.html'],

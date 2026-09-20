@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-20T21:31:34.892Z",
-    "commit": "a09f87c29",
+    "op": "2026-09-20T21:51:33.956Z",
+    "commit": "f3ec5d889",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9922,7 +9922,7 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4,
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "world-widget-catalog.test.js": {

@@ -32,6 +32,7 @@ const kluis = require('./kluis');
 
 const mediaBestand = require('./media/bestand');
 const MIME = mediaBestand.MIME;
+const EXT_VAN_MIME = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 const URL_PREFIX = '/media/';
 
 /* De S3-laag (SigV4-ondertekening, configuratie en backend) staat als
@@ -98,8 +99,14 @@ function maakMedia({ dir, env }) {
     if (!m) return null;
     let buf;
     try { buf = Buffer.from(m[2], 'base64'); } catch (e) { return null; }
-    const opgeslagen = await bewaarBuffer(buf, m[1], maxBytes);
-    return opgeslagen && opgeslagen.naam;
+    if (!buf.length || (maxBytes && buf.length > maxBytes)) return null;
+    /* Bestaande domeinen sturen al jaren een gevalideerde image-data-URL. Hun
+       contract blijft MIME + base64; alleen de nieuwe rauwe bestandsingangen
+       gebruiken soortVanBuffer() om de bytes zelf te herkennen. Anders zou een
+       strengere uploadpoort oude huur-, schade- en profielfoto's stil breken. */
+    const naam = crypto.randomBytes(16).toString('hex') + '.' + EXT_VAN_MIME[m[1]];
+    await put(naam, kluis.versleutelBestand(buf, naam));
+    return naam;
   }
   async function bewaarPubliek(dataUrl, maxBytes) { const n = await bewaar(dataUrl, maxBytes); return n ? url(n) : null; }
   async function bewaarBestandPubliek(buf, opgegevenMime, grenzen) {

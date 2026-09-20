@@ -72,7 +72,11 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "berichten",
-      "url": "/apps/comm.html"
+      "url": "/apps/comm.html",
+      "woorden": [
+        "mensen",
+        "dichtbij"
+      ]
     },
     {
       "naam": "Bestellen",
@@ -471,9 +475,9 @@
       "sleutel": "sociaal",
       "url": "/apps/sociaal.html",
       "woorden": [
-        "wereld",
-        "zorgvuldig",
-        "dichtbij"
+        "mensen",
+        "maken",
+        "wereld"
       ]
     },
     {

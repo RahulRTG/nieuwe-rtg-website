@@ -214,6 +214,7 @@ body.rtg-social-elite{
 .sociaal-register #lijn,.sociaal-poorten .poorten{display:grid!important;grid-template-columns:1fr!important;gap:1px!important;background:var(--social-line)!important}
 .sociaal-register .vak,.sociaal-poorten .poort{margin:0!important;border:0!important;border-radius:0!important;background:#1d1512!important;color:var(--social-ivory)!important;box-shadow:none!important}
 .sociaal-register .vak .mom,.sociaal-poorten .poort{color:var(--social-ivory)!important}
+.sociaal-register .stil,.sociaal-poorten .poort>span:not(.ic){color:#cbbfb5!important}
 .sociaal-poorten .poort .ic{color:var(--social-gold)!important}
 
 @media(min-width:760px){

@@ -200,7 +200,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 388 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 395 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -7,21 +7,22 @@
 
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
+    var view = el.ownerDocument.defaultView || w;
     for (var p = el; p; p = p.parentElement) {
       if (p.hidden || p.inert || p.getAttribute('aria-hidden') === 'true') return false;
-      if (p !== root && !root.contains(p) && !p.matches('.rtg-edge-bottom,.rtg-edge-appslot') && w.getComputedStyle(p).display === 'none') return false;
-      if (p === el && p !== root && !el.matches('.cmd-balkblad,.cmd-balksluit') && w.getComputedStyle(p).display === 'none') return false;
+      if (p !== root && !root.contains(p) && !p.matches('.rtg-edge-bottom,.rtg-edge-appslot') && view.getComputedStyle(p).display === 'none') return false;
+      if (p === el && p !== root && !el.matches('.cmd-balkblad,.cmd-balksluit') && view.getComputedStyle(p).display === 'none') return false;
     }
     return el.isConnected;
   }
-  function sourceButtons() {
+  function sourceButtons(doc, embedded) {
     var out = [], tabs = new Set();
-    d.querySelectorAll(ROOTS).forEach(function (root) {
+    (doc || d).querySelectorAll(ROOTS + (embedded ? ',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]' : '')).forEach(function (root) {
       var controls = root.matches('button') ? [root] : root.querySelectorAll('button,a[href]');
       controls.forEach(function (el) {
         if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button')) return;
         var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
-        if (label(el) && available(el, root) && (!tab || !tabs.has(tab))) {
+        if (label(el) && available(el, root) && (!tab || !tabs.has(tab)) && !out.some(function (x) { return x.el === el; })) {
           out.push({ el: el, root: root }); if (tab) tabs.add(tab);
         }
       });
@@ -44,6 +45,7 @@
     }
     var focused = container.contains(d.activeElement) ? d.activeElement.dataset.cap : '';
     container.textContent = '';
+    if (w.RTGDesktopFrame && w.RTGDesktopFrame.controls(container, sourceButtons)) return;
     var A = w.RTGAdaptief;
     if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;
     var primary = d.querySelector('.rtg-edge-action');

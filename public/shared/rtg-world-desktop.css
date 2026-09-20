@@ -1,0 +1,82 @@
+/* Shared geometry, with the current world's heritage signature as a quiet accent. */
+.wd-shell{display:contents}
+.wd-people,.wd-favorites,.wd-library,.wd-greeting{display:none}
+body[data-rtg-desktop]{--wd-accent:var(--rtg-world-signature,var(--wh-gold));--wd-line:color-mix(in srgb,var(--wd-accent) 32%,#4b4133);--wd-surface:color-mix(in srgb,var(--wd-accent) 5%,#15130f)}
+body[data-rtg-desktop="foundation"]{--wd-surface:color-mix(in srgb,var(--rtg-world-bg,#071522) 90%,#161410)}
+body[data-world-home] .wd-shell [hidden]{display:none!important}
+.wd-shell :is(button,a,input):focus-visible{outline:2px solid var(--wh-gold);outline-offset:4px}
+.wd-focus{min-width:0;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);overflow:hidden;background:var(--wd-surface);scroll-margin-top:6rem}
+.wd-focus-head{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;padding:1rem 1.4rem;border-bottom:1px solid var(--wd-line)}
+.wd-focus-head h2{font:400 1.65rem/1.25 "Bodoni Moda",serif;color:var(--wh-ink);margin:0;margin-inline-end:auto}
+.wd-app-frame{width:100%;height:calc(100dvh - 17rem);min-height:34rem;display:block;border:0;background:var(--wh-bg)}
+.wd-frame-notice,.wd-direct,.wd-frame-retry{margin:1rem;line-height:1.6}
+.wd-shell .wd-text-button,.wd-shell .wd-frame-retry{font:500 .8rem/1.5 Inter,sans-serif;min-height:44px;padding:.5rem .2rem;border:0;border-bottom:1px solid var(--wd-line);border-radius:0;background:transparent;color:var(--wh-gold);cursor:pointer}
+.wd-announcement{grid-column:1/-1;line-height:1.6;padding:1rem;border:1px solid var(--wd-line);color:var(--wh-ink)}
+@media(min-width:1000px){
+  body.rtg-stijl[data-rtg-desktop]{padding-inline:0!important}
+  body[data-rtg-desktop] .rtg-edge-side{display:none!important}
+  body[data-rtg-desktop] .rtg-edge-crumbs,body[data-rtg-desktop] .rtg-edge-worldbar{display:none!important}
+  body[data-rtg-desktop] .rtg-edge-top{display:flex;align-items:center;padding-inline:1.6rem!important;min-height:4rem}
+  body[data-rtg-desktop] .rtg-edge-mark{display:flex;align-items:center;flex:0 0 auto;border:0;font-size:2.25rem;color:var(--wh-gold)!important}
+  body[data-rtg-desktop] .rtg-edge-state{margin-inline-start:auto}
+  body[data-rtg-desktop] .rtg-edge-mark::after{font:400 1rem/1.2 Inter,sans-serif}
+  body[data-rtg-desktop] .reisapp{max-width:none!important;width:auto!important;padding-inline:0!important}
+  body[data-rtg-desktop] .wd-shell{display:grid;grid-template-columns:minmax(190px,230px) minmax(0,1fr) minmax(220px,280px);align-items:start;gap:clamp(1rem,2vw,2rem);max-width:1680px;width:calc(100% - 3rem);margin:2rem auto 10rem;padding:0;isolation:isolate}
+  body[data-rtg-desktop] .wd-home,body[data-rtg-desktop] main.wd-home#inhoud,body[data-rtg-desktop] main.wd-home#hoofd{grid-column:2;min-width:0;width:100%;max-width:none!important;max-height:min(44rem,calc(100dvh - 15rem));margin:0!important;padding:0 .2rem .2rem!important;overflow:auto!important;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
+  body[data-rtg-desktop] .living-example-photo>img{height:clamp(360px,31vw,460px);aspect-ratio:auto}
+  body[data-rtg-desktop] .living-intro .momenten{padding-block:.5rem 1rem}
+  body[data-rtg-desktop] .living-intro .moment i{width:3.5rem;height:3.5rem}
+  body[data-rtg-desktop] .living-intro .moment img{width:3.5rem;height:3.5rem}
+  body[data-rtg-desktop] .living-feed-heading h2{font-size:2.3rem;margin:.5rem 0 1rem}
+  body[data-rtg-desktop] .wd-home .wh-travel-layout{display:block}
+  body[data-rtg-desktop] .wd-home .wh-travel-help{margin-top:1.5rem}
+  /* The expanded trip details now occupy one central column, not the viewport. */
+  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .dagdek{grid-template-columns:minmax(0,1fr)!important}
+  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .daghoofd{display:flex!important;flex-direction:column}
+  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .dagtitel{padding:1.25rem!important;align-self:stretch;pointer-events:auto}
+  body[data-rtg-desktop="travel"] .wd-home .travel-hero-actie{position:static!important;margin-top:1rem}
+  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .kaartraster{min-height:18rem!important}
+  body[data-rtg-desktop] .wd-home :is(.wh-photo,.wh-card){border-color:var(--wd-line)}
+  body[data-rtg-desktop] .wd-home .wh-home h1{font-size:clamp(2.6rem,3.3vw,4.2rem)}
+  body[data-rtg-desktop] .wd-home .wh-work-hero,body[data-rtg-desktop] .wd-home .wh-foundation-hero{min-height:31rem}
+  body[data-rtg-desktop] .wd-home .wh-pair{grid-template-columns:1fr}
+  body[data-rtg-desktop] .wd-home .living-intro{padding-inline:0}
+  body[data-rtg-desktop] .wd-people,body[data-rtg-desktop] .wd-favorites{display:block;position:sticky;top:6.5rem;min-width:0;max-height:calc(100dvh - 15rem);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
+  body[data-rtg-desktop] .wd-people{grid-column:1;grid-row:2;background:var(--wd-surface);border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);padding:1.15rem}
+  .wd-people .rtg-ss-module-head h3{font:400 1.8rem/1.2 "Bodoni Moda",serif;color:var(--wh-ink);margin:0 0 1.2rem}
+  .wd-people .rtg-module-head-tools{display:none}
+  .wd-people h4{margin:1.6rem 0 .5rem;font:500 .8rem/1.5 Inter,sans-serif;color:var(--wh-ink)}
+  .wd-shell .wd-muted{color:var(--wh-soft);font:400 .76rem/1.6 Inter,sans-serif;overflow-wrap:anywhere}
+  .wd-person{display:flex;align-items:flex-start;gap:.65rem;padding:1rem 0;border-bottom:1px solid var(--wd-line);color:var(--wh-ink);text-decoration:none;font:400 .82rem/1.5 Inter,sans-serif;overflow-wrap:anywhere}
+  .wd-person strong,.wd-person span.wd-muted{display:block}
+  .wd-avatar{display:grid;place-items:center;flex:0 0 2.2rem;width:2.2rem;height:2.2rem;border-radius:50%;border:1px solid var(--wd-line);background:color-mix(in srgb,var(--wd-accent) 22%,#32251b);color:var(--wh-gold)}
+  .wd-favorites{grid-column:3;grid-row:2}
+  .wd-greeting{display:grid;grid-template-columns:1fr auto;grid-column:1/-1;gap:.25rem 1rem;border-bottom:1px solid var(--wd-line);padding-bottom:1.1rem}
+  .wd-greeting h1{font:400 1.45rem/1.3 "Bodoni Moda",serif;color:var(--wh-ink);margin:0;letter-spacing:0;text-transform:none}
+  .wd-greeting time{font:400 .73rem/1.5 Inter,sans-serif;color:var(--wh-soft);grid-column:1}
+  .wd-greeting p{font:400 .7rem/1.5 Inter,sans-serif;color:var(--wh-gold);grid-column:2;grid-row:1/3;align-self:center;margin:0}
+  .wd-favorites h2{font:500 .68rem/1.6 Inter,sans-serif;letter-spacing:.15em;text-transform:uppercase;color:var(--wh-gold);margin:0 0 1rem}
+  .wd-shell .wd-widget{border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);background:var(--wd-surface);overflow:hidden;min-width:0;margin:0 0 .85rem;transition:border-color .2s,background .2s}
+  .wd-shell .wd-widget:hover{border-color:var(--wh-gold)}
+  .wd-shell .wd-widget-open{display:block;text-align:start;background:transparent;color:var(--wh-ink);width:100%;padding:1.05rem;border:0;min-width:0;cursor:pointer;font:400 .78rem/1.55 Inter,sans-serif;border-radius:0;box-shadow:none}
+  .wd-widget-title{display:flex;gap:.6rem;align-items:center;font-weight:600;margin-bottom:1rem}
+  .wd-expand{margin-inline-start:auto;color:var(--wh-gold)}
+  .wd-icon{display:inline-flex;flex:0 0 1rem;width:1rem;height:1rem;color:var(--wh-gold)}
+  .wd-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .wd-widget-parts{display:grid;gap:.7rem;min-height:3.8rem;align-content:start}
+  .wd-widget-parts>span{display:flex;align-items:center;gap:.65rem;overflow-wrap:anywhere}
+  .wd-widget-foot{display:block;border-top:1px solid var(--wd-line);padding-top:.7rem;margin-top:1rem;font-size:.68rem;color:var(--wh-soft)}
+  .wd-shell .wd-widget-pin{background:transparent;color:var(--wh-soft);font:400 .66rem/1.4 Inter,sans-serif;border:0;min-height:36px;padding:.5rem 1rem;text-align:start;width:100%;cursor:pointer;border-radius:0}
+  .wd-widget-pin[aria-pressed="true"]{color:var(--wh-gold)}
+  .wd-library{display:block;grid-column:1/-1;border-top:1px solid var(--wd-line);padding-top:1.6rem;scroll-margin-top:6rem}
+  .wd-library-heading{display:flex;justify-content:space-between;gap:2rem;align-items:center;margin-bottom:1.5rem}
+  .wd-library-heading h2{font:400 2.4rem/1.2 "Bodoni Moda",serif;color:var(--wh-ink);margin:0}
+  .wd-search-label{font:400 .7rem/1.4 Inter,sans-serif;color:var(--wh-soft)}
+  .wd-shell input.wd-search{display:block;margin-top:.4rem;width:280px;min-height:44px;border:1px solid var(--wd-line);background:var(--wd-surface);border-radius:var(--rtg-radius-editorial);color:var(--wh-ink);padding:.65rem .85rem;font:400 .85rem/1.5 Inter,sans-serif}
+  .wd-catalog{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+  .wd-pages{display:flex;justify-content:center;align-items:center;gap:1rem;color:var(--wh-soft);font:400 .75rem/1.5 Inter,sans-serif}
+  .wd-pages button{background:transparent;border:1px solid var(--wd-line);color:var(--wh-ink);border-radius:var(--rtg-radius-editorial);padding:.65rem .9rem;min-height:44px;cursor:pointer}
+  .wd-pages button:disabled{opacity:.45;cursor:default}
+  .wd-expanded .wd-focus{grid-column:2/4;grid-row:2}
+}
+@media(prefers-reduced-motion:reduce){.wd-shell *{transition:none!important;scroll-behavior:auto!important}}

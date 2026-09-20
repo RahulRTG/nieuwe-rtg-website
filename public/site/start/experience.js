@@ -5,6 +5,7 @@
   var E = w.RTGAdaptiveEdge;
   function announce(text) { $('experienceStatus').textContent = text; }
   function go(id) {
+    if (w.RTGPublicApp) { w.RTGPublicApp.open(id); return; }
     var target = $(id); if (!target) return;
     if (E) E.setState('dock');
     target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true });
@@ -13,23 +14,14 @@
   }
   function text(tag, value) { var el = d.createElement(tag); el.textContent = value; return el; }
   function renderProposal() {
-    var spec = C.SCENARIOS[s.scenario], proposal = C.proposal(s);
-    $('demoTitle').textContent = spec.title; $('demoWorld').textContent = C.WORLDS[spec.world].name;
-    $('demoIntro').textContent = spec.intro; $('demoOptionLabel').textContent = spec.label;
-    $('demoOption').replaceChildren();
-    spec.options.forEach(function (o) { var node = text('option', o[1]); node.value = o[0]; $('demoOption').appendChild(node); });
-    $('demoOption').value = s.option; $('demoSteps').replaceChildren();
-    proposal.rows.forEach(function (r) {
-      var li = d.createElement('li'); li.dataset.conflict = String(r.conflict);
-      li.append(text('small', r.world), text('strong', r.text)); $('demoSteps').appendChild(li);
-    });
-    $('demoResult').textContent = proposal.result;
+    var proposal = w.RTGStorylineStage.paint($('voorstel'), s);
     $('proposalSummary').replaceChildren(text('h3', proposal.title));
     var list = d.createElement('ul'); proposal.rows.forEach(function (r) { list.appendChild(text('li', r.text)); });
     $('proposalSummary').appendChild(list);
     $('exampleReceipt').textContent = s.confirmed ? 'Voorbeeld bevestigd. Er is niets geboekt, betaald, verstuurd of gedeeld.' : 'Deze bevestiging heeft uitsluitend effect in de demonstratie.';
     $('confirmExample').disabled = s.confirmed || proposal.conflict;
     $('confirmExample').textContent = s.confirmed ? 'Voorbeeld bevestigd' : proposal.conflict ? 'Los eerst het voorbeeldconflict op' : 'Bevestig dit voorbeeld';
+    d.dispatchEvent(new CustomEvent('rtg-public-state'));
   }
   function renderPersonal() {
     $('personalWorlds').replaceChildren();
@@ -76,7 +68,7 @@
     s = C.state(); currentWorld = 'living'; allFaq = false;
     $('intent').value = ''; $('faqSearch').value = ''; $('carryInterests').checked = false;
     $('accessGoal').value = 'explore'; $('accessGoal').dispatchEvent(new Event('change'));
-    ['allowCalendar', 'allowWork', 'allowLocation'].forEach(function (id) { $(id).checked = true; });
+    ['allowCalendar', 'allowWork', 'allowLocation'].forEach(function (id) { $(id).checked = !(w.RTGPublicApp && id === 'allowCalendar'); });
     $('intentFeedback').textContent = 'Uw verkenning is gereset. Probeer een reis, etentje, werkdag of gezinsmoment.';
     d.querySelectorAll('details').forEach(function (el) { el.open = false; });
     d.querySelector('[name="scenario"][value="travel"]').checked = true;
@@ -115,7 +107,9 @@
   function nextWorld(delta) { var keys = Object.keys(C.WORLDS); world(keys[(keys.indexOf(currentWorld) + delta + keys.length) % keys.length], false); }
   renderProposal(); renderPersonal(); renderWorld(); d.body.classList.add('experience-ready');
   w.RTGExperience = { go: go, choose: choose, world: world, nextWorld: nextWorld, reset: reset,
-    allQuestions: function () { allFaq = true; renderFaq(); go('vragen'); },
+    snapshot: function () { return JSON.parse(JSON.stringify(s)); },
+    permission: function (key, value) { var id = { calendar: 'allowCalendar', work: 'allowWork', location: 'allowLocation' }[key]; if (!id) return; $(id).checked = !!value; permissions(); },
+    allQuestions: function (navigate) { allFaq = true; renderFaq(); if (navigate !== false) go('vragen'); },
     explain: function () { $('personalWhy').open = true; go('uw-rtg'); },
     proposal: function () { renderProposal(); E.openPanel($('summaryPanel'), { title: 'Uw voorbeeldvoorstel', copy: 'Alles blijft binnen deze demonstratie.' }); },
     currentWorld: function () { return currentWorld; }

@@ -64,4 +64,18 @@ test.describe('workspace-accountwegen', () => {
     assert.equal(gelezen.status, 200); assert.equal(gelezen.body.audit[0].action, 'travel.driver.attach');
     assert.equal(gelezen.body.audit[0].detail, undefined);
   });
+
+  test('world widget preferences remain account-bound and independent of the command workspace', async () => {
+    const original = await api('/api/ik/workspace', {});
+    for (const scope of ['living', 'travel', 'work', 'foundation']) {
+      const saved = await api('/api/ik/workspace/zet', { scope, workspace: { order: [scope + '.agenda'], token: 'never-store' } });
+      assert.equal(saved.status, 200);
+      const read = await api('/api/ik/workspace', { scope });
+      assert.deepEqual(read.body.workspace.order, [scope + '.agenda']);
+      assert.equal(read.body.workspace.token, undefined);
+    }
+    assert.deepEqual((await api('/api/ik/workspace', {})).body.workspace, original.body.workspace);
+    assert.equal((await api('/api/ik/workspace', { scope: '__proto__' })).status, 400);
+    assert.equal((await api('/api/ik/workspace/zet', { scope: 'other-account', workspace: { order: ['agenda'] } })).status, 400);
+  });
 });

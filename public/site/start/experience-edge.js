@@ -1,5 +1,6 @@
 (function (w, d) {
   'use strict';
+  if (w.RTGPublicApp) return; // The public projection mounts the same shared Edge once.
   var X = w.RTGExperience, edge = w.RTGAdaptiveEdge, scenes = Array.from(d.querySelectorAll('[data-scene]'));
   if (!X || !edge) return;
   var index = 0, pending = false, lastScroll = w.scrollY;

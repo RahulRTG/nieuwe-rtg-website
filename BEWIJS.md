@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1949 bestanden en 13990 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1954 bestanden en 14003 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,12 +12,12 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1949 |
-| losse beweringen (`test(...)`) | 13990 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 154 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1305 |
+| toetsbestanden | 1954 |
+| losse beweringen (`test(...)`) | 14003 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 159 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1308 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 71 |
+| niet te meten (al rood, geen module gevonden, ...) | 73 |
 | alleen in de kop *genoemd*, nog niet gemeten | 167 |
 | niets van beide | 406 |
 
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1715 bestanden, 13580 beweringen.
+1716 bestanden, 13583 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1658,9 +1658,9 @@ toets omvalt.
 | `webplatform.test.js` | 28 | gezakt op `liegpoort /api/` | RTG WEB PLATFORM -- de automatische bedrijfssite en de browser die bedrijven begrijpt. Het principe onder deze laag is "automatic first, customizable forever": een partner krijgt uit zijn zaakprofiel in een keer een... |
 | `webpush.test.js` | 5 | gezakt op `&&->||#0` | Test voor onze eigen web-push (server/webpush.js), die het pakket `web-push` verving. Twee harde ijkpunten: 1. |
 | `website-aanvraag-handoff.test.js` | 2 | -- | De publieke website geeft een aanvraag browser-tot-browser door aan de app. Deze toets bewaakt de privacygrens en de enige ontvangende route: het fragment mag niet in serverlogs belanden en pas na inloggen mag... |
-| `website-codeproof.test.js` | 3 | -- | DE PUBLIEKE BLOKKEN ZEGGEN ALLEEN WAT DE CODE DRAAGT. Deze toets bewaakt dat ieder compact startblok en iedere resultaat- of mogelijkheidskaart verdieping heeft, en dat elk zichtbaar code-anker werkelijk in deze... |
-| `website-text-style.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `website-truth.test.js` | 5 | -- | DE WEBSITE VERTELT DE APPWAARHEID. Deze toets bewaakt de hele verbinding: de gegenereerde momentopname moet exact uit de wereld- en pasbronnen komen, iedere openbare pagina moet haar laden en alle pagina's moeten... |
+| `website-codeproof.test.js` | 3 | geen bronmutatie mogelijk | DE PUBLIEKE BLOKKEN ZEGGEN ALLEEN WAT DE CODE DRAAGT. Deze toets bewaakt dat ieder compact startblok en iedere resultaat- of mogelijkheidskaart verdieping heeft, en dat elk zichtbaar code-anker werkelijk in deze... |
+| `website-text-style.test.js` | 4 | geen bronmutatie mogelijk | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `website-truth.test.js` | 5 | gezakt op `===->!==#0` | DE WEBSITE VERTELT DE APPWAARHEID. Deze toets bewaakt de hele verbinding: de gegenereerde momentopname moet exact uit de wereld- en pasbronnen komen, iedere openbare pagina moet haar laden en alle pagina's moeten... |
 | `weigering-laat-niets-achter.test.js` | 4 | genoemd | EEN WEIGERING LAAT NIETS ACHTER. PROOF.md paragraaf 9: degraderen gaat naar de veiligste toestand, en de veiligste toestand van een geweigerd verzoek is dat het nooit heeft plaatsgevonden. |
 | `wekdekking.test.js` | 5 | gezakt op `===->!==#0` | DE WEKDEKKING: houdt het besluit de code bij, en houdt de code het besluit bij? scripts/wekdekking.js zegt vandaag `zonderUitspraak: 0`. |
 | `wekkers.test.js` | 6 | gezakt op `===->!==#0` | DE WEKKERMETER -- en of hij werkelijk iets onderscheidt. scripts/wekkers.js telt wat werk kan beginnen zonder dat iemand een pad opvraagt: een klok, een busabonnee, een webhook. |
@@ -1718,7 +1718,8 @@ toets omvalt.
 | `workspace-contract.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `workspace-platform.test.js` | 5 | -- | De platformgrenzen onder de Dynamic Layer: versiecontract, Event Fabric, Action Broker, centrale state, orchestration en declaratieve blueprints. |
 | `workspace-server-platform.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `workspace-voorkeur.test.js` | 4 | -- | De Adaptive Workspace bewaart compositie en niets anders. Dit toetst zowel de pure grens als de twee accountwegen die Continuity gebruikt. |
+| `workspace-voorkeur.test.js` | 5 | gezakt op `liegpoort /api/` | De Adaptive Workspace bewaart compositie en niets anders. Dit toetst zowel de pure grens als de twee accountwegen die Continuity gebruikt. |
+| `world-widget-catalog.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `writehealth-lus.test.js` | 5 | gezakt op `===->!==#0` | DE SCHRIJFPOORT MAG ZIJN EIGEN GESLOTEN TOESTAND NIET ALS NIEUWE STORING LEZEN. Gemeten in de 100M-ronde van 9 september 2026: de poort sloot 89 keer, en 45 van die sluitingen droegen als reden "collectietransactie:... |
 | `zaaihash.test.js` | 5 | gezakt op `liegpoort /api/` | DE ZAAI-HASH, EN DE GRENS ERONDER. De demo-seed maakte bij elke serverstart 220 scrypt-hashes voor 4 verschillende wachtwoorden. |
 | `zaak-balie.test.js` | 7 | gezakt op `liegpoort /api/` | DE BALIE VAN EEN ZAAK -- 7 endpoints uit de supplier-groep. agenda/toevoegen, agenda/wijzig, agenda/verwijder, ticket/add, ticket/status, lost/add en lost/done stonden als nooit aangeroepen in de waargenomen... |
@@ -1755,7 +1756,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-234 bestanden, 410 beweringen.
+238 bestanden, 420 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1954,6 +1955,7 @@ toets omvalt.
 | `spelteams.e2e.js` | 1 | gezakt op `liegpoort /api/` | TEAMS IN EEN ECHTE BROWSER. De serverkant is los nagemeten (test/spelteams.test.js). |
 | `sprong.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE SPRONG: via Edge naar elke functie, vanaf elk scherm. Deze toets bewaakt de belofte die scripts/tikken.js meet. |
 | `staff-account-scherm.e2e.js` | 1 | -- | De leverancierdeur in een echte browser: productie-UI vraagt geen viercijferige staff-PIN en het hoofdformulier belt uitsluitend aan bij de persoonlijke RTG-accountingang. De server draait in Magnaat Test zodat een... |
+| `storyline-worlds.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `taalkast.e2e.js` | 1 | gezakt op `liegpoort /api/` | WAT DE 114 TALEN KOSTTEN, EN WAAROM DAT NIET MEER ZO IS. De automatische vertaallaag bewaarde zijn vertalingen in een Map in de scope van de pagina. |
 | `tijdlijn-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/tijdlijn.html. De belofte van dit scherm is dat het NIETS verzint: wat er staat komt uit een laag die het lid al had, en er wordt geen verband en geen score bij verzonnen. |
 | `toegankelijk-scherm.e2e.js` | 1 | -- | De belofte van het toegankelijkheidsprofiel is "op elk scherm van RTG", en dat is precies wat een servertoets niet kan zien. Deze toets zet de instelling op de ene pagina (apps/ik.html) en kijkt of hij doorwerkt op... |
@@ -1988,6 +1990,9 @@ toets omvalt.
 | `werktafel.e2e.js` | 4 | genoemd | DE WERKTAFEL: wanneer hij er WEL mag staan, en wanneer niet. Deze toets bestaat om twee fouten die alleen op een breed venster bestonden, en die daarom niemand zag: de app wordt op een telefoon ontwikkeld en op een... |
 | `winkel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE WINKEL VAN DE RTFOUNDATION (/apps/foundation/winkel.html) IN EEN ECHTE BROWSER. kern/rtfos/winkel.js draagt vier grendels en test/rtfos-gift-ruil-routes.test.js beproeft ze over de draad: geen voorraad geen... |
 | `world-dashboard.e2e.js` | 1 | -- | DE VIER WERELDHOMES ZIJN HUN EIGEN DASHBOARD. Deze proef bewaakt de grens die bij de nieuwe schil het makkelijkst weer vervaagt: de gedeelde laag mag de echte Living-, Work-, Travel- en Foundation-DOM alleen opmaken. |
+| `world-desktop-identity.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `world-desktop-state.e2e.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `world-desktop.e2e.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `world-homes.e2e.js` | 4 | -- | Approved homes must retain real data, language state and the shared Edge. AI is off: built-in copy must still work and photos must never invent trips. |
 | `zaakpay.e2e.js` | 2 | genoemd | Schermtoets voor RTG Pay aan de ZAAKKANT (public/apps/zaakpay.html). Dit scherm bestond niet. |
 | `zaakregie.e2e.js` | 2 | -- | Schermtoets voor de Regie van de zaak: hetzelfde scherm hangt in de zaak-app (leverancier.html, breed) en in de personeels-PDA (personeel.html, duimstand), en beide moeten opkomen zonder onopgevangen JS-fouten.... |

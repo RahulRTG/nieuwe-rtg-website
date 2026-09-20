@@ -1,0 +1,5550 @@
+{
+  "version": 1,
+  "apps": [
+    {
+      "id": "agenda",
+      "url": "/apps/agenda.html",
+      "name": "Agenda",
+      "world": "living",
+      "worlds": [
+        "living",
+        "travel",
+        "work",
+        "foundation"
+      ],
+      "type": "calendar",
+      "icon": "calendar-days",
+      "sections": [
+        "Weekagenda",
+        "Deelnemers",
+        "Herinneringen"
+      ],
+      "description": "Maand, week en lijst; uitnodigen op codenaam, herinneringen, en je RTG-boekingen staan er vanzelf in.",
+      "maturity": "L0"
+    },
+    {
+      "id": "app",
+      "url": "/apps/app.html",
+      "name": "Mijn RTG",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Jouw reis.",
+        "Betalen.",
+        "Jouw AI."
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "appcel",
+      "url": "/apps/appcel.html",
+      "name": "App Store · cel",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Benodigde gegevens",
+        "Machtigingen",
+        "Uw akkoord"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "appstore-dossier",
+      "url": "/apps/appstore-dossier.html",
+      "name": "App-dossier",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Appdossier",
+        "Gegevensgebruik",
+        "Toestemmingen"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "appstore-kantoor",
+      "url": "/apps/appstore-kantoor.html",
+      "name": "Appkeuring",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Wachtrij",
+        "Toestemmingen",
+        "Uw oordeel"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "appstore-uitgever",
+      "url": "/apps/appstore-uitgever.html",
+      "name": "App Store · uitgever",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw app",
+        "Versies",
+        "Keuring"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "architect-pda",
+      "url": "/apps/architect-pda.html",
+      "name": "RTG Architect PDA",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw project",
+        "Inspectie",
+        "Notities en beelden"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "arrival",
+      "url": "/apps/arrival.html",
+      "name": "Aankomst",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "stay",
+      "icon": "bed-double",
+      "sections": [
+        "Uw aankomst",
+        "Gedeelde voorkeuren",
+        "Benodigde toestemming"
+      ],
+      "description": "Uw verblijf en aankomst rustig voorbereid.",
+      "maturity": "L0"
+    },
+    {
+      "id": "attenties",
+      "url": "/apps/attenties.html",
+      "name": "Attenties",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Belangrijke datum",
+        "Voorkeuren",
+        "Eerdere attenties"
+      ],
+      "description": "Uw relatiebeheer: per relatie de band, de belangrijke data en hun voorkeuren, plus de giftgeschiedenis zodat u nooit twee keer hetzelfde geeft.",
+      "maturity": "L0"
+    },
+    {
+      "id": "avond",
+      "url": "/apps/avond.html",
+      "name": "Een avond",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Wat voor avond wordt het?",
+        "Het voorstel",
+        "Wat er loopt"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "backoffice",
+      "url": "/apps/backoffice.html",
+      "name": "Backoffice",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Actiecentrum Dagbriefing",
+        "Live onderweg",
+        "Partnerprestaties"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "belastingkantoor",
+      "url": "/apps/belastingkantoor.html",
+      "name": "Belastingkantoor (inspecteur)",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw dossier",
+        "Documenten",
+        "Besluiten"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "bestanden",
+      "url": "/apps/bestanden.html",
+      "name": "Bestanden",
+      "world": "work",
+      "worlds": [
+        "living",
+        "travel",
+        "work",
+        "foundation"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "Uw mappen",
+        "Uw documenten",
+        "Toegang"
+      ],
+      "description": "De versleutelde kluis: mappen, versies, delen op codenaam en een prullenbak die 30 dagen bewaart. Je Office-werk staat er vanzelf bij.",
+      "maturity": "L0"
+    },
+    {
+      "id": "bestellen",
+      "url": "/apps/bestellen.html",
+      "name": "Bestellen",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Iets bijzonders, zo bij je thuis.",
+        "Ontdek restaurants",
+        "Kies een restaurant"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "bewijsmap",
+      "url": "/apps/bewijsmap.html",
+      "name": "Bewijsmap",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "Wat u kunt aantonen",
+        "Wie er iets van u kreeg",
+        "Waar deze lijst ophoudt"
+      ],
+      "description": "Uw documenten, versies en gedeelde toegang.",
+      "maturity": "L0"
+    },
+    {
+      "id": "boardroom",
+      "url": "/apps/boardroom.html",
+      "name": "Boardroom",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Besluitagenda",
+        "Ledenregister",
+        "Afwegingen"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "boeken",
+      "url": "/apps/boeken.html",
+      "name": "Boeken",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Voor u",
+        "Bewaard",
+        "Recent"
+      ],
+      "description": "De huisbibliotheek plus je eigen tekstbestanden uit de kluis, met een rustige lezer. Alleen je leesplek reist mee; geen leesdoelen, geen reeksen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "browser",
+      "url": "/apps/browser.html",
+      "name": "RTG Browser",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "library",
+      "icon": "book-open",
+      "sections": [
+        "Uw websites",
+        "Bewaard",
+        "Recent bekeken"
+      ],
+      "description": "Blader door de sites die leden in het RTG-web publiceren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "camera",
+      "url": "/apps/camera.html",
+      "name": "Camera",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "capture",
+      "icon": "camera",
+      "sections": [
+        "Voorbeeld",
+        "Opname",
+        "Bewaren"
+      ],
+      "description": "Fotograferen, plus RTG Eye: voertuigschouw en hands-free werkvloerlog.",
+      "maturity": "L0"
+    },
+    {
+      "id": "cellier",
+      "url": "/apps/cellier.html",
+      "name": "Cellier",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Uw wijnkelder",
+        "Drinkvenster",
+        "Voorraad"
+      ],
+      "description": "Uw wijnkelder: per fles domein, jaargang, aantal, waarde en drinkvenster. Het overzicht wijst aan wat nu op dronk is, met de kelderwaarde. Een fles schenken telt af.",
+      "maturity": "L0"
+    },
+    {
+      "id": "cercle",
+      "url": "/apps/cercle.html",
+      "name": "Cercle",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Uw lidmaatschap",
+        "Gastpassen",
+        "Dresscode"
+      ],
+      "description": "Uw besloten clubs en lidmaatschappen: stad, lidnummer, dresscode, met welke clubs er reciprociteit is en hoeveel gastpassen u nog heeft. Vraag \"waar kan ik in Milaan terecht\" en u ziet op welk lidmaatschap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "chauffeur",
+      "url": "/apps/chauffeur.html",
+      "name": "RTG Chauffeur",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Uw rit",
+        "Ophaallocatie",
+        "Ritlog"
+      ],
+      "description": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "clips",
+      "url": "/apps/clips.html",
+      "name": "Clips",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Een clip maken",
+        "Bewerken",
+        "Knippen"
+      ],
+      "description": "Korte video's die lokaal bij de maker blijven; een eindige dagselectie.",
+      "maturity": "L0"
+    },
+    {
+      "id": "comm",
+      "url": "/apps/comm.html",
+      "name": "Berichten",
+      "world": "living",
+      "worlds": [
+        "living",
+        "travel",
+        "work",
+        "foundation"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Gesprekken",
+        "Afspraken uit het gesprek",
+        "Gedeelde bestanden"
+      ],
+      "description": "Alle gesprekken van het platform op een plek -- mensen, zaken, onderweg, officieel -- met bellen en videobellen in de kop van het gesprek. Rahul vat samen, stelt een antwoord op en haalt de afspraken eruit.",
+      "maturity": "L0"
+    },
+    {
+      "id": "command",
+      "url": "/apps/command.html",
+      "name": "RTG Command",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Actuele signalen",
+        "Besluiten",
+        "Uitvoering"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "commerce",
+      "url": "/apps/commerce.html",
+      "name": "Commerce",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "De werkwoorden, nu gemeten",
+        "Etalage van een verkoper",
+        "Terugsturen"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "concern",
+      "url": "/apps/concern.html",
+      "name": "Mijn concern",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Entiteiten",
+        "Bestuur",
+        "Bevoegdheden"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "concierge",
+      "url": "/apps/concierge.html",
+      "name": "Concierge-bureau · De Rechterhand",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw werk",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "connect",
+      "url": "/apps/connect.html",
+      "name": "Ontdekken",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Ontdek",
+        "Jij",
+        "Wat u hebt gedaan"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "decision-room",
+      "url": "/apps/decision-room.html",
+      "name": "Decision Room",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "note",
+      "icon": "notebook-pen",
+      "sections": [
+        "De afweging",
+        "Uw besluit",
+        "Onderbouwing"
+      ],
+      "description": "Besluitagenda, volledige afweging, menselijke bevestiging en borging in één controleerbaar spoor.",
+      "maturity": "L0"
+    },
+    {
+      "id": "defensie",
+      "url": "/apps/defensie.html",
+      "name": "RTG Defensie",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw eenheid",
+        "Materieel",
+        "Bevoorrading"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "dispatch",
+      "url": "/apps/dispatch.html",
+      "name": "RTG Dispatch",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Open opdrachten",
+        "Onderweg",
+        "Beschikbare vloot"
+      ],
+      "description": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "doelen",
+      "url": "/apps/doelen.html",
+      "name": "Doelen",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "note",
+      "icon": "notebook-pen",
+      "sections": [
+        "Mijn doelen",
+        "Een doel erbij",
+        "Bewaard"
+      ],
+      "description": "Uw notities, afwegingen en plannen bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "doos",
+      "url": "/apps/doos.html",
+      "name": "Zaakdoos",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw apparatuur",
+        "Signalen",
+        "Werkopdrachten"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "entourage",
+      "url": "/apps/entourage.html",
+      "name": "Entourage",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Reisgezelschap",
+        "Dieetwensen",
+        "Documenten"
+      ],
+      "description": "Uw vaste reisgezelschap: wie u meeneemt, hun band, dieet en documenten met vervaldatum. Stel een gezelschap samen en zie wat er ontbreekt voordat u aan de balie staat.",
+      "maturity": "L0"
+    },
+    {
+      "id": "festival-gast",
+      "url": "/apps/festival-gast.html",
+      "name": "RTG Festival · uw weekend",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw pas",
+        "Programma",
+        "Uw gezelschap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "festival",
+      "url": "/apps/festival.html",
+      "name": "RTG Festival",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Locaties",
+        "Servicevragen",
+        "Open aandachtspunten"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "flits",
+      "url": "/apps/flits.html",
+      "name": "Flits",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "route",
+      "icon": "route",
+      "sections": [
+        "In de buurt",
+        "Vooruitblik",
+        "Overstappen"
+      ],
+      "description": "Een ingetogen rijscherm met community-meldingen (flitser, file, ongeval) en spraak.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foodcourt",
+      "url": "/apps/foodcourt.html",
+      "name": "Food Court",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Voor u gevonden",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Alle restaurants op een rij; reserveren met tijdsloten in een paar tikken.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-agenda",
+      "url": "/apps/foundation/agenda.html",
+      "name": "Gezinsagenda",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "calendar",
+      "icon": "calendar-days",
+      "sections": [
+        "Schooldag",
+        "Gezinsafspraken",
+        "Wie gaat mee"
+      ],
+      "description": "Alle afspraken van het gezin op een rij, voor iedereen zichtbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-arena",
+      "url": "/apps/foundation/arena.html",
+      "name": "De Arena",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Wie daag je uit?",
+        "De uitdaging is verstuurd",
+        "Spelregels"
+      ],
+      "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-babyboek",
+      "url": "/apps/foundation/babyboek.html",
+      "name": "Fotoboekje",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Uw fotoboekje",
+        "Eerste momenten",
+        "Herinneringen"
+      ],
+      "description": "De eerste momenten in een boekje, met zinnen die vanzelf mooi worden.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-beheer",
+      "url": "/apps/foundation/beheer.html",
+      "name": "Gezin & beheer",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Jullie gezinscode",
+        "Profielen",
+        "Bericht of oproep sturen"
+      ],
+      "description": "De mensen en gesprekken die voor u tellen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-beroepen",
+      "url": "/apps/foundation/beroepen.html",
+      "name": "Beroepen-Bibliotheek",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "library",
+      "icon": "book-open",
+      "sections": [
+        "Beroepen",
+        "Werkzaamheden",
+        "Opleidingsroutes"
+      ],
+      "description": "Wat je later kunt worden: honderden beroepen, eerlijk beschreven.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-bieb",
+      "url": "/apps/foundation/bieb.html",
+      "name": "RTF-Bibliotheek",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "library",
+      "icon": "book-open",
+      "sections": [
+        "Uw apps",
+        "Leeftijd en interesse",
+        "Uw volgende keuze"
+      ],
+      "description": "Gratis kind- en gezinsapps van de RTFoundation.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-bord",
+      "url": "/apps/foundation/bord.html",
+      "name": "Bord",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "note",
+      "icon": "notebook-pen",
+      "sections": [
+        "Leerlingen",
+        "Opgaven klaarzetten",
+        "Agenda en huiswerk"
+      ],
+      "description": "Een bord met kaartjes: ideeen, plannen en wat af is.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-budget",
+      "url": "/apps/foundation/budget.html",
+      "name": "Maandbegroting",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Inkomsten",
+        "Uitgaven",
+        "Ruimte om te sparen"
+      ],
+      "description": "Wat komt binnen, wat gaat eruit, wat houd je over; rekent mee terwijl je typt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-buurtruil",
+      "url": "/apps/foundation/buurtruil.html",
+      "name": "Buurtruil",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Uw selectie",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-campus",
+      "url": "/apps/foundation/campus.html",
+      "name": "Campus",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Jouw ontwikkeling",
+        "Jouw leerlingwerkplek",
+        "Vier verbonden werelden"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-club",
+      "url": "/apps/foundation/club.html",
+      "name": "Clubportaal",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Dichtbij",
+        "Uw deelname",
+        "Contact"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-clubswerk",
+      "url": "/apps/foundation/clubswerk.html",
+      "name": "Clubs & steden · RTF",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Dichtbij",
+        "Uw deelname",
+        "Contact"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-contact",
+      "url": "/apps/foundation/contact.html",
+      "name": "Contact",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Uw kring",
+        "Gesprekken",
+        "Gedeelde momenten"
+      ],
+      "description": "De mensen en gesprekken die voor u tellen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-cv",
+      "url": "/apps/foundation/cv.html",
+      "name": "CV-maker",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Over jou",
+        "Werkervaring + Toevoegen",
+        "Opleiding + Toevoegen"
+      ],
+      "description": "Je eerste cv, in nette zinnen, klaar om te versturen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-dromen",
+      "url": "/apps/foundation/dromen.html",
+      "name": "Onze dromen",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Uw droom",
+        "Kleine volgende stap",
+        "Samen bespreken"
+      ],
+      "description": "Waar het gezin van droomt, bewaard en af en toe teruggelezen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-geld-later",
+      "url": "/apps/foundation/geld-later.html",
+      "name": "Geld & Later",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Vandaag",
+        "Kleine stappen geven rust.",
+        "Uw route. Uw toekomst."
+      ],
+      "description": "Begrijp uw geld van vandaag en vind een rustige route naar leren, studie en werk.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-geld",
+      "url": "/apps/foundation/geld.html",
+      "name": "Geldmaatje",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Ons spaarpotje",
+        "Bespaartip van de dag",
+        "Vraag het je geldmaatje"
+      ],
+      "description": "Snappen wat geld is en wat dingen kosten, spelenderwijs.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-geloofbieb",
+      "url": "/apps/foundation/geloofbieb.html",
+      "name": "Geloof & Wijsheid",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "library",
+      "icon": "book-open",
+      "sections": [
+        "Tradities",
+        "Leesbare teksten",
+        "Uw leesplek"
+      ],
+      "description": "Alle tradities als gelijken naast elkaar, met echte leesbare teksten.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-geven",
+      "url": "/apps/foundation/geven.html",
+      "name": "Geven",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Overzicht",
+        "Bewegingen",
+        "Uw akkoord"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-gevoel",
+      "url": "/apps/foundation/gevoel.html",
+      "name": "Hoe voel je je?",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "health",
+      "icon": "heart",
+      "sections": [
+        "Uw gevoel vandaag",
+        "Eigen dagboek",
+        "Even praten"
+      ],
+      "description": "Tik het gezichtje aan dat bij je past; er wordt niets opgeslagen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-gezondheid-welzijn",
+      "url": "/apps/foundation/gezondheid-welzijn.html",
+      "name": "Gezondheid & Welzijn",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "health",
+      "icon": "heart",
+      "sections": [
+        "Wat helpt vandaag?",
+        "Hoe gaat het vandaag?",
+        "Een ritme dat bij u past."
+      ],
+      "description": "Vandaag, uw eigen ritme en echte zorgcontacten rustig bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-gezondheid",
+      "url": "/apps/foundation/gezondheid.html",
+      "name": "Gezondheidsmaatje",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "health",
+      "icon": "heart",
+      "sections": [
+        "Uw eigen ritme",
+        "Contactpersonen",
+        "Medische informatie"
+      ],
+      "description": "Uw eigen informatie en afspraken rustig bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-hulpwijzer",
+      "url": "/apps/foundation/hulpwijzer.html",
+      "name": "Hulpwijzer",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Weet je niet waar te beginnen?",
+        "Uw keuzes",
+        "Hulp vinden"
+      ],
+      "description": "Welke hulp bestaat er, en waar klop je aan? Alles op een rij.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-index",
+      "url": "/apps/foundation/index.html",
+      "name": "RTFoundation",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Wat er voor u klaarstaat",
+        "Groeien op uw eigen tempo.",
+        "Uw ontwikkeling"
+      ],
+      "description": "Gratis hulp voor je gezin: alles wat de RTFoundation biedt op één plek.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-kantoor",
+      "url": "/apps/foundation/kantoor.html",
+      "name": "RTF-kantoor",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw werk",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-keuken",
+      "url": "/apps/foundation/keuken.html",
+      "name": "Gezinskeuken",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Weekmenu",
+        "Boodschappenlijst",
+        "Vaste boodschappen"
+      ],
+      "description": "Wat eten we: recepten, boodschappen en de weekplanning.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-klas",
+      "url": "/apps/foundation/klas.html",
+      "name": "Klas",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Uw leerpad",
+        "Oefenen",
+        "Terugkijken"
+      ],
+      "description": "Het klasoverzicht: wie zit erin, wat staat er deze week op het rooster.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-kleuren",
+      "url": "/apps/foundation/kleuren.html",
+      "name": "Kleuren en vormen",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Zoek de rode cirkel: spelen op kleur, op vorm, of op allebei tegelijk.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-klimaatfonds",
+      "url": "/apps/foundation/klimaatfonds.html",
+      "name": "Klimaatfonds",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Dichtbij",
+        "Uw deelname",
+        "Contact"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-klusjes",
+      "url": "/apps/foundation/klusjes.html",
+      "name": "Klusjes en sterren",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Uw klusjes",
+        "Verdeling",
+        "Samen terugkijken"
+      ],
+      "description": "Klusjes verdelen en sterren verdienen, zonder gedoe aan tafel.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-kompas",
+      "url": "/apps/foundation/kompas.html",
+      "name": "Kompas",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "health",
+      "icon": "heart",
+      "sections": [
+        "Goed om te weten",
+        "Uw ritme",
+        "Uw aantekeningen"
+      ],
+      "description": "Het tienerkompas: koers houden als alles tegelijk komt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-leerpaspoort",
+      "url": "/apps/foundation/leerpaspoort.html",
+      "name": "Mijn leerpaspoort",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Uw leerlijn",
+        "Volgende les",
+        "Behaalde doelen"
+      ],
+      "description": "Je leerlijn, lessen, opgaven, behaalde doelen en bijles in één persoonlijke werkplek.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-leren",
+      "url": "/apps/foundation/leren.html",
+      "name": "Leren & Groei",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Vandaag",
+        "Uw tempo",
+        "Iemand naast u nodig?"
+      ],
+      "description": "Zie wat vandaag telt, wat al groeit en krijg hulp op je eigen tempo.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-liedjes",
+      "url": "/apps/foundation/liedjes.html",
+      "name": "Liedjes en versjes",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Voor de meezinger",
+        "Bewaard",
+        "Recent"
+      ],
+      "description": "Oude Nederlandse liedjes met de tekst groot in beeld, om samen te zingen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-magazine",
+      "url": "/apps/foundation/magazine.html",
+      "name": "Magazine",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Verhalen",
+        "Gezinstips",
+        "Eigen bijdragen"
+      ],
+      "description": "Het RTF-magazine: verhalen, tips en werk van gezinnen zelf.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-mail",
+      "url": "/apps/foundation/mail.html",
+      "name": "RTF Mail",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "mail",
+      "icon": "mail",
+      "sections": [
+        "Nieuw bericht",
+        "Uw concept",
+        "Afspraken"
+      ],
+      "description": "Je eigen Foundation-postvak, publiek uitsluitend op codenaam.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-markt",
+      "url": "/apps/foundation/markt.html",
+      "name": "Koopje",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Uw selectie",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Ruilen, weggeven en delen in de buurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-mediawijs",
+      "url": "/apps/foundation/mediawijs.html",
+      "name": "Online wijs",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Als het echt misgaat",
+        "Even sparren over schermen?",
+        "Terugkijken"
+      ],
+      "description": "Echte situaties van je telefoon, met eerlijke uitleg over wat je keuze oplevert.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-meedoen-ontdekken",
+      "url": "/apps/foundation/meedoen-ontdekken.html",
+      "name": "Meedoen & Ontdekken",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Kies uw stad",
+        "Voor u in de buurt",
+        "Dichtbij, zonder u te volgen."
+      ],
+      "description": "Ontdek open activiteiten en projecten dichtbij, zonder dat uw locatie wordt gevolgd.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-memorie",
+      "url": "/apps/foundation/memorie.html",
+      "name": "Memorie",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Kaartjes omdraaien en paren zoeken, met drie, zes of acht paren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-mijnbanden",
+      "url": "/apps/foundation/mijnbanden.html",
+      "name": "Wie mag iets van mij zien",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Uw kring",
+        "Gesprekken",
+        "Gedeelde momenten"
+      ],
+      "description": "Wie er iets van jou mag zien, per onderdeel en tot wanneer; altijd terug te nemen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-ochtend",
+      "url": "/apps/foundation/ochtend.html",
+      "name": "Ochtendritme",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Uw ochtendstappen",
+        "Wat al gelukt is",
+        "Samen verder"
+      ],
+      "description": "Aankleden, tanden, jas: de ochtend in stapjes die een kleuter zelf snapt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-onveilig",
+      "url": "/apps/foundation/onveilig.html",
+      "name": "Als je niet veilig bent",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Als u vaker bang bent dat er iets gebeurt",
+        "Wat wij niet voor je kunnen verbergen",
+        "Wat er met deze pagina gebeurt"
+      ],
+      "description": "Waar je gratis terechtkunt bij geweld, misbruik, uitbuiting of geen slaapplek.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-oppasinfo",
+      "url": "/apps/foundation/oppasinfo.html",
+      "name": "Oppasinformatie",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Noodcontacten",
+        "Allergieën",
+        "Eten en bedtijd"
+      ],
+      "description": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-opvoeden",
+      "url": "/apps/foundation/opvoeden.html",
+      "name": "Opvoedhulp",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Waar loop je tegenaan?",
+        "Vraag het je opvoedcoach",
+        "Hulp vinden"
+      ],
+      "description": "Rustige hulp bij het gedoe van elke dag, zonder oordeel.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-os-bestuur",
+      "url": "/apps/foundation/os-bestuur.html",
+      "name": "Governance",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Besluiten",
+        "Verantwoording",
+        "Toezicht"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-os-deelnemer",
+      "url": "/apps/foundation/os-deelnemer.html",
+      "name": "Mijn hulpvraag",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Uw vraag",
+        "Contact en afspraken",
+        "Voortgang"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-os-donateur",
+      "url": "/apps/foundation/os-donateur.html",
+      "name": "Mijn giften",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Uw giften",
+        "Bestemming",
+        "Verantwoording"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-os-portaal",
+      "url": "/apps/foundation/os-portaal.html",
+      "name": "RTFoundation portaal",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Dichtbij",
+        "Uw deelname",
+        "Contact"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-os-publiek",
+      "url": "/apps/foundation/os-publiek.html",
+      "name": "RTFoundation in jouw buurt",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Alles wat in FoundationOS hangt.",
+        "Uw deelname",
+        "Contact"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-os-veld",
+      "url": "/apps/foundation/os-veld.html",
+      "name": "Mijn lijst",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Uw werklijst",
+        "Afspraken",
+        "Terugkoppeling"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-os-vrijwilliger",
+      "url": "/apps/foundation/os-vrijwilliger.html",
+      "name": "Mijn vrijwilligerswerk",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Uw beschikbaarheid",
+        "Taken",
+        "Uw contactpersoon"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-os",
+      "url": "/apps/foundation/os.html",
+      "name": "Foundation OS",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw werk",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-overhoren",
+      "url": "/apps/foundation/overhoren.html",
+      "name": "Overhoren",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Nieuwe lijst",
+        "Jouw lijsten",
+        "Jouw duels"
+      ],
+      "description": "Woordjes en sommen overhoren; alleen of als duel met een vriend.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-partner",
+      "url": "/apps/foundation/partner.html",
+      "name": "Stadsraad",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Dichtbij",
+        "Uw deelname",
+        "Contact"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-pesten",
+      "url": "/apps/foundation/pesten.html",
+      "name": "Sterker dan pesten",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Wat kun je doen?",
+        "Ik wil het mijn gezin vertellen",
+        "Praat met een maatje"
+      ],
+      "description": "Wat je kunt doen als je gepest wordt, en bij wie je terechtkunt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-presenteren",
+      "url": "/apps/foundation/presenteren.html",
+      "name": "Spreekbeurt en presentatie",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Waar gaat het over",
+        "Je opbouw",
+        "Hardop oefenen"
+      ],
+      "description": "Je verhaal opbouwen in vaste stukken, met tijdverdeling en een oefenklok.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-privacy",
+      "url": "/apps/foundation/privacy.html",
+      "name": "Privacy",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Wat we beschermen",
+        "Locatie is altijd jouw keuze",
+        "Wie ziet wat"
+      ],
+      "description": "Wat er met jullie gegevens gebeurt, in gewone woorden.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-projecten",
+      "url": "/apps/foundation/projecten.html",
+      "name": "Samen aan een project",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "note",
+      "icon": "notebook-pen",
+      "sections": [
+        "Jullie projecten",
+        "Project",
+        "Taken (tik om een taak te pakken)"
+      ],
+      "description": "Werkstukken en groepswerk stap voor stap, met taken en een planning.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-rechten",
+      "url": "/apps/foundation/rechten.html",
+      "name": "Wat mag ik op welke leeftijd",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Ik ben",
+        "Hoeveel je mag werken",
+        "Lees dit erbij"
+      ],
+      "description": "Werken, geld, school en zorg per leeftijd, met de werktijden erbij.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-registreren",
+      "url": "/apps/foundation/registreren.html",
+      "name": "Registreren bij FOUNDATION",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Hoe wilt u meedoen",
+        "Uw gezinsruimte",
+        "Uw toestemming"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-reis",
+      "url": "/apps/foundation/reis.html",
+      "name": "Op reis",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Uw reisplan",
+        "Paklijst",
+        "Onderweg"
+      ],
+      "description": "Samen op pad: inpakken, plannen en onderweg iets te doen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-rust",
+      "url": "/apps/foundation/rust.html",
+      "name": "Even rust",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "health",
+      "icon": "heart",
+      "sections": [
+        "Rustmoment",
+        "Uw ademruimte",
+        "Geluid naar keuze"
+      ],
+      "description": "Een stille plek in de app als het te druk wordt in je hoofd.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-samen-thuis",
+      "url": "/apps/foundation/samen-thuis.html",
+      "name": "Samen Thuis",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Vandaag",
+        "Niet perfect, wel samen.",
+        "Ons gezin."
+      ],
+      "description": "Vandaag, ieder gezinslid en iets regelen vanuit één rustig overzicht.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-school",
+      "url": "/apps/foundation/school.html",
+      "name": "School",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Een rustige schooldag.",
+        "Van aanmelden naar een echte werkruimte.",
+        "Terugkijken"
+      ],
+      "description": "Klas, rooster, huiswerk en cijfers voor het hele gezin.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-schoolbieb",
+      "url": "/apps/foundation/schoolbieb.html",
+      "name": "School-Bibliotheek",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "library",
+      "icon": "book-open",
+      "sections": [
+        "Vakken",
+        "Jaar en niveau",
+        "Oefenmateriaal"
+      ],
+      "description": "Lesmateriaal en oefenstof per vak en per jaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-schrift",
+      "url": "/apps/foundation/schrift.html",
+      "name": "Schrift",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "note",
+      "icon": "notebook-pen",
+      "sections": [
+        "Uw schrift",
+        "Aantekeningen",
+        "Opgaven"
+      ],
+      "description": "Je eigen schrift: aantekeningen en sommen netjes bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-schrijven",
+      "url": "/apps/foundation/schrijven.html",
+      "name": "Schrijven",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Jouw bewaarde stukken",
+        "Bewerken",
+        "Voorvertoning"
+      ],
+      "description": "Samen verhalen bedenken en schrijven; de app helpt met een begin.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-societeit",
+      "url": "/apps/foundation/societeit.html",
+      "name": "De Sociëteit",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Wie daag je uit?",
+        "Waar komen de vragen vandaan?",
+        "Hoe spelen jullie?"
+      ],
+      "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-speelhal",
+      "url": "/apps/foundation/speelhal.html",
+      "name": "Game Hall",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Zeven eindige spellen voor rekenen, taal, geheugen, klokkijken en logisch denken.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-speeltuin",
+      "url": "/apps/foundation/speeltuin.html",
+      "name": "De Speeltuin",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-steun",
+      "url": "/apps/foundation/steun.html",
+      "name": "Steun voor jou",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Hoe gaat het echt met jou?",
+        "Even je hart luchten",
+        "Wanneer het te veel wordt"
+      ],
+      "description": "Een luisterend oor en echte hulplijnen, altijd bereikbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-studie",
+      "url": "/apps/foundation/studie.html",
+      "name": "Verder leren",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Gratis en goedkope wegen",
+        "Vraag het je studiecoach",
+        "Terugkijken"
+      ],
+      "description": "Opleidingen en vervolgstappen verkennen, zonder druk.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-tellen",
+      "url": "/apps/foundation/tellen.html",
+      "name": "Tellen tot tien",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Dingen aantikken en samen hardop tellen; geen klok, geen puntentelling.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-toetsen",
+      "url": "/apps/foundation/toetsen.html",
+      "name": "Toetsplanner",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "calendar",
+      "icon": "calendar-days",
+      "sections": [
+        "Uw volgende toets",
+        "Leerplanning",
+        "Oefenstof"
+      ],
+      "description": "Je toetsweek uitgesmeerd over de dagen, zodat je niet hoeft te stampen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-veilig-vertrouwd",
+      "url": "/apps/foundation/veilig-vertrouwd.html",
+      "name": "Veilig & Vertrouwd",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Hoe is het nu?",
+        "Wie liet iets weten?",
+        "U bepaalt wie dichtbij mag komen."
+      ],
+      "description": "Uw kring, uw keuzes en hulp wanneer dat nodig is.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-veilig",
+      "url": "/apps/foundation/veilig.html",
+      "name": "Veilig thuis",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Waar ben je nu?",
+        "Waar is iedereen?",
+        "Ik voel me niet veilig"
+      ],
+      "description": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-verhaaltje",
+      "url": "/apps/foundation/verhaaltje.html",
+      "name": "Voorleesverhaaltjes",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Voor de voorlezer",
+        "Bewaard",
+        "Recent"
+      ],
+      "description": "Zes korte verhaaltjes om samen voor te lezen, bladzijde voor bladzijde.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-verjaardagen",
+      "url": "/apps/foundation/verjaardagen.html",
+      "name": "Verjaardagen & wensen",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "calendar",
+      "icon": "calendar-days",
+      "sections": [
+        "Verjaardagen",
+        "Wensenlijst",
+        "Samen iets regelen"
+      ],
+      "description": "Niemand vergeten: verjaardagen en wensenlijstjes bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-vrienden",
+      "url": "/apps/foundation/vrienden.html",
+      "name": "Contacten",
+      "world": "living",
+      "worlds": [
+        "living",
+        "foundation"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Contacten",
+        "Verhalen",
+        "Gedeelde momenten"
+      ],
+      "description": "Vrienden, snaps en verhalen van 24 uur, veilig en op codenaam.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-wegwijzer",
+      "url": "/apps/foundation/wegwijzer.html",
+      "name": "Zelf iets in gang zetten",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Hier kan het nu niet",
+        "1. Bent u op dit moment veilig?",
+        "2. Kan iemand meekijken op dit toestel?"
+      ],
+      "description": "Zonder account en zonder je naam een hulpvraag achterlaten, met een code om hem in te trekken.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-werk",
+      "url": "/apps/foundation/werk.html",
+      "name": "Werk en vacatures",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Jouw desk",
+        "Beslis met feiten",
+        "Beste volgende kansen"
+      ],
+      "description": "Bijbanen en vacatures, met een sollicitatie die je zelf kunt volgen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-winkel",
+      "url": "/apps/foundation/winkel.html",
+      "name": "De winkel van de RTFoundation",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Uw selectie",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-zakgeld",
+      "url": "/apps/foundation/zakgeld.html",
+      "name": "Zakgeld",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Uw spaarpot",
+        "Spaardoel",
+        "Bewegingen"
+      ],
+      "description": "Het zakgeldpotje: sparen voor iets, samen bijgehouden.",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-zorg",
+      "url": "/apps/foundation/zorg.html",
+      "name": "Zorg",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Uw volgende hulp",
+        "U houdt de regie.",
+        "Waar kunnen we bij helpen?"
+      ],
+      "description": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+      "maturity": "L0"
+    },
+    {
+      "id": "galerij",
+      "url": "/apps/galerij.html",
+      "name": "Galerij",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Voor u",
+        "Bewaard",
+        "Recent"
+      ],
+      "description": "Al je beelden op een plek: tijdlijn per maand, albums en favorieten. Leest De Salon en Bestanden; niets dubbel, geen gezichtsherkenning.",
+      "maturity": "L0"
+    },
+    {
+      "id": "garderobe",
+      "url": "/apps/garderobe.html",
+      "name": "Garde-robe",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Uw kledingstukken",
+        "Kasten en woningen",
+        "Uw vaklui"
+      ],
+      "description": "Uw digitale garderobe: per stuk type, merk, kleur, maat en waar het hangt -- welke woning, welke kast. Plus uw vaklui: kleermaker, schoenmaker, stomerij.",
+      "maturity": "L0"
+    },
+    {
+      "id": "gast",
+      "url": "/apps/gast.html",
+      "name": "Aan tafel",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Schuif aan",
+        "De kaart",
+        "Wat er op tafel staat"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "gedachten",
+      "url": "/apps/gedachten.html",
+      "name": "Gedachtenboek",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "note",
+      "icon": "notebook-pen",
+      "sections": [
+        "Iets opschrijven",
+        "Wat u eerder schreef",
+        "Bewaard"
+      ],
+      "description": "Uw notities, afwegingen en plannen bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld",
+      "url": "/apps/geld.html",
+      "name": "RTG Geld",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Overzicht",
+        "Bewegingen",
+        "Uw akkoord"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-balans",
+      "url": "/apps/geld.html#balans",
+      "name": "Balans",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Saldo",
+        "Bewegingen",
+        "Periode"
+      ],
+      "description": "Je saldo en tikgeschiedenis in één overzicht.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-bank",
+      "url": "/apps/geld.html#bank",
+      "name": "Bank",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Rekeningen",
+        "Bewegingen",
+        "Toestemmingen"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-labfonds",
+      "url": "/apps/geld.html#labfonds",
+      "name": "Lab-fonds",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Uw bijdrage",
+        "Onderzoeksdoelen",
+        "Verantwoording"
+      ],
+      "description": "Steun het RTG-onderzoekslab en volg waar je bijdrage heen gaat.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-logboek",
+      "url": "/apps/geld.html#logboek",
+      "name": "Logboek",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Uw object",
+        "Volgende onderhoudsbeurt",
+        "Onderhoudshistorie"
+      ],
+      "description": "Het onderhoudsboek van uw jacht, jet, oldtimer of ander kostbaar bezit: keuringen, servicebeurten, reparaties en verzekeringen met datum, kosten en wanneer het weer aan de beurt is.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-mecenaat",
+      "url": "/apps/geld.html#mecenaat",
+      "name": "Mecenaat",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Gekozen doel",
+        "Toezeggingen",
+        "Gedane giften"
+      ],
+      "description": "Uw filantropie op orde: per gift het doel, het thema, het bedrag, en of het een toezegging is of al betaald. Het overzicht toont wat er via de RTFoundation loopt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-metier",
+      "url": "/apps/geld.html#metier",
+      "name": "Métier",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "Uw beroepsprofiel",
+        "Bevestigde rollen",
+        "Delen met een werkgever"
+      ],
+      "description": "Je beroepsprofiel op codenaam, met de rollen die RTG zelf heeft bevestigd. Je naam geef je per werkgever vrij, en je trekt hem net zo makkelijk weer in.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-nalatenschap",
+      "url": "/apps/geld.html#nalatenschap",
+      "name": "Nalatenschap",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "Uw documenten",
+        "Vertrouwenspersonen",
+        "Persoonlijke wensen"
+      ],
+      "description": "Een discreet, versleuteld dossier voor later: welke documenten er zijn en waar ze liggen, uw vertrouwenspersonen, en uw persoonlijke wensen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-rtgcode",
+      "url": "/apps/geld.html#rtgcode",
+      "name": "RTG-code",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Betaalcode",
+        "Toegangscode",
+        "Geldigheid"
+      ],
+      "description": "Je betaal- en toegangscodes veilig op één plek.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-wallet",
+      "url": "/apps/geld.html#wallet",
+      "name": "Wallet",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Uw saldo",
+        "Betaalmiddelen",
+        "Recente bewegingen"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "geld-wbw",
+      "url": "/apps/geld.html#wbw",
+      "name": "Wie betaalt wat",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Uw groep",
+        "Groepsuitgaven",
+        "Verrekening"
+      ],
+      "description": "Groepsuitgaven met live balans en verrekenen via RTG Pay.",
+      "maturity": "L0"
+    },
+    {
+      "id": "gemeente",
+      "url": "/apps/gemeente.html",
+      "name": "RTG Gemeente",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw melding",
+        "Afspraken",
+        "Uw aanvragen"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "gemeenteloket",
+      "url": "/apps/gemeenteloket.html",
+      "name": "Gemeente-loket (medewerker)",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw zaak",
+        "Gegevens",
+        "Bekendmakingen"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "gemeentepda",
+      "url": "/apps/gemeentepda.html",
+      "name": "Gemeente-PDA (buitendienst)",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw werk",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "genootschap",
+      "url": "/apps/genootschap.html",
+      "name": "Genootschap",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Prikbord",
+        "Peilingen",
+        "Bijeenkomsten"
+      ],
+      "description": "Besloten groepen met een prikbord, peilingen en bijeenkomsten. Geheim is echt geheim, en er is geen enkele groeitruc.",
+      "maturity": "L0"
+    },
+    {
+      "id": "gereedschap",
+      "url": "/apps/gereedschap.html",
+      "name": "Gereedschap",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "tools",
+      "icon": "wrench",
+      "sections": [
+        "Rekening delen",
+        "Wekkers en timers",
+        "Wereldklok"
+      ],
+      "description": "Rekenmachine (met btw en rekening delen), wekkers en timers die op de server aftellen, stopwatch en wereldklok. Rahul zet ze ook voor je.",
+      "maturity": "L0"
+    },
+    {
+      "id": "ghost",
+      "url": "/apps/ghost.html",
+      "name": "Ghost Driver",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Geplande rit",
+        "Mogelijke knelpunten",
+        "Alternatieven"
+      ],
+      "description": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "handel",
+      "url": "/apps/handel.html",
+      "name": "RTG Handel: inkoop tussen zaken",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Uw selectie",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "hangar",
+      "url": "/apps/hangar.html",
+      "name": "Hangar",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Uw toestel",
+        "Vluchtplanning",
+        "Vlieguren en documenten"
+      ],
+      "description": "Uw privevliegtuigen en charters: per toestel type, registratie, thuishaven en stoelen, met de vluchten, de vlieguren en de laatst bekende positie.",
+      "maturity": "L0"
+    },
+    {
+      "id": "hardware-pda",
+      "url": "/apps/hardware-pda.html",
+      "name": "RTG Hardware PDA",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw apparaat",
+        "Controle",
+        "Service"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "home",
+      "url": "/apps/home.html",
+      "name": "RTG Home Kit",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Uw scènes",
+        "Apparaten",
+        "Bediening"
+      ],
+      "description": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-bar",
+      "url": "/apps/horeca-bar.html",
+      "name": "RTG Horeca: bar",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Drankbonnen",
+        "Bereiding",
+        "Uitgifte"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-beheer",
+      "url": "/apps/horeca-beheer.html",
+      "name": "RTG Horeca: beheer",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Dagplanning",
+        "Personeel",
+        "Signalen"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-bezorg",
+      "url": "/apps/horeca-bezorg.html",
+      "name": "RTG Horeca: bezorging",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Klaar voor vertrek",
+        "Bezorgritten",
+        "Aflevering"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-club",
+      "url": "/apps/horeca-club.html",
+      "name": "RTG Horeca: club",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Deur en toegang",
+        "Tafels",
+        "Clubtegoed"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-events",
+      "url": "/apps/horeca-events.html",
+      "name": "RTG Horeca: events",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Offerte",
+        "Verbruik",
+        "Nacalculatie"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-expeditie",
+      "url": "/apps/horeca-expeditie.html",
+      "name": "RTG Horeca: expeditie",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Open bonnen",
+        "Bereiding",
+        "Uitgifte"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-haccp",
+      "url": "/apps/horeca-haccp.html",
+      "name": "RTG Horeca: HACCP",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Controlepunten",
+        "Metingen",
+        "Afwijkingen"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-hotel",
+      "url": "/apps/horeca-hotel.html",
+      "name": "RTG Horeca: hotel",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Gastrekening",
+        "Roomservice",
+        "Overdracht"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-pda",
+      "url": "/apps/horeca-pda.html",
+      "name": "RTG Horeca: PDA Service",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Nu  over de grens",
+        "Ook open",
+        "Wijken"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca-vloer",
+      "url": "/apps/horeca-vloer.html",
+      "name": "RTG Horeca: vloer",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Tafels",
+        "Bestellingen",
+        "Servicevragen"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "horeca",
+      "url": "/apps/horeca.html",
+      "name": "Horeca",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Eén ritme door de hele zaak.",
+        "Van gerecht naar levende operatie.",
+        "De hele zaak. Eén veilige beweging."
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "hotels",
+      "url": "/apps/hotels.html",
+      "name": "Verblijven",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "stay",
+      "icon": "bed-double",
+      "sections": [
+        "Aankomst",
+        "Uw verblijf",
+        "Vertrek"
+      ],
+      "description": "Hotels, appartementen en villa's met ledenprijzen en keyless toegang.",
+      "maturity": "L0"
+    },
+    {
+      "id": "ik",
+      "url": "/apps/ik.html",
+      "name": "Wie ben ik",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Alles onder uw regie.",
+        "Uw account",
+        "Uw werelden"
+      ],
+      "description": "Wat Rahul over je mag weten: hoe hij tegen je doet, je voornaamwoorden en je eigen geloofskeuze. Alles optioneel.",
+      "maturity": "L0"
+    },
+    {
+      "id": "isolatie",
+      "url": "/apps/isolatie.html",
+      "name": "Isolatiemodus",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "De effectieve stand",
+        "Een drager verstrengen",
+        "Lopende ontsluitingen"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "juridisch",
+      "url": "/apps/juridisch.html",
+      "name": "Juridisch",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "Uw document",
+        "Versies",
+        "Toegang"
+      ],
+      "description": "Voorwaarden, contracten en je eigen akkoorden.",
+      "maturity": "L0"
+    },
+    {
+      "id": "juridisch-partnervoorwaarden",
+      "url": "/apps/juridisch/partnervoorwaarden.html",
+      "name": "Partnervoorwaarden",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "1. Het partnerschap en 0% commissie",
+        "2. Het verplichte Salon-bedrijfsaccount",
+        "3. Betalingen en het betaalmoment"
+      ],
+      "description": "Uw documenten, versies en gedeelde toegang.",
+      "maturity": "L0"
+    },
+    {
+      "id": "juridisch-privacy",
+      "url": "/apps/juridisch/privacy.html",
+      "name": "Privacybeleid",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "1. Pseudonimisering: de codenaam",
+        "2. Welke gegevens we verwerken, en waarom",
+        "3. Wat we niet doen"
+      ],
+      "description": "Uw documenten, versies en gedeelde toegang.",
+      "maturity": "L0"
+    },
+    {
+      "id": "juridisch-voorwaarden",
+      "url": "/apps/juridisch/voorwaarden.html",
+      "name": "Algemene voorwaarden",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "1. Het lidmaatschap",
+        "2. Boeken en betalen",
+        "3. Huren, kopen en laten bezorgen"
+      ],
+      "description": "Uw documenten, versies en gedeelde toegang.",
+      "maturity": "L0"
+    },
+    {
+      "id": "kantoor",
+      "url": "/apps/kantoor.html",
+      "name": "RTG Kantoor",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Dit verdient uw aandacht.",
+        "Vandaag",
+        "Wat er verder speelt"
+      ],
+      "description": "Uw werkdag bij elkaar -- afspraken, open taken, documenten en gedeelde bestanden -- ongeacht in welke app ze leven. Maken en wijzigen blijft in de app die het echte werk doet.",
+      "maturity": "L0"
+    },
+    {
+      "id": "kantoren",
+      "url": "/apps/kantoren.html",
+      "name": "Afdelingen",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "De werklijst van deze kamer",
+        "De Paniekkamer",
+        "Paniekkamer-chat"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "kassa",
+      "url": "/apps/kassa.html",
+      "name": "De Kassa",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Uw rekening",
+        "Betaalwijze",
+        "Bevestiging"
+      ],
+      "description": "Gasten, voorbereiding en uitvoering bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "klankwerk-kantoor",
+      "url": "/apps/klankwerk-kantoor.html",
+      "name": "Uitgave beoordelen",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Wat u hier beslist",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "klankwerk",
+      "url": "/apps/klankwerk.html",
+      "name": "RTG Klankwerk",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Uw project",
+        "Sporen",
+        "Notenrol"
+      ],
+      "description": "Zelf muziek maken: een raster, een notenrol en Rahul die iets neerzet. Alles wordt opgewekt, dus alles is van jou.",
+      "maturity": "L0"
+    },
+    {
+      "id": "kosten",
+      "url": "/apps/kosten.html",
+      "name": "RTG Kostprijs",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Gebruikerskosten",
+        "Dekking",
+        "Maandraming"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "krant",
+      "url": "/apps/krant.html",
+      "name": "RTG Krant",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Voor u",
+        "Bewaard",
+        "Recent"
+      ],
+      "description": "De kiosk: de kranten die nieuwsbedrijven binnen RTG uitgeven, elk in de eigen huisstijl.",
+      "maturity": "L0"
+    },
+    {
+      "id": "lab",
+      "url": "/apps/lab.html",
+      "name": "RTG Onderzoekslab",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw onderzoek",
+        "Onderbouwing",
+        "Beoordeling"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "labpas",
+      "url": "/apps/labpas.html",
+      "name": "Mijn Living Lab",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw onderzoek",
+        "Uw toestemming",
+        "Terugkoppeling"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "lesmaker",
+      "url": "/apps/lesmaker.html",
+      "name": "RTG Lesmaker",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Uw concept",
+        "Bewerken",
+        "Voorvertoning"
+      ],
+      "description": "Uw werk krijgt vorm, stap voor stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "leven",
+      "url": "/apps/leven.html",
+      "name": "Mijn leven",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Maison Noire",
+        "Salon Privé",
+        "Chef aan huis"
+      ],
+      "description": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "leverancier-aanvragen",
+      "url": "/apps/leverancier-aanvragen.html",
+      "name": "Aanvragen uit de Mall",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Uw selectie",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "leverancier-commerce",
+      "url": "/apps/leverancier-commerce.html",
+      "name": "Verkoopwegen en retouren",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Waarlangs u verkoopt",
+        "Wat er terugkomt",
+        "Voorwaarden"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "leverancier-rtmail",
+      "url": "/apps/leverancier-rtmail.html",
+      "name": "RTMAIL zaak",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "mail",
+      "icon": "mail",
+      "sections": [
+        "Postvak",
+        "Uw concept",
+        "Afspraken"
+      ],
+      "description": "Uw correspondentie en de afspraken die eruit voortkomen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "leverancier-service",
+      "url": "/apps/leverancier-service.html",
+      "name": "Hulp van RTG",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "call",
+      "icon": "video",
+      "sections": [
+        "Uw gesprek",
+        "Deelnemers",
+        "Gedeeld scherm"
+      ],
+      "description": "Spreek elkaar, met ruimte om samen te kijken.",
+      "maturity": "L0"
+    },
+    {
+      "id": "leverancier",
+      "url": "/apps/leverancier.html",
+      "name": "RTG Partners, leverancier-app",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Vandaag.",
+        "Bestellingen",
+        "Ritten"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "life",
+      "url": "/apps/life.html",
+      "name": "RTG Life",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "health",
+      "icon": "heart",
+      "sections": [
+        "Uw dag",
+        "Hoe u ervoor staat",
+        "Hoe zit u erbij"
+      ],
+      "description": "Uw eigen informatie en afspraken rustig bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "lifestyle",
+      "url": "/apps/lifestyle.html",
+      "name": "Privekantoor",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw werk",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "living-os",
+      "url": "/apps/living-os.html",
+      "name": "Het Vooruitzicht",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Voeg eerst een intentie toe.",
+        "Leg eerst vast wat u wilt.",
+        "Voorbereiding vrijgeven"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "livinglab",
+      "url": "/apps/livinglab.html",
+      "name": "Living Lab",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Onderzoeken",
+        "Deelname",
+        "Toestemming"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "loonstrook",
+      "url": "/apps/loonstrook.html",
+      "name": "Loon",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Uw loonperiode",
+        "Loonstroken",
+        "Inzagegeschiedenis"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "loopbaan",
+      "url": "/apps/loopbaan.html",
+      "name": "Mijn loopbaan",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "community",
+      "icon": "map-pin",
+      "sections": [
+        "De reeks",
+        "Iets toevoegen",
+        "De zeven voorraden"
+      ],
+      "description": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+      "maturity": "L0"
+    },
+    {
+      "id": "loopbaanbewijs",
+      "url": "/apps/loopbaanbewijs.html",
+      "name": "Een regel uit een loopbaan",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "Uw document",
+        "Versies",
+        "Toegang"
+      ],
+      "description": "Uw documenten, versies en gedeelde toegang.",
+      "maturity": "L0"
+    },
+    {
+      "id": "luchthaven",
+      "url": "/apps/luchthaven.html",
+      "name": "RTG Airport (operations)",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Uw werkplek",
+        "Vluchtbewegingen",
+        "Open meldingen"
+      ],
+      "description": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "magnaat-kantoor",
+      "url": "/apps/magnaat-kantoor.html",
+      "name": "RTG Controleregister · Boardroom",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Controleregister",
+        "Testtaken",
+        "Onderbouwing"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "magnaat-partnerstudio",
+      "url": "/apps/magnaat-partnerstudio.html",
+      "name": "Magnaat Partnerstudio",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "De digitale tweeling wordt voorbereid",
+        "Van officiële partner naar speelbaar bedrijf",
+        "Uw bedrijf in één gecontroleerd model"
+      ],
+      "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+      "maturity": "L0"
+    },
+    {
+      "id": "magnaat",
+      "url": "/apps/magnaat.html",
+      "name": "Magnaat",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Uw werkvloer vraagt een keuze",
+        "Kies uw volgende uitdaging",
+        "Uw wereld vandaag"
+      ],
+      "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+      "maturity": "L0"
+    },
+    {
+      "id": "maison",
+      "url": "/apps/maison.html",
+      "name": "Maison",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Huishoudelijke taken",
+        "Wie helpt mee",
+        "Huislogboek"
+      ],
+      "description": "Huishouden en staf: uw huishoudelijk personeel met rol en contact, de lopende taken met wie en wanneer, en een logboek van wat er in en om huis speelt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "mall",
+      "url": "/apps/mall.html",
+      "name": "Mall",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Gevonden",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "marechaussee",
+      "url": "/apps/marechaussee.html",
+      "name": "Brigade RTG Airport (KMar)",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Uw post",
+        "Open zaken",
+        "Overdracht"
+      ],
+      "description": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "media",
+      "url": "/apps/media.html",
+      "name": "RTG Media",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Nieuwe productie",
+        "Releasecontrole",
+        "Recent"
+      ],
+      "description": "Eén mediawereld over Klankwerk, Theater, Clips en Podium heen: muziek, kijk en flow als drie standen op dezelfde catalogus, met één makersprofiel en uw eigen regelaars in plaats van een algoritme.",
+      "maturity": "L0"
+    },
+    {
+      "id": "medicijnen",
+      "url": "/apps/medicijnen.html",
+      "name": "Medicijnen",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "health",
+      "icon": "heart",
+      "sections": [
+        "Volgend innamemoment",
+        "Uw middelen",
+        "Eigen notities"
+      ],
+      "description": "Uw eigen informatie en afspraken rustig bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "meet",
+      "url": "/apps/meet.html",
+      "name": "Meet",
+      "world": "living",
+      "worlds": [
+        "living",
+        "travel",
+        "work",
+        "foundation"
+      ],
+      "type": "call",
+      "icon": "video",
+      "sections": [
+        "Uw gesprek",
+        "Deelnemers",
+        "Gedeeld scherm"
+      ],
+      "description": "Vergaderen op codenaam: kamers met een korte code, scherm delen, en een Vergaderruimte-knop op elke agenda-afspraak. Beeld en geluid lopen peer-to-peer.",
+      "maturity": "L0"
+    },
+    {
+      "id": "meldkamer",
+      "url": "/apps/meldkamer.html",
+      "name": "RTG Meldkamer",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Open meldingen",
+        "Eenheden",
+        "Overdracht"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "memo",
+      "url": "/apps/memo.html",
+      "name": "Memo",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "capture",
+      "icon": "camera",
+      "sections": [
+        "Voorbeeld",
+        "Opname",
+        "Bewaren"
+      ],
+      "description": "Spraakmemo's opnemen; de audio staat als gewoon bestand in je Bestanden-kluis. Het toestel luistert mee voor een transcript en Rahul vat samen als jij dat vraagt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "merken",
+      "url": "/apps/merken.html",
+      "name": "Merken & vestigingen",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Merken",
+        "Vestigingen",
+        "Verantwoordelijken"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "mijn-gegevens",
+      "url": "/apps/mijn-gegevens.html",
+      "name": "Wat weet RTG van mij",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Uw toegang",
+        "Toestemmingen",
+        "Activiteit"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "mijn-isolatie",
+      "url": "/apps/mijn-isolatie.html",
+      "name": "Accountbescherming",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Hoe je nu staat",
+        "Strenger zetten",
+        "Weer terug"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "mijn-neigingen",
+      "url": "/apps/mijn-neigingen.html",
+      "name": "Mijn neigingen",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Uw toegang",
+        "Toestemmingen",
+        "Activiteit"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "mijn-post",
+      "url": "/apps/mijn-post.html",
+      "name": "Post van RTG",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "mail",
+      "icon": "mail",
+      "sections": [
+        "Postvak",
+        "Uw concept",
+        "Afspraken"
+      ],
+      "description": "Uw correspondentie en de afspraken die eruit voortkomen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "mijn-relaties",
+      "url": "/apps/mijn-relaties.html",
+      "name": "Wie heeft toegang tot mij",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Uw toegang",
+        "Toestemmingen",
+        "Activiteit"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "mijn-sessies",
+      "url": "/apps/mijn-sessies.html",
+      "name": "Waar ben ik aanwezig",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Mijn sessies",
+        "Alles behalve deze",
+        "Activiteit"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "mijnmall",
+      "url": "/apps/mijnmall.html",
+      "name": "Mijn Mall",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Uw selectie",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Je lijsten, je reismanden en de vragen die je in de Mall hebt uitgezet.",
+      "maturity": "L0"
+    },
+    {
+      "id": "move",
+      "url": "/apps/move.html",
+      "name": "Haal ik het?",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "route",
+      "icon": "route",
+      "sections": [
+        "De overgangen",
+        "Bestemming",
+        "Overstappen"
+      ],
+      "description": "Bekijk de route en wat onderweg aandacht vraagt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "muziek",
+      "url": "/apps/muziek.html",
+      "name": "RTG Sound",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Meer dan muziek.",
+        "Stations",
+        "Straks in de wachtrij"
+      ],
+      "description": "Je muziek, rustig en zonder reclame.",
+      "maturity": "L0"
+    },
+    {
+      "id": "navigatie",
+      "url": "/apps/navigatie.html",
+      "name": "Navigatie",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "route",
+      "icon": "route",
+      "sections": [
+        "De weg denkt mee.",
+        "Route",
+        "Kaarten"
+      ],
+      "description": "Navigeren met de RTG-kaart.",
+      "maturity": "L0"
+    },
+    {
+      "id": "nieuws",
+      "url": "/apps/nieuws.html",
+      "name": "Nieuws",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Voor u",
+        "Bewaard",
+        "Recent"
+      ],
+      "description": "RTG Nieuws per rubriek, met wat je later wilt lezen bewaard.",
+      "maturity": "L0"
+    },
+    {
+      "id": "notities",
+      "url": "/apps/notities.html",
+      "name": "Notities & Taken",
+      "world": "living",
+      "worlds": [
+        "living",
+        "travel",
+        "work",
+        "foundation"
+      ],
+      "type": "note",
+      "icon": "notebook-pen",
+      "sections": [
+        "Uw overzicht",
+        "Volgende stap",
+        "Bewaard"
+      ],
+      "description": "Notities en lijstjes met vinkjes; delen op codenaam is samen werken, en een datum wordt vanzelf een agenda-afspraak.",
+      "maturity": "L0"
+    },
+    {
+      "id": "office",
+      "url": "/apps/office.html",
+      "name": "RTDocs",
+      "world": "work",
+      "worlds": [
+        "living",
+        "travel",
+        "work",
+        "foundation"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "Daarna",
+        "RTG Office",
+        "Werk dat door kan."
+      ],
+      "description": "De juiste documentversie, context en menselijke beoordeling bij het werk dat haar nodig heeft.",
+      "maturity": "L0"
+    },
+    {
+      "id": "onderhoud",
+      "url": "/apps/onderhoud.html",
+      "name": "Onderhoud",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Open melding",
+        "Afspraak met een vakmens",
+        "Voortgang"
+      ],
+      "description": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "onderneming",
+      "url": "/apps/onderneming.html",
+      "name": "Onderneming",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw organisatie",
+        "Open acties",
+        "Bedrijfsgegevens"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "oog",
+      "url": "/apps/oog.html",
+      "name": "RTG Eye",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "capture",
+      "icon": "camera",
+      "sections": [
+        "Voertuigschouw",
+        "Laatste schouwen",
+        "Werkvloer"
+      ],
+      "description": "Uw opname blijft een concept tot u deze bewaart.",
+      "maturity": "L0"
+    },
+    {
+      "id": "ov",
+      "url": "/apps/ov.html",
+      "name": "RTG OV",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Alles voor uw volgende reis",
+        "Waar gaat het heen?",
+        "Hoe wilt u reizen?"
+      ],
+      "description": "Bus, trein, metro, veerboot en taxi in één reisapp, met live GPS en snelle check-in.",
+      "maturity": "L0"
+    },
+    {
+      "id": "ovcontrol",
+      "url": "/apps/ovcontrol.html",
+      "name": "RTG Mobility Control Tower",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Lijnen en diensten",
+        "Afwijkingen",
+        "Beschikbare voertuigen"
+      ],
+      "description": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "ovdienst",
+      "url": "/apps/ovdienst.html",
+      "name": "OV-dienst",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Uw lijn",
+        "Volgende halte",
+        "Dienstafspraken"
+      ],
+      "description": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "overheid",
+      "url": "/apps/overheid.html",
+      "name": "De Overheid",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Berichtenbox",
+        "Uw aangiften",
+        "Uw aanvragen"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "overheidspda",
+      "url": "/apps/overheidspda.html",
+      "name": "Overheids-PDA",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw werk",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "ovroutes",
+      "url": "/apps/ovroutes.html",
+      "name": "OV-routes",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "route",
+      "icon": "route",
+      "sections": [
+        "Uw lijnen",
+        "Nieuwe lijn",
+        "Overstappen"
+      ],
+      "description": "Bekijk de route en wat onderweg aandacht vraagt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "pakketten",
+      "url": "/apps/pakketten.html",
+      "name": "RTG Bedrijfspakketten",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Werkplekken",
+        "Inbegrepen mogelijkheden",
+        "Voorwaarden"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "partner-network",
+      "url": "/apps/partner-network.html",
+      "name": "Partner Network",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Viering zonder drukte.",
+        "Vier beloften sluiten op elkaar aan.",
+        "Alles loopt volgens belofte."
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "partner-worden",
+      "url": "/apps/partner-worden.html",
+      "name": "Partner worden",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw aanvraag",
+        "Bedrijfsgegevens",
+        "Afspraken"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "passkeys",
+      "url": "/apps/passkeys.html",
+      "name": "Passkeys",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Uw eerste passkey",
+        "Inloggen met een passkey",
+        "Mijn passkeys"
+      ],
+      "description": "Inloggen met vingerafdruk, gezicht of een fysieke sleutel.",
+      "maturity": "L0"
+    },
+    {
+      "id": "pay",
+      "url": "/apps/pay.html",
+      "name": "Betalen",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Tikken",
+        "Voor jou",
+        "Klompje, voor wie er niet bij is"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "payroll",
+      "url": "/apps/payroll.html",
+      "name": "RTG Payroll · het loonkantoor",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Loonperiode",
+        "Te controleren",
+        "Klaar voor akkoord"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "personeel",
+      "url": "/apps/personeel.html",
+      "name": "Personeel",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw dienst",
+        "Teamrooster",
+        "Uw profiel"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "platformregister",
+      "url": "/apps/platformregister.html",
+      "name": "Platformregister",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Geregistreerde onderdelen",
+        "Relaties",
+        "Onderbouwing"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "podium",
+      "url": "/apps/podium.html",
+      "name": "Podium",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Nu live",
+        "Alle kanalen",
+        "Mijn kanaal"
+      ],
+      "description": "Je eigen live-kanaal (18+), met chat, RTG Pay-cadeaus en abonnementen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "project-room",
+      "url": "/apps/project-room.html",
+      "name": "Project Room",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "note",
+      "icon": "notebook-pen",
+      "sections": [
+        "Uw volgende stap",
+        "Projectdossier",
+        "Oplevering"
+      ],
+      "description": "Van goedgekeurd besluit naar één volgende stap, een levend projectdossier en aantoonbare menselijke oplevering.",
+      "maturity": "L0"
+    },
+    {
+      "id": "pulse",
+      "url": "/apps/pulse.html",
+      "name": "Pulse",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Uw kring",
+        "Gesprekken",
+        "Gedeelde momenten"
+      ],
+      "description": "De hoogtepunten van vandaag in jouw RTG-wereld, rustig gebundeld, geen eindeloze feed.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rechtbank",
+      "url": "/apps/rechtbank.html",
+      "name": "De Rechtspraak (griffie)",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Zaakdossier",
+        "Zittingen",
+        "Processtukken"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "redactie-pda",
+      "url": "/apps/redactie-pda.html",
+      "name": "Redactie PDA",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Uw concept",
+        "Bewerken",
+        "Voorvertoning"
+      ],
+      "description": "Uw werk krijgt vorm, stap voor stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "redactie",
+      "url": "/apps/redactie.html",
+      "name": "RTG Redactie · Journalistiek",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Snel nieuws plaatsen",
+        "Nieuw blok",
+        "Kies beeld"
+      ],
+      "description": "Uw werk krijgt vorm, stap voor stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "redactiekantoor",
+      "url": "/apps/redactiekantoor.html",
+      "name": "RTG Redactie (kantoor)",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Uw concept",
+        "Bewerken",
+        "Voorvertoning"
+      ],
+      "description": "Uw werk krijgt vorm, stap voor stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "reisboek",
+      "url": "/apps/reisboek.html",
+      "name": "Reisboek",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Reis beheren",
+        "Verblijf",
+        "Reisdocumenten"
+      ],
+      "description": "Uw prive-reisdossier: per reis een draaiboek met de heen- en terugreis, de verblijven, de reisdocumenten met geldigheid en een dag-tot-dag-programma.",
+      "maturity": "L0"
+    },
+    {
+      "id": "reisbureau",
+      "url": "/apps/reisbureau.html",
+      "name": "Reisbureau",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Vertel ons hoe u wilt reizen.",
+        "Verblijf",
+        "Reisdocumenten"
+      ],
+      "description": "Samengestelde reizen tegen de nettoprijs, met AI-reisadvies in gewone woorden.",
+      "maturity": "L0"
+    },
+    {
+      "id": "reisuitnodiging",
+      "url": "/apps/reisuitnodiging.html",
+      "name": "Uw reis staat klaar",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Heenreis",
+        "Verblijf",
+        "Reisdocumenten"
+      ],
+      "description": "Uw reis, stap voor stap bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "reizen-veilig",
+      "url": "/apps/reizen-veilig.html",
+      "name": "Reizen & Veilig",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Alleen delen wat nodig is",
+        "Ibiza, jetset-week",
+        "Gstaad, alpien weekend"
+      ],
+      "description": "Uw reis, stap voor stap bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "reizen",
+      "url": "/apps/reizen.html",
+      "name": "RTG Reizen",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Alles voor onderweg.",
+        "Uw reisboek",
+        "Uw volgende stap"
+      ],
+      "description": "Uw komende reis bij elkaar -- vlucht, verblijf, reis en charter -- ongeacht in welke app u hem boekte. Boeken en annuleren blijft in de app die het echte werk doet.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rendezvous",
+      "url": "/apps/rendezvous.html",
+      "name": "Rendez-vous",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Uw introductie",
+        "Beschikbaarheid",
+        "Afspraakvoorstel"
+      ],
+      "description": "Besloten introducties voor Lifestyle en Business: waar u tegelijk bent en welk dagdeel u beiden uitkomt, en met Arrange it regelt De Rechterhand de ontmoeting.",
+      "maturity": "L0"
+    },
+    {
+      "id": "residentie",
+      "url": "/apps/residentie.html",
+      "name": "Residentie",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "stay",
+      "icon": "bed-double",
+      "sections": [
+        "Uw residentie",
+        "De huisgids",
+        "Contact tijdens uw verblijf"
+      ],
+      "description": "Uw verblijf en aankomst rustig voorbereid.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rijksloket",
+      "url": "/apps/rijksloket.html",
+      "name": "Rijks-loket (ambtenaar)",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw zaak",
+        "Documenten",
+        "Bekendmakingen"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rit",
+      "url": "/apps/rit.html",
+      "name": "Ritstatus",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Heenreis",
+        "Verblijf",
+        "Reisdocumenten"
+      ],
+      "description": "Uw reis, stap voor stap bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "routedekking",
+      "url": "/apps/routedekking.html",
+      "name": "Routedekking",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "route",
+      "icon": "route",
+      "sections": [
+        "Dekking per domein",
+        "Bronnen",
+        "Ontbrekende schakels"
+      ],
+      "description": "Bekijk de route en wat onderweg aandacht vraagt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "routedossier",
+      "url": "/apps/routedossier.html",
+      "name": "Routedossier",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "route",
+      "icon": "route",
+      "sections": [
+        "Uw route",
+        "Verbindingen",
+        "Bewijs en bronnen"
+      ],
+      "description": "Bekijk de route en wat onderweg aandacht vraagt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rtg",
+      "url": "/apps/rtg.html",
+      "name": "Het Huis",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw reis, documenten en open acties bij elkaar.",
+        "Uw dagelijkse basis.",
+        "Stille luxe, met echte regie."
+      ],
+      "description": "Reserveren, boeken en bestellen bij alle partners, alles op codenaam.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rtgid",
+      "url": "/apps/rtgid.html",
+      "name": "RTG iD",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Inloggen bij een dienst",
+        "Actieve toegang",
+        "Machtigingen"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rtgkantoor",
+      "url": "/apps/rtgkantoor.html",
+      "name": "Het RTG Kantoor · de RTG AI",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Actueel werk",
+        "Onderzoeksjournaal",
+        "Beoordeling"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rtgone",
+      "url": "/apps/rtgone.html",
+      "name": "RTG One",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Vandaag",
+        "Beslis met zicht op het gevolg.",
+        "Laat werk doorlopen, zonder alles over te dragen."
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rtgschool",
+      "url": "/apps/rtgschool.html",
+      "name": "School",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Uw leerpad",
+        "Oefenen",
+        "Terugkijken"
+      ],
+      "description": "Leren en oefenen, met overzicht over uw volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "rtmail",
+      "url": "/apps/rtmail.html",
+      "name": "RTMail",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "mail",
+      "icon": "mail",
+      "sections": [
+        "Daarna",
+        "Kies een bericht",
+        "RTMAIL"
+      ],
+      "description": "Uw correspondentie en de afspraken die eruit voortkomen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "salon",
+      "url": "/apps/salon.html",
+      "name": "De Salon",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Alleen wat van betekenis is.",
+        "Gesprekken",
+        "Gedeelde momenten"
+      ],
+      "description": "Het besloten sociale netwerk van RTG: zelf plaatsen met foto's en onderwerpen, leden volgen, bewaren en reageren. Rahul schrijft een bijschrift mee en vat de reacties samen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "scanner",
+      "url": "/apps/scanner.html",
+      "name": "Scanner",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "capture",
+      "icon": "camera",
+      "sections": [
+        "Voorbeeld",
+        "Opname",
+        "Bewaren"
+      ],
+      "description": "Documenten vastleggen met de camera of uit je foto's, documentmodus voor leesbaar papier, en bewaren als PDF of losse foto's in je Bestanden-kluis.",
+      "maturity": "L0"
+    },
+    {
+      "id": "scherm",
+      "url": "/apps/scherm.html",
+      "name": "Tweede scherm",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+      "maturity": "L0"
+    },
+    {
+      "id": "schoolpartner",
+      "url": "/apps/schoolpartner.html",
+      "name": "RTG School Partner",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "learning",
+      "icon": "graduation-cap",
+      "sections": [
+        "Alles wat een schooldag nodig heeft.",
+        "Goed bestuur begint met overzicht.",
+        "Jouw werk, met jouw bevoegdheden."
+      ],
+      "description": "Leren en oefenen, met overzicht over uw volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "service-bel",
+      "url": "/apps/service-bel.html",
+      "name": "Bellen met RTG",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "call",
+      "icon": "video",
+      "sections": [
+        "Uw gesprek",
+        "Deelnemers",
+        "Gedeeld scherm"
+      ],
+      "description": "Spreek elkaar, met ruimte om samen te kijken.",
+      "maturity": "L0"
+    },
+    {
+      "id": "service",
+      "url": "/apps/service.html",
+      "name": "RTG Service · de wachtrij",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw werk",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "sitemaker",
+      "url": "/apps/sitemaker.html",
+      "name": "Website-maker",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Uw pagina",
+        "Blokken",
+        "Voorvertoning"
+      ],
+      "description": "Bouw met blokken je eigen RTG-site, met eigen foto's en beeld uit De Salon.",
+      "maturity": "L0"
+    },
+    {
+      "id": "sociaal-prive",
+      "url": "/apps/sociaal-prive.html",
+      "name": "Privé",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Uw besloten ruimtes",
+        "Meet",
+        "Vonk"
+      ],
+      "description": "De mensen en gesprekken die voor u tellen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "sociaal",
+      "url": "/apps/sociaal.html",
+      "name": "RTG Sociaal",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Uw volgende moment",
+        "Uw kring",
+        "Tijdlijn"
+      ],
+      "description": "Wat er tussen u en de mensen om u heen speelt -- gesprekken die op antwoord wachten, aanstaande bijeenkomsten, en wat er in uw kring geplaatst is. Praten en plaatsen blijft in de app die het echte werk doet.",
+      "maturity": "L0"
+    },
+    {
+      "id": "spelen",
+      "url": "/apps/spelen.html",
+      "name": "Spelen",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Mens erger je niet",
+        "Schaken",
+        "Woordduel"
+      ],
+      "description": "Dammen, rummikub, Magnaat, partyspellen, sudoku en meer, samen of alleen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "spelen-pas-foundation-open-magnaat",
+      "url": "/apps/spelen.html?pas=foundation&open=magnaat",
+      "name": "Magnaat",
+      "world": "living",
+      "worlds": [
+        "living",
+        "foundation"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Bouw samen een eerlijke onderneming en leer over handel, risico, bank, mensen en verantwoordelijkheid.",
+      "maturity": "L0"
+    },
+    {
+      "id": "spelscherm",
+      "url": "/apps/spelscherm.html",
+      "name": "Game Night",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+      "maturity": "L0"
+    },
+    {
+      "id": "sport",
+      "url": "/apps/sport.html",
+      "name": "Sport",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Je sportactiviteiten en clubs.",
+      "maturity": "L0"
+    },
+    {
+      "id": "sportclub",
+      "url": "/apps/sportclub.html",
+      "name": "FC RTG · Clubkantoor",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "game",
+      "icon": "puzzle",
+      "sections": [
+        "Kiezen",
+        "Samen spelen",
+        "Spelregels"
+      ],
+      "description": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+      "maturity": "L0"
+    },
+    {
+      "id": "stad",
+      "url": "/apps/stad.html",
+      "name": "Mijn Stad",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "route",
+      "icon": "route",
+      "sections": [
+        "Vertrek",
+        "Bestemming",
+        "Overstappen"
+      ],
+      "description": "Alles om je heen in het RTG-web, op de kaart van je stad.",
+      "maturity": "L0"
+    },
+    {
+      "id": "stadsdoos",
+      "url": "/apps/stadsdoos.html",
+      "name": "RTG Stadsdoos veld-app",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw opdracht",
+        "Locatie",
+        "Terugkoppeling"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "studio-pda",
+      "url": "/apps/studio-pda.html",
+      "name": "RTG Studio PDA",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Uw concept",
+        "Bewerken",
+        "Voorvertoning"
+      ],
+      "description": "Uw werk krijgt vorm, stap voor stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "table",
+      "url": "/apps/table.html",
+      "name": "Table",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "hospitality",
+      "icon": "utensils",
+      "sections": [
+        "Gasten en dieetwensen",
+        "Tafelindeling",
+        "Menu per gang"
+      ],
+      "description": "De prive-diners en events die u zelf geeft: gastenlijst met dieet en voorkeuren, tafelindeling, menu per gang. Herbruikbaar voor de volgende keer.",
+      "maturity": "L0"
+    },
+    {
+      "id": "techniek",
+      "url": "/apps/techniek.html",
+      "name": "Technische status",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Systeemstatus",
+        "Open incidenten",
+        "Onderzoek"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "theater",
+      "url": "/apps/theater.html",
+      "name": "Theater",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Uw abonnementen",
+        "Nieuw in de zaal",
+        "Van uw werk"
+      ],
+      "description": "Videobibliotheek op bioscoopniveau, tot 4K, met kanalen en reacties.",
+      "maturity": "L0"
+    },
+    {
+      "id": "thuis",
+      "url": "/apps/thuis.html",
+      "name": "Thuis",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Uw selectie",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Uw keuze, de voorwaarden en de volgende stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "tijdlijn",
+      "url": "/apps/tijdlijn.html",
+      "name": "Tijdlijn",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "note",
+      "icon": "notebook-pen",
+      "sections": [
+        "Terugkijken",
+        "Volgende stap",
+        "Bewaard"
+      ],
+      "description": "Uw notities, afwegingen en plannen bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "toestemming",
+      "url": "/apps/toestemming.html",
+      "name": "Toestemming",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Wat er nu mag",
+        "Wie heeft er gekeken",
+        "Wat u kunt aantonen"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "training",
+      "url": "/apps/training.html",
+      "name": "Training",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "health",
+      "icon": "heart",
+      "sections": [
+        "Vandaag op schema",
+        "Uw trainingsplan",
+        "Eigen voortgang"
+      ],
+      "description": "Uw eigen informatie en afspraken rustig bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "uitgaan",
+      "url": "/apps/uitgaan.html",
+      "name": "Uitgaan",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "shop",
+      "icon": "shopping-bag",
+      "sections": [
+        "Nog iets toevoegen?",
+        "Bijzonderheden",
+        "Voorwaarden"
+      ],
+      "description": "Bars, clubs en beachclubs met hun avonden en gastenlijsten.",
+      "maturity": "L0"
+    },
+    {
+      "id": "vandaag",
+      "url": "/apps/vandaag.html",
+      "name": "Vandaag",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "calendar",
+      "icon": "calendar-days",
+      "sections": [
+        "Eerstvolgende afspraak",
+        "Aandacht nodig",
+        "Uw avond"
+      ],
+      "description": "Een rustig overzicht van uw tijd.",
+      "maturity": "L0"
+    },
+    {
+      "id": "veilig",
+      "url": "/apps/veilig.html",
+      "name": "RTG Veilig",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "safety",
+      "icon": "hand-heart",
+      "sections": [
+        "Uw kring",
+        "Meer rust en zekerheid",
+        "Hulp vinden"
+      ],
+      "description": "Thuiswacht, Codewoord, Vitaal en Thuisrust in een app: zeggen hoe lang je onderweg bent, je kring stil waarschuwen, dagelijks laten weten dat het goed gaat, en stil zijn zonder onbereikbaar te worden. De klok tikt op de server, dus het werkt ook als je telefoon uitvalt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "veilig-codewoord",
+      "url": "/apps/veilig.html#codewoord",
+      "name": "RTG Veilig",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [
+        "Uw kring",
+        "Meer rust en zekerheid"
+      ],
+      "description": "",
+      "maturity": "L0"
+    },
+    {
+      "id": "veilig-rust",
+      "url": "/apps/veilig.html#rust",
+      "name": "RTG Veilig",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [
+        "Uw kring",
+        "Meer rust en zekerheid"
+      ],
+      "description": "",
+      "maturity": "L0"
+    },
+    {
+      "id": "veilig-vitaal",
+      "url": "/apps/veilig.html#vitaal",
+      "name": "RTG Veilig",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [
+        "Uw kring",
+        "Meer rust en zekerheid"
+      ],
+      "description": "",
+      "maturity": "L0"
+    },
+    {
+      "id": "veilig-wacht",
+      "url": "/apps/veilig.html#wacht",
+      "name": "RTG Veilig",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [
+        "Uw kring",
+        "Meer rust en zekerheid"
+      ],
+      "description": "",
+      "maturity": "L0"
+    },
+    {
+      "id": "verificatie",
+      "url": "/apps/verificatie.html",
+      "name": "Identiteit aantonen",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "identity",
+      "icon": "shield-check",
+      "sections": [
+        "Waar u nu staat",
+        "Twee stappen",
+        "Uw identiteitsbewijs"
+      ],
+      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "vertaler",
+      "url": "/apps/vertaler.html",
+      "name": "Vertaler",
+      "world": "living",
+      "worlds": [
+        "living",
+        "travel",
+        "work",
+        "foundation"
+      ],
+      "type": "tools",
+      "icon": "wrench",
+      "sections": [
+        "Uw tekst",
+        "Voorbeeldvertaling",
+        "Reiszinnen"
+      ],
+      "description": "Typen of spreken, live vertalen, voorlezen en reiszinnen per situatie. Geschiedenis blijft op het toestel; zonder AI-sleutel vertaalt het huiswoordenboek eerlijk.",
+      "maturity": "L0"
+    },
+    {
+      "id": "vertegenwoordiging",
+      "url": "/apps/vertegenwoordiging.html",
+      "name": "Mijn team",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Mijn team",
+        "Mijn eigen grens",
+        "Wat er namens mij is gebeurd"
+      ],
+      "description": "De mensen en gesprekken die voor u tellen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "vluchten",
+      "url": "/apps/vluchten.html",
+      "name": "Vluchten",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Heenreis",
+        "Verblijf",
+        "Reisdocumenten"
+      ],
+      "description": "Vluchten zoeken, boeken en volgen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "voeding",
+      "url": "/apps/voeding.html",
+      "name": "Voeding",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "health",
+      "icon": "heart",
+      "sections": [
+        "Uw maaltijdplanning",
+        "Eigen voedingsnotities",
+        "Boodschappen"
+      ],
+      "description": "Uw eigen informatie en afspraken rustig bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "voertuig",
+      "url": "/apps/voertuig.html",
+      "name": "RTG Voertuig",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "fleet",
+      "icon": "car-front",
+      "sections": [
+        "Gekozen voertuig",
+        "Papieren",
+        "Onderhoud"
+      ],
+      "description": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+      "maturity": "L0"
+    },
+    {
+      "id": "vonk",
+      "url": "/apps/vonk.html",
+      "name": "Vonk",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "social",
+      "icon": "users",
+      "sections": [
+        "Wat u belangrijk vindt",
+        "Uw matches",
+        "Ontmoetingsvoorstel"
+      ],
+      "description": "RTG Vonk: zeg wat er echt toe doet (verplicht, sterke voorkeur, leuk meegenomen); hooguit zes mensen per dag, en bij een match kiest u blind uit drie plekken op gelijke reistijd.",
+      "maturity": "L0"
+    },
+    {
+      "id": "websitestudio",
+      "url": "/apps/websitestudio.html",
+      "name": "Website-studio",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Uw ontwerp",
+        "Blokken",
+        "Versies"
+      ],
+      "description": "Uw werk krijgt vorm, stap voor stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "wereld",
+      "url": "/apps/wereld.html",
+      "name": "LivingOS Home",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Het leven, met elkaar.",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "werk",
+      "url": "/apps/werk.html",
+      "name": "RTG Werk OS",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw organisatie, rustig in beeld.",
+        "Wat vraagt aandacht?",
+        "Besluiten met menselijke autoriteit."
+      ],
+      "description": "De werkplek van een hele organisatie: startscherm per rol, projecten, kennisbank, klanten, servicedesk, bouw, apparaten, contracten en besluiten. Wat niet gemeten wordt, staat er als niet gemeten en niet als nul.",
+      "maturity": "L0"
+    },
+    {
+      "id": "werkplek",
+      "url": "/apps/werkplek.html",
+      "name": "RTG Enterprise Campus",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw werk",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "werkruimte",
+      "url": "/apps/werkruimte.html",
+      "name": "Werkruimte",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "briefcase-business",
+      "sections": [
+        "Uw werk",
+        "Aandacht nodig",
+        "Volgende stap"
+      ],
+      "description": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "wonen",
+      "url": "/apps/wonen.html",
+      "name": "Wonen",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "home",
+      "icon": "house",
+      "sections": [
+        "Thuis in beeld",
+        "Vandaag",
+        "Om te bewaren"
+      ],
+      "description": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+      "maturity": "L0"
+    },
+    {
+      "id": "woningdossier",
+      "url": "/apps/woningdossier.html",
+      "name": "Woningdossier",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "files",
+      "icon": "file-text",
+      "sections": [
+        "Snel nodig",
+        "Apparaten thuis",
+        "Toegang"
+      ],
+      "description": "Uw documenten, versies en gedeelde toegang.",
+      "maturity": "L0"
+    },
+    {
+      "id": "zaakkosten",
+      "url": "/apps/zaakkosten.html",
+      "name": "RTG Kostprijs: wat uw zaak ons kost",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Uw kosten",
+        "Verbruik",
+        "Periode"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "zaakpay",
+      "url": "/apps/zaakpay.html",
+      "name": "RTG Pay · de zaak",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "money",
+      "icon": "wallet",
+      "sections": [
+        "Overzicht",
+        "Bewegingen",
+        "Uw akkoord"
+      ],
+      "description": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+      "maturity": "L0"
+    },
+    {
+      "id": "zaakweb",
+      "url": "/apps/zaakweb.html",
+      "name": "Mijn RTG-website",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "create",
+      "icon": "pen-tool",
+      "sections": [
+        "Uw concept",
+        "Bewerken",
+        "Voorvertoning"
+      ],
+      "description": "Uw werk krijgt vorm, stap voor stap.",
+      "maturity": "L0"
+    },
+    {
+      "id": "zaal",
+      "url": "/apps/zaal.html",
+      "name": "De Zaal",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "media",
+      "icon": "play",
+      "sections": [
+        "Voor u",
+        "Bewaard",
+        "Recent"
+      ],
+      "description": "Wat leden zelf gemaakt hebben, op volgorde van wanneer het uitkwam. Geen hitlijst.",
+      "maturity": "L0"
+    },
+    {
+      "id": "zakelijk",
+      "url": "/apps/zakelijk.html",
+      "name": "RTG Zakelijk vervoer",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "travel",
+      "icon": "plane",
+      "sections": [
+        "Wacht op uw akkoord",
+        "Het reisbeleid",
+        "Wat uw medewerker ziet"
+      ],
+      "description": "Uw reis, stap voor stap bij elkaar.",
+      "maturity": "L0"
+    }
+  ]
+}

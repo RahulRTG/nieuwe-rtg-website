@@ -72,7 +72,8 @@ test('publieke website houdt tekst, inhoud en Edge binnen alle schermranden',
     let browser;
     try {
       browser = await pw.chromium.launch(browserOpties(pw));
-      const context = await browser.newContext({ reducedMotion: 'reduce', serviceWorkers: 'block' });
+      const context = await browser.newContext({ reducedMotion: 'reduce', serviceWorkers: 'block', locale: 'nl-NL' });
+      await context.addInitScript(() => localStorage.setItem('rtg_lang', 'nl'));
       const page = await context.newPage();
       for (const viewport of VIEWPORTS) {
         await page.setViewportSize(viewport);

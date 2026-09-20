@@ -948,6 +948,13 @@ const EIGEN_MODULE = new Map([
    Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
    poging is een vermoeden. */
 const GEEN_BRONMUTATIE = new Map([
+  /* Deze broncontracten lezen HTML/tekst via fs. TALEN is alleen hun noemer;
+     diens migratieversie muteren raakt de tekstbewering niet. Op 20-09-2026
+     afzonderlijk gemeten: AI in de paginatitel respectievelijk een ontbrekende
+     fragmentkaart laat precies de bijbehorende toets zakken, met groene
+     nulmetingen. Beide mutaties zijn daarna teruggezet. */
+  ['website-text-style.test.js', 'tekstcontract; handmutatie AI in de paginatitel laat exact de publieke-webteksttoets zakken; vier toetsen in de nulmeting groen'],
+  ['website-codeproof.test.js', 'HTML-contract; handmutatie van een fragmentklasse laat exact de zes-kaartenbewering zakken; drie toetsen in de nulmeting groen'],
   /* DE AFBOUWWET WOONT IN scripts/, EN DAAR KOMT DEZE MOTOR NIET.
 
      Beide toetsen gaan over scripts/lib/afbouw-afloop.js en scripts/afbouw-slot.js.

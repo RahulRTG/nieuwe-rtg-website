@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-09-20T07:16:58.340Z",
-  "completedAt": "2026-09-20T07:17:23.770Z",
+  "startedAt": "2026-09-20T07:35:13.706Z",
+  "completedAt": "2026-09-20T07:35:38.559Z",
   "node": "v24.18.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "8a00a1ef45be4d49cdf288546c718f47e60886e8365e70b2eb1911a0a9f9e57e",
+  "testOutputSha256": "ec3a37b40c8ae664da152e27be76c82ebf989df368e523756018c9b001d19265",
   "sources": {
     "public/apps/access/meaning.js": "34aada4780c1e2e836d3e6b5d9e0839ccd51d5f75078ef0aca7a4a49499fbedd",
     "public/apps/access/portal.css": "50a4099d085813b3b8e00021f62e0e8a30e5170779f1613c5d3dc9f2d0b34b90",
@@ -16,7 +16,7 @@
     "public/shared/rtg-simple.css": "4ff1b4790c987556a34ed8d59fd00e626411af52250da3ec26491a9842e16148",
     "public/shared/rtg-edge-appbar.js": "59de3b2e49addd8a5a708969a3d0399f3dd53cb39a5666f8bd2f4525ea998c7c",
     "public/shared/verbinding.js": "68360e7729f19f512c01fdee4cd3bebb5f7f21f057065e88da536a146cb80289",
-    "public/shared/i18n.js": "f17c4683e77cb41f7c457ccfc46445cce84feac58e74ee468894ffe8ab4c8a0c",
+    "public/shared/i18n.js": "a1413f14c50b9b32c3122e193726427766486b7125ece1c0d7cc96754da7cc7a",
     "public/shared/rtg-edge-smart-menu.js": "ace12eb9ac031c6b8453799c21bb7a14f465ca644b10738e3c86bda120b96560",
     "public/shared/rtg-edge-library.js": "b216e3b2f82abae5440a8ece6c1d3745e68b2b27be6a8bb879cd148fe0e98a16",
     "public/shared/rtg-adaptive-edge-controls.js": "b720987449bbd1b3976ff513e8344e5b7c49787d2012611a470e603f35c729cd",

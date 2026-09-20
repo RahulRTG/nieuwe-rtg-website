@@ -4716,6 +4716,12 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
     ['public/shared/rtg-adaptive-edge.css', new Set([
       'var(--rtg-radius-system,22px)'
     ])],
+    ['public/shared/i18n/i18n-03.js', new Set([
+      'var(--rtg-radius-content,2px)', 'var(--rtg-radius-system,22px)'
+    ])],
+    ['public/shared/i18n.js', new Set([
+      'var(--rtg-radius-content,2px)', 'var(--rtg-radius-system,22px)'
+    ])],
     ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)'])], ['public/shared/rtg-simple.css', new Set([
       'var(--rtg-radius-system)!important'
     ])],

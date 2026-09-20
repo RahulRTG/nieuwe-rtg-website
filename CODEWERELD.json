@@ -1,27 +1,27 @@
 {
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
-    "op": "2026-09-19",
-    "commit": "6083f652"
+    "op": "2026-09-20",
+    "commit": "def8834c"
   },
   "registers": {
     "geteld": 178,
-    "opRoute": 63,
-    "opBestand": 94,
+    "opRoute": 62,
+    "opBestand": 95,
     "opSymbool": 1,
     "zonderAs": 20
   },
   "assen": {
     "route": {
-      "sleutels": 6288,
+      "sleutels": 6290,
       "registers": 74
     },
     "bestand": {
-      "sleutels": 4827,
+      "sleutels": 5178,
       "registers": 139
     },
     "symbool": {
-      "sleutels": 19517,
+      "sleutels": 22525,
       "registers": 1,
       "reden": null,
       "gereedschapAanwezig": true,
@@ -33,13 +33,13 @@
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 15840,
-        "seconden": 3
+        "seconden": 3.4
       }
     }
   },
   "ruggengraat": {
-    "paden": 6288,
-    "inMeerDanEenRegister": 5490,
+    "paden": 6290,
+    "inMeerDanEenRegister": 5492,
     "pct": 87.3,
     "verdeling": [
       {
@@ -72,11 +72,11 @@
       },
       {
         "registers": 28,
-        "paden": 22
+        "paden": 21
       },
       {
         "registers": 27,
-        "paden": 27
+        "paden": 28
       },
       {
         "registers": 26,
@@ -88,75 +88,75 @@
       },
       {
         "registers": 24,
-        "paden": 356
+        "paden": 355
       },
       {
         "registers": 23,
-        "paden": 737
-      },
-      {
-        "registers": 22,
-        "paden": 1208
-      },
-      {
-        "registers": 21,
         "paden": 744
       },
       {
+        "registers": 22,
+        "paden": 1203
+      },
+      {
+        "registers": 21,
+        "paden": 743
+      },
+      {
         "registers": 20,
-        "paden": 339
+        "paden": 341
       },
       {
         "registers": 19,
-        "paden": 153
+        "paden": 151
       },
       {
         "registers": 18,
-        "paden": 183
+        "paden": 184
       },
       {
         "registers": 17,
-        "paden": 148
+        "paden": 155
       },
       {
         "registers": 16,
-        "paden": 160
+        "paden": 194
       },
       {
         "registers": 15,
-        "paden": 324
+        "paden": 337
       },
       {
         "registers": 14,
-        "paden": 153
+        "paden": 150
       },
       {
         "registers": 13,
-        "paden": 64
+        "paden": 88
       },
       {
         "registers": 12,
-        "paden": 59
+        "paden": 47
       },
       {
         "registers": 11,
-        "paden": 59
-      },
-      {
-        "registers": 10,
-        "paden": 11
-      },
-      {
-        "registers": 9,
         "paden": 13
       },
       {
+        "registers": 10,
+        "paden": 4
+      },
+      {
+        "registers": 9,
+        "paden": 3
+      },
+      {
         "registers": 8,
-        "paden": 9
+        "paden": 25
       },
       {
         "registers": 7,
-        "paden": 29
+        "paden": 12
       },
       {
         "registers": 6,
@@ -168,11 +168,11 @@
       },
       {
         "registers": 4,
-        "paden": 71
+        "paden": 72
       },
       {
         "registers": 3,
-        "paden": 50
+        "paden": 51
       },
       {
         "registers": 2,
@@ -186,7 +186,7 @@
   },
   "brug": {
     "uitleg": "paren route -> bestand die BINNEN EEN RIJ van een register staan; alleen daar beweert een register dat die twee bij elkaar horen",
-    "paden": 5365,
+    "paden": 5407,
     "registersDieSpreken": [
       "AANROEPGRAAF.json",
       "DOELGROEPBEREIK.json",
@@ -196,47 +196,86 @@
       "ROUTEBRON.json",
       "SCHRIJFANALYSE.json"
     ],
-    "verschilToetsbaar": 5051,
-    "verschilDekkingPct": 94.1,
-    "verschillen": 15,
+    "verschilToetsbaar": 5202,
+    "verschilDekkingPct": 96.2,
+    "verschillen": 18,
     "soortBeslistIn": "ROUTEBRON.json -- daar wordt een verschil ingedeeld als `verouderd` of `tegenspraak`; deze meter telt alleen DAT ze verschillen",
     "verschilReden": null,
     "verschilLijst": [
       {
-        "pad": "/api/bedrijf/werkruimte/maak",
+        "pad": "/api/fluister",
         "bestanden": [
           {
-            "bestand": "server/bedrijf/index.js",
+            "bestand": "server/routes/member/persoonlijk-rahul.js",
             "volgens": [
               "AANROEPGRAAF.json",
-              "ROUTEBRON.json",
-              "SCHRIJFANALYSE.json"
+              "DOELGROEPBEREIK.json",
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
             ]
           },
           {
-            "bestand": "server/bedrijf/werkruimte.js",
+            "bestand": "server/routes/member/persoonlijk.js",
             "volgens": [
-              "MACHINEDEKKING.json"
+              "SCHRIJFANALYSE.json"
             ]
           }
         ]
       },
       {
-        "pad": "/api/fluister",
+        "pad": "/api/bedrijf/werkruimte/maak",
         "bestanden": [
           {
-            "bestand": "server/routes/member/persoonlijk.js",
+            "bestand": "server/bedrijf/werkruimte.js",
             "volgens": [
               "AANROEPGRAAF.json",
-              "ROUTEBRON.json",
-              "SCHRIJFANALYSE.json"
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
             ]
           },
           {
-            "bestand": "server/routes/member/persoonlijk-rahul.js",
+            "bestand": "server/bedrijf/index.js",
             "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
+        "pad": "/api/salon/deal/claim",
+        "bestanden": [
+          {
+            "bestand": "server/routes/member/salon-claims.js",
+            "volgens": [
+              "AANROEPGRAAF.json",
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/member/salon.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
+        "pad": "/api/supplier/salon/deal/redeem",
+        "bestanden": [
+          {
+            "bestand": "server/routes/supplier/salon/claims.js",
+            "volgens": [
+              "AANROEPGRAAF.json",
               "DOELGROEPBEREIK.json",
-              "MACHINEDEKKING.json"
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/supplier/salon/publiceren.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
             ]
           }
         ]
@@ -245,73 +284,35 @@
         "pad": "/api/supplier/horeca/arrival/promise",
         "bestanden": [
           {
-            "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
-            "volgens": [
-              "AANROEPGRAAF.json",
-              "SCHRIJFANALYSE.json"
-            ]
-          },
-          {
             "bestand": "server/routes/supplier/horeca/invisible-arrival-zaak.js",
             "volgens": [
+              "AANROEPGRAAF.json",
               "MACHINEDEKKING.json",
               "ROUTEBRON.json"
-            ]
-          }
-        ]
-      },
-      {
-        "pad": "/api/supplier/horeca/gang/vrij",
-        "bestanden": [
-          {
-            "bestand": "server/routes/supplier/horeca/rekening.js",
-            "volgens": [
-              "AANROEPGRAAF.json",
-              "SCHRIJFANALYSE.json"
             ]
           },
-          {
-            "bestand": "server/routes/supplier/horeca/rekeninglezen.js",
-            "volgens": [
-              "MACHINEDEKKING.json",
-              "ROUTEBRON.json"
-            ]
-          }
-        ]
-      },
-      {
-        "pad": "/api/supplier/horeca/arrivals",
-        "bestanden": [
           {
             "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
             "volgens": [
-              "AANROEPGRAAF.json",
               "SCHRIJFANALYSE.json"
-            ]
-          },
-          {
-            "bestand": "server/routes/supplier/horeca/invisible-arrival-zaak.js",
-            "volgens": [
-              "ROUTEBRON.json"
             ]
           }
         ]
       },
       {
-        "pad": "/api/supplier/horeca/rekening",
+        "pad": "/api/bedrijf/geconsolideerd",
         "bestanden": [
           {
-            "bestand": "server/routes/supplier/horeca/rekening.js",
+            "bestand": "server/bedrijf/beeld-consolidatie.js",
             "volgens": [
               "AANROEPGRAAF.json",
-              "SCHRIJFANALYSE.json"
+              "ROUTEBRON.json"
             ]
           },
           {
-            "bestand": "server/routes/supplier/horeca/rekeninglezen.js",
+            "bestand": "server/bedrijf/beeld.js",
             "volgens": [
-              "MACHINEDEKKING.json",
-              "ROUTEBRON.json"
+              "SCHRIJFANALYSE.json"
             ]
           }
         ]
@@ -336,40 +337,38 @@
         ]
       },
       {
-        "pad": "/api/office/bank/incasso",
+        "pad": "/api/supplier/horeca/arrivals",
         "bestanden": [
           {
-            "bestand": "server/routes/kantoren/bank-rekeningen.js",
+            "bestand": "server/routes/supplier/horeca/invisible-arrival-zaak.js",
             "volgens": [
               "AANROEPGRAAF.json",
-              "ROUTEBRON.json",
-              "SCHRIJFANALYSE.json"
+              "ROUTEBRON.json"
             ]
           },
           {
-            "bestand": "server/routes/kantoren/bank-incasso.js",
+            "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
             "volgens": [
-              "MACHINEDEKKING.json",
-              "MUTATIESEMANTIEK.json"
+              "SCHRIJFANALYSE.json"
             ]
           }
         ]
       },
       {
-        "pad": "/api/salon/deal/claim",
+        "pad": "/api/supplier/horeca/gang/vrij",
         "bestanden": [
           {
-            "bestand": "server/routes/member/salon.js",
+            "bestand": "server/routes/supplier/horeca/rekeninglezen.js",
             "volgens": [
               "AANROEPGRAAF.json",
-              "ROUTEBRON.json",
-              "SCHRIJFANALYSE.json"
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
             ]
           },
           {
-            "bestand": "server/routes/member/salon-claims.js",
+            "bestand": "server/routes/supplier/horeca/rekening.js",
             "volgens": [
-              "MACHINEDEKKING.json"
+              "SCHRIJFANALYSE.json"
             ]
           }
         ]
@@ -378,36 +377,16 @@
         "pad": "/api/supplier/horeca/rekeningen",
         "bestanden": [
           {
-            "bestand": "server/routes/supplier/horeca/rekening.js",
-            "volgens": [
-              "AANROEPGRAAF.json",
-              "SCHRIJFANALYSE.json"
-            ]
-          },
-          {
             "bestand": "server/routes/supplier/horeca/rekeninglezen.js",
             "volgens": [
-              "ROUTEBRON.json"
-            ]
-          }
-        ]
-      },
-      {
-        "pad": "/api/supplier/salon/deal/redeem",
-        "bestanden": [
-          {
-            "bestand": "server/routes/supplier/salon/publiceren.js",
-            "volgens": [
               "AANROEPGRAAF.json",
-              "ROUTEBRON.json",
-              "SCHRIJFANALYSE.json"
+              "ROUTEBRON.json"
             ]
           },
           {
-            "bestand": "server/routes/supplier/salon/claims.js",
+            "bestand": "server/routes/supplier/horeca/rekening.js",
             "volgens": [
-              "DOELGROEPBEREIK.json",
-              "MACHINEDEKKING.json"
+              "SCHRIJFANALYSE.json"
             ]
           }
         ]
@@ -418,13 +397,13 @@
           {
             "bestand": "server/routes/member/persoonlijk-spar.js",
             "volgens": [
-              "DOELGROEPBEREIK.json"
+              "DOELGROEPBEREIK.json",
+              "ROUTEBRON.json"
             ]
           },
           {
             "bestand": "server/routes/member/persoonlijk.js",
             "volgens": [
-              "ROUTEBRON.json",
               "SCHRIJFANALYSE.json"
             ]
           }
@@ -468,18 +447,89 @@
         ]
       },
       {
+        "pad": "/api/office/bank/incasso",
+        "bestanden": [
+          {
+            "bestand": "server/routes/kantoren/bank-incasso.js",
+            "volgens": [
+              "MACHINEDEKKING.json",
+              "MUTATIESEMANTIEK.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/kantoren/bank-rekeningen.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
         "pad": "/api/spar/status",
         "bestanden": [
           {
             "bestand": "server/routes/member/persoonlijk-spar.js",
             "volgens": [
-              "MACHINEDEKKING.json"
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
             ]
           },
           {
             "bestand": "server/routes/member/persoonlijk.js",
             "volgens": [
-              "ROUTEBRON.json",
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
+        "pad": "/api/supplier/horeca/rekening",
+        "bestanden": [
+          {
+            "bestand": "server/routes/supplier/horeca/rekeninglezen.js",
+            "volgens": [
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/supplier/horeca/rekening.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
+        "pad": "/api/bedrijf/werkruimte",
+        "bestanden": [
+          {
+            "bestand": "server/bedrijf/werkruimte.js",
+            "volgens": [
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/bedrijf/index.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
+        "pad": "/api/spar/parkeer",
+        "bestanden": [
+          {
+            "bestand": "server/routes/member/persoonlijk-spar.js",
+            "volgens": [
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/member/persoonlijk.js",
+            "volgens": [
               "SCHRIJFANALYSE.json"
             ]
           }
@@ -490,11 +540,11 @@
   "bronbereik": {
     "uitleg": "twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.",
     "bestanden": 4675,
-    "genoemd": 4325,
-    "pct": 92.5,
-    "gedrag": 2404,
-    "gedragPct": 51.4,
-    "relatie": 4151,
+    "genoemd": 4675,
+    "pct": 100,
+    "gedrag": 2415,
+    "gedragPct": 51.7,
+    "relatie": 4675,
     "indexregisters": [
       {
         "register": "AANROEPGRAAF.json",
@@ -520,7 +570,7 @@
     "zwijgendeRegisters": [
       {
         "register": "SCHERMGEDRAG.json",
-        "bestanden": 137
+        "bestanden": 141
       }
     ],
     "indexgrens": "een register telt als index als hij zichzelf zo verklaart (soort: index) of minstens 95% van een boom noemt. Een index zegt WAAR iets woont en WAT met wat samenhangt; hij zegt niet of het schrijft, klopt of bewezen is -- daarom telt hij niet mee voor de gedragsteller.",
@@ -528,44 +578,23 @@
       {
         "boom": "server",
         "bestanden": 3582,
-        "genoemd": 3291,
-        "pct": 91.9,
-        "gedrag": 2103,
+        "genoemd": 3582,
+        "pct": 100,
+        "gedrag": 2104,
         "gedragPct": 58.7
       },
       {
         "boom": "public",
         "bestanden": 1093,
-        "genoemd": 1034,
-        "pct": 94.6,
-        "gedrag": 301,
-        "gedragPct": 27.5
+        "genoemd": 1093,
+        "pct": 100,
+        "gedrag": 311,
+        "gedragPct": 28.5
       }
     ],
     "serverPct": 58.7,
-    "publicPct": 27.5,
-    "nooitGenoemdVoorbeeld": [
-      "server/bedrijf/productie-identiteit.js",
-      "server/config/foundation-vrijgave.js",
-      "server/config/productie-identiteit.js",
-      "server/config/productie-media.js",
-      "server/db/collectie-bewerken.js",
-      "server/db/economische-boeking.js",
-      "server/db/opslag-slot.js",
-      "server/db/resync.js",
-      "server/db/verzoekwikkel.js",
-      "server/foundation/systeembericht.js",
-      "server/functies/register/cat-domeinen5.js",
-      "server/functies/register/cat-genres.js",
-      "server/functies/register/cat-life2.js",
-      "server/functies/register/fasetreden.js",
-      "server/inzagelog-bewaring.js",
-      "server/inzagelog-veel.js",
-      "server/kern/aanmeldingen/lidabonnement-opzeg.js",
-      "server/kern/aanmeldingen/lidabonnement.js",
-      "server/kern/ai/routeropslag.js",
-      "server/kern/ai/routertellers.js"
-    ],
+    "publicPct": 28.5,
+    "nooitGenoemdVoorbeeld": [],
     "zonderGedragVoorbeeld": [
       "server/accounts/demohash.js",
       "server/accounts/dossier.js",
@@ -593,6 +622,10 @@
     "uitleg": "elk register telt zijn eigen aantal routes. Wie ze samenvoegt kiest een noemer, en dat is een besluit -- geen afleiding (zelfde vondst als MUTATIEINVENTARIS.json).",
     "perRegister": [
       {
+        "register": "ROUTEBRON.json",
+        "paden": 5101
+      },
+      {
         "register": "DEKKING.json",
         "paden": 5081
       },
@@ -615,10 +648,6 @@
       {
         "register": "FAALPROEF.json",
         "paden": 4961
-      },
-      {
-        "register": "ROUTEBRON.json",
-        "paden": 4945
       },
       {
         "register": "ROLPROEF.json",
@@ -678,19 +707,19 @@
       },
       {
         "register": "AANROEPGRAAF.json",
-        "paden": 2978
+        "paden": 3122
       },
       {
         "register": "IDOR.json",
         "paden": 1705
       },
       {
-        "register": "MUTATIECONTRACT-VOORSTEL.json",
-        "paden": 1026
+        "register": "SCHERMROUTES.json",
+        "paden": 1059
       },
       {
-        "register": "SCHERMROUTES.json",
-        "paden": 1003
+        "register": "MUTATIECONTRACT-VOORSTEL.json",
+        "paden": 1026
       },
       {
         "register": "HANDLERWACHT.json",
@@ -737,19 +766,19 @@
   "perRegister": [
     {
       "register": "AANROEPGRAAF.json",
-      "as": "route",
-      "paden": 2978,
-      "bestanden": 2710,
+      "as": "bestand",
+      "paden": 3122,
+      "bestanden": 3141,
       "symbolen": 0,
-      "paren": 2987
+      "paren": 3131
     },
     {
       "register": "ROUTEBRON.json",
       "as": "route",
-      "paden": 4945,
-      "bestanden": 644,
+      "paden": 5101,
+      "bestanden": 670,
       "symbolen": 0,
-      "paren": 4942
+      "paren": 5098
     },
     {
       "register": "DEKKING.json",
@@ -832,6 +861,14 @@
       "paren": 0
     },
     {
+      "register": "SYMBOLEN.json",
+      "as": "symbool",
+      "paden": 0,
+      "bestanden": 4680,
+      "symbolen": 22525,
+      "paren": 0
+    },
+    {
       "register": "ONBEWEZEN.json",
       "as": "route",
       "paden": 4498,
@@ -869,14 +906,6 @@
       "paden": 3995,
       "bestanden": 1,
       "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "SYMBOLEN.json",
-      "as": "symbool",
-      "paden": 0,
-      "bestanden": 3992,
-      "symbolen": 19517,
       "paren": 0
     },
     {
@@ -922,8 +951,8 @@
     {
       "register": "LUSSEN.json",
       "as": "bestand",
-      "paden": 36,
-      "bestanden": 1833,
+      "paden": 39,
+      "bestanden": 1886,
       "symbolen": 0,
       "paren": 0
     },
@@ -938,8 +967,8 @@
     {
       "register": "SCHERMROUTES.json",
       "as": "route",
-      "paden": 1003,
-      "bestanden": 384,
+      "paden": 1059,
+      "bestanden": 409,
       "symbolen": 0,
       "paren": 0
     },
@@ -1027,7 +1056,7 @@
       "register": "SCHERMGEDRAG.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 368,
+      "bestanden": 380,
       "symbolen": 0,
       "paren": 0
     },
@@ -1036,6 +1065,14 @@
       "as": "route",
       "paden": 359,
       "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "KERNHERKOMST.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 249,
       "symbolen": 0,
       "paren": 0
     },
@@ -1056,18 +1093,10 @@
       "paren": 0
     },
     {
-      "register": "KERNHERKOMST.json",
-      "as": "bestand",
-      "paden": 0,
-      "bestanden": 233,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
       "register": "TEKSTOPPERVLAK.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 189,
+      "bestanden": 197,
       "symbolen": 0,
       "paren": 0
     },
@@ -1200,14 +1229,6 @@
       "paren": 0
     },
     {
-      "register": "BEWIJSLADDER.json",
-      "as": "bestand",
-      "paden": 0,
-      "bestanden": 57,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
       "register": "REFUNDMIGRATIE.json",
       "as": "bestand",
       "paden": 0,
@@ -1220,6 +1241,14 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 55,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "BEWIJSLADDER.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 54,
       "symbolen": 0,
       "paren": 0
     },
@@ -1408,15 +1437,15 @@
       "paren": 0
     },
     {
-      "register": "DOORWERKING.json",
+      "register": "STAGEVORM.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 19,
+      "bestanden": 20,
       "symbolen": 0,
       "paren": 0
     },
     {
-      "register": "STAGEVORM.json",
+      "register": "DOORWERKING.json",
       "as": "bestand",
       "paden": 0,
       "bestanden": 19,

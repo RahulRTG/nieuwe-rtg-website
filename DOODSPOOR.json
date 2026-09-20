@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-09-19",
+  "stempel": "2026-09-20",
   "uitleg": "Gemeten met scripts/doodspoor.js uit IDEMPROEF.json (wie raakt welke collectie aan, per rol) plus de brontekst (wie leest hem). Een handoff is gesloten, gezien, eigen of open; er is geen schaal. \"gezien\" is vermoed en \"open\" is geen oordeel over een route die niet gemeten is. Zie MAATSTAF.md par. 3.",
   "grens": "Dit meet alleen handoffs die via een collectie lopen. Mail, sms en webhooks als ontvanger vallen erbuiten; eigenaar, termijn en verval van een stand ook (statuscontract, nog niet gebouwd). De eerste ronde is een meting en geen poort.",
   "telling": {
@@ -77,7 +77,7 @@
     "nietGemeten": 3223,
     "lezers": null
   },
-  "infra": 14,
+  "infra": 11,
   "terminaalVerklaard": 34,
   "tussenVerklaard": 7,
   "aangewezen": 1,
@@ -87,19 +87,11 @@
     "genootschap -> POST /api/genootschap/binnen (de proef kreeg status 400)"
   ],
   "verlopen": {
-    "terminaal": [
-      "commandBeleid"
-    ],
+    "terminaal": [],
     "tussen": [],
     "besluit": [],
     "tegenroute": [],
-    "infra": [
-      "sessions",
-      "wacht",
-      "techniek",
-      "wervingIdem",
-      "wervingIdemAfdruk"
-    ],
+    "infra": [],
     "ontvanger": []
   },
   "openCollecties": [

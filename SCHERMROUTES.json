@@ -2,17 +2,17 @@
  "soort": "index",
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
-  "op": "2026-09-19",
-  "commit": "6083f652"
+  "op": "2026-09-20",
+  "commit": "def8834c"
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-09-03T19:18:43.125Z",
-   "commit": "6b68189d"
+   "op": "2026-09-19T19:07:50.269Z",
+   "commit": "6083f652"
   },
-  "bekendePaden": 4925
+  "bekendePaden": 5081
  },
  "gemeten": {
   "schermenMetPad": 405,
@@ -21,123 +21,14 @@
   "verwijzingen": 1086,
   "voorvoegsels": 136,
   "basisPaden": 2,
-  "doodPad": 27,
-  "doodPadVerwijzingen": 27
+  "doodPad": 0,
+  "doodPadVerwijzingen": 0
  },
  "basisPadLijst": [
   "/api/foundation",
   "/api/rtf/social"
  ],
- "doodPad": [
-  {
-   "pad": "/api/connect/dossier",
-   "scherm": "public/apps/connect.html"
-  },
-  {
-   "pad": "/api/connect/horizon",
-   "scherm": "public/apps/connect.html"
-  },
-  {
-   "pad": "/api/connect/ontdek",
-   "scherm": "public/apps/connect.html"
-  },
-  {
-   "pad": "/api/connect/open",
-   "scherm": "public/apps/connect.html"
-  },
-  {
-   "pad": "/api/connect/portfolio",
-   "scherm": "public/apps/connect.html"
-  },
-  {
-   "pad": "/api/connect/schuif",
-   "scherm": "public/apps/connect.html"
-  },
-  {
-   "pad": "/api/connect/signaal",
-   "scherm": "public/apps/connect.html"
-  },
-  {
-   "pad": "/api/connect/werk",
-   "scherm": "public/apps/connect.html"
-  },
-  {
-   "pad": "/api/carriere/regel/toon",
-   "scherm": "public/apps/loopbaanbewijs.html"
-  },
-  {
-   "pad": "/api/move/vooraf",
-   "scherm": "public/apps/mall.html"
-  },
-  {
-   "pad": "/api/neiging/antwoord",
-   "scherm": "public/apps/mijn-neigingen.html"
-  },
-  {
-   "pad": "/api/neiging/geheugen",
-   "scherm": "public/apps/mijn-neigingen.html"
-  },
-  {
-   "pad": "/api/neiging/intake",
-   "scherm": "public/apps/mijn-neigingen.html"
-  },
-  {
-   "pad": "/api/neiging/niet-voor",
-   "scherm": "public/apps/mijn-neigingen.html"
-  },
-  {
-   "pad": "/api/neiging/opnieuw",
-   "scherm": "public/apps/mijn-neigingen.html"
-  },
-  {
-   "pad": "/api/neiging/overslaan",
-   "scherm": "public/apps/mijn-neigingen.html"
-  },
-  {
-   "pad": "/api/neiging/vergeet",
-   "scherm": "public/apps/mijn-neigingen.html"
-  },
-  {
-   "pad": "/api/reisbureau/afzeggen",
-   "scherm": "public/apps/reisbureau.html"
-  },
-  {
-   "pad": "/api/reisbureau/wijzig",
-   "scherm": "public/apps/reisbureau.html"
-  },
-  {
-   "pad": "/api/projectie/kijk",
-   "scherm": "public/apps/spelscherm.js"
-  },
-  {
-   "pad": "/api/projectie/koppel",
-   "scherm": "public/apps/spelscherm.js"
-  },
-  {
-   "pad": "/api/training/voorstel/aanvaard",
-   "scherm": "public/apps/training.html"
-  },
-  {
-   "pad": "/api/training/voorstel/weiger",
-   "scherm": "public/apps/training.html"
-  },
-  {
-   "pad": "/api/training/voorstellen",
-   "scherm": "public/apps/training.html"
-  },
-  {
-   "pad": "/api/home/onderhoud",
-   "scherm": "public/apps/wonen.js"
-  },
-  {
-   "pad": "/api/home/onderhoud/annuleer",
-   "scherm": "public/apps/wonen.js"
-  },
-  {
-   "pad": "/api/home/onderhoud/meld",
-   "scherm": "public/apps/wonen.js"
-  }
- ],
+ "doodPad": [],
  "nietGelezen": [
   {
    "bestand": "public/shared/werkos/werkos-01.js",

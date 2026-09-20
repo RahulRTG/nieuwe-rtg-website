@@ -2,42 +2,43 @@
  "soort": "index",
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
-  "op": "2026-09-19",
-  "commit": "6083f652"
+  "op": "2026-09-20",
+  "commit": "def8834c"
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
   "bestanden": 3582,
   "nietGelezen": 0,
   "aanroepen": 149652,
-  "kanten": 26489,
+  "kanten": 26516,
   "kantenLokaal": 16819,
   "kantenIngevoerd": 1606,
   "kantenLid": 1624,
-  "kantenViaKern": 5885,
+  "kantenViaKern": 5912,
   "kantenModuleAlsFunctie": 82,
   "kantenLidOpInvoer": 260,
   "kantenUitFabriek": 213,
-  "kantenViaKernZonderSymbool": 4079,
-  "kernherkomstGelezen": 1190,
-  "onopgelosteAanroepen": 110996,
-  "onopgelosteNamen": 11577,
+  "kantenViaKernZonderSymbool": 4105,
+  "kernherkomstGelezen": 1246,
+  "onopgelosteAanroepen": 110962,
+  "onopgelosteNamen": 11562,
   "onopgelostNaarSoort": {
    "ingebouwd": 29276,
    "externeModule": 815,
    "kader": 11315,
-   "contextobject": 15706,
+   "contextobject": 15676,
    "uitgepaktObject": 1506,
-   "lokaleWaarde": 19373,
+   "lokaleWaarde": 19369,
    "methodeOpWaarde": 32603,
    "overig": 402
   },
-  "opgelostPct": 25.8,
-  "doelOnbekend": 1,
+  "opgelostPct": 25.9,
+  "doelOnbekend": 0,
+  "bewaakteVooruitwijzing": 1,
   "doelNietVastTeStellen": 60,
-  "symbolenMetAanroeper": 9699,
-  "routesMetSymbool": 3137,
-  "routeSymboolKanten": 6617
+  "symbolenMetAanroeper": 9706,
+  "routesMetSymbool": 3131,
+  "routeSymboolKanten": 6624
  },
  "routeNaarSymbool": [
   {
@@ -865,6 +866,17 @@
     "server/lib/klok.js#nu",
     "server/server.js#appUrl",
     "server/routes/member/herstelkanaal.js#DEV_VELDEN"
+   ]
+  },
+  {
+   "route": "POST /api/bezorg/bestel",
+   "bestand": "server/routes/member/kopen/bezorg.js",
+   "symbolen": [
+    "server/opzet/kernlaag7.js#null",
+    "server/server.js#null",
+    "server/kern/util.js#coord",
+    "server/kern/servicekosten.js#servicekostenVoor",
+    "server/kern/gastzorg.js#null"
    ]
   },
   {
@@ -2074,6 +2086,16 @@
    ]
   },
   {
+   "route": "POST /api/mediaos/aanwezig/volg",
+   "bestand": "server/routes/mediaos.js",
+   "symbolen": [
+    "server/routes/mediaos.js#geenGast",
+    "server/routes/mediaos.js#stuur",
+    "server/kern/mediaos/index.js#null",
+    "server/routes/mediaos.js#sess"
+   ]
+  },
+  {
    "route": "POST /api/meet/kom",
    "bestand": "server/routes/meet.js",
    "symbolen": [
@@ -2091,6 +2113,16 @@
     "server/routes/member/boardroom.js#dgVan",
     "server/routes/member/boardroom.js#taalVan",
     "server/server.js#null"
+   ]
+  },
+  {
+   "route": "POST /api/booking/request",
+   "bestand": "server/routes/member/boeken.js",
+   "symbolen": [
+    "server/opzet/kernlaag7.js#null",
+    "server/server.js#null",
+    "server/server.js#geborenVan",
+    "server/kern/gastzorg.js#null"
    ]
   },
   {
@@ -2284,16 +2316,6 @@
    ]
   },
   {
-   "route": "POST /api/bezorg/bestel",
-   "bestand": "server/routes/member/kopen/bezorg.js",
-   "symbolen": [
-    "server/opzet/kernlaag7.js#null",
-    "server/server.js#null",
-    "server/kern/util.js#coord",
-    "server/kern/servicekosten.js#servicekostenVoor"
-   ]
-  },
-  {
    "route": "POST /api/onderneming/koppel",
    "bestand": "server/routes/member/onderneming.js",
    "symbolen": [
@@ -2401,6 +2423,26 @@
     "server/routes/member/salonapp.js#uit",
     "server/routes/member/salonapp.js#poortVoor",
     "server/routes/member/salonapp.js#fout"
+   ]
+  },
+  {
+   "route": "POST /api/charter/boek",
+   "bestand": "server/routes/member/voertuigen/charter.js",
+   "symbolen": [
+    "server/opzet/kernlaag7.js#null",
+    "server/server.js#null",
+    "server/server.js#geborenVan",
+    "server/kern/gastzorg.js#null"
+   ]
+  },
+  {
+   "route": "POST /api/huur/boek",
+   "bestand": "server/routes/member/voertuigen/huur.js",
+   "symbolen": [
+    "server/opzet/kernlaag7.js#null",
+    "server/server.js#null",
+    "server/server.js#geborenVan",
+    "server/kern/gastzorg.js#null"
    ]
   },
   {
@@ -2701,6 +2743,16 @@
     "server/server.js#tooManyTries",
     "server/server.js#noteFailedTry",
     "server/routes/samen.js#status"
+   ]
+  },
+  {
+   "route": "POST /api/office/service/wachtrij",
+   "bestand": "server/routes/service-kantoor.js",
+   "symbolen": [
+    "server/routes/service-kantoor.js#veilig",
+    "server/routes/service-kantoor.js#lijf",
+    "server/routes/service-kantoor.js#kort",
+    "server/kern/service/index.js#null"
    ]
   },
   {
@@ -5539,11 +5591,20 @@
    ]
   },
   {
-   "route": "POST /api/mediaos/aanwezig/volg",
+   "route": "POST /api/mediaos/aanwezig/mijn",
    "bestand": "server/routes/mediaos.js",
    "symbolen": [
     "server/routes/mediaos.js#geenGast",
-    "server/routes/mediaos.js#stuur",
+    "server/kern/mediaos/index.js#null",
+    "server/routes/mediaos.js#sess"
+   ]
+  },
+  {
+   "route": "POST /api/mediaos/aanwezig",
+   "bestand": "server/routes/mediaos.js",
+   "symbolen": [
+    "server/routes/mediaos.js#geenGast",
+    "server/kern/mediaos/index.js#null",
     "server/routes/mediaos.js#sess"
    ]
   },
@@ -5671,15 +5732,6 @@
     "server/server.js#geenGast",
     "server/routes/member/boardroom.js#teVaak",
     "server/routes/member/boardroom.js#bordOpts"
-   ]
-  },
-  {
-   "route": "POST /api/booking/request",
-   "bestand": "server/routes/member/boeken.js",
-   "symbolen": [
-    "server/opzet/kernlaag7.js#null",
-    "server/server.js#null",
-    "server/server.js#geborenVan"
    ]
   },
   {
@@ -6295,15 +6347,6 @@
    ]
   },
   {
-   "route": "POST /api/charter/boek",
-   "bestand": "server/routes/member/voertuigen/charter.js",
-   "symbolen": [
-    "server/opzet/kernlaag7.js#null",
-    "server/server.js#null",
-    "server/server.js#geborenVan"
-   ]
-  },
-  {
    "route": "POST /api/charter/foto",
    "bestand": "server/routes/member/voertuigen/charter.js",
    "symbolen": [
@@ -6328,15 +6371,6 @@
     "server/routes/member/voertuigen/charter.js#mijnCharter",
     "server/kern/util.js#coord",
     "server/server.js#null"
-   ]
-  },
-  {
-   "route": "POST /api/huur/boek",
-   "bestand": "server/routes/member/voertuigen/huur.js",
-   "symbolen": [
-    "server/opzet/kernlaag7.js#null",
-    "server/server.js#null",
-    "server/server.js#geborenVan"
    ]
   },
   {
@@ -6517,6 +6551,42 @@
     "server/routes/navigatie.js#geenGast",
     "server/routes/navigatie.js#stuur",
     "server/kern/navigatie.js#null"
+   ]
+  },
+  {
+   "route": "POST /api/nav/gebieden",
+   "bestand": "server/routes/navigatie.js",
+   "symbolen": [
+    "server/routes/navigatie.js#geenGast",
+    "server/routes/navigatie.js#stuur",
+    "server/kern/navigatie/mijnkaarten.js#null"
+   ]
+  },
+  {
+   "route": "POST /api/nav/gebied/kies",
+   "bestand": "server/routes/navigatie.js",
+   "symbolen": [
+    "server/routes/navigatie.js#geenGast",
+    "server/routes/navigatie.js#stuur",
+    "server/kern/navigatie/mijnkaarten.js#null"
+   ]
+  },
+  {
+   "route": "POST /api/nav/gebied/weg",
+   "bestand": "server/routes/navigatie.js",
+   "symbolen": [
+    "server/routes/navigatie.js#geenGast",
+    "server/routes/navigatie.js#stuur",
+    "server/kern/navigatie/mijnkaarten.js#null"
+   ]
+  },
+  {
+   "route": "POST /api/nav/gebied/pakket",
+   "bestand": "server/routes/navigatie.js",
+   "symbolen": [
+    "server/routes/navigatie.js#geenGast",
+    "server/kern/navigatie/toestelpakket.js#null",
+    "server/routes/navigatie.js#stuur"
    ]
   },
   {
@@ -6886,15 +6956,6 @@
     "server/routes/samen.js#lid",
     "server/routes/samen.js#handel",
     "server/routes/samen.js#idem"
-   ]
-  },
-  {
-   "route": "POST /api/office/service/wachtrij",
-   "bestand": "server/routes/service-kantoor.js",
-   "symbolen": [
-    "server/routes/service-kantoor.js#veilig",
-    "server/routes/service-kantoor.js#lijf",
-    "server/routes/service-kantoor.js#kort"
    ]
   },
   {
@@ -11733,22 +11794,6 @@
    ]
   },
   {
-   "route": "POST /api/mediaos/aanwezig/mijn",
-   "bestand": "server/routes/mediaos.js",
-   "symbolen": [
-    "server/routes/mediaos.js#geenGast",
-    "server/routes/mediaos.js#sess"
-   ]
-  },
-  {
-   "route": "POST /api/mediaos/aanwezig",
-   "bestand": "server/routes/mediaos.js",
-   "symbolen": [
-    "server/routes/mediaos.js#geenGast",
-    "server/routes/mediaos.js#sess"
-   ]
-  },
-  {
    "route": "POST /api/mediaos/aanwezig/zoek",
    "bestand": "server/routes/mediaos.js",
    "symbolen": [
@@ -11938,6 +11983,14 @@
    "symbolen": [
     "server/opzet/kernlaag7.js#null",
     "server/kern/lidacties.js#koopTicketVoor"
+   ]
+  },
+  {
+   "route": "POST /api/transfer/aanvraag",
+   "bestand": "server/routes/member/kopen/tickets.js",
+   "symbolen": [
+    "server/server.js#null",
+    "server/kern/gastzorg.js#null"
    ]
   },
   {
@@ -12137,38 +12190,6 @@
    "bestand": "server/routes/member/partnerkanaal.js",
    "symbolen": [
     "server/server.js#findStaffPartner",
-    "server/server.js#null"
-   ]
-  },
-  {
-   "route": "POST /api/asset/koop",
-   "bestand": "server/routes/member/persoonlijk-assets.js",
-   "symbolen": [
-    "server/kern/assets.js#null",
-    "server/server.js#null"
-   ]
-  },
-  {
-   "route": "POST /api/asset/herroep",
-   "bestand": "server/routes/member/persoonlijk-assets.js",
-   "symbolen": [
-    "server/kern/assets.js#null",
-    "server/server.js#null"
-   ]
-  },
-  {
-   "route": "POST /api/asset/wachtlijst",
-   "bestand": "server/routes/member/persoonlijk-assets.js",
-   "symbolen": [
-    "server/kern/assets.js#null",
-    "server/server.js#null"
-   ]
-  },
-  {
-   "route": "POST /api/asset/uitstap",
-   "bestand": "server/routes/member/persoonlijk-assets.js",
-   "symbolen": [
-    "server/kern/assets.js#null",
     "server/server.js#null"
    ]
   },
@@ -12837,35 +12858,11 @@
    ]
   },
   {
-   "route": "POST /api/nav/gebieden",
+   "route": "GET /api/nav/gebied/pakket/:code/:deel",
    "bestand": "server/routes/navigatie.js",
    "symbolen": [
     "server/routes/navigatie.js#geenGast",
-    "server/routes/navigatie.js#stuur"
-   ]
-  },
-  {
-   "route": "POST /api/nav/gebied/kies",
-   "bestand": "server/routes/navigatie.js",
-   "symbolen": [
-    "server/routes/navigatie.js#geenGast",
-    "server/routes/navigatie.js#stuur"
-   ]
-  },
-  {
-   "route": "POST /api/nav/gebied/weg",
-   "bestand": "server/routes/navigatie.js",
-   "symbolen": [
-    "server/routes/navigatie.js#geenGast",
-    "server/routes/navigatie.js#stuur"
-   ]
-  },
-  {
-   "route": "POST /api/nav/gebied/pakket",
-   "bestand": "server/routes/navigatie.js",
-   "symbolen": [
-    "server/routes/navigatie.js#geenGast",
-    "server/routes/navigatie.js#stuur"
+    "server/kern/navigatie/toestelpakket.js#null"
    ]
   },
   {
@@ -14037,6 +14034,14 @@
    ]
   },
   {
+   "route": "POST /api/supplier/service/keuzes",
+   "bestand": "server/routes/service-zaak.js",
+   "symbolen": [
+    "server/routes/service-zaak.js#veilig",
+    "server/kern/service/index.js#null"
+   ]
+  },
+  {
    "route": "POST /api/supplier/service/mijn",
    "bestand": "server/routes/service-zaak.js",
    "symbolen": [
@@ -14058,6 +14063,14 @@
    "symbolen": [
     "server/routes/service-zaak.js#veilig",
     "server/routes/service-zaak.js#melder"
+   ]
+  },
+  {
+   "route": "POST /api/service/keuzes",
+   "bestand": "server/routes/service.js",
+   "symbolen": [
+    "server/routes/service.js#veilig",
+    "server/kern/service/index.js#null"
    ]
   },
   {
@@ -14146,6 +14159,14 @@
    "symbolen": [
     "server/routes/social/pin.js#binding",
     "server/routes/social/pin.js#gastheer"
+   ]
+  },
+  {
+   "route": "POST /api/projectie/koppel",
+   "bestand": "server/routes/spellen.js",
+   "symbolen": [
+    "server/routes/spellen.js#veilig",
+    "server/kern/spellen.js#null"
    ]
   },
   {
@@ -17612,6 +17633,13 @@
    ]
   },
   {
+   "route": "POST /api/logout",
+   "bestand": "server/routes/auth/inlog-pas.js",
+   "symbolen": [
+    "server/server.js#null"
+   ]
+  },
+  {
    "route": "POST /api/auth/me",
    "bestand": "server/routes/auth/inlog-pas.js",
    "symbolen": [
@@ -20531,13 +20559,6 @@
    ]
   },
   {
-   "route": "POST /api/transfer/aanvraag",
-   "bestand": "server/routes/member/kopen/tickets.js",
-   "symbolen": [
-    "server/server.js#null"
-   ]
-  },
-  {
    "route": "POST /api/betaal/direct",
    "bestand": "server/routes/member/kopen.js",
    "symbolen": [
@@ -20734,31 +20755,31 @@
    ]
   },
   {
-   "route": "POST /api/assets",
+   "route": "POST /api/asset/koop",
    "bestand": "server/routes/member/persoonlijk-assets.js",
    "symbolen": [
-    "server/kern/assets.js#null"
+    "server/server.js#null"
    ]
   },
   {
-   "route": "POST /api/asset/document",
+   "route": "POST /api/asset/herroep",
    "bestand": "server/routes/member/persoonlijk-assets.js",
    "symbolen": [
-    "server/kern/assets.js#null"
+    "server/server.js#null"
    ]
   },
   {
-   "route": "POST /api/asset/mijn",
+   "route": "POST /api/asset/wachtlijst",
    "bestand": "server/routes/member/persoonlijk-assets.js",
    "symbolen": [
-    "server/kern/assets.js#null"
+    "server/server.js#null"
    ]
   },
   {
-   "route": "POST /api/asset/gebruik",
+   "route": "POST /api/asset/uitstap",
    "bestand": "server/routes/member/persoonlijk-assets.js",
    "symbolen": [
-    "server/kern/assets.js#null"
+    "server/server.js#null"
    ]
   },
   {
@@ -21413,13 +21434,6 @@
    ]
   },
   {
-   "route": "GET /api/nav/gebied/pakket/:code/:deel",
-   "bestand": "server/routes/navigatie.js",
-   "symbolen": [
-    "server/routes/navigatie.js#geenGast"
-   ]
-  },
-  {
    "route": "POST /api/neiging/intake",
    "bestand": "server/routes/neiging.js",
    "symbolen": [
@@ -21585,34 +21599,6 @@
    "bestand": "server/routes/office/toegang.js",
    "symbolen": [
     "server/routes/office/toegang.js#past"
-   ]
-  },
-  {
-   "route": "POST /api/office/asset/waarde",
-   "bestand": "server/routes/office/veiligheid.js",
-   "symbolen": [
-    "server/kern/assets.js#null"
-   ]
-  },
-  {
-   "route": "POST /api/office/asset/overzicht",
-   "bestand": "server/routes/office/veiligheid.js",
-   "symbolen": [
-    "server/kern/assets.js#null"
-   ]
-  },
-  {
-   "route": "POST /api/office/asset/terugkoop",
-   "bestand": "server/routes/office/veiligheid.js",
-   "symbolen": [
-    "server/kern/assets.js#null"
-   ]
-  },
-  {
-   "route": "POST /api/office/asset/fees",
-   "bestand": "server/routes/office/veiligheid.js",
-   "symbolen": [
-    "server/kern/assets.js#null"
    ]
   },
   {
@@ -22729,20 +22715,6 @@
    ]
   },
   {
-   "route": "POST /api/supplier/service/keuzes",
-   "bestand": "server/routes/service-zaak.js",
-   "symbolen": [
-    "server/routes/service-zaak.js#veilig"
-   ]
-  },
-  {
-   "route": "POST /api/service/keuzes",
-   "bestand": "server/routes/service.js",
-   "symbolen": [
-    "server/routes/service.js#veilig"
-   ]
-  },
-  {
    "route": "POST /api/sociaal/graaf",
    "bestand": "server/routes/sociaal.js",
    "symbolen": [
@@ -22887,13 +22859,6 @@
    "bestand": "server/routes/social.js",
    "symbolen": [
     "server/routes/social.js#iceServers"
-   ]
-  },
-  {
-   "route": "POST /api/projectie/koppel",
-   "bestand": "server/routes/spellen.js",
-   "symbolen": [
-    "server/routes/spellen.js#veilig"
    ]
   },
   {
@@ -24077,6 +24042,13 @@
    "bestand": "server/routes/supplier/moedertaal.js",
    "symbolen": [
     "server/translate.js#translate"
+   ]
+  },
+  {
+   "route": "POST /api/supplier/onderneming",
+   "bestand": "server/routes/supplier/onderneming.js",
+   "symbolen": [
+    "server/kern/onderneming/index.js#null"
    ]
   },
   {
@@ -25571,7 +25543,7 @@
   },
   {
    "naam": "save",
-   "aantal": 350
+   "aantal": 349
   },
   {
    "naam": "Date.parse",
@@ -25811,7 +25783,7 @@
     },
     {
      "naam": "crypto.randomBytes",
-     "aantal": 425
+     "aantal": 426
     },
     {
      "naam": "d",
@@ -25876,7 +25848,7 @@
     },
     {
      "naam": "save",
-     "aantal": 294
+     "aantal": 293
     },
     {
      "naam": "eigen.bak",
@@ -27015,12 +26987,15 @@
    ]
   }
  ],
- "doelOnbekend": [
+ "doelOnbekend": [],
+ "bewaakteVooruitwijzing": [
   {
    "van": "server/accounts/transactie.js#begin",
    "naar": "server/db/verzoekcontext.js#registreerDeelnemer",
    "hoe": "lid",
-   "lijn": 128
+   "lijn": 128,
+   "wachtOpLijn": 102,
+   "binding": "verzoekcontext"
   }
  ],
  "nietGelezen": [],
@@ -33240,6 +33215,14 @@
    "naar": "scenarioVan",
    "hoe": "lokaal",
    "lijn": 128
+  },
+  {
+   "vanBestand": "server/betaal-connect.js",
+   "van": "(module)",
+   "naarBestand": "server/kern/connect/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 26
   },
   {
    "vanBestand": "server/betaal-sandbox.js",
@@ -53156,6 +53139,14 @@
   {
    "vanBestand": "server/kern/care/leden.js",
    "van": "careBoek",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 83
+  },
+  {
+   "vanBestand": "server/kern/care/leden.js",
+   "van": "careBoek",
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
@@ -72842,14 +72833,6 @@
    "lijn": 124
   },
   {
-   "vanBestand": "server/kern/fluister/acties.js",
-   "van": "voerUit",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 41
-  },
-  {
    "vanBestand": "server/kern/fluister/betalen.js",
    "van": "bestel",
    "naarBestand": "server/kern/mobiliteit/index.js",
@@ -72936,6 +72919,14 @@
    "naar": null,
    "hoe": "viaKern",
    "lijn": 114
+  },
+  {
+   "vanBestand": "server/kern/fluister/bevestig.js",
+   "van": "reserveer",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 117
   },
   {
    "vanBestand": "server/kern/fluister/boeken.js",
@@ -73040,6 +73031,14 @@
    "naar": null,
    "hoe": "viaKern",
    "lijn": 44
+  },
+  {
+   "vanBestand": "server/kern/fluister/gegevens.js",
+   "van": "voerActieUit",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 47
   },
   {
    "vanBestand": "server/kern/fluister/gegevens.js",
@@ -94011,6 +94010,14 @@
   },
   {
    "vanBestand": "server/kern/lidacties/ritten.js",
+   "van": "vraagRitVoor",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 79
+  },
+  {
+   "vanBestand": "server/kern/lidacties/ritten.js",
    "van": "betaalRitVoor",
    "naarBestand": "server/server.js",
    "naar": null,
@@ -94048,6 +94055,14 @@
    "naar": null,
    "hoe": "viaKern",
    "lijn": 33
+  },
+  {
+   "vanBestand": "server/kern/lidacties.js",
+   "van": "koopTicketVoor",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 61
   },
   {
    "vanBestand": "server/kern/lidacties.js",
@@ -103740,6 +103755,14 @@
   {
    "vanBestand": "server/kern/mailontvanger.js",
    "van": "kentAdres",
+   "naarBestand": "server/kern/service/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 67
+  },
+  {
+   "vanBestand": "server/kern/mailontvanger.js",
+   "van": "kentAdres",
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
@@ -107180,6 +107203,14 @@
   {
    "vanBestand": "server/kern/mediaos/momenten.js",
    "van": "voor",
+   "naarBestand": "server/kern/mediaos/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 30
+  },
+  {
+   "vanBestand": "server/kern/mediaos/momenten.js",
+   "van": "voor",
    "naarBestand": "server/kern/mediaos/momenten.js",
    "naar": "lijst",
    "hoe": "lokaal",
@@ -107592,6 +107623,14 @@
    "naar": "merkVan",
    "hoe": "lokaal",
    "lijn": 53
+  },
+  {
+   "vanBestand": "server/kern/mediaos/zoeken.js",
+   "van": "zoek",
+   "naarBestand": "server/kern/mediaos/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 54
   },
   {
    "vanBestand": "server/kern/medicatie-regels.js",
@@ -128923,6 +128962,14 @@
   },
   {
    "vanBestand": "server/kern/reisbureau-besluit.js",
+   "van": "boekBesluit",
+   "naarBestand": "server/opzet/kernlaag1.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 70
+  },
+  {
+   "vanBestand": "server/kern/reisbureau-besluit.js",
    "van": "bevestig",
    "naarBestand": "server/kern/reisbureau-besluit.js",
    "naar": "pakAanvraag",
@@ -129048,6 +129095,14 @@
    "naar": "nieuwId",
    "hoe": "lokaal",
    "lijn": 144
+  },
+  {
+   "vanBestand": "server/kern/reisbureau-betaling.js",
+   "van": "terugboeken",
+   "naarBestand": "server/server.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 160
   },
   {
    "vanBestand": "server/kern/reisbureau-geldrijen.js",
@@ -142088,6 +142143,14 @@
    "naar": "spiegelNaarPosts",
    "hoe": "lokaal",
    "lijn": 106
+  },
+  {
+   "vanBestand": "server/kern/salon/uitlichten.js",
+   "van": "uitlicht",
+   "naarBestand": "server/kern/mediaos/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 115
   },
   {
    "vanBestand": "server/kern/salon/uitlichten.js",
@@ -156684,6 +156747,14 @@
   {
    "vanBestand": "server/kern/stuur/lus.js",
    "van": "stuurLus",
+   "naarBestand": "server/routes/isolatie.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 73
+  },
+  {
+   "vanBestand": "server/kern/stuur/lus.js",
+   "van": "stuurLus",
    "naarBestand": "server/kern/stuur/lusstap.js",
    "naar": null,
    "hoe": "moduleAlsFunctie",
@@ -156728,6 +156799,14 @@
    "naar": "zwaar",
    "hoe": "ingevoerd",
    "lijn": 128
+  },
+  {
+   "vanBestand": "server/kern/stuur/luscontext.js",
+   "van": "(module)",
+   "naarBestand": "server/routes/isolatie.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 28
   },
   {
    "vanBestand": "server/kern/stuur/luscontext.js",
@@ -156992,6 +157071,14 @@
    "naar": "canoniekeVerwijzingen",
    "hoe": "ingevoerd",
    "lijn": 149
+  },
+  {
+   "vanBestand": "server/kern/stuur/paden.js",
+   "van": "stuurPaden",
+   "naarBestand": "server/routes/isolatie.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 78
   },
   {
    "vanBestand": "server/kern/stuur/paden.js",
@@ -177604,6 +177691,14 @@
   {
    "vanBestand": "server/opzet/kernlaag4.js",
    "van": "(module)",
+   "naarBestand": "server/kern/mediaos/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 57
+  },
+  {
+   "vanBestand": "server/opzet/kernlaag4.js",
+   "van": "(module)",
    "naarBestand": "server/kern/metingen.js",
    "naar": "metingVanBehandelaar",
    "hoe": "viaKern",
@@ -177688,6 +177783,14 @@
    "naar": "eigenaarEmail",
    "hoe": "lid",
    "lijn": 33
+  },
+  {
+   "vanBestand": "server/opzet/kernlaag7-ruimtes.js",
+   "van": "(module)",
+   "naarBestand": "server/opzet/mediaos.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 74
   },
   {
    "vanBestand": "server/opzet/kernlaag7.js",
@@ -178452,6 +178555,14 @@
   {
    "vanBestand": "server/pg/collectietransactie.js",
    "van": "bewerkCollectie",
+   "naarBestand": "server/kern/connect/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 31
+  },
+  {
+   "vanBestand": "server/pg/collectietransactie.js",
+   "van": "bewerkCollectie",
    "naarBestand": "server/db/merge.js",
    "naar": "merge3",
    "hoe": "ingevoerd",
@@ -178488,6 +178599,14 @@
    "naar": "geldig",
    "hoe": "lokaal",
    "lijn": 50
+  },
+  {
+   "vanBestand": "server/pg/economische-boeking.js",
+   "van": "boekEenmaal",
+   "naarBestand": "server/kern/connect/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 53
   },
   {
    "vanBestand": "server/pg/economische-boeking.js",
@@ -179320,6 +179439,14 @@
    "naar": "fout",
    "hoe": "lokaal",
    "lijn": 56
+  },
+  {
+   "vanBestand": "server/pg/verzoektransactie.js",
+   "van": "commitVerzoek",
+   "naarBestand": "server/kern/connect/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 58
   },
   {
    "vanBestand": "server/pg/verzoektransactie.js",
@@ -181536,6 +181663,14 @@
    "naar": null,
    "hoe": "viaKern",
    "lijn": 40
+  },
+  {
+   "vanBestand": "server/routes/auth/inlog-pas.js",
+   "van": "route:POST /api/logout",
+   "naarBestand": "server/server.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 55
   },
   {
    "vanBestand": "server/routes/auth/inlog-pas.js",
@@ -194844,6 +194979,14 @@
   {
    "vanBestand": "server/routes/mediaos.js",
    "van": "route:POST /api/mediaos/aanwezig/volg",
+   "naarBestand": "server/kern/mediaos/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 154
+  },
+  {
+   "vanBestand": "server/routes/mediaos.js",
+   "van": "route:POST /api/mediaos/aanwezig/volg",
    "naarBestand": "server/routes/mediaos.js",
    "naar": "sess",
    "hoe": "lokaal",
@@ -194860,6 +195003,14 @@
   {
    "vanBestand": "server/routes/mediaos.js",
    "van": "route:POST /api/mediaos/aanwezig/mijn",
+   "naarBestand": "server/kern/mediaos/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 163
+  },
+  {
+   "vanBestand": "server/routes/mediaos.js",
+   "van": "route:POST /api/mediaos/aanwezig/mijn",
    "naarBestand": "server/routes/mediaos.js",
    "naar": "sess",
    "hoe": "lokaal",
@@ -194872,6 +195023,14 @@
    "naar": "geenGast",
    "hoe": "lokaal",
    "lijn": 168
+  },
+  {
+   "vanBestand": "server/routes/mediaos.js",
+   "van": "route:POST /api/mediaos/aanwezig",
+   "naarBestand": "server/kern/mediaos/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 170
   },
   {
    "vanBestand": "server/routes/mediaos.js",
@@ -195744,6 +195903,14 @@
    "naar": "geborenVan",
    "hoe": "viaKern",
    "lijn": 32
+  },
+  {
+   "vanBestand": "server/routes/member/boeken.js",
+   "van": "route:POST /api/booking/request",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 43
   },
   {
    "vanBestand": "server/routes/member/boeken.js",
@@ -197291,6 +197458,14 @@
   },
   {
    "vanBestand": "server/routes/member/kopen/bezorg.js",
+   "van": "route:POST /api/bezorg/bestel",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 79
+  },
+  {
+   "vanBestand": "server/routes/member/kopen/bezorg.js",
    "van": "route:POST /api/bezorg/volg",
    "naarBestand": "server/server.js",
    "naar": null,
@@ -197344,6 +197519,14 @@
    "naar": null,
    "hoe": "viaKern",
    "lijn": 54
+  },
+  {
+   "vanBestand": "server/routes/member/kopen/tickets.js",
+   "van": "route:POST /api/transfer/aanvraag",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 78
   },
   {
    "vanBestand": "server/routes/member/kopen.js",
@@ -198955,43 +199138,11 @@
   },
   {
    "vanBestand": "server/routes/member/persoonlijk-assets.js",
-   "van": "route:POST /api/assets",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 8
-  },
-  {
-   "vanBestand": "server/routes/member/persoonlijk-assets.js",
-   "van": "route:POST /api/asset/document",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 11
-  },
-  {
-   "vanBestand": "server/routes/member/persoonlijk-assets.js",
-   "van": "route:POST /api/asset/koop",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 16
-  },
-  {
-   "vanBestand": "server/routes/member/persoonlijk-assets.js",
    "van": "route:POST /api/asset/koop",
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
    "lijn": 16
-  },
-  {
-   "vanBestand": "server/routes/member/persoonlijk-assets.js",
-   "van": "route:POST /api/asset/herroep",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 22
   },
   {
    "vanBestand": "server/routes/member/persoonlijk-assets.js",
@@ -199004,42 +199155,10 @@
   {
    "vanBestand": "server/routes/member/persoonlijk-assets.js",
    "van": "route:POST /api/asset/wachtlijst",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 27
-  },
-  {
-   "vanBestand": "server/routes/member/persoonlijk-assets.js",
-   "van": "route:POST /api/asset/wachtlijst",
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
    "lijn": 27
-  },
-  {
-   "vanBestand": "server/routes/member/persoonlijk-assets.js",
-   "van": "route:POST /api/asset/mijn",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 31
-  },
-  {
-   "vanBestand": "server/routes/member/persoonlijk-assets.js",
-   "van": "route:POST /api/asset/gebruik",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 33
-  },
-  {
-   "vanBestand": "server/routes/member/persoonlijk-assets.js",
-   "van": "route:POST /api/asset/uitstap",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 38
   },
   {
    "vanBestand": "server/routes/member/persoonlijk-assets.js",
@@ -201299,6 +201418,14 @@
   },
   {
    "vanBestand": "server/routes/member/voertuigen/charter.js",
+   "van": "route:POST /api/charter/boek",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 72
+  },
+  {
+   "vanBestand": "server/routes/member/voertuigen/charter.js",
    "van": "route:POST /api/charter/mijn",
    "naarBestand": "server/server.js",
    "naar": null,
@@ -201424,6 +201551,14 @@
    "naar": "geborenVan",
    "hoe": "viaKern",
    "lijn": 62
+  },
+  {
+   "vanBestand": "server/routes/member/voertuigen/huur.js",
+   "van": "route:POST /api/huur/boek",
+   "naarBestand": "server/kern/gastzorg.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 78
   },
   {
    "vanBestand": "server/routes/member/voertuigen/huur.js",
@@ -203747,6 +203882,14 @@
   },
   {
    "vanBestand": "server/routes/navigatie.js",
+   "van": "route:POST /api/nav/gebieden",
+   "naarBestand": "server/kern/navigatie/mijnkaarten.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 59
+  },
+  {
+   "vanBestand": "server/routes/navigatie.js",
    "van": "route:POST /api/nav/gebied/kies",
    "naarBestand": "server/routes/navigatie.js",
    "naar": "geenGast",
@@ -203759,6 +203902,14 @@
    "naarBestand": "server/routes/navigatie.js",
    "naar": "stuur",
    "hoe": "lokaal",
+   "lijn": 67
+  },
+  {
+   "vanBestand": "server/routes/navigatie.js",
+   "van": "route:POST /api/nav/gebied/kies",
+   "naarBestand": "server/kern/navigatie/mijnkaarten.js",
+   "naar": null,
+   "hoe": "viaKern",
    "lijn": 67
   },
   {
@@ -203779,11 +203930,27 @@
   },
   {
    "vanBestand": "server/routes/navigatie.js",
+   "van": "route:POST /api/nav/gebied/weg",
+   "naarBestand": "server/kern/navigatie/mijnkaarten.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 71
+  },
+  {
+   "vanBestand": "server/routes/navigatie.js",
    "van": "route:POST /api/nav/gebied/pakket",
    "naarBestand": "server/routes/navigatie.js",
    "naar": "geenGast",
    "hoe": "lokaal",
    "lijn": 84
+  },
+  {
+   "vanBestand": "server/routes/navigatie.js",
+   "van": "route:POST /api/nav/gebied/pakket",
+   "naarBestand": "server/kern/navigatie/toestelpakket.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 85
   },
   {
    "vanBestand": "server/routes/navigatie.js",
@@ -203800,6 +203967,14 @@
    "naar": "geenGast",
    "hoe": "lokaal",
    "lijn": 94
+  },
+  {
+   "vanBestand": "server/routes/navigatie.js",
+   "van": "route:GET /api/nav/gebied/pakket/:code/:deel",
+   "naarBestand": "server/kern/navigatie/toestelpakket.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 95
   },
   {
    "vanBestand": "server/routes/navigatie.js",
@@ -204496,38 +204671,6 @@
    "naar": "past",
    "hoe": "lokaal",
    "lijn": 61
-  },
-  {
-   "vanBestand": "server/routes/office/veiligheid.js",
-   "van": "route:POST /api/office/asset/waarde",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 30
-  },
-  {
-   "vanBestand": "server/routes/office/veiligheid.js",
-   "van": "route:POST /api/office/asset/overzicht",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 35
-  },
-  {
-   "vanBestand": "server/routes/office/veiligheid.js",
-   "van": "route:POST /api/office/asset/terugkoop",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 38
-  },
-  {
-   "vanBestand": "server/routes/office/veiligheid.js",
-   "van": "route:POST /api/office/asset/fees",
-   "naarBestand": "server/kern/assets.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 43
   },
   {
    "vanBestand": "server/routes/office/verificaties.js",
@@ -209963,6 +210106,14 @@
   },
   {
    "vanBestand": "server/routes/service-kantoor.js",
+   "van": "route:POST /api/office/service/wachtrij",
+   "naarBestand": "server/kern/service/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 60
+  },
+  {
+   "vanBestand": "server/routes/service-kantoor.js",
    "van": "route:POST /api/office/service/zaak",
    "naarBestand": "server/routes/service-kantoor.js",
    "naar": "veilig",
@@ -210331,6 +210482,14 @@
   },
   {
    "vanBestand": "server/routes/service-zaak.js",
+   "van": "route:POST /api/supplier/service/keuzes",
+   "naarBestand": "server/kern/service/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 51
+  },
+  {
+   "vanBestand": "server/routes/service-zaak.js",
    "van": "route:POST /api/supplier/service/open",
    "naarBestand": "server/routes/service-zaak.js",
    "naar": "veilig",
@@ -210576,6 +210735,14 @@
    "naar": "veilig",
    "hoe": "lokaal",
    "lijn": 41
+  },
+  {
+   "vanBestand": "server/routes/service.js",
+   "van": "route:POST /api/service/keuzes",
+   "naarBestand": "server/kern/service/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 42
   },
   {
    "vanBestand": "server/routes/service.js",
@@ -211423,6 +211590,14 @@
    "naarBestand": "server/routes/spellen.js",
    "naar": "veilig",
    "hoe": "lokaal",
+   "lijn": 125
+  },
+  {
+   "vanBestand": "server/routes/spellen.js",
+   "van": "route:POST /api/projectie/koppel",
+   "naarBestand": "server/kern/spellen.js",
+   "naar": null,
+   "hoe": "viaKern",
    "lijn": 125
   },
   {
@@ -212728,6 +212903,14 @@
    "naar": "alleenPersoneel",
    "hoe": "lokaal",
    "lijn": 89
+  },
+  {
+   "vanBestand": "server/routes/stuur.js",
+   "van": "intrekHandler",
+   "naarBestand": "server/kern/stuur.js",
+   "naar": "stuurIntrek",
+   "hoe": "viaKern",
+   "lijn": 90
   },
   {
    "vanBestand": "server/routes/stuur.js",
@@ -220096,6 +220279,14 @@
    "naar": "translate",
    "hoe": "lid",
    "lijn": 56
+  },
+  {
+   "vanBestand": "server/routes/supplier/onderneming.js",
+   "van": "route:POST /api/supplier/onderneming",
+   "naarBestand": "server/kern/onderneming/index.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 40
   },
   {
    "vanBestand": "server/routes/supplier/orders/afhandeling.js",

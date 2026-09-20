@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1941 bestanden en 13959 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1941 bestanden en 13960 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1941 |
-| losse beweringen (`test(...)`) | 13959 |
+| losse beweringen (`test(...)`) | 13960 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 151 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1305 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -1751,7 +1751,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-230 bestanden, 405 beweringen.
+230 bestanden, 406 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1966,7 +1966,7 @@ toets omvalt.
 | `vrienden-blok.e2e.js` | 1 | gezakt op `liegpoort /api/` | RTG VRIENDEN: HET HELE SCRIPTBLOK DRAAIT, EN NIET ALLEEN HET BEGIN. WAT HIER FOUT GING, want dat bepaalt wat deze toets moet meten. |
 | `wegwijzerscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERMTOETS VOOR DE TWEE VEILIGHEIDSSCHERMEN VAN DE RTFOUNDATION: /apps/foundation/onveilig.html en /apps/foundation/wegwijzer.html. WAAROM DEZE TWEE EEN BROWSER NODIG HEBBEN. |
 | `wereldbreedte.e2e.js` | 1 | genoemd | ELKE WERELD PAST OP EEN TELEFOON. Vier van de twaalf werelden liepen op 390px rechts buiten beeld: Partner Network 558, Private Office 557, Living OS 532, Instant Reality 459. |
-| `wereldlaag.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Wereld. test/wereldlaag.test.js bewijst de server-kant; deze bewijst dat de APP het doet, en vooral dat de NAAD werkt. |
+| `wereldlaag.e2e.js` | 2 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Wereld. test/wereldlaag.test.js bewijst de server-kant; deze bewijst dat de APP het doet, en vooral dat de NAAD werkt. |
 | `wereldrooster.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET HUIS VAN EEN WERELD TOONT ZIJN HELE WERELD. De fout die dit voorkomt is echt gebeurd en bleef lang stil: elk wereldhuis droeg een HANDGESCHREVEN rooster diensten, en dat liep uit de pas met MAPPEN. |
 | `werkblad.e2e.js` | 1 | -- | RTG Kantoren en de middenconsole in een echte browser. Twee dingen die alleen daar te zien zijn: 1. |
 | `werkcommandbalk.e2e.js` | 1 | gezakt op `getal+1#5` | DE COMMANDOBALK VAN HET WERK OS -- zoekt hij echt, en volgt hij de rechten? Hier stond een balk die op een woordmatch een tab opende en daarna zei: "Rechten en handelingen volgen uw rol." Het eerste klopte, het... |

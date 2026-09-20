@@ -24,6 +24,74 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
   body: JSON.stringify(body || {})
 })).json();
 
+test('LivingOS editorial home: responsive example, real destinations, language and source failure',
+  { skip: geenBrowser(pw) }, async () => {
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DEMO: '0' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
+    await ctx.addInitScript(() => { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); });
+    const page = await ctx.newPage(), errors = [], writes = [];
+    letOpFouten(page, errors);
+    page.on('request', r => { if (/\/api\/(like|salon\/(bewaar|reageer|plaats))$/.test(new URL(r.url()).pathname)) writes.push(r.url()); });
+    await page.goto(srv.base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.living-welcome[data-example="true"]');
+    await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+    assert.match(await page.locator('.living-example-head').innerText(), /Voorbeeldmoment/);
+    assert.equal(await page.locator('.living-welcome .tel,.living-welcome .auteur').count(), 0, 'example is never a fabricated post');
+    assert.equal(await page.locator('.moment').count(), 4);
+    assert.deepEqual(await page.locator('.moment').evaluateAll(els => els.map(e => e.getAttribute('href'))),
+      ['/apps/camera.html', '/apps/foodcourt.html', '/apps/table.html', '/apps/reizen.html']);
+    assert.equal(await page.locator('#livingNearby').getAttribute('href'), '/apps/foodcourt.html');
+    for (const width of [320, 390, 1440]) {
+      await page.setViewportSize({ width, height: 844 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, 'no horizontal overflow at ' + width);
+      assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
+      assert.equal(await page.locator('.social-nav').isVisible(), false);
+      assert.equal(await page.locator('#feedHeading h2').evaluate(e => e.getBoundingClientRect().height > 20), true, 'the editorial heading is visible');
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const key of ['appreciate', 'reply', 'save']) {
+      await page.locator('[data-living-example="' + key + '"]').click();
+      assert.equal(await page.locator('#livingExampleNote').isVisible(), true);
+      assert.match(await page.locator('#livingExampleNote [role="status"]').innerText(), /Dit voorbeeld/);
+    }
+    await page.evaluate(() => RTGi18n.set('en'));
+    await page.waitForFunction(() => document.getElementById('livingWelcomeTitle').textContent === 'Everything tastes better together.');
+    assert.match(await page.locator('#livingExampleNote [role="status"]').innerText(), /This example is not saved/);
+    assert.equal(await page.locator('#livingExampleNote').isVisible(), true, 'language changes preserve the expanded explanation');
+    assert.equal(await page.locator('#livingAccess').innerText(), 'Open your LivingOS');
+    await page.evaluate(() => RTGi18n.set('ar'));
+    assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
+    await page.evaluate(() => RTGi18n.set('nl'));
+    assert.deepEqual(writes, [], 'the example must not call real post mutations');
+
+    // An unavailable feed cannot masquerade as a welcoming empty account.
+    const n = Date.now();
+    const member = await api(srv.base, '/api/auth/register', { name: 'Living reader', email: 'living' + n + '@e.test',
+      phone: '06' + String(n).slice(-8), password: 'geheim123', geboortedatum: '1990-02-02', tier: 'rtg' });
+    assert.ok(member.token);
+    await page.evaluate(t => localStorage.setItem('rtg_member_token', t), member.token);
+    await page.route('**/api/wereld/feed', route => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'Bron tijdelijk niet bereikbaar.' }) }));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.living-load-error');
+    assert.equal(await page.locator('.living-welcome').count(), 0);
+    assert.equal(await page.locator('#livingAccess').isVisible(), false);
+    await page.unroute('**/api/wereld/feed');
+    await page.locator('[data-living-retry]').click();
+    await page.waitForSelector('.living-welcome');
+    assert.equal(await page.locator('.living-load-error').count(), 0);
+    assert.equal(await page.locator('#fout').isVisible(), false);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  } finally {
+    if (browser) await browser.close();
+    await stop(srv.child);
+  }
+});
+
 test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wereld-e2e-'));
@@ -68,7 +136,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
     assert.equal(await page.locator('main .living-intro').isVisible(), true,
       'het verhaal en de fotografische ingangen blijven inhoud, ook nadat de Edge de bediening overneemt');
-    assert.equal(await page.locator('.moment img').count(), 4, 'de snelle ingangen dragen echte fotografie');
+    assert.equal(await page.locator('.moment img').count(), 3, 'de snelle ingangen dragen echte fotografie');
     await page.waitForSelector('#passport:not([hidden])', { timeout: 15000 });
     assert.match(await page.locator('#passport').innerText(), /Member passport/i);
     assert.match(await page.locator('#passport').innerText(), /Verified/i,
@@ -258,10 +326,10 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     assert.match(await page2.locator('.living-note').innerText(), /Sfeerbeeld/);
     assert.equal(await page2.locator('.living-welcome .tel,.living-welcome .auteur').count(), 0);
     await page2.evaluate(() => RTGi18n.set('en'));
-    await page2.waitForFunction(() => document.getElementById('livingWelcomeTitle').textContent === 'Life is better when you share it.');
+    await page2.waitForFunction(() => document.getElementById('livingWelcomeTitle').textContent === 'Everything tastes better together.');
     assert.equal((await api(base, '/api/wereld/state', {}, b)).modus, 'prive');
     await page2.evaluate(() => RTGi18n.set('nl'));
-    assert.match(await page2.locator('#livingWelcomeTitle').innerText(), /Het leven is mooier/);
+    assert.match(await page2.locator('#livingWelcomeTitle').innerText(), /Samen smaakt alles beter/);
 
     // Dezelfde route in een werkvlak houdt de inhoud, maar geen tweede balk.
     // Voor deze regel verscheen hier aantoonbaar nog de oude social-nav.

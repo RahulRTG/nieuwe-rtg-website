@@ -231,9 +231,10 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 
 <link href="/apps/wereld-feed.css" rel="stylesheet">
+<link href="/shared/rtg-world-home.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-social-experience" data-rtg-world="living" data-rtg-eigenvlak="onyx" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-social-experience" data-world-home="living" data-rtg-world="living" data-rtg-eigenvlak="onyx" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 
 <div class="os-switcher" role="navigation" data-living-label="worldNav">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span data-i18n="living.worldsLine">Vier werelden &middot; één kern</span></a>
@@ -250,19 +251,16 @@
   <div class="kopinhoud" id="eliteKop">
     <div class="elite-merk">
       <div><h1 id="livingTitle" class="living-sr" translate="no" data-i18n="living.brand">RTG LivingOS</h1><p class="eyebrow" data-i18n="living.moments">Mensen, plekken en momenten</p></div>
-      <div class="belofte" data-i18n="living.promise">Een betekenisvoller leven</div>
     </div>
     <nav class="momenten" data-living-label="storyNav">
       <a class="moment" href="/apps/camera.html"><i aria-hidden="true">+</i><span data-i18n="living.story">Uw verhaal</span></a>
-      <a class="moment" href="/apps/reisboek.html"><i aria-hidden="true"><img src="/images/start/dagdelen/hero-avond.jpg" alt="" width="68" height="68"></i><span data-i18n="living.travel">Reizen</span></a>
-      <a class="moment" href="/apps/table.html"><i aria-hidden="true"><img src="/images/worlds/heritage/living-heritage-v2.jpg" alt="" width="68" height="68"></i><span data-i18n="living.table">Aan tafel</span></a>
-      <a class="moment" href="/apps/foundation/vrienden.html"><i aria-hidden="true"><img src="/images/worlds/heritage/foundation-heritage-v2.jpg" alt="" width="68" height="68"></i><span data-i18n="living.friends">Vrienden</span></a>
-      <a class="moment" href="/apps/rtg.html"><i aria-hidden="true"><img src="/images/worlds/heritage/living-heritage-v2.jpg" alt="" width="68" height="68"></i><span data-i18n="living.LivingOS" translate="no">LivingOS</span></a>
+      <a class="moment" href="/apps/foodcourt.html"><i aria-hidden="true"><img src="/images/world-homes/living-canal.webp" alt="" width="68" height="68"></i><span data-i18n="living.nearby">Dichtbij</span></a>
+      <a class="moment" href="/apps/table.html"><i aria-hidden="true"><img src="/images/world-homes/living.webp" alt="" width="68" height="68"></i><span data-i18n="living.table">Aan tafel</span></a>
+      <a class="moment" href="/apps/reizen.html"><i aria-hidden="true"><img src="/images/world-homes/living-coast.webp" alt="" width="68" height="68"></i><span data-i18n="living.onTheWay">Onderweg</span></a>
     </nav>
-    <nav class="werelden" id="werelden" data-living-label="worldFilter"></nav>
   </div>
 </section>
-  <div class="living-feed-heading" id="feedHeading"><h2 data-i18n="living.feed">Uw momenten</h2><p data-i18n="living.order">Binnen elke groep staan de nieuwste momenten bovenaan.</p></div>
+  <div class="living-feed-heading" id="feedHeading"><h2 data-i18n="living.together">Het leven, met elkaar.</h2><p class="living-sr" data-i18n="living.order">Binnen elke groep staan de nieuwste momenten bovenaan.</p></div>
   <div id="fout" hidden></div>
   <!-- EEN SCHERM DAT WACHT, HOORT TE ZEGGEN DAT HET WACHT.
 
@@ -279,6 +277,12 @@
        de server dan traag genoeg is; in zijn eentje haalde dit scherm het altijd
        en leek er niets aan de hand. -->
   <div id="feed"><p class="leeg" data-i18n="living.loading">Uw momenten worden geladen.</p></div>
+  <a class="living-nearby" id="livingNearby" href="/apps/foodcourt.html">
+    <img src="/images/world-homes/living-coast.webp" alt="" width="180" height="120" loading="lazy">
+    <span><strong data-i18n="living.discoverNearby">Ontdek wat dichtbij is.</strong><span data-i18n="living.nextMoment">Vind een plek voor uw volgende moment.</span></span>
+    <span aria-hidden="true">→</span>
+  </a>
+  <p class="living-access" id="livingAccess" hidden><a href="/apps/app.html" data-i18n="living.login">Open uw LivingOS</a></p>
   <div id="profiel" hidden></div>
   <div id="ontdek" hidden>
     <form id="zoekform" autocomplete="off">
@@ -288,6 +292,7 @@
     <div id="zoekuit"></div>
   </div>
 <aside class="living-membership" id="membership">
+    <nav class="werelden" id="werelden" data-living-label="worldFilter"></nav>
   <section class="lenscontext" id="lensContext" aria-live="polite" hidden></section>
     <section class="passport" id="passport" data-living-label="passport" hidden>
       <div class="passportkop">
@@ -309,6 +314,7 @@
 </nav>
 
 <script src="/shared/glyf.js"></script>
+<script src="/apps/wereld-welcome.js"></script>
 <script src="/apps/wereld-feed.js"></script>
 <script>
 (function () {
@@ -623,7 +629,9 @@
     $('#werelden').hidden = welke !== 'feed';
     $('#lenzen').hidden = welke !== 'feed';
     $('#feedHeading').hidden = welke !== 'feed';
-    $('#membership').hidden = welke !== 'feed';
+    $('#membership').hidden = welke !== 'feed' || !staat.modi.length;
+    $('#livingAccess').hidden = welke !== 'feed' || !!token;
+    $('#livingNearby').hidden = welke !== 'feed';
     var bij = { feed: 'homeTab', profiel: 'profielTab', ontdek: 'ontdekTab' };
     document.querySelectorAll('.social-nav a').forEach(function (a) {
       a.setAttribute('aria-current', a.id === bij[welke] ? 'page' : 'false');
@@ -658,6 +666,7 @@
     .then(function (d) {
       staat.modus = d.modus; staat.lens = d.lens || 'friends'; staat.modi = d.modi; staat.kaart = d.koppelkaart || {};
       staat.vermogens = d.vermogens || []; staat.lenzen = d.lenzen || [];
+      $('#membership').hidden = staat.weergave !== 'feed'; $('#livingAccess').hidden = true;
       /* De modus reist mee naar de aparte berichten-app: de la die bij deze
          wereld hoort komt van de SERVER (kern/wereld/koppel.js), zodat dit
          scherm geen eigen kaart bijhoudt. Is er geen la voor deze wereld, dan
@@ -670,9 +679,7 @@
       return laad();
     })
     .catch(function (e) {
-      $('#passport').hidden = false;
-      $('#wie').removeAttribute('data-i18n');
-      $('#wie').textContent = RTGLivingFeed.T('signedOut', 'U bent niet ingelogd.');
+      $('#membership').hidden = true; $('#livingAccess').hidden = !!token;
       /* De wachtregel weghalen, anders staat er "Bezig met laden..." ONDER een
          foutmelding: het scherm zou dan tegelijk zeggen dat het stuk is en dat
          het nog bezig is. De melding is het antwoord; verder hoort dit vlak

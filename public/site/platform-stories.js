@@ -2,7 +2,7 @@
  "use strict";
  var story=w.RTGPublicDataFactory.story,card=w.RTGPublicDataFactory.card;
  var companyStories=[
-  story('origin',['Ons verhaal','Our story'],'Het leven is verbonden. Wij bouwen de samenhang.','Life is connected. We build the connections.','Het begon met reizen. Daar ontdekten we hoeveel eromheen samenkomt.','It began with travel. That showed us how much comes together around it.','platform/company','living','origin'),
+  story('origin',['Ons verhaal','Our story'],'Het begint bij mensen.','It starts with people.','Het begon met reizen. Nu bouwen we aan samenhang in het leven eromheen.','It began with travel. Now we are building connections in the life around it.','platform/company','living','origin'),
   story('vision',['Visie','Vision'],'Een platform rondom mensen.','A platform built around people.','Leven, reizen, werk en kansen geven we een plek binnen dezelfde RTG-visie.','We give life, travel, work and opportunity a place within the same RTG vision.','world-homes/living','living','worlds'),
   story('technology',['Techniek','Technology'],'Van een wens naar een verantwoorde handeling.','From an intention to a responsible action.','Betekenis, bevoegdheid en bewijs bepalen hoe wij het platform ontwerpen.','Meaning, authority and evidence shape how we design the platform.','world-homes/work','work','architecture'),
   story('control',['Regie','Control'],'Rahul bereidt voor. U houdt de regie.','Rahul prepares. You remain in control.','Een voorstel en de bevoegdheid om het uit te voeren zijn verschillende stappen.','A proposal and the authority to execute it are different steps.','world-homes/living','living','control'),

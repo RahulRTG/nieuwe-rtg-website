@@ -1,3 +1,4 @@
+@import url('../shared/rtg-world-widgets.css');
 /* The world-home geometry is imported unchanged. This layer supplies public content. */
 body[data-public-platform]{--wh-ink:#f6efe3;--wh-soft:#d8cfc2;--wh-gold:#e2c389;--wh-bg:#100e0b;background:#100e0b!important;color:var(--wh-ink)!important;font-family:Inter,sans-serif;--wd-surface:#15130f;--wd-line:rgba(216,187,135,.3)}
 body[data-public-platform]>.experience-header,body[data-public-platform]>.experience-footer,body[data-public-platform]>.site-header,body[data-public-platform]>.site-footer,.pp-source{display:none!important}
@@ -150,11 +151,6 @@ body[data-public-platform] .pp-shell .pp-button{border-radius:var(--rtg-radius-s
 body[data-public-platform] .pp-language-choice{border-radius:var(--rtg-radius-editorial)!important}
 body[data-public-platform] .pp-step{border:0!important;border-radius:0!important;padding:0!important;background:transparent!important}
 body[data-public-platform] .pp-shell .pp-side-widget h2{font:400 1.4rem/1.25 "Bodoni Moda",serif!important;letter-spacing:0;text-transform:none}
-body[data-public-platform] .pp-edge .rtg-adaptive-edge{position:fixed;left:50%;width:min(720px,calc(100% - 28px))}
-body[data-public-platform] .pp-edge .rtg-adaptive-bar>button{border:0;background:transparent;font:inherit;padding:6px;color:var(--edge-bar-copy)}
-body[data-public-platform] .pp-edge .rtg-adaptive-item svg{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
-body[data-public-platform] .pp-edge .rtg-adaptive-sheet-head>button{border:0;background:transparent}
-body[data-public-platform] .pp-edge .rtg-adaptive-bar{border-radius:var(--rtg-radius-system)}
 .pp-menu-panel:not([hidden]){display:grid;gap:.6rem;padding-block:1rem}.pp-menu-item{display:block;width:100%;min-height:48px;padding:.8rem;border:1px solid var(--wd-line);background:#201a13;color:var(--wh-ink);text-align:start;border-radius:var(--rtg-radius-editorial);cursor:pointer}
 .pp-shell .wd-favorites{display:flex;flex-direction:column;gap:1rem}
 @media(max-width:999px){body[data-public-platform] .pp-story>.wd-icon{width:5rem;height:5rem}.pp-header{flex-wrap:nowrap}.pp-context{white-space:nowrap}.pp-shell .pp-story img{max-width:none}.pp-shell .pp-stories{overflow-x:auto}.pp-shell .pp-library-tools>.pp-icon-button{flex:0 0 44px}.pp-shell .pp-feature .pp-button{border-radius:0!important}}

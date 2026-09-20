@@ -3,7 +3,7 @@
  'use strict';
  w.RTGPublicEdge=function(o){
   var P=w.RTGPublicPlatform,E=w.RTGAdaptiveEdge,root=d.createElement('div'),panel=d.createElement('div');
-  root.className='rtg-experience-edge pp-edge';panel.hidden=true;panel.className='pp-menu-panel';d.body.append(root,panel);
+  root.className='rtg-edge-chrome rtg-experience-edge pp-edge';panel.hidden=true;panel.className='pp-menu-panel';d.body.append(root,panel);
   function actions(){
    panel.replaceChildren();
    var rows=[['next',function(){o.shell.collapse();o.shell.next(1);}],['previous',function(){o.shell.collapse();o.shell.next(-1);}]];
@@ -24,7 +24,10 @@
    return true;
   }};
   E.start(d,w,host);
+  /* Public navigation does not evaluate a member mandate. Keep the native surface without a false verification badge. */
+  root.querySelector('.rtg-adaptive-guard').remove();
   function labels(){
+   var heading=root.querySelector('.rtg-adaptive-sheet-head small'),headingKey=o.kind==='company'?'company':'app';if(heading){var headingText=P.copy(headingKey);heading.dataset.i18n='public.'+headingKey;heading.dataset.i18nSource=w.RTGPublicContent.words[headingKey][0];if(heading.textContent!==headingText)heading.textContent=headingText;}
    var keys={home:'home',worlds:'worlds',menu:'menu',context:'actions',primary:'actions',connect:'actions',ai:'rahulAppCardTitle',back:'back',status:'regie',presence:'people'};
    root.querySelectorAll('.rtg-adaptive-item').forEach(function(el){var key=keys[el.dataset.rtgAdaptiveAction];if(!key)return;var value=P.copy(key),label=el.querySelector('small');if(label){label.dataset.i18n='public.'+key;label.dataset.i18nSource=w.RTGPublicContent.words[key][0];label.translate=false;if(label.textContent!==value)label.textContent=value;}el.dataset.i18nAria='public.'+key;if(el.getAttribute('aria-label')!==value)el.setAttribute('aria-label',value);});
    var caption=root.querySelector('.rtg-adaptive-caption'),value=P.copy(o.kind==='company'?'company':'app');if(caption&&caption.textContent!==value)caption.textContent=value;

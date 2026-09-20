@@ -3,7 +3,9 @@
    remain authoritative. Declared capabilities use the existing weight gate. */
 (function (w, d) {
   'use strict';
-  var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav';
+  // iOS moves overflow actions out of its visible header. Its menu is replaced
+  // by Edge, so these original controls must remain reachable here as well.
+  var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
 
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
@@ -20,7 +22,7 @@
     (doc || d).querySelectorAll(ROOTS + (embedded ? ',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]' : '')).forEach(function (root) {
       var controls = root.matches('button') ? [root] : root.querySelectorAll('button,a[href]');
       controls.forEach(function (el) {
-        if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button')) return;
+        if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button,.amn-knop,#osMenuBtn,.rtg-rahul-tab')) return;
         var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
         if (label(el) && available(el, root) && (!tab || !tabs.has(tab)) && !out.some(function (x) { return x.el === el; })) {
           out.push({ el: el, root: root }); if (tab) tabs.add(tab);

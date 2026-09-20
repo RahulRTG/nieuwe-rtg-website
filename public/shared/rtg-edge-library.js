@@ -8,9 +8,9 @@
   function werelden(e, C) {
     return '<nav class="rtg-edge-worlds" aria-label="Vier RTG werelden">' + ORDE.map(function (sleutel) {
       var wereld = C[sleutel];
-      /* Het HUIS en niet de werkplek: een tik op een wereld brengt je naar het
-         wereldscherm uit MAPPEN. Zie de opmerking in rtg-edge-worlds.js. */
-      return '<a href="' + (wereld.huis || wereld.home) + '" ' +
+      /* The world switcher and Home use the same actual world home. Public
+         entrances remain separate routes, not alternate navigation targets. */
+      return '<a href="' + (wereld.home || wereld.huis) + '" ' +
         (e.key === sleutel ? 'aria-current="page"' : '') + '>' + wereld.kaart + '</a>';
     }).join('') + '</nav>';
   }
@@ -26,7 +26,7 @@
     return ORDE.map(function (sleutel, i) {
       var wereld = C[sleutel];
       if (!wereld) return '';
-      return '<a href="' + (wereld.huis || wereld.home) + '"' +
+      return '<a href="' + (wereld.home || wereld.huis) + '"' +
         (sleutel === e.key ? ' aria-current="page"' : '') +
         '><span aria-hidden="true">0' + (i + 1) + '</span>' + esc(wereld.kaart) + '</a>';
     }).join('');

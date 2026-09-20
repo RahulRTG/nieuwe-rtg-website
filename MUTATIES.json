@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-20T15:12:45.931Z",
-    "commit": "b32038082",
-    "boomVuil": true,
-    "boomAnders": 6,
+    "op": "2026-09-20T15:14:56.090Z",
+    "commit": "9e45b3af0",
+    "boomVuil": false,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -9922,9 +9922,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/world-widgets.js",
-      "operator": "getal+1#0",
+      "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 1
     },
     "writehealth-lus.test.js": {
       "soort": "puur",

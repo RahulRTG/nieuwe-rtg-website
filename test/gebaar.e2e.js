@@ -39,8 +39,9 @@ const REGEL = (titel, ref) => '<a class="reis" href="/apps/office.html" data-sig
    waar de regel niet meer staat, en landt de muis ernaast. Dat is de tweede helft
    van dezelfde fout als de scrollIntoView hieronder -- een proef die faalt om de
    verkeerde reden is net zo min een proef. */
+/* Centreer de regel boven de vaste Edge Bar, zodat de veeg de regel raakt. */
 async function maat(loc) {
-  await loc.scrollIntoViewIfNeeded();
+  await loc.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }));
   return loc.boundingBox();
 }
 
@@ -231,8 +232,7 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
       });
     });
     const rij = page.locator('.proefrij');
-    await rij.scrollIntoViewIfNeeded();   // zie de toelichting hierboven
-    const doos = await rij.boundingBox();
+    const doos = await maat(rij);
 
     // 1. doorvegen naar links voert af EN biedt de weg terug aan
     await veeg(page, doos, -(doos.width * 0.55 + 90), true);

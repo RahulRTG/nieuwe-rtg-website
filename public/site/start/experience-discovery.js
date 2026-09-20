@@ -19,7 +19,7 @@
       if (!row.hidden) visible++;
     });
     d.body.classList.toggle('faq-all', allFaq || !!query);
-    $('faqCount').textContent = visible + ' van ' + rows.length + ' vragen' + (!allFaq && !query ? ' · Via Acties in de Edge kunt u alle vragen tonen.' : '');
+    $('faqCount').textContent = visible + ' van ' + rows.length + ' vragen' + (!allFaq && !query ? '. Via Acties in de Edge kunt u alle vragen tonen.' : '');
     $('faqEmpty').hidden = visible > 0;
   }
   w.RTGExperienceDiscovery = Object.freeze({ faq: faq, handoff: handoff });

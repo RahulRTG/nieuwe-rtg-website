@@ -65,7 +65,9 @@ test('Heritage context returns through real navigation without writes', async t 
       await page.waitForFunction(() => RTGReizen.staat.blad === 'taxi');
     });
     await t.test('Work restores audience and respects a direct address', async () => {
-      await visit('/apps/kantoor.html'); await page.click('[data-work-kies="ondernemers"]');
+      await visit('/apps/kantoor.html');
+      await page.locator('#worldWorkDetails > summary').click();
+      await page.click('[data-work-kies="ondernemers"]');
       await page.evaluate(() => history.replaceState(null,'',location.pathname));
       await returnTo('/apps/kantoor.html');
       await page.waitForFunction(() => document.body.dataset.workDoelgroep === 'ondernemers');

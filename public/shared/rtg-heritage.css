@@ -25,7 +25,7 @@ body[data-rtg-skin="heritage"]{
   --rtg-space-4:16px;--rtg-space-6:24px;--rtg-space-8:32px;
   --rtg-space-12:48px;--rtg-space-16:64px;--rtg-space-24:96px;
   --rtg-space-32:128px;--rtg-grid-gap:clamp(20px,2vw,32px);
-  --rtg-radius-content:2px;--rtg-radius-system:22px;
+  --rtg-radius-content:2px;--rtg-radius-system:22px;--rtg-radius-editorial:16px;
   --rtg-target:48px;
 
   --rtg-world-bg:#0c0b0a;

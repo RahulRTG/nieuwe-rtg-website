@@ -51,7 +51,9 @@ async function claudeTranslate(text, to) {
     model: 'claude-sonnet-5',
     max_tokens: 600,
     system: 'You are a translation engine for a luxury travel club. Translate the user message into ' + target +
-      '. Keep the tone natural and courteous. Preserve names, places and emoji. Reply with ONLY the translation, no quotes, no notes.',
+      '. Write plain, natural language that sounds like a person wrote it. Keep the meaning exact and do not add promotional claims. ' +
+      'Preserve names, places, numbers and functional punctuation. Do not add em dashes, decorative arrows, bullets, emoji or smart quotation marks. ' +
+      'Reply with ONLY the translation, no quotes and no notes.',
     messages: [{ role: 'user', content: String(text).slice(0, 1500) }]
   });
   return response.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();

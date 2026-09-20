@@ -13,7 +13,9 @@ const css = lees('public/shared/rtg-foundation-thuis-2026.css');
 test('FoundationOS draagt het goedgekeurde persoonlijke drieluik', () => {
   assert.match(html, /FoundationOS persoonlijk overzicht/);
   for (const paneel of ['vandaag', 'groei', 'kring']) assert.match(html, new RegExp('data-rtf-paneel="' + paneel + '"'));
-  for (const kop of ['Vandaag hoeft u het niet alleen te doen', 'Groeien op uw eigen tempo', 'De juiste mensen, dichtbij']) assert.match(html, new RegExp(kop));
+  assert.match(html, /data-wh-foundation/);
+  assert.match(lees('public/shared/rtg-world-home-copy.js'), /Ruimte om te groeien/);
+  for (const kop of ['Groeien op uw eigen tempo', 'De juiste mensen, dichtbij']) assert.match(html, new RegExp(kop));
   for (const bestand of ['rtg-foundation-thuis-2026.css', 'voorzijde-weergave.js', 'voorzijde.js']) assert.equal((html.match(new RegExp(bestand.replace(/[.]/g, '\\.'), 'g')) || []).length, 1, bestand);
 });
 

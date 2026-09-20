@@ -40,7 +40,8 @@ const WERELDEN = [
   },
   {
     naam: 'WorkOS', wereld: 'work', pad: '/apps/kantoor.html', hoofd: '#inhoud',
-    panelen: ['.doelgroep', '.cv-rij', '#werkdag', '#poorten'],
+    panelen: ['.wh-work-hero', '.wh-attention', '.wh-work-feature', '.wh-support'],
+    maxCanvas: 1216, // De goedgekeurde editorial compositie is maximaal 76rem breed.
     context: ['wereldtabs', 'wereldapps'],
     oud: [
       'body > .wereldtabs', 'body > .wereldapps', 'body > .rtgdeel-balk',
@@ -49,7 +50,8 @@ const WERELDEN = [
   },
   {
     naam: 'TravelOS', wereld: 'travel', pad: '/apps/reizen.html', hoofd: '#inhoud',
-    panelen: ['.dagdek', '.strook', '.kaartraster', '.kompas'],
+    panelen: ['.wh-stories', '.wh-travel-hero', '.wh-travel-help'],
+    maxCanvas: 1216,
     context: ['travel-header', 'hoofdtabs'],
     /* TWEE BLOKKEN DIE MET OPZET IN DEZELFDE RASTERCEL LIGGEN. De grote titel
        hoort over het fotodek, dus .dagtitel en .kaartraster delen grid-row 1 --
@@ -262,7 +264,8 @@ function keurDashboard(m, route, maat) {
     label + ': oude balk buiten Edge-context zichtbaar:\n' + m.oudZichtbaar.join('\n'));
   assert.deepEqual(m.ontbrekend, [], label + ': native panelen ontbreken: ' + m.ontbrekend.join(', '));
   assert.ok(m.panelen >= 3, label + ': dashboard toont geen meervoudige native panelen');
-  assert.ok(m.canvas.width >= (maat.width >= 1000 ? maat.width * .72 : maat.width * .84),
+  assert.ok(m.canvas.width >= Math.min(route.maxCanvas || Infinity,
+    maat.width >= 1000 ? maat.width * .72 : maat.width * .84),
     label + ': canvas is geen brede werkruimte: ' + JSON.stringify(m.canvas));
   assert.ok(m.canvas.left >= -1 && m.canvas.right <= m.viewport + 1,
     label + ': canvas valt buiten het kijkvlak: ' + JSON.stringify(m.canvas));
@@ -309,6 +312,9 @@ async function bewijsHandeling(page, route, maat) {
     return;
   }
   if (route.wereld === 'work') {
+    await page.locator('#worldWorkDetails > summary').click();
+    for (const selector of ['.doelgroep', '.cv-rij', '#poorten'])
+      await page.locator(selector).first().waitFor({ state: 'visible' });
     const actie = '[data-work-kies="ondernemers"]';
     await raakdoel(page, actie, label);
     await page.click(actie);
@@ -321,6 +327,9 @@ async function bewijsHandeling(page, route, maat) {
     return;
   }
   if (route.wereld === 'travel') {
+    await page.locator('[data-wh-copy="travelDetails"]').click();
+    for (const selector of ['.dagdek', '.strook', '.kaartraster', '.kompas'])
+      await page.locator(selector).first().waitFor({ state: 'visible' });
     const actie = '#reisVolgende [data-naar-blad="reizen"]';
     await page.waitForSelector(actie, { state: 'visible', timeout: geduld(15000) });
     await raakdoel(page, actie, label);

@@ -63,6 +63,8 @@ const EIGENAAR = {
     waarom: 'language-proof.js schrijft de namenlijst pas na geslaagde betekenisproeven; --check bewaakt de bronafdrukken en de gemeten reikwijdte blijft expliciet.' },
   'LANGUAGEFAILOVER.json': { schrijver: 'scripts/language-proof.js',
     waarom: 'language-proof.js schrijft de namenlijst pas na de geisoleerde HTTP-uitvalproef; --check bewaakt de bronafdrukken. Dit simuleert geen productiebewijs.' },
+  'WORLD-HOMES.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden ontwerp- en implementatienotitie voor de drie goedgekeurde homes, met de daadwerkelijk uitgevoerde proeven en hun grenzen.' },
   'LANGUAGE.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden architectuur- en bereikbeschrijving; de drie taalrapporten dragen het afzonderlijke uitvoerbare bewijs.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',

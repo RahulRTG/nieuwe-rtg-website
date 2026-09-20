@@ -47,6 +47,8 @@
 
     function teken() {
       d.body.dataset.workDoelgroep = actief;
+      var details = d.getElementById('worldWorkDetails');
+      if (details && (geldig(query) || geldig(hash))) details.open = true;
       keuzes.forEach(function (keuze) {
         var gekozen = keuze.dataset.workKies === actief;
         keuze.classList.toggle('actief', gekozen);

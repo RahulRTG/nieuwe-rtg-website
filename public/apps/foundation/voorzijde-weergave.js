@@ -6,12 +6,12 @@
   function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function initialen(naam){return String(naam||'RT').trim().split(/\s+/).slice(0,2).map(function(x){return x.charAt(0)}).join('').toUpperCase()||'RT'}
   function kleur(v){return /^#[0-9a-f]{6}$/i.test(String(v||''))?v:'#861936'}
-  function dagNaam(iso){var n=new Date(iso+'T12:00:00');var v=new Date();var m=new Date(v);m.setDate(v.getDate()+1);var zelf=function(x){return x.toISOString().slice(0,10)};if(iso===zelf(v))return'Vandaag';if(iso===zelf(m))return'Morgen';return n.toLocaleDateString('nl-NL',{weekday:'short',day:'numeric'})}
-  function dag(info,items){
+  function dagNaam(iso){var n=new Date(iso+'T12:00:00');var v=new Date();var m=new Date(v);m.setDate(v.getDate()+1);var zelf=function(x){return x.toISOString().slice(0,10)};if(iso===zelf(v))return'Vandaag';if(iso===zelf(m))return'Morgen';return n.toLocaleDateString(d.documentElement.lang||'nl',{weekday:'short',day:'numeric'})}
+  function dag(info,items,state){
     var p=info.profiel||{},naam=p.naam||'u';el('rtfVoorNaam').textContent=naam;el('rtfVoorInit').textContent=initialen(naam);el('rtfGroeiInit').textContent=initialen(naam);
     var uur=new Date().getHours();el('rtfGroet').textContent=(uur<12?'Goedemorgen, ':uur<18?'Goedemiddag, ':'Goedenavond, ')+naam;
-    el('rtfDatum').textContent=new Date().toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
-    var vak=el('rtfDagLijst'),rijen=(items||[]).slice(0,6);vak.innerHTML=rijen.length?rijen.map(function(x){var bron=x.bron==='school'?'Van school':(x.wieNaam?'Voor '+x.wieNaam:'Voor het gezin');return '<a class="rtf-thuis-regel" href="agenda.html"><time>'+esc(x.tijd||dagNaam(x.datum))+'</time><div><b>'+esc(x.titel)+'</b><span>'+esc(bron+(x.notitie?' - '+x.notitie:''))+'</span></div><em aria-hidden="true">&rarr;</em></a>'}).join(''):'<p class="rtf-thuis-leeg">Er staat niets in uw agenda voor de komende dagen. De ruimte is van u.</p>';
+    el('rtfDatum').textContent=new Date().toLocaleDateString(d.documentElement.lang||'nl',{weekday:'long',day:'numeric',month:'long'});
+    var vak=el('rtfDagLijst');if(state==='loading'||state==='error'){vak.innerHTML='<p class="rtf-thuis-leeg" role="status">'+w.RTGWorldHome.text(state==='error'?'agendaError':'agendaLoading')+'</p>';return}var rijen=(items||[]).slice(0,6);vak.innerHTML=rijen.length?rijen.map(function(x){var bron=x.bron==='school'?'Van school':(x.wieNaam?'Voor '+x.wieNaam:'Voor het gezin');return '<a class="rtf-thuis-regel" href="agenda.html"><time>'+esc(x.tijd||dagNaam(x.datum))+'</time><div><b>'+esc(x.titel)+'</b><span>'+esc(bron+(x.notitie?' - '+x.notitie:''))+'</span></div><em aria-hidden="true">&rarr;</em></a>'}).join(''):'<p class="rtf-thuis-leeg">Er staat niets in uw agenda voor de komende dagen. De ruimte is van u.</p>';
   }
   function groei(info,pas,plan){
     var p=info.profiel||{},kind=p.rol==='kind',fase=pas&&pas.fase;

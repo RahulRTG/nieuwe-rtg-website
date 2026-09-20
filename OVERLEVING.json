@@ -3,10 +3,10 @@
   "uitleg": "Single Compromise Survivability (WEERBAARHEID.md par. 4): als er EEN ding wordt overgenomen, houdt RTG dan stand? Acht scenario's, elk met een bron, een bewijsgraad en wat de rij NIET dekt. Met opzet geen samengesteld cijfer.",
   "grens": "`onbekend` is een eersteklas uitslag en betekent nooit \"waarschijnlijk goed\". Elke rij leest een echte bron; ontbreekt die, dan wordt de rij `onbekend` met de reden en niet stil een middenwaarde. De rijen `sessie` en `dienst` dragen `vermoed`: die gaan over een VORM in de code en niet over wat er in productie gebeurt.",
   "stempel": {
-    "op": "2026-09-09T08:08:39.809Z",
-    "commit": "dee1586f",
+    "op": "2026-09-19T19:03:57.898Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 12,
     "instrument": "scripts/overleving.js",
     "node": "v22.22.2"
   },
@@ -24,7 +24,7 @@
       "vraag": "Iemand heeft de gedeelde kantoorcode. Houdt RTG stand?",
       "uitkomst": "deels",
       "graad": "vermoed",
-      "grond": "422 van 590 kantoorroutes hangen achter de gedeelde code; van de 13 die geld bewegen, rechten verlenen of bulk uitvoeren staan er 0 zonder mens op naam, en 0 kantoorroutes vragen een tweede handtekening (KANTOORMACHT.json)",
+      "grond": "427 van 605 kantoorroutes hangen achter de gedeelde code; van de 14 die geld bewegen, rechten verlenen of bulk uitvoeren staan er 0 zonder mens op naam, en 0 kantoorroutes vragen een tweede handtekening (KANTOORMACHT.json)",
       "nietGemeten": "wat een gestolen code in de PRAKTIJK oplevert -- dat hangt af van welke 460 routes het zijn, en er is geen risicomodule die dat weegt (KANTOORMACHT.md par. 3)"
     },
     {
@@ -48,7 +48,7 @@
       "vraag": "Een medewerker handelt te kwader trouw, in zijn eentje. Houdt RTG stand?",
       "uitkomst": "deels",
       "graad": "vermoed",
-      "grond": "loon en krediet kennen een scheiding (kern/payroll/run.js: concept -> gecontroleerd -> manager -> administrateur -> definitief, \"NOOIT dezelfde persoon\"; een kredietaanvraag komt van een LID en het besluit van het kantoor). Sinds 9 september vragen 2 kantoorroutes een tweede mens (/api/office/bank/incasso, /api/office/bank/rekening/rood): de aanvrager kan zijn eigen aanvraag niet bevestigen, en het lijf staat vast bij de aanvraag. Van de 13 zware kantoorroutes staan er 0 zonder mens op naam, en 0 gebruiken kern/appstore/vierogen via een eigen require (KANTOORMACHT.json); de ontsluitceremonie kent ook een tweede paar ogen",
+      "grond": "loon en krediet kennen een scheiding (kern/payroll/run.js: concept -> gecontroleerd -> manager -> administrateur -> definitief, \"NOOIT dezelfde persoon\"; een kredietaanvraag komt van een LID en het besluit van het kantoor). Sinds 9 september vragen 2 kantoorroutes een tweede mens (/api/office/bank/incasso, /api/office/bank/rekening/rood): de aanvrager kan zijn eigen aanvraag niet bevestigen, en het lijf staat vast bij de aanvraag. Van de 14 zware kantoorroutes staan er 0 zonder mens op naam, en 0 gebruiken kern/appstore/vierogen via een eigen require (KANTOORMACHT.json); de ontsluitceremonie kent ook een tweede paar ogen",
       "nietGemeten": "welke handeling vier ogen VERDIENT is een besluit en geen meting -- KANTOORMACHT.json zegt dat met zoveel woorden onder `ongemeten.vierOgenVereist`. Bevriezen staat er met opzet NIET achter: dat is omkeerbaar en het is de knop waarmee je fraude stopt, dus twee mensen eisen maakt de rem trager dan de diefstal (besluit van de eigenaar, 9 september 2026)"
     },
     {

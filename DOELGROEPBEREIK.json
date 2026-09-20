@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T09:02:24.072Z",
-    "commit": "8d784199",
+    "op": "2026-09-19T19:06:21.542Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 33,
     "instrument": "scripts/doelgroepbereik.js",
     "node": "v22.22.2"
   },
@@ -1566,6 +1566,141 @@
       "reden": "2 van de 2 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
+      "functie": "neiging",
+      "naam": "RTG Neiging (Mijn neigingen)",
+      "doelgroep": "rtg",
+      "verklaard": true,
+      "routes": 7,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/neiging/antwoord",
+        "bewakers": [
+          "auth",
+          "lid"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/neiging.js",
+        "regel": 42,
+        "samengesteld": false,
+        "rauw": ", auth, lid, (req, res) =>"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/neiging/antwoord",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "neiging",
+      "naam": "RTG Neiging (Mijn neigingen)",
+      "doelgroep": "lifestyle",
+      "verklaard": true,
+      "routes": 7,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/neiging/antwoord",
+        "bewakers": [
+          "auth",
+          "lid"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/neiging.js",
+        "regel": 42,
+        "samengesteld": false,
+        "rauw": ", auth, lid, (req, res) =>"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/neiging/antwoord",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "neiging",
+      "naam": "RTG Neiging (Mijn neigingen)",
+      "doelgroep": "business",
+      "verklaard": true,
+      "routes": 7,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/neiging/antwoord",
+        "bewakers": [
+          "auth",
+          "lid"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/neiging.js",
+        "regel": 42,
+        "samengesteld": false,
+        "rauw": ", auth, lid, (req, res) =>"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/neiging/antwoord",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "neiging",
+      "naam": "RTG Neiging (Mijn neigingen)",
+      "doelgroep": "gast",
+      "verklaard": false,
+      "routes": 7,
+      "beproefd": 7,
+      "onbepaaldeRoutes": 7,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "neiging",
+      "naam": "RTG Neiging (Mijn neigingen)",
+      "doelgroep": "leverancier",
+      "verklaard": false,
+      "routes": 7,
+      "beproefd": 7,
+      "onbepaaldeRoutes": 7,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "neiging",
+      "naam": "RTG Neiging (Mijn neigingen)",
+      "doelgroep": "personeel",
+      "verklaard": false,
+      "routes": 7,
+      "beproefd": 7,
+      "onbepaaldeRoutes": 7,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "neiging",
+      "naam": "RTG Neiging (Mijn neigingen)",
+      "doelgroep": "foundation",
+      "verklaard": false,
+      "routes": 7,
+      "beproefd": 7,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "deze doelgroep dekt gezinnen, leerlingen EN scholen; de meter draagt alleen een gezinssessie"
+    },
+    {
+      "functie": "neiging",
+      "naam": "RTG Neiging (Mijn neigingen)",
+      "doelgroep": "intern",
+      "verklaard": false,
+      "routes": 7,
+      "beproefd": 7,
+      "onbepaaldeRoutes": 7,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
       "functie": "privekantoor",
       "naam": "Het Privékantoor (Lifestyle)",
       "doelgroep": "rtg",
@@ -1700,7 +1835,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/salonapp.js",
-        "regel": 140,
+        "regel": 128,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -1724,7 +1859,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/salonapp.js",
-        "regel": 140,
+        "regel": 128,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -1748,7 +1883,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/salonapp.js",
-        "regel": 140,
+        "regel": 128,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -1772,7 +1907,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/salonapp.js",
-        "regel": 156,
+        "regel": 144,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -2068,12 +2203,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 228,
-        "zonderRoldeur": 228,
+        "routes": 247,
+        "zonderRoldeur": 247,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "247 routes met geen roldeur(en) en 247 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -2086,12 +2221,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 228,
-        "zonderRoldeur": 228,
+        "routes": 247,
+        "zonderRoldeur": 247,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "247 routes met geen roldeur(en) en 247 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -2104,12 +2239,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 228,
-        "zonderRoldeur": 228,
+        "routes": 247,
+        "zonderRoldeur": 247,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "247 routes met geen roldeur(en) en 247 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -2936,7 +3071,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 77,
+        "regel": 96,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -2960,7 +3095,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 77,
+        "regel": 96,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -2984,7 +3119,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 77,
+        "regel": 96,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -3008,7 +3143,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 77,
+        "regel": 96,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -7387,7 +7522,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/gemoed.js",
-        "regel": 8,
+        "regel": 56,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, gemoedVan(req.session.key)));"
       },
@@ -7411,7 +7546,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/gemoed.js",
-        "regel": 8,
+        "regel": 56,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, gemoedVan(req.session.key)));"
       },
@@ -7435,7 +7570,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/gemoed.js",
-        "regel": 8,
+        "regel": 56,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, gemoedVan(req.session.key)));"
       },
@@ -7459,7 +7594,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/gemoed.js",
-        "regel": 8,
+        "regel": 56,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, gemoedVan(req.session.key)));"
       },
@@ -9549,6 +9684,158 @@
       "onbepaaldeRoutes": 6,
       "open": "POST /api/carriere/regel/toon",
       "uitslag": "geen-deur"
+    },
+    {
+      "functie": "connect",
+      "naam": "Ontdekken (leren, doen, doorgeven)",
+      "doelgroep": "rtg",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/connect/dossier",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/connect.js",
+        "regel": 104,
+        "samengesteld": false,
+        "rauw": ", auth, dossier(lid));"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/connect/dossier",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "connect",
+      "naam": "Ontdekken (leren, doen, doorgeven)",
+      "doelgroep": "lifestyle",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/connect/dossier",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/connect.js",
+        "regel": 104,
+        "samengesteld": false,
+        "rauw": ", auth, dossier(lid));"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/connect/dossier",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "connect",
+      "naam": "Ontdekken (leren, doen, doorgeven)",
+      "doelgroep": "business",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/connect/dossier",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/connect.js",
+        "regel": 104,
+        "samengesteld": false,
+        "rauw": ", auth, dossier(lid));"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/connect/dossier",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "connect",
+      "naam": "Ontdekken (leren, doen, doorgeven)",
+      "doelgroep": "gast",
+      "verklaard": false,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/connect/dossier",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/connect.js",
+        "regel": 104,
+        "samengesteld": false,
+        "rauw": ", auth, dossier(lid));"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/connect/dossier",
+      "uitslag": "bereikbaar-zonder-verklaring",
+      "triageBewijs": {
+        "zelfde": 3,
+        "geweigerd": 1,
+        "onbekend": 0,
+        "vergeleken": 4
+      },
+      "triage": "gelijk-aan-verklaard",
+      "triageReden": "een verklaarde doelgroep krijgt op POST /api/connect/dossier exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
+    },
+    {
+      "functie": "connect",
+      "naam": "Ontdekken (leren, doen, doorgeven)",
+      "doelgroep": "leverancier",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "connect",
+      "naam": "Ontdekken (leren, doen, doorgeven)",
+      "doelgroep": "personeel",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "connect",
+      "naam": "Ontdekken (leren, doen, doorgeven)",
+      "doelgroep": "foundation",
+      "verklaard": true,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "deze doelgroep dekt gezinnen, leerlingen EN scholen; de meter draagt alleen een gezinssessie"
+    },
+    {
+      "functie": "connect",
+      "naam": "Ontdekken (leren, doen, doorgeven)",
+      "doelgroep": "intern",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "supplier",
@@ -12339,7 +12626,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 107,
+        "regel": 126,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -12363,7 +12650,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 107,
+        "regel": 126,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -12387,7 +12674,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 107,
+        "regel": 126,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -12411,7 +12698,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 103,
+        "regel": 122,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -14497,7 +14784,7 @@
       "naam": "Reisbureau",
       "doelgroep": "rtg",
       "verklaard": true,
-      "routes": 7,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/reisbureau",
@@ -14521,7 +14808,7 @@
       "naam": "Reisbureau",
       "doelgroep": "lifestyle",
       "verklaard": true,
-      "routes": 7,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/reisbureau",
@@ -14545,7 +14832,7 @@
       "naam": "Reisbureau",
       "doelgroep": "business",
       "verklaard": true,
-      "routes": 7,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/reisbureau",
@@ -14569,7 +14856,7 @@
       "naam": "Reisbureau",
       "doelgroep": "gast",
       "verklaard": true,
-      "routes": 7,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/reisbureau",
@@ -14593,32 +14880,32 @@
       "naam": "Reisbureau",
       "doelgroep": "leverancier",
       "verklaard": false,
-      "routes": 7,
-      "beproefd": 7,
-      "onbepaaldeRoutes": 7,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "dom-reisbureau",
       "naam": "Reisbureau",
       "doelgroep": "personeel",
       "verklaard": false,
-      "routes": 7,
-      "beproefd": 7,
-      "onbepaaldeRoutes": 7,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "dom-reisbureau",
       "naam": "Reisbureau",
       "doelgroep": "foundation",
       "verklaard": false,
-      "routes": 7,
-      "beproefd": 7,
+      "routes": 8,
+      "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "onbepaald",
@@ -14629,12 +14916,12 @@
       "naam": "Reisbureau",
       "doelgroep": "intern",
       "verklaard": false,
-      "routes": 7,
-      "beproefd": 7,
-      "onbepaaldeRoutes": 7,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "dom-care",
@@ -16162,7 +16449,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/persoonlijk-rahul.js",
-        "regel": 25,
+        "regel": 33,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -16186,7 +16473,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/persoonlijk-rahul.js",
-        "regel": 25,
+        "regel": 33,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -16210,7 +16497,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/persoonlijk-rahul.js",
-        "regel": 25,
+        "regel": 33,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -16234,7 +16521,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/persoonlijk-rahul.js",
-        "regel": 25,
+        "regel": 33,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -18259,358 +18546,6 @@
       "uitslag": "geen-deur"
     },
     {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "rtg",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/beslis",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 35,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.beslis(String((req.body || {}).id || ''), lid(req))); });"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/labfonds/beslis",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/beslis geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "lifestyle",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/beslis",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 35,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.beslis(String((req.body || {}).id || ''), lid(req))); });"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/labfonds/beslis",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/beslis geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "business",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/beslis",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 35,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.beslis(String((req.body || {}).id || ''), lid(req))); });"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/labfonds/beslis",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/beslis geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "gast",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/financiering",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 41,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => veilig(res, () => {"
-      },
-      "beproefd": 4,
-      "onbepaaldeRoutes": 2,
-      "open": "POST /api/labfonds/financiering",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/financiering geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "leverancier",
-      "verklaard": false,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 7,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "7 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "personeel",
-      "verklaard": false,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 7,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "7 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "foundation",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "deze doelgroep dekt gezinnen, leerlingen EN scholen; de meter draagt alleen een gezinssessie"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "intern",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/boardroom",
-        "bewakers": [
-          "officeAuth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 48,
-        "samengesteld": false,
-        "rauw": ", officeAuth, (req, res) => veilig(res, () => labfonds.boardroom()));"
-      },
-      "beproefd": 2,
-      "onbepaaldeRoutes": 1,
-      "open": "POST /api/labfonds/boardroom",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/boardroom geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "rtg",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/samen/chat",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/samen.js",
-        "regel": 57,
-        "samengesteld": false,
-        "rauw": ", auth, async (req, res) => {"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/samen/chat",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/samen/chat geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "lifestyle",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/samen/chat",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/samen.js",
-        "regel": 57,
-        "samengesteld": false,
-        "rauw": ", auth, async (req, res) => {"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/samen/chat",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/samen/chat geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "business",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/samen/chat",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/samen.js",
-        "regel": 57,
-        "samengesteld": false,
-        "rauw": ", auth, async (req, res) => {"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/samen/chat",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/samen/chat geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "gast",
-      "verklaard": false,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 8,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "leverancier",
-      "verklaard": false,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 8,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "personeel",
-      "verklaard": false,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 8,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "foundation",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "deze doelgroep dekt gezinnen, leerlingen EN scholen; de meter draagt alleen een gezinssessie"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "intern",
-      "verklaard": false,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 8,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
-    },
-    {
       "functie": "dom-les",
       "naam": "Klaslokaal (lesmaker)",
       "doelgroep": "rtg",
@@ -18790,7 +18725,7 @@
       "functie": "dom-leerstof",
       "naam": "Leerstof",
       "doelgroep": "rtg",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "openRoute": {
         "methode": "POST",
@@ -18808,21 +18743,13 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/leerstof/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/leerstof/antwoord geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "dom-leerstof",
       "naam": "Leerstof",
       "doelgroep": "lifestyle",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "openRoute": {
         "methode": "POST",
@@ -18840,21 +18767,13 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/leerstof/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/leerstof/antwoord geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "dom-leerstof",
       "naam": "Leerstof",
       "doelgroep": "business",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "openRoute": {
         "methode": "POST",
@@ -18872,21 +18791,13 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/leerstof/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/leerstof/antwoord geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "dom-leerstof",
       "naam": "Leerstof",
       "doelgroep": "gast",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "openRoute": {
         "methode": "POST",
@@ -18904,15 +18815,7 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/leerstof/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/leerstof/antwoord geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "dom-leerstof",
@@ -18942,7 +18845,7 @@
       "functie": "dom-leerstof",
       "naam": "Leerstof",
       "doelgroep": "foundation",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
@@ -18966,7 +18869,7 @@
       "functie": "dom-onderwijs",
       "naam": "Onderwijs (paspoort en ladder)",
       "doelgroep": "rtg",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 7,
       "openRoute": {
         "methode": "POST",
@@ -18984,21 +18887,13 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/onderwijs/advies",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/onderwijs/advies geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "dom-onderwijs",
       "naam": "Onderwijs (paspoort en ladder)",
       "doelgroep": "lifestyle",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 7,
       "openRoute": {
         "methode": "POST",
@@ -19016,21 +18911,13 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/onderwijs/advies",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/onderwijs/advies geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "dom-onderwijs",
       "naam": "Onderwijs (paspoort en ladder)",
       "doelgroep": "business",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 7,
       "openRoute": {
         "methode": "POST",
@@ -19048,21 +18935,13 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/onderwijs/advies",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/onderwijs/advies geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "dom-onderwijs",
       "naam": "Onderwijs (paspoort en ladder)",
       "doelgroep": "gast",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 7,
       "openRoute": {
         "methode": "POST",
@@ -19080,15 +18959,7 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/onderwijs/advies",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/onderwijs/advies geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "dom-onderwijs",
@@ -19118,7 +18989,7 @@
       "functie": "dom-onderwijs",
       "naam": "Onderwijs (paspoort en ladder)",
       "doelgroep": "foundation",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 7,
       "beproefd": 7,
       "onbepaaldeRoutes": 0,
@@ -19297,7 +19168,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/appstore/lid.js",
-        "regel": 113,
+        "regel": 117,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => res.json({"
       },
@@ -19321,7 +19192,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/appstore/lid.js",
-        "regel": 113,
+        "regel": 117,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => res.json({"
       },
@@ -19345,7 +19216,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/appstore/lid.js",
-        "regel": 113,
+        "regel": 117,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => res.json({"
       },
@@ -19369,7 +19240,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/appstore/lid.js",
-        "regel": 113,
+        "regel": 117,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => res.json({"
       },
@@ -25109,7 +24980,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 121,
+        "regel": 140,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25133,7 +25004,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 121,
+        "regel": 140,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25157,7 +25028,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 121,
+        "regel": 140,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25181,7 +25052,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 121,
+        "regel": 140,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25293,7 +25164,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/assistent.js",
-        "regel": 61,
+        "regel": 70,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25317,7 +25188,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/assistent.js",
-        "regel": 61,
+        "regel": 70,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25341,7 +25212,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/assistent.js",
-        "regel": 61,
+        "regel": 70,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25365,7 +25236,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/assistent.js",
-        "regel": 61,
+        "regel": 70,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25668,7 +25539,7 @@
         "bestand": "server/server.js",
         "regel": 1505,
         "samengesteld": false,
-        "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
+        "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
       "beproefd": 5,
       "onbepaaldeRoutes": 2,
@@ -25693,7 +25564,7 @@
         "bestand": "server/server.js",
         "regel": 1505,
         "samengesteld": false,
-        "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
+        "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
       "beproefd": 5,
       "onbepaaldeRoutes": 2,
@@ -25718,7 +25589,7 @@
         "bestand": "server/server.js",
         "regel": 1505,
         "samengesteld": false,
-        "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
+        "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
       "beproefd": 5,
       "onbepaaldeRoutes": 0,
@@ -25743,7 +25614,7 @@
         "bestand": "server/server.js",
         "regel": 1505,
         "samengesteld": false,
-        "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
+        "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
       "beproefd": 5,
       "onbepaaldeRoutes": 2,
@@ -26221,7 +26092,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/assistent.js",
-        "regel": 12,
+        "regel": 13,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -26245,7 +26116,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/assistent.js",
-        "regel": 12,
+        "regel": 13,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -26269,7 +26140,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/assistent.js",
-        "regel": 12,
+        "regel": 13,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -26293,7 +26164,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/assistent.js",
-        "regel": 10,
+        "regel": 11,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => res.json(aiStatus()));"
       },
@@ -30510,7 +30381,7 @@
       "functie": "ov-bijles",
       "naam": "Bijles",
       "doelgroep": "rtg",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 2,
       "openRoute": {
         "methode": "POST",
@@ -30528,21 +30399,13 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/bijles/gesprek",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/bijles/gesprek geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "ov-bijles",
       "naam": "Bijles",
       "doelgroep": "lifestyle",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 2,
       "openRoute": {
         "methode": "POST",
@@ -30560,21 +30423,13 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/bijles/gesprek",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/bijles/gesprek geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "ov-bijles",
       "naam": "Bijles",
       "doelgroep": "business",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 2,
       "openRoute": {
         "methode": "POST",
@@ -30592,21 +30447,13 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/bijles/gesprek",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/bijles/gesprek geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "ov-bijles",
       "naam": "Bijles",
       "doelgroep": "gast",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 2,
       "openRoute": {
         "methode": "POST",
@@ -30624,15 +30471,7 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/bijles/gesprek",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/bijles/gesprek geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
+      "uitslag": "waar"
     },
     {
       "functie": "ov-bijles",
@@ -30662,7 +30501,7 @@
       "functie": "ov-bijles",
       "naam": "Bijles",
       "doelgroep": "foundation",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 2,
       "beproefd": 2,
       "onbepaaldeRoutes": 0,
@@ -31241,6 +31080,482 @@
       "onbepaaldeRoutes": 0,
       "open": "POST /api/mail/ses",
       "uitslag": "waar"
+    },
+    {
+      "functie": "rtf-leerpaspoort",
+      "naam": "Leerpaspoort (leerling)",
+      "doelgroep": "rtg",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-leerpaspoort",
+      "naam": "Leerpaspoort (leerling)",
+      "doelgroep": "lifestyle",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-leerpaspoort",
+      "naam": "Leerpaspoort (leerling)",
+      "doelgroep": "business",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-leerpaspoort",
+      "naam": "Leerpaspoort (leerling)",
+      "doelgroep": "gast",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-leerpaspoort",
+      "naam": "Leerpaspoort (leerling)",
+      "doelgroep": "leverancier",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-leerpaspoort",
+      "naam": "Leerpaspoort (leerling)",
+      "doelgroep": "personeel",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-leerpaspoort",
+      "naam": "Leerpaspoort (leerling)",
+      "doelgroep": "foundation",
+      "verklaard": true,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "rtf-leerpaspoort",
+      "naam": "Leerpaspoort (leerling)",
+      "doelgroep": "intern",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "dom-labfonds",
+      "naam": "Het labfonds",
+      "doelgroep": "rtg",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/labfonds/beslis",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/labfonds.js",
+        "regel": 83,
+        "samengesteld": false,
+        "rauw": ", auth, alsLid(DOEN.beslis, true));"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/labfonds/beslis",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "dom-labfonds",
+      "naam": "Het labfonds",
+      "doelgroep": "lifestyle",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/labfonds/beslis",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/labfonds.js",
+        "regel": 83,
+        "samengesteld": false,
+        "rauw": ", auth, alsLid(DOEN.beslis, true));"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/labfonds/beslis",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "dom-labfonds",
+      "naam": "Het labfonds",
+      "doelgroep": "business",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/labfonds/beslis",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/labfonds.js",
+        "regel": 83,
+        "samengesteld": false,
+        "rauw": ", auth, alsLid(DOEN.beslis, true));"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/labfonds/beslis",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "dom-labfonds",
+      "naam": "Het labfonds",
+      "doelgroep": "gast",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/labfonds/financiering",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/labfonds.js",
+        "regel": 89,
+        "samengesteld": false,
+        "rauw": ", auth, alsLid(DOEN.financiering, false));"
+      },
+      "beproefd": 4,
+      "onbepaaldeRoutes": 2,
+      "open": "POST /api/labfonds/financiering",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "dom-labfonds",
+      "naam": "Het labfonds",
+      "doelgroep": "leverancier",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 7,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "7 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "dom-labfonds",
+      "naam": "Het labfonds",
+      "doelgroep": "personeel",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 7,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "7 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "dom-labfonds",
+      "naam": "Het labfonds",
+      "doelgroep": "foundation",
+      "verklaard": true,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "deze doelgroep dekt gezinnen, leerlingen EN scholen; de meter draagt alleen een gezinssessie"
+    },
+    {
+      "functie": "dom-labfonds",
+      "naam": "Het labfonds",
+      "doelgroep": "intern",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/labfonds/boardroom",
+        "bewakers": [
+          "officeAuth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/labfonds.js",
+        "regel": 105,
+        "samengesteld": false,
+        "rauw": ", officeAuth, (req, res) => veilig(res, () => labfonds.boardroom()));"
+      },
+      "beproefd": 2,
+      "onbepaaldeRoutes": 1,
+      "open": "POST /api/labfonds/boardroom",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "dom-samen",
+      "naam": "Samen (stadsraad)",
+      "doelgroep": "rtg",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/samen/chat",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/samen.js",
+        "regel": 57,
+        "samengesteld": false,
+        "rauw": ", auth, async (req, res) => {"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/samen/chat",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "dom-samen",
+      "naam": "Samen (stadsraad)",
+      "doelgroep": "lifestyle",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/samen/chat",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/samen.js",
+        "regel": 57,
+        "samengesteld": false,
+        "rauw": ", auth, async (req, res) => {"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/samen/chat",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "dom-samen",
+      "naam": "Samen (stadsraad)",
+      "doelgroep": "business",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/samen/chat",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/samen.js",
+        "regel": 57,
+        "samengesteld": false,
+        "rauw": ", auth, async (req, res) => {"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/samen/chat",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "dom-samen",
+      "naam": "Samen (stadsraad)",
+      "doelgroep": "gast",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "dom-samen",
+      "naam": "Samen (stadsraad)",
+      "doelgroep": "leverancier",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "dom-samen",
+      "naam": "Samen (stadsraad)",
+      "doelgroep": "personeel",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "dom-samen",
+      "naam": "Samen (stadsraad)",
+      "doelgroep": "foundation",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "deze doelgroep dekt gezinnen, leerlingen EN scholen; de meter draagt alleen een gezinssessie"
+    },
+    {
+      "functie": "dom-samen",
+      "naam": "Samen (stadsraad)",
+      "doelgroep": "intern",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "rtf-samen",
+      "naam": "Samen (gezin)",
+      "doelgroep": "rtg",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-samen",
+      "naam": "Samen (gezin)",
+      "doelgroep": "lifestyle",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-samen",
+      "naam": "Samen (gezin)",
+      "doelgroep": "business",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-samen",
+      "naam": "Samen (gezin)",
+      "doelgroep": "gast",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-samen",
+      "naam": "Samen (gezin)",
+      "doelgroep": "leverancier",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-samen",
+      "naam": "Samen (gezin)",
+      "doelgroep": "personeel",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
+    },
+    {
+      "functie": "rtf-samen",
+      "naam": "Samen (gezin)",
+      "doelgroep": "foundation",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/rtf/samen/chat",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/rtfschool.js",
+        "regel": 118,
+        "samengesteld": false,
+        "rauw": ", async (req, res) => {"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/rtf/samen/chat",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "rtf-samen",
+      "naam": "Samen (gezin)",
+      "doelgroep": "intern",
+      "verklaard": false,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "fs-terrein",
@@ -31606,17 +31921,17 @@
     }
   ],
   "telling": {
-    "cellen": 1736,
-    "waar": 579,
-    "correct-afgesloten": 181,
+    "cellen": 1768,
+    "waar": 606,
+    "correct-afgesloten": 195,
     "registerleugen": 18,
-    "bereikbaar-zonder-verklaring": 132,
+    "bereikbaar-zonder-verklaring": 113,
     "geen-deur": 133,
-    "onbepaald": 689,
+    "onbepaald": 699,
     "niet-beproefd": 4,
     "sessie-ontbreekt": 0
   },
-  "routesGezien": 5022,
+  "routesGezien": 5071,
   "leugens": [
     {
       "functie": "social",
@@ -31683,12 +31998,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 228,
-        "zonderRoldeur": 228,
+        "routes": 247,
+        "zonderRoldeur": 247,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "247 routes met geen roldeur(en) en 247 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -31701,12 +32016,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 228,
-        "zonderRoldeur": 228,
+        "routes": 247,
+        "zonderRoldeur": 247,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "247 routes met geen roldeur(en) en 247 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -31719,12 +32034,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 228,
-        "zonderRoldeur": 228,
+        "routes": 247,
+        "zonderRoldeur": 247,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "247 routes met geen roldeur(en) en 247 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -32291,7 +32606,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 77,
+        "regel": 96,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -32739,7 +33054,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/gemoed.js",
-        "regel": 8,
+        "regel": 56,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, gemoedVan(req.session.key)));"
       },
@@ -33173,6 +33488,38 @@
       "triageReden": "een verklaarde doelgroep krijgt op POST /api/carriere/ledger/deel exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
     },
     {
+      "functie": "connect",
+      "naam": "Ontdekken (leren, doen, doorgeven)",
+      "doelgroep": "gast",
+      "verklaard": false,
+      "routes": 8,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/connect/dossier",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/connect.js",
+        "regel": 104,
+        "samengesteld": false,
+        "rauw": ", auth, dossier(lid));"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/connect/dossier",
+      "uitslag": "bereikbaar-zonder-verklaring",
+      "triageBewijs": {
+        "zelfde": 3,
+        "geweigerd": 1,
+        "onbekend": 0,
+        "vergeleken": 4
+      },
+      "triage": "gelijk-aan-verklaard",
+      "triageReden": "een verklaarde doelgroep krijgt op POST /api/connect/dossier exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
+    },
+    {
       "functie": "supplier",
       "naam": "Partner-app (algemeen)",
       "doelgroep": "rtg",
@@ -33601,7 +33948,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 103,
+        "regel": 122,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -34049,7 +34396,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/persoonlijk-rahul.js",
-        "regel": 25,
+        "regel": 33,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -34545,518 +34892,6 @@
       },
       "triage": "ruimer-dan-verklaard",
       "triageReden": "elke verklaarde doelgroep wordt op POST /api/lab2/app/bevoegd geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "rtg",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/beslis",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 35,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.beslis(String((req.body || {}).id || ''), lid(req))); });"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/labfonds/beslis",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/beslis geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "lifestyle",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/beslis",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 35,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.beslis(String((req.body || {}).id || ''), lid(req))); });"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/labfonds/beslis",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/beslis geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "business",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/beslis",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 35,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.beslis(String((req.body || {}).id || ''), lid(req))); });"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/labfonds/beslis",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/beslis geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "gast",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/financiering",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 41,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => veilig(res, () => {"
-      },
-      "beproefd": 4,
-      "onbepaaldeRoutes": 2,
-      "open": "POST /api/labfonds/financiering",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/financiering geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-labfonds",
-      "naam": "Het labfonds",
-      "doelgroep": "intern",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/labfonds/boardroom",
-        "bewakers": [
-          "officeAuth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/labfonds.js",
-        "regel": 48,
-        "samengesteld": false,
-        "rauw": ", officeAuth, (req, res) => veilig(res, () => labfonds.boardroom()));"
-      },
-      "beproefd": 2,
-      "onbepaaldeRoutes": 1,
-      "open": "POST /api/labfonds/boardroom",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/labfonds/boardroom geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "rtg",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/samen/chat",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/samen.js",
-        "regel": 57,
-        "samengesteld": false,
-        "rauw": ", auth, async (req, res) => {"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/samen/chat",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/samen/chat geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "lifestyle",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/samen/chat",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/samen.js",
-        "regel": 57,
-        "samengesteld": false,
-        "rauw": ", auth, async (req, res) => {"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/samen/chat",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/samen/chat geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-samen",
-      "naam": "Samen (stadsraad)",
-      "doelgroep": "business",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/samen/chat",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/samen.js",
-        "regel": 57,
-        "samengesteld": false,
-        "rauw": ", auth, async (req, res) => {"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/samen/chat",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/samen/chat geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-leerstof",
-      "naam": "Leerstof",
-      "doelgroep": "rtg",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/leerstof/antwoord",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/leerstof.js",
-        "regel": 15,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, leerstof.leerstofOefenAntwoord(req.session.key, req.body || {})));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/leerstof/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/leerstof/antwoord geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-leerstof",
-      "naam": "Leerstof",
-      "doelgroep": "lifestyle",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/leerstof/antwoord",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/leerstof.js",
-        "regel": 15,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, leerstof.leerstofOefenAntwoord(req.session.key, req.body || {})));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/leerstof/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/leerstof/antwoord geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-leerstof",
-      "naam": "Leerstof",
-      "doelgroep": "business",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/leerstof/antwoord",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/leerstof.js",
-        "regel": 15,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, leerstof.leerstofOefenAntwoord(req.session.key, req.body || {})));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/leerstof/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/leerstof/antwoord geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-leerstof",
-      "naam": "Leerstof",
-      "doelgroep": "gast",
-      "verklaard": false,
-      "routes": 8,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/leerstof/antwoord",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/leerstof.js",
-        "regel": 15,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, leerstof.leerstofOefenAntwoord(req.session.key, req.body || {})));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/leerstof/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/leerstof/antwoord geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-onderwijs",
-      "naam": "Onderwijs (paspoort en ladder)",
-      "doelgroep": "rtg",
-      "verklaard": false,
-      "routes": 7,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/onderwijs/advies",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/onderwijs.js",
-        "regel": 10,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, vervolg.advies(req.session.key)));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/onderwijs/advies",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/onderwijs/advies geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-onderwijs",
-      "naam": "Onderwijs (paspoort en ladder)",
-      "doelgroep": "lifestyle",
-      "verklaard": false,
-      "routes": 7,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/onderwijs/advies",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/onderwijs.js",
-        "regel": 10,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, vervolg.advies(req.session.key)));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/onderwijs/advies",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/onderwijs/advies geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-onderwijs",
-      "naam": "Onderwijs (paspoort en ladder)",
-      "doelgroep": "business",
-      "verklaard": false,
-      "routes": 7,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/onderwijs/advies",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/onderwijs.js",
-        "regel": 10,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, vervolg.advies(req.session.key)));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/onderwijs/advies",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/onderwijs/advies geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "dom-onderwijs",
-      "naam": "Onderwijs (paspoort en ladder)",
-      "doelgroep": "gast",
-      "verklaard": false,
-      "routes": 7,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/onderwijs/advies",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/onderwijs.js",
-        "regel": 10,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, vervolg.advies(req.session.key)));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/onderwijs/advies",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/onderwijs/advies geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
     },
     {
       "functie": "dom-bestanden",
@@ -35949,134 +35784,6 @@
       },
       "triage": "gelijk-aan-verklaard",
       "triageReden": "een verklaarde doelgroep krijgt op POST /api/spar/lijst exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
-    },
-    {
-      "functie": "ov-bijles",
-      "naam": "Bijles",
-      "doelgroep": "rtg",
-      "verklaard": false,
-      "routes": 2,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/bijles/gesprek",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/bijles.js",
-        "regel": 19,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, bijles.gesprek('lid:' + req.session.key)));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/bijles/gesprek",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/bijles/gesprek geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "ov-bijles",
-      "naam": "Bijles",
-      "doelgroep": "lifestyle",
-      "verklaard": false,
-      "routes": 2,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/bijles/gesprek",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/bijles.js",
-        "regel": 19,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, bijles.gesprek('lid:' + req.session.key)));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/bijles/gesprek",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/bijles/gesprek geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "ov-bijles",
-      "naam": "Bijles",
-      "doelgroep": "business",
-      "verklaard": false,
-      "routes": 2,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/bijles/gesprek",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/bijles.js",
-        "regel": 19,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, bijles.gesprek('lid:' + req.session.key)));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/bijles/gesprek",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/bijles/gesprek geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
-    },
-    {
-      "functie": "ov-bijles",
-      "naam": "Bijles",
-      "doelgroep": "gast",
-      "verklaard": false,
-      "routes": 2,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/bijles/gesprek",
-        "bewakers": [
-          "auth"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/bijles.js",
-        "regel": 19,
-        "samengesteld": false,
-        "rauw": ", auth, (req, res) => stuur(res, bijles.gesprek('lid:' + req.session.key)));"
-      },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/bijles/gesprek",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 0,
-        "geweigerd": 1,
-        "onbekend": 0,
-        "vergeleken": 1
-      },
-      "triage": "ruimer-dan-verklaard",
-      "triageReden": "elke verklaarde doelgroep wordt op POST /api/bijles/gesprek geweigerd en deze komt er langs; dit is een toegangsvraag voor een mens"
     },
     {
       "functie": "ov-kantoorgesprek",

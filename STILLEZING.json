@@ -3,10 +3,10 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-09-20T09:54:15.753Z",
-  "commit": "669b6bff9",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-20T11:40:42.043Z",
+  "commit": "124320711",
+  "boomVuil": true,
+  "boomAnders": 82,
   "instrument": "scripts/stillezing.js",
   "node": "v24.18.0"
  },
@@ -108,7 +108,7 @@
   "scripts": [
    {
     "bestand": "scripts/aanroepgraaf.js",
-    "regel": 155,
+    "regel": 163,
     "leest": [
      "KERNHERKOMST.json"
     ],
@@ -293,7 +293,7 @@
    },
    {
     "bestand": "scripts/doodspoor.js",
-    "regel": 236,
+    "regel": 233,
     "leest": [
      "IDEMPROEF.json"
     ],
@@ -301,7 +301,7 @@
    },
    {
     "bestand": "scripts/doodspoor.js",
-    "regel": 487,
+    "regel": 541,
     "leest": [
      "DOODSPOOR.json"
     ],

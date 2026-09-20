@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-13T12:40:25.472Z",
-  "commit": "9f223793",
+  "op": "2026-09-19T19:07:10.339Z",
+  "commit": "6083f652",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 37,
   "instrument": "scripts/ondernemerbewijs.js",
   "node": "v22.22.2"
  },
@@ -21,12 +21,12 @@
    "commit": "33aa414d"
   },
   "rol": {
-   "op": "2026-09-06T06:36:17.918Z",
-   "commit": "b1451280"
+   "op": "2026-09-19T17:23:30.217Z",
+   "commit": "f0dbcb5d"
   },
   "idem": {
-   "op": "2026-09-12T18:47:56.456Z",
-   "commit": "ace21253"
+   "op": "2026-09-19T17:45:58.177Z",
+   "commit": "adc9db1b"
   },
   "herstel": {
    "op": null,
@@ -47,8 +47,8 @@
    "commit": "9ecef79b"
   },
   "handeling": {
-   "op": "2026-09-03T12:28:12.517Z",
-   "commit": "1c5dc892"
+   "op": "2026-09-19T18:07:51.160Z",
+   "commit": "adc9db1b"
   }
  },
  "lagen": [
@@ -162,13 +162,13 @@
   }
  ],
  "telling": {
-  "capabilities": 197,
-  "werk": 68,
-  "meegeleverd": 129,
-  "routesToegewezen": 3490,
-  "routesZonderCapability": 1539,
+  "capabilities": 204,
+  "werk": 71,
+  "meegeleverd": 133,
+  "routesToegewezen": 3555,
+  "routesZonderCapability": 1534,
   "verkoopbaar": 0,
-  "onbewezen": 197,
+  "onbewezen": 204,
   "geblokkeerd": 0
  },
  "perLaag": {
@@ -180,7 +180,7 @@
    "capabilities": {
     "groen": 0,
     "rood": 0,
-    "onbekend": 197
+    "onbekend": 204
    },
    "routes": {
     "let": "deze laag heeft geen route-korrel; zie `korrel`"
@@ -195,7 +195,7 @@
    "capabilities": {
     "groen": 0,
     "rood": 0,
-    "onbekend": 197
+    "onbekend": 204
    },
    "routes": {
     "let": "deze laag heeft geen route-korrel; zie `korrel`"
@@ -210,7 +210,7 @@
    "capabilities": {
     "groen": 0,
     "rood": 0,
-    "onbekend": 197
+    "onbekend": 204
    },
    "routes": {
     "let": "deze laag heeft geen route-korrel; zie `korrel`"
@@ -225,7 +225,7 @@
    "capabilities": {
     "groen": 0,
     "rood": 0,
-    "onbekend": 197
+    "onbekend": 204
    },
    "routes": {
     "let": "deze laag heeft geen route-korrel; zie `korrel`"
@@ -240,7 +240,7 @@
    "capabilities": {
     "groen": 0,
     "rood": 0,
-    "onbekend": 197
+    "onbekend": 204
    },
    "routes": {
     "let": "deze laag heeft geen route-korrel; zie `korrel`"
@@ -253,14 +253,14 @@
    "korrel": "route",
    "graad": "vermoed",
    "capabilities": {
-    "groen": 2,
+    "groen": 1,
     "rood": 0,
-    "onbekend": 195
+    "onbekend": 203
    },
    "routes": {
-    "groen": 217,
+    "groen": 219,
     "rood": 0,
-    "onbekend": 3273
+    "onbekend": 3336
    },
    "reden": "IDEMPROEF.json neemt per route een voor/na-beeld van de opslag en ziet dus of de schrijfactie de collectie werkelijk RAAKTE. Dat is de halve vraag: het bewijst dat het resultaat in de opslag landde, niet dat het een herstart overleeft. Daarom graad `vermoed` en niet `gemeten`."
   },
@@ -270,14 +270,14 @@
    "korrel": "route",
    "graad": "gemeten",
    "capabilities": {
-    "groen": 130,
+    "groen": 131,
     "rood": 0,
-    "onbekend": 67
+    "onbekend": 73
    },
    "routes": {
     "groen": 2786,
     "rood": 0,
-    "onbekend": 704
+    "onbekend": 769
    },
    "reden": null
   },
@@ -289,12 +289,12 @@
    "capabilities": {
     "groen": 11,
     "rood": 0,
-    "onbekend": 186
+    "onbekend": 193
    },
    "routes": {
-    "groen": 1135,
+    "groen": 1181,
     "rood": 0,
-    "onbekend": 2355
+    "onbekend": 2374
    },
    "reden": null
   },
@@ -304,14 +304,14 @@
    "korrel": "route",
    "graad": "vermoed",
    "capabilities": {
-    "groen": 2,
+    "groen": 3,
     "rood": 0,
-    "onbekend": 195
+    "onbekend": 201
    },
    "routes": {
-    "groen": 439,
+    "groen": 464,
     "rood": 0,
-    "onbekend": 3051
+    "onbekend": 3091
    },
    "reden": "LET OP WAT DIT WEL EN NIET ZEGT. HANDELINGPROEF.json meet of een geslaagde oproep een GEKETENDE regel naliet in het handelingsspoor -- een regel die via correlatie en oorzaak (kern/envelop.js) terug te volgen is naar wat hem veroorzaakte. Dat is het SUBSTRAAT van uitlegbaarheid en niet de uitleg zelf: dat een gevolg naar zijn oorzaak wijst, betekent niet dat een ondernemer het in woorden te horen krijgt. Daarom graad `vermoed`. Het verschil met `auditbaar` is echt en niet cosmetisch: AUDITPROEF vraagt OF er een spoor is, deze of dat spoor een KETEN vormt. Niet samenvoegen. En niet verwarren met WAAROM.json -- dat zegt per route waarom hij niet te BEWIJZEN valt, wat provability is en geen uitlegbaarheid."
   },
@@ -323,12 +323,12 @@
    "capabilities": {
     "groen": 0,
     "rood": 0,
-    "onbekend": 197
+    "onbekend": 204
    },
    "routes": {
-    "groen": 36,
+    "groen": 38,
     "rood": 0,
-    "onbekend": 3454
+    "onbekend": 3517
    },
    "reden": "let op de naamsbotsing met `herstelbaar` hierboven: dat gaat over een tweede identieke aanroep, dit over een TEGENHANGER die de handeling ongedaan maakt. Twee verschillende vragen, twee verschillende registers."
   },
@@ -338,14 +338,14 @@
    "korrel": "route",
    "graad": "gemeten",
    "capabilities": {
-    "groen": 6,
+    "groen": 7,
     "rood": 0,
-    "onbekend": 191
+    "onbekend": 197
    },
    "routes": {
-    "groen": 762,
+    "groen": 775,
     "rood": 0,
-    "onbekend": 2728
+    "onbekend": 2780
    },
    "reden": null
   },
@@ -357,12 +357,12 @@
    "capabilities": {
     "groen": 0,
     "rood": 0,
-    "onbekend": 197
+    "onbekend": 204
    },
    "routes": {
     "groen": 0,
     "rood": 0,
-    "onbekend": 3490
+    "onbekend": 3555
    },
    "reden": "GEEN nieuwe autonomieladder (INT-01). De uitslag is de bestaande bewijspoort: kern/stuur/beleid.js laat een capability zonder bewijs uit de lijst vallen waaruit de AI kiest, en VERTROUWEN.json levert die vervalstaat."
   }
@@ -397,13 +397,13 @@
   "lijst": [
    {
     "laag": "bevoegd",
-    "totaalInBron": 732,
-    "binnenOndernemer": 418,
+    "totaalInBron": 753,
+    "binnenOndernemer": 430,
     "perReden": {
-     "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)": 235,
+     "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)": 228,
      "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord": 62,
+     "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets": 58,
      "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord": 44,
-     "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets": 39,
      "lichaamssleutel: rtfPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets": 17,
      "lichaamssleutel: gastAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets": 16,
      "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache": 3,
@@ -415,8 +415,8 @@
     "totaalInBron": 0,
     "binnenOndernemer": 0,
     "perReden": {},
-    "nietToeTeRekenen": 733,
-    "reden": "dit register telt zijn niet-beproefbare routes per reden (733 in totaal) maar noemt de routes niet, dus zij zijn niet aan een capability toe te wijzen. Dat is een tekort van de rapportage, geen afwezigheid van blinde vlekken."
+    "nietToeTeRekenen": 753,
+    "reden": "dit register telt zijn niet-beproefbare routes per reden (753 in totaal) maar noemt de routes niet, dus zij zijn niet aan een capability toe te wijzen. Dat is een tekort van de rapportage, geen afwezigheid van blinde vlekken."
    }
   ]
  },
@@ -463,8 +463,8 @@
     "bewijs": {
      "schakels": 7,
      "gesloten": 6,
-     "storingen": 8,
-     "gehouden": 8,
+     "storingen": 9,
+     "gehouden": 9,
      "stempel": "2026-09-13"
     }
    },
@@ -479,7 +479,7 @@
      "gesloten": 11,
      "storingen": 8,
      "gehouden": 8,
-     "stempel": "2026-09-03"
+     "stempel": "2026-09-19"
     }
    },
    {
@@ -547,7 +547,7 @@
      "gesloten": 8,
      "storingen": 11,
      "gehouden": 11,
-     "stempel": "2026-09-03"
+     "stempel": "2026-09-19"
     }
    },
    {
@@ -561,7 +561,7 @@
      "gesloten": 7,
      "storingen": 7,
      "gehouden": 7,
-     "stempel": "2026-09-03"
+     "stempel": "2026-09-19"
     }
    },
    {
@@ -651,7 +651,7 @@
     "/api/supplier",
     "/api/partner"
    ],
-   "routes": 865,
+   "routes": 867,
    "stand": "ONBEWEZEN",
    "lagen": {
     "bereikbaar": {
@@ -664,7 +664,7 @@
     "begrijpelijk": {
      "stand": "ONBEKEND",
      "gemeten": 0,
-     "totaal": 865,
+     "totaal": 867,
      "graad": "onbekend",
      "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
     },
@@ -678,79 +678,79 @@
     "voltooibaar": {
      "stand": "ONBEKEND",
      "gemeten": 0,
-     "totaal": 865,
+     "totaal": 867,
      "graad": "onbekend",
      "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
     },
     "waarheidsgetrouw": {
      "stand": "ONBEKEND",
      "gemeten": 0,
-     "totaal": 865,
+     "totaal": 867,
      "graad": "onbekend",
      "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 58,
+     "groen": 57,
      "rood": 0,
-     "onbekend": 807,
-     "totaal": 865,
+     "onbekend": 810,
+     "totaal": 867,
      "graad": "vermoed",
-     "reden": "807 van 865 routes niet gemeten"
+     "reden": "810 van 867 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 852,
+     "groen": 858,
      "rood": 0,
-     "onbekend": 13,
-     "totaal": 865,
+     "onbekend": 9,
+     "totaal": 867,
      "graad": "gemeten",
-     "reden": "13 van 865 routes niet gemeten"
+     "reden": "9 van 867 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
-     "groen": 242,
+     "groen": 244,
      "rood": 0,
      "onbekend": 623,
-     "totaal": 865,
+     "totaal": 867,
      "graad": "gemeten",
-     "reden": "623 van 865 routes niet gemeten"
+     "reden": "623 van 867 routes niet gemeten"
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
-     "groen": 228,
+     "groen": 235,
      "rood": 0,
-     "onbekend": 637,
-     "totaal": 865,
+     "onbekend": 632,
+     "totaal": 867,
      "graad": "vermoed",
-     "reden": "637 van 865 routes niet gemeten"
+     "reden": "632 van 867 routes niet gemeten"
     },
     "omkeerbaar": {
      "stand": "ONBEKEND",
      "groen": 10,
      "rood": 0,
-     "onbekend": 855,
-     "totaal": 865,
+     "onbekend": 857,
+     "totaal": 867,
      "graad": "gemeten",
-     "reden": "855 van 865 routes niet gemeten"
+     "reden": "857 van 867 routes niet gemeten"
     },
     "auditbaar": {
      "stand": "ONBEKEND",
      "groen": 228,
      "rood": 0,
-     "onbekend": 637,
-     "totaal": 865,
+     "onbekend": 639,
+     "totaal": 867,
      "graad": "gemeten",
-     "reden": "637 van 865 routes niet gemeten"
+     "reden": "639 van 867 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
      "groen": 0,
      "rood": 0,
-     "onbekend": 865,
-     "totaal": 865,
+     "onbekend": 867,
+     "totaal": 867,
      "graad": "gemeten",
-     "reden": "865 van 865 routes niet gemeten"
+     "reden": "867 van 867 routes niet gemeten"
     }
    }
   },
@@ -768,7 +768,7 @@
    "paden": [
     "/api/member"
    ],
-   "routes": 201,
+   "routes": 202,
    "stand": "ONBEWEZEN",
    "lagen": {
     "bereikbaar": {
@@ -781,7 +781,7 @@
     "begrijpelijk": {
      "stand": "ONBEKEND",
      "gemeten": 0,
-     "totaal": 201,
+     "totaal": 202,
      "graad": "onbekend",
      "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
     },
@@ -795,32 +795,32 @@
     "voltooibaar": {
      "stand": "ONBEKEND",
      "gemeten": 0,
-     "totaal": 201,
+     "totaal": 202,
      "graad": "onbekend",
      "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
     },
     "waarheidsgetrouw": {
      "stand": "ONBEKEND",
      "gemeten": 0,
-     "totaal": 201,
+     "totaal": 202,
      "graad": "onbekend",
      "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 18,
+     "groen": 15,
      "rood": 0,
-     "onbekend": 183,
-     "totaal": 201,
+     "onbekend": 187,
+     "totaal": 202,
      "graad": "vermoed",
-     "reden": "183 van 201 routes niet gemeten"
+     "reden": "187 van 202 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
-     "groen": 201,
+     "groen": 202,
      "rood": 0,
      "onbekend": 0,
-     "totaal": 201,
+     "totaal": 202,
      "graad": "gemeten",
      "reden": null
     },
@@ -828,46 +828,46 @@
      "stand": "ONBEKEND",
      "groen": 81,
      "rood": 0,
-     "onbekend": 120,
-     "totaal": 201,
+     "onbekend": 121,
+     "totaal": 202,
      "graad": "gemeten",
-     "reden": "120 van 201 routes niet gemeten"
+     "reden": "121 van 202 routes niet gemeten"
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
      "groen": 0,
      "rood": 0,
-     "onbekend": 201,
-     "totaal": 201,
+     "onbekend": 202,
+     "totaal": 202,
      "graad": "vermoed",
-     "reden": "201 van 201 routes niet gemeten"
+     "reden": "202 van 202 routes niet gemeten"
     },
     "omkeerbaar": {
      "stand": "ONBEKEND",
      "groen": 2,
      "rood": 0,
-     "onbekend": 199,
-     "totaal": 201,
+     "onbekend": 200,
+     "totaal": 202,
      "graad": "gemeten",
-     "reden": "199 van 201 routes niet gemeten"
+     "reden": "200 van 202 routes niet gemeten"
     },
     "auditbaar": {
      "stand": "ONBEKEND",
      "groen": 70,
      "rood": 0,
-     "onbekend": 131,
-     "totaal": 201,
+     "onbekend": 132,
+     "totaal": 202,
      "graad": "gemeten",
-     "reden": "131 van 201 routes niet gemeten"
+     "reden": "132 van 202 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
      "groen": 0,
      "rood": 0,
-     "onbekend": 201,
-     "totaal": 201,
+     "onbekend": 202,
+     "totaal": 202,
      "graad": "gemeten",
-     "reden": "201 van 201 routes niet gemeten"
+     "reden": "202 van 202 routes niet gemeten"
     }
    }
   },
@@ -885,7 +885,7 @@
    "paden": [
     "/api/rtf"
    ],
-   "routes": 136,
+   "routes": 110,
    "stand": "ONBEWEZEN",
    "lagen": {
     "bereikbaar": {
@@ -898,7 +898,7 @@
     "begrijpelijk": {
      "stand": "ONBEKEND",
      "gemeten": 0,
-     "totaal": 136,
+     "totaal": 110,
      "graad": "onbekend",
      "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
     },
@@ -912,79 +912,79 @@
     "voltooibaar": {
      "stand": "ONBEKEND",
      "gemeten": 0,
-     "totaal": 136,
+     "totaal": 110,
      "graad": "onbekend",
      "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
     },
     "waarheidsgetrouw": {
      "stand": "ONBEKEND",
      "gemeten": 0,
-     "totaal": 136,
+     "totaal": 110,
      "graad": "onbekend",
      "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 11,
+     "groen": 9,
      "rood": 0,
-     "onbekend": 125,
-     "totaal": 136,
+     "onbekend": 101,
+     "totaal": 110,
      "graad": "vermoed",
-     "reden": "125 van 136 routes niet gemeten"
+     "reden": "101 van 110 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 26,
+     "groen": 8,
      "rood": 0,
-     "onbekend": 110,
-     "totaal": 136,
+     "onbekend": 102,
+     "totaal": 110,
      "graad": "gemeten",
-     "reden": "110 van 136 routes niet gemeten"
+     "reden": "102 van 110 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
-     "groen": 39,
+     "groen": 37,
      "rood": 0,
-     "onbekend": 97,
-     "totaal": 136,
+     "onbekend": 73,
+     "totaal": 110,
      "graad": "gemeten",
-     "reden": "97 van 136 routes niet gemeten"
+     "reden": "73 van 110 routes niet gemeten"
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
      "groen": 0,
      "rood": 0,
-     "onbekend": 136,
-     "totaal": 136,
+     "onbekend": 110,
+     "totaal": 110,
      "graad": "vermoed",
-     "reden": "136 van 136 routes niet gemeten"
+     "reden": "110 van 110 routes niet gemeten"
     },
     "omkeerbaar": {
      "stand": "ONBEKEND",
      "groen": 0,
      "rood": 0,
-     "onbekend": 136,
-     "totaal": 136,
+     "onbekend": 110,
+     "totaal": 110,
      "graad": "gemeten",
-     "reden": "136 van 136 routes niet gemeten"
+     "reden": "110 van 110 routes niet gemeten"
     },
     "auditbaar": {
      "stand": "ONBEKEND",
      "groen": 0,
      "rood": 0,
-     "onbekend": 136,
-     "totaal": 136,
+     "onbekend": 110,
+     "totaal": 110,
      "graad": "gemeten",
-     "reden": "136 van 136 routes niet gemeten"
+     "reden": "110 van 110 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
      "groen": 0,
      "rood": 0,
-     "onbekend": 136,
-     "totaal": 136,
+     "onbekend": 110,
+     "totaal": 110,
      "graad": "gemeten",
-     "reden": "136 van 136 routes niet gemeten"
+     "reden": "110 van 110 routes niet gemeten"
     }
    }
   },
@@ -1069,12 +1069,12 @@
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 107,
+     "onbekend": 108,
      "totaal": 108,
      "graad": "vermoed",
-     "reden": "107 van 108 routes niet gemeten"
+     "reden": "108 van 108 routes niet gemeten"
     },
     "omkeerbaar": {
      "stand": "ONBEKEND",
@@ -1158,12 +1158,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 2,
+     "groen": 3,
      "rood": 0,
-     "onbekend": 95,
+     "onbekend": 94,
      "totaal": 97,
      "graad": "vermoed",
-     "reden": "95 van 97 routes niet gemeten"
+     "reden": "94 van 97 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -1627,12 +1627,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 13,
+     "groen": 12,
      "rood": 0,
-     "onbekend": 69,
+     "onbekend": 70,
      "totaal": 82,
      "graad": "vermoed",
-     "reden": "69 van 82 routes niet gemeten"
+     "reden": "70 van 82 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "ONBEKEND",
@@ -1864,12 +1864,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 57,
+     "onbekend": 58,
      "totaal": 58,
      "graad": "vermoed",
-     "reden": "57 van 58 routes niet gemeten"
+     "reden": "58 van 58 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -1981,12 +1981,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 3,
+     "groen": 4,
      "rood": 0,
-     "onbekend": 40,
+     "onbekend": 39,
      "totaal": 43,
      "graad": "vermoed",
-     "reden": "40 van 43 routes niet gemeten"
+     "reden": "39 van 43 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -2098,12 +2098,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 2,
+     "groen": 1,
      "rood": 0,
-     "onbekend": 41,
+     "onbekend": 42,
      "totaal": 43,
      "graad": "vermoed",
-     "reden": "41 van 43 routes niet gemeten"
+     "reden": "42 van 43 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -2690,12 +2690,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 5,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 23,
+     "onbekend": 28,
      "totaal": 28,
      "graad": "gemeten",
-     "reden": "23 van 28 routes niet gemeten"
+     "reden": "28 van 28 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -2741,6 +2741,122 @@
      "totaal": 28,
      "graad": "gemeten",
      "reden": "28 van 28 routes niet gemeten"
+    }
+   }
+  },
+  {
+   "id": "mediaos",
+   "naam": "RTG Media (één mediawereld)",
+   "categorie": "Eigen apps",
+   "kant": "mee",
+   "doelgroepen": [
+    "rtg",
+    "lifestyle",
+    "business"
+   ],
+   "paden": [
+    "/api/mediaos"
+   ],
+   "routes": 27,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 27,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 27,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 27,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 1,
+     "rood": 0,
+     "onbekend": 26,
+     "totaal": 27,
+     "graad": "vermoed",
+     "reden": "26 van 27 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "GROEN",
+     "groen": 27,
+     "rood": 0,
+     "onbekend": 0,
+     "totaal": 27,
+     "graad": "gemeten",
+     "reden": null
+    },
+    "herstelbaar": {
+     "stand": "ONBEKEND",
+     "groen": 14,
+     "rood": 0,
+     "onbekend": 13,
+     "totaal": 27,
+     "graad": "gemeten",
+     "reden": "13 van 27 routes niet gemeten"
+    },
+    "uitlegbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 27,
+     "totaal": 27,
+     "graad": "vermoed",
+     "reden": "27 van 27 routes niet gemeten"
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 27,
+     "totaal": 27,
+     "graad": "gemeten",
+     "reden": "27 van 27 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "ONBEKEND",
+     "groen": 9,
+     "rood": 0,
+     "onbekend": 18,
+     "totaal": 27,
+     "graad": "gemeten",
+     "reden": "18 van 27 routes niet gemeten"
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 27,
+     "totaal": 27,
+     "graad": "gemeten",
+     "reden": "27 van 27 routes niet gemeten"
     }
    }
   },
@@ -2858,6 +2974,124 @@
      "totaal": 27,
      "graad": "gemeten",
      "reden": "27 van 27 routes niet gemeten"
+    }
+   }
+  },
+  {
+   "id": "connect",
+   "naam": "Ontdekken (leren, doen, doorgeven)",
+   "categorie": "Eigen apps",
+   "kant": "mee",
+   "doelgroepen": [
+    "rtg",
+    "lifestyle",
+    "business",
+    "foundation"
+   ],
+   "paden": [
+    "/api/connect",
+    "/api/rtf/connect"
+   ],
+   "routes": 26,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 26,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 26,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 26,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 1,
+     "rood": 0,
+     "onbekend": 25,
+     "totaal": 26,
+     "graad": "vermoed",
+     "reden": "25 van 26 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "ONBEKEND",
+     "groen": 15,
+     "rood": 0,
+     "onbekend": 11,
+     "totaal": 26,
+     "graad": "gemeten",
+     "reden": "11 van 26 routes niet gemeten"
+    },
+    "herstelbaar": {
+     "stand": "ONBEKEND",
+     "groen": 15,
+     "rood": 0,
+     "onbekend": 11,
+     "totaal": 26,
+     "graad": "gemeten",
+     "reden": "11 van 26 routes niet gemeten"
+    },
+    "uitlegbaar": {
+     "stand": "ONBEKEND",
+     "groen": 9,
+     "rood": 0,
+     "onbekend": 17,
+     "totaal": 26,
+     "graad": "vermoed",
+     "reden": "17 van 26 routes niet gemeten"
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 26,
+     "totaal": 26,
+     "graad": "gemeten",
+     "reden": "26 van 26 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 26,
+     "totaal": 26,
+     "graad": "gemeten",
+     "reden": "26 van 26 routes niet gemeten"
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 26,
+     "totaal": 26,
+     "graad": "gemeten",
+     "reden": "26 van 26 routes niet gemeten"
     }
    }
   },
@@ -3237,15 +3471,127 @@
    }
   },
   {
+   "id": "staff",
+   "naam": "Personeels-app (PDA)",
+   "categorie": "Personeel & integraties",
+   "kant": "werk",
+   "doelgroepen": [
+    "personeel"
+   ],
+   "paden": [
+    "/api/staff"
+   ],
+   "routes": 23,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 23,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 23,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 23,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 23,
+     "totaal": 23,
+     "graad": "vermoed",
+     "reden": "23 van 23 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "ONBEKEND",
+     "groen": 22,
+     "rood": 0,
+     "onbekend": 1,
+     "totaal": 23,
+     "graad": "gemeten",
+     "reden": "1 van 23 routes niet gemeten"
+    },
+    "herstelbaar": {
+     "stand": "ONBEKEND",
+     "groen": 3,
+     "rood": 0,
+     "onbekend": 20,
+     "totaal": 23,
+     "graad": "gemeten",
+     "reden": "20 van 23 routes niet gemeten"
+    },
+    "uitlegbaar": {
+     "stand": "ONBEKEND",
+     "groen": 3,
+     "rood": 0,
+     "onbekend": 20,
+     "totaal": 23,
+     "graad": "vermoed",
+     "reden": "20 van 23 routes niet gemeten"
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 23,
+     "totaal": 23,
+     "graad": "gemeten",
+     "reden": "23 van 23 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "ONBEKEND",
+     "groen": 3,
+     "rood": 0,
+     "onbekend": 20,
+     "totaal": 23,
+     "graad": "gemeten",
+     "reden": "20 van 23 routes niet gemeten"
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 23,
+     "totaal": 23,
+     "graad": "gemeten",
+     "reden": "23 van 23 routes niet gemeten"
+    }
+   }
+  },
+  {
    "id": "dom-sport",
    "naam": "Sport",
    "categorie": "Cultuur en gezelschap",
-   "kant": "mee",
+   "kant": "werk",
    "doelgroepen": [
-    "rtg",
-    "lifestyle",
-    "business",
-    "foundation"
+    "leverancier",
+    "personeel"
    ],
    "paden": [
     "/api/sport"
@@ -3406,21 +3752,21 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 21,
+     "onbekend": 22,
      "totaal": 22,
      "graad": "vermoed",
-     "reden": "21 van 22 routes niet gemeten"
+     "reden": "22 van 22 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 22,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 22,
      "totaal": 22,
      "graad": "gemeten",
-     "reden": null
+     "reden": "22 van 22 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -3457,122 +3803,6 @@
      "totaal": 22,
      "graad": "gemeten",
      "reden": "15 van 22 routes niet gemeten"
-    },
-    "autonoomVeilig": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 22,
-     "totaal": 22,
-     "graad": "gemeten",
-     "reden": "22 van 22 routes niet gemeten"
-    }
-   }
-  },
-  {
-   "id": "mediaos",
-   "naam": "RTG Media (één mediawereld)",
-   "categorie": "Eigen apps",
-   "kant": "mee",
-   "doelgroepen": [
-    "rtg",
-    "lifestyle",
-    "business"
-   ],
-   "paden": [
-    "/api/mediaos"
-   ],
-   "routes": 22,
-   "stand": "ONBEWEZEN",
-   "lagen": {
-    "bereikbaar": {
-     "stand": "ONBEKEND",
-     "gemeten": 87,
-     "totaal": 102,
-     "graad": "gemeten",
-     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
-    },
-    "begrijpelijk": {
-     "stand": "ONBEKEND",
-     "gemeten": 0,
-     "totaal": 22,
-     "graad": "onbekend",
-     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
-    },
-    "bedienbaar": {
-     "stand": "ONBEKEND",
-     "gemeten": 3,
-     "totaal": 102,
-     "graad": "gemeten",
-     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
-    },
-    "voltooibaar": {
-     "stand": "ONBEKEND",
-     "gemeten": 0,
-     "totaal": 22,
-     "graad": "onbekend",
-     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
-    },
-    "waarheidsgetrouw": {
-     "stand": "ONBEKEND",
-     "gemeten": 0,
-     "totaal": 22,
-     "graad": "onbekend",
-     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
-    },
-    "persistent": {
-     "stand": "ONBEKEND",
-     "groen": 1,
-     "rood": 0,
-     "onbekend": 21,
-     "totaal": 22,
-     "graad": "vermoed",
-     "reden": "21 van 22 routes niet gemeten"
-    },
-    "bevoegd": {
-     "stand": "GROEN",
-     "groen": 22,
-     "rood": 0,
-     "onbekend": 0,
-     "totaal": 22,
-     "graad": "gemeten",
-     "reden": null
-    },
-    "herstelbaar": {
-     "stand": "ONBEKEND",
-     "groen": 11,
-     "rood": 0,
-     "onbekend": 11,
-     "totaal": 22,
-     "graad": "gemeten",
-     "reden": "11 van 22 routes niet gemeten"
-    },
-    "uitlegbaar": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 22,
-     "totaal": 22,
-     "graad": "vermoed",
-     "reden": "22 van 22 routes niet gemeten"
-    },
-    "omkeerbaar": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 22,
-     "totaal": 22,
-     "graad": "gemeten",
-     "reden": "22 van 22 routes niet gemeten"
-    },
-    "auditbaar": {
-     "stand": "ONBEKEND",
-     "groen": 9,
-     "rood": 0,
-     "onbekend": 13,
-     "totaal": 22,
-     "graad": "gemeten",
-     "reden": "13 van 22 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
@@ -3944,11 +4174,10 @@
    "id": "dom-lucht",
    "naam": "Luchtvaart en luchthaven",
    "categorie": "Diensten (leden)",
-   "kant": "mee",
+   "kant": "werk",
    "doelgroepen": [
-    "rtg",
-    "lifestyle",
-    "business"
+    "leverancier",
+    "personeel"
    ],
    "paden": [
     "/api/lucht"
@@ -4174,120 +4403,6 @@
    }
   },
   {
-   "id": "staff",
-   "naam": "Personeels-app (PDA)",
-   "categorie": "Personeel & integraties",
-   "kant": "werk",
-   "doelgroepen": [
-    "personeel"
-   ],
-   "paden": [
-    "/api/staff"
-   ],
-   "routes": 20,
-   "stand": "ONBEWEZEN",
-   "lagen": {
-    "bereikbaar": {
-     "stand": "ONBEKEND",
-     "gemeten": 87,
-     "totaal": 102,
-     "graad": "gemeten",
-     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
-    },
-    "begrijpelijk": {
-     "stand": "ONBEKEND",
-     "gemeten": 0,
-     "totaal": 20,
-     "graad": "onbekend",
-     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
-    },
-    "bedienbaar": {
-     "stand": "ONBEKEND",
-     "gemeten": 3,
-     "totaal": 102,
-     "graad": "gemeten",
-     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
-    },
-    "voltooibaar": {
-     "stand": "ONBEKEND",
-     "gemeten": 0,
-     "totaal": 20,
-     "graad": "onbekend",
-     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
-    },
-    "waarheidsgetrouw": {
-     "stand": "ONBEKEND",
-     "gemeten": 0,
-     "totaal": 20,
-     "graad": "onbekend",
-     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
-    },
-    "persistent": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 20,
-     "totaal": 20,
-     "graad": "vermoed",
-     "reden": "20 van 20 routes niet gemeten"
-    },
-    "bevoegd": {
-     "stand": "ONBEKEND",
-     "groen": 19,
-     "rood": 0,
-     "onbekend": 1,
-     "totaal": 20,
-     "graad": "gemeten",
-     "reden": "1 van 20 routes niet gemeten"
-    },
-    "herstelbaar": {
-     "stand": "ONBEKEND",
-     "groen": 3,
-     "rood": 0,
-     "onbekend": 17,
-     "totaal": 20,
-     "graad": "gemeten",
-     "reden": "17 van 20 routes niet gemeten"
-    },
-    "uitlegbaar": {
-     "stand": "ONBEKEND",
-     "groen": 3,
-     "rood": 0,
-     "onbekend": 17,
-     "totaal": 20,
-     "graad": "vermoed",
-     "reden": "17 van 20 routes niet gemeten"
-    },
-    "omkeerbaar": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 20,
-     "totaal": 20,
-     "graad": "gemeten",
-     "reden": "20 van 20 routes niet gemeten"
-    },
-    "auditbaar": {
-     "stand": "ONBEKEND",
-     "groen": 3,
-     "rood": 0,
-     "onbekend": 17,
-     "totaal": 20,
-     "graad": "gemeten",
-     "reden": "17 van 20 routes niet gemeten"
-    },
-    "autonoomVeilig": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 20,
-     "totaal": 20,
-     "graad": "gemeten",
-     "reden": "20 van 20 routes niet gemeten"
-    }
-   }
-  },
-  {
    "id": "theater",
    "naam": "RTG Theater (video)",
    "categorie": "Eigen apps",
@@ -4349,12 +4464,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 19,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 1,
+     "onbekend": 20,
      "totaal": 20,
      "graad": "gemeten",
-     "reden": "1 van 20 routes niet gemeten"
+     "reden": "20 van 20 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -4574,12 +4689,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 2,
+     "groen": 1,
      "rood": 0,
-     "onbekend": 17,
+     "onbekend": 18,
      "totaal": 19,
      "graad": "vermoed",
-     "reden": "17 van 19 routes niet gemeten"
+     "reden": "18 van 19 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -4810,12 +4925,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 2,
+     "groen": 1,
      "rood": 0,
-     "onbekend": 17,
+     "onbekend": 18,
      "totaal": 19,
      "graad": "vermoed",
-     "reden": "17 van 19 routes niet gemeten"
+     "reden": "18 van 19 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -4990,6 +5105,126 @@
    }
   },
   {
+   "id": "dom-labfonds",
+   "naam": "Het labfonds",
+   "categorie": "RTFoundation",
+   "kant": "mee",
+   "doelgroepen": [
+    "rtg",
+    "lifestyle",
+    "business",
+    "gast",
+    "foundation",
+    "intern"
+   ],
+   "paden": [
+    "/api/labfonds",
+    "/api/rtf/labfonds"
+   ],
+   "routes": 17,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 17,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 17,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 17,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 11,
+     "rood": 0,
+     "onbekend": 6,
+     "totaal": 17,
+     "graad": "vermoed",
+     "reden": "6 van 17 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "ONBEKEND",
+     "groen": 9,
+     "rood": 0,
+     "onbekend": 8,
+     "totaal": 17,
+     "graad": "gemeten",
+     "reden": "8 van 17 routes niet gemeten"
+    },
+    "herstelbaar": {
+     "stand": "ONBEKEND",
+     "groen": 15,
+     "rood": 0,
+     "onbekend": 2,
+     "totaal": 17,
+     "graad": "gemeten",
+     "reden": "2 van 17 routes niet gemeten"
+    },
+    "uitlegbaar": {
+     "stand": "ONBEKEND",
+     "groen": 3,
+     "rood": 0,
+     "onbekend": 14,
+     "totaal": 17,
+     "graad": "vermoed",
+     "reden": "14 van 17 routes niet gemeten"
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 17,
+     "totaal": 17,
+     "graad": "gemeten",
+     "reden": "17 van 17 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "ONBEKEND",
+     "groen": 3,
+     "rood": 0,
+     "onbekend": 14,
+     "totaal": 17,
+     "graad": "gemeten",
+     "reden": "14 van 17 routes niet gemeten"
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 17,
+     "totaal": 17,
+     "graad": "gemeten",
+     "reden": "17 van 17 routes niet gemeten"
+    }
+   }
+  },
+  {
    "id": "dom-livinglab-bewoner",
    "naam": "Living Lab: de bewonerskant",
    "categorie": "RTFoundation",
@@ -5116,8 +5351,6 @@
    "categorie": "Werk (zaken en personeel)",
    "kant": "werk",
    "doelgroepen": [
-    "intern",
-    "business",
     "leverancier",
     "personeel"
    ],
@@ -6107,21 +6340,21 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 13,
+     "onbekend": 14,
      "totaal": 14,
      "graad": "vermoed",
-     "reden": "13 van 14 routes niet gemeten"
+     "reden": "14 van 14 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 13,
+     "onbekend": 14,
      "totaal": 14,
      "graad": "gemeten",
-     "reden": "13 van 14 routes niet gemeten"
+     "reden": "14 van 14 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -6462,21 +6695,21 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 0,
+     "groen": 1,
      "rood": 0,
-     "onbekend": 13,
+     "onbekend": 12,
      "totaal": 13,
      "graad": "vermoed",
-     "reden": "13 van 13 routes niet gemeten"
+     "reden": "12 van 13 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "ONBEKEND",
-     "groen": 10,
+     "stand": "GROEN",
+     "groen": 13,
      "rood": 0,
-     "onbekend": 3,
+     "onbekend": 0,
      "totaal": 13,
      "graad": "gemeten",
-     "reden": "3 van 13 routes niet gemeten"
+     "reden": null
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -6489,12 +6722,12 @@
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
-     "groen": 3,
+     "groen": 4,
      "rood": 0,
-     "onbekend": 10,
+     "onbekend": 9,
      "totaal": 13,
      "graad": "vermoed",
-     "reden": "10 van 13 routes niet gemeten"
+     "reden": "9 van 13 routes niet gemeten"
     },
     "omkeerbaar": {
      "stand": "ONBEKEND",
@@ -6933,12 +7166,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 11,
+     "onbekend": 12,
      "totaal": 12,
      "graad": "vermoed",
-     "reden": "11 van 12 routes niet gemeten"
+     "reden": "12 van 12 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -7071,12 +7304,12 @@
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
-     "groen": 8,
+     "groen": 7,
      "rood": 0,
-     "onbekend": 4,
+     "onbekend": 5,
      "totaal": 12,
      "graad": "gemeten",
-     "reden": "4 van 12 routes niet gemeten"
+     "reden": "5 van 12 routes niet gemeten"
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
@@ -8113,12 +8346,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 0,
+     "groen": 2,
      "rood": 0,
-     "onbekend": 11,
+     "onbekend": 9,
      "totaal": 11,
      "graad": "vermoed",
-     "reden": "11 van 11 routes niet gemeten"
+     "reden": "9 van 11 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -8182,13 +8415,8 @@
    "categorie": "Winkel en media",
    "kant": "werk",
    "doelgroepen": [
-    "rtg",
-    "lifestyle",
-    "business",
-    "gast",
     "leverancier",
-    "personeel",
-    "foundation"
+    "personeel"
    ],
    "paden": [
     "/api/appstore/uitgever"
@@ -8297,6 +8525,123 @@
    }
   },
   {
+   "id": "dom-leerstof",
+   "naam": "Leerstof",
+   "categorie": "RTFoundation",
+   "kant": "mee",
+   "doelgroepen": [
+    "rtg",
+    "lifestyle",
+    "business",
+    "gast"
+   ],
+   "paden": [
+    "/api/leerstof"
+   ],
+   "routes": 10,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 10,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 10,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 10,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 10,
+     "totaal": 10,
+     "graad": "vermoed",
+     "reden": "10 van 10 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "GROEN",
+     "groen": 10,
+     "rood": 0,
+     "onbekend": 0,
+     "totaal": 10,
+     "graad": "gemeten",
+     "reden": null
+    },
+    "herstelbaar": {
+     "stand": "ONBEKEND",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 8,
+     "totaal": 10,
+     "graad": "gemeten",
+     "reden": "8 van 10 routes niet gemeten"
+    },
+    "uitlegbaar": {
+     "stand": "ONBEKEND",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 8,
+     "totaal": 10,
+     "graad": "vermoed",
+     "reden": "8 van 10 routes niet gemeten"
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 10,
+     "totaal": 10,
+     "graad": "gemeten",
+     "reden": "10 van 10 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "ONBEKEND",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 8,
+     "totaal": 10,
+     "graad": "gemeten",
+     "reden": "8 van 10 routes niet gemeten"
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 10,
+     "totaal": 10,
+     "graad": "gemeten",
+     "reden": "10 van 10 routes niet gemeten"
+    }
+   }
+  },
+  {
    "id": "dom-nav",
    "naam": "Navigatie",
    "categorie": "Diensten (leden)",
@@ -8357,13 +8702,13 @@
      "reden": "10 van 10 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "ONBEKEND",
-     "groen": 6,
+     "stand": "GROEN",
+     "groen": 10,
      "rood": 0,
-     "onbekend": 4,
+     "onbekend": 0,
      "totaal": 10,
      "graad": "gemeten",
-     "reden": "4 van 10 routes niet gemeten"
+     "reden": null
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -8473,12 +8818,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 2,
+     "groen": 3,
      "rood": 0,
-     "onbekend": 8,
+     "onbekend": 7,
      "totaal": 10,
      "graad": "vermoed",
-     "reden": "8 van 10 routes niet gemeten"
+     "reden": "7 van 10 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -8590,21 +8935,21 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 2,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 8,
+     "onbekend": 10,
      "totaal": 10,
      "graad": "vermoed",
-     "reden": "8 van 10 routes niet gemeten"
+     "reden": "10 van 10 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 10,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 10,
      "totaal": 10,
      "graad": "gemeten",
-     "reden": null
+     "reden": "10 van 10 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -9105,6 +9450,122 @@
      "totaal": 9,
      "graad": "gemeten",
      "reden": "8 van 9 routes niet gemeten"
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 9,
+     "totaal": 9,
+     "graad": "gemeten",
+     "reden": "9 van 9 routes niet gemeten"
+    }
+   }
+  },
+  {
+   "id": "dom-samen",
+   "naam": "Samen (stadsraad)",
+   "categorie": "RTFoundation",
+   "kant": "mee",
+   "doelgroepen": [
+    "rtg",
+    "lifestyle",
+    "business"
+   ],
+   "paden": [
+    "/api/samen"
+   ],
+   "routes": 9,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 9,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 9,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 9,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 9,
+     "totaal": 9,
+     "graad": "vermoed",
+     "reden": "9 van 9 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "GROEN",
+     "groen": 9,
+     "rood": 0,
+     "onbekend": 0,
+     "totaal": 9,
+     "graad": "gemeten",
+     "reden": null
+    },
+    "herstelbaar": {
+     "stand": "ONBEKEND",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 7,
+     "totaal": 9,
+     "graad": "gemeten",
+     "reden": "7 van 9 routes niet gemeten"
+    },
+    "uitlegbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 9,
+     "totaal": 9,
+     "graad": "vermoed",
+     "reden": "9 van 9 routes niet gemeten"
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 7,
+     "totaal": 9,
+     "graad": "gemeten",
+     "reden": "7 van 9 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "ONBEKEND",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 7,
+     "totaal": 9,
+     "graad": "gemeten",
+     "reden": "7 van 9 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
@@ -9825,11 +10286,10 @@
    "id": "dom-kmar",
    "naam": "Grensdiensten (KMar)",
    "categorie": "Identiteit en veiligheid",
-   "kant": "mee",
+   "kant": "werk",
    "doelgroepen": [
-    "rtg",
-    "lifestyle",
-    "business"
+    "leverancier",
+    "personeel"
    ],
    "paden": [
     "/api/kmar"
@@ -9938,6 +10398,123 @@
    }
   },
   {
+   "id": "dom-reisbureau",
+   "naam": "Reisbureau",
+   "categorie": "Diensten (leden)",
+   "kant": "mee",
+   "doelgroepen": [
+    "rtg",
+    "lifestyle",
+    "business",
+    "gast"
+   ],
+   "paden": [
+    "/api/reisbureau"
+   ],
+   "routes": 8,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 8,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 8,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 8,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 8,
+     "totaal": 8,
+     "graad": "vermoed",
+     "reden": "8 van 8 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "GROEN",
+     "groen": 8,
+     "rood": 0,
+     "onbekend": 0,
+     "totaal": 8,
+     "graad": "gemeten",
+     "reden": null
+    },
+    "herstelbaar": {
+     "stand": "ONBEKEND",
+     "groen": 3,
+     "rood": 0,
+     "onbekend": 5,
+     "totaal": 8,
+     "graad": "gemeten",
+     "reden": "5 van 8 routes niet gemeten"
+    },
+    "uitlegbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 8,
+     "totaal": 8,
+     "graad": "vermoed",
+     "reden": "8 van 8 routes niet gemeten"
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 8,
+     "totaal": 8,
+     "graad": "gemeten",
+     "reden": "8 van 8 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "ONBEKEND",
+     "groen": 3,
+     "rood": 0,
+     "onbekend": 5,
+     "totaal": 8,
+     "graad": "gemeten",
+     "reden": "5 van 8 routes niet gemeten"
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 8,
+     "totaal": 8,
+     "graad": "gemeten",
+     "reden": "8 van 8 routes niet gemeten"
+    }
+   }
+  },
+  {
    "id": "oog",
    "naam": "RTG Eye (werkvloer-camera)",
    "categorie": "Eigen apps",
@@ -9990,12 +10567,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 7,
+     "onbekend": 8,
      "totaal": 8,
      "graad": "vermoed",
-     "reden": "7 van 8 routes niet gemeten"
+     "reden": "8 van 8 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -10472,12 +11049,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 5,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 3,
+     "onbekend": 8,
      "totaal": 8,
      "graad": "gemeten",
-     "reden": "3 van 8 routes niet gemeten"
+     "reden": "8 van 8 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -10831,12 +11408,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 5,
+     "groen": 2,
      "rood": 0,
-     "onbekend": 2,
+     "onbekend": 5,
      "totaal": 7,
      "graad": "gemeten",
-     "reden": "2 van 7 routes niet gemeten"
+     "reden": "5 van 7 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -10947,12 +11524,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 0,
+     "groen": 6,
      "rood": 0,
-     "onbekend": 7,
+     "onbekend": 1,
      "totaal": 7,
      "graad": "gemeten",
-     "reden": "7 van 7 routes niet gemeten"
+     "reden": "1 van 7 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -10965,12 +11542,12 @@
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
-     "groen": 0,
+     "groen": 2,
      "rood": 0,
-     "onbekend": 7,
+     "onbekend": 5,
      "totaal": 7,
      "graad": "vermoed",
-     "reden": "7 van 7 routes niet gemeten"
+     "reden": "5 van 7 routes niet gemeten"
     },
     "omkeerbaar": {
      "stand": "ONBEKEND",
@@ -11238,9 +11815,9 @@
    }
   },
   {
-   "id": "dom-reisbureau",
-   "naam": "Reisbureau",
-   "categorie": "Diensten (leden)",
+   "id": "dom-onderwijs",
+   "naam": "Onderwijs (paspoort en ladder)",
+   "categorie": "RTFoundation",
    "kant": "mee",
    "doelgroepen": [
     "rtg",
@@ -11249,7 +11826,7 @@
     "gast"
    ],
    "paden": [
-    "/api/reisbureau"
+    "/api/onderwijs"
    ],
    "routes": 7,
    "stand": "ONBEWEZEN",
@@ -11299,22 +11876,22 @@
      "reden": "7 van 7 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "ONBEKEND",
-     "groen": 5,
+     "stand": "GROEN",
+     "groen": 7,
      "rood": 0,
-     "onbekend": 2,
+     "onbekend": 0,
      "totaal": 7,
      "graad": "gemeten",
-     "reden": "2 van 7 routes niet gemeten"
+     "reden": null
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
-     "groen": 3,
+     "groen": 4,
      "rood": 0,
-     "onbekend": 4,
+     "onbekend": 3,
      "totaal": 7,
      "graad": "gemeten",
-     "reden": "4 van 7 routes niet gemeten"
+     "reden": "3 van 7 routes niet gemeten"
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
@@ -11336,12 +11913,12 @@
     },
     "auditbaar": {
      "stand": "ONBEKEND",
-     "groen": 3,
+     "groen": 4,
      "rood": 0,
-     "onbekend": 4,
+     "onbekend": 3,
      "totaal": 7,
      "graad": "gemeten",
-     "reden": "4 van 7 routes niet gemeten"
+     "reden": "3 van 7 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
@@ -11464,6 +12041,122 @@
      "totaal": 7,
      "graad": "gemeten",
      "reden": "4 van 7 routes niet gemeten"
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 7,
+     "totaal": 7,
+     "graad": "gemeten",
+     "reden": "7 van 7 routes niet gemeten"
+    }
+   }
+  },
+  {
+   "id": "neiging",
+   "naam": "RTG Neiging (Mijn neigingen)",
+   "categorie": "Leden (RTG-app)",
+   "kant": "mee",
+   "doelgroepen": [
+    "rtg",
+    "lifestyle",
+    "business"
+   ],
+   "paden": [
+    "/api/neiging"
+   ],
+   "routes": 7,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 7,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 7,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 7,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 5,
+     "totaal": 7,
+     "graad": "vermoed",
+     "reden": "5 van 7 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "GROEN",
+     "groen": 7,
+     "rood": 0,
+     "onbekend": 0,
+     "totaal": 7,
+     "graad": "gemeten",
+     "reden": null
+    },
+    "herstelbaar": {
+     "stand": "ONBEKEND",
+     "groen": 4,
+     "rood": 0,
+     "onbekend": 3,
+     "totaal": 7,
+     "graad": "gemeten",
+     "reden": "3 van 7 routes niet gemeten"
+    },
+    "uitlegbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 7,
+     "totaal": 7,
+     "graad": "vermoed",
+     "reden": "7 van 7 routes niet gemeten"
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 7,
+     "totaal": 7,
+     "graad": "gemeten",
+     "reden": "7 van 7 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 7,
+     "totaal": 7,
+     "graad": "gemeten",
+     "reden": "7 van 7 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
@@ -12006,13 +12699,13 @@
      "reden": "6 van 6 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 6,
+     "stand": "ONBEKEND",
+     "groen": 3,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 3,
      "totaal": 6,
      "graad": "gemeten",
-     "reden": null
+     "reden": "3 van 6 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -12115,12 +12808,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 2,
+     "groen": 3,
      "rood": 0,
-     "onbekend": 4,
+     "onbekend": 3,
      "totaal": 6,
      "graad": "vermoed",
-     "reden": "4 van 6 routes niet gemeten"
+     "reden": "3 van 6 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -14476,12 +15169,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 4,
+     "onbekend": 5,
      "totaal": 5,
      "graad": "vermoed",
-     "reden": "4 van 5 routes niet gemeten"
+     "reden": "5 van 5 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "ONBEKEND",
@@ -15766,13 +16459,13 @@
      "reden": "4 van 4 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "ONBEKEND",
-     "groen": 0,
+     "stand": "GROEN",
+     "groen": 4,
      "rood": 0,
-     "onbekend": 4,
+     "onbekend": 0,
      "totaal": 4,
      "graad": "gemeten",
-     "reden": "4 van 4 routes niet gemeten"
+     "reden": null
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -16342,12 +17035,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 0,
+     "groen": 1,
      "rood": 0,
-     "onbekend": 4,
+     "onbekend": 3,
      "totaal": 4,
      "graad": "vermoed",
-     "reden": "4 van 4 routes niet gemeten"
+     "reden": "3 van 4 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "ONBEKEND",
@@ -17166,13 +17859,13 @@
      "reden": "4 van 4 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 4,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 4,
      "totaal": 4,
      "graad": "gemeten",
-     "reden": null
+     "reden": "4 van 4 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -17391,21 +18084,21 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 2,
+     "onbekend": 3,
      "totaal": 3,
      "graad": "vermoed",
-     "reden": "2 van 3 routes niet gemeten"
+     "reden": "3 van 3 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 3,
+     "stand": "ONBEKEND",
+     "groen": 2,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 3,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 3 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -17624,12 +18317,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 0,
+     "groen": 1,
      "rood": 0,
-     "onbekend": 3,
+     "onbekend": 2,
      "totaal": 3,
      "graad": "vermoed",
-     "reden": "3 van 3 routes niet gemeten"
+     "reden": "2 van 3 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -17642,12 +18335,12 @@
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 2,
      "rood": 0,
-     "onbekend": 2,
+     "onbekend": 1,
      "totaal": 3,
      "graad": "gemeten",
-     "reden": "2 van 3 routes niet gemeten"
+     "reden": "1 van 3 routes niet gemeten"
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
@@ -19489,12 +20182,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 2,
+     "onbekend": 3,
      "totaal": 3,
      "graad": "vermoed",
-     "reden": "2 van 3 routes niet gemeten"
+     "reden": "3 van 3 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "ONBEKEND",
@@ -20421,12 +21114,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 1,
+     "onbekend": 2,
      "totaal": 2,
      "graad": "vermoed",
-     "reden": "1 van 2 routes niet gemeten"
+     "reden": "2 van 2 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -21071,6 +21764,124 @@
    }
   },
   {
+   "id": "knelpunt",
+   "naam": "Knelpunten (welke weg ligt open)",
+   "categorie": "Eigen apps",
+   "kant": "mee",
+   "doelgroepen": [
+    "rtg",
+    "lifestyle",
+    "business",
+    "foundation"
+   ],
+   "paden": [
+    "/api/knelpunt",
+    "/api/rtf/knelpunt"
+   ],
+   "routes": 2,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 2,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 2,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 2,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 2,
+     "totaal": 2,
+     "graad": "vermoed",
+     "reden": "2 van 2 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "ONBEKEND",
+     "groen": 1,
+     "rood": 0,
+     "onbekend": 1,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": "1 van 2 routes niet gemeten"
+    },
+    "herstelbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 2,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": "2 van 2 routes niet gemeten"
+    },
+    "uitlegbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 2,
+     "totaal": 2,
+     "graad": "vermoed",
+     "reden": "2 van 2 routes niet gemeten"
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 2,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": "2 van 2 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 2,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": "2 van 2 routes niet gemeten"
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 2,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": "2 van 2 routes niet gemeten"
+    }
+   }
+  },
+  {
    "id": "life",
    "naam": "RTG Life (het ene scherm)",
    "categorie": "Eigen apps",
@@ -21537,6 +22348,123 @@
    }
   },
   {
+   "id": "ov-bijles",
+   "naam": "Bijles",
+   "categorie": "RTFoundation",
+   "kant": "mee",
+   "doelgroepen": [
+    "rtg",
+    "lifestyle",
+    "business",
+    "gast"
+   ],
+   "paden": [
+    "/api/bijles"
+   ],
+   "routes": 2,
+   "stand": "ONBEWEZEN",
+   "lagen": {
+    "bereikbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 87,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "begrijpelijk": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 2,
+     "graad": "onbekend",
+     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
+    },
+    "bedienbaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 3,
+     "totaal": 102,
+     "graad": "gemeten",
+     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
+    },
+    "voltooibaar": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 2,
+     "graad": "onbekend",
+     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
+    },
+    "waarheidsgetrouw": {
+     "stand": "ONBEKEND",
+     "gemeten": 0,
+     "totaal": 2,
+     "graad": "onbekend",
+     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
+    },
+    "persistent": {
+     "stand": "ONBEKEND",
+     "groen": 1,
+     "rood": 0,
+     "onbekend": 1,
+     "totaal": 2,
+     "graad": "vermoed",
+     "reden": "1 van 2 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "GROEN",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 0,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": null
+    },
+    "herstelbaar": {
+     "stand": "GROEN",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 0,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": null
+    },
+    "uitlegbaar": {
+     "stand": "GROEN",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 0,
+     "totaal": 2,
+     "graad": "vermoed",
+     "reden": null
+    },
+    "omkeerbaar": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 2,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": "2 van 2 routes niet gemeten"
+    },
+    "auditbaar": {
+     "stand": "GROEN",
+     "groen": 2,
+     "rood": 0,
+     "onbekend": 0,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": null
+    },
+    "autonoomVeilig": {
+     "stand": "ONBEKEND",
+     "groen": 0,
+     "rood": 0,
+     "onbekend": 2,
+     "totaal": 2,
+     "graad": "gemeten",
+     "reden": "2 van 2 routes niet gemeten"
+    }
+   }
+  },
+  {
    "id": "ov-mail-binnen",
    "naam": "RTG Mail: post van buiten aannemen",
    "categorie": "Werk (zaken en personeel)",
@@ -21831,13 +22759,13 @@
      "reden": "2 van 2 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "ONBEKEND",
-     "groen": 0,
+     "stand": "GROEN",
+     "groen": 2,
      "rood": 0,
-     "onbekend": 2,
+     "onbekend": 0,
      "totaal": 2,
      "graad": "gemeten",
-     "reden": "2 van 2 routes niet gemeten"
+     "reden": null
     },
     "herstelbaar": {
      "stand": "GROEN",
@@ -21948,13 +22876,13 @@
      "reden": "2 van 2 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 2,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 2,
      "totaal": 2,
      "graad": "gemeten",
-     "reden": null
+     "reden": "2 van 2 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "GROEN",
@@ -22064,13 +22992,13 @@
      "reden": "2 van 2 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 2,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 2,
      "totaal": 2,
      "graad": "gemeten",
-     "reden": null
+     "reden": "2 van 2 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -22870,13 +23798,13 @@
      "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
     },
     "persistent": {
-     "stand": "GROEN",
-     "groen": 1,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 1,
      "graad": "vermoed",
-     "reden": null
+     "reden": "1 van 1 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -22888,13 +23816,13 @@
      "reden": null
     },
     "herstelbaar": {
-     "stand": "GROEN",
-     "groen": 1,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 1,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 1 routes niet gemeten"
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
@@ -23066,122 +23994,6 @@
    ],
    "paden": [
     "/api/memo"
-   ],
-   "routes": 1,
-   "stand": "ONBEWEZEN",
-   "lagen": {
-    "bereikbaar": {
-     "stand": "ONBEKEND",
-     "gemeten": 87,
-     "totaal": 102,
-     "graad": "gemeten",
-     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 87 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
-    },
-    "begrijpelijk": {
-     "stand": "ONBEKEND",
-     "gemeten": 0,
-     "totaal": 1,
-     "graad": "onbekend",
-     "reden": "Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden."
-    },
-    "bedienbaar": {
-     "stand": "ONBEKEND",
-     "gemeten": 3,
-     "totaal": 102,
-     "graad": "gemeten",
-     "reden": "APPWERKT.json meet per ONDERDEEL en niet per capability; 3 van 102 onderdelen bewezen. Niet aan deze capability toe te rekenen zonder die brug."
-    },
-    "voltooibaar": {
-     "stand": "ONBEKEND",
-     "gemeten": 0,
-     "totaal": 1,
-     "graad": "onbekend",
-     "reden": "per ROUTE niet te beantwoorden: APPWERKT.json staat op GEEN_FIXTURE voor alle 102 rijen. Alleen een ketenproef (tafel, rit, toelating) bewijst dit, en dan voor de hele keten tegelijk."
-    },
-    "waarheidsgetrouw": {
-     "stand": "ONBEKEND",
-     "gemeten": 0,
-     "totaal": 1,
-     "graad": "onbekend",
-     "reden": "idem: dit is per definitie een vraag over twee actoren (handelt A, ziet B dat?) en dus ketenwerk. Een losse routetoets kan hem niet stellen."
-    },
-    "persistent": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 1,
-     "totaal": 1,
-     "graad": "vermoed",
-     "reden": "1 van 1 routes niet gemeten"
-    },
-    "bevoegd": {
-     "stand": "GROEN",
-     "groen": 1,
-     "rood": 0,
-     "onbekend": 0,
-     "totaal": 1,
-     "graad": "gemeten",
-     "reden": null
-    },
-    "herstelbaar": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 1,
-     "totaal": 1,
-     "graad": "gemeten",
-     "reden": "1 van 1 routes niet gemeten"
-    },
-    "uitlegbaar": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 1,
-     "totaal": 1,
-     "graad": "vermoed",
-     "reden": "1 van 1 routes niet gemeten"
-    },
-    "omkeerbaar": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 1,
-     "totaal": 1,
-     "graad": "gemeten",
-     "reden": "1 van 1 routes niet gemeten"
-    },
-    "auditbaar": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 1,
-     "totaal": 1,
-     "graad": "gemeten",
-     "reden": "1 van 1 routes niet gemeten"
-    },
-    "autonoomVeilig": {
-     "stand": "ONBEKEND",
-     "groen": 0,
-     "rood": 0,
-     "onbekend": 1,
-     "totaal": 1,
-     "graad": "gemeten",
-     "reden": "1 van 1 routes niet gemeten"
-    }
-   }
-  },
-  {
-   "id": "knelpunt",
-   "naam": "Knelpunten (welke weg ligt open)",
-   "categorie": "Eigen apps",
-   "kant": "mee",
-   "doelgroepen": [
-    "rtg",
-    "lifestyle",
-    "business"
-   ],
-   "paden": [
-    "/api/knelpunt"
    ],
    "routes": 1,
    "stand": "ONBEWEZEN",
@@ -23699,13 +24511,13 @@
      "reden": "1 van 1 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 1,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 1,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 1 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "GROEN",

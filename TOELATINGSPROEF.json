@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-09-03",
+  "stempel": "2026-09-19",
   "uitleg": "De toelatingsketen van een zaak in een gereguleerd genre: aanvraag, bewijs, aftekenen, besluit, zaak, herkeuring. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Derde keten naast tafelproef en ritproef -- zie MAATSTAF.md par. 7.",
   "grens": "Alleen de zaakaanmelding in een gereguleerd genre; de ballotage van een LID en een vrij genre lopen anders. Geen browser. Dat het geld werkelijk binnenkomt is niet gemeten: de termijn wordt administratief afgetekend.",
   "genre": "apotheek",
@@ -12,9 +12,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "id 5ae15ba7, in de wachtrij: true",
+      "ziet": "id 94fe3d72, in de wachtrij: true",
       "fout": null,
-      "ms": 19
+      "ms": 15
     },
     {
       "nr": 2,
@@ -38,7 +38,7 @@
       "status": 200,
       "ziet": "stand na indienen: ingediend",
       "fout": null,
-      "ms": 14
+      "ms": 9
     },
     {
       "nr": 4,
@@ -62,7 +62,7 @@
       "status": 200,
       "ziet": "status: geaccepteerd, besloten door: user-1",
       "fout": null,
-      "ms": 31
+      "ms": 21
     },
     {
       "nr": 6,
@@ -72,9 +72,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "antwoord: {\"ok\":true,\"maand\":1,\"zaak\":{\"code\":\"PROEFZAAK\",\"staffId\":184,\"pin\":\"8214\"}}",
+      "ziet": "antwoord: {\"ok\":true,\"maand\":1,\"zaak\":{\"code\":\"PROEFZAAK\",\"staffId\":184,\"pin\":\"9690\",\"toegang\":\"magnaat-test-pin\"}}",
       "fout": null,
-      "ms": 120
+      "ms": 105
     },
     {
       "nr": 7,
@@ -86,7 +86,7 @@
       "status": 200,
       "ziet": "op de herkeuringslijst: true (1 rijen)",
       "fout": null,
-      "ms": 26
+      "ms": 25
     }
   ],
   "storingen": [
@@ -134,14 +134,14 @@
     }
   ],
   "aanmelding": {
-    "id": "5ae15ba7",
+    "id": "94fe3d72",
     "genre": "apotheek"
   },
   "wereld": {
     "keurder": "ingelogd met het eigenaarsaccount (demostand); de gedeelde kantoorcode heeft geen naam en kan daarom niet aftekenen of beslissen -- zie storing 1 en 7",
     "naamvorm": "de naam die in het dossier belandt is een SLEUTEL (user-1), geen mensennaam"
   },
-  "verlopenId": "074f5724",
+  "verlopenId": "7e2ae855",
   "telling": {
     "schakels": 7,
     "gesloten": 7,

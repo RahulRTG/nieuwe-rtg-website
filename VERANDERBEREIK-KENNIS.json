@@ -3,17 +3,17 @@
  "uitleg": "Wat een toets KAN raken, afgeleid uit de code alleen: heeft hij een require-kant die in server/ uitkomt. Dezelfde commit geeft hier altijd hetzelfde -- er komt geen journaal aan te pas. Wat er bij EEN uitvoering werkelijk is waargenomen staat in VERANDERBEREIK-RONDE.json.",
  "hoe": "npm run veranderbereik:vastleggen",
  "stempel": {
-  "op": "2026-09-16T08:41:50.649Z",
-  "commit": "2b1a1621f",
+  "op": "2026-09-19T19:06:03.190Z",
+  "commit": "6083f652",
   "boomVuil": false,
-  "boomAnders": 5,
+  "boomAnders": 29,
   "instrument": "scripts/veranderbereik.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "gemeten": {
-  "toetsbestanden": 1926,
-  "statischBereik": 1155,
-  "blindeVlekStatisch": 771
+  "toetsbestanden": 1940,
+  "statischBereik": 1164,
+  "blindeVlekStatisch": 776
  },
  "nietGemeten": {
   "waargenomenBereik": "wat een toets werkelijk raakte is een WAARNEMING en hoort niet in dit bestand: die hangt af van welke ronde er liep. Zie VERANDERBEREIK-RONDE.json."
@@ -50,6 +50,9 @@
    "statisch": false
   },
   "aanwezigheid.test.js": {
+   "statisch": true
+  },
+  "access-language.e2e.js": {
    "statisch": true
   },
   "accountroutes.test.js": {
@@ -934,6 +937,9 @@
   "contract.test.js": {
    "statisch": true
   },
+  "contrastcontext.e2e.js": {
+   "statisch": true
+  },
   "controlekamer.test.js": {
    "statisch": false
   },
@@ -966,6 +972,9 @@
   },
   "dagplan.test.js": {
    "statisch": true
+  },
+  "daily-rooms.e2e.js": {
+   "statisch": false
   },
   "db-redis-mirror.test.js": {
    "statisch": true
@@ -1111,6 +1120,9 @@
   "economische-boeking-isolatie.test.js": {
    "statisch": true
   },
+  "edge-enige-balk.e2e.js": {
+   "statisch": false
+  },
   "edge-system.test.js": {
    "statisch": true
   },
@@ -1131,6 +1143,9 @@
   },
   "eigen-website.test.js": {
    "statisch": false
+  },
+  "eigenaar-aanmaken.test.js": {
+   "statisch": true
   },
   "eigenaar-wedloop.test.js": {
    "statisch": true
@@ -1195,6 +1210,9 @@
   "eventloop.test.js": {
    "statisch": true
   },
+  "evidence-engine.test.js": {
+   "statisch": true
+  },
   "excursie.test.js": {
    "statisch": false
   },
@@ -1205,6 +1223,12 @@
    "statisch": false
   },
   "experience-platform.test.js": {
+   "statisch": true
+  },
+  "experience-rtg.e2e.js": {
+   "statisch": false
+  },
+  "experience-rtg.test.js": {
    "statisch": true
   },
   "experience-surface.e2e.js": {
@@ -1275,6 +1299,9 @@
   },
   "festival.test.js": {
    "statisch": true
+  },
+  "first-steps.e2e.js": {
+   "statisch": false
   },
   "fiscaal-aansluiting.test.js": {
    "statisch": true
@@ -1957,6 +1984,9 @@
   "i18n-auto.test.js": {
    "statisch": true
   },
+  "i18n-dictionary.test.js": {
+   "statisch": true
+  },
   "ideeen.test.js": {
    "statisch": false
   },
@@ -2028,6 +2058,9 @@
   },
   "incidentcontrole.test.js": {
    "statisch": true
+  },
+  "ingebedde-chrome.e2e.js": {
+   "statisch": false
   },
   "inhoudswacht.test.js": {
    "statisch": true
@@ -2357,6 +2390,9 @@
    "statisch": true
   },
   "landpakket.test.js": {
+   "statisch": true
+  },
+  "language-foundations.test.js": {
    "statisch": true
   },
   "lcov.test.js": {
@@ -3345,6 +3381,9 @@
   },
   "oog.test.js": {
    "statisch": false
+  },
+  "openbare-bouwstand.test.js": {
+   "statisch": true
   },
   "oplaadgat.test.js": {
    "statisch": true
@@ -4991,6 +5030,9 @@
    "statisch": true
   },
   "tegoed.test.js": {
+   "statisch": true
+  },
+  "tekstbinding.test.js": {
    "statisch": true
   },
   "tenant.test.js": {

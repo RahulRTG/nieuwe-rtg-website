@@ -4,10 +4,10 @@
     "server/kern/gastzorg-profiel.js"
   ],
   "stempel": {
-    "op": "2026-09-15T03:25:28.876Z",
-    "commit": "b0d25685",
+    "op": "2026-09-19T19:07:15.005Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 39,
     "instrument": "scripts/doorwerking.js",
     "node": "v22.22.2"
   },

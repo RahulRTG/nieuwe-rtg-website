@@ -3,12 +3,12 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-20T08:27:07.059Z",
-  "commit": "8dddc7250",
+  "op": "2026-09-20T10:27:44.935Z",
+  "commit": "45f3f41f",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 3,
   "instrument": "scripts/afgeleid.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "gemeten": {
   "artefacten": 302,
@@ -21,7 +21,7 @@
   "metEigenaar": 190,
   "afgeleidEigenaarHard": 167,
   "afgeleidGrendelt": 18,
-  "metStempel": 95,
+  "metStempel": 98,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -813,11 +813,11 @@
    "naam": "DROOGLOOP.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/droogloop.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/droogloop.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/droogloop.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run droogloop",
    "grendelt": false,
@@ -2574,11 +2574,11 @@
    "naam": "ONDERZOEKSKETEN.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/onderzoeksketen.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/onderzoeksketen.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/onderzoeksketen.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run onderzoeksketen",
    "grendelt": false,
@@ -2883,11 +2883,11 @@
    "naam": "RESOLVERBEREIK.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/resolverbereik.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/resolverbereik.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/resolverbereik.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run resolverbereik",
    "grendelt": false,

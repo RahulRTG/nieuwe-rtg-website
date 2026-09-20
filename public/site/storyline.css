@@ -1,0 +1,64 @@
+/* The public storyline inherits the app's Heritage geometry and world materials. */
+body.rtg-experience,body.world-story{--story-gold:#e2c389;--story-line:rgba(216,187,135,.28);--story-bg:#100e0b;--story-ink:#f6efe3;--story-soft:#d8cfc2}
+.rtg-experience .scene{padding-block:clamp(5rem,8vw,9rem)}
+.rtg-experience .opening{padding-top:10rem;padding-bottom:12rem}
+.rtg-experience .opening-copy{max-width:1100px}
+.rtg-experience .opening-copy h1{font-size:clamp(3.6rem,7.6vw,7.5rem);max-width:15ch}
+.rtg-experience .experience-header{border-bottom:1px solid var(--story-line);padding-block:1.6rem;gap:1rem}
+.rtg-experience .experience-brand{color:var(--story-gold)}
+.rtg-experience .scene:not(.opening):not(.fragmentation)>.scene-heading{max-width:100%;display:grid;grid-template-columns:1.3fr 1fr;column-gap:4rem;align-items:end}
+.rtg-experience .scene-heading>.overline{grid-column:1/-1;margin-bottom:1.3rem}
+.rtg-experience .scene-heading h2{margin-bottom:0}
+.rtg-experience .scene-heading>p:last-child{max-width:40ch;align-self:end;margin:0}
+.rtg-experience .charcoal,.rtg-experience .origin,.rtg-experience .create-section{background:radial-gradient(ellipse at 80% 20%,var(--rtg-world-signature-soft),transparent 65%),var(--story-bg);color:var(--story-ink)}
+.rtg-experience .origin-copy{max-width:1020px}
+.rtg-experience .origin .story-principle{color:var(--story-gold)}
+.rtg-experience .scenario-choices{gap:.8rem;border:0;margin-bottom:1.2rem}
+.rtg-experience .scenario-choices label>span{border:1px solid #75634455;border-radius:var(--rtg-radius-editorial);background:#e8e0d4;padding:1.1rem 1.3rem;min-height:90px;font-size:1.3rem}
+.rtg-experience .scenario-choices input:checked+span{background:var(--story-bg);color:var(--story-ink);border-color:#a18353;box-shadow:inset 0 -2px var(--story-gold)}
+.rtg-experience .scenario-choices input:checked+span small{color:var(--story-gold)}
+.rtg-experience .personal-home{border:1px solid var(--story-line);border-radius:var(--rtg-radius-editorial);background:linear-gradient(120deg,#2a2119,#100e0b);box-shadow:0 24px 80px #20180d20;color:var(--story-ink)}
+.rtg-experience .personal-worlds a{border-color:var(--story-line);color:var(--story-ink)}
+.rtg-experience .personal-worlds small,.rtg-experience .personal-heading{color:var(--story-gold)}
+.rtg-experience .personal-foot{color:var(--story-soft)}
+.rtg-experience .world-stage{border:1px solid var(--story-line);border-radius:var(--rtg-radius-editorial);overflow:hidden}
+.rtg-experience .world-room{min-height:39rem}
+.rtg-experience .world-room>div{background:linear-gradient(90deg,#100e0be8,#100e0b2e);padding:clamp(2rem,5vw,5rem);min-width:0}
+.rtg-experience .world-room h3{font-size:clamp(2.7rem,5.5vw,5rem)}
+.rtg-experience .intent-form{max-width:100%;background:#201b15;border:1px solid var(--story-line);border-radius:var(--rtg-radius-editorial);padding:clamp(1rem,2.5vw,2rem)}
+.rtg-experience .intent-steps{gap:1rem}.rtg-experience .intent-steps li{border:1px solid var(--story-line);border-radius:var(--rtg-radius-editorial);padding:1.4rem;background:linear-gradient(120deg,#211b15,#14110e)}
+.rtg-experience .permission-demo{border:1px solid #aa967f77;border-radius:var(--rtg-radius-editorial);padding:clamp(1rem,3vw,2.5rem);background:#eae2d5}
+.rtg-experience .questions{background:#eee9df}.rtg-experience .faq-list{border-top:1px solid #99856e66}.rtg-experience .faq-list details{border-bottom:1px solid #99856e66}
+.rtg-experience .create-section{padding-bottom:12rem}
+.rtg-experience .create-section h2{font-size:clamp(4.5rem,10vw,9rem)}
+.rtg-experience .create-section .create-link{color:var(--story-gold)}
+body.world-story{background:var(--story-bg);--edge-side:0px}
+.world-story .rtg-adaptive-edge{position:fixed}
+.world-story .rtg-adaptive-bar>button{border:0;cursor:pointer;font:inherit}
+.world-story .rtg-adaptive-item svg{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+.world-story .rtg-adaptive-sheet-head>button{border:0;background:transparent;cursor:pointer}
+.world-story .world-hero{background:var(--story-bg)}
+.world-story .world-header{border-color:var(--story-line)}
+.world-story .brand-name{background:transparent;border:0;padding:0;font-weight:400;color:var(--story-gold)}
+.world-story .brand-slogan{color:var(--story-soft);font-family:Inter,sans-serif;letter-spacing:.18em;font-size:.56rem;margin-top:.4rem}
+.world-story .world-lead{font-family:Inter,sans-serif;font-size:clamp(.95rem,1.2vw,1.15rem);line-height:1.85;max-width:48ch}
+.world-story .world-hero-inner{padding-top:5rem}
+.world-story .world-label,.world-story .moment .story-kicker,.world-story .principle .story-kicker{color:var(--story-gold)}
+.world-story .button{border-radius:var(--rtg-radius-editorial);text-transform:none;letter-spacing:0;font:500 .86rem/1.5 Inter,sans-serif;min-height:48px}
+.world-story .button-primary{background:linear-gradient(120deg,#e5c99e,#b18b61);color:#20170f;border-color:#c3a373}
+.world-story .button-ghost{border-color:var(--story-line)}
+.world-story .outcomes,.world-story .capability-grid{gap:1rem;background:transparent;border:0}
+.world-story .outcome,.world-story .capability{border:1px solid #9b856b55;border-radius:var(--rtg-radius-editorial);background:#faf6ee}
+.world-story .outcome h3{margin-top:1.5rem}
+.world-story .moment,.world-story .principle{background:radial-gradient(ellipse at top right,var(--rtg-world-signature-soft),transparent 65%),var(--story-bg)}
+.world-story .world-footer{padding-bottom:10rem;background:var(--story-bg)}
+.world-story .story-section,.world-story .capability-section,.world-story .pass-fit{background:#eee9df}
+.world-story .story-intro h2,.world-story .capability-heading h2{font-size:clamp(2.5rem,4.5vw,4.8rem)}
+.story-edge-panel nav{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
+.story-edge-panel a,.story-edge-panel button{display:flex;align-items:center;min-height:48px;padding:.8rem;border:1px solid var(--story-line);background:transparent;color:var(--story-ink);font:400 .82rem/1.5 Inter,sans-serif;text-decoration:none;cursor:pointer;text-align:start}
+.story-progress{position:fixed;inset-block-start:0;inset-inline-start:0;height:2px;width:100%;transform:scaleX(var(--story-progress,0));transform-origin:left;background:var(--story-gold);z-index:10;pointer-events:none}
+[dir="rtl"] .story-progress{transform-origin:right}
+@media(min-width:1500px){.rtg-experience .scene{padding-inline:max(6vw,calc((100vw - 1440px)/2))}}
+@media(max-width:820px){.rtg-experience .scene:not(.opening):not(.fragmentation)>.scene-heading{display:block}.rtg-experience .scene-heading h2{margin-bottom:1.5rem}.rtg-experience .world-room{min-height:44rem}.rtg-experience .experience-brand{font-size:2.25rem}.rtg-experience .edition{font-size:.48rem;max-width:8rem}.world-story .world-footer nav{flex-wrap:wrap}}
+@media(max-width:560px){.rtg-experience .scene{padding-block:4.5rem}.rtg-experience .opening{padding-top:10rem;padding-bottom:12rem;min-height:780px;height:100svh}.rtg-experience .opening-copy h1{font-size:clamp(3.3rem,13.5vw,4.6rem)}.rtg-experience .scene-heading h2{font-size:clamp(2.7rem,10.5vw,3.8rem)}.rtg-experience .scenario-choices label>span{font-size:1.15rem;padding:1rem;min-height:100px}.rtg-experience .create-section{padding-bottom:11rem}.world-story .world-hero-inner{padding-top:3rem}.world-story .brand-name{font-size:0}.world-story .brand-name::after{color:var(--story-gold)}.rtg-experience .intent-steps li{padding:1.1rem}}
+@media(prefers-reduced-motion:reduce){.story-progress{transition:none}.rtg-experience .fragment{transform:none!important;transition:none!important}.rtg-experience .hero-photo{transition:none}}

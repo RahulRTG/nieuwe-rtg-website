@@ -13,17 +13,7 @@
   }
   function text(tag, value) { var el = d.createElement(tag); el.textContent = value; return el; }
   function renderProposal() {
-    var spec = C.SCENARIOS[s.scenario], proposal = C.proposal(s);
-    $('demoTitle').textContent = spec.title; $('demoWorld').textContent = C.WORLDS[spec.world].name;
-    $('demoIntro').textContent = spec.intro; $('demoOptionLabel').textContent = spec.label;
-    $('demoOption').replaceChildren();
-    spec.options.forEach(function (o) { var node = text('option', o[1]); node.value = o[0]; $('demoOption').appendChild(node); });
-    $('demoOption').value = s.option; $('demoSteps').replaceChildren();
-    proposal.rows.forEach(function (r) {
-      var li = d.createElement('li'); li.dataset.conflict = String(r.conflict);
-      li.append(text('small', r.world), text('strong', r.text)); $('demoSteps').appendChild(li);
-    });
-    $('demoResult').textContent = proposal.result;
+    var proposal = w.RTGStorylineStage.paint($('voorstel'), s);
     $('proposalSummary').replaceChildren(text('h3', proposal.title));
     var list = d.createElement('ul'); proposal.rows.forEach(function (r) { list.appendChild(text('li', r.text)); });
     $('proposalSummary').appendChild(list);

@@ -35,6 +35,11 @@
      nog eens opschrijven zou betekenen dat er twee waarheden zijn over hoe lang
      een stuk mag worden -- en die lopen vroeg of laat uit elkaar. */
   var track = null, instrumenten = {}, raster = null, vuil = false, grens = { maten: 8 };
+  var wijzigLuisteraars = [];
+  function gewijzigd() {
+    vuil = true;
+    wijzigLuisteraars.forEach(function (f) { try { f(track); } catch (e) {} });
+  }
 
   // de stukken van dit lid, zoals de lijst ze binnenkrijgt
   var STUKKEN = [];
@@ -130,7 +135,7 @@
       raster = window.RTGStudioRaster.maak({
         rack: $('#rack'), rol: $('#rol'),
         lengte: function () { return $('#tLengte').value; },
-        opWijziging: function () { vuil = true; }
+        opWijziging: gewijzigd
       });
     }
     raster.zet(track, instrumenten);
@@ -148,7 +153,7 @@
   ['#tNaam', '#tBpm', '#tMaten', '#tKlaar'].forEach(function (s) {
     document.addEventListener('change', function (e) {
       if (!track || !e.target.matches || !e.target.matches(s)) return;
-      leesVelden(); vuil = true; raster.zet(track, instrumenten);
+      leesVelden(); gewijzigd(); raster.zet(track, instrumenten);
     });
   });
 
@@ -156,7 +161,10 @@
     if (!track) return Promise.resolve();
     leesVelden();
     return api('bewaar', { id: track.id, naam: track.naam, bpm: track.bpm, maten: track.maten,
-      kanalen: track.kanalen, secties: track.secties || [], klaar: track.klaar }).then(function (d) {
+      kanalen: track.kanalen, secties: track.secties || [], klaar: track.klaar,
+      swing: track.swing, masterGain: track.masterGain, masterLaag: track.masterLaag,
+      masterMidden: track.masterMidden, masterHoog: track.masterHoog,
+      masterDrive: track.masterDrive }).then(function (d) {
       if (d.error) { fout(d.error); return; }
       track = d.track; vuil = false;
       raster.zet(track, instrumenten);
@@ -202,9 +210,18 @@
     instrumenten: function () { return instrumenten; },
     raster: function () { return raster; },
     leesVelden: function () { if (track) leesVelden(); },
-    gewijzigd: function () { vuil = true; },
+    gewijzigd: gewijzigd,
     bewaar: function () { return bewaarNu(true); },
     bijOpenen: function (f) { luisteraars.push(f); if (track) f(track); },
+    bijWijziging: function (f) { wijzigLuisteraars.push(f); },
+    herstel: function (moment) {
+      if (!track || !moment) return;
+      track = JSON.parse(JSON.stringify(moment));
+      $('#tNaam').value = track.naam; $('#tBpm').value = track.bpm;
+      $('#tMaten').value = track.maten; $('#tKlaar').checked = !!track.klaar;
+      gewijzigd(); raster.zet(track, instrumenten); meld();
+    },
+    isVuil: function () { return vuil; },
     velden: function () { $('#tBpm').value = track.bpm; $('#tMaten').value = track.maten; },
     naarLijst: function () { track = null; toonLijst(); }
   };

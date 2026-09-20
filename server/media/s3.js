@@ -6,9 +6,11 @@ const crypto = require('crypto');
 const https = require('https');
 const http = require('http');
 
-// De grootste toegestane bronfoto is 2 MiB. Geef de AEAD-envelop 64 bytes
-// ruimte, maar laat een kapotte objectserver nooit onbegrensd bufferen.
-const MAX_OBJECT_BYTES = 2 * 1024 * 1024 + 64;
+/* De mediastore draagt inmiddels ook korte Salon-video's. De productlaag legt
+   per soort een strengere grens op (foto 12 MiB, video 60 MiB); deze laag moet
+   alleen groot genoeg zijn voor het grootste geldige bronbestand plus de
+   AEAD-envelop. Een kapotte objectserver blijft dus nog altijd begrensd. */
+const MAX_OBJECT_BYTES = 64 * 1024 * 1024 + 64;
 
 /* ---------- AWS Signature V4 (dependency-vrij) ---------------------------------
    De ondertekening staat los zodat ze te testen is tegen de officiele

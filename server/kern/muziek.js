@@ -1,12 +1,6 @@
-/* RTG STUDIO: zelf muziek maken.
+/* RTG STUDIO: raster, notenrol, mengpaneel en Rahul-voorstellen.
 
-   De kern van een muziekprogramma als FL Studio, teruggebracht tot wat een mens
-   in een middag leert: een RASTER met kanalen en stappen, een NOTENROL voor wat
-   een toonhoogte heeft, een MENGPANEEL, en een AI die iets neerzet waar je
-   verder mee kunt. Wat er niet in zit zijn de duizend knoppen waar niemand ooit
-   aankomt.
-
-   DRIE REGELS DIE HIER NIET ONDERHANDELBAAR ZIJN.
+   DRIE REGELS ZIJN NIET ONDERHANDELBAAR.
 
    1. ALLES WORDT OPGEWEKT, NIETS WORDT GELEEND. Elke klank komt uit de app zelf
       (kern/muziek-instrumenten.js legt uit waarom). Daardoor zit er geen licentie
@@ -26,6 +20,7 @@
    lijst, of een aanbeveling om "vandaag nog iets te maken". Een instrument
    hoort te wachten tot je het pakt. */
 const I = require('./muziek-instrumenten');
+const mix = require('./muziek-mix');
 
 module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/muziek', bezit: { muziek: 'lijst' } });
@@ -52,11 +47,11 @@ module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
   function schoonKanaal(k, stappen) {
     if (!I.bestaat(k && k.instrument)) return null;
     const inst = k.instrument;
-    const uit = { id: (k && k.id) || rid(), instrument: inst,
+    const uit = mix.kanaalMix(k, { id: (k && k.id) || rid(), instrument: inst,
       naam: schoon((k && k.naam) || I.INSTRUMENTEN[inst].naam, 24),
       volume: Math.max(0, Math.min(1, Number(k && k.volume != null ? k.volume : 0.8))) || 0,
       pan: Math.max(-1, Math.min(1, Number((k && k.pan) || 0))) || 0,
-      stil: !!(k && k.stil) };
+      stil: !!(k && k.stil) });
     if (!I.speeltNoten(inst)) {
       const rij = Array.isArray(k && k.stappen) ? k.stappen : [];
       uit.stappen = Array.from(new Set(rij.map(s => getal(s, 0, stappen - 1, -1)).filter(s => s >= 0)))
@@ -106,12 +101,12 @@ module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
       // Het is een keuze van de maker, geen oordeel van ons.
       klaar: v.klaar != null ? !!v.klaar : !!basis.klaar,
       bewerkt: nu()
-    });
+    }, mix.trackMix(v, basis));
   }
 
-  const publiek = (t) => ({ id: t.id, naam: t.naam, bpm: t.bpm, maten: t.maten,
+  const publiek = (t) => Object.assign({ id: t.id, naam: t.naam, bpm: t.bpm, maten: t.maten,
     stappen: I.stappenVoor(t.maten), kanalen: t.kanalen, secties: t.secties || [],
-    klaar: !!t.klaar, at: t.at, bewerkt: t.bewerkt });
+    klaar: !!t.klaar, at: t.at, bewerkt: t.bewerkt }, mix.publiekeMix(t));
   // Voor een lijst hoeven de noten niet mee; die zijn het grootste stuk.
   const kort = (t, key) => ({ id: t.id, naam: t.naam, bpm: t.bpm, maten: t.maten,
     kanalen: (t.kanalen || []).length, klaar: !!t.klaar, at: t.at, bewerkt: t.bewerkt,

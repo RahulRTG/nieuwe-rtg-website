@@ -70,6 +70,21 @@ test('camera.html: het beeld opent, en zonder camera zegt het scherm WAAROM',
     }, null, { timeout: 15000 });
     assert.equal(await page.evaluate(() => document.querySelector('#geenCam').classList.contains('aan')),
       false, 'met een werkende camera hoort de "geen camera"-melding weg te blijven');
+    await page.waitForFunction(() => !document.querySelector('#sluiter').disabled,
+      null, { timeout: 10000 });
+    assert.equal(await page.evaluate(() => document.querySelector('#sluiter').disabled), false,
+      'de sluiter wordt pas vrijgegeven zodra werkelijk camerabeeld klaarstaat');
+
+    /* Een stroom alleen is nog geen camera-app. De sluiter moet uit het actuele
+       videobeeld een echte JPEG maken en hem als laatste opname tonen. */
+    await page.click('#sluiter');
+    await page.waitForFunction(() => {
+      const knop = document.querySelector('#duimpje');
+      const foto = document.querySelector('#duimBeeld');
+      return !!(knop && !knop.hidden && foto && /^blob:/.test(foto.src));
+    }, null, { timeout: 10000 });
+    assert.match(await page.evaluate(() => document.querySelector('#duimBeeld').src), /^blob:/,
+      'de sluiter maakt een lokale foto in plaats van alleen een animatie');
 
     /* ---- 3) de looks werken, en die hebben geen camera nodig ----
 
@@ -132,6 +147,8 @@ test('camera.html: het beeld opent, en zonder camera zegt het scherm WAAROM',
     await page.waitForFunction(() => document.querySelector('#geenCam').classList.contains('aan'),
       null, { timeout: 15000 });
     const tekst = await page.evaluate(() => document.querySelector('#geenCamTekst').textContent);
+    assert.equal(await page.locator('#probeerCamera').isVisible(), true,
+      'na een weigering of ontbrekend toestel kan de gebruiker de camera opnieuw openen');
     assert.ok(!tekst.startsWith(STANDAARDTEKST),
       'het scherm laat de nietszeggende openingstekst staan in plaats van de OORZAAK te noemen: ' + tekst);
     /* De oorzaak moet ERIN staan, en niet de algemene "dit huis kent die fout

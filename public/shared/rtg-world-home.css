@@ -1,4 +1,4 @@
-/* The three approved editorial homes. The shared Edge retains all chrome. */
+/* The four approved editorial homes. The shared Edge retains all chrome. */
 body.rtg-stijl[data-world-home]{--wh-ink:#f6efe3;--wh-soft:#d8cfc2;--wh-line:rgba(216,187,135,.32);--wh-gold:#e2c389;--wh-bg:#100e0b;background:var(--wh-bg)!important;color:var(--wh-ink)!important;height:auto!important;min-height:100dvh;overflow-x:clip!important;overflow-y:visible!important}
 body[data-world-home]::before,body[data-world-home]::after{pointer-events:none}
 body[data-world-home] #inhoud,body[data-world-home] #hoofd{width:100%;max-width:76rem!important;min-width:0;margin:0 auto!important;padding:0 clamp(1rem,3vw,2.5rem) calc(9rem + env(safe-area-inset-bottom,0px))!important;background:transparent!important;border:0!important;box-shadow:none!important}
@@ -73,3 +73,16 @@ body[data-world-home] [hidden]{display:none!important}
 @media(min-width:900px){body[data-world-home] .wh-travel-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:2rem;align-items:start}body[data-world-home] .wh-travel-help{margin:0}body[data-world-home] .wh-foundation-hero{min-height:36rem}body[data-world-home] .wh-pair{grid-template-columns:repeat(2,minmax(0,1fr))}body[data-world-home] .wh-work-hero{min-height:34rem}}
 @media(max-width:480px){body[data-world-home] .wh-home h1,body[data-world-home] .wh-foundation-hero h1{font-size:clamp(2.6rem,11.5vw,3.7rem)}body[data-world-home] .wh-travel-hero{min-height:35rem}body[data-world-home] .wh-work-hero{min-height:25rem}body[data-world-home] .wh-foundation-hero{min-height:28rem}body[data-world-home] .wh-pair{gap:.7rem}body[data-world-home] .wh-card{min-height:21rem}body[data-world-home] .wh-card>div{padding:.8rem}body[data-world-home] .wh-card h3{font-size:1.5rem}body[data-world-home] .wh-card p{font-size:.82rem}body[data-world-home] .wh-photo-copy{padding:1.25rem 1.25rem 2rem}}
 @media(prefers-reduced-motion:reduce){body[data-world-home] .wh-home *{scroll-behavior:auto;animation:none;transition:none}}
+
+/* Living keeps the real social projection and uses the same editorial role. */
+body.rtg-social-experience[data-world-home="living"] :is(#feed .kaart,.living-welcome,.living-load-error,.living-nearby){border-radius:var(--rtg-radius-editorial)}
+body[data-world-home="living"] .living-nearby>img{border-radius:var(--rtg-radius-editorial)}
+body.rtg-social-experience[data-world-home="living"][data-rtg-skin="heritage"] .rtg-edge-top{background:transparent!important;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:0;box-shadow:none!important}
+body[data-world-home="living"] .rtg-edge-top::after{display:none}
+@media(max-width:767px){body[data-world-home="living"] .rtg-edge-mark{font-size:36px;font-weight:400;gap:8px;align-items:center}}
+body[data-world-home="living"] .rtg-edge-mark{color:var(--wh-gold)!important}
+body[data-world-home="living"] .rtg-edge-mark::after{font:400 23px/1 Inter,sans-serif;letter-spacing:-.025em;text-transform:none}
+body[data-world-home="living"] .rtg-edge-profile{border-color:var(--wh-gold)!important;font-size:0!important;color:var(--wh-gold)!important}
+body[data-world-home="living"] .rtg-edge-profile::after{content:"";display:block;width:20px;height:26px;background:radial-gradient(circle at 50% 6px,currentColor 4.5px,transparent 5px),radial-gradient(ellipse 10px 8px at 50% 23px,currentColor 98%,transparent 100%)}
+body[data-world-home="living"] .rtg-adaptive-bar{border-color:var(--wh-gold)}
+@media(max-width:359px){body[data-world-home="living"] .rtg-edge-mark{font-size:30px}body[data-world-home="living"] .rtg-edge-mark::after{font-size:20px}}

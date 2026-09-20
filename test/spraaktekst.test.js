@@ -89,6 +89,28 @@ test('een JSON-antwoord van een server die geen platte tekst geeft, wordt gewoon
   assert.equal(r.tekst, 'hallo daar');
 });
 
+test('een bewaarde video krijgt tijdregels van hetzelfde lokale model', async () => {
+  const nep = async () => ({ ok: true, status: 200, text: async () => JSON.stringify({
+    text: 'Welkom in De Salon.', segments: [{ start: 0.4, end: 2.8, text: 'Welkom in De Salon.' }]
+  }) });
+  const r = await laag.transcribeerOpname(Buffer.from('videobytes'),
+    { env: LOKAAL, soort: 'video/webm', duurS: 8, fetchImpl: nep });
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.equal(r.precies, true);
+  assert.deepEqual(r.ondertitels, [{ van: 0.4, tot: 2.8, tekst: 'Welkom in De Salon.' }]);
+});
+
+test('een lokaal model zonder tijdcodes levert bewerkbare tijden bij benadering', async () => {
+  const nep = async () => ({ ok: true, status: 200,
+    text: async () => JSON.stringify({ text: 'De eerste zin. De tweede zin.' }) });
+  const r = await laag.transcribeerOpname(Buffer.from('videobytes'),
+    { env: LOKAAL, soort: 'video/mp4', duurS: 10, fetchImpl: nep });
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.equal(r.precies, false);
+  assert.ok(r.ondertitels.length >= 1);
+  assert.equal(r.ondertitels.at(-1).tot, 10);
+});
+
 test('een stukke modelserver levert een fout en geen lege regel', async () => {
   const stuk = async () => { throw new Error('connection refused'); };
   const r = await laag.transcribeer(Buffer.from('x'), { env: LOKAAL, fetchImpl: stuk });

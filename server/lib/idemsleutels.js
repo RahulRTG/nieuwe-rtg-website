@@ -124,6 +124,7 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-vracht').SLEUTELS,
   require('./idemsleutels-rtgid').SLEUTELS,
   require('./idemsleutels-salon').SLEUTELS,
+  require('./idemsleutels-media').SLEUTELS,
   require('./idemsleutels-connect').SLEUTELS,
   /* De restbak: de laatste 27 uit de bron verklaard (89a36fcac). Deze regel
      verdween in de samenvoeging van twaalf PR's (2 september 2026) en dertig

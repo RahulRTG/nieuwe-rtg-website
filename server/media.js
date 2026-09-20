@@ -23,41 +23,20 @@
    - Snaps/verhalen (privé, kijk-een-keer): de kale bestandsnaam. Die komt nooit als
      publieke URL naar buiten; bij het openen leest de server het bestand en geeft
      het eenmalig als data-URL terug, waarna het weg mag. */
-const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const https = require('https');
-const http = require('http');
 const kluis = require('./kluis');
 
-const MIME = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+const mediaBestand = require('./media/bestand');
+const MIME = mediaBestand.MIME;
 const EXT_VAN_MIME = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 const URL_PREFIX = '/media/';
+const { maakDiskBackend } = require('./media/disk');
 
 /* De S3-laag (SigV4-ondertekening, configuratie en backend) staat als
    deelmodule apart; sigV4 en afgeleideSleutel worden hieronder ongewijzigd
    mee geexporteerd. */
-const { MAX_OBJECT_BYTES, afgeleideSleutel, sigV4, s3ConfigVanEnv, maakS3Backend } = require('./media/s3');
-
-function maakDiskBackend(dir) {
-  function ensure() { try { fs.mkdirSync(dir, { recursive: true, mode: 0o700 }); fs.chmodSync(dir, 0o700); } catch (e) { try { fs.mkdirSync(dir, { recursive: true }); } catch (x) {} } }
-  return {
-    naam: 'disk',
-    async put(naam, enc) {
-      if (enc.length > MAX_OBJECT_BYTES) throw new Error('Mediaobject overschrijdt de maximale mediagrootte.');
-      ensure(); fs.writeFileSync(path.join(dir, naam), enc, { mode: 0o600 });
-    },
-    async get(naam) {
-      const p = path.join(dir, naam);
-      if (fs.statSync(p).size > MAX_OBJECT_BYTES) throw new Error('Mediaobject overschrijdt de maximale mediagrootte.');
-      const buf = fs.readFileSync(p);
-      if (buf.length > MAX_OBJECT_BYTES) throw new Error('Mediaobject overschrijdt de maximale mediagrootte.');
-      return buf;
-    },
-    async del(naam) { try { fs.unlinkSync(path.join(dir, naam)); } catch (e) {} },
-    async has(naam) { return fs.existsSync(path.join(dir, naam)); }
-  };
-}
+const { afgeleideSleutel, sigV4, s3ConfigVanEnv, maakS3Backend } = require('./media/s3');
 
 function maakMedia({ dir, env }) {
   env = env || process.env;
@@ -82,22 +61,48 @@ function maakMedia({ dir, env }) {
     return enc;
   }
 
+  const soortVanBuffer = mediaBestand.soortVanBuffer;
+
+  async function bewaarBuffer(buf, opgegevenMime, maxBytes, voorvoegsel) {
+    const soort = soortVanBuffer(buf, opgegevenMime);
+    if (!soort || (maxBytes && buf.length > maxBytes)) return null;
+    const naam = (voorvoegsel || '') + crypto.randomBytes(16).toString('hex') + '.' + soort.ext;
+    await put(naam, kluis.versleutelBestand(buf, naam));
+    return { naam, mime: soort.mime, kind: soort.kind, bytes: buf.length };
+  }
+
   // Een data-URL opslaan -> bestandsnaam (of null als het geen geldige foto is/te groot).
   async function bewaar(dataUrl, maxBytes) {
     const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ''));
     if (!m) return null;
     let buf;
     try { buf = Buffer.from(m[2], 'base64'); } catch (e) { return null; }
-    if (!buf.length) return null;
-    if (maxBytes && buf.length > maxBytes) return null;
+    if (!buf.length || (maxBytes && buf.length > maxBytes)) return null;
+    /* Bestaande domeinen sturen al jaren een gevalideerde image-data-URL. Hun
+       contract blijft MIME + base64; alleen de nieuwe rauwe bestandsingangen
+       gebruiken soortVanBuffer() om de bytes zelf te herkennen. Anders zou een
+       strengere uploadpoort oude huur-, schade- en profielfoto's stil breken. */
     const naam = crypto.randomBytes(16).toString('hex') + '.' + EXT_VAN_MIME[m[1]];
-    // Ongeldige invoer geeft null; een echte opslagstoring is iets anders en
-    // moet de HTTP-foutketen bereiken. Anders kan een route 200 antwoorden
-    // terwijl de gevraagde foto nooit duurzaam is opgeslagen.
     await put(naam, kluis.versleutelBestand(buf, naam));
     return naam;
   }
   async function bewaarPubliek(dataUrl, maxBytes) { const n = await bewaar(dataUrl, maxBytes); return n ? url(n) : null; }
+  async function bewaarBestandPubliek(buf, opgegevenMime, grenzen) {
+    const soort = soortVanBuffer(buf, opgegevenMime);
+    if (!soort) return null;
+    const limiet = soort.kind === 'video' ? grenzen && grenzen.video : grenzen && grenzen.image;
+    const opgeslagen = await bewaarBuffer(buf, soort.mime, limiet);
+    return opgeslagen ? { src: url(opgeslagen.naam), mime: opgeslagen.mime,
+      type: opgeslagen.kind, bytes: opgeslagen.bytes } : null;
+  }
+  /* Een privébestand krijgt bewust een naam die de publieke /media-route niet
+     accepteert. Alleen een domeinroute met een eigen toegangspoort kan de kale
+     verwijzing lezen; een gekopieerde opslagnaam wordt dus geen openbare URL. */
+  async function bewaarBestandPrive(buf, opgegevenMime, maxBytes) {
+    const opgeslagen = await bewaarBuffer(buf, opgegevenMime, maxBytes, 'prive-');
+    return opgeslagen ? { ref: opgeslagen.naam, mime: opgeslagen.mime,
+      type: opgeslagen.kind, bytes: opgeslagen.bytes } : null;
+  }
 
   async function leesBuf(ref) {
     try { const n = naamVan(ref); return kluis.ontsleutelBestand(await haal(n), n); }
@@ -122,19 +127,7 @@ function maakMedia({ dir, env }) {
   }
   async function bestaat(ref) { return backend.has(naamVan(ref)); }
 
-  // De publieke /media-route: streamt een Salon-foto (na ontsleutelen). De naam is
-  // 32 hex-tekens en dus onraadbaar; geen directory-traversal (basename + whitelist).
-  async function serveer(req, res) {
-    const naam = path.basename(String(req.params.naam || ''));
-    if (!/^[0-9a-f]{32}\.(jpg|jpeg|png|webp)$/.test(naam)) return res.status(400).end();
-    const buf = await leesBuf(naam);
-    if (!buf) return res.status(404).end();
-    const ext = path.extname(naam).slice(1).toLowerCase();
-    res.set('Content-Type', MIME[ext] || 'application/octet-stream');
-    res.set('Cache-Control', 'public, max-age=31536000, immutable'); // inhoud verandert nooit voor een naam; CDN mag cachen
-    res.set('X-Content-Type-Options', 'nosniff');
-    res.end(buf);
-  }
+  const serveer = mediaBestand.maakServeer(leesBuf);
 
   /* Eenmalige migratie: foto's die nu nog als base64 IN db.data staan, verplaatsen
      naar de mediastore en vervangen door een verwijzing. Idempotent. */
@@ -166,7 +159,9 @@ function maakMedia({ dir, env }) {
     return n;
   }
 
-  return { MEDIA_DIR, backendNaam: backend.naam, isRef, url, naamVan, pad, bewaar, bewaarPubliek, leesBuf, leesDataUrl, verwijder, bestaat, serveer, migreerDb };
+  return { MEDIA_DIR, backendNaam: backend.naam, isRef, url, naamVan, pad, bewaar, bewaarPubliek,
+    bewaarBestandPubliek, bewaarBestandPrive, soortVanBuffer, leesBuf, leesDataUrl,
+    verwijder, bestaat, serveer, migreerDb };
 }
 
 module.exports = { maakMedia, sigV4, afgeleideSleutel };

@@ -1,0 +1,78 @@
+/* RTG Music Studio Pro: dezelfde filmische Heritage-taal als TravelOS,
+   WorkOS en FoundationOS, met de dichtheid van een echte studio. */
+body.rtg-music-studio{
+  --studio-bg:#0b0807;--studio-card:rgba(29,20,16,.86);--studio-card2:rgba(255,247,231,.045);
+  --studio-line:rgba(231,202,143,.22);--studio-gold:#d8b66f;--studio-ivory:#fff7ea;
+  --studio-wine:#7e203c;--studio-soft:#b9aa9d;
+  min-height:100vh;background:
+    radial-gradient(circle at 84% -8%,rgba(164,94,43,.22),transparent 28rem),
+    radial-gradient(circle at 8% 30%,rgba(126,32,60,.14),transparent 32rem),#0b0807!important;
+  color:var(--studio-ivory);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 5rem)
+}
+body.rtg-music-studio.rtg-edge-host{padding-top:0!important}
+body.rtg-music-studio .rtg-edge-top,body.rtg-music-studio .os-switcher{display:none!important}
+body.rtg-music-studio .studio-kop{position:sticky!important;inset:0 0 auto!important;z-index:9000!important;
+  min-height:5.35rem!important;padding:calc(env(safe-area-inset-top,0px) + .7rem) max(1rem,calc((100vw - 82rem)/2)) .72rem!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:1rem!important;
+  background:rgba(11,8,7,.86)!important;border:0!important;border-bottom:1px solid var(--studio-line)!important;
+  backdrop-filter:blur(24px) saturate(1.25)!important;box-shadow:0 1rem 4rem rgba(0,0,0,.2)!important}
+body.rtg-music-studio main>.ios-groot,body.rtg-music-studio main>.ios-boven,body.rtg-music-studio main>.ios-onder{display:none!important}
+body.rtg-music-studio .studio-kop .amn-knop,body.rtg-music-studio .studio-kop .rtg-rahul-tab{display:none!important}
+body.rtg-music-studio .studio-kop .ios-nav-rij{display:flex!important;align-items:center!important;width:auto!important;gap:.7rem!important}
+body.rtg-music-studio .studio-kop .ios-nav-links{display:flex!important;align-items:center!important}
+body.rtg-music-studio .studio-kop .ios-nav-titel{display:flex!important;align-items:center!important;gap:.55rem!important;color:var(--studio-ivory)!important;font:500 .9rem Inter,system-ui,sans-serif!important;white-space:nowrap!important}
+body.rtg-music-studio .studio-kop .ios-nav-titel::before{content:"RTG";color:var(--studio-ivory);font:400 1.85rem/1 'Bodoni Moda',Georgia,serif;letter-spacing:-.05em}
+body.rtg-music-studio .studio-kop .ios-nav-titel::after{content:"MusicOS";padding-left:.55rem;border-left:1px solid var(--studio-line);color:var(--studio-gold);font-size:.48rem;letter-spacing:.18em;text-transform:uppercase}
+body.rtg-music-studio .studio-kop .ios-nav-extra{display:flex!important;margin-left:auto!important}
+.studio-merk,.studio-transport{display:flex;align-items:center;gap:.58rem}.studio-merk .terug{width:2rem;height:2rem;
+  display:grid;place-items:center;border:1px solid var(--studio-line);border-radius:50%;color:var(--studio-ivory)!important}
+.studio-rtg{color:var(--studio-ivory);font:400 2rem/1 'Bodoni Moda',Georgia,serif;text-decoration:none;letter-spacing:-.05em}
+.studio-merk>span{padding-left:.72rem;border-left:1px solid var(--studio-line)}
+.studio-merk .ey{color:var(--studio-gold)!important;font-size:.48rem!important;letter-spacing:.26em!important}
+.studio-merk h1{margin:.08rem 0 0;font:500 .95rem/1 Inter,system-ui,sans-serif;letter-spacing:.01em}
+body.rtg-music-studio .knop{min-height:44px;border:1px solid var(--studio-line)!important;background:rgba(255,255,255,.035)!important;
+  color:var(--studio-ivory)!important;padding:.5rem .85rem!important;font-size:.72rem!important;letter-spacing:.02em;backdrop-filter:blur(10px)}
+body.rtg-music-studio .knop:hover{border-color:rgba(216,182,111,.7)!important;background:rgba(216,182,111,.08)!important}
+body.rtg-music-studio .knop.vol{background:linear-gradient(135deg,#efcf8b,#c79743)!important;border-color:#e1bd70!important;color:#160e09!important}
+.studio-icon{width:2.35rem;padding:0!important;font-size:1.1rem!important}.studio-icon:disabled{opacity:.28}.studio-stop span{font-size:.62rem;margin-right:.3rem}
+.studio-play{min-width:6.4rem}.studio-save{border-color:rgba(255,247,234,.42)!important}
+body.rtg-music-studio main{width:min(100%,82rem)!important;max-width:none!important;margin:0 auto!important;padding:1.2rem clamp(.8rem,2.3vw,2rem)!important}
+.studio-intro{position:relative;min-height:12rem;margin-bottom:1.1rem;padding:2rem clamp(1.1rem,4vw,3.2rem);display:flex;align-items:end;
+  justify-content:space-between;gap:1rem;overflow:hidden;border:1px solid var(--studio-line);
+  background:linear-gradient(90deg,rgba(10,6,4,.96) 8%,rgba(10,6,4,.55) 62%,rgba(10,6,4,.22)),
+  url('/images/music/rtg-sound-hero-v1.jpg') 50% 47%/cover;box-shadow:0 1.5rem 4rem rgba(0,0,0,.28)}
+.studio-intro::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(9,6,5,.72));pointer-events:none}
+.studio-intro>*{position:relative;z-index:1}.studio-intro p,.master-label,.studio-paneelkop span,.export-kop span{margin:0 0 .45rem;color:#e5ca91;
+  font-size:.56rem;letter-spacing:.25em;text-transform:uppercase}.studio-intro h2{max-width:11ch;margin:0;color:var(--studio-ivory);
+  font:400 clamp(2.3rem,5vw,4.5rem)/.92 'Bodoni Moda',Georgia,serif}.studio-intro>a{color:#f0d798;text-decoration:none;border-bottom:1px solid #cfa85a;padding:.3rem 0;white-space:nowrap}
+body.rtg-music-studio .kaart{border:1px solid var(--studio-line)!important;background:linear-gradient(145deg,rgba(35,24,18,.9),rgba(16,11,9,.94))!important;
+  box-shadow:0 1.2rem 3.5rem rgba(0,0,0,.2)!important;padding:clamp(.9rem,2vw,1.35rem)!important}
+body.rtg-music-studio .kop.deel{margin:1.4rem 0 .52rem!important;color:var(--studio-gold)!important;font-size:.57rem!important;letter-spacing:.26em!important}
+body.rtg-music-studio .veld{min-height:2.35rem;border-color:var(--studio-line)!important;background:rgba(255,255,255,.045)!important;color:var(--studio-ivory)!important}
+body.rtg-music-studio .stil{color:var(--studio-soft)!important}.master-kaart{background:linear-gradient(135deg,rgba(107,31,55,.3),rgba(30,19,14,.92))!important}
+.master-kop,.studio-paneelkop,.export-kop{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:1.05rem}
+.master-kop h2,.studio-paneelkop h2,.export-kop h2{margin:0;color:var(--studio-ivory);font:400 2rem/1 'Bodoni Moda',Georgia,serif}
+.master-kop>label,.export-instellingen label{display:grid;gap:.35rem;color:var(--studio-soft);font-size:.62rem;text-transform:uppercase;letter-spacing:.12em}
+.master-grid{display:grid;grid-template-columns:repeat(6,minmax(7rem,1fr));gap:.55rem;margin-bottom:.9rem}
+.master-grid label{min-width:0;padding:.72rem;border:1px solid rgba(231,202,143,.16);background:rgba(7,5,4,.32)}
+.master-grid label>span{font-size:.58rem;letter-spacing:.13em;text-transform:uppercase;color:#d9c6af}.master-grid output{float:right;color:var(--studio-gold);font-size:.6rem}
+.master-grid input,.kmix-regelaar input{display:block;width:100%;margin-top:.7rem;accent-color:var(--studio-gold)}
+.studio-paneelkop p{max-width:20rem;color:var(--studio-soft);font-size:.68rem;text-align:right}.studio-paneelkop h2{font-size:1.7rem}
+body.rtg-music-studio .kanaal{grid-template-columns:13rem minmax(28rem,1fr)!important;gap:.8rem!important;padding:.75rem 0!important;border-color:rgba(231,202,143,.14)!important}
+body.rtg-music-studio .kkop{grid-template-columns:minmax(0,1fr) auto auto!important;gap:.35rem!important;padding:.5rem;border:1px solid rgba(231,202,143,.14);background:rgba(8,5,4,.35)}
+body.rtg-music-studio .knaam{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--studio-ivory)!important;font-size:.76rem!important}
+body.rtg-music-studio .kanaal.gekozen .knaam{color:#f0d696!important}.kstil,.ksolo{min-width:2.7rem;border:1px solid var(--studio-line);background:transparent;
+  color:#a99a8e;font:600 .52rem Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .35rem;cursor:pointer}
+.kstil.aan{color:#f098ad!important;border-color:#8f304b!important}.ksolo.aan{color:#160e09;background:var(--studio-gold);border-color:var(--studio-gold)}
+.kmix{grid-column:1/-1;display:grid;grid-template-columns:repeat(7,1fr);gap:.25rem}.kmix-regelaar{min-width:0;color:#97897e;font-size:.48rem;text-transform:uppercase;letter-spacing:.06em}
+.kmix-regelaar input{height:.65rem;margin-top:.15rem}.baan{min-width:28rem}.cel{height:2.05rem!important;border-color:rgba(255,255,255,.025)!important;
+  background:rgba(255,255,255,.035)!important}.cel.tel{background:rgba(216,182,111,.07)!important}.cel.aan{background:linear-gradient(180deg,#e0bd73,#b88b3b)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,241,201,.28),0 .2rem .7rem rgba(216,182,111,.12)}.cel.toon.aan,.cel.zwart.aan{background:linear-gradient(180deg,#9d3654,#681a34)!important}
+.cel.nu{box-shadow:inset 0 0 0 2px #fff4d7!important}.rol{border-color:var(--studio-line)!important;background:rgba(7,5,4,.32)}.rbaan .cel{height:1.25rem!important}
+body.rtg-music-studio .stuk{min-height:5rem;padding:1rem 1.1rem!important;border-color:var(--studio-line)!important;background:linear-gradient(100deg,rgba(40,27,20,.88),rgba(20,13,10,.82))!important}
+body.rtg-music-studio .stuk .nm{font:400 1.25rem 'Bodoni Moda',Georgia,serif}.stuk .mt{display:block;margin-top:.25rem}.stuk .rechts{color:var(--studio-gold)!important}
+.export-kop b{padding:.35rem .55rem;border:1px solid rgba(216,182,111,.4);color:#e8cb8e;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase}
+.export-instellingen{display:grid;grid-template-columns:repeat(2,minmax(0,15rem));gap:.7rem;margin-bottom:.9rem}.export-acties{margin-bottom:.6rem}
+.melding{bottom:calc(env(safe-area-inset-bottom,0px) + 1.2rem)!important;border-color:var(--studio-line)!important;background:rgba(20,13,10,.94)!important;color:var(--studio-ivory)!important;backdrop-filter:blur(20px)}
+@media(max-width:900px){.master-grid{grid-template-columns:repeat(3,1fr)}body.rtg-music-studio .kanaal{grid-template-columns:11rem minmax(28rem,1fr)!important}#rack{overflow-x:auto}}
+@media(max-width:640px){body.rtg-music-studio .studio-kop{align-items:flex-start!important;display:block!important;padding-left:.8rem!important;padding-right:.8rem!important}.studio-transport{margin-top:.7rem;justify-content:stretch}.studio-transport .knop{flex:1}.studio-save{display:none}.studio-intro{min-height:15rem;display:block;padding-top:5rem}.studio-intro>a{display:inline-block;margin-top:1rem}.master-grid{grid-template-columns:repeat(2,1fr)}.master-kop,.studio-paneelkop,.export-kop{display:block}.master-kop>label{margin-top:.8rem}.studio-paneelkop p{margin-top:.45rem;text-align:left}.export-kop b{display:inline-block;margin-top:.75rem}body.rtg-music-studio .kanaal{grid-template-columns:10rem minmax(28rem,1fr)!important}.export-instellingen{grid-template-columns:1fr}.export-acties .knop{width:100%}}

@@ -121,6 +121,7 @@
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/apps/camera-heritage.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false">
@@ -137,19 +138,21 @@
 <h1 class="vis-verborgen">RTG Camera</h1>
 
 <div class="zoeker" id="zoeker" role="main">
-  <video id="beeld" autoplay playsinline muted aria-label="Camerabeeld"></video>
+  <video id="beeld" autoplay playsinline muted poster="/images/worlds/heritage/living-sociaal-hero-v1.jpg" aria-label="Camerabeeld"></video>
   <div class="raster aan" id="raster" aria-hidden="true"><i class="v1"></i><i class="v2"></i><i class="h1"></i><i class="h2"></i></div>
   <div class="waterpas" id="waterpas" aria-hidden="true"></div>
   <div class="foodring" id="foodring" aria-hidden="true"></div>
   <div class="geen-cam" id="geenCam">
     <b>De camera is hier niet beschikbaar</b>
     <span id="geenCamTekst">Geef de browser toegang tot de camera, of open de app op een telefoon. Rahul&#39;s fototips werken ondertussen gewoon.</span>
+    <button class="camera-probeer" id="probeerCamera" type="button">Camera opnieuw openen</button>
   </div>
 </div>
 <div class="flits-anim" id="flitsAnim" aria-hidden="true"></div>
 
-<header class="boven">
+<header class="boven" aria-label="Camera bediening">
   <button class="knopje" id="terug" aria-label="Terug naar de app">←</button>
+  <span class="camera-merk"><b>RTG</b><span>Camera</span></span>
   <span class="rek"></span>
   <button class="knopje" id="openKnop" aria-label="Open een bestaande foto in de Studio"></button>
   <input type="file" id="openBestand" accept="image/*" class="vis-verborgen" tabindex="-1" aria-label="Fotobestand kiezen">
@@ -169,7 +172,7 @@
   </div>
   <div class="rij">
     <button class="duimpje" id="duimpje" aria-label="Laatste foto openen in de Studio" hidden><img id="duimBeeld" alt="Laatste foto"></button>
-    <button class="sluiter" id="sluiter" data-hoofdactie aria-label="Maak een foto"></button>
+  <button class="sluiter" id="sluiter" data-hoofdactie aria-label="Maak een foto" disabled></button>
     <button class="knopje" id="micKnop" aria-label="Spraaksturing: zeg bijvoorbeeld foto, wissel of tip"></button>
   </div>
 </div>
@@ -477,19 +480,59 @@ window.Studio = (function () {
 
   /* ---------- de camera: hoogste kwaliteit die het toestel geeft ---------- */
   let stroom = null, kant = 'environment', spoor = null;
-  async function start() {
+  function stopCamera() {
     if (stroom) stroom.getTracks().forEach(t => t.stop());
+    stroom = null; spoor = null; beeld.srcObject = null;
+    $('#sluiter').disabled = true;
+  }
+  function wachtOpBeeld() {
+    if (beeld.readyState >= 2 && beeld.videoWidth > 0) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const controle = () => {
+        if (beeld.readyState >= 2 && beeld.videoWidth > 0 && beeld.videoHeight > 0) klaar();
+      };
+      const klaar = () => { opruim(); resolve(); };
+      const fout = () => { opruim(); reject(new Error('De camerastroom geeft nog geen beeld.')); };
+      const timer = setTimeout(fout, 8000);
+      const peiling = setInterval(controle, 100);
+      const opruim = () => {
+        clearTimeout(timer);
+        clearInterval(peiling);
+        beeld.removeEventListener('loadeddata', controle);
+        beeld.removeEventListener('canplay', controle);
+        beeld.removeEventListener('playing', controle);
+        beeld.removeEventListener('resize', controle);
+        beeld.removeEventListener('error', fout);
+      };
+      /* Safari, Chromium en ingebouwde app-browsers melden het eerste frame
+         niet allemaal met hetzelfde evenement. Controleer elk bruikbaar
+         signaal én kortstondig de echte videomaten. */
+      beeld.addEventListener('loadeddata', controle);
+      beeld.addEventListener('canplay', controle);
+      beeld.addEventListener('playing', controle);
+      beeld.addEventListener('resize', controle);
+      beeld.addEventListener('error', fout, { once: true });
+      controle();
+    });
+  }
+  async function start() {
+    stopCamera();
+    zoeker.setAttribute('aria-busy', 'true');
+    $('#probeerCamera').disabled = true;
     try {
       /* Via de mediapoort (shared/media.js): die stelt de diagnose -- onveilig
          adres, kader dat het recht niet doorgeeft, geweigerd, geen apparaat,
          bezet -- en geeft de reden mee. Dit scherm heeft er zelf een plek voor
          (#geenCamTekst), dus vragen we hem stil en zetten we hem daar neer. */
       stroom = await RTGMedia.vraag({ audio: false, video: {
-        facingMode: kant, width: { ideal: 4096 }, height: { ideal: 2160 } } }, { stil: true });
+        facingMode: { ideal: kant }, width: { ideal: 4096 }, height: { ideal: 2160 } } }, { stil: true });
       beeld.srcObject = stroom;
       spoor = stroom.getVideoTracks()[0];
+      await beeld.play();
+      await wachtOpBeeld();
       zoeker.classList.toggle('spiegel', kant === 'user');
       $('#geenCam').classList.remove('aan');
+      $('#sluiter').disabled = false;
       // de lamp (torch) alleen tonen als dit toestel hem echt heeft
       const kan = spoor.getCapabilities ? spoor.getCapabilities() : {};
       $('#flitsKnop').hidden = !kan.torch;
@@ -497,8 +540,12 @@ window.Studio = (function () {
       const r = e.rtg || { kort: 'Camera gaat niet open', uitleg: e.message };
       $('#geenCamTekst').textContent = r.kort + '. ' + r.uitleg + ' Rahul’s fototips werken ondertussen gewoon.';
       $('#geenCam').classList.add('aan');
+    } finally {
+      zoeker.removeAttribute('aria-busy');
+      $('#probeerCamera').disabled = false;
     }
   }
+  $('#probeerCamera').addEventListener('click', start);
   $('#wisselKnop').addEventListener('click', () => { kant = kant === 'user' ? 'environment' : 'user'; start(); });
   let lamp = false;
   $('#flitsKnop').addEventListener('click', async () => {
@@ -546,7 +593,11 @@ window.Studio = (function () {
       'Mooi zo. Maak er direct nog een: de tweede is vaak nog net iets rustiger.'][Math.floor(Math.random() * 3)];
   }
   function maakFoto() {
-    if (!stroom) { volgendeTip(); return; }
+    if (!stroom || beeld.readyState < 2 || !beeld.videoWidth || !beeld.videoHeight) {
+      zegRahul('De camera is nog niet klaar. Open hem opnieuw en geef toegang wanneer uw toestel dat vraagt.');
+      $('#geenCam').classList.add('aan');
+      return;
+    }
     const c = document.createElement('canvas');
     c.width = beeld.videoWidth || 1280; c.height = beeld.videoHeight || 720;
     const tx = c.getContext('2d');
@@ -605,6 +656,7 @@ window.Studio = (function () {
 
   volgendeTip();
   start();
+  window.addEventListener('pagehide', stopCamera);
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>

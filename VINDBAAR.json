@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-19T20:57:10.095Z",
-    "commit": "06e7010d9",
+    "op": "2026-09-20T11:36:01.146Z",
+    "commit": "cea10ab1b",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 99,
-  "woorden": 1171,
-  "gevonden": 764,
-  "dekking": 0.6524,
+  "woorden": 1201,
+  "gevonden": 777,
+  "dekking": 0.647,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -110,9 +110,36 @@
       ]
     },
     {
+      "naam": "RTG Media",
+      "url": "/apps/media.html",
+      "woorden": 54,
+      "gevonden": 35,
+      "mist": [
+        "professionele",
+        "grading",
+        "uitsnede",
+        "beweging",
+        "tekst",
+        "ondertiteling",
+        "beperkingen",
+        "watermerkvrij",
+        "exporteren",
+        "releasecontrole",
+        "automatische",
+        "ducking",
+        "bron",
+        "dempen",
+        "exporteer",
+        "master",
+        "controle",
+        "starten",
+        "kijken"
+      ]
+    },
+    {
       "naam": "Mall",
       "url": "/apps/mall.html",
-      "woorden": 46,
+      "woorden": 45,
       "gevonden": 29,
       "mist": [
         "gevonden",
@@ -130,8 +157,7 @@
         "tussen",
         "leveranciers",
         "bestellen",
-        "plaatsen",
-        "openen"
+        "plaatsen"
       ]
     },
     {
@@ -298,8 +324,8 @@
     {
       "naam": "Sociaal",
       "url": "/apps/sociaal.html",
-      "woorden": 12,
-      "gevonden": 4,
+      "woorden": 10,
+      "gevonden": 2,
       "mist": [
         "kring",
         "tijdlijn",
@@ -377,8 +403,8 @@
     {
       "naam": "Rendez-vous",
       "url": "/apps/rendezvous.html",
-      "woorden": 26,
-      "gevonden": 19,
+      "woorden": 25,
+      "gevonden": 18,
       "mist": [
         "intentie",
         "inhoud",
@@ -407,8 +433,8 @@
     {
       "naam": "RTG One",
       "url": "/apps/rtgone.html",
-      "woorden": 31,
-      "gevonden": 24,
+      "woorden": 30,
+      "gevonden": 23,
       "mist": [
         "geladen",
         "persoonlijke",
@@ -422,8 +448,8 @@
     {
       "naam": "Website",
       "url": "/apps/sitemaker.html",
-      "woorden": 22,
-      "gevonden": 15,
+      "woorden": 21,
+      "gevonden": 14,
       "mist": [
         "blok",
         "websites",
@@ -479,8 +505,8 @@
     {
       "naam": "RTMail",
       "url": "/apps/rtmail.html",
-      "woorden": 24,
-      "gevonden": 18,
+      "woorden": 23,
+      "gevonden": 17,
       "mist": [
         "daarna",
         "externe",
@@ -662,8 +688,8 @@
     {
       "naam": "Berichten",
       "url": "/apps/comm.html",
-      "woorden": 4,
-      "gevonden": 1,
+      "woorden": 5,
+      "gevonden": 2,
       "mist": [
         "samenvatting",
         "afspraken",
@@ -695,12 +721,12 @@
     {
       "naam": "Muziek",
       "url": "/apps/muziek.html",
-      "woorden": 8,
-      "gevonden": 5,
+      "woorden": 10,
+      "gevonden": 7,
       "mist": [
-        "stations",
-        "straks",
-        "wachtrij"
+        "geluid",
+        "makers",
+        "hierna"
       ]
     },
     {
@@ -739,8 +765,8 @@
     {
       "naam": "Ontdekken",
       "url": "/apps/connect.html",
-      "woorden": 11,
-      "gevonden": 8,
+      "woorden": 10,
+      "gevonden": 7,
       "mist": [
         "hebt",
         "gedaan",
@@ -875,19 +901,10 @@
       ]
     },
     {
-      "naam": "RTG Media",
-      "url": "/apps/media.html",
-      "woorden": 17,
-      "gevonden": 16,
-      "mist": [
-        "releasecontrole"
-      ]
-    },
-    {
       "naam": "Vandaag",
       "url": "/apps/pulse.html",
-      "woorden": 6,
-      "gevonden": 5,
+      "woorden": 5,
+      "gevonden": 4,
       "mist": [
         "savedheading"
       ]
@@ -976,8 +993,8 @@
     {
       "naam": "RTFoundation portaal",
       "url": "/apps/foundation/os-portaal.html",
-      "woorden": 7,
-      "gevonden": 6,
+      "woorden": 6,
+      "gevonden": 5,
       "mist": [
         "bedrijf"
       ]
@@ -1006,8 +1023,8 @@
     {
       "naam": "Camera",
       "url": "/apps/camera.html",
-      "woorden": 15,
-      "gevonden": 15,
+      "woorden": 16,
+      "gevonden": 16,
       "mist": []
     },
     {
@@ -1097,8 +1114,8 @@
     {
       "naam": "Wonen",
       "url": "/apps/wonen.html",
-      "woorden": 6,
-      "gevonden": 6,
+      "woorden": 5,
+      "gevonden": 5,
       "mist": []
     },
     {

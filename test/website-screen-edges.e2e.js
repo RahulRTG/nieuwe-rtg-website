@@ -30,7 +30,12 @@ const ROUTES = [
   '/site/werelden/livingos.html',
   '/site/werelden/travelos.html',
   '/site/werelden/workos.html',
-  '/site/werelden/foundationos.html'
+  '/site/werelden/foundationos.html',
+  '/site/passen/community.html',
+  '/site/passen/rtg-pass.html',
+  '/site/passen/business-lite.html',
+  '/site/passen/business-pass.html',
+  '/site/passen/lifestyle-pass.html'
 ];
 const VIEWPORTS = [
   { width: 320, height: 700 },
@@ -73,6 +78,9 @@ test('publieke website houdt tekst, inhoud en Edge binnen alle schermranden',
         await page.setViewportSize(viewport);
         for (const route of ROUTES) {
           await page.goto(base + route, { waitUntil: 'domcontentloaded' });
+          await page.waitForFunction(() => document.documentElement.dataset.websiteTruth);
+          assert.equal(await page.evaluate(() => document.documentElement.dataset.websiteTruth), 'actueel',
+            route + ' kon de actuele appwaarheid niet laden');
           if (route === '/') await page.waitForFunction(() => document.body.dataset.rtgAdaptiveReady === 'true');
           const gemeten = await randmeting(page);
           assert.ok(gemeten.overloop <= 1, route + ' loopt ' + gemeten.overloop + 'px buiten ' + viewport.width);

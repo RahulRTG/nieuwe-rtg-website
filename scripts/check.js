@@ -934,6 +934,7 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
   ];
   const MAG_ZONDER = new Map([
     ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
+    ['/api/muziek/bestand-ticket', 'een tijdelijke luisterkaart voor muziek die al in RTG is gepubliceerd; "ticket" is hier een cryptografische toegangssleutel en geen aankoop bij een derde'],
     ['/api/member/boardroom/logboek', 'je eigen boardroom-journaal ("logboek" bevat toevallig "boek"); geen derde partij'],
     /* Dezelfde valse vriend, nu bij De Rechterhand. Het REISBOEK is uw eigen
        reisdagboek en het LOGBOEK het onderhoudsboek van uw eigen jacht of
@@ -3688,6 +3689,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     spiegel:     { open: false, stil: true },   // je eigen beeld, zichtbaar, zonder geluid
     werktuig:    { open: false, stil: true },   // beeld als invoer of rekenmiddel
     ondertiteld: { open: false, anker: true },  // opgenomen inhoud MET een weg naar tekst
+    muziek:      { open: false },               // muziekspoor, met zichtbare titel; geen gesproken programma
     /* LIVE, TWEERICHTING. Draagt altijd een tekstbaan waarin deelnemers
        meeschrijven (`baan`). Draagt hij DAARNAAST een spraakanker, dan is er ook
        automatische ondertiteling en telt hij niet meer als open -- zie `SPRAAK`
@@ -3749,6 +3751,10 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      zoals `ondertiteld` niet zegt dat elke maker cues heeft getypt. Wat de code
      wel afdwingt staat in `SPRAAK` hieronder: er is een weg, en waar hij niet
      open staat ZEGT het scherm dat -- geen knop die niets doet. */
+  /* 4 -> 5 -> 4 OP 19 SEPTEMBER 2026. De Salon kreeg eerst een korte video
+     zonder tekstweg en maakte die schuld dezelfde dag af: lokale automatische
+     transcriptie of handmatige tijdregels vóór plaatsing, plus de gedeelde
+     band in de feed. Alleen werkelijk stille video mag zonder regels door. */
   const OPEN_MAX = 4;
   /* De band woonde als private functie IN de clipdeler; sinds het Theater en de
      Media OS dezelfde cue-lijst tonen staat hij als gedeelde laag in
@@ -3807,9 +3813,15 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
     ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
     ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],
+    ['public/apps/media.html#proVideo', ['ondertiteld', 'de lokale bronvideo van Studio Pro; handmatige tijdregels of het lokale spraakmodel worden als ondertitel in de gerenderde master ingebakken', ['public/apps/media/studio-pro-engine.js', 'cueOp']]],
+    ['public/apps/media.html#proMuziek', ['muziek', 'de optionele lokale muzieklaag van Studio Pro; de maker kiest het bestand en ziet naam, mixsterkte en rechtenwaarschuwing in de werkbank']],
+    ['public/apps/muziek.html#eigenAudio', ['muziek', 'een door een lid gedeeld muzieknummer; dit vak accepteert uitsluitend muziekformaten en toont titel, maker, speelstand en voortgang als zichtbare bediening, niet een gesproken programma zonder tekstweg']],
     ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted', ['public/apps/meet/kamer.js', 'RTGMeelezen'], ['public/apps/meet.html', 'meeluister.js']]],
     ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
     ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
+    ['public/apps/salon.html#1', ['ondertiteld', 'een korte video in de Salon-feed; de maker maakt lokale automatische of handmatige tijdregels vóór plaatsing en de speler toont dezelfde cue-lijst', ['public/apps/salon.html', 'zetSalonOndertitels']]],
+    ['public/apps/salon.html#2', ['spiegel', 'het stille voorbeeld van de eigen gekozen video voordat het lid de Salon-post plaatst']],
+    ['public/apps/salon.html#3', ['werktuig', 'een stille videominiatuur in het profielraster die alleen als ingang naar de volledige post dient']],
     ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand. Er loopt WEL een tekstbaan mee: de kanaalchat (#chatKijk, aria-live), waarin de uitzender meeschrijft of zijn eigen spraak laat omzetten met de knop Live tekst (#studioSpraak) -- geen ondertiteling waar je op kunt rekenen, wel een weg naar tekst', ['public/apps/podium.html', 'studioSpraak']]],
     ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
     ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],
@@ -3939,7 +3951,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     const metSpraak = [...gevonden.keys()].filter(spraakOk);
     ok(gevonden.size + ' media-elementen, elk met een besluit en een reden: ' +
       (gevonden.size - open.length) + ' geregeld (' +
-      noem(['spiegel', 'werktuig', 'ondertiteld', 'gesprek met ondertiteling']) + '), ' +
+      noem(['spiegel', 'werktuig', 'muziek', 'ondertiteld', 'gesprek met ondertiteling']) + '), ' +
       open.length + ' open (' + noem(['gesprek', 'uitzending', 'onbedekt']) + '), ratel op ' + OPEN_MAX +
       '\n  ' + metBaan.length + ' dragen een TEKSTBAAN waarin deelnemers meeschrijven, en ' +
       metSpraak.length + ' daarvan ook automatische ondertiteling uit een LOKAAL model' +
@@ -4723,6 +4735,7 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
       'var(--rtg-radius-content,2px)', 'var(--rtg-radius-system,22px)'
     ])],
     ['public/shared/rtg-world-home.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-system)'])],
+    ['public/site/website-truth.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)'])], ['public/shared/rtg-simple.css', new Set([
       'var(--rtg-radius-system)!important'
     ])],
@@ -5875,6 +5888,14 @@ try {
   require('child_process').execFileSync(process.execPath,[path.join(ROOT,'scripts/language-proof.js'),'--check'],{stdio:'pipe'});
   ok('LANGUAGECAPABILITY, MEANINGPARITY en LANGUAGEFAILOVER horen bij deze bron');
 } catch(e) { fout('taalbewijs ontbreekt of is verouderd; draai npm run language:proof'); }
+
+console.log('\n73) de openbare website volgt de waarheid van de app');
+try {
+  require('./websitewaarheid').controle();
+  ok('werelden, app-routes en pasprijzen zijn uit de centrale appbronnen opgebouwd');
+} catch (e) {
+  fout(e.message);
+}
 
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
 

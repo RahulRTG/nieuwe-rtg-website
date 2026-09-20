@@ -470,7 +470,7 @@ integratie- en browserproeven staan in `test/rtg-edge-2.test.js`,
   dunne actielijn; primaire acties blijven rustig omlijnd.
 - Fotografie geeft context en sfeer, nooit een verzonnen status of cijfer.
 - Operationele inhoud houdt rechte hoeken en dunne lijnen. De op 20 september
-  2026 goedgekeurde fotografische homes van TravelOS, WorkOS en FoundationOS
+  2026 goedgekeurde fotografische homes van LivingOS, TravelOS, WorkOS en FoundationOS
   gebruiken de centrale rol `--rtg-radius-editorial` (16px) voor hun fotokaarten
   en begeleidende inhoud. Alleen `rtg-world-home.css` mag deze rol toepassen;
   de gewone inhoudsrol en systeemrol blijven ongewijzigd. Eén duidelijke

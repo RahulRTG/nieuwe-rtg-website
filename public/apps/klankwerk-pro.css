@@ -30,7 +30,7 @@ body.rtg-music-studio .studio-kop .ios-nav-extra{display:flex!important;margin-l
 .studio-merk>span{padding-left:.72rem;border-left:1px solid var(--studio-line)}
 .studio-merk .ey{color:var(--studio-gold)!important;font-size:.48rem!important;letter-spacing:.26em!important}
 .studio-merk h1{margin:.08rem 0 0;font:500 .95rem/1 Inter,system-ui,sans-serif;letter-spacing:.01em}
-body.rtg-music-studio .knop{min-height:2.35rem;border:1px solid var(--studio-line)!important;background:rgba(255,255,255,.035)!important;
+body.rtg-music-studio .knop{min-height:44px;border:1px solid var(--studio-line)!important;background:rgba(255,255,255,.035)!important;
   color:var(--studio-ivory)!important;padding:.5rem .85rem!important;font-size:.72rem!important;letter-spacing:.02em;backdrop-filter:blur(10px)}
 body.rtg-music-studio .knop:hover{border-color:rgba(216,182,111,.7)!important;background:rgba(216,182,111,.08)!important}
 body.rtg-music-studio .knop.vol{background:linear-gradient(135deg,#efcf8b,#c79743)!important;border-color:#e1bd70!important;color:#160e09!important}

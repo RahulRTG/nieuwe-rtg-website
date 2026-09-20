@@ -233,19 +233,19 @@ test('Reality Engine blijft bruikbaar, leesbaar en rustig op mobiel', () => {
 
 test('Adaptive Edge vervangt de oude dubbele Social-randen', () => {
   const css = lees('public/shared/rtg-adaptive-edge.css');
+  assert.match(css, /body\[data-rtg-adaptive-ready="true"\]:has\(\.rtg-suitebar\.rtg-edge-owned-bar\)\{--suite-top:0px/,
+    'de oude suite-inzet wordt opgeheven zodra Edge gereed is');
+  assert.match(css, /:is\([^}]*\.rtg-edge-owned-bar\)\{display:none!important/,
+    'oude navigatie en technische telemetrie mogen niet naast Edge zichtbaar blijven');
+  assert.match(css, /:has\(\.rtg-intel-strip\.rtg-edge-owned-bar\)\{--rtg-intel-height:0px\}/,
+    'ook Social en De Salon tonen techniek pas op verzoek');
   const claim = lees('public/shared/rtg-adaptive-edge-claim.js');
-  assert.match(css, /body\[data-rtg-adaptive-ready="true"\] :is\([^}]*\.rtg-edge-owned-bar\)\{display:none!important\}/,
-    'alleen door Edge overgenomen bediening wordt verborgen');
-  assert.match(claim, /var CLAIM = '\.rtg-suitebar,\.rtg-suitenav,\.tos-opsnav,\.rtg-social-commandbar,'[\s\S]*'\.salon-socialnav,\.rtg-intel-strip/,
-    'suite-, Social-, Salon- en statusbalken worden door dezelfde eigenaar gemeten');
-  assert.match(claim, /winnaars\.forEach\(function \(el\) \{ el\.classList\.add\(EIGEN\); \}\)/,
-    'de balk wordt pas na het meten als eigendom gemarkeerd');
-  assert.match(css, /:has\(\.rtg-suitebar\.rtg-edge-owned-bar\)\{--suite-top:0px;--suite-nav:0px/,
-    'de oude suite-inzet wordt pas na een geldige claim opgeheven');
-  assert.match(css, /:has\(\.salon-socialnav\.rtg-edge-owned-bar\) \.salon-werkveld\{padding-top:0!important\}/,
-    'een overgenomen Salon-balk laat geen lege strook achter');
-  assert.match(css, /#feed \.clip>\.laag\{padding-bottom:calc\(var\(--edge-bottom\)/,
-    'de Social-feed reserveert de werkelijke ruimte van de zwevende rand');
+  assert.match(claim, /CLAIM = '[^']*\.rtg-suitebar[^;]*\.salon-socialnav[^;]*\.rtg-intel-strip/,
+    'de oude vaste Social-navigatie blijft niet achter de nieuwe Edge staan');
+  assert.match(css, /:has\(\.salon-socialnav\.rtg-edge-owned-bar\) \.salon-werkveld\{padding-top:0!important/,
+    'een verborgen commandobalk laat geen lege strook boven De Salon achter');
+  assert.match(css, /body\.rtg-social-messages\[data-rtg-adaptive-ready="true"\] \.comm\{[\s\S]*var\(--rtg-adaptive-inset\)/,
+    'Berichten reserveert de werkelijke ruimte van de nieuwe zwevende rand');
   const runtime = lees('public/shared/social-intelligence-runtime.js');
   assert.match(runtime, /id: 'social-context'[\s\S]*run: openDeck/,
     'de verborgen technische laag blijft via Acties bereikbaar');

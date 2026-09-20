@@ -1232,6 +1232,12 @@
       "url": "/apps/vertegenwoordiging.html"
     },
     {
+      "label": "Deel uw muziek",
+      "app": "Muziek",
+      "wereld": "LivingOS",
+      "url": "/apps/muziek.html"
+    },
+    {
       "label": "Doe mee",
       "app": "Muziek",
       "wereld": "LivingOS",

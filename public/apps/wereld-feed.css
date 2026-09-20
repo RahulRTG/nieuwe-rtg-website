@@ -1,28 +1,24 @@
 /* LivingOS feed: content stays in the page; the shared Edge owns navigation. */
 body.rtg-social-experience[data-rtg-skin="heritage"]{background:#100e0d!important;--rtg-world-photo:none;--rtg-world-ground:#100e0d;--rtg-world-bg:#100e0d;--rtg-world-card:#191513;--rtg-world-ink:#f4f0e9;--rtg-world-muted:#c9c0b6}
-body.rtg-social-experience main{max-width:760px;margin-inline:auto;padding:0 16px calc(160px + env(safe-area-inset-bottom));isolation:isolate}
-.living-intro{position:relative;padding:30px 8px 0;isolation:isolate}
-.living-intro::before{content:'';position:absolute;inset:0 -16px 0;z-index:-1;background:linear-gradient(180deg,rgba(16,14,13,.35),#100e0d 94%),url('/images/start/dagdelen/hero-avond.jpg') center 48%/cover;opacity:.8}
-.living-intro .elite-merk{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
-.living-intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:32px;line-height:1.2;font-weight:400;letter-spacing:-.035em;margin:0;color:#eedbb5}
-.living-intro h1 span{font:400 16px Inter,sans-serif;color:#f4f0e9;letter-spacing:0;margin-inline-start:12px}
-.living-intro .eyebrow{font:400 9px/1.6 Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#e0d5c8;margin:6px 0 0}
-.living-intro .belofte{font:italic 18px/1.2 'Bodoni Moda',Georgia,serif;max-width:150px;color:#eedbb5}
-.living-intro .momenten{display:flex;gap:16px;overflow-x:auto;scrollbar-width:none;padding:0 0 22px;margin-inline:-8px;scroll-snap-type:x proximity}
-.living-intro .moment{display:flex;flex:0 0 72px;flex-direction:column;align-items:center;gap:8px;text-align:center;white-space:normal;color:#ded5cb;font-size:11px;line-height:1.4;text-decoration:none;scroll-snap-align:start}
-.living-intro .moment i{display:grid;place-items:center;width:68px;height:68px;box-sizing:border-box;border:2px solid #a94161;border-radius:50%;padding:3px;background:#15110f;margin:0;overflow:hidden;box-shadow:0 0 0 1px rgba(231,190,123,.18)}
+body.rtg-social-experience main{max-width:760px;margin-inline:auto;padding:0 14px calc(120px + env(safe-area-inset-bottom));isolation:isolate}
+.living-intro{position:relative;padding:8px 2px 0;isolation:isolate}
+body.rtg-social-experience::before{content:'';position:absolute;inset:0 0 auto;height:360px;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(16,14,11,.1),#100e0b 94%),url('/images/world-homes/living-coast.webp') center 45%/cover}
+.living-intro .elite-merk{margin-bottom:22px}
+.living-intro .eyebrow{font:400 9px/1.6 Inter,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#eedbb5;margin:0}
+.living-intro .momenten{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;padding:0 0 16px}
+.living-intro .moment{display:flex;min-width:0;flex-direction:column;align-items:center;gap:7px;text-align:center;white-space:normal;color:#f4f0e9;font:400 12px/1.4 Inter,sans-serif;text-decoration:none}
+.living-intro .moment i{display:grid;place-items:center;width:100%;max-width:88px;aspect-ratio:1;box-sizing:border-box;border:2px solid #a94161;border-radius:50%;padding:2px;background:#15110f;margin:0;overflow:hidden}
 .living-intro .moment i::after{display:none}
 .living-intro .moment img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
-.living-intro .moment:first-child i{border:1px solid #c9c0b6;color:#f4f0e9;font:300 32px/1 Inter,sans-serif}
+.living-intro .moment:first-child i{border:1px solid #e2c389;color:#f4f0e9;font:300 34px/1 Inter,sans-serif;background:rgba(16,14,11,.65)}
 .living-intro .moment:hover i{border-color:#eedbb5}
 body.rtg-social-experience .werelden{display:flex;gap:20px;overflow-x:auto;border-bottom:1px solid var(--rtg-line);padding:0;margin-bottom:16px;scrollbar-width:none}
 body.rtg-social-experience .werelden button{background:transparent!important;border:0;border-bottom:2px solid transparent;border-radius:0;min-height:48px;flex:0 0 auto;padding:8px 0;color:#c9c0b6;font:500 14px Inter,sans-serif;white-space:nowrap}
 body.rtg-social-experience .werelden button[aria-current="true"]{border-bottom-color:#eedbb5;color:#fff!important}
 body.rtg-social-experience .werelden button:disabled{opacity:.55}
-.living-feed-heading{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:0 0 16px}
-.living-feed-heading h2{font:400 22px/1.25 'Bodoni Moda',Georgia,serif;margin:0}
-.living-feed-heading p{font:400 10px/1.4 Inter,sans-serif;color:#c9c0b6;margin:0;text-align:end}
-body.rtg-social-experience #feed .kaart{position:relative;margin-bottom:24px;padding:0!important;overflow:hidden;border:1px solid rgba(244,240,233,.2);border-radius:0;background:#1b1715!important;box-shadow:none}
+.living-feed-heading{padding:0 3px 13px}
+.living-feed-heading h2{font:400 clamp(28px,7.3vw,44px)/1.15 'Bodoni Moda',Georgia,serif;margin:0;letter-spacing:-.035em;color:#f6efe3;text-wrap:balance}
+body.rtg-social-experience #feed .kaart{position:relative;margin-bottom:24px;padding:0!important;overflow:hidden;border:1px solid #c8ab75;border-radius:0;background:#1b1715!important;box-shadow:none}
 .living-post-head{display:flex;gap:12px;align-items:center;padding:16px;min-width:0}
 .living-avatar{display:grid;place-items:center;flex:0 0 38px;height:38px;border:1px solid #aa566b;border-radius:50%;background:#341c23;color:#f4f0e9;font:400 18px 'Bodoni Moda',Georgia,serif}
 .living-author{flex:1;min-width:0}
@@ -38,16 +34,6 @@ body.rtg-social-experience .kaart .living-post-copy p{font:400 16px/1.65 Inter,s
 body.rtg-social-experience .kaart .acties{padding:12px 16px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid rgba(244,240,233,.1)}
 body.rtg-social-experience .kaart .acties button{min-height:44px;padding:8px 12px;border:1px solid rgba(244,240,233,.25);background:transparent;border-radius:0;font:400 12px Inter,sans-serif;color:#f4f0e9}
 body.rtg-social-experience .kaart .tel{display:flex;gap:12px;font-size:11px;color:#d3c7bd;margin-inline-start:auto;white-space:nowrap}
-.living-welcome{position:relative;isolation:isolate;min-height:460px;display:flex;flex-direction:column;justify-content:space-between;padding:26px 24px;box-sizing:border-box;overflow:hidden;border:1px solid rgba(244,240,233,.2);border-radius:0;background:#171310}
-.living-welcome>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% center;z-index:-2}
-.living-welcome::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(12,10,9,.25),rgba(12,10,9,.1) 25%,rgba(12,10,9,.92) 82%)}
-.living-welcome .living-kicker{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#f4f0e9;margin:0 0 14px}
-.living-welcome h2{font:400 clamp(38px,8vw,64px)/1.02 'Bodoni Moda',Georgia,serif;letter-spacing:-.035em;color:#fff8ef;max-width:320px;margin:0 0 90px;text-wrap:balance}
-.living-welcome .living-welcome-copy{max-width:410px}
-.living-welcome p{font:400 13px/1.7 Inter,sans-serif;color:#f0e8de;margin:0 0 16px}
-.living-welcome a,.living-welcome button{display:inline-flex;align-items:center;justify-content:space-between;gap:24px;min-height:48px;color:#fff8ef;font:500 13px/1.5 Inter,sans-serif;text-decoration:none;border:0;border-bottom:1px solid #c9b08a;background:transparent;padding:0 0 4px}
-.living-welcome a::after{content:'↗';font-size:24px}
-.living-welcome .living-note{font-size:10px;color:#d5c9be;margin:18px 0 0}
 .living-membership{padding:28px 0 0}
 .living-membership .lenscontext a{display:inline-flex;align-items:center;min-height:44px;padding-block:4px;box-sizing:border-box}
 body.rtg-social-experience .living-membership .passport{background:transparent;border:0;border-block:1px solid var(--rtg-line);padding:20px 0;margin:0 0 16px}
@@ -58,14 +44,6 @@ body.rtg-social-experience .meer{min-height:48px;margin:16px 0;border-color:var(
 body.rtg-social-experience .balk a{min-height:44px;box-sizing:border-box}
 body.rtg-social-experience :is(a,button,select,input):focus-visible{outline:2px solid #eedbb5;outline-offset:4px}
 body.rtg-social-experience #zoekform input{min-width:0}
-@media(min-width:960px){.living-intro{padding-top:40px}.living-intro h1{font-size:42px}.living-intro .momenten{gap:24px}.living-intro .moment{flex-basis:88px}.living-intro .moment i{width:80px;height:80px}.living-welcome{min-height:560px}.living-welcome h2{max-width:450px}.living-membership{padding-top:32px}}
-@media(max-width:359px){.living-intro .belofte{display:none}.living-intro .momenten{gap:12px}.living-welcome{padding:24px 18px}.living-feed-heading{align-items:flex-start}.living-feed-heading p{max-width:90px}.kaart .tel{width:100%;margin-inline-start:0!important}}
-@media(prefers-reduced-motion:reduce){.living-intro *{scroll-behavior:auto;transition:none}}
-
-.living-intro .living-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.living-intro .elite-merk{min-height:32px;margin-bottom:22px}
-.living-intro .belofte{display:block;font-size:16px;max-width:130px}
-.living-intro .eyebrow{max-width:160px;line-height:1.8;margin:0}
 body.rtg-social-experience .social-nav .nav-label{font-size:inherit}
 /* A short photo post is one composition. Long posts retain their full text
    below the photograph, including when the reader increases the text size. */
@@ -75,17 +53,40 @@ body.rtg-social-experience #feed .living-photo{display:grid}
 .living-photo .living-post-copy{grid-area:1/1;align-self:end;z-index:1;background:linear-gradient(0deg,rgba(12,10,9,.94),transparent);padding:64px 18px 8px}
 .living-photo .acties{grid-area:2/1}
 @media(max-width:359px){.living-photo .living-post-head{padding:12px 12px 40px}.living-photo .living-post-copy{padding-inline:12px}}
-@media(max-width:600px){
-  .living-intro{padding-top:14px}
-  .living-intro .elite-merk{min-height:20px;margin-bottom:14px}
-  .living-intro .belofte{display:none}
-  .living-intro .eyebrow{max-width:none;font-size:8px}
-  .living-intro .momenten{padding-bottom:16px}
-  body.rtg-social-experience .werelden{margin-bottom:8px}
-  .living-feed-heading{justify-content:flex-end;padding-bottom:10px}
-  .living-feed-heading h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
-  .living-feed-heading p{max-width:none;font-size:9px}
-}
-
 /* In een werkvlak blijft de bediening bij de Edge van het bovenliggende scherm. */
 body.rtg-social-experience.rtg-edge-embed > .social-nav{display:none!important}
+
+.living-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+.living-welcome{position:relative;overflow:hidden;border:1px solid #c8ab75;background:#100e0b}
+.living-example-photo{display:grid;isolation:isolate}
+.living-example-photo>img{grid-area:1/1;display:block;width:100%;height:100%;aspect-ratio:1;object-fit:cover;object-position:center 58%;z-index:-1}
+.living-example-head{grid-area:1/1;align-self:start;display:flex;align-items:center;gap:10px;padding:12px 10px 36px;background:linear-gradient(rgba(10,8,5,.86),rgba(10,8,5,.4) 70%,transparent);color:#fff7e9}
+.living-example-head>img{width:38px;height:38px;border:1px solid #e2c389;border-radius:50%;object-fit:cover}
+.living-example-head p{font:500 13px/1.4 Inter,sans-serif;margin:0 0 2px}
+.living-example-head>div>span{font:400 11px/1.5 Inter,sans-serif;color:#e7ddd0}
+.living-example-copy{grid-area:1/1;align-self:end;padding:50px 13px 14px;background:linear-gradient(transparent,rgba(10,8,5,.84) 65%,#100e0b);color:#f6efe3}
+.living-example-copy h2{font:400 clamp(26px,6.9vw,43px)/1.1 'Bodoni Moda',Georgia,serif;letter-spacing:-.035em;margin:0 0 5px;text-wrap:balance}
+.living-example-copy p{font:400 12px/1.55 Inter,sans-serif;margin:0;color:#f6efe3}
+.living-example-actions{display:flex;align-items:center;gap:14px;padding:0 9px;margin:0 9px;border-top:1px solid #71624e}
+.living-example-actions button{display:grid;place-items:center;min-width:44px;min-height:44px;padding:9px;border:0;background:transparent;color:#f6efe3}
+.living-example-actions button:last-child{margin-inline-start:auto}
+.living-example-actions button[aria-expanded="true"]{color:#e2c389}
+.living-example-actions svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round}
+.living-example-note{padding:12px 16px;border-top:1px solid #71624e}
+.living-example-note p,.living-load-error p{font:400 14px/1.6 Inter,sans-serif;margin:0 0 12px;color:#d8cfc2}
+.living-example-note a,.living-load-error button{display:inline-flex;align-items:center;gap:16px;min-height:44px;padding:6px 0;border:0;border-bottom:1px solid #e2c389;color:#e2c389;background:transparent;font:400 14px/1.5 Inter,sans-serif;text-decoration:none}
+.living-load-error{padding:24px;border:1px solid #c8ab75}
+.living-load-error h2{font:400 28px/1.15 'Bodoni Moda',Georgia,serif;margin:0 0 16px}
+.living-nearby{position:relative;display:flex;align-items:center;gap:11px;margin:12px 0 0;padding:7px;border:1px solid #c8ab75;color:#f6efe3;text-decoration:none;background:#100e0b}
+.living-nearby>img{width:36%;max-width:180px;align-self:stretch;object-fit:cover;aspect-ratio:1.75;min-height:68px}
+.living-nearby>span:not([aria-hidden]){min-width:0;flex:1}
+.living-nearby strong{display:block;font:400 clamp(18px,5.2vw,28px)/1.1 'Bodoni Moda',Georgia,serif;letter-spacing:-.035em;margin-bottom:5px;text-wrap:balance}
+.living-nearby span>span{display:block;font:400 10px/1.5 Inter,sans-serif;color:#d8cfc2}
+.living-nearby>span[aria-hidden]{position:absolute;inset-inline-end:10px;bottom:10px;font-size:24px;color:#e2c389}
+.living-nearby span>span{padding-inline-end:24px}
+.living-access{margin:18px 0 0;font:400 13px/1.5 Inter,sans-serif}
+.living-access a{display:inline-flex;align-items:center;min-height:44px;color:#e2c389;border-bottom:1px solid #71624e;text-decoration:none}
+[dir="rtl"] .living-nearby>span[aria-hidden]{transform:scaleX(-1)}
+@media(min-width:768px){.living-intro{padding-top:22px}.living-intro .eyebrow{font-size:11px}.living-intro .momenten{max-width:480px;gap:32px;padding-bottom:26px}.living-intro .moment{font-size:14px}.living-example-photo>img{aspect-ratio:1.1}.living-example-head{padding:22px 22px 60px}.living-example-head p{font-size:17px}.living-example-head>div>span{font-size:13px}.living-example-copy{padding:100px 24px 24px}.living-example-copy p{font-size:16px}.living-nearby{gap:20px;padding:10px}.living-nearby span>span{font-size:13px}}
+@media(max-width:359px){.living-intro .momenten{gap:10px}.living-intro .moment{font-size:11px}.living-intro .eyebrow{font-size:8px}.living-example-copy p{font-size:11px}.living-nearby{gap:8px}.living-nearby strong{font-size:18px}.living-nearby>span[aria-hidden]{font-size:20px}.kaart .tel{width:100%;margin-inline-start:0!important}}
+@media(prefers-reduced-motion:reduce){.living-intro *{scroll-behavior:auto;transition:none}}

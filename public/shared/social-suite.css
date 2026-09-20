@@ -1,5 +1,5 @@
 /* ==========================================================================
-   RTG SOCIAL OS · PRODUCTSUITE
+   RTG SOCIAL OS: PRODUCTSUITE
 
    Eén kalme commandolaag rond zelfstandige sociale capabilities. De onderlaag
    blijft functioneel en donker; ivoor maakt de werkvelden leesbaar; messing
@@ -372,7 +372,7 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
 }
 
 /* ==========================================================================
-   ELITE MATERIAL PASS 2 · SOCIAL OS
+   ELITE MATERIAL PASS 2: SOCIAL OS
 
    De suite gebruikt vaste registerlijnen en contrasterende materialen. Geen
    zwevende witte bediening, geen lege demo-vlakken, geen generieke SaaS-card.
@@ -521,7 +521,7 @@ body.rtg-social-messages .stuurknop{
   --rtg-goud:var(--gold-tekst);
 }
 
-/* BERICHTEN · DE NIEUWE LIVINGOS-KAMER.
+/* BERICHTEN: DE NIEUWE LIVINGOS-KAMER.
    De informatie blijft compact en menselijk: eerst de mensen en gesprekken,
    technische context pas wanneer iemand daar zelf om vraagt. De bestaande
    inbox- en gesprekslogica verandert niet. */

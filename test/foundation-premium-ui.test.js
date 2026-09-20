@@ -37,9 +37,15 @@ test('hubtegels kunnen op telefoon niet door hun tekst uit het raster groeien', 
   assert.match(js, /icoon\.dataset\.code/);
 });
 
-test('de entree en leerwereld spreken dezelfde ambitieuze, toegankelijke belofte', () => {
-  assert.match(hub, /Jouw toekomst\. <b>Op wereldniveau\.<\/b>/);
-  assert.match(hub, /Toegankelijk voor ieder kind en ieder gezin/);
+test('de editorial entree houdt groei, gratis toegang en een veilige gezinsomgeving bij elkaar', () => {
+  const projectie = fs.readFileSync(path.join(ROOT, 'public/shared/rtg-world-home.js'), 'utf8');
+  const woorden = fs.readFileSync(path.join(ROOT, 'public/shared/rtg-world-home-copy.js'), 'utf8');
+  assert.match(hub, /data-wh-foundation/);
+  assert.match(projectie, /text\('grow'\)/);
+  assert.match(projectie, /text\('free'\)/);
+  assert.match(woorden, /Ruimte om te groeien\./);
+  assert.match(woorden, /Altijd 100% gratis/);
+  assert.match(hub, /FoundationOS is en blijft 100% gratis\./);
   assert.match(hub, /Veilige gezinsomgeving/);
   assert.doesNotMatch(hub, /const AVATARS = \['',''/);
 });

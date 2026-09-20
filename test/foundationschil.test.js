@@ -59,3 +59,10 @@ test('3. de schil noemt zichzelf een versie, zodat een update ook echt doorkomt'
      waarde toetsen (die verandert bij elke uitgave), wel dat hij er is. */
   assert.ok(/const CACHE = '[^']+'/.test(sw), 'de service worker hoort een cachenaam te dragen');
 });
+
+// De nieuwe fotografische home moet ook met zijn presentatielaag openen.
+test('4. de nieuwe home heeft zijn code, vorm en fotografie in de schil', () => {
+  for (const p of ['/shared/rtg-world-home.css', '/shared/rtg-world-home-copy.js',
+    '/shared/rtg-world-home.js', '/images/world-homes/foundation.webp'])
+    assert.ok(inSchil.has(p), p + ' ontbreekt in de offline-schil');
+});

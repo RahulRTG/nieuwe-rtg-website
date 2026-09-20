@@ -447,7 +447,7 @@ toets omvalt.
 | `foundation-vrijgave.test.js` | 8 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `foundation.test.js` | 28 | gezakt op `liegpoort /api/` | Integratietests voor de RTFoundation-lesapp (gratis onderwijs): de live-les, het bord, het schrift, opgaven en de AI-bijles. Draait tegen een echte RTG-server in een tijdelijke datamap. |
 | `foundationregistratie.test.js` | 4 | -- | FOUNDATION-registratie: openbaar aanvragen, nooit openbaar toelaten. De Boardroom moet elk toepasselijk bewijs afzonderlijk vastleggen voordat een schoolcode, vrijwilligerscode of partnercode ontstaat. |
-| `foundationschil.test.js` | 3 | geen module gevonden | De offline-schil van het RTFoundation-huis. WAAROM DEZE TOETS ER IS. |
+| `foundationschil.test.js` | 4 | geen module gevonden | De offline-schil van het RTFoundation-huis. WAAROM DEZE TOETS ER IS. |
 | `fout-aggregatie.test.js` | 5 | gezakt op `&&->||` | Test voor de eigen in-memory fout-aggregatie in server/log.js. Storingen worden gegroepeerd op een vingerafdruk (bericht met cijfers weggenormaliseerd + plaats), met een teller; foutenSamenvatting() geeft de... |
 | `fout-client-route.test.js` | 3 | gezakt op `liegpoort /api/` | DE DEUR VOOR EEN FOUT UIT DE BROWSER (/api/fout/client). Deze route staat er met opzet ZONDER inlog: een fout die het inloggen zelf sloopt, is juist de fout die je wilt zien. |
 | `fout-client.test.js` | 9 | gezakt op `liegpoort /api/` | DE INGANG VOOR BROWSERFOUTEN: POST /api/fout/client WAAROM DEZE TOETS BESTAAT. Dit is het enige spoor van een storing die alleen op het toestel van een gebruiker gebeurt (server/routes/fout.js, gevoed door... |
@@ -1984,6 +1984,7 @@ toets omvalt.
 | `werktafel.e2e.js` | 4 | genoemd | DE WERKTAFEL: wanneer hij er WEL mag staan, en wanneer niet. Deze toets bestaat om twee fouten die alleen op een breed venster bestonden, en die daarom niemand zag: de app wordt op een telefoon ontwikkeld en op een... |
 | `winkel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE WINKEL VAN DE RTFOUNDATION (/apps/foundation/winkel.html) IN EEN ECHTE BROWSER. kern/rtfos/winkel.js draagt vier grendels en test/rtfos-gift-ruil-routes.test.js beproeft ze over de draad: geen voorraad geen... |
 | `world-dashboard.e2e.js` | 1 | -- | DE VIER WERELDHOMES ZIJN HUN EIGEN DASHBOARD. Deze proef bewaakt de grens die bij de nieuwe schil het makkelijkst weer vervaagt: de gedeelde laag mag de echte Living-, Work-, Travel- en Foundation-DOM alleen opmaken. |
+| `world-homes.e2e.js` | 4 | -- | Approved homes must retain real data, language state and the shared Edge. AI is off: built-in copy must still work and photos must never invent trips. |
 | `zaakpay.e2e.js` | 2 | genoemd | Schermtoets voor RTG Pay aan de ZAAKKANT (public/apps/zaakpay.html). Dit scherm bestond niet. |
 | `zaakregie.e2e.js` | 2 | -- | Schermtoets voor de Regie van de zaak: hetzelfde scherm hangt in de zaak-app (leverancier.html, breed) en in de personeels-PDA (personeel.html, duimstand), en beide moeten opkomen zonder onopgevangen JS-fouten.... |
 | `zaal.e2e.js` | 1 | -- | Scherm-test voor de hele keten van deze ronde: een LIED laten neerzetten met een eigen zin erin, het samen produceren, uitgeven, en het in DE ZAAL horen. De zwaarste bewering die hier op het scherm getoetst wordt: de... |

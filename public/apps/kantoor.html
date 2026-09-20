@@ -74,16 +74,19 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
-<link href="/images/worlds/heritage/work-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
+<link href="/images/world-homes/work.webp" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
 <link href="/shared/rtg-anchor-experiences-2026.css" rel="stylesheet">
 <link rel="stylesheet" href="/shared/rtg-world-start.css">
 <script src="/shared/rtg-world-start.js" defer></script>
 
 <script>setTimeout(function(){var b=document.body;if(b&&b.getAttribute("data-rtg-world-start")==="loading"){b.setAttribute("data-rtg-world-start","ready");b.removeAttribute("aria-busy");var l=b.querySelector(".rtg-world-start");if(l)l.hidden=true;}},12500);</script>
+<link href="/shared/rtg-world-home.css" rel="stylesheet">
+<script src="/shared/rtg-world-home-copy.js"></script>
+<script src="/shared/rtg-world-home.js"></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-work-experience" data-rtg-modus="pro" data-rtg-world="work" data-rtg-world-dashboard="work" data-rtg-vandaag-luxe data-rtg-edge-2-context="wereldtabs,wereldapps" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
+<body data-world-home="work" class="rtg-stijl rtg-work-experience" data-rtg-modus="pro" data-rtg-world="work" data-rtg-world-dashboard="work" data-rtg-vandaag-luxe data-rtg-edge-2-context="wereldtabs,wereldapps" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
 <div class="rtg-world-start" role="status" aria-live="polite"><span class="rtg-world-start-brand" aria-hidden="true"><strong>Rahul Travel Group</strong><span>Experience the elite class</span></span><span class="rtg-world-start-status">WorkOS wordt klaargezet…</span></div>
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <!-- DE WERELDSTROOK IS WEG EN DAT IS GEEN GAT. De vier werelden stonden hier
@@ -218,9 +221,32 @@
   <a href="/apps/sitemaker.html">Website-maker</a>
 </nav>
 <main id="inhoud">
-  <header class="merkkop">
-    <h1 class="rtg-ceremonie">WorkOS<span class="onder">RTG Kantoor · Personeel · Ondernemers · Organisaties</span></h1>
-  </header>
+  <div class="wh-home">
+    <header class="wh-photo wh-work-hero">
+      <img src="/images/world-homes/work.webp" alt="" width="1408" height="1056" fetchpriority="high">
+      <div class="wh-photo-copy"><h1 id="worldWorkGreeting">Goedendag.</h1><p data-wh-copy="workIntro">Uw werkdag begint met overzicht.</p></div><span class="wh-caption" data-wh-copy="atmosphere">Sfeerbeeld</span>
+    </header>
+    <section class="wh-attention" aria-labelledby="worldWorkAttention">
+      <h2 id="worldWorkAttention" data-wh-copy="attention">Dit verdient uw aandacht.</h2>
+      <div id="worldWorkState" role="status">Uw gegevens worden opgehaald.</div>
+      <a id="worldWorkLogin" class="wh-link" href="/apps/app.html" hidden><span data-wh-copy="signIn">Meld u aan bij RTG</span><span aria-hidden="true">↗</span></a>
+<section id="vandaagVak" hidden>
+    <div class="regkop"><h2>Vandaag</h2><span class="tel" id="telVandaag"></span></div>
+    <div id="vandaag"></div>
+  </section>
+      <div class="regkop" id="worldWorkOther" hidden><h2>Wat er verder speelt</h2><span class="tel" id="tel"></span></div>
+      <div id="werkdag"></div>
+    </section>
+    <section aria-labelledby="worldWorkProjects"><h2 id="worldWorkProjects" data-wh-copy="projects">Waar we aan werken.</h2>
+      <a class="wh-work-feature" href="/apps/werkruimte.html?gebied=kantoor"><div class="wh-photo">
+        <img src="/images/first-steps/reisbureau.webp" alt="" width="1024" height="1365" loading="lazy">
+        <div class="wh-photo-copy"><h3 data-wh-copy="plans">Geef uw plannen de ruimte.</h3><p data-wh-copy="together">Houd uw plannen, documenten en mensen bij elkaar.</p><span class="wh-link"><span data-wh-copy="workspace">Bekijk de werkruimte</span> <span aria-hidden="true">↗</span></span></div><span class="wh-caption" data-wh-copy="atmosphere">Sfeerbeeld</span>
+      </div></a>
+    </section>
+    <a class="wh-support" href="/apps/personeel.html"><div><h2 data-wh-copy="team">Uw team blijft dichtbij.</h2><p data-wh-copy="teamIntro">Bekijk uw werkdag, uw rooster en de mensen met wie u samenwerkt.</p><span class="wh-link"><span data-wh-copy="openTeam">Open uw team</span> <span aria-hidden="true">↗</span></span></div></a>
+  </div>
+  <details class="wh-details" id="worldWorkDetails"><summary data-wh-copy="workDetails">Uw organisatie en alle werkonderdelen</summary>
+
 
   <section class="doelgroep" data-rtg-transition="world" aria-labelledby="workDoelgroepKop">
     <nav class="doelgroepnav" aria-label="Voor wie is WORK">
@@ -274,21 +300,8 @@
        Hij staat leeg en verdwijnt als er niets is: een lege tijdlijn boven een
        rustige dag is een leeg kader dat om aandacht vraagt zonder iets te
        zeggen. Wat er niet is, hoort er ook niet als doosje te staan. -->
-  <section id="vandaagVak" hidden>
-    <div class="regkop"><h2>Vandaag</h2><span class="tel" id="telVandaag"></span></div>
-    <div id="vandaag"></div>
-  </section>
-  </div>
 
-  <!-- HET REGISTER HOUDT DE REST, en met opzet niet ook vandaag: dan zou
-       hetzelfde overleg twee keer op een scherm staan dat zijn hele bestaan
-       ontleent aan weglaten. De tijdlijn is de klok van vandaag, het register
-       is wat daarna komt en wat geen tijd heeft. -->
-  <div class="regkop">
-    <h2>Wat er verder speelt</h2>
-    <span class="tel" id="tel"></span>
   </div>
-  <div id="werkdag"><p class="stil">Laden...</p></div>
 
   <div class="regkop"><h2>De kantoorwereld</h2></div>
   <div class="poorten" id="poorten"></div>
@@ -329,6 +342,8 @@
     <span>&copy; RTG &middot; WorkOS</span>
     <span>Experience the elite class</span>
   </footer>
+
+  </details>
 </main>
 
 <!-- Het Canvas komt VOOR het scherm-script en zonder defer: het blok hieronder
@@ -478,11 +493,13 @@
   }
 
   function teken(d) {
+    RTGWorldHome.work(d, 'ready');
     tekenStand(d);
     const alles = d.regels || [];
     tekenVandaag(alles);
     // wat de tijdlijn toont, staat niet nog eens in het register
     const r = alles.filter(x => !opDeKlok(x));
+    $('#worldWorkOther').hidden = !r.length;
     $('#tel').textContent = r.length ? r.length + (r.length === 1 ? ' regel' : ' regels') : '';
     $('#werkdag').innerHTML = r.length
       ? r.map(werkRegel).join('')
@@ -491,7 +508,7 @@
          er staat iets, drie centimeter hoger. */
       : (alles.length
         ? '<p class="stil">Verder staat er niets open; wat er vandaag is, staat hierboven.</p>'
-        : '<p class="stil">Er staat niets open. Wat u maakt in Office, Agenda, Notities of Bestanden komt hier vanzelf te staan.</p>');
+        : '');
 
     $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
       '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
@@ -544,7 +561,8 @@
          de reden komt in de rustregel te staan, niet in een aparte melding. */
       // geen esc(): het Canvas zet tekst met textContent en escapet dus zelf
       RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: e.message + ' Log eerst in via de leden-app.' });
-      $('#werkdag').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      RTGWorldHome.work(null, token() ? 'error' : 'guest');
+      $('#werkdag').textContent = '';
       $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
         '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
         '<b>' + esc(n) + '</b><span>' + esc(z) + '</span></a>').join('');

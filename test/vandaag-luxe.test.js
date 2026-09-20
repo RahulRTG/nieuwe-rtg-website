@@ -20,14 +20,20 @@ const HOMES = [
   ['foundation', 'public/apps/foundation/os-publiek.html', '/apps/foundation/os-publiek.html', '#main', 'foundation-heritage-v2.jpg']
 ];
 
-test('exact de vier canonieke homes laden één runtime, stijl en eigen wereldbeeld', () => {
+test('de vier dashboardroutes laden één runtime, stijl en hun vastgelegde wereldbeeld', () => {
   for (const [wereld, bestand, , , beeld] of HOMES) {
     const html = lees(bestand);
     assert.match(html, new RegExp('<body[^>]+data-rtg-world="' + wereld +
       '"[^>]+data-rtg-world-dashboard="' + wereld + '"[^>]+data-rtg-vandaag-luxe(?:\\s|>)'), bestand);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.css/g) || []).length, 1, bestand);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.js/g) || []).length, 1, bestand);
-    assert.equal((html.match(new RegExp('/images/worlds/heritage/' + beeld, 'g')) || []).length, 1, bestand);
+    // Work en Travel gebruiken de goedgekeurde editorial foto. De preload
+    // wijst naar precies dat lokale beeld, ook als het in de inhoud terugkomt.
+    const foto = ['work', 'travel'].includes(wereld)
+      ? '/images/world-homes/' + wereld + '.webp'
+      : '/images/worlds/heritage/' + beeld;
+    assert.equal((html.match(new RegExp('<link[^>]+href="' + foto.replace(/\./g, '\\.') + '"[^>]+rel="preload"', 'g')) || []).length, 1, bestand);
+    assert.ok(fs.existsSync(path.join(ROOT, 'public', foto)), foto);
     assert.doesNotMatch(html, /wereld-atlas\.jpg/, bestand + ' mag geen quadrant uit de oude atlas laden');
   }
 });

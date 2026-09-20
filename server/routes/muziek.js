@@ -4,6 +4,7 @@
 module.exports = (kern) => {
   const { app, express, auth, muziekMaak, muziekMijn, muziekOpen, muziekBewaar, muziekWeg,
     muziekRahul, anthropic } = kern;
+  const { wie: envelopWie } = require('../opzet/envelop');
   const bestanden = muziekMaak && muziekMaak.bestanden;
   if (!muziekMaak) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
@@ -11,7 +12,10 @@ module.exports = (kern) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Studio is voor leden.' }); return true; }
     return false;
   };
-  const k = (req) => req.session.key;
+  /* De poort zet de actor al in de centrale verzoekenvelop. Gebruik die ene
+     identiteit door de hele muziekhandeling en val alleen terug voor oude
+     proefopstellingen die nog geen envelop bouwen. */
+  const k = (req) => envelopWie(req) || req.session.key;
 
   /* De persoonlijke bibliotheek van RTG Sound. De upload is rauw, zodat 60 MB
      muziek niet als base64 door JSON en db.data reist. Afspelen gaat met een

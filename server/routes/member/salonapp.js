@@ -15,6 +15,7 @@
    Gemount vanuit routes/member.js. */
 const { veiligeFout } = require('../../kern/util');
 module.exports = (kern) => {
+  const { wie: envelopWie } = require('../../opzet/envelop');
   const { app, express, auth, geenGast, db, findSupplier, zijnVrienden,
     salon, salonProfiel, salonReacties, salonInzicht } = kern;
   const zichtbaarheid = require('../../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden });
@@ -35,7 +36,8 @@ module.exports = (kern) => {
      upload-id terug dat pas door /plaats wordt verbruikt. */
   app.post('/api/salon/media', auth, express.raw({ type: () => true, limit: '61mb' }), async (req, res) => {
     if (geenGast(req, res)) return;
-    try { uit(res, await salon.upload(req.session, req.body, req.get('Content-Type') || '')); }
+    const sessie = Object.assign({}, req.session, { key: envelopWie(req) || req.session.key });
+    try { uit(res, await salon.upload(sessie, req.body, req.get('Content-Type') || '')); }
     catch (e) { fout(res, e); }
   });
 
@@ -44,7 +46,8 @@ module.exports = (kern) => {
      door dezelfde eigendoms- en cuecontrole. */
   app.post('/api/salon/ondertitels', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    try { uit(res, await salon.ondertitel(req.session, req.body || {})); }
+    const sessie = Object.assign({}, req.session, { key: envelopWie(req) || req.session.key });
+    try { uit(res, await salon.ondertitel(sessie, req.body || {})); }
     catch (e) { fout(res, e); }
   });
 

@@ -2,6 +2,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const pw = laadPlaywright(), skip = geenBrowser(pw);
+const { haalSessies, opslagVoor } = require('../scripts/lib/proefsessies');
 let srv, browser, member, other, conversation;
 async function post(path, body, token) {
   const r = await fetch(srv.base + path, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -102,4 +103,28 @@ test('switching worlds reaches their current homes through the visible Edge', { 
       assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
     }
   } finally { await ctx.close(); }
+});
+
+test('mobile office screens keep the standard Edge inside the physical viewport', { skip }, async () => {
+  const staff = await startServer({ env: { RTG_MAGNAAT_TEST: '1', RTG_AI_UIT: '1', SMTP_URL: '' } });
+  let ctx;
+  try {
+    const auth = await haalSessies(staff.base);
+    assert.deepEqual(auth.overgeslagen, []);
+    ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+    await ctx.addInitScript(data => { for (const [k, v] of Object.entries(data)) localStorage.setItem(k, v); },
+      { ...opslagVoor(auth.sessies), rtg_lang: 'nl' });
+    for (const route of ['/apps/kantoren.html', '/apps/routedossier.html']) {
+      const page = await ctx.newPage();
+      await page.goto(staff.base + route);
+      await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+      const edge = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]');
+      const rect = await edge.boundingBox();
+      assert.ok(rect && rect.y >= 0 && rect.y + rect.height <= 844 && rect.x + rect.width <= 390,
+        route + ': content overflow must not push the fixed Edge outside the phone screen');
+      await edge.click();
+      assert.equal(await page.locator('.rtg-adaptive-controls').isVisible(), true);
+      await page.close();
+    }
+  } finally { if (ctx) await ctx.close(); await stop(staff.child); }
 });

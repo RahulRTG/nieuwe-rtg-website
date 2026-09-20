@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-e5f9ec44';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-cb81911b';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
   '/apps/foundation/samen-thuis.html', '/apps/foundation/samen-thuis.js', '/apps/foundation/samen-thuis-weergave.js',
@@ -65,6 +65,8 @@ const SHELL = [
   '/apps/rtgschool/leer.js', '/apps/rtgschool/examen.js', '/apps/rtgschool/bijles.js',
   '/shared/id.js', '/shared/basis.js', '/shared/rtg-world-identity.js', '/shared/rtg-foundation-thuis-2026.css', '/shared/rtg-foundation-leren-2026.css', '/shared/rtg-foundation-samen-thuis-2026.css', '/shared/rtg-foundation-geld-later-2026.css', '/shared/rtg-foundation-gezondheid-welzijn-2026.css', '/shared/rtg-foundation-veilig-vertrouwd-2026.css',
   '/shared/rtg-foundation-hulp-2026.css', '/shared/rtg-foundation-meedoen-ontdekken-2026.css',
+  '/shared/rtg-world-home.css', '/shared/rtg-world-home-copy.js', '/shared/rtg-world-home.js',
+  '/images/world-homes/foundation.webp',
   '/shared/rtg-world-start.css', '/shared/rtg-world-start.js',
   '/shared/rtg-route-memory-core.js', '/shared/rtg-route-memory.js',
   '/shared/rtg-heritage-transition.js', '/shared/rtg-action-dock.js', '/shared/rtg-edge-preferences.js', '/shared/rtg-heritage-registry.js',

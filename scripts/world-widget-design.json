@@ -1,0 +1,3638 @@
+{
+  "/apps/gast.html": {
+    "name": "Aan tafel",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Schuif aan",
+      "De kaart",
+      "Wat er op tafel staat"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/arrival.html": {
+    "name": "Aankomst",
+    "type": "stay",
+    "icon": "bed-double",
+    "sections": [
+      "Uw aankomst",
+      "Gedeelde voorkeuren",
+      "Benodigde toestemming"
+    ],
+    "intro": "Uw verblijf en aankomst rustig voorbereid.",
+    "shared": false
+  },
+  "/apps/leverancier-aanvragen.html": {
+    "name": "Aanvragen uit de Mall",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Uw selectie",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/mijn-isolatie.html": {
+    "name": "Accountbescherming",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Hoe je nu staat",
+      "Strenger zetten",
+      "Weer terug"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/kantoren.html": {
+    "name": "Afdelingen",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "De werklijst van deze kamer",
+      "De Paniekkamer",
+      "Paniekkamer-chat"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/agenda.html": {
+    "name": "Agenda",
+    "type": "calendar",
+    "icon": "calendar-days",
+    "sections": [
+      "Weekagenda",
+      "Deelnemers",
+      "Herinneringen"
+    ],
+    "intro": "Een rustig overzicht van uw tijd.",
+    "shared": true
+  },
+  "/apps/juridisch/voorwaarden.html": {
+    "name": "Algemene voorwaarden",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "1. Het lidmaatschap",
+      "2. Boeken en betalen",
+      "3. Huren, kopen en laten bezorgen"
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": false
+  },
+  "/apps/foundation/onveilig.html": {
+    "name": "Als je niet veilig bent",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Als u vaker bang bent dat er iets gebeurt",
+      "Wat wij niet voor je kunnen verbergen",
+      "Wat er met deze pagina gebeurt"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/appcel.html": {
+    "name": "App Store · cel",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Benodigde gegevens",
+      "Machtigingen",
+      "Uw akkoord"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/appstore-uitgever.html": {
+    "name": "App Store · uitgever",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw app",
+      "Versies",
+      "Keuring"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/appstore-dossier.html": {
+    "name": "App-dossier",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Appdossier",
+      "Gegevensgebruik",
+      "Toestemmingen"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/appstore-kantoor.html": {
+    "name": "Appkeuring",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Wachtrij",
+      "Toestemmingen",
+      "Uw oordeel"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/attenties.html": {
+    "name": "Attenties",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Belangrijke datum",
+      "Voorkeuren",
+      "Eerdere attenties"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/foundation/babyboek.html": {
+    "name": "Babyboek",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Uw fotoboekje",
+      "Eerste momenten",
+      "Herinneringen"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/backoffice.html": {
+    "name": "Backoffice",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Actiecentrum Dagbriefing",
+      "Live onderweg",
+      "Partnerprestaties"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/geld.html#balans": {
+    "name": "Balans",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Saldo",
+      "Bewegingen",
+      "Periode"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/geld.html#bank": {
+    "name": "Bank",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Rekeningen",
+      "Bewegingen",
+      "Toestemmingen"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/belastingkantoor.html": {
+    "name": "Belastingkantoor (inspecteur)",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw dossier",
+      "Documenten",
+      "Besluiten"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/service-bel.html": {
+    "name": "Bellen met RTG",
+    "type": "call",
+    "icon": "video",
+    "sections": [
+      "Uw gesprek",
+      "Deelnemers",
+      "Gedeeld scherm"
+    ],
+    "intro": "Spreek elkaar, met ruimte om samen te kijken.",
+    "shared": false
+  },
+  "/apps/comm.html": {
+    "name": "Berichten",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Gesprekken",
+      "Afspraken uit het gesprek",
+      "Gedeelde bestanden"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": true
+  },
+  "/apps/foundation/beroepen.html": {
+    "name": "Beroepen-Bibliotheek",
+    "type": "library",
+    "icon": "book-open",
+    "sections": [
+      "Beroepen",
+      "Werkzaamheden",
+      "Opleidingsroutes"
+    ],
+    "intro": "Een rustige plek om te zoeken, te kiezen en verder te lezen.",
+    "shared": false
+  },
+  "/apps/bestanden.html": {
+    "name": "Bestanden",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "Uw mappen",
+      "Uw documenten",
+      "Toegang"
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": true
+  },
+  "/apps/bestellen.html": {
+    "name": "Bestellen",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Iets bijzonders, zo bij je thuis.",
+      "Ontdek restaurants",
+      "Kies een restaurant"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/pay.html": {
+    "name": "Betalen",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Tikken",
+      "Voor jou",
+      "Klompje, voor wie er niet bij is"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/bewijsmap.html": {
+    "name": "Bewijsmap",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "Wat u kunt aantonen",
+      "Wie er iets van u kreeg",
+      "Waar deze lijst ophoudt"
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": false
+  },
+  "/apps/boardroom.html": {
+    "name": "Boardroom",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Besluitagenda",
+      "Ledenregister",
+      "Afwegingen"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/boeken.html": {
+    "name": "Boeken",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Voor u",
+      "Bewaard",
+      "Recent"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/foundation/bord.html": {
+    "name": "Bord",
+    "type": "note",
+    "icon": "notebook-pen",
+    "sections": [
+      "Leerlingen",
+      "Opgaven klaarzetten",
+      "Agenda en huiswerk"
+    ],
+    "intro": "Uw notities, afwegingen en plannen bij elkaar.",
+    "shared": false
+  },
+  "/apps/marechaussee.html": {
+    "name": "Brigade RTG Airport (KMar)",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Uw post",
+      "Open zaken",
+      "Overdracht"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/foundation/buurtruil.html": {
+    "name": "Buurtruil",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Uw selectie",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/camera.html": {
+    "name": "Camera",
+    "type": "capture",
+    "icon": "camera",
+    "sections": [
+      "Voorbeeld",
+      "Opname",
+      "Bewaren"
+    ],
+    "intro": "Uw opname blijft een concept tot u deze bewaart.",
+    "shared": false
+  },
+  "/apps/foundation/campus.html": {
+    "name": "Campus",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Jouw ontwikkeling",
+      "Jouw leerlingwerkplek",
+      "Vier verbonden werelden"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/cellier.html": {
+    "name": "Cellier",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Uw wijnkelder",
+      "Drinkvenster",
+      "Voorraad"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/cercle.html": {
+    "name": "Cercle",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Uw lidmaatschap",
+      "Gastpassen",
+      "Dresscode"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/clips.html": {
+    "name": "Clips",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Een clip maken",
+      "Bewerken",
+      "Knippen"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/foundation/club.html": {
+    "name": "Clubportaal",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Dichtbij",
+      "Uw deelname",
+      "Contact"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/foundation/clubswerk.html": {
+    "name": "Clubs & steden · RTF",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Dichtbij",
+      "Uw deelname",
+      "Contact"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/commerce.html": {
+    "name": "Commerce",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "De werkwoorden, nu gemeten",
+      "Etalage van een verkoper",
+      "Terugsturen"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/concierge.html": {
+    "name": "Concierge-bureau · De Rechterhand",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw werk",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/contact.html": {
+    "name": "Contact",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Uw kring",
+      "Gesprekken",
+      "Gedeelde momenten"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/foundation/cv.html": {
+    "name": "CV-maker",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Over jou",
+      "Werkervaring + Toevoegen",
+      "Opleiding + Toevoegen"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/foundation/arena.html": {
+    "name": "De Arena",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Wie daag je uit?",
+      "De uitdaging is verstuurd",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/kassa.html": {
+    "name": "De Kassa",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Uw rekening",
+      "Betaalwijze",
+      "Bevestiging"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/overheid.html": {
+    "name": "De Overheid",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Berichtenbox",
+      "Uw aangiften",
+      "Uw aanvragen"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/rechtbank.html": {
+    "name": "De Rechtspraak (griffie)",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Zaakdossier",
+      "Zittingen",
+      "Processtukken"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/salon.html": {
+    "name": "De Salon",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Alleen wat van betekenis is.",
+      "Gesprekken",
+      "Gedeelde momenten"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/foundation/societeit.html": {
+    "name": "De Sociëteit",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Wie daag je uit?",
+      "Waar komen de vragen vandaan?",
+      "Hoe spelen jullie?"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/foundation/speeltuin.html": {
+    "name": "De Speeltuin",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/foundation/winkel.html": {
+    "name": "De winkel van de RTFoundation",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Uw selectie",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/zaal.html": {
+    "name": "De Zaal",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Voor u",
+      "Bewaard",
+      "Recent"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/decision-room.html": {
+    "name": "Decision Room",
+    "type": "note",
+    "icon": "notebook-pen",
+    "sections": [
+      "De afweging",
+      "Uw besluit",
+      "Onderbouwing"
+    ],
+    "intro": "Uw notities, afwegingen en plannen bij elkaar.",
+    "shared": false
+  },
+  "/apps/doelen.html": {
+    "name": "Doelen",
+    "type": "note",
+    "icon": "notebook-pen",
+    "sections": [
+      "Mijn doelen",
+      "Een doel erbij",
+      "Bewaard"
+    ],
+    "intro": "Uw notities, afwegingen en plannen bij elkaar.",
+    "shared": false
+  },
+  "/apps/avond.html": {
+    "name": "Een avond",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Wat voor avond wordt het?",
+      "Het voorstel",
+      "Wat er loopt"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/loopbaanbewijs.html": {
+    "name": "Een regel uit een loopbaan",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "Uw document",
+      "Versies",
+      "Toegang"
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": false
+  },
+  "/apps/entourage.html": {
+    "name": "Entourage",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Reisgezelschap",
+      "Dieetwensen",
+      "Documenten"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/sportclub.html": {
+    "name": "FC RTG · Clubkantoor",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/flits.html": {
+    "name": "Flits",
+    "type": "route",
+    "icon": "route",
+    "sections": [
+      "In de buurt",
+      "Vooruitblik",
+      "Overstappen"
+    ],
+    "intro": "Bekijk de route en wat onderweg aandacht vraagt.",
+    "shared": false
+  },
+  "/apps/foodcourt.html": {
+    "name": "Food Court",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Voor u gevonden",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/foundation/os.html": {
+    "name": "Foundation OS",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw werk",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/galerij.html": {
+    "name": "Galerij",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Voor u",
+      "Bewaard",
+      "Recent"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/foundation/speelhal.html": {
+    "name": "Game Hall",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/spelscherm.html": {
+    "name": "Game Night",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/garderobe.html": {
+    "name": "Garde-robe",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Uw kledingstukken",
+      "Kasten en woningen",
+      "Uw vaklui"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/gedachten.html": {
+    "name": "Gedachtenboek",
+    "type": "note",
+    "icon": "notebook-pen",
+    "sections": [
+      "Iets opschrijven",
+      "Wat u eerder schreef",
+      "Bewaard"
+    ],
+    "intro": "Uw notities, afwegingen en plannen bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/geld-later.html": {
+    "name": "Geld & Later",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Vandaag",
+      "Kleine stappen geven rust.",
+      "Uw route. Uw toekomst."
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/foundation/geld.html": {
+    "name": "Geldmaatje",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Ons spaarpotje",
+      "Bespaartip van de dag",
+      "Vraag het je geldmaatje"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/foundation/geloofbieb.html": {
+    "name": "Geloof & Wijsheid",
+    "type": "library",
+    "icon": "book-open",
+    "sections": [
+      "Tradities",
+      "Leesbare teksten",
+      "Uw leesplek"
+    ],
+    "intro": "Een rustige plek om te zoeken, te kiezen en verder te lezen.",
+    "shared": false
+  },
+  "/apps/gemeenteloket.html": {
+    "name": "Gemeente-loket (medewerker)",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw zaak",
+      "Gegevens",
+      "Bekendmakingen"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/gemeentepda.html": {
+    "name": "Gemeente-PDA (buitendienst)",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw werk",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/genootschap.html": {
+    "name": "Genootschap",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Prikbord",
+      "Peilingen",
+      "Bijeenkomsten"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/gereedschap.html": {
+    "name": "Gereedschap",
+    "type": "tools",
+    "icon": "wrench",
+    "sections": [
+      "Rekening delen",
+      "Wekkers en timers",
+      "Wereldklok"
+    ],
+    "intro": "Het juiste gereedschap, binnen dezelfde omgeving.",
+    "shared": false
+  },
+  "/apps/foundation/geven.html": {
+    "name": "Geven",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Overzicht",
+      "Bewegingen",
+      "Uw akkoord"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/foundation/beheer.html": {
+    "name": "Gezin & beheer",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Jullie gezinscode",
+      "Profielen",
+      "Bericht of oproep sturen"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/foundation/agenda.html": {
+    "name": "Gezinsagenda",
+    "type": "calendar",
+    "icon": "calendar-days",
+    "sections": [
+      "Schooldag",
+      "Gezinsafspraken",
+      "Wie gaat mee"
+    ],
+    "intro": "Een rustig overzicht van uw tijd.",
+    "shared": false
+  },
+  "/apps/foundation/keuken.html": {
+    "name": "Gezinskeuken",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Weekmenu",
+      "Boodschappenlijst",
+      "Vaste boodschappen"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/foundation/gezondheid-welzijn.html": {
+    "name": "Gezondheid & Welzijn",
+    "type": "health",
+    "icon": "heart",
+    "sections": [
+      "Wat helpt vandaag?",
+      "Hoe gaat het vandaag?",
+      "Een ritme dat bij u past."
+    ],
+    "intro": "Uw eigen informatie en afspraken rustig bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/gezondheid.html": {
+    "name": "Gezondheidsmaatje",
+    "type": "health",
+    "icon": "heart",
+    "sections": [
+      "Uw eigen ritme",
+      "Contactpersonen",
+      "Medische informatie"
+    ],
+    "intro": "Uw eigen informatie en afspraken rustig bij elkaar.",
+    "shared": false
+  },
+  "/apps/ghost.html": {
+    "name": "Ghost Driver",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Geplande rit",
+      "Mogelijke knelpunten",
+      "Alternatieven"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/foundation/os-bestuur.html": {
+    "name": "Governance",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Besluiten",
+      "Verantwoording",
+      "Toezicht"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/move.html": {
+    "name": "Haal ik het?",
+    "type": "route",
+    "icon": "route",
+    "sections": [
+      "De overgangen",
+      "Bestemming",
+      "Overstappen"
+    ],
+    "intro": "Bekijk de route en wat onderweg aandacht vraagt.",
+    "shared": false
+  },
+  "/apps/hangar.html": {
+    "name": "Hangar",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Uw toestel",
+      "Vluchtplanning",
+      "Vlieguren en documenten"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/rtg.html": {
+    "name": "Het Huis",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw reis, documenten en open acties bij elkaar.",
+      "Uw dagelijkse basis.",
+      "Stille luxe, met echte regie."
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/rtgkantoor.html": {
+    "name": "Het RTG Kantoor · de RTG AI",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Actueel werk",
+      "Onderzoeksjournaal",
+      "Beoordeling"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/living-os.html": {
+    "name": "Het Vooruitzicht",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Voeg eerst een intentie toe.",
+      "Leg eerst vast wat u wilt.",
+      "Voorbereiding vrijgeven"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/gevoel.html": {
+    "name": "Hoe voel je je?",
+    "type": "health",
+    "icon": "heart",
+    "sections": [
+      "Uw gevoel vandaag",
+      "Eigen dagboek",
+      "Even praten"
+    ],
+    "intro": "Uw eigen informatie en afspraken rustig bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca.html": {
+    "name": "Horeca",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Eén ritme door de hele zaak.",
+      "Van gerecht naar levende operatie.",
+      "De hele zaak. Eén veilige beweging."
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/leverancier-service.html": {
+    "name": "Hulp van RTG",
+    "type": "call",
+    "icon": "video",
+    "sections": [
+      "Uw gesprek",
+      "Deelnemers",
+      "Gedeeld scherm"
+    ],
+    "intro": "Spreek elkaar, met ruimte om samen te kijken.",
+    "shared": false
+  },
+  "/apps/foundation/hulpwijzer.html": {
+    "name": "Hulpwijzer",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Weet je niet waar te beginnen?",
+      "Uw keuzes",
+      "Hulp vinden"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/verificatie.html": {
+    "name": "Identiteit aantonen",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Waar u nu staat",
+      "Twee stappen",
+      "Uw identiteitsbewijs"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/isolatie.html": {
+    "name": "Isolatiemodus",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "De effectieve stand",
+      "Een drager verstrengen",
+      "Lopende ontsluitingen"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/juridisch.html": {
+    "name": "Juridisch",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "Uw document",
+      "Versies",
+      "Toegang"
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": false
+  },
+  "/apps/foundation/klas.html": {
+    "name": "Klas",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Uw leerpad",
+      "Oefenen",
+      "Terugkijken"
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/foundation/kleuren.html": {
+    "name": "Kleuren en vormen",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/foundation/klimaatfonds.html": {
+    "name": "Klimaatfonds",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Dichtbij",
+      "Uw deelname",
+      "Contact"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/foundation/klusjes.html": {
+    "name": "Klusjes en sterren",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Uw klusjes",
+      "Verdeling",
+      "Samen terugkijken"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/foundation/kompas.html": {
+    "name": "Kompas",
+    "type": "health",
+    "icon": "heart",
+    "sections": [
+      "Goed om te weten",
+      "Uw ritme",
+      "Uw aantekeningen"
+    ],
+    "intro": "Uw eigen informatie en afspraken rustig bij elkaar.",
+    "shared": false
+  },
+  "/apps/geld.html#labfonds": {
+    "name": "Lab-fonds",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Uw bijdrage",
+      "Onderzoeksdoelen",
+      "Verantwoording"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/foundation/leren.html": {
+    "name": "Leren & Groei",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Vandaag",
+      "Uw tempo",
+      "Iemand naast u nodig?"
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/foundation/liedjes.html": {
+    "name": "Liedjes en versjes",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Voor de meezinger",
+      "Bewaard",
+      "Recent"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/livinglab.html": {
+    "name": "Living Lab",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Onderzoeken",
+      "Deelname",
+      "Toestemming"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/wereld.html": {
+    "name": "LivingOS Home",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Het leven, met elkaar.",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/geld.html#logboek": {
+    "name": "Logboek",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Uw object",
+      "Volgende onderhoudsbeurt",
+      "Onderhoudshistorie"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/loonstrook.html": {
+    "name": "Loon",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Uw loonperiode",
+      "Loonstroken",
+      "Inzagegeschiedenis"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/foundation/budget.html": {
+    "name": "Maandbegroting",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Inkomsten",
+      "Uitgaven",
+      "Ruimte om te sparen"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/foundation/magazine.html": {
+    "name": "Magazine",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Verhalen",
+      "Gezinstips",
+      "Eigen bijdragen"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/magnaat.html": {
+    "name": "Magnaat",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Uw werkvloer vraagt een keuze",
+      "Kies uw volgende uitdaging",
+      "Uw wereld vandaag"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/magnaat-partnerstudio.html": {
+    "name": "Magnaat Partnerstudio",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "De digitale tweeling wordt voorbereid",
+      "Van officiële partner naar speelbaar bedrijf",
+      "Uw bedrijf in één gecontroleerd model"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/spelen.html?pas=foundation&open=magnaat": {
+    "name": "Magnaat voor Foundation",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/maison.html": {
+    "name": "Maison",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Huishoudelijke taken",
+      "Wie helpt mee",
+      "Huislogboek"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/mall.html": {
+    "name": "Mall",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Gevonden",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/foundation/markt.html": {
+    "name": "Markt",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Uw selectie",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/geld.html#mecenaat": {
+    "name": "Mecenaat",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Gekozen doel",
+      "Toezeggingen",
+      "Gedane giften"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/medicijnen.html": {
+    "name": "Medicijnen",
+    "type": "health",
+    "icon": "heart",
+    "sections": [
+      "Volgend innamemoment",
+      "Uw middelen",
+      "Eigen notities"
+    ],
+    "intro": "Uw eigen informatie en afspraken rustig bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/meedoen-ontdekken.html": {
+    "name": "Meedoen & Ontdekken",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Kies uw stad",
+      "Voor u in de buurt",
+      "Dichtbij, zonder u te volgen."
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/meet.html": {
+    "name": "Meet",
+    "type": "call",
+    "icon": "video",
+    "sections": [
+      "Uw gesprek",
+      "Deelnemers",
+      "Gedeeld scherm"
+    ],
+    "intro": "Spreek elkaar, met ruimte om samen te kijken.",
+    "shared": true
+  },
+  "/apps/memo.html": {
+    "name": "Memo",
+    "type": "capture",
+    "icon": "camera",
+    "sections": [
+      "Voorbeeld",
+      "Opname",
+      "Bewaren"
+    ],
+    "intro": "Uw opname blijft een concept tot u deze bewaart.",
+    "shared": false
+  },
+  "/apps/foundation/memorie.html": {
+    "name": "Memorie",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/merken.html": {
+    "name": "Merken & vestigingen",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Merken",
+      "Vestigingen",
+      "Verantwoordelijken"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/geld.html#metier": {
+    "name": "Métier",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Uw beroepsprofiel",
+      "Bevestigde rollen",
+      "Delen met een werkgever"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/concern.html": {
+    "name": "Mijn concern",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Entiteiten",
+      "Bestuur",
+      "Bevoegdheden"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/os-donateur.html": {
+    "name": "Mijn giften",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Uw giften",
+      "Bestemming",
+      "Verantwoording"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/foundation/os-deelnemer.html": {
+    "name": "Mijn hulpvraag",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Uw vraag",
+      "Contact en afspraken",
+      "Voortgang"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/foundation/leerpaspoort.html": {
+    "name": "Mijn leerpaspoort",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Uw leerlijn",
+      "Volgende les",
+      "Behaalde doelen"
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/leven.html": {
+    "name": "Mijn leven",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Maison Noire",
+      "Salon Privé",
+      "Chef aan huis"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/foundation/os-veld.html": {
+    "name": "Mijn lijst",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Uw werklijst",
+      "Afspraken",
+      "Terugkoppeling"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/labpas.html": {
+    "name": "Mijn Living Lab",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw onderzoek",
+      "Uw toestemming",
+      "Terugkoppeling"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/loopbaan.html": {
+    "name": "Mijn loopbaan",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "De reeks",
+      "Iets toevoegen",
+      "De zeven voorraden"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/mijnmall.html": {
+    "name": "Mijn Mall",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Uw selectie",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/mijn-neigingen.html": {
+    "name": "Mijn neigingen",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Uw toegang",
+      "Toestemmingen",
+      "Activiteit"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/app.html": {
+    "name": "Mijn RTG",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Jouw reis.",
+      "Betalen.",
+      "Jouw AI."
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/zaakweb.html": {
+    "name": "Mijn RTG-website",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Uw concept",
+      "Bewerken",
+      "Voorvertoning"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/stad.html": {
+    "name": "Mijn Stad",
+    "type": "route",
+    "icon": "route",
+    "sections": [
+      "Vertrek",
+      "Bestemming",
+      "Overstappen"
+    ],
+    "intro": "Bekijk de route en wat onderweg aandacht vraagt.",
+    "shared": false
+  },
+  "/apps/vertegenwoordiging.html": {
+    "name": "Mijn team",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Mijn team",
+      "Mijn eigen grens",
+      "Wat er namens mij is gebeurd"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/foundation/os-vrijwilliger.html": {
+    "name": "Mijn vrijwilligerswerk",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Uw beschikbaarheid",
+      "Taken",
+      "Uw contactpersoon"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/geld.html#nalatenschap": {
+    "name": "Nalatenschap",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "Uw documenten",
+      "Vertrouwenspersonen",
+      "Persoonlijke wensen"
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": false
+  },
+  "/apps/navigatie.html": {
+    "name": "Navigatie",
+    "type": "route",
+    "icon": "route",
+    "sections": [
+      "De weg denkt mee.",
+      "Route",
+      "Kaarten"
+    ],
+    "intro": "Bekijk de route en wat onderweg aandacht vraagt.",
+    "shared": false
+  },
+  "/apps/nieuws.html": {
+    "name": "Nieuws",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Voor u",
+      "Bewaard",
+      "Recent"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/notities.html": {
+    "name": "Notities & Taken",
+    "type": "note",
+    "icon": "notebook-pen",
+    "sections": [
+      "Uw overzicht",
+      "Volgende stap",
+      "Bewaard"
+    ],
+    "intro": "Uw notities, afwegingen en plannen bij elkaar.",
+    "shared": true
+  },
+  "/apps/foundation/ochtend.html": {
+    "name": "Ochtendritme",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Uw ochtendstappen",
+      "Wat al gelukt is",
+      "Samen verder"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/onderhoud.html": {
+    "name": "Onderhoud",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Open melding",
+      "Afspraak met een vakmens",
+      "Voortgang"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/onderneming.html": {
+    "name": "Onderneming",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw organisatie",
+      "Open acties",
+      "Bedrijfsgegevens"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/mediawijs.html": {
+    "name": "Online wijs",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Als het echt misgaat",
+      "Even sparren over schermen?",
+      "Terugkijken"
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/connect.html": {
+    "name": "Ontdekken",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Ontdek",
+      "Jij",
+      "Wat u hebt gedaan"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/foundation/dromen.html": {
+    "name": "Onze dromen",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Uw droom",
+      "Kleine volgende stap",
+      "Samen bespreken"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/foundation/reis.html": {
+    "name": "Op reis",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Uw reisplan",
+      "Paklijst",
+      "Onderweg"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/oppasinfo.html": {
+    "name": "Oppasinformatie",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Noodcontacten",
+      "Allergieën",
+      "Eten en bedtijd"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/foundation/opvoeden.html": {
+    "name": "Opvoedhulp",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Waar loop je tegenaan?",
+      "Vraag het je opvoedcoach",
+      "Hulp vinden"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/ovdienst.html": {
+    "name": "OV-dienst",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Uw lijn",
+      "Volgende halte",
+      "Dienstafspraken"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/ovroutes.html": {
+    "name": "OV-routes",
+    "type": "route",
+    "icon": "route",
+    "sections": [
+      "Uw lijnen",
+      "Nieuwe lijn",
+      "Overstappen"
+    ],
+    "intro": "Bekijk de route en wat onderweg aandacht vraagt.",
+    "shared": false
+  },
+  "/apps/overheidspda.html": {
+    "name": "Overheids-PDA",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw werk",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/overhoren.html": {
+    "name": "Overhoren",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Nieuwe lijst",
+      "Jouw lijsten",
+      "Jouw duels"
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/partner-network.html": {
+    "name": "Partner Network",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Viering zonder drukte.",
+      "Vier beloften sluiten op elkaar aan.",
+      "Alles loopt volgens belofte."
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/partner-worden.html": {
+    "name": "Partner worden",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw aanvraag",
+      "Bedrijfsgegevens",
+      "Afspraken"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/juridisch/partnervoorwaarden.html": {
+    "name": "Partnervoorwaarden",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "1. Het partnerschap en 0% commissie",
+      "2. Het verplichte Salon-bedrijfsaccount",
+      "3. Betalingen en het betaalmoment"
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": false
+  },
+  "/apps/passkeys.html": {
+    "name": "Passkeys",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Uw eerste passkey",
+      "Inloggen met een passkey",
+      "Mijn passkeys"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/personeel.html": {
+    "name": "Personeel",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw dienst",
+      "Teamrooster",
+      "Uw profiel"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/pesten.html": {
+    "name": "Pesten",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Wat kun je doen?",
+      "Ik wil het mijn gezin vertellen",
+      "Praat met een maatje"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/platformregister.html": {
+    "name": "Platformregister",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Geregistreerde onderdelen",
+      "Relaties",
+      "Onderbouwing"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/podium.html": {
+    "name": "Podium",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Nu live",
+      "Alle kanalen",
+      "Mijn kanaal"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/mijn-post.html": {
+    "name": "Post van RTG",
+    "type": "mail",
+    "icon": "mail",
+    "sections": [
+      "Postvak",
+      "Uw concept",
+      "Afspraken"
+    ],
+    "intro": "Uw correspondentie en de afspraken die eruit voortkomen.",
+    "shared": false
+  },
+  "/apps/foundation/privacy.html": {
+    "name": "Privacy",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Wat we beschermen",
+      "Locatie is altijd jouw keuze",
+      "Wie ziet wat"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/juridisch/privacy.html": {
+    "name": "Privacybeleid",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "1. Pseudonimisering: de codenaam",
+      "2. Welke gegevens we verwerken, en waarom",
+      "3. Wat we niet doen"
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": false
+  },
+  "/apps/sociaal-prive.html": {
+    "name": "Privé",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Uw besloten ruimtes",
+      "Meet",
+      "Vonk"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/lifestyle.html": {
+    "name": "Privekantoor",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw werk",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/project-room.html": {
+    "name": "Project Room",
+    "type": "note",
+    "icon": "notebook-pen",
+    "sections": [
+      "Uw volgende stap",
+      "Projectdossier",
+      "Oplevering"
+    ],
+    "intro": "Uw notities, afwegingen en plannen bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/projecten.html": {
+    "name": "Projecten",
+    "type": "note",
+    "icon": "notebook-pen",
+    "sections": [
+      "Jullie projecten",
+      "Project",
+      "Taken (tik om een taak te pakken)"
+    ],
+    "intro": "Uw notities, afwegingen en plannen bij elkaar.",
+    "shared": false
+  },
+  "/apps/pulse.html": {
+    "name": "Pulse",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Uw kring",
+      "Gesprekken",
+      "Gedeelde momenten"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/redactie-pda.html": {
+    "name": "Redactie PDA",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Uw concept",
+      "Bewerken",
+      "Voorvertoning"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/foundation/registreren.html": {
+    "name": "Registreren bij FOUNDATION",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Hoe wilt u meedoen",
+      "Uw gezinsruimte",
+      "Uw toestemming"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/reisboek.html": {
+    "name": "Reisboek",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Reis beheren",
+      "Verblijf",
+      "Reisdocumenten"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/reisbureau.html": {
+    "name": "Reisbureau",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Vertel ons hoe u wilt reizen.",
+      "Verblijf",
+      "Reisdocumenten"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/reizen-veilig.html": {
+    "name": "Reizen & Veilig",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Alleen delen wat nodig is",
+      "Ibiza, jetset-week",
+      "Gstaad, alpien weekend"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/rendezvous.html": {
+    "name": "Rendez-vous",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Uw introductie",
+      "Beschikbaarheid",
+      "Afspraakvoorstel"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/residentie.html": {
+    "name": "Residentie",
+    "type": "stay",
+    "icon": "bed-double",
+    "sections": [
+      "Uw residentie",
+      "De huisgids",
+      "Contact tijdens uw verblijf"
+    ],
+    "intro": "Uw verblijf en aankomst rustig voorbereid.",
+    "shared": false
+  },
+  "/apps/rijksloket.html": {
+    "name": "Rijks-loket (ambtenaar)",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw zaak",
+      "Documenten",
+      "Bekendmakingen"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/rit.html": {
+    "name": "Ritstatus",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Heenreis",
+      "Verblijf",
+      "Reisdocumenten"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/routedekking.html": {
+    "name": "Routedekking",
+    "type": "route",
+    "icon": "route",
+    "sections": [
+      "Dekking per domein",
+      "Bronnen",
+      "Ontbrekende schakels"
+    ],
+    "intro": "Bekijk de route en wat onderweg aandacht vraagt.",
+    "shared": false
+  },
+  "/apps/routedossier.html": {
+    "name": "Routedossier",
+    "type": "route",
+    "icon": "route",
+    "sections": [
+      "Uw route",
+      "Verbindingen",
+      "Bewijs en bronnen"
+    ],
+    "intro": "Bekijk de route en wat onderweg aandacht vraagt.",
+    "shared": false
+  },
+  "/apps/office.html": {
+    "name": "RTDocs",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "Daarna",
+      "RTG Office",
+      "Werk dat door kan."
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": true
+  },
+  "/apps/foundation/mail.html": {
+    "name": "RTF Mail",
+    "type": "mail",
+    "icon": "mail",
+    "sections": [
+      "Nieuw bericht",
+      "Uw concept",
+      "Afspraken"
+    ],
+    "intro": "Uw correspondentie en de afspraken die eruit voortkomen.",
+    "shared": false
+  },
+  "/apps/foundation/bieb.html": {
+    "name": "RTF-Bibliotheek",
+    "type": "library",
+    "icon": "book-open",
+    "sections": [
+      "Uw apps",
+      "Leeftijd en interesse",
+      "Uw volgende keuze"
+    ],
+    "intro": "Een rustige plek om te zoeken, te kiezen en verder te lezen.",
+    "shared": false
+  },
+  "/apps/foundation/kantoor.html": {
+    "name": "RTF-kantoor",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw werk",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/index.html": {
+    "name": "RTFoundation",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Wat er voor u klaarstaat",
+      "Groeien op uw eigen tempo.",
+      "Uw ontwikkeling"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/os-publiek.html": {
+    "name": "RTFoundation in jouw buurt",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Alles wat in FoundationOS hangt.",
+      "Uw deelname",
+      "Contact"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/foundation/os-portaal.html": {
+    "name": "RTFoundation portaal",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Dichtbij",
+      "Uw deelname",
+      "Contact"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/luchthaven.html": {
+    "name": "RTG Airport (operations)",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Uw werkplek",
+      "Vluchtbewegingen",
+      "Open meldingen"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/architect-pda.html": {
+    "name": "RTG Architect PDA",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw project",
+      "Inspectie",
+      "Notities en beelden"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/pakketten.html": {
+    "name": "RTG Bedrijfspakketten",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Werkplekken",
+      "Inbegrepen mogelijkheden",
+      "Voorwaarden"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/browser.html": {
+    "name": "RTG Browser",
+    "type": "library",
+    "icon": "book-open",
+    "sections": [
+      "Uw websites",
+      "Bewaard",
+      "Recent bekeken"
+    ],
+    "intro": "Een rustige plek om te zoeken, te kiezen en verder te lezen.",
+    "shared": false
+  },
+  "/apps/chauffeur.html": {
+    "name": "RTG Chauffeur",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Uw rit",
+      "Ophaallocatie",
+      "Ritlog"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/command.html": {
+    "name": "RTG Command",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Actuele signalen",
+      "Besluiten",
+      "Uitvoering"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/magnaat-kantoor.html": {
+    "name": "RTG Controleregister · Boardroom",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Controleregister",
+      "Testtaken",
+      "Onderbouwing"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/defensie.html": {
+    "name": "RTG Defensie",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw eenheid",
+      "Materieel",
+      "Bevoorrading"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/dispatch.html": {
+    "name": "RTG Dispatch",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Open opdrachten",
+      "Onderweg",
+      "Beschikbare vloot"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/werkplek.html": {
+    "name": "RTG Enterprise Campus",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw werk",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/oog.html": {
+    "name": "RTG Eye",
+    "type": "capture",
+    "icon": "camera",
+    "sections": [
+      "Voertuigschouw",
+      "Laatste schouwen",
+      "Werkvloer"
+    ],
+    "intro": "Uw opname blijft een concept tot u deze bewaart.",
+    "shared": false
+  },
+  "/apps/festival.html": {
+    "name": "RTG Festival",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Locaties",
+      "Servicevragen",
+      "Open aandachtspunten"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/festival-gast.html": {
+    "name": "RTG Festival · uw weekend",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw pas",
+      "Programma",
+      "Uw gezelschap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/geld.html": {
+    "name": "RTG Geld",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Overzicht",
+      "Bewegingen",
+      "Uw akkoord"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/gemeente.html": {
+    "name": "RTG Gemeente",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw melding",
+      "Afspraken",
+      "Uw aanvragen"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/handel.html": {
+    "name": "RTG Handel: inkoop tussen zaken",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Uw selectie",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/hardware-pda.html": {
+    "name": "RTG Hardware PDA",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw apparaat",
+      "Controle",
+      "Service"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/home.html": {
+    "name": "RTG Home Kit",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Uw scènes",
+      "Apparaten",
+      "Bediening"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/horeca-bar.html": {
+    "name": "RTG Horeca: bar",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Drankbonnen",
+      "Bereiding",
+      "Uitgifte"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca-beheer.html": {
+    "name": "RTG Horeca: beheer",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Dagplanning",
+      "Personeel",
+      "Signalen"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca-bezorg.html": {
+    "name": "RTG Horeca: bezorging",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Klaar voor vertrek",
+      "Bezorgritten",
+      "Aflevering"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca-club.html": {
+    "name": "RTG Horeca: club",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Deur en toegang",
+      "Tafels",
+      "Clubtegoed"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca-events.html": {
+    "name": "RTG Horeca: events",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Offerte",
+      "Verbruik",
+      "Nacalculatie"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca-expeditie.html": {
+    "name": "RTG Horeca: expeditie",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Open bonnen",
+      "Bereiding",
+      "Uitgifte"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca-haccp.html": {
+    "name": "RTG Horeca: HACCP",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Controlepunten",
+      "Metingen",
+      "Afwijkingen"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca-hotel.html": {
+    "name": "RTG Horeca: hotel",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Gastrekening",
+      "Roomservice",
+      "Overdracht"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca-pda.html": {
+    "name": "RTG Horeca: PDA Service",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Nu  over de grens",
+      "Ook open",
+      "Wijken"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/horeca-vloer.html": {
+    "name": "RTG Horeca: vloer",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Tafels",
+      "Bestellingen",
+      "Servicevragen"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/rtgid.html": {
+    "name": "RTG iD",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Inloggen bij een dienst",
+      "Actieve toegang",
+      "Machtigingen"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/kantoor.html": {
+    "name": "RTG Kantoor",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Dit verdient uw aandacht.",
+      "Vandaag",
+      "Wat er verder speelt"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/klankwerk.html": {
+    "name": "RTG Klankwerk",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Uw project",
+      "Sporen",
+      "Notenrol"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/kosten.html": {
+    "name": "RTG Kostprijs",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Gebruikerskosten",
+      "Dekking",
+      "Maandraming"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/zaakkosten.html": {
+    "name": "RTG Kostprijs: wat uw zaak ons kost",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Uw kosten",
+      "Verbruik",
+      "Periode"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/krant.html": {
+    "name": "RTG Krant",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Voor u",
+      "Bewaard",
+      "Recent"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/lesmaker.html": {
+    "name": "RTG Lesmaker",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Uw concept",
+      "Bewerken",
+      "Voorvertoning"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/life.html": {
+    "name": "RTG Life",
+    "type": "health",
+    "icon": "heart",
+    "sections": [
+      "Uw dag",
+      "Hoe u ervoor staat",
+      "Hoe zit u erbij"
+    ],
+    "intro": "Uw eigen informatie en afspraken rustig bij elkaar.",
+    "shared": false
+  },
+  "/apps/media.html": {
+    "name": "RTG Media",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Nieuwe productie",
+      "Releasecontrole",
+      "Recent"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/meldkamer.html": {
+    "name": "RTG Meldkamer",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Open meldingen",
+      "Eenheden",
+      "Overdracht"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/ovcontrol.html": {
+    "name": "RTG Mobility Control Tower",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Lijnen en diensten",
+      "Afwijkingen",
+      "Beschikbare voertuigen"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/lab.html": {
+    "name": "RTG Onderzoekslab",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw onderzoek",
+      "Onderbouwing",
+      "Beoordeling"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/rtgone.html": {
+    "name": "RTG One",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Vandaag",
+      "Beslis met zicht op het gevolg.",
+      "Laat werk doorlopen, zonder alles over te dragen."
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/ov.html": {
+    "name": "RTG OV",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Alles voor uw volgende reis",
+      "Waar gaat het heen?",
+      "Hoe wilt u reizen?"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/leverancier.html": {
+    "name": "RTG Partners, leverancier-app",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Vandaag.",
+      "Bestellingen",
+      "Ritten"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/zaakpay.html": {
+    "name": "RTG Pay · de zaak",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Overzicht",
+      "Bewegingen",
+      "Uw akkoord"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/payroll.html": {
+    "name": "RTG Payroll · het loonkantoor",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Loonperiode",
+      "Te controleren",
+      "Klaar voor akkoord"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/redactie.html": {
+    "name": "RTG Redactie · Journalistiek",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Snel nieuws plaatsen",
+      "Nieuw blok",
+      "Kies beeld"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/redactiekantoor.html": {
+    "name": "RTG Redactie (kantoor)",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Uw concept",
+      "Bewerken",
+      "Voorvertoning"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/reizen.html": {
+    "name": "RTG Reizen",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Alles voor onderweg.",
+      "Uw reisboek",
+      "Uw volgende stap"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/schoolpartner.html": {
+    "name": "RTG School Partner",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Alles wat een schooldag nodig heeft.",
+      "Goed bestuur begint met overzicht.",
+      "Jouw werk, met jouw bevoegdheden."
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/service.html": {
+    "name": "RTG Service · de wachtrij",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw werk",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/sociaal.html": {
+    "name": "RTG Sociaal",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Uw volgende moment",
+      "Uw kring",
+      "Tijdlijn"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/muziek.html": {
+    "name": "RTG Sound",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Meer dan muziek.",
+      "Stations",
+      "Straks in de wachtrij"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/stadsdoos.html": {
+    "name": "RTG Stadsdoos veld-app",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw opdracht",
+      "Locatie",
+      "Terugkoppeling"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/studio-pda.html": {
+    "name": "RTG Studio PDA",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Uw concept",
+      "Bewerken",
+      "Voorvertoning"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/veilig.html": {
+    "name": "RTG Veilig",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Uw kring",
+      "Meer rust en zekerheid",
+      "Hulp vinden"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/voertuig.html": {
+    "name": "RTG Voertuig",
+    "type": "fleet",
+    "icon": "car-front",
+    "sections": [
+      "Gekozen voertuig",
+      "Papieren",
+      "Onderhoud"
+    ],
+    "intro": "Voertuigen, ritten en de mensen die ze uitvoeren.",
+    "shared": false
+  },
+  "/apps/werk.html": {
+    "name": "RTG Werk OS",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw organisatie, rustig in beeld.",
+      "Wat vraagt aandacht?",
+      "Besluiten met menselijke autoriteit."
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/zakelijk.html": {
+    "name": "RTG Zakelijk vervoer",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Wacht op uw akkoord",
+      "Het reisbeleid",
+      "Wat uw medewerker ziet"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/geld.html#rtgcode": {
+    "name": "RTG-code",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Betaalcode",
+      "Toegangscode",
+      "Geldigheid"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/rtmail.html": {
+    "name": "RTMail",
+    "type": "mail",
+    "icon": "mail",
+    "sections": [
+      "Daarna",
+      "Kies een bericht",
+      "RTMAIL"
+    ],
+    "intro": "Uw correspondentie en de afspraken die eruit voortkomen.",
+    "shared": false
+  },
+  "/apps/leverancier-rtmail.html": {
+    "name": "RTMAIL zaak",
+    "type": "mail",
+    "icon": "mail",
+    "sections": [
+      "Postvak",
+      "Uw concept",
+      "Afspraken"
+    ],
+    "intro": "Uw correspondentie en de afspraken die eruit voortkomen.",
+    "shared": false
+  },
+  "/apps/foundation/rust.html": {
+    "name": "Rust",
+    "type": "health",
+    "icon": "heart",
+    "sections": [
+      "Rustmoment",
+      "Uw ademruimte",
+      "Geluid naar keuze"
+    ],
+    "intro": "Uw eigen informatie en afspraken rustig bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/samen-thuis.html": {
+    "name": "Samen Thuis",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Vandaag",
+      "Niet perfect, wel samen.",
+      "Ons gezin."
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/scanner.html": {
+    "name": "Scanner",
+    "type": "capture",
+    "icon": "camera",
+    "sections": [
+      "Voorbeeld",
+      "Opname",
+      "Bewaren"
+    ],
+    "intro": "Uw opname blijft een concept tot u deze bewaart.",
+    "shared": false
+  },
+  "/apps/foundation/school.html": {
+    "name": "School",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Een rustige schooldag.",
+      "Van aanmelden naar een echte werkruimte.",
+      "Terugkijken"
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/rtgschool.html": {
+    "name": "School",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Uw leerpad",
+      "Oefenen",
+      "Terugkijken"
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/foundation/schoolbieb.html": {
+    "name": "School-Bibliotheek",
+    "type": "library",
+    "icon": "book-open",
+    "sections": [
+      "Vakken",
+      "Jaar en niveau",
+      "Oefenmateriaal"
+    ],
+    "intro": "Een rustige plek om te zoeken, te kiezen en verder te lezen.",
+    "shared": false
+  },
+  "/apps/foundation/schrift.html": {
+    "name": "Schrift",
+    "type": "note",
+    "icon": "notebook-pen",
+    "sections": [
+      "Uw schrift",
+      "Aantekeningen",
+      "Opgaven"
+    ],
+    "intro": "Uw notities, afwegingen en plannen bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/schrijven.html": {
+    "name": "Schrijven",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Jouw bewaarde stukken",
+      "Bewerken",
+      "Voorvertoning"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/spelen.html": {
+    "name": "Spelen",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Mens erger je niet",
+      "Schaken",
+      "Woordduel"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/sport.html": {
+    "name": "Sport",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/foundation/presenteren.html": {
+    "name": "Spreekbeurt en presentatie",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Waar gaat het over",
+      "Je opbouw",
+      "Hardop oefenen"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/foundation/partner.html": {
+    "name": "Stadsraad",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Dichtbij",
+      "Uw deelname",
+      "Contact"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/foundation/steun.html": {
+    "name": "Steun voor jou",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Hoe gaat het echt met jou?",
+      "Even je hart luchten",
+      "Wanneer het te veel wordt"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/table.html": {
+    "name": "Table",
+    "type": "hospitality",
+    "icon": "utensils",
+    "sections": [
+      "Gasten en dieetwensen",
+      "Tafelindeling",
+      "Menu per gang"
+    ],
+    "intro": "Gasten, voorbereiding en uitvoering bij elkaar.",
+    "shared": false
+  },
+  "/apps/techniek.html": {
+    "name": "Technische status",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Systeemstatus",
+      "Open incidenten",
+      "Onderzoek"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/tellen.html": {
+    "name": "Tellen tot tien",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/theater.html": {
+    "name": "Theater",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Uw abonnementen",
+      "Nieuw in de zaal",
+      "Van uw werk"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/thuis.html": {
+    "name": "Thuis",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Uw selectie",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/tijdlijn.html": {
+    "name": "Tijdlijn",
+    "type": "note",
+    "icon": "notebook-pen",
+    "sections": [
+      "Terugkijken",
+      "Volgende stap",
+      "Bewaard"
+    ],
+    "intro": "Uw notities, afwegingen en plannen bij elkaar.",
+    "shared": false
+  },
+  "/apps/toestemming.html": {
+    "name": "Toestemming",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Wat er nu mag",
+      "Wie heeft er gekeken",
+      "Wat u kunt aantonen"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/foundation/toetsen.html": {
+    "name": "Toetsen",
+    "type": "calendar",
+    "icon": "calendar-days",
+    "sections": [
+      "Uw volgende toets",
+      "Leerplanning",
+      "Oefenstof"
+    ],
+    "intro": "Een rustig overzicht van uw tijd.",
+    "shared": false
+  },
+  "/apps/training.html": {
+    "name": "Training",
+    "type": "health",
+    "icon": "heart",
+    "sections": [
+      "Vandaag op schema",
+      "Uw trainingsplan",
+      "Eigen voortgang"
+    ],
+    "intro": "Uw eigen informatie en afspraken rustig bij elkaar.",
+    "shared": false
+  },
+  "/apps/scherm.html": {
+    "name": "Tweede scherm",
+    "type": "game",
+    "icon": "puzzle",
+    "sections": [
+      "Kiezen",
+      "Samen spelen",
+      "Spelregels"
+    ],
+    "intro": "Kies een spel of activiteit en bepaal uw eigen tempo.",
+    "shared": false
+  },
+  "/apps/uitgaan.html": {
+    "name": "Uitgaan",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Nog iets toevoegen?",
+      "Bijzonderheden",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/klankwerk-kantoor.html": {
+    "name": "Uitgave beoordelen",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Wat u hier beslist",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/reisuitnodiging.html": {
+    "name": "Uw reis staat klaar",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Heenreis",
+      "Verblijf",
+      "Reisdocumenten"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/vandaag.html": {
+    "name": "Vandaag",
+    "type": "calendar",
+    "icon": "calendar-days",
+    "sections": [
+      "Eerstvolgende afspraak",
+      "Aandacht nodig",
+      "Uw avond"
+    ],
+    "intro": "Een rustig overzicht van uw tijd.",
+    "shared": false
+  },
+  "/apps/foundation/veilig-vertrouwd.html": {
+    "name": "Veilig & Vertrouwd",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Hoe is het nu?",
+      "Wie liet iets weten?",
+      "U bepaalt wie dichtbij mag komen."
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/foundation/veilig.html": {
+    "name": "Veilig thuis",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Waar ben je nu?",
+      "Waar is iedereen?",
+      "Ik voel me niet veilig"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/hotels.html": {
+    "name": "Verblijven",
+    "type": "stay",
+    "icon": "bed-double",
+    "sections": [
+      "Aankomst",
+      "Uw verblijf",
+      "Vertrek"
+    ],
+    "intro": "Uw verblijf en aankomst rustig voorbereid.",
+    "shared": false
+  },
+  "/apps/foundation/studie.html": {
+    "name": "Verder leren",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Gratis en goedkope wegen",
+      "Vraag het je studiecoach",
+      "Terugkijken"
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/foundation/verjaardagen.html": {
+    "name": "Verjaardagen & wensen",
+    "type": "calendar",
+    "icon": "calendar-days",
+    "sections": [
+      "Verjaardagen",
+      "Wensenlijst",
+      "Samen iets regelen"
+    ],
+    "intro": "Een rustig overzicht van uw tijd.",
+    "shared": false
+  },
+  "/apps/leverancier-commerce.html": {
+    "name": "Verkoopwegen en retouren",
+    "type": "shop",
+    "icon": "shopping-bag",
+    "sections": [
+      "Waarlangs u verkoopt",
+      "Wat er terugkomt",
+      "Voorwaarden"
+    ],
+    "intro": "Uw keuze, de voorwaarden en de volgende stap.",
+    "shared": false
+  },
+  "/apps/vertaler.html": {
+    "name": "Vertaler",
+    "type": "tools",
+    "icon": "wrench",
+    "sections": [
+      "Uw tekst",
+      "Voorbeeldvertaling",
+      "Reiszinnen"
+    ],
+    "intro": "Het juiste gereedschap, binnen dezelfde omgeving.",
+    "shared": true
+  },
+  "/apps/vluchten.html": {
+    "name": "Vluchten",
+    "type": "travel",
+    "icon": "plane",
+    "sections": [
+      "Heenreis",
+      "Verblijf",
+      "Reisdocumenten"
+    ],
+    "intro": "Uw reis, stap voor stap bij elkaar.",
+    "shared": false
+  },
+  "/apps/voeding.html": {
+    "name": "Voeding",
+    "type": "health",
+    "icon": "heart",
+    "sections": [
+      "Uw maaltijdplanning",
+      "Eigen voedingsnotities",
+      "Boodschappen"
+    ],
+    "intro": "Uw eigen informatie en afspraken rustig bij elkaar.",
+    "shared": false
+  },
+  "/apps/vonk.html": {
+    "name": "Vonk",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Wat u belangrijk vindt",
+      "Uw matches",
+      "Ontmoetingsvoorstel"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/foundation/verhaaltje.html": {
+    "name": "Voorleesverhaaltjes",
+    "type": "media",
+    "icon": "play",
+    "sections": [
+      "Voor de voorlezer",
+      "Bewaard",
+      "Recent"
+    ],
+    "intro": "Verder kijken, luisteren of lezen op uw tempo.",
+    "shared": false
+  },
+  "/apps/foundation/vrienden.html": {
+    "name": "Vrienden",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Contacten",
+      "Verhalen",
+      "Gedeelde momenten"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/mijn-sessies.html": {
+    "name": "Waar ben ik aanwezig",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Mijn sessies",
+      "Alles behalve deze",
+      "Activiteit"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/geld.html#wallet": {
+    "name": "Wallet",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Uw saldo",
+      "Betaalmiddelen",
+      "Recente bewegingen"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/foundation/rechten.html": {
+    "name": "Wat mag ik op welke leeftijd",
+    "type": "learning",
+    "icon": "graduation-cap",
+    "sections": [
+      "Ik ben",
+      "Hoeveel je mag werken",
+      "Lees dit erbij"
+    ],
+    "intro": "Leren en oefenen, met overzicht over uw volgende stap.",
+    "shared": false
+  },
+  "/apps/mijn-gegevens.html": {
+    "name": "Wat weet RTG van mij",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Uw toegang",
+      "Toestemmingen",
+      "Activiteit"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/sitemaker.html": {
+    "name": "Website-maker",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Uw pagina",
+      "Blokken",
+      "Voorvertoning"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/websitestudio.html": {
+    "name": "Website-studio",
+    "type": "create",
+    "icon": "pen-tool",
+    "sections": [
+      "Uw ontwerp",
+      "Blokken",
+      "Versies"
+    ],
+    "intro": "Uw werk krijgt vorm, stap voor stap.",
+    "shared": false
+  },
+  "/apps/foundation/werk.html": {
+    "name": "Werk en vacatures",
+    "type": "community",
+    "icon": "map-pin",
+    "sections": [
+      "Jouw desk",
+      "Beslis met feiten",
+      "Beste volgende kansen"
+    ],
+    "intro": "Ontdek mensen, activiteiten en mogelijkheden in uw omgeving.",
+    "shared": false
+  },
+  "/apps/werkruimte.html": {
+    "name": "Werkruimte",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw werk",
+      "Aandacht nodig",
+      "Volgende stap"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/ik.html": {
+    "name": "Wie ben ik",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Alles onder uw regie.",
+      "Uw account",
+      "Uw werelden"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/geld.html#wbw": {
+    "name": "Wie betaalt wat",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Uw groep",
+      "Groepsuitgaven",
+      "Verrekening"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/mijn-relaties.html": {
+    "name": "Wie heeft toegang tot mij",
+    "type": "identity",
+    "icon": "shield-check",
+    "sections": [
+      "Uw toegang",
+      "Toestemmingen",
+      "Activiteit"
+    ],
+    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "shared": false
+  },
+  "/apps/foundation/mijnbanden.html": {
+    "name": "Wie mag iets van mij zien",
+    "type": "social",
+    "icon": "users",
+    "sections": [
+      "Uw kring",
+      "Gesprekken",
+      "Gedeelde momenten"
+    ],
+    "intro": "De mensen en gesprekken die voor u tellen.",
+    "shared": false
+  },
+  "/apps/wonen.html": {
+    "name": "Wonen",
+    "type": "home",
+    "icon": "house",
+    "sections": [
+      "Thuis in beeld",
+      "Vandaag",
+      "Om te bewaren"
+    ],
+    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "shared": false
+  },
+  "/apps/woningdossier.html": {
+    "name": "Woningdossier",
+    "type": "files",
+    "icon": "file-text",
+    "sections": [
+      "Snel nodig",
+      "Apparaten thuis",
+      "Toegang"
+    ],
+    "intro": "Uw documenten, versies en gedeelde toegang.",
+    "shared": false
+  },
+  "/apps/doos.html": {
+    "name": "Zaakdoos",
+    "type": "workspace",
+    "icon": "briefcase-business",
+    "sections": [
+      "Uw apparatuur",
+      "Signalen",
+      "Werkopdrachten"
+    ],
+    "intro": "Het werk, de mensen en de volgende beslissing bij elkaar.",
+    "shared": false
+  },
+  "/apps/foundation/zakgeld.html": {
+    "name": "Zakgeld",
+    "type": "money",
+    "icon": "wallet",
+    "sections": [
+      "Uw spaarpot",
+      "Spaardoel",
+      "Bewegingen"
+    ],
+    "intro": "Bekijk eerst de gegevens en bepaal dan wat er gebeurt.",
+    "shared": false
+  },
+  "/apps/foundation/wegwijzer.html": {
+    "name": "Zelf iets in gang zetten",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Hier kan het nu niet",
+      "1. Bent u op dit moment veilig?",
+      "2. Kan iemand meekijken op dit toestel?"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  },
+  "/apps/foundation/zorg.html": {
+    "name": "Zorg",
+    "type": "safety",
+    "icon": "hand-heart",
+    "sections": [
+      "Uw volgende hulp",
+      "U houdt de regie.",
+      "Waar kunnen we bij helpen?"
+    ],
+    "intro": "Uw vertrouwde kring, uw keuzes en beschikbare hulp.",
+    "shared": false
+  }
+}

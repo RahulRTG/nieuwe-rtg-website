@@ -732,6 +732,12 @@
      niets. Stil de inbox tonen zou lijken alsof de knop kapot is (regel 5). */
   function uitDeWereld() {
     var q = new URLSearchParams(location.search);
+    var gekozen = q.get('gesprek');
+    if (gekozen) {
+      var bestaand = staat.gesprekken.find(function (g) { return g.id === gekozen; });
+      if (!bestaand) return Promise.reject(new Error('Dit gesprek is niet beschikbaar in uw inbox.'));
+      open(bestaand); return Promise.resolve();
+    }
     var met = q.get('met'), over = q.get('over'), lade = q.get('lade');
     /* ?lade= komt van de wereldschakelaar: kies je daar Business, dan opent de
        inbox in de la die daarbij hoort. We controleren hem tegen de laden die

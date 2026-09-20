@@ -1,0 +1,46 @@
+/* Native widgets share materials, not identical interiors. */
+.wd-world-label{display:none}
+@media(min-width:1000px){
+  .wd-world-label{display:inline;font:400 1rem/1.4 Inter,sans-serif;margin-inline:.7rem;color:var(--wh-ink);letter-spacing:0;text-transform:none}
+  .wd-shell .wd-widget{position:relative}
+  .wd-shell .wd-widget-open{padding-inline-end:3.1rem!important}
+  .wd-shell .wd-widget-pin{position:absolute;top:.65rem;inset-inline-end:.55rem;width:32px;min-height:30px;padding:0;font-size:0;border:0;background:none}
+  .wd-shell .wd-widget-pin::before{content:'☆';font:400 1.15rem/1 Inter,sans-serif}
+  .wd-shell .wd-widget-pin[aria-pressed="true"]::before{content:'★'}
+  .wd-shell .wd-widget{background:linear-gradient(145deg,color-mix(in srgb,var(--wd-accent) 6%,#1a1814),#10100e);box-shadow:inset 0 1px rgba(242,226,201,.035),0 9px 30px rgba(0,0,0,.12)}
+  .wd-shell .wd-widget-open{padding:.85rem 1rem .25rem}
+  .wd-widget-open .wd-widget-title{margin-bottom:.45rem}
+  .wd-widget-content{padding:.2rem 1rem .7rem;min-height:9rem;font:400 .8rem/1.5 Inter,sans-serif;color:var(--wh-ink)}
+  .wd-shell .wd-primary{display:block;min-height:38px;width:100%;padding:.55rem .8rem;margin:.9rem 0 .15rem;border:1px solid #b59a6c;border-radius:var(--rtg-radius-editorial);background:linear-gradient(110deg,#ead7b3,#b7926b);color:#231c12;box-shadow:0 3px 13px rgba(190,149,78,.07);font:600 .74rem/1.45 Inter,sans-serif;cursor:pointer}
+  .wd-widget-photo{position:relative;height:5rem;margin:.2rem 0 .65rem;border-radius:var(--rtg-radius-editorial);overflow:hidden}
+  .wd-widget-photo img{width:100%;height:100%;object-fit:cover}
+  .wd-widget-photo figcaption{position:absolute;inset-inline-start:.5rem;bottom:.4rem;padding:.1rem .4rem;background:rgba(0,0,0,.8);color:#fff2df;font:400 .55rem/1.5 Inter,sans-serif}
+  .wd-data-row{display:flex;gap:.65rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--wd-line)}
+  .wd-data-row>div{min-width:0;overflow-wrap:anywhere}
+  .wd-data-row strong,.wd-data-row span.wd-muted{display:block}
+  .wd-data-row strong{font-weight:500;font-size:.8rem}
+  .wd-widget-empty{margin:.5rem 0;line-height:1.7;color:var(--wh-soft);min-height:3.5rem}
+  .wd-widget-warning{padding:.5rem;border-inline-start:2px solid var(--wh-gold);font-size:.72rem;color:var(--wh-soft)}
+  .wd-widget-updated{display:block;font:400 .58rem/1.6 Inter,sans-serif;color:var(--wh-soft);margin-top:.65rem}
+  .wd-date-hero{display:flex;gap:.8rem;align-items:center;margin:.7rem 0}
+  .wd-date-hero strong{font-weight:600}.wd-date-hero p{margin:.2rem 0}.wd-date-hero small{color:var(--wh-soft)}
+  .wd-date-tile{flex:0 0 3.2rem;min-height:3.7rem;display:grid;align-content:center;text-align:center;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);background:linear-gradient(145deg,#4b3320,#211b14);color:var(--wh-gold)}
+  .wd-date-tile b{font:400 1.9rem/1.1 "Bodoni Moda",serif}.wd-date-tile span{font-size:.55rem;text-transform:uppercase}
+  .wd-date-nav{display:flex;gap:1rem;justify-content:space-between}.wd-date-nav button{font-size:.63rem!important}.wd-date-nav button:disabled{opacity:.35}
+  .wd-task{display:flex;align-items:center;gap:.65rem;min-height:42px;font:.8rem/1.55 Inter,sans-serif;color:var(--wh-ink);cursor:pointer}
+  .wd-task input{appearance:auto;width:16px;height:16px;accent-color:var(--wh-gold);flex:0 0 16px;padding:0;margin:0}
+  .wd-task input:checked+span{text-decoration:line-through;color:var(--wh-soft)}
+  .wd-security{display:grid;place-items:center;height:5.2rem;background:radial-gradient(ellipse,color-mix(in srgb,var(--wd-accent) 20%,transparent),transparent 65%)}
+  .wd-security .wd-icon{width:3rem;height:3rem;color:var(--wh-gold)}
+  .wd-money{display:flex;flex-direction:column;gap:.75rem;padding:1rem 0}.wd-money strong{font:400 2rem/1.2 "Bodoni Moda",serif;letter-spacing:.01em}
+  .wd-capability-emblem{height:4.2rem;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse,color-mix(in srgb,var(--wd-accent) 15%,transparent),transparent 70%)}
+  .wd-capability-emblem .wd-icon{width:2.3rem;height:2.3rem}
+  .wd-capability-route .wd-capability-emblem{background:repeating-linear-gradient(35deg,transparent,transparent 24px,rgba(208,182,110,.14) 25px,transparent 26px),linear-gradient(160deg,#0a1921,#14222a);border-radius:var(--rtg-radius-editorial)}
+  .wd-capability-files .wd-capability-emblem{border:1px solid var(--wd-line);width:4rem;margin:.5rem auto;transform:rotate(-3deg);background:linear-gradient(145deg,#372e20,#161410)}
+  .wd-library-heading{flex-wrap:wrap;gap:1rem}.wd-library-heading h2{margin-inline-end:auto}
+  .wd-filters{display:flex;align-items:center;gap:.4rem}
+  .wd-filters :is(select,button){min-height:38px;border:1px solid var(--wd-line);background:var(--wd-surface);color:var(--wh-soft);border-radius:var(--rtg-radius-editorial);padding:.5rem;font:400 .7rem/1.5 Inter,sans-serif}
+  .wd-filters button[aria-pressed="true"]{border-color:var(--wh-gold);color:var(--wh-gold)}
+  .wd-library[data-view="list"] .wd-catalog{grid-template-columns:1fr 1fr}
+  .wd-library[data-view="list"] .wd-widget-photo{height:5rem}
+}

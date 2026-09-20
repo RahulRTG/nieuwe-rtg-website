@@ -33,17 +33,30 @@ function normaliseerWorkspace(invoer, op) {
     density: x.density === 'compact' ? 'compact' : 'comfortable', updatedAt: op || null };
 }
 
-function lees(md) {
-  const opgeslagen = md && md.interface && md.interface.workspace;
+function scopeNaam(scope) {
+  return scope == null || scope === '' ? 'default' :
+    ['living', 'travel', 'work', 'foundation'].includes(scope) ? scope : null;
+}
+function lees(md, scope) {
+  const key = scopeNaam(scope);
+  if (!key) return { status: 400, error: 'Onbekende werkruimte.' };
+  const opgeslagen = md && md.interface && (key === 'default' ? md.interface.workspace :
+    md.interface.worldWorkspaces && md.interface.worldWorkspaces[key]);
   const w = normaliseerWorkspace(opgeslagen || {}, opgeslagen && opgeslagen.updatedAt);
   return w.error ? normaliseerWorkspace({}, null) : w;
 }
 
-function zet(md, invoer, op) {
+function zet(md, invoer, op, scope) {
+  const key = scopeNaam(scope);
+  if (!key) return { status: 400, error: 'Onbekende werkruimte.' };
   const w = normaliseerWorkspace(invoer, op || klok.datum().toISOString());
   if (w.error) return w;
   if (!md.interface || typeof md.interface !== 'object' || Array.isArray(md.interface)) md.interface = {};
-  md.interface.workspace = w;
+  if (key === 'default') md.interface.workspace = w;
+  else {
+    if (!md.interface.worldWorkspaces) md.interface.worldWorkspaces = {};
+    md.interface.worldWorkspaces[key] = w;
+  }
   return w;
 }
 

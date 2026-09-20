@@ -137,14 +137,16 @@ module.exports = (kern) => {
   app.post('/api/ik/workspace', auth, (req, res) => {
     const id = uid(req);
     if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
-    res.json({ ok: true, workspace: workspace.lees(accounts.getMemberState(id) || {}) });
+    const r = workspace.lees(accounts.getMemberState(id) || {}, req.body && req.body.scope);
+    if (r.error) return uit(res, r);
+    res.json({ ok: true, workspace: r });
   });
 
   app.post('/api/ik/workspace/zet', auth, (req, res) => {
     const id = uid(req);
     if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
     const md = accounts.getMemberState(id) || {};
-    const r = workspace.zet(md, req.body && req.body.workspace, klok.datum().toISOString());
+    const r = workspace.zet(md, req.body && req.body.workspace, klok.datum().toISOString(), req.body && req.body.scope);
     if (r.error) return uit(res, r);
     accounts.saveMemberState(id, md);
     res.json({ ok: true, workspace: r });

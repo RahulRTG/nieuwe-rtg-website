@@ -54,7 +54,9 @@
       if (!identity.authenticated()) return Promise.reject(new Error('signed-out'));
       return w.fetch(url, { method: 'POST', credentials: 'same-origin', signal: extra && extra.signal,
         headers: Object.assign({ 'Content-Type': 'application/json' }, identity.headers()), body: JSON.stringify(body || {}) }).then(function (r) {
-        return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || 'request-failed'); return j; });
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok) { var error = new Error(j.error || 'request-failed'); error.status = r.status; throw error; } return j;
+        });
       });
     }
     function contextVoor(mid, status) {

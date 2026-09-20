@@ -101,6 +101,7 @@ test('plaats: een hek passeren levert een waarneming op, en geen coordinaat over
     const v = await api(base, '/api/plaats/venster', { doel: 'stad', bron: 'schermtoets', minuten: 60 }, reg.token);
     assert.equal(v.status, 200);
 
+    const ontvangst = page.waitForResponse(r => r.url().includes('/api/plaats/waarneem') && r.request().method() === 'POST');
     const gestart = await page.evaluate(() => window.RTGPlaats.start('stad'));
     assert.equal(gestart.ok, true, 'de motor start: ' + JSON.stringify(gestart));
 
@@ -108,6 +109,9 @@ test('plaats: een hek passeren levert een waarneming op, en geen coordinaat over
     await page.waitForFunction(() => window.RTGPlaats.stand().binnen.length > 0,
       null, { timeout: 10000 });
 
+    // Local geofence state precedes the request. Read the server only after
+    // its acknowledgement, otherwise a busy CI machine races this assertion.
+    assert.equal((await ontvangst).status(), 200);
     const stand = await api(base, '/api/plaats/stand', {}, reg.token);
     assert.ok(stand.waarnemingen.length >= 1, 'de server kreeg een waarneming');
     assert.equal(stand.waarnemingen[0].wat, 'binnen');

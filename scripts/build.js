@@ -179,6 +179,7 @@ function stempelServiceWorkers() {
 
 (async () => {
   require('./workspace-worlds').schrijf();
+  require('./world-widgets').schrijf();
   const gebundeld = schrijfBundels();
   console.log('[build] gebundeld: ' + (gebundeld.length ? gebundeld.join(', ') : 'bundels al actueel'));
   await minifyGedeeld();

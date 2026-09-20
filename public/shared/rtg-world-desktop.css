@@ -41,7 +41,8 @@ body[data-world-home] .wd-shell [hidden]{display:none!important}
   body[data-rtg-desktop] .wd-home .wh-work-hero,body[data-rtg-desktop] .wd-home .wh-foundation-hero{min-height:31rem}
   body[data-rtg-desktop] .wd-home .wh-pair{grid-template-columns:1fr}
   body[data-rtg-desktop] .wd-home .living-intro{padding-inline:0}
-  body[data-rtg-desktop] .wd-people,body[data-rtg-desktop] .wd-favorites{display:block;position:sticky;top:6.5rem;min-width:0;max-height:calc(100dvh - 15rem);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
+  /* Side panels belong to the story row and scroll away before the full-width library. */
+  body[data-rtg-desktop] .wd-people,body[data-rtg-desktop] .wd-favorites{display:block;position:relative;min-width:0;max-height:calc(100dvh - 15rem);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
   body[data-rtg-desktop] .wd-people{grid-column:1;grid-row:2;background:var(--wd-surface);border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);padding:1.15rem}
   .wd-people .rtg-ss-module-head h3{font:400 1.8rem/1.2 "Bodoni Moda",serif;color:var(--wh-ink);margin:0 0 1.2rem}
   .wd-people .rtg-module-head-tools{display:none}

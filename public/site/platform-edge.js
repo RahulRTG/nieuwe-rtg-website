@@ -3,7 +3,7 @@
  'use strict';
  w.RTGPublicEdge=function(o){
   var P=w.RTGPublicPlatform,E=w.RTGAdaptiveEdge,root=d.createElement('div'),panel=d.createElement('div');
-  root.className='rtg-experience-edge pp-edge';panel.hidden=true;panel.className='pp-menu-panel';d.body.append(root,panel);
+  root.className='rtg-edge-chrome rtg-experience-edge pp-edge';panel.hidden=true;panel.className='pp-menu-panel';d.body.append(root,panel);
   function actions(){
    panel.replaceChildren();
    var rows=[['next',function(){o.shell.collapse();o.shell.next(1);}],['previous',function(){o.shell.collapse();o.shell.next(-1);}]];

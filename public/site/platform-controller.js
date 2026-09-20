@@ -18,7 +18,7 @@
   function saveHash(){var h=new URLSearchParams();h.set('story',selected.id);if(current)h.set('detail',current);w.history.replaceState(null,'','#rtg?'+h.toString());}
   function filterCards(){
    var q=search.value.trim().toLocaleLowerCase();var count=0;
-   catalog.querySelectorAll('[data-public-widget]').forEach(function(el){var card=data.cards.find(function(c){return c.id===el.dataset.publicWidget;});el.hidden=!!((filter.value!=='all'&&card.world!==filter.value)||(q&&!(copy(card.title)+' '+copy(card.body)).toLocaleLowerCase().includes(q)));if(!el.hidden)count++;});empty.hidden=count>0;
+   catalog.querySelectorAll('[data-public-widget]').forEach(function(el){var card=data.cards.find(function(c){return c.id===el.dataset.publicWidget;}),matches=filter.value==='all'||(filter.value==='favorites'?!!el.querySelector('[data-company-pin][aria-pressed="true"]'):card.world===filter.value);el.hidden=!!(!matches||(q&&!(copy(card.title)+' '+copy(card.body)).toLocaleLowerCase().includes(q)));if(!el.hidden)count++;});empty.hidden=count>0;
   }
   function setView(list){catalog.classList.toggle('pp-list-view',list);gridButton.setAttribute('aria-pressed',String(!list));listButton.setAttribute('aria-pressed',String(list));}
   function collapse(){

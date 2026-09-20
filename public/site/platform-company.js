@@ -43,6 +43,7 @@
   return el;
  }
  function open(id){
+  if(/^\/worlds\/(living|travel|work|foundation)\/$/.test(id)){w.location.assign(id);return;}
   if(id.startsWith('https://app.rahultravelgroup.com/')){w.location.assign(id);return;}
   if(id==='language-picker'){w.RTGi18n.openModal();return;}
   var card=D.company.cards.find(function(c){return c.id===id;});if(!card)return;

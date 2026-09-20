@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-20T08:34:16.117Z",
-    "commit": "574afab1f",
+    "op": "2026-09-20T08:35:56.816Z",
+    "commit": "7a7616906",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -12,8 +12,8 @@
   "drempel": 3,
   "bestemmingen": 99,
   "woorden": 1201,
-  "gevonden": 752,
-  "dekking": 0.6261,
+  "gevonden": 777,
+  "dekking": 0.647,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -76,54 +76,6 @@
       ]
     },
     {
-      "naam": "RTG Media",
-      "url": "/apps/media.html",
-      "woorden": 54,
-      "gevonden": 14,
-      "mist": [
-        "professionele",
-        "grading",
-        "uitsnede",
-        "beweging",
-        "tekst",
-        "ondertiteling",
-        "beperkingen",
-        "watermerkvrij",
-        "exporteren",
-        "releasecontrole",
-        "ongedaan",
-        "opnieuw",
-        "origineel",
-        "rechten",
-        "afspelen",
-        "kleur",
-        "kader",
-        "lagen",
-        "geluid",
-        "export",
-        "afwerking",
-        "clean",
-        "cinema",
-        "golden",
-        "editorial",
-        "monochroom",
-        "spiegelen",
-        "veilige",
-        "zones",
-        "keyframe",
-        "ondertitels",
-        "toepassen",
-        "lokaal",
-        "transcriberen",
-        "automatische",
-        "ducking",
-        "bron",
-        "dempen",
-        "exporteer",
-        "master"
-      ]
-    },
-    {
       "naam": "Onderneming",
       "url": "/apps/onderneming.html",
       "woorden": 33,
@@ -155,6 +107,33 @@
         "pijplijn",
         "bestuur",
         "capaciteit"
+      ]
+    },
+    {
+      "naam": "RTG Media",
+      "url": "/apps/media.html",
+      "woorden": 54,
+      "gevonden": 35,
+      "mist": [
+        "professionele",
+        "grading",
+        "uitsnede",
+        "beweging",
+        "tekst",
+        "ondertiteling",
+        "beperkingen",
+        "watermerkvrij",
+        "exporteren",
+        "releasecontrole",
+        "automatische",
+        "ducking",
+        "bron",
+        "dempen",
+        "exporteer",
+        "master",
+        "controle",
+        "starten",
+        "kijken"
       ]
     },
     {
@@ -620,19 +599,6 @@
       ]
     },
     {
-      "naam": "Muziek",
-      "url": "/apps/muziek.html",
-      "woorden": 10,
-      "gevonden": 5,
-      "mist": [
-        "geluid",
-        "makers",
-        "hierna",
-        "publiceer",
-        "anderen"
-      ]
-    },
-    {
       "naam": "Video",
       "url": "/apps/clips.html",
       "woorden": 16,
@@ -669,18 +635,6 @@
         "klaarzetten",
         "agenda",
         "huiswerk"
-      ]
-    },
-    {
-      "naam": "Berichten",
-      "url": "/apps/comm.html",
-      "woorden": 5,
-      "gevonden": 1,
-      "mist": [
-        "samenvatting",
-        "afspraken",
-        "gesprek",
-        "dichtbij"
       ]
     },
     {
@@ -732,6 +686,17 @@
       ]
     },
     {
+      "naam": "Berichten",
+      "url": "/apps/comm.html",
+      "woorden": 5,
+      "gevonden": 2,
+      "mist": [
+        "samenvatting",
+        "afspraken",
+        "gesprek"
+      ]
+    },
+    {
       "naam": "Films en series",
       "url": "/apps/theater.html",
       "woorden": 9,
@@ -751,6 +716,17 @@
         "poort",
         "kanalen",
         "kijkers"
+      ]
+    },
+    {
+      "naam": "Muziek",
+      "url": "/apps/muziek.html",
+      "woorden": 10,
+      "gevonden": 7,
+      "mist": [
+        "geluid",
+        "makers",
+        "hierna"
       ]
     },
     {
@@ -907,15 +883,6 @@
       ]
     },
     {
-      "naam": "Camera",
-      "url": "/apps/camera.html",
-      "woorden": 16,
-      "gevonden": 15,
-      "mist": [
-        "opnieuw"
-      ]
-    },
-    {
       "naam": "Food Court",
       "url": "/apps/foodcourt.html",
       "woorden": 7,
@@ -1051,6 +1018,13 @@
       "url": "/apps/geld.html#rtgcode",
       "woorden": 0,
       "gevonden": 0,
+      "mist": []
+    },
+    {
+      "naam": "Camera",
+      "url": "/apps/camera.html",
+      "woorden": 16,
+      "gevonden": 16,
       "mist": []
     },
     {

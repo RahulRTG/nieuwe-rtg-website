@@ -111,6 +111,7 @@
     });
     w.addEventListener('pagehide', function () { entries.forEach(function (x) { clearTimeout(x.timer); if (x.observer) x.observer.disconnect(); }); });
     w.addEventListener('storage', function (e) { if (e.key == null || e.key === 'rtg_member_token' || e.key === 'rtf_sessie') w.location.reload(); });
+    w.addEventListener('rtf-session-changed', function () { w.location.reload(); });
     return { open: open, collapse: collapse, active: active, controls: controls, prepare: prepare, isOpen: function () { return !!current; } };
   };
 })(window, document);

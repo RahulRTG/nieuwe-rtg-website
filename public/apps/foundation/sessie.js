@@ -104,12 +104,19 @@ function opKleur(hex) {
 }
 
 /* de sessie van de hulppas: lezen, actief en bewaren */
+  function schrijf(s) {
+    var old = lees();
+    if (s) localStorage.setItem(KEY, JSON.stringify(s)); else localStorage.removeItem(KEY);
+    if ((old && old.token || '') !== (s && s.token || '') ||
+      (old && old.profiel && old.profiel.id || '') !== (s && s.profiel && s.profiel.id || ''))
+      w.dispatchEvent(new Event('rtf-session-changed'));
+  }
   var Sessie = {
     huidig: lees,
     actief: function () { var s = lees(); return !!(s && s.code && s.token); },
-    zet: function (s) { localStorage.setItem(KEY, JSON.stringify(s)); },
-    wisProfiel: function () { var s = lees(); if (s) { delete s.token; delete s.profiel; localStorage.setItem(KEY, JSON.stringify(s)); } },
-    uitloggen: function () { localStorage.removeItem(KEY); },
+    zet: schrijf,
+    wisProfiel: function () { var s = lees(); if (s) { delete s.token; delete s.profiel; schrijf(s); } },
+    uitloggen: function () { schrijf(null); },
     naam: function () { var s = lees(); return (s && s.profiel && s.profiel.naam) || ''; },
     /* De deur van de RTFoundation.
 

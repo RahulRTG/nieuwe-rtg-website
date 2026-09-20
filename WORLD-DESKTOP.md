@@ -53,7 +53,11 @@ Widget-ID's worden via de bestaande accountvoorkeur opgeslagen onder een vaste
 wereldscope. De bestaande commandowerkruimte blijft apart. Er worden geen
 gesprekken, bedragen, formulieren of tokens in deze voorkeur geschreven.
 Een mislukte eerste lezing mag geen opgeslagen indeling overschrijven.
-Gasten bewaren hun keuze uitsluitend in het huidige schermgeheugen.
+Gasten en gezinsschermen bewaren hun keuze uitsluitend in het huidige
+schermgeheugen. Foundation gebruikt voor contacten en widgets uitsluitend het
+gekozen gezinsprofiel; een gelijktijdig ingelogd ledenaccount levert daar geen
+gegevens of bewaarde widgetvoorkeuren aan. Profielwissels en uitloggen wissen
+de oude weergaven door de desktop opnieuw te laden.
 
 De gedeelde taalruntime vertaalt de interface. NL en EN hebben vaste bronkopij;
 andere talen volgen het bestaande taalbeleid en de bestaande terugvalregels.

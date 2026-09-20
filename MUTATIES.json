@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-20T15:14:56.090Z",
-    "commit": "9e45b3af0",
-    "boomVuil": false,
+    "op": "2026-09-20T21:26:34.541Z",
+    "commit": "6ebc936a7",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
@@ -9916,6 +9916,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "world-function-controls.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
       "scherp": "gezakt"
     },
     "world-widget-catalog.test.js": {

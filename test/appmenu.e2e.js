@@ -592,7 +592,7 @@ test('het witte Edge-menu zet de vier werelden bovenaan, en het springboard is w
     assert.deepEqual(b.koppen, ['Uw vier werelden'],
       'het witte menu benoemt de vier werelden niet, gevonden: ' + b.koppen.join(', '));
     assert.deepEqual(b.werelden.map((w) => w.url),
-      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
+      ['/apps/wereld.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/index.html'],
       'het witte menu hoort exact LivingOS, WorkOS, TravelOS en FoundationOS bovenaan te dragen');
     const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
     assert.deepEqual(onzichtbaar.map((w) => w.naam), [],
@@ -690,8 +690,13 @@ test('elke wereld in het witte Edge-menu opent ook echt zijn huis, als werkblad'
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);
 
-    const b = await werelden(page);
-    for (const w of b.werelden) {
+    const homes = [
+      { naam: 'LivingOS', url: '/apps/wereld.html' },
+      { naam: 'WorkOS', url: '/apps/kantoor.html' },
+      { naam: 'TravelOS', url: '/apps/reizen.html' },
+      { naam: 'FoundationOS', url: '/apps/foundation/index.html' }
+    ];
+    for (const w of homes) {
       await openWereldWerkblad(page, w.url);
       await page.waitForFunction((url) => {
         const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe') ||
@@ -860,7 +865,10 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);
-    await openWereldWerkblad(page, '/apps/rtg.html');
+    // Het openbare Living-register blijft via Werkbladen bereikbaar. De
+    // wereldkiezer opent inmiddels de persoonlijke home /apps/wereld.html.
+    await openLade(page);
+    await page.locator('#rtgCommand .cmd-nav button[data-url="/apps/rtg.html"]').click();
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       return !!(f && f.contentDocument && /\/apps\/rtg\.html$/.test(f.contentWindow.location.pathname));

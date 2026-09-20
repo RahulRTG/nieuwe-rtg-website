@@ -8,25 +8,15 @@
    "status": 200,
    "gewijzigd": [
     "store.db:apiSpoor",
-    "store.db:bankregie",
-    "store.db:handelingLog",
-    "store.db:ledenBoard",
-    "store.db:paySaldi",
-    "store.db:payVerzoeken",
-    "store.db:rtgai",
-    "store.db:waardeReserves"
+    "store.db:geldketenDossiers",
+    "store.db:handelingLog"
    ],
    "domein": [
-    "store.db:bankregie",
-    "store.db:ledenBoard",
-    "store.db:paySaldi",
-    "store.db:payVerzoeken",
-    "store.db:waardeReserves"
+    "store.db:geldketenDossiers"
    ],
    "sporen": [
     "store.db:apiSpoor",
-    "store.db:handelingLog",
-    "store.db:rtgai"
+    "store.db:handelingLog"
    ],
    "bevestigNodig": false,
    "voorspeld": {
@@ -43,14 +33,12 @@
    "status": 200,
    "gewijzigd": [
     "store.db:apiSpoor",
-    "store.db:handelingLog",
-    "store.db:rtgai"
+    "store.db:handelingLog"
    ],
    "domein": [],
    "sporen": [
     "store.db:apiSpoor",
-    "store.db:handelingLog",
-    "store.db:rtgai"
+    "store.db:handelingLog"
    ],
    "bevestigNodig": false,
    "voorspeld": {
@@ -68,16 +56,14 @@
    "gewijzigd": [
     "store.db:apiSpoor",
     "store.db:handelingLog",
-    "store.db:onderwijs",
-    "store.db:rtgai"
+    "store.db:onderwijs"
    ],
    "domein": [
     "store.db:onderwijs"
    ],
    "sporen": [
     "store.db:apiSpoor",
-    "store.db:handelingLog",
-    "store.db:rtgai"
+    "store.db:handelingLog"
    ],
    "bevestigNodig": false,
    "voorspeld": {
@@ -95,16 +81,14 @@
    "gewijzigd": [
     "store.db:apiSpoor",
     "store.db:handelingLog",
-    "store.db:mediaSmaak",
-    "store.db:rtgai"
+    "store.db:mediaSmaak"
    ],
    "domein": [
     "store.db:mediaSmaak"
    ],
    "sporen": [
     "store.db:apiSpoor",
-    "store.db:handelingLog",
-    "store.db:rtgai"
+    "store.db:handelingLog"
    ],
    "bevestigNodig": false,
    "voorspeld": {
@@ -122,16 +106,14 @@
    "gewijzigd": [
     "store.db:agendas",
     "store.db:apiSpoor",
-    "store.db:handelingLog",
-    "store.db:rtgai"
+    "store.db:handelingLog"
    ],
    "domein": [
     "store.db:agendas"
    ],
    "sporen": [
     "store.db:apiSpoor",
-    "store.db:handelingLog",
-    "store.db:rtgai"
+    "store.db:handelingLog"
    ],
    "bevestigNodig": false,
    "voorspeld": {
@@ -149,7 +131,7 @@
   "stappen": 5,
   "gemeten": 5,
   "nietGemeten": 0,
-  "collecties": 11,
+  "collecties": 6,
   "voorspellingBeoordeeld": 3,
   "voorspellingKlopt": 2,
   "voorspellingOnbekend": 2
@@ -165,26 +147,17 @@
  "geraakteCollecties": [
   "store.db:agendas",
   "store.db:apiSpoor",
-  "store.db:bankregie",
+  "store.db:geldketenDossiers",
   "store.db:handelingLog",
-  "store.db:ledenBoard",
   "store.db:mediaSmaak",
-  "store.db:onderwijs",
-  "store.db:paySaldi",
-  "store.db:payVerzoeken",
-  "store.db:rtgai",
-  "store.db:waardeReserves"
+  "store.db:onderwijs"
  ],
  "afwijkingen": [
   {
    "capability": "/api/pay/overzicht",
    "voorspeld": "geen-effect-gemeten",
    "waargenomen": [
-    "store.db:bankregie",
-    "store.db:ledenBoard",
-    "store.db:paySaldi",
-    "store.db:payVerzoeken",
-    "store.db:waardeReserves"
+    "store.db:geldketenDossiers"
    ],
    "reden": "de proefronde zag niets veranderen; met deze invoer veranderde er wel iets"
   }
@@ -195,5 +168,13 @@
   "alles buiten de opslag blijft onzichtbaar: mail, een betaalprovider, een derde partij",
   "gemeten wordt WELKE collectie bewoog, niet hoeveel erin veranderde",
   "een voorspelling op `onbekend` wordt niet beoordeeld: onbekend kan niet fout zijn, en dat als goed tellen zou de uitslag opkloppen"
- ]
+ ],
+ "stempel": {
+  "op": "2026-09-19T19:05:58.848Z",
+  "commit": "6083f652",
+  "boomVuil": false,
+  "boomAnders": 23,
+  "instrument": "scripts/droogloop.js",
+  "node": "v22.22.2"
+ }
 }

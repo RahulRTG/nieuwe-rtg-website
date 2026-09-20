@@ -1,67 +1,77 @@
 {
- "paden": 176,
+ "paden": 177,
  "perRol": {
-  "member": 120,
+  "member": 121,
   "supplier": 40,
   "staff": 16
  },
  "vormen": {
   "eigen woorden": {
-   "gevonden": 176,
-   "totaal": 176,
+   "gevonden": 177,
+   "totaal": 177,
    "dekking": 100,
    "versmaldPct": 100,
    "gemiddeldWerkveld": 10.7,
    "gemist": []
   },
   "mensenwoorden": {
-   "gevonden": 176,
-   "totaal": 176,
+   "gevonden": 177,
+   "totaal": 177,
    "dekking": 100,
    "versmaldPct": 100,
-   "gemiddeldWerkveld": 10.8,
+   "gemiddeldWerkveld": 10.7,
    "gemist": []
   },
   "alleen domein": {
-   "gevonden": 176,
-   "totaal": 176,
+   "gevonden": 177,
+   "totaal": 177,
    "dekking": 100,
    "versmaldPct": 28,
-   "gemiddeldWerkveld": 65.6,
+   "gemiddeldWerkveld": 66.3,
    "gemist": []
   },
   "alleen werkwoord": {
-   "gevonden": 176,
-   "totaal": 176,
+   "gevonden": 177,
+   "totaal": 177,
    "dekking": 100,
    "versmaldPct": 94,
    "gemiddeldWerkveld": 7.4,
    "gemist": []
   },
   "typefout": {
-   "gevonden": 176,
-   "totaal": 176,
+   "gevonden": 177,
+   "totaal": 177,
    "dekking": 100,
    "versmaldPct": 14,
-   "gemiddeldWerkveld": 80.2,
+   "gemiddeldWerkveld": 81,
    "gemist": []
   },
   "omgekeerd": {
-   "gevonden": 176,
-   "totaal": 176,
+   "gevonden": 177,
+   "totaal": 177,
    "dekking": 100,
    "versmaldPct": 100,
-   "gemiddeldWerkveld": 10.8,
+   "gemiddeldWerkveld": 10.7,
    "gemist": []
   },
   "veel ruis": {
-   "gevonden": 176,
-   "totaal": 176,
+   "gevonden": 177,
+   "totaal": 177,
    "dekking": 100,
    "versmaldPct": 94,
-   "gemiddeldWerkveld": 12.8,
+   "gemiddeldWerkveld": 12.7,
    "gemist": []
   }
  },
- "laagste": 100
+ "laagste": 100,
+ "stempel": {
+  "op": "2026-09-19T19:05:53.642Z",
+  "commit": "6083f652",
+  "boomVuil": false,
+  "boomAnders": 22,
+  "instrument": "scripts/resolverbereik.js",
+  "node": "v22.22.2"
+ },
+ "uitleg": "Per toegestaan pad een gegenereerde vraag in zeven vervormingen; gemeten of de resolver dat pad dan in zijn werkveld houdt.",
+ "grens": "Zegt alleen of het pad in het werkveld BLIJFT (dekking), niet of het bovenaan staat; en de zinnen zijn gegenereerd, geen echte vragen van leden."
 }

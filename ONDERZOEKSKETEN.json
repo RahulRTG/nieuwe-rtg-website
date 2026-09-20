@@ -1,6 +1,16 @@
 {
+  "stempel": {
+    "op": "2026-09-19T19:05:59.073Z",
+    "commit": "6083f652",
+    "boomVuil": false,
+    "boomAnders": 24,
+    "instrument": "scripts/onderzoeksketen.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Welke stations van het onderzoek in de code naar elkaar verwijzen, en of de keten daarmee rond is.",
+  "grens": "Zegt niet of een verwijzing altijd gevuld is, en niet of het om hetzelfde onderzoek gaat -- zie `let`.",
   "gemeten": {
-    "op": "2026-08-31",
+    "op": "2026-09-19",
     "stations": 10,
     "paren": 90,
     "schakels": 10,

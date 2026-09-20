@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-14T23:42:58.982Z",
-  "commit": "9fed38d7",
+  "op": "2026-09-19T19:08:25.687Z",
+  "commit": "6083f652",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 57,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 2096,
+  "meetwerk": 2095,
   "instrument": 323,
-  "grens": 645
+  "grens": 665
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2419,
+  "staat": 2418,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,19 +28,19 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2419,
-  "randVanDeMethode": 645,
+  "achterstand": 2418,
+  "randVanDeMethode": 665,
   "auth-onbeslist": 1,
-  "capability-in-handler": 549,
+  "capability-in-handler": 550,
   "objectpoort": 52,
   "output-deuren": 18,
-  "lichaamssleutel": 74,
+  "lichaamssleutel": 93,
   "output-niet-toerekenbaar": 285,
   "output-blind": 0,
   "output-onwaarneembaar": 4,
   "audit-wisselend": null,
   "audit-verklaard": null,
-  "rollback-gezakt": 1,
+  "rollback-gezakt": 0,
   "object-vooraf": 323,
   "proefruis": 1,
   "gevolg-onbekend": 95,
@@ -62,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 549,
+   "aantal": 550,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -86,7 +86,7 @@
    "id": "lichaamssleutel",
    "soort": "grens",
    "wat": "routes waarvan de sleutel een VELD IN HET VERZOEK is, geen token in de kop",
-   "aantal": 74,
+   "aantal": 93,
    "waarom": "gastAuth leest req.body.sleutel, gezinsPoort en rtfPoort lezen code+token uit het lichaam. Een member-, supplier- of officetoken is voor zo n deur niet fout maar IRRELEVANT: hij kijkt er niet naar. Alle drie krijgen dezelfde 401.",
    "sluit": "niets in deze proef; die 401 als bewijs tellen zou dezelfde fout zijn die de AUTH-as al 294 cellen kostte. Een proef op sessiesleutels is een andere vraag."
   },
@@ -134,7 +134,7 @@
    "id": "rollback-gezakt",
    "soort": "meetwerk",
    "wat": "routes die weigeren en toch de toestand veranderen",
-   "aantal": 1,
+   "aantal": 0,
    "waarom": "de meeste zijn /api/rtfos/* met securityLog en sessions -- vermoedelijk de auth-laag die een geweigerde poging vastlegt, en dus mogelijk ruis in de meting en geen lek. Maar EEN ervan verspringt per ronde van plek, en een bevinding die verhuist is zelf een bevinding over de meting.",
    "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },
@@ -198,191 +198,187 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-09-12",
-    "aantal": 1
-   },
-   {
     "op": "2026-09-13",
     "aantal": 1
    },
    {
     "op": "2026-09-14",
+    "aantal": 1
+   },
+   {
+    "op": "2026-09-19",
     "aantal": 1
    }
   ],
   "capability-in-handler": [
    {
-    "op": "2026-09-12",
-    "aantal": 549
-   },
-   {
     "op": "2026-09-13",
     "aantal": 549
    },
    {
     "op": "2026-09-14",
     "aantal": 549
+   },
+   {
+    "op": "2026-09-19",
+    "aantal": 550
    }
   ],
   "objectpoort": [
    {
-    "op": "2026-09-12",
-    "aantal": 52
-   },
-   {
     "op": "2026-09-13",
     "aantal": 52
    },
    {
     "op": "2026-09-14",
+    "aantal": 52
+   },
+   {
+    "op": "2026-09-19",
     "aantal": 52
    }
   ],
   "output-deuren": [
    {
-    "op": "2026-09-12",
-    "aantal": 18
-   },
-   {
     "op": "2026-09-13",
     "aantal": 18
    },
    {
     "op": "2026-09-14",
+    "aantal": 18
+   },
+   {
+    "op": "2026-09-19",
     "aantal": 18
    }
   ],
   "lichaamssleutel": [
    {
-    "op": "2026-09-12",
-    "aantal": 74
-   },
-   {
     "op": "2026-09-13",
     "aantal": 74
    },
    {
     "op": "2026-09-14",
     "aantal": 74
+   },
+   {
+    "op": "2026-09-19",
+    "aantal": 93
    }
   ],
   "output-niet-toerekenbaar": [
    {
-    "op": "2026-09-12",
-    "aantal": 285
-   },
-   {
     "op": "2026-09-13",
     "aantal": 285
    },
    {
     "op": "2026-09-14",
+    "aantal": 285
+   },
+   {
+    "op": "2026-09-19",
     "aantal": 285
    }
   ],
   "output-blind": [
    {
-    "op": "2026-09-12",
-    "aantal": 0
-   },
-   {
     "op": "2026-09-13",
     "aantal": 0
    },
    {
     "op": "2026-09-14",
+    "aantal": 0
+   },
+   {
+    "op": "2026-09-19",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-09-12",
-    "aantal": 4
-   },
-   {
     "op": "2026-09-13",
     "aantal": 4
    },
    {
     "op": "2026-09-14",
+    "aantal": 4
+   },
+   {
+    "op": "2026-09-19",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-09-12",
-    "aantal": null
-   },
-   {
     "op": "2026-09-13",
     "aantal": null
    },
    {
     "op": "2026-09-14",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-19",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-09-12",
-    "aantal": null
-   },
-   {
     "op": "2026-09-13",
     "aantal": null
    },
    {
     "op": "2026-09-14",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-19",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
-    "op": "2026-09-12",
-    "aantal": 1
-   },
-   {
     "op": "2026-09-13",
     "aantal": 1
    },
    {
     "op": "2026-09-14",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-19",
+    "aantal": 0
    }
   ],
   "object-vooraf": [
    {
-    "op": "2026-09-12",
-    "aantal": 323
-   },
-   {
     "op": "2026-09-13",
     "aantal": 323
    },
    {
     "op": "2026-09-14",
+    "aantal": 323
+   },
+   {
+    "op": "2026-09-19",
     "aantal": 323
    }
   ],
   "proefruis": [
    {
-    "op": "2026-09-12",
-    "aantal": 1
-   },
-   {
     "op": "2026-09-13",
     "aantal": 1
    },
    {
     "op": "2026-09-14",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-19",
+    "aantal": 1
    }
   ],
   "gevolg-onbekend": [
-   {
-    "op": "2026-09-12",
-    "aantal": 87
-   },
    {
     "op": "2026-09-13",
     "aantal": 89
@@ -390,41 +386,41 @@
    {
     "op": "2026-09-14",
     "aantal": 95
+   },
+   {
+    "op": "2026-09-19",
+    "aantal": 95
    }
   ],
   "droogloop-onbeoordeeld": [
-   {
-    "op": "2026-09-12",
-    "aantal": 2
-   },
    {
     "op": "2026-09-13",
     "aantal": 2
    },
    {
     "op": "2026-09-14",
+    "aantal": 2
+   },
+   {
+    "op": "2026-09-19",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-09-12",
-    "aantal": 49
-   },
-   {
     "op": "2026-09-13",
     "aantal": 49
    },
    {
     "op": "2026-09-14",
     "aantal": 49
+   },
+   {
+    "op": "2026-09-19",
+    "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
-   {
-    "op": "2026-09-12",
-    "aantal": 1578
-   },
    {
     "op": "2026-09-13",
     "aantal": 1578
@@ -432,19 +428,23 @@
    {
     "op": "2026-09-14",
     "aantal": 1607
+   },
+   {
+    "op": "2026-09-19",
+    "aantal": 1607
    }
   ],
   "wegwerpserver-kopieen": [
-   {
-    "op": "2026-09-12",
-    "aantal": 3
-   },
    {
     "op": "2026-09-13",
     "aantal": 3
    },
    {
     "op": "2026-09-14",
+    "aantal": 3
+   },
+   {
+    "op": "2026-09-19",
     "aantal": 3
    }
   ]
@@ -467,12 +467,6 @@
    "aantal": 285,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: node scripts/outputproef.js --meet=<n>. Die liegt over EEN route en draait alleen de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd per ronde, dus dit sluit met werk en niet met een doorbraak."
-  },
-  {
-   "id": "rollback-gezakt",
-   "aantal": 1,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },
   {
    "id": "object-vooraf",

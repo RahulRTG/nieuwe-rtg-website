@@ -351,6 +351,8 @@ const GETALLEN = {
     wat: 'onopgeloste aanroepen die GEEN van de verklaarde soorten zijn -- de echte restbak' },
   'graaf.doelOnbekend': { bron: 'AANROEPGRAAF.json', veld: 'gemeten.doelOnbekend',
     wat: 'ingevoerde namen die het doelbestand niet kent -- elke andere waarde dan nul is een bevinding' },
+  'graaf.bewaakteVooruitwijzing': { bron: 'AANROEPGRAAF.json', veld: 'gemeten.bewaakteVooruitwijzing',
+    wat: 'aanroepen naar een integratie die met opzet nog niet gebouwd is, waar het bestand zelf afbreekt als de andere kant ontbreekt -- een gedeclareerd gat, geen vergissing' },
   'graaf.aanroepers': { bron: 'AANROEPGRAAF.json', veld: 'gemeten.symbolenMetAanroeper',
     wat: 'symbolen waarvan bekend is wie ze aanroept' },
   'graaf.routesMetSymbool': { bron: 'AANROEPGRAAF.json', veld: 'gemeten.routesMetSymbool',

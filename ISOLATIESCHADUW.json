@@ -1,47 +1,37 @@
 {
   "stempel": {
-    "op": "2026-09-02T17:24:05.932Z",
+    "op": "2026-09-19T19:04:07.307Z",
     "node": "v22.22.2"
   },
   "uitleg": "Wat middleware/isolatiepoort.js zou sluiten als hij beet. Gemeten met echt HTTP-verkeer van een echt lid met een echte stand, niet geschat.",
   "grens": "Dit gaat over de paden uit de member-allowlist van kern/stuur/beleid.js en over GEEN ander verkeer. Een lid dat een pad gebruikt dat daar niet in staat, is hier niet gemeten -- en dat is iets anders dan \"die loopt door\".",
-  "paden": 120,
+  "paden": 121,
   "rondes": [
     {
       "stand": "waakzaam",
       "drager": "identiteit",
-      "paden": 120,
-      "gewogen": 117,
+      "paden": 121,
+      "gewogen": 118,
       "zouSluiten": 0,
       "gesloten": []
     },
     {
       "stand": "beperkt",
       "drager": "identiteit",
-      "paden": 120,
-      "gewogen": 117,
+      "paden": 121,
+      "gewogen": 118,
       "zouSluiten": 0,
       "gesloten": []
     },
     {
       "stand": "beschermd",
       "drager": "identiteit",
-      "paden": 120,
-      "gewogen": 117,
-      "zouSluiten": 26,
+      "paden": 121,
+      "gewogen": 118,
+      "zouSluiten": 24,
       "gesloten": [
         {
           "pad": "/api/bank/advies",
-          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
-          "reden": "BESCHERMSTAND_CATEGORIE"
-        },
-        {
-          "pad": "/api/bank/akkoord",
-          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
-          "reden": "BESCHERMSTAND_CATEGORIE"
-        },
-        {
-          "pad": "/api/bank/bevries",
           "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
           "reden": "BESCHERMSTAND_CATEGORIE"
         },
@@ -180,9 +170,9 @@
     {
       "stand": "isolatie",
       "drager": "identiteit",
-      "paden": 120,
-      "gewogen": 117,
-      "zouSluiten": 85,
+      "paden": 121,
+      "gewogen": 118,
+      "zouSluiten": 84,
       "gesloten": [
         {
           "pad": "/api/agenda/antwoord",
@@ -246,16 +236,6 @@
         },
         {
           "pad": "/api/bank/advies",
-          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
-          "reden": "BESCHERMSTAND_CATEGORIE"
-        },
-        {
-          "pad": "/api/bank/akkoord",
-          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
-          "reden": "BESCHERMSTAND_CATEGORIE"
-        },
-        {
-          "pad": "/api/bank/bevries",
           "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
           "reden": "BESCHERMSTAND_CATEGORIE"
         },
@@ -486,6 +466,11 @@
         },
         {
           "pad": "/api/meet/weg",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/member/voorstel/intrek",
           "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
           "reden": "ISOLATIE_LEESSET"
         },

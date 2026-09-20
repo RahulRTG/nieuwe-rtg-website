@@ -1,8 +1,8 @@
 {
  "uitleg": "Afgeleide executiekaart: per route wat de AI ermee mag, wat het bewijs eronder zegt en of een herhaling schade doet. De herkomst staat per veldsoort in `velden`, de vertaling naar de gedeelde gezagsnoemer in `noemer`. NOOIT met de hand wijzigen: npm run executionmap:controle zakt erop.",
  "bronnen": {
-  "IDEMPROEF.json": "77ebd1d289f4d7ac",
-  "IDEMBESLUIT.json": "a20e7b5abed335c8",
+  "IDEMPROEF.json": "5cce9271ee73b1aa",
+  "IDEMBESLUIT.json": "ec408e450a3b0b53",
   "HERSTEL.json": "43f74e808fe06d72",
   "VERTROUWEN.json": "6fb6bc1a3e8ce705",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
@@ -72,10 +72,10 @@
   }
  },
  "telling": {
-  "capabilities": 4933,
+  "capabilities": 4972,
   "bereikbaarPerRol": 177,
   "conflicten": 0,
-  "metBesluit": 128,
+  "metBesluit": 148,
   "metVermoedeTerugweg": 49,
   "bevestigdeTerugweg": 43
  },
@@ -4837,6 +4837,135 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/dossier",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/horizon",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/kring",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/kring/keuzes",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/naklank",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/naklank/tel",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/naklank/weg",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "instelling",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/noteer",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/ontdek",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/open",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/portfolio",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/schuif",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/signaal",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/uitleg",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/connect/werk",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -16603,6 +16732,66 @@
    "bereik": "verboden"
   },
   {
+   "pad": "/api/neiging/antwoord",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/neiging/geheugen",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/neiging/intake",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/neiging/niet-voor",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/neiging/opnieuw",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "instelling",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/neiging/overslaan",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "instelling",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/neiging/vergeet",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
    "pad": "/api/noodkaart",
    "rol": "member",
    "herhaling": "beschermd",
@@ -19592,6 +19781,14 @@
    "bereik": "verboden"
   },
   {
+   "pad": "/api/office/reisbureau/terugboeking",
+   "rol": "office",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
    "pad": "/api/office/reisbureau/uitnodiging-roteer",
    "rol": "office",
    "herhaling": "ongemeten",
@@ -21372,7 +21569,7 @@
   {
    "pad": "/api/onboarding/teken",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "herhalingBesluit": "instelling",
@@ -23709,6 +23906,14 @@
    "bereik": "verboden"
   },
   {
+   "pad": "/api/reisbureau/betaal",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
    "pad": "/api/reisbureau/boek",
    "rol": "member",
    "herhaling": "ongemeten",
@@ -24209,6 +24414,100 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/dossier",
+   "rol": "",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/horizon",
+   "rol": "",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/kring",
+   "rol": "",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/kring/keuzes",
+   "rol": "",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/naklank",
+   "rol": "",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/noteer",
+   "rol": "",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/ontdek",
+   "rol": "",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/open",
+   "rol": "",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/portfolio",
+   "rol": "",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/signaal",
+   "rol": "",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/connect/werk",
+   "rol": "",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -29157,6 +29456,30 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/staff/gemoed",
+   "rol": "supplier",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/staff/gemoed/weg",
+   "rol": "supplier",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/staff/gemoed/zet",
+   "rol": "supplier",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
@@ -34420,6 +34743,15 @@
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "herhalingBesluit": "instelling",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/supplier/onderneming",
+   "rol": "supplier",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {

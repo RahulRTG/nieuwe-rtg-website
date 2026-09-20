@@ -1,22 +1,22 @@
 {
   "stempel": {
-    "op": "2026-09-14T08:08:28.928Z",
-    "commit": "9a7caf217",
+    "op": "2026-09-19T18:56:34.630Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 2,
     "instrument": "scripts/stilspoor.js",
     "node": "v22.22.2"
   },
   "soort": "meting",
-  "uitleg": "Schrijfacties waarvan het falen volledig wordt weggevangen, terwijl de aanroeper daarna succes meldt. De klasse van LAT.md regel 18: een belofte over een spoor is pas een regel als het spoor kan weigeren.",
+  "uitleg": "Schrijfacties waarvan het falen volledig wordt weggevangen, terwijl de aanroeper daarna succes meldt. De klasse van LAT.md regel 21: een belofte over een spoor is pas een regel als het spoor kan weigeren.",
   "grens": "Deze meting toont NIET aan dat een gesmoorde schrijfactie fout is -- server/log.js en kern/envelop.js smoren met reden. Het is een triagelijst, geen oordeel. Zij toont ook niet aan dat dit alle gevallen zijn: de herkenning van een spoor- of opslagschrijver is lexicaal, dus dit is een ONDERGRENS op de schuld. En zij zegt niets over aanroepers die de uitslag van een schrijfactie negeren zonder try/catch -- dat is dezelfde faalvorm zonder dit kenmerk.",
   "graad": "vermoed",
   "gemeten": {
-    "bestanden": 3480,
-    "vangers": 1858,
-    "leegVangers": 680,
-    "spoorAanroepen": 228,
-    "opslagAanroepen": 3222,
+    "bestanden": 3582,
+    "vangers": 1875,
+    "leegVangers": 681,
+    "spoorAanroepen": 241,
+    "opslagAanroepen": 3248,
     "spoorGesmoord": 18,
     "opslagGesmoord": 25,
     "spoorGesmoordMetBesluit": 0,
@@ -68,7 +68,7 @@
       "lijf": "const z = zaken.vind(r.zaak.id); if (z) loop.noteer(z, { soort: 'notitie', van: 'systeem', tekst: 'Binnengekomen per e-mail. De afzender is "
     },
     {
-      "plek": "server/kern/stuur.js:71",
+      "plek": "server/kern/stuur/toets.js:62",
       "lijf": "schaduw().noteer(o.wereld, pad, weger().weeg(beleid.niveau, body));"
     },
     {
@@ -84,7 +84,7 @@
       "lijf": "noteer();"
     },
     {
-      "plek": "server/routes/member/persoonlijk-rahul.js:118",
+      "plek": "server/routes/member/persoonlijk-rahul.js:136",
       "lijf": "if (!req.session.account || !antwoord) return; noteerBeurt(req.session.account, req.body.q, antwoord, req.body.lang);"
     },
     {
@@ -190,11 +190,11 @@
       "lijf": "save();"
     },
     {
-      "plek": "server/server.js:1829",
+      "plek": "server/server.js:1819",
       "lijf": "save();"
     },
     {
-      "plek": "server/server.js:1909",
+      "plek": "server/server.js:1899",
       "lijf": "save();"
     }
   ]

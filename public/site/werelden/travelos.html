@@ -9,7 +9,7 @@
   <title>TravelOS | Rahul Travel Group</title>
   <link rel="icon" href="../../icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../start/start-base.css">
-  <link rel="stylesheet" href="./world.css?v=20260907">
+  <link rel="stylesheet" href="./world.css?v=20260920-text3">
 </head>
 <body class="world-story" data-world="travel">
   <a class="skip-link" href="#verhaal">Ga naar de inhoud</a>
@@ -17,7 +17,7 @@
     <section class="world-hero" aria-labelledby="wereldtitel">
       <header class="world-header">
         <a class="brand" href="../../../" aria-label="Rahul Travel Group, naar de startpagina"><span class="brand-name">Rahul Travel Group</span><span class="brand-slogan">EXPERIENCE THE ELITE CLASS</span></a>
-        <div class="world-header-actions"><a class="world-back" href="../../../#werelden">← Vier werelden</a><a class="login-link" href="https://app.rahultravelgroup.com/apps/reizen.html">Open TravelOS</a></div>
+        <div class="world-header-actions"><a class="world-back" href="../../../#werelden">Vier werelden</a><button type="button" class="login-link language-link" data-language-picker aria-label="Taal kiezen">Taal</button><a class="login-link" href="https://app.rahultravelgroup.com/apps/reizen.html">Open TravelOS</a></div>
       </header>
       <div class="world-hero-inner">
         <div class="world-hero-copy">
@@ -36,13 +36,13 @@
             <div><p class="story-kicker">Waar het om draait</p><h2>U maakt één reis. De reiswereld ziet losse onderdelen.</h2></div>
             <div class="story-intro-text">
               <p>De luchtvaartmaatschappij kent uw vlucht. Het hotel kent uw kamer. De chauffeur kent een ophaaltijd. U bent degene die alles bij elkaar moet houden.</p>
-              <p>TravelOS maakt van losse bevestigingen weer één reisbeeld. Het helpt u voorbereiden, houdt veranderingen in context en brengt de juiste informatie naar voren op het moment dat die nodig is. Als iets afwijkt, hoeft u niet opnieuw vanaf nul te beginnen.</p>
+              <p>TravelOS zet losse bevestigingen bij dezelfde reis. Het helpt bij de voorbereiding, laat zien wat een wijziging voor de rest van de reis betekent en toont informatie wanneer u die nodig heeft. Als iets verandert, hoeft u niet alles opnieuw uit te zoeken.</p>
             </div>
           </div>
           <div class="outcomes">
-            <article class="outcome"><span class="outcome-number">01</span><h3>Eén actueel overzicht</h3><p>Boekingen, tijden, adressen, documenten en afspraken volgen dezelfde reis in plaats van verschillende inboxen.</p><details class="proof-detail"><summary>Wat staat er echt in de code?</summary><p>Het reisboek en de reisroutes bewaren onderdelen onder dezelfde reiscontext. “Actueel” is begrensd: RTG toont de laatst bekende bronstatus en verzint geen providerbevestiging.</p><span class="proof-source">public/apps/reisboek.html · server/routes/reis.js</span></details></article>
-            <article class="outcome"><span class="outcome-number">02</span><h3>Eerder voorbereid</h3><p>Benodigde documenten, vertrek, overstappen en aankomst komen in beeld voordat ze om uw aandacht vragen.</p><details class="proof-detail"><summary>Wat staat er echt in de code?</summary><p>Er zijn controles voor reisdocumenten, veiligheid en vertrekstappen. Zij kunnen ontbrekende informatie signaleren; geldigheid bij een overheid of vervoerder blijft afhankelijk van die externe bron.</p><span class="proof-source">public/apps/reizen-veilig.html · public/apps/reisboek-momenten.js</span></details></article>
-            <article class="outcome"><span class="outcome-number">03</span><h3>Ondersteuning dichtbij</h3><p>Zelf regelen waar het kan, menselijke service inschakelen waar de situatie daarom vraagt.</p><details class="proof-detail"><summary>Wat staat er echt in de code?</summary><p>De app bevat zelfbediening en aparte leverancier- en servicestromen. Menselijke uitvoering is een overdracht naar een bevoegde rol, geen autonome belofte van de assistent.</p><span class="proof-source">public/apps/reisbureau.html · public/apps/leverancier-service.html</span></details></article>
+            <article class="outcome"><span class="outcome-number">01</span><h3>Eén actueel overzicht</h3><p>Boekingen, tijden, adressen, documenten en afspraken volgen dezelfde reis in plaats van verschillende inboxen.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Het reisboek bewaart alle onderdelen bij dezelfde reis. RTG toont de laatst ontvangen status en maakt zelf geen bevestiging van een luchtvaartmaatschappij, hotel of vervoerder.</p><span class="proof-source">public/apps/reisboek.html; server/routes/reis.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">02</span><h3>Eerder voorbereid</h3><p>Benodigde documenten, vertrek, overstappen en aankomst komen in beeld voordat ze om uw aandacht vragen.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>De app controleert of benodigde reisgegevens zijn ingevuld en kan ontbrekende informatie melden. Alleen een overheid of vervoerder kan bepalen of een document geldig is.</p><span class="proof-source">public/apps/reizen-veilig.html; public/apps/reisboek-momenten.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">03</span><h3>Ondersteuning dichtbij</h3><p>Zelf regelen waar het kan, menselijke service inschakelen waar de situatie daarom vraagt.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>De app heeft schermen voor zelfbediening, leveranciers en service. Als een mens iets moet uitvoeren, wordt de vraag aan een bevoegde medewerker doorgegeven.</p><span class="proof-source">public/apps/reisbureau.html; public/apps/leverancier-service.html</span></details></article>
           </div>
         </div>
       </section>
@@ -63,10 +63,10 @@
             <p>TravelOS ordent functies rond de reis die u beleeft. Niet rond de systemen van de afzonderlijke aanbieder.</p>
           </div>
           <div class="capability-grid">
-            <article class="capability"><h3>Reisbeeld &amp; documenten</h3><p>Reisplanning, bevestigingen, identiteit, visa, tickets en belangrijke gegevens logisch bij elkaar.</p><details class="proof-detail"><summary>Bekijk de concrete basis</summary><p>Reisboek, identiteit en vervoerbewijs zijn afzonderlijke codeonderdelen die in een reiscontext samen kunnen worden getoond. RTG noemt een document pas bevestigd wanneer de opgeslagen bron dat draagt.</p><span class="proof-source">public/apps/reisboek.html · server/identiteitsmap.js · server/routes/mobiliteit/vervoerbewijs.js</span></details></article>
-            <article class="capability"><h3>Vlucht &amp; verblijf</h3><p>Vertrek, overstappen, stoel- en verblijfsinformatie in dezelfde tijdlijn, met wijzigingen in hun context.</p><details class="proof-detail"><summary>Bekijk de concrete basis</summary><p>De reisschermen bevatten vertrek-, boekings- en verblijfsstappen. Een weergave van een wijziging is niet hetzelfde als de wijziging bij een luchtvaartmaatschappij of accommodatie uitvoeren.</p><span class="proof-source">public/apps/reizen-performance-reis.js · public/apps/leverancier-kamer.js</span></details></article>
-            <article class="capability"><h3>Vervoer &amp; navigatie</h3><p>De route naar vertrek, vervoer op bestemming en afspraken onderweg als aansluitende delen van dezelfde reis.</p><details class="proof-detail"><summary>Bekijk de concrete basis</summary><p>De mobiliteitskern bevat reisplannen, ritten en vervoerbewijzen. Zakelijke ritten hebben bovendien eigen rekening- en bevoegdheidsregels.</p><span class="proof-source">server/kern/mobiliteit/reisplan.js · server/kern/mobiliteit/zakelijk.js</span></details></article>
-            <article class="capability"><h3>Aankomst &amp; bestemming</h3><p>Lokale informatie, veiligheid, ervaringen, ondersteuning en praktische zaken beschikbaar wanneer u aankomt.</p><details class="proof-detail"><summary>Bekijk de concrete basis</summary><p>De app heeft aankomst-, veiligheids- en lokale serviceschermen. Welke dienst werkelijk geleverd kan worden, volgt uit de beschikbare partner of bron op dat moment.</p><span class="proof-source">public/apps/reizen-veilig.js · public/apps/reizen-performance-taxi.js</span></details></article>
+            <article class="capability"><h3>Reisoverzicht en documenten</h3><p>Reisplanning, bevestigingen, identiteit, visa, tickets en belangrijke gegevens logisch bij elkaar.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Het reisboek, de identiteitsmap en vervoerbewijzen zijn aparte onderdelen die samen bij een reis kunnen worden getoond. Een document krijgt pas de status bevestigd wanneer de opgeslagen bron dat aangeeft.</p><span class="proof-source">public/apps/reisboek.html; server/identiteitsmap.js; server/routes/mobiliteit/vervoerbewijs.js</span></details></article>
+            <article class="capability"><h3>Vlucht en verblijf</h3><p>Vertrek, overstappen, stoel- en verblijfsinformatie in dezelfde tijdlijn, met de bijbehorende wijzigingen.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>De reisschermen bevatten stappen voor vertrek, boekingen en verblijf. Een wijziging tonen is niet hetzelfde als die wijziging uitvoeren bij een luchtvaartmaatschappij of accommodatie.</p><span class="proof-source">public/apps/reizen-performance-reis.js; public/apps/leverancier-kamer.js</span></details></article>
+            <article class="capability"><h3>Vervoer en navigatie</h3><p>De reis naar het vertrekpunt, vervoer op de bestemming en afspraken onderweg sluiten op elkaar aan.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>RTG bevat reisplannen, ritten en vervoerbewijzen. Voor zakelijke ritten gelden aparte regels voor rekeningen en bevoegdheden.</p><span class="proof-source">server/kern/mobiliteit/reisplan.js; server/kern/mobiliteit/zakelijk.js</span></details></article>
+            <article class="capability"><h3>Aankomst en bestemming</h3><p>Lokale informatie, veiligheid, ervaringen, ondersteuning en praktische zaken beschikbaar wanneer u aankomt.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>De app heeft schermen voor aankomst, veiligheid en plaatselijke diensten. Of een dienst beschikbaar is, hangt af van de partner of informatiebron op dat moment.</p><span class="proof-source">public/apps/reizen-veilig.js; public/apps/reizen-performance-taxi.js</span></details></article>
           </div>
         </div>
       </section>
@@ -86,6 +86,6 @@
        pagina is die een bezoeker van buiten Nederland ziet. Dezelfde laag als
        de voordeur (index.html) en als elk appscherm; hij vraagt de server pas
        iets zodra er werkelijk een andere taal is gekozen. -->
-  <script src="../../shared/i18n.js" defer></script>
+  <script src="../../shared/i18n.js?v=20260920-text" defer></script>
 </body>
 </html>

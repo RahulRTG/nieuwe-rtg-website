@@ -1316,11 +1316,9 @@ window.RTGUiBronTekst = function(source){
   function vlag(code) {
     return '<span class="rtg-lang-code">' + String(code || '').toUpperCase() + '</span>';
   }
-  // kleine, in huisstijl getekende tekens (geen emoji), currentColor volgend
+  // Kleine, functionele lijntekening voor spraakinvoer.
   const ICOON = {
-    mic: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v3.5"/></svg>',
-    spark: '<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M12 2c.5 4.6 2.4 6.5 7 7-4.6.5-6.5 2.4-7 7-.5-4.6-2.4-6.5-7-7 4.6-.5 6.5-2.4 7-7z"/></svg>',
-    globe: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>'
+    mic: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v3.5"/></svg>'
   };
   // veelgebruikte land-/taalnamen die Rahul moet herkennen (genormaliseerd:
   // kleine letters, accenten eraf). De rest matcht op de eigen naam + Engelse naam.
@@ -1569,22 +1567,21 @@ window.RTGUiBronTekst = function(source){
       scrim.className = 'rtg-lang-scrim';
       scrim.setAttribute('data-i18n-ignore', '');
       // de matcher kent de HELE wereld (alle 114) als die binnen is; anders de
-      // actieve set. Er staan geen vlagknoppen meer: je kiest door te typen of
-      // te spreken, Rahul herkent je land of taal en stelt hem voor.
+      // actieve set. De bezoeker kiest door een land of taal te typen of uit te
+      // spreken. Daarna verschijnt één duidelijke keuze.
       this._lijst = this._alleTalen || WERELD || Object.keys(LANGS).map(c => ({ code: c, naam: LANGS[c].native, en: LANGS[c].label }));
       this._aanbevolen = recommended || 'en';
       const kanSpreken = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
       scrim.innerHTML =
         '<div class="rtg-lang-card" role="dialog" aria-modal="true" aria-label="Choose your language / Kies je taal">' +
-          '<canvas class="rtg-lang-mond" id="rtg-lang-mond" width="440" height="200" aria-hidden="true"></canvas>' +
-          '<h2>Where in the world are you?</h2>' +
-          '<p>Type or say your language &middot; Rahul switches for you</p>' +
-          '<div class="rtg-lang-ai">' +
+          '<h2>Choose your language / Kies uw taal</h2>' +
+          '<p>Type or say a language / Typ of spreek een taal</p>' +
+          '<div class="rtg-lang-search">' +
             (kanSpreken ? '<button type="button" id="rtg-lang-mic" aria-label="Speak your language / Spreek je taal">' + ICOON.mic + '</button>' : '') +
             '<input id="rtg-lang-zoek" autocomplete="off" enterkeyhint="go" ' +
               'aria-label="Type your country or language / Typ je land of taal" ' +
-              'placeholder="Say or type where you&rsquo;re from&hellip;">' +
-            '<button type="button" id="rtg-lang-rahul" aria-label="Let Rahul choose / Laat Rahul kiezen">' + ICOON.spark + '</button>' +
+              'placeholder="Country or language / Land of taal">' +
+            '<button type="button" id="rtg-lang-submit" aria-label="Use selected language / Gebruik gekozen taal">OK</button>' +
           '</div>' +
           '<button type="button" class="rtg-lang-hint" id="rtg-lang-hint" hidden></button>' +
         '</div>';
@@ -1593,12 +1590,12 @@ window.RTGUiBronTekst = function(source){
       const zoek = scrim.querySelector('#rtg-lang-zoek');
       const hint = scrim.querySelector('#rtg-lang-hint');
       const self = this;
-      // toon Rahuls voorstel (geen knoppenlijst): een vlag + de naam, aantikbaar
+      // Toon één passende taalnaam die de bezoeker kan aantikken.
       const stelVoor = () => {
         const res = self.zoekTaal(zoek.value.trim());
         if (!zoek.value.trim() || !res.code) {
           hint.hidden = true; hint.removeAttribute('data-lang');
-          if (zoek.value.trim()) { hint.hidden = false; hint.removeAttribute('data-lang'); hint.innerHTML = '<span class="rtg-lang-mis">Hmm, not sure yet &mdash; try a country or language.</span>'; }
+          if (zoek.value.trim()) { hint.hidden = false; hint.removeAttribute('data-lang'); hint.innerHTML = '<span class="rtg-lang-mis">Language not found. Try another name. / Taal niet gevonden. Probeer een andere naam.</span>'; }
           return;
         }
         const t = self._lijst.find(x => x.code === res.code) || {};
@@ -1606,7 +1603,7 @@ window.RTGUiBronTekst = function(source){
         hint.setAttribute('data-lang', res.code);
         hint.innerHTML = vlag(res.code) +
           '<span class="rtg-lang-sug"><b>' + String(t.naam || res.code).replace(/[<>]/g, '') + '</b>' +
-          '<span class="rtg-lang-go">tap to continue &middot; tik om verder te gaan</span></span>';
+          '<span class="rtg-lang-go">Continue / Verder</span></span>';
       };
       const kies = (code) => {
         code = code || self.zoekTaal(zoek.value.trim()).code || self._aanbevolen;
@@ -1614,7 +1611,7 @@ window.RTGUiBronTekst = function(source){
       };
       zoek.addEventListener('input', stelVoor);
       zoek.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); kies(); } });
-      scrim.querySelector('#rtg-lang-rahul').addEventListener('click', () => kies());
+      scrim.querySelector('#rtg-lang-submit').addEventListener('click', () => kies());
       hint.addEventListener('click', () => kies(hint.getAttribute('data-lang')));
       // spreken: de eigen stem invullen en meteen laten herkennen
       const mic = scrim.querySelector('#rtg-lang-mic');
@@ -1629,7 +1626,7 @@ window.RTGUiBronTekst = function(source){
           if (e.key === 'Escape' && m && m.classList.contains('open')) { this.set(this.lang); this.closeModal(); }
         });
       }
-      if (stondOpen) { scrim.classList.add('open'); this._startMond(); }
+      if (stondOpen) { scrim.classList.add('open'); this._startSterren(); }
     },
     // spreken -> tekst (Web Speech API, geen afhankelijkheden). Lukt het niet,
     // dan gebeurt er gewoon niets bijzonders; typen blijft altijd werken.
@@ -1649,19 +1646,6 @@ window.RTGUiBronTekst = function(source){
         rec.start();
       } catch (e) { mic.classList.remove('luistert'); }
     },
-    // de signatuurlippen: pas laden/tekenen zodra de kiezer echt getoond wordt
-    _startMond() {
-      const c = document.getElementById('rtg-lang-mond');
-      if (!c || this._mond) return;
-      const go = () => { if (window.RTGMond && !this._mond) this._mond = window.RTGMond.maak(c); };
-      if (window.RTGMond) go();
-      else if (!this._mondLaadt) {
-        this._mondLaadt = true;
-        const s = document.createElement('script'); s.src = assetPad('/shared/mond.js'); s.async = true;
-        s.onload = go; document.head.appendChild(s);
-      }
-      this._startSterren();
-    },
     // een heel subtiele 3D-sterrenhemel achter de kaart, in RTG-stijl
     _startSterren() {
       const scrim = document.getElementById('rtg-lang-modal');
@@ -1676,7 +1660,7 @@ window.RTGUiBronTekst = function(source){
     openModal() {
       if (!document.getElementById('rtg-lang-modal')) this.buildModal(this.chosen ? this.lang : (this._aanbevolen || detectDevice()));
       const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.add('open');
-      this._startMond();
+      this._startSterren();
       const z = document.getElementById('rtg-lang-zoek');
       if (z) setTimeout(() => { try { z.focus(); } catch (e) {} }, 80);
     },
@@ -1687,7 +1671,14 @@ window.RTGUiBronTekst = function(source){
        het vraagteken. Taal is een instelling, dus hij staat nu waar de andere
        instellingen staan: in het bedieningspaneel (shared/bediening.js), dat
        openModal() aanroept. Het leden-OS deed dit al met de tegel "Taal". */
-    buildSwitch() { /* geen zwevende knop meer; zie het bedieningspaneel */ },
+    buildSwitch() {
+      const self = this;
+      document.querySelectorAll('[data-language-picker]').forEach(function (button) {
+        if (button.hasAttribute('data-language-picker-ready')) return;
+        button.setAttribute('data-language-picker-ready', 'true');
+        button.addEventListener('click', function () { self.openModal(); });
+      });
+    },
     /* updateSwitch bijgewerkt de knop die er niet meer is. Hij zocht nog naar
        #rtg-lang-switch, en dat element staat sinds de verhuizing naar het
        bedieningspaneel op geen enkele pagina meer -- de blindevlek-toets ving
@@ -1712,20 +1703,19 @@ window.RTGUiBronTekst = function(source){
         font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
         animation:rtgLangIn .4s cubic-bezier(.2,.8,.2,1);}
       @keyframes rtgLangIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:none;}}
-      .rtg-lang-mond{display:block;width:200px;height:90px;margin:0.1rem auto -0.15rem;}
       .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.55rem;margin:0.1rem 0 0.1rem;letter-spacing:-0.01em;color:#F7F3EC;}
       .rtg-lang-card p{color:#B8B2A8;font-size:0.8rem;margin:0 0 0.85rem;}
-      .rtg-lang-ai{display:flex;align-items:center;gap:0.45rem;background:rgba(255,255,255,0.05);
+      .rtg-lang-search{display:flex;align-items:center;gap:0.45rem;background:rgba(255,255,255,0.05);
         border:1px solid rgba(222,219,213,0.16);border-radius:0;padding:0.1rem 0.1rem 0.1rem 0.9rem;
         margin:0 auto 0.5rem;max-width:520px;width:100%;transition:border-color .18s;}
-      .rtg-lang-ai:focus-within{border-color:#C9A24B;}
-      .rtg-lang-ai input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;
+      .rtg-lang-search:focus-within{border-color:#C9A24B;}
+      .rtg-lang-search input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;
         font-family:inherit;font-size:0.92rem;padding:0.7rem 0;}
-      .rtg-lang-ai input::placeholder{color:#8A8680;}
-      .rtg-lang-ai button{flex:none;background:linear-gradient(180deg,#9E1C40,#7F1634);color:#fff;border:none;cursor:pointer;
+      .rtg-lang-search input::placeholder{color:#8A8680;}
+      .rtg-lang-search button{flex:none;background:linear-gradient(180deg,#9E1C40,#7F1634);color:#fff;border:none;cursor:pointer;
         border-radius:0;padding:0.55rem 0.72rem;font-size:1rem;line-height:1;transition:filter .18s,transform .12s;}
-      .rtg-lang-ai button:hover{filter:brightness(1.14);}
-      .rtg-lang-ai button:active{transform:scale(0.95);}
+      .rtg-lang-search button:hover{filter:brightness(1.14);}
+      .rtg-lang-search button:active{transform:scale(0.95);}
       #rtg-lang-mic{background:rgba(255,255,255,0.08);}
       #rtg-lang-mic.luistert{background:linear-gradient(180deg,#C23A5E,#9E1C40);animation:rtgMic 1.1s ease-in-out infinite;}
       @keyframes rtgMic{0%,100%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}50%{box-shadow:0 0 0 6px rgba(194,58,94,0);}}

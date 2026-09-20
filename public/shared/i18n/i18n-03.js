@@ -7,7 +7,7 @@
           if (e.key === 'Escape' && m && m.classList.contains('open')) { this.set(this.lang); this.closeModal(); }
         });
       }
-      if (stondOpen) { scrim.classList.add('open'); this._startMond(); }
+      if (stondOpen) { scrim.classList.add('open'); this._startSterren(); }
     },
     // spreken -> tekst (Web Speech API, geen afhankelijkheden). Lukt het niet,
     // dan gebeurt er gewoon niets bijzonders; typen blijft altijd werken.
@@ -27,19 +27,6 @@
         rec.start();
       } catch (e) { mic.classList.remove('luistert'); }
     },
-    // de signatuurlippen: pas laden/tekenen zodra de kiezer echt getoond wordt
-    _startMond() {
-      const c = document.getElementById('rtg-lang-mond');
-      if (!c || this._mond) return;
-      const go = () => { if (window.RTGMond && !this._mond) this._mond = window.RTGMond.maak(c); };
-      if (window.RTGMond) go();
-      else if (!this._mondLaadt) {
-        this._mondLaadt = true;
-        const s = document.createElement('script'); s.src = assetPad('/shared/mond.js'); s.async = true;
-        s.onload = go; document.head.appendChild(s);
-      }
-      this._startSterren();
-    },
     // een heel subtiele 3D-sterrenhemel achter de kaart, in RTG-stijl
     _startSterren() {
       const scrim = document.getElementById('rtg-lang-modal');
@@ -54,7 +41,7 @@
     openModal() {
       if (!document.getElementById('rtg-lang-modal')) this.buildModal(this.chosen ? this.lang : (this._aanbevolen || detectDevice()));
       const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.add('open');
-      this._startMond();
+      this._startSterren();
       const z = document.getElementById('rtg-lang-zoek');
       if (z) setTimeout(() => { try { z.focus(); } catch (e) {} }, 80);
     },
@@ -65,7 +52,14 @@
        het vraagteken. Taal is een instelling, dus hij staat nu waar de andere
        instellingen staan: in het bedieningspaneel (shared/bediening.js), dat
        openModal() aanroept. Het leden-OS deed dit al met de tegel "Taal". */
-    buildSwitch() { /* geen zwevende knop meer; zie het bedieningspaneel */ },
+    buildSwitch() {
+      const self = this;
+      document.querySelectorAll('[data-language-picker]').forEach(function (button) {
+        if (button.hasAttribute('data-language-picker-ready')) return;
+        button.setAttribute('data-language-picker-ready', 'true');
+        button.addEventListener('click', function () { self.openModal(); });
+      });
+    },
     /* updateSwitch bijgewerkt de knop die er niet meer is. Hij zocht nog naar
        #rtg-lang-switch, en dat element staat sinds de verhuizing naar het
        bedieningspaneel op geen enkele pagina meer -- de blindevlek-toets ving
@@ -90,20 +84,19 @@
         font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
         animation:rtgLangIn .4s cubic-bezier(.2,.8,.2,1);}
       @keyframes rtgLangIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:none;}}
-      .rtg-lang-mond{display:block;width:200px;height:90px;margin:0.1rem auto -0.15rem;}
       .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.55rem;margin:0.1rem 0 0.1rem;letter-spacing:-0.01em;color:#F7F3EC;}
       .rtg-lang-card p{color:#B8B2A8;font-size:0.8rem;margin:0 0 0.85rem;}
-      .rtg-lang-ai{display:flex;align-items:center;gap:0.45rem;background:rgba(255,255,255,0.05);
+      .rtg-lang-search{display:flex;align-items:center;gap:0.45rem;background:rgba(255,255,255,0.05);
         border:1px solid rgba(222,219,213,0.16);border-radius:0;padding:0.1rem 0.1rem 0.1rem 0.9rem;
         margin:0 auto 0.5rem;max-width:520px;width:100%;transition:border-color .18s;}
-      .rtg-lang-ai:focus-within{border-color:#C9A24B;}
-      .rtg-lang-ai input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;
+      .rtg-lang-search:focus-within{border-color:#C9A24B;}
+      .rtg-lang-search input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;
         font-family:inherit;font-size:0.92rem;padding:0.7rem 0;}
-      .rtg-lang-ai input::placeholder{color:#8A8680;}
-      .rtg-lang-ai button{flex:none;background:linear-gradient(180deg,#9E1C40,#7F1634);color:#fff;border:none;cursor:pointer;
+      .rtg-lang-search input::placeholder{color:#8A8680;}
+      .rtg-lang-search button{flex:none;background:linear-gradient(180deg,#9E1C40,#7F1634);color:#fff;border:none;cursor:pointer;
         border-radius:0;padding:0.55rem 0.72rem;font-size:1rem;line-height:1;transition:filter .18s,transform .12s;}
-      .rtg-lang-ai button:hover{filter:brightness(1.14);}
-      .rtg-lang-ai button:active{transform:scale(0.95);}
+      .rtg-lang-search button:hover{filter:brightness(1.14);}
+      .rtg-lang-search button:active{transform:scale(0.95);}
       #rtg-lang-mic{background:rgba(255,255,255,0.08);}
       #rtg-lang-mic.luistert{background:linear-gradient(180deg,#C23A5E,#9E1C40);animation:rtgMic 1.1s ease-in-out infinite;}
       @keyframes rtgMic{0%,100%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}50%{box-shadow:0 0 0 6px rgba(194,58,94,0);}}

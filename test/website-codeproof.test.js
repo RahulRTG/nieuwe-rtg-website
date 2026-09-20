@@ -19,7 +19,7 @@ const worldPages = [
 
 function sources(html) {
   return [...html.matchAll(/(?:data-proof-source="|class="proof-source">)([^"<]+)/g)]
-    .flatMap(match => match[1].split('·'))
+    .flatMap(match => match[1].split(';'))
     .map(value => value.trim())
     .filter(Boolean);
 }

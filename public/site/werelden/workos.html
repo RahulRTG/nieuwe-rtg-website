@@ -9,7 +9,7 @@
   <title>WorkOS | Rahul Travel Group</title>
   <link rel="icon" href="../../icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../start/start-base.css">
-  <link rel="stylesheet" href="./world.css?v=20260907">
+  <link rel="stylesheet" href="./world.css?v=20260920-text3">
 </head>
 <body class="world-story" data-world="work">
   <a class="skip-link" href="#verhaal">Ga naar de inhoud</a>
@@ -17,7 +17,7 @@
     <section class="world-hero" aria-labelledby="wereldtitel">
       <header class="world-header">
         <a class="brand" href="../../../" aria-label="Rahul Travel Group, naar de startpagina"><span class="brand-name">Rahul Travel Group</span><span class="brand-slogan">EXPERIENCE THE ELITE CLASS</span></a>
-        <div class="world-header-actions"><a class="world-back" href="../../../#werelden">← Vier werelden</a><a class="login-link" href="https://app.rahultravelgroup.com/apps/kantoor.html">Open WorkOS</a></div>
+        <div class="world-header-actions"><a class="world-back" href="../../../#werelden">Vier werelden</a><button type="button" class="login-link language-link" data-language-picker aria-label="Taal kiezen">Taal</button><a class="login-link" href="https://app.rahultravelgroup.com/apps/kantoor.html">Open WorkOS</a></div>
       </header>
       <div class="world-hero-inner">
         <div class="world-hero-copy">
@@ -40,9 +40,9 @@
             </div>
           </div>
           <div class="outcomes">
-            <article class="outcome"><span class="outcome-number">01</span><h3>Duidelijkheid per rol</h3><p>Mensen zien hun werk, bevoegdheden en relevante informatie zonder door de hele organisatie te hoeven zoeken.</p><details class="proof-detail"><summary>Wat staat er echt in de code?</summary><p>Werkruimtes, rollen en capabilities worden aan de serverzijde gecontroleerd. Een verborgen knop is dus niet de beveiliging; de route toetst opnieuw wie de handeling mag uitvoeren.</p><span class="proof-source">server/bedrijf/productie-identiteit.js · server/functies/register/</span></details></article>
-            <article class="outcome"><span class="outcome-number">02</span><h3>Minder overdracht</h3><p>Een proces houdt zijn context wanneer het van verkoop naar planning, uitvoering, betaling en nazorg beweegt.</p><details class="proof-detail"><summary>Wat staat er echt in de code?</summary><p>Projecten, taken, post en commerce hebben eigen modules, met een verzoekcontext die de bevoegde werkruimte meeneemt. Dat verbindt de keten zonder alle gegevens één onbeperkte bak te maken.</p><span class="proof-source">server/bedrijf/project.js · server/bedrijf/taak.js · server/opzet/handeling.js</span></details></article>
-            <article class="outcome"><span class="outcome-number">03</span><h3>Controleerbaar werken</h3><p>Besluiten, documenten, geldstromen en bevestigingen zijn terug te vinden voor wie daarvoor bevoegd is.</p><details class="proof-detail"><summary>Wat staat er echt in de code?</summary><p>Besluiten, verzoeken en mutaties krijgen afzonderlijke registratie en auditinformatie. De code bewaart daarmee een spoor; dat is geen verklaring dat iedere denkbare externe gebeurtenis automatisch is bewezen.</p><span class="proof-source">server/bedrijf/besluit.js · server/opzet/auditspoor.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">01</span><h3>Duidelijkheid per rol</h3><p>Mensen zien hun werk, bevoegdheden en relevante informatie zonder door de hele organisatie te hoeven zoeken.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>De server controleert per werkruimte en rol welke functies iemand mag gebruiken. Een knop verbergen is niet genoeg: bij iedere handeling wordt de bevoegdheid opnieuw gecontroleerd.</p><span class="proof-source">server/bedrijf/productie-identiteit.js; server/functies/register/</span></details></article>
+            <article class="outcome"><span class="outcome-number">02</span><h3>Minder overdracht</h3><p>De informatie blijft bij het werk wanneer een aanvraag van verkoop naar planning, uitvoering, betaling en nazorg gaat.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Projecten, taken, post en bestellingen hebben elk een eigen onderdeel. De bevoegde werkruimte wordt bij een verzoek gecontroleerd, zonder alle organisatiegegevens voor iedereen open te stellen.</p><span class="proof-source">server/bedrijf/project.js; server/bedrijf/taak.js; server/opzet/handeling.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">03</span><h3>Controleerbaar werken</h3><p>Besluiten, documenten, geldstromen en bevestigingen zijn terug te vinden voor wie daarvoor bevoegd is.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Besluiten, verzoeken en wijzigingen worden apart vastgelegd. Daardoor is later te zien wat er in RTG is gebeurd. Gebeurtenissen buiten RTG zijn daarmee niet automatisch bewezen.</p><span class="proof-source">server/bedrijf/besluit.js; server/opzet/auditspoor.js</span></details></article>
           </div>
         </div>
       </section>
@@ -63,10 +63,10 @@
             <p>WorkOS kan klein beginnen en meer rollen, processen en controle toevoegen wanneer de organisatie groeit.</p>
           </div>
           <div class="capability-grid">
-            <article class="capability"><h3>Start &amp; inrichting</h3><p>Organisatie, teams, rollen, toegang en werkafspraken als een heldere basis voor samenwerking.</p><details class="proof-detail"><summary>Bekijk de concrete basis</summary><p>De zakelijke toegang bouwt een werkruimtecontext op en koppelt rollen aan beschikbare functies. Oude of ontbrekende context wordt niet stil als een andere organisatie geïnterpreteerd.</p><span class="proof-source">server/bedrijf/productie-identiteit.js · server/opzet/leverancierpoort.js</span></details></article>
-            <article class="capability"><h3>Mensen &amp; verantwoordelijkheid</h3><p>Medewerkers, planning, inzet, ontwikkeling, loonprocessen en bevoegdheden verbonden met het werk.</p><details class="proof-detail"><summary>Bekijk de concrete basis</summary><p>Personeel, planning en payroll hebben aparte schermen en routes. Loonberekening, vrijgave en uitbetaling zijn niet één knop en vragen de passende rol.</p><span class="proof-source">public/apps/personeel.html · server/routes/payroll.js · server/routes/payroll-os-run.js</span></details></article>
-            <article class="capability"><h3>Kennis &amp; uitvoering</h3><p>Documenten, post, projecten, taken, communicatie en besluiten in de context waarin ze ontstaan.</p><details class="proof-detail"><summary>Bekijk de concrete basis</summary><p>Project, taak, post en besluit zijn afzonderlijke domeinmodules. Daardoor kan de interface samenhang tonen terwijl elke mutatie via haar eigen regels blijft lopen.</p><span class="proof-source">server/bedrijf/project.js · server/bedrijf/taak.js · server/bedrijf/postbrug.js · server/bedrijf/besluit.js</span></details></article>
-            <article class="capability"><h3>Operatie &amp; netwerk</h3><p>Financiën, handel, hospitality, leveranciers en partners als aansluitende onderdelen van dezelfde dienstverlening.</p><details class="proof-detail"><summary>Bekijk de concrete basis</summary><p>Commerce, betalen, horeca en leveranciers hebben eigen routes en operationele schermen. Een gezamenlijke werkplek heft de afzonderlijke rekening-, voorraad- en partnercontroles niet op.</p><span class="proof-source">server/routes/commerce.js · server/routes/pay-zaak.js · public/apps/horeca/</span></details></article>
+            <article class="capability"><h3>Start en inrichting</h3><p>Organisatie, teams, rollen, toegang en werkafspraken als een heldere basis voor samenwerking.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>De zakelijke toegang koppelt iedere rol aan de functies die binnen de werkruimte beschikbaar zijn. Ontbrekende of verouderde gegevens worden niet als toegang tot een andere organisatie behandeld.</p><span class="proof-source">server/bedrijf/productie-identiteit.js; server/opzet/leverancierpoort.js</span></details></article>
+            <article class="capability"><h3>Mensen en verantwoordelijkheid</h3><p>Medewerkers, planning, inzet, ontwikkeling, loonverwerking en bevoegdheden verbonden met het werk.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Personeel, planning en loonverwerking hebben aparte schermen en controles. Berekenen, goedkeuren en uitbetalen zijn verschillende handelingen waarvoor de juiste rol nodig is.</p><span class="proof-source">public/apps/personeel.html; server/routes/payroll.js; server/routes/payroll-os-run.js</span></details></article>
+            <article class="capability"><h3>Kennis en uitvoering</h3><p>Documenten, post, projecten, taken, communicatie en besluiten op de plek waar het werk gebeurt.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Projecten, taken, post en besluiten worden apart opgeslagen. De schermen kunnen de samenhang tonen, terwijl voor iedere wijziging de eigen regels blijven gelden.</p><span class="proof-source">server/bedrijf/project.js; server/bedrijf/taak.js; server/bedrijf/postbrug.js; server/bedrijf/besluit.js</span></details></article>
+            <article class="capability"><h3>Dagelijks werk en netwerk</h3><p>Financiën, handel, horeca, leveranciers en partners als aansluitende onderdelen van dezelfde dienstverlening.</p><details class="proof-detail"><summary>Bekijk wat al is gebouwd</summary><p>Bestellingen, betalingen, horeca en leveranciers hebben eigen schermen en controles. Ook in een gezamenlijke werkplek blijven rekeningen, voorraad en partners apart beveiligd.</p><span class="proof-source">server/routes/commerce.js; server/routes/pay-zaak.js; public/apps/horeca/</span></details></article>
           </div>
         </div>
       </section>
@@ -86,6 +86,6 @@
        pagina is die een bezoeker van buiten Nederland ziet. Dezelfde laag als
        de voordeur (index.html) en als elk appscherm; hij vraagt de server pas
        iets zodra er werkelijk een andere taal is gekozen. -->
-  <script src="../../shared/i18n.js" defer></script>
+  <script src="../../shared/i18n.js?v=20260920-text" defer></script>
 </body>
 </html>

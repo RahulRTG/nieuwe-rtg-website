@@ -12,9 +12,12 @@ body.world-story{max-width:100%;overflow-x:clip;background:#0b0908;color:var(--i
 .world-shell{max-width:100%;overflow:clip}
 .world-shell :is(header,main,footer,section,article,div){min-width:0}
 .world-header{position:relative;z-index:10;width:var(--page);min-height:102px;margin:0 auto;display:flex;align-items:center;gap:2rem;border-bottom:1px solid rgba(255,255,255,.16)}
-.world-header-actions{display:flex;align-items:center;gap:1.4rem;margin-left:auto}
+.world-header-actions{display:flex;flex:0 0 auto;align-items:center;gap:1.4rem;margin-left:0;margin-inline-start:auto;direction:ltr}
+.world-header-actions>*{direction:inherit}
+[dir="rtl"] .world-header-actions>*{direction:rtl}
 .world-back{color:rgba(255,255,255,.74);font-size:.7rem;font-weight:700;letter-spacing:.12em;text-decoration:none;text-transform:uppercase}
 .world-back:hover{color:var(--gold)}
+.language-link{background:transparent;font-family:inherit;cursor:pointer}
 
 .world-hero{position:relative;isolation:isolate;min-height:760px;background:#0b0908}
 .world-hero::before{position:absolute;z-index:-2;inset:0;background:var(--world-image) center/cover no-repeat;content:""}
@@ -41,7 +44,7 @@ body.world-story{max-width:100%;overflow-x:clip;background:#0b0908;color:var(--i
 .outcome-number{color:var(--world);font-family:var(--serif);font-size:1.15rem}
 .outcome h3{margin:3rem 0 1rem;font-family:var(--serif);font-size:1.8rem;font-weight:500;line-height:1.1}
 .outcome p{margin:0;color:#6a6058;font-size:.9rem;line-height:1.75}
-.proof-detail{margin-top:1.35rem;border-top:1px solid rgba(23,18,15,.15);padding-top:1rem}.proof-detail summary{position:relative;padding-right:1.7rem;color:var(--world);font-size:.72rem;font-weight:700;letter-spacing:.04em;line-height:1.5;list-style:none;cursor:pointer}.proof-detail summary::-webkit-details-marker{display:none}.proof-detail summary::after{position:absolute;right:0;top:-.1rem;font-family:var(--serif);font-size:1.25rem;font-weight:400;content:"+"}.proof-detail[open] summary::after{content:"−"}.proof-detail>p{margin:.9rem 0 0!important;color:#544a42!important;font-size:.79rem!important;line-height:1.72!important}.proof-source{display:block;margin-top:.8rem;color:#766a60;font:500 .62rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.proof-source::before{display:block;margin-bottom:.2rem;color:var(--world);font:700 .58rem/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;content:"Code-ankers"}
+.proof-detail{margin-top:1.35rem;border-top:1px solid rgba(23,18,15,.15);padding-top:1rem}.proof-detail summary{position:relative;padding-right:3.6rem;color:var(--world);font-size:.72rem;font-weight:700;letter-spacing:.04em;line-height:1.5;list-style:none;cursor:pointer}.proof-detail summary::-webkit-details-marker{display:none}.proof-detail summary::after{position:absolute;right:0;top:.12rem;font-family:var(--sans);font-size:.56rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;content:"Meer"}.proof-detail[open] summary::after{content:"Minder"}.proof-detail>p{margin:.9rem 0 0!important;color:#544a42!important;font-size:.79rem!important;line-height:1.72!important}.proof-source{display:block;margin-top:.8rem;color:#766a60;font:500 .62rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.proof-source::before{display:block;margin-bottom:.2rem;color:var(--world);font:700 .58rem/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;content:"Bestanden"}
 
 .moment{display:grid;grid-template-columns:1fr 1fr;min-height:650px;background:#0d0b0a}
 .moment-visual{min-height:520px;background:linear-gradient(0deg,rgba(8,7,6,.24),rgba(8,7,6,.08)),var(--world-image) center/cover no-repeat}
@@ -81,6 +84,7 @@ body.world-story{max-width:100%;overflow-x:clip;background:#0b0908;color:var(--i
 
 @media(max-width:600px){
   .world-header{min-height:80px}.world-header-actions{gap:.5rem}.world-header .login-link{border:0;padding:.35rem .2rem;font-size:.6rem;letter-spacing:.06em}
+  .world-header .brand-slogan{display:none}.world-header .brand-name{padding:.35rem .55rem .42rem;font-size:0}.world-header .brand-name::after{content:"RTG";font-size:1.15rem}
   .world-hero{min-height:650px}.world-hero::after{background:linear-gradient(90deg,rgba(5,5,5,.88),rgba(5,5,5,.4)),linear-gradient(0deg,#0b0908 0%,transparent 48%)}
   .world-hero-inner{min-height:570px;align-items:flex-end;padding:3rem 0 5rem}
   .world-hero h1{font-size:clamp(3rem,14vw,4.8rem)}

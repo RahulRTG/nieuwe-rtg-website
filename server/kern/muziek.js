@@ -1,12 +1,6 @@
-/* RTG STUDIO: zelf muziek maken.
+/* RTG STUDIO: raster, notenrol, mengpaneel en Rahul-voorstellen.
 
-   De kern van een muziekprogramma als FL Studio, teruggebracht tot wat een mens
-   in een middag leert: een RASTER met kanalen en stappen, een NOTENROL voor wat
-   een toonhoogte heeft, een MENGPANEEL, en een AI die iets neerzet waar je
-   verder mee kunt. Wat er niet in zit zijn de duizend knoppen waar niemand ooit
-   aankomt.
-
-   DRIE REGELS DIE HIER NIET ONDERHANDELBAAR ZIJN.
+   DRIE REGELS ZIJN NIET ONDERHANDELBAAR.
 
    1. ALLES WORDT OPGEWEKT, NIETS WORDT GELEEND. Elke klank komt uit de app zelf
       (kern/muziek-instrumenten.js legt uit waarom). Daardoor zit er geen licentie
@@ -35,6 +29,10 @@ module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
     const n = Math.round(Number(v));
     return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : terug;
   };
+  const kommagetal = (v, min, max, terug) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : terug;
+  };
 
   function T() {
     return eigen.bak('muziek');
@@ -56,7 +54,12 @@ module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
       naam: schoon((k && k.naam) || I.INSTRUMENTEN[inst].naam, 24),
       volume: Math.max(0, Math.min(1, Number(k && k.volume != null ? k.volume : 0.8))) || 0,
       pan: Math.max(-1, Math.min(1, Number((k && k.pan) || 0))) || 0,
-      stil: !!(k && k.stil) };
+      stil: !!(k && k.stil), solo: !!(k && k.solo),
+      eqLaag: kommagetal(k && k.eqLaag, -12, 12, 0),
+      eqMidden: kommagetal(k && k.eqMidden, -12, 12, 0),
+      eqHoog: kommagetal(k && k.eqHoog, -12, 12, 0),
+      reverb: kommagetal(k && k.reverb, 0, 1, 0),
+      delay: kommagetal(k && k.delay, 0, 1, 0) };
     if (!I.speeltNoten(inst)) {
       const rij = Array.isArray(k && k.stappen) ? k.stappen : [];
       uit.stappen = Array.from(new Set(rij.map(s => getal(s, 0, stappen - 1, -1)).filter(s => s >= 0)))
@@ -102,6 +105,13 @@ module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
       naam: schoon(v.naam != null ? v.naam : basis.naam, 60) || 'Naamloos',
       bpm: getal(v.bpm, I.BPM_MIN, I.BPM_MAX, basis.bpm || 100),
       maten, kanalen, secties,
+      swing: kommagetal(v.swing, 0, 0.75, basis.swing || 0),
+      masterGain: kommagetal(v.masterGain, 0.25, 1.5,
+        basis.masterGain != null ? basis.masterGain : 0.8),
+      masterLaag: kommagetal(v.masterLaag, -9, 9, basis.masterLaag || 0),
+      masterMidden: kommagetal(v.masterMidden, -9, 9, basis.masterMidden || 0),
+      masterHoog: kommagetal(v.masterHoog, -9, 9, basis.masterHoog || 0),
+      masterDrive: kommagetal(v.masterDrive, 0, 1, basis.masterDrive || 0.35),
       // "klaar" betekent: dit stuk is af genoeg om ergens anders te gebruiken.
       // Het is een keuze van de maker, geen oordeel van ons.
       klaar: v.klaar != null ? !!v.klaar : !!basis.klaar,
@@ -111,6 +121,9 @@ module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
 
   const publiek = (t) => ({ id: t.id, naam: t.naam, bpm: t.bpm, maten: t.maten,
     stappen: I.stappenVoor(t.maten), kanalen: t.kanalen, secties: t.secties || [],
+    swing: t.swing || 0, masterGain: t.masterGain != null ? t.masterGain : 0.8,
+    masterLaag: t.masterLaag || 0, masterMidden: t.masterMidden || 0,
+    masterHoog: t.masterHoog || 0, masterDrive: t.masterDrive != null ? t.masterDrive : 0.35,
     klaar: !!t.klaar, at: t.at, bewerkt: t.bewerkt });
   // Voor een lijst hoeven de noten niet mee; die zijn het grootste stuk.
   const kort = (t, key) => ({ id: t.id, naam: t.naam, bpm: t.bpm, maten: t.maten,

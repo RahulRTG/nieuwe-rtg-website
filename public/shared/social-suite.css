@@ -520,3 +520,105 @@ body.rtg-social-messages .stuurknop{
   --rtg-leesgoud:var(--gold-tekst);
   --rtg-goud:var(--gold-tekst);
 }
+
+/* BERICHTEN · DE NIEUWE LIVINGOS-KAMER.
+   De informatie blijft compact en menselijk: eerst de mensen en gesprekken,
+   technische context pas wanneer iemand daar zelf om vraagt. De bestaande
+   inbox- en gesprekslogica verandert niet. */
+body.rtg-social-messages .lijst{
+  position:relative;
+  isolation:isolate;
+  background:
+    linear-gradient(155deg,rgba(16,17,14,.97) 0%,rgba(20,20,17,.94) 58%,rgba(54,31,37,.88) 130%),
+    url('../images/worlds/heritage/living-heritage-v2.jpg') 68% center/cover no-repeat!important;
+}
+body.rtg-social-messages .lijst::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 75% 3%,rgba(205,184,121,.12),transparent 34%),
+    linear-gradient(90deg,transparent 49.8%,rgba(255,255,255,.025) 50%,transparent 50.2%);
+}
+body.rtg-social-messages .lijst-kop{
+  padding:clamp(1.65rem,4vw,2.5rem) clamp(1.15rem,4vw,1.65rem) 1rem!important;
+}
+body.rtg-social-messages .lijst-kicker{
+  margin:0 0 .55rem;
+  color:#cdb879;
+  font:650 .58rem/1 Inter,system-ui,sans-serif;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+}
+body.rtg-social-messages .lijst-kop h1{
+  margin:0;
+  font-size:clamp(2.25rem,7vw,3.25rem)!important;
+  letter-spacing:-.035em;
+}
+body.rtg-social-messages .lijst-intro{
+  margin:.5rem 0 0;
+  color:#aaa69d;
+  font-size:.76rem;
+  line-height:1.45;
+}
+body.rtg-social-messages .zoekrij{
+  align-items:stretch;
+  gap:.55rem;
+  margin-top:1.15rem;
+}
+body.rtg-social-messages .zoekrij input{
+  min-height:48px;
+  padding:.7rem .9rem!important;
+}
+body.rtg-social-messages .nieuwknop{
+  min-width:48px;
+  min-height:48px;
+  gap:.5rem;
+  padding:0 .95rem!important;
+  font:650 .65rem/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+body.rtg-social-messages .nieuwknop span:first-child{
+  font-size:1.15rem;
+  line-height:1;
+}
+@media(min-width:431px){
+  body.rtg-social-messages .nieuwknop{
+    width:48px!important;
+    height:48px!important;
+    flex:0 0 auto!important;
+    padding:0!important;
+  }
+  body.rtg-social-messages .nieuwknop span:last-child{display:none;}
+}
+body.rtg-social-messages .laden{
+  gap:1rem!important;
+  padding:0 clamp(1.15rem,4vw,1.65rem)!important;
+  scroll-padding-inline:clamp(1.15rem,4vw,1.65rem);
+}
+body.rtg-social-messages .laden button{
+  flex:0 0 auto;
+  padding:.75rem 0 .85rem!important;
+}
+body.rtg-social-messages .gesprekken{
+  padding-top:.25rem;
+}
+
+@media(max-width:430px){
+  body.rtg-social-messages .zoekrij{
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+  }
+  body.rtg-social-messages .zoekrij input,
+  body.rtg-social-messages .nieuwknop{
+    width:100%!important;
+    max-width:none!important;
+    flex:1 1 100%!important;
+  }
+  body.rtg-social-messages .nieuwknop{
+    justify-content:center;
+  }
+}

@@ -4,12 +4,9 @@
    elkaar, en één blik waarin je ziet wat er gebeurt. Slagwerk zet je aan en uit
    per stap; wat een toonhoogte heeft krijgt een notenrol (rol.js).
 
-   DE ZWAARSTE ONTWERPKEUZE HIER IS WAT ER NIET IS. Een muziekprogramma kan
-   eindeloos knoppen krijgen -- automatisering, effecten per kanaal, tempo dat
-   meebeweegt. Elk daarvan kost een halve dag en maakt het scherm voor een
-   beginner een stukje ontoegankelijker. Wat erin zit is wat je nodig hebt om
-   een stuk AF te krijgen: aanzetten, toonhoogte, lengte, volume, links-rechts,
-   en stil. De rest wacht tot iemand er echt om vraagt.
+   Onder het raster zit per kanaal een compacte studiostrip: volume, pan,
+   driebands EQ, ruimte, delay, mute en solo. Dezelfde waarden gaan naar de
+   live motor en de WAV-master; dit zijn dus geen decoratieve regelaars.
 
    Elke stap draagt zijn nummer als label voor een schermlezer, en de eerste
    tel van elke maat is zwaarder getekend -- anders tel je met je ogen. */
@@ -39,6 +36,17 @@
       teken: function () { teken(); }
     });
 
+    function regelaar(k, veld, label, min, max, stap, terug) {
+      var vak = document.createElement('label'); vak.className = 'kmix-regelaar';
+      var tekst = document.createElement('span'); tekst.textContent = label; vak.appendChild(tekst);
+      var invoer = document.createElement('input'); invoer.type = 'range';
+      invoer.min = String(min); invoer.max = String(max); invoer.step = String(stap);
+      invoer.value = k[veld] != null ? k[veld] : terug;
+      invoer.setAttribute('aria-label', label + ' van ' + (k.naam || k.instrument));
+      invoer.addEventListener('input', function () { k[veld] = Number(invoer.value); opWijziging(); });
+      vak.appendChild(invoer); return vak;
+    }
+
     /* ---- het rek: één regel per kanaal ---- */
     function tekenRack() {
       rackEl.textContent = '';
@@ -50,7 +58,7 @@
         var kop = document.createElement('div'); kop.className = 'kkop';
         var naam = document.createElement('button');
         naam.type = 'button'; naam.className = 'knaam';
-        naam.textContent = (instrumenten[k.instrument] || {}).naam || k.instrument;
+        naam.textContent = k.naam || (instrumenten[k.instrument] || {}).naam || k.instrument;
         naam.setAttribute('aria-pressed', gekozen === i ? 'true' : 'false');
         naam.addEventListener('click', function () { gekozen = i; teken(); });
         kop.appendChild(naam);
@@ -62,13 +70,23 @@
         stil.addEventListener('click', function () { k.stil = !k.stil; opWijziging(); teken(); });
         kop.appendChild(stil);
 
-        var vol = document.createElement('input');
-        vol.type = 'range'; vol.min = '0'; vol.max = '1'; vol.step = '0.05';
-        vol.value = k.volume != null ? k.volume : 0.8;
-        vol.className = 'kvol';
-        vol.setAttribute('aria-label', 'Volume van ' + naam.textContent);
-        vol.addEventListener('input', function () { k.volume = Number(vol.value); opWijziging(); });
-        kop.appendChild(vol);
+        var solo = document.createElement('button');
+        solo.type = 'button'; solo.className = 'ksolo' + (k.solo ? ' aan' : '');
+        solo.textContent = 'solo';
+        solo.setAttribute('aria-pressed', k.solo ? 'true' : 'false');
+        solo.setAttribute('aria-label', 'Solo: ' + naam.textContent);
+        solo.addEventListener('click', function () { k.solo = !k.solo; opWijziging(); teken(); });
+        kop.appendChild(solo);
+
+        var mix = document.createElement('div'); mix.className = 'kmix';
+        mix.appendChild(regelaar(k, 'volume', 'Vol', 0, 1, .02, .8));
+        mix.appendChild(regelaar(k, 'pan', 'Pan', -1, 1, .05, 0));
+        mix.appendChild(regelaar(k, 'eqLaag', 'Low', -12, 12, 1, 0));
+        mix.appendChild(regelaar(k, 'eqMidden', 'Mid', -12, 12, 1, 0));
+        mix.appendChild(regelaar(k, 'eqHoog', 'High', -12, 12, 1, 0));
+        mix.appendChild(regelaar(k, 'reverb', 'Space', 0, 1, .05, 0));
+        mix.appendChild(regelaar(k, 'delay', 'Delay', 0, 1, .05, 0));
+        kop.appendChild(mix);
         rij.appendChild(kop);
 
         var baan = document.createElement('div'); baan.className = 'baan';

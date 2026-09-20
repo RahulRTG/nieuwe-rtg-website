@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-15T20:23:56.045Z",
-  "commit": "d4c190d4f",
-  "boomVuil": false,
-  "boomAnders": 8,
+  "op": "2026-09-19T21:19:19.931Z",
+  "commit": "e0bf02a3a",
+  "boomVuil": true,
+  "boomAnders": 11,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4982,
-  "geclassificeerd": 4982,
+  "totaal": 4990,
+  "geclassificeerd": 4990,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3189,
-   "NOT_APPLICABLE": 1197,
-   "PROTECTED": 462,
-   "INTENTIONALLY_NON_IDEMPOTENT": 134
+   "NOT_APPLICABLE": 1199,
+   "PROTECTED": 466,
+   "INTENTIONALLY_NON_IDEMPOTENT": 136
   },
-  "vastgesteldDoorMens": 1841,
+  "vastgesteldDoorMens": 1849,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4101,
+   "AUTHENTICATED": 4109,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 737,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4681,
-   "niet gemeten": 49
+   "niet gemeten": 57
   },
   "voorstellen": {},
   "metingVan": "2026-09-14T23:40:03.108Z"
@@ -53156,6 +53156,90 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "muziek.feed.publiceren",
+   "route": "POST /api/muziek/bestand",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "muziek.feed.luisterkaart",
+   "route": "POST /api/muziek/bestand-ticket",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "muziek.feed.verwijderen",
+   "route": "POST /api/muziek/bestand-weg",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "muziek.feed.eigen",
+   "route": "POST /api/muziek/bestanden",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "muziek.bewaar",
    "route": "POST /api/muziek/bewaar",
    "semantiek": {
@@ -53179,6 +53263,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "muziek.feed.lezen",
+   "route": "POST /api/muziek/feed",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -53232,6 +53337,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "muziek.feed.waarderen",
+   "route": "POST /api/muziek/mooi",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -92183,6 +92309,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "salon.media.upload",
+   "route": "POST /api/salon/media",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "salon.meld",
    "route": "POST /api/salon/meld",
    "semantiek": {
@@ -92206,6 +92353,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "salon.media.ondertitels",
+   "route": "POST /api/salon/ondertitels",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -118388,7 +118556,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "salon",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"

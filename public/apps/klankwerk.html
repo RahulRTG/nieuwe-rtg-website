@@ -4,7 +4,7 @@
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Klankwerk &middot; zelf muziek maken</title>
+<title>RTG Music Studio Pro &middot; maak zonder grenzen</title>
 <link rel="icon" href="/icon.svg">
 <meta name="theme-color" content="#0C0C0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -117,20 +117,29 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/apps/klankwerk-pro.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage">
-<header>
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <span><span class="ey">RTG</span><h1>Klankwerk</h1></span>
-  <span class="rij" style="margin-left:auto;">
-    <a class="knop" href="/apps/zaal.html">De zaal</a>
-    <button class="knop vol" id="speel" type="button">Speel</button>
-    <button class="knop" id="stopKnop" type="button">Stop</button>
-    <button class="knop" id="bewaar" type="button">Bewaren</button>
-  </span>
+<body class="rtg-stijl rtg-music-studio" data-rtg-world="living" data-rtg-skin="heritage">
+<header class="studio-kop">
+  <div class="studio-merk">
+    <a class="terug" href="/apps/muziek.html" aria-label="Terug naar RTG Sound">&#8592;</a>
+    <a class="studio-rtg" href="/apps/app.html">RTG</a>
+    <span><span class="ey">MusicOS</span><h1>Studio Pro</h1></span>
+  </div>
+  <nav class="studio-transport" aria-label="Studio bediening">
+    <button class="knop studio-icon" id="undoKnop" type="button" aria-label="Ongedaan maken" disabled>↶</button>
+    <button class="knop studio-icon" id="redoKnop" type="button" aria-label="Opnieuw" disabled>↷</button>
+    <button class="knop studio-stop" id="stopKnop" type="button"><span aria-hidden="true">■</span> Stop</button>
+    <button class="knop vol studio-play" id="speel" type="button"><span aria-hidden="true">▶</span> Speel</button>
+    <button class="knop studio-save" id="bewaar" type="button">Bewaren</button>
+  </nav>
 </header>
 
 <main id="main">
+  <section class="studio-intro rtgdeel-vast" aria-label="RTG Music Studio Pro">
+    <div><p>Alles inbegrepen · uw muziek blijft van u</p><h2>Van eerste maat tot master.</h2></div>
+    <a href="/apps/zaal.html">Open de zaal <span aria-hidden="true">↗</span></a>
+  </section>
   <div id="lijstVlak"><p class="stil">Laden&hellip;</p></div>
 
   <div id="werkVlak" hidden>
@@ -155,6 +164,7 @@
 
     <div class="kop deel">Het raster</div>
     <div class="kaart">
+      <div class="studio-paneelkop"><div><span>Arrangement</span><h2>Tracks, beats en klank.</h2></div><p>Per kanaal: mute, solo, pan, EQ, ruimte en delay.</p></div>
       <div id="rack"></div>
       <div class="rij h-mt70">
         <label class="stil" for="nieuwInstrument">Instrument</label>
@@ -162,6 +172,27 @@
         <button class="knop" id="kanaalBij" type="button">Kanaal erbij</button>
         <button class="knop rood" id="kanaalWeg" type="button">Gekozen kanaal weg</button>
       </div>
+    </div>
+
+    <div class="kop deel">Mastering</div>
+    <div class="kaart master-kaart">
+      <div class="master-kop">
+        <div><span class="master-label">Master console</span><h2>Uw eindklank.</h2></div>
+        <label>Startpunt<select class="veld" id="masterPreset">
+          <option value="eigen">Eigen instelling</option><option value="warm">Warm &amp; rijk</option>
+          <option value="helder">Helder &amp; open</option><option value="club">Club &amp; krachtig</option>
+          <option value="film">Filmisch breed</option>
+        </select></label>
+      </div>
+      <div class="master-grid">
+        <label><span>Swing</span><output id="swingWaarde">0%</output><input id="tSwing" type="range" min="0" max="0.75" step="0.05" value="0"></label>
+        <label><span>Master</span><output id="masterGainWaarde">80%</output><input id="masterGain" type="range" min="0.25" max="1.5" step="0.05" value="0.8"></label>
+        <label><span>Low</span><output id="masterLaagWaarde">0 dB</output><input id="masterLaag" type="range" min="-9" max="9" step="1" value="0"></label>
+        <label><span>Mid</span><output id="masterMiddenWaarde">0 dB</output><input id="masterMidden" type="range" min="-9" max="9" step="1" value="0"></label>
+        <label><span>High</span><output id="masterHoogWaarde">0 dB</output><input id="masterHoog" type="range" min="-9" max="9" step="1" value="0"></label>
+        <label><span>Limiter</span><output id="masterDriveWaarde">35%</output><input id="masterDrive" type="range" min="0" max="1" step="0.05" value="0.35"></label>
+      </div>
+      <p class="stil">De master-EQ, limiter en swing worden ook in uw WAV toegepast. Geen voorbeeldfilter, geen kwaliteitsverlies bij export.</p>
     </div>
 
     <div class="kop deel">De notenrol</div>
@@ -239,8 +270,14 @@
 
     <div class="kop deel">Meenemen</div>
     <div class="kaart">
-      <div class="rij">
-        <button class="knop" id="exportWav" type="button">Als geluidsbestand (WAV)</button>
+      <div class="export-kop"><div><span>Onbeperkt exporteren</span><h2>Uw master. Uw bestand.</h2></div><b>Geen watermerk</b></div>
+      <div class="export-instellingen">
+        <label>Kwaliteit<select class="veld" id="exportKwaliteit"><option value="44100-16">44.1 kHz / 16-bit</option><option value="48000-24" selected>48 kHz / 24-bit</option><option value="96000-24">96 kHz / 24-bit</option></select></label>
+        <label>Lengte<select class="veld" id="exportRondes"><option value="1">1 ronde</option><option value="2" selected>2 rondes</option><option value="4">4 rondes</option></select></label>
+      </div>
+      <div class="rij export-acties">
+        <button class="knop vol" id="exportWav" type="button">Exporteer WAV-master</button>
+        <button class="knop" id="exportStem" type="button">Exporteer gekozen stem</button>
         <button class="knop" id="exportJson" type="button">Als stuk (leesbare getallen)</button>
         <button class="knop rood" id="stukWeg" type="button">Dit stuk weghalen</button>
         <button class="knop" id="terugLijst" type="button">Naar mijn stukken</button>
@@ -267,6 +304,7 @@
 <script src="/apps/klankwerk/acties.js"></script>
 <script src="/apps/klankwerk/vorm.js"></script>
 <script src="/apps/klankwerk/samen.js"></script>
+<script src="/apps/klankwerk/pro.js"></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

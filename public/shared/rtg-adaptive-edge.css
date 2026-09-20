@@ -27,7 +27,7 @@ body[data-rtg-adaptive-ready="true"] .rtg-edge-2-context{bottom:calc(var(--rtg-a
 body[data-rtg-edge-venster-open="true"] .rtg-adaptive-edge,
 body[data-rtg-adaptive-ready="true"]:has(.hv-balk:not(.hv-weg)) .rtg-adaptive-edge,
 body[data-rtg-adaptive-ready="true"]:has(:is(dialog[open],.scrim.open[role="dialog"])) .rtg-adaptive-edge{visibility:hidden;pointer-events:none;transform:translate(-50%,110%)}
-@media(max-width:767px){body[data-rtg-adaptive-ready="true"]{--edge-side:0px}.rtg-adaptive-edge{left:50%;width:calc(100vw - 20px)}body[data-rtg-adaptive-ready="true"] .rtg-edge-top{left:0}.rtg-adaptive-sheet{left:0;right:0}}
+@media(max-width:767px){body[data-rtg-adaptive-ready="true"]{--edge-side:0px!important}.rtg-adaptive-edge{left:50%;width:calc(100vw - 20px)}body[data-rtg-adaptive-ready="true"] .rtg-edge-top{left:0}.rtg-adaptive-sheet{left:0;right:0}}
 @media(max-width:360px){.rtg-adaptive-edge{width:calc(100vw - 12px)}.rtg-adaptive-bar{padding:5px}.rtg-adaptive-item small{font-size:10px}.rtg-adaptive-sheet{padding:18px 14px 30px}.rtg-adaptive-sheet-list{grid-template-columns:1fr}.rtg-adaptive-presence{left:8px}}
 @media(hover:hover) and (pointer:fine){.rtg-adaptive-edge[data-rtg-adaptive-state="peek"]:hover{width:min(720px,calc(100vw - var(--edge-side) - 28px));height:var(--rtg-adaptive-height)}.rtg-adaptive-edge[data-rtg-adaptive-state="peek"]:hover .rtg-adaptive-bar{grid-template-columns:repeat(5,minmax(44px,1fr));padding:6px}.rtg-adaptive-edge[data-rtg-adaptive-state="peek"]:hover .rtg-adaptive-item{display:flex!important}.rtg-adaptive-edge[data-rtg-adaptive-state="peek"]:hover .rtg-adaptive-bar::after{display:none}}
 @media(prefers-reduced-motion:reduce){.rtg-adaptive-edge,.rtg-adaptive-bar{transition:none!important}}
@@ -89,3 +89,75 @@ body[data-rtg-adaptive-ready="true"] .rtg-adaptive-sheet>.rtg-edge-action .rtg-c
 body[data-rtg-adaptive-ready="true"] .rtg-adaptive-sheet>.rtg-edge-action .rtg-continue-key-copy{min-width:0!important;overflow:hidden!important;font-size:12px!important;font-weight:700!important;text-overflow:ellipsis!important;white-space:nowrap!important}
 body[data-rtg-adaptive-ready="true"] .rtg-adaptive-sheet>.rtg-edge-action [aria-hidden="true"]{display:none!important}
 body[data-rtg-adaptive-ready="true"] #feed .clip>.laag{padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px) + 1.2rem)}
+
+/* SOCIAL HEEFT NOG MAAR EEN RAND.
+   De Social-suite is ouder dan Adaptive Edge en bracht daarom zelf een vaste
+   bovenbalk, ondernavigatie en technische Reality-status mee. Zodra Edge er
+   is, zijn dat drie kopieën van dezelfde systeemfunctie. We laten de bronnen
+   in de DOM (hun handlers en dialoog blijven bruikbaar), maar Edge is de enige
+   zichtbare eigenaar van navigatie en ruimte. Zo geldt dit meteen voor alle
+   twaalf sociale schermen en niet alleen voor Berichten. */
+body.rtg-suite-page.rtg-edge-host[data-rtg-adaptive-ready="true"]{
+  --suite-top:0px;
+  --suite-nav:0px;
+  --suite-stack:0px;
+  padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;
+  padding-right:0!important;
+  padding-bottom:var(--rtg-adaptive-inset)!important;
+  padding-left:var(--edge-side)!important;
+}
+body.rtg-suite-page.rtg-edge-host[data-rtg-adaptive-ready="true"] :is(.rtg-suitebar,.rtg-suitenav,.rtg-intel-strip,.rtg-reality-graph){
+  display:none!important;
+}
+body.rtg-social-elite.rtg-edge-host[data-rtg-adaptive-ready="true"] :is(.rtg-intel-strip,.rtg-reality-graph){
+  display:none!important;
+}
+body.rtg-social-elite.rtg-edge-host[data-rtg-adaptive-ready="true"] > .rtg-social-commandbar,
+body.rtg-social-elite.rtg-edge-host[data-rtg-adaptive-ready="true"] :is(.sociaal-ruimtes,.salon-socialnav){
+  display:none!important;
+}
+body.rtg-social-elite:not(.rtg-salon-elite).rtg-edge-host[data-rtg-adaptive-ready="true"] main#inhoud,
+body.rtg-salon-elite.rtg-edge-host[data-rtg-adaptive-ready="true"] .salon-werkveld{
+  padding-top:0!important;
+}
+body.rtg-social-elite:not(.rtg-salon-elite).rtg-edge-host[data-rtg-adaptive-ready="true"] .merkkop{
+  min-height:252px!important;
+  padding-bottom:1.4rem!important;
+}
+body.rtg-salon-elite.rtg-edge-host[data-rtg-adaptive-ready="true"] .salon-werkveld>header{
+  min-height:304px!important;
+}
+body.rtg-suite-page.rtg-edge-host[data-rtg-adaptive-ready="true"] .rtg-suitehero.rtg-intel-host{
+  min-height:230px!important;
+  padding-bottom:1.8rem!important;
+  align-items:flex-end!important;
+}
+body.rtg-suite-page.rtg-edge-host[data-rtg-adaptive-ready="true"] .private-hero.rtg-intel-host{
+  min-height:430px!important;
+}
+
+/* Berichten is een viewport-app en kan de gewone body-opvulling niet erven.
+   Het werkvlak sluit exact tussen de ene bovenrand en de zwevende onderrand;
+   de donkere grond loopt erachter door zodat er nooit een witte strook ligt. */
+body.rtg-social-messages.rtg-edge-host[data-rtg-adaptive-ready="true"]{
+  padding:0!important;
+  background:#11120f!important;
+}
+body.rtg-social-messages.rtg-edge-host[data-rtg-adaptive-ready="true"] .comm{
+  inset:calc(var(--edge-top) + env(safe-area-inset-top,0px)) 0 var(--rtg-adaptive-inset) var(--edge-side)!important;
+}
+
+@media(max-width:900px){
+  body.rtg-suite-page.rtg-edge-host[data-rtg-adaptive-ready="true"] .rtg-suitehero.rtg-intel-host{
+    min-height:245px!important;
+    padding-bottom:1.5rem!important;
+  }
+}
+@media(max-width:767px){
+  body.rtg-suite-page.rtg-edge-host[data-rtg-adaptive-ready="true"]{
+    padding-left:0!important;
+  }
+  body.rtg-social-messages.rtg-edge-host[data-rtg-adaptive-ready="true"] .comm{
+    left:0!important;
+  }
+}

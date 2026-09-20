@@ -20,7 +20,7 @@ module.exports = (kern) => {
   const zichtbaarheid = require('../../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden });
   // veiligeFout: laat de melding staan, haalt er alleen ons bestandssysteem uit
   const fout = (res, e) => res.status(400).json({ error: veiligeFout(e) });
-  const uit = (res, r) => r && r.error ? res.status(400).json(r) : res.json(r);
+  const uit = (res, r) => r && r.error ? res.status(r.status || 400).json(r) : res.json(r);
 
   /* De kijker: waarom mag ik deze post zien? Partner-volgen (bestond al),
      vriendschap (bestond al) en lid-volgen (nieuw). */
@@ -29,6 +29,25 @@ module.exports = (kern) => {
   }
 
   // ---- plaatsen en de feed ----
+  /* Bestanden reizen rauw en een voor een. Foto's als base64 in de JSON-post
+     maakten een gewone telefoonfoto groter dan de oude bodygrens; video's
+     pasten daar principieel niet in. De kern geeft een kort, sessiegebonden
+     upload-id terug dat pas door /plaats wordt verbruikt. */
+  app.post('/api/salon/media', auth, express.raw({ type: () => true, limit: '61mb' }), async (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, await salon.upload(req.session, req.body, req.get('Content-Type') || '')); }
+    catch (e) { fout(res, e); }
+  });
+
+  /* Een video wordt vóór het plaatsen ondertiteld. Automatisch gaat alleen via
+     het lokale spraakmodel; handmatige regels en "geen gesproken tekst" lopen
+     door dezelfde eigendoms- en cuecontrole. */
+  app.post('/api/salon/ondertitels', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, await salon.ondertitel(req.session, req.body || {})); }
+    catch (e) { fout(res, e); }
+  });
+
   app.post('/api/salon/plaats', express.json({ limit: '10mb' }), auth, async (req, res) => {
     if (geenGast(req, res)) return;
     try { uit(res, await salon.plaats(req.session, req.body || {})); } catch (e) { fout(res, e); }

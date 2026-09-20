@@ -3,17 +3,13 @@
 
    Wat hier veranderde en waarom:
 
-   1. LEDEN KONDEN NIET PLAATSEN. Alleen partners hadden een route naar De
-      Salon; het postmodel had al een veld `authorKey` voor een lid, maar er was
-      niets dat het vulde. Een sociaal netwerk waarin alleen bedrijven mogen
-      praten is geen sociaal netwerk.
-   2. HET PLAFOND VAN 60. Elke publicatie deed `posts.slice(0, 60)`: post 61
+   1. LEDEN KONDEN NIET PLAATSEN. Alleen partners hadden een route; nu schrijft
+      een lid zelf via `authorKey`.
+   2. HET PLAFOND VAN 60. `posts.slice(0, 60)` zorgde dat post 61
       duwde post 1 er stilletjes uit, voorgoed. Dat is nu een ruim, instelbaar
       venster met echte paginering.
-      Wel bewust BEGRENSD gebleven: `posts` is een enkele rij in de kv-opslag,
-      en een collectie die eindeloos groeit maakt elke save duurder (dezelfde
-      valkuil als bij `orders`, zie docs/hardening.md). Moet het ooit oneindig,
-      dan is het grootboek-patroon (server/db/tx/) de route, niet een hogere kap.
+      Wel begrensd: `posts` is één rij in de kv-opslag; oneindig vraagt later
+      het grootboek-patroon, niet alleen een hogere kap.
    3. Beeld gaat NOOIT als base64 de database in; het gaat naar de mediastore en
       we bewaren de verwijzing. Dat was al zo voor partners en geldt hier ook.
 
@@ -22,16 +18,19 @@
 const { keur } = require('../veilig');
 const vorm = require('./vorm');
 
-module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcastSync }) => {
+module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcastSync, spraaktekst }) => {
   /* Valt een post uit het venster, of haalt de auteur hem weg, dan gaan zijn
      foto's mee. Dat gebeurde niet: de verwijzing verdween, het bestand bleef --
      zie kern/mediaopruim.js voor wat dat op drie plekken tegelijk aanrichtte. */
   const opruim = require('../mediaopruim')(media, db);
   const MAX_POSTS = Number(process.env.SALON_MAX || 2000);
-  const MAX_MEDIA = 6;              // foto's per post (de karrousel)
+  const MAX_MEDIA = 6;              // foto's/video's per post (de karrousel)
+  const salonMedia = require('./media')({ media, crypto, spraaktekst });
+  const { MAX_FOTO_BYTES, MAX_VIDEO_BYTES } = salonMedia;
   const PAGINA = 20;                // posts per bladzijde
   const TEKST_MAX = 600;
   const nu = () => new Date().toISOString();
+  const upload = salonMedia.upload;
 
   /* Een id dat echt uniek is. Eerst stond hier `Date.now() + random(1000)`, en
      dat leek genoeg tot de paginerings-toets 65 posts achter elkaar plaatste:
@@ -59,21 +58,10 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
   }
   const publiek = require('./publiek')({ S, vorm });
 
-  /* Onderwerpen uit de tekst. Bewust simpel en zichtbaar: wat je typt is wat je
-     krijgt. Geen verborgen categorisering, geen profiel dat meegroeit. */
-  const ONDERWERP = /#([\p{L}\p{N}_]{2,30})/gu;
-  function onderwerpenUit(tekst) {
-    const uit = [];
-    for (const m of String(tekst || '').matchAll(ONDERWERP)) {
-      const t = m[1].toLowerCase();
-      if (!uit.includes(t)) uit.push(t);
-      if (uit.length >= 10) break;
-    }
-    return uit;
-  }
+  const onderwerpenUit = require('./onderwerpen');
 
-  /* Een lid plaatst. Meerdere foto's mogen, elk met een eigen alt-tekst: een
-     beschrijving voor wie niet ziet. Zonder alt-tekst gaat de foto gewoon mee,
+  /* Een lid plaatst. Meerdere foto's/video's mogen, elk met een beschrijving
+     voor wie niet ziet. Zonder beschrijving gaat het bestand gewoon mee,
      maar de app vraagt erom -- de a11y-keuring van dit project is niet voor
      niets een vaste stap. */
   async function plaats(sess, invoer) {
@@ -83,13 +71,28 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
     if (tekst) { const k = keur(tekst); if (!k.ok) return { error: k.reden }; }
 
     const beeld = [];
+    const gebruikteUploads = [];
     for (const m of ruw) {
+      const uploadId = m && typeof m === 'object' ? String(m.uploadId || '') : '';
       const bron = typeof m === 'string' ? m : (m && m.beeld);
-      if (typeof bron !== 'string' || !bron) continue;
       const alt = String((m && m.alt) || '').slice(0, 200);
       if (alt) { const k = keur(alt); if (!k.ok) return { error: k.reden }; }
-      try { beeld.push({ src: await media.bewaarPubliek(bron, 1.5 * 1024 * 1024), alt }); }
-      catch (e) { return { error: 'Deze foto kon ik niet bewaren.' }; }
+      if (uploadId) {
+        const klaar = salonMedia.neem(sess, uploadId);
+        if (!klaar) return { error: 'Deze upload is verlopen. Kies het bestand opnieuw.' };
+        if (klaar.type === 'video' && klaar.ondertitelStatus === 'wacht') return {
+          error: 'Maak eerst ondertitels, of geef aan dat de video geen gesproken tekst bevat.' };
+        beeld.push({ src: klaar.src, alt, type: klaar.type, mime: klaar.mime,
+          ondertitels: klaar.ondertitels || [], ondertitelStatus: klaar.ondertitelStatus });
+        gebruikteUploads.push(uploadId);
+        continue;
+      }
+      if (typeof bron !== 'string' || !bron) continue;
+      try {
+        const src = await media.bewaarPubliek(bron, 1.5 * 1024 * 1024);
+        if (!src) return { error: 'Deze foto is te groot of heeft een niet-ondersteund formaat.' };
+        beeld.push({ src, alt, type: 'image', mime: String(bron.slice(5, bron.indexOf(';'))) });
+      } catch (e) { return { error: 'Deze foto kon ik niet bewaren.' }; }
     }
 
     S();
@@ -97,7 +100,7 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
       id: nieuwId(),
       author: liveCodename(sess) || 'Een lid', authorKey: sess.key, tier: sess.tier,
       partner: false, place: String((invoer && invoer.plaats) || '').slice(0, 60) || null,
-      visual: null, photo: beeld.length ? beeld[0].src : null,   // photo: wat oudere schermen lezen
+      visual: null, photo: (beeld.find(m => m.type !== 'video') || {}).src || null, // oudere schermen lezen alleen beeld
       media: beeld, onderwerpen: onderwerpenUit(tekst),
       text: tekst, lang: (invoer && invoer.lang) || 'nl', at: nu(),
       momentType: vorm.soort(invoer && invoer.momentType),
@@ -114,6 +117,7 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
     // foto's vallen mee af, anders groeit de mediastore ongelimiteerd door
     kap();
     save();
+    salonMedia.verbruik(gebruikteUploads);
     if (broadcastSync) broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
     return { ok: true, post: publiek(post, sess) };
   }
@@ -203,5 +207,6 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
     opruim.wis(opruim.refsVanPosts(eraf));
   }
 
-  return { plaats, verwijder, feed, publiek, onderwerpen, onderwerpenUit, postMet, kap, S, MAX_POSTS, MAX_MEDIA };
+  return { upload, ondertitel: salonMedia.ondertitel, plaats, verwijder, feed, publiek, onderwerpen, onderwerpenUit, postMet, kap, S,
+    MAX_POSTS, MAX_MEDIA, MAX_FOTO_BYTES, MAX_VIDEO_BYTES };
 };

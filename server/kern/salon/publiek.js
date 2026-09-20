@@ -18,8 +18,12 @@ module.exports = ({ S, vorm }) => function publiek(p, sess) {
       actie: p.offer.actie || null
     } : (p.deal ? { titel: p.deal.titel || '', geldigTot: p.deal.geldigTot || null,
       capaciteit: null, actie: null } : null),
-    media: Array.isArray(p.media) && p.media.length ? p.media
-      : (p.photo ? [{ src: p.photo, alt: '' }] : []),
+    media: Array.isArray(p.media) && p.media.length ? p.media.map(m => ({
+      src: m.src, alt: m.alt || '', type: m.type === 'video' ? 'video' : 'image',
+      mime: m.mime || (m.type === 'video' ? 'video/mp4' : null),
+      ondertitels: m.type === 'video' && Array.isArray(m.ondertitels) ? m.ondertitels : [],
+      ondertitelStatus: m.type === 'video' ? (m.ondertitelStatus || null) : null
+    })) : (p.photo ? [{ src: p.photo, alt: '', type: 'image', mime: null }] : []),
     onderwerpen: p.onderwerpen || [],
     likes: (p.baseLikes || 0) + Object.keys(p.likedBy || {}).length,
     liked: !!(p.likedBy && mij && p.likedBy[mij]),

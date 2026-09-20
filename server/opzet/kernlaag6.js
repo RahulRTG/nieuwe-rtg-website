@@ -21,7 +21,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, anthropic, app, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, log, logActivity, loginFails, noteFailedTry, notify, pinSlot, rememberSession, save, sessieregister, schoon, sseToCustomer, sseToOffice, supplierState } = hulp;
+  const { accounts, anthropic, app, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, log, logActivity, loginFails, media, noteFailedTry, notify, pinSlot, rememberSession, save, sessieregister, schoon, sseToCustomer, sseToOffice, supplierState } = hulp;
 
 /* RTG OV (kern/ov.js): al het vervoer in een app. Lijnen met haltes, live
    voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS) en
@@ -90,6 +90,10 @@ kern.muziekSamen = null;
 Object.assign(kern, require('../kern/muziek')({ db, save, crypto, schoon,
   magBij: (t, key) => (kern.muziekSamen ? kern.muziekSamen.muziekMagBij(t, key) : t.key === key),
   stempel: (t, key) => { if (kern.muziekSamen) kern.muziekSamen.muziekStempel(t, key); } }));
+/* Geüploade muziek is een andere bezitsvorm dan een Studio-stuk: echte bytes
+   in de privé-mediastore, met tijdelijke luisterkaarten voor de speler. */
+Object.assign(kern, require('../kern/muziek-bestanden')({ db, save, crypto, schoon, media,
+  codenaamVan: kern.codenaamVan }));
 kern.muziekSamen = require('../kern/muziek-samen')({ save,
   trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan });
 Object.assign(kern, kern.muziekSamen);

@@ -1,0 +1,333 @@
+{
+  "schema": 1,
+  "source": [
+    "public/shared/rtg-edge-worlds.js",
+    "server/kern/pasladder.js"
+  ],
+  "sourceHash": "098c84f0411e0b9f3073460c07c1d4c9e457d4fa72825f733eebc956fe7b7167",
+  "worlds": {
+    "living": {
+      "name": "LivingOS",
+      "appName": "LIVING OS",
+      "publicRoute": "/apps/rtg.html",
+      "homeRoute": "/apps/wereld.html",
+      "workspaceRoute": "/apps/werkruimte.html?gebied=living",
+      "action": "Vergelijk werelden",
+      "groupCount": 2,
+      "featureCount": 12,
+      "groups": [
+        {
+          "name": "Leefmodel",
+          "count": 5
+        },
+        {
+          "name": "Uw leven",
+          "count": 7
+        }
+      ],
+      "tools": [
+        {
+          "id": "universe",
+          "name": "Overzicht",
+          "route": "/apps/living-os.html?view=universe"
+        },
+        {
+          "id": "intent",
+          "name": "Voornemen",
+          "route": "/apps/living-os.html?view=intent"
+        },
+        {
+          "id": "worlds",
+          "name": "Routes vergelijken",
+          "route": "/apps/living-os.html?view=worlds"
+        },
+        {
+          "id": "decisions",
+          "name": "Beslissingen",
+          "route": "/apps/living-os.html?view=decisions"
+        },
+        {
+          "id": "evidence",
+          "name": "Terugkijken",
+          "route": "/apps/living-os.html?view=evidence"
+        },
+        {
+          "id": "leven",
+          "name": "Mijn leven",
+          "route": "/apps/leven.html"
+        },
+        {
+          "id": "geld",
+          "name": "RTG Geld",
+          "route": "/apps/geld.html"
+        },
+        {
+          "id": "veilig",
+          "name": "RTG Veilig",
+          "route": "/apps/veilig.html"
+        }
+      ]
+    },
+    "travel": {
+      "name": "TravelOS",
+      "appName": "TRAVEL OS",
+      "publicRoute": "/apps/reizen.html",
+      "homeRoute": "/apps/reizen.html",
+      "workspaceRoute": "/apps/werkruimte.html?gebied=reizen",
+      "action": "Open reisdetail",
+      "groupCount": 3,
+      "featureCount": 13,
+      "groups": [
+        {
+          "name": "Plannen",
+          "count": 5
+        },
+        {
+          "name": "Onderweg",
+          "count": 5
+        },
+        {
+          "name": "Private travel",
+          "count": 3
+        }
+      ],
+      "tools": [
+        {
+          "id": "vandaag",
+          "name": "Vandaag",
+          "route": "/apps/reizen.html#vandaag"
+        },
+        {
+          "id": "vluchten",
+          "name": "Vluchten",
+          "route": "/apps/vluchten.html"
+        },
+        {
+          "id": "hotels",
+          "name": "Verblijven",
+          "route": "/apps/hotels.html"
+        },
+        {
+          "id": "reisbureau",
+          "name": "Reisbureau",
+          "route": "/apps/reisbureau.html"
+        },
+        {
+          "id": "mobiliteit",
+          "name": "Openbaar vervoer",
+          "route": "/apps/ov.html"
+        },
+        {
+          "id": "navigatie",
+          "name": "Navigatie",
+          "route": "/apps/navigatie.html"
+        },
+        {
+          "id": "rit",
+          "name": "Ritstatus",
+          "route": "/apps/rit.html"
+        },
+        {
+          "id": "reisboek",
+          "name": "Reisboek",
+          "route": "/apps/reisboek.html"
+        },
+        {
+          "id": "hangar",
+          "name": "Private Mobility",
+          "route": "/apps/hangar.html"
+        }
+      ]
+    },
+    "work": {
+      "name": "WorkOS",
+      "appName": "WORK OS",
+      "publicRoute": "/apps/kantoor.html",
+      "homeRoute": "/apps/kantoor.html",
+      "workspaceRoute": "/apps/werkruimte.html?gebied=kantoor",
+      "action": "Open werkbank",
+      "groupCount": 4,
+      "featureCount": 17,
+      "groups": [
+        {
+          "name": "Dag & team",
+          "count": 5
+        },
+        {
+          "name": "Maken & delen",
+          "count": 5
+        },
+        {
+          "name": "Ondernemen",
+          "count": 5
+        },
+        {
+          "name": "Regie",
+          "count": 2
+        }
+      ],
+      "tools": [
+        {
+          "id": "vandaag",
+          "name": "Vandaag",
+          "route": "/apps/kantoor.html"
+        },
+        {
+          "id": "afdelingen",
+          "name": "Afdelingen",
+          "route": "/apps/kantoren.html"
+        },
+        {
+          "id": "personeel",
+          "name": "Personeel",
+          "route": "/apps/personeel.html?kantoor=1"
+        },
+        {
+          "id": "office",
+          "name": "Presentaties & Office",
+          "route": "/apps/office.html?werk=kantoor"
+        },
+        {
+          "id": "agenda",
+          "name": "Agenda",
+          "route": "/apps/agenda.html"
+        },
+        {
+          "id": "mail",
+          "name": "RTG Mail",
+          "route": "/apps/rtmail.html"
+        },
+        {
+          "id": "bestanden",
+          "name": "Bestanden",
+          "route": "/apps/bestanden.html"
+        },
+        {
+          "id": "backoffice",
+          "name": "Backoffice",
+          "route": "/apps/backoffice.html"
+        },
+        {
+          "id": "command",
+          "name": "RTG Command",
+          "route": "/apps/command.html"
+        }
+      ]
+    },
+    "foundation": {
+      "name": "FoundationOS",
+      "appName": "RTFOUNDATION",
+      "publicRoute": "/apps/foundation/os-publiek.html",
+      "homeRoute": "/apps/foundation/index.html",
+      "workspaceRoute": "/apps/werkruimte.html?gebied=foundation",
+      "action": "Ga verder",
+      "groupCount": 6,
+      "featureCount": 62,
+      "groups": [
+        {
+          "name": "Start & leren",
+          "count": 14
+        },
+        {
+          "name": "Klein beginnen",
+          "count": 7
+        },
+        {
+          "name": "Spelen & samen",
+          "count": 7
+        },
+        {
+          "name": "Gezin & dag",
+          "count": 8
+        },
+        {
+          "name": "Zelfstandig leven",
+          "count": 13
+        },
+        {
+          "name": "Vooruit & hulp",
+          "count": 13
+        }
+      ],
+      "tools": [
+        {
+          "id": "campus",
+          "name": "Campus",
+          "route": "/apps/foundation/campus.html"
+        },
+        {
+          "id": "leren",
+          "name": "Leren & Groei",
+          "route": "/apps/foundation/leren.html"
+        },
+        {
+          "id": "spelen",
+          "name": "De Speelhal",
+          "route": "/apps/foundation/speelhal.html"
+        },
+        {
+          "id": "agenda",
+          "name": "Gezinsagenda",
+          "route": "/apps/foundation/agenda.html"
+        },
+        {
+          "id": "beheer",
+          "name": "Gezin & beheer",
+          "route": "/apps/foundation/beheer.html"
+        },
+        {
+          "id": "hulp",
+          "name": "Hulpwijzer",
+          "route": "/apps/foundation/hulpwijzer.html"
+        }
+      ]
+    }
+  },
+  "passes": {
+    "community": {
+      "appId": "gratis",
+      "name": "RTG Community",
+      "available": true,
+      "contractPrice": false,
+      "priceLabel": "Kosteloos",
+      "billingNote": "Geen maandelijkse bijdrage.",
+      "audience": "de maatschappelijke laag: de minimale ingang tot het RTG OS"
+    },
+    "rtg": {
+      "appId": "rtg",
+      "name": "RTG Pass",
+      "available": true,
+      "contractPrice": false,
+      "priceLabel": "€ 65",
+      "billingNote": "Per maand, exclusief btw.",
+      "audience": "de consument"
+    },
+    "business-lite": {
+      "appId": "business-lite",
+      "name": "RTG Business Lite",
+      "available": true,
+      "contractPrice": false,
+      "priceLabel": "€ 150",
+      "billingNote": "Per maand, exclusief btw.",
+      "audience": "zzp en klein MKB: software-as-a-service, geen omzetcommissie"
+    },
+    "business": {
+      "appId": "business",
+      "name": "RTG Business Pass",
+      "available": true,
+      "contractPrice": true,
+      "priceLabel": "Vanaf € 5.000",
+      "billingNote": "De uiteindelijke maandprijs wordt per klant afgesproken.",
+      "audience": "grotere organisaties: een enterprise-relatie"
+    },
+    "lifestyle": {
+      "appId": "lifestyle",
+      "name": "RTG Lifestyle Pass",
+      "available": true,
+      "contractPrice": true,
+      "priceLabel": "Vanaf € 20.000",
+      "billingNote": "De uiteindelijke maandprijs wordt per klant afgesproken.",
+      "audience": "high-touch: concierge en volledige regie, met een mens erachter"
+    }
+  }
+}

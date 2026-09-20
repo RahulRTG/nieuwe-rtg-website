@@ -4723,6 +4723,7 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
       'var(--rtg-radius-content,2px)', 'var(--rtg-radius-system,22px)'
     ])],
     ['public/shared/rtg-world-home.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-system)'])],
+    ['public/site/website-truth.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)'])], ['public/shared/rtg-simple.css', new Set([
       'var(--rtg-radius-system)!important'
     ])],
@@ -5875,6 +5876,14 @@ try {
   require('child_process').execFileSync(process.execPath,[path.join(ROOT,'scripts/language-proof.js'),'--check'],{stdio:'pipe'});
   ok('LANGUAGECAPABILITY, MEANINGPARITY en LANGUAGEFAILOVER horen bij deze bron');
 } catch(e) { fout('taalbewijs ontbreekt of is verouderd; draai npm run language:proof'); }
+
+console.log('\n73) de openbare website volgt de waarheid van de app');
+try {
+  require('./websitewaarheid').controle();
+  ok('werelden, app-routes en pasprijzen zijn uit de centrale appbronnen opgebouwd');
+} catch (e) {
+  fout(e.message);
+}
 
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
 

@@ -1,51 +1,51 @@
 {
   "stempel": {
-    "op": "2026-09-15T02:41:59.680Z",
-    "commit": "5c15d25b",
+    "op": "2026-09-19T19:08:08.910Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 53,
     "instrument": "scripts/neigingvorm.js",
     "node": "v22.22.2"
   },
   "uitleg": "Gemeten met scripts/neigingvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in NEIGING.md par. 0. Drie metingen die niet hetzelfde zeggen: A de namen die het voorstel introduceert, B of er al een voorkeurslaag is en of die zijn etiketten draagt, C het voorstel tegen bestaande code met een nagetrokken verwijzing.",
   "grens": "LET OP BIJ METING A, TWEE KEER. (1) Deze meter telt zijn EIGEN laag mee: `neiging` scoort hier niet nul omdat server/kern/neiging/ inmiddels bestaat. Gemeten op de commit VOOR deze tak stond `neiging` in 4 bestanden, alle vier als gewone Nederlandse tekst in een toelichting, en 0 keer als veldnaam -- na te rekenen met `git grep -lIi neiging <commit>`. (2) De eerste versie van deze meting las alleen server/kern en drie broers, en gaf daarmee `adaptief` vrij terwijl ADAPTIEF.md een laag van 95 bestanden draagt, inclusief test/adaptief.test.js die bij het bouwen prompt is overschreven. Die zeef is gerepareerd (de hele boom) en `vrij` betekent nu NERGENS genoemd, zonder marge. Wat deze meter NIET aantoont. A is lexicaal en dus een ONDERgrens; een gedeelde naam is geen gedeelde betekenis, dat beslist een mens die beide bestanden opent. B leest bewaarde vormen en veldnamen: voorkeuren in vrije tekst of onder een woord buiten de lijst ontsnappen eraan. B heeft daarbovenop een gemeten blinde vlek die eruitziet als succes -- de gedeelde lezer vormenVan() ziet alleen expliciete velden (naam:) en geen verkorte eigenschappen ({ wens }), dus juist geschreven rijen tellen vaak niet mee en seed-achtige rijen wel; dat is niet hier gerepareerd omdat een tweede parser de vergelijking met de vier eerdere vormmetingen waardeloos maakt. C trekt na dat een verwijzing KLOPT, niet dat de genoemde code volstaat -- `draagt` betekent \"er is bestaande code die dit punt raakt\", en het veld `dekt` zegt per punt welke helft ontbreekt; dat is een oordeel en geen meting.",
-  "vastgelegd": "2026-09-15",
+  "vastgelegd": "2026-09-19",
   "gemeten": {
     "naam": [
       {
         "naam": "moment",
-        "plekken": 1616,
-        "domeinen": 385,
-        "alsVeld": 97,
+        "plekken": 1691,
+        "domeinen": 404,
+        "alsVeld": 104,
         "vrij": false,
         "voorbeeldDomeinen": [
           "A11Y-INGELOGD.json",
           "AANROEPGRAAF.json",
           "ACTIVERING.json",
+          "AFGELEID.json",
           "AFSPRAAK.md",
-          "APPSTORE.md",
-          "APPWERKT.json"
+          "APPSTORE.md"
         ]
       },
       {
         "naam": "context",
-        "plekken": 1208,
-        "domeinen": 269,
-        "alsVeld": 122,
+        "plekken": 1274,
+        "domeinen": 284,
+        "alsVeld": 127,
         "vrij": false,
         "voorbeeldDomeinen": [
           "AANROEPGRAAF.json",
           "ACTIVERING.json",
           "ADAPTIEF.md",
+          "AFGELEID.json",
           "AICONTEXT.json",
-          "APPSTORE.md",
-          "APPWERKT.json"
+          "APPSTORE.md"
         ]
       },
       {
         "naam": "groep",
-        "plekken": 1170,
-        "domeinen": 255,
+        "plekken": 1197,
+        "domeinen": 265,
         "alsVeld": 242,
         "vrij": false,
         "voorbeeldDomeinen": [
@@ -53,15 +53,15 @@
           "AANROEPGRAAF.json",
           "ACTIVERING.json",
           "ADAMPROEF.json",
-          "ARCHITECTUUR.md",
-          "AUDITPROEF.json"
+          "AFGELEID.json",
+          "ARCHITECTUUR.md"
         ]
       },
       {
         "naam": "profiel",
-        "plekken": 1052,
-        "domeinen": 254,
-        "alsVeld": 178,
+        "plekken": 1085,
+        "domeinen": 261,
+        "alsVeld": 183,
         "vrij": false,
         "voorbeeldDomeinen": [
           "A11Y-INGELOGD.json",
@@ -74,8 +74,8 @@
       },
       {
         "naam": "verval",
-        "plekken": 683,
-        "domeinen": 224,
+        "plekken": 698,
+        "domeinen": 231,
         "alsVeld": 116,
         "vrij": false,
         "voorbeeldDomeinen": [
@@ -89,8 +89,8 @@
       },
       {
         "naam": "geheugen",
-        "plekken": 489,
-        "domeinen": 189,
+        "plekken": 505,
+        "domeinen": 199,
         "alsVeld": 28,
         "vrij": false,
         "voorbeeldDomeinen": [
@@ -104,9 +104,9 @@
       },
       {
         "naam": "signaal",
-        "plekken": 461,
-        "domeinen": 179,
-        "alsVeld": 30,
+        "plekken": 487,
+        "domeinen": 190,
+        "alsVeld": 33,
         "vrij": false,
         "voorbeeldDomeinen": [
           ".github",
@@ -118,25 +118,10 @@
         ]
       },
       {
-        "naam": "zekerheid",
-        "plekken": 318,
-        "domeinen": 119,
-        "alsVeld": 26,
-        "vrij": false,
-        "voorbeeldDomeinen": [
-          "AANROEPGRAAF.json",
-          "AFSPRAAK.md",
-          "BEDRADING.json",
-          "BETROUWBAARHEID.md",
-          "BEWIJS.md",
-          "BEWIJSLADDER.json"
-        ]
-      },
-      {
         "naam": "projectie",
-        "plekken": 309,
-        "domeinen": 146,
-        "alsVeld": 22,
+        "plekken": 344,
+        "domeinen": 164,
+        "alsVeld": 23,
         "vrij": false,
         "voorbeeldDomeinen": [
           "AANROEPGRAAF.json",
@@ -148,24 +133,39 @@
         ]
       },
       {
+        "naam": "zekerheid",
+        "plekken": 337,
+        "domeinen": 129,
+        "alsVeld": 29,
+        "vrij": false,
+        "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "AFSPRAAK.md",
+          "BEDRADING.json",
+          "BETROUWBAARHEID.md",
+          "BEWIJS.md",
+          "BEWIJSKOSTEN.json"
+        ]
+      },
+      {
         "naam": "intent",
-        "plekken": 273,
-        "domeinen": 101,
-        "alsVeld": 35,
+        "plekken": 312,
+        "domeinen": 113,
+        "alsVeld": 36,
         "vrij": false,
         "voorbeeldDomeinen": [
           "AANROEPGRAAF.json",
           "AFSPRAAK.md",
           "AUDITPROEF.json",
           "BEWIJS.md",
-          "CLAUDE.md",
-          "CODECREDENTIALS.json"
+          "BEWIJSKOSTEN.json",
+          "BEWIJSMACHINE.md"
         ]
       },
       {
         "naam": "voorkeur",
-        "plekken": 266,
-        "domeinen": 118,
+        "plekken": 283,
+        "domeinen": 125,
         "alsVeld": 25,
         "vrij": false,
         "voorbeeldDomeinen": [
@@ -179,7 +179,7 @@
       },
       {
         "naam": "situatie",
-        "plekken": 147,
+        "plekken": 151,
         "domeinen": 66,
         "alsVeld": 19,
         "vrij": false,
@@ -188,59 +188,59 @@
           "APPSTORE.md",
           "BEWIJS.md",
           "CARRIERE.md",
-          "CLAUDE.md",
-          "CONCERN.md"
+          "CONCERN.md",
+          "DOCTRINE.json"
         ]
       },
       {
         "naam": "interesse",
-        "plekken": 103,
-        "domeinen": 60,
-        "alsVeld": 9,
+        "plekken": 112,
+        "domeinen": 64,
+        "alsVeld": 10,
         "vrij": false,
         "voorbeeldDomeinen": [
           "AANROEPGRAAF.json",
           "AUDITPROEF.json",
           "BEWIJS.md",
           "BUNDELS.md",
-          "DEKKING.json",
-          "DOCTRINE.json"
+          "CONNECT.md",
+          "DEKKING.json"
         ]
       },
       {
         "naam": "adaptief",
-        "plekken": 92,
-        "domeinen": 33,
+        "plekken": 103,
+        "domeinen": 37,
         "alsVeld": 0,
         "vrij": false,
         "voorbeeldDomeinen": [
           "A11Y-INGELOGD.json",
           "ADAPTIEF.md",
+          "AFGELEID.json",
           "APPWERKT.json",
           "BEWIJS.md",
-          "CLAUDE.md",
-          "DOCTRINE.json"
+          "CLAUDE.md"
         ]
       },
       {
         "naam": "neiging",
-        "plekken": 41,
-        "domeinen": 21,
-        "alsVeld": 10,
+        "plekken": 78,
+        "domeinen": 52,
+        "alsVeld": 14,
         "vrij": false,
         "voorbeeldDomeinen": [
+          "AANROEPGRAAF.json",
+          "ACTIVERING.json",
+          "AFGELEID.json",
           "BEWIJS.md",
-          "CLAUDE.md",
-          "GRENZEN.json",
-          "MUTATIECONTRACT.json",
-          "NEIGING.md",
-          "NEIGINGVORM.json"
+          "CODEWERELD.json",
+          "DEKKING.json"
         ]
       },
       {
         "naam": "relevantie",
         "plekken": 18,
-        "domeinen": 12,
+        "domeinen": 13,
         "alsVeld": 1,
         "vrij": false,
         "voorbeeldDomeinen": [
@@ -254,7 +254,7 @@
       }
     ],
     "voorkeur": {
-      "vormenTotaal": 1403,
+      "vormenTotaal": 1418,
       "metAffiniteit": 14,
       "domeinen": [
         "kern/gebouw-demo",

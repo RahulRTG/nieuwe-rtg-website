@@ -73,10 +73,37 @@ test('4b. elke terminale soort is een van de drie, en drie is een besluit', () =
 });
 
 test('5. een verklaring die niemand meer nodig heeft, staat als verlopen in de uitslag', () => {
-  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { iets: 1 })) });
+  /* `bestaatInCode: () => false` beschrijft de wereld van deze nagebootste
+     proef: daarin bestaat geen server/. Zonder dat zou de ECHTE boom hier
+     binnenlekken en zou dit niets meer beproeven -- want `sessions` en
+     `techniek` staan daar gewoon in. Zie de uitleg bij `verlopen` in
+     scripts/doodspoor.js: verlopen is niet-bereikt EN niet-aanwezig. */
+  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { iets: 1 })), bestaatInCode: () => false });
   assert.ok(u.verlopen.terminaal.includes(TERM_NAAM));
   assert.ok(u.verlopen.tussen.includes(Object.keys(O.TUSSEN)[0]));
   assert.ok(u.verlopen.infra.includes(INFRA_NAAM));
+});
+
+test('5b. NIET BEREIKT IS NIET NIET MEER NODIG: een levende verklaring vervalt niet', () => {
+  /* De keerzijde van toets 5, en hij komt uit een echte bijna-fout. Toen
+     IDEMPROEF.json na twee weken opnieuw gemeten werd, noemde deze meter
+     `sessions`, `techniek` en `commandBeleid` verlopen -- terwijl
+     `db.data.sessions` negen keer in server/ staat en `db.data.techniek`
+     negenenvijftig keer. Ze waren niet overbodig; de proef was er deze ronde
+     niet langs gekomen. Wie ze dan weghaalt, laat de eerstvolgende meting die
+     ze WEL raakt een handoff of dood spoor verzinnen.
+
+     Deze toets houdt vast dat bestaan zwaarder weegt dan bereikt worden: een
+     proef die niets aanraakt, maar een wereld waarin de collectie bestaat,
+     levert GEEN verlopen verklaring op.
+     MUTATIE: haal `|| bestaatInCode(c)` uit bestaatNog() weg -- dan zakt hij. */
+  const levend = Object.keys(O.INFRA)[0];
+  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { iets: 1 })), bestaatInCode: c => c === levend });
+  assert.ok(!u.verlopen.infra.includes(levend),
+    levend + ' bestaat nog in de bron en hoort dus niet verlopen te heten');
+  assert.ok(u.verlopen.infra.length > 0,
+    'de andere infra-verklaringen bestaan in deze wereld niet en horen wel verlopen te zijn -- ' +
+    'anders toetst deze toets niets');
 });
 
 test('6. infra telt niet mee: een route die alleen de sessietabel raakt is geen bron', () => {
@@ -175,7 +202,7 @@ test('12b. een besluit-verklaring wijst naar een document dat bestaat', () => {
       c + ': ' + d.document + ' bestaat niet');
     assert.ok(d.reden && d.reden.length > 80, c + ': de reden is te kort om een besluit te beschrijven');
   }
-  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { iets: 1 })) });
+  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { iets: 1 })), bestaatInCode: () => false });
   assert.ok(u.verlopen.besluit.length, 'een ongebruikte besluit-verklaring hoort verlopen te heten');
 });
 

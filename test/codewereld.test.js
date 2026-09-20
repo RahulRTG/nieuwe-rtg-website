@@ -88,3 +88,34 @@ test('6. een bevinding van de meters staat op nul -- en dat is een ratel', () =>
   assert.strictEqual(lees('SCHERMROUTES.json').gemeten.doodPad, 0,
     'een scherm noemt een exact API-pad dat geen route is en ook geen stam ervan. Zie SCHERMROUTES.json -> doodPad.');
 });
+
+test('6a. de bak naast die ratel is geen vluchtheuvel: elke vooruitwijzing draagt zijn wacht', () => {
+  /* `bewaakteVooruitwijzing` bestaat omdat er een derde geval is naast "de
+     invoer klopt niet meer" en "het symbool is hernoemd": een aanroep naar een
+     integratie die met opzet nog niet gebouwd is, waar het bestand zelf afbreekt
+     als de andere kant er niet is. Zo'n gat is gedeclareerd en geen vergissing.
+
+     Precies daarom is deze bak gevaarlijk: alles wat hierin belandt, telt niet
+     meer mee in de ratel ernaast. Deze toets rekent elke regel daarom NA tegen
+     de echte bron -- de wacht moet er staan, op de genoemde regel, op dezelfde
+     naam, en hij moet werkelijk AFBREKEN. Een wacht die alleen waarschuwt is
+     geen wacht, en dan hoort de aanroep gewoon een bevinding te zijn.
+
+     MUTATIE (beide met de hand nagetrokken, 20 september 2026): haal de wacht
+     uit server/accounts/transactie.js weg -> doelOnbekend 0 -> 1. Vervang de
+     `throw` door een `console.warn` -> ook 1. De ratel blijft dus bijten. */
+  const g = lees('AANROEPGRAAF.json');
+  const lijst = g.bewaakteVooruitwijzing || [];
+  assert.strictEqual(g.gemeten.bewaakteVooruitwijzing, lijst.length,
+    'de teller en de lijst horen hetzelfde te zeggen');
+  for (const v of lijst) {
+    const [bestand] = v.van.split('#');
+    const naam = v.naar.split('#')[1];
+    const regels = fs.readFileSync(path.join(WORTEL, bestand), 'utf8').split('\n');
+    const wacht = regels[v.wachtOpLijn - 1] || '';
+    assert.match(wacht, new RegExp('typeof\\s+' + v.binding + '\\s*\\.\\s*' + naam + "\\s*!==\\s*'function'"),
+      bestand + ':' + v.wachtOpLijn + ' draagt niet de wacht die het register beweert: ' + wacht.trim());
+    assert.match(regels.slice(v.wachtOpLijn - 1, v.wachtOpLijn + 4).join('\n'), /\bthrow\b/,
+      bestand + ':' + v.wachtOpLijn + ' toetst wel, maar breekt niet af -- dan is het een bevinding');
+  }
+});

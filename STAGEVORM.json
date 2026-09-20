@@ -1,22 +1,23 @@
 {
   "stempel": {
-    "op": "2026-09-13T10:05:58.440Z",
-    "commit": "58d0ec7c",
+    "op": "2026-09-19T19:08:02.658Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 52,
     "instrument": "scripts/stagevorm.js",
     "node": "v22.22.2"
   },
   "uitleg": "Gemeten met scripts/stagevorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in STAGE.md par. 0. Drie metingen die niet hetzelfde zeggen: A de naam, B de datavorm, C het bereik van de bestaande wekhaak.",
   "grens": "Wat deze meter NIET aantoont: dat er geen gedeeld PROCES is. Hij kijkt naar bewaarde VORMEN en naar namen in de bron, niet naar werkwoorden, volgorde of uitkomst -- KETENVORM.json laat zien dat die twee vragen verschillende antwoorden geven. Meting A wijst naambotsingen aan en bewijst niet dat twee gelijknamige vormen hetzelfde BETEKENEN; dat beslist een mens die beide bestanden opent. Meting C telt of een domein de wekhaak aanroept, niet of het dat ZOU MOETEN: een domein zonder publieke gebeurtenis hoort terecht in de lijst zonder haak.",
-  "vastgelegd": "2026-09-13",
+  "vastgelegd": "2026-09-19",
   "gemeten": {
     "naam": [
       {
         "naam": "momenten",
-        "plekken": 7,
+        "plekken": 8,
         "domeinen": [
           "kern/baby",
+          "kern/mediaos",
           "kern/rtfos",
           "kern/socialegraaf",
           "kern/sportclub",
@@ -25,6 +26,7 @@
         ],
         "waar": [
           "server/kern/baby.js",
+          "server/kern/mediaos/momenten.js",
           "server/kern/rtfos/subsidies-keten.js",
           "server/kern/rtfos/subsidies.js",
           "server/kern/socialegraaf/bronnen.js",
@@ -35,12 +37,14 @@
       },
       {
         "naam": "moment",
-        "plekken": 1,
+        "plekken": 2,
         "domeinen": [
-          "kern/magnaat"
+          "kern/magnaat",
+          "kern/mediaos"
         ],
         "waar": [
-          "server/kern/magnaat-economie.js"
+          "server/kern/magnaat-economie.js",
+          "server/kern/mediaos/momenten.js"
         ]
       },
       {
@@ -79,14 +83,14 @@
       }
     ],
     "vorm": {
-      "vormen": 67,
+      "vormen": 69,
       "domeinen": 10,
-      "velden": 143,
+      "velden": 144,
       "inAlleDomeinen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 5,
-      "veldenDomeineigen": 126,
-      "domeineigenPct": 88.1,
+      "veldenDomeineigen": 127,
+      "domeineigenPct": 88.2,
       "perDomein": [
         {
           "domein": "kern/clips",
@@ -106,7 +110,7 @@
         },
         {
           "domein": "kern/mediaos",
-          "velden": 16
+          "velden": 18
         },
         {
           "domein": "kern/muziek",
@@ -130,6 +134,15 @@
         }
       ],
       "gedeeld": [
+        {
+          "veld": "maker",
+          "domeinen": 3,
+          "waar": [
+            "kern/clips",
+            "kern/festival",
+            "kern/mediaos"
+          ]
+        },
         {
           "veld": "bio",
           "domeinen": 2,
@@ -192,14 +205,6 @@
           "waar": [
             "kern/muziek",
             "kern/theater"
-          ]
-        },
-        {
-          "veld": "maker",
-          "domeinen": 2,
-          "waar": [
-            "kern/clips",
-            "kern/festival"
           ]
         },
         {

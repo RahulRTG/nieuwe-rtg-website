@@ -1,15 +1,15 @@
 {
   "stempel": {
-    "op": "2026-09-15T05:28:02.146Z",
-    "commit": "711a4b10",
+    "op": "2026-09-19T19:08:11.537Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 55,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
   "uitleg": "Gemeten met scripts/namensvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in REPRESENTATIE.md par. 0: delen de bestaande manieren waarop iemand namens een ander handelt werkelijk een machine? Twee lijsten (smal = handelen, ruim = handelen plus kennen), zodat de uitslag niet op de lijst drijft.",
   "grens": "De eenheid is het MECHANISME en niet het domein, omdat kern/service/machtiging*.js en kern/command/bijstand*.js elk een mechanisme BINNEN een groter domein zijn. Daardoor zijn de percentages hier NIET uitwisselbaar met CARRIEREVORM.json of STAGEVORM.json, die per domein tellen; alleen de VORM van het antwoord is vergelijkbaar. Verder meet dit bewaarde VORMEN (velden van objectliteralen) en geen werkwoorden, volgorde of uitkomst: een nul zegt dat er geen gedeeld OBJECT is, niet dat er geen gedeeld PROCES is -- die tweede vraag beantwoordt een ketenproef. Een mechanisme zonder opgeslagen vormen (een regelbestand zonder db) valt uit de noemer en staat in `zonderVormen`. De woordenschat telt IDENTIFIERS na aftrek van commentaar en tekenreeksen: `bezet` is een waarschuwing met een adres en geen verbod, en samenstellingen tellen niet mee omdat een samenstelling een andere naam is.",
-  "vastgelegd": "2026-09-15",
+  "vastgelegd": "2026-09-19",
   "gemeten": {
     "smal": {
       "vormen": 10,
@@ -551,7 +551,7 @@
           "mechanisme": "app-machtiging",
           "wie": "een app van derden namens een lid",
           "bestanden": 5,
-          "namen": 28,
+          "namen": 27,
           "opNaam": [
             "verlenen",
             "intrekken",
@@ -596,17 +596,17 @@
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 252,
-      "domeinen": 135,
-      "samengesteld": 182,
-      "samengesteldDomeinen": 84,
+      "bestanden": 253,
+      "domeinen": 136,
+      "samengesteld": 184,
+      "samengesteldDomeinen": 85,
       "stand": "bezet",
       "waar": [
         "bedrijf",
         "kern/aanmeldgesprek-hulp",
         "kern/afdelingen",
         "kern/agenda-pro",
-        "kern/algpin"
+        "kern/ai"
       ],
       "vormen": [
         "DOELEN",
@@ -688,9 +688,9 @@
     },
     {
       "woord": "machtiging",
-      "bestanden": 19,
+      "bestanden": 20,
       "domeinen": 8,
-      "samengesteld": 37,
+      "samengesteld": 39,
       "samengesteldDomeinen": 12,
       "stand": "bezet",
       "waar": [
@@ -706,7 +706,7 @@
         "MACHTIGING_NOOIT",
         "RTG_MACHTIGING_NIET_GEVRAAGD",
         "RTG_MACHTIGING_NIET_VERLEEND",
-        "eersteMachtiging"
+        "RTG_MACHTIGING_VERSMALD"
       ]
     },
     {
@@ -826,8 +826,8 @@
     },
     {
       "woord": "zekerheid",
-      "bestanden": 23,
-      "domeinen": 12,
+      "bestanden": 26,
+      "domeinen": 13,
       "samengesteld": 5,
       "samengesteldDomeinen": 3,
       "stand": "bezet",
@@ -835,8 +835,8 @@
         "kern/avond",
         "kern/command",
         "kern/commercie",
-        "kern/fiscaal",
-        "kern/frictie"
+        "kern/connect",
+        "kern/fiscaal"
       ],
       "vormen": [
         "contractzekerheid",
@@ -934,8 +934,8 @@
     },
     {
       "woord": "deal",
-      "bestanden": 9,
-      "domeinen": 9,
+      "bestanden": 11,
+      "domeinen": 11,
       "samengesteld": 9,
       "samengesteldDomeinen": 5,
       "stand": "bezet",
@@ -957,9 +957,9 @@
     },
     {
       "woord": "mandaat",
-      "bestanden": 9,
+      "bestanden": 11,
       "domeinen": 5,
-      "samengesteld": 6,
+      "samengesteld": 8,
       "samengesteldDomeinen": 4,
       "stand": "bezet",
       "waar": [
@@ -970,12 +970,12 @@
         "kern/stuur"
       ],
       "vormen": [
+        "MANDAATPOORT",
+        "RTG_MANDAAT_AFDWINGEN",
         "maakMandaat",
         "mandaatBron",
-        "mandaatGeldig",
-        "mandaatLaag",
-        "mandaatPlafond",
-        "mandaatUitleg"
+        "mandaatContext",
+        "mandaatGeldig"
       ]
     },
     {

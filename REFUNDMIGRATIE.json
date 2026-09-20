@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-09-13T20:32:12.589Z",
-  "commit": "16263f0ec",
+  "op": "2026-09-19T19:07:15.399Z",
+  "commit": "6083f652",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 40,
   "instrument": "scripts/refundmigratie.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "soort": "meting",
  "uitleg": "Welke lezer van een betaalstand (`paid`) kan mee naar de tegenboeking. Orders zijn om; rides, tickets en boekingen niet. Dit telt de lezers en wijst ze aan; het VERKLAART ze niet -- een lezer staat op onbekend tot iemand hem met de hand heeft ingedeeld.",

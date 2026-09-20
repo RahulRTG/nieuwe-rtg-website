@@ -46,10 +46,10 @@ uitslag van `npm run kantoormacht` (`KANTOORMACHT.json`, blok 0 van
 
 | As | Getal | Graad |
 |---|---|---|
-| kantoorroutes (`/api/office` + `/api/boardroom`) | **<!--getal:kantoor.routes-->590<!--/getal-->** over <!--getal:kantoor.bestanden-->90<!--/getal--> bestanden | gemeten |
-| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->168<!--/getal-->** | gemeten |
-| deur is de gedeelde code | **<!--getal:kantoor.deurGedeeld-->422<!--/getal-->** | gemeten |
-| handler kent de handelende mens | <!--getal:kantoor.handlerKentMens-->130<!--/getal--> | vermoed (bovengrens) |
+| kantoorroutes (`/api/office` + `/api/boardroom`) | **<!--getal:kantoor.routes-->605<!--/getal-->** over <!--getal:kantoor.bestanden-->95<!--/getal--> bestanden | gemeten |
+| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->178<!--/getal-->** | gemeten |
+| deur is de gedeelde code | **<!--getal:kantoor.deurGedeeld-->427<!--/getal-->** | gemeten |
+| handler kent de handelende mens | <!--getal:kantoor.handlerKentMens-->141<!--/getal--> | vermoed (bovengrens) |
 | **anoniem uitvoerbaar** | **<!--getal:kantoor.anoniem-->365<!--/getal-->** | vermoed (ondergrens) |
 | schrijft een auditspoor | 130 | vermoed |
 | vraagt een reden | 259 | vermoed |
@@ -422,7 +422,7 @@ mensen is "een tweede paar ogen" soms "dezelfde mens morgen"**. Daar helpt geen
 hoeveelheid code tegen. `vierogen.js` is er eerlijk over: hij levert de graad van
 de scheiding mee in plaats van een groen vinkje.
 
-**`ENFORCE_EXECUTE` heeft een prijs.** <!--getal:kantoor.deurGedeeld-->422<!--/getal--> routes hangen aan de gedeelde deur, en
+**`ENFORCE_EXECUTE` heeft een prijs.** <!--getal:kantoor.deurGedeeld-->427<!--/getal--> routes hangen aan de gedeelde deur, en
 het kantoor doet daar het dagelijkse werk mee. Wie de deur dichtzet zonder eerst
 de schaduwronde, legt werk stil dat gisteren gewoon mocht. Dat is precies waarom
 `kluispoort.js` destijds de gedeelde code níét heeft afgesloten: *deze poort

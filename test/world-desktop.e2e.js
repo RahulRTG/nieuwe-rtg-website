@@ -35,14 +35,22 @@ test.after(async () => { if (browser) await browser.close(); if (srv) await stop
 test('four desktop worlds use one composition and one Edge; the mobile home stays usable', { skip }, async () => {
   const ctx = await context(null), page = await ctx.newPage(), errors = []; letOpFouten(page, errors);
   try {
-    for (const route of ['/apps/wereld.html', '/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/index.html']) {
+    for (const route of ['/', '/apps/wereld.html', '/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/index.html']) {
       await open(page, route);
       assert.equal(await page.locator('.wd-people').isVisible(), true);
       assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
-      assert.ok(await page.locator('.wd-world-label').evaluate(e => e.getBoundingClientRect().bottom <= e.closest('header').getBoundingClientRect().bottom));
+      if (route !== '/') assert.ok(await page.locator('.wd-world-label').evaluate(e => e.getBoundingClientRect().bottom <= e.closest('header').getBoundingClientRect().bottom));
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route);
-      assert.match(await page.locator('.wd-people').innerText(), /Meld u aan/);
+      if (route !== '/') assert.match(await page.locator('.wd-people').innerText(), /Meld u aan/);
       if (route.includes('foundation')) assert.match(await page.locator('.wd-people').innerText(), /100% gratis/);
+      await page.locator('.wd-library').scrollIntoViewIfNeeded();
+      const overlap = await page.evaluate(() => {
+        const top = document.querySelector('.wd-library').getBoundingClientRect().top;
+        return [...document.querySelectorAll('.wd-people,.wd-favorites')]
+          .some(el => el.getBoundingClientRect().bottom > top + 1);
+      });
+      assert.equal(overlap, false, route + ': the side panels must not cover the library when scrolling');
+      await page.evaluate(() => scrollTo(0, 0));
       await page.setViewportSize({ width: 390, height: 844 });
       assert.equal(await page.locator('.wd-people').isVisible(), false);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route + ' mobile');

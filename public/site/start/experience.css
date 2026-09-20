@@ -1,15 +1,16 @@
 /* Experience RTG uses the product's Heritage materials and Adaptive Edge. */
 body.rtg-experience{margin:0;background:#f4f0e9;background-image:none;color:#241f19;--edge-side:0px;--edge-bar-accent-soft:rgba(192,165,68,.14);--edge-ok:#62b98a;--serif:"Bodoni Moda",Georgia,serif;--sans:Inter,system-ui,sans-serif;font-family:var(--sans);overflow-x:clip}
+body.rtg-experience :is(main,section,article,div,header,footer){min-width:0}
 html{scroll-padding-top:32px}*{box-sizing:border-box}[hidden]{display:none!important}
 .rtg-experience button,.rtg-experience input,.rtg-experience select{font:inherit}
 .rtg-experience button{cursor:pointer}.rtg-experience :focus-visible{outline:2px solid currentColor;outline-offset:5px}
 .rtg-experience main{background:transparent}.rtg-experience h1,.rtg-experience h2,.rtg-experience h3{font-weight:450}
 .rtg-experience a{text-underline-offset:6px}.rtg-experience em{font-weight:450}
-.experience-header{position:absolute;z-index:5;top:0;left:0;width:100%;padding:30px 5vw;display:flex;justify-content:space-between;align-items:center;color:#fff8ed}
+.experience-header{position:absolute;z-index:5;top:0;left:0;width:100%;padding:calc(30px + env(safe-area-inset-top,0px)) max(5vw,calc(var(--safe-right) + 16px)) 30px max(5vw,calc(var(--safe-left) + 16px));display:flex;justify-content:space-between;align-items:center;color:#fff8ed}
 .experience-brand{display:flex;gap:24px;align-items:center;text-decoration:none;font:400 46px/.9 var(--serif)}
 .experience-brand span{max-width:140px;font:500 9px/1.7 var(--sans);letter-spacing:.19em}
 .edition{font-size:9px;letter-spacing:.19em;display:flex;align-items:center;gap:12px}.edition i{width:5px;height:5px;border-radius:50%;background:#d0b77b;box-shadow:0 0 0 5px #d0b77b1c}
-.scene{position:relative;padding:110px max(6vw,24px);isolation:isolate;scroll-margin-top:0}
+.scene{position:relative;padding:110px max(6vw,calc(var(--safe-right) + 18px)) 110px max(6vw,calc(var(--safe-left) + 18px));isolation:isolate;scroll-margin-top:0;overflow-wrap:break-word}
 .scene .overline{font:600 10px/1.5 var(--sans);letter-spacing:.2em;color:inherit;margin:0 0 30px;opacity:.8}
 .scene h2{font-size:clamp(48px,6.3vw,88px);letter-spacing:-.05em;line-height:1.03;margin:0 0 26px}
 .scene-heading{max-width:790px;margin-bottom:56px}.scene-heading>p:last-child{max-width:500px;font-size:16px;line-height:1.85;margin-bottom:0}

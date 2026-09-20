@@ -35,6 +35,14 @@
    BEVINDING (`doelOnbekend`) -- ofwel de invoer klopt niet meer, ofwel het
    symbool is hernoemd.
 
+   ER IS EEN DERDE GEVAL, en dat is geen van beide: een aanroep naar een
+   integratie die met opzet nog niet gebouwd is, waarbij het aanroepende bestand
+   zelf toetst of de functie bestaat en anders met een genoemde fout afbreekt.
+   Die heet `bewaakteVooruitwijzing` en wordt apart geteld -- zie de uitleg bij
+   bewaakteWacht(). Hij verdwijnt niet uit de uitslag; hij staat er alleen niet
+   als beschuldiging in, want een gedeclareerd gat is iets anders dan een
+   vergissing.
+
    Draaien: npm run aanroepgraaf -> AANROEPGRAAF.json */
 'use strict';
 
@@ -159,12 +167,14 @@ const lijst = BOMEN.flatMap(bestanden);
 
 /* Ronde 1: per bestand de symbolen en de invoerbindingen. */
 const bomen = new Map(), symbolenVan = new Map(), invoer = new Map(), uitvoerVan = new Map(), fabrieksparams = new Map(),
-  contextnamen = new Map(), lokaleWaarden = new Map(), externeModules = new Map(), uitgepakt = new Map(), nietGelezen = [];
+  contextnamen = new Map(), lokaleWaarden = new Map(), externeModules = new Map(), uitgepakt = new Map(), nietGelezen = [],
+  tekstVan = new Map();
 for (const rel of lijst) {
-  let ast;
-  try { ast = parse(fs.readFileSync(path.join(WORTEL, rel), 'utf8'), {}); }
+  let ast, tekst;
+  try { tekst = fs.readFileSync(path.join(WORTEL, rel), 'utf8'); ast = parse(tekst, {}); }
   catch (e) { nietGelezen.push({ bestand: rel, fout: String(e.message).slice(0, 90) }); continue; }
   bomen.set(rel, ast);
+  tekstVan.set(rel, tekst);
   const sym = new Set(), bind = new Map(), uitvoerNamen = new Set(), schaduw = new Set();
   const externBind = new Set(), uitObjectBind = new Set();
   let uitvoerVorm = null;
@@ -406,8 +416,44 @@ function routehandlers(ast) {
   return per;
 }
 
+/* EEN BEWAAKTE VOORUITWIJZING IS GEEN ONTBREKEND SYMBOOL.
+   Er is een derde geval naast "de invoer klopt niet meer" en "het symbool is
+   hernoemd": een aanroep naar een integratie die met OPZET nog niet gebouwd is,
+   waarbij het aanroepende bestand zelf eerst toetst of de functie er is en
+   anders met een genoemde fout afbreekt. Dat is geen vergissing maar een
+   gedeclareerd gat -- de aanroep is onbereikbaar tot de andere kant bestaat.
+
+   Het onderscheid is machinaal na te rekenen en wordt niet aangenomen: in de
+   brontekst van HETZELFDE bestand moet `typeof <iets>.<naam> !== 'function'`
+   staan, en daarop moet binnen hetzelfde blok een `throw` volgen. Een wacht die
+   niets doet is geen wacht, en een wacht in een ander bestand zegt niets over
+   deze aanroep.
+
+   Ze verdwijnen daarmee NIET uit de uitslag: ze verhuizen naar een eigen bak met
+   hun eigen teller, zodat de ratel op `doelOnbekend` blijft bijten. Haalt iemand
+   de wacht weg, dan valt de aanroep bij de volgende meting vanzelf terug in
+   `doelOnbekend` en zakt de toets die daarover gaat. */
+function bewaakteWacht(rel, naam) {
+  const tekst = tekstVan.get(rel);
+  if (!tekst || !naam) return null;
+  const re = new RegExp('typeof\\s+([A-Za-z_$][\\w$]*)\\s*\\.\\s*' +
+    naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*!==\\s*[\'"]function[\'"]', 'g');
+  let m;
+  while ((m = re.exec(tekst))) {
+    /* De wacht moet ook werkelijk afbreken. 400 tekens is ruim genoeg voor een
+       `if (...) throw fout(CODE, 'uitleg')` en te krap om een throw verderop in
+       de functie per ongeluk mee te tellen. */
+    const staart = tekst.slice(m.index, m.index + 400);
+    if (/\bthrow\b/.test(staart)) {
+      const regel = tekst.slice(0, m.index).split('\n').length;
+      return { binding: m[1], lijn: regel };
+    }
+  }
+  return null;
+}
+
 /* Ronde 2: de aanroepen. */
-const kanten = [], onopgelost = new Map(), doelOnbekend = [];
+const kanten = [], onopgelost = new Map(), doelOnbekend = [], bewaakteVooruitwijzing = [];
 const routeKanten = [], perSoort = new Map(), overigWaar = new Map();
 let calls = 0, doelNietVastTeStellen = 0;
 for (const [rel, ast] of bomen) {
@@ -516,7 +562,13 @@ for (const [rel, ast] of bomen) {
          staan -- geen gok naar een symbool dat er niet is. */
       if (hoe === 'viaKern') doelNaam = null;
       else if (uitDaar === null || uitDaar === undefined) { doelNietVastTeStellen++; return; }
-      else { doelOnbekend.push({ van: rel + '#' + van, naar: doelBestand + '#' + doelNaam, hoe, lijn: n.lijn }); return; }
+      else {
+        const wacht = bewaakteWacht(rel, doelNaam);
+        const vondst = { van: rel + '#' + van, naar: doelBestand + '#' + doelNaam, hoe, lijn: n.lijn };
+        if (wacht) bewaakteVooruitwijzing.push({ ...vondst, wachtOpLijn: wacht.lijn, binding: wacht.binding });
+        else doelOnbekend.push(vondst);
+        return;
+      }
     }
     const sleutel = rel + '#' + van + ' -> ' + doelBestand + '#' + doelNaam;
     if (gezien.has(sleutel)) return;
@@ -572,6 +624,7 @@ const uit = {
     onopgelostNaarSoort: soorten,
     opgelostPct: calls ? Math.round((calls - onopgelostTotaal) / calls * 1000) / 10 : 0,
     doelOnbekend: doelOnbekend.length,
+    bewaakteVooruitwijzing: bewaakteVooruitwijzing.length,
     doelNietVastTeStellen: doelNietVastTeStellen,
     symbolenMetAanroeper: aanroepersVan.size,
     routesMetSymbool: new Set(routeKanten.map(r => r.route)).size,
@@ -590,6 +643,7 @@ const uit = {
       .map(([naam, aantal]) => ({ naam, aantal, waar: soort === 'overig' ? [...(overigWaar.get(naam) || [])] : undefined }))
   })),
   doelOnbekend: doelOnbekend.slice(0, 40),
+  bewaakteVooruitwijzing,
   nietGelezen,
   kanten
 };
@@ -604,6 +658,8 @@ console.log('  onopgelost  ', g.onopgelosteAanroepen, 'aanroepen over', g.onopge
 console.log('    waarvan   ', Object.entries(soorten).map(([k, v]) => k + ': ' + v).join(', '));
 console.log('  doelOnbekend', g.doelOnbekend, '(ingevoerde naam die het doelbestand niet kent -- een BEVINDING) |',
   g.doelNietVastTeStellen, 'niet vast te stellen (module.exports is geen object)');
+console.log('  bewaakteVooruitwijzing', g.bewaakteVooruitwijzing,
+  '(doel bestaat niet, maar het bestand zelf breekt af als het er niet is -- een GEDECLAREERD GAT)');
 console.log('  symbolen met een aanroeper:', g.symbolenMetAanroeper);
 console.log('  brug route -> symbool:', g.routesMetSymbool, 'routes met minstens een symbool,', g.routeSymboolKanten, 'kanten');
 console.log('\n  meest onopgelost:', onopgelostGesorteerd.slice(0, 8).map(([n, a]) => n + ' (' + a + ')').join(', '));

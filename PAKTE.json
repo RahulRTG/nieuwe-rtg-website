@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T11:57:22.333Z",
-    "commit": "c933e406",
+    "op": "2026-09-19T18:56:52.530Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 10,
     "instrument": "scripts/pakte.js",
     "node": "v22.22.2"
   },
@@ -12,16 +12,16 @@
   "verandertNiets": true,
   "corpus": {
     "bestand": "server/kern/stuur/menstaal.json",
-    "gevallenNU": 26,
-    "metContext": 2
+    "gevallenNU": 41,
+    "metContext": 16
   },
   "telling": {
-    "gemeten": 26,
+    "gemeten": 41,
     "antwoordrail": 1,
-    "stuur": 25,
+    "stuur": 40,
     "nietGemeten": 0,
     "misgelopen": 0,
-    "uitlegNaarStuur": 8
+    "uitlegNaarStuur": 9
   },
   "perKlasse": {
     "INFORMATION": {
@@ -31,27 +31,27 @@
       "nietGemeten": 0
     },
     "ACTION": {
-      "gevallen": 11,
+      "gevallen": 12,
       "antwoordrail": 0,
-      "stuur": 11,
+      "stuur": 12,
       "nietGemeten": 0
     },
     "AMBIGUOUS": {
-      "gevallen": 4,
+      "gevallen": 10,
       "antwoordrail": 1,
-      "stuur": 3,
+      "stuur": 9,
       "nietGemeten": 0
     },
     "FOLLOWUP": {
-      "gevallen": 1,
+      "gevallen": 6,
       "antwoordrail": 0,
-      "stuur": 1,
+      "stuur": 6,
       "nietGemeten": 0
     },
     "CONTEXTUAL_REFERENCE": {
-      "gevallen": 2,
+      "gevallen": 5,
       "antwoordrail": 0,
-      "stuur": 2,
+      "stuur": 5,
       "nietGemeten": 0
     }
   },
@@ -88,6 +88,10 @@
     {
       "id": "info-gegevens",
       "input": "wie kan mijn gegevens zien"
+    },
+    {
+      "id": "ctx-leg-dit-uit",
+      "input": "leg dit uit"
     }
   ],
   "grens": "Dit zegt NIET of de antwoordrail een goed antwoord gaf; alleen wie de vraag claimde. Het is gemeten met de DETERMINISTISCHE rail -- een modelrail kan anders claimen, want dan bestaat stuurLus om een andere reden. Alleen de gevallen die vandaag beproefbaar zijn tellen mee; de contextgevallen (FASE4) zijn niet gemeten. En elk geval kreeg een VERS lid, dus er is geen gespreksgeschiedenis: in een lopend gesprek kan de antwoordrail vaker claimen dan hier, omdat p.wacht en het geheugen dan gevuld zijn. De gevallen met een `contextGeval` zijn MET die context gepost; dat is de context uit het CONTRACT en niet die van een echt scherm.",
@@ -177,6 +181,15 @@
       "id": "act-agenda-vrijdag",
       "klasse": "ACTION",
       "input": "zet vrijdag in mijn agenda",
+      "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-agenda-tandarts",
+      "klasse": "ACTION",
+      "input": "zet de tandarts vrijdag om 14:00 in mijn agenda",
       "verwachteRoute": "OPERATIONAL",
       "metContext": false,
       "pakte": false,
@@ -291,6 +304,60 @@
       "uitslag": "stuur"
     },
     {
+      "id": "amb-die-andere-geen-kandidaten",
+      "klasse": "AMBIGUOUS",
+      "input": "die andere",
+      "verwachteRoute": "CLARIFY",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "amb-die-andere-onbevoegd",
+      "klasse": "AMBIGUOUS",
+      "input": "die andere",
+      "verwachteRoute": "CLARIFY",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "amb-betaal-die-geen",
+      "klasse": "AMBIGUOUS",
+      "input": "betaal die",
+      "verwachteRoute": "CLARIFY",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "amb-betaal-die-1",
+      "klasse": "AMBIGUOUS",
+      "input": "betaal die",
+      "verwachteRoute": "OPERATIONAL",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "amb-betaal-die-3",
+      "klasse": "AMBIGUOUS",
+      "input": "betaal die",
+      "verwachteRoute": "CLARIFY",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "amb-annuleer-hem",
+      "klasse": "AMBIGUOUS",
+      "input": "annuleer hem",
+      "verwachteRoute": "CLARIFY",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
       "id": "amb-doe-maar-leeg",
       "klasse": "AMBIGUOUS",
       "input": "doe maar",
@@ -300,11 +367,65 @@
       "uitslag": "antwoordrail"
     },
     {
+      "id": "fup-liever-later-reis",
+      "klasse": "FOLLOWUP",
+      "input": "liever later",
+      "verwachteRoute": "OPERATIONAL",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "fup-liever-later-afspraak",
+      "klasse": "FOLLOWUP",
+      "input": "liever later",
+      "verwachteRoute": "OPERATIONAL",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
       "id": "fup-liever-later-geen",
       "klasse": "FOLLOWUP",
       "input": "liever later",
       "verwachteRoute": "CLARIFY",
       "metContext": false,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "fup-ja-doe-maar",
+      "klasse": "FOLLOWUP",
+      "input": "ja doe maar",
+      "verwachteRoute": "CLARIFY",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "fup-toch-niet",
+      "klasse": "FOLLOWUP",
+      "input": "toch niet",
+      "verwachteRoute": "OPERATIONAL",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "fup-laat-maar-twee",
+      "klasse": "FOLLOWUP",
+      "input": "laat maar",
+      "verwachteRoute": "OPERATIONAL",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "ctx-deze-met",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "input": "deze",
+      "verwachteRoute": "CLARIFY",
+      "metContext": true,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -323,6 +444,24 @@
       "input": "zelfde als vorige keer",
       "verwachteRoute": "CLARIFY",
       "metContext": false,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "ctx-leg-dit-uit",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "input": "leg dit uit",
+      "verwachteRoute": "ANSWER",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "ctx-open-hem",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "input": "open hem",
+      "verwachteRoute": "OPERATIONAL",
+      "metContext": true,
       "pakte": false,
       "uitslag": "stuur"
     }

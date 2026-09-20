@@ -1,22 +1,22 @@
 {
   "stempel": {
-    "op": "2026-09-03T11:41:29.927Z",
-    "commit": "44f4c264",
+    "op": "2026-09-19T19:06:09.169Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 8,
+    "boomAnders": 31,
     "instrument": "scripts/wekkers.js",
     "node": "v22.22.2"
   },
   "hoe": "npm run wekkers:vast",
   "grens": "Dit vindt ingangen aan hun PATROON in de code (setInterval, subscribe, createServer, spawn) plus de verklaarde webhooks. Wat hij NIET aantoont: dat een gevonden wekker ook echt loopt, en dat de lijst compleet is -- een ingang in een vorm die hier niet staat, bestaat voor deze meter niet. Een wekker BINNEN de envelop van een functie gaat bovendien niet vanzelf uit als die functie uit gaat.",
-  "gemetenOp": "2026-09-03",
+  "gemetenOp": "2026-09-19",
   "meetAlleen": "deze meter blokkeert niets; hij loopt in de schaduw (CONTROLPLANE.md: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen)",
   "aiIsGeenGat": "kern/stuur.js r.130 roept zijn paden aan met fetch('http://127.0.0.1:'+poort+pad): de AI gaat over echte HTTP en komt dus langs dezelfde functieschakelaars als een mens",
   "watDitNietZegt": "een wekker IN de envelop van een functie wordt niet automatisch uitgezet als die functie uit gaat -- de schakelaar staat op de route, niet op de timer. De nul is wel hard: nul functies betekent dat niets hem raakt.",
-  "wekkers": 62,
+  "wekkers": 61,
   "perSoort": {
-    "KLOK": 41,
-    "BUS": 6,
+    "KLOK": 39,
+    "BUS": 7,
     "LUISTERAAR": 11,
     "WERKER": 4
   },
@@ -281,7 +281,7 @@
     {
       "soort": "KLOK",
       "bestand": "server/opzet/start.js",
-      "aantal": 2,
+      "aantal": 3,
       "functies": 0,
       "welke": [],
       "verklaard": "bedrading: hangt de diensten op, en is zelf geen functie",
@@ -508,8 +508,8 @@
       "welke": [
         "supplier",
         "office",
-        "ov-browser",
         "dom-site",
+        "ov-browser",
         "dom-eigendomein"
       ],
       "trede": "partners"
@@ -548,84 +548,16 @@
       "soort": "BUS",
       "bestand": "server/kern/sessies.js",
       "aantal": 1,
-      "functies": 11,
+      "functies": 9,
       "welke": [
         "supplier",
+        "member",
         "tg-inlog",
         "staff",
         "verificatie",
-        "ov-zorgprofiel",
-        "kern-locatie",
         "dom-fluister",
-        "ov-spar"
-      ],
-      "trede": "partners"
-    },
-    {
-      "soort": "KLOK",
-      "bestand": "server/kern/agenda-ics.js",
-      "aantal": 1,
-      "functies": 12,
-      "welke": [
-        "supplier",
-        "office",
-        "member",
-        "rtf-contacten",
-        "kern-meldingen",
-        "dom-werkplek",
-        "kern-live",
-        "foundation"
-      ],
-      "trede": "partners"
-    },
-    {
-      "soort": "KLOK",
-      "bestand": "server/foundation/berichten.js",
-      "aantal": 1,
-      "functies": 13,
-      "welke": [
-        "supplier",
-        "office",
-        "member",
-        "rtf-contacten",
-        "kern-meldingen",
-        "dom-werkplek",
-        "kern-live",
-        "foundation"
-      ],
-      "trede": "partners"
-    },
-    {
-      "soort": "KLOK",
-      "bestand": "server/foundation/onderwijs/les.js",
-      "aantal": 1,
-      "functies": 13,
-      "welke": [
-        "supplier",
-        "office",
-        "member",
-        "rtf-contacten",
-        "kern-meldingen",
-        "dom-werkplek",
-        "kern-live",
-        "foundation"
-      ],
-      "trede": "partners"
-    },
-    {
-      "soort": "KLOK",
-      "bestand": "server/school/bellen.js",
-      "aantal": 1,
-      "functies": 13,
-      "welke": [
-        "supplier",
-        "office",
-        "member",
-        "rtf-contacten",
-        "kern-meldingen",
-        "dom-werkplek",
-        "kern-live",
-        "foundation"
+        "stuur",
+        "tg-zegel"
       ],
       "trede": "partners"
     },
@@ -643,6 +575,23 @@
         "dom-rekening",
         "dom-bank-rekening-open",
         "dom-bank-storten"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/agenda-ics.js",
+      "aantal": 1,
+      "functies": 17,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
       ],
       "trede": "partners"
     },
@@ -665,6 +614,57 @@
     },
     {
       "soort": "KLOK",
+      "bestand": "server/foundation/berichten.js",
+      "aantal": 1,
+      "functies": 18,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/foundation/onderwijs/les.js",
+      "aantal": 1,
+      "functies": 18,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/school/bellen.js",
+      "aantal": 1,
+      "functies": 18,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
       "bestand": "server/kern/pay/schaduw.js",
       "aantal": 1,
       "functies": 25,
@@ -681,10 +681,10 @@
       "trede": "partners"
     },
     {
-      "soort": "KLOK",
-      "bestand": "server/kern/command/alarm.js",
+      "soort": "BUS",
+      "bestand": "server/kern/intreksignaal.js",
       "aantal": 1,
-      "functies": 196,
+      "functies": 50,
       "welke": [
         "supplier",
         "office",
@@ -699,26 +699,9 @@
     },
     {
       "soort": "KLOK",
-      "bestand": "server/kern/command/canary.js",
+      "bestand": "server/kern/command/tikker.js",
       "aantal": 1,
-      "functies": 196,
-      "welke": [
-        "supplier",
-        "office",
-        "member",
-        "rtf-contacten",
-        "kern-meldingen",
-        "dom-werkplek",
-        "kern-live",
-        "foundation"
-      ],
-      "trede": "partners"
-    },
-    {
-      "soort": "KLOK",
-      "bestand": "server/kern/command/uitrolregie.js",
-      "aantal": 1,
-      "functies": 196,
+      "functies": 207,
       "welke": [
         "supplier",
         "office",

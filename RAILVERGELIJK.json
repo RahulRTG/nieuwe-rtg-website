@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T05:56:22.302Z",
-    "commit": "c0ff8b2c",
+    "op": "2026-09-19T18:56:44.373Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 9,
     "instrument": "scripts/railvergelijk.js",
     "node": "v22.22.2"
   },

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-06T13:48:19.728Z",
-    "commit": "613879a6",
+    "op": "2026-09-19T19:05:05.636Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 15,
     "instrument": "scripts/verraadronde.js",
     "node": "v22.22.2"
   },
@@ -16,7 +16,7 @@
     "invariantschendingen": 0,
     "blindeInjecties": 0,
     "onherhaalbareRondes": 0,
-    "inCatalogus": 9
+    "inCatalogus": 12
   },
   "rondes": [
     {

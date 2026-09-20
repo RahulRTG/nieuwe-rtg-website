@@ -80,7 +80,6 @@ const GROEPEN = {
    ook niet als dood spoor. Elke regel draagt zijn reden. */
 const INFRA = {
   sessions: 'de sessietabel; elke aanroep raakt hem',
-  wacht: 'de wachtrij van de rem (pin-deur); geen zaakobject',
   techniek: 'de technische status; geen zaakobject',
   bankIdem: 'idempotentiesleutels van de bank; bewijs van herhaling, geen object',
   bankIdemAfdruk: 'afdrukken bij die sleutels; idem',
@@ -89,8 +88,6 @@ const INFRA = {
   payIdemAfdruk: 'afdrukken bij die sleutels; idem',
   kassaIdem: 'idempotentiesleutels van de kassa; idem',
   kassaIdemAfdruk: 'afdrukken bij die sleutels; idem',
-  wervingIdem: 'idempotentiesleutels van de werving; idem',
-  wervingIdemAfdruk: 'afdrukken bij die sleutels; idem',
   contactPinSecurity: 'de rem op de contactpin (LINK.md); geen object maar een teller',
   onboarding: 'de onboardingsstand van een sessie; hoort bij de mens en niet bij een zaak'
 };
@@ -250,6 +247,27 @@ function collectiesVan(r) {
   return Object.keys(a).filter(k => !INFRA[k]);
 }
 
+/* De hele brontekst van een boom, aaneen. Alleen nodig om te toetsen OF een
+   collectie ergens nog bestaat -- niet waar, en niet hoe vaak. Wordt hooguit
+   een keer per meting gelezen, en alleen als er werkelijk een verklaring is die
+   anders vervallen zou heten. */
+function alleBrontekst(map) {
+  const stukken = [];
+  (function lees(d) {
+    let inhoud;
+    try { inhoud = fs.readdirSync(path.join(WORTEL, d), { withFileTypes: true }); } catch (e) { return; }
+    for (const e of inhoud) {
+      if (e.name === 'node_modules' || e.name === 'data' || e.name.startsWith('.')) continue;
+      const rel = d + '/' + e.name;
+      if (e.isDirectory()) lees(rel);
+      else if (e.name.endsWith('.js')) {
+        try { stukken.push(fs.readFileSync(path.join(WORTEL, rel), 'utf8')); } catch (x) { /* onleesbaar: telt niet mee */ }
+      }
+    }
+  })(map);
+  return stukken.join('\n');
+}
+
 /* ---- STATISCHE LEZERS: welk bronbestand (plus een hop requires) leest
    `data.<collectie>`? Vermoed en geen meting, en zo gelabeld. ---- */
 function lezerIndex(routes) {
@@ -291,11 +309,24 @@ function lezerIndex(routes) {
 /* ---- DE METING ----
    proef:  IDEMPROEF.json (of een nagebootste, voor de toetsen)
    routes: alleRoutes() met bestand per route (of []: dan geen lezers, en dat
-           staat in de uitslag als nietGezien.lezers) */
-function meet({ proef, routes } = {}) {
+           staat in de uitslag als nietGezien.lezers)
+   bestaatInCode: of een collectie nog ERGENS in de bron staat. Standaard wordt
+           dat in server/ opgezocht -- zie de uitleg bij `verlopen` verderop.
+           Een toets die met een NAGEBOOTSTE proef werkt, beschrijft een wereld
+           waarin die bron niet bestaat; die geeft hier dus zijn eigen antwoord,
+           want anders lekt de echte boom een synthetische wereld in en is het
+           vervalmechanisme niet meer te beproeven. */
+function meet({ proef, routes, bestaatInCode } = {}) {
   proef = proef || leesProef();
   if (!proef || !Array.isArray(proef.perRoute)) return { fout: 'IDEMPROEF.json ontbreekt -- draai eerst: npm run idemproef' };
   routes = routes || [];
+  if (!bestaatInCode) {
+    let serverBron = null;
+    bestaatInCode = c => {
+      if (serverBron === null) serverBron = alleBrontekst('server');
+      return new RegExp('db\\.data\\.' + c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(serverBron);
+    };
+  }
   const bestandVan = new Map(routes.map(r => [r.methode + ' ' + r.pad, r.bestand]));
   const lezers = routes.length ? lezerIndex(routes) : new Map();
 
@@ -406,16 +437,39 @@ function meet({ proef, routes } = {}) {
     for (const r of perRoute) if (r.groep === g) { perGroep[g].bronroutes++; perGroep[g][r.stand]++; }
   }
 
+  /* NIET BEREIKT IS NIET NIET MEER NODIG.
+     `gebruikt` en `alleCollecties` hieronder komen allebei uit de routes die in
+     DEZE ronde werk deden. Een verklaring die daar niet in voorkomt, is daarmee
+     nog niet overbodig: de proef kan er simpelweg niet langs zijn gekomen. Die
+     twee op een hoop gooien is exact de fout die dit huis elders benoemt --
+     "geteld is niet gelopen", en een tekort van de proef is geen oordeel.
+
+     Het kostte bijna drie levende verklaringen: `sessions`, `techniek` en
+     `commandBeleid` werden verlopen genoemd terwijl `db.data.sessions` negen
+     keer in server/ staat, `db.data.techniek` negenenvijftig keer, en
+     kern/command/beleid.js gewoon bestaat. Waren ze weggehaald, dan had de
+     eerstvolgende meting die ze WEL raakt ze als handoff of dood spoor geteld --
+     een verzonnen bevinding, en daar leest niemand later doorheen.
+
+     Een verklaring vervalt daarom pas als zij en niet-bereikt IS en nergens meer
+     BESTAAT. Bestaan wordt getoetst tegen twee bronnen die breder zijn dan deze
+     ronde: alle collecties die de proef uberhaupt zag (ook bij routes die geen
+     werk deden), en de brontekst van server/ zelf. */
+  const volledigeCollecties = new Set();
+  for (const r of proef.perRoute) for (const k of Object.keys((r.opslag && r.opslag.a) || {})) volledigeCollecties.add(k);
+  const bestaatNog = c => volledigeCollecties.has(c) || bestaatInCode(c);
+
   const gebruikt = new Set(perCollectie.keys());
-  const verlopenTerminaal = Object.keys(TERMINAAL).filter(c => !gebruikt.has(c));
-  const verlopenTussen = Object.keys(TUSSEN).filter(c => !gebruikt.has(c));
-  const verlopenBesluit = Object.keys(WACHT_OP_BESLUIT).filter(c => !gebruikt.has(c));
+  const vervallen = bak => Object.keys(bak).filter(c => !gebruikt.has(c) && !bestaatNog(c));
+  const verlopenTerminaal = vervallen(TERMINAAL);
+  const verlopenTussen = vervallen(TUSSEN);
+  const verlopenBesluit = vervallen(WACHT_OP_BESLUIT);
   const zonderDocument = Object.entries(WACHT_OP_BESLUIT)
     .filter(([, d]) => !fs.existsSync(path.join(WORTEL, d.document)))
     .map(([c, d]) => c + ' -> ' + d.document + ' (bestaat niet)');
   const alleCollecties = new Set();
   for (const r of gemeten) for (const k of Object.keys((r.opslag && r.opslag.a) || {})) alleCollecties.add(k);
-  const verlopenInfra = Object.keys(INFRA).filter(c => !alleCollecties.has(c));
+  const verlopenInfra = Object.keys(INFRA).filter(c => !alleCollecties.has(c) && !bestaatNog(c));
   const gebruikteAangewezen = new Set([...perCollectie.values()].filter(x => x.graad === 'aangewezen').map(x => x.collectie));
   for (const c of aangewezen.keys()) if (!gebruikteAangewezen.has(c)) verlopenOntvanger.push(c + ' -> ' + aangewezen.get(c).route + ' (niet meer nodig: de meter ziet de ontvanger zelf)');
 

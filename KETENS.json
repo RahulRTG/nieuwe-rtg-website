@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-03T12:31:24.363Z",
-    "commit": "1c5dc892",
+    "op": "2026-09-19T18:07:29.915Z",
+    "commit": "adc9db1b",
     "boomVuil": false,
     "boomAnders": 3,
     "instrument": "scripts/ketenronde.js",
@@ -75,12 +75,11 @@
       "afwijkingen": [
         "auditSpoor: true -> null",
         "blijftNaHerstart: true -> null",
-        "identiteitLukte: true -> undefined",
+        "identiteitLukte: true -> false",
         "ledgerKlopt: true -> null",
         "retryGafTweedeEffect: false -> null",
         "retryNaHerstartDubbel: false -> undefined",
         "schrijfStatus: 200 -> null",
-        "startteOp: true -> false",
         "zichtbaarVoorHerstart: true -> null"
       ],
       "lat": {
@@ -101,7 +100,8 @@
         "ledgerKlopt": null,
         "auditSpoor": null,
         "retryGafTweedeEffect": null,
-        "startteOp": false
+        "startteOp": true,
+        "identiteitLukte": false
       }
     },
     {
@@ -189,10 +189,9 @@
       "afwijkingen": [
         "auditSpoor: true -> null",
         "blijftNaHerstart: true -> null",
-        "identiteitLukte: true -> undefined",
+        "identiteitLukte: true -> false",
         "retryGafTweedeEffect: false -> null",
         "schrijfStatus: 200 -> null",
-        "startteOp: true -> false",
         "zichtbaarVoorHerstart: true -> null"
       ],
       "lat": {
@@ -210,7 +209,8 @@
         "ledgerKlopt": null,
         "auditSpoor": null,
         "retryGafTweedeEffect": null,
-        "startteOp": false
+        "startteOp": true,
+        "identiteitLukte": false
       }
     },
     {
@@ -294,10 +294,9 @@
       "afwijkingen": [
         "auditSpoor: true -> null",
         "blijftNaHerstart: true -> null",
-        "identiteitLukte: true -> undefined",
+        "identiteitLukte: true -> false",
         "retryGafTweedeEffect: true -> null",
         "schrijfStatus: 200 -> null",
-        "startteOp: true -> false",
         "zichtbaarVoorHerstart: true -> null"
       ],
       "lat": {
@@ -315,7 +314,8 @@
         "ledgerKlopt": null,
         "auditSpoor": null,
         "retryGafTweedeEffect": null,
-        "startteOp": false
+        "startteOp": true,
+        "identiteitLukte": false
       }
     },
     {

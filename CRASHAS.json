@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T10:27:43.948Z",
-    "commit": "adf0407a2",
+    "op": "2026-09-19T19:05:59.541Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 26,
     "instrument": "scripts/crashas.js",
     "node": "v22.22.2"
   },
@@ -61,7 +61,7 @@
     "actief": false,
     "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen."
   },
-  "gemetenOp": "2026-09-14T10:27:43.908Z",
+  "gemetenOp": "2026-09-19T19:05:59.505Z",
   "telling": {
     "routes": 45,
     "paren": 270,

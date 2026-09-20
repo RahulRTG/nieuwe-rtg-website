@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:41:14.674Z",
-    "commit": "b9ef5d31",
+    "op": "2026-09-19T19:06:50.003Z",
+    "commit": "6083f652",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 34,
     "instrument": "scripts/aanvoervorm.js",
     "node": "v22.22.2"
   },
@@ -23,10 +23,10 @@
     ],
     "terreinenLeeg": [],
     "vormen": 100,
-    "velden": 211,
+    "velden": 209,
     "perTerrein": {
       "werk": {
-        "velden": 19,
+        "velden": 18,
         "modules": [
           "server/kern/werk.js",
           "server/kern/werkplaats.js",
@@ -34,7 +34,7 @@
         ]
       },
       "opleiding": {
-        "velden": 137,
+        "velden": 135,
         "modules": [
           "server/kern/beroepenbieb/index.js",
           "server/kern/onderwijs-ladder.js",
@@ -107,18 +107,17 @@
     },
     "inAlleTerreinen": [],
     "inMinstensHelft": [],
-    "inEenTerreinPct": 93.8,
+    "inEenTerreinPct": 94.3,
     "paren": [
       {
         "paar": [
           "werk",
           "opleiding"
         ],
-        "gedeeld": 7,
-        "overlap": 0.047,
+        "gedeeld": 6,
+        "overlap": 0.041,
         "velden": [
           "af",
-          "doel",
           "grootteMB",
           "icon",
           "sterren",

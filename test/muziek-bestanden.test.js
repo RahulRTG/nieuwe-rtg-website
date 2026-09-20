@@ -77,7 +77,8 @@ test('een maker publiceert eigen muziek in de feed zonder een kale publieke medi
   const eigen = await post('/api/muziek/bestanden', {}, a);
   const ander = await post('/api/muziek/bestanden', {}, b);
   assert.deepEqual(eigen.body.nummers.map(x => x.id), [nummer.id]);
-  assert.deepEqual(ander.body.nummers, []);
+  assert.ok(Array.isArray(ander.body.nummers));
+  assert.equal(ander.body.nummers.length, 0);
 
   const feed = await post('/api/muziek/feed', {}, b);
   assert.equal(feed.body.nummers[0].id, nummer.id);
@@ -107,7 +108,8 @@ test('een ander lid luistert via een tijdelijke kaart, volledig en met ranges', 
   assert.equal(r.status, 206);
   assert.equal(r.headers.get('content-range'), 'bytes 3-12/' + MP3.length);
   assert.deepEqual(Buffer.from(await r.arrayBuffer()), MP3.subarray(3, 13));
-  assert.equal((await fetch(base + '/api/muziek/luister/' + '0'.repeat(48))).status, 404);
+  const onbekendeLuisterkaart = '/api/muziek/luister/:ticket'.replace(':ticket', '0'.repeat(48));
+  assert.equal((await fetch(base + onbekendeLuisterkaart)).status, 404);
 });
 
 test('geen audio, geen rechtenbevestiging, geen inlog en andermans verwijdering worden geweigerd', async () => {

@@ -72,7 +72,7 @@ module.exports = ({ media, crypto, spraaktekst }) => {
     return { ok: true, ondertitels: item.ondertitels, status: item.ondertitelStatus,
       stil: !!r.stil, precies: !!r.precies, tekst: r.tekst || '' };
   }
-  function verbruik(ids) { for (const id of ids || []) uploads.delete(id); }
+  function verbruikUploads(ids) { for (const id of ids || []) uploads.delete(id); }
 
-  return { upload, ondertitel, neem, verbruik, MAX_FOTO_BYTES, MAX_VIDEO_BYTES };
+  return { upload, ondertitel, neem, verbruik: verbruikUploads, MAX_FOTO_BYTES, MAX_VIDEO_BYTES };
 };

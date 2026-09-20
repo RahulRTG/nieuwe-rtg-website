@@ -11,13 +11,12 @@ const MAX_PER_LID = 200;
 const TICKET_MS = 15 * 60 * 1000;
 
 module.exports = ({ db, save, crypto, schoon, media, codenaamVan }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/muziek-bestanden',
+    bezit: { muziekBestanden: 'lijst' } });
   const tickets = new Map();
   const uploads = new Map();
   const nu = () => new Date().toISOString();
-  const lijst = () => {
-    if (!Array.isArray(db.data.muziekBestanden)) db.data.muziekBestanden = [];
-    return db.data.muziekBestanden;
-  };
+  const lijst = () => eigen.bak('muziekBestanden');
   const met = (id) => lijst().find(x => x.id === String(id || '')) || null;
   const vanMij = (key, id) => {
     const item = met(id);
@@ -72,7 +71,7 @@ module.exports = ({ db, save, crypto, schoon, media, codenaamVan }) => {
     return { status: 200, ok: true, nummer: publiek(item, key) };
   }
 
-  async function upload(key, bytes, opgegevenMime, naam, duurS, titel, beschrijving, eigenWerk, idem) {
+  async function publiceerBestand(key, bytes, opgegevenMime, naam, duurS, titel, beschrijving, eigenWerk, idem) {
     const sleutel = String(idem || '').trim().slice(0, 200);
     if (sleutel.length < 16) return { status: 400,
       error: 'De publicatiesleutel ontbreekt. Probeer het publiceren opnieuw.' };
@@ -133,16 +132,15 @@ module.exports = ({ db, save, crypto, schoon, media, codenaamVan }) => {
   function weg(key, id) {
     const item = vanMij(key, id);
     if (!item) return { status: 404, error: 'Dit nummer staat niet in uw muziekbibliotheek.' };
-    db.data.muziekBestanden = lijst().filter(x => x.id !== item.id);
+    eigen.zetBak('muziekBestanden', lijst().filter(x => x.id !== item.id));
     for (const [token, t] of tickets) if (t.id === item.id) tickets.delete(token);
     media.verwijder(item.ref);
     save();
     return { status: 200, ok: true };
   }
 
-  return { muziekBestandUpload: upload, muziekBestandenMijn: mijn, muziekBestandenFeed: feed,
-    muziekBestandTicket: ticket, muziekBestandLuister: luister,
-    muziekBestandMooi: mooi, muziekBestandWeg: weg };
+  return { upload: publiceerBestand, mijn, feed,
+    ticket, luister, mooi, weg };
 };
 
 module.exports.MAX_BYTES = MAX_BYTES;

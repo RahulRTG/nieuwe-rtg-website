@@ -3,8 +3,8 @@
    de kern, zodat een geraden id niets oplevert. */
 module.exports = (kern) => {
   const { app, express, auth, muziekMaak, muziekMijn, muziekOpen, muziekBewaar, muziekWeg,
-    muziekBestandUpload, muziekBestandenMijn, muziekBestandenFeed, muziekBestandTicket,
-    muziekBestandLuister, muziekBestandMooi, muziekBestandWeg, muziekRahul, anthropic } = kern;
+    muziekRahul, anthropic } = kern;
+  const bestanden = muziekMaak && muziekMaak.bestanden;
   if (!muziekMaak) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -16,11 +16,11 @@ module.exports = (kern) => {
   /* De persoonlijke bibliotheek van RTG Sound. De upload is rauw, zodat 60 MB
      muziek niet als base64 door JSON en db.data reist. Afspelen gaat met een
      korte luisterkaart; daardoor staat het permanente ledentoken nooit in src. */
-  if (muziekBestandUpload) {
+  if (bestanden) {
     app.post('/api/muziek/bestand', auth, express.raw({ type: () => true, limit: '61mb' }), async (req, res) => {
       if (geenGast(req, res)) return;
       const kop = naam => { const v = String(req.get(naam) || ''); try { return decodeURIComponent(v); } catch (e) { return v; } };
-      try { stuur(res, await muziekBestandUpload(k(req), req.body,
+      try { stuur(res, await bestanden.upload(k(req), req.body,
         req.get('Content-Type') || '', kop('X-RTG-Bestandsnaam') || 'Muziek', req.get('X-RTG-Duur'),
         kop('X-RTG-Titel'), kop('X-RTG-Beschrijving'), req.get('X-RTG-Eigenwerk') === 'ja',
         req.get('Idempotency-Key'))); }
@@ -28,27 +28,27 @@ module.exports = (kern) => {
     });
     app.post('/api/muziek/bestanden', auth, (req, res) => {
       if (geenGast(req, res)) return;
-      stuur(res, muziekBestandenMijn(k(req)));
+      stuur(res, bestanden.mijn(k(req)));
     });
     app.post('/api/muziek/feed', auth, (req, res) => {
       if (geenGast(req, res)) return;
-      stuur(res, muziekBestandenFeed(k(req)));
+      stuur(res, bestanden.feed(k(req)));
     });
     app.post('/api/muziek/bestand-ticket', auth, (req, res) => {
       if (geenGast(req, res)) return;
-      stuur(res, muziekBestandTicket(k(req), req.body && req.body.id));
+      stuur(res, bestanden.ticket(k(req), req.body && req.body.id));
     });
     app.post('/api/muziek/bestand-weg', auth, (req, res) => {
       if (geenGast(req, res)) return;
-      stuur(res, muziekBestandWeg(k(req), req.body && req.body.id));
+      stuur(res, bestanden.weg(k(req), req.body && req.body.id));
     });
     app.post('/api/muziek/mooi', auth, (req, res) => {
       if (geenGast(req, res)) return;
-      stuur(res, muziekBestandMooi(k(req), req.body && req.body.id, req.body && req.body.aan));
+      stuur(res, bestanden.mooi(k(req), req.body && req.body.id, req.body && req.body.aan));
     });
     app.get('/api/muziek/luister/:ticket', async (req, res) => {
       try {
-        const item = await muziekBestandLuister(req.params.ticket);
+        const item = await bestanden.luister(req.params.ticket);
         if (!item) return res.status(404).end();
         res.set('Content-Disposition', "inline; filename*=UTF-8''" + encodeURIComponent(item.naam));
         require('../media/bestand').stuurBuffer(req, res, item.bytes, item.mime, 'private, no-store');

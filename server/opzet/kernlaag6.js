@@ -90,12 +90,12 @@ kern.muziekSamen = null;
 Object.assign(kern, require('../kern/muziek')({ db, save, crypto, schoon,
   magBij: (t, key) => (kern.muziekSamen ? kern.muziekSamen.muziekMagBij(t, key) : t.key === key),
   stempel: (t, key) => { if (kern.muziekSamen) kern.muziekSamen.muziekStempel(t, key); } }));
-/* Geüploade muziek is een andere bezitsvorm dan een Studio-stuk: echte bytes
-   in de privé-mediastore, met tijdelijke luisterkaarten voor de speler. */
-Object.assign(kern, require('../kern/muziek-bestanden')({ db, save, crypto, schoon, media,
-  codenaamVan: kern.codenaamVan }));
 kern.muziekSamen = require('../kern/muziek-samen')({ save,
   trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan });
+/* Eigen audiobytes hangen aan de bestaande muziekpoort, niet aan zeven nieuwe
+   namen in de gedeelde kern. */
+kern.muziekMaak.bestanden = require('../kern/muziek-bestanden')({ db, save, crypto, schoon,
+  media, codenaamVan: kern.codenaamVan });
 Object.assign(kern, kern.muziekSamen);
 Object.assign(kern, require('../kern/muziek-uitgave')({ db, save, crypto, schoon,
   trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan,

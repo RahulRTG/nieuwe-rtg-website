@@ -1,5 +1,5 @@
 /* ============================================================================
-   DE BEDOELING PER SCHRIJFROUTE -- het enige mensenwerk in het contractregister.
+   DE BEDOELING PER SCHRIJFROUTE -- mensenwerk in het contractregister.
 
    scripts/mutatiecontract.js leidt vier van de vijf assen af uit een bron: de
    routes en hun deur uit de draaiende router, het duplicaatgedrag uit

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1943 bestanden en 13968 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1944 bestanden en 13973 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1943 |
-| losse beweringen (`test(...)`) | 13968 |
+| toetsbestanden | 1944 |
+| losse beweringen (`test(...)`) | 13973 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 151 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1305 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 167 |
-| niets van beide | 400 |
+| niets van beide | 401 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1712 bestanden, 13565 beweringen.
+1712 bestanden, 13566 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1752,7 +1752,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-231 bestanden, 403 beweringen.
+232 bestanden, 407 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|

@@ -453,7 +453,7 @@ const EIGEN_MODULE = new Map([
   // Deze proeven raken respectievelijk de Office-opslag via HTTP en een
   // testproxy via een lokale import. Richt bronmutaties op hun echte gedrag.
   ['office-save-atomic.test.js', ['server/kern/office/docs.js']],
-  ['office-classificatie-grens.test.js', ['server/kern/office/basis.js', 'server/kern/office/delen.js', 'server/kern/office/samen.js']],
+  ['office-classificatie-grens.test.js', ['server/kern/office/rechten.js', 'server/kern/office/gezinsdeling.js', 'server/kern/office/samen.js']],
   ['pg-fault-proxy.test.js', ['test/pg-fault-proxy.js']],
   // This test executes the browser language loader in a VM, not through require.
   ['i18n-dictionary.test.js', ['public/shared/i18n.js']],

@@ -49,6 +49,8 @@ test('strikte gezinsdocumenten blijven privé via API, lijst, opslag en herstart
     // De omgekeerde volgorde mag evenmin een tegenstrijdige staat opslaan.
     assert.equal((await rtf('beheer', { id, classificatie: 'intern' })).status, 200);
     assert.equal((await rtf('gezin', { id, rechten: 'lezen' })).status, 200);
+    const sharedList = await rtf('mijn', {}, reader);
+    assert.ok(sharedList.body.gedeeld.some(d => d.id === id), 'dezelfde lijst toont een toegelaten deling wel');
     const shared = opgeslagen(id);
     assert.equal((await rtf('beheer', { id, classificatie: 'strikt' })).status, 409);
     assert.deepEqual(opgeslagen(id), shared);

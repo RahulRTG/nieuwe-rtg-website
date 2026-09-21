@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1959 bestanden en 14015 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1960 bestanden en 14017 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1959 |
-| losse beweringen (`test(...)`) | 14015 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 162 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1313 |
+| toetsbestanden | 1960 |
+| losse beweringen (`test(...)`) | 14017 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 163 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1314 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
 | alleen in de kop *genoemd*, nog niet gemeten | 167 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1718 bestanden, 13585 beweringen.
+1719 bestanden, 13587 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -970,6 +970,7 @@ toets omvalt.
 | `ochtend.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor het Ochtendritme (RTFoundation-gezin): een persoonlijk ochtendlijstje dat elke dag reset, de zachte weektelling bij een afgeronde ochtend (bewust geen reeks en geen record -- een ketting die je... |
 | `office-bank.test.js` | 8 | gezakt op `liegpoort /api/` | DE BANK VANUIT DE BOARDROOM -- de zwaarste knoppen die er zijn. Tien endpoints die de waargenomen dekkingsmeting als nooit aangeroepen aanwees. |
 | `office-blad.test.js` | 6 | gezakt op `true->false#0` | De rekenmotor van RTG Office. Deze draait in de browser, dus we laden het bestand hier los in en rekenen erop -- zonder server, zonder scherm. |
+| `office-classificatie-grens.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `office-enterprise.test.js` | 6 | gezakt op `liegpoort /api/` | De enterprisegrens van RTG Office. Bewijst drie dingen die bij echt samenwerken niet stil fout mogen gaan: een oud venster overschrijft nooit een nieuwere versie, goedkeuren blijft een menselijke eigenaarsbeslissing,... |
 | `office-payroll-dekking.test.js` | 11 | gezakt op `liegpoort /api/` | NEGENTIEN KANTOORDEUREN DIE NOOIT WERDEN GEOPEND. De dekkingsmeter telt welke endpoints de suite tijdens een run echt aanroept. |
 | `office-save-atomic.test.js` | 1 | gezakt op `!==->===#1` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

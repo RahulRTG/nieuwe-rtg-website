@@ -162,7 +162,7 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
     save();
     // wie meeleest of meeschrijft krijgt een seintje dat er iets veranderd is
     for (const mk of [...(d.gedeeldMet || []), ...(d.bewerkers || []), d.key]) {
-      if (mk === key) continue;
+      if (mk === key || !magLezen(d, mk)) continue;
       try { sseToCustomer(mk, 'office', { kind: 'gewijzigd', id: d.id }); } catch (e) {}
     }
     return { status: 200, ok: true, gewijzigd: d.gewijzigd, fase: faseVan(d) };

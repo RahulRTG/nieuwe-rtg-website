@@ -68,6 +68,8 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
     if (d.key !== key) return { status: 403, error: 'Alleen de maker deelt met het gezin.' };
     if (!d.kring) return { status: 400, error: 'Dit document hoort niet bij een gezin.' };
     if (![null, '', 'uit', 'lezen', 'bewerken'].includes(stand)) return { status: 400, error: 'Kies uit, lezen of bewerken.' };
+    if ((stand === 'lezen' || stand === 'bewerken') && d.beheer && d.beheer.classificatie === 'strikt')
+      return { status: 409, error: 'Een strikt document kan niet worden gedeeld. Pas eerst de classificatie aan.' };
     d.kringDeel = (stand === 'lezen' || stand === 'bewerken') ? stand : null;
     d.gewijzigd = nu();
     d.laatstDoor = naamVan(key);

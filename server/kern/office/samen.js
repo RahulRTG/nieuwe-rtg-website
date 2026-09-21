@@ -35,7 +35,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
   const deelnemers = d => [...new Set([d.key, ...(d.gedeeldMet || []), ...(d.bewerkers || [])])];
   const meld = (d, key, kind, extra) => {
     for (const mk of deelnemers(d)) {
-      if (mk === key) continue;
+      if (mk === key || !magLezen(d, mk)) continue;
       try { sseToCustomer(mk, 'office', Object.assign({ kind, id: d.id, titel: d.titel }, extra || {})); } catch (e) {}
     }
   };
@@ -112,7 +112,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     if (d.key !== key) return { status: 403, error: 'Alleen de eigenaar beheert classificatie en bewaartermijn.' };
     const huidig = beheerVan(d);
     const classificatie = CLASSIFICATIES.includes(data && data.classificatie) ? data.classificatie : huidig.classificatie;
-    if (classificatie === 'strikt' && ((d.gedeeldMet || []).length || (d.bewerkers || []).length))
+    if (classificatie === 'strikt' && ((d.gedeeldMet || []).length || (d.bewerkers || []).length || d.kringDeel))
       return { status: 409, error: 'Trek bestaande delingen eerst in voordat u dit document als strikt classificeert.' };
     const heeftTags = !!(data && Object.prototype.hasOwnProperty.call(data, 'tags'));
     const tags = !heeftTags ? huidig.tags

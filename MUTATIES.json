@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-21T06:26:10.975Z",
-    "commit": "2be5d1273",
+    "op": "2026-09-21T14:53:44.671Z",
+    "commit": "462ff29f8",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5735,6 +5735,14 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "office-save-atomic.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/office/docs.js",
+      "operator": "!==->===#1",
+      "gezakt": 1,
+      "geprobeerd": 7
+    },
     "office-tweede-helft.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6448,6 +6456,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "pg-fault-proxy.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "test/pg-fault-proxy.js",
+      "operator": "getal+1#1",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "pg-snapshot.test.js": {
       "soort": "server",

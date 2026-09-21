@@ -223,6 +223,8 @@ test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
 
     await page.goto(base + '/apps/arrival.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.rtgnader', { timeout: 20000 });
+    const waargenomen = page.waitForResponse(r => r.url().endsWith('/api/plaats/waarneem') &&
+      r.request().postDataJSON()?.hek === elders.id, { timeout: 20000 });
     await page.click('.rtgnader .ja');
 
     /* De motor moet echt gedraaid hebben, anders bewijst "geen puls" niets: hij
@@ -231,7 +233,7 @@ test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
       null, { timeout: 20000 });
     // De lokale motor verwerkt de GPS eerst; de waarneming moet daarna ook
     // door de server zijn verwerkt voordat we die opgeslagen stand beoordelen.
-    await wachtOpNetstilte(page);
+    assert.equal((await waargenomen).status(), 200, 'de server heeft de waarneming ontvangen');
     const stand = await api(base, '/api/plaats/stand', {}, reg.token);
     assert.ok(stand.waarnemingen.some(w => w.hek === elders.id && w.wat === 'binnen'),
       'het toestel heeft de andere zaak wel degelijk als binnen gezien');

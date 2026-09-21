@@ -1,4 +1,4 @@
-/* 114 wereldtalen: het register telt er 114. De 24 kerntalen delen met www een
+/* 114 wereldtalen: het register telt er 114. De 55 producttalen delen met www een
    expliciet kwaliteitscontract; overige talen blijven technisch beschikbaar.
    Het publieke /api/vertaal/ui vertaalt het UI-woordenboek van
    een pagina in een keer naar een actieve wereldtaal (shared/i18n.js haalt
@@ -38,7 +38,7 @@ test('1. het register telt 114 wereldtalen, elk met een eigen endoniem', async (
     assert.ok(alles.body.talen.some(t => t.code === code), code + ' staat in het register');
   const dubbel = alles.body.talen.map(t => t.code).filter((c, i, a) => a.indexOf(c) !== i);
   assert.equal(dubbel.length, 0, 'geen dubbele taalcodes');
-  assert.equal(alles.body.talen.filter(t => t.kern).length, 24, '24 talen dragen het kerncontract');
+  assert.equal(alles.body.talen.filter(t => t.kern).length, 55, '55 talen dragen het productcontract');
 });
 
 test('2. de UI-route rapporteert aantoonbaar volledige vertaling', async () => {

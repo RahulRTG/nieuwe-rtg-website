@@ -15,7 +15,11 @@
   if (w.RTGAutoVertaling) return;
 
   var RTL = new Set(['ar', 'dv', 'fa', 'he', 'ps', 'sd', 'ug', 'ur', 'yi']);
-  var KERN = new Set(['nl','en','de','fr','es','pt','it','pl','ru','uk','tr','ar','fa','he','hi','bn','ur','zh','ja','ko','id','vi','th','sw']);
+  var KERN = new Set([
+    'nl','en','de','fr','es','pt','it','pl','ru','uk','tr','ro','el','cs','sk','hu','bg','hr','sr','bs','sl','sv','no','da','fi',
+    'ar','fa','he','hi','bn','ur','pa','gu','mr','ta','te','kn','ml','ne','si','zh','ja','ko','th','vi','id','ms','tl','km','my',
+    'sw','am','so','af','ha'
+  ]);
   var ATTRS = ['placeholder', 'title', 'aria-label', 'aria-description', 'alt'];
   var NEGEER = 'script,style,noscript,template,code,pre,kbd,samp,svg,canvas,textarea,' +
     '[translate="no"],[data-i18n-ignore],[data-user-content],[contenteditable="true"],' +
@@ -37,7 +41,13 @@
     laad: function () { return Promise.resolve(new Map()); } };
   var oorspronkelijkeRichting = document.documentElement.getAttribute('dir');
   var apiMeta = document.querySelector && document.querySelector('meta[name="rtg-api-base"]');
-  var apiBasis = String(apiMeta && apiMeta.getAttribute('content') || '').replace(/\/+$/, '');
+  /* De automatische laag moet op de statische www dezelfde app-API gebruiken
+     als de sleutelweg. Voorheen deed alleen i18n-01.js dat; losse tekst vroeg
+     daardoor op www aan een niet-bestaande /api-route en bleef Engels. */
+  var statischeVoordeuren = ['https://rahulrtg.github.io','https://rahultravelgroup.com','https://www.rahultravelgroup.com'];
+  var appOorsprong = 'https://app.rahultravelgroup.com';
+  var apiBasis = String((apiMeta && apiMeta.getAttribute('content')) ||
+    (statischeVoordeuren.indexOf(location.origin) >= 0 ? appOorsprong : '') || '').replace(/\/+$/, '');
   function apiPad(pad) { return apiBasis + pad; }
 
   function letters(s) { return /[A-Za-zÀ-ÖØ-öø-ÿ\u0100-\uFFFF]/.test(s); }

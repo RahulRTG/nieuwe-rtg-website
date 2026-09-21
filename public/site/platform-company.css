@@ -104,3 +104,628 @@ body[data-public-platform="company"] .pp-footer{border-top:1px solid var(--wd-li
 }
 @media(min-width:700px) and (max-width:999px){body[data-public-platform="company"] .pp-shell .wd-catalog{grid-template-columns:1fr 1fr}}
 @media(max-width:360px){body[data-public-platform="company"] .pp-mobile-intro{font-size:1.8rem!important}body[data-public-platform="company"] .pp-feature-copy h2{font-size:2.1rem}.pc-tab{font-size:.64rem}}
+
+/* Premium company layer: one editorial system, without a legacy page inside a card. */
+body[data-public-platform="company"]{
+ --company-bg:#0d0c0a;
+ --company-surface:#14120f;
+ --company-surface-raised:#191612;
+ --company-ink:#f4eee4;
+ --company-soft:#b9b0a4;
+ --company-gold:#d9bc84;
+ --company-line:rgba(217,188,132,.2);
+ --wd-line:var(--company-line);
+ background:var(--company-bg)!important;
+ color:var(--company-ink)!important;
+}
+body[data-public-platform="company"]::before{
+ position:absolute;
+ height:min(46rem,78svh);
+ opacity:.52;
+ background:
+  linear-gradient(180deg,rgba(13,12,10,.22),var(--company-bg) 92%),
+  linear-gradient(90deg,rgba(13,12,10,.46),transparent 48%,rgba(13,12,10,.34)),
+  url('../images/world-homes/travel.webp') center 42%/cover;
+}
+body[data-public-platform="company"][data-company-page]:not([data-company-page="home"])::before{
+ height:18rem;
+ opacity:.3;
+}
+body[data-public-platform="company"] .pp-header{
+ position:sticky!important;
+ top:0!important;
+ min-height:76px;
+ padding:14px max(24px,calc((100vw - 1500px)/2))!important;
+ border-bottom:1px solid var(--company-line);
+ background:rgba(13,12,10,.76)!important;
+ backdrop-filter:blur(22px) saturate(1.15);
+ -webkit-backdrop-filter:blur(22px) saturate(1.15);
+}
+body[data-public-platform="company"] .pp-brand{
+ font-size:2.85rem!important;
+ color:var(--company-ink)!important;
+}
+body[data-public-platform="company"] .pp-context{
+ color:var(--company-soft);
+ font-size:.78rem;
+ letter-spacing:.12em;
+ text-transform:uppercase;
+}
+body[data-public-platform="company"] .pp-tagline{
+ color:var(--company-soft);
+ font-size:.62rem;
+ letter-spacing:.2em;
+}
+body[data-public-platform="company"] .pp-profile{
+ border-color:var(--company-line);
+ color:var(--company-gold);
+}
+body[data-public-platform="company"] .pp-shell{
+ width:min(calc(100% - 48px),1500px);
+ margin:42px auto 11rem;
+ gap:clamp(1.25rem,2.4vw,2.8rem);
+}
+body[data-public-platform="company"] .pp-stories{
+ display:grid;
+ grid-template-columns:repeat(6,minmax(0,1fr));
+ gap:0;
+ margin:0 0 2rem;
+ padding:0;
+ overflow:visible;
+ border-top:1px solid var(--company-line);
+}
+body[data-public-platform="company"] .pp-story{
+ position:relative;
+ min-width:0;
+ min-height:64px;
+ display:flex;
+ align-items:flex-end;
+ justify-content:flex-start;
+ padding:12px 10px;
+ border:0;
+ border-inline-end:1px solid var(--company-line);
+ border-bottom:1px solid var(--company-line);
+ color:var(--company-soft);
+ text-align:start;
+ font-size:.67rem;
+ letter-spacing:.03em;
+}
+body[data-public-platform="company"] .pp-story:last-child{border-inline-end:0}
+body[data-public-platform="company"] .pp-story img,
+body[data-public-platform="company"] .pp-shell .pp-story>.wd-icon{
+ display:none;
+}
+body[data-public-platform="company"] .pp-story[aria-pressed="true"]{
+ color:var(--company-ink);
+ border-bottom-color:var(--company-gold);
+ background:rgba(217,188,132,.045);
+}
+body[data-public-platform="company"] .pp-story[aria-pressed="true"]::before{
+ content:"";
+ position:absolute;
+ top:-1px;
+ inset-inline:10px;
+ height:1px;
+ background:var(--company-gold);
+}
+body[data-public-platform="company"] .wd-greeting{
+ border-color:var(--company-line);
+ padding-bottom:1.4rem;
+}
+body[data-public-platform="company"] .wd-greeting h1{
+ color:var(--company-gold);
+ font-size:.67rem;
+ letter-spacing:.18em;
+ text-transform:uppercase;
+}
+body[data-public-platform="company"] .pp-feature{
+ min-height:clamp(34rem,64svh,48rem);
+ border-color:var(--company-line);
+ border-radius:0;
+ background:var(--company-surface);
+}
+body[data-public-platform="company"] .pp-feature::after{
+ background:linear-gradient(180deg,rgba(8,7,6,.03) 20%,rgba(8,7,6,.18) 48%,rgba(8,7,6,.94) 94%);
+}
+body[data-public-platform="company"] .pp-feature-copy{
+ padding:clamp(1.6rem,3.2vw,3rem);
+}
+body[data-public-platform="company"] .pp-feature-copy h2{
+ max-width:15ch;
+ margin:.55rem 0 1rem;
+ font-size:clamp(3rem,5.4vw,5.8rem);
+ line-height:.96;
+}
+body[data-public-platform="company"] .pp-feature-copy p{
+ max-width:44ch;
+ color:var(--company-ink);
+ font-size:clamp(.95rem,1.2vw,1.12rem);
+}
+body[data-public-platform="company"] .pp-feature-copy .pp-button{
+ color:var(--company-ink)!important;
+ border-color:var(--company-gold);
+}
+body[data-public-platform="company"] .pp-boundary{
+ display:none;
+}
+body[data-public-platform="company"] .pp-shell.wd-expanded{
+ display:block;
+ max-width:1500px;
+}
+body[data-public-platform="company"] .pp-shell.wd-expanded>.wd-greeting,
+body[data-public-platform="company"] .pp-shell.wd-expanded>.wd-people{
+ display:none;
+}
+body[data-public-platform="company"] .pp-shell.wd-expanded>.wd-focus{
+ width:100%;
+ border:0;
+ border-radius:0;
+ overflow:visible;
+ background:transparent;
+}
+body[data-public-platform="company"] .wd-focus-head{
+ display:flex;
+ align-items:center;
+ min-height:58px;
+ margin-bottom:clamp(1.5rem,3vw,3rem);
+ padding:0 0 14px;
+ border-bottom:1px solid var(--company-line);
+}
+body[data-public-platform="company"] .wd-focus-head h2{
+ font:500 .68rem/1.4 Inter,sans-serif;
+ letter-spacing:.16em;
+ text-transform:uppercase;
+ color:var(--company-gold);
+}
+body[data-public-platform="company"] .wd-focus-head .wd-text-button{
+ margin-inline-start:auto;
+ border:0;
+ color:var(--company-soft);
+ font-size:.74rem;
+ letter-spacing:.04em;
+}
+body[data-public-platform="company"] .pp-detail-content{
+ padding:0;
+}
+body[data-public-platform="company"] .pp-existing-page{
+ display:block;
+ width:100%;
+ color:var(--company-ink);
+}
+body[data-public-platform="company"] .pp-existing-page .page-hero{
+ position:relative;
+ width:100%!important;
+ height:clamp(34rem,66svh,46rem)!important;
+ margin:0!important;
+ padding:0!important;
+ overflow:hidden;
+ border:1px solid var(--company-line);
+ border-radius:0!important;
+ background:var(--company-surface)!important;
+}
+body[data-public-platform="company"] .pp-existing-page .page-hero::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:linear-gradient(180deg,rgba(7,6,5,.02) 25%,rgba(7,6,5,.12) 48%,rgba(7,6,5,.88));
+ pointer-events:none;
+}
+body[data-public-platform="company"] .pp-existing-page .page-hero img{
+ position:absolute;
+ inset:0;
+ width:100%;
+ height:100%;
+ object-fit:cover;
+ filter:saturate(.78) contrast(1.03);
+}
+body[data-public-platform="company"] .pp-existing-page .page-shade{
+ position:absolute;
+ inset:0;
+ background:linear-gradient(90deg,rgba(10,8,6,.38),transparent 70%);
+}
+body[data-public-platform="company"] .pp-existing-page .hero-copy{
+ position:absolute;
+ z-index:2;
+ inset:0;
+ display:flex;
+ flex-direction:column;
+ justify-content:flex-end;
+ width:100%;
+ max-width:none!important;
+ padding:clamp(2rem,5vw,5rem)!important;
+ background:transparent;
+}
+body[data-public-platform="company"] .pp-existing-page .hero-copy>p{
+ margin:0 0 1.25rem;
+ color:var(--company-gold);
+ font-size:.68rem;
+ letter-spacing:.18em;
+ text-transform:uppercase;
+}
+body[data-public-platform="company"] .pp-existing-page .hero-copy h1{
+ max-width:11ch;
+ margin:0 0 1.25rem;
+ color:var(--company-ink)!important;
+ font:400 clamp(4rem,9vw,8.8rem)/.9 "Bodoni Moda",Georgia,serif!important;
+ letter-spacing:-.055em;
+}
+body[data-public-platform="company"] .pp-existing-page .hero-lead{
+ max-width:36ch;
+ color:var(--company-ink);
+ font-size:clamp(1.05rem,1.8vw,1.42rem);
+ line-height:1.45;
+}
+body[data-public-platform="company"] .pp-existing-page .hero-foot{
+ display:none;
+}
+body[data-public-platform="company"] .pp-existing-page .breadcrumb{
+ display:flex!important;
+ flex-wrap:wrap;
+ align-items:center;
+ gap:.65rem;
+ width:100%!important;
+ margin:0!important;
+ padding:18px 0!important;
+ border-bottom:1px solid var(--company-line);
+ color:var(--company-soft)!important;
+ font-size:.68rem;
+ letter-spacing:.08em;
+ text-transform:uppercase;
+}
+body[data-public-platform="company"] .pp-existing-page .breadcrumb a{
+ color:var(--company-soft);
+ text-decoration:none;
+}
+body[data-public-platform="company"] .pp-existing-page .breadcrumb strong{
+ color:var(--company-gold);
+ font-weight:500;
+}
+body[data-public-platform="company"] .pp-existing-page .breadcrumb>span{
+ color:rgba(217,188,132,.45);
+}
+body[data-public-platform="company"] .pp-existing-page .page-intro{
+ width:min(100%,1100px)!important;
+ margin:0!important;
+ padding:clamp(4rem,9vw,8rem) 0!important;
+}
+body[data-public-platform="company"] .pp-existing-page .page-intro p{
+ max-width:32ch;
+ margin:0;
+ color:var(--company-ink);
+ font:400 clamp(2rem,4.5vw,4.3rem)/1.08 "Bodoni Moda",Georgia,serif;
+ letter-spacing:-.035em;
+}
+body[data-public-platform="company"] .pp-existing-page .content-wrap{
+ display:block!important;
+ width:100%!important;
+ margin:0!important;
+ padding:0!important;
+}
+body[data-public-platform="company"] .pp-existing-page .content-section{
+ display:grid!important;
+ grid-template-columns:minmax(80px,.25fr) minmax(0,1fr);
+ gap:clamp(1.5rem,4vw,5rem);
+ width:100%!important;
+ margin:0!important;
+ padding:clamp(3.5rem,7vw,6.5rem) 0!important;
+ border-top:1px solid var(--company-line);
+ background:transparent!important;
+}
+body[data-public-platform="company"] .pp-existing-page .section-index{
+ color:var(--company-gold);
+ font-size:.66rem;
+ letter-spacing:.16em;
+}
+body[data-public-platform="company"] .pp-existing-page .section-body{
+ min-width:0;
+}
+body[data-public-platform="company"] .pp-existing-page .section-body>h2{
+ max-width:15ch;
+ margin:0 0 2rem;
+ color:var(--company-ink)!important;
+ font:400 clamp(2.7rem,5.3vw,5.6rem)/.98 "Bodoni Moda",Georgia,serif!important;
+ letter-spacing:-.045em;
+}
+body[data-public-platform="company"] .pp-existing-page .section-body>p{
+ max-width:63ch;
+ color:var(--company-soft);
+ font-size:clamp(.98rem,1.2vw,1.12rem);
+ line-height:1.8;
+}
+body[data-public-platform="company"] .pp-existing-page .item-grid,
+body[data-public-platform="company"] .pp-existing-page .fact-strip,
+body[data-public-platform="company"] .pp-existing-page .related>div{
+ display:grid!important;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:0;
+ margin-top:2.5rem;
+ border-top:1px solid var(--company-line);
+}
+body[data-public-platform="company"] .pp-existing-page .item-grid article,
+body[data-public-platform="company"] .pp-existing-page .fact-strip article{
+ min-width:0;
+ padding:1.5rem 1.5rem 2rem;
+ border:0!important;
+ border-inline-end:1px solid var(--company-line)!important;
+ border-bottom:1px solid var(--company-line)!important;
+ border-radius:0!important;
+ background:transparent!important;
+ box-shadow:none!important;
+}
+body[data-public-platform="company"] .pp-existing-page .item-grid article:nth-child(3n),
+body[data-public-platform="company"] .pp-existing-page .fact-strip article:nth-child(3n){
+ border-inline-end:0!important;
+}
+body[data-public-platform="company"] .pp-existing-page .item-grid small,
+body[data-public-platform="company"] .pp-existing-page .fact-strip small{
+ color:var(--company-gold);
+ font-size:.62rem;
+ letter-spacing:.12em;
+}
+body[data-public-platform="company"] .pp-existing-page .item-grid h3,
+body[data-public-platform="company"] .pp-existing-page .fact-strip h3{
+ margin:1.9rem 0 .8rem;
+ color:var(--company-ink)!important;
+ font:400 clamp(1.35rem,2vw,2rem)/1.08 "Bodoni Moda",Georgia,serif!important;
+}
+body[data-public-platform="company"] .pp-existing-page .item-grid p,
+body[data-public-platform="company"] .pp-existing-page .fact-strip p{
+ margin:0;
+ color:var(--company-soft);
+ font-size:.86rem;
+ line-height:1.65;
+}
+body[data-public-platform="company"] .pp-existing-page .content-links{
+ display:flex;
+ flex-wrap:wrap;
+ gap:1rem;
+ margin-top:2rem;
+}
+body[data-public-platform="company"] .pp-existing-page .content-links a,
+body[data-public-platform="company"] .pp-existing-page .final-cta a{
+ display:inline-flex;
+ min-height:46px;
+ align-items:center;
+ padding:0 0 .2rem;
+ border-bottom:1px solid var(--company-gold);
+ color:var(--company-ink);
+ text-decoration:none;
+ font-size:.76rem;
+ letter-spacing:.12em;
+ text-transform:uppercase;
+}
+body[data-public-platform="company"] .pp-existing-page .related{
+ width:100%!important;
+ margin:0!important;
+ padding:clamp(3.5rem,7vw,6.5rem) 0!important;
+ border-top:1px solid var(--company-line);
+}
+body[data-public-platform="company"] .pp-existing-page .related>p{
+ color:var(--company-gold);
+ font-size:.65rem;
+ letter-spacing:.16em;
+}
+body[data-public-platform="company"] .pp-existing-page .related>div{
+ grid-template-columns:repeat(4,minmax(0,1fr));
+}
+body[data-public-platform="company"] .pp-existing-page .related a{
+ display:grid;
+ min-height:10rem;
+ align-content:space-between;
+ padding:1.4rem;
+ border-inline-end:1px solid var(--company-line);
+ border-bottom:1px solid var(--company-line);
+ color:var(--company-ink);
+ text-decoration:none;
+}
+body[data-public-platform="company"] .pp-existing-page .related a:last-child{
+ border-inline-end:0;
+}
+body[data-public-platform="company"] .pp-existing-page .related a span{
+ color:var(--company-gold);
+ font-size:.62rem;
+ letter-spacing:.12em;
+}
+body[data-public-platform="company"] .pp-existing-page .related a strong{
+ font:400 1.35rem/1.1 "Bodoni Moda",Georgia,serif;
+}
+body[data-public-platform="company"] .pp-existing-page .final-cta{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) auto;
+ align-items:end;
+ gap:2rem;
+ width:100%!important;
+ margin:0!important;
+ padding:clamp(4rem,9vw,8rem) 0!important;
+ border-top:1px solid var(--company-line);
+}
+body[data-public-platform="company"] .pp-existing-page .final-cta p{
+ margin:0;
+ color:var(--company-ink);
+ font:400 clamp(3rem,7vw,7.5rem)/.92 "Bodoni Moda",Georgia,serif;
+ letter-spacing:-.05em;
+}
+body[data-public-platform="company"] .pp-existing-page .final-cta em{
+ color:var(--company-gold);
+ font-style:normal;
+}
+body[data-public-platform="company"] .pp-footer{
+ width:min(calc(100% - 48px),1500px);
+ margin:0 auto;
+ padding:2rem 0 calc(9rem + env(safe-area-inset-bottom));
+ border-top:1px solid var(--company-line);
+ color:var(--company-soft);
+}
+
+@media(min-width:1000px){
+ body[data-public-platform="company"] .pp-shell>.wd-people,
+ body[data-public-platform="company"] .pp-shell>.wd-favorites{
+  display:none!important;
+ }
+ body[data-public-platform="company"] .pp-shell>.wd-home{
+  grid-column:1/-1;
+  width:100%;
+  padding-inline:0!important;
+ }
+}
+
+@media(max-width:999px){
+ body[data-public-platform="company"] .pp-header{
+  min-height:68px;
+  padding:11px 16px!important;
+  background:rgba(13,12,10,.88)!important;
+ }
+ body[data-public-platform="company"] .pp-brand{font-size:2.35rem!important}
+ body[data-public-platform="company"] .pp-context{font-size:.7rem}
+ body[data-public-platform="company"] .pp-shell,
+ body[data-public-platform="company"] .pp-shell.wd-expanded{
+  display:flex;
+  width:auto;
+  margin:24px 16px 8rem;
+  gap:1rem;
+ }
+ body[data-public-platform="company"] .pp-shell.wd-expanded>.wd-focus{display:block}
+ body[data-public-platform="company"] .wd-focus-head{
+  min-height:52px;
+  margin-bottom:18px;
+  padding-bottom:12px;
+ }
+ body[data-public-platform="company"] .wd-focus-head h2{font-size:.62rem}
+ body[data-public-platform="company"] .wd-focus-head .wd-text-button{font-size:.68rem}
+ body[data-public-platform="company"] .pp-feature{
+  min-height:clamp(31rem,68svh,42rem);
+  border-radius:0;
+ }
+ body[data-public-platform="company"] .pp-feature-copy{padding:1.45rem 1.45rem 7rem}
+ body[data-public-platform="company"] .pp-feature-copy h2{
+  font-size:clamp(2.8rem,13vw,4.7rem);
+  line-height:.94;
+ }
+ body[data-public-platform="company"] .pp-boundary{
+  display:none;
+ }
+ body[data-public-platform="company"] .pp-stories{
+  display:flex;
+  gap:0;
+  margin:1rem 0 1.4rem;
+  overflow-x:auto;
+  scroll-snap-type:x proximity;
+ }
+ body[data-public-platform="company"] .pp-story{
+  flex:0 0 104px;
+  min-height:58px;
+  padding:11px 9px;
+  scroll-snap-align:start;
+ }
+ body[data-public-platform="company"] .pp-story img,
+ body[data-public-platform="company"] .pp-shell .pp-story>.wd-icon{
+  display:none;
+ }
+ body[data-public-platform="company"] .pp-existing-page .page-hero{
+  height:clamp(29rem,70svh,40rem)!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .hero-copy{
+  padding:1.6rem 1.6rem 7rem!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .hero-copy h1{
+  margin-bottom:1rem;
+  font-size:clamp(3.2rem,16vw,5.2rem)!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .hero-copy>p{
+  margin-bottom:.9rem;
+  font-size:.6rem;
+  letter-spacing:.13em;
+ }
+ body[data-public-platform="company"] .pp-existing-page .hero-lead{
+  max-width:30ch;
+  font-size:1rem;
+ }
+ body[data-public-platform="company"] .pp-existing-page .breadcrumb{
+  gap:.45rem;
+  padding:14px 0!important;
+  font-size:.58rem;
+ }
+ body[data-public-platform="company"] .pp-existing-page .page-intro{
+  padding:3.8rem 0!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .page-intro p{
+  font-size:clamp(1.8rem,8.5vw,2.75rem);
+ }
+ body[data-public-platform="company"] .pp-existing-page .content-section{
+  grid-template-columns:1fr;
+  gap:1.1rem;
+  padding:3.5rem 0!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .section-body>h2{
+  margin-bottom:1.4rem;
+  font-size:clamp(2.35rem,12vw,3.75rem)!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .item-grid,
+ body[data-public-platform="company"] .pp-existing-page .fact-strip{
+  grid-template-columns:1fr;
+  margin-top:2rem;
+ }
+ body[data-public-platform="company"] .pp-existing-page .item-grid article,
+ body[data-public-platform="company"] .pp-existing-page .fact-strip article{
+  padding:1.25rem 0 1.5rem;
+  border-inline-end:0!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .item-grid h3,
+ body[data-public-platform="company"] .pp-existing-page .fact-strip h3{
+  margin:1.1rem 0 .6rem;
+  font-size:1.6rem!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .related{
+  padding:3.5rem 0!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .related>div{
+  grid-template-columns:1fr 1fr;
+ }
+ body[data-public-platform="company"] .pp-existing-page .related a{
+  min-height:8.5rem;
+  padding:1rem 0;
+ }
+ body[data-public-platform="company"] .pp-existing-page .related a:nth-child(odd){
+  padding-inline-end:1rem;
+ }
+ body[data-public-platform="company"] .pp-existing-page .related a:nth-child(even){
+  padding-inline-start:1rem;
+  border-inline-end:0;
+ }
+ body[data-public-platform="company"] .pp-existing-page .final-cta{
+  grid-template-columns:1fr;
+  align-items:start;
+  padding:4rem 0!important;
+ }
+ body[data-public-platform="company"] .pp-existing-page .final-cta p{
+  font-size:clamp(3rem,14vw,5rem);
+ }
+ body[data-public-platform="company"] .pp-footer{
+  width:auto;
+  margin-inline:16px;
+  padding-bottom:calc(8rem + env(safe-area-inset-bottom));
+ }
+}
+
+@media(max-width:767px){
+ body[data-public-platform="company"] .rtg-adaptive-edge{
+  width:calc(100% - var(--rtg-safe-left) - var(--rtg-safe-right) - 32px);
+ }
+}
+
+@media(max-width:370px){
+ body[data-public-platform="company"] .pp-shell,
+ body[data-public-platform="company"] .pp-shell.wd-expanded{margin-inline:12px}
+ body[data-public-platform="company"] .pp-brand{font-size:2.1rem!important}
+ body[data-public-platform="company"] .pp-context{font-size:.64rem;letter-spacing:.08em}
+ body[data-public-platform="company"] .pp-existing-page .hero-copy{padding:1.25rem 1.25rem 7rem!important}
+ body[data-public-platform="company"] .pp-existing-page .hero-copy h1{font-size:3.2rem!important}
+ body[data-public-platform="company"] .pp-existing-page .related>div{grid-template-columns:1fr}
+ body[data-public-platform="company"] .pp-existing-page .related a,
+ body[data-public-platform="company"] .pp-existing-page .related a:nth-child(odd),
+ body[data-public-platform="company"] .pp-existing-page .related a:nth-child(even){
+  min-height:6.5rem;
+  padding:1rem 0;
+  border-inline-end:0;
+ }
+}

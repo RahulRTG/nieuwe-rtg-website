@@ -6,7 +6,7 @@
  function say(id,nl,en){words[id]=[nl,en];w.I18N.en["public."+id]=en;return id;}
  var common={
   home:say('home','Home','Home'),worlds:say('worlds','Werelden','Worlds'),actions:say('actions','Acties','Actions'),menu:say('menu','Menu','Menu'),
-  company:say('company','Over RTG','About RTG'),app:say('app','Ontdek RTG','Explore RTG'),
+  company:say('company','Bedrijf','Company'),app:say('app','Ontdek RTG','Explore RTG'),
   welcomeCompany:say('welcomeCompany','Welkom bij RTG.','Welcome to RTG.'),welcomeApp:say('welcomeApp','Welkom in uw eerste RTG-ervaring.','Welcome to your first RTG experience.'),
   subCompany:say('subCompany','Ontdek het bedrijf achter de werelden.','Discover the company behind the worlds.'),
   subApp:say('subApp','Demonstratie · zonder account','Demonstration · no account needed'),

@@ -4,6 +4,28 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const {startServer,stopHard,laadPlaywright,browserOpties,geenBrowser,veegDoor}=require('./helper');
 const pw=laadPlaywright();
+test('Office: een oud lijstantwoord brengt geen verwijderd document terug in de drive of RTDocs',{skip:geenBrowser(pw)},async()=>{
+ for(const front of [false,true])await fixture(async({browser,base,token,api})=>{
+  const own=await api('maak',{soort:'tekst',titel:'Moet verdwenen blijven'});
+  const page=await pageFor(browser,base,token,390);
+  await page.locator('[data-rtd-documentrij="'+own.id+'"]').waitFor();await drive(page);
+  let releaseOld,readyOld,held=false;
+  const release=new Promise(r=>{releaseOld=r}),ready=new Promise(r=>{readyOld=r});
+  await page.route('**/api/kantoorpakket/mijn',async route=>{
+   if(held)return route.continue();held=true;
+   const response=await route.fetch();readyOld();await release;await route.fulfill({response});
+  });
+  await page.evaluate(isFront=>{window.oldList=isFront?window.RTGDocs.vernieuw():window.RTGOffice.laad()},front);await ready;
+  const row=page.locator('#mijnDocs .doc[data-open="'+own.id+'"]');await drawer(page,row);await row.locator('.gb-doe').click();await confirmGesture(page);await row.waitFor({state:'detached'});
+  await page.waitForFunction(id=>!document.querySelector('[data-rtd-documentrij="'+id+'"]'),own.id);
+  assert.equal((await api('mijn')).docs.length,0,'de server heeft het document verwijderd');
+  releaseOld();await page.evaluate(()=>window.oldList);
+  assert.equal(await row.count(),0,'een oud antwoord mag het document niet opnieuw in de lijst zetten');
+  assert.equal(await page.locator('[data-rtd-documentrij="'+own.id+'"]').count(),0,'RTDocs blijft gelijk aan de bewaarde stand');
+  assert.equal(await page.evaluate(()=>window.RTGOffice.stand().docs.length),0);
+  await page.close();
+ });
+});
 async function fixture(doe){
  const srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});let browser;
  try{const call=async(p,b,t)=>{const r=await fetch(srv.base+p,{method:'POST',headers:{'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{})},body:JSON.stringify(b||{})});return{status:r.status,...await r.json()}};

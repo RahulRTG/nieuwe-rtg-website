@@ -96,8 +96,11 @@
   var blad = null, pres = null, presLoop = null, formulier = null, schets = null, bord = null;
 
   /* ---------- de drive ---------- */
+  var lijstAanvraag = 0;
   function laadLijst() {
+    var aanvraag = ++lijstAanvraag;
     return api('mijn').then(function (r) {
+      if (aanvraag !== lijstAanvraag) return;
       if (r.status !== 200) { zeg(r.body.error || opzet.leeg); return; }
       stand = r.body;
       tekenSjablonen(r.body.sjablonen || []);

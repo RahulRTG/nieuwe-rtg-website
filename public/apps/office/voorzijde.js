@@ -50,6 +50,7 @@
     w.scrollTo(0, 0);
   }
   function leeg(tekst) {
+    staat.huidig = null;
     vind('#rtdFocus').removeAttribute('data-rtd-documentrij');
     vind('#rtdDag').textContent = 'Uw werkmoment · rustig';
     vind('#rtdFocus').innerHTML = '<div class="rtd-leeg"><h2>Nog geen document nodig.</h2><p>' + veilig(tekst || 'Uw documentruimte is leeg.') + '</p><button class="rtd-secundair" type="button" data-rtd-nieuw>Maak een document</button></div>';
@@ -74,14 +75,17 @@
       return '<button class="rtd-rij" type="button" data-rtd-documentrij="' + veilig(x.id) + '" data-rtd-dossier="' + veilig(x.id) + '"><span class="rtd-kleinbestand">' + veilig(type(x.soort)) + '</span><span><b>' + veilig(x.titel) + '</b><small>' + veilig(reden(x)) + ' · ' + veilig(datum(x.gewijzigd)) + '</small></span><span class="rtd-type">' + veilig(fase(x.fase)) + '</span></button>';
     }).join('') : '<div class="rtd-leeg">Daarna vraagt geen ander document om aandacht.</div>';
   }
+  var lijstAanvraag = 0;
   async function laad() {
+    var aanvraag = ++lijstAanvraag;
     vind('#rtdFocus').innerHTML = '<div class="rtd-leeg">Uw documenten worden geordend…</div>';
     try {
       var uit = await office.api('mijn');
+      if (aanvraag !== lijstAanvraag) return;
       if (uit.status !== 200) throw new Error(uit.body.error || 'Log eerst in om uw documenten te zien.');
       staat.documenten = (uit.body.docs || []).concat(uit.body.gedeeld || []);
       renderNodig();
-    } catch (e) { staat.documenten = []; leeg(e.message || String(e)); }
+    } catch (e) { if (aanvraag === lijstAanvraag) { staat.documenten = []; leeg(e.message || String(e)); } }
   }
   function kies(id) { return staat.documenten.find(function (x) { return String(x.id) === String(id); }) || staat.huidig || staat.documenten[0]; }
   async function openDossier(id) {

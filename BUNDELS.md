@@ -351,7 +351,7 @@ omlaag.
 
 ## `apps/office/app.js`
 
-`public/apps/office/app/` -- 8 delen, 911 regels in de delen
+`public/apps/office/app/` -- 8 delen, 933 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -692,7 +692,7 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 9 delen, 1882 regels in de delen
+`public/shared/i18n/` -- 9 delen, 1883 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -885,7 +885,7 @@ omlaag.
 
 ## `shared/werkos.js`
 
-`public/shared/werkos/` -- 7 delen, 683 regels in de delen
+`public/shared/werkos/` -- 7 delen, 686 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -96,6 +96,25 @@
   var blad = null, pres = null, presLoop = null, formulier = null, schets = null, bord = null;
 
   /* ---------- de drive ---------- */
+  var verwijderenBezig = new Set();
+  async function verwijderen(id, bevestigd) {
+    var doc = stand && (stand.docs || []).find(function (x) { return x.id === id && x.vanMij; });
+    if (!doc || verwijderenBezig.has(id)) return false;
+    if (!bevestigd && !confirm('Wilt u "' + doc.titel + '" voorgoed verwijderen? Dit kunt u niet ongedaan maken.')) return false;
+    verwijderenBezig.add(id);
+    try {
+      var r = await api('weg', { id: id });
+      if (r.status !== 200 || r.body.error || !r.body.ok) throw new Error(r.body.error || 'Het document kon niet worden verwijderd.');
+      tabs = tabs.filter(function (tab) { return tab.id !== id; });
+      if (open && open.id === id) { clearTimeout(bewaarT); sluitEditor(); }
+      else tekenTabs();
+      await laadLijst();
+      if (window.RTGDocs) await window.RTGDocs.vernieuw();
+      zeg('Het document is verwijderd.');
+      return true;
+    } catch (e) { zeg(e.message || 'Het document kon niet worden verwijderd. Probeer het opnieuw.'); return false; }
+    finally { verwijderenBezig.delete(id); }
+  }
   function laadLijst() {
     return api('mijn').then(function (r) {
       if (r.status !== 200) { zeg(r.body.error || opzet.leeg); return; }
@@ -134,6 +153,7 @@
       b.addEventListener('click', function () { nieuw(null, b.dataset.sjab); });
     });
   }
+  var lijstSleutel = '';
   function tekenLijst() {
     if (!stand) return;
     var zoek = $('#zoek').value.trim().toLowerCase();
@@ -155,11 +175,16 @@
         return String(b.gewijzigd).localeCompare(String(a.gewijzigd));
       });
     };
-    $('#mijnDocs').innerHTML = teken(zeef(stand.docs || []), true, zoek);
-    $('#gedeeldDocs').innerHTML = teken(zeef(stand.gedeeld || []), false, zoek);
+    var eigen = teken(zeef(stand.docs || []), true, zoek), gedeeld = teken(zeef(stand.gedeeld || []), false, zoek);
+    var sleutel = eigen + '\n' + gedeeld;
+    if (sleutel === lijstSleutel) return;
+    lijstSleutel = sleutel;
+    $('#mijnDocs').innerHTML = eigen;
+    $('#gedeeldDocs').innerHTML = gedeeld;
     Array.prototype.forEach.call(document.querySelectorAll('[data-open]'), function (b) {
       b.addEventListener('click', function () { openen(b.dataset.open); });
       b.addEventListener('keydown', function (e) {
+        if (e.target !== b) return;
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openen(b.dataset.open); }
       });
     });
@@ -172,11 +197,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-weg]'), function (b) {
       b.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (!confirm('Dit document verwijderen?')) return;
-        api('weg', { id: b.dataset.weg }).then(function (w) {
-          if (w.body.error) return zeg(w.body.error);
-          zeg('Verwijderd.'); laadLijst();
-        });
+        verwijderen(b.dataset.weg);
       });
     });
   }
@@ -220,7 +241,7 @@
         '<span class="acties">' + (eigen
           ? '<button class="mini ster' + (d.ster ? ' aan' : '') + '" data-ster="' + d.id + '" data-aan="' + (d.ster ? '1' : '0') +
             '" title="Markeren" aria-label="Markeren">' + (d.ster ? '★' : '☆') + '</button>' +
-            '<button class="mini weg" data-weg="' + d.id + '">weg</button>'
+            '<button class="mini weg" type="button" data-weg="' + d.id + '">Verwijderen</button>'
           : '') + '</span></div>';
     }).join('');
   }
@@ -904,6 +925,7 @@
     laad: laadLijst,
     openen: openen,
     nieuw: nieuw,
+    verwijderen: verwijderen,
     stand: function () { return stand; }
   });
 

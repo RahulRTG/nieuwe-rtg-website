@@ -68,6 +68,7 @@
     laad: laadLijst,
     openen: openen,
     nieuw: nieuw,
+    verwijderen: verwijderen,
     stand: function () { return stand; }
   });
 

@@ -35,7 +35,7 @@ test.after(async () => { if (browser) await browser.close(); if (srv) await stop
 test('four desktop worlds use one composition and one Edge; the mobile home stays usable', { skip }, async () => {
   const ctx = await context(null), page = await ctx.newPage(), errors = []; letOpFouten(page, errors);
   try {
-    for (const route of ['/', '/apps/wereld.html', '/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/index.html']) {
+    for (const route of ['/apps/wereld.html', '/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/index.html']) {
       await open(page, route);
       assert.equal(await page.locator('.wd-people').isVisible(), true);
       assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);

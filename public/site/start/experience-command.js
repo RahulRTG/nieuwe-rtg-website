@@ -17,7 +17,8 @@
 
   function appUrl(path) {
     var base = d.querySelector('meta[name="rtg-app-base"]');
-    return new URL(path.replace(/^\//, ''), base ? base.content : 'https://app.rahultravelgroup.com/').href;
+    var root = new URL(base && base.content ? base.content : 'https://app.rahultravelgroup.com/', d.baseURI).href;
+    return new URL(path.replace(/^\//, ''), root).href;
   }
 
   function build(data) {

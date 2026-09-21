@@ -1,7 +1,7 @@
 (function (w, d) {
   'use strict';
   var truth = null, current = 'work', locale = d.documentElement.lang || undefined;
-  var appBase = d.querySelector('meta[name="rtg-app-base"]').content;
+  var appBase = new URL(d.querySelector('meta[name="rtg-app-base"]').content, d.baseURI).href;
   function appUrl(path) { return new URL(path.replace(/^\//, ''), appBase).href; }
   function draw(id) {
     if (!truth || !truth.worlds[id]) return;

@@ -31,6 +31,16 @@ for(const width of [390,1440])test('Office '+width+': alle zes documentsoorten m
  }
  await page.reload();await page.waitForFunction(()=>window.RTGOffice&&window.RTGOffice.stand());await drive(page);
  assert.equal(await page.locator('#mijnDocs .doc').count(),6);
+ const favorite=page.locator('#mijnDocs .doc[data-open="'+created[0]+'"]');
+ await favorite.click({button:'right'});
+ await page.locator('dialog.gb-blad').getByRole('button',{name:'Als favoriet bewaren',exact:true}).click();
+ await page.waitForFunction(id=>window.RTGOffice.stand().docs.find(x=>x.id===id).ster,created[0]);
+ await page.reload();await page.waitForFunction(()=>window.RTGOffice&&window.RTGOffice.stand());await drive(page);
+ assert.equal((await api('mijn')).docs.find(d=>d.id===created[0]).ster,true,'favoriet blijft na herladen bewaard');
+ await favorite.click({button:'right'});
+ await page.locator('dialog.gb-blad').getByRole('button',{name:'Uit favorieten verwijderen',exact:true}).click();
+ await page.waitForFunction(id=>!window.RTGOffice.stand().docs.find(x=>x.id===id).ster,created[0]);
+ assert.equal((await api('mijn')).docs.length,6,'favoriet verwijderen verwijdert geen document');
  await page.locator('#mijnDocs .doc').filter({hasText:'Controle tekst'}).click();
  await page.locator('#editor.aan').waitFor();
  assert.match(await page.locator('#tekst').innerText(),/na het herladen/);await page.locator('#editTerug').click();

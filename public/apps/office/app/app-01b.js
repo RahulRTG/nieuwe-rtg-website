@@ -1,24 +1,5 @@
 
   /* ---------- de drive ---------- */
-  var verwijderenBezig = new Set();
-  async function verwijderen(id, bevestigd) {
-    var doc = stand && (stand.docs || []).find(function (x) { return x.id === id && x.vanMij; });
-    if (!doc || verwijderenBezig.has(id)) return false;
-    if (!bevestigd && !confirm('Wilt u "' + doc.titel + '" voorgoed verwijderen? Dit kunt u niet ongedaan maken.')) return false;
-    verwijderenBezig.add(id);
-    try {
-      var r = await api('weg', { id: id });
-      if (r.status !== 200 || r.body.error || !r.body.ok) throw new Error(r.body.error || 'Het document kon niet worden verwijderd.');
-      tabs = tabs.filter(function (tab) { return tab.id !== id; });
-      if (open && open.id === id) { clearTimeout(bewaarT); sluitEditor(); }
-      else tekenTabs();
-      await laadLijst();
-      if (window.RTGDocs) await window.RTGDocs.vernieuw();
-      zeg('Het document is verwijderd.');
-      return true;
-    } catch (e) { zeg(e.message || 'Het document kon niet worden verwijderd. Probeer het opnieuw.'); return false; }
-    finally { verwijderenBezig.delete(id); }
-  }
   function laadLijst() {
     return api('mijn').then(function (r) {
       if (r.status !== 200) { zeg(r.body.error || opzet.leeg); return; }
@@ -95,7 +76,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-ster]'), function (b) {
       b.addEventListener('click', function (e) {
         e.stopPropagation();
-        api('ster', { id: b.dataset.ster, aan: b.dataset.aan !== '1' }).then(function () { laadLijst(); });
+        markeren(b.dataset.ster, b.dataset.aan !== '1');
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-weg]'), function (b) {

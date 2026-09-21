@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-20T21:51:33.956Z",
-    "commit": "f3ec5d889",
+    "op": "2026-09-21T06:26:10.975Z",
+    "commit": "2be5d1273",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1992,6 +1992,13 @@
       "operator": ">=->>#0",
       "gezakt": 1,
       "geprobeerd": 5
+    },
+    "control-uniqueness.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
     },
     "controlekamer.test.js": {
       "soort": "server",
@@ -5706,6 +5713,13 @@
       "operator": "true->false#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "office-controls.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "office-enterprise.test.js": {
       "soort": "server",

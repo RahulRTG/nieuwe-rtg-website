@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 477 delen, 0 zonder onderwerp.**
+**60 bundels, 478 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -351,12 +351,13 @@ omlaag.
 
 ## `apps/office/app.js`
 
-`public/apps/office/app/` -- 8 delen, 933 regels in de delen
+`public/apps/office/app/` -- 9 delen, 948 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `app-01.js` | RTG Office, de app zelf: de drive en de schil om de drie editors heen |
 | `app-01b.js` | de drive |
+| `app-01c.js` | One owner action for desktop buttons and mobile document gestures |
 | `app-02.js` | openen |
 | `app-02a.js` | tekstdocument |
 | `app-02a2.js` | menselijke documentwerkstroom |
@@ -692,7 +693,7 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 9 delen, 1883 regels in de delen
+`public/shared/i18n/` -- 9 delen, 1884 regels in de delen
 
 | deel | onderwerp |
 |---|---|

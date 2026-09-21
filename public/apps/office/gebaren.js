@@ -20,7 +20,11 @@
         rechts: doc.vanMij ? [{ naam: text('office.deleteForever', 'Voorgoed verwijderen', 'Delete permanently'),
           teken: 'ingrijp', sig: 'incident', borg: true, doe: function () { O.verwijderen(id, true); } }] : [],
         links: [{ naam: text('office.openDocument', 'Document openen', 'Open document'), teken: 'openen',
-          doe: function () { if (w.RTGDocs) w.RTGDocs.diep(id); else O.openen(id); } }]
+          doe: function () { if (w.RTGDocs) w.RTGDocs.diep(id); else O.openen(id); } }].concat(doc.vanMij ? [{
+          naam: doc.ster ? text('office.unstar', 'Uit favorieten verwijderen', 'Remove from favourites')
+            : text('office.star', 'Als favoriet bewaren', 'Save as a favourite'), teken: 'rahul',
+          doe: function () { return O.markeren(id, !doc.ster); }
+        }] : [])
       };
     }
     ['mijnDocs', 'gedeeldDocs', 'rtdVoorzijde'].forEach(function (id) {

@@ -849,6 +849,7 @@ window.RTGUiBronnen = Object.freeze({
   'Acties':'Actions','ACTIES':'ACTIONS','Terug':'Back','Vooruit':'Forward','Sluiten':'Close',
   'Openen':'Open','Opslaan':'Save','Annuleren':'Cancel','Doorgaan':'Continue','Ga verder':'Continue',
   'Voorgoed verwijderen':'Delete permanently','Document openen':'Open document','Verwijderen':'Delete',
+  'Als favoriet bewaren':'Save as a favourite','Uit favorieten verwijderen':'Remove from favourites',
   'Volgende stap':'Next step','Uw werelden':'Your worlds','Context en opties':'Context and options',
   'Veiligheid en status':'Security and status','Open Connect':'Open Connect','Bekijk actuele status':'View current status',
   'Rahul vragen':'Ask Rahul','Praat met Rahul':'Talk to Rahul','Vraag Rahul':'Ask Rahul','Vraag Rahul…':'Ask Rahul…',

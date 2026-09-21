@@ -96,25 +96,6 @@
   var blad = null, pres = null, presLoop = null, formulier = null, schets = null, bord = null;
 
   /* ---------- de drive ---------- */
-  var verwijderenBezig = new Set();
-  async function verwijderen(id, bevestigd) {
-    var doc = stand && (stand.docs || []).find(function (x) { return x.id === id && x.vanMij; });
-    if (!doc || verwijderenBezig.has(id)) return false;
-    if (!bevestigd && !confirm('Wilt u "' + doc.titel + '" voorgoed verwijderen? Dit kunt u niet ongedaan maken.')) return false;
-    verwijderenBezig.add(id);
-    try {
-      var r = await api('weg', { id: id });
-      if (r.status !== 200 || r.body.error || !r.body.ok) throw new Error(r.body.error || 'Het document kon niet worden verwijderd.');
-      tabs = tabs.filter(function (tab) { return tab.id !== id; });
-      if (open && open.id === id) { clearTimeout(bewaarT); sluitEditor(); }
-      else tekenTabs();
-      await laadLijst();
-      if (window.RTGDocs) await window.RTGDocs.vernieuw();
-      zeg('Het document is verwijderd.');
-      return true;
-    } catch (e) { zeg(e.message || 'Het document kon niet worden verwijderd. Probeer het opnieuw.'); return false; }
-    finally { verwijderenBezig.delete(id); }
-  }
   function laadLijst() {
     return api('mijn').then(function (r) {
       if (r.status !== 200) { zeg(r.body.error || opzet.leeg); return; }
@@ -191,7 +172,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-ster]'), function (b) {
       b.addEventListener('click', function (e) {
         e.stopPropagation();
-        api('ster', { id: b.dataset.ster, aan: b.dataset.aan !== '1' }).then(function () { laadLijst(); });
+        markeren(b.dataset.ster, b.dataset.aan !== '1');
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-weg]'), function (b) {
@@ -268,6 +249,39 @@
   $('#nieuwFormulier').addEventListener('click', function () { nieuw('formulier'); });
   $('#nieuwSchets').addEventListener('click', function () { nieuw('schets'); });
   $('#nieuwBord').addEventListener('click', function () { nieuw('bord'); });
+  /* One owner action for desktop buttons and mobile document gestures. */
+  var documentActieBezig = new Set();
+  async function markeren(id, aan) {
+    var doc = stand && (stand.docs || []).find(function (x) { return x.id === id && x.vanMij; });
+    if (!doc || documentActieBezig.has(id)) return false;
+    documentActieBezig.add(id);
+    try {
+      var r = await api('ster', { id: id, aan: !!aan });
+      if (r.status !== 200 || r.body.error || !r.body.ok) throw new Error(r.body.error || 'De markering kon niet worden bewaard.');
+      await laadLijst();
+      if (window.RTGDocs) await window.RTGDocs.vernieuw();
+      return true;
+    } catch (e) { zeg(e.message || 'De markering kon niet worden bewaard.'); return false; }
+    finally { documentActieBezig.delete(id); }
+  }
+  async function verwijderen(id, bevestigd) {
+    var doc = stand && (stand.docs || []).find(function (x) { return x.id === id && x.vanMij; });
+    if (!doc || documentActieBezig.has(id)) return false;
+    if (!bevestigd && !confirm('Wilt u "' + doc.titel + '" voorgoed verwijderen? Dit kunt u niet ongedaan maken.')) return false;
+    documentActieBezig.add(id);
+    try {
+      var r = await api('weg', { id: id });
+      if (r.status !== 200 || r.body.error || !r.body.ok) throw new Error(r.body.error || 'Het document kon niet worden verwijderd.');
+      tabs = tabs.filter(function (tab) { return tab.id !== id; });
+      if (open && open.id === id) { clearTimeout(bewaarT); sluitEditor(); }
+      else tekenTabs();
+      await laadLijst();
+      if (window.RTGDocs) await window.RTGDocs.vernieuw();
+      zeg('Het document is verwijderd.');
+      return true;
+    } catch (e) { zeg(e.message || 'Het document kon niet worden verwijderd. Probeer het opnieuw.'); return false; }
+    finally { documentActieBezig.delete(id); }
+  }
 
   /* ---------- openen ---------- */
   function zetTab(doc) {
@@ -917,7 +931,7 @@
   });
 
   /* RTDocs is de rustige voorzijde van deze documentmotor. De voorzijde
-     krijgt bewust alleen deze vier deuren: dezelfde API, dezelfde lijst en
+     gebruikt dezelfde API, dezelfde lijst en
      dezelfde editor. Zo ontstaan er geen tweede documentenmodel en geen
      schaduwversies naast RTG Office. */
   window.RTGOffice = Object.freeze({
@@ -926,6 +940,7 @@
     openen: openen,
     nieuw: nieuw,
     verwijderen: verwijderen,
+    markeren: markeren,
     stand: function () { return stand; }
   });
 

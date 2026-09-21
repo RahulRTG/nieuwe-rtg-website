@@ -1,0 +1,30 @@
+{
+  "kind": "Schermafbeeldingen uit de echte RTG-app in een lokale wegwerpomgeving",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "screens": [
+    {
+      "id": "organisatie",
+      "route": "/apps/werk.html",
+      "file": "organisatie.png",
+      "sourceHash": "54e5909d13be2579758f4a74eff3a6d078ec658120ec6d3f3380bd5ae729cd94",
+      "imageHash": "80477dfd06d8aec28abfd9cc1dc5d071daa255e4a8ad7572295f4868f52650e9"
+    },
+    {
+      "id": "partner",
+      "route": "/apps/leverancier.html",
+      "file": "partner.png",
+      "sourceHash": "d98e6851774f981bc17384246dbdd05a626a06fa88863f613937520cf25d3ea4",
+      "imageHash": "8c6e6243b35d8635ea98e81aae3abd2609a26f290033059fedc8ad8e88097a87"
+    },
+    {
+      "id": "gebruiker",
+      "route": "/apps/app.html",
+      "file": "gebruiker.png",
+      "sourceHash": "8c46a88e8a9de144719621da4ac4f12927bd1b814f7cb4a5fbcf0579d166d7d1",
+      "imageHash": "67c1ac543b7c6c5f43a0fc4039ae9e9c744ed9acd010af87ae315913ae8e8a93"
+    }
+  ]
+}

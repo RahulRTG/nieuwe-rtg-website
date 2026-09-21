@@ -34,6 +34,55 @@ test('de nieuwe voordeur draagt het RTG-merk en niet het vervangen scherm', () =
     'de openbare pagina laadt niet stil de ingelogde commandtab vanaf een fout rootpad');
 });
 
+test('de voordeur presenteert RTG eerst als B2B2C-platform', () => {
+  assert.match(HTML, /B2B2C-platform/);
+  assert.match(HTML, /organisaties, partners en mensen/);
+  assert.match(HTML, /data-scene="Organisatie, partner en gebruiker"/);
+  assert.match(HTML, /data-app-truth-screen="organisatie"/);
+  assert.match(HTML, /data-app-truth-screen="partner"/);
+  assert.match(HTML, /data-app-truth-screen="gebruiker"/);
+  assert.match(HTML, /ECHTE APP-SCHERMEN/);
+  assert.match(HTML, /data-app-path="\/apps\/partner-worden\.html"/);
+  assert.doesNotMatch(HTML, /<iframe\b/i,
+    'de www probeert de app niet door de framebeveiliging heen in te bedden');
+});
+
+test('Experience 2.0 gebruikt één interface voor drie kanten van het platform', () => {
+  assert.match(HTML, /data-role-select="organisatie"/);
+  assert.match(HTML, /data-role-select="partner"/);
+  assert.match(HTML, /data-role-select="gebruiker"/);
+  assert.equal((HTML.match(/class="scene platform-section role-experience/g) || []).length, 1);
+});
+
+test('de productstage toont alleen beelden uit de gecontroleerde appwaarheid', () => {
+  const truth = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/site/website-truth.json'), 'utf8'));
+  for (const screen of truth.platform) {
+    assert.match(HTML, new RegExp('data-stage-screen="' + screen.id + '"'));
+    assert.match(HTML, new RegExp(screen.image.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+  assert.doesNotMatch(HTML, /<iframe/i);
+});
+
+test('oorzaak en gevolg hebben vijf concrete stappen', () => {
+  assert.equal((HTML.match(/data-flow-step="[0-4]"/g) || []).length, 5);
+  assert.match(HTML, /GEBRUIKER[\s\S]*PARTNER[\s\S]*WORKOS[\s\S]*BETALING[\s\S]*ORGANISATIE/);
+});
+
+test('zoeken, graph en Explore zijn bedienbaar zonder zware bibliotheek', () => {
+  assert.match(HTML, /id="commandDialog"/);
+  assert.match(HTML, /data-graph-topic="restaurant"/);
+  assert.match(HTML, /data-explore-world="work"/);
+  assert.doesNotMatch(HTML, /three\.js|webgl|gsap/i);
+});
+
+test('de zelfstandige Explore-route leest dezelfde appwaarheid', () => {
+  const explore = fs.readFileSync(path.join(ROOT, 'explore/index.html'), 'utf8');
+  const script = fs.readFileSync(path.join(ROOT, 'public/site/explore.js'), 'utf8');
+  assert.match(explore, /Vier werelden/);
+  assert.match(script, /website-truth\.json/);
+  assert.match(script, /world\.tools/);
+});
+
 test('de vier wereldkaarten en inloggen wijzen naar de echte app', () => {
   const verwacht = {
     living: '/apps/rtg.html',

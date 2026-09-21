@@ -65,6 +65,7 @@
     "wereldrooster:controle": "node scripts/wereldrooster.js --controle",
     "websitewaarheid": "node scripts/websitewaarheid.js",
     "websitewaarheid:controle": "node scripts/websitewaarheid.js --controle",
+    "websitebeelden": "node scripts/websitebeelden.js && node scripts/websitewaarheid.js",
     "handelingindex": "node scripts/handelingindex.js",
     "handelingindex:controle": "node scripts/handelingindex.js --controle",
     "vindbaar": "node scripts/vindbaar.js",

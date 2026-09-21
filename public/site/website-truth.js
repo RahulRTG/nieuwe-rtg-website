@@ -87,6 +87,7 @@
   }
 
   function toepassen(data) {
+    window.RTGWebsiteTruth = data;
     document.querySelectorAll('[data-app-truth-screen]').forEach(function (element) {
       var screen = (data.platform || []).find(function (item) { return item.id === element.dataset.appTruthScreen; });
       if (screen) bindPlatformScreen(element, screen);
@@ -104,6 +105,7 @@
     var pasId = document.body.dataset.pass;
     if (pasId && data.passes[pasId]) bindPas(document.body, data.passes[pasId]);
     document.documentElement.dataset.websiteTruth = 'actueel';
+    window.dispatchEvent(new CustomEvent('rtg-website-truth', { detail: data }));
   }
 
   fetch(bron, { credentials: 'same-origin' })

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1954 bestanden en 14005 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1954 bestanden en 14010 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1954 |
-| losse beweringen (`test(...)`) | 14005 |
+| losse beweringen (`test(...)`) | 14010 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 159 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1308 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1716 bestanden, 13585 beweringen.
+1716 bestanden, 13590 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1457,7 +1457,7 @@ toets omvalt.
 | `staffgemoed.test.js` | 7 | gezakt op `liegpoort /api/` | DE DAGCHECK-IN VOOR DE VLOER -- en vooral: wat de werkgever NIET ziet. ONDERNEMEN.md par. |
 | `staffinvite.test.js` | 12 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
 | `stagevorm.test.js` | 4 | gezakt op `getal+1#0` | DE STAGEVORM-METER: kan hij nog vinden wat hij beweert niet te vinden? STAGE.md par. |
-| `startpagina.test.js` | 9 | -- | De losse GitHub Pages-voordeur: merk, routes en dagdeelbeelden. Deze pagina draait niet via de productieserver: index.html in de repositoryroot wordt rechtstreeks door GitHub Pages bediend. |
+| `startpagina.test.js` | 14 | -- | De losse GitHub Pages-voordeur: merk, routes en dagdeelbeelden. Deze pagina draait niet via de productieserver: index.html in de repositoryroot wordt rechtstreeks door GitHub Pages bediend. |
 | `stempel.test.js` | 4 | gezakt op `===->!==#0` | HET STEMPEL: WANNEER IS EEN METING ONREPRODUCEERBAAR? `boomVuil` beantwoordt een vraag met gevolgen: hoort deze uitslag bij de commit die eronder staat, of bij iets wat nergens is vastgelegd? |
 | `stempelveiligheid.test.js` | 6 | gezakt op `===->!==#0` | KAN EEN METER REPO-WAARHEID SCHRIJVEN DIE NIEMAND HEEFT GEVRAAGD? Deze toetsen bewaken de METER en niet de scripts die hij telt. |
 | `stijlafsplitsing.test.js` | 8 | -- | HET AFGESPLITSTE STIJLBLOK: WAT ER WEG MAG, EN VOORAL WAT NIET. Over alle 258 schermen is 74% van de HTML inline CSS en JS. |

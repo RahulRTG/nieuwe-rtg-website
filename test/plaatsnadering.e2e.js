@@ -229,6 +229,9 @@ test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
        hoort de andere zaak wel degelijk als binnen te zien. */
     await page.waitForFunction(() => window.RTGPlaats && window.RTGPlaats.stand().binnen.length > 0,
       null, { timeout: 20000 });
+    // De lokale motor verwerkt de GPS eerst; de waarneming moet daarna ook
+    // door de server zijn verwerkt voordat we die opgeslagen stand beoordelen.
+    await wachtOpNetstilte(page);
     const stand = await api(base, '/api/plaats/stand', {}, reg.token);
     assert.ok(stand.waarnemingen.some(w => w.hek === elders.id && w.wat === 'binnen'),
       'het toestel heeft de andere zaak wel degelijk als binnen gezien');

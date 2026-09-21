@@ -61,7 +61,11 @@
  if(hash.get('detail')&&hash.get('detail')!=='page')open(hash.get('detail'));
  else if(d.body.dataset.companyPage!=='home'&&(!hash.has('story')||hash.get('detail')==='page')){
   var heading=source.querySelector('h1'),key=word('currentPage',heading?heading.textContent:d.title,heading?heading.textContent:d.title),content=P.node('article',null,'pp-existing-page');
-  while(source.firstChild)content.append(source.firstChild);shell.show('page',key,content);
+  content.dataset.companyDocument=d.body.dataset.companyPage||'page';
+  while(source.firstChild)content.append(source.firstChild);
+  content.querySelectorAll('.breadcrumb > span').forEach(function(separator){separator.textContent='/';});
+  content.querySelectorAll('.content-links a > span,.related a > b,.final-cta a > span').forEach(function(mark){mark.remove();});
+  shell.show('page',key,content);
  }
  w.addEventListener('hashchange',function(){var h=new URLSearchParams(w.location.hash.replace(/^#rtg\?/,''));if(h.get('story'))shell.select(h.get('story'),false);if(h.get('detail'))open(h.get('detail'));else shell.collapse();});
  w.RTGi18n.apply(w.RTGi18n.lang);

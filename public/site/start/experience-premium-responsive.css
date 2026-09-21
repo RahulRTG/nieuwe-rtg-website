@@ -2,7 +2,7 @@
 @media(max-width:1100px){
  .rtg-experience .experience-arrival{grid-template-columns:minmax(330px,.8fr) minmax(480px,1.2fr);gap:45px}.arrival-network{height:590px}.arrival-node-org{right:218px}.arrival-node-partner{right:110px}.role-layout{grid-template-columns:.78fr 1.22fr;gap:55px}.role-copy h2{font-size:55px}
 }
-@media(max-width:820px){
+@media(max-width:900px){
  .experience-header{width:calc(100% - 48px);padding-top:calc(23px + env(safe-area-inset-top,0px));padding-bottom:21px}.experience-brand{font-size:34px}.experience-brand span{display:none}.edition{display:none}.command-open{margin-left:auto}
  .rtg-experience .experience-arrival{min-height:0;height:auto;max-height:none;padding:128px 24px 122px;display:block;background:#0d0e0c}.experience-arrival .hero-media{display:none}.experience-arrival::after{background:linear-gradient(90deg,transparent 49.8%,rgba(255,255,255,.04) 50%,transparent 50.2%),linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px);background-size:100% 100%,100% 72px}.experience-arrival .opening-copy{max-width:none}.experience-arrival .opening-copy h1{max-width:720px;font-size:clamp(58px,11vw,84px)}.experience-arrival .opening-copy h1 em{font-size:.7em}.experience-arrival .opening-sub{max-width:550px}.platform-facts{max-width:560px}
  .arrival-network{margin-top:58px;height:620px}.experience-arrival .opening-foot{left:24px;right:24px;bottom:38px}

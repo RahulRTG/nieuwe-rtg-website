@@ -37,6 +37,24 @@ test('alle vier wereldkaarten krijgen actuele namen, onderdelen en app-routes', 
   assert.doesNotMatch(runtime, /innerHTML/);
 });
 
+test('de B2B2C-schermen komen uit bestaande app-routes en een gecontroleerd echt beeld', () => {
+  const data = waarheid.maak();
+  const html = lees('index.html');
+  assert.deepEqual(data.platform.map((scherm) => scherm.id), ['organisatie', 'partner', 'gebruiker']);
+  assert.deepEqual(data.platform.map((scherm) => scherm.route),
+    ['/apps/werk.html', '/apps/leverancier.html', '/apps/app.html']);
+  assert.doesNotMatch(JSON.stringify(data.platform), /\bAI\b/i,
+    'de openbare productuitleg gebruikt geen AI-labels');
+  for (const scherm of data.platform) {
+    assert.match(html, new RegExp('data-app-truth-screen="' + scherm.id + '"'));
+    assert.ok(fs.existsSync(path.join(ROOT, 'public', scherm.image)), scherm.image + ' bestaat');
+    assert.equal(scherm.sourceHash, waarheid.schermBronHash(scherm.route));
+    assert.ok(scherm.summary && scherm.actions.length && scherm.note,
+      scherm.id + ' neemt zijn uitleg uit de app-gids over');
+  }
+  assert.match(lees('public/site/website-truth.js'), /bindPlatformScreen/);
+});
+
 test('alle openbare verhaalpagina’s gebruiken dezelfde wereldstijl', () => {
   for (const bestand of PAGINAS) {
     const html = lees(bestand);

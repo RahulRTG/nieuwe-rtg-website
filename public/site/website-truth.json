@@ -1,10 +1,63 @@
 {
-  "schema": 1,
+  "schema": 2,
   "source": [
     "public/shared/rtg-edge-worlds.js",
-    "server/kern/pasladder.js"
+    "server/kern/pasladder.js",
+    "server/kern/appgids.js",
+    "public/apps/werk.html",
+    "public/apps/leverancier.html",
+    "public/apps/app.html"
   ],
-  "sourceHash": "098c84f0411e0b9f3073460c07c1d4c9e457d4fa72825f733eebc956fe7b7167",
+  "sourceHash": "e86e1638e325ff50afca7d5e880da048e913613df5e20cc702078c27b68f63a6",
+  "platform": [
+    {
+      "id": "organisatie",
+      "audience": "Organisatie",
+      "name": "RTG Werk OS",
+      "route": "/apps/werk.html",
+      "image": "images/start/app-schermen/organisatie.png",
+      "action": "Open RTG Werk OS",
+      "summary": "RTG Werk OS: de werkplek van een hele organisatie -- projecten, kennis, klanten, service, bouw, IT, contracten en besluiten.",
+      "actions": [
+        "Ga naar binnen met de werkruimtecode en uw eigen lid-token; dat is bewust iets anders dan uw RTG-pas",
+        "Lees uw startscherm: het volgt uw rollen, en wat geen bron heeft staat er als NIET GEMETEN in plaats van als nul",
+        "Kies een module en zie de lijst plus wat aandacht vraagt; koppel eenmalig uw RTG-account voor agenda, postvak en kluis"
+      ],
+      "note": "Wat u niet mag zien, staat er niet als lege doos; en wat nergens wordt gemeten, staat er met de reden erbij.",
+      "sourceHash": "54e5909d13be2579758f4a74eff3a6d078ec658120ec6d3f3380bd5ae729cd94"
+    },
+    {
+      "id": "partner",
+      "audience": "Partner",
+      "name": "De leverancier-app",
+      "route": "/apps/leverancier.html",
+      "image": "images/start/app-schermen/partner.png",
+      "action": "Open de partneromgeving",
+      "summary": "De leverancier-app: uw hele zaak in één scherm, van orders tot personeel.",
+      "actions": [
+        "Beheer orders, reserveringen en voorraad",
+        "Stuur uw team aan met rooster en taken"
+      ],
+      "note": "Kijk elke ochtend één minuut naar het actiecentrum; dan begint de dag zonder verrassingen.",
+      "sourceHash": "d98e6851774f981bc17384246dbdd05a626a06fa88863f613937520cf25d3ea4"
+    },
+    {
+      "id": "gebruiker",
+      "audience": "Gebruiker",
+      "name": "RTG OS",
+      "route": "/apps/app.html",
+      "image": "images/start/app-schermen/gebruiker.png",
+      "action": "Open RTG",
+      "summary": "Je homescreen: mappen boven de klok, bellen en je wallet eronder, Rahul in de balk.",
+      "actions": [
+        "Tik een app; omhoog vegen op het streepje onderin brengt je terug op de homescreen",
+        "Typ in de balk onderaan: het OS doet het zelf of Rahul pakt het op",
+        "Je ledenpas ligt in je wallet, de tegel rechts onder de klok"
+      ],
+      "note": "Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.",
+      "sourceHash": "97aa889219b8a5e4fa0677d6613e0d151305f5149e6c86a9c779878a1355b18b"
+    }
+  ],
   "worlds": {
     "living": {
       "name": "LivingOS",

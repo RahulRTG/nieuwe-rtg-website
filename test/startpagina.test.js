@@ -34,6 +34,19 @@ test('de nieuwe voordeur draagt het RTG-merk en niet het vervangen scherm', () =
     'de openbare pagina laadt niet stil de ingelogde commandtab vanaf een fout rootpad');
 });
 
+test('de voordeur presenteert RTG eerst als B2B2C-platform', () => {
+  assert.match(HTML, /B2B2C-platform/);
+  assert.match(HTML, /organisaties, partners en mensen/);
+  assert.match(HTML, /data-scene="Organisatie, partner en gebruiker"/);
+  assert.match(HTML, /data-app-truth-screen="organisatie"/);
+  assert.match(HTML, /data-app-truth-screen="partner"/);
+  assert.match(HTML, /data-app-truth-screen="gebruiker"/);
+  assert.match(HTML, /ECHTE APP-SCHERMEN/);
+  assert.match(HTML, /data-app-path="\/apps\/partner-worden\.html"/);
+  assert.doesNotMatch(HTML, /<iframe\b/i,
+    'de www probeert de app niet door de framebeveiliging heen in te bedden');
+});
+
 test('de vier wereldkaarten en inloggen wijzen naar de echte app', () => {
   const verwacht = {
     living: '/apps/rtg.html',

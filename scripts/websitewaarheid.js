@@ -13,6 +13,39 @@ const ROOT = path.join(__dirname, '..');
 const WERELDBRON = path.join(ROOT, 'public/shared/rtg-edge-worlds.js');
 const DOEL = path.join(ROOT, 'public/site/website-truth.json');
 const VOLGORDE = ['living', 'travel', 'work', 'foundation'];
+const PLATFORM = [
+  { id: 'organisatie', audience: 'Organisatie', name: 'RTG Werk OS', route: '/apps/werk.html',
+    image: 'images/start/app-schermen/organisatie.png', action: 'Open RTG Werk OS' },
+  { id: 'partner', audience: 'Partner', name: 'De leverancier-app', route: '/apps/leverancier.html',
+    image: 'images/start/app-schermen/partner.png', action: 'Open de partneromgeving' },
+  { id: 'gebruiker', audience: 'Gebruiker', name: 'RTG OS', route: '/apps/app.html',
+    image: 'images/start/app-schermen/gebruiker.png', action: 'Open RTG' }
+];
+
+function schermBronHash(route) {
+  const htmlPad = path.join(ROOT, 'public', String(route).replace(/^\//, ''));
+  const html = fs.readFileSync(htmlPad, 'utf8');
+  const bestanden = [htmlPad];
+  for (const match of html.matchAll(/(?:src|href)=["']([^"'#?]+)["']/g)) {
+    const url = match[1];
+    if (!url.startsWith('/') && !url.startsWith('./') && !url.startsWith('../')) continue;
+    const relatief = url.startsWith('/')
+      ? url.replace(/^\//, '')
+      : path.relative(path.join(ROOT, 'public'), path.resolve(path.dirname(htmlPad), url));
+    const bestand = path.join(ROOT, 'public', relatief);
+    if (bestand.startsWith(path.join(ROOT, 'public')) && fs.existsSync(bestand) && fs.statSync(bestand).isFile()) {
+      bestanden.push(bestand);
+    }
+  }
+  const bron = [...new Set(bestanden)].sort().map((bestand) => fs.readFileSync(bestand)).join('\n');
+  return crypto.createHash('sha256').update(bron).digest('hex');
+}
+
+function beeldregister() {
+  const bestand = path.join(ROOT, 'public/images/start/app-schermen/HERKOMST.json');
+  if (!fs.existsSync(bestand)) throw new Error('herkomstregister voor echte app-schermen ontbreekt; draai npm run websitebeelden');
+  return JSON.parse(fs.readFileSync(bestand, 'utf8'));
+}
 
 function wereldenUitBron() {
   const code = fs.readFileSync(WERELDBRON, 'utf8');
@@ -59,6 +92,7 @@ function maak() {
   }
 
   const ladder = require('../server/kern/pasladder').treden();
+  const appgids = require('../server/kern/appgids');
   const passen = {};
   for (const pas of ladder) {
     const id = pas.id === 'gratis' ? 'community' : pas.id;
@@ -75,11 +109,34 @@ function maak() {
     };
   }
 
-  const hashBron = code + '\n' + JSON.stringify(ladder);
+  const register = beeldregister();
+  const platform = PLATFORM.map((scherm) => {
+    if (!routeBestaat(scherm.route)) throw new Error('platformscherm verwijst naar ontbrekende app-route: ' + scherm.route);
+    const gids = appgids.gidsVan(scherm.route);
+    if (!gids || gids.algemeen) throw new Error('platformscherm mist een eigen app-uitleg: ' + scherm.route);
+    if (!fs.existsSync(path.join(ROOT, 'public', scherm.image))) {
+      throw new Error('platformscherm mist zijn echte appbeeld: public/' + scherm.image);
+    }
+    const sourceHash = schermBronHash(scherm.route);
+    const bewijs = (register.screens || []).find((item) => item.id === scherm.id);
+    if (!bewijs || bewijs.route !== scherm.route || bewijs.sourceHash !== sourceHash) {
+      throw new Error('appbeeld voor ' + scherm.id + ' loopt achter op de schermbron; draai npm run websitebeelden');
+    }
+    const imageHash = crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, 'public', scherm.image))).digest('hex');
+    if (bewijs.imageHash !== imageHash) {
+      throw new Error('appbeeld voor ' + scherm.id + ' komt niet overeen met zijn herkomstregister; draai npm run websitebeelden');
+    }
+    const actions = gids.doe.filter((actie) => !/\bAI\b/i.test(actie)).slice(0, 3);
+    return Object.assign({}, scherm, { summary: gids.wat, actions, note: gids.tip, sourceHash });
+  });
+
+  const hashBron = code + '\n' + JSON.stringify(ladder) + '\n' + JSON.stringify(platform);
   const uit = {
-    schema: 1,
-    source: ['public/shared/rtg-edge-worlds.js', 'server/kern/pasladder.js'],
+    schema: 2,
+    source: ['public/shared/rtg-edge-worlds.js', 'server/kern/pasladder.js', 'server/kern/appgids.js',
+      'public/apps/werk.html', 'public/apps/leverancier.html', 'public/apps/app.html'],
     sourceHash: crypto.createHash('sha256').update(hashBron).digest('hex'),
+    platform,
     worlds: wereldUit,
     passes: passen
   };
@@ -119,4 +176,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { maak, schrijf, controle };
+module.exports = { maak, schrijf, controle, schermBronHash, PLATFORM };

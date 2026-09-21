@@ -1,6 +1,6 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const { haalSessies, opslagVoor } = require('../scripts/lib/proefsessies');
 let srv, browser, member, other, conversation;
@@ -92,6 +92,8 @@ test('mobile messages send to the intended test recipient and retain the convers
 
 test('switching worlds reaches their current homes through the visible Edge', { skip }, async () => {
   const { ctx, page } = await pageFor();
+  const errors = []; letOpFouten(page, errors);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   try {
     await open(page, '/apps/kantoor.html');
     for (const [name, route] of [['LivingOS', '/apps/wereld.html'], ['TravelOS', '/apps/reizen.html'],
@@ -102,6 +104,7 @@ test('switching worlds reaches their current homes through the visible Edge', { 
       await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
       assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
     }
+    assert.deepEqual(errors, [], 'world switches preserve working navigation without application errors');
   } finally { await ctx.close(); }
 });
 

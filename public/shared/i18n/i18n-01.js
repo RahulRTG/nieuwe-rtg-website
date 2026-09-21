@@ -40,11 +40,15 @@
   };
   const KERN = new Set([
     'nl', 'en', 'de', 'fr', 'es', 'pt', 'it', 'pl', 'ru', 'uk', 'tr',
-    'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'zh', 'ja', 'ko', 'id', 'vi', 'th', 'sw'
+    'ro', 'el', 'cs', 'sk', 'hu', 'bg', 'hr', 'sr', 'bs', 'sl', 'sv', 'no',
+    'da', 'fi', 'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'pa', 'gu', 'mr', 'ta',
+    'te', 'kn', 'ml', 'ne', 'si', 'zh', 'ja', 'ko', 'th', 'vi', 'id', 'ms',
+    'tl', 'km', 'my', 'sw', 'am', 'so', 'af', 'ha'
   ]);
   /* Wereldtalen: de Boardroom bepaalt welke talen aanstaan; de kiezer toont ze
-     allemaal. De 24 kerntalen wisselen atomair: een onvolledig woordenboek
-     blijft volledig Engels in plaats van meerdere talen op een scherm te mengen. */
+     allemaal. De 55 producttalen wisselen per zichtbaar oppervlak atomair:
+     een onvolledig scherm blijft volledig Engels in plaats van meerdere talen
+     op hetzelfde scherm te mengen. */
   let WERELD = window.RTGWereldTalen || null; // [{code, naam, en}] uit /api/talen
   function supported() { return WERELD ? WERELD.map(t => t.code) : Object.keys(LANGS); }
   const orig = new WeakMap(); // element -> { text, html, ph }
@@ -112,24 +116,52 @@
   const RTGi18n = {
     lang: 'nl',
     chosen: false,
-    // UI-woordenboek: Nederlands staat in de HTML. Een kerntaal wordt pas
-    // zichtbaar als elke Engelse woordenboeksleutel een echte vertaling heeft.
+    _relevanteSleutels(en) {
+      const keys = new Set(this._usedKeys);
+      const bindings = ['data-i18n','data-i18n-html','data-i18n-ph','data-i18n-aria','data-i18n-title'];
+      try {
+        document.querySelectorAll(bindings.map(b => '[' + b + ']').join(',')).forEach(el => {
+          const zichtbaar = el.tagName === 'TITLE' || typeof el.getClientRects !== 'function' || el.getClientRects().length > 0;
+          if (!zichtbaar) return;
+          bindings.forEach(binding => {
+            const key = el.getAttribute(binding);
+            if (key) keys.add(key);
+          });
+        });
+      } catch (e) {}
+      return Array.from(keys).filter(key => typeof en[key] === 'string' && en[key].length <= 300);
+    },
+    // Nederlands staat in de HTML. Een producttaal wordt pas zichtbaar als
+    // alle sleutels van het huidige scherm vertaald zijn. Verborgen schermen
+    // blokkeren de pagina niet meer; wanneer zij openen, volgt een nieuwe ronde.
     dict(lang) {
       const all = window.I18N || {};
       if (lang === 'nl') return all.nl || {};
       const en = all.en || {};
       const own = all[lang] || {};
       if (lang !== 'en' && KERN.has(lang)) {
-        const compleet = Object.keys(en).every(key => typeof en[key] !== 'string' ||
+        const state = this._wereldDict[lang];
+        const vereist = state && Array.isArray(state.required) ? state.required : this._relevanteSleutels(en);
+        const compleet = vereist.every(key =>
           (Object.prototype.hasOwnProperty.call(own, key) && typeof own[key] === 'string' && own[key].length > 0));
         if (!compleet) return Object.assign({}, en);
       }
       return Object.assign({}, en, own);
     },
     _usedKeys: new Set(),
+    _wereldTimer: null,
+    _planWereldDict(lang) {
+      if (lang === 'nl' || lang === 'en' || this._wereldTimer) return;
+      this._wereldTimer = setTimeout(() => {
+        this._wereldTimer = null;
+        if (this.lang === lang) this.laadWereldDict(lang, false);
+      }, 0);
+    },
     t(key, fallback) {
       this._usedKeys.add(key);
       if (this.lang === 'nl') return fallback != null ? fallback : key;
+      const own = (window.I18N && window.I18N[this.lang]) || {};
+      if (this.lang !== 'en' && own[key] == null) this._planWereldDict(this.lang);
       const v = this.dict(this.lang)[key];
       if(v!=null)return v;
       const known=window.RTGUiBronTekst && window.RTGUiBronTekst(fallback);
@@ -141,7 +173,7 @@
       lang = /^[a-z]{2}$/.test(String(lang || '')) ? lang : 'nl';
       this.lang = lang;
       document.documentElement.setAttribute('lang', lang);
-      if (lang !== 'nl' && lang !== 'en') this.laadWereldDict(lang);
+      if (lang !== 'nl' && lang !== 'en') this.laadWereldDict(lang, false);
       const d = this.dict(lang);
 
       document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -217,16 +249,22 @@
        EN HIJ VRAAGT ALLEEN WAT HIJ MIST. Van vierhonderd sleutels zijn er op de
        tweede pagina meestal een handvol nieuw; de rest komt uit de kast. */
     _wereldDict: {},
-    async laadWereldDict(lang) {
+    async laadWereldDict(lang, volledigWoordenboek) {
       if (lang === 'nl' || lang === 'en') return;
-      const state = this._wereldDict[lang] || (this._wereldDict[lang] = { pending:false, tried:new Map() });
-      if (state.pending) return;
+      const state = this._wereldDict[lang] || (this._wereldDict[lang] = { pending:false, rerun:false, tried:new Map() });
+      if (state.pending) { state.rerun=true; return; }
       const en = (window.I18N || {}).en || {};
       const own = (window.I18N || {})[lang] || {};
       const kast = window.RTGVertaalKast;
-      const keys = Object.keys(en).filter(k => typeof en[k] === 'string' && en[k].length <= 300 &&
+      const toegestaan = k => typeof en[k] === 'string' && en[k].length <= 300 &&
         !(window.RTGAccessMeaning && (k.startsWith('access.') || k.startsWith('onb.')) &&
-          ['decision','legal'].includes(window.RTGAccessMeaning.risk(k))) &&
+          ['decision','legal'].includes(window.RTGAccessMeaning.risk(k)));
+      /* Een expliciete laadWereldDict-aanroep blijft het volledige woordenboek
+         kunnen voorverwarmen. De normale schermweg geeft `false` mee en wacht
+         alleen op wat nu werkelijk wordt gebruikt. */
+      const relevant = (volledigWoordenboek === false ? this._relevanteSleutels(en) : Object.keys(en)).filter(toegestaan);
+      state.required = relevant;
+      const keys = relevant.filter(k =>
         own[k] == null && state.tried.get(k) !== en[k]);
       if (!keys.length) return;
       // The visible screen is first; every remaining key still has a bounded batch.
@@ -276,9 +314,10 @@
       } finally {
         state.pending=false;
         const klaar = Object.assign({}, own, out);
-        const compleet = Object.keys(en).every(key => typeof en[key] !== 'string' ||
+        const compleet = relevant.every(key =>
           (Object.prototype.hasOwnProperty.call(klaar, key) && typeof klaar[key] === 'string' && klaar[key].length > 0));
         if (compleet) publish(true);
+        if (state.rerun) { state.rerun=false; this._planWereldDict(lang); }
       }
     },
 

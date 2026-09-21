@@ -172,7 +172,7 @@
             WERELD = d.talen; // de actieve set (voor de vertaling)
             // de matcher kent meteen de HELE wereld (alle 114) voor typen/spreken
             this._alleTalen = (Array.isArray(d.alle) && d.alle.length) ? d.alle : d.talen;
-            // Dezelfde 24 kerntalen als op www staan vooraan; de overige
+            // Dezelfde 55 producttalen als op www staan vooraan; de overige
             // wereldtalen blijven vindbaar via land- of taalnaam.
             this._alleTalen = this._alleTalen.slice().sort((a, b) =>
               Number(!!b.kern) - Number(!!a.kern));

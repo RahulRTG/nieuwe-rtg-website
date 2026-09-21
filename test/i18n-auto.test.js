@@ -177,12 +177,33 @@ test('de kast ruimt de oude opslag-per-pagina eenmalig op', () => {
   assert.equal(opslag.getItem('rtg_tr_v2_opgeruimd'), '1', 'en het gebeurt maar een keer');
 });
 
-test('de 24 kerntalen wisselen atomair en markeren onvolledige schermen', () => {
+test('de 55 producttalen wisselen atomair en markeren onvolledige schermen', () => {
   const lezer = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-00b.js'), 'utf8');
   const schrijver = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-00c.js'), 'utf8');
+  const sleutelweg = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-01.js'), 'utf8');
+  const producttalen = require('../server/talen').KERN_TAALCODES;
+  assert.equal(producttalen.length, 55);
+  for (const code of producttalen) {
+    assert.match(lezer, new RegExp("'" + code + "'"), code + ' ontbreekt in het automatische vangnet');
+    assert.match(sleutelweg, new RegExp("'" + code + "'"), code + ' ontbreekt in de sleutelweg');
+  }
   assert.match(lezer, /var KERN = new Set/);
   assert.match(schrijver, /data-rtg-taal-volledig/);
   assert.match(schrijver, /herstel\(\)/, 'een mislukte kernvertaling herstelt de volledige brontaal');
+});
+
+test('de sleutelweg vertaalt alleen het huidige scherm en herneemt later toegevoegde onderdelen', () => {
+  const bron = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-01.js'), 'utf8');
+  assert.match(bron, /_relevanteSleutels\(en\)/,
+    'de zichtbare schermsleutels worden niet afzonderlijk bepaald');
+  assert.match(bron, /volledigWoordenboek === false \? this\._relevanteSleutels\(en\) : Object\.keys\(en\)/,
+    'de normale schermweg kan nog steeds niet van volledige voorverwarming worden gescheiden');
+  assert.doesNotMatch(bron, /const compleet = Object\.keys\(en\)\.every/,
+    'een verborgen woordenboek mag het geopende scherm niet blokkeren');
+  assert.match(bron, /state\.pending\) \{ state\.rerun=true/,
+    'een onderdeel dat tijdens een vertaalronde opent, moet daarna worden hervat');
+  assert.match(bron, /this\._planWereldDict\(this\.lang\)/,
+    'een later door JavaScript getekende sleutel moet zelf een vertaalronde starten');
 });
 
 test('de sleutelweg deelt de kast van de vangnetlaag', () => {
@@ -226,11 +247,16 @@ test('de statische voordeuren staan op EEN lijst, aan beide kanten gelijk', () =
      op een van de voordeuren niet meer doet. */
   const { VOORDEUREN, APP_OORSPRONG } = require('../server/lib/voordeuren');
   const bron = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-01.js'), 'utf8');
+  const vangnet = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-00b.js'), 'utf8');
   const m = bron.match(/const STATISCHE_VOORDEUREN = \[([^\]]*)\]/);
   assert.ok(m, 'de browserkant noemt de voordeuren');
   const inBrowser = m[1].split(',').map(x => x.trim().replace(/^'|'$/g, '')).filter(Boolean);
   assert.deepEqual(inBrowser, VOORDEUREN, 'server/lib/voordeuren.js is de bron');
   assert.match(bron, new RegExp("APP_OORSPRONG = '" + APP_OORSPRONG + "'"));
+  for (const voordeur of VOORDEUREN) assert.match(vangnet, new RegExp(voordeur.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
+    'het automatische vangnet mist de statische voordeur ' + voordeur);
+  assert.match(vangnet, new RegExp("appOorsprong = '" + APP_OORSPRONG + "'"),
+    'het automatische vangnet wijst niet naar dezelfde app-API');
 
   /* En de verhaalpagina's mogen die keuze niet met een vaste meta overrulen:
      dan haalt een eigen installatie zijn vertalingen bij ons op. */

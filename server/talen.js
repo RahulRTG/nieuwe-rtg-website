@@ -137,13 +137,15 @@ const TALEN = [
 
 const OP_CODE = new Map(TALEN.map(t => [t.code, t]));
 const BASIS = ['nl', 'en']; // altijd aan; kan niet uit
-/* De publieke website en de app voeren voor de grootste wereldtalen hetzelfde
-   kwaliteitscontract. De overige wereldtalen blijven beschikbaar, maar mogen
-   niet stil als gelijkwaardig aan de redactioneel onderhouden kernset worden
-   gepresenteerd. */
+/* De publieke website en alle apps voeren voor deze 55 producttalen hetzelfde
+   schermcontract. De overige wereldtalen blijven beschikbaar, maar mogen niet
+   stil als gelijkwaardig aan de onderhouden productset worden gepresenteerd. */
 const KERN_TAALCODES = Object.freeze([
   'nl', 'en', 'de', 'fr', 'es', 'pt', 'it', 'pl', 'ru', 'uk', 'tr',
-  'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'zh', 'ja', 'ko', 'id', 'vi', 'th', 'sw'
+  'ro', 'el', 'cs', 'sk', 'hu', 'bg', 'hr', 'sr', 'bs', 'sl', 'sv', 'no',
+  'da', 'fi', 'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'pa', 'gu', 'mr', 'ta',
+  'te', 'kn', 'ml', 'ne', 'si', 'zh', 'ja', 'ko', 'th', 'vi', 'id', 'ms',
+  'tl', 'km', 'my', 'sw', 'am', 'so', 'af', 'ha'
 ]);
 const KERN_SET = new Set(KERN_TAALCODES);
 /* Een verse RTG-installatie spreekt de hele wereld. De Boardroom kan talen

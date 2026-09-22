@@ -10,7 +10,9 @@
   function back() { X.go(scenes[Math.max(0, index - 1)].id); }
   function actions() {
     var id = scenes[index].id;
-    var rows = [{ label: index ? 'Verder in het verhaal' : 'Ontdek RTG', run: next }, { label: 'Direct naar de Playground', run: function () { X.go('moment'); } }];
+    var rows = [{ label: index ? 'Verder op deze pagina' : 'Bekijk het platform', run: next }, { label: 'Zoek in RTG', run: function () { if (w.RTGCommand) w.RTGCommand.open(); } }];
+    if (id === 'platform') rows = [{ label: 'Bekijk de verbindingsketen', run: function () { X.go('verbinding'); } }, { label: 'Verken de RTG Graph', run: function () { X.go('graph'); } }, { label: 'Explore RTG', run: function () { X.go('explore'); } }];
+    if (id === 'verbinding' || id === 'graph' || id === 'explore') rows = [{ label: 'Zoek een onderdeel', run: function () { if (w.RTGCommand) w.RTGCommand.open(); } }, { label: 'Kies een andere ingang', run: function () { X.go('platform'); } }, { label: 'Open de echte app', run: function () { w.location.assign('https://app.rahultravelgroup.com/apps/app.html'); } }];
     if (id === 'moment' || id === 'rahul') rows = [{ label: 'Bekijk het voorbeeldvoorstel', run: X.proposal }, { label: 'Verander de voorbeeldsituatie', run: function () { X.go('moment'); } }, { label: 'Bekijk uw RTG', run: function () { X.go('uw-rtg'); } }];
     if (id === 'uw-rtg') rows = [{ label: 'Waarom zie ik dit?', run: X.explain }, { label: 'Verken alle werelden', run: function () { X.go('werelden'); } }, { label: 'Reset mijn verkenning', run: X.reset }];
     if (id === 'werelden') rows = [{ label: 'Volgende wereld', run: function () { X.nextWorld(1); } }, { label: 'Vorige wereld', run: function () { X.nextWorld(-1); } }, { label: 'Kies een wereld', run: function () { panel('worldPanel', 'Uw vier werelden'); } }];
@@ -25,11 +27,11 @@
     panel('actionsPanel', scenes[index].dataset.scene, 'Kies wat u wilt doen.');
   }
   var host = { root: root, cfg: { home: '#top', kaart: 'Experience RTG' }, ctx: { title: 'Ontdek RTG' }, onEdgeAction: function (action) {
-    if (action === 'menu') panel('explorePanel', 'Experience RTG', 'U bepaalt waar u begint.');
+    if (action === 'menu') panel('explorePanel', 'Rahul Travel Group', 'Kies welk deel van het platform u wilt bekijken.');
     else if (action === 'worlds') panel('worldPanel', 'Uw vier werelden');
     else if (action === 'home') X.go('top');
     else if (action === 'back') back();
-    else if (action === 'ai') { X.go('rahul'); d.getElementById('intent').focus({ preventScroll: true }); }
+    else if (action === 'ai') { if (w.RTGCommand) w.RTGCommand.open(); }
     else if (action === 'context' || action === 'primary' || action === 'connect') actionPanel();
     else if (action === 'status' || action === 'presence') X.go('regie');
     else return false;
@@ -43,8 +45,8 @@
     var ids = rows.map(function (item, i) { return 'experience-action-' + i; });
     ['home', 'context', 'actions', 'connect', 'rahul'].forEach(function (deck) { edge.setProjection({ deck: deck, actions: ids }); });
     host.ctx.title = scenes[index].dataset.scene;
-    edge.continueWith({ title: host.ctx.title, copy: 'Uw verkenning. Uw volgende stap.' });
-    var caption = root.querySelector('.rtg-adaptive-caption'); if (caption) caption.textContent = index ? host.ctx.title : 'ONTDEK RTG';
+    edge.continueWith({ title: host.ctx.title, copy: 'Kies uw volgende stap.' });
+    var caption = root.querySelector('.rtg-adaptive-caption'); if (caption) caption.textContent = index ? host.ctx.title : 'RTG PLATFORM';
   }
   function measure() {
     pending = false;

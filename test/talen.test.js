@@ -28,10 +28,13 @@ test('register: dekt de wereld, kent endoniemen en Engelse namen', () => {
   assert.ok(!bestaat('xx'), 'onzin-codes bestaan niet');
 });
 
-test('register: www en app delen exact dezelfde 24 kerntalen', () => {
+test('register: www en app delen exact dezelfde 55 producttalen', () => {
   assert.deepEqual(KERN_TAALCODES, [
     'nl', 'en', 'de', 'fr', 'es', 'pt', 'it', 'pl', 'ru', 'uk', 'tr',
-    'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'zh', 'ja', 'ko', 'id', 'vi', 'th', 'sw'
+    'ro', 'el', 'cs', 'sk', 'hu', 'bg', 'hr', 'sr', 'bs', 'sl', 'sv', 'no',
+    'da', 'fi', 'ar', 'fa', 'he', 'hi', 'bn', 'ur', 'pa', 'gu', 'mr', 'ta',
+    'te', 'kn', 'ml', 'ne', 'si', 'zh', 'ja', 'ko', 'th', 'vi', 'id', 'ms',
+    'tl', 'km', 'my', 'sw', 'am', 'so', 'af', 'ha'
   ]);
   assert.ok(KERN_TAALCODES.every(code => bestaat(code) && isKerntaal(code)));
   const t = maakTalen({ db: { data: {} }, save: () => {} });

@@ -693,7 +693,7 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 9 delen, 1884 regels in de delen
+`public/shared/i18n/` -- 9 delen, 1933 regels in de delen
 
 | deel | onderwerp |
 |---|---|

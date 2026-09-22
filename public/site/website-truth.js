@@ -67,7 +67,31 @@
     zetTekst(element.querySelector('[data-app-truth-billing]'), pas.billingNote);
   }
 
+  function bindPlatformScreen(element, screen) {
+    zetTekst(element.querySelector('[data-app-truth-screen-audience]'), screen.audience);
+    zetTekst(element.querySelector('[data-app-truth-screen-name]'), screen.name);
+    zetTekst(element.querySelector('[data-app-truth-screen-summary]'), screen.summary);
+    zetTekst(element.querySelector('[data-app-truth-screen-note]'), screen.note);
+    vulLijst(element.querySelector('[data-app-truth-screen-actions]'), screen.actions);
+    var image = element.querySelector('[data-app-truth-screen-image]');
+    if (image) {
+      image.src = new URL(screen.image, middelenBasis).href;
+      image.alt = 'Echt scherm van ' + screen.name + ' in een afgeschermde testomgeving';
+    }
+    var link = element.querySelector('[data-app-truth-screen-link]');
+    if (link) {
+      link.href = naarApp(screen.route);
+      link.dataset.appPath = screen.route;
+      link.textContent = screen.action;
+    }
+  }
+
   function toepassen(data) {
+    window.RTGWebsiteTruth = data;
+    document.querySelectorAll('[data-app-truth-screen]').forEach(function (element) {
+      var screen = (data.platform || []).find(function (item) { return item.id === element.dataset.appTruthScreen; });
+      if (screen) bindPlatformScreen(element, screen);
+    });
     document.querySelectorAll('[data-app-truth-world]').forEach(function (element) {
       var wereld = data.worlds[element.dataset.appTruthWorld];
       if (wereld) bindWereld(element, wereld);
@@ -81,6 +105,7 @@
     var pasId = document.body.dataset.pass;
     if (pasId && data.passes[pasId]) bindPas(document.body, data.passes[pasId]);
     document.documentElement.dataset.websiteTruth = 'actueel';
+    window.dispatchEvent(new CustomEvent('rtg-website-truth', { detail: data }));
   }
 
   fetch(bron, { credentials: 'same-origin' })

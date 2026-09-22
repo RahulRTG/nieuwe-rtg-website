@@ -2,8 +2,10 @@
 'use strict';
 const { createHash } = require('node:crypto');
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+const evidenceDigest = binding => digest(JSON.stringify({ files: binding.files, runs: binding.runs }));
 function verify(binding, expected, files) {
   const errors = [];
+  if (!expected.evidenceDigest || evidenceDigest(binding) !== expected.evidenceDigest) errors.push('trusted-evidence-digest');
   for (const key of ['domain','commit','artifactDigest','policyDigest','contractDigests'])
     if (JSON.stringify(binding[key]) !== JSON.stringify(expected[key])) errors.push('binding:' + key);
   if (!/^[a-f0-9]{40}$/.test(binding.commit || '')) errors.push('commit-format');
@@ -26,4 +28,4 @@ function verify(binding, expected, files) {
   if (!binding.runs || !binding.runs.length) errors.push('missing-runs');
   return { valid: errors.length === 0, errors, authentication: 'UNSIGNED_LOCAL_INTEGRITY; trusted expected digests must be supplied independently' };
 }
-module.exports = { digest, verify };
+module.exports = { digest, evidenceDigest, verify };

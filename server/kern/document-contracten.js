@@ -9,6 +9,7 @@ function bevries(value) {
 const POLICY = bevries({ id: 'documents.owner@1', version: 1,
   authority: 'authenticated member, revalidated at transaction execution; owned vault resource',
   denial: 'unknown owner/resource: 404; invalid or revoked session: 401',
+  unavailable: '503 carries NOT_EVALUATED; an uncertain or unperformed check never attests ALLOW',
   guest: 'anonymous guest cannot mutate; registered free account can',
   rahul: 'same HTTP authority; server-held human confirmation required before dispatch' });
 const policyDigest = afdruk(POLICY);
@@ -22,5 +23,5 @@ function versie(it) {
   return createHash('sha256').update(JSON.stringify(velden.map(k => it[k] ?? null))).digest('hex');
 }
 const staat = it => ({ id: it.id, state: it.weg ? 'trashed' : 'active', version: versie(it) });
-const fout = (status, code, error) => ({ status, code, error, messageId: 'document.' + code, policy: { id: POLICY.id, digest: policyDigest, decision: [401, 404].includes(status) ? 'DENY' : 'ALLOW' } });
+const fout = (status, code, error) => ({ status, code, error, messageId: 'document.' + code, policy: { id: POLICY.id, digest: policyDigest, decision: status === 503 ? 'NOT_EVALUATED' : [401, 404].includes(status) ? 'DENY' : 'ALLOW' } });
 module.exports = { CONTRACTEN, POLICY, policyDigest, afdruk, versie, staat, fout };

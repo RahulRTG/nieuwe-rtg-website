@@ -58,6 +58,10 @@ test('authorization is required inside the transaction, including revocation whi
   assert.equal((await pending).code, 'authority_revoked'); assert.equal(f.item.weg, false);
   assert.equal((await f.execute('owner', f.input())).code, 'authority_revoked');
   assert.equal(f.all['lid:owner'].documentOperations, undefined);
+  const unavailable = factory({ store: 'unsupported' });
+  const failed = await unavailable('owner', f.input());
+  assert.equal(failed.status, 503);
+  assert.equal(failed.policy.decision, 'NOT_EVALUATED', 'a check never performed must not attest ALLOW');
 });
 test('browser transport retains operation identity across failed/delayed delivery and protects newer projections', async () => {
   const w = { crypto: { randomUUID } }; vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../public/shared/document-capability.js'), 'utf8'), { window: w });

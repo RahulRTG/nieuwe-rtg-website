@@ -5,6 +5,8 @@
    allowlist. Niet-toegestane eigenschappen zijn afwezig, niet null. */
 'use strict';
 
+const VERSION = 2;
+
 const NAMES = Object.freeze({
   VONK_PROFILE_OWNER: 'VONK_PROFILE_OWNER',
   VONK_DISCOVERY: 'VONK_DISCOVERY',
@@ -21,7 +23,9 @@ const NAMES = Object.freeze({
   RENDEZVOUS_TOGETHER: 'RENDEZVOUS_TOGETHER',
   RENDEZVOUS_MEET: 'RENDEZVOUS_MEET',
   RAHUL_CONNECTION: 'RAHUL_CONNECTION',
-  BACKOFFICE_SAFETY: 'BACKOFFICE_SAFETY'
+  BACKOFFICE_SAFETY: 'BACKOFFICE_SAFETY',
+  VONK_EDGE: 'VONK_EDGE',
+  RENDEZVOUS_EDGE: 'RENDEZVOUS_EDGE'
 });
 
 const CONTRACTS = Object.freeze({
@@ -40,7 +44,9 @@ const CONTRACTS = Object.freeze({
   [NAMES.RENDEZVOUS_TOGETHER]: ['samen', 'met', 'ikVerklaarde'],
   [NAMES.RENDEZVOUS_MEET]: ['setting', 'settingLabel', 'stad', 'van', 'tot', 'dagdeel', 'dagdeelLabel', 'ikAkkoord', 'anderAkkoord', 'tekst', 'bijRechterhand'],
   [NAMES.RAHUL_CONNECTION]: ['matchCodenaam', 'gedeeldeLocaties', 'openLocaties', 'watIkZoek', 'presence', 'gedeeldDagdeel', 'voorkeursStad'],
-  [NAMES.BACKOFFICE_SAFETY]: ['id', 'van', 'over', 'reden', 'at', 'status']
+  [NAMES.BACKOFFICE_SAFETY]: ['id', 'van', 'over', 'reden', 'at', 'status'],
+  [NAMES.VONK_EDGE]: ['surface', 'state', 'availableCapabilities', 'actions', 'stateRevision', 'policyVersion', 'projectionVersion', 'stateContractVersion'],
+  [NAMES.RENDEZVOUS_EDGE]: ['surface', 'state', 'availableCapabilities', 'actions', 'stateRevision', 'policyVersion', 'projectionVersion', 'stateContractVersion']
 });
 
 /* `null` mag betekenis hebben (bijvoorbeeld: het lid heeft nog niet
@@ -82,6 +88,9 @@ function project(name, source) {
   if (name === NAMES.RAHUL_CONNECTION) {
     if (aanwezig(s.presence)) uit.presence = s.presence.map(presence);
   }
+  if ((name === NAMES.VONK_EDGE || name === NAMES.RENDEZVOUS_EDGE) && aanwezig(s.actions)) {
+    uit.actions = s.actions.map(a => alleen(a, ['id', 'labelKey', 'capability', 'intent']));
+  }
   return uit;
 }
 
@@ -114,4 +123,4 @@ function rahulOutputGuard(tekst, toegestaneProjectie, priveBronnen) {
   return { ok: true, tekst: antwoord };
 }
 
-module.exports = { NAMES, CONTRACTS, project, projectList, rahulOutputGuard };
+module.exports = { VERSION, NAMES, CONTRACTS, project, projectList, rahulOutputGuard };

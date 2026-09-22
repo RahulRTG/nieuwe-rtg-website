@@ -151,6 +151,7 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     },
     tafelkaart: H.tafelkaart };
   const api = { vonkProfielZet: profielZet };
+  Object.assign(api, require('./state')({ d, mag, nu, geblokkeerd }));
   Object.assign(api, require('./selectie')(ctx));
   Object.assign(api, require('./kiezen')(ctx));
   Object.assign(api, require('./match')(ctx));

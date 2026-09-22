@@ -18,6 +18,8 @@ module.exports = (ctx) => {
     if (!doel || !d().profielen[doel]) return { status: 404, error: 'Geen Vonk-profiel met die codenaam.' };
     if (doel === key) return { status: 400, error: 'Uzelf liken hoeft niet.' };
     if (geblokkeerd(key, doel)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
+    if (d().matches.some(m => (m.a === key && m.b === doel) || (m.a === doel && m.b === key)))
+      return { status: 409, code: 'INVALID_PRODUCT_TRANSITION', error: 'Deze verbinding is al een match.' };
     d().likes = d().likes.filter(l => !(l.van === key && l.naar === doel));
     if (aan === false) { d().likes.push({ van: key, naar: doel, nee: true, at: nu() }); save(); return { status: 200, ok: true }; }
     d().likes.push({ van: key, naar: doel, at: nu() });

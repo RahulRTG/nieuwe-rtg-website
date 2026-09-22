@@ -145,6 +145,8 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
   // Arrange It: Rahul stelt samen, beiden keuren goed, De Rechterhand regelt
   const arrange = require('./rendezvous-arrange')({ R, AW, B, mag, codenaam, schoon, nu, save,
     matchesVan, tableZet, notify, Projection });
+
+  const stateApi = require('./rendezvous-state')({ R, mag, nu, geblokkeerd, ontdek, samen, matchesVan });
   /* rvKies en rvMeldingen komen uit de dating-premium-ronde (main): kiezen met
      drie acties (like/pas/blokkeer) en de meldingen voor kantoor. De routelaag
      stuurt like en pas daar al langs, dus rvLike/rvPas uit ontdek bestaan niet
@@ -152,6 +154,7 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
      samenvoeging eerder in het reisscherm liet zien. */
   return { rvProfielGet, rvProfiel, ...ontdek, ...kring, rvMatches, rvDate, rvAanwezigWis,
     rvKies, rvMeldingen,
+    ...stateApi,
     rvArrange: arrange.rvArrange, rvAkkoord: arrange.rvAkkoord,
     rvSamen: samen.rvSamen, rvSamenZet: samen.rvSamenZet };
 };

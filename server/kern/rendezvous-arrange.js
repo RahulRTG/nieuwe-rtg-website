@@ -34,6 +34,7 @@
    GEEN AANSPORING. Geen "de ander wacht", geen teller, geen herinnering.
    LIFE.md par. 4.1. */
 const Consent = require('./connection-consent');
+const RendezvousState = require('./connection-state-rendezvous');
 
 module.exports = (ctx) => {
   const { R, AW, B, mag, codenaam, schoon, nu, save, matchesVan, tableZet, notify, Projection } = ctx;
@@ -52,9 +53,7 @@ module.exports = (ctx) => {
   const paar = (a, b) => [a, b].sort().join('|');
   function V() { const r = R(); if (!r.voorstellen || typeof r.voorstellen !== 'object') r.voorstellen = {}; return r.voorstellen; }
   function ledger(v) { if (!v.toestemming || typeof v.toestemming !== 'object') v.toestemming = {}; return v.toestemming; }
-  const binding = (v, actor, counterpart) => ({ actor, counterpart,
-    purpose: 'rendezvous.arrange', capability: 'connection.meet.accept',
-    scope: v.id + ':' + v.setting, version: 1 });
+  const binding = RendezvousState.arrangeBinding;
   function actief(v, actor, counterpart) {
     /* Oude voorstellen blijven geldig tijdens de migratie. Nieuwe handelingen
        worden altijd in het doelgebonden ledger geschreven. */

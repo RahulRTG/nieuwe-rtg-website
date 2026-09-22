@@ -130,6 +130,31 @@ constitutionele, cross-product-, consent-, projectie- en non-interferencetests.
 Alleen na een volledig groene ronde schrijft het script het herleidbare
 `CONNECTION_CONSTITUTION.json` met een bronhash en feitelijke aantallen.
 
+### Ronde 3 — Product State & Edge Contract
+
+Ronde 2 is als afzonderlijk herstelpunt vastgelegd in commit `315bfce37`.
+Daarboven leiden `connection-state-vonk.js` en
+`connection-state-rendezvous.js` actuele productstates af uit de bestaande
+productopslag. Discovery, Conversation en Meet worden niet samengevoegd met
+Today, Introduction, Arrange It, The Table of Together.
+
+`connection-product-state.js` combineert productstate, actor, productpolicy,
+implementatiestatus, consent, blokkade en context. Alleen toegestane waarden
+komen als `availableCapabilities` uit de resolver. Een niet-beschikbare
+capability is afwezig; er wordt geen `false`-vlag naar de client gestuurd.
+
+De semantische Edge staat in `connection-edge.js`. Hij levert actienamen,
+vertaalsleutels, capabilities en intents via de benoemde projecties
+`VONK_EDGE` en `RENDEZVOUS_EDGE`. Dit is nadrukkelijk nog geen visueel ontwerp.
+Voice, Route en automatische Concierge ontbreken zolang hun capabilities
+`implemented: false` zijn.
+
+Iedere Edge-projectie bevat `stateRevision`, `policyVersion`,
+`projectionVersion` en `stateContractVersion`. Mutatieroutes herberekenen
+altijd eerst de actuele serverstate. Een meegestuurde oude revision krijgt
+`STALE_CONNECTION_STATE`; zonder revision kan de client evenmin iets openen,
+omdat capability en transition opnieuw server-side worden gecontroleerd.
+
 ## Gefixeerde bouwvolgorde
 
 0. baseline bevriezen;

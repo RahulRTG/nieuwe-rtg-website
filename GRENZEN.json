@@ -1152,6 +1152,7 @@
       "rvAkkoord",
       "rvArrange",
       "rvDate",
+      "rvEdge",
       "rvEncounter",
       "rvIntroAntwoord",
       "rvIntroducties",
@@ -1163,6 +1164,7 @@
       "rvProfielGet",
       "rvSamen",
       "rvSamenZet",
+      "rvStateGuard",
       "rvTafelAntwoord",
       "rvTafels",
       "salon",
@@ -2503,13 +2505,15 @@
       "vonkBericht",
       "vonkBetaal",
       "vonkBlokkeer",
+      "vonkEdge",
       "vonkHalfweg",
       "vonkKies",
       "vonkLike",
       "vonkMeldingen",
       "vonkMijn",
       "vonkProfielZet",
-      "vonkSelectie"
+      "vonkSelectie",
+      "vonkStateGuard"
     ],
     "voorspel": [
       "voorspel"

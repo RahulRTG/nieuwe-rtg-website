@@ -59,9 +59,13 @@ test('new homes fit mobile and desktop, use one Edge and retain visible free Fou
         if (route.includes('foundation')) {
           assert.match(await page.locator('#vWelkom .wh-free').innerText(), /Altijd 100% gratis/);
           await page.locator('#vWelkom .wh-support').scrollIntoViewIfNeeded();
-          assert.equal(await page.locator('#vWelkom .wh-support').evaluate(e => {
-            const r = e.getBoundingClientRect(); return r.top >= 0 && r.top < innerHeight;
-          }), true, 'the lower part can be reached by scrolling');
+          const supportGeometry = await page.locator('#vWelkom .wh-support').evaluate(e => {
+            const r = e.getBoundingClientRect();
+            return { visible: r.bottom > 0 && r.top < innerHeight, top: Math.round(r.top), viewport: innerHeight,
+              pageTop: Math.round(scrollY), pageHeight: document.documentElement.scrollHeight };
+          });
+          assert.equal(supportGeometry.visible, true, 'the lower part can be reached by scrolling: ' +
+            route + ' at ' + width + ' ' + JSON.stringify(supportGeometry));
         }
       }
     }

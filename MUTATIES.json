@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-22T06:24:24.555Z",
-    "commit": "e3709730c",
+    "op": "2026-09-22T14:54:01.853Z",
+    "commit": "8ef4a5975",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2174,6 +2174,30 @@
       "module": "scripts/doctrine.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-capability-storage.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "document-capability.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "document-capability.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
       "geprobeerd": 1
     },
     "doelbinding.test.js": {

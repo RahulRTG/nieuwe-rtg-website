@@ -2,24 +2,19 @@
 /* Onderteken een reeds door onafhankelijke partijen aangeleverd dossier.
    Dit maakt geen enkele controle groen: iedere PASS en ieder bewijsbestand
    moet al bestaan en kloppen. De privésleutel komt uitsluitend uit de secret
-   RTG_RELEASE_SIGN_KEY; de vaste publieke sleutel staat in deploy/. */
+   RTG_EVIDENCE_SIGN_KEY; het vaste evidence-anker staat in deploy/. */
 'use strict';
 
-const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const extern = require('../server/config/external-release');
+const trust = require('../server/config/release-trust');
 const { eisSchoneReleasebron } = require('./lib/productie-vrijgave');
 
 const ROOT = path.join(__dirname, '..');
 
 function priveSleutel(env) {
-  const ruw = String((env || process.env).RTG_RELEASE_SIGN_KEY || '');
-  if (!ruw) throw new Error('RTG_RELEASE_SIGN_KEY ontbreekt.');
-  const pem = ruw.includes('BEGIN') ? ruw : Buffer.from(ruw, 'base64').toString('utf8');
-  const sleutel = crypto.createPrivateKey(pem);
-  if (sleutel.asymmetricKeyType !== 'ed25519') throw new Error('De ondertekeningssleutel is geen Ed25519-sleutel.');
-  return sleutel;
+  return trust.privateKey('EVIDENCE', env);
 }
 
 function teken(root = ROOT, env = process.env) {
@@ -37,14 +32,8 @@ function teken(root = ROOT, env = process.env) {
     if (extern.sha256(bytes) !== String(bewijs.sha256).toLowerCase())
       throw new Error('Bewijsbytes wijken af voor ' + naam + '.');
   }
-  const publiekBytes = extern.leesRegulier(paden.sleutelPad, 16 * 1024);
-  const publiek = crypto.createPublicKey(publiekBytes);
-  if (publiek.asymmetricKeyType !== 'ed25519') throw new Error('Het vertrouwensanker is geen Ed25519-sleutel.');
-  const prive = priveSleutel(env);
-  const proef = Buffer.from('rtg-external-release-sleutelproef-v1');
-  if (!crypto.verify(null, proef, publiek, crypto.sign(null, proef, prive)))
-    throw new Error('RTG_RELEASE_SIGN_KEY hoort niet bij deploy/release-sleutel.pub.');
-  const handtekening = crypto.sign(null, dossierBytes, prive).toString('base64') + '\n';
+  const prive = trust.authorizedPrivate(root, 'EVIDENCE', env);
+  const handtekening = trust.sign('EVIDENCE', dossierBytes, prive) + '\n';
   const tijdelijk = paden.handtekeningPad + '.tmp-' + process.pid;
   fs.writeFileSync(tijdelijk, handtekening, { mode:0o600, flag:'wx' });
   fs.renameSync(tijdelijk, paden.handtekeningPad);

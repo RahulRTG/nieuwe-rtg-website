@@ -140,23 +140,22 @@ test('de signer tekent alleen een compleet dossier op een schone exacte HEAD', t
   const sleutels = crypto.generateKeyPairSync('ed25519');
   fs.mkdirSync(path.join(root, 'deploy'), { recursive:true });
   fs.writeFileSync(path.join(root, '.gitignore'), '.release/\n');
-  fs.writeFileSync(path.join(root, 'deploy', 'release-sleutel.pub'),
-    sleutels.publicKey.export({ type:'spki', format:'pem' }));
+  require('./release-trust-fixture').trustFixture(root, { EVIDENCE:sleutels });
   const git = (...args) => spawnSync('git', args, { cwd:root, encoding:'utf8' });
   assert.equal(git('init', '--quiet').status, 0);
   assert.equal(git('config', 'user.email', 'release@test.invalid').status, 0);
   assert.equal(git('config', 'user.name', 'Release Test').status, 0);
-  assert.equal(git('add', '.gitignore', 'deploy/release-sleutel.pub').status, 0);
+  assert.equal(git('add', '.gitignore', 'deploy').status, 0);
   assert.equal(git('commit', '--quiet', '-m', 'vertrouwensanker').status, 0);
   const commit = git('rev-parse', 'HEAD').stdout.trim();
   maakGetekendeVrijgave(root, { commit, sleutels, runtimeBewijs:false });
   fs.unlinkSync(path.join(root, '.release', 'external-release.sig'));
   const prive = sleutels.privateKey.export({ type:'pkcs8', format:'pem' }).toString('base64');
   const resultaat = require('../scripts/external-release-teken').teken(root,
-    { RTG_RELEASE_SIGN_KEY:prive });
+    { RTG_EVIDENCE_SIGN_KEY:prive });
   assert.equal(resultaat.ok, true);
 
-  fs.appendFileSync(path.join(root, 'deploy', 'release-sleutel.pub'), '\n');
+  fs.appendFileSync(path.join(root, 'deploy', 'evidence-sleutel.pub'), '\n');
   assert.throws(() => require('../scripts/external-release-teken').teken(root,
-    { RTG_RELEASE_SIGN_KEY:prive }), /productiebron bevat wijzigingen/);
+    { RTG_EVIDENCE_SIGN_KEY:prive }), /productiebron bevat wijzigingen/);
 });

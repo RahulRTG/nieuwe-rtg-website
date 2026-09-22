@@ -10,6 +10,7 @@ const promotie = require('../scripts/lib/productie-promotie');
 const { BRONNEN } = require('../scripts/lib/productie-vrijgave');
 const extern = require('../server/config/external-release');
 const { maakGetekendeVrijgave } = require('./foundation-vrijgave-fixture');
+const trust = require('../server/config/release-trust');
 
 const COMMIT = 'a'.repeat(40);
 const sha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
@@ -28,7 +29,7 @@ function kandidaat(backup) {
 function opstelling(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-promotie-'));
   t.after(() => fs.rmSync(root, { recursive:true, force:true }));
-  maakGetekendeVrijgave(root, { commit:COMMIT });
+  const { trustKeys } = maakGetekendeVrijgave(root, { commit:COMMIT });
   const bronnen = {};
   for (const [naam, rel] of Object.entries(BRONNEN)) {
     const pad = path.join(root, rel);
@@ -46,10 +47,8 @@ function opstelling(t) {
   status.bewijsSha256 = sha(JSON.stringify(status));
   const statusPad = path.join(root, '.release', 'productie-status.json');
   fs.writeFileSync(statusPad, JSON.stringify(status) + '\n');
-  const keys = crypto.generateKeyPairSync('ed25519');
-  fs.writeFileSync(path.join(root, promotie.REL.sleutel),
-    keys.publicKey.export({ type:'spki', format:'pem' }));
-  const document = { formaat:'rtg-productie-promotie-v1', gemaakt:new Date().toISOString(),
+  const keys = trustKeys.PROMOTION;
+  const document = { formaat:'rtg-productie-promotie-v2', ondertekenDomein:trust.ROLES.PROMOTION.domain, gemaakt:new Date().toISOString(),
     commit:COMMIT, release:status.release, goedgekeurdDoor:'Release Authority', besluit:'CAB-123',
     productionStatus:{ pad:'.release/productie-status.json',
       sha256:sha(fs.readFileSync(statusPad)), bewijsSha256:status.bewijsSha256 },
@@ -62,7 +61,7 @@ function opstelling(t) {
   fs.writeFileSync(path.join(root, promotie.REL.document), bytes);
   fs.writeFileSync(path.join(root, promotie.REL.handtekening),
     promotie.teken(bytes, keys.privateKey) + '\n');
-  return { root, status, statusPad };
+  return { root, status, statusPad, trustKeys, bytes };
 }
 
 test('aparte Ed25519-promotie bindt READY, kandidaat en alle bewijsbytes', t => {
@@ -98,4 +97,26 @@ test('tamper, verkeerde signer en ontbrekende promotieartefacten falen gesloten'
   s = opstelling(t);
   fs.rmSync(path.join(s.root, promotie.REL.document));
   assert.throws(() => promotie.controleer(s.root, COMMIT), /ontbreekt/);
+});
+
+test('build/evidence keys cannot authorize promotion even with a correctly typed promotion statement', t => {
+  const s = opstelling(t);
+  for (const wrong of ['BUILD', 'EVIDENCE']) {
+    fs.writeFileSync(path.join(s.root, promotie.REL.handtekening), promotie.teken(s.bytes, s.trustKeys[wrong].privateKey));
+    assert.throws(() => promotie.controleer(s.root, COMMIT), /release-authority-handtekening/);
+  }
+  fs.writeFileSync(path.join(s.root, promotie.REL.handtekening), trust.sign('BUILD', s.bytes, s.trustKeys.PROMOTION.privateKey));
+  assert.throws(() => promotie.controleer(s.root, COMMIT), /release-authority-handtekening/);
+  fs.writeFileSync(path.join(s.root, promotie.REL.handtekening), crypto.sign(null, s.bytes, s.trustKeys.PROMOTION.privateKey).toString('base64'));
+  assert.throws(() => promotie.controleer(s.root, COMMIT), /release-authority-handtekening/);
+});
+
+test('a valid promotion signature never upgrades a legacy or relabelled statement', t => {
+  const s = opstelling(t), document = JSON.parse(s.bytes);
+  for (const patch of [{ formaat:'rtg-productie-promotie-v1' }, { ondertekenDomein:trust.ROLES.EVIDENCE.domain }]) {
+    const bytes = Buffer.from(JSON.stringify({ ...document, ...patch }));
+    fs.writeFileSync(path.join(s.root, promotie.REL.document), bytes);
+    fs.writeFileSync(path.join(s.root, promotie.REL.handtekening), promotie.teken(bytes, s.trustKeys.PROMOTION.privateKey));
+    assert.throws(() => promotie.controleer(s.root, COMMIT), /niet exact/);
+  }
 });

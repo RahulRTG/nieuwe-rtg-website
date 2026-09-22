@@ -10,8 +10,9 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const trust = require('./release-trust');
 
-const FORMAAT = 'rtg-external-release-v2';
+const FORMAAT = 'rtg-external-release-v3';
 const MAX_DOSSIER_BYTES = 64 * 1024;
 const MAX_BEWIJS_BYTES = 32 * 1024 * 1024;
 const ALLE_CONTROLES = Object.freeze([
@@ -68,7 +69,8 @@ function leesRegulier(bestand, maximum) {
 
 function controleerStructuur(dossier, releaseCommit, vereisteControles, opties = {}) {
   if (!dossier || typeof dossier !== 'object' || Array.isArray(dossier) ||
-      dossier.formaat !== FORMAAT || dossier.geslaagd !== true) return fout('dossier-niet-groen');
+      dossier.formaat !== FORMAAT || dossier.ondertekenDomein !== trust.ROLES.EVIDENCE.domain ||
+      dossier.geslaagd !== true) return fout('dossier-niet-groen');
   const commit = String(dossier.commit || '').toLowerCase();
   const verwacht = String(releaseCommit || '').toLowerCase();
   if (!/^[a-f0-9]{40,64}$/.test(commit) || !/^[a-f0-9]{40,64}$/.test(verwacht) || commit !== verwacht)
@@ -96,7 +98,7 @@ function controleerStructuur(dossier, releaseCommit, vereisteControles, opties =
   return { ok:true, commit };
 }
 
-function controleerBestanden({ dossierPad, handtekeningPad, bewijsRoot, sleutelPad,
+function controleerBestanden({ dossierPad, handtekeningPad, bewijsRoot, sleutelPad, trustRoot,
   releaseCommit, vereisteControles = ALLE_CONTROLES, eisFoundationOpen = false } = {}) {
   try {
     const dossierBytes = leesRegulier(dossierPad, MAX_DOSSIER_BYTES);
@@ -107,7 +109,10 @@ function controleerBestanden({ dossierPad, handtekeningPad, bewijsRoot, sleutelP
       { eisFoundationOpen });
     if (!structuur.ok) return structuur;
 
-    const sleutelBytes = leesRegulier(sleutelPad, 16 * 1024);
+    if (!trustRoot || path.resolve(sleutelPad) !== path.resolve(trustRoot, trust.ROLES.EVIDENCE.publicFile))
+      return fout('verkeerd-evidence-vertrouwensanker');
+    const ankers = trust.anchors(trustRoot);
+    const sleutelBytes = ankers.EVIDENCE.bytes;
     let sleutel;
     try { sleutel = crypto.createPublicKey(sleutelBytes); }
     catch (e) { return fout('vertrouwenssleutel-ongeldig'); }
@@ -115,7 +120,7 @@ function controleerBestanden({ dossierPad, handtekeningPad, bewijsRoot, sleutelP
     const handtekeningTekst = leesRegulier(handtekeningPad, 1024).toString('ascii').trim();
     if (!/^[A-Za-z0-9+/]{86}==$/.test(handtekeningTekst)) return fout('handtekening-ongeldig');
     const handtekening = Buffer.from(handtekeningTekst, 'base64');
-    if (handtekening.length !== 64 || !crypto.verify(null, dossierBytes, sleutel, handtekening))
+    if (handtekening.length !== 64 || !trust.verify('EVIDENCE', dossierBytes, handtekeningTekst, sleutel))
       return fout('handtekening-klopt-niet');
 
     const bewijsMapStat = fs.lstatSync(bewijsRoot);
@@ -145,7 +150,7 @@ function padenVoorDossier(dossierPad, root) {
   const basis = path.dirname(dossierPad);
   return { dossierPad, handtekeningPad:path.join(basis, 'external-release.sig'),
     bewijsRoot:path.join(basis, 'external-evidence'),
-    sleutelPad:path.join(root, 'deploy', 'release-sleutel.pub') };
+    sleutelPad:path.join(root, trust.ROLES.EVIDENCE.publicFile), trustRoot:root };
 }
 
 function controleerReleaseRoot(root, releaseCommit) {

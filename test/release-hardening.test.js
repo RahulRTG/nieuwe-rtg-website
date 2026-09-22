@@ -167,11 +167,14 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen offici�
   const bron = lees('.github/workflows/release-image.yml');
   const afbouw = bron.indexOf('npm run afbouw:software');
   const pg = bron.indexOf('node scripts/pgtoetsen.js');
-  const sleutel = bron.indexOf('imageherkomst.js --sleutelcontrole');
+  const bootstrap = bron.indexOf('imageherkomst.js --sleutelcontrole');
+  const sleutel = bron.indexOf('imageherkomst.js --sleutelcontrole', afbouw);
   const kandidaat = bron.indexOf('docker push "$RTG_CANDIDATE_IMAGE"');
   const teken = bron.indexOf('imageherkomst.js --binden --eis-handtekening');
   const controle = bron.indexOf('imageherkomst.js --controle');
   assert.ok(afbouw >= 0 && afbouw < kandidaat, 'de volledige software-afbouw staat niet vóór het kandidaatimage');
+  assert.ok(bootstrap >= 0 && bootstrap < afbouw,
+    'de drie signingrollen worden niet vóór de bouw gecontroleerd');
   assert.ok(pg > afbouw && pg < kandidaat && /postgres:16-alpine/.test(bron) && /redis:7-alpine/.test(bron),
     'het kandidaatimage kan ontstaan zonder PostgreSQL/Redis-duurzaamheidsbewijs');
   assert.ok(sleutel > afbouw && sleutel < kandidaat,
@@ -196,7 +199,9 @@ test('live deploy vereist een aparte handmatig ondertekende productiepromotie', 
   const vrijgave = lees('scripts/live-vrijgave.js');
   const promotie = lees('scripts/lib/productie-promotie.js');
   assert.match(vrijgave, /productie-promotie.*controleer/);
-  assert.match(promotie, /RTG_PROMOTION_SIGN_KEY/);
+  assert.match(promotie, /trust\.authorizedPrivate\(root, 'PROMOTION', env\)/);
+  assert.equal(require('../server/config/release-trust').ROLES.PROMOTION.secret, 'RTG_PROMOTION_SIGN_KEY');
+  assert.match(promotie, /trust\.verify\('PROMOTION', documentBytes, sigTekst, key\)/);
   assert.match(promotie, /deploy\/promotie-sleutel\.pub/);
   assert.match(promotie, /bewijskaart/);
   assert.match(promotie, /live-kandidaat.*controleer/);

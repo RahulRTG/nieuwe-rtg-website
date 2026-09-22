@@ -107,10 +107,15 @@ npm run live:deploy            # gebruikt alleen bewezen digestrefs; bouwt niets
 npm run live:probe
 ```
 
-De twee ondertekeningssleutels zijn gescheiden: `RTG_RELEASE_SIGN_KEY` tekent
-het onafhankelijke externe dossier en `RTG_PROMOTION_SIGN_KEY` tekent het
-uiteindelijke menselijke promotiebesluit. Bewaar beide buiten de appomgeving;
-de promotiesleutel hoort uitsluitend bij de release-authority.
+Er zijn drie gescheiden ondertekeningsrollen. `RTG_RELEASE_SIGN_KEY` tekent
+uitsluitend buildherkomst (`RTG:BUILD:v1`), `RTG_EVIDENCE_SIGN_KEY` uitsluitend
+externe dossiers (`RTG:EXTERNAL-EVIDENCE:v1`) en `RTG_PROMOTION_SIGN_KEY` het
+menselijke promotiebesluit (`RTG:PROMOTION:v1`). De publieke ankers staan in
+`deploy/release-sleutel.pub`, `deploy/evidence-sleutel.pub` en
+`deploy/promotie-sleutel.pub`; ze moeten alle drie bestaan en verschillend zijn.
+Private keys horen uitsluitend in de bijbehorende secret store, nooit in de
+appomgeving, Git, terminaluitvoer of bewijsbundles. De buildjob krijgt alleen
+de build-private-key. Zie [trust-bootstrap en migratie](deploy/TRUST.md).
 
 Beschermde Foundation- en minderjarigenfuncties staan in de eerste release
 standaard server-side dicht. Het externe dossier legt dat vast met

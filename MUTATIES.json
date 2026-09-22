@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-21T17:10:49.393Z",
-    "commit": "ab1f4b3ac",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-22T05:58:24.762Z",
+    "commit": "9ae9beb3f",
+    "boomVuil": true,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -6939,6 +6939,14 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "release-trust.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/release-trust.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
     },
     "rem.test.js": {
       "soort": "puur",

@@ -1,5 +1,6 @@
 {
-  "formaat": "rtg-external-release-v2",
+  "formaat": "rtg-external-release-v3",
+  "ondertekenDomein": "RTG:EXTERNAL-EVIDENCE:v1",
   "geslaagd": false,
   "commit": "VUL-IN-VOLLEDIGE-GIT-SHA",
   "goedgekeurdDoor": "VUL-IN-NAAM-EN-ORGANISATIE",

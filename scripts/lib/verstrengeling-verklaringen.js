@@ -16,6 +16,8 @@
    Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
    DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
 module.exports = [
+  { van: 'domein:bestanden', naar: 'domein:document-capability', soort: 'DOMEINRELATIE',
+    reden: 'De persoonlijke bestandenkluis delegeert trash/restore aan haar eigen versiegebonden lifecyclecontract; UI, Edge Bar, API en bevestigde Rahul-aanvragen krijgen zo dezelfde eigenaarcontrole en transactie.' },
   /* DE KEURING ONDER DE VERTAALMOTOR. server/translate/ levert vertalingen en
      kern/taalkeuring.js beoordeelt of een modelantwoord er een mag heten. Dat
      is een rand tussen twee delen, en hij is er met opzet: de motor mag zijn

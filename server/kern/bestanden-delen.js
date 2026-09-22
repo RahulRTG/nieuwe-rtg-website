@@ -55,21 +55,16 @@ function maakBestandenDelen(basis) {
     if (buf.length > MAX_BESTAND) return { status: 413, error: 'Een bestand mag hooguit 15 MB zijn.' };
     // het quotum is van de eigenaar, ook als een gedeelde de versie plaatst
     if (gebruik(v.eigenaar) + buf.length > QUOTUM) return { status: 413, error: 'De kluis van de eigenaar is vol.' };
+    const verwacht = require('./document-contracten').versie(it);
     // een nieuwe versie is een vers bestand: dezelfde poort als een upload
     const besmet = scanOk ? await scanOk(key, dataUrl) : null;
     if (besmet) return besmet;
-    it.versies = it.versies || [];
-    it.versies.unshift({ ref: it.ref, bytes: it.bytes, op: it.gewijzigd || it.op, door: it.door || null });
-    // meer dan MAX_VERSIES bewaren we niet: de oudste valt eraf, inclusief de bytes
-    while (it.versies.length > MAX_VERSIES) wisBytes(it.versies.pop().ref);
-    it.ref = schrijfBytes(buf); it.bytes = buf.length; it.mime = m[1];
-    it.gewijzigd = nu(); it.door = v.eigenaar === key ? null : codenaamVan(key);
-    const mis = await vastleggen();
-    if (mis) return mis;
-    if (v.eigenaar !== key) {
-      try { sseToCustomer(v.eigenaar, 'bestanden', { kind: 'versie', naam: it.naam, door: codenaamVan(key) }); } catch (e) {}
+    const r = await require('./bestanden-versiecommit')(basis)({ key, eigenaar: v.eigenaar,
+      id: it.id, verwacht, buf, mime: m[1] });
+    if (!r.error && v.eigenaar !== key) {
+      try { sseToCustomer(v.eigenaar, 'bestanden', { kind: 'versie', id: it.id }); } catch (e) {}
     }
-    return { id: it.id, versies: it.versies.length };
+    return r;
   }
   function versies(key, bid) {
     const v = vind(String(bid || ''));
@@ -120,26 +115,29 @@ function maakBestandenDelen(basis) {
   }
 
   /* ---- de prullenbak: een zichtbare la met een klok erop, geen zwart gat ---- */
-  async function weg(key, bid) {
+  async function weg(key, bid, invoer) {
     const eigen = bord(key).items.find(x => x.id === String(bid || ''));
-    if (eigen) {
-      if (!eigen.weg) { eigen.weg = true; eigen.wegOp = nu(); return (await vastleggen()) || { prullenbak: true }; }
-      // tweede keer 'weg' vanuit de prullenbak = echt weg, met inhoud en versies
-      wisItem(eigen);
-      const b = bord(key); b.items = b.items.filter(x => x.id !== eigen.id);
-      return (await vastleggen()) || { weg: true };
-    }
-    const v = vind(String(bid || ''));                 // gedeeld: alleen uzelf eraf halen
+    if (eigen) return basis.documentActie(key, { ...(invoer || {}), id: bid,
+      capability: 'document.trash', contractVersion: 1 });
+    // Legacy recipient operation removes only their own sharing permission.
+    const v = vind(String(bid || ''));
     if (!v || !magErbij(key, v)) return { status: 404, error: 'Dat bestand staat niet in uw kluis.' };
     const code = codenaamVan(key);
     v.item.gedeeldMet = (v.item.gedeeldMet || []).filter(c => c !== code);
     return (await vastleggen()) || { ok: true };
   }
-  async function herstel(key, bid) {
-    const it = bord(key).items.find(x => x.id === String(bid || ''));
-    if (!it || !it.weg) return { status: 404, error: 'Dat bestand staat niet in de prullenbak.' };
-    it.weg = false; it.wegOp = null;
-    return (await vastleggen()) || { ok: true };
+  async function herstel(key, bid, invoer) {
+    return basis.documentActie(key, { ...(invoer || {}), id: bid,
+      capability: 'document.restore', contractVersion: 1 });
+  }
+  // Explicit legacy purge: separate intent, never inferred by /weg on a retry.
+  // Blob/metadata recovery for purge is NOT part of the trash/restore pilot.
+  async function wis(key, bid) {
+    const b = bord(key), it = b.items.find(x => x.id === String(bid || ''));
+    if (!it) return { status: 404, error: 'Dat bestand staat niet in uw kluis.' };
+    if (!it.weg) return { status: 409, error: 'Verplaats dit bestand eerst naar de prullenbak.' };
+    wisItem(it); b.items = b.items.filter(x => x.id !== it.id);
+    return (await vastleggen()) || { weg: true };
   }
   async function leegPrullenbak(key) {
     const b = bord(key);
@@ -151,7 +149,7 @@ function maakBestandenDelen(basis) {
 
   return { bestandenDeel: deel, bestandenVersieNieuw: versieNieuw, bestandenVersies: versies,
     bestandenVersieTerug: versieTerug, bestandenHaal: haal, bestandenWeg: weg,
-    bestandenHerstel: herstel, bestandenLeegPrullenbak: leegPrullenbak };
+    bestandenHerstel: herstel, bestandenWis: wis, bestandenLeegPrullenbak: leegPrullenbak };
 }
 
 module.exports = { maakBestandenDelen };

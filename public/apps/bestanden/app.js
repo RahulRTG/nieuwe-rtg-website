@@ -13,6 +13,10 @@
   var token = null;
   try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
   var api = function (pad, body) {
+    if ((pad === 'weg' || pad === 'herstel') && stand) {
+      var file = (stand.items || []).find(function (it) { return it.id === (body || {}).id; });
+      if (file) return window.RTGDocumentCapability(api, pad === 'weg' ? 'document.trash' : 'document.restore', file);
+    }
     return window.RTGOperation.requestJson(window.fetch.bind(window), '/api/bestanden/' + pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify(body || {})

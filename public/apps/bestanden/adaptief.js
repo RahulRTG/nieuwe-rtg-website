@@ -37,13 +37,25 @@
   function $(s) { return d.querySelector(s); }
   function B() { return w.RTGBestanden || null; }
   function P() { return w.RTGBestandenPaneel || null; }
-  function nu() { var p = P(); return (p && p.open && p.open()) || null; }
+  function nu() { var p = P(); return (p && p.huidig && p.huidig()) || null; }
   function aan() { var s = $('#bkScrim'); return !!(s && s.classList.contains('open')); }
 
   function tik(el) {
     if (!el) return;
     ['mousedown', 'mouseup', 'click'].forEach(function (n) {
       el.dispatchEvent(new w.MouseEvent(n, { bubbles: true, cancelable: true, view: w }));
+    });
+  }
+
+  function voerUit(pad, file, melding) {
+    var b = B();
+    return b.api(pad, { id: file.id }).then(function (r) {
+      if (r.status !== 200 || r.body.error) {
+        var error = r.body.error || 'De handeling is niet bevestigd.';
+        b.meld(error); throw new Error(error);
+      }
+      if (melding) b.meld(melding);
+      return b.laad().then(function () { if (P()) P().sluit(); });
     });
   }
 
@@ -116,20 +128,20 @@
     /* WEG: het gewicht komt uit de toestand. Zie de kop van dit bestand. */
     if (f.weg) {
       zet('bestanden.voorgoed', 'Voorgoed weg', '✕', 'bewust',
-        function () { b.api('weg', { id: f.id }).then(function () { b.meld('Voorgoed weg.'); b.laad(); }); },
+        function () { return voerUit('wis', f, 'Het bestand is definitief verwijderd.'); },
         { staat: { bevestiging: {
           watGebeurt: 'Dit bestand verdwijnt met al zijn versies. Herstellen kan hierna niet meer.',
           omvang: b.maat(f.bytes), knop: 'Voorgoed weggooien' } } });
       zet('bestanden.herstel', 'Terugzetten', '↺', 'licht',
-        function () { b.api('herstel', { id: f.id }).then(function () { b.meld('Terug in de kluis.'); b.laad(); }); });
+        function () { return voerUit('herstel', f, 'Het bestand staat weer in uw kluis.'); });
     } else if (f.vanMij) {
       zet('bestanden.weg', 'Verwijder', '✕', 'terug',
-        function () { b.api('weg', { id: f.id }).then(function () { b.laad(); }); },
+        function () { return voerUit('weg', f); },
         { staat: {
           /* De weg terug is dezelfde api() die het paneel gebruikt. Zonder deze
              functie zou `terug` een lege belofte zijn, en dan zet gewicht.js hem
              van rechtswege een trap hoger (GRAMMATICA.md). */
-          ongedaan: function () { b.api('herstel', { id: f.id }).then(function () { b.laad(); }); } } });
+          ongedaan: function () { return voerUit('herstel', f); } } });
     }
     return uit;
   }

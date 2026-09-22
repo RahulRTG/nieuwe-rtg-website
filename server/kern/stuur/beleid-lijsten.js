@@ -16,6 +16,7 @@
    met KLEIN hieronder, en niet in een commentaarregel. */
 const LEZEN = Object.freeze({
   member: [
+    /^\/api\/bestanden\/mijn$/,
     /^\/api\/kantoorpakket\/(mijn|open|versies|uitslag)$/,
     /^\/api\/onderwijs\/(advies|ladder|mijn)$/,
     /^\/api\/leerstof\/(vakken|les)$/,
@@ -105,6 +106,7 @@ const KLEIN = Object.freeze({
    de aanname. */
 const VOORSTEL = Object.freeze({
   member: [
+    /^\/api\/bestanden\/actie$/, // only the two explicit document contracts; never purge
     /^\/api\/kantoorpakket\/(maak|bewaar|deel|weg|ster|terug|fase|vul)$/,
     /^\/api\/onderwijs\/(inschrijf|jaar-over|doel)$/,
     /^\/api\/leerstof\/(examen|examen-antwoord)$/,

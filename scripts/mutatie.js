@@ -450,6 +450,10 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // The document pilot reaches this handler through HTTP, browser or child processes.
+  ['document-capability.test.js', ['server/kern/document-capability.js']],
+  ['document-capability-storage.test.js', ['server/kern/document-capability.js']],
+  ['document-capability.e2e.js', ['server/kern/document-capability.js']],
   // Deze proeven raken respectievelijk de Office-opslag via HTTP en een
   // testproxy via een lokale import. Richt bronmutaties op hun echte gedrag.
   ['office-save-atomic.test.js', ['server/kern/office/docs.js']],

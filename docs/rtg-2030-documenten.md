@@ -1,15 +1,15 @@
 # Eerste capabilitypilot — de betekenis van verwijderen
 
-Status: ontwerp, nog geen nieuwe runtimecapabilities. Basis:
+Status: eerste trash/restore-implementatie en gerichte lokale bewijsronde. Historische ontwerpbasis:
 `3af1a3edba382aee9bdf7b45a294ff35691a9765`.
 Hoort bij [RTG 2030](rtg-2030.md).
 
-## Bestaande semantiek
+## Semantiek vóór deze pilot
 
 De [route](../server/routes/bestanden.js) `POST /api/bestanden/weg` roept
 `bestandenWeg` aan in [bestanden-delen.js](../server/kern/bestanden-delen.js):
 
-| Actor en state | Huidig effect |
+| Actor en state | Effect in de historische ontwerpbasis |
 |---|---|
 | Eigenaar, bestand actief | `weg = true`, tijdstip opslaan, prullenbak tonen |
 | Eigenaar, bestand al in prullenbak | `wisItem`, huidige bytes en versies verwijderen, item verwijderen |
@@ -99,6 +99,52 @@ back-up mag een al bevestigde purge niet ongemerkt ongedaan maken.
    kandidaat. Bewijs schema- en datacompatibiliteit van rollback. Gebruik voor
    onomkeerbare purge geen oude fallback die het nieuwe contract omzeilt.
 
-Er wordt in deze ontwerpronde niets omgeschakeld. Deze pilot maakt één bestaande
-betekenisgrens concreet; de bestaande financiële P0-bewijsstap blijft daarnaast
-een zelfstandige releaseblokkade totdat het vereiste bewijs aanwezig is.
+## Implementatie van de eerste verticale proef
+
+De betekenisbron is [document-contracten.js](../server/kern/document-contracten.js).
+De uitvoering staat in [document-capability.js](../server/kern/document-capability.js).
+Een SQLite- of PostgreSQL-collectietransactie bindt eigenaar, verwachte versie,
+stateovergang en operatiebon. Een herhaling krijgt de oorspronkelijke effectbon
+én de actuele resourcestatus; een latere restore wordt niet door een oude trash
+ongedaan gemaakt. De opslag gooit replaybescherming nooit stil weg: bij 10.000
+bonnen per kluis sluit deze ingang tot expliciet bewaarbeheer beschikbaar is.
+
+`POST /api/bestanden/actie` accepteert alleen de twee v1-capabilities. De oude
+owner-routes `/weg` en `/herstel` gebruiken dezelfde functie en vereisen nu ook
+`operationId` en `expectedVersion`. Een oude client zonder deze velden krijgt
+428 en moet herladen. Het bijgewerkte scherm, gebaren en de standaard Edge Bar
+gebruiken [dezelfde adapter](../public/apps/bestanden/capability.js).
+Rahul gebruikt de bestaande `/api/member/doe`-voorstelketen: de server bewaart
+exacte invoer, en bevestiging hercontroleert actor en documentversie.
+Ook de buitenste bevestigingsroute passeert de algemene antwoordcaches niet:
+een hergebruikte bevestiging wordt door de goedkeuringsopslag geweigerd.
+
+De [opslagproeven](../test/document-capability-storage.test.js) onderzoeken twee
+processen, echte SQL-weigering en geïsoleerde crashes vóór/na commit. De
+[HTTP-proeven](../test/document-capability.test.js) toetsen semantiek, rechten,
+herhaling en Rahul. De [browserproef](../test/document-capability.e2e.js) bedient
+het echte documentpaneel en de Edge Bar met verschillende taalinstellingen.
+Uitvoer en cryptografische bronbinding staan bij de specifieke kandidaat in
+het dossier `output/document-pilot/` van de Codex-werkruimte; deze tekst is geen
+vervanging voor een geslaagde run.
+
+Deze proef dekt de persoonlijke bestandenkluis. Office, juridische documenten,
+organisationele bewaring en alle 114 vertalingen zijn hiermee niet bewezen.
+De Engelse en Arabische browserproef bewijst dezelfde handeling bij die
+taalinstellingen, geen volledige vertaling: met externe AI uit blijven delen
+van de interface Nederlands of Engels. Fysieke apparaten, volledige menselijke
+toegankelijkheidsbeoordeling en document-realtime zijn aparte bewijsstappen.
+Prullenbak-expiratie, bulk leegmaken en de nu expliciete legacy-route `/wis`
+behouden hun bestaande afzonderlijke uitvoering; hun blob/metadata-crashherstel
+blijft onbewezen. `/wis` wordt nooit door een trash-retry of door Rahul gekozen.
+Een onzekere uploadcommit laat voorbereide bytes behouden; opruiming van zulke
+orphan blobs vraagt een afzonderlijk herstelcontract. Er wordt geen R5-purge-
+correctness, volledige documentmigratie, productieartifact of rollback geclaimd.
+
+Voor UI/rechtenprojectie is bovendien hersteld dat het detailpaneel de Edge Bar
+verborg en zijn eigen contextgetter overschreef. Een Edge-actie meldt pas succes
+na een succesvol domeinantwoord. De generieke Edge-tekst claimt vooraf geen al
+gecontroleerd mandaat meer: de controle gebeurt bij uitvoering.
+
+De bestaande financiële P0-bewijsstap MONEY-012 blijft onafhankelijk releaseblokkerend.
+Deze ronde merge't of promoveert niets.

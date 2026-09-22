@@ -4,7 +4,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { randomUUID, randomBytes } = require('node:crypto'), { DatabaseSync } = require('node:sqlite');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, edgeActies, letOpFouten } = require('./helper');
 const pw = laadPlaywright();
 const cases = [
   ['trash-allow', 'documents.trash', false, 'ALLOW'], ['trash-deny', 'documents.trash', false, 'DENY'],
@@ -65,7 +65,7 @@ test('UI Edge API Rahul equivalence: ALLOW DENY INVALID STALE with identical act
           page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
           await page.addInitScript(token => { localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, owner);
           page.on('dialog', d => d.accept());
-          page.on('pageerror', e => browserErrors.push(e.message));
+          letOpFouten(page, browserErrors);
         }
         results[caller] = [];
         for (const f of fixtures) {

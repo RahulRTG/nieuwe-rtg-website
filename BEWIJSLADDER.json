@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-22T16:47:12.921Z",
-    "commit": "cda62c916",
-    "boomVuil": true,
-    "boomAnders": 1,
+    "op": "2026-09-22T16:47:39.675Z",
+    "commit": "9116a0458",
+    "boomVuil": false,
+    "boomAnders": 0,
     "instrument": "scripts/bewijsladder.js",
     "node": "v24.18.0"
   },
@@ -19,7 +19,7 @@
       "mechanismen": [
         {
           "doel": "git diff",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "ci.yml"
           ],
@@ -1120,7 +1120,7 @@
     "graadGemeten": 0,
     "graadVermoed": 12,
     "graadOnbekend": 0,
-    "alleenKeten": 24,
+    "alleenKeten": 23,
     "zonderTrede": 0
   }
 }

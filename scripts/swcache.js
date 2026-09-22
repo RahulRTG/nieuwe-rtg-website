@@ -14,31 +14,36 @@ const path = require('path');
 const crypto = require('crypto');
 
 const WORTEL = path.join(__dirname, '..');
-const SW = path.join(WORTEL, 'public', 'sw.js');
+const WERKERS = ['sw.js', 'apps/foundation/sw.js'];
 
 /* De afdruk komt uit ./lib/swvingerafdruk.js, want hij werd ook door
    scripts/build.js gerekend -- en die twee waren het niet eens. Zie de kop
    daar voor de drie verschillen en wat ze kostten. */
 const { schilVan, cachenaamVoor } = require('./lib/swvingerafdruk');
 
+for (const rel of WERKERS) {
+const SW = path.join(WORTEL, 'public', rel);
 const tekst = fs.readFileSync(SW, 'utf8');
 const schil = schilVan(tekst);
 if (!schil || !schil.length) {
-  console.error('[swcache] de SHELL-lijst in public/sw.js is niet te lezen');
-  process.exit(1);
+  console.error('[swcache] de SHELL-lijst in ' + rel + ' is niet te lezen');
+  process.exitCode = 1;
+  continue;
 }
 const uit = cachenaamVoor(tekst, path.join(WORTEL, 'public'));
 const hoort = uit && uit.nieuw;
 const staat = uit && uit.huidig;
 
 if (staat === hoort) {
-  console.log('[swcache] klopt: ' + staat + ' (' + schil.length + ' schilbestanden)');
-  process.exit(0);
+  console.log('[swcache] ' + rel + ' klopt: ' + staat + ' (' + schil.length + ' schilbestanden)');
+  continue;
 }
 if (!process.argv.includes('--schrijf')) {
-  console.error('[swcache] de cachenaam loopt achter op de schil: ' + staat + ' -> ' + hoort +
+  console.error('[swcache] ' + rel + ' loopt achter op de schil: ' + staat + ' -> ' + hoort +
     '\n           draai: node scripts/swcache.js --schrijf');
-  process.exit(1);
+  process.exitCode = 1;
+  continue;
 }
 fs.writeFileSync(SW, tekst.replace(/const CACHE = '[^']+'/, "const CACHE = '" + hoort + "'"));
-console.log('[swcache] bijgewerkt: ' + staat + ' -> ' + hoort);
+console.log('[swcache] ' + rel + ' bijgewerkt: ' + staat + ' -> ' + hoort);
+}

@@ -450,6 +450,11 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // Deze proeven raken respectievelijk de Office-opslag via HTTP en een
+  // testproxy via een lokale import. Richt bronmutaties op hun echte gedrag.
+  ['office-save-atomic.test.js', ['server/kern/office/docs.js']],
+  ['office-classificatie-grens.test.js', ['server/kern/office/rechten.js', 'server/kern/office/gezinsdeling.js', 'server/kern/office/samen.js']],
+  ['pg-fault-proxy.test.js', ['test/pg-fault-proxy.js']],
   // This test executes the browser language loader in a VM, not through require.
   ['i18n-dictionary.test.js', ['public/shared/i18n.js']],
   /* De grendel op een openbare Magnaat Test-installatie draait VOOR er ook maar

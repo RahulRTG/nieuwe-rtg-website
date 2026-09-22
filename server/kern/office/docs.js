@@ -128,14 +128,19 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
       return { status: 409, error: 'Dit document is intussen door iemand anders gewijzigd.',
         code: 'VERSIECONFLICT', huidig: d.gewijzigd, laatstDoor: d.laatstDoor || naamVan(d.key) };
     }
+    // Eerst alle invoer valideren. Een geweigerde opslag mag ook de titel in
+    // de gedeelde werkkopie niet wijzigen: een latere save zou die meenemen.
+    const nieuweInhoud = data.inhoud && typeof data.inhoud === 'object'
+      ? schoonInhoud(d.soort, data.inhoud) : null;
+    if (nieuweInhoud && grootteVan(nieuweInhoud) > MAX_BYTES)
+      return { status: 413, error: 'Dit document is te groot; kort het in.' };
     let veranderd = false;
     if (typeof data.titel === 'string' && d.key === key) {
       const titel = schoon(data.titel, MAX_TITEL) || d.titel;
       if (titel !== d.titel) { d.titel = titel; veranderd = true; }
     }
-    if (data.inhoud && typeof data.inhoud === 'object') {
-      const schoon2 = schoonInhoud(d.soort, data.inhoud);
-      if (grootteVan(schoon2) > MAX_BYTES) return { status: 413, error: 'Dit document is te groot; kort het in.' };
+    if (nieuweInhoud) {
+      const schoon2 = nieuweInhoud;
       // elke echte wijziging bewaart de vorige stand; de cap houdt het klein
       if (!d.versies) d.versies = [];
       if (JSON.stringify(schoon2) !== JSON.stringify(d.inhoud)) {
@@ -157,7 +162,7 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
     save();
     // wie meeleest of meeschrijft krijgt een seintje dat er iets veranderd is
     for (const mk of [...(d.gedeeldMet || []), ...(d.bewerkers || []), d.key]) {
-      if (mk === key) continue;
+      if (mk === key || !magLezen(d, mk)) continue;
       try { sseToCustomer(mk, 'office', { kind: 'gewijzigd', id: d.id }); } catch (e) {}
     }
     return { status: 200, ok: true, gewijzigd: d.gewijzigd, fase: faseVan(d) };

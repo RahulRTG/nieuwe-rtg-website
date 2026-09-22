@@ -4469,16 +4469,16 @@ console.log('\n54) de release-workflow publiceert niets zonder stuklijst en herk
     if (!/upload-artifact/.test(wf) || !/sbom\.json/.test(wf)) klachten.push('de stuklijst wordt niet bewaard: zonder upload blijft er na de run niets van over');
     /* Een sleutel die er WEL staat maar geen sleutel is, is erger dan geen
        sleutel: hij ziet eruit als een vertrouwensanker. */
-    const pubPad = path.join(ROOT, 'deploy/release-sleutel.pub');
-    if (fs.existsSync(pubPad)) {
+    const trust = require('../server/config/release-trust');
+    const ankerAanwezig = Object.values(trust.ROLES).some(rol => fs.existsSync(path.join(ROOT, rol.publicFile)));
+    if (ankerAanwezig) {
       try {
-        const sleutel = require('crypto').createPublicKey(fs.readFileSync(pubPad, 'utf8'));
-        if (sleutel.asymmetricKeyType !== 'ed25519') klachten.push('deploy/release-sleutel.pub is geen Ed25519-sleutel maar ' + sleutel.asymmetricKeyType);
-      } catch (e) { klachten.push('deploy/release-sleutel.pub is geen leesbare publieke sleutel: ' + e.message); }
+        trust.anchors(ROOT);
+      } catch (e) { klachten.push(e.message); }
     }
     if (klachten.length) klachten.forEach(fout);
     else ok('de workflow maakt de stuklijst na de push, bindt hem aan het digest, controleert en bewaart hem' +
-      (fs.existsSync(pubPad) ? ', en de vastgelegde publieke sleutel is een geldige Ed25519-sleutel' : ' (nog geen vastgelegde publieke sleutel: releases zijn ongetekend)'));
+      (ankerAanwezig ? ', met drie verschillende Ed25519-vertrouwensankers' : ' (trust-bootstrap ontbreekt: imagepublicatie en promotie blijven geblokkeerd)'));
   }
 }
 

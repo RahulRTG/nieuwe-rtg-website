@@ -92,13 +92,36 @@ test('RTG Commerce: een lid vult zijn mand bij twee verkopers, leest dat RTG nie
           && String(r.request().postData() || '').includes('"' + code + '"'), { timeout: 20000 });
         await page.selectOption('#kies', code);
         assert.equal((await klaar).status(), 200, 'de etalage van ' + code + ' komt van de server');
-        await page.waitForFunction(() => /^Te koop/.test((document.querySelector('#etalage') || { textContent: '' }).textContent.trim()),
-          null, { timeout: 15000 });
+        await page.waitForFunction(c => document.querySelector('#etalage').dataset.verkoper === c
+          && document.querySelector('#etalage').getAttribute('aria-busy') === 'false', code, { timeout: 15000 });
       };
       await page.goto(base + '/apps/commerce.html', { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => document.querySelectorAll('#kies option[value]').length > 0
         && document.querySelectorAll('#meters .meter').length === 8, null, { timeout: 20000 });
       assert.match(await page.locator('#meting-n').textContent(), /\d+ koopbaren/, 'de meting telt de levende koopbaren');
+
+      // A slow response from the previous seller must never replace the new
+      // selection. Hold a real Maison response, select Kikunoi, then release it.
+      await kies('KIKUNOI');
+      let releaseOld, oldReady;
+      const release = new Promise(r => { releaseOld = r; });
+      const ready = new Promise(r => { oldReady = r; });
+      const holdOld = async route => {
+        if (route.request().postDataJSON().verkoper !== 'MAISON') return route.continue();
+        const response = await route.fetch(); oldReady(); await release;
+        await route.fulfill({response});
+      };
+      await page.route('**/api/commerce/etalage', holdOld);
+      await page.selectOption('#kies', 'MAISON'); await ready;
+      await kies('KIKUNOI');
+      const oldDelivered = page.waitForResponse(r => r.url().endsWith('/api/commerce/etalage')
+        && r.request().postDataJSON().verkoper === 'MAISON');
+      releaseOld(); await (await oldDelivered).finished();
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      assert.equal(await page.locator('#kies').inputValue(), 'KIKUNOI');
+      assert.equal(await page.locator('#etalage').getAttribute('data-verkoper'), 'KIKUNOI', 'a late seller response cannot replace the chosen seller');
+      assert.match(await page.locator('#etalage').innerText(), /Een zaak is geen artikel/);
+      await page.unroute('**/api/commerce/etalage', holdOld);
 
       /* ---- 2. niet te koop: een reden, geen knop ---- */
       await kies('KIKUNOI');

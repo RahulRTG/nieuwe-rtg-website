@@ -37,7 +37,7 @@ async function zaak(code, wieNaam) {
 }
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_BIND: '127.0.0.1', STUN_UIT: '1' } });
   base = srv.base;
   const a = await lid(); const b = await lid();
   lidA = a.token; lidB = b.token; codeB = b.codenaam;
@@ -156,8 +156,8 @@ test('7. de AI-schrijfhulp: lokale hulp blijft werken, en alleen voor wie mag sc
   assert.equal((await api('/api/kantoorpakket/ai', { id, opdracht: 'samenvatten' }, lidB)).status, 403, 'zonder schrijfrechten geen AI-hulp');
 });
 
-test('9. RTF: elk gezinsprofiel een eigen map, delen binnen het gezin, gast leest mee', async () => {
-  // een gezin met twee profielen en een gekoppelde oppas (gast)
+test('9. RTF: elk gezinsprofiel een eigen map en delen binnen het gezin', async () => {
+  // een gezin met twee profielen
   const t = Date.now().toString().slice(-8);
   const g = await api('/api/foundation/gezin/maak', { gezinsnaam: 'Office ' + t, naam: 'Mama ' + t, pin: '1234' });
   const code = g.body.code;
@@ -201,10 +201,21 @@ test('10. RTF-gast (oppas of familielid): meelezen mag, maken en bewerken niet',
   const rtf = (pad, body, tok) => api('/api/rtf/kantoorpakket' + pad, Object.assign({ code, token: tok }, body || {}));
   const m = await rtf('/maak', { soort: 'tekst', titel: 'Weekbrief' }, g.body.token);
   await rtf('/gezin', { id: m.body.id, rechten: 'lezen' }, g.body.token);
-  // een oppas koppelt aan het gezin en krijgt een gast-token
-  const koppel = await api('/api/foundation/gast/koppel', { code, token: g.body.token, naam: 'Oppas Els' });
-  const gastTok = koppel.body && (koppel.body.token || (koppel.body.gast && koppel.body.gast.token));
-  if (!gastTok) return; // geen gastenkoppeling in deze opstelling; de kern-poort is dan al gedekt
+  assert.equal(m.status, 200, 'het gedeelde document bestaat');
+  // Een gast accepteert een persoonlijke uitnodiging met eigen toestemming.
+  // Een ontbrekende fixture mag de rechtencontroles nooit stil overslaan.
+  const uitnodiging = await api('/api/foundation/gezin/uitnodiging/maak', {
+    code, token: g.body.token, naam: 'Oppas Els', rol: 'gast'
+  });
+  assert.equal(uitnodiging.status, 200, 'de beheerder kan een gast uitnodigen');
+  assert.ok(uitnodiging.body.uitnodiging, 'de persoonlijke uitnodiging is aanwezig');
+  const koppel = await api('/api/foundation/gezin/uitnodiging/accepteer', {
+    uitnodiging: uitnodiging.body.uitnodiging, akkoord: true, privacyAkkoord: true, pin: '5656'
+  });
+  assert.equal(koppel.status, 200, 'de gast accepteert de uitnodiging');
+  assert.equal(koppel.body.profiel.rol, 'gast');
+  const gastTok = koppel.body.token;
+  assert.ok(gastTok, 'de gast heeft een eigen sessie');
   assert.equal((await rtf('/open', { id: m.body.id }, gastTok)).status, 200, 'de gast leest het gezinsdocument mee');
   assert.equal((await rtf('/maak', { soort: 'tekst' }, gastTok)).status, 403, 'de gast maakt niets aan');
   assert.equal((await rtf('/bewaar', { id: m.body.id, inhoud: { tekst: 'x' } }, gastTok)).status, 403);

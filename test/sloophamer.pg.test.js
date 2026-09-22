@@ -7,8 +7,8 @@
       updates onderweg, bestellingen + betalingen, leesverzoeken) verdeeld over
       A en B. De server mag onder die druk geen enkele 5xx-crash geven en moet
       daarna nog gezond zijn.
-   2. Netwerk-sabotage: midden in een actieve realtime-datastroom bevriezen we
-      Postgres (SIGSTOP), en herstellen daarna (SIGCONT). Liveness blijft groen,
+   2. Netwerk-sabotage: midden in een actieve realtime-datastroom verbreken we
+      uitsluitend de eigen PostgreSQL-proxyverbinding en herstellen die daarna. Liveness blijft groen,
       maar een mutatie mag zonder duurzame requestcommit geen succes teruggeven:
       hij faalt begrensd met 503, readiness sluit en opent pas na volledige
       resync. De geweigerde mutatie mag daarbij geen fantoomstaat achterlaten.
@@ -19,11 +19,6 @@
      DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtggrand \
      REDIS_URL=redis://127.0.0.1:6399 \
      node --test test/sloophamer.pg.test.js */
-/* Draait PostgreSQL lokaal in Docker, geef dan ook de expliciete wegwerpcontainer
-   mee: RTG_POSTGRES_CONTAINER=rtg-pg-proef. Alleen onder CI mag de toets zonder
-   die variabele de ene draaiende postgres:16-alpine-servicecontainer herkennen.
-   Bij nul of meerdere kandidaten faalt de storingproef gesloten; lokaal kiest de
-   toets nooit zelf een Docker-container. */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF. Verschillende
    PG-toetsen maken en droppen dezelfde tabellen (kv, tx_ledger, users), en
    `node --test` draait bestanden standaard PARALLEL: dan trekt de een de tabel
@@ -35,7 +30,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { maakPgStoringProxy } = require('./pg-fault-proxy');
 const { startServer, stop } = require('./helper');
 
 const HEEFT_PG = !!(process.env.DATABASE_URL || process.env.PG_URL);
@@ -71,45 +66,6 @@ async function wachtGereed(base, naam) {
   throw new Error(naam + ' werd niet opnieuw gereed: ' + JSON.stringify(laatste));
 }
 
-// een proces met SIGSTOP bevriezen / met SIGCONT hervatten (netwerk-partitie)
-const IS_CI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
-const IS_GITHUB_CI = process.env.GITHUB_ACTIONS === 'true';
-let bestuurdePostgresContainer = null;
-
-function vindCiPostgresContainer() {
-  if (!IS_GITHUB_CI) return null;
-  const uitvoer = execFileSync('docker', [
-    'ps',
-    '--filter', 'ancestor=postgres:16-alpine',
-    '--filter', 'status=running',
-    '--format', '{{.ID}}'
-  ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-  const kandidaten = uitvoer.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-  return kandidaten.length === 1 ? kandidaten[0] : null;
-}
-
-function seinNaar(patroon, sig) {
-  try {
-    if (patroon === 'postgres') {
-      const expliciet = String(process.env.RTG_POSTGRES_CONTAINER || '').trim();
-      const container = expliciet
-        || (sig === 'CONT' ? bestuurdePostgresContainer : null)
-        || vindCiPostgresContainer();
-      if (container) {
-        execFileSync('docker', [sig === 'STOP' ? 'pause' : 'unpause', container], { stdio: 'ignore' });
-        bestuurdePostgresContainer = sig === 'STOP' ? container : null;
-        return true;
-      }
-      // Een CI-run zonder exact één herkenbare servicecontainer mag nooit
-      // terugvallen op een brede processelectie op de host.
-      if (IS_CI) return false;
-    }
-    execFileSync('pkill', ['-' + sig, '-x', patroon], { stdio: 'ignore' });
-    return true;
-  }
-  catch (e) { return false; } // geen proces/container of geen recht om hem te besturen
-}
-
 let seq = 0;
 async function nieuwLid(base) {
   const u = (Date.now() + (++seq)).toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
@@ -122,6 +78,8 @@ async function nieuwLid(base) {
 test('SLOOPHAMER: stormloop, PostgreSQL-sabotage en betaalrace op gedeelde PG + Redis',
   { skip: OVERSLAAN }, async (t) => {
 
+  const pgProxy = await maakPgStoringProxy(process.env.DATABASE_URL || process.env.PG_URL);
+  t.after(() => pgProxy.sluit());
   const dirA = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sl-A-'));
   const dirB = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sl-B-'));
   // De productiegrens is 30 seconden. Voor een harde storingproef zetten we de
@@ -129,7 +87,7 @@ test('SLOOPHAMER: stormloop, PostgreSQL-sabotage en betaalrace op gedeelde PG + 
   // in plaats van dertig seconden op een bevroren socket te wachten. Deze grens
   // verandert de requestcommit-semantiek niet en blijft ruim boven een normale
   // lokale query.
-  const opslagGrenzen = { PG_QUERY_MS: '2000', PG_STATEMENT_MS: '2000', PG_CONNECT_MS: '2000' };
+  const opslagGrenzen = { DATABASE_URL: pgProxy.url, PG_URL: '', PG_QUERY_MS: '2000', PG_STATEMENT_MS: '2000', PG_CONNECT_MS: '2000' };
   const A = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dirA, ...opslagGrenzen } });
   const B = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dirB, ...opslagGrenzen } });
 
@@ -139,8 +97,7 @@ test('SLOOPHAMER: stormloop, PostgreSQL-sabotage en betaalrace op gedeelde PG + 
   await api(A.base, '/api/supplier/menu', { menu: [{ id: 'ramen', name: 'Ramen', price: 18, publiekePrijs: 18, cat: 'Warm', station: 'keuken', sectie: 'warm' }] }, supLogin.body.token);
 
   t.after(() => {
-    // laat de infra draaien zoals we hem vonden
-    seinNaar('postgres', 'CONT'); seinNaar('redis-server', 'CONT');
+    pgProxy.herstel();
     stop(A.child); stop(B.child);
     try { fs.rmSync(dirA, { recursive: true, force: true }); } catch (e) {}
     try { fs.rmSync(dirB, { recursive: true, force: true }); } catch (e) {}
@@ -212,9 +169,9 @@ test('SLOOPHAMER: stormloop, PostgreSQL-sabotage en betaalrace op gedeelde PG + 
     try {
       // Redis blijft bewust draaien: de 503 en gesloten readiness hieronder
       // kunnen daardoor alleen de PostgreSQL-waarheidsgrens bewijzen.
-      console.log('    STEKKER ERUIT: Postgres bevriezen...');
-      pgGestopt = seinNaar('postgres', 'STOP');
-      assert.equal(pgGestopt, true, 'de storingproef kon het PostgreSQL-proces niet bevriezen');
+      console.log('    STEKKER ERUIT: eigen PostgreSQL-verbinding verbreken...');
+      pgProxy.verbreek();
+      pgGestopt = true;
       await sleep(350);
 
       const begin = Date.now();
@@ -237,8 +194,8 @@ test('SLOOPHAMER: stormloop, PostgreSQL-sabotage en betaalrace op gedeelde PG + 
       assert.equal(gereedTijdens.body.writeHealthy, false,
         'de gesloten readiness komt aantoonbaar van de PostgreSQL-schrijfgrens');
     } finally {
-      console.log('    STEKKER ERIN: Postgres hervatten...');
-      if (pgGestopt) seinNaar('postgres', 'CONT');
+      console.log('    STEKKER ERIN: eigen PostgreSQL-verbinding herstellen...');
+      if (pgGestopt) pgProxy.herstel();
       loop = false;
       await stroom;
     }

@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const release = require('../release-bewijs');
 const bronRelease = require('../bron-release-bewijs');
 const herkomst = require('../imageherkomst');
+const trust = require('../../server/config/release-trust');
 
 const REL = Object.freeze({ kandidaat: '.release/live-kandidaat.json',
   image: '.release/live-kandidaat-image-bewijs.json',
@@ -41,7 +42,7 @@ function controleerKeten(root, { commit, verwijzing, digest, backup, inhoudSha25
   try {
     document = lees(root, documentRel);
     sbomBytes = fs.readFileSync(path.join(root, sbomRel));
-    publiek = fs.readFileSync(path.join(root, 'deploy', 'release-sleutel.pub'), 'utf8');
+    publiek = trust.anchors(root).BUILD.bytes;
   } catch (e) { throw new Error('Getekende imageherkomst/SBOM ontbreekt voor de kandidaat.'); }
   const controle = herkomst.controleerKandidaatHerkomst({ document, sbomBytes,
     publiekPem:publiek, draait:digest, commit, image:verwijzing,

@@ -27,7 +27,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 const fixture = require('./navigatie-index-fixture');
@@ -48,9 +48,10 @@ function zetWereld(TMP) {
   return index;
 }
 
-async function metLid(fn, { gps = true } = {}) {
+async function metLid(fn, { gps = true, nwb = false } = {}) {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-navkaarten-'));
   const index = zetWereld(TMP);
+  if (nwb) bouwPakket({ map: path.join(TMP, 'navigatie') });
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
   let browser;
   try {
@@ -86,6 +87,40 @@ async function paneelOpen(page) {
   await page.evaluate(() => document.getElementById('kaartenKnop').click());
   await page.waitForSelector('#kaartenPaneel.zien .kaartrij', { timeout: 60000 });
 }
+
+test('navigatie zonder WebGL: echte route sluiten, lagen bedienen en zoomen zonder 3D-renderer',
+  { skip: geenBrowser(pw) }, async () => {
+  await metLid(async ({ base, ctx }) => {
+    await ctx.addInitScript(() => {
+      localStorage.setItem('rtg_os_gps', '1');
+      const get = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (type, ...args) {
+        return /webgl/.test(type) ? null : get.call(this, type, ...args);
+      };
+    });
+    const page = await ctx.newPage(), errors = [];
+    letOpFouten(page, errors);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(base + '/apps/navigatie.html?naar=52.362,4.91&label=Testbestemming');
+    await page.waitForFunction(() => document.querySelector('#badge3d').textContent === '2D', null, { timeout: 10000 });
+    await page.locator('#paneel.zien').waitFor();
+    assert.equal(await page.locator('#bestemNaam').textContent(), 'Testbestemming');
+    await page.locator('#sluitPaneel').click();
+    await page.locator('#paneel.zien').waitFor({ state: 'hidden' });
+    const layer = page.locator('.lagen [data-laag="leverancier"]');
+    await layer.click();
+    assert.equal(await layer.getAttribute('aria-pressed'), 'false');
+    assert.deepEqual(errors, [], 'route sluiten en kaartlagen vereisen geen 3D-renderer');
+    const canvas = page.locator('#kaart');
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const before = await canvas.evaluate(e => e.toDataURL());
+    const b = await canvas.boundingBox();
+    await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+    await page.mouse.wheel(0, -300);
+    await page.waitForFunction(old => document.querySelector('#kaart').toDataURL() !== old, before);
+    assert.deepEqual(errors, [], 'ook zonder 3D blijven route en kaartbediening beschikbaar');
+  }, { nwb: true });
+});
 
 test('het kaartenpaneel toont de gebieden uit de index, met aangeboden en gebouwd apart',
   { skip: geenBrowser(pw) }, async () => {

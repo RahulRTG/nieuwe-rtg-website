@@ -98,10 +98,14 @@
       var knop = Array.from(root.querySelectorAll('.cmd-nav button[data-url]')).find(function (b) {
         try { return new URL(b.dataset.url, venster.location.href).pathname === pad; } catch (fout) { return false; }
       });
-      if (!knop) return;
+      var command = venster.RTGCommand;
+      if (!knop && !(command && typeof command.open === 'function')) return;
       ev.preventDefault(); ev.stopPropagation();
       if (indexOpen()) menu.click();
-      knop.click();
+      // Een nieuwe wereldhome hoeft geen oude publieke deur in de bank te
+      // vervangen. Ook die home opent via dezelfde bewaakte werktafel.
+      if (knop) knop.click();
+      else command.open(wereld.getAttribute('href'), wereld.textContent.trim());
     }, true);
     if (venster.MutationObserver) {
       var boom = new venster.MutationObserver(sync);

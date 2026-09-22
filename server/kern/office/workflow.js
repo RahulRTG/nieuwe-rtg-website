@@ -47,7 +47,7 @@ module.exports = ({ save, sseToCustomer }, basis) => {
       : naar === 'archief' ? 'gearchiveerd' : 'concept-heropend', { van, naar });
     save();
     for (const mk of [...(d.gedeeldMet || []), ...(d.bewerkers || []), d.key]) {
-      if (mk === key) continue;
+      if (mk === key || !magLezen(d, mk)) continue;
       try { sseToCustomer(mk, 'office', { kind: 'status', id: d.id, titel: d.titel, van, naar }); } catch (e) {}
     }
     return { status: 200, ok: true, fase: naar, gewijzigd: d.gewijzigd,

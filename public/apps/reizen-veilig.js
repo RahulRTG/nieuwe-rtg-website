@@ -28,7 +28,7 @@
     $('#rvPanes').appendChild(el);panes.push({id:id,titel:a[0],el:el});kies(panes.length-1);haak(el);if(id==='overzicht')laadMomenten(el)
   }
   function kies(i){actief=i;panes.forEach(function(p,n){p.el.classList.toggle('actief',n===i)});teken();document.querySelectorAll('[data-open]').forEach(function(b){b.classList.toggle('actief',b.dataset.open===panes[i].id);b.setAttribute('aria-current',b.dataset.open===panes[i].id?'page':'false')});context();meldAdaptief()}
-  function teken(){var t=$('#rvTabs');t.innerHTML='';panes.forEach(function(p,i){var b=document.createElement('button');b.className='rv-tab'+(i===actief?' actief':'');b.textContent=p.titel;b.onclick=function(){kies(i)};t.appendChild(b)})}
+  function teken(){var t=$('#rvTabs');t.innerHTML='';panes.forEach(function(p,i){var b=document.createElement('button');b.className='rv-tab'+(i===actief?' actief':'');b.textContent=p.titel;b.dataset.rtgActionKey='reisveilig.'+p.id;b.onclick=function(){kies(i)};t.appendChild(b)})}
   function haak(el){el.querySelectorAll('[data-action]').forEach(function(b){b.onclick=function(){open(b.dataset.action,innerWidth>760)}});el.querySelectorAll('[data-circle=maak]').forEach(function(b){b.onclick=function(){$('#rvMomentFout').textContent='';$('#rvDialoog').showModal()}});gebaren(el)}
   /* De regels van 'Uw eerstvolgende moment' dragen hun acties (shared/gebaar.js):
      veeg naar links om te doen wat de regel voorstelt, naar rechts om hem over

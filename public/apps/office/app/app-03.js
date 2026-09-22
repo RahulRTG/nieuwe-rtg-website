@@ -60,7 +60,7 @@
   });
 
   /* RTDocs is de rustige voorzijde van deze documentmotor. De voorzijde
-     krijgt bewust alleen deze vier deuren: dezelfde API, dezelfde lijst en
+     gebruikt dezelfde API, dezelfde lijst en
      dezelfde editor. Zo ontstaan er geen tweede documentenmodel en geen
      schaduwversies naast RTG Office. */
   window.RTGOffice = Object.freeze({
@@ -68,6 +68,8 @@
     laad: laadLijst,
     openen: openen,
     nieuw: nieuw,
+    verwijderen: verwijderen,
+    markeren: markeren,
     stand: function () { return stand; }
   });
 

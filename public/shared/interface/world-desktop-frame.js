@@ -90,11 +90,11 @@
           b.onclick = function () { var latest = A.voorNu().find(function (i) { return i.id === item.id; });
             if (latest) { w.RTGAdaptiveEdge.setDeck('home'); w.RTGAdaptiveEdge.setState('dock'); buttons.voer(latest); } }; container.appendChild(b); });
       }
-      collect(scope.doc, true).forEach(function (source) {
+      collect(scope.doc, true, items).forEach(function (source) {
         var el = source.el, b = U.el('button', 'rtg-adaptive-sheet-action', el.getAttribute('aria-label') || el.textContent.trim());
         b.type = 'button'; b.dataset.desktopSource = el.id || ''; b.disabled = el.disabled || el.getAttribute('aria-disabled') === 'true';
         b.onclick = function () {
-          if (!collect(scope.doc, true).some(function (s) { return s.el === el; }) || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
+          if (!collect(scope.doc, true, items).some(function (s) { return s.el === el; }) || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
           w.RTGAdaptiveEdge.setDeck('home'); w.RTGAdaptiveEdge.setState('dock'); el.click();
         }; container.appendChild(b);
       }); return true;

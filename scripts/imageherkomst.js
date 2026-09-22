@@ -40,14 +40,13 @@
    sleutel had. De controle leest deploy/release-sleutel.pub -- wie een vals
    herkomstdocument maakt, moet dus ook een commit in deze repository krijgen.
 
-   Draai:
-     node scripts/herkomst.js --nieuwe-sleutel
-     node scripts/herkomst.js --sleutelcontrole
-     node scripts/herkomst.js --sbom --image=ghcr.io/org/app:v1 --uit=.release/sbom.json
-     node scripts/herkomst.js --binden --image=ghcr.io/org/app:v1 --digest=sha256:... \
+   Bootstrap echte identiteiten uitsluitend volgens deploy/TRUST.md. Draai:
+     node scripts/imageherkomst.js --sleutelcontrole
+     node scripts/imageherkomst.js --sbom --image=ghcr.io/org/app:v1 --uit=.release/sbom.json
+     node scripts/imageherkomst.js --binden --image=ghcr.io/org/app:v1 --digest=sha256:... \
           --sbom=.release/sbom.json --uit=.release/herkomst.json
-     node scripts/herkomst.js --controle --herkomst=.release/herkomst.json
-     node scripts/herkomst.js --controle --herkomst=.release/herkomst.json --draait=sha256:...
+     node scripts/imageherkomst.js --controle --herkomst=.release/herkomst.json
+     node scripts/imageherkomst.js --controle --herkomst=.release/herkomst.json --draait=sha256:...
    ========================================================================== */
 'use strict';
 
@@ -55,9 +54,9 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const cp = require('child_process');
+const trust = require('../server/config/release-trust');
 
 const WORTEL = path.join(__dirname, '..');
-const SLEUTELBESTAND = path.join(WORTEL, 'deploy', 'release-sleutel.pub');
 const STANDAARD_SBOM = '.release/sbom.json';
 const STANDAARD_HERKOMST = '.release/herkomst.json';
 const UITVOER_BESTANDEN = Object.freeze({
@@ -255,21 +254,9 @@ function nieuweSleutel() {
   };
 }
 
-/* De privésleutel komt uit de omgeving en nooit uit een bestand in de
-   repository. In CI is dat een secret; op een laptop een export uit de
-   secrets manager. Base64 mag, want een PEM met echte nieuwe regels overleeft
-   niet elke secret-store. */
-function priveUitOmgeving(env) {
-  const ruw = (env || process.env).RTG_RELEASE_SIGN_KEY || '';
-  if (!ruw) return null;
-  const tekst = ruw.includes('BEGIN') ? ruw : Buffer.from(ruw, 'base64').toString('utf8');
-  if (!tekst.includes('BEGIN')) throw new Error('RTG_RELEASE_SIGN_KEY is geen PEM en geen base64-PEM.');
-  return crypto.createPrivateKey(tekst);
-}
-
 function teken(document, priveSleutel) {
   const bytes = Buffer.from(canoniek(document), 'utf8');
-  return crypto.sign(null, bytes, priveSleutel).toString('base64');
+  return trust.sign('BUILD', bytes, priveSleutel);
 }
 
 function controleerHandtekening(document, handtekening, publiekPem) {
@@ -281,7 +268,7 @@ function controleerHandtekening(document, handtekening, publiekPem) {
     if (sleutel.asymmetricKeyType !== 'ed25519' ||
         !/^[A-Za-z0-9+/]{86}==$/.test(String(handtekening || ''))) return false;
     const sig = Buffer.from(handtekening, 'base64');
-    return sig.length === 64 && crypto.verify(null, bytes, sleutel, sig);
+    return sig.length === 64 && trust.verify('BUILD', bytes, handtekening, sleutel);
   } catch (e) { return false; }
 }
 
@@ -302,7 +289,8 @@ function sleutelpaarKlopt(priveSleutel, publiekPem) {
    ------------------------------------------------------------------------- */
 function maakHerkomst({ image, digest, sbomBytes, sbomComponenten, bewijs, bron, bouw, uitvoering, gemaakt }) {
   return {
-    formaat: 'rtg-herkomst-v1',
+    formaat: 'rtg-herkomst-v2',
+    ondertekenDomein: trust.ROLES.BUILD.domain,
     gemaakt,
     image: { verwijzing: image || null, digest: digest || null },
     sbom: { sha256: sha256(sbomBytes), componenten: sbomComponenten, formaat: 'CycloneDX-1.5' },
@@ -315,7 +303,8 @@ function maakHerkomst({ image, digest, sbomBytes, sbomComponenten, bewijs, bron,
 
 function controleerHerkomst({ document, sbomBytes, publiekPem, draait }) {
   const klachten = [];
-  if (!document || document.formaat !== 'rtg-herkomst-v1') return { ok: false, klachten: ['Onbekend of beschadigd herkomstdocument.'] };
+  if (!document || document.formaat !== 'rtg-herkomst-v2' || document.ondertekenDomein !== trust.ROLES.BUILD.domain)
+    return { ok: false, klachten: ['Onbekend formaat of verkeerd signature-domein voor buildherkomst.'] };
 
   if (!document.handtekening || !document.handtekening.waarde) {
     klachten.push('Er staat geen handtekening onder dit document.');
@@ -448,29 +437,12 @@ function leesJson(rel) {
    DE VIER STANDEN.
    ------------------------------------------------------------------------- */
 function doeNieuweSleutel() {
-  const sleutel = nieuweSleutel();
-  console.log('DE PRIVESLEUTEL (nu naar je secrets manager, nooit naar de repository):');
-  console.log('RTG_RELEASE_SIGN_KEY=' + Buffer.from(sleutel.prive).toString('base64'));
-  console.log('');
-  console.log('DE PUBLIEKE SLEUTEL (hoort WEL in de repository, in deploy/release-sleutel.pub):');
-  console.log(sleutel.publiek.trim());
-  console.log('');
-  console.log('Zet hem neer met: node scripts/herkomst.js --nieuwe-sleutel --schrijf-publiek');
-  if (process.argv.includes('--schrijf-publiek')) {
-    schrijf('deploy/release-sleutel.pub', sleutel.publiek);
-    console.log('Geschreven: deploy/release-sleutel.pub -- commit dit bestand.');
-  }
+  throw new Error('Maak echte signingkeys rechtstreeks in de bevoegde secret store; private keys worden nooit naar terminal of bestanden uitgevoerd. Zie deploy/TRUST.md.');
 }
 
 function doeSleutelcontrole() {
-  if (!fs.existsSync(SLEUTELBESTAND))
-    throw new Error('deploy/release-sleutel.pub ontbreekt; publicatie zonder vastgelegd vertrouwensanker is verboden.');
-  const prive = priveUitOmgeving();
-  if (!prive) throw new Error('RTG_RELEASE_SIGN_KEY ontbreekt; een ongetekend image mag niet worden gepubliceerd.');
-  const publiek = fs.readFileSync(SLEUTELBESTAND, 'utf8');
-  if (!sleutelpaarKlopt(prive, publiek))
-    throw new Error('RTG_RELEASE_SIGN_KEY hoort niet bij deploy/release-sleutel.pub.');
-  console.log('Release-ondertekening gereed: privésleutel en vastgelegd vertrouwensanker horen bij elkaar.');
+  trust.authorizedPrivate(WORTEL, 'BUILD');
+  console.log('Build-ondertekening gereed: drie gescheiden publieke rollen en passende build-private-key.');
 }
 
 function doeSbom() {
@@ -539,24 +511,17 @@ function doeBinden() {
     gemaakt: new Date().toISOString()
   });
 
-  const prive = priveUitOmgeving();
-  if (prive) {
-    document.handtekening = {
-      algoritme: 'ed25519',
-      publiekeSleutelSha256: sha256(crypto.createPublicKey(prive).export({ type: 'spki', format: 'der' })),
-      waarde: teken(document, prive)
-    };
-  }
+  const prive = trust.authorizedPrivate(WORTEL, 'BUILD');
+  document.handtekening = {
+    algoritme: 'ed25519',
+    publiekeSleutelSha256: sha256(crypto.createPublicKey(prive).export({ type: 'spki', format: 'der' })),
+    waarde: teken(document, prive)
+  };
 
   const pad = schrijf(uit, JSON.stringify(document, null, 2) + '\n');
   console.log('Herkomstdocument geschreven: ' + pad);
   console.log('  image   ' + digest);
   console.log('  sbom    ' + document.sbom.sha256 + ' (' + document.sbom.componenten + ' componenten)');
-  if (!prive) {
-    console.log('ONGETEKEND: RTG_RELEASE_SIGN_KEY staat niet in de omgeving.');
-    console.log('Een herkomstdocument zonder handtekening is een notitie, geen bewijs.');
-    if (process.argv.includes('--eis-handtekening')) process.exitCode = 1;
-  }
 }
 
 function doeControle() {
@@ -568,7 +533,7 @@ function doeControle() {
   let sbomBytes = null;
   try { sbomBytes = fs.readFileSync(path.resolve(WORTEL, sbomPad)); } catch (e) { /* zonder stuklijst toetsen we alleen de handtekening */ }
 
-  const publiekPem = fs.existsSync(SLEUTELBESTAND) ? fs.readFileSync(SLEUTELBESTAND, 'utf8') : null;
+  const publiekPem = trust.anchors(WORTEL).BUILD.bytes;
   const streng = process.argv.includes('--eis-kandidaat');
   const r = streng
     ? controleerKandidaatHerkomst({ document, sbomBytes, publiekPem,
@@ -594,7 +559,7 @@ function hoofd() {
   if (process.argv.includes('--sbom')) return doeSbom();
   if (process.argv.includes('--binden')) return doeBinden();
   if (process.argv.includes('--controle')) return doeControle();
-  console.log('Gebruik: --nieuwe-sleutel | --sleutelcontrole | --sbom | --binden | --controle (zie de kop van dit bestand).');
+  console.log('Gebruik: --sleutelcontrole | --sbom | --binden | --controle (bootstrap: deploy/TRUST.md).');
   process.exitCode = 1;
 }
 

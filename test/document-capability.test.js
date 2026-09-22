@@ -13,7 +13,7 @@ const api = async (pad, body, token = a, transportKey) => {
 };
 const act = body => api('/api/bestanden/actie', body);
 const list = async () => (await api('/api/bestanden/mijn')).body.items;
-const input = (file, capability = 'document.trash') => ({ capability, contractVersion: 1,
+const input = (file, capability = 'documents.trash') => ({ capability, contractVersion: 1,
   operationId: crypto.randomUUID(), id: file.id, expectedVersion: file.documentVersion });
 async function file() {
   const r = await api('/api/bestanden/upload', { naam: 'pilot.txt', dataUrl: 'data:text/plain;base64,cHJvb2Y=' });
@@ -42,7 +42,7 @@ test('one logical trash survives concurrent retries; content and versions remain
   assert.equal((await list()).find(x => x.id === f.id).weg, true);
   assert.equal((await api('/api/bestanden/haal', { id: f.id })).body.dataUrl, 'data:text/plain;base64,cHJvb2Yy');
   assert.equal((await api('/api/bestanden/haal', { id: f.id, versie: 0 })).body.dataUrl, 'data:text/plain;base64,cHJvb2Y=');
-  const restore = input((await list()).find(x => x.id === f.id), 'document.restore');
+  const restore = input((await list()).find(x => x.id === f.id), 'documents.restore');
   const restored = await act(restore);
   assert.equal(restored.status, 200, JSON.stringify(restored));
   assert.equal(restored.body.resource.state, 'active', JSON.stringify(restored));
@@ -60,7 +60,7 @@ test('changed input, stale versions, unknown contracts and forged authority fail
   assert.equal((await act({ ...body, capability: 'document.purge' })).status, 400);
   assert.equal((await act({ ...body, operationId: [body.operationId] })).status, 428);
   assert.equal((await act(body)).status, 200);
-  assert.equal((await act({ ...body, capability: 'document.restore' })).body.code, 'operation_conflict');
+  assert.equal((await act({ ...body, capability: 'documents.restore' })).body.code, 'operation_conflict');
   assert.equal((await act({ ...body, operationId: crypto.randomUUID() })).body.code, 'version_conflict');
 });
 
@@ -83,9 +83,9 @@ test('legacy owner paths require explicit operation and cannot infer permanent d
   assert.equal((await api('/api/bestanden/weg', body)).body.capability, capability);
   assert.equal((await api('/api/bestanden/weg', body)).body.herhaald, true);
   assert.equal((await api('/api/bestanden/haal', { id: f.id })).status, 200);
-  const restore = input((await list()).find(x => x.id === f.id), 'document.restore');
+  const restore = input((await list()).find(x => x.id === f.id), 'documents.restore');
   const r = await api('/api/bestanden/herstel', { id: f.id, operationId: restore.operationId, expectedVersion: restore.expectedVersion });
-  assert.equal(r.body.capability, 'document.restore');
+  assert.equal(r.body.capability, 'documents.restore');
   assert.equal((await api('/api/bestanden/wis', { id: f.id })).status, 409);
 });
 
@@ -100,7 +100,7 @@ test('Rahul prepares the same contract; only the bound human confirmation execut
   const confirmationKey = crypto.randomUUID();
   const done = await api('/api/member/doe/bevestig', confirm, a, confirmationKey);
   assert.equal(done.body.status, 200, JSON.stringify(done));
-  assert.equal(done.body.antwoord.capability, 'document.trash');
+  assert.equal(done.body.antwoord.capability, 'documents.trash');
   const retry = await act(body);
   assert.equal(retry.body.auditRef, done.body.antwoord.auditRef);
   assert.equal(retry.body.herhaald, true);

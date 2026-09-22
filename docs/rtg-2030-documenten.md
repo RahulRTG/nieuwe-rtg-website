@@ -1,6 +1,6 @@
 # Eerste capabilitypilot — de betekenis van verwijderen
 
-Status: eerste trash/restore-implementatie en gerichte lokale bewijsronde. Historische ontwerpbasis:
+Status: trash/restore-kandidaat in certificering; de actuele machineleesbare betekenis staat in `server/kern/document-contracten-v1.json`. Een status PROVEN volgt uitsluitend uit het kandidaatgebonden certificeringsdossier. Historische ontwerpbasis:
 `3af1a3edba382aee9bdf7b45a294ff35691a9765`.
 Hoort bij [RTG 2030](rtg-2030.md).
 
@@ -29,8 +29,8 @@ een zwaarder effect krijgen.
 
 | Betekenis-ID v1 | Bevoegdheid | Toegestane overgang | Verboden effect |
 |---|---|---|---|
-| `document.trash` | Eigenaar van het persoonlijke bestand | Actief → prullenbak; prullenbak → dezelfde prullenbak | Bytes of versies definitief verwijderen |
-| `document.restore` | Eigenaar | Prullenbak → actief; actief → actief bij geldige herhaling | Oude deelrechten ongemerkt uitbreiden of verloren bytes als hersteld melden |
+| `documents.trash@1` | Eigenaar van het persoonlijke bestand | Actief → prullenbak; prullenbak → dezelfde prullenbak | Bytes of versies definitief verwijderen |
+| `documents.restore@1` | Eigenaar | Prullenbak → actief; actief → actief bij geldige herhaling | Oude deelrechten ongemerkt uitbreiden of verloren bytes als hersteld melden |
 | `document.remove_from_my_view` | Geverifieerde ontvanger | Eigen deeltoegang → ingetrokken; herhaling blijft ingetrokken | Bestand of toegang van een ander verwijderen |
 | `document.purge` | Eigenaar plus expliciet bevoegd besluit voor dit effect | Prullenbak → purge pending → aantoonbaar verwijderd | Een onduidelijke retry behandelen als nieuwe purge, of succes melden terwijl bytes onverklaard achterblijven |
 

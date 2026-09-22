@@ -80,7 +80,7 @@ module.exports = (kern) => {
   });
   app.post('/api/bestanden/actie', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, await bestanden.documentActie(req.session.key, req.body));
+    stuur(res, await bestanden.documentActie(req.session.key, req.body, req.documentAuthority));
   });
   app.post('/api/bestanden/wis', auth, async (req, res) => {
     if (geenGast(req, res)) return;
@@ -88,11 +88,11 @@ module.exports = (kern) => {
   });
   app.post('/api/bestanden/weg', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, await bestanden.bestandenWeg(req.session.key, String((req.body || {}).id || ''), req.body));
+    stuur(res, await bestanden.bestandenWeg(req.session.key, String((req.body || {}).id || ''), req.body, req.documentAuthority));
   });
   app.post('/api/bestanden/herstel', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, await bestanden.bestandenHerstel(req.session.key, String((req.body || {}).id || ''), req.body));
+    stuur(res, await bestanden.bestandenHerstel(req.session.key, String((req.body || {}).id || ''), req.body, req.documentAuthority));
   });
   app.post('/api/bestanden/leeg', auth, async (req, res) => {
     if (geenGast(req, res)) return;

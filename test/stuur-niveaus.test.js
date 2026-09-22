@@ -51,7 +51,7 @@ const ERBIJ_GEKOMEN = [
   { pad: '/api/bestanden/mijn', op: '2026-09-22', naar: 'lezen',
     reden: 'Documents-pilot: Rahul leest dezelfde eigen metadata en verwachte documentversie als de UI; mutaties vereisen een afzonderlijk servervoorstel.' },
   { pad: '/api/bestanden/actie', op: '2026-09-22', naar: 'voorstel',
-    reden: 'Documents-pilot: uitsluitend document.trash en document.restore, via dezelfde owner-policy en duurzame operatiebon. Purge blijft verboden voor Rahul.' },
+    reden: 'Documents-pilot: uitsluitend documents.trash en documents.restore, via dezelfde owner-policy en duurzame operatiebon. Purge blijft verboden voor Rahul.' },
   { pad: '/api/member/voorstel/intrek', op: '2026-09-13', naar: 'klein',
     reden: 'besluit van de eigenaar: een lid mag zijn eigen klaargezette voorstel conversationeel ' +
       'intrekken. Hij kan uitsluitend vermogen INLEVEREN -- de drie andere `klein`-paden van een ' +

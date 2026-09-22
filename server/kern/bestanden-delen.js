@@ -115,10 +115,10 @@ function maakBestandenDelen(basis) {
   }
 
   /* ---- de prullenbak: een zichtbare la met een klok erop, geen zwart gat ---- */
-  async function weg(key, bid, invoer) {
+  async function weg(key, bid, invoer, authority) {
     const eigen = bord(key).items.find(x => x.id === String(bid || ''));
     if (eigen) return basis.documentActie(key, { ...(invoer || {}), id: bid,
-      capability: 'document.trash', contractVersion: 1 });
+      capability: 'documents.trash', contractVersion: 1 }, authority);
     // Legacy recipient operation removes only their own sharing permission.
     const v = vind(String(bid || ''));
     if (!v || !magErbij(key, v)) return { status: 404, error: 'Dat bestand staat niet in uw kluis.' };
@@ -126,9 +126,9 @@ function maakBestandenDelen(basis) {
     v.item.gedeeldMet = (v.item.gedeeldMet || []).filter(c => c !== code);
     return (await vastleggen()) || { ok: true };
   }
-  async function herstel(key, bid, invoer) {
+  async function herstel(key, bid, invoer, authority) {
     return basis.documentActie(key, { ...(invoer || {}), id: bid,
-      capability: 'document.restore', contractVersion: 1 });
+      capability: 'documents.restore', contractVersion: 1 }, authority);
   }
   // Explicit legacy purge: separate intent, never inferred by /weg on a retry.
   // Blob/metadata recovery for purge is NOT part of the trash/restore pilot.

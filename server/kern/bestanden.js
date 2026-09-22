@@ -126,17 +126,7 @@ function maakBestanden({ db, save, bijeen, inBundel, bewerkCollectie, store, cry
     return mis || { id: it.id, documentVersion: require('./document-contracten').versie(it), bytes: it.bytes };
   }
 
-  async function wijzig(key, bid, wat) {
-    const b = bord(key);
-    const it = b.items.find(x => x.id === String(bid || ''));
-    if (!it) return { status: 404, error: 'Dat bestand staat niet in uw kluis.' };
-    if (wat.naam !== undefined) { const n = schoonNaam(wat.naam); if (!n) return { status: 400, error: 'Geef het bestand een naam.' }; it.naam = n; }
-    if (wat.map !== undefined) { const doel = String(wat.map || '') || null; it.map = doel && b.mappen.find(x => x.id === doel) ? doel : null; }
-    if (wat.ster !== undefined) it.ster = !!wat.ster;
-    it.gewijzigd = nu();
-    const mis = await vastleggen();   // legt de mutaties hierboven duurzaam vast
-    return mis || { ok: true };
-  }
+  const wijzig = require('./bestanden-metadata')({ bord, bewerkCollectie, schoonNaam, nu });
 
   /* ---- de lijst: het hele bord in een keer, plus de Office-spiegel ---- */
   function lijst(key) {

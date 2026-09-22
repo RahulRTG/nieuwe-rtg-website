@@ -64,7 +64,7 @@ for (const [lang, width, height] of [['nl', 390, 844], ['en', 1440, 1000], ['ar'
       await page.waitForFunction(() => !document.getElementById('bkScrim').classList.contains('open'));
       assert.equal(await page.evaluate(() => document.querySelector('main').inert), false);
       assert.equal(await page.evaluate(() => document.activeElement === document.body), false, 'focus returns to a usable control');
-      assert.deepEqual(trace.filter(x => x.kind === 'request').map(x => x.body.capability), ['document.trash', 'document.restore']);
+      assert.deepEqual(trace.filter(x => x.kind === 'request').map(x => x.body.capability), ['documents.trash', 'documents.restore']);
       assert.ok(trace.filter(x => x.kind === 'request').every(x => x.body.contractVersion === 1 && x.body.operationId && x.body.expectedVersion));
       await page.reload({ waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window.RTGBestanden && window.RTGBestanden.stand());

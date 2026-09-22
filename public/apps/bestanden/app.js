@@ -1,7 +1,4 @@
-/* RTG Bestanden, het bord: het mappenpad, de lijst met eerlijke meta,
-   het quotum, zoeken en sorteren, de prullenbak-weergave en uploaden
-   (kiezen of slepen; grote bestanden gaan vanzelf in stukken). Het
-   bestand-paneel staat in paneel.js. */
+/* Documents presentation and transport; lifecycle meaning belongs to the server. */
 (function () {
   'use strict';
   var $ = function (s) { return document.querySelector(s); };
@@ -15,7 +12,11 @@
   var api = function (pad, body) {
     if ((pad === 'weg' || pad === 'herstel') && stand) {
       var file = (stand.items || []).find(function (it) { return it.id === (body || {}).id; });
-      if (file) return window.RTGDocumentCapability(api, pad === 'weg' ? 'document.trash' : 'document.restore', file);
+      if (file) return window.RTGDocumentCapability(api, pad === 'weg' ? 'documents.trash' : 'documents.restore', file);
+    }
+    if (pad === 'wijzig' && stand) {
+      var editing = (stand.items || []).find(function (it) { return it.id === (body || {}).id; });
+      if (editing) body = Object.assign({}, body, { expectedVersion: editing.documentVersion });
     }
     return window.RTGOperation.requestJson(window.fetch.bind(window), '/api/bestanden/' + pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
@@ -43,8 +44,11 @@
     hier = next.hier; bak = next.bak; teken();
   });
 
+  var readSequence = 0;
   function laad() {
+    var sequence = ++readSequence;
     return api('mijn').then(function (r) {
+      if (sequence !== readSequence) return;
       if (r.status !== 200) { window.RTGDaily.render('bestanden', 'error', { retry: laad }); return meld(r.body.error || window.RTGDailyCopy.value('failed')); }
       stand = r.body;
       window.RTGRouteMemory.ready('bestanden');
@@ -176,5 +180,6 @@
   window.RTGBestanden = { api: api, meld: meld, laad: laad, maat: maat, stuur: stuur,
     stand: function () { return stand; }, bak: function () { return bak; } };
   window.addEventListener('rtglang', teken);
+  ['focus', 'online'].forEach(function (event) { window.addEventListener(event, function () { if (token) laad(); }); });
   if (!token) window.RTGDaily.render('bestanden', 'guest'); else laad();
 })();

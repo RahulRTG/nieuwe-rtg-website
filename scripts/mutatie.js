@@ -451,6 +451,12 @@ function draaiToets(bestand, env, wacht, forceer) {
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
   // The document pilot reaches this handler through HTTP, browser or child processes.
+  ['document-equivalence.e2e.js', ['server/kern/document-capability.js']],
+  ['document-persistence.e2e.js', ['server/kern/document-capability.js']],
+  ['document-revocation.test.js', ['server/kern/document-capability.js']],
+  ['document-certification.test.js', ['server/kern/document-capability.js']],
+  ['document-architecture.test.js', ['scripts/document-fitness.js']],
+  ['document-binding.test.js', ['scripts/document-evidence.js']],
   ['document-capability.test.js', ['server/kern/document-capability.js']],
   ['document-capability-storage.test.js', ['server/kern/document-capability.js']],
   ['document-capability.e2e.js', ['server/kern/document-capability.js']],

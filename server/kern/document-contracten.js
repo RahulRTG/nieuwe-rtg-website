@@ -1,17 +1,19 @@
 /* Betekenis vóór projectie. Alleen de persoonlijke bestandenkluis valt onder v1. */
 'use strict';
 const { createHash } = require('node:crypto');
-const CONTRACTEN = Object.freeze(Object.fromEntries([
-  ['document.trash', 'active', 'trashed'], ['document.restore', 'trashed', 'active']
-].map(([id, voor, na]) => [id, Object.freeze({
-  id, version: 1, actor: 'authenticated-owner', resource: 'personal-vault-file',
-  input: ['id', 'operationId', 'expectedVersion'], before: voor, after: na,
-  risk: 'R1; R2 when shared', authority: 'owner; Rahul additionally requires server-held human approval',
-  invariant: 'No blob, content version or sharing permission is removed or added.',
-  persistence: 'State and operation receipt commit in the same collection transaction.',
-  recovery: 'Retry the same operationId and input; never infer a heavier effect from current state.',
-  failure: 'No confirmed success without a committed receipt; stale state is a conflict.'
-})])));
+const afdruk = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+function bevries(value) {
+  if (value && typeof value === 'object') { Object.values(value).forEach(bevries); Object.freeze(value); }
+  return value;
+}
+const POLICY = bevries({ id: 'documents.owner@1', version: 1,
+  authority: 'authenticated member, revalidated at transaction execution; owned vault resource',
+  denial: 'unknown owner/resource: 404; invalid or revoked session: 401',
+  guest: 'anonymous guest cannot mutate; registered free account can',
+  rahul: 'same HTTP authority; server-held human confirmation required before dispatch' });
+const policyDigest = afdruk(POLICY);
+const CONTRACTEN = bevries(Object.fromEntries(require('./document-contracten-v1.json').capabilities
+  .map(c => [c.id, { ...c, digest: afdruk(c) }])));
 
 // The revision prevents ABA (trash -> restore -> active with otherwise identical metadata).
 function versie(it) {
@@ -20,5 +22,5 @@ function versie(it) {
   return createHash('sha256').update(JSON.stringify(velden.map(k => it[k] ?? null))).digest('hex');
 }
 const staat = it => ({ id: it.id, state: it.weg ? 'trashed' : 'active', version: versie(it) });
-const fout = (status, code, error) => ({ status, code, error, messageId: 'document.' + code });
-module.exports = { CONTRACTEN, versie, staat, fout };
+const fout = (status, code, error) => ({ status, code, error, messageId: 'document.' + code, policy: { id: POLICY.id, digest: policyDigest, decision: [401, 404].includes(status) ? 'DENY' : 'ALLOW' } });
+module.exports = { CONTRACTEN, POLICY, policyDigest, afdruk, versie, staat, fout };

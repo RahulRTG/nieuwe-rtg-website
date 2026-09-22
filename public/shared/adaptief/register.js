@@ -150,7 +150,7 @@
     var c = caps[id];
     if (!c || typeof c.doe !== 'function') return false;
     if (!mag(id)) return false;
-    try { c.doe(arg); } catch (e) { if (w.console) w.console.error('[adaptief] ' + id, e); return false; }
+    try { var result = c.doe(arg); if (result && typeof result.then === 'function') return result; } catch (e) { if (w.console) w.console.error('[adaptief] ' + id, e); return false; }
     return true;
   }
 

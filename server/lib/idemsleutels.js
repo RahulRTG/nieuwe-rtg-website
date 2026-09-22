@@ -86,6 +86,7 @@ function sleutelVoor(methode, pad) {
    zonder reden was daar dus gewoon toegestaan. Een controle die niet over alles
    loopt is geen controle. */
 Object.assign(SLEUTELS,
+  require('./idemsleutels-document').SLEUTELS,
   require('./idemsleutels-basis').SLEUTELS,
   /* De vijf dubbeltikken uit de leesronde van 13 september; zie de kop daar. */
   require('./idemsleutels-afleidrest').SLEUTELS,

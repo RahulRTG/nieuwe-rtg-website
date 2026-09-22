@@ -221,10 +221,10 @@ test('11. delen, versies en de prullenbak bevestigen ook niet zonder opslag', as
   const up = await api(eerlijk.base, '/api/bestanden/upload',
     { naam: 'proef.txt', dataUrl: 'data:text/plain;base64,' + Buffer.from('proef').toString('base64') }, tok);
   assert.equal(up.status, 200);
-  const weg = await api(eerlijk.base, '/api/bestanden/weg', { id: up.body.id }, tok);
+  const weg = await api(eerlijk.base, '/api/bestanden/weg', { id: up.body.id, expectedVersion: up.body.documentVersion, operationId: require('node:crypto').randomUUID() }, tok);
   assert.equal(weg.status, 200);
   assert.equal(weg.body.prullenbak, true, 'een 200 zonder inhoud is een niet-afgewachte belofte');
-  const her = await api(eerlijk.base, '/api/bestanden/herstel', { id: up.body.id }, tok);
+  const her = await api(eerlijk.base, '/api/bestanden/herstel', { id: up.body.id, expectedVersion: weg.body.resource.version, operationId: require('node:crypto').randomUUID() }, tok);
   assert.equal(her.body.ok, true);
 
   const tok2 = await lid(leugen.base);

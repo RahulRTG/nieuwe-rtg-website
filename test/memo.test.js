@@ -47,7 +47,8 @@ test('1. de memo-flow leeft in de kluis: map, upload, lijst en prullenbak', asyn
   const haal = await api('/api/bestanden/haal', { id: up.body.id });
   assert.match(haal.body.dataUrl, /^data:audio\/webm;base64,/, 'afspelen haalt de audio gewoon uit de kluis');
   // weggooien is prullenbak, geen zwart gat
-  await api('/api/bestanden/weg', { id: up.body.id });
+  const removed = await api('/api/bestanden/weg', { id: up.body.id, expectedVersion: memo.documentVersion, operationId: require('node:crypto').randomUUID() });
+  assert.equal(removed.status, 200);
   l = await api('/api/bestanden/mijn');
   assert.equal(l.body.items.find(x => x.id === up.body.id).weg, true);
 });

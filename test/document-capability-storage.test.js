@@ -12,15 +12,15 @@ const { versie } = require('../server/kern/document-contracten');
 
 const item = { id: 'doc-1', naam: 'synthetic.txt', ref: 'blob-1', versies: [{ ref: 'blob-0' }],
   gedeeldMet: ['recipient'], weg: false, wegOp: null };
-const input = () => ({ capability: 'document.trash', contractVersion: 1, id: item.id,
+const input = () => ({ capability: 'documents.trash', contractVersion: 1, id: item.id,
   operationId: randomUUID(), expectedVersion: versie(item) });
 const setup = `const d=require('./server/db');d.load();
 const fs=require('node:fs'),path=require('node:path');
 const {DatabaseSync}=require('node:sqlite');
 const read=()=>d.bewerkCollectie('bestanden',s=>s['lid:owner']);
-const maak=(bewerken=d.bewerkCollectie)=>require('./server/kern/document-capability')({
+const maak=(bewerken=d.bewerkCollectie)=>{const execute=require('./server/kern/document-capability')({
  bewerkCollectie:bewerken,store:'sqlite',nu:()=>new Date().toISOString(),
- leesBytes:ref=>{try{return fs.readFileSync(path.join(process.env.RTG_DATA_DIR,ref))}catch(e){return null}}});
+ leesBytes:ref=>{try{return fs.readFileSync(path.join(process.env.RTG_DATA_DIR,ref))}catch(e){return null}}});return (key,input)=>execute(key,input,()=>true)};
 `;
 function run(map, code) {
   return new Promise((resolve, reject) => {
@@ -92,7 +92,7 @@ test('missing content cannot be confirmed as restored, and removed owner cannot 
   const map = await fixture(t), b = input();
   const trashed = await run(map, `maak()('owner',${JSON.stringify(b)}).then(r=>console.log(JSON.stringify(r)));`);
   fs.unlinkSync(path.join(map, 'blob-0'));
-  const restore = { ...b, capability: 'document.restore', operationId: randomUUID(), expectedVersion: trashed.resource.version };
+  const restore = { ...b, capability: 'documents.restore', operationId: randomUUID(), expectedVersion: trashed.resource.version };
   const failed = await run(map, `maak()('owner',${JSON.stringify(restore)}).then(r=>console.log(JSON.stringify({r,db:read()})));`);
   assert.equal(failed.r.status, 410);
   assert.equal(failed.db.items[0].weg, true);
@@ -126,4 +126,40 @@ test('simultaneous upload and trash have one winner; revocation is checked after
     `versionCommit({...${JSON.stringify(request)},key:'recipient',buf:Buffer.from('forbidden')}).then(r=>console.log(JSON.stringify(r)));`);
   assert.equal(revoked.status, 404);
   assert.notEqual(fs.existsSync(path.join(map, 'blob-new')) && fs.readFileSync(path.join(map, 'blob-new'), 'utf8'), 'forbidden');
+});
+
+test('distinct concurrent trash/restore requests serialize without stale state resurrection', async t => {
+  for (const scenario of ['trash-trash', 'restore-restore', 'restore-trash']) {
+    const map = await fixture(t);
+    let current = item;
+    if (scenario !== 'trash-trash') {
+      await run(map, `maak()('owner',${JSON.stringify(input())}).then(r=>console.log(JSON.stringify(r)));`);
+      current = (await run(map, 'console.log(JSON.stringify(read()));')).items[0];
+    }
+    const [left, right] = scenario.split('-');
+    const commands = [left, right].map(action => ({ ...input(), capability: 'documents.' + action, expectedVersion: versie(current) }));
+    const results = await Promise.all(commands.map(b => run(map, `maak()('owner',${JSON.stringify(b)}).then(r=>console.log(JSON.stringify(r)));`)));
+    const db = await run(map, 'console.log(JSON.stringify(read()));');
+    if (scenario === 'restore-trash') {
+      assert.equal(results[0].ok, true);
+      assert.ok(results[1].code === 'version_conflict' || (results[1].ok && !results[1].effect.changed));
+      assert.equal(db.items[0].weg, false); assert.equal(db.items[0].documentRevision, 2);
+    } else {
+      assert.equal(results.filter(r => r.ok).length, 1);
+      assert.equal(results.filter(r => r.code === 'version_conflict').length, 1);
+      assert.equal(db.items[0].documentRevision, scenario === 'trash-trash' ? 1 : 2);
+    }
+    const successful = results.filter(r => r.ok).length;
+    assert.equal(Object.keys(db.documentOperations).length, successful + (scenario === 'trash-trash' ? 0 : 1));
+  }
+});
+test('metadata edit and trash use the same storage lock and preserve lifecycle authority', async t => {
+  const map = await fixture(t), b = input();
+  const edit = `const current=read();const change=require('./server/kern/bestanden-metadata')({bord:()=>current,bewerkCollectie:d.bewerkCollectie,schoonNaam:n=>n,nu:()=>new Date().toISOString()});
+  change('owner','doc-1',{naam:'edited.txt',expectedVersion:${JSON.stringify(versie(item))}}).then(r=>console.log(JSON.stringify(r)));`;
+  const results = await Promise.all([run(map, edit), run(map, `maak()('owner',${JSON.stringify(b)}).then(r=>console.log(JSON.stringify(r)));`)]);
+  assert.equal(results.filter(r => r.ok).length, 1); assert.equal(results.filter(r => r.code === 'version_conflict').length, 1);
+  const db = await run(map, 'console.log(JSON.stringify(read()));');
+  assert.equal(db.items[0].weg, !!results[1].ok);
+  assert.equal(db.items[0].naam, results[0].ok ? 'edited.txt' : 'synthetic.txt');
 });

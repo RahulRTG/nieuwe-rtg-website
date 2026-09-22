@@ -61,7 +61,8 @@ test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.doesNotMatch(VIEW, /rtg-adaptive-lips[^\n]+(?:circle|ellipse)/);
   assert.doesNotMatch(VIEW, /rtg-adaptive-caption/);
   assert.match(CSS, /data-rtg-adaptive-state="peek"[^}]*width:136px;height:50px/);
-  assert.match(VIEW, /Mandaat gecontroleerd/);
+  assert.doesNotMatch(VIEW, /Mandaat gecontroleerd/);
+  assert.match(VIEW, /Controle bij uitvoering/);
   assert.match(CSS, /\.rtg-adaptive-sheet \.rtg-edge-2-context-slot :is\([^}]+grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/);
   assert.match(CSS, /\.scrim\.open\[role="dialog"\]/);
   assert.match(CSS, /\.hv-balk:not\(\.hv-weg\)/);

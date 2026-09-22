@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-22T14:54:01.853Z",
-    "commit": "8ef4a5975",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-22T16:01:35.074Z",
+    "commit": "57d37077c",
+    "boomVuil": true,
+    "boomAnders": 9,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -2176,12 +2176,28 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "document-architecture.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/document-fitness.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-binding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/document-evidence.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "document-capability-storage.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/document-capability.js",
       "operator": "===->!==#0",
-      "gezakt": 5,
+      "gezakt": 7,
       "geprobeerd": 1
     },
     "document-capability.e2e.js": {
@@ -2199,6 +2215,38 @@
       "operator": "===->!==#0",
       "gezakt": 7,
       "geprobeerd": 1
+    },
+    "document-certification.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-equivalence.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-persistence.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-revocation.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "!==->===#1",
+      "gezakt": 1,
+      "geprobeerd": 8
     },
     "doelbinding.test.js": {
       "soort": "puur",

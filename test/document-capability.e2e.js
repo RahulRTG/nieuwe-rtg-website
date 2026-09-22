@@ -41,7 +41,9 @@ for (const [lang, width, height] of [['nl', 390, 844], ['en', 1440, 1000], ['ar'
       await page.waitForSelector('[data-open="' + f.id + '"]');
       await page.locator('[data-open="' + f.id + '"]').click();
       if (out) await page.screenshot({ path: path.join(out, 'document-' + lang + '-before.png'), fullPage: true });
+      const trashResponse = page.waitForResponse(r => new URL(r.url()).pathname === '/api/bestanden/actie');
       await page.locator('#bkWeg').click();
+      assert.equal((await trashResponse).status(), 200, 'trash must be confirmed by the backend');
       await page.waitForFunction(() => !document.querySelector('#bkScrim').classList.contains('open'));
       assert.equal((await state()).weg, true);
       await edgeActies(page);
@@ -52,7 +54,9 @@ for (const [lang, width, height] of [['nl', 390, 844], ['en', 1440, 1000], ['ar'
       await restore.waitFor({ state: 'visible', timeout: 8000 });
       assert.ok(await restore.getAttribute('aria-label'), 'Edge action has an accessible name');
       if (out) await page.screenshot({ path: path.join(out, 'document-' + lang + '-edge.png'), fullPage: true });
+      const restoreResponse = page.waitForResponse(r => new URL(r.url()).pathname === '/api/bestanden/actie');
       await restore.click();
+      assert.equal((await restoreResponse).status(), 200, 'restore must be confirmed by the backend');
       await page.waitForFunction(() => {
         const b = window.RTGBestanden; return b && b.stand().items.every(x => !x.weg);
       });

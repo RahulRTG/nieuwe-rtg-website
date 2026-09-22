@@ -220,10 +220,7 @@ function bewijsVan(doel) {
    naar een artefact van vijf dagen schrijft en `impactbereik.js` nergens draait.
    De stand nam de STERKSTE premisse, en dat is precies verkeerd om.
 
-   Een conclusie is nooit harder dan haar zachtste premisse
-   (kern/identiteit/vertrouwen.js), en de stand van een rij is de strengste van
-   haar bewijzen (BETROUWBAARHEID.md). Daarom telt de graad van een sport de
-   ZWAKSTE van zijn mechanismen.
+   De graad volgt de zwakste premisse (BETROUWBAARHEID.md).
 
    GEEN NIEUWE LADDER. Dit huis heeft er een, en die staat in BESTUUR.md par. 3
    als huisregel: onbekend, vermoed, gemeten, bewezen. Een eigen woordenlijst
@@ -361,7 +358,9 @@ function meet() {
       graadGemeten: sporten.filter(s => s.graad === 'gemeten').length,
       graadVermoed: sporten.filter(s => s.graad === 'vermoed').length,
       graadOnbekend: sporten.filter(s => s.graad === 'onbekend').length,
-      alleenKeten: sporten.reduce((n, s) => n + s.mechanismen.filter(m => !m.lokaal).length, 0),
+      // Eén doel kan meer sporten dienen. Bewaar ook alle ruwe vermeldingen.
+      alleenKeten: new Set(sporten.flatMap(s => s.mechanismen.filter(m => !m.lokaal).map(m => m.doel))).size,
+      vermeldingenAlleenKeten: sporten.reduce((n, s) => n + s.mechanismen.filter(m => !m.lokaal).length, 0),
       zonderTrede: zonderTrede.length
     } };
 }

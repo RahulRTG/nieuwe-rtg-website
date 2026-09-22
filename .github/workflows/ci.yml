@@ -132,6 +132,7 @@ jobs:
       - name: De goedkope harde poorten
         run: |
           npm run ci-keten
+          node scripts/document-fitness.js
           npm run check
       - name: Exacte groene main-basis zoeken
         id: basis

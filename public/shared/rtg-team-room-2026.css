@@ -17,7 +17,7 @@ body.trm-voorzijde-actief>#shell{display:none!important}
 body.trm-voorzijde-actief>.wos-dock{display:none!important}
 /* Navigation stays interactive in the standard Edge; .trm-nav is its source. */
 .trm-voorzijde[hidden]{display:none!important}
-.trm-voorzijde{min-height:100dvh;padding:0 0 calc(5.4rem + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(10,6,4,.35) 0,rgba(10,6,4,.84) 27rem,var(--trm-diep) 42rem),url('/images/worlds/heritage/work-heritage-v2.jpg') center top/auto 38rem no-repeat,linear-gradient(180deg,var(--trm-nacht),var(--trm-diep));color:var(--trm-ivoor);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.trm-voorzijde{min-height:100dvh;padding:0 0 calc(5.4rem + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(10,6,4,.35) 0,rgba(10,6,4,.84) 27rem,var(--trm-diep) 42rem),url('/images/editorial/team-room.webp') center top/auto 38rem no-repeat,linear-gradient(180deg,var(--trm-nacht),var(--trm-diep));color:var(--trm-ivoor);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 .trm-voorzijde *{box-sizing:border-box}
 .trm-voorzijde button,.trm-voorzijde a{font:inherit}
 .trm-binnen{width:min(100%,56rem);margin:0 auto;padding:env(safe-area-inset-top) .9rem 2rem}

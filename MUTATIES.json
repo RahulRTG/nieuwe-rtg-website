@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-22T06:24:24.555Z",
-    "commit": "e3709730c",
+    "op": "2026-09-22T16:18:32.077Z",
+    "commit": "c5bdb7094",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2175,6 +2175,78 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "document-architecture.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/document-fitness.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-binding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/document-evidence.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-capability-storage.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "document-capability.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "document-capability.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "document-certification.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-equivalence.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-persistence.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "document-revocation.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/document-capability.js",
+      "operator": "!==->===#1",
+      "gezakt": 1,
+      "geprobeerd": 8
     },
     "doelbinding.test.js": {
       "soort": "puur",

@@ -177,12 +177,14 @@
       });
       Array.prototype.forEach.call(document.querySelectorAll('[data-weg]'), function (el) {
         el.addEventListener('click', function () {
-          api('/api/bestanden/weg', { id: el.dataset.weg }).then(function (r2) {
+          var file = LIJST.find(function (it) { return it.id === el.dataset.weg; });
+          if (!file) return laad();
+          window.RTGDocumentCapability(function (pad, body) { return api('/api/bestanden/' + pad, body); }, 'documents.trash', file).then(function (r2) {
             if (r2.body.error) return meld(r2.body.error);
             delete TX[el.dataset.weg]; txBewaar();
             meld('Naar de prullenbak van je kluis (30 dagen te herstellen).');
             laad();
-          });
+          }).catch(function () { meld('De handeling is niet bevestigd. Probeer dezelfde memo opnieuw.'); });
         });
       });
     });

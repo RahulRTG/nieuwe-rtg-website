@@ -15,7 +15,7 @@ test('Samen Thuis draagt de drie getekende schermen en vijf herkenbare navigatie
   for (const woord of ['Vandaag', 'Gezin', 'Regelen', 'Berichten', 'Meer']) assert.match(html, new RegExp('>' + woord + '<'));
   assert.match(html, /Samen begint met overzicht/);
   assert.match(html, /Alleen zichtbaar voor uw gezin/);
-  assert.match(stijl, /foundation-heritage-v2\.jpg/);
+  assert.match(stijl, /foundation-family\.webp/);
 });
 
 test('het overzicht leest uitsluitend de bestaande gezinsbronnen', () => {

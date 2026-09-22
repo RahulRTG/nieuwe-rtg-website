@@ -10,10 +10,7 @@
    Dat staat hier, per route, met de reden erbij.
 
    DE VOLGORDE IS EEN GRENS EN GEEN GEWOONTE. Eerst het contract, dan de route.
-   Een schrijfroute zonder contract laat de keuring zakken (regel in
-   scripts/check.js), en dat is de hele reden dat dit bestand bestaat: zo kan het
-   gat niet stil weer groeien terwijl iemand aan de achterkant aan het opruimen
-   is.
+   scripts/check.js weigert een schrijfroute zonder contract.
 
    WAT HIER NIET MAG. Een stand invullen omdat de meter iets liet zien. De meter
    levert een VOORSTEL; hier staat een besluit. Het verschil is dat een besluit
@@ -41,6 +38,7 @@
 'use strict';
 
 const CONTRACTEN = Object.assign({},
+  require('./mutatiecontracten-document').CONTRACTEN,
   require('./mutatiecontracten-storingen').CONTRACTEN,
   /* Opgesplitst omdat scripts/check.js een bestandsgrens kent en die terecht
      aansloeg: een lijst die naar duizenden regels groeit, hoort niet in een

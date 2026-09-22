@@ -72,9 +72,9 @@
   body.sleept .sleep{display:block;}
 
   /* het paneel */
-  .scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;
+  .file-detail{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;
     align-items:flex-start;justify-content:center;padding:1rem;overflow:auto;}
-  .scrim.open{display:flex;}
+  .file-detail.open{display:flex;padding-bottom:calc(var(--rtg-adaptive-inset,108px) + env(safe-area-inset-bottom,0px) + 20px);}
   .paneel{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;
     width:min(560px,100%);margin:auto 0;}
   .paneel input.titel{width:100%;background:none;border:none;border-bottom:1px solid var(--line);
@@ -149,7 +149,7 @@
   </div>
 </main>
 
-<div class="scrim" id="bkScrim" role="dialog" aria-label="Bestand" data-i18n-aria="dailyField.file">
+<div class="file-detail" id="bkScrim" role="dialog" aria-modal="false" aria-label="Bestand" data-i18n-aria="dailyField.file">
   <div class="paneel">
     <input class="titel" id="bkNaam" maxlength="120" aria-label="Bestandsnaam" data-i18n-aria="dailyField.filename">
     <p class="stil h-mt40" id="bkMeta"></p>
@@ -191,12 +191,14 @@
 <script src="/shared/rtg-operation.js"></script>
 <script src="/apps/bestanden/context.js"></script>
 <script src="/shared/bestand-upload.js"></script>
+<script src="/shared/document-capability.js"></script>
 <script src="/apps/bestanden/app.js"></script>
 <script src="/apps/bestanden/paneel.js"></script>
 <script src="/shared/adaptief.js" defer></script>
 <script src="/shared/adaptief/grammatica.js" defer></script>
 <script src="/shared/adaptief/register.js" defer></script>
 <script src="/shared/adaptief/lagen.js" defer></script>
+<script src="/shared/adaptief/gewicht.js" defer></script>
 <script src="/shared/adaptief/brug.js" defer></script>
 <script src="/apps/bestanden/adaptief.js" defer></script>
 <script src="/apps/bestanden/gebaren.js"></script>

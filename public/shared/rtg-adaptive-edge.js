@@ -124,7 +124,7 @@
   function build() {
     var host = d.createElement('section'); host.className = 'rtg-adaptive-edge'; host.setAttribute('aria-label', 'RTG Adaptive Edge');
     host.innerHTML = '<button class="rtg-adaptive-presence" type="button" hidden><i></i><span></span></button><div class="rtg-adaptive-identity" hidden></div>' +
-      '<section class="rtg-adaptive-sheet" hidden aria-hidden="true"><div class="rtg-adaptive-sheet-head"><div><small>VEILIGE VOLGENDE STAP</small><h2></h2><p></p></div><button type="button" data-rtg-adaptive-close aria-label="Sluiten">×</button></div><div class="rtg-adaptive-guard"><i></i><span>Alleen toegestane acties</span><b>Mandaat gecontroleerd</b></div><div class="rtg-adaptive-sheet-list"></div></section>' +
+      '<section class="rtg-adaptive-sheet" hidden aria-hidden="true"><div class="rtg-adaptive-sheet-head"><div><small>VEILIGE VOLGENDE STAP</small><h2></h2><p></p></div><button type="button" data-rtg-adaptive-close aria-label="Sluiten">×</button></div><div class="rtg-adaptive-guard"><i></i><span>Uw volgende handeling</span><b>Controle bij uitvoering</b></div><div class="rtg-adaptive-sheet-list"></div></section>' +
       '<nav class="rtg-adaptive-bar" aria-label="Home, Context, Acties, Connect en Rahul"></nav>';
     rt.edge.root.appendChild(host); rt.host = host; rt.bar = host.querySelector('.rtg-adaptive-bar');
     rt.sheet = host.querySelector('.rtg-adaptive-sheet'); rt.sheetTitle = host.querySelector('h2');

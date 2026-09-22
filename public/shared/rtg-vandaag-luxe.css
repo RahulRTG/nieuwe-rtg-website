@@ -631,7 +631,7 @@ body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool
   background-image:
     radial-gradient(42rem 26rem at 82% -8rem,var(--rtg-world-signature-soft,rgba(127,22,52,.1)),transparent 72%),
     var(--rtg-world-photo-mask,linear-gradient(112deg,rgba(244,240,232,.985),rgba(244,240,232,.94))),
-    var(--rtg-world-photo,url('/images/worlds/heritage/living-heritage-v2.jpg')),
+    var(--rtg-world-photo,none),
     var(--rtg-world-ground,linear-gradient(155deg,#fbf8f2,#f4f0e8 58%,#e8e0d2))!important;
   background-size:auto,auto,cover,auto!important;
   background-position:center,center,var(--rtg-world-photo-position,68% center),center!important;

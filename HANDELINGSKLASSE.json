@@ -3,13 +3,13 @@
   "grens": "`ongemarkeerd` is geen laag risico maar de vaststelling dat geen grens in dit huis deze route aanwijst, en `onbekend` is geen onomkeerbaar maar een niet beproefde terugweg. Ze staan daarom apart en worden niet bij het gemarkeerde opgeteld.",
   "gemeten": {
     "paden": 4972,
-    "risicoGemarkeerd": 257,
+    "risicoGemarkeerd": 258,
     "omkeerbaarGemeten": 44,
     "beproefdePaden": 44
   },
   "risicoVerdeling": {
-    "geen": 57,
-    "ongemarkeerd": 4715,
+    "geen": 58,
+    "ongemarkeerd": 4714,
     "verhoogd": 111,
     "hoog": 89,
     "onbekend": 0

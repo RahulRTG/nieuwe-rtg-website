@@ -8,7 +8,7 @@
 }
 
 body[data-rtg-world="living"] .zoeker{
-  background:#0d0907 url('/images/worlds/heritage/living-sociaal-hero-v1.jpg') center/cover no-repeat!important;
+  background:#0d0907!important;
 }
 
 body[data-rtg-world="living"] .zoeker::after{
@@ -132,7 +132,7 @@ body[data-rtg-world="living"] .geen-cam{
   padding:0 1.25rem 17rem;
   text-align:left;
   color:var(--camera-ivory);
-  background:linear-gradient(180deg,rgba(7,5,4,.16),rgba(7,5,4,.9)),url('/images/worlds/heritage/living-sociaal-hero-v1.jpg') center/cover no-repeat!important;
+  background:linear-gradient(180deg,rgba(7,5,4,.16),rgba(7,5,4,.9)),url('/images/editorial/camera-studio.webp') center/cover no-repeat!important;
 }
 
 body[data-rtg-world="living"] .geen-cam b{max-width:12ch;font:500 2.25rem/.98 'Bodoni Moda',Georgia,serif}

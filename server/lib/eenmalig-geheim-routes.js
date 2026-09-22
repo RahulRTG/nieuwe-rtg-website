@@ -10,6 +10,8 @@ const ROUTES = new Set([
   /* Account- en personeelsroutes geven een sessie/PIN eenmalig terug. Een
      generieke retrycache zou die na intrekking vóór de echte deur herhalen. */
   'POST /api/auth/register',
+  // Human approval is consumed once; replay must reach current auth and the approval store.
+  'POST /api/member/doe/bevestig',
   'POST /api/werving/verbind',
   'POST /api/supplier/staff/add',
   'POST /api/supplier/staff/reset-pin',

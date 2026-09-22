@@ -125,6 +125,7 @@ function maakDubbeltik(opties) {
   function middleware() {
     return function dubbeltik(req, res, next) {
       if (!SCHRIJFT.has(req.method)) return next();
+      if (require('./document-operatiepad')(req.path)) return next();
       if (overslaan(req)) return next();
       const sleutel = sleutelUit(req);
       if (!sleutel) return next();

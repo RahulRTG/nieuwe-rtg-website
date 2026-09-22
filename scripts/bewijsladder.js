@@ -32,7 +32,7 @@
                 bij geen enkele commit, en dat is precies het verschil tussen
                 een uitslag en een bewijs.
 
-   DE RESTBAK IS DE ANTI-DRIFT. Elke poort die de keten draait en die geen
+   Elke poort die de keten draait en die geen
    sport heeft, staat in `zonderTrede`. Dat is fail-closed: een nieuw soort
    bewijs verdwijnt niet stil uit dit beeld, het valt eruit en vraagt om een
    plek. test/bewijsladder.test.js zakt zodra die bak groeit.
@@ -69,7 +69,7 @@ const K = { dim: '\x1b[2m', groen: '\x1b[32m', rood: '\x1b[31m', geel: '\x1b[33m
    ========================================================================== */
 const LADDER = [
   { id: 'snel', naam: 'Snelle bewijzen', wat: 'huisregels, statische analyse, geheimen, het contract van de keten zelf',
-    patronen: [/check\.js$/, /ast-scan\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /ci-lokaal\.js$/,
+    patronen: [/check\.js$/, /ast-scan\.js$/, /document-fitness\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /ci-lokaal\.js$/,
       /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /^git diff$/] },
   { id: 'geraakt', naam: 'Wat kan deze wijziging raken', wat: 'de affected-graaf: welk bewijs moet opnieuw',
     patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /verstrengeling\.js$/, /activering\.js$/,
@@ -220,10 +220,7 @@ function bewijsVan(doel) {
    naar een artefact van vijf dagen schrijft en `impactbereik.js` nergens draait.
    De stand nam de STERKSTE premisse, en dat is precies verkeerd om.
 
-   Een conclusie is nooit harder dan haar zachtste premisse
-   (kern/identiteit/vertrouwen.js), en de stand van een rij is de strengste van
-   haar bewijzen (BETROUWBAARHEID.md). Daarom telt de graad van een sport de
-   ZWAKSTE van zijn mechanismen.
+   De graad volgt de zwakste premisse (BETROUWBAARHEID.md).
 
    GEEN NIEUWE LADDER. Dit huis heeft er een, en die staat in BESTUUR.md par. 3
    als huisregel: onbekend, vermoed, gemeten, bewezen. Een eigen woordenlijst
@@ -361,7 +358,9 @@ function meet() {
       graadGemeten: sporten.filter(s => s.graad === 'gemeten').length,
       graadVermoed: sporten.filter(s => s.graad === 'vermoed').length,
       graadOnbekend: sporten.filter(s => s.graad === 'onbekend').length,
-      alleenKeten: sporten.reduce((n, s) => n + s.mechanismen.filter(m => !m.lokaal).length, 0),
+      // Eén doel kan meer sporten dienen. Bewaar ook alle ruwe vermeldingen.
+      alleenKeten: new Set(sporten.flatMap(s => s.mechanismen.filter(m => !m.lokaal).map(m => m.doel))).size,
+      vermeldingenAlleenKeten: sporten.reduce((n, s) => n + s.mechanismen.filter(m => !m.lokaal).length, 0),
       zonderTrede: zonderTrede.length
     } };
 }

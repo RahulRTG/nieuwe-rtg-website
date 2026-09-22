@@ -1266,9 +1266,8 @@ const carriereledger = maakCarriereLedger({
   db, save, bijeen, inBundel, crypto, schoon, codenaamVan });
 const bestandenOpslag = require('./kern/bestanden-opslag')({ db });
 const bestanden = require('./kern/bestanden').maakBestanden({
-  // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
-  // langs het scan-net, dus die scant zichzelf zodra het bestand compleet is
-  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir: DATA_DIR, antivirus });
+  // Gestukte uploads worden na samenvoegen gescand.
+  db, save, bijeen, inBundel, bewerkCollectie, store: STORE, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir: DATA_DIR, antivirus });
 /* RTG Meet (kern/meet.js): vergaderkamers op codenaam; de server geeft
    alleen WebRTC-seinen door, beeld en geluid lopen peer-to-peer. */
 const meet = require('./kern/meet').maakMeet({

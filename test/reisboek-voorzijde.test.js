@@ -20,9 +20,7 @@ test('het Reisboek heeft de drie goedgekeurde, herkenbare TravelOS-momenten',()=
   assert.match(css,/--rb-ink:#03101a/);
   assert.match(css,/--rb-gold:#dca45f/);
   assert.match(css,/--rb-burgundy:#7d102e/);
-  assert.match(css,/travelos\/ibiza-airport\.jpg/);
-  assert.match(css,/travelos\/travel-documents\.jpg/);
-  assert.match(css,/travelos\/travel-desk\.jpg/);
+  assert.match(css,/travelos\/airport-operations\.jpg/);
 });
 
 test('de voorzijde leest de echte reisbronnen en maakt geen tweede boeking',()=>{

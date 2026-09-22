@@ -62,7 +62,7 @@ body.travel-os{
   --groen:var(--tos-green);
   --rood:var(--tos-danger);
   --let:var(--tos-wine-licht);
-  --tos-scene:url('/images/travelos/travel-desk.jpg');
+  --tos-scene:none;
   min-width:320px;
   min-height:100dvh;
   margin:0;
@@ -91,15 +91,15 @@ body.travel-os{
   opacity:.62;
 }
 body.travel-os > main{position:relative;z-index:1}
-body.travel-os[data-travelos-scene="aviation"]{--tos-scene:url('/images/travelos/private-aviation.jpg')}
-body.travel-os[data-travelos-scene="villa"]{--tos-scene:url('/images/travelos/ibiza-villa.jpg')}
-body.travel-os[data-travelos-scene="desk"]{--tos-scene:url('/images/travelos/travel-desk.jpg')}
-body.travel-os[data-travelos-scene="documents"]{--tos-scene:url('/images/travelos/travel-documents.jpg')}
-body.travel-os[data-travelos-scene="mobility"]{--tos-scene:url('/images/travelos/coastal-train.jpg')}
-body.travel-os[data-travelos-scene="road"]{--tos-scene:url('/images/travelos/night-road.jpg')}
-body.travel-os[data-travelos-scene="city"]{--tos-scene:url('/images/travelos/city-arrival.jpg')}
-body.travel-os[data-travelos-scene="operations"]{--tos-scene:url('/images/travelos/airport-operations.jpg')}
-body.travel-os[data-travelos-scene="residence"]{--tos-scene:url('/images/travelos/residence-lobby.jpg')}
+body.travel-os[data-travelos-scene="aviation"]{--tos-scene:none}
+body.travel-os[data-travelos-scene="villa"]{--tos-scene:none}
+body.travel-os[data-travelos-scene="desk"]{--tos-scene:none}
+body.travel-os[data-travelos-scene="documents"]{--tos-scene:none}
+body.travel-os[data-travelos-scene="mobility"]{--tos-scene:none}
+body.travel-os[data-travelos-scene="road"]{--tos-scene:none}
+body.travel-os[data-travelos-scene="city"]{--tos-scene:none}
+body.travel-os[data-travelos-scene="operations"]{--tos-scene:none}
+body.travel-os[data-travelos-scene="residence"]{--tos-scene:none}
 
 .tos-module-hero{
   position:relative;

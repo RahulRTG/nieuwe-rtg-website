@@ -15,7 +15,7 @@ const MAX_VERSIES = 10;                 // per bestand; de oudste valt eraf
 const PRULLENBAK_DAGEN = 30;
 const MAX_NAAM = 120;
 
-function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir, antivirus }) {
+function maakBestanden({ db, save, bijeen, inBundel, bewerkCollectie, store, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir, antivirus }) {
   const OPSLAG = path.join(dir, 'bestanden');
   const id = () => 'b' + crypto.randomBytes(6).toString('hex');
   const nu = () => new Date().toISOString();
@@ -41,6 +41,7 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
   function magErbij(key, v) {
     if (!v) return false;
     if (v.eigenaar === key) return true;
+    if (v.item.weg) return false;
     const code = codenaamVan(key);
     return !!(code && (v.item.gedeeldMet || []).includes(code));
   }
@@ -70,9 +71,7 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
   }
   const schoonNaam = n => schoon(String(n || ''), MAX_NAAM).replace(/[/\\]/g, '-').trim();
 
-  /* De kluis van een lid: bevestigd is vastgelegd (server/lib/duurzaam.js). De
-     BYTES staan al duurzaam op schijf; wat hier duurzaam wordt is de VERWIJZING
-     ernaartoe -- zonder die is het bestand er wel en bestaat het niet. */
+  // Durable metadata confirmation; document actions use the collection transaction.
   const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'bestanden' });
 
   /* ---- mappen: plat opgeslagen, genest via 'ouder' ---- */
@@ -102,11 +101,7 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
     return mis || { ok: true };
   }
 
-  /* De Ontsmetter aan de deur van de kluis. Twee plekken maken hier van bytes
-     een bestand -- upload() hieronder en versieNieuw() in ./bestanden-delen.js
-     -- en die halen allebei dezelfde poort langs. De gestukte upload loopt via
-     die twee en heeft er dus geen eigen kopie van nodig; het waarom van dat
-     alles staat in ./bestanden-poort.js. */
+  // Uploads and new versions share the antivirus boundary.
   const { scanOk } = require('./bestanden-poort')({ antivirus });
 
   /* ---- uploaden: een data-URL in, een verwijzing terug ---- */
@@ -128,20 +123,10 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
     const it = { id: id(), naam, map, mime: m[1], bytes: buf.length, ref: schrijfBytes(buf),
       versies: [], gedeeldMet: [], ster: false, weg: false, wegOp: null, op: nu(), gewijzigd: nu() };
     const mis = await vastleggen(() => { b.items.push(it); });
-    return mis || { id: it.id, bytes: it.bytes };
+    return mis || { id: it.id, documentVersion: require('./document-contracten').versie(it), bytes: it.bytes };
   }
 
-  async function wijzig(key, bid, wat) {
-    const b = bord(key);
-    const it = b.items.find(x => x.id === String(bid || ''));
-    if (!it) return { status: 404, error: 'Dat bestand staat niet in uw kluis.' };
-    if (wat.naam !== undefined) { const n = schoonNaam(wat.naam); if (!n) return { status: 400, error: 'Geef het bestand een naam.' }; it.naam = n; }
-    if (wat.map !== undefined) { const doel = String(wat.map || '') || null; it.map = doel && b.mappen.find(x => x.id === doel) ? doel : null; }
-    if (wat.ster !== undefined) it.ster = !!wat.ster;
-    it.gewijzigd = nu();
-    const mis = await vastleggen();   // legt de mutaties hierboven duurzaam vast
-    return mis || { ok: true };
-  }
+  const wijzig = require('./bestanden-metadata')({ bord, bewerkCollectie, schoonNaam, nu });
 
   /* ---- de lijst: het hele bord in een keer, plus de Office-spiegel ---- */
   function lijst(key) {
@@ -163,7 +148,7 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
       gebruik: gebruik(key), quotum: QUOTUM };
   }
   function toon(it, vanMij) {
-    return { id: it.id, naam: it.naam, map: vanMij ? it.map : null, mime: it.mime, bytes: it.bytes,
+    return { id: it.id, documentVersion: require('./document-contracten').versie(it), naam: it.naam, map: vanMij ? it.map : null, mime: it.mime, bytes: it.bytes,
       versies: (it.versies || []).length, gedeeldMet: it.gedeeldMet || [], ster: !!it.ster,
       weg: !!it.weg, wegOp: it.wegOp || null, op: it.op, gewijzigd: it.gewijzigd, vanMij: !!vanMij };
   }
@@ -177,9 +162,11 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
   }
 
   // vastleggen gaat mee: delen en versies zijn dezelfde kluis (LAT.md regel 1)
-  const basis = { db, save, vastleggen, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer,
+  const basis = { db, save, vastleggen, bewerkCollectie, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer,
     bord, borden, vind, magErbij, schrijfBytes, leesBytes, wisBytes, wisItem, gebruik, nu,
     QUOTUM, MAX_BESTAND, MAX_VERSIES, antivirus, scanOk };
+  const documentActie = require('./document-capability')({ bewerkCollectie, store, leesBytes, nu });
+  basis.documentActie = documentActie;
   const delen = maakBestandenDelen(basis);
   // grote bestanden komen in stukken binnen (bestanden-stukken.js) en lopen
   // aan het eind gewoon door dezelfde upload-weg, met quotum en al
@@ -187,7 +174,7 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
   // vergetelheid (AVG art. 17) raakt ook de bytes; zie ./bestanden-vergeten.js
   const vergeten = require('./bestanden-vergeten')({ borden, wisItem, codenaamVan });
   return Object.assign({ bestandenLijst: lijst, bestandenMapNieuw: mapNieuw, bestandenMapWijzig: mapWijzig,
-    bestandenUpload: upload, bestandenWijzig: wijzig }, delen, stukken, vergeten);
+    bestandenUpload: upload, bestandenWijzig: wijzig, documentActie }, delen, stukken, vergeten);
 }
 
 module.exports = { maakBestanden };

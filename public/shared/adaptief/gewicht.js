@@ -62,10 +62,18 @@
     r.meld({ tekst: tekst, ongedaan: ongedaan });
   }
 
-  function draai(it, extra) {
+  function draai(it, extra, after) {
     var f = it.doe || (w.RTGAdaptief && function (a) { return w.RTGAdaptief.doe(it.id, a); });
     if (typeof f !== 'function') return false;
-    try { f(extra); } catch (e) { if (w.console) w.console.error('[gewicht] ' + it.id, e); return false; }
+    try {
+      var result = f(extra);
+      if (result && typeof result.then === 'function') {
+        result.then(function () { if (after) after(); }, function () {
+          var r = rail(); if (r) r.meld({ tekst: 'De handeling is niet bevestigd. Controleer de actuele toestand.' });
+        });
+      } else if (result !== false && after) after();
+      if (result === false) return false;
+    } catch (e) { if (w.console) w.console.error('[gewicht] ' + it.id, e); return false; }
     return true;
   }
 
@@ -92,7 +100,7 @@
       ga.textContent = bev.knop || it.naam;
       ga.onclick = function () {
         L.sluit();
-        if (draai(it, {})) naMelding(it, it.ongedaan);
+        draai(it, {}, function () { naMelding(it, it.ongedaan); });
       };
       rij.appendChild(af); rij.appendChild(ga);
       lijf.appendChild(rij);
@@ -208,7 +216,7 @@
       g = 'bewust';
     }
     if (g === 'licht') return draai(it, {});
-    if (g === 'terug') { var ok = draai(it, {}); if (ok) naMelding(it, it.ongedaan); return ok; }
+    if (g === 'terug') return draai(it, {}, function () { naMelding(it, it.ongedaan); });
     if (g === 'bewust') return bewust(it, bev);
     if (g === 'plechtig') return plechtig(it, bev);
     return zwaar(it, bev, false);

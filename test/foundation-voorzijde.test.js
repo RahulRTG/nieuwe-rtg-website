@@ -30,7 +30,7 @@ test('privacy en bestaande gereedschappen blijven zichtbaar', () => {
   assert.match(html, /Een band geeft nooit automatisch toegang/);
   assert.match(html, /Volledig FoundationOS|Alle apps/);
   assert.match(html, /Rustig overzicht/);
-  assert.match(css, /foundation-heritage-v2\.jpg/);
+  assert.match(css, /foundation-home\.webp/);
   assert.match(css, /--ft-wijn:#861936/);
 });
 

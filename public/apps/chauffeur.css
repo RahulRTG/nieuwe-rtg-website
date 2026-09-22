@@ -85,7 +85,7 @@ main{position:relative;z-index:2;padding-bottom:calc(94px + env(safe-area-inset-
 .fasebalk i.gedaan{background:var(--goud)}
 .faselabels{display:grid;grid-template-columns:repeat(5,1fr);gap:.35rem;margin:-.75rem 0 1.2rem;color:#777a77;font-size:.43rem;letter-spacing:.09em;text-align:center}
 .faselabels span:first-child{text-align:left}.faselabels span:last-child{text-align:right}.faselabels span.gedaan{color:#d2b979}
-.ritbeeld{position:relative;min-height:270px;margin:-1.6rem -1.55rem 1.4rem;overflow:hidden;border-bottom:1px solid #3b3e3d;background-image:linear-gradient(0deg,rgba(4,5,5,.94),transparent 68%),linear-gradient(90deg,rgba(4,5,5,.68),transparent 62%),url('/images/travelos/ibiza-airport.jpg');background-size:cover;background-position:center 57%}
+.ritbeeld{position:relative;min-height:270px;margin:-1.6rem -1.55rem 1.4rem;overflow:hidden;border-bottom:1px solid #3b3e3d;background-image:linear-gradient(0deg,rgba(4,5,5,.94),transparent 68%),linear-gradient(90deg,rgba(4,5,5,.68),transparent 62%),none;background-size:cover;background-position:center 57%}
 .ritbeeld>div{position:absolute;left:1.55rem;right:1.55rem;bottom:1.35rem;display:flex;flex-direction:column;gap:.35rem}
 .ritbeeld small,.passagierkaart small{color:var(--goud);font-size:.56rem;font-weight:650;letter-spacing:.17em}
 .ritbeeld strong{font-size:clamp(1.35rem,5vw,2rem);line-height:1;text-transform:uppercase}

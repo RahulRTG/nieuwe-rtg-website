@@ -17,6 +17,20 @@ const path = require('node:path');
 const W = require('../scripts/lib/werkstroom');
 const lokaal = require('../scripts/ci-lokaal');
 
+test('artifact dependency starts after download and never leaks into another job', () => {
+  const gates = W.poortenVan('fixture.yml', [
+    'on:', '  pull_request:', 'jobs:', '  first:', '    steps:',
+    '      - run: node scripts/document-fitness.js',
+    '      - uses: actions/download-artifact@fixture',
+    '      - run: node scripts/check.js',
+    '  second:', '    steps:', '      - run: node scripts/check.js'
+  ].join('\n')).filter(g => g.soort === 'toets');
+  assert.deepEqual(gates.map(g => g.artefact), [false, true, false]);
+  assert.equal(W.oordeel(gates[0]).lokaal, true);
+  assert.equal(W.oordeel(gates[1]).soortReden, 'artefact');
+  assert.equal(W.oordeel(gates[2]).lokaal, true);
+});
+
 test('de ontleder leest een werkstroom: jobs, stappen, blokschalen en regelnummers', () => {
   const doc = W.ontleed([
     'name: Proef',

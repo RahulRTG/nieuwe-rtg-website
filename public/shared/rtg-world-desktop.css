@@ -2,7 +2,8 @@
 .wd-shell{display:contents}
 .wd-people,.wd-favorites,.wd-library,.wd-greeting{display:none}
 body[data-rtg-desktop]{--wd-accent:var(--rtg-world-signature,var(--wh-gold));--wd-line:color-mix(in srgb,var(--wd-accent) 32%,#4b4133);--wd-surface:color-mix(in srgb,var(--wd-accent) 5%,#15130f)}
-body[data-rtg-desktop="foundation"]{--wd-surface:color-mix(in srgb,var(--rtg-world-bg,#071522) 90%,#161410)}
+body[data-rtg-desktop="living"]{--wh-ink:var(--rtg-world-ink,#ede7da);--wh-soft:var(--rtg-world-muted,#dcd7cb);--wh-line:var(--rtg-world-line,rgba(201,162,75,.18));--wh-gold:var(--rtg-world-metal,#c9a24b);--wh-bg:var(--rtg-world-bg,#030303);--wd-surface:color-mix(in srgb,var(--rtg-world-card,#121210) 94%,#050504)}
+body[data-rtg-desktop="foundation"]{--wh-ink:var(--rtg-world-ink,#f2f2ea);--wh-soft:var(--rtg-world-muted,#aebccc);--wh-line:var(--rtg-world-line,rgba(242,242,234,.17));--wh-gold:var(--rtg-world-metal,#d0b66e);--wh-bg:var(--rtg-world-bg,#071522);--wd-surface:color-mix(in srgb,var(--rtg-world-card,#0b2032) 92%,#050b10)}
 body[data-world-home] .wd-shell [hidden]{display:none!important}
 .wd-shell :is(button,a,input):focus-visible{outline:2px solid var(--wh-gold);outline-offset:4px}
 .wd-focus{min-width:0;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);overflow:hidden;background:var(--wd-surface);scroll-margin-top:6rem}
@@ -22,7 +23,7 @@ body[data-world-home] .wd-shell [hidden]{display:none!important}
   body[data-rtg-desktop] .rtg-edge-mark::after{font:400 1rem/1.2 Inter,sans-serif}
   body[data-rtg-desktop] .reisapp{max-width:none!important;width:auto!important;padding-inline:0!important}
   body[data-rtg-desktop] .wd-shell{display:grid;grid-template-columns:minmax(190px,230px) minmax(0,1fr) minmax(220px,280px);align-items:start;gap:clamp(1rem,2vw,2rem);max-width:1680px;width:calc(100% - 3rem);margin:2rem auto 10rem;padding:0;isolation:isolate}
-  body[data-rtg-desktop] .wd-home,body[data-rtg-desktop] main.wd-home#inhoud,body[data-rtg-desktop] main.wd-home#hoofd{grid-column:2;min-width:0;width:100%;max-width:none!important;max-height:min(44rem,calc(100dvh - 15rem));margin:0!important;padding:0 .2rem .2rem!important;overflow:auto!important;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
+  body[data-rtg-desktop] .wd-home,body[data-rtg-desktop] main.wd-home#inhoud,body[data-rtg-desktop] main.wd-home#hoofd,body[data-rtg-desktop] main.wd-home#main{grid-column:2;min-width:0;width:100%;max-width:none!important;max-height:min(44rem,calc(100dvh - 15rem));margin:0!important;padding:0 .2rem .2rem!important;overflow:auto!important;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
   body[data-rtg-desktop] .living-example-photo>img{height:clamp(360px,31vw,460px);aspect-ratio:auto}
   body[data-rtg-desktop] .living-intro .momenten{padding-block:.5rem 1rem}
   body[data-rtg-desktop] .living-intro .moment i{width:3.5rem;height:3.5rem}
@@ -41,6 +42,21 @@ body[data-world-home] .wd-shell [hidden]{display:none!important}
   body[data-rtg-desktop] .wd-home .wh-work-hero,body[data-rtg-desktop] .wd-home .wh-foundation-hero{min-height:31rem}
   body[data-rtg-desktop] .wd-home .wh-pair{grid-template-columns:1fr}
   body[data-rtg-desktop] .wd-home .living-intro{padding-inline:0}
+  /* De oorspronkelijke LivingOS-schil blijft de mobiele fallback. Zodra de
+     gedeelde desktop-home actief is, draagt die schil geen eigen kolommen of
+     hoogte meer en kan hetzelfde middenvlak als WorkOS worden gebruikt. */
+  body[data-rtg-desktop="living"] .schil{display:contents!important;min-height:0!important}
+  body[data-rtg-desktop="living"] .schil>.bank,body[data-rtg-desktop="living"] .schil>.topbar{display:none!important}
+  body[data-rtg-desktop="living"] .wd-home .dag{grid-template-columns:minmax(0,1fr)!important}
+  body[data-rtg-desktop="living"] .wd-home .kompas{position:static}
+  /* De publieke Foundation-home houdt zijn eigen stadsinhoud en nachtblauwe
+     materiaal, maar gedraagt zich in de middelste kolom als de WorkOS-home.
+     De stadkiezer valt daarom onder de hero in plaats van er als een tweede
+     dashboardkolom naast te staan. */
+  body[data-rtg-desktop="foundation"] .wd-home .onthaal{display:block!important;margin:0 0 1rem!important;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important}
+  body[data-rtg-desktop="foundation"] .wd-home .onthaal-beeld{min-height:31rem;border:1px solid var(--wd-line);background:var(--rtg-world-photo-mask),var(--rtg-world-photo) var(--rtg-world-photo-position,center)/cover no-repeat,var(--rtg-world-ground,#071522)}
+  body[data-rtg-desktop="foundation"] .wd-home .onthaal-kies{margin-top:1.5rem;border:1px solid var(--wd-line);background:var(--wd-surface)}
+  body[data-rtg-desktop="foundation"] .wd-home .tweeluik{grid-template-columns:minmax(0,1fr)}
   /* Side panels belong to the story row and scroll away before the full-width library. */
   body[data-rtg-desktop] .wd-people,body[data-rtg-desktop] .wd-favorites{display:block;position:relative;min-width:0;max-height:calc(100dvh - 15rem);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
   body[data-rtg-desktop] .wd-people{grid-column:1;grid-row:2;background:var(--wd-surface);border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);padding:1.15rem}

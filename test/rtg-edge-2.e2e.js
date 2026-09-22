@@ -44,9 +44,9 @@ const ROUTES = [
   },
   {
     naam: 'FoundationOS Vandaag', pad: '/apps/foundation/os-publiek.html', wereld: 'foundation',
-    context: ['world-shell'],
+    context: ['wereldtabs'],
     oud: [
-      'body > .ws-balk', 'body > .rtgdeel-balk', 'body > header.ios-nav',
+      'body > .wereldtabs', 'body > .wereldapps', 'body > .ws-balk', 'body > .rtgdeel-balk', 'body > header.ios-nav',
       'body > .ios-thuis', '#osMenuBtn'
     ]
   },
@@ -76,9 +76,9 @@ const ROUTES = [
   },
   {
     naam: 'FoundationOS Stad', pad: '/apps/foundation/os-publiek.html?stad=zaandam',
-    wereld: 'foundation', context: ['world-shell'],
+    wereld: 'foundation', context: ['wereldtabs'],
     oud: [
-      'body > .ws-balk', 'body > .rtgdeel-balk', 'body > header.ios-nav',
+      'body > .wereldtabs', 'body > .wereldapps', 'body > .ws-balk', 'body > .rtgdeel-balk', 'body > header.ios-nav',
       'body > .ios-thuis', '#osMenuBtn'
     ]
   }
@@ -422,7 +422,9 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
         await page.setViewportSize({ width: 1440, height: 900 });
         await page.goto(base + '/apps/rtg.html', { waitUntil: 'domcontentloaded' });
         await wachtOpEdge2(page);
-        await zetStand(page, 'overview', { top: true, side: true, bottom: true, reveal: false });
+        // LivingOS gebruikt hier dezelfde brede wereldcompositie als WorkOS:
+        // de desktop-zijrand wijkt voor de vaste mensen/inhoud/apps-kolommen.
+        await zetStand(page, 'overview', { top: true, side: false, bottom: true, reveal: false });
         await page.evaluate(() => {
           const frame = document.createElement('iframe');
           frame.id = 'rtg-edge-2-proefframe';

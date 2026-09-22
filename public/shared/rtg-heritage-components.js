@@ -30,6 +30,45 @@
         }).observe(el);
       }
     });
+    /* Een route houdt zijn bestaande DOM, maar het primaire werkvlak krijgt
+       voortaan wel een vaste naam. Daardoor kan één stylesheet alle 294
+       schermen dezelfde buitenmaat geven zonder te gokken op historische
+       klassen als .wrap, .werk, .app of .blad. Geneste mains tellen niet als
+       tweede pagina en een kaart/editor/camera blijft een vrij canvas. */
+    var roots = Array.from(d.querySelectorAll('main,[role="main"]')).filter(function (el) {
+      if (el.closest('.rtg-edge-chrome,dialog,[role="dialog"]')) return;
+      var parent = el.parentElement && el.parentElement.closest('main,[role="main"]');
+      if (parent) return false;
+      /* Command and the standalone workspace are the workspace shells, not
+         documents inside them. Their <main> must therefore keep the exact
+         Edge bounds: applying the normal content inset here would create a
+         second top gutter above every opened app. */
+      var immersive = d.body.classList.contains('rtg-edge-workspace') || !!el.closest('#rtgCommand') || !!canvas || el.matches('[data-rtg-native-canvas]') || !!el.querySelector('[data-rtg-native-canvas]');
+      mark(el, 'data-rtg-screen-root', immersive ? 'immersive' : 'content');
+      return true;
+    });
+    /* Enkele voordeuren houden het ingelogde <main> bewust verborgen en tonen
+       eerst een sectie of shell. Ook die zichtbare voordeur is het scherm en
+       mag niet boven de Edge beginnen. Kies alleen een groot, direct kind;
+       scripts, oude navigatie en de Edge zelf kunnen zo nooit pagina worden. */
+    var visibleRoot = roots.some(function (el) {
+      var rect = el.getBoundingClientRect(), style = getComputedStyle(el);
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 240 && rect.height > 160;
+    });
+    if (!visibleRoot) {
+      var candidates = Array.from(d.body.children).filter(function (el) {
+        if (el.matches('script,style,link,nav,header,footer,dialog,[role="dialog"],[role="alertdialog"],.rtg-edge-chrome,.rtg-world-start,.os-switcher')) return false;
+        var rect = el.getBoundingClientRect(), style = getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 240 && rect.height > 160;
+      }).sort(function (a, b) {
+        var ar = a.getBoundingClientRect(), br = b.getBoundingClientRect();
+        return (br.width * br.height) - (ar.width * ar.height);
+      });
+      if (candidates[0]) {
+        var fallback = candidates[0], free = !!canvas || fallback.matches('[data-rtg-native-canvas]') || !!fallback.querySelector('[data-rtg-native-canvas]');
+        mark(fallback, 'data-rtg-screen-root', free ? 'immersive' : 'content');
+      }
+    }
     (profile.rules || []).concat(registry.common).forEach(function (rule) {
       d.querySelectorAll(rule.selector).forEach(function (el) {
         if (!el.closest(SCOPE) || el.closest(EXCLUDE) || !guarded(el, rule.guard)) return;

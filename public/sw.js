@@ -14,7 +14,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-1972ae1d';
+const CACHE = 'rtg-app-d9b7ecb1';
 const SHELL = ['/apps/app.html', '/shared/id.js',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
      bewaren en daarna identiteit, materiaal, beweging of lettertypen missen. */
@@ -30,7 +30,7 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
   '/shared/rtg-operation.js', '/shared/rtg-side-sheet.js',
   '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
   '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-experiences.css', '/shared/rtg-heritage-components.css',
-  '/shared/rtg-simple.css',
+  '/shared/rtg-simple.css', '/shared/rtg-world-screen.css',
   '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',
   '/shared/rtg-continue-key.css', '/shared/rtg-continue-key-core.js',
   '/shared/rtg-continue-key.js', '/shared/rtg-heritage-order.js',

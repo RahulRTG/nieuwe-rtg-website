@@ -68,9 +68,9 @@ const WERELDEN = [
   {
     naam: 'FoundationOS', wereld: 'foundation', pad: '/apps/foundation/os-publiek.html', hoofd: '#main',
     panelen: ['.onthaal', '.tweeluik', '.doen', '.band'],
-    context: ['world-shell'],
+    context: ['wereldtabs', 'wereldapps'],
     oud: [
-      'body > .ws-balk', 'body > .rtgdeel-balk', 'body > header.ios-nav',
+      'body > .wereldtabs', 'body > .wereldapps', 'body > .ws-balk', 'body > .rtgdeel-balk', 'body > header.ios-nav',
       'body > .ios-thuis', '#osMenuBtn'
     ]
   }

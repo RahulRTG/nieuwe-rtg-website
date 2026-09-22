@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-22T15:56:19.622Z",
-  "commit": "57d37077c",
-  "boomVuil": true,
-  "boomAnders": 7,
+  "op": "2026-09-22T16:15:51.829Z",
+  "commit": "ea2e87136",
+  "boomVuil": false,
+  "boomAnders": 3,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },
@@ -7255,7 +7255,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -7789,7 +7789,7 @@
    "semantiek": {
     "klasse": "hooguitEens"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",

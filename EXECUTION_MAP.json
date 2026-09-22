@@ -73,7 +73,7 @@
  },
  "telling": {
   "capabilities": 4972,
-  "bereikbaarPerRol": 177,
+  "bereikbaarPerRol": 178,
   "conflicten": 0,
   "metBesluit": 148,
   "metVermoedeTerugweg": 49,
@@ -2473,7 +2473,11 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
-   "bereik": "verboden"
+   "bereik": {
+    "member": "lezen",
+    "supplier": "verboden",
+    "staff": "verboden"
+   }
   },
   {
    "pad": "/api/bestanden/pdf/notitie",

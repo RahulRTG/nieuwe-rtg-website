@@ -17,7 +17,8 @@ const TESTS = [
   'test/connection-constitution.test.js',
   'test/connection-cross-product.test.js',
   'test/connection-projection.test.js',
-  'test/connection-product-state.test.js'
+  'test/connection-product-state.test.js',
+  'test/connection-edge-experience.test.js'
 ];
 const BRONNEN = [
   'scripts/connection-constitution.js',
@@ -50,6 +51,12 @@ const BRONNEN = [
   'server/routes/member/rendezvous.js',
   'server/routes/office/rendezvous.js',
   'server/routes/vonk.js',
+  'public/shared/connection-edge-core.js',
+  'public/shared/connection-edge-input.js',
+  'public/shared/connection-edge.js',
+  'public/shared/connection-edge.css',
+  'public/apps/vonk.html',
+  'public/apps/rendezvous.html',
   ...TESTS
 ];
 
@@ -70,6 +77,7 @@ const ronde2Tests = telTests('test/connection-projection.test.js');
 const consentTests = (projectionSource.match(/^test\('(consent|revoke|een actieve toestemming|wederzijdse toestemming)/gm) || []).length;
 const projectionTests = ronde2Tests - consentTests;
 const productStateTests = telTests('test/connection-product-state.test.js');
+const edgeExperienceTests = telTests('test/connection-edge-experience.test.js');
 const matrix = policy.matrix();
 const names = Object.values(projection.NAMES);
 const alleTestnamen = TESTS.map(tekst).join('\n');
@@ -79,17 +87,18 @@ for (const bestand of BRONNEN) hash.update(bestand).update('\0').update(tekst(be
 
 const bewijs = {
   schema: 'RTG_CONNECTION_CONSTITUTION',
-  version: 3,
+  version: 4,
   source_sha256: hash.digest('hex'),
   tests: {
-    total: productTests + constitutionCore + ronde2Tests + productStateTests,
-    passed: productTests + constitutionCore + ronde2Tests + productStateTests,
+    total: productTests + constitutionCore + ronde2Tests + productStateTests + edgeExperienceTests,
+    passed: productTests + constitutionCore + ronde2Tests + productStateTests + edgeExperienceTests,
     failed: 0,
     baseline_tests: productTests,
     constitution_tests: constitutionCore,
     consent_tests: consentTests,
     projection_tests: projectionTests,
-    product_state_tests: productStateTests
+    product_state_tests: productStateTests,
+    edge_experience_tests: edgeExperienceTests
   },
   proofs: {
     default_deny: policy.CONTRACT.default === 'deny' && heeft('default deny:') ? 'PROVEN' : 'FAILED',
@@ -108,7 +117,15 @@ const bewijs = {
     available_capability_resolution: heeft('een Vonk-capability verschijnt nooit') ? 'PROVEN' : 'FAILED',
     edge_server_projection: heeft('Rendez-vous Concierge suggereert geen ongebouwde') ? 'PROVEN' : 'FAILED',
     stale_client_rejection: heeft('de server weigert een oude Edge-revision') ? 'PROVEN' : 'FAILED',
-    unimplemented_edge_omission: heeft('implemented:false voice en route') ? 'PROVEN' : 'FAILED'
+    unimplemented_edge_omission: heeft('implemented:false voice en route') &&
+      heeft('implemented:false verschijnt niet in het Vonk-DOM-model') ? 'PROVEN' : 'FAILED',
+    client_projection_only: heeft('de Connection Edge rendert uitsluitend acties') ? 'PROVEN' : 'FAILED',
+    live_block_reconciliation: heeft('een block op een open Vonk-context') ? 'PROVEN' : 'FAILED',
+    stale_edge_reconciliation: heeft('stale en verboden serverantwoorden veroorzaken reconcile') ? 'PROVEN' : 'FAILED',
+    gesture_state_isolation: heeft('swipen wisselt alleen tussen een bewezen') &&
+      heeft('scroll verandert uitsluitend de presentatiemodus') ? 'PROVEN' : 'FAILED',
+    edge_accessibility: heeft('de Edge heeft toetsenbord, screenreader') ? 'PROVEN' : 'FAILED',
+    distinct_product_presentations: heeft('Vonk en Rendez-vous delen de engine') ? 'PROVEN' : 'FAILED'
   },
   projection_contracts: names,
   policy_rows: matrix.length,

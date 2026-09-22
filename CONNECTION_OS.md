@@ -155,6 +155,32 @@ altijd eerst de actuele serverstate. Een meegestuurde oude revision krijgt
 `STALE_CONNECTION_STATE`; zonder revision kan de client evenmin iets openen,
 omdat capability en transition opnieuw server-side worden gecontroleerd.
 
+### Ronde 4 - Connection Edge Experience
+
+De browserlaag staat in drie kleine gedeelde modules:
+
+- `connection-edge-core.js` maakt uit een serverprojectie een streng clientmodel;
+- `connection-edge-input.js` behandelt toetsen, halen, scrollvorm en haptics;
+- `connection-edge.js` rendert dat model in dezelfde fysieke Edge en voert een
+  geprojecteerde actie via de productschil uit.
+
+De renderer controleert zowel het productprefix van de surface als de
+`availableCapabilities` bij iedere actie. Er bestaan geen clientdefaults voor
+Voice, Route of Concierge. Een block, ingetrokken toestemming, verdwenen
+context of stale revision veroorzaakt een nieuwe projectie; de oude DOM wordt
+niet als autoriteit gebruikt.
+
+Vonk en Rendez-vous delen alleen de engine. Vonk gebruikt een warmere,
+directere presentatie; Rendez-vous een stille redactionele presentatie. Tap
+voert een geprojecteerde actie uit, een horizontale haal wisselt uitsluitend
+tussen een reeds geprojecteerde root- en kindcontext, en scrollen verandert
+alleen de grootte van de Edge.
+
+De bestaande schermtabs zijn niet meer de bron voor Connection-navigatie. De
+serverprojectie tekent de acties. Toetsenbordbediening, live-regio,
+touchdoelen, safe areas, grote tekst, RTL en reduced motion zitten in dezelfde
+gedeelde laag.
+
 ## Gefixeerde bouwvolgorde
 
 0. baseline bevriezen;

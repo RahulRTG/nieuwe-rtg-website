@@ -20,6 +20,7 @@
 <link href="/shared/social-suite.css" rel="stylesheet">
 <link href="/shared/social-intelligence.css" rel="stylesheet">
 <link href="/shared/dating-premium.css" rel="stylesheet">
+<link href="/shared/connection-edge.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/social-suite.js" defer></script>
 <script src="/shared/social-intelligence.js" defer></script>
@@ -42,7 +43,7 @@
   <span class="os-switcher__state">Kern verbonden</span>
 </div>
 <header><div><span>RTG Elite · Signature members only</span><h1>Rendez-vous</h1></div></header>
-<nav class="dating-tabs" id="tabs" aria-label="Rendez-vous"></nav>
+<nav class="dating-tabs" id="tabs" aria-label="Rendez-vous" hidden></nav>
 <main id="main" tabindex="-1"><div class="dating-empty"><strong>Rendez-vous wordt geopend</strong><p>Uw besloten ruimte en identiteitsstatus worden gecontroleerd.</p></div></main>
 <div class="melding" id="melding" role="status" aria-live="polite"></div>
 
@@ -63,6 +64,9 @@
 
 <script src="/shared/deur.js"></script>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/connection-edge-core.js"></script>
+<script src="/shared/connection-edge-input.js"></script>
+<script src="/shared/connection-edge.js"></script>
 <script>
 /* Samenvoeging van twee rondes. De dating-premium-ronde van main levert de
    opzet: de shell (command/werk/context), de tabs-runtime, toonGate met
@@ -76,11 +80,7 @@
   const $ = s => document.querySelector(s);
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let token = null; try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
-  let tab = 'profiel', uitvoer = null, locaties = [], safetyTarget = null;
-  /* Vier tabbladen: de eerste drie uit de premium-ronde, het vierde uit de
-     ONTMOETEN.md-ronde -- tafels, introducties en Together horen bij het
-     ontmóéten en niet bij het vinden, dus ze staan apart. */
-  const tabs = [['profiel','Profiel'],['ontdek','Ontdek'],['matches','Matches'],['kring','De kring']];
+  let tab = 'profiel', uitvoer = null, locaties = [], safetyTarget = null, connectionEdge = null;
   const voorkeuren = ['Gastronomie','Kunst','Zeilen','Wellness','Reizen','Cultuur'];
   document.addEventListener('DOMContentLoaded', () => { document.querySelector('.rtg-spring')?.remove(); document.body.prepend($('.skip')); }, { once:true });
 
@@ -95,8 +95,9 @@
     return data;
   }
   function tekenTabs() {
-    $('#tabs').innerHTML = tabs.map(([key,label]) => '<button type="button" role="tab" aria-selected="'+(tab===key)+'" data-tab="'+key+'">'+label+'</button>').join('');
-    document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; laad(); });
+    const edgeHost = $('#tabs'), ingebed = !!(connectionEdge && connectionEdge.inspect().embedded);
+    edgeHost.hidden = !ingebed; if (!ingebed) edgeHost.replaceChildren();
+    if (connectionEdge) connectionEdge.select(tab === 'ontdek' ? 'today' : tab === 'kring' ? 'society' : '');
   }
   function command(titel, detail) {
     return '<section class="dating-command" aria-label="Veiligheidsstatus">'+
@@ -114,6 +115,7 @@
     return (items || []).map(x => '<span class="dating-chip'+(samen.includes(String(x).toLowerCase())?' shared':'')+'">'+esc(x)+'</span>').join('');
   }
   function toonGate(fout) {
+    if (connectionEdge) connectionEdge.clear();
     const inlog = !token || (fout && fout.status === 401);
     const identiteit = fout && fout.code === 'IDENTITY_REQUIRED';
     const leeftijd = fout && fout.code === 'AGE_REQUIRED';
@@ -138,6 +140,36 @@
   }
   $('#blockOnly').addEventListener('click', e => { e.preventDefault(); safety(false); });
   $('#blockReport').addEventListener('click', e => { e.preventDefault(); safety(true); });
+
+  function zetTab(nieuw) { tab = nieuw; laad(); }
+  function bindIntroductionContexts() {
+    if (!connectionEdge) return;
+    document.querySelectorAll('[data-connection-introduction]').forEach(card => {
+      const open = () => connectionEdge.openLayer({ kind:'introduction',
+        id:card.dataset.connectionIntroduction, label:card.dataset.connectionName });
+      card.addEventListener('focusin', open); card.addEventListener('pointerdown', open, { passive:true });
+    });
+  }
+  function startConnectionEdge() {
+    if (!window.RTGConnectionEdge) return;
+    connectionEdge = RTGConnectionEdge.create({ product:'rendezvous',
+      load:ctx => api('edge', ctx.kind === 'introduction' ? { kind:'introduction', id:ctx.id } : {}),
+      onError:fout => meld(fout.message || 'De bediening kon niet worden bijgewerkt.'),
+      onAction:async ({ action, context, projection }) => {
+        if (context.kind === 'root') {
+          if (action.id === 'today') zetTab('ontdek');
+          else if (action.id === 'society') zetTab('kring');
+          else if (action.id === 'concierge') window.location.href = '/apps/lifestyle.html';
+          return;
+        }
+        if (action.id === 'safety') { openSafety(context.id, context.label || 'Dit lid'); return; }
+        if (action.id !== 'not_now' && action.id !== 'open_to_introduction') return;
+        const r = await api('introductie/antwoord', { id:context.id,
+          ja:action.intent === 'accept', stateRevision:projection.stateRevision });
+        meld(r.geopend ? 'De introductie is open.' : 'Genoteerd.'); await laad();
+      }});
+    if (connectionEdge) connectionEdge.setRoot();
+  }
 
   /* Meenemen (shared/uitvoer.js): u neemt mee wat er op het tabblad staat, met
      de velden los en iedereen op zijn CODENAAM -- echte namen kent deze app
@@ -248,7 +280,7 @@
     const data = await api('kandidaten');
     uitvoer = {naam:'kandidaten',kolommen:['codenaam','status','zoekt','locaties','gedeelde locaties','tegelijk ergens'],rijen:(data.kandidaten||[]).map(k=>[k.codenaam||'',k.status||'',k.zoekt||'',(k.locaties||[]).join(', '),(k.gedeeldeLocaties||[]).join(', '),(k.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', ')])};
     let lijst = '';
-    if (!data.profielAan) lijst += '<div class="dating-date"><strong>Uw profiel is verborgen.</strong> Zet het bij Profiel aan om een like te kunnen geven en zelf gevonden te worden.</div>';
+    if (!data.profielAan) lijst += '<div class="dating-date"><strong>Uw profiel is verborgen.</strong> Open uw profiel om zichtbaar te worden.<div class="dating-actions strak"><button class="dating-button" type="button" id="rvOpenProfiel">Profiel openen</button></div></div>';
     if (!data.kandidaten.length) lijst += '<div class="dating-empty"><strong>Uw selectie is voor nu compleet</strong><p>Rendez-vous blijft bewust eindig. Nieuwe passende Signature-members verschijnen zodra ze beschikbaar zijn.</p></div>';
     else lijst += '<div class="dating-list">'+data.kandidaten.map(k => {
       const match=k.status==='match', liked=k.status==='geliked';
@@ -264,6 +296,7 @@
     document.querySelectorAll('[data-pass]').forEach(b=>b.onclick=async()=>{try{await api('pas',{id:b.dataset.pass});laad();}catch(e){meld(e.message);}});
     document.querySelectorAll('[data-matches]').forEach(b=>b.onclick=()=>{tab='matches';laad();});
     document.querySelectorAll('[data-safe]').forEach(b=>b.onclick=()=>openSafety(b.dataset.safe,b.dataset.name));
+    const profielKnop=$('#rvOpenProfiel');if(profielKnop)profielKnop.onclick=()=>zetTab('profiel');
   }
 
   async function matches() {
@@ -342,7 +375,7 @@
 
     werk += '<div class="dating-section-head dating-ruim" ><div><span class="dating-eyebrow">Introducties</span><h2>Voorgesteld worden</h2></div><p>U hoort het pas als het wederzijds is. Een nee blijft stil.</p></div>'
       +((i.introducties||[]).length ? '<div class="dating-list">'+i.introducties.map(x =>
-        '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">Introductie</div><h3>'+esc(x.codenaam)+'</h3>'
+        '<article class="dating-person" data-connection-introduction="'+esc(x.id)+'" data-connection-name="'+esc(x.codenaam)+'"><div class="dating-person-main"><div class="dating-person-mark">Introductie</div><h3>'+esc(x.codenaam)+'</h3>'
         +(x.aanleiding?'<p class="dating-bio">'+esc(x.aanleiding)+'</p>':'')
         +(x.geopend?'<div class="dating-meta">De introductie is open.</div>':'')+'</div>'
         +'<div class="dating-person-actions">'+(x.geopend ? '' : x.ikAntwoordde===null
@@ -366,15 +399,16 @@
         $('#pin').value = ''; laad(); } catch (e) { meld(e.message); } };
     const los = $('#losser'); if (los) los.onclick = async () => {
       try { await api('samen/zet', { ja: false }); meld('Bijgewerkt.'); laad(); } catch (e) { meld(e.message); } };
+    bindIntroductionContexts();
   }
 
   async function laad() {
     tekenTabs(); uitvoer=null;
     if(!token){toonGate(new Error('Log eerst in via de leden-app.'));return;}
-    try { if(tab==='profiel')await profiel(); else if(tab==='ontdek')await ontdek(); else if(tab==='kring')await kring(); else await matches(); }
+    try { if(tab==='profiel')await profiel(); else if(tab==='ontdek')await ontdek(); else if(tab==='kring')await kring(); else await matches(); if(connectionEdge)connectionEdge.refresh(true); }
     catch(e){ if(e.status===403||e.status===401)toonGate(e); else { $('#main').innerHTML='<div class="dating-empty"><strong>Rendez-vous kon niet laden</strong><p>'+esc(e.message)+'</p></div>'; meld(e.message); } }
   }
-  laad();
+  startConnectionEdge(); laad();
 })();
 </script>
 <script src="/shared/schermbeeld.js" defer></script>

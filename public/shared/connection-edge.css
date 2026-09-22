@@ -1,0 +1,102 @@
+/* Connection Edge is de zichtbare projectie van de servertoestand. De basis
+   is gedeeld; Vonk en Rendez-vous houden een eigen ritme en materiaal. */
+body[data-connection-edge]{--connection-edge-space:calc(7.6rem + env(safe-area-inset-bottom,0px));padding-bottom:var(--connection-edge-space)!important;}
+.connection-edge[hidden]{display:none!important;}
+.connection-edge{
+  position:fixed;z-index:10020;inset-inline:clamp(.75rem,3vw,2rem);inset-block-end:calc(.7rem + env(safe-area-inset-bottom,0px));
+  width:min(760px,calc(100vw - clamp(1.5rem,6vw,4rem)));margin-inline:auto;box-sizing:border-box;
+  display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:.7rem;padding:.58rem;
+  isolation:isolate;transition:width .28s cubic-bezier(.2,.8,.2,1),padding .28s cubic-bezier(.2,.8,.2,1),
+    transform .28s cubic-bezier(.2,.8,.2,1),background-color .24s ease,box-shadow .24s ease;
+  touch-action:pan-y;overscroll-behavior:contain;
+}
+.rtg-edge-bottom.connection-edge-owner{
+  display:block!important;min-height:0!important;width:auto!important;height:auto!important;padding:0!important;border:0!important;
+  background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;pointer-events:none;
+}
+.rtg-edge-bottom.connection-edge-owner>:not(.connection-edge),
+.rtg-adaptive-edge.connection-edge-owner>:not(.connection-edge){display:none!important;}
+.rtg-edge-bottom.connection-edge-owner>.connection-edge,
+.rtg-adaptive-edge.connection-edge-owner>.connection-edge{pointer-events:auto;}
+.rtg-edge-bottom.connection-edge-owner .connection-edge,
+.rtg-adaptive-edge.connection-edge-owner .connection-edge{position:fixed;}
+.rtg-adaptive-edge.connection-edge-owner{pointer-events:none;border:0!important;background:transparent!important;box-shadow:none!important;}
+.dating-tabs:has(>.connection-edge.is-embedded){display:block!important;padding:0!important;overflow:visible!important;background:transparent!important;border:0!important;}
+.connection-edge.is-embedded{
+  position:relative;inset:auto;width:100%;margin:0;border-radius:0;box-shadow:none;
+}
+.connection-edge.is-embedded.is-compact{width:100%;transform:none;}
+.connection-edge__context{
+  min-width:6.5rem;padding-inline:.72rem;color:inherit;font:650 .58rem/1.1 Inter,system-ui,sans-serif;
+  letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:max-width .22s ease,opacity .18s ease,padding .22s ease;
+}
+.connection-edge__rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(5.5rem,1fr);gap:.28rem;min-width:0;}
+.connection-edge__action{
+  appearance:none;min-width:0;min-height:52px;margin:0;padding:.52rem .68rem;display:flex;align-items:center;justify-content:center;gap:.48rem;
+  border:1px solid transparent;border-radius:var(--rtg-radius-system,22px);color:inherit;background:transparent;font:650 clamp(.68rem,1.8vw,.82rem)/1 Inter,system-ui,sans-serif;
+  letter-spacing:.015em;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:color .18s ease,background-color .18s ease,border-color .18s ease,transform .18s ease;
+}
+.connection-edge__action:active{transform:scale(.975);}
+.connection-edge__action:focus-visible{outline:2px solid currentColor;outline-offset:2px;}
+.connection-edge__action[aria-current="page"]{font-weight:760;}
+.connection-edge__mark{width:.35rem;height:.35rem;flex:none;border:1px solid currentColor;border-radius:50%;opacity:.5;transition:transform .18s ease,opacity .18s ease,background-color .18s ease;}
+.connection-edge__action[aria-current="page"] .connection-edge__mark{opacity:1;background:currentColor;transform:scale(1.28);}
+.connection-edge__label{overflow:hidden;text-overflow:ellipsis;}
+.connection-edge__status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+.connection-edge.is-compact{width:min(560px,calc(100vw - 2rem));padding:.36rem;transform:translateY(.16rem);}
+.connection-edge.is-compact .connection-edge__context{max-width:0;min-width:0;padding:0;opacity:0;}
+.connection-edge.is-compact .connection-edge__action{min-height:46px;padding-block:.38rem;}
+
+/* Vonk: warm, direct en levend. De beweging zit in gewicht en licht, niet in
+   confetti of spelbeloningen. */
+.connection-edge--vonk{
+  color:#fff8ee;border:1px solid rgba(229,196,120,.34);border-radius:var(--rtg-radius-system,22px);
+  background:linear-gradient(125deg,rgba(31,15,18,.97),rgba(72,19,36,.96) 58%,rgba(26,17,15,.98));
+  box-shadow:0 18px 55px rgba(42,10,20,.32),inset 0 1px rgba(255,255,255,.09);
+}
+.connection-edge--vonk::before{content:"";position:absolute;z-index:-1;inset:12% 18%;border-radius:50%;background:rgba(196,151,67,.16);filter:blur(24px);pointer-events:none;}
+.connection-edge--vonk .connection-edge__context{color:#d9b65f;}
+.connection-edge--vonk .connection-edge__action:hover,
+.connection-edge--vonk .connection-edge__action[aria-current="page"]{color:#fffaf1;border-color:rgba(228,193,112,.34);background:rgba(255,245,223,.09);}
+.connection-edge--vonk .connection-edge__mark{color:#e3c878;}
+
+/* Rendez-vous: een stille hospitality-laag. Minder glans, meer ruimte en een
+   redactionele titeltoon; dezelfde renderer, nadrukkelijk niet dezelfde huid. */
+.connection-edge--rendezvous{
+  color:#27231c;border:1px solid rgba(96,78,42,.3);border-radius:var(--rtg-radius-system,22px);
+  background:rgba(247,243,235,.94);box-shadow:0 22px 64px rgba(32,27,19,.2),inset 0 1px rgba(255,255,255,.85);
+  backdrop-filter:blur(20px) saturate(.78);
+}
+.connection-edge--rendezvous .connection-edge__context{color:#74601b;font-family:"Bodoni Moda",Georgia,serif;font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:none;}
+.connection-edge--rendezvous .connection-edge__rail{gap:.5rem;}
+.connection-edge--rendezvous .connection-edge__action{border-radius:0;border-inline:0;border-block:1px solid transparent;font-weight:560;}
+.connection-edge--rendezvous .connection-edge__action:hover,
+.connection-edge--rendezvous .connection-edge__action[aria-current="page"]{color:#5d4c12;border-block-color:rgba(133,112,7,.38);background:rgba(192,165,68,.055);}
+.connection-edge--rendezvous .connection-edge__mark{border-radius:0;width:.48rem;height:1px;border:0;background:currentColor;transform:none;}
+.connection-edge--rendezvous .connection-edge__action[aria-current="page"] .connection-edge__mark{height:2px;transform:scaleX(1.35);}
+
+[dir="rtl"] .connection-edge{direction:rtl;}
+[dir="rtl"] .connection-edge__rail{direction:rtl;}
+html.rtg-tekst-groot .connection-edge,html.rtg-tekst-groter .connection-edge{width:min(900px,calc(100vw - 1.5rem));}
+html.rtg-tekst-groot .connection-edge__rail,html.rtg-tekst-groter .connection-edge__rail{grid-auto-columns:minmax(7rem,1fr);overflow-x:auto;}
+html.rtg-tekst-groot .connection-edge__action,html.rtg-tekst-groter .connection-edge__action{white-space:normal;line-height:1.18;}
+@media(max-width:620px){
+  body[data-connection-edge]{--connection-edge-space:calc(7rem + env(safe-area-inset-bottom,0px));}
+  .connection-edge{inset-inline:.65rem;inset-block-end:calc(.55rem + env(safe-area-inset-bottom,0px));width:calc(100vw - 1.3rem);grid-template-columns:1fr;padding:.44rem;}
+  .connection-edge__context{display:none;}
+  .connection-edge__rail{grid-auto-columns:minmax(0,1fr);gap:.2rem;}
+  .connection-edge__action{min-height:52px;padding:.5rem .35rem;gap:.32rem;font-size:clamp(.65rem,3.2vw,.76rem);}
+  .connection-edge.is-compact{width:calc(100vw - 2.4rem);}
+  .connection-edge.is-embedded,.connection-edge.is-embedded.is-compact{width:100%;inset:auto;}
+  .connection-edge.is-compact .connection-edge__action{min-height:48px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .connection-edge,.connection-edge__context,.connection-edge__action,.connection-edge__mark{scroll-behavior:auto!important;transition:none!important;animation:none!important;}
+}
+@media(forced-colors:active){
+  .connection-edge{background:Canvas;color:CanvasText;border:2px solid CanvasText;box-shadow:none;}
+  .connection-edge__action[aria-current="page"]{border-color:Highlight;color:Highlight;}
+}
+@media print{.connection-edge,.rtg-edge-bottom.connection-edge-owner{display:none!important;}}

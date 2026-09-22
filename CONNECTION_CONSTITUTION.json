@@ -1,16 +1,17 @@
 {
   "schema": "RTG_CONNECTION_CONSTITUTION",
-  "version": 3,
-  "source_sha256": "50b2620348f550885b6c11f55c9d260b749d7b26fb7d5a93f6d3d5c9297c2b1a",
+  "version": 4,
+  "source_sha256": "330e37010cb739da00cf1532c703d763090e225397cf712ac1be385a1be2ac3a",
   "tests": {
-    "total": 88,
-    "passed": 88,
+    "total": 98,
+    "passed": 98,
     "failed": 0,
     "baseline_tests": 58,
     "constitution_tests": 8,
     "consent_tests": 4,
     "projection_tests": 7,
-    "product_state_tests": 11
+    "product_state_tests": 11,
+    "edge_experience_tests": 10
   },
   "proofs": {
     "default_deny": "PROVEN",
@@ -29,7 +30,13 @@
     "available_capability_resolution": "PROVEN",
     "edge_server_projection": "PROVEN",
     "stale_client_rejection": "PROVEN",
-    "unimplemented_edge_omission": "PROVEN"
+    "unimplemented_edge_omission": "PROVEN",
+    "client_projection_only": "PROVEN",
+    "live_block_reconciliation": "PROVEN",
+    "stale_edge_reconciliation": "PROVEN",
+    "gesture_state_isolation": "PROVEN",
+    "edge_accessibility": "PROVEN",
+    "distinct_product_presentations": "PROVEN"
   },
   "projection_contracts": [
     "VONK_PROFILE_OWNER",

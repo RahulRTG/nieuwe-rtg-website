@@ -18,6 +18,7 @@
 <link href="/shared/social-suite.css" rel="stylesheet">
 <link href="/shared/social-intelligence.css" rel="stylesheet">
 <link href="/shared/dating-premium.css" rel="stylesheet">
+<link href="/shared/connection-edge.css" rel="stylesheet">
 <style>
   /* Samenvoeging 26-8-2026: de premium-opzet (dating-premium.css) is de basis;
      dit blok bevat ALLEEN de componenten uit de ONTMOETEN.md-ronde die daar
@@ -70,7 +71,7 @@
   <span class="os-switcher__state">Kern verbonden</span>
 </div>
 <header><div><span>Verified introductions</span><h1>Vonk</h1></div></header>
-<nav class="dating-tabs" id="tabs" aria-label="Vonk"></nav>
+<nav class="dating-tabs" id="tabs" aria-label="Vonk" hidden></nav>
 <main id="inhoud" tabindex="-1"><div class="dating-empty"><strong>Vonk wordt geopend</strong><p>Uw identiteit en besloten selectie worden gecontroleerd.</p></div></main>
 <div class="melding" id="melding" role="status" aria-live="polite"></div>
 
@@ -104,19 +105,21 @@
      model aan met RTGUitvoer.bron(). In de <head> hield hij het parsen op
      zonder dat het iets won. -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/connection-edge-core.js"></script>
+<script src="/shared/connection-edge-input.js"></script>
+<script src="/shared/connection-edge.js"></script>
 <script>
 (() => {
   'use strict';
   const $ = s => document.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let token = null; try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
-  let tab = 'vandaag', selectie = null, matches = [], geo = null, safetyTarget = null, payTarget = null;
+  let tab = 'vandaag', selectie = null, matches = [], geo = null, safetyTarget = null, payTarget = null, connectionEdge = null;
   /* Uit de ONTMOETEN.md-ronde: de assentabel (kern/vonk/wensen.js), de dagdelen
      (kern/beschikbaar.js) en de tafelkaart (kern/vonk/halfweg.js) komen van de
      server mee met /selectie. Het scherm heeft geen eigen lijst -- een as erbij
      is een regel in de server en verder niets (LAT.md regel 4). */
   let TABEL = null, ROOSTER = null, KAART = null;
-  const tabs = [['profiel','Profiel'],['vandaag','Vandaag'],['matches','Matches']];
   const interesses = ['Reizen','Gastronomie','Muziek','Kunst','Sport','Natuur','Boeken','Wellness'];
   /* De labels bij de voorkeurstaal en de tafelkaart. Alleen vertaling van
      server-ids naar leestekst; de waarheid zelf woont in de kern. */
@@ -128,11 +131,12 @@
   function meld(tekst) { const m=$('#melding');m.textContent=tekst;m.style.opacity='1';clearTimeout(m._timer);m._timer=setTimeout(()=>{m.style.opacity='0';},3400); }
   async function api(pad, body) {
     const r=await fetch('/api/vonk/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(body||{})});
-    const data=await r.json().catch(()=>({})); if(!r.ok){const e=new Error(data.error||'Er ging iets mis.');e.status=r.status;throw e;} return data;
+    const data=await r.json().catch(()=>({})); if(!r.ok){const e=new Error(data.error||'Er ging iets mis.');e.status=r.status;e.code=data.code;throw e;} return data;
   }
   function tekenTabs() {
-    $('#tabs').hidden=false; $('#tabs').innerHTML=tabs.map(([key,label])=>'<button type="button" role="tab" aria-selected="'+(tab===key)+'" data-tab="'+key+'">'+label+'</button>').join('');
-    document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();});
+    const edgeHost=$('#tabs'), ingebed=!!(connectionEdge&&connectionEdge.inspect().embedded);
+    edgeHost.hidden=!ingebed;if(!ingebed)edgeHost.replaceChildren();
+    if(connectionEdge)connectionEdge.select(tab==='vandaag'?'discover':tab);
   }
   function command(titel, detail) {
     return '<section class="dating-command" aria-label="Veiligheidsstatus"><div class="dating-command-main"><span>Verified introductions</span><strong>'+esc(titel)+'</strong></div><div class="dating-command-cell" data-state="safe"><span>Identiteit</span><strong>18+ · geverifieerd</strong></div><div class="dating-command-cell"><span>Selectie</span><strong>Maximaal zes</strong></div><div class="dating-command-cell"><span>Regie</span><strong>'+esc(detail)+'</strong></div></section>';
@@ -148,6 +152,7 @@
   const niveau=n=>n?' · '+esc(n.id)+' · '+esc(n.naam):'';
   function toonGate(fout) {
     $('#tabs').hidden=true;
+    if(connectionEdge)connectionEdge.clear();
     const kyc=/verifieer|paspoort|kyc/i.test(fout.message), leeftijd=/vanaf 18|18 jaar/i.test(fout.message);
     const titel=kyc?'Verifieer eerst uw identiteit':leeftijd?'Vonk is alleen voor 18+':'Open Vonk via uw ledenaccount';
     $('#inhoud').innerHTML='<section class="dating-gate"><div class="dating-seal">V</div><span class="dating-eyebrow">Toegang bewaakt</span><h2>'+titel+'</h2><p>'+esc(fout.message)+'</p><div class="dating-actions"><a class="dating-button primary" href="/apps/app.html">'+(kyc?'Start identiteitscontrole':'Terug naar de leden-app')+'</a></div></section>';
@@ -237,14 +242,49 @@
   function koppelKies(mid){
     document.querySelectorAll('[data-kies="'+CSS.escape(mid)+'"]').forEach(b=>b.onclick=async()=>{
       try{
-        const r=await api('kies',{id:mid,optie:b.dataset.optie});
+        const r=await api('kies',{id:mid,optie:b.dataset.optie,stateRevision:connectionEdge&&connectionEdge.revision(mid)||undefined});
         meld(r.rond?'U koos allebei dezelfde plek.':r.beideGekozen?'U koos verschillend; u ziet nu allebei de keuzes.':'Genoteerd.');
         if(r.rond){await laad();return;} // de tafel staat nu klaar; het hele blad mag mee
         const doel=document.getElementById('hw-'+mid);
-        const hw=await api('halfweg',{id:mid});
+        if(connectionEdge)await connectionEdge.refresh(true);
+        const hw=await api('halfweg',{id:mid,stateRevision:connectionEdge&&connectionEdge.revision(mid)||undefined});
         doel.innerHTML=tekenOpties(mid,hw); koppelKies(mid);
       }catch(e){meld(e.message);}
     });
+  }
+
+  async function openHalfweg(id, revision){
+    const doel=document.getElementById('hw-'+id);if(!doel)return;
+    doel.innerHTML='<p class="dating-copy">Even kijken…</p>';
+    try{const hw=await api('halfweg',{id,stateRevision:revision||undefined});doel.innerHTML=tekenOpties(id,hw);koppelKies(id);}
+    catch(e){doel.innerHTML='<p class="dating-copy">'+esc(e.message)+'</p>';if(connectionEdge&&window.RTGConnectionEdge.shouldReconcile(e))await connectionEdge.refresh(true);}
+  }
+
+  function bindMatchContexts(){
+    if(!connectionEdge)return;
+    document.querySelectorAll('[data-connection-match]').forEach(card=>{
+      const open=()=>connectionEdge.openLayer({kind:'match',id:card.dataset.connectionMatch,label:card.dataset.connectionName});
+      card.addEventListener('focusin',open);card.addEventListener('pointerdown',open,{passive:true});
+    });
+  }
+
+  function zetTab(nieuw){tab=nieuw;render();}
+  function startConnectionEdge(){
+    if(!window.RTGConnectionEdge)return;
+    connectionEdge=RTGConnectionEdge.create({product:'vonk',load:ctx=>api('edge',ctx.kind==='match'?{id:ctx.id}:{}),
+      onError:fout=>meld(fout.message||'De bediening kon niet worden bijgewerkt.'),
+      onAction:async({action,context,projection})=>{
+        if(context.kind==='root'){
+          if(action.id==='discover')zetTab('vandaag');else if(action.id==='matches')zetTab('matches');else if(action.id==='profile')zetTab('profiel');
+          return;
+        }
+        const kaart=document.querySelector('[data-connection-match="'+CSS.escape(String(context.id))+'"]');
+        if(action.id==='chat'){const veld=kaart&&kaart.querySelector('[data-text]');if(veld){veld.scrollIntoView({block:'center'});veld.focus();}}
+        else if(action.id==='meet')await openHalfweg(context.id,projection.stateRevision);
+        else if(action.id==='more'||action.id==='safety')openSafety(context.label||'Dit lid');
+        else if(action.id==='date'&&kaart)kaart.scrollIntoView({block:'center'});
+      }});
+    if(connectionEdge)connectionEdge.setRoot();
   }
 
   function renderProfiel(){
@@ -323,7 +363,7 @@
   }
 
   function renderMatches(){
-    const lijst=!matches.length?'<div class="dating-empty"><strong>Nog geen wederzijdse match</strong><p>Zodra jullie elkaar allebei kiezen, opent hier een besloten chat en kan er een tafel klaarstaan.</p></div>':'<div class="dating-list">'+matches.map(x=>{const t=x.tafel;return '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">'+esc(statusLabel(x.status))+niveau(x.betrouwbaarheid)+'</div><h3>'+esc(x.met)+'</h3>'+(t?'<div class="dating-meta">'+esc(t.supplierName)+' · '+esc(t.plek)+' · '+esc(t.datum)+' om '+esc(t.tijd)+'</div><div class="dating-date"><strong>€ '+esc(t.prijsPP)+' p.p.</strong> · € '+esc(t.rtgDeel)+' RTG en € '+esc(t.prijsPP-t.rtgDeel)+' aanbetaling bij de zaak. '+(x.ikBetaalde?'Uw aandeel is bevestigd.':x.anderBetaalde?'De ander heeft al bevestigd.':'Nog niemand heeft betaald.')+'</div>':'<div class="dating-meta">Geen automatische tafel; kies samen een plek of spreek iets af in de chat.</div>')+
+    const lijst=!matches.length?'<div class="dating-empty"><strong>Nog geen wederzijdse match</strong><p>Zodra jullie elkaar allebei kiezen, opent hier een besloten chat en kan er een tafel klaarstaan.</p></div>':'<div class="dating-list">'+matches.map(x=>{const t=x.tafel;return '<article class="dating-person" data-connection-match="'+esc(x.id)+'" data-connection-name="'+esc(x.met)+'"><div class="dating-person-main"><div class="dating-person-mark">'+esc(statusLabel(x.status))+niveau(x.betrouwbaarheid)+'</div><h3>'+esc(x.met)+'</h3>'+(t?'<div class="dating-meta">'+esc(t.supplierName)+' · '+esc(t.plek)+' · '+esc(t.datum)+' om '+esc(t.tijd)+'</div><div class="dating-date"><strong>€ '+esc(t.prijsPP)+' p.p.</strong> · € '+esc(t.rtgDeel)+' RTG en € '+esc(t.prijsPP-t.rtgDeel)+' aanbetaling bij de zaak. '+(x.ikBetaalde?'Uw aandeel is bevestigd.':x.anderBetaalde?'De ander heeft al bevestigd.':'Nog niemand heeft betaald.')+'</div>':'<div class="dating-meta">Geen automatische tafel; kies samen een plek of spreek iets af in de chat.</div>')+
       (merken(x.kenmerken)?'<div class="dating-chips">'+merken(x.kenmerken)+'</div>':'')+
       /* Eén dagdeel dat u allebei aankruiste, of niets -- nooit de hokjes van
          de ander (kern/beschikbaar.js). */
@@ -336,12 +376,8 @@
     document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>openPay(b.dataset.pay));
     document.querySelectorAll('[data-send]').forEach(b=>b.onclick=async()=>{const inp=document.querySelector('[data-text="'+CSS.escape(b.dataset.send)+'"]');if(!inp.value.trim()){meld('Schrijf eerst een bericht.');return;}try{await api('bericht',{id:b.dataset.send,tekst:inp.value});inp.value='';meld('Uw bericht is verstuurd.');await laad();}catch(e){meld(e.message);}});
     document.querySelectorAll('[data-safe]').forEach(b=>b.onclick=()=>openSafety(b.dataset.safe));
-    document.querySelectorAll('[data-halfweg]').forEach(b=>b.onclick=async()=>{
-      const doel=document.getElementById('hw-'+b.dataset.halfweg);
-      doel.innerHTML='<p class="dating-copy">Even kijken…</p>';
-      try{const hw=await api('halfweg',{id:b.dataset.halfweg});doel.innerHTML=tekenOpties(b.dataset.halfweg,hw);koppelKies(b.dataset.halfweg);}
-      catch(e){doel.innerHTML='<p class="dating-copy">'+esc(e.message)+'</p>';}
-    });
+    document.querySelectorAll('[data-halfweg]').forEach(b=>b.onclick=()=>openHalfweg(b.dataset.halfweg,connectionEdge&&connectionEdge.revision(b.dataset.halfweg)));
+    bindMatchContexts();
   }
 
   function render(){tekenTabs();if(tab==='profiel')renderProfiel();else if(tab==='vandaag')renderVandaag();else renderMatches();}
@@ -349,8 +385,8 @@
     /* De drie kaarten uit de ONTMOETEN.md-ronde reizen mee met /selectie zolang
        er een profiel is; eenmaal gezien blijven ze staan. */
     if(selectie.tabel)TABEL=selectie.tabel;if(selectie.rooster)ROOSTER=selectie.rooster;if(selectie.tafelkaart)KAART=selectie.tafelkaart;
-    matches=(await api('mijn')).matches||[];if(!selectie.profiel)tab='profiel';render();}catch(e){if(e.status===401||e.status===403)toonGate(e);else{$('#inhoud').innerHTML='<div class="dating-empty"><strong>Vonk kon niet laden</strong><p>'+esc(e.message)+'</p></div>';meld(e.message);}}}
-  laad();
+    matches=(await api('mijn')).matches||[];if(!selectie.profiel)tab='profiel';render();if(connectionEdge)connectionEdge.refresh(true);}catch(e){if(e.status===401||e.status===403)toonGate(e);else{$('#inhoud').innerHTML='<div class="dating-empty"><strong>Vonk kon niet laden</strong><p>'+esc(e.message)+'</p></div>';meld(e.message);}}}
+  startConnectionEdge();laad();
 })();
 </script>
 <script src="/shared/deelmenu.js" defer></script>

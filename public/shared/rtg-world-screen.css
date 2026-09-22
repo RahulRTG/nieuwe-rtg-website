@@ -20,7 +20,7 @@ body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]:not([data-rtg-sc
   padding-top:max(clamp(24px,3.6vw,56px),calc(var(--edge-top,44px) + 20px))!important;
   padding-right:clamp(20px,4vw,64px)!important;
   padding-bottom:calc(var(--edge-bottom,72px) + max(40px,env(safe-area-inset-bottom)))!important;
-  padding-left:clamp(20px,4vw,64px)!important;color:var(--rtg-world-ink)
+  padding-left:clamp(20px,4vw,64px)!important
 }
 body.rtg-edge-embed[data-rtg-screen] [data-rtg-screen-root="content"]{
   min-height:100%;padding-top:clamp(16px,2.5vw,32px)!important;

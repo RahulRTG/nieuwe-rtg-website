@@ -92,6 +92,11 @@ test('de gedeelde schermlaag overschrijft geen lokaal bewezen achtergrondparen',
   assert.ok(hoofdregel, 'de centrale schermgrens ontbreekt');
   assert.doesNotMatch(hoofdregel[1], /background(?:-color|-image|-attachment)?\s*:/,
     'de centrale laag mag de lokaal toegankelijke achtergrond niet overschilderen');
+
+  const inhoudsregel = WERELDSCHERMEN.match(/\[data-rtg-screen-root="content"\][^{]*\{([^}]*)\}/);
+  assert.ok(inhoudsregel, 'de centrale inhoudsmaat ontbreekt');
+  assert.doesNotMatch(inhoudsregel[1], /(?:^|;)\s*color\s*:/,
+    'de centrale laag mag de lokaal toegankelijke tekstkleur niet overschrijven');
 });
 
 test('kaart-, camera- en werkruimtecanvassen blijven expliciet uitgezonderd', () => {

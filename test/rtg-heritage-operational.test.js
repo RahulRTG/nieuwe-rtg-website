@@ -85,6 +85,15 @@ test('ieder gemarkeerd wereldscherm krijgt dezelfde buitenmaat en veilige Edge-r
     'de gedeelde layout mag bestaande inhoud nooit verbergen');
 });
 
+test('de gedeelde schermlaag overschrijft geen lokaal bewezen achtergrondparen', () => {
+  const hoofdregel = WERELDSCHERMEN.match(
+    /body\[data-rtg-skin="heritage"\]\[data-rtg-world\]\[data-rtg-screen\]:not\(\[data-rtg-screen="world-home"\]\)\{([^}]*)\}/
+  );
+  assert.ok(hoofdregel, 'de centrale schermgrens ontbreekt');
+  assert.doesNotMatch(hoofdregel[1], /background(?:-color|-image|-attachment)?\s*:/,
+    'de centrale laag mag de lokaal toegankelijke achtergrond niet overschilderen');
+});
+
 test('kaart-, camera- en werkruimtecanvassen blijven expliciet uitgezonderd', () => {
   const canvassen = [
     ['public/apps/navigatie.html', 'travel-os-map'],

@@ -39,11 +39,11 @@
       if (el.closest('.rtg-edge-chrome,dialog,[role="dialog"]')) return;
       var parent = el.parentElement && el.parentElement.closest('main,[role="main"]');
       if (parent) return false;
-      /* Command is the world workspace itself, not a document inside it. Its
-         <main> must therefore keep the exact Edge bounds: applying the normal
-         content inset here would create a second top gutter above every
-         opened app. */
-      var immersive = !!el.closest('#rtgCommand') || !!canvas || el.matches('[data-rtg-native-canvas]') || !!el.querySelector('[data-rtg-native-canvas]');
+      /* Command and the standalone workspace are the workspace shells, not
+         documents inside them. Their <main> must therefore keep the exact
+         Edge bounds: applying the normal content inset here would create a
+         second top gutter above every opened app. */
+      var immersive = d.body.classList.contains('rtg-edge-workspace') || !!el.closest('#rtgCommand') || !!canvas || el.matches('[data-rtg-native-canvas]') || !!el.querySelector('[data-rtg-native-canvas]');
       mark(el, 'data-rtg-screen-root', immersive ? 'immersive' : 'content');
       return true;
     });

@@ -2,14 +2,12 @@
    De homes leerden de bediening; alle onderliggende functies spreken hier
    dezelfde taal. Dit blad wijzigt geen routes, data of handlers. Het geeft de
    bestaande hoofdvlakken en de door Heritage gemarkeerde rollen één maat,
-   ritme en materiaal. Native canvassen (kaart, camera, editor, spel) blijven
-   vrij en krijgen alleen de veilige wereldgrond eromheen. */
+   ritme en materiaal. De lokaal bewezen kleurparen blijven leidend; zo blijft
+   tekst ook op historische functies aantoonbaar leesbaar. Native canvassen
+   (kaart, camera, editor, spel) blijven vrij. */
 
 body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]:not([data-rtg-screen="world-home"]){
-  min-height:100dvh;overflow-x:clip;background-color:var(--rtg-world-bg)!important;
-  background-image:radial-gradient(52rem 30rem at 84% -8rem,var(--rtg-world-signature-soft),transparent 72%),
-    var(--rtg-world-ground)!important;background-size:auto!important;background-position:center!important;
-  background-repeat:no-repeat!important;background-attachment:fixed!important
+  min-height:100dvh;overflow-x:clip
 }
 
 /* De hoofdmaat van een functie is ruimer dan een formulier, maar rustiger dan
@@ -105,9 +103,6 @@ body[data-rtg-skin="heritage"][data-rtg-screen]:not([data-rtg-screen="world-home
 }
 
 @media(max-width:767px){
-  body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]:not([data-rtg-screen="world-home"]){
-    background-attachment:scroll!important
-  }
   body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]:not([data-rtg-screen="world-home"])
     [data-rtg-screen-root="content"]{
     width:100%!important;min-height:100dvh;padding-top:max(18px,env(safe-area-inset-top))!important;

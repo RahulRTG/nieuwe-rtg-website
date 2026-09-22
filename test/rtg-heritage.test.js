@@ -37,7 +37,7 @@ test('vier vaste werelden delen één volledige token- en dieptegrammatica', () 
     for (const token of ['bg', 'card', 'card-strong', 'ink', 'muted', 'line', 'signature', 'metal']) {
       assert.match(blok[1], new RegExp('--rtg-world-' + token + ':'), wereld + ' mist ' + token);
     }
-    assert.match(blok[1], /--rtg-world-photo:url\(/, wereld + ' mist wereldfotografie');
+    assert.match(blok[1], /--rtg-world-photo:none;/, wereld + ' mag geen foto wereldwijd herhalen');
   }
   for (const token of ['--rtg-depth-content:', '--rtg-depth-focus:', '--rtg-depth-system:',
     '--rtg-radius-content:2px', '--rtg-radius-editorial:16px', '--rtg-radius-system:22px', '--rtg-target:48px']) {
@@ -125,26 +125,26 @@ test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
   assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
 });
 
-test('de vier werelden hebben elk een eigen foto en merkaccent', () => {
+test('de vier werelden houden hun merkaccent zonder globale herhaalfoto', () => {
   const werelden = {
-    living: ['living-heritage-v2.jpg', '#ebcc94'],
-    travel: ['travel-heritage-v2.jpg', '#a82c51'],
-    work: ['work-heritage-v2.jpg', '#c8bda9'],
-    foundation: ['foundation-heritage-v2.jpg', '#3d68c9']
+    living: '#ebcc94',
+    travel: '#a82c51',
+    work: '#c8bda9',
+    foundation: '#3d68c9'
   };
-  for (const [wereld, [foto, accent]] of Object.entries(werelden)) {
+  for (const [wereld, accent] of Object.entries(werelden)) {
     const omgeving = SIMPLE.match(new RegExp(
       'body\\[data-rtg-skin="heritage"\\]\\[data-rtg-world="' + wereld +
       '"\\]:not\\(\\[data-rtg-eigenvlak\\]\\)\\{([^}]+)\\}'
     ));
-    assert.ok(omgeving, wereld + ' mist de gedeelde fotografische omgeving');
-    assert.ok(omgeving[1].includes('/images/worlds/heritage/' + foto), wereld + ' mist de juiste foto');
+    assert.ok(omgeving, wereld + ' mist de gedeelde wereldomgeving');
+    assert.match(omgeving[1], /--rtg-world-photo:none/, wereld + ' mag geen foto aan iedere app opdringen');
     assert.ok(SIMPLE.includes('--edge-bar-accent:' + accent), wereld + ' mist het juiste accent');
     const kaart = SIMPLE.match(new RegExp(
       '\\.cmd-startwereld\\[data-world="' + wereld + '"\\]\\{([^}]+)\\}'
     ));
-    assert.ok(kaart, wereld + ' mist de fotografische wereldkaart');
-    assert.ok(kaart[1].includes('/images/worlds/heritage/' + foto), wereld + ' kaart mist de juiste foto');
+    assert.ok(kaart, wereld + ' mist de wereldkaart');
+    assert.match(kaart[1], /--rtg-card-photo:none/, wereld + ' navigatiekaart gebruikt eigen materiaal');
   }
 });
 

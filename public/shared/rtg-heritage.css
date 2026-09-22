@@ -136,7 +136,7 @@ body[data-rtg-skin="heritage"][data-rtg-world="living"]{
   --rtg-status-warn:#765300;
   --rtg-status-danger:#9b2c42;
   --rtg-world-schema:light;
-  --rtg-world-photo:url('../images/worlds/heritage/living-heritage-v2.jpg');
+  --rtg-world-photo:none;
   --rtg-world-photo-position:68% center;
   --rtg-world-photo-mask:linear-gradient(112deg,rgba(244,240,232,.975),rgba(244,240,232,.89));
   --rtg-depth-content:inset 0 1px rgba(255,255,255,.72),0 1px 0 rgba(55,40,15,.08);
@@ -156,7 +156,7 @@ body[data-rtg-skin="heritage"][data-rtg-world="travel"]{
   --rtg-world-signature:#a72049;
   --rtg-world-signature-soft:rgba(158,28,64,.20);
   --rtg-world-metal:#d0b77b;
-  --rtg-world-photo:url('../images/worlds/heritage/travel-heritage-v2.jpg');
+  --rtg-world-photo:none;
   --rtg-world-photo-position:68% center;
   --rtg-world-photo-mask:linear-gradient(112deg,rgba(20,9,14,.975),rgba(20,9,14,.83));
 }
@@ -173,7 +173,7 @@ body[data-rtg-skin="heritage"][data-rtg-world="work"]{
   --rtg-world-signature:#75b8b1;
   --rtg-world-signature-soft:rgba(117,184,177,.15);
   --rtg-world-metal:#c1a45f;
-  --rtg-world-photo:url('../images/worlds/heritage/work-heritage-v2.jpg');
+  --rtg-world-photo:none;
   --rtg-world-photo-position:70% center;
   --rtg-world-photo-mask:linear-gradient(112deg,rgba(12,17,18,.975),rgba(12,17,18,.84));
 }
@@ -190,7 +190,7 @@ body[data-rtg-skin="heritage"][data-rtg-world="foundation"]{
   --rtg-world-signature:#d0b66e;
   --rtg-world-signature-soft:rgba(208,182,110,.14);
   --rtg-world-metal:#d0b66e;
-  --rtg-world-photo:url('../images/worlds/heritage/foundation-heritage-v2.jpg');
+  --rtg-world-photo:none;
   --rtg-world-photo-position:72% center;
   --rtg-world-photo-mask:linear-gradient(112deg,rgba(7,21,34,.975),rgba(7,21,34,.84));
 }

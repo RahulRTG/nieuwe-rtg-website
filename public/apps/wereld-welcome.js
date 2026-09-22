@@ -31,7 +31,7 @@
       + '</p><button type="button" data-living-retry>' + text('retry', 'Probeer het opnieuw') + '</button></section>';
     return '<section class="living-welcome" data-example="true" aria-labelledby="livingWelcomeTitle">'
       + '<div class="living-example-photo"><img src="/images/world-homes/living.webp" alt="" width="1122" height="1402" fetchpriority="high">'
-      + '<div class="living-example-head"><img src="/images/world-homes/living.webp" alt="" width="40" height="40">'
+      + '<div class="living-example-head"><span class="living-example-mark" aria-hidden="true">RTG</span>'
       + '<div><p>' + text('exampleTitle', 'Een moment aan tafel') + '</p><span>' + text('example', 'Voorbeeldmoment') + '</span></div></div>'
       + '<div class="living-example-copy"><h2 id="livingWelcomeTitle">' + text('dinnerTitle', 'Samen smaakt alles beter.')
       + '</h2><p>' + text('dinnerCopy', 'Een lange avond, met de mensen die ertoe doen.') + '</p></div></div>'

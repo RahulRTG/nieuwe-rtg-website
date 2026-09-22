@@ -275,7 +275,7 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
 .private-hero{position:relative;min-height:360px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);overflow:hidden;border-bottom:1px solid rgba(255,255,255,.1);}
 .private-hero::before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(17,18,16,.98) 0%,rgba(22,23,20,.91) 48%,rgba(37,27,29,.44) 72%,rgba(17,18,16,.8) 100%),
-  url('/campagne/palacio.jpg') center 48%/cover no-repeat;filter:saturate(.58);}
+  none center 48%/cover no-repeat;filter:saturate(.58);}
 .private-hero-copy,.private-hero-register{position:relative;z-index:1;}
 .private-hero-copy{display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(3rem,6vw,6rem) clamp(1.4rem,6vw,6.8rem) 3.6rem;}
 .private-kicker{color:#c5ad72;font:600 .6rem/1 Inter,system-ui,sans-serif;letter-spacing:.24em;text-transform:uppercase;}
@@ -395,7 +395,7 @@ body.rtg-suite-page{
   min-height:230px;border-bottom-color:rgba(205,184,121,.24);
   background:
     linear-gradient(90deg,rgba(18,19,16,.985) 0%,rgba(24,24,21,.94) 52%,rgba(67,35,44,.68) 80%,rgba(18,19,16,.88) 100%),
-    url('/campagne/huis-omslag.jpg') 70% 50%/cover no-repeat;
+    none 70% 50%/cover no-repeat;
 }
 .rtg-suitehero::after{opacity:.55;}
 
@@ -530,7 +530,7 @@ body.rtg-social-messages .lijst{
   isolation:isolate;
   background:
     linear-gradient(155deg,rgba(16,17,14,.97) 0%,rgba(20,20,17,.94) 58%,rgba(54,31,37,.88) 130%),
-    url('../images/worlds/heritage/living-heritage-v2.jpg') 68% center/cover no-repeat!important;
+    none 68% center/cover no-repeat!important;
 }
 body.rtg-social-messages .lijst::before{
   content:"";

@@ -38,8 +38,8 @@
     host.innerHTML = '<div class="wh-foundation-hero wh-photo"><img src="/images/world-homes/foundation.webp" alt="" width="1408" height="1056" fetchpriority="high">'
       + '<p class="wh-free">' + text('free') + '</p><div class="wh-photo-copy"><h1>' + text('grow') + '</h1><p>' + text('foundationIntro') + '</p></div><span class="wh-caption">' + text('atmosphere') + '</span></div>'
       + '<section class="wh-discover"><h2>' + text('discover') + '</h2><p>' + text('choose') + '</p><div class="wh-pair">'
-      + '<a class="wh-card" href="/apps/foundation/leren.html"><img src="/images/world-homes/foundation.webp" width="1408" height="1056" alt="" loading="lazy"><div><h3>' + text('learn') + '</h3><p>' + text('learnIntro') + '</p><span aria-hidden="true">↗</span></div></a>'
-      + '<a class="wh-card" href="/apps/foundation/meedoen-ontdekken.html"><img src="/images/worlds/heritage/foundation-meedoen-atelier-v1.jpg" width="1024" height="1024" alt="" loading="lazy"><div><h3>' + text('talent') + '</h3><p>' + text('talentIntro') + '</p><span aria-hidden="true">↗</span></div></a></div></section>'
+      + '<a class="wh-card" href="/apps/foundation/leren.html"><img src="/images/editorial/foundation-discover-learning.webp" width="1448" height="1086" alt="" loading="lazy"><div><h3>' + text('learn') + '</h3><p>' + text('learnIntro') + '</p><span aria-hidden="true">↗</span></div></a>'
+      + '<a class="wh-card" href="/apps/foundation/meedoen-ontdekken.html"><img src="/images/editorial/foundation-discover-talent.webp" width="1448" height="1086" alt="" loading="lazy"><div><h3>' + text('talent') + '</h3><p>' + text('talentIntro') + '</p><span aria-hidden="true">↗</span></div></a></div></section>'
       + '<a class="wh-support" href="/apps/foundation/hulpwijzer.html"><div><h2>' + text('support') + '</h2><p>' + text('supportIntro') + '</p><span class="wh-link">' + text('possibilities') + ' <span aria-hidden="true">↗</span></span></div></a>';
   }
   function openFragment() {

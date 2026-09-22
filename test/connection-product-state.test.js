@@ -52,6 +52,17 @@ test('implemented:false voice en route bestaan niet in Edge of capabilities', ()
   assert.equal(Object.hasOwn(edge, 'voice'), false);
 });
 
+test('een bevestigde toekomstige Vonk-date projecteert alleen Date en Safety', () => {
+  const state = Vonk.match({ key: 'a', now: '2026-09-22T12:00:00.000Z', match: {
+    id: 'm2', a: 'a', b: 'b', status: 'bevestigd', tafel: { datum: '2026-09-24' }, betaald: { a:true, b:true }, halfweg: { keuzes: {} }
+  } });
+  const edge = ProductState.resolve({ actor: 'member', product: 'vonk', productState: state,
+    access: { pass: 'member', verified: true, adult: true }, subject: 'a', context: { id: 'm2' } });
+  assert.equal(edge.state, 'DATE_CONFIRMED');
+  assert.deepEqual(edge.actions.map(a => a.id), ['date', 'safety']);
+  assert.ok(!edge.actions.some(a => ['chat', 'meet', 'voice', 'route'].includes(a.id)));
+});
+
 test('Rendez-vous Concierge suggereert geen ongebouwde automatische service', () => {
   const edge = ProductState.resolve({ actor: 'member', product: 'rendezvous',
     productState: Rendezvous.root({ aan: true }), access: toegang, subject: 'a', context: { kind: 'root' } });

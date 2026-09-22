@@ -181,6 +181,33 @@ serverprojectie tekent de acties. Toetsenbordbediening, live-regio,
 touchdoelen, safe areas, grote tekst, RTL en reduced motion zitten in dezelfde
 gedeelde laag.
 
+### Ronde 5 - Vonk 2.0
+
+Vonk presenteert de bestaande bewezen keten nu als één productervaring. De
+ontdekking heet `Today's Six`: maximaal zes echte serverprojecties en nooit
+opvulprofielen. Een kandidaat toont uitsluitend codenaam, leeftijd, woonregio,
+vrijgegeven profielvelden en de reeds disclosure-veilige waaromregels. Omdat de
+server nog geen profielmedia projecteert, tekent de client geen fictieve
+personenfoto's.
+
+Het eigenaarprofiel is een Connection Passport met de lagen Dit ben ik, Ik
+zoek, Voor mij belangrijk, Mijn wereld, Wanneer ik kan en Privacy. Velden die
+op `match` of `engine` staan blijven in ontdekking afwezig. Na wederzijdse
+interesse opent de bestaande tekstchat, met optionele gesprekstarters die alleen
+uit de matchprojectie komen.
+
+Meet Halfway toont het bestaande gedeelde dagdeel, maximaal drie plekken rond
+het midden, de blinde plaatskeuze, EUR 10 per persoon en de dubbele bevestiging.
+Na bevestiging projecteert dezelfde servergedreven Edge `Date` en `Safety`.
+Voice, Video, mediaberichten en Route zijn niet toegevoegd en staan niet in de
+DOM.
+
+De presentatiecode staat in `vonk-2-core.js` en `vonk-2.css`. Dubbeltikken op
+interesse, chat, plaatskeuze, betaling en safety worden client-side
+samengevoegd; de server blijft daarnaast iedere transition en revision opnieuw
+valideren. URL-geschiedenis bewaart alleen de zichtbare tab en kandidaatcontext,
+nooit Connection-businessstate.
+
 ## Gefixeerde bouwvolgorde
 
 0. baseline bevriezen;

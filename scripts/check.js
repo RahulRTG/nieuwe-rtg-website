@@ -4738,6 +4738,7 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
       'var(--rtg-radius-content,2px)', 'var(--rtg-radius-system,22px)'
     ])],
     ['public/shared/rtg-world-home.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-system)'])],
+    ['public/shared/vonk-2.css', new Set(['var(--rtg-radius-system)'])],
     ['public/shared/rtg-world-desktop.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/shared/rtg-world-widgets.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/shared/rtg-world-screen.css', new Set(['var(--rtg-radius-content)!important'])],

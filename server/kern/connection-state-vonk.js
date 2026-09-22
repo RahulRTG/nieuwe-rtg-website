@@ -43,7 +43,10 @@ function match({ match: m, key, now }) {
   let surface = 'VONK_MATCH';
   if (m.status === 'bevestigd') {
     state = !date || date > today ? STATES.DATE_CONFIRMED : date === today ? STATES.DATE_ACTIVE : STATES.POST_DATE;
-    if (state === STATES.DATE_ACTIVE) surface = 'VONK_DATE_ACTIVE';
+    /* Vanaf bevestiging is de ontmoeting het product. Dezelfde bewezen Date /
+       Safety-projectie blijft actief tot en met de dag zelf; Route blijft door
+       implemented:false volledig afwezig. */
+    if ([STATES.DATE_CONFIRMED, STATES.DATE_ACTIVE].includes(state)) surface = 'VONK_DATE_ACTIVE';
   } else {
     const keuzes = m.halfweg && m.halfweg.keuzes ? m.halfweg.keuzes : {};
     const aantal = Object.keys(keuzes).length;

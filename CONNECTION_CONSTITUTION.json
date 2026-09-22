@@ -1,16 +1,16 @@
 {
   "schema": "RTG_CONNECTION_CONSTITUTION",
   "version": 4,
-  "source_sha256": "330e37010cb739da00cf1532c703d763090e225397cf712ac1be385a1be2ac3a",
+  "source_sha256": "2356909f1fde97aeef03a147e10fd8476f3adaf3c9991f0ae79bf005e1f2e015",
   "tests": {
-    "total": 98,
-    "passed": 98,
+    "total": 99,
+    "passed": 99,
     "failed": 0,
     "baseline_tests": 58,
     "constitution_tests": 8,
     "consent_tests": 4,
     "projection_tests": 7,
-    "product_state_tests": 11,
+    "product_state_tests": 12,
     "edge_experience_tests": 10
   },
   "proofs": {

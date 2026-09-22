@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-22T16:47:39.675Z",
-    "commit": "9116a0458",
+    "op": "2026-09-22T17:12:04.581Z",
+    "commit": "0f88d9cf1",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsladder.js",
@@ -66,7 +66,7 @@
         },
         {
           "doel": "scripts/ci-keten.js",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "ci.yml"
           ],
@@ -108,7 +108,7 @@
         },
         {
           "doel": "scripts/document-fitness.js",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "ci.yml"
           ],
@@ -241,7 +241,7 @@
         },
         {
           "doel": "scripts/evidence-base.js",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "ci.yml"
           ],
@@ -752,7 +752,7 @@
         },
         {
           "doel": "scripts/e2e.js",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "ci.yml",
             "wacht.yml"
@@ -872,7 +872,7 @@
         },
         {
           "doel": "scripts/bron-release-bewijs.js",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "release-image.yml"
           ],
@@ -1120,7 +1120,8 @@
     "graadGemeten": 0,
     "graadVermoed": 12,
     "graadOnbekend": 0,
-    "alleenKeten": 23,
+    "alleenKeten": 17,
+    "vermeldingenAlleenKeten": 18,
     "zonderTrede": 0
   }
 }

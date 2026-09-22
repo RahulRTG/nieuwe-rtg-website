@@ -13,6 +13,10 @@ alles hieronder in vier bakken — **staat**, **een stap weg**, **een besluit
 nodig**, **jaren weg** — zodat niemand ze voor elkaar aanziet. Wat in de laatste
 twee bakken staat, hoort nergens als knop op een scherm te verschijnen.
 
+De [RTG 2030-uitwerking](docs/rtg-2030.md) verbindt deze richting met de huidige
+code, standaardstatus en een stapsgewijze migratie. De eerste voorgestelde
+verticale migratie staat in de [documentenpilot](docs/rtg-2030-documenten.md).
+
 En net als daar begint het met een meting, want de eerste wet van deze opzet is
 ook haar grootste aanname.
 

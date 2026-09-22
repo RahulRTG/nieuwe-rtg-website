@@ -57,7 +57,11 @@ test('each shared-key pair and each missing anchor is rejected before authority 
     assert.throws(() => trust.anchors(root), /ontbreekt of is ongeldig/);
   }
   restore();
-  fs.writeFileSync(path.join(root, trust.ROLES.EVIDENCE.publicFile), '-----BEGIN PRIVATE KEY-----\nnot-a-private-key\n-----END PRIVATE KEY-----\n');
+  // A public SPKI payload deliberately mislabelled as private is still not a
+  // public anchor. No private key material is written, even in this fixture.
+  const mislabelledPublic = keys.EVIDENCE.publicKey.export({ type:'spki', format:'pem' })
+    .replaceAll('PUBLIC KEY', 'PRIVATE KEY');
+  fs.writeFileSync(path.join(root, trust.ROLES.EVIDENCE.publicFile), mislabelledPublic);
   assert.throws(() => trust.anchors(root), /ongeldig/);
 });
 

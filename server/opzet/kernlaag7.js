@@ -55,7 +55,8 @@ Object.assign(kern, require('../kern/werkbijlogin').maakWerkBijLogin({
    woonplaatsen (EUR 10 p.p. vooraf: EUR 5 RTG, EUR 5 aanbetaling zaak). */
 Object.assign(kern, require('../kern/vonk').maakVonk({
   db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
-  haversine, etaMinutes, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
+  haversine, etaMinutes, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice,
+  connectionBlocking: kern.connectionBlocking
 }));
 /* De voorspeller (kern/voorspel.js): leert het ritme van elk lid en elke
    zaak uit het RTG Pay-grootboek (de ene bron waar elke app in boekt) en

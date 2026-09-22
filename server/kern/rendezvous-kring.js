@@ -59,7 +59,7 @@
    backofficescherm waar dat gebeurt; de kern kan het wel, en dat gat staat zo in
    ONTMOETEN.md. */
 module.exports = (ctx) => {
-  const { R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin } = ctx;
+  const { R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, geblokkeerd, Projection } = ctx;
 
   const id = () => 'rv' + crypto.randomBytes(4).toString('hex');
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
@@ -68,7 +68,7 @@ module.exports = (ctx) => {
 
   function T() { const r = R(); if (!r.tafels || typeof r.tafels !== 'object') r.tafels = {}; return r.tafels; }
   // de kantoorkant (samenstellen en overzicht) woont in ./rendezvous-tafels.js
-  const kantoor = require('./rendezvous-tafels')({ T, id, isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')), schoon, nu, save, notify, codenaam });
+  const kantoor = require('./rendezvous-tafels')({ T, id, isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')), schoon, nu, save, notify, codenaam, geblokkeerd, R, Projection });
   function I() { const r = R(); if (!r.introducties || typeof r.introducties !== 'object') r.introducties = {}; return r.introducties; }
 
   /* ---- The Table ---- */
@@ -81,8 +81,9 @@ module.exports = (ctx) => {
     if (!poort.ok) return { status: 403, error: poort.reden };
     const uit = Object.values(T())
       .filter(t => t.genodigden[key])
-      .map(t => ({ id: t.id, naam: t.naam, stad: t.stad, datum: t.datum, tijd: t.tijd,
-        thema: t.thema, plaatsen: t.plaatsen, mijnStatus: t.genodigden[key].status }))
+      .map(t => Projection.project(Projection.NAMES.RENDEZVOUS_TABLE_MEMBER,
+        { id: t.id, naam: t.naam, stad: t.stad, datum: t.datum, tijd: t.tijd,
+          thema: t.thema, plaatsen: t.plaatsen, mijnStatus: t.genodigden[key].status }))
       .sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
     return { status: 200, tafels: uit };
   }
@@ -101,6 +102,7 @@ module.exports = (ctx) => {
 
   function introBied(soort, a, b, aanleiding) {
     if (!SOORTEN.includes(soort) || !a || !b || a === b) return null;
+    if (geblokkeerd && geblokkeerd(R(), a, b)) return null;
     const sl = paar(a, b);
     const bestaand = I()[sl];
     if (bestaand && !bestaand.gesloten) return bestaand;
@@ -123,8 +125,10 @@ module.exports = (ctx) => {
       const [x, y] = v.id.split('|');
       if (x !== key && y !== key) continue;
       const met = x === key ? y : x;
-      uit.push({ id: v.id, soort: v.soort, aanleiding: v.aanleiding, codenaam: codenaam(met),
-        ikAntwoordde: v.ja[key] === undefined ? null : !!v.ja[key], geopend: !!v.geopend, at: v.at });
+      if (geblokkeerd && geblokkeerd(R(), key, met)) continue;
+      uit.push(Projection.project(Projection.NAMES.RENDEZVOUS_INTRODUCTION,
+        { id: v.id, soort: v.soort, aanleiding: v.aanleiding, codenaam: codenaam(met),
+          ikAntwoordde: v.ja[key] === undefined ? null : !!v.ja[key], geopend: !!v.geopend, at: v.at }));
     }
     return { status: 200, introducties: uit.sort((a, b) => String(b.at).localeCompare(String(a.at))) };
   }
@@ -137,6 +141,7 @@ module.exports = (ctx) => {
     const [x, y] = v.id.split('|');
     if (x !== key && y !== key) return { status: 404, error: 'Deze vraag staat niet voor u open.' };
     const met = x === key ? y : x;
+    if (geblokkeerd && geblokkeerd(R(), key, met)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
     v.ja[key] = ja !== false;
 
     /* Een nee sluit de vraag, en de ander hoort niets. Zou er een melding komen,
@@ -164,14 +169,17 @@ module.exports = (ctx) => {
     const doel = handleVanPin ? handleVanPin(String(pin || '').trim()) : null;
     if (!doel || doel === key) return { status: 404, error: 'Die pin wijst niemand aan.' };
     const r = R();
+    if (geblokkeerd && geblokkeerd(r, key, doel)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
     if (!r.ontmoetingen || typeof r.ontmoetingen !== 'object') r.ontmoetingen = {};
     const sl = paar(key, doel);
     const o = r.ontmoetingen[sl] || (r.ontmoetingen[sl] = { wie: {}, at: nu() });
     o.wie[key] = nu();
     save();
-    if (!o.wie[doel]) return { status: 200, ok: true, wacht: true };
+    if (!o.wie[doel]) return { status: 200,
+      ...Projection.project(Projection.NAMES.RENDEZVOUS_ENCOUNTER, { ok: true, wacht: true }) };
     introBied('encounter', key, doel, 'u heeft elkaar ontmoet');
-    return { status: 200, ok: true, wacht: false, codenaam: codenaam(doel) };
+    return { status: 200, ...Projection.project(Projection.NAMES.RENDEZVOUS_ENCOUNTER,
+      { ok: true, wacht: false, codenaam: codenaam(doel) }) };
   }
 
   return { ...kantoor, rvTafels: tafels, rvTafelAntwoord: tafelAntwoord,

@@ -27,6 +27,7 @@ const { maakOntmoetpoort, MIN_LEEFTIJD } = require('../ontmoetpoort');
 const W = require('./wensen');
 const B = require('../beschikbaar');
 const H = require('./halfweg');
+const Projection = require('../connection-projection');
 
 const DAG_MAX = 6;            // de eindige dagselectie
 const PRIJS_CENTEN = 1000;    // EUR 10 p.p.
@@ -35,7 +36,7 @@ const RTG_CENTEN = 500;       // waarvan EUR 5 voor RTG; de rest is aanbetaling 
 const { maakLidstand } = require('../betrouwbaarheid');
 
 function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan, keyVanCodenaam,
-  haversine, etaMinutes, reserveerTafel, pay, notify, sseToCustomer, sseToOffice }) {
+  haversine, etaMinutes, reserveerTafel, pay, notify, sseToCustomer, sseToOffice, connectionBlocking }) {
   const id = () => 'vonk' + crypto.randomBytes(5).toString('hex');
   const nu = () => new Date().toISOString();
   function d() {
@@ -87,19 +88,8 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     save();
     return { status: 200, ok: true, profiel: publiek(key, p, true) };
   }
-  /* HOE ZEKER RTG WEET DAT DIT DEZE MENS IS, en waarom dat hier hoort.
-
-     De poort hierboven zegt tegen wie hem niet haalt: "Activeer eerst uw
-     RTG-geverifieerde paspoort (KYC); zo weet iedereen op Vonk dat de ander
-     echt is." Dat is een belofte aan de ANDER -- en die bereikte hem nooit. Op
-     een kaartje stond een codenaam, een leeftijd en een stad, precies zoals op
-     elk ander datingprofiel ter wereld.
-
-     De poort garandeert al minstens A3, dus dit is geen zeef maar een
-     onderscheid: A4 betekent dat RTG de selfie naast het document heeft gelegd
-     en dus dat dit gezicht bij dat paspoort hoort. Dat is exact wat je wilt
-     weten voordat je met een vreemde afspreekt, en het staat nergens anders in
-     dit huis waar iemand het kan lezen. */
+  /* Toon ook hoe zeker RTG weet dat dit deze mens is. De poort garandeert A3;
+     A4 betekent dat selfie en document bij elkaar zijn gecontroleerd. */
   const lidstandVan = maakLidstand({ accounts });
   const niveauVan = key => {
     try { const st = lidstandVan(key); return st && st.niveau ? { id: st.niveau.id, naam: st.niveau.naam } : null; }
@@ -109,9 +99,11 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
   /* `zelf` is het eigen profiel en krijgt alles, INCLUSIEF de wensen -- die gaan
      alleen naar de eigenaar terug. `niveau` bepaalt wat een ander ziet:
      'kandidaten' in de dagselectie, 'match' na een wederzijdse like. */
-  const publiek = (key, p, zelf, niveau) => ({ codenaam: codenaamVan(key), over: p.over, leeftijd: p.leeftijd,
-    stad: p.stad, interesses: p.interesses, betrouwbaarheid: niveauVan(key), kenmerken: W.toonKenmerken(p, zelf ? 'match' : (niveau || 'kandidaten')),
-    ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt, leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax,
+  const publiek = (key, p, zelf, niveau, extra) => Projection.project(
+    zelf ? Projection.NAMES.VONK_PROFILE_OWNER : Projection.NAMES.VONK_DISCOVERY,
+    { codenaam: codenaamVan(key), over: p.over, leeftijd: p.leeftijd,
+      stad: p.stad, interesses: p.interesses, betrouwbaarheid: niveauVan(key), kenmerken: W.toonKenmerken(p, zelf ? 'match' : (niveau || 'kandidaten')),
+      ...(extra || {}), ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt, leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax,
       /* afstandActief komt uit de dating-premium-ronde op main: het scherm zegt
          ermee of de afstandsfilter iets kan meten (er is een eigen plek bekend)
          of dood staat. Alleen voor de eigenaar, net als de rest van dit blok. */
@@ -131,10 +123,14 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
      allebei krijgen (LAT.md regel 4). */
   const likeVan = (van, naar) => d().likes.find(l => l.van === van && l.naar === naar);
   const matchTussen = (a, b) => d().matches.find(m => (m.a === a && m.b === b) || (m.a === b && m.b === a));
+  const geblokkeerd = (a, b) => !!(((d().profielen[a] || {}).blokkade || []).includes(b)
+    || ((d().profielen[b] || {}).blokkade || []).includes(a)
+    || (connectionBlocking && connectionBlocking.isGeblokkeerd(a, b)));
 
-  const ctx = { db, save, schoon, id, nu, d, mag, likeVan, matchTussen, publiek, DAG_MAX, niveauVan,
+  const ctx = { db, save, schoon, id, nu, d, mag, likeVan, matchTussen, publiek, DAG_MAX, niveauVan, geblokkeerd,
+    Projection,
     codenaamVan, keyVanCodenaam, haversine,
-    reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN,
+    reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN, connectionBlocking,
     /* Pas na een wederzijdse like gaan de assen open die op 'match' staan. Dat
        is wat die zichtbaarheidskeuze BETEKENT; zonder deze regel was het een
        knop die niets doet (LAT.md regel 8). */

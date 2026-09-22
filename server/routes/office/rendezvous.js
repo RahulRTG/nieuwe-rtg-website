@@ -11,11 +11,16 @@
 module.exports = (octx) => {
   const { kern } = octx;
   const { app, officeAuth, keyVanCodenaam, rvTafelMaak, rvTafelNodig, rvTafelKantoor } = kern;
+  const { eis } = require('../connection-policy')({ product: 'rendezvous' });
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
 
-  app.post('/api/office/rendezvous/tafels', officeAuth, (req, res) => stuur(res, rvTafelKantoor()));
+  app.post('/api/office/rendezvous/tafels', officeAuth, (req, res) => {
+    if (!eis(req, res, 'connection.table.manage', 'office')) return;
+    stuur(res, rvTafelKantoor());
+  });
 
   app.post('/api/office/rendezvous/tafel/maak', officeAuth, async (req, res) => {
+    if (!eis(req, res, 'connection.table.manage', 'office')) return;
     const b = req.body || {};
     /* De codenamen worden een voor een opgezocht. Een naam die niemand aanwijst
        wordt GEMELD en niet stil overgeslagen: anders zet het kantoor een tafel
@@ -30,6 +35,7 @@ module.exports = (octx) => {
   });
 
   app.post('/api/office/rendezvous/tafel/nodig', officeAuth, async (req, res) => {
+    if (!eis(req, res, 'connection.table.manage', 'office')) return;
     const t = await keyVanCodenaam(String((req.body || {}).codenaam || '').trim());
     if (!t || !t.key) return res.status(404).json({ error: 'Geen lid met die codenaam.' });
     stuur(res, rvTafelNodig(String((req.body || {}).id || ''), t.key));

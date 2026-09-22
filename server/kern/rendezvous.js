@@ -14,7 +14,9 @@
    losser was dan de brede. De pas-eis (Lifestyle of Business) blijft op de route
    waar hij hoort; de leeftijd en de identiteit horen hier, want de kern is wat
    elke ingang passeert. */
-module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin }) => {
+module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin,
+  connectionBlocking }) => {
+  const Projection = require('./connection-projection');
   const nu = () => new Date().toISOString();
   const { ontmoetPoort } = require('./ontmoetpoort').maakOntmoetpoort({ accounts, leeftijdVan });
   const mag = key => ontmoetPoort(key, 'Rendez-vous');
@@ -51,14 +53,15 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
   const codenaam = key => (codenaamVan ? codenaamVan(key) : '') || 'Een lid';
   /* Uit de dating-premium-ronde op main: een blokkade werkt in BEIDE richtingen,
      wie u blokkeerde ziet u ook niet meer. */
-  const geblokkeerd = (r, a, b) => !!((r.blokkades[a] && r.blokkades[a][b]) || (r.blokkades[b] && r.blokkades[b][a]));
+  const geblokkeerd = (r, a, b) => !!((r.blokkades[a] && r.blokkades[a][b]) || (r.blokkades[b] && r.blokkades[b][a])
+    || (connectionBlocking && connectionBlocking.isGeblokkeerd(a, b)));
   // overlap van twee locatielijsten, hoofdletterongevoelig, met de oorspronkelijke schrijfwijze
   function gedeeld(a, b) {
     const bl = (b || []).map(x => x.toLowerCase());
     return (a || []).filter(x => bl.includes(x.toLowerCase()));
   }
   const { rvKies, rvMeldingen } = require('./rendezvous-acties')({
-    R, save, crypto, notify, schoon, nu, codenaam, gedeeld, geblokkeerd, mag
+    R, save, crypto, notify, schoon, nu, codenaam, gedeeld, geblokkeerd, mag, connectionBlocking, Projection
   });
 
   function rvProfielGet(key) {
@@ -68,10 +71,11 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
     const p = r.profielen[key] || { aan: false, over: '', zoekt: '', wensen: [], locaties: [] };
     /* Alles wat we van u weten staat hier, ook de aanwezigheid: ONTMOETEN.md
        par. 2.1 eist dat een lid het kan zien en kan wissen. */
-    return { status: 200, codenaam: codenaam(key), rooster: B.rooster(),
-      profiel: { aan: !!p.aan, over: p.over || '', zoekt: p.zoekt || '', wensen: p.wensen || [],
+    return { status: 200, ...Projection.project(Projection.NAMES.RENDEZVOUS_PROFILE_OWNER,
+      { codenaam: codenaam(key), rooster: B.rooster(),
+        profiel: { aan: !!p.aan, over: p.over || '', zoekt: p.zoekt || '', wensen: p.wensen || [],
         locaties: p.locaties || [], thuis: p.thuis || '', aanwezig: AW.schoonAanwezig(p.aanwezig, schoon),
-        beschikbaar: B.schoonBeschikbaar(p.beschikbaar) } };
+        beschikbaar: B.schoonBeschikbaar(p.beschikbaar) } }) };
   }
   function rvProfiel(key, b) {
     const poort = mag(key);
@@ -103,10 +107,11 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
         const g = gedeeld(mij.locaties, r.profielen[t].locaties);
         const samen = AW.overlapTussen(mij, r.profielen[t]);
         // waar u tegelijk bent gaat voor op waar u allebei weleens komt
-        uit.push({ id: t, codenaam: codenaam(t), gedeeldeLocaties: g, samen,
+        uit.push(Projection.project(Projection.NAMES.RENDEZVOUS_MATCH,
+          { id: t, codenaam: codenaam(t), gedeeldeLocaties: g, samen,
           // pas hier, na de wederzijdse like: een dagdeel of niets
           wanneer: B.zin(mij.beschikbaar, r.profielen[t].beschikbaar),
-          voorstel: (samen[0] && samen[0].stad) || g[0] || null, sinds: mijn[t] });
+          voorstel: (samen[0] && samen[0].stad) || g[0] || null, sinds: mijn[t] }));
       }
     }
     uit.sort((a, b) => String(b.sinds).localeCompare(String(a.sinds)));
@@ -131,15 +136,15 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
   }
 
   // Together: twee eenzijdige verklaringen, "samen" is de projectie erover
-  const samen = require('./rendezvous-samen')({ R, mag, codenaam, nu, save });
-  const ontdek = require('./rendezvous-ontdek')({ R, AW, B, mag, codenaam, gedeeld, save, notify, nu, geblokkeerd,
+  const samen = require('./rendezvous-samen')({ R, mag, codenaam, nu, save, geblokkeerd, Projection });
+  const ontdek = require('./rendezvous-ontdek')({ R, AW, B, mag, codenaam, gedeeld, save, notify, nu, geblokkeerd, Projection,
     partnerVan: samen.rvPartnerVan });
   // The Table, Moment en Encounter (een tweezijdige ja, twee momenten)
-  const kring = require('./rendezvous-kring')({ R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin });
-  const { rvDate } = require('./rendezvous-date')({ R, AW, B, mag, codenaam, schoon, matchesVan, anthropic });
+  const kring = require('./rendezvous-kring')({ R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, geblokkeerd, Projection });
+  const { rvDate } = require('./rendezvous-date')({ R, AW, B, mag, codenaam, schoon, matchesVan, anthropic, Projection });
   // Arrange It: Rahul stelt samen, beiden keuren goed, De Rechterhand regelt
   const arrange = require('./rendezvous-arrange')({ R, AW, B, mag, codenaam, schoon, nu, save,
-    matchesVan, tableZet, notify });
+    matchesVan, tableZet, notify, Projection });
   /* rvKies en rvMeldingen komen uit de dating-premium-ronde (main): kiezen met
      drie acties (like/pas/blokkeer) en de meldingen voor kantoor. De routelaag
      stuurt like en pas daar al langs, dus rvLike/rvPas uit ontdek bestaan niet

@@ -5,7 +5,9 @@
 module.exports = (kern) => {
   const { app, auth, officeAuth,
     vonkProfielZet, vonkSelectie, vonkLike, vonkBetaal, vonkBericht, vonkMijn, vonkBlokkeer, vonkMeldingen,
-    vonkHalfweg, vonkKies, vonkEdge, vonkStateGuard } = kern;
+    vonkHalfweg, vonkKies, vonkEdge, vonkStateGuard,
+    vonkFotoUpload, vonkFotoPubliceer, vonkFotoVerwijder, vonkFotoLever, express } = kern;
+  const { stuurBuffer } = require('../media/bestand');
   const State = require('../kern/connection-state-vonk');
   const { eis } = require('./connection-policy')({ product: 'vonk', identityAtCore: true });
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error, ...(r.code ? { code: r.code } : {}) }) : res.json(r);
@@ -21,6 +23,27 @@ module.exports = (kern) => {
   });
 
   app.post('/api/vonk/profiel', auth, lid('connection.profile.manage', (req, res) => stuur(res, vonkProfielZet(req.session.key, req.body || {}))));
+  app.post('/api/vonk/profile-photo', auth, express.raw({ type: () => true, limit: '8mb' }),
+    lid('connection.profile.photo.manage', async (req, res) => {
+      try {
+        stuur(res, await vonkFotoUpload(req.session.key, req.body, req.get('Content-Type') || '', {
+          visibility: req.get('X-RTG-Visibility'), alt: req.get('X-RTG-Alt'),
+          idempotencyKey: req.get('Idempotency-Key')
+        }));
+      } catch (e) { res.status(500).json({ error: 'De foto kon niet veilig worden opgeslagen.' }); }
+    }));
+  app.post('/api/vonk/profile-photo/publish', auth, lid('connection.profile.photo.manage', (req, res) =>
+    stuur(res, vonkFotoPubliceer(req.session.key, req.body && req.body.id,
+      req.body && req.body.visibility, !(req.body && req.body.publish === false)))));
+  app.post('/api/vonk/profile-photo/remove', auth, lid('connection.profile.photo.manage', (req, res) =>
+    stuur(res, vonkFotoVerwijder(req.session.key, req.body && req.body.id))));
+  app.get('/api/vonk/profile-photo/delivery/:ticket', async (req, res) => {
+    try {
+      const item = await vonkFotoLever(req.params.ticket);
+      if (!item) return res.status(404).end();
+      return stuurBuffer(req, res, item.bytes, item.mime, 'private, no-store');
+    } catch (e) { if (!res.headersSent) res.status(404).end(); }
+  });
   app.post('/api/vonk/selectie', auth, lid('connection.discover', (req, res) => stuur(res, vonkSelectie(req.session.key))));
   app.post('/api/vonk/edge', auth, lid('connection.match.read', (req, res) => stuur(res, vonkEdge(req.session.key, req.body || {}))));
   app.post('/api/vonk/like', auth, overgang('connection.match.choose', State.EVENTS.CHOOSE_CANDIDATE,

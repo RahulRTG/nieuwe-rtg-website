@@ -28,6 +28,15 @@ test('de client verzint geen waarom-regel uit profielwaarden', () => {
   assert.equal(Object.hasOwn(model, 'religion'), false);
 });
 
+test('de client gebruikt uitsluitend tijdelijke Vonk-fototickets', () => {
+  const veilig = Vonk.kandidaat({ codenaam:'Maan', media:[{ id:'1', position:0,
+    src:'/api/vonk/profile-photo/delivery/abc_DEF-123', alt:'Portret' },
+  { id:'2', src:'https://bucket.example/permanent.jpg', alt:'Niet gebruiken' }] });
+  assert.equal(veilig.media.length, 1);
+  assert.equal(Vonk.hoofdfoto(veilig).alt, 'Portret');
+  assert.equal(Vonk.hoofdfoto({ media:[{ src:'/media/prive-geheim.jpg' }] }), null);
+});
+
 test('Vonk-fasen onderscheiden match, gesprek, bevestigde en actieve date', () => {
   assert.equal(Vonk.fase({}, '2026-09-22'), 'MATCH');
   assert.equal(Vonk.fase({ berichten:[{ tekst:'Hoi' }] }, '2026-09-22'), 'CONVERSATION');

@@ -186,9 +186,8 @@ gedeelde laag.
 Vonk presenteert de bestaande bewezen keten nu als één productervaring. De
 ontdekking heet `Today's Six`: maximaal zes echte serverprojecties en nooit
 opvulprofielen. Een kandidaat toont uitsluitend codenaam, leeftijd, woonregio,
-vrijgegeven profielvelden en de reeds disclosure-veilige waaromregels. Omdat de
-server nog geen profielmedia projecteert, tekent de client geen fictieve
-personenfoto's.
+vrijgegeven profielvelden en de reeds disclosure-veilige waaromregels. Zonder
+een geprojecteerde profielfoto tekent de client geen fictieve personenfoto.
 
 Het eigenaarprofiel is een Connection Passport met de lagen Dit ben ik, Ik
 zoek, Voor mij belangrijk, Mijn wereld, Wanneer ik kan en Privacy. Velden die
@@ -208,6 +207,31 @@ samengevoegd; de server blijft daarnaast iedere transition en revision opnieuw
 valideren. URL-geschiedenis bewaart alleen de zichtbare tab en kandidaatcontext,
 nooit Connection-businessstate.
 
+### Ronde 6 - Identity Media & Profile Presence
+
+R6 voegt uitsluitend veilige profielfoto's aan Vonk toe. De capabilityfamilie
+`connection.profile.photo` loopt door dezelfde default-deny- en projectielaag
+als de rest van Connection OS. Upload en publicatie zijn gescheiden:
+
+`UPLOADED → PROCESSING → READY` en daarna pas, door een aparte ledenhandeling,
+`DRAFT → PUBLISHED`.
+
+JPEG- en PNG-bytes worden server-side herkend, structureel gecontroleerd,
+begrensd op 8 MB en 24 megapixel en genormaliseerd zonder EXIF, GPS, XMP of
+tekstmetadata. De versleutelde opslagreferentie verlaat de server nooit. Een
+projectie bevat alleen een kortlevend versleuteld delivery-ticket; iedere
+levering controleert opnieuw blokkade, actuele visibility, publicatiestatus,
+versie en — voor `AFTER_MATCH` — de bestaande wederzijdse match.
+
+De drie zichtbaarheidstoestanden zijn `DISCOVERY`, `AFTER_MATCH` en `PRIVATE`.
+Intrekken, verwijderen of blokkeren maakt reeds uitgegeven tickets onmiddellijk
+ongeldig voor volgende requests. Een profielfoto draagt afzonderlijk
+`verificationState: UNVERIFIED`; identity- en age-verificatie zeggen dus nooit
+stilzwijgend dat het gezicht op de foto geverifieerd is.
+
+Niet in R6: profielvideo, chatmedia, voice, videobellen en wijzigingen aan
+Rendez-vous.
+
 ## Gefixeerde bouwvolgorde
 
 0. baseline bevriezen;
@@ -217,8 +241,14 @@ nooit Connection-businessstate.
 3. expliciete server-side projections voor Vonk, Rendez-vous, Rahul en Edge;
 4. Edge als projectie van productstate;
 5. de bestaande Vonk-keten volledig afmaken;
-6. de stille Rendez-vous-experience bouwen zonder Vonk als componentbibliotheek
-   te behandelen.
+6. veilige Profile Media, beginnend met profielfoto's;
+7. chatmedia en eventueel voice uitsluitend als afzonderlijk bewezen
+   capabilities beoordelen;
+8. video uitsluitend bouwen wanneer de productwaarde en volledige
+   realtime-veiligheidsketen bewezen zijn;
+9. Vonk productiehardening;
+10. de stille Rendez-vous-experience bouwen zonder Vonk als
+    componentbibliotheek te behandelen.
 
 Acceptance blijft bewust eenvoudig:
 

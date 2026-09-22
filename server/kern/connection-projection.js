@@ -5,10 +5,11 @@
    allowlist. Niet-toegestane eigenschappen zijn afwezig, niet null. */
 'use strict';
 
-const VERSION = 2;
+const VERSION = 3;
 
 const NAMES = Object.freeze({
   VONK_PROFILE_OWNER: 'VONK_PROFILE_OWNER',
+  VONK_PROFILE_MEDIA_OWNER: 'VONK_PROFILE_MEDIA_OWNER',
   VONK_DISCOVERY: 'VONK_DISCOVERY',
   VONK_MATCH: 'VONK_MATCH',
   VONK_CONVERSATION: 'VONK_CONVERSATION',
@@ -29,9 +30,10 @@ const NAMES = Object.freeze({
 });
 
 const CONTRACTS = Object.freeze({
-  [NAMES.VONK_PROFILE_OWNER]: ['codenaam', 'over', 'leeftijd', 'stad', 'interesses', 'betrouwbaarheid', 'kenmerken', 'geslacht', 'zoekt', 'leeftijdMin', 'leeftijdMax', 'maxKm', 'actief', 'afstandActief', 'wensen', 'zicht', 'beschikbaar', 'datewens'],
-  [NAMES.VONK_DISCOVERY]: ['codenaam', 'over', 'leeftijd', 'stad', 'interesses', 'betrouwbaarheid', 'kenmerken', 'gemeen', 'waarom'],
-  [NAMES.VONK_MATCH]: ['id', 'met', 'at', 'status', 'betrouwbaarheid', 'tafel', 'ikBetaalde', 'anderBetaalde', 'berichten', 'kenmerken', 'wanneer'],
+  [NAMES.VONK_PROFILE_OWNER]: ['codenaam', 'over', 'leeftijd', 'stad', 'interesses', 'betrouwbaarheid', 'kenmerken', 'geslacht', 'zoekt', 'leeftijdMin', 'leeftijdMax', 'maxKm', 'actief', 'afstandActief', 'wensen', 'zicht', 'beschikbaar', 'datewens', 'media'],
+  [NAMES.VONK_PROFILE_MEDIA_OWNER]: ['media'],
+  [NAMES.VONK_DISCOVERY]: ['codenaam', 'over', 'leeftijd', 'stad', 'interesses', 'betrouwbaarheid', 'kenmerken', 'gemeen', 'waarom', 'media'],
+  [NAMES.VONK_MATCH]: ['id', 'met', 'at', 'status', 'betrouwbaarheid', 'tafel', 'ikBetaalde', 'anderBetaalde', 'berichten', 'kenmerken', 'wanneer', 'media'],
   [NAMES.VONK_CONVERSATION]: ['van', 'tekst', 'at'],
   [NAMES.VONK_MEET]: ['supplierCode', 'supplierName', 'plek', 'middenAfstandKm', 'datum', 'tijd', 'prijsPP', 'rtgDeel', 'soort', 'reisminuten', 'waarom'],
   [NAMES.RENDEZVOUS_PROFILE_OWNER]: ['codenaam', 'rooster', 'profiel'],
@@ -70,6 +72,15 @@ function project(name, source) {
   if (!CONTRACTS[name]) throw new Error('Onbekende Connection-projectie: ' + name);
   const s = source && typeof source === 'object' ? source : {};
   const uit = alleen(s, CONTRACTS[name]);
+
+  if ([NAMES.VONK_PROFILE_OWNER, NAMES.VONK_PROFILE_MEDIA_OWNER, NAMES.VONK_DISCOVERY, NAMES.VONK_MATCH].includes(name)
+      && aanwezig(s.media)) {
+    /* Een opslagref, owner-key of lifecycle-log kan via een objectspread nooit
+       meeliften. Ook geneste media hebben hun eigen vaste contract. */
+    uit.media = (Array.isArray(s.media) ? s.media : []).map(m => alleen(m,
+      ['id', 'purpose', 'visibility', 'processingState', 'publicationState', 'moderationState',
+        'verificationState', 'width', 'height', 'mime', 'position', 'version', 'alt', 'src', 'expiresAt']));
+  }
 
   if (name === NAMES.VONK_MATCH) {
     if (aanwezig(s.tafel)) uit.tafel = project(NAMES.VONK_MEET, s.tafel);

@@ -11,6 +11,13 @@
    en staat er bovendien geen id in het journaal dat naar een persoon leidt. */
 function padVorm(p) {
   return String(p || '')
+    /* Een profielfoto-ticket is een kortlevende bearer: wie hem bezit kan de
+       foto binnen de geprojecteerde context ophalen. Hij mag daarom net zo min
+       als een wachtwoord in een log of foutmelding belanden. Deze specifieke
+       vorm moet vóór de generieke sleutelregels staan; base64url bevat immers
+       niet noodzakelijk zestien hextekens achter elkaar. */
+    .replace(/^\/api\/vonk\/profile-photo\/delivery\/[^/]+(?=\/|$)/i,
+      '/api/vonk/profile-photo/delivery/:ticket')
     /* Oude wervingslinks droegen de zes-teken-bearer in het pad. Nieuwe links
        gebruiken uitsluitend een browserfragment, maar een oude bookmark mag
        ook bij een omleiding nooit alsnog in verzoek-, fout- of journaallogs

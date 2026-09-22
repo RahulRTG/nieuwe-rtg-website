@@ -33,10 +33,9 @@ const DAG_MAX = 6;            // de eindige dagselectie
 const PRIJS_CENTEN = 1000;    // EUR 10 p.p.
 const RTG_CENTEN = 500;       // waarvan EUR 5 voor RTG; de rest is aanbetaling bij de zaak
 
-const { maakLidstand } = require('../betrouwbaarheid');
-
 function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan, keyVanCodenaam,
-  haversine, etaMinutes, reserveerTafel, pay, notify, sseToCustomer, sseToOffice, connectionBlocking }) {
+  haversine, etaMinutes, reserveerTafel, pay, notify, sseToCustomer, sseToOffice, connectionBlocking,
+  media, connectionMediaTicketSecret }) {
   const id = () => 'vonk' + crypto.randomBytes(5).toString('hex');
   const nu = () => new Date().toISOString();
   function d() {
@@ -88,28 +87,12 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     save();
     return { status: 200, ok: true, profiel: publiek(key, p, true) };
   }
-  /* Toon ook hoe zeker RTG weet dat dit deze mens is. De poort garandeert A3;
-     A4 betekent dat selfie en document bij elkaar zijn gecontroleerd. */
-  const lidstandVan = maakLidstand({ accounts });
-  const niveauVan = key => {
-    try { const st = lidstandVan(key); return st && st.niveau ? { id: st.niveau.id, naam: st.niveau.naam } : null; }
-    catch (e) { return null; }
-  };
-
   /* `zelf` is het eigen profiel en krijgt alles, INCLUSIEF de wensen -- die gaan
      alleen naar de eigenaar terug. `niveau` bepaalt wat een ander ziet:
      'kandidaten' in de dagselectie, 'match' na een wederzijdse like. */
-  const publiek = (key, p, zelf, niveau, extra) => Projection.project(
-    zelf ? Projection.NAMES.VONK_PROFILE_OWNER : Projection.NAMES.VONK_DISCOVERY,
-    { codenaam: codenaamVan(key), over: p.over, leeftijd: p.leeftijd,
-      stad: p.stad, interesses: p.interesses, betrouwbaarheid: niveauVan(key), kenmerken: W.toonKenmerken(p, zelf ? 'match' : (niveau || 'kandidaten')),
-      ...(extra || {}), ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt, leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax,
-      /* afstandActief komt uit de dating-premium-ronde op main: het scherm zegt
-         ermee of de afstandsfilter iets kan meten (er is een eigen plek bekend)
-         of dood staat. Alleen voor de eigenaar, net als de rest van dit blok. */
-      maxKm: p.maxKm, actief: p.actief, afstandActief: isFinite(p.lat) && isFinite(p.lng),
-      wensen: p.wensen || {}, zicht: p.zicht || {},
-      beschikbaar: p.beschikbaar || [], datewens: p.datewens || H.zetDatewens(null, {}) } : {}) });
+  let profileMedia = null;
+  const { publiek, niveauVan } = require('./projecties')({ accounts, codenaamVan, W, H, Projection,
+    mediaVan: () => profileMedia });
 
   /* ---- de dagselectie: eindig en wederzijds passend ----
      pastBij dekt de drie eisen die ALTIJD hard zijn en die daarom niet in de
@@ -127,8 +110,13 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     || ((d().profielen[b] || {}).blokkade || []).includes(a)
     || (connectionBlocking && connectionBlocking.isGeblokkeerd(a, b)));
 
+  profileMedia = require('../connection-profile-media')({ db, save, crypto, media, schoon, gate: mag,
+    isBlocked: geblokkeerd, isMatch: (a, b) => !!matchTussen(a, b),
+    ticketSecret: connectionMediaTicketSecret });
+
   const ctx = { db, save, schoon, id, nu, d, mag, likeVan, matchTussen, publiek, DAG_MAX, niveauVan, geblokkeerd,
     Projection,
+    profileMedia,
     codenaamVan, keyVanCodenaam, haversine,
     reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN, connectionBlocking,
     /* Pas na een wederzijdse like gaan de assen open die op 'match' staan. Dat
@@ -150,7 +138,9 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
         reisMin: m => etaMinutes(m, 'driving') });
     },
     tafelkaart: H.tafelkaart };
-  const api = { vonkProfielZet: profielZet };
+  const api = { vonkProfielZet: profielZet,
+    vonkFotoUpload: profileMedia.upload, vonkFotoPubliceer: profileMedia.publiceer,
+    vonkFotoVerwijder: profileMedia.verwijder, vonkFotoLever: profileMedia.lever };
   Object.assign(api, require('./state')({ d, mag, nu, geblokkeerd }));
   Object.assign(api, require('./selectie')(ctx));
   Object.assign(api, require('./kiezen')(ctx));

@@ -64,6 +64,19 @@ test('Vonk discovery bevat alleen zijn contract en geen verborgen identiteit of 
   }
 });
 
+test('Vonk-profielmedia projecteert nooit eigenaar, opslagref of lifecycle', () => {
+  const media = [{ id:'cpm1', purpose:'PROFILE_PHOTO', visibility:'DISCOVERY', processingState:'READY',
+    publicationState:'PUBLISHED', verificationState:'UNVERIFIED', moderationState:'NOT_REVIEWED',
+    width:1200, height:1600, mime:'image/jpeg', position:0, version:2, alt:'Portret',
+    src:'/api/vonk/profile-photo/delivery/ticket', expiresAt:'2026-09-22T12:00:00Z',
+    owner:'user-2', ref:'prive-geheim.jpg', lifecycle:[{ state:'UPLOADED' }], idempotencyKey:'geheim' }];
+  const uit = Projection.project(NAMES.VONK_DISCOVERY, { codenaam:'Ster', media });
+  assert.equal(uit.media.length, 1);
+  assert.equal(uit.media[0].src, '/api/vonk/profile-photo/delivery/ticket');
+  for (const veld of ['owner', 'ref', 'lifecycle', 'idempotencyKey'])
+    assert.equal(Object.hasOwn(uit.media[0], veld), false, veld + ' mag de media-projectie niet verlaten');
+});
+
 test('verborgen geloof verandert een onbevoegde projectie niet', () => {
   const a = { codenaam: 'Ster', over: 'Hallo', leeftijd: 31, stad: 'Gent', religion: 'joods',
     religionImportance: 'belangrijk', debugReason: 'religie' };

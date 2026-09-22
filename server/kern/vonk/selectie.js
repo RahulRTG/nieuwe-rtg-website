@@ -69,7 +69,7 @@ module.exports = (ctx) => {
       .map(({ k, p }) => publiek(k, p, false, 'kandidaten', {
         gemeen: (p.interesses || []).filter(i => ik.interesses.includes(i)),
         waarom: W.reden(ik, p)
-      }));
+      }, key));
     /* Een lege dag is een antwoord en geen storing (ONTMOETEN.md par. 3.5).
 
        De zin wijst de harde eisen alleen aan als die WERKELIJK iemand hebben

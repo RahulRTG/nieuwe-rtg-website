@@ -18,7 +18,8 @@ const TESTS = [
   'test/connection-cross-product.test.js',
   'test/connection-projection.test.js',
   'test/connection-product-state.test.js',
-  'test/connection-edge-experience.test.js'
+  'test/connection-edge-experience.test.js',
+  'test/connection-profile-media.test.js'
 ];
 const BRONNEN = [
   'scripts/connection-constitution.js',
@@ -29,6 +30,9 @@ const BRONNEN = [
   'server/kern/connection-edge.js',
   'server/kern/connection-projection.js',
   'server/kern/connection-product-state.js',
+  'server/kern/connection-image.js',
+  'server/kern/connection-profile-media.js',
+  'server/kern/journaalvorm.js',
   'server/kern/connection-state-rendezvous.js',
   'server/kern/connection-state-vonk.js',
   'server/kern/rendezvous.js',
@@ -44,18 +48,24 @@ const BRONNEN = [
   'server/kern/vonk/state.js',
   'server/kern/vonk/kiezen.js',
   'server/kern/vonk/match.js',
+  'server/kern/vonk/projecties.js',
   'server/kern/vonk/selectie.js',
   'server/opzet/kernlaag4.js',
   'server/opzet/kernlaag7.js',
+  'server/opzet/kernlaag7-vonk.js',
   'server/routes/connection-policy.js',
   'server/routes/member/rendezvous.js',
   'server/routes/office/rendezvous.js',
   'server/routes/vonk.js',
+  'server/lib/mutatiecontracten-connection-media.js',
+  'scripts/lib/publiek.js',
   'public/shared/connection-edge-core.js',
   'public/shared/connection-edge-input.js',
   'public/shared/connection-edge.js',
   'public/shared/connection-edge.css',
   'public/apps/vonk.html',
+  'public/shared/vonk-2-core.js',
+  'public/shared/vonk-2.css',
   'public/apps/rendezvous.html',
   ...TESTS
 ];
@@ -78,6 +88,7 @@ const consentTests = (projectionSource.match(/^test\('(consent|revoke|een actiev
 const projectionTests = ronde2Tests - consentTests;
 const productStateTests = telTests('test/connection-product-state.test.js');
 const edgeExperienceTests = telTests('test/connection-edge-experience.test.js');
+const profileMediaTests = telTests('test/connection-profile-media.test.js');
 const matrix = policy.matrix();
 const names = Object.values(projection.NAMES);
 const alleTestnamen = TESTS.map(tekst).join('\n');
@@ -87,18 +98,19 @@ for (const bestand of BRONNEN) hash.update(bestand).update('\0').update(tekst(be
 
 const bewijs = {
   schema: 'RTG_CONNECTION_CONSTITUTION',
-  version: 4,
+  version: 5,
   source_sha256: hash.digest('hex'),
   tests: {
-    total: productTests + constitutionCore + ronde2Tests + productStateTests + edgeExperienceTests,
-    passed: productTests + constitutionCore + ronde2Tests + productStateTests + edgeExperienceTests,
+    total: productTests + constitutionCore + ronde2Tests + productStateTests + edgeExperienceTests + profileMediaTests,
+    passed: productTests + constitutionCore + ronde2Tests + productStateTests + edgeExperienceTests + profileMediaTests,
     failed: 0,
     baseline_tests: productTests,
     constitution_tests: constitutionCore,
     consent_tests: consentTests,
     projection_tests: projectionTests,
     product_state_tests: productStateTests,
-    edge_experience_tests: edgeExperienceTests
+    edge_experience_tests: edgeExperienceTests,
+    profile_media_tests: profileMediaTests
   },
   proofs: {
     default_deny: policy.CONTRACT.default === 'deny' && heeft('default deny:') ? 'PROVEN' : 'FAILED',
@@ -125,7 +137,15 @@ const bewijs = {
     gesture_state_isolation: heeft('swipen wisselt alleen tussen een bewezen') &&
       heeft('scroll verandert uitsluitend de presentatiemodus') ? 'PROVEN' : 'FAILED',
     edge_accessibility: heeft('de Edge heeft toetsenbord, screenreader') ? 'PROVEN' : 'FAILED',
-    distinct_product_presentations: heeft('Vonk en Rendez-vous delen de engine') ? 'PROVEN' : 'FAILED'
+    distinct_product_presentations: heeft('Vonk en Rendez-vous delen de engine') ? 'PROVEN' : 'FAILED',
+    profile_media_draft_before_publication: heeft('upload accepted is een concept') ? 'PROVEN' : 'FAILED',
+    profile_media_metadata_minimization: heeft('beeldgrens verifieert bytes') ? 'PROVEN' : 'FAILED',
+    profile_media_short_delivery: heeft('DISCOVERY-publicatie verschijnt als kort ticket') ? 'PROVEN' : 'FAILED',
+    profile_media_revocation: heeft('intrekken maakt een al uitgegeven ticket') ? 'PROVEN' : 'FAILED',
+    profile_media_progressive_disclosure: heeft('AFTER_MATCH bestaat niet in discovery') ? 'PROVEN' : 'FAILED',
+    profile_media_blocking: heeft('cross-product block sluit ook een reeds uitgegeven matchfoto') ? 'PROVEN' : 'FAILED',
+    profile_media_storage_isolation: heeft('Vonk-profielmedia projecteert nooit eigenaar') ? 'PROVEN' : 'FAILED',
+    photo_identity_separation: heeft('upload accepted is een concept') ? 'PROVEN' : 'FAILED'
   },
   projection_contracts: names,
   policy_rows: matrix.length,

@@ -41,8 +41,21 @@
       codenaam: tekst(p.codenaam), initialen: initialen(p.codenaam), leeftijd: p.leeftijd,
       stad: tekst(p.stad), over: tekst(p.over), interesses: lijst(p.interesses).map(tekst).filter(Boolean),
       gemeen: lijst(p.gemeen).map(tekst).filter(Boolean), kenmerken: p.kenmerken || {},
-      betrouwbaarheid: p.betrouwbaarheid || null, waarom: redenen(p.waarom)
+      betrouwbaarheid: p.betrouwbaarheid || null, waarom: redenen(p.waarom),
+      media: lijst(p.media).map(function (m) { return {
+        id:tekst(m && m.id), src:tekst(m && m.src), alt:tekst(m && m.alt) || 'Profielfoto',
+        visibility:tekst(m && m.visibility), publicationState:tekst(m && m.publicationState),
+        verificationState:tekst(m && m.verificationState), position:Number(m && m.position) || 0
+      }; }).filter(function (m) { return m.id && /^\/api\/vonk\/profile-photo\/delivery\/[A-Za-z0-9_-]+$/.test(m.src); })
+        .sort(function (a, b) { return a.position - b.position; })
     });
+  }
+
+  function hoofdfoto(profiel) {
+    var media = lijst(profiel && profiel.media).filter(function (m) {
+      return m && /^\/api\/vonk\/profile-photo\/delivery\/[A-Za-z0-9_-]+$/.test(tekst(m.src));
+    });
+    return media.sort(function (a, b) { return (Number(a.position) || 0) - (Number(b.position) || 0); })[0] || null;
   }
 
   function vandaag(rows) {
@@ -87,6 +100,6 @@
     return { tab:tab, kandidaat:kandidaatNaam };
   }
 
-  return Object.freeze({ daggroet:daggroet, initialen:initialen, redenen:redenen, kandidaat:kandidaat,
+  return Object.freeze({ daggroet:daggroet, initialen:initialen, redenen:redenen, kandidaat:kandidaat, hoofdfoto:hoofdfoto,
     vandaag:vandaag, fase:fase, gesprekstarters:gesprekstarters, hashVoor:hashVoor, leesHash:leesHash });
 }));

@@ -7,7 +7,7 @@
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine, niveauVan,
     reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN,
-    kenmerkenVan, wanneerMet, optiesVoor, geblokkeerd, connectionBlocking, Projection } = ctx;
+    kenmerkenVan, wanneerMet, optiesVoor, geblokkeerd, connectionBlocking, Projection, profileMedia } = ctx;
 
   /* Like/voorbij; wederzijds opent match, chat en tafel. */
   async function like(key, codenaam, aan) {
@@ -123,6 +123,7 @@ module.exports = (ctx) => {
       berichten: m.berichten.slice(-30),
       // hier gaan de assen open die het lid op 'pas na een match' had gezet
       kenmerken: kenmerkenVan(m.a === key ? m.b : m.a),
+      media: profileMedia ? profileMedia.projecteer(key, m.a === key ? m.b : m.a, 'match') : [],
       /* En hier pas de beschikbaarheid: EEN dagdeel dat u allebei aankruiste,
          of niets. Nooit de hokjes van de ander (../beschikbaar.js). */
       wanneer: wanneerMet(key, m.a === key ? m.b : m.a)

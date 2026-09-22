@@ -6,6 +6,7 @@
       "passes": ["member"],
       "capabilities": {
         "connection.profile.manage": ["member"],
+        "connection.profile.photo.manage": ["member"],
         "connection.discover": ["member"],
         "connection.match.choose": ["member"],
         "connection.match.read": ["member"],
@@ -18,6 +19,7 @@
       },
       "projections": {
         "connection.profile.manage": "VONK_PROFILE_OWNER",
+        "connection.profile.photo.manage": "VONK_PROFILE_MEDIA_OWNER",
         "connection.discover": "VONK_DISCOVERY",
         "connection.match.choose": "VONK_DISCOVERY",
         "connection.match.read": "VONK_MATCH",
@@ -74,6 +76,7 @@
   "capabilities": {
     "connection.profile.read": { "implemented": true, "domainState": [], "projection": "own-profile" },
     "connection.profile.manage": { "implemented": true, "domainState": [], "projection": "own-profile" },
+    "connection.profile.photo.manage": { "implemented": true, "domainState": ["profile-active"], "projection": "profile-media-owner" },
     "connection.discover": { "implemented": true, "domainState": ["profile-active"], "projection": "candidate" },
     "connection.match.choose": { "implemented": true, "domainState": ["profile-active", "not-blocked"], "projection": "choice" },
     "connection.match.read": { "implemented": true, "domainState": ["mutual-match", "not-blocked"], "projection": "match" },

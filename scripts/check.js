@@ -4737,6 +4737,7 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
     ['public/shared/rtg-world-home.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-system)'])],
     ['public/shared/rtg-world-desktop.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/shared/rtg-world-widgets.css', new Set(['var(--rtg-radius-editorial)'])],
+    ['public/shared/rtg-world-screen.css', new Set(['var(--rtg-radius-content)!important'])],
     ['public/site/storyline.css', new Set(['var(--rtg-radius-editorial)'])],
     // The public company/product projection shares the native world-home tokens.
     ['public/site/platform-shell.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-system)', 'var(--rtg-radius-editorial)!important', 'var(--rtg-radius-system)!important'])],

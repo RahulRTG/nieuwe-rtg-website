@@ -14,13 +14,14 @@ const MATERIALEN = lees('public/shared/rtg-heritage-materials.css');
 const ADAPTERS = lees('public/shared/rtg-heritage-adapters.css');
 const COMPONENTEN = lees('public/shared/rtg-heritage-components.css');
 const SIMPLE = lees('public/shared/rtg-simple.css');
+const WERELDSCHERMEN = lees('public/shared/rtg-world-screen.css');
 const EDGE = lees('public/shared/rtg-edge-library.js');
 const CHECK = lees('scripts/check.js');
 
 test('de centrale laag blijft klein, gesplitst en laat alle delen één keer binnen', () => {
   for (const naam of ['rtg-heritage.css', 'rtg-heritage-materials.css', 'rtg-heritage-adapters.css',
     'rtg-heritage-experiences.css',
-    'rtg-heritage-components.css']) {
+    'rtg-heritage-components.css', 'rtg-world-screen.css']) {
     const bytes = fs.statSync(path.join(ROOT, 'public/shared', naam)).size;
     assert.ok(bytes < 10 * 1024, naam + ' hoort onder de 10 KB te blijven, is ' + bytes);
   }
@@ -28,6 +29,7 @@ test('de centrale laag blijft klein, gesplitst en laat alle delen één keer bin
   assert.equal((TOKENS.match(/rtg-heritage-adapters\.css/g) || []).length, 1);
   assert.equal((TOKENS.match(/rtg-heritage-experiences\.css/g) || []).length, 1);
   assert.equal((TOKENS.match(/rtg-heritage-components\.css/g) || []).length, 1);
+  assert.equal((TOKENS.match(/rtg-world-screen\.css/g) || []).length, 1);
 });
 
 test('vier vaste werelden delen één volledige token- en dieptegrammatica', () => {
@@ -120,9 +122,13 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
 });
 
 test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
-  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-simple.css',
+  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-world-screen.css',
     'last import is shared and project-relative; no query that the CSS bundler would discard');
   assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
+  assert.match(WERELDSCHERMEN, /data-rtg-screen-root="content"/);
+  assert.match(WERELDSCHERMEN, /data-rtg-screen-root="immersive"/);
+  assert.match(WERELDSCHERMEN, /data-rtg-component="OperationalPanel"/);
+  assert.match(WERELDSCHERMEN, /data-rtg-component="ContextStrip"/);
 });
 
 test('de vier werelden hebben elk een eigen foto en merkaccent', () => {
@@ -192,6 +198,7 @@ test('de volledige Heritage-laag reist mee in beide offline schillen', () => {
     '/shared/rtg-heritage-experiences.css',
     '/shared/rtg-heritage-components.css',
     '/shared/rtg-simple.css',
+    '/shared/rtg-world-screen.css',
     '/shared/rtg-heritage-motion.css',
     '/shared/rtg-heritage-motion.js',
     '/shared/rtg-continue-key.css',

@@ -1,0 +1,129 @@
+/* RTG WERELDSCHERMEN -------------------------------------------------------
+   De homes leerden de bediening; alle onderliggende functies spreken hier
+   dezelfde taal. Dit blad wijzigt geen routes, data of handlers. Het geeft de
+   bestaande hoofdvlakken en de door Heritage gemarkeerde rollen één maat,
+   ritme en materiaal. Native canvassen (kaart, camera, editor, spel) blijven
+   vrij en krijgen alleen de veilige wereldgrond eromheen. */
+
+body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]:not([data-rtg-screen="world-home"]){
+  min-height:100dvh;overflow-x:clip;background-color:var(--rtg-world-bg)!important;
+  background-image:radial-gradient(52rem 30rem at 84% -8rem,var(--rtg-world-signature-soft),transparent 72%),
+    var(--rtg-world-ground)!important;background-size:auto!important;background-position:center!important;
+  background-repeat:no-repeat!important;background-attachment:fixed!important
+}
+
+/* De hoofdmaat van een functie is ruimer dan een formulier, maar rustiger dan
+   een home. De Edge blijft het vaste bedieningskader; inhoud begint eronder en
+   eindigt ruim boven de duimbalk. */
+body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]:not([data-rtg-screen="world-home"])
+  [data-rtg-screen-root="content"]{
+  box-sizing:border-box;min-width:0;width:min(100%,1440px)!important;max-width:1440px!important;
+  min-height:calc(100dvh - var(--edge-top,44px));margin-inline:auto!important;
+  padding-top:max(clamp(24px,3.6vw,56px),calc(var(--edge-top,44px) + 20px))!important;
+  padding-right:clamp(20px,4vw,64px)!important;
+  padding-bottom:calc(var(--edge-bottom,72px) + max(40px,env(safe-area-inset-bottom)))!important;
+  padding-left:clamp(20px,4vw,64px)!important;color:var(--rtg-world-ink)
+}
+body.rtg-edge-embed[data-rtg-screen] [data-rtg-screen-root="content"]{
+  min-height:100%;padding-top:clamp(16px,2.5vw,32px)!important;
+  padding-bottom:clamp(16px,2.5vw,32px)!important
+}
+body[data-rtg-screen] [data-rtg-screen-root="immersive"]{min-width:0;max-width:100%;overflow:hidden}
+
+/* Context is geen tweede marketinghero. De eerste uitlegstrook van een
+   functie gebruikt dezelfde fotografie en schaal als de WorkOS-home, maar
+   blijft compact genoeg om het echte werk meteen te tonen. */
+body[data-rtg-skin="heritage"] [data-rtg-component="ContextStrip"]{
+  min-width:0;margin:0 0 clamp(20px,3vw,36px)!important;padding:clamp(22px,3.4vw,46px)!important;
+  border:1px solid var(--rtg-world-line)!important;color:var(--rtg-world-ink)!important;
+  background-color:var(--rtg-world-card)!important;background-image:
+    linear-gradient(105deg,var(--rtg-world-bg) 0%,color-mix(in srgb,var(--rtg-world-bg) 88%,transparent) 56%,
+      color-mix(in srgb,var(--rtg-world-bg) 48%,transparent)),var(--rtg-world-photo)!important;
+  background-position:center,var(--rtg-world-photo-position)!important;background-size:auto,cover!important;
+  box-shadow:var(--rtg-depth-focus)!important
+}
+body[data-rtg-skin="heritage"] [data-rtg-component="ContextStrip"] :is(h1,h2){
+  max-width:15ch;margin:.18em 0;color:var(--rtg-world-ink)!important;
+  font:450 clamp(36px,5vw,68px)/.98 var(--rtg-display,"Bodoni Moda",Georgia,serif)!important;
+  letter-spacing:-.035em!important;text-wrap:balance
+}
+body[data-rtg-skin="heritage"] [data-rtg-component="ContextStrip"] :is(p,.sub,.onder){
+  max-width:62ch;color:var(--rtg-world-muted)!important;line-height:1.6
+}
+
+/* Echte werkvlakken: één grens, één kaartkleur, dezelfde inwendige ruimte.
+   Formulieren en tabellen blijven recht en compact; losse historische ronde
+   dozen worden hiermee niet verder aangedikt. */
+body[data-rtg-skin="heritage"] [data-rtg-component="OperationalPanel"]{
+  box-sizing:border-box;min-width:0;max-width:100%;margin-block:0 clamp(16px,2vw,28px);
+  padding:clamp(16px,2.4vw,30px);overflow-x:auto;overscroll-behavior-inline:contain;
+  border:1px solid var(--rtg-world-line)!important;border-radius:var(--rtg-radius-content)!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.035),transparent 44%),
+    color-mix(in srgb,var(--rtg-world-card) 97%,transparent)!important;
+  color:var(--rtg-world-ink);box-shadow:var(--rtg-depth-content)!important
+}
+body[data-rtg-skin="heritage"] [data-rtg-component="OperationalPanel"] :is(h1,h2,h3,legend){
+  color:var(--rtg-world-ink)
+}
+body[data-rtg-skin="heritage"] [data-rtg-component="OperationalPanel"] :is(p,small,.sub,.meta,.stil){
+  color:var(--rtg-world-muted)
+}
+body[data-rtg-skin="heritage"] [data-rtg-component="NarrativePanel"]{
+  position:relative;min-width:0;margin-block:0 clamp(18px,2.4vw,32px);padding:clamp(24px,4vw,52px);
+  border:1px solid var(--rtg-world-line)!important;background:linear-gradient(135deg,
+    var(--rtg-world-signature-soft),transparent 64%),var(--rtg-world-card)!important;
+  color:var(--rtg-world-ink);box-shadow:var(--rtg-depth-focus)!important
+}
+body[data-rtg-skin="heritage"] [data-rtg-component="NarrativePanel"]::before{
+  content:"";position:absolute;left:-1px;top:-1px;width:min(190px,42%);border-top:2px solid var(--rtg-world-metal)
+}
+
+/* Momenten en operationele tabellen gedragen zich als rijen, niet als een
+   verzameling los zwevende widgets. */
+body[data-rtg-skin="heritage"] [data-rtg-component="MomentList"]{
+  min-width:0;border-color:var(--rtg-world-line)!important;background:transparent!important;box-shadow:none!important
+}
+body[data-rtg-skin="heritage"] [data-rtg-moment-row]{
+  min-width:0;border-color:var(--rtg-world-line)!important;box-shadow:none!important
+}
+body[data-rtg-skin="heritage"] [data-rtg-operational-table]{
+  width:100%;max-width:100%;border-collapse:collapse;background:transparent;font-variant-numeric:tabular-nums
+}
+body[data-rtg-skin="heritage"] [data-rtg-operational-table] :is(th,td){
+  padding:12px 10px;border-bottom:1px solid var(--rtg-world-line);text-align:start
+}
+
+/* Een toegangspoort is ook een wereldscherm. Historische full-screen shells
+   mogen hun eigen geometrie houden, maar niet meer de kleur van een andere
+   wereld over het hele venster schilderen. */
+body[data-rtg-skin="heritage"][data-rtg-screen]:not([data-rtg-screen="world-home"])
+  >:is(#shell,.shell,.schil,.app):not(.rtg-edge-chrome){
+  --bg:var(--rtg-world-bg);--card:var(--rtg-world-card);--panel:var(--rtg-world-card);
+  --txt:var(--rtg-world-ink);--muted:var(--rtg-world-muted);--line:var(--rtg-world-line);
+  --gold:var(--rtg-world-metal);--accent:var(--rtg-world-signature);
+  border-color:var(--rtg-world-line);color:var(--rtg-world-ink)
+}
+
+@media(max-width:767px){
+  body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]:not([data-rtg-screen="world-home"]){
+    background-attachment:scroll!important
+  }
+  body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]:not([data-rtg-screen="world-home"])
+    [data-rtg-screen-root="content"]{
+    width:100%!important;min-height:100dvh;padding-top:max(18px,env(safe-area-inset-top))!important;
+    padding-right:max(14px,env(safe-area-inset-right))!important;
+    padding-bottom:calc(var(--edge-bottom,72px) + max(24px,env(safe-area-inset-bottom)))!important;
+    padding-left:max(14px,env(safe-area-inset-left))!important
+  }
+  body[data-rtg-skin="heritage"] [data-rtg-component="ContextStrip"]{
+    padding:22px 18px!important;background-image:linear-gradient(0deg,var(--rtg-world-bg),
+      color-mix(in srgb,var(--rtg-world-bg) 62%,transparent)),var(--rtg-world-photo)!important
+  }
+  body[data-rtg-skin="heritage"] [data-rtg-component="ContextStrip"] :is(h1,h2){font-size:clamp(34px,12vw,54px)!important}
+  body[data-rtg-skin="heritage"] [data-rtg-component="OperationalPanel"]{padding:16px}
+  body[data-rtg-skin="heritage"] [data-rtg-operational-table]{display:block;overflow-x:auto;white-space:nowrap}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body[data-rtg-skin="heritage"][data-rtg-screen] *{scroll-behavior:auto!important}
+}

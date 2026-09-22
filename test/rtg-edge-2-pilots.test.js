@@ -27,7 +27,7 @@ const PAGINAS = [
   { bestand: 'public/apps/rtg.html', context: 'living-bank,living-top', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/kantoor.html', context: 'wereldtabs,wereldapps', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/reizen.html', context: 'travel-header,hoofdtabs', stand: 'overview', auto: 'true' },
-  { bestand: 'public/apps/foundation/os-publiek.html', context: 'world-shell', stand: 'overview', auto: 'true' },
+  { bestand: 'public/apps/foundation/os-publiek.html', context: 'wereldtabs,wereldapps', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/agenda.html', context: 'native-header,duimbalk', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/reisboek.html', context: 'native-header', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/werk.html', context: 'work-bank,work-top', stand: 'overview', auto: 'true' }

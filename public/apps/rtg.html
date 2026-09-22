@@ -101,9 +101,15 @@
 <script src="/shared/rtg-world-start.js" defer></script>
 
 <script>setTimeout(function(){var b=document.body;if(b&&b.getAttribute("data-rtg-world-start")==="loading"){b.setAttribute("data-rtg-world-start","ready");b.removeAttribute("aria-busy");var l=b.querySelector(".rtg-world-start");if(l)l.hidden=true;}},12500);</script>
+<!-- LivingOS gebruikt op desktop dezelfde wereldcompositie als WorkOS en
+     FoundationOS. De bestaande Living-inhoud en bordeaux signatuur blijven
+     intact; mensen, hoofdvlak, favorieten en appbibliotheek delen hun bron. -->
+<link rel="stylesheet" href="/shared/rtg-world-desktop.css">
+<link rel="stylesheet" href="/shared/rtg-world-widgets.css">
+<script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-ios-home data-rtg-world="living" data-rtg-world-dashboard="living" data-rtg-vandaag-luxe data-rtg-edge-2-context="living-bank,living-top" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
+<body data-world-home="living" class="rtg-stijl" data-ios-home data-rtg-world="living" data-rtg-world-dashboard="living" data-rtg-vandaag-luxe data-rtg-edge-2-context="living-bank,living-top" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
 <div class="rtg-world-start" role="status" aria-live="polite"><span class="rtg-world-start-brand" aria-hidden="true"><strong>Rahul Travel Group</strong><span>Experience the elite class</span></span><span class="rtg-world-start-status">LivingOS wordt klaargezet…</span></div>
 <a class="skip" href="#inhoud">Naar inhoud</a>
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">

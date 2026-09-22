@@ -184,13 +184,34 @@
 <script src="/shared/rtg-world-start.js" defer></script>
 
 <script>setTimeout(function(){var b=document.body;if(b&&b.getAttribute("data-rtg-world-start")==="loading"){b.setAttribute("data-rtg-world-start","ready");b.removeAttribute("aria-busy");var l=b.querySelector(".rtg-world-start");if(l)l.hidden=true;}},12500);</script>
+<!-- FoundationOS gebruikt op desktop voortaan exact dezelfde wereldcompositie
+     als WorkOS. De inhoud en het nachtblauwe Foundation-materiaal blijven van
+     deze wereld; alleen de gedeelde plaatsing van mensen, hoofdvlak,
+     favorieten, appbibliotheek en Edge komt uit één bron. -->
+<link rel="stylesheet" href="/shared/rtg-world-desktop.css">
+<link rel="stylesheet" href="/shared/rtg-world-widgets.css">
+<script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-world-dashboard="foundation" data-rtg-vandaag-luxe data-rtg-vandaag-surface="public-city" data-rtg-edge-2-context="world-shell" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
+<body data-world-home="foundation" class="rtg-stijl" data-rtg-world="foundation" data-rtg-world-dashboard="foundation" data-rtg-vandaag-luxe data-rtg-vandaag-surface="public-city" data-rtg-edge-2-context="wereldtabs,wereldapps" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
 <div class="rtg-world-start" role="status" aria-live="polite"><span class="rtg-world-start-brand" aria-hidden="true"><strong>Rahul Travel Group</strong><span>Experience the elite class</span></span><span class="rtg-world-start-status">FoundationOS wordt klaargezet…</span></div>
-<!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
-     Edge-schil (shared/rtg-edge-system.js), die dit scherm via randen.js al
-     draagt. Zie de opmerking in apps/kantoor.html. -->
+<!-- Dezelfde twee contextbronnen als WorkOS. Edge neemt ze bij een geslaagde
+     start over; zonder JavaScript blijven het gewone, bruikbare links. De
+     oude Foundation-zijrail wordt op deze home bewust niet meer geladen. -->
+<nav class="wereldtabs" data-tabs aria-label="Bladen in FoundationOS">
+  <a class="wereldtab" href="/apps/foundation/os-publiek.html" aria-current="page">Vandaag</a>
+  <a class="wereldtab wereldtab-plus" href="/apps/foundation/index.html"
+     aria-label="FoundationOS openen">&#xFF0B;</a>
+</nav>
+<nav class="wereldapps" aria-label="Apps in deze wereld">
+  <b>FoundationOS</b>
+  <a href="/apps/foundation/agenda.html">Agenda</a>
+  <a href="/apps/foundation/leren.html">Leren</a>
+  <a href="/apps/foundation/schrijven.html">Schrijven</a>
+  <a href="/apps/foundation/vrienden.html">Vrienden</a>
+  <a href="/apps/foundation/hulpwijzer.html">Hulpwijzer</a>
+  <a href="/apps/foundation/os-portaal.html">Portaal</a>
+</nav>
 <main id="main">
 
   <section class="onthaal" data-rtg-transition="world" aria-labelledby="onthaalkop">
@@ -545,7 +566,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/experience-actions.js?v=20260829-7" defer></script>
 <script src="/shared/experience-kernel.js?v=20260829-7" defer></script>
-<script src="schil-os.js" defer></script>
 <script src="premium.js" defer></script>
 </body>
 </html>

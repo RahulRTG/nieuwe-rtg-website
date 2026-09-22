@@ -477,6 +477,7 @@
   }
   let flitsPunten = [];
   function bouwPinnen() {
+    if (!R || !hier) return; // De 2D-tekenlus leest de actuele pinnen zelf.
     const m = Drie.leegMesh();
     for (const p of zichtbarePlekken()) {
       const w = naarWereld(p.lat, p.lng);
@@ -492,6 +493,7 @@
 
   /* ---- de route als oplichtend lint ---- */
   function bouwRoute() {
+    if (!R) return; // Ook vóór de kaart klaarstaat mag een route sluiten.
     const punten = route ? route.route.map(p => naarWereld(p.lat, p.lng)) : [];
     const m = Drie.lint(punten, 4.5, [0.62, 0.11, 0.25], 1.2);
     if (laagRoute) R.vervang(laagRoute, m); else laagRoute = R.voegToe(m, { emissie: 1 });
@@ -526,7 +528,7 @@
   /* ---- 2D-terugval als er geen WebGL is ---- */
   function teken2D() {
     const ctx = canvas.getContext('2d'); if (!ctx || !kaartData) return;
-    const W = canvas.width, H = canvas.height, sc = Math.min(W, H) / (520);
+    const W = canvas.width, H = canvas.height, sc = Math.min(W, H) / 520 * (240 / cam.afstand);
     const cx = W / 2, cy = H / 2;
     const toXY = (lat, lng) => { const w = naarWereld(lat, lng); return [cx + (w[0] - cam.doel[0]) * sc, cy + (w[1] - cam.doel[2]) * sc]; };
     ctx.fillStyle = '#0C0C0B'; ctx.fillRect(0, 0, W, H);

@@ -70,7 +70,7 @@ test('signature, vertrouwenssleutel en externe bewijsbytes blijven na READY exac
   assert.throws(() => leesProductiestatus(s.commit, s.root), /externe dossier|bewijsbestand/);
 
   s = opstelling();
-  fs.writeFileSync(path.join(s.root, 'deploy', 'release-sleutel.pub'), 'geen sleutel\n');
+  fs.writeFileSync(path.join(s.root, 'deploy', 'evidence-sleutel.pub'), 'geen sleutel\n');
   assert.throws(() => leesProductiestatus(s.commit, s.root), /externe dossier/);
 });
 

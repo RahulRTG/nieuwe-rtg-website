@@ -22,7 +22,7 @@ before(async () => {
   if (!HEEFT_REDIS) return;
   POORT = await vrijePoort();
   URL = 'redis://127.0.0.1:' + POORT;
-  server = spawn('redis-server', ['--port', String(POORT), '--save', '', '--appendonly', 'no'], { stdio: 'ignore' });
+  server = spawn('redis-server', ['--bind', '127.0.0.1', '--port', String(POORT), '--save', '', '--appendonly', 'no'], { stdio: 'ignore' });
   /* WACHTEN TOT HIJ LUISTERT -- MET EEN DEADLINE, en dat is de plek waar het
      eerder vastliep.
 

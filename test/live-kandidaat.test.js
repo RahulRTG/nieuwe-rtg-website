@@ -35,7 +35,8 @@ function opstelling() {
   schrijf(root, '.gitignore', '.release/\n');
   fs.mkdirSync(path.join(root, '.release'), { recursive: true });
   const sleutels = herkomst.nieuweSleutel();
-  schrijf(root, 'deploy/release-sleutel.pub', sleutels.publiek);
+  require('./release-trust-fixture').trustFixture(root, { BUILD:{
+    publicKey:crypto.createPublicKey(sleutels.publiek), privateKey:crypto.createPrivateKey(sleutels.prive) } });
   const git = (...args) => spawnSync('git', args, { cwd:root, encoding:'utf8' });
   assert.equal(git('init', '--quiet').status, 0);
   assert.equal(git('config', 'user.email', 'candidate@test.invalid').status, 0);

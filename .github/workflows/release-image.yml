@@ -40,6 +40,10 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: npm
+      - name: Ondertekeningsrollen vóór bouw bewijzen
+        env:
+          RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}
+        run: node scripts/imageherkomst.js --sleutelcontrole
       - run: npm ci
       # xmllint is de scheidsrechter van test/samlc14n.test.js en die toets slaat
       # zichzelf niet over; ubuntu-latest draagt hem niet. Zie ci.yml voor waarom.

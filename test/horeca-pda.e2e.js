@@ -419,8 +419,8 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     // OPNEMEN: van de kaart, met een allergie en voor die stoel
     await page.selectOption('#tVoor', { label: 'bij het raam' });
     await page.fill('#tAllergie', 'schaaldieren');
-    const kaartKnop = await page.$('#tKaart [data-item]');
-    assert.ok(kaartKnop, 'de kaart van de zaak staat op de PDA');
+    const kaartKnop = page.locator('#tKaart [data-item]').first();
+    assert.equal(await kaartKnop.count(), 1, 'de kaart van de zaak staat op de PDA');
     const wat = await kaartKnop.evaluate(el => el.textContent);
     /* WAT ER OP DE REKENING KOMT IS DE BEWERING HIERONDER, dus daar mag deze wacht
        niet op vooruitlopen. De rekening zei "Nog niets besteld"; zodra hij iets
@@ -444,8 +444,8 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.ok(vol.regels[0].gastNr, 'de regel hangt aan de stoel');
 
     // GANGEN STUREN
-    const naarKeuken = await page.$('#tRegels [data-vrij]');
-    assert.ok(naarKeuken, 'er staat een knop om de gang naar de keuken te sturen');
+    const naarKeuken = page.locator('#tRegels [data-vrij]').first();
+    assert.equal(await naarKeuken.count(), 1, 'er staat een knop om de gang naar de keuken te sturen');
     await naarKeuken.click();
     /* Vrijgeven laat de knop verdwijnen: er staat in die gang niets meer open. Dat
        is meteen het teken dat de server klaar is -- de vraag ertussen gaat
@@ -458,8 +458,10 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
       'en de knop is weg, want er staat niets meer open');
 
     // AFREKENEN
-    const betaal = await page.$('#tBetaal [data-betaal="pin"]');
-    assert.ok(betaal, 'er staat een pinknop met het openstaande bedrag');
+    // Een rekeningupdate hertekent de knoppen; de locator volgt dezelfde actie
+    // ook wanneer het eerdere DOM-element inmiddels vervangen is.
+    const betaal = page.locator('#tBetaal [data-betaal="pin"]');
+    assert.equal(await betaal.count(), 1, 'er staat één pinknop met het openstaande bedrag');
     assert.match(await betaal.evaluate(el => el.textContent), /\d/, 'met een bedrag erin');
     await betaal.click();
     /* Een gesloten rekening klapt het tafelvenster dicht en zet de werklijst terug

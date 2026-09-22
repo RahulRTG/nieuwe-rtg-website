@@ -96,8 +96,11 @@
   var blad = null, pres = null, presLoop = null, formulier = null, schets = null, bord = null;
 
   /* ---------- de drive ---------- */
+  var lijstAanvraag = 0;
   function laadLijst() {
+    var aanvraag = ++lijstAanvraag;
     return api('mijn').then(function (r) {
+      if (aanvraag !== lijstAanvraag) return;
       if (r.status !== 200) { zeg(r.body.error || opzet.leeg); return; }
       stand = r.body;
       tekenSjablonen(r.body.sjablonen || []);
@@ -134,6 +137,7 @@
       b.addEventListener('click', function () { nieuw(null, b.dataset.sjab); });
     });
   }
+  var lijstSleutel = '';
   function tekenLijst() {
     if (!stand) return;
     var zoek = $('#zoek').value.trim().toLowerCase();
@@ -155,28 +159,29 @@
         return String(b.gewijzigd).localeCompare(String(a.gewijzigd));
       });
     };
-    $('#mijnDocs').innerHTML = teken(zeef(stand.docs || []), true, zoek);
-    $('#gedeeldDocs').innerHTML = teken(zeef(stand.gedeeld || []), false, zoek);
+    var eigen = teken(zeef(stand.docs || []), true, zoek), gedeeld = teken(zeef(stand.gedeeld || []), false, zoek);
+    var sleutel = eigen + '\n' + gedeeld;
+    if (sleutel === lijstSleutel) return;
+    lijstSleutel = sleutel;
+    $('#mijnDocs').innerHTML = eigen;
+    $('#gedeeldDocs').innerHTML = gedeeld;
     Array.prototype.forEach.call(document.querySelectorAll('[data-open]'), function (b) {
       b.addEventListener('click', function () { openen(b.dataset.open); });
       b.addEventListener('keydown', function (e) {
+        if (e.target !== b) return;
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openen(b.dataset.open); }
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-ster]'), function (b) {
       b.addEventListener('click', function (e) {
         e.stopPropagation();
-        api('ster', { id: b.dataset.ster, aan: b.dataset.aan !== '1' }).then(function () { laadLijst(); });
+        markeren(b.dataset.ster, b.dataset.aan !== '1');
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-weg]'), function (b) {
       b.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (!confirm('Dit document verwijderen?')) return;
-        api('weg', { id: b.dataset.weg }).then(function (w) {
-          if (w.body.error) return zeg(w.body.error);
-          zeg('Verwijderd.'); laadLijst();
-        });
+        verwijderen(b.dataset.weg);
       });
     });
   }
@@ -220,7 +225,7 @@
         '<span class="acties">' + (eigen
           ? '<button class="mini ster' + (d.ster ? ' aan' : '') + '" data-ster="' + d.id + '" data-aan="' + (d.ster ? '1' : '0') +
             '" title="Markeren" aria-label="Markeren">' + (d.ster ? '★' : '☆') + '</button>' +
-            '<button class="mini weg" data-weg="' + d.id + '">weg</button>'
+            '<button class="mini weg" type="button" data-weg="' + d.id + '">Verwijderen</button>'
           : '') + '</span></div>';
     }).join('');
   }
@@ -247,6 +252,39 @@
   $('#nieuwFormulier').addEventListener('click', function () { nieuw('formulier'); });
   $('#nieuwSchets').addEventListener('click', function () { nieuw('schets'); });
   $('#nieuwBord').addEventListener('click', function () { nieuw('bord'); });
+  /* One owner action for desktop buttons and mobile document gestures. */
+  var documentActieBezig = new Set();
+  async function markeren(id, aan) {
+    var doc = stand && (stand.docs || []).find(function (x) { return x.id === id && x.vanMij; });
+    if (!doc || documentActieBezig.has(id)) return false;
+    documentActieBezig.add(id);
+    try {
+      var r = await api('ster', { id: id, aan: !!aan });
+      if (r.status !== 200 || r.body.error || !r.body.ok) throw new Error(r.body.error || 'De markering kon niet worden bewaard.');
+      await laadLijst();
+      if (window.RTGDocs) await window.RTGDocs.vernieuw();
+      return true;
+    } catch (e) { zeg(e.message || 'De markering kon niet worden bewaard.'); return false; }
+    finally { documentActieBezig.delete(id); }
+  }
+  async function verwijderen(id, bevestigd) {
+    var doc = stand && (stand.docs || []).find(function (x) { return x.id === id && x.vanMij; });
+    if (!doc || documentActieBezig.has(id)) return false;
+    if (!bevestigd && !confirm('Wilt u "' + doc.titel + '" voorgoed verwijderen? Dit kunt u niet ongedaan maken.')) return false;
+    documentActieBezig.add(id);
+    try {
+      var r = await api('weg', { id: id });
+      if (r.status !== 200 || r.body.error || !r.body.ok) throw new Error(r.body.error || 'Het document kon niet worden verwijderd.');
+      tabs = tabs.filter(function (tab) { return tab.id !== id; });
+      if (open && open.id === id) { clearTimeout(bewaarT); sluitEditor(); }
+      else tekenTabs();
+      await laadLijst();
+      if (window.RTGDocs) await window.RTGDocs.vernieuw();
+      zeg('Het document is verwijderd.');
+      return true;
+    } catch (e) { zeg(e.message || 'Het document kon niet worden verwijderd. Probeer het opnieuw.'); return false; }
+    finally { documentActieBezig.delete(id); }
+  }
 
   /* ---------- openen ---------- */
   function zetTab(doc) {
@@ -896,7 +934,7 @@
   });
 
   /* RTDocs is de rustige voorzijde van deze documentmotor. De voorzijde
-     krijgt bewust alleen deze vier deuren: dezelfde API, dezelfde lijst en
+     gebruikt dezelfde API, dezelfde lijst en
      dezelfde editor. Zo ontstaan er geen tweede documentenmodel en geen
      schaduwversies naast RTG Office. */
   window.RTGOffice = Object.freeze({
@@ -904,6 +942,8 @@
     laad: laadLijst,
     openen: openen,
     nieuw: nieuw,
+    verwijderen: verwijderen,
+    markeren: markeren,
     stand: function () { return stand; }
   });
 

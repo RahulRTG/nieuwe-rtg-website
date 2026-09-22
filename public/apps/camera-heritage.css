@@ -55,6 +55,7 @@ body[data-rtg-world="living"] .knopje{
 }
 
 body[data-rtg-world="living"] .knopje[aria-pressed="true"]{border-color:var(--camera-gold)!important;color:var(--camera-gold)!important}
+body[data-rtg-world="living"] .knopje[hidden]{display:none!important}
 
 body[data-rtg-world="living"] .onder{
   bottom:calc(var(--edge-bottom,64px) + env(safe-area-inset-bottom,0px))!important;

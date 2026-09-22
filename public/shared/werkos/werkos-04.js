@@ -58,6 +58,7 @@
     const railKnoppen = [];
     for (const a of apps) {
       const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', a.naam);
+      b.dataset.rtgActionKey = 'work.panel.' + apps.indexOf(a);
       const glyf = window.RTGGlyf && RTGGlyf.svg(a.glyf || 'paneel'); if (glyf) b.appendChild(glyf);
       const s = document.createElement('span'); s.textContent = a.naam; b.appendChild(s); b.addEventListener('click', () => ga(a));
       rail.appendChild(b); railKnoppen.push({ a, b });
@@ -70,7 +71,9 @@
     dockKnop(HUIS_SVG, 'Naar boven', () => { window.scrollTo({ top:0, behavior:'smooth' }); actief(null); });
     for (const a of apps.slice(0, 4)) {
       const glyf = window.RTGGlyf && RTGGlyf.svgHTML(a.glyf || 'paneel');
-      dockKnoppen.push({ a, b:dockKnop(glyf || '', a.naam, () => ga(a)) });
+      const b = dockKnop(glyf || '', a.naam, () => ga(a));
+      b.dataset.rtgActionKey = 'work.panel.' + apps.indexOf(a);
+      dockKnoppen.push({ a, b });
     }
     dockKnop(ZOEK_SVG, 'Command Center', open); document.body.appendChild(dock);
 

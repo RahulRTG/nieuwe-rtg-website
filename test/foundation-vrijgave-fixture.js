@@ -5,6 +5,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const extern = require('../server/config/external-release');
 const releaseBewijs = require('../scripts/release-bewijs');
+const trust = require('../server/config/release-trust');
+const { trustFixture } = require('./release-trust-fixture');
 
 const COMMIT = 'a'.repeat(40);
 const HASH = 'b'.repeat(64);
@@ -32,7 +34,7 @@ function groenDossier(commit = COMMIT, hashes = {}) {
   controles.foundationMinderjarigen = { ...controles.foundationMinderjarigen,
     vrijgave:'OPEN', leeftijdscontrole:'PASS', moderatie:'PASS' };
   return {
-    formaat:extern.FORMAAT, geslaagd:true, commit,
+    formaat:extern.FORMAAT, ondertekenDomein:trust.ROLES.EVIDENCE.domain, geslaagd:true, commit,
     goedgekeurdDoor:'Onafhankelijke beoordelaar', goedgekeurdAt:'2026-09-04T12:00:00.000Z',
     controles
   };
@@ -46,6 +48,7 @@ function maakGetekendeVrijgave(root, opties = {}) {
   fs.mkdirSync(bewijsMap, { recursive:true });
   fs.mkdirSync(deployMap, { recursive:true });
   const sleutels = opties.sleutels || crypto.generateKeyPairSync('ed25519');
+  const trustKeys = trustFixture(root, { EVIDENCE:sleutels });
   const hashes = {};
   for (const naam of Object.values(BESTANDSNAMEN)) {
     const bytes = Buffer.from('extern bewijs voor ' + naam + '\n');
@@ -58,11 +61,9 @@ function maakGetekendeVrijgave(root, opties = {}) {
   fs.writeFileSync(path.join(releaseMap, 'external-release.json'), dossierBytes);
   const tekenSleutel = opties.tekenSleutel || sleutels.privateKey;
   fs.writeFileSync(path.join(releaseMap, 'external-release.sig'),
-    crypto.sign(null, dossierBytes, tekenSleutel).toString('base64') + '\n');
-  fs.writeFileSync(path.join(deployMap, 'release-sleutel.pub'),
-    sleutels.publicKey.export({ type:'spki', format:'pem' }));
+    trust.sign('EVIDENCE', dossierBytes, tekenSleutel) + '\n');
   if (opties.runtimeBewijs !== false) maakRuntimeBewijs(root, opties.runtimeCommit || commit);
-  return { dossier, dossierBytes, bewijsMap, sleutels };
+  return { dossier, dossierBytes, bewijsMap, sleutels, trustKeys };
 }
 
 /* Kleine maar volledige runtime-opstelling voor de imagebewijsverifier. Het

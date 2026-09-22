@@ -251,3 +251,14 @@ body.rtg-social-messages .blad{
 @media(min-width:1280px){
   body.rtg-social-messages .comm{grid-template-columns:minmax(23rem,28vw) minmax(0,1fr) 285px!important}
 }
+
+/* The conversation must fit above the shared Edge, including its composer.
+   Embedded conversations have no own Edge and keep their full frame height. */
+body.rtg-social-messages[data-rtg-adaptive-ready="true"] .comm{
+  bottom:var(--rtg-adaptive-inset)!important;
+  height:auto!important;
+}
+body.rtg-social-messages .draad-kop .terug,
+body.rtg-social-messages .bub time,
+body.rtg-social-messages .bub .acties button,
+body.rtg-social-messages .dagscheiding{color:#655440!important}

@@ -250,11 +250,15 @@ function chips(k){
   }).join('') + '</div>';
 }
 
+let etalageAanvraag = 0;
 async function tekenEtalage(code){
   if (!code) return;
+  const aanvraag = ++etalageAanvraag;
   const el = $('#etalage'); el.innerHTML = '<p class="leeg">Laden…</p>';
+  el.setAttribute('aria-busy', 'true'); delete el.dataset.verkoper;
   try {
     const r = await api('/api/commerce/etalage', { verkoper: code });
+    if (aanvraag !== etalageAanvraag) return;
     const teKoop = r.teKoop || [], niet = r.nietTeKoop || [];
     let h = '';
     h += '<h3 style="font-size:.95rem;margin:.4rem 0 .7rem;">Te koop <span class="n" style="color:var(--soft);font-family:Inter,sans-serif;font-size:.72rem;">'+teKoop.length+'</span></h3>';
@@ -294,9 +298,11 @@ async function tekenEtalage(code){
         '<div class="waarom'+(prima?' prima':'')+'">'+esc(k.waarom||'')+'</div></div>';
     }).join('') : '<p class="leeg">Alles van deze verkoper staat te koop.</p>';
     el.innerHTML = h;
+    el.dataset.verkoper = code;
     el.querySelectorAll('[data-in]').forEach(b => b.onclick = () => inMand(b.getAttribute('data-in'), b));
     el.querySelectorAll('[data-retour]').forEach(b => b.onclick = () => retourVorm(b, b.getAttribute('data-retour')));
-  } catch (e) { el.innerHTML = '<div class="stuk">'+esc(e.message)+'</div>'; }
+  } catch (e) { if (aanvraag === etalageAanvraag) el.innerHTML = '<div class="stuk">'+esc(e.message)+'</div>'; }
+  finally { if (aanvraag === etalageAanvraag) el.setAttribute('aria-busy', 'false'); }
 }
 
 /* Het blok waarin een koper de prijsvraag beantwoordt. Bij een vast bedrag

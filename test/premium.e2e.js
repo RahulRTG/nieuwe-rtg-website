@@ -299,6 +299,11 @@ test('premium: de knop blijft getekend als de app zijn gastheer sluit',
     await volgVerzoeken(page);
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.setViewportSize({ width: 390, height: 844 });
+    // Session restoration first selects the account's pass. Do not inject
+    // the export source into the document that is about to be replaced.
+    await page.waitForURL(url => url.pathname === '/apps/app.html' && url.searchParams.get('pas') === 'rtg');
+    await page.locator('#app.active').waitFor();
+    assert.equal(await page.locator('#gate').isVisible(), false, 'the authenticated app has closed the original host');
     await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });
     /* deze app meldt zijn bron pas aan als er gegevens zijn; we melden er
        zelf een aan zodat plaats() gedwongen wordt te kiezen */

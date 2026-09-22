@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-20T15:14:56.090Z",
-    "commit": "9e45b3af0",
+    "op": "2026-09-22T06:24:24.555Z",
+    "commit": "e3709730c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1992,6 +1992,13 @@
       "operator": ">=->>#0",
       "gezakt": 1,
       "geprobeerd": 5
+    },
+    "control-uniqueness.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
     },
     "controlekamer.test.js": {
       "soort": "server",
@@ -5707,6 +5714,21 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "office-classificatie-grens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/office/rechten.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "office-controls.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "office-enterprise.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5720,6 +5742,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 11,
       "scherp": "gezakt"
+    },
+    "office-save-atomic.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/office/docs.js",
+      "operator": "!==->===#1",
+      "gezakt": 1,
+      "geprobeerd": 7
     },
     "office-tweede-helft.test.js": {
       "soort": "server",
@@ -6435,6 +6465,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "pg-fault-proxy.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "test/pg-fault-proxy.js",
+      "operator": "getal+1#1",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "pg-snapshot.test.js": {
       "soort": "server",
       "staat": "slaat zichzelf over",
@@ -6901,6 +6939,14 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "release-trust.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/release-trust.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
     },
     "rem.test.js": {
       "soort": "puur",
@@ -9916,6 +9962,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "world-function-controls.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "world-widget-catalog.test.js": {

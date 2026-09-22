@@ -50,12 +50,7 @@ function maakBasis({ db, crypto, codenaamVan }) {
     if (k.startsWith('rtf:')) return k.split(':')[2] || 'gezinslid';
     return codenaamVan(k);
   };
-  // de kring: een RTF-gezin deelt binnen het eigen gezin, nooit daarbuiten
-  const inKring = (d, kring) => !!(kring && d.kring === kring && d.kringDeel);
-  const magSchrijven = (d, key, kring) => d.key === key || (d.bewerkers || []).includes(key)
-    || (inKring(d, kring) && d.kringDeel === 'bewerken');
-  const magLezen = (d, key, kring) => magSchrijven(d, key, kring) || (d.gedeeldMet || []).includes(key)
-    || inKring(d, kring);
+  const { inKring, magSchrijven, magLezen } = require('./rechten');
   const faseVan = d => FASES.includes(d && d.fase) ? d.fase : 'concept';
   const schrijfAudit = (d, door, actie, extra) => {
     if (!d.audit) d.audit = [];

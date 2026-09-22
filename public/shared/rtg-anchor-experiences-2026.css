@@ -86,7 +86,7 @@ body.rtg-travel-experience{
   --rtg-world-ink:#f7f0e6;--rtg-world-muted:#bdc5c7;--rtg-world-line:rgba(213,181,116,.24);
   --rtg-world-signature:#8b1d3d;--rtg-world-signature-soft:rgba(139,29,61,.2);--rtg-world-metal:#d5b574;
   --rtg-world-ground:linear-gradient(165deg,#081c2d,#04111d 58%,#030b12);
-  --rtg-world-photo:url('/images/travelos/ibiza-villa.jpg');--rtg-world-photo-position:center;
+  --rtg-world-photo:none;--rtg-world-photo-position:center;
   --rtg-world-photo-mask:linear-gradient(112deg,rgba(4,17,29,.94),rgba(4,17,29,.62));
 }
 body.rtg-travel-experience[data-rtg-skin="heritage"]{
@@ -107,7 +107,7 @@ body.rtg-travel-experience[data-rtg-world-dashboard-ready="true"]{background:rad
 .rtg-travel-experience .hoofdtabs button.actief{color:var(--anchor-gold)!important}
 .rtg-travel-experience .hoofdtabs button.actief::after{background:var(--anchor-gold)!important}
 .rtg-travel-experience .kaartraster{min-height:35rem!important;border-color:rgba(213,181,116,.28)!important;background:#071827!important}
-.rtg-travel-experience .kaartraster::before{background-image:url('/images/travelos/ibiza-villa.jpg')!important;background-position:center!important;filter:saturate(.72) contrast(1.08)!important}
+.rtg-travel-experience .kaartraster::before{background-image:none!important;background-position:center!important;filter:saturate(.72) contrast(1.08)!important}
 .rtg-travel-experience .kaartraster::after{background:linear-gradient(90deg,rgba(3,14,24,.98),rgba(3,14,24,.65) 58%,rgba(3,14,24,.12)),linear-gradient(0deg,rgba(3,14,24,.93),transparent 72%)!important}
 .rtg-travel-experience .dagtitel{padding:clamp(1.2rem,4vw,3rem)!important}
 .rtg-travel-experience .travel-belofte{max-width:12ch;margin:.4rem 0 1rem;color:var(--anchor-ivory);font:400 clamp(3rem,6vw,5.8rem)/.92 var(--anchor-serif);letter-spacing:-.04em;text-wrap:balance}
@@ -127,7 +127,7 @@ body.rtg-work-experience{
   --rtg-world-ink:#f3eee4;--rtg-world-muted:#aeb8bd;--rtg-world-line:rgba(213,181,116,.2);
   --rtg-world-signature:#8b1d3d;--rtg-world-signature-soft:rgba(139,29,61,.15);--rtg-world-metal:#d5b574;
   --rtg-world-ground:linear-gradient(160deg,#0a1b28,#05101a 62%,#03090f);
-  --rtg-world-photo:url('/images/worlds/heritage/work-heritage-v2.jpg');--rtg-world-photo-position:center;
+  --rtg-world-photo:none;--rtg-world-photo-position:center;
   --rtg-world-photo-mask:linear-gradient(90deg,rgba(5,16,26,.97),rgba(5,16,26,.68));
 }
 body.rtg-work-experience[data-rtg-skin="heritage"]{
@@ -147,7 +147,7 @@ body.rtg-work-experience[data-rtg-skin="heritage"]{
 .rtg-work-experience .wereldtab[aria-current="page"]{color:var(--anchor-gold)!important}
 .rtg-work-experience .merkkop{border-bottom-color:rgba(213,181,116,.2)!important}
 .rtg-work-experience .merkkop::before{color:var(--anchor-gold)!important}
-.rtg-work-experience .doelgroep{min-height:37rem!important;background:linear-gradient(90deg,rgba(4,14,23,.98),rgba(4,14,23,.72) 58%,rgba(4,14,23,.16)),linear-gradient(0deg,rgba(4,14,23,.94),transparent 72%),url('/images/worlds/heritage/work-heritage-v2.jpg') center/cover no-repeat!important}
+.rtg-work-experience .doelgroep{min-height:37rem!important;background:linear-gradient(90deg,rgba(4,14,23,.98),rgba(4,14,23,.72) 58%,rgba(4,14,23,.16)),linear-gradient(0deg,rgba(4,14,23,.94),transparent 72%),none center/cover no-repeat!important}
 .rtg-work-experience .doelgroeptekst h2{max-width:12ch!important;color:var(--anchor-ivory)!important;font-size:clamp(3rem,6vw,5.7rem)!important}
 .rtg-work-experience .doelgroeptekst p{font-size:.88rem!important;line-height:1.6!important}
 .rtg-work-experience .work-ey{display:block;margin-bottom:.6rem;color:var(--anchor-gold);font-size:.58rem;font-weight:700;letter-spacing:.22em}
@@ -177,7 +177,7 @@ body.rtg-school-experience{
 .rtg-school-experience .school-boventitel h1{font-family:var(--anchor-serif)!important;font-weight:500!important}
 .rtg-school-experience .wrap{max-width:70rem!important;padding:1rem 1rem 7rem!important}
 .rtg-school-experience .enterprise-hero{position:relative;isolation:isolate;min-height:34rem;display:flex!important;align-items:flex-end!important;padding:clamp(1.2rem,4vw,3rem)!important;overflow:hidden;border:1px solid rgba(245,240,231,.2)!important;background:#071827!important;color:var(--anchor-ivory)!important}
-.rtg-school-experience .enterprise-hero::before{content:"";position:absolute;z-index:-2;inset:0;background:url('/images/worlds/heritage/foundation-heritage-v2.jpg') center/cover no-repeat;filter:saturate(.72) contrast(1.02)}
+.rtg-school-experience .enterprise-hero::before{content:"";position:absolute;z-index:-2;inset:0;background:url('/images/editorial/foundation-school.webp') center/cover no-repeat;filter:saturate(.72) contrast(1.02)}
 .rtg-school-experience .enterprise-hero::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,rgba(5,18,29,.96),rgba(5,18,29,.48) 66%,rgba(5,18,29,.12)),linear-gradient(0deg,rgba(5,18,29,.93),transparent 70%)}
 .rtg-school-experience .enterprise-hero>div:first-child{max-width:39rem}
 .rtg-school-experience .enterprise-hero .ey{color:#e3c88c!important}

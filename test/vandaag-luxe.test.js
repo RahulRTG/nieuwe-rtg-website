@@ -21,17 +21,14 @@ const HOMES = [
 ];
 
 test('de vier dashboardroutes laden één runtime, stijl en hun vastgelegde wereldbeeld', () => {
-  for (const [wereld, bestand, , , beeld] of HOMES) {
+  for (const [wereld, bestand] of HOMES) {
     const html = lees(bestand);
     assert.match(html, new RegExp('<body[^>]+data-rtg-world="' + wereld +
       '"[^>]+data-rtg-world-dashboard="' + wereld + '"[^>]+data-rtg-vandaag-luxe(?:\\s|>)'), bestand);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.css/g) || []).length, 1, bestand);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.js/g) || []).length, 1, bestand);
-    // Work en Travel gebruiken de goedgekeurde editorial foto. De preload
-    // wijst naar precies dat lokale beeld, ook als het in de inhoud terugkomt.
-    const foto = ['work', 'travel'].includes(wereld)
-      ? '/images/world-homes/' + wereld + '.webp'
-      : '/images/worlds/heritage/' + beeld;
+    // Preload only the image this home actually presents.
+    const foto = wereld === 'living' ? '/campagne/huis-omslag.jpg' : '/images/world-homes/' + wereld + '.webp';
     assert.equal((html.match(new RegExp('<link[^>]+href="' + foto.replace(/\./g, '\\.') + '"[^>]+rel="preload"', 'g')) || []).length, 1, bestand);
     assert.ok(fs.existsSync(path.join(ROOT, 'public', foto)), foto);
     assert.doesNotMatch(html, /wereld-atlas\.jpg/, bestand + ' mag geen quadrant uit de oude atlas laden');
@@ -156,8 +153,10 @@ test('iedere wereld erft centraal materiaal en gebruikt een eigen brede foto', (
         wereld + ' erft --rtg-world-' + token + ' niet');
     }
   }
-  for (const beeld of HOMES.map(rij => rij[4]))
-    assert.ok(JS.includes('/images/worlds/heritage/' + beeld), beeld + ' mist uit het runtimecontract');
+  for (const [wereld] of HOMES) {
+    const beeld = wereld === 'living' ? '/campagne/huis-omslag.jpg' : '/images/world-homes/' + wereld + '.webp';
+    assert.equal(luxe.CONTRACT.beelden[wereld], beeld, wereld + ' contract verwijst naar het echte homebeeld');
+  }
   assert.doesNotMatch(CSS + JS, /wereld-atlas\.jpg/);
   assert.match(CSS, /background-size:auto,auto,cover,auto/);
 });

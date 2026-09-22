@@ -40,7 +40,7 @@
 .sociaal-stage>#vandaagVak{grid-column:1!important;grid-row:1/3!important;}
 .sociaal-stage>.sociaal-briefing{grid-column:2!important;grid-row:1!important;}
 .sociaal-stage>.sociaal-kringpaneel{grid-column:2!important;grid-row:2!important;}
-#vandaagVak{position:relative;isolation:isolate;min-height:620px;margin:0!important;padding:2.2rem;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;border-radius:0;background:linear-gradient(180deg,rgba(10,10,9,.05),rgba(10,10,9,.08) 35%,rgba(10,10,9,.9) 100%),url('/campagne/hero.jpg') center/cover no-repeat!important;box-shadow:0 24px 54px rgba(36,34,29,.16);color:#f7f5ef;}
+#vandaagVak{position:relative;isolation:isolate;min-height:620px;margin:0!important;padding:2.2rem;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;border-radius:0;background:linear-gradient(180deg,rgba(10,10,9,.05),rgba(10,10,9,.08) 35%,rgba(10,10,9,.9) 100%),none center/cover no-repeat!important;box-shadow:0 24px 54px rgba(36,34,29,.16);color:#f7f5ef;}
 #vandaagVak::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,transparent 22%,rgba(7,7,6,.58) 47%,rgba(7,7,6,.93) 100%),linear-gradient(90deg,rgba(7,7,6,.22),transparent 66%);}
 #vandaagVak .sociaal-uitgelicht{position:absolute;top:1.8rem;left:2.2rem;padding:.45rem .65rem;border-radius:0;background:rgba(16,17,15,.6);color:#f3ead1;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:.59rem;letter-spacing:.16em;text-transform:uppercase;}
 #vandaagVak>.regkop{position:absolute;top:clamp(17rem,23vw,21rem);right:2.2rem;left:2.2rem;margin:0;padding:0;border:0;}
@@ -93,7 +93,7 @@
   color:#f4efe3;
   background:
     linear-gradient(90deg,rgba(18,18,16,.98) 0%,rgba(24,24,21,.93) 48%,rgba(45,27,32,.65) 75%,rgba(17,18,16,.86) 100%),
-    url('/campagne/huis-omslag.jpg') 72% 46%/cover no-repeat;
+    none 72% 46%/cover no-repeat;
 }
 .rtg-social-elite .merkkop::after{
   content:"SOCIAL / PRIVATE EDITION";
@@ -231,7 +231,7 @@
   min-height:700px;padding:3rem;border-radius:0;box-shadow:none;
   background:
     linear-gradient(180deg,rgba(12,12,9,.03) 22%,rgba(12,12,9,.16) 50%,rgba(12,12,9,.83) 100%),
-    url('/campagne/hero.jpg') center/cover no-repeat!important;
+    none center/cover no-repeat!important;
   filter:none;
 }
 #vandaagVak::after{background:linear-gradient(180deg,transparent 36%,rgba(8,8,6,.08) 55%,rgba(8,8,6,.76) 100%);}
@@ -350,7 +350,7 @@
 .rtg-social-elite .merkkop{
   min-height:285px;margin-inline:calc(clamp(1.5rem,5vw,6.5rem) * -1);
   padding:3.5rem clamp(1.5rem,5vw,6.5rem) 2.7rem;border-bottom-color:rgba(205,184,121,.25);color:#f4efe3;
-  background:linear-gradient(90deg,rgba(18,19,16,.985),rgba(24,24,21,.92) 54%,rgba(61,35,41,.64) 82%,rgba(18,19,16,.85)),url('/campagne/palacio.jpg') 72% 48%/cover no-repeat;
+  background:linear-gradient(90deg,rgba(18,19,16,.985),rgba(24,24,21,.92) 54%,rgba(61,35,41,.64) 82%,rgba(18,19,16,.85)),none 72% 48%/cover no-repeat;
 }
 .rtg-social-elite .merkkop::after{content:"SOCIAL / PRIVATE EDITION";right:clamp(1.5rem,5vw,6.5rem);color:rgba(244,239,227,.34);}
 .rtg-social-elite .sociaal-boven{color:#cdb879;}
@@ -374,7 +374,7 @@
   .rtg-social-elite .rtg-social-commandbar{background:#171815;}
   .rtg-social-elite:not(.rtg-salon-elite) .amn-knop.amn-zweef,.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.amn-knop{color:#f4efe4!important;}
   .rtg-social-elite:not(.rtg-salon-elite) main#inhoud{background:#dcd5c8;}
-  .rtg-social-elite .merkkop{min-height:315px;margin:0;padding:2.5rem 1.25rem 2rem;background:linear-gradient(100deg,rgba(18,19,16,.97),rgba(43,28,32,.74)),url('/campagne/palacio.jpg') 60% center/cover no-repeat;}
+  .rtg-social-elite .merkkop{min-height:315px;margin:0;padding:2.5rem 1.25rem 2rem;background:linear-gradient(100deg,rgba(18,19,16,.97),rgba(43,28,32,.74)),none 60% center/cover no-repeat;}
   .rtg-social-elite .merkkop::after{content:"PRIVATE / 01";right:1.25rem;color:rgba(244,239,227,.42);}
   .rtg-social-elite .merkkop h1{color:#f6f1e7;}
   .rtg-social-elite .sociaal-inleiding{color:rgba(246,241,231,.65);font-size:.8rem;}

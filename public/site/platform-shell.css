@@ -71,6 +71,7 @@ body[data-public-platform] .wd-shell{margin-top:1rem}
 .pp-world-mini{display:flex;gap:.5rem;width:100%}
 .pp-mini-world{flex:1;min-width:0;padding:0;background:transparent;border:0;color:var(--wh-ink);cursor:pointer}
 .pp-mini-world img{width:100%;aspect-ratio:1;border-radius:50%;object-fit:cover}
+.pp-mini-world>.wd-icon{display:grid;place-items:center;width:100%;height:auto;aspect-ratio:1;padding:24%;border:1px solid var(--wd-line);border-radius:50%;color:var(--wh-gold);background:linear-gradient(135deg,#33251c,#111312)}
 .pp-mini-world span{display:block;font-size:.62rem;margin-top:.5rem}
 .pp-chain{display:flex;gap:.5rem;justify-content:space-around;width:100%;padding:.8rem 0}
 .pp-chain>span{display:grid;gap:.75rem;justify-items:center;text-align:center;font-size:.75rem;flex:1}

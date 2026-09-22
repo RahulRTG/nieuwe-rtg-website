@@ -12,7 +12,7 @@
       return Number.isNaN(x.getTime()) ? '' : new Intl.DateTimeFormat(d.documentElement.lang || 'nl', opt || { day: 'numeric', month: 'short' }).format(x); }
     function row(title, sub, glyph) { var n = U.el('div', 'wd-data-row'); n.appendChild(U.icon(glyph || app.icon));
       var body = U.el('div'); body.appendChild(text('strong', '', title)); if (sub) body.appendChild(text('span', 'wd-muted', sub)); n.appendChild(body); root.appendChild(n); return n; }
-    function photo(url) { var f = U.el('figure', 'wd-widget-photo'), im = U.el('img'); im.src = url; im.alt = ''; im.loading = 'lazy';
+    function photo(url) { if (o.compact) return; var f = U.el('figure', 'wd-widget-photo'), im = U.el('img'); im.src = url; im.alt = ''; im.loading = 'lazy';
       f.appendChild(im); f.appendChild(copy('figcaption', '', 'atmosphere')); root.appendChild(f); }
     function empty(key) { root.appendChild(copy('p', 'wd-widget-empty', key || 'empty')); }
     function array(j, key) { if (!Array.isArray(j[key])) throw new Error('invalid-widget-data'); return j[key]; }
@@ -50,7 +50,7 @@
       if (!notes.length) empty('notesEmpty'); root.appendChild(button('newTask', function () { o.open('newList'); }));
     }
     function travel(j) {
-      var trips = array(j, 'reizen'); photo('/images/world-homes/travel.webp');
+      var trips = array(j, 'reizen'); photo(app.id === 'reisboek' ? '/images/editorial/widget-tripbook.webp' : '/images/editorial/widget-trips.webp');
       if (trips.length) { var x = trips[0], dates = x.venster || x; row(x.bestemming || x.titel || x.naam,
         dates.van ? [date(dates.van), date(dates.tot)].filter(Boolean).join(' - ') : '', 'plane'); }
       else empty('tripEmpty'); root.appendChild(open('trip'));
@@ -92,7 +92,7 @@
       else if (app.id === 'verificatie') { if (!j.user) throw new Error('invalid-profile');
         var shield = U.el('div', 'wd-security'); shield.appendChild(U.icon('shield')); root.appendChild(shield);
         root.appendChild(copy('p', '', j.user.emailVerified === true ? 'verified' : 'unverified')); root.appendChild(open('account')); }
-      else if (app.id === 'foodcourt' || app.id === 'table') { photo('/images/world-homes/living.webp');
+      else if (app.id === 'foodcourt' || app.id === 'table') { photo(app.id === 'table' ? '/images/editorial/widget-table.webp' : '/images/editorial/widget-restaurants.webp');
         var list = array(j, app.id === 'table' ? 'events' : 'restaurants');
         list.slice(0, 2).forEach(function (x) { row(x.naam, [x.stad || x.locatie, x.keuken || x.datum].filter(Boolean).join(' · ')); });
         if (!list.length) empty(); root.appendChild(open('restaurants')); }

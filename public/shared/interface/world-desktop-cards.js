@@ -48,7 +48,7 @@
       title.appendChild(translated(app.name, app.id + '.name')); title.appendChild(U.el('span', 'wd-expand', '↗')); open.appendChild(title);
       box.appendChild(open);
       var body = U.el('div', 'wd-widget-content'); box.appendChild(body);
-      (compact ? favoriteSurfaces : surfaces).push(w.RTGWidgetLive(app, body, { state: views[app.id] || (views[app.id] = {}),
+      (compact ? favoriteSurfaces : surfaces).push(w.RTGWidgetLive(app, body, { compact: compact, state: views[app.id] || (views[app.id] = {}),
         open: function (action) { o.open(app, open, action); },
         run: function (action, data) { return o.runtime.execute(action, data); } }));
       var pin = U.button(selected.includes(app.id) ? 'unpin' : 'pin', function () {

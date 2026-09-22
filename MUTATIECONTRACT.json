@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-22T14:55:04.150Z",
-  "commit": "8ef4a5975",
-  "boomVuil": false,
-  "boomAnders": 2,
+  "op": "2026-09-22T15:56:19.622Z",
+  "commit": "57d37077c",
+  "boomVuil": true,
+  "boomAnders": 7,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },
@@ -13,11 +13,10 @@
   "totaal": 4992,
   "geclassificeerd": 4992,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3189,
+   "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1199,
    "PROTECTED": 467,
-   "INTENTIONALLY_NON_IDEMPOTENT": 136,
-   "UNTESTABLE": 1
+   "INTENTIONALLY_NON_IDEMPOTENT": 136
   },
   "vastgesteldDoorMens": 1851,
   "afgeleidDoorScript": 3141,
@@ -7800,7 +7799,7 @@
     ]
    },
    "bewijs": null,
-   "stand": "UNTESTABLE",
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

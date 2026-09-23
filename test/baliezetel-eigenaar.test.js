@@ -19,7 +19,8 @@
    4. een assertie voor het GEVEN van boardroomtoegang maakt het INTREKKEN niet
       af: twee actienamen, twee bindingen;
    5. intrekken werkt meteen: wie zijn zetel kwijt is, komt bij het volgende
-      verzoek niet meer aan de balie.
+      verzoek niet meer aan de balie. Sinds AUTHORITY.md fase 3 sluit intrekken
+      ook de open kantoorsessie, dus dat volgende verzoek krijgt 401 en geen 403.
 
    Draai los: node --test test/baliezetel-eigenaar.test.js
    ========================================================================== */
@@ -120,7 +121,10 @@ test('4. een vinger voor GEVEN maakt INTREKKEN niet af', async () => {
   const ok = await api('/api/office/boardroom/toegang/weg',
     { codenaam: lidCodenaam, ...(await bevestig('eigenaar-boardroomtoegang-weg')) }, baas);
   assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 160));
-  assert.equal((await api('/api/office/balie/zetels', {}, vertrouweling)).status, 403,
+  /* 401 en geen 403: intrekken sluit sinds AUTHORITY.md fase 3 ook de open
+     kantoorsessie (test/kantoorintrekking.test.js). Hij is er dus meteen uit,
+     zonder te wachten tot zijn sessie verloopt -- en nu ook zonder sessie. */
+  assert.equal((await api('/api/office/balie/zetels', {}, vertrouweling)).status, 401,
     'de vertrouweling is er meteen uit, zonder dat zijn sessie verloopt');
 });
 
@@ -132,6 +136,7 @@ test('5. een ingetrokken zetel werkt bij het volgende verzoek niet meer', async 
   const weg = await api('/api/office/balie/zetel',
     { key: tweedeKey, weg: true, ...(await bevestig('eigenaar-baliezetel')) }, baas);
   assert.equal(weg.status, 200);
-  assert.equal((await api('/api/office/balie/zoek', { codenaam: lidCodenaam }, sessie)).status, 403,
-    'dezelfde sessie, geen zetel meer');
+  assert.equal(weg.body.sessiesGesloten, 1, 'intrekken sluit de open kantoorsessie (AUTHORITY.md fase 3)');
+  assert.equal((await api('/api/office/balie/zoek', { codenaam: lidCodenaam }, sessie)).status, 401,
+    'dezelfde sessie, geen zetel meer -- en de sessie zelf is dicht');
 });

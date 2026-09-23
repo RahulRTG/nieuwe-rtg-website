@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-23T06:15:48.036Z",
-  "commit": "3263a90",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-23T09:49:41.152Z",
+  "commit": "0869deb",
+  "boomVuil": true,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -1079,25 +1079,25 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda",
-   "bestand": "server/foundation/gasten/gezinsleven.js:22",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:70",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/bereik",
-   "bestand": "server/foundation/gasten/gezinsleven.js:54",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:112",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/verwijder",
-   "bestand": "server/foundation/gasten/gezinsleven.js:86",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:136",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/wijzig",
-   "bestand": "server/foundation/gasten/gezinsleven.js:37",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:89",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1271,25 +1271,25 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus",
-   "bestand": "server/foundation/gasten/gezinsleven.js:106",
+   "bestand": "server/foundation/gasten/gezinsleven.js:10",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus/gedaan",
-   "bestand": "server/foundation/gasten/gezinsleven.js:119",
+   "bestand": "server/foundation/gasten/gezinsleven.js:23",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus/keur",
-   "bestand": "server/foundation/gasten/gezinsleven.js:129",
+   "bestand": "server/foundation/gasten/gezinsleven.js:33",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus/verwijder",
-   "bestand": "server/foundation/gasten/gezinsleven.js:140",
+   "bestand": "server/foundation/gasten/gezinsleven.js:44",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1457,19 +1457,19 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen",
-   "bestand": "server/foundation/zorg.js:92",
+   "bestand": "server/foundation/zorg.js:103",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/bevestig",
-   "bestand": "server/foundation/zorg.js:99",
+   "bestand": "server/foundation/zorg.js:110",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/intrekken",
-   "bestand": "server/foundation/zorg.js:107",
+   "bestand": "server/foundation/zorg.js:118",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -4018,7 +4018,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1448",
+   "bestand": "server/server.js:1451",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

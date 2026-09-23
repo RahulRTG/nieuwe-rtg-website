@@ -90,7 +90,7 @@ test('elke capability heeft precies een eigenaar, en die eigenaar draagt haar', 
    OMLAAG: een open punt sluiten verlaagt OPEN_MAX met de hand, een nieuw open
    punt erbij laat deze toets zakken tot iemand het besluit neemt om hem te
    verhogen -- met de reden in de historie. */
-const OPEN_MAX = 9;
+const OPEN_MAX = 8;
 
 test('het aantal open oordelen stijgt niet (OPEN_MAX mag alleen omlaag)', () => {
   const open = REG.oordelen.filter(o => o.stand === 'open').length;

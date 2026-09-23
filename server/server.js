@@ -1212,6 +1212,9 @@ lidDeps.zijnVrienden = zijnVrienden;
    codenaamVan uit de sociale kern nodig heeft. */
 Object.assign(agenda, require('./kern/agenda-pro').maakAgendaPro({
   db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }));
+// De RTF-gezinsagenda schrijft en leest via dezelfde motor (sleutel gezin:<code>);
+// bij het binden gaan de punten uit de oude gezinslijst een keer over.
+rtf.setAgenda(agenda);
 /* Notities & Taken (kern/notities.js): het bord met notities en lijstjes.
    Krijgt de agenda mee, want een notitie met datum en tijd wordt een
    gekoppelde afspraak -- een wekkerlaag, niet drie.

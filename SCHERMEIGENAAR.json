@@ -60,7 +60,6 @@
     "festival.crewdashboard": "apps/festival.html",
     "navigatie.verkeersmeldingen": "apps/flits.html",
     "horeca.reserveren": "apps/foodcourt.html",
-    "rtf.gezinsagenda": "apps/foundation/agenda.html",
     "rtf.arena": "apps/foundation/arena.html",
     "rtf.fotoboekje": "apps/foundation/babyboek.html",
     "gezin.beheer": "apps/foundation/beheer.html",
@@ -496,11 +495,10 @@
         "apps/foundation/agenda.html",
         "apps/agenda.html"
       ],
-      "klasse": "gedeeltelijk",
-      "stand": "open",
+      "klasse": "zelfde-component",
+      "stand": "uitgevoerd",
       "eigenaar": "apps/agenda.html",
-      "reden": "Twee agenda-implementaties: de gezinsagenda op de Foundation-gezinsdata en de persoonlijke agenda op kern/agenda.js. Andere opslag, dezelfde workflow.",
-      "vervolg": "Besluit nodig: kern/agenda.js krijgt een gezin-eigenaarsleutel naast lid: en sup:, en de gezinsagenda wordt een schil op die motor (met migratie van de bestaande gezinspunten)."
+      "reden": "Twee agenda-implementaties op hetzelfde doel: de gezinsagenda hield een eigen lijst in het gezinsrecord met een eigen herhaaluitrol. Nu schrijft en leest hij via de agendamotor (kern/agenda.js + agenda-pro.js) onder de sleutel gezin:<code>, met een eenmalige overname van de oude punten. Het scherm blijft als schil voor een andere doelgroep: een gezinssessie (ook de oppas, alleen-lezen) en geen ledensessie, met kleur per gezinslid en school die meekijkt. De gedeelde weergave is /apps/agenda/kalender.js."
     },
     {
       "schermen": [
@@ -997,10 +995,10 @@
       "doel": "Een restaurant vinden en een tafel reserveren op een gekozen datum/tijd."
     },
     "apps/foundation/agenda.html": {
-      "capability": "rtf.gezinsagenda",
-      "rol": "eigenaar",
+      "capability": "agenda.afspraken",
+      "rol": "schil",
       "doelgroep": "rtf-gezin",
-      "doel": "Schoolafspraken en gezinsafspraken in een gedeelde agenda bekijken en beheren."
+      "doel": "De gedeelde gezinsagenda: dezelfde agenda als die van een lid, voor het gezin samen, met de oppas als meelezer."
     },
     "apps/foundation/arena.html": {
       "capability": "rtf.arena",

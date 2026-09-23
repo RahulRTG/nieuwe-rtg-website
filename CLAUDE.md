@@ -29,9 +29,11 @@ Decision Room. `test/schermeigenaar.test.js` houdt het register tegen een VERSE
 meting: een nieuw scherm op dezelfde routes als een bestaand scherm zakt tot het
 een oordeel heeft (vijf klassen plus `geen-dubbel` met reden), een alias krijgt
 geen klikbare link binnen het huis, en binnen een wereld draagt geen menu-item de
-naam van een ander. Negen oordelen staan `open` met een vervolg (ratel `OPEN_MAX`,
-alleen omlaag) — de grootste zijn de gezinsagenda naast `kern/agenda.js` en Pulse
-naast De Salon. De toegangsschermen zijn al samengevoegd: "Wie heeft toegang tot
+naam van een ander. Acht oordelen staan `open` met een vervolg (ratel `OPEN_MAX`,
+alleen omlaag) — de grootste is Pulse naast De Salon. De gezinsagenda is al
+samengevoegd: hij draait op dezelfde motor als de ledenagenda
+(`kern/agenda.js`, sleutel `gezin:<code>`) en zijn scherm is een schil voor de
+gezinssessie, met de oppas als meelezer. De toegangsschermen zijn al samengevoegd: "Wie heeft toegang tot
 mij" (`mijn-relaties.html`) is het ene scherm, `toestemming.html` een
 doorverwijzing, en RTG iD houdt alleen inloggen bij een dienst en machtigen.
 

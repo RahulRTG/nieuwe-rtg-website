@@ -71,6 +71,7 @@ const KAART = [
   ['adaptief/grammatica.js', 'grammatica-kern', 'gewicht:sb waarom:sb gebaar-drempel:s', [
     ['schrijft', 'de vijf trappen', 'var GEWICHT = {'],
     ['beslist', 'terug zonder weg terug is bewust', "return g === 'terug' && !kanTerug ? 'bewust' : g;"],
+    ['schrijft', 'de vijf bronnen van een verhindering', 'var BRONNEN = {'],
     ['beslist', 'onbekende bron wordt toestand', "var bron = BRONNEN[v.bron] ? v.bron : 'toestand';"],
     ['schrijft', 'vasthoudduur per trap', 'var VASTHOUD = { zwaar: 900, plechtig: 1200 };'],
     ['schrijft', 'de drempels van de gebaren', 'var DREMPELS = { lang: 480, stil: 8, omhoog: 44, diep: 150, veeg: 36, sluit: 90,']]],
@@ -97,7 +98,7 @@ const KAART = [
   ['adaptief/vasthoud.js', 'grammatica-render', 'gebaar-drempel:l', [
     ['beslist', 'vol vasthouden bevestigt', 'if (deel >= 1) { stop(); af(); return; }'],
     ['leest', 'loslaten onder de poging telt niet', 'if (ver <= D.poging) return;']]],
-  ['adaptief/gewicht.js', 'trust', 'gewicht:b waarom:l trust-rail:l gebaar-drempel:l', [
+  ['adaptief/gewicht.js', 'trust', 'gewicht:bl waarom:l trust-rail:l gebaar-drempel:l', [
     ['beslist', 'de weg per trap', "if (g === 'bewust') return bewust(it, bev);"],
     ['beslist', 'compensatie is nooit ongedaan maken', "if (cap && cap.herstel === 'compensatie' && it.ongedaan)"],
     ['leest', 'het effectieve gewicht', "var g = gram.effectief(it.gewicht, typeof it.ongedaan === 'function');"],
@@ -125,7 +126,7 @@ const KAART = [
     ['beslist', 'Edge 2 compact wordt peek', "else if (state === 'compact') setState('peek', 'auto');"],
     ['schrijft', 'klaar-vlag; CSS zet de onderbalk weg', "d.body.dataset.rtgAdaptiveReady = 'true';"],
     ['leest', 'een tik op het tweede register via de kern', 'if (custom && custom.run) return K.voer(custom, w);']]],
-  ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'capability-register:sb bevoegdheid:b zichtbaarheidsstand:b gewicht:b', [
+  ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'capability-register:sb bevoegdheid:b zichtbaarheidsstand:b gewicht:bl', [
     ['schrijft', 'tweede register, laatste wint', 'state.registry[id] = { id: id'],
     ['beslist', 'alleen licht in dit register', "if (item.confirm || (item.gewicht && item.gewicht !== 'licht')) {"],
     ['leest', 'een tik langs de gewichtlaag', "return w.RTGGewicht.voer({ id: e.id, naam: e.label, gewicht: 'licht', doe: e.run })"],
@@ -163,6 +164,7 @@ const KAART = [
     ['rendert', 'de onderbalk van de casco', '<footer class="rtg-edge-bottom">'],
     ['leest', 'peilt gereedheid', "fetch('/api/ready', { cache: 'no-store' })"],
     ['beslist', 'Beveiligd, TEST of Beperkt', "magnaat ? 'TEST' : ok ? 'Beveiligd' : 'Beperkt';"],
+    ['schrijft', 'eigen gezondheidsvlag op de statusknop', "state.parentNode.dataset.edgeHealth = state.textContent === 'Beveiligd' ? 'ok' : 'waiting';"],
     ['projecteert', 'vaste wereldvolgorde', "var ORDE = ['living', 'work', 'travel', 'foundation'];"]]],
   ['rtg-edge-worlds.js', 'edge-casco', 'wereld:s', [
     ['schrijft', 'wereldcatalogi naast MAPPEN', 'w.RTGEdgeWorlds = {'],
@@ -173,10 +175,10 @@ const KAART = [
     ['beslist', 'welke paginabalk mee gaat', "return el.hasAttribute('data-rtg-edge-bar') || (el.parentElement === d.body"],
     ['rendert', 'verhuist de balk zelf', 'rt.slot.appendChild(el);'],
     ['schrijft', 'de Edge bezit een appbalk', "rt.body.setAttribute('data-rtg-edge-appbar', 'true');"]]],
-  ['rtg-edge-command.js', 'edge-casco', 'onderbalk:b', [
+  ['rtg-edge-command.js', 'edge-casco', 'onderbalk:sb', [
     ['beslist', 'neemt het menu tot 999 px', "var media = venster.matchMedia('(max-width:999px)')"],
     ['schrijft', 'claimt de menuknop', "menu.setAttribute('data-rtg-command-owner', 'true');"]]],
-  ['rtg-edge-preferences.js', 'edge-casco', 'onderbalk:b voortzetting:l', [
+  ['rtg-edge-preferences.js', 'edge-casco', 'onderbalk:bl voortzetting:l', [
     ['beslist', 'layoutknop weg buiten de werkruimte', "if (!e.workspace) e.root.querySelector('.rtg-edge-layout').hidden = true;"],
     ['schrijft', 'contexttoken voor Edge 2', "w.RTGEdge2.registerContext(tokens.concat('world-shell'));"],
     ['bewaart', 'dichtheid via de routecontext', 'if (w.RTGRouteMemory) w.RTGRouteMemory.save();']]],
@@ -198,7 +200,7 @@ const KAART = [
     ['beslist', 'onder 14 px telt niet', 'Math.abs(delta)<14'],
     ['beslist', 'een gebaar is 1500 ms vers', 'var GESTURE_MS=1500;'],
     ['beslist', 'auto: alle twaalf balktokens', "if(raw==='auto')return{ok:true,auto:true,tokens:Object.keys(CONTEXT)};"]]],
-  ['rtg-edge-2-loader.js', 'laden', 'hoofdactie:sb zichtbaarheidsstand:sb', [
+  ['rtg-edge-2-loader.js', 'laden', 'hoofdactie:sb zichtbaarheidsstand:sb gebaar-drempel:l', [
     ['beslist', 'hoofdactie per hard pad', "if (pad === '/apps/rtg.html') {"],
     ['schrijft', 'muteert het object van de casco', 'e.onAction = doe; e.ctx.actie = tekst; k.hidden = false; k.textContent = tekst;'],
     ['schrijft', 'standaardstand overview', "b.setAttribute('data-rtg-edge-2-state', 'overview');"],
@@ -209,7 +211,7 @@ const KAART = [
     ['rendert', 'herstelgrepen boven en onder', "knop.className = 'rtg-edge-2-edge-reveal rtg-edge-2-edge-reveal--' + kant[0];"],
     ['schrijft', 'terug naar overview via de API', "if (win.RTGEdge2) win.RTGEdge2.setState('overview', { source: 'edge' });"],
     ['schrijft', 'theme-color, ook in rtg-themas.js', 'meta.content = kleur;']]],
-  ['randen.js', 'laden', 'wereld:sb', [
+  ['randen.js', 'laden', 'wereld:sbl', [
     ['leest', 'statische wereld is leidend', '.includes(d.body.dataset.rtgWorld)) wereld = d.body.dataset.rtgWorld;'],
     ['beslist', 'eigen padlijst voor de wereld', "else if (['/apps/reizen.html'].includes(pad)) wereld = 'travel';"],
     ['schrijft', 'wereld op body in een frame', 'd.body.dataset.rtgWorld = wereld;'],
@@ -228,12 +230,12 @@ const KAART = [
     ['beslist', 'sessie en dichte intakepoort', 'function mag(){return aangemeld()&&poortDicht()}'],
     ['leest', 'sessiestand van app-main', "return !!(app&&app.classList.contains('active'))"],
     ['beslist', 'vangt Home van de Edge af', 'if(!a||!mag()||!tafel)return;e.preventDefault();e.stopPropagation();thuis()']]],
-  ['command/werktafel.js', 'schil', 'onderbalk:s voortzetting:b vluchtige-context:l', [
+  ['command/werktafel.js', 'schil', 'onderbalk:s voortzetting:bl vluchtige-context:l', [
     ['rendert', 'bladen in de Command-balk', "b.className='cmd-balkblad'+(i===actief?' actief':'');"],
     ['beslist', 'hooguit twee bladen', 'if(panes.length>=2)verwijder(actief>=0?actief:0);'],
     ['bewaart', 'bladen bij elke sync', 'w.RTGCommandGeheugen.schrijf(panes,actief);'],
     ['leest', 'hervat de laatste bladen', 'var g=w.RTGCommandGeheugen.lees();if(!g)return;']]],
-  ['command/bladstand.js', 'schil', 'wereld:sb', [
+  ['command/bladstand.js', 'schil', 'wereld:sbl', [
     ['leest', 'de echte plek van het blad', 'wereld=id.classify(pad)'],
     ['beslist', 'vier werelden of geen', "if(WERELDEN.indexOf(wereld)<0)wereld='geen';"],
     ['schrijft', 'wereldlabel op body', "d.body.setAttribute('data-rtg-blad-wereld',wereld)"],
@@ -262,7 +264,7 @@ const KAART = [
     ['schrijft', 'laat de Edge frame-balken claimen', 'if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(doc, win);'],
     ['beslist', 'hooguit vier frames', "if (!x && entries.length >= 4) { o.announce(U.value('limit')); return false; }"],
     ['leest', 'herlaadt bij een sessiewissel', "e.key === 'rtg_member_token' || e.key === 'rtf_sessie'"]]],
-  ['interface/world-desktop-home.js', 'schil', 'capability-register:s wereld:s', [
+  ['interface/world-desktop-home.js', 'schil', 'capability-register:s wereld:sl', [
     ['leest', 'de wereld van het bureau', 'world = d.body.dataset.worldHome'],
     ['schrijft', 'wereldlabel in het merk van de Edge', 'label.translate = false; brand.appendChild(label);'],
     ['schrijft', "'home' in het tweede register", "w.RTGAdaptiveEdge.registerAction({ id: 'home', label: U.value('overview'), run: function () {"]]],
@@ -278,7 +280,7 @@ const KAART = [
     ['bewaart', 'routecontext naar de opslag', 'storage.setItem(KEY, JSON.stringify(rows)); return true;'],
     ['beslist', '24 uur geldig', 'row.at > now + 60000 || row.at <= now - TTL'],
     ['beslist', 'hooguit 24 routes of 64 KB', 'while (rows.length > MAX || JSON.stringify(rows).length > BYTES) rows.shift();']]],
-  ['rtg-route-memory.js', 'continuiteit', 'voortzetting:b hoofdactie:l', [
+  ['rtg-route-memory.js', 'continuiteit', 'voortzetting:bl hoofdactie:l', [
     ['bewaart', 'naar sessionStorage', 'return C.writeStorage(win.sessionStorage, path, state);'],
     ['beslist', 'elke interactie breekt herstel af', 'interrupted = true; stopRestore(); queueSave();'],
     ['schrijft', 'anker via de publieke API', 'anchorDone = true; win.RTGContinueKey.setPosition(saved.anchor);']]],
@@ -310,7 +312,7 @@ const KAART = [
     ['leest', 'het actieve blad, alleen lezend', "querySelector('#rtgCommand .cmd-pane.actief iframe')"],
     ['leest', 'twee hoofdactiebronnen naast elkaar', "edgeLabel !== tekstVan(scherm[0])) gebreken.push('hoofdactie-dubbel')"],
     ['projecteert', 'herkomst blad of scherm', "herkomst: b ? 'blad:data-hoofdactie' : 'scherm:data-hoofdactie'"]]],
-  ['edge/actiestaat.js', 'blikveld', 'gewicht:b waarom:b bevoegdheid:l', [
+  ['edge/actiestaat.js', 'blikveld', 'gewicht:bl waarom:b bevoegdheid:l', [
     ['leest', 'hetzelfde effectieve gewicht', 'var gewicht = G && gram.effectief ? gram.effectief(gevraagd, kanOngedaan) : String(gevraagd);'],
     ['beslist', 'zonder tabel gaat zwaar dicht', "} else if (!G && gewicht !== 'licht') {"],
     ['beslist', 'alleen een serveroordeel telt', "if (i.oordeel.bron === 'server' && OORDEEL.indexOf(i.oordeel.uitkomst) >= 0)"],
@@ -370,7 +372,7 @@ const WAAROM = {
   'gebaar-drempel': 'DREMPELS in grammatica.js is de tabel, en zes herkenners lezen hem. Twee plekken beslissen met eigen maten: de gebaarversheid van Edge 2 (1500 ms, 14 px) en de gebaarlaag van de lijsten (RICHTING 8 en STIL 6 in gebaar-02, lang drukken 520 ms en 8 px per as in gebaar-03b). Die laatste stond na ronde 1 niet op de kaart, waardoor deze verantwoordelijkheid een eigenaar leek te hebben; de code is niet veranderd, de kaart ziet hem nu.',
   waarom: 'De vijf bronnen staan twee keer (BRONNEN in grammatica.js, BRONWOORD in waarom.js), en verhinderd-gaat-niet-door wordt beslist in register.js, balkknop.js, orb.js en actiestaat.js naast de uitleg in grammatica.js en waarom.js.',
   zichtbaarheidsstand: 'Vier standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel en een vensterboolean in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, en de Edge 1-vouwstand; ze delen geen stand. Daarnaast zetten twee schermen (Work en FoundationOS) de Edge 2-stand zelf op body, buiten setState om. De Second Screen stond hier tot ronde 2 en is eraf: zijn stand gaat over de bank van de schil, niet over de Edge.',
-  onderbalk: 'Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, en RTGDaily die zelf een Edge-balk ophangt.',
+  onderbalk: 'Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, RTGDaily die zelf een Edge-balk ophangt, en het Edge-commando dat de menuknop tot 999 px claimt.',
   bevoegdheid: 'Drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, allowed van de Edge-Core, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft -- het blikveld zegt dat hardop.',
 };
 

@@ -24,7 +24,7 @@ module.exports = function kantoordeur(app, kern, deps) {
   beleidsmotor.review = require('../kern/beleidsmotor/review').maakReview({ kantoorHouders: () => kern().kantoorHouders(),
     boardroomLijst: rauw.boardroomLijst, magBoardroom: rauw.magBoardroom, boardroomBaas: rauw.boardroomBaas,
     magBalie: (k) => kern().magBalie(k), balieZetels: () => kern().balieZetels(),
-    codenaamVan: (k) => kern().codenaamVan(k) }).review;
+    codenaamVan: (k) => kern().codenaamVan(k), laatstGebruikt: beleidsmotor.laatstGebruikt }).review;
   return Object.assign({}, rauw, {
     beleidsmotor,
     officeAuth: beleidsmotor.bewaak('kantoor', rauw.officeAuth),

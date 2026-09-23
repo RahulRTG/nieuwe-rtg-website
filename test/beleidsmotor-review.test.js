@@ -40,7 +40,7 @@ async function medewerker(base, kantoorrol) {
   if (kantoorrol) assert.equal((await api(base, '/api/account/koppel', { soort: 'kantoor', code: CODE }, reg.token)).status, 200);
   await api(base, '/api/auth/me', {}, reg.token);
   const u = (reg.state && reg.state.user) || {};
-  return { key: 'user-' + u.id, codenaam: u.codename };
+  return { key: 'user-' + u.id, codenaam: u.codename, lid: reg.token };
 }
 const review = (base, token, body) => api(base, '/api/office/beleidsmotor/review', body === undefined ? { reden: REDEN } : body, token);
 const rij = (r, key) => (r.body.houders || []).find(h => h.key === key);
@@ -96,6 +96,19 @@ test('2-4. houders, zetels en de gesimuleerde deuren', async () => {
   assert.deepEqual(rij(r2, m.key).zetels.map(z => z.soort).sort(), ['boardroom', 'kantoorrol']);
   assert.equal((await api(eerlijk.base, '/api/office/boardroom/toegang/weg', { codenaam: m.codenaam }, eig)).status, 200);
   assert.equal(rij(await review(eerlijk.base, eig), m.key).deuren.boardroom, 'WEIGEREN', 'en intrekken zet hem terug');
+
+  /* Slapend (besluit van 23 september): de kantoorrol is vandaag gebruikt, de
+     boardroomsleutel niet. Een zetel zonder datum is `onbekend` zolang de meting
+     geen 90 dagen loopt -- nooit meteen `ja`. */
+  const sessie = await api(eerlijk.base, '/api/account/start', { rol: 'kantoor' }, m.lid);
+  assert.equal((await api(eerlijk.base, '/api/office/state', {}, sessie.body.token)).status, 200);
+  const r4 = await review(eerlijk.base, eig);
+  const rol = rij(r4, m.key).zetels.find(z => z.soort === 'kantoorrol');
+  assert.equal(rol.laatstGebruikt, new Date().toISOString().slice(0, 10), 'de laatste gebruiksdatum van de kantoorrol');
+  assert.equal(rol.slapend, 'nee');
+  const balie = rij(r4, balieZonderRol.key).zetels.find(z => z.soort === 'balie');
+  assert.equal(balie.laatstGebruikt, null);
+  assert.equal(balie.slapend, 'onbekend', 'geen datum en een meting van minder dan 90 dagen is onbekend');
 
   const codes = r2.body.houders.map(x => x.codenaam || x.key);
   assert.deepEqual(codes, codes.slice().sort((a, c) => String(a).localeCompare(String(c))), 'gesorteerd op codenaam en op niets anders');

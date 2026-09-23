@@ -19,7 +19,7 @@
 
 const { kan, DEUREN } = require('./regels');
 
-function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaas, magBalie, balieZetels, codenaamVan }) {
+function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaas, magBalie, balieZetels, codenaamVan, laatstGebruikt }) {
   const probeer = (fn, anders) => { try { return fn(); } catch (e) { return anders; } };
 
   function houders() {
@@ -27,7 +27,11 @@ function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaa
     const zet = (key, soort, sinds) => {
       if (!key) return;
       const h = per.get(key) || { key, zetels: [] };
-      h.zetels.push({ soort, sinds: sinds || null });
+      /* Slapend (besluit van de eigenaar): alleen de laatste gebruiksdatum, 90
+         dagen bewaard. `onbekend` zolang de meting zelf nog geen 90 dagen loopt. */
+      const g = typeof laatstGebruikt === 'function' ? probeer(() => laatstGebruikt(key, soort), null) : null;
+      h.zetels.push({ soort, sinds: sinds || null, laatstGebruikt: g ? g.laatstGebruikt : null,
+        slapend: g ? g.slapend : 'onbekend' });
       per.set(key, h);
     };
     for (const k of probeer(() => kantoorHouders() || [], [])) zet(k.key, 'kantoorrol', k.sinds);
@@ -69,6 +73,8 @@ function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaa
       uitleg: 'Wie houdt een kantoorzetel, sinds wanneer, en wat de vier deuren voor die mens zouden besluiten ' +
         '(AUTHORITY.md fase 8). Alleen lezen: intrekken gebeurt waar het recht woont.',
       aanname: 'De deuren zijn gesimuleerd uit de zetels: als deze mens met zijn eigen account en de kantoorrol inlogt.',
+      slapend: 'Per zetel alleen de laatste gebruiksdatum, 90 dagen bewaard. Slapend is ja pas als de meting zelf 90 ' +
+        'dagen loopt; daarvoor heet een zetel zonder datum onbekend.',
       nietGezien: ['de gedeelde kantoorcode (die heeft geen houder)', 'rollen binnen RTFOS (BENOEMING.md)',
         'rollen in het Werk OS van een klant (bedrijf/rollen.js)'],
       houders: rijen,

@@ -336,7 +336,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
 | 7 | **identiteiten voor agents, diensten en apparaten** | **agent staat** (23 september 2026; par. 5c); diensten en apparaten niet |
-| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf en de toegangsreview staan** (par. 5g); slapende rechten niet (een besluit over een gebruiksspoor per medewerker) |
+| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf, de toegangsreview en slapende rechten staan** (par. 5g); de simulator voor een ander niet |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
 
 ### 5a. Fase 1, zoals hij er staat
@@ -583,11 +583,20 @@ liegende server. Zes mutaties laten de toets zakken, waaronder het spoor
 negeren, geen reden eisen, een zetelbron overslaan en een besluit vast op
 toestaan zetten.
 
-**Slapende rechten staan er met opzet niet.** "Sinds wanneer niet gebruikt"
-vraagt een gebruiksspoor per medewerker. Dat is een gedragslogboek over
-personeel, en de beleidsmotor houdt juist tellers zonder wie (par. 5a). Wie dat
-spoor wil, neemt een besluit met een bewaartermijn; het hoort er niet
-stilzwijgend bij te komen.
+**Slapende rechten, op besluit van de eigenaar (23 september 2026): alleen de
+laatste gebruiksdatum per zetel, 90 dagen bewaard** (`kern/beleidsmotor/slapend.js`).
+Per houder en per zetel (kantoorrol, boardroom, balie) staat er EEN datum: de dag
+waarop hij voor het laatst door die deur ging. Er staat geen tijdstip, geen route,
+geen handeling en geen aantal bij, want dat zou een gedragslogboek over personeel
+zijn. Een datum ouder dan 90 dagen wordt gewist. Een zetel zonder datum heet pas
+`slapend: ja` als de meting zelf 90 dagen loopt; daarvoor heet hij `onbekend`, en
+"we weten het niet" is geen "slapend". De schrijfweg is die van
+`kantoor/mensdeur-spoel.js` (een RAM-buffer, `bewerkCollectie` op een timer), want
+er wordt genoteerd NA het antwoord, en een `save()` daar brak al eens de
+PostgreSQL-opstelling. `test/beleidsmotor-slapend.test.js` beproeft de 90 dagen met
+een nagebootste klok, en de reviewtoets beproeft tegen een echte server dat de
+kantoorrol vandaag `nee` is en een ongebruikte baliezetel `onbekend`. Vier mutaties
+laten de toets zakken.
 
 ---
 

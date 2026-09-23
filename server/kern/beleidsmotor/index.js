@@ -47,11 +47,16 @@ const VERKLAARD_OPEN = Object.freeze({
 
 function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron, nu }) {
   const tijd = nu || Date.now;
-  const eigen = require('../eigencollectie')({ db, domein: 'kern/beleidsmotor', bezit: { beleidsmotor: 'kaart' } });
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/beleidsmotor', bezit: { beleidsmotor: 'kaart', zetelGebruik: 'kaart' } });
   const bak = () => eigen.bak('beleidsmotor');
   const kijk = () => eigen.kijk('beleidsmotor');
   const spoeler = require('../kantoor/mensdeur-spoel').maakSpoeler({
     bak, save, bewerkCollectie, collectie: 'beleidsmotor', maxPaden: MAX_SLEUTELS, velden: VELDEN });
+  /* Fase 8, besluit van de eigenaar: per zetel alleen de laatste gebruiksdatum
+     (./slapend.js). Geen route, geen tijdstip, geen aantal. */
+  const slapend = require('./slapend').maakSlapend({ bak: () => eigen.bak('zetelGebruik'),
+    kijk: () => eigen.kijk('zetelGebruik'), save, bewerkCollectie, nu: tijd });
+  const ZETEL_VAN_DEUR = { kantoor: 'kantoorrol', 'op-naam': 'kantoorrol', boardroom: 'boardroom', balie: 'balie' };
   const feitenVan = maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron });
   const oneensVoorbeelden = [];
   const sinds = tijd();
@@ -77,6 +82,10 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
            stap-op. Alleen als hij er echt doorheen ging. */
         if (door && feiten && feiten.eigenaarMens === true && STAPOP_DEUREN.includes(deur)) {
           spoeler.tikVeld('stapop ' + deur + ' ' + patroon(req), 'eigenaarZonderStapop');
+        }
+        if (door && typeof boardroomWie === 'function') {
+          const key = boardroomWie(req);
+          if (key) slapend.noteer(key, ZETEL_VAN_DEUR[deur]);
         }
         /* FASE 4 in de schaduw: welk werkwoord van de boardroom, en welke kamer,
            werd gebruikt. Zonder wie; de sleutels zijn begrensd (./werkwoorden.js). */
@@ -154,7 +163,8 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     });
   }
 
-  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, bewaak, meelezer, stand, spoel: spoeler.spoel };
+  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, bewaak, meelezer, stand,
+    spoel: () => { slapend.spoel(); return spoeler.spoel(); }, laatstGebruikt: slapend.laatst };
 }
 
 module.exports = { maakBeleidsmotor, VERKLAARD_OPEN, VELDEN };

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-23T18:18:48.640Z",
-  "commit": "892691a2",
+  "op": "2026-09-23T18:23:57.189Z",
+  "commit": "92e8de5c",
   "boomVuil": false,
   "boomAnders": 7,
   "instrument": "scripts/mutatiecontract.js",
@@ -11,15 +11,14 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5005,
-  "geclassificeerd": 5001,
+  "geclassificeerd": 5005,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1205,
-   "PROTECTED": 468,
-   "INTENTIONALLY_NON_IDEMPOTENT": 138,
-   "LEGACY_PENDING_CLASSIFICATION": 4
+   "NOT_APPLICABLE": 1206,
+   "PROTECTED": 470,
+   "INTENTIONALLY_NON_IDEMPOTENT": 139
   },
-  "vastgesteldDoorMens": 1860,
+  "vastgesteldDoorMens": 1864,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4119,
@@ -5891,19 +5890,21 @@
   {
    "mutatieId": "bedrijf.lid.tekengrens",
    "route": "POST /api/bedrijf/lid/tekengrens",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.lid.uit-dienst",
@@ -6941,53 +6942,59 @@
   {
    "mutatieId": "bedrijf.uitgave.betaald",
    "route": "POST /api/bedrijf/uitgave/betaald",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.uitgave.maak",
    "route": "POST /api/bedrijf/uitgave/maak",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.uitgaven",
    "route": "POST /api/bedrijf/uitgaven",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.uitval",

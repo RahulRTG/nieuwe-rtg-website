@@ -157,6 +157,7 @@ function haak(app) {
              leeg -- `geen` zou een meting suggereren waar er geen was. */
           if (!res.headersSent)
             res.setHeader('X-RTG-Effectbon', bon.klassen.length ? bon.klassen.join(',') : 'geen-klasse');
+          require('./kern/agentteken').meld(req, res); // A5: een agent zegt wie hij is
         } catch (e) { /* een bon die niet kan, mag het antwoord niet breken */ }
         return echt.apply(this, args);
       };

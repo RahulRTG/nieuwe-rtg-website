@@ -335,7 +335,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | fase 2 |
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | fase 4 |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | fase 4 |
-| 7 | **identiteiten voor agents, diensten en apparaten** | besluit A5 |
+| 7 | **identiteiten voor agents, diensten en apparaten** | **agent staat** (23 september 2026; par. 5c); diensten en apparaten niet |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | fase 5 |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
 
@@ -418,6 +418,32 @@ als EEN stap die als geheel slaagt of faalt; en de sessies van de GEDEELDE
 kantoorcode, die geen mens dragen en dus niet per mens in te trekken zijn. Dat
 laatste lost fase 2 op (de code wordt een uitnodiging), en fase 2 wacht op de
 schaduw van fase 1.
+
+### 5c. Besluit A5: de AI handelt zichtbaar namens een mens
+
+Rahul (`kern/stuur.js`) voert een handeling uit door de route intern opnieuw aan te
+roepen met het token van de gebruiker. Voor de BEVOEGDHEID is dat goed (de AI kan
+nooit meer dan de mens die hem iets vraagt) en dat blijft zo. Voor het SPOOR was het
+slecht: er stond een klik van het lid, en niemand zag dat een machine het deed.
+
+- **Het kenmerk.** `kern/agentteken.js` geeft de interne aanroep een kop met een
+  geheim dat alleen in dit PROCES bestaat (de aanroep gaat naar 127.0.0.1, dus naar
+  hetzelfde proces). Een ontbrekend of vals kenmerk is gewoon geen agent en nooit
+  een fout.
+- **De envelop.** `actor.id` blijft de mens: die sleutel is op meer plekken een
+  datasleutel dan een naam. De agent komt ernaast als `actor.agent`
+  (`'ai:rahul'`), dus het spoor noemt beide.
+- **Terug naar de aanroeper.** Het antwoord meldt de handelaar (`X-RTG-Handelaar`,
+  gezet bij de effectbon), en `/api/member/doe` geeft hem door als `agent`.
+- **Getoetst** in `test/stuur.test.js` toets 10, tegen een echte server: via Rahul
+  staat er `ai:rahul`, bij een gewone klik niets, en een vals of kaal kenmerk maakt
+  er geen agent van. Twee mutaties zakken: het kenmerk niet meesturen, en het
+  geheim niet controleren.
+
+**Wat nog niet staat.** Een effectieve bevoegdheid als DOORSNEDE van mens, agent,
+doel en gegevensbeleid. Vandaag is het de bevoegdheid van de mens, versmald door
+`kern/stuur/beleid.js`; het mandaat (`kern/stuur/mandaat.js`) heeft nog geen
+aanroeper. Diensten en apparaten krijgen nog geen eigen identiteit.
 
 ---
 

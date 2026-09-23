@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1973 bestanden en 14087 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1973 bestanden en 14088 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1973 |
-| losse beweringen (`test(...)`) | 14087 |
+| losse beweringen (`test(...)`) | 14088 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1327 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1729 bestanden, 13654 beweringen.
+1729 bestanden, 13655 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1491,7 +1491,7 @@ toets omvalt.
 | `stuur-plan.test.js` | 11 | gezakt op `===->!==#0` | DE PLANCOMPILER (server/kern/stuur/plan.js, EXECUTIE.md blok 3). De sprong van dit blok is dat een keten van handelingen een OBJECT wordt dat je kunt wegen voordat er iets gebeurt. |
 | `stuur-resolver-taal.test.js` | 7 | gezakt op `===->!==#0` | DE TAALSUITE VAN DE CAPABILITY-RESOLVER -- de veiligheidskant. test/stuur-resolver.test.js bewijst de GRENS: er komt nooit een pad bij. |
 | `stuur-resolver.test.js` | 14 | gezakt op `===->!==#0` | DE CAPABILITY-RESOLVER (server/kern/stuur/resolver.js, EXECUTIE.md blok 0). Wat hier bewezen moet worden is niet "hij kiest goed" maar iets hardere: hij kan de bevoegdheid niet veranderen. |
-| `stuur.test.js` | 9 | gezakt op `liegpoort /api/` | Het AI-stuur: Rahul voert acties uit op elk toegestaan API-pad via een interne aanroep met de eigen inlog van de gebruiker. Dezelfde rechten en dezelfde schakelkast als de app-knoppen; infrastructuur is verboden... |
+| `stuur.test.js` | 10 | gezakt op `liegpoort /api/` | Het AI-stuur: Rahul voert acties uit op elk toegestaan API-pad via een interne aanroep met de eigen inlog van de gebruiker. Dezelfde rechten en dezelfde schakelkast als de app-knoppen; infrastructuur is verboden... |
 | `stuurplafond.test.js` | 9 | gezakt op `===->!==#0` | HET UITVOERINGSPLAFOND (server/kern/stuur/plafond.js). Dit bestand bewaakt de regel waarop de hele omlegging van de vraagbalk rust: geen enkele bestaande vraag mag door een routewissel automatisch een side effect... |
 | `stuurrail.test.js` | 14 | gezakt op `===->!==#0` | DE INTERPRETATIERAIL -- is hij werkelijk vervangbaar, en grendelt hij dicht? Dit bestand bewaakt één belofte: de RTG-keten (resolver -> plan -> gevolg -> plafond -> capability) moet te beproeven zijn ZONDER extern... |
 | `stuurspoor.test.js` | 12 | gezakt op `===->!==#0` | HET STUURSPOOR -- observeert het, en bewijst het iets? Twee beloften. |

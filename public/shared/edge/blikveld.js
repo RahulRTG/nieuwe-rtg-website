@@ -83,6 +83,13 @@
     return veld(waarde, bij, 'ui', contextGezien);
   }
 
+  /* De vorm van het object beslist ../objectverwijzing.js, ook zijn reden. */
+  function object(c, bij, t) {
+    var P = w.RTGObjectverwijzing, o = c && c.object, v = P && o && P.verwijzing(o);
+    if (!o || !c.bron || v) return eigen(c, 'object', bij, t, v);
+    return veld(null, 'geen', 'geen', t, P ? P.reden(o) : 'objectverwijzing.js is niet geladen');
+  }
+
   /* De hoofdactie leest ./blikveld-hoofdactie.js: in de schil kijkt die in het
      ACTIEVE blad (EDGE.md par. 2). Zacht: ontbreekt hij, dan staat het veld leeg
      met die reden en loopt de rest door. */
@@ -156,7 +163,7 @@
         : veld(null, 'geen', 'geen', t, 'deze laag kent geen sessie, en setIdentity heeft geen producent'),
       wereld: wereld(t),
       context: contextVan(bij, c, t),
-      object: eigen(c, 'object', bij, t, c && kopie(c.object)),
+      object: object(c, bij, t),
       activiteit: eigen(c, 'activiteit', bij, t, c && String(c.activiteit)),
       presence: snap && snap.presence ? veld(snap.presence, 'edge-signaal', 'ui', t)
         : veld(null, 'geen', 'geen', t, 'er loopt niets dat hier wordt gemeld'),

@@ -24,8 +24,10 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const SCHERMEN = ['office', 'app', 'bestanden', 'reizen-veilig', 'reizen'];
-/* De volgorde die het register eist: eerst de leer, dan de delen, dan het register. */
-const VOLGORDE = ['/shared/adaptief.js', '/shared/adaptief/vorm.js', '/shared/adaptief/register.js'];
+/* De volgorde die het register eist: eerst de leer, dan de delen, dan het register.
+   De objectpoort (shared/objectverwijzing.js, stap 20) is zo'n deel: het register
+   pakt hem bij het laden, en zonder poort gaat er geen object door. */
+const VOLGORDE = ['/shared/adaptief.js', '/shared/objectverwijzing.js', '/shared/adaptief/vorm.js', '/shared/adaptief/register.js'];
 
 function scripts(scherm) {
   const html = fs.readFileSync(path.join(WORTEL, 'public', 'apps', scherm + '.html'), 'utf8')
@@ -52,3 +54,12 @@ for (const scherm of SCHERMEN) {
     }
   });
 }
+
+test('werkruimte.html laadt de objectpoort voor de schil', () => {
+  /* De schil (rtg-schil.js, zonder defer) pakt de poort bij het laden; daarna
+     laden is voor hem hetzelfde als niet laden. werkruimte-objecten.e2e.js ziet
+     dat ook: dan komt er geen sleep door. */
+  const s = scripts('werkruimte');
+  const p = s.indexOf('/shared/objectverwijzing.js'), schil = s.indexOf('/shared/rtg-schil.js');
+  assert.ok(p >= 0 && schil > p, 'werkruimte.html hoort de objectpoort voor rtg-schil.js te laden');
+});

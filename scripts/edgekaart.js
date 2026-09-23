@@ -101,6 +101,12 @@ const KAART = [
   /* Afgesplitst uit het register (ronde 2, stap 19): de vorm van het apparaat. */
   ['adaptief/vorm.js', 'grammatica-kern', '', [
     ['schrijft', '-', 'de vorm op html', "d.documentElement.setAttribute('data-rtg-vorm', v);"]]],
+  /* De objectpoort (ronde 2, stap 20): de ENIGE die beslist wat een object is.
+     Het register, de schil en het blikveld lezen hem; object is geen van de
+     veertien namen, dus het etiket is '-'. */
+  ['objectverwijzing.js', 'grammatica-kern', '', [
+    ['beslist', '-', 'een object is een verwijzing, afgekapt', 'var GRENS = { soort: 32, id: 64, label: 120, velden: 8, veldnaam: 24, veldwaarde: 120 };'],
+    ['beslist', '-', 'zonder id geen verwijzing', "return o.id ? '' : 'een object zonder id is geen verwijzing';"]]],
   ['adaptief/grammatica.js', 'grammatica-kern', 'gewicht:sb waarom:sb gebaar-drempel:s', [
     ['schrijft', 'gewicht:s', 'de vijf trappen', 'var GEWICHT = {'],
     ['beslist', 'gewicht:b', 'terug zonder weg terug is bewust', "return g === 'terug' && !kanTerug ? 'bewust' : g;"],

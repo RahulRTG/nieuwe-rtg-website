@@ -35,6 +35,8 @@
   var gram = w.RTGGrammatica || null;
   var V = w.RTGAdaptiefVorm;
   if (!V) return;                          // zonder de vorm geen register
+  /* Wat een object is, beslist ../objectverwijzing.js. Zonder poort geen object. */
+  var P = w.RTGObjectverwijzing || null;
 
   var caps = {}, gebrek = [], gemeld = {};
   var luisterCtx = [];
@@ -104,7 +106,7 @@
       acties: (c && Array.isArray(c.acties) ? c.acties : []).slice(),
       selectie: !!(c && c.selectie), staat: (c && c.staat) || {},
       rail: (c && Array.isArray(c.rail) ? c.rail : []),
-      object: (c && c.object && typeof c.object === 'object') ? c.object : null,
+      object: P && c ? P.verwijzing(c.object) : null,
       activiteit: String((c && c.activiteit) || '') };
     v.sleutel = sleutelVan(v);
     if (v.sleutel === nu.sleutel) return nu;

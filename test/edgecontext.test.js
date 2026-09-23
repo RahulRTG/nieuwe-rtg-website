@@ -31,8 +31,10 @@ const vm = require('vm');
 const leer = require('../public/shared/adaptief.js');
 const gram = require('../public/shared/adaptief/grammatica.js');
 const deel = (f) => fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'adaptief', f), 'utf8');
-/* Het register leest zijn vorm uit ./vorm.js (test/adaptiefdelen.test.js). */
-const REGISTER = [deel('vorm.js'), deel('register.js')];
+/* Het register leest zijn vorm uit ./vorm.js en de vorm van een object uit
+   ../objectverwijzing.js (test/adaptiefdelen.test.js). */
+const POORT = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'objectverwijzing.js'), 'utf8');
+const REGISTER = [POORT, deel('vorm.js'), deel('register.js')];
 
 function register() {
   const mq = () => ({ matches: false, addEventListener() {} });
@@ -50,7 +52,8 @@ test('object en activiteit komen door de context heen', () => {
   const gezien = [];
   A.opContext((c) => gezien.push(c.sleutel));
   const c = A.context({ bron: 'office.tekst', acties: [], object: { soort: 'document', id: 'd1' }, activiteit: 'schrijven' });
-  assert.deepEqual(c.object, { soort: 'document', id: 'd1' });
+  /* Een object is een verwijzing (shared/objectverwijzing.js, stap 20). */
+  assert.deepEqual(JSON.parse(JSON.stringify(c.object)), { soort: 'document', id: 'd1', label: '', velden: {} });
   assert.equal(c.activiteit, 'schrijven');
   assert.equal(A.context({ bron: 'x', object: 'geen object' }).object, null, 'een tekst is geen object');
   const n = gezien.length;

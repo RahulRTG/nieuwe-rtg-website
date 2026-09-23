@@ -22,6 +22,9 @@ const SLEUTELS = {
      geen tweede bedoeling. */
   'POST /api/concern/nieuw': { zelfdeVerzoek: true },              // naam
   'POST /api/concern/entiteit/nieuw': { zelfdeVerzoek: true },     // naam + rechtsvorm
+  /* De inhaalslag (kern/concern/aanname.js): een herhaalde keuze legt niets meer
+     vast, want wie al een dienstverband heeft staat niet meer in het voorstel. */
+  'POST /api/concern/vestiging/inhaal': { zelfdeVerzoek: true },
   'POST /api/gewoonten/maak': { zelfdeVerzoek: true },             // naam
   'POST /api/genootschap/richt-op': { zelfdeVerzoek: true },       // naam + soort
   'POST /api/agenda/toevoegen': { zelfdeVerzoek: true },           // titel + datum + tijd

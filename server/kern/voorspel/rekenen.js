@@ -11,7 +11,11 @@ const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag
    "Rahul ziet"; nooit een schreeuwende melding. */
 function seintjeVoor(voorLidResultaat) {
   const v = voorLidResultaat && (voorLidResultaat.verwachtingen || [])[0];
-  if (!v || v.rijp < 0.6 || v.zekerheid < 0.2) return null;
+  /* De drempel is een REGEL en geen getal: minstens drie bezoeken (dat eist
+     gewoontenUit al) en het gebruikelijke ritme voor 60% verstreken. Hier stond
+     ook `zekerheid < 0.2`, een samengesteld cijfer dat nooit tegen de uitkomst
+     is gehouden (ARBEID.md par. 4 punt 11, INT-04). */
+  if (!v || !(v.rijp >= AAN_DE_BEURT)) return null;
   /* EN HIJ ZWIJGT ALS JE AANTOONBAAR ERGENS ANDERS BENT (PLAATS.md fase 3).
 
      De rangschikking in voorLid laat zo'n verwachting al zakken, maar het
@@ -44,7 +48,7 @@ function ketenUit(bronnen, nu = new Date()) {
     const tafelStaat = (bronnen.reserveringen || []).some(r =>
       ['aangevraagd', 'bevestigd'].includes(r.status) && r.datum === vb.aankomst);
     if (!tafelStaat) keten.push({
-      soort: 'keten', zekerheid: 0.9, rijp: 1,
+      soort: 'keten', rijp: 1, grond: 'een bevestigde boeking',
       zaak: vb.supplierName, code: vb.supplierCode || null,
       wat: 'uw aankomst bij ' + vb.supplierName + ' op ' + vb.aankomst,
       waarom: 'de check-in staat vast, de rest van de keten nog niet',
@@ -81,16 +85,34 @@ function gewoontenUit(rijen, rek, nu = new Date()) {
     const tussenDagen = som / (tijden.length - 1) / 86400000;
     const sindsDagen = (nu.getTime() - tijden[tijden.length - 1]) / 86400000;
     const rijp = tussenDagen > 0.04 ? Math.min(1, sindsDagen / tussenDagen) : 1;
-    const zekerheid = Math.min(1, rs.length / 8) *
-      (0.35 + 0.35 * rijp + 0.15 * uur.aandeel + 0.15 * dag.aandeel);
     lijst.push({
       code, n: rs.length, uur: uur.waarde, dag: dag.waarde, dagNaam: DAGEN[dag.waarde],
       tussenDagen: +tussenDagen.toFixed(2), sindsDagen: +sindsDagen.toFixed(2),
       gemCenten: Math.round(rs.reduce((s, r) => s + r.centen, 0) / rs.length),
-      rijp: +rijp.toFixed(2), zekerheid: +zekerheid.toFixed(2)
+      rijp: +rijp.toFixed(2),
+      /* DE OPBOUW EN GEEN CIJFER. Hier stond een `zekerheid` uit vier gewichten
+         (0,35 + 0,35 x rijp + 0,15 x uur + 0,15 x dag, maal n/8) die sortering en
+         seintje stuurde en nooit tegen de uitkomst is gehouden. Een ongeijkt
+         cijfer dat gedrag stuurt is een orakel (INT-04); de losse delen zijn wel
+         na te rekenen, dus die gaan mee. */
+      opbouw: { bezoeken: rs.length, rijp: +rijp.toFixed(2),
+        vastUur: +uur.aandeel.toFixed(2), vasteDag: +dag.aandeel.toFixed(2) }
     });
   }
-  return lijst.sort((a, b) => b.zekerheid - a.zekerheid);
+  return lijst.sort(volgorde);
+}
+
+/* De volgorde is een regel in woorden, lexicografisch en dus zonder gewichten:
+   een keten rond een vaste boeking eerst, dan wat nu aan de beurt is (het ritme
+   voor 60% verstreken -- dezelfde drempel als het seintje), dan de meeste
+   bezoeken, bij gelijk aantal het rijpste ritme. Elke stap is aan een lid uit
+   te leggen; een gewogen som is dat niet. */
+const VOLGORDE = 'vaste boeking eerst, dan wat nu aan de beurt is, dan de meeste bezoeken, dan het rijpste ritme';
+const AAN_DE_BEURT = 0.6;
+function volgorde(a, b) {
+  const k = (v) => (v.soort === 'keten' ? 0 : 1);
+  const beurt = (v) => ((v.rijp || 0) >= AAN_DE_BEURT ? 0 : 1);
+  return k(a) - k(b) || beurt(a) - beurt(b) || (b.n || 0) - (a.n || 0) || (b.rijp || 0) - (a.rijp || 0);
 }
 
 /* combinatiegedrag. Twee zaken die door dezelfde leden binnen een dagdeel (6 uur)
@@ -123,4 +145,4 @@ function combinatiesUit(rijen) {
     gemA: Math.round(p.somA / p.n), gemB: Math.round(p.somB / p.n) })).sort((x, y) => y.n - x.n);
 }
 
-module.exports = { DAGEN, seintjeVoor, ketenUit, modus, gewoontenUit, combinatiesUit };
+module.exports = { DAGEN, VOLGORDE, volgorde, seintjeVoor, ketenUit, modus, gewoontenUit, combinatiesUit };

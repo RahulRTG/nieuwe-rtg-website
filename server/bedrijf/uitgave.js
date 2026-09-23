@@ -26,7 +26,7 @@
 
    GELD VERLAAT HET HUIS NIET VANZELF (GELD.md). Deze laag verplaatst niets. De
    werkruimte kiest hoe een goedgekeurde uitgave wordt betaald (./tekengrens.js):
-   buiten RTG, met een kenmerk, of via RTG Bank -- dan maakt een mens die niet de
+   buiten RTG, met een kenmerk, of via RTG Rekening -- dan maakt een mens die niet de
    indiener is de SEPA-overboeking vanaf zijn eigen rekening, en toetst deze laag
    die opdracht. De stand wordt BEREKEND, en nergens met de hand gezet. */
 'use strict';
@@ -97,7 +97,7 @@ module.exports = (sctx) => {
       error: 'Deze uitgave is nog niet goedgekeurd. Nog nodig: ' + s.ontbreekt.join(' en ') + '.' });
     const bw = sctx.betaalwijze(g.w);
     let kenmerk = schoon(req.body.kenmerk, 60);
-    if (bw.wijze === 'rtgbank') {
+    if (bw.wijze === 'rekening') {
       const f = viaBank(g, u, String(req.body.opdrachtId || ''));
       if (f) return res.status(f.status).json({ error: f.error });
       kenmerk = String(req.body.opdrachtId);
@@ -107,7 +107,7 @@ module.exports = (sctx) => {
     log(g.w, g.l, 'uitgave-betaald-genoteerd', u.id, kenmerk);
     save();
     res.json({ ok: true, uitgave: toon(g.w, u),
-      let: bw.wijze === 'rtgbank'
+      let: bw.wijze === 'rekening'
         ? 'Genoteerd als betaald met uw SEPA-opdracht ' + kenmerk + '. Het Werk OS heeft zelf niets overgemaakt; het heeft uw overboeking getoetst.'
         : 'Genoteerd als betaald. RTG heeft niets overgemaakt; dit is uw notitie dat het buiten RTG is gebeurd.' });
   });

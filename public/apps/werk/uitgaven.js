@@ -7,11 +7,11 @@
    -- geen tweede manier om een handeling te doen.
 
    Wat de server weigert, staat hier gewoon als melding: de indiener die zelf
-   wil goedkeuren, een bedrag boven de tekengrens, een betaling via RTG Bank
+   wil goedkeuren, een bedrag boven de tekengrens, een betaling via RTG Rekening
    met een opdracht van iemand anders. Die zinnen zijn het halve product.
 
    De betaalwijze staat bovenaan de tweede lijst, MET de reden als RTG de weg
-   via RTG Bank heeft uitgezet: een werkruimte die "rtgbank" koos en toch buiten
+   via RTG Rekening heeft uitgezet: een werkruimte die "rekening" koos en toch buiten
    RTG moet betalen, hoort dat te lezen voordat ze een opdrachtnummer zoekt. */
 (function () {
   'use strict';
@@ -35,7 +35,7 @@
       }), 'Nog geen uitgaven.');
       var bw = r.body.betaalwijze || {};
       K.lijst($('mExtra'), [K.rij('<b>Betaalwijze</b> <span class="tag">' + esc(bw.wijze || 'extern') + '</span>',
-        bw.wijze === 'rtgbank'
+        bw.wijze === 'rekening'
           ? 'Een ander dan de indiener maakt de SEPA-overboeking vanaf zijn eigen RTG-rekening en geeft het opdrachtnummer op.'
           : (bw.reden ? esc(bw.reden) : 'Buiten RTG betalen, en een ander dan de indiener noteert het kenmerk.'))], '');
       $('mLet').textContent = r.body.let || '';
@@ -49,8 +49,8 @@
     ['Goedkeuren', '/keur', [['soort', 'soort', 'vast:uitgave'], ['id', 'Uitgave-id', 'tekst', '9rem'],
       ['recht', 'Namens', 'keuze:geld.goedkeuren,recht,besluit', '10rem']]],
     ['Betaald noteren', '/uitgave/betaald', [['id', 'Uitgave-id', 'tekst', '9rem'], ['kenmerk', 'Kenmerk (buiten RTG)', 'tekst', '10rem'],
-      ['opdrachtId', 'SEPA-opdracht (via RTG Bank)', 'tekst', '11rem']]],
-    ['Betaalwijze kiezen', '/werkruimte/betaalwijze', [['wijze', 'Betaalwijze', 'keuze:extern,rtgbank', '9rem']]],
+      ['opdrachtId', 'SEPA-opdracht (via RTG Rekening)', 'tekst', '11rem']]],
+    ['Betaalwijze kiezen', '/werkruimte/betaalwijze', [['wijze', 'Betaalwijze', 'keuze:extern,rekening', '9rem']]],
     ['Koppel aan entiteit', '/werkruimte/entiteit', [['entiteitId', 'Entiteit-id (leeg = loskoppelen)', 'tekst', '14rem']]],
     ['Tekengrens van een lid', '/lid/tekengrens', [['lidId', 'Lid-id', 'tekst', '9rem'], ['bedrag', 'Grens in euro (leeg = geen)', 'getal', '11rem']]]
   ];

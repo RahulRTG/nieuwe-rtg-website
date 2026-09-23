@@ -10,7 +10,7 @@
       laagste van de twee wint. Beide versmallen alleen; geen van beide verleent
       een recht. Een bestuurder met een vrije naam of als extern vastgelegd telt
       niet mee: vergelijken op een naam die niemand heeft gecontroleerd is raden.
-   2. DE BETAALWIJZE kiest de werkruimte zelf: `extern` (standaard) of `rtgbank`.
+   2. DE BETAALWIJZE kiest de werkruimte zelf: `extern` (standaard) of `rekening`.
       De tweede kan alleen als RTG die weg heeft aangezet (kern/werkbetaling.js).
       Zet RTG hem later uit, dan valt de werkruimte terug op extern, met de reden.
 
@@ -68,10 +68,10 @@ module.exports = (sctx) => {
   app.post('/api/bedrijf/werkruimte/betaalwijze', (req, res) => {
     const g = werkPoort(req, res, 'werkruimte'); if (!g) return;
     const wijze = String(req.body.wijze || '');
-    if (!['extern', 'rtgbank'].includes(wijze)) return res.status(400).json({ error: 'Kies extern of rtgbank.' });
+    if (!['extern', 'rekening'].includes(wijze)) return res.status(400).json({ error: 'Kies extern of rekening.' });
     const rtg = kern.werkBankpadStand();
-    if (wijze === 'rtgbank' && !rtg.aan) return res.status(409).json({
-      error: 'RTG heeft betalen via RTG Bank voor werkruimtes (nog) niet aangezet.', uitleg: rtg.uitleg });
+    if (wijze === 'rekening' && !rtg.aan) return res.status(409).json({
+      error: 'RTG heeft betalen via RTG Rekening voor werkruimtes (nog) niet aangezet.', uitleg: rtg.uitleg });
     g.w.betaalwijze = wijze;
     log(g.w, g.l, 'betaalwijze', null, wijze);
     save();
@@ -80,10 +80,10 @@ module.exports = (sctx) => {
 
   /* Welke weg geldt NU: de keuze van de werkruimte, tenzij RTG de weg dicht heeft. */
   function betaalwijze(w) {
-    if (w.betaalwijze !== 'rtgbank') return { wijze: 'extern', gekozen: w.betaalwijze || 'extern', reden: null };
+    if (w.betaalwijze !== 'rekening') return { wijze: 'extern', gekozen: w.betaalwijze || 'extern', reden: null };
     const rtg = kern.werkBankpadStand();
-    return rtg.aan ? { wijze: 'rtgbank', gekozen: 'rtgbank', reden: null }
-      : { wijze: 'extern', gekozen: 'rtgbank', reden: 'RTG heeft betalen via RTG Bank uitgezet; tot het weer aan staat, wordt buiten RTG betaald.' };
+    return rtg.aan ? { wijze: 'rekening', gekozen: 'rekening', reden: null }
+      : { wijze: 'extern', gekozen: 'rekening', reden: 'RTG heeft betalen via RTG Rekening uitgezet; tot het weer aan staat, wordt buiten RTG betaald.' };
   }
 
   /* De grendel op het bedrag. Null is door; een object is de weigering. */

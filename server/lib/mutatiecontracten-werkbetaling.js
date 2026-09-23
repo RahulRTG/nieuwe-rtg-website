@@ -1,6 +1,6 @@
 /* Mutatiecontracten voor de Werk OS-uitgave, deel twee (AUTHORITY.md par. 5e,
    vervolg): de koppeling van een werkruimte aan een entiteit, de betaalwijze die
-   de werkruimte kiest, en de schakelaar waarmee RTG de weg via RTG Bank aan- of
+   de werkruimte kiest, en de schakelaar waarmee RTG de weg via RTG Rekening aan- of
    uitzet. Een eigen bestand omdat ./mutatiecontracten-beleidsmotor.js tegen de
    bestandsgrens zit; zelfde vorm, zelfde velden. */
 'use strict';
@@ -20,7 +20,7 @@ const CONTRACTEN = {
   'POST /api/bedrijf/werkruimte/betaalwijze': {
     mutatieId: 'bedrijf.werkruimte.betaalwijze', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
     toegang: WERK, stand: 'PROTECTED',
-    bewijs: { gemeten: 'test/bedrijfuitgave-mix.test.js toets 4-5: de keuze is een toestand (extern of rtgbank)', op: '2026-09-23' },
+    bewijs: { gemeten: 'test/bedrijfuitgave-mix.test.js toets 4-5: de keuze is een toestand (extern of rekening)', op: '2026-09-23' },
     nagekeken: 'met de hand, 2026-09-23: bedrijf/tekengrens.js zet g.w.betaalwijze op een van twee waarden',
     afgetekend: AF
   },

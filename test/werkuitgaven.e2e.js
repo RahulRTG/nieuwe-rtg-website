@@ -111,8 +111,8 @@ test('een uitgave gaat op het scherm van indienen via een ander naar betaald', {
     await vul('a_h1_id', eigen);
     await druk(1, /diende deze uitgave in/);
 
-    /* ---- RTG Bank staat standaard uit, en het scherm zegt dat ---- */
-    await page.selectOption('#a_h3_wijze', 'rtgbank');
+    /* ---- RTG Rekening staat standaard uit, en het scherm zegt dat ---- */
+    await page.selectOption('#a_h3_wijze', 'rekening');
     await druk(3, /niet aangezet/);
 
     /* ---- de eigen tekengrens zet een ander ---- */

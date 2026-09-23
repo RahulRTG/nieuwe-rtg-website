@@ -9,7 +9,7 @@
       die entiteit is;
    3. de laagste grens wint: de tekenlimiet uit de concerngraaf houdt een
       goedkeuring tegen, en de werkruimtegrens ook als die lager is;
-   4. via RTG Bank kan pas als RTG de weg aanzet (standaard uit), en dan toetst het
+   4. via RTG Rekening kan pas als RTG de weg aanzet (standaard uit), en dan toetst het
       Werk OS de SEPA-opdracht: van wie, hoeveel, naar welk IBAN;
    5. zet RTG de weg uit, dan valt de werkruimte terug op extern, met de reden.
 
@@ -115,13 +115,13 @@ test('1-3. codenaam in de concerngraaf, koppeling door de eigenaar, en de laagst
   assert.equal((await keur(CFO, klein.id)).status, 200, 'onder beide grenzen gaat het door');
 });
 
-test('4-5. via RTG Bank: pas als RTG hem aanzet, en de SEPA-opdracht wordt getoetst', async () => {
-  const dicht = await api('/api/bedrijf/werkruimte/betaalwijze', Object.assign({ wijze: 'rtgbank' }, bare(DIR)));
+test('4-5. via RTG Rekening: pas als RTG hem aanzet, en de SEPA-opdracht wordt getoetst', async () => {
+  const dicht = await api('/api/bedrijf/werkruimte/betaalwijze', Object.assign({ wijze: 'rekening' }, bare(DIR)));
   assert.equal(dicht.status, 409, 'standaard uit: ' + JSON.stringify(dicht.body));
   assert.equal((await api('/api/office/werkos/bankpad', {}, EIG)).body.aan, false);
   const aan = await api('/api/office/werkos/bankpad/zet', { aan: true }, EIG);
   assert.equal(aan.status, 200, JSON.stringify(aan.body));
-  assert.equal((await api('/api/bedrijf/werkruimte/betaalwijze', Object.assign({ wijze: 'rtgbank' }, bare(DIR)))).status, 200);
+  assert.equal((await api('/api/bedrijf/werkruimte/betaalwijze', Object.assign({ wijze: 'rekening' }, bare(DIR)))).status, 200);
 
   const IBAN = 'NL91ABNA0417164300';
   const u = (await maak(FIN, 125, { iban: 'nl91 abna 0417 1643 00' })).body.uitgave;
@@ -146,7 +146,7 @@ test('4-5. via RTG Bank: pas als RTG hem aanzet, en de SEPA-opdracht wordt getoe
   const ok = await betaal(CFO, sepa.body.opdrachtId);
   assert.equal(ok.status, 200, JSON.stringify(ok.body));
   assert.equal(ok.body.uitgave.stand, 'betaald');
-  assert.equal(ok.body.uitgave.betaald.via, 'rtgbank');
+  assert.equal(ok.body.uitgave.betaald.via, 'rekening');
   assert.equal(ok.body.uitgave.betaald.kenmerk, sepa.body.opdrachtId);
   assert.match(ok.body.let, /SEPA-opdracht/, 'de bevestiging zegt hoe er betaald is, niet "buiten RTG"');
 
@@ -159,13 +159,13 @@ test('4-5. via RTG Bank: pas als RTG hem aanzet, en de SEPA-opdracht wordt getoe
   assert.equal((await api('/api/office/werkos/bankpad/zet', { aan: false }, EIG)).status, 200);
   const lijst = (await api('/api/bedrijf/uitgaven', bare(FIN))).body;
   assert.equal(lijst.betaalwijze.wijze, 'extern');
-  assert.equal(lijst.betaalwijze.gekozen, 'rtgbank');
+  assert.equal(lijst.betaalwijze.gekozen, 'rekening');
   assert.match(lijst.betaalwijze.reden, /uitgezet/);
   const extern = await api('/api/bedrijf/uitgave/betaald', Object.assign({ id: tweede.id, kenmerk: 'BANK-EXT' }, bare(CFO)));
   assert.equal(extern.status, 200, 'buiten RTG, met een kenmerk: ' + JSON.stringify(extern.body));
 });
 
-test('alleen de eigenaar zet de weg via RTG Bank aan, ook niet wie de boardroom in mag', async () => {
+test('alleen de eigenaar zet de weg via RTG Rekening aan, ook niet wie de boardroom in mag', async () => {
   const { kantoorKoppelBody } = require('./helper');
   assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: DIR.rtg.codenaam }, EIG)).status, 200);
   assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(BASE, DIR.rtg.token), DIR.rtg.token)).status, 200);

@@ -23,6 +23,19 @@ const CONTRACTEN = {
       'ook dit verzoek telt daar mee als een waarneming van de boardroomdeur, en dat is die andere ingang',
     afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
   },
+  'POST /api/office/beleidsmotor/waarom': {
+    mutatieId: 'office.beleidsmotor.waarom',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'tegen een draaiende server (test/beleidsmotor.test.js toets 8): 401 zonder sessie, ' +
+      'en per sessiesoort het besluit over zichzelf; twee keer vragen geeft hetzelfde', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de handler roept alleen beleidsmotor.waarom(req) aan, en die leest de ' +
+      'feiten van het token en rekent met regels.kan() -- geen save(), geen toewijzing. De poort ervoor ' +
+      '(officeAuth, gewikkeld) telt via res.finish mee in de schaduw; dat is de andere ingang',
+    afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
+  },
 };
 
 module.exports = { CONTRACTEN };

@@ -10,12 +10,23 @@
    zijn voor de gedeelde code. */
 module.exports = (octx) => {
   const { kern } = octx;
-  const { app, boardroomAuth, beleidsmotor } = kern;
+  const { app, officeAuth, boardroomAuth, beleidsmotor } = kern;
 
   app.post('/api/office/beleidsmotor', boardroomAuth, (req, res) => {
     if (!beleidsmotor || typeof beleidsmotor.stand !== 'function') {
       return res.status(503).json({ error: 'De beleidsmotor is niet bedraad in deze server.' });
     }
     res.json(beleidsmotor.stand());
+  });
+
+  /* WAAROM MAG IK HIER (NIET) IN? Voor elke kantoorsessie, ook de gedeelde code,
+     en alleen over zichzelf. Een weigering zonder reden laat iemand raden; dit
+     noemt per deur welke eis viel. */
+  app.post('/api/office/beleidsmotor/waarom', officeAuth, (req, res) => {
+    if (!beleidsmotor || typeof beleidsmotor.waarom !== 'function') {
+      return res.status(503).json({ error: 'De beleidsmotor is niet bedraad in deze server.' });
+    }
+    res.json({ ok: true, deuren: beleidsmotor.waarom(req),
+      grens: 'Alleen over uzelf. Dit zegt wat de deuren vandaag zouden besluiten; de poorten zelf beslissen nog.' });
   });
 };

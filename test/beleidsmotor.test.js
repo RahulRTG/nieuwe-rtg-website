@@ -173,3 +173,21 @@ test('7. besluit A2 in de schaduw: de eigenaar door een gevoelige deur wordt get
   assert.ok(!s.eigenaarZonderStapop.some(x => x.route === 'POST /api/office/state'), 'de gewone kantoordeur is geen gevoelige lezing');
   assert.deepEqual(s.stapopDeuren, ['op-naam', 'balie']);
 });
+
+test('8. waarom mag ik hier (niet) in: per deur het besluit over jezelf, met de eis die viel', async () => {
+  assert.equal((await api('/api/office/beleidsmotor/waarom', {}, null)).status, 401);
+  const per = async (t) => Object.fromEntries((await api('/api/office/beleidsmotor/waarom', {}, t)).body.deuren.map(d => [d.deur, d]));
+  const g = await per(gedeeld);
+  assert.equal(g.kantoor.uitkomst, 'TOESTAAN');
+  assert.equal(g['op-naam'].uitkomst, 'WEIGEREN', 'de gedeelde code is geen mens');
+  assert.match(g['op-naam'].reden, /RTG-account|mens/, 'en de reden zegt welke eis viel');
+  assert.equal(g['op-naam'].opbouw[1].gehaald, false);
+  const m = await per(opNaam);
+  assert.equal(m['op-naam'].uitkomst, 'TOESTAAN');
+  assert.equal(m.boardroom.uitkomst, 'WEIGEREN');
+  const e = await per(eig);
+  for (const d of ['kantoor', 'op-naam', 'boardroom', 'balie']) assert.equal(e[d].uitkomst, 'TOESTAAN', d);
+  /* het antwoord moet kloppen met wat de poort echt doet: dezelfde sessie, dezelfde deur */
+  assert.equal((await api('/api/office/verifications', {}, gedeeld)).status, 403);
+  assert.equal((await api('/api/office/mensdeur', {}, opNaam)).status, 403);
+});

@@ -64,7 +64,8 @@ module.exports = function start(deps) {
      die weigering houdt zichzelf in stand. Zie kern/kappen.js. */
   const kappen = require('../kern/kappen').maakKappen({ db, save, media, log });
   setInterval(() => {
-    onderhoudsronde({ loginFails, pinSlot, ruimBuffer, kappen });
+    const ronde = onderhoudsronde({ loginFails, pinSlot, ruimBuffer, kappen, vooruitblik: kern.vooruitblikVastleggen });
+    if (ronde.vooruitblik && ronde.vooruitblik.ok === false) log.warn('kostenvooruitblik niet vastgelegd: ' + ronde.vooruitblik.fout);
     /* Bevestigd geld waarvan de domeinafhandeling tijdens een opslag- of
        processtoring strandde, blijft niet op een nieuwe providerretry wachten. */
     if (kern.betaalWaarheid && typeof kern.betaalWaarheid.ronde === 'function')

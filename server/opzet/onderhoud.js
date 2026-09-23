@@ -51,9 +51,9 @@ function ruimRemmen(fails, nu, stilteMs) {
 
 /* De hele ronde in een aanroep. Elk onderdeel is los weg te laten, zodat een
    toets er een kan bekijken zonder de andere twee op te tuigen. */
-function onderhoudsronde({ loginFails, pinSlot, ruimBuffer, kappen, nu } = {}) {
+function onderhoudsronde({ loginFails, pinSlot, ruimBuffer, kappen, vooruitblik, nu } = {}) {
   const tijd = nu || Date.now();
-  const uit = { remmen: 0, gekapt: 0 };
+  const uit = { remmen: 0, gekapt: 0, vooruitblik: null };
   if (loginFails) uit.remmen = ruimRemmen(loginFails, tijd);
   if (pinSlot && typeof pinSlot.opruimen === 'function') pinSlot.opruimen();
   if (typeof ruimBuffer === 'function') ruimBuffer();
@@ -64,6 +64,17 @@ function onderhoudsronde({ loginFails, pinSlot, ruimBuffer, kappen, nu } = {}) {
      te groot en loopt het volgende verzoek tegen dezelfde weigering aan. Buiten
      een verzoek bestaat dat probleem niet. Zie kern/kappen.js en KRIMP.json. */
   if (kappen && typeof kappen.ronde === 'function') uit.gekapt = kappen.ronde().totaal;
+  /* DE KOSTENVOORUITBLIK VASTLEGGEN (ARBEID.md par. 4 punt 10). De kop van
+     kern/kosten/vooruitblik.js zegt "elke dag legt de onderhoudsronde de
+     projectie vast", en die aanroep bestond niet: legVoorspellingVast had
+     buiten de toets geen aanroeper, dus de trefzekerheid bleef altijd
+     "niet gemeten" en de band verscheen nooit. Hij is zelf een keer per dag
+     (een tweede aanroep op dezelfde dag slaat over). Een fout hier stopt de
+     rest van de ronde niet, maar gaat ook niet stil: hij staat in de uitslag. */
+  if (typeof vooruitblik === 'function') {
+    try { uit.vooruitblik = vooruitblik(); }
+    catch (e) { uit.vooruitblik = { ok: false, fout: String(e && e.message || e) }; }
+  }
   return uit;
 }
 

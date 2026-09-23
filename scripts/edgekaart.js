@@ -139,6 +139,7 @@ const KAART = [
     ['leest', 'veeg opzij wisselt deck, drempel uit de tabel', 'if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > D.veeg)'],
     ['leest', 'lang drukken uit de tabel', '}, D.lang);'],
     ['beslist', 'auto-peek bij scrollen', "if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;"],
+    ['leest', 'de gebaarversheid van Edge 2, alleen waar Edge 2 draait', 'if (gebaar && !e2.gestureFresh(gebaar)) return;'],
     ['beslist', 'omhoog naar RTGDiepte', 'if (-dy >= D.diep) depth.tweede(); else depth.eerste();']]],
   ['rtg-adaptive-edge-loader.js', 'laden', '', [
     ['beslist', 'overslaan als de global bestaat', 'if (global && w[global]) { done(true); return; }'],

@@ -1,0 +1,62 @@
+Je bouwt één spoor van ronde 2 van RTG Edge 3.0 in de repository RahulRTG/nieuwe-rtg-website (Nederlandstalige codebase). Er draaien tegelijk andere cloudsessies op andere sporen; een ouder-sessie voegt alle sporen samen in PR #346 (tak claude/app-navigation-buttons-l6yubp).
+
+BASIS EN TAK. Je kloon staat op commit f5fa7e56 van claude/app-navigation-buttons-l6yubp (ronde 1, de merge met main, en ronde 2 stap 1-5: de meter telt 'zelf' per veld en de Edge-kaart heeft het rijformaat [rol, etiket, wat, citaat] met drie afgeleide controles). Werk en push UITSLUITEND op je eigen tak (de outcome-tak van deze sessie, claude/edge-r2-<spoor>). Maak GEEN pull request, abonneer je niet op PR-activiteit, en push nooit naar een andere tak. Als node_modules ontbreekt: npm ci. Chromium staat klaar (PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers); niet installeren.
+
+WAT JE LEEST. Lees vóór je begint EDGE.md (vooral par. 1, 2, 6, 7, 10 en 11), GRAMMATICA.md, LAT.md, en de kop van scripts/edgekaart.js (het rijformaat, keur(): elk citaat hangt aan een etiket in zijn rij en elk s/b-etiket heeft een citaat dat het draagt; de afgeleide controles: wie registerAction aanroept op de Edge-kern, wie data-rtg-world op body zet en wie data-rtg-edge-2-state op body zet, moet op de kaart staan). Een producent die stopt met registerAction verliest IN DEZELFDE STAP zijn capability-register:s-etiket en het citaat, anders zakt keur of de afgeleide controle.
+
+BESLUITEN VAN DE EIGENAAR (23 september 2026), niet heropenen:
+- K-reikwijdte: wereld telt nooit als 'zelf' en moet kloppen met MAPPEN op de gedeelde routes; context zelf op schermen met een eigen hoofdactie via een schuldlijst die alleen krimpt (dat is een latere stap, niet de jouwe).
+- K-casco: het samenvoegen van de twee contextmodellen is LATER; niet in ronde 2.
+- K-bladlijst: de zes snelkoppelingen van de kern gaan uit het blad (latere stap 17).
+- K-borg: de vasthoudbevestiging van gebaar wordt 'bewust' in ronde 3; in ronde 2 blijft BORGTIJD 800 staan.
+En wat de ontwerper zelf besliste:
+WAT IK ZELF BESLIS, als technisch beste optie:
+- Home blijft betekenen wat nu bewezen is: het frame inklappen, anders naar boven (world-desktop.e2e.js:86-93). De haak wordt een annuleerbare gebeurtenis 'rtg-edge-home'.
+- Vrienden is drift van een genomen besluit (WERELDEN.md:119-127) en wordt hersteld zonder vraag.
+- RTGWorkspaceContext wordt een lezer zonder eigen staat, met een eerste lezer.
+- Activiteit blijft een veld van het scherm; ronde 2 heeft er geen producent voor en zegt dat met reden.
+- Sociaal: elk scherm publiceert zijn eigen context.
+- De objectmeting gaat via een e2e, met 'na-openen' in de meter.
+- Handhaving: één tand op context-zelf.
+- De objectpoort kapt af en weigert niet, want dat is het gedrag van vandaag in de werkruimte.
+- Omhoog vegen op de landing vraagt eerst de host.
+Let op het nieuwe verklaringsformaat van de meter (stap 2): een verklaring is één attribuut PER VELD op body, met de reden als waarde: data-rtg-edge-nvt-<veld>="reden" of data-rtg-edge-na-openen-<veld>="reden".
+
+HUISREGELS DIE HIER ZWAAR WEGEN:
+- de Edge bezit de werkelijkheid niet: geen derde contextmodel, geen verzonnen producent, geen Edge-state die naar een domein terugschrijft, geen tweede lijst naast iets dat al een eigenaar heeft; een afgeleide waarde mag zich niet als eigen publicatie voordoen; een leeg veld draagt zijn reden;
+- productbestanden in public/ en server/ zijn max 10240 bytes (scripts/check.js regel 13), meet met wc -c; een bundel blijft gelijk aan zijn delen (node scripts/bundel.js);
+- schrijf code die lijkt op de code eromheen (Nederlandse commentaarblokken in dezelfde toon en dichtheid);
+- ELKE bewering in een toets trek je na met een MUTATIE: fout aanbrengen, toets draaien, zien zakken, terugdraaien (git diff leeg). Een toets die je niet hebt zien zakken is geen toets. Geen toets overslaan, uitzetten of verzwakken;
+- LAT regel 17: zeg nooit "de gate is groen" maar welke poort groen staat.
+
+VOLGORDE PER STAP. (1) de toets die het gebrek of het nieuwe gedrag vastlegt, (2) de code, (3) de mutaties uit de specificatie (en wat jij verder nodig vindt), (4) een codecommit met in de body: wat er veranderde, welke toetsen je draaide met uitslag, en elke mutatie met uitslag. Nederlandse titel in de gebiedende wijs, in de stijl van git log, eindigend op "(Edge ronde 2, stap N)".
+
+AAN HET EIND: DE REGISTERTREIN OP JE TAK, zodat de CI op je tak een echt oordeel geeft. Op een schone boom (commit eerst), in deze volgorde en alleen wat verandert: npm run edgekaart; npm run build en npm run swcache:vast; npm run websitebeelden (en daarna nog eens build als het appbeeld zijn bron veranderde); npm run language:proof als app.html of app-main.js veranderde; node scripts/mutatie.js <elk nieuw toetsbestand>; npm run bewijs; npm run stillezing:vast; npm run deelindex; npm run kaart; npm run functielijst; npm run getallen; npm run norm:vast. Commit per register (titel "Meet ... opnieuw na stap N"). Draai daarna npm run check, npm run norm en npm run registerklopt en repareer wat ze noemen. De browsermeter npm run edgedekking draai je NIET (behalve als je spoor dat uitdrukkelijk zegt): die meet de integrator aan het eind op de samengevoegde boom.
+CLAUDE.md is het bestand van de gebruiker: raak daar alleen een getal-merkteken aan via npm run getallen, en geen zinnen.
+
+COMMITS eindigen ALTIJD met precies deze twee regels:
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HoWdWcm1fHsHF53RZ3zfYT
+Zet nooit een modelnaam of model-id in een commit, code of document.
+
+PUSH EN CI. Push je tak (git push -u origin <je tak>; bij een netwerkfout tot vier keer opnieuw met 2, 4, 8, 16 s). Start daarna de CI op je tak met de GitHub-tools: mcp__github__actions_run_trigger met method run_workflow, workflow_id ci.yml, ref <je tak> (laad het schema eerst met ToolSearch). Wacht NIET op de uitslag en poll niet; beëindig je beurt. Krijg je later een bericht dat de CI op je tak rood is, zoek dan de oorzaak, repareer, laat de registertrein opnieuw lopen waar nodig, push en start de CI opnieuw.
+
+EINDVERSLAG. Schrijf je eindverslag als laatste bericht in deze sessie (per stap: klaar, gedeeltelijk of niet, met toetsen, mutaties, afwijkingen van het plan met reden, bestandsgroottes, en wat je niet hebt kunnen bevestigen). Wees eerlijk: wat niet af is, heet zo.
+
+JOUW SPOOR:
+Spoor home, tak claude/edge-r2-home, stap 14. Het spoor wereld (stap 13) haalt in public/shared/interface/world-desktop-home.js de uitzondering voor vrienden weg (regels 10-11); raak die regels niet aan. Het nieuwe kanaal rtg-edge-home hoort als LEVEND kanaal op de kaart te komen (zender en luisteraar), niet als dood kanaal.
+
+DE SPECIFICATIE UIT HET EINDPLAN (letterlijk):
+STAP 14 -- Home op het wereldbureau overleeft een herstart van de Edge
+DOEL: Eerst de toets, die vandaag rood is. Na destroy() en start(document, window) verlaat een tik op Home het document op rtg.html (naar /apps/wereld.html), en herlaadt hij op wereld, kantoor en reizen. Oorzaak: het model begint bij elke start leeg (rtg-adaptive-edge.js:137, core.js:68-71) en de observer koppelt los (world-desktop-home.js:71-72).
+
+Daarna de uitvoering:
+- execute('home') stuurt een annuleerbare 'rtg-edge-home' vóór w.location.href = cfg.home (rtg-adaptive-edge.js:41). De naam begint letterlijk met 'rtg-', zodat kanalen() hem ziet.
+- world-desktop-home.js luistert op window, klapt het frame in of scrolt naar boven, en annuleert.
+- Alleen registerAction (:66-68) verdwijnt. Het label (:61-65) blijft aan de observer hangen.
+- Op de kaart gaat capability-register:s van world-desktop-home weg; de luisteraar komt er als citaat bij.
+BESTANDEN: public/shared/rtg-adaptive-edge.js, public/shared/interface/world-desktop-home.js, test/world-desktop.e2e.js, scripts/edgekaart.js
+TOETSEN: Herstartproef bij 1440x1050 op wereld, rtg, kantoor en reizen: destroy(), start(), een merkteken op window, een frame open, tik op Home. Het frame klapt in, het merkteken bestaat nog, en .wd-world-label staat er nog. | world-desktop.e2e.js:42 (label) en :86-93 (ingetypte tekst blijft) blijven groen.
+MUTATIES: Haal de luisteraar weg: de herstartproef zakt (Home navigeert). | Negeer defaultPrevented in execute: de herstartproef zakt. | Haal het label uit de observer: de labelbewering zakt.
+REGISTERS: EDGEKAART.json (levendeKanalen gaat van 13 naar 14 als merkteken in EDGE.md via getallen; in CLAUDE.md staat het als losse tekst), registertrein (stap 0), met RTG_BOUW want world-desktop-home.js staat in interface/
+RISICO: De bytes van de dispatch zijn vermoed (ongeveer 100 tot 110). rtg-adaptive-edge.js heeft 281 B ruimte (9959); met wc -c nagaan. Past het niet, dan gaat het in dezelfde wijziging als stap 18. Er verandert geen aria van de balkknoppen, want dit is geen onEdgeAction (input.js:29-34). Het bfcache-herstel blijft open.

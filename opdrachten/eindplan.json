@@ -1,0 +1,1057 @@
+{
+ "samenvatting": "EINDPLAN RONDE 2 (\"context\") van RTG Edge 3.0. Ik heb alleen gelezen: HEAD bad01a1, schone boom, geen bestand gewijzigd, geen schrijvend script gedraaid.\n\nWAT IK ZELF HEB NAGELEZEN (gemeten door te lezen):\n- EDGE.md:153 (gebaar-drempel \"de derde\" met één eigenaar), :207, :557, :613 en :703-706.\n- WERELDEN.md:119-127 (het besluit over vrienden van 7 september).\n- GRAMMATICA.md:156-159, :169-171 en :191. Daar staat letterlijk: \"voorgoed weg ... dat is bewust\".\n- scripts/edgedekking.js:147 en :689-749. achteruitgang() weigert al te schrijven als een scherm zijn zelf-herkomst verliest, behalve met --aanvaard.\n- public/shared/interface/world-desktop-home.js:10-11 en :59-72. Het label en registerAction zitten in dezelfde edge().\n- rtg-adaptive-edge.js:34-67.\n- rtg-adaptive-edge-controls.js:20-34 en :55-58. De hoofdactie verhuist zonder voorwaarde naar het blad.\n- blikveld.js:56-75 en :115-151.\n- second-screen-modules.js:55-80. Daar staat laatste.titel uit A.context() zonder te kijken naar de herkomst.\n- grammatica.js:67-86 en gebaar-03b.js:42-77.\n- office/app.js:34-36. Office leest alleen werk en bedrijf uit de URL; er is geen deeplink naar een document.\n- command-entry.js:23-52 en rtg-edge-2-loader.js:98-104. De publieke poort setState(..., {source:'auto'}) bestaat.\n- rtg-edge-2-context.js exporteert gestureBind en gestureFresh.\n- ci.yml:872-875 (build en daarna git diff --exit-code), websitewaarheid.js:121-123, check.js regel 35 (:2487), meterijk.test.js:980-991 en norm.js:1291-1303.\n- NORM.json:137-147 en de herkomstverdeling in EDGEDEKKING.json: wereld route 281, context scherm 1, hoofdactie scherm:data-hoofdactie 51 en padtabel 7.\n- EDGEKAART.json: gebaar-drempel heeft 1 schrijver en 1 beslisser, gewicht 1 schrijver en 8 beslissers.\n- De naam 'objectverwijzing' en de naam 'rtg-edge-home' komen allebei nergens voor.\n- Voor public/site/platform-*.js vond ik geen enkele lader: alleen check.js:4743 noemt ze, in een lijst met afrondingen.\n- Bytes: bestanden/adaptief.js 7862, office/adaptief.js 10089, command-entry.js 2149 en gebaar-02.js 8616.\nAlle andere getallen komen uit de leesrapporten en tegenlezingen en staan er met hun bron.\n\nWAT ER TEGENOVER HET PLAN VERANDERT, PER BEZWAAR:\n\nBlokkerende bezwaren, allebei verwerkt:\n- (H1) De registertrein. Stap 0 is nu een vaste procedure. Die trein is een startpunt. Het oordeel komt van npm run ci:lokaal en npm run registerklopt, want die leiden hun poorten zelf af. Ik heb de CI-poort zelf nagelezen op ci.yml:872-875.\n- (H2/G4) De objectmeting. Object wordt nu bewezen met een e2e waarin de toets zelf een document aanmaakt. EDGEDEKKING toont object eerlijk als 'na-openen'. Er is geen belofte meer dat de tand stijgt.\n\nBelangrijke bezwaren, allemaal verwerkt:\n- G1/H8. 'Nu relevant' toont een titel bij herkomst 'scherm' OF 'blad'. Er komt een e2e in app.html bij, en second-screen-modules.js wordt eerst afgesplitst.\n- G2. Er komt één tand, edgeVeldContextZelf, met ijking. Ik noem hem eerlijk een tweede sleutel na --aanvaard en geen CI-handhaver. Er komen geen tanden voor object of activiteit. Bewering (1) is herschreven.\n- G3/H4. De omgedraaide volgorde in wereld() is nu een robuustheidsproef. Die vangt de bestaande volgordetoets al (edgeblikveld.test.js:131-137). De tandenproef is: voeg 'route' toe aan de lijst voor wereld. De lijst dekt alle negen velden, trust inbegrepen, met een volledigheidstoets.\n- H3. In de schil krijgt alles wat uit de context komt het etiket 'blad' (trust wordt 'blad:rail'). edgeblikveld.e2e.js:95 en :109 bewegen mee.\n- G5. Voor 'zelf' eis ik de hoofdactie niet als gedeclareerde capability. De regel blijft besluit 11: een context met bron. Anders staat de hoofdactie twee keer in het blad (controls.js:55-58).\n- G6. De zes sociale schermen zonder eigen hoofdactie publiceren als voertuig en tellen niet als bewijs.\n- G7. 'Vijf standmachines' wordt 'deels'. Het casco als lezer is keuze K-casco.\n- G8. De wereldbewering geldt alleen voor de 82 gedeelde routes. Het MANIFEST heet niet meer 'eigenaar'.\n- G9. Activiteit blijft zoals par. 2 het definieert, en hoort in ronde 4 (EDGE.md:557).\n- G10. De trap van de borg is keuze K-borg.\n- H5. De kaartstap is gesplitst in drie.\n- H6. Elke producent die stopt, verliest in dezelfde stap zijn etiket.\n- H7. Het label van het bureau blijft staan, en de herstartproef controleert dat.\n- H9. De objectpoort kapt af, zoals vandaag, en wordt in drieën gesplitst. Hij laadt ook in werkruimte.html. Drie toetsen gaan mee.\n- H10. De ijking in meterijk komt erbij.\n- H11. Build, catalogus en service workers gaan mee bij vrienden, met een e2e op het FoundationOS-bureau.\n- H12. Er komt een unittoets op momentopname().acties.\n- H13. De balk bindt zijn eigen gebaarversheid met de functies van de ene eigenaar (RTGEdge2Context), en alleen waar Edge 2 draait. De landing houdt het gedrag van vandaag.\n- H14. loslaten:false krijgt een eigen terugvalweg zonder pointerup.\n\nKleinere bezwaren, allemaal verwerkt: de naam 'objectverwijzing' (0 treffers), EDGE.md:190 en :568, platform-edge.js (vermoed dood), het dubbel laden van de grammatica (grammatica.js:179-180), aanraking via CDP, een 'kort' van 150 ms, en de nep-core in de vormtoets.\n\nWAT IK VERWERP OF ANDERS DOE, MET REDEN:\n(a) Stap 8 vóór stap 4 zetten om de stijging naar 12 te ontlopen, zoals de tegenlezing voorstelde, verwerp ik. gebaar-02.js:9-11 houdt eigen drempels (RICHTING 8, STIL 6), dus gebaar blijft een tweede beslisser over gebaar-drempel, welke volgorde je ook kiest. De eerlijke kaart geeft edgeDubbeleEigenaars 12. Dat is vermoed en moet eerst met bouw()/keur() in het geheugen worden nagerekend. Die stijging gaat als uitgeschreven NORM-besluit met reden, en EDGE.md:151-153 wordt rechtgezet. Een meter die stijgt omdat hij beter ziet, is geen achteruitgang. Een meter die laag blijft omdat hij iets niet ziet, is erger.\n(b) Een tand op het aantal edge-compat-handelingen verwerp ik. De vormtoets maakt de API zelf onmogelijk, en dat is sterker dan een telling.\n(c) A2 voor Home (pull uit RTGAdaptief) verwerp ik. Het verandert de contextbron op vijf bureaus en dubbelt world-desktop-frame.js:84.\n(d) De NORM-tanden helemaal schrappen verwerp ik. Zonder tand verdwijnt een met --aanvaard geaccepteerde daling van context-zelf bij de volgende meting uit aanvaardAchteruit. Met de tand vraagt die daling een besluit met reden.\n\nWAT IK ZELF BESLIS, als technisch beste optie:\n- Home blijft betekenen wat nu bewezen is: het frame inklappen, anders naar boven (world-desktop.e2e.js:86-93). De haak wordt een annuleerbare gebeurtenis 'rtg-edge-home'.\n- Vrienden is drift van een genomen besluit (WERELDEN.md:119-127) en wordt hersteld zonder vraag.\n- RTGWorkspaceContext wordt een lezer zonder eigen staat, met een eerste lezer.\n- Activiteit blijft een veld van het scherm; ronde 2 heeft er geen producent voor en zegt dat met reden.\n- Sociaal: elk scherm publiceert zijn eigen context.\n- De objectmeting gaat via een e2e, met 'na-openen' in de meter.\n- Handhaving: één tand op context-zelf.\n- Gebaar: lang drukken, stil en de vervaltijd van 'scherp' gaan naar de tabel; de borg volgt K-borg.\n- Domeinstand: command-entry gebruikt bij een hashwissel setState met source 'auto'. Dan blijft het vastgelegde gedrag van de pilot staan en wint een handmatige keuze.\n- De vouwstand gaat weg.\n- De objectpoort kapt af en weigert niet, want dat is het gedrag van vandaag in de werkruimte.\n- Omhoog vegen op de landing vraagt eerst de host.\n\nDE VIER VRAGEN AAN DE EIGENAAR:\n- K-reikwijdte: wat 'elk scherm publiceert' in ronde 2 moet bewijzen.\n- K-casco: het casco als lezer in ronde 2 of later. EDGE.md:207 zegt nu ronde 2.\n- K-bladlijst: de zes snelkoppelingen, een zichtbare verandering.\n- K-borg: welke trap de borg van gebaar is.\n\nWAT NIET GEBEURT: geen derde contextmodel, geen verzonnen producent, geen tweede lijst naast MAPPEN of RTGAdaptief, geen visueel herontwerp, en geen belofte dat edgeDubbeleEigenaars daalt. De teller gaat eerlijk naar 12 (vermoed). Alleen K-casco optie b kan hem, met een eigen meting, weer laten zakken.",
+ "stappen": [
+  {
+   "nr": 0,
+   "titel": "Registertrein en commitvorm (geldt voor elke stap)",
+   "doel": "Elke stap wordt een eigen commitreeks op een schone boom die in CI groen staat. Stillezing, kaart en functielijst eisen eisSchoneBoom, dus de volgorde ligt vast. Er zijn twee soorten commits:\n- de codecommit;\n- de registercommits, die daarna op een schone boom gedraaid worden.\n\nHet startpunt is de lijst uit de tegenlezing op haalbaarheid. Die heeft ronde 1 zo gelopen (negen losse registercommits in 5359e1a..HEAD):\n- npm run edgekaart en npm run getallen;\n- npm run build (SW-cachenamen, RTG_BOUW, wereldcatalogus, website-truth), en npm run websitebeelden zodra websitewaarheid.js:121-123 over het appbeeld gooit;\n- het taalbewijs als app.html of app-main.js verandert;\n- npm run stillezing:vast;\n- npm run mutatie op nieuwe en gewijzigde toetsen, npm run bewijs, en norm --vastleggen (toetsenNietGemeten mag alleen omlaag);\n- deelindex, kaart en functielijst;\n- edgedekking alleen waar de dekking verandert.\n\nDit is een startpunt en geen waarheid. Het oordeel komt van npm run ci:lokaal (leidt zijn poorten af uit .github/workflows, LAT regel 13) en van npm run registerklopt. Daarin zitten edgekaart, edgenieuwscherm en stillezing, die niet in check zitten. Per poort zeggen we wat groen staat (LAT regel 17).",
+   "bestanden": [
+    "geen productbestand; alleen de volgorde van commits"
+   ],
+   "toetsen": [
+    "npm run ci:lokaal na elke stap",
+    "npm run registerklopt na elke stap die een register raakt"
+   ],
+   "mutaties": [
+    "Sla na een wijziging aan scripts/edgekaart.js stillezing:vast over. Dan moet registerklopt of ci:lokaal zakten, want STILLEZING.json draagt edgekaart.js:545. Zakt het niet, dan hoort die schakel niet in de trein en gaat hij eruit."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "EDGEDEKKING.json",
+    "NORM.json",
+    "STILLEZING.json",
+    "MUTATIES/BEWIJS.md",
+    "BUNDELS.md",
+    "ARCHITECTUUR.md",
+    "FUNCTIES.md",
+    "websitebeelden/website-truth",
+    "taalbewijs (LANGUAGECAPABILITY/LANGUAGEFAILOVER/MEANINGPARITY)",
+    "getal-merktekens in EDGE.md en CLAUDE.md"
+   ],
+   "risico": "Zonder deze stap wordt CI bij bijna elke stap rood. Het grootste risico is een vergeten generator die alleen in CI draait; ci:lokaal ondervangt dat. CLAUDE.md is het bestand van de gebruiker, en losse getallen daarin ('13 levende kanalen', 'nog 11') worden alleen met zijn akkoord bijgewerkt.",
+   "hangtAfVan": []
+  },
+  {
+   "nr": 1,
+   "titel": "De meter: zelf per veld een gesloten lijst, en in de schil alles uit een blad het etiket 'blad'",
+   "doel": "In scripts/edgedekking.js wordt zelf(herkomst) (:147) zelf(veld, herkomst), met een tabel ZELF voor alle negen VELDEN (:112-113):\n- identiteit, wereld, presence en voortzetting: leeg;\n- context, object en activiteit: ['scherm'];\n- hoofdactie: ['scherm:data-hoofdactie'];\n- trust: ['scherm:rail'].\nDe aanroepers gaan mee: telling, achteruitgang (:701) en contractNieuw (:178, :183).\n\nIn blikveld.js (:123 en :143-151) gebeurt dit:\n- In de schil (#rtgCommand aanwezig) krijgt alles uit c het etiket 'blad': context, object en activiteit worden 'blad', trust wordt 'blad:rail'. In app.html is de brug (brug.js:171) de enige publicist.\n- Object en activiteit gelden alleen als c.bron er is. Anders blijft het veld leeg, met de reden 'het scherm zegt niet wie het is'.\n\nEr verandert geen scherm. Het effect: 'zelf' kan alleen nog stijgen door een publicatie van het scherm zelf.",
+   "bestanden": [
+    "scripts/edgedekking.js",
+    "public/shared/edge/blikveld.js",
+    "test/edgeblikveld.test.js",
+    "test/edgeblikveld.e2e.js (:95 wacht op 'blad', :109 object-herkomst 'blad')",
+    "test/edgedekking-zelf.test.js (nieuw)"
+   ],
+   "toetsen": [
+    "Unittoets per veld op zelf(). Volledigheid: elke sleutel uit VELDEN staat in ZELF.",
+    "Schilproef in vm: een context via de brug geeft voor context, object en activiteit 'blad' en voor trust 'blad:rail', en zelf=false.",
+    "Bronscan: van de scripts die app.html laadt, roept alleen adaptief/brug.js RTGAdaptief.context met een argument aan.",
+    "De bestaande volgordetoets edgeblikveld.test.js:131-137 blijft groen.",
+    "edgeblikveld.e2e.js stappen 2 en 3 zijn groen met de nieuwe etiketten."
+   ],
+   "mutaties": [
+    "Voeg 'route' toe aan ZELF.wereld: de unittoets zakt.",
+    "Voeg 'blad' toe aan ZELF.context: de unittoets zakt.",
+    "Haal de trust-regel uit ZELF: de volledigheidstoets zakt.",
+    "Geef in de schil weer 'scherm': de schilproef zakt.",
+    "Laat object zonder bron weer 'scherm' zijn: de unittoets zakt.",
+    "Robuustheidsproef, die moet groen blijven voor de nieuwe toets: zet 'pagina' vóór de route in wereld(). zelf(wereld) blijft false, en de BESTAANDE volgordetoets zakt. Die hoort dat werk te doen."
+   ],
+   "registers": [
+    "registertrein (stap 0); blikveld.js staat in de SHELL van sw.js"
+   ],
+   "risico": "Vermoed is dat er geen daling in de telling komt: 'pagina' komt 0 keer voor, en de enige context-zelf is reizen-veilig (EDGEDEKKING.json, gemeten). Daalt het toch, dan is dat een meetcorrectie en zo wordt het genoemd. blikveld.js heeft 779 B ruimte (9461). De bronscan is lexicaal: een publicist die de naam via een omweg aanroept, ziet hij niet.",
+   "hangtAfVan": [
+    "0"
+   ]
+  },
+  {
+   "nr": 2,
+   "titel": "De meter: een nvt-reden per veld en de stand 'na-openen'",
+   "doel": "Nu dekt één reden alle genoemde velden (edgedekking.js:63-69, :307-308 en :461), en 'dit veld ontstaat pas na openen' kan nergens terecht.\n\nEr komt een reden PER VELD, plus een vierde stand 'na-openen' die een scherm met reden verklaart. 'na-openen' telt nooit als 'ja', en van 'ja' naar 'na-openen' is een achteruitgang. De attribuutnamen worden eerst op bezetting nagezocht.\n\nIn deze stap verandert er geen scherm; de verklaring komt in stap 21.",
+   "bestanden": [
+    "scripts/edgedekking.js",
+    "test/edgedekking-zelf.test.js"
+   ],
+   "toetsen": [
+    "Unit: 'na-openen' zonder reden wordt 'nee'.",
+    "Unit: een reden voor veld A dekt veld B niet.",
+    "Unit: van 'ja' naar 'na-openen' staat in achteruitgang()."
+   ],
+   "mutaties": [
+    "Tel 'na-openen' als 'ja': de telling-toets zakt.",
+    "Accepteer één reden voor alle velden: de per-veldtoets zakt.",
+    "Haal 'na-openen' uit achteruitgang(): de ratel-toets zakt."
+   ],
+   "registers": [
+    "registertrein (stap 0)"
+   ],
+   "risico": "Laag. Het gaat alleen om het script, waarvoor geen bytegrens geldt.",
+   "hangtAfVan": [
+    "1"
+   ]
+  },
+  {
+   "nr": 3,
+   "titel": "Kaart A: de ontbrekende producenten erop, en de Second Screen eraf als indelingscorrectie",
+   "doel": "Nieuwe of gewijzigde rijen in KAART (scripts/edgekaart.js):\n- rtg-world-identity.js: wereld:s (apply(), :109-124).\n- interface/world-desktop-home.js: capability-register:s (:66) en wereld:s (het label uit data-world-home, :5 en :61-64).\n- site/start/experience-edge.js: capability-register:s (:41, :44-46).\n- signals.js en social-intelligence-runtime.js: van capability-register:l naar :s.\n- interface/workspace-context.js: vluchtige-context:s en :b (current en de ontdubbeling, :13-21).\n- interface/second-screen-modules.js: vluchtige-context:l (:73).\n- apps/werk/command-entry.js en apps/foundation/os-publiek.html (:390-391): zichtbaarheidsstand:s. kaal() leest .html, gemeten door de tegenlezing.\n- De vensterboolean van rtg-edge-2-loader.js als citaat.\n- gebaar/gebaar-02.js: gebaar-drempel:b (RICHTING en STIL, :9-11).\n- gebaar/gebaar-03b.js: gebaar-drempel:b (520 op :24, 8 per as op :28) en gewicht:b (BORGTIJD, :42).\n\nsecond-screen.js gaat uit zichtbaarheidsstand. Dat is een INDELINGSCORRECTIE (hij bestuurt .cmd-bank, second-screen.js:10-11 en :76-77) en wordt in EDGE.md par. 1 zo genoemd.\n\nWie via de API van de eigenaar schrijft (world-desktop-frame.js, setState), blijft lezer, zoals de definitie van de kaart zegt.\n\nVerwacht effect: gebaar-drempel wordt dubbel (vandaag 1 schrijver en 1 beslisser), dus edgeDubbeleEigenaars gaat van 11 naar 12. Dat is vermoed. Eerst narekenen met bouw()/keur() in het geheugen. Klopt het, dan komt er een NORM-besluit met reden ('de kaart ziet een bestaande tweede eigenaar; geen nieuwe code'). EDGE.md:151-153 wordt rechtgezet.",
+   "bestanden": [
+    "scripts/edgekaart.js",
+    "test/edgekaart.test.js",
+    "EDGEKAART.json",
+    "NORM.json (besluit met reden)",
+    "EDGE.md (par. 1)"
+   ],
+   "toetsen": [
+    "npm run edgekaart:controle groen.",
+    "edgekaart.test.js: register gelijk aan code (bestaand)."
+   ],
+   "mutaties": [
+    "Haal de rij van gebaar-02.js weg terwijl de code gelijk blijft: edgekaart.test.js zakt (register wijkt af). Na stap 5 zakt ook de afgeleide controle.",
+    "Laat het NORM-besluit weg: npm run norm zakt op 12 tegen 11."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "NORM.json",
+    "getallen (edgekaart.bestanden, rollen)",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Dat de teller naar 12 gaat, is vermoed. Alle andere nieuwe rijen landen op namen die al dubbel zijn (wereld heeft 4 schrijvers en 4 beslissers, capability-register 2 en 3, vluchtige-context 2 en 2, gewicht 1 en 8). Een stijging die niet te verklaren is, gaat niet door.",
+   "hangtAfVan": [
+    "0"
+   ]
+  },
+  {
+   "nr": 4,
+   "titel": "Kaart B: een etiket hangt aan een citaat, in beide richtingen",
+   "doel": "Nu staan etiketten en citaten los van elkaar (edgekaart.js:342-345 en :350-353). Daardoor verlaagt het weghalen van alleen een etiket de schuld, met 0 keurfouten (scenario 4, standenrapport).\n\nNa deze stap:\n- draagt elk citaat met de rol 'schrijft' of 'beslist' de naam waarover het gaat;\n- heeft elk etiket s of b minstens één zo'n citaat;\n- tellen 'rendert' en 'projecteert' volgens een uitgeschreven tabel.\n\nDit verandert het formaat van 60 rijen met 193 citaten (tegenlezing, in het geheugen doorgerekend).",
+   "bestanden": [
+    "scripts/edgekaart.js",
+    "test/edgekaart.test.js"
+   ],
+   "toetsen": [
+    "keur(): een etiket zonder citaat is rood, en een citaat met een naam die niet in de etiketten staat ook.",
+    "Vóór en na de formaatwijziging geeft bouw() in het geheugen dezelfde telling."
+   ],
+   "mutaties": [
+    "Haal alleen een etiket weg: keur() zakt. Vandaag is dat 11 naar 10 met 0 fouten.",
+    "Zet een verkeerde naam op een citaat: keur() zakt."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "STILLEZING.json (edgekaart.js-regels)",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Een grote tekstwijziging in één script. Het uitgangspunt is dat de uitkomst van bouw() niet verandert; verandert hij toch, dan gaat het besluit terug naar stap 3.",
+   "hangtAfVan": [
+    "3"
+   ]
+  },
+  {
+   "nr": 5,
+   "titel": "Kaart C: afgeleide controles die de kaart aan de code houden",
+   "doel": "Drie controles die lexicaal uit public/ worden afgeleid, met een uitgeschreven lijst ontvangernamen:\n(1) wie registerAction aanroept op RTGAdaptiveEdge (de landing noemt hem 'edge', signals 'api') is gelijk aan de schrijvers van capability-register via de kern. workspace-broker.js:60, workspace-registries.js:46 en workspace-module-host.js:33 vallen er met naam buiten.\n(2) wie data-rtg-world of dataset.rtgWorld schrijft, staat erop als wereld:s.\n(3) wie data-rtg-edge-2-state op body zet, staat erop als zichtbaarheidsstand:s.\nHiermee kan 'tweede register leeg' in stap 18 BEWEZEN worden.",
+   "bestanden": [
+    "scripts/edgekaart.js",
+    "test/edgekaart.test.js"
+   ],
+   "toetsen": [
+    "De drie afgeleide controles zijn groen op HEAD na stap 3."
+   ],
+   "mutaties": [
+    "Voeg een registerAction-aanroep toe in een testbestand onder public/: controle 1 zakt.",
+    "Haal de rij van rtg-world-identity.js weg: controle 2 zakt.",
+    "Haal de rij van command-entry.js weg: controle 3 zakt."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Lexicaal, dus een ondergrens: een aanroep via een samengestelde naam ontsnapt. Dat staat met reden in de uitleg van de controle.",
+   "hangtAfVan": [
+    "3"
+   ]
+  },
+  {
+   "nr": 6,
+   "titel": "Verse EDGEDEKKING en één tand op context-zelf",
+   "doel": "Meet EDGEDEKKING.json opnieuw met de meter van stap 1 en 2. Het register draagt nu 5359e1a, en 'een register dat niet is hergedraaid, is een bewering over het verleden'.\n\nVoeg één tand edgeVeldContextZelf toe, die alleen omhoog mag. Dat vraagt een tak in leesEdge (norm.js:1291-1303) en een METERS-regel. De tand wordt eerlijk beschreven: hij is GEEN CI-handhaver, want de browsermeter draait niet in CI. Een daling wordt al per scherm tegengehouden door achteruitgang() (edgedekking.js:689-749, zelf nagelezen). De tand bijt alleen na een bewuste --aanvaard en maakt dan van die daling een NORM-besluit met reden, in plaats van een regel in aanvaardAchteruit die bij de volgende meting verdwijnt.\n\nEr komen geen zelf-tanden voor object of activiteit: die staan op 0 en kunnen in deze ronde niet zakken. De bestaande tanden op .ja blijven.\n\nMeet in dezelfde ronde de noemer voor stap 24: hoeveel schermen een eigen hoofdactie hebben. Nu is dat 51 gemeten plus 7 via de padtabel, tegen 68 in de bron.",
+   "bestanden": [
+    "scripts/norm.js",
+    "test/meterijk.test.js (ijking met een zelf-tak in edgeIjking, :2281-2302, en een regel bij :985)",
+    "NORM.json",
+    "EDGEDEKKING.json"
+   ],
+   "toetsen": [
+    "meterijk: de ijking van edgeVeldContextZelf slaat uit op een register met een verlaagde zelf-telling (check.js regel 35).",
+    "norm: een register met een lagere context-zelf laat npm run norm zakken.",
+    "achteruitgang() blijft ongewijzigd groen."
+   ],
+   "mutaties": [
+    "Laat leesEdge voor de nieuwe tand .ja lezen in plaats van .zelf: de ijking zakt.",
+    "Op een kopie van het register, de mutatie uit het contractrapport (context van reizen-veilig van 'scherm' naar 'edge-casco', zoals na een --aanvaard): de tand zakt, terwijl edgeVeldContext op 282 bleef staan."
+   ],
+   "registers": [
+    "EDGEDEKKING.json",
+    "NORM.json",
+    "getallen (edgedekking.*)",
+    "registertrein (stap 0)"
+   ],
+   "risico": "De meting duurt ongeveer een kwartier. Een lagere basislijn door stap 1 is een meetcorrectie en wordt zo genoemd.",
+   "hangtAfVan": [
+    "1",
+    "2"
+   ]
+  },
+  {
+   "nr": 7,
+   "titel": "Borg en lang drukken van gebaar vastpinnen op gedrag",
+   "doel": "Twee mutaties die nu geen toets opmerkt (gemeten door het gebrekenrapport): 520 wordt 5000 en BORGTIJD wordt 1. Daarmee gaat een borg af op een tik, en alles blijft groen. De borg-e2e's lopen nu alleen via het toetsenbord (gebaar.e2e.js:257-270).\n\nNieuwe e2e's met aanwijzer en aanraking op een onomkeerbare regelactie (gebaar-04c.js:58 maakt die vanzelf een borg):\n- kort vasthouden, 150 ms (minstens één animatieframe), voert niets uit;\n- lang vasthouden, ruim boven de hoogste tijd in VASTHOUD, voert uit;\n- lang drukken op een rij opent de actielade.\nAanraking gaat via CDP Input.dispatchTouchEvent, want Playwright kent alleen tap().\n\nDe toets gebruikt grenzen die uit de tabel komen en pint geen getal vast. Hij blijft dus geldig na stap 10.",
+   "bestanden": [
+    "test/gebaar.e2e.js (of test/gebaar-notities.e2e.js)"
+   ],
+   "toetsen": [
+    "e2e borg met aanwijzer: kort doet niets, lang voert uit.",
+    "e2e borg met aanraking via CDP: kort doet niets.",
+    "e2e lang drukken met aanwijzer opent de actielade."
+   ],
+   "mutaties": [
+    "BORGTIJD = 1 (gebaar-03b.js:42 en de bundel gebaar.js:611, aangeleverd via page.route): de kort-toets zakt.",
+    "BORGTIJD = 5000: de toets 'lang voert uit' zakt.",
+    "'}, 520);' naar 5000 (gebaar-03b.js:24 en de bundel :593): de lang-drukken-toets zakt."
+   ],
+   "registers": [
+    "registertrein (stap 0), inclusief mutatie en bewijs voor de nieuwe toetsen"
+   ],
+   "risico": "Een tijdgebonden e2e. De grenzen liggen ruim van alle tabeltijden af. Vasthouden zonder bewegen raakt de wedloop in helper.js niet.",
+   "hangtAfVan": [
+    "0"
+   ]
+  },
+  {
+   "nr": 8,
+   "titel": "veegDoor zegt welke weg hij nam, en leert vasthouden zonder loslaten",
+   "doel": "veegDoor (helper.js:1216-1296) meldt voortaan de weg die hij nam: vlucht of terugval. Nu telt die terugval nergens.\n\nNieuwe optie loslaten:false, met een EIGEN terugvalweg: synthetische pointerdown en move, zonder pointerup. De reeksen op notities (:116-118) en rtmail (:143-145) beweren iets terwijl de knop nog is ingedrukt, en laten daarna los met een echte page.mouse.up.",
+   "bestanden": [
+    "test/helper.js",
+    "test/helper-veegdoor.test.js (nieuw, of een blok in een bestaande helpertoets)"
+   ],
+   "toetsen": [
+    "Helpertoets: de gekozen weg wordt gerapporteerd.",
+    "Helpertoets: bij loslaten:false komt er in beide wegen geen pointerup."
+   ],
+   "mutaties": [
+    "Maak de terugval weer stil: de rapportagetoets zakt.",
+    "Stuur pointerup in de terugvalweg van loslaten:false: de toets zakt."
+   ],
+   "registers": [
+    "registertrein (stap 0)"
+   ],
+   "risico": "Een nieuwe optie in een gedeelde helper, en die wordt door veel e2e's geladen. De bestaande aanroepers moeten ongewijzigd blijven.",
+   "hangtAfVan": [
+    "0"
+   ]
+  },
+  {
+   "nr": 9,
+   "titel": "De vier omwegen door veegDoor, en de koude meting van de wedloop",
+   "doel": "De reeksen die veegDoor omzeilen, gaan erdoorheen:\n- gebaar.e2e.js:48-55 (aangeroepen op :131, :144, :153, :238, :249 en :366);\n- gebaar-notities.e2e.js:117;\n- gebaar-rtmail.e2e.js:144;\n- gebaar-salon.e2e.js:141 (die laat meteen los).\n\nDaarna volgen N rondes tegen een KOUDE server: hoe vaak de terugval afgaat, en de verdeling van het gat tussen pointerdown en de eerste move van 8 px of meer. Lokaal met een warme server is dat maximaal 51 ms (gebrekenrapport); de koude staart is niet gemeten. De uitkomst gaat met graad en stempel in EDGE.md par. 11. Dat is de meting die par. 11 eist voordat gebaar naar de tabel gaat.",
+   "bestanden": [
+    "test/gebaar.e2e.js",
+    "test/gebaar-notities.e2e.js",
+    "test/gebaar-rtmail.e2e.js",
+    "test/gebaar-salon.e2e.js",
+    "test/gebaar-omweg.test.js (nieuwe bronscan)",
+    "EDGE.md (par. 11)"
+   ],
+   "toetsen": [
+    "Bronscan: geen losse page.mouse.down gevolgd door moves in gebaar*.e2e.js buiten helper.js. Vasthouden zonder bewegen, uit stap 7, is uitgezonderd.",
+    "De vier reeksen zijn groen via veegDoor."
+   ],
+   "mutaties": [
+    "Zet een losse page.mouse.down terug in gebaar-salon.e2e.js:141: de bronscan zakt."
+   ],
+   "registers": [
+    "registertrein (stap 0)"
+   ],
+   "risico": "De koude meting kost CI-tijd. Zonder die meting blijft 'hoe vaak' een vermoeden: helper.js:1157-1160 noemt ongeveer 1 op 5 van vóór de reparatie.",
+   "hangtAfVan": [
+    "8"
+   ]
+  },
+  {
+   "nr": 10,
+   "titel": "gebaar leest DREMPELS en brengt de grammatica zelf mee; de borg volgt K-borg",
+   "doel": "Aanpassingen aan gebaar:\n- gebaar-01.js laadt /shared/adaptief/grammatica.js zacht bij de eerste zet() of lijst(), en alleen als !w.RTGGrammatica. grammatica.js:179-180 heeft geen bescherming tegen dubbel laden. basis.js (:319-323) laadt hem niet, en als blad krijgen 5 van de 9 gebaarschermen hem nooit (gemeten).\n- gebaar-03b.js leest bij pointerdown DREMPELS.lang en .stil (grammatica.js:83-84), in plaats van 520 (:24) en 8 (:28). Zonder tabel loopt er geen timer.\n- 'scherp' via het toetsenbord vervalt na DREMPELS.herbevestig. Dat volgt GRAMMATICA.md:205 ('vier seconden geldig') en vasthoud.js.\n- BORGTIJD: bij K-borg optie 1 blijft 800 staan en staat hij met reden op de kaart als gewicht:b tot ronde 3. Bij optie 2 leest houdVast VASTHOUD.zwaar, en weigert de borg te bevestigen zonder tabel. Bij optie 3 komt er een eigen sleutel.\n- De bundel gebaar.js wordt opnieuw gebouwd (scripts/bundel.js:51; check.js regel 6; BUNDELS.md).\n- Op de kaart gaat gebaar-03b.js voor lang en stil van gebaar-drempel:b naar :l. gebaar-02.js houdt RICHTING en STIL, dus de teller blijft 12 (vermoed, narekenen).",
+   "bestanden": [
+    "public/shared/gebaar/gebaar-01.js",
+    "public/shared/gebaar/gebaar-03b.js",
+    "public/shared/gebaar.js (bundel)",
+    "scripts/edgekaart.js",
+    "test/drempels.test.js",
+    "test/gebaar.test.js",
+    "test/gebaar-notities.e2e.js",
+    "test/helper.js (veegDoor wacht op window.RTGGrammatica)"
+   ],
+   "toetsen": [
+    "777-proef in vm: met een nep-tabel met lang=777 staat de timer op 777. Zonder tabel loopt er geen timer.",
+    "e2e op notities als same-origin blad: lang drukken opent de actielade (de grammatica komt via het zachte laden).",
+    "e2e toetsenbord: wapen de borg, wacht langer dan herbevestig, druk: er gebeurt niets.",
+    "Zacht laden op een scherm dat de grammatica al heeft: één scripttag, dezelfde globale.",
+    "De verbodslijst in drempels.test.js:93-102 krijgt gebaar-03b.js erbij. gebaar-02.js blijft er met reden buiten (RICHTING en STIL).",
+    "De e2e's van stap 7 blijven groen."
+   ],
+   "mutaties": [
+    "Zet '}, 520);' terug: de verbodslijst zakt.",
+    "Haal het zachte laden weg: de blad-e2e op notities zakt.",
+    "Haal de vervaltijd van 'scherp' weg: de toetsenbord-e2e zakt.",
+    "Laad altijd, zonder de controle op de globale: de dubbel-laadtoets zakt.",
+    "Alleen bij K-borg optie 2: zet BORGTIJD = 800 terug; een proef met zwaar=1234 in de nep-tabel zakt."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "BUNDELS.md",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Zichtbaar anders gedrag: lang drukken gaat van 520 naar 480 ms. De grammatica (ongeveer 9,8 kB) wordt voortaan ook op gebaarschermen geladen die hem nog niet hadden. Vanaf nu hangt de wedloop ook af van de laadtijd van de grammatica (kantoor.html 857 ms, gemeten), vandaar het wachten in veegDoor. Het getal voor de borg verandert alleen bij K-borg optie 2.",
+   "hangtAfVan": [
+    "3",
+    "7",
+    "9"
+   ]
+  },
+  {
+   "nr": 11,
+   "titel": "Een hashwissel in Work laat de Edge 2-keuze van de gebruiker staan",
+   "doel": "Nu zet command-entry.js:32-33 en :37-38 bij elke hashwissel (:49) de state en auto op body. Edge 2 behandelt dat als een start, en de bewaarde handmatige keuze wordt 'auto' (M6, drie mutaties).\n\nNa deze stap schrijft volgRoute() bij het LADEN nog steeds de verklaring. Die is gelijk aan de HTML, en de pilottoets rtg-edge-2-pilots.test.js:238-248 blijft gelden. Bij een HASHWISSEL roept hij, als RTGEdge2 er is, RTGEdge2.setState('overview', { source: 'auto' }) aan. Dat is dezelfde poort die de loader gebruikt (rtg-edge-2-loader.js:103-104), en daar wint een handmatige keuze ('if(bron==='auto'&&rt.manual)return', rtg-edge-2.js). De 'zichtbare autorand' van de pilot blijft zo voor wie niets koos.",
+   "bestanden": [
+    "public/apps/werk/command-entry.js",
+    "test/rtg-edge-2-pilots.test.js",
+    "test/rtg-edge-2.e2e.js (of een nieuwe stap in een werk-e2e)",
+    "scripts/edgekaart.js"
+   ],
+   "toetsen": [
+    "vm: een hashwissel met een nep-RTGEdge2 roept setState aan met source 'auto' en raakt de body-attributen niet.",
+    "vm: het laden schrijft de attributen zoals nu (de pilot blijft).",
+    "e2e op /apps/werk.html#projecten: handmatig Compact, dan de hash naar #people. De opslag blijft 'compact' en de stand blijft compact.",
+    "e2e zonder handmatige keuze: een hashwissel geeft overview."
+   ],
+   "mutaties": [
+    "Zet de attribuutregels terug in het pad van de hashwissel: de e2e zakt (de opslag wordt 'auto').",
+    "Laat source weg bij setState: de e2e zakt (handmatig verliest)."
+   ],
+   "registers": [
+    "EDGEKAART.json (command-entry.js blijft schrijver bij het laden en is API-lezer bij een hashwissel)",
+    "registertrein (stap 0), met websitebeelden want command-entry.js is een bron van werk.html"
+   ],
+   "risico": "Vermoed: bij het laden overschrijft command-entry een bewaarde keuze niet. Bij os-publiek.html is dat gemeten (standenrapport); bij werk.html niet apart. De e2e laadt daarom ook met een bewaarde 'compact'.",
+   "hangtAfVan": [
+    "3"
+   ]
+  },
+  {
+   "nr": 12,
+   "titel": "De balk flikkert niet meer bij programmatisch scrollen",
+   "doel": "De scrollregel van de balk (rtg-adaptive-edge-input.js:104-111) vraagt de gebaarversheid, maar alleen op pagina's waar Edge 2 draait (w.RTGEdge2). Hij gebruikt daarvoor de functies van de ene eigenaar: RTGEdge2Context.gestureBind en gestureFresh (rtg-edge-2-context.js, zelf nagelezen), op een EIGEN rt. Er is geen leesweg in de interne rt van Edge 2, en gestureFresh verlengt bij het lezen. Het is een tweede set luisteraars met dezelfde definitie.\n\nZonder Edge 2 (de landing, de sitepagina's) blijft het gedrag zoals vandaag.",
+   "bestanden": [
+    "public/shared/rtg-adaptive-edge-input.js",
+    "test/rtg-adaptive-edge.e2e.js",
+    "scripts/edgekaart.js (citaat: input.js leest de gebaarversheid van rtg-edge-2-context.js)"
+   ],
+   "toetsen": [
+    "e2e op /apps/reisboek.html bij 390 px: window.scrollTo(0,900) zonder gebaar geeft binnen 900 ms, per frame bemonsterd, geen peek.",
+    "e2e op dezelfde pagina: wiel omlaag geeft peek en daarna dock, zoals nu (M1).",
+    "e2e op / bij 390 px: wiel omlaag geeft peek (de weg zonder Edge 2)."
+   ],
+   "mutaties": [
+    "Haal de versheidsvraag weg: de flikkertoets zakt.",
+    "Eis RTGEdge2Context altijd: de landingstoets zakt (geen peek meer).",
+    "Klok van 520 naar 520000: de wiel-toets zakt."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "registertrein (stap 0)"
+   ],
+   "risico": "input.js heeft 2513 B ruimte (7727). De ruststand in compact blijft dock (zie nietInDezeRonde).",
+   "hangtAfVan": [
+    "3"
+   ]
+  },
+  {
+   "nr": 13,
+   "titel": "Wereld: het MANIFEST en MAPPEN kloppen op wat ze delen, en vrienden volgt zijn besluit",
+   "doel": "Er komt een consistentietoets tussen het MANIFEST (rtg-world-identity.js:20-69) en MAPPEN (via het gegenereerde WERELDLIJST.md), over de routes die ze DELEN. Dat zijn er 82 (tegenlezing, gemeten met node); contractrapport: 96 onderdelen met een adres, 91 gelijk.\n\nUitzonderingen dragen hun reden: de drie tabs van app.html en de doorwijzer geld-command. data-world-home van de zes wereldbureaus wordt tegen het MANIFEST gelegd.\n\nVrienden is drift van het besluit van 7 september (WERELDEN.md:119-127) en geen open vraag:\n- rtg-world-identity.js:23 wordt foundation;\n- npm run heritage:vast (vrienden.html:145);\n- de harde uitzondering op world-desktop-home.js:10-11 verdwijnt;\n- npm run build ververst world-widget-catalog.json (:2138-2142 zegt nu living), de SW-caches (foundation/sw.js:34) en RTG_BOUW.\n\nDe 212 routes die alleen in het MANIFEST staan, krijgen geen tweede eigenaar en worden zo genoemd.",
+   "bestanden": [
+    "test/wereldregister.test.js (of test/rtg-world-identity.test.js)",
+    "public/shared/rtg-world-identity.js",
+    "public/apps/foundation/vrienden.html",
+    "public/shared/interface/world-desktop-home.js",
+    "public/shared/interface/world-widget-catalog.json (via build)",
+    "test/world-desktop.e2e.js"
+   ],
+   "toetsen": [
+    "Consistentietoets: MANIFEST en MAPPEN over de gedeelde routes, uitzonderingen met reden, en data-world-home.",
+    "e2e op /apps/foundation/index.html bij 1440 px: Vrienden staat in de bibliotheek.",
+    "test/rtg-world-identity.test.js:62-76 blijft groen."
+   ],
+   "mutaties": [
+    "Verander de wereld van één gedeelde route in het MANIFEST: de toets zakt.",
+    "Haal de reden van een uitzondering weg: de toets zakt.",
+    "Zet vrienden terug op living: de toets zakt.",
+    "Weghalen van de uitzondering zonder de catalogus te verversen: de bureau-e2e zakt."
+   ],
+   "registers": [
+    "world-widget-catalog.json",
+    "SW-cachenamen",
+    "RTG_BOUW",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Vrienden krijgt een ander wereldaccent en een ander Edge-casco; dat is het gevolg van het besluit. De 212 routes die alleen in het MANIFEST staan, zijn een bestaande spanning met WERELD.md:266. Die maakt deze stap zichtbaar en lost hij niet op (zie nietInDezeRonde).",
+   "hangtAfVan": [
+    "3"
+   ]
+  },
+  {
+   "nr": 14,
+   "titel": "Home op het wereldbureau overleeft een herstart van de Edge",
+   "doel": "Eerst de toets, die vandaag rood is. Na destroy() en start(document, window) verlaat een tik op Home het document op rtg.html (naar /apps/wereld.html), en herlaadt hij op wereld, kantoor en reizen. Oorzaak: het model begint bij elke start leeg (rtg-adaptive-edge.js:137, core.js:68-71) en de observer koppelt los (world-desktop-home.js:71-72).\n\nDaarna de uitvoering:\n- execute('home') stuurt een annuleerbare 'rtg-edge-home' vóór w.location.href = cfg.home (rtg-adaptive-edge.js:41). De naam begint letterlijk met 'rtg-', zodat kanalen() hem ziet.\n- world-desktop-home.js luistert op window, klapt het frame in of scrolt naar boven, en annuleert.\n- Alleen registerAction (:66-68) verdwijnt. Het label (:61-65) blijft aan de observer hangen.\n- Op de kaart gaat capability-register:s van world-desktop-home weg; de luisteraar komt er als citaat bij.",
+   "bestanden": [
+    "public/shared/rtg-adaptive-edge.js",
+    "public/shared/interface/world-desktop-home.js",
+    "test/world-desktop.e2e.js",
+    "scripts/edgekaart.js"
+   ],
+   "toetsen": [
+    "Herstartproef bij 1440x1050 op wereld, rtg, kantoor en reizen: destroy(), start(), een merkteken op window, een frame open, tik op Home. Het frame klapt in, het merkteken bestaat nog, en .wd-world-label staat er nog.",
+    "world-desktop.e2e.js:42 (label) en :86-93 (ingetypte tekst blijft) blijven groen."
+   ],
+   "mutaties": [
+    "Haal de luisteraar weg: de herstartproef zakt (Home navigeert).",
+    "Negeer defaultPrevented in execute: de herstartproef zakt.",
+    "Haal het label uit de observer: de labelbewering zakt."
+   ],
+   "registers": [
+    "EDGEKAART.json (levendeKanalen gaat van 13 naar 14 als merkteken in EDGE.md via getallen; in CLAUDE.md staat het als losse tekst)",
+    "registertrein (stap 0), met RTG_BOUW want world-desktop-home.js staat in interface/"
+   ],
+   "risico": "De bytes van de dispatch zijn vermoed (ongeveer 100 tot 110). rtg-adaptive-edge.js heeft 281 B ruimte (9959); met wc -c nagaan. Past het niet, dan gaat het in dezelfde wijziging als stap 18. Er verandert geen aria van de balkknoppen, want dit is geen onEdgeAction (input.js:29-34). Het bfcache-herstel blijft open.",
+   "hangtAfVan": [
+    "5"
+   ]
+  },
+  {
+   "nr": 15,
+   "titel": "Omhoog vegen op de landing en de sitepagina's vraagt eerst de host",
+   "doel": "Nu zet omhoog vegen de Edge op 'expanded' zonder de host te vragen (input.js:81-87), en renderSheet toont dan de kernlijst. Na deze stap roept de invoerlaag eerst execute('context') aan als de host onEdgeAction heeft. De landing (experience-edge.js:40) en de sitepagina's (storyline-edge.js:41) openen dan hun eigen paneel.\n\nDaarna verdwijnen experience-edge.js:41 (zeven allowed:false zonder reden, alleen om de defaults te onderdrukken) en :44-46. Op de kaart gaat capability-register:s van experience-edge.js weg.\n\n/ wordt per verzoek als scriptbundel samengesteld (gemeten door de tegenlezing), dus er valt niets opnieuw te bouwen.",
+   "bestanden": [
+    "public/shared/rtg-adaptive-edge-input.js",
+    "public/site/start/experience-edge.js",
+    "test/experience-rtg.e2e.js",
+    "scripts/edgekaart.js"
+   ],
+   "toetsen": [
+    "e2e bij 390x844: omhoog vegen op / toont de scènerijen en niet 'Voor deze context zijn geen veilige acties beschikbaar.'",
+    "Dezelfde proef op één pagina onder public/site/."
+   ],
+   "mutaties": [
+    "Zet de wijziging in input.js terug terwijl :44-46 weg blijven: de e2e zakt met de lege melding.",
+    "Zet de setProjection-regel terug: na stap 18 zakt de vormtoets."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "registertrein (stap 0)"
+   ],
+   "risico": "EDGEDEKKING ziet de landing niet, dus alleen de e2e bewijst dit. public/site/platform-edge.js heeft ook een onEdgeAction, maar ik vond geen enkele lader (vermoed dood). Hij staat niet in de e2e maar wel in nietInDezeRonde. Schermen zonder onEdgeAction houden hun huidige pad.",
+   "hangtAfVan": [
+    "5"
+   ]
+  },
+  {
+   "nr": 16,
+   "titel": "Sociaal: één declaratie, en elk scherm zegt zelf waar je bent",
+   "doel": "EERST meten, in de browser: hoeveel knoppen op comm.html openDeck openen. De dubbeling is afgeleid uit CSS en claimregels en nog niet gezien.\n\nDe negen sociale schermen laden adaptief.js, adaptief/grammatica.js en daarna adaptief/register.js. De grammatica moet vóór het register, omdat register.js:35 en :179 hem bij het laden lezen.\n\nsocial-intelligence-runtime.js:41-49 stopt met pollen en met registerAction. Hij declareert {id:'sociaal.context', naam:'Sociale context bekijken', telefoon/tablet/bureau:['paneel'], gewicht:'licht', effect:'lokaal', doe: openDeck}. Een herstel wordt niet verzonnen.\n\nElk scherm publiceert zelf een context met bron, titel en die id in acties:\n- sociaal-prive krijgt een eigen inline blok;\n- meet publiceert via meet/app.js (7065 B);\n- de andere zeven doen het in hun inline script.\n\n.rtg-intel-command krijgt data-rtg-action-key='sociaal.context'.\n\nTelregel: van de negen hebben alleen vonk, comm en meet een eigen hoofdactie (grep op data-hoofdactie). De zes andere publiceren als voertuig voor de declaratie en tellen NIET als bewijs voor ronde 2. De teller context-zelf stijgt daar door het mechanisme, en dat staat er zo bij.\n\nOp de kaart gaat de runtime van capability-register:s naar :l.",
+   "bestanden": [
+    "public/shared/social-intelligence-runtime.js",
+    "public/shared/social-intelligence.js",
+    "public/apps/{rendezvous,vonk,entourage,attenties,cercle,sociaal,comm,sociaal-prive,meet}.html",
+    "public/apps/meet/app.js",
+    "test/social-elite.test.js (:250-251)",
+    "test/sociaal-edge.e2e.js (nieuw)",
+    "scripts/edgekaart.js"
+   ],
+   "toetsen": [
+    "e2e op /apps/sociaal.html: een tik op 'Sociale context bekijken' in het Edge-blad gaat via RTGGewicht.voer (verklikker zoals in edgeblikveld.e2e.js stap 7 en 8).",
+    "e2e op /apps/comm.html: precies 1 knop opent openDeck, maar alleen als de voormeting er 2 liet zien.",
+    "Herstartproef: na destroy()/start() staat de handeling er nog.",
+    "social-elite.test.js gaat van een regex op registerAction naar declareer plus data-rtg-action-key."
+   ],
+   "mutaties": [
+    "Haal data-rtg-action-key weg: de telling op comm.html zakt naar 2. Dat geldt alleen als de voormeting de dubbeling liet zien; anders valt deze mutatie af, met die reden erbij.",
+    "Draai de laadvolgorde om, met een verhinderde stand in context().staat: de verhindering valt stil uit voorNu (register.js:179) en de toets zakt.",
+    "Zet registerAction terug in de runtime: na stap 18 zakt de vormtoets."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "EDGEDEKKING.json (edge-compat van 1983 naar 1974; RTGAdaptief van 10 naar 19)",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Er komt laadwerk bij per scherm, en de lader trekt dan ook de gewichtlaag mee (loader.js:23-35). De bytes per schermscript zijn niet gemeten, behalve meet/kamer.js (10183, dus niet gebruiken). Publiceert de gedeelde runtime de context, dan is dat een verzonnen producent; daarom gebeurt het per scherm.",
+   "hangtAfVan": [
+    "1",
+    "5",
+    "6"
+   ]
+  },
+  {
+   "nr": 17,
+   "titel": "De lijst van de kern uit het blad (volgens K-bladlijst)",
+   "doel": "Bij K-bladlijst D1:\n- renderSheet (rtg-adaptive-edge.js:51-67) tekent geen lijst van de kern meer, en de lege melding (:62-65) staat niet meer boven een gevulde lijst;\n- de aanroep K.defaults (:138) verdwijnt;\n- de registratie op signals.js:9 verdwijnt; setPresence (:10-12) blijft;\n- de CSS-klasse rtg-adaptive-sheet-action blijft, want de controls gebruiken hem (controls.js:75 en :89).\n\nDaarmee verdwijnen de dode 'Bekijk actuele status' (:47), 'Open Connect' dat het menu opent (:48) en de 'primary' die zichzelf heropent (:34-36).\n\nAlle zeven default-ids bestaan als balkknop in SPECS (in het geheugen nagerekend door de tegenlezing), dus er wordt niets verborgen. Op de kaart gaat capability-register:s van signals.js weg.",
+   "bestanden": [
+    "public/shared/rtg-adaptive-edge.js",
+    "public/shared/rtg-adaptive-edge-signals.js",
+    "test/rtg-adaptive-edge.test.js",
+    "test/rtg-adaptive-edge.e2e.js",
+    "scripts/edgekaart.js"
+   ],
+   "toetsen": [
+    "Unit: na start() is RTGAdaptiveEdgeCore.momentopname().acties leeg.",
+    "e2e op een casco-scherm: in het uitgeklapte blad staan geen knoppen met data-rtg-adaptive-action, de verhuisde hoofdactie staat er één keer, en er staat geen 'geen veilige acties' boven een gevulde lijst.",
+    "rtg-adaptive-edge.test.js:86-94 wordt een afwezigheidstoets."
+   ],
+   "mutaties": [
+    "Zet de aanroep K.defaults terug: de unittoets zakt.",
+    "Zet de registratie in signals.js terug: de unittoets zakt (acties bevat primary)."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "EDGEDEKKING.json (edge-compat naar 0)",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Zichtbaar: zes snelkoppelingen verdwijnen uit het blad. Daarom hangt dit aan een besluit van de eigenaar. Bij D2 komt er een vaste tabel naast SPECS in plaats van weghalen. Bij 'laten' vervalt stap 18.",
+   "hangtAfVan": [
+    "14",
+    "15",
+    "16",
+    "K-bladlijst"
+   ]
+  },
+  {
+   "nr": 18,
+   "titel": "Het kernregister weg, met een vormtoets die zijn terugkeer tegenhoudt",
+   "doel": "Wat verdwijnt:\n- uit core: register, voer, setProjection, actions, project, allowed, defaults, en registry en projections uit model(); acties uit momentopname();\n- uit rtg-adaptive-edge.js: registerAction, setProjection en de custom-tak (:39-40);\n- uit blikveld.js: de edge-compat-lus (:134-142).\nDe bak edge-compat blijft in HERKOMSTEN (edgedekking.js:441) als zichtbare nul.\n\nEr komt geen tand op het aantal: de vormtoets maakt de API zelf onmogelijk.\n\nIn EDGE.md komt de gemeten opbouw: vijf producenten en 1983 = 273x7 + 9x8. De tekst over 'de drie schermen' verdwijnt op :190, :568 (par. 9, punt 24), :613 en uit par. 0 en 11.",
+   "bestanden": [
+    "public/shared/rtg-adaptive-edge-core.js",
+    "public/shared/rtg-adaptive-edge.js",
+    "public/shared/edge/blikveld.js",
+    "scripts/edgekaart.js (citaten :125, :127-132, :278 en WAAROM :318)",
+    "test/rtg-adaptive-edge.test.js",
+    "test/edgeblikveld.test.js",
+    "test/edgeblikveld.e2e.js",
+    "test/edgekaart.test.js",
+    "test/edgeregister-leeg.test.js (nieuw)",
+    "EDGE.md"
+   ],
+   "toetsen": [
+    "Vormtoets: registerAction, setProjection en register bestaan niet op RTGAdaptiveEdge en RTGAdaptiveEdgeCore. De workspace-broker valt er met naam buiten.",
+    "De afgeleide controle 1 uit stap 5 staat op 0.",
+    "edgeblikveld.test.js houdt een nep-core MET acties en beweert dat lees().acties geen edge-compat bevat.",
+    "Aangepast: rtg-adaptive-edge.test.js:27-94, edgeblikveld.test.js:85 en :166-186, en edgeblikveld.e2e.js stap 8 (:219-237) plus de kop op :23-25 en :37-38.",
+    "world-desktop.e2e.js:86-93 blijft groen."
+   ],
+   "mutaties": [
+    "Exporteer registerAction opnieuw: de vormtoets zakt.",
+    "Zet de edge-compat-lus terug in het blikveld: edgeblikveld.test.js zakt.",
+    "Laat world-desktop-home.js weer registerAction aanroepen: de TypeError valt in de .catch (:76-80), het bureau breekt af, en world-desktop.e2e.js zakt."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "EDGEDEKKING.json (edge-compat 0)",
+    "getallen",
+    "registertrein (stap 0)"
+   ],
+   "risico": "edgeDubbeleEigenaars daalt hier niet. capability-register houdt register.js als schrijver en adaptief.js en controls.js als beslissers (registerrapport, doorgerekend). De kern wordt ongeveer 2 kB kleiner.",
+   "hangtAfVan": [
+    "14",
+    "15",
+    "16",
+    "17"
+   ]
+  },
+  {
+   "nr": 19,
+   "titel": "register.js zuiver afsplitsen",
+   "doel": "register.js heeft 33 B ruimte (10207). Er wordt een deel afgesplitst in een nieuw bestand, als zuivere verhuizing, met een scripttag in de vijf HTML-bestanden die register.js laden: office, app, bestanden, reizen-veilig en reizen. Er verandert geen gedrag.",
+   "bestanden": [
+    "public/shared/adaptief/register.js",
+    "public/shared/adaptief/<afgesplitst deel>.js (naam op bezetting nagezocht)",
+    "public/apps/{office,app,bestanden,reizen-veilig,reizen}.html",
+    "public/sw.js (SHELL, via build)"
+   ],
+   "toetsen": [
+    "Alle bestaande toetsen van register en adaptief blijven groen.",
+    "Bronscan: de vijf HTML-bestanden laden beide delen, in de juiste volgorde.",
+    "check.js regel 13 is groen."
+   ],
+   "mutaties": [
+    "Haal de nieuwe scripttag weg op reizen-veilig: de bronscan zakt, en de context-e2e van reizen-veilig ook."
+   ],
+   "registers": [
+    "registertrein (stap 0), met build, websitebeelden en taalbewijs want app.html verandert"
+   ],
+   "risico": "Het raakt alle vijf de schermen die register.js laden.",
+   "hangtAfVan": [
+    "0"
+   ]
+  },
+  {
+   "nr": 20,
+   "titel": "Eén objectpoort, 'objectverwijzing', vóór de eerste producent",
+   "doel": "schoneVerwijzing (rtg-schil/06b-objecten.js:180-192) verhuist naar één klein gedeeld bestand. De naam 'objectverwijzing' komt in de repo 0 keer voor; 'verwijzing' zelf staat in 134 bestanden, onder meer in de zorgketen.\n\nWie het gebruikt:\n- 06b-objecten.js en 07-start.js:35 (de bundel rtg-schil.js; commandDelen in build.js:106-110, dus RTG_BOUW en BUNDELS.md);\n- register.js:128;\n- blikveld.js:148, dat alleen de verwijzing kopieert.\n\nHet laadt vóór register.js op de vijf schermen en vóór rtg-schil.js in werkruimte.html.\n\nHet gedrag is AFKAPPEN, zoals vandaag: soort tot 32 tekens, id tot 64, label tot 120, hooguit 8 velden. Een object zonder id geeft in het blikveld een leeg veld met reden.",
+   "bestanden": [
+    "public/shared/objectverwijzing.js (nieuw)",
+    "public/shared/rtg-schil/06b-objecten.js",
+    "public/shared/rtg-schil.js (bundel)",
+    "public/shared/adaptief/register.js (of het afgesplitste deel)",
+    "public/shared/edge/blikveld.js",
+    "public/apps/werkruimte.html en de vijf HTML-bestanden uit stap 19",
+    "test/edgecontext.test.js (:50)",
+    "test/edgeblikveld.e2e.js (:108)",
+    "test/edgeblikveld.test.js (:101)"
+   ],
+   "toetsen": [
+    "Unit: een dossier met velden op het hoogste niveau (naam, adres) geeft alleen soort, id, label en velden.",
+    "Unit: 20 velden in o.velden geeft er 8.",
+    "Unit: zonder id komt er null met reden.",
+    "De drie bestaande vormtoetsen zijn bijgewerkt naar de verwijzingsvorm.",
+    "werkruimte-objecten.e2e.js blijft groen.",
+    "check.js regel 6 en regel 13 zijn groen."
+   ],
+   "mutaties": [
+    "Omzeil de poort in register.js: de dossiertoets zakt.",
+    "Verhoog de veldgrens naar 20: de unittoets zakt.",
+    "Laad de poort na rtg-schil.js in werkruimte.html: werkruimte-objecten.e2e.js zakt."
+   ],
+   "registers": [
+    "EDGEKAART.json (de poort als enige beslisser over de objectvorm; vooraf in het geheugen narekenen)",
+    "BUNDELS.md",
+    "RTG_BOUW",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Afkappen in plaats van weigeren houdt de werkruimte gelijk. Een object met label '' en velden {} is nu de vorm, en drie toetsen bewegen mee. De brug (brug.js:93) gaat ook door de poort.",
+   "hangtAfVan": [
+    "1",
+    "19"
+   ]
+  },
+  {
+   "nr": 21,
+   "titel": "De eerste objecten: een document in Office en een bestand in Bestanden, bewezen met een e2e",
+   "doel": "office/adaptief.js:189-193 en bestanden/adaptief.js:152-161 publiceren al een context bij een open document of bestand. Ze krijgen er een verwijzing {soort:'document'|'bestand', id, label} bij.\n\nHet bewijs is een e2e waarin de toets met zijn EIGEN lid via de gewone route een document en een bestand aanmaakt en opent. Een seed-object kan niet: de meter maakt per ronde een vers lid aan (edgedekking.js:221-226), en Office opent alleen via een POST op de sleutel van dat lid (office/app.js:77-78 en :348; de URL kent alleen werk en bedrijf, :34-36).\n\nIn EDGEDEKKING verklaren beide schermen object als 'na-openen' met reden (stap 2). De meter blijft een lezer die niets aanklikt, en er wordt geen stijging van een tand beloofd.",
+   "bestanden": [
+    "public/apps/office/adaptief.js",
+    "public/apps/bestanden/adaptief.js",
+    "public/apps/office.html en public/apps/bestanden.html (na-openen-verklaring)",
+    "test/edgeobject.e2e.js (nieuw)"
+   ],
+   "toetsen": [
+    "e2e: het object in het blikveld is precies de verwijzing en draagt geen inhoud.",
+    "EDGEDEKKING: object staat op 'na-openen' met reden op beide schermen."
+   ],
+   "mutaties": [
+    "Zet de inhoud in het object en omzeil de poort: de e2e zakt.",
+    "Haal de na-openen-verklaring weg: de meter geeft 'nee'."
+   ],
+   "registers": [
+    "EDGEDEKKING.json",
+    "registertrein (stap 0)"
+   ],
+   "risico": "office/adaptief.js heeft 151 B ruimte (10089). Of de verwijzing daarin past, is vermoed en wordt met wc -c gemeten; anders eerst zuiver afsplitsen. bestanden/adaptief.js heeft 2378 B ruimte (7862).",
+   "hangtAfVan": [
+    "2",
+    "20"
+   ]
+  },
+  {
+   "nr": 22,
+   "titel": "second-screen-modules.js zuiver afsplitsen",
+   "doel": "second-screen-modules.js heeft 1 B ruimte (10239). De module 'Nu relevant' gaat als zuivere verhuizing naar een eigen bestand, met een scripttag in app.html. Er verandert geen gedrag.",
+   "bestanden": [
+    "public/shared/interface/second-screen-modules.js",
+    "public/shared/interface/<afgesplitst deel>.js",
+    "public/apps/app.html"
+   ],
+   "toetsen": [
+    "De bestaande Second Screen-toetsen (appmenu.e2e.js) blijven groen.",
+    "grammatica.test.js:255 (regex op de module) wordt verplaatst naar het nieuwe bestand en blijft matchen.",
+    "scripts/workspace-contract.js is groen."
+   ],
+   "mutaties": [
+    "Haal de nieuwe scripttag weg: de module 'context' ontbreekt en de toets zakt."
+   ],
+   "registers": [
+    "RTG_BOUW (interface/)",
+    "registertrein (stap 0), met build, websitebeelden en taalbewijs"
+   ],
+   "risico": "Laag, maar app.html verandert, dus de hele registertrein draait.",
+   "hangtAfVan": [
+    "0"
+   ]
+  },
+  {
+   "nr": 23,
+   "titel": "RTGWorkspaceContext leest het blikveld, zonder eigen staat, en krijgt een eerste lezer",
+   "doel": "get() geeft op het moment van vragen {op, velden:{wereld, context, object, activiteit}} uit RTGEdgeBlikveld.lees(). Herkomst, gezag en sinds blijven ongewijzigd, en er komt nooit 'autoritatief'. Zonder blikveld, of als het gooit, of als clean() weigert: {velden:null, reden}.\n\nWat verdwijnt:\n- current, set, refresh, subscribe, source en de ontdubbeling (workspace-context.js:13-21);\n- workspace-runtime.js:17, :22, :25 en :84;\n- context:{} (workspace-state.js:27);\n- het tweede render-argument (workspace-module-host.js:51, nul lezers gemeten);\n- second-screen.js:16.\n\nDe eerste lezer: 'Nu relevant' toont de titel uit ctx.context().velden.context bij herkomst 'scherm' OF 'blad', en niet bij 'edge-casco' of 'document'. Zo blijft in app.html de titel van het blad staan, want na stap 1 heet die 'blad'.\n\nOp de kaart gaat workspace-context.js van s/b naar l, en het citaat van second-screen.js:16 verdwijnt (edgekaart.js:243 en :246).",
+   "bestanden": [
+    "public/shared/interface/workspace-context.js",
+    "public/shared/interface/workspace-runtime.js",
+    "public/shared/interface/workspace-state.js",
+    "public/shared/interface/workspace-module-host.js",
+    "public/shared/interface/second-screen.js",
+    "public/shared/interface/<module Nu relevant uit stap 22>",
+    "test/workspace-context.test.js (nieuw)",
+    "test/edgeblikveld.e2e.js",
+    "test/world-desktop.e2e.js",
+    "scripts/edgekaart.js",
+    "EDGE.md (:160, :202-207)",
+    "RTG-WORKSPACE-RUNTIME.md (:140)"
+   ],
+   "toetsen": [
+    "Unit met een nagemaakt blikveld: get() is byte voor byte gelijk aan de vier velden van lees().",
+    "Unit: een tweede get() ziet een wijziging zonder refresh.",
+    "Unit: ontbrekend, gooiend of onveilig blikveld geeft velden:null met reden.",
+    "Bronscan: geen RTGAdaptief en geen setter in workspace-context.js.",
+    "e2e in app.html met reizen als open blad: 'Nu relevant' toont de titel van het blad.",
+    "e2e na stap 3 van edgeblikveld.e2e.js: de context en het object van de Second Screen zijn gelijk aan die van het blikveld.",
+    "e2e op /apps/reizen.html bij 1440 px: velden.wereld is {waarde:'travel', herkomst:'route'} zodra het blikveld er is."
+   ],
+   "mutaties": [
+    "Overschrijf de herkomst in get(): de gelijkheidstoets zakt.",
+    "Zet een cache terug: 'ziet een wijziging zonder refresh' zakt.",
+    "Val terug op RTGAdaptief.context(): de bronscan zakt.",
+    "Geef bij een gooiende clean() de oude kopie terug: de toets 'null met reden' zakt.",
+    "Toon de titel alleen bij 'scherm': de e2e in app.html zakt (de titel verdwijnt)."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "RTG_BOUW",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Per aanroep een volledige lees(); vermoed zijn het er ongeveer 6 per toepassen, en het weghalen van het render-argument beperkt dat. Wie in een opContext-luisteraar leest, kan sinds:null krijgen (gemeten); daar niet op sleutelen. vluchtige-context blijft dubbel, dus de teller beweegt niet.",
+   "hangtAfVan": [
+    "1",
+    "3",
+    "22"
+   ]
+  },
+  {
+   "nr": 24,
+   "titel": "Context zelf op schermen met een eigen hoofdactie: de regel, een schuldlijst en porties (volgens K-reikwijdte)",
+   "doel": "Besluit 11 (EDGE.md:524-528; contractNieuw, edgedekking.js:176-184) geldt nu alleen voor nieuwe schermen. Het wordt verbreed naar bestaande gemeten schermen met hoofdactie-herkomst scherm:data-hoofdactie, via een SCHULDLIJST in de meter die alleen mag krimpen.\n\nDe regel blijft die van besluit 11: een context via RTGAdaptief.context met een bron. Er is uitdrukkelijk GEEN eis dat de hoofdactie als capability in acties staat. De controls verhuizen de echte knop al zonder voorwaarde (controls.js:55-58, zelf gelezen), en een gedeclareerde kopie zou een tweede bron en een dubbele knop in het blad zijn.\n\nDe eerste portie komt uit de gemeten 51. Bestanden publiceert dan ook bij binnenkomst en niet alleen bij een open bestand. De omvang volgt uit K-reikwijdte en de verse noemer van stap 6.",
+   "bestanden": [
+    "scripts/edgedekking.js",
+    "test/edgenieuwscherm.test.js",
+    "per portie de schermscripts"
+   ],
+   "toetsen": [
+    "edgenieuwscherm.test.js: elk scherm met hoofdactie-herkomst scherm:data-hoofdactie dat niet op de schuldlijst staat, heeft een context met herkomst 'scherm'.",
+    "De schuldlijst mag niet groeien."
+   ],
+   "mutaties": [
+    "Zet een scherm terug op de schuldlijst: de toets zakt (de lijst groeit).",
+    "Haal de bron weg uit de publicatie van een scherm uit de portie: de toets zakt (het scherm staat niet op de lijst maar is niet zelf)."
+   ],
+   "registers": [
+    "EDGEDEKKING.json per portie (een volle meting; een deelmeting schrijft niets)",
+    "NORM.json (edgeVeldContextZelf stijgt en wordt vastgelegd)",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Per scherm komen er 3 scripts plus de gewichtlaag bij. De bytes per schermscript zijn niet gemeten: 42 van de 51 hebben een inline script, en defensie.js is volgens de tegenlezing 13054 B. 'Zelf' meet dat het scherm via de eigenaar spreekt, niet hoe rijk die context is.",
+   "hangtAfVan": [
+    "6",
+    "16",
+    "K-reikwijdte"
+   ]
+  },
+  {
+   "nr": 25,
+   "titel": "De Edge 1-vouwstand weghalen",
+   "doel": "Weg: body.rtg-edge-fold (rtg-edge-system.js:68 en :76-80, rtg-edge-system.css:100-102, rtg-edge-2-loader.js:7) en het citaat 'Edge 1-vouwstand' op de kaart.\n\nDe vouwstand leeft alleen als Edge 2 niet rendert (M4). In de laadwedloop blijft hij soms naast Edge 2 hangen, zonder zichtbaar effect (M5). Er is geen toets voor, en de casco laadt de lader van Edge 2 altijd (rtg-edge-system.js:33).",
+   "bestanden": [
+    "public/shared/rtg-edge-system.js",
+    "public/shared/rtg-edge-system.css",
+    "public/shared/rtg-edge-2-loader.js",
+    "scripts/edgekaart.js",
+    "test/rtg-edge-2.e2e.js"
+   ],
+   "toetsen": [
+    "Vormtoets: 'rtg-edge-fold' komt in public/shared niet meer voor.",
+    "rtg-edge-2.e2e.js blijft groen."
+   ],
+   "mutaties": [
+    "Zet de toggle van de klasse terug: de vormtoets zakt."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Rendert Edge 2 niet, dan vouwt de tweede menuklik niet meer; die terugval is vandaag niet beproefd. Het levert bytes op in rtg-edge-system.js (16 B ruimte, 10224).",
+   "hangtAfVan": [
+    "3"
+   ]
+  },
+  {
+   "nr": 26,
+   "titel": "Het casco als lezer van de context van het scherm (alleen bij K-casco optie b)",
+   "doel": "Begint met een meting en niet met bouwen:\n- welke 281 schermen hun casco-titel uit de catalogus halen (91, vermoed) en welke uit document.title (190);\n- wat de drie setContext-aanroepers zetten (rtg-schil.js:257, rtg-schil/03-surfaces.js:113, reizen-performance.js:63).\n\nDaarna wordt RTGEdge.active.ctx (rtg-edge-system.js:128) bij een schermcontext met bron AFGELEID uit RTGAdaptief.context(), en gaat de beslissing van de brug over het actieve blad (edgekaart.js:114) naar het register.\n\nPas samen kunnen die twee vluchtige-context van de lijst dubbele eigenaars halen. Dat is vermoed, uit het werkruimterapport.",
+   "bestanden": [
+    "public/shared/rtg-edge-system.js",
+    "public/shared/adaptief/brug.js",
+    "scripts/edgekaart.js",
+    "EDGE.md (:200-208)"
+   ],
+   "toetsen": [
+    "e2e: een scherm dat context publiceert, geeft in het casco dezelfde titel. Een scherm zonder publicatie houdt zijn casco-titel.",
+    "npm run edgekaart:controle: vluchtige-context heeft één eigenaar."
+   ],
+   "mutaties": [
+    "Laat het casco weer zijn eigen context houden naast de schermcontext: de e2e op de titelgelijkheid zakt.",
+    "Laat de beslissing van de brug staan: de kaart houdt twee beslissers."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "NORM.json (edgeDubbeleEigenaars daalt door echte samenvoeging)",
+    "registertrein (stap 0)"
+   ],
+   "risico": "rtg-edge-system.js heeft pas ruimte na stap 25. Dit raakt de titel van 281 schermen. Zonder de meting vooraf niet beginnen.",
+   "hangtAfVan": [
+    "23",
+    "25",
+    "K-casco"
+   ]
+  },
+  {
+   "nr": 27,
+   "titel": "Afsluiting: verse registers, eerlijke tekst en het oordeel van de keten",
+   "doel": "EDGEKAART.json en EDGEDEKKING.json worden op één commit vers gemaakt.\n\nIn EDGE.md par. 0, 1, 10 en 11 komen alleen gemeten getallen:\n- De zin van ronde 2 in par. 10 wordt volgens K-reikwijdte herschreven.\n- In de tabel van par. 11:\n  - 'home-actie' gaat dicht, met de herstartproef.\n  - 'gebaar' gaat dicht voor lang drukken, stil en 'scherp'. De borg volgt K-borg: bij optie 1 blijft hij open met ronde 3.\n  - 'vijf standmachines' wordt DEELS: de vouwstand is weg, de indeling klopt, en de flikkering en M6 zijn dicht, maar Edge 2, de balk en de lader blijven apart.\n- Nieuwe open gebreken met hun ronde:\n  - window.confirm in de workspace-broker (ronde 3);\n  - 'Nu relevant' via A.voorNu (ronde 3);\n  - het bfcache-herstel van het wereldbureau (open);\n  - platform-*.js, vermoed dood.\n\nCLAUDE.md draagt '13 levende kanalen' en 'nog 11' als losse tekst. Dat is het bestand van de gebruiker en wordt alleen met zijn akkoord bijgewerkt.\n\nDaarna npm run ci:lokaal en npm run registerklopt, en per poort zeggen wat groen staat en wat niet bevestigd is.",
+   "bestanden": [
+    "EDGE.md",
+    "EDGEKAART.json",
+    "EDGEDEKKING.json",
+    "NORM.json"
+   ],
+   "toetsen": [
+    "npm run edgekaart:controle",
+    "npm run norm",
+    "test/getallen.test.js",
+    "npm run registerklopt",
+    "npm run ci:lokaal"
+   ],
+   "mutaties": [
+    "Zet een met opzet verkeerd getal in een merkteken in EDGE.md: test/getallen.test.js zakt (bestaande zelfijking).",
+    "Zet EDGEKAART.json terug op de versie van vóór stap 18: edgekaart.test.js zakt."
+   ],
+   "registers": [
+    "EDGEKAART.json",
+    "EDGEDEKKING.json",
+    "NORM.json",
+    "getallen",
+    "registertrein (stap 0)"
+   ],
+   "risico": "Hier ligt de verleiding om een daling van de dubbele eigenaars of een samengesteld dekkingscijfer te boeken. Het plan belooft geen van beide: de teller staat eerlijk op 12 (vermoed) tenzij K-casco optie b hem echt laat zakken.",
+   "hangtAfVan": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+    "25"
+   ]
+  }
+ ],
+ "keuzes": [
+  {
+   "id": "K-reikwijdte",
+   "vraag": "Wat moet ronde 2 bewijzen met 'elk scherm publiceert wereld en context' (EDGE.md:613)?",
+   "soort": "besluit-eigenaar",
+   "opties": [
+    {
+     "label": "Wereld 'heeft' en klopt met MAPPEN; context zelf op schermen met een eigen hoofdactie, via een schuldlijst die krimpt (aanbevolen)",
+     "betekent": "Wereld telt nooit als 'zelf'. Voor de 82 gedeelde routes moet hij kloppen met MAPPEN. Besluit 11 geldt ook voor bestaande schermen met een eigen hoofdactie. Ronde 2 staat als de regel, de meter en de eerste portie staan. Het contextdeel heet 'gedeeltelijk' tot de schuldlijst leeg is. De zin in par. 10 wordt: 'elk scherm heeft een wereld die met de eigenaar klopt, en elk scherm met een eigen hoofdactie publiceert zijn context zelf'.",
+     "kost": "Eén zin in EDGE.md, een schuldlijst in de meter, en per portie 3 scripts per scherm. De noemer komt uit de verse meting: 51 gemeten plus 7 via de padtabel, tegen 68 in de bron."
+    },
+    {
+     "label": "Hetzelfde, maar ronde 2 staat pas als de schuldlijst leeg is",
+     "betekent": "Ronde 2 eindigt pas als elk scherm met een eigen hoofdactie zijn context zelf publiceert.",
+     "kost": "Alle schermen uit de noemer (51 tot 68) in deze ronde, met het laadwerk en de bytes per scherm. De bytes zijn nog niet gemeten."
+    },
+    {
+     "label": "Besluit 11 alleen voor nieuwe schermen laten gelden",
+     "betekent": "Ronde 2 bewijst context-zelf alleen op wat hij zelf aanraakt: sociaal, Office en Bestanden, plus elk nieuw scherm.",
+     "kost": "Het criterium wordt smal. De 51 bestaande schermen met handelingen blijven bij de titel van het casco, zonder schuld die krimpt."
+    }
+   ],
+   "aanbevolen": "Wereld 'heeft' en klopt met MAPPEN; context zelf op schermen met een eigen hoofdactie, via een schuldlijst die krimpt (aanbevolen)",
+   "waarom": "De letterlijke lezing is voor wereld alleen met een instrumenttruc te halen. data-rtg-world is een gebakken kopie van het MANIFEST (heritage-uitrol.js:72-88), en een omgedraaide volgorde in wereld() laat wereld-zelf van 0 naar ongeveer 281 springen zonder nieuwe informatie (vm-mutatie, contractrapport). Dat botst met WERELDEN.md:95-96 en LAT regel 4. Voor context zet besluit 11 de regel al. De vraag is alleen hoe ver ronde 2 hem doortrekt, en dat bepaalt de omvang van de ronde."
+  },
+  {
+   "id": "K-casco",
+   "vraag": "Wordt het casco in ronde 2 een LEZER van de context van het scherm, of later? EDGE.md:207 zegt 'Samenvoegen is ronde 2', terwijl het criterium in par. 10 het niet noemt.",
+   "soort": "besluit-eigenaar",
+   "opties": [
+    {
+     "label": "Later, als eigen stap met eigen meting; EDGE.md:207 zegt dat (aanbevolen)",
+     "betekent": "Ronde 2 laat de twee contextmodellen naast elkaar staan en maakt RTGWorkspaceContext een lezer (stap 23). EDGE.md:207 krijgt 'na ronde 2'.",
+     "kost": "De enige echte samenvoeging die de lijst dubbele eigenaars korter maakt, wacht. In ronde 2 daalt de teller niet; hij stijgt eerlijk naar 12 (vermoed)."
+    },
+    {
+     "label": "In ronde 2, als laatste stap (stap 26)",
+     "betekent": "RTGEdge.active.ctx wordt afgeleid uit de schermcontext, en de beslissing van de brug gaat naar het register. Vermoed is dat vluchtige-context dan van de lijst gaat.",
+     "kost": "Het raakt de titel van 281 schermen. rtg-edge-system.js heeft pas ruimte na het weghalen van de vouwstand. Er zijn drie setContext-aanroepers. De ronde wordt langer en begint met een meting."
+    }
+   ],
+   "aanbevolen": "Later, als eigen stap met eigen meting; EDGE.md:207 zegt dat (aanbevolen)",
+   "waarom": "Het plan schoof dit zonder besluit door, en de tegenlezing wees dat terecht aan (EDGE.md:207, zelf gelezen). Ik raad later aan, zodat een daling van de teller aan echte samenvoeging wordt toegeschreven en niet vermengd raakt met de eerlijke stijging door stap 3. Ronde 2 levert zijn bewijs ook zonder deze stap."
+  },
+  {
+   "id": "K-bladlijst",
+   "vraag": "Mag de lijst van de Edge-kern uit het uitgeklapte blad verdwijnen (de zes snelkoppelingen: Volgende stap, Uw werelden, Bekijk actuele status en andere)?",
+   "soort": "besluit-eigenaar",
+   "opties": [
+    {
+     "label": "Weg: de controls zijn de ene lijst in het blad (D1, aanbevolen)",
+     "betekent": "Het blad toont RTGAdaptief, de geoogste knoppen en de verhuisde hoofdactie. De dode 'Bekijk actuele status' (rtg-adaptive-edge.js:47), 'Open Connect' dat het menu opent (:48) en de 'primary' die zichzelf heropent (:34-36) verdwijnen.",
+     "kost": "Zes snelkoppelingen verdwijnen uit het blad. Alle zeven ids bestaan als balkknop in SPECS (in het geheugen nagerekend door de tegenlezing), dus er wordt niets verborgen. edge-compat gaat naar 0."
+    },
+    {
+     "label": "Een vaste tabel naast SPECS, buiten het register (D2)",
+     "betekent": "De woordenlijst blijft zichtbaar in het blad, zonder run of allowed, en zonder presence en connect.",
+     "kost": "Twee tabellen over dezelfde ids: een kleine tweede lijst binnen de vormlaag."
+    },
+    {
+     "label": "Laten zoals het is",
+     "betekent": "De defaults blijven in het register.",
+     "kost": "Het register wordt niet leeg (stap 18 vervalt), en drie dode of misleidende knoppen blijven."
+    }
+   ],
+   "aanbevolen": "Weg: de controls zijn de ene lijst in het blad (D1, aanbevolen)",
+   "waarom": "1974 van de 1983 edge-compat-regels zijn deze defaults (273x7, gemeten). Het is de woordenlijst van de Edge en geen capability van een scherm. Het is wel een zichtbare verandering voor de gebruiker, en CLAUDE.md vraagt dan om te laten zien wat er verandert voordat het gebeurt."
+  },
+  {
+   "id": "K-borg",
+   "vraag": "Welke trap uit de gewichtsgrammatica is de borg van gebaar (een regelactie die niet terug kan, nu 800 ms vasthouden)?",
+   "soort": "besluit-eigenaar",
+   "opties": [
+    {
+     "label": "'bewust', uitgevoerd in ronde 3 langs RTGGewicht.voer; in ronde 2 alleen het gedrag vastpinnen (aanbevolen)",
+     "betekent": "Volgt GRAMMATICA.md:191: 'voorgoed weg, met alle versies -- dat is bewust'. Dat is een vraag met inhoud, geen vasthouden. BORGTIJD 800 blijft in ronde 2 staan, met reden op de kaart als gewicht:b. De toets van stap 7 dicht de onveilige kant nu al.",
+     "kost": "De rij in par. 11 blijft voor de borg open, met ronde 3. Later komt de gewichtlaag op vijf gebaarschermen erbij, en een zichtbaar andere bevestiging."
+    },
+    {
+     "label": "De vasthoudbeweging van 'zwaar' zonder reden: de borg leest VASTHOUD.zwaar (900)",
+     "betekent": "De tijd komt in ronde 2 uit de tabel. De afwijking wordt uitgeschreven in GRAMMATICA.md: gewicht bewust, beweging vasthouden.",
+     "kost": "VASTHOUD krijgt een gebruik buiten zijn trap (grammatica.js:76-81 zegt 'per trap'). De borg wordt 100 ms langer. De keuring 'zwaarzonder' (grammatica.js:69) moet weten dat dit bewust zo is."
+    },
+    {
+     "label": "Een eigen sleutel in DREMPELS",
+     "betekent": "De borg is een eigen gebaar met een eigen tijd in de tabel.",
+     "kost": "Een tweede tabel met vasthoudtijden naast VASTHOUD: een tweede bevestigingsschaal."
+    }
+   ],
+   "aanbevolen": "'bewust', uitgevoerd in ronde 3 langs RTGGewicht.voer; in ronde 2 alleen het gedrag vastpinnen (aanbevolen)",
+   "waarom": "Het plan beantwoordde deze vraag stil door VASTHOUD.zwaar te lenen. Maar zwaar eist een reden (grammatica.js:69-72), en GRAMMATICA.md noemt een onomkeerbare verwijdering bewust. Gewicht is de enige gewichtsschaal. Ronde 3 is de ronde van 'gewicht afgedwongen', dus daar hoort de trap. Het veiligheidsgebrek (een borg die op een tik afgaat zonder dat een toets zakt) wordt in stap 7 hoe dan ook gedicht."
+  }
+ ],
+ "nietInDezeRonde": [
+  {
+   "wat": "Eén zichtbaarheidsmachine voor Edge 2 en de adaptieve balk (optie F uit het standenrapport)",
+   "waarom": "EDGE.md par. 12: geen visueel herontwerp in deze ronde. rtg-edge-2.js heeft 25 B ruimte en rtg-edge-2.css (44 KB) is op drie standen gebouwd. De machines beheren aantoonbaar verschillende elementen. Daarom heet 'vijf standmachines' na ronde 2 'deels'."
+  },
+  {
+   "wat": "De ruststand van de balk als Edge 2 compact staat: peek in plaats van dock (optie B uit het standenrapport)",
+   "waarom": "Een zichtbare gedragswijziging op telefoonmaat die grenst aan par. 12. Stap 12 lost de flikkering op zonder deze keuze."
+  },
+  {
+   "wat": "De kaart per machinefamilie tellen in plaats van per bestand",
+   "waarom": "Een andere telregel is zelf een herindeling. Niet tijdens een ronde die zijn getallen als bewijs gebruikt; eerst een besluit met een notitie."
+  },
+  {
+   "wat": "De window.confirm in de workspace-broker (second-screen.js:21, workspace-broker.js:71-74; ritmonitoring met deelLocatie)",
+   "waarom": "Een apart actieregister met manifest, permission en audit, en geen Edge-kernregister. Het hoort bij ronde 3 (gewicht afgedwongen). Het komt als open gebrek in par. 11; de bereikbaarheid is vermoed."
+  },
+  {
+   "wat": "'Nu relevant' laten lezen uit RTGEdgeBlikveld.acties() in plaats van A.voorNu() (second-screen-modules.js:61-62 en :78)",
+   "waarom": "Het verschil, een AFWEZIGE handeling die aangeboden blijft, wordt pas bereikbaar met een serveroordeel in ronde 3. Het komt als open gebrek in de tabel."
+  },
+  {
+   "wat": "Producenten van activiteit",
+   "waarom": "Activiteit blijft een veld dat het scherm over zichzelf zegt (EDGE.md par. 2, :229). Wat er loopt, hoort volgens EDGE.md:557 in ronde 4 en in een domein, niet in de Edge. Ronde 2 laat het veld leeg met reden."
+  },
+  {
+   "wat": "De borg van gebaar langs RTGGewicht.voer (alleen bij K-borg optie 1)",
+   "waarom": "Dat vraagt de gewichtlaag op vijf gebaarschermen en een zichtbaar andere bevestiging. Het is de ronde van 'gewicht afgedwongen' (ronde 3)."
+  },
+  {
+   "wat": "Het gedeelde deel van het MANIFEST afleiden uit MAPPEN, en de 212 routes die alleen in het MANIFEST staan tegen WERELD.md:266 leggen",
+   "waarom": "Stap 13 toetst eerst of de twee het eens zijn. Wie afleidt terwijl er nog een tegenspraak is, kopieert een fout. Of het MANIFEST voor schermen zonder eigen deur een uitgeschreven uitzondering is, is een apart besluit."
+  },
+  {
+   "wat": "De drie andere lijsten met een wereld per pad (RTGEdgeWorlds 104 items, randen.js:57-62 met 22 paden, world-widget-catalog.json) afleiden uit de eigenaar",
+   "waarom": "Pas nadat stap 13 de twee eigenaren gelijk heeft gezet."
+  },
+  {
+   "wat": "RICHTING 8 en STIL 6 (gebaar-02.js:9-11) en de marge van 8 px per as tegenover Manhattan (gebaar-03b.js:28, input.js:68)",
+   "waarom": "Andere gebaren, die eerst een eigen meting nodig hebben. Zolang ze blijven, is gebaar-02.js eerlijk een tweede beslisser over gebaar-drempel en staat de teller op 12 (vermoed)."
+  },
+  {
+   "wat": "Tanden op object-zelf en activiteit-zelf",
+   "waarom": "Ze staan op 0 en kunnen in deze ronde niet zakken; object wordt met een e2e bewezen en niet door de meter. Een tand die niet kan uitslaan, is geen instrument."
+  },
+  {
+   "wat": "De browsermeter in een nachtelijke CI-workflow",
+   "waarom": "Dat is de enige manier om een regressie van context-zelf bij een codewijziging in CI te vangen. Het kost CI-tijd en een workflow en kan later zonder dat er iets hoeft te worden teruggedraaid. Tot die tijd heet de tand van stap 6 een tweede sleutel en geen handhaver."
+  },
+  {
+   "wat": "public/site/platform-*.js opruimen",
+   "waarom": "Ik vond geen enkele lader: alleen check.js:4743 noemt platform-shell.css, in een lijst met afrondingen. Dat de bestanden dood zijn, is vermoed. Verwijderen is een eigen opruimstap met een meting."
+  },
+  {
+   "wat": "Modulefouten van de werkruimte naar een diagnose (o.error)",
+   "waarom": "EDGE.md par. 11 zet dit op 'besluit': de foutmelder heeft een budget van 3 en een deur zonder inlog."
+  },
+  {
+   "wat": "Het bfcache-herstel van het wereldbureau (pagehide breekt de runtime af, pageshow bouwt niets op; world-desktop-home.js:74)",
+   "waarom": "Headless niet te laten optreden: het werd een verse load. Het blijft open tot er een meting in een echte browser is."
+  },
+  {
+   "wat": "Het casco als lezer (alleen bij K-casco optie a)",
+   "waarom": "Dan is dat de eerste stap na ronde 2, met een eigen meting van de 281 casco-titels en de drie setContext-aanroepers. EDGE.md:207 wordt daarop aangepast."
+  }
+ ],
+ "bewijsVanRonde": "Ronde 1 maakte het tweede register LICHT, sloot de dode kanalen, liet zes herkenners DREMPELS lezen en maakte de hoofdactie van een blad zichtbaar voor de schil. Ronde 2 bewijst daarbovenop het volgende.\n\n(1) 'ZELF' KOMT ALLEEN NOG VAN EEN SCHERM.\n- Elk van de negen velden heeft een gesloten lijst, met een volledigheidstoets.\n- De tandenproef: 'route' toevoegen aan de lijst voor wereld laat de toets zakken.\n- De robuustheidsproef: een omgedraaide volgorde in wereld() beweegt 'zelf' niet. Die vangt de bestaande volgordetoets.\n- In de schil draagt alles wat uit een blad komt het etiket 'blad'.\n- Wat de tand op context-zelf NIET is: een CI-handhaver. Hij is een tweede sleutel na --aanvaard. De eerste sleutel, achteruitgang(), bestond al.\n\n(2) DE EDGE HEEFT ÉÉN HANDELINGSREGISTER.\n- registerAction, register en setProjection bestaan niet meer, en een vormtoets houdt hun terugkeer tegen.\n- De afgeleide aanroeperscontrole staat op 0.\n- Een verse meting geeft edge-compat 0.\n- Dit geldt alleen als K-bladlijst niet 'laten' wordt.\n\n(3) HOME OVERLEEFT EEN HERSTART.\nOp een wereldbureau overleeft Home een herstart van de Edge, en het wereldlabel blijft staan. Vandaag is dat rood op rtg.html.\n\n(4) RTGWORKSPACECONTEXT IS EEN PROJECTIE ZONDER EIGEN STAAT.\n- Hij is byte voor byte gelijk aan het blikveld.\n- Hij ziet een wijziging zonder refresh.\n- Bij een fout geeft hij null met reden.\n- Hij heeft een eerste lezer: 'Nu relevant' toont in app.html de titel van het blad zoals vandaag.\n\n(5) WERELD KLOPT OP DE GEDEELDE ROUTES.\n- Voor de 82 routes die het MANIFEST en MAPPEN delen, zijn ze het eens (plus data-world-home op de zes bureaus). Elke uitzondering draagt haar reden.\n- Vrienden staat weer waar het besluit van 7 september hem zette.\n- De 212 routes die alleen in het MANIFEST staan, zijn met naam genoemd en NIET door een tweede eigenaar bewezen.\n\n(6) GEBAAR LEEST DE GRAMMATICA.\n- gebaar leest DREMPELS.lang en .stil en brengt de grammatica zelf mee (de blad-e2e op notities).\n- 'scherp' vervalt na herbevestig.\n- Een borg met aanwijzer of vinger kan niet op een tik afgaan. In ronde 1 bleef de mutatie BORGTIJD=1 groen.\n- De trap van de borg volgt K-borg.\n\n(7) EDGE 2 EN DE BALK.\n- Een handmatige keuze voor Edge 2 overleeft een hashwissel in Work.\n- De balk flikkert niet bij programmatisch scrollen.\n- De landing houdt haar gedrag.\n\n(8) HET EERSTE OBJECT GAAT DOOR ÉÉN POORT.\nHet eerste object dat een scherm publiceert, gaat door één afkappende poort. Een dossier komt er aantoonbaar niet door. Dat is bewezen met een e2e en niet met de meter.\n\nWAT RONDE 2 MET OPZET NIET BEWIJST:\n- Dat edgeDubbeleEigenaars daalt. De teller stijgt eerlijk naar 12 (vermoed, eerst narekenen), omdat de kaart gebaar-02.js als tweede eigenaar van gebaar-drempel gaat zien. Dalen kan alleen door echte samenvoeging (K-casco optie b).\n- Dat activiteit gevuld is. Het veld blijft leeg met reden; volgens EDGE.md:557 hoort het in ronde 4, in een domein.\n- Dat EDGEDEKKING een object meet. De meter zegt eerlijk 'na-openen'.\n- Dat de landing en de wereldbureaus in EDGEDEKKING staan. Alleen hun eigen e2e's bewijzen die.\n- Dat de vijf standmachines één zijn. Dat heet 'deels'.\n- Dat elk scherm met een hoofdactie zijn context zelf publiceert. Dat hangt af van K-reikwijdte, en tot de schuldlijst leeg is, heet dat deel 'gedeeltelijk'.",
+ "besluitenEigenaar": {
+  "K-reikwijdte": "Regel + schuldlijst: wereld telt nooit als zelf en moet kloppen met MAPPEN op de gedeelde routes; context zelf op schermen met een eigen hoofdactie via een schuldlijst die alleen krimpt; ronde 2 staat als regel, meter en eerste portie staan, het contextdeel heet gedeeltelijk tot de lijst leeg is.",
+  "K-casco": "Later, als eigen stap met eigen meting. Stap 26 vervalt. EDGE.md:207 krijgt na ronde 2.",
+  "K-bladlijst": "Weg: de controls zijn de ene lijst in het blad (D1).",
+  "K-borg": "bewust, uitgevoerd in ronde 3 langs RTGGewicht.voer; in ronde 2 alleen het gedrag vastpinnen en het lek dichten (BORGTIJD 800 blijft staan, met reden op de kaart)."
+ },
+ "datumBesluiten": "2026-09-23"
+}

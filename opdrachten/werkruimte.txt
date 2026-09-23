@@ -1,0 +1,75 @@
+Je bouwt één spoor van ronde 2 van RTG Edge 3.0 in de repository RahulRTG/nieuwe-rtg-website (Nederlandstalige codebase). Er draaien tegelijk andere cloudsessies op andere sporen; een ouder-sessie voegt alle sporen samen in PR #346 (tak claude/app-navigation-buttons-l6yubp).
+
+BASIS EN TAK. Je kloon staat op commit f5fa7e56 van claude/app-navigation-buttons-l6yubp (ronde 1, de merge met main, en ronde 2 stap 1-5: de meter telt 'zelf' per veld en de Edge-kaart heeft het rijformaat [rol, etiket, wat, citaat] met drie afgeleide controles). Werk en push UITSLUITEND op je eigen tak (de outcome-tak van deze sessie, claude/edge-r2-<spoor>). Maak GEEN pull request, abonneer je niet op PR-activiteit, en push nooit naar een andere tak. Als node_modules ontbreekt: npm ci. Chromium staat klaar (PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers); niet installeren.
+
+WAT JE LEEST. Lees vóór je begint EDGE.md (vooral par. 1, 2, 6, 7, 10 en 11), GRAMMATICA.md, LAT.md, en de kop van scripts/edgekaart.js (het rijformaat, keur(): elk citaat hangt aan een etiket in zijn rij en elk s/b-etiket heeft een citaat dat het draagt; de afgeleide controles: wie registerAction aanroept op de Edge-kern, wie data-rtg-world op body zet en wie data-rtg-edge-2-state op body zet, moet op de kaart staan). Een producent die stopt met registerAction verliest IN DEZELFDE STAP zijn capability-register:s-etiket en het citaat, anders zakt keur of de afgeleide controle.
+
+BESLUITEN VAN DE EIGENAAR (23 september 2026), niet heropenen:
+- K-reikwijdte: wereld telt nooit als 'zelf' en moet kloppen met MAPPEN op de gedeelde routes; context zelf op schermen met een eigen hoofdactie via een schuldlijst die alleen krimpt (dat is een latere stap, niet de jouwe).
+- K-casco: het samenvoegen van de twee contextmodellen is LATER; niet in ronde 2.
+- K-bladlijst: de zes snelkoppelingen van de kern gaan uit het blad (latere stap 17).
+- K-borg: de vasthoudbevestiging van gebaar wordt 'bewust' in ronde 3; in ronde 2 blijft BORGTIJD 800 staan.
+En wat de ontwerper zelf besliste:
+WAT IK ZELF BESLIS, als technisch beste optie:
+- Home blijft betekenen wat nu bewezen is: het frame inklappen, anders naar boven (world-desktop.e2e.js:86-93). De haak wordt een annuleerbare gebeurtenis 'rtg-edge-home'.
+- Vrienden is drift van een genomen besluit (WERELDEN.md:119-127) en wordt hersteld zonder vraag.
+- RTGWorkspaceContext wordt een lezer zonder eigen staat, met een eerste lezer.
+- Activiteit blijft een veld van het scherm; ronde 2 heeft er geen producent voor en zegt dat met reden.
+- Sociaal: elk scherm publiceert zijn eigen context.
+- De objectmeting gaat via een e2e, met 'na-openen' in de meter.
+- Handhaving: één tand op context-zelf.
+- De objectpoort kapt af en weigert niet, want dat is het gedrag van vandaag in de werkruimte.
+- Omhoog vegen op de landing vraagt eerst de host.
+Let op het nieuwe verklaringsformaat van de meter (stap 2): een verklaring is één attribuut PER VELD op body, met de reden als waarde: data-rtg-edge-nvt-<veld>="reden" of data-rtg-edge-na-openen-<veld>="reden".
+
+HUISREGELS DIE HIER ZWAAR WEGEN:
+- de Edge bezit de werkelijkheid niet: geen derde contextmodel, geen verzonnen producent, geen Edge-state die naar een domein terugschrijft, geen tweede lijst naast iets dat al een eigenaar heeft; een afgeleide waarde mag zich niet als eigen publicatie voordoen; een leeg veld draagt zijn reden;
+- productbestanden in public/ en server/ zijn max 10240 bytes (scripts/check.js regel 13), meet met wc -c; een bundel blijft gelijk aan zijn delen (node scripts/bundel.js);
+- schrijf code die lijkt op de code eromheen (Nederlandse commentaarblokken in dezelfde toon en dichtheid);
+- ELKE bewering in een toets trek je na met een MUTATIE: fout aanbrengen, toets draaien, zien zakken, terugdraaien (git diff leeg). Een toets die je niet hebt zien zakken is geen toets. Geen toets overslaan, uitzetten of verzwakken;
+- LAT regel 17: zeg nooit "de gate is groen" maar welke poort groen staat.
+
+VOLGORDE PER STAP. (1) de toets die het gebrek of het nieuwe gedrag vastlegt, (2) de code, (3) de mutaties uit de specificatie (en wat jij verder nodig vindt), (4) een codecommit met in de body: wat er veranderde, welke toetsen je draaide met uitslag, en elke mutatie met uitslag. Nederlandse titel in de gebiedende wijs, in de stijl van git log, eindigend op "(Edge ronde 2, stap N)".
+
+AAN HET EIND: DE REGISTERTREIN OP JE TAK, zodat de CI op je tak een echt oordeel geeft. Op een schone boom (commit eerst), in deze volgorde en alleen wat verandert: npm run edgekaart; npm run build en npm run swcache:vast; npm run websitebeelden (en daarna nog eens build als het appbeeld zijn bron veranderde); npm run language:proof als app.html of app-main.js veranderde; node scripts/mutatie.js <elk nieuw toetsbestand>; npm run bewijs; npm run stillezing:vast; npm run deelindex; npm run kaart; npm run functielijst; npm run getallen; npm run norm:vast. Commit per register (titel "Meet ... opnieuw na stap N"). Draai daarna npm run check, npm run norm en npm run registerklopt en repareer wat ze noemen. De browsermeter npm run edgedekking draai je NIET (behalve als je spoor dat uitdrukkelijk zegt): die meet de integrator aan het eind op de samengevoegde boom.
+CLAUDE.md is het bestand van de gebruiker: raak daar alleen een getal-merkteken aan via npm run getallen, en geen zinnen.
+
+COMMITS eindigen ALTIJD met precies deze twee regels:
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HoWdWcm1fHsHF53RZ3zfYT
+Zet nooit een modelnaam of model-id in een commit, code of document.
+
+PUSH EN CI. Push je tak (git push -u origin <je tak>; bij een netwerkfout tot vier keer opnieuw met 2, 4, 8, 16 s). Start daarna de CI op je tak met de GitHub-tools: mcp__github__actions_run_trigger met method run_workflow, workflow_id ci.yml, ref <je tak> (laad het schema eerst met ToolSearch). Wacht NIET op de uitslag en poll niet; beëindig je beurt. Krijg je later een bericht dat de CI op je tak rood is, zoek dan de oorzaak, repareer, laat de registertrein opnieuw lopen waar nodig, push en start de CI opnieuw.
+
+EINDVERSLAG. Schrijf je eindverslag als laatste bericht in deze sessie (per stap: klaar, gedeeltelijk of niet, met toetsen, mutaties, afwijkingen van het plan met reden, bestandsgroottes, en wat je niet hebt kunnen bevestigen). Wees eerlijk: wat niet af is, heet zo.
+
+JOUW SPOOR:
+Spoor werkruimte, tak claude/edge-r2-werkruimte, stap 22 en 23 in die volgorde. K-casco is LATER: EDGE.md:207 wordt "na ronde 2" in plaats van "Samenvoegen is ronde 2".
+
+DE SPECIFICATIE UIT HET EINDPLAN (letterlijk):
+STAP 22 -- second-screen-modules.js zuiver afsplitsen
+DOEL: second-screen-modules.js heeft 1 B ruimte (10239). De module 'Nu relevant' gaat als zuivere verhuizing naar een eigen bestand, met een scripttag in app.html. Er verandert geen gedrag.
+BESTANDEN: public/shared/interface/second-screen-modules.js, public/shared/interface/<afgesplitst deel>.js, public/apps/app.html
+TOETSEN: De bestaande Second Screen-toetsen (appmenu.e2e.js) blijven groen. | grammatica.test.js:255 (regex op de module) wordt verplaatst naar het nieuwe bestand en blijft matchen. | scripts/workspace-contract.js is groen.
+MUTATIES: Haal de nieuwe scripttag weg: de module 'context' ontbreekt en de toets zakt.
+REGISTERS: RTG_BOUW (interface/), registertrein (stap 0), met build, websitebeelden en taalbewijs
+RISICO: Laag, maar app.html verandert, dus de hele registertrein draait.
+
+STAP 23 -- RTGWorkspaceContext leest het blikveld, zonder eigen staat, en krijgt een eerste lezer
+DOEL: get() geeft op het moment van vragen {op, velden:{wereld, context, object, activiteit}} uit RTGEdgeBlikveld.lees(). Herkomst, gezag en sinds blijven ongewijzigd, en er komt nooit 'autoritatief'. Zonder blikveld, of als het gooit, of als clean() weigert: {velden:null, reden}.
+
+Wat verdwijnt:
+- current, set, refresh, subscribe, source en de ontdubbeling (workspace-context.js:13-21);
+- workspace-runtime.js:17, :22, :25 en :84;
+- context:{} (workspace-state.js:27);
+- het tweede render-argument (workspace-module-host.js:51, nul lezers gemeten);
+- second-screen.js:16.
+
+De eerste lezer: 'Nu relevant' toont de titel uit ctx.context().velden.context bij herkomst 'scherm' OF 'blad', en niet bij 'edge-casco' of 'document'. Zo blijft in app.html de titel van het blad staan, want na stap 1 heet die 'blad'.
+
+Op de kaart gaat workspace-context.js van s/b naar l, en het citaat van second-screen.js:16 verdwijnt (edgekaart.js:243 en :246).
+BESTANDEN: public/shared/interface/workspace-context.js, public/shared/interface/workspace-runtime.js, public/shared/interface/workspace-state.js, public/shared/interface/workspace-module-host.js, public/shared/interface/second-screen.js, public/shared/interface/<module Nu relevant uit stap 22>, test/workspace-context.test.js (nieuw), test/edgeblikveld.e2e.js, test/world-desktop.e2e.js, scripts/edgekaart.js, EDGE.md (:160, :202-207), RTG-WORKSPACE-RUNTIME.md (:140)
+TOETSEN: Unit met een nagemaakt blikveld: get() is byte voor byte gelijk aan de vier velden van lees(). | Unit: een tweede get() ziet een wijziging zonder refresh. | Unit: ontbrekend, gooiend of onveilig blikveld geeft velden:null met reden. | Bronscan: geen RTGAdaptief en geen setter in workspace-context.js. | e2e in app.html met reizen als open blad: 'Nu relevant' toont de titel van het blad. | e2e na stap 3 van edgeblikveld.e2e.js: de context en het object van de Second Screen zijn gelijk aan die van het blikveld. | e2e op /apps/reizen.html bij 1440 px: velden.wereld is {waarde:'travel', herkomst:'route'} zodra het blikveld er is.
+MUTATIES: Overschrijf de herkomst in get(): de gelijkheidstoets zakt. | Zet een cache terug: 'ziet een wijziging zonder refresh' zakt. | Val terug op RTGAdaptief.context(): de bronscan zakt. | Geef bij een gooiende clean() de oude kopie terug: de toets 'null met reden' zakt. | Toon de titel alleen bij 'scherm': de e2e in app.html zakt (de titel verdwijnt).
+REGISTERS: EDGEKAART.json, RTG_BOUW, registertrein (stap 0)
+RISICO: Per aanroep een volledige lees(); vermoed zijn het er ongeveer 6 per toepassen, en het weghalen van het render-argument beperkt dat. Wie in een opContext-luisteraar leest, kan sinds:null krijgen (gemeten); daar niet op sleutelen. vluchtige-context blijft dubbel, dus de teller beweegt niet.

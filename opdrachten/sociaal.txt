@@ -1,0 +1,71 @@
+Je bouwt één spoor van ronde 2 van RTG Edge 3.0 in de repository RahulRTG/nieuwe-rtg-website (Nederlandstalige codebase). Er draaien tegelijk andere cloudsessies op andere sporen; een ouder-sessie voegt alle sporen samen in PR #346 (tak claude/app-navigation-buttons-l6yubp).
+
+BASIS EN TAK. Je kloon staat op commit f5fa7e56 van claude/app-navigation-buttons-l6yubp (ronde 1, de merge met main, en ronde 2 stap 1-5: de meter telt 'zelf' per veld en de Edge-kaart heeft het rijformaat [rol, etiket, wat, citaat] met drie afgeleide controles). Werk en push UITSLUITEND op je eigen tak (de outcome-tak van deze sessie, claude/edge-r2-<spoor>). Maak GEEN pull request, abonneer je niet op PR-activiteit, en push nooit naar een andere tak. Als node_modules ontbreekt: npm ci. Chromium staat klaar (PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers); niet installeren.
+
+WAT JE LEEST. Lees vóór je begint EDGE.md (vooral par. 1, 2, 6, 7, 10 en 11), GRAMMATICA.md, LAT.md, en de kop van scripts/edgekaart.js (het rijformaat, keur(): elk citaat hangt aan een etiket in zijn rij en elk s/b-etiket heeft een citaat dat het draagt; de afgeleide controles: wie registerAction aanroept op de Edge-kern, wie data-rtg-world op body zet en wie data-rtg-edge-2-state op body zet, moet op de kaart staan). Een producent die stopt met registerAction verliest IN DEZELFDE STAP zijn capability-register:s-etiket en het citaat, anders zakt keur of de afgeleide controle.
+
+BESLUITEN VAN DE EIGENAAR (23 september 2026), niet heropenen:
+- K-reikwijdte: wereld telt nooit als 'zelf' en moet kloppen met MAPPEN op de gedeelde routes; context zelf op schermen met een eigen hoofdactie via een schuldlijst die alleen krimpt (dat is een latere stap, niet de jouwe).
+- K-casco: het samenvoegen van de twee contextmodellen is LATER; niet in ronde 2.
+- K-bladlijst: de zes snelkoppelingen van de kern gaan uit het blad (latere stap 17).
+- K-borg: de vasthoudbevestiging van gebaar wordt 'bewust' in ronde 3; in ronde 2 blijft BORGTIJD 800 staan.
+En wat de ontwerper zelf besliste:
+WAT IK ZELF BESLIS, als technisch beste optie:
+- Home blijft betekenen wat nu bewezen is: het frame inklappen, anders naar boven (world-desktop.e2e.js:86-93). De haak wordt een annuleerbare gebeurtenis 'rtg-edge-home'.
+- Vrienden is drift van een genomen besluit (WERELDEN.md:119-127) en wordt hersteld zonder vraag.
+- RTGWorkspaceContext wordt een lezer zonder eigen staat, met een eerste lezer.
+- Activiteit blijft een veld van het scherm; ronde 2 heeft er geen producent voor en zegt dat met reden.
+- Sociaal: elk scherm publiceert zijn eigen context.
+- De objectmeting gaat via een e2e, met 'na-openen' in de meter.
+- Handhaving: één tand op context-zelf.
+- De objectpoort kapt af en weigert niet, want dat is het gedrag van vandaag in de werkruimte.
+- Omhoog vegen op de landing vraagt eerst de host.
+Let op het nieuwe verklaringsformaat van de meter (stap 2): een verklaring is één attribuut PER VELD op body, met de reden als waarde: data-rtg-edge-nvt-<veld>="reden" of data-rtg-edge-na-openen-<veld>="reden".
+
+HUISREGELS DIE HIER ZWAAR WEGEN:
+- de Edge bezit de werkelijkheid niet: geen derde contextmodel, geen verzonnen producent, geen Edge-state die naar een domein terugschrijft, geen tweede lijst naast iets dat al een eigenaar heeft; een afgeleide waarde mag zich niet als eigen publicatie voordoen; een leeg veld draagt zijn reden;
+- productbestanden in public/ en server/ zijn max 10240 bytes (scripts/check.js regel 13), meet met wc -c; een bundel blijft gelijk aan zijn delen (node scripts/bundel.js);
+- schrijf code die lijkt op de code eromheen (Nederlandse commentaarblokken in dezelfde toon en dichtheid);
+- ELKE bewering in een toets trek je na met een MUTATIE: fout aanbrengen, toets draaien, zien zakken, terugdraaien (git diff leeg). Een toets die je niet hebt zien zakken is geen toets. Geen toets overslaan, uitzetten of verzwakken;
+- LAT regel 17: zeg nooit "de gate is groen" maar welke poort groen staat.
+
+VOLGORDE PER STAP. (1) de toets die het gebrek of het nieuwe gedrag vastlegt, (2) de code, (3) de mutaties uit de specificatie (en wat jij verder nodig vindt), (4) een codecommit met in de body: wat er veranderde, welke toetsen je draaide met uitslag, en elke mutatie met uitslag. Nederlandse titel in de gebiedende wijs, in de stijl van git log, eindigend op "(Edge ronde 2, stap N)".
+
+AAN HET EIND: DE REGISTERTREIN OP JE TAK, zodat de CI op je tak een echt oordeel geeft. Op een schone boom (commit eerst), in deze volgorde en alleen wat verandert: npm run edgekaart; npm run build en npm run swcache:vast; npm run websitebeelden (en daarna nog eens build als het appbeeld zijn bron veranderde); npm run language:proof als app.html of app-main.js veranderde; node scripts/mutatie.js <elk nieuw toetsbestand>; npm run bewijs; npm run stillezing:vast; npm run deelindex; npm run kaart; npm run functielijst; npm run getallen; npm run norm:vast. Commit per register (titel "Meet ... opnieuw na stap N"). Draai daarna npm run check, npm run norm en npm run registerklopt en repareer wat ze noemen. De browsermeter npm run edgedekking draai je NIET (behalve als je spoor dat uitdrukkelijk zegt): die meet de integrator aan het eind op de samengevoegde boom.
+CLAUDE.md is het bestand van de gebruiker: raak daar alleen een getal-merkteken aan via npm run getallen, en geen zinnen.
+
+COMMITS eindigen ALTIJD met precies deze twee regels:
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HoWdWcm1fHsHF53RZ3zfYT
+Zet nooit een modelnaam of model-id in een commit, code of document.
+
+PUSH EN CI. Push je tak (git push -u origin <je tak>; bij een netwerkfout tot vier keer opnieuw met 2, 4, 8, 16 s). Start daarna de CI op je tak met de GitHub-tools: mcp__github__actions_run_trigger met method run_workflow, workflow_id ci.yml, ref <je tak> (laad het schema eerst met ToolSearch). Wacht NIET op de uitslag en poll niet; beëindig je beurt. Krijg je later een bericht dat de CI op je tak rood is, zoek dan de oorzaak, repareer, laat de registertrein opnieuw lopen waar nodig, push en start de CI opnieuw.
+
+EINDVERSLAG. Schrijf je eindverslag als laatste bericht in deze sessie (per stap: klaar, gedeeltelijk of niet, met toetsen, mutaties, afwijkingen van het plan met reden, bestandsgroottes, en wat je niet hebt kunnen bevestigen). Wees eerlijk: wat niet af is, heet zo.
+
+JOUW SPOOR:
+Spoor sociaal, tak claude/edge-r2-sociaal, stap 16. Begin met de voormeting in een echte browser (hoeveel knoppen op comm.html openDeck openen) en schrijf de uitslag in je commitbody; de mutatie op data-rtg-action-key geldt alleen als die voormeting een dubbeling liet zien.
+
+DE SPECIFICATIE UIT HET EINDPLAN (letterlijk):
+STAP 16 -- Sociaal: één declaratie, en elk scherm zegt zelf waar je bent
+DOEL: EERST meten, in de browser: hoeveel knoppen op comm.html openDeck openen. De dubbeling is afgeleid uit CSS en claimregels en nog niet gezien.
+
+De negen sociale schermen laden adaptief.js, adaptief/grammatica.js en daarna adaptief/register.js. De grammatica moet vóór het register, omdat register.js:35 en :179 hem bij het laden lezen.
+
+social-intelligence-runtime.js:41-49 stopt met pollen en met registerAction. Hij declareert {id:'sociaal.context', naam:'Sociale context bekijken', telefoon/tablet/bureau:['paneel'], gewicht:'licht', effect:'lokaal', doe: openDeck}. Een herstel wordt niet verzonnen.
+
+Elk scherm publiceert zelf een context met bron, titel en die id in acties:
+- sociaal-prive krijgt een eigen inline blok;
+- meet publiceert via meet/app.js (7065 B);
+- de andere zeven doen het in hun inline script.
+
+.rtg-intel-command krijgt data-rtg-action-key='sociaal.context'.
+
+Telregel: van de negen hebben alleen vonk, comm en meet een eigen hoofdactie (grep op data-hoofdactie). De zes andere publiceren als voertuig voor de declaratie en tellen NIET als bewijs voor ronde 2. De teller context-zelf stijgt daar door het mechanisme, en dat staat er zo bij.
+
+Op de kaart gaat de runtime van capability-register:s naar :l.
+BESTANDEN: public/shared/social-intelligence-runtime.js, public/shared/social-intelligence.js, public/apps/{rendezvous,vonk,entourage,attenties,cercle,sociaal,comm,sociaal-prive,meet}.html, public/apps/meet/app.js, test/social-elite.test.js (:250-251), test/sociaal-edge.e2e.js (nieuw), scripts/edgekaart.js
+TOETSEN: e2e op /apps/sociaal.html: een tik op 'Sociale context bekijken' in het Edge-blad gaat via RTGGewicht.voer (verklikker zoals in edgeblikveld.e2e.js stap 7 en 8). | e2e op /apps/comm.html: precies 1 knop opent openDeck, maar alleen als de voormeting er 2 liet zien. | Herstartproef: na destroy()/start() staat de handeling er nog. | social-elite.test.js gaat van een regex op registerAction naar declareer plus data-rtg-action-key.
+MUTATIES: Haal data-rtg-action-key weg: de telling op comm.html zakt naar 2. Dat geldt alleen als de voormeting de dubbeling liet zien; anders valt deze mutatie af, met die reden erbij. | Draai de laadvolgorde om, met een verhinderde stand in context().staat: de verhindering valt stil uit voorNu (register.js:179) en de toets zakt. | Zet registerAction terug in de runtime: na stap 18 zakt de vormtoets.
+REGISTERS: EDGEKAART.json, EDGEDEKKING.json (edge-compat van 1983 naar 1974; RTGAdaptief van 10 naar 19), registertrein (stap 0)
+RISICO: Er komt laadwerk bij per scherm, en de lader trekt dan ook de gewichtlaag mee (loader.js:23-35). De bytes per schermscript zijn niet gemeten, behalve meet/kamer.js (10183, dus niet gebruiken). Publiceert de gedeelde runtime de context, dan is dat een verzonnen producent; daarom gebeurt het per scherm.

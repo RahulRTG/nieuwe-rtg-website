@@ -1,0 +1,85 @@
+Je bouwt één spoor van ronde 2 van RTG Edge 3.0 in de repository RahulRTG/nieuwe-rtg-website (Nederlandstalige codebase). Er draaien tegelijk andere cloudsessies op andere sporen; een ouder-sessie voegt alle sporen samen in PR #346 (tak claude/app-navigation-buttons-l6yubp).
+
+BASIS EN TAK. Je kloon staat op commit f5fa7e56 van claude/app-navigation-buttons-l6yubp (ronde 1, de merge met main, en ronde 2 stap 1-5: de meter telt 'zelf' per veld en de Edge-kaart heeft het rijformaat [rol, etiket, wat, citaat] met drie afgeleide controles). Werk en push UITSLUITEND op je eigen tak (de outcome-tak van deze sessie, claude/edge-r2-<spoor>). Maak GEEN pull request, abonneer je niet op PR-activiteit, en push nooit naar een andere tak. Als node_modules ontbreekt: npm ci. Chromium staat klaar (PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers); niet installeren.
+
+WAT JE LEEST. Lees vóór je begint EDGE.md (vooral par. 1, 2, 6, 7, 10 en 11), GRAMMATICA.md, LAT.md, en de kop van scripts/edgekaart.js (het rijformaat, keur(): elk citaat hangt aan een etiket in zijn rij en elk s/b-etiket heeft een citaat dat het draagt; de afgeleide controles: wie registerAction aanroept op de Edge-kern, wie data-rtg-world op body zet en wie data-rtg-edge-2-state op body zet, moet op de kaart staan). Een producent die stopt met registerAction verliest IN DEZELFDE STAP zijn capability-register:s-etiket en het citaat, anders zakt keur of de afgeleide controle.
+
+BESLUITEN VAN DE EIGENAAR (23 september 2026), niet heropenen:
+- K-reikwijdte: wereld telt nooit als 'zelf' en moet kloppen met MAPPEN op de gedeelde routes; context zelf op schermen met een eigen hoofdactie via een schuldlijst die alleen krimpt (dat is een latere stap, niet de jouwe).
+- K-casco: het samenvoegen van de twee contextmodellen is LATER; niet in ronde 2.
+- K-bladlijst: de zes snelkoppelingen van de kern gaan uit het blad (latere stap 17).
+- K-borg: de vasthoudbevestiging van gebaar wordt 'bewust' in ronde 3; in ronde 2 blijft BORGTIJD 800 staan.
+En wat de ontwerper zelf besliste:
+WAT IK ZELF BESLIS, als technisch beste optie:
+- Home blijft betekenen wat nu bewezen is: het frame inklappen, anders naar boven (world-desktop.e2e.js:86-93). De haak wordt een annuleerbare gebeurtenis 'rtg-edge-home'.
+- Vrienden is drift van een genomen besluit (WERELDEN.md:119-127) en wordt hersteld zonder vraag.
+- RTGWorkspaceContext wordt een lezer zonder eigen staat, met een eerste lezer.
+- Activiteit blijft een veld van het scherm; ronde 2 heeft er geen producent voor en zegt dat met reden.
+- Sociaal: elk scherm publiceert zijn eigen context.
+- De objectmeting gaat via een e2e, met 'na-openen' in de meter.
+- Handhaving: één tand op context-zelf.
+- De objectpoort kapt af en weigert niet, want dat is het gedrag van vandaag in de werkruimte.
+- Omhoog vegen op de landing vraagt eerst de host.
+Let op het nieuwe verklaringsformaat van de meter (stap 2): een verklaring is één attribuut PER VELD op body, met de reden als waarde: data-rtg-edge-nvt-<veld>="reden" of data-rtg-edge-na-openen-<veld>="reden".
+
+HUISREGELS DIE HIER ZWAAR WEGEN:
+- de Edge bezit de werkelijkheid niet: geen derde contextmodel, geen verzonnen producent, geen Edge-state die naar een domein terugschrijft, geen tweede lijst naast iets dat al een eigenaar heeft; een afgeleide waarde mag zich niet als eigen publicatie voordoen; een leeg veld draagt zijn reden;
+- productbestanden in public/ en server/ zijn max 10240 bytes (scripts/check.js regel 13), meet met wc -c; een bundel blijft gelijk aan zijn delen (node scripts/bundel.js);
+- schrijf code die lijkt op de code eromheen (Nederlandse commentaarblokken in dezelfde toon en dichtheid);
+- ELKE bewering in een toets trek je na met een MUTATIE: fout aanbrengen, toets draaien, zien zakken, terugdraaien (git diff leeg). Een toets die je niet hebt zien zakken is geen toets. Geen toets overslaan, uitzetten of verzwakken;
+- LAT regel 17: zeg nooit "de gate is groen" maar welke poort groen staat.
+
+VOLGORDE PER STAP. (1) de toets die het gebrek of het nieuwe gedrag vastlegt, (2) de code, (3) de mutaties uit de specificatie (en wat jij verder nodig vindt), (4) een codecommit met in de body: wat er veranderde, welke toetsen je draaide met uitslag, en elke mutatie met uitslag. Nederlandse titel in de gebiedende wijs, in de stijl van git log, eindigend op "(Edge ronde 2, stap N)".
+
+AAN HET EIND: DE REGISTERTREIN OP JE TAK, zodat de CI op je tak een echt oordeel geeft. Op een schone boom (commit eerst), in deze volgorde en alleen wat verandert: npm run edgekaart; npm run build en npm run swcache:vast; npm run websitebeelden (en daarna nog eens build als het appbeeld zijn bron veranderde); npm run language:proof als app.html of app-main.js veranderde; node scripts/mutatie.js <elk nieuw toetsbestand>; npm run bewijs; npm run stillezing:vast; npm run deelindex; npm run kaart; npm run functielijst; npm run getallen; npm run norm:vast. Commit per register (titel "Meet ... opnieuw na stap N"). Draai daarna npm run check, npm run norm en npm run registerklopt en repareer wat ze noemen. De browsermeter npm run edgedekking draai je NIET (behalve als je spoor dat uitdrukkelijk zegt): die meet de integrator aan het eind op de samengevoegde boom.
+CLAUDE.md is het bestand van de gebruiker: raak daar alleen een getal-merkteken aan via npm run getallen, en geen zinnen.
+
+COMMITS eindigen ALTIJD met precies deze twee regels:
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HoWdWcm1fHsHF53RZ3zfYT
+Zet nooit een modelnaam of model-id in een commit, code of document.
+
+PUSH EN CI. Push je tak (git push -u origin <je tak>; bij een netwerkfout tot vier keer opnieuw met 2, 4, 8, 16 s). Start daarna de CI op je tak met de GitHub-tools: mcp__github__actions_run_trigger met method run_workflow, workflow_id ci.yml, ref <je tak> (laad het schema eerst met ToolSearch). Wacht NIET op de uitslag en poll niet; beëindig je beurt. Krijg je later een bericht dat de CI op je tak rood is, zoek dan de oorzaak, repareer, laat de registertrein opnieuw lopen waar nodig, push en start de CI opnieuw.
+
+EINDVERSLAG. Schrijf je eindverslag als laatste bericht in deze sessie (per stap: klaar, gedeeltelijk of niet, met toetsen, mutaties, afwijkingen van het plan met reden, bestandsgroottes, en wat je niet hebt kunnen bevestigen). Wees eerlijk: wat niet af is, heet zo.
+
+JOUW SPOOR:
+Spoor object, tak claude/edge-r2-object, stap 19, 20 en 21 in die volgorde. Stap 21 verklaart object op office.html en bestanden.html met data-rtg-edge-na-openen-object="<reden>" op body (het nieuwe formaat per veld). Draai de browsermeter edgedekking niet; de integrator meet aan het eind.
+
+DE SPECIFICATIE UIT HET EINDPLAN (letterlijk):
+STAP 19 -- register.js zuiver afsplitsen
+DOEL: register.js heeft 33 B ruimte (10207). Er wordt een deel afgesplitst in een nieuw bestand, als zuivere verhuizing, met een scripttag in de vijf HTML-bestanden die register.js laden: office, app, bestanden, reizen-veilig en reizen. Er verandert geen gedrag.
+BESTANDEN: public/shared/adaptief/register.js, public/shared/adaptief/<afgesplitst deel>.js (naam op bezetting nagezocht), public/apps/{office,app,bestanden,reizen-veilig,reizen}.html, public/sw.js (SHELL, via build)
+TOETSEN: Alle bestaande toetsen van register en adaptief blijven groen. | Bronscan: de vijf HTML-bestanden laden beide delen, in de juiste volgorde. | check.js regel 13 is groen.
+MUTATIES: Haal de nieuwe scripttag weg op reizen-veilig: de bronscan zakt, en de context-e2e van reizen-veilig ook.
+REGISTERS: registertrein (stap 0), met build, websitebeelden en taalbewijs want app.html verandert
+RISICO: Het raakt alle vijf de schermen die register.js laden.
+
+STAP 20 -- Eén objectpoort, 'objectverwijzing', vóór de eerste producent
+DOEL: schoneVerwijzing (rtg-schil/06b-objecten.js:180-192) verhuist naar één klein gedeeld bestand. De naam 'objectverwijzing' komt in de repo 0 keer voor; 'verwijzing' zelf staat in 134 bestanden, onder meer in de zorgketen.
+
+Wie het gebruikt:
+- 06b-objecten.js en 07-start.js:35 (de bundel rtg-schil.js; commandDelen in build.js:106-110, dus RTG_BOUW en BUNDELS.md);
+- register.js:128;
+- blikveld.js:148, dat alleen de verwijzing kopieert.
+
+Het laadt vóór register.js op de vijf schermen en vóór rtg-schil.js in werkruimte.html.
+
+Het gedrag is AFKAPPEN, zoals vandaag: soort tot 32 tekens, id tot 64, label tot 120, hooguit 8 velden. Een object zonder id geeft in het blikveld een leeg veld met reden.
+BESTANDEN: public/shared/objectverwijzing.js (nieuw), public/shared/rtg-schil/06b-objecten.js, public/shared/rtg-schil.js (bundel), public/shared/adaptief/register.js (of het afgesplitste deel), public/shared/edge/blikveld.js, public/apps/werkruimte.html en de vijf HTML-bestanden uit stap 19, test/edgecontext.test.js (:50), test/edgeblikveld.e2e.js (:108), test/edgeblikveld.test.js (:101)
+TOETSEN: Unit: een dossier met velden op het hoogste niveau (naam, adres) geeft alleen soort, id, label en velden. | Unit: 20 velden in o.velden geeft er 8. | Unit: zonder id komt er null met reden. | De drie bestaande vormtoetsen zijn bijgewerkt naar de verwijzingsvorm. | werkruimte-objecten.e2e.js blijft groen. | check.js regel 6 en regel 13 zijn groen.
+MUTATIES: Omzeil de poort in register.js: de dossiertoets zakt. | Verhoog de veldgrens naar 20: de unittoets zakt. | Laad de poort na rtg-schil.js in werkruimte.html: werkruimte-objecten.e2e.js zakt.
+REGISTERS: EDGEKAART.json (de poort als enige beslisser over de objectvorm; vooraf in het geheugen narekenen), BUNDELS.md, RTG_BOUW, registertrein (stap 0)
+RISICO: Afkappen in plaats van weigeren houdt de werkruimte gelijk. Een object met label '' en velden {} is nu de vorm, en drie toetsen bewegen mee. De brug (brug.js:93) gaat ook door de poort.
+
+STAP 21 -- De eerste objecten: een document in Office en een bestand in Bestanden, bewezen met een e2e
+DOEL: office/adaptief.js:189-193 en bestanden/adaptief.js:152-161 publiceren al een context bij een open document of bestand. Ze krijgen er een verwijzing {soort:'document'|'bestand', id, label} bij.
+
+Het bewijs is een e2e waarin de toets met zijn EIGEN lid via de gewone route een document en een bestand aanmaakt en opent. Een seed-object kan niet: de meter maakt per ronde een vers lid aan (edgedekking.js:221-226), en Office opent alleen via een POST op de sleutel van dat lid (office/app.js:77-78 en :348; de URL kent alleen werk en bedrijf, :34-36).
+
+In EDGEDEKKING verklaren beide schermen object als 'na-openen' met reden (stap 2). De meter blijft een lezer die niets aanklikt, en er wordt geen stijging van een tand beloofd.
+BESTANDEN: public/apps/office/adaptief.js, public/apps/bestanden/adaptief.js, public/apps/office.html en public/apps/bestanden.html (na-openen-verklaring), test/edgeobject.e2e.js (nieuw)
+TOETSEN: e2e: het object in het blikveld is precies de verwijzing en draagt geen inhoud. | EDGEDEKKING: object staat op 'na-openen' met reden op beide schermen.
+MUTATIES: Zet de inhoud in het object en omzeil de poort: de e2e zakt. | Haal de na-openen-verklaring weg: de meter geeft 'nee'.
+REGISTERS: EDGEDEKKING.json, registertrein (stap 0)
+RISICO: office/adaptief.js heeft 151 B ruimte (10089). Of de verwijzing daarin past, is vermoed en wordt met wc -c gemeten; anders eerst zuiver afsplitsen. bestanden/adaptief.js heeft 2378 B ruimte (7862).

@@ -470,7 +470,7 @@ stap mogelijk maakt.
 | 4 | Par. 4 punt 6 en 7: `noteerVast` in de identiteitsinzage, Hiring in het consentregister | bouwen | dezelfde vorm als besluit 5 uit `MENSNETWERK.md` |
 | 5 | De Adamproef verlengen voorbij *aangenomen*: aanname → werkrelatie → contract → loon | meten | maakt de naad uit par. 3 zichtbaar |
 | 6 | **Welk werkrelatiemodel is de waarheid**, met een brug die één kant op loopt | besluit | zonder dat besluit heeft elke verticaal drie mogelijke eindpunten |
-| 7 | **Wordt de weigering van `werving.suite` opgeheven**, en zo ja, met welk volledig proces | besluit | voorwaarde voor Talent & Hiring als verticaal |
+| 7 | **Wordt de weigering van `werving.suite` opgeheven**, en zo ja, met welk volledig proces | **genomen** (23 september 2026): opgeheven, als BESCHRIJVEND vermogen en niet als poort op de pas -- zie par. 7a | voorwaarde voor Talent & Hiring als verticaal |
 | 8 | Par. 1: vaardigheden van de vacature in de werkvondst, de weg naar een ontbrekend stuk bij `persoonseis`, en `tekorten()` per zaak voor de werkgever | bouwen | maakt de openingszin van het voorstel waar met wat er al ligt |
 | 9 | **Welk profiel is de bron van vaardigheden** (Métier of het professionele profiel van Zakelijk); daarna pas een gedeelde lijst. De vormmeting van par. 0 vastleggen als register met een ratel | besluit + meten | voorwaarde voor voorstel 103 |
 
@@ -593,6 +593,18 @@ nagetrokken (schakel 18 zakt als de keuze wordt genegeerd, als er zonder keuze
 wordt vastgelegd, en als de eigendomscontrole op de vestiging ontbreekt). Wat de keten met opzet NIET
 loopt: goedkeuren en uitbetalen van de loonrun (twee handtekeningen en een
 betaling, die zet een proef niet), en een loonrun bij een Spaanse zaak.
+
+**Besluit 7 is genomen (23 september 2026): `werving.suite` is terug.** De keten
+van vacature tot loon is rond, dus de weigering in `server/kern/wereld/lijsten.js`
+is opgeheven -- en de eigenaar koos de vorm: de naam staat bij Business als
+BESCHRIJVEND in `server/kern/wereld/rechten.js`, met de reden erbij, en niet als
+poort op de pas. Twee redenen. Een poort zou elke zaak die vandaag werft iets
+afnemen (een besluit uitvoeren mag niet weigeren wat gisteren lukte), en een
+werknemer koopt nooit een pas om te mogen werken (CONCERN.md). De suite is dus de
+keten die er staat, gepoort bij de zaak. Wat er met opzet NIET in zit: assessments
+-- een cijfer op een mens is een grens en geen gat -- en `sales.suite`, die weg
+blijft. `test/wereldvermogens.test.js` zakt als de naam in de pas staat zonder
+poort of reden (met een mutatie nagetrokken).
 
 De rest van par. 6 wacht op deze negen. De solver (106), de what-if-promotie
 (107), het geheugen (126, 127, 129) en de agents met eigen reikwijdte (122, 124)

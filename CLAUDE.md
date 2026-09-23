@@ -840,7 +840,11 @@ buiten tarief en grens, en de Edge-balk toont een verboden actie MET haar reden
 in plaats van haar weg te laten. Te weinig rust bij een mens blijft met opzet
 een waarschuwing. **De eigenaar koos dezelfde dag** (par. 7a): `employment` aan
 een entiteit is de waarheid, de keten van vacature tot loon wordt rond gemaakt
-voordat `werving.suite` opengaat, en Métier is de bron van vaardigheden. De
+voordat `werving.suite` opengaat, en Métier is de bron van vaardigheden. Dat
+laatste is gebeurd: `werving.suite` staat sinds 23 september weer bij Business,
+als BESCHRIJVEND vermogen en niet als poort op de pas -- de keten wordt bij de
+zaak gepoort, een werknemer koopt nooit een pas, en assessments zitten er met
+opzet niet in. De
 Adamproef loopt sindsdien door tot de loonstrook en is rond: 18 van 18 schakels,
 10 van 10 storingen. De drie breuken die hij vond zijn dicht: een aanname wordt
 een dienstverband bij de entiteit van de zaak (`kern/concern/aanname.js`, een

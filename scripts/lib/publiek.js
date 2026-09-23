@@ -76,6 +76,7 @@ const PUBLIEK = new Map([
   ['/api/webauthn/login', 'de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig'],
   ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
   ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
+  ['/api/foundation/registratie/catalogus', 'de eisen per registratiesoort en de actieve steden: een aanvrager leest ze vóór hij een account heeft, anders doen de keuzes op registreren.html niets (besluit eigenaar 23-09-2026, met rem per ip)'],
   ['/api/foundation/registratie/aanvragen', 'een school, vrijwilliger of stichting heeft vóór toelating nog geen account of code (met rem per ip)'],
   ['/api/foundation/registratie/status', 'de willekeurige, gehashte statussleutel is de geloofsbrief en toont uitsluitend die ene aanvraag (met rem per ip)'],
   /* Vijf uit #176 ("vier bewust publieke routes gingen offline omdat twee

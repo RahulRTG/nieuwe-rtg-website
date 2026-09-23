@@ -12,7 +12,10 @@
      naar boven zonder te zeggen waarom;
    - Labfonds, Veilig en Vertaler weigerden een lege invoer zonder woord;
    - de knooppunten van Partner Network waren knoppen zonder handeling en
-     zijn nu weergave.
+     zijn nu weergave;
+   - de keuzes op foundation/registreren.html deden niets omdat de catalogus
+     achter de kantoorpoort stond (openbaar gemaakt als besluit van de
+     eigenaar; zet officeAuth terug op de route en deze bewering zakt).
 
    DE MUTATIE: zet in een van die plekken de oude stille `return` terug, en de
    bijbehorende bewering zakt -- er verschijnt dan geen tekst.
@@ -93,6 +96,12 @@ test('een knop die niet kan, zegt waarom', { skip: geenBrowser(pw) }, async () =
     const vert = await page.waitForFunction(() => document.body.innerText.includes('nog geen vertaling'),
       null, { timeout: 10000 }).then(() => true).catch(() => false);
     assert.ok(vert, 'Kopieer zonder vertaling zegt niets');
+
+    // Foundation-registratie: de keuzes openen hun formulier (de catalogus is openbaar).
+    await naar('/apps/foundation/registreren.html');
+    await page.locator('.keuze[data-type="school"]').click();
+    await page.waitForSelector('#formulierPaneel:not([hidden])', { timeout: 10000 });
+    assert.equal(await page.locator('#type').inputValue(), 'school', 'de keuze School opent geen formulier');
 
     // Partner Network: wat niets doet, is geen knop.
     await naar('/apps/partner-network.html');

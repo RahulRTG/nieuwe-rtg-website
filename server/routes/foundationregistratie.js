@@ -17,21 +17,21 @@ module.exports = kern => {
     try { const p = mail.send(aan, onderwerp, tekst); if (p && p.catch) p.catch(() => {}); } catch (_) {}
   };
 
-  /* ACHTER DE KANTOORPOORT, en dat is een besluit met een randje.
+  /* OPENBAAR, als besluit van de eigenaar (23 september 2026).
 
-     Dit stond open en werd door NIEMAND aangeroepen -- geen enkel scherm in
-     public/ vraagt hem op. Wat hij teruggeeft is de volledige eisencatalogus
-     per type plus de lijst actieve steden. Geen geheim, maar wel de complete
-     kaart van wat de Foundation vraagt en waar zij zit, gratis op te halen door
-     iedereen die het adres raadt. De ladder ving hem op de trede "de dwaler":
-     een route die zonder inlog een geslaagd antwoord geeft.
+     Deze route stond open, werd door de ladder gevonden op de trede "de
+     dwaler" en ging achter de kantoorpoort met de aantekening dat geen scherm
+     hem opvroeg. Dat klopte niet: foundation/registreren.js haalt hem op
+     voordat hij de keuzes School, Vrijwilliger en Partnerstichting aan een
+     formulier koppelt. Achter de poort deden die drie knoppen dus niets, voor
+     precies de mensen voor wie de balie bestaat -- een school of stichting
+     heeft vóór toelating nog geen account.
 
-     LET OP ALS DE AANVRAAGPAGINA HEM OOIT NODIG HEEFT. De registratie zelf
-     (/aanvragen hieronder) blijft bewust open achter zijn rem -- een school of
-     stichting heeft nog geen account. Wil dat formulier deze catalogus tonen,
-     open hem dan BEWUST via de PUBLIEK-lijst in scripts/poortwacht.js, met een
-     reden, en niet door deze poort weer weg te halen. */
-  app.post('/api/foundation/registratie/catalogus', officeAuth, leesRem, (req, res) =>
+     Wat eruit komt is de eisencatalogus per type plus de actieve steden: geen
+     geheim, en wat de Foundation vraagt hoort een aanvrager vooraf te kunnen
+     lezen. Hij staat daarom met reden op de PUBLIEK-lijst (scripts/lib/publiek.js)
+     en houdt zijn rem per ip. */
+  app.post('/api/foundation/registratie/catalogus', leesRem, (req, res) =>
     res.json(foundationregistratie.catalogus()));
 
   app.post('/api/foundation/registratie/aanvragen', aanvraagRem, (req, res) => {

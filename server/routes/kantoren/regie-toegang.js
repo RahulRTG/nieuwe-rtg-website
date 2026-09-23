@@ -10,7 +10,7 @@
    alleen `error` door, en dan weet het scherm niet dat het een ceremonie moet
    starten, of voor welke actie. test/baliezetel-eigenaar.test.js houdt dat vast. */
 module.exports = (ctx) => {
-  const { app, boardroomAuth, boardroomLijst, keyVanCodenaam, veilig, afdelingen, db, save, zwaar, boardroomUser } = ctx;
+  const { app, boardroomAuth, boardroomLijst, keyVanCodenaam, veilig, afdelingen, save, zwaar, boardroomUser } = ctx;
 
   app.post('/api/office/boardroom/toegang', boardroomAuth, (req, res) => veilig(res, () =>
     ({ status: 200, ok: true, baas: !!req.boardroomBaas, lijst: boardroomLijst().map(t => ({ codenaam: t.codenaam, sinds: t.at })) })));
@@ -43,9 +43,13 @@ module.exports = (ctx) => {
       if (bewijs.error) return zwaar.stuur(res, bewijs);
       const wie = String(req.body.codenaam || '').trim().toLowerCase();
       const lijst = boardroomLijst();
-      const rest = lijst.filter(x => String(x.codenaam || '').toLowerCase() !== wie);
-      if (rest.length !== lijst.length) {
-        db.data.boardroomToegang = rest;
+      // ter plekke inkorten: boardroomLijst() geeft de lijst zelf, en zo raakt
+      // dit bestand de opslag niet rechtstreeks aan (ratel dbDeuren)
+      const voor = lijst.length;
+      for (let i = lijst.length - 1; i >= 0; i--)
+        if (String(lijst[i].codenaam || '').toLowerCase() === wie) lijst.splice(i, 1);
+      const rest = lijst;
+      if (rest.length !== voor) {
         save();
         afdelingen.audit('eigenaar', 'Boardroom-toegang ingetrokken van ' + req.body.codenaam);
       }

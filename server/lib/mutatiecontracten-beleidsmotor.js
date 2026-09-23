@@ -110,6 +110,37 @@ const CONTRACTEN = {
     nagekeken: 'met de hand, 2026-09-23: overzicht() leest via eigen.kijk en schrijft niets',
     afgetekend: AF
   },
+  /* De uitgave in het Werk OS (AUTHORITY.md par. 5e, vervolg). */
+  'POST /api/bedrijf/uitgave/maak': {
+    mutatieId: 'bedrijf.uitgave.maak', herkomst: 'mens', semantiek: { klasse: 'nietHerhaalbaar' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'werkruimte' }, stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'een tweede oproep is een tweede uitgave: twee facturen van hetzelfde bedrag bij dezelfde begunstigde zijn twee betalingen',
+    bewijs: { gemeten: 'test/bedrijfuitgave.test.js: elke oproep geeft een uitgave met een eigen id', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: bedrijf/uitgave.js maakt elke keer een nieuw id met rid(5)',
+    afgetekend: AF
+  },
+  'POST /api/bedrijf/uitgaven': {
+    mutatieId: 'bedrijf.uitgaven', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'werkruimte' }, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/bedrijfuitgave.test.js: de lijst met de berekende stand', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de handler roept alleen toon() aan en schrijft niets; werkPoort met geld vraagt geen reden en logt dus niets',
+    afgetekend: AF
+  },
+  'POST /api/bedrijf/uitgave/betaald': {
+    mutatieId: 'bedrijf.uitgave.betaald', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'werkruimte' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/bedrijfuitgave.test.js toets 5-6: een tweede notitie geeft 409 en laat de eerste staan. ' +
+      'Een toestandscontrole en geen duplicaatlaag', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de route weigert zodra u.betaald staat',
+    afgetekend: AF
+  },
+  'POST /api/bedrijf/lid/tekengrens': {
+    mutatieId: 'bedrijf.lid.tekengrens', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'werkruimte' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/bedrijfuitgave.test.js toets 4: zetten en weghalen, en dezelfde waarde twee keer geeft dezelfde grens', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de route zet l.tekengrensCenten op een waarde; een herhaling zet dezelfde waarde (en een journaalregel)',
+    afgetekend: AF
+  },
 };
 
 module.exports = { CONTRACTEN };

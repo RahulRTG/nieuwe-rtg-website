@@ -74,6 +74,13 @@ const SLEUTELS = {
     waarom: 'een tweede oproep geeft een nieuwe sleutel en maakt de vorige van die doos ongeldig; een laag die ' +
       'hem opslikt geeft een sleutel terug die de doos niet meer binnenlaat' },
   'POST /api/office/doos/sleutel/weg': { zelfdeVerzoek: true },
+  /* De uitgave in het Werk OS: indienen is elke keer een nieuwe uitgave; betaald
+     noteren en de tekengrens zetten zijn een toestand. */
+  'POST /api/bedrijf/uitgave/maak': { nietIdempotent: true,
+    waarom: 'een tweede oproep is een tweede uitgave; een laag die hem opslikt laat een echte tweede factuur verdwijnen' },
+  'POST /api/bedrijf/uitgaven': { leest: true },
+  'POST /api/bedrijf/uitgave/betaald': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/lid/tekengrens': { zelfdeVerzoek: true },
   'POST /api/office/doos/sleutels': { leest: true }
 };
 

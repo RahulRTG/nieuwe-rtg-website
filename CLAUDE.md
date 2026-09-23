@@ -838,7 +838,14 @@ het Consent Center, een ongeijkt zekerheidscijfer stuurt de voorspeller niet
 meer, de AI-kostenmeter boekt het model dat antwoordde en laat lokaal verbruik
 buiten tarief en grens, en de Edge-balk toont een verboden actie MET haar reden
 in plaats van haar weg te laten. Te weinig rust bij een mens blijft met opzet
-een waarschuwing.
+een waarschuwing. **De eigenaar koos dezelfde dag** (par. 7a): `employment` aan
+een entiteit is de waarheid, de keten van vacature tot loon wordt rond gemaakt
+voordat `werving.suite` opengaat, en Métier is de bron van vaardigheden. De
+Adamproef loopt sindsdien door tot de loonrun (17 schakels, 14 gesloten, 3 open
+met reden) en wijst drie breuken aan: een Foundation-profiel kan een aanname niet
+claimen omdat het geen lidaccount heeft, een aanname maakt geen employment, en de
+werkgever uit de proef staat in Spanje terwijl er alleen een Nederlands
+regelpakket ligt.
 
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
@@ -2072,7 +2079,7 @@ het bord de ene helft van de functie uit en de andere niet, exact de
 `social`-fout. En de meter bewijst het besluit in plaats van het te geloven:
 `knelpunt x foundation` ging van `correct-afgesloten` naar **`waar`** zonder dat
 de 33 leugens bewogen -- het besluit is een PRODUCTvraag, of de deur daarna
-opengaat een METING. De keten staat op 12 schakels, 11 gesloten; schakel 12 is de
+opengaat een METING. De keten stond toen op 12 schakels, 11 gesloten; schakel 12 is de
 belofte dat een Foundation-profiel vanuit EEN doel echte werk- EN leermogelijkheden
 bereikt zonder dat een bron wordt verzonnen, gladgestreken of als advies vermomd.
 **Schakel 4 blijft open met een SMALLERE reden**, en dat is met opzet: er is nu

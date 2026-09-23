@@ -38,7 +38,8 @@
     setState('dock');
     var custom = rt.model.registry[action];
     if (custom && custom.run) return K.voer(custom, w);
-    if (action === 'home') { w.location.href = rt.edge.cfg.home; return true; }
+    // Een scherm met een eigen thuis (het wereldbureau) annuleert; anders gaan we naar cfg.home.
+    if (action === 'home') { if (w.dispatchEvent(new w.CustomEvent('rtg-edge-home', { cancelable: true }))) w.location.href = rt.edge.cfg.home; return true; }
     if (action === 'back') { w.history.back(); return true; }
     if (action === 'worlds') return legacy('.rtg-edge-worlds-trigger');
     if (action === 'menu') return legacy('.rtg-edge-menu');

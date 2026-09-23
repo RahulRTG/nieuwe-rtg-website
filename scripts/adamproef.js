@@ -516,6 +516,130 @@ async function loop(basis, uit) {
       };
     });
 
+  /* ---- DE KETEN NA "AANGENOMEN" (ARBEID.md par. 7a, 23 september 2026) ----
+     Tot hier eindigde de proef bij een bericht op het bord van Adam. De eigenaar
+     besloot dat `employment` aan een ENTITEIT de waarheid is en dat de keten van
+     vacature tot loon rond moet voordat `werving.suite` opengaat. Deze schakels
+     METEN waar die keten vandaag breekt; ze bouwen niets en ze poetsen niets weg.
+
+     Twee hoofdpersonen, en dat is met opzet. Adam loopt door zolang hij kan
+     (schakel 13). Waar hij niet verder kan, neemt een VOLWASSEN LID het over,
+     zodat de rest van de keten (contract, dienstverband, loon) toch gemeten
+     wordt in plaats van ongezien te blijven achter de eerste dichte deur. */
+
+  /* 13 -- WORDT ADAM PERSONEEL? De aanname van een sollicitant zonder
+     lidaccount levert een kassacode en een link op, en `/api/werving/verbind`
+     eist een eigen RTG-account. De proef kijkt naar de UITKOMST: staat Adam in
+     het team van de zaak? */
+  await stap(
+    schakel(13, 'werkgever', 'Adam', 'maakt van de aanname een plek in het team',
+      'een Foundation-profiel heeft geen eigen RTG-account, en een aanname claimen eist er een ' +
+      '(/api/werving/verbind). De aanname eindigt bij een kassacode die de werkgever met de hand ' +
+      'moet doorgeven; een zeventienjarige in een gezin komt zo niet in het team. Besluit 1 van ' +
+      'ARBEID.md par. 7a (employment is de waarheid) moet hier een weg voor krijgen.'),
+    () => P('/api/supplier/roster', { code: WERKGEVER }),
+    async r => {
+      const team = (r.data && r.data.staff) || [];
+      const adam = team.find(x => /^Adam\b/.test(String(x.name || '')));
+      return { klopt: !!adam, wat: adam ? 'Adam staat in het team (id ' + adam.id + ')'
+        : 'Adam staat niet in het team (' + team.length + ' mensen)' };
+    });
+
+  /* Het volwassen lid: een eigen account, een cv, en een sollicitatie op
+     dezelfde vacature. Geen uitslag klaarzetten, alleen de wereld. */
+  const nova = await P('/api/auth/register', { name: 'Nova Proef', email: 'nova.proef@voorbeeld.nl',
+    phone: '0612349876', password: 'geheim123', geboortedatum: '1995-03-03', tier: 'rtg', pasApp: 'rtg' });
+  const N = nova.data && nova.data.token;
+  if (!N) throw new Error('geen volwassen lid aan te maken (status ' + nova.status + ')');
+  await P('/api/cv/save', { name: 'Nova Proef', contact: 'nova.proef@voorbeeld.nl',
+    skills: 'koken, bediening', about: 'Werkt graag in een keuken.' }, N);
+  const nsoll = await P('/api/member/apply', { supplierCode: WERKGEVER, vacatureId: vacId }, N);
+  if (nsoll.status !== 200) throw new Error('het volwassen lid kon niet solliciteren (status ' + nsoll.status + ')');
+  const novaSoll = (await sollicitatiesBijZaak(basis, S)).find(a => a.name === 'Nova Proef');
+  if (!novaSoll) throw new Error('de sollicitatie van het volwassen lid is niet te vinden');
+
+  /* 14 -- EEN LID DAT WORDT AANGENOMEN, IS METEEN PERSONEEL. Dit is de weg die
+     wel bestaat: neemAan() verbindt de uitnodiging met het account. */
+  let novaStaff = null;
+  await stap(
+    schakel(14, 'werkgever', 'lid', 'neemt een volwassen lid aan; dat staat meteen in het team'),
+    () => P('/api/supplier/apply/decide', { id: novaSoll.id, action: 'aannemen' }, S),
+    async r => {
+      novaStaff = r.data && r.data.direct && r.data.direct.staffId;
+      return { klopt: !!novaStaff, wat: novaStaff ? 'direct in dienst, personeelsnummer ' + novaStaff
+        : 'geen directe plek: ' + JSON.stringify(Object.keys(r.data || {})) };
+    });
+
+  /* 15 -- HET CONTRACT. Zonder contract draait er nooit een loonstrook
+     (payroll-os-zaak.js zegt het zelf). De manager legt het vast op het
+     personeelsnummer uit schakel 14. */
+  const vanaf = new Date().toISOString().slice(0, 8) + '01';
+  await stap(
+    schakel(15, 'werkgever', 'huis', 'legt het arbeidscontract vast'),
+    () => novaStaff ? P('/api/supplier/payroll/contract', { staffId: novaStaff, vanaf, soort: 'oproep',
+      uurloonCenten: 1450, urenPerWeek: 12, functie: 'Keukenhulp' }, S)
+      : Promise.resolve({ status: 0, data: null }),
+    async () => {
+      const c = await P('/api/supplier/payroll/contracten', { staffId: novaStaff }, S);
+      const versies = Object.values((c.data && c.data.contracten) || {}).flat();
+      return { klopt: versies.some(v => v.uurloonCenten === 1450 && v.vanaf === vanaf),
+        wat: versies.length + ' contractversie(s), vanaf ' + vanaf };
+    });
+
+  /* 16 -- IS DE AANNAME OOK EEN DIENSTVERBAND BIJ DE ENTITEIT? Dat is besluit 1
+     van ARBEID.md par. 7a. Het lid zelf vraagt het na, op zijn eigen sessie:
+     staat de werkgever tussen zijn werkplekken? */
+  await stap(
+    schakel(16, 'huis', 'lid', 'maakt van de aanname een dienstverband bij de entiteit (employment)',
+      'de werving eindigt bij een personeelsnummer aan een ZAAK (staffId); er ontstaat geen ' +
+      'employment aan een entiteit, en kern/payroll leest employment nergens. Dat is de naad uit ' +
+      'ARBEID.md par. 3, en besluit 1 van par. 7a zegt aan welke kant hij dicht moet: een brug ' +
+      'van staffId naar employment die een kant op loopt.'),
+    () => P('/api/concern/mijnwerk', {}, N),
+    async r => {
+      const plekken = (r.data && r.data.werkplekken) || [];
+      return { klopt: plekken.length > 0, wat: plekken.length
+        ? plekken.length + ' werkplek(ken): ' + plekken.map(x => x.bedrijf).join(', ')
+        : 'geen dienstverband: "' + ((r.data && r.data.regel) || '') + '"' };
+    });
+
+  /* 17 -- LOON. Het kantoor opent de loonrun van de zaak over deze maand; het
+     contract uit schakel 15 hoort daarin een regel op te leveren. Goedkeuren en
+     uitbetalen horen hier met opzet NIET bij: dat zijn twee handtekeningen en
+     een betaling, en die zet een proef niet. */
+  const kantoor = await P('/api/office/login', { code: 'RTG-OFFICE-PROEF' });
+  const K = kantoor.data && kantoor.data.token;
+  const periode = vanaf.slice(0, 7);
+  /* DE WERELD, NIET DE UITSLAG: een loonrun draait alleen op een regelpakket dat
+     een mens van het kantoor heeft aangemerkt. De meegeleverde jaargang meldt
+     zelf dat hij niet tegen het Handboek is gelegd, dus aanmerken gaat alleen
+     UITDRUKKELIJK en met een reden -- dezelfde opstelling als
+     test/loonstrook-portaal.test.js. Ligt er geen pakket dat deze maand geldt,
+     dan zakt schakel 17 met die reden, en dat is dan een echte bevinding. */
+  if (K) {
+    const regels = await P('/api/office/payroll/regels', { land: 'NL' }, K);
+    const pakket = ((regels.data && regels.data.pakketten) || []).find(x =>
+      x.geldigVan <= vanaf && (!x.geldigTot || x.geldigTot >= vanaf));
+    if (pakket) await P('/api/office/payroll/regels/keur', { land: 'NL', versie: pakket.versie, ondanks: true,
+      reden: 'Adamproef: demo-tabellen, geen echte loonstroken' }, K);
+  }
+  await stap(
+    schakel(17, 'kantoor', 'lid', 'opent de loonrun; het contract levert een loonregel op',
+      'de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen een ' +
+      'Nederlands regelpakket (kern/payroll/jaargangen/nl-2026.json). Een loonrun voor een zaak ' +
+      'buiten Nederland weigert dus, terecht en met de reden erbij: een tarief verzinnen is erger dan ' +
+      'geen run. Wat ontbreekt is een Spaans regelpakket met een bron, geen code. Dat een run voor een ' +
+      'Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js.'),
+    () => K ? P('/api/office/payroll/run/open', { code: WERKGEVER, periode }, K)
+      : Promise.resolve({ status: 0, data: null }),
+    async r => {
+      const run = r.data && r.data.run;
+      const regels = (run && run.regels) || [];
+      const regel = regels.find(x => Number(x.staffId) === Number(novaStaff));
+      return { klopt: !!regel, wat: regel ? 'loonregel voor personeelsnummer ' + novaStaff + ' in run ' + run.id
+        : 'geen loonregel (' + regels.length + ' regels in de run)' };
+    });
+
   return { w, S, M, vacId };
 }
 
@@ -667,7 +791,9 @@ async function meet() {
       'hij zelf ziet. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de ' +
       'keten zijn belofte als het misgaat?). Vierde keten naast tafel-, rit- en toelatingsproef; met opzet ' +
       'geen gedeelde module -- zie MAATSTAF.md par. 7 en scripts/ketenvorm.js.',
-    grens: 'Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen). De andere ' +
+    grens: 'Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen -> team -> ' +
+      'contract -> dienstverband -> loonrun). Vanaf schakel 14 loopt een volwassen lid door waar Adam niet ' +
+      'verder kan; goedkeuren en uitbetalen van de loonrun zijn met opzet niet gelopen. De andere ' +
       'terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden ' +
       'en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou ' +
       'MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt ' +

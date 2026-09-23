@@ -150,12 +150,11 @@ const KAART = [
   ['rtg-adaptive-edge-claim.js', 'adaptieve-balk', 'onderbalk:sb', [
     ['beslist', 'alleen vaste of plakkende balken', "if (stijl.position !== 'fixed' && stijl.position !== 'sticky') return false;"],
     ['schrijft', 'markeert de geclaimde balken', 'winnaars.forEach(function (el) { el.classList.add(EIGEN); });']]],
-  ['rtg-edge-system.js', 'edge-casco', 'wereld:sb vluchtige-context:s hoofdactie:s zichtbaarheidsstand:s', [
+  ['rtg-edge-system.js', 'edge-casco', 'wereld:sb vluchtige-context:s hoofdactie:s', [
     ['beslist', 'wereld: gevraagd, anders work', "var key = o.world || 'work', cfg = C[key] || C.work;"],
     ['schrijft', 'wereld op body', 'd.body.dataset.rtgWorld = key;'],
     ['schrijft', 'eigen context', 'A.ctx = Object.assign({}, A.ctx, c || {});'],
-    ['schrijft', 'tekst van de hoofdactie', 'hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;'],
-    ['schrijft', 'Edge 1-vouwstand', "d.body.classList.add('rtg-edge-fold')"]]],
+    ['schrijft', 'tekst van de hoofdactie', 'hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;']]],
   ['rtg-edge-library.js', 'edge-casco', 'hoofdactie:s onderbalk:s trust-rail:sb wereld:l', [
     ['rendert', 'de hoofdactieknop', '<div class="rtg-edge-action"><button type="button" data-rtg-edge-primary></button></div>'],
     ['rendert', 'de onderbalk van de casco', '<footer class="rtg-edge-bottom">'],
@@ -324,7 +323,7 @@ const WAAROM = {
   hoofdactie: 'De library maakt de knop, de casco en de Edge 2-loader (padtabel) zetten tekst en actie, de Continue Key herbouwt inhoud en anker en de controls verhuizen hem; het scherm wijst intussen zijn eigen data-hoofdactie aan, en het blikveld meldt het verschil als hoofdactie-dubbel.',
   gewicht: 'De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: twee keer een eigen standaard licht voor een ONTBREKEND gewicht (adaptief.js, brug.js; register.js laat het gewicht sinds ronde 1 staan), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), en de Edge-Core laat in zijn tweede register alleen licht toe.',
   waarom: 'De vijf bronnen staan twee keer (BRONNEN in grammatica.js, BRONWOORD in waarom.js), en verhinderd-gaat-niet-door wordt beslist in register.js, balkknop.js, orb.js en actiestaat.js naast de uitleg in grammatica.js en waarom.js.',
-  zichtbaarheidsstand: 'Vijf standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, de Edge 1-vouwstand en de Second Screen; ze delen geen stand.',
+  zichtbaarheidsstand: 'Vier standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, en de Second Screen; ze delen geen stand. De Edge 1-vouwstand is in ronde 2 weggehaald.',
   onderbalk: 'Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, en RTGDaily die zelf een Edge-balk ophangt.',
   bevoegdheid: 'Drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, allowed van de Edge-Core, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft -- het blikveld zegt dat hardop.',
 };

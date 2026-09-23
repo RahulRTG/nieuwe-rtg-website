@@ -4,7 +4,6 @@
   w.__RTGEdge2Loader = true;
 
   var b = d.body, h = d.head || d.documentElement;
-  b.classList.remove('rtg-edge-fold');
   b.setAttribute('data-rtg-edge-2', '');
   if (!b.hasAttribute('data-rtg-edge-2-context')) b.setAttribute('data-rtg-edge-2-context', 'none');
   if (!b.hasAttribute('data-rtg-edge-2-state')) b.setAttribute('data-rtg-edge-2-state', 'overview');

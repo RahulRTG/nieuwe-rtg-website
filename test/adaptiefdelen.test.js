@@ -9,9 +9,13 @@
 
    Dat maakt de volgorde een eis en geen gewoonte: alle scripts laden met
    `defer`, dus in documentvolgorde, en een deel dat NA het register staat is er
-   op het moment dat het register draait nog niet. Er staan vijf schermen die het
-   register laden (office, app, bestanden, reizen-veilig, reizen), en een scherm
-   dat een deel vergeet heeft geen balk en geen context -- zonder foutmelding.
+   op het moment dat het register draait nog niet. Er staan veertien schermen die
+   het register laden (office, app, bestanden, reizen-veilig, reizen, en sinds
+   ronde 2 stap 16 de negen sociale schermen), en een scherm dat een deel vergeet
+   heeft geen balk en geen context -- zonder foutmelding. Dat gebeurde ook echt:
+   het sociaal-spoor zette het register op negen schermen terwijl het object-spoor
+   tegelijk vorm.js afsplitste, en na het samenvoegen had RTG Sociaal geen
+   RTGAdaptief meer. Elk spoor was apart groen.
 
    DE MUTATIE: haal de scripttag van vorm.js weg op reizen-veilig.html. Deze toets
    zakt, en de contextproef van reizen-veilig in test/appmenu.e2e.js ook (de
@@ -23,7 +27,8 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
-const SCHERMEN = ['office', 'app', 'bestanden', 'reizen-veilig', 'reizen'];
+const SCHERMEN = ['office', 'app', 'bestanden', 'reizen-veilig', 'reizen',
+  'sociaal', 'comm', 'meet', 'vonk', 'rendezvous', 'entourage', 'attenties', 'cercle', 'sociaal-prive'];
 /* De volgorde die het register eist: eerst de leer, dan de delen, dan het register.
    De objectpoort (shared/objectverwijzing.js, stap 20) is zo'n deel: het register
    pakt hem bij het laden, en zonder poort gaat er geen object door. */
@@ -35,7 +40,7 @@ function scripts(scherm) {
   return [...html.matchAll(/<script\b[^>]*\bsrc="([^"?]+)/g)].map((m) => m[1]);
 }
 
-test('precies deze vijf schermen laden het register', () => {
+test('precies deze schermen laden het register', () => {
   const dir = path.join(WORTEL, 'public', 'apps');
   const laden = fs.readdirSync(dir).filter((f) => f.endsWith('.html'))
     .filter((f) => scripts(f.slice(0, -5)).includes('/shared/adaptief/register.js'))

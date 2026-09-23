@@ -24,7 +24,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | kernmodules (`server/kern/**`) | 2256 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 381 |
-| toetsbestanden (`test/*.test.js`) | 1726 |
+| toetsbestanden (`test/*.test.js`) | 1728 |
 | schermtoetsen (`test/*.e2e.js`) | 244 |
 
 ## 2. De weg van een verzoek
@@ -153,8 +153,8 @@ app(207) auth(128) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) statu
 accounts(27) schoon(23) managerOnly(18) codenaamVan(18) rtf(18) boardroomWie(17)
 save(17) tooManyTries(14) geenGast(14) express(13) crypto(12) findSupplier(12)
 appUrl(11) pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10) keyVanCodenaam(10)
-rtmail(10) kern(9) gegevensStop(9) logActivity(9) sseToOffice(9) payrollOS(9)
-loginFails(8) stuur(8) mail(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6)
+rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) payrollOS(9) loginFails(8) stuur(8)
+logActivity(8) mail(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6)
 tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
 ```
 

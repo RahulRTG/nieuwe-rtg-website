@@ -3,7 +3,7 @@
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { OFFICE_CODE, app, archief, crypto, db, loginFails, noteFailedTry, officeAuth, kluisAuth, officeState,
-          rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten,
+          rememberSession, sessionFor, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten,
           handelingsspoor } = kern;
 app.post('/api/office/login', (req, res) => {
   const bucket = 'office:' + req.ip;
@@ -131,7 +131,12 @@ app.get('/api/office/stream', (req, res) => {
   if (!officeQueryMag(req.query.token)) return res.status(401).end();
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
   res.write('retry: 3000\n\n');
-  const client = { office: true, res };
+  /* De stroom kent zijn sessie (AUTHORITY.md fase 3): kern/kantoor/intrekking.js
+     sluit hem bij een intrekking, en kern/sse.js vraagt voor elk bericht opnieuw
+     of het token nog een kantoortoken is. */
+  const tok = String(req.query.token || '');
+  const oSess = sessionFor(tok);
+  const client = { office: true, res, sid: (oSess && oSess.sid) || null, geldig: () => officeQueryMag(tok) };
   sseClients.push(client);
   const ping = setInterval(() => res.write(': ping\n\n'), 25000);
   req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });

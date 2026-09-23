@@ -30,8 +30,14 @@ module.exports = (kern) => {
     if (!echtAccount(req, res)) return;
     stuur(res, await accStart(req.session.key, req.body || {}, req));
   });
-  app.post('/api/account/ontkoppel', auth, (req, res) => {
+  app.post('/api/account/ontkoppel', auth, async (req, res) => {
     if (!echtAccount(req, res)) return;
-    stuur(res, accOntkoppel(req.session.key, req.body || {}));
+    const r = accOntkoppel(req.session.key, req.body || {});
+    /* Wie de kantoorrol loslaat, laat ook de kantoorsessies los die er al open
+       stonden (AUTHORITY.md fase 3): anders bleef die deur dertig dagen open. */
+    if (r && r.ok && String((req.body || {}).rol || '') === 'kantoor' && kern.kantoorIntrekking) {
+      r.sessiesGesloten = (await kern.kantoorIntrekking.sluitKantoorVan(req.session.key, req)).sessies;
+    }
+    stuur(res, r);
   });
 };

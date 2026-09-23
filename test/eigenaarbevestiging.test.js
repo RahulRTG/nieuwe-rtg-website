@@ -266,7 +266,10 @@ test('12. een boardroomlid dat niet de eigenaar is, deelt GEEN baliezetels uit',
   const weg = await api('/api/office/boardroom/toegang/weg',
     { codenaam, ...(await bevestigBoard('eigenaar-boardroomtoegang-weg')) }, lid);
   assert.equal(weg.status, 200, JSON.stringify(weg.body).slice(0, 160));
+  /* En sinds AUTHORITY.md fase 3 niet alleen de kamer maar ook de deur: de open
+     kantoorsessie zelf is ingetrokken (test/kantoorintrekking.test.js). */
   const nu = await api('/api/office/boardroom', {}, kantoor);
-  assert.equal(nu.status, 403, 'dezelfde, nog open sessie komt de boardroom direct niet meer in');
+  assert.equal(nu.status, 401, 'dezelfde, nog open sessie is direct dicht');
+  assert.equal(weg.body.sessiesGesloten, 1, 'het antwoord zegt hoeveel sessies er dichtgingen');
 });
 

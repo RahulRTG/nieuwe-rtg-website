@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1585,
-    "kernGedeeld": 240,
+    "kernBreedte": 1586,
+    "kernGedeeld": 241,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -135,6 +135,15 @@
     "planDomeinenGemeten": 7
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 240,
+      "meter": "kernGedeeld 240 -> 241; kernBreedte 1585 -> 1586",
+      "reden": "Intrekken sluit wat openstaat (AUTHORITY.md fase 3). Drie domeinen trekken een kantoorrecht in -- account (de kantoorrol ontkoppelen), kantoren (boardroomtoegang) en ledenbalie (een baliezetel) -- en alle drie lezen daarvoor de ene kern.kantoorIntrekking. Dat is de bedoelde koppeling: EEN plek die weet welke kantoorsessies van een mens zijn en hoe je ze sluit. Een kopie per domein zou deze meter sparen en drie intrekwegen opleveren die binnen een jaar uiteenlopen (LAT-regel 4).",
+      "waarheen": "GRENZEN.json (account, kantoren en ledenbalie dragen kantoorIntrekking) en test/kantoorintrekking.test.js, die per intrekweg tegen een echte server vasthoudt dat de open sessie meteen 401 geeft"
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

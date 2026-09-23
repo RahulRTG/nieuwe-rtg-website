@@ -331,7 +331,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 0 | P0 + P0b | **klaar** |
 | 1 | **de beleidsmotor in de schaduw**: `kan(...)` leest de bestaande poorten en geeft een besluit met opbouw; draait naast elke kantoorroute en telt waar hij het oneens is (de vorm van `tegenfeit.js`) | **staat, in de schaduw** (23 september 2026; zie par. 5a) |
 | 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | fase 1, besluit A2 |
-| 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | fase 2 |
+| 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | fase 2 |
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | fase 4 |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | fase 4 |
@@ -375,6 +375,38 @@ uitkomsten, en `ONBEKEND` (een bron kon niet antwoorden) is geen `WEIGEREN`.
   code, een medewerker op naam en de eigenaar, door alle vier deuren nul keer oneens.
   Drie mutaties zakken: een verkeerd feit, een blinde A3-teller, de documentdeur open.
 
+### 5b. Fase 3, het deel dat nu staat
+
+`server/kern/kantoor/intrekking.js`. Er komt geen tweede intrekmechanisme bij: elke
+sessie draagt een `sid`, `accounts.trekInSessie` zet die duurzaam op de intreklijst
+(over de bus naar elke instantie), en `sessionFor` weigert haar bij het volgende
+verzoek. Nieuw is alleen de vraag welke kantoorsessies van deze mens zijn.
+
+- **Drie intrekwegen sluiten nu wat openstaat.** De kantoorrol ontkoppelen
+  (`/api/account/ontkoppel`), boardroomtoegang intrekken en een baliezetel
+  weghalen sluiten elke open kantoorsessie van die mens, ook op een ander toestel.
+  Het antwoord zegt hoeveel (`sessiesGesloten`). De sessie van wie intrekt blijft
+  staan.
+- **Elke stroom, elk bericht (B3).** `kern/sse.js` vraagt vlak voor ELK bericht of
+  de stroom nog mag (`geldig()`). Een vraag die gooit, geldt als nee. De
+  kantoorstroom kent daarvoor zijn sessie; de leveranciersstroom
+  (`routes/supplier/stroom.js`) controleert de personeelssessie en of de zaak
+  niet is geschorst.
+- **B5.** `concern/employment.js` wijst nu naar `verandering-eigendom.js`, waar de
+  offboarding echt staat.
+- **Getoetst** in `test/kantoorintrekking.test.js`, tegen een echte server. Drie
+  mutaties zakken: ontkoppelen zonder sluiten, een stroom zonder keuring per
+  bericht, en intrekken van de boardroom zonder sluiten. De toets vond zelf een
+  fout: een gesloten stroom werd uit de lijst gehaald terwijl de lus eroverheen
+  liep, en de volgende verbinding miste dan een bericht.
+
+**Wat nog niet staat.** Een machtigingsversie IN het token, zodat elke
+bevoegdheidswijziging (niet alleen deze drie) een sessie ongeldig maakt; offboarding
+als EEN stap die als geheel slaagt of faalt; en de sessies van de GEDEELDE
+kantoorcode, die geen mens dragen en dus niet per mens in te trekken zijn. Dat
+laatste lost fase 2 op (de code wordt een uitnodiging), en fase 2 wacht op de
+schaduw van fase 1.
+
 ---
 
 ## 6. Bevindingen die niet op het ontwerp hoeven te wachten
@@ -383,9 +415,9 @@ uitkomsten, en `ONBEKEND` (een bron kon niet antwoorden) is geen `WEIGEREN`.
 |---|---|---|---|
 | B1 | `/api/office/export.csv` liet geen enkel spoor na | een journaalregel die weigert als hij niet vaststaat (`noteerVast`) | **staat** (23 september 2026; `test/ledenbaliespoor.test.js` toets 8, onder `schrijf-verloren` geen CSV) |
 | B2 | `server/kern/appstore/vierogen.js` liet door zonder identiteit (`onbekend`) | weigeren met `geen-identiteit` en de weg eromheen | **staat** (23 september 2026; `test/appstore-vierogen.test.js` toets 0, `test/appstore-persoon.test.js` toets 7: de gedeelde code tekent een persoonlijke inzending niet meer af) |
-| B3 | de kantoor- en leveranciersstream toetsen alleen bij het openen | bij elk bericht de sessie en de rechten opnieuw | een stap weg |
+| B3 | de kantoor- en leveranciersstream toetsten alleen bij het openen | bij elk bericht de sessie en de rechten opnieuw | **staat** (23 september 2026; par. 5b) |
 | B4 | `/media/:naam` zonder toegangscontrole, een jaar `public` gecachet | eerst meten wat er staat; privémateriaal achter een korte, ondertekende link | vraagt een besluit |
-| B5 | `employment.js` verwijst naar een `offboarding.js` die niet bestaat | fase 3; tot die tijd de verwijzing eerlijk maken | een stap weg |
+| B5 | `employment.js` verwees naar een `offboarding.js` die niet bestaat | de verwijzing eerlijk maken | **staat** (verwijst nu naar `verandering-eigendom.js`) |
 | B6 | de auditketen is niet extern verankerd | `server/lib/keten-anker.js` in bedrijf nemen | vraagt een besluit (waar) |
 | B7 | `/api/office/doc` leverde paspoortscans aan de gedeelde code | op naam, zoals de lijst | **staat** (23 september 2026; gevonden door de A3-meting, par. 5a) |
 

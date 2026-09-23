@@ -110,11 +110,9 @@ module.exports = (kern) => {
      geen namen; die blijven waar ze horen. */
   app.post('/api/office/balie/zetels', boardroomAuth, (req, res) => veilig(res, () =>
     ({ ok: true, baas: !!req.boardroomBaas, zetels: balieZetels() })));
-  /* UITDELEN EN INTREKKEN IS VAN DE EIGENAAR, EN DE SERVER DWINGT DAT AF.
-     Hier stond alleen `boardroomAuth`; alleen het SCHERM verborg de knop, dus
-     elk boardroomlid kon zichzelf bij de ledendossiers zetten, zonder passkey
-     en zonder spoor. Nu: de eigenaar, een verse passkey, en een auditregel op
-     sleutel. magBalie leest live, dus intrekken werkt meteen. */
+  /* UITDELEN EN INTREKKEN IS VAN DE EIGENAAR (de server dwingt het af; eerst
+     verborg alleen het scherm de knop): een verse passkey, een auditregel op
+     sleutel, en intrekken sluit ook de open kantoorsessies (AUTHORITY.md fase 3). */
   app.post('/api/office/balie/zetel', boardroomAuth, async (req, res) => {
     try {
       if (!req.boardroomBaas) return res.status(403).json({ error: 'Alleen de eigenaar geeft of trekt een baliezetel in.' });
@@ -131,6 +129,7 @@ module.exports = (kern) => {
       if (r && r.error) return res.status(r.status || 400).json({ error: r.error });
       afdelingen.audit('eigenaar', (weg ? 'Baliezetel ingetrokken van ' : 'Baliezetel gegeven aan ') + key +
         (bewijs.bewezen ? ' (passkey)' : ' (zonder passkey: dit account heeft er nog geen)'));
+      if (weg && kern.kantoorIntrekking) r.sessiesGesloten = (await kern.kantoorIntrekking.sluitKantoorVan(key, req)).sessies;
       // de verse lijst gaat mee terug: het scherm werkt erop
       res.json(Object.assign({}, r, { zetels: balieZetels() }));
     } catch (e) { console.error('[ledenbalie]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }

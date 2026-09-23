@@ -13,7 +13,7 @@
    meer in -- ook niet met een sessie die al openstond. */
 module.exports = (ctx) => {
   const { app, boardroomAuth, boardroomLijst, keyVanCodenaam, veilig, afdelingen,
-          save, zwaar, boardroomUser } = ctx;
+          save, zwaar, boardroomUser, kern } = ctx;
 
   app.post('/api/office/boardroom/toegang', boardroomAuth, (req, res) => veilig(res, () =>
     ({ status: 200, ok: true, baas: !!req.boardroomBaas, lijst: boardroomLijst().map(t => ({ codenaam: t.codenaam, sinds: t.at })) })));
@@ -44,20 +44,25 @@ module.exports = (ctx) => {
       zwaar.sessieSleutel(req), req, 'Het intrekken van boardroom-toegang').catch(() => null);
     if (!bewijs) return res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' });
     if (bewijs.error) return zwaar.stuur(res, bewijs);
-    return veilig(res, () => {
+    try {
       const wie = String(req.body.codenaam || '').trim().toLowerCase();
       // IN DE LEVENDE LIJST van boardroomLijst(): geen tweede weg naar db.data
       const lijst = boardroomLijst();
-      const voor = lijst.length;
+      const weg = [];
       for (let i = lijst.length - 1; i >= 0; i--) {
-        if (String(lijst[i].codenaam || '').toLowerCase() === wie) lijst.splice(i, 1);
+        if (String(lijst[i].codenaam || '').toLowerCase() === wie) weg.push(lijst.splice(i, 1)[0]);
       }
-      const rest = lijst;
-      if (rest.length !== voor) {
+      let sessiesGesloten = 0;
+      if (weg.length) {
         save();
         afdelingen.audit('eigenaar', 'Boardroom-toegang ingetrokken van ' + req.body.codenaam);
+        /* En de kantoorsessies die al openstonden gaan dicht (AUTHORITY.md
+           fase 3): magBoardroom sloot alleen de kamer, niet de deur ernaartoe. */
+        for (const t of weg) if (t.key && kern.kantoorIntrekking) {
+          sessiesGesloten += (await kern.kantoorIntrekking.sluitKantoorVan(t.key, req)).sessies;
+        }
       }
-      return { status: 200, ok: true, lijst: rest.map(x => ({ codenaam: x.codenaam, sinds: x.at })) };
-    });
+      res.json({ ok: true, sessiesGesloten, lijst: lijst.map(x => ({ codenaam: x.codenaam, sinds: x.at })) });
+    } catch (e) { console.error('[regie-toegang]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 };

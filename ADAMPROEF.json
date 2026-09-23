@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T12:07:57.200Z",
-    "commit": "afd11e9dc",
+    "op": "2026-09-23T12:08:39.600Z",
+    "commit": "6488f16f4",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/adamproef.js",
@@ -18,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Gouden Valk 1FE8",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Blauwe Lynx 32D1",
       "fout": null,
       "ms": 0
     },
@@ -32,7 +32,7 @@
       "status": 200,
       "ziet": "de motor antwoordt het gezin: 1 wegen beoordeeld",
       "fout": null,
-      "ms": 15
+      "ms": 13
     },
     {
       "nr": 3,
@@ -44,7 +44,7 @@
       "status": 200,
       "ziet": "3 wegen, volgorde ongewijzigd: true, geblokkeerde weg blijft staan met \"heb ik een startkwalificatie\"",
       "fout": null,
-      "ms": 14
+      "ms": 11
     },
     {
       "nr": 4,
@@ -56,7 +56,7 @@
       "status": 200,
       "ziet": "de motor gaf 3 wegen bij een kaal doel (via-werk, via-opleiding, via-opvang), samengesteld door het huis: true, geen ervan heet \"open\": true",
       "fout": null,
-      "ms": 5
+      "ms": 6
     },
     {
       "nr": 5,
@@ -66,9 +66,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature 62fec4b0, minimumleeftijd 16",
+      "ziet": "vacature 1ee64ddf, minimumleeftijd 16",
       "fout": null,
-      "ms": 9
+      "ms": 8
     },
     {
       "nr": 6,
@@ -80,7 +80,7 @@
       "status": 200,
       "ziet": "1 vacatures zichtbaar, magSolliciteren: true",
       "fout": null,
-      "ms": 9
+      "ms": 5
     },
     {
       "nr": 7,
@@ -92,7 +92,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 10
+      "ms": 9
     },
     {
       "nr": 8,
@@ -102,7 +102,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie 15fc5f36, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie 7f0e6c45, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
       "ms": 13
     },
@@ -116,7 +116,7 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 24
+      "ms": 28
     },
     {
       "nr": 10,
@@ -128,7 +128,7 @@
       "status": 200,
       "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Uw personeelsuitnodiging staat ...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 20
+      "ms": 26
     },
     {
       "nr": 11,
@@ -152,19 +152,19 @@
       "status": 200,
       "ziet": "opleiding + opvang + werk; 26 vondsten in 1 vorm; werk 1/1, opleiding 24/20000, opvang 1/1",
       "fout": null,
-      "ms": 9
+      "ms": 10
     },
     {
       "nr": 13,
       "van": "werkgever",
       "naar": "Adam",
       "wat": "maakt van de aanname een plek in het team",
-      "bekend": "een Foundation-profiel heeft geen eigen RTG-account, en een aanname claimen eist er een (/api/werving/verbind). De aanname eindigt bij een kassacode die de werkgever met de hand moet doorgeven; een zeventienjarige in een gezin komt zo niet in het team. Besluit 1 van ARBEID.md par. 7a (employment is de waarheid) moet hier een weg voor krijgen.",
+      "bekend": "WAT ONTBREEKT: een weg van een aanname naar een plek in het team voor iemand zonder eigen RTG-account. WAAROM: een aanname claimen eist een lidsessie (/api/werving/verbind in server/routes/werving.js), en een Foundation-profiel heeft die niet; de aanname eindigt bij een kassacode die de werkgever met de hand moet doorgeven. WIE EROVER GAAT: de eigenaar, via besluit 1 van ARBEID.md par. 7a (employment is de waarheid) -- die brug moet ook een gezinslid dragen.",
       "stand": "openBekend",
       "status": 200,
       "ziet": "Adam staat niet in het team (2 mensen)",
       "fout": null,
-      "ms": 2
+      "ms": 3
     },
     {
       "nr": 14,
@@ -176,7 +176,7 @@
       "status": 200,
       "ziet": "direct in dienst, personeelsnummer 184",
       "fout": null,
-      "ms": 138
+      "ms": 242
     },
     {
       "nr": 15,
@@ -188,14 +188,14 @@
       "status": 200,
       "ziet": "1 contractversie(s), vanaf 2026-09-01",
       "fout": null,
-      "ms": 11
+      "ms": 18
     },
     {
       "nr": 16,
       "van": "huis",
       "naar": "lid",
       "wat": "maakt van de aanname een dienstverband bij de entiteit (employment)",
-      "bekend": "de werving eindigt bij een personeelsnummer aan een ZAAK (staffId); er ontstaat geen employment aan een entiteit, en kern/payroll leest employment nergens. Dat is de naad uit ARBEID.md par. 3, en besluit 1 van par. 7a zegt aan welke kant hij dicht moet: een brug van staffId naar employment die een kant op loopt.",
+      "bekend": "WAT ONTBREEKT: een dienstverband (employment) aan de entiteit na een aanname. WAAROM: de werving eindigt bij een personeelsnummer aan een ZAAK (staffId), alleen kern/concern/uitnodiging.js maakt een employment aan, en kern/payroll leest employment nergens -- de naad uit ARBEID.md par. 3. WIE EROVER GAAT: besloten door de eigenaar (par. 7a, besluit 1); wat nog moet is de brug van staffId naar employment die een kant op loopt, in de vorm van kern/mobiliteit/appbrug.js.",
       "stand": "openBekend",
       "status": 200,
       "ziet": "geen dienstverband: \"U heeft nog geen werkplek. Een werkgever nodigt u uit; dat is gratis.\"",
@@ -207,11 +207,11 @@
       "van": "kantoor",
       "naar": "lid",
       "wat": "opent de loonrun; het contract levert een loonregel op",
-      "bekend": "de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen een Nederlands regelpakket (kern/payroll/jaargangen/nl-2026.json). Een loonrun voor een zaak buiten Nederland weigert dus, terecht en met de reden erbij: een tarief verzinnen is erger dan geen run. Wat ontbreekt is een Spaans regelpakket met een bron, geen code. Dat een run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js.",
+      "bekend": "WAT ONTBREEKT: een Spaans regelpakket met een bron. WAAROM: de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen server/kern/payroll/jaargangen/nl-2026.json; kern/payroll/run.js weigert dan terecht, want een tarief verzinnen is erger dan geen run. Dat een run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js. WIE EROVER GAAT: het kantoor dat de loonadministratie voert, via de dekking per land (server/routes/payroll-os-dekking.js); een tabel zonder bron zet geen proef erin.",
       "stand": "openBekend",
       "status": 409,
       "antwoord": "Er is geen regelpakket dat gold op 2026-09-01. Haal de jaargang binnen en merk hem aan.",
-      "ms": 14
+      "ms": 6
     }
   ],
   "storingen": [
@@ -295,7 +295,7 @@
       "naar": "Adam",
       "wat": "maakt van de aanname een plek in het team",
       "gemeten": "Adam staat niet in het team (2 mensen)",
-      "reden": "een Foundation-profiel heeft geen eigen RTG-account, en een aanname claimen eist er een (/api/werving/verbind). De aanname eindigt bij een kassacode die de werkgever met de hand moet doorgeven; een zeventienjarige in een gezin komt zo niet in het team. Besluit 1 van ARBEID.md par. 7a (employment is de waarheid) moet hier een weg voor krijgen."
+      "reden": "WAT ONTBREEKT: een weg van een aanname naar een plek in het team voor iemand zonder eigen RTG-account. WAAROM: een aanname claimen eist een lidsessie (/api/werving/verbind in server/routes/werving.js), en een Foundation-profiel heeft die niet; de aanname eindigt bij een kassacode die de werkgever met de hand moet doorgeven. WIE EROVER GAAT: de eigenaar, via besluit 1 van ARBEID.md par. 7a (employment is de waarheid) -- die brug moet ook een gezinslid dragen."
     },
     {
       "schakel": 16,
@@ -303,7 +303,7 @@
       "naar": "lid",
       "wat": "maakt van de aanname een dienstverband bij de entiteit (employment)",
       "gemeten": "geen dienstverband: \"U heeft nog geen werkplek. Een werkgever nodigt u uit; dat is gratis.\"",
-      "reden": "de werving eindigt bij een personeelsnummer aan een ZAAK (staffId); er ontstaat geen employment aan een entiteit, en kern/payroll leest employment nergens. Dat is de naad uit ARBEID.md par. 3, en besluit 1 van par. 7a zegt aan welke kant hij dicht moet: een brug van staffId naar employment die een kant op loopt."
+      "reden": "WAT ONTBREEKT: een dienstverband (employment) aan de entiteit na een aanname. WAAROM: de werving eindigt bij een personeelsnummer aan een ZAAK (staffId), alleen kern/concern/uitnodiging.js maakt een employment aan, en kern/payroll leest employment nergens -- de naad uit ARBEID.md par. 3. WIE EROVER GAAT: besloten door de eigenaar (par. 7a, besluit 1); wat nog moet is de brug van staffId naar employment die een kant op loopt, in de vorm van kern/mobiliteit/appbrug.js."
     },
     {
       "schakel": 17,
@@ -311,7 +311,7 @@
       "naar": "lid",
       "wat": "opent de loonrun; het contract levert een loonregel op",
       "gemeten": "Er is geen regelpakket dat gold op 2026-09-01. Haal de jaargang binnen en merk hem aan.",
-      "reden": "de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen een Nederlands regelpakket (kern/payroll/jaargangen/nl-2026.json). Een loonrun voor een zaak buiten Nederland weigert dus, terecht en met de reden erbij: een tarief verzinnen is erger dan geen run. Wat ontbreekt is een Spaans regelpakket met een bron, geen code. Dat een run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js."
+      "reden": "WAT ONTBREEKT: een Spaans regelpakket met een bron. WAAROM: de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen server/kern/payroll/jaargangen/nl-2026.json; kern/payroll/run.js weigert dan terecht, want een tarief verzinnen is erger dan geen run. Dat een run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js. WIE EROVER GAAT: het kantoor dat de loonadministratie voert, via de dekking per land (server/routes/payroll-os-dekking.js); een tabel zonder bron zet geen proef erin."
     }
   ]
 }

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T16:21:33.446Z",
-    "commit": "81cf70a0",
+    "op": "2026-09-23T17:00:16.158Z",
+    "commit": "5b827e6",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -164,6 +164,10 @@
       "operator": "!==->===#0",
       "gezakt": 8,
       "geprobeerd": 2
+    },
+    "adaptiefdelen.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "administratie.test.js": {
       "soort": "server",
@@ -2559,6 +2563,13 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "edgeobject.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "eenaccount-werkruimte.test.js": {
       "soort": "server",
@@ -5872,6 +5883,14 @@
     "objectveld.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "objectverwijzing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/objectverwijzing.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "ochtend.test.js": {
       "soort": "server",

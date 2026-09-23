@@ -116,7 +116,7 @@ module.exports = ({ kern }) => {
 
   const ctx = { accounts, db, crypto, bearer, logActivity, notifySupplier,
     transactie, lijstVan, publiek, vindIn, geldig, herstelGeldig, supplierVanCode,
-    idemHash, doel: DOEL, scope: SCOPE, dagen: DAGEN, dubbeltikMs: DUBBELTIK_MS };
+    idemHash, doel: DOEL, scope: SCOPE, dagen: DAGEN, dubbeltikMs: DUBBELTIK_MS, kern };
   return Object.assign({ wervingsBasis, wervingsLink },
     require('./uitnodiging-uitgifte')(ctx), require('./uitnodiging-claim')(ctx));
 };

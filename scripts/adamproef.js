@@ -546,6 +546,28 @@ async function loop(basis, uit) {
         : 'Adam staat niet in het team (' + team.length + ' mensen)' };
     });
 
+  /* DE WERELD VAN DE ONDERNEMER. Het dienstverband hangt aan een ENTITEIT, en
+     een zaak wijst zijn entiteit aan via een vestiging (kern/concern/
+     vestiging.js). Cafe Brisa hangt in de seed aan niets, dus zonder deze
+     opstelling meet schakel 16 alleen dat de zaak nergens aan hangt. Een lid
+     wordt manager van de zaak (uitnodiging + claim, de gewone weg) en koppelt
+     hem aan zijn eigen entiteit -- dezelfde stappen als een echte ondernemer,
+     langs dezelfde routes. Geen uitslag klaarzetten, alleen de wereld. */
+  const baas = await P('/api/auth/register', { name: 'Ondernemer Proef', email: 'ondernemer.proef@voorbeeld.nl',
+    phone: '0612349875', password: 'geheim123', geboortedatum: '1980-04-04', tier: 'business', pasApp: 'business' });
+  const O = baas.data && baas.data.token;
+  const baasInv = await P('/api/supplier/staff/invite', { name: 'Ondernemer Proef', role: 'manager', func: 'Eigenaar' }, S);
+  const baasCode = baasInv.data && baasInv.data.invite && baasInv.data.invite.kassacode;
+  if (O && baasCode) await P('/api/werving/verbind', { kassacode: baasCode }, O);
+  const ent = O ? await P('/api/concern/entiteit/nieuw', { naam: 'Brisa SL', land: 'ES' }, O) : null;
+  const entId = ent && ent.data && ent.data.entiteit && ent.data.entiteit.id;
+  const ves = entId ? await P('/api/concern/vestiging/nieuw', { entiteit: entId, naam: 'Ibiza', plaats: 'Ibiza' }, O) : null;
+  const vesId = ves && ves.data && ves.data.vestiging && ves.data.vestiging.id;
+  const koppel = vesId ? await P('/api/concern/vestiging/zaak', { vestiging: vesId, code: WERKGEVER }, O) : null;
+  if (!koppel || koppel.status !== 200) throw new Error('de ondernemer kon de zaak niet aan zijn entiteit koppelen (status ' +
+    (koppel ? koppel.status + ': ' + ((koppel.data && koppel.data.error) || '') : 'geen') + ')');
+  uit.wereld.ondernemer = 'lid, manager van ' + WERKGEVER + ', koppelt de zaak aan zijn entiteit via /api/concern/vestiging/zaak';
+
   /* Het volwassen lid: een eigen account, een cv, en een sollicitatie op
      dezelfde vacature. Geen uitslag klaarzetten, alleen de wereld. */
   const nova = await P('/api/auth/register', { name: 'Nova Proef', email: 'nova.proef@voorbeeld.nl',
@@ -588,20 +610,20 @@ async function loop(basis, uit) {
     });
 
   /* 16 -- IS DE AANNAME OOK EEN DIENSTVERBAND BIJ DE ENTITEIT? Dat is besluit 1
-     van ARBEID.md par. 7a. Het lid zelf vraagt het na, op zijn eigen sessie:
-     staat de werkgever tussen zijn werkplekken? */
+     van ARBEID.md par. 7a, en sinds 23 september draagt kern/concern/aanname.js
+     de brug. Het lid zelf vraagt het na, op zijn eigen sessie: staat de
+     werkgever tussen zijn werkplekken? Zonder de brug zakt deze schakel (met een
+     mutatie nagetrokken: "U heeft nog geen werkplek"). */
   await stap(
-    schakel(16, 'huis', 'lid', 'maakt van de aanname een dienstverband bij de entiteit (employment)',
-      'WAT ONTBREEKT: een dienstverband (employment) aan de entiteit na een aanname. WAAROM: de ' +
-      'werving eindigt bij een personeelsnummer aan een ZAAK (staffId), alleen kern/concern/uitnodiging.js ' +
-      'maakt een employment aan, en kern/payroll leest employment nergens -- de naad uit ARBEID.md par. 3. ' +
-      'WIE EROVER GAAT: besloten door de eigenaar (par. 7a, besluit 1); wat nog moet is de brug van ' +
-      'staffId naar employment die een kant op loopt, in de vorm van kern/mobiliteit/appbrug.js.'),
+    schakel(16, 'huis', 'lid', 'maakt van de aanname een dienstverband bij de entiteit (employment)'),
     () => P('/api/concern/mijnwerk', {}, N),
     async r => {
       const plekken = (r.data && r.data.werkplekken) || [];
-      return { klopt: plekken.length > 0, wat: plekken.length
-        ? plekken.length + ' werkplek(ken): ' + plekken.map(x => x.bedrijf).join(', ')
+      /* Het dienstverband hoort bij de entiteit van de ZAAK (Brisa SL) en niet
+         bij een willekeurige werkgever, en de rol is de functie van de vacature. */
+      const hier = plekken.find(x => x.bedrijf === 'Brisa SL' && x.rol === 'Keukenhulp');
+      return { klopt: !!hier, wat: plekken.length
+        ? plekken.length + ' werkplek(ken): ' + plekken.map(x => x.bedrijf + ' als ' + x.rol).join(', ')
         : 'geen dienstverband: "' + ((r.data && r.data.regel) || '') + '"' };
     });
 

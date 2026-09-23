@@ -94,20 +94,7 @@ module.exports = ctx => {
     if (staff && accounts.deactivateStaff) accounts.deactivateStaff(staff.id);
   }
 
-  function neveneffecten(lid, s, naam, inv) {
-    try {
-      const st = accounts.getMemberState(lid.id) || {};
-      if (!st.via) {
-        st.via = { soort: 'zaak', code: s.code, naam: s.name, at: new Date().toISOString() };
-        accounts.saveMemberState(lid.id, st);
-      }
-    } catch (e) {}
-    logActivity(s.code, { name: naam, role: inv.role },
-      naam + ' meldde zich aan als teamlid (RTG-lid)');
-    try {
-      notifySupplier(s.code, { kind: 'team', text: naam + ' heeft zich aangemeld bij het team.' });
-    } catch (e) {}
-  }
+  const { neveneffecten } = require('./uitnodiging-na')(ctx);
 
   async function verbindCode(lid, kassacode, opties, verwachtSupplier) {
     if (!lid || !kassacode)
@@ -175,8 +162,8 @@ module.exports = ctx => {
       const bevestigd = await Promise.resolve(bevestigActief(inv.id, lid.id, staff.id));
       if (!bevestigd || bevestigd.error) { sluitStaff(staff); return bevestigd; }
     } catch (e) { sluitStaff(staff); throw e; }
-    neveneffecten(lid, s, naam, inv);
-    return { ok: true, staff, naam, ...(legacyPin ? { pin } : {}), s, invite: inv };
+    const dienstverband = neveneffecten(lid, s, naam, inv);
+    return { ok: true, staff, naam, ...(legacyPin ? { pin } : {}), s, invite: inv, dienstverband };
   }
 
   async function wisselCodeIn(lid, kassacode) {
@@ -196,7 +183,7 @@ module.exports = ctx => {
     const lid = accounts.getUserById(id);
     if (!lid) return null;
     const v = await verbindCode(lid, uitgegeven.kassacode, {}, supplier.code);
-    return v && v.ok ? { staffId: v.staff.id, naam: v.naam } : null;
+    return v && v.ok ? { staffId: v.staff.id, naam: v.naam, dienstverband: v.dienstverband || null } : null;
   }
 
   return { zoekInvite, verbindCode, wisselCodeIn, neemAan };

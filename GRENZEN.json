@@ -2049,6 +2049,7 @@
       "dagen",
       "dagrapport",
       "defensie",
+      "dienstverbandUitAanname",
       "doel",
       "dorpBuurt",
       "dorpDrukte",
@@ -2599,6 +2600,7 @@
       "tafelwensen"
     ],
     "werving": [
+      "dienstverbandUitAanname",
       "loginFails",
       "noteFailedTry",
       "notifySupplier",

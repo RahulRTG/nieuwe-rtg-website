@@ -185,7 +185,15 @@ module.exports = (kern) => {
   });
 
   const personeelVan = (code) => (accounts && accounts.listStaff ? accounts.listStaff(code) : []);
-  require('./concern/vestiging')(kern, { mijn, mijnVestiging, stuur, nietGevonden });
+  /* Beheert dit lid de zaak? Een actieve manager in het personeelsregister van
+     die zaak; hier gebouwd en als hulp doorgegeven, zoals personeelVan. */
+  const beheertZaak = (req, code) => {
+    const acc = req.session && req.session.account;
+    if (!acc || acc.id == null || !accounts || !accounts.staffByMember) return false;
+    const rij = accounts.staffByMember(code, acc.id);
+    return !!(rij && rij.role === 'manager');
+  };
+  require('./concern/vestiging')(kern, { mijn, mijnVestiging, stuur, nietGevonden, beheertZaak });
   require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden, personeelVan });
   require('./concern/verandering')(kern, { mijn, stuur, nietGevonden });
   require('./concern/voorstel')(kern, { mijn, stuur, nietGevonden });

@@ -28,12 +28,12 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1589,
+    "kernBreedte": 1592,
     "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 331,
+    "keuringOmvang": 332,
     "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -151,11 +151,21 @@
   "notities": [
     {
       "datum": "2026-09-23",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 331,
+      "vervalt": "2026-12-23",
+      "meter": "keuringOmvang 331 -> 332",
+      "reden": "De SOM van twee lijnen en geen nieuwe groei: server/lib/mutatiecontracten.js is het verzamelregister waar elke tak EEN require-regel aan toevoegt. #347 bracht hem op 9393 bytes (mutatiecontracten-werkbetaling), #350 op 9387, main stond op 9335 -- alle drie onder de waarschuwingsgrens van ~9400. Samen staat hij op 9445. De harde 10 kB-grens verandert niet, en routes/concern.js, dat door dezelfde samenvoeging erover ging, is in dezelfde ronde op zijn naad geknipt (routes/concern/vestiging.js).",
+      "waarheen": "server/lib/mutatiecontracten.js: de require-lijst van deelregisters laat zich afleiden uit de bestandsnamen (mutatiecontracten-*.js) in plaats van ze een voor een te noemen; dat brengt hem ruim onder de grens."
+    },
+    {
+      "datum": "2026-09-23",
       "soort": "structureel",
       "sleutel": "kernBreedte",
       "van": 1586,
-      "meter": "kernBreedte 1586 -> 1590 (de SOM van drie lijnen, niet een nieuwe naam)",
-      "reden": "Samenvoeging van #346, #347 en #350 op main (954b477). Main stond op 1586. #347 voegde er EEN naam aan toe (de kantooruitnodiging, AUTHORITY.md fase 2: 1586 -> 1587), #350 DRIE (de brug, de loonkant en de inhaalslag uit ARBEID.md par. 7a: 1583 -> 1586 op zijn eigen basis), en #346 geen. Elke stap staat met een eigen notitie hieronder. Er komt met deze samenvoeging geen naam bij -- het getal stijgt omdat de lijnen nu naast elkaar staan.",
+      "meter": "kernBreedte 1586 -> 1592 (de SOM van drie lijnen, niet een nieuwe naam)",
+      "reden": "Samenvoeging van #346, #347 en #350 op main (954b477). Main stond op 1586. #347 voegde er DRIE namen aan toe (de kantooruitnodiging, en de schakelaar en het bankbewijs van de Werk OS-uitgave: 1586 -> 1589), #350 DRIE (de brug, de loonkant en de inhaalslag uit ARBEID.md par. 7a: 1583 -> 1586 op zijn eigen basis), en #346 geen. Elke stap staat met een eigen notitie hieronder. Er komt met deze samenvoeging geen naam bij -- het getal stijgt omdat de lijnen nu naast elkaar staan.",
       "waarheen": "De notities van de drie takken zelf; dezelfde vorm als de samenvoeging van 15 september (1579 -> 1580)."
     },
     {

@@ -6,9 +6,9 @@
    eigendomscontrole (mijn, mijnVestiging) blijft in het hoofdbestand en komt hier
    binnen als hulp, zodat er geen tweede kopie van ontstaat. */
 module.exports = (kern, hulp) => {
-  const { app, auth, accounts, vestigingNieuw, vestigingUnit, vestigingUnitLos, vestigingSluit,
+  const { app, auth, vestigingNieuw, vestigingUnit, vestigingUnitLos, vestigingSluit,
     vestigingBeeld, vestigingAlleVanEntiteit } = kern;
-  const { mijn, mijnVestiging, stuur, nietGevonden } = hulp;
+  const { mijn, mijnVestiging, stuur, nietGevonden, beheertZaak } = hulp;
 
   app.post('/api/concern/vestigingen', auth, (req, res) => {
     const e = mijn(req);
@@ -27,13 +27,7 @@ module.exports = (kern, hulp) => {
   app.post('/api/concern/vestiging/zaak', auth, (req, res) => {
     const v = mijnVestiging(req);
     if (!v) return stuur(res, nietGevonden);
-    const beheert = (code) => {
-      const acc = req.session && req.session.account;
-      if (!acc || acc.id == null || !accounts || !accounts.staffByMember) return false;
-      const rij = accounts.staffByMember(code, acc.id);
-      return !!(rij && rij.role === 'manager');
-    };
-    stuur(res, vestigingUnit(v, (req.body || {}).code, beheert));
+    stuur(res, vestigingUnit(v, (req.body || {}).code, (code) => beheertZaak(req, code)));
   });
 
   app.post('/api/concern/vestiging/zaaklos', auth, (req, res) => {

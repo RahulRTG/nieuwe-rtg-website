@@ -13,8 +13,7 @@
    De keuze wordt per pagina onthouden, en #deel-<naam> in de URL opent dat
    deel direct (deep-link; andere hashes blijven met rust). Programmatisch:
    RTGDeel.open('naam') -- ook voor toetsen die als een gebruiker eerst
-   navigeren en dan klikken. Bij elke wissel vuurt er een 'rtgdeel'-event
-   op document, voor schermen die dan opnieuw willen meten.
+   navigeren en dan klikken.
 
    Een pagina doet mee door dit bestand te laden (defer); meer is het niet.
    De stijl gebruikt de variabelen van het huis waar hij staat: het leden-OS

@@ -88,6 +88,7 @@ module.exports = (kern) => {
     }
     res.json({ ok: true, code: v.s.code, bedrijf: v.s.name, staffId: v.staff.id,
       name: v.naam, role: v.invite.role, ...(legacyPin && v.pin ? { pin: v.pin } : {}),
+      dienstverband: v.dienstverband || null,
       identiteit: identiteitStap(lid) });
   });
 

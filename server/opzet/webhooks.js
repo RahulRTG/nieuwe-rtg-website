@@ -73,6 +73,8 @@ module.exports = function hangWebhooksOp(deps) {
       log.warn('munt-webhook geweigerd', { fout: e.message, id: req.id });
       return res.status(400).json({ error: 'Ongeldige handtekening.' });
     }
+    // fase 7: pas NA de handtekening draait het werk als de aanbieder (kern/dienstidentiteit.js)
+    return require('../kern/dienstidentiteit').alsAanbieder('munt', async () => {
     try {
       if (evt && (evt.status === 'ontvangen' || evt.type === 'ontvangst.voltooid') && evt.id) {
         const entry = munten.bevestig({ id: evt.id, euroCenten: evt.euroCenten });
@@ -96,5 +98,6 @@ module.exports = function hangWebhooksOp(deps) {
       return res.status(500).json({ error: 'De ontvangst is nog niet verwerkt; probeer de webhook opnieuw.' });
     }
     res.json({ ok: true });
+    });
   });
 };

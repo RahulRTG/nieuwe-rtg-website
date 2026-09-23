@@ -456,6 +456,10 @@ const EIGEN_MODULE = new Map([
      nagetrokken: linkSync terug naar een kale schrijf (toets 1 zakt), een
      verkeerde lengte stil vervangen (toets 2 zakt). */
   ['sleutel-wedloop.test.js', ['server/lib/sleutelbestand.js']],
+  /* VEEGDOOR (Edge ronde 2, stap 8). De toets beproeft de helper zelf: welke weg
+     veegDoor nam, en vasthouden zonder loslaten. De liegpoort raakt hem niet,
+     want er gaat geen antwoord van een route in om; de module is test/helper.js. */
+  ['helper-veegdoor.e2e.js', ['test/helper.js']],
   // The document pilot reaches this handler through HTTP, browser or child processes.
   ['document-equivalence.e2e.js', ['server/kern/document-capability.js']],
   ['document-persistence.e2e.js', ['server/kern/document-capability.js']],
@@ -566,6 +570,11 @@ const EIGEN_MODULE = new Map([
      bewering zakken. De expliciete koppeling voorkomt dat een echte VM-toets
      als "geen module gevonden" buiten de mutatiemeting blijft. */
   ['workspace-platform.test.js', ['public/shared/interface/module-sdk.js']],
+  /* De werkruimtecontext (Edge ronde 2, stap 23) is browsercode die de toets in
+     een VM uitvoert, dus zonder require. Met de hand nagetrokken: de herkomst
+     overschrijven, een cache terugzetten, terugvallen op RTGAdaptief en bij een
+     weigering de oude kopie teruggeven laten elk een bewering zakken. */
+  ['workspace-context.test.js', ['public/shared/interface/workspace-context.js']],
   /* DE TENANTLAAG: twee toetsen die de server als kindproces starten en dus
      geen require van hun module dragen. Beide regels zijn met een mutatie
      nagetrokken en niet gegokt.
@@ -671,7 +680,7 @@ const EIGEN_MODULE = new Map([
      hoofdactie aan) -- alle vier raak. De module die hij het hardst beproeft is
      het blikveld zelf. De contexttoets leest register.js als tekst in een
      nagemaakt venster, dus de motor vindt zijn module niet via require. */
-  ['edgeblikveld.e2e.js', ['public/shared/edge/blikveld.js']],
+  ['edgeblikveld.e2e.js', ['public/shared/edge/blikveld.js', 'public/shared/edge/blikveld-hoofdactie.js']],
   ['edgecontext.test.js', ['public/shared/adaptief/register.js']],
   /* DE METING PER CAPABILITY. Vier mutaties, vier raak: de vloer eruit (dan
      krijgt drie verzoeken een geruststellende 0,0%), routes zonder functie
@@ -1091,6 +1100,11 @@ const GEEN_BRONMUTATIE = new Map([
      het gedrag niet vast, en dat is aantoonbaar onwaar) en niet als niet-gemeten
      (dat zou eerlijk werk bestraffen, zie de kop van deze lijst). */
   ['ondernemerbewijs.test.js', 'leest registers en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). De faalklasse staat in de toets zelf: vier tegenproeven op gemuteerde registers in een wegwerpmap, elk aantoonbaar raak'],
+  /* HET REGISTER IN DELEN (Edge ronde 2, stap 19 en 20). Deze toets leest de
+     SCRIPTTAGS van zes schermen; de operatoren van de motor zijn gedragsmatig en
+     raken geen scripttag (met de HTML als module: "geen bruikbare mutatie"). De
+     foutklasse is met de hand nagetrokken, en alle drie zakten ze. */
+  ['adaptiefdelen.test.js', 'leest scripttags in HTML en geen module; de operatoren raken geen scripttag. Met de hand nagetrokken: vorm.js weg op reizen-veilig (zakt, en appmenu.e2e.js op de context van reizen-veilig), vorm.js na register.js op app (zakt), de objectpoort na rtg-schil.js in werkruimte (zakt, en werkruimte-objecten.e2e.js)'],
   ['autonomiegrens.test.js', 'leest EXECUTION_MAP.json en ROLPROEF.json en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). Toets 3 is de tegenproef: een blind pad autonoom maken laat de grens uitslaan'],
   /* Ik heb dit bestand eerst in EIGEN_MODULE gezet met public/apps/voertuig.js en
      rit.js erbij -- de twee modules die deze toets echt leest. De motor probeerde

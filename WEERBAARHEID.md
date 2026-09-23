@@ -151,7 +151,7 @@ slaagde. **Een deur dichtzetten is de goedkoopste manier om te ontdekken welke
 foutafhandeling er nooit is geweest.**
 
 **De prijs staat hardop.** `anoniemUitvoerbaar` ging van 365 terug naar
-<!--getal:kantoor.anoniem-->366<!--/getal-->, en die teller mag alleen dalen. De
+<!--getal:kantoor.anoniem-->358<!--/getal-->, en die teller mag alleen dalen. De
 verhoging staat daarom uitgeschreven in `KANTOORMACHT.json` zelf — met de reden
 en met wat hem weer omlaag brengt — in de vorm van de `OPEN_MAX`-verhoging uit
 `SERVICE.md` par. 13, en `test/kantoormacht.test.js` toets 6b weigert voortaan

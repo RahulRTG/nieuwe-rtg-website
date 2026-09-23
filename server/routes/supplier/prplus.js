@@ -56,7 +56,7 @@ module.exports = (kern) => {
   // de stille minuutklok: ook zonder dat iemand het kantoor opent gaat de
   // geplande campagne live (unref: houdt het proces niet wakker)
   const klok = setInterval(() => {
-    try { for (const code of Object.keys(db.data.campagnes || {})) publiceerRijp(code); } catch (e) {}
+    try { require('../../kern/dienstidentiteit').alsDienst('prplus', () => { for (const code of Object.keys(db.data.campagnes || {})) publiceerRijp(code); }); } catch (e) {}
   }, 60000);
   if (klok.unref) klok.unref();
 

@@ -28,8 +28,9 @@
 
 const { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN } = require('./regels');
 const { maakFeiten } = require('./feiten');
+const { werkwoordVan, kamerVan, EXPORTEN } = require('./werkwoorden');
 
-const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop'];
+const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'];
 const MAX_SLEUTELS = 2400;   // ~600 kantoorroutes maal hoogstens vier deuren
 const VOORBEELDEN = 20;
 const DAG = 86400000;
@@ -46,11 +47,15 @@ const VERKLAARD_OPEN = Object.freeze({
 
 function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron, nu }) {
   const tijd = nu || Date.now;
-  const eigen = require('../eigencollectie')({ db, domein: 'kern/beleidsmotor', bezit: { beleidsmotor: 'kaart' } });
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/beleidsmotor', bezit: { beleidsmotor: 'kaart', zetelGebruik: 'kaart' } });
   const bak = () => eigen.bak('beleidsmotor');
   const kijk = () => eigen.kijk('beleidsmotor');
   const spoeler = require('../kantoor/mensdeur-spoel').maakSpoeler({
     bak, save, bewerkCollectie, collectie: 'beleidsmotor', maxPaden: MAX_SLEUTELS, velden: VELDEN });
+  /* Fase 8: per zetel alleen de laatste gebruiksdatum (./slapend.js). */
+  const slapend = require('./slapend').maakSlapend({ bak: () => eigen.bak('zetelGebruik'),
+    kijk: () => eigen.kijk('zetelGebruik'), save, bewerkCollectie, nu: tijd });
+  const ZETEL_VAN_DEUR = { kantoor: 'kantoorrol', 'op-naam': 'kantoorrol', boardroom: 'boardroom', balie: 'balie' };
   const feitenVan = maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron });
   const oneensVoorbeelden = [];
   const sinds = tijd();
@@ -70,18 +75,22 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
         besluit = kan(feiten, deur);
       } catch (e) { besluit = null; }
       let door = false;
-      if (besluit && res && typeof res.once === 'function') {
-        res.once('finish', () => {
-          try {
-            vergelijk(deur, patroon(req), door, besluit);
-            /* A2 in de schaduw: de eigenaar door een gevoelige deur, zonder
-               stap-op. Alleen als hij er echt doorheen ging. */
-            if (door && feiten && feiten.eigenaarMens === true && STAPOP_DEUREN.includes(deur)) {
-              spoeler.tikVeld('stapop ' + deur + ' ' + patroon(req), 'eigenaarZonderStapop');
-            }
-          } catch (e) { /* een meting raakt geen antwoord */ }
-        });
-      }
+      if (besluit) naAfloop(req, res, () => {
+        vergelijk(deur, patroon(req), door, besluit);
+        /* A2 in de schaduw: de eigenaar door een gevoelige deur, zonder
+           stap-op. Alleen als hij er echt doorheen ging. */
+        if (door && feiten && feiten.eigenaarMens === true && STAPOP_DEUREN.includes(deur)) {
+          spoeler.tikVeld('stapop ' + deur + ' ' + patroon(req), 'eigenaarZonderStapop');
+        }
+        if (door && typeof boardroomWie === 'function') {
+          const key = boardroomWie(req);
+          if (key) slapend.noteer(key, ZETEL_VAN_DEUR[deur]);
+        }
+        /* Fase 4: welk werkwoord en welke kamer, zonder wie (./werkwoorden.js). */
+        if (door && deur === 'boardroom') spoeler.tikVeld('werkwoord ' + (werkwoordVan(req.routePatroon) || '(geen)'), 'gebruik');
+        const kamer = door && deur === 'kantoor' ? kamerVan(patroon(req), req.body) : null;
+        if (kamer) spoeler.tikVeld('kamer ' + kamer, 'gebruik');
+      });
       return poort(req, res, function () { door = true; return next.apply(this, arguments); });
     };
     Object.defineProperty(gewikkeld, 'name', { value: poort.name || deur });
@@ -103,18 +112,31 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
   /* A3 IN DE SCHADUW: hangt VOOR de kantoorroutes en kijkt na afloop of er een
      poort van de motor heeft gelopen. Een 404 is geen route; die telt niet. */
   function meelezer(req, res, next) {
-    if (res && typeof res.once === 'function') {
-      res.once('finish', () => {
-        try {
-          if (req.beleidsPoorten && req.beleidsPoorten.length) return;
-          if (!req.routePatroon || res.statusCode === 404) return;
-          const sleutel = patroon(req);
-          if (VERKLAARD_OPEN[sleutel]) return;
-          spoeler.tikVeld('geen-poort ' + sleutel, 'zonderPoort');
-        } catch (e) { /* idem */ }
+    naAfloop(req, res, () => {
+      /* FASE 6: een geleverde export telt apart van lezen (./werkwoorden.js). */
+      if (res.statusCode === 200 && EXPORTEN[patroon(req)]) spoeler.tikVeld('export ' + patroon(req), 'gebruik');
+      if (req.beleidsPoorten && req.beleidsPoorten.length) return;
+      if (!req.routePatroon || res.statusCode === 404) return;
+      const sleutel = patroon(req);
+      if (VERKLAARD_OPEN[sleutel]) return;
+      spoeler.tikVeld('geen-poort ' + sleutel, 'zonderPoort');
+    });
+    next();
+  }
+
+  /* EEN LUISTERAAR PER VERZOEK, op 'close': een kantoorroute draagt al tien
+     finish-luisteraars van andere lagen, en de elfde gaf een MaxListeners-
+     waarschuwing. Alleen een afgerond antwoord telt (writableFinished). */
+  function naAfloop(req, res, werk) {
+    if (!req || !res || typeof res.once !== 'function') return;
+    if (!req.beleidsWerk) {
+      req.beleidsWerk = [];
+      res.once('close', () => {
+        if (res.writableFinished === false) return;
+        for (const w of req.beleidsWerk) { try { w(); } catch (e) { /* een meting raakt geen antwoord */ } }
       });
     }
-    next();
+    req.beleidsWerk.push(werk);
   }
 
   /* DE STAND staat in ./stand.js: hoe de tellers gelezen worden is een eigen
@@ -137,7 +159,8 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     });
   }
 
-  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, bewaak, meelezer, stand, spoel: spoeler.spoel };
+  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, bewaak, meelezer, stand,
+    spoel: () => { slapend.spoel(); return spoeler.spoel(); }, laatstGebruikt: slapend.laatst };
 }
 
 module.exports = { maakBeleidsmotor, VERKLAARD_OPEN, VELDEN };

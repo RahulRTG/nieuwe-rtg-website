@@ -96,7 +96,8 @@
 <script src="/shared/rtg-edge-icons.js"></script>
 <script src="/shared/rtg-edge-library.js"></script>
 <script src="/shared/rtg-edge-system.js"></script>
-<script src="/shared/rtg-schil.js?v=2c41e5d3"></script>
+<script src="/shared/objectverwijzing.js"></script>
+<script src="/shared/rtg-schil.js?v=d659ea22"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -214,6 +215,8 @@
   document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); paletOpen(); }
   });
+  // de Zoeken-knop van de schil doet wat ⌘K doet (de Edge vangt ⌘K als hij aanstaat)
+  $('#ruimte').addEventListener('rtg-palet-open', () => { if (RTGEdge.active) RTGEdge.openFunctions(); else paletOpen(); });
 
   /* Een kamer bewaren (stap 5). Bewust met een naam die u zelf geeft: "Mijn
      Directie" onthoudt u, "Werkruimte 3" niet. */

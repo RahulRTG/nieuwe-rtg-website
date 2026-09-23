@@ -2138,9 +2138,8 @@
       "id": "foundation-vrienden",
       "url": "/apps/foundation/vrienden.html",
       "name": "Contacten",
-      "world": "living",
+      "world": "foundation",
       "worlds": [
-        "living",
         "foundation"
       ],
       "type": "social",

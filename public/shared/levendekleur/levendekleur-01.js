@@ -97,7 +97,6 @@
     try { localStorage.setItem(BKEY, String(Math.max(0, Math.min(100, +v)))); } catch (e) {}
     bCache = Math.max(0, Math.min(100, +v));
     bPas(); vorige = ''; bMerk();
-    try { w.dispatchEvent(new Event('rtg-beweging')); } catch (e) {}
   }
 
   // de zoekbalk-parameters veranderen niet zolang de pagina staat: één keer

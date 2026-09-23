@@ -36,37 +36,31 @@
       Input.prepare(rt, action); setState('expanded'); return true;
     }
     setState('dock');
-    var custom = rt.model.registry[action];
-    if (custom && custom.run) {
-      if (!K.allowed(custom)) return false;
-      if (custom.confirm && !w.confirm(custom.confirm)) return false;
-      custom.run(); return true;
-    }
-    if (action === 'home') { w.location.href = rt.edge.cfg.home; return true; }
+    // Een scherm met een eigen thuis (het wereldbureau) annuleert; anders gaan we naar cfg.home.
+    if (action === 'home') { if (w.dispatchEvent(new w.CustomEvent('rtg-edge-home', { cancelable: true }))) w.location.href = rt.edge.cfg.home; return true; }
     if (action === 'back') { w.history.back(); return true; }
     if (action === 'worlds') return legacy('.rtg-edge-worlds-trigger');
     if (action === 'menu') return legacy('.rtg-edge-menu');
     if (action === 'status') return legacy('.rtg-edge-state');
     if (action === 'ai') return legacy('.rtg-edge-ai');
     if (action === 'presence') return rt.model.presence && rt.model.presence.action ? execute(rt.model.presence.action) : false;
-    if (action === 'connect') {
-      var event = new w.CustomEvent('rtg-adaptive-connect', { bubbles: true, cancelable: true });
-      return rt.host.dispatchEvent(event) ? legacy('.rtg-edge-menu') : true;
-    }
+    if (action === 'connect') return legacy('.rtg-edge-menu');
     return false;
   }
   function renderSheet() {
     if (rt.customPanel) return;
-    var items = K.actions(rt.model), continuation = rt.model.continuation;
+    var continuation = rt.model.continuation;
     rt.sheetTitle.textContent = continuation && continuation.title || rt.edge.ctx.title || d.title || 'Wat wilt u doen?';
     rt.sheetCopy.textContent = continuation && continuation.copy || 'Wat wilt u doen?';
     rt.sheetList.textContent = '';
-    items.forEach(function (item) { rt.sheetList.appendChild(K.sheetButton(d, item, execute)); });
-    if (!items.length) {
+    if (rt.renderControls) rt.renderControls();
+    /* De handelingen van het scherm tekenen de controls; de kern heeft geen eigen
+       lijst meer (stap 17). De lege melding staat er dus alleen als er werkelijk
+       niets is, en nooit boven een gevulde lijst. */
+    if (!(rt.controls && rt.controls.children.length) && !rt.primarySlot) {
       var empty = d.createElement('p'); empty.className = 'rtg-adaptive-empty';
       empty.textContent = 'Voor deze context zijn geen veilige acties beschikbaar.'; rt.sheetList.appendChild(empty);
     }
-    if (rt.renderControls) rt.renderControls();
   }
   function renderDeck() {
     rt.bar.textContent = '';
@@ -92,13 +86,6 @@
   }
   function closePanel() { Input.closePanel(rt); }
   function openPanel(node, options) { return Input.openPanel(rt, node, options, setState); }
-  function registerAction(item) { var ok = rt && K.register(rt.model, item); if (ok) renderSheet(); return !!ok; }
-  function setProjection(input) {
-    if (!rt) return false;
-    var deck = K.setProjection(rt.model, input); if (!deck) return false;
-    if (input.open) { rt.model.deck = deck; renderDeck(); setState('expanded'); }
-    else if (deck === rt.model.deck) renderSheet(); return true;
-  }
   function setPresence(input) {
     if (!rt) return false;
     rt.model.presence = input && input.label ? { label: String(input.label).slice(0, 100), action: input.action || null } : null;
@@ -138,7 +125,7 @@
     var edge = host || (w.RTGEdge && w.RTGEdge.active);
     if (rt || doc !== d || win !== w || !K || !Input || !d.body || !edge || !edge.root || !edge.cfg || !edge.ctx) return rt;
     rt = { doc: d, win: w, edge: edge, model: K.model(), manual: false };
-    K.defaults(rt.model); build(); d.body.dataset.rtgAdaptiveReady = 'true'; setState('dock', 'auto');
+    build(); d.body.dataset.rtgAdaptiveReady = 'true'; setState('dock', 'auto');
     w.RTGAdaptiveEdgeControls.start(rt);
     if (w.MutationObserver) rt.observer = new w.MutationObserver(function () {
       var state = d.body.getAttribute('data-rtg-edge-2-state');
@@ -159,6 +146,6 @@
     d.body.removeAttribute('data-rtg-adaptive-ready'); d.body.removeAttribute('data-rtg-adaptive-state'); rt = null;
   }
   w.RTGAdaptiveEdge = Object.freeze({ start: start, setState: setState, setDeck: setDeck,
-    registerAction: registerAction, setProjection: setProjection, openPanel: openPanel, setPresence: setPresence,
+    openPanel: openPanel, setPresence: setPresence,
     setIdentity: setIdentity, continueWith: continueWith, destroy: destroy });
 }(window, document));

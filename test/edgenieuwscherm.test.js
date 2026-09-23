@@ -11,7 +11,7 @@
      geen scherm en valt erbuiten;
    - het publiceert een wereld en een context;
    - het wijst een hoofdactie aan, of verklaart met reden dat die er niet is
-     (data-rtg-edge-nvt="hoofdactie" + data-rtg-edge-nvt-reden);
+     (data-rtg-edge-nvt-hoofdactie="reden": een reden per veld, sinds ronde 2);
    - geen enkele geblokkeerde handeling staat er zonder reden.
 
    Wat NIEUW is, staat vast in de basislijn van EDGEDEKKING.json: de schermen
@@ -25,7 +25,15 @@
    is, de weigering van een doorverwijzing zonder reden, of de eis dat een
    scherm met een eigen hoofdactie zijn context zelf publiceert (toets 2 zakt op
    alle vijf); laat de ratel de herkomst negeren (toets 4 zakt); en voeg een .html toe
-   onder public/apps zonder meting (toets 1 zakt). */
+   onder public/apps zonder meting (toets 1 zakt).
+
+   BESLUIT 11 VOOR BESTAANDE SCHERMEN (stap 24, K-reikwijdte): een gemeten scherm
+   met een eigen hoofdactie spreekt zijn context zelf, of staat op de schuldlijst
+   CONTEXT_SCHULD in scripts/edgedekking.js. Die lijst mag alleen krimpen.
+   MUTATIES, elk nagetrokken: zet Bestanden terug op de lijst (toets 6 zakt: de
+   lijst groeit en hij spreekt al zelf), en haal de bron weg uit de kale context
+   van bestanden/adaptief.js en meet opnieuw (toets 5 zakt: niet zelf en niet op
+   de lijst). */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -36,7 +44,7 @@ const WORTEL = path.join(__dirname, '..');
 const REGISTER = path.join(WORTEL, 'EDGEDEKKING.json');
 /* Het contract en de schermlijst komen van de meter zelf (scripts/edgedekking.js):
    een tweede telling van dezelfde schermen loopt op een dag uit de pas. */
-const { contractNieuw: schendingen, alleSchermen, achteruitgang } = require('../scripts/edgedekking.js');
+const { contractNieuw: schendingen, alleSchermen, achteruitgang, contextSchuld, CONTEXT_SCHULD } = require('../scripts/edgedekking.js');
 
 test('elk nieuw scherm is gemeten en haalt het harde contract', () => {
   const reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
@@ -97,4 +105,29 @@ test('de ratel ziet ook een veld dat ja blijft maar niet meer van het scherm zel
 test('de basislijn en de schermen lopen niet uit elkaar', () => {
   const reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
   for (const p of reg.basislijn) assert.ok(reg.schermen[p], p + ' staat in de basislijn maar niet in de meting');
+});
+
+/* De schuldlijst mag alleen krimpen: dit getal gaat omlaag bij elke portie, en
+   nooit omhoog. Een scherm dat er weer bij moet, is een achteruitgang en geen
+   aanpassing van dit getal. */
+const SCHULD_MAX = 49;
+
+test('elk bestaand scherm met een eigen hoofdactie spreekt zijn context zelf, of staat op de schuldlijst', () => {
+  const reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  assert.deepEqual(contextSchuld(reg), []);
+});
+
+test('de schuldlijst groeit niet, en kan zakken', () => {
+  assert.ok(CONTEXT_SCHULD.length <= SCHULD_MAX, 'CONTEXT_SCHULD groeide van ' + SCHULD_MAX + ' naar ' + CONTEXT_SCHULD.length);
+  assert.equal(new Set(CONTEXT_SCHULD).size, CONTEXT_SCHULD.length, 'een scherm staat twee keer op de lijst');
+  const reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  const kopie = JSON.parse(JSON.stringify(reg));
+  const pad = Object.keys(kopie.schermen).find((p) => kopie.schermen[p].status === 'gemeten' &&
+    (kopie.schermen[p].herkomst || {}).hoofdactie === 'scherm:data-hoofdactie' && !CONTEXT_SCHULD.includes(p));
+  assert.ok(pad, 'er hoort minstens een scherm met eigen hoofdactie buiten de lijst te staan (de eerste portie)');
+  kopie.schermen[pad].herkomst.context = 'edge-casco';
+  assert.ok(contextSchuld(kopie).some((x) => x.startsWith(pad + ': heeft een eigen hoofdactie')), 'een scherm dat terugvalt op het casco hoort te zakken');
+  const schuld = CONTEXT_SCHULD[0];
+  kopie.schermen[schuld].herkomst.context = 'scherm';
+  assert.ok(contextSchuld(kopie).some((x) => x.startsWith(schuld + ': publiceert zijn context zelf')), 'een afgelost scherm hoort van de lijst te moeten');
 });

@@ -87,6 +87,34 @@
         <button class="rtg-knop vol" id="bzGeef" type="button" data-i18n="bz.geef">Geef een zetel</button>
       </div>
     </section>
+
+    <!-- De kantoorrol hangt sinds 23 september 2026 alleen nog aan een account
+         via een uitnodiging op naam (AUTHORITY.md fase 2). Alleen de eigenaar
+         maakt er een; de code wordt een keer getoond. -->
+    <section class="rtg-groep" id="kuSectie" hidden>
+      <h2 data-i18n="ku.h">Iemand in het kantoor</h2>
+      <p class="rtg-uitleg" data-i18n="ku.sub">Een nieuwe medewerker koppelt de kantoorrol aan zijn eigen RTG-account met een uitnodiging van u: op zijn codenaam, een keer te gebruiken en zeven dagen geldig. De code ziet u hier een keer; geef hem op een veilige manier door.</p>
+      <div class="rtg-rij">
+        <input class="rtg-veld h-flex1" id="kuCode" maxlength="60" data-i18n-ph="ku.ph" placeholder="Codenaam van de medewerker">
+        <button class="rtg-knop vol" id="kuMaak" type="button" data-i18n="ku.maak">Maak een uitnodiging</button>
+      </div>
+      <p class="rtg-uitleg" id="kuUit" aria-live="polite"></p>
+    </section>
+
+    <!-- De zaakdozen (AUTHORITY.md fase 7): welke dozen melden nog met de gedeelde
+         sleutel. Die gaat pas dicht als deze lijst leeg blijft (besluit van
+         23 september 2026). Uitgeven en intrekken is van de eigenaar, met de vinger. -->
+    <section class="rtg-groep" id="dsSectie" hidden>
+      <h2 data-i18n="ds.h">De zaakdozen</h2>
+      <p class="rtg-uitleg" data-i18n="ds.sub">Een doos met een eigen sleutel is bewezen; een doos op de gedeelde sleutel noemt alleen zijn eigen naam. De gedeelde sleutel gaat dicht zodra hieronder niemand meer staat.</p>
+      <div id="dsGedeeld"><p class="rtg-leeg" data-i18n="ds.laden">Dozen laden&hellip;</p></div>
+      <div id="dsEigen"></div>
+      <div class="rtg-rij" id="dsGeven" hidden>
+        <input class="rtg-veld h-flex1" id="dsNaam" maxlength="40" data-i18n-ph="ds.ph" placeholder="Naam van de doos">
+        <button class="rtg-knop vol" id="dsGeef" type="button" data-i18n="ds.geef">Geef een eigen sleutel</button>
+      </div>
+      <p class="rtg-uitleg" id="dsUit" aria-live="polite"></p>
+    </section>
   </div>
 </main>
 
@@ -141,7 +169,19 @@ window.I18N = { en: {
   'bz.geen':'Nobody is at the desk yet.', 'bz.sinds':'at the desk since ', 'bz.weg':'Withdraw',
   'bz.leeg':'Please fill in the codename of the member first.',
   'bz.nietgevonden':'We do not know this codename.', 'bz.meer':'More than one member matches; please be more precise.',
-  'bz.geefOk':'The seat has been given.', 'bz.wegOk':'The seat has been withdrawn.'
+  'bz.geefOk':'The seat has been given.', 'bz.wegOk':'The seat has been withdrawn.',
+  'ku.h':'Someone in the office',
+  'ku.sub':'A new employee links the office role to their own RTG account with an invitation from you: for their codename, usable once and valid for seven days. You see the code here once; pass it on safely.',
+  'ku.ph':'Codename of the employee', 'ku.maak':'Make an invitation',
+  'ku.leeg':'Please fill in the codename of the employee first.',
+  'ku.code':'Invitation code (shown once): ', 'ku.tot':' valid until ',
+  'ds.h':'The business boxes',
+  'ds.sub':'A box with its own key is proven; a box on the shared key only states its own name. The shared key closes once nobody is listed below.',
+  'ds.laden':'Loading boxes…', 'ds.ph':'Name of the box', 'ds.geef':'Give its own key',
+  'ds.gedeeld':'Still on the shared key (last seven days)', 'ds.geengedeeld':'No box reported on the shared key in the last seven days.',
+  'ds.eigen':'Boxes with their own key', 'ds.laatst':'last seen ', 'ds.keer':' times',
+  'ds.klaar':'own key issued, not yet on the box', 'ds.sinds':'own key since ', 'ds.weg':'Withdraw',
+  'ds.leeg':'Please fill in the name of the box first.', 'ds.sleutel':'Key (shown once): ', 'ds.wegOk':'The key has been withdrawn.'
 } };
 </script>
 <script>
@@ -306,6 +346,7 @@ window.I18N = { en: {
   function laadZetels() {
     return post('/api/office/balie/zetels', {}).then(function (d) {
       zetelBaas = !!d.baas;
+      $('kuSectie').hidden = !zetelBaas;
       toonZetels(zetelsUit(d));
     }).catch(function (e) { leeg($('bzLijst'), e.message); });
   }
@@ -337,6 +378,64 @@ window.I18N = { en: {
     }).catch(function (e) { zeg(e.message, 'fout'); }).then(function () { b.disabled = false; });
   }
 
+  /* Een uitnodiging voor het kantoor: zwaar werk, dus met de vinger. De code
+     staat alleen in dit antwoord; de server bewaart hem niet. */
+  function maakUitnodiging() {
+    var v = $('kuCode').value.trim();
+    if (!v) { zeg(T('ku.leeg', 'Vul eerst de codenaam van de medewerker in.'), 'let'); return; }
+    var b = $('kuMaak');
+    b.disabled = true;
+    metVinger('/api/office/kantoor/uitnodiging', { codenaam: v }).then(function (d) {
+      $('kuCode').value = '';
+      $('kuUit').textContent = T('ku.code', 'Uitnodigingscode (een keer getoond): ') + d.code +
+        T('ku.tot', ', geldig tot ') + datum(d.verloopt);
+    }).catch(function (e) { zeg(e.message, 'fout'); }).then(function () { b.disabled = false; });
+  }
+
+  /* ---- de zaakdozen ---- */
+  function toonDozen(d, baas) {
+    $('dsSectie').hidden = false;
+    $('dsGeven').hidden = !baas;
+    var g = $('dsGedeeld'), e = $('dsEigen');
+    g.textContent = ''; e.textContent = '';
+    g.appendChild(el('h3', 'rtg-sub', T('ds.gedeeld', 'Nog op de gedeelde sleutel (laatste zeven dagen)')));
+    if (!(d.nogGedeeld || []).length) g.appendChild(el('p', 'rtg-leeg', T('ds.geengedeeld', 'Geen doos meldde de afgelopen zeven dagen met de gedeelde sleutel.')));
+    (d.nogGedeeld || []).forEach(function (x) {
+      rij(g, x.doos, T('ds.laatst', 'laatst gezien ') + datum(x.laatst) + ' · ' + x.aantal + T('ds.keer', ' keer') +
+        (x.heeftEigen ? ' · ' + T('ds.klaar', 'eigen sleutel uitgegeven, nog niet op de doos') : ''), null);
+    });
+    if ((d.dozen || []).length) e.appendChild(el('h3', 'rtg-sub', T('ds.eigen', 'Dozen met een eigen sleutel')));
+    (d.dozen || []).forEach(function (x) {
+      var k = null;
+      if (baas) {
+        k = el('button', 'rtg-knop', T('ds.weg', 'Trek in'));
+        k.type = 'button';
+        k.addEventListener('click', function () {
+          k.disabled = true;
+          metVinger('/api/office/doos/sleutel/weg', { doos: x.doos })
+            .then(function () { zeg(T('ds.wegOk', 'De sleutel is ingetrokken.'), 'goed'); return laadDozen(); })
+            .catch(function (er) { zeg(er.message, 'fout'); k.disabled = false; });
+        });
+      }
+      rij(e, x.doos, T('ds.sinds', 'eigen sleutel sinds ') + datum(x.sinds), k);
+    });
+  }
+  function laadDozen() {
+    return post('/api/office/doos/sleutels', {}).then(function (d) { toonDozen(d, zetelBaas); })
+      .catch(function () { /* geen boardroom, geen dozen: de sectie blijft verborgen */ });
+  }
+  function geefDoosSleutel() {
+    var v = $('dsNaam').value.trim();
+    if (!v) { zeg(T('ds.leeg', 'Vul eerst de naam van de doos in.'), 'let'); return; }
+    var b = $('dsGeef');
+    b.disabled = true;
+    metVinger('/api/office/doos/sleutel', { doos: v }).then(function (d) {
+      $('dsNaam').value = '';
+      $('dsUit').textContent = T('ds.sleutel', 'Sleutel (een keer getoond): ') + d.sleutel + ' · ' + (d.let || '');
+      return laadDozen();
+    }).catch(function (e) { zeg(e.message, 'fout'); }).then(function () { b.disabled = false; });
+  }
+
   function tabrij() {
     var bar = $('boTabs');
     bar.addEventListener('click', function (e) {
@@ -362,9 +461,13 @@ window.I18N = { en: {
     laadRegister(true).then(function (ok) {
       if (!ok) return;
       tabrij();
-      laadZetels();
+      laadZetels().then(laadDozen);
+      $('dsGeef').addEventListener('click', geefDoosSleutel);
+      $('dsNaam').addEventListener('keydown', function (e) { if (e.key === 'Enter') geefDoosSleutel(); });
       $('bzGeef').addEventListener('click', geefZetel);
       $('bzCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') geefZetel(); });
+      $('kuMaak').addEventListener('click', maakUitnodiging);
+      $('kuCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') maakUitnodiging(); });
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);

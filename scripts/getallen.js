@@ -578,6 +578,8 @@ const GETALLEN = {
     wat: 'verantwoordelijkheden met meer dan een schrijver of beslisser (mag alleen dalen)' },
   'edgekaart.dodeKanalen': { bron: 'EDGEKAART.json', veld: 'telling.dodeKanalen',
     wat: 'rtg-gebeurtenissen in public/ met een luisteraar zonder zender of andersom (mag alleen dalen)' },
+  'edgekaart.levendeKanalen': { bron: 'EDGEKAART.json', veld: 'telling.levendeKanalen',
+    wat: 'rtg-gebeurtenissen met zender EN luisteraar; houdt "nul dood" eerlijk (een wandeling die niets ziet, geeft ook nul)' },
   'edgedekking.schermen': { bron: 'EDGEDEKKING.json', veld: 'telling.schermen',
     wat: 'schermen onder public/apps die de dekkingsmeter in een browser opende' },
   'edgedekking.metBlikveld': { bron: 'EDGEDEKKING.json', veld: 'telling.metBlikveld',

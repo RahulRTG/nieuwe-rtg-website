@@ -52,7 +52,10 @@ const { WERKGEVER_VELDEN } = require('../server/kern/werk');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'ADAMPROEF.json');
-const WERKGEVER = 'BRISA';                 // Cafe Brisa uit de seed: een zaak met keukenwerk
+const WERKGEVER = 'BRISA';
+/* De Nederlandse werkgever voor het volwassen lid: de enige zaak in de zaaiset
+   met een Nederlandse stad, dus met land NL en dus met een regelpakket. */
+const NL_ZAAK = 'MERIDIAAN';                 // Cafe Brisa uit de seed: een zaak met keukenwerk
 
 /* De geboortedatum van een zeventienjarige, GEREKEND en niet ingetypt. Een
    vaste datum in een proef verloopt: hij is over een jaar achttien en dan meet
@@ -185,6 +188,29 @@ async function wereld(basis) {
    inhoud, en weigert terecht een leeg cv (storing 5 meet dat). */
 const CV = { name: 'Adam', contact: 'adam@voorbeeld.nl', headline: 'Wil graag in de keuken werken',
   skills: ['koken', 'afwassen'], about: 'Ik kook thuis veel en wil het vak leren.' };
+
+/* DE ONDERNEMER KOPPELT ZIJN ZAAK AAN ZIJN ENTITEIT. Een lid wordt manager van
+   de zaak (uitnodiging + claim, de gewone weg) en hangt hem aan een vestiging
+   van zijn eigen entiteit -- dezelfde stappen als een echte ondernemer, langs
+   dezelfde routes. Dat is wereld en geen uitslag: zonder deze stap is er geen
+   werkgever om een dienstverband bij te maken, en meet de keten dat alleen. */
+async function ondernemerKoppelt(basis, S, { code, entiteit, land, plaats, email, telefoon }) {
+  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
+  const baas = await P('/api/auth/register', { name: 'Ondernemer ' + entiteit, email, phone: telefoon,
+    password: 'geheim123', geboortedatum: '1980-04-04', tier: 'business', pasApp: 'business' });
+  const O = baas.data && baas.data.token;
+  const inv = await P('/api/supplier/staff/invite', { name: 'Ondernemer ' + entiteit, role: 'manager', func: 'Eigenaar' }, S);
+  const kassacode = inv.data && inv.data.invite && inv.data.invite.kassacode;
+  if (O && kassacode) await P('/api/werving/verbind', { kassacode }, O);
+  const ent = O ? await P('/api/concern/entiteit/nieuw', { naam: entiteit, land }, O) : null;
+  const entId = ent && ent.data && ent.data.entiteit && ent.data.entiteit.id;
+  const ves = entId ? await P('/api/concern/vestiging/nieuw', { entiteit: entId, naam: plaats, plaats }, O) : null;
+  const vesId = ves && ves.data && ves.data.vestiging && ves.data.vestiging.id;
+  const koppel = vesId ? await P('/api/concern/vestiging/zaak', { vestiging: vesId, code }, O) : null;
+  if (!koppel || koppel.status !== 200) throw new Error('de ondernemer kon ' + code + ' niet aan ' + entiteit +
+    ' koppelen (status ' + (koppel ? koppel.status + ': ' + ((koppel.data && koppel.data.error) || '') : 'geen') + ')');
+  return { O, entId, vesId };
+}
 
 async function loop(basis, uit) {
   const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
@@ -516,6 +542,241 @@ async function loop(basis, uit) {
       };
     });
 
+  /* ---- DE KETEN NA "AANGENOMEN" (ARBEID.md par. 7a, 23 september 2026) ----
+     Tot hier eindigde de proef bij een bericht op het bord van Adam. De eigenaar
+     besloot dat `employment` aan een ENTITEIT de waarheid is en dat de keten van
+     vacature tot loon rond moet voordat `werving.suite` opengaat. Deze schakels
+     METEN waar die keten vandaag breekt; ze bouwen niets en ze poetsen niets weg.
+
+     Twee hoofdpersonen, en dat is met opzet. Adam loopt door zolang hij kan
+     (schakel 13). Waar hij niet verder kan, neemt een VOLWASSEN LID het over,
+     zodat de rest van de keten (contract, dienstverband, loon) toch gemeten
+     wordt in plaats van ongezien te blijven achter de eerste dichte deur. */
+
+  /* DE WERELD VAN DE ONDERNEMER. Het dienstverband hangt aan een ENTITEIT, en
+     een zaak wijst zijn entiteit aan via een vestiging (kern/concern/
+     vestiging.js). Cafe Brisa hangt in de seed aan niets, dus zonder deze
+     opstelling meet schakel 13 alleen dat de zaak nergens aan hangt. Zie
+     ondernemerKoppelt() hierboven. */
+  await ondernemerKoppelt(basis, S, { code: WERKGEVER, entiteit: 'Brisa SL', land: 'ES', plaats: 'Ibiza',
+    email: 'ondernemer.proef@voorbeeld.nl', telefoon: '0612349875' });
+  uit.wereld.ondernemer = 'een lid, manager van ' + WERKGEVER + ', koppelt de zaak aan Brisa SL via /api/concern/vestiging/zaak';
+
+  /* 13 -- ADAM NEEMT ZIJN PLEK IN (ARBEID.md par. 7a, 23 september 2026). Tot
+     die dag eindigde zijn aanname bij een kassacode die de werkgever met de hand
+     moest doorgeven, want claimen eist een eigen RTG-account en een
+     gezinsprofiel heeft er geen. Nu staat de uitnodiging bij zijn eigen
+     sollicitatie (/gezin/sollicitaties, `plek`), en een RTG-account mag vanaf
+     vijftien. Adam doet dus wat een zeventienjarige echt doet: hij opent zijn
+     sollicitaties, maakt een gratis eigen account, en neemt de plek in langs de
+     gewone claimroute. Gemeten wordt de UITKOMST: staat hij in het team, en
+     heeft hij een dienstverband bij de entiteit van de zaak? */
+  let adamToken = null;
+  await stap(
+    schakel(13, 'Adam', 'werkgever', 'neemt met een eigen account zijn plek in het team in, zonder dat de werkgever iets doorgeeft'),
+    async () => {
+      const rij = rijVan(await sollicitatiesVanAdam(basis, w.code, w.adam.token), 'Keukenhulp');
+      const link = rij && rij.plek && rij.plek.link;
+      if (!link) return { status: 409, data: { error: 'geen uitnodiging bij Adams sollicitatie' } };
+      const kassacode = new URLSearchParams(String(link).split('#')[1] || '').get('werving');
+      const acc = await P('/api/auth/register', { name: 'Adam', email: 'adam.proef@voorbeeld.nl', phone: '0612349874',
+        password: 'geheim123', geboortedatum: geborenJaarGeleden(17), tier: 'guest', pasApp: 'rtg' });
+      adamToken = acc.data && acc.data.token;
+      if (!adamToken) return acc;
+      return P('/api/werving/verbind', { kassacode }, adamToken);
+    },
+    async r => {
+      const team = ((await P('/api/supplier/roster', { code: WERKGEVER })).data || {}).staff || [];
+      const inTeam = team.find(x => /^Adam\b/.test(String(x.name || '')));
+      const werk = ((await P('/api/concern/mijnwerk', {}, adamToken)).data || {}).werkplekken || [];
+      const dv = werk.find(x => x.bedrijf === 'Brisa SL' && x.rol === 'Keukenhulp');
+      return { klopt: !!inTeam && !!dv && r.data && r.data.staffId === inTeam.id,
+        wat: (inTeam ? 'in het team (id ' + inTeam.id + ')' : 'NIET in het team') + ', ' +
+          (dv ? 'dienstverband bij ' + dv.bedrijf + ' als ' + dv.rol : 'geen dienstverband') };
+    });
+
+  /* HET VOLWASSEN LID, BIJ EEN NEDERLANDSE WERKGEVER. Waar Adam niet verder kon,
+     liep een volwassen lid door. Die keten gaat tot de loonrun, en een loonrun
+     draait op het regelpakket van het LAND van de zaak: Cafe Brisa staat op
+     Ibiza (ES, afgeleid uit de stad in kern/supplierdefaults.js) en er ligt geen
+     Spaans pakket. Het land van Brisa omzetten zou de wereld vervalsen; daarom
+     wordt het lid aangenomen bij de Meridiaan Toren op de Zuidas (NL), met een
+     eigen manager en een eigen ondernemer. Adam blijft bij Brisa. */
+  const nlTeam = ((await P('/api/supplier/roster', { code: NL_ZAAK })).data || {}).staff || [];
+  const nlManager = nlTeam.find(x => x.role === 'manager');
+  const nlLogin = nlManager ? await P('/api/supplier/login', { code: NL_ZAAK, staffId: nlManager.id, pin: '1234' }) : null;
+  const S2 = nlLogin && nlLogin.data && nlLogin.data.token;
+  if (!S2) throw new Error('geen managersessie bij ' + NL_ZAAK + ' (status ' + (nlLogin ? nlLogin.status : 'geen manager') + ')');
+  const nlVac = await P('/api/supplier/vacature', { func: 'Receptie', soort: 'parttime', minLeeftijd: 18,
+    omschrijving: 'De ontvangst van de toren, drie dagen per week.' }, S2);
+  const nlVacId = (((nlVac.data && nlVac.data.vacatures) || []).find(x => x.func === 'Receptie') || {}).id;
+  if (!nlVacId) throw new Error('geen vacature bij ' + NL_ZAAK + ' (status ' + nlVac.status + ')');
+  const meridiaan = await ondernemerKoppelt(basis, S2, { code: NL_ZAAK, entiteit: 'Meridiaan BV', land: 'NL', plaats: 'Amsterdam',
+    email: 'ondernemer.nl@voorbeeld.nl', telefoon: '0612349873' });
+  uit.wereld.nederland = 'een volwassen lid bij ' + NL_ZAAK + ' (NL), met een ondernemer die de zaak aan Meridiaan BV koppelt';
+
+  const nova = await P('/api/auth/register', { name: 'Nova Proef', email: 'nova.proef@voorbeeld.nl',
+    phone: '0612349876', password: 'geheim123', geboortedatum: '1995-03-03', tier: 'rtg', pasApp: 'rtg' });
+  const N = nova.data && nova.data.token;
+  if (!N) throw new Error('geen volwassen lid aan te maken (status ' + nova.status + ')');
+  await P('/api/cv/save', { name: 'Nova Proef', contact: 'nova.proef@voorbeeld.nl',
+    skills: 'ontvangst, talen', about: 'Werkt graag met mensen.' }, N);
+  const nsoll = await P('/api/member/apply', { supplierCode: NL_ZAAK, vacatureId: nlVacId }, N);
+  if (nsoll.status !== 200) throw new Error('het volwassen lid kon niet solliciteren (status ' + nsoll.status + ')');
+  const novaSoll = (await sollicitatiesBijZaak(basis, S2)).find(a => a.name === 'Nova Proef');
+  if (!novaSoll) throw new Error('de sollicitatie van het volwassen lid is niet te vinden');
+
+  /* 14 -- EEN LID DAT WORDT AANGENOMEN, IS METEEN PERSONEEL. Dit is de weg die
+     wel bestaat: neemAan() verbindt de uitnodiging met het account. */
+  let novaStaff = null;
+  await stap(
+    schakel(14, 'werkgever', 'lid', 'neemt een volwassen lid aan; dat staat meteen in het team'),
+    () => P('/api/supplier/apply/decide', { id: novaSoll.id, action: 'aannemen' }, S2),
+    async r => {
+      novaStaff = r.data && r.data.direct && r.data.direct.staffId;
+      return { klopt: !!novaStaff, wat: novaStaff ? 'direct in dienst, personeelsnummer ' + novaStaff
+        : 'geen directe plek: ' + JSON.stringify(Object.keys(r.data || {})) };
+    });
+
+  /* 15 -- HET CONTRACT. Zonder contract draait er nooit een loonstrook
+     (payroll-os-zaak.js zegt het zelf). De manager legt het vast op het
+     personeelsnummer uit schakel 14. */
+  const vanaf = new Date().toISOString().slice(0, 8) + '01';
+  await stap(
+    schakel(15, 'werkgever', 'huis', 'legt het arbeidscontract vast'),
+    /* Een contract met een VASTE omvang (drie dagen, 24 uur): dan draagt het
+       contract het loon en niet de klok (kern/payroll/samenstellen.js). Met een
+       oproepcontract en nog geen geklokte uren levert een run terecht niets op,
+       en dan meet schakel 17 dat het lid nog niet gewerkt heeft. */
+    () => novaStaff ? P('/api/supplier/payroll/contract', { staffId: novaStaff, vanaf, soort: 'vast',
+      uurloonCenten: 1450, urenPerWeek: 24, functie: 'Receptie' }, S2)
+      : Promise.resolve({ status: 0, data: null }),
+    async () => {
+      const c = await P('/api/supplier/payroll/contracten', { staffId: novaStaff }, S2);
+      const versies = Object.values((c.data && c.data.contracten) || {}).flat();
+      return { klopt: versies.some(v => v.uurloonCenten === 1450 && v.vanaf === vanaf),
+        wat: versies.length + ' contractversie(s), vanaf ' + vanaf };
+    });
+
+  /* 16 -- IS DE AANNAME OOK EEN DIENSTVERBAND BIJ DE ENTITEIT? Dat is besluit 1
+     van ARBEID.md par. 7a, en sinds 23 september draagt kern/concern/aanname.js
+     de brug. Het lid zelf vraagt het na, op zijn eigen sessie: staat de
+     werkgever tussen zijn werkplekken? Zonder de brug zakt deze schakel (met een
+     mutatie nagetrokken: "U heeft nog geen werkplek"). */
+  await stap(
+    schakel(16, 'huis', 'lid', 'maakt van de aanname een dienstverband bij de entiteit (employment)'),
+    () => P('/api/concern/mijnwerk', {}, N),
+    async r => {
+      const plekken = (r.data && r.data.werkplekken) || [];
+      /* Het dienstverband hoort bij de entiteit van de ZAAK (Meridiaan BV) en niet
+         bij een willekeurige werkgever, en de rol is de functie van de vacature. */
+      const hier = plekken.find(x => x.bedrijf === 'Meridiaan BV' && x.rol === 'Receptie');
+      return { klopt: !!hier, wat: plekken.length
+        ? plekken.length + ' werkplek(ken): ' + plekken.map(x => x.bedrijf + ' als ' + x.rol).join(', ')
+        : 'geen dienstverband: "' + ((r.data && r.data.regel) || '') + '"' };
+    });
+
+  /* 17 -- LOON. Het kantoor opent de loonrun van de zaak over deze maand; het
+     contract uit schakel 15 hoort daarin een regel op te leveren. Goedkeuren en
+     uitbetalen horen hier met opzet NIET bij: dat zijn twee handtekeningen en
+     een betaling, en die zet een proef niet. */
+  const kantoor = await P('/api/office/login', { code: 'RTG-OFFICE-PROEF' });
+  const K = kantoor.data && kantoor.data.token;
+  const periode = vanaf.slice(0, 7);
+  /* DE WERELD, NIET DE UITSLAG: een loonrun draait alleen op een regelpakket dat
+     een mens van het kantoor heeft aangemerkt. De meegeleverde jaargang meldt
+     zelf dat hij niet tegen het Handboek is gelegd, dus aanmerken gaat alleen
+     UITDRUKKELIJK en met een reden -- dezelfde opstelling als
+     test/loonstrook-portaal.test.js. Ligt er geen pakket dat deze maand geldt,
+     dan zakt schakel 17 met die reden, en dat is dan een echte bevinding. */
+  if (K) {
+    const regels = await P('/api/office/payroll/regels', { land: 'NL' }, K);
+    const pakket = ((regels.data && regels.data.pakketten) || []).find(x =>
+      x.geldigVan <= vanaf && (!x.geldigTot || x.geldigTot >= vanaf));
+    if (pakket) await P('/api/office/payroll/regels/keur', { land: 'NL', versie: pakket.versie, ondanks: true,
+      reden: 'Adamproef: demo-tabellen, geen echte loonstroken' }, K);
+  }
+  /* DE BESTURINGSPROEF VOOR SCHAKEL 17. Zonder een geval waarin de run WEL moet
+     melden, staat "geen bevinding voor het lid" ook groen als de toets helemaal
+     niet draaide. Dat geval zit al in de wereld: de ondernemer van Meridiaan
+     werd manager voordat hij de zaak aan zijn entiteit koppelde, dus zijn
+     aanmelding kreeg geen dienstverband. Krijgt hij een contract, dan hoort de
+     run hem te melden als loon zonder dienstverband. */
+  const baasNl = ((((await P('/api/supplier/roster', { code: NL_ZAAK })).data || {}).staff) || [])
+    .find(x => /^Ondernemer /.test(String(x.name || '')));
+  if (baasNl) await P('/api/supplier/payroll/contract', { staffId: baasNl.id, vanaf, soort: 'vast',
+    uurloonCenten: 2500, urenPerWeek: 8, functie: 'Eigenaar' }, S2);
+  await stap(
+    schakel(17, 'kantoor', 'lid', 'opent de loonrun; het contract levert een loonregel op, en de run leest het dienstverband'),
+    () => K ? P('/api/office/payroll/run/open', { code: NL_ZAAK, periode }, K)
+      : Promise.resolve({ status: 0, data: null }),
+    async r => {
+      /* Het antwoord van run/open is een SAMENVATTING (kern/payroll/run.js,
+         kort()) en draagt de stroken niet; wie daarin naar regels zoekt, meet
+         altijd nul. De proef haalt de run daarom op zoals het kantoor hem leest. */
+      const runId = r.data && r.data.run && r.data.run.id;
+      const een = runId ? await P('/api/office/payroll/run/een', { runId }, K) : null;
+      const stroken = (een && een.data && een.data.run && een.data.run.stroken) || [];
+      const strook = stroken.find(x => Number(x.staffId) === Number(novaStaff));
+      const basis = strook && (strook.invoer || []).find(x => x.component === 'basissalaris');
+      /* EN DE LOONKANT LEEST HET DIENSTVERBAND (kern/concern/aanname.js,
+         dienstverbandToets): het lid heeft er een bij Meridiaan BV, dus de run
+         meldt hem niet als loon zonder dienstverband, en de toets draaide echt
+         (geen "niet getoetst"). */
+      const bev = (een && een.data && een.data.bevindingen) || [];
+      const zonderDv = bev.filter(b => b.soort === 'loon_zonder_dienstverband' && Number(b.staffId) === Number(novaStaff));
+      const nietGetoetst = bev.filter(b => b.soort === 'dienstverband_niet_getoetst');
+      const baasGemeld = !!baasNl && bev.some(b => b.soort === 'loon_zonder_dienstverband' && Number(b.staffId) === Number(baasNl.id));
+      return { klopt: !!basis && basis.centen > 0 && !zonderDv.length && !nietGetoetst.length && baasGemeld,
+        wat: (strook ? 'loonstrook voor personeelsnummer ' + novaStaff + ' in run ' + runId +
+          (basis ? ', basissalaris ' + (basis.centen / 100).toFixed(2) + ' euro' : ', ZONDER basissalaris')
+          : 'geen loonstrook (' + stroken.length + ' stroken in de run)') +
+          '; dienstverband ' + (zonderDv.length ? 'ONTBREEKT volgens de run' : nietGetoetst.length ? 'NIET getoetst' : 'getoetst en gevonden') +
+          '; de ondernemer zonder dienstverband is ' + (baasGemeld ? 'gemeld' : 'NIET gemeld') };
+    });
+
+  /* 18 -- DE INHAALSLAG. De ondernemer uit de besturingsproef van schakel 17
+     werd manager VOOR de brug er voor zijn zaak was, en heeft dus geen
+     dienstverband. De eigenaar van de entiteit vraagt eerst een voorstel (daar
+     hoort hij in te staan en het lid NIET, want die heeft er al een), kiest dan
+     zelf, en pas daarna staat het dienstverband er. Zonder keuze wordt er niets
+     vastgelegd (kern/concern/aanname.js, dienstverbandInhaal). */
+  await stap(
+    schakel(18, 'werkgever', 'huis', 'haalt de aannames van voor de brug in: eerst een voorstel, dan zijn eigen keuze'),
+    () => baasNl ? P('/api/concern/vestiging/inhaal', { vestiging: meridiaan.vesId, code: NL_ZAAK }, meridiaan.O)
+      : Promise.resolve({ status: 0, data: null }),
+    async r => {
+      const vs = (r.data && r.data.voorstel) || [];
+      const baasErin = vs.some(x => Number(x.staffId) === Number(baasNl.id));
+      const novaErin = vs.some(x => Number(x.staffId) === Number(novaStaff));
+      /* Een ander lid met dezelfde vestiging en zaak in het lichaam krijgt niets:
+         geen voorstel en geen dienstverband (de eigendomscontrole in de route). */
+      const vreemd = await P('/api/concern/vestiging/inhaal/bevestig', { vestiging: meridiaan.vesId, code: NL_ZAAK,
+        keuze: [baasNl.id] }, N);
+      const voor = await P('/api/concern/mensen', { entiteit: meridiaan.entId }, meridiaan.O);
+      const eerst = ((voor.data && voor.data.mensen) || []).length;
+      const doe = await P('/api/concern/vestiging/inhaal/bevestig', { vestiging: meridiaan.vesId, code: NL_ZAAK,
+        keuze: [baasNl.id] }, meridiaan.O);
+      /* Dezelfde keuze nog een keer (een dubbeltik). Binnen het venster vangt
+         de idem-poort hem en geeft het EERSTE antwoord terug (`herhaald: true`,
+         met dezelfde `gemaakt`); daarbuiten staat de ondernemer niet meer in het
+         voorstel en maakt de kern er niets bij. De bewering is dus de TELLING in
+         de opslag en niet het antwoord -- een herhaald antwoord zegt wat de
+         eerste keer gebeurde. */
+      const nogEens = await P('/api/concern/vestiging/inhaal/bevestig', { vestiging: meridiaan.vesId, code: NL_ZAAK,
+        keuze: [baasNl.id] }, meridiaan.O);
+      const na = await P('/api/concern/mensen', { entiteit: meridiaan.entId }, meridiaan.O);
+      const mensen = (na.data && na.data.mensen) || [];
+      const gemaakt = (doe.data && doe.data.gemaakt) || [];
+      const tweede = nogEens.data && nogEens.data.herhaald ? [] : ((nogEens.data && nogEens.data.gemaakt) || []);
+      const klopt = baasErin && !novaErin && r.data.uitgevoerd === false && mensen.length === eerst + 1 &&
+        gemaakt.length === 1 && !tweede.length && vreemd.status === 404 && mensen.some(m => m.rol === 'Eigenaar');
+      return { klopt, wat: 'voorstel met ' + vs.length + ' mens(en)' + (baasErin ? ', de ondernemer erin' : ', ZONDER de ondernemer') +
+        (novaErin ? ', het lid ten onrechte erin' : '') + '; een vreemde kreeg ' + vreemd.status + '; ' + eerst + ' dienstverband(en) voor de keuze, ' + mensen.length + ' erna' +
+        (tweede.length ? '; de herhaling maakte er NOG een' : ', ook na een herhaalde keuze' +
+          (nogEens.data && nogEens.data.herhaald ? ' (door de idem-poort als herhaling herkend)' : '')) };
+    });
+
   return { w, S, M, vacId };
 }
 
@@ -538,6 +799,24 @@ async function storingen(basis, uit, ctx) {
     if (!v) throw new Error('geen vacature "' + func + '" (status ' + r.status + ')');
     return v.id;
   };
+
+  /* 0. DE UITNODIGING IS VAN ADAM EN VAN NIEMAND ANDERS. Sinds 23 september
+     staat de link om je plek in te nemen bij de sollicitatie zelf. Die link is
+     een eenmalige sleutel: wie hem ziet, kan de plek claimen. Dus: de ouder en
+     de zus zien hem niet op hun eigen sessie, en de werkgever vindt hem niet in
+     de rij die hij van de sollicitatie krijgt (dat is de positieve lijst van
+     kern/werk.js, en `plek` staat daar met opzet niet in). */
+  const zichtbaarVoor = async (tok) => (((await P('/api/foundation/gezin/sollicitaties', { code: w.code, token: tok })).data || {})
+    .sollicitaties || []).filter(x => x.plek).length;
+  /* Eerst de besturingsproef: Adam zelf ziet hem wel. Zonder die helft staat
+     deze storing ook groen als er nooit een uitnodiging was. */
+  const bijAdam = await zichtbaarVoor(w.adam.token);
+  const bijOuder = await zichtbaarVoor(w.ouderToken), bijZus = await zichtbaarVoor(w.zus.token);
+  const bijWerkgever = (await sollicitatiesBijZaak(basis, S)).filter(a => a.plek).length;
+  noteer('de uitnodiging om de plek in te nemen staat bij Adams sollicitatie',
+    'alleen Adam ziet hem: niet de ouder, niet de zus, en niet de werkgever in de rij van de sollicitatie',
+    bijAdam >= 1 && bijOuder === 0 && bijZus === 0 && bijWerkgever === 0,
+    'bij Adam ' + bijAdam + ', bij de ouder ' + bijOuder + ', bij de zus ' + bijZus + ', bij de werkgever ' + bijWerkgever);
 
   /* 1. DE JONGERE ZUS. Vijftien, dus onder de grens van zestien. Een weigering
      hoort de reden te dragen EN de weg eromheen -- anders is het een muur. */
@@ -667,7 +946,9 @@ async function meet() {
       'hij zelf ziet. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de ' +
       'keten zijn belofte als het misgaat?). Vierde keten naast tafel-, rit- en toelatingsproef; met opzet ' +
       'geen gedeelde module -- zie MAATSTAF.md par. 7 en scripts/ketenvorm.js.',
-    grens: 'Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen). De andere ' +
+    grens: 'Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen -> team -> ' +
+      'contract -> dienstverband -> loonrun). Vanaf schakel 14 loopt een volwassen lid door waar Adam niet ' +
+      'verder kan; goedkeuren en uitbetalen van de loonrun zijn met opzet niet gelopen. De andere ' +
       'terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden ' +
       'en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou ' +
       'MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt ' +

@@ -2,7 +2,11 @@
    Een route krijgt precies een vaste menselijke context: Living, Travel,
    Work of Foundation. Core blijft de techniek die alle werelden ondersteunt,
    maar is geen vijfde zichtbare wereld. Toegang, data en gedrag blijven bij
-   het scherm zelf; dit manifest bepaalt alleen de vaste kamer en haar Edge. */
+   het scherm zelf; dit manifest bepaalt alleen de vaste kamer en haar Edge.
+   Waar MAPPEN (app-main, de enige wereldlijst) dezelfde route noemt, is dit
+   een afgeleide die daarmee moet kloppen en geen tweede eigenaar
+   (test/rtg-world-identity.test.js); de routes die alleen hier staan krijgen
+   van die toets geen tweede eigenaar erbij. */
 (function (g, fabriek) {
   'use strict';
   var api = fabriek();
@@ -20,7 +24,7 @@
   var MANIFEST = Object.freeze({
     living: routes('\
       agenda appstore-dossier attenties camera cellier cercle clips comm commerce entourage foodcourt \
-      foundation/vrienden garderobe geld krant leven lifestyle living-os maison mall media \
+      garderobe geld krant leven lifestyle living-os maison mall media \
       mijnmall muziek nieuws onderhoud pay podium pulse rendezvous rtg scherm sociaal spelen spelscherm sport table \
       theater thuis uitgaan veilig verificatie vonk wereld wonen woningdossier \
       app avond bestellen concierge doelen festival-gast festival galerij gast gedachten genootschap \
@@ -62,7 +66,7 @@
       foundation/registreren foundation/reis foundation/rust foundation/samen-thuis foundation/school foundation/schoolbieb \
       foundation/schrift foundation/schrijven foundation/societeit foundation/speelhal \
       foundation/speeltuin foundation/steun foundation/studie foundation/tellen foundation/toetsen \
-      foundation/veilig foundation/veilig-vertrouwd foundation/verhaaltje foundation/verjaardagen \
+      foundation/veilig foundation/veilig-vertrouwd foundation/verhaaltje foundation/verjaardagen foundation/vrienden \
       foundation/wegwijzer foundation/werk foundation/winkel foundation/zakgeld foundation/zorg \
       connect defensie gemeente gemeenteloket gemeentepda lab lesmaker livinglab overheid overheidspda \
       rechtbank rijksloket schoolpartner zorgbalie')

@@ -43,23 +43,29 @@
       if (controls && button.getAttribute('aria-controls') !== controls) button.setAttribute('aria-controls', controls);
     });
   }
+  /* De drempels staan in de grammatica (EDGE.md par. 11); zonder tabel zijn de
+     gebaren op de balk uit en blijven tik, Cmd+K en Alt+pijl werken. */
+  function drempels(rt) { var g = rt.win.RTGGrammatica; return g && g.DREMPELS || null; }
   function bind(rt, handlers) {
     var down = false, x = 0, y = 0, lastX = 0, lastY = 0, timer = null, held = false, blockClickUntil = 0;
     var scrollTimer = null, lastScroll = rt.win.scrollY || 0;
+    var D = null;
     rt.bar.addEventListener('pointerdown', function (event) {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
+      D = drempels(rt);
+      if (!D) return;
       down = true; held = false; x = lastX = event.clientX; y = lastY = event.clientY;
       timer = rt.win.setTimeout(function () {
         if (!down) return;
         held = true;
         if (!rt.win.RTGOrb || !rt.win.RTGOrb.open()) handlers.rahul();
         haptic(rt.win);
-      }, 620);
+      }, D.lang);
     });
     rt.bar.addEventListener('pointermove', function (event) {
       if (!down) return;
       lastX = event.clientX; lastY = event.clientY;
-      if (Math.abs(event.clientX - x) + Math.abs(event.clientY - y) > 8) {
+      if (Math.abs(event.clientX - x) + Math.abs(event.clientY - y) > D.stil) {
         rt.win.clearTimeout(timer);
         try { rt.bar.setPointerCapture(event.pointerId); } catch (e) {}
       }
@@ -71,16 +77,18 @@
       down = false; rt.win.clearTimeout(timer); rt.bar.style.removeProperty('--rtg-adaptive-drag');
       if (held) { blockClickUntil = Date.now() + 400; return; }
       var dx = (event ? event.clientX : lastX) - x, dy = (event ? event.clientY : lastY) - y;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > 36) blockClickUntil = Date.now() + 400;
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 36) handlers.deck(dx < 0 ? 1 : -1);
-      else if (dy < -36) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > D.veeg) blockClickUntil = Date.now() + 400;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > D.veeg) handlers.deck(dx < 0 ? 1 : -1);
+      else if (-dy >= D.omhoog) {
+        /* Een host met een eigen paneel (de landing, de sitepagina's) krijgt
+           eerst de vraag; de kernlijst is alleen voor wie er geen heeft. */
         var depth = rt.win.RTGDiepte, adapt = rt.win.RTGAdaptief;
         if (depth && adapt && adapt.voorNu().length) {
           handlers.state('dock');
-          if (-dy >= depth.DREMPELS.tweede) depth.tweede(); else depth.eerste();
-        } else handlers.state('expanded');
+          if (-dy >= D.diep) depth.tweede(); else depth.eerste();
+        } else if (!rt.edge.onEdgeAction || !handlers.action('context')) handlers.state('expanded');
       }
-      else if (dy > 36) handlers.state('peek');
+      else if (dy > D.veeg) handlers.state('peek');
     }
     rt.bar.addEventListener('pointerup', stop);
     rt.bar.addEventListener('pointercancel', function () { stop(null); });
@@ -95,9 +103,19 @@
         event.preventDefault(); handlers.deck(event.key === 'ArrowRight' ? 1 : -1);
       } else if (event.key === 'Escape') handlers.escape();
     });
+    /* WIE SCROLDE (EDGE.md, ronde 2). Een scroll zonder gebaar -- een anker, een
+       scrollTo van het scherm -- liet de balk opkijken en 520 ms later weer
+       zakken: een flikkering. Of een scroll van de mens kwam, heeft een eigenaar
+       (rtg-edge-2-context.js); de balk vraagt het met diens gestureBind en
+       gestureFresh op een eigen stand, net als de loader, en houdt geen tweede
+       definitie. Alleen waar Edge 2 draait: op de landing en de sitepagina's
+       blijft het zoals het was. */
+    var e2 = rt.win.RTGEdge2, gebaar = null;
+    if (e2 && e2.gestureBind && e2.gestureFresh) { gebaar = { events: [] }; e2.gestureBind(gebaar, rt.win); }
     rt.win.addEventListener('scroll', function () {
       var now = rt.win.scrollY || 0, moved = Math.abs(now - lastScroll); lastScroll = now;
       if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;
+      if (gebaar && !e2.gestureFresh(gebaar)) return;
       handlers.state('peek', 'auto'); rt.win.clearTimeout(scrollTimer);
       scrollTimer = rt.win.setTimeout(function () {
         if (!rt.manual && rt.model.state === 'peek') handlers.state('dock', 'auto');

@@ -376,7 +376,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 31 delen, 3103 regels in de delen
+`public/apps/personeel/` -- 31 delen, 3121 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -612,7 +612,7 @@ omlaag.
 
 ## `shared/deelmenu.js`
 
-`public/shared/deelmenu/` -- 3 delen, 374 regels in de delen
+`public/shared/deelmenu/` -- 3 delen, 372 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -631,7 +631,7 @@ omlaag.
 
 ## `shared/gebaar.js`
 
-`public/shared/gebaar/` -- 8 delen, 1051 regels in de delen
+`public/shared/gebaar/` -- 8 delen, 1096 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -742,7 +742,7 @@ omlaag.
 
 ## `shared/levendekleur.js`
 
-`public/shared/levendekleur/` -- 2 delen, 281 regels in de delen
+`public/shared/levendekleur/` -- 2 delen, 280 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -812,7 +812,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 811 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 804 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -877,7 +877,7 @@ omlaag.
 
 ## `shared/verbinding.js`
 
-`public/shared/verbinding/` -- 2 delen, 347 regels in de delen
+`public/shared/verbinding/` -- 2 delen, 346 regels in de delen
 
 | deel | onderwerp |
 |---|---|

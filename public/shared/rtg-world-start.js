@@ -11,7 +11,6 @@
     function finish() {
       if(closed)return;closed=true;observer.disconnect();w.clearTimeout(timer);w.clearTimeout(fallback);
       body.setAttribute('data-rtg-world-start','ready');body.removeAttribute('aria-busy');layer.hidden=true;
-      d.dispatchEvent(new CustomEvent('rtg-world-start-ready'));
     }
     function check() {
       if(closed)return;

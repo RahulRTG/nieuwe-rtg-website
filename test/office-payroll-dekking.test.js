@@ -533,8 +533,17 @@ test('een correctie is een nieuwe run die naar de oude wijst, en de aangifte lee
     { code: ZAAK, staffId: MANAGER, pin: '1234' })).body.token;
   assert.ok(zaakTok, 'de manager van ' + ZAAK + ' logt in bij zijn eigen zaak');
   assert.equal((await api('/api/supplier/payroll/keur', { runId: spoor.runId }, zaakTok)).status, 200);
-  assert.equal((await api('/api/office/payroll/run/keur', { runId: spoor.runId }, gedeeld)).status, 200);
-  assert.equal((await api('/api/office/payroll/run/definitief', { runId: spoor.runId }, gedeeld)).status, 200,
+  /* De administrateur tekent OP NAAM (AUTHORITY.md fase 5): met de gedeelde code
+     stond hier 'onbekend' onder de handtekening. */
+  const naamloos = await api('/api/office/payroll/run/keur', { runId: spoor.runId }, gedeeld);
+  assert.equal(naamloos.status, 403, 'de gedeelde code tekent geen loonrun: ' + uitleg(naamloos));
+  assert.equal(naamloos.body.watNu, 'inloggen-op-naam', 'en krijgt de weg erheen');
+  assert.equal((await api('/api/office/payroll/run/definitief', { runId: spoor.runId }, gedeeld)).status, 403);
+  assert.equal((await api('/api/office/payroll/run/keur', { runId: spoor.runId }, eigenaar)).status, 200);
+  const getekend = (await api('/api/office/payroll/run/een', { runId: spoor.runId }, gedeeld)).body.run;
+  const admin = (getekend.goedkeuringen || []).find(g => g.rol === 'administrateur');
+  assert.ok(admin && admin.door && admin.door !== 'onbekend', 'onder de handtekening staat een mens: ' + JSON.stringify(admin));
+  assert.equal((await api('/api/office/payroll/run/definitief', { runId: spoor.runId }, eigenaar)).status, 200,
     'de verklaarde bevinding houdt de run niet meer tegen');
 
   const voor = await api('/api/office/payroll/aangifte/lijst', { code: ZAAK }, gedeeld);

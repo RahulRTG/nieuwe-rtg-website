@@ -133,11 +133,15 @@
       "assetMet",
       "bedrijf",
       "bestanden",
+      "concernMagTekenen",
       "eigenaar",
+      "entiteitVind",
       "findSupplier",
       "rtmailTeam",
       "rtmailVak",
       "tenant",
+      "werkBankBewijs",
+      "werkBankpadStand",
       "werkplekken"
     ],
     "bestanden": [
@@ -203,6 +207,7 @@
       "accounts",
       "app",
       "auth",
+      "beheertZaak",
       "concernBelangen",
       "concernBoom",
       "concernDiscovery",
@@ -225,6 +230,7 @@
       "concernReadiness",
       "concernUbo",
       "concernZet",
+      "dienstverbandInhaal",
       "employmentBeeindig",
       "employmentNieuw",
       "employmentOpDatum",
@@ -244,6 +250,7 @@
       "kwalificatieZet",
       "kwalificatiesVan",
       "mijn",
+      "mijnVestiging",
       "nietGevonden",
       "ondernemingVind",
       "scopeFunctiescheiding",
@@ -300,6 +307,7 @@
       "beveilig",
       "zaakdoos"
     ],
+    "doos-wacht": [],
     "drm": [
       "drm"
     ],
@@ -603,6 +611,7 @@
       "ideeen",
       "invoer",
       "kantoorIntrekking",
+      "kantoorUitnodiging",
       "kluisAuth",
       "magnaatLeren",
       "mail",
@@ -625,6 +634,8 @@
       "voornemens",
       "wacht",
       "weefsel",
+      "werkBankpadStand",
+      "werkBankpadZet",
       "werkplaats",
       "zaakAbonnement",
       "zelfzorg",
@@ -1515,7 +1526,10 @@
       "payroll"
     ],
     "payroll-os": [
+      "codenaamVan",
+      "dienstverbandToets",
       "findSupplier",
+      "naamAuth",
       "payrollOS"
     ],
     "payroll-os-dekking": [
@@ -1529,7 +1543,9 @@
       "payrollOS"
     ],
     "payroll-os-run": [
+      "dienstverbandToets",
       "findSupplier",
+      "naamAuth",
       "payrollOS"
     ],
     "payroll-os-uitgang": [
@@ -2059,6 +2075,7 @@
       "dagen",
       "dagrapport",
       "defensie",
+      "dienstverbandUitAanname",
       "doel",
       "dorpBuurt",
       "dorpDrukte",
@@ -2610,6 +2627,7 @@
       "tafelwensen"
     ],
     "werving": [
+      "dienstverbandUitAanname",
       "loginFails",
       "noteFailedTry",
       "notifySupplier",

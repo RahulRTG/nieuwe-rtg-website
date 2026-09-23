@@ -16,6 +16,12 @@
    Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
    DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
 module.exports = [
+  /* DE ZWARE POORT LEEST DE LIJST ZWARE HANDELINGEN. kern/zwaarbewijs.js weigert
+     een actienaam die kern/webauthn-acties.js niet kent bij de EERSTE aanroep:
+     zonder die controle ging zo'n route op de terugval door zolang de eigenaar
+     geen passkey had, en was hij daarna dicht (23 september 2026: drie routes). */
+  { van: 'domein:zwaarbewijs', naar: 'domein:webauthn-acties', soort: 'BELEID',
+    reden: 'de zware poort weigert een actienaam die niet in de gesloten lijst ZWARE_ACTIES staat, zodat een route met een onbekende naam meteen zakt in plaats van pas als de eigenaar een passkey heeft' },
   { van: 'domein:bestanden', naar: 'domein:document-capability', soort: 'DOMEINRELATIE',
     reden: 'De persoonlijke bestandenkluis delegeert trash/restore aan haar eigen versiegebonden lifecyclecontract; UI, Edge Bar, API en bevestigde Rahul-aanvragen krijgen zo dezelfde eigenaarcontrole en transactie.' },
   /* DE KEURING ONDER DE VERTAALMOTOR. server/translate/ levert vertalingen en

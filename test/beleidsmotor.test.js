@@ -18,7 +18,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 const { kan, DEUREN, UITKOMST } = require('../server/kern/beleidsmotor/regels');
 const { VERKLAARD_OPEN } = require('../server/kern/beleidsmotor');
 
@@ -68,7 +68,7 @@ test.before(async () => {
      in ./helper.js pakt eerst de eigenaar, en dan meet de boardroomdeur niets. */
   const reg = (await api('/api/auth/register', { name: 'Beleid Toets', email: 'beleid' + Date.now() + '@voorbeeld.test',
     password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' })).body;
-  await api('/api/account/koppel', { soort: 'kantoor', code: 'BELEID-KANTOOR' }, reg.token);
+  await api('/api/account/koppel', await kantoorKoppelBody(srv.base, reg.token), reg.token);
   opNaam = (await api('/api/account/start', { rol: 'kantoor' }, reg.token)).body.token;
   eig = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   assert.ok(gedeeld && opNaam && eig, 'drie sessies nodig: gedeelde code, kantoor op naam, eigenaar');
@@ -130,12 +130,13 @@ test('5. A3 slaat uit: een kantoorroute zonder bekende poort wordt geteld, de re
   const { maakBeleidsmotor } = require('../server/kern/beleidsmotor');
   const m = maakBeleidsmotor({ db: { data: {} }, save: () => {}, sessionFor: () => null, accounts: {}, eigenaar: {},
     boardroomWie: () => null, magBoardroom: () => false, balieBron: () => () => false });
-  const loop = (patroon, status, poorten, method) => {
+  const loop = (patroon, status, poorten, method, afgebroken) => {
     const req = { method: method || 'POST', routePatroon: patroon, beleidsPoorten: poorten };
-    const res = new EventEmitter(); res.statusCode = status;
+    const res = new EventEmitter(); res.statusCode = status; res.writableFinished = !afgebroken;
     m.meelezer(req, res, () => {});
-    res.emit('finish');
+    res.emit('close');
   };
+  loop('/api/office/zonder-slot', 200, undefined, 'POST', true);   // afgebroken: telt niet
   loop('/api/office/zonder-slot', 200);
   loop('/api/office/zonder-slot', 400);
   loop('/api/office/met-slot', 200, ['kantoor']);
@@ -177,11 +178,11 @@ test('7. besluit A2 in de schaduw: de eigenaar door een gevoelige deur wordt get
 test('8. waarom mag ik hier (niet) in: per deur het besluit over jezelf, met de eis die viel', async () => {
   assert.equal((await api('/api/office/beleidsmotor/waarom', {}, null)).status, 401);
   const per = async (t) => Object.fromEntries((await api('/api/office/beleidsmotor/waarom', {}, t)).body.deuren.map(d => [d.deur, d]));
-  const g = await per(gedeeld);
-  assert.equal(g.kantoor.uitkomst, 'TOESTAAN');
-  assert.equal(g['op-naam'].uitkomst, 'WEIGEREN', 'de gedeelde code is geen mens');
-  assert.match(g['op-naam'].reden, /RTG-account|mens/, 'en de reden zegt welke eis viel');
-  assert.equal(g['op-naam'].opbouw[1].gehaald, false);
+  /* De gedeelde code heeft geen zelf om over te vragen: die krijgt de weigering
+     van de kluispoort, en die noemt de weg (een eigen RTG-account). */
+  const g = await api('/api/office/beleidsmotor/waarom', {}, gedeeld);
+  assert.equal(g.status, 403);
+  assert.match(String(g.body.error || ''), /eigen RTG-account/);
   const m = await per(opNaam);
   assert.equal(m['op-naam'].uitkomst, 'TOESTAAN');
   assert.equal(m.boardroom.uitkomst, 'WEIGEREN');

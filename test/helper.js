@@ -451,36 +451,50 @@ function postJson(base) {
    proefpubliek in gezelschap.js). Twee kopieen van dezelfde weg lopen uiteen
    zodra de inlog verandert -- LAT.md regel 4. Geeft null als het niet lukt, zodat
    de aanroeper zelf kan besluiten wat dat betekent. */
-async function kantoorAlsPersoon(base, code) {
+async function kantoorAlsPersoon(base, code, opties) {
   const post = postJson(base);
-  const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+  /* `opties.eigenaar`: de e-mail van de eigenaar van DEZE server. Een toets die
+     start met een eigen RTG_OWNER_EMAIL heeft een andere demo-eigenaar dan de
+     standaard, en die kon hier niet binnenkomen -- dan gaf dit hulpje null en
+     viel alles wat een kantoormens nodig had om. */
+  const login = (opties && opties.eigenaar) || 'roellie.i@gmail.com';
+  const eig = await post('/api/auth/login', { login, password: 'Imran', pasApp: 'business' });
   if (eig && eig.token) {
     const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
     if (kantoor && kantoor.token) return kantoor.token;
   }
-  /* GEEN DEMO-EIGENAAR? DAN DE WEG DIE EEN MEDEWERKER OOK LOOPT.
+  /* GEEN DEMO-EIGENAAR? DAN GEEN KANTOORMENS. Hier stond een tweede weg: een
+     vers account dat de kantoorrol koppelde met de gedeelde code. Die weg is
+     dicht (besluit van de eigenaar, 23 september 2026): de kantoorrol hangt
+     alleen nog aan een account via een uitnodiging van de eigenaar, en zonder
+     eigenaar is er niemand die uitnodigt. `code` blijft in de handtekening
+     staan zodat de aanroepers niet hoeven te veranderen. */
+  void code;
+  return null;
+}
 
-     De eigenaar hierboven bestaat alleen in de demo-seed. Toetsen die met een
-     eigen OFFICE_CODE en een lege database starten, kregen daarom `null` terug
-     en vielen terug op de gedeelde code -- en sinds kern/kantoor/kluispoort.js
-     komt die niet meer langs de kluisdeuren (KYC-besluit, documentnummer,
-     aftekenen).
+/* DE KANTOORROL KOPPELEN, ZOALS HET IN PRODUCTIE GAAT: de eigenaar maakt een
+   uitnodiging voor de codenaam van dit lid, en het lid verzilvert hem. Geeft het
+   LICHAAM voor /api/account/koppel terug, zodat een toets alleen dat hoeft te
+   wisselen. De gedeelde code koppelt niet meer (kern/eenaccount/koppelen.js).
 
-     De tweede weg is geen omweg maar het echte scenario: een eigen RTG-account,
-     daarin de kantoorrol koppelen met dezelfde code, en die rol starten. Wat je
-     terugkrijgt is een office-sessie MET een sleutel, en dat is precies wat het
-     inzagejournaal nodig heeft om een regel naar een mens terug te voeren.
-
-     Elke aanroeper krijgt een vers account, zodat twee toetsen nooit dezelfde
-     kantoormedewerker delen. */
-  const email = 'kantoor' + Date.now() + Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
-  const reg = await post('/api/auth/register', { name: 'Kantoor Toets', email,
-    password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' });
-  if (!reg || !reg.token) return null;
-  const k = await post('/api/account/koppel', { soort: 'kantoor', code: code || 'RTG-OFFICE' }, reg.token);
-  if (!k || k.error) return null;
-  const s2 = await post('/api/account/start', { rol: 'kantoor' }, reg.token);
-  return (s2 && s2.token) || null;
+   `opties.eigenaar` is een eigen eigenaarssessie (een toets met RTG_OWNER_EMAIL),
+   en `opties.bevestig` levert de zware ceremonie voor een eigenaar met passkey:
+   een uitnodiging maken is zwaar werk. */
+async function kantoorKoppelBody(base, lidToken, extra, opties) {
+  const post = postJson(base);
+  const o = opties || {};
+  const me = await post('/api/auth/me', {}, lidToken);
+  const codenaam = me && me.user && me.user.codename;
+  let eigTok = o.eigenaar || null;
+  if (!eigTok) {
+    const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+    eigTok = eig && eig.token;
+  }
+  const bewijs = o.bevestig ? await o.bevestig() : {};
+  const u = codenaam && eigTok
+    ? await post('/api/office/kantoor/uitnodiging', { codenaam, ...bewijs }, eigTok) : null;
+  return Object.assign({ soort: 'kantoor', uitnodiging: (u && u.code) || 'geen-uitnodiging' }, extra || {});
 }
 
 /* Een lid naar Lifestyle of Business tillen, zoals het in het echt gaat: een
@@ -1177,9 +1191,39 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
    bewegen en loslaten synchroon worden afgeleverd. Een timer kan niet midden
    in één JavaScript-taak vallen. Ook die poging loopt door precies dezelfde
    pointerlisteners; alleen de CI-planner zit er niet meer tussen. Geen langere
-   wachttijden: die maken een dobbelsteen stiller, niet eerlijker. */
+   wachttijden: die maken een dobbelsteen stiller, niet eerlijker.
+
+   DE WEG DIE HIJ NAM, EN WAAROM DIE TERUGKOMT. De terugval hierboven maakt de
+   race onschadelijk, maar daarmee ook onzichtbaar: een proef die groen staat
+   zegt niet of dat via de browser kwam of via de rendererpoging, en hoe vaak
+   die tweede afgaat telde nergens (EDGE.md par. 11, ronde 2). veegDoor geeft
+   daarom terug welke weg het werd: 'vlucht' (de protocolvlucht naar Chromium)
+   of 'terugval' (de poging in de renderer). Wie het niet wil weten, negeert het.
+
+   LOSLATEN IS EEN KEUZE. Met { loslaten: false } blijft de knop ingedrukt,
+   zodat een proef kan kijken naar wat er ONDER een halve veeg ligt en daarna
+   zelf loslaat met een echte page.mouse.up(). Dat geldt voor BEIDE wegen: in
+   de vlucht gaat er geen mouseReleased achteraan, en de terugval heeft een
+   eigen staart -- synthetisch neer en bewegen, zonder pointerup. De enige
+   pointerup die de terugval dan nog stuurt, is die van de mislukte vlucht
+   ervoor; na de laatste pointerdown komt er geen. Lukt de rendererpoging niet,
+   dan wordt er wel losgelaten: een gebaar dat niet begon, hoort niet te
+   blijven hangen terwijl de fout wordt gemeld. */
 async function veegDoor(page, doos, opties) {
   const o = opties || {};
+  const loslaten = o.loslaten !== false;
+  /* DE TABEL EERST (ronde 2, stap 10). Lang drukken en stilstaan lezen hun
+     drempel uit de grammatica, en de gebaarlaag laadt die zacht bij de eerste
+     zet() of lijst(). Een veeg die valt voordat hij er is, veegt over een laag
+     zonder lang drukken: dan is er geen wedloop, en bewijst de proef minder dan
+     hij lijkt. Waar de gebaarlaag staat, wacht de helper dus op de tabel. Komt
+     hij niet, dan is dat een gebrek van de laag en geen reden om zonder te vegen. */
+  const tabel = await page.waitForFunction(() => !window.RTGGebaar || !!window.RTGGrammatica, null,
+    { timeout: geduld(5000) }).then(() => true, () => false);
+  if (!tabel) {
+    throw new Error('de gebaarlaag staat er, maar de grammatica kwam niet (shared/gebaar/gebaar-01.js laadt hem ' +
+      'bij de eerste zet() of lijst()); zonder DREMPELS is lang drukken uit en meet deze veeg iets anders dan hij lijkt');
+  }
   const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
   const x0 = doos.x + doos.width * (Number.isFinite(o.startFractie) ? o.startFractie : 0.8);
   /* Dezelfde racevrije aanzet is ook nodig voor een halve veeg die alleen een
@@ -1207,8 +1251,8 @@ async function veegDoor(page, doos, opties) {
     const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
     if (begonnen) {
       for (let i = 2; i <= stappen; i++) await beweeg(x0 + (px * i) / stappen, true);
-      await los(x0 + px);
-      return;
+      if (loslaten) await los(x0 + px);
+      return 'vlucht';
     }
 
     await los(x0 + eerste);
@@ -1220,7 +1264,7 @@ async function veegDoor(page, doos, opties) {
     await page.waitForFunction(() => !document.querySelector('.gb-blad,.gb-lade,[data-gb]'), null,
       { timeout: 5000 }).catch(() => {});
     const rendererPoging = await page.evaluate(({
-      x0, y, px, stappen, eerste, kiezer, startFractie, afstand, vanBoven
+      x0, y, px, stappen, eerste, kiezer, startFractie, afstand, vanBoven, loslaten
     }) => {
       /* De regel uit zijn rechthoek, niet het toevallige bovenste element op
          dat punt. Na een langdruk kan daar nog één frame een verdwijnende
@@ -1279,17 +1323,19 @@ async function veegDoor(page, doos, opties) {
         for (let i = 2; i <= stappen; i++)
           stuur('pointermove', beginX + (verschuiving * i) / stappen, 1);
       }
-      stuur('pointerup', beginX + (begon ? verschuiving : eersteStap), 0);
-      return begon ? true : 'niet-opgepakt';
+      if (!begon) { stuur('pointerup', beginX + eersteStap, 0); return 'niet-opgepakt'; }
+      if (loslaten) stuur('pointerup', beginX + verschuiving, 0);
+      return true;
     }, {
       x0, y, px, stappen, eerste, kiezer: o.kiezer || null,
-      startFractie: o.startFractie, afstand: o.afstand, vanBoven: o.vanBoven
+      startFractie: o.startFractie, afstand: o.afstand, vanBoven: o.vanBoven, loslaten
     });
     if (rendererPoging !== true) {
       throw new Error('het gebaar begon niet via browserinput en ook niet in één rendererhandeling (' +
         (rendererPoging === 'geen-rij' ? 'er stond geen enkele .gb-rij op het scherm'
           : 'de gebaarlaag pakte de beweging niet op') + '); dan is de gebaarbedrading zelf stuk.');
     }
+    return 'terugval';
   } finally {
     await cdp.detach();
   }
@@ -1400,7 +1446,7 @@ async function bankDeur(page, naam, opties) {
 }
 
 module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
-  installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
+  installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
   wachtOpNetstilte, wachtOpBestand, klikEnWacht, tekstVan, postJson,

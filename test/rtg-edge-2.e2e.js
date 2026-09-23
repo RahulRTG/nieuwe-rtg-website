@@ -475,3 +475,131 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
     await stop(child);
   }
 });
+
+/* EEN KEUZE VAN DE MENS OVERLEEFT EEN HASHWISSEL IN WORK (EDGE.md, ronde 2).
+   command-entry.js schreef bij elke wissel de stand en de automatiek op body,
+   en Edge 2 las dat als een nieuwe start: wie Compact had gekozen, stond na
+   #people weer op automatisch, en de opslag zei 'auto'. Nu gaat een wissel
+   langs RTGEdge2.setState als automatiek, en die wijkt voor een keuze van de
+   mens. Drie gevallen, elk in een eigen browsercontext zodat de opslag schoon
+   begint: een keuze in de sessie, geen keuze (dan geeft een wissel overview
+   zoals voorheen), en een keuze die bij het laden al bewaard was -- dat het
+   laden die laat staan was vermoed en wordt hier gemeten.
+
+   Let op het verkeerde experiment: de automatiek wijkt ook voor een mens die
+   met de rand BEZIG is (isBusy: een aanwijzer boven de rand, focus erin, een
+   open paneel), en de muis van de proef staat na een klik of op (0,0) precies
+   daar. Dan zou 'de keuze blijft staan' groen zijn omdat de poort weigerde en
+   niet omdat de keuze won. Vóór elke wissel gaat de aanwijzer daarom naar de
+   inhoud, en de proef eist dat de rand dan NIET bezig is.
+
+   DE MUTATIES, elk nagetrokken: zet de attribuutregels terug in het pad van de
+   wissel (de opslag wordt 'auto' en de stand overview), en laat `source` weg
+   bij setState (de wissel is dan zelf een keuze en de opslag zegt 'overview'). */
+const WERK_VOORKEUR = 'rtg.edge2.state.v1:/apps/werk.html';
+
+async function werkStand(page) {
+  return page.evaluate(sleutel => ({
+    stand: document.body.getAttribute('data-rtg-edge-2-state'),
+    auto: document.body.getAttribute('data-rtg-edge-2-auto'),
+    opslag: localStorage.getItem(sleutel),
+    kop: document.body.getAttribute('data-rtg-vandaag-surface-title'),
+    bezig: window.RTGEdge2Context.isBusy(document, false)
+  }), WERK_VOORKEUR);
+}
+
+/* Edge 2 stemt af via een MutationObserver en een setTimeout(0). Er wordt dus
+   niet op stilte gewacht maar op de wissel zelf, en daarna op drie macrotaken en
+   een frame: dan heeft elke reactie op de wissel plaatsgevonden. */
+async function werkWissel(page, hash) {
+  await page.mouse.move(720, 450);
+  assert.equal((await werkStand(page)).bezig, false,
+    'de rand is bezig vóór de wissel; dan meet de proef de weigering en niet de keuze');
+  await page.evaluate(async h => {
+    await new Promise(klaar => {
+      addEventListener('hashchange', () => klaar(), { once: true });
+      location.hash = h;
+    });
+    for (let i = 0; i < 3; i++) await new Promise(r => setTimeout(r, 30));
+    await new Promise(r => requestAnimationFrame(() => r()));
+  }, hash);
+  return werkStand(page);
+}
+
+async function openWerk(browser, base, bewaard) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await context.addInitScript(([sleutel, stand]) => {
+    try {
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      if (stand) localStorage.setItem(sleutel, stand);
+    } catch (e) {}
+  }, [WERK_VOORKEUR, bewaard || null]);
+  const page = await context.newPage();
+  await page.goto(base + '/apps/werk.html#projecten', { waitUntil: 'domcontentloaded' });
+  if (new URL(page.url()).pathname !== '/apps/werk.html') return { context, page, omgeleid: new URL(page.url()).pathname };
+  await wachtOpEdge2(page, '/apps/werk.html');
+  return { context, page, omgeleid: null };
+}
+
+test('Edge 2: een keuze van de mens overleeft een hashwissel in Work',
+  { skip: geenBrowser(pw) }, async (t) => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+
+    await t.test('Compact gekozen in de sessie, dan #people', async (st) => {
+      const { context, page, omgeleid } = await openWerk(browser, base);
+      try {
+        if (omgeleid) { st.skip('werk.html leidde naar ' + omgeleid + '; geen contract omzeild'); return; }
+        const begin = await werkStand(page);
+        assert.equal(begin.stand, 'overview', 'zonder keuze begint Work in overview');
+        assert.equal(begin.opslag, null, 'de proef begint zonder bewaarde keuze');
+        await page.click('.rtg-edge-state');
+        await page.click('[data-edge-2-mode="compact"]');
+        await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-state') === 'compact');
+        assert.equal((await werkStand(page)).opslag, 'compact', 'de keuze is als keuze bewaard');
+
+        const na = await werkWissel(page, 'people');
+        assert.equal(na.kop, null, 'de wissel is niet verwerkt: de projectenkop staat er nog');
+        assert.equal(na.opslag, 'compact', 'de hashwissel overschreef de bewaarde keuze');
+        assert.equal(na.stand, 'compact', 'de hashwissel zette de gekozen stand terug');
+
+        const terug = await werkWissel(page, 'projecten');
+        assert.equal(terug.kop, 'Projecten en taken', 'de terugwissel is niet verwerkt');
+        assert.deepEqual([terug.stand, terug.opslag], ['compact', 'compact'], 'de terugwissel overschreef de keuze');
+      } finally { await context.close(); }
+    });
+
+    await t.test('geen keuze: een wissel geeft overview zoals voorheen', async (st) => {
+      const { context, page, omgeleid } = await openWerk(browser, base);
+      try {
+        if (omgeleid) { st.skip('werk.html leidde naar ' + omgeleid + '; geen contract omzeild'); return; }
+        const gezet = await page.evaluate(() => window.RTGEdge2.setState('compact', { source: 'auto' }));
+        assert.equal(gezet, true, 'de automatiek mocht Work niet op compact zetten');
+        await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-state') === 'compact');
+        const na = await werkWissel(page, 'people');
+        assert.equal(na.kop, null, 'de wissel is niet verwerkt');
+        assert.equal(na.stand, 'overview', 'zonder keuze hoort een wissel het overzicht te geven');
+        assert.equal(na.auto, 'true', 'zonder keuze blijft de automatiek aan');
+        assert.equal(na.opslag, null, 'een wissel is geen keuze en bewaart niets');
+      } finally { await context.close(); }
+    });
+
+    await t.test('een bij het laden bewaarde Compact blijft staan, ook na een wissel', async (st) => {
+      const { context, page, omgeleid } = await openWerk(browser, base, 'compact');
+      try {
+        if (omgeleid) { st.skip('werk.html leidde naar ' + omgeleid + '; geen contract omzeild'); return; }
+        const begin = await werkStand(page);
+        assert.deepEqual([begin.stand, begin.opslag], ['compact', 'compact'],
+          'het laden van #projecten overschreef de bewaarde keuze');
+        const na = await werkWissel(page, 'people');
+        assert.equal(na.kop, null, 'de wissel is niet verwerkt');
+        assert.deepEqual([na.stand, na.opslag], ['compact', 'compact'], 'de wissel overschreef de bewaarde keuze');
+      } finally { await context.close(); }
+    });
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+  }
+});

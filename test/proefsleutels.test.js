@@ -69,6 +69,16 @@ function nepPost(mislukt = new Set()) {
         return { status: 200, data: { token: 't:register:' + nr, state: { user: { id: 1000 + nr } } } };
       }
       if (pad === '/api/techniek/sso/scimsleutel') return { status: 200, data: { sleutel: 'rtgscim_' + 'x'.repeat(30) } };
+      /* DE KANTOORROL LOOPT VIA EEN UITNODIGING (23 september 2026): de munter
+         vraagt de codenaam van het verse account op en de boardroom maakt er een
+         uitnodiging voor. Zelfde vormen als de echte server --
+         /api/auth/me geeft { user: { codename } } (routes/auth/inlog-pas.js) en
+         de uitnodiging { ok, codenaam, code } (routes/kantoren/uitnodiging.js).
+         De codenaam hangt aan het token, zodat A en B ook hier twee mensen zijn. */
+      if (pad === '/api/auth/me' && tok) return { status: 200, data: { user: { codename: 'Codenaam ' + tok } } };
+      if (pad === '/api/office/kantoor/uitnodiging') {
+        return { status: 200, data: { ok: true, codenaam: lijf && lijf.codenaam, code: 'UITN-' + nr } };
+      }
       /* EEN SESSIE HOORT BIJ EEN ACCOUNT, ook in een nep-server. Gaf deze regel
          voor /api/account/start altijd hetzelfde token terug, dan kregen twee
          VERSCHILLENDE kantoormensen dezelfde sleutel -- en dan staat er groen

@@ -11,7 +11,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 let srv, base, lid, office;
 /* De vier-ogen op het OPSCHALEN vraagt twee ECHTE personen. Vroeger stonden hier
@@ -92,7 +92,7 @@ test.before(async () => {
   const cn = (await api('state', {}, reg.token)).body.state.user.codename;
   const geef = await bapi('boardroom/toegang/geef', { codenaam: cn }, baas);
   assert.equal(geef.status, 200, 'de eigenaar geeft boardroom-toegang: ' + JSON.stringify(geef.body).slice(0, 140));
-  const kop = await api('account/koppel', { soort: 'kantoor', code: 'KANTOOR-BANK-1' }, reg.token);
+  const kop = await api('account/koppel', await kantoorKoppelBody(base, reg.token), reg.token);
   assert.equal(kop.status, 200, 'het tweede lid koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 140));
   tweede = (await api('account/start', { rol: 'kantoor' }, reg.token)).body.token;
   assert.ok(tweede, 'en staat als tweede persoon in de backoffice');
@@ -106,7 +106,7 @@ test.before(async () => {
     body: JSON.stringify({ name: 'Bankmedewerker', email: 'med' + w + '@x.nl', phone: '06' + w,
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }) })).json();
   assert.ok(med.token, 'de kantoormedewerker heeft een eigen account');
-  const kop2 = await api('account/koppel', { soort: 'kantoor', code: 'KANTOOR-BANK-1' }, med.token);
+  const kop2 = await api('account/koppel', await kantoorKoppelBody(base, med.token), med.token);
   assert.equal(kop2.status, 200, 'de medewerker koppelt de kantoorrol: ' + JSON.stringify(kop2.body).slice(0, 140));
   opNaam = (await api('account/start', { rol: 'kantoor' }, med.token)).body.token;
   assert.ok(opNaam, 'en staat op naam in de backoffice');
@@ -119,7 +119,7 @@ test.before(async () => {
     body: JSON.stringify({ name: 'Bankmedewerker twee', email: 'med2' + w2 + '@x.nl', phone: '06' + w2,
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }) })).json();
   assert.ok(med2.token, 'de tweede kantoormedewerker heeft een eigen account');
-  const kop3 = await api('account/koppel', { soort: 'kantoor', code: 'KANTOOR-BANK-1' }, med2.token);
+  const kop3 = await api('account/koppel', await kantoorKoppelBody(base, med2.token), med2.token);
   assert.equal(kop3.status, 200, 'de tweede medewerker koppelt de kantoorrol: ' + JSON.stringify(kop3.body).slice(0, 140));
   opNaam2 = (await api('account/start', { rol: 'kantoor' }, med2.token)).body.token;
   assert.ok(opNaam2, 'en staat ook op naam in de backoffice');

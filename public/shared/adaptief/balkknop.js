@@ -62,7 +62,9 @@
        gereedschap zit nu waar het hoort: omhoog trekken, of de ⋯ ernaast. */
     var klok = null;
     b.addEventListener('pointerdown', function () {
-      klok = w.setTimeout(function () { klok = null; uitleg(it); }, 480);
+      var D = w.RTGGrammatica && w.RTGGrammatica.DREMPELS;
+      if (!D) return;                     // zonder tabel geen snelweg; de tik en de ⋯ blijven
+      klok = w.setTimeout(function () { klok = null; uitleg(it); }, D.lang);
     });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (n) {
       b.addEventListener(n, function () { if (klok) { w.clearTimeout(klok); klok = null; } });

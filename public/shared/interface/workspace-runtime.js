@@ -11,20 +11,17 @@
     var surface = 'peek', actief = null, dood = false, registries = w.RTGWorkspaceRegistries();
     registries.registerWorldCatalog(w.RTGWorkspaceWorldCatalog || []);
     function fout(waar, error) {
-      try { d.dispatchEvent(new w.CustomEvent('rtg-workspace-error', { detail: { waar: waar,
-        message: String(error && error.message || error || 'Onbekende fout') } })); } catch (e) {}
       if (typeof o.error === 'function') o.error(waar, error);
     }
     var identity = w.RTGIdentityRuntime({ actor: o.actor }), session = w.RTGSessionRuntime({ identity: identity, deviceId: o.deviceId });
-    var contextEngine = w.RTGWorkspaceContext({ source: o.context });
+    var contextEngine = w.RTGWorkspaceContext();
     var navigation = w.RTGWorkspaceNavigation({ open: o.open });
     var policy = w.RTGWorkspacePolicy({ actor: identity.actor(), permission: o.permission, tenantPolicy: o.tenantPolicy });
     var state = w.RTGWorkspaceState({ workspaceId: o.workspaceId, global: o.globalState, user: o.userState,
       session: Object.assign(session.snapshot(), o.sessionState || {}),
-      workspace: Object.assign({ context: contextEngine.get() }, o.workspaceState || {}),
+      workspace: o.workspaceState,
       persist: o.persistModuleState, onChange: o.onStateChange });
     session.subscribe(function (s) { state.hostSet('session', s, 'connection-change'); });
-    contextEngine.subscribe(function (c) { state.hostSet('workspace', { context: c.value }, c.reason); });
     var orchestrator = w.RTGWorkspaceOrchestrator({ error: fout, apply: function (layout, changes, event) {
       toepassen(layout); state.hostSet('workspace', { layout: layout }, 'orchestration');
       if (typeof o.onOrchestrate === 'function') o.onOrchestrate(layout, changes, event);
@@ -74,7 +71,7 @@
     function frame(def) {
       var item = w.RTGWorkspaceModuleHost({ runtimeId: id, definition: def, context: function (status) { return contextVoor(def.manifest.id, status); },
         registerAction: broker.registerAction, subscribe: function (owner, type, fn) { return broker.subscribe(owner, type, fn, false); },
-        workspaceContext: contextEngine.get, error: fout });
+        error: fout });
       mounted[def.manifest.id] = item; return item;
     }
     function vormVoor(m, gewenste) {
@@ -83,7 +80,6 @@
       return m.states.filter(function (s) { return m.surfaces[s]; })[0];
     }
     function toepassen(layout) {
-      contextEngine.refresh();
       Object.keys(mounted).forEach(function (mid) { var directive = layout[mid] || { surface: 'inherit' };
         var gewenst = SDK.states.indexOf(directive.surface) >= 0 ? directive.surface : surface;
         mounted[mid].render(vormVoor(defs[mid].manifest, gewenst), directive, mid === actief); });
@@ -111,7 +107,7 @@
     }
     function destroy() {
       dood = true; Object.keys(mounted).forEach(function (mid) { mounted[mid].destroy(); });
-      broker.destroy(); orchestrator.destroy(); navigation.destroy(); contextEngine.destroy(); session.destroy(); state.destroy();
+      broker.destroy(); orchestrator.destroy(); navigation.destroy(); session.destroy(); state.destroy();
       defs = Object.create(null); mounted = Object.create(null);
     }
     return { version: SDK.version, id: id, register: registreer, mount: mount, setState: setState, dispatch: dispatch,

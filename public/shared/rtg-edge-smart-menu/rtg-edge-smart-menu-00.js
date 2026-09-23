@@ -57,7 +57,26 @@
       });
       nav.appendChild(ruimte);
     }
-    bronknoppen(rt.root).forEach(function (bron, i) {
+    /* In de schil draagt de Edge die van LivingOS (app.html hoort daar), dus
+       las "Dit scherm" de LivingOS-functies voor elk blad, ook in TravelOS.
+       Daar komt "hier" van het actieve blad (shared/command/werktafel.js zet
+       het) en openen de functies als blad. Op de lege tafel is er geen hier. */
+    var blad = command && d.body.getAttribute('data-rtg-blad-wereld');
+    if (blad) {
+      var cfgBlad = blad !== 'geen' && w.RTGEdgeWorlds && w.RTGEdgeWorlds[blad];
+      (cfgBlad ? cfgBlad.tools.slice(0, 3) : []).forEach(function (t) {
+        var k = d.createElement('button');
+        k.type = 'button'; k.className = 'rtg-edge-here-action';
+        k.innerHTML = icoon(t[2]) + '<span></span><em aria-hidden="true">›</em>';
+        k.querySelector('span').textContent = t[1];
+        k.addEventListener('click', function () {
+          sluit(rt);
+          if (w.RTGCommand && w.RTGCommand.actief && w.RTGCommand.actief()) w.RTGCommand.open(t[3], t[1]);
+          else location.href = t[3];
+        });
+        nav.appendChild(k);
+      });
+    } else bronknoppen(rt.root).forEach(function (bron, i) {
       var knop = d.createElement('button');
       knop.type = 'button'; knop.className = 'rtg-edge-here-action';
       knop.innerHTML = (bron.querySelector('svg') ? bron.querySelector('svg').outerHTML : icoon(['calendar','home','play'][i] || 'spark')) +
@@ -91,6 +110,16 @@
     rt.hier.hidden = naam !== 'here'; rt.alles.hidden = naam !== 'all';
     rt.body.setAttribute('data-rtg-edge-menu-face', naam);
     if (naam === 'here') maakHier(rt);
+    /* Zelfde reden als in maakHier: in de schil is de huidige wereld die van
+       het actieve blad, niet die van de Edge van app.html. */
+    var blad = d.getElementById('rtgCommand') && d.body.getAttribute('data-rtg-blad-wereld');
+    if (blad && naam === 'all' && w.RTGEdgeWorlds) {
+      var eigen = w.RTGEdgeWorlds[blad];
+      Array.from(rt.alles.querySelectorAll('.rtg-edge-smart-worlds a')).forEach(function (a) {
+        if (eigen && a.getAttribute('href') === (eigen.home || eigen.huis)) a.setAttribute('aria-current', 'page');
+        else a.removeAttribute('aria-current');
+      });
+    }
     if (focus) rt.tabs.find(function (x) { return x.getAttribute('data-edge-face') === naam; }).focus();
   }
 

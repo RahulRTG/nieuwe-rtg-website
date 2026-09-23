@@ -140,5 +140,14 @@
     rahul:rahul,
     uitKind:function(bron,url){return !!(tafel&&tafel.thuisUitKind(bron,url))},
     sluitAlles:function(){if(tafel)tafel.sluitAlles()}};
+  /* HOME EN HET BEELDMERK IN DE SCHIL. De Edge van app.html is die van
+     LivingOS, dus Home en het RTG-merk wezen naar /apps/wereld.html: wie in
+     TravelOS op Home drukte, stond buiten de werktafel in de momentenfeed van
+     een andere wereld. Binnen de werktafel is Home de lege keuze (WERELD.md);
+     zonder werktafel (uitgelogd, intake) doet de knop wat hij altijd deed.
+     Vangfase, zodat de eigen handler van de knop niet eerst wegnavigeert. */
+  d.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest(
+    '.rtg-edge-mark,.rtg-edge-bottom a[aria-label="Naar home"],.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');
+    if(!a||!mag()||!tafel)return;e.preventDefault();e.stopPropagation();thuis()},true);
   if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',init);else init();
 })(window,document);

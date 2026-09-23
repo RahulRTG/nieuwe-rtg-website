@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1970 bestanden en 14067 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1971 bestanden en 14068 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1970 |
-| losse beweringen (`test(...)`) | 14067 |
+| toetsbestanden | 1971 |
+| losse beweringen (`test(...)`) | 14068 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1324 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
-| alleen in de kop *genoemd*, nog niet gemeten | 167 |
+| alleen in de kop *genoemd*, nog niet gemeten | 168 |
 | niets van beide | 406 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -1766,7 +1766,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-244 bestanden, 433 beweringen.
+245 bestanden, 434 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2002,6 +2002,7 @@ toets omvalt.
 | `werkscherm.e2e.js` | 3 | -- | Het Werk OS-scherm in een echte browser: /apps/werk.html. Drie beweringen die van buiten NIET te zien zijn aan een groene API-toets: 1. |
 | `werkschermen.e2e.js` | 4 | -- | DE WERKSCHERMEN: WIE ZIT ER ACHTER, EN WAT MAG DIE ZIEN. De laatste grote groep uit TAKEN 4.9. |
 | `werkstatus.e2e.js` | 1 | gezakt op `===->!==#0` | DE ORGANISATIESTAND OP EEN ECHT SCHERM -- en vooral wat er NIET staat. De bewijspoort (kern/tenant/bewijs.js) maakte van elke enterprisebewering een object met een bron of een reden. |
+| `werktafel-lussen.e2e.js` | 1 | genoemd | DE LUSSEN VAN DE WERKTAFEL OP EEN TELEFOON: een wereld openen, erin rondgaan, en weer terugkomen -- met de knoppen die een mens werkelijk gebruikt. Vier fouten die samen het gevoel gaven dat je "niet fatsoenlijk door... |
 | `werktafel.e2e.js` | 4 | genoemd | DE WERKTAFEL: wanneer hij er WEL mag staan, en wanneer niet. Deze toets bestaat om twee fouten die alleen op een breed venster bestonden, en die daarom niemand zag: de app wordt op een telefoon ontwikkeld en op een... |
 | `winkel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE WINKEL VAN DE RTFOUNDATION (/apps/foundation/winkel.html) IN EEN ECHTE BROWSER. kern/rtfos/winkel.js draagt vier grendels en test/rtfos-gift-ruil-routes.test.js beproeft ze over de draad: geen voorraad geen... |
 | `world-dashboard.e2e.js` | 1 | -- | DE VIER WERELDHOMES ZIJN HUN EIGEN DASHBOARD. Deze proef bewaakt de grens die bij de nieuwe schil het makkelijkst weer vervaagt: de gedeelde laag mag de echte Living-, Work-, Travel- en Foundation-DOM alleen opmaken. |

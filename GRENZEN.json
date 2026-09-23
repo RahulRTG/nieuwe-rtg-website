@@ -1513,7 +1513,9 @@
     ],
     "payroll-os": [
       "findSupplier",
-      "payrollOS"
+      "payrollOS",
+      "naamAuth",
+      "codenaamVan"
     ],
     "payroll-os-dekking": [
       "payrollOS"

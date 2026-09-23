@@ -124,6 +124,12 @@ test('7. het beleid komt bovenop de bevoegdheid, en hangt aan het bedrag', () =>
   const na = ruim.beslis({ actor: 'directeur', handeling: 'money.refund', waardeCenten: 150000,
     context: { goedgekeurdDoor: 'tweede-persoon', omkeerbaar: true, bevestigingVers: true } });
   assert.equal(na.uitkomst, UITKOMST.TOESTAAN);
+
+  // de aanvrager die zichzelf als goedkeurder opgeeft, is geen tweede persoon
+  const zelf = ruim.beslis({ actor: 'directeur', handeling: 'money.refund', waardeCenten: 150000,
+    context: { goedgekeurdDoor: 'directeur', omkeerbaar: true, bevestigingVers: true } });
+  assert.equal(zelf.uitkomst, UITKOMST.GOEDKEURING, 'wie zijn eigen handeling goedkeurt, tekent alleen');
+  assert.match(zelf.reden, /eigen handeling/);
 });
 
 /* DE VIERDE BEWERING. "We weten het niet" en "het mag niet" zijn verschillende

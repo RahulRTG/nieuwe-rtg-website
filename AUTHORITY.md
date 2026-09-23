@@ -333,7 +333,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | fase 1, besluit A2 |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
-| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | fase 4 |
+| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | fase 4 |
 | 7 | **identiteiten voor agents, diensten en apparaten** | **agent staat** (23 september 2026; par. 5c); diensten en apparaten niet |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf staat** (`/api/office/beleidsmotor/waarom`, op naam: de gedeelde code heeft geen zelf); reviews, slapende rechten en de simulator niet |
@@ -486,6 +486,39 @@ te wijzen is aan de gedeelde code, die geen mens draagt. De uitrol gaat daarna p
 kamer en per werkwoord, niet op een percentage (KANTOORMACHT.md). De vier kamers
 die het machtsmodel mist (veiligheid, operaties, bestuur en risico) staan er ook
 nog niet.
+
+### 5e. Fase 5, de vier ogen: wat dicht is en wat eerst een onderwerp nodig heeft
+
+De meting vooraf: `geld.goedkeuren` wordt door geen enkele route op naam
+gecontroleerd. Het Werk OS (`server/bedrijf/`) kent geen factuur, betaling of
+inkooporder, en contract, klant en dienstverband leggen niet vast wie ze
+aanmaakte (`door` is hooguit een naam, en bij een dienstverband ontbreekt hij
+helemaal). De echte goedkeuringen met vier ogen staan elders: de loonrun
+(`kern/payroll/run.js`), de uitgaven van RTFOS (`kern/rtfos/geld-uitgaven.js`) en
+de beslislaag van de geldketen (`kern/commercie/besluit.js`). Daar zaten twee gaten.
+
+- **Een loonrun werd ondertekend met de gedeelde code.** De administrateur tekende
+  achter `officeAuth`, en onder de handtekening stond `onbekend`. Een handtekening
+  van niemand geeft geen vier ogen. `/api/office/payroll/run/keur` en `/definitief`
+  hangen nu achter `naamAuth`. De naam komt uit de sessie (de codenaam van de mens),
+  nooit uit het lichaam. De gedeelde code krijgt 403 met de weg erheen
+  (`test/office-payroll-dekking.test.js`).
+- **De beslislaag liet de aanvrager zichzelf goedkeuren.** Stap 4 van `beslis()`
+  keek alleen of er een `goedgekeurdDoor` was, en niet of dat een ander was. Nu
+  telt een goedkeuring door de aanvrager zelf niet als tweede persoon
+  (`test/besluit.test.js` toets 7).
+
+Beide zijn met een mutatie nagetrokken: haal de reparatie weg en de toets zakt.
+
+**Wat nog niet staat, en waarom.** De drie conflicten van `scope.js` afdwingen
+kan pas als er een ONDERWERP is om ze op af te dwingen. "Je keurt geen betaling
+goed aan een relatie die je zelf aanmaakte" vraagt een betaling die in het Werk
+OS bestaat en een relatie die haar maker vastlegt, en geen van beide is er. Een
+afdwinging over rechten die niemand controleert, zou een schijnbewaker zijn.
+Hetzelfde geldt voor een tekengrens per organisatie: `besluit.js` heeft een
+globaal beleid, en `kern/concern/graaf-bevoegdheid.js` kent al een tekenlimiet
+per bestuurder of volmacht. Die twee aan elkaar hangen is de volgende stap. Dat is
+aansluiten en niet uitvinden, en er komt geen derde rechtenmodel bij.
 
 ---
 

@@ -456,6 +456,10 @@ const EIGEN_MODULE = new Map([
      nagetrokken: linkSync terug naar een kale schrijf (toets 1 zakt), een
      verkeerde lengte stil vervangen (toets 2 zakt). */
   ['sleutel-wedloop.test.js', ['server/lib/sleutelbestand.js']],
+  /* VEEGDOOR (Edge ronde 2, stap 8). De toets beproeft de helper zelf: welke weg
+     veegDoor nam, en vasthouden zonder loslaten. De liegpoort raakt hem niet,
+     want er gaat geen antwoord van een route in om; de module is test/helper.js. */
+  ['helper-veegdoor.e2e.js', ['test/helper.js']],
   // The document pilot reaches this handler through HTTP, browser or child processes.
   ['document-equivalence.e2e.js', ['server/kern/document-capability.js']],
   ['document-persistence.e2e.js', ['server/kern/document-capability.js']],

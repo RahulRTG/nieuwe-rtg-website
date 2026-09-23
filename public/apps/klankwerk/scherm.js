@@ -158,7 +158,7 @@
   });
 
   function bewaarNu(stil) {
-    if (!track) return Promise.resolve();
+    if (!track) { if (!stil) fout('Open of maak eerst een nummer.'); return Promise.resolve(); }
     leesVelden();
     return api('bewaar', { id: track.id, naam: track.naam, bpm: track.bpm, maten: track.maten,
       kanalen: track.kanalen, secties: track.secties || [], klaar: track.klaar,

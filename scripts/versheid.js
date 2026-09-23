@@ -229,6 +229,12 @@ const REGISTERS = [
      de proef zag veranderen, en wat een mens erover heeft verklaard. Hij veroudert op
      twee manieren -- een nieuwe AI-bereikbare route, en een verse idempotentieronde. */
   ['GEVOLGDEKKING.json', 'npm run gevolgdekking:vastleggen', 'van hoeveel AI-bedienbare handelingen bekend is wat zij veroorzaken'],
+  /* DE EDGE (EDGE.md). Twee registers en allebei een melding: de kaart veroudert
+     met elke rtg-gebeurtenis die er in public/ bij komt, de dekking met elk
+     scherm. Hun tanden zitten op de inhoud (test/edgekaart.test.js en
+     test/edgenieuwscherm.test.js, plus de normtanden) en niet op de ouderdom. */
+  ['EDGEKAART.json', 'npm run edgekaart', 'wie in de Edge-lagen schrijft en beslist, en welke kanalen nergens aankomen'],
+  ['EDGEDEKKING.json', 'npm run edgedekking', 'wat elk scherm, gemeten in een browser, aan de Edge vertelt'],
   /* DE OVERLEVING STAAT MET OPZET OP `overig` EN NIET OP BEVEILIGING, en dat is
      de correctie op een eerste versie die hem die vlag wel gaf -- "hij gaat over
      beveiliging, dus hij hoort in de beveiligingsklasse". Dat is de verkeerde

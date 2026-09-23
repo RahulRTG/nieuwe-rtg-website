@@ -90,14 +90,15 @@
     } catch (e) { meld('Spreken kan niet op dit toestel.'); }
   });
   $('#zegOp').addEventListener('click', function () {
-    if (!laatste || !window.speechSynthesis) return;
+    if (!laatste) { meld('Vertaal eerst iets; dan leest dit het voor.'); return; }
+    if (!window.speechSynthesis) { meld('Voorlezen kan niet op dit toestel.'); return; }
     var u = new SpeechSynthesisUtterance(laatste);
     u.lang = $('#taalNaar').value;
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
   });
   $('#kopieer').addEventListener('click', function () {
-    if (!laatste) return;
+    if (!laatste) { meld('Er is nog geen vertaling om te kopieren.'); return; }
     (navigator.clipboard ? navigator.clipboard.writeText(laatste) : Promise.reject())
       .then(function () { meld('Gekopieerd.'); })
       .catch(function () { meld('Kopieren lukte niet; selecteer de tekst gerust zelf.'); });
@@ -154,7 +155,7 @@
   }
   $('#bewaarZin').addEventListener('click', function () {
     var tekst = $('#invoer').value.trim();
-    if (!tekst || !laatste) return;
+    if (!tekst || !laatste) { meld('Vertaal eerst een zin; dan kunt u hem bewaren.'); return; }
     vast.unshift({ van: tekst, naar: laatste });
     vast = vast.slice(0, 50);
     try { localStorage.setItem('rtg_vertaal_vast', JSON.stringify(vast)); } catch (e) {}

@@ -1628,6 +1628,52 @@ geen grijze knop zonder uitleg bij), en **de orb stelt voor maar beslist nooit**
 wat er gebeurt loopt langs capability, verhindering en gewicht, en `plechtig` wordt
 door een mens afgemaakt. Lees die vóór je een handeling toevoegt aan een scherm.
 
+**`EDGE.md` is RTG Edge 3.0** -- één canonieke context-, trust- en actielaag
+voor heel RTG, opgebouwd uit bestaande primitives. Lees die vóór je iets aan de
+balk onderin, de adaptieve Edge, het casco of de handelingen van een scherm
+verandert. De kern in twee zinnen: **de Edge bezit de werkelijkheid niet, hij
+krijgt er een blikveld op**, en **de Edge presenteert bevoegdheid, hij verleent
+haar nooit** -- dus geen derde contextmodel, geen `edge.canPay()` en geen
+Edge-state die naar een domein terugschrijft. Ronde 0 bouwde geen
+productintelligentie maar een meetbare fundering: `npm run edgekaart`
+(`EDGEKAART.json`: per bestand wie schrijft, beslist en leest, elk met een citaat
+dat letterlijk in de bron moet staan) vond <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal-->
+verantwoordelijkheden met meer dan één eigenaar (twee capabilityregisters, twee
+contextmodellen, vier plekken die de wereld vaststellen, vijf standmachines) en
+<!--getal:edgekaart.dodeKanalen-->17<!--/getal--> dode kanalen, waaronder precies de vijf signalen
+waar de adaptieve Edge naar luistert en die geen scherm verstuurt. Het **Edge
+Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
+herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
+voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op
+`null` met die reden. `shared/edge/actiestaat.js` zet een handeling in een van
+vier standen (AFWEZIG, GEBLOKKEERD, BESCHIKBAAR, LOPEND); alleen een oordeel met
+`bron: 'server'` telt, GEBLOKKEERD draagt altijd een reden, de bevestiging volgt
+de vlaggen van de GEWICHT-tabel en het werkelijke gewicht komt uit
+`grammatica.effectief()` -- dezelfde regel die `gewicht.js` bij het uitvoeren
+gebruikt. **Gewicht is geen voorrang**: gewicht is de zwaarte van een handeling
+en blijft de enige gewichtsschaal, voorrang (wat nu zichtbaar moet zijn) wordt
+een deterministische volgorde zonder score, en `VOORRANG` is als identifier al
+bezet in `server/pg/sync.js`. `npm run edgedekking` meet in een echte browser
+per scherm wat het aan de Edge vertelt, per veld en met opzet zonder samengesteld
+percentage; een nieuw scherm krijgt het harde contract
+(`test/edgenieuwscherm.test.js`), een bestaand scherm mag niet achteruit. Vijf
+gebreken zijn in dezelfde ronde gerepareerd omdat ze bereikbaar waren of de
+verkeerde kant op faalden, en het zwaarste was een dode knop: de lader van de
+adaptieve Edge bracht de balkknoppen mee maar niet de gewichtlaag, dus op een los
+scherm met een register (Office) deed een `bewust`-handeling in het Edge-blad
+niets. Verder voerde de Second Screen handelingen uit langs het gewicht heen, en
+faalden de orb en `bewust` zonder lade open waar de balk en `zwaar` dichtgingen,
+en gold "compensatie is nooit Ongedaan maken" alleen bij het tonen en niet in de
+uitvoerder.
+**Een ingang die een handeling kan uitvoeren, gaat altijd langs
+`RTGGewicht.voer`** -- ook als hij alleen een id kent (`voerId`). De tweede ronde
+besluiten staan in par. 8 van EDGE.md: urgentie krijgt geen eigen schaal maar is
+de voorgrondtrede, voortzetting wordt eerst lokaal afgemaakt, een verzoek loopt
+via het domein en niet via een eigen verzoekobject, eerst de hoedanigheid in
+sessie en envelop en dan pas een rolwisselaar, het werkdeck gaat over het open
+werkstuk, en **een nieuw scherm met een eigen hoofdactie publiceert zijn context
+zelf** (`contractNieuw`).
+
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
 centrale console, en Context Linking dat alleen een verwijzing rondstuurt.

@@ -21,7 +21,9 @@
   function bindInvoer(){
     const veld = $('#codeveld'), knop = $('#koppelKnop');
     if (!veld || !knop) return;
-    const voerUit = ()=>{ const code = veld.value.trim().toUpperCase(); if (code) koppel(code); };
+    const voerUit = ()=>{ const code = veld.value.trim().toUpperCase();
+      if (!code) { const m = $('#melding'); if (m) m.textContent = 'Vul eerst de schermcode in.'; veld.focus(); return; }
+      koppel(code); };
     knop.addEventListener('click', voerUit);
     veld.addEventListener('keydown', e=>{ if (e.key === 'Enter') voerUit(); });
   }

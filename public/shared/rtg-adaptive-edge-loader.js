@@ -10,12 +10,41 @@
     node.addEventListener('error', function () { done(false); }, { once: true });
     (d.head || d.documentElement).appendChild(node);
   }
+  /* DE GEWICHTLAAG REIST MEE MET DE BALK (EDGE.md par. 11). Deze lader bracht
+     de knoppen van het register mee maar niet wat ze weegt: op een los scherm
+     met een register (Office) deed een `bewust`-handeling in het Edge-blad
+     niets, en een verhinderde knop zei alleen zijn naam. Pas na
+     DOMContentLoaded, want dan hebben de defer-scripts van het scherm gedraaid
+     en is bekend of er een register is; en zacht, want zonder deze laag gaat
+     een zware handeling dicht en niet open. */
+  function stijl(pad) {
+    if (!d.querySelector('link[href^="' + pad + '"]')) add('link', pad, '', function () {});
+  }
+  function gewichtlaag(verder) {
+    function ga() {
+      if (!w.RTGAdaptief || !w.RTGGrammatica) { verder(); return; }
+      stijl('/shared/adaptief.css'); stijl('/shared/grammatica.css');
+      add('script', '/shared/adaptief/lagen.js', 'RTGLagen', function () {
+        add('script', '/shared/adaptief/vasthoud.js', 'RTGVasthoud', function () {
+          add('script', '/shared/adaptief/waarom.js', 'RTGWaarom', function () {
+            add('script', '/shared/adaptief/gewicht.js', 'RTGGewicht', function () { verder(); });
+          });
+        });
+      });
+    }
+    if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', ga, { once: true }); else ga();
+  }
   function start(doc, win) {
     if (doc !== d || win !== w) return false;
     add('link', '/shared/rtg-adaptive-edge.css', '', function (vorm) {
       if (!vorm) return;
       add('script', '/shared/rtg-adaptive-edge-core.js', 'RTGAdaptiveEdgeCore', function (kern) {
         if (!kern) return;
+        /* Het blikveld (EDGE.md) is ZACHT: laadt het niet, dan leest de balk
+           zoals hij deed, en de rest van de keten gaat door. */
+        add('script', '/shared/edge/actiestaat.js', 'RTGEdgeActiestaat', function () {
+        add('script', '/shared/edge/blikveld.js', 'RTGEdgeBlikveld', function () {
+        gewichtlaag(function () {
         add('script', '/shared/rtg-adaptive-edge-input.js', 'RTGAdaptiveEdgeInput', function (invoer) {
           if (!invoer) return;
           add('script', '/shared/adaptief/balkknop.js', 'RTGAdaptiefBalkKnoppen', function (knoppen) {
@@ -34,6 +63,9 @@
           });
           });
           });
+        });
+        });
+        });
         });
       });
     });

@@ -52,7 +52,10 @@ const { WERKGEVER_VELDEN } = require('../server/kern/werk');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'ADAMPROEF.json');
-const WERKGEVER = 'BRISA';                 // Cafe Brisa uit de seed: een zaak met keukenwerk
+const WERKGEVER = 'BRISA';
+/* De Nederlandse werkgever voor het volwassen lid: de enige zaak in de zaaiset
+   met een Nederlandse stad, dus met land NL en dus met een regelpakket. */
+const NL_ZAAK = 'MERIDIAAN';                 // Cafe Brisa uit de seed: een zaak met keukenwerk
 
 /* De geboortedatum van een zeventienjarige, GEREKEND en niet ingetypt. Een
    vaste datum in een proef verloopt: hij is over een jaar achttien en dan meet
@@ -185,6 +188,28 @@ async function wereld(basis) {
    inhoud, en weigert terecht een leeg cv (storing 5 meet dat). */
 const CV = { name: 'Adam', contact: 'adam@voorbeeld.nl', headline: 'Wil graag in de keuken werken',
   skills: ['koken', 'afwassen'], about: 'Ik kook thuis veel en wil het vak leren.' };
+
+/* DE ONDERNEMER KOPPELT ZIJN ZAAK AAN ZIJN ENTITEIT. Een lid wordt manager van
+   de zaak (uitnodiging + claim, de gewone weg) en hangt hem aan een vestiging
+   van zijn eigen entiteit -- dezelfde stappen als een echte ondernemer, langs
+   dezelfde routes. Dat is wereld en geen uitslag: zonder deze stap is er geen
+   werkgever om een dienstverband bij te maken, en meet de keten dat alleen. */
+async function ondernemerKoppelt(basis, S, { code, entiteit, land, plaats, email, telefoon }) {
+  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
+  const baas = await P('/api/auth/register', { name: 'Ondernemer ' + entiteit, email, phone: telefoon,
+    password: 'geheim123', geboortedatum: '1980-04-04', tier: 'business', pasApp: 'business' });
+  const O = baas.data && baas.data.token;
+  const inv = await P('/api/supplier/staff/invite', { name: 'Ondernemer ' + entiteit, role: 'manager', func: 'Eigenaar' }, S);
+  const kassacode = inv.data && inv.data.invite && inv.data.invite.kassacode;
+  if (O && kassacode) await P('/api/werving/verbind', { kassacode }, O);
+  const ent = O ? await P('/api/concern/entiteit/nieuw', { naam: entiteit, land }, O) : null;
+  const entId = ent && ent.data && ent.data.entiteit && ent.data.entiteit.id;
+  const ves = entId ? await P('/api/concern/vestiging/nieuw', { entiteit: entId, naam: plaats, plaats }, O) : null;
+  const vesId = ves && ves.data && ves.data.vestiging && ves.data.vestiging.id;
+  const koppel = vesId ? await P('/api/concern/vestiging/zaak', { vestiging: vesId, code }, O) : null;
+  if (!koppel || koppel.status !== 200) throw new Error('de ondernemer kon ' + code + ' niet aan ' + entiteit +
+    ' koppelen (status ' + (koppel ? koppel.status + ': ' + ((koppel.data && koppel.data.error) || '') : 'geen') + ')');
+}
 
 async function loop(basis, uit) {
   const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
@@ -530,24 +555,11 @@ async function loop(basis, uit) {
   /* DE WERELD VAN DE ONDERNEMER. Het dienstverband hangt aan een ENTITEIT, en
      een zaak wijst zijn entiteit aan via een vestiging (kern/concern/
      vestiging.js). Cafe Brisa hangt in de seed aan niets, dus zonder deze
-     opstelling meet schakel 16 alleen dat de zaak nergens aan hangt. Een lid
-     wordt manager van de zaak (uitnodiging + claim, de gewone weg) en koppelt
-     hem aan zijn eigen entiteit -- dezelfde stappen als een echte ondernemer,
-     langs dezelfde routes. Geen uitslag klaarzetten, alleen de wereld. */
-  const baas = await P('/api/auth/register', { name: 'Ondernemer Proef', email: 'ondernemer.proef@voorbeeld.nl',
-    phone: '0612349875', password: 'geheim123', geboortedatum: '1980-04-04', tier: 'business', pasApp: 'business' });
-  const O = baas.data && baas.data.token;
-  const baasInv = await P('/api/supplier/staff/invite', { name: 'Ondernemer Proef', role: 'manager', func: 'Eigenaar' }, S);
-  const baasCode = baasInv.data && baasInv.data.invite && baasInv.data.invite.kassacode;
-  if (O && baasCode) await P('/api/werving/verbind', { kassacode: baasCode }, O);
-  const ent = O ? await P('/api/concern/entiteit/nieuw', { naam: 'Brisa SL', land: 'ES' }, O) : null;
-  const entId = ent && ent.data && ent.data.entiteit && ent.data.entiteit.id;
-  const ves = entId ? await P('/api/concern/vestiging/nieuw', { entiteit: entId, naam: 'Ibiza', plaats: 'Ibiza' }, O) : null;
-  const vesId = ves && ves.data && ves.data.vestiging && ves.data.vestiging.id;
-  const koppel = vesId ? await P('/api/concern/vestiging/zaak', { vestiging: vesId, code: WERKGEVER }, O) : null;
-  if (!koppel || koppel.status !== 200) throw new Error('de ondernemer kon de zaak niet aan zijn entiteit koppelen (status ' +
-    (koppel ? koppel.status + ': ' + ((koppel.data && koppel.data.error) || '') : 'geen') + ')');
-  uit.wereld.ondernemer = 'lid, manager van ' + WERKGEVER + ', koppelt de zaak aan zijn entiteit via /api/concern/vestiging/zaak';
+     opstelling meet schakel 13 alleen dat de zaak nergens aan hangt. Zie
+     ondernemerKoppelt() hierboven. */
+  await ondernemerKoppelt(basis, S, { code: WERKGEVER, entiteit: 'Brisa SL', land: 'ES', plaats: 'Ibiza',
+    email: 'ondernemer.proef@voorbeeld.nl', telefoon: '0612349875' });
+  uit.wereld.ondernemer = 'een lid, manager van ' + WERKGEVER + ', koppelt de zaak aan Brisa SL via /api/concern/vestiging/zaak';
 
   /* 13 -- ADAM NEEMT ZIJN PLEK IN (ARBEID.md par. 7a, 23 september 2026). Tot
      die dag eindigde zijn aanname bij een kassacode die de werkgever met de hand
@@ -582,17 +594,35 @@ async function loop(basis, uit) {
           (dv ? 'dienstverband bij ' + dv.bedrijf + ' als ' + dv.rol : 'geen dienstverband') };
     });
 
-  /* Het volwassen lid: een eigen account, een cv, en een sollicitatie op
-     dezelfde vacature. Geen uitslag klaarzetten, alleen de wereld. */
+  /* HET VOLWASSEN LID, BIJ EEN NEDERLANDSE WERKGEVER. Waar Adam niet verder kon,
+     liep een volwassen lid door. Die keten gaat tot de loonrun, en een loonrun
+     draait op het regelpakket van het LAND van de zaak: Cafe Brisa staat op
+     Ibiza (ES, afgeleid uit de stad in kern/supplierdefaults.js) en er ligt geen
+     Spaans pakket. Het land van Brisa omzetten zou de wereld vervalsen; daarom
+     wordt het lid aangenomen bij de Meridiaan Toren op de Zuidas (NL), met een
+     eigen manager en een eigen ondernemer. Adam blijft bij Brisa. */
+  const nlTeam = ((await P('/api/supplier/roster', { code: NL_ZAAK })).data || {}).staff || [];
+  const nlManager = nlTeam.find(x => x.role === 'manager');
+  const nlLogin = nlManager ? await P('/api/supplier/login', { code: NL_ZAAK, staffId: nlManager.id, pin: '1234' }) : null;
+  const S2 = nlLogin && nlLogin.data && nlLogin.data.token;
+  if (!S2) throw new Error('geen managersessie bij ' + NL_ZAAK + ' (status ' + (nlLogin ? nlLogin.status : 'geen manager') + ')');
+  const nlVac = await P('/api/supplier/vacature', { func: 'Receptie', soort: 'parttime', minLeeftijd: 18,
+    omschrijving: 'De ontvangst van de toren, drie dagen per week.' }, S2);
+  const nlVacId = (((nlVac.data && nlVac.data.vacatures) || []).find(x => x.func === 'Receptie') || {}).id;
+  if (!nlVacId) throw new Error('geen vacature bij ' + NL_ZAAK + ' (status ' + nlVac.status + ')');
+  await ondernemerKoppelt(basis, S2, { code: NL_ZAAK, entiteit: 'Meridiaan BV', land: 'NL', plaats: 'Amsterdam',
+    email: 'ondernemer.nl@voorbeeld.nl', telefoon: '0612349873' });
+  uit.wereld.nederland = 'een volwassen lid bij ' + NL_ZAAK + ' (NL), met een ondernemer die de zaak aan Meridiaan BV koppelt';
+
   const nova = await P('/api/auth/register', { name: 'Nova Proef', email: 'nova.proef@voorbeeld.nl',
     phone: '0612349876', password: 'geheim123', geboortedatum: '1995-03-03', tier: 'rtg', pasApp: 'rtg' });
   const N = nova.data && nova.data.token;
   if (!N) throw new Error('geen volwassen lid aan te maken (status ' + nova.status + ')');
   await P('/api/cv/save', { name: 'Nova Proef', contact: 'nova.proef@voorbeeld.nl',
-    skills: 'koken, bediening', about: 'Werkt graag in een keuken.' }, N);
-  const nsoll = await P('/api/member/apply', { supplierCode: WERKGEVER, vacatureId: vacId }, N);
+    skills: 'ontvangst, talen', about: 'Werkt graag met mensen.' }, N);
+  const nsoll = await P('/api/member/apply', { supplierCode: NL_ZAAK, vacatureId: nlVacId }, N);
   if (nsoll.status !== 200) throw new Error('het volwassen lid kon niet solliciteren (status ' + nsoll.status + ')');
-  const novaSoll = (await sollicitatiesBijZaak(basis, S)).find(a => a.name === 'Nova Proef');
+  const novaSoll = (await sollicitatiesBijZaak(basis, S2)).find(a => a.name === 'Nova Proef');
   if (!novaSoll) throw new Error('de sollicitatie van het volwassen lid is niet te vinden');
 
   /* 14 -- EEN LID DAT WORDT AANGENOMEN, IS METEEN PERSONEEL. Dit is de weg die
@@ -600,7 +630,7 @@ async function loop(basis, uit) {
   let novaStaff = null;
   await stap(
     schakel(14, 'werkgever', 'lid', 'neemt een volwassen lid aan; dat staat meteen in het team'),
-    () => P('/api/supplier/apply/decide', { id: novaSoll.id, action: 'aannemen' }, S),
+    () => P('/api/supplier/apply/decide', { id: novaSoll.id, action: 'aannemen' }, S2),
     async r => {
       novaStaff = r.data && r.data.direct && r.data.direct.staffId;
       return { klopt: !!novaStaff, wat: novaStaff ? 'direct in dienst, personeelsnummer ' + novaStaff
@@ -613,11 +643,15 @@ async function loop(basis, uit) {
   const vanaf = new Date().toISOString().slice(0, 8) + '01';
   await stap(
     schakel(15, 'werkgever', 'huis', 'legt het arbeidscontract vast'),
-    () => novaStaff ? P('/api/supplier/payroll/contract', { staffId: novaStaff, vanaf, soort: 'oproep',
-      uurloonCenten: 1450, urenPerWeek: 12, functie: 'Keukenhulp' }, S)
+    /* Een contract met een VASTE omvang (drie dagen, 24 uur): dan draagt het
+       contract het loon en niet de klok (kern/payroll/samenstellen.js). Met een
+       oproepcontract en nog geen geklokte uren levert een run terecht niets op,
+       en dan meet schakel 17 dat het lid nog niet gewerkt heeft. */
+    () => novaStaff ? P('/api/supplier/payroll/contract', { staffId: novaStaff, vanaf, soort: 'vast',
+      uurloonCenten: 1450, urenPerWeek: 24, functie: 'Receptie' }, S2)
       : Promise.resolve({ status: 0, data: null }),
     async () => {
-      const c = await P('/api/supplier/payroll/contracten', { staffId: novaStaff }, S);
+      const c = await P('/api/supplier/payroll/contracten', { staffId: novaStaff }, S2);
       const versies = Object.values((c.data && c.data.contracten) || {}).flat();
       return { klopt: versies.some(v => v.uurloonCenten === 1450 && v.vanaf === vanaf),
         wat: versies.length + ' contractversie(s), vanaf ' + vanaf };
@@ -633,9 +667,9 @@ async function loop(basis, uit) {
     () => P('/api/concern/mijnwerk', {}, N),
     async r => {
       const plekken = (r.data && r.data.werkplekken) || [];
-      /* Het dienstverband hoort bij de entiteit van de ZAAK (Brisa SL) en niet
+      /* Het dienstverband hoort bij de entiteit van de ZAAK (Meridiaan BV) en niet
          bij een willekeurige werkgever, en de rol is de functie van de vacature. */
-      const hier = plekken.find(x => x.bedrijf === 'Brisa SL' && x.rol === 'Keukenhulp');
+      const hier = plekken.find(x => x.bedrijf === 'Meridiaan BV' && x.rol === 'Receptie');
       return { klopt: !!hier, wat: plekken.length
         ? plekken.length + ' werkplek(ken): ' + plekken.map(x => x.bedrijf + ' als ' + x.rol).join(', ')
         : 'geen dienstverband: "' + ((r.data && r.data.regel) || '') + '"' };
@@ -662,21 +696,22 @@ async function loop(basis, uit) {
       reden: 'Adamproef: demo-tabellen, geen echte loonstroken' }, K);
   }
   await stap(
-    schakel(17, 'kantoor', 'lid', 'opent de loonrun; het contract levert een loonregel op',
-      'WAT ONTBREEKT: een Spaans regelpakket met een bron. WAAROM: de werkgever uit deze proef (Cafe ' +
-      'Brisa) staat op Ibiza, land ES, en er ligt alleen server/kern/payroll/jaargangen/nl-2026.json; ' +
-      'kern/payroll/run.js weigert dan terecht, want een tarief verzinnen is erger dan geen run. Dat een ' +
-      'run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js. ' +
-      'WIE EROVER GAAT: het kantoor dat de loonadministratie voert, via de dekking per land ' +
-      '(server/routes/payroll-os-dekking.js); een tabel zonder bron zet geen proef erin.'),
-    () => K ? P('/api/office/payroll/run/open', { code: WERKGEVER, periode }, K)
+    schakel(17, 'kantoor', 'lid', 'opent de loonrun; het contract levert een loonregel op'),
+    () => K ? P('/api/office/payroll/run/open', { code: NL_ZAAK, periode }, K)
       : Promise.resolve({ status: 0, data: null }),
     async r => {
-      const run = r.data && r.data.run;
-      const regels = (run && run.regels) || [];
-      const regel = regels.find(x => Number(x.staffId) === Number(novaStaff));
-      return { klopt: !!regel, wat: regel ? 'loonregel voor personeelsnummer ' + novaStaff + ' in run ' + run.id
-        : 'geen loonregel (' + regels.length + ' regels in de run)' };
+      /* Het antwoord van run/open is een SAMENVATTING (kern/payroll/run.js,
+         kort()) en draagt de stroken niet; wie daarin naar regels zoekt, meet
+         altijd nul. De proef haalt de run daarom op zoals het kantoor hem leest. */
+      const runId = r.data && r.data.run && r.data.run.id;
+      const een = runId ? await P('/api/office/payroll/run/een', { runId }, K) : null;
+      const stroken = (een && een.data && een.data.run && een.data.run.stroken) || [];
+      const strook = stroken.find(x => Number(x.staffId) === Number(novaStaff));
+      const basis = strook && (strook.invoer || []).find(x => x.component === 'basissalaris');
+      return { klopt: !!basis && basis.centen > 0,
+        wat: strook ? 'loonstrook voor personeelsnummer ' + novaStaff + ' in run ' + runId +
+          (basis ? ', basissalaris ' + (basis.centen / 100).toFixed(2) + ' euro' : ', ZONDER basissalaris')
+          : 'geen loonstrook (' + stroken.length + ' stroken in de run)' };
     });
 
   return { w, S, M, vacId };

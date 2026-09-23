@@ -149,7 +149,13 @@ levenscycli. Twee regels die er als eerste uit kwamen en die overal gelden:
 vond zeven plekken, twee door een toets beschermd), en **de motor VERVANGT de
 vijf gezagsvocabulaires in plaats van er een zesde naast te zetten** (INT-01).
 Eén grammatica, geen tabel met alle rechten: het domein bezit zijn werkwoorden.
-Namen: `benoeming`, `orggraaf`, `beleidsmotor` en `tekengrens` zijn vrij;
+**De vijf besluiten A1–A5 zijn genomen (23 september 2026)** en fase 1 staat in de
+SCHADUW: `server/kern/beleidsmotor/` kent de vier kantoordeuren als gegevens, velt
+naast elke poort een eigen besluit en telt eens/oneens (A1), en telt elke
+kantoorroute die zonder bekende poort afliep (A3) -- zonder iets tegen te houden.
+Die A3-meting vond meteen dat `/api/office/doc` paspoortscans aan de gedeelde code
+gaf; dat is nu op naam. Namen: `benoeming`, `orggraaf` en `tekengrens` zijn vrij,
+`beleidsmotor` is nu in gebruik;
 `policy`, `capability`, `machtiging`, `lidmaatschap` en `delegatie` zijn bezet.
 
 **`HDI.md` is de laag BOVEN de Foundation** — RTG Human Development

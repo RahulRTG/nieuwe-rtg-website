@@ -2249,10 +2249,22 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, notee
     } });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const { officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications, mensdeurStand } = maakKantoor({
+const kantoorRauw = maakKantoor({
   db, save, bewerkCollectie, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
+const { boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications, mensdeurStand } = kantoorRauw;
+/* De beleidsmotor loopt in de schaduw mee met de kantoordeuren (AUTHORITY.md
+   fase 1): hij velt een eigen besluit naast dat van de poort en houdt niets
+   tegen. De meelezer hangt VOOR de kantoorroutes (A3: route zonder poort). */
+const beleidsmotor = require('./kern/beleidsmotor').maakBeleidsmotor({
+  db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom,
+  balieBron: () => kern.magBalie });
+app.use('/api/office', beleidsmotor.meelezer);
+const officeAuth = beleidsmotor.bewaak('kantoor', kantoorRauw.officeAuth);
+const kluisAuth = beleidsmotor.bewaak('op-naam', kantoorRauw.kluisAuth);
+const naamAuth = beleidsmotor.bewaak('op-naam', kantoorRauw.naamAuth);
+const boardroomAuth = beleidsmotor.bewaak('boardroom', kantoorRauw.boardroomAuth);
 
 /* ================= DOORLOPEND GESPREK IN DE APP =================
    Elk lid heeft één doorlopend gesprek, volledig binnen de beveiligde RTG-app.
@@ -2290,7 +2302,7 @@ const kern = {
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, corrigeerFactuur, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, beleidsmotor, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,

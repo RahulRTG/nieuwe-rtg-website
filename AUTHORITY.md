@@ -329,7 +329,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | fase | inhoud | hangt af van |
 |---|---|---|
 | 0 | P0 + P0b | **klaar** |
-| 1 | **de beleidsmotor in de schaduw**: `kan(...)` leest de bestaande poorten en geeft een besluit met opbouw; draait naast elke kantoorroute en telt waar hij het oneens is (de vorm van `tegenfeit.js`) | besluit A1 |
+| 1 | **de beleidsmotor in de schaduw**: `kan(...)` leest de bestaande poorten en geeft een besluit met opbouw; draait naast elke kantoorroute en telt waar hij het oneens is (de vorm van `tegenfeit.js`) | **staat, in de schaduw** (23 september 2026; zie par. 5a) |
 | 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | fase 1, besluit A2 |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | fase 2 |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | fase 2 |
@@ -338,6 +338,42 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 7 | **identiteiten voor agents, diensten en apparaten** | besluit A5 |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | fase 5 |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
+
+### 5a. Fase 1, zoals hij er staat
+
+`server/kern/beleidsmotor/` (drie bestanden) en `/api/office/beleidsmotor` (achter
+`boardroomAuth`). De vier kantoordeuren staan als GEGEVENS in `regels.js`: een deur
+is een lijst eisen die allemaal moeten kloppen, een eis een lijst feiten waarvan er
+een genoeg is. `feiten.js` leest ze zelf uit het token en nooit uit wat een poort op
+het verzoek zette, anders vergelijkt de schaduw de poort met zichzelf. Drie
+uitkomsten, en `ONBEKEND` (een bron kon niet antwoorden) is geen `WEIGEREN`.
+
+- **A1 in de schaduw.** `bewaak(deur, poort)` wikkelt `officeAuth`, `kluisAuth`,
+  `naamAuth`, `boardroomAuth` en `balieAuth` met behoud van hun naam, velt een eigen
+  besluit en telt na afloop `eens`, `oneens` of `onbekend`. Er is geen tak die iets
+  tegenhoudt. Een deur mag pas verhuizen als hij rijp is (200 waarnemingen, 7 dagen:
+  `RIJP` uit `commercie/schaduw.js`) en nooit oneens was. Dat verhuizen is een eigen
+  stap met een eigen besluit.
+- **A3 in de schaduw.** Een meelezer voor alle `/api/office`-routes telt elke route
+  die afliep zonder een poort die de motor kent. Drie routes zijn verklaard open, elk
+  met een reden (`VERKLAARD_OPEN`): de inlog, de live-stroom en de documentdownload.
+- **Een teller en geen journaal**, de grens van `kantoor/mensdeur.js`: per deur en
+  routepatroon een paar getallen, en de enige voorbeelden zijn die van `oneens`, in
+  het geheugen en zonder sleutel of naam. De schrijfweg is die van `mensdeur`
+  (`mensdeur-spoel.js`, nu met eigen tellers), zodat de PostgreSQL-les niet een
+  tweede keer geleerd hoeft te worden.
+- **Wat de schaduw bewijst, en wat niet.** Hij bewijst dat de SAMENSTELLING van de
+  regels gelijk is aan die van de poorten. De feiten lezen dezelfde bronnen als de
+  poorten (sessie, account, boardroomlijst, baliezetels), dus een fout in een bron
+  zit aan beide kanten.
+- **Wat de A3-meting meteen vond (B7).** `/api/office/doc` leverde een ontsleuteld
+  paspoort of selfie uit aan ELK kantoortoken in de query, ook de gedeelde code,
+  terwijl de lijst waar die link uit komt (`/api/office/verifications`) al achter
+  `kluisAuth` hing. Nu is het document op naam, zoals de lijst
+  (`officeQueryOpNaam`, `test/beleidsmotor.test.js` toets 6).
+- **Getoetst** in `test/beleidsmotor.test.js`: tegen een echte server met de gedeelde
+  code, een medewerker op naam en de eigenaar, door alle vier deuren nul keer oneens.
+  Drie mutaties zakken: een verkeerd feit, een blinde A3-teller, de documentdeur open.
 
 ---
 
@@ -351,6 +387,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | B4 | `/media/:naam` zonder toegangscontrole, een jaar `public` gecachet | eerst meten wat er staat; privémateriaal achter een korte, ondertekende link | vraagt een besluit |
 | B5 | `employment.js` verwijst naar een `offboarding.js` die niet bestaat | fase 3; tot die tijd de verwijzing eerlijk maken | een stap weg |
 | B6 | de auditketen is niet extern verankerd | `server/lib/keten-anker.js` in bedrijf nemen | vraagt een besluit (waar) |
+| B7 | `/api/office/doc` leverde paspoortscans aan de gedeelde code | op naam, zoals de lijst | **staat** (23 september 2026; gevonden door de A3-meting, par. 5a) |
 
 ---
 

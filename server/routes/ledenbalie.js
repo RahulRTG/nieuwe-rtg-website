@@ -22,7 +22,7 @@
    tweede oordeel hier zou op den duur van het eerste gaan afwijken, en dan is
    niet meer te zeggen welke van de twee de regel is. */
 module.exports = (kern) => {
-  const { app, officeAuth, boardroomAuth, boardroomWie, magBalie, afdelingen,
+  const { app, officeAuth, boardroomAuth, boardroomWie, magBalie, afdelingen, beleidsmotor,
           balieZetels, balieZetelZet, balieZetelWeg, balieZoek, balieDossier,
           balieHerstel, balieKlachtOpen, balieKlachtStatus, balieAboVoorstel } = kern;
 
@@ -55,14 +55,16 @@ module.exports = (kern) => {
      De weigering noemt de reden. "Geen toegang" laat een medewerker met een
      geldige kantoorcode raden wat hij verkeerd doet, terwijl het antwoord juist
      iets uitlegt dat hij moet weten: deze handelingen dragen een naam. */
-  function balieAuth(req, res, next) {
+  /* De beleidsmotor loopt mee (AUTHORITY.md fase 1); de poort zelf blijft beslissen. */
+  const bewaakt = (p) => (beleidsmotor ? beleidsmotor.bewaak('balie', p) : p);
+  const balieAuth = bewaakt(function balieAuth(req, res, next) {
     const key = boardroomWie(req);
     if (!magBalie(key)) {
       return res.status(403).json({ error: 'De ledenbalie vraagt een zetel op naam. De gedeelde kantoorcode opent wel de ruimte, maar wijst niemand aan, en werk aan het account van een lid hoort herleidbaar te zijn tot een mens. Meldt u zich aan met het eigen RTG-account; de eigenaar deelt de zetels aan de balie uit.' });
     }
     req.balieKey = key;
     next();
-  }
+  });
 
   /* Zoeken op codenaam of steuncode. De sleutel van de baliemedewerker gaat
      mee, want elke raadpleging komt in het inzagejournaal te staan; zonder die

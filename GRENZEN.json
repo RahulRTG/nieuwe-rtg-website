@@ -662,6 +662,7 @@
       "balieZetelZet",
       "balieZetels",
       "balieZoek",
+      "beleidsmotor",
       "boardroomAuth",
       "magBalie",
       "zwaarbewijs"
@@ -1380,6 +1381,7 @@
       "assetHertaxeer",
       "assetKantoor",
       "assetTerugkoopUit",
+      "beleidsmotor",
       "boardroomAuth",
       "broadcastSync",
       "bureauBalie",

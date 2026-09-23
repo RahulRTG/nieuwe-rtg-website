@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T15:23:01.673Z",
-    "commit": "8c2b3bd",
+    "op": "2026-09-23T15:23:15.663Z",
+    "commit": "37b125f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4201,6 +4201,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "scherp": "gezakt"
+    },
+    "kantooruitnodiging.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
       "scherp": "gezakt"
     },
     "kantoorwereld.test.js": {

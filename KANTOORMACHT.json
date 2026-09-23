@@ -21,20 +21,20 @@
     }
   ],
   "stempel": {
-    "op": "2026-09-23T15:57:43.212Z",
-    "commit": "40d0f457",
+    "op": "2026-09-23T18:23:52.538Z",
+    "commit": "92e8de5c",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 610,
-    "deurEistMens": 185,
+    "routes": 614,
+    "deurEistMens": 189,
     "deurGedeeld": 425,
     "zonderBewakerslaag": 3,
     "handlerKentMens": 148,
     "anoniemUitvoerbaar": 358,
-    "metSpoor": 147,
-    "metReden": 289,
-    "bestanden": 98,
+    "metSpoor": 148,
+    "metReden": 290,
+    "bestanden": 99,
     "zwaar": 14,
     "zwaarZonderMens": 0,
     "zwaarLezend": 4,
@@ -62,10 +62,10 @@
       "gemeten": 81,
       "geenWerk": 302,
       "geenOpslag": 203,
-      "nietInProef": 24,
-      "totaal": 610
+      "nietInProef": 28,
+      "totaal": 614
     },
-    "dekkingPct": 13.3,
+    "dekkingPct": 13.2,
     "raakt": [
       {
         "pad": "/api/office/bank/rekening/open",
@@ -328,7 +328,7 @@
   ],
   "deuren": {
     "officeAuth": 447,
-    "boardroomAuth": 116,
+    "boardroomAuth": 120,
     "balieAuth": 31,
     "kluisAuth": 23,
     "techAuth": 16,

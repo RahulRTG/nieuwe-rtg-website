@@ -10,7 +10,7 @@
     "bewijsAlleenKeten": 17,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
-    "browserpoortToetsen": 375,
+    "browserpoortToetsen": 386,
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 529,
     "dbDeurenSchrijvend": 275,
@@ -19,7 +19,7 @@
     "delenZonderOnderwerp": 0,
     "dependencies": 0,
     "devPakketten": 1,
-    "e2eBestanden": 247,
+    "e2eBestanden": 251,
     "endpointsNooitAangeraakt": 0,
     "endpointsZonderTest": 902,
     "faalproefGezakt": 1,
@@ -28,12 +28,12 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1590,
+    "kernBreedte": 1589,
     "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 332,
+    "keuringOmvang": 331,
     "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 150,
+    "ratelTanden": 152,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1732,
+    "testbestanden": 1750,
     "toetsenNietGemeten": 624,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -123,12 +123,12 @@
     "veranderbereikZonderBereik": 530,
     "stilLezing": 5,
     "stilLezingMeters": 61,
-    "stilLezingBereik": 569,
+    "stilLezingBereik": 582,
     "bewijsOnderscheidt": 6,
     "connectDomeinenGemeten": 23,
     "afgeleidZonderEigenaar": 2,
     "afgeleidOnbeslist": 105,
-    "afgeleidMetEigenaar": 193,
+    "afgeleidMetEigenaar": 197,
     "herbouwVerschilt": 0,
     "herbouwBewezen": 14,
     "veranderbereikStatisch": 1164,
@@ -138,14 +138,15 @@
     "edgeDubbeleEigenaars": 11,
     "rtgDodeKanalen": 0,
     "edgeVeldIdentiteit": 0,
-    "edgeVeldWereld": 281,
-    "edgeVeldContext": 282,
+    "edgeVeldWereld": 279,
+    "edgeVeldContext": 280,
     "edgeVeldObject": 0,
     "edgeVeldActiviteit": 0,
     "edgeVeldPresence": 0,
     "edgeVeldVoortzetting": 0,
     "edgeVeldHoofdactie": 58,
-    "edgeVeldTrust": 0
+    "edgeVeldTrust": 0,
+    "edgeVeldContextZelf": 11
   },
   "notities": [
     {
@@ -2841,6 +2842,40 @@
       "meter": "kernBreedte 1585 -> 1586",
       "reden": "De inhaalslag voor de aannames van voor de brug (ARBEID.md par. 7a, gekozen door de eigenaar): EEN kernnaam erbij, `dienstverbandInhaal`, aangeraakt door het domein concern. Hij woont in de module die het dienstverband BEZIT (kern/concern/aanname.js), zodat de route niet zelf beslist wie er een dienstverband mist. De personeelslijst en de eigendomscontrole komen via het hulpobject van routes/concern.js, dat `accounts` al aanraakt; ze uit dat object destructureren telde de meter als twee kernnamen die het niet zijn.",
       "waarheen": "server/kern/concern/aanname.js (dienstverbandInhaal), server/routes/concern/mensen.js (/api/concern/vestiging/inhaal) en test/aanname-dienstverband.test.js toets 10 tot en met 13. De Adamproef schakel 18 meet het tegen een echte server, en zakt zonder keuze, met een automatische keuze en zonder eigendomscontrole."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "edgeDubbeleEigenaars",
+      "van": 11,
+      "meter": "edgeDubbeleEigenaars 11 -> 12",
+      "reden": "De kaart ziet een tweede eigenaar die er al was; er is geen code bijgekomen. Ronde 1 zette gebaar-drempel op een eigenaar (DREMPELS in grammatica.js, met de gebaarversheid van Edge 2 als enige beslisser), maar de gebaarlaag van de lijsten (shared/gebaar/, op elk scherm met basis.js) beslist met eigen maten -- RICHTING 8 en STIL 6 in gebaar-02.js, lang drukken 520 ms en 8 px per as in gebaar-03b.js -- en stond niet op de kaart. Ronde 2 zet hem erop (stap 3, samen met de andere ontbrekende producenten), in het geheugen nagerekend met bouw(): gebaar-drempel is de enige verantwoordelijkheid die daardoor dubbel wordt; alle andere nieuwe rijen landen op namen die al dubbel waren. Een meter die stijgt omdat hij beter ziet is geen achteruitgang; een meter die laag blijft omdat hij iets niet ziet, is erger.",
+      "waarheen": "EDGEKAART.json draagt beide gebaarbestanden als beslisser van gebaar-drempel met een letterlijk citaat, en de WAAROM-regel in scripts/edgekaart.js zegt waarom het dubbel is. Wanneer hij weer daalt: stap 10 van ronde 2 laat gebaar-03b.js lang drukken en stil uit DREMPELS lezen, maar gebaar-02.js houdt RICHTING en STIL, dus de teller blijft 12 tot ook die in de tabel staan."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "edgeVeldWereld",
+      "van": 281,
+      "meter": "edgeVeldWereld 281 -> 279",
+      "reden": "Twee schermen zijn bewust een doorverwijzing geworden in de consolidatieronde van 23 september 2026 (SCHERMEIGENAAR.json): /apps/vandaag.html is opgegaan in life.html (Dag, een tweede dagproduct met verzonnen momenten) en /apps/toestemming.html in mijn-relaties.html#soort (privacy.toegang). Een omleiding heeft geen eigen blikveld, dus de meter telt ze als 'omgeleid' en niet meer als 'ja'. Er verdween geen publicatie van een scherm dat er nog is: de doelen (life.html, mijn-relaties.html) staan zelf gemeten op 'ja'. De verse meting (npm run edgedekking, stempel dbb3c96) zakte daarop met 4 velden achteruit en is met --aanvaard geschreven; die vier staan in aanvaardAchteruit, en omdat die lijst bij de volgende meting verdwijnt, staat het besluit hier."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "edgeVeldContext",
+      "van": 282,
+      "meter": "edgeVeldContext 282 -> 280",
+      "reden": "Twee schermen zijn bewust een doorverwijzing geworden in de consolidatieronde van 23 september 2026 (SCHERMEIGENAAR.json): /apps/vandaag.html is opgegaan in life.html (Dag, een tweede dagproduct met verzonnen momenten) en /apps/toestemming.html in mijn-relaties.html#soort (privacy.toegang). Een omleiding heeft geen eigen blikveld, dus de meter telt ze als 'omgeleid' en niet meer als 'ja'. Er verdween geen publicatie van een scherm dat er nog is: de doelen (life.html, mijn-relaties.html) staan zelf gemeten op 'ja'. De verse meting (npm run edgedekking, stempel dbb3c96) zakte daarop met 4 velden achteruit en is met --aanvaard geschreven; die vier staan in aanvaardAchteruit, en omdat die lijst bij de volgende meting verdwijnt, staat het besluit hier."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1586,
+      "meter": "kernBreedte 1586 -> 1589 (de SOM van twee lijnen, geen nieuwe naam)",
+      "reden": "Het samengaan met main (954b4779). Twee lijnen verhoogden deze meter ONAFHANKELIJK van 1583 naar 1586, elk met drie uitgeschreven notities die hieronder blijven staan: main met de beleidsmotor, de personeelsinlog en het intrekken van kantoorrechten (AUTHORITY.md), deze tak met dienstverbandUitAanname, dienstverbandToets en dienstverbandInhaal (ARBEID.md par. 7a). Samen zijn dat zes namen en dus 1589; kernGedeeld blijft 241, want de drie namen van deze tak raakt elk precies een domein.",
+      "waarheen": "GRENZEN.json draagt beide lijnen, elk onder hun eigen domein; de afzonderlijke bronnotities hieronder bepalen de vervolgstap."
     }
   ],
   "prestatie": {
@@ -2859,7 +2894,7 @@
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-09-15",
+    "keuringOmvang": "2026-09-23",
     "testbestanden": "2026-09-23",
     "toetsenNietGemeten": "2026-09-14",
     "inlineStijlAttributen": "2026-09-23",
@@ -2971,7 +3006,8 @@
     "edgeVeldPresence": "2026-09-23",
     "edgeVeldVoortzetting": "2026-09-23",
     "edgeVeldHoofdactie": "2026-09-23",
-    "edgeVeldTrust": "2026-09-23"
+    "edgeVeldTrust": "2026-09-23",
+    "edgeVeldContextZelf": "2026-09-23"
   },
   "uitzonderingen": [
     {

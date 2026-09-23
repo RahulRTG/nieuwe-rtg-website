@@ -20,21 +20,23 @@
    3. HET BEDRAG STAAT VAST. Er is geen route die het wijzigt: een andere
       betaling is een nieuwe uitgave. De goedkeuring gaat over precies dit
       bedrag (`bijWaardeCenten`, dezelfde grendel als bij een contract).
-   4. EEN TEKENGRENS VERSMALT ALLEEN (AUTHORITY.md regel 2). Een lid kan een
-      grens dragen; wie erboven zit keurt niet goed namens `geld.goedkeuren`.
-      Geen grens is geen versmalling, en een grens verleent nooit een recht.
+   4. EEN TEKENGRENS VERSMALT ALLEEN (AUTHORITY.md regel 2). Die van het lid in
+      de werkruimte en die uit de concerngraaf; de strengste wint. Dat woont in
+      ./tekengrens.js.
 
-   GELD VERLAAT HET HUIS NIET VANZELF (GELD.md). Deze laag verplaatst niets:
-   een goedgekeurde uitgave wordt buiten RTG betaald, en een mens die niet de
-   indiener is noteert dat met een kenmerk. De stand wordt BEREKEND uit de
-   goedkeuringen en die notitie, en nergens met de hand gezet. */
+   GELD VERLAAT HET HUIS NIET VANZELF (GELD.md). Deze laag verplaatst niets. De
+   werkruimte kiest hoe een goedgekeurde uitgave wordt betaald (./tekengrens.js):
+   buiten RTG, met een kenmerk, of via RTG Bank -- dan maakt een mens die niet de
+   indiener is de SEPA-overboeking vanaf zijn eigen rekening, en toetst deze laag
+   die opdracht. De stand wordt BEREKEND, en nergens met de hand gezet. */
 'use strict';
 
 const EENHEID = require('../kern/geld/eenheid');
 
 module.exports = (sctx) => {
-  const { app, save, schoon, nu, rid, werkPoort, beheerVan, log, eigenVeld } = sctx;
+  const { app, save, schoon, nu, rid, werkPoort, log, eigenVeld, kern } = sctx;
   const U = (w) => { if (!w.uitgaven) w.uitgaven = {}; return w.uitgaven; };
+  const ibanVan = (v) => { const x = String(v || '').replace(/\s/g, '').toUpperCase(); return /^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(x) ? x : null; };
   const euro = (c) => (Number(c || 0) / 100).toFixed(2);
 
   /* De stand, afgeleid. `regelStand` komt uit ./regelpoort.js en weet welke
@@ -45,7 +47,7 @@ module.exports = (sctx) => {
     return { stand, ontbreekt: s.ontbreekt, eist: s.eist };
   }
   const toon = (w, u) => Object.assign({ id: u.id, omschrijving: u.omschrijving, begunstigde: u.begunstigde,
-    factuur: u.factuur, bedrag: euro(u.waardeCenten), afdeling: u.afdeling, land: u.land,
+    factuur: u.factuur, iban: u.iban || null, bedrag: euro(u.waardeCenten), afdeling: u.afdeling, land: u.land,
     door: u.door.naam, at: u.at, betaald: u.betaald || null,
     goedkeuringen: (u.goedkeuringen || []).filter(k => !k.vervallen).map(k => ({ naam: k.naam, recht: k.recht, at: k.at })) },
   standVan(w, u));
@@ -61,7 +63,7 @@ module.exports = (sctx) => {
     if (!(centen > 0)) return res.status(400).json({ error: 'Een uitgave heeft een bedrag boven nul, in euro.' });
     const u = { id: rid(5), omschrijving, begunstigde, factuur: schoon(req.body.factuur, 40) || null,
       waardeCenten: centen, afdeling: schoon(req.body.afdeling, 40) || null,
-      land: (schoon(req.body.land, 2) || '').toUpperCase() || null,
+      land: (schoon(req.body.land, 2) || '').toUpperCase() || null, iban: ibanVan(req.body.iban),
       door: { lidId: g.l.id, naam: g.l.naam }, at: nu(), goedkeuringen: [], betaald: null };
     U(g.w)[u.id] = u;
     log(g.w, g.l, 'uitgave-ingediend', u.id, euro(centen));
@@ -74,7 +76,7 @@ module.exports = (sctx) => {
   app.post('/api/bedrijf/uitgaven', (req, res) => {
     const g = werkPoort(req, res, 'geld'); if (!g) return;
     const rijen = Object.values(U(g.w)).map(u => toon(g.w, u)).sort((a, b) => String(b.at).localeCompare(String(a.at)));
-    res.json({ ok: true, aantal: rijen.length, uitgaven: rijen,
+    res.json({ ok: true, aantal: rijen.length, uitgaven: rijen, betaalwijze: sctx.betaalwijze(g.w),
       let: 'De stand is berekend uit de goedkeuringen en de betaalnotitie; niemand zet hem met de hand.' });
   });
 
@@ -93,41 +95,45 @@ module.exports = (sctx) => {
     const s = standVan(g.w, u);
     if (s.stand !== 'goedgekeurd') return res.status(409).json({
       error: 'Deze uitgave is nog niet goedgekeurd. Nog nodig: ' + s.ontbreekt.join(' en ') + '.' });
-    const kenmerk = schoon(req.body.kenmerk, 60);
+    const bw = sctx.betaalwijze(g.w);
+    let kenmerk = schoon(req.body.kenmerk, 60);
+    if (bw.wijze === 'rtgbank') {
+      const f = viaBank(g, u, String(req.body.opdrachtId || ''));
+      if (f) return res.status(f.status).json({ error: f.error });
+      kenmerk = String(req.body.opdrachtId);
+    }
     if (!kenmerk) return res.status(400).json({ error: 'Noteer het kenmerk van de betaling (bijvoorbeeld de bankreferentie).' });
-    u.betaald = { door: g.l.naam, lidId: g.l.id, kenmerk, at: nu() };
+    u.betaald = { door: g.l.naam, lidId: g.l.id, kenmerk, via: bw.wijze, at: nu() };
     log(g.w, g.l, 'uitgave-betaald-genoteerd', u.id, kenmerk);
     save();
     res.json({ ok: true, uitgave: toon(g.w, u),
       let: 'Genoteerd als betaald. RTG heeft niets overgemaakt; dit is uw notitie dat het buiten RTG is gebeurd.' });
   });
 
-  /* De tekengrens van een lid zetten of weghalen. Dezelfde deur als de rollen
-     (beheerVan): wie rollen toekent, begrenst ze ook. Leeg haalt de grens weg. */
-  app.post('/api/bedrijf/lid/tekengrens', (req, res) => {
-    const w = beheerVan(req, res); if (!w) return;
-    const l = eigenVeld(w.leden, String(req.body.lidId || ''));
-    if (!l) return res.status(404).json({ error: 'Dat lid kennen we niet.' });
-    const leeg = req.body.bedrag == null || req.body.bedrag === '';
-    const centen = leeg ? null : EENHEID.naarCenten(Number(req.body.bedrag));
-    if (!leeg && !(centen >= 0)) return res.status(400).json({ error: 'Een tekengrens is een bedrag in euro, of leeg om hem weg te halen.' });
-    l.tekengrensCenten = centen;
-    log(w, null, 'tekengrens', l.id, leeg ? 'weg' : euro(centen));
-    save();
-    res.json({ ok: true, lidId: l.id, tekengrens: leeg ? null : euro(centen),
-      let: leeg ? 'Geen tekengrens: dit lid keurt goed binnen zijn rechten.'
-        : 'Dit lid keurt namens geld.goedkeuren niets goed boven ' + euro(centen) + ' euro. Een grens versmalt alleen; hij geeft geen recht.' });
-  });
+  /* VIA RTG BANK: de betaling is een echte SEPA-opdracht die DEZE mens deed,
+     vanaf zijn eigen RTG-rekening, voor precies dit bedrag en naar dit IBAN, en
+     hij is niet mislukt of al voor een andere uitgave gebruikt. Het Werk OS
+     verplaatst zelf niets (kern/werkbetaling.js). */
+  function viaBank(g, u, id) {
+    if (!u.iban) return { status: 409, error: 'Deze uitgave heeft geen IBAN van de begunstigde, dus een overboeking is er niet aan te toetsen.' };
+    const b = id ? kern.werkBankBewijs(id, g.l.rtgCodenaam) : null;
+    if (!b) return { status: 404, error: 'Die SEPA-opdracht kennen we niet. Maak de overboeking vanaf uw RTG-rekening en geef het opdrachtnummer op.' };
+    if (b.onbedraad) return { status: 503, error: 'De bank is niet aangesloten; deze betaling is nu niet te controleren.' };
+    if (b.mislukt) return { status: 409, error: 'Die opdracht is mislukt of teruggeboekt (' + b.status + ').' };
+    if (!b.vanDeze) return { status: 403, error: 'Die opdracht kwam niet van uw eigen RTG-rekening.' };
+    if (b.centen !== Number(u.waardeCenten)) return { status: 409, error: 'Die opdracht is ' + euro(b.centen) + ' euro; de uitgave is ' + euro(u.waardeCenten) + ' euro.' };
+    if (b.bestemming !== u.iban) return { status: 409, error: 'Die opdracht ging naar een ander IBAN dan de begunstigde van deze uitgave.' };
+    if (Object.values(U(g.w)).some(x => x.betaald && x.betaald.kenmerk === id)) return { status: 409, error: 'Die opdracht staat al bij een andere uitgave.' };
+    return null;
+  }
 
   /* De grendels die ./regelpoort.js voor elke goedkeuring vraagt. Een object
      terug is een weigering, null is door. */
   function keurGrendel(g, soort, obj, recht) {
     if (soort === 'uitgave' && obj.door && obj.door.lidId === g.l.id) return { status: 409,
       error: 'U diende deze uitgave in, dus u keurt hem niet goed -- ook niet namens een ander recht. Functiescheiding: de indiener en de goedkeurder zijn twee mensen.' };
-    const grens = g.l.tekengrensCenten;
-    if (recht === 'geld.goedkeuren' && grens != null && Number(obj.waardeCenten || 0) > grens) return { status: 403,
-      error: 'Dit bedrag (' + euro(obj.waardeCenten) + ' euro) ligt boven uw tekengrens van ' + euro(grens) + ' euro. Een lid met een hogere grens keurt dit goed.' };
-    return null;
+    /* De tekengrens: de strengste van werkruimte en concerngraaf (./tekengrens.js). */
+    return sctx.tekengrensWeigering(g, obj, recht);
   }
   /* Wat een soort altijd eist, los van de bedrijfsregels. */
   const basisEis = (soort) => (soort === 'uitgave' ? ['geld.goedkeuren'] : []);

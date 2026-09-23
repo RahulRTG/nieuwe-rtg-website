@@ -28,17 +28,21 @@ module.exports = (ctx) => {
     const bestuur = (tijdOpDatumVan(entiteitId, 'bestuurder', d) || []).map(f => ({
       wie: f.sleutel, rol: f.waarde,
       bevoegd: (f.extra || {}).bevoegd || 'alleen',
-      limiet: (f.extra || {}).tekenlimiet ?? null, van: f.van, tot: f.tot
+      limiet: (f.extra || {}).tekenlimiet ?? null, van: f.van, tot: f.tot,
+      /* herkend: vastgelegd als RTG-codenaam (./persoon.js). Een oud feit met een
+         vrije naam en een externe staan er ook, maar zijn niet herkend. */
+      herkend: (f.extra || {}).extern === false
     }));
     const volmachten = (tijdOpDatumVan(entiteitId, 'volmacht', d) || []).map(f => ({
       wie: f.sleutel, wat: f.waarde,
-      limiet: (f.extra || {}).tekenlimiet ?? null, van: f.van, tot: f.tot
+      limiet: (f.extra || {}).tekenlimiet ?? null, van: f.van, tot: f.tot,
+      herkend: (f.extra || {}).extern === false
     }));
     const b = Number.isFinite(bedrag) ? bedrag : null;
     const past = (limiet) => b === null || limiet === null || limiet === undefined || b <= limiet;
 
     const alleen = bestuur.filter(x => x.bevoegd === 'alleen' && past(x.limiet))
-      .concat(volmachten.filter(v => past(v.limiet)).map(v => ({ wie: v.wie, rol: 'gevolmachtigde', bevoegd: 'alleen', limiet: v.limiet })));
+      .concat(volmachten.filter(v => past(v.limiet)).map(v => ({ wie: v.wie, rol: 'gevolmachtigde', bevoegd: 'alleen', limiet: v.limiet, herkend: v.herkend })));
     const samen = bestuur.filter(x => x.bevoegd !== 'alleen' && past(x.limiet));
     const teLaag = bestuur.concat(volmachten).filter(x => !past(x.limiet));
 
@@ -47,7 +51,7 @@ module.exports = (ctx) => {
       /* Gezamenlijk bevoegd met z'n eenen is niemand: dat hoort er te staan en
          niet stilzwijgend als "kan wel" te worden gelezen. */
       samenGenoeg: samen.length >= 2,
-      teLaag: teLaag.map(x => ({ wie: x.wie, limiet: x.limiet })),
+      teLaag: teLaag.map(x => ({ wie: x.wie, limiet: x.limiet, herkend: x.herkend })),
       uitleg: alleen.length ? 'Deze personen kunnen zelfstandig tekenen.'
         : (samen.length >= 2 ? 'Niemand kan alleen tekenen; twee gezamenlijk bevoegde bestuurders samen wel.'
           : 'Er is voor dit bedrag niemand bevoegd. Kijk naar de tekenlimieten of naar een volmacht.') };

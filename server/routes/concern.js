@@ -14,6 +14,8 @@
    ./concern/mensen.js en de veranderkant in ./concern/verandering.js: dit
    bestand ging over de 10 kB van het modulebeleid, en dat is de goede naad --
    hier het bedrijf, daar de mensen, daar de verbouwing. */
+const { duidBestuurder } = require('../kern/concern/persoon');
+
 module.exports = (kern) => {
   const { app, auth, accounts, concernNieuw, concernZet, concernBoom, concernUbo,
     concernBelangen, concernMagTekenen, concernGeraaktDoorVerloop, concernReadiness,
@@ -114,11 +116,15 @@ module.exports = (kern) => {
      Elk feit draagt een bron; ./kern/concern/bron.js weigert het zonder. `wie`
      komt uit de sessie zodat het spoor op een codenaam staat en niet op iets
      wat de aanvrager zelf mag verzinnen. */
-  app.post('/api/concern/feit/zet', auth, (req, res) => {
+  app.post('/api/concern/feit/zet', auth, async (req, res) => {
     const e = mijn(req);
     if (!e) return stuur(res, nietGevonden);
-    const b = req.body || {};
-    stuur(res, tijdZet(e.id, String(b.soort || ''), Object.assign({}, b, { wie: req.session.key })));
+    const soort = String((req.body || {}).soort || '');
+    /* Een bestuurder of gevolmachtigde is een codenaam of uitdrukkelijk extern
+       (kern/concern/persoon.js): een tekengrens moet weten wie het is. */
+    const d = await duidBestuurder(soort, req.body, kern.keyVanCodenaam);
+    if (!d.ok) return stuur(res, d);
+    stuur(res, tijdZet(e.id, soort, Object.assign({}, d.body, { wie: req.session.key })));
   });
 
   app.post('/api/concern/feit/beeindig', auth, (req, res) => {

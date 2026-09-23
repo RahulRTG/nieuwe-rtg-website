@@ -79,6 +79,7 @@ module.exports = (kern) => {
   Object.assign(sctx, require('./regelpoort')(sctx));
   Object.assign(sctx, require('./besluit')(sctx));
   Object.assign(sctx, require('./uitgave')(sctx));
+  Object.assign(sctx, require('./tekengrens')(sctx));
   require('./besluitlijst')(sctx);
   require('./aansluiting')(sctx);
   require('./postbrug')(sctx);

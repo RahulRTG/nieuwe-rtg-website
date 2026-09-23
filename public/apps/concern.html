@@ -179,6 +179,7 @@ function vakBestuur(b){
   return '<div class="vak"><h2>Bestuur en bevoegdheid</h2><div class="lijst">'+rijen+'</div>'+
     '<div class="raster r10">'+
     '<label class="veld">Wie (codenaam)<input id="bWie"></label>'+
+    '<label class="veld"><span><input type="checkbox" id="bExtern"> Iemand buiten RTG</span></label>'+
     '<label class="veld">Rol<input id="bRol" value="bestuurder"></label>'+
     '<label class="veld">Bevoegd<select id="bBev"><option value="alleen">Alleen</option>'+
     '<option value="gezamenlijk">Gezamenlijk</option></select></label>'+
@@ -325,7 +326,7 @@ function knopen(){
     if(!wie.trim()){meld('Wie is de bestuurder?');return;}
     const lim=($('#bLim')||{}).value;
     try{ await api('feit/zet',{entiteit:HUIDIG,soort:'bestuurder',
-      waarde:($('#bRol')||{}).value||'bestuurder',sleutel:wie.trim(),
+      waarde:($('#bRol')||{}).value||'bestuurder',sleutel:wie.trim(),extern:!!(($('#bExtern')||{}).checked),
       van:($('#bVan')||{}).value||undefined,bronSoort:'mens',
       extra:{bevoegd:($('#bBev')||{}).value||'alleen',
         tekenlimiet:lim===''?null:Number(lim)}});

@@ -194,6 +194,7 @@ test('RTG Concern: een ondernemer begint een entiteit, legt een registratie met 
 
       /* ---- 3. bestuur en UBO: gerekend, niet geoordeeld ---- */
       await page.fill('#bWie', 'marco');
+      await page.check('#bExtern');
       assert.equal(await handel(page, '#bKnop', '/api/concern/feit/zet', 'marco'), 200, 'de bestuurder is vastgelegd');
       const bestuur = await page.locator('#hoofd .vak', { hasText: 'Bestuur en bevoegdheid' }).textContent();
       assert.match(bestuur, /marco/);

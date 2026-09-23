@@ -63,6 +63,8 @@ module.exports = (ctx) => {
 
   /* De sleutel van de kamer (tonen, geven, intrekken) staat in ./regie-toegang.js. */
   require('./regie-toegang')(ctx);
+  /* De kantoorrol op naam (fase 2) staat in ./uitnodiging.js. */
+  require('./uitnodiging')(ctx);
 
   /* De schakelroutes van de kast (globaal, fijn, genre, de grote hendel en de
      uitrolfases) staan in ./regie-schakel.js -- afgesplitst voor de 10 KB van

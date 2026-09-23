@@ -59,7 +59,13 @@ const SLEUTELS = {
   'POST /api/office/beleidsmotor/waarom': { leest: true },
   /* De toegangsreview (fase 8) leest drie zetelbronnen. Elke aanroep laat bewust
      EEN journaalregel na: het journaal hoort elke inzage te zien, ook de tweede. */
-  'POST /api/office/beleidsmotor/review': { leest: true }
+  'POST /api/office/beleidsmotor/review': { leest: true },
+  /* De kantooruitnodiging (fase 2): elke oproep maakt een NIEUWE code en maakt de
+     vorige van dezelfde mens ongeldig. Het overzicht leest alleen. */
+  'POST /api/office/kantoor/uitnodiging': { nietIdempotent: true,
+    waarom: 'een tweede oproep is een tweede uitnodiging: een nieuwe code, en de vorige vervalt; een laag die ' +
+      'hem opslikt geeft de eigenaar een code terug waarvan hij denkt dat die de nieuwste is' },
+  'POST /api/office/kantoor/uitnodigingen': { leest: true }
 };
 
 module.exports = { SLEUTELS };

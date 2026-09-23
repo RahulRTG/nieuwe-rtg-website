@@ -3,7 +3,7 @@
   "gemeten": {
     "op": "2026-09-23T13:46:01.000Z",
     "commit": "e7550a2fb",
-    "routesToen": 5116
+    "routesToen": 5118
   },
   "aangeraakt": [
     "GET /",
@@ -2285,6 +2285,8 @@
     "POST /api/office/kamers",
     "POST /api/office/kantine/menu",
     "POST /api/office/kantine/menu-zet",
+    "POST /api/office/kantoor/uitnodiging",
+    "POST /api/office/kantoor/uitnodigingen",
     "POST /api/office/kantoorpakket/aanwezig",
     "POST /api/office/kantoorpakket/ai",
     "POST /api/office/kantoorpakket/beheer",

@@ -29,7 +29,7 @@ const MAX_POGING = 5; // koppel-pogingen per account per minuut
 
 module.exports = (kctx) => {
   const { accounts, findSupplier, checkCred, hasCred, DEMO, DEMO_SUPPLIER, OFFICE_CODE,
-    veiligGelijk, totpOk, logInlog, pinSlot, nu } = kctx;
+    veiligGelijk, totpOk, logInlog, pinSlot, nu, kantoorUitnodiging } = kctx;
 
   /* De koppel-teller draait op HETZELFDE slot als de personeelspin hieronder.
      Hij had een eigen Map met dezelfde grenzen en zonder opruimronde -- en dat
@@ -101,11 +101,18 @@ module.exports = (kctx) => {
          voor niets. */
       const doel = 'kantoor:koppel';
       if (pinSlot.dicht(doel)) return { status: 429, error: 'Te veel foute pogingen. Wacht een minuut.' };
-      if (!veiligGelijk(String(body.code || '').trim().toUpperCase(), OFFICE_CODE)) {
+      /* FASE 2 (AUTHORITY.md): een uitnodiging op naam naast de gedeelde code.
+         De uitnodiging gaat langs hetzelfde doel-slot en dezelfde tweede factor,
+         en wordt pas verbruikt als ook die klopt. */
+      const viaUitnodiging = !!(kantoorUitnodiging && String(body.uitnodiging || '').trim());
+      const toegang = viaUitnodiging ? kantoorUitnodiging.verzilver(key, body.uitnodiging, { proef: true })
+        : (veiligGelijk(String(body.code || '').trim().toUpperCase(), OFFICE_CODE) ? { ok: true }
+          : { status: 401, error: 'Onjuiste backoffice-code.' });
+      if (!toegang.ok) {
         fout(key);
-        pinSlot.fout(doel, 'de backoffice-code via /api/account/koppel');
+        pinSlot.fout(doel, viaUitnodiging ? 'een kantooruitnodiging via /api/account/koppel' : 'de backoffice-code via /api/account/koppel');
         logInlog('koppel', false, 'kantoor', req);
-        return { status: 401, error: 'Onjuiste backoffice-code.' };
+        return toegang;
       }
       if (process.env.OFFICE_TOTP_SECRET && !totpOk(process.env.OFFICE_TOTP_SECRET, body.totp)) {
         fout(key);
@@ -113,8 +120,13 @@ module.exports = (kctx) => {
         logInlog('koppel', false, 'kantoor (tweede factor)', req);
         return { status: 401, error: 'Tweede factor vereist: voer de authenticator-code in.' };
       }
+      if (viaUitnodiging) {
+        const v = kantoorUitnodiging.verzilver(key, body.uitnodiging);
+        if (!v.ok) return v;
+      }
       pinSlot.goed(doel);
-      return { rol: { rol: 'kantoor', at: nu() } };
+      if (kantoorUitnodiging) kantoorUitnodiging.telWeg(viaUitnodiging ? 'uitnodiging' : 'gedeeldeCode');
+      return { rol: { rol: 'kantoor', at: nu(), via: viaUitnodiging ? 'uitnodiging' : 'gedeelde-code' } };
     }
 
     return { status: 400, error: 'Kies wat u koppelt: personeel, zaak of kantoor.' };

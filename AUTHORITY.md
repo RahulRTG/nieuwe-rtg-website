@@ -330,7 +330,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 |---|---|---|
 | 0 | P0 + P0b | **klaar** |
 | 1 | **de beleidsmotor in de schaduw**: `kan(...)` leest de bestaande poorten en geeft een besluit met opbouw; draait naast elke kantoorroute en telt waar hij het oneens is (de vorm van `tegenfeit.js`) | **staat, in de schaduw** (23 september 2026; zie par. 5a) |
-| 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | fase 1, besluit A2 |
+| 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | **de uitnodiging staat, in de schaduw** (23 september 2026; par. 5h); de gedeelde code dichtdoen wacht op een week meten en een apart besluit |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
@@ -597,6 +597,38 @@ PostgreSQL-opstelling. `test/beleidsmotor-slapend.test.js` beproeft de 90 dagen 
 een nagebootste klok, en de reviewtoets beproeft tegen een echte server dat de
 kantoorrol vandaag `nee` is en een ongebruikte baliezetel `onbekend`. Vier mutaties
 laten de toets zakken.
+
+### 5h. Fase 2: de kantooruitnodiging op naam, naast de gedeelde code
+
+Besluit van de eigenaar (23 september 2026): nu bouwen, en de gedeelde
+kantoorcode laten werken tot de schaduw een week heeft gemeten. Wie vandaag de
+kantoorrol koppelt, doet dat met een code die het hele kantoor kent, en die code
+bewijst dus niet wie er koppelt. `kern/kantoor/uitnodiging.js` legt ernaast een
+uitnodiging die dat wel doet:
+
+- **op naam**: alleen het account waarvoor hij is gemaakt kan hem verzilveren. De
+  poging van een ander verbruikt hem niet;
+- **eenmalig**: een nieuwe uitnodiging voor dezelfde mens maakt de oude ongeldig;
+- **zeven dagen geldig**;
+- **zonder de code op te slaan**: de opslag houdt een hash. De eigenaar ziet de
+  code een keer, in het antwoord.
+
+De eigenaar maakt hem (`/api/office/kantoor/uitnodiging`). Dat is zwaar, net als
+boardroomtoegang geven, en alleen de eigenaar mag het, ook niet wie
+boardroomtoegang kreeg. De medewerker verzilvert hem via `/api/account/koppel` met
+`uitnodiging` in plaats van `code`. Dat gaat langs hetzelfde pogingenslot en
+dezelfde tweede factor, en de uitnodiging wordt pas verbruikt als ook die klopt.
+Er wordt geen recht verleend dat de gedeelde code niet ook gaf.
+
+**De schaduw**: elke geslaagde koppeling telt mee onder de weg waarlangs hij
+kwam (`/api/office/kantoor/uitnodigingen`, veld `koppelwegen`). Zodra
+`gedeeldeCode` niet meer stijgt, kan de gedeelde code dicht voor NIEUWE
+koppelingen. Dat is een apart besluit, en deze module neemt het niet.
+`test/kantooruitnodiging.test.js` beproeft dit tegen een echte server. Zeven
+mutaties laten de toets zakken, waaronder het verzilveren door een ander, geen
+vervaldatum, de code in de opslag en de eigenaarscontrole weglaten. Niet
+beproefd is de volgorde met de tweede factor (dat de uitnodiging pas na een
+geldige TOTP opgaat), want de toetsen draaien zonder `OFFICE_TOTP_SECRET`.
 
 ---
 

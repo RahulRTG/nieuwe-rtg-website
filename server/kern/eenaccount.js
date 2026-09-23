@@ -34,8 +34,11 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
      is ontstaan. Liever een server die niet start. */
   if (!pinSlot || typeof pinSlot.personeel !== 'function')
     throw new Error('eenaccount: pinSlot ontbreekt; zonder gedeeld doel-slot is /api/account/koppel een tweede, ongeremde deur naar de personeelspin.');
+  /* Fase 2: de uitnodiging op naam woont bij de kantoorlaag, maar wordt hier
+     verzilverd, want hier komt de kantoorrol aan de sleutelbos. */
+  const kantoorUitnodiging = require('./kantoor/uitnodiging').maakUitnodiging({ db, save, crypto });
   const koppelen = require('./eenaccount/koppelen')({ accounts, findSupplier, checkCred, hasCred,
-    DEMO, DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, logInlog, pinSlot, nu });
+    DEMO, DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, logInlog, pinSlot, nu, kantoorUitnodiging });
 
   /* De AFGELEIDE sleutels: niet opgeslagen maar gelezen uit een waarheid die
      ergens anders al staat -- de kantoordeur van de eigenaar en elke
@@ -135,7 +138,7 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     return uit;
   }
 
-  return { accRollen, accKoppel, accStart, accOntkoppel, kantoorHouders };
+  return { accRollen, accKoppel, accStart, accOntkoppel, kantoorHouders, kantoorUitnodiging };
 }
 
 module.exports = { maakEenAccount };

@@ -20,7 +20,12 @@ module.exports = (kern) => {
 
   /* De sleutelwacht van de doos-vloot, met de eigen sleutel per doos (fase 7),
      staat in ./doos-wacht.js. */
-  const doosSleutelOk = require('./doos-wacht')({ db, save, crypto, beveilig });
+  const doosSleutelOk = require('./doos-wacht')({ db, save, crypto, beveilig, noteerAfketser: () => {
+    if (!Array.isArray(db.data.doosAfketsers)) db.data.doosAfketsers = [];
+    db.data.doosAfketsers.unshift({ at: Date.now() });
+    db.data.doosAfketsers = db.data.doosAfketsers.slice(0, 500);
+    save();
+  } });
 
   /* De Zaakdoos: een verse kloon van de data voor het kastje in de zaak.
      De doos zelf meldt zijn status onbeschermd op het eigen net. */

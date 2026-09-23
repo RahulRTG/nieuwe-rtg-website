@@ -1,7 +1,9 @@
 /* De sleutelwacht van de Zaakdoos-vloot. Afgesplitst uit ./doos.js toen de
    eigen sleutel per doos (AUTHORITY.md fase 7) dat bestand over de 10 kB zette.
-   Geeft doosSleutelOk(req, res) terug: true als de aanroep door mag. */
-module.exports = ({ db, save, crypto, beveilig }) => {
+   Geeft doosSleutelOk(req, res) terug: true als de aanroep door mag. Het
+   wegschrijven van een afketser komt als functie binnen: de opslag van de vloot
+   blijft in ./doos.js, en `db`/`save` zijn er alleen voor het sleutelregister. */
+module.exports = ({ crypto, beveilig, noteerAfketser, db, save }) => {
   /* ---------- de sleutelwacht van de doos-vloot ----------
      Elke /api/doos/-route zit achter de gedeelde sleutel (RTG_DOOS_SLEUTEL),
      in constante tijd vergeleken. Wie te vaak een verkeerde sleutel probeert
@@ -30,10 +32,7 @@ module.exports = ({ db, save, crypto, beveilig }) => {
     if (!s || g.length !== s.length || !crypto.timingSafeEqual(Buffer.from(g), Buffer.from(s))) {
       rij.push(Date.now());
       doosAfketsers.set(ip, rij);
-      if (!Array.isArray(db.data.doosAfketsers)) db.data.doosAfketsers = [];
-      db.data.doosAfketsers.unshift({ at: Date.now() });
-      db.data.doosAfketsers = db.data.doosAfketsers.slice(0, 500);
-      save();
+      noteerAfketser(); // de opslag blijft in ./doos.js
       try { if (beveilig && rij.length >= DOOS_AFKETS_MAX) beveilig.meld('doos-sleutel', 'hoog', 'IP na ' + rij.length + ' verkeerde doos-sleutels een kwartier buitengesloten.', { ip }); } catch (e) {}
       res.status(403).json({ error: 'Geen toegang.' });
       return false;

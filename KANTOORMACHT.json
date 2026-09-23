@@ -10,23 +10,31 @@
       "op": "2026-09-09",
       "reden": "Vier LEZINGEN stonden een dag achter kluisAuth (kredietbord, salarisvoorstel, bevoegdheidsmatrix, machtskaart) en zijn teruggezet naar de gedeelde code. KANTOORMACHT.md zet ENFORCE_EXECUTE bewust voor ENFORCE_READ: lezen raakt elk scherm voor de kleinste risicoreductie, en het bank-scherm rendeerde er niet meer door -- bankVervers() haalt kredietbord en matrix in een Promise.all op, dus de hele kamer viel om. Nog altijd 16 lager dan main (385).",
       "omlaag": "De zes uitvoerende bankknoppen staan nu op naam; de volgende stap is niet deze vier lezingen maar de 13 zware routes buiten de bank, en daarna ENFORCE_READ per kamer."
+    },
+    {
+      "as": "anoniemUitvoerbaar",
+      "van": 365,
+      "naar": 366,
+      "op": "2026-09-23",
+      "reden": "POST /api/office/beleidsmotor/waarom (AUTHORITY.md fase 1, #347) is met opzet open voor ELKE kantoorsessie, ook de gedeelde code: hij zegt alleen over de aanvrager zelf welke eis per deur viel, zodat een weigering niet geraden hoeft te worden. Hij schrijft niets (mutatiecontract NOT_APPLICABLE, idem-verklaring leest). Op de tak van #347 mat de meter al 366; het register was daar niet bijgewerkt.",
+      "omlaag": "Zodra de beleidsmotor uit de schaduw komt (AUTHORITY.md fase 2) antwoordt de route op de handelende mens en valt hij onder KENT_MENS; tot dan telt hij hier mee."
     }
   ],
   "stempel": {
-    "op": "2026-09-19T19:03:57.663Z",
-    "commit": "6083f652",
+    "op": "2026-09-23T14:52:10.256Z",
+    "commit": "40c417f2",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 605,
-    "deurEistMens": 178,
-    "deurGedeeld": 427,
+    "routes": 607,
+    "deurEistMens": 179,
+    "deurGedeeld": 428,
     "zonderBewakerslaag": 3,
     "handlerKentMens": 141,
-    "anoniemUitvoerbaar": 365,
-    "metSpoor": 147,
-    "metReden": 280,
-    "bestanden": 95,
+    "anoniemUitvoerbaar": 366,
+    "metSpoor": 144,
+    "metReden": 286,
+    "bestanden": 97,
     "zwaar": 14,
     "zwaarZonderMens": 0,
     "zwaarLezend": 4,
@@ -54,10 +62,10 @@
       "gemeten": 81,
       "geenWerk": 302,
       "geenOpslag": 203,
-      "nietInProef": 19,
-      "totaal": 605
+      "nietInProef": 21,
+      "totaal": 607
     },
-    "dekkingPct": 13.4,
+    "dekkingPct": 13.3,
     "raakt": [
       {
         "pad": "/api/office/bank/rekening/open",
@@ -183,7 +191,7 @@
     "schaduw": {
       "wat": "een nieuwe regel loopt eerst mee zonder te blokkeren",
       "aanKantoorroute": 1,
-      "aanroepersInServer": 7
+      "aanroepersInServer": 9
     },
     "rechten": {
       "wat": "machtskaart: nominaal naast effectief",
@@ -319,8 +327,8 @@
     }
   ],
   "deuren": {
-    "officeAuth": 449,
-    "boardroomAuth": 112,
+    "officeAuth": 450,
+    "boardroomAuth": 113,
     "balieAuth": 31,
     "kluisAuth": 22,
     "techAuth": 16,

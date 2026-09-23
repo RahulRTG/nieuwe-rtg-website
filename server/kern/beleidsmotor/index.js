@@ -70,18 +70,14 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
         besluit = kan(feiten, deur);
       } catch (e) { besluit = null; }
       let door = false;
-      if (besluit && res && typeof res.once === 'function') {
-        res.once('finish', () => {
-          try {
-            vergelijk(deur, patroon(req), door, besluit);
-            /* A2 in de schaduw: de eigenaar door een gevoelige deur, zonder
-               stap-op. Alleen als hij er echt doorheen ging. */
-            if (door && feiten && feiten.eigenaarMens === true && STAPOP_DEUREN.includes(deur)) {
-              spoeler.tikVeld('stapop ' + deur + ' ' + patroon(req), 'eigenaarZonderStapop');
-            }
-          } catch (e) { /* een meting raakt geen antwoord */ }
-        });
-      }
+      if (besluit) naAfloop(req, res, () => {
+        vergelijk(deur, patroon(req), door, besluit);
+        /* A2 in de schaduw: de eigenaar door een gevoelige deur, zonder
+           stap-op. Alleen als hij er echt doorheen ging. */
+        if (door && feiten && feiten.eigenaarMens === true && STAPOP_DEUREN.includes(deur)) {
+          spoeler.tikVeld('stapop ' + deur + ' ' + patroon(req), 'eigenaarZonderStapop');
+        }
+      });
       return poort(req, res, function () { door = true; return next.apply(this, arguments); });
     };
     Object.defineProperty(gewikkeld, 'name', { value: poort.name || deur });
@@ -103,18 +99,31 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
   /* A3 IN DE SCHADUW: hangt VOOR de kantoorroutes en kijkt na afloop of er een
      poort van de motor heeft gelopen. Een 404 is geen route; die telt niet. */
   function meelezer(req, res, next) {
-    if (res && typeof res.once === 'function') {
+    naAfloop(req, res, () => {
+      if (req.beleidsPoorten && req.beleidsPoorten.length) return;
+      if (!req.routePatroon || res.statusCode === 404) return;
+      const sleutel = patroon(req);
+      if (VERKLAARD_OPEN[sleutel]) return;
+      spoeler.tikVeld('geen-poort ' + sleutel, 'zonderPoort');
+    });
+    next();
+  }
+
+  /* EEN LUISTERAAR PER VERZOEK, hoeveel poorten er ook meelopen. Elke poort en
+     de meelezer hingen eerst een eigen 'finish' aan het antwoord, en achter
+     twee gewikkelde poorten plus de bestaande metingen ging dat over de tien
+     (MaxListenersExceededWarning in de schermtoetsen). Nu verzamelt het verzoek
+     het werk, en voert een enkele luisteraar het uit; een meting raakt nooit
+     het antwoord. */
+  function naAfloop(req, res, werk) {
+    if (!req || !res || typeof res.once !== 'function') return;
+    if (!req.beleidsWerk) {
+      req.beleidsWerk = [];
       res.once('finish', () => {
-        try {
-          if (req.beleidsPoorten && req.beleidsPoorten.length) return;
-          if (!req.routePatroon || res.statusCode === 404) return;
-          const sleutel = patroon(req);
-          if (VERKLAARD_OPEN[sleutel]) return;
-          spoeler.tikVeld('geen-poort ' + sleutel, 'zonderPoort');
-        } catch (e) { /* idem */ }
+        for (const w of req.beleidsWerk) { try { w(); } catch (e) { /* een meting raakt geen antwoord */ } }
       });
     }
-    next();
+    req.beleidsWerk.push(werk);
   }
 
   /* DE STAND staat in ./stand.js: hoe de tellers gelezen worden is een eigen

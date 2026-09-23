@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T16:21:31.373Z",
-    "commit": "81cf70a0",
+    "op": "2026-09-23T16:41:04.073Z",
+    "commit": "afda747",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -3301,34 +3301,12 @@
       "rollen": [
         {
           "rol": "schrijft",
-          "etiket": "capability-register:s",
-          "wat": "zeven ids zonder run",
-          "citaat": "edge.registerAction({ id: id, label: id, allowed: false });"
-        },
-        {
-          "rol": "schrijft",
-          "etiket": "capability-register:s",
-          "wat": "de scenerijen met een run",
-          "citaat": "edge.registerAction({ id: 'experience-action-' + i, label: item.label, run: function () {"
-        },
-        {
-          "rol": "schrijft",
-          "etiket": "capability-register:s",
-          "wat": "op alle vijf decks",
-          "citaat": "edge.setProjection({ deck: deck, actions: ids });"
-        },
-        {
-          "rol": "schrijft",
           "etiket": "wereld:s",
           "wat": "wereld op body per scene",
           "citaat": "d.body.dataset.rtgWorld = active.id === 'werelden' ? X.currentWorld() : active.dataset.tone;"
         }
       ],
       "verantwoordelijkheden": [
-        {
-          "naam": "capability-register",
-          "als": "schrijver"
-        },
         {
           "naam": "wereld",
           "als": "schrijver"
@@ -3428,8 +3406,7 @@
         "public/shared/interface/world-desktop-home.js",
         "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-adaptive-edge-signals.js",
-        "public/shared/social-intelligence-runtime.js",
-        "public/site/start/experience-edge.js"
+        "public/shared/social-intelligence-runtime.js"
       ],
       "beslissers": [
         "public/shared/adaptief.js",
@@ -3824,15 +3801,14 @@
         "public/shared/interface/world-desktop-home.js",
         "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-adaptive-edge-signals.js",
-        "public/shared/social-intelligence-runtime.js",
-        "public/site/start/experience-edge.js"
+        "public/shared/social-intelligence-runtime.js"
       ],
       "beslissers": [
         "public/shared/adaptief.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge-core.js"
       ],
-      "waarom": "Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij, gevuld door vijf producenten: zijn eigen standaardingangen, Signals (primary), de sociale runtime (social-context), het wereldbureau (home) en de landing (zeven ids zonder run plus de scenerijen); leeg in ronde 2. De controls oogsten paginaknoppen als derde bron."
+      "waarom": "Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij, gevuld door vier producenten: zijn eigen standaardingangen, Signals (primary), de sociale runtime (social-context) en het wereldbureau (home); de landing viel eruit in ronde 2 (stap 15), leeg in ronde 2. De controls oogsten paginaknoppen als derde bron."
     },
     {
       "naam": "gebaar-drempel",
@@ -4031,8 +4007,7 @@
     "registerAction": [
       "public/shared/interface/world-desktop-home.js",
       "public/shared/rtg-adaptive-edge-signals.js",
-      "public/shared/social-intelligence-runtime.js",
-      "public/site/start/experience-edge.js"
+      "public/shared/social-intelligence-runtime.js"
     ],
     "wereld": [
       "public/shared/randen.js",
@@ -4058,7 +4033,7 @@
   },
   "telling": {
     "bestanden": 71,
-    "rollen": 216,
+    "rollen": 213,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 13

@@ -66,15 +66,15 @@ Per veld een telling, en met opzet **geen samengesteld percentage**: een
 gemiddelde over tien velden verbergt welk veld bewoog (`BEWIJSMACHINE.md`).
 
 Uitslag over <!--getal:edgedekking.schermen-->310<!--/getal--> schermen, waarvan er
-<!--getal:edgedekking.metBlikveld-->282<!--/getal--> een blikveld laden (de rest is
+<!--getal:edgedekking.metBlikveld-->280<!--/getal--> een blikveld laden (de rest is
 een doorverwijzing, een scherm zonder Edge, of een scherm dat een lid niet
 opent — elk met de reden in het register):
 
 | Veld | Schermen met een waarde | waarvan het scherm hem zelf levert |
 |---|---|---|
 | identiteit | <!--getal:edgedekking.identiteit-->0<!--/getal--> | <!--getal:edgedekking.identiteitZelf-->0<!--/getal--> |
-| wereld | <!--getal:edgedekking.wereld-->281<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
-| context | <!--getal:edgedekking.context-->282<!--/getal--> | <!--getal:edgedekking.contextZelf-->1<!--/getal--> |
+| wereld | <!--getal:edgedekking.wereld-->279<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
+| context | <!--getal:edgedekking.context-->280<!--/getal--> | <!--getal:edgedekking.contextZelf-->1<!--/getal--> |
 | object | <!--getal:edgedekking.object-->0<!--/getal--> | <!--getal:edgedekking.objectZelf-->0<!--/getal--> |
 | activiteit | <!--getal:edgedekking.activiteit-->0<!--/getal--> | <!--getal:edgedekking.activiteitZelf-->0<!--/getal--> |
 | presence | <!--getal:edgedekking.presence-->0<!--/getal--> | <!--getal:edgedekking.presenceZelf-->0<!--/getal--> |
@@ -499,6 +499,21 @@ wordt getoond, hardop, en de teller moet dalen.
   verklaart dat het geen hoofdactie heeft, mag bij de titel van het casco
   blijven — daar bewijst de context-eis alleen dat er een titel is, en dat staat
   er dan ook zo.
+
+  De noemer voor een bestaand scherm (de schuldlijst van besluit K-reikwijdte,
+  een latere stap) is gemeten op 23 september 2026, bij de verse meting van stap
+  6 (`EDGEDEKKING.json`, stempel `dbb3c96`). **68 schermen wijzen in de bron
+  een eigen hoofdactie aan**: 67 met `data-hoofdactie` in hun HTML en een
+  (`klankwerk.html`) via zijn script. Het oude getal 68 klopte toevallig maar
+  telde verkeerd: `meet.html` noemt het attribuut alleen in een commentaar dat
+  hij het BEWUST niet draagt, en `klankwerk` stond er niet in. Van die 68 staan
+  er **51** bij binnenkomst als lid gemeten met herkomst `scherm:data-hoofdactie`;
+  de andere **17** tonen hun knop pas later of onder een andere rol (hij staat
+  verborgen, zoals het maakblok van `foundation/klusjes.html`) en meten `nee`.
+  Daarnaast krijgen **7** schermen hun hoofdactie uit de padtabel van Edge 2, en
+  geen van die zeven wijst er zelf een aan. De context publiceert vandaag op
+  precies één scherm zichzelf (`reizen-veilig.html`); de tand
+  `edgeVeldContextZelf` hieronder staat daarom op 1.
 - **Een verklaring hoort bij een veld** (ronde 2). Een scherm verklaart per veld
   op zijn body, en de waarde van het attribuut IS de reden:
   `data-rtg-edge-nvt-<veld>` (dit veld bestaat hier niet) of

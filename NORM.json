@@ -138,8 +138,8 @@
     "edgeDubbeleEigenaars": 12,
     "rtgDodeKanalen": 0,
     "edgeVeldIdentiteit": 0,
-    "edgeVeldWereld": 281,
-    "edgeVeldContext": 282,
+    "edgeVeldWereld": 279,
+    "edgeVeldContext": 280,
     "edgeVeldObject": 0,
     "edgeVeldActiviteit": 0,
     "edgeVeldPresence": 0,
@@ -2796,6 +2796,22 @@
         "hoe": "DE SCHULD VAN VANOCHTEND IS AFGELOST, en langs de weg die er toen bij stond. kern/waarde/economischeherkomst.js en kern/waarde/herkomstsplitsing.js hadden nul aanroepers; de verticale slice geeft ze er drie (reisbureau-samenstelling, reisbureau-betaling, bijdragebasis) en daarmee vallen ze allebei uit deze post. Er komt er EEN voor terug -- kern/waarde/bijdragebasis.js, die de basis uitrekent en nog door geen enkele route wordt gelezen -- dus 19 - 2 + 1 = 18. De tand wordt aangedraaid en niet blijven staan: wat een keer beter is geworden, hoort niet stil terug te kunnen.",
         "daarna": "bijdragebasis.js krijgt zijn aanroeper zodra er een scherm of route is die de basis TOONT. Dat is bewust nog niet gebouwd: er staat geen tarief naast, dus er valt nog niets af te rekenen -- en een bord dat een basis toont zonder dat iemand weet wat ermee gebeurt, nodigt uit tot een getal dat niemand heeft afgewogen."
       }
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "edgeVeldWereld",
+      "van": 281,
+      "meter": "edgeVeldWereld 281 -> 279",
+      "reden": "Twee schermen zijn bewust een doorverwijzing geworden in de consolidatieronde van 23 september 2026 (SCHERMEIGENAAR.json): /apps/vandaag.html is opgegaan in life.html (Dag, een tweede dagproduct met verzonnen momenten) en /apps/toestemming.html in mijn-relaties.html#soort (privacy.toegang). Een omleiding heeft geen eigen blikveld, dus de meter telt ze als 'omgeleid' en niet meer als 'ja'. Er verdween geen publicatie van een scherm dat er nog is: de doelen (life.html, mijn-relaties.html) staan zelf gemeten op 'ja'. De verse meting (npm run edgedekking, stempel dbb3c96) zakte daarop met 4 velden achteruit en is met --aanvaard geschreven; die vier staan in aanvaardAchteruit, en omdat die lijst bij de volgende meting verdwijnt, staat het besluit hier."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "edgeVeldContext",
+      "van": 282,
+      "meter": "edgeVeldContext 282 -> 280",
+      "reden": "Twee schermen zijn bewust een doorverwijzing geworden in de consolidatieronde van 23 september 2026 (SCHERMEIGENAAR.json): /apps/vandaag.html is opgegaan in life.html (Dag, een tweede dagproduct met verzonnen momenten) en /apps/toestemming.html in mijn-relaties.html#soort (privacy.toegang). Een omleiding heeft geen eigen blikveld, dus de meter telt ze als 'omgeleid' en niet meer als 'ja'. Er verdween geen publicatie van een scherm dat er nog is: de doelen (life.html, mijn-relaties.html) staan zelf gemeten op 'ja'. De verse meting (npm run edgedekking, stempel dbb3c96) zakte daarop met 4 velden achteruit en is met --aanvaard geschreven; die vier staan in aanvaardAchteruit, en omdat die lijst bij de volgende meting verdwijnt, staat het besluit hier."
     }
   ],
   "prestatie": {

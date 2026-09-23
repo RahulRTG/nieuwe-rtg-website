@@ -21,9 +21,11 @@ module.exports = (ctx) => {
   const { router, F, G, db, save, schoon, isGast } = ctx;
   const { familieVan, sessieVan } = ctx;
   let agenda = null;
+  // de enige deur naar de gedeelde agendacollectie, dezelfde als die van de motor
+  const { agendaWortel } = require('../../kern/agenda-opslag')({ db });
   const sleutel = g => agendaGezinSleutel(g.code);
   // alleen lezen: een gezin zonder punten krijgt geen lege lijst in de opslag
-  const punten = g => ((db.data.agendas || {})[sleutel(g)]) || [];
+  const punten = g => agendaWortel()[sleutel(g)] || [];
   function motorKlaar(res) {
     if (agenda) return true;
     res.status(503).json({ error: 'De agenda is nu even niet beschikbaar.' });
@@ -36,8 +38,7 @@ module.exports = (ctx) => {
      dat er al staat wordt niet nog eens gezet, en het veld in het gezinsrecord
      verdwijnt pas als alles over is. */
   function neemOver() {
-    const w = db.data.agendas && typeof db.data.agendas === 'object' && !Array.isArray(db.data.agendas)
-      ? db.data.agendas : (db.data.agendas = {});
+    const w = agendaWortel();
     let bewogen = 0;
     for (const g of Object.values(G())) {
       if (!g || !Array.isArray(g.agenda)) continue;
@@ -59,7 +60,7 @@ module.exports = (ctx) => {
   function setAgenda(m) { agenda = m; neemOver(); }
   // AVG: een gewist gezin neemt zijn agenda mee (foundation/zorg.js)
   function wisGezinsagenda(code) {
-    if (db.data.agendas) delete db.data.agendas[agendaGezinSleutel(code)];
+    delete agendaWortel()[agendaGezinSleutel(code)];
   }
 
   function velden(body) {

@@ -113,9 +113,7 @@ test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op 
        dan vindt de laag geen acties meer en gaat er geen actielade open. Deze
        proef wil de lade ZIEN, niet uitvoeren; dat gebeurt hieronder met de
        toets. */
-    await page.mouse.move(d2.x + d2.width * 0.15, d2.y + d2.height / 2);
-    await page.mouse.down();
-    for (let i = 1; i <= 10; i++) await page.mouse.move(d2.x + d2.width * 0.15 + i * 11, d2.y + d2.height / 2);
+    await veegDoor(page, d2, { startFractie: 0.15, afstand: 110, stappen: 10, loslaten: false });
     /* De EERSTE actie ligt vast -- dat is degene die een volle veeg uitvoert --
        en wat er verder in de lade past hangt van de breedte van de kaart af. Het
        bord is een raster, dus een kaart is smaller dan het venster en 'Overnemen'

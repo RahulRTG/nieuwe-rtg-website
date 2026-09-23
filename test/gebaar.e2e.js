@@ -13,7 +13,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
 /* Waar de browser NIET op de plek staat die het pakket verwacht (een
@@ -45,14 +45,15 @@ async function maat(loc) {
   return loc.boundingBox();
 }
 
+/* DE VEEG ZELF GAAT DOOR veegDoor (test/helper.js). Hier stond een eigen reeks
+   -- mouse.down() en daarna twintig losse moves -- en daarmee precies de race die
+   veegDoor oplost: tussen down() en de eerste move() zat een aparte CDP-ronde, en
+   op een pagina die nog opstart haalt die de timer van lang drukken. Wat hier
+   blijft is de MAAT van deze proef: waar hij begint, hoe ver hij gaat, in
+   twintig stapjes (een sprong van honderd pixels is voor de browser geen veeg),
+   en of hij loslaat. */
 async function veeg(page, doos, px, losLaten) {
-  const y = doos.y + doos.height / 2;
-  const x0 = px < 0 ? doos.x + doos.width * 0.7 : doos.x + doos.width * 0.15;
-  await page.mouse.move(x0, y);
-  await page.mouse.down();
-  // in stapjes, want een sprong van honderd pixels is voor de browser geen veeg
-  for (let i = 1; i <= 20; i++) await page.mouse.move(x0 + (px * i) / 20, y);
-  if (losLaten) await page.mouse.up();
+  return veegDoor(page, doos, { startFractie: px < 0 ? 0.7 : 0.15, afstand: px, stappen: 20, loslaten: losLaten });
 }
 
 /* WACHTEN OP DE LADE, NIET OP STILTE. wachtOpRust telt hoe lang de tekst niet
@@ -270,6 +271,181 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
     await wachtOpRust(page);
     assert.deepEqual(await page.evaluate(() => window.__log), ['verwijderd'],
       'de tweede druk voert hem uit');
+
+    assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens de proef');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* VASTHOUDEN MET EEN HAND, EN NIET ALLEEN MET EEN TOETS.
+
+   De proef hierboven drukt twee keer op Enter: dat bewijst de toetsenbordweg en
+   niets over de aanwijzer. Gemeten in ronde 2 (EDGE.md par. 11): met BORGTIJD op
+   1 ging een borg af op een TIK en bleef elke toets in dit huis groen, en lang
+   drukken op 5000 ms zag ook niemand. Een borg die op een tik afgaat is erger dan
+   geen borg, want hij belooft iets wat hij niet houdt.
+
+   Deze proeven pinnen het GEDRAG vast en geen getal. Kort ligt ruim onder elke
+   tijd in de grammatica en ruim boven een animatieframe (de vulling loopt op
+   requestAnimationFrame, dus korter dan een frame zegt niets); lang ligt ruim
+   boven de hoogste vasthoudtijd. Zo blijven ze geldig als lang drukken naar
+   DREMPELS gaat en als de borg in ronde 3 naar het gewicht verhuist (besluit
+   K-borg, EDGE.md par. 8).
+
+   De borg komt hier uit de LAAG en niet uit een vlag: een serveractie zonder weg
+   terug wordt vanzelf een borg (gebaar-04c.js), en dat is precies het pad van
+   Weggooien op het bord. */
+const gram = require('../public/shared/adaptief/grammatica.js');
+const KORT = 150;
+const LANG_BORG = 2 * Math.max(...Object.values(gram.VASTHOUD));
+const LANG_DRUK = 2 * gram.DREMPELS.lang;
+
+async function proefBorg(page) {
+  await page.evaluate(() => {
+    document.querySelector('#werkdag').innerHTML =
+      '<div class="proefrij" tabindex="0" style="height:70px"><span>Een regel om vast te houden</span></div>';
+    window.__log = [];
+    window.RTGGebaar.zet(document.querySelector('.proefrij'), {
+      titel: 'Een regel om vast te houden',
+      rechts: [{ naam: 'Afronden', teken: 'gereed', doe: () => { window.__log.push('afgerond'); } }],
+      links: [window.RTGGebaar.klaar.server({ naam: 'Weggooien', teken: 'ingrijp', sig: 'incident',
+        doe: () => { window.__log.push('weggegooid'); return Promise.resolve(); } })]
+    });
+  });
+  await page.waitForSelector('.proefrij.gb-rij', { timeout: 5000 });
+}
+
+/* De borgknop in de actielade. Geopend langs de deur van de laag en niet langs
+   een gebaar: deze stap meet de KNOP, en een gebaar dat de lade opent is een
+   eigen proef hieronder. */
+async function borgKnop(page) {
+  await page.evaluate(() => window.RTGGebaar.open(document.querySelector('.proefrij')));
+  await page.waitForFunction(() => { const d = document.querySelector('dialog.gb-blad'); return !!(d && d.open); },
+    null, { timeout: 15000 });
+  const knop = page.locator('dialog.gb-blad button.gb-borg');
+  assert.equal(await knop.count(), 1, 'een serveractie zonder weg terug hoort vanzelf een borg te zijn');
+  assert.match(await knop.textContent(), /Weggooien.*houd vast/, 'en de knop hoort te zeggen dat je hem vasthoudt');
+  return knop;
+}
+const midden = async (loc) => { const b = await loc.boundingBox(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; };
+
+async function houdMuis(page, loc, ms) {
+  const p = await midden(loc);
+  await page.mouse.move(p.x, p.y);
+  await page.mouse.down();
+  await page.waitForTimeout(ms);
+  await page.mouse.up();
+}
+
+/* EEN VINGER LANGS HET PROTOCOL. Playwright kent voor aanraking alleen tap(), en
+   een tik is precies wat hier NIET gebeurt: de vinger blijft liggen. Via CDP gaan
+   touchStart en touchEnd met een echte tijd ertussen naar Chromium, die er zelf
+   pointerdown en pointerup van maakt -- dezelfde weg als een telefoon. */
+async function houdVinger(page, loc, ms) {
+  const p = await midden(loc);
+  const cdp = await page.context().newCDPSession(page);
+  try {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [p] });
+    await page.waitForTimeout(ms);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  } finally { await cdp.detach(); }
+}
+
+async function openKantoor(page, base) {
+  await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
+  await page.waitForFunction(() => {
+    const el = document.querySelector('#werkdag');
+    return !!el && getComputedStyle(el).visibility !== 'hidden';
+  }, null, { timeout: 20000 });
+}
+
+test('met een aanwijzer: kort vasthouden op een borg doet niets, lang voert uit, en lang drukken opent de actielade',
+  { skip: geenBrowser(pw) }, async () => {
+  assert.ok(KORT * 2 <= Math.min(gram.DREMPELS.lang, ...Object.values(gram.VASTHOUD)),
+    'kort hoort ruim onder elke tijd in de grammatica te liggen, anders meet deze proef de tabel en niet de borg');
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gebaar-borg-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const page = await browser.newPage({ viewport: { width: 900, height: 900 } });
+    const paginaFouten = [];
+    letOpFouten(page, paginaFouten);
+    await openKantoor(page, base);
+    await proefBorg(page);
+
+    // 1. lang drukken op de regel opent de acties als lijst, zonder iets uit te voeren
+    const rij = page.locator('.proefrij');
+    await rij.scrollIntoViewIfNeeded();
+    assert.equal(await page.locator('dialog.gb-blad').count(), 0, 'voor het drukken hoort er geen actielade te staan');
+    await houdMuis(page, rij, LANG_DRUK);
+    await page.waitForFunction(() => { const d = document.querySelector('dialog.gb-blad'); return !!(d && d.open); },
+      null, { timeout: 5000 }).catch(() => {});
+    assert.deepEqual(await page.evaluate(() => {
+      const d = document.querySelector('dialog.gb-blad');
+      return d && d.open ? [...d.querySelectorAll('menu button > span')].map((s) => s.textContent) : null;
+    }), ['Afronden', 'Weggooien · houd vast'], 'lang drukken op een regel hoort de actielade met alle acties te openen');
+    assert.deepEqual(await page.evaluate(() => window.__log), [], 'lang drukken legt uit en voert niets uit');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('dialog.gb-blad'), null, { timeout: 5000 });
+
+    // 2. kort vasthouden op de borg: de vulling begint en valt terug, er gebeurt niets
+    const knop = await borgKnop(page);
+    await houdMuis(page, knop, KORT);
+    await wachtOpRust(page);
+    assert.deepEqual(await page.evaluate(() => window.__log), [],
+      'een borg mag NIET afgaan op ' + KORT + ' ms vasthouden; dan is het een knop met een vertraging');
+    assert.equal(await page.evaluate(() => !!(document.querySelector('dialog.gb-blad') || {}).open), true,
+      'na kort vasthouden hoort de borg er nog te staan, klaar voor een echte poging');
+
+    // 3. lang vasthouden voert hem uit
+    await houdMuis(page, knop, LANG_BORG);
+    await page.waitForFunction(() => window.__log.length > 0, null, { timeout: 5000 }).catch(() => {});
+    assert.deepEqual(await page.evaluate(() => window.__log), ['weggegooid'],
+      'na ' + LANG_BORG + ' ms vasthouden hoort de borg uitgevoerd te zijn');
+
+    assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens de proef');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('met een vinger: kort vasthouden op een borg doet niets, lang voert uit',
+  { skip: geenBrowser(pw) }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gebaar-vinger-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+    /* hasTouch en geen isMobile: aanraking aan, maar dezelfde opmaak als de proef
+       met de aanwijzer, zodat alleen de hand verschilt. */
+    const context = await browser.newContext({ viewport: { width: 900, height: 900 }, hasTouch: true });
+    const page = await context.newPage();
+    const paginaFouten = [];
+    letOpFouten(page, paginaFouten);
+    await openKantoor(page, base);
+    await proefBorg(page);
+
+    const knop = await borgKnop(page);
+    await houdVinger(page, knop, KORT);
+    await wachtOpRust(page);
+    assert.deepEqual(await page.evaluate(() => window.__log), [],
+      'een borg mag ook met een vinger NIET afgaan op ' + KORT + ' ms; dat is een tik');
+    assert.equal(await page.evaluate(() => !!(document.querySelector('dialog.gb-blad') || {}).open), true,
+      'na een korte aanraking hoort de borg er nog te staan');
+
+    /* De tegenproef, en zonder hem zegt de eerste niets: komt de vinger niet bij
+       de knop aan, dan doet kort ook "niets". */
+    await houdVinger(page, knop, LANG_BORG);
+    await page.waitForFunction(() => window.__log.length > 0, null, { timeout: 5000 }).catch(() => {});
+    assert.deepEqual(await page.evaluate(() => window.__log), ['weggegooid'],
+      'na ' + LANG_BORG + ' ms met een vinger vasthouden hoort de borg uitgevoerd te zijn');
 
     assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens de proef');
   } finally {

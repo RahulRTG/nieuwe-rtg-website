@@ -764,6 +764,40 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
 | vier geheugens voor "waar was ik" die elkaar niet lezen | par. 1 | 4 |
 | "waarom niet" heeft aan de serverkant vijf vormen zonder gedeelde woorden, en `routes/stuur.js` maakt van elke weigering een kale `error` | `server/routes/stuur.js` | 3 |
 
+**De wedloop van de veeg, koud gemeten** (ronde 2, stap 9; graad `gemeten`,
+23 september 2026, op deze ontwikkelbak met vier kernen en een tweede bouwer
+ernaast). De rij hierboven eiste deze meting voordat `gebaar` naar de tabel gaat:
+lang drukken van 520 naar 480 ms maakt het venster kleiner waarin een veeg in een
+proef voor vasthouden kan worden aangezien. Eerst gingen de vier reeksen die er
+nog omheen liepen door `veegDoor` (`gebaar.e2e.js`, het bord, de post en de
+Salon; `test/gebaar-omweg.test.js` houdt dat vast op de bron), en `veegDoor`
+zegt sinds stap 8 welke weg hij nam. Daarna `node scripts/veegwedloop.js`: per
+ronde alles vers -- een server met een lege map, een lid met twee bestanden, een
+nieuwe browser -- en vegen op de bestandenlijst zodra de eerste regel een
+gebaarregel is, zoals `test/gebaar-bestanden.e2e.js`. Het gat is gemeten in de
+pagina, in de luisteraar zelf: van de echte pointerdown tot de eerste echte
+beweging van 8 px of meer.
+
+| Wijze | Rondes | Uitkomst | Gat mediaan | p90 | max | loadavg |
+|---|---|---|---|---|---|---|
+| `veegDoor` | 20 | 20 vlucht, 0 terugval | 1,8 ms | 3,6 ms | 9,4 ms | 0,71-2,52 |
+| `veegDoor` | 40 | 40 vlucht, 0 terugval | 1,9 ms | 6,6 ms | 15,1 ms | 2,89-4,90 |
+| oude losse reeks (`--wijze los`) | 20 | 19 begonnen, 1 niet | 45,9 ms | 133,1 ms | 161,8 ms | 1,91-3,11 |
+| oude losse reeks, met oorzaak | 40 | 40 begonnen | 44,5 ms | 119,9 ms | 299,3 ms | 2,65-4,35 |
+
+Wat dat zegt, en wat niet. Via `veegDoor` ging de terugval in 60 koude rondes
+**nul keer** af; dat betekent dat hij zeldzaam is (bij 0 van 60 ligt de ware kans
+met 95% zekerheid onder de 5%) en niet dat hij nooit afgaat, dus hij blijft staan.
+Het grootste gat was 15 ms tegen een venster van 480: ruim dertig keer marge. De
+oude reeks -- een eigen protocolronde tussen neer en bewegen -- had een staart tot
+300 ms onder belasting, en de ene ronde die niet begon had een gat van 52,9 ms,
+ver onder de timer: dat was dus NIET de wedloop met lang drukken, en de oorzaak is
+niet vastgesteld (de oorzaakmelding kwam er pas daarna bij, en in 40 rondes erna
+ging niets mis). Twee keer met opzet 700 ms gewacht na neer gaf een keer `timer`
+en een keer `geen-regel`: de neerdruk viel op een koude pagina naast de regel,
+omdat het vlak nog schoof. Dat is gezien en niet geteld (graad `vermoed`); de
+terugval van `veegDoor` vangt het ook op, want die zoekt de regel opnieuw.
+
 Vijf gebreken uit dezelfde inventaris en uit de indeling van de vijftig punten
 zijn in deze ronde wél gerepareerd, omdat ze bereikbaar waren of in de verkeerde
 richting faalden:

@@ -848,7 +848,11 @@ brug die een kant op loopt en geen werkgever raadt), een gezinslid neemt zijn
 plek zelf in (de uitnodiging reist mee met zijn sollicitatie, alleen hij ziet
 haar, en hij claimt met een eigen account -- mag vanaf vijftien), en de loonrun
 wordt gemeten bij een Nederlandse zaak in plaats van het land van Café Brisa te
-vervalsen. Let op de meetfout die daarbij bovenkwam: het antwoord van
+vervalsen. En de loonrun leest het dienstverband: wie een strook krijgt zonder
+lopend dienstverband bij de entiteit van de zaak, wordt een bevinding
+(`loon_zonder_dienstverband`, ernst `midden` -- zichtbaar, niet blokkerend, want
+de aannames van voor de brug hebben er nog geen). Let op de meetfout die daarbij
+bovenkwam: het antwoord van
 `/api/office/payroll/run/open` is een samenvatting zonder stroken, dus wie
 daarin naar loonregels zoekt meet altijd nul.
 

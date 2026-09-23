@@ -546,10 +546,25 @@ drie dicht):
   (`run/een`). Een Spaans regelpakket met een bron blijft nodig voor een loonrun
   bij Café Brisa zelf; dat is een bron en geen code.
 
+**De loonkant leest het dienstverband** (dezelfde dag, besluit 1 aan de andere
+kant). De loonadministratie blijft rekenen op het personeelsnummer van de zaak,
+want daar hangen contract en strook. Maar bij het openen van een run toetst
+`dienstverbandToets` in `server/kern/concern/aanname.js` of wie een strook krijgt
+een lopend dienstverband heeft bij de entiteit van die zaak, in die periode. Zo
+niet, dan komt er een bevinding `loon_zonder_dienstverband` met ernst `midden`:
+zichtbaar voor de administrateur, maar niet blokkerend, want de aannames van vóór
+de brug hebben er nog geen. Wat niet te toetsen is (een zaak zonder entiteit,
+personeel zonder eigen account), staat er als `dienstverband_niet_getoetst` en
+valt niet weg. Of die bevinding ooit `hoog` wordt en een definitieve run
+tegenhoudt, is een besluit voor wanneer de oude aannames zijn bijgewerkt.
+
 **De keten van Adam is daarmee rond: 17 van 17 schakels gesloten, 10 van 10
 storingen gehouden** (`ADAMPROEF.json`), van gezin tot loonstrook. Zonder
 basissalaris zakt schakel 17, zonder de uitnodiging schakel 13, zonder de brug
-schakel 16 -- alle drie met een mutatie nagetrokken. Wat de keten met opzet NIET
+schakel 16, en zonder de dienstverbandtoets weer schakel 17 -- die heeft een
+besturingsproef: de ondernemer van Meridiaan werd manager voordat hij de zaak
+koppelde, heeft dus geen dienstverband, en hoort gemeld te worden. Alle vier met
+een mutatie nagetrokken. Wat de keten met opzet NIET
 loopt: goedkeuren en uitbetalen van de loonrun (twee handtekeningen en een
 betaling, die zet een proef niet), en een loonrun bij een Spaanse zaak.
 

@@ -75,6 +75,14 @@ const EIGENAAR = {
     waarom: 'Handmatig beoordeelde bevindingen en resterende taalgrenzen; geen automatisch gegenereerd register.' },
   /* De aanleiding zelf. Er is geen schrijvend script: de lijst wordt met de hand
      onderhouden en mag alleen krimpen. */
+  /* De consolidatieronde van 23 september 2026: de meting (welke schermen
+     roepen dezelfde paden aan) en het besluit (wie is eigenaar per capability)
+     zijn twee bestanden, en alleen de eerste heeft een schrijver. */
+  'SCHERMFUNCTIE.json': { schrijver: 'scripts/schermfunctie.js' },
+  'SCHERMEIGENAAR.json': { handmatig: true, lezer: 'test/schermeigenaar.test.js',
+    waarom: 'het eigenaarsregister is een BESLUIT per capability en per overlappend paar; de toets houdt het ' +
+      'tegen een verse meting van scripts/schermfunctie.js, en wie het uit die meting genereert laat de toets ' +
+      'met zichzelf vergelijken' },
   'BEREIK.json': { handmatig: true, lezer: 'test/bereikbaar.test.js',
     waarom: 'schuldlijst van schermen zonder klikroute; wordt met de hand bijgehouden en mag alleen krimpen. ' +
       'Precies daarom kon een nieuw script hem stil overschrijven zonder dat een schrijverscan iets zag.' },

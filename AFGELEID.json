@@ -3,23 +3,23 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-22T17:33:16.891Z",
-  "commit": "33e75309",
-  "boomVuil": false,
+  "op": "2026-09-23T10:06:40.441Z",
+  "commit": "7a4fd34",
+  "boomVuil": true,
   "boomAnders": 1,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 304,
-  "bron": 7,
-  "afgeleid": 169,
+  "artefacten": 306,
+  "bron": 8,
+  "afgeleid": 170,
   "fragmenten": 22,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 190,
-  "afgeleidEigenaarHard": 167,
+  "metEigenaar": 191,
+  "afgeleidEigenaarHard": 168,
   "afgeleidGrendelt": 18,
   "metStempel": 98,
   "stempelAnders": 0
@@ -3058,6 +3058,32 @@
    "stempelInstrument": "scripts/scherfmeter.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run scherfmeter:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMEIGENAAR.json",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMFUNCTIE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schermfunctie.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/schermfunctie.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run schermfunctie",
    "grendelt": false,
    "botsingVerklaard": null
   },

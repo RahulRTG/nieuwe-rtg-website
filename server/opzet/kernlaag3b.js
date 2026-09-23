@@ -50,6 +50,9 @@ Object.assign(kern, require('../kern/bureau')({ db, save, crypto, anthropic, liv
    voorstel. Staat hier omdat hij de tower voedt langs de agenda -- niet als
    eigen opslag. Een aangenomen voorstel is een gewone afspraak. */
 Object.assign(kern, { postdatum: require('../kern/postdatum')({ db, save, rtmail, agenda: kern.agenda }) });
+// De RTF-gezinsagenda leest en schrijft via dezelfde motor (sleutel
+// gezin:<code>); bij het binden gaan de oude gezinspunten een keer over.
+kern.rtf.setAgenda(kern.agenda);
 /* Geldbeleid (kern/geldbeleid/): het beleid van het LID over zijn eigen geld --
    regels, potten en het append-only actielog (GELD.md par. 3-5). Aan db/save
    zoals geldregie in kernlaag4, want dit is een schrijvende opslaglaag en geen

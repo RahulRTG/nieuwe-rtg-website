@@ -142,4 +142,7 @@ const { groepen, leerlingPassen } = require('./foundation/leeftijdsgroepen')({ G
 // magSolliciteren/groepLeeftijd horen ook naar buiten: de sollicitatieroute moet
 // de leeftijdsgrens uit het PROFIEL kunnen halen in plaats van uit het verzoek.
 // setKostenHook: de kostenpoort van de RTFoundation (foundation/kostenpoort.js).
-module.exports = { aanGezinslid, setOnderwijs, router, setKostenHook, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen, setSchoolMail, schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief, foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief, accepteerGast };
+/* de gezinsagenda draait op de RTG-agendamotor, die pas na de sociale kern
+   bestaat: server.js bindt hem laat, zoals de marktplaats */
+const setAgenda = m => ctx.setAgenda(m);
+module.exports = { aanGezinslid, setOnderwijs, setAgenda, router, setKostenHook, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen, setSchoolMail, schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief, foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief, accepteerGast };

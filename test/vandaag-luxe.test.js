@@ -123,7 +123,7 @@ test('Foundation stadsquery blijft een toestand van hetzelfde dashboard', () => 
 test('de vier bestaande panelstructuren en hun echte hoofdacties blijven bron-DOM', () => {
   const verwachtingen = [
     ['public/apps/rtg.html', ['class="dag"', 'class="kompas"', 'id="reisdossier"',
-      'class="rtg-dashboard-hero-cta" href="/apps/vandaag.html"']],
+      'class="rtg-dashboard-hero-cta" href="/apps/life.html"']],
     ['public/apps/kantoor.html', ['class="doelgroep"', 'class="cv-rij"', 'id="werkdag"', 'id="poorten"']],
     ['public/apps/reizen.html', ['class="dagdek"', 'class="strook"', 'class="kaartraster"',
       'data-naar-blad="reizen"']],

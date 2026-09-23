@@ -50,7 +50,10 @@ test('WorkOS opent werkdag, besluit en overdracht direct in de bestaande command
 
   const one = lees('public/apps/rtgone.html');
   assert.match(one, /\['today','decisions','handover'\]\.includes\(START_VIEW\)/);
-  assert.match(one, /endpoint:'goedkeuring'/);
+  // besluiten voorleggen en nemen doet Decision Room (SCHERMEIGENAAR.json): RTG One
+  // opent daar een nieuw besluit, en keurt niet zelf goed
+  assert.match(one, /\/apps\/decision-room\.html\?nieuw=1/);
+  assert.doesNotMatch(one, /endpoint:'goedkeuring'/);
   assert.match(one, /endpoint:'overdracht'/);
 });
 

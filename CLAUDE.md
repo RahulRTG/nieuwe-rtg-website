@@ -17,6 +17,26 @@ staat ook **het wereldpatroon**: samenvoegen is stap een, niet de bedoeling —
 een wereld is pas af als hij zijn onderwerp begrijpt (graaf, beleid, cockpit,
 gegronde Rahul, actielog).
 
+**`SCHERMEIGENAAR.json` zegt per zichtbare functie wie de eigenaar is** — precies
+één scherm per capability; andere schermen mogen haar tonen of openen maar
+bouwen haar niet opnieuw. Het kwam uit de consolidatieronde van 23 september
+2026, die niet op bestanden vergeleek (geen enkel scherm was byte voor byte
+gelijk) maar op wat erachter zit: `npm run schermfunctie` legt elk paar schermen
+naast elkaar op de API-paden die ze aanroepen. Zo vond hij twee dagproducten
+(`vandaag.html` toonde verzonnen momenten naast `life.html`), een tweede
+avond-samensteller in `leven.js` en een tweede beslisweg in RTG One naast
+Decision Room. `test/schermeigenaar.test.js` houdt het register tegen een VERSE
+meting: een nieuw scherm op dezelfde routes als een bestaand scherm zakt tot het
+een oordeel heeft (vijf klassen plus `geen-dubbel` met reden), een alias krijgt
+geen klikbare link binnen het huis, en binnen een wereld draagt geen menu-item de
+naam van een ander. Acht oordelen staan `open` met een vervolg (ratel `OPEN_MAX`,
+alleen omlaag) — de grootste is Pulse naast De Salon. De gezinsagenda is al
+samengevoegd: hij draait op dezelfde motor als de ledenagenda
+(`kern/agenda.js`, sleutel `gezin:<code>`) en zijn scherm is een schil voor de
+gezinssessie, met de oppas als meelezer. De toegangsschermen zijn al samengevoegd: "Wie heeft toegang tot
+mij" (`mijn-relaties.html`) is het ene scherm, `toestemming.html` een
+doorverwijzing, en RTG iD houdt alleen inloggen bij een dienst en machtigen.
+
 **`GELD.md`, `LEVEN.md` en `LIFE.md` zijn de diepte-documenten per wereld.** GELD.md
 maakt van RTG Geld een financieel besturingssysteem; de harde grens daar is
 dat geld het huis nooit vanzelf verlaat. LEVEN.md maakt van RTFoundation een

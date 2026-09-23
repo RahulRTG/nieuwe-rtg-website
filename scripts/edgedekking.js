@@ -156,10 +156,9 @@ const DOORVERWIJZING_MET_REDEN = {};
    scherm dat niet in de basislijn staat, moet gemeten zijn en de Edge laden,
    een wereld en een context hebben, een hoofdactie ZELF aanwijzen
    (data-hoofdactie) of met reden verklaren dat die er niet is, en geen enkele
-   geblokkeerde handeling zonder reden dragen. De context-eis bewijst vandaag
-   alleen dat het casco een titel heeft; dat een nieuw scherm zijn context ook
-   ZELF publiceert (via RTGAdaptief) is een besluit, want het brengt het register
-   naar elk nieuw scherm (EDGE.md par. 7). Het woont hier, bij de meter, en
+   geblokkeerde handeling zonder reden dragen. Wie een eigen hoofdactie heeft,
+   publiceert ook zijn context zelf (besluit 11); een scherm zonder hoofdactie
+   mag bij de titel van het casco blijven. Het woont hier, bij de meter, en
    test/edgenieuwscherm.test.js roept het aan. */
 function contractNieuw(reg, opSchijf) {
   const basis = new Set(reg.basislijn || []);
@@ -177,6 +176,12 @@ function contractNieuw(reg, opSchijf) {
     for (const veld of ['wereld', 'context']) if (s.velden[veld] !== 'ja') uit.push(pad + ': publiceert geen ' + veld);
     const hoofd = s.velden.hoofdactie === 'nvt' || (s.velden.hoofdactie === 'ja' && zelf((s.herkomst || {}).hoofdactie));
     if (!hoofd) uit.push(pad + ': wijst zelf geen hoofdactie aan (data-hoofdactie) en verklaart ook niet waarom niet');
+    /* Besluit 11 (EDGE.md par. 8): wie handelingen heeft, zegt ook zelf waar je
+       bent. Een scherm dat met reden geen hoofdactie heeft, mag bij de titel
+       van het casco blijven. */
+    else if (s.velden.hoofdactie === 'ja' && !zelf((s.herkomst || {}).context)) {
+      uit.push(pad + ': heeft een eigen hoofdactie maar publiceert zijn context niet zelf (RTGAdaptief.context)');
+    }
     for (const [bron, a] of Object.entries(s.acties || {})) {
       if (a.geblokkeerdZonderWaarom) uit.push(pad + ': ' + a.geblokkeerdZonderWaarom + ' geblokkeerde handeling(en) zonder reden (' + bron + ')');
     }

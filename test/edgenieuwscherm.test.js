@@ -22,8 +22,9 @@
 
    DE MUTATIES, elk nagetrokken: haal in contractNieuw de hoofdactie-eis weg,
    de eis dat geblokkeerd een reden draagt, de eis dat een nieuw scherm gemeten
-   is, of de weigering van een doorverwijzing zonder reden (toets 2 zakt op alle
-   vier); laat de ratel de herkomst negeren (toets 4 zakt); en voeg een .html toe
+   is, de weigering van een doorverwijzing zonder reden, of de eis dat een
+   scherm met een eigen hoofdactie zijn context zelf publiceert (toets 2 zakt op
+   alle vijf); laat de ratel de herkomst negeren (toets 4 zakt); en voeg een .html toe
    onder public/apps zonder meting (toets 1 zakt). */
 'use strict';
 const test = require('node:test');
@@ -66,7 +67,17 @@ test('het contract kan zakken: een verzonnen nieuw scherm dat het niet haalt', (
   kopie.schermen[pad].herkomst = Object.assign({}, kopie.schermen[pad].herkomst, { hoofdactie: 'edge-padtabel' });
   assert.ok(schendingen(kopie, [pad]).some((x) => /wijst zelf geen hoofdactie aan/.test(x)));
   kopie.schermen[pad].herkomst.hoofdactie = 'scherm:data-hoofdactie';
+  /* Besluit 11: wie een eigen hoofdactie heeft, publiceert zijn context zelf;
+     de titel van het casco volstaat dan niet meer. */
+  kopie.schermen[pad].herkomst.context = 'edge-casco';
+  assert.ok(schendingen(kopie, [pad]).some((x) => /publiceert zijn context niet zelf/.test(x)));
+  kopie.schermen[pad].herkomst.context = 'scherm';
   assert.deepEqual(schendingen(kopie, [pad]), []);
+  kopie.schermen[pad].velden.hoofdactie = 'nvt';
+  kopie.schermen[pad].herkomst.context = 'edge-casco';
+  assert.deepEqual(schendingen(kopie, [pad]), [], 'zonder hoofdactie mag een scherm bij de titel van het casco blijven');
+  kopie.schermen[pad].velden.hoofdactie = 'ja';
+  kopie.schermen[pad].herkomst.context = 'scherm';
   /* Een nieuw scherm dat een lid doorstuurt, is niet gemeten -- ook als het
      naar een inlog gaat en onder zijn eigen rol wel een Edge zou hebben. */
   kopie.schermen['/apps/nieuw-kantoor-proef.html'] = { status: 'omgeleid', naar: '/apps/personeel.html' };

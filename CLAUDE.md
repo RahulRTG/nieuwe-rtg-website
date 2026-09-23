@@ -1558,7 +1558,13 @@ faalden de orb en `bewust` zonder lade open waar de balk en `zwaar` dichtgingen,
 en gold "compensatie is nooit Ongedaan maken" alleen bij het tonen en niet in de
 uitvoerder.
 **Een ingang die een handeling kan uitvoeren, gaat altijd langs
-`RTGGewicht.voer`** -- ook als hij alleen een id kent (`voerId`).
+`RTGGewicht.voer`** -- ook als hij alleen een id kent (`voerId`). De tweede ronde
+besluiten staan in par. 8 van EDGE.md: urgentie krijgt geen eigen schaal maar is
+de voorgrondtrede, voortzetting wordt eerst lokaal afgemaakt, een verzoek loopt
+via het domein en niet via een eigen verzoekobject, eerst de hoedanigheid in
+sessie en envelop en dan pas een rolwisselaar, het werkdeck gaat over het open
+werkstuk, en **een nieuw scherm met een eigen hoofdactie publiceert zijn context
+zelf** (`contractNieuw`).
 
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een

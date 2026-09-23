@@ -432,11 +432,13 @@ wordt getoond, hardop, en de teller moet dalen.
   staat: anders haalt het het contract zonder ooit onder zijn eigen rol gemeten
   te zijn. `test/edgenieuwscherm.test.js` houdt dat vast.
 
-  Eerlijk over wat de context-eis bewijst: vandaag alleen dat het casco een
-  titel heeft. Dat een nieuw scherm zijn context ook ZELF publiceert, via
-  `RTGAdaptief`, is een besluit en geen bouwtaak — het brengt het register naar
-  elk nieuw scherm. Tot dat besluit er is, staat het verschil in de kolom
-  hierboven en niet in het contract.
+  De context-eis is sinds besluit 11 tweeledig. Een nieuw scherm dat een eigen
+  hoofdactie aanwijst, heeft handelingen en publiceert zijn context ZELF, via
+  `RTGAdaptief.context()` (daarvoor laadt het `shared/adaptief.js`,
+  `adaptief/grammatica.js` en `adaptief/register.js`). Een scherm dat met reden
+  verklaart dat het geen hoofdactie heeft, mag bij de titel van het casco
+  blijven — daar bewijst de context-eis alleen dat er een titel is, en dat staat
+  er dan ook zo.
 - **Gewijzigde schermen worden niet slechter** — dat is dezelfde vergelijking
   per scherm als de eerste regel.
 - **De kaart loopt niet achter.** `npm run edgekaart:controle` zakt als de code
@@ -479,13 +481,48 @@ eerste twee, en ronde 3 sluit daarop aan.
 5. **De autoritatieve domein- en serverstand wint altijd.** De Edge duwt nooit
    staat terug naar een domein.
 
+**De tweede ronde besluiten, dezelfde dag**, over de zes punten die in par. 9
+een besluit vroegen. De eigenaar koos telkens de aanbevolen optie; ze staan hier
+met wat ze betekenen en wat ze uitsluiten.
+
+6. **Urgentie krijgt geen eigen schaal** (punt 9). Urgentie IS de voorgrondtrede
+   uit par. 4: "menselijke actie vereist" is wat het voorstel Required noemde,
+   veiligheid en kritieke toestand zijn Critical, de rest blijft rustig. De
+   standen van de Trust Rail (rustig, aandacht, bezig) blijven over TOESTAND gaan
+   en niet over voorrang. Er komen dus geen drie schalen voor één vraag.
+7. **Voortzetting wordt eerst lokaal afgemaakt** (punt 10 en 14). Ronde 4 zet
+   object, activiteit en selectie als VERWIJZING in de lokale momentopname, in
+   de vorm die later kan synchroniseren. Overdracht naar een ander apparaat en de
+   servervariant blijven dicht tot een apart besluit over privacy en
+   bewaartermijn; punt 14 is daarmee het enige punt dat nog een besluit vraagt.
+8. **Een verzoek loopt via het domein** (punt 17). De Edge roept de
+   verzoekfunctie van het domein aan (een tweede handtekening, een stuurvoorstel,
+   een zaak); er komt geen domeinoverstijgend verzoekobject. Een overzicht van
+   "wat wacht op mij" is een deck dat die domeinbronnen LEEST.
+9. **Eerst de hoedanigheid, dan pas een rolwisselaar** (punt 34). Hoedanigheid
+   wordt een veld van de sessie en van `kern/envelop.js` (een versiesprong van
+   een envelop die op acht velden gesloten is) voordat de Edge een wisselaar
+   krijgt. Een rolnaam tonen zonder dat de bevoegdheid meewisselt, komt er niet:
+   dat is de stille contextwissel die MN-02 verbiedt.
+10. **Het werkdeck gaat over het open werkstuk** (punt 21): het document, de
+    sheet of de presentatie waar je nu in staat. Office publiceert die context en
+    handelingen al, dus er komt geen werkobject naast.
+11. **Een nieuw scherm met handelingen publiceert zijn context zelf.** Wie een
+    eigen hoofdactie aanwijst, zegt via `RTGAdaptief.context()` ook waar je bent;
+    een scherm dat met reden verklaart dat het geen hoofdactie heeft (een lees- of
+    infoscherm), mag bij de titel van het casco blijven. Gehandhaafd:
+    `contractNieuw` in `scripts/edgedekking.js` en `test/edgenieuwscherm.test.js`.
+
+En de volgorde: **ronde 1 begint nu** (par. 10).
+
 ---
 
 ## 9. De vijftig punten van het voorstel, per stand
 
 Elk punt is ingedeeld met het bewijs in de code erbij, en met de ronde waarin hij
 thuishoort. Uitslag: **8 staan**, **32 zijn een stap weg**, **6 vragen een
-besluit** en **4 zijn jaren weg**. Dat het merendeel een stap weg is, is de
+besluit** en **4 zijn jaren weg** — en na de besluiten 6 tot en met 11 van
+par. 8 zijn er nog **37 een stap weg en vraagt er 1 een besluit** (punt 14). Dat het merendeel een stap weg is, is de
 uitkomst die het voorstel verdiende: de onderdelen bestaan bijna allemaal, onder
 een andere naam of in één domein, en het werk is aansluiten en niet uitvinden.
 
@@ -499,19 +536,19 @@ een andere naam of in één domein, en het werk is aansluiten en niet uitvinden.
 | 6 | Reason engine | stap weg | 3 | In de browser draagt elke verhindering een reden (en sinds deze ronde ook buiten de schil); aan de serverkant vijf vormen zonder gedeelde woorden. |
 | 7 | Live presence rail | stap weg | 4 | Presence is een label met één producent (de Ga verder-toets). De bronnen bestaan (livestaat van de rit, meet); de ordening wacht op de voorgrondresolver. |
 | 8 | Priority arbitration | stap weg | 3 | De volgorde staat als contract (par. 4); de resolver wacht op een tweede bron van lopende zaken. |
-| 9 | Urgency zonder manipulatie | besluit | 3 | Wordt urgentie een eigen schaal, of is het de voorgrondtrede zelf? Aanbeveling: geen nieuwe schaal -- drie schalen voor één vraag is de fout van INT-01. |
-| 10 | Continuity engine over apparaten | besluit | 4 | Besluit 1: nog niet via de server. De servervariant wacht op privacy en bewaartermijn. |
+| 9 | Urgency zonder manipulatie | stap weg | 3 | Besloten (par. 8, besluit 6): geen eigen schaal; urgentie is de voorgrondtrede. De resolver is ronde 3. |
+| 10 | Continuity engine over apparaten | stap weg | 4 | Besloten (besluit 7): eerst lokaal afmaken, in de vorm die later kan synchroniseren. |
 | 11 | Continuity snapshot | stap weg | 4 | Positie en veilige UI-staat worden per route bewaard (24 uur, met geheimenfilter); object, activiteit en selectie nog niet. |
 | 12 | Cross-app continuity | stap weg | 4 | Het objectprotocol tussen apps bestaat maar heeft nul producenten en draait alleen in de werkruimte. |
 | 13 | Task stack | stap weg | 4 | Nu is de context, Hierna de voortzetting; `LOPEND` kan vandaag niet voorkomen omdat het blikveld `loopt` nog niet doorgeeft. Later hoort in een domein, niet in de Edge. |
-| 14 | Handoff naar ander apparaat | besluit | 4 | Hetzelfde besluit als punt 10; een eenmalige RTG-code (LINK.md) omzeilt opslag maar moet tijdelijk en begrensd zijn. |
+| 14 | Handoff naar ander apparaat | besluit | 4 | Blijft dicht tot een apart besluit over privacy en bewaartermijn (besluit 7). Een eenmalige RTG-code (LINK.md) is de weg zonder opslag. |
 | 15 | Collaboration presence | stap weg | 4 | Office heeft echte aanwezigheid op codenamen; de Edge leest het nog niet als veld. Nooit namen buiten die context (besluit 2). |
 | 16 | People context | stap weg | 2 | "Gedeeld met N" staat in Bestanden en Office. Een telling in deze context, geen ranglijst van contacten. |
-| 17 | Request attention | besluit | 3 | Roept de Edge de verzoekcapability van het domein aan, of komt er een domeinoverstijgend verzoekobject? De meting wijst naar het eerste (0 gedeelde actoren over de ketens). |
+| 17 | Request attention | stap weg | 3 | Besloten (besluit 8): via de verzoekfunctie van het domein; "wat wacht op mij" is een deck dat domeinbronnen leest. |
 | 18 | Approval deck | stap weg | 3 | Bekijken, bewijs en goedkeuren bestaan per domein, met vier ogen. Het deck leest die bronnen; stuurvoorstellen leven in het procesgeheugen. |
 | 19 | Money deck | stap weg | 3 | Alle assen staan in het dossier van de geldketen, maar alleen voor de kantoorincasso. Geld verlaat het huis nooit vanzelf. |
 | 20 | Travel deck | stap weg | 2 | De reiswacht is al een eerlijke projectie; het deck leest die en krijgt geen eigen reisstaat. |
-| 21 | Work deck | besluit | 2 | Wat is het onderwerp: het werkstuk, de dienst, of het werkveld? Zonder die keuze wordt het een werkobject over domeinen die niets delen. |
+| 21 | Work deck | stap weg | 2 | Besloten (besluit 10): het open werkstuk; Office is de eerste producent. |
 | 22 | Meeting deck | stap weg | 4 | Meet bestaat als domein met een meeleesbaan; de Edge krijgt er alleen een compat-handeling van. |
 | 23 | Creation deck | stap weg | 2 | Document, Sheet en Present publiceren al context en handelingen; sinds deze ronde werken hun bewuste handelingen ook in het Edge-blad buiten de schil. |
 | 24 | Edge-handelingen als capabilities | stap weg | 1 | `RTGAdaptief` is al een capabilityregister; het tweede register (`registerAction`) loopt buiten gewicht en verhindering om. Ronde 1 leegt het. |
@@ -524,7 +561,7 @@ een andere naam of in één domein, en het werk is aansluiten en niet uitvinden.
 | 31 | Sync state | stap weg | 4 | Office kent opgeslagen, bezig en conflict -- afgeleid uit een ZIN met een reguliere expressie. De bron hoort de stand als woord te leveren. |
 | 32 | Trust Rail | stap weg | 3 | Werkt in de schil voor Office en Bestanden; identiteit, goedkeuring, transactie en herstel ontbreken als categorie. |
 | 33 | Identity awareness | stap weg | 2 | De vorm bestaat (`setIdentity`), niets vult hem. Alleen waar de context de identiteit al rechtmatig toont (besluit 2). |
-| 34 | Role switching | besluit | 3 | Wordt hoedanigheid een veld van sessie en envelop (een versiesprong) vóór de Edge een rolwisselaar krijgt? Anders wisselt hij een label en niet de bevoegdheid -- de stille contextwissel die MN-02 verbiedt. |
+| 34 | Role switching | stap weg | 3 | Besloten (besluit 9): eerst hoedanigheid in sessie en envelop, dan pas een wisselaar; nooit alleen een label (MN-02). |
 | 35 | Confidentiality indicator | staat | 3 | Strikt zet delen uit met reden en bron, en `mag()` weigert; niet alleen een grijze knop. |
 | 36 | Rahul context button | stap weg | 5 | "Wat kan hier" en "waarom niet" bestaan deterministisch; Rahul leest het blikveld nog niet, en alleen via een positieve veldenlijst (AI-CONTEXT-01). |
 | 37 | Rahul lens | jaren weg | 5 | Vraagt per domein een afwijkingscontract, een positieve veldenlijst naar een model en een gemeten trefzekerheid; geen van drie bestaat buiten de loonstrook. |
@@ -542,11 +579,11 @@ een andere naam of in één domein, en het werk is aansluiten en niet uitvinden.
 | 49 | Spatial expansion | staat | 1 | Van balk naar blad naar werkmodus bestaat, met dezelfde handelingen op elke trap -- in twee uitvoeringen. |
 | 50 | Edge als runtime surface | jaren weg | 6 | Als presentatieoppervlak is de Edge de som van ronde 1 tot 5. Als engine of autoriteit komt hij er niet: dat botst met grens 1 en besluit 5. |
 
-De zes besluiten (9, 10, 14, 17, 21, 34) zijn vragen aan de eigenaar en geen
-bouwtaken; bij 9, 17 en 21 staat de aanbeveling erbij en wijst de meting dezelfde
-kant op. Punt 10 en 14 wachten op hetzelfde besluit (de servervariant van
-voortzetting, besluit 1), en punt 34 is groter dan de Edge: hoedanigheid bestaat
-vandaag alleen in `kern/vertegenwoordiging/`.
+De zes punten die een besluit vroegen (9, 10, 14, 17, 21, 34) zijn op 23
+september 2026 beslist (par. 8, besluiten 6 tot en met 10). Alleen punt 14 blijft
+een besluit: overdracht tussen apparaten wacht op een eigen besluit over privacy
+en bewaartermijn. Punt 34 is groter dan de Edge: hoedanigheid bestaat vandaag
+alleen in `kern/vertegenwoordiging/`.
 
 ---
 

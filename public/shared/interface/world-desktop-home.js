@@ -8,7 +8,7 @@
       if (!r.ok) throw new Error('catalog-unavailable'); return r.json();
     }).then(function (catalog) {
       var all = catalog.apps, apps = all.filter(function (a) { return a.worlds.includes(world) &&
-        (world !== 'foundation' || a.world === 'foundation' || a.url.includes('pas=foundation') || a.url === '/apps/foundation/vrienden.html'); });
+        (world !== 'foundation' || a.world === 'foundation' || a.url.includes('pas=foundation')); });
       var root = U.el('div', 'wd-shell'), people = U.label(U.el('aside', 'wd-people'), 'people');
       var favorites = U.label(U.el('aside', 'wd-favorites'), 'favorites'), surface = U.el('section', 'wd-focus');
       var library = U.label(U.el('section', 'wd-library'), 'library'), announcement = U.el('p', 'wd-announcement');

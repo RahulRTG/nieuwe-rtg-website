@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-22T16:18:32.077Z",
-    "commit": "c5bdb7094",
+    "op": "2026-09-23T09:21:40.771Z",
+    "commit": "8c08db7",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -8541,6 +8541,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "stilleknoppen.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/veiligheid.js",
+      "operator": "return-weg#1",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
     "stillepost.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -9940,6 +9948,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/apps/werk/status.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "werktafel-lussen.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/command/bladstand.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1

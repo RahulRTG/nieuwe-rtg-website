@@ -15,10 +15,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1972 |
 | losse beweringen (`test(...)`) | 14070 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1324 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1326 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
-| alleen in de kop *genoemd*, nog niet gemeten | 169 |
+| alleen in de kop *genoemd*, nog niet gemeten | 167 |
 | niets van beide | 406 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -1970,7 +1970,7 @@ toets omvalt.
 | `spelteams.e2e.js` | 1 | gezakt op `liegpoort /api/` | TEAMS IN EEN ECHTE BROWSER. De serverkant is los nagemeten (test/spelteams.test.js). |
 | `sprong.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE SPRONG: via Edge naar elke functie, vanaf elk scherm. Deze toets bewaakt de belofte die scripts/tikken.js meet. |
 | `staff-account-scherm.e2e.js` | 1 | -- | De leverancierdeur in een echte browser: productie-UI vraagt geen viercijferige staff-PIN en het hoofdformulier belt uitsluitend aan bij de persoonlijke RTG-accountingang. De server draait in Magnaat Test zodat een... |
-| `stilleknoppen.e2e.js` | 1 | genoemd | KNOPPEN DIE NIETS DEDEN EN NIETS ZEIDEN. Een kruipronde over alle 310 schermen onder public/apps (elke zichtbare knop aangetikt als lid, op telefoonformaat) vond een terugkerend patroon: een knop die bij een leeg... |
+| `stilleknoppen.e2e.js` | 1 | gezakt op `return-weg#1` | KNOPPEN DIE NIETS DEDEN EN NIETS ZEIDEN. Een kruipronde over alle 310 schermen onder public/apps (elke zichtbare knop aangetikt als lid, op telefoonformaat) vond een terugkerend patroon: een knop die bij een leeg... |
 | `storyline-worlds.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `taalkast.e2e.js` | 1 | gezakt op `liegpoort /api/` | WAT DE 114 TALEN KOSTTEN, EN WAAROM DAT NIET MEER ZO IS. De automatische vertaallaag bewaarde zijn vertalingen in een Map in de scope van de pagina. |
 | `tijdlijn-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/tijdlijn.html. De belofte van dit scherm is dat het NIETS verzint: wat er staat komt uit een laag die het lid al had, en er wordt geen verband en geen score bij verzonnen. |
@@ -2003,7 +2003,7 @@ toets omvalt.
 | `werkscherm.e2e.js` | 3 | -- | Het Werk OS-scherm in een echte browser: /apps/werk.html. Drie beweringen die van buiten NIET te zien zijn aan een groene API-toets: 1. |
 | `werkschermen.e2e.js` | 4 | -- | DE WERKSCHERMEN: WIE ZIT ER ACHTER, EN WAT MAG DIE ZIEN. De laatste grote groep uit TAKEN 4.9. |
 | `werkstatus.e2e.js` | 1 | gezakt op `===->!==#0` | DE ORGANISATIESTAND OP EEN ECHT SCHERM -- en vooral wat er NIET staat. De bewijspoort (kern/tenant/bewijs.js) maakte van elke enterprisebewering een object met een bron of een reden. |
-| `werktafel-lussen.e2e.js` | 1 | genoemd | DE LUSSEN VAN DE WERKTAFEL OP EEN TELEFOON: een wereld openen, erin rondgaan, en weer terugkomen -- met de knoppen die een mens werkelijk gebruikt. Vier fouten die samen het gevoel gaven dat je "niet fatsoenlijk door... |
+| `werktafel-lussen.e2e.js` | 1 | gezakt op `===->!==#0` | DE LUSSEN VAN DE WERKTAFEL OP EEN TELEFOON: een wereld openen, erin rondgaan, en weer terugkomen -- met de knoppen die een mens werkelijk gebruikt. Vier fouten die samen het gevoel gaven dat je "niet fatsoenlijk door... |
 | `werktafel.e2e.js` | 4 | genoemd | DE WERKTAFEL: wanneer hij er WEL mag staan, en wanneer niet. Deze toets bestaat om twee fouten die alleen op een breed venster bestonden, en die daarom niemand zag: de app wordt op een telefoon ontwikkeld en op een... |
 | `winkel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE WINKEL VAN DE RTFOUNDATION (/apps/foundation/winkel.html) IN EEN ECHTE BROWSER. kern/rtfos/winkel.js draagt vier grendels en test/rtfos-gift-ruil-routes.test.js beproeft ze over de draad: geen voorraad geen... |
 | `world-dashboard.e2e.js` | 1 | -- | DE VIER WERELDHOMES ZIJN HUN EIGEN DASHBOARD. Deze proef bewaakt de grens die bij de nieuwe schil het makkelijkst weer vervaagt: de gedeelde laag mag de echte Living-, Work-, Travel- en Foundation-DOM alleen opmaken. |

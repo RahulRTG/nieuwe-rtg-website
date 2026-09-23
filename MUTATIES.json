@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T17:01:03.374Z",
-    "commit": "8917766e",
+    "op": "2026-09-23T18:36:26.838Z",
+    "commit": "6346577f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2571,6 +2571,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "edgeregister-leeg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-adaptive-edge-core.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "eenaccount-werkruimte.test.js": {
       "soort": "server",

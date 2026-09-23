@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1992 bestanden en 14193 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1993 bestanden en 14206 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1992 |
-| losse beweringen (`test(...)`) | 14193 |
+| toetsbestanden | 1993 |
+| losse beweringen (`test(...)`) | 14206 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1346 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1347 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
 | alleen in de kop *genoemd*, nog niet gemeten | 169 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1744 bestanden, 13756 beweringen.
+1745 bestanden, 13769 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -369,9 +369,10 @@ toets omvalt.
 | `economische-boeking-isolatie.test.js` | 1 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `edge-system.test.js` | 7 | gezakt op `return-weg#0` | Het gedeelde interactieve randenstelsel van WorkOS, TravelOS, LivingOS en RTFoundation. Deze toets bewaakt de dunne geometrie, eigen wereldpaletten, volledige functieroutes, echte bediening en de maximaal vier... |
 | `edgeactiestaat.test.js` | 8 | gezakt op `===->!==#0` | HET ACTIECONTRACT VAN DE EDGE, over ALLE combinaties en niet over drie voorbeelden. shared/edge/actiestaat.js zet een handeling in een van vier standen (AFWEZIG, GEBLOKKEERD, BESCHIKBAAR, LOPEND). |
-| `edgeblikveld.test.js` | 12 | gezakt op `===->!==#0` | HET EDGE BLIKVELD IS EEN PROJECTIE EN GEEN BRON. shared/edge/blikveld.js leest wat de Edge van de werkelijkheid ziet. |
+| `edgeblikveld.test.js` | 14 | gezakt op `===->!==#0` | HET EDGE BLIKVELD IS EEN PROJECTIE EN GEEN BRON. shared/edge/blikveld.js leest wat de Edge van de werkelijkheid ziet. |
 | `edgecontext.test.js` | 3 | gezakt op `+->-#0` | DE CONTEXT DIE DE EDGE LEEST: wat er bij kwam, en een oud gebrek in de sleutel. Ronde 0 van EDGE.md voegt geen derde contextmodel toe; hij breidt het ENE uit dat er al was (shared/adaptief/register.js,... |
-| `edgekaart.test.js` | 4 | gezakt op `===->!==#0` | DE EDGEKAART LOOPT NIET ACHTER, EN ZE KAN ZAKKEN (EDGE.md par. 0 en 7). |
+| `edgedekking-zelf.test.js` | 8 | gezakt op `>=->>#0` | WAT TELT ALS "HET SCHERM ZEGT HET ZELF" -- EEN GESLOTEN LIJST PER VELD. scripts/edgedekking.js telt per veld niet alleen of er een waarde is, maar ook of het SCHERM die zelf leverde. |
+| `edgekaart.test.js` | 7 | gezakt op `===->!==#0` | DE EDGEKAART LOOPT NIET ACHTER, EN ZE KAN ZAKKEN (EDGE.md par. 0 en 7). |
 | `edgenieuwscherm.test.js` | 4 | gezakt op `!==->===#0` | EEN NIEUW SCHERM KRIJGT HET HARDE EDGE-CONTRACT (EDGE.md par. 7, besluit 4). |
 | `eenaccount-werkruimte.test.js` | 3 | gezakt op `liegpoort /api/` | Een inlog voor alles -- ook voor het RTG Werk OS. WAT HIER OP HET SPEL STAAT. |
 | `eenaccount.test.js` | 9 | gezakt op `liegpoort /api/` | Een account voor alles: mensen registreren zich EEN keer; personeel, zaak en kantoor zijn daarna koppelingen aan dat ene account (na bewijs van de bestaande werk-inlog) en accStart munt exact dezelfde sessies als de... |

@@ -52,8 +52,7 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
   const kijk = () => eigen.kijk('beleidsmotor');
   const spoeler = require('../kantoor/mensdeur-spoel').maakSpoeler({
     bak, save, bewerkCollectie, collectie: 'beleidsmotor', maxPaden: MAX_SLEUTELS, velden: VELDEN });
-  /* Fase 8, besluit van de eigenaar: per zetel alleen de laatste gebruiksdatum
-     (./slapend.js). Geen route, geen tijdstip, geen aantal. */
+  /* Fase 8: per zetel alleen de laatste gebruiksdatum (./slapend.js). */
   const slapend = require('./slapend').maakSlapend({ bak: () => eigen.bak('zetelGebruik'),
     kijk: () => eigen.kijk('zetelGebruik'), save, bewerkCollectie, nu: tijd });
   const ZETEL_VAN_DEUR = { kantoor: 'kantoorrol', 'op-naam': 'kantoorrol', boardroom: 'boardroom', balie: 'balie' };
@@ -87,8 +86,7 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
           const key = boardroomWie(req);
           if (key) slapend.noteer(key, ZETEL_VAN_DEUR[deur]);
         }
-        /* FASE 4 in de schaduw: welk werkwoord van de boardroom, en welke kamer,
-           werd gebruikt. Zonder wie; de sleutels zijn begrensd (./werkwoorden.js). */
+        /* Fase 4: welk werkwoord en welke kamer, zonder wie (./werkwoorden.js). */
         if (door && deur === 'boardroom') spoeler.tikVeld('werkwoord ' + (werkwoordVan(req.routePatroon) || '(geen)'), 'gebruik');
         const kamer = door && deur === 'kantoor' ? kamerVan(patroon(req), req.body) : null;
         if (kamer) spoeler.tikVeld('kamer ' + kamer, 'gebruik');
@@ -126,17 +124,15 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     next();
   }
 
-  /* EEN LUISTERAAR PER VERZOEK, hoeveel poorten er ook meelopen. Elke poort en
-     de meelezer hingen eerst een eigen 'finish' aan het antwoord, en achter
-     twee gewikkelde poorten plus de bestaande metingen ging dat over de tien
-     (MaxListenersExceededWarning in de schermtoetsen). Nu verzamelt het verzoek
-     het werk, en voert een enkele luisteraar het uit; een meting raakt nooit
-     het antwoord. */
+  /* EEN LUISTERAAR PER VERZOEK, op 'close': een kantoorroute draagt al tien
+     finish-luisteraars van andere lagen, en de elfde gaf een MaxListeners-
+     waarschuwing. Alleen een afgerond antwoord telt (writableFinished). */
   function naAfloop(req, res, werk) {
     if (!req || !res || typeof res.once !== 'function') return;
     if (!req.beleidsWerk) {
       req.beleidsWerk = [];
-      res.once('finish', () => {
+      res.once('close', () => {
+        if (res.writableFinished === false) return;
         for (const w of req.beleidsWerk) { try { w(); } catch (e) { /* een meting raakt geen antwoord */ } }
       });
     }

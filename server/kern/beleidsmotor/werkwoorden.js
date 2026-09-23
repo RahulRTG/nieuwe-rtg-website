@@ -23,8 +23,8 @@
    (boardroom). test/beleidsmotor-werkwoorden.test.js zakt zodra een
    boardroomroute onder geen enkel werkwoord valt. */
 const WERKWOORDEN = Object.freeze({
-  toegang: { trede: 'uitvoeren', uitleg: 'wie mag de boardroom en de balie in, en wat de deuren zouden besluiten',
-    voorvoegsels: ['/api/office/boardroom/toegang', '/api/office/balie/', '/api/office/beleidsmotor', '/api/office/mensdeur', '/api/office/ledenregister'] },
+  toegang: { trede: 'uitvoeren', uitleg: 'wie mag het kantoor, de boardroom en de balie in, en wat de deuren zouden besluiten',
+    voorvoegsels: ['/api/office/boardroom/toegang', '/api/office/balie/', '/api/office/beleidsmotor', '/api/office/mensdeur', '/api/office/ledenregister', '/api/office/kantoor/'] },
   kosten: { trede: 'uitvoeren', uitleg: 'kostprijs, tarieven, perioden sluiten en een rekening vrijgeven (KOSTEN.md)',
     voorvoegsels: ['/api/office/kosten/'] },
   geld: { trede: 'uitvoeren', uitleg: 'prijzen, commissie, de bank, voornemens tekenen en de economische werelden',

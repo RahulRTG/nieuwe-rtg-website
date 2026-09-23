@@ -130,12 +130,13 @@ test('5. A3 slaat uit: een kantoorroute zonder bekende poort wordt geteld, de re
   const { maakBeleidsmotor } = require('../server/kern/beleidsmotor');
   const m = maakBeleidsmotor({ db: { data: {} }, save: () => {}, sessionFor: () => null, accounts: {}, eigenaar: {},
     boardroomWie: () => null, magBoardroom: () => false, balieBron: () => () => false });
-  const loop = (patroon, status, poorten, method) => {
+  const loop = (patroon, status, poorten, method, afgebroken) => {
     const req = { method: method || 'POST', routePatroon: patroon, beleidsPoorten: poorten };
-    const res = new EventEmitter(); res.statusCode = status;
+    const res = new EventEmitter(); res.statusCode = status; res.writableFinished = !afgebroken;
     m.meelezer(req, res, () => {});
-    res.emit('finish');
+    res.emit('close');
   };
+  loop('/api/office/zonder-slot', 200, undefined, 'POST', true);   // afgebroken: telt niet
   loop('/api/office/zonder-slot', 200);
   loop('/api/office/zonder-slot', 400);
   loop('/api/office/met-slot', 200, ['kantoor']);

@@ -55,7 +55,7 @@ test('de scan ziet een omweg, en ziet vasthouden niet als omweg', () => {
     'een eigen mousePressed hoort een omweg te zijn');
   assert.equal(omwegen("send({ type: 'touchStart' }); send({ type: 'touchMove' }); send({ type: 'touchEnd' });").length, 1,
     'een touchStart met een touchMove erachter hoort een omweg te zijn');
-  assert.deepEqual(omwegen('await page.mouse.move(1,2);\nawait page.mouse.down();\nawait page.waitForTimeout(150);\nawait page.mouse.up();\nawait page.mouse.move(5,6);'), [],
+  assert.deepEqual(omwegen('await page.mouse.move(1,2);\nawait page.mouse.down();\nawait page.waitForFunction(klaar);\nawait page.mouse.up();\nawait page.mouse.move(5,6);'), [],
     'vasthouden zonder bewegen, en erheen gaan, is geen omweg');
   assert.deepEqual(omwegen("send({ type: 'touchStart' }); wacht(); send({ type: 'touchEnd' });"), [],
     'een vinger die blijft liggen is geen omweg');

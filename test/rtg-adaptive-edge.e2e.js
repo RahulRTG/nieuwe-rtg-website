@@ -276,7 +276,14 @@ test('Edge voert appbediening uit, controleert actuele beschikbaarheid en sluit 
    DE MUTATIES, elk nagetrokken: haal de versheidsvraag weg (de flikkertoets zakt
    op peek), eis de gebaarversheid ook zonder Edge 2 (de landing krijgt geen peek
    meer), en zet de klok van 520 op 520000 (het wiel komt nooit op dock). */
-async function volgBalk(page, doe, ms) {
+/* WACHTEN OP DE TOESTAND, NIET OP DE KLOK (test/klokwacht.test.js). De proef
+   stopt zodra zijn uitkomst er is: 'peekDock' als de balk via peek op dock
+   staat, 'peek' als er een peek was en de pagina voorbij 100 px kwam, en 'rust'
+   als scroll en balkstand dertig frames stil liggen -- dat laatste is het venster
+   waarin een flikkering zich zou verraden, geteld in frames in plaats van ms. Een
+   grens van vijf seconden houdt de lus eindig; de bewering daarna zegt wat er
+   ontbrak. */
+async function volgBalk(page, doe, klaar) {
   /* Eerst de waarnemers, dan de handeling: een wiel dat vertrekt voordat de
      waarnemer hangt, wordt anders niet gezien. */
   await page.evaluate(() => {
@@ -294,13 +301,24 @@ async function volgBalk(page, doe, ms) {
   });
   if (doe === 'scrollTo') await page.evaluate(() => window.scrollTo(0, 900));
   else await doe();
-  return page.evaluate(async duur => {
-    await new Promise(r => setTimeout(r, duur));
-    const p = window.__balkProef;
+  return page.evaluate(async soort => {
+    const p = window.__balkProef, t0 = performance.now();
+    let stil = 0, y = window.scrollY, n = p.standen.length;
+    while (performance.now() - t0 < 5000) {
+      await new Promise(r => requestAnimationFrame(r));
+      const laatste = p.standen[p.standen.length - 1];
+      if (soort === 'peekDock' && p.standen.includes('peek') && laatste === 'dock') break;
+      if (soort === 'peek' && p.standen.includes('peek') && p.hoogste > 100) break;
+      if (soort === 'rust') {
+        if (window.scrollY === y && p.standen.length === n) stil++;
+        else { stil = 0; y = window.scrollY; n = p.standen.length; }
+        if (stil >= 30) break;
+      }
+    }
     p.loopt = false; p.waarnemer.disconnect(); removeEventListener('scroll', p.scrol, { capture: true }); p.noteer();
     return { standen: p.standen, y: p.hoogste, edge2: !!window.RTGEdge2,
       edge2Stand: document.body.getAttribute('data-rtg-edge-2-state') };
-  }, ms);
+  }, klaar);
 }
 
 test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zoals voorheen',
@@ -334,7 +352,7 @@ test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zo
       const page = await edge2Pagina(st, '/apps/reisboek.html');
       if (!page) return;
       try {
-        const m = await volgBalk(page, 'scrollTo', 900);
+        const m = await volgBalk(page, 'scrollTo', 'rust');
         assert.equal(m.edge2, true, 'op reisboek hoort Edge 2 te draaien');
         assert.ok(m.y > 50, 'de pagina scrolde niet (' + m.y + '); dan meet deze proef niets');
         assert.deepEqual(m.standen, ['dock'], 'de balk flikkerde bij een scroll van de software: ' + m.standen.join(' > '));
@@ -346,7 +364,7 @@ test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zo
       if (!page) return;
       try {
         await page.mouse.move(195, 420);
-        const m = await volgBalk(page, () => page.mouse.wheel(0, 700), 1400);
+        const m = await volgBalk(page, () => page.mouse.wheel(0, 700), 'peekDock');
         assert.equal(m.edge2, true, 'op reizen hoort Edge 2 te draaien');
         assert.ok(m.y > 50, 'het wiel scrolde de pagina niet (hoogste ' + m.y + '; ' + m.standen.join(' > ') + ')');
         assert.ok(m.standen.includes('peek'), 'een wiel gaf geen peek: ' + m.standen.join(' > '));
@@ -363,7 +381,7 @@ test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zo
         await page.waitForSelector('.rtg-experience-edge .rtg-adaptive-bar');
         await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState === 'dock');
         await page.mouse.move(195, 420);
-        const m = await volgBalk(page, () => page.mouse.wheel(0, 700), 700);
+        const m = await volgBalk(page, () => page.mouse.wheel(0, 700), 'peek');
         assert.equal(m.edge2, false, 'de landing hoort zonder Edge 2 te draaien; dan meet deze proef de verkeerde weg');
         assert.ok(m.y > 100, 'het wiel scrolde de landing niet (' + m.y + ')');
         assert.ok(m.standen.includes('peek'), 'een wiel op de landing gaf geen peek: ' + m.standen.join(' > '));

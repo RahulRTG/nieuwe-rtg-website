@@ -183,7 +183,6 @@ test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op 
    deze proef zet het bord in een frame op dezelfde oorsprong, zoals de werktafel
    een blad opent, en drukt lang op een kaart. Eerst het gebaar en daarna de
    oorzaak: zakt hij, dan zegt de eerste bewering WAT er misgaat. */
-const gram = require('../public/shared/adaptief/grammatica.js');
 
 test('als blad in een frame: lang drukken op een notitie opent de actielade, met de grammatica die de laag zelf meebrengt',
   { skip: geenBrowser(pw) }, async () => {
@@ -231,10 +230,10 @@ test('als blad in een frame: lang drukken op een notitie opent de actielade, met
     const b = await kaart.boundingBox();
     await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
     await page.mouse.down();
-    await page.waitForTimeout(2 * gram.DREMPELS.lang);
-    await page.mouse.up();
+    /* Vasthouden tot de lade open is, niet een vaste tijd (test/klokwacht.test.js). */
     await frame.waitForFunction(() => { const d = document.querySelector('dialog.gb-blad'); return !!(d && d.open); },
       null, { timeout: 5000 }).catch(() => {});
+    await page.mouse.up();
     assert.equal(await frame.evaluate(() => !!(document.querySelector('dialog.gb-blad') || {}).open), true,
       'lang drukken op een kaart in een blad hoort de actielade te openen');
     assert.deepEqual(await frame.evaluate(() => ({

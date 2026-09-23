@@ -243,14 +243,14 @@ function contractNieuw(reg, opSchijf) {
    als capability in de acties staat: de controls verhuizen de echte knop al, en
    een gedeclareerde kopie zou een tweede bron en een dubbele knop in het blad
    zijn. Bij de eerste meting (23 september 2026) stonden er 51 schermen onder;
-   Bestanden is de eerste portie. */
+   Bestanden is de eerste portie, en Comm spreekt zelf sinds het sociaal-spoor
+   (stap 16). */
 const CONTEXT_SCHULD = Object.freeze([
   '/apps/agenda.html',
   '/apps/avond.html',
   '/apps/belastingkantoor.html',
   '/apps/browser.html',
   '/apps/clips.html',
-  '/apps/comm.html',
   '/apps/concern.html',
   '/apps/defensie.html',
   '/apps/foundation/club.html',

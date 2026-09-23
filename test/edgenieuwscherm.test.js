@@ -110,7 +110,7 @@ test('de basislijn en de schermen lopen niet uit elkaar', () => {
 /* De schuldlijst mag alleen krimpen: dit getal gaat omlaag bij elke portie, en
    nooit omhoog. Een scherm dat er weer bij moet, is een achteruitgang en geen
    aanpassing van dit getal. */
-const SCHULD_MAX = 50;
+const SCHULD_MAX = 49;
 
 test('elk bestaand scherm met een eigen hoofdactie spreekt zijn context zelf, of staat op de schuldlijst', () => {
   const reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));

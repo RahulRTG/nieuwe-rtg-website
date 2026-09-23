@@ -515,11 +515,24 @@ wordt getoond, hardop, en de teller moet dalen.
 - **De kaart loopt niet achter.** `npm run edgekaart:controle` zakt als de code
   iets anders zegt dan het register, en elk citaat moet letterlijk staan;
   `test/edgekaart.test.js` doet hetzelfde in de gewone suite.
-- **Normtanden** (`NORM.json`): twaalf tanden. `edgeGeblokkeerdZonderWaarom` hoort op nul
+- **Normtanden** (`NORM.json`): dertien tanden. `edgeGeblokkeerdZonderWaarom` hoort op nul
   te staan en mag alleen dalen; `edgeDubbeleEigenaars` en `rtgDodeKanalen` zijn
   schulden en mogen alleen dalen; en per veld een tand die alleen mag stijgen
   (`edgeVeldIdentiteit` tot en met `edgeVeldTrust`). Negen veldtanden en geen
   som, om dezelfde reden als in par. 0.
+
+  De dertiende is `edgeVeldContextZelf` (ronde 2, stap 6), en die telt de
+  schermen die hun context ZELF publiceren in plaats van de `ja`'s. Hij mag
+  alleen stijgen, en hij is met opzet **geen CI-handhaver**: de browsermeter
+  draait niet in CI, dus het getal beweegt alleen als iemand `npm run
+  edgedekking` draait en het register incheckt. Een scherm dat zijn eigen
+  context kwijtraakt, houdt `achteruitgang()` al per scherm tegen. De tand bijt
+  pas na een bewuste `--aanvaard`, en maakt van die daling dan een besluit met
+  reden in `NORM.json` — in plaats van een regel in `aanvaardAchteruit` die bij
+  de volgende meting verdwijnt. Die val is echt: zet de context van
+  `reizen-veilig` van `scherm` naar `edge-casco` en `edgeVeldContext` blijft
+  staan, want het blijft `ja`. Er komen geen zelf-tanden voor object en
+  activiteit: die staan op nul en kunnen in ronde 2 niet zakken.
 
 Wat er met opzet **nog niet** is: een strengere eis voor nieuwe kritieke
 mutaties dan voor schermen die alleen lezen (besluit 4). Dat vraagt een indeling

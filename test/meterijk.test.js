@@ -971,7 +971,7 @@ const IJKINGEN = {
       } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
     }
   },
-  /* DE EDGE (EDGE.md par. 7). Twaalf tanden op twee registers, allemaal met
+  /* DE EDGE (EDGE.md par. 7). Dertien tanden op twee registers, allemaal met
      dezelfde proef (edgeIjking hieronder): een tijdelijk register met een
      bekende waarde, dan een met een VERSCHOVEN waarde, en de lezer hoort exact
      mee te bewegen -- en een register zonder het getal hoort een fout te geven
@@ -983,6 +983,10 @@ const IJKINGEN = {
   edgeVeldIdentiteit: { proef: () => edgeIjking('EDGEDEKKING.json', 'identiteit') },
   edgeVeldWereld: { proef: () => edgeIjking('EDGEDEKKING.json', 'wereld') },
   edgeVeldContext: { proef: () => edgeIjking('EDGEDEKKING.json', 'context') },
+  /* De zelf-tand leest `zelf` en niet `ja`: in het nagemaakte register staan
+     die twee met opzet op verschillende getallen, zodat een lezer die `ja`
+     leest niet meebeweegt en de ijking zakt. */
+  edgeVeldContextZelf: { proef: () => edgeIjking('EDGEDEKKING.json', 'context', 'zelf') },
   edgeVeldObject: { proef: () => edgeIjking('EDGEDEKKING.json', 'object') },
   edgeVeldActiviteit: { proef: () => edgeIjking('EDGEDEKKING.json', 'activiteit') },
   edgeVeldPresence: { proef: () => edgeIjking('EDGEDEKKING.json', 'presence') },
@@ -2285,11 +2289,11 @@ const IJKINGEN = {
    niet bij JSON, want dan is het geen geldige JSON meer en leest de meter niets
    -- en een meter die niets leest, beweegt ook niet, waardoor de ijking zou
    slagen om de verkeerde reden. */
-/* De proef achter de twaalf Edge-tanden. Het register wordt in een tijdelijke
+/* De proef achter de dertien Edge-tanden. Het register wordt in een tijdelijke
    map nagemaakt in precies de vorm die scripts/edgekaart.js en
    scripts/edgedekking.js schrijven, zodat de ijking niet de echte meting (die
    een browser vraagt) hoeft te draaien. */
-function edgeIjking(bestand, wat) {
+function edgeIjking(bestand, wat, teller) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-edge-ijk-'));
   const pad = path.join(dir, bestand);
   const maak = (n) => {
@@ -2297,17 +2301,24 @@ function edgeIjking(bestand, wat) {
     if (wat === 'geblokkeerdZonderWaarom') {
       return { telling: { acties: { RTGAdaptief: { geblokkeerdZonderWaarom: n }, 'edge-compat': { geblokkeerdZonderWaarom: 1 } } } };
     }
+    if (teller === 'zelf') return { telling: { perVeld: { [wat]: { ja: 20, zelf: n, nee: 3, nvt: 0 } } } };
     return { telling: { perVeld: { [wat]: { ja: n, nee: 3, nvt: 0 } } } };
   };
   try {
     fs.writeFileSync(pad, JSON.stringify(maak(4)));
-    const voor = norm.leesEdge(pad, wat);
+    const voor = norm.leesEdge(pad, wat, teller);
     fs.writeFileSync(pad, JSON.stringify(maak(9)));
-    const na = norm.leesEdge(pad, wat);
+    const na = norm.leesEdge(pad, wat, teller);
     assert.equal(na - voor, 5, 'de lezer hoort exact mee te bewegen met ' + wat);
     fs.writeFileSync(pad, JSON.stringify({ telling: {} }));
-    assert.throws(() => norm.leesEdge(pad, wat), new RegExp(wat), 'een ontbrekend getal levert geen nul maar een fout');
-    assert.throws(() => norm.leesEdge(path.join(dir, 'weg.json'), wat), /ontbreekt/);
+    assert.throws(() => norm.leesEdge(pad, wat, teller), new RegExp(wat), 'een ontbrekend getal levert geen nul maar een fout');
+    if (teller) {
+      /* Een register van voor de zelf-telling (alleen `ja`) is geen nul maar
+         een meting die dit getal niet draagt. */
+      fs.writeFileSync(pad, JSON.stringify({ telling: { perVeld: { [wat]: { ja: 20, nee: 3 } } } }));
+      assert.throws(() => norm.leesEdge(pad, wat, teller), new RegExp(teller), 'een register zonder ' + teller + ' levert geen nul maar een fout');
+    }
+    assert.throws(() => norm.leesEdge(path.join(dir, 'weg.json'), wat, teller), /ontbreekt/);
     return na - voor;
   } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
 }

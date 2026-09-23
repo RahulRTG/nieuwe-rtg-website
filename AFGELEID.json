@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-22T17:33:16.891Z",
-  "commit": "33e75309",
+  "op": "2026-09-23T10:38:42.408Z",
+  "commit": "15574cb",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 304,
+  "artefacten": 307,
   "bron": 7,
-  "afgeleid": 169,
-  "fragmenten": 22,
+  "afgeleid": 171,
+  "fragmenten": 23,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 190,
-  "afgeleidEigenaarHard": 167,
+  "metEigenaar": 193,
+  "afgeleidEigenaarHard": 169,
   "afgeleidGrendelt": 18,
-  "metStempel": 98,
+  "metStempel": 100,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -847,6 +847,46 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EDGE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EDGEDEKKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/edgedekking.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/edgedekking.js"
+   ],
+   "stempelInstrument": "scripts/edgedekking.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run edgedekking",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EDGEKAART.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/edgekaart.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/edgekaart.js"
+   ],
+   "stempelInstrument": "scripts/edgekaart.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run edgekaart",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {

@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 151,
+    "ratelTanden": 152,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -145,7 +145,8 @@
     "edgeVeldPresence": 0,
     "edgeVeldVoortzetting": 0,
     "edgeVeldHoofdactie": 58,
-    "edgeVeldTrust": 0
+    "edgeVeldTrust": 0,
+    "edgeVeldContextZelf": 1
   },
   "notities": [
     {
@@ -2942,7 +2943,8 @@
     "edgeVeldPresence": "2026-09-23",
     "edgeVeldVoortzetting": "2026-09-23",
     "edgeVeldHoofdactie": "2026-09-23",
-    "edgeVeldTrust": "2026-09-23"
+    "edgeVeldTrust": "2026-09-23",
+    "edgeVeldContextZelf": "2026-09-23"
   },
   "uitzonderingen": [
     {

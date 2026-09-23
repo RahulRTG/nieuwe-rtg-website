@@ -14,6 +14,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
+const gram = require('../public/shared/adaptief/grammatica.js');
 
 const pw = laadPlaywright();
 /* Waar de browser NIET op de plek staat die het pakket verwacht (een
@@ -256,6 +257,9 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
       'doorvegen mag een onomkeerbare actie niet uitvoeren -- daar is borg voor');
 
     // 3. hij gebeurt wel, maar pas na twee drukken op de echte knop
+    /* Scherp vervalt na DREMPELS.herbevestig, en zonder tabel gaat hij niet op
+       scherp: dus eerst de tabel, die zacht meekomt met RTGGebaar.zet(). */
+    await page.waitForFunction(() => !!window.RTGGrammatica, null, { timeout: 10000 });
     await page.evaluate(() => document.querySelector('.proefrij').focus());
     await page.keyboard.press('ArrowRight');
     await wachtOpRust(page);
@@ -267,6 +271,18 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
     assert.deepEqual(await page.evaluate(() => window.__log), [],
       'de eerste druk zet hem op scherp en voert nog niets uit');
     assert.ok(await knop.getAttribute('data-scherp') !== null, 'op scherp hoort zichtbaar te zijn');
+    /* SCHERP VERVALT (ronde 2, stap 10), zoals de tweede weg van vasthoud.js:
+       "vier seconden geldig". Een borg die daarna nog op scherp stond, voerde uit
+       op een druk die er niets meer mee te maken had. Hier wordt gewacht op de
+       TIJD, want die is het gedrag -- en de tijd komt uit de tabel. */
+    await page.waitForTimeout(gram.DREMPELS.herbevestig + 500);
+    assert.equal(await knop.getAttribute('data-scherp'), null,
+      'na DREMPELS.herbevestig (' + gram.DREMPELS.herbevestig + ' ms) hoort scherp vervallen te zijn');
+    await knop.press('Enter');
+    await wachtOpRust(page);
+    assert.deepEqual(await page.evaluate(() => window.__log), [],
+      'een druk na het vervallen hoort NIET uit te voeren, alleen opnieuw scherp te zetten');
+    assert.ok(await knop.getAttribute('data-scherp') !== null, 'en dan staat hij weer op scherp');
     await knop.press('Enter');
     await wachtOpRust(page);
     assert.deepEqual(await page.evaluate(() => window.__log), ['verwijderd'],
@@ -293,12 +309,11 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
    requestAnimationFrame, dus korter dan een frame zegt niets); lang ligt ruim
    boven de hoogste vasthoudtijd. Zo blijven ze geldig als lang drukken naar
    DREMPELS gaat en als de borg in ronde 3 naar het gewicht verhuist (besluit
-   K-borg, EDGE.md par. 8).
+   K-borg van 23 september 2026).
 
    De borg komt hier uit de LAAG en niet uit een vlag: een serveractie zonder weg
    terug wordt vanzelf een borg (gebaar-04c.js), en dat is precies het pad van
    Weggooien op het bord. */
-const gram = require('../public/shared/adaptief/grammatica.js');
 const KORT = 150;
 const LANG_BORG = 2 * Math.max(...Object.values(gram.VASTHOUD));
 const LANG_DRUK = 2 * gram.DREMPELS.lang;
@@ -316,6 +331,10 @@ async function proefBorg(page) {
     });
   });
   await page.waitForSelector('.proefrij.gb-rij', { timeout: 5000 });
+  /* Lang drukken leest zijn tijd uit de grammatica, en die komt zacht mee met de
+     eerste zet() (gebaar-01.js). Zonder tabel is lang drukken uit; dan meet de
+     proef een laag die er zo niet hoort te staan. */
+  await page.waitForFunction(() => !!window.RTGGrammatica, null, { timeout: 10000 });
 }
 
 /* De borgknop in de actielade. Geopend langs de deur van de laag en niet langs

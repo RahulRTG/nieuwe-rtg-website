@@ -324,15 +324,21 @@ const KAART = [
     ['projecteert', 'trust-rail:s', 'verbinding uit het protocol', "? (location.protocol === 'https:' ? 'ONLINE / TLS' : 'ONLINE / LOCAL')"]]],
   /* De gebaarlaag van de lijsten (shared/gebaar.js, op elk scherm met basis.js)
      stond tot ronde 2 niet op de kaart, en daardoor leek gebaar-drempel na ronde 1
-     een eigenaar te hebben. De code is niet veranderd; de kaart ziet hem nu. De
-     borgtijd blijft 800 tot ronde 3 (besluit K-borg, EDGE.md par. 8). */
+     een eigenaar te hebben. Sinds stap 10 leest gebaar-03b lang drukken en stil
+     uit DREMPELS, en brengt gebaar-01 de grammatica zelf mee. gebaar-02 houdt
+     RICHTING en STIL (andere gebaren, een eigen meting), en de borgtijd blijft
+     800 tot ronde 3 (besluit K-borg, EDGE.md par. 8). */
+  ['gebaar/gebaar-01.js', 'afnemer', 'gebaar-drempel:l', [
+    ['leest', 'gebaar-drempel:l', 'de tabel bij elk gebaar, nooit bewaard', 'function drempels() { var G = window.RTGGrammatica; return G && G.DREMPELS; }'],
+    ['beslist', '-', 'laadt de grammatica alleen als hij er niet is', "if (window.RTGGrammatica || d.querySelector('script[src*=\"shared/adaptief/grammatica.js\"]')) return;"]]],
   ['gebaar/gebaar-02.js', 'afnemer', 'gebaar-drempel:b', [
     ['beslist', 'gebaar-drempel:b', 'eigen richtingsdrempel naast DREMPELS', 'var RICHTING = 8;'],
     ['beslist', 'gebaar-drempel:b', 'eigen stilte voor de klik erna', 'var STIL = 6;']]],
-  ['gebaar/gebaar-03b.js', 'afnemer', 'gebaar-drempel:b gewicht:b', [
-    ['beslist', 'gebaar-drempel:b', 'eigen lang drukken naast DREMPELS.lang', '}, 520);'],
-    ['beslist', 'gebaar-drempel:b', 'eigen stilte per as naast DREMPELS.stil', 'Math.abs(e.clientX - g.x0) < 8 && Math.abs(e.clientY - g.y0) < 8) return;'],
-    ['beslist', 'gewicht:b', 'eigen borgtijd naast VASTHOUD, tot ronde 3', 'var BORGTIJD = 800;']]],
+  ['gebaar/gebaar-03b.js', 'afnemer', 'gebaar-drempel:l gewicht:b', [
+    ['leest', 'gebaar-drempel:l', 'lang drukken uit DREMPELS.lang', '}, D.lang);'],
+    ['leest', 'gebaar-drempel:l', 'stilte uit DREMPELS.stil', 'langStil = D.stil;'],
+    ['leest', 'gebaar-drempel:l', 'scherp vervalt na DREMPELS.herbevestig', 'scherp = setTimeout(bot, D.herbevestig);'],
+    ['beslist', 'gewicht:b', 'eigen borgtijd naast VASTHOUD, tot ronde 3 (K-borg)', 'var BORGTIJD = 800;']]],
   ['edge/blikveld.js', 'blikveld', 'capability-register:l vluchtige-context:l wereld:l identiteit:l presence:l trust-rail:l voortzetting:l hoofdactie:l gewicht:l waarom:l bevoegdheid:l', [
     ['projecteert', '-', 'een leesbeeld; schrijft niets', 'return { versie: 1, op: t, velden: velden, acties: gedaan, gebreken: gebreken };'],
     ['leest', 'hoofdactie:l', 'de hoofdactie via zijn lezer', "H && typeof H.lees === 'function' ? H.lees(w) : null"],
@@ -400,7 +406,7 @@ const WAAROM = {
   voortzetting: 'Vier geheugens voor waar was ik: continueWith (alleen in het model van de Edge), de werktafelbladen (localStorage), de routecontext (sessionStorage, 24 uur) en Recent bezocht van het slimme menu (sessionStorage); geen van vier leest een ander.',
   hoofdactie: 'De library maakt de knop, de casco en de Edge 2-loader (padtabel) zetten tekst en actie, de Continue Key herbouwt inhoud en anker en de controls verhuizen hem; het scherm wijst intussen zijn eigen data-hoofdactie aan, en het blikveld meldt het verschil als hoofdactie-dubbel.',
   gewicht: 'De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: twee keer een eigen standaard licht voor een ONTBREKEND gewicht (adaptief.js, brug.js; register.js laat het gewicht sinds ronde 1 staan), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), de Edge-Core laat in zijn tweede register alleen licht toe, en de gebaarlaag houdt een eigen borgtijd van 800 ms naast VASTHOUD (die blijft tot ronde 3, besluit K-borg).',
-  'gebaar-drempel': 'DREMPELS in grammatica.js is de tabel, en zes herkenners lezen hem. Twee plekken beslissen met eigen maten: de gebaarversheid van Edge 2 (1500 ms, 14 px) en de gebaarlaag van de lijsten (RICHTING 8 en STIL 6 in gebaar-02, lang drukken 520 ms en 8 px per as in gebaar-03b). Die laatste stond na ronde 1 niet op de kaart, waardoor deze verantwoordelijkheid een eigenaar leek te hebben; de code is niet veranderd, de kaart ziet hem nu.',
+  'gebaar-drempel': 'DREMPELS in grammatica.js is de tabel, en zes herkenners lezen hem. Twee plekken beslissen met eigen maten: de gebaarversheid van Edge 2 (1500 ms, 14 px) en de gebaarlaag van de lijsten (RICHTING 8 en STIL 6 in gebaar-02, voor veeg of scroll en de klik erna -- andere gebaren, die een eigen meting vragen). Lang drukken en stil in gebaar-03b lezen sinds ronde 2, stap 10 de tabel, en gebaar-01 brengt de grammatica zelf mee.',
   waarom: 'De vijf bronnen staan twee keer (BRONNEN in grammatica.js, BRONWOORD in waarom.js), en verhinderd-gaat-niet-door wordt beslist in register.js, balkknop.js, orb.js en actiestaat.js naast de uitleg in grammatica.js en waarom.js.',
   zichtbaarheidsstand: 'Drie standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel en een vensterboolean in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt en sinds ronde 2 zijn gebaarversheid leest; ze delen geen stand. De Edge 1-vouwstand is in ronde 2 weggehaald. Daarnaast zetten twee schermen de Edge 2-stand zelf op body: FoundationOS bij een stadswissel, Work alleen nog bij het laden (een hashwissel gaat sinds ronde 2 via setState als automatiek, zodat een handmatige keuze wint). De Second Screen stond hier tot ronde 2 en is eraf: zijn stand gaat over de bank van de schil, niet over de Edge.',
   onderbalk: 'Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, RTGDaily die zelf een Edge-balk ophangt, en het Edge-commando dat de menuknop tot 999 px claimt.',

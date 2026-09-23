@@ -1198,6 +1198,18 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
 async function veegDoor(page, doos, opties) {
   const o = opties || {};
   const loslaten = o.loslaten !== false;
+  /* DE TABEL EERST (ronde 2, stap 10). Lang drukken en stilstaan lezen hun
+     drempel uit de grammatica, en de gebaarlaag laadt die zacht bij de eerste
+     zet() of lijst(). Een veeg die valt voordat hij er is, veegt over een laag
+     zonder lang drukken: dan is er geen wedloop, en bewijst de proef minder dan
+     hij lijkt. Waar de gebaarlaag staat, wacht de helper dus op de tabel. Komt
+     hij niet, dan is dat een gebrek van de laag en geen reden om zonder te vegen. */
+  const tabel = await page.waitForFunction(() => !window.RTGGebaar || !!window.RTGGrammatica, null,
+    { timeout: geduld(5000) }).then(() => true, () => false);
+  if (!tabel) {
+    throw new Error('de gebaarlaag staat er, maar de grammatica kwam niet (shared/gebaar/gebaar-01.js laadt hem ' +
+      'bij de eerste zet() of lijst()); zonder DREMPELS is lang drukken uit en meet deze veeg iets anders dan hij lijkt');
+  }
   const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
   const x0 = doos.x + doos.width * (Number.isFinite(o.startFractie) ? o.startFractie : 0.8);
   /* Dezelfde racevrije aanzet is ook nodig voor een halve veeg die alleen een

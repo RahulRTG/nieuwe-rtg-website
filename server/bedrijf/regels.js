@@ -40,6 +40,8 @@
 const AFGEDWONGEN = {
   contract: { voorwaarde: 'boven', extra: ['land', 'afdeling'],
     waar: 'bij het activeren van een contract: zolang een vereiste goedkeuring ontbreekt, staat het op "wacht op goedkeuring" in plaats van actief' },
+  uitgave: { voorwaarde: 'boven', extra: ['land', 'afdeling'],
+    waar: 'bij een uitgave: zolang een vereiste goedkeuring ontbreekt, is hij niet goedgekeurd en kan hij niet als betaald worden genoteerd' },
   besluit: { voorwaarde: 'besluitSoort',
     waar: 'bij het sluiten van de stemronde: zolang een vereiste goedkeuring ontbreekt, kan het besluit niet worden gesloten' }
 };
@@ -59,7 +61,7 @@ module.exports = (sctx) => {
   function regelsVoor(w, soort, obj) {
     return Object.values(R(w)).filter(r => {
       if (r.soort !== soort) return false;
-      if (soort === 'contract') {
+      if (soort === 'contract' || soort === 'uitgave') {
         if (Number(obj.waardeCenten || 0) <= Number(r.bovenCenten || 0)) return false;
         /* De extra voorwaarden zijn EN en ze lezen een veld van het contract
            zelf. Een regel die een land of afdeling noemt terwijl het contract

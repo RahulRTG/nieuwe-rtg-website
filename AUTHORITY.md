@@ -333,7 +333,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | **staat** (23 september 2026; par. 5h): de uitnodiging op naam, en de gedeelde code koppelt geen kantoorrol meer (besluit van dezelfde dag). Inloggen op het kantoor met de code blijft |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
-| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
+| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e), en **het onderwerp staat ook**: de uitgave in het Werk OS, met functiescheiding en een tekengrens per lid (par. 5e, vervolg). De koppeling met de tekenlimiet uit de concerngraaf en RTG Bank als uitvoering zijn aparte besluiten |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
 | 7 | **identiteiten voor agents, diensten en apparaten** | **staat** (23 september 2026; par. 5c en 5i): agent, diensten, toestellen, webhooks, en de zaakdoos met een eigen sleutel in de schaduw. De gedeelde doos-sleutel gaat dicht als elke doos er een heeft; het overzicht toont welke nog gedeeld melden |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **staat** (23 september 2026; par. 5g) |
@@ -519,6 +519,43 @@ Hetzelfde geldt voor een tekengrens per organisatie: `besluit.js` heeft een
 globaal beleid, en `kern/concern/graaf-bevoegdheid.js` kent al een tekenlimiet
 per bestuurder of volmacht. Die twee aan elkaar hangen is de volgende stap. Dat is
 aansluiten en niet uitvinden, en er komt geen derde rechtenmodel bij.
+
+**Het onderwerp staat (besluit van de eigenaar, 23 september 2026: de
+Werk OS-betaling bouwen).** De meting vooraf vond dat het Werk OS het meeste al
+had: de ene goedkeurroute (`bedrijf/regelpoort.js`) met een goedkeuring die aan
+het bedrag hangt, bedrijfsregels met een drempel (`bedrijf/regels.js`), en een
+dood startblok dat naar `/api/bedrijf/uitgave/maak` wees zonder dat die route
+bestond. `bedrijf/uitgave.js` vult dat gat, en voegt geen rechtenmodel toe:
+
+- **de uitgave draagt haar indiener uit de sessie** (`door`, het lid met een eigen
+  sleutel). Het beheer-token dient niets in, want een uitgave zonder gezicht maakt
+  functiescheiding ontoetsbaar;
+- **de indiener keurt niet goed**, ook niet namens een tweede recht. Dat is het
+  conflict `inkoop-en-betalen` van `scope.js`, nu afgedwongen op de plek waar het
+  onderwerp woont (de haak `keurGrendel` in de goedkeurroute);
+- **elke uitgave eist minstens een goedkeuring namens `geld.goedkeuren`**, ook
+  zonder bedrijfsregel. Anders is een uitgave onder de drempel met alleen de
+  indiener "rond". Een bedrijfsregel kan er iets bij eisen (`soort: 'uitgave'`,
+  met drempel, land en afdeling zoals bij een contract);
+- **de tekengrens is een versmalling per lid** (`/api/bedrijf/lid/tekengrens`,
+  dezelfde deur als de rollen). Boven de grens keurt het lid niet goed namens
+  `geld.goedkeuren`; geen grens betekent geen versmalling, en een grens verleent
+  nooit een recht;
+- **het bedrag staat vast**: er is geen route die het wijzigt;
+- **er gaat geen geld** (GELD.md). De stand wordt berekend
+  (`wacht op goedkeuring`, `goedgekeurd`, `betaald`), en betaald is een NOTITIE
+  van een mens die niet de indiener is, met een kenmerk: de betaling gebeurt
+  buiten RTG.
+
+`test/bedrijfuitgave.test.js` loopt het tegen een echte server; acht mutaties
+laten hem zakken, waaronder de indiener laten goedkeuren, de tekengrens negeren,
+de basiseis weghalen en de indiener uit het verzoek nemen. **Wat bewust nog niet
+staat**: de tekenlimiet van de concerngraaf hangt aan een bestuurder van een
+ENTITEIT en de tekengrens hier aan een LID van een werkruimte. Dat zijn twee van
+de drie werkrelatiemodellen die elkaar niet lezen (ARBEID.md), en welk model de
+waarheid is, is een besluit. En uitvoeren via RTG Bank (klaarzetten als
+betaalopdracht, een mens bevestigt) is een tweede besluit, omdat het een
+werkruimte aan een bankpositie koppelt.
 
 ### 5f. Fase 6: lezen is niet exporteren
 

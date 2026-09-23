@@ -3,22 +3,22 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-23T07:45:05.633Z",
-  "commit": "0dab261",
-  "boomVuil": true,
-  "boomAnders": 2,
+  "op": "2026-09-23T08:03:21.610Z",
+  "commit": "ca55a00",
+  "boomVuil": false,
+  "boomAnders": 1,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 305,
+  "artefacten": 306,
   "bron": 7,
   "afgeleid": 170,
-  "fragmenten": 22,
+  "fragmenten": 23,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 191,
+  "metEigenaar": 192,
   "afgeleidEigenaarHard": 168,
   "afgeleidGrendelt": 18,
   "metStempel": 99,
@@ -2472,6 +2472,18 @@
    "schrijvers": [
     "scripts/objectmodel.js"
    ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "OFFICE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,

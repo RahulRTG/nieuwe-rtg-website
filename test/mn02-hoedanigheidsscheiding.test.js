@@ -42,7 +42,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mn02-'));
 const CODE = 'RTG-OFFICE-MN02';
@@ -77,7 +77,7 @@ test.before(async () => {
   /* R KRIJGT ZIJN TWEEDE HOEDANIGHEID OP HETZELFDE ACCOUNT. Niet via
      test/helper.js kantoorAlsPersoon(): die registreert een VERS account, en dan
      zijn het twee mensen en meet deze proef het verkeerde. */
-  await post('/api/account/koppel', { soort: 'kantoor', code: CODE }, R.token);
+  await post('/api/account/koppel', await kantoorKoppelBody(BASE, R.token), R.token);
   R.kantoor = (await post('/api/account/start', { rol: 'kantoor' }, R.token)).body.token;
   await post('/api/office/balie/zetel', { key: R.key }, eigenaarKantoor);
 

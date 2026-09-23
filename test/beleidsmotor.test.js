@@ -18,7 +18,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 const { kan, DEUREN, UITKOMST } = require('../server/kern/beleidsmotor/regels');
 const { VERKLAARD_OPEN } = require('../server/kern/beleidsmotor');
 
@@ -68,7 +68,7 @@ test.before(async () => {
      in ./helper.js pakt eerst de eigenaar, en dan meet de boardroomdeur niets. */
   const reg = (await api('/api/auth/register', { name: 'Beleid Toets', email: 'beleid' + Date.now() + '@voorbeeld.test',
     password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' })).body;
-  await api('/api/account/koppel', { soort: 'kantoor', code: 'BELEID-KANTOOR' }, reg.token);
+  await api('/api/account/koppel', await kantoorKoppelBody(srv.base, reg.token), reg.token);
   opNaam = (await api('/api/account/start', { rol: 'kantoor' }, reg.token)).body.token;
   eig = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   assert.ok(gedeeld && opNaam && eig, 'drie sessies nodig: gedeelde code, kantoor op naam, eigenaar');

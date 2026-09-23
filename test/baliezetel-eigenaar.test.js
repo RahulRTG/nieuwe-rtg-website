@@ -29,7 +29,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-baliezetel-'));
@@ -69,7 +69,7 @@ test.before(async () => {
   lid = v.token; lidKey = v.key; lidCodenaam = v.codenaam;
   assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: lidCodenaam }, baas)).status, 200,
     'de eigenaar geeft de sleutel (nog zonder passkey)');
-  assert.equal((await api('/api/account/koppel', { soort: 'kantoor', code: 'RTG-OFFICE' }, lid)).status, 200);
+  assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(base, lid), lid)).status, 200);
   vertrouweling = (await api('/api/account/start', { rol: 'kantoor' }, lid)).body.token;
   assert.equal((await api('/api/office/balie/zetels', {}, vertrouweling)).status, 200, 'de vertrouweling is binnen');
 
@@ -129,7 +129,8 @@ test('4. een vinger voor GEVEN maakt INTREKKEN niet af', async () => {
 });
 
 test('5. een ingetrokken zetel werkt bij het volgende verzoek niet meer', async () => {
-  assert.equal((await api('/api/account/koppel', { soort: 'kantoor', code: 'RTG-OFFICE' }, tweede)).status, 200);
+  assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(base, tweede, null,
+    { eigenaar: baas, bevestig: () => bevestig('eigenaar-kantooruitnodiging') }), tweede)).status, 200);
   const sessie = (await api('/api/account/start', { rol: 'kantoor' }, tweede)).body.token;
   const binnen = await api('/api/office/balie/zoek', { codenaam: lidCodenaam }, sessie);
   assert.equal(binnen.status, 200, 'met zetel aan de balie: ' + JSON.stringify(binnen.body).slice(0, 160));

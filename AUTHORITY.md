@@ -330,7 +330,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 |---|---|---|
 | 0 | P0 + P0b | **klaar** |
 | 1 | **de beleidsmotor in de schaduw**: `kan(...)` leest de bestaande poorten en geeft een besluit met opbouw; draait naast elke kantoorroute en telt waar hij het oneens is (de vorm van `tegenfeit.js`) | **staat, in de schaduw** (23 september 2026; zie par. 5a) |
-| 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | **de uitnodiging staat, in de schaduw** (23 september 2026; par. 5h); de gedeelde code dichtdoen wacht op een week meten en een apart besluit |
+| 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | **staat** (23 september 2026; par. 5h): de uitnodiging op naam, en de gedeelde code koppelt geen kantoorrol meer (besluit van dezelfde dag). Inloggen op het kantoor met de code blijft |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
@@ -639,6 +639,35 @@ mutaties laten de toets zakken, waaronder het verzilveren door een ander, geen
 vervaldatum, de code in de opslag en de eigenaarscontrole weglaten. Niet
 beproefd is de volgorde met de tweede factor (dat de uitnodiging pas na een
 geldige TOTP opgaat), want de toetsen draaien zonder `OFFICE_TOTP_SECRET`.
+
+**Dicht voor nieuwe koppelingen (besluit van de eigenaar, later op 23 september
+2026).** De week meten is niet afgewacht: de eigenaar koos "nu dicht". De
+gedeelde code koppelt geen kantoorrol meer aan een account; `/api/account/koppel`
+geeft 403 met `watNu: 'uitnodiging'`, goed of fout getypt hetzelfde antwoord, en
+telt de poging als `gedeeldeCodeGeweigerd`. Wat blijft: inloggen op het kantoor
+met de code (`/api/office/login`), en de koppelingen die al bestonden. Vier
+dingen die dat besluit blootlegde:
+
+- **er was geen scherm om een uitnodiging te maken of te verzilveren.** De
+  boardroom heeft nu *Iemand in het kantoor* (alleen de eigenaar, met de vinger),
+  en de kantoorlogin van `personeel.html` toont een veld voor de uitnodiging aan
+  wie ingelogd is en de rol nog niet heeft. Het personeelsscherm koppelde tot dan
+  STIL met de code na elke kantoorlogin; die regel is weg;
+- **de ceremonie kende de naam `eigenaar-kantooruitnodiging` niet.** Zolang de
+  eigenaar geen passkey heeft valt dat niet op; daarna was de route dicht voor
+  precies de mens die hem mag gebruiken. Hij staat nu in `ZWARE_ACTIES`, en
+  `test/eigenaarbevestiging.test.js` toets 0b leest elke `eis(..., '<naam>')` in
+  `server/` en zakt op een naam die de lijst niet kent (mutatie: de naam eruit,
+  toets zakt);
+- **de volgorde met de tweede factor is nu beproefd**: `test/eenaccount.test.js`
+  toets 8 draait met `OFFICE_TOTP_SECRET` en biedt twee keer dezelfde uitnodiging
+  met een foute factor aan; beide keren is de factor het bezwaar. Met de proef
+  weggehaald zakt hij;
+- **de prijs**: wie een kantoorrol op naam nodig heeft (de balie, RTFOS-personeel,
+  de vier-ogenproeven) heeft nu een uitnodiging van de eigenaar nodig. Zonder
+  eigenaar is er niemand die uitnodigt, en dat is de bedoeling. De proeven doen
+  het zoals productie (`kantoorKoppelBody` in `test/helper.js`, en de sleutelbos
+  in `scripts/lib/proefsleutels.js`).
 
 ### 5i. Fase 7: diensten en toestellen met een eigen identiteit
 

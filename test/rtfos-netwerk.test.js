@@ -35,7 +35,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfos4-'));
 const OFFICE_CODE = 'RTFOS4-KEURING';
@@ -53,7 +53,7 @@ async function kantoorLid(naam, mail, tel) {
   const reg = await post('/api/auth/register', { name: naam, email: mail, phone: tel,
     password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
   assert.ok(reg.body.token, 'registreren mislukte: ' + JSON.stringify(reg.body).slice(0, 150));
-  await post('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, reg.body.token);
+  await post('/api/account/koppel', await kantoorKoppelBody(BASE, reg.body.token), reg.body.token);
   const start = await post('/api/account/start', { rol: 'kantoor' }, reg.body.token);
   const ik = await os_('ik', {}, start.body.token);
   return { office: start.body.token, key: ik.body.key };

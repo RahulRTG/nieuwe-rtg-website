@@ -54,6 +54,7 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-terugstorting',     // POST /api/office/bank/terugstorting
   'eigenaar-herstel-in',        // POST /api/techniek/herstel/inrichten
   'eigenaar-herstel-af',        // POST /api/techniek/herstel/afbreken
+  'eigenaar-kantooruitnodiging', // POST /api/office/kantoor/uitnodiging
   'passkey-weg'                 // POST /api/webauthn/weg
 ]);
 

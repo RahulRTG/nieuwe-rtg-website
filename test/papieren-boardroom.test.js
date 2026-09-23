@@ -29,7 +29,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-papieren-'));
 let srv, base, office, baas, gast;
@@ -59,7 +59,7 @@ test.before(async () => {
   const cn = (await api('/api/state', {}, reg.body.token)).body.state.user.codename;
   assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: cn }, baas)).status, 200,
     'de eigenaar geeft boardroom-toegang');
-  await api('/api/account/koppel', { soort: 'kantoor', code: 'KANTOOR-PAP-1' }, reg.body.token);
+  await api('/api/account/koppel', await kantoorKoppelBody(base, reg.body.token), reg.body.token);
   gast = (await api('/api/account/start', { rol: 'kantoor' }, reg.body.token)).body.token;
   assert.ok(gast, 'en die persoon staat in de backoffice');
 });

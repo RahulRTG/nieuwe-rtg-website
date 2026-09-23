@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 
 const CODE = 'REVIEW-KANTOOR';
 const REDEN = 'Kwartaalreview van de kantoortoegang';
@@ -37,7 +37,7 @@ async function medewerker(base, kantoorrol) {
   const reg = (await api(base, '/api/auth/register', { name: 'Review Toets ' + n, email: 'review' + n + Date.now() + '@voorbeeld.test',
     password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' })).body;
   assert.ok(reg.token, 'registreren lukt');
-  if (kantoorrol) assert.equal((await api(base, '/api/account/koppel', { soort: 'kantoor', code: CODE }, reg.token)).status, 200);
+  if (kantoorrol) assert.equal((await api(base, '/api/account/koppel', await kantoorKoppelBody(base, reg.token), reg.token)).status, 200);
   await api(base, '/api/auth/me', {}, reg.token);
   const u = (reg.state && reg.state.user) || {};
   return { key: 'user-' + u.id, codenaam: u.codename, lid: reg.token };

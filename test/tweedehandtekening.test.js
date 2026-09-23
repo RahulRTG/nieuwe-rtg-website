@@ -31,7 +31,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweehand-'));
 const CODE = 'KANTOOR-TWEEHAND-1';
@@ -57,7 +57,7 @@ async function medewerker(merk) {
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)),
     password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(reg.body.token, 'medewerker ' + merk + ' geregistreerd');
-  const kop = await api('/api/account/koppel', { soort: 'kantoor', code: CODE }, reg.body.token);
+  const kop = await api('/api/account/koppel', await kantoorKoppelBody(base, reg.body.token), reg.body.token);
   assert.equal(kop.status, 200, 'medewerker ' + merk + ' koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 120));
   const start = await api('/api/account/start', { rol: 'kantoor' }, reg.body.token);
   assert.ok(start.body.token, 'medewerker ' + merk + ' staat op naam in de backoffice');

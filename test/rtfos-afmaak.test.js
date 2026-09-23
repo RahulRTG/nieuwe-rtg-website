@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosaf-'));
 const OFFICE_CODE = 'RTFOSAF-KEURING';
@@ -53,7 +53,7 @@ test.before(async () => {
   // een medewerker: de laagste rol, met opzet -- die heeft geen casus.lezen
   const reg = await post('/api/auth/register', { name: 'Medewerker Fatima', email: 'mf@rtfosaf.test',
     phone: '0612345688', password: 'geheim123', geboortedatum: '1992-01-01', pasApp: 'rtg' });
-  await post('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, reg.body.token);
+  await post('/api/account/koppel', await kantoorKoppelBody(BASE, reg.body.token), reg.body.token);
   WERKER = (await post('/api/account/start', { rol: 'kantoor' }, reg.body.token)).body.token;
   KEY_WERKER = (await os_('ik', {}, WERKER)).body.key;
   await os_('zetel', { stad: STAD, key: KEY_WERKER, naam: 'Fatima', rol: 'medewerker' });

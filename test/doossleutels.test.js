@@ -18,7 +18,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 const { maakDoosSleutels } = require('../server/kern/zaakdoos/sleutels');
 const { doosKoppen } = require('../server/kern/zaakdoos/koppen');
 
@@ -52,7 +52,7 @@ test('1-4. uitgeven, bewezen naam, schaduw en intrekken', async () => {
   const reg = (await api('/api/auth/register', { name: 'Doos Toets', email: 'doos' + Date.now() + '@voorbeeld.test',
     password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' })).body;
   await api('/api/auth/me', {}, reg.token);
-  assert.equal((await api('/api/account/koppel', { soort: 'kantoor', code: CODE }, reg.token)).status, 200);
+  assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(srv.base, reg.token), reg.token)).status, 200);
   assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: reg.state.user.codename }, eig)).status, 200);
   const mede = (await api('/api/account/start', { rol: 'kantoor' }, reg.token)).body.token;
   assert.equal((await api('/api/office/doos/sleutels', {}, mede)).status, 200, 'hij komt de boardroom in');

@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 const { PIN_ACTIES, ZWARE_ACTIES } = require('../server/kern/webauthn-acties');
 
@@ -90,6 +90,28 @@ test('0. de woordenlijsten delen geen enkel woord', () => {
     'een gedeelde naam maakt een PIN-ceremonie inwisselbaar voor een zware handeling');
   assert.ok(ZWARE_ACTIES.includes('passkey-weg'),
     'zonder deze staat de ratel van bovenaf open');
+});
+
+/* De andere richting: een route die een zware ceremonie EIST voor een naam die
+   niet in de lijst staat, kan nooit worden bevestigd -- de ceremonie weigert de
+   naam. Zolang de eigenaar geen passkey heeft valt dat niet op; daarna is de
+   route dicht voor precies de mens die hem mag gebruiken. Zo ging het met de
+   kantooruitnodiging (23 september 2026). */
+test('0b. elke naam die een route als zware ceremonie eist, staat in de lijst', () => {
+  const namen = new Set();
+  const loop = (map) => {
+    for (const n of fs.readdirSync(map, { withFileTypes: true })) {
+      const p = path.join(map, n.name);
+      if (n.isDirectory()) { if (n.name !== 'data' && n.name !== 'node_modules') loop(p); continue; }
+      if (!n.name.endsWith('.js')) continue;
+      const bron = fs.readFileSync(p, 'utf8');
+      for (const m of bron.matchAll(/\beis\(\s*[^'()]*(?:\([^()]*\))?[^'()]*,\s*'([a-z][a-z-]+)'/g)) namen.add(m[1]);
+    }
+  };
+  loop(path.join(__dirname, '..', 'server'));
+  assert.ok(namen.size >= 9, 'de meter vindt de zware routes (' + [...namen].join(', ') + ')');
+  assert.deepEqual([...namen].filter(a => !ZWARE_ACTIES.includes(a)), [],
+    'een zware route met een naam die de ceremonie niet kent');
 });
 
 test('1. de ratel staat open zolang er geen passkey is', async () => {
@@ -209,12 +231,13 @@ async function bevestigBoard(actie) {
     antwoord: sleutel.loginAntwoord(o.body.opties.challenge, origin, ++teller) };
 }
 
-/* Het tweede account opent de kantoordeur op zijn EIGEN naam: de backoffice-code
-   een keer koppelen, dan een kantoorsessie munten die zijn sleutel draagt. */
+/* Het tweede account opent de kantoordeur op zijn EIGEN naam: de kantoorrol een
+   keer koppelen met een uitnodiging van de eigenaar, dan een kantoorsessie munten die zijn sleutel draagt. */
 async function kantoorsessieVanGast() {
   const l = await api('/api/auth/login', { login: gast, password: gastWw, pasApp: 'rtg' });
   assert.ok(l.body.token, 'het tweede account logt in: ' + JSON.stringify(l.body).slice(0, 160));
-  const k = await api('/api/account/koppel', { soort: 'kantoor', code: KANTOORCODE }, l.body.token);
+  const k = await api('/api/account/koppel', await kantoorKoppelBody(base, l.body.token, null,
+    { eigenaar: lid, bevestig: () => bevestigBoard('eigenaar-kantooruitnodiging') }), l.body.token);
   assert.equal(k.status, 200, 'koppelen met de kantoorcode: ' + JSON.stringify(k.body).slice(0, 160));
   const s = await api('/api/account/start', { rol: 'kantoor' }, l.body.token);
   assert.equal(s.status, 200, 'de kantoorsessie op naam: ' + JSON.stringify(s.body).slice(0, 160));

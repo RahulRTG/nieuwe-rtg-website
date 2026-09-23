@@ -56,7 +56,10 @@ const SLEUTELS = {
      de gewikkelde poorten op res.finish en niet in deze handlers, dus twee keer
      opvragen verandert niets aan wat er geteld of besloten is. */
   'POST /api/office/beleidsmotor': { leest: true },
-  'POST /api/office/beleidsmotor/waarom': { leest: true }
+  'POST /api/office/beleidsmotor/waarom': { leest: true },
+  /* De toegangsreview (fase 8) leest drie zetelbronnen. Elke aanroep laat bewust
+     EEN journaalregel na: het journaal hoort elke inzage te zien, ook de tweede. */
+  'POST /api/office/beleidsmotor/review': { leest: true }
 };
 
 module.exports = { SLEUTELS };

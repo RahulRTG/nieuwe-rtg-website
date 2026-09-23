@@ -36,6 +36,19 @@ const CONTRACTEN = {
       '(kluisAuth, gewikkeld) telt via res.finish mee in de schaduw; dat is de andere ingang',
     afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
   },
+  'POST /api/office/beleidsmotor/review': {
+    mutatieId: 'office.beleidsmotor.review',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'tegen een draaiende server (test/beleidsmotor-review.test.js): 403 voor de gedeelde code, ' +
+      '400 zonder reden, twee keer vragen geeft dezelfde houders, en onder schrijf-verloren geen lijst', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de handler schrijft alleen een regel in het inzagejournaal ' +
+      '(noteerVast, bewust een per inzage) en roept daarna beleidsmotor.review() aan, die de drie zetelbronnen ' +
+      'leest -- geen save(), geen toewijzing',
+    afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
+  },
 };
 
 module.exports = { CONTRACTEN };

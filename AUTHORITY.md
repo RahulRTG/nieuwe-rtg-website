@@ -336,7 +336,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
 | 7 | **identiteiten voor agents, diensten en apparaten** | **agent staat** (23 september 2026; par. 5c); diensten en apparaten niet |
-| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf staat** (`/api/office/beleidsmotor/waarom`, op naam: de gedeelde code heeft geen zelf); reviews, slapende rechten en de simulator niet |
+| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf en de toegangsreview staan** (par. 5g); slapende rechten niet (een besluit over een gebruiksspoor per medewerker) |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
 
 ### 5a. Fase 1, zoals hij er staat
@@ -553,6 +553,41 @@ in de bron is dat niet te onderscheiden van een scherm. Een grens daarop vraagt
 een gegevensklasse per veld, en die bestaat niet (par. 1.5). Het afschrift van een
 lid (`/api/office/bank/afschrift`) blijft achter de gedeelde code: het is lezen,
 en ENFORCE_EXECUTE vóór ENFORCE_READ is een besluit (`test/bankdeuren.test.js`).
+
+### 5g. Fase 8: de toegangsreview
+
+`/api/office/beleidsmotor/review` (boardroom, met een verplichte reden) geeft per
+houder van een kantoorzetel:
+- de codenaam, nooit een naam;
+- de zetels en sinds wanneer;
+- wat de vier deuren voor die mens zouden besluiten.
+
+De review leest drie bronnen, elk met een eigen levenscyclus: de kantoorrol op
+een account, de boardroomtoegang en de baliezetels. Hij schrijft er niets in.
+Intrekken gebeurt waar het recht woont (fase 3), want een tweede intrekweg hier
+zou uiteenlopen met de eerste. Drie dingen die niet mogen sneuvelen:
+
+- **Een review is een lijst mensen.** Daarom vraagt hij een reden, en de regel
+  in het inzagejournaal moet VASTSTAAN voordat de lijst wordt samengesteld.
+  Onder `schrijf-verloren` komt er geen lijst.
+- **Er wordt niet gerangschikt.** De volgorde is alfabetisch op codenaam en op
+  niets anders, want een review die rangschikt maakt van toegang een score.
+- **De deuren zijn GESIMULEERD en dat staat erbij**: "als deze mens met zijn
+  eigen account en de kantoorrol inlogt". Een zetel zonder kantoorrol opent
+  niets en wordt gemeld als `zetelZonderDeur`, niet verborgen.
+
+In `nietGezien` staat wat de review niet ziet: de gedeelde code (die heeft
+geen houder), rollen binnen RTFOS en rollen in het Werk OS van een klant.
+`test/beleidsmotor-review.test.js` beproeft dit tegen een eerlijke en een
+liegende server. Zes mutaties laten de toets zakken, waaronder het spoor
+negeren, geen reden eisen, een zetelbron overslaan en een besluit vast op
+toestaan zetten.
+
+**Slapende rechten staan er met opzet niet.** "Sinds wanneer niet gebruikt"
+vraagt een gebruiksspoor per medewerker. Dat is een gedragslogboek over
+personeel, en de beleidsmotor houdt juist tellers zonder wie (par. 5a). Wie dat
+spoor wil, neemt een besluit met een bewaartermijn; het hoort er niet
+stilzwijgend bij te komen.
 
 ---
 

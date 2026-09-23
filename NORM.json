@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1589,
+    "kernBreedte": 1590,
     "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1731,
-    "toetsenNietGemeten": 625,
+    "toetsenNietGemeten": 626,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -148,6 +148,25 @@
     "edgeVeldTrust": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1589,
+      "meter": "kernBreedte 1589 -> 1590",
+      "reden": "kern.tijdDuid: een oude vrije naam in de concerngraaf alsnog duiden als codenaam of extern (server/kern/concern/duiding.js). Het domein concern leest hem via zijn eigen routebestand. Het zou kunnen met tijdBeeindig plus tijdZet, maar dan staat er in de tijdmachine een aftreden en een aantreden die nooit gebeurden, en een dag zonder bestuurder.",
+      "waarheen": "GRENZEN.json (concern) en test/concernduiding.test.js"
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 625,
+      "vervalt": "2026-12-23",
+      "meter": "toetsenNietGemeten 625 -> 626",
+      "reden": "test/concernduiding.test.js is nieuw. Met de hand nagetrokken met zeven mutaties op kern/concern/duiding.js en de route (vervallen, codenaam-grendel, dubbele mens, soort, bron, gids-schrijfwijze, extern-vlag), alle zeven gevangen. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

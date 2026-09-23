@@ -149,15 +149,9 @@
         gewicht: e.gewicht || it.gewicht || null, bevestiging: e.bevestiging || null, ongedaan: !!e.ongedaan,
         herstel: e.herstel || 'onbekend', gezag: e.gezag || 'onbekend', gevolg: e.gevolg || null, gebreken: e.gebreken || [] };
     });
-    /* Het TWEEDE register (registerAction van de balk) staat er ook in, met zijn
-       gebrek erbij: allowed:false zonder reden viel daar stil uit de lijst. */
-    ((snap && snap.acties) || []).forEach(function (a) {
-      var e = w.RTGEdgeActiestaat ? w.RTGEdgeActiestaat.bepaal({ id: a.id,
-        verhinderd: a.allowed ? null : { reden: '' } }, w.RTGGrammatica || null) : {};
-      gedaan.push({ id: a.id, naam: a.label, herkomst: 'edge-compat', staat: e.staat || null, waarom: e.waarom || null,
-        gewicht: e.gewicht || 'licht', bevestiging: e.bevestiging || null, ongedaan: false, herstel: 'onbekend',
-        gezag: 'onbekend', gevolg: e.gevolg || null, gebreken: e.gebreken || [] });
-    });
+    /* Het tweede register (registerAction van de balk) is weg (ronde 2, stap 18):
+       elke handeling komt uit RTGAdaptief. Een kern die toch acties draagt,
+       wordt hier niet gelezen -- test/edgeblikveld.test.js houdt dat vast. */
     var velden = {
       identiteit: snap && snap.identity ? veld(snap.identity, 'edge-signaal', 'ui', t)
         : veld(null, 'geen', 'geen', t, 'deze laag kent geen sessie, en setIdentity heeft geen producent'),

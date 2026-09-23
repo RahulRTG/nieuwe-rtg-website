@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-23T17:28:05.824Z",
-    "commit": "42f470bd",
-    "boomVuil": false,
+    "op": "2026-09-23T17:58:17.990Z",
+    "commit": "7f385793",
+    "boomVuil": true,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
     "node": "v22.22.2"
@@ -1467,8 +1467,8 @@
         {
           "rol": "leest",
           "etiket": "capability-register:l",
-          "wat": "het tweede register erbij",
-          "citaat": "gedaan.push({ id: a.id, naam: a.label, herkomst: 'edge-compat'"
+          "wat": "de handelingen van RTGAdaptief",
+          "citaat": "var A = adaptief(), lijst = A && A.voorNu ? A.voorNu() : [];"
         },
         {
           "rol": "projecteert",
@@ -2002,36 +2002,6 @@
       "laag": "adaptieve-balk",
       "rollen": [
         {
-          "rol": "schrijft",
-          "etiket": "capability-register:s",
-          "wat": "tweede register, laatste wint",
-          "citaat": "state.registry[id] = { id: id"
-        },
-        {
-          "rol": "beslist",
-          "etiket": "gewicht:b",
-          "wat": "alleen licht in dit register",
-          "citaat": "if (item.confirm || (item.gewicht && item.gewicht !== 'licht')) {"
-        },
-        {
-          "rol": "leest",
-          "etiket": "gewicht:l",
-          "wat": "een tik langs de gewichtlaag",
-          "citaat": "return w.RTGGewicht.voer({ id: e.id, naam: e.label, gewicht: 'licht', doe: e.run })"
-        },
-        {
-          "rol": "beslist",
-          "etiket": "capability-register:b",
-          "wat": "ids buiten het patroon eruit",
-          "citaat": "if (!state || !/^[a-z][a-z0-9-]{1,39}$/.test(id)) return false;"
-        },
-        {
-          "rol": "beslist",
-          "etiket": "bevoegdheid:b",
-          "wat": "allowed: boolean of functie",
-          "citaat": "typeof item.allowed === 'function' ? !!item.allowed()"
-        },
-        {
           "rol": "beslist",
           "etiket": "zichtbaarheidsstand:b",
           "wat": "vier balkstanden",
@@ -2039,26 +2009,6 @@
         }
       ],
       "verantwoordelijkheden": [
-        {
-          "naam": "bevoegdheid",
-          "als": "beslisser"
-        },
-        {
-          "naam": "capability-register",
-          "als": "beslisser"
-        },
-        {
-          "naam": "capability-register",
-          "als": "schrijver"
-        },
-        {
-          "naam": "gewicht",
-          "als": "beslisser"
-        },
-        {
-          "naam": "gewicht",
-          "als": "lezer"
-        },
         {
           "naam": "zichtbaarheidsstand",
           "als": "beslisser"
@@ -2179,12 +2129,6 @@
           "citaat": "knop = d.querySelector('[data-rtg-edge-primary]:not([hidden])');"
         },
         {
-          "rol": "schrijft",
-          "etiket": "capability-register:s",
-          "wat": "'primary' in het tweede register",
-          "citaat": "api.registerAction({ id: 'primary', label: label.slice(0, 80), allowed: !knop.disabled });"
-        },
-        {
           "rol": "beslist",
           "etiket": "presence:b",
           "wat": "pending wordt presence",
@@ -2192,10 +2136,6 @@
         }
       ],
       "verantwoordelijkheden": [
-        {
-          "naam": "capability-register",
-          "als": "schrijver"
-        },
         {
           "naam": "hoofdactie",
           "als": "lezer"
@@ -2255,19 +2195,9 @@
           "etiket": "onderbalk:s",
           "wat": "klaar-vlag; CSS zet de onderbalk weg",
           "citaat": "d.body.dataset.rtgAdaptiveReady = 'true';"
-        },
-        {
-          "rol": "leest",
-          "etiket": "capability-register:l",
-          "wat": "een tik op het tweede register via de kern",
-          "citaat": "if (custom && custom.run) return K.voer(custom, w);"
         }
       ],
       "verantwoordelijkheden": [
-        {
-          "naam": "capability-register",
-          "als": "lezer"
-        },
         {
           "naam": "identiteit",
           "als": "schrijver"
@@ -3455,7 +3385,6 @@
       "schrijvers": [],
       "beslissers": [
         "public/shared/command.js",
-        "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-daily.js"
       ],
       "lezers": [
@@ -3465,14 +3394,11 @@
     },
     "capability-register": {
       "schrijvers": [
-        "public/shared/adaptief/register.js",
-        "public/shared/rtg-adaptive-edge-core.js",
-        "public/shared/rtg-adaptive-edge-signals.js"
+        "public/shared/adaptief/register.js"
       ],
       "beslissers": [
         "public/shared/adaptief.js",
-        "public/shared/rtg-adaptive-edge-controls.js",
-        "public/shared/rtg-adaptive-edge-core.js"
+        "public/shared/rtg-adaptive-edge-controls.js"
       ],
       "lezers": [
         "public/apps/bestanden/adaptief.js",
@@ -3489,7 +3415,6 @@
         "public/shared/interface/world-desktop-frame.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge-input.js",
-        "public/shared/rtg-adaptive-edge.js",
         "public/shared/social-intelligence-runtime.js"
       ]
     },
@@ -3526,8 +3451,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/adaptief/orb.js",
         "public/shared/edge/actiestaat.js",
-        "public/shared/gebaar/gebaar-03b.js",
-        "public/shared/rtg-adaptive-edge-core.js"
+        "public/shared/gebaar/gebaar-03b.js"
       ],
       "lezers": [
         "public/apps/bestanden/adaptief.js",
@@ -3536,8 +3460,7 @@
         "public/shared/adaptief/register.js",
         "public/shared/adaptief/waarom.js",
         "public/shared/edge/actiestaat.js",
-        "public/shared/edge/blikveld.js",
-        "public/shared/rtg-adaptive-edge-core.js"
+        "public/shared/edge/blikveld.js"
       ]
     },
     "hoofdactie": {
@@ -3853,7 +3776,6 @@
       "schrijvers": [],
       "beslissers": [
         "public/shared/command.js",
-        "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-daily.js"
       ],
       "waarom": "Drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, allowed van de Edge-Core, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft -- het blikveld zegt dat hardop."
@@ -3861,16 +3783,13 @@
     {
       "naam": "capability-register",
       "schrijvers": [
-        "public/shared/adaptief/register.js",
-        "public/shared/rtg-adaptive-edge-core.js",
-        "public/shared/rtg-adaptive-edge-signals.js"
+        "public/shared/adaptief/register.js"
       ],
       "beslissers": [
         "public/shared/adaptief.js",
-        "public/shared/rtg-adaptive-edge-controls.js",
-        "public/shared/rtg-adaptive-edge-core.js"
+        "public/shared/rtg-adaptive-edge-controls.js"
       ],
-      "waarom": "Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij, gevuld door vier producenten: zijn eigen standaardingangen, Signals (primary), de sociale runtime (social-context) en het wereldbureau (home); de landing viel eruit in ronde 2 (stap 15), leeg in ronde 2. De controls oogsten paginaknoppen als derde bron."
+      "waarom": "Het tweede register van de Edge-Core is weg (ronde 2, stap 18: registerAction, setProjection en voer bestaan niet meer, en de afgeleide controle 1 staat op nul). Wat overblijft is RTGAdaptief als schrijver (declareer, laatste wint) met de keuring van adaptief.js als beslisser, naast de controls die paginaknoppen oogsten als tweede bron van wat er in het blad staat -- en dat is de reden dat deze verantwoordelijkheid nog twee beslissers heeft."
     },
     {
       "naam": "gebaar-drempel",
@@ -3896,8 +3815,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/adaptief/orb.js",
         "public/shared/edge/actiestaat.js",
-        "public/shared/gebaar/gebaar-03b.js",
-        "public/shared/rtg-adaptive-edge-core.js"
+        "public/shared/gebaar/gebaar-03b.js"
       ],
       "waarom": "De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: twee keer een eigen standaard licht voor een ONTBREKEND gewicht (adaptief.js, brug.js; register.js laat het gewicht sinds ronde 1 staan), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), de Edge-Core laat in zijn tweede register alleen licht toe, en de gebaarlaag houdt een eigen borgtijd van 800 ms naast VASTHOUD (die blijft tot ronde 3, besluit K-borg)."
     },
@@ -4062,9 +3980,7 @@
     ]
   },
   "afgeleid": {
-    "registerAction": [
-      "public/shared/rtg-adaptive-edge-signals.js"
-    ],
+    "registerAction": [],
     "wereld": [
       "public/shared/randen.js",
       "public/shared/rtg-edge-system.js",
@@ -4089,7 +4005,7 @@
   },
   "telling": {
     "bestanden": 73,
-    "rollen": 218,
+    "rollen": 211,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 14

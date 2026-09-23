@@ -91,19 +91,20 @@ test('een etiket hangt aan een citaat, in beide richtingen', () => {
 
   /* Een etiket s of b zonder citaat: het laatste citaat dat het droeg zegt '-'. */
   const signals = rij('rtg-adaptive-edge-signals.js');
-  const primary = signals[3].find((c) => c[1] === 'capability-register:s');
-  primary[1] = '-';
+  const pending = signals[3].find((c) => c[1] === 'presence:b');
+  pending[1] = '-';
   try {
     const f = kaart.keur();
-    assert.ok(f.some((x) => /etiket capability-register:s heeft geen citaat dat het draagt/.test(x)), f.join('\n'));
-  } finally { primary[1] = 'capability-register:s'; }
+    assert.ok(f.some((x) => /etiket presence:b heeft geen citaat dat het draagt/.test(x)), f.join('\n'));
+  } finally { pending[1] = 'presence:b'; }
 
   /* De tabel: een lezing draagt nooit een schrijver. */
-  primary[0] = 'leest';
+  const schrijver = rij('rtg-adaptive-edge.js')[3].find((c) => c[1] === 'presence:s');
+  schrijver[0] = 'leest';
   try {
     const f = kaart.keur();
     assert.ok(f.some((x) => /een citaat dat leest draagt geen schrijver/.test(x)), f.join('\n'));
-  } finally { primary[0] = 'schrijft'; }
+  } finally { schrijver[0] = 'schrijft'; }
 
   assert.deepEqual(kaart.keur(), [], 'na elke mutatie staat de kaart weer zoals hij was');
 });
@@ -165,8 +166,9 @@ test('geen rtg-gebeurtenis zonder zender of zonder luisteraar', () => {
    lexicaal uit public/ en leggen ze naast de kaart: wie registerAction aanroept
    op de Edge-kern (gelijk aan de schrijvers van capability-register met die
    aanroep als citaat), wie data-rtg-world en wie data-rtg-edge-2-state op body
-   zet (die staan erop met een s). Met de eerste kan "het tweede register is
-   leeg" in ronde 2 BEWEZEN worden: die lijst op nul.
+   zet (die staan erop met een s). Met de eerste is "het tweede register is
+   leeg" in ronde 2 BEWEZEN: die lijst staat op nul (stap 18), en de zelfijking
+   hieronder houdt vast dat hij nog kan zakken.
 
    Nul fouten mag nooit groen zijn doordat de lezer niets zag (LAT regel 9):
    daarom eerst dat elke controle iets vindt, en daarna een zelfijking met een
@@ -179,9 +181,10 @@ test('geen rtg-gebeurtenis zonder zender of zonder luisteraar', () => {
 test('de afgeleide controles vinden wat de kaart moet dragen, en kunnen zakken', () => {
   const wand = WAND, nu = kaart.afgeleid(wand);
   assert.deepEqual(nu.fouten, []);
-  for (const k of ['registerAction', 'wereld', 'zichtbaarheidsstand']) {
+  for (const k of ['wereld', 'zichtbaarheidsstand']) {
     assert.ok(nu.gevonden[k].length > 0, 'de lezer vond niemand voor ' + k + ', dus deze controle meet niets');
   }
+  assert.deepEqual(nu.gevonden.registerAction, [], 'het tweede register hoort leeg te zijn: niemand roept registerAction aan op de Edge-kern');
   const met = (pad, code) => kaart.afgeleid(wand.concat([[pad, code]])).fouten;
   const zakt = (fouten, re, wat) => assert.ok(fouten.some((f) => re.test(f)), wat + '\n' + fouten.join('\n'));
 
@@ -208,16 +211,13 @@ test('de afgeleide controles vinden wat de kaart moet dragen, en kunnen zakken',
   finally { kaart.ZONDER_LADER.pop(); }
 
   /* Andersom: de kaart noemt een aanroep die de lezer niet vindt. */
-  const kern = kaart.KAART.find((x) => x[0] === 'rtg-adaptive-edge-core.js')[3].find((c) => c[1] === 'capability-register:s');
-  const echt = kern[3];
-  kern[3] = 'x.registerAction(';
-  try { zakt(kaart.afgeleid(wand).fouten, /core\.js: staat op de kaart als schrijver via registerAction, maar de lezer vindt de aanroep niet/, 'kaart zonder aanroep'); }
-  finally { kern[3] = echt; }
+  kaart.KAART.push(['public/shared/proef.js', 'proef', 'capability-register:s', [['schrijft', 'capability-register:s', 'proef', 'x.registerAction(']]]);
+  try { zakt(kaart.afgeleid(wand).fouten, /proef\.js: staat op de kaart als schrijver via registerAction, maar de lezer vindt de aanroep niet/, 'kaart zonder aanroep'); }
+  finally { kaart.KAART.pop(); }
 
   /* En van de kant van de kaart: een rij weg, terwijl de code gelijk blijft. */
   for (const [p, re] of [['rtg-world-identity.js', /rtg-world-identity\.js: zet data-rtg-world/],
-    ['public/apps/werk/command-entry.js', /command-entry\.js: zet data-rtg-edge-2-state/],
-    ['rtg-adaptive-edge-signals.js', /signals\.js: roept registerAction aan/]]) {
+    ['public/apps/werk/command-entry.js', /command-entry\.js: zet data-rtg-edge-2-state/]]) {
     const i = kaart.KAART.findIndex((x) => x[0] === p);
     assert.ok(i >= 0, p + ' staat niet meer op de kaart; kies een andere rij voor deze proef');
     const [weg] = kaart.KAART.splice(i, 1);

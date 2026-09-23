@@ -11,8 +11,10 @@
       bericht en geen context. Wie het blikveld nieuwer vindt dan het scherm, heeft
       ongelijk; het scherm en de server winnen (besluit 5).
    3. HET ENE LEESPAD: acties() geeft de handelingen van RTGAdaptief met hun
-      Edge-stand erbij, en het tweede register (registerAction) staat in lees() met
-      zijn gebrek zichtbaar in plaats van stil weggevallen.
+      Edge-stand erbij. Het tweede register (registerAction) is weg (ronde 2, stap
+      18), en een kern die toch acties zou dragen wordt niet gelezen: elke
+      handeling in lees() komt uit RTGAdaptief. Mutatie: zet de edge-compat-lus
+      terug in blikveld.js, en toets 3 zakt.
 
    4. DE HOOFDACTIE VAN HET ACTIEVE BLAD (ronde 1): in de schil leest
       edge/blikveld-hoofdactie.js het blad dat open is, alleen bij dezelfde
@@ -208,7 +210,7 @@ test('de hoofdactie: aangewezen door het scherm, en twee bronnen die iets anders
   assert.equal(l.velden.hoofdactie.waarde, null, 'een verborgen knop is geen aangewezen hoofdactie');
 });
 
-test('het ene leespad: acties() met Edge-stand, en het tweede register met zijn gebrek', () => {
+test('het ene leespad: acties() met Edge-stand, en een kern met acties wordt niet gelezen', () => {
   const { w } = venster({
     adaptief: { ctx: { bron: 'bestanden', acties: ['weg', 'deel'] },
       items: [{ id: 'weg', naam: 'Verwijder', gewicht: 'terug', ongedaan: () => {} },
@@ -221,10 +223,8 @@ test('het ene leespad: acties() met Edge-stand, en het tweede register met zijn 
   assert.equal(a[0].edge.ongedaan, true, 'exact herstel met een weg terug mag ongedaan maken aanbieden');
   assert.equal(typeof a[0].ongedaan, 'function', 'het item voor de balk behoudt zijn eigen functies');
   const l = b.lees();
-  const stil = l.acties.find((x) => x.id === 'stil');
-  assert.equal(stil.herkomst, 'edge-compat');
-  assert.equal(stil.staat, 'GEBLOKKEERD');
-  assert.ok(stil.gebreken.includes('redenloos'), 'allowed:false zonder reden hoort als gebrek zichtbaar te zijn');
+  assert.deepEqual(l.acties.map((x) => x.id), ['weg', 'deel'], 'alleen de handelingen van RTGAdaptief');
+  assert.ok(l.acties.every((x) => x.herkomst === 'RTGAdaptief'), 'er komt geen edge-compat meer in lees()');
   assert.ok(l.acties.every((x) => x.gezag !== 'server' && x.gezag !== 'autoritatief'), 'zonder server geen servergezag');
   assert.doesNotThrow(() => JSON.stringify(l), 'lees() is platte data');
 });

@@ -83,10 +83,10 @@ const DRAAGT = { schrijft: 'sl', beslist: 'bl', rendert: 'sl', projecteert: 'sl'
    [rol, etiket, wat, citaat]. Een pad zonder public/ ervoor woont in
    public/shared/. s = schrijver (houdt of zet de toestand ZELF), b = beslisser
    (kiest de uitkomst), l = lezer (leest haar, of voedt haar via de API van de
-   eigenaar -- wie via declareer of setPresence schrijft, is geen eigenaar). Een
-   uitzondering, met opzet: wie het TWEEDE register vult (registerAction op de
-   Edge-kern), staat er als schrijver op. Dat register moet leeg (ronde 2), en
-   alleen zo ziet de kaart wie het nog vult. */
+   eigenaar -- wie via declareer of setPresence schrijft, is geen eigenaar). Het
+   TWEEDE register (registerAction op de Edge-kern) is in ronde 2 (stap 18)
+   weggehaald; wie het opnieuw zou vullen, staat er als schrijver op, en de
+   afgeleide controle 1 houdt die lijst op nul. */
 const KAART = [
   ['adaptief.js', 'grammatica-kern', 'capability-register:b gewicht:b', [
     ['schrijft', '-', 'de leer als globale', 'root.RTGAdaptiefLeer = leer;'],
@@ -157,20 +157,14 @@ const KAART = [
     ['schrijft', 'capability-register:l', 'herdeclareert met een postbode', 'A.declareer({ id: c.id, naam: c.naam, label: c.label, groep: c.groep'],
     ['beslist', 'gewicht:b', 'standaard licht over de grens', "gewicht: c.gewicht || 'licht',"],
     ['schrijft', 'vluchtige-context:l', 'zet de context bovenin', 'A.context(ctx);']]],
-  ['rtg-adaptive-edge.js', 'adaptieve-balk', 'presence:s identiteit:s voortzetting:s zichtbaarheidsstand:sb onderbalk:s capability-register:l vluchtige-context:l', [
+  ['rtg-adaptive-edge.js', 'adaptieve-balk', 'presence:s identiteit:s voortzetting:s zichtbaarheidsstand:sb onderbalk:s vluchtige-context:l', [
     ['schrijft', 'presence:s', 'presence in het eigen model', 'rt.model.presence = input && input.label ?'],
     ['schrijft', 'identiteit:s', 'identiteit in het eigen model', 'rt.model.identity = acting ?'],
     ['schrijft', 'voortzetting:s', 'voortzetting in het eigen model', 'rt.model.continuation = input && input.title ?'],
     ['schrijft', 'zichtbaarheidsstand:s', 'balkstand op body', 'd.body.dataset.rtgAdaptiveState = rt.model.state;'],
     ['beslist', 'zichtbaarheidsstand:b', 'Edge 2 compact wordt peek', "else if (state === 'compact') setState('peek', 'auto');"],
-    ['schrijft', 'onderbalk:s', 'klaar-vlag; CSS zet de onderbalk weg', "d.body.dataset.rtgAdaptiveReady = 'true';"],
-    ['leest', 'capability-register:l', 'een tik op het tweede register via de kern', 'if (custom && custom.run) return K.voer(custom, w);']]],
-  ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'capability-register:sb bevoegdheid:b zichtbaarheidsstand:b gewicht:bl', [
-    ['schrijft', 'capability-register:s', 'tweede register, laatste wint', 'state.registry[id] = { id: id'],
-    ['beslist', 'gewicht:b', 'alleen licht in dit register', "if (item.confirm || (item.gewicht && item.gewicht !== 'licht')) {"],
-    ['leest', 'gewicht:l', 'een tik langs de gewichtlaag', "return w.RTGGewicht.voer({ id: e.id, naam: e.label, gewicht: 'licht', doe: e.run })"],
-    ['beslist', 'capability-register:b', 'ids buiten het patroon eruit', 'if (!state || !/^[a-z][a-z0-9-]{1,39}$/.test(id)) return false;'],
-    ['beslist', 'bevoegdheid:b', 'allowed: boolean of functie', "typeof item.allowed === 'function' ? !!item.allowed()"],
+    ['schrijft', 'onderbalk:s', 'klaar-vlag; CSS zet de onderbalk weg', "d.body.dataset.rtgAdaptiveReady = 'true';"]]],
+  ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'zichtbaarheidsstand:b', [
     ['beslist', 'zichtbaarheidsstand:b', 'vier balkstanden', "var STATES = Object.freeze(['peek', 'dock', 'deck', 'expanded']);"]]],
   ['rtg-adaptive-edge-controls.js', 'adaptieve-balk', 'capability-register:bl hoofdactie:s vluchtige-context:l', [
     ['leest', 'capability-register:l', 'handelingen via het blikveld', 'if (w.RTGEdgeBlikveld) return w.RTGEdgeBlikveld.acties();'],
@@ -186,9 +180,8 @@ const KAART = [
   ['rtg-adaptive-edge-loader.js', 'laden', '', [
     ['beslist', '-', 'overslaan als de global bestaat', 'if (global && w[global]) { done(true); return; }'],
     ['schrijft', '-', 'start de Edge na de keten', 'w.RTGAdaptiveEdge.start(d, w);']]],
-  ['rtg-adaptive-edge-signals.js', 'adaptieve-balk', 'presence:b hoofdactie:l capability-register:s', [
+  ['rtg-adaptive-edge-signals.js', 'adaptieve-balk', 'presence:b hoofdactie:l', [
     ['leest', 'hoofdactie:l', 'eenmalig de hoofdactie', "knop = d.querySelector('[data-rtg-edge-primary]:not([hidden])');"],
-    ['schrijft', 'capability-register:s', "'primary' in het tweede register", "api.registerAction({ id: 'primary', label: label.slice(0, 80), allowed: !knop.disabled });"],
     ['beslist', 'presence:b', 'pending wordt presence', "if (staat === 'pending') api.setPresence({ label: label + ' wordt uitgevoerd'"]]],
   ['rtg-adaptive-edge-claim.js', 'adaptieve-balk', 'onderbalk:sb', [
     ['beslist', 'onderbalk:b', 'alleen vaste of plakkende balken', "if (stijl.position !== 'fixed' && stijl.position !== 'sticky') return false;"],
@@ -352,7 +345,7 @@ const KAART = [
   ['edge/blikveld.js', 'blikveld', 'capability-register:l vluchtige-context:l wereld:l identiteit:l presence:l trust-rail:l voortzetting:l hoofdactie:l gewicht:l waarom:l bevoegdheid:l', [
     ['projecteert', '-', 'een leesbeeld; schrijft niets', 'return { versie: 1, op: t, velden: velden, acties: gedaan, gebreken: gebreken };'],
     ['leest', 'hoofdactie:l', 'de hoofdactie via zijn lezer', "H && typeof H.lees === 'function' ? H.lees(w) : null"],
-    ['leest', 'capability-register:l', 'het tweede register erbij', "gedaan.push({ id: a.id, naam: a.label, herkomst: 'edge-compat'"],
+    ['leest', 'capability-register:l', 'de handelingen van RTGAdaptief', 'var A = adaptief(), lijst = A && A.voorNu ? A.voorNu() : [];'],
     ['projecteert', 'bevoegdheid:l', 'bevoegdheid zonder bron', "bevoegdheid: veld(null, 'geen', 'geen', t,"]]],
   ['edge/blikveld-hoofdactie.js', 'blikveld', 'hoofdactie:l', [
     ['leest', 'hoofdactie:l', 'het actieve blad, alleen lezend', "querySelector('#rtgCommand .cmd-pane.actief iframe')"],
@@ -407,7 +400,7 @@ const KAART = [
    Een dubbele zonder regel hier, of een regel zonder dubbele, laat het script
    zakken: dan is de verklaring bij de afleiding achtergebleven. */
 const WAAROM = {
-  'capability-register': 'Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij, gevuld door vier producenten: zijn eigen standaardingangen, Signals (primary), de sociale runtime (social-context) en het wereldbureau (home); de landing viel eruit in ronde 2 (stap 15), leeg in ronde 2. De controls oogsten paginaknoppen als derde bron.',
+  'capability-register': 'Het tweede register van de Edge-Core is weg (ronde 2, stap 18: registerAction, setProjection en voer bestaan niet meer, en de afgeleide controle 1 staat op nul). Wat overblijft is RTGAdaptief als schrijver (declareer, laatste wint) met de keuring van adaptief.js als beslisser, naast de controls die paginaknoppen oogsten als tweede bron van wat er in het blad staat -- en dat is de reden dat deze verantwoordelijkheid nog twee beslissers heeft.',
   'vluchtige-context': 'Twee contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie) en RTGEdge.active.ctx (scope, titel, actie, tool); tot ronde 2 was er een derde, RTGWorkspaceContext met een eigen current en een eigen ontdubbeling, en sinds stap 23 is dat een lezer van het blikveld zonder eigen staat; reizen-performance.js voedt de eerste twee allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen) en de brug (actief blad) elk apart.',
   wereld: 'De huidige wereld wordt op vier plekken BEPAALD: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco. GESCHREVEN wordt hij op meer: rtg-world-identity.js bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, en de landing zet hem per scene vanuit drie scripts.',
   'trust-rail': 'Verbinding en beveiliging worden op drie plekken zelf afgeleid en elk op een eigen strook getoond: RTGRail (navigator.onLine), het statuspaneel van de casco (/api/ready, Beveiligd) en de Intelligence-strook (protocol als ONLINE / TLS); geen van drie leest een ander.',

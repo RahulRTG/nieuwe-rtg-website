@@ -37,11 +37,19 @@
   function kopwereld(r){
     if(!r){d.body.removeAttribute('data-rtg-blad-wereld');return}
     var blad=r.querySelector('.cmd-pane.actief iframe'),id=w.RTGWorldIdentity,wereld=null;
-    if(blad&&id&&typeof id.classify==='function'){try{wereld=id.classify(blad.getAttribute('src'))}catch(e){wereld=null}}
+    /* De ECHTE plek van het blad, niet het src-attribuut: bladhaak.js werkt bij
+       navigatie binnen het frame alleen p.url bij, dus src bleef de eerste
+       pagina en het label bleef LivingOS zeggen na een link naar TravelOS. */
+    var pad=null;if(blad){try{pad=blad.contentWindow.location.pathname}catch(e){pad=null}
+      if(!pad||pad==='blank')pad=blad.getAttribute('src')}
+    if(pad&&id&&typeof id.classify==='function'){try{wereld=id.classify(pad)}catch(e){wereld=null}}
     if(WERELDEN.indexOf(wereld)<0)wereld='geen';
     if(d.body.getAttribute('data-rtg-blad-wereld')!==wereld)d.body.setAttribute('data-rtg-blad-wereld',wereld)}
 
-  function bij(){var r=root();wachtpost(r);kopwereld(r)}
+  /* Een navigatie BINNEN een blad verandert de DOM van de schil niet; zijn
+     load-event is het enige teken. */
+  function bij(){var r=root();wachtpost(r);kopwereld(r);
+    if(r)r.querySelectorAll('.cmd-pane iframe').forEach(function(f){if(!f.rtgBlikLoad){f.rtgBlikLoad=1;f.addEventListener('load',bij)}})}
   /* De werktafel wordt bij elke standwissel opnieuw OPGEBOUWD (werktafel.js,
      zet), dus de waarnemer hangt aan body en kijkt alleen naar #rtgCommand. */
   var gehaakt=null,binnen=null;

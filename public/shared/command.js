@@ -145,9 +145,10 @@
      TravelOS op Home drukte, stond buiten de werktafel in de momentenfeed van
      een andere wereld. Binnen de werktafel is Home de lege keuze (WERELD.md);
      zonder werktafel (uitgelogd, intake) doet de knop wat hij altijd deed.
-     Vangfase, zodat de eigen handler van de knop niet eerst wegnavigeert. */
+     Vangfase, zodat de eigen handler van de knop niet eerst wegnavigeert. En
+     op de VORM, niet op aria-label="Naar home": i18n.js vertaalt dat label. */
   d.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest(
-    '.rtg-edge-mark,.rtg-edge-bottom a[aria-label="Naar home"],.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');
+    '.rtg-edge-mark,.rtg-edge-bottom>a,.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');
     if(!a||!mag()||!tafel)return;e.preventDefault();e.stopPropagation();thuis()},true);
   if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',init);else init();
 })(window,document);

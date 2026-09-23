@@ -15,7 +15,9 @@
    3) HOME GING DE SCHIL UIT, naar de LivingOS-momentenfeed, ook vanuit TravelOS:
       de Edge van app.html is die van LivingOS (shared/command.js).
    4) DE KOP ZEI "LIVINGOS" boven elke wereld, en "Dit scherm" in het menu toonde
-      de LivingOS-functies (bladstand.js + rtg-edge-smart-menu).
+      de LivingOS-functies (bladstand.js + rtg-edge-smart-menu). En na een
+      navigatie binnen een blad bleef het label op de eerste pagina staan.
+   5) EEN TABTITEL GING ALS MARKUP de schil in (werktafel.js, innerHTML).
 
    DE MUTATIES, elk nagetrokken: haal in rtg-world-start.js de uitweg voor
    `geschikt()` weg (1 zakt op de tijd), zet in bladstand.js wachtpost() uit
@@ -100,6 +102,10 @@ test('werktafel op een telefoon: wereld open, erin, terug, Home -- en je blijft 
     await page.locator('.cmd-leeg button[data-url="/apps/kantoor.html"]').click();
     await page.waitForSelector('.cmd-pane.actief iframe', { timeout: 20000 });
     assert.equal((await label()).wereld, 'work');
+    /* 4c) Navigeren BINNEN een blad: het label volgt de echte plek van het
+       frame, niet zijn src-attribuut (bladhaak.js werkt dat niet bij). */
+    await page.evaluate(() => { document.querySelector('.cmd-pane.actief iframe').contentWindow.location.href = '/apps/reizen.html'; });
+    await page.waitForFunction(() => document.body.getAttribute('data-rtg-blad-wereld') === 'travel', null, { timeout: 20000 });
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 20000 });
     assert.equal(new URL(page.url()).pathname, '/apps/app.html', 'Home ging de schil uit');
@@ -113,6 +119,15 @@ test('werktafel op een telefoon: wereld open, erin, terug, Home -- en je blijft 
     const hier = await page.locator('.rtg-edge-here-list').innerText();
     assert.match(hier, /Vluchten/, 'in TravelOS hoort "Dit scherm" TravelOS-functies te tonen');
     assert.doesNotMatch(hier, /Routes vergelijken/, 'de LivingOS-functies horen niet in TravelOS');
+
+    /* 5) Een tabtitel is TEKST. Hij komt uit localStorage of uit document.title
+       van het frame, en ging als innerHTML de schil in. */
+    await page.evaluate(() => localStorage.setItem('rtg_cmd_bladen', JSON.stringify({
+      bladen: [{ url: '/apps/reizen.html', titel: '<img src=x id=kwaad>' }], actief: 0 })));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.cmd-pane.actief iframe', { timeout: 20000 });
+    assert.equal(await page.locator('#kwaad').count(), 0, 'een tabtitel werd als markup in de schil gezet');
+    assert.equal(await page.locator('.cmd-tab span').first().textContent(), '<img src=x id=kwaad>');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {

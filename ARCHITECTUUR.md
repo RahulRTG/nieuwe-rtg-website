@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5118 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5122 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5118 |
-| servermodules (`server/**/*.js`) | 3618 |
-| routebestanden (`server/routes/**`) | 600 |
-| kernmodules (`server/kern/**`) | 2267 |
+| API-endpoints | 5122 |
+| servermodules (`server/**/*.js`) | 3622 |
+| routebestanden (`server/routes/**`) | 602 |
+| kernmodules (`server/kern/**`) | 2269 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 382 |
-| toetsbestanden (`test/*.test.js`) | 1735 |
+| toetsbestanden (`test/*.test.js`) | 1736 |
 | schermtoetsen (`test/*.e2e.js`) | 244 |
 
 ## 2. De weg van een verzoek
@@ -113,7 +113,7 @@ zie §5 -- er zijn nog 242 kern-namen die meer dan één domein aanraakt.
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 699 | 72 | 16 | 427 |
 | `supplier` | 624 | 126 | 6 | 336 |
-| `office` | 73 | 21 | 3 | 84 |
+| `office` | 74 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 77 | 19 | 1 | 64 |
@@ -128,7 +128,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3485 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3488 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

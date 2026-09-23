@@ -85,7 +85,17 @@ app.post('/api/office/timeline', officeAuth, (req, res) => {
 /* Bewust POST met het token in de Authorization-header (zelfde les als de
    bank-export): een token in een GET-querystring lekt via logs, proxies en de
    browsergeschiedenis. De backoffice downloadt via fetch + blob. */
-app.post('/api/office/export.csv', kluisAuth, (req, res) => {
+app.post('/api/office/export.csv', kluisAuth, async (req, res) => {
+  /* ZONDER SPOOR GEEN EXPORT (AUTHORITY.md B1). Dit bestand draagt de codenaam
+     van elke klant naast elke bestelling; eerst schreef het niets. noteerVast
+     komt pas terug als de opslag de regel heeft bevestigd, en anders weigeren
+     we -- een write-behind noteer() zou hier een valse bevestiging zijn. De
+     actor komt uit de sessie, nooit uit het verzoek. */
+  const actor = require('../../opzet/envelop').wie(req);
+  const spoor = await require('../../inzagelog').noteerVast({
+    door: { id: actor, naam: actor || 'kantoor (gedeelde code)' },
+    over: 'alle bestellingen, ritten en boekingen', waarom: 'boekhoudexport', bron: 'office/export.csv' });
+  if (!spoor.ok) return res.status(spoor.status || 503).json({ error: spoor.error, spoor: spoor.reden });
   const esc = require('../../kern/factuur').csvCel; // csv-veilig + geen formule-injectie
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv"');

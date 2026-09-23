@@ -235,3 +235,20 @@ async function eigenaarsToken(base) {
   const r = await api(base, '/api/auth/login', { login: 'Rahul', password: 'Imran' });
   return (r.body && r.body.token) || '';
 }
+
+test('8. de boekhoudexport gaat niet uit zonder spoor (AUTHORITY.md B1)', async () => {
+  /* De export draagt de codenaam van elke klant naast elke bestelling, en liet
+     eerst geen enkel spoor na. Hij hangt nu aan noteerVast(): de eerlijke opslag
+     levert gewoon een CSV, de liegende weigert -- anders bewijst de eerste helft
+     niet dat er gejournaliseerd wordt. */
+  const post = (base, token) => fetch(base + '/api/office/export.csv', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' });
+  const goed = await post(eerlijk.base, balieA);
+  assert.equal(goed.status, 200, 'de export hoort met een vastgelegd spoor gewoon te werken');
+  assert.match(goed.headers.get('content-type') || '', /text\/csv/);
+  const fout = await post(leugen.base, balieB);
+  assert.ok(fout.status >= 500, 'de export gaf ' + fout.status + ' terwijl het spoor niet vaststaat');
+  const lijf = await fout.text();
+  assert.ok(!/datum;soort;partner/.test(lijf), 'er is boekhouding meegestuurd zonder spoor');
+  assert.equal(JSON.parse(lijf).spoor, 'niet-bevestigd', 'de weigering zegt waarom');
+});

@@ -345,8 +345,8 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 
 | # | bevinding | voorstel | stand |
 |---|---|---|---|
-| B1 | `/api/office/export.csv` laat geen enkel spoor na | een journaalregel die weigert als hij niet vaststaat (`noteerVast`) | een stap weg, klein |
-| B2 | `server/kern/appstore/vierogen.js` laat door zonder identiteit (`onbekend`) | weigeren zonder identiteit aan beide kanten | een stap weg, klein |
+| B1 | `/api/office/export.csv` liet geen enkel spoor na | een journaalregel die weigert als hij niet vaststaat (`noteerVast`) | **staat** (23 september 2026; `test/ledenbaliespoor.test.js` toets 8, onder `schrijf-verloren` geen CSV) |
+| B2 | `server/kern/appstore/vierogen.js` liet door zonder identiteit (`onbekend`) | weigeren met `geen-identiteit` en de weg eromheen | **staat** (23 september 2026; `test/appstore-vierogen.test.js` toets 0, `test/appstore-persoon.test.js` toets 7: de gedeelde code tekent een persoonlijke inzending niet meer af) |
 | B3 | de kantoor- en leveranciersstream toetsen alleen bij het openen | bij elk bericht de sessie en de rechten opnieuw | een stap weg |
 | B4 | `/media/:naam` zonder toegangscontrole, een jaar `public` gecachet | eerst meten wat er staat; privémateriaal achter een korte, ondertekende link | vraagt een besluit |
 | B5 | `employment.js` verwijst naar een `offboarding.js` die niet bestaat | fase 3; tot die tijd de verwijzing eerlijk maken | een stap weg |
@@ -355,6 +355,15 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 ---
 
 ## 7. Besluiten van de eigenaar
+
+**Alle vijf genomen op 23 september 2026, telkens de aanbevolen keuze:** A1
+vervangen (geleidelijk, `GEZAG.json` mag alleen dalen), A2 de eigenaar is geen
+dagelijkse superuser (stap-op en reden bij gevoelige lezingen, ook voor hem),
+A3 default-deny op de draaiende server, eerst in de schaduw, A4 eigen rollen
+alleen als bundel van bestaande werkwoorden met een rechtensimulatie vooraf,
+en A5 een agent handelt onder een eigen identiteit (`ai:<naam>`) namens een
+mens. Wat hieronder staat is de afweging zoals die is voorgelegd; genomen is
+niet gebouwd -- de stand per onderdeel blijft in par. 4 en 5.
 
 **A1 -- Vervangt de beleidsmotor de vijf gezagsvocabulaires?**
 - **(aanbevolen)** Ja, geleidelijk: elke vocabulaire die verhuist verdwijnt uit

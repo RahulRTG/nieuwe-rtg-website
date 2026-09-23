@@ -137,6 +137,21 @@ effectieve rechten byte voor byte vergelijkt. Let op de namen: `mandaat`,
 `machtiging`, `bevoegdheid`, `geschorst` en `termijn` zijn bezet — het heet
 `uitgavegrens`, `opgeschort` en `zittingsduur`.
 
+**`AUTHORITY.md` is de RTG Authority Engine** -- van TOEGANG modelleren ("mag
+Finance in") naar BEVOEGDHEID ("mag namens RTG Nederland tot € 25.000 klaarzetten,
+niet uitvoeren, tot 31 december, boven € 10.000 met een verse passkey"). Lees die
+vóór je een poort, rol, recht, tekengrens of auditregel toevoegt. `BENOEMING.md`
+is er het Foundation-profiel van. De meting: er is geen beslispunt maar er zijn
+er zeven, geen afdwingpunt maar zestien poortfuncties plus 26 gezagsfuncties in
+handlers, en geen lidmaatschap maar elf losse opslagplaatsen met vier
+levenscycli. Twee regels die er als eerste uit kwamen en die overal gelden:
+**de actor van een auditregel komt uit de sessie en nooit uit het verzoek** (P0b
+vond zeven plekken, twee door een toets beschermd), en **de motor VERVANGT de
+vijf gezagsvocabulaires in plaats van er een zesde naast te zetten** (INT-01).
+Eén grammatica, geen tabel met alle rechten: het domein bezit zijn werkwoorden.
+Namen: `benoeming`, `orggraaf`, `beleidsmotor` en `tekengrens` zijn vrij;
+`policy`, `capability`, `machtiging`, `lidmaatschap` en `delegatie` zijn bezet.
+
 **`HDI.md` is de laag BOVEN de Foundation** — RTG Human Development
 Infrastructure, als richtingsdocument met per onderdeel of het **staat**, **een
 stap weg** is, **een besluit vraagt** of **jaren weg** is (zoals PLATFORM.md en

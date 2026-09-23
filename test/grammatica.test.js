@@ -272,6 +272,14 @@ test('de uitvoerder: compensatie is nooit "Ongedaan maken", en zonder lade gaat 
   r = laad(false, undefined);
   assert.equal(r.G.voer({ id: 'deel', naam: 'Delen', gewicht: 'bewust' }), false);
   assert.deepEqual(r.log.gedaan, [], 'zonder lade gaat een bewuste handeling dicht');
+  /* Een grammatica van VOOR effectief() (een verouderde cache naast een nieuwe
+     gewicht.js) levert geen uitvoerder, en dan gaan balk en orb dicht voor alles
+     wat niet licht is -- in plaats van een TypeError bij elke tik. DE MUTATIE:
+     haal in gewicht.js `|| !gram.effectief` weg (dan bestaat RTGGewicht wel). */
+  const oud = Object.assign({}, gram); delete oud.effectief;
+  const window = { RTGGrammatica: oud, console: { warn() {}, error() {} } };
+  vm.runInNewContext(bron, { window, document: {} });
+  assert.equal(window.RTGGewicht, undefined, 'een grammatica zonder effectief() levert geen uitvoerder');
 });
 
 test('verhinderd is niet uitgeschakeld: de knop blijft bedienbaar en zegt het in zijn naam', () => {

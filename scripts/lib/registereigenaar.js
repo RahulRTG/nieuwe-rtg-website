@@ -90,6 +90,12 @@ const EIGENAAR = {
      bijkomen zonder dat iemand zegt wie ze bezit. */
   'VERANDERBEREIK-KENNIS.json': { schrijver: 'scripts/veranderbereik.js' },
   'VERANDERBEREIK-RONDE.json': { schrijver: 'scripts/veranderbereik.js' },
+  /* DE EDGE (EDGE.md par. 9). Twee meters en elk zijn eigen bestand: de kaart
+     leest de BRON (wie schrijft, beslist en leest), de dekking een echte
+     BROWSER (welk veld heeft elk scherm, en waar komt het vandaan). Hun ratels
+     staan in scripts/norm.js; dat de meters kunnen uitslaan in test/meterijk.test.js. */
+  'EDGEKAART.json': { schrijver: 'scripts/edgekaart.js' },
+  'EDGEDEKKING.json': { schrijver: 'scripts/edgedekking.js' },
   'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },

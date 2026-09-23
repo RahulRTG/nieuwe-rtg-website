@@ -29,7 +29,7 @@
   'use strict';
   if (w.RTGGewicht) return;
   var gram = w.RTGGrammatica;
-  if (!gram) return;
+  if (!gram || !gram.effectief) return;   // oude grammatica: dicht
 
   function rail() { return w.RTGRail || null; }
   function lagen() { return w.RTGLagen || null; }
@@ -195,8 +195,7 @@
   }
 
   /* ------------------------------------------------------------- de ingang --
-     Eén functie, en elke tik in het dock loopt er langs: wie de capability
-     aanroept, krijgt zijn trap mee. */
+     Elke tik loopt hier langs en krijgt zijn trap mee. */
   function voer(it, bevestiging) {
     if (!it) return false;
     if (it.verhinderd) {                    // grijs is nooit stil: waarom.js legt uit

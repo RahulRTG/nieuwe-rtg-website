@@ -185,6 +185,12 @@ const REGISTER = {
      gedeeldheid door een regex in plaats van door een feit, en leest de nul als
      bevestiging terwijl hij een blinde vlek is. */
   'PLANVORM.json': { meter: ['planDomeinenGemeten'] },
+  /* OFFICEVORM.json meet of de elf objectdomeinen onder het voorgestelde
+     `RTGObject` (OFFICE.md par. 0) een datavorm delen. Geratelde waarde: het
+     BEREIK, om exact de reden van PLANVORM.json hierboven -- de uitkomst is een
+     nul, en een nul over minder domeinen leest als bevestiging terwijl hij een
+     blinde vlek is. */
+  'OFFICEVORM.json': { meter: ['officeDomeinenGemeten'] },
   /* NEIGINGVORM.json meet of er een persoonlijke laag bij mag en in welke vorm
      (NEIGING.md par. 0). Twee geratelde waarden, en met opzet geen derde over de
      NAAMmeting: die telt sinds server/kern/neiging/ bestaat zijn eigen bestanden

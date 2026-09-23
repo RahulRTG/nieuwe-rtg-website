@@ -24,7 +24,8 @@
 module.exports = (kern) => {
   const { app, officeAuth, boardroomAuth, boardroomWie, magBalie,
           balieZetels, balieZetelZet, balieZetelWeg, balieZoek, balieDossier,
-          balieHerstel, balieKlachtOpen, balieKlachtStatus, balieAboVoorstel } = kern;
+          balieHerstel, balieKlachtOpen, balieKlachtStatus, balieAboVoorstel,
+          zwaarbewijs, afdelingen } = kern;
 
   /* Elk antwoord loopt door dezelfde omhulling. Hij wacht op een belofte, want
      het herstel zet e-mail en sms in gang en hoeft niet synchroon te zijn. Een
@@ -108,13 +109,30 @@ module.exports = (kern) => {
      geen namen; die blijven waar ze horen. */
   app.post('/api/office/balie/zetels', boardroomAuth, (req, res) => veilig(res, () =>
     ({ ok: true, baas: !!req.boardroomBaas, zetels: balieZetels() })));
-  app.post('/api/office/balie/zetel', boardroomAuth, (req, res) => veilig(res, () => {
+  /* Een zetel geven of intrekken is RECHT VERLENEN, en dat deed tot 23 september
+     2026 iedereen met een boardroomsleutel: de poort hierboven laat de eigenaar
+     EN wie van hem de sleutel kreeg binnen, en `baas` ging alleen naar het
+     scherm om knoppen te tonen. Een scherm is geen grens. Nu dezelfde drie
+     grendels als het geven van boardroomtoegang (routes/kantoren/regie.js):
+     alleen de eigenaar, een verse passkey via de zware poort (kern/zwaarbewijs.js,
+     met zijn zichtbare terugval zolang er geen passkey is), en een auditregel.
+     Ook INTREKKEN vraagt de vinger: een gestolen eigenaarssessie die de
+     balie leegveegt is een storing die niemand mag kunnen veroorzaken zonder
+     toestel. Intrekken werkt meteen, want magBalie leest de lijst bij elk
+     verzoek; er is geen token met een eigen levensduur om te laten verlopen. */
+  app.post('/api/office/balie/zetel', boardroomAuth, (req, res) => veilig(res, async () => {
+    if (!req.boardroomBaas) return { status: 403, error: 'Alleen de eigenaar geeft of trekt een baliezetel in. De boardroomsleutel opent de kamer, maar verleent geen rechten aan anderen.' };
     const key = kort(lijf(req).key, 120);
     if (!key) return { status: 400, error: 'Geef de sleutel van het lid dat de zetel krijgt of verliest.' };
     const weg = lijf(req).weg === true || kort(lijf(req).actie, 20) === 'weg';
+    const bewijs = await zwaarbewijs.eis(zwaarbewijs.boardroomUser(req), 'eigenaar-baliezetel',
+      zwaarbewijs.sessieSleutel(req), req, weg ? 'Het intrekken van een baliezetel' : 'Het geven van een baliezetel');
+    if (bewijs.error) return bewijs;
     const r = weg ? balieZetelWeg(key) : balieZetelZet(key);
+    if (r && r.error) return r;
+    afdelingen.audit('eigenaar', (weg ? 'Baliezetel ingetrokken van ' : 'Baliezetel gegeven aan ') + key);
     // de verse lijst gaat mee terug: het scherm werkt erop, en een tweede ronde
     // langs de server zou het beeld alleen maar even uit de pas laten lopen
-    return (r && r.error) ? r : Object.assign({}, r, { zetels: balieZetels() });
+    return Object.assign({}, r, { zetels: balieZetels() });
   }));
 };

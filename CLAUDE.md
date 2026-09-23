@@ -811,6 +811,28 @@ staat, een stap weg is, een besluit vraagt of jaren weg is; het eerste dat vanda
 écht fout kan gaan staat bovenaan par. 7: **géén roostermotor leest verzuim**,
 dus een zieke medewerker kan gewoon worden ingepland.
 
+**`OFFICE.md` is de richting van RTG Office Next** -- van zes editors naar
+werk: alles wat een bedrijf van Microsoft 365 of Google Workspace verwacht,
+maar documenten, data, processen en AI als één systeem. Een richtingsdocument
+met per onderdeel **staat**, **een stap weg**, **vraagt een besluit** of **jaren
+weg**, over de 26 punten van de eigenaar. Het dragende punt, een universeel
+`RTGObject`, is eerst **gemeten** (`npm run officevorm`, `OFFICEVORM.json`):
+<!--getal:officevorm.inAlle-->0<!--/getal--> van <!--getal:officevorm.velden-->144<!--/getal--> velden in alle <!--getal:officevorm.domeinen-->11<!--/getal--> objectdomeinen,
+<!--getal:officevorm.domeineigenPct-->95.1<!--/getal-->% in precies één. Er komt dus geen objecttype maar een **blok dat
+verwijst** (de view uit `CREATE.md` par. 3) met de gedeelde kop als envelop. Het
+grootste gat is geen functie: **een tekstdocument heeft hier geen model, het IS
+HTML** (`execCommand` op `inhoud.tekst`), en wijzigingen bijhouden, live samen
+schrijven en DOCX zonder verlies rusten alle drie op een model. Lees vóór je aan
+Office werkt vooral par. 4: samenvoegen geldt voor inhoud en nooit voor een
+stand, en classificatie reist mee naar elke uitgang -- de AI-schrijfhulp stuurde
+een strikt document gewoon naar een model (dicht sinds 23 september 2026). Par.
+6-9 brengen de punten 27-150 terug tot **vijftien platformen** met een
+afhankelijkheidsgraaf en een bouwvolgorde; lees par. 6.2 vóór je een van die
+punten bouwt, want daar staan de botsingen met besluiten die al genomen zijn
+(geen zesde gezagsladder voor AI-risico, het commandoveld wacht op de twee
+getallen van `EXECUTIE.md` blok 9, en procesanalyse gaat per stap en nooit per
+mens).
+
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
 PIN), waarachter het platform per context tijdelijke, begrensde bevoegdheden

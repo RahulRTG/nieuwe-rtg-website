@@ -168,6 +168,11 @@ window.I18N = { en: {
       });
     });
   }
+  /* Zetels geven en intrekken is een zware handeling: de server kan om een
+     passkey vragen, en /shared/zwaarbevestig.js doet dan de ceremonie. */
+  function zwaar(pad, body) {
+    return window.RTGZwaar.doe(pad, body, { token: token(), optiesPad: '/api/office/boardroom/bevestig/opties' });
+  }
   // dezelfde melder als de rest van deze pagina, met dezelfde standen
   function zeg(t, soort) {
     var e = $('melder'); if (!e) return;
@@ -276,7 +281,7 @@ window.I18N = { en: {
         k.type = 'button';
         k.addEventListener('click', function () {
           k.disabled = true;
-          post('/api/office/balie/zetel', { key: z.key, weg: true })
+          zwaar('/api/office/balie/zetel', { key: z.key, weg: true })
             .then(function (d) { zeg(T('bz.wegOk', 'De zetel is ingetrokken.'), 'goed'); toonZetels(zetelsUit(d)); })
             .catch(function (e) { zeg(e.message, 'fout'); k.disabled = false; });
         });
@@ -310,7 +315,7 @@ window.I18N = { en: {
     var b = $('bzGeef');
     b.disabled = true;
     sleutelVan(v).then(function (key) {
-      return post('/api/office/balie/zetel', { key: key });
+      return zwaar('/api/office/balie/zetel', { key: key });
     }).then(function (d) {
       $('bzCode').value = '';
       zeg(T('bz.geefOk', 'De zetel is gegeven.'), 'goed');
@@ -354,6 +359,8 @@ window.I18N = { en: {
 </script>
 <script src="/shared/i18n.js"></script>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/passkey.js"></script>
+<script src="/shared/zwaarbevestig.js"></script>
 <script src="/apps/boardroom.js" defer></script>
 <script src="/apps/boardroom-eigenaar.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

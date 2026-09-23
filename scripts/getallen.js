@@ -149,6 +149,17 @@ const GETALLEN = {
     wat: 'verschillende combinaties van stations over de plandomeinen' },
   'planvorm.reistijd': { bron: 'PLANVORM.json', veld: 'rondes.ruim.lus.zeldzaamste.domeinen',
     wat: 'plandomeinen die het zeldzaamste station (reistijd) uitvoeren' },
+  /* De officevorm (OFFICE.md par. 0). Zelfde reden als de planvorm hierboven:
+     het BEREIK staat eerst, omdat een nul over minder domeinen er vers en
+     verouderd hetzelfde uitziet. */
+  'officevorm.domeinen': { bron: 'OFFICEVORM.json', veld: 'rondes.ruim.vorm.domeinen.length',
+    wat: 'objectdomeinen onder het voorgestelde RTGObject waarover de vorm is gemeten' },
+  'officevorm.velden': { bron: 'OFFICEVORM.json', veld: 'rondes.ruim.vorm.velden',
+    wat: 'velden over de objectdomeinen (ruime lijst), envelop eruit' },
+  'officevorm.inAlle': { bron: 'OFFICEVORM.json', veld: 'rondes.ruim.vorm.inAlleDomeinen.length',
+    wat: 'velden die in ALLE objectdomeinen staan' },
+  'officevorm.domeineigenPct': { bron: 'OFFICEVORM.json', veld: 'rondes.ruim.vorm.inEenDomeinPct',
+    wat: 'percentage velden dat in precies EEN objectdomein staat (ruime lijst)' },
   'kantoor.routes': { bron: 'KANTOORMACHT.json', veld: 'gemeten.routes',
     wat: 'kantoorroutes achter /api/office en /api/boardroom' },
   'kantoor.deurEistMens': { bron: 'KANTOORMACHT.json', veld: 'gemeten.deurEistMens',
@@ -569,7 +580,7 @@ const GETALLEN = {
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
   'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md',
-  'KEURING.md', 'VERANDERING.md', 'PLANNING.md'];
+  'KEURING.md', 'VERANDERING.md', 'PLANNING.md', 'OFFICE.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

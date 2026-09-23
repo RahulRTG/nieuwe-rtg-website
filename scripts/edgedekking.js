@@ -32,6 +32,8 @@
                valt bijvoorbeeld terug op de documenttitel -- dan staat er
                'ja' met herkomst 'document', en dat is iets anders dan een
                scherm dat zijn context zelf publiceert. Lees de twee samen.
+               Welke herkomst als "het scherm zelf" telt, staat per veld in
+               ZELF hieronder, en nergens anders.
      acties    tellingen over lees().acties, gesplitst naar het register waar
                ze vandaan komen (RTGAdaptief tegenover edge-compat, de
                registerAction van de balk): standen, gezag, gevolg, herstel,
@@ -141,10 +143,33 @@ function alleSchermen() {
 
 /* ZEGT HET SCHERM HET ZELF? Een `ja` zegt dat er een waarde is, niet wie hem
    leverde: de context is op bijna elk los scherm de titel die het casco uit
-   document.title haalt, en de wereld komt uit de centrale wereldkaart. Alleen
-   een herkomst die bij het scherm zelf begint (`scherm`, `scherm:*`, of het
-   pagina-attribuut) telt als "het scherm publiceert dit". */
-function zelf(herkomst) { return /^scherm/.test(herkomst || '') || herkomst === 'pagina'; }
+   document.title haalt, en de wereld komt uit de centrale wereldkaart.
+
+   Daarom een GESLOTEN LIJST PER VELD, en geen patroon over alle velden. Het
+   patroon (`^scherm`, plus het pagina-attribuut) liet twee dingen door die geen
+   publicatie van het scherm zijn: `data-rtg-world` is een gebakken kopie van het
+   MANIFEST (heritage-uitrol.js), en elke herkomst die toevallig met "scherm"
+   begint telde mee, ook een die er morgen bij komt. Nu telt alleen wat hier
+   staat, en een veld dat hier niet staat is een fout en geen stille nee.
+
+   - identiteit, wereld, presence en voortzetting: nooit. De wereld komt uit de
+     route, het blad of die kopie (K-reikwijdte: wereld telt nooit als zelf), en
+     de andere drie komen uit de Edge-kern of het toestel.
+   - context, object en activiteit: alleen `scherm`. In de schil heet wat uit een
+     blad komt `blad` (edge/blikveld.js), en dat is de brug die publiceert, niet
+     het scherm dat hier gemeten wordt.
+   - hoofdactie: alleen `scherm:data-hoofdactie`, niet de padtabel.
+   - trust: alleen `scherm:rail`; offline is een toestand van het TOESTEL. */
+const ZELF = Object.freeze({
+  identiteit: Object.freeze([]), wereld: Object.freeze([]),
+  context: Object.freeze(['scherm']), object: Object.freeze(['scherm']), activiteit: Object.freeze(['scherm']),
+  presence: Object.freeze([]), voortzetting: Object.freeze([]),
+  hoofdactie: Object.freeze(['scherm:data-hoofdactie']), trust: Object.freeze(['scherm:rail'])
+});
+function zelf(veld, herkomst) {
+  if (!Object.prototype.hasOwnProperty.call(ZELF, veld)) throw new Error('edgedekking: veld "' + veld + '" staat niet in ZELF');
+  return ZELF[veld].indexOf(String(herkomst || '')) >= 0;
+}
 
 /* Schermen die een lid met opzet doorsturen en daarom niet als lid te meten
    zijn, MET de reden. Een nieuw scherm dat doorstuurt en hier niet staat, zakt:
@@ -174,12 +199,12 @@ function contractNieuw(reg, opSchijf) {
     }
     if (s.status !== 'gemeten') { uit.push(pad + ': nieuw scherm zonder Edge (' + s.status + ')'); continue; }
     for (const veld of ['wereld', 'context']) if (s.velden[veld] !== 'ja') uit.push(pad + ': publiceert geen ' + veld);
-    const hoofd = s.velden.hoofdactie === 'nvt' || (s.velden.hoofdactie === 'ja' && zelf((s.herkomst || {}).hoofdactie));
+    const hoofd = s.velden.hoofdactie === 'nvt' || (s.velden.hoofdactie === 'ja' && zelf('hoofdactie', (s.herkomst || {}).hoofdactie));
     if (!hoofd) uit.push(pad + ': wijst zelf geen hoofdactie aan (data-hoofdactie) en verklaart ook niet waarom niet');
     /* Besluit 11 (EDGE.md par. 8): wie handelingen heeft, zegt ook zelf waar je
        bent. Een scherm dat met reden geen hoofdactie heeft, mag bij de titel
        van het casco blijven. */
-    else if (s.velden.hoofdactie === 'ja' && !zelf((s.herkomst || {}).context)) {
+    else if (s.velden.hoofdactie === 'ja' && !zelf('context', (s.herkomst || {}).context)) {
       uit.push(pad + ': heeft een eigen hoofdactie maar publiceert zijn context niet zelf (RTGAdaptief.context)');
     }
     for (const [bron, a] of Object.entries(s.acties || {})) {
@@ -188,7 +213,7 @@ function contractNieuw(reg, opSchijf) {
   }
   return uit;
 }
-module.exports = { alleSchermen, contractNieuw, zelf, achteruitgang, VELDEN, DOORVERWIJZING_MET_REDEN };
+module.exports = { alleSchermen, contractNieuw, zelf, ZELF, achteruitgang, VELDEN, DOORVERWIJZING_MET_REDEN };
 
 /* ---------------------------------------------------------------------------
    DE NALOOP draait vóór alles: geen server, geen browser. Hij meet niet; hij
@@ -667,7 +692,7 @@ function telling(schermen) {
     if (!s.stabiel) onrustig++;
     for (const v of VELDEN) {
       perVeld[v][s.velden[v]]++;
-      if (s.velden[v] === 'ja' && zelf((s.herkomst || {})[v])) perVeld[v].zelf++;
+      if (s.velden[v] === 'ja' && zelf(v, (s.herkomst || {})[v])) perVeld[v].zelf++;
     }
     for (const h of Object.keys(s.acties)) {
       if (!acties[h]) acties[h] = leegActies();
@@ -698,7 +723,7 @@ function achteruitgang(oud, nieuw) {
       /* Ook achteruit: het scherm zei het ZELF en nu komt het uit een terugval
          (casco, route, padtabel). Dan blijft het 'ja' terwijl er iets verdween. */
       const hOud = (o.herkomst || {})[v], hNu = (n.herkomst || {})[v];
-      if (nu === 'ja' && zelf(hOud) && !zelf(hNu)) uit.push({ pad, veld: v, was: 'ja (' + hOud + ')', nu: 'ja (' + hNu + ')', status: n.status });
+      if (nu === 'ja' && zelf(v, hOud) && !zelf(v, hNu)) uit.push({ pad, veld: v, was: 'ja (' + hOud + ')', nu: 'ja (' + hNu + ')', status: n.status });
     }
   }
   return uit;

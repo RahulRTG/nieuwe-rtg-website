@@ -227,13 +227,13 @@ eigen indruk (`SERVICE.md` par. 12).
 |---|---|---|
 | identiteit | de Edge-kern, als een scherm `setIdentity` aanroept | `edge-signaal` — en er is vandaag **geen** producent |
 | wereld | het open blad in de schil; anders de route in `rtg-world-identity.js`; anders `data-rtg-world` op de pagina | `blad`, `route`, `pagina` |
-| context | de context die het scherm in `RTGAdaptief` zette; anders het Edge-casco; anders de documenttitel | `scherm`, `edge-casco`, `document` |
-| object | `object` in de context van het scherm | `scherm` |
-| activiteit | `activiteit` in de context van het scherm | `scherm` |
+| context | de context die het scherm in `RTGAdaptief` zette (in de schil: die de brug uit het actieve blad doorgaf); anders het Edge-casco; anders de documenttitel | `scherm` (in de schil `blad`), `edge-casco`, `document` |
+| object | `object` in de context van het scherm, alleen als die context een bron heeft (anders leeg: het scherm zegt niet wie het is) | `scherm` (in de schil `blad`) |
+| activiteit | `activiteit` in de context van het scherm, alleen met een bron, net als het object | `scherm` (in de schil `blad`) |
 | presence | de Edge-kern | `edge-signaal` |
 | voortzetting | het geheugen van de werktafel (in de schil); anders het signaal van de kern | `toestel:werktafel`, `edge-signaal` |
 | hoofdactie | in de schil het ACTIEVE blad (`[data-hoofdactie]` daarin, anders leeg met reden); los het scherm zelf, anders de knop van de padtabel | `blad:data-hoofdactie`, `blad`, `scherm:data-hoofdactie`, `edge-padtabel` |
-| trust | de `rail` in de context; offline als toestand van het toestel | `scherm:rail`, `toestel` |
+| trust | de `rail` in de context; offline als toestand van het toestel | `scherm:rail` (in de schil `blad:rail`), `toestel` |
 | bevoegdheid | **niets**, met de reden erbij | — |
 
 **Gezag heeft vier waarden en de hoogste is vandaag leeg.** `autoritatief` is
@@ -263,6 +263,16 @@ leeg met die reden (`blad`) en leent het niet de knop van de schil -- de padtabe
 van Edge 2 draait niet in een blad. Wat de schil nog steeds niet ziet: de
 padtabel van een blad, en alles van een blad van een andere herkomst. De
 dekkingsmeter meet de schermen los; een meting van de schil zelf is ronde 2.
+
+**In de schil heet alles wat uit een blad komt `blad`** (ronde 2). Daar zet
+alleen de brug een context in `RTGAdaptief` -- `test/edgedekking-zelf.test.js`
+houdt dat lexicaal vast over de scripts van `app.html` -- en die geeft door wat
+het blad zei. Context, object en activiteit heten daar dus `blad` en de rail
+`blad:rail`, nooit `scherm`. Wat de meter als "het scherm zegt het zelf" telt,
+is een gesloten lijst per veld (`ZELF` in `scripts/edgedekking.js`): alleen
+`scherm` voor context, object en activiteit, `scherm:data-hoofdactie` en
+`scherm:rail`, en voor de wereld niets -- ook niet het pagina-attribuut, want
+`data-rtg-world` is een kopie van het MANIFEST en geen publicatie.
 
 ### De uitbreiding van de context, en een oud gebrek in de sleutel
 

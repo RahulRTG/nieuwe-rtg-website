@@ -695,8 +695,18 @@ async function loop(basis, uit) {
     if (pakket) await P('/api/office/payroll/regels/keur', { land: 'NL', versie: pakket.versie, ondanks: true,
       reden: 'Adamproef: demo-tabellen, geen echte loonstroken' }, K);
   }
+  /* DE BESTURINGSPROEF VOOR SCHAKEL 17. Zonder een geval waarin de run WEL moet
+     melden, staat "geen bevinding voor het lid" ook groen als de toets helemaal
+     niet draaide. Dat geval zit al in de wereld: de ondernemer van Meridiaan
+     werd manager voordat hij de zaak aan zijn entiteit koppelde, dus zijn
+     aanmelding kreeg geen dienstverband. Krijgt hij een contract, dan hoort de
+     run hem te melden als loon zonder dienstverband. */
+  const baasNl = ((((await P('/api/supplier/roster', { code: NL_ZAAK })).data || {}).staff) || [])
+    .find(x => /^Ondernemer /.test(String(x.name || '')));
+  if (baasNl) await P('/api/supplier/payroll/contract', { staffId: baasNl.id, vanaf, soort: 'vast',
+    uurloonCenten: 2500, urenPerWeek: 8, functie: 'Eigenaar' }, S2);
   await stap(
-    schakel(17, 'kantoor', 'lid', 'opent de loonrun; het contract levert een loonregel op'),
+    schakel(17, 'kantoor', 'lid', 'opent de loonrun; het contract levert een loonregel op, en de run leest het dienstverband'),
     () => K ? P('/api/office/payroll/run/open', { code: NL_ZAAK, periode }, K)
       : Promise.resolve({ status: 0, data: null }),
     async r => {
@@ -708,10 +718,20 @@ async function loop(basis, uit) {
       const stroken = (een && een.data && een.data.run && een.data.run.stroken) || [];
       const strook = stroken.find(x => Number(x.staffId) === Number(novaStaff));
       const basis = strook && (strook.invoer || []).find(x => x.component === 'basissalaris');
-      return { klopt: !!basis && basis.centen > 0,
-        wat: strook ? 'loonstrook voor personeelsnummer ' + novaStaff + ' in run ' + runId +
+      /* EN DE LOONKANT LEEST HET DIENSTVERBAND (kern/concern/aanname.js,
+         dienstverbandToets): het lid heeft er een bij Meridiaan BV, dus de run
+         meldt hem niet als loon zonder dienstverband, en de toets draaide echt
+         (geen "niet getoetst"). */
+      const bev = (een && een.data && een.data.bevindingen) || [];
+      const zonderDv = bev.filter(b => b.soort === 'loon_zonder_dienstverband' && Number(b.staffId) === Number(novaStaff));
+      const nietGetoetst = bev.filter(b => b.soort === 'dienstverband_niet_getoetst');
+      const baasGemeld = !!baasNl && bev.some(b => b.soort === 'loon_zonder_dienstverband' && Number(b.staffId) === Number(baasNl.id));
+      return { klopt: !!basis && basis.centen > 0 && !zonderDv.length && !nietGetoetst.length && baasGemeld,
+        wat: (strook ? 'loonstrook voor personeelsnummer ' + novaStaff + ' in run ' + runId +
           (basis ? ', basissalaris ' + (basis.centen / 100).toFixed(2) + ' euro' : ', ZONDER basissalaris')
-          : 'geen loonstrook (' + stroken.length + ' stroken in de run)' };
+          : 'geen loonstrook (' + stroken.length + ' stroken in de run)') +
+          '; dienstverband ' + (zonderDv.length ? 'ONTBREEKT volgens de run' : nietGetoetst.length ? 'NIET getoetst' : 'getoetst en gevonden') +
+          '; de ondernemer zonder dienstverband is ' + (baasGemeld ? 'gemeld' : 'NIET gemeld') };
     });
 
   return { w, S, M, vacId };

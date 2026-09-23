@@ -102,3 +102,39 @@ test('6. de claim geeft de uitslag van de brug mee, en hij valt niet stil weg', 
   assert.deepEqual(gevraagd, { zaak: 'BRISA', persoon: 'user-7', rol: 'Kok' }, 'de persoon is de ledensleutel uit het account');
   assert.equal(log.length, 3, 'het activiteitenlog loopt gewoon door');
 });
+
+/* ---- DE LOONKANT LEEST HET DIENSTVERBAND (dienstverbandToets) ---- */
+
+test('7. wie een strook krijgt zonder lopend dienstverband, komt als bevinding in de run', () => {
+  const { K } = wereld();
+  K.dienstverbandUitAanname({ zaak: 'BRISA', persoon: 'user-7', rol: 'Kok' });
+  const t = K.dienstverbandToets({ zaak: 'BRISA', periode: '2026-09',
+    personeel: [{ id: 1, naam: 'Met', memberId: 7 }, { id: 2, naam: 'Zonder', memberId: 8 }] });
+  assert.equal(t.getoetst, true);
+  const zonder = t.bevindingen.filter(b => b.soort === 'loon_zonder_dienstverband');
+  assert.deepEqual(zonder.map(b => b.staffId), [2], 'alleen wie geen dienstverband heeft');
+  assert.equal(zonder[0].ernst, 'midden', 'zichtbaar maar niet blokkerend: de aannames van voor de brug hebben er nog geen');
+});
+
+test('8. een dienstverband bij een ANDERE entiteit telt niet, en een beeindigd dienstverband ook niet', () => {
+  const { K } = wereld();
+  const e2 = K.entiteitVind(K.entiteitNieuw('user-9', { naam: 'Andere BV', land: 'NL' }).entiteit.id);
+  K.employmentNieuw({ persoon: 'user-7', entiteit: e2.id, rol: 'Kok' });
+  const oud = K.employmentNieuw({ persoon: 'user-8', entiteit: K.vestigingVanUnit('BRISA').entiteit, rol: 'Kok',
+    van: '2026-01-01', tot: '2026-06-30' });
+  assert.ok(oud.ok);
+  const t = K.dienstverbandToets({ zaak: 'BRISA', periode: '2026-09',
+    personeel: [{ id: 1, memberId: 7 }, { id: 2, memberId: 8 }] });
+  assert.deepEqual(t.bevindingen.filter(b => b.soort === 'loon_zonder_dienstverband').map(b => b.staffId), [1, 2]);
+});
+
+test('9. wat niet getoetst kan worden, staat er met de reden bij en valt niet weg', () => {
+  const { K } = wereld();
+  const los = K.dienstverbandToets({ zaak: 'LOS', periode: '2026-09', personeel: [{ id: 1, memberId: 7 }] });
+  assert.equal(los.getoetst, false);
+  assert.match(los.bevindingen[0].uitleg, /geen vestiging/);
+  const zonderAccount = K.dienstverbandToets({ zaak: 'BRISA', periode: '2026-09', personeel: [{ id: 3, memberId: null }] });
+  assert.equal(zonderAccount.bevindingen.length, 1);
+  assert.equal(zonderAccount.bevindingen[0].soort, 'dienstverband_niet_getoetst');
+  assert.notEqual(zonderAccount.bevindingen[0].ernst, 'hoog', 'niet te toetsen is geen overtreding');
+});

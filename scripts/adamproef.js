@@ -527,25 +527,6 @@ async function loop(basis, uit) {
      zodat de rest van de keten (contract, dienstverband, loon) toch gemeten
      wordt in plaats van ongezien te blijven achter de eerste dichte deur. */
 
-  /* 13 -- WORDT ADAM PERSONEEL? De aanname van een sollicitant zonder
-     lidaccount levert een kassacode en een link op, en `/api/werving/verbind`
-     eist een eigen RTG-account. De proef kijkt naar de UITKOMST: staat Adam in
-     het team van de zaak? */
-  await stap(
-    schakel(13, 'werkgever', 'Adam', 'maakt van de aanname een plek in het team',
-      'WAT ONTBREEKT: een weg van een aanname naar een plek in het team voor iemand zonder eigen ' +
-      'RTG-account. WAAROM: een aanname claimen eist een lidsessie (/api/werving/verbind in ' +
-      'server/routes/werving.js), en een Foundation-profiel heeft die niet; de aanname eindigt bij een ' +
-      'kassacode die de werkgever met de hand moet doorgeven. WIE EROVER GAAT: de eigenaar, via besluit 1 ' +
-      'van ARBEID.md par. 7a (employment is de waarheid) -- die brug moet ook een gezinslid dragen.'),
-    () => P('/api/supplier/roster', { code: WERKGEVER }),
-    async r => {
-      const team = (r.data && r.data.staff) || [];
-      const adam = team.find(x => /^Adam\b/.test(String(x.name || '')));
-      return { klopt: !!adam, wat: adam ? 'Adam staat in het team (id ' + adam.id + ')'
-        : 'Adam staat niet in het team (' + team.length + ' mensen)' };
-    });
-
   /* DE WERELD VAN DE ONDERNEMER. Het dienstverband hangt aan een ENTITEIT, en
      een zaak wijst zijn entiteit aan via een vestiging (kern/concern/
      vestiging.js). Cafe Brisa hangt in de seed aan niets, dus zonder deze
@@ -567,6 +548,39 @@ async function loop(basis, uit) {
   if (!koppel || koppel.status !== 200) throw new Error('de ondernemer kon de zaak niet aan zijn entiteit koppelen (status ' +
     (koppel ? koppel.status + ': ' + ((koppel.data && koppel.data.error) || '') : 'geen') + ')');
   uit.wereld.ondernemer = 'lid, manager van ' + WERKGEVER + ', koppelt de zaak aan zijn entiteit via /api/concern/vestiging/zaak';
+
+  /* 13 -- ADAM NEEMT ZIJN PLEK IN (ARBEID.md par. 7a, 23 september 2026). Tot
+     die dag eindigde zijn aanname bij een kassacode die de werkgever met de hand
+     moest doorgeven, want claimen eist een eigen RTG-account en een
+     gezinsprofiel heeft er geen. Nu staat de uitnodiging bij zijn eigen
+     sollicitatie (/gezin/sollicitaties, `plek`), en een RTG-account mag vanaf
+     vijftien. Adam doet dus wat een zeventienjarige echt doet: hij opent zijn
+     sollicitaties, maakt een gratis eigen account, en neemt de plek in langs de
+     gewone claimroute. Gemeten wordt de UITKOMST: staat hij in het team, en
+     heeft hij een dienstverband bij de entiteit van de zaak? */
+  let adamToken = null;
+  await stap(
+    schakel(13, 'Adam', 'werkgever', 'neemt met een eigen account zijn plek in het team in, zonder dat de werkgever iets doorgeeft'),
+    async () => {
+      const rij = rijVan(await sollicitatiesVanAdam(basis, w.code, w.adam.token), 'Keukenhulp');
+      const link = rij && rij.plek && rij.plek.link;
+      if (!link) return { status: 409, data: { error: 'geen uitnodiging bij Adams sollicitatie' } };
+      const kassacode = new URLSearchParams(String(link).split('#')[1] || '').get('werving');
+      const acc = await P('/api/auth/register', { name: 'Adam', email: 'adam.proef@voorbeeld.nl', phone: '0612349874',
+        password: 'geheim123', geboortedatum: geborenJaarGeleden(17), tier: 'guest', pasApp: 'rtg' });
+      adamToken = acc.data && acc.data.token;
+      if (!adamToken) return acc;
+      return P('/api/werving/verbind', { kassacode }, adamToken);
+    },
+    async r => {
+      const team = ((await P('/api/supplier/roster', { code: WERKGEVER })).data || {}).staff || [];
+      const inTeam = team.find(x => /^Adam\b/.test(String(x.name || '')));
+      const werk = ((await P('/api/concern/mijnwerk', {}, adamToken)).data || {}).werkplekken || [];
+      const dv = werk.find(x => x.bedrijf === 'Brisa SL' && x.rol === 'Keukenhulp');
+      return { klopt: !!inTeam && !!dv && r.data && r.data.staffId === inTeam.id,
+        wat: (inTeam ? 'in het team (id ' + inTeam.id + ')' : 'NIET in het team') + ', ' +
+          (dv ? 'dienstverband bij ' + dv.bedrijf + ' als ' + dv.rol : 'geen dienstverband') };
+    });
 
   /* Het volwassen lid: een eigen account, een cv, en een sollicitatie op
      dezelfde vacature. Geen uitslag klaarzetten, alleen de wereld. */
@@ -687,6 +701,24 @@ async function storingen(basis, uit, ctx) {
     if (!v) throw new Error('geen vacature "' + func + '" (status ' + r.status + ')');
     return v.id;
   };
+
+  /* 0. DE UITNODIGING IS VAN ADAM EN VAN NIEMAND ANDERS. Sinds 23 september
+     staat de link om je plek in te nemen bij de sollicitatie zelf. Die link is
+     een eenmalige sleutel: wie hem ziet, kan de plek claimen. Dus: de ouder en
+     de zus zien hem niet op hun eigen sessie, en de werkgever vindt hem niet in
+     de rij die hij van de sollicitatie krijgt (dat is de positieve lijst van
+     kern/werk.js, en `plek` staat daar met opzet niet in). */
+  const zichtbaarVoor = async (tok) => (((await P('/api/foundation/gezin/sollicitaties', { code: w.code, token: tok })).data || {})
+    .sollicitaties || []).filter(x => x.plek).length;
+  /* Eerst de besturingsproef: Adam zelf ziet hem wel. Zonder die helft staat
+     deze storing ook groen als er nooit een uitnodiging was. */
+  const bijAdam = await zichtbaarVoor(w.adam.token);
+  const bijOuder = await zichtbaarVoor(w.ouderToken), bijZus = await zichtbaarVoor(w.zus.token);
+  const bijWerkgever = (await sollicitatiesBijZaak(basis, S)).filter(a => a.plek).length;
+  noteer('de uitnodiging om de plek in te nemen staat bij Adams sollicitatie',
+    'alleen Adam ziet hem: niet de ouder, niet de zus, en niet de werkgever in de rij van de sollicitatie',
+    bijAdam >= 1 && bijOuder === 0 && bijZus === 0 && bijWerkgever === 0,
+    'bij Adam ' + bijAdam + ', bij de ouder ' + bijOuder + ', bij de zus ' + bijZus + ', bij de werkgever ' + bijWerkgever);
 
   /* 1. DE JONGERE ZUS. Vijftien, dus onder de grens van zestien. Een weigering
      hoort de reden te dragen EN de weg eromheen -- anders is het een muur. */

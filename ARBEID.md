@@ -474,6 +474,32 @@ stap mogelijk maakt.
 | 8 | Par. 1: vaardigheden van de vacature in de werkvondst, de weg naar een ontbrekend stuk bij `persoonseis`, en `tekorten()` per zaak voor de werkgever | bouwen | maakt de openingszin van het voorstel waar met wat er al ligt |
 | 9 | **Welk profiel is de bron van vaardigheden** (Métier of het professionele profiel van Zakelijk); daarna pas een gedeelde lijst. De vormmeting van par. 0 vastleggen als register met een ratel | besluit + meten | voorwaarde voor voorstel 103 |
 
+### 7a. De besluiten van 23 september 2026
+
+De eigenaar heeft drie van de vier besluiten uit deze tabel genomen, en de volgorde
+van het werk erna.
+
+1. **Stap 6 -- `employment` aan een ENTITEIT is de waarheid.** Een aanname via de
+   werving hoort voortaan ook een dienstverband bij de entiteit te maken, en
+   `staffId` aan een zaak wordt daarvan afgeleid. De brug loopt een kant op, in de
+   vorm van `server/kern/mobiliteit/appbrug.js`. Het werkruimtelid blijft een
+   productinstantie en geen juridische relatie (`TENANT.md`). Wat dit kost staat
+   er eerlijk bij: `kern/payroll` noemt `employment` vandaag nul keer, dus de
+   loonkant moet om.
+2. **Stap 7 -- de keten wordt rond gemaakt.** De weigering van `werving.suite` in
+   `server/kern/wereld/lijsten.js` blijft staan zolang de keten van vacature tot
+   loon niet rond is. Dat is geen "blijft dicht" maar de opdracht: het doel is de
+   hele keten, en de suite gaat pas open als een geheel. Een half proces opent hij
+   nooit.
+3. **Stap 9 -- Métier is de bron van vaardigheden.** Het loopbaanprofiel bestaat
+   voor elke mens, ook zonder bedrijf, en heeft al een naamvrijgave per werkgever.
+   Het professionele profiel van Zakelijk gaat eruit lezen; er komt een gedeelde
+   lijst die de negen plekken opneemt en geen tiende wordt.
+4. **Eerstvolgende stap: de Adamproef verlengen** (stap 5) voorbij *aangenomen*,
+   naar werkrelatie, contract en loon. Dat is meten en geen bouwen, en het maakt
+   besluit 1 hard: waar de keten breekt, staat dan in een register in plaats van
+   in deze paragraaf.
+
 De rest van par. 6 wacht op deze negen. De solver (106), de what-if-promotie
 (107), het geheugen (126, 127, 129) en de agents met eigen reikwijdte (122, 124)
 wachten bovendien op besluiten die elders al openstaan: de mandaatbesluiten uit

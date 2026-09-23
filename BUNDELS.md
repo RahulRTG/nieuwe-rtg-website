@@ -631,7 +631,7 @@ omlaag.
 
 ## `shared/gebaar.js`
 
-`public/shared/gebaar/` -- 8 delen, 1051 regels in de delen
+`public/shared/gebaar/` -- 8 delen, 1096 regels in de delen
 
 | deel | onderwerp |
 |---|---|

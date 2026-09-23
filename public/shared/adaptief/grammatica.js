@@ -79,6 +79,11 @@
      zichtbare vulling mee, want een knop die niets doet terwijl je hem
      vasthoudt, IS kapot voor wie het niet weet. */
   var VASTHOUD = { zwaar: 900, plechtig: 1200 };
+  /* De DREMPELS van de gebaren, op EEN plek: elke herkenner leest ze als het
+     gebaar begint (EDGE.md par. 11). ms: lang, herbevestig; px: stil, omhoog,
+     diep, veeg, sluit; poging: deel van de vasthoudtijd. Zonder tabel: gebaar uit. */
+  var DREMPELS = { lang: 480, stil: 8, omhoog: 44, diep: 150, veeg: 36, sluit: 90,
+    poging: 0.15, herbevestig: 4000 };
 
   /* -------------------------------------------------------- verhinderd --
      WAAROM KAN IK DIT NIET? Een grijze knop is een raadsel, en een raadsel in
@@ -168,7 +173,7 @@
     return g === 'terug' && !kanTerug ? 'bewust' : g;
   }
 
-  var gram = { GEBAREN: GEBAREN, GEWICHT: GEWICHT, TRAPPEN: TRAPPEN, VASTHOUD: VASTHOUD,
+  var gram = { GEBAREN: GEBAREN, GEWICHT: GEWICHT, TRAPPEN: TRAPPEN, VASTHOUD: VASTHOUD, DREMPELS: DREMPELS,
     BRONNEN: BRONNEN, verhindering: verhindering, uitleg: uitleg, keur: keur, effectief: effectief };
 
   if (typeof module !== 'undefined' && module.exports) { module.exports = gram; return; }

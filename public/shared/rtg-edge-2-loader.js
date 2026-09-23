@@ -84,10 +84,10 @@
   function koppelWerkScroll() {
     var stage = vind('.wk-stage');
     if (!stage) return;
-    var laatste = stage.scrollTop || 0, gepland = false, gebaarTijd = 0;
+    var laatste = stage.scrollTop || 0, gepland = false, gebaar = { gebaarTijd: 0 };
     ['wheel', 'touchmove', 'keydown'].forEach(function (t) {
       stage.addEventListener(t, function (e) {
-        if (w.RTGEdge2 && w.RTGEdge2.scrollGesture(e)) gebaarTijd = Date.now();
+        if (w.RTGEdge2 && w.RTGEdge2.scrollGesture(e)) gebaar.gebaarTijd = Date.now();
       }, { passive: true, capture: true });
     });
     stage.addEventListener('scroll', function () {
@@ -99,9 +99,7 @@
         laatste = nu;
         if (!w.RTGEdge2 || b.getAttribute('data-rtg-edge-2-auto') !== 'true' ||
             b.getAttribute(VENSTER_ATTR) === 'true') return;
-        var tijd = Date.now();
-        if (tijd - gebaarTijd > w.RTGEdge2.GESTURE_MS) return;
-        gebaarTijd = tijd;
+        if (!w.RTGEdge2.gestureFresh(gebaar)) return;   // een eigenaar: rtg-edge-2-context.js
         if (nu <= 32 || verschil < -14) w.RTGEdge2.setState('overview', { source: 'auto' });
         else if (verschil > 14) w.RTGEdge2.setState('compact', { source: 'auto' });
       };

@@ -70,30 +70,31 @@ const KAART = [
     ['schrijft', 'de vijf trappen', 'var GEWICHT = {'],
     ['beslist', 'terug zonder weg terug is bewust', "return g === 'terug' && !kanTerug ? 'bewust' : g;"],
     ['beslist', 'onbekende bron wordt toestand', "var bron = BRONNEN[v.bron] ? v.bron : 'toestand';"],
-    ['schrijft', 'vasthoudduur per trap', 'var VASTHOUD = { zwaar: 900, plechtig: 1200 };']]],
-  ['adaptief/diepte.js', 'grammatica-render', 'gebaar-drempel:b onderbalk:l capability-register:l', [
+    ['schrijft', 'vasthoudduur per trap', 'var VASTHOUD = { zwaar: 900, plechtig: 1200 };'],
+    ['schrijft', 'de drempels van de gebaren', 'var DREMPELS = { lang: 480, stil: 8, omhoog: 44, diep: 150, veeg: 36, sluit: 90,']]],
+  ['adaptief/diepte.js', 'grammatica-render', 'gebaar-drempel:l onderbalk:l capability-register:l', [
     ['leest', 'items uit het register', 'return (w.RTGAdaptief && w.RTGAdaptief.voorNu()) || [];'],
-    ['beslist', 'tweede trap vanaf 150 px', 'var TWEEDE = 150;'],
+    ['leest', 'de trekdrempels uit de tabel', 'var EERSTE = D.omhoog, TWEEDE = D.diep;'],
     ['schrijft', 'trekstand op .cmd-balk', "b.dataset.trek = ver >= TWEEDE ? 'twee' : (ver >= EERSTE ? 'een' : '');"]]],
   ['adaptief/balk.js', 'grammatica-render', 'onderbalk:sb capability-register:l vluchtige-context:l wereld:l', [
     ['rendert', 'de contextzone in .cmd-balk', "zone.className = 'cmd-acties';"],
     ['beslist', 'contextacties, anders werelden', 'if (!items.length && !panes().length && !vastBladen)'],
     ['schrijft', 'rij voor de adaptieve Edge', 'o.root.rtgEdgeItems = function () { return laatsteRij.slice(); };']]],
-  ['adaptief/balkknop.js', 'grammatica-render', 'gewicht:b waarom:b gebaar-drempel:b', [
+  ['adaptief/balkknop.js', 'grammatica-render', 'gewicht:b waarom:b gebaar-drempel:l', [
     ['beslist', 'verhinderd legt uit', 'if (it.verhinderd) { uitleg(it); return; }'],
     ['beslist', 'zonder gewichtlaag alleen licht', "if ((it.gewicht || 'licht') !== 'licht') {"],
-    ['beslist', 'lang drukken na 480 ms', 'klok = w.setTimeout(function () { klok = null; uitleg(it); }, 480);']]],
-  ['adaptief/orb.js', 'grammatica-render', 'gewicht:b waarom:b gebaar-drempel:b capability-register:l', [
+    ['leest', 'lang drukken uit de tabel', 'klok = w.setTimeout(function () { klok = null; uitleg(it); }, D.lang);']]],
+  ['adaptief/orb.js', 'grammatica-render', 'gewicht:b waarom:b gebaar-drempel:l capability-register:l', [
     ['beslist', 'splitst kan en kan niet', 'kan: items.filter(function (x) { return !x.verhinderd; }),'],
     ['beslist', 'zonder gewichtlaag alleen licht', "if ((it.gewicht || 'licht') !== 'licht') return;"],
-    ['beslist', 'eigen langdrukdrempel', 'var LANG = 480;']]],
-  ['adaptief/lagen.js', 'grammatica-render', 'gebaar-drempel:b', [
+    ['leest', 'lang drukken uit de tabel', 'return g && g.DREMPELS && g.DREMPELS.lang;']]],
+  ['adaptief/lagen.js', 'grammatica-render', 'gebaar-drempel:l', [
     ['rendert', 'lade, paneel of taak', "var wortel = el('div', 'rtg-laag rtg-laag-' + soort);"],
-    ['beslist', 'veeg omlaag vanaf 90 px', 'if (y > 90) sluit();'],
+    ['leest', 'de sluitveeg uit de tabel', 'if (y > D.sluit) sluit();'],
     ['schrijft', 'een stap in de geschiedenis', "w.history.pushState({ rtgLaag: ++teller }, '')"]]],
-  ['adaptief/vasthoud.js', 'grammatica-render', 'gebaar-drempel:b', [
+  ['adaptief/vasthoud.js', 'grammatica-render', 'gebaar-drempel:l', [
     ['beslist', 'vol vasthouden bevestigt', 'if (deel >= 1) { stop(); af(); return; }'],
-    ['beslist', 'loslaten onder 15% telt niet', 'if (ver <= 0.15) return;']]],
+    ['leest', 'loslaten onder de poging telt niet', 'if (ver <= D.poging) return;']]],
   ['adaptief/gewicht.js', 'trust', 'gewicht:b waarom:l trust-rail:l gebaar-drempel:l', [
     ['beslist', 'de weg per trap', "if (g === 'bewust') return bewust(it, bev);"],
     ['beslist', 'compensatie is nooit ongedaan maken', "if (cap && cap.herstel === 'compensatie' && it.ongedaan)"],
@@ -134,11 +135,11 @@ const KAART = [
     ['beslist', 'welke paginaknop geoogst wordt', 'if (label(el) && available(el, root) && (!tab || !tabs.has(tab))'],
     ['rendert', 'verhuist de hoofdactie in het blad', 'rt.primarySlot = primary; rt.sheet.appendChild(primary);'],
     ['rendert', 'bladtitel uit RTGAdaptief', 'if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;']]],
-  ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:b zichtbaarheidsstand:b capability-register:l', [
-    ['beslist', 'veeg opzij na 36 px wisselt deck', 'if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 36)'],
-    ['beslist', 'eigen langdruk van 620 ms', '}, 620);'],
+  ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:l zichtbaarheidsstand:b capability-register:l', [
+    ['leest', 'veeg opzij wisselt deck, drempel uit de tabel', 'if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > D.veeg)'],
+    ['leest', 'lang drukken uit de tabel', '}, D.lang);'],
     ['beslist', 'auto-peek bij scrollen', "if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;"],
-    ['beslist', 'omhoog naar RTGDiepte', 'if (-dy >= depth.DREMPELS.tweede) depth.tweede(); else depth.eerste();']]],
+    ['beslist', 'omhoog naar RTGDiepte', 'if (-dy >= D.diep) depth.tweede(); else depth.eerste();']]],
   ['rtg-adaptive-edge-loader.js', 'laden', '', [
     ['beslist', 'overslaan als de global bestaat', 'if (global && w[global]) { done(true); return; }'],
     ['schrijft', 'start de Edge na de keten', 'w.RTGAdaptiveEdge.start(d, w);']]],
@@ -194,12 +195,12 @@ const KAART = [
     ['beslist', 'onder 14 px telt niet', 'Math.abs(delta)<14'],
     ['beslist', 'een gebaar is 1500 ms vers', 'var GESTURE_MS=1500;'],
     ['beslist', 'auto: alle twaalf balktokens', "if(raw==='auto')return{ok:true,auto:true,tokens:Object.keys(CONTEXT)};"]]],
-  ['rtg-edge-2-loader.js', 'laden', 'hoofdactie:sb zichtbaarheidsstand:sb gebaar-drempel:b', [
+  ['rtg-edge-2-loader.js', 'laden', 'hoofdactie:sb zichtbaarheidsstand:sb', [
     ['beslist', 'hoofdactie per hard pad', "if (pad === '/apps/rtg.html') {"],
     ['schrijft', 'muteert het object van de casco', 'e.onAction = doe; e.ctx.actie = tekst; k.hidden = false; k.textContent = tekst;'],
     ['schrijft', 'standaardstand overview', "b.setAttribute('data-rtg-edge-2-state', 'overview');"],
     ['beslist', 'tweede autoregel voor .wk-stage', "if (nu <= 32 || verschil < -14) w.RTGEdge2.setState('overview'"],
-    ['beslist', 'kopie van de gebaarversheid', 'if (tijd - gebaarTijd > w.RTGEdge2.GESTURE_MS) return;']]],
+    ['leest', 'de gebaarversheid van Edge 2', 'if (!w.RTGEdge2.gestureFresh(gebaar)) return;']]],
   ['rtg-edge-2-reveal.js', 'edge-2', 'zichtbaarheidsstand:l', [
     ['rendert', 'herstelgrepen boven en onder', "knop.className = 'rtg-edge-2-edge-reveal rtg-edge-2-edge-reveal--' + kant[0];"],
     ['schrijft', 'terug naar overview via de API', "if (win.RTGEdge2) win.RTGEdge2.setState('overview', { source: 'edge' });"],
@@ -321,7 +322,6 @@ const WAAROM = {
   zichtbaarheidsstand: 'Vijf standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, de Edge 1-vouwstand en de Second Screen; ze delen geen stand.',
   onderbalk: 'Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, en RTGDaily die zelf een Edge-balk ophangt.',
   bevoegdheid: 'Drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, allowed van de Edge-Core, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft -- het blikveld zegt dat hardop.',
-  'gebaar-drempel': 'De drempels staan in een tabel (GEBAREN, VASTHOUD) maar worden overal zelf gekozen: lang drukken is 480 ms in balkknop.js en orb.js en 620 ms in de adaptieve balk, de gebaarversheid staat als kopie in de Edge 2-loader, en diepte, lagen, vasthoud en de invoerlaag hebben elk een eigen afstand.'
 };
 
 const pad = p => p.startsWith('public/') ? p : 'public/shared/' + p;

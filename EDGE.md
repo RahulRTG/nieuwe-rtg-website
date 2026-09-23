@@ -148,8 +148,9 @@ presentatie- en compatlaag. Dat klopt, maar een oordeel dat vóór de meting wor
 uitgesproken is een aanname met een mooie naam. De kaart stelt het nu vast op de
 verantwoordelijkheden, met een gesloten woordenlijst van veertien:
 
-Van de veertien hebben er twee één eigenaar (identiteit en presence — en die
-hebben in de app nauwelijks een producent). De andere twaalf hebben er meer, en
+Van de veertien hadden er bij de eerste meting twee één eigenaar (identiteit en
+presence — en die hebben in de app nauwelijks een producent); sinds ronde 1 is
+`gebaar-drempel` de derde. De andere elf hebben er meer, en
 dat is geen detail maar de kern van het voorstel: **de Edge weet vandaag niet
 wat er speelt omdat hij het op te veel plekken tegelijk weet.**
 
@@ -165,7 +166,6 @@ wat er speelt omdat hij het op te veel plekken tegelijk weet.**
 | trust-rail | drie plekken leiden verbinding en beveiliging zelf af, elk op een eigen strook |
 | gewicht | de tabel en de regel staan in `grammatica.js`, en sinds ronde 1 lezen de uitleg en de orb het werkelijke gewicht uit `effectief()`; twee plekken hebben nog een eigen standaard `licht` voor een ONTBREKEND gewicht (`adaptief.js`, `brug.js`), de regel voor "zonder gewichtlaag" staat drie keer apart (balk, orb, actiestaat; de werkmodus gaat sinds ronde 1 via de balk), en de Edge-kern laat in zijn tweede register alleen licht toe |
 | waarom | de vijf bronnen staan twee keer (`grammatica.js` en `waarom.js`), en "verhinderd gaat niet door" wordt op vier plekken beslist |
-| gebaar-drempel | lang drukken is 480 ms in de balk en de orb en 620 ms in de adaptieve balk |
 | bevoegdheid | drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, `allowed` van de Edge-kern, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft |
 
 De teller `edgeDubbeleEigenaars` mag alleen dalen. Hij daalt doordat een
@@ -179,8 +179,10 @@ Het oordeel dat daaruit volgt:
   (`register.js`), wat er nu speelt (de vluchtige context), wat een handeling
   weegt (`grammatica.js`) en waarom iets niet kan (`waarom.js`). Een tweede
   schrijver van een van die vier is een gebrek, en de kaart noemt hem.
-- **`rtg-adaptive-edge*` hoort de vorm te bezitten**: de zichtbaarheidsstand, de
-  onderbalk en de gebaardrempels. Tot ronde 1 besliste het op twee plekken nog
+- **`rtg-adaptive-edge*` hoort de vorm te bezitten**: de zichtbaarheidsstand en
+  de onderbalk; de gebaardrempels LEEST het sinds ronde 1 uit `DREMPELS` in
+  `grammatica.js`, want wat een gebaar betekent en wanneer het er een is, hoort
+  bij de taal en niet bij een van de balken. Tot ronde 1 besliste het op twee plekken nog
   over betekenis: `registerAction` in de kern was een tweede register met een
   eigen uitvoerweg, en de adaptieve Edge vroeg met `window.confirm` in plaats van
   langs het gewicht. `window.confirm` is weg, en het tweede register kent alleen
@@ -665,7 +667,18 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
   `zwaarr` beloofde "Gebeurt meteen." en `terug` zonder weg terug beloofde een
   Ongedaan maken dat niet kwam; beide lezen nu `effectief()`. Vier
   gedragstoetsen in `test/grammatica.test.js` draaien de echte modules in een vm
-  met een kleine nep-DOM, en zeven mutaties zijn nagetrokken.
+  met een kleine nep-DOM, en zeven mutaties zijn nagetrokken;
+- **ronde 1: de gebaardrempels staan op een plek.** Lang drukken was 480 ms in de
+  balk en de orb en 620 ms in de adaptieve balk -- de balk die een lid op
+  `app.html` echt gebruikt -- en omhoog trekken begon daar op 36 px terwijl
+  GRAMMATICA.md 44 zegt. Nu staat er een tabel, `DREMPELS` in `grammatica.js`, en
+  zes herkenners lezen hem als het gebaar begint (balkknop, orb, diepte, lagen,
+  vasthoud en de invoerlaag). Er staat nergens meer een kopie: zonder tabel is
+  het gebaar uit, de tik en de ⋯ blijven, en vasthouden bevestigt dan nooit. De
+  lader van de adaptieve Edge brengt de grammatica zacht mee, en de landing plus
+  de negen sitepagina's die de invoerlaag zelf laden, laden hem eerst. De kopie
+  van de gebaarversheid in de Edge 2-lader is weg; die heeft een eigenaar
+  (`rtg-edge-2-context.js`). `test/drempels.test.js`, vijf mutaties nagetrokken.
 
 **Nagetrokken en open, met de ronde waarin ze horen:**
 
@@ -674,7 +687,7 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
 | modulefouten van de werkruimte bereiken geen diagnose: `o.error` is de enige haak en geen aanroeper geeft hem mee (het dode kanaal `rtg-workspace-error` verborg dat) | `interface/workspace-runtime.js` | besluit (foutmelder heeft een budget van 3 en een deur zonder inlog) |
 | de home-actie op de wereldbureaus hangt aan een observer die na de eerste keer losgaat; wordt de adaptieve Edge ooit opnieuw gestart, dan verdwijnt hij (vandaag start niets hem opnieuw) | `interface/world-desktop-home.js` | 2 |
 | `RTGAdaptief.doe()` kijkt alleen of iets verhinderd is, niet wat het weegt; wie hem rechtstreeks aanroept, slaat de bevestiging over | `adaptief/register.js` | 3 |
-| lang drukken is 480 ms in de balk en de orb en 620 ms in de adaptieve balk | par. 1 | 1 |
+| `gebaar.js` (op elk scherm met `basis.js`) heeft een eigen lang drukken van 520 ms en een borgtijd van 800 ms, buiten de kaart; naar de tabel halen vraagt eerst een meting van de wedloop in `test/helper.js` | `shared/gebaar/` | 2 |
 | vijf standmachines voor wat er van de Edge te zien is | par. 1 | 2 |
 | vier geheugens voor "waar was ik" die elkaar niet lezen | par. 1 | 4 |
 | "waarom niet" heeft aan de serverkant vijf vormen zonder gedeelde woorden, en `routes/stuur.js` maakt van elke weigering een kale `error` | `server/routes/stuur.js` | 3 |

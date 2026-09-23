@@ -123,9 +123,11 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
   assert.match(INPUT, /pointerup/);
   assert.match(INPUT, /lastX = event\.clientX; lastY = event\.clientY/);
   assert.match(INPUT, /event \? event\.clientY : lastY/);
-  assert.match(INPUT, /dy < -36/);
-  assert.match(INPUT, /dy > 36/);
-  assert.match(INPUT, /620/);
+  /* De drempels zelf staan in de grammatica (test/drempels.test.js); hier alleen
+     dat de invoerlaag ze leest en geen eigen getal draagt. */
+  assert.match(INPUT, /-dy >= D\.omhoog/);
+  assert.match(INPUT, /dy > D\.veeg/);
+  assert.match(INPUT, /\}, D\.lang\);/);
   assert.match(INPUT, /handlers\.rahul\(\)/);
   assert.match(INPUT, /Alt|altKey/);
   assert.match(INPUT, /metaKey \|\| event\.ctrlKey/);
@@ -138,7 +140,8 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
 test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezig', () => {
   const bronnen = ['/shared/rtg-adaptive-edge-loader.js'];
   const adaptieveBronnen = ['/shared/rtg-adaptive-edge.css', '/shared/rtg-adaptive-edge-core.js',
-    '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js'];
+    '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js',
+    '/shared/adaptief/grammatica.js'];
   for (const bron of bronnen) {
     assert.ok(LOADER.includes(bron), bron + ' ontbreekt in de loader');
     assert.ok(SW.includes(bron), bron + ' ontbreekt in de offline schil');

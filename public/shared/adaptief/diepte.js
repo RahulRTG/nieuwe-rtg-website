@@ -29,8 +29,6 @@
   'use strict';
   if (w.RTGDiepte) return;
 
-  var EERSTE = 44;      // vanaf hier: het uitgebreide gereedschap
-  var TWEEDE = 150;     // vanaf hier: de volledige werkmodus
   var RUST = 1400;      // zo lang na de laatste beweging is het weer stil
 
   var knoppen = null, rustklok = 0;
@@ -102,10 +100,11 @@
      Terwijl je trekt loopt het dock mee omhoog. Zonder die terugkoppeling is het
      een gebaar dat je moet geloven, en dan gebruikt niemand het. */
   function haak(b) {
-    if (!b || b._diepte) return;
+    var g = w.RTGGrammatica, D = g && g.DREMPELS;
+    if (!b || b._diepte || !D) return;   // zonder tabel geen trek; de ⋯ blijft
     b._diepte = 1;
     var y0 = 0, bezig = false, ver = 0, gevangen = false, pid = null;
-    var GRIJP = 8;
+    var EERSTE = D.omhoog, TWEEDE = D.diep;
     function neer(e) {
       if (b.classList.contains('vraagt')) return;         // Rahul heeft de balk
       y0 = e.clientY; bezig = true; ver = 0; gevangen = false; pid = e.pointerId;
@@ -126,7 +125,7 @@
          knop erin. Een handeling aantikken deed niets meer -- het gebaar had de
          bediening opgegeten. Vandaar de drempel: onder acht pixels is het een tik
          en blijft de balk overal vanaf. */
-      if (!gevangen && ver > GRIJP) {
+      if (!gevangen && ver > D.stil) {
         gevangen = true;
         try { b.setPointerCapture(e.pointerId); } catch (x) {}
       }
@@ -189,5 +188,5 @@
   else start();
 
   w.RTGDiepte = { eerste: eerste, tweede: tweede, bezig: bezig, start: start,
-    DREMPELS: { eerste: EERSTE, tweede: TWEEDE } };
+  };
 })(window, document);

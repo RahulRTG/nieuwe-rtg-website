@@ -39,7 +39,7 @@
   'use strict';
   if (w.RTGOrb) return;
 
-  var LANG = 480;
+  function lang() { var g = w.RTGGrammatica; return g && g.DREMPELS && g.DREMPELS.lang; }
 
   function root() { return d.getElementById('rtgCommand'); }
   function mond() { var r = root(); return r && r.querySelector('.cmd-mondknop'); }
@@ -134,7 +134,7 @@
      leest als een scherm dat op hol slaat. */
   function haak() {
     var m = mond();
-    if (!m || m._orb) return;
+    if (!m || m._orb || !lang()) return;  // zonder drempel geen gebaar, en dus geen belofte
     m._orb = 1;
     var klok = null, ging = false;
     m.addEventListener('pointerdown', function (e) {
@@ -143,7 +143,7 @@
          dock kan de knop een paar pixels verplaatsen; zonder capture levert de
          browser dan pointerleave en wordt een echte lange druk geannuleerd. */
       try { m.setPointerCapture(e.pointerId); } catch (fout) {}
-      klok = w.setTimeout(function () { klok = null; ging = open(); }, LANG);
+      klok = w.setTimeout(function () { klok = null; ging = open(); }, lang());
     });
     ['pointerup', 'pointercancel'].forEach(function (n) {
       m.addEventListener(n, function () { if (klok) { w.clearTimeout(klok); klok = null; } });

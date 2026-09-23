@@ -19,7 +19,8 @@
    keuze. Op de gewone netwerken is het precies andersom. */
 const { idVanKey } = require('../../lib/lidsleutel');
 
-module.exports = ({ db, save, accounts, codenaamVan, keyVanCodenaam, findSupplier, notifySupplier, notify }) => {
+module.exports = ({ db, save, accounts, codenaamVan, keyVanCodenaam, findSupplier, notifySupplier, notify,
+  inzagelog = require('../../inzagelog') }) => {
   const LOG_MAX = 200;
   const nu = () => new Date().toISOString();
   const metier = () => {
@@ -111,6 +112,17 @@ module.exports = ({ db, save, accounts, codenaamVan, keyVanCodenaam, findSupplie
       logInzage(tref.key, c, false);
       return { status: 404, error: 'Bij deze codenaam hoort geen accountdossier.' };
     }
+    /* OOK IN HET CENTRALE JOURNAAL, EN DAAR VAST. De regel hierboven in het
+       eigen Métier-log is wat het lid in Métier leest; maar een werkgever die
+       een echte naam uit de kluis haalt is een inzage zoals elke andere, en
+       stond daardoor niet in het journaal dat /api/privacy/inzage toont
+       (ARBEID.md par. 4 punt 6). Zelfde regel als de ledenbalie: geen
+       aantoonbaar spoor, geen naam. */
+    const spoor = inzagelog && typeof inzagelog.noteerVast === 'function'
+      ? await inzagelog.noteerVast({ door: { naam: 'werkgever ' + c }, over: { id: lidId, codenaam: tref.codename || null },
+        waarom: 'naam vrijgegeven door het lid (Métier)', bron: 'metier/naam:' + c })
+      : { ok: false, status: 503, error: 'Het inzagejournaal is niet aangesloten. Zonder spoor geen naam.' };
+    if (!spoor || !spoor.ok) return { status: (spoor && spoor.status) || 503, error: (spoor && spoor.error) || 'Zonder spoor geen naam.' };
     logInzage(tref.key, c, true);
     try { if (notify) notify(tref.key, 'Een werkgever bekeek je naam in Métier.'); } catch (e) {}
     return { status: 200, ok: true, codenaam: tref.codename || codenaamVan(tref.key), naam: accounts.realNameOf(u) };

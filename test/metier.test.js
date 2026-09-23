@@ -110,6 +110,11 @@ test('de naam is een sleutel: vrijgeven, bekijken, intrekken, en dan is er niets
   // 4. het lid ziet dat er gekeken is
   const log2 = await json(await raw('/metier/naam-log', {}, a.token));
   assert.equal(log2.inzage.filter(l => l.gelukt).length, 1, 'de gelukte inzage staat erbij');
+  /* en in het CENTRALE journaal, dat het lid via /api/privacy/inzage leest
+     (ARBEID.md par. 4 punt 6): een naam uit de kluis is een inzage als elke andere */
+  const centraal = await json(await raw('/privacy/inzage', {}, a.token));
+  assert.ok((centraal.inzage || []).some(r => /metier\/naam/.test(r.bron || '')),
+    'de naamvrijgave staat in het centrale inzagejournaal: ' + JSON.stringify(centraal.inzage).slice(0, 300));
 
   // 5. intrekken werkt direct, en daarna is er niets te lezen: er lag nergens een kopie
   const intrek = await json(await raw('/metier/naam-intrekken', { code: z.code }, a.token));

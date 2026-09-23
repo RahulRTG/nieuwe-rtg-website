@@ -7,7 +7,7 @@
 
 const { DEUREN, FEITEN, STAPOP_DEUREN } = require('./regels');
 const { RIJP } = require('../commercie/schaduw');
-const { WERKWOORDEN, KAMERSOORT } = require('./werkwoorden');
+const { WERKWOORDEN, KAMERSOORT, EXPORTEN } = require('./werkwoorden');
 
 /* Drie bakken en geen percentage, en de rijpheid per deur apart: een deur die
    rijp is en nul keer oneens, kan verhuizen; de rest niet. */
@@ -17,7 +17,7 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
   const stapop = [];
   const gebruik = {};
   for (const r of Object.values(beeld)) {
-    if (r.pad.startsWith('werkwoord ') || r.pad.startsWith('kamer ')) { gebruik[r.pad] = r.gebruik || 0; continue; }
+    if (r.pad.startsWith('werkwoord ') || r.pad.startsWith('kamer ') || r.pad.startsWith('export ')) { gebruik[r.pad] = r.gebruik || 0; continue; }
     if (r.pad.startsWith('stapop ')) {
       const [, deur, ...rest] = r.pad.split(' ');
       stapop.push({ deur, route: rest.join(' '), keer: r.eigenaarZonderStapop || 0 });
@@ -67,6 +67,8 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
       uitleg: WERKWOORDEN[w].uitleg, gebruik: gebruik['werkwoord ' + w] || 0 })),
     zonderWerkwoord: gebruik['werkwoord (geen)'] || 0,
     kamers: Object.keys(KAMERSOORT).map(k => ({ kamer: k, soort: KAMERSOORT[k],
-      kanBevoegdheidDragen: KAMERSOORT[k] === 'bestuurlijk', gebruik: gebruik['kamer ' + k] || 0 }))
+      kanBevoegdheidDragen: KAMERSOORT[k] === 'bestuurlijk', gebruik: gebruik['kamer ' + k] || 0 })),
+    /* FASE 6: lezen is niet exporteren. Hoe vaak een bestand het huis verliet. */
+    exporten: Object.keys(EXPORTEN).map(r => Object.assign({ route: r }, EXPORTEN[r], { geleverd: gebruik['export ' + r] || 0 }))
   };
 };

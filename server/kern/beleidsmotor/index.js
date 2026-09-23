@@ -28,7 +28,7 @@
 
 const { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN } = require('./regels');
 const { maakFeiten } = require('./feiten');
-const { werkwoordVan, kamerVan } = require('./werkwoorden');
+const { werkwoordVan, kamerVan, EXPORTEN } = require('./werkwoorden');
 
 const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'];
 const MAX_SLEUTELS = 2400;   // ~600 kantoorroutes maal hoogstens vier deuren
@@ -106,6 +106,8 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
      poort van de motor heeft gelopen. Een 404 is geen route; die telt niet. */
   function meelezer(req, res, next) {
     naAfloop(req, res, () => {
+      /* FASE 6: een geleverde export telt apart van lezen (./werkwoorden.js). */
+      if (res.statusCode === 200 && EXPORTEN[patroon(req)]) spoeler.tikVeld('export ' + patroon(req), 'gebruik');
       if (req.beleidsPoorten && req.beleidsPoorten.length) return;
       if (!req.routePatroon || res.statusCode === 404) return;
       const sleutel = patroon(req);

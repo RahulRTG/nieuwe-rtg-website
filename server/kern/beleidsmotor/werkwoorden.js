@@ -84,4 +84,19 @@ function kamerVan(sleutel, body) {
   return Object.prototype.hasOwnProperty.call(KAMERSOORT, id) ? id : null;
 }
 
-module.exports = { WERKWOORDEN, werkwoordVan, KAMERSOORT, KAMERROUTES, kamerVan };
+/* FASE 6: LEZEN IS NIET EXPORTEREN. Een scherm dat een lijst toont blijft in
+   het huis; een bestand dat wordt meegegeven gaat eruit en is daarna niet meer
+   terug te halen. Elke kantoorroute die een bijlage meegeeft staat hier, met de
+   poort die een MENS eist en het spoor dat vaststaat VOORDAT de bytes gaan.
+   test/beleidsmotor-exporten.test.js zoekt de bijlagen zelf op in de bron en
+   zakt bij een export die hier niet staat, of die er anders uitziet dan hier
+   verklaard. Wat dit NIET dekt: een JSON-antwoord met een hele collectie is ook
+   bulk, maar dat is aan de bron niet te onderscheiden van een scherm. */
+const EXPORTEN = Object.freeze({
+  'POST /api/office/export.csv': { poort: 'kluisAuth', spoor: 'inzagelog.noteerVast',
+    wat: 'alle bestellingen, ritten en boekingen met de codenaam van de klant' },
+  'POST /api/office/aidata/export': { poort: 'boardroomAuth', spoor: 'afdelingen.audit',
+    wat: 'de complete AI-dataset (JSONL)' }
+});
+
+module.exports = { WERKWOORDEN, werkwoordVan, KAMERSOORT, KAMERROUTES, kamerVan, EXPORTEN };

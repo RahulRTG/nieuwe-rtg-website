@@ -116,8 +116,8 @@ Dit huis heeft meer dan het zelf weet:
 ### 1.5 Wat er aantoonbaar ontbreekt
 
 - **geen gegevensklasse per veld** (bevestigd; `KANTOORMACHT.md` zegt het al);
-- **geen onderscheid tussen lezen en exporteren**; `/api/office/export.csv` laat
-  geen enkel spoor na;
+- **geen onderscheid tussen lezen en exporteren**; `/api/office/export.csv` liet
+  geen enkel spoor na (gerepareerd: B1, en fase 6 in par. 5f);
 - **geen machtigingsversie in het token** (`userId.exp.issued.sid`): intrekken
   bestaat per sessie en per account, niet per recht;
 - **geen offboarding**: `server/kern/concern/employment.js` verwijst naar een
@@ -334,7 +334,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
-| 6 | **lezen ≠ exporteren**, en export met een spoor | fase 4 |
+| 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
 | 7 | **identiteiten voor agents, diensten en apparaten** | **agent staat** (23 september 2026; par. 5c); diensten en apparaten niet |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf staat** (`/api/office/beleidsmotor/waarom`, op naam: de gedeelde code heeft geen zelf); reviews, slapende rechten en de simulator niet |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
@@ -519,6 +519,40 @@ Hetzelfde geldt voor een tekengrens per organisatie: `besluit.js` heeft een
 globaal beleid, en `kern/concern/graaf-bevoegdheid.js` kent al een tekenlimiet
 per bestuurder of volmacht. Die twee aan elkaar hangen is de volgende stap. Dat is
 aansluiten en niet uitvinden, en er komt geen derde rechtenmodel bij.
+
+### 5f. Fase 6: lezen is niet exporteren
+
+De meting vooraf ging uit van wat een export DOET, niet van hoe hij heet. Een
+kantoorroute die een bijlage meegeeft (`Content-Disposition: attachment`) stuurt
+een bestand het huis uit, en dat is daarna niet meer terug te halen. Er zijn er
+twee: `/api/office/export.csv` (alle bestellingen, ritten en boekingen met de
+codenaam van de klant) en `/api/office/aidata/export` (de complete AI-dataset).
+Beide eisen een mens (`kluisAuth` en `boardroomAuth`) en leggen hun spoor vast
+VOORDAT de bytes gaan (`inzagelog.noteerVast` en de duurzame `afdelingen.audit`);
+lukt dat niet, dan wordt er geweigerd. De andere exports in het huis zijn
+zelfexports: een lid of een zaak die de eigen gegevens ophaalt. Dat is geen
+kantoormacht.
+
+- **Het register.** `EXPORTEN` in `kern/beleidsmotor/werkwoorden.js` noemt per
+  export de poort, het spoor en wat erin zit. Het is geen zesde vocabulaire, maar
+  de verklaring waar de beleidsmotor mee telt.
+- **De telling.** Een GELEVERDE export telt apart van lezen. Een geweigerde telt
+  niet (`/api/office/beleidsmotor`, veld `exporten`).
+- **De handhaving.** `test/beleidsmotor-exporten.test.js` zoekt de bijlagen zelf
+  op in de BRON, met het commentaar eruit. De toets zakt:
+  - bij een kantoorexport die niet in het register staat;
+  - bij een verklaarde export die geen bijlage meer geeft;
+  - bij een export achter een poort die geen mens eist;
+  - bij een register dat een andere poort noemt dan de router.
+
+  Tegen een echte server exporteert de gedeelde code niets. Vier mutaties laten
+  de toets zakken, waaronder de boekhoudexport terugzetten achter `officeAuth`.
+
+**Wat dit NIET dekt.** Een JSON-antwoord met een hele collectie is ook bulk, maar
+in de bron is dat niet te onderscheiden van een scherm. Een grens daarop vraagt
+een gegevensklasse per veld, en die bestaat niet (par. 1.5). Het afschrift van een
+lid (`/api/office/bank/afschrift`) blijft achter de gedeelde code: het is lezen,
+en ENFORCE_EXECUTE vóór ENFORCE_READ is een besluit (`test/bankdeuren.test.js`).
 
 ---
 

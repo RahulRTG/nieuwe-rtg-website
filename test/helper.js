@@ -451,9 +451,12 @@ function postJson(base) {
    proefpubliek in gezelschap.js). Twee kopieen van dezelfde weg lopen uiteen
    zodra de inlog verandert -- LAT.md regel 4. Geeft null als het niet lukt, zodat
    de aanroeper zelf kan besluiten wat dat betekent. */
-async function kantoorAlsPersoon(base, code) {
+/* `eigenaar`: de login van de eigenaar als de toets een eigen RTG_OWNER_EMAIL zet.
+   Zonder die parameter viel zo'n toets vroeger terug op de gedeelde code, en die
+   weg is dicht -- dan kwam er stil null terug en brak de toets op een later punt. */
+async function kantoorAlsPersoon(base, code, eigenaar) {
   const post = postJson(base);
-  const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+  const eig = await post('/api/auth/login', { login: eigenaar || 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
   if (eig && eig.token) {
     const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
     if (kantoor && kantoor.token) return kantoor.token;

@@ -176,9 +176,21 @@ wat er speelt omdat hij het op te veel plekken tegelijk weet.**
 De teller `edgeDubbeleEigenaars` mag alleen dalen. Hij daalt doordat een
 verantwoordelijkheid één eigenaar krijgt — nooit doordat een bestand van de
 kaart verdwijnt: het citaat moet letterlijk staan, dus een schrijver weghalen
-betekent de code weghalen. Stijgen doet hij alleen met een uitgeschreven besluit
-in `NORM.json`, en dat is in ronde 2 één keer gebeurd (11 naar 12, par. 1
-hierboven): **een meter die stijgt omdat hij beter ziet, is geen achteruitgang;
+betekent de code weghalen. En sinds ronde 2 ook nooit doordat alleen een
+ETIKET verdwijnt: tot dan stonden etiketten en citaten los naast elkaar, en
+verlaagde het weghalen van een etiket de teller zonder een enkele keurfout. Nu
+hangt elk citaat aan het etiket waar het over gaat (`naam:letter`, of `-` als
+het over geen van de veertien gaat), heeft elk etiket s of b minstens één citaat
+dat het draagt, en zegt een uitgeschreven tabel (`DRAAGT`) welke rol welke letter
+kan dragen: een lezing maakt niemand eigenaar, en `rendert`, `projecteert` en
+`bewaart` dragen een schrijver alleen als het bestand de toestand zelf houdt.
+Twee etiketten bleken toen geen citaat te hebben (`waarom` in `grammatica.js`,
+`trust-rail` in de library) en tien citaten gingen over iets wat het bestand
+las zonder dat de `l` erbij stond; die zijn eerst rechtgezet, zodat de
+formaatwijziging zelf aantoonbaar niets aan de telling veranderde.
+
+Stijgen doet de teller alleen met een uitgeschreven besluit in `NORM.json`, en
+dat is in ronde 2 één keer gebeurd (11 naar 12, hierboven): **een meter die stijgt omdat hij beter ziet, is geen achteruitgang;
 een meter die laag blijft omdat hij iets niet ziet, is erger.**
 
 Het oordeel dat daaruit volgt:

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T12:50:07.794Z",
-    "commit": "ef54abcea",
+    "op": "2026-09-23T13:05:48.111Z",
+    "commit": "a0120c658",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/adamproef.js",
@@ -18,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Rode Merel 00D3",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Zilveren Lynx 1422",
       "fout": null,
       "ms": 0
     },
@@ -32,7 +32,7 @@
       "status": 200,
       "ziet": "de motor antwoordt het gezin: 1 wegen beoordeeld",
       "fout": null,
-      "ms": 12
+      "ms": 11
     },
     {
       "nr": 3,
@@ -44,7 +44,7 @@
       "status": 200,
       "ziet": "3 wegen, volgorde ongewijzigd: true, geblokkeerde weg blijft staan met \"heb ik een startkwalificatie\"",
       "fout": null,
-      "ms": 9
+      "ms": 10
     },
     {
       "nr": 4,
@@ -56,7 +56,7 @@
       "status": 200,
       "ziet": "de motor gaf 3 wegen bij een kaal doel (via-werk, via-opleiding, via-opvang), samengesteld door het huis: true, geen ervan heet \"open\": true",
       "fout": null,
-      "ms": 6
+      "ms": 7
     },
     {
       "nr": 5,
@@ -66,9 +66,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature 3462d3d9, minimumleeftijd 16",
+      "ziet": "vacature 888f0cdc, minimumleeftijd 16",
       "fout": null,
-      "ms": 7
+      "ms": 9
     },
     {
       "nr": 6,
@@ -80,7 +80,7 @@
       "status": 200,
       "ziet": "1 vacatures zichtbaar, magSolliciteren: true",
       "fout": null,
-      "ms": 8
+      "ms": 9
     },
     {
       "nr": 7,
@@ -92,7 +92,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 10
+      "ms": 11
     },
     {
       "nr": 8,
@@ -102,9 +102,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie 32e46fe2, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie ed16cb67, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
-      "ms": 12
+      "ms": 14
     },
     {
       "nr": 9,
@@ -116,7 +116,7 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 24
+      "ms": 26
     },
     {
       "nr": 10,
@@ -140,7 +140,7 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 3
+      "ms": 2
     },
     {
       "nr": 12,
@@ -164,7 +164,7 @@
       "status": 200,
       "ziet": "in het team (id 185), dienstverband bij Brisa SL als Keukenhulp",
       "fout": null,
-      "ms": 236
+      "ms": 245
     },
     {
       "nr": 14,
@@ -174,7 +174,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "direct in dienst, personeelsnummer 186",
+      "ziet": "direct in dienst, personeelsnummer 187",
       "fout": null,
       "ms": 124
     },
@@ -198,7 +198,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "1 werkplek(ken): Brisa SL als Keukenhulp",
+      "ziet": "1 werkplek(ken): Meridiaan BV als Receptie",
       "fout": null,
       "ms": 5
     },
@@ -207,11 +207,12 @@
       "van": "kantoor",
       "naar": "lid",
       "wat": "opent de loonrun; het contract levert een loonregel op",
-      "bekend": "WAT ONTBREEKT: een Spaans regelpakket met een bron. WAAROM: de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen server/kern/payroll/jaargangen/nl-2026.json; kern/payroll/run.js weigert dan terecht, want een tarief verzinnen is erger dan geen run. Dat een run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js. WIE EROVER GAAT: het kantoor dat de loonadministratie voert, via de dekking per land (server/routes/payroll-os-dekking.js); een tabel zonder bron zet geen proef erin.",
-      "stand": "openBekend",
-      "status": 409,
-      "antwoord": "Er is geen regelpakket dat gold op 2026-09-01. Haal de jaargang binnen en merk hem aan.",
-      "ms": 6
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "loonstrook voor personeelsnummer 187 in run run_ea1bff4125, basissalaris 1508.00 euro",
+      "fout": null,
+      "ms": 19
     }
   ],
   "storingen": [
@@ -243,7 +244,7 @@
       "naam": "Adam solliciteert zonder een afgemaakt cv",
       "belofte": "wordt geweigerd met needCv, en laat geen rij achter bij de werkgever",
       "stand": "gehouden",
-      "wat": "status 409, needCv: true, rijen voor/na: 2/2"
+      "wat": "status 409, needCv: true, rijen voor/na: 1/1"
     },
     {
       "naam": "iemand solliciteert met de gezinscode van Adam en een vreemd token",
@@ -281,28 +282,20 @@
     "adam": "profiel, 17 jaar, rol kind",
     "zus": "profiel, 15 jaar -- voor storing 1",
     "werkgever": "BRISA",
-    "ondernemer": "lid, manager van BRISA, koppelt de zaak aan zijn entiteit via /api/concern/vestiging/zaak"
+    "ondernemer": "een lid, manager van BRISA, koppelt de zaak aan Brisa SL via /api/concern/vestiging/zaak",
+    "nederland": "een volwassen lid bij MERIDIAAN (NL), met een ondernemer die de zaak aan Meridiaan BV koppelt"
   },
   "telling": {
     "schakels": 17,
-    "gesloten": 16,
+    "gesloten": 17,
     "open": 0,
-    "openBekend": 1,
+    "openBekend": 0,
     "stuk": 0,
     "storingen": 10,
     "gehouden": 10,
     "gebroken": 0
   },
-  "sluit": false,
+  "sluit": true,
   "sluitMetBevinding": true,
-  "bevindingen": [
-    {
-      "schakel": 17,
-      "van": "kantoor",
-      "naar": "lid",
-      "wat": "opent de loonrun; het contract levert een loonregel op",
-      "gemeten": "Er is geen regelpakket dat gold op 2026-09-01. Haal de jaargang binnen en merk hem aan.",
-      "reden": "WAT ONTBREEKT: een Spaans regelpakket met een bron. WAAROM: de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen server/kern/payroll/jaargangen/nl-2026.json; kern/payroll/run.js weigert dan terecht, want een tarief verzinnen is erger dan geen run. Dat een run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js. WIE EROVER GAAT: het kantoor dat de loonadministratie voert, via de dekking per land (server/routes/payroll-os-dekking.js); een tabel zonder bron zet geen proef erin."
-    }
-  ]
+  "bevindingen": []
 }

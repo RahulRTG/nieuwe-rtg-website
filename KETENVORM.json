@@ -36,8 +36,8 @@
       "proef": "scripts/adamproef.js",
       "schakels": 17,
       "storingen": 10,
-      "sluit": false,
-      "bevindingen": 1
+      "sluit": true,
+      "bevindingen": 0
     },
     {
       "naam": "moment",
@@ -89,7 +89,6 @@
     },
     "apart": {
       "schakel": [
-        "antwoord",
         "bekend"
       ],
       "storing": []

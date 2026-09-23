@@ -392,7 +392,7 @@ function volg(s, pos, arg) {
   /* Een wrapper die ook als WAARDE het bestand uit gaat (`{ emit: emit }`,
      `api.emit(...)`), wordt ook buiten dit bestand aangeroepen: die namen zien we
      niet, dus dynamisch en niet een lege lijst. */
-  const naamRe = fn.naam.replace(/\$/g, '\\$');
+  const naamRe = fn.naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   if (new RegExp('\\.' + naamRe + '\\(|[:,=(]\\s*' + naamRe + '\\s*[,})\\]]').test(s)) return null;
   const k = fn.params.indexOf(arg), namen = [];
   for (const m of s.matchAll(new RegExp('(^|[^\\w$.])' + naamRe + '\\(', 'g'))) {

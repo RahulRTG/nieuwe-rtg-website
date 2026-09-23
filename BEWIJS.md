@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1991 bestanden en 14175 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1992 bestanden en 14193 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1991 |
-| losse beweringen (`test(...)`) | 14175 |
+| toetsbestanden | 1992 |
+| losse beweringen (`test(...)`) | 14193 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1345 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1346 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
-| alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 405 |
+| alleen in de kop *genoemd*, nog niet gemeten | 169 |
+| niets van beide | 404 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1743 bestanden, 13738 beweringen.
+1744 bestanden, 13756 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -349,6 +349,7 @@ toets omvalt.
 | `doorwerking.test.js` | 7 | gezakt op `===->!==#0` | DE DOORWERKING VAN HET ZORGPROFIEL (scripts/doorwerking.js). MAATSTAF.md U10: een gegeven wordt één keer gevraagd en alleen hergebruikt met doel, toestemming, bron en actualiteit. |
 | `doos-journaal.test.js` | 3 | gezakt op `true->false` | Zaakdoos-journaal, beveiliging: het journaal wordt na herstel nagespeeld naar de cloud met de inlog van de doos. Daarom is het gezegeld (HMAC), genummerd (seq) en padgebonden. |
 | `doos-regie.test.js` | 5 | gezakt op `liegpoort /api/` | De doos-regie: het beheer op afstand van de Zaakdoos-vloot. Het kantoor zet een doelversie en per doos een netwerkrol (accesspoint, versterker, gastwifi); de doos haalt beide zelf op bij zijn eigen melding en meldt... |
+| `drempels.test.js` | 5 | gezakt op `&&->||#0` | DE DREMPELS VAN DE GEBAREN STAAN OP EEN PLEK (EDGE.md par. 11, ronde 1). |
 | `drie.test.js` | 9 | gezakt op `!==->===` | Drie (public/shared/drie.js): de pure kern van de 3D-laag -- mat4/vec3 en de meshbouwers -- draait ook in Node en is hier los getoetst (geen canvas nodig). De WebGL-renderer zelf leeft alleen in de browser en valt... |
 | `drm.test.js` | 5 | gezakt op `liegpoort /api/` | RTG contentbescherming, de DRM-route (kern/drm.js): Encrypted Media Extensions met een Clear Key-licentie die RTG zelf bedient. Draai: npm test |
 | `droogloop.test.js` | 9 | gezakt op `!==->===#0` | De droogloop beproefd op zijn twee eigen aannames: dat hij het VERSCHIL ziet, en dat hij huishouding van domein scheidt. Niet op de server -- die draait in het instrument zelf en kost een minuut; hier staan de twee... |
@@ -368,9 +369,9 @@ toets omvalt.
 | `economische-boeking-isolatie.test.js` | 1 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `edge-system.test.js` | 7 | gezakt op `return-weg#0` | Het gedeelde interactieve randenstelsel van WorkOS, TravelOS, LivingOS en RTFoundation. Deze toets bewaakt de dunne geometrie, eigen wereldpaletten, volledige functieroutes, echte bediening en de maximaal vier... |
 | `edgeactiestaat.test.js` | 8 | gezakt op `===->!==#0` | HET ACTIECONTRACT VAN DE EDGE, over ALLE combinaties en niet over drie voorbeelden. shared/edge/actiestaat.js zet een handeling in een van vier standen (AFWEZIG, GEBLOKKEERD, BESCHIKBAAR, LOPEND). |
-| `edgeblikveld.test.js` | 6 | gezakt op `===->!==#0` | HET EDGE BLIKVELD IS EEN PROJECTIE EN GEEN BRON. shared/edge/blikveld.js leest wat de Edge van de werkelijkheid ziet. |
+| `edgeblikveld.test.js` | 12 | gezakt op `===->!==#0` | HET EDGE BLIKVELD IS EEN PROJECTIE EN GEEN BRON. shared/edge/blikveld.js leest wat de Edge van de werkelijkheid ziet. |
 | `edgecontext.test.js` | 3 | gezakt op `+->-#0` | DE CONTEXT DIE DE EDGE LEEST: wat er bij kwam, en een oud gebrek in de sleutel. Ronde 0 van EDGE.md voegt geen derde contextmodel toe; hij breidt het ENE uit dat er al was (shared/adaptief/register.js,... |
-| `edgekaart.test.js` | 3 | gezakt op `===->!==#0` | DE EDGEKAART LOOPT NIET ACHTER, EN ZE KAN ZAKKEN (EDGE.md par. 0 en 7). |
+| `edgekaart.test.js` | 4 | gezakt op `===->!==#0` | DE EDGEKAART LOOPT NIET ACHTER, EN ZE KAN ZAKKEN (EDGE.md par. 0 en 7). |
 | `edgenieuwscherm.test.js` | 4 | gezakt op `!==->===#0` | EEN NIEUW SCHERM KRIJGT HET HARDE EDGE-CONTRACT (EDGE.md par. 7, besluit 4). |
 | `eenaccount-werkruimte.test.js` | 3 | gezakt op `liegpoort /api/` | Een inlog voor alles -- ook voor het RTG Werk OS. WAT HIER OP HET SPEL STAAT. |
 | `eenaccount.test.js` | 9 | gezakt op `liegpoort /api/` | Een account voor alles: mensen registreren zich EEN keer; personeel, zaak en kantoor zijn daarna koppelingen aan dat ene account (na bewijs van de bestaande werk-inlog) en accStart munt exact dezelfde sessies als de... |
@@ -553,7 +554,7 @@ toets omvalt.
 | `golive.test.js` | 4 | gezakt op `&&->||#0` | De generale repetitie voor live gaan: start de server ECHT in productiestand en bewijs dat hij zich dan ook zo gedraagt (demo dicht, geen dev-lekken, registreren en de technische pagina werken), dat een onveilige... |
 | `graafas.test.js` | 9 | genoemd | DE GRAFEN EN HUN AS -- de meter die beslist of de aandachtlaag EEN laag wordt. WAAROM DEZE TOETS ZWAAR WEEGT. |
 | `grafsteen.pg.test.js` | 7 | genoemd | DE GRAFSTEEN: EEN GEWISTE COLLECTIE BLIJFT GEWIST (TAKEN.md 4.38). HET GAT DAT DIT DICHT Elke node houdt een lokale snapshot als warme cache. |
-| `grammatica.test.js` | 22 | genoemd | DE RTG MOBILE INTERACTION GRAMMAR, machinaal gehandhaafd. De regels staan in GRAMMATICA.md; test/adaptief.test.js meet de laag eronder. |
+| `grammatica.test.js` | 24 | genoemd | DE RTG MOBILE INTERACTION GRAMMAR, machinaal gehandhaafd. De regels staan in GRAMMATICA.md; test/adaptief.test.js meet de laag eronder. |
 | `grand-integratie.pg.test.js` | 1 | slaat zichzelf over | De zwaarste integratietest tot nu toe: TWEE server-instances (A en B) die één echte PostgreSQL-store én één Redis-bus delen, en samen een volledige, gelijktijdige reis over meerdere genres afhandelen. Bewijst in één... |
 | `grens-sweep.test.js` | 5 | gezakt op `liegpoort /api/` | DE GRENS-SWEEP -- elk endpoint een keer echt aangeroepen, met twee harde eisen. WAT DIT WEL IS Er zijn ruim duizend endpoints die in geen enkele test voorkwamen. |
 | `grondwacht.test.js` | 46 | genoemd | DE WACHTERS -- en of ze echt kunnen zakken. LAT.md regel 10: een meter die je niet hebt zien uitslaan, meet niets. |
@@ -1271,7 +1272,7 @@ toets omvalt.
 | `rtfwelzijn.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 1): het gevoelsdagboek. Opt-in (de server bewaart alleen wat het kind zelf instuurt), prive per profiel (ook dicht voor gasten), een woord per dag (vandaag herzien mag, gisteren blijft staan), en... |
 | `rtfwelzijn2.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 2): de nieuwe coach-soorten voor de welzijnsapps. Zonder AI-sleutel geeft elke soort zijn EIGEN warme demotekst (de knop werkt dus altijd), een onbekende soort valt veilig terug, en de... |
 | `rtg-a11y.test.js` | 8 | -- | DE TOEGANKELIJKHEIDSADAPTER -- leest hij de keuring werkelijk goed uit? scripts/rtg-a11y.js voegt geen regels toe: hij richt de bestaande machinerie (scripts/a11ykeuring.js en scripts/raakvlakkeuring.js) op een... |
-| `rtg-adaptive-edge.test.js` | 7 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rtg-adaptive-edge.test.js` | 11 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-continue-key.test.js` | 10 | gezakt op `===->!==#0` | De Continue Key mag rijk bewegen, maar blijft exact de bestaande primaire Edge-knop. Deze toets bewaakt identiteit, veilige ankers, toetsenbord, langdruk, geometrie, a11y, opslag en motion-koppeling. |
 | `rtg-edge-2-pilots.test.js` | 14 | gezakt op `===->!==#0` | De eerste acht Vandaag-routes sluiten declaratief aan op Edge 2, terwijl het bestaande Edge-casco de enige eigenaar van top, side en bottom blijft. Deze toets bewaakt de routecontexten, de centrale loaderhandshake en... |
 | `rtg-edge-2.test.js` | 14 | gezakt op `===->!==#0` | Edge 2.0 bestuurt het bestaande casco. Deze toets borgt dat er geen tweede balkenstelsel, netwerklaag of onbegrensde contextselectie ontstaat. |
@@ -2018,7 +2019,7 @@ toets omvalt.
 | `werkmerk.e2e.js` | 1 | gezakt op `&&->||#1` | HET MERK VAN DE KLANT IN EEN ECHTE BROWSER -- en waar het ophoudt. Dit is de white-label-vraag op het scherm waar hij toe doet: de medewerker van een klant ziet zijn eigen organisatie boven zijn werkruimte staan. |
 | `werkos-schil.e2e.js` | 2 | -- | De vaste WerkOS-schil moet op elke breedte dezelfde drie bedieningslagen houden. Deze componenttoets gebruikt het echte gedeelde script, maar een klein tabmodel: zo bewaken we navigatie en maatvoering zonder inlogdata. |
 | `werkruimte-objecten.e2e.js` | 1 | genoemd | Scherm-test voor stap 7 uit WERKRUIMTE.md: objecten slepen tussen apps. Wat hier bewezen wordt is niet dat er iets beweegt, maar de twee regels die dit een operating environment maken in plaats van een desktop met... |
-| `werkruimte.e2e.js` | 1 | -- | Scherm-test voor de RTG Werkruimte: stap 5 (werkruimtes bewaren en terughalen) en stap 6 (het commandopalet) uit WERKRUIMTE.md. Wat hier bewezen wordt is dat de kamer ECHT terugkomt -- niet dat er een knop staat. |
+| `werkruimte.e2e.js` | 1 | genoemd | Scherm-test voor de RTG Werkruimte: stap 5 (werkruimtes bewaren en terughalen) en stap 6 (het commandopalet) uit WERKRUIMTE.md. Wat hier bewezen wordt is dat de kamer ECHT terugkomt -- niet dat er een knop staat. |
 | `werkscherm.e2e.js` | 3 | -- | Het Werk OS-scherm in een echte browser: /apps/werk.html. Drie beweringen die van buiten NIET te zien zijn aan een groene API-toets: 1. |
 | `werkschermen.e2e.js` | 4 | -- | DE WERKSCHERMEN: WIE ZIT ER ACHTER, EN WAT MAG DIE ZIEN. De laatste grote groep uit TAKEN 4.9. |
 | `werkstatus.e2e.js` | 1 | gezakt op `===->!==#0` | DE ORGANISATIESTAND OP EEN ECHT SCHERM -- en vooral wat er NIET staat. De bewijspoort (kern/tenant/bewijs.js) maakte van elke enterprisebewering een object met een bron of een reden. |

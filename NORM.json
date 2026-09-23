@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1584,
+    "kernBreedte": 1585,
     "kernGedeeld": 239,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -135,6 +135,15 @@
     "planDomeinenGemeten": 7
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1584,
+      "meter": "kernBreedte 1584 -> 1585; kernGedeeld blijft 239",
+      "reden": "De loonkant van besluit 1 (ARBEID.md par. 7a): de loonrun leest het dienstverband. Er komt EEN kernnaam bij, `dienstverbandToets`, aangeraakt door het domein payroll-os. Hij had onder de naam van de brug kunnen hangen (een object met twee functies onder `dienstverbandUitAanname`), en dan was deze meter niet bewogen -- maar dat zou de meter omzeilen en geen koppeling uitsparen: de loonrun raakt het concern hoe dan ook aan. De toets zelf woont in de module die het dienstverband BEZIT (kern/concern/aanname.js), zodat de loonkant niet zelf beslist wat een lopend dienstverband is.",
+      "waarheen": "server/kern/concern/aanname.js (dienstverbandToets), server/routes/payroll-os-run.js (de aansluiting bij run/open, binnen een try) en test/aanname-dienstverband.test.js toets 7 tot en met 9. De Adamproef schakel 17 meet het tegen een echte server met een besturingsproef, en zakt zonder de aansluiting."
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

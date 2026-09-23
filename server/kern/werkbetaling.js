@@ -54,7 +54,8 @@ module.exports = ({ db, save, opdrachten, rekeningenVanLid }) => {
        dan "niet van u": zeg het, in plaats van een weigering die een oorzaak verzint. */
     if (typeof rekeningenVanLid !== 'function') return { onbedraad: true };
     const zijne = codenaam ? (rekeningenVanLid(codenaam).rekeningen || []) : [];
-    return { id: op.id, centen: op.centen, bestemming: op.bestemming || null,
+    /* bron: het bedrag komt uit de betaalopdracht zelf, niet uit het verzoek. */
+    return { id: op.id, centen: op.centen, bron: 'betaalopdracht:' + op.id, bestemming: op.bestemming || null,
       vanDeze: !!op.bron && zijne.some(x => x.iban === op.bron), mislukt: MISLUKT.includes(op.status), status: op.status };
   }
 

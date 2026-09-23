@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1586,
+    "kernBreedte": 1590,
     "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -148,6 +148,15 @@
     "edgeVeldTrust": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1586,
+      "meter": "kernBreedte 1586 -> 1590 (de SOM van drie lijnen, niet een nieuwe naam)",
+      "reden": "Samenvoeging van #346, #347 en #350 op main (954b477). Main stond op 1586. #347 voegde er EEN naam aan toe (de kantooruitnodiging, AUTHORITY.md fase 2: 1586 -> 1587), #350 DRIE (de brug, de loonkant en de inhaalslag uit ARBEID.md par. 7a: 1583 -> 1586 op zijn eigen basis), en #346 geen. Elke stap staat met een eigen notitie hieronder. Er komt met deze samenvoeging geen naam bij -- het getal stijgt omdat de lijnen nu naast elkaar staan.",
+      "waarheen": "De notities van de drie takken zelf; dezelfde vorm als de samenvoeging van 15 september (1579 -> 1580)."
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

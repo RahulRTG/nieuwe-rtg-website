@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1993 bestanden en 14206 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1995 bestanden en 14216 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1993 |
-| losse beweringen (`test(...)`) | 14206 |
+| toetsbestanden | 1995 |
+| losse beweringen (`test(...)`) | 14216 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1347 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1348 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
-| alleen in de kop *genoemd*, nog niet gemeten | 169 |
+| alleen in de kop *genoemd*, nog niet gemeten | 170 |
 | niets van beide | 404 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1745 bestanden, 13769 beweringen.
+1746 bestanden, 13773 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -367,7 +367,7 @@ toets omvalt.
 | `economic-runtime.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `economie.test.js` | 10 | genoemd | RTG ECONOMIC CONTROL PLANE: vier werelden, en een firewall ertussen die standaard weigert. Deze toetsen gaan over de GRENS en niet over de rekensom -- die staat in test/kosten.test.js. |
 | `economische-boeking-isolatie.test.js` | 1 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `edge-system.test.js` | 7 | gezakt op `return-weg#0` | Het gedeelde interactieve randenstelsel van WorkOS, TravelOS, LivingOS en RTFoundation. Deze toets bewaakt de dunne geometrie, eigen wereldpaletten, volledige functieroutes, echte bediening en de maximaal vier... |
+| `edge-system.test.js` | 8 | gezakt op `return-weg#0` | Het gedeelde interactieve randenstelsel van WorkOS, TravelOS, LivingOS en RTFoundation. Deze toets bewaakt de dunne geometrie, eigen wereldpaletten, volledige functieroutes, echte bediening en de maximaal vier... |
 | `edgeactiestaat.test.js` | 8 | gezakt op `===->!==#0` | HET ACTIECONTRACT VAN DE EDGE, over ALLE combinaties en niet over drie voorbeelden. shared/edge/actiestaat.js zet een handeling in een van vier standen (AFWEZIG, GEBLOKKEERD, BESCHIKBAAR, LOPEND). |
 | `edgeblikveld.test.js` | 14 | gezakt op `===->!==#0` | HET EDGE BLIKVELD IS EEN PROJECTIE EN GEEN BRON. shared/edge/blikveld.js leest wat de Edge van de werkelijkheid ziet. |
 | `edgecontext.test.js` | 3 | gezakt op `+->-#0` | DE CONTEXT DIE DE EDGE LEEST: wat er bij kwam, en een oud gebrek in de sleutel. Ronde 0 van EDGE.md voegt geen derde contextmodel toe; hij breidt het ENE uit dat er al was (shared/adaptief/register.js,... |
@@ -485,6 +485,7 @@ toets omvalt.
 | `gastroomservice.test.js` | 7 | gezakt op `liegpoort /api/` | HET GUEST OS OP DE KAMER: roomservice. DE DERDE NAAD, en de scherpste. |
 | `gastverzoek.test.js` | 12 | gezakt op `liegpoort /api/` | WAT EEN GAST VRAAGT IN PLAATS VAN BESTELT. De gastkant kon bestellen en afrekenen, maar niet zeggen "kunt u even komen". |
 | `gastzorg.test.js` | 3 | gezakt op `liegpoort /api/` | De zorgvolle keten: het zorgprofiel reist alleen met toestemming mee met bestellingen en verblijven, en de live locatie is alleen zichtbaar voor zaken die de gast zelf aanwees, tot de zaak (of de gast) het stopt. |
+| `gebaar-omweg.test.js` | 2 | gezakt op `return-weg#1` | GEEN OMWEG LANGS veegDoor IN DE GEBAARPROEVEN (EDGE.md par. 11, ronde 2). |
 | `gebaar.test.js` | 15 | genoemd | RTG Gebaren: de regels die je aan een scherm niet ziet, machinaal gehandhaafd. WAAROM DEZE TOETS BESTAAT. |
 | `gebouw.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Enterprise: het complete kantoorgebouw-systeem (demo Meridiaan Toren). Bewaakt de zalen zonder dubbele boekingen, de bezoekersstroom langs de receptie, badges, facilitaire meldingen, valet, de jetset-laag en de... |
 | `gebouwplus.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Enterprise (gebouwplus): de plus-laag van het kantoorgebouw. Getoetst: de manager van de demo-toren legt een huurcontract vast, verlengt en beeindigt het; leads schuiven door de fasen; energie-weken worden... |
@@ -1275,7 +1276,7 @@ toets omvalt.
 | `rtg-a11y.test.js` | 8 | -- | DE TOEGANKELIJKHEIDSADAPTER -- leest hij de keuring werkelijk goed uit? scripts/rtg-a11y.js voegt geen regels toe: hij richt de bestaande machinerie (scripts/a11ykeuring.js en scripts/raakvlakkeuring.js) op een... |
 | `rtg-adaptive-edge.test.js` | 11 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-continue-key.test.js` | 10 | gezakt op `===->!==#0` | De Continue Key mag rijk bewegen, maar blijft exact de bestaande primaire Edge-knop. Deze toets bewaakt identiteit, veilige ankers, toetsenbord, langdruk, geometrie, a11y, opslag en motion-koppeling. |
-| `rtg-edge-2-pilots.test.js` | 14 | gezakt op `===->!==#0` | De eerste acht Vandaag-routes sluiten declaratief aan op Edge 2, terwijl het bestaande Edge-casco de enige eigenaar van top, side en bottom blijft. Deze toets bewaakt de routecontexten, de centrale loaderhandshake en... |
+| `rtg-edge-2-pilots.test.js` | 15 | gezakt op `===->!==#0` | De eerste acht Vandaag-routes sluiten declaratief aan op Edge 2, terwijl het bestaande Edge-casco de enige eigenaar van top, side en bottom blijft. Deze toets bewaakt de routecontexten, de centrale loaderhandshake en... |
 | `rtg-edge-2.test.js` | 14 | gezakt op `===->!==#0` | Edge 2.0 bestuurt het bestaande casco. Deze toets borgt dat er geen tweede balkenstelsel, netwerklaag of onbegrensde contextselectie ontstaat. |
 | `rtg-edge-accessibility.test.js` | 8 | geen bronmutatie mogelijk | De luxe Edge-rand blijft alleen premium wanneer haar echte bediening ook leesbaar en raakbaar is. Deze toets borgt de 44px-doelen, inclusief 320px, en meet de Living-statuskleuren als tekst in plaats van als moodboard. |
 | `rtg-edge-appbar.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1785,7 +1786,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-248 bestanden, 437 beweringen.
+249 bestanden, 443 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1854,7 +1855,7 @@ toets omvalt.
 | `gebaar-notities.e2e.js` | 1 | -- | HET DERDE DOMEIN MET EEN VEEG DIE DE SERVER RAAKT, en het eerste waar de twee soorten actie NAAST elkaar liggen. Archiveren is omkeerbaar: `bewaar {archief:true}` legt de notitie in de la en `{archief:false}` haalt... |
 | `gebaar-rtmail.e2e.js` | 1 | -- | DE VEEG OVER POST, TEGEN EEN ECHTE SERVER. Dit is het gebaar dat een lid al kent van buiten dit huis: opzij is weg, de andere kant is markeren. |
 | `gebaar-salon.e2e.js` | 1 | -- | DE SALON: het vierde domein, en het eerste waar NIET elke actie de regel weghaalt. Archiveren haalt een post uit je tijdlijn, dus dat loopt via KLAAR.server: inklappen, server, en een weg terug. |
-| `gebaar.e2e.js` | 3 | genoemd | RTG Gebaren in een echte browser: de laden onder een regel, de drempel, de uitvoering en de weg terug. WAAROM DIT EEN E2E IS EN GEEN UNIT. |
+| `gebaar.e2e.js` | 5 | genoemd | RTG Gebaren in een echte browser: de laden onder een regel, de drempel, de uitvoering en de weg terug. WAAROM DIT EEN E2E IS EN GEEN UNIT. |
 | `gedachten-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/gedachten.html. Het punt dat hier op het scherm zelf moet kloppen: bij een zin waar de crisisregel op aanslaat blijft de notitie STAAN en komt de hulp ernaast. |
 | `gegevenskaart-scherm.e2e.js` | 1 | genoemd | Schermtoets voor apps/mijn-gegevens.html. DE BEWERING DIE ERTOE DOET is dat "niet vast te stellen" op dit scherm een EIGEN gezicht heeft en niet dat van "nee". |
 | `geld.e2e.js` | 1 | -- | Scherm-test voor RTG Geld als ECHTE app: vier rustige hoofdingangen met de twaalf vertrouwde geldstanden bereikbaar achter Meer (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd). |
@@ -1865,6 +1866,7 @@ toets omvalt.
 | `grammatica.e2e.js` | 1 | genoemd | DE GRAMMATICA IN EEN ECHTE BROWSER. De regels staan in GRAMMATICA.md, de statische kant in test/grammatica.test.js. |
 | `handelscherm.e2e.js` | 0 | -- | Scherm-test: RTG Handel in een echte browser (Playwright). De endpoints van de handelsketen liggen vast in test/handelsketen.test.js. |
 | `handenvrij.e2e.js` | 1 | -- | Muisvrij bedienen, in een echte browser. De zinsontleding is los getoetst (test/handenvrij.test.js). |
+| `helper-veegdoor.e2e.js` | 2 | -- | DE VEEGHELPER ZELF, en niet een scherm dat hem gebruikt. veegDoor (test/helper.js) heeft twee wegen: de protocolvlucht naar Chromium, en een terugval in de renderer voor als de timer van lang drukken de vlucht heeft... |
 | `heritage-context.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `heritage-intelligence.e2e.js` | 1 | gezakt op `liegpoort /api/` | Een geïsoleerde server en een aangemelde browser controleren behoud van invoer, routecontext en de vaste bediening bij trage of ontbrekende bronnen. |
 | `horeca-bar.e2e.js` | 1 | -- | HET BARSCHERM in een echte browser: /apps/horeca-bar.html. De rekensom staat vast in test/horeca-bar.test.js. |
@@ -1970,9 +1972,9 @@ toets omvalt.
 | `rtfspeelhoek.e2e.js` | 1 | -- | Scherm-test voor de speelhoek van de kleintjes (RTF-golf 7): het nieuwe Pakken-spel bij tellen, Welke is anders? bij kleuren, samen om de beurt bij memorie en de napraatvraag aan het eind van een voorleesverhaaltje. |
 | `rtfwelzijn.e2e.js` | 1 | -- | Scherm-test voor het gevoelsdagboek op gevoel.html: gezichtje aantikken blijft vluchtig (de belofte van de pagina), bewaren is een eigen keuze, het dagboekje toont wat het kind zelf bewaarde, en herzien kan. |
 | `rtg-a11y.e2e.js` | 2 | -- | DE TOEGANKELIJKHEIDSADAPTER IN EEN ECHTE BROWSER. test/rtg-a11y.test.js toetst het VERTAALSTUK met de echte uitvoervorm van de keuring. |
-| `rtg-adaptive-edge.e2e.js` | 4 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rtg-adaptive-edge.e2e.js` | 5 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-dev.e2e.js` | 1 | -- | RTG DEV IN EEN ECHTE BROWSER -- want dit is de bewering die alleen daar valt na te rekenen. Alles wat `rtg dev` belooft, hangt aan drie dingen die je met curl niet ziet: 1. |
-| `rtg-edge-2.e2e.js` | 1 | -- | DE ENE RAND ROND DE ACHT EERSTE VANDAAG-SCHERMEN. Deze proef telt niet alleen dat Edge bestaat. |
+| `rtg-edge-2.e2e.js` | 2 | genoemd | DE ENE RAND ROND DE ACHT EERSTE VANDAAG-SCHERMEN. Deze proef telt niet alleen dat Edge bestaat. |
 | `rtg-id-family.e2e.js` | 3 | gezakt op `liegpoort /api/` | RTG access in a real browser: one shared Edge, four concise registration steps, explicit agreement and existing password/WebAuthn/2FA recovery routes. All identities and credentials belong to isolated local test... |
 | `rtmail-team.e2e.js` | 1 | -- | Scherm-test voor de RTMAIL-teams. De unit-toetsen (test/rtmail-team.test.js) bewijzen de server-kant; deze bewijst dat het scherm het doet: een team oprichten, iemand erbij zetten, een bericht oppakken en afhandelen,... |
 | `rtmail-vak.e2e.js` | 1 | -- | Schermtoets voor het POSTVAK in RTG Mail: de mappenbalk, zoeken, opbergen, de ster en het gesprek. De servertoetsen (test/rtmail-vak.test.js) bewijzen dat de laag klopt; deze bewijst dat een mens er ook echt bij kan. |

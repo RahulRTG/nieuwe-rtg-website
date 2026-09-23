@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T17:15:17.236Z",
-    "commit": "b3e5603",
+    "op": "2026-09-23T17:28:05.824Z",
+    "commit": "42f470bd",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -3467,8 +3467,7 @@
       "schrijvers": [
         "public/shared/adaptief/register.js",
         "public/shared/rtg-adaptive-edge-core.js",
-        "public/shared/rtg-adaptive-edge-signals.js",
-        "public/site/start/experience-edge.js"
+        "public/shared/rtg-adaptive-edge-signals.js"
       ],
       "beslissers": [
         "public/shared/adaptief.js",
@@ -3864,8 +3863,7 @@
       "schrijvers": [
         "public/shared/adaptief/register.js",
         "public/shared/rtg-adaptive-edge-core.js",
-        "public/shared/rtg-adaptive-edge-signals.js",
-        "public/site/start/experience-edge.js"
+        "public/shared/rtg-adaptive-edge-signals.js"
       ],
       "beslissers": [
         "public/shared/adaptief.js",
@@ -4065,8 +4063,7 @@
   },
   "afgeleid": {
     "registerAction": [
-      "public/shared/rtg-adaptive-edge-signals.js",
-      "public/site/start/experience-edge.js"
+      "public/shared/rtg-adaptive-edge-signals.js"
     ],
     "wereld": [
       "public/shared/randen.js",
@@ -4091,8 +4088,8 @@
     ]
   },
   "telling": {
-    "bestanden": 72,
-    "rollen": 220,
+    "bestanden": 73,
+    "rollen": 218,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 14

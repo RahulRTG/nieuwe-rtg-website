@@ -283,6 +283,12 @@ const REGISTER = {
   'ISOLATIESCHADUW.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'ISOLATIEPROEF.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
+  /* De consolidatieronde (CLAUDE.md, SCHERMEIGENAAR.json). De toets meet VERS
+     met scripts/schermfunctie.js en zakt op een overlappaar zonder oordeel, een
+     menu-ingang op een alias en een link naar een alias; het aantal open
+     oordelen mag er alleen dalen (OPEN_MAX). */
+  'SCHERMFUNCTIE.json': { eigenRatel: 'test/schermeigenaar.test.js' },
+  'SCHERMEIGENAAR.json': { eigenRatel: 'test/schermeigenaar.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
   /* De Business Proof Map en de vierde gouden keten. Beide hangen aan
      test/ondernemerbewijs.test.js, en dat is geen regel-om-de-regel: die toets

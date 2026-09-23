@@ -83,6 +83,20 @@ test('elke capability heeft precies een eigenaar, en die eigenaar draagt haar', 
   }
 });
 
+/* DE RATEL. Tien oordelen staan open op 23 september 2026 (de toegangsschermen,
+   de gezinsagenda, rit naast ov, Pulse naast De Salon, twee sociale overzichten,
+   Commerce naast de Mall, en vier gedeelde componenten). Dat getal mag alleen
+   OMLAAG: een open punt sluiten verlaagt OPEN_MAX met de hand, een nieuw open
+   punt erbij laat deze toets zakken tot iemand het besluit neemt om hem te
+   verhogen -- met de reden in de historie. */
+const OPEN_MAX = 10;
+
+test('het aantal open oordelen stijgt niet (OPEN_MAX mag alleen omlaag)', () => {
+  const open = REG.oordelen.filter(o => o.stand === 'open').length;
+  assert.ok(open <= OPEN_MAX, open + ' open oordelen, de ratel staat op ' + OPEN_MAX + ': los een punt op in plaats van er een bij te zetten');
+  assert.ok(open >= OPEN_MAX, 'er staan er nog maar ' + open + ' open: zet OPEN_MAX op ' + open + ', anders kan er ongemerkt een bij');
+});
+
 test('elk oordeel is een van de vijf klassen (of geen-dubbel met reden), en open betekent: er staat een vervolg', () => {
   for (const o of REG.oordelen) {
     const naam = o.schermen.join(' + ');

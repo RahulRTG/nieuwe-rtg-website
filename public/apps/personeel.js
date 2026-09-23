@@ -390,6 +390,25 @@
     $('#teamAccessDescription').innerHTML = teamText(descriptionKey, description);
     $('#gate').scrollTop = 0;
   }
+  /* De gewone accountinlog (met zijn tweede factor) en daarna de kantoordeur.
+     Vraagt het account een tweede stap, dan loopt die via de leden-app: die
+     stap nog eens nabouwen zou een tweede inlog met eigen regels zijn. */
+  async function naarKantoorMetAccount(login, password){
+    let d = {};
+    try {
+      const r = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login, password }) });
+      d = await r.json().catch(() => ({}));
+      if (!r.ok) return false;
+    } catch(e){ return false; }
+    if (!d.token) {
+      $('#liErr').textContent = T('pd.ka.tweede','Uw account heeft toegang tot RTG Kantoor en vraagt een tweede stap. Log in via de leden-app en open daar Mijn werkplekken, Backoffice.');
+      return true;
+    }
+    try { localStorage.setItem('rtg_member_token', d.token); } catch(e){}
+    stepKantoor();
+    await kantoorMetAccount(d.token);
+    return true;
+  }
   function formulierLogin(){
     $('#gateStep').innerHTML =
       '<form class="lform" id="loginForm" autocomplete="on">'+
@@ -407,7 +426,12 @@
       $('#liErr').textContent = '';
       const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
       try { await mijnLogin($('#liUser').value.trim(), $('#liPass').value); }
-      catch(err){ $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.'); btn.disabled = false; }
+      catch(err){
+        btn.disabled = false;
+        // geen zaak, wel kantoor: zelfde account, andere deur (pda/posities.js)
+        if (err.data && err.data.kantoor && await naarKantoorMetAccount($('#liUser').value.trim(), $('#liPass').value)) return;
+        $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.');
+      }
     });
     $('#toJoin').addEventListener('click', stepAanmelden);
     $('#toForgot').addEventListener('click', stepForgot);
@@ -574,17 +598,34 @@
         b.id = 'kaAccountVerder';
         b.className = 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
         b.textContent = '' + T('pd.ka.een', 'Verder met uw RTG-account');
-        b.addEventListener('click', async () => {
-          const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: JSON.stringify({ rol: 'kantoor' }) });
-          const sd = await s.json().catch(() => ({}));
-          if (!s.ok) { $('#kaFout').textContent = sd.error || T('pd.mis', 'Er ging iets mis.'); return; }
-          kaToken = sd.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
-          enterKantoor();
-        });
+        b.addEventListener('click', () => kantoorMetAccount(lt));
         const kaart = $('#gateStep').querySelector('.card');
         if (kaart) kaart.appendChild(b);
       } catch(e){}
     })();
+  }
+  /* Met het ene RTG-account de kantoordeur openen (/api/account/start, dezelfde
+     munt als de werk-kiezer). Heeft het lid een algemene pin, dan vraagt de
+     server erom; daar komt dan een pinveld voor in de plaats van een melding
+     zonder uitweg. */
+  async function kantoorMetAccount(lt, pin){
+    const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
+      body: JSON.stringify(pin ? { rol: 'kantoor', pin } : { rol: 'kantoor' }) });
+    const sd = await s.json().catch(() => ({}));
+    if (!s.ok) {
+      if (sd.pinNodig && !$('#kaPin') && $('#kaFout')) {
+        $('#kaFout').insertAdjacentHTML('afterend', '<div class="pinrow h-mt60"><input id="kaPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="'+T('pin.veld','Algemene pin')+'" placeholder="'+T('pin.veld','Algemene pin')+'">'+
+          '<button id="kaPinGo" class="hoofd">'+T('pd.ka.binnen','Binnen')+'</button></div>');
+        const ga = () => kantoorMetAccount(lt, $('#kaPin').value.trim());
+        $('#kaPinGo').addEventListener('click', ga);
+        $('#kaPin').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });
+        $('#kaPin').focus();
+      }
+      $('#kaFout').textContent = sd.error || T('pd.mis', 'Er ging iets mis.');
+      return;
+    }
+    kaToken = sd.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
+    enterKantoor();
   }
   async function enterKantoor(){
     const k = await kaApi('kamers');

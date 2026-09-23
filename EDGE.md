@@ -738,8 +738,8 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
 | modulefouten van de werkruimte bereiken geen diagnose: `o.error` is de enige haak en geen aanroeper geeft hem mee (het dode kanaal `rtg-workspace-error` verborg dat) | `interface/workspace-runtime.js` | besluit (foutmelder heeft een budget van 3 en een deur zonder inlog) |
 | de home-actie op de wereldbureaus hangt aan een observer die na de eerste keer losgaat; wordt de adaptieve Edge ooit opnieuw gestart, dan verdwijnt hij (vandaag start niets hem opnieuw) | `interface/world-desktop-home.js` | 2 |
 | `RTGAdaptief.doe()` kijkt alleen of iets verhinderd is, niet wat het weegt; wie hem rechtstreeks aanroept, slaat de bevestiging over | `adaptief/register.js` | 3 |
-| `gebaar.js` (op elk scherm met `basis.js`) heeft een eigen lang drukken van 520 ms en een borgtijd van 800 ms (sinds ronde 2 op de kaart als tweede beslisser, par. 1); naar de tabel halen vraagt eerst een meting van de wedloop in `test/helper.js` | `shared/gebaar/` | 2 |
-| vijf standmachines voor wat er van de Edge te zien is | par. 1 | 2 |
+| `gebaar.js` (op elk scherm met `basis.js`) heeft een eigen lang drukken van 520 ms en een borgtijd van 800 ms (sinds ronde 2 op de kaart, als beslisser naast de gebaarversheid van Edge 2; par. 1); naar de tabel halen vraagt eerst een meting van de wedloop in `test/helper.js` | `shared/gebaar/` | 2 |
+| vier standmachines voor wat er van de Edge te zien is (de vijfde, de Second Screen, bleek een indelingsfout: par. 1) | par. 1 | 2 |
 | vier geheugens voor "waar was ik" die elkaar niet lezen | par. 1 | 4 |
 | "waarom niet" heeft aan de serverkant vijf vormen zonder gedeelde woorden, en `routes/stuur.js` maakt van elke weigering een kale `error` | `server/routes/stuur.js` | 3 |
 

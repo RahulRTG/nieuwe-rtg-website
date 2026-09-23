@@ -533,10 +533,11 @@ async function loop(basis, uit) {
      het team van de zaak? */
   await stap(
     schakel(13, 'werkgever', 'Adam', 'maakt van de aanname een plek in het team',
-      'een Foundation-profiel heeft geen eigen RTG-account, en een aanname claimen eist er een ' +
-      '(/api/werving/verbind). De aanname eindigt bij een kassacode die de werkgever met de hand ' +
-      'moet doorgeven; een zeventienjarige in een gezin komt zo niet in het team. Besluit 1 van ' +
-      'ARBEID.md par. 7a (employment is de waarheid) moet hier een weg voor krijgen.'),
+      'WAT ONTBREEKT: een weg van een aanname naar een plek in het team voor iemand zonder eigen ' +
+      'RTG-account. WAAROM: een aanname claimen eist een lidsessie (/api/werving/verbind in ' +
+      'server/routes/werving.js), en een Foundation-profiel heeft die niet; de aanname eindigt bij een ' +
+      'kassacode die de werkgever met de hand moet doorgeven. WIE EROVER GAAT: de eigenaar, via besluit 1 ' +
+      'van ARBEID.md par. 7a (employment is de waarheid) -- die brug moet ook een gezinslid dragen.'),
     () => P('/api/supplier/roster', { code: WERKGEVER }),
     async r => {
       const team = (r.data && r.data.staff) || [];
@@ -591,10 +592,11 @@ async function loop(basis, uit) {
      staat de werkgever tussen zijn werkplekken? */
   await stap(
     schakel(16, 'huis', 'lid', 'maakt van de aanname een dienstverband bij de entiteit (employment)',
-      'de werving eindigt bij een personeelsnummer aan een ZAAK (staffId); er ontstaat geen ' +
-      'employment aan een entiteit, en kern/payroll leest employment nergens. Dat is de naad uit ' +
-      'ARBEID.md par. 3, en besluit 1 van par. 7a zegt aan welke kant hij dicht moet: een brug ' +
-      'van staffId naar employment die een kant op loopt.'),
+      'WAT ONTBREEKT: een dienstverband (employment) aan de entiteit na een aanname. WAAROM: de ' +
+      'werving eindigt bij een personeelsnummer aan een ZAAK (staffId), alleen kern/concern/uitnodiging.js ' +
+      'maakt een employment aan, en kern/payroll leest employment nergens -- de naad uit ARBEID.md par. 3. ' +
+      'WIE EROVER GAAT: besloten door de eigenaar (par. 7a, besluit 1); wat nog moet is de brug van ' +
+      'staffId naar employment die een kant op loopt, in de vorm van kern/mobiliteit/appbrug.js.'),
     () => P('/api/concern/mijnwerk', {}, N),
     async r => {
       const plekken = (r.data && r.data.werkplekken) || [];
@@ -625,11 +627,12 @@ async function loop(basis, uit) {
   }
   await stap(
     schakel(17, 'kantoor', 'lid', 'opent de loonrun; het contract levert een loonregel op',
-      'de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen een ' +
-      'Nederlands regelpakket (kern/payroll/jaargangen/nl-2026.json). Een loonrun voor een zaak ' +
-      'buiten Nederland weigert dus, terecht en met de reden erbij: een tarief verzinnen is erger dan ' +
-      'geen run. Wat ontbreekt is een Spaans regelpakket met een bron, geen code. Dat een run voor een ' +
-      'Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js.'),
+      'WAT ONTBREEKT: een Spaans regelpakket met een bron. WAAROM: de werkgever uit deze proef (Cafe ' +
+      'Brisa) staat op Ibiza, land ES, en er ligt alleen server/kern/payroll/jaargangen/nl-2026.json; ' +
+      'kern/payroll/run.js weigert dan terecht, want een tarief verzinnen is erger dan geen run. Dat een ' +
+      'run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js. ' +
+      'WIE EROVER GAAT: het kantoor dat de loonadministratie voert, via de dekking per land ' +
+      '(server/routes/payroll-os-dekking.js); een tabel zonder bron zet geen proef erin.'),
     () => K ? P('/api/office/payroll/run/open', { code: WERKGEVER, periode }, K)
       : Promise.resolve({ status: 0, data: null }),
     async r => {

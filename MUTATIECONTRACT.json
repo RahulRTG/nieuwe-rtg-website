@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-23T13:51:38.962Z",
-  "commit": "549bb1ee9",
+  "op": "2026-09-23T15:44:53.225Z",
+  "commit": "6f51dc494",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4993,
-  "geclassificeerd": 4993,
+  "totaal": 4994,
+  "geclassificeerd": 4994,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1199,
+   "NOT_APPLICABLE": 1200,
    "PROTECTED": 468,
    "INTENTIONALLY_NON_IDEMPOTENT": 136
   },
-  "vastgesteldDoorMens": 1852,
+  "vastgesteldDoorMens": 1853,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4112,
+   "AUTHENTICATED": 4113,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 737,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 21
+   "niet gemeten": 22
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -15143,7 +15143,28 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "concern.vestiging.inhaal.bevestig",
+   "route": "POST /api/concern/vestiging/inhaal/bevestig",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

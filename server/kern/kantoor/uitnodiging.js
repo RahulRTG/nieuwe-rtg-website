@@ -1,7 +1,7 @@
 /* DE KANTOORUITNODIGING -- AUTHORITY.md fase 2, gebouwd naast de gedeelde code.
 
-   Besluit van de eigenaar (23 september 2026): bouwen, en de gedeelde
-   kantoorcode laten werken tot de schaduw een week heeft gemeten. Vandaag komt
+   Besluit van de eigenaar (23 september 2026): bouwen, en daarna dezelfde dag
+   de gedeelde code dicht voor nieuwe koppelingen. Tot dan kwam
    iedereen de kantoorrol binnen met EEN code die het hele kantoor kent, en die
    code is daarmee geen bewijs van wie er koppelt. Een uitnodiging is dat wel:
 
@@ -11,10 +11,10 @@
      - ZONDER DE CODE OP TE SLAAN: alleen een hash. De code wordt een keer getoond,
        aan de eigenaar die hem maakt, en verder nergens.
 
-   DE SCHADUW van fase 2 zit er ook in: elke geslaagde koppeling telt mee onder
-   de weg waarlangs hij kwam (`gedeeldeCode` of `uitnodiging`). Pas als dat getal
-   laat zien dat niemand meer met de gedeelde code koppelt, kan die dicht -- en
-   dat is een volgend besluit, niet iets wat deze module doet.
+   DE TELLING: elke koppeling telt mee onder de weg waarlangs hij kwam. Sinds
+   later op 23 september 2026 koppelt de gedeelde code niet meer (besluit van de
+   eigenaar, kern/eenaccount/koppelen.js); `gedeeldeCode` telt de koppelingen van
+   daarvoor en `gedeeldeCodeGeweigerd` de pogingen erna.
 
    Wat hier NIET gebeurt: een recht verlenen. Een verzilverde uitnodiging levert
    precies de kantoorrol die de gedeelde code ook gaf; niet meer. */
@@ -80,9 +80,9 @@ function maakUitnodiging({ db, save, crypto, nu }) {
       uitnodigingen: lijst().slice(-100).reverse().map(u => ({ id: u.id, codenaam: u.codenaam, gemaakt: u.gemaakt,
         verloopt: u.verloopt, stand: u.gebruikt ? 'gebruikt' : u.ingetrokken ? 'ingetrokken'
           : Date.parse(u.verloopt) < nuT ? 'verlopen' : 'open' })),
-      koppelwegen: Object.assign({ gedeeldeCode: 0, uitnodiging: 0 }, eigen.kijk('kantoorKoppelwegen') || {}),
-      uitleg: 'Fase 2 in de schaduw: de gedeelde kantoorcode werkt nog. Zodra koppelwegen.gedeeldeCode niet meer ' +
-        'stijgt, kan hij dicht -- dat is een apart besluit.'
+      koppelwegen: Object.assign({ gedeeldeCode: 0, gedeeldeCodeGeweigerd: 0, uitnodiging: 0 }, eigen.kijk('kantoorKoppelwegen') || {}),
+      uitleg: 'Sinds 23 september 2026 koppelt de gedeelde kantoorcode geen kantoorrol meer aan een account (besluit ' +
+        'van de eigenaar); gedeeldeCode telt de koppelingen van daarvoor, gedeeldeCodeGeweigerd de pogingen erna.'
     };
   }
 

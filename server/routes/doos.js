@@ -18,38 +18,14 @@ module.exports = (kern) => {
   // de rondreistijd peilen voor de satellietmodus; zonder inloggen, zonder poespas.
   app.get('/api/sat/ping', (req, res) => res.json({ ok: 1, t: Date.now() }));
 
-  /* ---------- de sleutelwacht van de doos-vloot ----------
-     Elke /api/doos/-route zit achter de gedeelde sleutel (RTG_DOOS_SLEUTEL),
-     in constante tijd vergeleken. Wie te vaak een verkeerde sleutel probeert
-     (brute force), wordt per IP een kwartier buitengesloten: ook een DAARNA
-     juiste sleutel krijgt dan 429. Elke afketser komt in het veiligheidslog
-     en telt mee op het Veiligheid-bord van de kantoren. */
-  const doosAfketsers = new Map(); // ip -> [tijdstippen]
-  const DOOS_AFKETS_MAX = 8, DOOS_AFKETS_VENSTER = 15 * 60 * 1000;
-  function doosSleutelOk(req, res) {
-    const ip = req.ip || 'onbekend';
-    const rij = (doosAfketsers.get(ip) || []).filter(t => Date.now() - t < DOOS_AFKETS_VENSTER);
-    if (rij.length >= DOOS_AFKETS_MAX) {
-      doosAfketsers.set(ip, rij);
-      res.status(429).json({ error: 'Te veel mislukte pogingen; probeer het over een kwartier opnieuw.' });
-      return false;
-    }
-    const s = process.env.RTG_DOOS_SLEUTEL || '';
-    const g = String(req.get('x-doos-sleutel') || '');
-    if (!s || g.length !== s.length || !crypto.timingSafeEqual(Buffer.from(g), Buffer.from(s))) {
-      rij.push(Date.now());
-      doosAfketsers.set(ip, rij);
-      if (!Array.isArray(db.data.doosAfketsers)) db.data.doosAfketsers = [];
-      db.data.doosAfketsers.unshift({ at: Date.now() });
-      db.data.doosAfketsers = db.data.doosAfketsers.slice(0, 500);
-      save();
-      try { if (beveilig && rij.length >= DOOS_AFKETS_MAX) beveilig.meld('doos-sleutel', 'hoog', 'IP na ' + rij.length + ' verkeerde doos-sleutels een kwartier buitengesloten.', { ip }); } catch (e) {}
-      res.status(403).json({ error: 'Geen toegang.' });
-      return false;
-    }
-    doosAfketsers.delete(ip); // een goede sleutel wist de teller
-    return true;
-  }
+  /* De sleutelwacht van de doos-vloot, met de eigen sleutel per doos (fase 7),
+     staat in ./doos-wacht.js. */
+  const doosSleutelOk = require('./doos-wacht')({ db, save, crypto, beveilig, noteerAfketser: () => {
+    if (!Array.isArray(db.data.doosAfketsers)) db.data.doosAfketsers = [];
+    db.data.doosAfketsers.unshift({ at: Date.now() });
+    db.data.doosAfketsers = db.data.doosAfketsers.slice(0, 500);
+    save();
+  } });
 
   /* De Zaakdoos: een verse kloon van de data voor het kastje in de zaak.
      De doos zelf meldt zijn status onbeschermd op het eigen net. */
@@ -63,10 +39,17 @@ module.exports = (kern) => {
      van aard: naam, rondreistijd, modus en journaalstand; geen zaakdata. */
   app.post('/api/doos/meting', (req, res) => {
     if (!doosSleutelOk(req, res)) return;
+    /* Een bewezen doos schrijft op de bus als zichzelf; een doos met de gedeelde
+       sleutel blijft zonder actor, want zijn naam is een zelfopgave. */
+    if (req.doosBewezen) return require('../kern/dienstidentiteit').alsDoos(req.doosBewezen, () => meting(req, res));
+    meting(req, res);
+  });
+  function meting(req, res) {
     if (!Array.isArray(db.data.doosMetingen)) db.data.doosMetingen = [];
     const b = req.body || {};
     const meting = {
-      doos: String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40),
+      doos: req.doosBewezen || String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40),
+      bewezen: !!req.doosBewezen,
       rtt: Math.max(0, Math.min(60000, Math.round(Number(b.rtt) || 0))),
       modus: b.modus === 'lokaal' ? 'lokaal' : 'cloud',
       journaal: Math.max(0, Math.round(Number(b.journaal) || 0)), at: Date.now()
@@ -108,7 +91,7 @@ module.exports = (kern) => {
     if (opdracht) uit.opdracht = opdracht;
     if (netwerk) uit.netwerk = netwerk;
     res.json(uit);
-  });
+  }
   /* Het update-kanaal: de doos haalt hier de doelversie op (na de
      update-opdracht) en meldt de uitslag van zijn update-hook terug.
      Beide achter de gedeelde sleutel; de cloud duwt nooit iets naar binnen. */
@@ -122,7 +105,7 @@ module.exports = (kern) => {
     if (!Array.isArray(db.data.doosUpdateStatus)) db.data.doosUpdateStatus = [];
     const b = req.body || {};
     const s = {
-      doos: String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40),
+      doos: req.doosBewezen || String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40),
       van: String(b.van || '').replace(/[^\w.\-]/g, '').slice(0, 20),
       naar: b.naar ? String(b.naar).replace(/[^\w.\-]/g, '').slice(0, 20) : null,
       gelukt: b.gelukt === true,

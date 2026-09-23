@@ -8,6 +8,8 @@
    ========================================================================== */
 'use strict';
 
+const AF = { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' };
+
 const CONTRACTEN = {
   'POST /api/office/beleidsmotor': {
     mutatieId: 'office.beleidsmotor',
@@ -75,6 +77,69 @@ const CONTRACTEN = {
     nagekeken: 'met de hand, 2026-09-23: de handler roept alleen overzicht() aan, die leest via eigen.bak/kijk ' +
       'en schrijft niets',
     afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
+  },
+  /* Fase 8 en 7: de simulator en de sleutel per zaakdoos. */
+  'POST /api/office/beleidsmotor/simulatie': {
+    mutatieId: 'office.beleidsmotor.simulatie', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'tegen een draaiende server (test/beleidsmotor-review.test.js): de simulatie verandert niets aan ' +
+      'de review erna, en onder schrijf-verloren geen antwoord', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: alleen een journaalregel (bewust een per vraag) en een rekensom in review.simuleer()',
+    afgetekend: AF
+  },
+  'POST /api/office/doos/sleutel': {
+    mutatieId: 'office.doos.sleutel', herkomst: 'mens', semantiek: { klasse: 'nietHerhaalbaar' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'een tweede oproep geeft een nieuwe sleutel en maakt de vorige van die doos ongeldig',
+    bewijs: { gemeten: 'test/doossleutels.test.js toets 5: na een tweede geef() geeft de eerste sleutel geen doos meer', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: kern/zaakdoos/sleutels.js geef() overschrijft de hash van die doos',
+    afgetekend: AF
+  },
+  'POST /api/office/doos/sleutel/weg': {
+    mutatieId: 'office.doos.sleutel.weg', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/doossleutels.test.js toets 5: een tweede trekIn() geeft ingetrokken:false en laat de ' +
+      'opslag byte voor byte gelijk', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: trekIn() verwijdert alleen als de doos er staat; daarna is er niets meer te doen',
+    afgetekend: AF
+  },
+  'POST /api/office/doos/sleutels': {
+    mutatieId: 'office.doos.sleutels', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/doossleutels.test.js: het overzicht met de wegen, zonder sleutels of hashes', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: overzicht() leest via eigen.kijk en schrijft niets',
+    afgetekend: AF
+  },
+  /* De uitgave in het Werk OS (AUTHORITY.md par. 5e, vervolg). */
+  'POST /api/bedrijf/uitgave/maak': {
+    mutatieId: 'bedrijf.uitgave.maak', herkomst: 'mens', semantiek: { klasse: 'nietHerhaalbaar' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'werkruimte' }, stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'een tweede oproep is een tweede uitgave: twee facturen van hetzelfde bedrag bij dezelfde begunstigde zijn twee betalingen',
+    bewijs: { gemeten: 'test/bedrijfuitgave.test.js: elke oproep geeft een uitgave met een eigen id', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: bedrijf/uitgave.js maakt elke keer een nieuw id met rid(5)',
+    afgetekend: AF
+  },
+  'POST /api/bedrijf/uitgaven': {
+    mutatieId: 'bedrijf.uitgaven', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'werkruimte' }, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/bedrijfuitgave.test.js: de lijst met de berekende stand', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de handler roept alleen toon() aan en schrijft niets; werkPoort met geld vraagt geen reden en logt dus niets',
+    afgetekend: AF
+  },
+  'POST /api/bedrijf/uitgave/betaald': {
+    mutatieId: 'bedrijf.uitgave.betaald', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'werkruimte' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/bedrijfuitgave.test.js toets 5-6: een tweede notitie geeft 409 en laat de eerste staan. ' +
+      'Een toestandscontrole en geen duplicaatlaag', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de route weigert zodra u.betaald staat',
+    afgetekend: AF
+  },
+  'POST /api/bedrijf/lid/tekengrens': {
+    mutatieId: 'bedrijf.lid.tekengrens', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'werkruimte' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/bedrijfuitgave.test.js toets 4: zetten en weghalen, en dezelfde waarde twee keer geeft dezelfde grens', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de route zet l.tekengrensCenten op een waarde; een herhaling zet dezelfde waarde (en een journaalregel)',
+    afgetekend: AF
   },
 };
 

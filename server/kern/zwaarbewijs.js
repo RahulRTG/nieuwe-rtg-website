@@ -24,6 +24,7 @@
    geslaagde bevestiging ook toegang gaan betekenen. */
 'use strict';
 const crypto = require('crypto');
+const { ZWARE_ACTIES } = require('./webauthn-acties');
 
 /* Het voorvoegsel van de binding, en het woont hier omdat DEZE poort hem maakt
    -- niet in ./webauthn-acties.js, dat de woordenlijsten draagt. Het draagt een
@@ -67,6 +68,16 @@ module.exports = ({ zwaarBeveiliging, appUrl, log, beveiligVan, accounts, envelo
      { status, error } die de route ongewijzigd doorgeeft. `bewezen:false`
      betekent: doorgelaten op de terugval, en dat staat inmiddels in het log. */
   async function eis(user, actie, sleutel, req, omschrijving) {
+    /* EEN NAAM DIE DE CEREMONIE NIET KENT, IS EEN FOUT IN DE CODE -- en die moet
+       meteen zakken, niet pas als de eigenaar een passkey heeft. Zonder deze regel
+       ging zo'n route op de terugval gewoon door, en sloot hij zich daarna voor
+       precies de mens die hem mag gebruiken: de ceremonie weigert de naam. Zo
+       gebeurde het met de kantooruitnodiging en de doossleutels (23 september
+       2026); een toets tegen een echte server vangt het nu bij de eerste aanroep. */
+    if (!ZWARE_ACTIES.includes(actie)) {
+      if (log && log.error) log.error('zwaar-onbekende-actie', { actie });
+      return { status: 500, error: 'Deze handeling is niet goed ingericht. Meld het bij RTG.' };
+    }
     if (!user) return { status: 403, error: 'Deze handeling hoort bij een eigen RTG-account.' };
 
     if (!zwaarBeveiliging.nodig(user)) {

@@ -74,7 +74,7 @@ module.exports = ({ dataDir, cloud, sleutel, doosNaam }) => {
   async function meldUpdateStatus(naar, gelukt, melding) {
     try {
       await fetch(cloud() + '/api/doos/update/status', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': sleutel },
+        method: 'POST', headers: require('./koppen').doosKoppen({ 'Content-Type': 'application/json' }, sleutel),
         body: JSON.stringify({ doos: doosNaam, van: VERSIE, naar: naar || null, gelukt, melding }),
         signal: AbortSignal.timeout(10000)
       });
@@ -83,7 +83,7 @@ module.exports = ({ dataDir, cloud, sleutel, doosNaam }) => {
   async function doeUpdate() {
     let doel = null;
     try {
-      const r = await fetch(cloud() + '/api/doos/update', { headers: { 'x-doos-sleutel': sleutel }, signal: AbortSignal.timeout(15000) });
+      const r = await fetch(cloud() + '/api/doos/update', { headers: require('./koppen').doosKoppen({}, sleutel), signal: AbortSignal.timeout(15000) });
       if (r.ok) doel = await r.json();
     } catch (e) { /* geen lijn */ }
     if (!doel || !doel.versie) return meldUpdateStatus(null, false, 'geen doelversie bij de cloud gevonden');

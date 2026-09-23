@@ -65,7 +65,23 @@ const SLEUTELS = {
   'POST /api/office/kantoor/uitnodiging': { nietIdempotent: true,
     waarom: 'een tweede oproep is een tweede uitnodiging: een nieuwe code, en de vorige vervalt; een laag die ' +
       'hem opslikt geeft de eigenaar een code terug waarvan hij denkt dat die de nieuwste is' },
-  'POST /api/office/kantoor/uitnodigingen': { leest: true }
+  'POST /api/office/kantoor/uitnodigingen': { leest: true },
+  /* De simulator (fase 8) rekent en verandert niets; elke oproep laat bewust een
+     journaalregel na. De doossleutels (fase 7): uitgeven maakt elke keer een
+     NIEUWE sleutel en maakt de vorige ongeldig; intrekken is een toestand. */
+  'POST /api/office/beleidsmotor/simulatie': { leest: true },
+  'POST /api/office/doos/sleutel': { nietIdempotent: true,
+    waarom: 'een tweede oproep geeft een nieuwe sleutel en maakt de vorige van die doos ongeldig; een laag die ' +
+      'hem opslikt geeft een sleutel terug die de doos niet meer binnenlaat' },
+  'POST /api/office/doos/sleutel/weg': { zelfdeVerzoek: true },
+  /* De uitgave in het Werk OS: indienen is elke keer een nieuwe uitgave; betaald
+     noteren en de tekengrens zetten zijn een toestand. */
+  'POST /api/bedrijf/uitgave/maak': { nietIdempotent: true,
+    waarom: 'een tweede oproep is een tweede uitgave; een laag die hem opslikt laat een echte tweede factuur verdwijnen' },
+  'POST /api/bedrijf/uitgaven': { leest: true },
+  'POST /api/bedrijf/uitgave/betaald': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/lid/tekengrens': { zelfdeVerzoek: true },
+  'POST /api/office/doos/sleutels': { leest: true }
 };
 
 module.exports = { SLEUTELS };

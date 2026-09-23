@@ -28,8 +28,8 @@ const { idVanKey } = require('../../lib/lidsleutel');
 const MAX_POGING = 5; // koppel-pogingen per account per minuut
 
 module.exports = (kctx) => {
-  const { accounts, findSupplier, checkCred, hasCred, DEMO, DEMO_SUPPLIER, OFFICE_CODE,
-    veiligGelijk, totpOk, logInlog, pinSlot, nu, kantoorUitnodiging } = kctx;
+  const { accounts, findSupplier, checkCred, hasCred, DEMO, DEMO_SUPPLIER,
+    totpOk, logInlog, pinSlot, nu, kantoorUitnodiging } = kctx;
 
   /* De koppel-teller draait op HETZELFDE slot als de personeelspin hieronder.
      Hij had een eigen Map met dezelfde grenzen en zonder opruimronde -- en dat
@@ -105,12 +105,21 @@ module.exports = (kctx) => {
          De uitnodiging gaat langs hetzelfde doel-slot en dezelfde tweede factor,
          en wordt pas verbruikt als ook die klopt. */
       const viaUitnodiging = !!(kantoorUitnodiging && String(body.uitnodiging || '').trim());
-      const toegang = viaUitnodiging ? kantoorUitnodiging.verzilver(key, body.uitnodiging, { proef: true })
-        : (veiligGelijk(String(body.code || '').trim().toUpperCase(), OFFICE_CODE) ? { ok: true }
-          : { status: 401, error: 'Onjuiste backoffice-code.' });
+      /* DE GEDEELDE CODE KOPPELT NIET MEER (besluit van de eigenaar, 23 september
+         2026). Een code die het hele kantoor kent, bewijst niet wie er koppelt.
+         De weigering zegt niet of de code klopte -- dat zou hem alsnog laten
+         raden -- maar wel wat wel werkt. Inloggen op het kantoor met de code
+         (/api/office/login) blijft; alleen de rol aan een ACCOUNT hangen niet. */
+      if (!viaUitnodiging) {
+        if (kantoorUitnodiging) kantoorUitnodiging.telWeg('gedeeldeCodeGeweigerd');
+        logInlog('koppel', false, 'kantoor (zonder uitnodiging)', req);
+        return { status: 403, watNu: 'uitnodiging',
+          error: 'De kantoorrol koppel je alleen met een uitnodiging van de eigenaar. Vraag hem er een voor je codenaam.' };
+      }
+      const toegang = kantoorUitnodiging.verzilver(key, body.uitnodiging, { proef: true });
       if (!toegang.ok) {
         fout(key);
-        pinSlot.fout(doel, viaUitnodiging ? 'een kantooruitnodiging via /api/account/koppel' : 'de backoffice-code via /api/account/koppel');
+        pinSlot.fout(doel, 'een kantooruitnodiging via /api/account/koppel');
         logInlog('koppel', false, 'kantoor', req);
         return toegang;
       }
@@ -120,13 +129,11 @@ module.exports = (kctx) => {
         logInlog('koppel', false, 'kantoor (tweede factor)', req);
         return { status: 401, error: 'Tweede factor vereist: voer de authenticator-code in.' };
       }
-      if (viaUitnodiging) {
-        const v = kantoorUitnodiging.verzilver(key, body.uitnodiging);
-        if (!v.ok) return v;
-      }
+      const v = kantoorUitnodiging.verzilver(key, body.uitnodiging);
+      if (!v.ok) return v;
       pinSlot.goed(doel);
-      if (kantoorUitnodiging) kantoorUitnodiging.telWeg(viaUitnodiging ? 'uitnodiging' : 'gedeeldeCode');
-      return { rol: { rol: 'kantoor', at: nu(), via: viaUitnodiging ? 'uitnodiging' : 'gedeelde-code' } };
+      kantoorUitnodiging.telWeg('uitnodiging');
+      return { rol: { rol: 'kantoor', at: nu(), via: 'uitnodiging' } };
     }
 
     return { status: 400, error: 'Kies wat u koppelt: personeel, zaak of kantoor.' };

@@ -82,7 +82,37 @@ function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaa
     };
   }
 
-  return { review };
+  /* DE SIMULATOR (fase 8): wat zouden de deuren voor DEZE mens besluiten als hij
+     een zetel erbij kreeg of kwijtraakte? Er verandert niets: het is een
+     rekensom over dezelfde feiten als de review, en de uitkomst toont alleen
+     de deuren die van besluit wisselen. `plus` en `min` noemen zetelsoorten. */
+  function simuleer(key, { plus, min } = {}) {
+    const bij = (Array.isArray(plus) ? plus : []).filter(z => ZETELSOORTEN.includes(z));
+    const af = (Array.isArray(min) ? min : []).filter(z => ZETELSOORTEN.includes(z));
+    const h = houders().find(x => x.key === key) || { key, zetels: [] };
+    const voorF = feitenVoor(h);
+    const heeft = new Set(h.zetels.map(z => z.soort));
+    for (const z of bij) heeft.add(z);
+    for (const z of af) heeft.delete(z);
+    const baas = voorF.eigenaar === true;
+    const kantoor = heeft.has('kantoorrol') || baas;
+    const naF = Object.assign({}, voorF, { kantoorsessie: kantoor, mensOpSessie: kantoor,
+      boardroomZetel: baas || heeft.has('boardroom'), balieZetel: baas || heeft.has('boardroom') || heeft.has('balie') });
+    const verschil = [];
+    const deuren = {};
+    for (const d of Object.keys(DEUREN)) {
+      const voor = kan(voorF, d).uitkomst, na = kan(naF, d).uitkomst;
+      deuren[d] = { voor, na };
+      if (voor !== na) verschil.push({ deur: d, voor, na });
+    }
+    return { key, zetelsVoor: [...new Set(h.zetels.map(z => z.soort))], zetelsNa: [...heeft], deuren, verschil,
+      genegeerd: [].concat(plus || [], min || []).filter(z => !ZETELSOORTEN.includes(z)),
+      grens: 'Een simulatie: er is niets veranderd. De eigenaar blijft eigenaar, wat de simulatie ook zegt.' };
+  }
+
+  return { review, simuleer };
 }
+
+const ZETELSOORTEN = Object.freeze(['kantoorrol', 'boardroom', 'balie']);
 
 module.exports = { maakReview };

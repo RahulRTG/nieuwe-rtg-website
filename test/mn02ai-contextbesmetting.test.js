@@ -95,7 +95,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mn02ai-'));
 const REDEN = 'Controle van het abonnement na een vraag van het lid zelf';
@@ -203,7 +203,7 @@ test.before(async () => {
   rId = rUser.id;
   assert.ok(rLid && rCodenaam, 'R is lid, met een eigen codenaam');
 
-  const koppel = await api('/api/account/koppel', { soort: 'kantoor', code: 'RTG-OFFICE' }, rLid);
+  const koppel = await api('/api/account/koppel', await kantoorKoppelBody(base, rLid), rLid);
   assert.equal(koppel.status, 200, 'dezelfde mens koppelt de kantoorrol: ' + JSON.stringify(koppel.body).slice(0, 160));
   rKantoor = (await api('/api/account/start', { rol: 'kantoor' }, rLid)).body.token;
   assert.ok(rKantoor, 'R heeft nu een kantoorsessie NAAST zijn ledensessie');

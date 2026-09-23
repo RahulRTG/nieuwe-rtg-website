@@ -35,6 +35,26 @@ module.exports = (octx) => {
     res.json(Object.assign({ ok: true }, beleidsmotor.review()));
   });
 
+  /* DE SIMULATOR (fase 8): wat verandert er aan de deuren van deze codenaam als
+     hij een zetel erbij krijgt of kwijtraakt? Er wordt niets veranderd, maar het
+     is een vraag OVER een mens: dus boardroom, een reden en een journaalregel die
+     vaststaat voordat het antwoord er is -- dezelfde regels als de review. */
+  app.post('/api/office/beleidsmotor/simulatie', boardroomAuth, async (req, res) => {
+    if (!beleidsmotor || typeof beleidsmotor.simuleer !== 'function') {
+      return res.status(503).json({ error: 'De beleidsmotor is niet bedraad in deze server.' });
+    }
+    const b = req.body || {};
+    const reden = String(b.reden || '').trim().slice(0, 300);
+    if (reden.length < 5) return res.status(400).json({ error: 'Geef een reden op voor deze simulatie; die komt in het inzagejournaal.' });
+    const t = await kern.keyVanCodenaam(b.codenaam);
+    if (!t) return res.status(404).json({ error: 'Deze codenaam kennen we niet.' });
+    const actor = require('../../opzet/envelop').wie(req);
+    const spoor = await require('../../inzagelog').noteerVast({ door: { id: actor, naam: actor || 'boardroom' },
+      over: t.codename, waarom: reden, bron: 'office/beleidsmotor/simulatie' });
+    if (!spoor.ok) return res.status(spoor.status || 503).json({ error: spoor.error, spoor: spoor.reden });
+    res.json(Object.assign({ ok: true, codenaam: t.codename }, beleidsmotor.simuleer(t.key, { plus: b.plus, min: b.min })));
+  });
+
   /* WAAROM MAG IK HIER (NIET) IN? Alleen over zichzelf, en dus alleen voor wie
      een zelf HEEFT: een kantoorsessie op naam (kluisAuth). De gedeelde code
      krijgt de weigering van die poort, en die zegt precies wat hij wilde weten

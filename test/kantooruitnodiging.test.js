@@ -8,8 +8,9 @@
       ongeldig;
    4. de code staat niet in de opslag (alleen een hash), en na zeven dagen is hij
       dicht;
-   5. de gedeelde code werkt nog (schaduw), en elke koppeling telt mee onder de
-      weg waarlangs hij kwam.
+   5. de gedeelde code koppelt geen kantoorrol meer (besluit van 23 september
+      2026), inloggen op het kantoor met de code blijft, en elke koppeling telt
+      mee onder de weg waarlangs hij kwam.
 
    Draai los: node --test test/kantooruitnodiging.test.js */
 const test = require('node:test');
@@ -18,7 +19,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 const { maakUitnodiging } = require('../server/kern/kantoor/uitnodiging');
 
 const CODE = 'UITNODIG-KANTOOR';
@@ -60,7 +61,7 @@ test('1-3. op naam, eenmalig, en de oude vervalt', async () => {
   assert.equal((await nodig(a.codenaam, gedeeld)).status, 403, 'de gedeelde code nodigt niemand uit');
   /* Ook wie boardroomtoegang KREEG, is de eigenaar niet: personeel aannemen blijft van hem. */
   const mede = await lid();
-  assert.equal((await api('/api/account/koppel', { soort: 'kantoor', code: CODE }, mede.token)).status, 200);
+  assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(srv.base, mede.token), mede.token)).status, 200);
   assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: mede.codenaam }, eig)).status, 200);
   const medeKantoor = (await api('/api/account/start', { rol: 'kantoor' }, mede.token)).body.token;
   assert.equal((await api('/api/office/kantoor/uitnodigingen', {}, medeKantoor)).status, 200, 'hij komt de boardroom in');
@@ -83,14 +84,17 @@ test('1-3. op naam, eenmalig, en de oude vervalt', async () => {
   assert.equal((await koppel(a.token, tweede.body.code)).status, 401, 'eenmalig: tweede keer is hij op');
 });
 
-test('5. de gedeelde code werkt nog, en de koppelwegen tellen mee', async () => {
+test('5. de gedeelde code koppelt niet meer, en de koppelwegen tellen mee', async () => {
   const c = await lid();
-  assert.equal((await api('/api/account/koppel', { soort: 'kantoor', code: CODE }, c.token)).status, 200,
-    'de schaduw: de gedeelde code blijft werken tot een apart besluit');
+  const code = await api('/api/account/koppel', { soort: 'kantoor', code: CODE }, c.token);
+  assert.equal(code.status, 403, 'besluit van 23 september 2026: de gedeelde code koppelt geen kantoorrol meer');
+  assert.equal(code.body.watNu, 'uitnodiging');
+  assert.equal((await api('/api/office/login', { code: CODE })).status, 200, 'inloggen op het kantoor met de code blijft');
   const o = await api('/api/office/kantoor/uitnodigingen', {}, eig);
   assert.equal(o.status, 200);
-  assert.equal(o.body.koppelwegen.uitnodiging, 1);
-  assert.ok(o.body.koppelwegen.gedeeldeCode >= 1);
+  assert.equal(o.body.koppelwegen.uitnodiging, 2, 'de medewerker en a kwamen binnen met een uitnodiging');
+  assert.equal(o.body.koppelwegen.gedeeldeCode, 0, 'niemand koppelde met de gedeelde code');
+  assert.equal(o.body.koppelwegen.gedeeldeCodeGeweigerd, 1, 'en de ene poging werd geweigerd');
   assert.ok(o.body.uitnodigingen.some(u => u.stand === 'gebruikt'));
   assert.ok(o.body.uitnodigingen.some(u => u.stand === 'ingetrokken'));
   assert.ok(!JSON.stringify(o.body).includes('hash'), 'het overzicht draagt geen hash');

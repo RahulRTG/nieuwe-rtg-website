@@ -1649,7 +1649,7 @@ NORM.json en geen achteruitgang. Daarnaast vond ronde 0
 luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
 weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
 nu op <!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode tegenover
-<!--getal:edgekaart.levendeKanalen-->13<!--/getal--> levende kanalen. Het **Edge
+<!--getal:edgekaart.levendeKanalen-->14<!--/getal--> levende kanalen. Het **Edge
 Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
 herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
 voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op

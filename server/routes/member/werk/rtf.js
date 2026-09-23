@@ -29,6 +29,11 @@ module.exports = (wctx) => {
     applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
   });
 
+  /* ZONDER INLOG, EN DAT IS MET OPZET (nagelopen voor ARBEID.md par. 4 punt
+     8). Dit is dezelfde openbare lijst als de vacaturepagina van een zaak; er
+     staat geen persoon in. De leeftijd uit het verzoek FILTERT alleen wat er
+     getoond wordt en beslist niets: /api/rtf/solliciteer leest de leeftijd uit
+     het gezinsprofiel en weigert daar. */
   app.post('/api/rtf/vacatures', (req, res) => {
     const lft = parseInt(req.body && req.body.leeftijd, 10);
     const minOk = Number.isFinite(lft) ? lft : null;

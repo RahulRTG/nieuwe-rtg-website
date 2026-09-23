@@ -9,6 +9,7 @@ module.exports = (wctx) => {
   const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
           findSupplier, logActivity, managerOnly, notify, notifyApplicant, notifySupplier, save, schoon,
           sseToOffice, sseToSupplier, supplierAuth } = kern;
+const { sollRem, SOLL_PER_UUR } = require('./sollrem');
 app.post('/api/supplier/apply', (req, res) => {
   const s = findSupplier(req.body.code);
   if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
@@ -17,6 +18,9 @@ app.post('/api/supplier/apply', (req, res) => {
   const contact = String(req.body.contact || '').trim().slice(0, 80);
   const note = String(req.body.note || '').trim().slice(0, 400);
   if (!name || !func || !contact) return res.status(400).json({ error: 'Vul uw naam, de functie en een telefoonnummer of e-mailadres in.' });
+  const teller = sollRem(req.ip, s.code);
+  if (teller.n >= SOLL_PER_UUR) return res.status(429).json({ error: 'U hebt hier het afgelopen uur al veel sollicitaties ingestuurd. Probeer het later opnieuw, of bel de zaak.' });
+  teller.n += 1;
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
     name, func, contact, note, status: 'nieuw',

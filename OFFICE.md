@@ -24,6 +24,10 @@ komen en niet uit het voorstel:
 3. **Wat er vandaag onder het voorstel ontbreekt.** Het grootste gat is geen
    functie. Het is dat een tekstdocument hier geen model heeft (par. 1).
 
+Par. 0 tot en met 5 gaan over de eerste 26 punten. Par. 6 tot en met 9 gaan over
+de punten 27–150, en brengen ze op verzoek van de eigenaar terug tot vijftien
+platformen met een afhankelijkheidsgraaf en een bouwvolgorde.
+
 ---
 
 ## 0. De meting: is er een `RTGObject`?
@@ -247,12 +251,16 @@ mag offline, `strikt` niet, en `vertrouwelijk` is de vraag.
 **10. Rahul in de editor** — *staat half, en er is eerst een gat te dichten.*
 De schrijfhulp heeft acht opdrachten, waarvan er vijf lokaal draaien zonder
 model (`kern/office/delen.js`: formule, samenvatten, inkorten, actiepunten,
-kritisch). **Het gat:** de drie die wél een model aanroepen (herschrijven,
-engels, doorschrijven) sturen de eerste 6000 tekens van het HELE document mee en
-lezen `beheer.classificatie` niet. Een document dat als *strikt* staat mag niet
-gedeeld worden, maar gaat wel naar een model. Dat is de eerste stap van dit hele
-programma, en hij is klein: strikt gaat niet naar een model (of alleen naar
-`LOCAL_AI_URL`), en de weigering zegt dat erbij. Daarna geldt AI-CONTEXT-01 uit
+kritisch). **Het gat was:** de drie die wél een model aanroepen (herschrijven,
+engels, doorschrijven) stuurden de eerste 6000 tekens van het HELE document mee
+en lazen `beheer.classificatie` niet. **Dicht sinds 23 september 2026**: een
+strikt document krijgt 403 `CLASSIFICATIE_STRIKT` met de reden, en
+`test/office-ai-classificatie.test.js` vangt met een nep-modelserver wat het huis
+verlaat (met een tegenproef, en de weigering uitzetten laat hem zakken). "Alleen
+naar het lokale model" bleek geen uitweg: de keten in `server/ai.js` valt bij een
+storing van het lokale model door naar een externe aanbieder, en een
+per-aanroep *nooit extern* bestaat daar niet. Dat is een besluit voor de
+AI-uitgang (platform 11 in par. 8), niet voor Office. Daarna geldt AI-CONTEXT-01 uit
 `MENSNETWERK.md` par. 4d ook hier: **een AI-context wordt opgebouwd uit een
 positieve lijst, nooit uit een object waar daarna iets uit wordt gehaald.**
 "Selecteer een tabel en vraag waarom de marge daalde" betekent dat Rahul de
@@ -436,7 +444,7 @@ editors, wel met formaten en een model.
 
 | stap | wat | stand | waarom hier |
 |---|---|---|---|
-| 0 | strikte documenten niet naar een extern model (punt 10) | een stap weg, dagen | het is een lek, en het is klein |
+| 0 | strikte documenten niet naar een taalmodel (punt 10) | **gedaan**, 23 september 2026 | het was een lek, en het was klein |
 | 1 | XLSX lezen en schrijven op de bestaande bladmotor | een stap weg | het bladmodel bestaat al (`cellen`, `opmaak`); dit is het goedkoopste formaat met de meeste waarde |
 | 2 | het tekstmodel, met een importeur van de bestaande HTML-documenten | een stap weg, maanden | draagt punt 4, 8 en 3 |
 | 3 | DOCX schrijven, dan lezen, met de trouwmeter | na 2 | draagt 23, 24 en 25 |
@@ -453,11 +461,229 @@ genomen moet worden.
 
 ---
 
-## 6. Wat dit document niet zegt
+## 6. De punten 27–150: waar de lat verder omhoog gaat
+
+De eigenaar trok de lat op 23 september een tweede keer omhoog: niet gelijkwaardig
+aan Microsoft 365 of Google Workspace, maar **een concrete reden voor een bedrijf
+om zijn dagelijkse werk naar RTG te verplaatsen**. Daarbij kwamen 124 punten,
+van een universele commandolaag tot een Company Runtime. De eigenaar zei er zelf
+bij wat de volgende stap moet zijn: *niet meteen 151–200 verzinnen, maar de 150
+terugbrengen tot ongeveer vijftien platformen, een afhankelijkheidsgraaf en een
+meerjarige bouwvolgorde.* Dat doen par. 7 tot en met 9. Deze paragraaf zet eerst
+recht waar een punt botst met iets wat dit huis al heeft besloten of gemeten.
+
+### 6.1 Wat herhaald wordt en al beantwoord is
+
+- **79 en 142, het universele objectmodel en de canonieke datalaag**, zijn par. 0
+  in een ander jasje. Een canonieke klant over systeem A en RTG heen is de
+  `Asset`-vorm over een systeemgrens, en die is er nog verder van af dan binnen
+  één huis. De vorm die wel werkt staat in `MAATSTAF.md` par. 7g: een projectie met
+  vaste etiketten per bron (`terrein`, `wat`, `ingang`, `dektNiet`, `herkomst`),
+  waarbij de bron zijn eigen betekenis houdt.
+- **44, universele blokken**, is punt 3 (blokken verwijzen, ze zijn niet
+  hetzelfde object). "Het blijft hetzelfde object" klopt alleen als de bron de
+  waarheid houdt en het blok hem toont.
+- **38, 97 en 39, het migratiecentrum**, zijn punt 24. **40 en 98, parallel
+  draaien**, zijn punt 25. **41 en 99, formaten als eersteklas burger**, zijn
+  punt 23 met de trouwmeter van punt 4. **53, 55, 57 en 61** komen terug als 112,
+  75, 57 en 73.
+
+### 6.2 Wat botst met een besluit van dit huis
+
+| punt | botst met | de vorm die overleeft |
+|---|---|---|
+| **69** risiconiveaus L0–L5 | de zesde gezagsladder. `scripts/gezagsnoemer.js` legt vijf bestaande schalen al op één noemer van vier treden (`geen` / `tonen` / `klaarzetten` / `uitvoeren`), en `EXECUTIE.md` zegt dat een nieuwe ladder precies de consolidatie ongedaan maakt | het RISICO van een handeling is een EIGENSCHAP die `kern/frictie/motor.js` per geval uitrekent (bedrag, omkeerbaarheid, zekerheid, met de opbouw erbij), en het gezag blijft een van de vier treden. L4 "extern" en L5 "juridisch/financieel" zijn geen treden maar redenen om een tweede handtekening te eisen |
+| **27** één commandoveld voor het hele huis | `EXECUTIE.md` blok 9, **bewust niet gebouwd**: `VERTROUWEN.json` stond op 0 bewezen routes en de gevolgvoorspelling op 96 van 176 onbekend. *Eerst die twee getallen bewegen, dan de balk* | het veld mag er komen als het kiest uit wat `resolver.js` al versmalt en `plan.js` al weegt, en elk plan zegt wat het NIET weet. Het besluit is van de eigenaar |
+| **30 en 108** tijdreizen | `KANTOORMACHT.md`: er is geen historische toestand van entiteiten, en tijdreizen botst met de eigen bewaartermijnen | alleen waar het domein het al bijhoudt: `kern/concern/tijd.js` houdt juridische feiten met `van`/`tot` en overschrijft nooit, `server/bedrijf/toen.js` weigert met zoveel woorden een volledige reconstructie. "De workspace zoals hij op 17 maart was" wordt dus "wat dit domein van 17 maart weet", mét wat het niet meer weet |
+| **61 en 73** procesanalyse | CAR-05 en `KANTOORMACHT.md`: een score op een mens wordt nooit een sorteersleutel | per STAP en per cohort, nooit per mens. Het voorbeeld van de eigenaar ("71% van de vertraging zit bij account provisioning") is precies goed; "de medewerker die het langst doet over provisioning" is het product dat niet mag bestaan. `kern/service/kwaliteit.js` meet al doorlooptijd zonder naam |
+| **86** screenshots beperken | `HDI.md` over de noodstand: een webapp kan de app-switcher, notificaties en browsergeschiedenis niet garanderen | wat niet af te dwingen is, staat er hardop bij als *ontmoedigd*. Een watermerk kan wél, en zegt meer |
+| **83** klembord | hetzelfde: een webapp kan kopiëren niet afdwingen | DLP geldt waar de SERVER een uitgang is (delen, export, download, AI, API). Het klembord staat in de lijst van wat het niet ziet |
+| **49 en 85** klantsleutels | `vault.key` en `RTG_ENC_KEY` zijn platformbreed, en `kern/beschermstand-lijst.js` zegt dat er voor `secret.key` en `vault.key` geen rotatie bestaat | sleutelrotatie komt vóór klantsleutels. Wie de eigen sleutel niet kan draaien, kan die van een ander niet beloven |
+| **110** Rahul overal in beeld | `INTELLIGENTIE.md` INT-04: een aandachtmotor geeft een besluit met zijn opbouw en nooit een samengesteld cijfer, en `CANVAS.md`: hooguit drie dingen die aandacht vragen | ambient mag, als het één regel met een reden is en je hem kunt wegklikken |
+| **149** autonome zones | `EXECUTIE.md`: een mandaat verleent nooit vermogen, het versmalt alleen, en geld en het pasbesluit blijven mensenwerk | de inkoopketen uit het voorbeeld kan, binnen een mandaat met een plafond, tot en met het KLAARZETTEN. Bestellen boven nul euro is uitvoeren richting een derde, en dat blijft een mens (`GELD.md`) |
+
+### 6.3 Wat al staat en de lat al haalt
+
+Een deel van de 124 staat er, meestal onder een andere naam:
+
+- **68 de AI-firewall** (gebruiker ∩ agent ∩ classificatie ∩ context) is
+  letterlijk `kern/stuur/mandaat.js`: de speelruimte is een doorsnede en kan
+  structureel niets toevoegen.
+- **67 agentidentiteit** bestaat half: het voorvoegsel `ai:` in
+  `kern/service/machtiging-grenzen.js` (een AI is nooit de tweede handtekening),
+  API-sleutels met scopes en quota in `kern/command/apipoort.js`, en de `actor` in
+  de envelop. Serviceaccounts ontbreken.
+- **127 budgetten**: `ai-meter.js` (dagplafond voor het hele huis),
+  `ai-rem.js` (per minuut), `ai-budget.js` (per persoon per pas) en
+  `kern/kosten/grens.js` (twee sloten, de strengste wint).
+- **71 schaduwstand**: `commercie/schaduw.js` (UIT, SCHADUW, AFDWINGEN, en
+  afdwingen alleen na schaduw) en de modelrouter die in de schaduw meet.
+- **33 en 69 goedkeuren per actie**: `stuur/goedkeuring.js` (eenmalig token,
+  gebonden aan pad, body, rol en persoon) en `bevestiging.js` met een bon.
+- **35 modelrouter**: `kern/ai/router.js`, vijf technieken van goedkoop naar
+  duur, en hij zegt hardop dat er geen constraint solver is.
+- **94 en 95 tijdelijke rechten en noodtoegang**: `kern/command/toegang.js`
+  (alles draagt een `tot`, noodtoegang wordt gejournaliseerd) en
+  `kern/command/bijstand.js`.
+- **92 passkeys eerst**: `server/webauthn/`, step-up per handeling in
+  `kern/webauthn-actie.js`, en een apparaatsleutel die niet te exporteren is
+  (`public/shared/toestelsleutel.js`).
+- **90 de auditketen**: `lib/keten.js` (en het ankerbesluit uit punt 14).
+- **75 besluiten**: `server/bedrijf/besluit.js`, met bezwaren die nooit
+  verdwijnen en een evaluatiedatum op elk aangenomen besluit.
+- **54 en 118 wat-als**: `kern/command/simulatie.js` rekent op echte tellingen en
+  zet de aannames in de uitslag.
+
+### 6.4 Wat nergens staat
+
+Niet gevonden, en dus werk: MCP (noch als server, noch als client), uitgaande
+webhooks, een OAuth-provider voor derden, een eigen API-beschrijving (OpenAPI),
+een register van gebeurtenisnamen (`OS.md` zegt met opzet dat de envelop geen
+schemaregister is), een automatisering die een gebruiker zelf maakt (er zijn
+alleen vaste draaiboeken in `kern/automatisering.js`), een datamodel dat een
+bedrijf zelf aanlegt (alleen in `server/school/`), procesanalyse over standen
+heen, detectie van BSN en paspoortnummers in vrije tekst, sleutels per klant,
+een regio-instelling, beoordeling van het sessierisico, eDiscovery over meer dan
+mail, een clean room, een publieke statuspagina, en een AI-noodstop per tenant
+(`RTG_AI_UIT` is er alleen voor het hele huis).
+
+---
+
+## 7. Van 150 punten naar vijftien platformen
+
+Een platform hier is een vermogen dat door meerdere punten wordt gebruikt en één
+eigenaar in de code heeft of hoort te krijgen. Het is **geen** objecttype en geen
+laag die de domeinen bezit (par. 0): domeinen houden hun betekenis, de platformen
+leveren wat ze delen. Dat is de regel van `AFSPRAAK.md`, hier toegepast: *RTG deelt
+bewijs, identiteit, levenscyclus, rechten en opvolging, en de domeinen houden hun
+eigen betekenis.*
+
+| # | platform | punten | stand | wat er al is |
+|---|---|---|---|---|
+| **P1** | Identiteit, sessie en apparaat | 67, 91–95 | **staat grotendeels** | codenamen en kluis, passkeys, step-up, apparaatsleutel, SAML/OIDC/SCIM, tijdelijke rechten, noodtoegang. Ontbreekt: serviceaccounts, sessierisico |
+| **P2** | Beleid en bevoegdheid | 13, 21, 45, 51, 52, 80, 81, 115–117, 136 | **staat als motor, ontbreekt op veldniveau** | vier dimensies en acht uitkomsten (`CONTROLPLANE.md`), schaduw vóór afdwingen, doelbinding, bedrijfsregels met afdwingpunt (`bedrijf/regels.js`, `regelpoort.js`). Ontbreekt: rechten per blok of veld, en een beleidstaal die een beheerder kan lezen |
+| **P3** | Classificatie en gegevensbescherming | 46–48, 82, 83, 86 | **een stap weg** | drie classificaties per document, strikt blokkeert delen én (sinds stap 0) het model. Ontbreekt: detectoren, dynamisch zwartlakken, één plek die elke uitgang langsloopt |
+| **P4** | Opslag, bewaring, bewijs en plaats | 22, 49, 50, 56, 84, 85, 88–90, 96, 100 | **staat voor de helft** | PostgreSQL, S3, back-up, bewaartermijnen, juridische bewaring (mail, tenant, ID-dossier), hashketen, uitgang per tenant. Ontbreekt: sleutelrotatie, klantsleutels, regio's, herstel naar een tijdstip, eDiscovery, trust center |
+| **P5** | Documentmodellen en formaten | 4, 5, 7, 23, 41, 42, 99 | **het fundament ontbreekt** | het bladmodel bestaat, het tekstmodel niet (par. 1). Geen enkel Office- of ODF-formaat |
+| **P6** | Samenwerking en offline | 8, 9, 145 | **vraagt een besluit** | SSE en de bus met Redis, optimistisch slot. Geen CRDT, geen uitgaande wachtrij |
+| **P7** | Blokken, views en de werkschil | 3, 6, 43, 44, 101–107, 26, 146 | **grammatica staat** | inhoud / view / handeling (`CREATE.md`), caps met een bestemming (`objectlaag/caps.js`), de adaptieve laag (`ADAPTIEF.md`). Gegenereerde UI = samengesteld uit toegestane blokken, nooit code |
+| **P8** | Projecties, graaf en zoeken | 16, 17, 28, 29, 76–78, 111, 143 | **de vorm staat, de bedrijfsgraaf niet** | drie projecties (`levensgraaf`, `socialegraaf`, `geldgraaf`), ruim tien zoekroutes per domein. Ontbreekt: de bedrijfsprojectie en de federatie. Semantisch zoeken alleen lokaal |
+| **P9** | Gebeurtenissen en tijd | 30, 108, 113, 114, 116, 147, 148 | **staat zonder register** | bus met envelop (actor, correlatie, oorzaak, classificatie), `concern/tijd.js`, append-only gebeurtenissen in `bedrijf/`. Ontbreekt: een register van gebeurtenisnamen en tijdregels |
+| **P10** | Stuurlaag: plan, mandaat, bevestiging | 10–12, 31–34, 66–71, 121–130, 149 | **staat, en is de sterkste** | resolver, plan, gevolg, mandaat, goedkeuring, bon, schaduw. Ontbreekt: de gevolgmeting voor 96 van 176 paden, een typetaal tussen agents, en de promotieladder van `PROOF.md` als poort voor een agent |
+| **P11** | AI-uitgang en modelrouter | 35, 103, 104, 144 | **staat in de schaduw** | router met vijf technieken, lokaal eerst, budgetten, dagplafond. Ontbreekt: een per-aanroep *nooit extern* (zie stap 0), en een noodstop per tenant |
+| **P12** | Workflow en automatisering | 13, 59, 60, 109, 115, 116, 135 | **staat voor documenten, niet voor gebruikers** | de Office-fasen op de server, vaste draaiboeken, `rtgone`-automatisering met herstel. Ontbreekt: een staatsmachine die een gebruiker bouwt, en tijdregels |
+| **P13** | Besluiten en vergaderen | 19, 55–58, 75 | **staat in stukken** | besluiten met bezwaren en evaluatie, notulen die later worden vastgesteld, RTG Meet, spraak naar tekst alleen lokaal. Ontbreekt: het besluitdossier dat de stukken aan elkaar knoopt |
+| **P14** | Simulatie en procesmeting | 53, 54, 61, 72–74, 112, 118–120 | **staat als tweeling, niet als procesanalyse** | `command/simulatie.js`, de stadsweefselsimulatie, Magnaat met de synthetische bank. Ontbreekt: doorlooptijd per stap over domeinen heen, en scenariotakken |
+| **P15** | Koppelen, overstappen en bouwen op RTG | 24, 25, 37–40, 62–65, 97, 98, 131–141 | **het dunst** | API-sleutels (`apipoort.js`), de App Store met een cel, Webmaker, SSO/SCIM. Ontbreekt: MCP, uitgaande webhooks, OAuth voor derden, API-beschrijving, bronkoppelingen, een eigen datamodel per bedrijf |
+
+Drie punten vallen buiten de vijftien en staan er met opzet niet in als
+platform: **26 en 146** (native apps en spatial) zijn uitvoervormen van P7 en
+een releasebesluit, **87** (clean room) is een product op P2 + P3 + P8 en geen
+fundament, en **150** (Company Runtime) is de optelsom en geen onderdeel.
+
+---
+
+## 8. De afhankelijkheidsgraaf
+
+Een pijl betekent: *kan niet eerlijk bestaan zonder*.
+
+```text
+                     P1 Identiteit
+                          │
+          ┌───────────────┼────────────────┐
+          ▼               ▼                ▼
+   P2 Beleid ◄──── P3 Classificatie    P4 Opslag, bewijs
+          │               │                │
+          │      ┌────────┴──────┐         │
+          ▼      ▼               ▼         ▼
+      P10 Stuurlaag        P11 AI-uitgang  P9 Gebeurtenissen en tijd
+          │   │                  │           │         │
+          │   └────────┬─────────┘           │         │
+          │            ▼                     ▼         ▼
+          │      P12 Workflow ◄──────── P8 Projecties  P14 Simulatie
+          │            │                  │    │
+          ▼            ▼                  ▼    │
+     P13 Besluiten ◄───┘            P7 Blokken ◄── P5 Modellen ◄── P6 Samenwerking
+                                          │
+                                          ▼
+                                    P15 Koppelen, bouwen
+```
+
+Wat de graaf zegt, in drie zinnen:
+
+1. **P3 staat hoger dan hij lijkt.** Classificatie voedt het beleid (P2), de
+   AI-uitgang (P11), het zoeken (P8), offline (P6) en export (P15). Stap 0 was een
+   voorbeeld: één uitgang die haar niet las, en er ging een strikt document naar
+   een model. Elke nieuwe uitgang zonder P3 is hetzelfde lek opnieuw.
+2. **P5 is het smalste punt voor de Office-kant.** Blokken (P7), samen schrijven
+   (P6) en formaten (P15-overstap) wachten er alle drie op, en niets anders kan
+   het vervangen.
+3. **P10 is ver, maar hangt aan twee getallen en niet aan code.** De stuurlaag
+   staat; wat haar tegenhoudt is dat de gevolgmeting en het bewijsregister te
+   weinig zeggen. Meer agents bovenop dat getal geeft meer macht zonder meer
+   zekerheid.
+
+---
+
+## 9. Bouwvolgorde
+
+De stuurmaat blijft die van par. 5 (**wanneer kan een bedrijf een dag werken
+zonder Word te openen**), met een tweede ernaast die de lat van de eigenaar
+vangt: **wanneer kan RTG een CIO iets tonen wat hij bij de ander niet krijgt**.
+Die tweede vraag bepaalt de volgorde meer dan de eerste. Een CIO stapt niet over
+omdat de tekstverwerker even goed is, maar omdat er iets bij komt wat hij nu mist.
+
+### Wat RTG al heeft en de ander niet op deze manier
+
+Dit zijn de vier redenen om over te stappen die het dichtst bij staan, omdat de
+fundering er al ligt:
+
+1. **Een AI die nooit meer kan dan de mens die hem vraagt, en dat is structureel.**
+   `mandaat.js` is een doorsnede, geen instelling. Dat is punt 68, en hier hoeft
+   het niet gebouwd te worden.
+2. **Elke uitkomst draagt haar bewijsgraad** (onbekend, vermoed, gemeten,
+   bewezen) en *niet vast te stellen* is een eersteklas antwoord (`BESTUUR.md`).
+   Dat is punt 34 en 70 als huisregel in plaats van als functie.
+3. **Het besluit met zijn bezwaren.** `bedrijf/besluit.js` laat een bezwaar nooit
+   verdwijnen en zet een evaluatiedatum op elk besluit. Met het dossier van P13
+   wordt dat punt 55 en 76, en dat heeft niemand zo.
+4. **De uitgang is al gebouwd.** `kern/tenant/` heeft een levensloop met een
+   uitgang. Met de formaten van P5 wordt dat punt 100: *je kunt weg, en daarom
+   durf je te komen.*
+
+### De fasen
+
+| fase | wat | platformen | stand | waarom hier |
+|---|---|---|---|---|
+| **0** | strikt niet naar een model | P3, P11 | **gedaan** | het was een lek |
+| **1** | één uitgangspoort voor classificatie: delen, export, download, AI, API en zoeken lezen haar op dezelfde plek, met een toets die elke nieuwe uitgang dwingt zich te melden | P3 | een stap weg | na stap 0 is dit hetzelfde lek, maar dan structureel dicht |
+| **2** | XLSX in en uit, en DOCX schrijven | P5 | een stap weg | het goedkoopste deel van de overstap, en de uitgang (reden 4) wordt echt |
+| **3** | het tekstmodel met de importeur van de bestaande documenten, dan DOCX lezen met de trouwmeter | P5 | maanden | fundament voor P6 en P7 |
+| **4** | het besluitdossier: besluit, stukken, cijfers, bezwaren, goedkeuringen en uitvoering aan elkaar, op de hashketen | P13, P4 | een stap weg | reden 3; bijna alles bestaat |
+| **5** | de bedrijfsprojectie en één zoekveld als federatie, met bronnen bij elk antwoord | P8 | een stap weg | punt 29 met bron en datum is het vertrouwensproduct, en er komt geen centrale index |
+| **6** | besluit over samenwerking (CRDT kopen of bouwen) en over offline per classificatie | P6 | besluit | wacht op 3 |
+| **7** | serviceaccounts en uitgaande webhooks, daarna MCP als server over de lijst die `beleid.js` al toestaat | P1, P15 | een stap weg | "koppel eerst, vervang later" is de commerciële route van de eigenaar; MCP mag geen tweede toegangsweg worden, dus het leest dezelfde lijst |
+| **8** | de gevolgmeting en het bewijsregister omhoog (de twee getallen van blok 9) | P10 | jaren, en een meting | pas daarna het commandoveld (27) en agents met uitvoerend gezag |
+| **9** | rechten per blok en dynamisch zwartlakken | P2, P3, P7 | na 3 | vraagt het tekstmodel; op HTML is het een filter op markup |
+| **10** | procesanalyse per stap, daarna scenariotakken | P14, P9 | een stap weg voor de eerste | het register van gebeurtenisnamen komt eerst, anders meet je namen |
+| **11** | sleutelrotatie, dan regio's en klantsleutels | P4 | besluit, daarna jaren | wat je zelf niet kunt draaien, kun je een ander niet beloven |
+| **12** | een datamodel per bedrijf, bladapps en workflows die een gebruiker bouwt | P15, P12, P7 | jaren | rust op 2, 3, 7 en 9 |
+
+**Wat bewust achteraan staat:** agents die zelfstandig uitvoeren (punt 121–130
+voorbij klaarzetten), autonome zones (149), spatial (146) en de Company Runtime
+(150). Niet omdat ze onbelangrijk zijn, maar omdat elk ervan macht toevoegt op een
+fundering die vandaag nog niet kan zeggen wat een handeling aanraakt. De volgorde
+van de eigenaar zelf, *connect, import, coexist, prove, migrate, consolidate,
+optimize, automate*, zegt hetzelfde: automatiseren komt als laatste.
+
+---
+
+## 10. Wat dit document niet zegt
 
 - De tabel met concurrenten staat hier niet in, want die veroudert per kwartaal.
-  Ook de uitspraken over Loop, Copilot Pages, Gemini en Sheets Canvas in de
-  opdracht zijn niet nagetrokken. Ze sturen de richting, en ze zijn niet gemeten.
+  Ook de uitspraken over Loop, Copilot Pages, Work IQ, Gemini, MCP bij Google,
+  Sheets Canvas en de nieuwe producten van andere partijen in de opdracht zijn
+  niet nagetrokken. Ze sturen de richting, en ze zijn niet gemeten.
 - "Staat" is nagezocht in de code en niet beproefd in een browser. Waar een
   toets bestaat staat hij erbij; de rest is graad `vermoed`.
 - De kop-as van par. 0 is lexicaal en een ondergrens. De conclusie rust op de

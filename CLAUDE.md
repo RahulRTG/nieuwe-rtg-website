@@ -825,7 +825,13 @@ HTML** (`execCommand` op `inhoud.tekst`), en wijzigingen bijhouden, live samen
 schrijven en DOCX zonder verlies rusten alle drie op een model. Lees vóór je aan
 Office werkt vooral par. 4: samenvoegen geldt voor inhoud en nooit voor een
 stand, en classificatie reist mee naar elke uitgang -- de AI-schrijfhulp stuurde
-een strikt document gewoon naar een model.
+een strikt document gewoon naar een model (dicht sinds 23 september 2026). Par.
+6-9 brengen de punten 27-150 terug tot **vijftien platformen** met een
+afhankelijkheidsgraaf en een bouwvolgorde; lees par. 6.2 vóór je een van die
+punten bouwt, want daar staan de botsingen met besluiten die al genomen zijn
+(geen zesde gezagsladder voor AI-risico, het commandoveld wacht op de twee
+getallen van `EXECUTIE.md` blok 9, en procesanalyse gaat per stap en nooit per
+mens).
 
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG

@@ -1529,9 +1529,11 @@ haar nooit** -- dus geen derde contextmodel, geen `edge.canPay()` en geen
 Edge-state die naar een domein terugschrijft. Ronde 0 bouwde geen
 productintelligentie maar een meetbare fundering: `npm run edgekaart`
 (`EDGEKAART.json`: per bestand wie schrijft, beslist en leest, elk met een citaat
-dat letterlijk in de bron moet staan) vond <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal-->
-verantwoordelijkheden met meer dan één eigenaar (twee capabilityregisters, twee
-contextmodellen, vier plekken die de wereld vaststellen, vijf standmachines) en
+dat letterlijk in de bron moet staan) vond 12 verantwoordelijkheden met meer dan
+één eigenaar (twee capabilityregisters, twee contextmodellen, vier plekken die de
+wereld vaststellen, vijf standmachines; na ronde 1 nog
+<!--getal:edgekaart.dubbeleEigenaars-->11<!--/getal-->, want de gebaardrempels
+hebben er een) en
 17 dode kanalen, waaronder precies de vijf signalen waar de adaptieve Edge naar
 luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
 weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat

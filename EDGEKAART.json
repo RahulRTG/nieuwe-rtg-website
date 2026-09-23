@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T16:21:31.373Z",
-    "commit": "81cf70a0",
+    "op": "2026-09-23T16:56:20.095Z",
+    "commit": "9cd6444",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -3257,15 +3257,9 @@
       "rollen": [
         {
           "rol": "schrijft",
-          "etiket": "capability-register:s",
-          "wat": "'social-context' in het tweede register",
-          "citaat": "edge.registerAction({ id: 'social-context', label: 'Sociale context bekijken'"
-        },
-        {
-          "rol": "schrijft",
-          "etiket": "capability-register:s",
-          "wat": "overschrijft het actiedeck",
-          "citaat": "edge.setProjection({ deck: 'actions', actions: ['social-context'] });"
+          "etiket": "capability-register:l",
+          "wat": "'sociaal.context' als declaratie, via RTGAdaptief",
+          "citaat": "A.declareer({ id: 'sociaal.context', naam: 'Sociale context bekijken'"
         },
         {
           "rol": "projecteert",
@@ -3277,7 +3271,7 @@
       "verantwoordelijkheden": [
         {
           "naam": "capability-register",
-          "als": "schrijver"
+          "als": "lezer"
         },
         {
           "naam": "trust-rail",
@@ -3428,7 +3422,6 @@
         "public/shared/interface/world-desktop-home.js",
         "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-adaptive-edge-signals.js",
-        "public/shared/social-intelligence-runtime.js",
         "public/site/start/experience-edge.js"
       ],
       "beslissers": [
@@ -3451,7 +3444,8 @@
         "public/shared/interface/world-desktop-frame.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge-input.js",
-        "public/shared/rtg-adaptive-edge.js"
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/social-intelligence-runtime.js"
       ]
     },
     "gebaar-drempel": {
@@ -3824,7 +3818,6 @@
         "public/shared/interface/world-desktop-home.js",
         "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-adaptive-edge-signals.js",
-        "public/shared/social-intelligence-runtime.js",
         "public/site/start/experience-edge.js"
       ],
       "beslissers": [
@@ -4031,7 +4024,6 @@
     "registerAction": [
       "public/shared/interface/world-desktop-home.js",
       "public/shared/rtg-adaptive-edge-signals.js",
-      "public/shared/social-intelligence-runtime.js",
       "public/site/start/experience-edge.js"
     ],
     "wereld": [
@@ -4058,7 +4050,7 @@
   },
   "telling": {
     "bestanden": 71,
-    "rollen": 216,
+    "rollen": 215,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 13

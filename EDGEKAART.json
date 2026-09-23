@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T13:40:23.712Z",
-    "commit": "b197836",
+    "op": "2026-09-23T15:38:14.399Z",
+    "commit": "ac14e34",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -54,6 +54,40 @@
         "attributen": [],
         "opslag": [],
         "fetch": []
+      }
+    },
+    {
+      "pad": "public/apps/foundation/os-publiek.html",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "Edge 2-stand op body bij een stadswissel",
+          "citaat": "document.body.setAttribute('data-rtg-edge-2-state', 'overview');"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-edge-2-auto",
+          "data-rtg-edge-2-state",
+          "data-rtg-experience",
+          "data-rtg-foundation-city",
+          "data-rtg-vandaag-",
+          "data-rtg-world-start"
+        ],
+        "opslag": [],
+        "fetch": [
+          "/api/rtfos/publiek/"
+        ]
       }
     },
     {
@@ -269,6 +303,36 @@
         "opslag": [
           "localStorage rtg_member_token"
         ],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/apps/werk/command-entry.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "Edge 2-stand op body bij een hashwissel",
+          "citaat": "document.body.setAttribute('data-rtg-edge-2-state', 'overview');"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-edge-2-auto",
+          "data-rtg-edge-2-state",
+          "data-rtg-vandaag-luxe",
+          "data-rtg-vandaag-surface-title"
+        ],
+        "opslag": [],
         "fetch": []
       }
     },
@@ -1324,19 +1388,103 @@
       }
     },
     {
-      "pad": "public/shared/interface/second-screen.js",
-      "laag": "schil",
+      "pad": "public/shared/gebaar/gebaar-02.js",
+      "laag": "afnemer",
       "rollen": [
         {
-          "rol": "schrijft",
-          "wat": "eigen stand peek/panel/workspace/focus",
-          "citaat": "root.dataset.rtgSecondScreen = state;"
+          "rol": "beslist",
+          "wat": "eigen richtingsdrempel naast DREMPELS",
+          "citaat": "var RICHTING = 8;"
         },
         {
           "rol": "beslist",
-          "wat": "breed: peek wordt workspace",
-          "citaat": "if (next === 'peek' && mq.matches) next = 'workspace';"
+          "wat": "eigen stilte voor de klik erna",
+          "citaat": "var STIL = 6;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/gebaar/gebaar-03b.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "eigen lang drukken naast DREMPELS.lang",
+          "citaat": "}, 520);"
         },
+        {
+          "rol": "beslist",
+          "wat": "eigen stilte per as naast DREMPELS.stil",
+          "citaat": "Math.abs(e.clientX - g.x0) < 8 && Math.abs(e.clientY - g.y0) < 8) return;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "eigen borgtijd naast VASTHOUD, tot ronde 3",
+          "citaat": "var BORGTIJD = 800;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/interface/second-screen-modules.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "Nu relevant: de titel uit RTGAdaptief",
+          "citaat": "function laatsteContext() { return (A && A.context && A.context()) || laatste || {}; }"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/interface/second-screen.js",
+      "laag": "schil",
+      "rollen": [
         {
           "rol": "leest",
           "wat": "context van het bovendocument",
@@ -1347,19 +1495,47 @@
         {
           "naam": "vluchtige-context",
           "als": "lezer"
-        },
-        {
-          "naam": "zichtbaarheidsstand",
-          "als": "beslisser"
-        },
-        {
-          "naam": "zichtbaarheidsstand",
-          "als": "schrijver"
         }
       ],
       "gemeten": {
         "globals": [
           "RTGInterfaceSecondScreen"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/interface/workspace-context.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "een eigen current naast RTGAdaptief",
+          "citaat": "current = next; var change = { value: get(), reason: reason || 'host-update' };"
+        },
+        {
+          "rol": "beslist",
+          "wat": "slikt een gelijke context",
+          "citaat": "var next = clean(value); if (JSON.stringify(next) === JSON.stringify(current)) return get();"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "vluchtige-context",
+          "als": "beslisser"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGWorkspaceContext"
         ],
         "zendt": [],
         "luistert": [],
@@ -1418,6 +1594,52 @@
           "rtglang"
         ],
         "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/interface/world-desktop-home.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "de wereld van het bureau",
+          "citaat": "world = d.body.dataset.worldHome"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "wereldlabel in het merk van de Edge",
+          "citaat": "label.translate = false; brand.appendChild(label);"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "'home' in het tweede register",
+          "citaat": "w.RTGAdaptiveEdge.registerAction({ id: 'home', label: U.value('overview'), run: function () {"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "schrijver"
+        },
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGDesktopFrame",
+          "RTGDesktopHome"
+        ],
+        "zendt": [],
+        "luistert": [
+          "rtglang"
+        ],
+        "attributen": [
+          "data-rtg-desktop"
+        ],
         "opslag": [],
         "fetch": []
       }
@@ -1715,6 +1937,11 @@
           "citaat": "knop = d.querySelector('[data-rtg-edge-primary]:not([hidden])');"
         },
         {
+          "rol": "schrijft",
+          "wat": "'primary' in het tweede register",
+          "citaat": "api.registerAction({ id: 'primary', label: label.slice(0, 80), allowed: !knop.disabled });"
+        },
+        {
           "rol": "beslist",
           "wat": "pending wordt presence",
           "citaat": "if (staat === 'pending') api.setPresence({ label: label + ' wordt uitgevoerd'"
@@ -1723,7 +1950,7 @@
       "verantwoordelijkheden": [
         {
           "naam": "capability-register",
-          "als": "lezer"
+          "als": "schrijver"
         },
         {
           "naam": "hoofdactie",
@@ -2049,6 +2276,11 @@
           "rol": "leest",
           "wat": "de gebaarversheid van Edge 2",
           "citaat": "if (!w.RTGEdge2.gestureFresh(gebaar)) return;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "vensterboolean: een dialoog is open",
+          "citaat": "if (open) b.setAttribute(VENSTER_ATTR, 'true'); else b.removeAttribute(VENSTER_ATTR);"
         }
       ],
       "verantwoordelijkheden": [
@@ -2701,6 +2933,37 @@
       }
     },
     {
+      "pad": "public/shared/rtg-world-identity.js",
+      "laag": "continuiteit",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "wereld op body uit het MANIFEST",
+          "citaat": "body.setAttribute('data-rtg-world', wereld);"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGWorldIdentity"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-eigenvlak",
+          "data-rtg-skin",
+          "data-rtg-world"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
       "pad": "public/shared/rtg-world-start.js",
       "laag": "laden",
       "rollen": [
@@ -2733,6 +2996,11 @@
       "rollen": [
         {
           "rol": "schrijft",
+          "wat": "'social-context' in het tweede register",
+          "citaat": "edge.registerAction({ id: 'social-context', label: 'Sociale context bekijken'"
+        },
+        {
+          "rol": "schrijft",
           "wat": "overschrijft het actiedeck",
           "citaat": "edge.setProjection({ deck: 'actions', actions: ['social-context'] });"
         },
@@ -2745,7 +3013,7 @@
       "verantwoordelijkheden": [
         {
           "naam": "capability-register",
-          "als": "lezer"
+          "als": "schrijver"
         },
         {
           "naam": "trust-rail",
@@ -2759,6 +3027,113 @@
         ],
         "luistert": [],
         "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/site/start/experience-edge.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "zeven ids zonder run",
+          "citaat": "edge.registerAction({ id: id, label: id, allowed: false });"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "de scenerijen met een run",
+          "citaat": "edge.registerAction({ id: 'experience-action-' + i, label: item.label, run: function () {"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "op alle vijf decks",
+          "citaat": "edge.setProjection({ deck: deck, actions: ids });"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "wereld op body per scene",
+          "citaat": "d.body.dataset.rtgWorld = active.id === 'werelden' ? X.currentWorld() : active.dataset.tone;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "schrijver"
+        },
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-world"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/site/start/experience-graph.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "wereld op body bij een keuze in de graaf",
+          "citaat": "d.body.dataset.rtgWorld = id;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [
+          "rtg-website-truth"
+        ],
+        "attributen": [
+          "data-rtg-world"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/site/start/experience.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "wereld op body in de werelden-scene",
+          "citaat": "d.body.dataset.rtgWorld = currentWorld;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGExperience"
+        ],
+        "zendt": [
+          "change",
+          "rtg-public-state"
+        ],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-world"
+        ],
         "opslag": [],
         "fetch": []
       }
@@ -2780,7 +3155,11 @@
     "capability-register": {
       "schrijvers": [
         "public/shared/adaptief/register.js",
-        "public/shared/rtg-adaptive-edge-core.js"
+        "public/shared/interface/world-desktop-home.js",
+        "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/rtg-adaptive-edge-signals.js",
+        "public/shared/social-intelligence-runtime.js",
+        "public/site/start/experience-edge.js"
       ],
       "beslissers": [
         "public/shared/adaptief.js",
@@ -2802,9 +3181,7 @@
         "public/shared/interface/world-desktop-frame.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge-input.js",
-        "public/shared/rtg-adaptive-edge-signals.js",
-        "public/shared/rtg-adaptive-edge.js",
-        "public/shared/social-intelligence-runtime.js"
+        "public/shared/rtg-adaptive-edge.js"
       ]
     },
     "gebaar-drempel": {
@@ -2812,6 +3189,8 @@
         "public/shared/adaptief/grammatica.js"
       ],
       "beslissers": [
+        "public/shared/gebaar/gebaar-02.js",
+        "public/shared/gebaar/gebaar-03b.js",
         "public/shared/rtg-edge-2-context.js"
       ],
       "lezers": [
@@ -2836,6 +3215,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/adaptief/orb.js",
         "public/shared/edge/actiestaat.js",
+        "public/shared/gebaar/gebaar-03b.js",
         "public/shared/rtg-adaptive-edge-core.js"
       ],
       "lezers": [
@@ -2936,11 +3316,13 @@
     "vluchtige-context": {
       "schrijvers": [
         "public/shared/adaptief/register.js",
+        "public/shared/interface/workspace-context.js",
         "public/shared/rtg-edge-system.js"
       ],
       "beslissers": [
         "public/shared/adaptief/brug.js",
-        "public/shared/adaptief/register.js"
+        "public/shared/adaptief/register.js",
+        "public/shared/interface/workspace-context.js"
       ],
       "lezers": [
         "public/apps/bestanden/adaptief.js",
@@ -2952,6 +3334,7 @@
         "public/shared/adaptief/rail.js",
         "public/shared/command/werktafel.js",
         "public/shared/edge/blikveld.js",
+        "public/shared/interface/second-screen-modules.js",
         "public/shared/interface/second-screen.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js"
@@ -2998,9 +3381,14 @@
     "wereld": {
       "schrijvers": [
         "public/shared/command/bladstand.js",
+        "public/shared/interface/world-desktop-home.js",
         "public/shared/randen.js",
         "public/shared/rtg-edge-system.js",
-        "public/shared/rtg-edge-worlds.js"
+        "public/shared/rtg-edge-worlds.js",
+        "public/shared/rtg-world-identity.js",
+        "public/site/start/experience-edge.js",
+        "public/site/start/experience-graph.js",
+        "public/site/start/experience.js"
       ],
       "beslissers": [
         "public/shared/command/bladstand.js",
@@ -3018,14 +3406,14 @@
     },
     "zichtbaarheidsstand": {
       "schrijvers": [
-        "public/shared/interface/second-screen.js",
+        "public/apps/foundation/os-publiek.html",
+        "public/apps/werk/command-entry.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/shared/rtg-edge-2-loader.js",
         "public/shared/rtg-edge-2.js",
         "public/shared/rtg-edge-system.js"
       ],
       "beslissers": [
-        "public/shared/interface/second-screen.js",
         "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge.js",
@@ -3051,13 +3439,20 @@
     ],
     "afnemer": [
       "public/apps/bestanden/adaptief.js",
+      "public/apps/foundation/os-publiek.html",
       "public/apps/office/adaptief-pres.js",
       "public/apps/office/adaptief-staat.js",
       "public/apps/office/adaptief.js",
       "public/apps/reizen-performance.js",
       "public/apps/reizen-veilig.js",
+      "public/apps/werk/command-entry.js",
+      "public/shared/gebaar/gebaar-02.js",
+      "public/shared/gebaar/gebaar-03b.js",
       "public/shared/rtg-daily.js",
-      "public/shared/social-intelligence-runtime.js"
+      "public/shared/social-intelligence-runtime.js",
+      "public/site/start/experience-edge.js",
+      "public/site/start/experience-graph.js",
+      "public/site/start/experience.js"
     ],
     "blikveld": [
       "public/shared/edge/actiestaat.js",
@@ -3071,7 +3466,8 @@
       "public/shared/rtg-continue-key-core.js",
       "public/shared/rtg-continue-key.js",
       "public/shared/rtg-route-memory-core.js",
-      "public/shared/rtg-route-memory.js"
+      "public/shared/rtg-route-memory.js",
+      "public/shared/rtg-world-identity.js"
     ],
     "edge-2": [
       "public/shared/rtg-edge-2-context.js",
@@ -3116,8 +3512,11 @@
       "public/shared/command/bladstand.js",
       "public/shared/command/geheugen.js",
       "public/shared/command/werktafel.js",
+      "public/shared/interface/second-screen-modules.js",
       "public/shared/interface/second-screen.js",
+      "public/shared/interface/workspace-context.js",
       "public/shared/interface/world-desktop-frame.js",
+      "public/shared/interface/world-desktop-home.js",
       "public/shared/rtg-themas.js"
     ],
     "trust": [
@@ -3141,14 +3540,30 @@
       "naam": "capability-register",
       "schrijvers": [
         "public/shared/adaptief/register.js",
-        "public/shared/rtg-adaptive-edge-core.js"
+        "public/shared/interface/world-desktop-home.js",
+        "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/rtg-adaptive-edge-signals.js",
+        "public/shared/social-intelligence-runtime.js",
+        "public/site/start/experience-edge.js"
       ],
       "beslissers": [
         "public/shared/adaptief.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge-core.js"
       ],
-      "waarom": "Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij (leeg in ronde 2, als de drie schermen die erop leunen via RTGAdaptief publiceren), en de controls oogsten paginaknoppen als derde bron."
+      "waarom": "Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij, gevuld door vijf producenten: zijn eigen standaardingangen, Signals (primary), de sociale runtime (social-context), het wereldbureau (home) en de landing (zeven ids zonder run plus de scenerijen); leeg in ronde 2. De controls oogsten paginaknoppen als derde bron."
+    },
+    {
+      "naam": "gebaar-drempel",
+      "schrijvers": [
+        "public/shared/adaptief/grammatica.js"
+      ],
+      "beslissers": [
+        "public/shared/gebaar/gebaar-02.js",
+        "public/shared/gebaar/gebaar-03b.js",
+        "public/shared/rtg-edge-2-context.js"
+      ],
+      "waarom": "DREMPELS in grammatica.js is de tabel, en zes herkenners lezen hem. Twee plekken beslissen met eigen maten: de gebaarversheid van Edge 2 (1500 ms, 14 px) en de gebaarlaag van de lijsten (RICHTING 8 en STIL 6 in gebaar-02, lang drukken 520 ms en 8 px per as in gebaar-03b). Die laatste stond na ronde 1 niet op de kaart, waardoor deze verantwoordelijkheid een eigenaar leek te hebben; de code is niet veranderd, de kaart ziet hem nu."
     },
     {
       "naam": "gewicht",
@@ -3163,9 +3578,10 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/adaptief/orb.js",
         "public/shared/edge/actiestaat.js",
+        "public/shared/gebaar/gebaar-03b.js",
         "public/shared/rtg-adaptive-edge-core.js"
       ],
-      "waarom": "De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: twee keer een eigen standaard licht voor een ONTBREKEND gewicht (adaptief.js, brug.js; register.js laat het gewicht sinds ronde 1 staan), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), en de Edge-Core laat in zijn tweede register alleen licht toe."
+      "waarom": "De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: twee keer een eigen standaard licht voor een ONTBREKEND gewicht (adaptief.js, brug.js; register.js laat het gewicht sinds ronde 1 staan), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), de Edge-Core laat in zijn tweede register alleen licht toe, en de gebaarlaag houdt een eigen borgtijd van 800 ms naast VASTHOUD (die blijft tot ronde 3, besluit K-borg)."
     },
     {
       "naam": "hoofdactie",
@@ -3223,13 +3639,15 @@
       "naam": "vluchtige-context",
       "schrijvers": [
         "public/shared/adaptief/register.js",
+        "public/shared/interface/workspace-context.js",
         "public/shared/rtg-edge-system.js"
       ],
       "beslissers": [
         "public/shared/adaptief/brug.js",
-        "public/shared/adaptief/register.js"
+        "public/shared/adaptief/register.js",
+        "public/shared/interface/workspace-context.js"
       ],
-      "waarom": "Twee contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie) en RTGEdge.active.ctx (scope, titel, actie, tool); reizen-performance.js voedt ze allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen) en de brug (actief blad) elk apart."
+      "waarom": "Drie contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie), RTGEdge.active.ctx (scope, titel, actie, tool) en RTGWorkspaceContext (een eigen current, gevoed uit de eerste, met een eigen ontdubbeling); reizen-performance.js voedt de eerste twee allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen), de brug (actief blad) en de werkruimte (gelijk wordt geslikt) elk apart."
     },
     {
       "naam": "voortzetting",
@@ -3268,9 +3686,14 @@
       "naam": "wereld",
       "schrijvers": [
         "public/shared/command/bladstand.js",
+        "public/shared/interface/world-desktop-home.js",
         "public/shared/randen.js",
         "public/shared/rtg-edge-system.js",
-        "public/shared/rtg-edge-worlds.js"
+        "public/shared/rtg-edge-worlds.js",
+        "public/shared/rtg-world-identity.js",
+        "public/site/start/experience-edge.js",
+        "public/site/start/experience-graph.js",
+        "public/site/start/experience.js"
       ],
       "beslissers": [
         "public/shared/command/bladstand.js",
@@ -3278,19 +3701,19 @@
         "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
         "public/shared/rtg-edge-system.js"
       ],
-      "waarom": "De huidige wereld wordt op vier plekken vastgesteld: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco."
+      "waarom": "De huidige wereld wordt op vier plekken BEPAALD: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco. GESCHREVEN wordt hij op meer: rtg-world-identity.js bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, en de landing zet hem per scene vanuit drie scripts."
     },
     {
       "naam": "zichtbaarheidsstand",
       "schrijvers": [
-        "public/shared/interface/second-screen.js",
+        "public/apps/foundation/os-publiek.html",
+        "public/apps/werk/command-entry.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/shared/rtg-edge-2-loader.js",
         "public/shared/rtg-edge-2.js",
         "public/shared/rtg-edge-system.js"
       ],
       "beslissers": [
-        "public/shared/interface/second-screen.js",
         "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge.js",
@@ -3298,7 +3721,7 @@
         "public/shared/rtg-edge-2-loader.js",
         "public/shared/rtg-edge-2.js"
       ],
-      "waarom": "Vijf standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, de Edge 1-vouwstand en de Second Screen; ze delen geen stand."
+      "waarom": "Vier standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel en een vensterboolean in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, en de Edge 1-vouwstand; ze delen geen stand. Daarnaast zetten twee schermen (Work en FoundationOS) de Edge 2-stand zelf op body, buiten setState om. De Second Screen stond hier tot ronde 2 en is eraf: zijn stand gaat over de bank van de schil, niet over de Edge."
     }
   ],
   "dodeKanalen": {
@@ -3323,9 +3746,9 @@
     ]
   },
   "telling": {
-    "bestanden": 60,
-    "rollen": 193,
-    "dubbeleEigenaars": 11,
+    "bestanden": 71,
+    "rollen": 214,
+    "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 13
   }

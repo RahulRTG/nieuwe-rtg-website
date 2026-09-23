@@ -34,8 +34,53 @@ test('intentprojectie toont uitsluitend geregistreerde en toegestane acties', ()
     .map(x => x.id), ['reis', 'hotel']);
   toegestaan = false;
   assert.deepEqual(kern.project(['reis'], model.registry, 4), []);
-  kern.register(model, { id: 'boeken', label: 'Boeken', confirm: 'Boeking bevestigen?', allowed: true });
-  assert.equal(model.registry.boeken.confirm, 'Boeking bevestigen?');
+});
+
+/* HET TWEEDE REGISTER KENT ALLEEN LICHT (EDGE.md par. 10, ronde 1). Het had een
+   eigen uitvoerweg: een eigen `confirm` via window.confirm, langs de
+   gewichtsgrammatica heen. Wat een bevestiging vraagt, hoort in RTGAdaptief.
+   DE MUTATIES, elk nagetrokken: haal de weigering uit register() (de eerste twee
+   toetsen zakken), versmal hem tot `item.gewicht === 'zwaar'` (alleen de tweede
+   zakt), laat voer() bij een gewichtlaag zelf run() aanroepen (de derde zakt), en
+   zet de oude execute met window.confirm terug (de vierde zakt). */
+test('het tweede register weigert een eigen bevestiging, en laat niets achter', () => {
+  const model = kern.model();
+  assert.equal(kern.register(model, { id: 'boeken', label: 'Boeken', confirm: 'Boeking bevestigen?', allowed: true, run() {} }), false);
+  assert.equal(model.registry.boeken, undefined, 'een geweigerde handeling hoort niet in het register te staan');
+});
+
+test('het tweede register kent alleen licht: elk ander gewicht wordt geweigerd', () => {
+  const model = kern.model();
+  for (const gewicht of ['terug', 'bewust', 'zwaar', 'plechtig', 'onbekend']) {
+    assert.equal(kern.register(model, { id: 'h-' + gewicht, label: gewicht, gewicht, run() {} }), false, gewicht);
+    assert.equal(model.registry['h-' + gewicht], undefined, gewicht + ' liet een regel achter');
+  }
+  assert.equal(kern.register(model, { id: 'h-licht', label: 'licht', gewicht: 'licht', run() {} }), true);
+  assert.equal(kern.register(model, { id: 'h-zonder', label: 'zonder gewicht', run() {} }), true);
+});
+
+test('een tik gaat langs de gewichtlaag, als licht; zonder laag draait alleen wat mag', () => {
+  let gedraaid = 0;
+  const run = () => { gedraaid++; };
+  const aanroepen = [];
+  const w = { RTGGewicht: { voer(it) { aanroepen.push(it); return it.doe() !== false; } } };
+  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: true, run }, w), true);
+  assert.equal(aanroepen.length, 1, 'de gewichtlaag hoort precies een keer te worden aangeroepen');
+  assert.equal(aanroepen[0].gewicht, 'licht');
+  assert.equal(aanroepen[0].id, 'proef');
+  assert.equal(gedraaid, 1, 'de handeling draait via de gewichtlaag, en maar een keer');
+  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: false, run }, w), false);
+  assert.equal(aanroepen.length, 1, 'een handeling die niet mag, bereikt de gewichtlaag niet');
+  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: true, run }, {}), true);
+  assert.equal(gedraaid, 2, 'zonder gewichtlaag draait licht direct');
+  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: () => false, run }, {}), false);
+  assert.equal(gedraaid, 2);
+  assert.equal(kern.voer({ id: 'zonder', label: 'Zonder run' }, w), false);
+});
+
+test('de uitvoerder van de Edge kent geen window.confirm meer (vorm; het gedrag bewijst edgeblikveld.e2e.js)', () => {
+  assert.doesNotMatch(VIEW, /confirm\(/);
+  assert.match(VIEW, /if \(custom && custom\.run\) return K\.voer\(custom, w\);/);
 });
 
 test('voorspelde acties verdringen geen veilige terugval en blijven begrensd', () => {

@@ -37,11 +37,7 @@
     }
     setState('dock');
     var custom = rt.model.registry[action];
-    if (custom && custom.run) {
-      if (!K.allowed(custom)) return false;
-      if (custom.confirm && !w.confirm(custom.confirm)) return false;
-      custom.run(); return true;
-    }
+    if (custom && custom.run) return K.voer(custom, w);
     if (action === 'home') { w.location.href = rt.edge.cfg.home; return true; }
     if (action === 'back') { w.history.back(); return true; }
     if (action === 'worlds') return legacy('.rtg-edge-worlds-trigger');

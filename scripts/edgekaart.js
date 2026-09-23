@@ -114,16 +114,18 @@ const KAART = [
     ['schrijft', 'herdeclareert met een postbode', 'A.declareer({ id: c.id, naam: c.naam, label: c.label, groep: c.groep'],
     ['beslist', 'standaard licht over de grens', "gewicht: c.gewicht || 'licht',"],
     ['schrijft', 'zet de context bovenin', 'A.context(ctx);']]],
-  ['rtg-adaptive-edge.js', 'adaptieve-balk', 'presence:s identiteit:s voortzetting:s zichtbaarheidsstand:sb onderbalk:s gewicht:b capability-register:l vluchtige-context:l', [
+  ['rtg-adaptive-edge.js', 'adaptieve-balk', 'presence:s identiteit:s voortzetting:s zichtbaarheidsstand:sb onderbalk:s capability-register:l vluchtige-context:l', [
     ['schrijft', 'presence in het eigen model', 'rt.model.presence = input && input.label ?'],
     ['schrijft', 'identiteit in het eigen model', 'rt.model.identity = acting ?'],
     ['schrijft', 'voortzetting in het eigen model', 'rt.model.continuation = input && input.title ?'],
     ['schrijft', 'balkstand op body', 'd.body.dataset.rtgAdaptiveState = rt.model.state;'],
     ['beslist', 'Edge 2 compact wordt peek', "else if (state === 'compact') setState('peek', 'auto');"],
     ['schrijft', 'klaar-vlag; CSS zet de onderbalk weg', "d.body.dataset.rtgAdaptiveReady = 'true';"],
-    ['beslist', 'eigen bevestiging met window.confirm', 'if (custom.confirm && !w.confirm(custom.confirm)) return false;']]],
-  ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'capability-register:sb bevoegdheid:b zichtbaarheidsstand:b', [
+    ['leest', 'een tik op het tweede register via de kern', 'if (custom && custom.run) return K.voer(custom, w);']]],
+  ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'capability-register:sb bevoegdheid:b zichtbaarheidsstand:b gewicht:b', [
     ['schrijft', 'tweede register, laatste wint', 'state.registry[id] = { id: id'],
+    ['beslist', 'alleen licht in dit register', "if (item.confirm || (item.gewicht && item.gewicht !== 'licht')) {"],
+    ['leest', 'een tik langs de gewichtlaag', "return w.RTGGewicht.voer({ id: e.id, naam: e.label, gewicht: 'licht', doe: e.run })"],
     ['beslist', 'ids buiten het patroon eruit', 'if (!state || !/^[a-z][a-z0-9-]{1,39}$/.test(id)) return false;'],
     ['beslist', 'allowed: boolean of functie', "typeof item.allowed === 'function' ? !!item.allowed()"],
     ['beslist', 'vier balkstanden', "var STATES = Object.freeze(['peek', 'dock', 'deck', 'expanded']);"]]],
@@ -308,13 +310,13 @@ const KAART = [
    Een dubbele zonder regel hier, of een regel zonder dubbele, laat het script
    zakken: dan is de verklaring bij de afleiding achtergebleven. */
 const WAAROM = {
-  'capability-register': 'Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); een actie via registerAction ontloopt de gewichtsgrammatica, en de controls oogsten paginaknoppen als derde bron.',
+  'capability-register': 'Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij (leeg in ronde 2, besluit 11), en de controls oogsten paginaknoppen als derde bron.',
   'vluchtige-context': 'Twee contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie) en RTGEdge.active.ctx (scope, titel, actie, tool); reizen-performance.js voedt ze allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen) en de brug (actief blad) elk apart.',
   wereld: 'De huidige wereld wordt op vier plekken vastgesteld: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco.',
   'trust-rail': 'Verbinding en beveiliging worden op drie plekken zelf afgeleid en elk op een eigen strook getoond: RTGRail (navigator.onLine), het statuspaneel van de casco (/api/ready, Beveiligd) en de Intelligence-strook (protocol als ONLINE / TLS); geen van drie leest een ander.',
   voortzetting: 'Vier geheugens voor waar was ik: continueWith (alleen in het model van de Edge), de werktafelbladen (localStorage), de routecontext (sessionStorage, 24 uur) en Recent bezocht van het slimme menu (sessionStorage); geen van vier leest een ander.',
   hoofdactie: 'De library maakt de knop, de casco en de Edge 2-loader (padtabel) zetten tekst en actie, de Continue Key herbouwt inhoud en anker en de controls verhuizen hem; het scherm wijst intussen zijn eigen data-hoofdactie aan, en het blikveld meldt het verschil als hoofdactie-dubbel.',
-  gewicht: 'De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: drie keer een eigen standaard licht (adaptief.js, register.js zonder grammatica, brug.js), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), en window.confirm in de adaptieve Edge.',
+  gewicht: 'De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: drie keer een eigen standaard licht (adaptief.js, register.js zonder grammatica, brug.js), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), en de Edge-Core laat in zijn tweede register alleen licht toe.',
   waarom: 'De vijf bronnen staan twee keer (BRONNEN in grammatica.js, BRONWOORD in waarom.js), en verhinderd-gaat-niet-door wordt beslist in register.js, balkknop.js, orb.js en actiestaat.js naast de uitleg in grammatica.js en waarom.js.',
   zichtbaarheidsstand: 'Vijf standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, de Edge 1-vouwstand en de Second Screen; ze delen geen stand.',
   onderbalk: 'Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, en RTGDaily die zelf een Edge-balk ophangt.',

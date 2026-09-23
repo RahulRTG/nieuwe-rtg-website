@@ -19,12 +19,17 @@
    7. de GEWICHTLAAG reist mee met de balk: op een los scherm met een register
       (Office) opent een `bewust`-handeling in het Edge-blad de lade en gaat pas
       na bevestigen door, en een verhinderde knop zegt waarom.
+   8. het TWEEDE REGISTER kent alleen licht (ronde 1): een zware handeling via
+      registerAction wordt geweigerd, en een tik op een lichte gaat precies een
+      keer langs RTGGewicht.voer -- niet meer langs window.confirm.
 
    DE MUTATIES, elk nagetrokken: laat de loader blikveld.js niet laden (1 zakt),
    haal object uit zendContext in brug.js (3 zakt), laat de controls weer zelf
    RTGAdaptief.voorNu() lezen (4 zakt: de balk tekent dan een handeling die
    acties() als AFWEZIG weglaat), laat de agendahoofdactie wegvallen (6 zakt),
-   en laat de loader de gewichtlaag overslaan (7 zakt).
+   laat de loader de gewichtlaag overslaan (7 zakt), en zet in
+   rtg-adaptive-edge.js de oude execute met custom.run() terug (8 zakt: de
+   spion op RTGGewicht.voer blijft op nul).
 
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
@@ -179,6 +184,26 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     await page.locator('.rtg-adaptive-controls [data-cap="proef.nee"]').click();
     await page.waitForFunction(() => document.body.innerText.includes('Strikt geclassificeerd'), null, { timeout: 10000 });
     assert.deepEqual(await page.evaluate(() => window.gedaan), [], 'een verhinderde handeling legt uit en voert niets uit');
+
+    // 8) Het tweede register kent alleen licht, en een tik gaat langs de gewichtlaag.
+    await office();
+    const zwaar = await page.evaluate(() => {
+      window.tweede = { gedraaid: 0, gewogen: [] };
+      const echt = RTGGewicht.voer;
+      RTGGewicht.voer = function (it) { window.tweede.gewogen.push(it.gewicht); return echt.apply(this, arguments); };
+      return RTGAdaptiveEdge.registerAction({ id: 'proef-zwaar', label: 'Proef zwaar', gewicht: 'zwaar', run: () => { window.tweede.gedraaid++; } });
+    });
+    assert.equal(zwaar, false, 'een zware handeling hoort het tweede register niet in te komen');
+    await page.evaluate(() => {
+      RTGAdaptiveEdge.registerAction({ id: 'proef-licht', label: 'Proef licht', run: () => { window.tweede.gedraaid++; } });
+      RTGAdaptiveEdge.setProjection({ deck: 'actions', actions: ['proef-zwaar', 'proef-licht'], open: true });
+    });
+    assert.equal(await page.locator('.rtg-adaptive-sheet-list [data-rtg-adaptive-action="proef-zwaar"]').count(), 0,
+      'een geweigerde handeling staat niet in het blad');
+    await page.locator('.rtg-adaptive-sheet-list [data-rtg-adaptive-action="proef-licht"]').click();
+    await page.waitForFunction(() => window.tweede.gedraaid === 1, null, { timeout: 10000 });
+    assert.deepEqual(await page.evaluate(() => window.tweede.gewogen), ['licht'],
+      'een tik op het tweede register gaat precies een keer langs RTGGewicht.voer, als licht');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {

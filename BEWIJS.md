@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1995 bestanden en 14219 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2000 bestanden en 14239 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,12 +12,12 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1995 |
-| losse beweringen (`test(...)`) | 14219 |
+| toetsbestanden | 2000 |
+| losse beweringen (`test(...)`) | 14239 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1349 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1353 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 73 |
+| niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
 | niets van beide | 403 |
 
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1746 bestanden, 13775 beweringen.
+1749 bestanden, 13789 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1789,7 +1789,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-249 bestanden, 444 beweringen.
+251 bestanden, 450 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2037,7 +2037,7 @@ toets omvalt.
 | `world-dashboard.e2e.js` | 1 | -- | DE VIER WERELDHOMES ZIJN HUN EIGEN DASHBOARD. Deze proef bewaakt de grens die bij de nieuwe schil het makkelijkst weer vervaagt: de gedeelde laag mag de echte Living-, Work-, Travel- en Foundation-DOM alleen opmaken. |
 | `world-desktop-identity.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `world-desktop-state.e2e.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `world-desktop.e2e.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `world-desktop.e2e.js` | 9 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `world-function-controls.e2e.js` | 5 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `world-homes.e2e.js` | 4 | -- | Approved homes must retain real data, language state and the shared Edge. AI is off: built-in copy must still work and photos must never invent trips. |
 | `zaakpay.e2e.js` | 2 | genoemd | Schermtoets voor RTG Pay aan de ZAAKKANT (public/apps/zaakpay.html). Dit scherm bestond niet. |

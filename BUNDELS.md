@@ -376,7 +376,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 31 delen, 3103 regels in de delen
+`public/apps/personeel/` -- 31 delen, 3121 regels in de delen
 
 | deel | onderwerp |
 |---|---|

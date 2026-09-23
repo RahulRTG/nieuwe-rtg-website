@@ -1,197 +1,24 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Toestemming</title>
-<meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/veiligheid.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  .tst{border:1px solid var(--line);border-radius:0;padding:1rem;margin:.7rem 0;}
-  .tst .wie{font-family:'Bodoni Moda',Georgia,serif;font-size:1.1rem;}
-  .tst .kant{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--goldlicht);}
-  .tst .wat{color:var(--soft);font-size:.85rem;line-height:1.55;margin:.3rem 0;}
-  /* Het doel staat er als eigen regel en niet als bijzin achter "wat": dat is
-     de vraag waar toestemming om draait, en hij verdwijnt zodra hij een staart
-     wordt van iets anders. */
-  .tst .doel{color:var(--txt);font-size:.85rem;line-height:1.55;margin:.3rem 0;}
-  .tst .tot{color:var(--soft);font-size:.78rem;line-height:1.5;}
-  .knop.mini{padding:.4rem .7rem;font-size:.8rem;margin-top:.7rem;}
-  .grens{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin:.7rem 0;}
-  .grens b{display:block;}
-  .grens span{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .storing{border:1px solid var(--rood,#DE6E92);border-radius:0;padding:.7rem .9rem;
-    margin:.6rem 0;font-size:.82rem;color:var(--soft);}
-  .voorbehoud{border-left:2px solid var(--goldlicht);padding:.2rem 0 .2rem .9rem;
-    color:var(--soft);font-size:.84rem;line-height:1.6;margin:1rem 0;}
-  .kijk{display:flex;gap:.9rem;border-bottom:1px solid var(--line);padding:.7rem 0;}
-  .kijk .om{color:var(--soft);font-size:.76rem;white-space:nowrap;min-width:6.5rem;}
-  .kijk .rek{flex:1;min-width:0;}
-  .kijk .wie{font-size:.95rem;}
-  .kijk .wat{color:var(--soft);font-size:.82rem;line-height:1.5;}
-  .kijk .waarom{color:var(--soft);font-size:.82rem;line-height:1.5;font-style:italic;}
-  /* Geen text-transform hier, anders dan bij .kant hierboven: die labels zijn
-     gewone woorden, deze zijn namen. Uppercase maakt van "RTG iD" een "RTG ID",
-     en de kleine i is geen opmaak maar het merk. */
-  .kijk .bron{font-size:.64rem;letter-spacing:.14em;color:var(--goldlicht);}
-</style>
-<script src="/shared/seizoen.js" defer></script>
-<script src="/shared/plek.js" defer></script>
-<script src="/shared/veiligheid.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<!-- Toestemming is opgegaan in "Wie heeft toegang tot mij" (SCHERMEIGENAAR.json:
+     privacy.toegang -> mijn-relaties.html). Deze vraag had drie schermen op
+     dezelfde bron; de lijst per soort is daar een weergave geworden, naast die
+     per partij, samen met de inzagekaart en de grenzen. #soort opent die
+     weergave meteen.
+
+     Dit pad blijft voor bladwijzers en links van buiten; binnen het huis linkt
+     niets er meer naar. De querystring gaat VOOR de hash mee. -->
+<meta http-equiv="refresh" content="0; url=/apps/mijn-relaties.html#soort">
+<link rel="canonical" href="/apps/mijn-relaties.html">
+<script>location.replace('/apps/mijn-relaties.html' + location.search + '#soort');</script>
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage">
-<a class="skip" href="#inhoud">Naar de inhoud</a>
-<header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
-  <h1>Toestemming</h1>
-  <div class="rek"></div>
-  <span class="stil">wie raakt uw gegevens aan</span>
-</header>
-<main id="inhoud">
-  <p class="stil">Elke partij die iets van u mag zien, en elk toestel dat iets voor u wegschrijft.
-  Intrekken doet u hier, en dat gaat naar de plek waar de toestemming leeft; er blijft dus nergens
-  een kopie staan die nog wel mag.</p>
-
-  <section aria-label="Wat er nu mag">
-    <h2>Wat er nu mag</h2>
-    <div id="lijst"><p class="stil">Laden...</p></div>
-  </section>
-
-  <!-- De tweede helft van dezelfde vraag. Hierboven staat wat er OPENSTAAT,
-       hieronder wat er IS GEBEURD. Bewust twee lijsten en niet een: door elkaar
-       gehaald ziet een afgeronde inzage eruit als een openstaande toegang, en
-       dan zou intrekken iets beloven wat er niet meer is. -->
-  <section aria-label="Wie heeft er gekeken">
-    <h2>Wie heeft er gekeken</h2>
-    <p class="stil" id="kaartKop">Laden...</p>
-    <div id="kaart"></div>
-    <div id="kaartGrenzen"></div>
-  </section>
-
-  <!-- De andere helft van dezelfde vraag. Hier staat wie iets van u mag ZIEN;
-       daar staat wat u zelf kunt AANTONEN. Twee schermen, een onderwerp, en
-       daarom verwijzen ze naar elkaar in plaats van elkaars lijst na te bouwen. -->
-  <section aria-label="Wat u kunt aantonen">
-    <h2>Wat u kunt aantonen</h2>
-    <p class="stil">De andere kant van deze vraag: niet wie iets van u mag zien, maar wat u zelf
-    kunt aantonen zonder een papier te sturen. Dat staat in uw
-    <a href="/apps/bewijsmap.html">Bewijsmap</a>.</p>
-  </section>
-
-  <section aria-label="Waar deze lijst ophoudt">
-    <h2>Waar deze lijst ophoudt</h2>
-    <div id="grenzen"></div>
-    <div id="voorbehoud"></div>
-  </section>
-
-  <div id="grens" class="rtgdeel-vast"></div>
-</main>
-<script>
-(() => {
-  const $ = s => document.querySelector(s);
-  const esc = s => Veilig.esc(String(s == null ? '' : s));
-  const KANT = { ziet: 'Ziet', schrijft: 'Schrijft', doet: 'Handelt namens u' };
-
-  /* DE TERMIJN STAAT ER ALTIJD, OOK ALS ER GEEN DATUM IS. Hier stond eerst
-     `t.tot ? 'Tot ...' : ''`, en dan verdween de regel bij vijf van de negen
-     lagen -- precies de lagen zonder einddatum. Een venster waar niets bij staat
-     leest als "dat loopt wel af", en dat is het tegenovergestelde van waar. De
-     server levert nu een STAND met een uitleg (kern/consent-register.js); dit
-     toont hem, en verzint er niets bij. */
-  function termijn(t) {
-    const m = t.termijn;
-    if (!m) return 'Tot wanneer dit loopt, is hier niet vast te stellen.';
-    if (m.soort === 'venster') return 'Loopt tot ' + m.tot + '.';
-    return m.uitleg || 'Loopt door tot u hem stopt.';
-  }
-
-  function teken(d) {
-    /* Een laag die het niet doet, staat bovenaan en niet als lege regel. Op dit
-       scherm is stilte gevaarlijker dan elders: een ontbrekende regel leest als
-       "niemand kijkt mee". */
-    const storingen = (d.storingen || []).map(t =>
-      '<div class="storing" role="status">' + esc(t) + ' Deze lijst is daardoor niet compleet.</div>').join('');
-
-    const rijen = (d.toestemmingen || []).map(t =>
-      '<div class="tst"><span class="kant">' + esc(KANT[t.richting] || t.richting) + '</span>' +
-      '<div class="wie">' + esc(t.wie) + '</div>' +
-      '<div class="wat">' + esc(t.wat) + '</div>' +
-      (t.doel ? '<div class="doel">' + esc(t.doel) + '</div>' : '') +
-      '<div class="tot">' + esc(termijn(t)) + '</div>' +
-      (t.intrekbaar
-        ? '<button class="knop mini" data-intrek="' + esc(t.laag) + '|' + esc(t.id) + '">Intrekken</button>'
-        : '') + '</div>').join('');
-
-    $('#lijst').innerHTML = storingen + (rijen ||
-      '<p class="stil">Op dit moment mag geen enkele partij iets van u zien, en er schrijft geen toestel.</p>');
-
-    $('#lijst').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
-      const [laag, id] = b.dataset.intrek.split('|');
-      try { await Veilig.api('/api/toestemming/intrek', { laag, id }); await laad();
-        Veilig.melding('Ingetrokken.'); }
-      catch (e) { Veilig.melding(e.message); }
-    }));
-
-    $('#grenzen').innerHTML = (d.nietGedekt || []).map(x =>
-      '<div class="grens"><b>' + esc(x.naam) + '</b><span>' + esc(x.reden) + '</span></div>').join('');
-    $('#voorbehoud').innerHTML = d.voorbehoud
-      ? '<p class="voorbehoud">' + esc(d.voorbehoud) + '</p>' : '';
-  }
-
-  /* De inzagekaart: wie heeft er gekeken. Een eigen aanroep en een eigen lijst,
-     want het is een andere vraag dan hierboven -- en een die niet stukgaat als
-     de toestemmingenlijst hapert, en omgekeerd. */
-  function tekenKaart(d) {
-    const storingen = (d.storingen || []).map(t =>
-      '<div class="storing" role="status">' + esc(t) + ' Deze kaart is daardoor niet compleet.</div>').join('');
-
-    const rijen = (d.kaart || []).map(r => {
-      const om = String(r.om || '');
-      return '<div class="kijk"><span class="om">' + esc(om.slice(0, 10)) + '<br>' + esc(om.slice(11, 16)) + '</span>' +
-        '<span class="rek"><span class="bron">' + esc(r.bron) + '</span>' +
-        '<div class="wie">' + esc(r.wie) + '</div>' +
-        '<div class="wat">' + esc(r.wat) + '</div>' +
-        (r.waarom ? '<div class="waarom">Reden: ' + esc(r.waarom) + '</div>' : '') +
-        '</span></div>';
-    }).join('');
-
-    $('#kaartKop').textContent = rijen
-      ? 'Er is ' + d.gekeken + ' keer iets van u opgevraagd. Uw eigen goedkeuringen staan er ook bij, want zonder die regel is de inzage erboven niet te volgen.'
-      : 'Er heeft nog niemand iets van u opgevraagd.';
-    $('#kaart').innerHTML = storingen + rijen;
-    $('#kaartGrenzen').innerHTML = ((d.nietZichtbaar || []).map(x =>
-      '<div class="grens"><b>' + esc(x.naam) + '</b><span>' + esc(x.reden) + '</span></div>').join('')) +
-      (d.voorbehoud ? '<p class="voorbehoud">' + esc(d.voorbehoud) + '</p>' : '');
-  }
-
-  async function laad() {
-    try { teken(await Veilig.api('/api/toestemming')); }
-    catch (e) { $('#lijst').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
-    try { tekenKaart(await Veilig.api('/api/inzagekaart')); }
-    catch (e) { $('#kaartKop').textContent = e.message; }
-  }
-
-  if (document.readyState !== 'loading') laad();
-  else window.addEventListener('load', laad);
-})();
-</script>
-<script src="/shared/deelmenu.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
-<script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
-<script src="/shared/cookie.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
+<body>
+<p>Toestemming staat nu in Wie heeft toegang tot mij. <a href="/apps/mijn-relaties.html#soort">Ga verder</a>.</p>
 </body>
 </html>

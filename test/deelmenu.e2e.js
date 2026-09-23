@@ -196,15 +196,21 @@ test('deelmenu: geen knop opent een leeg scherm, geen knop herhaalt zijn eigen n
        bewijzen. Een tweede bewijs op de verkeerde plek is geen extra zekerheid;
        het is een toets die stuk gaat om iets waar hij niet over gaat. */
     bundel.controleer();
-    await page.goto(base + '/apps/rtgid.html', { waitUntil: 'domcontentloaded' });
+    /* HIER STOND rtgid.html, met vier delen. Sinds de consolidatie van de
+       toegangsschermen (SCHERMEIGENAAR.json) staan Actieve toegang en het
+       Inzagelog in Wie heeft toegang tot mij, en houdt RTG iD er twee -- onder de
+       drie maakt het deelmenu met opzet geen balk. De marker-met-eigen-kop-vorm
+       waar deze toets om begon, staat hieronder als eerste synthetische vorm op
+       het echte component; hier meet hij het scherm dat de delen nu draagt. */
+    await page.goto(base + '/apps/mijn-relaties.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
-    await page.goto(base + '/apps/rtgid.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(base + '/apps/mijn-relaties.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.rtgdeel-balk button', { state: 'attached', timeout: 8000 });
 
-    /* 1. rtgid.html zoals hij op de plank ligt: vier delen, vier knoppen. */
+    /* 1. het toegangsscherm zoals hij op de plank ligt: vier delen, vier knoppen. */
     const id = await page.evaluate(METER, null);
-    assert.deepEqual(id.regels.map(r => r.naam), ['Inloggen', 'Toegang', 'Machtigingen', 'Inzagelog'],
-      'de vier markers van de pagina zijn de vier knoppen');
+    assert.deepEqual(id.regels.map(r => r.naam), ['Wat er nu openstaat', 'Wie heeft er gekeken', 'Wat u kunt aantonen', 'Wat dit scherm niet dekt'],
+      'de vier secties van de pagina zijn de vier knoppen');
     assert.deepEqual(id.regels.filter(r => r.eigen === 0).map(r => r.naam), [],
       'geen knop opent een leeg scherm');
     assert.deepEqual(id.regels.filter(r => r.dubbel).map(r => r.naam), [],

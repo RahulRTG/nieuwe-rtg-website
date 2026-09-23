@@ -571,10 +571,9 @@
         "apps/rtgid.html"
       ],
       "klasse": "functioneel-dubbel",
-      "stand": "open",
+      "stand": "uitgevoerd",
       "eigenaar": "apps/mijn-relaties.html",
-      "reden": "Drie antwoorden op \"wie heeft toegang tot mij, en trek het in\": toestemming.html (per soort) en mijn-relaties.html (per partij) op dezelfde /api/toestemming-data met allebei een intrekweg, en rtgid.html met een eigen inzagelog en intrekweg voor RTG iD-diensten.",
-      "vervolg": "Een scherm \"Wie heeft toegang tot mij\" met twee groeperingen (per partij, per soort) en de RTG iD-machtigingen als een van de partijen; toestemming.html en de toegangsblokken van rtgid.html worden een alias of een stand daarvan."
+      "reden": "Drie antwoorden op \"wie heeft toegang tot mij, en trek het in\", op dezelfde bron: toestemming.html (per soort) en mijn-relaties.html (per partij) op /api/toestemming, en de blokken Actieve toegang, Machtigingen en Inzagelog van rtgid.html, terwijl kern/consent-register.js de RTG iD-sessies en -machtigingen al als laag droeg en /api/inzagekaart het iD-log al las. Nu een scherm met twee groeperingen, de inzagekaart (met export) en de grenzen; toestemming.html is een doorverwijzing naar de weergave per soort, en RTG iD houdt inloggen bij een dienst, iemand machtigen en namens wie u zelf mag inloggen."
     },
     {
       "schermen": [
@@ -1973,7 +1972,7 @@
       "capability": "privacy.toegang",
       "rol": "eigenaar",
       "doelgroep": "lid",
-      "doel": "Per partij zien welke toegang tot zijn gegevens nog open staat, de gevolgen van intrekken vooraf bekijken, en een relatie sluiten."
+      "doel": "Alles zien wat er openstaat (per partij of per soort), een relatie sluiten of een losse toestemming intrekken, en lezen wie er iets heeft opgevraagd."
     },
     "apps/mijn-sessies.html": {
       "capability": "account.sessies",
@@ -2251,7 +2250,7 @@
       "capability": "identiteit.rtgid-diensten",
       "rol": "eigenaar",
       "doelgroep": "lid",
-      "doel": "Zien bij welke diensten hij is ingelogd met RTG iD en welke machtigingen en inzage daar bij horen."
+      "doel": "Met RTG iD en een passkey inloggen bij een dienst, en iemand machtigen om dat namens mij te doen."
     },
     "apps/rtgkantoor.html": {
       "capability": "kantoor.ai-besturing",
@@ -2412,10 +2411,8 @@
       "doel": "Terugkijken op eerdere momenten in een chronologische tijdlijn."
     },
     "apps/toestemming.html": {
-      "capability": "privacy.toegang",
-      "rol": "tweede-ingang",
-      "doelgroep": "lid",
-      "doel": "Zien wat er nu aan gegevens mag worden ingezien, wie er heeft gekeken, en dit kunnen aantonen of intrekken."
+      "rol": "alias",
+      "naar": "/apps/mijn-relaties.html#soort"
     },
     "apps/training.html": {
       "capability": "gezondheid.training",

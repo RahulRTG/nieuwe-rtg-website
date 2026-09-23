@@ -83,13 +83,14 @@ test('elke capability heeft precies een eigenaar, en die eigenaar draagt haar', 
   }
 });
 
-/* DE RATEL. Tien oordelen staan open op 23 september 2026 (de toegangsschermen,
+/* DE RATEL. Tien oordelen stonden open op 23 september 2026; de toegangsschermen
+   (toestemming, mijn-relaties, rtgid) zijn dezelfde dag samengevoegd, dus negen:
    de gezinsagenda, rit naast ov, Pulse naast De Salon, twee sociale overzichten,
-   Commerce naast de Mall, en vier gedeelde componenten). Dat getal mag alleen
+   Commerce naast de Mall, en vier gedeelde componenten. Dat getal mag alleen
    OMLAAG: een open punt sluiten verlaagt OPEN_MAX met de hand, een nieuw open
    punt erbij laat deze toets zakken tot iemand het besluit neemt om hem te
    verhogen -- met de reden in de historie. */
-const OPEN_MAX = 10;
+const OPEN_MAX = 9;
 
 test('het aantal open oordelen stijgt niet (OPEN_MAX mag alleen omlaag)', () => {
   const open = REG.oordelen.filter(o => o.stand === 'open').length;

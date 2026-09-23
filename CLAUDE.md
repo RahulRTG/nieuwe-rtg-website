@@ -29,9 +29,11 @@ Decision Room. `test/schermeigenaar.test.js` houdt het register tegen een VERSE
 meting: een nieuw scherm op dezelfde routes als een bestaand scherm zakt tot het
 een oordeel heeft (vijf klassen plus `geen-dubbel` met reden), een alias krijgt
 geen klikbare link binnen het huis, en binnen een wereld draagt geen menu-item de
-naam van een ander. Tien oordelen staan `open` met een vervolg — de grootste zijn
-de toegangsschermen (`toestemming`/`mijn-relaties`/`rtgid`), de gezinsagenda naast
-`kern/agenda.js`, en Pulse naast De Salon.
+naam van een ander. Negen oordelen staan `open` met een vervolg (ratel `OPEN_MAX`,
+alleen omlaag) — de grootste zijn de gezinsagenda naast `kern/agenda.js` en Pulse
+naast De Salon. De toegangsschermen zijn al samengevoegd: "Wie heeft toegang tot
+mij" (`mijn-relaties.html`) is het ene scherm, `toestemming.html` een
+doorverwijzing, en RTG iD houdt alleen inloggen bij een dienst en machtigen.
 
 **`GELD.md`, `LEVEN.md` en `LIFE.md` zijn de diepte-documenten per wereld.** GELD.md
 maakt van RTG Geld een financieel besturingssysteem; de harde grens daar is

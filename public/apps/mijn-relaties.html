@@ -76,6 +76,27 @@
   details summary::before{content:'+';font-size:0.9rem;line-height:1;width:0.9rem;text-align:center;color:var(--gold);}
   details[open] summary::before{content:'\2013';}
   details[open] summary{color:var(--txt);}
+  /* Per soort (voorheen /apps/toestemming.html) en de inzagekaart. Zelfde
+     vormtaal als de partijkaarten, zodat twee groeperingen van dezelfde
+     toestemmingen er niet uitzien als twee verschillende lijsten. */
+  .weergave{display:flex;gap:0.4rem;margin:0.4rem 0 0.2rem;}
+  .weergave button{background:transparent;border:1px solid var(--line);color:var(--soft);font-size:0.78rem;
+    padding:0.45rem 0.8rem;min-height:36px;}
+  .weergave button[aria-pressed="true"]{border-color:var(--gold);color:var(--txt);}
+  .tst{background:var(--card);border:1px solid var(--line);padding:1rem;margin:0.7rem 0;}
+  .tst .kant{font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+  .tst .wie{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
+  .tst .wat,.tst .tot{color:var(--soft);font-size:0.82rem;line-height:1.55;margin:0.25rem 0;}
+  .tst .doel{font-size:0.85rem;line-height:1.55;margin:0.25rem 0;}
+  .kijk{display:flex;gap:0.9rem;border-bottom:1px solid var(--line);padding:0.7rem 0;}
+  .kijk .om{color:var(--soft);font-size:0.76rem;white-space:nowrap;min-width:6.5rem;}
+  .kijk .rek2{flex:1;min-width:0;}
+  .kijk .wat,.kijk .waarom{color:var(--soft);font-size:0.82rem;line-height:1.5;}
+  .kijk .waarom{font-style:italic;}
+  /* Geen text-transform: dit zijn namen, en uppercase maakt van "RTG iD" een "RTG ID". */
+  .kijk .bron{font-size:0.64rem;letter-spacing:0.14em;color:var(--gold);}
+  .voorbehoud{border-left:2px solid var(--gold);padding:0.2rem 0 0.2rem 0.9rem;color:var(--soft);
+    font-size:0.84rem;line-height:1.6;margin:1rem 0;}
   .weg{display:none !important;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
 </style>
@@ -91,13 +112,57 @@
   <span class="rek"></span>
 </header>
 <main>
-  <p class="stil">Hier staat wat er op dit moment openstaat, gegroepeerd per partij in plaats van per soort.
-    Alles wat u hier ziet, kunt u hier ook sluiten. Wat dit scherm niet dekt, staat er onderaan bij.</p>
-  <div id="lijst"><p class="stil">Bezig met ophalen&#8230;</p></div>
-  <div id="los"></div>
-  <div id="grenzen"></div>
+  <p class="stil">Alles wat er op dit moment openstaat: welke partij iets van u mag zien, welk toestel
+    iets voor u wegschrijft, en wie namens u mag handelen. Wat u hier ziet, kunt u hier ook sluiten, en dat
+    gaat naar de plek waar de toestemming leeft. Wat dit scherm niet dekt, staat er onderaan bij.</p>
+  <!-- EEN SCHERM, DRIE WAREN HET. Deze vraag had drie antwoorden: /apps/toestemming.html
+       (per soort), dit scherm (per partij) en de toegangsblokken van /apps/rtgid.html,
+       alle drie op dezelfde bron (kern/consent-register.js, dat de RTG iD-sessies en
+       -machtigingen al als laag droeg) en /api/inzagekaart (die het RTG iD-log al las).
+       SCHERMEIGENAAR.json: eigenaar is dit scherm; toestemming.html is een
+       doorverwijzing en RTG iD houdt alleen wat alleen RTG iD kan (inloggen bij een
+       dienst, iemand machtigen). -->
+  <section aria-label="Wat er nu openstaat">
+    <h2>Wat er nu openstaat</h2>
+    <!-- Twee groeperingen van DEZELFDE toestemmingen, en geen twee lijsten: per partij
+         sluit u een hele relatie (met de gevolgen vooraf), per soort trekt u een enkele
+         toestemming in. -->
+    <div class="weergave" role="group" aria-label="Groeperen">
+      <button type="button" data-weergave="partij" aria-pressed="true">Per partij</button>
+      <button type="button" data-weergave="soort" aria-pressed="false">Per soort</button>
+    </div>
+    <div id="lijst"><p class="stil">Bezig met ophalen&#8230;</p></div>
+    <div id="los"></div>
+    <div id="soort" hidden><p class="stil">Bezig met ophalen&#8230;</p></div>
+  </section>
+
+  <!-- Wat er IS GEBEURD, naast wat er OPENSTAAT. Bewust een eigen lijst: door elkaar
+       gehaald ziet een afgeronde inzage eruit als een openstaande toegang, en dan
+       zou intrekken iets beloven wat er niet meer is. -->
+  <section aria-label="Wie heeft er gekeken">
+    <h2>Wie heeft er gekeken</h2>
+    <p class="stil" id="kaartKop">Bezig met ophalen&#8230;</p>
+    <div id="kaart"></div>
+    <div id="kaartGrenzen"></div>
+  </section>
+
+  <section aria-label="Wat u kunt aantonen">
+    <h2>Wat u kunt aantonen</h2>
+    <p class="stil">De andere kant van deze vraag: niet wie iets van u mag zien, maar wat u zelf kunt
+      aantonen zonder een papier te sturen. Dat staat in uw <a href="/apps/bewijsmap.html">Bewijsmap</a>.
+      Bij een dienst inloggen met uw RTG iD, of iemand machtigen om dat namens u te doen, gaat via
+      <a href="/apps/rtgid.html">RTG iD</a>; wat daaruit openstaat, ziet u hierboven terug.</p>
+  </section>
+
+  <section aria-label="Wat dit scherm niet dekt">
+    <h2>Wat dit scherm niet dekt</h2>
+    <div id="grenzen"></div>
+  </section>
+  <div id="grens" class="rtgdeel-vast"></div>
 </main>
 <div class="melding" id="melding" role="status" aria-live="polite"></div>
+<!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt de inzagekaart aan met RTGUitvoer.bron(). -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -202,14 +267,14 @@
     return el;
   }
 
-  async function laad() {
+  let laad = async function () {
     const r = await api('/api/toestemming/relaties');
     const lijst = $('#lijst'); lijst.textContent = '';
     if (r.status === 401) { lijst.appendChild(tekst(maak('p', 'stil'), 'Log in om dit te zien.')); return; }
     if (r.body.error) { lijst.appendChild(tekst(maak('p', 'stil'), r.body.error)); return; }
 
     const rel = r.body.relaties || [];
-    lijst.appendChild(tekst(maak('h2'), rel.length ? 'Partijen met toegang' : 'Partijen met toegang'));
+    lijst.appendChild(tekst(maak('h3', 'telling'), 'Partijen met toegang'));
     if (!rel.length) {
       lijst.appendChild(tekst(maak('p', 'stil'),
         'Er staat op dit moment niets open bij een partij. Dat betekent niet dat niemand ooit iets van u heeft gezien; wat al gebeurd is, staat op uw inzagekaart.'));
@@ -226,7 +291,7 @@
 
     const los = $('#los'); los.textContent = '';
     if (r.body.nietGebonden) {
-      los.appendChild(tekst(maak('h2'), 'Niet aan een partij gebonden'));
+      los.appendChild(tekst(maak('h3', 'telling'), 'Niet aan een partij gebonden'));
       los.appendChild(tekst(maak('p', 'stil'), r.body.nietGebonden.uitleg));
       const k = maak('article', 'partij');
       for (const rij of r.body.nietGebonden.rijen) k.appendChild(magRij(rij));
@@ -234,20 +299,121 @@
     }
 
     const gr = $('#grenzen'); gr.textContent = '';
-    gr.appendChild(tekst(maak('h2'), 'Wat dit scherm niet dekt'));
-    gr.appendChild(tekst(maak('p', 'stil'), r.body.voorbehoud || ''));
+    if (r.body.voorbehoud) gr.appendChild(tekst(maak('p', 'voorbehoud'), r.body.voorbehoud));
     for (const b of (r.body.buiten || []).concat(r.body.nietGedekt || [])) {
       const d = maak('div', 'grens');
       d.appendChild(tekst(maak('b'), b.naam));
       d.appendChild(tekst(maak('span'), b.reden));
       gr.appendChild(d);
     }
+  };
+
+
+  /* ---- per soort (was /apps/toestemming.html) ---- */
+  const KANT = { ziet: 'Ziet', schrijft: 'Schrijft', doet: 'Handelt namens u', seint: 'Seint u' };
+  /* DE TERMIJN STAAT ER ALTIJD, OOK ALS ER GEEN DATUM IS. Een venster waar niets
+     bij staat leest als "dat loopt wel af"; de server levert een STAND met een
+     uitleg (kern/consent-register.js) en dit toont hem zonder er iets bij te verzinnen. */
+  function termijn(t) {
+    const m = t.termijn;
+    if (!m) return 'Tot wanneer dit loopt, is hier niet vast te stellen.';
+    if (m.soort === 'venster') return 'Loopt tot ' + m.tot + '.';
+    return m.uitleg || 'Loopt door tot u hem stopt.';
+  }
+  function soortRij(t) {
+    const el = maak('div', 'tst');
+    el.appendChild(tekst(maak('span', 'kant'), KANT[t.richting] || t.richting));
+    el.appendChild(tekst(maak('div', 'wie'), t.wie));
+    el.appendChild(tekst(maak('div', 'wat'), t.wat));
+    if (t.doel) el.appendChild(tekst(maak('div', 'doel'), t.doel));
+    el.appendChild(tekst(maak('div', 'tot'), termijn(t)));
+    if (t.intrekbaar) {
+      const b = maak('button', 'knop rood');
+      b.type = 'button';
+      b.textContent = 'Intrekken';
+      b.dataset.intrek = t.laag + '|' + t.id;
+      b.style.marginTop = '0.7rem';
+      b.addEventListener('click', async () => {
+        b.disabled = true;
+        const r = await api('/api/toestemming/intrek', { laag: t.laag, id: t.id });
+        if (r.body.error) { b.disabled = false; return zeg(r.body.error); }
+        zeg('Ingetrokken.');
+        laad();
+      });
+      el.appendChild(b);
+    }
+    return el;
+  }
+  async function laadSoort() {
+    const r = await api('/api/toestemming');
+    const doos = $('#soort'); doos.textContent = '';
+    if (r.body.error) { doos.appendChild(tekst(maak('p', 'stil'), r.body.error)); return; }
+    /* Een laag die het niet doet staat bovenaan en niet als lege regel: stilte
+       leest hier als "niemand kijkt mee". */
+    for (const s of r.body.storingen || []) doos.appendChild(tekst(maak('div', 'let'), s + ' Deze lijst is daardoor niet compleet.'));
+    const rijen = r.body.toestemmingen || [];
+    if (!rijen.length) doos.appendChild(tekst(maak('p', 'stil'),
+      'Op dit moment mag geen enkele partij iets van u zien, en er schrijft geen toestel.'));
+    for (const t of rijen) doos.appendChild(soortRij(t));
   }
 
+  /* ---- wie heeft er gekeken (de inzagekaart; RTG iD is daar een van de bronnen) ---- */
+  let KAART = null;
+  async function laadKaart() {
+    const r = await api('/api/inzagekaart');
+    const doos = $('#kaart'); doos.textContent = '';
+    if (r.body.error) { $('#kaartKop').textContent = r.body.error; return; }
+    const d = r.body; KAART = d;
+    for (const s of d.storingen || []) doos.appendChild(tekst(maak('div', 'let'), s + ' Deze kaart is daardoor niet compleet.'));
+    const rijen = d.kaart || [];
+    $('#kaartKop').textContent = rijen.length
+      ? 'Er is ' + d.gekeken + ' keer iets van u opgevraagd. Uw eigen goedkeuringen staan er ook bij, want zonder die regel is de inzage erboven niet te volgen.'
+      : 'Er heeft nog niemand iets van u opgevraagd.';
+    for (const k of rijen) {
+      const om = String(k.om || '');
+      const el = maak('div', 'kijk');
+      const tijd = maak('span', 'om'); tijd.textContent = om.slice(0, 10) + ' ' + om.slice(11, 16);
+      el.appendChild(tijd);
+      const rek = maak('span', 'rek2');
+      rek.appendChild(tekst(maak('span', 'bron'), k.bron));
+      rek.appendChild(tekst(maak('div', 'wie'), k.wie));
+      rek.appendChild(tekst(maak('div', 'wat'), k.wat));
+      if (k.waarom) rek.appendChild(tekst(maak('div', 'waarom'), 'Reden: ' + k.waarom));
+      el.appendChild(rek);
+      doos.appendChild(el);
+    }
+    const gr = $('#kaartGrenzen'); gr.textContent = '';
+    for (const x of d.nietZichtbaar || []) {
+      const g = maak('div', 'grens');
+      g.appendChild(tekst(maak('b'), x.naam)); g.appendChild(tekst(maak('span'), x.reden));
+      gr.appendChild(g);
+    }
+    if (d.voorbehoud) gr.appendChild(tekst(maak('p', 'voorbehoud'), d.voorbehoud));
+  }
+  /* Meenemen: stond op RTG iD voor alleen het iD-log; hier voor de hele kaart.
+     Datum en tijd los, zodat een rij ook buiten deze app te sorteren is. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+    if (!KAART || !(KAART.kaart || []).length) return null;
+    return { naam: 'inzagekaart', kolommen: ['datum', 'tijd', 'bron', 'wie', 'wat', 'reden'],
+      rijen: KAART.kaart.map(k => [String(k.om).slice(0, 10), String(k.om).slice(11, 16), k.bron, k.wie, k.wat, k.waarom || '']) };
+  });
+
+  /* ---- groeperen ---- */
+  document.querySelectorAll('[data-weergave]').forEach(b => b.addEventListener('click', () => {
+    const soort = b.dataset.weergave === 'soort';
+    document.querySelectorAll('[data-weergave]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    $('#lijst').hidden = soort; $('#los').hidden = soort; $('#soort').hidden = !soort;
+  }));
+  /* Een oude link naar toestemming.html komt binnen met #soort. */
+  if (location.hash === '#soort') document.querySelector('[data-weergave="soort"]').click();
+
+  const laadRelaties = laad;
+  laad = async () => { await Promise.all([laadRelaties(), laadSoort(), laadKaart()]); };
   laad();
 })();
 </script>
 <script src="/shared/toestelsleutel.js"></script>
+<script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 </body>

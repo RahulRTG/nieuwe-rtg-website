@@ -3751,11 +3751,29 @@
       "type": "identity",
       "icon": "shield-check",
       "sections": [
-        "Uw toegang",
-        "Toestemmingen",
-        "Activiteit"
+        "Wat er nu openstaat",
+        "Wie heeft er gekeken",
+        "Wat dit scherm niet dekt"
       ],
       "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "maturity": "L0"
+    },
+    {
+      "id": "mijn-relaties-soort",
+      "url": "/apps/mijn-relaties.html#soort",
+      "name": "Wie heeft toegang tot mij",
+      "world": "living",
+      "worlds": [
+        "living"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [
+        "Wat er nu openstaat",
+        "Wie heeft er gekeken",
+        "Wat u kunt aantonen"
+      ],
+      "description": "",
       "maturity": "L0"
     },
     {
@@ -4568,10 +4586,9 @@
       "icon": "shield-check",
       "sections": [
         "Inloggen bij een dienst",
-        "Actieve toegang",
         "Machtigingen"
       ],
-      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+      "description": "Inloggen met uw passkey, en iemand machtigen om dat namens u te doen.",
       "maturity": "L0"
     },
     {
@@ -5041,24 +5058,6 @@
         "Bewaard"
       ],
       "description": "Uw notities, afwegingen en plannen bij elkaar.",
-      "maturity": "L0"
-    },
-    {
-      "id": "toestemming",
-      "url": "/apps/toestemming.html",
-      "name": "Toestemming",
-      "world": "living",
-      "worlds": [
-        "living"
-      ],
-      "type": "identity",
-      "icon": "shield-check",
-      "sections": [
-        "Wat er nu mag",
-        "Wie heeft er gekeken",
-        "Wat u kunt aantonen"
-      ],
-      "description": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
       "maturity": "L0"
     },
     {

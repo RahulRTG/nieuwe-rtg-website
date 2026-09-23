@@ -27,7 +27,7 @@
       gereedschap home ik isolatie juridisch juridisch/partnervoorwaarden juridisch/privacy \
       juridisch/voorwaarden klankwerk labpas life medicijnen meet memo mijn-gegevens mijn-isolatie \
       mijn-neigingen mijn-post mijn-relaties mijn-sessies notities oog passkeys rtgid salon scanner service-bel service \
-      sociaal-prive tijdlijn toestemming training vertaler voeding zaal'),
+      sociaal-prive tijdlijn training vertaler voeding zaal'),
     travel: routes('\
       arrival boeken chauffeur flits hangar hotels move navigatie ov reisboek reisbureau reizen-veilig reizen \
       residentie rit routedossier stad vluchten \
@@ -77,7 +77,7 @@
 
   var REDIRECTS = routes('\
     balans bank berichten codewoord geld-command labfonds logboek mecenaat metier nalatenschap rtgcode thuisrust \
-    thuiswacht vandaag vitaal wallet wbw');
+    thuiswacht toestemming vandaag vitaal wallet wbw');
   var ROUTES = Object.create(null);
   Object.keys(MANIFEST).forEach(function (wereld) {
     MANIFEST[wereld].forEach(function (pad) { ROUTES[pad] = wereld; });

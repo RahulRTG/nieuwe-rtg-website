@@ -142,3 +142,18 @@ test('Foundation widgets read the chosen family profile without a paid member ac
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
   } finally { await ctx.close(); }
 });
+test('Vrienden stands in the Foundation library because its world says so, not by exception', { skip }, async () => {
+  /* WERELDEN.md: Vrienden moved to FoundationOS on 7 September. The desktop used
+     to keep it in this library through a hard-coded url in world-desktop-home.js;
+     now the catalogue carries world 'foundation' from the manifest. Remove the
+     exception without rebuilding the catalogue and this test fails. */
+  const ctx = await context(null), page = await ctx.newPage(), errors = []; letOpFouten(page, errors);
+  try {
+    await open(page, '/apps/foundation/index.html');
+    await page.waitForSelector('.wd-library .wd-catalog [data-widget]');
+    await page.fill('.wd-library #wdSearch', 'Contacten');
+    await page.waitForSelector('.wd-library .wd-catalog [data-widget="foundation-vrienden"]', { timeout: 5000 });
+    assert.equal(await page.locator('.wd-library .wd-catalog [data-widget="foundation-vrienden"]').count(), 1);
+    assert.deepEqual(errors, []);
+  } finally { await ctx.close(); }
+});

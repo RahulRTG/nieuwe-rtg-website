@@ -111,7 +111,9 @@ oorzaken voor dezelfde nul, en dat is precies waarom er geen samengesteld
 percentage bestaat.
 
 De handelingen tellen apart, per herkomst: die uit `RTGAdaptief` en die uit het
-tweede register (`edge-compat`). Een handeling die geblokkeerd is zonder reden,
+tweede register (`edge-compat`). Die tweede bak blijft met opzet staan als
+zichtbare nul: het register is in ronde 2 weggehaald (stap 18), en een meter die
+de bak zou laten vallen, kan niet meer zien dat hij terugkomt. Een handeling die geblokkeerd is zonder reden,
 telt als schuld en hoort op nul te staan; dat staat hij. Een ongemeten gevolg
 telt als `onbekend`, en daar staan ze vandaag vrijwel allemaal — geen enkel
 scherm draagt nog een serveroordeel of een gemeten gevolg (par. 3 en 5).
@@ -160,16 +162,16 @@ wat er speelt omdat hij het op te veel plekken tegelijk weet.**
 
 | Verantwoordelijkheid | Wat de kaart vond |
 |---|---|
-| capability-register | twee registers met elk een eigen poort: `RTGAdaptief` (declareren, keuring) en de Edge-kern (`registerAction`); sinds ronde 1 kent de tweede alleen licht en voert hij uit langs `RTGGewicht.voer`, maar hij houdt die handelingen nog apart bij (leeg in ronde 2), en de controls oogsten paginaknoppen als derde bron. Dat tweede register heeft **vijf producenten** en niet de drie schermen die eerst werden genoemd: zijn eigen standaardingangen (zeven ids zonder uitvoering, op elk scherm met de adaptieve Edge), Signals (`primary`, ook op elk scherm), de sociale runtime (`social-context`, negen schermen), het wereldbureau (`home`, vanaf 1000 px) en de landing (zeven ids met `allowed: false` plus de scènerijen). Sinds ronde 2 staan alle vijf op de kaart; wie `registerAction` aanroept staat er als schrijver op, want alleen zo is te zien wie het register nog vult |
+| capability-register | EEN register: `RTGAdaptief` (declareren, keuring via de leer en de grammatica). De Edge-kern had een tweede (`registerAction`, `setProjection`, een eigen uitvoerweg); dat kende sinds ronde 1 alleen licht en is in ronde 2 weggehaald (stap 17 en 18). Het had vijf producenten en niet de drie schermen die eerst werden genoemd: zijn eigen zeven standaardingangen (op elk scherm met de adaptieve Edge), Signals (`primary`), de sociale runtime, het wereldbureau (`home`) en de landing -- vóór het weghalen telde de meting daaruit 1983 handelingen (273 schermen met 7, 9 met 8). De sociale runtime declareert sinds stap 16 in `RTGAdaptief`, het wereldbureau vangt Home sinds stap 14 op met een annuleerbare gebeurtenis op `window` (die overleeft een herstart van de Edge), de landing viel eruit in stap 15, en de standaardingangen en Signals verdwenen in stap 17. De teller zakt er niet van: de controls oogsten paginaknoppen als tweede bron van wat er in het blad staat, dus deze verantwoordelijkheid houdt twee beslissers |
 | vluchtige-context | twee contextmodellen: `RTGAdaptief.context()` en `RTGEdge.active.ctx` van het casco. `RTGWorkspaceContext` had een eigen `current` en een eigen ontdubbeling en was daarmee een derde; sinds ronde 2 (stap 23) leest hij het blikveld op het moment van vragen, zonder eigen staat, en staat hij als lezer op de kaart. De teller beweegt daar niet van: er blijven twee schrijvers en twee beslissers |
 | wereld | vier plekken BEPALEN de wereld: het casco, `randen.js` met een eigen padlijst, `bladstand.js` en de wereldcatalogus naast `MAPPEN`. GESCHREVEN wordt hij op meer plekken, en die stonden tot ronde 2 niet op de kaart: `rtg-world-identity.js` bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, en de landing zet hem per scène vanuit drie scripts |
 | hoofdactie | de library maakt de knop, casco en padtabel zetten tekst en actie, de Ga verder-toets herbouwt hem, de controls verhuizen hem — terwijl het scherm zijn eigen `data-hoofdactie` aanwijst |
 | voortzetting | vier geheugens voor "waar was ik" (`continueWith`, de werktafel, de routecontext, Recent bezocht) die elkaar niet lezen |
-| zichtbaarheidsstand | vier standmachines (Edge 2, zijn loader met een tweede autoregel en de vensterboolean, de adaptieve balk, de Edge 1-vouwstand) die geen stand delen, plus twee schermen (Work en FoundationOS) die de Edge 2-stand zelf op body zetten, buiten `setState` om. De Second Screen stond hier als vijfde en is er in ronde 2 afgehaald: zijn stand (peek, panel, workspace, focus) gaat over de bank van de schil (`.cmd-bank`) en niet over de Edge. Dat is een **indelingscorrectie en geen samenvoeging**: er is geen code veranderd en er is niets opgelost |
+| zichtbaarheidsstand | drie standmachines (Edge 2, zijn loader met een tweede autoregel en de vensterboolean, de adaptieve balk) die geen stand delen; de vierde, de Edge 1-vouwstand, is in ronde 2 weggehaald. Work zet de Edge 2-stand bij een hashwissel sinds ronde 2 via `setState` als automatiek (stap 11), zodat een handmatige stand wint; bij het laden en in FoundationOS (`os-publiek.html`, bij een stadswissel) wordt hij nog buiten `setState` om op body gezet. De Second Screen stond hier als vijfde en is er in ronde 2 afgehaald: zijn stand (peek, panel, workspace, focus) gaat over de bank van de schil (`.cmd-bank`) en niet over de Edge. Dat is een **indelingscorrectie en geen samenvoeging**: er is geen code veranderd en er is niets opgelost |
 | onderbalk | negen schrijvers van wat er onderin staat (de negende, het Edge-commando dat de menuknop claimt, stond er als beslisser en is in ronde 2 ook als schrijver erop gezet) |
 | trust-rail | drie plekken leiden verbinding en beveiliging zelf af, elk op een eigen strook |
-| gewicht | de tabel en de regel staan in `grammatica.js`, en sinds ronde 1 lezen de uitleg en de orb het werkelijke gewicht uit `effectief()`; twee plekken hebben nog een eigen standaard `licht` voor een ONTBREKEND gewicht (`adaptief.js`, `brug.js`), de regel voor "zonder gewichtlaag" staat drie keer apart (balk, orb, actiestaat; de werkmodus gaat sinds ronde 1 via de balk), de Edge-kern laat in zijn tweede register alleen licht toe, en de gebaarlaag houdt een eigen borgtijd van 800 ms naast `VASTHOUD` (die blijft tot ronde 3, besluit K-borg) |
-| gebaar-drempel | `DREMPELS` in `grammatica.js` is de tabel en zes herkenners lezen hem, maar twee plekken beslissen met eigen maten: de gebaarversheid van Edge 2 (1500 ms, 14 px) en de gebaarlaag van de lijsten (richting 8 px en stil 6 px in `gebaar-02.js`, lang drukken 520 ms en 8 px per as in `gebaar-03b.js`). Die tweede stond na ronde 1 niet op de kaart; daarom telde deze verantwoordelijkheid toen als opgelost |
+| gewicht | de tabel en de regel staan in `grammatica.js`, en sinds ronde 1 lezen de uitleg en de orb het werkelijke gewicht uit `effectief()`; twee plekken hebben nog een eigen standaard `licht` voor een ONTBREKEND gewicht (`adaptief.js`, `brug.js`), de regel voor "zonder gewichtlaag" staat drie keer apart (balk, orb, actiestaat; de werkmodus gaat sinds ronde 1 via de balk), en de gebaarlaag houdt een eigen borgtijd van 800 ms naast `VASTHOUD` (die blijft tot ronde 3, besluit K-borg) |
+| gebaar-drempel | `DREMPELS` in `grammatica.js` is de tabel en zes herkenners lezen hem, maar twee plekken beslissen met eigen maten: de gebaarversheid van Edge 2 (1500 ms, 14 px) en de gebaarlaag van de lijsten (richting 8 px en stil 6 px in `gebaar-02.js`, voor veeg of scroll en de klik erna). Lang drukken, stil en `scherp` in `gebaar-03b.js` lezen sinds ronde 2 (stap 10) de tabel, en zonder tabel loopt daar geen timer. De gebaarlaag stond na ronde 1 niet op de kaart; daarom telde deze verantwoordelijkheid toen als opgelost |
 | waarom | de vijf bronnen staan twee keer (`grammatica.js` en `waarom.js`), en "verhinderd gaat niet door" wordt op vier plekken beslist |
 | bevoegdheid | drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, `allowed` van de Edge-kern, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft |
 
@@ -201,7 +203,8 @@ stond de gebaarlaag er na ronde 1 niet op. Sinds ronde 2 leggen drie
 gelijk aan de schrijvers van capability-register met die aanroep als citaat, wie
 `data-rtg-world` op body zet staat erop als `wereld:s`, en wie
 `data-rtg-edge-2-state` op body zet als `zichtbaarheidsstand:s`. De eerste is
-de meter voor "het tweede register is leeg": die lijst op nul. Het is een
+de meter voor "het tweede register is leeg": die lijst staat sinds stap 18 op
+nul, en een zelfijking met een nagemaakt bestand houdt vast dat hij kan zakken. Het is een
 ondergrens (een samengestelde naam of een `CONTRACT`-veld ontsnapt; Edge 2 zelf
 staat er daarom met de hand op), elke uitzondering noemt bestand en reden (het
 actieregister van de werkruimte deelt alleen de naam `registerAction`; twee
@@ -221,18 +224,17 @@ Het oordeel dat daaruit volgt:
   bij de taal en niet bij een van de balken. Tot ronde 1 besliste het op twee plekken nog
   over betekenis: `registerAction` in de kern was een tweede register met een
   eigen uitvoerweg, en de adaptieve Edge vroeg met `window.confirm` in plaats van
-  langs het gewicht. `window.confirm` is weg, en het tweede register kent alleen
-  nog licht en voert uit langs `RTGGewicht.voer`; LEEG is het pas in ronde 2,
-  want vijf producenten vullen het nog (de tabel hierboven). Welke handelingen
+  langs het gewicht. `window.confirm` is weg (ronde 1), en het tweede register is er
+  sinds ronde 2 niet meer (stap 17 en 18; `test/edgeregister-leeg.test.js`
+  laadt kern en weergave en maakt de API zelf onmogelijk). Welke handelingen
   er zijn, leest het sinds ronde 0 niet meer zelf: `rtg-adaptive-edge-controls.js`
   vraagt ze aan het blikveld in plaats van `RTGAdaptief.voorNu()`.
-- **Het Edge-casco en Edge 2 zijn compat**: `registerAction` en de padtabel van
-  het casco zijn een tweede register naast `RTGAdaptief`. Dat register wordt in
-  ronde 0 niet verwijderd (dan verdwijnen er handelingen van schermen die er
-  vandaag op leunen) maar **zichtbaar gemaakt**: het blikveld toont zijn
-  handelingen met de herkomst `edge-compat`, en een handeling die daar
-  `allowed: false` staat zonder reden, draagt het gebrek `redenloos` in plaats
-  van stil uit de lijst te vallen.
+- **Het Edge-casco en Edge 2 zijn compat**: de padtabel van het casco is een
+  tweede bron naast `RTGAdaptief`. Ernaast stond tot ronde 2 ook
+  `registerAction`; dat werd in ronde 0 niet verwijderd maar **zichtbaar
+  gemaakt** (herkomst `edge-compat` in het blikveld), zodat eerst te zien was
+  wie erop leunde, en pas in ronde 2 weggehaald toen die producenten waren
+  overgegaan.
 - **Er zijn vandaag al twee contextmodellen, en een lezer.** "Geen derde
   contextmodel" betekent daarom niet dat er één is: `RTGAdaptief.context()` is
   de bron van wat een scherm over zichzelf zegt, en `RTGEdge.active.ctx` is het
@@ -655,7 +657,7 @@ een andere naam of in één domein, en het werk is aansluiten en niet uitvinden.
 | 21 | Work deck | stap weg | 2 | Besloten (besluit 10): het open werkstuk; Office is de eerste producent. |
 | 22 | Meeting deck | stap weg | 4 | Meet bestaat als domein met een meeleesbaan; de Edge krijgt er alleen een compat-handeling van. |
 | 23 | Creation deck | stap weg | 2 | Document, Sheet en Present publiceren al context en handelingen; sinds deze ronde werken hun bewuste handelingen ook in het Edge-blad buiten de schil. |
-| 24 | Edge-handelingen als capabilities | stap weg | 1 en 2 | `RTGAdaptief` is al een capabilityregister. Het tweede register (`registerAction`) kent sinds ronde 1 alleen licht en voert uit langs `RTGGewicht.voer`; leeg is het pas in ronde 2, als de drie schermen die erop leunen via `RTGAdaptief.declareer` publiceren. |
+| 24 | Edge-handelingen als capabilities | stap weg | 1 en 2 | `RTGAdaptief` is al een capabilityregister. Het tweede register (`registerAction`) is in ronde 2 weggehaald; zijn producenten publiceren via `RTGAdaptief.declareer` of vielen weg. |
 | 25 | Action contracts | stap weg | 3 | Het contract met vier standen staat, over alle combinaties getoetst. Risico, authenticatie en resultaat ontbreken; gezag, gevolg en herstel staan overal op onbekend. |
 | 26 | Risk-aware actions | stap weg | 3 | Gewicht wordt per scherm verklaard, niet uit risico berekend; de frictiemotor die dat per bedrag wel doet, hangt niet aan de Edge. |
 | 27 | Preview before commit | staat | 3 | Bewust, zwaar en plechtig laten eerst zien wat er gebeurt; zonder gewichtlaag gaan ze dicht. Het GEMETEN gevolg zit er nog niet in. |
@@ -700,7 +702,7 @@ nooit op "de functie staat erin".
 |---|---|---|
 | 0 — fundament | de kaart, het ene leespad, herkomst per waarde, het actiecontract, de dekkingsmeter en de ratels | **staat** (dit document) |
 | 1 — fundament verbreden | de dode kanalen gesloten of verwijderd, het tweede register alleen licht (uitvoering langs `RTGGewicht.voer`), elke hoofdactie in een blad zichtbaar voor de schil; en onderweg een antwoord op "wat weegt dit" en de gebaardrempels op een plek | **staat** (par. 11): 17 dode kanalen naar 0, dubbele eigenaars 12 naar 11; het tweede register is LICHT en nog niet LEEG (ronde 2) |
-| 2 — context | elk scherm publiceert wereld, context en (waar het er een heeft) object en activiteit; `RTGWorkspaceContext` leest het blikveld; het tweede register leeg (de drie schermen die erop leunen, publiceren via `RTGAdaptief.declareer`) | een stap weg |
+| 2 — context | volgens besluit K-reikwijdte: een REGEL met een schuldlijst en geen belofte over elk scherm. De wereld telt nooit als "zelf" en moet kloppen met `MAPPEN`; een scherm met een eigen hoofdactie publiceert zijn context zelf, of staat op `CONTEXT_SCHULD` (die alleen krimpt). `RTGWorkspaceContext` leest het blikveld; het tweede register is weg; het open document en bestand zijn een object | **staat** (par. 11): het tweede register is weg en de API kan niet stil terugkomen; context door het scherm zelf 1 naar 11 van 280 schermen; de schuldlijst staat op 49 van 51 (Bestanden en Comm gingen eraf); object alleen na openen (2 schermen, met reden verklaard); activiteit op 0. De dubbele eigenaars staan op 12, want het samenvoegen van de twee contextmodellen is na ronde 2 (besluit K-casco) |
 | 3 — actie en trust | het eerste serveroordeel per principal en capability, één vorm voor "waarom niet", de voorgrondresolver, gewicht afgedwongen in `RTGAdaptief.doe` | een stap weg, deels besluit |
 | 4 — voortzetting en realtime | voortzetting als contract (besluit 1), presence met echte producenten, een task stack | een stap weg; de servervariant vraagt een besluit |
 | 5 — Rahul | Rahul leest het blikveld en `waarom.js`, stelt handelingen voor uit het register, en beslist niets | een stap weg na ronde 3 |
@@ -748,7 +750,7 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
   `confirm` en elk gewicht boven licht (met een waarschuwing, nooit stil licht
   uitgevoerd), en een tik gaat via `K.voer` langs `RTGGewicht.voer`
   (`test/rtg-adaptive-edge.test.js`, en `test/edgeblikveld.e2e.js` stap 8 op een
-  echt scherm). Het register is LICHT en nog niet LEEG: dat is ronde 2;
+  echt scherm). In ronde 2 is het register daarna helemaal weggehaald (hieronder);
 - **ronde 1: een antwoord op "wat weegt dit".** `directMag()` gaf een onbekende
   trap licht terwijl `effectief()` hem zwaar maakt, en had geen aanroeper: weg.
   Drie plekken liepen daarnaast uiteen met de uitvoerder, en alle drie faalden ze
@@ -785,15 +787,56 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
   `blad:data-hoofdactie`, terug naar reizen weer `blad`, en de verklikker staat
   nu ook in het blad.
 
+**Ronde 2 (context), gerepareerd en met een toets die op een mutatie zakt:**
+
+- **het tweede register is weg.** Stap 17 (besluit K-bladlijst) haalde de zeven
+  vaste snelkoppelingen uit het blad -- elk bestond als balkknop, dus er werd
+  niets verborgen -- en de registratie van de hoofdactie door Signals (de
+  voortgangsmelding blijft). Stap 18 haalde `register`, `setProjection`,
+  `voer` en de lijstfuncties uit de kern (8320 naar 3898 bytes),
+  `registerAction` en `setProjection` uit de weergave en de `edge-compat`-lus
+  uit het blikveld. Er staat geen tand op een aantal:
+  `test/edgeregister-leeg.test.js` laadt de kern en de weergave echt en maakt
+  de API zelf onmogelijk. Een verhinderde handeling met haar reden woont alleen
+  nog in `adaptief/balkknop.js`, en de lege melding in het blad staat nooit
+  meer boven een gevulde lijst (`test/edgeblikveld.e2e.js` stap 8);
+- **Home op het wereldbureau overleeft een herstart van de Edge** (stap 14): de
+  haak is een annuleerbare gebeurtenis op `window` en hangt niet meer aan het
+  model; de herstartproef staat in `test/world-desktop.e2e.js`;
+- **de gebaarlaag leest de tabel voor lang drukken, stil en `scherp`** (stap
+  10): zonder tabel loopt er geen timer, en `gebaar-01.js` brengt de
+  grammatica zacht mee. De borgtijd van 800 ms blijft tot ronde 3 (besluit
+  K-borg);
+- **de Edge 1-vouwstand is weg** (stap 25), en Work vraagt de Edge 2-stand bij
+  een hashwissel via `setState` als automatiek (stap 11);
+- **`RTGWorkspaceContext` heeft geen eigen staat meer** (stap 23): hij leest het
+  blikveld op het moment van vragen, dus er is geen derde contextmodel meer;
+- **besluit 11 geldt ook voor bestaande schermen** (stap 24, K-reikwijdte): een
+  scherm met een eigen hoofdactie spreekt zijn context zelf of staat op
+  `CONTEXT_SCHULD` in `scripts/edgedekking.js`, en die lijst mag alleen
+  krimpen (`test/edgenieuwscherm.test.js`). Bestanden publiceert nu ook zonder
+  open bestand, en de lijst staat op 49;
+- **een gebrek dat alleen het samenvoegen liet zien.** Het sociaal-spoor zette
+  `adaptief/register.js` op negen schermen terwijl het object-spoor tegelijk
+  de vorm afsplitste naar `adaptief/vorm.js`; `register.js` stopt stil zonder
+  die vorm, dus na het samenvoegen had RTG Sociaal geen `RTGAdaptief` meer --
+  geen context en geen handeling in het blad, zonder foutmelding. Beide sporen
+  waren apart groen. `test/adaptiefdelen.test.js` bewaakte de volgorde al voor
+  vijf schermen en zakte; de negen staan er nu bij, en
+  `test/sociaal-edge.e2e.js` is weer groen.
+
 **Nagetrokken en open, met de ronde waarin ze horen:**
 
 | Gebrek | Waar | Ronde |
 |---|---|---|
 | modulefouten van de werkruimte bereiken geen diagnose: `o.error` is de enige haak en geen aanroeper geeft hem mee (het dode kanaal `rtg-workspace-error` verborg dat) | `interface/workspace-runtime.js` | besluit (foutmelder heeft een budget van 3 en een deur zonder inlog) |
-| de home-actie op de wereldbureaus hangt aan een observer die na de eerste keer losgaat; wordt de adaptieve Edge ooit opnieuw gestart, dan verdwijnt hij (vandaag start niets hem opnieuw) | `interface/world-desktop-home.js` | 2 |
 | `RTGAdaptief.doe()` kijkt alleen of iets verhinderd is, niet wat het weegt; wie hem rechtstreeks aanroept, slaat de bevestiging over | `adaptief/register.js` | 3 |
-| `gebaar.js` (op elk scherm met `basis.js`) heeft een eigen lang drukken van 520 ms en een borgtijd van 800 ms (sinds ronde 2 op de kaart, als beslisser naast de gebaarversheid van Edge 2; par. 1); naar de tabel halen vraagt eerst een meting van de wedloop in `test/helper.js` | `shared/gebaar/` | 2 |
-| vier standmachines voor wat er van de Edge te zien is (de vijfde, de Second Screen, bleek een indelingsfout: par. 1) | par. 1 | 2 |
+| `gebaar.js` houdt een eigen borgtijd van 800 ms naast `VASTHOUD`; lang drukken, stil en `scherp` lezen sinds ronde 2 de tabel (hierboven) | `shared/gebaar/` | 3 (besluit K-borg: de borg wordt `bewust`) |
+| DEELS: drie standmachines voor wat er van de Edge te zien is (Edge 2, zijn lader en de adaptieve balk). De vouwstand is weg, de indeling klopt (de Second Screen was er geen), en Work gaat via `setState`; ze delen nog geen stand | par. 1 | 3 |
+| de workspace-broker valt zonder eigen `confirm` terug op `window.confirm`: een bevestiging buiten de gewichtsgrammatica | `interface/workspace-broker.js` | 3 |
+| 'Nu relevant' kiest zijn handelingen met `RTGAdaptief.voorNu()` en niet via het blikveld | `interface/modules/context.js` | 3 |
+| het wereldbureau herstelt zich niet na een terugkeer uit de bfcache (gemeld door het wereld-spoor, graad `vermoed`, niet nagetrokken) | `interface/world-desktop-home.js` | open |
+| geen enkele `.html` laadt `site/platform-*.js` (dertien bestanden; vermoed dood, maar een lader in JavaScript is niet uitgesloten) | `public/site/` | open, eerst meten |
 | vier geheugens voor "waar was ik" die elkaar niet lezen | par. 1 | 4 |
 | "waarom niet" heeft aan de serverkant vijf vormen zonder gedeelde woorden, en `routes/stuur.js` maakt van elke weigering een kale `error` | `server/routes/stuur.js` | 3 |
 

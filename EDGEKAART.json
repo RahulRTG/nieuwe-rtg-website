@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T13:40:23.712Z",
-    "commit": "b197836",
+    "op": "2026-09-23T16:26:43.634Z",
+    "commit": "009728bf",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -1646,6 +1646,11 @@
           "rol": "beslist",
           "wat": "auto-peek bij scrollen",
           "citaat": "if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;"
+        },
+        {
+          "rol": "leest",
+          "wat": "de gebaarversheid van Edge 2, alleen waar Edge 2 draait",
+          "citaat": "if (gebaar && !e2.gestureFresh(gebaar)) return;"
         },
         {
           "rol": "beslist",
@@ -3324,7 +3329,7 @@
   },
   "telling": {
     "bestanden": 60,
-    "rollen": 193,
+    "rollen": 194,
     "dubbeleEigenaars": 11,
     "dodeKanalen": 0,
     "levendeKanalen": 13

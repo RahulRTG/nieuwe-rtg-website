@@ -122,6 +122,8 @@
   .doenkaart svg{width:2rem;height:2rem;stroke:var(--burgundy);fill:none;stroke-width:1.2;}
   .doenkaart b{font-size:.88rem;font-weight:600;}
   .doenkaart .uitleg{font-size:.78rem;}
+  /* wat een kaart zegt als hij je nog nergens heen kan brengen */
+  .doenreden{margin:0 0 .8rem;font-size:.85rem;line-height:1.5;color:var(--muted);}
   /* De pil brak over twee regels en liep daarmee door de rand van de kaart. */
   .doenkaart .pil{white-space:nowrap;align-self:center;}
   .doenkaart .heen{margin-top:auto;padding-top:.5rem;min-height:44px;display:flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:600;color:var(--rtg-goud,#C9A24B);}
@@ -230,6 +232,7 @@
   <div class="tweeluik">
     <section aria-labelledby="doenkop">
       <div class="buurtsec" id="doenkop">Wat kun je doen in jouw stad</div>
+      <p class="doenreden" id="doenReden" role="status" aria-live="polite" hidden></p>
       <div class="doen">
 
         <button type="button" class="doenkaart" data-heen="hulp">
@@ -496,6 +499,7 @@ async function toonStad(id, opties) {
     const r = await api('stad', { id });
     if (!actueel()) return false;
     GEKOZEN = id;
+    $('#doenReden').hidden = true;
     $('#steden').querySelectorAll('[data-stad]').forEach(k =>
       k.setAttribute('aria-pressed', k.dataset.stad === id ? 'true' : 'false'));
     tekenVrijePlekken(r.activiteiten);
@@ -540,10 +544,21 @@ document.querySelectorAll('[data-heen]').forEach(k => k.addEventListener('click'
   /* Nog geen stad: onthouden waar hij heen wilde en hem eerst laten kiezen.
      Zonder stad bestaat het blok niet, en een knop die naar niets springt is
      erger dan een knop die zegt wat er eerst moet. */
+  const eerste = $('#steden .buurtstad'), reden = $('#doenReden');
+  /* Zonder open afdeling is er geen stad om te kiezen: dan sprong deze kaart
+     naar "er is nog geen afdeling open" en zei hij zelf niets -- je tikte en
+     stond ergens anders zonder te weten waarom. Nu blijft hij staan en zegt
+     het, hier bij de kaart. */
+  if (!eerste) {
+    reden.textContent = 'Er is nog geen afdeling open in een stad. Zodra er een start, brengt deze kaart je erheen.';
+    reden.hidden = false;
+    return;
+  }
   WACHT = k.dataset.heen;
+  reden.textContent = 'Kies eerst hierboven je stad; daarna brengt deze kaart je erheen.';
+  reden.hidden = false;
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  const eerste = $('#steden .buurtstad');
-  if (eerste) eerste.focus({ preventScroll: true });
+  eerste.focus({ preventScroll: true });
 }));
 
 start();

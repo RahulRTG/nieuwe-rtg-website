@@ -651,7 +651,7 @@ async function tekenTeamVrienden(){
 }
 $('#teamMaak').addEventListener('click', async ()=>{
   const naam = $('#teamNaam').value.trim();
-  if (!naam) return;
+  if (!naam) { meld('Geef je team eerst een naam.'); $('#teamNaam').focus(); return; }
   try{
     await api('team-nieuw',{ naam, leden: teamGekozen });
     $('#teamNaam').value=''; teamGekozen = [];

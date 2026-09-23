@@ -827,7 +827,7 @@ ritwerelden -- welk model de waarheid is, is een besluit. En Talent & Hiring als
 verticaal stuit eerst op een weigering in code: `server/kern/wereld/lijsten.js`
 haalde `werving.suite` eruit omdat *een half aangezette wervingslaag gevaarlijker
 is dan een afwezige*. Par. 4 somt dertien fouten op die deze meting vond in de
-bestaande werklaag, waarvan vijf vandaag een mens raken: de Foundation-herkomst
+bestaande werklaag, waarvan vijf een mens raakten en op 23 september zijn gerepareerd: de Foundation-herkomst
 lekt via een ONTBREKEND veld (en `scripts/adamproef.js` schakel 8 is daar blind
 voor), "open voor werk" komt in het log van de huidige werkgever, payroll sorteert
 kandidaten op een score, `public/apps/foundation/werk.html` belooft *geen

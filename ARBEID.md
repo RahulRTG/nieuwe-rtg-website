@@ -300,7 +300,19 @@ uit de code afgeleid en niet beproefd.
     `GRAMMATICA.md`: *verhinderd is niet uitgeschakeld*. Voorstel 117 en 120 bouwen
     precies op dit patroon.
 
-Punten 1 tot en met 5 raken vandaag een mens. Die horen vóór alles in par. 7.
+Punten 1 tot en met 5 raakten een mens, en **zijn gerepareerd (23 september
+2026)**: `werkgeverSollicitatie` is een positieve lijst (`WERKGEVER_VELDEN` in
+`server/kern/werk.js`) en een Foundation-sollicitatie draagt `vacatureId` net als
+een ledenrij, met `test/werkgeversollicitatie.test.js` en een Adamproef-schakel 8
+die nu de sleutelset toetst (op de oude code zakt hij: *geen vacatureId, anders
+dan een lid*); de schakelaar "open voor werk" schrijft niet meer in het zaaklog;
+payroll geeft kandidaten redenen in woorden in plaats van een score, zonder
+sortering en zonder afkap op mensen; `foundation/werk.html` toont geen percentage
+meer; en de rustregel staat in `server/kern/beveiliging/rooster/rust.js` (elf uur,
+over de datumgrens), de automaat plant er nooit tegenin, een mens krijgt de
+botsing als waarschuwing, en elke dienst draagt `door`
+(`test/bevrust.test.js`). Of een MENS ook geweigerd moet worden bij te weinig
+rust, is een besluit en geen reparatie. Punten 6 tot en met 13 staan nog open.
 
 ---
 

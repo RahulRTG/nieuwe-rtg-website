@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T19:17:10.260Z",
-    "commit": "acc19e13",
+    "op": "2026-09-23T19:21:09.427Z",
+    "commit": "bf2f5c71",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 8,
     "instrument": "scripts/doorbelasting.js",
     "node": "v22.22.2"
   },
@@ -23,16 +23,16 @@
   "vorm": {
     "vormenTotaal": 1426,
     "geldvormen": 213,
-    "volgbaar": 30,
+    "volgbaar": 31,
     "perHerkomstveld": {
-      "bron": 15,
+      "bron": 16,
       "provider": 2,
       "aanbieder": 7,
       "herkomst": 1,
       "leverancier": 6,
       "economischeHerkomst": 4
     },
-    "nietVolgbaar": 183,
+    "nietVolgbaar": 182,
     "volgbareModules": [
       "server/kern/appbieb.js",
       "server/kern/betaalopdracht/index.js",
@@ -63,6 +63,7 @@
       "server/kern/rtfos/geld-uitgaven.js",
       "server/kern/rtfos/inkoop.js",
       "server/kern/wallet.js",
+      "server/kern/werkbetaling.js",
       "server/kern/werkplaats.js"
     ],
     "perModule": {
@@ -372,7 +373,7 @@
       },
       "server/kern/werkbetaling.js": {
         "geldvormen": 1,
-        "volgbaar": 0
+        "volgbaar": 1
       },
       "server/kern/werkplaats.js": {
         "geldvormen": 1,

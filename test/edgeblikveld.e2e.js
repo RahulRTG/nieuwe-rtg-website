@@ -27,8 +27,12 @@
       registerAction wordt geweigerd, en een tik op een lichte gaat precies een
       keer langs RTGGewicht.voer -- niet meer langs window.confirm.
 
+   3b. de WERKRUIMTE leest het blikveld (ronde 2): de Second Screen ziet dezelfde
+      context en hetzelfde object, en 'Nu relevant' toont de titel van het blad.
+
    DE MUTATIES, elk nagetrokken: laat de loader blikveld.js niet laden (1 zakt),
-   haal object uit zendContext in brug.js (3 zakt), laat de controls weer zelf
+   haal object uit zendContext in brug.js (3 zakt), toon in modules/context.js
+   de titel alleen bij herkomst 'scherm' (3b zakt: de titel verdwijnt), laat de controls weer zelf
    RTGAdaptief.voorNu() lezen (4 zakt: de balk tekent dan een handeling die
    acties() als AFWEZIG weglaat), laat de agendahoofdactie wegvallen (6 zakt),
    laat de loader de gewichtlaag overslaan (7 zakt), haal '.actief' uit de
@@ -110,6 +114,18 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'proef-1', label: '', velden: {} }, 'een object is een verwijzing (shared/objectverwijzing.js)');
     assert.deepEqual([l.velden.object.herkomst, l.velden.activiteit.herkomst], ['blad', 'blad'],
       'in de schil komt het object uit het blad, niet van een scherm dat hier zelf publiceert');
+
+    // 3b) De werkruimte van de Second Screen LEEST het blikveld (ronde 2, stap 23):
+    //     zelfde context en object, en 'Nu relevant' toont de titel van het blad.
+    const ss = await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand').__rtgSecondScreen.runtime;
+      const w = r.contextEngine.get().velden, b = RTGEdgeBlikveld.lees().velden;
+      const kop = document.querySelector('[data-rtg-module="context"] .rtg-ss-context strong');
+      return { werk: [w.context, w.object], blik: [b.context, b.object], kop: kop && kop.textContent };
+    });
+    assert.deepEqual(ss.werk, ss.blik, 'de werkruimte houdt geen eigen context naast het blikveld');
+    assert.ok(ss.blik[0].waarde.titel, 'het blad van reizen draagt een titel');
+    assert.equal(ss.kop, ss.blik[0].waarde.titel, "'Nu relevant' toont de titel van het open blad");
 
     // 4) De balk tekent wat acties() geeft, en elke handeling draagt een stand.
     /* De handelingen staan in het blad van de Edge, en dat tekent alleen als het

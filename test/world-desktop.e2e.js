@@ -59,6 +59,17 @@ test('four desktop worlds use one composition and one Edge; the mobile home stay
     assert.deepEqual(errors, []);
   } finally { await ctx.close(); }
 });
+test('the workspace context reads the Edge field of view: TravelOS by route', { skip }, async () => {
+  /* Ronde 2, stap 23: RTGWorkspaceContext houdt geen eigen staat meer en leest
+     het blikveld; op een los wereldbureau komt de wereld uit de route. */
+  const ctx = await context(null), page = await ctx.newPage();
+  try {
+    await open(page, '/apps/reizen.html');
+    await page.waitForFunction(() => !!window.RTGEdgeBlikveld && !!window.RTGWorkspaceContext);
+    const wereld = await page.evaluate(() => window.RTGWorkspaceContext().get().velden.wereld);
+    assert.deepEqual([wereld.waarde, wereld.herkomst], ['travel', 'route']);
+  } finally { await ctx.close(); }
+});
 test('native calendar and task widgets read and change actual persisted records', { skip }, async () => {
   const ctx = await context(), page = await ctx.newPage();
   try {

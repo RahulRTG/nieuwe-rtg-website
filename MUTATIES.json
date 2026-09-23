@@ -10235,6 +10235,14 @@
       "gezakt": 6,
       "geprobeerd": 2
     },
+    "workspace-context.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/interface/workspace-context.js",
+      "operator": "!==->===#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "workspace-voorkeur.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -8,6 +8,7 @@ const lees = p => fs.readFileSync(path.join(root, p), 'utf8');
 const JS = lees('public/shared/interface/second-screen-personal.js');
 const CSS = lees('public/shared/interface/second-screen-personal.css');
 const MODULES = lees('public/shared/interface/second-screen-modules.js');
+const CONTEXT = lees('public/shared/interface/modules/context.js');
 const TRAVEL = lees('public/shared/interface/modules/travel.js');
 const EMPTY = lees('public/shared/interface/workspace-empty.js');
 const LEEG = lees('public/shared/leeg.js');
@@ -72,7 +73,7 @@ test('de persoonlijke voorzijde heeft vier echte snelle deuren', () => {
   assert.match(JS, /\/apps\/ik\.html#persoonlijk/);
   assert.match(JS, /\/apps\/juridisch\/privacy\.html/);
   assert.match(JS, /\/apps\/comm\.html/);
-  assert.match(MODULES, /Geen actie nodig\. Rahul houdt de rest in de gaten\./);
+  assert.match(CONTEXT, /Geen actie nodig\. Rahul houdt de rest in de gaten\./);
 });
 
 test('lege informatie is één familie en opent meteen de juiste invullaag', () => {

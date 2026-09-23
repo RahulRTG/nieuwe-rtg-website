@@ -290,14 +290,16 @@ const KAART = [
   /* De Second Screen stond hier als schrijver en beslisser van de
      zichtbaarheidsstand. Zijn stand (peek, panel, workspace, focus) gaat over de
      bank van de schil (.cmd-bank) en niet over de Edge: een INDELINGSCORRECTIE in
-     ronde 2, geen samenvoeging (EDGE.md par. 1). */
-  ['interface/second-screen.js', 'schil', 'vluchtige-context:l', [
-    ['leest', 'vluchtige-context:l', 'context van het bovendocument', 'return w.RTGAdaptief && w.RTGAdaptief.context ? w.RTGAdaptief.context() : {};']]],
-  ['interface/second-screen-modules.js', 'schil', 'vluchtige-context:l', [
-    ['leest', 'vluchtige-context:l', 'Nu relevant: de titel uit RTGAdaptief', 'function laatsteContext() { return (A && A.context && A.context()) || laatste || {}; }']]],
-  ['interface/workspace-context.js', 'schil', 'vluchtige-context:sb', [
-    ['schrijft', 'vluchtige-context:s', 'een eigen current naast RTGAdaptief', "current = next; var change = { value: get(), reason: reason || 'host-update' };"],
-    ['beslist', 'vluchtige-context:b', 'slikt een gelijke context', 'var next = clean(value); if (JSON.stringify(next) === JSON.stringify(current)) return get();']]],
+     ronde 2, geen samenvoeging (EDGE.md par. 1). Daarna las hij alleen nog
+     RTGAdaptief.context() om de werkruimtecontext te voeden; sinds stap 23 leest
+     die het blikveld zelf, dus staat de Second Screen niet meer op de kaart. */
+  ['interface/modules/context.js', 'schil', 'vluchtige-context:l', [
+    ['leest', 'vluchtige-context:l', 'Nu relevant: bron en acties voor context.updated', 'function laatsteContext() { return (A && A.context && A.context()) || laatste || {}; }'],
+    ['leest', 'vluchtige-context:l', 'Nu relevant: de titel uit de werkruimtecontext', 'var v = ctx.context().velden, c = v && v.context;']]],
+  /* Sinds ronde 2 (stap 23) een LEZER van het blikveld zonder eigen staat: de
+     eigen current en de ontdubbeling zijn weg, dus hij schrijft en beslist niets. */
+  ['interface/workspace-context.js', 'schil', 'vluchtige-context:l', [
+    ['leest', 'vluchtige-context:l', 'vier velden uit het blikveld, op het moment van vragen', 'var b = B.lees(), velden = {};']]],
   ['interface/world-desktop-frame.js', 'schil', 'capability-register:l onderbalk:l identiteit:l', [
     ['projecteert', 'capability-register:l', 'oogst handelingen uit het frame', 'var A = scope.win.RTGAdaptief, items = A && A.voorNu ? A.voorNu() : [];'],
     ['schrijft', 'onderbalk:l', 'laat de Edge frame-balken claimen', 'if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(doc, win);'],
@@ -400,7 +402,7 @@ const KAART = [
    zakken: dan is de verklaring bij de afleiding achtergebleven. */
 const WAAROM = {
   'capability-register': 'Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij, gevuld door vier producenten: zijn eigen standaardingangen, Signals (primary), de sociale runtime (social-context) en het wereldbureau (home); de landing viel eruit in ronde 2 (stap 15), leeg in ronde 2. De controls oogsten paginaknoppen als derde bron.',
-  'vluchtige-context': 'Drie contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie), RTGEdge.active.ctx (scope, titel, actie, tool) en RTGWorkspaceContext (een eigen current, gevoed uit de eerste, met een eigen ontdubbeling); reizen-performance.js voedt de eerste twee allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen), de brug (actief blad) en de werkruimte (gelijk wordt geslikt) elk apart.',
+  'vluchtige-context': 'Twee contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie) en RTGEdge.active.ctx (scope, titel, actie, tool); tot ronde 2 was er een derde, RTGWorkspaceContext met een eigen current en een eigen ontdubbeling, en sinds stap 23 is dat een lezer van het blikveld zonder eigen staat; reizen-performance.js voedt de eerste twee allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen) en de brug (actief blad) elk apart.',
   wereld: 'De huidige wereld wordt op vier plekken BEPAALD: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco. GESCHREVEN wordt hij op meer: rtg-world-identity.js bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, en de landing zet hem per scene vanuit drie scripts.',
   'trust-rail': 'Verbinding en beveiliging worden op drie plekken zelf afgeleid en elk op een eigen strook getoond: RTGRail (navigator.onLine), het statuspaneel van de casco (/api/ready, Beveiligd) en de Intelligence-strook (protocol als ONLINE / TLS); geen van drie leest een ander.',
   voortzetting: 'Vier geheugens voor waar was ik: continueWith (alleen in het model van de Edge), de werktafelbladen (localStorage), de routecontext (sessionStorage, 24 uur) en Recent bezocht van het slimme menu (sessionStorage); geen van vier leest een ander.',

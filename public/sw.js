@@ -53,7 +53,7 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
   '/apps/app.html?pas=rtg', '/apps/app.html?pas=lifestyle', '/apps/app.html?pas=business',
   '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js',
   '/shared/interface/second-screen.css', '/shared/interface/second-screen-personal.css', '/shared/interface/workspace-empty.js', '/shared/interface/second-screen-modules.js',
-  '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
+  '/shared/interface/modules/context.js', '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
   /* DE TAAL HOORT BIJ DE SCHIL. Zonder i18n.js opent een offline start altijd
      in het Nederlands, ook voor wie zijn taal allang gekozen had -- de laag die
      de tekst omzet was er domweg niet. En zonder de schilbestanden heeft die

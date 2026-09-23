@@ -137,9 +137,15 @@ platformmodel vormen:
 global     thema, taal, device
 user       rechten, voorkeuren, opgeslagen workspaces
 session    online, authenticatie, actief device
-workspace  layout, actieve module, surface, context
+workspace  layout, actieve module, surface
 module     eigen draft, filters, scroll- en domeincontext
 ```
+
+De context staat niet in de state. De Context Engine
+(`workspace-context.js`) houdt geen eigen kopie maar leest het Edge Blikveld op
+het moment van vragen: een module vraagt `context.context()` en krijgt wereld,
+context, object en activiteit met hun herkomst, of `velden: null` met de reden
+(EDGE.md par. 1).
 
 Modules mogen alleen hun eigen `module`-vak schrijven. Workspacecompositie
 reist via het account tussen apparaten. Brondata en gevoelige inhoud blijven

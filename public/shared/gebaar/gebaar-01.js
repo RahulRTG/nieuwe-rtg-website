@@ -54,6 +54,24 @@
     (d.head || d.documentElement).appendChild(l);
   }
 
+  /* DE GRAMMATICA KOMT OOK MEE, maar pas als er iets te vegen valt. Lang drukken
+     en stilstaan lezen hun drempel uit DREMPELS in shared/adaptief/grammatica.js
+     (EDGE.md par. 11), en zonder die tabel loopt er geen timer. basis.js laadt
+     hem niet, en als blad in de werktafel kregen vijf van de negen
+     gebaarschermen hem nooit. Daarom brengt de laag hem zelf mee, bij de eerste
+     zet() of lijst() -- in rust doet deze laag niets. Een keer, en niet als hij
+     er al is of al onderweg: grammatica.js heeft zelf geen grendel tegen dubbel
+     laden, en een tweede lading maakt een tweede tabel. */
+  function grammaticaZacht() {
+    if (window.RTGGrammatica || d.querySelector('script[src^="/shared/adaptief/grammatica.js"]')) return;
+    var s = d.createElement('script');
+    s.src = '/shared/adaptief/grammatica.js'; s.async = true;
+    (d.head || d.documentElement).appendChild(s);
+  }
+  /* De tabel wordt GELEZEN op het moment dat een gebaar begint, nooit bewaard:
+     wie hem bij het laden kopieert, heeft de kopie waar ronde 1 er zes van opruimde. */
+  function drempels() { var G = window.RTGGrammatica; return G && G.DREMPELS; }
+
   /* ------------------------------------------------------------- tekens --
      Eigen set, 24x24 grid, een lijndikte (ONTWERP.md par. 13). Ze staan hier en
      niet in shared/glyf.js omdat die set over APPS gaat (bellen, salon, wallet)

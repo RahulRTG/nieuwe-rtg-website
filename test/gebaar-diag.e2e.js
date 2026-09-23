@@ -110,6 +110,14 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
       // het klembord is in een kale browser niet toegestaan; we luisteren mee
       navigator.clipboard.writeText = (x) => { window.__plak = x; return Promise.resolve(); };
     }, REGEL('Nieuwe presentatie', 'doc86af40638634') + REGEL('Nieuw document', 'docefe8bb102fbb'));
+    await page.evaluate(() => { window.__in = performance.now(); window.__weg = []; window.__js = []; new MutationObserver((ms) => { for (const m of ms) for (const n of m.removedNodes) if (n.classList && n.classList.contains('reis')) window.__weg.push(Math.round(performance.now() - window.__in)); }).observe(document.querySelector('#werkdag'), { childList: true });
+      window.__scroll = []; addEventListener('scroll', (e) => window.__scroll.push(Math.round(performance.now() - window.__in) + ':' + Math.round(scrollY) + ':' + (e.target === document ? 'doc' : (e.target.id || e.target.className || e.target.tagName))), true);
+      const t = (n) => (...a) => { window.__js.push(Math.round(performance.now() - window.__in) + ' ' + n + ' ' + (new Error().stack || '').split('\n').slice(2, 5).join(' | ')); };
+      for (const [o, n] of [[Element.prototype, 'scrollIntoView'], [Element.prototype, 'scrollTo'], [Element.prototype, 'scrollBy'], [window, 'scrollTo'], [window, 'scrollBy'], [HTMLElement.prototype, 'focus']]) { const orig = o[n]; o[n] = function (...a) { t(n)(); return orig.apply(this, a); }; }
+      const naam = (el) => el ? (el.id || String(el.className || el.tagName)).slice(0, 30) : '-';
+      for (const n of ['pointerdown', 'pointerup', 'click', 'mousedown', 'mouseup']) document.addEventListener(n, (e) => { const t0 = Math.round(performance.now() - window.__in); setTimeout(() => window.__js.push(t0 + ' ' + n + ' ' + naam(e.target) + (e.isTrusted ? '' : ' synth') + ' x' + Math.round(e.clientX) + (e.defaultPrevented ? ' prevented' : '')), 0); }, true);
+      document.addEventListener('focusin', (e) => window.__js.push(Math.round(performance.now() - window.__in) + ' focusin ' + (e.target.id || e.target.className || e.target.tagName)), true);
+    });
 
     // 1. de laag herkent de regels zelf, zonder dat het scherm ze aanmeldt
     await page.waitForSelector('#werkdag .reis.gb-rij', { timeout: 5000 });
@@ -130,13 +138,16 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     const doos = await rij.boundingBox();
 
     // 2. halve veeg naar links -> de rechterlade blijft open staan, niets gebeurt
-    await veeg(page, await maat(rij), -140, true);
+    const WEG = await veeg(page, await maat(rij), -140, true);
     await ladeOpen(page);
     assert.deepEqual(await laden(page), { kant: 'rechts', gereed: false, acties: ['Openen', 'Delen'] },
       'een halve veeg naar links hoort de rechterlade te openen zonder iets uit te voeren');
 
     // 3. een tik op een actie sluit de lade en opent de regel NIET
-    await page.locator('#werkdag .gb-lade .gb-doe').nth(1).click();
+    const DIAG = () => page.evaluate(() => ({ nu: Math.round(performance.now() - window.__in), weg: window.__weg, scroll: window.__scroll.slice(0, 30), js: window.__js.slice(0, 60), lg: (() => { const l = document.querySelector('#werkdag .gb-lade'); const d = l && l.querySelectorAll('.gb-doe')[1]; if (!d) return null; const r = d.getBoundingClientRect(); const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return { r: [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)], top: top ? (top.className || top.tagName) : null, greep: !!document.querySelector('.gb-greep') }; })(), rijen: document.querySelectorAll('#werkdag .reis').length, lade: !!document.querySelector('#werkdag .gb-lade') })).catch((e) => e.message);
+    const voor = await DIAG();
+    try { await page.locator('#werkdag .gb-lade .gb-doe').nth(1).click({ timeout: 4000 }); } catch (e) { console.log('DIAG', WEG, JSON.stringify(voor), JSON.stringify(await DIAG())); throw e; }
+    if (!/kantoor\.html/.test(page.url())) console.log('DIAG-NAV', WEG, JSON.stringify(voor));
     await ladeDicht(page);
     assert.match(page.url(), /kantoor\.html/,
       'een tik in de lade mag niet doorlekken naar de link waar de regel zelf op zit');

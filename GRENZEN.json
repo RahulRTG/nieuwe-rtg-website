@@ -14,7 +14,8 @@
       "accKoppel",
       "accOntkoppel",
       "accRollen",
-      "accStart"
+      "accStart",
+      "kantoorIntrekking"
     ],
     "adres": [
       "adresZoek"
@@ -600,6 +601,7 @@
       "hardware",
       "ideeen",
       "invoer",
+      "kantoorIntrekking",
       "kluisAuth",
       "magnaatLeren",
       "mail",
@@ -664,7 +666,9 @@
       "balieZoek",
       "boardroomAuth",
       "magBalie",
-      "zwaarbewijs"
+      "zwaarbewijs",
+      "beleidsmotor",
+      "kantoorIntrekking"
     ],
     "ledenregister": [
       "boardroomAuth",
@@ -1380,6 +1384,7 @@
       "assetHertaxeer",
       "assetKantoor",
       "assetTerugkoopUit",
+      "beleidsmotor",
       "boardroomAuth",
       "broadcastSync",
       "bureauBalie",

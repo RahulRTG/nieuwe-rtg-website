@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T16:26:43.634Z",
-    "commit": "009728bf",
+    "op": "2026-09-23T16:30:51.641Z",
+    "commit": "5cbd4559",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -2499,11 +2499,6 @@
           "rol": "schrijft",
           "wat": "tekst van de hoofdactie",
           "citaat": "hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;"
-        },
-        {
-          "rol": "schrijft",
-          "wat": "Edge 1-vouwstand",
-          "citaat": "d.body.classList.add('rtg-edge-fold')"
         }
       ],
       "verantwoordelijkheden": [
@@ -2521,10 +2516,6 @@
         },
         {
           "naam": "wereld",
-          "als": "schrijver"
-        },
-        {
-          "naam": "zichtbaarheidsstand",
           "als": "schrijver"
         }
       ],
@@ -3026,8 +3017,7 @@
         "public/shared/interface/second-screen.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/shared/rtg-edge-2-loader.js",
-        "public/shared/rtg-edge-2.js",
-        "public/shared/rtg-edge-system.js"
+        "public/shared/rtg-edge-2.js"
       ],
       "beslissers": [
         "public/shared/interface/second-screen.js",
@@ -3291,8 +3281,7 @@
         "public/shared/interface/second-screen.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/shared/rtg-edge-2-loader.js",
-        "public/shared/rtg-edge-2.js",
-        "public/shared/rtg-edge-system.js"
+        "public/shared/rtg-edge-2.js"
       ],
       "beslissers": [
         "public/shared/interface/second-screen.js",
@@ -3303,7 +3292,7 @@
         "public/shared/rtg-edge-2-loader.js",
         "public/shared/rtg-edge-2.js"
       ],
-      "waarom": "Vijf standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, de Edge 1-vouwstand en de Second Screen; ze delen geen stand."
+      "waarom": "Vier standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, en de Second Screen; ze delen geen stand. De Edge 1-vouwstand is in ronde 2 weggehaald."
     }
   ],
   "dodeKanalen": {
@@ -3329,7 +3318,7 @@
   },
   "telling": {
     "bestanden": 60,
-    "rollen": 194,
+    "rollen": 193,
     "dubbeleEigenaars": 11,
     "dodeKanalen": 0,
     "levendeKanalen": 13

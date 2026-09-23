@@ -76,10 +76,11 @@
     /* HET GEWICHT STAAT ERBIJ, en dat is geen versiering. Wie leest dat iets
        "vraagt bevestiging" weet vooraf waar hij aan begint; wie dat pas merkt als
        de lade opengaat, heeft het gevoel dat de software hem tegenhoudt. */
-    if (!it.verhinderd && it.gewicht && it.gewicht !== 'licht') {
+    var gr = w.RTGGrammatica, eg = gr && gr.effectief ? gr.effectief(it.gewicht, typeof it.ongedaan === 'function') : (it.gewicht || 'licht');
+    if (!it.verhinderd && eg !== 'licht') {
       var g = d.createElement('span');
       g.className = 'orb-weegt';
-      g.textContent = it.gewicht === 'terug' ? 'terug te draaien' : 'vraagt bevestiging';
+      g.textContent = eg === 'terug' ? 'terug te draaien' : 'vraagt bevestiging';
       r.appendChild(g);
     }
     r.onclick = function () {

@@ -163,7 +163,7 @@ wat er speelt omdat hij het op te veel plekken tegelijk weet.**
 | zichtbaarheidsstand | vijf standmachines (Edge 2, zijn loader, de adaptieve balk, de Edge 1-vouwstand, de Second Screen) die geen stand delen |
 | onderbalk | acht schrijvers van wat er onderin staat |
 | trust-rail | drie plekken leiden verbinding en beveiliging zelf af, elk op een eigen strook |
-| gewicht | de tabel en de regel staan in `grammatica.js`, maar drie plekken hebben een eigen standaard `licht`, de regel voor "zonder gewichtlaag" staat drie keer apart (balk, orb, actiestaat -- sinds deze ronde gaan ze wel alle drie dicht), en de Edge-kern laat in zijn tweede register alleen licht toe |
+| gewicht | de tabel en de regel staan in `grammatica.js`, en sinds ronde 1 lezen de uitleg en de orb het werkelijke gewicht uit `effectief()`; twee plekken hebben nog een eigen standaard `licht` voor een ONTBREKEND gewicht (`adaptief.js`, `brug.js`), de regel voor "zonder gewichtlaag" staat drie keer apart (balk, orb, actiestaat; de werkmodus gaat sinds ronde 1 via de balk), en de Edge-kern laat in zijn tweede register alleen licht toe |
 | waarom | de vijf bronnen staan twee keer (`grammatica.js` en `waarom.js`), en "verhinderd gaat niet door" wordt op vier plekken beslist |
 | gebaar-drempel | lang drukken is 480 ms in de balk en de orb en 620 ms in de adaptieve balk |
 | bevoegdheid | drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, `allowed` van de Edge-kern, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft |
@@ -652,7 +652,20 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
   `confirm` en elk gewicht boven licht (met een waarschuwing, nooit stil licht
   uitgevoerd), en een tik gaat via `K.voer` langs `RTGGewicht.voer`
   (`test/rtg-adaptive-edge.test.js`, en `test/edgeblikveld.e2e.js` stap 8 op een
-  echt scherm). Het register is LICHT en nog niet LEEG: dat is ronde 2.
+  echt scherm). Het register is LICHT en nog niet LEEG: dat is ronde 2;
+- **ronde 1: een antwoord op "wat weegt dit".** `directMag()` gaf een onbekende
+  trap licht terwijl `effectief()` hem zwaar maakt, en had geen aanroeper: weg.
+  Drie plekken liepen daarnaast uiteen met de uitvoerder, en alle drie faalden ze
+  de verkeerde kant op. Zonder grammatica zette `register.js` elk gewicht op
+  licht, dus een zware handeling draaide met een tik (de eerdere zin hier dat de
+  balk, de orb en de actiestaat "alle drie dichtgaan" klopte daardoor niet: zij
+  kregen `licht` al binnen). De tweede trap van de werkmodus (`diepte.js`) voerde
+  zonder gewichtlaag alles uit, en gaat nu langs dezelfde `voer` als het dock. En
+  de uitleg (`waarom.js`) en de orb lazen het RUWE gewicht, dus een tikfout als
+  `zwaarr` beloofde "Gebeurt meteen." en `terug` zonder weg terug beloofde een
+  Ongedaan maken dat niet kwam; beide lezen nu `effectief()`. Vier
+  gedragstoetsen in `test/grammatica.test.js` draaien de echte modules in een vm
+  met een kleine nep-DOM, en zeven mutaties zijn nagetrokken.
 
 **Nagetrokken en open, met de ronde waarin ze horen:**
 
@@ -661,7 +674,6 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
 | modulefouten van de werkruimte bereiken geen diagnose: `o.error` is de enige haak en geen aanroeper geeft hem mee (het dode kanaal `rtg-workspace-error` verborg dat) | `interface/workspace-runtime.js` | besluit (foutmelder heeft een budget van 3 en een deur zonder inlog) |
 | de home-actie op de wereldbureaus hangt aan een observer die na de eerste keer losgaat; wordt de adaptieve Edge ooit opnieuw gestart, dan verdwijnt hij (vandaag start niets hem opnieuw) | `interface/world-desktop-home.js` | 2 |
 | `RTGAdaptief.doe()` kijkt alleen of iets verhinderd is, niet wat het weegt; wie hem rechtstreeks aanroept, slaat de bevestiging over | `adaptief/register.js` | 3 |
-| een onbekende trap is in `directMag()` licht en in `effectief()` zwaar; `directMag` heeft geen aanroeper, maar twee antwoorden op dezelfde vraag horen niet naast elkaar te staan | `adaptief/grammatica.js` | 1 |
 | lang drukken is 480 ms in de balk en de orb en 620 ms in de adaptieve balk | par. 1 | 1 |
 | vijf standmachines voor wat er van de Edge te zien is | par. 1 | 2 |
 | vier geheugens voor "waar was ik" die elkaar niet lezen | par. 1 | 4 |

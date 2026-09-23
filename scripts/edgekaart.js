@@ -60,11 +60,11 @@ const KAART = [
     ['schrijft', 'de leer als globale', 'root.RTGAdaptiefLeer = leer;'],
     ['beslist', 'keuring: bureau wel, telefoon niet', 'if (opBureau && !(c.vormen.telefoon || []).length) {'],
     ['beslist', 'standaardgewicht licht', "c.gewicht = (spec && spec.gewicht) || 'licht';"]]],
-  ['adaptief/register.js', 'grammatica-kern', 'capability-register:s vluchtige-context:sb gewicht:b waarom:b', [
+  ['adaptief/register.js', 'grammatica-kern', 'capability-register:s vluchtige-context:sb gewicht:l waarom:b', [
     ['schrijft', 'declaratie, laatste wint', 'caps[c.id] = c;'],
     ['schrijft', 'context naar de luisteraars', 'luisterCtx.slice().forEach(function (f) { try { f(nu); } catch (e) {} });'],
     ['beslist', 'slikt een gelijke context', 'if (v.sleutel === nu.sleutel) return nu;'],
-    ['beslist', 'zonder grammatica elke trap licht', "if (!gram && c.gewicht && c.gewicht !== 'licht') {"],
+    ['leest', 'zonder grammatica een gebrek; het gewicht blijft', "if (!gram && c.gewicht && c.gewicht !== 'licht') {"],
     ['beslist', 'verhinderd gaat niet door', 'return !((st && st.verhinderd) || c.verhinderd);']]],
   ['adaptief/grammatica.js', 'grammatica-kern', 'gewicht:sb waarom:sb gebaar-drempel:s', [
     ['schrijft', 'de vijf trappen', 'var GEWICHT = {'],
@@ -103,7 +103,7 @@ const KAART = [
   ['adaptief/waarom.js', 'trust', 'waarom:sb gewicht:l', [
     ['schrijft', 'tweede lijst van de vijf bronnen', 'var BRONWOORD = {'],
     ['beslist', 'eigen stap, los of niets aan te doen', "else regel(lijf, 'Hier kunt u zelf niets aan veranderen.', 'wm-stap');"],
-    ['projecteert', 'belofte per gewicht', "regel(lijf, BELOFTE[it.gewicht || 'licht'] || BELOFTE.licht, 'wm-belofte');"]]],
+    ['projecteert', 'belofte volgt het effectieve gewicht', "regel(lijf, BELOFTE[gram && gram.effectief ? gram.effectief(it.gewicht"]]],
   ['adaptief/rail.js', 'trust', 'trust-rail:sb vluchtige-context:l', [
     ['leest', 'de rail uit de context', 'var uit = (ctx && Array.isArray(ctx.rail) ? ctx.rail : []).slice();'],
     ['leest', 'meet zelf de verbinding', 'if (w.navigator && w.navigator.onLine === false) {'],
@@ -316,7 +316,7 @@ const WAAROM = {
   'trust-rail': 'Verbinding en beveiliging worden op drie plekken zelf afgeleid en elk op een eigen strook getoond: RTGRail (navigator.onLine), het statuspaneel van de casco (/api/ready, Beveiligd) en de Intelligence-strook (protocol als ONLINE / TLS); geen van drie leest een ander.',
   voortzetting: 'Vier geheugens voor waar was ik: continueWith (alleen in het model van de Edge), de werktafelbladen (localStorage), de routecontext (sessionStorage, 24 uur) en Recent bezocht van het slimme menu (sessionStorage); geen van vier leest een ander.',
   hoofdactie: 'De library maakt de knop, de casco en de Edge 2-loader (padtabel) zetten tekst en actie, de Continue Key herbouwt inhoud en anker en de controls verhuizen hem; het scherm wijst intussen zijn eigen data-hoofdactie aan, en het blikveld meldt het verschil als hoofdactie-dubbel.',
-  gewicht: 'De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: drie keer een eigen standaard licht (adaptief.js, register.js zonder grammatica, brug.js), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), en de Edge-Core laat in zijn tweede register alleen licht toe.',
+  gewicht: 'De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: twee keer een eigen standaard licht voor een ONTBREKEND gewicht (adaptief.js, brug.js; register.js laat het gewicht sinds ronde 1 staan), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), en de Edge-Core laat in zijn tweede register alleen licht toe.',
   waarom: 'De vijf bronnen staan twee keer (BRONNEN in grammatica.js, BRONWOORD in waarom.js), en verhinderd-gaat-niet-door wordt beslist in register.js, balkknop.js, orb.js en actiestaat.js naast de uitleg in grammatica.js en waarom.js.',
   zichtbaarheidsstand: 'Vijf standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, de Edge 1-vouwstand en de Second Screen; ze delen geen stand.',
   onderbalk: 'Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, en RTGDaily die zelf een Edge-balk ophangt.',

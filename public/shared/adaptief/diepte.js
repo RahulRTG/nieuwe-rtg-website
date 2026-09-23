@@ -86,11 +86,7 @@
           t.textContent = it.label || '';
           r.appendChild(t);
           r.appendChild(d.createTextNode(it.naam));
-          r.onclick = function () {
-            L.sluit();
-            if (w.RTGGewicht) w.RTGGewicht.voer(it);
-            else A.doe(it.id);
-          };
+          r.onclick = function () { L.sluit(); k.voer(it); };   // dezelfde weg als het dock
           lijf.appendChild(r);
         });
       }

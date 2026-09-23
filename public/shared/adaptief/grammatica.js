@@ -158,13 +158,6 @@
     return uit;
   }
 
-  /* Mag deze handeling zonder meer gebeuren zodra iemand tikt? Alleen de twee
-     lichtste trappen. De rest gaat langs shared/adaptief/gewicht.js. */
-  function directMag(gewicht) {
-    var G = GEWICHT[gewicht] || GEWICHT.licht;
-    return !G.vraagt;
-  }
-
   /* Het gewicht dat een handeling WERKELIJK krijgt, op een plek zodat gewicht.js
      (dat uitvoert) en edge/actiestaat.js (dat toont) nooit uit elkaar lopen:
      `terug` zonder weg terug is `bewust`, en een onbekende trap is `zwaar` --
@@ -176,8 +169,7 @@
   }
 
   var gram = { GEBAREN: GEBAREN, GEWICHT: GEWICHT, TRAPPEN: TRAPPEN, VASTHOUD: VASTHOUD,
-    BRONNEN: BRONNEN, verhindering: verhindering, uitleg: uitleg, keur: keur, directMag: directMag,
-    effectief: effectief };
+    BRONNEN: BRONNEN, verhindering: verhindering, uitleg: uitleg, keur: keur, effectief: effectief };
 
   if (typeof module !== 'undefined' && module.exports) { module.exports = gram; return; }
   root.RTGGrammatica = gram;

@@ -87,7 +87,8 @@
           else if (h.los) regel(lijf, 'Dit kan veranderen zodra hierboven iets is opgelost.', 'wm-stap');
           else regel(lijf, 'Hier kunt u zelf niets aan veranderen.', 'wm-stap');
         } else {
-          regel(lijf, BELOFTE[it.gewicht || 'licht'] || BELOFTE.licht, 'wm-belofte');
+          // wat gewicht.js doet, niet wat er gedeclareerd staat (onbekend: geen belofte)
+          regel(lijf, BELOFTE[gram && gram.effectief ? gram.effectief(it.gewicht, typeof it.ongedaan === 'function') : (it.gewicht || 'licht')], 'wm-belofte');
           if (it.groep) regel(lijf, 'Hoort bij: ' + it.groep, 'wm-stap');
           /* De handeling staat er ook als KNOP: wie lang drukt om te kijken wat
              iets is, wil het daarna vaak gewoon doen, en hem terugsturen naar de

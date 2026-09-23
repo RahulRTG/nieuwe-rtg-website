@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-23T14:22:51.394Z",
-  "commit": "1f0365c",
+  "op": "2026-09-23T15:05:23.144Z",
+  "commit": "bb6541b",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,18 +10,18 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4994,
-  "geclassificeerd": 4994,
+  "totaal": 4995,
+  "geclassificeerd": 4995,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1201,
+   "NOT_APPLICABLE": 1202,
    "PROTECTED": 467,
    "INTENTIONALLY_NON_IDEMPOTENT": 136
   },
-  "vastgesteldDoorMens": 1853,
+  "vastgesteldDoorMens": 1854,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4113,
+   "AUTHENTICATED": 4114,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 737,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 22
+   "niet gemeten": 23
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -57074,6 +57074,27 @@
   {
    "mutatieId": "office.beleidsmotor",
    "route": "POST /api/office/beleidsmotor",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.beleidsmotor.review",
+   "route": "POST /api/office/beleidsmotor/review",
    "semantiek": {
     "klasse": "idempotent"
    },

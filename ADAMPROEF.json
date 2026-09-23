@@ -1,14 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:40:40.563Z",
-    "commit": "b9ef5d31",
+    "op": "2026-09-23T12:07:57.200Z",
+    "commit": "afd11e9dc",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/adamproef.js",
     "node": "v22.22.2"
   },
   "uitleg": "Een keten rond een jongere van 17 zonder RTG-account: van een doel naar een mogelijkheid die hij zelf ziet. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Vierde keten naast tafel-, rit- en toelatingsproef; met opzet geen gedeelde module -- zie MAATSTAF.md par. 7 en scripts/ketenvorm.js.",
-  "grens": "Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen). De andere terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt kind; deze proef zegt niets over of de mens dit ook zo beleeft.",
+  "grens": "Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen -> team -> contract -> dienstverband -> loonrun). Vanaf schakel 14 loopt een volwassen lid door waar Adam niet verder kan; goedkeuren en uitbetalen van de loonrun zijn met opzet niet gelopen. De andere terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt kind; deze proef zegt niets over of de mens dit ook zo beleeft.",
   "schakels": [
     {
       "nr": 1,
@@ -18,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Zilveren Uil 1543",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Gouden Valk 1FE8",
       "fout": null,
       "ms": 0
     },
@@ -32,7 +32,7 @@
       "status": 200,
       "ziet": "de motor antwoordt het gezin: 1 wegen beoordeeld",
       "fout": null,
-      "ms": 6
+      "ms": 15
     },
     {
       "nr": 3,
@@ -44,18 +44,19 @@
       "status": 200,
       "ziet": "3 wegen, volgorde ongewijzigd: true, geblokkeerde weg blijft staan met \"heb ik een startkwalificatie\"",
       "fout": null,
-      "ms": 7
+      "ms": 14
     },
     {
       "nr": 4,
       "van": "mens",
       "naar": "knelpuntmotor",
-      "wat": "noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan",
-      "bekend": "WAT ONTBREEKT: een bron die uit een DOEL de MANIEREN samenstelt. DEZE REDEN IS SINDS 13 SEPTEMBER 2026 SMALLER GEWORDEN EN NIET WEGGEVALLEN, en dat verschil is de moeite waard. Er is nu wel aanvoer (kern/knelpunt/aanvoer*.js, twee bronnen), maar die levert VONDSTEN bij een RANDVOORWAARDE -- wat zou dit knelpunt kunnen opheffen -- en geen WEGEN bij een kaal doel. Wie \"ik wil weer aan het werk\" intikt, heeft nog steeds zelf de manieren te bedenken; pas daarna vindt het huis er iets bij. WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. WIE EROVER GAAT: de eigenaar. De stap die nog ontbreekt is klein en eerlijk te benoemen: van een doel naar een handvol manieren, zonder ze te rangschikken.",
-      "stand": "openBekend",
-      "status": 400,
-      "antwoord": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
-      "ms": 4
+      "wat": "noemt alleen een doel; dit huis stelt de mogelijke wegen samen uit zijn eigen bronnen",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "de motor gaf 3 wegen bij een kaal doel (via-werk, via-opleiding, via-opvang), samengesteld door het huis: true, geen ervan heet \"open\": true",
+      "fout": null,
+      "ms": 5
     },
     {
       "nr": 5,
@@ -65,9 +66,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature d385839a, minimumleeftijd 16",
+      "ziet": "vacature 62fec4b0, minimumleeftijd 16",
       "fout": null,
-      "ms": 6
+      "ms": 9
     },
     {
       "nr": 6,
@@ -79,7 +80,7 @@
       "status": 200,
       "ziet": "1 vacatures zichtbaar, magSolliciteren: true",
       "fout": null,
-      "ms": 4
+      "ms": 9
     },
     {
       "nr": 7,
@@ -91,7 +92,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 8
+      "ms": 10
     },
     {
       "nr": 8,
@@ -101,9 +102,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie 0e24afc8, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie 15fc5f36, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
-      "ms": 9
+      "ms": 13
     },
     {
       "nr": 9,
@@ -115,7 +116,7 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 20
+      "ms": 24
     },
     {
       "nr": 10,
@@ -127,7 +128,7 @@
       "status": 200,
       "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Uw personeelsuitnodiging staat ...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 23
+      "ms": 20
     },
     {
       "nr": 11,
@@ -139,7 +140,7 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 1
+      "ms": 2
     },
     {
       "nr": 12,
@@ -149,9 +150,68 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "opleiding + werk; 25 vondsten in 1 vorm; werk 1/1, opleiding 24/20000",
+      "ziet": "opleiding + opvang + werk; 26 vondsten in 1 vorm; werk 1/1, opleiding 24/20000, opvang 1/1",
       "fout": null,
-      "ms": 7
+      "ms": 9
+    },
+    {
+      "nr": 13,
+      "van": "werkgever",
+      "naar": "Adam",
+      "wat": "maakt van de aanname een plek in het team",
+      "bekend": "een Foundation-profiel heeft geen eigen RTG-account, en een aanname claimen eist er een (/api/werving/verbind). De aanname eindigt bij een kassacode die de werkgever met de hand moet doorgeven; een zeventienjarige in een gezin komt zo niet in het team. Besluit 1 van ARBEID.md par. 7a (employment is de waarheid) moet hier een weg voor krijgen.",
+      "stand": "openBekend",
+      "status": 200,
+      "ziet": "Adam staat niet in het team (2 mensen)",
+      "fout": null,
+      "ms": 2
+    },
+    {
+      "nr": 14,
+      "van": "werkgever",
+      "naar": "lid",
+      "wat": "neemt een volwassen lid aan; dat staat meteen in het team",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "direct in dienst, personeelsnummer 184",
+      "fout": null,
+      "ms": 138
+    },
+    {
+      "nr": 15,
+      "van": "werkgever",
+      "naar": "huis",
+      "wat": "legt het arbeidscontract vast",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "1 contractversie(s), vanaf 2026-09-01",
+      "fout": null,
+      "ms": 11
+    },
+    {
+      "nr": 16,
+      "van": "huis",
+      "naar": "lid",
+      "wat": "maakt van de aanname een dienstverband bij de entiteit (employment)",
+      "bekend": "de werving eindigt bij een personeelsnummer aan een ZAAK (staffId); er ontstaat geen employment aan een entiteit, en kern/payroll leest employment nergens. Dat is de naad uit ARBEID.md par. 3, en besluit 1 van par. 7a zegt aan welke kant hij dicht moet: een brug van staffId naar employment die een kant op loopt.",
+      "stand": "openBekend",
+      "status": 200,
+      "ziet": "geen dienstverband: \"U heeft nog geen werkplek. Een werkgever nodigt u uit; dat is gratis.\"",
+      "fout": null,
+      "ms": 5
+    },
+    {
+      "nr": 17,
+      "van": "kantoor",
+      "naar": "lid",
+      "wat": "opent de loonrun; het contract levert een loonregel op",
+      "bekend": "de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen een Nederlands regelpakket (kern/payroll/jaargangen/nl-2026.json). Een loonrun voor een zaak buiten Nederland weigert dus, terecht en met de reden erbij: een tarief verzinnen is erger dan geen run. Wat ontbreekt is een Spaans regelpakket met een bron, geen code. Dat een run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js.",
+      "stand": "openBekend",
+      "status": 409,
+      "antwoord": "Er is geen regelpakket dat gold op 2026-09-01. Haal de jaargang binnen en merk hem aan.",
+      "ms": 14
     }
   ],
   "storingen": [
@@ -177,7 +237,7 @@
       "naam": "Adam solliciteert zonder een afgemaakt cv",
       "belofte": "wordt geweigerd met needCv, en laat geen rij achter bij de werkgever",
       "stand": "gehouden",
-      "wat": "status 409, needCv: true, rijen voor/na: 1/1"
+      "wat": "status 409, needCv: true, rijen voor/na: 2/2"
     },
     {
       "naam": "iemand solliciteert met de gezinscode van Adam en een vreemd token",
@@ -217,10 +277,10 @@
     "werkgever": "BRISA"
   },
   "telling": {
-    "schakels": 12,
-    "gesloten": 11,
+    "schakels": 17,
+    "gesloten": 14,
     "open": 0,
-    "openBekend": 1,
+    "openBekend": 3,
     "stuk": 0,
     "storingen": 9,
     "gehouden": 9,
@@ -230,12 +290,28 @@
   "sluitMetBevinding": true,
   "bevindingen": [
     {
-      "schakel": 4,
-      "van": "mens",
-      "naar": "knelpuntmotor",
-      "wat": "noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan",
-      "gemeten": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
-      "reden": "WAT ONTBREEKT: een bron die uit een DOEL de MANIEREN samenstelt. DEZE REDEN IS SINDS 13 SEPTEMBER 2026 SMALLER GEWORDEN EN NIET WEGGEVALLEN, en dat verschil is de moeite waard. Er is nu wel aanvoer (kern/knelpunt/aanvoer*.js, twee bronnen), maar die levert VONDSTEN bij een RANDVOORWAARDE -- wat zou dit knelpunt kunnen opheffen -- en geen WEGEN bij een kaal doel. Wie \"ik wil weer aan het werk\" intikt, heeft nog steeds zelf de manieren te bedenken; pas daarna vindt het huis er iets bij. WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. WIE EROVER GAAT: de eigenaar. De stap die nog ontbreekt is klein en eerlijk te benoemen: van een doel naar een handvol manieren, zonder ze te rangschikken."
+      "schakel": 13,
+      "van": "werkgever",
+      "naar": "Adam",
+      "wat": "maakt van de aanname een plek in het team",
+      "gemeten": "Adam staat niet in het team (2 mensen)",
+      "reden": "een Foundation-profiel heeft geen eigen RTG-account, en een aanname claimen eist er een (/api/werving/verbind). De aanname eindigt bij een kassacode die de werkgever met de hand moet doorgeven; een zeventienjarige in een gezin komt zo niet in het team. Besluit 1 van ARBEID.md par. 7a (employment is de waarheid) moet hier een weg voor krijgen."
+    },
+    {
+      "schakel": 16,
+      "van": "huis",
+      "naar": "lid",
+      "wat": "maakt van de aanname een dienstverband bij de entiteit (employment)",
+      "gemeten": "geen dienstverband: \"U heeft nog geen werkplek. Een werkgever nodigt u uit; dat is gratis.\"",
+      "reden": "de werving eindigt bij een personeelsnummer aan een ZAAK (staffId); er ontstaat geen employment aan een entiteit, en kern/payroll leest employment nergens. Dat is de naad uit ARBEID.md par. 3, en besluit 1 van par. 7a zegt aan welke kant hij dicht moet: een brug van staffId naar employment die een kant op loopt."
+    },
+    {
+      "schakel": 17,
+      "van": "kantoor",
+      "naar": "lid",
+      "wat": "opent de loonrun; het contract levert een loonregel op",
+      "gemeten": "Er is geen regelpakket dat gold op 2026-09-01. Haal de jaargang binnen en merk hem aan.",
+      "reden": "de werkgever uit deze proef (Cafe Brisa) staat op Ibiza, land ES, en er ligt alleen een Nederlands regelpakket (kern/payroll/jaargangen/nl-2026.json). Een loonrun voor een zaak buiten Nederland weigert dus, terecht en met de reden erbij: een tarief verzinnen is erger dan geen run. Wat ontbreekt is een Spaans regelpakket met een bron, geen code. Dat een run voor een Nederlandse zaak wel een loonregel oplevert, bewijst test/loonstrook-portaal.test.js."
     }
   ]
 }

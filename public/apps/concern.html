@@ -169,12 +169,22 @@ function vakEntiteit(b){
     '&ldquo;ingevuld door uzelf&rdquo;; een uittreksel overschrijft dat later met de registerbron.</p></div>';
 }
 
+/* Een bestuurder die (nog) niet op een codenaam staat, telt niet mee voor een
+   tekengrens in het Werk OS. De eigenaar koppelt hem hier; het is een correctie
+   van wie het was, geen nieuw bestuur (server/kern/concern/duiding.js). */
+function duidVeld(x){
+  if(!x.feit||x.persoon==='codenaam') return '';
+  return '<span class="rij" data-duid="'+esc(x.feit)+'"><span class="meta">'+(x.persoon==='extern'?'extern':'vrije naam')+
+    ' &middot; telt niet voor een tekengrens</span><input class="duidNaam" aria-label="Codenaam van '+esc(x.wie)+'" placeholder="codenaam">'+
+    '<button class="knop duidKnop" type="button">Koppel aan codenaam</button>'+
+    (x.persoon==='vrij'?'<button class="knop duidExtern" type="button">Buiten RTG</button>':'')+'</span>';
+}
 function vakBestuur(b){
   if(!b) return '';
   const rijen=(b.bestuurders||[]).map(x=>'<div class="regel"><strong>'+esc(x.wie)+'</strong>'+
     '<span class="meta">'+esc(x.rol)+(x.bevoegd?' &middot; '+esc(x.bevoegd)+' bevoegd':'')+
     (x.tekenlimiet!=null?' &middot; tot &euro;'+Number(x.tekenlimiet).toLocaleString('nl-NL'):'')+'</span>'+
-    '<span class="sp"></span><span class="meta">'+esc(x.van)+(x.tot?' t/m '+esc(x.tot):'')+'</span></div>').join('')
+    '<span class="sp"></span><span class="meta">'+esc(x.van)+(x.tot?' t/m '+esc(x.tot):'')+'</span>'+duidVeld(x)+'</div>').join('')
     || '<p class="stil">Nog geen bestuurder vastgelegd.</p>';
   return '<div class="vak"><h2>Bestuur en bevoegdheid</h2><div class="lijst">'+rijen+'</div>'+
     '<div class="raster r10">'+
@@ -332,6 +342,16 @@ function knopen(){
         tekenlimiet:lim===''?null:Number(lim)}});
       meld('Bestuurder vastgelegd.'); await herlaad(); }
     catch(e){ meld(e.message); }});
+
+  document.querySelectorAll('[data-duid]').forEach(el=>el.addEventListener('click',async(ev)=>{
+    const extern=ev.target.classList.contains('duidExtern');
+    if(!extern&&!ev.target.classList.contains('duidKnop')) return;
+    const naam=(el.querySelector('.duidNaam')||{}).value||'';
+    if(!extern&&!naam.trim()){meld('Welke codenaam is het?');return;}
+    try{ await api('feit/duid',{entiteit:HUIDIG,feit:el.dataset.duid,codenaam:naam.trim(),extern,
+      bronSoort:'mens',bronDetail:'gekoppeld door de eigenaar in RTG Concern'});
+      meld(extern?'Vastgelegd als iemand buiten RTG.':'Gekoppeld aan de codenaam. Hij telt nu mee voor de tekengrens.'); await herlaad(); }
+    catch(e){ meld(e.message); }}));
 
   const a=$('#aKnop'); if(a) a.addEventListener('click',async()=>{
     const wie=($('#aWie')||{}).value||'', pct=($('#aPct')||{}).value;

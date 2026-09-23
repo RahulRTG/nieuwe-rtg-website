@@ -39,6 +39,7 @@ module.exports = (ctx) => {
   const k = { db, save, crypto, schoon, findSupplier, vandaag: ctx.vandaag, opslag };
 
   Object.assign(k, require('./tijd')(k));
+  Object.assign(k, require('./duiding')(k));
   Object.assign(k, require('./entiteit')(k));
   Object.assign(k, require('./vestiging')(k));
   Object.assign(k, require('./graaf')(k));

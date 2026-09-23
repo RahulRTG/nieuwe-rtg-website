@@ -199,6 +199,17 @@ test('RTG Concern: een ondernemer begint een entiteit, legt een registratie met 
       const bestuur = await page.locator('#hoofd .vak', { hasText: 'Bestuur en bevoegdheid' }).textContent();
       assert.match(bestuur, /marco/);
       assert.match(bestuur, /alleen bevoegd/, 'met zijn bevoegdheid');
+      assert.match(bestuur, /telt niet voor een tekengrens/, 'een externe bestuurder zegt dat hij niet meetelt');
+
+      /* Koppelen aan een codenaam: een correctie van wie het was, via de knop
+         (server/kern/concern/duiding.js). Daarna telt hij mee, en de knop is weg. */
+      const ik = (await post(base, '/api/auth/me', {}, lid)).body.user.codename;
+      await page.locator('[data-duid] .duidNaam').fill(ik.toLowerCase());
+      assert.equal(await handel(page, '[data-duid] .duidKnop', '/api/concern/feit/duid', ik), 200, 'de bestuurder is gekoppeld');
+      const gekoppeld = await page.locator('#hoofd .vak', { hasText: 'Bestuur en bevoegdheid' }).textContent();
+      assert.match(gekoppeld, new RegExp(ik), 'de codenaam in de schrijfwijze van de gids');
+      assert.doesNotMatch(gekoppeld, /telt niet voor een tekengrens/, 'en er staat geen koppelveld meer');
+      assert.equal(await page.locator('[data-duid]').count(), 0);
 
       await page.fill('#aWie', 'marco');
       await page.fill('#aPct', '60');

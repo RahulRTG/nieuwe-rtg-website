@@ -29,7 +29,7 @@
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1586,
-    "kernGedeeld": 241,
+    "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -135,6 +135,15 @@
     "planDomeinenGemeten": 7
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 241,
+      "meter": "kernGedeeld 241 -> 242; kernBreedte blijft 1586",
+      "reden": "Vier ogen op de loonrun (AUTHORITY.md fase 5). De administrateur-handtekening kon met de gedeelde code en stond dan op 'onbekend'. payroll-os leest daarom naamAuth (de poort op naam) en codenaamVan (de naam onder de handtekening, uit de sessie). Beide namen bestonden al en worden al door andere domeinen gelezen; een eigen kopie van de poort of de naamopzoeking zou deze meter sparen en een tweede, uiteenlopende deur opleveren (LAT-regel 4, en de kop van kern/kantoor/kluispoort.js).",
+      "waarheen": "GRENZEN.json (payroll-os draagt naamAuth en codenaamVan) en test/office-payroll-dekking.test.js, die vasthoudt dat de gedeelde code 403 krijgt en dat er een mens onder de handtekening staat"
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

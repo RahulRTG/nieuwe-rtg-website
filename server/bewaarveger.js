@@ -105,7 +105,7 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
   }
 
   function start() {
-    const t = setInterval(veeg, 3600000);
+    const t = setInterval(() => require('./kern/dienstidentiteit').alsDienst('bewaarveger', veeg), 3600000);
     if (t.unref) t.unref();
     return t;
   }

@@ -29,11 +29,51 @@ const CONTRACTEN = {
     semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' },
     stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'tegen een draaiende server (test/beleidsmotor.test.js toets 8): 401 zonder sessie, ' +
-      'en per sessiesoort het besluit over zichzelf; twee keer vragen geeft hetzelfde', op: '2026-09-23' },
+    bewijs: { gemeten: 'tegen een draaiende server (test/beleidsmotor.test.js toets 8): 401 zonder sessie, 403 voor ' +
+      'de gedeelde code, en per sessie op naam het besluit over zichzelf; twee keer vragen geeft hetzelfde', op: '2026-09-23' },
     nagekeken: 'met de hand, 2026-09-23: de handler roept alleen beleidsmotor.waarom(req) aan, en die leest de ' +
       'feiten van het token en rekent met regels.kan() -- geen save(), geen toewijzing. De poort ervoor ' +
-      '(officeAuth, gewikkeld) telt via res.finish mee in de schaduw; dat is de andere ingang',
+      '(kluisAuth, gewikkeld) telt via res.finish mee in de schaduw; dat is de andere ingang',
+    afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
+  },
+  'POST /api/office/beleidsmotor/review': {
+    mutatieId: 'office.beleidsmotor.review',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'tegen een draaiende server (test/beleidsmotor-review.test.js): 403 voor de gedeelde code, ' +
+      '400 zonder reden, twee keer vragen geeft dezelfde houders, en onder schrijf-verloren geen lijst', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de handler schrijft alleen een regel in het inzagejournaal ' +
+      '(noteerVast, bewust een per inzage) en roept daarna beleidsmotor.review() aan, die de drie zetelbronnen ' +
+      'leest -- geen save(), geen toewijzing',
+    afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
+  },
+  /* De kantooruitnodiging (AUTHORITY.md fase 2) woont hier mee: dezelfde laag,
+     de kantoordeur op naam. */
+  'POST /api/office/kantoor/uitnodiging': {
+    mutatieId: 'office.kantoor.uitnodiging',
+    herkomst: 'mens',
+    semantiek: { klasse: 'nietHerhaalbaar' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'een tweede oproep is een tweede uitnodiging: een nieuwe code, en de vorige van dezelfde mens vervalt',
+    bewijs: { gemeten: 'tegen een draaiende server (test/kantooruitnodiging.test.js): twee oproepen gaven twee ' +
+      'codes, en de eerste koppelde daarna niet meer (401)', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: server/kern/kantoor/uitnodiging.js maak() trekt de open uitnodiging van ' +
+      'dezelfde sleutel in en zet een nieuwe met een eigen hash',
+    afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
+  },
+  'POST /api/office/kantoor/uitnodigingen': {
+    mutatieId: 'office.kantoor.uitnodigingen',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'tegen een draaiende server (test/kantooruitnodiging.test.js): het overzicht met de ' +
+      'koppelwegen, zonder hash', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: de handler roept alleen overzicht() aan, die leest via eigen.bak/kijk ' +
+      'en schrijft niets',
     afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
   },
 };

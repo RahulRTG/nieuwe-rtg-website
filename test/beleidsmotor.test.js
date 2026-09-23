@@ -130,12 +130,13 @@ test('5. A3 slaat uit: een kantoorroute zonder bekende poort wordt geteld, de re
   const { maakBeleidsmotor } = require('../server/kern/beleidsmotor');
   const m = maakBeleidsmotor({ db: { data: {} }, save: () => {}, sessionFor: () => null, accounts: {}, eigenaar: {},
     boardroomWie: () => null, magBoardroom: () => false, balieBron: () => () => false });
-  const loop = (patroon, status, poorten, method) => {
+  const loop = (patroon, status, poorten, method, afgebroken) => {
     const req = { method: method || 'POST', routePatroon: patroon, beleidsPoorten: poorten };
-    const res = new EventEmitter(); res.statusCode = status;
+    const res = new EventEmitter(); res.statusCode = status; res.writableFinished = !afgebroken;
     m.meelezer(req, res, () => {});
-    res.emit('finish');
+    res.emit('close');
   };
+  loop('/api/office/zonder-slot', 200, undefined, 'POST', true);   // afgebroken: telt niet
   loop('/api/office/zonder-slot', 200);
   loop('/api/office/zonder-slot', 400);
   loop('/api/office/met-slot', 200, ['kantoor']);
@@ -177,11 +178,11 @@ test('7. besluit A2 in de schaduw: de eigenaar door een gevoelige deur wordt get
 test('8. waarom mag ik hier (niet) in: per deur het besluit over jezelf, met de eis die viel', async () => {
   assert.equal((await api('/api/office/beleidsmotor/waarom', {}, null)).status, 401);
   const per = async (t) => Object.fromEntries((await api('/api/office/beleidsmotor/waarom', {}, t)).body.deuren.map(d => [d.deur, d]));
-  const g = await per(gedeeld);
-  assert.equal(g.kantoor.uitkomst, 'TOESTAAN');
-  assert.equal(g['op-naam'].uitkomst, 'WEIGEREN', 'de gedeelde code is geen mens');
-  assert.match(g['op-naam'].reden, /RTG-account|mens/, 'en de reden zegt welke eis viel');
-  assert.equal(g['op-naam'].opbouw[1].gehaald, false);
+  /* De gedeelde code heeft geen zelf om over te vragen: die krijgt de weigering
+     van de kluispoort, en die noemt de weg (een eigen RTG-account). */
+  const g = await api('/api/office/beleidsmotor/waarom', {}, gedeeld);
+  assert.equal(g.status, 403);
+  assert.match(String(g.body.error || ''), /eigen RTG-account/);
   const m = await per(opNaam);
   assert.equal(m['op-naam'].uitkomst, 'TOESTAAN');
   assert.equal(m.boardroom.uitkomst, 'WEIGEREN');

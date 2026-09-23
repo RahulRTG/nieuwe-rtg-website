@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1586,
-    "kernGedeeld": 241,
+    "kernBreedte": 1587,
+    "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -148,6 +148,24 @@
     "edgeVeldTrust": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1586,
+      "meter": "kernBreedte 1586 -> 1587; kernGedeeld blijft 242",
+      "reden": "De kantooruitnodiging (AUTHORITY.md fase 2, besluit van de eigenaar). Het domein kantoren leest kern.kantoorUitnodiging om een uitnodiging te maken en het overzicht te tonen; de module woont bij de kantoorlaag en wordt in eenaccount verzilverd, waar de kantoorrol aan de sleutelbos komt. Een eigen kopie in het routebestand zou een tweede opslag van uitnodigingen opleveren.",
+      "waarheen": "GRENZEN.json (kantoren draagt kantoorUitnodiging) en test/kantooruitnodiging.test.js"
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 241,
+      "meter": "kernGedeeld 241 -> 242; kernBreedte blijft 1586",
+      "reden": "Vier ogen op de loonrun (AUTHORITY.md fase 5). De administrateur-handtekening kon met de gedeelde code en stond dan op 'onbekend'. payroll-os leest daarom naamAuth (de poort op naam) en codenaamVan (de naam onder de handtekening, uit de sessie). Beide namen bestonden al en worden al door andere domeinen gelezen; een eigen kopie van de poort of de naamopzoeking zou deze meter sparen en een tweede, uiteenlopende deur opleveren (LAT-regel 4, en de kop van kern/kantoor/kluispoort.js).",
+      "waarheen": "GRENZEN.json (payroll-os draagt naamAuth en codenaamVan) en test/office-payroll-dekking.test.js, die vasthoudt dat de gedeelde code 403 krijgt en dat er een mens onder de handtekening staat"
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

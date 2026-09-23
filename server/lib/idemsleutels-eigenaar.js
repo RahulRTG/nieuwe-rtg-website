@@ -51,7 +51,21 @@ const SLEUTELS = {
     waarom: 'verse registratie-uitdaging binnen het herstelvenster' },
   'POST /api/herstel/eigenaar/passkey': { nietIdempotent: true,
     waarom: 'zet de passkey en SLUIT het venster; herhaalbaar maken zou van een geslaagd herstel ' +
-      'een kwartier lang een open deur maken' }
+      'een kwartier lang een open deur maken' },
+  /* De beleidsmotor (AUTHORITY.md fase 1): twee leeswegen. De tellers lopen via
+     de gewikkelde poorten op res.finish en niet in deze handlers, dus twee keer
+     opvragen verandert niets aan wat er geteld of besloten is. */
+  'POST /api/office/beleidsmotor': { leest: true },
+  'POST /api/office/beleidsmotor/waarom': { leest: true },
+  /* De toegangsreview (fase 8) leest drie zetelbronnen. Elke aanroep laat bewust
+     EEN journaalregel na: het journaal hoort elke inzage te zien, ook de tweede. */
+  'POST /api/office/beleidsmotor/review': { leest: true },
+  /* De kantooruitnodiging (fase 2): elke oproep maakt een NIEUWE code en maakt de
+     vorige van dezelfde mens ongeldig. Het overzicht leest alleen. */
+  'POST /api/office/kantoor/uitnodiging': { nietIdempotent: true,
+    waarom: 'een tweede oproep is een tweede uitnodiging: een nieuwe code, en de vorige vervalt; een laag die ' +
+      'hem opslikt geeft de eigenaar een code terug waarvan hij denkt dat die de nieuwste is' },
+  'POST /api/office/kantoor/uitnodigingen': { leest: true }
 };
 
 module.exports = { SLEUTELS };

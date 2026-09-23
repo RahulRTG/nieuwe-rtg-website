@@ -603,6 +603,7 @@
       "ideeen",
       "invoer",
       "kantoorIntrekking",
+      "kantoorUitnodiging",
       "kluisAuth",
       "magnaatLeren",
       "mail",
@@ -1516,7 +1517,9 @@
     ],
     "payroll-os": [
       "findSupplier",
-      "payrollOS"
+      "payrollOS",
+      "naamAuth",
+      "codenaamVan"
     ],
     "payroll-os-dekking": [
       "payrollOS"

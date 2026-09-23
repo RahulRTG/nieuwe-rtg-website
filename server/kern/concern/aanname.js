@@ -69,10 +69,15 @@ module.exports = (ctx) => {
     for (const p of (personeel || [])) {
       if (p.memberId == null) { zonderAccount++; continue; }
       const heeft = employmentVanPersoon('user-' + p.memberId, true).some(loopt);
+      /* De administrateur ziet de bevinding, maar INHALEN doet de eigenaar van de
+         entiteit (alleen hij mag een dienstverband op zijn naam verklaren). De
+         weg noemt dus wie en waar, en niet een knop die de administrateur niet
+         heeft. */
       if (!heeft) bevindingen.push({ soort: 'loon_zonder_dienstverband', ernst: 'midden', staffId: p.id,
         eigenaar: 'administrateur', uitleg: (p.naam || 'Deze medewerker') + ' staat in de loonrun maar heeft in deze ' +
-          'periode geen lopend dienstverband bij de entiteit van deze zaak. Leg het dienstverband vast in RTG Concern, ' +
-          'of ga na of deze persoon hier nog werkt.' });
+          'periode geen lopend dienstverband bij de entiteit van deze zaak. De eigenaar van de entiteit legt het vast ' +
+          'in RTG Concern, onder Dienstverbanden inhalen; of ga na of deze persoon hier nog werkt.',
+        weg: { wie: 'de eigenaar van de entiteit', waar: 'RTG Concern, Dienstverbanden inhalen', adres: '/apps/concern.html' } });
     }
     if (zonderAccount) bevindingen.push({ soort: 'dienstverband_niet_getoetst', ernst: 'laag', eigenaar: 'administrateur',
       uitleg: zonderAccount + ' medewerker(s) zonder eigen RTG-account: een dienstverband hangt aan een account, dus voor ' +

@@ -80,5 +80,50 @@ module.exports = (ctx) => {
     return { getoetst: true, entiteit: v.entiteit, bevindingen };
   }
 
-  return { dienstverbandUitAanname, dienstverbandToets };
+  /* DE INHAALSLAG: de aannames van VOOR de brug (ARBEID.md par. 7a).
+
+     Wie al in het personeelsregister van een zaak stond voordat de brug er was,
+     heeft geen dienstverband, en de loonrun meldt hem daarom. Dit zet een
+     VOORSTEL klaar en voert niets uit zonder `keuze`: de eigenaar van de
+     entiteit ziet wie het betreft en vinkt zelf aan -- een dienstverband op
+     iemands naam is een verklaring van een werkgever, en die wordt niet in
+     bulk voor hem afgelegd. `keuze` telt alleen voor wie IN het voorstel staat;
+     een personeelsnummer dat er niet in staat, wordt overgeslagen met de reden.
+
+     Personeel zonder eigen account valt erbuiten en wordt apart geteld: een
+     dienstverband hangt aan een ledensleutel, en die wordt niet geraden. */
+  function dienstverbandInhaal({ zaak, vestiging, personeel, keuze } = {}) {
+    const v = vestigingVanUnit(zaak);
+    /* Hangt de zaak op een ANDERE vestiging dan die van de aanvrager, dan is
+       het antwoord hetzelfde als "bestaat niet": het verschil zou verklappen
+       welke zaken waar hangen. */
+    if (vestiging && (!v || v.id !== vestiging)) return { status: 404, error: 'Deze zaak hangt niet aan deze vestiging.' };
+    if (!v) return { status: 409, error: 'Deze zaak hangt aan geen vestiging van een entiteit.',
+      hoe: 'Koppel de zaak eerst aan een vestiging (/api/concern/vestiging/zaak).' };
+    const voorstel = [];
+    let alBinnen = 0, zonderAccount = 0;
+    for (const p of (personeel || [])) {
+      if (p.memberId == null) { zonderAccount++; continue; }
+      const persoon = 'user-' + p.memberId;
+      if (employmentVanPersoon(persoon, false).some(e => e.entiteit === v.entiteit)) { alBinnen++; continue; }
+      voorstel.push({ staffId: p.id, naam: p.naam || null, rol: String(p.rol || '').trim() || 'Medewerker', persoon });
+    }
+    const uit = { ok: true, entiteit: v.entiteit, vestiging: v.id, alBinnen, zonderAccount,
+      voorstel: voorstel.map(({ persoon, ...rest }) => rest) };
+    if (!Array.isArray(keuze)) return Object.assign(uit, { uitgevoerd: false,
+      volgende: 'Kies wie er een dienstverband krijgt; er wordt niets vastgelegd zonder uw keuze.' });
+    const gekozen = new Set(keuze.map(Number));
+    const gemaakt = [], overgeslagen = [];
+    for (const p of voorstel) {
+      if (!gekozen.has(Number(p.staffId))) continue;
+      gekozen.delete(Number(p.staffId));
+      const r = employmentNieuw({ persoon: p.persoon, entiteit: v.entiteit, vestiging: v.id, rol: p.rol });
+      if (r && r.ok) gemaakt.push({ staffId: p.staffId, employment: r.employment.id });
+      else overgeslagen.push({ staffId: p.staffId, reden: (r && r.error) || 'Het dienstverband kon niet worden gemaakt.' });
+    }
+    for (const id of gekozen) overgeslagen.push({ staffId: id, reden: 'Staat niet in het voorstel voor deze zaak.' });
+    return Object.assign(uit, { uitgevoerd: true, gemaakt, overgeslagen });
+  }
+
+  return { dienstverbandUitAanname, dienstverbandToets, dienstverbandInhaal };
 };

@@ -501,7 +501,7 @@ van het werk erna.
    in deze paragraaf.
 
 **Gedaan (23 september 2026).** `scripts/adamproef.js` loopt nu door tot de
-loonrun: 17 schakels, alle 17 gesloten, 0 stuk, en 10 van de 10
+loonrun: 17 schakels, alle 17 gesloten (sindsdien 18, zie de inhaalslag hieronder), 0 stuk, en 10 van de 10
 storingen gehouden (`ADAMPROEF.json`). Waar Adam niet verder kan, neemt een
 volwassen lid het over, zodat de rest van de keten toch gemeten wordt. De drie
 breuken die de verlenging vond, in de volgorde waarin een mens ze tegenkomt (alle
@@ -558,13 +558,30 @@ personeel zonder eigen account), staat er als `dienstverband_niet_getoetst` en
 valt niet weg. Of die bevinding ooit `hoog` wordt en een definitieve run
 tegenhoudt, is een besluit voor wanneer de oude aannames zijn bijgewerkt.
 
-**De keten van Adam is daarmee rond: 17 van 17 schakels gesloten, 10 van 10
+**De inhaalslag voor de aannames van vóór de brug** (dezelfde dag, gekozen door
+de eigenaar). Wie al in het personeelsregister van een zaak stond, krijgt geen
+dienstverband vanzelf: `dienstverbandInhaal` in `server/kern/concern/aanname.js`,
+achter `/api/concern/vestiging/inhaal`, zet een VOORSTEL klaar (wie een eigen
+account heeft en nog geen lopend dienstverband bij deze entiteit), en legt pas iets
+vast met een `keuze` van de eigenaar. Een dienstverband op iemands naam is een
+verklaring van een werkgever, en die wordt niet in bulk voor hem afgelegd. Wie
+gekozen wordt maar niet in het voorstel staat, wordt overgeslagen met de reden;
+personeel zonder eigen account wordt apart geteld en niet geraden; en een zaak op
+een andere vestiging dan die van de aanvrager geeft hetzelfde antwoord als "bestaat
+niet". De bevinding blijft `midden`: of hij `hoog` wordt, is een besluit voor
+wanneer de inhaalslag bij de bestaande zaken gedaan is.
+
+**De keten van Adam is daarmee rond: 18 van 18 schakels gesloten, 10 van 10
 storingen gehouden** (`ADAMPROEF.json`), van gezin tot loonstrook. Zonder
 basissalaris zakt schakel 17, zonder de uitnodiging schakel 13, zonder de brug
 schakel 16, en zonder de dienstverbandtoets weer schakel 17 -- die heeft een
 besturingsproef: de ondernemer van Meridiaan werd manager voordat hij de zaak
-koppelde, heeft dus geen dienstverband, en hoort gemeld te worden. Alle vier met
-een mutatie nagetrokken. Wat de keten met opzet NIET
+koppelde, heeft dus geen dienstverband, en hoort gemeld te worden. Schakel 18 haalt
+precies die ondernemer in: eerst een voorstel waar hij in staat en het lid niet,
+dan de keuze, een herhaalde keuze die niets meer vastlegt, en een ander lid dat met
+dezelfde vestiging en zaak in het lichaam 404 krijgt. Alle vijf met een mutatie
+nagetrokken (schakel 18 zakt als de keuze wordt genegeerd, als er zonder keuze
+wordt vastgelegd, en als de eigendomscontrole op de vestiging ontbreekt). Wat de keten met opzet NIET
 loopt: goedkeuren en uitbetalen van de loonrun (twee handtekeningen en een
 betaling, die zet een proef niet), en een loonrun bij een Spaanse zaak.
 

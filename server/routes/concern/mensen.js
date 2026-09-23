@@ -84,6 +84,19 @@ module.exports = (kern, hulp) => {
     stuur(res, employmentNieuw(Object.assign({}, req.body, { entiteit: e.id })));
   });
 
+  /* De inhaalslag voor aannames van voor de brug (kern/concern/aanname.js).
+     Zonder `keuze` alleen een voorstel; de zaak moet op DEZE vestiging hangen,
+     anders zou een vestiging van de aanvrager genoeg zijn om andermans
+     personeel in dienst te verklaren. */
+  app.post('/api/concern/vestiging/inhaal', auth, (req, res) => {
+    const v = hulp.mijnVestiging(req);
+    if (!v) return stuur(res, nietGevonden);
+    const code = String((req.body || {}).code || '').toUpperCase();
+    const personeel = hulp.personeelVan(code).map(st => ({ id: st.id, naam: st.name,
+      rol: st.func || (st.role === 'manager' ? 'Manager' : ''), memberId: st.member_id }));
+    stuur(res, kern.dienstverbandInhaal({ zaak: code, vestiging: v.id, personeel, keuze: (req.body || {}).keuze }));
+  });
+
   /* Een dienstverband is van een entiteit; de eigendomscontrole loopt daarlangs
      en niet langs het dienstverband zelf. Anders zou een employment-id uit het
      lichaam genoeg zijn om andermans personeel te ontslaan. */

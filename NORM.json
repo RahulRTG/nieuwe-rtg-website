@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1585,
+    "kernBreedte": 1586,
     "kernGedeeld": 239,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -2774,6 +2774,15 @@
         "hoe": "DE SCHULD VAN VANOCHTEND IS AFGELOST, en langs de weg die er toen bij stond. kern/waarde/economischeherkomst.js en kern/waarde/herkomstsplitsing.js hadden nul aanroepers; de verticale slice geeft ze er drie (reisbureau-samenstelling, reisbureau-betaling, bijdragebasis) en daarmee vallen ze allebei uit deze post. Er komt er EEN voor terug -- kern/waarde/bijdragebasis.js, die de basis uitrekent en nog door geen enkele route wordt gelezen -- dus 19 - 2 + 1 = 18. De tand wordt aangedraaid en niet blijven staan: wat een keer beter is geworden, hoort niet stil terug te kunnen.",
         "daarna": "bijdragebasis.js krijgt zijn aanroeper zodra er een scherm of route is die de basis TOONT. Dat is bewust nog niet gebouwd: er staat geen tarief naast, dus er valt nog niets af te rekenen -- en een bord dat een basis toont zonder dat iemand weet wat ermee gebeurt, nodigt uit tot een getal dat niemand heeft afgewogen."
       }
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1585,
+      "meter": "kernBreedte 1585 -> 1586",
+      "reden": "De inhaalslag voor de aannames van voor de brug (ARBEID.md par. 7a, gekozen door de eigenaar): EEN kernnaam erbij, `dienstverbandInhaal`, aangeraakt door het domein concern. Hij woont in de module die het dienstverband BEZIT (kern/concern/aanname.js), zodat de route niet zelf beslist wie er een dienstverband mist. De personeelslijst en de eigendomscontrole komen via het hulpobject van routes/concern.js, dat `accounts` al aanraakt; ze uit dat object destructureren telde de meter als twee kernnamen die het niet zijn.",
+      "waarheen": "server/kern/concern/aanname.js (dienstverbandInhaal), server/routes/concern/mensen.js (/api/concern/vestiging/inhaal) en test/aanname-dienstverband.test.js toets 10 tot en met 13. De Adamproef schakel 18 meet het tegen een echte server, en zakt zonder keuze, met een automatische keuze en zonder eigendomscontrole."
     }
   ],
   "prestatie": {

@@ -209,6 +209,7 @@ async function ondernemerKoppelt(basis, S, { code, entiteit, land, plaats, email
   const koppel = vesId ? await P('/api/concern/vestiging/zaak', { vestiging: vesId, code }, O) : null;
   if (!koppel || koppel.status !== 200) throw new Error('de ondernemer kon ' + code + ' niet aan ' + entiteit +
     ' koppelen (status ' + (koppel ? koppel.status + ': ' + ((koppel.data && koppel.data.error) || '') : 'geen') + ')');
+  return { O, entId, vesId };
 }
 
 async function loop(basis, uit) {
@@ -610,7 +611,7 @@ async function loop(basis, uit) {
     omschrijving: 'De ontvangst van de toren, drie dagen per week.' }, S2);
   const nlVacId = (((nlVac.data && nlVac.data.vacatures) || []).find(x => x.func === 'Receptie') || {}).id;
   if (!nlVacId) throw new Error('geen vacature bij ' + NL_ZAAK + ' (status ' + nlVac.status + ')');
-  await ondernemerKoppelt(basis, S2, { code: NL_ZAAK, entiteit: 'Meridiaan BV', land: 'NL', plaats: 'Amsterdam',
+  const meridiaan = await ondernemerKoppelt(basis, S2, { code: NL_ZAAK, entiteit: 'Meridiaan BV', land: 'NL', plaats: 'Amsterdam',
     email: 'ondernemer.nl@voorbeeld.nl', telefoon: '0612349873' });
   uit.wereld.nederland = 'een volwassen lid bij ' + NL_ZAAK + ' (NL), met een ondernemer die de zaak aan Meridiaan BV koppelt';
 
@@ -732,6 +733,43 @@ async function loop(basis, uit) {
           : 'geen loonstrook (' + stroken.length + ' stroken in de run)') +
           '; dienstverband ' + (zonderDv.length ? 'ONTBREEKT volgens de run' : nietGetoetst.length ? 'NIET getoetst' : 'getoetst en gevonden') +
           '; de ondernemer zonder dienstverband is ' + (baasGemeld ? 'gemeld' : 'NIET gemeld') };
+    });
+
+  /* 18 -- DE INHAALSLAG. De ondernemer uit de besturingsproef van schakel 17
+     werd manager VOOR de brug er voor zijn zaak was, en heeft dus geen
+     dienstverband. De eigenaar van de entiteit vraagt eerst een voorstel (daar
+     hoort hij in te staan en het lid NIET, want die heeft er al een), kiest dan
+     zelf, en pas daarna staat het dienstverband er. Zonder keuze wordt er niets
+     vastgelegd (kern/concern/aanname.js, dienstverbandInhaal). */
+  await stap(
+    schakel(18, 'werkgever', 'huis', 'haalt de aannames van voor de brug in: eerst een voorstel, dan zijn eigen keuze'),
+    () => baasNl ? P('/api/concern/vestiging/inhaal', { vestiging: meridiaan.vesId, code: NL_ZAAK }, meridiaan.O)
+      : Promise.resolve({ status: 0, data: null }),
+    async r => {
+      const vs = (r.data && r.data.voorstel) || [];
+      const baasErin = vs.some(x => Number(x.staffId) === Number(baasNl.id));
+      const novaErin = vs.some(x => Number(x.staffId) === Number(novaStaff));
+      /* Een ander lid met dezelfde vestiging en zaak in het lichaam krijgt niets:
+         geen voorstel en geen dienstverband (de eigendomscontrole in de route). */
+      const vreemd = await P('/api/concern/vestiging/inhaal', { vestiging: meridiaan.vesId, code: NL_ZAAK,
+        keuze: [baasNl.id] }, N);
+      const voor = await P('/api/concern/mensen', { entiteit: meridiaan.entId }, meridiaan.O);
+      const eerst = ((voor.data && voor.data.mensen) || []).length;
+      const doe = await P('/api/concern/vestiging/inhaal', { vestiging: meridiaan.vesId, code: NL_ZAAK,
+        keuze: [baasNl.id] }, meridiaan.O);
+      /* Dezelfde keuze nog een keer (een dubbeltik): de ondernemer staat dan
+         niet meer in het voorstel, dus er komt geen tweede dienstverband bij. */
+      const nogEens = await P('/api/concern/vestiging/inhaal', { vestiging: meridiaan.vesId, code: NL_ZAAK,
+        keuze: [baasNl.id] }, meridiaan.O);
+      const na = await P('/api/concern/mensen', { entiteit: meridiaan.entId }, meridiaan.O);
+      const mensen = (na.data && na.data.mensen) || [];
+      const gemaakt = (doe.data && doe.data.gemaakt) || [];
+      const tweede = (nogEens.data && nogEens.data.gemaakt) || [];
+      const klopt = baasErin && !novaErin && r.data.uitgevoerd === false && mensen.length === eerst + 1 &&
+        gemaakt.length === 1 && !tweede.length && vreemd.status === 404 && mensen.some(m => m.rol === 'Eigenaar');
+      return { klopt, wat: 'voorstel met ' + vs.length + ' mens(en)' + (baasErin ? ', de ondernemer erin' : ', ZONDER de ondernemer') +
+        (novaErin ? ', het lid ten onrechte erin' : '') + '; een vreemde kreeg ' + vreemd.status + '; ' + eerst + ' dienstverband(en) voor de keuze, ' + mensen.length + ' erna' +
+        (tweede.length ? '; de herhaling maakte er NOG een' : ', ook na een herhaalde keuze') };
     });
 
   return { w, S, M, vacId };

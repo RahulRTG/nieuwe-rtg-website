@@ -21,8 +21,8 @@
     }
   ],
   "stempel": {
-    "op": "2026-09-23T15:48:20.253Z",
-    "commit": "6eea430",
+    "op": "2026-09-23T15:57:43.212Z",
+    "commit": "40d0f457",
     "node": "v22.22.2"
   },
   "gemeten": {
@@ -32,7 +32,7 @@
     "zonderBewakerslaag": 3,
     "handlerKentMens": 148,
     "anoniemUitvoerbaar": 358,
-    "metSpoor": 144,
+    "metSpoor": 147,
     "metReden": 289,
     "bestanden": 98,
     "zwaar": 14,

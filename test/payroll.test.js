@@ -105,6 +105,19 @@ test('de matchtafel: onvindbaar tot je jezelf open voor werk zet, daarna gelinkt
   const vac = open.vacatures.find(v => v.vacature.func === 'Gastheer rondvaart');
   assert.ok(vac.kandidaten.length >= 1, 'de vacature krijgt nu een kandidaat-suggestie');
   assert.ok(!vac.kandidaten[0].naam.includes(' '), 'op de matchtafel alleen de voornaam');
+  /* ARBEID.md par. 4 punt 3: geen cijfer op een mens. Een kandidaat draagt
+     redenen in woorden, geen score, en er wordt niet op gesorteerd. */
+  for (const v of open.vacatures) for (const k of v.kandidaten) {
+    assert.equal('score' in k, false, 'geen score op een kandidaat');
+    assert.equal('past' in k, false, 'het werkdruksignaal is geen matchcriterium');
+    assert.ok(Array.isArray(k.redenen) && k.redenen.length, 'elke kandidaat zegt waarom hij erop staat');
+  }
+  assert.ok(kansen.kansen.every(k => !('score' in k) && Array.isArray(k.redenen)), 'ook een kans draagt redenen en geen score');
+  /* ARBEID.md par. 4 punt 2: wie gaat rondkijken, wordt niet gezien door de
+     zaak waar hij nu werkt. Het zaaklog gaat mee naar elke actor van die zaak. */
+  const zaak = (await json(await api('/api/supplier/state', {}, kikunoiStaf))).state;
+  assert.ok(Array.isArray(zaak.activity), 'de proef ziet het zaaklog');
+  assert.ok(!JSON.stringify(zaak.activity).includes('open voor werk'), 'de huidige werkgever ziet niet dat iemand open staat voor werk');
   // schakelaar weer uit: meteen weer onvindbaar
   await api('/api/supplier/payroll/openvoorwerk', { aan: false }, kikunoiStaf);
   const weer = await json(await api('/api/office/payroll/match', {}, officeToken));

@@ -1607,6 +1607,17 @@ const IJKINGEN = {
       (j) => { j.rondes.ruim.vorm.domeinen = (j.rondes.ruim.vorm.domeinen || []).slice(0, -3); return j; },
       () => voor.planDomeinenGemeten - norm.meet().planDomeinenGemeten)
   },
+  /* DE TAND VAN 23 SEPTEMBER 2026: officeDomeinenGemeten, de zuster van de tand
+     hierboven en om dezelfde reden: OFFICEVORM.json draagt een nul (0 velden in
+     alle objectdomeinen onder het voorgestelde RTGObject), en ziet de meter stil
+     minder domeinen, dan blijft die nul staan terwijl hij van "deze domeinen
+     delen niets" verandert in "we hebben minder gekeken". De mutatie zit op de
+     LIJST, want norm.js leest er de lengte van. */
+  officeDomeinenGemeten: {
+    proef: (voor) => metVervangenJson('OFFICEVORM.json',
+      (j) => { j.rondes.ruim.vorm.domeinen = (j.rondes.ruim.vorm.domeinen || []).slice(0, -3); return j; },
+      () => voor.officeDomeinenGemeten - norm.meet().officeDomeinenGemeten)
+  },
   /* DE TWEE TANDEN VAN 15 SEPTEMBER 2026, bij NEIGINGVORM.json (NEIGING.md par.
      0). Ze staan allebei op een NUL of op een getal waar een besluit op rust, en
      dat is precies waarom ze een ijking nodig hebben: bij zo'n meter is "hij is

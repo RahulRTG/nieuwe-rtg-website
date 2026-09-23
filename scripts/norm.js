@@ -762,6 +762,9 @@ const METERS = [
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
   { sleutel: 'planDomeinenGemeten', richting: 'omhoog', wat: 'plandomeinen die de planvormmeter werkelijk heeft gezien' },
+  /* OFFICEVORM.json (OFFICE.md par. 0): het bereik onder de nul waarop het
+     besluit rust dat er geen `RTGObject` komt. */
+  { sleutel: 'officeDomeinenGemeten', richting: 'omhoog', wat: 'objectdomeinen die de officevormmeter werkelijk heeft gezien' },
   /* NEIGINGVORM.json (NEIGING.md par. 0). Twee ratels en met opzet geen derde
      over de naamsmeting: die telt sinds de laag bestaat zijn eigen bestanden
      mee, dus een getal daarop zou alleen maar groeien met het werk.
@@ -1697,6 +1700,7 @@ function meet(bronnen) {
     stempelSchrijversGezien: leesRegister('STEMPELVEILIGHEID.json', (j) => j.schrijvers),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
     planDomeinenGemeten: leesRegister('PLANVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
+    officeDomeinenGemeten: leesRegister('OFFICEVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
     neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
     neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
     connectDomeinenGemeten: leesRegister('CONNECTLUS.json', (j) => j.werkwoorden.domeinen),

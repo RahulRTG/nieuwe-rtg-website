@@ -450,6 +450,12 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  /* DE SLEUTELWEDLOOP. De toets leest ook scripts/lib/bron.js (om commentaar
+     te strippen), en de motor koos die als module -- een mutatie daar zegt niets
+     over de sleutels. De module die hij beproeft is de helper; met de hand
+     nagetrokken: linkSync terug naar een kale schrijf (toets 1 zakt), een
+     verkeerde lengte stil vervangen (toets 2 zakt). */
+  ['sleutel-wedloop.test.js', ['server/lib/sleutelbestand.js']],
   // The document pilot reaches this handler through HTTP, browser or child processes.
   ['document-equivalence.e2e.js', ['server/kern/document-capability.js']],
   ['document-persistence.e2e.js', ['server/kern/document-capability.js']],
@@ -520,6 +526,11 @@ const EIGEN_MODULE = new Map([
      Bevestigd door de motor, en dat is hier de voorwaarde: met deze regel
      muteert hij scripts/wekdekking.js en zakt de toets erop. */
   ['wekdekking.test.js', ['scripts/wekdekking.js']],
+  /* DE ZWARE STAP op het scherm is een browserscript dat zich aan `window`
+     hangt; de toets laadt hem als TEKST in een eigen venster-object en requiret
+     hem niet. Statisch ziet de motor dan geen module, en toetsenNietGemeten zou
+     het schrijven van deze toets bestraffen. */
+  ['zwaarstap.test.js', ['public/shared/zwaarstap.js']],
   /* DE MOMENTPROEF wordt door zijn toets als TEKST gelezen (fs.readFileSync) en
      niet gerequired: de toets bewaakt de VORM van het instrument -- zakt het op
      een open schakel, draagt elke bevinding een reden, staan B en D er allebei --

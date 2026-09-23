@@ -24,16 +24,36 @@ test('Adaptive Edge heeft vier toestanden en vijf vaste decks', () => {
   assert.equal(kern.normState('onbekend'), 'dock');
 });
 
-test('intentprojectie toont uitsluitend geregistreerde en toegestane acties', () => {
+test('intentprojectie toont geregistreerde acties, en een verboden actie MET haar reden', () => {
+  /* ARBEID.md par. 4 punt 13 en GRAMMATICA.md: verhinderd is niet weggelaten.
+     Hier legde de toets vast dat een verboden actie stil verdween. */
   const model = kern.model();
   let toegestaan = true;
   kern.register(model, { id: 'reis', label: 'Reis', allowed: () => toegestaan, run() {} });
-  kern.register(model, { id: 'verboden', label: 'Verboden', allowed: false, run() {} });
+  kern.register(model, { id: 'verboden', label: 'Verboden', allowed: false, reason: 'Vraagt een Lifestyle Pass.', run() {} });
   kern.register(model, { id: 'hotel', label: 'Hotel', allowed: true, run() {} });
-  assert.deepEqual(kern.project(['reis', 'verboden', 'onbekend', 'reis', 'hotel'], model.registry, 4)
-    .map(x => x.id), ['reis', 'hotel']);
+  const lijst = kern.project(['reis', 'verboden', 'onbekend', 'reis', 'hotel'], model.registry, 4);
+  assert.deepEqual(lijst.map(x => x.id), ['reis', 'verboden', 'hotel'], 'onbekend bestaat niet en blijft weg');
+  assert.equal(lijst[1].blocked, true);
+  assert.equal(lijst[1].reason, 'Vraagt een Lifestyle Pass.');
+  assert.equal(lijst[1].run, undefined, 'een verhinderde actie draagt geen uitvoerbare functie');
   toegestaan = false;
-  assert.deepEqual(kern.project(['reis'], model.registry, 4), []);
+  const nu = kern.project(['reis'], model.registry, 4);
+  assert.equal(nu[0].blocked, true);
+  assert.match(nu[0].reason, /niet opgegeven/, 'zonder reden verzinnen we er geen, we zeggen dat hij ontbreekt');
+  /* en de knop die het blad ervan maakt: zichtbaar verhinderd, de reden als
+     tekst, en een tik voert niets uit */
+  const gelopen = [];
+  const doc = { createElement: (tag) => { const el = { tag, dataset: {}, attrs: {}, kids: [], luister: {},
+    setAttribute(k, v) { this.attrs[k] = v; }, appendChild(c) { this.kids.push(c); },
+    addEventListener(t, f) { this.luister[t] = f; } }; return el; } };
+  const knop = kern.sheetButton(doc, lijst[1], (id) => gelopen.push(id));
+  assert.equal(knop.attrs['aria-disabled'], 'true');
+  assert.equal(knop.kids[0].textContent, 'Vraagt een Lifestyle Pass.');
+  assert.equal(knop.luister.click, undefined, 'een verhinderde knop voert niets uit');
+  kern.sheetButton(doc, lijst[0], (id) => gelopen.push(id)).luister.click();
+  assert.deepEqual(gelopen, ['reis']);
+  assert.match(VIEW, /K\.sheetButton\(/, 'het blad gebruikt die knop');
 });
 
 /* HET TWEEDE REGISTER KENT ALLEEN LICHT (EDGE.md par. 10, ronde 1). Het had een

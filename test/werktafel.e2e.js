@@ -159,12 +159,12 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        niet zakken: er bouwt uit zichzelf toch niets meer, dus "geen werktafel"
        zou ook groen zijn met de grendel eruit (LAT.md regel 9). Dit is de weg
        die het gat had: een app openen terwijl de overeenkomst nog openstaat. */
-    await page.evaluate(() => { try { window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'); } catch (e) {} });
+    await page.evaluate(() => { try { window.RTGCommand.open('/apps/life.html', 'Vandaag'); } catch (e) {} });
     await wachtOpRust(page);
     const dicht = await page.evaluate(stand);
     // op het PAD toetsen: de app draagt een querystring (?pas=rtg) en die hoort er te mogen zijn
     assert.equal(new URL(page.url()).pathname, '/apps/app.html',
-      'openen mag ook geen paginasprong worden: /apps/vandaag.html draagt de deur niet, dus dat is de deur omzeilen');
+      'openen mag ook geen paginasprong worden: /apps/life.html draagt de deur niet, dus dat is de deur omzeilen');
     /* Zonder deze bewering kan de rest niet zakken: is #app niet `active`, dan
        weigert de werktafel sowieso en bewijst "geen werktafel" niets. Precies de
        vorm uit LAT.md regel 9. */
@@ -191,7 +191,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.equal(thuis.commandActief, true, 'en een app opent hier als blad');
 
     // 3) een app openen vult de werkvloer; de lege staat maakt plaats
-    await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
+    await page.evaluate(() => window.RTGCommand.open('/apps/life.html', 'Vandaag'));
     await page.waitForSelector('#rtgCommand .cmd-pane', { timeout: 10000 });
     const werk = await page.evaluate(stand);
     assert.equal(werk.bladen, 1, 'een geopende app is een blad, en alleen die ene');
@@ -224,7 +224,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     /* 5) EN ANDERSOM. checkOnboarding is asynchroon: de deur kan opengaan NADAT
        de werktafel er al staat. Dan is wegnemen de enige juiste uitkomst -- een
        weigering bij het bouwen alleen zou dit gat open laten. */
-    await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
+    await page.evaluate(() => window.RTGCommand.open('/apps/life.html', 'Vandaag'));
     await page.waitForSelector('#rtgCommand .cmd-pane', { timeout: 10000 });
     await page.evaluate(() => { document.getElementById('onbGate').hidden = false; });
     /* De werktafel hoort te wijken zodra de poort weer open staat; dat is een
@@ -249,7 +249,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     const smal = await page.evaluate(stand);
     assert.equal(smal.poortOpen, true, 'voorwaarde: de intake staat nog open, anders toetst het hieronder niets');
     assert.equal(smal.werktafel, false, 'op een telefoon bestaat deze werktafel sowieso niet');
-    await page.evaluate(() => { try { window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'); } catch (e) {} });
+    await page.evaluate(() => { try { window.RTGCommand.open('/apps/life.html', 'Vandaag'); } catch (e) {} });
     await wachtOpRust(page);
     assert.equal(new URL(page.url()).pathname, '/apps/app.html',
       'ook op een telefoon mag een openstaande overeenkomst niet met een paginasprong te passeren zijn');
@@ -277,7 +277,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.equal(smalThuis.bladen, 0, 'een lid zonder onthouden bladen begint ook op een telefoon leeg');
     assert.equal(smalThuis.schilVangt, false, 'en de schil vangt hem ook op een telefoon niet af');
 
-    await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
+    await page.evaluate(() => window.RTGCommand.open('/apps/life.html', 'Vandaag'));
     await page.waitForSelector('#rtgCommand .cmd-pane', { timeout: 10000 });
     const smalBlad = await page.evaluate(stand);
     assert.equal(new URL(page.url()).pathname, '/apps/app.html',
@@ -357,7 +357,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'false', 'en de stand hoort mee te gaan');
 
     // een TWEEDE blad geeft de strip zijn werk terug
-    await page.evaluate(() => window.RTGCommand.open('/apps/geld-command.html', 'Geld'));
+    await page.evaluate(() => window.RTGCommand.open('/apps/geld.html', 'Geld'));
     await wachtTot(page, () => document.querySelectorAll('.cmd-pane').length === 2,
       null, { wat: 'het tweede blad' });
     const twee = await page.evaluate(stand);

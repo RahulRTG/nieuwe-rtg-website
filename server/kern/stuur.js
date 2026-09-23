@@ -22,6 +22,7 @@ const INTERNE_GOEDKEURING = Symbol('stuur-goedgekeurd');
 
 /* De verbodslijst, de licht/zwaar-classificatie en de deeltakenparser wonen in
    ./stuur/classificatie.js; ze worden hier nog steeds geexporteerd. */
+const agentteken = require('./agentteken');
 const { VERBODEN, classificeer, parseSubs } = require('./stuur/classificatie');
 const rail = require('./stuur/rail');
 
@@ -57,14 +58,18 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
     const koppen = { 'Content-Type': 'application/json' };
     const auth = req.get && req.get('authorization');
     if (auth) koppen.Authorization = auth;
+    // A5: de AI handelt zichtbaar NAMENS deze mens (kern/agentteken.js)
+    koppen[agentteken.KOP] = agentteken.kop('rahul');
     try {
       const r = await fetch('http://127.0.0.1:' + poort + pad, {
         method: 'POST', headers: koppen, body: JSON.stringify(body == null ? {} : body),
         signal: AbortSignal.timeout(TIMEOUT_MS)
       });
       const antwoord = await r.json().catch(() => ({}));
-      try { log && log.info && log.info('stuur', { pad, s: r.status }); } catch (e) {}
-      return { status: r.status, antwoord };
+      // wat de route zelf over de handelaar zegt; null als niemand het vastlegde
+      const agent = r.headers.get('x-rtg-handelaar') || null;
+      try { log && log.info && log.info('stuur', { pad, s: r.status, agent }); } catch (e) {}
+      return { status: r.status, antwoord, agent };
     } catch (e) {
       return { status: 502, error: 'De actie kwam niet aan: ' + (e && e.name === 'TimeoutError' ? 'tijd verstreken.' : 'interne fout.') };
     }

@@ -46,15 +46,40 @@
     try { return typeof item.allowed === 'function' ? !!item.allowed() : item.allowed !== false; }
     catch (e) { return false; }
   }
+  /* VERHINDERD IS NIET WEGGELATEN (GRAMMATICA.md: een verhindering draagt altijd
+     een reden; ARBEID.md par. 4 punt 13). Een actie die hier nu niet mag, staat
+     er MET haar reden in plaats van stil te verdwijnen -- anders lijkt de functie
+     niet te bestaan. Zonder opgegeven reden zeggen we dat hardop, en verzinnen
+     we er geen. Wat niet geregistreerd is, bestaat niet en blijft weg. */
+  var GEEN_REDEN = 'Waarom dit hier nu niet kan, is niet opgegeven.';
+  function reason(item) {
+    var r;
+    try { r = typeof item.reason === 'function' ? item.reason() : item.reason; } catch (e) { r = ''; }
+    return String(r || '').slice(0, 160) || GEEN_REDEN;
+  }
   function project(ids, registry, limit) {
     var out = [], seen = Object.create(null), max = Math.max(0, Math.min(5, Number(limit) || 4));
     (ids || []).forEach(function (input) {
       var id = typeof input === 'string' ? input : input && input.id;
       var item = id && registry && registry[id];
-      if (!item || seen[id] || out.length >= max || !allowed(item)) return;
-      seen[id] = true; out.push(item);
+      if (!item || seen[id] || out.length >= max) return;
+      seen[id] = true;
+      out.push(allowed(item) ? item : { id: item.id, label: item.label, blocked: true, reason: reason(item) });
     });
     return out;
+  }
+  /* De knop in het blad. Hier en niet in de weergave, zodat de regel "verhinderd
+     staat er met zijn reden" op één plek woont: aria-disabled, de reden als
+     tekst eronder, en een tik die niets uitvoert. */
+  function sheetButton(doc, item, run) {
+    var b = doc.createElement('button'); b.type = 'button'; b.className = 'rtg-adaptive-sheet-action';
+    b.dataset.rtgAdaptiveAction = item.id; b.textContent = item.label;
+    if (item.blocked) {
+      b.setAttribute('aria-disabled', 'true'); b.dataset.rtgAdaptiveBlocked = 'true';
+      var r = doc.createElement('small'); r.className = 'rtg-adaptive-reason'; r.textContent = item.reason;
+      b.appendChild(r);
+    } else b.addEventListener('click', function () { run(item.id); });
+    return b;
   }
   function defaults(state) {
     var labels = { primary: 'Volgende stap', worlds: 'Uw werelden', context: 'Context en opties',
@@ -92,7 +117,7 @@
       return false;
     }
     state.registry[id] = { id: id, label: String(item.label || id).slice(0, 80),
-      allowed: item.allowed, run: typeof item.run === 'function' ? item.run : null };
+      allowed: item.allowed, reason: item.reason, run: typeof item.run === 'function' ? item.run : null };
     return true;
   }
   /* Een tik: dezelfde ingang als het dock (RTGGewicht.voer), met gewicht licht. */
@@ -114,5 +139,6 @@
   }
   return Object.freeze({ STATES: STATES, DECKS: DECKS, SPECS: SPECS, normState: normState, detail: detail,
     normDeck: normDeck, nextDeck: nextDeck, allowed: allowed, project: project,
-    model: model, momentopname: momentopname, defaults: defaults, register: register, voer: voer, setProjection: setProjection, actions: actions });
+    reason: reason, sheetButton: sheetButton, model: model, momentopname: momentopname, defaults: defaults,
+    register: register, voer: voer, setProjection: setProjection, actions: actions });
 }));

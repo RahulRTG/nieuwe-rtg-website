@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '53f247aa';
+var RTG_BOUW = '2c41e5d3';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3801,7 +3801,7 @@ var RTG_BOUW = '53f247aa';
   // Elke app kent zijn eigen huisstijl-glyf (shared/glyf.js) op naam van de
   // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
-    ontdek:      { naam: 'Ontdekken',     url: '/apps/rtg.html' },
+    ontdek:      { naam: 'Overzicht',     url: '/apps/rtg.html' },
     /* De cockpit van LivingOS (WERELDEN.md). Het bestand heet nog living-os,
        want een bestandsnaam is geen merknaam; de APP heette dat ook, en dat
        botste vier regels ver in de bank met de WERELD LivingOS. */
@@ -3824,7 +3824,7 @@ var RTG_BOUW = '53f247aa';
        -- die is Rahuls routeertabel en de bron van werkbladtitels -- maar tekent
        geen bank-sectie meer. test/wereldregister.test.js bewaakt dat elke app
        uit die catalogus ook echt in een wereld hangt. */
-    vandaag:     { naam: 'Vandaag',        url: '/apps/vandaag.html' },
+    vandaag:     { naam: 'Vandaag',        url: '/apps/life.html' },
     leven:       { naam: 'Mijn leven',     url: '/apps/leven.html' },
     sociaal:     { naam: 'Sociaal',        url: '/apps/sociaal.html' },
     /* De WERELDLAAG (README: server/kern/wereld/) -- een LEESLAAG over vijf
@@ -3839,7 +3839,7 @@ var RTG_BOUW = '53f247aa';
        WERELDEN.md gaat over de MENS: wie zijn eigen tijdlijn leest, is bezig
        met zijn dagelijks leven. */
     wereldlaag:  { naam: 'Alles bij elkaar', url: '/apps/wereld.html' },
-    geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
+    geldcommand: { naam: 'Geld',           url: '/apps/geld.html' },
     commerce:    { naam: 'Commerce',       url: '/apps/commerce.html' },
     /* HIER STONDEN INSTANTREALITY EN PRIVATEOFFICE, en die zijn 19 augustus 2026
        samengevoegd met de sleutel ernaast (WERELDEN.md, "de twee dubbele
@@ -3909,8 +3909,8 @@ var RTG_BOUW = '53f247aa';
        een wereld hangen zou een deur maken naar een tafel waar u niet zit. */
     mall:        { naam: 'Mall',          url: '/apps/mall.html' },
     mijnmall:    { naam: 'Mijn bestellingen', url: '/apps/mijnmall.html' },
-    pay:         { naam: 'Betalen',       url: '/apps/pay.html' },
-    huis:        { naam: 'Thuis',         url: '/apps/thuis.html' },
+    pay:         { naam: 'RTG Pay',       url: '/apps/pay.html' },
+    huis:        { naam: 'Logeren bij leden', url: '/apps/thuis.html' },
     uitgaan:     { naam: 'Uitgaan',       url: '/apps/uitgaan.html' },
     foodcourt:   { naam: 'Food Court',    url: '/apps/foodcourt.html' },
     spelavond:   { naam: 'Game Night',    url: '/apps/spelscherm.html' },
@@ -4003,7 +4003,7 @@ var RTG_BOUW = '53f247aa';
     nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/geld.html#nalatenschap' },
     logboek:     { naam: 'Logboek',       url: '/apps/geld.html#logboek' },
     cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
-    pulse:       { naam: 'Vandaag',         url: '/apps/pulse.html' },
+    pulse:       { naam: 'Pulse',           url: '/apps/pulse.html' },
     nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
     krant:       { naam: 'Krant',     url: '/apps/krant.html' },
     /* RTG Reizen staat NAAST Vluchten, Verblijven, Reisbureau en Hangar en niet

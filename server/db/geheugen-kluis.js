@@ -13,6 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { DATA_DIR, beslotenMap, besloten } = require('./opslag');
+const { leesOfPubliceer } = require('../lib/sleutelbestand');
 
 const MAGIC = Buffer.from('RTGMEM1');
 
@@ -20,13 +21,24 @@ function laadSleutel() {
   const ruw = process.env.RTG_ENC_KEY || '';
   if (ruw) return /^[0-9a-fA-F]{64}$/.test(ruw) ? Buffer.from(ruw, 'hex') : crypto.createHash('sha256').update(ruw).digest();
   const kf = path.join(DATA_DIR, 'geheugen.key');
+  /* Lezen, of als EERSTE publiceren (server/lib/sleutelbestand.js). Hier stond
+     een lezing die bij een korte sleutel stil een NIEUWE schreef, over de oude
+     heen -- en een tweede proces dat midden in het schrijven las, zag precies
+     zo'n korte sleutel. Een bestand dat er staat en geen sleutel is, wordt nu
+     nooit vervangen; alleen als publiceren zelf niet lukt (een datamap die niet
+     beschrijfbaar is) draait dit door met een sessiesleutel, zoals het al deed. */
+  let hex;
   try {
-    if (fs.existsSync(kf)) { const b = Buffer.from(fs.readFileSync(kf, 'utf8').trim(), 'hex'); if (b.length === 32) return b; }
-  } catch (e) {}
-  const nieuw = crypto.randomBytes(32);
-  try { beslotenMap(DATA_DIR); fs.writeFileSync(kf, nieuw.toString('hex'), { mode: 0o600 }); besloten(kf); }
-  catch (e) { console.warn('[geheugen] kon de sleutel niet bewaren (' + e.message + '); draai door met een sessiesleutel.'); }
-  return nieuw;
+    beslotenMap(DATA_DIR);
+    hex = leesOfPubliceer(kf, () => crypto.randomBytes(32).toString('hex'), (p) => fs.readFileSync(p, 'utf8'));
+    besloten(kf);
+  } catch (e) {
+    console.warn('[geheugen] kon de sleutel niet bewaren (' + e.message + '); draai door met een sessiesleutel.');
+    return crypto.randomBytes(32);
+  }
+  const b = Buffer.from(String(hex).trim(), 'hex');
+  if (b.length !== 32) throw new Error('geheugen.key is geen sleutel van 32 bytes; hij wordt met opzet NIET vervangen (server/lib/sleutelbestand.js).');
+  return b;
 }
 let KEY = null;
 function sleutel() { if (!KEY) KEY = laadSleutel(); return KEY; }

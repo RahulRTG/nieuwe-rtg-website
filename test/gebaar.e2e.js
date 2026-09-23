@@ -13,7 +13,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
 /* Waar de browser NIET op de plek staat die het pakket verwacht (een
@@ -45,14 +45,15 @@ async function maat(loc) {
   return loc.boundingBox();
 }
 
+/* DE VEEG ZELF GAAT DOOR veegDoor (test/helper.js). Hier stond een eigen reeks
+   -- mouse.down() en daarna twintig losse moves -- en daarmee precies de race die
+   veegDoor oplost: tussen down() en de eerste move() zat een aparte CDP-ronde, en
+   op een pagina die nog opstart haalt die de timer van lang drukken. Wat hier
+   blijft is de MAAT van deze proef: waar hij begint, hoe ver hij gaat, in
+   twintig stapjes (een sprong van honderd pixels is voor de browser geen veeg),
+   en of hij loslaat. */
 async function veeg(page, doos, px, losLaten) {
-  const y = doos.y + doos.height / 2;
-  const x0 = px < 0 ? doos.x + doos.width * 0.7 : doos.x + doos.width * 0.15;
-  await page.mouse.move(x0, y);
-  await page.mouse.down();
-  // in stapjes, want een sprong van honderd pixels is voor de browser geen veeg
-  for (let i = 1; i <= 20; i++) await page.mouse.move(x0 + (px * i) / 20, y);
-  if (losLaten) await page.mouse.up();
+  return veegDoor(page, doos, { startFractie: px < 0 ? 0.7 : 0.15, afstand: px, stappen: 20, loslaten: losLaten });
 }
 
 /* WACHTEN OP DE LADE, NIET OP STILTE. wachtOpRust telt hoe lang de tekst niet

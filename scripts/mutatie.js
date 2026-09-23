@@ -566,6 +566,11 @@ const EIGEN_MODULE = new Map([
      bewering zakken. De expliciete koppeling voorkomt dat een echte VM-toets
      als "geen module gevonden" buiten de mutatiemeting blijft. */
   ['workspace-platform.test.js', ['public/shared/interface/module-sdk.js']],
+  /* De werkruimtecontext (Edge ronde 2, stap 23) is browsercode die de toets in
+     een VM uitvoert, dus zonder require. Met de hand nagetrokken: de herkomst
+     overschrijven, een cache terugzetten, terugvallen op RTGAdaptief en bij een
+     weigering de oude kopie teruggeven laten elk een bewering zakken. */
+  ['workspace-context.test.js', ['public/shared/interface/workspace-context.js']],
   /* DE TENANTLAAG: twee toetsen die de server als kindproces starten en dus
      geen require van hun module dragen. Beide regels zijn met een mutatie
      nagetrokken en niet gegokt.

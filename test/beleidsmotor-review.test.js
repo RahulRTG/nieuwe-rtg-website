@@ -110,6 +110,22 @@ test('2-4. houders, zetels en de gesimuleerde deuren', async () => {
   assert.equal(balie.laatstGebruikt, null);
   assert.equal(balie.slapend, 'onbekend', 'geen datum en een meting van minder dan 90 dagen is onbekend');
 
+  /* DE SIMULATOR: een boardroomzetel erbij zet alleen de boardroomdeur om, en er
+     verandert NIETS aan de echte zetels. */
+  const sim = await api(eerlijk.base, '/api/office/beleidsmotor/simulatie',
+    { codenaam: m.codenaam, plus: ['boardroom', 'verzonnen'], reden: REDEN }, eig);
+  assert.equal(sim.status, 200, JSON.stringify(sim.body).slice(0, 200));
+  // wie de boardroom in mag, zit ook aan de balie (kern/ledenbalie-zetels.js: magBalie)
+  assert.deepEqual(sim.body.verschil, [{ deur: 'boardroom', voor: 'WEIGEREN', na: 'TOESTAAN' },
+    { deur: 'balie', voor: 'WEIGEREN', na: 'TOESTAAN' }]);
+  assert.deepEqual(sim.body.genegeerd, ['verzonnen'], 'een onbekende zetel wordt genoemd en niet stil verwerkt');
+  assert.equal(rij(await review(eerlijk.base, eig), m.key).deuren.boardroom, 'WEIGEREN', 'de simulatie veranderde niets');
+  const min = await api(eerlijk.base, '/api/office/beleidsmotor/simulatie',
+    { codenaam: m.codenaam, min: ['kantoorrol'], reden: REDEN }, eig);
+  assert.deepEqual(min.body.verschil.map(v => v.deur).sort(), ['kantoor', 'op-naam'], 'zonder kantoorrol vallen beide kantoordeuren');
+  assert.equal((await api(eerlijk.base, '/api/office/beleidsmotor/simulatie', { codenaam: m.codenaam, reden: REDEN }, gedeeld)).status, 403);
+  assert.equal((await api(eerlijk.base, '/api/office/beleidsmotor/simulatie', { codenaam: m.codenaam }, eig)).status, 400);
+
   const codes = r2.body.houders.map(x => x.codenaam || x.key);
   assert.deepEqual(codes, codes.slice().sort((a, c) => String(a).localeCompare(String(c))), 'gesorteerd op codenaam en op niets anders');
 });
@@ -119,4 +135,13 @@ test('5. onder een liegende opslag komt er geen lijst', async () => {
   assert.ok(r.status >= 500, 'de review gaf ' + r.status + ' terwijl het spoor niet vaststaat');
   assert.ok(!r.body.houders, 'er is een lijst mensen meegestuurd zonder spoor');
   assert.equal(r.body.spoor, 'niet-bevestigd');
+  /* Met een codenaam die BESTAAT (de eigenaar staat in elke zaaiset): anders komt
+     de 404 eerder dan de spoorcontrole, en meet deze proef het opzoeken. */
+  const lid = (await api(leugen.base, '/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body;
+  const cn = ((await api(leugen.base, '/api/auth/me', {}, lid.token)).body.user || {}).codename || (lid.state && lid.state.user.codename);
+  assert.ok(cn, 'de codenaam van de eigenaar is bekend');
+  const sim = await api(leugen.base, '/api/office/beleidsmotor/simulatie', { codenaam: cn, reden: REDEN }, eigLeugen);
+  assert.ok(sim.status >= 500, 'de simulator gaf ' + sim.status + ' terwijl het spoor niet vaststaat');
+  assert.ok(!sim.body.deuren, 'ook de simulator geeft niets zonder spoor');
+  assert.equal(sim.body.spoor, 'niet-bevestigd');
 });

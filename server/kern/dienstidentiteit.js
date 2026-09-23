@@ -50,4 +50,35 @@ function alsToestel(id, fn) {
   return envelop.inKeten(e, fn);
 }
 
-module.exports = { DIENSTEN, alsDienst, alsToestel, actorVan };
+/* Een zaakdoos met een EIGEN sleutel (kern/zaakdoos/sleutels.js). Alleen dan: een
+   doos die met de gedeelde sleutel binnenkomt noemt zichzelf, en die naam op de
+   bus zetten zou een zelfopgave als identiteit verkopen. */
+function alsDoos(naam, fn) {
+  const e = envelop.alsStart(envelop.maak({ kanaal: 'doos', actor: 'doos:' + String(naam).slice(0, 40),
+    classificatie: 'intern' }));
+  return envelop.inKeten(e, fn);
+}
+
+/* AANBIEDERS die ons een webhook sturen. Ook een gesloten lijst, en de identiteit
+   geldt pas NA de controle van hun handtekening -- wie hem ervoor zou zetten,
+   laat een onbewezen afzender als aanbieder op de bus verschijnen. */
+const AANBIEDERS = Object.freeze({
+  stripe: 'kaartbetalingen en uitbetalingen',
+  mollie: 'betalingen; het bericht zelf is geen bewijs, RTG haalt de betaling opnieuw op',
+  adyen: 'betalingen, met een HMAC per melding',
+  munt: 'de munt-aanbieder die ontvangst en omzetting bevestigt',
+  storingen: 'de foutmeldingen van de eigen installaties'
+});
+/* Voer fn uit als deze aanbieder. Een lege naam (een webhook zonder bewezen
+   aanbieder, zoals de demo-afzender) draait gewoon zonder actor. Bewust GEEN
+   AsyncLocalStorage.enterWith: dat zet de identiteit op de hele asynchrone
+   context van de aanroeper, en de toets vond dat hij daarmee in een naastgelegen
+   keten opdook. Het werk na de handtekening gaat hier dus als functie in. */
+function alsAanbieder(naam, fn) {
+  if (!naam) return fn();
+  if (!Object.prototype.hasOwnProperty.call(AANBIEDERS, naam)) throw new Error('dienstidentiteit: onbekende aanbieder ' + naam);
+  const e = envelop.alsStart(envelop.maak({ kanaal: 'webhook', actor: 'aanbieder:' + naam, classificatie: 'intern' }));
+  return envelop.inKeten(e, fn);
+}
+
+module.exports = { DIENSTEN, AANBIEDERS, alsDienst, alsToestel, alsDoos, alsAanbieder, actorVan };

@@ -335,8 +335,8 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
-| 7 | **identiteiten voor agents, diensten en apparaten** | **agent, diensten en toestellen staan** (23 september 2026; par. 5c en 5i); de zaakdoos niet (een gedeelde sleutel, par. 5i) |
-| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf, de toegangsreview en slapende rechten staan** (par. 5g); de simulator voor een ander niet |
+| 7 | **identiteiten voor agents, diensten en apparaten** | **staat** (23 september 2026; par. 5c en 5i): agent, diensten, toestellen, webhooks, en de zaakdoos met een eigen sleutel in de schaduw; de gedeelde doos-sleutel weghalen is een apart besluit |
+| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **staat** (23 september 2026; par. 5g) |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
 
 ### 5a. Fase 1, zoals hij er staat
@@ -583,6 +583,16 @@ liegende server. Zes mutaties laten de toets zakken, waaronder het spoor
 negeren, geen reden eisen, een zetelbron overslaan en een besluit vast op
 toestaan zetten.
 
+**De simulator** (`/api/office/beleidsmotor/simulatie`, boardroom, reden en een
+journaalregel die vaststaat, net als de review) laat voor een codenaam zien welke
+deuren van besluit wisselen als hij een zetel erbij krijgt (`plus`) of kwijtraakt
+(`min`). Er verandert NIETS: het is een rekensom over dezelfde feiten als de
+review, en de toets kijkt na afloop of de echte zetels gelijk bleven. Een
+onbekende zetelsoort wordt genoemd (`genegeerd`) en niet stil verwerkt. De toets
+vond meteen iets dat in het ontwerp stond maar in de verwachting ontbrak: wie een
+boardroomzetel krijgt, zit ook aan de balie (`magBalie` rekent de boardroom mee),
+dus de simulatie toont twee deuren die omslaan en niet een.
+
 **Slapende rechten, op besluit van de eigenaar (23 september 2026): alleen de
 laatste gebruiksdatum per zetel, 90 dagen bewaard** (`kern/beleidsmotor/slapend.js`).
 Per houder en per zetel (kantoorrol, boardroom, balie) staat er EEN datum: de dag
@@ -660,15 +670,40 @@ een identiteit zegt WIE er handelt en verleent niets.
 - **Een toestel schrijft als `toestel:<id>`**, niet als het lid. Het lid staat in
   de meting zelf.
 
-**Wat nog niet staat, en waarom.**
-- **De zaakdoos** authenticeert met EEN gedeelde sleutel (`RTG_DOOS_SLEUTEL`) en
-  noemt zichzelf in het verzoek (`body.doos`). Wie de sleutel heeft, kan zich
-  dus voor elke doos uitgeven. Een identiteit daarop plakken zou een verzonnen
-  identiteit bewijzen. De uitweg is een sleutel per doos, zoals de toestellen
-  hebben (`kern/toestellen.js`): een stap weg, en een wijziging aan de vloot.
-- **Webhooks** krijgen nog geen actor.
-- De overige timers die niet schrijven (infrastructuur) zijn niet omgezet.
-- De toegangsreview (par. 5g) toont diensten niet, want die houden geen zetel.
+**De zaakdoos krijgt een eigen sleutel, in de schaduw.** De vloot authenticeerde
+met EEN gedeelde sleutel (`RTG_DOOS_SLEUTEL`), en een doos noemde zichzelf in het
+verzoek (`body.doos`). Wie die sleutel had, kon zich dus voor elke doos uitgeven.
+Nu staat er een sleutel per doos naast (`kern/zaakdoos/sleutels.js`, zoals bij de
+toestellen):
+- 48 hex-tekens, een keer getoond, en in de opslag alleen een hash;
+- uitgeven en intrekken kan alleen de eigenaar, met dezelfde extra bevestiging als
+  bij boardroomtoegang (`/api/office/doos/sleutel` en `.../weg`);
+- met een eigen sleutel komt de NAAM uit het register en niet uit het verzoek;
+- de meting draagt `bewezen` en het wereldbord laat het verschil zien;
+- op de bus schrijft de doos als `doos:<naam>`, maar alleen als hij bewezen is: een
+  zelfopgave op de bus zetten zou een verzonnen identiteit bewijzen.
+
+De doos stuurt de eigen sleutel mee als hij er een heeft (`RTG_DOOS_ID` en
+`RTG_DOOS_EIGEN_SLEUTEL`, via `kern/zaakdoos/koppen.js`). De gedeelde sleutel
+werkt nog. Elke geldige aanroep telt onder de weg waarlangs hij kwam
+(`/api/office/doos/sleutels`); de gedeelde sleutel weghalen is een apart besluit.
+
+**Webhooks van aanbieders schrijven nu als `aanbieder:<naam>`** (stripe, mollie,
+adyen, munt, storingen: een gesloten lijst), en alleen NA de controle van hun
+handtekening. Bij Mollie is dat na het opnieuw ophalen van de betaling, want het
+bericht zelf is geen bewijs. Een onbewezen afzender, zoals de demo-afzender,
+draait zonder actor. De eerste versie gebruikte `AsyncLocalStorage.enterWith`, en
+de toets vond dat de identiteit daarmee in de asynchrone context van de aanroeper
+bleef hangen. Het werk na de handtekening gaat daarom als functie in `alsAanbieder`.
+
+Getoetst in `test/doossleutels.test.js` en `test/dienstidentiteit.test.js`. Negen
+mutaties laten de toetsen zakken, waaronder de eigen sleutel negeren, de naam uit
+het verzoek nemen, een niet-eigenaar laten uitgeven, niet intrekken, de sleutel
+in de opslag zetten en de aanbieder niet zetten.
+
+**Wat nog niet staat.** De overige timers die niet schrijven (infrastructuur)
+zijn niet omgezet. De toegangsreview (par. 5g) toont diensten, dozen en
+aanbieders niet, want die houden geen zetel.
 
 ---
 

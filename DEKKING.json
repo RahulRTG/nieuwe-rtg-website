@@ -3,7 +3,7 @@
   "gemeten": {
     "op": "2026-09-23T13:46:01.000Z",
     "commit": "e7550a2fb",
-    "routesToen": 5118
+    "routesToen": 5122
   },
   "aangeraakt": [
     "GET /",
@@ -2184,6 +2184,7 @@
     "POST /api/office/bank/vergunning",
     "POST /api/office/beleidsmotor",
     "POST /api/office/beleidsmotor/review",
+    "POST /api/office/beleidsmotor/simulatie",
     "POST /api/office/beleidsmotor/waarom",
     "POST /api/office/betalingen/status",
     "POST /api/office/bewaarverzoek",
@@ -2225,6 +2226,9 @@
     "GET /api/office/doc",
     "POST /api/office/doos/netwerk-zet",
     "POST /api/office/doos/regie",
+    "POST /api/office/doos/sleutel",
+    "POST /api/office/doos/sleutel/weg",
+    "POST /api/office/doos/sleutels",
     "POST /api/office/doos/update-zet",
     "POST /api/office/economie/journaal",
     "POST /api/office/economie/proef",

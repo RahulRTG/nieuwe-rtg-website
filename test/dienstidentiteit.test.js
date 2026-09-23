@@ -13,7 +13,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { DIENSTEN, alsDienst, alsToestel, actorVan } = require('../server/kern/dienstidentiteit');
+const { DIENSTEN, AANBIEDERS, alsDienst, alsToestel, alsDoos, alsAanbieder, actorVan } = require('../server/kern/dienstidentiteit');
 const envelop = require('../server/kern/envelop');
 
 function bronbestanden(map, uit = []) {
@@ -61,4 +61,31 @@ test('4. een toestel schrijft als toestel', () => {
   alsToestel('a1b2c3d4', () => { e = envelop.huidige(); });
   assert.equal(e.actor, 'toestel:a1b2c3d4');
   assert.equal(e.classificatie, 'persoonsgegeven', 'een meting gaat over een herleidbaar mens');
+});
+
+test('5. een bewezen doos schrijft als doos', () => {
+  let e = null;
+  alsDoos('doos-a', () => { e = envelop.huidige(); });
+  assert.equal(e.actor, 'doos:doos-a');
+});
+
+test('6. een aanbieder heet zo alleen binnen zijn werk, en de lijst is gesloten', async () => {
+  const gebruikt = new Set();
+  for (const f of bronbestanden(path.join(__dirname, '..', 'server'))) {
+    // Hier GEEN commentaarfilter: het mediatype ster-slash-ster van express.raw
+    // opent voor een regex een commentaar dat nooit sluit, en dan verdwijnt de
+    // rest van het bestand. Een aanroep in commentaar zou hier alleen te veel tellen.
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const m of bron.matchAll(/alsAanbieder\((?:[^,]*\? *)?'([^']+)'/g)) gebruikt.add(m[1]);
+  }
+  assert.deepEqual([...gebruikt].filter(n => !AANBIEDERS[n]), [], 'een aanbieder die niet is verklaard');
+  assert.deepEqual(Object.keys(AANBIEDERS).filter(n => !gebruikt.has(n)), [], 'een verklaarde aanbieder zonder webhook');
+  assert.throws(() => alsAanbieder('iedereen', () => {}), /onbekende aanbieder/);
+  let binnen = null;
+  await alsAanbieder('mollie', async () => { await null; binnen = envelop.huidige(); });
+  assert.equal(binnen.actor, 'aanbieder:mollie', 'ook na een await in het werk');
+  assert.equal(envelop.huidige(), null, 'en daarna niet meer: geen lek naar de aanroeper');
+  let zonder = 'x';
+  alsAanbieder(null, () => { zonder = envelop.huidige(); });
+  assert.equal(zonder, null, 'een onbewezen afzender draait zonder actor');
 });

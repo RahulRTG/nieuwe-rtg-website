@@ -65,6 +65,8 @@ module.exports = (ctx) => {
   require('./regie-toegang')(ctx);
   /* De kantoorrol op naam (fase 2) staat in ./uitnodiging.js. */
   require('./uitnodiging')(ctx);
+  /* Een eigen sleutel per zaakdoos (fase 7) staat in ./doossleutels.js. */
+  require('./doossleutels')(ctx);
 
   /* De schakelroutes van de kast (globaal, fijn, genre, de grote hendel en de
      uitrolfases) staan in ./regie-schakel.js -- afgesplitst voor de 10 KB van

@@ -8,6 +8,8 @@
    ========================================================================== */
 'use strict';
 
+const AF = { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' };
+
 const CONTRACTEN = {
   'POST /api/office/beleidsmotor': {
     mutatieId: 'office.beleidsmotor',
@@ -75,6 +77,38 @@ const CONTRACTEN = {
     nagekeken: 'met de hand, 2026-09-23: de handler roept alleen overzicht() aan, die leest via eigen.bak/kijk ' +
       'en schrijft niets',
     afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
+  },
+  /* Fase 8 en 7: de simulator en de sleutel per zaakdoos. */
+  'POST /api/office/beleidsmotor/simulatie': {
+    mutatieId: 'office.beleidsmotor.simulatie', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'tegen een draaiende server (test/beleidsmotor-review.test.js): de simulatie verandert niets aan ' +
+      'de review erna, en onder schrijf-verloren geen antwoord', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: alleen een journaalregel (bewust een per vraag) en een rekensom in review.simuleer()',
+    afgetekend: AF
+  },
+  'POST /api/office/doos/sleutel': {
+    mutatieId: 'office.doos.sleutel', herkomst: 'mens', semantiek: { klasse: 'nietHerhaalbaar' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'een tweede oproep geeft een nieuwe sleutel en maakt de vorige van die doos ongeldig',
+    bewijs: { gemeten: 'test/doossleutels.test.js toets 5: na een tweede geef() geeft de eerste sleutel geen doos meer', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: kern/zaakdoos/sleutels.js geef() overschrijft de hash van die doos',
+    afgetekend: AF
+  },
+  'POST /api/office/doos/sleutel/weg': {
+    mutatieId: 'office.doos.sleutel.weg', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/doossleutels.test.js toets 5: een tweede trekIn() geeft ingetrokken:false en laat de ' +
+      'opslag byte voor byte gelijk', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: trekIn() verwijdert alleen als de doos er staat; daarna is er niets meer te doen',
+    afgetekend: AF
+  },
+  'POST /api/office/doos/sleutels': {
+    mutatieId: 'office.doos.sleutels', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/doossleutels.test.js: het overzicht met de wegen, zonder sleutels of hashes', op: '2026-09-23' },
+    nagekeken: 'met de hand, 2026-09-23: overzicht() leest via eigen.kijk en schrijft niets',
+    afgetekend: AF
   },
 };
 

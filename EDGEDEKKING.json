@@ -1,13 +1,13 @@
 {
   "stempel": {
-    "op": "2026-09-23T10:43:52.333Z",
-    "commit": "5359e1a",
+    "op": "2026-09-23T17:05:51.911Z",
+    "commit": "dbb3c96",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgedekking.js",
     "node": "v22.22.2"
   },
-  "uitleg": "Per scherm onder public/apps: welke velden van het Edge-contract het scherm publiceert, gemeten in een echte browser via window.RTGEdgeBlikveld.lees(), als vers lid met een RTG Pass en getekende overeenkomst, op 390x844 (touch), elk scherm in een eigen lege browsercontext. 'ja' = er staat een waarde (lees herkomst erbij: context valt terug op de documenttitel); 'nvt' = de body verklaart het veld met data-rtg-edge-nvt EN een niet-lege data-rtg-edge-nvt-reden; anders 'nee'. De stand bij binnenkomst: er wordt niets aangeklikt. Waarden worden niet bewaard, alleen of er een is. geen-blikveld draagt de eerste ontbrekende schakel van de laadketen, in de pagina nagelezen. Wat in de volle ronde (vier tegelijk) geen blikveld had, niet tot rust kwam of een veld verloor, is daarna los herhaald en die uitslag telt; eersteRonde zegt wat de volle ronde zag als dat anders was. gebreken in de telling = op hoeveel schermen.",
+  "uitleg": "Per scherm onder public/apps: welke velden van het Edge-contract het scherm publiceert, gemeten in een echte browser via window.RTGEdgeBlikveld.lees(), als vers lid met een RTG Pass en getekende overeenkomst, op 390x844 (touch), elk scherm in een eigen lege browsercontext. 'ja' = er staat een waarde (lees herkomst erbij: context valt terug op de documenttitel); 'nvt' = de body verklaart met data-rtg-edge-nvt-<veld>=reden dat het veld hier niet bestaat; 'na-openen' = de body verklaart met data-rtg-edge-na-openen-<veld>=reden dat het pas na openen ontstaat (telt nooit als ja); een reden per veld, en zonder reden of met beide verklaringen 'nee'. De redenen staan per scherm in redenen. zelf telt alleen de herkomsten uit ZELF in scripts/edgedekking.js. De stand bij binnenkomst: er wordt niets aangeklikt. Waarden worden niet bewaard, alleen of er een is (de redenen zijn wat het scherm in zijn eigen HTML verklaart, geen sessiewaarden). geen-blikveld draagt de eerste ontbrekende schakel van de laadketen, in de pagina nagelezen. Wat in de volle ronde (vier tegelijk) geen blikveld had, niet tot rust kwam of een veld verloor, is daarna los herhaald en die uitslag telt; eersteRonde zegt wat de volle ronde zag als dat anders was. gebreken in de telling = op hoeveel schermen.",
   "sessie": "lid",
   "viewport": {
     "width": 390,
@@ -328,7 +328,36 @@
     "/apps/zakelijk.html",
     "/apps/zorgbalie.html"
   ],
-  "aanvaardAchteruit": [],
+  "aanvaardAchteruit": [
+    {
+      "pad": "/apps/toestemming.html",
+      "veld": "wereld",
+      "was": "ja",
+      "nu": "nee",
+      "status": "omgeleid"
+    },
+    {
+      "pad": "/apps/toestemming.html",
+      "veld": "context",
+      "was": "ja",
+      "nu": "nee",
+      "status": "omgeleid"
+    },
+    {
+      "pad": "/apps/vandaag.html",
+      "veld": "wereld",
+      "was": "ja",
+      "nu": "nee",
+      "status": "omgeleid"
+    },
+    {
+      "pad": "/apps/vandaag.html",
+      "veld": "context",
+      "was": "ja",
+      "nu": "nee",
+      "status": "omgeleid"
+    }
+  ],
   "schermen": {
     "/apps/agenda.html": {
       "status": "gemeten",
@@ -19152,76 +19181,15 @@
       "stabiel": true
     },
     "/apps/toestemming.html": {
-      "status": "gemeten",
+      "status": "omgeleid",
       "http": 200,
-      "velden": {
-        "identiteit": "nee",
-        "wereld": "ja",
-        "context": "ja",
-        "object": "nee",
-        "activiteit": "nee",
-        "presence": "nee",
-        "voortzetting": "nee",
-        "hoofdactie": "nee",
-        "trust": "nee"
-      },
-      "herkomst": {
-        "identiteit": "geen",
-        "wereld": "route",
-        "context": "edge-casco",
-        "object": "geen",
-        "activiteit": "geen",
-        "presence": "geen",
-        "voortzetting": "geen",
-        "hoofdactie": "geen",
-        "trust": "geen"
-      },
-      "acties": {
-        "RTGAdaptief": {
-          "totaal": 0,
-          "perStaat": {
-            "AFWEZIG": 0,
-            "GEBLOKKEERD": 0,
-            "BESCHIKBAAR": 0,
-            "LOPEND": 0
-          },
-          "zonderStaat": 0,
-          "gezagBekend": 0,
-          "geblokkeerdZonderWaarom": 0,
-          "gevolg": {
-            "bekend": 0,
-            "onvolledig": 0,
-            "onbekend": 0,
-            "zonder": 0
-          },
-          "herstelBekend": 0,
-          "metGewicht": 0,
-          "metGebreken": 0
-        },
-        "edge-compat": {
-          "totaal": 7,
-          "perStaat": {
-            "AFWEZIG": 0,
-            "GEBLOKKEERD": 0,
-            "BESCHIKBAAR": 7,
-            "LOPEND": 0
-          },
-          "zonderStaat": 0,
-          "gezagBekend": 0,
-          "geblokkeerdZonderWaarom": 0,
-          "gevolg": {
-            "bekend": 0,
-            "onvolledig": 0,
-            "onbekend": 7,
-            "zonder": 0
-          },
-          "herstelBekend": 0,
-          "metGewicht": 0,
-          "metGebreken": 0
-        }
-      },
+      "velden": null,
+      "herkomst": null,
+      "acties": null,
       "gebreken": [],
-      "stabiel": true
+      "naar": "/apps/mijn-relaties.html",
+      "reden": "het scherm stuurde door naar /apps/mijn-relaties.html; wat daar staat is een ander scherm en telt hier niet",
+      "herhaald": true
     },
     "/apps/training.html": {
       "status": "gemeten",
@@ -19368,76 +19336,15 @@
       "stabiel": true
     },
     "/apps/vandaag.html": {
-      "status": "gemeten",
+      "status": "omgeleid",
       "http": 200,
-      "velden": {
-        "identiteit": "nee",
-        "wereld": "ja",
-        "context": "ja",
-        "object": "nee",
-        "activiteit": "nee",
-        "presence": "nee",
-        "voortzetting": "nee",
-        "hoofdactie": "nee",
-        "trust": "nee"
-      },
-      "herkomst": {
-        "identiteit": "geen",
-        "wereld": "route",
-        "context": "edge-casco",
-        "object": "geen",
-        "activiteit": "geen",
-        "presence": "geen",
-        "voortzetting": "geen",
-        "hoofdactie": "geen",
-        "trust": "geen"
-      },
-      "acties": {
-        "RTGAdaptief": {
-          "totaal": 0,
-          "perStaat": {
-            "AFWEZIG": 0,
-            "GEBLOKKEERD": 0,
-            "BESCHIKBAAR": 0,
-            "LOPEND": 0
-          },
-          "zonderStaat": 0,
-          "gezagBekend": 0,
-          "geblokkeerdZonderWaarom": 0,
-          "gevolg": {
-            "bekend": 0,
-            "onvolledig": 0,
-            "onbekend": 0,
-            "zonder": 0
-          },
-          "herstelBekend": 0,
-          "metGewicht": 0,
-          "metGebreken": 0
-        },
-        "edge-compat": {
-          "totaal": 7,
-          "perStaat": {
-            "AFWEZIG": 0,
-            "GEBLOKKEERD": 0,
-            "BESCHIKBAAR": 7,
-            "LOPEND": 0
-          },
-          "zonderStaat": 0,
-          "gezagBekend": 0,
-          "geblokkeerdZonderWaarom": 0,
-          "gevolg": {
-            "bekend": 0,
-            "onvolledig": 0,
-            "onbekend": 7,
-            "zonder": 0
-          },
-          "herstelBekend": 0,
-          "metGewicht": 0,
-          "metGebreken": 0
-        }
-      },
+      "velden": null,
+      "herkomst": null,
+      "acties": null,
       "gebreken": [],
-      "stabiel": true
+      "naar": "/apps/life.html",
+      "reden": "het scherm stuurde door naar /apps/life.html; wat daar staat is een ander scherm en telt hier niet",
+      "herhaald": true
     },
     "/apps/veilig.html": {
       "status": "gemeten",
@@ -20922,82 +20829,91 @@
   },
   "telling": {
     "schermen": 310,
-    "metBlikveld": 282,
+    "metBlikveld": 280,
     "perStatus": {
-      "gemeten": 282,
+      "gemeten": 280,
       "geen-blikveld": 1,
-      "omgeleid": 27,
+      "omgeleid": 29,
       "fout": 0
     },
     "geenBlikveld": {
       "basis-in-head": 1
     },
     "onrustig": 0,
-    "herhaald": 1,
+    "herhaald": 3,
     "andersInEersteRonde": 0,
     "perVeld": {
       "identiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 280,
         "nvt": 0,
-        "zonderMeting": 28
+        "na-openen": 0,
+        "zonderMeting": 30
       },
       "wereld": {
-        "ja": 281,
+        "ja": 279,
         "zelf": 0,
         "nee": 1,
         "nvt": 0,
-        "zonderMeting": 28
+        "na-openen": 0,
+        "zonderMeting": 30
       },
       "context": {
-        "ja": 282,
+        "ja": 280,
         "zelf": 1,
         "nee": 0,
         "nvt": 0,
-        "zonderMeting": 28
+        "na-openen": 0,
+        "zonderMeting": 30
       },
       "object": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 280,
         "nvt": 0,
-        "zonderMeting": 28
+        "na-openen": 0,
+        "zonderMeting": 30
       },
       "activiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 280,
         "nvt": 0,
-        "zonderMeting": 28
+        "na-openen": 0,
+        "zonderMeting": 30
       },
       "presence": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 280,
         "nvt": 0,
-        "zonderMeting": 28
+        "na-openen": 0,
+        "zonderMeting": 30
       },
       "voortzetting": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 280,
         "nvt": 0,
-        "zonderMeting": 28
+        "na-openen": 0,
+        "zonderMeting": 30
       },
       "hoofdactie": {
         "ja": 58,
         "zelf": 51,
-        "nee": 224,
+        "nee": 222,
         "nvt": 0,
-        "zonderMeting": 28
+        "na-openen": 0,
+        "zonderMeting": 30
       },
       "trust": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 280,
         "nvt": 0,
-        "zonderMeting": 28
+        "na-openen": 0,
+        "zonderMeting": 30
       }
     },
     "acties": {
@@ -21023,11 +20939,11 @@
         "metGebreken": 0
       },
       "edge-compat": {
-        "totaal": 1983,
+        "totaal": 1969,
         "perStaat": {
           "AFWEZIG": 0,
           "GEBLOKKEERD": 0,
-          "BESCHIKBAAR": 1983,
+          "BESCHIKBAAR": 1969,
           "LOPEND": 0
         },
         "zonderStaat": 0,
@@ -21036,7 +20952,7 @@
         "gevolg": {
           "bekend": 0,
           "onvolledig": 0,
-          "onbekend": 1983,
+          "onbekend": 1969,
           "zonder": 0
         },
         "herstelBekend": 0,

@@ -8177,6 +8177,13 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "sociaal-edge.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "sociaal-index.test.js": {
       "soort": "puur",
       "staat": "gezakt",

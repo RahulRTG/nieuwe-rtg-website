@@ -50,6 +50,11 @@
 <link href="/shared/social-suite.css" rel="stylesheet">
 <link href="/shared/social-intelligence.css" rel="stylesheet">
 <script src="/shared/social-suite.js" defer></script>
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/adaptief/grammatica.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
 <script src="/shared/social-intelligence.js" defer></script>
 <script src="/shared/social-intelligence-deck.js" defer></script>
 <script src="/shared/social-intelligence-runtime.js" defer></script>
@@ -141,6 +146,15 @@ async function laad(){
   };
 }
 laad();
+/* WAAR JE BENT, gezegd door dit scherm zelf (EDGE.md, ronde 2). De sociale
+   runtime declareert de handeling; welke handelingen hier spelen, zegt het
+   scherm. Na DOMContentLoaded, want het register laadt met defer.
+   Een eigen hoofdactie heeft dit scherm niet: het publiceert als voertuig
+   voor de declaratie, en telt niet als bewijs dat een scherm met een
+   hoofdactie zijn context zelf zegt. */
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.RTGAdaptief) RTGAdaptief.context({ bron: 'sociaal.entourage', titel: 'Entourage', acties: ['sociaal.context'] });
+}, { once: true });
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

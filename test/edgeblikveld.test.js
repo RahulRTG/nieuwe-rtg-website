@@ -11,12 +11,18 @@
       bericht en geen context. Wie het blikveld nieuwer vindt dan het scherm, heeft
       ongelijk; het scherm en de server winnen (besluit 5).
    3. HET ENE LEESPAD: acties() geeft de handelingen van RTGAdaptief met hun
-      Edge-stand erbij, en het tweede register (registerAction) staat in lees() met
-      zijn gebrek zichtbaar in plaats van stil weggevallen.
+      Edge-stand erbij. Het tweede register (registerAction) is weg (ronde 2, stap
+      18), en een kern die toch acties zou dragen wordt niet gelezen: elke
+      handeling in lees() komt uit RTGAdaptief. Mutatie: zet de edge-compat-lus
+      terug in blikveld.js, en toets 3 zakt.
 
    4. DE HOOFDACTIE VAN HET ACTIEVE BLAD (ronde 1): in de schil leest
       edge/blikveld-hoofdactie.js het blad dat open is, alleen bij dezelfde
       herkomst, leent de knop van de schil niet, en schrijft of onthoudt niets.
+   5. WIE HET ZEI (ronde 2): in de schil komt de context van de brug, dus uit
+      een BLAD -- context, object en activiteit heten daar `blad` en de rail
+      `blad:rail`, nooit `scherm`. En een object of activiteit zonder bron is
+      geen publicatie: het veld blijft leeg met die reden.
 
    DE MUTATIES, elk nagetrokken: laat wereld() het src-loze schilpad overslaan (de
    wereldvolgorde zakt), laat een veld zonder reden leeg (de vormtoets zakt), laat
@@ -26,7 +32,11 @@
    knop van de schil), sla de vergelijking over zodra er een blad is, haal de
    herkomstcontrole, de try/catch of de readyState-controle weg, haal de
    `if (!h)`-tak in blikveld.js weg, en zet een setAttribute in zijn tekstVan --
-   elk zakt op zijn eigen toets. */
+   elk zakt op zijn eigen toets. Voor ronde 2: zet het pagina-attribuut VOOR de
+   route in wereld() (de wereldvolgorde zakt op de proef waarin route en
+   attribuut iets anders zeggen -- zonder die proef bleef hij groen), geef in de
+   schil weer `scherm` (de schiltoets zakt), en laat een object zonder bron weer
+   door (de brontoets zakt). */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -38,6 +48,7 @@ const { maak } = require(BRON);
 const Actiestaat = require('../public/shared/edge/actiestaat.js');
 const gram = require('../public/shared/adaptief/grammatica.js');
 const WereldId = require('../public/shared/rtg-world-identity.js');
+const Poort = require('../public/shared/objectverwijzing.js');
 
 const Hoofdactie = require('../public/shared/edge/blikveld-hoofdactie.js');
 const HBRON = path.join(__dirname, '..', 'public', 'shared', 'edge', 'blikveld-hoofdactie.js');
@@ -71,7 +82,8 @@ function venster(o) {
     sessionStorage: { setItem: verboden('sessionStorage'), getItem() { return null; } },
     postMessage: verboden('postMessage'), fetch: verboden('fetch'),
     RTGWorldIdentity: o.geenWereldkaart ? undefined : WereldId,
-    RTGEdgeActiestaat: Actiestaat, RTGGrammatica: gram, RTGEdgeBlikveldHoofdactie: o.geenLezer ? undefined : Hoofdactie };
+    RTGEdgeActiestaat: Actiestaat, RTGGrammatica: gram, RTGEdgeBlikveldHoofdactie: o.geenLezer ? undefined : Hoofdactie,
+    RTGObjectverwijzing: Poort };
   w.location.origin = 'https://rtg.test';
   if (o.adaptief) {
     const ctx = Object.assign({ bron: '', titel: '', acties: [], selectie: false, staat: {}, rail: [], sleutel: 'k1' }, o.adaptief.ctx);
@@ -98,7 +110,7 @@ function vormKlopt(velden) {
 
 test('elk veld draagt waarde, herkomst, gezag en sinds; leeg betekent met reden', () => {
   for (const o of [{}, { offline: true }, { geenWereldkaart: true, pad: '/nergens.html' },
-    { adaptief: { ctx: { bron: 'office.tekst', titel: 'Brief', object: { soort: 'document' }, activiteit: 'schrijven', rail: [{ sleutel: 'opslag', tekst: 'Opgeslagen', staat: 'rustig' }] } } }]) {
+    { adaptief: { ctx: { bron: 'office.tekst', titel: 'Brief', object: { soort: 'document', id: 'd1', label: 'Brief' }, activiteit: 'schrijven', rail: [{ sleutel: 'opslag', tekst: 'Opgeslagen', staat: 'rustig' }] } } }]) {
     const { w } = venster(o);
     const l = maak(w).lees();
     assert.deepEqual(Object.keys(l.velden).sort(), ['activiteit', 'bevoegdheid', 'context', 'hoofdactie', 'identiteit',
@@ -133,6 +145,11 @@ test('de wereld: het open blad in de schil, dan de route, dan het pagina-attribu
   assert.equal(l.velden.wereld.waarde, null, 'op de lege tafel kiest de schil nog geen wereld');
   l = maak(venster({ pad: '/apps/reizen.html' }).w).lees();
   assert.deepEqual([l.velden.wereld.waarde, l.velden.wereld.herkomst], ['travel', 'route']);
+  /* De volgorde zelf: zeggen route en attribuut iets anders, dan wint de route.
+     Zonder deze proef kon het attribuut voor de route schuiven en bleef alles
+     hier groen, want geen enkele proef droeg ze allebei. */
+  l = maak(venster({ pad: '/apps/reizen.html', body: { 'data-rtg-world': 'work' } }).w).lees();
+  assert.deepEqual([l.velden.wereld.waarde, l.velden.wereld.herkomst], ['travel', 'route']);
   l = maak(venster({ geenWereldkaart: true, body: { 'data-rtg-world': 'work' } }).w).lees();
   assert.deepEqual([l.velden.wereld.waarde, l.velden.wereld.herkomst], ['work', 'pagina']);
 });
@@ -144,11 +161,41 @@ test('de context en wat het scherm er zelf over zegt: object, activiteit en Trus
   const l = maak(w).lees();
   assert.deepEqual(l.velden.context.waarde, { bron: 'office.tekst', titel: 'Brief', selectie: true });
   assert.equal(l.velden.context.herkomst, 'scherm');
-  assert.deepEqual(l.velden.object.waarde, { soort: 'document', id: 'd1' });
+  /* Een object is een verwijzing (shared/objectverwijzing.js, stap 20). */
+  assert.deepEqual(l.velden.object.waarde, { soort: 'document', id: 'd1', label: '', velden: {} });
   assert.equal(l.velden.activiteit.waarde, 'schrijven');
   assert.equal(l.velden.trust.herkomst, 'scherm:rail');
   const off = maak(venster({ offline: true }).w).lees();
   assert.equal(off.velden.trust.waarde[0].sleutel, 'offline', 'offline is een toestand van het toestel en staat in de rail');
+});
+
+test('in de schil komt de context uit een blad: context, object en activiteit heten blad, de rail blad:rail', () => {
+  const ctx = { bron: 'reizen.tabs', titel: 'Reizen', object: { soort: 'reis', id: 'r1' }, activiteit: 'plannen',
+    rail: [{ sleutel: 'opslag', tekst: 'Opgeslagen', staat: 'rustig' }] };
+  const l = maak(venster({ schil: {}, pad: '/apps/app.html', body: { 'data-rtg-blad-wereld': 'travel' }, adaptief: { ctx } }).w).lees();
+  assert.deepEqual(['context', 'object', 'activiteit', 'trust'].map((v) => l.velden[v].herkomst), ['blad', 'blad', 'blad', 'blad:rail']);
+  assert.equal(l.velden.context.waarde.bron, 'reizen.tabs', 'de waarde blijft wat het blad zei; alleen het etiket zegt waar het vandaan kwam');
+  assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'r1', label: '', velden: {} });
+  vormKlopt(l.velden);
+  /* Los, zonder schil, is dezelfde context wel van het scherm zelf. */
+  const los = maak(venster({ pad: '/apps/reizen.html', adaptief: { ctx } }).w).lees();
+  assert.deepEqual(['context', 'object', 'activiteit', 'trust'].map((v) => los.velden[v].herkomst), ['scherm', 'scherm', 'scherm', 'scherm:rail']);
+  /* Offline blijft een toestand van het toestel, ook in de schil. */
+  const off = maak(venster({ schil: {}, offline: true, pad: '/apps/app.html', adaptief: { ctx } }).w).lees();
+  assert.equal(off.velden.trust.herkomst, 'toestel');
+});
+
+test('een object of activiteit zonder bron is geen publicatie: leeg, met de reden erbij', () => {
+  for (const schil of [null, {}]) {
+    const l = maak(venster({ schil, pad: '/apps/app.html',
+      adaptief: { ctx: { bron: '', object: { soort: 'document', id: 'd1' }, activiteit: 'schrijven' } } }).w).lees();
+    for (const v of ['object', 'activiteit']) {
+      assert.equal(l.velden[v].waarde, null, v + (schil ? ' in de schil' : ' los'));
+      assert.equal(l.velden[v].herkomst, 'geen');
+      assert.match(l.velden[v].reden, /zegt niet wie het is/);
+    }
+    vormKlopt(l.velden);
+  }
 });
 
 test('de hoofdactie: aangewezen door het scherm, en twee bronnen die iets anders zeggen is een gebrek', () => {
@@ -163,7 +210,7 @@ test('de hoofdactie: aangewezen door het scherm, en twee bronnen die iets anders
   assert.equal(l.velden.hoofdactie.waarde, null, 'een verborgen knop is geen aangewezen hoofdactie');
 });
 
-test('het ene leespad: acties() met Edge-stand, en het tweede register met zijn gebrek', () => {
+test('het ene leespad: acties() met Edge-stand, en een kern met acties wordt niet gelezen', () => {
   const { w } = venster({
     adaptief: { ctx: { bron: 'bestanden', acties: ['weg', 'deel'] },
       items: [{ id: 'weg', naam: 'Verwijder', gewicht: 'terug', ongedaan: () => {} },
@@ -176,10 +223,8 @@ test('het ene leespad: acties() met Edge-stand, en het tweede register met zijn 
   assert.equal(a[0].edge.ongedaan, true, 'exact herstel met een weg terug mag ongedaan maken aanbieden');
   assert.equal(typeof a[0].ongedaan, 'function', 'het item voor de balk behoudt zijn eigen functies');
   const l = b.lees();
-  const stil = l.acties.find((x) => x.id === 'stil');
-  assert.equal(stil.herkomst, 'edge-compat');
-  assert.equal(stil.staat, 'GEBLOKKEERD');
-  assert.ok(stil.gebreken.includes('redenloos'), 'allowed:false zonder reden hoort als gebrek zichtbaar te zijn');
+  assert.deepEqual(l.acties.map((x) => x.id), ['weg', 'deel'], 'alleen de handelingen van RTGAdaptief');
+  assert.ok(l.acties.every((x) => x.herkomst === 'RTGAdaptief'), 'er komt geen edge-compat meer in lees()');
   assert.ok(l.acties.every((x) => x.gezag !== 'server' && x.gezag !== 'autoritatief'), 'zonder server geen servergezag');
   assert.doesNotThrow(() => JSON.stringify(l), 'lees() is platte data');
 });

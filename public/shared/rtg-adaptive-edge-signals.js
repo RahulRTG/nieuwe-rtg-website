@@ -6,7 +6,8 @@
     var api = w.RTGAdaptiveEdge, knop = d.querySelector('[data-rtg-edge-primary]:not([hidden])');
     if (!api || !knop) return;
     var label = (knop.getAttribute('aria-label') || knop.textContent || 'Volgende stap').replace(/\s+/g, ' ').trim();
-    api.registerAction({ id: 'primary', label: label.slice(0, 80), allowed: !knop.disabled });
+    /* Geen registratie meer (stap 17): de hoofdactie verhuist zelf naar het blad
+       via de controls. Alleen de voortgang wordt nog gemeld. */
     var staat = knop.getAttribute('data-rtg-action-state');
     if (staat === 'pending') api.setPresence({ label: label + ' wordt uitgevoerd', action: 'primary' });
     else if (staat === 'success') api.setPresence({ label: label + ' is gereed', action: 'primary' });

@@ -251,3 +251,126 @@ test('Edge voert appbediening uit, controleert actuele beschikbaarheid en sluit 
     await stop(child);
   }
 });
+
+/* DE BALK FLIKKERT NIET BIJ EEN SCROLL VAN DE SOFTWARE (EDGE.md, ronde 2). Een
+   scrollTo van het scherm liet de balk opkijken (peek) en 520 ms later weer
+   zakken. Waar Edge 2 draait, vraagt de balk nu de gebaarversheid van de ene
+   eigenaar (rtg-edge-2-context.js); zonder Edge 2 -- de landing -- blijft het
+   gedrag van vandaag. Drie gevallen: een scroll zonder gebaar geeft geen peek
+   (reisboek), een wiel geeft peek en daarna dock zoals voorheen (reizen), en op
+   de landing geeft een wiel peek.
+
+   Waarom het wiel op reizen en niet op reisboek: zonder inlog is reisboek maar
+   zo'n 150 px langer dan het venster. Een wiel maakt Edge 2 compact, de pagina
+   krimpt tot het venster, de scroll valt terug op 0 en Edge 2 gaat weer naar
+   overview -- en DAT zet de balk op dock, wat de klok van de balk ook doet.
+   Op reizen blijft Edge 2 compact staan, dus de dock daar komt van de klok van
+   de balk zelf; de proef eist dat Edge 2 op het eind nog compact is.
+
+   Elke tussenstand telt: een MutationObserver schrijft ELKE waarde van
+   data-rtg-adaptive-state op, en daarnaast wordt per frame bemonsterd. Een peek
+   die binnen een frame weer weg is, glipt zo niet langs. `y` is de HOOGSTE
+   scrollpositie tijdens de proef en niet de laatste, want een pagina kan
+   krimpen terwijl er gescrold wordt.
+
+   DE MUTATIES, elk nagetrokken: haal de versheidsvraag weg (de flikkertoets zakt
+   op peek), eis de gebaarversheid ook zonder Edge 2 (de landing krijgt geen peek
+   meer), en zet de klok van 520 op 520000 (het wiel komt nooit op dock). */
+async function volgBalk(page, doe, ms) {
+  /* Eerst de waarnemers, dan de handeling: een wiel dat vertrekt voordat de
+     waarnemer hangt, wordt anders niet gezien. */
+  await page.evaluate(() => {
+    const host = document.querySelector('.rtg-adaptive-edge');
+    const p = window.__balkProef = { standen: [host.dataset.rtgAdaptiveState], hoogste: window.scrollY, loopt: true };
+    p.noteer = () => { const s = host.dataset.rtgAdaptiveState; if (p.standen[p.standen.length - 1] !== s) p.standen.push(s); };
+    p.waarnemer = new MutationObserver(p.noteer);
+    p.waarnemer.observe(host, { attributes: true, attributeFilter: ['data-rtg-adaptive-state'] });
+    /* In de VANGfase: een luisteraar die later komt, leest de positie pas nadat
+       Edge 2 op dezelfde scroll compact werd en de pagina kromp. */
+    p.scrol = () => { p.hoogste = Math.max(p.hoogste, window.scrollY); };
+    addEventListener('scroll', p.scrol, { passive: true, capture: true });
+    const frame = () => { p.noteer(); if (p.loopt) requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+  });
+  if (doe === 'scrollTo') await page.evaluate(() => window.scrollTo(0, 900));
+  else await doe();
+  return page.evaluate(async duur => {
+    await new Promise(r => setTimeout(r, duur));
+    const p = window.__balkProef;
+    p.loopt = false; p.waarnemer.disconnect(); removeEventListener('scroll', p.scrol, { capture: true }); p.noteer();
+    return { standen: p.standen, y: p.hoogste, edge2: !!window.RTGEdge2,
+      edge2Stand: document.body.getAttribute('data-rtg-edge-2-state') };
+  }, ms);
+}
+
+test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zoals voorheen',
+  { skip: geenBrowser(pw) }, async (t) => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(() => { try { localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {} });
+
+    const edge2Pagina = async (st, pad) => {
+      const page = await context.newPage();
+      await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
+      if (new URL(page.url()).pathname !== pad) {
+        st.skip(pad + ' leidde naar ' + new URL(page.url()).pathname + '; geen contract omzeild');
+        await page.close(); return null;
+      }
+      await wacht(page, pad);
+      await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-rendered') === 'true' &&
+        document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState === 'dock');
+      /* scrollTo(0, 900) wordt afgekapt op een korte pagina, en elke afstand
+         boven de 8 px laat de balk reageren. Kan er niet gescrold worden, dan
+         meet deze proef niets en zakt hij hier. */
+      assert.ok(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight > 60),
+        pad + ' kan niet scrollen; dan meet deze proef niets');
+      return page;
+    };
+
+    await t.test('reisboek: scrollTo zonder gebaar geeft geen peek', async (st) => {
+      const page = await edge2Pagina(st, '/apps/reisboek.html');
+      if (!page) return;
+      try {
+        const m = await volgBalk(page, 'scrollTo', 900);
+        assert.equal(m.edge2, true, 'op reisboek hoort Edge 2 te draaien');
+        assert.ok(m.y > 50, 'de pagina scrolde niet (' + m.y + '); dan meet deze proef niets');
+        assert.deepEqual(m.standen, ['dock'], 'de balk flikkerde bij een scroll van de software: ' + m.standen.join(' > '));
+      } finally { await page.close(); }
+    });
+
+    await t.test('reizen: een wiel omlaag geeft peek en daarna dock', async (st) => {
+      const page = await edge2Pagina(st, '/apps/reizen.html');
+      if (!page) return;
+      try {
+        await page.mouse.move(195, 420);
+        const m = await volgBalk(page, () => page.mouse.wheel(0, 700), 1400);
+        assert.equal(m.edge2, true, 'op reizen hoort Edge 2 te draaien');
+        assert.ok(m.y > 50, 'het wiel scrolde de pagina niet (hoogste ' + m.y + '; ' + m.standen.join(' > ') + ')');
+        assert.ok(m.standen.includes('peek'), 'een wiel gaf geen peek: ' + m.standen.join(' > '));
+        assert.equal(m.edge2Stand, 'compact',
+          'Edge 2 staat niet meer op compact; dan kan de dock van Edge 2 komen en niet van de klok van de balk');
+        assert.equal(m.standen[m.standen.length - 1], 'dock', 'na het wiel kwam de balk niet op dock: ' + m.standen.join(' > '));
+      } finally { await page.close(); }
+    });
+
+    await t.test('landing: een wiel omlaag geeft peek, ook zonder Edge 2', async () => {
+      const page = await context.newPage();
+      try {
+        await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+        await page.waitForSelector('.rtg-experience-edge .rtg-adaptive-bar');
+        await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState === 'dock');
+        await page.mouse.move(195, 420);
+        const m = await volgBalk(page, () => page.mouse.wheel(0, 700), 700);
+        assert.equal(m.edge2, false, 'de landing hoort zonder Edge 2 te draaien; dan meet deze proef de verkeerde weg');
+        assert.ok(m.y > 100, 'het wiel scrolde de landing niet (' + m.y + ')');
+        assert.ok(m.standen.includes('peek'), 'een wiel op de landing gaf geen peek: ' + m.standen.join(' > '));
+      } finally { await page.close(); }
+    });
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+  }
+});

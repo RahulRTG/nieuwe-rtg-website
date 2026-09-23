@@ -631,7 +631,7 @@ omlaag.
 
 ## `shared/gebaar.js`
 
-`public/shared/gebaar/` -- 8 delen, 1051 regels in de delen
+`public/shared/gebaar/` -- 8 delen, 1096 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -812,7 +812,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 811 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 804 regels in de delen
 
 | deel | onderwerp |
 |---|---|

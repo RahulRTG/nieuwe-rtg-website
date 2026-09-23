@@ -34,18 +34,18 @@
       if (lastFocus && lastFocus.focus) lastFocus.focus();
     }
     /* Adaptive Edge is de zichtbare systeemrand. De technische context blijft
-       beschikbaar, maar pas nadat iemand er bij Acties bewust om vraagt; hij
-       hoeft daarom niet meer als permanente balk boven iedere sociale pagina
-       te staan. Edge wordt later geladen dan deze runtime, dus we wachten kort
-       op zijn publieke API zonder een tweede knop of gegevenslaag te maken. */
-    function exposeInEdge(attempt) {
-      var edge = window.RTGAdaptiveEdge;
-      if (edge && edge.registerAction && edge.setProjection) {
-        edge.registerAction({ id: 'social-context', label: 'Sociale context bekijken', allowed: true, run: openDeck });
-        edge.setProjection({ deck: 'actions', actions: ['social-context'] });
-        return;
-      }
-      if (attempt < 40) window.setTimeout(function () { exposeInEdge(attempt + 1); }, 100);
+       beschikbaar, maar pas nadat iemand er in het Edge-blad bewust om vraagt.
+       Het is EEN declaratie in RTGAdaptief (EDGE.md, ronde 2): hier stond een
+       lus die op de Edge wachtte en de handeling in diens tweede register zette,
+       en een herstart van de Edge gooide hem weg. Welke handelingen er NU spelen
+       zegt elk scherm zelf, in zijn eigen context -- de runtime weet niet waar je
+       bent, en publiceert dat dus ook niet. Een herstel is er niet: het deck
+       openen verandert niets, en dan verzinnen we geen terugweg. */
+    function declareer() {
+      var A = window.RTGAdaptief;
+      if (!A) return;
+      A.declareer({ id: 'sociaal.context', naam: 'Sociale context bekijken', telefoon: ['paneel'],
+        tablet: ['paneel'], bureau: ['paneel'], gewicht: 'licht', effect: 'lokaal', doe: openDeck });
     }
     function update() {
       var time = document.getElementById('rtgIntelTime');
@@ -84,7 +84,7 @@
       attributeFilter: ['hidden', 'aria-hidden', 'class']
     });
     update();
-    exposeInEdge(0);
+    declareer();
     window.setInterval(update, 1000);
 
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

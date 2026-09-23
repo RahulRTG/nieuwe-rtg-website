@@ -8,7 +8,9 @@
    2. de WERELD volgt het open blad van de schil (en zegt op de lege tafel met
       reden dat er nog geen wereld is gekozen);
    3. de BRUG: wat een scherm in zijn blad als context publiceert -- ook het
-      nieuwe object en de activiteit -- komt in het blikveld van de schil aan;
+      nieuwe object en de activiteit -- komt in het blikveld van de schil aan,
+      met de herkomst `blad`: in de schil is het de brug die doorgeeft wat het
+      blad zei, en niet een scherm dat het zelf publiceert (ronde 2);
    4. het ENE LEESPAD: de balk tekent de handelingen die acties() geeft, en elke
       handeling draagt een Edge-stand;
    5. lees() SCHRIJFT NIETS, ook niet in een echte pagina met alle lagen geladen;
@@ -21,20 +23,25 @@
       na bevestigen door, en een verhinderde knop zegt waarom.
    4b. de HOOFDACTIE VAN HET ACTIEVE BLAD (ronde 1): de schil leest hem uit het
       blad dat open is, en onthoudt niets; stap 5 verklikt ook in dat blad.
-   8. het TWEEDE REGISTER kent alleen licht (ronde 1): een zware handeling via
-      registerAction wordt geweigerd, en een tik op een lichte gaat precies een
-      keer langs RTGGewicht.voer -- niet meer langs window.confirm.
+   8. het BLAD HEEFT GEEN EIGEN LIJST (ronde 2, stap 17 en 18): het tweede
+      register is weg, in het uitgeklapte blad staat geen knop van de kern, de
+      verhuisde hoofdactie staat er hooguit een keer, en de lege melding staat
+      niet boven een gevulde lijst.
+
+   3b. de WERKRUIMTE leest het blikveld (ronde 2): de Second Screen ziet dezelfde
+      context en hetzelfde object, en 'Nu relevant' toont de titel van het blad.
 
    DE MUTATIES, elk nagetrokken: laat de loader blikveld.js niet laden (1 zakt),
-   haal object uit zendContext in brug.js (3 zakt), laat de controls weer zelf
+   haal object uit zendContext in brug.js (3 zakt), toon in modules/context.js
+   de titel alleen bij herkomst 'scherm' (3b zakt: de titel verdwijnt), laat de controls weer zelf
    RTGAdaptief.voorNu() lezen (4 zakt: de balk tekent dan een handeling die
    acties() als AFWEZIG weglaat), laat de agendahoofdactie wegvallen (6 zakt),
    laat de loader de gewichtlaag overslaan (7 zakt), haal '.actief' uit de
    selector van de hoofdactielezer (4b zakt: hij blijft op 'blad'), laat hem het
    laatste label onthouden (4b zakt bij de terugkeer naar reizen), zet een
-   setAttribute in zijn tekstVan (5 zakt: de verklikker in het blad slaat aan), en zet in
-   rtg-adaptive-edge.js de oude execute met custom.run() terug (8 zakt: de
-   spion op RTGGewicht.voer blijft op nul).
+   setAttribute in zijn tekstVan (5 zakt: de verklikker in het blad slaat aan), en zet
+   de oude rtg-adaptive-edge.js en -core.js met hun register terug (8 zakt: de
+   API bestaat weer en de kern tekent zijn snelkoppelingen in het blad).
 
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
@@ -92,7 +99,7 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     await page.locator('.cmd-leeg button[data-url="/apps/reizen.html"]').click();
     const blad = () => page.frames().find((f) => /\/apps\/reizen\.html/.test(f.url()));
     await page.waitForFunction(() => document.body.getAttribute('data-rtg-blad-wereld') === 'travel', null, { timeout: 20000 });
-    await page.waitForFunction(() => RTGEdgeBlikveld.lees().velden.context.herkomst === 'scherm', null, { timeout: 20000 });
+    await page.waitForFunction(() => RTGEdgeBlikveld.lees().velden.context.herkomst === 'blad', null, { timeout: 20000 });
     let l = await page.evaluate(() => RTGEdgeBlikveld.lees());
     assert.deepEqual([l.velden.wereld.waarde, l.velden.wereld.herkomst], ['travel', 'blad']);
     assert.equal(l.velden.context.waarde.bron, 'reizen.tabs', 'de context van het blad komt via de brug in de schil');
@@ -105,8 +112,21 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     });
     await page.waitForFunction(() => RTGEdgeBlikveld.lees().velden.activiteit.waarde === 'plannen', null, { timeout: 10000 });
     l = await page.evaluate(() => RTGEdgeBlikveld.lees());
-    assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'proef-1' });
-    assert.equal(l.velden.object.herkomst, 'scherm');
+    assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'proef-1', label: '', velden: {} }, 'een object is een verwijzing (shared/objectverwijzing.js)');
+    assert.deepEqual([l.velden.object.herkomst, l.velden.activiteit.herkomst], ['blad', 'blad'],
+      'in de schil komt het object uit het blad, niet van een scherm dat hier zelf publiceert');
+
+    // 3b) De werkruimte van de Second Screen LEEST het blikveld (ronde 2, stap 23):
+    //     zelfde context en object, en 'Nu relevant' toont de titel van het blad.
+    const ss = await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand').__rtgSecondScreen.runtime;
+      const w = r.contextEngine.get().velden, b = RTGEdgeBlikveld.lees().velden;
+      const kop = document.querySelector('[data-rtg-module="context"] .rtg-ss-context strong');
+      return { werk: [w.context, w.object], blik: [b.context, b.object], kop: kop && kop.textContent };
+    });
+    assert.deepEqual(ss.werk, ss.blik, 'de werkruimte houdt geen eigen context naast het blikveld');
+    assert.ok(ss.blik[0].waarde.titel, 'het blad van reizen draagt een titel');
+    assert.equal(ss.kop, ss.blik[0].waarde.titel, "'Nu relevant' toont de titel van het open blad");
 
     // 4) De balk tekent wat acties() geeft, en elke handeling draagt een stand.
     /* De handelingen staan in het blad van de Edge, en dat tekent alleen als het
@@ -216,25 +236,22 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     await page.waitForFunction(() => document.body.innerText.includes('Strikt geclassificeerd'), null, { timeout: 10000 });
     assert.deepEqual(await page.evaluate(() => window.gedaan), [], 'een verhinderde handeling legt uit en voert niets uit');
 
-    // 8) Het tweede register kent alleen licht, en een tik gaat langs de gewichtlaag.
+    // 8) Het blad heeft geen eigen lijst meer: alleen de handelingen van het scherm.
     await office();
-    const zwaar = await page.evaluate(() => {
-      window.tweede = { gedraaid: 0, gewogen: [] };
-      const echt = RTGGewicht.voer;
-      RTGGewicht.voer = function (it) { window.tweede.gewogen.push(it.gewicht); return echt.apply(this, arguments); };
-      return RTGAdaptiveEdge.registerAction({ id: 'proef-zwaar', label: 'Proef zwaar', gewicht: 'zwaar', run: () => { window.tweede.gedraaid++; } });
-    });
-    assert.equal(zwaar, false, 'een zware handeling hoort het tweede register niet in te komen');
-    await page.evaluate(() => {
-      RTGAdaptiveEdge.registerAction({ id: 'proef-licht', label: 'Proef licht', run: () => { window.tweede.gedraaid++; } });
-      RTGAdaptiveEdge.setProjection({ deck: 'actions', actions: ['proef-zwaar', 'proef-licht'], open: true });
-    });
-    assert.equal(await page.locator('.rtg-adaptive-sheet-list [data-rtg-adaptive-action="proef-zwaar"]').count(), 0,
-      'een geweigerde handeling staat niet in het blad');
-    await page.locator('.rtg-adaptive-sheet-list [data-rtg-adaptive-action="proef-licht"]').click();
-    await page.waitForFunction(() => window.tweede.gedraaid === 1, null, { timeout: 10000 });
-    assert.deepEqual(await page.evaluate(() => window.tweede.gewogen), ['licht'],
-      'een tik op het tweede register gaat precies een keer langs RTGGewicht.voer, als licht');
+    await page.evaluate(() => { RTGAdaptiveEdge.setDeck('actions'); RTGAdaptiveEdge.setState('expanded'); });
+    await page.waitForSelector('.rtg-adaptive-sheet:not([hidden])', { timeout: 10000 });
+    const eigenBlad = await page.evaluate(() => ({
+      api: ['registerAction', 'setProjection'].filter((n) => typeof RTGAdaptiveEdge[n] !== 'undefined'),
+      kern: document.querySelectorAll('.rtg-adaptive-sheet [data-rtg-adaptive-action]').length,
+      hoofd: document.querySelectorAll('.rtg-adaptive-sheet .rtg-edge-action').length,
+      controls: document.querySelectorAll('.rtg-adaptive-controls > *').length,
+      leeg: !!document.querySelector('.rtg-adaptive-sheet .rtg-adaptive-empty')
+    }));
+    assert.deepEqual(eigenBlad.api, [], 'het tweede register bestaat niet meer op de pagina');
+    assert.equal(eigenBlad.kern, 0, 'in het blad staat geen knop van de kern');
+    assert.ok(eigenBlad.hoofd <= 1, 'de verhuisde hoofdactie staat er hooguit een keer');
+    assert.ok(eigenBlad.controls > 0, 'Office tekent handelingen in het blad, anders toetst dit niets');
+    assert.equal(eigenBlad.leeg, false, 'geen lege melding boven een gevulde lijst');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {

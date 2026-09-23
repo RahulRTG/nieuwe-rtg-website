@@ -38,12 +38,8 @@
     return true;
   } };
   edge.start(d, w, host);
-  ['primary', 'worlds', 'presence', 'context', 'status', 'connect', 'ai'].forEach(function (id) { edge.registerAction({ id: id, label: id, allowed: false }); });
   function update() {
-    var rows = actions();
-    rows.forEach(function (item, i) { edge.registerAction({ id: 'experience-action-' + i, label: item.label, run: function () { edge.setState('dock'); item.run(); } }); });
-    var ids = rows.map(function (item, i) { return 'experience-action-' + i; });
-    ['home', 'context', 'actions', 'connect', 'rahul'].forEach(function (deck) { edge.setProjection({ deck: deck, actions: ids }); });
+    // De rijen staan in het eigen paneel (actionPanel); de Edge vraagt de host eerst.
     host.ctx.title = scenes[index].dataset.scene;
     edge.continueWith({ title: host.ctx.title, copy: 'Kies uw volgende stap.' });
     var caption = root.querySelector('.rtg-adaptive-caption'); if (caption) caption.textContent = index ? host.ctx.title : 'RTG PLATFORM';

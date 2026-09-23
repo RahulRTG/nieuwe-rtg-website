@@ -24,93 +24,33 @@ test('Adaptive Edge heeft vier toestanden en vijf vaste decks', () => {
   assert.equal(kern.normState('onbekend'), 'dock');
 });
 
-test('intentprojectie toont geregistreerde acties, en een verboden actie MET haar reden', () => {
-  /* ARBEID.md par. 4 punt 13 en GRAMMATICA.md: verhinderd is niet weggelaten.
-     Hier legde de toets vast dat een verboden actie stil verdween. */
+/* HET BLAD HEEFT GEEN EIGEN LIJST MEER (EDGE.md par. 11, ronde 2 stap 17 en 18).
+   Er stond een tweede register naast RTGAdaptief met zeven vaste
+   snelkoppelingen; die zijn weg (besluit K-bladlijst) en het register met hen.
+   Een verhinderde handeling met haar reden woont nu alleen in
+   adaptief/balkknop.js. DE MUTATIES, elk nagetrokken: zet K.defaults terug in
+   start() (toets 1 en 2 zakken), en zet de registratie in signals.js terug
+   (toets 2 zakt). De vorm van de API bewaakt test/edgeregister-leeg.test.js. */
+test('na een verse start draagt de Edge-kern geen handelingen', () => {
   const model = kern.model();
-  let toegestaan = true;
-  kern.register(model, { id: 'reis', label: 'Reis', allowed: () => toegestaan, run() {} });
-  kern.register(model, { id: 'verboden', label: 'Verboden', allowed: false, reason: 'Vraagt een Lifestyle Pass.', run() {} });
-  kern.register(model, { id: 'hotel', label: 'Hotel', allowed: true, run() {} });
-  const lijst = kern.project(['reis', 'verboden', 'onbekend', 'reis', 'hotel'], model.registry, 4);
-  assert.deepEqual(lijst.map(x => x.id), ['reis', 'verboden', 'hotel'], 'onbekend bestaat niet en blijft weg');
-  assert.equal(lijst[1].blocked, true);
-  assert.equal(lijst[1].reason, 'Vraagt een Lifestyle Pass.');
-  assert.equal(lijst[1].run, undefined, 'een verhinderde actie draagt geen uitvoerbare functie');
-  toegestaan = false;
-  const nu = kern.project(['reis'], model.registry, 4);
-  assert.equal(nu[0].blocked, true);
-  assert.match(nu[0].reason, /niet opgegeven/, 'zonder reden verzinnen we er geen, we zeggen dat hij ontbreekt');
-  /* en de knop die het blad ervan maakt: zichtbaar verhinderd, de reden als
-     tekst, en een tik voert niets uit */
-  const gelopen = [];
-  const doc = { createElement: (tag) => { const el = { tag, dataset: {}, attrs: {}, kids: [], luister: {},
-    setAttribute(k, v) { this.attrs[k] = v; }, appendChild(c) { this.kids.push(c); },
-    addEventListener(t, f) { this.luister[t] = f; } }; return el; } };
-  const knop = kern.sheetButton(doc, lijst[1], (id) => gelopen.push(id));
-  assert.equal(knop.attrs['aria-disabled'], 'true');
-  assert.equal(knop.kids[0].textContent, 'Vraagt een Lifestyle Pass.');
-  assert.equal(knop.luister.click, undefined, 'een verhinderde knop voert niets uit');
-  kern.sheetButton(doc, lijst[0], (id) => gelopen.push(id)).luister.click();
-  assert.deepEqual(gelopen, ['reis']);
-  assert.match(VIEW, /K\.sheetButton\(/, 'het blad gebruikt die knop');
+  const snap = kern.momentopname();
+  assert.equal(snap.acties, undefined, 'de momentopname kent geen acties meer');
+  assert.equal(model.registry, undefined, 'het model heeft geen register');
+  assert.doesNotMatch(VIEW, /K\.defaults\(|K\.actions\(|model\.registry/, 'het blad vult geen eigen lijst');
 });
 
-/* HET TWEEDE REGISTER KENT ALLEEN LICHT (EDGE.md par. 10, ronde 1). Het had een
-   eigen uitvoerweg: een eigen `confirm` via window.confirm, langs de
-   gewichtsgrammatica heen. Wat een bevestiging vraagt, hoort in RTGAdaptief.
-   DE MUTATIES, elk nagetrokken: haal de weigering uit register() (de eerste twee
-   toetsen zakken), versmal hem tot `item.gewicht === 'zwaar'` (alleen de tweede
-   zakt), laat voer() bij een gewichtlaag zelf run() aanroepen (de derde zakt), en
-   zet de oude execute met window.confirm terug (de vierde zakt). */
-test('het tweede register weigert een eigen bevestiging, en laat niets achter', () => {
-  const model = kern.model();
-  assert.equal(kern.register(model, { id: 'boeken', label: 'Boeken', confirm: 'Boeking bevestigen?', allowed: true, run() {} }), false);
-  assert.equal(model.registry.boeken, undefined, 'een geweigerde handeling hoort niet in het register te staan');
+test('de hoofdactie wordt niet meer als snelkoppeling geregistreerd; de voortgang blijft', () => {
+  assert.doesNotMatch(SIGNALS, /registerAction\(/, 'signals.js registreert de hoofdactie niet meer');
+  assert.match(SIGNALS, /api\.setPresence\(/, 'de voortgangsmelding blijft');
+  assert.doesNotMatch(VIEW, /K\.defaults\(/);
 });
 
-test('het tweede register kent alleen licht: elk ander gewicht wordt geweigerd', () => {
-  const model = kern.model();
-  for (const gewicht of ['terug', 'bewust', 'zwaar', 'plechtig', 'onbekend']) {
-    assert.equal(kern.register(model, { id: 'h-' + gewicht, label: gewicht, gewicht, run() {} }), false, gewicht);
-    assert.equal(model.registry['h-' + gewicht], undefined, gewicht + ' liet een regel achter');
-  }
-  assert.equal(kern.register(model, { id: 'h-licht', label: 'licht', gewicht: 'licht', run() {} }), true);
-  assert.equal(kern.register(model, { id: 'h-zonder', label: 'zonder gewicht', run() {} }), true);
-});
-
-test('een tik gaat langs de gewichtlaag, als licht; zonder laag draait alleen wat mag', () => {
-  let gedraaid = 0;
-  const run = () => { gedraaid++; };
-  const aanroepen = [];
-  const w = { RTGGewicht: { voer(it) { aanroepen.push(it); return it.doe() !== false; } } };
-  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: true, run }, w), true);
-  assert.equal(aanroepen.length, 1, 'de gewichtlaag hoort precies een keer te worden aangeroepen');
-  assert.equal(aanroepen[0].gewicht, 'licht');
-  assert.equal(aanroepen[0].id, 'proef');
-  assert.equal(gedraaid, 1, 'de handeling draait via de gewichtlaag, en maar een keer');
-  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: false, run }, w), false);
-  assert.equal(aanroepen.length, 1, 'een handeling die niet mag, bereikt de gewichtlaag niet');
-  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: true, run }, {}), true);
-  assert.equal(gedraaid, 2, 'zonder gewichtlaag draait licht direct');
-  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: () => false, run }, {}), false);
-  assert.equal(gedraaid, 2);
-  assert.equal(kern.voer({ id: 'zonder', label: 'Zonder run' }, w), false);
+test('de lege melding staat nooit boven een gevulde lijst (vorm; het gedrag bewijst rtg-adaptive-edge.e2e.js)', () => {
+  assert.match(VIEW, /if \(!\(rt\.controls && rt\.controls\.children\.length\) && !rt\.primarySlot\)/);
 });
 
 test('de uitvoerder van de Edge kent geen window.confirm meer (vorm; het gedrag bewijst edgeblikveld.e2e.js)', () => {
   assert.doesNotMatch(VIEW, /confirm\(/);
-  assert.match(VIEW, /if \(custom && custom\.run\) return K\.voer\(custom, w\);/);
-});
-
-test('voorspelde acties verdringen geen veilige terugval en blijven begrensd', () => {
-  const model = kern.model();
-  ['primary', 'worlds', 'presence', 'boarding', 'hotel'].forEach(id => {
-    kern.register(model, { id, label: id, allowed: true });
-  });
-  kern.setProjection(model, { deck: 'home', actions: ['boarding', 'hotel', 'boarding'] });
-  assert.deepEqual(kern.actions(model).map(x => x.id), ['boarding', 'hotel', 'primary', 'worlds']);
-  assert.equal(kern.actions(model).length, 4);
 });
 
 test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {

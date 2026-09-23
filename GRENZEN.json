@@ -1517,11 +1517,11 @@
       "payroll"
     ],
     "payroll-os": [
+      "codenaamVan",
       "dienstverbandToets",
       "findSupplier",
-      "payrollOS",
       "naamAuth",
-      "codenaamVan"
+      "payrollOS"
     ],
     "payroll-os-dekking": [
       "payrollOS"
@@ -1534,7 +1534,9 @@
       "payrollOS"
     ],
     "payroll-os-run": [
+      "dienstverbandToets",
       "findSupplier",
+      "naamAuth",
       "payrollOS"
     ],
     "payroll-os-uitgang": [

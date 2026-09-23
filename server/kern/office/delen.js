@@ -114,7 +114,20 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
         (punten.length ? punten : ['Geen vaste structurele lacunes gevonden.']).map((x, i) => (i + 1) + ') ' + x).join('\n') };
     }
 
-    // Alleen deze drie opdrachten maken werkelijk nieuwe taal.
+    /* Alleen deze drie opdrachten maken werkelijk nieuwe taal, en dus gaat
+       alleen hier documenttekst naar een model. Een STRIKT document gaat daar
+       niet heen (OFFICE.md par. 4, grens 4: classificatie reist mee naar elke
+       uitgang). Het mag niet gedeeld worden, en een model is ook een ontvanger.
+       "Alleen naar het lokale model" is geen uitweg: de keten in server/ai.js
+       valt bij een storing van het lokale model door naar een externe
+       aanbieder, en een per-aanroep "nooit extern" bestaat daar niet. De
+       weigering staat VOOR de providercheck, zodat hij ook zonder provider
+       zichtbaar en toetsbaar is. */
+    if (d.beheer && d.beheer.classificatie === 'strikt') {
+      return { status: 403, code: 'CLASSIFICATIE_STRIKT', opdracht, handmatig: true,
+        error: 'Dit document is strikt geclassificeerd en gaat niet naar een taalmodel. ' +
+          'Samenvatten, inkorten, actiepunten, formule en kritisch lezen werken wel: die blijven in RTG.' };
+    }
     if (anthropic) {
       try {
         const prompt = opdracht === 'herschrijven' ? 'Herschrijf deze tekst zakelijk en helder, in het Nederlands, ongeveer even lang:\n' + kaal

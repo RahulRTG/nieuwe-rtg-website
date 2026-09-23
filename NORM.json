@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1582,
-    "kernGedeeld": 238,
+    "kernBreedte": 1583,
+    "kernGedeeld": 239,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -135,6 +135,15 @@
     "planDomeinenGemeten": 7
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 238,
+      "meter": "kernGedeeld 238 -> 239; kernBreedte 1582 -> 1583",
+      "reden": "De personeelsinlog (/api/supplier/mijn/login) was een doodlopende weg voor wie voor RTG zelf werkt: de eigenaar, met klopend wachtwoord en de kantoorsleutel aan zijn bos, las 'vraag uw werkgever om een kassacode'. De deur wijst nu de weg naar de kantoordeur (zonder zelf een sessie te munten), en daarvoor leest het domein supplier de ene sleutelbos kern.accRollen. Dat is een bewuste koppeling en geen erosie: de regel wie de kantoorsleutel draagt (afgeleid voor de eigenaar, gekoppeld via de backoffice-code) staat op EEN plek, en een eigen kopie in de PDA-laag zou deze meter sparen en LAT-regel 4 breken.",
+      "waarheen": "GRENZEN.json (supplier draagt accRollen) en test/eigenaarwerkplek.test.js, die de wijzer en het ontbreken van een sessie tegen een echte server vasthoudt"
+    },
     {
       "datum": "2026-09-15",
       "soort": "structureel",

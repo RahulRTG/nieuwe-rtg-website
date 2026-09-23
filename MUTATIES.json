@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T15:23:15.663Z",
-    "commit": "37b125f",
+    "op": "2026-09-23T15:29:12.429Z",
+    "commit": "8e38b9c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2196,6 +2196,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "dienstidentiteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/dienstidentiteit.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "directpay.test.js": {
       "soort": "server",

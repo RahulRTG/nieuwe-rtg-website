@@ -85,7 +85,9 @@ const SLEUTELS = {
   'POST /api/bedrijf/werkruimte/betaalwijze': { zelfdeVerzoek: true },
   'POST /api/office/werkos/bankpad': { leest: true },
   'POST /api/office/werkos/bankpad/zet': { zelfdeVerzoek: true },
-  'POST /api/office/doos/sleutels': { leest: true }
+  'POST /api/office/doos/sleutels': { leest: true },
+  /* Een vrije naam duiden: de tweede keer is het oude feit al vervallen en weigert de route. */
+  'POST /api/concern/feit/duid': { zelfdeVerzoek: true }
 };
 
 module.exports = { SLEUTELS };

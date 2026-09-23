@@ -108,7 +108,7 @@ function stempelBouw() {
     'shared/command/inlogpoort.js', 'shared/command/bladhaak.js', 'shared/command/romp.js',
     'shared/command/geheugen.js', 'shared/command/beginscherm.js', 'shared/command/bladstand.js',
     'shared/command/werktafel.js',
-    'shared/command.css', 'shared/rtg-schil.js']
+    'shared/command.css', 'shared/objectverwijzing.js', 'shared/rtg-schil.js']
     .map(p => path.join(PUB, p)).concat(interfaceDelen.sort());
   if (!fs.existsSync(html) || !fs.existsSync(js)) return;
   let s = fs.readFileSync(js, 'utf8');

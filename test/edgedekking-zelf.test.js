@@ -93,7 +93,7 @@ function losVenster(ctx) {
     querySelector() { return null; }, querySelectorAll(sel) { return sel === '[data-hoofdactie]' ? [knop] : []; } };
   const c = Object.assign({ bron: '', titel: '', acties: [], selectie: false, staat: {}, rail: [], sleutel: 'k' }, ctx);
   return { document: d, location: { pathname: '/apps/office.html', origin: 'https://rtg.test' }, navigator: { onLine: true },
-    RTGEdgeBlikveldHoofdactie: Hoofdactie,
+    RTGEdgeBlikveldHoofdactie: Hoofdactie, RTGObjectverwijzing: require('../public/shared/objectverwijzing.js'),
     RTGAdaptief: { context() { return c; }, opContext(f) { f(c); }, voorNu() { return []; }, capability() { return null; } } };
 }
 
@@ -132,7 +132,7 @@ function schil() {
     RTGAdaptiefLeer: leer, RTGGrammatica: gram
   });
   vm.runInContext('window = globalThis; parent = globalThis;', ctx);
-  for (const rel of ['public/shared/adaptief/register.js', 'public/shared/adaptief/brug.js', 'public/shared/edge/blikveld.js']) {
+  for (const rel of ['public/shared/objectverwijzing.js', 'public/shared/adaptief/vorm.js', 'public/shared/adaptief/register.js', 'public/shared/adaptief/brug.js', 'public/shared/edge/blikveld.js']) {
     vm.runInContext(lees(rel), ctx, { filename: rel });
   }
   const zend = (c) => luisteraars.forEach((f) => f({ origin: 'https://rtg.test', source: bladVenster,
@@ -148,7 +148,7 @@ test('4. in de schil: een context via de brug heet blad en blad:rail, en telt ne
   const l = JSON.parse(JSON.stringify(ctx.RTGEdgeBlikveld.lees()));
   assert.equal(l.velden.context.waarde.bron, 'reizen.tabs', 'de context van het blad kwam over de brug aan');
   assert.deepEqual(['context', 'object', 'activiteit', 'trust'].map((v) => l.velden[v].herkomst), ['blad', 'blad', 'blad', 'blad:rail']);
-  assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'r1' });
+  assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'r1', label: '', velden: {} });
   for (const v of VELDEN) assert.equal(zelf(v, l.velden[v].herkomst), false, v + ' telt in de schil niet als zelf (' + l.velden[v].herkomst + ')');
 });
 

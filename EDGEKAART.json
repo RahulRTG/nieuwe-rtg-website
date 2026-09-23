@@ -972,9 +972,7 @@
         ],
         "zendt": [],
         "luistert": [],
-        "attributen": [
-          "data-rtg-vorm"
-        ],
+        "attributen": [],
         "opslag": [],
         "fetch": []
       }
@@ -1009,6 +1007,31 @@
         "zendt": [],
         "luistert": [],
         "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/vorm.js",
+      "laag": "grammatica-kern",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "etiket": null,
+          "wat": "de vorm op html",
+          "citaat": "d.documentElement.setAttribute('data-rtg-vorm', v);"
+        }
+      ],
+      "verantwoordelijkheden": [],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiefVorm"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-vorm"
+        ],
         "opslag": [],
         "fetch": []
       }
@@ -1781,6 +1804,35 @@
         "attributen": [
           "data-rtg-desktop"
         ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/objectverwijzing.js",
+      "laag": "grammatica-kern",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "etiket": null,
+          "wat": "een object is een verwijzing, afgekapt",
+          "citaat": "var GRENS = { soort: 32, id: 64, label: 120, velden: 8, veldnaam: 24, veldwaarde: 120 };"
+        },
+        {
+          "rol": "beslist",
+          "etiket": null,
+          "wat": "zonder id geen verwijzing",
+          "citaat": "return o.id ? '' : 'een object zonder id is geen verwijzing';"
+        }
+      ],
+      "verantwoordelijkheden": [],
+      "gemeten": {
+        "globals": [
+          "RTGObjectverwijzing"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
         "opslag": [],
         "fetch": []
       }
@@ -3750,7 +3802,9 @@
     "grammatica-kern": [
       "public/shared/adaptief.js",
       "public/shared/adaptief/grammatica.js",
-      "public/shared/adaptief/register.js"
+      "public/shared/adaptief/register.js",
+      "public/shared/adaptief/vorm.js",
+      "public/shared/objectverwijzing.js"
     ],
     "grammatica-render": [
       "public/shared/adaptief/balk.js",

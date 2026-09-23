@@ -46,6 +46,7 @@ const { maak } = require(BRON);
 const Actiestaat = require('../public/shared/edge/actiestaat.js');
 const gram = require('../public/shared/adaptief/grammatica.js');
 const WereldId = require('../public/shared/rtg-world-identity.js');
+const Poort = require('../public/shared/objectverwijzing.js');
 
 const Hoofdactie = require('../public/shared/edge/blikveld-hoofdactie.js');
 const HBRON = path.join(__dirname, '..', 'public', 'shared', 'edge', 'blikveld-hoofdactie.js');
@@ -79,7 +80,8 @@ function venster(o) {
     sessionStorage: { setItem: verboden('sessionStorage'), getItem() { return null; } },
     postMessage: verboden('postMessage'), fetch: verboden('fetch'),
     RTGWorldIdentity: o.geenWereldkaart ? undefined : WereldId,
-    RTGEdgeActiestaat: Actiestaat, RTGGrammatica: gram, RTGEdgeBlikveldHoofdactie: o.geenLezer ? undefined : Hoofdactie };
+    RTGEdgeActiestaat: Actiestaat, RTGGrammatica: gram, RTGEdgeBlikveldHoofdactie: o.geenLezer ? undefined : Hoofdactie,
+    RTGObjectverwijzing: Poort };
   w.location.origin = 'https://rtg.test';
   if (o.adaptief) {
     const ctx = Object.assign({ bron: '', titel: '', acties: [], selectie: false, staat: {}, rail: [], sleutel: 'k1' }, o.adaptief.ctx);
@@ -106,7 +108,7 @@ function vormKlopt(velden) {
 
 test('elk veld draagt waarde, herkomst, gezag en sinds; leeg betekent met reden', () => {
   for (const o of [{}, { offline: true }, { geenWereldkaart: true, pad: '/nergens.html' },
-    { adaptief: { ctx: { bron: 'office.tekst', titel: 'Brief', object: { soort: 'document' }, activiteit: 'schrijven', rail: [{ sleutel: 'opslag', tekst: 'Opgeslagen', staat: 'rustig' }] } } }]) {
+    { adaptief: { ctx: { bron: 'office.tekst', titel: 'Brief', object: { soort: 'document', id: 'd1', label: 'Brief' }, activiteit: 'schrijven', rail: [{ sleutel: 'opslag', tekst: 'Opgeslagen', staat: 'rustig' }] } } }]) {
     const { w } = venster(o);
     const l = maak(w).lees();
     assert.deepEqual(Object.keys(l.velden).sort(), ['activiteit', 'bevoegdheid', 'context', 'hoofdactie', 'identiteit',
@@ -157,7 +159,8 @@ test('de context en wat het scherm er zelf over zegt: object, activiteit en Trus
   const l = maak(w).lees();
   assert.deepEqual(l.velden.context.waarde, { bron: 'office.tekst', titel: 'Brief', selectie: true });
   assert.equal(l.velden.context.herkomst, 'scherm');
-  assert.deepEqual(l.velden.object.waarde, { soort: 'document', id: 'd1' });
+  /* Een object is een verwijzing (shared/objectverwijzing.js, stap 20). */
+  assert.deepEqual(l.velden.object.waarde, { soort: 'document', id: 'd1', label: '', velden: {} });
   assert.equal(l.velden.activiteit.waarde, 'schrijven');
   assert.equal(l.velden.trust.herkomst, 'scherm:rail');
   const off = maak(venster({ offline: true }).w).lees();
@@ -170,7 +173,7 @@ test('in de schil komt de context uit een blad: context, object en activiteit he
   const l = maak(venster({ schil: {}, pad: '/apps/app.html', body: { 'data-rtg-blad-wereld': 'travel' }, adaptief: { ctx } }).w).lees();
   assert.deepEqual(['context', 'object', 'activiteit', 'trust'].map((v) => l.velden[v].herkomst), ['blad', 'blad', 'blad', 'blad:rail']);
   assert.equal(l.velden.context.waarde.bron, 'reizen.tabs', 'de waarde blijft wat het blad zei; alleen het etiket zegt waar het vandaan kwam');
-  assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'r1' });
+  assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'r1', label: '', velden: {} });
   vormKlopt(l.velden);
   /* Los, zonder schil, is dezelfde context wel van het scherm zelf. */
   const los = maak(venster({ pad: '/apps/reizen.html', adaptief: { ctx } }).w).lees();

@@ -107,7 +107,7 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     });
     await page.waitForFunction(() => RTGEdgeBlikveld.lees().velden.activiteit.waarde === 'plannen', null, { timeout: 10000 });
     l = await page.evaluate(() => RTGEdgeBlikveld.lees());
-    assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'proef-1' });
+    assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'proef-1', label: '', velden: {} }, 'een object is een verwijzing (shared/objectverwijzing.js)');
     assert.deepEqual([l.velden.object.herkomst, l.velden.activiteit.herkomst], ['blad', 'blad'],
       'in de schil komt het object uit het blad, niet van een scherm dat hier zelf publiceert');
 

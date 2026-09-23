@@ -165,6 +165,11 @@
       "gezakt": 8,
       "geprobeerd": 2
     },
+    "adaptiefdelen.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest scripttags in HTML en geen module; de operatoren raken geen scripttag. Met de hand nagetrokken: vorm.js weg op reizen-veilig (zakt, en appmenu.e2e.js op de context van reizen-veilig), vorm.js na register.js op app (zakt), de objectpoort na rtg-schil.js in werkruimte (zakt, en werkruimte-objecten.e2e.js)"
+    },
     "administratie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2559,6 +2564,13 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "edgeobject.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "eenaccount-werkruimte.test.js": {
       "soort": "server",
@@ -5888,6 +5900,14 @@
     "objectveld.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "objectverwijzing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/objectverwijzing.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "ochtend.test.js": {
       "soort": "server",

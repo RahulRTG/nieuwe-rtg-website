@@ -157,8 +157,12 @@
     if (!lijst.length) { A.wisContext(); return; }
     var staat = {};
     lijst.forEach(function (x) { staat[x.id] = x.staat; });
+    /* Het object is een VERWIJZING naar het open bestand: soort, id en naam, en
+       nooit de inhoud. De vorm beslist de objectpoort in het register
+       (shared/objectverwijzing.js); een scherm geeft alleen door wat het weet. */
     A.context({ bron: 'bestanden', titel: f.naam || 'Bestand',
-      acties: lijst.map(function (x) { return x.id; }), staat: staat, rail: rail() });
+      acties: lijst.map(function (x) { return x.id; }), staat: staat, rail: rail(),
+      object: { soort: 'bestand', id: f.id, label: f.naam || 'Bestand' } });
   }
 
   function start() {

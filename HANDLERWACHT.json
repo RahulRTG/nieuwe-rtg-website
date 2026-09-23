@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-23T12:50:37.260Z",
-  "commit": "ef54abcea",
+  "op": "2026-09-23T12:54:29.979Z",
+  "commit": "9be3a44e0",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -3869,7 +3869,7 @@
   },
   {
    "sleutel": "POST /api/supplier/apply",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js:13",
+   "bestand": "server/routes/supplier/werving/sollicitaties.js:14",
    "staat": "openbaar",
    "reden": "solliciteren bij een zaak kan zonder account"
   },

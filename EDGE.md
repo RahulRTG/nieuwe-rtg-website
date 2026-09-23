@@ -42,7 +42,7 @@ op de code past is een verouderde kaart en geen kaart. `--controle` hercompileer
 en vergelijkt met het ingecheckte register.
 
 Uitslag: <!--getal:edgekaart.bestanden-->71<!--/getal--> bestanden met
-<!--getal:edgekaart.rollen-->216<!--/getal--> verklaarde rollen, allemaal met een
+<!--getal:edgekaart.rollen-->213<!--/getal--> verklaarde rollen, allemaal met een
 citaat dat letterlijk staat;
 <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> verantwoordelijkheden met
 meer dan één schrijver of beslisser (par. 1), en

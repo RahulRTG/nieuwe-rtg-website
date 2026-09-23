@@ -501,11 +501,11 @@ van het werk erna.
    in deze paragraaf.
 
 **Gedaan (23 september 2026).** `scripts/adamproef.js` loopt nu door tot de
-loonrun: 17 schakels, 16 gesloten, 1 open met reden, 0 stuk, en 10 van de 10
+loonrun: 17 schakels, alle 17 gesloten, 0 stuk, en 10 van de 10
 storingen gehouden (`ADAMPROEF.json`). Waar Adam niet verder kan, neemt een
 volwassen lid het over, zodat de rest van de keten toch gemeten wordt. De drie
-breuken die de verlenging vond, in de volgorde waarin een mens ze tegenkomt (de
-eerste twee zijn dicht):
+breuken die de verlenging vond, in de volgorde waarin een mens ze tegenkomt (alle
+drie dicht):
 
 - **Schakel 13:** een Foundation-profiel kwam niet in het team. Een aanname
   claimen eist een lidsessie (`/api/werving/verbind`), en een gezinslid heeft
@@ -533,10 +533,25 @@ eerste twee zijn dicht):
   Café Brisa aan zijn eigen entiteit koppelt, langs de gewone routes; zonder de
   brug zakt de schakel (`test/aanname-dienstverband.test.js`, en een mutatie
   op de proef zelf).
-- **Schakel 17:** de loonrun weigert, omdat de werkgever uit de proef (Café
-  Brisa) in Spanje staat en er alleen een Nederlands regelpakket ligt. Dat is
-  geen codefout maar een ontbrekende bron; dat een Nederlandse run wel werkt,
-  bewijst `test/loonstrook-portaal.test.js`.
+- **Schakel 17:** de loonrun weigerde, omdat de werkgever uit de proef (Café
+  Brisa) in Spanje staat en er alleen een Nederlands regelpakket ligt. Dat was
+  geen codefout maar een ontbrekende bron. **Rond dezelfde dag**, zonder het land
+  van Brisa te vervalsen: het volwassen lid wordt aangenomen bij de Meridiaan
+  Toren (NL), met een eigen manager en een eigen ondernemer die de zaak aan
+  Meridiaan BV koppelt. Zijn contract heeft een vaste omvang (24 uur), zodat het
+  contract het loon draagt en niet de klok. De loonrun levert nu een strook met
+  basissalaris op. Onderweg bleek de schakel zelf verkeerd te meten: hij zocht de
+  stroken in de SAMENVATTING die `run/open` teruggeeft, en die draagt ze niet,
+  dus hij had nooit kunnen sluiten. Hij leest de run nu zoals het kantoor dat doet
+  (`run/een`). Een Spaans regelpakket met een bron blijft nodig voor een loonrun
+  bij Café Brisa zelf; dat is een bron en geen code.
+
+**De keten van Adam is daarmee rond: 17 van 17 schakels gesloten, 10 van 10
+storingen gehouden** (`ADAMPROEF.json`), van gezin tot loonstrook. Zonder
+basissalaris zakt schakel 17, zonder de uitnodiging schakel 13, zonder de brug
+schakel 16 -- alle drie met een mutatie nagetrokken. Wat de keten met opzet NIET
+loopt: goedkeuren en uitbetalen van de loonrun (twee handtekeningen en een
+betaling, die zet een proef niet), en een loonrun bij een Spaanse zaak.
 
 De rest van par. 6 wacht op deze negen. De solver (106), de what-if-promotie
 (107), het geheugen (126, 127, 129) en de agents met eigen reikwijdte (122, 124)

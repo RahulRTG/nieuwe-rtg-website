@@ -841,14 +841,16 @@ in plaats van haar weg te laten. Te weinig rust bij een mens blijft met opzet
 een waarschuwing. **De eigenaar koos dezelfde dag** (par. 7a): `employment` aan
 een entiteit is de waarheid, de keten van vacature tot loon wordt rond gemaakt
 voordat `werving.suite` opengaat, en Métier is de bron van vaardigheden. De
-Adamproef loopt sindsdien door tot de loonrun (17 schakels, 16 gesloten, 1 open
-met reden). Van de drie breuken die hij vond zijn er twee dicht: een aanname
-wordt een dienstverband bij de entiteit van de zaak (`kern/concern/aanname.js`,
-een brug die een kant op loopt en geen werkgever raadt), en een gezinslid neemt
-zijn plek zelf in -- de uitnodiging reist mee met zijn sollicitatie, alleen hij
-ziet haar, en hij claimt met een eigen account (mag vanaf vijftien) in plaats van
-dat de werkgever een link doorgeeft. Open blijft dat de werkgever uit de proef in
-Spanje staat terwijl er alleen een Nederlands regelpakket ligt.
+Adamproef loopt sindsdien door tot de loonstrook en is rond: 17 van 17 schakels,
+10 van 10 storingen. De drie breuken die hij vond zijn dicht: een aanname wordt
+een dienstverband bij de entiteit van de zaak (`kern/concern/aanname.js`, een
+brug die een kant op loopt en geen werkgever raadt), een gezinslid neemt zijn
+plek zelf in (de uitnodiging reist mee met zijn sollicitatie, alleen hij ziet
+haar, en hij claimt met een eigen account -- mag vanaf vijftien), en de loonrun
+wordt gemeten bij een Nederlandse zaak in plaats van het land van Café Brisa te
+vervalsen. Let op de meetfout die daarbij bovenkwam: het antwoord van
+`/api/office/payroll/run/open` is een samenvatting zonder stroken, dus wie
+daarin naar loonregels zoekt meet altijd nul.
 
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG

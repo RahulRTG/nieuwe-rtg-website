@@ -112,6 +112,12 @@ const EIGENAAR = {
      vloer oprekken zou die zin precies omdraaien. */
   'PLANVORM.json': { schrijver: 'scripts/planvorm.js' },
 
+  /* De officevorm: is er een `RTGObject` onder document, taak, betaling en de
+     andere subtypen die het voorstel voor RTG Office Next noemt (OFFICE.md par.
+     0)? Zelfde vorm als de planvorm hierboven: een schrijver, een ratel op het
+     BEREIK, een ijking en een regel in de versheidslijst. */
+  'OFFICEVORM.json': { schrijver: 'scripts/officevorm.js' },
+
   /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
      bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie
      hieronder vindt hem niet (het doel staat in een `const DOEL` die via

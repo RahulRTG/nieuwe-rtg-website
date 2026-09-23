@@ -546,6 +546,10 @@ const REGISTERS = [
      ziet er precies zo uit als een verse -- met als extra valkuil dat hij dan
      van "deze domeinen delen niets" in "we hebben minder gekeken" verandert
      zonder dat het getal beweegt. */
+  /* Vijfde van deze soort (OFFICE.md par. 0), met dezelfde faalvorm: een nul
+     waarop het besluit rust dat er geen `RTGObject` komt, en die veroudert met
+     de CODE -- een nieuw objectdomein of een hernoemde map verandert hem. */
+  ['OFFICEVORM.json', 'npm run officevorm:vast', 'of de objectdomeinen onder het voorgestelde RTGObject een datavorm DELEN -- het besluit tegen een universeel objectmodel voor RTG Office rust erop, en de uitslag is een nul'],
   ['PLANVORM.json', 'npm run planvorm:vast', 'of de plandomeinen een datavorm en een planlus DELEN -- het besluit over een universele planningsgrond rust erop, en de uitslag is twee nullen'],
   ['SPOORVORM.json', 'npm run spoorvorm:vast', 'hoever de zes andere mechanismen van de spoorvorm van kern/vertegenwoordiging/handelen.js staan -- een matrix vol streepjes ziet er vers en verouderd hetzelfde uit, en juist die matrix hoort te veranderen'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat

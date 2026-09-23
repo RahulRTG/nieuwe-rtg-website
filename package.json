@@ -386,6 +386,8 @@
     "doorbelasting:vast": "node scripts/doorbelasting.js --vastleggen",
     "planvorm": "node scripts/planvorm.js",
     "planvorm:vast": "node scripts/planvorm.js --vastleggen",
+    "officevorm": "node scripts/officevorm.js",
+    "officevorm:vast": "node scripts/officevorm.js --vastleggen",
     "aanvoervorm": "node scripts/aanvoervorm.js",
     "aanvoervorm:vast": "node scripts/aanvoervorm.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T11:00:07.920Z",
-    "commit": "b3dc7dddd",
+    "op": "2026-09-23T12:33:08.532Z",
+    "commit": "a6b62cf3f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -49,6 +49,14 @@
       "module": "server/kern/aanmeldingen.js",
       "operator": "false->true",
       "gezakt": 1
+    },
+    "aanname-dienstverband.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/werving/uitnodiging-na.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "aanvoer.test.js": {
       "soort": "puur",

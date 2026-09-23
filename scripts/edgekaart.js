@@ -168,10 +168,11 @@ const KAART = [
     ['beslist', 'capability-register:b', 'welke paginaknop geoogst wordt', 'if (label(el) && available(el, root) && (!tab || !tabs.has(tab))'],
     ['rendert', 'hoofdactie:s', 'verhuist de hoofdactie in het blad', 'rt.primarySlot = primary; rt.sheet.appendChild(primary);'],
     ['rendert', 'vluchtige-context:l', 'bladtitel uit RTGAdaptief', 'if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;']]],
-  ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:l zichtbaarheidsstand:b capability-register:l', [
+  ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:l zichtbaarheidsstand:bl capability-register:l', [
     ['leest', 'gebaar-drempel:l', 'veeg opzij wisselt deck, drempel uit de tabel', 'if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > D.veeg)'],
     ['leest', 'gebaar-drempel:l', 'lang drukken uit de tabel', '}, D.lang);'],
     ['beslist', 'zichtbaarheidsstand:b', 'auto-peek bij scrollen', "if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;"],
+    ['leest', 'zichtbaarheidsstand:l', 'de gebaarversheid van Edge 2, alleen waar Edge 2 draait', 'if (gebaar && !e2.gestureFresh(gebaar)) return;'],
     ['beslist', 'zichtbaarheidsstand:b', 'omhoog naar RTGDiepte', 'if (-dy >= D.diep) depth.tweede(); else depth.eerste();']]],
   ['rtg-adaptive-edge-loader.js', 'laden', '', [
     ['beslist', '-', 'overslaan als de global bestaat', 'if (global && w[global]) { done(true); return; }'],
@@ -183,12 +184,11 @@ const KAART = [
   ['rtg-adaptive-edge-claim.js', 'adaptieve-balk', 'onderbalk:sb', [
     ['beslist', 'onderbalk:b', 'alleen vaste of plakkende balken', "if (stijl.position !== 'fixed' && stijl.position !== 'sticky') return false;"],
     ['schrijft', 'onderbalk:s', 'markeert de geclaimde balken', 'winnaars.forEach(function (el) { el.classList.add(EIGEN); });']]],
-  ['rtg-edge-system.js', 'edge-casco', 'wereld:sb vluchtige-context:s hoofdactie:s zichtbaarheidsstand:s', [
+  ['rtg-edge-system.js', 'edge-casco', 'wereld:sb vluchtige-context:s hoofdactie:s', [
     ['beslist', 'wereld:b', 'wereld: gevraagd, anders work', "var key = o.world || 'work', cfg = C[key] || C.work;"],
     ['schrijft', 'wereld:s', 'wereld op body', 'd.body.dataset.rtgWorld = key;'],
     ['schrijft', 'vluchtige-context:s', 'eigen context', 'A.ctx = Object.assign({}, A.ctx, c || {});'],
-    ['schrijft', 'hoofdactie:s', 'tekst van de hoofdactie', 'hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;'],
-    ['schrijft', 'zichtbaarheidsstand:s', 'Edge 1-vouwstand', "d.body.classList.add('rtg-edge-fold')"]]],
+    ['schrijft', 'hoofdactie:s', 'tekst van de hoofdactie', 'hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;']]],
   ['rtg-edge-library.js', 'edge-casco', 'hoofdactie:s onderbalk:s trust-rail:sb wereld:l', [
     ['rendert', 'hoofdactie:s', 'de hoofdactieknop', '<div class="rtg-edge-action"><button type="button" data-rtg-edge-primary></button></div>'],
     ['rendert', 'onderbalk:s', 'de onderbalk van de casco', '<footer class="rtg-edge-bottom">'],
@@ -371,8 +371,9 @@ const KAART = [
     ['schrijft', 'vluchtige-context:l', 'en in die van het register', "A.context({ bron: 'reizen.tabs', titel: 'TravelOS',"],
     ['beslist', 'vluchtige-context:l', 'alleen in een frame', 'if (!A || w.parent === w) return;']]],
   /* Twee schermen zetten de Edge 2-stand zelf op body, buiten setState om. */
-  ['public/apps/werk/command-entry.js', 'afnemer', 'zichtbaarheidsstand:s', [
-    ['schrijft', 'zichtbaarheidsstand:s', 'Edge 2-stand op body bij een hashwissel', "document.body.setAttribute('data-rtg-edge-2-state', 'overview');"]]],
+  ['public/apps/werk/command-entry.js', 'afnemer', 'zichtbaarheidsstand:sl', [
+    ['schrijft', 'zichtbaarheidsstand:s', 'Edge 2-stand op body bij het laden (de verklaring)', "document.body.setAttribute('data-rtg-edge-2-state', 'overview');"],
+    ['schrijft', 'zichtbaarheidsstand:l', 'een hashwissel vraagt de poort als automatiek; handmatig wint', "edge2.setState('overview', { source: 'auto' });"]]],
   ['public/apps/foundation/os-publiek.html', 'afnemer', 'zichtbaarheidsstand:s', [
     ['schrijft', 'zichtbaarheidsstand:s', 'Edge 2-stand op body bij een stadswissel', "document.body.setAttribute('data-rtg-edge-2-state', 'overview');"]]],
   /* De landing (index.html in de wortel) draait de adaptieve Edge met een eigen
@@ -401,7 +402,7 @@ const WAAROM = {
   gewicht: 'De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: twee keer een eigen standaard licht voor een ONTBREKEND gewicht (adaptief.js, brug.js; register.js laat het gewicht sinds ronde 1 staan), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), de Edge-Core laat in zijn tweede register alleen licht toe, en de gebaarlaag houdt een eigen borgtijd van 800 ms naast VASTHOUD (die blijft tot ronde 3, besluit K-borg).',
   'gebaar-drempel': 'DREMPELS in grammatica.js is de tabel, en zes herkenners lezen hem. Twee plekken beslissen met eigen maten: de gebaarversheid van Edge 2 (1500 ms, 14 px) en de gebaarlaag van de lijsten (RICHTING 8 en STIL 6 in gebaar-02, lang drukken 520 ms en 8 px per as in gebaar-03b). Die laatste stond na ronde 1 niet op de kaart, waardoor deze verantwoordelijkheid een eigenaar leek te hebben; de code is niet veranderd, de kaart ziet hem nu.',
   waarom: 'De vijf bronnen staan twee keer (BRONNEN in grammatica.js, BRONWOORD in waarom.js), en verhinderd-gaat-niet-door wordt beslist in register.js, balkknop.js, orb.js en actiestaat.js naast de uitleg in grammatica.js en waarom.js.',
-  zichtbaarheidsstand: 'Vier standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel en een vensterboolean in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, en de Edge 1-vouwstand; ze delen geen stand. Daarnaast zetten twee schermen (Work en FoundationOS) de Edge 2-stand zelf op body, buiten setState om. De Second Screen stond hier tot ronde 2 en is eraf: zijn stand gaat over de bank van de schil, niet over de Edge.',
+  zichtbaarheidsstand: 'Drie standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel en een vensterboolean in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt en sinds ronde 2 zijn gebaarversheid leest; ze delen geen stand. De Edge 1-vouwstand is in ronde 2 weggehaald. Daarnaast zetten twee schermen de Edge 2-stand zelf op body: FoundationOS bij een stadswissel, Work alleen nog bij het laden (een hashwissel gaat sinds ronde 2 via setState als automatiek, zodat een handmatige keuze wint). De Second Screen stond hier tot ronde 2 en is eraf: zijn stand gaat over de bank van de schil, niet over de Edge.',
   onderbalk: 'Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, RTGDaily die zelf een Edge-balk ophangt, en het Edge-commando dat de menuknop tot 999 px claimt.',
   bevoegdheid: 'Drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, allowed van de Edge-Core, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft -- het blikveld zegt dat hardop.',
 };

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T16:21:31.373Z",
-    "commit": "81cf70a0",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-23T16:53:04.759Z",
+    "commit": "5a908d7f",
+    "boomVuil": true,
+    "boomAnders": 1,
     "instrument": "scripts/edgekaart.js",
     "node": "v22.22.2"
   },
@@ -331,11 +331,21 @@
         {
           "rol": "schrijft",
           "etiket": "zichtbaarheidsstand:s",
-          "wat": "Edge 2-stand op body bij een hashwissel",
+          "wat": "Edge 2-stand op body bij het laden (de verklaring)",
           "citaat": "document.body.setAttribute('data-rtg-edge-2-state', 'overview');"
+        },
+        {
+          "rol": "schrijft",
+          "etiket": "zichtbaarheidsstand:l",
+          "wat": "een hashwissel vraagt de poort als automatiek; handmatig wint",
+          "citaat": "edge2.setState('overview', { source: 'auto' });"
         }
       ],
       "verantwoordelijkheden": [
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "lezer"
+        },
         {
           "naam": "zichtbaarheidsstand",
           "als": "schrijver"
@@ -2031,6 +2041,12 @@
           "citaat": "if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;"
         },
         {
+          "rol": "leest",
+          "etiket": "zichtbaarheidsstand:l",
+          "wat": "de gebaarversheid van Edge 2, alleen waar Edge 2 draait",
+          "citaat": "if (gebaar && !e2.gestureFresh(gebaar)) return;"
+        },
+        {
           "rol": "beslist",
           "etiket": "zichtbaarheidsstand:b",
           "wat": "omhoog naar RTGDiepte",
@@ -2049,6 +2065,10 @@
         {
           "naam": "zichtbaarheidsstand",
           "als": "beslisser"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "lezer"
         }
       ],
       "gemeten": {
@@ -2968,12 +2988,6 @@
           "etiket": "hoofdactie:s",
           "wat": "tekst van de hoofdactie",
           "citaat": "hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;"
-        },
-        {
-          "rol": "schrijft",
-          "etiket": "zichtbaarheidsstand:s",
-          "wat": "Edge 1-vouwstand",
-          "citaat": "d.body.classList.add('rtg-edge-fold')"
         }
       ],
       "verantwoordelijkheden": [
@@ -2991,10 +3005,6 @@
         },
         {
           "naam": "wereld",
-          "als": "schrijver"
-        },
-        {
-          "naam": "zichtbaarheidsstand",
           "als": "schrijver"
         }
       ],
@@ -3691,8 +3701,7 @@
         "public/apps/werk/command-entry.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/shared/rtg-edge-2-loader.js",
-        "public/shared/rtg-edge-2.js",
-        "public/shared/rtg-edge-system.js"
+        "public/shared/rtg-edge-2.js"
       ],
       "beslissers": [
         "public/shared/rtg-adaptive-edge-core.js",
@@ -3703,6 +3712,8 @@
         "public/shared/rtg-edge-2.js"
       ],
       "lezers": [
+        "public/apps/werk/command-entry.js",
+        "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-continue-key.js",
         "public/shared/rtg-edge-2-reveal.js",
         "public/shared/rtg-themas.js"
@@ -3992,8 +4003,7 @@
         "public/apps/werk/command-entry.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/shared/rtg-edge-2-loader.js",
-        "public/shared/rtg-edge-2.js",
-        "public/shared/rtg-edge-system.js"
+        "public/shared/rtg-edge-2.js"
       ],
       "beslissers": [
         "public/shared/rtg-adaptive-edge-core.js",
@@ -4003,7 +4013,7 @@
         "public/shared/rtg-edge-2-loader.js",
         "public/shared/rtg-edge-2.js"
       ],
-      "waarom": "Vier standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel en een vensterboolean in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, en de Edge 1-vouwstand; ze delen geen stand. Daarnaast zetten twee schermen (Work en FoundationOS) de Edge 2-stand zelf op body, buiten setState om. De Second Screen stond hier tot ronde 2 en is eraf: zijn stand gaat over de bank van de schil, niet over de Edge."
+      "waarom": "Drie standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel en een vensterboolean in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt en sinds ronde 2 zijn gebaarversheid leest; ze delen geen stand. De Edge 1-vouwstand is in ronde 2 weggehaald. Daarnaast zetten twee schermen de Edge 2-stand zelf op body: FoundationOS bij een stadswissel, Work alleen nog bij het laden (een hashwissel gaat sinds ronde 2 via setState als automatiek, zodat een handmatige keuze wint). De Second Screen stond hier tot ronde 2 en is eraf: zijn stand gaat over de bank van de schil, niet over de Edge."
     }
   ],
   "dodeKanalen": {
@@ -4058,7 +4068,7 @@
   },
   "telling": {
     "bestanden": 71,
-    "rollen": 216,
+    "rollen": 217,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 13

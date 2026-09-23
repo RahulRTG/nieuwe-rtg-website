@@ -101,9 +101,19 @@
         event.preventDefault(); handlers.deck(event.key === 'ArrowRight' ? 1 : -1);
       } else if (event.key === 'Escape') handlers.escape();
     });
+    /* WIE SCROLDE (EDGE.md, ronde 2). Een scroll zonder gebaar -- een anker, een
+       scrollTo van het scherm -- liet de balk opkijken en 520 ms later weer
+       zakken: een flikkering. Of een scroll van de mens kwam, heeft een eigenaar
+       (rtg-edge-2-context.js); de balk vraagt het met diens gestureBind en
+       gestureFresh op een eigen stand, net als de loader, en houdt geen tweede
+       definitie. Alleen waar Edge 2 draait: op de landing en de sitepagina's
+       blijft het zoals het was. */
+    var e2 = rt.win.RTGEdge2, gebaar = null;
+    if (e2 && e2.gestureBind && e2.gestureFresh) { gebaar = { events: [] }; e2.gestureBind(gebaar, rt.win); }
     rt.win.addEventListener('scroll', function () {
       var now = rt.win.scrollY || 0, moved = Math.abs(now - lastScroll); lastScroll = now;
       if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;
+      if (gebaar && !e2.gestureFresh(gebaar)) return;
       handlers.state('peek', 'auto'); rt.win.clearTimeout(scrollTimer);
       scrollTimer = rt.win.setTimeout(function () {
         if (!rt.manual && rt.model.state === 'peek') handlers.state('dock', 'auto');

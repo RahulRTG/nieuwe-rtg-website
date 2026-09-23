@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1583,
+    "kernBreedte": 1584,
     "kernGedeeld": 239,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -135,6 +135,15 @@
     "planDomeinenGemeten": 7
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1583,
+      "meter": "kernBreedte 1583 -> 1584; kernGedeeld blijft 239",
+      "reden": "De brug uit ARBEID.md par. 7a, besluit 1: een aanname via de werving wordt ook een dienstverband bij de entiteit. De werving kende het concern niet, dus er komt EEN kernnaam bij, `dienstverbandUitAanname`, en met opzet geen twee: de claim had ook `vestigingVanUnit` plus `employmentNieuw` kunnen aanraken, en dan zou de werving zelf beslissen welke entiteit bij een zaak hoort. Een eigen toegang zet die keuze in de module die het dienstverband BEZIT (kern/concern/aanname.js), dezelfde vorm als `ondernemingAchterZaak` op 14 september. De naam staat in GRENZEN.json bij supplier en werving, omdat de claim in beide domeinen wordt gemount; hij wordt pas bij het aanroepen opgehaald en binnen een try, zodat de grens een aanmelding nooit kan breken.",
+      "waarheen": "server/kern/concern/aanname.js (de brug, een kant op, zonder personeelsregister), server/routes/supplier/werving/uitnodiging-na.js (de haak na de claim) en test/aanname-dienstverband.test.js (zes toetsen). De Adamproef schakel 16 meet het tegen een echte server en zakt zonder de brug. Zou een dienstverband ooit een personeelsplek terugschrijven, dan is dat de plek om hem weer te splitsen."
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

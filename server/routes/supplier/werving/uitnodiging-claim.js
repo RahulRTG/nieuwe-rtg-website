@@ -2,7 +2,7 @@
 const { idVanKey } = require('../../../lib/lidsleutel');
 
 module.exports = ctx => {
-  const { accounts, crypto, logActivity, notifySupplier, transactie, vindIn,
+  const { accounts, crypto, transactie, vindIn,
     publiek, geldig, herstelGeldig, supplierVanCode } = ctx;
   const CODE_FOUT = 'Deze kassacode is ongeldig of niet meer bruikbaar.';
   const zoekInvite = kassacode => transactie(bron => {

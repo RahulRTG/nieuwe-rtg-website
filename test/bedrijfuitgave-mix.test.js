@@ -86,8 +86,13 @@ test('1-3. codenaam in de concerngraaf, koppeling door de eigenaar, en de laagst
   const cfo = await feit({ sleutel: CFO.rtg.codenaam.toLowerCase(), extra: { bevoegd: 'alleen', tekenlimiet: 300 } });
   assert.equal(cfo.status, 200, JSON.stringify(cfo.body));
 
-  assert.equal((await api('/api/bedrijf/werkruimte/entiteit', Object.assign({ entiteitId: E }, bare(FIN)))).status, 403,
-    'een lid zonder RTG-account koppelt niets');
+  const zonderRecht = await api('/api/bedrijf/werkruimte/entiteit', Object.assign({ entiteitId: E }, bare(FIN)));
+  assert.equal(zonderRecht.status, 403, 'zonder het recht werkruimte komt niemand bij de koppeling');
+  assert.equal(zonderRecht.body.recht, 'werkruimte');
+  const EXT = await lid('Eva Extern', ['directie']);
+  const ext = await api('/api/bedrijf/werkruimte/entiteit', Object.assign({ entiteitId: E }, bare(EXT)));
+  assert.equal(ext.status, 409, 'een lid zonder RTG-account koppelt niets, en blijft ingelogd: ' + JSON.stringify(ext.body));
+  assert.match(ext.body.error, /eigen RTG-account/);
   assert.equal((await api('/api/bedrijf/werkruimte/entiteit', Object.assign({ entiteitId: E }, bare(CFO)))).status, 404,
     'een lid dat niet de eigenaar van de entiteit is, koppelt hem niet');
   assert.equal((await api('/api/bedrijf/werkruimte/entiteit', { werkruimte: W, beheerToken: B, entiteitId: E })).status, 403,
@@ -134,7 +139,7 @@ test('4-5. via RTG Bank: pas als RTG hem aanzet, en de SEPA-opdracht wordt getoe
 
   const betaal = (wie, opdrachtId) => api('/api/bedrijf/uitgave/betaald', Object.assign({ id: u.id, opdrachtId }, bare(wie)));
   assert.equal((await betaal(CFO, 'BO000000000000')).status, 404, 'een opdracht die niet bestaat');
-  assert.equal((await betaal(DIR, sepa.body.opdrachtId)).status, 403, 'een opdracht van een ander');
+  assert.equal((await betaal(DIR, sepa.body.opdrachtId)).status, 409, 'een opdracht van een ander');
   const bedrag = await betaal(CFO, scheef.body.opdrachtId);
   assert.equal(bedrag.status, 409, 'een ander bedrag: ' + JSON.stringify(bedrag.body));
   assert.match(bedrag.body.error, /99\.00 euro/);

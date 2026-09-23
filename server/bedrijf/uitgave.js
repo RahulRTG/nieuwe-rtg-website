@@ -122,7 +122,7 @@ module.exports = (sctx) => {
     if (!b) return { status: 404, error: 'Die SEPA-opdracht kennen we niet. Maak de overboeking vanaf uw RTG-rekening en geef het opdrachtnummer op.' };
     if (b.onbedraad) return { status: 503, error: 'De bank is niet aangesloten; deze betaling is nu niet te controleren.' };
     if (b.mislukt) return { status: 409, error: 'Die opdracht is mislukt of teruggeboekt (' + b.status + ').' };
-    if (!b.vanDeze) return { status: 403, error: 'Die opdracht kwam niet van uw eigen RTG-rekening.' };
+    if (!b.vanDeze) return { status: 409, error: 'Die opdracht kwam niet van uw eigen RTG-rekening.' };
     if (b.centen !== Number(u.waardeCenten)) return { status: 409, error: 'Die opdracht is ' + euro(b.centen) + ' euro; de uitgave is ' + euro(u.waardeCenten) + ' euro.' };
     if (b.bestemming !== u.iban) return { status: 409, error: 'Die opdracht ging naar een ander IBAN dan de begunstigde van deze uitgave.' };
     if (Object.values(U(g.w)).some(x => x.betaald && x.betaald.kenmerk === id)) return { status: 409, error: 'Die opdracht staat al bij een andere uitgave.' };

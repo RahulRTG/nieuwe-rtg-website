@@ -22,18 +22,23 @@
 const EENHEID = require('../kern/geld/eenheid');
 
 module.exports = (sctx) => {
-  const { app, save, schoon, werkPoort, beheerVan, log, eigenVeld, kern } = sctx;
+  const { app, save, schoon, werkPoort, log, eigenVeld, kern } = sctx;
   const euro = (c) => (Number(c || 0) / 100).toFixed(2);
 
+  /* Wie de werkruimte beheert, zet de grens -- maar nooit zijn EIGEN grens: een
+     versmalling die de versmalde zelf kan weghalen, versmalt niets. */
   app.post('/api/bedrijf/lid/tekengrens', (req, res) => {
-    const w = beheerVan(req, res); if (!w) return;
+    const g = werkPoort(req, res, 'werkruimte'); if (!g) return;
+    const w = g.w;
     const l = eigenVeld(w.leden, String(req.body.lidId || ''));
     if (!l) return res.status(404).json({ error: 'Dat lid kennen we niet.' });
+    if (!g.directie && l.id === g.l.id) return res.status(409).json({
+      error: 'Uw eigen tekengrens zet een ander. Een grens die u zelf kunt weghalen, begrenst niets.' });
     const leeg = req.body.bedrag == null || req.body.bedrag === '';
     const centen = leeg ? null : EENHEID.naarCenten(Number(req.body.bedrag));
     if (!leeg && !(centen >= 0)) return res.status(400).json({ error: 'Een tekengrens is een bedrag in euro, of leeg om hem weg te halen.' });
     l.tekengrensCenten = centen;
-    log(w, null, 'tekengrens', l.id, leeg ? 'weg' : euro(centen));
+    log(w, g.directie ? null : g.l, 'tekengrens', l.id, leeg ? 'weg' : euro(centen));
     save();
     res.json({ ok: true, lidId: l.id, tekengrens: leeg ? null : euro(centen),
       let: leeg ? 'Geen tekengrens in de werkruimte. Is de werkruimte aan een entiteit gekoppeld, dan kan de concerngraaf nog een grens geven.'
@@ -42,7 +47,9 @@ module.exports = (sctx) => {
 
   app.post('/api/bedrijf/werkruimte/entiteit', (req, res) => {
     const g = werkPoort(req, res, 'werkruimte'); if (!g) return;
-    if (g.directie || !g.l.rtgKey) return res.status(403).json({
+    /* Het beheer-token is geen gezicht (403); een lid zonder RTG-account heeft een
+       goede sleutel maar geen entiteit om te bezitten (409, en dus niet uitgelogd). */
+    if (g.directie || !g.l.rtgKey) return res.status(g.directie ? 403 : 409).json({
       error: 'Een werkruimte koppelt u aan een entiteit met een lid dat aan zijn eigen RTG-account hangt, niet met het beheer-token.' });
     const id = schoon(req.body.entiteitId, 40);
     if (!id) {

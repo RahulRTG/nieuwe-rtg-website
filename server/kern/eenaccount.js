@@ -123,7 +123,19 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     findSupplier, rememberSession, logInlog, logActivity, supplierState, officeState,
     magWerken, pinInfo, pinCheck, lijst, zelfde, eigenaarKantoor, afgeleid, nu, persoonsPoort, sessieregister });
 
-  return { accRollen, accKoppel, accStart, accOntkoppel };
+  /* Wie de kantoorrol houdt, voor de toegangsreview (AUTHORITY.md fase 8): alleen
+     sleutel en sinds, en alleen lezen. Hier en niet in de review, want deze
+     module is de eigenaar van db.data.accountRollen. */
+  function kantoorHouders() {
+    const alle = (db.data && db.data.accountRollen) || {};
+    const uit = [];
+    for (const [key, l] of Object.entries(alle)) {
+      for (const r of (Array.isArray(l) ? l : [])) if (r && r.rol === 'kantoor') uit.push({ key, sinds: r.at || null });
+    }
+    return uit;
+  }
+
+  return { accRollen, accKoppel, accStart, accOntkoppel, kantoorHouders };
 }
 
 module.exports = { maakEenAccount };

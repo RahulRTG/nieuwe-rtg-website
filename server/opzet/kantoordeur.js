@@ -21,7 +21,7 @@ module.exports = function kantoordeur(app, kern, deps) {
   app.use('/api/office', beleidsmotor.meelezer);
   /* Fase 8: de toegangsreview leest de drie zetelbronnen. De balie en de
      codenamen bestaan pas bij een verzoek, vandaar de functies. */
-  beleidsmotor.review = require('../kern/beleidsmotor/review').maakReview({ db: deps.db,
+  beleidsmotor.review = require('../kern/beleidsmotor/review').maakReview({ kantoorHouders: () => kern().kantoorHouders(),
     boardroomLijst: rauw.boardroomLijst, magBoardroom: rauw.magBoardroom, boardroomBaas: rauw.boardroomBaas,
     magBalie: (k) => kern().magBalie(k), balieZetels: () => kern().balieZetels(),
     codenaamVan: (k) => kern().codenaamVan(k) }).review;

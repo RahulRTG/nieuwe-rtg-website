@@ -2,7 +2,7 @@
 
    Wie houdt een kantoorzetel, sinds wanneer, en wat zouden de deuren voor die
    mens besluiten? Drie bronnen, elk met een eigen levenscyclus (AUTHORITY.md
-   par. 1.3): de kantoorrol op een account (db.data.accountRollen), de
+   par. 1.3): de kantoorrol op een account (kern/eenaccount.js), de
    boardroomtoegang (boardroomLijst) en de baliezetels. De review LEEST ze alle
    drie en schrijft niets: intrekken gebeurt waar het recht woont (fase 3), en
    een tweede intrekweg hier zou er een zijn die uiteenloopt.
@@ -19,7 +19,7 @@
 
 const { kan, DEUREN } = require('./regels');
 
-function maakReview({ db, boardroomLijst, magBoardroom, boardroomBaas, magBalie, balieZetels, codenaamVan }) {
+function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaas, magBalie, balieZetels, codenaamVan }) {
   const probeer = (fn, anders) => { try { return fn(); } catch (e) { return anders; } };
 
   function houders() {
@@ -30,10 +30,7 @@ function maakReview({ db, boardroomLijst, magBoardroom, boardroomBaas, magBalie,
       h.zetels.push({ soort, sinds: sinds || null });
       per.set(key, h);
     };
-    const rollen = (db.data && db.data.accountRollen) || {};
-    for (const [key, lijst] of Object.entries(rollen)) {
-      for (const r of (Array.isArray(lijst) ? lijst : [])) if (r && r.rol === 'kantoor') zet(key, 'kantoorrol', r.at);
-    }
+    for (const k of probeer(() => kantoorHouders() || [], [])) zet(k.key, 'kantoorrol', k.sinds);
     for (const t of probeer(() => boardroomLijst() || [], [])) zet(t.key, 'boardroom', t.at);
     for (const z of probeer(() => (typeof balieZetels === 'function' ? balieZetels() : []) || [], [])) zet(z.key, 'balie', z.sinds);
     return [...per.values()];

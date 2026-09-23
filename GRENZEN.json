@@ -652,6 +652,7 @@
       "rtf"
     ],
     "ledenbalie": [
+      "afdelingen",
       "balieAboVoorstel",
       "balieDossier",
       "balieHerstel",
@@ -662,7 +663,8 @@
       "balieZetels",
       "balieZoek",
       "boardroomAuth",
-      "magBalie"
+      "magBalie",
+      "zwaarbewijs"
     ],
     "ledenregister": [
       "boardroomAuth",

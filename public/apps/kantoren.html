@@ -1112,6 +1112,8 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/deur.js"></script>
+<script src="/shared/passkey.js"></script>
+<script src="/shared/zwaarbevestig.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1120,6 +1122,11 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+/* Een ZWARE handeling gaat niet door api(): die logt uit op elke 401, en een
+   passkeyvraag van de zware poort is ook een 401. /shared/zwaarbevestig.js
+   doet de ceremonie en stuurt opnieuw. */
+const zwaar = (pad, body) => window.RTGZwaar.doe('/api/office/' + pad, body,
+  { token: TOKEN, optiesPad: '/api/office/boardroom/bevestig/opties' });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
 function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vIntegraties','vBalie','vAtelier','vStudio','vHardware','vArchitect','vIdeeen','vWerkplaats'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
@@ -3741,7 +3748,7 @@ async function laadToegang(baas){
       '<button class="knop stil" data-toegangweg="'+esc(t.codenaam)+'" type="button" style="padding:.25rem .8rem;font-size:.75rem;">Trek in</button></div>').join('')
       : '<div class="leeg">Alleen jij kunt de boardroom in.</div>';
     $('#bToegangLijst').querySelectorAll('[data-toegangweg]').forEach(b => b.addEventListener('click', async () => {
-      try { await api('boardroom/toegang/weg', { codenaam: b.dataset.toegangweg }); meld('Toegang ingetrokken.'); laadToegang(true); }
+      try { await zwaar('boardroom/toegang/weg', { codenaam: b.dataset.toegangweg }); meld('Toegang ingetrokken.'); laadToegang(true); }
       catch (e) { meld(e.message); }
     }));
   } catch (e) {}
@@ -3749,7 +3756,7 @@ async function laadToegang(baas){
 $('#bToegangGeef').addEventListener('click', async () => {
   const c = $('#bToegangCode').value.trim();
   if (!c) return;
-  try { await api('boardroom/toegang/geef', { codenaam: c }); $('#bToegangCode').value = ''; meld('Toegang gegeven.'); laadToegang(true); }
+  try { await zwaar('boardroom/toegang/geef', { codenaam: c }); $('#bToegangCode').value = ''; meld('Toegang gegeven.'); laadToegang(true); }
   catch (e) { meld(e.message); }
 });
 /* HET PAPIERWERK. Achttien vragen die alleen een mens kan beantwoorden; de

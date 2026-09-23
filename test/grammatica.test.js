@@ -84,15 +84,31 @@ test('de vijf trappen lopen van niets vragen naar een mens vragen', () => {
   assert.deepEqual(trappen, [0, 1, 2, 3, 4]);
 });
 
-test('alleen de twee lichtste trappen gaan zonder meer door', () => {
-  /* DE MUTATIE: laat directMag() altijd true teruggeven. Elke tik in het dock
-     zou dan meteen doorgaan, en het hele gewicht wordt decor. */
-  assert.equal(gram.directMag('licht'), true);
-  assert.equal(gram.directMag('terug'), true);
-  for (const t of ['bewust', 'zwaar', 'plechtig']) {
-    assert.equal(gram.directMag(t), false, t + ' hoort niet zomaar door te gaan');
+test('een tik draait direct precies dan als het werkelijke gewicht niets vraagt', () => {
+  /* Dit was directMag(), en die gaf een onbekende trap LICHT terwijl effectief()
+     hem ZWAAR maakt: twee antwoorden op een vraag, en de ene had geen aanroeper
+     (EDGE.md par. 11, ronde 1). De belofte wordt nu gemeten waar hij wordt
+     waargemaakt: in de uitvoerder.
+
+     DE MUTATIES: laat gewicht.js `bewust` via draai() uitvoeren (zakt op
+     bewust), zet `vraagt: false` bij zwaar in grammatica.js (tabel en uitvoerder
+     lopen uiteen), of laat effectief() een onbekende trap licht geven (de
+     absolute regel over 'onzin' zakt -- de relatieve beweegt mee en kan dat niet
+     zien, daarom staan ze er allebei). */
+  const vm = require('vm');
+  assert.equal('directMag' in gram, false, 'directMag hoort weg te zijn: effectief() is het ene antwoord');
+  const bron = lees('public/shared/adaptief/gewicht.js');
+  for (const t of [...gram.TRAPPEN, undefined, 'onzin']) {
+    for (const terug of [false, true]) {
+      let gedraaid = 0;
+      const window = { RTGGrammatica: gram, console: { warn() {}, error() {} }, RTGLagen: { lade() {}, taak() {}, sluit() {} } };
+      vm.runInNewContext(bron, { window, document: {} });
+      window.RTGGewicht.voer({ id: 'h', naam: 'H', gewicht: t, doe: () => { gedraaid++; }, ongedaan: terug ? () => {} : undefined });
+      const direct = !gram.GEWICHT[gram.effectief(t, terug)].vraagt;
+      assert.equal(gedraaid, direct ? 1 : 0, String(t) + (terug ? ' met' : ' zonder') + ' weg terug');
+      if (t === 'onzin') assert.equal(gedraaid, 0, 'een onbekende trap draait nooit direct');
+    }
   }
-  assert.equal(gram.directMag('onzin'), true, 'een onbekend gewicht valt terug op licht');
 });
 
 test('vasthouden bestaat alleen bij de twee zwaarste trappen', () => {
@@ -433,3 +449,88 @@ function blokVan(kies) {
   const t = REGELS.filter((r) => r.kiezers.includes(kies));
   return t.length ? t.map((r) => r.inhoud).join('\n') : null;
 }
+
+/* ============================================ een antwoord op "wat weegt dit" ==
+   Ronde 1 (EDGE.md par. 11): drie plekken beslisten zelf wat een handeling
+   weegt, en ze liepen uiteen met de uitvoerder. Een kleine nep-DOM laat de echte
+   modules in een vm draaien, zodat de toetsen hun GEDRAG lezen en niet hun bron. */
+function wereld(metGrammatica) {
+  const vm = require('vm');
+  const leer = require('../public/shared/adaptief.js');
+  const el = (tag) => ({ tag, className: '', textContent: '', kinderen: [], attrs: {}, style: {}, dataset: {},
+    appendChild(k) { this.kinderen.push(k); return k; }, prepend(k) { this.kinderen.unshift(k); },
+    setAttribute(n, v) { this.attrs[n] = v; }, removeAttribute() {}, addEventListener() {}, focus() {},
+    querySelector() { return null; }, querySelectorAll() { return []; },
+    classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } } });
+  const document = { createElement: el, createTextNode: (t) => ({ textContent: t, kinderen: [] }), getElementById: () => null,
+    querySelector: () => null, querySelectorAll: () => [], addEventListener() {}, documentElement: el('html'), body: el('body') };
+  const bladen = [];
+  const laag = (o) => { const lijf = el('div'); if (o.inhoud) o.inhoud(lijf); bladen.push(lijf); };
+  const window = { RTGAdaptiefLeer: leer, console: { warn() {}, error() {} }, matchMedia: () => ({ matches: false, addEventListener() {} }),
+    setTimeout: (f) => f(), addEventListener() {}, RTGLagen: { lade: laag, taak: laag, sluit() {} } };
+  if (metGrammatica) window.RTGGrammatica = gram;
+  for (const f of ['register.js', 'waarom.js', 'balkknop.js', 'orb.js', 'diepte.js']) {
+    vm.runInNewContext(lees('public/shared/adaptief/' + f), { window, document, navigator: {} });
+  }
+  const alles = (n, uit = []) => { uit.push(n); (n.kinderen || []).forEach((k) => alles(k, uit)); return uit; };
+  return { window, bladen, alles };
+}
+const VORM = { telefoon: ['balk'], tablet: ['balk'], bureau: ['werkbalk'] };
+
+test('zonder grammatica blijft een gedeclareerd gewicht staan, en gaat zwaar dicht in balk EN werkmodus', () => {
+  /* register.js zette zonder grammatica elk gewicht op licht, dus een zware
+     handeling kwam als lichte uit voorNu en draaide met een tik; de tweede trap
+     van de werkmodus (diepte.js) voerde zonder gewichtlaag bovendien alles uit.
+     DE MUTATIES: zet `c.gewicht = 'licht';` terug in register.js (de zware wordt
+     uitgevoerd), of laat de rij in diepte.js weer `A.doe(it.id)` aanroepen. */
+  const w = wereld(false), A = w.window.RTGAdaptief, gedaan = [];
+  A.declareer(Object.assign({ id: 'proef.zwaar', naam: 'Zwaar', gewicht: 'zwaar', doe: () => gedaan.push('zwaar') }, VORM));
+  A.declareer(Object.assign({ id: 'proef.licht', naam: 'Licht', doe: () => gedaan.push('licht') }, VORM));
+  A.context({ bron: 'proef', titel: 'Proef', acties: ['proef.zwaar', 'proef.licht'] });
+  const items = A.voorNu();
+  assert.equal(items.find((x) => x.id === 'proef.zwaar').gewicht, 'zwaar', 'het gedeclareerde gewicht hoort te blijven staan');
+  assert.ok(A.gebreken().some((g) => g.soort === 'gewichtloos' && g.id === 'proef.zwaar'), 'en het gebrek hoort gemeld');
+  const k = w.window.RTGAdaptiefBalkKnoppen({ items: () => A.voorNu(), titel: () => 'Proef' });
+  items.forEach((it) => k.voer(it));
+  assert.deepEqual(gedaan, ['licht'], 'de balk voert zonder gewichtlaag alleen licht uit');
+  gedaan.length = 0;
+  w.window.RTGDiepte.tweede();
+  const rijen = w.alles(w.bladen[w.bladen.length - 1]).filter((n) => n.tag === 'button' && typeof n.onclick === 'function');
+  assert.equal(rijen.length, 2, 'de werkmodus toont beide handelingen');
+  rijen.forEach((r) => r.onclick());
+  assert.deepEqual(gedaan, ['licht'], 'de werkmodus voert zonder gewichtlaag alleen licht uit');
+});
+
+test('de uitleg en de orb beloven wat de uitvoerder doet', () => {
+  /* waarom.js las het RUWE gewicht: bij 'zwaarr' (een tikfout) beloofde de uitleg
+     "Gebeurt meteen." terwijl de uitvoerder hem als zwaar behandelt, en bij
+     `terug` zonder weg terug beloofde hij een Ongedaan maken dat niet kwam. De orb
+     zei in dat laatste geval "terug te draaien".
+     DE MUTATIES: zet in waarom.js `BELOFTE[it.gewicht || 'licht'] || BELOFTE.licht`
+     terug, of laat orb.js het label weer uit `it.gewicht` lezen. */
+  const w = wereld(true), W = w.window;
+  const belofte = (gewicht, terug) => {
+    W.RTGWaarom.leguit({ id: 'h', naam: 'H', gewicht, ongedaan: terug ? () => {} : undefined });
+    const p = w.alles(w.bladen[w.bladen.length - 1]).find((n) => n.className === 'wm-belofte');
+    return p ? p.textContent : null;
+  };
+  for (const t of [...gram.TRAPPEN, 'onzin']) {
+    for (const terug of [false, true]) {
+      const eff = gram.effectief(t, terug);
+      assert.equal(belofte(t, terug), belofte(eff, eff === 'terug'), t + (terug ? ' met' : ' zonder') + ' weg terug');
+    }
+  }
+  assert.notEqual(belofte('onzin', false), belofte('licht', false), 'een onbekende trap belooft nooit "meteen"');
+  assert.notEqual(belofte('terug', false), belofte('terug', true), 'zonder weg terug geen belofte van ongedaan maken');
+
+  const A = W.RTGAdaptief;
+  A.declareer(Object.assign({ id: 'proef.terug', naam: 'Terug', gewicht: 'terug', doe() {} }, VORM));
+  const label = (staat) => {
+    A.context({ bron: 'orb', titel: 'Orb', acties: ['proef.terug'], staat });
+    W.RTGOrb.open();
+    const s = w.alles(w.bladen[w.bladen.length - 1]).find((n) => n.className === 'orb-weegt');
+    return s ? s.textContent : null;
+  };
+  assert.equal(label({}), 'vraagt bevestiging', '`terug` zonder weg terug vraagt bevestiging, zoals de uitvoerder doet');
+  assert.equal(label({ 'proef.terug': { ongedaan: () => {} } }), 'terug te draaien');
+});

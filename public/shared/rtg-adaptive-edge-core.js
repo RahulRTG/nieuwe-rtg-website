@@ -105,13 +105,26 @@
         return { id: id, label: m.registry[id].label, allowed: allowed(m.registry[id]) };
       }) };
   }
+  /* Het tweede register kent ALLEEN licht (EDGE.md par. 11, ronde 1). Wat een
+     bevestiging vraagt, hoort in RTGAdaptief en weegt langs de grammatica; een
+     eigen confirm of een zwaarder gewicht wordt geweigerd, nooit stil licht
+     uitgevoerd. Leeg maken is ronde 2 (drie schermen leunen er nog op). */
   function register(state, item) {
     var id = String(item && item.id || '');
     if (!state || !/^[a-z][a-z0-9-]{1,39}$/.test(id)) return false;
+    if (item.confirm || (item.gewicht && item.gewicht !== 'licht')) {
+      if (typeof console !== 'undefined') console.warn('[edge] ' + id + ': dit register kent alleen licht; declareer in RTGAdaptief');
+      return false;
+    }
     state.registry[id] = { id: id, label: String(item.label || id).slice(0, 80),
-      allowed: item.allowed, reason: item.reason, confirm: item.confirm ? String(item.confirm).slice(0, 160) : '',
-      run: typeof item.run === 'function' ? item.run : null };
+      allowed: item.allowed, reason: item.reason, run: typeof item.run === 'function' ? item.run : null };
     return true;
+  }
+  /* Een tik: dezelfde ingang als het dock (RTGGewicht.voer), met gewicht licht. */
+  function voer(e, w) {
+    if (!e || typeof e.run !== 'function' || !allowed(e)) return false;
+    if (w && w.RTGGewicht) return w.RTGGewicht.voer({ id: e.id, naam: e.label, gewicht: 'licht', doe: e.run }) !== false;
+    e.run(); return true;
   }
   function setProjection(state, input) {
     if (!state || !input) return false;
@@ -126,5 +139,5 @@
   }
   return Object.freeze({ STATES: STATES, DECKS: DECKS, SPECS: SPECS, normState: normState, detail: detail,
     normDeck: normDeck, nextDeck: nextDeck, allowed: allowed, project: project,
-    reason: reason, sheetButton: sheetButton, model: model, momentopname: momentopname, defaults: defaults, register: register, setProjection: setProjection, actions: actions });
+    reason: reason, sheetButton: sheetButton, model: model, momentopname: momentopname, defaults: defaults, register: register, voer: voer, setProjection: setProjection, actions: actions });
 }));

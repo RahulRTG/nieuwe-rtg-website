@@ -671,7 +671,7 @@ const EIGEN_MODULE = new Map([
      hoofdactie aan) -- alle vier raak. De module die hij het hardst beproeft is
      het blikveld zelf. De contexttoets leest register.js als tekst in een
      nagemaakt venster, dus de motor vindt zijn module niet via require. */
-  ['edgeblikveld.e2e.js', ['public/shared/edge/blikveld.js']],
+  ['edgeblikveld.e2e.js', ['public/shared/edge/blikveld.js', 'public/shared/edge/blikveld-hoofdactie.js']],
   ['edgecontext.test.js', ['public/shared/adaptief/register.js']],
   /* DE METING PER CAPABILITY. Vier mutaties, vier raak: de vloer eruit (dan
      krijgt drie verzoeken een geruststellende 0,0%), routes zonder functie

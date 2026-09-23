@@ -26,9 +26,6 @@
     function listen(target, name, fn, options) {
       target.addEventListener(name, fn, options); events.push([target, name, fn, options]);
     }
-    function emit(name, detail) {
-      try { doc.dispatchEvent(new win.CustomEvent(name, { detail: detail })); } catch (e) {}
-    }
     function read() { try { return C.readStorage(win.sessionStorage); } catch (e) { return []; } }
     function elements() { return C.elements(doc); }
     function safeCapture(adapter) {
@@ -158,7 +155,7 @@
         [160, 500, 1400, 3200, 7000].forEach(function (delay) { retries.push(win.setTimeout(attempt, delay)); });
         retries.push(win.setTimeout(stopRestore, 8100)); attempt();
       }
-      emit('rtg-route-memory-ready', { route: path, restored: !!saved }); return api;
+      return api;
     }
     function boot() {
       if (doc.readyState === 'loading') listen(doc, 'DOMContentLoaded', start, { once: true }); else start();

@@ -74,6 +74,8 @@
      Onder de drempel veert hij terug -- een laag die bij twee pixels al dichtgaat
      leest als een laag die vanzelf wegvalt. */
   function haakVeeg(laag) {
+    var g = w.RTGGrammatica, D = g && g.DREMPELS;
+    if (!D) return;                        // zonder tabel sluit het doek, Escape en terug nog wel
     var vak = laag.vak, start = 0, bezig = false;
     function neer(e) {
       if (!e.target.closest('.lg-greep,.lg-kop')) return;
@@ -92,7 +94,7 @@
       vak.style.transition = '';
       var y = parseFloat((vak.style.transform.match(/translateY\(([-\d.]+)px\)/) || [0, 0])[1]) || 0;
       vak.style.transform = '';
-      if (y > 90) sluit();
+      if (y > D.sluit) sluit();
       else if (e && e.preventDefault) e.preventDefault();
     }
     vak.addEventListener('touchstart', neer, { passive: true });

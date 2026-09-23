@@ -11,8 +11,6 @@
     var surface = 'peek', actief = null, dood = false, registries = w.RTGWorkspaceRegistries();
     registries.registerWorldCatalog(w.RTGWorkspaceWorldCatalog || []);
     function fout(waar, error) {
-      try { d.dispatchEvent(new w.CustomEvent('rtg-workspace-error', { detail: { waar: waar,
-        message: String(error && error.message || error || 'Onbekende fout') } })); } catch (e) {}
       if (typeof o.error === 'function') o.error(waar, error);
     }
     var identity = w.RTGIdentityRuntime({ actor: o.actor }), session = w.RTGSessionRuntime({ identity: identity, deviceId: o.deviceId });

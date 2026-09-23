@@ -39,16 +39,6 @@
     return v;
   }
   function kopie(x) { try { return x == null ? null : JSON.parse(JSON.stringify(x)); } catch (e) { return null; } }
-  /* AANGEWEZEN, niet getekend: de Edge neemt de balk van het scherm op in zijn
-     eigen (dichte) blad of contextpaneel, dus een voorouder is dan [hidden] en
-     de maat is 0x0. De vraag is of het scherm een hoofdactie aanwijst. */
-  function aangewezen(el) { return !!el && !el.disabled && !el.hidden; }
-  /* De Ga verder-toets zet vier teksten in de knop; het label is die in rust. */
-  function tekstVan(el) {
-    var rust = el && el.querySelector && el.querySelector('[data-rtg-action-copy-for="idle"]');
-    return String((el && (el.getAttribute('aria-label') || (rust || el).textContent)) || '').replace(/\s+/g, ' ').trim().slice(0, 80);
-  }
-
   function adaptief() { return w.RTGAdaptief && typeof w.RTGAdaptief.context === 'function' ? w.RTGAdaptief : null; }
   /* Wanneer de context er kwam, weet alleen wie hem zag komen. Het blikveld hangt
      zich daarom een keer aan opContext -- lezend; de context zelf blijft van het
@@ -85,15 +75,15 @@
     return veld(d.title ? { bron: '', titel: d.title } : null, 'document', 'ui', t, 'geen titel');
   }
 
+  /* De hoofdactie leest ./blikveld-hoofdactie.js: in de schil kijkt die in het
+     ACTIEVE blad (EDGE.md par. 2). Zacht: ontbreekt hij, dan staat het veld leeg
+     met die reden en loopt de rest door. */
   function hoofdactie(t, gebreken) {
-    var scherm = Array.prototype.filter.call(d.querySelectorAll('[data-hoofdactie]'), aangewezen);
-    var edge = d.querySelector('[data-rtg-edge-primary]:not([hidden])');
-    var edgeLabel = aangewezen(edge) ? tekstVan(edge) : '';
-    if (scherm.length > 1) gebreken.push('hoofdactie-meervoudig');
-    if (scherm.length && edgeLabel && edgeLabel !== tekstVan(scherm[0])) gebreken.push('hoofdactie-dubbel');
-    if (scherm.length) return veld({ label: tekstVan(scherm[0]) }, 'scherm:data-hoofdactie', 'ui', t);
-    if (edgeLabel) return veld({ label: edgeLabel }, 'edge-padtabel', 'ui', t);
-    return veld(null, 'geen', 'geen', t, 'het scherm wijst geen hoofdactie aan (GRAMMATICA.md: data-hoofdactie)');
+    var H = w.RTGEdgeBlikveldHoofdactie, h = null;
+    try { h = H && typeof H.lees === 'function' ? H.lees(w) : null; } catch (e) { h = null; }
+    if (!h) return veld(null, 'geen', 'geen', t, 'de hoofdactielezer (edge/blikveld-hoofdactie.js) is niet geladen');
+    Array.prototype.push.apply(gebreken, h.gebreken || []);
+    return h.label ? veld({ label: h.label }, h.herkomst, 'ui', t) : veld(null, h.herkomst, 'geen', t, h.reden);
   }
 
   function voortzetting(snap, t) {

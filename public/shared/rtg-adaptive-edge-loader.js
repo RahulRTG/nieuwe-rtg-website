@@ -43,8 +43,12 @@
         /* Het blikveld (EDGE.md) is ZACHT: laadt het niet, dan leest de balk
            zoals hij deed, en de rest van de keten gaat door. */
         add('script', '/shared/edge/actiestaat.js', 'RTGEdgeActiestaat', function () {
+        add('script', '/shared/edge/blikveld-hoofdactie.js', 'RTGEdgeBlikveldHoofdactie', function () {
         add('script', '/shared/edge/blikveld.js', 'RTGEdgeBlikveld', function () {
         gewichtlaag(function () {
+        /* De gebaardrempels wonen in de grammatica; ZACHT, want zonder tabel zijn
+           alleen de gebaren uit en werkt de rest van de balk gewoon. */
+        add('script', '/shared/adaptief/grammatica.js', 'RTGGrammatica', function () {
         add('script', '/shared/rtg-adaptive-edge-input.js', 'RTGAdaptiveEdgeInput', function (invoer) {
           if (!invoer) return;
           add('script', '/shared/adaptief/balkknop.js', 'RTGAdaptiefBalkKnoppen', function (knoppen) {
@@ -63,6 +67,8 @@
           });
           });
           });
+        });
+        });
         });
         });
         });

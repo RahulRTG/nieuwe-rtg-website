@@ -60,40 +60,41 @@ const KAART = [
     ['schrijft', 'de leer als globale', 'root.RTGAdaptiefLeer = leer;'],
     ['beslist', 'keuring: bureau wel, telefoon niet', 'if (opBureau && !(c.vormen.telefoon || []).length) {'],
     ['beslist', 'standaardgewicht licht', "c.gewicht = (spec && spec.gewicht) || 'licht';"]]],
-  ['adaptief/register.js', 'grammatica-kern', 'capability-register:s vluchtige-context:sb gewicht:b waarom:b', [
+  ['adaptief/register.js', 'grammatica-kern', 'capability-register:s vluchtige-context:sb gewicht:l waarom:b', [
     ['schrijft', 'declaratie, laatste wint', 'caps[c.id] = c;'],
     ['schrijft', 'context naar de luisteraars', 'luisterCtx.slice().forEach(function (f) { try { f(nu); } catch (e) {} });'],
     ['beslist', 'slikt een gelijke context', 'if (v.sleutel === nu.sleutel) return nu;'],
-    ['beslist', 'zonder grammatica elke trap licht', "if (!gram && c.gewicht && c.gewicht !== 'licht') {"],
+    ['leest', 'zonder grammatica een gebrek; het gewicht blijft', "if (!gram && c.gewicht && c.gewicht !== 'licht') {"],
     ['beslist', 'verhinderd gaat niet door', 'return !((st && st.verhinderd) || c.verhinderd);']]],
   ['adaptief/grammatica.js', 'grammatica-kern', 'gewicht:sb waarom:sb gebaar-drempel:s', [
     ['schrijft', 'de vijf trappen', 'var GEWICHT = {'],
     ['beslist', 'terug zonder weg terug is bewust', "return g === 'terug' && !kanTerug ? 'bewust' : g;"],
     ['beslist', 'onbekende bron wordt toestand', "var bron = BRONNEN[v.bron] ? v.bron : 'toestand';"],
-    ['schrijft', 'vasthoudduur per trap', 'var VASTHOUD = { zwaar: 900, plechtig: 1200 };']]],
-  ['adaptief/diepte.js', 'grammatica-render', 'gebaar-drempel:b onderbalk:l capability-register:l', [
+    ['schrijft', 'vasthoudduur per trap', 'var VASTHOUD = { zwaar: 900, plechtig: 1200 };'],
+    ['schrijft', 'de drempels van de gebaren', 'var DREMPELS = { lang: 480, stil: 8, omhoog: 44, diep: 150, veeg: 36, sluit: 90,']]],
+  ['adaptief/diepte.js', 'grammatica-render', 'gebaar-drempel:l onderbalk:l capability-register:l', [
     ['leest', 'items uit het register', 'return (w.RTGAdaptief && w.RTGAdaptief.voorNu()) || [];'],
-    ['beslist', 'tweede trap vanaf 150 px', 'var TWEEDE = 150;'],
+    ['leest', 'de trekdrempels uit de tabel', 'var EERSTE = D.omhoog, TWEEDE = D.diep;'],
     ['schrijft', 'trekstand op .cmd-balk', "b.dataset.trek = ver >= TWEEDE ? 'twee' : (ver >= EERSTE ? 'een' : '');"]]],
   ['adaptief/balk.js', 'grammatica-render', 'onderbalk:sb capability-register:l vluchtige-context:l wereld:l', [
     ['rendert', 'de contextzone in .cmd-balk', "zone.className = 'cmd-acties';"],
     ['beslist', 'contextacties, anders werelden', 'if (!items.length && !panes().length && !vastBladen)'],
     ['schrijft', 'rij voor de adaptieve Edge', 'o.root.rtgEdgeItems = function () { return laatsteRij.slice(); };']]],
-  ['adaptief/balkknop.js', 'grammatica-render', 'gewicht:b waarom:b gebaar-drempel:b', [
+  ['adaptief/balkknop.js', 'grammatica-render', 'gewicht:b waarom:b gebaar-drempel:l', [
     ['beslist', 'verhinderd legt uit', 'if (it.verhinderd) { uitleg(it); return; }'],
     ['beslist', 'zonder gewichtlaag alleen licht', "if ((it.gewicht || 'licht') !== 'licht') {"],
-    ['beslist', 'lang drukken na 480 ms', 'klok = w.setTimeout(function () { klok = null; uitleg(it); }, 480);']]],
-  ['adaptief/orb.js', 'grammatica-render', 'gewicht:b waarom:b gebaar-drempel:b capability-register:l', [
+    ['leest', 'lang drukken uit de tabel', 'klok = w.setTimeout(function () { klok = null; uitleg(it); }, D.lang);']]],
+  ['adaptief/orb.js', 'grammatica-render', 'gewicht:b waarom:b gebaar-drempel:l capability-register:l', [
     ['beslist', 'splitst kan en kan niet', 'kan: items.filter(function (x) { return !x.verhinderd; }),'],
     ['beslist', 'zonder gewichtlaag alleen licht', "if ((it.gewicht || 'licht') !== 'licht') return;"],
-    ['beslist', 'eigen langdrukdrempel', 'var LANG = 480;']]],
-  ['adaptief/lagen.js', 'grammatica-render', 'gebaar-drempel:b', [
+    ['leest', 'lang drukken uit de tabel', 'return g && g.DREMPELS && g.DREMPELS.lang;']]],
+  ['adaptief/lagen.js', 'grammatica-render', 'gebaar-drempel:l', [
     ['rendert', 'lade, paneel of taak', "var wortel = el('div', 'rtg-laag rtg-laag-' + soort);"],
-    ['beslist', 'veeg omlaag vanaf 90 px', 'if (y > 90) sluit();'],
+    ['leest', 'de sluitveeg uit de tabel', 'if (y > D.sluit) sluit();'],
     ['schrijft', 'een stap in de geschiedenis', "w.history.pushState({ rtgLaag: ++teller }, '')"]]],
-  ['adaptief/vasthoud.js', 'grammatica-render', 'gebaar-drempel:b', [
+  ['adaptief/vasthoud.js', 'grammatica-render', 'gebaar-drempel:l', [
     ['beslist', 'vol vasthouden bevestigt', 'if (deel >= 1) { stop(); af(); return; }'],
-    ['beslist', 'loslaten onder 15% telt niet', 'if (ver <= 0.15) return;']]],
+    ['leest', 'loslaten onder de poging telt niet', 'if (ver <= D.poging) return;']]],
   ['adaptief/gewicht.js', 'trust', 'gewicht:b waarom:l trust-rail:l gebaar-drempel:l', [
     ['beslist', 'de weg per trap', "if (g === 'bewust') return bewust(it, bev);"],
     ['beslist', 'compensatie is nooit ongedaan maken', "if (cap && cap.herstel === 'compensatie' && it.ongedaan)"],
@@ -103,7 +104,7 @@ const KAART = [
   ['adaptief/waarom.js', 'trust', 'waarom:sb gewicht:l', [
     ['schrijft', 'tweede lijst van de vijf bronnen', 'var BRONWOORD = {'],
     ['beslist', 'eigen stap, los of niets aan te doen', "else regel(lijf, 'Hier kunt u zelf niets aan veranderen.', 'wm-stap');"],
-    ['projecteert', 'belofte per gewicht', "regel(lijf, BELOFTE[it.gewicht || 'licht'] || BELOFTE.licht, 'wm-belofte');"]]],
+    ['projecteert', 'belofte volgt het effectieve gewicht', "regel(lijf, BELOFTE[gram && gram.effectief ? gram.effectief(it.gewicht"]]],
   ['adaptief/rail.js', 'trust', 'trust-rail:sb vluchtige-context:l', [
     ['leest', 'de rail uit de context', 'var uit = (ctx && Array.isArray(ctx.rail) ? ctx.rail : []).slice();'],
     ['leest', 'meet zelf de verbinding', 'if (w.navigator && w.navigator.onLine === false) {'],
@@ -114,16 +115,18 @@ const KAART = [
     ['schrijft', 'herdeclareert met een postbode', 'A.declareer({ id: c.id, naam: c.naam, label: c.label, groep: c.groep'],
     ['beslist', 'standaard licht over de grens', "gewicht: c.gewicht || 'licht',"],
     ['schrijft', 'zet de context bovenin', 'A.context(ctx);']]],
-  ['rtg-adaptive-edge.js', 'adaptieve-balk', 'presence:s identiteit:s voortzetting:s zichtbaarheidsstand:sb onderbalk:s gewicht:b capability-register:l vluchtige-context:l', [
+  ['rtg-adaptive-edge.js', 'adaptieve-balk', 'presence:s identiteit:s voortzetting:s zichtbaarheidsstand:sb onderbalk:s capability-register:l vluchtige-context:l', [
     ['schrijft', 'presence in het eigen model', 'rt.model.presence = input && input.label ?'],
     ['schrijft', 'identiteit in het eigen model', 'rt.model.identity = acting ?'],
     ['schrijft', 'voortzetting in het eigen model', 'rt.model.continuation = input && input.title ?'],
     ['schrijft', 'balkstand op body', 'd.body.dataset.rtgAdaptiveState = rt.model.state;'],
     ['beslist', 'Edge 2 compact wordt peek', "else if (state === 'compact') setState('peek', 'auto');"],
     ['schrijft', 'klaar-vlag; CSS zet de onderbalk weg', "d.body.dataset.rtgAdaptiveReady = 'true';"],
-    ['beslist', 'eigen bevestiging met window.confirm', 'if (custom.confirm && !w.confirm(custom.confirm)) return false;']]],
-  ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'capability-register:sb bevoegdheid:b zichtbaarheidsstand:b', [
+    ['leest', 'een tik op het tweede register via de kern', 'if (custom && custom.run) return K.voer(custom, w);']]],
+  ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'capability-register:sb bevoegdheid:b zichtbaarheidsstand:b gewicht:b', [
     ['schrijft', 'tweede register, laatste wint', 'state.registry[id] = { id: id'],
+    ['beslist', 'alleen licht in dit register', "if (item.confirm || (item.gewicht && item.gewicht !== 'licht')) {"],
+    ['leest', 'een tik langs de gewichtlaag', "return w.RTGGewicht.voer({ id: e.id, naam: e.label, gewicht: 'licht', doe: e.run })"],
     ['beslist', 'ids buiten het patroon eruit', 'if (!state || !/^[a-z][a-z0-9-]{1,39}$/.test(id)) return false;'],
     ['beslist', 'allowed: boolean of functie', "typeof item.allowed === 'function' ? !!item.allowed()"],
     ['beslist', 'vier balkstanden', "var STATES = Object.freeze(['peek', 'dock', 'deck', 'expanded']);"]]],
@@ -132,18 +135,17 @@ const KAART = [
     ['beslist', 'welke paginaknop geoogst wordt', 'if (label(el) && available(el, root) && (!tab || !tabs.has(tab))'],
     ['rendert', 'verhuist de hoofdactie in het blad', 'rt.primarySlot = primary; rt.sheet.appendChild(primary);'],
     ['rendert', 'bladtitel uit RTGAdaptief', 'if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;']]],
-  ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:b zichtbaarheidsstand:b capability-register:l', [
-    ['beslist', 'veeg opzij na 36 px wisselt deck', 'if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 36)'],
-    ['beslist', 'eigen langdruk van 620 ms', '}, 620);'],
+  ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:l zichtbaarheidsstand:b capability-register:l', [
+    ['leest', 'veeg opzij wisselt deck, drempel uit de tabel', 'if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > D.veeg)'],
+    ['leest', 'lang drukken uit de tabel', '}, D.lang);'],
     ['beslist', 'auto-peek bij scrollen', "if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;"],
-    ['beslist', 'omhoog naar RTGDiepte', 'if (-dy >= depth.DREMPELS.tweede) depth.tweede(); else depth.eerste();']]],
+    ['beslist', 'omhoog naar RTGDiepte', 'if (-dy >= D.diep) depth.tweede(); else depth.eerste();']]],
   ['rtg-adaptive-edge-loader.js', 'laden', '', [
     ['beslist', 'overslaan als de global bestaat', 'if (global && w[global]) { done(true); return; }'],
     ['schrijft', 'start de Edge na de keten', 'w.RTGAdaptiveEdge.start(d, w);']]],
-  ['rtg-adaptive-edge-signals.js', 'adaptieve-balk', 'presence:b hoofdactie:l capability-register:l identiteit:l voortzetting:l', [
+  ['rtg-adaptive-edge-signals.js', 'adaptieve-balk', 'presence:b hoofdactie:l capability-register:l', [
     ['leest', 'eenmalig de hoofdactie', "knop = d.querySelector('[data-rtg-edge-primary]:not([hidden])');"],
-    ['beslist', 'pending wordt presence', "if (staat === 'pending') api.setPresence({ label: label + ' wordt uitgevoerd'"],
-    ['leest', 'vijf events zonder zender', "d.addEventListener('rtg-adaptive-project', function (e) {"]]],
+    ['beslist', 'pending wordt presence', "if (staat === 'pending') api.setPresence({ label: label + ' wordt uitgevoerd'"]]],
   ['rtg-adaptive-edge-claim.js', 'adaptieve-balk', 'onderbalk:sb', [
     ['beslist', 'alleen vaste of plakkende balken', "if (stijl.position !== 'fixed' && stijl.position !== 'sticky') return false;"],
     ['schrijft', 'markeert de geclaimde balken', 'winnaars.forEach(function (el) { el.classList.add(EIGEN); });']]],
@@ -193,12 +195,12 @@ const KAART = [
     ['beslist', 'onder 14 px telt niet', 'Math.abs(delta)<14'],
     ['beslist', 'een gebaar is 1500 ms vers', 'var GESTURE_MS=1500;'],
     ['beslist', 'auto: alle twaalf balktokens', "if(raw==='auto')return{ok:true,auto:true,tokens:Object.keys(CONTEXT)};"]]],
-  ['rtg-edge-2-loader.js', 'laden', 'hoofdactie:sb zichtbaarheidsstand:sb gebaar-drempel:b', [
+  ['rtg-edge-2-loader.js', 'laden', 'hoofdactie:sb zichtbaarheidsstand:sb', [
     ['beslist', 'hoofdactie per hard pad', "if (pad === '/apps/rtg.html') {"],
     ['schrijft', 'muteert het object van de casco', 'e.onAction = doe; e.ctx.actie = tekst; k.hidden = false; k.textContent = tekst;'],
     ['schrijft', 'standaardstand overview', "b.setAttribute('data-rtg-edge-2-state', 'overview');"],
     ['beslist', 'tweede autoregel voor .wk-stage', "if (nu <= 32 || verschil < -14) w.RTGEdge2.setState('overview'"],
-    ['beslist', 'kopie van de gebaarversheid', 'if (tijd - gebaarTijd > w.RTGEdge2.GESTURE_MS) return;']]],
+    ['leest', 'de gebaarversheid van Edge 2', 'if (!w.RTGEdge2.gestureFresh(gebaar)) return;']]],
   ['rtg-edge-2-reveal.js', 'edge-2', 'zichtbaarheidsstand:l', [
     ['rendert', 'herstelgrepen boven en onder', "knop.className = 'rtg-edge-2-edge-reveal rtg-edge-2-edge-reveal--' + kant[0];"],
     ['schrijft', 'terug naar overview via de API', "if (win.RTGEdge2) win.RTGEdge2.setState('overview', { source: 'edge' });"],
@@ -237,7 +239,7 @@ const KAART = [
     ['beslist', 'alleen paden binnen het huis', "b.url.charAt(0) === '/' && b.url.charAt(1) !== '/'"]]],
   ['rtg-world-start.js', 'laden', '', [
     ['leest', 'wacht op het renderstempel', "body.getAttribute('data-rtg-edge-2-rendered')==='true'"],
-    ['schrijft', 'klaar-event', "d.dispatchEvent(new CustomEvent('rtg-world-start-ready'));"]]],
+    ['schrijft', 'klaar-vlag op body', "body.setAttribute('data-rtg-world-start','ready');"]]],
   ['interface/second-screen.js', 'schil', 'zichtbaarheidsstand:sb vluchtige-context:l', [
     ['schrijft', 'eigen stand peek/panel/workspace/focus', 'root.dataset.rtgSecondScreen = state;'],
     ['beslist', 'breed: peek wordt workspace', "if (next === 'peek' && mq.matches) next = 'workspace';"],
@@ -262,8 +264,7 @@ const KAART = [
   ['rtg-route-memory.js', 'continuiteit', 'voortzetting:b hoofdactie:l', [
     ['bewaart', 'naar sessionStorage', 'return C.writeStorage(win.sessionStorage, path, state);'],
     ['beslist', 'elke interactie breekt herstel af', 'interrupted = true; stopRestore(); queueSave();'],
-    ['schrijft', 'anker via de publieke API', 'anchorDone = true; win.RTGContinueKey.setPosition(saved.anchor);'],
-    ['schrijft', 'klaar-event', "emit('rtg-route-memory-ready', { route: path, restored: !!saved });"]]],
+    ['schrijft', 'anker via de publieke API', 'anchorDone = true; win.RTGContinueKey.setPosition(saved.anchor);']]],
   ['rtg-daily.js', 'afnemer', 'onderbalk:s bevoegdheid:b', [
     ['rendert', 'exportbalk als Edge-balk', "host.setAttribute('data-rtg-edge-bar', ''); d.body.appendChild(host);"],
     ['beslist', 'gast: knoppen in Edge-balken uit', "if (state === 'guest') d.querySelectorAll('[data-rtg-edge-bar]')"],
@@ -273,9 +274,13 @@ const KAART = [
     ['projecteert', 'verbinding uit het protocol', "? (location.protocol === 'https:' ? 'ONLINE / TLS' : 'ONLINE / LOCAL')"]]],
   ['edge/blikveld.js', 'blikveld', 'capability-register:l vluchtige-context:l wereld:l identiteit:l presence:l trust-rail:l voortzetting:l hoofdactie:l gewicht:l waarom:l bevoegdheid:l', [
     ['projecteert', 'een leesbeeld; schrijft niets', 'return { versie: 1, op: t, velden: velden, acties: gedaan, gebreken: gebreken };'],
-    ['leest', 'twee hoofdactiebronnen naast elkaar', "edgeLabel !== tekstVan(scherm[0])) gebreken.push('hoofdactie-dubbel')"],
+    ['leest', 'de hoofdactie via zijn lezer', "H && typeof H.lees === 'function' ? H.lees(w) : null"],
     ['leest', 'het tweede register erbij', "gedaan.push({ id: a.id, naam: a.label, herkomst: 'edge-compat'"],
     ['projecteert', 'bevoegdheid zonder bron', "bevoegdheid: veld(null, 'geen', 'geen', t,"]]],
+  ['edge/blikveld-hoofdactie.js', 'blikveld', 'hoofdactie:l', [
+    ['leest', 'het actieve blad, alleen lezend', "querySelector('#rtgCommand .cmd-pane.actief iframe')"],
+    ['leest', 'twee hoofdactiebronnen naast elkaar', "edgeLabel !== tekstVan(scherm[0])) gebreken.push('hoofdactie-dubbel')"],
+    ['projecteert', 'herkomst blad of scherm', "herkomst: b ? 'blad:data-hoofdactie' : 'scherm:data-hoofdactie'"]]],
   ['edge/actiestaat.js', 'blikveld', 'gewicht:b waarom:b bevoegdheid:l', [
     ['leest', 'hetzelfde effectieve gewicht', 'var gewicht = G && gram.effectief ? gram.effectief(gevraagd, kanOngedaan) : String(gevraagd);'],
     ['beslist', 'zonder tabel gaat zwaar dicht', "} else if (!G && gewicht !== 'licht') {"],
@@ -310,18 +315,17 @@ const KAART = [
    Een dubbele zonder regel hier, of een regel zonder dubbele, laat het script
    zakken: dan is de verklaring bij de afleiding achtergebleven. */
 const WAAROM = {
-  'capability-register': 'Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); een actie via registerAction ontloopt de gewichtsgrammatica, en de controls oogsten paginaknoppen als derde bron.',
+  'capability-register': 'Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij (leeg in ronde 2, als de drie schermen die erop leunen via RTGAdaptief publiceren), en de controls oogsten paginaknoppen als derde bron.',
   'vluchtige-context': 'Twee contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie) en RTGEdge.active.ctx (scope, titel, actie, tool); reizen-performance.js voedt ze allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen) en de brug (actief blad) elk apart.',
   wereld: 'De huidige wereld wordt op vier plekken vastgesteld: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco.',
   'trust-rail': 'Verbinding en beveiliging worden op drie plekken zelf afgeleid en elk op een eigen strook getoond: RTGRail (navigator.onLine), het statuspaneel van de casco (/api/ready, Beveiligd) en de Intelligence-strook (protocol als ONLINE / TLS); geen van drie leest een ander.',
   voortzetting: 'Vier geheugens voor waar was ik: continueWith (alleen in het model van de Edge), de werktafelbladen (localStorage), de routecontext (sessionStorage, 24 uur) en Recent bezocht van het slimme menu (sessionStorage); geen van vier leest een ander.',
   hoofdactie: 'De library maakt de knop, de casco en de Edge 2-loader (padtabel) zetten tekst en actie, de Continue Key herbouwt inhoud en anker en de controls verhuizen hem; het scherm wijst intussen zijn eigen data-hoofdactie aan, en het blikveld meldt het verschil als hoofdactie-dubbel.',
-  gewicht: 'De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: drie keer een eigen standaard licht (adaptief.js, register.js zonder grammatica, brug.js), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), en window.confirm in de adaptieve Edge.',
+  gewicht: 'De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: twee keer een eigen standaard licht voor een ONTBREKEND gewicht (adaptief.js, brug.js; register.js laat het gewicht sinds ronde 1 staan), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), en de Edge-Core laat in zijn tweede register alleen licht toe.',
   waarom: 'De vijf bronnen staan twee keer (BRONNEN in grammatica.js, BRONWOORD in waarom.js), en verhinderd-gaat-niet-door wordt beslist in register.js, balkknop.js, orb.js en actiestaat.js naast de uitleg in grammatica.js en waarom.js.',
   zichtbaarheidsstand: 'Vijf standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, de Edge 1-vouwstand en de Second Screen; ze delen geen stand.',
   onderbalk: 'Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, en RTGDaily die zelf een Edge-balk ophangt.',
   bevoegdheid: 'Drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, allowed van de Edge-Core, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft -- het blikveld zegt dat hardop.',
-  'gebaar-drempel': 'De drempels staan in een tabel (GEBAREN, VASTHOUD) maar worden overal zelf gekozen: lang drukken is 480 ms in balkknop.js en orb.js en 620 ms in de adaptieve balk, de gebaarversheid staat als kopie in de Edge 2-loader, en diepte, lagen, vasthoud en de invoerlaag hebben elk een eigen afstand.'
 };
 
 const pad = p => p.startsWith('public/') ? p : 'public/shared/' + p;
@@ -470,6 +474,9 @@ function kanalen() {
     dynamisch.push(...e.dynamisch);
   }
   return {
+    /* Levend = een rtg-naam met zender EN luisteraar. Staat hier zodat "nul dood"
+       nooit groen is doordat de wandeling niets zag (LAT regel 9). */
+    levend: Object.keys(zenders).filter(n => luisteraars[n]).length,
     luisterZonderZender: Object.keys(luisteraars).filter(n => !zenders[n]).sort().map(n => ({ naam: n, luisteraars: luisteraars[n] })),
     zendZonderLuisteraar: Object.keys(zenders).filter(n => !luisteraars[n]).sort().map(n => ({ naam: n, zenders: zenders[n] })),
     dynamisch: dynamisch.sort((a, b) => (a.pad + a.soort + a.uitdrukking).localeCompare(b.pad + b.soort + b.uitdrukking))
@@ -497,7 +504,7 @@ function bouw() {
     .map(n => ({ naam: n, schrijvers: verantwoordelijkheden[n].schrijvers, beslissers: verantwoordelijkheden[n].beslissers, waarom: WAAROM[n] || null }));
   const lagen = {};
   for (const l of [...LAGEN].sort()) lagen[l] = lijst.filter(b => b.laag === l).map(b => b.pad);
-  const dodeKanalen = kanalen();
+  const { levend, ...dodeKanalen } = kanalen();
   return {
     uitleg: 'Gemaakt met scripts/edgekaart.js; de methode staat in de kop. Rollen en verantwoordelijkheden zijn VERKLAARD en elk citaat staat letterlijk in zijn bestand. ' +
       'schrijver = houdt of zet de toestand zelf; beslisser = kiest de uitkomst; lezer = leest haar of voedt haar via de API van de eigenaar. ' +
@@ -506,7 +513,7 @@ function bouw() {
       'Een dubbele eigenaar is een vondst en geen oordeel.',
     bestanden: lijst, verantwoordelijkheden, lagen, dubbeleEigenaars, dodeKanalen,
     telling: { bestanden: lijst.length, rollen: lijst.reduce((n, b) => n + b.rollen.length, 0), dubbeleEigenaars: dubbeleEigenaars.length,
-      dodeKanalen: dodeKanalen.luisterZonderZender.length + dodeKanalen.zendZonderLuisteraar.length }
+      dodeKanalen: dodeKanalen.luisterZonderZender.length + dodeKanalen.zendZonderLuisteraar.length, levendeKanalen: levend }
   };
 }
 
@@ -529,7 +536,7 @@ function main() {
   const t = r.telling, dk = r.dodeKanalen;
   const regel = 'EDGEKAART: ' + t.bestanden + ' bestanden, ' + t.rollen + ' rollen, ' + t.dubbeleEigenaars + ' dubbele eigenaars, ' +
     t.dodeKanalen + ' dode kanalen (' + dk.luisterZonderZender.length + ' luisteren zonder zender, ' +
-    dk.zendZonderLuisteraar.length + ' zenden zonder luisteraar), ' + dk.dynamisch.length + ' dynamisch';
+    dk.zendZonderLuisteraar.length + ' zenden zonder luisteraar), ' + t.levendeKanalen + ' levend, ' + dk.dynamisch.length + ' dynamisch';
   if (argv.includes('--controle')) {
     /* Ontbreken en onleesbaar zijn twee toestanden, en geen van beide is "loopt
        achter" (scripts/stillezing.js): ze zakken allebei, met hun eigen reden. */

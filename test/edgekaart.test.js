@@ -9,7 +9,8 @@
    2. het ingecheckte register is wat de code vandaag oplevert (behalve de
       stempel) -- anders loopt EDGEKAART.json achter;
    3. elke dubbele eigenaar draagt een verklaring, en elke verklaring hoort bij
-      een dubbele eigenaar.
+      een dubbele eigenaar;
+   4. er is geen dood rtg-kanaal (sinds ronde 1), en de meting ziet levende.
 
    DE MUTATIES, elk nagetrokken: verander een letter in een citaat van de
    verklaring (toets 1 zakt en noemt het bestand), voeg in een scherm een
@@ -49,4 +50,25 @@ test('elke dubbele eigenaar is verklaard, en elke verklaring hoort bij een dubbe
   assert.deepEqual(r.dubbeleEigenaars.filter((d) => !d.waarom).map((d) => d.naam), []);
   assert.deepEqual(Object.keys(kaart.WAAROM).filter((n) => !r.dubbeleEigenaars.some((d) => d.naam === n)), []);
   assert.equal(r.telling.dodeKanalen, r.dodeKanalen.luisterZonderZender.length + r.dodeKanalen.zendZonderLuisteraar.length);
+});
+
+/* GEEN DOOD RTG-KANAAL (EDGE.md par. 11, ronde 1). Er waren er 17: zestien
+   zijn weggehaald en rtg-palet-open is aangesloten. Een nieuwe zender zonder
+   luisteraar (of andersom) laat deze toets zakken met de naam erbij.
+
+   "Nul dood" mag nooit groen zijn doordat de wandeling niets zag (LAT regel 9):
+   daarom eerst `levendeKanalen > 0`, en een zelfijking op de lezer.
+
+   DE MUTATIES, elk nagetrokken: zet d.addEventListener('rtg-adaptive-identity',
+   ...) terug in rtg-adaptive-edge-signals.js (zakt op luisteren zonder zender),
+   zet de dispatch van rtg-volscherm terug (zakt op zenden zonder luisteraar),
+   haal de rtg-palet-open-luisteraar uit werkruimte.html (idem), en laat de
+   wandeling in kanalen() een map lezen die niet bestaat (zakt op levend). */
+test('geen rtg-gebeurtenis zonder zender of zonder luisteraar', () => {
+  const r = kaart.bouw();
+  assert.ok(r.telling.levendeKanalen > 0, 'de wandeling over public/ zag geen enkel levend kanaal, dus deze toets meet niets');
+  assert.deepEqual(r.dodeKanalen.luisterZonderZender.map((k) => k.naam), [], 'luistert naar een rtg-gebeurtenis die niemand verstuurt');
+  assert.deepEqual(r.dodeKanalen.zendZonderLuisteraar.map((k) => k.naam), [], 'verstuurt een rtg-gebeurtenis waar niemand naar luistert');
+  assert.deepEqual(kaart.events('x.js', "d.addEventListener('rtg-proef', f);").luistert, ['rtg-proef'], 'de lezer ziet een luisteraar');
+  assert.deepEqual(kaart.events('x.js', "d.dispatchEvent(new CustomEvent('rtg-proef'));").zendt, ['rtg-proef'], 'de lezer ziet een zender');
 });

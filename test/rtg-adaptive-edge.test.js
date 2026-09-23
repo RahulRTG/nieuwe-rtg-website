@@ -41,8 +41,6 @@ test('intentprojectie toont geregistreerde acties, en een verboden actie MET haa
   const nu = kern.project(['reis'], model.registry, 4);
   assert.equal(nu[0].blocked, true);
   assert.match(nu[0].reason, /niet opgegeven/, 'zonder reden verzinnen we er geen, we zeggen dat hij ontbreekt');
-  kern.register(model, { id: 'boeken', label: 'Boeken', confirm: 'Boeking bevestigen?', allowed: true });
-  assert.equal(model.registry.boeken.confirm, 'Boeking bevestigen?');
   /* en de knop die het blad ervan maakt: zichtbaar verhinderd, de reden als
      tekst, en een tik voert niets uit */
   const gelopen = [];
@@ -56,6 +54,53 @@ test('intentprojectie toont geregistreerde acties, en een verboden actie MET haa
   kern.sheetButton(doc, lijst[0], (id) => gelopen.push(id)).luister.click();
   assert.deepEqual(gelopen, ['reis']);
   assert.match(VIEW, /K\.sheetButton\(/, 'het blad gebruikt die knop');
+});
+
+/* HET TWEEDE REGISTER KENT ALLEEN LICHT (EDGE.md par. 10, ronde 1). Het had een
+   eigen uitvoerweg: een eigen `confirm` via window.confirm, langs de
+   gewichtsgrammatica heen. Wat een bevestiging vraagt, hoort in RTGAdaptief.
+   DE MUTATIES, elk nagetrokken: haal de weigering uit register() (de eerste twee
+   toetsen zakken), versmal hem tot `item.gewicht === 'zwaar'` (alleen de tweede
+   zakt), laat voer() bij een gewichtlaag zelf run() aanroepen (de derde zakt), en
+   zet de oude execute met window.confirm terug (de vierde zakt). */
+test('het tweede register weigert een eigen bevestiging, en laat niets achter', () => {
+  const model = kern.model();
+  assert.equal(kern.register(model, { id: 'boeken', label: 'Boeken', confirm: 'Boeking bevestigen?', allowed: true, run() {} }), false);
+  assert.equal(model.registry.boeken, undefined, 'een geweigerde handeling hoort niet in het register te staan');
+});
+
+test('het tweede register kent alleen licht: elk ander gewicht wordt geweigerd', () => {
+  const model = kern.model();
+  for (const gewicht of ['terug', 'bewust', 'zwaar', 'plechtig', 'onbekend']) {
+    assert.equal(kern.register(model, { id: 'h-' + gewicht, label: gewicht, gewicht, run() {} }), false, gewicht);
+    assert.equal(model.registry['h-' + gewicht], undefined, gewicht + ' liet een regel achter');
+  }
+  assert.equal(kern.register(model, { id: 'h-licht', label: 'licht', gewicht: 'licht', run() {} }), true);
+  assert.equal(kern.register(model, { id: 'h-zonder', label: 'zonder gewicht', run() {} }), true);
+});
+
+test('een tik gaat langs de gewichtlaag, als licht; zonder laag draait alleen wat mag', () => {
+  let gedraaid = 0;
+  const run = () => { gedraaid++; };
+  const aanroepen = [];
+  const w = { RTGGewicht: { voer(it) { aanroepen.push(it); return it.doe() !== false; } } };
+  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: true, run }, w), true);
+  assert.equal(aanroepen.length, 1, 'de gewichtlaag hoort precies een keer te worden aangeroepen');
+  assert.equal(aanroepen[0].gewicht, 'licht');
+  assert.equal(aanroepen[0].id, 'proef');
+  assert.equal(gedraaid, 1, 'de handeling draait via de gewichtlaag, en maar een keer');
+  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: false, run }, w), false);
+  assert.equal(aanroepen.length, 1, 'een handeling die niet mag, bereikt de gewichtlaag niet');
+  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: true, run }, {}), true);
+  assert.equal(gedraaid, 2, 'zonder gewichtlaag draait licht direct');
+  assert.equal(kern.voer({ id: 'proef', label: 'Proef', allowed: () => false, run }, {}), false);
+  assert.equal(gedraaid, 2);
+  assert.equal(kern.voer({ id: 'zonder', label: 'Zonder run' }, w), false);
+});
+
+test('de uitvoerder van de Edge kent geen window.confirm meer (vorm; het gedrag bewijst edgeblikveld.e2e.js)', () => {
+  assert.doesNotMatch(VIEW, /confirm\(/);
+  assert.match(VIEW, /if \(custom && custom\.run\) return K\.voer\(custom, w\);/);
 });
 
 test('voorspelde acties verdringen geen veilige terugval en blijven begrensd', () => {
@@ -98,9 +143,11 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
   assert.match(INPUT, /pointerup/);
   assert.match(INPUT, /lastX = event\.clientX; lastY = event\.clientY/);
   assert.match(INPUT, /event \? event\.clientY : lastY/);
-  assert.match(INPUT, /dy < -36/);
-  assert.match(INPUT, /dy > 36/);
-  assert.match(INPUT, /620/);
+  /* De drempels zelf staan in de grammatica (test/drempels.test.js); hier alleen
+     dat de invoerlaag ze leest en geen eigen getal draagt. */
+  assert.match(INPUT, /-dy >= D\.omhoog/);
+  assert.match(INPUT, /dy > D\.veeg/);
+  assert.match(INPUT, /\}, D\.lang\);/);
   assert.match(INPUT, /handlers\.rahul\(\)/);
   assert.match(INPUT, /Alt|altKey/);
   assert.match(INPUT, /metaKey \|\| event\.ctrlKey/);
@@ -113,7 +160,8 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
 test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezig', () => {
   const bronnen = ['/shared/rtg-adaptive-edge-loader.js'];
   const adaptieveBronnen = ['/shared/rtg-adaptive-edge.css', '/shared/rtg-adaptive-edge-core.js',
-    '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js'];
+    '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js',
+    '/shared/adaptief/grammatica.js', '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js'];
   for (const bron of bronnen) {
     assert.ok(LOADER.includes(bron), bron + ' ontbreekt in de loader');
     assert.ok(SW.includes(bron), bron + ' ontbreekt in de offline schil');
@@ -128,10 +176,10 @@ test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezi
   assert.match(ADAPTIVE_LOADER, /if \(!vorm\) return/);
   assert.match(ADAPTIVE_LOADER, /if \(!kern\) return/);
   assert.match(ADAPTIVE_LOADER, /if \(!invoer\) return/);
-  assert.match(SIGNALS, /rtg-adaptive-project/);
-  assert.match(SIGNALS, /rtg-adaptive-presence/);
-  assert.match(SIGNALS, /rtg-adaptive-identity/);
-  assert.match(SIGNALS, /rtg-adaptive-continuation/);
+  /* De signaallaag luistert naar niets: vijf luisteraars zonder zender zijn in
+     ronde 1 weggehaald (EDGE.md par. 10). Wie een scherm iets laat melden,
+     gebruikt de directe API (setIdentity, setPresence, continueWith). */
+  assert.doesNotMatch(SIGNALS, /addEventListener\(/);
 });
 
 test('alle Adaptive Edge-browsermodules blijven onder de productlimiet', () => {

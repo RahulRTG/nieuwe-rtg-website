@@ -19,12 +19,22 @@
    7. de GEWICHTLAAG reist mee met de balk: op een los scherm met een register
       (Office) opent een `bewust`-handeling in het Edge-blad de lade en gaat pas
       na bevestigen door, en een verhinderde knop zegt waarom.
+   4b. de HOOFDACTIE VAN HET ACTIEVE BLAD (ronde 1): de schil leest hem uit het
+      blad dat open is, en onthoudt niets; stap 5 verklikt ook in dat blad.
+   8. het TWEEDE REGISTER kent alleen licht (ronde 1): een zware handeling via
+      registerAction wordt geweigerd, en een tik op een lichte gaat precies een
+      keer langs RTGGewicht.voer -- niet meer langs window.confirm.
 
    DE MUTATIES, elk nagetrokken: laat de loader blikveld.js niet laden (1 zakt),
    haal object uit zendContext in brug.js (3 zakt), laat de controls weer zelf
    RTGAdaptief.voorNu() lezen (4 zakt: de balk tekent dan een handeling die
    acties() als AFWEZIG weglaat), laat de agendahoofdactie wegvallen (6 zakt),
-   en laat de loader de gewichtlaag overslaan (7 zakt).
+   laat de loader de gewichtlaag overslaan (7 zakt), haal '.actief' uit de
+   selector van de hoofdactielezer (4b zakt: hij blijft op 'blad'), laat hem het
+   laatste label onthouden (4b zakt bij de terugkeer naar reizen), zet een
+   setAttribute in zijn tekstVan (5 zakt: de verklikker in het blad slaat aan), en zet in
+   rtg-adaptive-edge.js de oude execute met custom.run() terug (8 zakt: de
+   spion op RTGGewicht.voer blijft op nul).
 
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
@@ -124,21 +134,47 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     await page.waitForFunction((id) => document.querySelector('.rtg-adaptive-controls [data-cap]') &&
       ![...document.querySelectorAll('.rtg-adaptive-controls [data-cap]')].some((b) => b.dataset.cap === id), weg, { timeout: 10000 });
 
-    // 5) lees() schrijft niets: geen opslag, geen attribuut, geen bericht.
+    /* 4b) De hoofdactie van het ACTIEVE blad (ronde 1, stap 5). Reizen wijst er
+       geen aan: dan zegt het blikveld 'blad' met de reden, en leent het de knop
+       van de schil NIET. De agenda wijst '+ Afspraak' aan, en die komt uit het
+       blad. Terug naar reizen: weer 'blad' -- er wordt niets onthouden. */
+    l = await page.evaluate(() => RTGEdgeBlikveld.lees());
+    assert.equal(l.velden.hoofdactie.herkomst, 'blad', 'reizen wijst geen hoofdactie aan');
+    assert.match(l.velden.hoofdactie.reden, /padtabel/);
+    const agendaBlad = async () => {
+      await page.evaluate(() => RTGCommand.open('/apps/agenda.html'));
+      await page.waitForFunction(() => RTGEdgeBlikveld.lees().velden.hoofdactie.herkomst === 'blad:data-hoofdactie', null, { timeout: 20000 });
+    };
+    await agendaBlad();
+    l = await page.evaluate(() => RTGEdgeBlikveld.lees());
+    assert.equal(l.velden.hoofdactie.waarde.label, '+ Afspraak', 'de hoofdactie komt uit het actieve blad');
+    assert.ok(!l.gebreken.includes('hoofdactie-dubbel'), 'de schil toont geen eigen primary die iets anders zegt');
+    await page.evaluate(() => RTGCommand.open('/apps/reizen.html'));
+    await page.waitForFunction(() => RTGEdgeBlikveld.lees().velden.hoofdactie.herkomst === 'blad', null, { timeout: 20000 });
+    await agendaBlad();
+
+    // 5) lees() schrijft niets: geen opslag, geen attribuut, geen bericht -- ook niet in het blad.
     const schrijfsels = await page.evaluate(() => {
-      const log = [];
-      const bewaar = [Storage.prototype.setItem, Element.prototype.setAttribute, window.postMessage, window.fetch];
-      Storage.prototype.setItem = function () { log.push('setItem'); };
-      Element.prototype.setAttribute = function () { log.push('setAttribute'); };
-      window.postMessage = function () { log.push('postMessage'); };
-      window.fetch = function () { log.push('fetch'); return Promise.reject(new Error('x')); };
-      try { RTGEdgeBlikveld.lees(); RTGEdgeBlikveld.lees(); }
+      const log = [], frame = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const vensters = [window, frame && frame.contentWindow].filter(Boolean);
+      const bewaar = vensters.map((v) => [v.Storage.prototype.setItem, v.Element.prototype.setAttribute, v.postMessage, v.fetch]);
+      vensters.forEach((v, i) => {
+        v.Storage.prototype.setItem = function () { log.push(i + ':setItem'); };
+        v.Element.prototype.setAttribute = function () { log.push(i + ':setAttribute'); };
+        v.postMessage = function () { log.push(i + ':postMessage'); };
+        v.fetch = function () { log.push(i + ':fetch'); return Promise.reject(new Error('x')); };
+      });
+      let herkomst = null;
+      try { RTGEdgeBlikveld.lees(); herkomst = RTGEdgeBlikveld.lees().velden.hoofdactie.herkomst; }
       finally {
-        [Storage.prototype.setItem, Element.prototype.setAttribute, window.postMessage, window.fetch] = bewaar;
+        vensters.forEach((v, i) => { [v.Storage.prototype.setItem, v.Element.prototype.setAttribute, v.postMessage, v.fetch] = bewaar[i]; });
       }
-      return log;
+      return { log, vensters: vensters.length, herkomst };
     });
-    assert.deepEqual(schrijfsels, [], 'het blikveld schreef iets');
+    /* De verklikker beproeft alleen een weg die in deze run echt gelopen is. */
+    assert.equal(schrijfsels.vensters, 2, 'de verklikker hoort ook in het blad te staan');
+    assert.equal(schrijfsels.herkomst, 'blad:data-hoofdactie', 'de lezing hoort echt in het blad te kijken');
+    assert.deepEqual(schrijfsels.log, [], 'het blikveld schreef iets');
 
     // 6) Een los scherm: de hoofdactie die het aanwijst, en de dubbele hoofdactie als gebrek.
     await page.goto(srv.base + '/apps/agenda.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
@@ -179,6 +215,26 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     await page.locator('.rtg-adaptive-controls [data-cap="proef.nee"]').click();
     await page.waitForFunction(() => document.body.innerText.includes('Strikt geclassificeerd'), null, { timeout: 10000 });
     assert.deepEqual(await page.evaluate(() => window.gedaan), [], 'een verhinderde handeling legt uit en voert niets uit');
+
+    // 8) Het tweede register kent alleen licht, en een tik gaat langs de gewichtlaag.
+    await office();
+    const zwaar = await page.evaluate(() => {
+      window.tweede = { gedraaid: 0, gewogen: [] };
+      const echt = RTGGewicht.voer;
+      RTGGewicht.voer = function (it) { window.tweede.gewogen.push(it.gewicht); return echt.apply(this, arguments); };
+      return RTGAdaptiveEdge.registerAction({ id: 'proef-zwaar', label: 'Proef zwaar', gewicht: 'zwaar', run: () => { window.tweede.gedraaid++; } });
+    });
+    assert.equal(zwaar, false, 'een zware handeling hoort het tweede register niet in te komen');
+    await page.evaluate(() => {
+      RTGAdaptiveEdge.registerAction({ id: 'proef-licht', label: 'Proef licht', run: () => { window.tweede.gedraaid++; } });
+      RTGAdaptiveEdge.setProjection({ deck: 'actions', actions: ['proef-zwaar', 'proef-licht'], open: true });
+    });
+    assert.equal(await page.locator('.rtg-adaptive-sheet-list [data-rtg-adaptive-action="proef-zwaar"]').count(), 0,
+      'een geweigerde handeling staat niet in het blad');
+    await page.locator('.rtg-adaptive-sheet-list [data-rtg-adaptive-action="proef-licht"]').click();
+    await page.waitForFunction(() => window.tweede.gedraaid === 1, null, { timeout: 10000 });
+    assert.deepEqual(await page.evaluate(() => window.tweede.gewogen), ['licht'],
+      'een tik op het tweede register gaat precies een keer langs RTGGewicht.voer, als licht');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {

@@ -29,9 +29,9 @@
   var leer = w.RTGAdaptiefLeer;
   if (!leer) return;                       // zonder de leer geen register
   /* De grammatica keurt de andere helft: gebaren, gewicht en de verplichte reden
-     bij een verhindering. Hij mag ontbreken -- dan draait alles op `licht` en is
-     er niets zwaars te declareren, wat een eerlijker uitkomst is dan een zware
-     handeling die stil als lichte doorgaat. */
+     bij een verhindering. Hij mag ontbreken -- dan blijft een gedeclareerd
+     gewicht STAAN (met het gebrek `gewichtloos`) en gaat alles wat niet licht is
+     dicht: een zware handeling mag nooit stil als lichte doorgaan. */
   var gram = w.RTGGrammatica || null;
 
   var caps = {}, gebrek = [], gemeld = {};
@@ -82,7 +82,6 @@
     if (!gram && c.gewicht && c.gewicht !== 'licht') {
       bevindingen.push({ soort: 'gewichtloos', id: c.id,
         wat: 'gewicht "' + c.gewicht + '" gedeclareerd zonder grammatica-laag' });
-      c.gewicht = 'licht';
     }
     if (bevindingen.length) {
       bevindingen.forEach(function (b) {
@@ -170,7 +169,7 @@
       var st = nu.staat && nu.staat[id];
       var it = { id: c.id, naam: c.naam, label: c.label || c.naam, teken: c.teken,
         groep: c.groep, primair: c.primair, presentaties: p, diepte: leer.diepte(c, vm),
-        gewicht: c.gewicht || 'licht' };
+        gewicht: c.gewicht };
       if (st && st.aan !== undefined) it.aan = !!st.aan;
       /* EEN VERHINDERING KOMT UIT DE CONTEXT ALS HIJ ER IS, ANDERS UIT DE
          DECLARATIE. Dat onderscheid is nodig: "extern delen mag niet" kan een

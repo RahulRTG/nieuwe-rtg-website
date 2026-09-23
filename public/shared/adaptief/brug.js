@@ -9,7 +9,10 @@
    werkblad gaat wonen -- dan heeft elk werkblad zijn eigen balk en zijn we terug
    bij honderd uitzonderingen. De andere is dat het bovendocument in het frame
    gaat graaien -- dan kent de schil de binnenkant van elke app, en dat is
-   precies wat de schil niet mag weten (WERKRUIMTE.md).
+   precies wat de schil niet mag weten (WERKRUIMTE.md). EEN lezer kijkt wel in
+   het actieve blad: edge/blikveld-hoofdactie.js, en alleen naar data-hoofdactie
+   -- een verklaring voor de Edge, geen binnenkant van de app -- onder dezelfde
+   drie eisen als hier (actief blad, zelfde herkomst, platte tekst).
 
    Wat er wél kan: het werkblad stuurt zijn DECLARATIES en zijn CONTEXT omhoog,
    en krijgt handelingen terug omlaag. Beide kanten kennen alleen ids.

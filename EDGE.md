@@ -41,19 +41,23 @@ staan; ontbreekt er een, dan zakt het script, want een verklaring die niet meer
 op de code past is een verouderde kaart en geen kaart. `--controle` hercompileert
 en vergelijkt met het ingecheckte register.
 
-Uitslag: <!--getal:edgekaart.bestanden-->59<!--/getal--> bestanden met
-<!--getal:edgekaart.rollen-->189<!--/getal--> verklaarde rollen, allemaal met een
+Uitslag: <!--getal:edgekaart.bestanden-->60<!--/getal--> bestanden met
+<!--getal:edgekaart.rollen-->193<!--/getal--> verklaarde rollen, allemaal met een
 citaat dat letterlijk staat;
-<!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> verantwoordelijkheden met
+<!--getal:edgekaart.dubbeleEigenaars-->11<!--/getal--> verantwoordelijkheden met
 meer dan één schrijver of beslisser (par. 1), en
-<!--getal:edgekaart.dodeKanalen-->17<!--/getal--> dode kanalen: `rtg`-gebeurtenissen
+<!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode kanalen: `rtg`-gebeurtenissen
 in `public/` waar wel naar geluisterd wordt maar die niemand verstuurt, of
 andersom. Die laatste telling loopt over heel `public/` en niet alleen over de
-Edge, want een dood kanaal naast de Edge is net zo dood — en vijf ervan zijn
-precies de signalen die de Edge zou moeten krijgen (`rtg-adaptive-project`,
-`-presence`, `-identity`, `-continuation`, `-action`: de adaptieve Edge luistert,
-en geen enkel scherm verstuurt ze als gebeurtenis). Namen die in code worden samengesteld, staan apart
-onder `dynamisch` en worden niet geraden.
+Edge, want een dood kanaal naast de Edge is net zo dood. Bij de eerste meting
+waren het er 17, en vijf daarvan waren precies de signalen die de Edge zou
+moeten krijgen (`rtg-adaptive-project`, `-presence`, `-identity`,
+`-continuation`, `-action`: de adaptieve Edge luisterde, en geen enkel scherm
+verstuurde ze). Ronde 1 heeft ze alle 17 gesloten (par. 11). Daarnaast staan er
+<!--getal:edgekaart.levendeKanalen-->13<!--/getal--> levende kanalen, met zender
+én luisteraar: dat getal houdt de nul eerlijk, want een wandeling die niets ziet
+geeft ook nul dood. Namen die in code worden samengesteld, staan apart onder
+`dynamisch` en worden niet geraden.
 
 **`npm run edgedekking` → `EDGEDEKKING.json`: wat een scherm aan de Edge
 vertelt.** Per scherm onder `public/apps/`, in een echte browser met een echte
@@ -91,9 +95,11 @@ de Edge een andere hoofdactie dan hij aanwijst (`hoofdactie-dubbel`), en de
 passkeyspagina wijst er twee aan (`hoofdactie-meervoudig`).
 
 Lees die nullen goed. Identiteit en voortzetting staan op nul omdat er in de
-app **geen producent** is: de adaptieve Edge luistert naar `rtg-adaptive-identity`
-en `-continuation`, en geen scherm verstuurt ze (de dode kanalen hierboven; alleen
-de openbare landing roept `continueWith` rechtstreeks aan). Presence heeft er
+app **geen producent** is: een scherm zou ze via de directe API melden
+(`setIdentity`, `continueWith`), en dat doet alleen de openbare landing. De
+luisteraars op `rtg-adaptive-identity` en `-continuation` zijn in ronde 1
+weggehaald, omdat niemand ze verstuurde (par. 11); er is geen zender bij verzonnen
+(besluit 2 en 7). Presence heeft er
 precies één: de Ga verder-toets meldt zich terwijl hij een handeling uitvoert —
 en de meter voert niets uit. Object en activiteit staan op nul omdat ze in ronde 0 zijn
 **toegevoegd** en nog geen scherm ze zet. Trust staat op nul omdat de twee
@@ -134,7 +140,7 @@ verschillende momenten gebouwd:
 | Edge 2 | `rtg-edge-2*.js` | zichtbaarheidsstanden en het contextpaneel |
 | schil | `command.js`, `command/*.js` | de werktafel van `app.html`: bladen, geheugen, wereldlabel |
 | continuïteit | `rtg-continue-key*.js`, `rtg-route-memory*.js`, `rtg-world-identity.js` | Ga verder, routegeheugen, welke route bij welke wereld hoort |
-| blikveld | `edge/blikveld.js`, `edge/actiestaat.js` | **nieuw in ronde 0**: het ene leespad |
+| blikveld | `edge/blikveld.js`, `edge/blikveld-hoofdactie.js`, `edge/actiestaat.js` | **nieuw in ronde 0**: het ene leespad (de hoofdactielezer sinds ronde 1) |
 
 **Het eigendomsoordeel, en waarom het pas na de meting komt.** Het voorstel zei
 vooraf: `shared/adaptief/` is de semantische kern en `rtg-adaptive-edge*` de
@@ -142,14 +148,15 @@ presentatie- en compatlaag. Dat klopt, maar een oordeel dat vóór de meting wor
 uitgesproken is een aanname met een mooie naam. De kaart stelt het nu vast op de
 verantwoordelijkheden, met een gesloten woordenlijst van veertien:
 
-Van de veertien hebben er twee één eigenaar (identiteit en presence — en die
-hebben in de app nauwelijks een producent). De andere twaalf hebben er meer, en
+Van de veertien hadden er bij de eerste meting twee één eigenaar (identiteit en
+presence — en die hebben in de app nauwelijks een producent); sinds ronde 1 is
+`gebaar-drempel` de derde. De andere elf hebben er meer, en
 dat is geen detail maar de kern van het voorstel: **de Edge weet vandaag niet
 wat er speelt omdat hij het op te veel plekken tegelijk weet.**
 
 | Verantwoordelijkheid | Wat de kaart vond |
 |---|---|
-| capability-register | twee registers met elk een eigen poort: `RTGAdaptief` (declareren, keuring) en de Edge-kern (`registerAction`); een handeling via de tweede ontloopt de gewichtsgrammatica, en de controls oogsten paginaknoppen als derde bron |
+| capability-register | twee registers met elk een eigen poort: `RTGAdaptief` (declareren, keuring) en de Edge-kern (`registerAction`); sinds ronde 1 kent de tweede alleen licht en voert hij uit langs `RTGGewicht.voer`, maar hij houdt die handelingen nog apart bij (leeg in ronde 2), en de controls oogsten paginaknoppen als derde bron |
 | vluchtige-context | twee contextmodellen: `RTGAdaptief.context()` en `RTGEdge.active.ctx` van het casco — en `RTGWorkspaceContext` als afgeleide met een eigen ontdubbeling |
 | wereld | vier plekken stellen de wereld vast: het casco, `randen.js` met een eigen padlijst, `bladstand.js` en de wereldcatalogus naast `MAPPEN` |
 | hoofdactie | de library maakt de knop, casco en padtabel zetten tekst en actie, de Ga verder-toets herbouwt hem, de controls verhuizen hem — terwijl het scherm zijn eigen `data-hoofdactie` aanwijst |
@@ -157,9 +164,8 @@ wat er speelt omdat hij het op te veel plekken tegelijk weet.**
 | zichtbaarheidsstand | vijf standmachines (Edge 2, zijn loader, de adaptieve balk, de Edge 1-vouwstand, de Second Screen) die geen stand delen |
 | onderbalk | acht schrijvers van wat er onderin staat |
 | trust-rail | drie plekken leiden verbinding en beveiliging zelf af, elk op een eigen strook |
-| gewicht | de tabel en de regel staan in `grammatica.js`, maar drie plekken hebben een eigen standaard `licht`, de regel voor "zonder gewichtlaag" staat drie keer apart (balk, orb, actiestaat -- sinds deze ronde gaan ze wel alle drie dicht), en de adaptieve Edge gebruikt `window.confirm` |
+| gewicht | de tabel en de regel staan in `grammatica.js`, en sinds ronde 1 lezen de uitleg en de orb het werkelijke gewicht uit `effectief()`; twee plekken hebben nog een eigen standaard `licht` voor een ONTBREKEND gewicht (`adaptief.js`, `brug.js`), de regel voor "zonder gewichtlaag" staat drie keer apart (balk, orb, actiestaat; de werkmodus gaat sinds ronde 1 via de balk), en de Edge-kern laat in zijn tweede register alleen licht toe |
 | waarom | de vijf bronnen staan twee keer (`grammatica.js` en `waarom.js`), en "verhinderd gaat niet door" wordt op vier plekken beslist |
-| gebaar-drempel | lang drukken is 480 ms in de balk en de orb en 620 ms in de adaptieve balk |
 | bevoegdheid | drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, `allowed` van de Edge-kern, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft |
 
 De teller `edgeDubbeleEigenaars` mag alleen dalen. Hij daalt doordat een
@@ -173,11 +179,15 @@ Het oordeel dat daaruit volgt:
   (`register.js`), wat er nu speelt (de vluchtige context), wat een handeling
   weegt (`grammatica.js`) en waarom iets niet kan (`waarom.js`). Een tweede
   schrijver van een van die vier is een gebrek, en de kaart noemt hem.
-- **`rtg-adaptive-edge*` hoort de vorm te bezitten**: de zichtbaarheidsstand, de
-  onderbalk en de gebaardrempels. Vandaag beslist het op twee plekken nog over
-  betekenis -- `registerAction` in de kern is een tweede register, en de
-  adaptieve Edge vraagt met `window.confirm` in plaats van langs het gewicht --
-  en dat zijn de eerste twee dingen die ronde 1 eruit haalt. Welke handelingen
+- **`rtg-adaptive-edge*` hoort de vorm te bezitten**: de zichtbaarheidsstand en
+  de onderbalk; de gebaardrempels LEEST het sinds ronde 1 uit `DREMPELS` in
+  `grammatica.js`, want wat een gebaar betekent en wanneer het er een is, hoort
+  bij de taal en niet bij een van de balken. Tot ronde 1 besliste het op twee plekken nog
+  over betekenis: `registerAction` in de kern was een tweede register met een
+  eigen uitvoerweg, en de adaptieve Edge vroeg met `window.confirm` in plaats van
+  langs het gewicht. `window.confirm` is weg, en het tweede register kent alleen
+  nog licht en voert uit langs `RTGGewicht.voer`; LEEG is het pas in ronde 2,
+  want drie schermen leunen er nog op. Welke handelingen
   er zijn, leest het sinds ronde 0 niet meer zelf: `rtg-adaptive-edge-controls.js`
   vraagt ze aan het blikveld in plaats van `RTGAdaptief.voorNu()`.
 - **Het Edge-casco en Edge 2 zijn compat**: `registerAction` en de padtabel van
@@ -222,7 +232,7 @@ eigen indruk (`SERVICE.md` par. 12).
 | activiteit | `activiteit` in de context van het scherm | `scherm` |
 | presence | de Edge-kern | `edge-signaal` |
 | voortzetting | het geheugen van de werktafel (in de schil); anders het signaal van de kern | `toestel:werktafel`, `edge-signaal` |
-| hoofdactie | `[data-hoofdactie]` van het scherm; anders de knop van de padtabel | `scherm:data-hoofdactie`, `edge-padtabel` |
+| hoofdactie | in de schil het ACTIEVE blad (`[data-hoofdactie]` daarin, anders leeg met reden); los het scherm zelf, anders de knop van de padtabel | `blad:data-hoofdactie`, `blad`, `scherm:data-hoofdactie`, `edge-padtabel` |
 | trust | de `rail` in de context; offline als toestand van het toestel | `scherm:rail`, `toestel` |
 | bevoegdheid | **niets**, met de reden erbij | — |
 
@@ -243,12 +253,16 @@ nagemaakt venster waarin elke schrijfweg een verklikker is, en
 geladen. Wie het blikveld nieuwer vindt dan het scherm, heeft ongelijk
 (besluit 5).
 
-**Wat de schil niet ziet.** Een scherm in een blad (iframe) laadt zijn eigen
-Edge niet; de schil claimt hem. De context van dat blad komt via de brug in het
-blikveld van de schil, maar een `[data-hoofdactie]` in het blad staat in een
-ander document en is voor de schil onzichtbaar. De dekkingsmeter meet de
-schermen daarom los, en de hoofdactie van een blad in de schil is een open punt
-van ronde 2 en geen stil gat.
+**Wat de schil ziet, en wat niet.** Een scherm in een blad (iframe) laadt zijn
+eigen Edge niet; de schil claimt hem. De context van dat blad komt via de brug in
+het blikveld van de schil. De `[data-hoofdactie]` van dat blad leest sinds ronde 1
+een eigen lezer, `edge/blikveld-hoofdactie.js`: bij elke `lees()` het ACTIEVE
+blad, alleen bij dezelfde herkomst en alleen dat ene verklaarde attribuut, en hij
+onthoudt en schrijft niets. Wijst het blad geen hoofdactie aan, dan staat het veld
+leeg met die reden (`blad`) en leent het niet de knop van de schil -- de padtabel
+van Edge 2 draait niet in een blad. Wat de schil nog steeds niet ziet: de
+padtabel van een blad, en alles van een blad van een andere herkomst. De
+dekkingsmeter meet de schermen los; een meting van de schil zelf is ronde 2.
 
 ### De uitbreiding van de context, en een oud gebrek in de sleutel
 
@@ -551,7 +565,7 @@ een andere naam of in één domein, en het werk is aansluiten en niet uitvinden.
 | 21 | Work deck | stap weg | 2 | Besloten (besluit 10): het open werkstuk; Office is de eerste producent. |
 | 22 | Meeting deck | stap weg | 4 | Meet bestaat als domein met een meeleesbaan; de Edge krijgt er alleen een compat-handeling van. |
 | 23 | Creation deck | stap weg | 2 | Document, Sheet en Present publiceren al context en handelingen; sinds deze ronde werken hun bewuste handelingen ook in het Edge-blad buiten de schil. |
-| 24 | Edge-handelingen als capabilities | stap weg | 1 | `RTGAdaptief` is al een capabilityregister; het tweede register (`registerAction`) loopt buiten gewicht en verhindering om. Ronde 1 leegt het. |
+| 24 | Edge-handelingen als capabilities | stap weg | 1 en 2 | `RTGAdaptief` is al een capabilityregister. Het tweede register (`registerAction`) kent sinds ronde 1 alleen licht en voert uit langs `RTGGewicht.voer`; leeg is het pas in ronde 2, als de drie schermen die erop leunen via `RTGAdaptief.declareer` publiceren. |
 | 25 | Action contracts | stap weg | 3 | Het contract met vier standen staat, over alle combinaties getoetst. Risico, authenticatie en resultaat ontbreken; gezag, gevolg en herstel staan overal op onbekend. |
 | 26 | Risk-aware actions | stap weg | 3 | Gewicht wordt per scherm verklaard, niet uit risico berekend; de frictiemotor die dat per bedrag wel doet, hangt niet aan de Edge. |
 | 27 | Preview before commit | staat | 3 | Bewust, zwaar en plechtig laten eerst zien wat er gebeurt; zonder gewichtlaag gaan ze dicht. Het GEMETEN gevolg zit er nog niet in. |
@@ -595,8 +609,8 @@ nooit op "de functie staat erin".
 | Ronde | Wat hij bewijst | Stand |
 |---|---|---|
 | 0 — fundament | de kaart, het ene leespad, herkomst per waarde, het actiecontract, de dekkingsmeter en de ratels | **staat** (dit document) |
-| 1 — fundament verbreden | de dode kanalen gesloten of verwijderd, het tweede register leeg, elke hoofdactie in een blad zichtbaar voor de schil | een stap weg |
-| 2 — context | elk scherm publiceert wereld, context en (waar het er een heeft) object en activiteit; `RTGWorkspaceContext` leest het blikveld | een stap weg |
+| 1 — fundament verbreden | de dode kanalen gesloten of verwijderd, het tweede register alleen licht (uitvoering langs `RTGGewicht.voer`), elke hoofdactie in een blad zichtbaar voor de schil; en onderweg een antwoord op "wat weegt dit" en de gebaardrempels op een plek | **staat** (par. 11): 17 dode kanalen naar 0, dubbele eigenaars 12 naar 11; het tweede register is LICHT en nog niet LEEG (ronde 2) |
+| 2 — context | elk scherm publiceert wereld, context en (waar het er een heeft) object en activiteit; `RTGWorkspaceContext` leest het blikveld; het tweede register leeg (de drie schermen die erop leunen, publiceren via `RTGAdaptief.declareer`) | een stap weg |
 | 3 — actie en trust | het eerste serveroordeel per principal en capability, één vorm voor "waarom niet", de voorgrondresolver, gewicht afgedwongen in `RTGAdaptief.doe` | een stap weg, deels besluit |
 | 4 — voortzetting en realtime | voortzetting als contract (besluit 1), presence met echte producenten, een task stack | een stap weg; de servervariant vraagt een besluit |
 | 5 — Rahul | Rahul leest het blikveld en `waarom.js`, stelt handelingen voor uit het register, en beslist niets | een stap weg na ronde 3 |
@@ -623,21 +637,75 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
 - de contextsleutel zag alleen `aan` (par. 2);
 - `allowed: false` zonder reden viel stil uit de balk en is nu een zichtbaar
   gebrek (par. 1);
-- zonder gewichtstabel faalde een zware handeling open (par. 3).
+- zonder gewichtstabel faalde een zware handeling open (par. 3);
+- **ronde 1: de 17 dode kanalen zijn gesloten.** Zestien zijn weggehaald: de
+  vijf luisteraars in `rtg-adaptive-edge-signals.js` (er komt geen verzonnen
+  zender bij; de directe API blijft), de luisteraar op `rtg-edge-ready` (de
+  observer op `data-rtg-adaptive-ready` was al de echte trigger), en de zenders
+  van `rtg-adaptive-connect`, `rtg-world-start-ready`, `rtg-route-memory-ready`,
+  `rtg-volscherm`, `rtg-beweging`, `rtg-wachtrij-leeg`, `rtgdeel`,
+  `rtg-workspace-error`, `rtg-storyline-render` en `rtg-platform-role` -- wat die
+  meldden, staat al als attribuut, klasse of melding. Een is aangesloten:
+  `rtg-palet-open`, zodat de Zoeken-knop van de schil doet wat ⌘K doet
+  (`werkruimte.html`). Die knop staat daar in een onderbalk die niet te zien is,
+  dus de e2e bewijst de bedrading en niet dat een mens hem bereikt.
+  `test/edgekaart.test.js` zakt op elk nieuw dood kanaal, en op een wandeling die
+  niets ziet;
+- **ronde 1: het tweede register ontloopt de gewichtsgrammatica niet meer.** Een
+  handeling via `registerAction` had een eigen uitvoerweg: een eigen `confirm`
+  via `window.confirm` ("weet u het zeker?", wat GRAMMATICA.md juist niet wil),
+  langs het gewicht heen. `register()` in de Edge-kern weigert nu een eigen
+  `confirm` en elk gewicht boven licht (met een waarschuwing, nooit stil licht
+  uitgevoerd), en een tik gaat via `K.voer` langs `RTGGewicht.voer`
+  (`test/rtg-adaptive-edge.test.js`, en `test/edgeblikveld.e2e.js` stap 8 op een
+  echt scherm). Het register is LICHT en nog niet LEEG: dat is ronde 2;
+- **ronde 1: een antwoord op "wat weegt dit".** `directMag()` gaf een onbekende
+  trap licht terwijl `effectief()` hem zwaar maakt, en had geen aanroeper: weg.
+  Drie plekken liepen daarnaast uiteen met de uitvoerder, en alle drie faalden ze
+  de verkeerde kant op. Zonder grammatica zette `register.js` elk gewicht op
+  licht, dus een zware handeling draaide met een tik (de eerdere zin hier dat de
+  balk, de orb en de actiestaat "alle drie dichtgaan" klopte daardoor niet: zij
+  kregen `licht` al binnen). De tweede trap van de werkmodus (`diepte.js`) voerde
+  zonder gewichtlaag alles uit, en gaat nu langs dezelfde `voer` als het dock. En
+  de uitleg (`waarom.js`) en de orb lazen het RUWE gewicht, dus een tikfout als
+  `zwaarr` beloofde "Gebeurt meteen." en `terug` zonder weg terug beloofde een
+  Ongedaan maken dat niet kwam; beide lezen nu `effectief()`. Vier
+  gedragstoetsen in `test/grammatica.test.js` draaien de echte modules in een vm
+  met een kleine nep-DOM, en zeven mutaties zijn nagetrokken;
+- **ronde 1: de gebaardrempels staan op een plek.** Lang drukken was 480 ms in de
+  balk en de orb en 620 ms in de adaptieve balk -- de balk die een lid op
+  `app.html` echt gebruikt -- en omhoog trekken begon daar op 36 px terwijl
+  GRAMMATICA.md 44 zegt. Nu staat er een tabel, `DREMPELS` in `grammatica.js`, en
+  zes herkenners lezen hem als het gebaar begint (balkknop, orb, diepte, lagen,
+  vasthoud en de invoerlaag). Er staat nergens meer een kopie: zonder tabel is
+  het gebaar uit, de tik en de ⋯ blijven, en vasthouden bevestigt dan nooit. De
+  lader van de adaptieve Edge brengt de grammatica zacht mee, en de landing plus
+  de negen sitepagina's die de invoerlaag zelf laden, laden hem eerst. De kopie
+  van de gebaarversheid in de Edge 2-lader is weg; die heeft een eigenaar
+  (`rtg-edge-2-context.js`). `test/drempels.test.js`, vijf mutaties nagetrokken;
+- **ronde 1: de hoofdactie van een blad is zichtbaar voor de schil.** Met een
+  geopende agenda meldde de schil "het scherm wijst geen hoofdactie aan", een lege
+  waarde met een reden die niet klopte: de knop stond in een ander document. Een
+  eigen lezer (`edge/blikveld-hoofdactie.js`, zacht geladen vóór het blikveld)
+  kijkt nu in het actieve blad, onder de drie eisen van de brug. De brug zelf was
+  gemeten en afgevallen: van de 68 schermen met een `data-hoofdactie` laadt er een
+  de brug. `test/edgeblikveld.test.js` (herkomst, niet lenen, beide gebreken, vijf
+  onleesbare bladen, geen lezer, geen schrijfweg) en stap 4b en 5 van
+  `test/edgeblikveld.e2e.js`: de agenda als blad geeft `+ Afspraak` met herkomst
+  `blad:data-hoofdactie`, terug naar reizen weer `blad`, en de verklikker staat
+  nu ook in het blad.
 
 **Nagetrokken en open, met de ronde waarin ze horen:**
 
 | Gebrek | Waar | Ronde |
 |---|---|---|
-| vijf signalen waar de Edge naar luistert en die niemand verstuurt (`rtg-adaptive-project`, `-presence`, `-identity`, `-continuation`, `-action`) | `rtg-adaptive-edge-signals.js` | 1 |
-| een handeling via `registerAction` ontloopt de gewichtsgrammatica | `rtg-adaptive-edge-core.js` | 1 |
+| modulefouten van de werkruimte bereiken geen diagnose: `o.error` is de enige haak en geen aanroeper geeft hem mee (het dode kanaal `rtg-workspace-error` verborg dat) | `interface/workspace-runtime.js` | besluit (foutmelder heeft een budget van 3 en een deur zonder inlog) |
+| de home-actie op de wereldbureaus hangt aan een observer die na de eerste keer losgaat; wordt de adaptieve Edge ooit opnieuw gestart, dan verdwijnt hij (vandaag start niets hem opnieuw) | `interface/world-desktop-home.js` | 2 |
 | `RTGAdaptief.doe()` kijkt alleen of iets verhinderd is, niet wat het weegt; wie hem rechtstreeks aanroept, slaat de bevestiging over | `adaptief/register.js` | 3 |
-| een onbekende trap is in `directMag()` licht en in `effectief()` zwaar; `directMag` heeft geen aanroeper, maar twee antwoorden op dezelfde vraag horen niet naast elkaar te staan | `adaptief/grammatica.js` | 1 |
-| lang drukken is 480 ms in de balk en de orb en 620 ms in de adaptieve balk | par. 1 | 1 |
+| `gebaar.js` (op elk scherm met `basis.js`) heeft een eigen lang drukken van 520 ms en een borgtijd van 800 ms, buiten de kaart; naar de tabel halen vraagt eerst een meting van de wedloop in `test/helper.js` | `shared/gebaar/` | 2 |
 | vijf standmachines voor wat er van de Edge te zien is | par. 1 | 2 |
 | vier geheugens voor "waar was ik" die elkaar niet lezen | par. 1 | 4 |
 | "waarom niet" heeft aan de serverkant vijf vormen zonder gedeelde woorden, en `routes/stuur.js` maakt van elke weigering een kale `error` | `server/routes/stuur.js` | 3 |
-| de hoofdactie van een blad is voor de schil onzichtbaar | par. 2 | 1 |
 
 Vijf gebreken uit dezelfde inventaris en uit de indeling van de vijftig punten
 zijn in deze ronde wél gerepareerd, omdat ze bereikbaar waren of in de verkeerde

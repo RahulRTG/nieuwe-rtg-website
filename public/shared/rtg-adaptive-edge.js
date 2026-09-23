@@ -37,11 +37,7 @@
     }
     setState('dock');
     var custom = rt.model.registry[action];
-    if (custom && custom.run) {
-      if (!K.allowed(custom)) return false;
-      if (custom.confirm && !w.confirm(custom.confirm)) return false;
-      custom.run(); return true;
-    }
+    if (custom && custom.run) return K.voer(custom, w);
     if (action === 'home') { w.location.href = rt.edge.cfg.home; return true; }
     if (action === 'back') { w.history.back(); return true; }
     if (action === 'worlds') return legacy('.rtg-edge-worlds-trigger');
@@ -49,10 +45,7 @@
     if (action === 'status') return legacy('.rtg-edge-state');
     if (action === 'ai') return legacy('.rtg-edge-ai');
     if (action === 'presence') return rt.model.presence && rt.model.presence.action ? execute(rt.model.presence.action) : false;
-    if (action === 'connect') {
-      var event = new w.CustomEvent('rtg-adaptive-connect', { bubbles: true, cancelable: true });
-      return rt.host.dispatchEvent(event) ? legacy('.rtg-edge-menu') : true;
-    }
+    if (action === 'connect') return legacy('.rtg-edge-menu');
     return false;
   }
   function renderSheet() {

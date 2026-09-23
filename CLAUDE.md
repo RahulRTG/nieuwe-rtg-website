@@ -1637,11 +1637,16 @@ haar nooit** -- dus geen derde contextmodel, geen `edge.canPay()` en geen
 Edge-state die naar een domein terugschrijft. Ronde 0 bouwde geen
 productintelligentie maar een meetbare fundering: `npm run edgekaart`
 (`EDGEKAART.json`: per bestand wie schrijft, beslist en leest, elk met een citaat
-dat letterlijk in de bron moet staan) vond <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal-->
-verantwoordelijkheden met meer dan één eigenaar (twee capabilityregisters, twee
-contextmodellen, vier plekken die de wereld vaststellen, vijf standmachines) en
-<!--getal:edgekaart.dodeKanalen-->17<!--/getal--> dode kanalen, waaronder precies de vijf signalen
-waar de adaptieve Edge naar luistert en die geen scherm verstuurt. Het **Edge
+dat letterlijk in de bron moet staan) vond 12 verantwoordelijkheden met meer dan
+één eigenaar (twee capabilityregisters, twee contextmodellen, vier plekken die de
+wereld vaststellen, vijf standmachines; na ronde 1 nog
+<!--getal:edgekaart.dubbeleEigenaars-->11<!--/getal-->, want de gebaardrempels
+hebben er een) en
+17 dode kanalen, waaronder precies de vijf signalen waar de adaptieve Edge naar
+luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
+weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
+nu op <!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode tegenover
+<!--getal:edgekaart.levendeKanalen-->13<!--/getal--> levende kanalen. Het **Edge
 Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
 herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
 voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op
@@ -1673,6 +1678,12 @@ via het domein en niet via een eigen verzoekobject, eerst de hoedanigheid in
 sessie en envelop en dan pas een rolwisselaar, het werkdeck gaat over het open
 werkstuk, en **een nieuw scherm met een eigen hoofdactie publiceert zijn context
 zelf** (`contractNieuw`).
+**Ronde 1 staat** (EDGE.md par. 10 en 11): de dode kanalen zijn gesloten, het
+tweede register kent alleen licht en voert uit langs `RTGGewicht.voer` (LEEG is
+ronde 2), "wat weegt dit" heeft een antwoord (`effectief()`; zonder grammatica
+blijft een gewicht staan en gaat zwaar dicht), de gebaardrempels staan op een plek
+(`DREMPELS` in `grammatica.js`; zonder tabel is een gebaar uit, nooit een kopie),
+en de schil leest de hoofdactie van het ACTIEVE blad (`edge/blikveld-hoofdactie.js`).
 
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een

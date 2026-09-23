@@ -13,20 +13,20 @@
     }
   ],
   "stempel": {
-    "op": "2026-09-23T15:10:10.609Z",
-    "commit": "d1efacb",
+    "op": "2026-09-23T15:24:20.053Z",
+    "commit": "2cd614f",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 608,
-    "deurEistMens": 183,
+    "routes": 610,
+    "deurEistMens": 185,
     "deurGedeeld": 425,
     "zonderBewakerslaag": 3,
     "handlerKentMens": 148,
     "anoniemUitvoerbaar": 358,
     "metSpoor": 147,
-    "metReden": 287,
-    "bestanden": 97,
+    "metReden": 289,
+    "bestanden": 98,
     "zwaar": 14,
     "zwaarZonderMens": 0,
     "zwaarLezend": 4,
@@ -54,8 +54,8 @@
       "gemeten": 81,
       "geenWerk": 302,
       "geenOpslag": 203,
-      "nietInProef": 22,
-      "totaal": 608
+      "nietInProef": 24,
+      "totaal": 610
     },
     "dekkingPct": 13.3,
     "raakt": [
@@ -320,7 +320,7 @@
   ],
   "deuren": {
     "officeAuth": 447,
-    "boardroomAuth": 114,
+    "boardroomAuth": 116,
     "balieAuth": 31,
     "kluisAuth": 23,
     "techAuth": 16,

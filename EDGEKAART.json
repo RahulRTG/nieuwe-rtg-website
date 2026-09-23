@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T10:38:41.311Z",
-    "commit": "15574cb",
+    "op": "2026-09-23T12:36:14.250Z",
+    "commit": "b7e0b2f",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -1662,11 +1662,6 @@
           "rol": "beslist",
           "wat": "pending wordt presence",
           "citaat": "if (staat === 'pending') api.setPresence({ label: label + ' wordt uitgevoerd'"
-        },
-        {
-          "rol": "leest",
-          "wat": "vijf events zonder zender",
-          "citaat": "d.addEventListener('rtg-adaptive-project', function (e) {"
         }
       ],
       "verantwoordelijkheden": [
@@ -1679,16 +1674,8 @@
           "als": "lezer"
         },
         {
-          "naam": "identiteit",
-          "als": "lezer"
-        },
-        {
           "naam": "presence",
           "als": "beslisser"
-        },
-        {
-          "naam": "voortzetting",
-          "als": "lezer"
         }
       ],
       "gemeten": {
@@ -1696,13 +1683,7 @@
           "RTGAdaptiveEdgeSignals"
         ],
         "zendt": [],
-        "luistert": [
-          "rtg-adaptive-action",
-          "rtg-adaptive-continuation",
-          "rtg-adaptive-identity",
-          "rtg-adaptive-presence",
-          "rtg-adaptive-project"
-        ],
+        "luistert": [],
         "attributen": [],
         "opslag": [],
         "fetch": []
@@ -1790,9 +1771,7 @@
         "globals": [
           "RTGAdaptiveEdge"
         ],
-        "zendt": [
-          "rtg-adaptive-connect"
-        ],
+        "zendt": [],
         "luistert": [],
         "attributen": [
           "data-rtg-adaptive-ready",
@@ -2606,11 +2585,6 @@
           "rol": "schrijft",
           "wat": "anker via de publieke API",
           "citaat": "anchorDone = true; win.RTGContinueKey.setPosition(saved.anchor);"
-        },
-        {
-          "rol": "schrijft",
-          "wat": "klaar-event",
-          "citaat": "emit('rtg-route-memory-ready', { route: path, restored: !!saved });"
         }
       ],
       "verantwoordelijkheden": [
@@ -2627,9 +2601,7 @@
         "globals": [
           "RTGRouteMemory"
         ],
-        "zendt": [
-          "rtg-route-memory-ready"
-        ],
+        "zendt": [],
         "luistert": [],
         "attributen": [
           "data-rtg-density",
@@ -2691,16 +2663,14 @@
         },
         {
           "rol": "schrijft",
-          "wat": "klaar-event",
-          "citaat": "d.dispatchEvent(new CustomEvent('rtg-world-start-ready'));"
+          "wat": "klaar-vlag op body",
+          "citaat": "body.setAttribute('data-rtg-world-start','ready');"
         }
       ],
       "verantwoordelijkheden": [],
       "gemeten": {
         "globals": [],
-        "zendt": [
-          "rtg-world-start-ready"
-        ],
+        "zendt": [],
         "luistert": [],
         "attributen": [
           "data-rtg-world-start"
@@ -2859,8 +2829,7 @@
         "public/apps/reizen-veilig.js",
         "public/shared/command.js",
         "public/shared/edge/blikveld.js",
-        "public/shared/interface/world-desktop-frame.js",
-        "public/shared/rtg-adaptive-edge-signals.js"
+        "public/shared/interface/world-desktop-frame.js"
       ]
     },
     "onderbalk": {
@@ -2956,7 +2925,6 @@
       ],
       "lezers": [
         "public/shared/edge/blikveld.js",
-        "public/shared/rtg-adaptive-edge-signals.js",
         "public/shared/rtg-edge-preferences.js"
       ]
     },
@@ -3303,112 +3271,8 @@
     }
   ],
   "dodeKanalen": {
-    "luisterZonderZender": [
-      {
-        "naam": "rtg-adaptive-action",
-        "luisteraars": [
-          "public/shared/rtg-adaptive-edge-signals.js"
-        ]
-      },
-      {
-        "naam": "rtg-adaptive-continuation",
-        "luisteraars": [
-          "public/shared/rtg-adaptive-edge-signals.js"
-        ]
-      },
-      {
-        "naam": "rtg-adaptive-identity",
-        "luisteraars": [
-          "public/shared/rtg-adaptive-edge-signals.js"
-        ]
-      },
-      {
-        "naam": "rtg-adaptive-presence",
-        "luisteraars": [
-          "public/shared/rtg-adaptive-edge-signals.js"
-        ]
-      },
-      {
-        "naam": "rtg-adaptive-project",
-        "luisteraars": [
-          "public/shared/rtg-adaptive-edge-signals.js"
-        ]
-      },
-      {
-        "naam": "rtg-edge-ready",
-        "luisteraars": [
-          "public/shared/interface/world-desktop-home.js"
-        ]
-      }
-    ],
-    "zendZonderLuisteraar": [
-      {
-        "naam": "rtg-adaptive-connect",
-        "zenders": [
-          "public/shared/rtg-adaptive-edge.js"
-        ]
-      },
-      {
-        "naam": "rtg-beweging",
-        "zenders": [
-          "public/shared/levendekleur/levendekleur-01.js"
-        ]
-      },
-      {
-        "naam": "rtg-palet-open",
-        "zenders": [
-          "public/shared/rtg-schil/05-context.js"
-        ]
-      },
-      {
-        "naam": "rtg-platform-role",
-        "zenders": [
-          "public/site/start/experience-platform.js"
-        ]
-      },
-      {
-        "naam": "rtg-route-memory-ready",
-        "zenders": [
-          "public/shared/rtg-route-memory.js"
-        ]
-      },
-      {
-        "naam": "rtg-storyline-render",
-        "zenders": [
-          "public/site/storyline-stage.js"
-        ]
-      },
-      {
-        "naam": "rtg-volscherm",
-        "zenders": [
-          "public/shared/volscherm.js"
-        ]
-      },
-      {
-        "naam": "rtg-wachtrij-leeg",
-        "zenders": [
-          "public/shared/verbinding/verbinding-01.js"
-        ]
-      },
-      {
-        "naam": "rtg-workspace-error",
-        "zenders": [
-          "public/shared/interface/workspace-runtime.js"
-        ]
-      },
-      {
-        "naam": "rtg-world-start-ready",
-        "zenders": [
-          "public/shared/rtg-world-start.js"
-        ]
-      },
-      {
-        "naam": "rtgdeel",
-        "zenders": [
-          "public/shared/deelmenu/deelmenu-02.js"
-        ]
-      }
-    ],
+    "luisterZonderZender": [],
+    "zendZonderLuisteraar": [],
     "dynamisch": [
       {
         "pad": "public/apps/foundation/realtime.js",
@@ -3429,8 +3293,9 @@
   },
   "telling": {
     "bestanden": 59,
-    "rollen": 189,
+    "rollen": 187,
     "dubbeleEigenaars": 12,
-    "dodeKanalen": 17
+    "dodeKanalen": 0,
+    "levendeKanalen": 13
   }
 }

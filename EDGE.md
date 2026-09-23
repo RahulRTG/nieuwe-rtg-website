@@ -42,11 +42,11 @@ op de code past is een verouderde kaart en geen kaart. `--controle` hercompileer
 en vergelijkt met het ingecheckte register.
 
 Uitslag: <!--getal:edgekaart.bestanden-->59<!--/getal--> bestanden met
-<!--getal:edgekaart.rollen-->189<!--/getal--> verklaarde rollen, allemaal met een
+<!--getal:edgekaart.rollen-->187<!--/getal--> verklaarde rollen, allemaal met een
 citaat dat letterlijk staat;
 <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> verantwoordelijkheden met
 meer dan één schrijver of beslisser (par. 1), en
-<!--getal:edgekaart.dodeKanalen-->17<!--/getal--> dode kanalen: `rtg`-gebeurtenissen
+<!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode kanalen: `rtg`-gebeurtenissen
 in `public/` waar wel naar geluisterd wordt maar die niemand verstuurt, of
 andersom. Die laatste telling loopt over heel `public/` en niet alleen over de
 Edge, want een dood kanaal naast de Edge is net zo dood. Bij de eerste meting

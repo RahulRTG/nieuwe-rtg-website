@@ -832,7 +832,13 @@ lekt via een ONTBREKEND veld (en `scripts/adamproef.js` schakel 8 is daar blind
 voor), "open voor werk" komt in het log van de huidige werkgever, payroll sorteert
 kandidaten op een score, `public/apps/foundation/werk.html` belooft *geen
 verborgen matchscore* boven een match die op 72 begint, en de beveiligingsplanner
-toetst rust niet over middernacht.
+toetst rust niet over middernacht. De andere acht zijn diezelfde dag ook dicht
+(par. 4): een werkgeversinzage zonder vaststaand spoor weigert, werving staat in
+het Consent Center, een ongeijkt zekerheidscijfer stuurt de voorspeller niet
+meer, de AI-kostenmeter boekt het model dat antwoordde en laat lokaal verbruik
+buiten tarief en grens, en de Edge-balk toont een verboden actie MET haar reden
+in plaats van haar weg te laten. Te weinig rust bij een mens blijft met opzet
+een waarschuwing.
 
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG

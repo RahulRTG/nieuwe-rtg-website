@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T10:28:13.302Z",
-    "commit": "043eb9b40",
+    "op": "2026-09-23T11:00:07.920Z",
+    "commit": "b3dc7dddd",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -360,6 +360,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "aikosten-bron.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/ai-meter.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 8
     },
     "aipoort.test.js": {
       "soort": "puur",
@@ -10237,6 +10245,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "zelfzorg-repareren.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zelfzorg/repareren.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "zelfzorg.test.js": {
       "soort": "server",

@@ -312,7 +312,33 @@ meer; en de rustregel staat in `server/kern/beveiliging/rooster/rust.js` (elf uu
 over de datumgrens), de automaat plant er nooit tegenin, een mens krijgt de
 botsing als waarschuwing, en elke dienst draagt `door`
 (`test/bevrust.test.js`). Of een MENS ook geweigerd moet worden bij te weinig
-rust, is een besluit en geen reparatie. Punten 6 tot en met 13 staan nog open.
+rust, is een besluit en geen reparatie: **het blijft een waarschuwing**, zo is
+besloten op 23 september 2026.
+
+**Punten 6 tot en met 13 zijn op dezelfde dag gerepareerd.** De
+identiteitsinzage van een werkgever gaat via `inzagelog.noteerVast()` en weigert
+met 503 als het spoor niet vaststaat -- geen gegevens, geen bericht, geen verzoek
+(`test/identiteit-opvraag.test.js`, ook onder een vastlegger die faalt); de
+naamvrijgave van Métier schrijft in het centrale journaal en weigert op dezelfde
+grond. Sollicitatie en anonieme werkinteresse staan in `NIET_GEDEKT` (nu in
+`server/kern/consent-register-grens.js`), en `test/consent-dekking.test.js` scant
+voortaan ook `server/routes` op de OVERDRACHTSvorm. `/api/supplier/apply` heeft
+een eigen rem per afzender en per zaak (`sollrem.js`, tien per uur, alleen
+opgeslagen sollicitaties tellen); `/api/rtf/vacatures` blijft met opzet open en
+zegt waarom (dezelfde openbare lijst als de vacaturepagina, de leeftijd filtert
+alleen en de sollicitatieroute leest hem uit het profiel). De reparatieknop maakt
+een collectie van een ander domein niet meer leeg maar geeft een advies met ernst
+`hoog`. De onderhoudsronde roept `vooruitblikVastleggen` aan, dus de
+trefzekerheid gaat meten. De voorspeller draagt geen `zekerheid` meer maar een
+`opbouw` (bezoeken, rijp, vast uur, vaste dag) en sorteert op een regel in
+woorden: vaste boeking, wat nu aan de beurt is, meeste bezoeken, rijpste ritme.
+De AI-kostenmeter boekt het model dat ANTWOORDDE (een onbekend model telt tegen
+het duurste tarief), weegt cachetokens zoals de dagmeter, telt OpenAI-cache niet
+meer dubbel, en meldt alleen extern verbruik aan de kostenhaak; een dichte
+verbruiksgrens sluit extern en laat het eigen model antwoorden
+(`test/aikosten-bron.test.js`). En de Edge-balk toont een verboden actie met
+haar reden -- zonder opgegeven reden staat er dat hij ontbreekt, er wordt er geen
+verzonnen. Elke nieuwe toets is op de oude code gedraaid en zakte daar.
 
 ---
 

@@ -61,9 +61,24 @@
       status: 'Veiligheid en status', connect: 'Open Connect', presence: 'Bekijk actuele status', ai: 'Rahul vragen' };
     Object.keys(labels).forEach(function (id) { register(state, { id: id, label: labels[id], allowed: true }); });
   }
+  /* Het model van de Edge die nu draait, voor EEN lezer: shared/edge/blikveld.js.
+     momentopname() geeft een losse kopie zonder functies, dus wie leest kan het
+     model niet veranderen -- het blikveld bezit niets (EDGE.md). */
+  var laatste = null;
   function model() {
-    return { state: 'dock', deck: 'home', registry: Object.create(null),
+    laatste = { state: 'dock', deck: 'home', registry: Object.create(null),
       projections: Object.create(null), presence: null, identity: null, continuation: null };
+    return laatste;
+  }
+  function momentopname() {
+    var m = laatste;
+    if (!m) return null;
+    return { state: m.state, deck: m.deck, identity: m.identity || null,
+      presence: m.presence ? { label: m.presence.label } : null,
+      continuation: m.continuation ? { title: m.continuation.title, copy: m.continuation.copy } : null,
+      acties: Object.keys(m.registry).map(function (id) {
+        return { id: id, label: m.registry[id].label, allowed: allowed(m.registry[id]) };
+      }) };
   }
   function register(state, item) {
     var id = String(item && item.id || '');
@@ -86,5 +101,5 @@
   }
   return Object.freeze({ STATES: STATES, DECKS: DECKS, SPECS: SPECS, normState: normState, detail: detail,
     normDeck: normDeck, nextDeck: nextDeck, allowed: allowed, project: project,
-    model: model, defaults: defaults, register: register, setProjection: setProjection, actions: actions });
+    model: model, momentopname: momentopname, defaults: defaults, register: register, setProjection: setProjection, actions: actions });
 }));

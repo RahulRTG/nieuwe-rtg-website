@@ -121,12 +121,22 @@ test('de gewichtlaag zet "terug" zonder weg terug een trap hoger', () => {
      IS. Dat mag geen stille tik worden: dan verdwijnt de weg terug zonder dat
      iemand het merkt. Hij wordt `bewust` -- dan maar vooraf vragen.
 
-     DE MUTATIE: haal het blok `if (g === 'terug' && typeof it.ongedaan !==
-     'function')` uit gewicht.js. */
+     De regel woont sinds EDGE.md ronde 0 op EEN plek (grammatica.effectief),
+     omdat hij er twee keer stond: in gewicht.js, dat uitvoert, en in
+     edge/actiestaat.js, dat toont. Twee kopieen van een regel lopen op een dag
+     uit elkaar, en dan toont de Edge iets anders dan er gebeurt.
+
+     DE MUTATIES: laat effectief() `terug` altijd doorlaten (de gedragshelft
+     zakt), of laat gewicht.js zijn eigen trap lezen in plaats van effectief()
+     aan te roepen (de bronhelft zakt). */
+  assert.equal(gram.effectief('terug', false), 'bewust');
+  assert.equal(gram.effectief('terug', true), 'terug');
+  assert.equal(gram.effectief(undefined, false), 'licht');
+  assert.equal(gram.effectief('plechtig', false), 'plechtig');
+  assert.equal(gram.effectief('zwaarr', true), 'zwaar', 'een onbekende trap is dicht, nooit licht');
   const bron = lees('public/shared/adaptief/gewicht.js');
-  assert.ok(/g === 'terug' && typeof it\.ongedaan !== 'function'/.test(bron),
-    'gewicht.js hoort een lege terug-belofte op te vangen');
-  assert.ok(/g = 'bewust'/.test(bron), 'en hem een trap hoger te zetten');
+  assert.ok(/gram\.effectief\(it\.gewicht, typeof it\.ongedaan === 'function'\)/.test(bron),
+    'gewicht.js hoort het werkelijke gewicht uit grammatica.effectief te halen');
 });
 
 /* ========================================================== verhinderd == */
@@ -178,6 +188,90 @@ test('een verhinderde handeling wordt geweigerd en niet alleen grijs getekend', 
   const bron = lees('public/shared/adaptief/register.js');
   assert.ok(/function mag\(id\)/.test(bron), 'het register hoort een mag() te hebben');
   assert.ok(/if \(!mag\(id\)\) return false;/.test(bron), 'en doe() hoort erop te stuiten');
+});
+
+test('zonder gewichtlaag gaat alleen licht door, in de balk EN in de orb', () => {
+  /* Twee ingangen naar dezelfde handeling, en ze faalden tegengesteld: de balk
+     weigerde een zware handeling als gewicht.js ontbrak, de orb voerde hem uit
+     (EDGEKAART.json, verantwoordelijkheid `gewicht`). Latent -- alleen app.html
+     laadt de orb, en die laadt de gewichtlaag ook -- maar een script dat niet
+     laadt is precies het moment waarop dit ertoe doet.
+
+     DE MUTATIE: haal in orb.js de regel `if ((it.gewicht || 'licht') !== 'licht')
+     return;` weg. */
+  for (const [p, doe] of [['public/shared/adaptief/balkknop.js', 'A.doe(it.id)'],
+    ['public/shared/adaptief/orb.js', 'w.RTGAdaptief.doe(it.id)']]) {
+    const bron = lees(p).replace(/\/\*[\s\S]*?\*\//g, '');
+    const van = bron.indexOf('RTGGewicht.voer(it)');
+    const tot = bron.indexOf(doe, van);
+    assert.ok(van > 0 && tot > van, p + ': de weg zonder gewichtlaag hoort na RTGGewicht.voer te komen');
+    assert.match(bron.slice(van, tot), /\(it\.gewicht \|\| 'licht'\) !== 'licht'/,
+      p + ': zonder gewichtlaag hoort alleen een lichte handeling door te gaan');
+  }
+});
+
+test('de Second Screen voert uit langs het gewicht, niet eromheen', () => {
+  /* "Nu relevant" in de Second Screen toonde de handelingen van de context en
+     riep bij een tik RTGAdaptief.doe() rechtstreeks aan. Dat register kijkt
+     alleen of iets verhinderd is, niet wat het weegt -- dus een `bewust`-
+     handeling ging zonder lade door en een `plechtig` zonder vasthouden
+     (inventaris van EDGE.md, bevestigd in de bron). Nu gaat die ingang langs
+     RTGGewicht.voerId, dezelfde weg als een tik in het dock.
+
+     DE MUTATIES: laat second-screen-modules.js weer A.doe aanroepen (de
+     bronhelft zakt), of laat voerId() het item overslaan en rechtstreeks doen
+     (de gedragshelft zakt). */
+  const vm = require('vm');
+  const gedaan = [], laden = [];
+  const items = [{ id: 'deel', naam: 'Delen', gewicht: 'bewust' }, { id: 'vet', naam: 'Vet', gewicht: 'licht' }];
+  const window = { RTGGrammatica: gram, console: { warn() {}, error() {} },
+    RTGAdaptief: { voorNu: () => items.map((x) => Object.assign({}, x)), doe: (id) => { gedaan.push(id); return true; } },
+    RTGLagen: { lade: (o) => laden.push(o.titel), sluit() {} } };
+  vm.runInNewContext(lees('public/shared/adaptief/gewicht.js'), { window, document: {} });
+  const G = window.RTGGewicht;
+  assert.equal(G.voerId('deel'), true);
+  assert.deepEqual([gedaan, laden], [[], ['Delen']], 'een bewuste handeling opent de lade en voert niets direct uit');
+  assert.equal(G.voerId('vet'), true);
+  assert.deepEqual(gedaan, ['vet'], 'een lichte handeling gaat gewoon door');
+  assert.equal(G.voerId('speelt-niet'), false, 'een handeling die nu niet speelt, draait niet');
+  assert.deepEqual(gedaan, ['vet']);
+  const modules = lees('public/shared/interface/second-screen-modules.js');
+  assert.match(modules, /'context\.execute': \{ run: function \(p\) \{ return !!w\.RTGGewicht && w\.RTGGewicht\.voerId\(/);
+  assert.doesNotMatch(modules, /A\.doe\(/, 'de Second Screen hoort RTGAdaptief.doe niet rechtstreeks aan te roepen');
+});
+
+test('de uitvoerder: compensatie is nooit "Ongedaan maken", en zonder lade gaat bewust dicht', () => {
+  /* Twee regels die eerst alleen bij het TONEN golden (edge/actiestaat.js) of in
+     de verkeerde richting faalden:
+
+     - een handeling die alleen met een tegenboeking te herstellen is
+       (herstel: 'compensatie') werd door gewicht.js toch met "Ongedaan maken"
+       uitgevoerd zodra het scherm een ongedaan-functie meegaf;
+     - `bewust` zonder RTGLagen voerde direct uit, waar `zwaar` dichtging.
+
+     DE MUTATIES: haal in gewicht.js de compensatieregel weg (de eerste helft
+     zakt: `terug` voert dan direct uit), of zet `bewust` zonder lade terug op
+     draai() (de tweede helft zakt). */
+  const vm = require('vm');
+  const bron = lees('public/shared/adaptief/gewicht.js');
+  function laad(metLagen, herstel) {
+    const log = { gedaan: [], laden: [] };
+    const window = { RTGGrammatica: gram, console: { warn() {}, error() {} },
+      RTGAdaptief: { capability: () => ({ herstel }), voorNu: () => [], doe: (id) => { log.gedaan.push(id); return true; } } };
+    if (metLagen) window.RTGLagen = { lade: (o) => log.laden.push(o.titel), sluit() {} };
+    vm.runInNewContext(bron, { window, document: {} });
+    return { G: window.RTGGewicht, log };
+  }
+  const terug = { id: 'boek', naam: 'Boeken', gewicht: 'terug', ongedaan: () => {} };
+  let r = laad(true, 'exact');
+  r.G.voer(terug);
+  assert.deepEqual(r.log.gedaan, ['boek'], 'exact herstel met een weg terug gaat direct, met Ongedaan maken erna');
+  r = laad(true, 'compensatie');
+  r.G.voer(terug);
+  assert.deepEqual([r.log.gedaan, r.log.laden], [[], ['Boeken']], 'compensatie wordt bewust: eerst de lade');
+  r = laad(false, undefined);
+  assert.equal(r.G.voer({ id: 'deel', naam: 'Delen', gewicht: 'bewust' }), false);
+  assert.deepEqual(r.log.gedaan, [], 'zonder lade gaat een bewuste handeling dicht');
 });
 
 test('verhinderd is niet uitgeschakeld: de knop blijft bedienbaar en zegt het in zijn naam', () => {

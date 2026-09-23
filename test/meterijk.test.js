@@ -971,6 +971,24 @@ const IJKINGEN = {
       } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
     }
   },
+  /* DE EDGE (EDGE.md par. 7). Twaalf tanden op twee registers, allemaal met
+     dezelfde proef (edgeIjking hieronder): een tijdelijk register met een
+     bekende waarde, dan een met een VERSCHOVEN waarde, en de lezer hoort exact
+     mee te bewegen -- en een register zonder het getal hoort een fout te geven
+     en geen nul. De veldtanden staan er per veld, zodat een typefout in EEN
+     veldnaam niet verdwijnt in een som. */
+  edgeGeblokkeerdZonderWaarom: { proef: () => edgeIjking('EDGEDEKKING.json', 'geblokkeerdZonderWaarom') },
+  edgeDubbeleEigenaars: { proef: () => edgeIjking('EDGEKAART.json', 'dubbeleEigenaars') },
+  rtgDodeKanalen: { proef: () => edgeIjking('EDGEKAART.json', 'dodeKanalen') },
+  edgeVeldIdentiteit: { proef: () => edgeIjking('EDGEDEKKING.json', 'identiteit') },
+  edgeVeldWereld: { proef: () => edgeIjking('EDGEDEKKING.json', 'wereld') },
+  edgeVeldContext: { proef: () => edgeIjking('EDGEDEKKING.json', 'context') },
+  edgeVeldObject: { proef: () => edgeIjking('EDGEDEKKING.json', 'object') },
+  edgeVeldActiviteit: { proef: () => edgeIjking('EDGEDEKKING.json', 'activiteit') },
+  edgeVeldPresence: { proef: () => edgeIjking('EDGEDEKKING.json', 'presence') },
+  edgeVeldVoortzetting: { proef: () => edgeIjking('EDGEDEKKING.json', 'voortzetting') },
+  edgeVeldHoofdactie: { proef: () => edgeIjking('EDGEDEKKING.json', 'hoofdactie') },
+  edgeVeldTrust: { proef: () => edgeIjking('EDGEDEKKING.json', 'trust') },
   zaakwigGezakt: {
     /* De verticale keten: geen brede teller maar een scenario. Nul betekent
        "elke stap en elke bedrijfsregel klopt op trede 3, 4 en 6" -- en dat mag
@@ -2256,6 +2274,33 @@ const IJKINGEN = {
    niet bij JSON, want dan is het geen geldige JSON meer en leest de meter niets
    -- en een meter die niets leest, beweegt ook niet, waardoor de ijking zou
    slagen om de verkeerde reden. */
+/* De proef achter de twaalf Edge-tanden. Het register wordt in een tijdelijke
+   map nagemaakt in precies de vorm die scripts/edgekaart.js en
+   scripts/edgedekking.js schrijven, zodat de ijking niet de echte meting (die
+   een browser vraagt) hoeft te draaien. */
+function edgeIjking(bestand, wat) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-edge-ijk-'));
+  const pad = path.join(dir, bestand);
+  const maak = (n) => {
+    if (wat === 'dubbeleEigenaars' || wat === 'dodeKanalen') return { telling: { [wat]: n } };
+    if (wat === 'geblokkeerdZonderWaarom') {
+      return { telling: { acties: { RTGAdaptief: { geblokkeerdZonderWaarom: n }, 'edge-compat': { geblokkeerdZonderWaarom: 1 } } } };
+    }
+    return { telling: { perVeld: { [wat]: { ja: n, nee: 3, nvt: 0 } } } };
+  };
+  try {
+    fs.writeFileSync(pad, JSON.stringify(maak(4)));
+    const voor = norm.leesEdge(pad, wat);
+    fs.writeFileSync(pad, JSON.stringify(maak(9)));
+    const na = norm.leesEdge(pad, wat);
+    assert.equal(na - voor, 5, 'de lezer hoort exact mee te bewegen met ' + wat);
+    fs.writeFileSync(pad, JSON.stringify({ telling: {} }));
+    assert.throws(() => norm.leesEdge(pad, wat), new RegExp(wat), 'een ontbrekend getal levert geen nul maar een fout');
+    assert.throws(() => norm.leesEdge(path.join(dir, 'weg.json'), wat), /ontbreekt/);
+    return na - voor;
+  } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+}
+
 function metVervangenJson(relPad, wijzig, doe) {
   const vol = path.join(WORTEL, relPad);
   assert.equal(fs.existsSync(vol), true, 'de ijking wijzigt alleen iets dat bestaat: ' + relPad);

@@ -654,6 +654,14 @@ const EIGEN_MODULE = new Map([
      deze toets niet raakt. Bevestigd door de motor is de kring van Veilig
      (return-weg: dan verschijnt de reden bij een lege codenaam niet). */
   ['stilleknoppen.e2e.js', ['public/shared/veiligheid.js']],
+  /* HET EDGE BLIKVELD (EDGE.md, ronde 0). De browserproef met de hand
+     nagetrokken op vier plekken (de loader laadt het blikveld niet, de brug laat
+     het object vallen, de controls lezen weer zelf, de agenda wijst geen
+     hoofdactie aan) -- alle vier raak. De module die hij het hardst beproeft is
+     het blikveld zelf. De contexttoets leest register.js als tekst in een
+     nagemaakt venster, dus de motor vindt zijn module niet via require. */
+  ['edgeblikveld.e2e.js', ['public/shared/edge/blikveld.js']],
+  ['edgecontext.test.js', ['public/shared/adaptief/register.js']],
   /* DE METING PER CAPABILITY. Vier mutaties, vier raak: de vloer eruit (dan
      krijgt drie verzoeken een geruststellende 0,0%), routes zonder functie
      weglaten (dan klopt het totaal terwijl er iets ontbreekt), een 4xx als

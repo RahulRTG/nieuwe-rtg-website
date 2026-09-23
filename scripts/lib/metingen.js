@@ -259,6 +259,12 @@ const REGISTER = {
   'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt', 'tredeIngangLekken'] },
   'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },
   'ZAAKWIG.json': { meter: ['zaakwigGezakt'] },
+  /* DE EDGE (EDGE.md par. 7). De kaart draagt twee schulden; de dekking een
+     schuld die op nul hoort te staan en negen veldtanden die alleen omhoog
+     mogen. De vergelijking per scherm zit daarnaast in edgedekking.js zelf. */
+  'EDGEKAART.json': { meter: ['edgeDubbeleEigenaars', 'rtgDodeKanalen'] },
+  'EDGEDEKKING.json': { meter: ['edgeGeblokkeerdZonderWaarom', 'edgeVeldIdentiteit', 'edgeVeldWereld', 'edgeVeldContext',
+    'edgeVeldObject', 'edgeVeldActiviteit', 'edgeVeldPresence', 'edgeVeldVoortzetting', 'edgeVeldHoofdactie', 'edgeVeldTrust'] },
   'MEETLEER.json': { meter: ['meetleerBlind'] },
 
   /* Deze vier dragen hun eigen grondwaarde. De ratel staat in het genoemde

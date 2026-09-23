@@ -113,17 +113,21 @@
        nieuwe declaratie -- en dan is een declaratie geen afspraak meer. Hij telt
        dus mee in de sleutel, anders blijft een knop grijs terwijl hij aan staat. */
     var st = Object.keys(c.staat || {}).sort().map(function (k) {
-      return k + (c.staat[k] && c.staat[k].aan ? '+' : '-');
+      try { return k + JSON.stringify(c.staat[k], function (s, v) { return typeof v === 'function' ? 'f' : v; }); }
+      catch (e) { return k; }
     }).join(',');
     var rl = (c.rail || []).map(function (x) { return x && (x.sleutel + ':' + x.tekst + ':' + x.staat); }).join(',');
-    return [c.bron, c.titel, c.selectie ? 's' : '-', (c.acties || []).join('|'), st, rl].join('|~|');
+    return [c.bron, c.titel, c.selectie ? 's' : '-', (c.acties || []).join('|'), st, rl,
+      JSON.stringify(c.object || null), c.activiteit || ''].join('|~|');
   }
   function context(c) {
     if (c === undefined) return nu;
     var v = { bron: String((c && c.bron) || ''), titel: String((c && c.titel) || ''),
       acties: (c && Array.isArray(c.acties) ? c.acties : []).slice(),
       selectie: !!(c && c.selectie), staat: (c && c.staat) || {},
-      rail: (c && Array.isArray(c.rail) ? c.rail : []) };
+      rail: (c && Array.isArray(c.rail) ? c.rail : []),
+      object: (c && c.object && typeof c.object === 'object') ? c.object : null,
+      activiteit: String((c && c.activiteit) || '') };
     v.sleutel = sleutelVan(v);
     if (v.sleutel === nu.sleutel) return nu;
     nu = v;

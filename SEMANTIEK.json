@@ -1,6 +1,6 @@
 {
-  "catalogi": 1097,
-  "verschillendeNamen": 646,
+  "catalogi": 1096,
+  "verschillendeNamen": 645,
   "namenInMeerDomeinen": 125,
   "woordenMetMeerBetekenissen": 107,
   "betekenissenTotaal": 400,
@@ -1942,6 +1942,135 @@
       ]
     },
     {
+      "naam": "VELDEN",
+      "domeinen": 10,
+      "betekenissen": 10,
+      "hoogsteOverlap": 0.09,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/db/tx/pgachter.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "soort",
+            "ref",
+            "klant",
+            "zaak"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/appstore/context.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "bedrag",
+            "bestemming",
+            "datum",
+            "tot"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/beleidsmotor/index.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "eens",
+            "oneens",
+            "onbekend",
+            "gebruik"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/gegevenspoort.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "telefoon",
+            "adres",
+            "identiteit",
+            "reisdocument"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/identiteit/sessievelden.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "authenticator",
+            "toestel",
+            "context",
+            "sleutelbinding"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levensdossier/velden.js"
+          ],
+          "leden": 24,
+          "voorbeeld": [
+            "verzoeken",
+            "bezittingen",
+            "afspraken",
+            "dossier"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderzoekslab.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "hardware",
+            "software",
+            "dorp",
+            "meta"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-regels.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "van",
+            "onderwerp",
+            "tekst",
+            "soort"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/webplatform-taal.js"
+          ],
+          "leden": 11,
+          "voorbeeld": [
+            "hero",
+            "kop",
+            "tekst",
+            "knop"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/koppelingen.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "naam",
+            "klas",
+            "opleiding",
+            "vestiging"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "NIVEAUS",
       "domeinen": 9,
       "betekenissen": 8,
@@ -3489,136 +3618,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "VELDEN",
-      "domeinen": 10,
-      "betekenissen": 10,
-      "hoogsteOverlap": 0.09,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/db/tx/pgachter.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "soort",
-            "ref",
-            "klant",
-            "zaak"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/appstore/context.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "bedrag",
-            "bestemming",
-            "datum",
-            "tot"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/beleidsmotor/index.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "eens",
-            "oneens",
-            "onbekend",
-            "gebruik"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/gegevenspoort.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "telefoon",
-            "adres",
-            "identiteit",
-            "reisdocument"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/identiteit/sessievelden.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "authenticator",
-            "toestel",
-            "context",
-            "sleutelbinding"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/levensdossier/velden.js"
-          ],
-          "leden": 24,
-          "voorbeeld": [
-            "verzoeken",
-            "bezittingen",
-            "afspraken",
-            "dossier"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderzoekslab.js"
-          ],
-          "leden": 9,
-          "voorbeeld": [
-            "hardware",
-            "software",
-            "dorp",
-            "meta"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtmail-regels.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "van",
-            "onderwerp",
-            "tekst",
-            "soort"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/webplatform-taal.js"
-          ],
-          "leden": 11,
-          "voorbeeld": [
-            "hero",
-            "kop",
-            "tekst",
-            "knop"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/school/koppelingen.js"
-          ],
-          "leden": 12,
-          "voorbeeld": [
-            "naam",
-            "klas",
-            "opleiding",
-            "vestiging"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 3586
+  "bestanden": 3605
 }

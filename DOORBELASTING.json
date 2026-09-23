@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T11:25:29.798Z",
-    "commit": "38299c54a",
+    "op": "2026-09-23T19:17:10.260Z",
+    "commit": "acc19e13",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 0,
     "instrument": "scripts/doorbelasting.js",
     "node": "v22.22.2"
   },
@@ -21,8 +21,8 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1405,
-    "geldvormen": 212,
+    "vormenTotaal": 1426,
+    "geldvormen": 213,
     "volgbaar": 30,
     "perHerkomstveld": {
       "bron": 15,
@@ -32,7 +32,7 @@
       "leverancier": 6,
       "economischeHerkomst": 4
     },
-    "nietVolgbaar": 182,
+    "nietVolgbaar": 183,
     "volgbareModules": [
       "server/kern/appbieb.js",
       "server/kern/betaalopdracht/index.js",
@@ -368,6 +368,10 @@
       },
       "server/kern/wbw.js": {
         "geldvormen": 3,
+        "volgbaar": 0
+      },
+      "server/kern/werkbetaling.js": {
+        "geldvormen": 1,
         "volgbaar": 0
       },
       "server/kern/werkplaats.js": {

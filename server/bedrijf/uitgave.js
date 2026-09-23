@@ -107,7 +107,9 @@ module.exports = (sctx) => {
     log(g.w, g.l, 'uitgave-betaald-genoteerd', u.id, kenmerk);
     save();
     res.json({ ok: true, uitgave: toon(g.w, u),
-      let: 'Genoteerd als betaald. RTG heeft niets overgemaakt; dit is uw notitie dat het buiten RTG is gebeurd.' });
+      let: bw.wijze === 'rtgbank'
+        ? 'Genoteerd als betaald met uw SEPA-opdracht ' + kenmerk + '. Het Werk OS heeft zelf niets overgemaakt; het heeft uw overboeking getoetst.'
+        : 'Genoteerd als betaald. RTG heeft niets overgemaakt; dit is uw notitie dat het buiten RTG is gebeurd.' });
   });
 
   /* VIA RTG BANK: de betaling is een echte SEPA-opdracht die DEZE mens deed,

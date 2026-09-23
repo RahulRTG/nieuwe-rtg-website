@@ -143,6 +143,7 @@ test('4-5. via RTG Bank: pas als RTG hem aanzet, en de SEPA-opdracht wordt getoe
   assert.equal(ok.body.uitgave.stand, 'betaald');
   assert.equal(ok.body.uitgave.betaald.via, 'rtgbank');
   assert.equal(ok.body.uitgave.betaald.kenmerk, sepa.body.opdrachtId);
+  assert.match(ok.body.let, /SEPA-opdracht/, 'de bevestiging zegt hoe er betaald is, niet "buiten RTG"');
 
   const tweede = (await maak(FIN, 125, { iban: IBAN })).body.uitgave;
   await keur(DIR, tweede.id);

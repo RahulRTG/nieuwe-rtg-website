@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-23T16:37:41.153Z",
-  "commit": "3a09d8d",
+  "op": "2026-09-23T16:59:48.898Z",
+  "commit": "9bb7bb00",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
@@ -21,8 +21,8 @@
   "vastgesteldDoorMens": 1860,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4120,
-   "PUBLIC": 123,
+   "AUTHENTICATED": 4119,
+   "PUBLIC": 124,
    "OBJECT_SCOPED": 737,
    "(niet af te leiden -- vraagt een verklaring)": 5,
    "SERVICE_TO_SERVICE": 15,
@@ -48,6 +48,12 @@
    "route": "POST /api/festival/scan",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/foundation/registratie/catalogus",
+   "bedoeld": "AUTHENTICATED",
+   "waargenomen": "PUBLIC",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -21101,11 +21107,10 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "AUTHENTICATED",
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth",
      "mw"
     ]
    },

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-23T11:40:50.152Z",
-  "commit": "aff2d77",
+  "op": "2026-09-23T17:49:00.385Z",
+  "commit": "b7dac01a7",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,19 +10,19 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4994,
-  "geclassificeerd": 4994,
+  "totaal": 4996,
+  "geclassificeerd": 4996,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1201,
-   "PROTECTED": 467,
+   "NOT_APPLICABLE": 1202,
+   "PROTECTED": 468,
    "INTENTIONALLY_NON_IDEMPOTENT": 136
   },
-  "vastgesteldDoorMens": 1853,
+  "vastgesteldDoorMens": 1855,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4113,
-   "PUBLIC": 123,
+   "AUTHENTICATED": 4114,
+   "PUBLIC": 124,
    "OBJECT_SCOPED": 737,
    "(niet af te leiden -- vraagt een verklaring)": 5,
    "SERVICE_TO_SERVICE": 15,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 22
+   "niet gemeten": 24
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -48,6 +48,12 @@
    "route": "POST /api/festival/scan",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/foundation/registratie/catalogus",
+   "bedoeld": "AUTHENTICATED",
+   "waargenomen": "PUBLIC",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -15138,6 +15144,48 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "concern.vestiging.inhaal",
+   "route": "POST /api/concern/vestiging/inhaal",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "concern.vestiging.inhaal.bevestig",
+   "route": "POST /api/concern/vestiging/inhaal/bevestig",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "concern.vestiging.nieuw",
    "route": "POST /api/concern/vestiging/nieuw",
    "semantiek": {
@@ -21101,11 +21149,10 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "AUTHENTICATED",
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth",
      "mw"
     ]
    },
@@ -57077,7 +57124,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -57098,7 +57145,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

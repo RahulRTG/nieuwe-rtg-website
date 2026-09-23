@@ -72,8 +72,31 @@ function tabel() {
 
 /* Wat kost dit antwoord. Alle vier de soorten tokens apart, want ze hebben
    alle vier een andere prijs. */
+/* Het tarief van een model. Een aanbieder geeft soms een gedateerde naam terug
+   (`claude-sonnet-5-20260101`); die hoort bij `claude-sonnet-5`, dus valt een
+   exacte treffer weg dan geldt de langste naam uit de tabel waar hij mee begint
+   -- met een streepje erachter, zodat `claude-opus-5` nooit `claude-opus-50`
+   vangt. Niets gevonden: het duurste dat we kennen. */
+function tariefVan(model) {
+  const t = tabel(), m = String(model || '');
+  if (t[m]) return t[m];
+  let beste = null;
+  for (const k of Object.keys(t)) if (m.startsWith(k + '-') && (!beste || k.length > beste.length)) beste = k;
+  return beste ? t[beste] : ONBEKEND;
+}
+
+/* De invoer in VOLLE-invoertokens: gewone invoer telt een, een cache-leesbeurt
+   een tiende, een cache-schrijfbeurt 1,25. Voor een teller die één tarief per
+   token kent (kern/kosten, soort ai-invoer) is dit het getal dat met dat tarief
+   de juiste prijs geeft. */
+function gewogenInvoer(usage) {
+  const u = usage || {};
+  return (Number(u.input_tokens) || 0) + (Number(u.cache_read_input_tokens) || 0) * CACHE_LEES +
+    (Number(u.cache_creation_input_tokens) || 0) * CACHE_SCHRIJF;
+}
+
 function kostenVan(model, usage) {
-  const p = tabel()[String(model || '')] || ONBEKEND;
+  const p = tariefVan(model);
   const u = usage || {};
   const inv = Number(u.input_tokens) || 0;
   const uit = Number(u.output_tokens) || 0;
@@ -196,4 +219,4 @@ function nulstel() { staat = LEEG(); }
    hij grijpt in als het geld op is), de rem daar STOPT iemand die er in een
    minuut doorheen gaat. Ze worden allebei aangeroepen in ./ai.js. */
 
-module.exports = { boek, boekFout, boekLokaal, boekLokaalFout, magNog, stand, nulstel, kostenVan, plafond, PRIJZEN, PRIJZEN_PEILDATUM };
+module.exports = { gewogenInvoer, tariefVan, boek, boekFout, boekLokaal, boekLokaalFout, magNog, stand, nulstel, kostenVan, plafond, PRIJZEN, PRIJZEN_PEILDATUM };

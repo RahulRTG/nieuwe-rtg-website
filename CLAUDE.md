@@ -1639,9 +1639,12 @@ productintelligentie maar een meetbare fundering: `npm run edgekaart`
 (`EDGEKAART.json`: per bestand wie schrijft, beslist en leest, elk met een citaat
 dat letterlijk in de bron moet staan) vond 12 verantwoordelijkheden met meer dan
 één eigenaar (twee capabilityregisters, twee contextmodellen, vier plekken die de
-wereld vaststellen, vijf standmachines; na ronde 1 nog
-<!--getal:edgekaart.dubbeleEigenaars-->11<!--/getal-->, want de gebaardrempels
-hebben er een) en
+wereld vaststellen, vijf standmachines). Na ronde 1 waren het er 11, want de
+gebaardrempels kregen een eigenaar; de kaart van ronde 2 ziet meer (vijf
+producenten van het tweede register, en dat `gebaar.js` zelf over zijn drempels
+beslist) en telt er nu <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> --
+een meter die stijgt omdat hij beter kijkt, en dus een uitgeschreven besluit in
+NORM.json en geen achteruitgang. Daarnaast vond ronde 0
 17 dode kanalen, waaronder precies de vijf signalen waar de adaptieve Edge naar
 luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
 weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat

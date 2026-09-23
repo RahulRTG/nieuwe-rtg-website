@@ -219,6 +219,8 @@
     "schermroutes": "node scripts/schermroutes.js",
     "aanroepgraaf": "node scripts/aanroepgraaf.js",
     "schermgedrag": "node scripts/schermgedrag.js",
+    "schermfunctie": "node scripts/schermfunctie.js",
+    "schermfunctie:controle": "node scripts/schermfunctie.js --controle",
     "contextproef": "node scripts/contextproef.js",
     "kernherkomst": "node scripts/kernherkomst.js",
     "faalproef": "node scripts/faalproef.js",

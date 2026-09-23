@@ -5098,24 +5098,6 @@
       "maturity": "L0"
     },
     {
-      "id": "vandaag",
-      "url": "/apps/vandaag.html",
-      "name": "Vandaag",
-      "world": "living",
-      "worlds": [
-        "living"
-      ],
-      "type": "calendar",
-      "icon": "calendar-days",
-      "sections": [
-        "Eerstvolgende afspraak",
-        "Aandacht nodig",
-        "Uw avond"
-      ],
-      "description": "Een rustig overzicht van uw tijd.",
-      "maturity": "L0"
-    },
-    {
       "id": "veilig",
       "url": "/apps/veilig.html",
       "name": "RTG Veilig",

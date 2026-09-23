@@ -1,125 +1,29 @@
 <!doctype html>
-<html lang="nl" data-rtg-thema="bordeaux">
+<html lang="nl">
 <head>
-<script src="/shared/id.js"></script>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Vandaag · RTG</title>
-<link rel="icon" href="/icons/pas-rtg.svg">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{--bg:var(--rtg-bg);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--line:var(--rtg-line);--goud:var(--gold-tekst,#C0A544)}
-  *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(90% 55% at 50% 105%,rgba(127,22,52,.14),transparent 64%),var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  main{width:min(840px,100%);margin:auto;padding:clamp(2rem,7vh,5.5rem) clamp(1.25rem,5vw,4rem) 7rem}
-  .ey{font-size:.64rem;letter-spacing:.26em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));margin-bottom:1.4rem}
-  .rahul{display:grid;grid-template-columns:72px minmax(0,1fr);gap:1.4rem;align-items:start}
-  .mond{width:72px;height:44px;background:none;border:1px solid color-mix(in srgb,var(--goud) 36%,transparent);border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--rtg-leesgoud,var(--goud))}
-  .mond::after{content:'◌';font:400 1.8rem Georgia;transform:scaleX(1.55)}
-  h1{font:400 clamp(2rem,4vw,3.8rem)/1.08 'Bodoni Moda',Georgia,serif;margin:0;max-width:15ch;text-wrap:balance}
-  .brief{font:400 clamp(1.08rem,1.8vw,1.4rem)/1.65 'Bodoni Moda',Georgia,serif;color:var(--muted);max-width:43ch;margin:1.25rem 0 0}
-  .keuzes{display:flex;gap:.55rem;flex-wrap:wrap;margin:2rem 0 0 96px}.keuzes button{border:1px solid var(--line);background:rgba(5,5,5,.22);color:var(--muted);border-radius:0;padding:.7rem 1rem;font:500 .78rem 'Inter';cursor:pointer}.keuzes button:hover{color:var(--txt);border-color:color-mix(in srgb,var(--goud) 58%,var(--line))}
-  .lijn{margin:clamp(3rem,8vh,6rem) 0 0 96px;border-top:1px solid var(--line);padding-top:1.5rem}.lijn h2{font:400 1.35rem 'Bodoni Moda',Georgia,serif;margin:0 0 1.2rem}.moment{display:grid;grid-template-columns:64px 1fr;gap:1rem;padding:.85rem 0;border-top:1px solid color-mix(in srgb,var(--line) 62%,transparent)}.tijd{color:var(--rtg-leesgoud,var(--goud));font-size:.75rem;font-variant-numeric:tabular-nums}.moment b{font:500 .9rem}.moment span{display:block;color:var(--soft);font-size:.78rem;margin-top:.2rem}.moment button{justify-self:start;margin-top:.55rem;border:0;background:none;color:var(--rtg-leesgoud,var(--goud));font:500 .72rem 'Inter';/* 14px hoog was onder de 24 van WCAG 2.5.8 */padding:5px 0;min-height:24px;cursor:pointer}
-  @media(max-width:600px){.rahul{grid-template-columns:1fr}.mond{width:58px;height:38px}.keuzes,.lijn{margin-left:0}}
-</style>
-<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
-<link href="/shared/rtg-anchor-experiences-2026.css" rel="stylesheet">
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vandaag</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<!-- Vandaag is opgegaan in RTG Life (SCHERMEIGENAAR.json: Dag -> life.html).
+
+     Dit scherm was een tweede dagproduct naast Life, en het slechtste van de
+     twee: de momenten van "vandaag" (10:30 reisvoorbereiding, 15:00 financieel
+     moment, 19:30 uw avond) stonden vast in de HTML, dus elk lid zag dezelfde
+     verzonnen dag. Life leest de dag uit /api/dag, en die leest sinds deze
+     ronde ook de agenda en de RTG-boekingen van vandaag.
+
+     Wat alleen hier stond en wel nuttig was -- de weg naar de agenda, de
+     bestellingen en de avond -- staat nu in Life. Dit pad blijft als
+     omleiding bestaan zolang er van buiten naar gelinkt kan zijn (een
+     bladwijzer, een geinstalleerd icoon); binnen het huis linkt niets er meer
+     naar. -->
+<meta http-equiv="refresh" content="0; url=/apps/life.html">
+<link rel="canonical" href="/apps/life.html">
+<script>location.replace('/apps/life.html' + location.search);</script>
 </head>
-<body class="rtg-stijl rtg-today-experience" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
-<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
-  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
-  <div class="os-switcher__links">
-    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
-    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
-    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
-    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
-  </div>
-  <span class="os-switcher__state">Kern verbonden</span>
-</div>
-<main class="today-shell" id="inhoud">
-  <header class="today-top">
-    <a class="today-brand" href="/apps/rtg.html"><b>RTG</b><span>LivingOS</span></a>
-    <span class="today-spacer"></span>
-    <a class="today-round" href="/apps/comm.html" aria-label="Open berichten">◇</a>
-    <button class="today-round" id="praat" type="button" aria-label="Vraag Rahul">◉</button>
-  </header>
-
-  <section class="today-hero" aria-labelledby="groet">
-    <img id="todayHero" src="/images/start/dagdelen/hero-ochtend.jpg" alt="Warm uitzicht vanuit huis">
-    <div>
-      <p class="today-ey">Mensen · plaatsen · momenten</p>
-      <h1 id="groet">Goedemorgen.</h1>
-      <p class="today-date" id="todayDatum"></p>
-      <p class="today-weather"><b aria-hidden="true">☼</b><span>Uw dag, rustig bij elkaar</span></p>
-      <p class="today-brief" id="brief">LivingOS brengt samen wat vandaag bij u hoort en laat de rest op de achtergrond doorlopen.</p>
-      <a class="today-primary" href="#vandaagOverzicht">Bekijk uw dag <span aria-hidden="true">→</span></a>
-    </div>
-  </section>
-
-  <div class="today-grid" id="vandaagOverzicht">
-    <section class="today-section" aria-labelledby="momentenTitel">
-      <div class="today-section-head"><h2 id="momentenTitel">Vandaag</h2><span id="todayRust">Alleen wat ertoe doet</span></div>
-      <div class="today-moments">
-        <article class="today-moment"><div class="tijd">10:30</div><div><b>Reisvoorbereiding</b><span>Planning en documenten staan klaar om te controleren.</span></div><button data-vraag="Open Reizen">Open →</button></article>
-        <article class="today-moment"><div class="tijd">15:00</div><div><b>Financieel moment</b><span>Bekijk alleen wat vandaag uw aandacht nodig heeft.</span></div><button data-vraag="Zet Geld ernaast">Bekijk →</button></article>
-        <article class="today-moment"><div class="tijd">19:30</div><div><b>Uw avond</b><span>Eten, vervoer en sfeer kunnen vanuit één voorstel worden geopend.</span></div><a class="today-secondary" href="/apps/leven.html">Open →</a></article>
-      </div>
-    </section>
-
-    <section class="today-section" aria-labelledby="aandachtTitel">
-      <div class="today-section-head"><h2 id="aandachtTitel">Wat vraagt uw aandacht?</h2><span>4 ingangen</span></div>
-      <div class="today-attention">
-        <a href="/apps/agenda.html"><i class="icoon" aria-hidden="true">□</i><span><b>Afspraken</b><span>Bevestigen, verplaatsen of samen plannen.</span></span><em>Agenda</em></a>
-        <a href="/apps/attenties.html"><i class="icoon" aria-hidden="true">♡</i><span><b>Uw mensen</b><span>Belangrijke momenten en attenties bij elkaar.</span></span><em>Bekijk</em></a>
-        <a href="/apps/mijnmall.html"><i class="icoon" aria-hidden="true">◇</i><span><b>Bestellingen</b><span>Volg wat onderweg is zonder winkels af te gaan.</span></span><em>Volg</em></a>
-        <a href="/apps/table.html"><i class="icoon" aria-hidden="true">○</i><span><b>Reservering vanavond</b><span>Tafel, gezelschap en voorkeuren in één dossier.</span></span><em>Details</em></a>
-      </div>
-      <p class="today-calm">De rest loopt vanzelf.</p>
-    </section>
-  </div>
-
-  <section class="today-evening" aria-labelledby="avondTitel">
-    <div>
-      <p class="today-ey">Vanavond</p>
-      <h2 id="avondTitel">Uw avond, al geregeld.</h2>
-      <div class="today-evening-list">
-        <a href="/apps/foodcourt.html"><i aria-hidden="true">◇</i><b>Diner of thuisbezorgd</b><span>Kies</span></a>
-        <a href="/apps/reizen.html"><i aria-hidden="true">◇</i><b>Vervoer op het juiste moment</b><span>Plan</span></a>
-        <a href="/apps/entourage.html"><i aria-hidden="true">◇</i><b>Wie er met u meegaat</b><span>Nodig uit</span></a>
-        <a href="/apps/muziek.html"><i aria-hidden="true">◇</i><b>Muziek die bij de sfeer past</b><span>Luister</span></a>
-      </div>
-      <a class="today-primary" href="/apps/leven.html">Open avond <span aria-hidden="true">→</span></a>
-      <a class="today-secondary" href="/apps/leven.html">Wijzig voorstel</a>
-    </div>
-  </section>
-
-  <nav class="today-nav" aria-label="LivingOS">
-    <a href="/apps/vandaag.html" aria-current="page"><b>☼</b>Vandaag</a>
-    <a href="/apps/wereld.html"><b>♧</b>Mensen</a>
-    <a class="maak" href="/apps/app.html"><b>＋</b><span class="vis-verborgen">Open de RTG-app</span></a>
-    <a href="/apps/thuis.html"><b>⌂</b>Thuis</a>
-    <a href="/apps/ik.html"><b>◎</b>Profiel</a>
-  </nav>
-</main>
-<script>
-  (function(){
-    var nu=new Date(),uur=nu.getHours(),g=document.getElementById('groet');
-    var maanden=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
-    var dagen=['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
-    g.textContent=(uur<12?'Goedemorgen.':uur<18?'Goedemiddag.':'Goedenavond.');
-    document.getElementById('todayDatum').textContent=dagen[nu.getDay()]+' '+nu.getDate()+' '+maanden[nu.getMonth()]+' '+nu.getFullYear();
-    document.getElementById('todayHero').src=uur<12?'/images/start/dagdelen/hero-ochtend.jpg':uur<18?'/images/start/dagdelen/hero-middag.jpg':'/images/start/dagdelen/hero-avond.jpg';
-    function ga(q){
-      if(parent.RTGCommand&&parent.RTGCommand.bestemming){var r=parent.RTGCommand.bestemming(q);document.getElementById('brief').textContent=r||'Zeg in de hulpbalk welke software u wilt openen.';return}
-      var paden={'Open Reizen':'/apps/reizen.html','Zet Geld ernaast':'/apps/geld-command.html','Open De Salon':'/apps/wereld.html'};
-      if(paden[q]) location.href=paden[q];
-    }
-    document.querySelectorAll('[data-vraag]').forEach(function(b){b.onclick=function(){ga(b.dataset.vraag)}});
-    document.getElementById('praat').onclick=function(){try{parent.document.querySelector('[data-open=ai]').click()}catch(e){location.href='/apps/app.html'}};
-  })();
-</script>
-<script src="/shared/basis.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
+<body style="background:#0C0C0B;color:#F4F1EC;font-family:Inter,system-ui,sans-serif;padding:2rem;">
+<p>Vandaag staat nu in RTG Life. <a href="/apps/life.html" style="color:#C9A24B;">Ga verder</a>.</p>
 </body>
 </html>

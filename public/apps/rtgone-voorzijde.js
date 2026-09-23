@@ -42,7 +42,8 @@
     } else if (knop.dataset.oneNieuw === 'besluit' && typeof w.decisionForm === 'function') w.decisionForm();
     else if (knop.dataset.oneNieuw === 'overdracht' && typeof w.openForm === 'function') w.openForm('handover');
     else if (knop.dataset.oneRoom) w.location.href = '/apps/decision-room.html?id=' + encodeURIComponent(knop.dataset.oneRoom) + '&huis=' + encodeURIComponent(huis);
-    else if (knop.dataset.oneBeslis && typeof w.act === 'function') w.act('goedkeuring/beslis', { id: knop.dataset.id, besluit: knop.dataset.oneBeslis }, knop.dataset.oneBeslis === 'afwijzen' ? 'Aanvraag afgewezen' : 'Uw besluit is vastgelegd');
+    /* Beslissen gebeurt in Decision Room (data-one-room hierboven); er stond hier
+       een tweede beslisweg die geen enkele knop meer aanriep. */
   });
   if (oudKop && !vind('[data-one-terug]', oudKop)) {
     var terug = d.createElement('button'); terug.type = 'button'; terug.className = 'one-terug'; terug.dataset.oneTerug = '';

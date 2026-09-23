@@ -22,7 +22,7 @@
       agenda appstore-dossier attenties camera cellier cercle clips comm commerce entourage foodcourt \
       foundation/vrienden garderobe geld krant leven lifestyle living-os maison mall media \
       mijnmall muziek nieuws onderhoud pay podium pulse rendezvous rtg scherm sociaal spelen spelscherm sport table \
-      theater thuis uitgaan vandaag veilig verificatie vonk wereld wonen woningdossier \
+      theater thuis uitgaan veilig verificatie vonk wereld wonen woningdossier \
       app avond bestellen concierge doelen festival-gast festival galerij gast gedachten genootschap \
       gereedschap home ik isolatie juridisch juridisch/partnervoorwaarden juridisch/privacy \
       juridisch/voorwaarden klankwerk labpas life medicijnen meet memo mijn-gegevens mijn-isolatie \
@@ -77,7 +77,7 @@
 
   var REDIRECTS = routes('\
     balans bank berichten codewoord geld-command labfonds logboek mecenaat metier nalatenschap rtgcode thuisrust \
-    thuiswacht vitaal wallet wbw');
+    thuiswacht vandaag vitaal wallet wbw');
   var ROUTES = Object.create(null);
   Object.keys(MANIFEST).forEach(function (wereld) {
     MANIFEST[wereld].forEach(function (pad) { ROUTES[pad] = wereld; });

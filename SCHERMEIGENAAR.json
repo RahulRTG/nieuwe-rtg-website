@@ -1,0 +1,2633 @@
+{
+  "soort": "schermeigenaar",
+  "uitleg": "Per zichtbare functie van RTG precies een eigenaar. Andere schermen mogen een capability tonen of openen, maar bouwen haar niet opnieuw. De classificatie per scherm is een voorstel van een leesronde over alle 320 schermen; de eigenaar en elk oordeel zijn besluiten uit de consolidatieronde van 23 september 2026. De feiten eronder staan in SCHERMFUNCTIE.json; test/schermeigenaar.test.js houdt dit register tegen een verse meting.",
+  "klassen": {
+    "exact-dubbel": "dezelfde inhoud: verwijderen of samenvoegen",
+    "functioneel-dubbel": "hetzelfde gebruikersdoel, dezelfde data en handelingen: een canoniek scherm, de rest migreert",
+    "gedeeltelijk": "een deel overlapt: dat deel gaat naar een eigenaar, het andere scherm houdt alleen zijn eigen verantwoordelijkheid",
+    "zelfde-component": "andere context mag blijven, maar gedeelde UI of logica wordt een component",
+    "alias": "geen productscherm, alleen een doorverwijzing zolang die aantoonbaar nodig is",
+    "geen-dubbel": "na onderzoek geen overlap in doel, data en workflow; de reden staat erbij"
+  },
+  "standen": {
+    "uitgevoerd": "in deze ronde opgelost",
+    "blijft": "mag zo bestaan; de reden staat erbij",
+    "open": "nog niet opgelost; het vervolg staat erbij, en een besluit van de eigenaar waar dat nodig is"
+  },
+  "rollen": {
+    "eigenaar": "dit scherm is de canonieke plek van zijn capability",
+    "schil": "een tweede ingang op DEZELFDE implementatie (gedeelde modules of routes), in een andere wereld of context",
+    "tweede-ingang": "een tweede eigen implementatie van een capability met een andere eigenaar; staat altijd in een open oordeel",
+    "alias": "een doorverwijzing"
+  },
+  "capabilities": {
+    "agenda.afspraken": "apps/agenda.html",
+    "kern.app": "apps/app.html",
+    "appstore.cel": "apps/appcel.html",
+    "appstore.dossier": "apps/appstore-dossier.html",
+    "appstore.keuring": "apps/appstore-kantoor.html",
+    "appstore.uitgeven": "apps/appstore-uitgever.html",
+    "ontwerp.opdracht": "apps/architect-pda.html",
+    "reizen.aankomst": "apps/arrival.html",
+    "relaties.attenties": "apps/attenties.html",
+    "leven.avond": "apps/avond.html",
+    "kantoor.appstore-keuring": "apps/backoffice.html",
+    "overheid.belastingdienst": "apps/belastingkantoor.html",
+    "docs.bestanden": "apps/bestanden.html",
+    "horeca.bestellen": "apps/bestellen.html",
+    "identiteit.bewijzen": "apps/bewijsmap.html",
+    "werk.boardroom": "apps/boardroom.html",
+    "media.boeken": "apps/boeken.html",
+    "web.browser": "apps/browser.html",
+    "media.camera": "apps/camera.html",
+    "leven.cellier": "apps/cellier.html",
+    "leven.cercle": "apps/cercle.html",
+    "vervoer.chauffeur": "apps/chauffeur.html",
+    "media.clips": "apps/clips.html",
+    "comm.berichten": "apps/comm.html",
+    "kantoor.command": "apps/command.html",
+    "winkel.commerce": "apps/commerce.html",
+    "werk.concern": "apps/concern.html",
+    "kantoor.concierge": "apps/concierge.html",
+    "ontdekken.connect": "apps/connect.html",
+    "werk.besluit": "apps/decision-room.html",
+    "defensie.gereedheid": "apps/defensie.html",
+    "vervoer.dispatch": "apps/dispatch.html",
+    "leven.doelen": "apps/doelen.html",
+    "werk.zaakoverzicht": "apps/doos.html",
+    "leven.entourage": "apps/entourage.html",
+    "festival.gast": "apps/festival-gast.html",
+    "festival.crewdashboard": "apps/festival.html",
+    "navigatie.verkeersmeldingen": "apps/flits.html",
+    "horeca.reserveren": "apps/foodcourt.html",
+    "rtf.gezinsagenda": "apps/foundation/agenda.html",
+    "rtf.arena": "apps/foundation/arena.html",
+    "rtf.fotoboekje": "apps/foundation/babyboek.html",
+    "gezin.beheer": "apps/foundation/beheer.html",
+    "rtf.beroepenbieb": "apps/foundation/beroepen.html",
+    "rtf.appbieb": "apps/foundation/bieb.html",
+    "rtf.bord": "apps/foundation/bord.html",
+    "rtf.maandbegroting": "apps/foundation/budget.html",
+    "gemeenschap.buurtruil": "apps/foundation/buurtruil.html",
+    "leren.overzicht": "apps/foundation/campus.html",
+    "rtf.club": "apps/foundation/club.html",
+    "kantoor.clubbeheer": "apps/foundation/clubswerk.html",
+    "rtf.contact": "apps/foundation/contact.html",
+    "werk.cvmaker": "apps/foundation/cv.html",
+    "rtf.dromen": "apps/foundation/dromen.html",
+    "rtf.geld-later": "apps/foundation/geld-later.html",
+    "geld.sparen": "apps/foundation/geld.html",
+    "rtf.geloofbieb": "apps/foundation/geloofbieb.html",
+    "geven.doneren": "apps/foundation/geven.html",
+    "rtf.gevoel": "apps/foundation/gevoel.html",
+    "rtf.gezondheid-welzijn": "apps/foundation/gezondheid-welzijn.html",
+    "rtf.gezondheidsmaatje": "apps/foundation/gezondheid.html",
+    "rtf.hulpwijzer": "apps/foundation/hulpwijzer.html",
+    "rtf.start": "apps/foundation/index.html",
+    "kantoor.rtfbeheer": "apps/foundation/kantoor.html",
+    "rtf.gezinskeuken": "apps/foundation/keuken.html",
+    "rtf.klas": "apps/foundation/klas.html",
+    "rtf.kleuren": "apps/foundation/kleuren.html",
+    "gemeenschap.klimaatfonds": "apps/foundation/klimaatfonds.html",
+    "rtf.klusjes": "apps/foundation/klusjes.html",
+    "rtf.kompas": "apps/foundation/kompas.html",
+    "leren.school": "apps/rtgschool.html",
+    "rtf.leren-groei": "apps/foundation/leren.html",
+    "rtf.liedjes": "apps/foundation/liedjes.html",
+    "media.magazine": "apps/foundation/magazine.html",
+    "rtf.bericht": "apps/foundation/mail.html",
+    "winkel.tweedehands": "apps/foundation/markt.html",
+    "rtf.mediawijs": "apps/foundation/mediawijs.html",
+    "rtf.meedoen": "apps/foundation/meedoen-ontdekken.html",
+    "rtf.memorie": "apps/foundation/memorie.html",
+    "rtf.wie-mag-zien": "apps/foundation/mijnbanden.html",
+    "leven.ochtendritme": "apps/foundation/ochtend.html",
+    "rtf.onveilig": "apps/foundation/onveilig.html",
+    "gezin.oppasinfo": "apps/foundation/oppasinfo.html",
+    "gezin.opvoedhulp": "apps/foundation/opvoeden.html",
+    "kantoor.governance": "apps/foundation/os-bestuur.html",
+    "hulp.aanvraagstatus": "apps/foundation/os-deelnemer.html",
+    "gift.overzicht": "apps/foundation/os-donateur.html",
+    "portaal.toegang": "apps/foundation/os-portaal.html",
+    "wereld.foundation": "apps/foundation/os-publiek.html",
+    "werk.veldwerk": "apps/foundation/os-veld.html",
+    "werk.vrijwilligerswerk": "apps/foundation/os-vrijwilliger.html",
+    "kantoor.hub": "apps/foundation/os.html",
+    "rtf.overhoren": "apps/foundation/overhoren.html",
+    "bestuur.stadsraad": "apps/foundation/partner.html",
+    "hulp.pesten": "apps/foundation/pesten.html",
+    "leren.presenteren": "apps/foundation/presenteren.html",
+    "rtf.privacy-uitleg": "apps/foundation/privacy.html",
+    "leren.project": "apps/foundation/projecten.html",
+    "info.rechten": "apps/foundation/rechten.html",
+    "account.registratie": "apps/foundation/registreren.html",
+    "reizen.aanvraag": "apps/foundation/reis.html",
+    "gezondheid.rust": "apps/foundation/rust.html",
+    "rtf.samen-thuis": "apps/foundation/samen-thuis.html",
+    "rtf.school": "apps/foundation/school.html",
+    "rtf.schoolbieb": "apps/foundation/schoolbieb.html",
+    "leren.livesles": "apps/foundation/schrift.html",
+    "leren.schrijven": "apps/foundation/schrijven.html",
+    "rtf.societeit": "apps/foundation/societeit.html",
+    "spel.speelhal": "apps/foundation/speelhal.html",
+    "spel.speeltuin": "apps/foundation/speeltuin.html",
+    "gezondheid.steun": "apps/foundation/steun.html",
+    "leren.volwassenenonderwijs": "apps/foundation/studie.html",
+    "spel.tellen": "apps/foundation/tellen.html",
+    "leren.toetsplanner": "apps/foundation/toetsen.html",
+    "rtf.veilig-vertrouwd": "apps/foundation/veilig-vertrouwd.html",
+    "rtf.veilig-thuis": "apps/foundation/veilig.html",
+    "media.verhalen": "apps/foundation/verhaaltje.html",
+    "gezin.verjaardagen": "apps/foundation/verjaardagen.html",
+    "rtf.contacten": "apps/foundation/vrienden.html",
+    "hulp.wegwijzer": "apps/foundation/wegwijzer.html",
+    "werk.vacatures": "apps/foundation/werk.html",
+    "rtf.winkel": "apps/foundation/winkel.html",
+    "geld.zakgeld": "apps/foundation/zakgeld.html",
+    "rtf.hulp-zorg": "apps/foundation/zorg.html",
+    "media.galerij": "apps/galerij.html",
+    "leven.garderobe": "apps/garderobe.html",
+    "horeca.tafelgast": "apps/gast.html",
+    "leven.gedachtenboek": "apps/gedachten.html",
+    "geld.overzicht": "apps/geld.html",
+    "overheid.gemeente-burger": "apps/gemeente.html",
+    "overheid.loketbeheer": "apps/gemeenteloket.html",
+    "overheid.buitendienst": "apps/gemeentepda.html",
+    "sociaal.genootschap": "apps/genootschap.html",
+    "kern.gereedschap": "apps/gereedschap.html",
+    "vervoer.chauffeuradvies": "apps/ghost.html",
+    "handel.inkoop": "apps/handel.html",
+    "reizen.vliegtuig": "apps/hangar.html",
+    "werk.werkopdrachten": "apps/hardware-pda.html",
+    "woning.apparaten": "apps/home.html",
+    "horeca.bar": "apps/horeca-bar.html",
+    "horeca.beheer": "apps/horeca-beheer.html",
+    "horeca.bezorging": "apps/horeca-bezorg.html",
+    "horeca.club": "apps/horeca-club.html",
+    "horeca.events": "apps/horeca-events.html",
+    "horeca.keuken": "apps/horeca-expeditie.html",
+    "horeca.haccp": "apps/horeca-haccp.html",
+    "horeca.hotel": "apps/horeca-hotel.html",
+    "horeca.pda": "apps/horeca-pda.html",
+    "horeca.vloer": "apps/horeca-vloer.html",
+    "horeca.dashboard": "apps/horeca.html",
+    "verblijf.hotel": "apps/hotels.html",
+    "instellingen.profiel": "apps/ik.html",
+    "techniek.isolatie": "apps/isolatie.html",
+    "site.juridisch": "apps/juridisch.html",
+    "site.juridisch.partnervoorwaarden": "apps/juridisch/partnervoorwaarden.html",
+    "site.juridisch.privacy": "apps/juridisch/privacy.html",
+    "site.juridisch.voorwaarden": "apps/juridisch/voorwaarden.html",
+    "wereld.work": "apps/kantoor.html",
+    "kantoor.kantoren": "apps/kantoren.html",
+    "handel.kassa": "apps/kassa.html",
+    "kantoor.uitgavenaam": "apps/klankwerk-kantoor.html",
+    "media.muziek-maken": "apps/klankwerk.html",
+    "kosten.beheer": "apps/kosten.html",
+    "media.krant": "apps/krant.html",
+    "kantoor.onderzoek": "apps/lab.html",
+    "onderzoek.deelname": "apps/labpas.html",
+    "leren.lesmaker": "apps/lesmaker.html",
+    "leven.werkblad": "apps/leven.html",
+    "handel.aanvragen": "apps/leverancier-aanvragen.html",
+    "handel.verkoopwegen": "apps/leverancier-commerce.html",
+    "zaak.rtmail": "apps/leverancier-rtmail.html",
+    "service.hulp": "apps/leverancier-service.html",
+    "zaak.beheer": "apps/leverancier.html",
+    "dag.overzicht": "apps/life.html",
+    "concierge.privekantoor": "apps/lifestyle.html",
+    "leven.vooruitzicht": "apps/living-os.html",
+    "onderzoek.lab": "apps/livinglab.html",
+    "loon.strook": "apps/loonstrook.html",
+    "loopbaan.ledger": "apps/loopbaan.html",
+    "loopbaan.bewijs": "apps/loopbaanbewijs.html",
+    "luchthaven.operatie": "apps/luchthaven.html",
+    "kantoor.controleregister": "apps/magnaat-kantoor.html",
+    "handel.digitaletweeling": "apps/magnaat-partnerstudio.html",
+    "spel.magnaat": "apps/magnaat.html",
+    "woning.huishouden": "apps/maison.html",
+    "winkel.mall": "apps/mall.html",
+    "luchthaven.grensbewaking": "apps/marechaussee.html",
+    "media.centrum": "apps/media.html",
+    "gezondheid.medicatie": "apps/medicijnen.html",
+    "comm.videobellen": "apps/meet.html",
+    "zorg.meldkamer": "apps/meldkamer.html",
+    "docs.spraakmemo": "apps/memo.html",
+    "kantoor.merken": "apps/merken.html",
+    "privacy.gegevens": "apps/mijn-gegevens.html",
+    "account.bescherming": "apps/mijn-isolatie.html",
+    "privacy.voorkeuren": "apps/mijn-neigingen.html",
+    "instellingen.postvoorkeuren": "apps/mijn-post.html",
+    "privacy.toegang": "apps/mijn-relaties.html",
+    "account.sessies": "apps/mijn-sessies.html",
+    "winkel.bestellingen": "apps/mijnmall.html",
+    "reizen.haalbaarheid": "apps/move.html",
+    "media.luisteren": "apps/muziek.html",
+    "navigatie.route": "apps/navigatie.html",
+    "nieuws.lezen": "apps/nieuws.html",
+    "docs.notities": "apps/notities.html",
+    "docs.office": "apps/office.html",
+    "woning.onderhoud": "apps/onderhoud.html",
+    "werk.onderneming": "apps/onderneming.html",
+    "zaak.visie-inspectie": "apps/oog.html",
+    "vervoer.rit": "apps/ov.html",
+    "zaak.ovregie": "apps/ovcontrol.html",
+    "zaak.ovdienst": "apps/ovdienst.html",
+    "overheid.rijk-burger": "apps/overheid.html",
+    "overheid.pda": "apps/overheidspda.html",
+    "zaak.ovroutes": "apps/ovroutes.html",
+    "werk.bedrijfspakket": "apps/pakketten.html",
+    "zaak.partnernetwerk": "apps/partner-network.html",
+    "zaak.partnerworden": "apps/partner-worden.html",
+    "account.passkeys": "apps/passkeys.html",
+    "betalen.rtgpay": "apps/pay.html",
+    "kantoor.payroll": "apps/payroll.html",
+    "zaak.teamroom": "apps/personeel.html",
+    "kantoor.platformregister": "apps/platformregister.html",
+    "media.podium": "apps/podium.html",
+    "werk.project": "apps/project-room.html",
+    "sociaal.pulse": "apps/pulse.html",
+    "overheid.rechtbank": "apps/rechtbank.html",
+    "zaak.redactie": "apps/redactie.html",
+    "kantoor.redactie": "apps/redactiekantoor.html",
+    "reizen.reisboek": "apps/reisboek.html",
+    "reizen.reisbureau": "apps/reisbureau.html",
+    "reizen.uitnodiging": "apps/reisuitnodiging.html",
+    "reizen.veilig": "apps/reizen-veilig.html",
+    "wereld.travel": "apps/reizen.html",
+    "sociaal.ontmoeten": "apps/rendezvous.html",
+    "sociaal.residentie": "apps/residentie.html",
+    "overheid.rijksloket": "apps/rijksloket.html",
+    "kantoor.routedekking": "apps/routedekking.html",
+    "kantoor.routedossier": "apps/routedossier.html",
+    "wereld.living": "apps/rtg.html",
+    "identiteit.rtgid-diensten": "apps/rtgid.html",
+    "kantoor.ai-besturing": "apps/rtgkantoor.html",
+    "werk.rtgone": "apps/rtgone.html",
+    "comm.mail": "apps/rtmail.html",
+    "sociaal.salon": "apps/salon.html",
+    "docs.scanner": "apps/scanner.html",
+    "horeca.tweedescherm": "apps/scherm.html",
+    "werk.schoolbeheer": "apps/schoolpartner.html",
+    "service.bellen": "apps/service-bel.html",
+    "kantoor.servicewachtrij": "apps/service.html",
+    "werk.website-maker": "apps/sitemaker.html",
+    "sociaal.prive-ruimtes": "apps/sociaal-prive.html",
+    "sociaal.leven": "apps/sociaal.html",
+    "spelen.bordspel": "apps/spelen.html",
+    "spelen.projectiescherm": "apps/spelscherm.html",
+    "sport.wedstrijd": "apps/sport.html",
+    "werk.sportclubbeheer": "apps/sportclub.html",
+    "reizen.stad": "apps/stad.html",
+    "kantoor.stadsdoos": "apps/stadsdoos.html",
+    "media.studio-pda": "apps/studio-pda.html",
+    "leven.tafel-gelegenheid": "apps/table.html",
+    "kantoor.techniekstatus": "apps/techniek.html",
+    "media.theater": "apps/theater.html",
+    "verblijf.logeren-bij-leden": "apps/thuis.html",
+    "sociaal.tijdlijn": "apps/tijdlijn.html",
+    "gezondheid.training": "apps/training.html",
+    "leven.uitgaan": "apps/uitgaan.html",
+    "veilig.noodcontacten": "apps/veilig.html",
+    "identiteit.verificatie": "apps/verificatie.html",
+    "taal.vertalen": "apps/vertaler.html",
+    "mandaat.beheer": "apps/vertegenwoordiging.html",
+    "reizen.vluchten": "apps/vluchten.html",
+    "gezondheid.voeding": "apps/voeding.html",
+    "vervoer.voertuig": "apps/voertuig.html",
+    "daten.vonk": "apps/vonk.html",
+    "site.bouwen": "apps/websitestudio.html",
+    "sociaal.alles": "apps/wereld.html",
+    "werk.organisatie": "apps/werk.html",
+    "werk.werkplek": "apps/werkplek.html",
+    "werk.werkruimte": "apps/werkruimte.html",
+    "woning.overzicht": "apps/wonen.html",
+    "woning.dossier": "apps/woningdossier.html",
+    "kosten.zaak": "apps/zaakkosten.html",
+    "zaak.pay": "apps/zaakpay.html",
+    "site.mijnwebsite": "apps/zaakweb.html",
+    "media.zaal": "apps/zaal.html",
+    "vervoer.zakelijkbeleid": "apps/zakelijk.html",
+    "site.404": "site/404.html",
+    "site.passen.business-lite": "site/passen/business-lite.html",
+    "site.passen.business-pass": "site/passen/business-pass.html",
+    "site.passen.community": "site/passen/community.html",
+    "site.passen.lifestyle-pass": "site/passen/lifestyle-pass.html",
+    "site.passen.rtg-pass": "site/passen/rtg-pass.html",
+    "site.werelden.foundationos": "site/werelden/foundationos.html",
+    "site.werelden.livingos": "site/werelden/livingos.html",
+    "site.werelden.travelos": "site/werelden/travelos.html",
+    "site.werelden.workos": "site/werelden/workos.html"
+  },
+  "oordelen": [
+    {
+      "schermen": [
+        "apps/foundation/leerpaspoort.html",
+        "apps/rtgschool.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": "apps/rtgschool.html",
+      "reden": "Exact dezelfde 17 routes, en dat is geen tweede implementatie: beide laden /apps/rtgschool/leer.js, examen.js en bijles.js. Een implementatie met twee schillen (RTF Campus en WorkOS School)."
+    },
+    {
+      "schermen": [
+        "apps/onderhoud.html",
+        "apps/wonen.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": "apps/wonen.html",
+      "reden": "Een woonproduct met drie tabbladen (Mijn thuis, Onderhoud, Dossier) op een gedeelde wonen.js; de gedeelde paden zijn de Bestanden-kluis, die eigenaar blijft van de opslag."
+    },
+    {
+      "schermen": [
+        "apps/onderhoud.html",
+        "apps/woningdossier.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": "apps/wonen.html",
+      "reden": "Zie wonen/onderhoud: tabbladen van hetzelfde woonproduct."
+    },
+    {
+      "schermen": [
+        "apps/wonen.html",
+        "apps/woningdossier.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": "apps/wonen.html",
+      "reden": "Zie wonen/onderhoud: tabbladen van hetzelfde woonproduct."
+    },
+    {
+      "schermen": [
+        "apps/gemeenteloket.html",
+        "apps/gemeentepda.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "open",
+      "eigenaar": null,
+      "reden": "Bureau en buitendienst van dezelfde gemeente op dezelfde meldingroutes; mag als twee contexten bestaan.",
+      "vervolg": "De meldinglogica staat twee keer inline. Trek hem uit tot een gedeelde component."
+    },
+    {
+      "schermen": [
+        "apps/avond.html",
+        "apps/leven.html"
+      ],
+      "klasse": "functioneel-dubbel",
+      "stand": "uitgevoerd",
+      "eigenaar": "apps/avond.html",
+      "reden": "leven.js had een eigen samensteller (\"Moment Contract\") op /api/avond/voorstel en /aanvragen, naast avond.html dat precies die workflow bezit. Het werkblad Leven opent nu avond.html in zijn paneel."
+    },
+    {
+      "schermen": [
+        "apps/foundation/gezondheid-welzijn.html",
+        "apps/foundation/zorg.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "blijft",
+      "eigenaar": "apps/foundation/zorg.html",
+      "reden": "Gezondheid & Welzijn is een wereldhub die de zorgstand alleen LEEST en doorlinkt; aanvragen en afspraken gebeuren in Hulp & Zorg."
+    },
+    {
+      "schermen": [
+        "apps/horeca-bar.html",
+        "apps/horeca-pda.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De gedeelde paden zijn de offline wachtrij (offline/handelingen, offline/sync) uit horeca/kern.js. Bar en PDA zijn verschillende werkstanden van een servicestroom (HORECA.md)."
+    },
+    {
+      "schermen": [
+        "apps/horeca-bar.html",
+        "apps/horeca.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "Zie horeca-bar/horeca-pda: gedeelde offline wachtrij."
+    },
+    {
+      "schermen": [
+        "apps/horeca-pda.html",
+        "apps/horeca.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "Zie horeca-bar/horeca-pda: gedeelde offline wachtrij."
+    },
+    {
+      "schermen": [
+        "apps/muziek.html",
+        "apps/rtg.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "blijft",
+      "eigenaar": "apps/muziek.html",
+      "reden": "Het LivingOS-huis toont \"samen luisteren\" en fluisteren alleen als ingang; beheren en luisteren gebeurt in RTG Sound."
+    },
+    {
+      "schermen": [
+        "apps/reizen.html",
+        "apps/rit.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "blijft",
+      "eigenaar": "apps/ov.html",
+      "reden": "Het TravelOS-huis leest lopende ritten alleen; aanvragen hoort bij vervoer (zie ov/rit)."
+    },
+    {
+      "schermen": [
+        "apps/foundation/bord.html",
+        "apps/foundation/schrift.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "Twee kanten van dezelfde les: de docent zet op het bord, de leerling werkt in het schrift."
+    },
+    {
+      "schermen": [
+        "apps/gemeentepda.html",
+        "apps/rijksloket.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De gedeelde paden zijn de generieke bevestig- en roosterroute van de zaakschil; gemeente en rijk zijn andere instanties met eigen zaken."
+    },
+    {
+      "schermen": [
+        "apps/foundation/onveilig.html",
+        "apps/foundation/wegwijzer.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De neutrale titel \"Wegwijzer\" van onveilig.html is een veiligheidskeuze: in de tabbalk mag niet te lezen staan dat iemand hulp zoekt bij geweld. De botsing is de camouflage."
+    },
+    {
+      "schermen": [
+        "apps/vandaag.html",
+        "apps/life.html"
+      ],
+      "klasse": "functioneel-dubbel",
+      "stand": "uitgevoerd",
+      "eigenaar": "apps/life.html",
+      "reden": "Twee dagproducten. vandaag.html toonde vaste, verzonnen momenten (10:30, 15:00, 19:30) zonder bron; life.html leest /api/dag. De drie nuttige ingangen van Vandaag staan nu in Life, de dagcoach leest ook de agenda en RTG-boekingen van vandaag, en vandaag.html is een doorverwijzing."
+    },
+    {
+      "schermen": [
+        "apps/agenda.html",
+        "apps/life.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "uitgevoerd",
+      "eigenaar": "apps/agenda.html",
+      "reden": "De kop van agenda.html was \"Uw dag\". Dag is wat vandaag speelt (Life), Agenda is plannen en afspraken beheren; de kop heet nu \"Uw agenda\" en Dag leest de agenda alleen."
+    },
+    {
+      "schermen": [
+        "apps/foundation/agenda.html",
+        "apps/agenda.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "open",
+      "eigenaar": "apps/agenda.html",
+      "reden": "Twee agenda-implementaties: de gezinsagenda op de Foundation-gezinsdata en de persoonlijke agenda op kern/agenda.js. Andere opslag, dezelfde workflow.",
+      "vervolg": "Besluit nodig: kern/agenda.js krijgt een gezin-eigenaarsleutel naast lid: en sup:, en de gezinsagenda wordt een schil op die motor (met migratie van de bestaande gezinspunten)."
+    },
+    {
+      "schermen": [
+        "apps/rtgone.html",
+        "apps/decision-room.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "uitgevoerd",
+      "eigenaar": "apps/decision-room.html",
+      "reden": "RTG One had een eigen beslisweg (goedkeuring/beslis) en een eigen voorlegformulier naast Decision Room op dezelfde routes. RTG One toont besluiten nog en stuurt naar Decision Room; voorleggen opent daar de intake (?nieuw=1)."
+    },
+    {
+      "schermen": [
+        "apps/rtgone.html",
+        "apps/project-room.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "uitgevoerd",
+      "eigenaar": "apps/project-room.html",
+      "reden": "RTG One vinkte projecttaken af (project/taak) naast Project Room. De taken staan er nog als stand, bijwerken gebeurt in Project Room. Een project maken uit een RTMAIL-bericht blijft in RTG One: dat kan Project Room niet."
+    },
+    {
+      "schermen": [
+        "apps/kantoor.html",
+        "apps/rtgone.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "Allebei \"werkdag\", maar andere kern, data en workflow: kantoor.html is de werkdag van een lid over agenda, notities en documenten (kern/kantoorwereld.js, bezit niets), RTG One is het interne werk van RTG-personeel (beloften, intenties, goedkeuringen, officeAuth)."
+    },
+    {
+      "schermen": [
+        "apps/leverancier.html",
+        "apps/personeel.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De partner-app beheert de zaak (HR, PR, gebouw, rapportage); de Team Room is de werkdag van een medewerker. Andere handelingen op andere data."
+    },
+    {
+      "schermen": [
+        "apps/thuis.html",
+        "apps/wonen.html",
+        "apps/home.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "uitgevoerd",
+      "eigenaar": null,
+      "reden": "Drie verantwoordelijkheden: logeren bij andere leden (thuis), de eigen woning (wonen met onderhoud en dossier), en apparaten bedienen (home). De botsing zat in de naam: het menu noemde thuisverhuur \"Thuis\" naast \"Mijn thuis\". Het heet nu \"Logeren bij leden\", en Home Kit brengt je terug naar Mijn thuis.",
+      "vervolg": "Besluit nodig: hoort Logeren bij leden in TravelOS naast Verblijven? Een lid dat een logeeradres zoekt, denkt aan een reis (WERELDEN.md)."
+    },
+    {
+      "schermen": [
+        "apps/geld-command.html",
+        "apps/geld.html"
+      ],
+      "klasse": "alias",
+      "stand": "uitgevoerd",
+      "eigenaar": "apps/geld.html",
+      "reden": "De menu-ingang \"Geld\" wees naar de doorverwijzing geld-command.html. Het menu wijst nu naar geld.html; de alias blijft voor oude bladwijzers."
+    },
+    {
+      "schermen": [
+        "apps/toestemming.html",
+        "apps/mijn-relaties.html",
+        "apps/rtgid.html"
+      ],
+      "klasse": "functioneel-dubbel",
+      "stand": "open",
+      "eigenaar": "apps/mijn-relaties.html",
+      "reden": "Drie antwoorden op \"wie heeft toegang tot mij, en trek het in\": toestemming.html (per soort) en mijn-relaties.html (per partij) op dezelfde /api/toestemming-data met allebei een intrekweg, en rtgid.html met een eigen inzagelog en intrekweg voor RTG iD-diensten.",
+      "vervolg": "Een scherm \"Wie heeft toegang tot mij\" met twee groeperingen (per partij, per soort) en de RTG iD-machtigingen als een van de partijen; toestemming.html en de toegangsblokken van rtgid.html worden een alias of een stand daarvan."
+    },
+    {
+      "schermen": [
+        "apps/rit.html",
+        "apps/ov.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "open",
+      "eigenaar": "apps/ov.html",
+      "reden": "RTG Aankomst & Chauffeur bouwt de ritaanvraag en het volgen opnieuw op /api/mob, naast RTG Vervoer.",
+      "vervolg": "rit.html wordt een aankomststand van ov.html (vlucht als vertrekpunt), of opent ov.html met die context; de eigen aanvraag- en volgcode vervalt."
+    },
+    {
+      "schermen": [
+        "apps/pulse.html",
+        "apps/salon.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "open",
+      "eigenaar": null,
+      "reden": "Twee zelfstandige feeds met dezelfde workflow (plaatsen, reageren, volgen, bewaren) op twee opslagen: Pulse (9+ microblog) en De Salon (besloten beeldnetwerk).",
+      "vervolg": "Besluit nodig: is een open 9+-microblog een ander product dan De Salon (dan blijven ze, met een gedeelde feedcomponent), of is Pulse een stand van De Salon?"
+    },
+    {
+      "schermen": [
+        "apps/wereld.html",
+        "apps/sociaal.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "open",
+      "eigenaar": null,
+      "reden": "Twee overzichten van het sociale leven in hetzelfde menu: \"Alles bij elkaar\" (wereld.html, een tijdlijn over Salon, Pulse en Zakelijk) en \"Sociaal\" (sociaal.html, kring en momenten volgens LIFE.md).",
+      "vervolg": "Besluit nodig: een van beide wordt het ene sociale overzicht; de andere een stand ervan."
+    },
+    {
+      "schermen": [
+        "apps/commerce.html",
+        "apps/mall.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "open",
+      "eigenaar": "apps/mall.html",
+      "reden": "Twee winkelingangen voor een lid: RTG Mall en RTG Commerce, elk met een eigen mand of aanvraagweg.",
+      "vervolg": "Besluit nodig: Commerce is volgens COMMERCE.md een laag en geen etalage. Voor een lid hoort er een winkel te zijn; commerce.html wordt dan de verkoperskant of een stand van de Mall."
+    },
+    {
+      "schermen": [
+        "apps/foundation/bieb.html",
+        "apps/foundation/geloofbieb.html",
+        "apps/foundation/schoolbieb.html",
+        "apps/foundation/beroepen.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "open",
+      "eigenaar": null,
+      "reden": "Vier bibliotheken met hetzelfde patroon (catalogus, installeren, verwijderen) op eigen catalogi; als contexten terecht apart.",
+      "vervolg": "Het patroon staat vier keer inline. Trek het uit tot een gedeelde bibliotheekcomponent."
+    },
+    {
+      "schermen": [
+        "apps/foundation/gevoel.html",
+        "apps/foundation/kompas.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "open",
+      "eigenaar": null,
+      "reden": "Twee welzijnsgesprekken voor kinderen in een ander leeftijdsregister.",
+      "vervolg": "Nagaan of dit een component met een leeftijdsregister kan zijn; de inline-code staat nu twee keer."
+    },
+    {
+      "schermen": [
+        "apps/rtmail.html",
+        "apps/leverancier-rtmail.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "open",
+      "eigenaar": "apps/rtmail.html",
+      "reden": "RTMAIL voor een lid en voor een zaak: andere sessie, dezelfde mailervaring.",
+      "vervolg": "De zaakkant heeft een eigen inline-implementatie; laat die de rtmail-modules gebruiken."
+    },
+    {
+      "schermen": [
+        "apps/foundation/speelhal.html",
+        "apps/foundation/speeltuin.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "Andere spellen voor een andere leeftijd, lokaal in de browser; geen gedeelde data."
+    },
+    {
+      "schermen": [
+        "apps/foundation/arena.html",
+        "apps/foundation/societeit.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "Verschillende spellen op dezelfde spelmotor (/api/rtf/spel); de motor is al gedeeld."
+    },
+    {
+      "schermen": [
+        "apps/redactie.html",
+        "apps/redactie-pda.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": "apps/redactie.html",
+      "reden": "Redactiebureau en verslaggever op locatie op dezelfde redactieroutes; de PDA is de veldstand."
+    },
+    {
+      "schermen": [
+        "apps/labpas.html",
+        "apps/livinglab.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De labpas is een deelnemer zonder account, het Living Lab is de werkplaats van onderzoek, ethiek en toezicht."
+    },
+    {
+      "schermen": [
+        "apps/foundation/veilig-vertrouwd.html",
+        "apps/foundation/veilig.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "blijft",
+      "eigenaar": "apps/foundation/veilig.html",
+      "reden": "De hub zet met een tik een status via de route van Veilig thuis en leest de kring; locatie delen en stoppen gebeurt in Veilig thuis."
+    },
+    {
+      "schermen": [
+        "apps/memo.html",
+        "apps/bestanden.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": "apps/bestanden.html",
+      "reden": "Memo neemt spraakmemo's op en bewaart ze IN de Bestanden-kluis (map Memo's); Bestanden blijft eigenaar van de opslag."
+    },
+    {
+      "schermen": [
+        "apps/scanner.html",
+        "apps/bestanden.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": "apps/bestanden.html",
+      "reden": "De scanner levert een pdf aan Bestanden via /api/bestanden/upload."
+    },
+    {
+      "schermen": [
+        "apps/gemeente.html",
+        "apps/overheid.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De burger bij de gemeente en bij het rijk: andere instanties en zaken."
+    },
+    {
+      "schermen": [
+        "apps/meet.html",
+        "apps/service-bel.html"
+      ],
+      "klasse": "zelfde-component",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "Videobellen met iemand en bellen met RTG over een zaak; de meeleesbaan (shared/meelezen.js) is al gedeeld (SERVICE.md par. 13)."
+    }
+  ],
+  "schermen": {
+    "apps/agenda.html": {
+      "capability": "agenda.afspraken",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Mijn afspraken en agenda voor de dag/week/maand overzien en nieuwe afspraken plannen."
+    },
+    "apps/app.html": {
+      "capability": "kern.app",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Vanuit één centraal beginscherm bij alle RTG-functies komen (betalen, bezittingen, salon, bestellen, gezin, reizen, zorg) en het eigen account beheren."
+    },
+    "apps/appcel.html": {
+      "capability": "appstore.cel",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een app van een derde partij (App Store) veilig openen en per keer bepalen welke gegevens ermee gedeeld worden."
+    },
+    "apps/appstore-dossier.html": {
+      "capability": "appstore.dossier",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Inzien welke apps ik heb genomen, wat ik ze gegeven heb en dat weer intrekken."
+    },
+    "apps/appstore-kantoor.html": {
+      "capability": "appstore.keuring",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Ingezonden apps keuren, toelaten of weigeren, en de afdracht/teruggaven van uitgevers afhandelen."
+    },
+    "apps/appstore-uitgever.html": {
+      "capability": "appstore.uitgeven",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als externe uitgever een eigen app indienen, bijwerken en het keuringsproces volgen."
+    },
+    "apps/architect-pda.html": {
+      "capability": "ontwerp.opdracht",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Een ontwerpconcept (architectuur) laten opstellen met AI-hulp en de uitvoering ervan volgen."
+    },
+    "apps/arrival.html": {
+      "capability": "reizen.aankomst",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "De eigen aankomst op een bestemming laten voorbereiden zonder het zelf te hoeven regelen, en de eigen locatie tijdens de reis delen."
+    },
+    "apps/attenties.html": {
+      "capability": "relaties.attenties",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "Persoonlijke relaties bijhouden en via De Rechterhand attenties/geschenken voor ze laten regelen."
+    },
+    "apps/avond.html": {
+      "capability": "leven.avond",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een avond uit plannen of laten voorstellen en aanvragen bij een zaak."
+    },
+    "apps/backoffice.html": {
+      "capability": "kantoor.appstore-keuring",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als medewerker de dagbriefing en operationele gegevens van de zaak bekijken, exporteren en tafels/taken indelen."
+    },
+    "apps/balans.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#balans"
+    },
+    "apps/bank.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#bank"
+    },
+    "apps/belastingkantoor.html": {
+      "capability": "overheid.belastingdienst",
+      "rol": "eigenaar",
+      "doelgroep": "overheid-medewerker",
+      "doel": "Als belastinginspecteur aanslagen, btw-zaken, naheffingen, bezwaren en kwijtschelding van ondernemers behandelen."
+    },
+    "apps/berichten.html": {
+      "rol": "alias",
+      "naar": "/apps/comm.html"
+    },
+    "apps/bestanden.html": {
+      "capability": "docs.bestanden",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Eigen bestanden en mappen bewaren, delen, downloaden en beheren."
+    },
+    "apps/bestellen.html": {
+      "capability": "horeca.bestellen",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Eten bestellen (bezorgen of afhalen) bij een zaak en de eigen bestellingen volgen."
+    },
+    "apps/bewijsmap.html": {
+      "capability": "identiteit.bewijzen",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Eigen identiteitsbewijzen/documenten inzien die RTG voor mij bewaart."
+    },
+    "apps/boardroom.html": {
+      "capability": "werk.boardroom",
+      "rol": "eigenaar",
+      "doelgroep": "business-lid",
+      "doel": "De eigen boardroom van het bedrijf beheren: leden/zetels toekennen en betalingsstatus volgen."
+    },
+    "apps/boeken.html": {
+      "capability": "media.boeken",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Boeken lezen uit de eigen boekenplank en leesvoortgang bijhouden."
+    },
+    "apps/browser.html": {
+      "capability": "web.browser",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Binnen de RTG-schil naar het web surfen, met eigen startpagina, geschiedenis en bladwijzers."
+    },
+    "apps/camera.html": {
+      "capability": "media.camera",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Foto's maken (met AI-herkenning/'fluister') en bewaren."
+    },
+    "apps/cellier.html": {
+      "capability": "leven.cellier",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "De eigen wijnkelder bijhouden en via De Rechterhand schenkadvies of een fles laten regelen."
+    },
+    "apps/cercle.html": {
+      "capability": "leven.cercle",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "Lidmaatschappen van exclusieve clubs beheren en gastenpassen regelen via De Rechterhand."
+    },
+    "apps/chauffeur.html": {
+      "capability": "vervoer.chauffeur",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als chauffeur beschikbaar staan, ritaanvragen aannemen en de rit navigeren."
+    },
+    "apps/clips.html": {
+      "capability": "media.clips",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Korte video's (clips) bekijken en zelf maken, met ondertiteling."
+    },
+    "apps/codewoord.html": {
+      "rol": "alias",
+      "naar": "/apps/veilig.html#codewoord"
+    },
+    "apps/comm.html": {
+      "capability": "comm.berichten",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Berichten sturen en ontvangen van de mensen dichtbij, met AI-samenvatting van gesprekken."
+    },
+    "apps/command.html": {
+      "capability": "kantoor.command",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als medewerker centrale toegang krijgen tot kantoorfuncties en opdrachten in één commandoscherm uitvoeren."
+    },
+    "apps/commerce.html": {
+      "capability": "winkel.commerce",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Producten en diensten uit de RTG-marktplaats bekijken, in de mand doen en aanvragen/afrekenen."
+    },
+    "apps/concern.html": {
+      "capability": "werk.concern",
+      "rol": "eigenaar",
+      "doelgroep": "business-lid",
+      "doel": "Het eigen concern inrichten: entiteiten, registraties, bestuurders, belangen en vestigingen vastleggen."
+    },
+    "apps/concierge.html": {
+      "capability": "kantoor.concierge",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als medewerker van De Rechterhand openstaande conciërgeverzoeken van leden bekijken en afhandelen."
+    },
+    "apps/connect.html": {
+      "capability": "ontdekken.connect",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Iets ontdekken, leren, maken of doorgeven binnen het ontdeknetwerk van de RTFoundation."
+    },
+    "apps/decision-room.html": {
+      "capability": "werk.besluit",
+      "rol": "eigenaar",
+      "doelgroep": "business-lid",
+      "doel": "Besluiten voor het bedrijf agenderen, afwegen en met de reden vastleggen."
+    },
+    "apps/defensie.html": {
+      "capability": "defensie.gereedheid",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-organisatie",
+      "doel": "Als organisatie de eigen operationele gereedheid beheren: eenheden, materieel, bevoorrading, oefeningen, veldhospitaal en verplaatsingen."
+    },
+    "apps/dispatch.html": {
+      "capability": "vervoer.dispatch",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als dispatchcentrum ritopdrachten aanmaken (ook telefonische boekingen) en chauffeurs coördineren."
+    },
+    "apps/doelen.html": {
+      "capability": "leven.doelen",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Persoonlijke doelen stellen, voortgang meten en bijstellen."
+    },
+    "apps/doos.html": {
+      "capability": "werk.zaakoverzicht",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als zaak in één oogopslag de eigen operationele status/rapportage zien."
+    },
+    "apps/entourage.html": {
+      "capability": "leven.entourage",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "De eigen persoonlijke entourage (mensen/dienstverleners om je heen) en hun documenten bijhouden via De Rechterhand."
+    },
+    "apps/festival-gast.html": {
+      "capability": "festival.gast",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Het eigen festivalweekend plannen: programma bekijken en samen met vrienden een groep vormen."
+    },
+    "apps/festival.html": {
+      "capability": "festival.crewdashboard",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als festivalcrew de dag beheren: diensten, podiumbeeld, kassa, gereedmeldingen en riderpunten bijhouden."
+    },
+    "apps/flits.html": {
+      "capability": "navigatie.verkeersmeldingen",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Tijdens het rijden live verkeersgevaren zien en melden (snelheidscontrole, obstakel) zoals bij een community-verkeersapp."
+    },
+    "apps/foodcourt.html": {
+      "capability": "horeca.reserveren",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een restaurant vinden en een tafel reserveren op een gekozen datum/tijd."
+    },
+    "apps/foundation/agenda.html": {
+      "capability": "rtf.gezinsagenda",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Schoolafspraken en gezinsafspraken in een gedeelde agenda bekijken en beheren."
+    },
+    "apps/foundation/arena.html": {
+      "capability": "rtf.arena",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Snelle reken-, reactie- en geheugenduels spelen tegen vrienden/klasgenoten of solo oefenen."
+    },
+    "apps/foundation/babyboek.html": {
+      "capability": "rtf.fotoboekje",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Dagelijkse foto's en momentjes van de baby bijhouden in een privé fotoboekje."
+    },
+    "apps/foundation/beheer.html": {
+      "capability": "gezin.beheer",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Als beheerder van het gezin profielen aanmaken/beheren, berichten sturen en gezinsgegevens beheren."
+    },
+    "apps/foundation/beroepen.html": {
+      "capability": "rtf.beroepenbieb",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een gratis leer-app over een specifiek beroep vinden en installeren."
+    },
+    "apps/foundation/bieb.html": {
+      "capability": "rtf.appbieb",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Gratis apps van de RTFoundation zoeken en installeren om te leren, spelen en ontdekken."
+    },
+    "apps/foundation/bord.html": {
+      "capability": "rtf.bord",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als docent een digitaal schoolbord tekenen, opgaven klaarzetten en leerlingschriften bekijken tijdens een live les."
+    },
+    "apps/foundation/budget.html": {
+      "capability": "rtf.maandbegroting",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een eigen maandbegroting maken om te zien wat je overhoudt en waarvoor je kunt sparen."
+    },
+    "apps/foundation/buurtruil.html": {
+      "capability": "gemeenschap.buurtruil",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Spullen binnen de eigen RTF-stad weggeven of zoeken, zonder geld."
+    },
+    "apps/foundation/campus.html": {
+      "capability": "leren.overzicht",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Vanuit één overzicht naar school, leerpaspoort, projecten, spellen en andere Foundation-onderdelen navigeren."
+    },
+    "apps/foundation/club.html": {
+      "capability": "rtf.club",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als sportclub met een clubcode het eigen samenwerkingsdossier met het RTF-team inzien en berichten."
+    },
+    "apps/foundation/clubswerk.html": {
+      "capability": "kantoor.clubbeheer",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als RTF-kantoor clubs aanmelden en per club programma's, afspraken en team beheren."
+    },
+    "apps/foundation/contact.html": {
+      "capability": "rtf.contact",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Chatten of bellen met een ander gezinslid."
+    },
+    "apps/foundation/cv.html": {
+      "capability": "werk.cvmaker",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een eigen cv opstellen en printen/opslaan als voorbereiding op solliciteren."
+    },
+    "apps/foundation/dromen.html": {
+      "capability": "rtf.dromen",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Dromen en doelen van gezinsleden delen, aanmoedigen en als behaald markeren."
+    },
+    "apps/foundation/geld-later.html": {
+      "capability": "rtf.geld-later",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Overzicht van eigen geld en toekomstroute (leren/studie/werk) bekijken en snel naar budget, spaardoel, cv of rechten gaan."
+    },
+    "apps/foundation/geld.html": {
+      "capability": "geld.sparen",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Samen als gezin sparen voor een doel en bespaartips krijgen of vragen stellen aan een geldcoach."
+    },
+    "apps/foundation/geloofbieb.html": {
+      "capability": "rtf.geloofbieb",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een leesbare tekst over een geloof of levensbeschouwing vinden, lezen en in de eigen kast zetten."
+    },
+    "apps/foundation/geven.html": {
+      "capability": "geven.doneren",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een gift (eenmalig, geoormerkt of periodiek) doen aan de RTFoundation."
+    },
+    "apps/foundation/gevoel.html": {
+      "capability": "rtf.gevoel",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Aangeven hoe je je voelt, ademoefening doen en desgewenst het gevoel privé bewaren of erover chatten."
+    },
+    "apps/foundation/gezondheid-welzijn.html": {
+      "capability": "rtf.gezondheid-welzijn",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Overzicht van de dag, ritme en zorgcontacten bekijken en snel naar gezondheidsboekje, zorg of hulp gaan."
+    },
+    "apps/foundation/gezondheid.html": {
+      "capability": "rtf.gezondheidsmaatje",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Medicijnen, afspraken en groeicurve van gezinsleden bijhouden."
+    },
+    "apps/foundation/hulpwijzer.html": {
+      "capability": "rtf.hulpwijzer",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Gratis hulpinstanties vinden (eten, kleding, geld, kinderen, gezondheid, werk) of via een AI-chat de juiste plek laten aanwijzen."
+    },
+    "apps/foundation/index.html": {
+      "capability": "rtf.start",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Inloggen/profiel kiezen en van daaruit het dagoverzicht, ontwikkeling, kring en alle Foundation-apps bereiken."
+    },
+    "apps/foundation/kantoor.html": {
+      "capability": "kantoor.rtfbeheer",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als RTF-medewerker het overzicht van kamers, kpi's, stadsraad en giftenbeleid van de stichting beheren."
+    },
+    "apps/foundation/keuken.html": {
+      "capability": "rtf.gezinskeuken",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Een weekmenu plannen en samen een boodschappenlijst bijhouden."
+    },
+    "apps/foundation/klas.html": {
+      "capability": "rtf.klas",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Als leerling met een klascode meedoen aan een live schoolquiz."
+    },
+    "apps/foundation/kleuren.html": {
+      "capability": "rtf.kleuren",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Kleuren en vormen oefenen door het juiste vak aan te tikken."
+    },
+    "apps/foundation/klimaatfonds.html": {
+      "capability": "gemeenschap.klimaatfonds",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Als bewoner een klimaatvraag voor de eigen stad indienen, erop stemmen en zien welk duurzaamheidsonderzoek en -project daaruit volgt."
+    },
+    "apps/foundation/klusjes.html": {
+      "capability": "rtf.klusjes",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Klusjes klaarzetten of afvinken en de sterren/weekgeld van kinderen bijhouden."
+    },
+    "apps/foundation/kompas.html": {
+      "capability": "rtf.kompas",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Als tiener praten met een AI-buddy over dingen die spelen (school, groepsdruk, thuis, verliefdheid) en hulplijnen vinden bij nood."
+    },
+    "apps/foundation/leerpaspoort.html": {
+      "capability": "leren.school",
+      "rol": "schil",
+      "doelgroep": "rtf-kind",
+      "doel": "De eigen leerlijn volgen: inschrijven op een fase, lessen/oefeningen doen, examentraining doen en bijles vragen."
+    },
+    "apps/foundation/leren.html": {
+      "capability": "rtf.leren-groei",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Dagelijks overzicht van leertaken bekijken, groei zien en hulp vragen of een live les starten/volgen."
+    },
+    "apps/foundation/liedjes.html": {
+      "capability": "rtf.liedjes",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Samen met een ouder een kinderliedje of versje kiezen en meezingen met de tekst in beeld."
+    },
+    "apps/foundation/magazine.html": {
+      "capability": "media.magazine",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een redactioneel RTF-magazine met verhalen en cijfers over de stichting lezen."
+    },
+    "apps/foundation/mail.html": {
+      "capability": "rtf.bericht",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Beveiligde e-mail versturen en ontvangen binnen FoundationOS (gezin, school, begeleiding)."
+    },
+    "apps/foundation/markt.html": {
+      "capability": "winkel.tweedehands",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Tweedehands spullen binnen het gezinsnetwerk kopen of verkopen ('Koopje')."
+    },
+    "apps/foundation/mediawijs.html": {
+      "capability": "rtf.mediawijs",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Via realistische online-situaties leren hoe je veilig en verstandig handelt op internet, en sparren met een AI-buddy."
+    },
+    "apps/foundation/meedoen-ontdekken.html": {
+      "capability": "rtf.meedoen",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Activiteiten en organisaties in de eigen stad ontdekken, meedoen aanvragen of zelf iets beginnen (club/project/ruil)."
+    },
+    "apps/foundation/memorie.html": {
+      "capability": "rtf.memorie",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een memoriespel spelen, alleen of samen om de beurt."
+    },
+    "apps/foundation/mijnbanden.html": {
+      "capability": "rtf.wie-mag-zien",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Zelf bepalen wie een band met je heeft en wat je met wie deelt, zonder dat ouders automatisch meekijken."
+    },
+    "apps/foundation/ochtend.html": {
+      "capability": "leven.ochtendritme",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Een eigen ochtendlijstje bijhouden en zien hoe het gezin ervoor staat vanochtend."
+    },
+    "apps/foundation/onveilig.html": {
+      "capability": "rtf.onveilig",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Direct vinden waar je in Nederland gratis en anoniem hulp krijgt bij geweld, uitbuiting of geen slaapplek."
+    },
+    "apps/foundation/oppasinfo.html": {
+      "capability": "gezin.oppasinfo",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Belangrijke info voor een oppas (allergieën, medicijnen, noodnummers) op één plek klaarzetten en delen."
+    },
+    "apps/foundation/opvoeden.html": {
+      "capability": "gezin.opvoedhulp",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Praktische opvoedtips vinden en een AI-opvoedcoach een vraag stellen over een concrete situatie met het kind."
+    },
+    "apps/foundation/os-bestuur.html": {
+      "capability": "kantoor.governance",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als RTF-bestuurslid presentie, besluiten, notulen en dossiers van de stichting bijhouden en vaststellen."
+    },
+    "apps/foundation/os-deelnemer.html": {
+      "capability": "hulp.aanvraagstatus",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Met een anonieme code de eigen hulpvraag bij de RTFoundation volgen en toestemming eventueel intrekken."
+    },
+    "apps/foundation/os-donateur.html": {
+      "capability": "gift.overzicht",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Met een anonieme code zien wat je hebt gegeven, waar het heen ging, en een giftbewijs opvragen."
+    },
+    "apps/foundation/os-portaal.html": {
+      "capability": "portaal.toegang",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-organisatie",
+      "doel": "Als partnerstichting, gemeente of lokale ondernemer met een eigen code het juiste foundation-dossier openen."
+    },
+    "apps/foundation/os-publiek.html": {
+      "capability": "wereld.foundation",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Zonder in te loggen zien wat de RTFoundation in de eigen stad doet en waar je terechtkunt voor hulp, projecten, activiteiten of vrijwilligerswerk."
+    },
+    "apps/foundation/os-veld.html": {
+      "capability": "werk.veldwerk",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als veldmedewerker de eigen lijst met huisbezoeken/taken bijhouden, adressen opzoeken en werk afronden."
+    },
+    "apps/foundation/os-vrijwilliger.html": {
+      "capability": "werk.vrijwilligerswerk",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Als vrijwilliger met een eigen code de planning, gewerkte uren en VOG-geldigheid inzien en uren doorgeven."
+    },
+    "apps/foundation/os.html": {
+      "capability": "kantoor.hub",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als RTF-kantoormedewerker het overzicht van alle stadsafdelingen beheren en naar governance, veld- of portaalfuncties doorschakelen."
+    },
+    "apps/foundation/overhoren.html": {
+      "capability": "rtf.overhoren",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Eigen overhoorlijsten maken en oefenen (woordjes, topografie, tafels), alleen of in een duel met een vriend."
+    },
+    "apps/foundation/partner.html": {
+      "capability": "bestuur.stadsraad",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-organisatie",
+      "doel": "Als stadspartner met een raadcode meebeslissen over foundation-voorstellen en labresultaten aan de raadstafel."
+    },
+    "apps/foundation/pesten.html": {
+      "capability": "hulp.pesten",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Begrijpen wat te doen bij pesten en er met één druk op de knop je gezin over vertellen."
+    },
+    "apps/foundation/presenteren.html": {
+      "capability": "leren.presenteren",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een spreekbeurt opbouwen, de tijd controleren en hardop oefenen met een spiekbriefje in steekwoorden."
+    },
+    "apps/foundation/privacy.html": {
+      "capability": "rtf.privacy-uitleg",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "In gewone taal begrijpen wat de RTFoundation-app van je gezin bewaart, hoe het beschermd is en hoe je het kunt wissen."
+    },
+    "apps/foundation/projecten.html": {
+      "capability": "leren.project",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Samen met gezinsleden of vrienden een schoolproject/werkstuk starten, taken verdelen en bijhouden wat af is."
+    },
+    "apps/foundation/rechten.html": {
+      "capability": "info.rechten",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Op je eigen leeftijd zien wat er in Nederland mag rond werken, geld, school, zorg en eigen beslissingen."
+    },
+    "apps/foundation/registreren.html": {
+      "capability": "account.registratie",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Kiezen hoe je meedoet aan de RTFoundation (gezin, school, vrijwilliger of partnerstichting) en die registratie starten."
+    },
+    "apps/foundation/reis.html": {
+      "capability": "reizen.aanvraag",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Voor jezelf/je gezin een vakantie aanvragen bij de foundation, of een ander gezin daarvoor voordragen."
+    },
+    "apps/foundation/rust.html": {
+      "capability": "gezondheid.rust",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Even tot rust komen met een ademoefening, een stiltemoment, vrij tekenen of een bemoedigende tekst."
+    },
+    "apps/foundation/samen-thuis.html": {
+      "capability": "rtf.samen-thuis",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "In één rustige tijdlijn zien wat er vandaag in het gezin speelt (agenda, menu, taken) zonder rond te hoeven vragen."
+    },
+    "apps/foundation/school.html": {
+      "capability": "rtf.school",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Als leerling/gezin de schooldag overzien: rooster, huiswerk, toetsen en contact met school op één plek."
+    },
+    "apps/foundation/schoolbieb.html": {
+      "capability": "rtf.schoolbieb",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Gratis educatieve apps voor je eigen niveau en vak vinden en installeren."
+    },
+    "apps/foundation/schrift.html": {
+      "capability": "leren.livesles",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Tijdens een live les meekijken/meeschrijven op het bord van de begeleider, opgaven maken en werk inleveren."
+    },
+    "apps/foundation/schrijven.html": {
+      "capability": "leren.schrijven",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Elke dag een schrijfopdracht op eigen niveau maken en die door een buddy laten meelezen."
+    },
+    "apps/foundation/societeit.html": {
+      "capability": "rtf.societeit",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Met vrienden of klasgenoten een quiz-, schat- of rangschikduel spelen, alleen tellend binnen het eigen potje."
+    },
+    "apps/foundation/speelhal.html": {
+      "capability": "spel.speelhal",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een van zeven mini-games spelen die net wat lastiger zijn dan de Speeltuin (6 t/m 12 jaar)."
+    },
+    "apps/foundation/speeltuin.html": {
+      "capability": "spel.speeltuin",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een van drie grote, simpele mini-games spelen voor de allerkleinsten, het hele scherm vullend."
+    },
+    "apps/foundation/steun.html": {
+      "capability": "gezondheid.steun",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Als verzorgende ouder/gezinslid even bij het eigen gemoed stilstaan, het hart luchten bij een luisterend AI-oor en weten waar je bij te zware momenten terechtkunt."
+    },
+    "apps/foundation/studie.html": {
+      "capability": "leren.volwassenenonderwijs",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Gratis of goedkope wegen vinden om verder te leren of een diploma/certificaat te halen naast je gezin."
+    },
+    "apps/foundation/tellen.html": {
+      "capability": "spel.tellen",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Spelenderwijs leren tellen: dingen aantikken en het goede getal kiezen, of precies zoveel dingen pakken."
+    },
+    "apps/foundation/toetsen.html": {
+      "capability": "leren.toetsplanner",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Een toets invoeren en het leren automatisch over de dagen ervoor laten spreiden in plaats van alles vooraf."
+    },
+    "apps/foundation/veilig-vertrouwd.html": {
+      "capability": "rtf.veilig-vertrouwd",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "In één hub een veiligheidsstatus delen met je kring en snel bij gerelateerde hulp (Veilig thuis, pesten, grenzen) komen."
+    },
+    "apps/foundation/veilig.html": {
+      "capability": "rtf.veilig-thuis",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Je gezin laten weten waar je bent en dat het goed gaat, of meteen een noodbericht sturen als dat niet zo is."
+    },
+    "apps/foundation/verhaaltje.html": {
+      "capability": "media.verhalen",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Samen een kort, veilig voorleesverhaaltje doorbladeren, in eigen tempo."
+    },
+    "apps/foundation/verjaardagen.html": {
+      "capability": "gezin.verjaardagen",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Verjaardagen en wensenlijstjes van gezinsleden bijhouden, cadeaus reserveren en samen inleggen in een cadeaupotje."
+    },
+    "apps/foundation/vrienden.html": {
+      "capability": "rtf.contacten",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Contacten binnen de RTFoundation/RTG vinden via codenaam en met hen chatten, bellen of via QR/PIN koppelen."
+    },
+    "apps/foundation/wegwijzer.html": {
+      "capability": "hulp.wegwijzer",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Zonder account anoniem beschrijven wat er speelt en op basis daarvan naar de juiste (nood)hulp geleid worden."
+    },
+    "apps/foundation/werk.html": {
+      "capability": "werk.vacatures",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Vacatures en werkkansen ontdekken, vergelijken, bewaren en bespreken zonder verborgen matchscore."
+    },
+    "apps/foundation/winkel.html": {
+      "capability": "rtf.winkel",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Spullen van de RTFoundation-stichting kopen (opbrengst naar het werk in de steden), af te halen bij de stichting."
+    },
+    "apps/foundation/zakgeld.html": {
+      "capability": "geld.zakgeld",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Het eigen zakgeldpotje bijhouden (erbij/uitgegeven) en sparen voor een eigen doel."
+    },
+    "apps/foundation/zorg.html": {
+      "capability": "rtf.hulp-zorg",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Zorgafspraken, medicatie en hulpvragen van het gezin overzien en zelf bepalen wie er meekijkt."
+    },
+    "apps/galerij.html": {
+      "capability": "media.galerij",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Eigen foto's en albums bekijken, favorieten markeren en een terugblik zien."
+    },
+    "apps/garderobe.html": {
+      "capability": "leven.garderobe",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "De eigen garderobe bijhouden en de persoonlijke stylist iets vragen."
+    },
+    "apps/gast.html": {
+      "capability": "horeca.tafelgast",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Als tafelgast (zonder account) zelf bestellen, de rekening volgen en afrekenen aan tafel."
+    },
+    "apps/gedachten.html": {
+      "capability": "leven.gedachtenboek",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Privé gedachten opschrijven en later terugvinden, zonder dat iemand meeleest."
+    },
+    "apps/geld-command.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html"
+    },
+    "apps/geld.html": {
+      "capability": "geld.overzicht",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Het volledige geldoverzicht beheren: wallet, bank, samen betalen, betaalcode, budgetten en de fondsen/mecenaat/nalatenschap."
+    },
+    "apps/gemeente.html": {
+      "capability": "overheid.gemeente-burger",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Als burger gemeentezaken regelen: afspraak maken, afval/vergunning/melding, belasting betalen."
+    },
+    "apps/gemeenteloket.html": {
+      "capability": "overheid.loketbeheer",
+      "rol": "eigenaar",
+      "doelgroep": "overheid-medewerker",
+      "doel": "Als gemeentemedewerker aan de balie afspraken, meldingen en vergunningaanvragen van burgers afhandelen."
+    },
+    "apps/gemeentepda.html": {
+      "capability": "overheid.buitendienst",
+      "rol": "eigenaar",
+      "doelgroep": "overheid-medewerker",
+      "doel": "Als buitendienstmedewerker onderweg meldingen bijwerken op een PDA."
+    },
+    "apps/genootschap.html": {
+      "capability": "sociaal.genootschap",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Deelnemen aan besloten genootschappen: uitnodigingen, bijeenkomsten en huisregels van eigen groepen beheren."
+    },
+    "apps/gereedschap.html": {
+      "capability": "kern.gereedschap",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Praktische hulpmiddelen gebruiken: wekker, stopwatch, rekenmachine, wereldklok en rekening delen."
+    },
+    "apps/ghost.html": {
+      "capability": "vervoer.chauffeuradvies",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als chauffeur advies krijgen over waar en wanneer te rijden voor het beste verdienpotentieel, zonder zelf in te grijpen."
+    },
+    "apps/handel.html": {
+      "capability": "handel.inkoop",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als zaak inkopen en verkopen tussen bedrijven onderling: aanvragen plaatsen, aanbiedingen doen, gunningen zien."
+    },
+    "apps/hangar.html": {
+      "capability": "reizen.vliegtuig",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "Als vliegtuigeigenaar/gebruiker het eigen toestel en vluchten beheren en de vluchtcoördinator iets vragen."
+    },
+    "apps/hardware-pda.html": {
+      "capability": "werk.werkopdrachten",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als medewerker van het hardwarelab een opdracht (concept naar order) op de werkvloer verwerken."
+    },
+    "apps/home.html": {
+      "capability": "woning.apparaten",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Slimme apparaten in huis bedienen: kamers, merken koppelen en scènes starten."
+    },
+    "apps/horeca-bar.html": {
+      "capability": "horeca.bar",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als barpersoneel bestellingen aan de bar afhandelen, ook offline."
+    },
+    "apps/horeca-beheer.html": {
+      "capability": "horeca.beheer",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als leidinggevende de dag, het personeel en signalen van de zaak overzien."
+    },
+    "apps/horeca-bezorg.html": {
+      "capability": "horeca.bezorging",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Bezorgritten dispatchen en de rit naar de gast volgen."
+    },
+    "apps/horeca-club.html": {
+      "capability": "horeca.club",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Clubtegoed, tafels en de deur (toegang) van een clubavond beheren."
+    },
+    "apps/horeca-events.html": {
+      "capability": "horeca.events",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Een evenement offreren, het verbruik bijhouden en achteraf nacalculeren."
+    },
+    "apps/horeca-expeditie.html": {
+      "capability": "horeca.keuken",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "De keuken en expeditie regisseren: welke bestelling waar naartoe moet."
+    },
+    "apps/horeca-haccp.html": {
+      "capability": "horeca.haccp",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "HACCP-controles (voedselveiligheid) registreren."
+    },
+    "apps/horeca-hotel.html": {
+      "capability": "horeca.hotel",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "De gastrekening en roomservice van hotelgasten beheren."
+    },
+    "apps/horeca-pda.html": {
+      "capability": "horeca.pda",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als bediening aan tafel bestellingen opnemen op een PDA, ook zonder verbinding."
+    },
+    "apps/horeca-vloer.html": {
+      "capability": "horeca.vloer",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "De vloer (zaal) overzien: welke tafels bezet zijn en waar aandacht nodig is."
+    },
+    "apps/horeca.html": {
+      "capability": "horeca.dashboard",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als horecazaak de hele operatie in één ritme overzien en naar het juiste deelscherm doorschakelen."
+    },
+    "apps/hotels.html": {
+      "capability": "verblijf.hotel",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een verblijf (hotel e.d.) zoeken en boeken, en de eigen boekingen beheren."
+    },
+    "apps/ik.html": {
+      "capability": "instellingen.profiel",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Persoonlijke instellingen beheren: profiel, toegankelijkheid, stemming/geloof-voorkeuren."
+    },
+    "apps/isolatie.html": {
+      "capability": "techniek.isolatie",
+      "rol": "eigenaar",
+      "doelgroep": "ontwikkelaar",
+      "doel": "Als technisch beheerder een 'isolatiemodus' voor een drager (systeemonderdeel) instellen en verstrengeling/ontsluiting testen."
+    },
+    "apps/juridisch.html": {
+      "capability": "site.juridisch",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Overzicht van de juridische documenten van RTG vinden (voorwaarden, privacy, partnervoorwaarden)."
+    },
+    "apps/juridisch/partnervoorwaarden.html": {
+      "capability": "site.juridisch.partnervoorwaarden",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "De partnervoorwaarden van RTG lezen, inclusief actuele tarieven."
+    },
+    "apps/juridisch/privacy.html": {
+      "capability": "site.juridisch.privacy",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Het privacybeleid van RTG lezen."
+    },
+    "apps/juridisch/voorwaarden.html": {
+      "capability": "site.juridisch.voorwaarden",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "De algemene voorwaarden van RTG lezen, inclusief actuele pasprijzen."
+    },
+    "apps/kantoor.html": {
+      "capability": "wereld.work",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "De eigen werkdag overzien: wat aandacht vraagt, projecten, team en agenda van vandaag."
+    },
+    "apps/kantoorpda.html": {
+      "rol": "alias",
+      "naar": "/apps/personeel.html?kantoor=1"
+    },
+    "apps/kantoren.html": {
+      "capability": "kantoor.kantoren",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als RTG-medewerker naar de interne kantooronderdelen navigeren (boardroom, rekening, stad, redactie, techniek, werkplaats)."
+    },
+    "apps/kassa.html": {
+      "capability": "handel.kassa",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Een medewerker van een zaak rekent een bestelling af aan de kassa (artikelen, korting, retour, derving, kasopmaak)."
+    },
+    "apps/klankwerk-kantoor.html": {
+      "capability": "kantoor.uitgavenaam",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Een RTG-medewerker beoordeelt de aanvraag van een lid om de RTG-naam onder zijn muziekuitgave te zetten."
+    },
+    "apps/klankwerk.html": {
+      "capability": "media.muziek-maken",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid maakt muziek (beats, zang, mix) in een digitale audiowerkplaats en geeft die uit."
+    },
+    "apps/kosten.html": {
+      "capability": "kosten.beheer",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "De boardroom bekijkt en stuurt de kostprijs per gebruiker: tarieven, periodes, doorbelasting en de relaties tussen economische werelden."
+    },
+    "apps/krant.html": {
+      "capability": "media.krant",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid leest artikelen uit een (gepersonaliseerde) krant of bladert door de gids van beschikbare kranten."
+    },
+    "apps/lab.html": {
+      "capability": "kantoor.onderzoek",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Een RTG-medewerker beheert en beoordeelt eigen onderzoeksprojecten door de vaste keten idee -> onderzoek -> prototype -> proef -> uitrol, met een verplichte mens bij proef en uitrol."
+    },
+    "apps/labfonds.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#labfonds"
+    },
+    "apps/labpas.html": {
+      "capability": "onderzoek.deelname",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Een onderzoeksdeelnemer (zonder RTG-account, met een labpas-code) volgt de voortgang van zijn eigen onderzoek en ziet buurtvragen en punten/badges."
+    },
+    "apps/lesmaker.html": {
+      "capability": "leren.lesmaker",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Een leraar maakt met AI een oefen-app op maat voor zijn leerlingen en volgt hun voortgang per leerling."
+    },
+    "apps/leven.html": {
+      "capability": "leven.werkblad",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid stelt één samengestelde avond (eten, uitgaan, verblijf, vervoer) samen of laat Rahul die voor hem combineren."
+    },
+    "apps/leverancier-aanvragen.html": {
+      "capability": "handel.aanvragen",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Een zaak bekijkt en beantwoordt aanvragen van leden die via de Mall zijn binnengekomen."
+    },
+    "apps/leverancier-commerce.html": {
+      "capability": "handel.verkoopwegen",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Een zaak beheert langs welke verkoopwegen hij verkoopt en handelt retouren af."
+    },
+    "apps/leverancier-rtmail.html": {
+      "capability": "zaak.rtmail",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Personeel van een zaak leest en verstuurt zakelijke e-mail via het RTMAIL-functieadres."
+    },
+    "apps/leverancier-service.html": {
+      "capability": "service.hulp",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Personeel van een zaak meldt een probleem met RTG zelf (uitbetaling, werkplek, koppeling) en volgt de afhandeling."
+    },
+    "apps/leverancier.html": {
+      "capability": "zaak.beheer",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Personeel van een zaak logt in en werkt zijn hele werkdag af: bestellingen, ritten, menukaart en overzicht."
+    },
+    "apps/life.html": {
+      "capability": "dag.overzicht",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid ziet in één dagoverzicht hoe het ermee gaat: stemming, gewoonten, medicatie, metingen, noodkaart en gekoppelde toestellen."
+    },
+    "apps/lifestyle.html": {
+      "capability": "concierge.privekantoor",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "Een Lifestyle Pass-lid opent zijn Privékantoor: de briefing van De Rechterhand, openstaande zaken en toegang tot de conciërgediensten."
+    },
+    "apps/living-os.html": {
+      "capability": "leven.vooruitzicht",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "Een lid legt een intentie/beslissing vast en krijgt daarvoor alvast agenda, geld, reis en veiligheid vooruit klaargezet en overzien."
+    },
+    "apps/livinglab.html": {
+      "capability": "onderzoek.lab",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-gezin",
+      "doel": "Een deelnemer aan RTFoundation-onderzoek start of hervat een onderzoeksuitdaging in het Living Lab."
+    },
+    "apps/logboek.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#logboek"
+    },
+    "apps/loonstrook.html": {
+      "capability": "loon.strook",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een werknemer bekijkt zijn loonstroken en ziet wie er in zijn loongegevens heeft gekeken."
+    },
+    "apps/loopbaan.html": {
+      "capability": "loopbaan.ledger",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid bekijkt en vult zijn carrièreledger: de reeks bewijsregels, de zeven voorraden en wat hij heeft gedeeld."
+    },
+    "apps/loopbaanbewijs.html": {
+      "capability": "loopbaan.bewijs",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Iemand zonder RTG-account bekijkt één enkele, met hem gedeelde regel uit andermans loopbaanledger."
+    },
+    "apps/luchthaven.html": {
+      "capability": "luchthaven.operatie",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Airport-operationeel personeel bestuurt de operatie: vluchten, gates, bagage, VIP, lounge, security en toren."
+    },
+    "apps/magnaat-kantoor.html": {
+      "capability": "kantoor.controleregister",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Een RTG-medewerker bekijkt het controleregister dat automatisch dekking van functies in Magnaat-bedrijfstweelingen ontdekt en beslist er bewust over."
+    },
+    "apps/magnaat-partnerstudio.html": {
+      "capability": "handel.digitaletweeling",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Een leverancier bouwt een digitale tweeling van zijn eigen bedrijf na voor het Magnaat-spel, zonder productierisico."
+    },
+    "apps/magnaat.html": {
+      "capability": "spel.magnaat",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid leert ondernemen door in een spel-simulatie een eigen bedrijf te runnen en keuzes te maken."
+    },
+    "apps/maison.html": {
+      "capability": "woning.huishouden",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "Een Lifestyle Pass-lid beheert zijn huishouden: personeel, taken en het logboek, via de huismeester."
+    },
+    "apps/mall.html": {
+      "capability": "winkel.mall",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid vindt en koopt/boekt producten, reizen en apps zonder eindeloos te zoeken."
+    },
+    "apps/marechaussee.html": {
+      "capability": "luchthaven.grensbewaking",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "KMar-personeel op de luchthaven bestuurt controles, incidenten en patrouilles."
+    },
+    "apps/mecenaat.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#mecenaat"
+    },
+    "apps/media.html": {
+      "capability": "media.centrum",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid vindt en beleeft media (muziek, producties) en beheert zijn releases en connecties."
+    },
+    "apps/medicijnen.html": {
+      "capability": "gezondheid.medicatie",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid houdt zijn medicijnen en voorraad bij en ziet wat hij vandaag moet nemen."
+    },
+    "apps/meet.html": {
+      "capability": "comm.videobellen",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid start of neemt deel aan een videogesprek."
+    },
+    "apps/meldkamer.html": {
+      "capability": "zorg.meldkamer",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Medisch personeel coördineert de meldkamer: eenheden, bedden/opnames, overdracht aan het ziekenhuis en consulten."
+    },
+    "apps/memo.html": {
+      "capability": "docs.spraakmemo",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid beheert eigen bestanden/notities en laat ze door AI samenvatten."
+    },
+    "apps/merken.html": {
+      "capability": "kantoor.merken",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Een RTG-medewerker beheert merken en vestigingen van een concern in het kantoorregister."
+    },
+    "apps/metier.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#metier"
+    },
+    "apps/mijn-gegevens.html": {
+      "capability": "privacy.gegevens",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid ziet welke gegevens RTG over hem heeft vastgelegd."
+    },
+    "apps/mijn-isolatie.html": {
+      "capability": "account.bescherming",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid zet zijn eigen account zelf strenger (of weer terug) als hij denkt dat er iets mis is, zonder iemand te bellen."
+    },
+    "apps/mijn-neigingen.html": {
+      "capability": "privacy.voorkeuren",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zien welke voorkeuren RTG uit zijn gedrag heeft afgeleid, ze aanvullen via een korte intake, en per voorkeur laten weten dat hij vergeten moet worden of niet gebruikt mag worden."
+    },
+    "apps/mijn-post.html": {
+      "capability": "instellingen.postvoorkeuren",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Per soort post van RTG (bijv. marketing, service) instellen via welk kanaal hij die wel of niet krijgt, alles in één keer uitzetten, en de geschiedenis van eigen wijzigingen terugzien."
+    },
+    "apps/mijn-relaties.html": {
+      "capability": "privacy.toegang",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Per partij zien welke toegang tot zijn gegevens nog open staat, de gevolgen van intrekken vooraf bekijken, en een relatie sluiten."
+    },
+    "apps/mijn-sessies.html": {
+      "capability": "account.sessies",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zien op welke toestellen/sessies er nu met zijn account gewerkt kan worden, hoe zeker dat bewezen is, het huidige toestel cryptografisch bevestigen, en een sessie (of alle andere) afsluiten."
+    },
+    "apps/mijnmall.html": {
+      "capability": "winkel.bestellingen",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Eigen bewaarde lijsten/producten, lopende bestellingen en samengestelde aanbiedingen overzien, en een vraag plaatsen die zaken kunnen beantwoorden."
+    },
+    "apps/move.html": {
+      "capability": "reizen.haalbaarheid",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "In één oogopslag zien of de overgangen tussen zijn geboekte reisonderdelen haalbaar zijn (ruim/krap/onhaalbaar), per overgang waarom, en doorgestuurd worden naar navigatie voor het volgende onderdeel."
+    },
+    "apps/muziek.html": {
+      "capability": "media.luisteren",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Muziek beluisteren, eigen bestanden/afspeellijsten beheren en samen luisteren met anderen."
+    },
+    "apps/nalatenschap.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#nalatenschap"
+    },
+    "apps/navigatie.html": {
+      "capability": "navigatie.route",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Van zijn huidige positie naar een bestemming genavigeerd worden."
+    },
+    "apps/nieuws.html": {
+      "capability": "nieuws.lezen",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "RTG-nieuwsartikelen per rubriek lezen en er een vraag over aan Rahul stellen."
+    },
+    "apps/notities.html": {
+      "capability": "docs.notities",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Eigen notities en taken bijhouden, vastpinnen, archiveren en desgewenst delen met iemand anders om samen te bewerken."
+    },
+    "apps/office.html": {
+      "capability": "docs.office",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Snel bij de eigen werkdocumenten en kantoorpakket-onderdelen komen zonder te hoeven zoeken."
+    },
+    "apps/onderhoud.html": {
+      "capability": "woning.onderhoud",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een onderhoudsprobleem in huis melden en de status van eigen meldingen volgen tot een vakman is gepland en het is opgelost."
+    },
+    "apps/onderneming.html": {
+      "capability": "werk.onderneming",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Als (aankomend) ondernemer zijn hele onderneming besturen: idee en cijfers doorrekenen, gezondheid en kasvooruitblik zien, rechtsvorm en oprichtingsstappen afhandelen, een zaak aanvragen, en lopende klanten, facturen, contracten, voorraad en personeel overzien."
+    },
+    "apps/oog.html": {
+      "capability": "zaak.visie-inspectie",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als medewerker met de camera een voertuig schouwen op nieuwe schade t.o.v. een eerdere nulmeting, of op de werkvloer knoploos loggen wie een aangeleerd item meeneemt of terugbrengt."
+    },
+    "apps/ov.html": {
+      "capability": "vervoer.rit",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Vervoer regelen: een taxi/rit boeken en volgen, inchecken en kaartjes kopen voor openbaar vervoer, de bedrijfspendel van de werkgever zien, of (Business) een afgeschermde private journey opzetten."
+    },
+    "apps/ovcontrol.html": {
+      "capability": "zaak.ovregie",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als OV-bedrijf in één oogopslag de live vloot, reizigersaantallen, omzet en lijnprestatie van vandaag overzien."
+    },
+    "apps/ovdienst.html": {
+      "capability": "zaak.ovdienst",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als chauffeur/conducteur een dienst starten (voertuig+lijn), tijdens de dienst reizigers via code inchecken en vervoerbewijzen controleren, en de dienst weer stoppen."
+    },
+    "apps/overheid.html": {
+      "capability": "overheid.rijk-burger",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zaken met de overheid regelen: officiële berichten lezen, belastingaangifte en toeslagen, rijbewijs en voertuig bij de RDW, en stemmen/subsidies/uitkeringen."
+    },
+    "apps/overheidspda.html": {
+      "capability": "overheid.pda",
+      "rol": "eigenaar",
+      "doelgroep": "overheid-medewerker",
+      "doel": "Als medewerker van een rijkskantoor (receptie/beveiliging/schoonmaak/bode) inloggen op de eigen werktelefoon en per locatie bezoekers, incidenten, taken en rondes afhandelen."
+    },
+    "apps/ovroutes.html": {
+      "capability": "zaak.ovroutes",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als OV-bedrijf de eigen lijnen en haltes op een tekenkaart intekenen, met naam, frequentie en tarief, zodat leden ze meteen zien."
+    },
+    "apps/pakketten.html": {
+      "capability": "werk.bedrijfspakket",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Als (aankomend) ondernemer een bedrijfstype kiezen en een passend werkplek-, app-, techniek- en kantoorpakket met 3D-plattegrond en QR-codes voorgesteld krijgen, desgewenst op maat gemaakt door Rahul."
+    },
+    "apps/partner-network.html": {
+      "capability": "zaak.partnernetwerk",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als hotelpartner zien welke reisintenties passen bij de eigen capaciteit, hoe het consortium van hotel/vervoer/diner/RTG-regie er gezamenlijk voor staat, en een 'levend contract' met andere partners openen."
+    },
+    "apps/partner-worden.html": {
+      "capability": "zaak.partnerworden",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Als lid een aanvraag indienen om met zijn bedrijf een gecontroleerde RTG-partnerwerkplek te krijgen, inclusief KVK/registratiegegevens en compliance-vragen, waarna een mens van RTG het beoordeelt."
+    },
+    "apps/passkeys.html": {
+      "capability": "account.passkeys",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Inloggen zonder wachtwoord met een passkey, of (ingelogd) een nieuwe passkey toevoegen en eigen passkeys beheren."
+    },
+    "apps/pay.html": {
+      "capability": "betalen.rtgpay",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Het eigen RTG Pay-saldo zien, geld versturen/tikkies maken, transactiegeschiedenis inzien en een kascode voor contant opnemen tonen."
+    },
+    "apps/payroll.html": {
+      "capability": "kantoor.payroll",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als RTG-loonkantoor zien wie waar werkt (met past-signaal), een loonrun draaien per zaak en periode, matching doen, en wereldwijde loonzaken beheren."
+    },
+    "apps/personeel.html": {
+      "capability": "zaak.teamroom",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als medewerker van een zaak inloggen op de personeels-app en van daaruit naar de eigen werkdag, team en zaakfuncties (backoffice, planning, PDA's) gaan."
+    },
+    "apps/platformregister.html": {
+      "capability": "kantoor.platformregister",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als RTG-medewerker het platformregister doorzoeken (per soort ding, met status/gedeelde/storing) en details van een item inzien."
+    },
+    "apps/podium.html": {
+      "capability": "media.podium",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Live uitzendingen bekijken, chatten en cadeaus geven, of via de zaal andere kanalen vinden."
+    },
+    "apps/project-room.html": {
+      "capability": "werk.project",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Projectvoortgang zien en uitvoeren (alleen wat nu kan), het projectdossier raadplegen, en bij oplevering bewijs vastleggen dat het beloofde resultaat is bereikt."
+    },
+    "apps/pulse.html": {
+      "capability": "sociaal.pulse",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Berichten plaatsen en lezen van mensen die hij volgt of ontdekt, reageren, en zijn eigen profiel en bewaarde berichten (plank) bekijken."
+    },
+    "apps/rechtbank.html": {
+      "capability": "overheid.rechtbank",
+      "rol": "eigenaar",
+      "doelgroep": "overheid-medewerker",
+      "doel": "Als griffie/rechter inloggen en de zittingsrol, zaken, beroepen en signalen van de rechtbank beheren, met AI-ondersteuning; de uitspraak blijft het besluit van de rechter."
+    },
+    "apps/redactie-pda.html": {
+      "capability": "zaak.redactie",
+      "rol": "schil",
+      "doelgroep": "zaak",
+      "doel": "Als verslaggever vanaf locatie snel een artikel schrijven en meteen publiceren of als concept bewaren, en eigen recente stukken beheren."
+    },
+    "apps/redactie.html": {
+      "capability": "zaak.redactie",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als redactie de dagplanning, artikelen, de huisstijl-site en cijfers van RTG Nieuws beheren."
+    },
+    "apps/redactiekantoor.html": {
+      "capability": "kantoor.redactie",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als RTG-kantoormedewerker de schrijftafel, drukkerij en nieuwstips van de redactie namens RTG beheren (niet de zaak/redactie zelf, maar het kantoor erachter)."
+    },
+    "apps/reisboek.html": {
+      "capability": "reizen.reisboek",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zijn eigen lopende reis als één geheel volgen: wat er vandaag speelt, de reisdocumenten, en gevraagde/gedane wijzigingen."
+    },
+    "apps/reisbureau.html": {
+      "capability": "reizen.reisbureau",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een door RTG samengestelde reis kiezen en boeken, reisadvies van Rahul krijgen, en een eigen geboekte reis wijzigen of afzeggen."
+    },
+    "apps/reisuitnodiging.html": {
+      "capability": "reizen.uitnodiging",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Via een eenmalige link zien welke reis voor hem is klaargezet en die overnemen in zijn eigen (eventueel nieuw aan te maken) RTG-account; ingelogd kan hij ook eerder verstuurde uitnodigingen beheren."
+    },
+    "apps/reizen-veilig.html": {
+      "capability": "reizen.veilig",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Eén TravelOS-werkblad waarin hij zijn reisdag overziet, vervoer regelt, samengestelde reizen bekijkt, en met 'RTG Veilig' een Live Circle instelt om zijn voortgang/aankomst gedoseerd te delen met wie hij kiest."
+    },
+    "apps/reizen.html": {
+      "capability": "wereld.travel",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zijn reisboek, reisdocumenten en volgende reisstap in één overzicht zien en verder plannen."
+    },
+    "apps/rendezvous.html": {
+      "capability": "sociaal.ontmoeten",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een geverifieerde, discrete date-ontmoeting plannen en beheren (locatie, tijd, veiligheid)."
+    },
+    "apps/residentie.html": {
+      "capability": "sociaal.residentie",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een virtuele suite/residentie bezoeken om met andere leden te socializen (gids, spel, gesprek)."
+    },
+    "apps/rijksloket.html": {
+      "capability": "overheid.rijksloket",
+      "rol": "eigenaar",
+      "doelgroep": "overheid-medewerker",
+      "doel": "Als ambtenaar bekendmakingen, bezwaren, subsidies, toeslagen en uitkeringen behandelen en besluiten."
+    },
+    "apps/rit.html": {
+      "capability": "vervoer.rit",
+      "rol": "tweede-ingang",
+      "doelgroep": "lid",
+      "doel": "Vanaf aankomst (bijv. vliegveld) een chauffeur/vervoer naar de bestemming regelen en volgen."
+    },
+    "apps/routedekking.html": {
+      "capability": "kantoor.routedekking",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als kantoormedewerker zien welke routes van het systeem bewezen/gedekt zijn per domein."
+    },
+    "apps/routedossier.html": {
+      "capability": "kantoor.routedossier",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als kantoormedewerker het dossier van elf schakels en alle routes van een keten inzien."
+    },
+    "apps/rtg.html": {
+      "capability": "wereld.living",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een overzicht van eigen momenten, reis/documenten/acties en het sociale leven eromheen zien (LivingOS-startscherm 'Ontdekken')."
+    },
+    "apps/rtgcode.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#rtgcode"
+    },
+    "apps/rtgid.html": {
+      "capability": "identiteit.rtgid-diensten",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zien bij welke diensten hij is ingelogd met RTG iD en welke machtigingen en inzage daar bij horen."
+    },
+    "apps/rtgkantoor.html": {
+      "capability": "kantoor.ai-besturing",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als kantoormedewerker de RTG AI (het besturende AI-systeem) het roer geven, trainen en laten onderzoeken, met journaal van haar acties."
+    },
+    "apps/rtgone.html": {
+      "capability": "werk.rtgone",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zijn werkdag overzichtelijk beheren: beslissen met zicht op gevolg en werk laten doorlopen zonder alles over te dragen."
+    },
+    "apps/rtgschool.html": {
+      "capability": "leren.school",
+      "rol": "eigenaar",
+      "doelgroep": "rtf-kind",
+      "doel": "Als leerling lesstof oefenen, examens maken, bijles krijgen en de eigen onderwijsvoortgang volgen."
+    },
+    "apps/rtmail.html": {
+      "capability": "comm.mail",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zijn inbox lezen en beantwoorden, met alleen wat ertoe doet, en van een gesprek naar een werkresultaat (project) gaan."
+    },
+    "apps/salon.html": {
+      "capability": "sociaal.salon",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Berichten/posts delen en bekijken in het besloten sociale netwerk De Salon, reageren en bewaren."
+    },
+    "apps/scanner.html": {
+      "capability": "docs.scanner",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een document met de camera scannen en als PDF of losse foto's bewaren."
+    },
+    "apps/scherm.html": {
+      "capability": "horeca.tweedescherm",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als leverancier een tweede scherm (bijv. keukenscherm) instellen op een bepaalde werkstand of het hoofdscherm spiegelen."
+    },
+    "apps/schoolpartner.html": {
+      "capability": "werk.schoolbeheer",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als schoolpersoneel/bestuur/directie het onderwijs, personeel, veiligheid en organisatie van de school beheren."
+    },
+    "apps/service-bel.html": {
+      "capability": "service.bellen",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Direct met RTG bellen (spraakgesprek) voor hulp, binnen de app."
+    },
+    "apps/service.html": {
+      "capability": "kantoor.servicewachtrij",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als kantoormedewerker de wachtrij van servicezaken behandelen: gesprek voeren, patronen/foutsignalen en kwaliteit bekijken."
+    },
+    "apps/sitemaker.html": {
+      "capability": "werk.website-maker",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een eigen website bouwen en beheren met blokken, thema's en AI-hulp, en eerdere versies terugzien."
+    },
+    "apps/sociaal-prive.html": {
+      "capability": "sociaal.prive-ruimtes",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Toegang krijgen tot besloten sociale ruimtes (Meet, Vonk, Rendez-vous, Cercle) die niet openbaar hoeven te zijn."
+    },
+    "apps/sociaal.html": {
+      "capability": "sociaal.leven",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zijn sociale wereld overzien: volgende moment, kring, tijdlijn en de bredere sociale wereld van RTG."
+    },
+    "apps/spelen.html": {
+      "capability": "spelen.bordspel",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een bordspel (mens-erger-je-niet, schaken, dammen, etc.) tegen anderen spelen."
+    },
+    "apps/spelscherm.html": {
+      "capability": "spelen.projectiescherm",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een spel dat op de telefoon is gestart, projecteren op een tweede scherm om samen aan tafel te spelen."
+    },
+    "apps/sport.html": {
+      "capability": "sport.wedstrijd",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Alles rond een sportwedstrijd volgen: programma, stand, vak kiezen, op het juiste moment."
+    },
+    "apps/sportclub.html": {
+      "capability": "werk.sportclubbeheer",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als sportclubpersoneel het clubkantoor runnen: teams, velden, wedstrijden, sponsors en financiën beheren."
+    },
+    "apps/stad.html": {
+      "capability": "reizen.stad",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zijn huidige stad/omgeving verkennen tijdens een reis of verblijf (scenario-gebaseerd overzicht)."
+    },
+    "apps/stadsdoos.html": {
+      "capability": "kantoor.stadsdoos",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Als veldapparaat (Stadsdoos) zich aanmelden en periodiek een hartslag naar het kantoor sturen."
+    },
+    "apps/studio-pda.html": {
+      "capability": "media.studio-pda",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als studiomedewerker met AI-hulp een muziek/media-concept maken."
+    },
+    "apps/table.html": {
+      "capability": "leven.tafel-gelegenheid",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "Voor een gelegenheid tafel/gasten/menu regelen via De Rechterhand (concierge), als Lifestyle Pass-functie."
+    },
+    "apps/techniek.html": {
+      "capability": "kantoor.techniekstatus",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als kantoormedewerker de technische status van het systeem bewaken: malware-scanner, betaalproviders, beveiliging en incidenten."
+    },
+    "apps/theater.html": {
+      "capability": "media.theater",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Films en series bekijken, abonnementen beheren en eigen kanaal met werk uploaden/reacties zien."
+    },
+    "apps/thuis.html": {
+      "capability": "verblijf.logeren-bij-leden",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zijn woning-gerelateerde diensten en producten bekijken en bestellen (huisregels, prijs, reviews van diensten aan huis)."
+    },
+    "apps/thuisrust.html": {
+      "rol": "alias",
+      "naar": "/apps/veilig.html#rust"
+    },
+    "apps/thuiswacht.html": {
+      "rol": "alias",
+      "naar": "/apps/veilig.html#wacht"
+    },
+    "apps/tijdlijn.html": {
+      "capability": "sociaal.tijdlijn",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "Terugkijken op eerdere momenten in een chronologische tijdlijn."
+    },
+    "apps/toestemming.html": {
+      "capability": "privacy.toegang",
+      "rol": "tweede-ingang",
+      "doelgroep": "lid",
+      "doel": "Zien wat er nu aan gegevens mag worden ingezien, wie er heeft gekeken, en dit kunnen aantonen of intrekken."
+    },
+    "apps/training.html": {
+      "capability": "gezondheid.training",
+      "rol": "eigenaar",
+      "doelgroep": "lifestyle-lid",
+      "doel": "Zijn trainingsschema bijhouden: voorgestelde trainingen van een behandelaar aanvaarden/weigeren of zelf iets noteren."
+    },
+    "apps/uitgaan.html": {
+      "capability": "leven.uitgaan",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een avond uitgaan plannen: reserveren, RSVP'en op events, bestellen, alles in de juiste volgorde voor vanavond."
+    },
+    "apps/vandaag.html": {
+      "rol": "alias",
+      "naar": "/apps/life.html"
+    },
+    "apps/veilig.html": {
+      "capability": "veilig.noodcontacten",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zien en regelen wie er over mij en mijn huis waakt: thuiswacht, codewoord, check-in en thuisrust."
+    },
+    "apps/verificatie.html": {
+      "capability": "identiteit.verificatie",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Mijn identiteit laten verifiëren door een foto van mijn ID en een selfie in te sturen."
+    },
+    "apps/vertaler.html": {
+      "capability": "taal.vertalen",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een tekst of gesproken zin snel laten vertalen, ook onderweg met kant-en-klare reiszinnen."
+    },
+    "apps/vertegenwoordiging.html": {
+      "capability": "mandaat.beheer",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Zien wie er namens mij mag handelen, zelf de grens daarvan bepalen en voorgestelde machtigingen beoordelen."
+    },
+    "apps/vitaal.html": {
+      "rol": "alias",
+      "naar": "/apps/veilig.html#vitaal"
+    },
+    "apps/vluchten.html": {
+      "capability": "reizen.vluchten",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een vlucht vinden en boeken, inchecken en de instapkaart beheren, of een privévlucht aanvragen."
+    },
+    "apps/voeding.html": {
+      "capability": "gezondheid.voeding",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Bijhouden welke maaltijden er deze week zijn gegeten, zonder dat er iets geteld wordt (geen calorieën)."
+    },
+    "apps/voertuig.html": {
+      "capability": "vervoer.voertuig",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Eén voertuig uit de eigen vloot opzoeken en zien of het inzetbaar is (papieren, geldigheid)."
+    },
+    "apps/vonk.html": {
+      "capability": "daten.vonk",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een geverifieerd datingprofiel bijhouden, matches zien en met wederzijdse matches een ontmoeting voorbereiden."
+    },
+    "apps/wallet.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#wallet"
+    },
+    "apps/wbw.html": {
+      "rol": "alias",
+      "naar": "/apps/geld.html#wbw"
+    },
+    "apps/websitestudio.html": {
+      "capability": "site.bouwen",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als RTG Atelier-medewerker een websitesjabloon met blokken en beelden bouwen en bewaren."
+    },
+    "apps/wereld.html": {
+      "capability": "sociaal.alles",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "De sociale feed van De Salon bekijken, met mensen in gesprek gaan en de eigen zichtbaarheid regelen."
+    },
+    "apps/werk.html": {
+      "capability": "werk.organisatie",
+      "rol": "eigenaar",
+      "doelgroep": "business-lid",
+      "doel": "Als organisatie-eigenaar of manager de eigen WorkOS openen: briefing, aandacht, personeel/onboarding en besluiten in één overzicht."
+    },
+    "apps/werkplek.html": {
+      "capability": "werk.werkplek",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Als medewerker van RTG of de RTFoundation het eigen kantoorhuis (bureau) kiezen om te openen."
+    },
+    "apps/werkruimte.html": {
+      "capability": "werk.werkruimte",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een eigen werkruimte-indeling (kamer) in RTG Command bewaren en later terugvinden."
+    },
+    "apps/wonen.html": {
+      "capability": "woning.overzicht",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "In één oogopslag zien hoe het thuis staat en wat er vandaag aandacht vraagt, met doorklik naar apparaten en onderhoud."
+    },
+    "apps/woningdossier.html": {
+      "capability": "woning.dossier",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Documenten over de eigen woning (contracten, garanties, handleidingen) opslaan en terugvinden."
+    },
+    "apps/zaakkosten.html": {
+      "capability": "kosten.zaak",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als leverancier zien wat de eigen zaak RTG aan kosten kost, met herkomst en vooruitblik."
+    },
+    "apps/zaakpay.html": {
+      "capability": "zaak.pay",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als leverancier het eigen RTG Pay-tegoed beheren: geld ontvangen, klaarzetten en uitbetalen naar de bank."
+    },
+    "apps/zaakweb.html": {
+      "capability": "site.mijnwebsite",
+      "rol": "eigenaar",
+      "doelgroep": "zaak",
+      "doel": "Als leverancier automatisch een eigen RTG-website laten genereren uit het profiel en die online zetten."
+    },
+    "apps/zaal.html": {
+      "capability": "media.zaal",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Muziek bekijken en beluisteren die leden hebben gemaakt, gefilterd op RTG-naam of eigen werk."
+    },
+    "apps/zakelijk.html": {
+      "capability": "vervoer.zakelijkbeleid",
+      "rol": "eigenaar",
+      "doelgroep": "business-lid",
+      "doel": "Als manager zakelijk vervoer beheren: ritten op akkoord goedkeuren, reisbeleid instellen en het maandoverzicht per kostenplaats en medewerker bekijken."
+    },
+    "apps/zorgbalie.html": {
+      "rol": "alias",
+      "naar": "/apps/personeel.html"
+    },
+    "site/404.html": {
+      "capability": "site.404",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen dat de opgevraagde pagina niet bestaat en een weg terug naar de site of de leden-app vinden."
+    },
+    "site/passen/business-lite.html": {
+      "capability": "site.passen.business-lite",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen wat Business Lite is, of het bij mijn zaak past, en doorklikken om te starten."
+    },
+    "site/passen/business-pass.html": {
+      "capability": "site.passen.business-pass",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen wat de Business Pass is, of die bij mijn organisatie past, en contact zoeken."
+    },
+    "site/passen/community.html": {
+      "capability": "site.passen.community",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen wat Community (drempelloos meedoen) inhoudt en er zonder drempel mee beginnen."
+    },
+    "site/passen/lifestyle-pass.html": {
+      "capability": "site.passen.lifestyle-pass",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen wat de Lifestyle Pass (uitvoering vóór u) inhoudt en of die past, en contact zoeken."
+    },
+    "site/passen/rtg-pass.html": {
+      "capability": "site.passen.rtg-pass",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen wat de RTG Pass (het hele platform) inhoudt en de pas ervaren."
+    },
+    "site/werelden/foundationos.html": {
+      "capability": "site.werelden.foundationos",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen wat FoundationOS voor mijn gezin kan betekenen aan de hand van een uitgewerkt voorbeeldmoment."
+    },
+    "site/werelden/livingos.html": {
+      "capability": "site.werelden.livingos",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen wat LivingOS voor mijn dagelijks leven kan betekenen aan de hand van een uitgewerkt voorbeeldmoment."
+    },
+    "site/werelden/travelos.html": {
+      "capability": "site.werelden.travelos",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen wat TravelOS voor mijn reizen kan betekenen aan de hand van een uitgewerkt voorbeeldmoment."
+    },
+    "site/werelden/workos.html": {
+      "capability": "site.werelden.workos",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen wat WorkOS voor mijn organisatie kan betekenen aan de hand van een uitgewerkt voorbeeldmoment."
+    }
+  }
+}

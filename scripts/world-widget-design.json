@@ -3263,18 +3263,6 @@
     "intro": "Uw reis, stap voor stap bij elkaar.",
     "shared": false
   },
-  "/apps/vandaag.html": {
-    "name": "Vandaag",
-    "type": "calendar",
-    "icon": "calendar-days",
-    "sections": [
-      "Eerstvolgende afspraak",
-      "Aandacht nodig",
-      "Uw avond"
-    ],
-    "intro": "Een rustig overzicht van uw tijd.",
-    "shared": false
-  },
   "/apps/foundation/veilig-vertrouwd.html": {
     "name": "Veilig & Vertrouwd",
     "type": "safety",

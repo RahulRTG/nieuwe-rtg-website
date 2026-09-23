@@ -5,6 +5,12 @@
    onder de 10 KB blijft; de bedrading komt via dezelfde context binnen. */
 const allocatie = require('../../kern/commercie/allocatie');
 const claims = require('../../kern/commercie/claims');
+/* WIE HET DEED KOMT UIT DE SESSIE, NOOIT UIT HET VERZOEK. Hier stond
+   `req.body.naam || 'boardroom'`: de aanroeper typte zijn eigen naam in het
+   spoor van een pasprijs, een vergoeding of de export van de complete
+   AI-dataset. De envelop draagt de sleutel die de boardroompoort vaststelde. */
+const { wie: envelopWie } = require('../../opzet/envelop');
+const wieDeed = (req) => envelopWie(req) || 'boardroom';
 
 module.exports = (ctx) => {
   const { app, officeAuth, boardroomAuth, veilig, stuur, afdelingen, kern,
@@ -69,7 +75,7 @@ module.exports = (ctx) => {
   app.post('/api/office/geld', boardroomAuth, (req, res) => veilig(res, () => geldOverzicht()));
   app.post('/api/office/geld/pasprijs', boardroomAuth, (req, res) => veilig(res, () => {
     const r = geldPasprijsZet(req.body || {});
-    if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Pasprijs ' + r.pas + ' gezet op € ' + (r.maandCenten / 100).toFixed(2) + ' per maand (ex btw)');
+    if (r.ok) afdelingen.audit(wieDeed(req), 'Pasprijs ' + r.pas + ' gezet op € ' + (r.maandCenten / 100).toFixed(2) + ' per maand (ex btw)');
     return r;
   }));
   /* De commissie-knop is weg (20 augustus 2026): de partnervergoeding over omzet
@@ -88,14 +94,14 @@ module.exports = (ctx) => {
      verbergen. */
   app.post('/api/office/geld/ai-inkoop', boardroomAuth, (req, res) => veilig(res, () => {
     const r = kern.geldAiInkoopZet(req.body || {});
-    if (r.ok) afdelingen.audit(req.body.naam || 'boardroom',
+    if (r.ok) afdelingen.audit(wieDeed(req),
       'AI-inkoopkosten gezet op ' + (r.inkoopCentenPer1000 / 100).toFixed(2) + ' euro per 1000 credits');
     return r;
   }));
 
   app.post('/api/office/geld/korting', boardroomAuth, (req, res) => veilig(res, () => {
     const r = geldKortingZet(req.body || {});
-    if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Ledenvoordeel ' + r.genre + ' gezet op ' + r.pct + '%');
+    if (r.ok) afdelingen.audit(wieDeed(req), 'Ledenvoordeel ' + r.genre + ' gezet op ' + r.pct + '%');
     return r;
   }));
 
@@ -115,7 +121,7 @@ module.exports = (ctx) => {
          kern/afdelingen/bewaking/index.js het spoor duurzaam vastlegt, kan deze
          route erop wachten -- en weigeren als het niet is vastgelegd. Liever
          geen export dan een export die niemand later kan terugvinden. */
-      const nietVastgelegd = await afdelingen.audit(req.body.naam || 'boardroom',
+      const nietVastgelegd = await afdelingen.audit(wieDeed(req),
         'AI-dataset geexporteerd: ' + r.aantal + ' records (JSONL)');
       if (nietVastgelegd) return res.status(nietVastgelegd.status).json({ error: nietVastgelegd.error });
       res.setHeader('Content-Type', 'application/jsonl; charset=utf-8');

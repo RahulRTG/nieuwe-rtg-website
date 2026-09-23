@@ -1,9 +1,9 @@
 {
   "catalogi": 1095,
-  "verschillendeNamen": 645,
+  "verschillendeNamen": 644,
   "namenInMeerDomeinen": 125,
   "woordenMetMeerBetekenissen": 107,
-  "betekenissenTotaal": 399,
+  "betekenissenTotaal": 400,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 33,
@@ -1943,8 +1943,8 @@
     },
     {
       "naam": "VELDEN",
-      "domeinen": 9,
-      "betekenissen": 9,
+      "domeinen": 10,
+      "betekenissen": 10,
       "hoogsteOverlap": 0.09,
       "soort": "botsing",
       "waar": [
@@ -1970,6 +1970,17 @@
             "bestemming",
             "datum",
             "tot"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/beleidsmotor/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "eens",
+            "oneens",
+            "onbekend"
           ]
         },
         {
@@ -2166,7 +2177,7 @@
       "naam": "BRONNEN",
       "domeinen": 8,
       "betekenissen": 8,
-      "hoogsteOverlap": 0,
+      "hoogsteOverlap": 0.05,
       "soort": "botsing",
       "waar": [
         {
@@ -2184,12 +2195,12 @@
           "bestanden": [
             "server/kern/dagcoach.js"
           ],
-          "leden": 6,
+          "leden": 8,
           "voorbeeld": [
+            "agenda",
+            "boeking",
             "medicijnen",
-            "zorg",
-            "verzorging",
-            "gewoonten"
+            "zorg"
           ]
         },
         {
@@ -3608,5 +3619,5 @@
       ]
     }
   ],
-  "bestanden": 3566
+  "bestanden": 3595
 }

@@ -1,8 +1,7 @@
-/* Schermtoets voor het samengevoegde RTG Leven: één controleerbaar Moment in
-   plaats van losse reserveringen. Hij bewaakt dat de gebruiker de opdracht
-   zelf geeft, dat het resultaat concreet en controleerbaar is, en dat partners
-   uitsluitend hun eigen onderdeel ontvangen. Daarnaast blijven scores,
-   voortgangsbalken en terugkom-lokkertjes verboden.
+/* Schermtoets voor het werkblad RTG Leven. Leven opent andere apps in panelen;
+   een avond samenstellen is van avond.html (SCHERMEIGENAAR.json), dus hier wordt
+   bewaakt dat Leven die eigenaar opent en haar niet opnieuw bouwt. Daarnaast
+   blijven scores, voortgangsbalken en terugkom-lokkertjes verboden.
 
    Draait alleen waar een browser beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
@@ -14,7 +13,7 @@ const path = require('path');
 
 const pw = laadPlaywright();
 
-test('RTG Leven maakt één controleerbaar Moment zonder score of aansporing',
+test('RTG Leven opent de avondplanner van avond.html, zonder eigen samensteller, score of aansporing',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-leven-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -56,15 +55,19 @@ test('RTG Leven maakt één controleerbaar Moment zonder score of aansporing',
     letOpFouten(page, fouten);
 
     await page.goto(base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.lv-moment[data-app], .lv-moment', { timeout: 15000 });
-
+    /* Leven is een werkblad dat andere apps OPENT; een avond samenstellen is van
+       avond.html (SCHERMEIGENAAR.json). Hier stond een tweede samensteller op
+       dezelfde routes met een eigen "Moment Contract"; het eerste paneel is nu
+       de eigenaar zelf. */
+    await page.waitForSelector('.rv-pane iframe[src="/apps/avond.html"]', { timeout: 15000 });
     const beeld = await page.evaluate(() => ({
       balk: !!document.querySelector('progress, [role="progressbar"]'),
       tekst: (document.querySelector('.lv-app').innerText || '').toLowerCase(),
-      composer: !!document.querySelector('[data-composer]')
+      eigenSamensteller: !!document.querySelector('[data-composer]'),
+      tab: (document.querySelector('#lvTabs') || {}).innerText || ''
     }));
-
-    assert.ok(beeld.composer, 'de gebruiker kan zelf sfeer, tijd, gezelschap en budget bepalen');
+    assert.equal(beeld.eigenSamensteller, false, 'Leven bouwt de avond-samensteller niet opnieuw');
+    assert.match(beeld.tab, /Uw avond/, 'het paneel heet naar wat het is, niet "Vandaag"');
     assert.equal(beeld.balk, false, 'geen voortgangsbalk over een leven');
 
     /* par. 2.9 en 2.4, op de getoonde tekst. "van de 10" vangt de teller die
@@ -75,25 +78,10 @@ test('RTG Leven maakt één controleerbaar Moment zonder score of aansporing',
         'het scherm hoort geen "' + woord + '" te tonen (LEVEN.md par. 2.4 en 2.9)');
     }
 
-    await page.fill('[data-composer] input[name="sfeer"]', 'rustig diner en veilig naar huis');
-    await page.fill('[data-composer] input[name="personen"]', '3');
-    await page.fill('[data-composer] input[name="budget"]', '175');
-    await page.click('[data-composer] button');
-    await page.waitForSelector('[data-contract]:not([hidden])', { timeout: 15000 });
-    const contract = await page.evaluate(() => ({
-      tekst: document.querySelector('[data-contract]').innerText,
-      tijdlijn: document.querySelector('[data-tijdlijn]').innerText,
-      aanvragen: !!document.querySelector('[data-contract] [data-aanvraag]')
-    }));
-    assert.match(contract.tekst, /MOMENT CONTRACT/i, 'het voorstel wordt een herkenbaar contract');
-    assert.match(contract.tekst, /3\s*gasten/i, 'het contract draagt het gekozen gezelschap');
-    const raming = /€\s*(\d+)/.exec(contract.tekst);
-    assert.ok(raming && Number(raming[1]) > 0 && Number(raming[1]) <= 175,
-      'de raming blijft concreet en onder het gekozen plafond van € 175: ' + contract.tekst);
-    assert.match(contract.tekst, /uitsluitend zijn eigen onderdeel/i,
-      'partners ontvangen niet het hele privéplan');
-    assert.ok(contract.aanvragen, 'de gebruiker houdt het expliciete akkoord op aanvragen');
-    assert.match(contract.tijdlijn, /Live regietafel/i, 'de samenhang blijft na het voorstel zichtbaar');
+    /* En in het paneel staat de echte planner, met het expliciete akkoord. */
+    const kader = page.frameLocator('.rv-pane iframe[src="/apps/avond.html"]');
+    await kader.locator('#bPlan').waitFor({ timeout: 15000 });
+    assert.equal(await kader.locator('#bPlan').count(), 1, 'de planner van avond.html staat in het paneel');
 
     const echteFouten = fouten.filter((f) => !/favicon/i.test(f));
     assert.deepEqual(echteFouten, [], 'het scherm hoort zonder consolefouten te draaien');

@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-22T17:33:16.891Z",
-  "commit": "33e75309",
+  "op": "2026-09-23T12:42:04.471Z",
+  "commit": "c94bfea7",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 304,
-  "bron": 7,
-  "afgeleid": 169,
-  "fragmenten": 22,
+  "artefacten": 314,
+  "bron": 10,
+  "afgeleid": 173,
+  "fragmenten": 25,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 190,
-  "afgeleidEigenaarHard": 167,
+  "metEigenaar": 197,
+  "afgeleidEigenaarHard": 171,
   "afgeleidGrendelt": 18,
-  "metStempel": 98,
+  "metStempel": 101,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -186,6 +186,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "ARBEID.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "ARCHITECTUUR.md",
    "soort": "AFGELEID",
    "eigenaar": "scripts/kaart.js",
@@ -211,6 +223,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=auditproef",
    "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AUTHORITY.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -261,6 +285,18 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BENOEMING.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -847,6 +883,46 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EDGE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EDGEDEKKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/edgedekking.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/edgedekking.js"
+   ],
+   "stempelInstrument": "scripts/edgedekking.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run edgedekking",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EDGEKAART.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/edgekaart.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/edgekaart.js"
+   ],
+   "stempelInstrument": "scripts/edgekaart.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run edgekaart",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2479,6 +2555,32 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "OFFICE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "OFFICEVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/officevorm.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/officevorm.js"
+   ],
+   "stempelInstrument": "scripts/officevorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run officevorm:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "OMZETPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/omzetproef.js",
@@ -3058,6 +3160,32 @@
    "stempelInstrument": "scripts/scherfmeter.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run scherfmeter:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMEIGENAAR.json",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMFUNCTIE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schermfunctie.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/schermfunctie.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run schermfunctie",
    "grendelt": false,
    "botsingVerklaard": null
   },

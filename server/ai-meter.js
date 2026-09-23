@@ -38,49 +38,9 @@
    plaats van af te wachten tot het middernacht is. Zie de kop van lib/klok.js. */
 const klok = require('./lib/klok');
 
-/* Prijzen per miljoen tokens, in dollar. Peildatum 2026-08-19.
-   Te overschrijven met RTG_AI_PRIJZEN (JSON), zodat een prijswijziging geen
-   codewijziging hoeft te zijn. */
-const PRIJZEN_PEILDATUM = '2026-08-19';
-const PRIJZEN = {
-  'claude-opus-5': { in: 5, uit: 25 },
-  'claude-opus-4-8': { in: 5, uit: 25 },
-  'claude-opus-4-7': { in: 5, uit: 25 },
-  'claude-opus-4-6': { in: 5, uit: 25 },
-  'claude-fable-5': { in: 10, uit: 50 },
-  'claude-sonnet-5': { in: 3, uit: 15 },
-  'claude-sonnet-4-6': { in: 3, uit: 15 },
-  'claude-haiku-4-5': { in: 1, uit: 5 },
-  'claude-haiku-4-5-20251001': { in: 1, uit: 5 }
-};
-/* Het duurste dat we kennen: het tarief voor een model dat niet in de tabel
-   staat. Zo leidt een nieuw of onbekend model nooit tot een te lage schatting. */
-const ONBEKEND = { in: 10, uit: 50 };
-
-/* Een cache-LEESBEURT kost een tiende van de invoerprijs, een cache-SCHRIJF
-   1,25x. Dat verschil is de hele reden dat verrijkMetCache in ./anthropic.js
-   bestaat, dus de meter hoort het ook te kennen -- anders lijkt caching duurder
-   dan het is en gaat iemand hem uitzetten. */
-const CACHE_LEES = 0.1;
-const CACHE_SCHRIJF = 1.25;
-
-function tabel() {
-  if (!process.env.RTG_AI_PRIJZEN) return PRIJZEN;
-  try { return Object.assign({}, PRIJZEN, JSON.parse(process.env.RTG_AI_PRIJZEN)); }
-  catch (e) { return PRIJZEN; }
-}
-
-/* Wat kost dit antwoord. Alle vier de soorten tokens apart, want ze hebben
-   alle vier een andere prijs. */
-function kostenVan(model, usage) {
-  const p = tabel()[String(model || '')] || ONBEKEND;
-  const u = usage || {};
-  const inv = Number(u.input_tokens) || 0;
-  const uit = Number(u.output_tokens) || 0;
-  const lees = Number(u.cache_read_input_tokens) || 0;
-  const schrijf = Number(u.cache_creation_input_tokens) || 0;
-  return ((inv * p.in) + (lees * p.in * CACHE_LEES) + (schrijf * p.in * CACHE_SCHRIJF) + (uit * p.uit)) / 1e6;
-}
+/* De prijstabel en de rekensom per antwoord staan in ./ai-prijzen.js (een eigen
+   onderwerp: wat kost een token, los van wat er vandaag is geteld). */
+const { PRIJZEN, PRIJZEN_PEILDATUM, tariefVan, gewogenInvoer, kostenVan } = require('./ai-prijzen');
 
 /* De stand van vandaag. Bewust in het geheugen en niet in de database: dit is
    een kraan en een teller, geen grootboek. Na een herstart begint de dag
@@ -196,4 +156,4 @@ function nulstel() { staat = LEEG(); }
    hij grijpt in als het geld op is), de rem daar STOPT iemand die er in een
    minuut doorheen gaat. Ze worden allebei aangeroepen in ./ai.js. */
 
-module.exports = { boek, boekFout, boekLokaal, boekLokaalFout, magNog, stand, nulstel, kostenVan, plafond, PRIJZEN, PRIJZEN_PEILDATUM };
+module.exports = { gewogenInvoer, tariefVan, boek, boekFout, boekLokaal, boekLokaalFout, magNog, stand, nulstel, kostenVan, plafond, PRIJZEN, PRIJZEN_PEILDATUM };

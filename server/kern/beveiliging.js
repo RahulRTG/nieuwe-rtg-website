@@ -36,9 +36,11 @@ const BEV_FUNCTIES = [
 ];
 // Vaste diensten (shifts). Uren tellen mee voor het budget.
 const BEV_SHIFTS = [
-  { id: 'dag', naam: 'Dag · 07:00-15:00', uren: 8 },
-  { id: 'avond', naam: 'Avond · 15:00-23:00', uren: 8 },
-  { id: 'nacht', naam: 'Nacht · 23:00-07:00', uren: 8 }
+  // van/tot in minuten vanaf middernacht van de dienstdatum; de nacht loopt door
+  // tot 07:00 de VOLGENDE dag (tot > 24 uur). De rustregel rekent hierop.
+  { id: 'dag', naam: 'Dag · 07:00-15:00', uren: 8, van: 7 * 60, tot: 15 * 60 },
+  { id: 'avond', naam: 'Avond · 15:00-23:00', uren: 8, van: 15 * 60, tot: 23 * 60 },
+  { id: 'nacht', naam: 'Nacht · 23:00-07:00', uren: 8, van: 23 * 60, tot: 31 * 60 }
 ];
 const BEV_ERNST = ['laag', 'midden', 'hoog', 'kritiek'];
 const AANVR_KLAAR = { gepland: true, afgewezen: true, geannuleerd: true };

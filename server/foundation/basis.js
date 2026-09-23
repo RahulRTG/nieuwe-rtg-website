@@ -22,10 +22,9 @@ module.exports = function maakBasis() {
      leesbaar (zachte migratie). */
   function laadSleutel() {
     const f = path.join(DATA_DIR, 'foundation.key');
-    try { if (fs.existsSync(f)) return fs.readFileSync(f); } catch (e) {}
-    const k = crypto.randomBytes(32);
-    try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(f, k, { mode: 0o600 }); } catch (e) {}
-    return k;
+    // lezen, of als eerste publiceren: nooit half, nooit twee sleutels (server/lib/sleutelbestand.js)
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    return require('../lib/sleutelbestand').sleutel(f, 32);
   }
   const SLEUTEL = laadSleutel();
   function encS(text) {

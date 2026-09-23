@@ -44,7 +44,7 @@
          tik -- de bevestiging zou verdwijnen precies doordat je hem van een
          andere kant aanraakt. De verhindering gaat om dezelfde reden mee. */
       gewicht: c.gewicht || 'licht',
-      verhinderd: c.verhinderd || null };
+      verhinderd: c.verhinderd || null, herstel: c.herstel || null, effect: c.effect || null };
   }
 
   /* EEN FUNCTIE GAAT NIET OVER DE GRENS, EN DAT MAG NIET STIL MISLUKKEN.
@@ -86,7 +86,8 @@
       try {
         w.parent.postMessage({ merk: MERK, soort: 'context', caps: caps,
           ctx: { bron: ctx.bron, titel: ctx.titel, acties: ctx.acties,
-            selectie: ctx.selectie, staat: platteStaat(ctx.staat), rail: ctx.rail || [] } }, HERKOMST);
+            selectie: ctx.selectie, staat: platteStaat(ctx.staat), rail: ctx.rail || [],
+            object: ctx.object || null, activiteit: ctx.activiteit || '' } }, HERKOMST);
       } catch (e) {}
     }
     A.opContext(zendContext);

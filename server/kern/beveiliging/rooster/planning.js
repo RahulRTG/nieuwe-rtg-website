@@ -55,6 +55,7 @@ module.exports = (ctx) => {
       id: d.id, datum: d.datum, shiftId: d.shiftId, shift: sh ? sh.naam : d.shiftId, uren: sh ? sh.uren : 0,
       postId: d.postId, post: p ? p.naam : 'Post', klant: p ? p.klant : '',
       guardId: d.guardId, guardNaam: d.guardNaam || guardNaam(s, d.guardId), status: d.status,
+      door: d.door || null, // 'autoplan' of 'mens'; null bij een dienst van voor dit veld
       inklokAt: d.inklokAt || null, uitklokAt: d.uitklokAt || null,
       /* De aanwezigheid bij de post: binnen of buiten met een tijd, en nooit een
          coordinaat (PLAATS.md grens 4). Hier stond niets, terwijl er wel een
@@ -92,7 +93,12 @@ module.exports = (ctx) => {
     }
     return { van: start, dagen: dagenUit, shifts: BEV_SHIFTS };
   }
-  function zetDienst(s, data) {
+  const { rustBotsing, MIN_RUST_UUR } = require('./rust')({ shiftVan, diensten, guardNaam });
+  /* `door` komt NOOIT uit het verzoek: de route geeft alleen de body door, en
+     een manager zou anders 'autoplan' kunnen typen. De automaat geeft hem als
+     tweede argument mee, zodat achteraf te zien is wie een dienst zette. */
+  function zetDienst(s, data, opts) {
+    const door = opts && opts.door === 'autoplan' ? 'autoplan' : 'mens';
     if (!functieAan(s, 'rooster')) return { status: 409, error: 'Rooster staat uit in uw boardroom.' };
     const p = postVan(s, String(data.postId || ''));
     if (!p) return { status: 404, error: 'Post niet gevonden.' };
@@ -102,16 +108,23 @@ module.exports = (ctx) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(datum)) return { status: 400, error: 'Kies een datum.' };
     const gid = Number(data.guardId);
     if (!guards(s).some(g => g.id === gid)) return { status: 404, error: 'Beveiliger niet in het team.' };
-    // geen dubbele dienst in dezelfde shift, en rust: niet ook de aangrenzende shift
+    // geen dubbele dienst in dezelfde shift
     const zelfde = diensten().find(d => d.supplierCode === s.code && d.datum === datum && d.guardId === gid && d.shiftId === sh.id && d.status !== 'geannuleerd');
     if (zelfde) return { status: 409, error: guardNaam(s, gid) + ' staat al op deze shift.' };
+    /* Rust: de automaat plant nooit tegen de rustregel in (planAuto filtert erop
+       en dit is de tweede grendel). Een MENS mag het wel -- een ruil of een
+       noodgeval is zijn besluit -- maar krijgt de botsing erbij te zien in
+       plaats van dat hij stil doorgaat. Of een mens hier ook geweigerd moet
+       worden, is een besluit en geen reparatie. */
+    const rust = rustBotsing(s, gid, datum, sh.id);
+    if (rust && door === 'autoplan') return { status: 409, error: rust };
     const dienst = { id: id('d'), supplierCode: s.code, datum, shiftId: sh.id, postId: p.id,
-      guardId: gid, guardNaam: guardNaam(s, gid), status: 'gepland', at: nu() };
+      guardId: gid, guardNaam: guardNaam(s, gid), status: 'gepland', door, at: nu() };
     diensten().unshift(dienst);
     db.data.bevDiensten = diensten().slice(0, 100000);
     save();
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
-    return { status: 200, ok: true, dienst: dienstPubliek(s, dienst) };
+    return { status: 200, ok: true, dienst: dienstPubliek(s, dienst), ...(rust ? { rustWaarschuwing: rust } : {}) };
   }
   function schrapDienst(s, dienstId) {
     const d = diensten().find(x => x.id === dienstId && x.supplierCode === s.code);
@@ -122,5 +135,5 @@ module.exports = (ctx) => {
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     return { status: 200, ok: true };
   }
-  return { budget, zetBudget, dienstPubliek, rooster, zetDienst, schrapDienst };
+  return { budget, zetBudget, dienstPubliek, rooster, zetDienst, schrapDienst, rustBotsing, MIN_RUST_UUR };
 };

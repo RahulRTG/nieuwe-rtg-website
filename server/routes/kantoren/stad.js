@@ -7,7 +7,9 @@
 module.exports = (ctx) => {
   const { app, officeAuth, veilig, afdelingen, kern } = ctx;
   const stad = kern.stad;
-  const naam = req => (req.body && req.body.naam ? String(req.body.naam) : 'boardroom');
+  /* Wie het deed komt uit de sessie, nooit uit het verzoek (hier stond
+     `req.body.naam`). Zonder naam op de sessie zegt het spoor dat eerlijk. */
+  const naam = req => require('../../opzet/envelop').wie(req) || 'kantoor (gedeelde code)';
 
   // het bord: scenario, domeinen met stand + regime, waarschuwingen, de vloot
   app.post('/api/office/stad', officeAuth, (req, res) => veilig(res, () => stad.stadBeeld()));
@@ -44,8 +46,12 @@ module.exports = (ctx) => {
      van een klus, met naam in het auditlog. */
   app.post('/api/office/stad/werk', officeAuth, (req, res) => veilig(res, () => stad.stadWerk()));
   app.post('/api/office/stad/werk/klaar', officeAuth, (req, res) => veilig(res, () => {
-    const r = stad.stadWerkKlaar({ sleutel: req.body.sleutel, wie: naam(req), notitie: req.body.notitie });
-    if (r.ok) afdelingen.audit(r.wie, 'Stadsklus klaargemeld: ' + r.omschrijving);
+    /* De monteur mag zijn naam OPGEVEN, en die staat bij de klus (wie deed het
+       werk). Het auditlog zegt wie er HANDELDE: de sessie, met de opgegeven
+       naam erbij als gegeven en niet als actor. */
+    const opgegeven = req.body.naam ? String(req.body.naam).slice(0, 60) : null;
+    const r = stad.stadWerkKlaar({ sleutel: req.body.sleutel, wie: opgegeven || naam(req), notitie: req.body.notitie });
+    if (r.ok) afdelingen.audit(naam(req), 'Stadsklus klaargemeld: ' + r.omschrijving + (opgegeven ? ' (gemeld als ' + opgegeven + ')' : ''));
     return r;
   }));
 

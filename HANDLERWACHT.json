@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-23T06:15:48.036Z",
-  "commit": "3263a90",
+  "op": "2026-09-23T12:42:00.772Z",
+  "commit": "0ce48fef",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -571,7 +571,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/journaal",
-   "bestand": "server/bedrijf/rollen.js:134",
+   "bestand": "server/bedrijf/rollen.js:143",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -697,7 +697,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/lid/rollen",
-   "bestand": "server/bedrijf/rollen.js:86",
+   "bestand": "server/bedrijf/rollen.js:95",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },
@@ -709,7 +709,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/mijn-rechten",
-   "bestand": "server/bedrijf/rollen.js:123",
+   "bestand": "server/bedrijf/rollen.js:132",
    "staat": "bewaakt",
    "wacht": "lidVan"
   },
@@ -805,7 +805,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/rollen",
-   "bestand": "server/bedrijf/rollen.js:79",
+   "bestand": "server/bedrijf/rollen.js:88",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -978,7 +978,7 @@
   },
   {
    "sleutel": "POST /api/betaaldiensttarief",
-   "bestand": "server/routes/kantoren/geld.js:31",
+   "bestand": "server/routes/kantoren/geld.js:37",
    "staat": "openbaar",
    "reden": "het betaaldiensttarief staat in de partnervoorwaarden"
   },
@@ -995,13 +995,13 @@
   },
   {
    "sleutel": "POST /api/claims",
-   "bestand": "server/routes/kantoren/geld.js:59",
+   "bestand": "server/routes/kantoren/geld.js:65",
    "staat": "openbaar",
    "reden": "de publieke claims voeden de voorwaardenpagina's, die je zonder inlog leest"
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:932",
+   "bestand": "server/server.js:931",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -1079,25 +1079,25 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda",
-   "bestand": "server/foundation/gasten/gezinsleven.js:22",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:71",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/bereik",
-   "bestand": "server/foundation/gasten/gezinsleven.js:54",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:113",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/verwijder",
-   "bestand": "server/foundation/gasten/gezinsleven.js:86",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:137",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/wijzig",
-   "bestand": "server/foundation/gasten/gezinsleven.js:37",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:90",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1271,25 +1271,25 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus",
-   "bestand": "server/foundation/gasten/gezinsleven.js:106",
+   "bestand": "server/foundation/gasten/gezinsleven.js:10",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus/gedaan",
-   "bestand": "server/foundation/gasten/gezinsleven.js:119",
+   "bestand": "server/foundation/gasten/gezinsleven.js:23",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus/keur",
-   "bestand": "server/foundation/gasten/gezinsleven.js:129",
+   "bestand": "server/foundation/gasten/gezinsleven.js:33",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus/verwijder",
-   "bestand": "server/foundation/gasten/gezinsleven.js:140",
+   "bestand": "server/foundation/gasten/gezinsleven.js:44",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1457,19 +1457,19 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen",
-   "bestand": "server/foundation/zorg.js:92",
+   "bestand": "server/foundation/zorg.js:103",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/bevestig",
-   "bestand": "server/foundation/zorg.js:99",
+   "bestand": "server/foundation/zorg.js:110",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/intrekken",
-   "bestand": "server/foundation/zorg.js:107",
+   "bestand": "server/foundation/zorg.js:118",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -3120,7 +3120,7 @@
   },
   {
    "sleutel": "POST /api/pasprijzen",
-   "bestand": "server/routes/kantoren/geld.js:16",
+   "bestand": "server/routes/kantoren/geld.js:22",
    "staat": "openbaar",
    "reden": "de prijslijst is publieke informatie"
   },
@@ -3516,7 +3516,7 @@
   },
   {
    "sleutel": "POST /api/rtf/solliciteer",
-   "bestand": "server/routes/member/werk/rtf.js:46",
+   "bestand": "server/routes/member/werk/rtf.js:51",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },
@@ -3798,7 +3798,7 @@
   },
   {
    "sleutel": "POST /api/rtf/vacatures",
-   "bestand": "server/routes/member/werk/rtf.js:32",
+   "bestand": "server/routes/member/werk/rtf.js:37",
    "staat": "openbaar",
    "reden": "openstaande vacatures zijn openbaar"
   },
@@ -3834,7 +3834,7 @@
   },
   {
    "sleutel": "POST /api/sociaalbeleid",
-   "bestand": "server/routes/kantoren/geld.js:48",
+   "bestand": "server/routes/kantoren/geld.js:54",
    "staat": "openbaar",
    "reden": "de sociale afdracht is een publieke belofte (RTFoundation)"
   },
@@ -3852,13 +3852,13 @@
   },
   {
    "sleutel": "POST /api/stad/doos/hartslag",
-   "bestand": "server/routes/kantoren/stad.js:91",
+   "bestand": "server/routes/kantoren/stad.js:97",
    "staat": "openbaar",
    "reden": "de stadsdoos stuurt zijn apparaatsleutel mee"
   },
   {
    "sleutel": "POST /api/stad/doos/meting",
-   "bestand": "server/routes/kantoren/stad.js:94",
+   "bestand": "server/routes/kantoren/stad.js:100",
    "staat": "openbaar",
    "reden": "idem"
   },
@@ -3869,7 +3869,7 @@
   },
   {
    "sleutel": "POST /api/supplier/apply",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js:12",
+   "bestand": "server/routes/supplier/werving/sollicitaties.js:13",
    "staat": "openbaar",
    "reden": "solliciteren bij een zaak kan zonder account"
   },
@@ -4018,7 +4018,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1448",
+   "bestand": "server/server.js:1447",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

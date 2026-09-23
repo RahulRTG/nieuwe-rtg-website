@@ -102,11 +102,13 @@
       });
       host.querySelector('#kringAdd').addEventListener('click', function () {
         var v = host.querySelector('#kringIn').value.trim();
-        if (v) na(V.api('/api/veiligheid/kring/toevoegen', { handle: v }));
+        if (!v) { V.melding('Vul eerst een codenaam in.'); return; }
+        na(V.api('/api/veiligheid/kring/toevoegen', { handle: v }));
       });
       host.querySelector('#mailAdd').addEventListener('click', function () {
         var v = host.querySelector('#mailIn').value.trim();
-        if (v) na(V.api('/api/veiligheid/kring/mail', { adres: v }));
+        if (!v) { V.melding('Vul eerst een e-mailadres in.'); return; }
+        na(V.api('/api/veiligheid/kring/mail', { adres: v }));
       });
     }).catch(function (e) {
       host.innerHTML = '<p class="stil">' + V.esc(e.message) + ' Log eerst in via de leden-app.</p>';

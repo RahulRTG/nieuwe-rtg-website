@@ -71,10 +71,22 @@ const EIGENAAR = {
     waarom: 'Handmatig onderhouden ontwerp- en implementatienotitie voor de drie goedgekeurde homes, met de daadwerkelijk uitgevoerde proeven en hun grenzen.' },
   'LANGUAGE.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden architectuur- en bereikbeschrijving; de drie taalrapporten dragen het afzonderlijke uitvoerbare bewijs.' },
+  'AUTHORITY.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (RTG Authority Engine); de bronverwijzingen zijn met de hand nagelopen, er is geen generator die het schrijft.' },
+  'BENOEMING.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (RTFoundation Roles & Governance 2.0); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',
     waarom: 'Handmatig beoordeelde bevindingen en resterende taalgrenzen; geen automatisch gegenereerd register.' },
   /* De aanleiding zelf. Er is geen schrijvend script: de lijst wordt met de hand
      onderhouden en mag alleen krimpen. */
+  /* De consolidatieronde van 23 september 2026: de meting (welke schermen
+     roepen dezelfde paden aan) en het besluit (wie is eigenaar per capability)
+     zijn twee bestanden, en alleen de eerste heeft een schrijver. */
+  'SCHERMFUNCTIE.json': { schrijver: 'scripts/schermfunctie.js' },
+  'SCHERMEIGENAAR.json': { handmatig: true, lezer: 'test/schermeigenaar.test.js',
+    waarom: 'het eigenaarsregister is een BESLUIT per capability en per overlappend paar; de toets houdt het ' +
+      'tegen een verse meting van scripts/schermfunctie.js, en wie het uit die meting genereert laat de toets ' +
+      'met zichzelf vergelijken' },
   'BEREIK.json': { handmatig: true, lezer: 'test/bereikbaar.test.js',
     waarom: 'schuldlijst van schermen zonder klikroute; wordt met de hand bijgehouden en mag alleen krimpen. ' +
       'Precies daarom kon een nieuw script hem stil overschrijven zonder dat een schrijverscan iets zag.' },
@@ -90,6 +102,12 @@ const EIGENAAR = {
      bijkomen zonder dat iemand zegt wie ze bezit. */
   'VERANDERBEREIK-KENNIS.json': { schrijver: 'scripts/veranderbereik.js' },
   'VERANDERBEREIK-RONDE.json': { schrijver: 'scripts/veranderbereik.js' },
+  /* DE EDGE (EDGE.md par. 9). Twee meters en elk zijn eigen bestand: de kaart
+     leest de BRON (wie schrijft, beslist en leest), de dekking een echte
+     BROWSER (welk veld heeft elk scherm, en waar komt het vandaan). Hun ratels
+     staan in scripts/norm.js; dat de meters kunnen uitslaan in test/meterijk.test.js. */
+  'EDGEKAART.json': { schrijver: 'scripts/edgekaart.js' },
+  'EDGEDEKKING.json': { schrijver: 'scripts/edgedekking.js' },
   'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
@@ -111,6 +129,12 @@ const EIGENAAR = {
      bijkomen, niet te stijgen doordat er registers bijkomen zonder eigenaar. De
      vloer oprekken zou die zin precies omdraaien. */
   'PLANVORM.json': { schrijver: 'scripts/planvorm.js' },
+
+  /* De officevorm: is er een `RTGObject` onder document, taak, betaling en de
+     andere subtypen die het voorstel voor RTG Office Next noemt (OFFICE.md par.
+     0)? Zelfde vorm als de planvorm hierboven: een schrijver, een ratel op het
+     BEREIK, een ijking en een regel in de versheidslijst. */
+  'OFFICEVORM.json': { schrijver: 'scripts/officevorm.js' },
 
   /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
      bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie

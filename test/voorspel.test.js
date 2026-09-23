@@ -46,7 +46,8 @@ test('het pure leren: drie vrijdagavonden bij dezelfde zaak worden een gewoonte'
   assert.equal(g[0].n, 3);
   assert.equal(g[0].dagNaam, 'vrijdag');
   assert.ok(Math.abs(g[0].tussenDagen - 7) < 0.1, 'ritme van een week');
-  assert.ok(g[0].zekerheid > 0.25, 'zekerheid groeit met rijpheid');
+  assert.deepEqual(Object.keys(g[0].opbouw).sort(), ['bezoeken', 'rijp', 'vastUur', 'vasteDag'],
+    'de opbouw gaat mee, niet een samengesteld cijfer');
   assert.equal(g[0].gemCenten, 8000);
 });
 
@@ -58,7 +59,7 @@ test('het pure leren: minder dan drie bezoeken is geen gewoonte', () => {
 });
 
 test('het stille seintje: alleen een rijpe gewoonte fluistert mee', () => {
-  const basis = { wat: 'Sal de Mar rond 20:00', waarom: '6 eerdere bezoeken', zekerheid: 0.5 };
+  const basis = { wat: 'Sal de Mar rond 20:00', waarom: '6 eerdere bezoeken' };
   const rijp = seintjeVoor({ verwachtingen: [{ ...basis, rijp: 0.9 }] });
   assert.ok(rijp && rijp.tekst.includes('Sal de Mar'), 'rijp wordt een seintje');
   assert.equal(seintjeVoor({ verwachtingen: [{ ...basis, rijp: 0.1 }] }), null, 'vers bezoek blijft stil');
@@ -74,6 +75,21 @@ test('het pure leren: een rijpe weekgewoonte krijgt een hoge rijpheid', () => {
   assert.ok(g[0].rijp >= 0.9, 'bijna een week later is de gewoonte rijp (rijp=' + g[0].rijp + ')');
 });
 
+test('geen ongeijkt cijfer: wat nu aan de beurt is gaat voor een oude gewoonte met meer bezoeken', () => {
+  /* ARBEID.md par. 4 punt 11. De oude samengestelde zekerheid zette A (acht
+     bezoeken, net geweest) boven B (vier bezoeken, ritme verstreken), puur
+     door gewichten die niemand tegen de uitkomst had gehouden. */
+  const rek = 'lid:X', nu = new Date('2026-07-17T12:00:00.000Z');
+  const rij = (code, dagenTerug) => ({ at: new Date(nu.getTime() - dagenTerug * 86400000).toISOString(),
+    van: rek, naar: 'partner:' + code, centen: 1000 });
+  const rijen = [1, 6, 11, 16, 21, 26, 31, 36].map(d => rij('AAA', d))
+    .concat([7, 14, 21, 28].map(d => rij('BBB', d)));
+  const g = gewoontenUit(rijen, rek, nu);
+  assert.deepEqual(g.map(x => x.code), ['BBB', 'AAA']);
+  assert.ok(g[0].rijp >= 0.6 && g[1].rijp < 0.6);
+  for (const x of g) assert.equal(x.zekerheid, undefined);
+});
+
 test('de reisketen vooruit: een vaste aankomst zonder tafel wordt een ketenvoorstel', () => {
   const nu = new Date('2026-07-19T10:00:00.000Z');
   const vb = { status: 'bevestigd', aankomst: '2026-07-22', supplierName: 'SAKURA', customerKey: 'k1' };
@@ -82,7 +98,7 @@ test('de reisketen vooruit: een vaste aankomst zonder tafel wordt een ketenvoors
   assert.equal(los[0].soort, 'keten');
   assert.match(los[0].vraag, /transfer/i);
   assert.match(los[0].vraag, /SAKURA/);
-  assert.ok(los[0].zekerheid >= 0.9 && los[0].rijp === 1, 'een vaste boeking is zeker en rijp');
+  assert.ok(los[0].grond && los[0].rijp === 1, 'een vaste boeking draagt haar grond en is rijp');
   // staat er al een tafel op de aankomstdag, dan is de keten compleet: stil
   const compleet = ketenUit({ verblijven: [vb],
     reserveringen: [{ status: 'bevestigd', datum: '2026-07-22' }] }, nu);
@@ -94,7 +110,7 @@ test('de reisketen vooruit: een vaste aankomst zonder tafel wordt een ketenvoors
 
 test('het keten-seintje: een klaarstaande keten fluistert als keten', () => {
   const s = seintjeVoor({ verwachtingen: [{ soort: 'keten', wat: 'uw aankomst bij SAKURA op 2026-07-22',
-    waarom: 'de check-in staat vast', rijp: 1, zekerheid: 0.9 }] });
+    waarom: 'de check-in staat vast', rijp: 1 }] });
   assert.ok(s && /keten kan klaargezet/i.test(s.tekst));
 });
 
@@ -121,7 +137,9 @@ test('na drie kassabetalingen voorspelt RTG de vaste zaak van het lid', async ()
   assert.equal(v.code, 'KIKUNOI');
   assert.match(v.wat, /Sal de Mar/);
   assert.match(v.vraag, /Sal de Mar/);
-  assert.ok(v.zekerheid > 0 && v.zekerheid <= 1);
+  assert.equal(v.zekerheid, undefined, 'geen ongeijkt cijfer naar het scherm');
+  assert.equal(v.opbouw.bezoeken, 3);
+  assert.match(r.body.volgorde, /meeste bezoeken/);
 });
 
 test('de zaak ziet een eerlijke morgen-verwachting met vaste gasten', async () => {

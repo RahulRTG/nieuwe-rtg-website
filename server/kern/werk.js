@@ -6,6 +6,9 @@
    Privacy: wie via de RTFoundation solliciteert, is voor de werkgever niet als
    zodanig herkenbaar (werkgeverSollicitatie verwijdert de interne velden). */
 
+/* Wat een werkgever van een sollicitatie ziet: zie werkgeverSollicitatie. */
+const WERKGEVER_VELDEN = Object.freeze(['id', 'name', 'func', 'contact', 'note', 'status', 'at', 'vacatureId', 'cv']);
+
 const VAC_SOORTEN = ['bijbaan', 'fulltime', 'parttime', 'stage', 'vrijwilliger', 'vakantiewerk'];
 
 function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, sseToCustomer, notifySupplier, notify, commWerk, rtf, meldLidVan }) {
@@ -139,11 +142,23 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
   /* Wat de werkgever van een sollicitatie te zien krijgt. Wie via de RTFoundation
      solliciteert, verschijnt bij het bedrijf precies als een gewoon RTG-lid; de
      herkomst (viaRTF), de sessiesleutel en de gezinsverwijzing blijven intern. */
+  /* EEN POSITIEVE LIJST EN GEEN WEGLAATLIJST. Hier stond `{ viaRTF, key, rtf,
+     ...rest }`, en dat lekte via wat er ONTBRAK: een ledenrij hield `codename` en
+     `vacatureId`, een RTF-rij had ze allebei niet, dus een werkgever las de
+     Foundation-herkomst af aan twee lege velden (ARBEID.md par. 4 punt 1). Bij
+     een weglaatlijst passeert elk nieuw veld de grens vanzelf; hier blijft elk
+     nieuw veld buiten tot iemand het er bewust bij zet (dezelfde richting als
+     AI-CONTEXT-01). `codename` gaat met opzet naar NIEMAND: de werkgeverschermen
+     lezen hem niet, en een codenaam naast een echte naam is precies de koppeling
+     die het codenaamontwerp voorkomt. `viaRTG` en `cv` zijn wat een lid en een
+     gezinslid gemeen hebben; een anonieme sollicitant zonder app heeft ze niet,
+     en dat verschil is echt en geen herkomst. */
   function werkgeverSollicitatie(a) {
     if (!a) return a;
-    const { viaRTF, key, rtf, ...rest } = a;
-    if (viaRTF) rest.viaRTG = true; // RTF-sollicitant lijkt op een gewoon RTG-lid
-    return rest;
+    const uit = {};
+    for (const veld of WERKGEVER_VELDEN) if (a[veld] !== undefined) uit[veld] = a[veld];
+    if (a.viaRTG || a.viaRTF) uit.viaRTG = true; // RTF-sollicitant lijkt op een gewoon RTG-lid
+    return uit;
   }
 
   /* De bezorging van een besluit bij de sollicitant staat in een DEELMODULE.
@@ -157,4 +172,4 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
   return { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, applyChatVertaald, chatStuur, meldWerkgever, openVacatures, werkgeverSollicitatie, notifyApplicant };
 }
 
-module.exports = { VAC_SOORTEN, maakWerk };
+module.exports = { VAC_SOORTEN, WERKGEVER_VELDEN, maakWerk };

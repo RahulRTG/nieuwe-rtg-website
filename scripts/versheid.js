@@ -229,6 +229,12 @@ const REGISTERS = [
      de proef zag veranderen, en wat een mens erover heeft verklaard. Hij veroudert op
      twee manieren -- een nieuwe AI-bereikbare route, en een verse idempotentieronde. */
   ['GEVOLGDEKKING.json', 'npm run gevolgdekking:vastleggen', 'van hoeveel AI-bedienbare handelingen bekend is wat zij veroorzaken'],
+  /* DE EDGE (EDGE.md). Twee registers en allebei een melding: de kaart veroudert
+     met elke rtg-gebeurtenis die er in public/ bij komt, de dekking met elk
+     scherm. Hun tanden zitten op de inhoud (test/edgekaart.test.js en
+     test/edgenieuwscherm.test.js, plus de normtanden) en niet op de ouderdom. */
+  ['EDGEKAART.json', 'npm run edgekaart', 'wie in de Edge-lagen schrijft en beslist, en welke kanalen nergens aankomen'],
+  ['EDGEDEKKING.json', 'npm run edgedekking', 'wat elk scherm, gemeten in een browser, aan de Edge vertelt'],
   /* DE OVERLEVING STAAT MET OPZET OP `overig` EN NIET OP BEVEILIGING, en dat is
      de correctie op een eerste versie die hem die vlag wel gaf -- "hij gaat over
      beveiliging, dus hij hoort in de beveiligingsklasse". Dat is de verkeerde
@@ -507,6 +513,7 @@ const REGISTERS = [
   ['SYMBOLEN.json', 'node scripts/symbolen.js --vastleggen', 'welke functies waar wonen'],
   ['SCHERMGEDRAG.json', 'node scripts/schermgedrag.js --vastleggen', 'wat een scherm werkelijk doet, gelezen uit zijn eigen script'],
   ['SCHERMROUTES.json', 'node scripts/schermroutes.js --vastleggen', 'welk bestand in public/ welk API-pad noemt, en welke daarvan dood zijn'],
+  ['SCHERMFUNCTIE.json', 'npm run schermfunctie', 'welke paren schermen dezelfde API-paden aanroepen, en welke schermen doorverwijzen -- de meting onder SCHERMEIGENAAR.json'],
   ['ROUTEBRON.json', 'node scripts/routebron.js --vastleggen', 'de routelijst waar SCHERMROUTES tegen meet -- veroudert hij, dan verzint de dode-padenteller er'],
   ['CONTEXTPROEF.json', 'node scripts/contextproef.js --vastleggen', 'of de async-context blijft staan waar hij moet blijven staan'],
   ['FAALPROEF.json', 'node scripts/faalproef.js --vastleggen', 'wat er gebeurt als een afhankelijkheid wegvalt'],
@@ -546,6 +553,10 @@ const REGISTERS = [
      ziet er precies zo uit als een verse -- met als extra valkuil dat hij dan
      van "deze domeinen delen niets" in "we hebben minder gekeken" verandert
      zonder dat het getal beweegt. */
+  /* Vijfde van deze soort (OFFICE.md par. 0), met dezelfde faalvorm: een nul
+     waarop het besluit rust dat er geen `RTGObject` komt, en die veroudert met
+     de CODE -- een nieuw objectdomein of een hernoemde map verandert hem. */
+  ['OFFICEVORM.json', 'npm run officevorm:vast', 'of de objectdomeinen onder het voorgestelde RTGObject een datavorm DELEN -- het besluit tegen een universeel objectmodel voor RTG Office rust erop, en de uitslag is een nul'],
   ['PLANVORM.json', 'npm run planvorm:vast', 'of de plandomeinen een datavorm en een planlus DELEN -- het besluit over een universele planningsgrond rust erop, en de uitslag is twee nullen'],
   ['SPOORVORM.json', 'npm run spoorvorm:vast', 'hoever de zes andere mechanismen van de spoorvorm van kern/vertegenwoordiging/handelen.js staan -- een matrix vol streepjes ziet er vers en verouderd hetzelfde uit, en juist die matrix hoort te veranderen'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat

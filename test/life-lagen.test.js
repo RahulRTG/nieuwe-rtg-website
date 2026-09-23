@@ -43,7 +43,9 @@ test('alle bestaande premiumdiensten in LIFE dragen de Lifestyle-poort', () => {
     'garderobe', 'lifestyle'
   ];
   for (const app of premium) {
-    const kaart = new RegExp('<a[^>]+href="/apps/' + app + '\\.html"[^>]+data-life-eist="lifestyle"');
+    // een stand van RTG Geld wordt geopend op zijn eigenaar (geld.html#stand), niet
+    // via de doorverwijzing; de poort reist mee (SCHERMEIGENAAR.json)
+    const kaart = new RegExp('<a[^>]+href="/apps/(?:' + app + '\\.html|geld\\.html#' + app + ')"[^>]+data-life-eist="lifestyle"');
     assert.match(html, kaart, app + ' staat zonder Lifestyle-poort in LIFE');
   }
   assert.equal((html.match(/data-life-eist="lifestyle"/g) || []).length, premium.length,

@@ -469,7 +469,7 @@ function wereld(metGrammatica) {
   const window = { RTGAdaptiefLeer: leer, console: { warn() {}, error() {} }, matchMedia: () => ({ matches: false, addEventListener() {} }),
     setTimeout: (f) => f(), addEventListener() {}, RTGLagen: { lade: laag, taak: laag, sluit() {} } };
   if (metGrammatica) window.RTGGrammatica = gram;
-  for (const f of ['register.js', 'waarom.js', 'balkknop.js', 'orb.js', 'diepte.js']) {
+  for (const f of ['vorm.js', 'register.js', 'waarom.js', 'balkknop.js', 'orb.js', 'diepte.js']) {
     vm.runInNewContext(lees('public/shared/adaptief/' + f), { window, document, navigator: {} });
   }
   const alles = (n, uit = []) => { uit.push(n); (n.kinderen || []).forEach((k) => alles(k, uit)); return uit; };

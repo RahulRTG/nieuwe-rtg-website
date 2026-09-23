@@ -132,7 +132,7 @@ function schil() {
     RTGAdaptiefLeer: leer, RTGGrammatica: gram
   });
   vm.runInContext('window = globalThis; parent = globalThis;', ctx);
-  for (const rel of ['public/shared/adaptief/register.js', 'public/shared/adaptief/brug.js', 'public/shared/edge/blikveld.js']) {
+  for (const rel of ['public/shared/adaptief/vorm.js', 'public/shared/adaptief/register.js', 'public/shared/adaptief/brug.js', 'public/shared/edge/blikveld.js']) {
     vm.runInContext(lees(rel), ctx, { filename: rel });
   }
   const zend = (c) => luisteraars.forEach((f) => f({ origin: 'https://rtg.test', source: bladVenster,

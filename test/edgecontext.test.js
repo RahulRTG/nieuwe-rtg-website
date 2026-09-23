@@ -30,13 +30,16 @@ const vm = require('vm');
 
 const leer = require('../public/shared/adaptief.js');
 const gram = require('../public/shared/adaptief/grammatica.js');
-const REGISTER = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'adaptief', 'register.js'), 'utf8');
+const deel = (f) => fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'adaptief', f), 'utf8');
+/* Het register leest zijn vorm uit ./vorm.js (test/adaptiefdelen.test.js). */
+const REGISTER = [deel('vorm.js'), deel('register.js')];
 
 function register() {
   const mq = () => ({ matches: false, addEventListener() {} });
   const window = { RTGAdaptiefLeer: leer, RTGGrammatica: gram, matchMedia: mq, console: { warn() {}, error() {} } };
   const document = { documentElement: { setAttribute() {} } };
-  vm.runInNewContext(REGISTER, { window, document });
+  const ctx = vm.createContext({ window, document });
+  REGISTER.forEach((bron) => vm.runInContext(bron, ctx));
   return window.RTGAdaptief;
 }
 

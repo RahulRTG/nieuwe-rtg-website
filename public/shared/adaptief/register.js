@@ -33,37 +33,16 @@
      gewicht STAAN (met het gebrek `gewichtloos`) en gaat alles wat niet licht is
      dicht: een zware handeling mag nooit stil als lichte doorgaan. */
   var gram = w.RTGGrammatica || null;
+  var V = w.RTGAdaptiefVorm;
+  if (!V) return;                          // zonder de vorm geen register
 
   var caps = {}, gebrek = [], gemeld = {};
-  var luisterVorm = [], luisterCtx = [];
+  var luisterCtx = [];
   var nu = { bron: '', titel: '', acties: [], selectie: false, staat: {}, rail: [], sleutel: '' };
 
-  /* ------------------------------------------------------------- de vorm --
-     Twee mediaqueries en geen resize-teller: de vorm verandert op een grens en
-     niet op elke pixel. De grenzen komen uit de leer, zodat er geen tweede
-     getal ontstaat naast dat in command.css (WERELD.md-fout in het klein: twee
-     lijsten zijn twee waarheden).
-
-     Hier stond eerst innerWidth bij het laden, één keer gemeten. Dat is dezelfde
-     fout die de sterrenhemel en de gloed maakten (WERELD.md): meten op een
-     moment in plaats van het scherm volgen. Draai je een telefoon, dan klopt een
-     gemeten momentopname niet meer. */
-  var mqBureau = w.matchMedia('(min-width:' + leer.MAAT.bureau + 'px)');
-  var mqTablet = w.matchMedia('(min-width:' + leer.MAAT.tablet + 'px)');
-  function vorm() { return mqBureau.matches ? 'bureau' : (mqTablet.matches ? 'tablet' : 'telefoon'); }
-  var laatste = vorm();
-  function hertoets() {
-    var v = vorm();
-    if (v === laatste) return;
-    laatste = v;
-    if (d.documentElement) d.documentElement.setAttribute('data-rtg-vorm', v);
-    luisterVorm.slice().forEach(function (f) { try { f(v); } catch (e) {} });
-  }
-  [mqBureau, mqTablet].forEach(function (mq) {
-    if (mq.addEventListener) mq.addEventListener('change', hertoets);
-    else if (mq.addListener) mq.addListener(hertoets);
-  });
-  if (d.documentElement) d.documentElement.setAttribute('data-rtg-vorm', laatste);
+  /* De vorm van het apparaat woont in ./vorm.js (afgesplitst op de grens van
+     10 KB); het register geeft hem door onder zijn eigen naam. */
+  var vorm = V.vorm;
 
   /* -------------------------------------------------------- declareren --
      Een declaratie mag twee keer binnenkomen (een app die herbouwt); de laatste
@@ -190,7 +169,7 @@
   w.RTGAdaptief = {
     vorm: vorm,
     raakmaat: leer.RAAK,
-    opVorm: function (f) { if (typeof f === 'function') { luisterVorm.push(f); f(vorm()); } },
+    opVorm: V.opVorm,
     declareer: declareer,
     declareerAlle: declareerAlle,
     capability: function (id) { return caps[id] || null; },

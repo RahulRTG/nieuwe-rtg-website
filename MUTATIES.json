@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-22T16:18:32.077Z",
-    "commit": "c5bdb7094",
+    "op": "2026-09-23T11:34:48.413Z",
+    "commit": "f4957b7",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -7985,6 +7985,14 @@
     "skipwacht.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "sleutel-wedloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/sleutelbestand.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "sleutelwoorden.test.js": {
       "soort": "puur",

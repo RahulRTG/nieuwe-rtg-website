@@ -450,6 +450,12 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  /* DE SLEUTELWEDLOOP. De toets leest ook scripts/lib/bron.js (om commentaar
+     te strippen), en de motor koos die als module -- een mutatie daar zegt niets
+     over de sleutels. De module die hij beproeft is de helper; met de hand
+     nagetrokken: linkSync terug naar een kale schrijf (toets 1 zakt), een
+     verkeerde lengte stil vervangen (toets 2 zakt). */
+  ['sleutel-wedloop.test.js', ['server/lib/sleutelbestand.js']],
   // The document pilot reaches this handler through HTTP, browser or child processes.
   ['document-equivalence.e2e.js', ['server/kern/document-capability.js']],
   ['document-persistence.e2e.js', ['server/kern/document-capability.js']],

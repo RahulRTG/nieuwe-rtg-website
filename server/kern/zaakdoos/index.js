@@ -79,8 +79,8 @@ module.exports = ({ db, save, log, dataDir }) => {
   const JOURNAAL_MAX_BODY = 64 * 1024; // een zaak-schrijfactie is nooit groter
   const zegelPad = path.join(dataDir || '.', 'dooszegel.key');
   let zegelKey;
-  try { zegelKey = fs.readFileSync(zegelPad); }
-  catch (e) { zegelKey = crypto.randomBytes(32); try { fs.writeFileSync(zegelPad, zegelKey, { mode: 0o600 }); } catch (e2) {} }
+  // lezen, of als eerste publiceren: nooit half, nooit twee sleutels (server/lib/sleutelbestand.js)
+  zegelKey = require('../../lib/sleutelbestand').sleutel(zegelPad, 32);
 
   function journaalPadOk(pad) {
     if (typeof pad !== 'string' || !pad.startsWith('/api/supplier/')) return false;

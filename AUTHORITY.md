@@ -335,7 +335,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
-| 7 | **identiteiten voor agents, diensten en apparaten** | **agent staat** (23 september 2026; par. 5c); diensten en apparaten niet |
+| 7 | **identiteiten voor agents, diensten en apparaten** | **agent, diensten en toestellen staan** (23 september 2026; par. 5c en 5i); de zaakdoos niet (een gedeelde sleutel, par. 5i) |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf, de toegangsreview en slapende rechten staan** (par. 5g); de simulator voor een ander niet |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
 
@@ -443,7 +443,7 @@ slecht: er stond een klik van het lid, en niemand zag dat een machine het deed.
 **Wat nog niet staat.** Een effectieve bevoegdheid als DOORSNEDE van mens, agent,
 doel en gegevensbeleid. Vandaag is het de bevoegdheid van de mens, versmald door
 `kern/stuur/beleid.js`; het mandaat (`kern/stuur/mandaat.js`) heeft nog geen
-aanroeper. Diensten en apparaten krijgen nog geen eigen identiteit.
+aanroeper. Diensten en toestellen kregen daarna een eigen identiteit (par. 5i).
 
 ### 5d. Fase 4 in de schaduw: de boardroom in werkwoorden, de kamers met hun soort
 
@@ -629,6 +629,46 @@ mutaties laten de toets zakken, waaronder het verzilveren door een ander, geen
 vervaldatum, de code in de opslag en de eigenaarscontrole weglaten. Niet
 beproefd is de volgorde met de tweede factor (dat de uitnodiging pas na een
 geldige TOTP opgaat), want de toetsen draaien zonder `OFFICE_TOTP_SECRET`.
+
+### 5i. Fase 7: diensten en toestellen met een eigen identiteit
+
+De meting (23 september 2026) vond dat diensten en apparaten vandaag geen
+identiteit hebben:
+- de achtergrondtaken die gegevens schrijven, deden dat zonder actor (de
+  bus-envelop gaf `null`) of met een los woord als `'automaat'` of `'systeem'`;
+- een gekoppeld toestel schreef met een eigen sleutel, maar kwam op de bus niet
+  voor;
+- webhooks van aanbieders controleren een handtekening, maar leggen de aanbieder
+  alleen vast als gegevensveld.
+
+Achteraf was dus niet te zien WELKE dienst iets deed. "Het systeem" was een
+alibi.
+
+`kern/dienstidentiteit.js` gebruikt de vorm van de AI-agent: een VOORVOEGSEL in
+de actor van de bus-envelop, `dienst:<naam>` en `toestel:<id>`, zoals
+`ai:rahul`. Er komt geen nieuwe soort in de verzoek-envelop en geen nieuwe rol:
+een identiteit zegt WIE er handelt en verleent niets.
+- **Zeven diensten** die gegevens schrijven draaien nu binnen `alsDienst`:
+  bewaarveger, webmaker-plan, prplus, payroll-bijwerken, zelfzorg, rtgai en
+  agenda-ics. Ook wat verderop uit hun werk volgt, draagt die actor, via de keten
+  van `kern/envelop.js`. De geplande publicatie van een site noteerde `null` als
+  wie en noteert nu `dienst:webmaker-plan`.
+- **De lijst is gesloten.** Een onbekende dienst gooit, en
+  `test/dienstidentiteit.test.js` zakt zodra de bron een dienst noemt die niet is
+  verklaard, of een verklaarde dienst nergens draait. Vier mutaties laten de
+  toets zakken.
+- **Een toestel schrijft als `toestel:<id>`**, niet als het lid. Het lid staat in
+  de meting zelf.
+
+**Wat nog niet staat, en waarom.**
+- **De zaakdoos** authenticeert met EEN gedeelde sleutel (`RTG_DOOS_SLEUTEL`) en
+  noemt zichzelf in het verzoek (`body.doos`). Wie de sleutel heeft, kan zich
+  dus voor elke doos uitgeven. Een identiteit daarop plakken zou een verzonnen
+  identiteit bewijzen. De uitweg is een sleutel per doos, zoals de toestellen
+  hebben (`kern/toestellen.js`): een stap weg, en een wijziging aan de vloot.
+- **Webhooks** krijgen nog geen actor.
+- De overige timers die niet schrijven (infrastructuur) zijn niet omgezet.
+- De toegangsreview (par. 5g) toont diensten niet, want die houden geen zetel.
 
 ---
 

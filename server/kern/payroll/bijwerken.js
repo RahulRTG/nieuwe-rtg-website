@@ -123,7 +123,7 @@ function maakBijwerken({ regelpakket, opslag, save, nu, log, dekking, fetchImpl 
   function start(interval) {
     if (klok) return klok;
     const ms = Number(interval) > 0 ? Number(interval) : RONDE_MS;
-    klok = setInterval(() => { ronde().catch(() => {}); }, ms);
+    klok = setInterval(() => { require('../dienstidentiteit').alsDienst('payroll-bijwerken', ronde).catch(() => {}); }, ms);
     if (klok.unref) klok.unref();
     return klok;
   }

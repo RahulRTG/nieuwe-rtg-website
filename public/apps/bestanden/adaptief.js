@@ -149,12 +149,16 @@
   /* Melden zodra het paneel opengaat of dichtgaat, en zodra er in het paneel iets
      verandert. Het register slikt een gelijke melding stil, dus dit mag zo vaak
      als er iets kán zijn veranderd. */
+  /* Zonder open bestand spreekt het scherm toch voor zichzelf (EDGE.md besluit
+     11, stap 24): een context met een bron en zonder handelingen, zodat de Edge
+     de titel van Bestanden leest en niet die van het casco. */
+  function kaal() { A.context({ bron: 'bestanden', titel: 'Bestanden' }); }
   function meld() {
-    if (!aan()) { A.wisContext(); return; }
+    if (!aan()) { kaal(); return; }
     var f = nu();
-    if (!f) { A.wisContext(); return; }
+    if (!f) { kaal(); return; }
     var lijst = caps();
-    if (!lijst.length) { A.wisContext(); return; }
+    if (!lijst.length) { kaal(); return; }
     var staat = {};
     lijst.forEach(function (x) { staat[x.id] = x.staat; });
     /* Het object is een VERWIJZING naar het open bestand: soort, id en naam, en

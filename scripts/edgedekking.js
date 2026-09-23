@@ -233,7 +233,86 @@ function contractNieuw(reg, opSchijf) {
   }
   return uit;
 }
-module.exports = { alleSchermen, contractNieuw, zelf, ZELF, achteruitgang, regelVan, telling, VELDEN, VERKLARINGEN,
+/* DE SCHULDLIJST VAN BESLUIT 11 (EDGE.md par. 8, stap 24; besluit K-reikwijdte).
+   Besluit 11 gold eerst alleen voor NIEUWE schermen. Het geldt nu voor elk
+   gemeten scherm met een eigen hoofdactie (scherm:data-hoofdactie): dat
+   publiceert zijn context zelf via RTGAdaptief.context met een bron, of het
+   staat hieronder. De lijst mag alleen krimpen -- test/edgenieuwscherm.test.js
+   houdt een maximum vast, en een scherm dat al zelf spreekt of niet meer onder
+   de regel valt, moet eraf. Er is uitdrukkelijk GEEN eis dat de hoofdactie ook
+   als capability in de acties staat: de controls verhuizen de echte knop al, en
+   een gedeclareerde kopie zou een tweede bron en een dubbele knop in het blad
+   zijn. Bij de eerste meting (23 september 2026) stonden er 51 schermen onder;
+   Bestanden is de eerste portie. */
+const CONTEXT_SCHULD = Object.freeze([
+  '/apps/agenda.html',
+  '/apps/avond.html',
+  '/apps/belastingkantoor.html',
+  '/apps/browser.html',
+  '/apps/clips.html',
+  '/apps/comm.html',
+  '/apps/concern.html',
+  '/apps/defensie.html',
+  '/apps/foundation/club.html',
+  '/apps/foundation/index.html',
+  '/apps/foundation/klas.html',
+  '/apps/foundation/os-deelnemer.html',
+  '/apps/foundation/os-donateur.html',
+  '/apps/foundation/os-portaal.html',
+  '/apps/foundation/os-vrijwilliger.html',
+  '/apps/foundation/partner.html',
+  '/apps/foundation/reis.html',
+  '/apps/foundation/rust.html',
+  '/apps/galerij.html',
+  '/apps/gemeenteloket.html',
+  '/apps/gemeentepda.html',
+  '/apps/genootschap.html',
+  '/apps/home.html',
+  '/apps/klankwerk.html',
+  '/apps/labpas.html',
+  '/apps/lesmaker.html',
+  '/apps/luchthaven.html',
+  '/apps/mall.html',
+  '/apps/marechaussee.html',
+  '/apps/media.html',
+  '/apps/mijnmall.html',
+  '/apps/muziek.html',
+  '/apps/notities.html',
+  '/apps/onderneming.html',
+  '/apps/ov.html',
+  '/apps/overheidspda.html',
+  '/apps/partner-worden.html',
+  '/apps/passkeys.html',
+  '/apps/podium.html',
+  '/apps/rechtbank.html',
+  '/apps/rijksloket.html',
+  '/apps/rtgid.html',
+  '/apps/rtgschool.html',
+  '/apps/scanner.html',
+  '/apps/sitemaker.html',
+  '/apps/sportclub.html',
+  '/apps/techniek.html',
+  '/apps/theater.html',
+  '/apps/thuis.html',
+  '/apps/websitestudio.html'
+]);
+function contextSchuld(reg) {
+  const uit = [], schuld = new Set(CONTEXT_SCHULD);
+  for (const [pad, s] of Object.entries(reg.schermen || {})) {
+    if (s.status !== 'gemeten' || (s.herkomst || {}).hoofdactie !== 'scherm:data-hoofdactie') continue;
+    const eigen = zelf('context', (s.herkomst || {}).context);
+    if (!eigen && !schuld.has(pad)) uit.push(pad + ': heeft een eigen hoofdactie maar publiceert zijn context niet zelf (RTGAdaptief.context) en staat niet op CONTEXT_SCHULD');
+    if (eigen && schuld.has(pad)) uit.push(pad + ': publiceert zijn context zelf; haal hem van CONTEXT_SCHULD');
+  }
+  for (const pad of CONTEXT_SCHULD) {
+    const s = (reg.schermen || {})[pad];
+    if (!s || s.status !== 'gemeten' || (s.herkomst || {}).hoofdactie !== 'scherm:data-hoofdactie') {
+      uit.push(pad + ': staat op CONTEXT_SCHULD maar valt niet (meer) onder de regel; haal hem eraf');
+    }
+  }
+  return uit;
+}
+module.exports = { alleSchermen, contractNieuw, contextSchuld, CONTEXT_SCHULD, zelf, ZELF, achteruitgang, regelVan, telling, VELDEN, VERKLARINGEN,
   DOORVERWIJZING_MET_REDEN };
 
 /* ---------------------------------------------------------------------------

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-23T13:06:51.499Z",
-  "commit": "37c14efed",
+  "op": "2026-09-23T13:16:51.749Z",
+  "commit": "24aa68fcb",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 4,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },

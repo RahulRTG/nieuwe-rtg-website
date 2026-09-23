@@ -45,6 +45,13 @@ const path = require('path');
    vroeg -- dat is een besluit van een mens, niet van een opstartpad. */
 function publiceer(pad, inhoud) {
   const tmp = pad + '.' + process.pid + '.tmp';
+  /* DE MAP HOORT ER TE ZIJN, OOK ALS NIEMAND HEM AL MAAKTE. De oude schrijvers
+     deden mkdir voordat ze schreven; bij de verhuizing hierheen viel dat weg, en
+     dat zag niemand zolang er altijd al een server was opgestart. Een aanroeper
+     buiten init() (test/pragmavolgorde.test.js op een verse checkout) kreeg dan
+     ENOENT op het tijdelijke bestand. mkdir met recursive is zelf veilig tegen
+     een wedloop: een tweede proces dat hem ook maakt, krijgt geen fout. */
+  fs.mkdirSync(path.dirname(pad), { recursive: true });
   fs.writeFileSync(tmp, inhoud, { mode: 0o600 });
   try {
     fs.linkSync(tmp, pad);

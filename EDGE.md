@@ -42,7 +42,7 @@ op de code past is een verouderde kaart en geen kaart. `--controle` hercompileer
 en vergelijkt met het ingecheckte register.
 
 Uitslag: <!--getal:edgekaart.bestanden-->73<!--/getal--> bestanden met
-<!--getal:edgekaart.rollen-->218<!--/getal--> verklaarde rollen, allemaal met een
+<!--getal:edgekaart.rollen-->211<!--/getal--> verklaarde rollen, allemaal met een
 citaat dat letterlijk staat;
 <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> verantwoordelijkheden met
 meer dan één schrijver of beslisser (par. 1), en
@@ -74,7 +74,7 @@ opent — elk met de reden in het register):
 |---|---|---|
 | identiteit | <!--getal:edgedekking.identiteit-->0<!--/getal--> | <!--getal:edgedekking.identiteitZelf-->0<!--/getal--> |
 | wereld | <!--getal:edgedekking.wereld-->279<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
-| context | <!--getal:edgedekking.context-->280<!--/getal--> | <!--getal:edgedekking.contextZelf-->1<!--/getal--> |
+| context | <!--getal:edgedekking.context-->280<!--/getal--> | <!--getal:edgedekking.contextZelf-->11<!--/getal--> |
 | object | <!--getal:edgedekking.object-->0<!--/getal--> | <!--getal:edgedekking.objectZelf-->0<!--/getal--> |
 | activiteit | <!--getal:edgedekking.activiteit-->0<!--/getal--> | <!--getal:edgedekking.activiteitZelf-->0<!--/getal--> |
 | presence | <!--getal:edgedekking.presence-->0<!--/getal--> | <!--getal:edgedekking.presenceZelf-->0<!--/getal--> |

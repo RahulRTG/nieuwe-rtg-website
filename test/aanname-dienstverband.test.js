@@ -114,6 +114,11 @@ test('7. wie een strook krijgt zonder lopend dienstverband, komt als bevinding i
   const zonder = t.bevindingen.filter(b => b.soort === 'loon_zonder_dienstverband');
   assert.deepEqual(zonder.map(b => b.staffId), [2], 'alleen wie geen dienstverband heeft');
   assert.equal(zonder[0].ernst, 'midden', 'zichtbaar maar niet blokkerend: de aannames van voor de brug hebben er nog geen');
+  assert.equal(zonder[0].weg.adres, '/apps/concern.html', 'de bevinding wijst naar het scherm waar het kan worden ingehaald');
+  assert.match(zonder[0].uitleg, /Dienstverbanden inhalen/);
+  assert.match(zonder[0].weg.wie, /eigenaar van de entiteit/, 'en naar wie het mag: niet de administrateur die de run leest');
+  assert.ok(require('node:fs').existsSync(require('node:path').join(__dirname, '../public', zonder[0].weg.adres)),
+    'het adres bestaat');
 });
 
 test('8. een dienstverband bij een ANDERE entiteit telt niet, en een beeindigd dienstverband ook niet', () => {

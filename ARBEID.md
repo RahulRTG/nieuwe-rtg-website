@@ -575,7 +575,9 @@ tweeen geknipt, TONEN (`/inhaal`, leest) en DOEN (`/inhaal/bevestig`), en dat wa
 geen stijlkeuze: als een route leest zonder keuze en schrijft met keuze, gaf de
 idem-poort een tweede voorstelvraag binnen vijf seconden het OUDE antwoord terug,
 met iemand erin die net een dienstverband had gekregen. De browsertoets vond het;
-geen enkele unittoets zag het. De bevinding blijft `midden`: of hij `hoog` wordt, is een besluit voor
+geen enkele unittoets zag het. De bevinding in de loonrun wijst er sindsdien naartoe: de
+administrateur leest wie het mag inhalen (de eigenaar van de entiteit, niet hijzelf)
+en waar (`weg` met wie, waar en adres). De bevinding blijft `midden`: of hij `hoog` wordt, is een besluit voor
 wanneer de inhaalslag bij de bestaande zaken gedaan is.
 
 **De keten van Adam is daarmee rond: 18 van 18 schakels gesloten, 10 van 10

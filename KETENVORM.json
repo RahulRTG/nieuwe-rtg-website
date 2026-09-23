@@ -35,9 +35,9 @@
       "domein": "foundation",
       "proef": "scripts/adamproef.js",
       "schakels": 17,
-      "storingen": 9,
+      "storingen": 10,
       "sluit": false,
-      "bevindingen": 2
+      "bevindingen": 1
     },
     {
       "naam": "moment",
@@ -318,6 +318,11 @@
       },
       {
         "keten": "adam",
+        "storing": "de uitnodiging om de plek in te nemen staat bij Adams sollicitatie",
+        "belofte": "alleen Adam ziet hem: niet de ouder, niet de zus, en niet de werkgever in de rij van de sollicitatie"
+      },
+      {
+        "keten": "adam",
         "storing": "de client stuurt een hogere leeftijd mee dan het profiel draagt",
         "belofte": "verandert niets: de leeftijd komt uit het profiel op de server"
       },
@@ -446,6 +451,6 @@
     "themasGedeeld": 2,
     "themasBijna": 3,
     "themasTotaal": 10,
-    "nietIngedeeld": 29
+    "nietIngedeeld": 30
   }
 }

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T12:33:15.745Z",
-    "commit": "65ce858d3",
+    "op": "2026-09-23T12:50:07.794Z",
+    "commit": "ef54abcea",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/adamproef.js",
@@ -18,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Rode Bever 3DC0",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Rode Merel 00D3",
       "fout": null,
       "ms": 0
     },
@@ -32,7 +32,7 @@
       "status": 200,
       "ziet": "de motor antwoordt het gezin: 1 wegen beoordeeld",
       "fout": null,
-      "ms": 11
+      "ms": 12
     },
     {
       "nr": 3,
@@ -44,7 +44,7 @@
       "status": 200,
       "ziet": "3 wegen, volgorde ongewijzigd: true, geblokkeerde weg blijft staan met \"heb ik een startkwalificatie\"",
       "fout": null,
-      "ms": 11
+      "ms": 9
     },
     {
       "nr": 4,
@@ -56,7 +56,7 @@
       "status": 200,
       "ziet": "de motor gaf 3 wegen bij een kaal doel (via-werk, via-opleiding, via-opvang), samengesteld door het huis: true, geen ervan heet \"open\": true",
       "fout": null,
-      "ms": 9
+      "ms": 6
     },
     {
       "nr": 5,
@@ -66,9 +66,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature d823ced9, minimumleeftijd 16",
+      "ziet": "vacature 3462d3d9, minimumleeftijd 16",
       "fout": null,
-      "ms": 8
+      "ms": 7
     },
     {
       "nr": 6,
@@ -80,7 +80,7 @@
       "status": 200,
       "ziet": "1 vacatures zichtbaar, magSolliciteren: true",
       "fout": null,
-      "ms": 7
+      "ms": 8
     },
     {
       "nr": 7,
@@ -92,7 +92,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 11
+      "ms": 10
     },
     {
       "nr": 8,
@@ -102,9 +102,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie 3e13be0e, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie 32e46fe2, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
-      "ms": 15
+      "ms": 12
     },
     {
       "nr": 9,
@@ -126,9 +126,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Uw personeelsuitnodiging staat ...\" van RTG, ongelezen: true",
+      "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Je plek staat klaar: open je so...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 29
+      "ms": 23
     },
     {
       "nr": 11,
@@ -140,7 +140,7 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 2
+      "ms": 3
     },
     {
       "nr": 12,
@@ -152,19 +152,19 @@
       "status": 200,
       "ziet": "opleiding + opvang + werk; 26 vondsten in 1 vorm; werk 1/1, opleiding 24/20000, opvang 1/1",
       "fout": null,
-      "ms": 11
+      "ms": 10
     },
     {
       "nr": 13,
-      "van": "werkgever",
-      "naar": "Adam",
-      "wat": "maakt van de aanname een plek in het team",
-      "bekend": "WAT ONTBREEKT: een weg van een aanname naar een plek in het team voor iemand zonder eigen RTG-account. WAAROM: een aanname claimen eist een lidsessie (/api/werving/verbind in server/routes/werving.js), en een Foundation-profiel heeft die niet; de aanname eindigt bij een kassacode die de werkgever met de hand moet doorgeven. WIE EROVER GAAT: de eigenaar, via besluit 1 van ARBEID.md par. 7a (employment is de waarheid) -- die brug moet ook een gezinslid dragen.",
-      "stand": "openBekend",
+      "van": "Adam",
+      "naar": "werkgever",
+      "wat": "neemt met een eigen account zijn plek in het team in, zonder dat de werkgever iets doorgeeft",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "Adam staat niet in het team (2 mensen)",
+      "ziet": "in het team (id 185), dienstverband bij Brisa SL als Keukenhulp",
       "fout": null,
-      "ms": 3
+      "ms": 236
     },
     {
       "nr": 14,
@@ -174,9 +174,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "direct in dienst, personeelsnummer 185",
+      "ziet": "direct in dienst, personeelsnummer 186",
       "fout": null,
-      "ms": 229
+      "ms": 124
     },
     {
       "nr": 15,
@@ -188,7 +188,7 @@
       "status": 200,
       "ziet": "1 contractversie(s), vanaf 2026-09-01",
       "fout": null,
-      "ms": 20
+      "ms": 12
     },
     {
       "nr": 16,
@@ -200,7 +200,7 @@
       "status": 200,
       "ziet": "1 werkplek(ken): Brisa SL als Keukenhulp",
       "fout": null,
-      "ms": 7
+      "ms": 5
     },
     {
       "nr": 17,
@@ -211,10 +211,16 @@
       "stand": "openBekend",
       "status": 409,
       "antwoord": "Er is geen regelpakket dat gold op 2026-09-01. Haal de jaargang binnen en merk hem aan.",
-      "ms": 7
+      "ms": 6
     }
   ],
   "storingen": [
+    {
+      "naam": "de uitnodiging om de plek in te nemen staat bij Adams sollicitatie",
+      "belofte": "alleen Adam ziet hem: niet de ouder, niet de zus, en niet de werkgever in de rij van de sollicitatie",
+      "stand": "gehouden",
+      "wat": "bij Adam 1, bij de ouder 0, bij de zus 0, bij de werkgever 0"
+    },
     {
       "naam": "een gezinslid van vijftien solliciteert",
       "belofte": "wordt geweigerd met de leeftijd erbij en met wat er voor hem WEL is",
@@ -279,25 +285,17 @@
   },
   "telling": {
     "schakels": 17,
-    "gesloten": 15,
+    "gesloten": 16,
     "open": 0,
-    "openBekend": 2,
+    "openBekend": 1,
     "stuk": 0,
-    "storingen": 9,
-    "gehouden": 9,
+    "storingen": 10,
+    "gehouden": 10,
     "gebroken": 0
   },
   "sluit": false,
   "sluitMetBevinding": true,
   "bevindingen": [
-    {
-      "schakel": 13,
-      "van": "werkgever",
-      "naar": "Adam",
-      "wat": "maakt van de aanname een plek in het team",
-      "gemeten": "Adam staat niet in het team (2 mensen)",
-      "reden": "WAT ONTBREEKT: een weg van een aanname naar een plek in het team voor iemand zonder eigen RTG-account. WAAROM: een aanname claimen eist een lidsessie (/api/werving/verbind in server/routes/werving.js), en een Foundation-profiel heeft die niet; de aanname eindigt bij een kassacode die de werkgever met de hand moet doorgeven. WIE EROVER GAAT: de eigenaar, via besluit 1 van ARBEID.md par. 7a (employment is de waarheid) -- die brug moet ook een gezinslid dragen."
-    },
     {
       "schakel": 17,
       "van": "kantoor",

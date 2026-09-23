@@ -2,7 +2,7 @@
    medewerker (supplierAuth: eigen loonstroken, eigen kansen en de eigen
    "open voor werk"-schakelaar). Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, officeAuth, supplierAuth, payroll, openVacatures, db, logActivity, schoon } = kern;
+  const { app, officeAuth, supplierAuth, payroll, openVacatures, db, schoon } = kern;
 
   /* ---------- het payroll-kantoor (RTG-office) ---------- */
   app.post('/api/office/payroll/overzicht', officeAuth, (req, res) => {
@@ -36,7 +36,7 @@ module.exports = (kern) => {
     const open = payroll.wieWerktWaar().filter(m => m.openVoorWerk)
       .map(m => ({ naam: m.naam.split(' ')[0], rol: m.rol, zaak: m.zaak, past: m.past,
         kansen: payroll.kansenVoor(m.code, m.staffId).slice(0, 3)
-          .map(k => ({ bedrijf: k.vacature.bedrijf, func: k.vacature.func, score: k.score })) }));
+          .map(k => ({ bedrijf: k.vacature.bedrijf, func: k.vacature.func, redenen: k.redenen })) }));
     res.json({ vacatures, open });
   });
 
@@ -52,13 +52,18 @@ module.exports = (kern) => {
     res.json({ open: !!o, wens: (o && o.wens) || '',
       kansen: payroll.kansenVoor(req.supplier.code, req.actor.staffId)
         .map(k => ({ bedrijf: k.vacature.bedrijf, func: k.vacature.func, plaats: k.vacature.plaats,
-          soort: k.vacature.soort, uren: k.vacature.uren, score: k.score })) });
+          soort: k.vacature.soort, uren: k.vacature.uren, redenen: k.redenen })) });
   });
 
   app.post('/api/supplier/payroll/openvoorwerk', supplierAuth, (req, res) => {
     if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen voor persoonlijke logins.' });
     const r = payroll.zetOpenVoorWerk(req.supplier.code, req.actor.staffId, !!req.body.aan, schoon(req.body.wens, 120));
-    logActivity(req.supplier.code, req.actor, 'zette "open voor werk" ' + (req.body.aan ? 'aan' : 'uit'));
+    /* GEEN REGEL IN HET ZAAKLOG. Hier schreef logActivity 'zette "open voor
+       werk" aan', en dat log gaat mee in supplierState naar elke actor van de
+       HUIDIGE zaak: wie ging rondkijken, werd gezien door wie hij misschien wil
+       verlaten (MN-02; ARBEID.md par. 4 punt 2). De schakelaar is van de
+       medewerker; het loonkantoor ziet hem op de matchtafel, zijn werkgever
+       niet. */
     res.json(r);
   });
 

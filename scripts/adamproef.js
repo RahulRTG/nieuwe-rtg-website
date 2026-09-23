@@ -48,6 +48,7 @@ const { start } = require('./lib/wegwerpserver');
 /* Het volle stempel (commit + boomVuil) en niet een kale datum: zonder
    waartegen-is-dit-gemeten is een register niet na te lopen. */
 const { stempel } = require('./lib/stempel');
+const { WERKGEVER_VELDEN } = require('../server/kern/werk');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'ADAMPROEF.json');
@@ -398,9 +399,19 @@ async function loop(basis, uit) {
          `viaRTG` voor in de plaats te zetten: een sollicitant uit een gezin
          lijkt op een gewoon RTG-lid. Wie dat weglekt, vertelt een werkgever
          iets over de thuissituatie van een zeventienjarige. */
-      const lekt = !!mijn && ('viaRTF' in mijn || 'rtf' in mijn || 'key' in mijn);
+      /* OP DE SLEUTELSET EN NIET OP DRIE NAMEN. Deze schakel zocht eerst alleen
+         naar viaRTF, rtf en key -- precies de weglaatlijst die hij moest bewaken
+         -- en stond groen terwijl de herkomst lekte via wat er ONTBRAK: een
+         ledenrij droeg codename en vacatureId, deze rij geen van beide (ARBEID.md
+         par. 4 punt 1). Nu: niets buiten de verklaarde werkgevervelden, en de
+         vacature erbij zoals bij een lid. */
+      const toegestaan = new Set([...WERKGEVER_VELDEN, 'viaRTG']);
+      const vreemd = mijn ? Object.keys(mijn).filter(k => !toegestaan.has(k)) : [];
+      const lekt = !!mijn && (vreemd.length > 0 || !mijn.vacatureId);
       return { klopt: !!mijn && !lekt && mijn.viaRTG === true,
         wat: mijn ? 'sollicitatie ' + mijn.id + ', status "' + mijn.status + '", lekt herkomst: ' + lekt +
+          (vreemd.length ? ' (velden: ' + vreemd.join(', ') + ')' : '') +
+          (mijn.vacatureId ? '' : ' (geen vacatureId, anders dan een lid)') +
           ', ziet viaRTG: ' + (mijn.viaRTG === true)
           : 'de werkgever ziet geen sollicitatie van Adam' };
     });

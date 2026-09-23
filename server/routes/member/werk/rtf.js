@@ -89,6 +89,9 @@ module.exports = (wctx) => {
       name, func: vac.func, contact,
       note: String(b.note || '').trim().slice(0, 400),
       viaRTF: true, rtf: { code: String(b.code).toUpperCase(), profielId: sess.p.id },
+      // net als een ledenrij: zonder vacatureId las de werkgever de herkomst
+      // af aan het ontbrekende veld (kern/werk.js, werkgeverSollicitatie)
+      vacatureId: vac.id,
       cv: {
         headline: String(cv.headline || '').slice(0, 80),
         experience: (Array.isArray(cv.experience) ? cv.experience : []).slice(0, 12).map(x => String(x).slice(0, 120)),

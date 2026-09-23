@@ -280,12 +280,12 @@ async function laadMatch(){
     '<div class="sec">Per vacature: wie past erbij</div>' +
     (d.vacatures.filter(v => v.kandidaten.length).map(v =>
       '<div class="regel"><b>' + esc(v.vacature.func) + '</b><span class="kpi">' + esc(v.vacature.bedrijf) + ' · ' + esc(v.vacature.plaats || '') + '</span>' +
-      '<span class="r kpi">' + v.kandidaten.map(k => esc(k.naam) + ' (' + esc(k.rol) + ', score ' + k.score + ')').join(' · ') + '</span></div>').join('')
+      '<span class="r kpi">' + v.kandidaten.map(k => esc(k.naam) + ' (' + esc(k.rol) + ': ' + esc((k.redenen || []).join('; ')) + ')').join(' · ') + '</span></div>').join('')
       || '<div class="leeg">Nog geen matches; zodra iemand zich open voor werk zet, verschijnt hij hier.</div>') +
     '<div class="sec h-mt70">Per persoon: welke bedrijven passen</div>' +
     (d.open.map(p =>
       '<div class="regel"><b>' + esc(p.naam) + '</b><span class="kpi">' + esc(p.rol) + ' · nu bij ' + esc(p.zaak) + '</span>' +
-      '<span class="r kpi">' + (p.kansen.map(k => esc(k.bedrijf) + ' -- ' + esc(k.func) + ' (score ' + k.score + ')').join(' · ') || 'nog geen passende vacature') + '</span></div>').join('')
+      '<span class="r kpi">' + (p.kansen.map(k => esc(k.bedrijf) + ' -- ' + esc(k.func) + ' (' + esc((k.redenen || []).join('; ')) + ')').join(' · ') || 'nog geen passende vacature') + '</span></div>').join('')
       || '<div class="leeg">Niemand heeft zich (nog) open voor werk gezet.</div>');
 }
 $('#lrDraai').addEventListener('click', async () => {

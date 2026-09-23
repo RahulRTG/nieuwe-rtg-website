@@ -7,12 +7,13 @@ module.exports = (ctx) => {
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
     diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost } = ctx;
-  const { rooster, zetDienst } = ctx;
+  const { rooster, zetDienst, rustBotsing } = ctx;
   /* ---- de AI neemt het rooster over: vul de open plekken van een dag ----
      Kiest per open plek een beschikbare bewaker: niet al op die shift, en met
-     rust (niet de aangrenzende shift dezelfde dag). Round-robin over het team,
-     zodat de uren eerlijk verdeeld worden. */
-  const NAAST = { dag: ['nacht', 'avond'], avond: ['dag', 'nacht'], nacht: ['avond', 'dag'] };
+     rust -- ook over de datumgrens, want een nachtdienst loopt door tot 07:00
+     de volgende ochtend (rustBotsing in rooster/planning.js; hier stond een
+     tabel die alleen binnen dezelfde datum keek). Gesorteerd op de minste uren
+     deze maand, dus op wat iemand TOEKOMT en niet op wat hij waard is. */
   function planAuto(s, datum) {
     if (!functieAan(s, 'autoplan')) return { status: 409, error: 'AI-planning staat uit in uw boardroom.' };
     const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum)) ? datum : vandaag();
@@ -38,12 +39,11 @@ module.exports = (ctx) => {
             .filter(g => {
               const set = shiftVanGuard.get(g.id) || new Set();
               if (set.has(sl.shiftId)) return false;                 // al op deze shift
-              for (const nb of (NAAST[sl.shiftId] || [])) if (set.has(nb)) return false; // rust
-              return true;
+              return !rustBotsing(s, g.id, dag, sl.shiftId);          // rust, ook over de datumgrens
             })
             .sort((a, b2) => (urenTeller.get(a.id) || 0) - (urenTeller.get(b2.id) || 0))[0];
           if (!kandidaat) { onvervuld++; continue; }
-          const r = zetDienst(s, { postId: post.postId, shiftId: sl.shiftId, datum: dag, guardId: kandidaat.id });
+          const r = zetDienst(s, { postId: post.postId, shiftId: sl.shiftId, datum: dag, guardId: kandidaat.id }, { door: 'autoplan' });
           if (r.ok) {
             gemaakt.push(r.dienst);
             if (!shiftVanGuard.has(kandidaat.id)) shiftVanGuard.set(kandidaat.id, new Set());

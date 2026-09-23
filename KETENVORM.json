@@ -34,7 +34,7 @@
       "naam": "adam",
       "domein": "foundation",
       "proef": "scripts/adamproef.js",
-      "schakels": 17,
+      "schakels": 18,
       "storingen": 10,
       "sluit": true,
       "bevindingen": 0

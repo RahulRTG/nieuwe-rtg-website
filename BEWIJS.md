@@ -1845,7 +1845,7 @@ toets omvalt.
 | `edge-enige-balk.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE EDGE IS DE ENE BALK -- en wat hij overneemt, neemt hij ook MEE. Naast de Edge stonden op 135 van 291 schermen nog eigen vaste balken: de gedeelde app-kop `.ios-nav` op 108 schermen, de suitebalk en suitenavigatie... |
 | `edgeblikveld.e2e.js` | 1 | gezakt op `===->!==#0` | HET EDGE BLIKVELD IN EEN ECHTE BROWSER, OP EEN ECHTE SERVER. test/edgeblikveld.test.js houdt de vorm vast met een nagemaakt venster. |
 | `eigensessieschermen.e2e.js` | 3 | -- | DE SCHERMEN MET EEN EIGEN SESSIESOORT, EN DE DOORVERWIJSSTUBS. Twaalf van de vijftien schermen die na TAKEN 4.9 nog geen eigen toets hadden. |
-| `experience-rtg.e2e.js` | 2 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `experience-rtg.e2e.js` | 3 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-surface.e2e.js` | 1 | -- | De browser-golden-path van het Experience Platform: een echte Economic Proof verschijnt alleen bij de juiste principal; een afspraak gaat via preview + menselijke bevestiging naar de autoritatieve agenda en komt... |
 | `first-steps.e2e.js` | 1 | gezakt op `liegpoort /api/` | The approved first-visit designs against a real, empty RTG server. Photos and category buttons must never masquerade as account data or bookable stock. |
 | `foundationmailscherm.e2e.js` | 2 | -- | DE TWEE FOUNDATIONSCHERMEN DIE GEEN ENKELE TOETS AFLEGDE. De toegankelijkheidskeuring telt per scherm of een toets hem WERKELIJK aflegt -- niet of een veegtoets hem aantikt of een cache hem ophaalt. |

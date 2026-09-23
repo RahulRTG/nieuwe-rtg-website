@@ -376,11 +376,9 @@ const KAART = [
   ['public/apps/foundation/os-publiek.html', 'afnemer', 'zichtbaarheidsstand:s', [
     ['schrijft', 'zichtbaarheidsstand:s', 'Edge 2-stand op body bij een stadswissel', "document.body.setAttribute('data-rtg-edge-2-state', 'overview');"]]],
   /* De landing (index.html in de wortel) draait de adaptieve Edge met een eigen
-     host, vult het tweede register en zet de wereld per scene. */
-  ['public/site/start/experience-edge.js', 'afnemer', 'capability-register:s wereld:s', [
-    ['schrijft', 'capability-register:s', 'zeven ids zonder run', 'edge.registerAction({ id: id, label: id, allowed: false });'],
-    ['schrijft', 'capability-register:s', 'de scenerijen met een run', "edge.registerAction({ id: 'experience-action-' + i, label: item.label, run: function () {"],
-    ['schrijft', 'capability-register:s', 'op alle vijf decks', 'edge.setProjection({ deck: deck, actions: ids });'],
+     host en zet de wereld per scene. Haar rijen staan sinds ronde 2 in haar
+     eigen paneel en niet meer in het tweede register (EDGE.md, stap 15). */
+  ['public/site/start/experience-edge.js', 'afnemer', 'wereld:s', [
     ['schrijft', 'wereld:s', 'wereld op body per scene', "d.body.dataset.rtgWorld = active.id === 'werelden' ? X.currentWorld() : active.dataset.tone;"]]],
   ['public/site/start/experience.js', 'afnemer', 'wereld:s', [
     ['schrijft', 'wereld:s', 'wereld op body in de werelden-scene', 'd.body.dataset.rtgWorld = currentWorld;']]],
@@ -392,7 +390,7 @@ const KAART = [
    Een dubbele zonder regel hier, of een regel zonder dubbele, laat het script
    zakken: dan is de verklaring bij de afleiding achtergebleven. */
 const WAAROM = {
-  'capability-register': 'Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij, gevuld door vijf producenten: zijn eigen standaardingangen, Signals (primary), de sociale runtime (social-context), het wereldbureau (home) en de landing (zeven ids zonder run plus de scenerijen); leeg in ronde 2. De controls oogsten paginaknoppen als derde bron.',
+  'capability-register': 'Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); sinds ronde 1 kent de Edge-Core alleen licht en voert hij uit langs RTGGewicht.voer, maar hij houdt die handelingen nog op een tweede plek bij, gevuld door vier producenten: zijn eigen standaardingangen, Signals (primary), de sociale runtime (social-context) en het wereldbureau (home); de landing viel eruit in ronde 2 (stap 15), leeg in ronde 2. De controls oogsten paginaknoppen als derde bron.',
   'vluchtige-context': 'Drie contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie), RTGEdge.active.ctx (scope, titel, actie, tool) en RTGWorkspaceContext (een eigen current, gevoed uit de eerste, met een eigen ontdubbeling); reizen-performance.js voedt de eerste twee allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen), de brug (actief blad) en de werkruimte (gelijk wordt geslikt) elk apart.',
   wereld: 'De huidige wereld wordt op vier plekken BEPAALD: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco. GESCHREVEN wordt hij op meer: rtg-world-identity.js bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, en de landing zet hem per scene vanuit drie scripts.',
   'trust-rail': 'Verbinding en beveiliging worden op drie plekken zelf afgeleid en elk op een eigen strook getoond: RTGRail (navigator.onLine), het statuspaneel van de casco (/api/ready, Beveiligd) en de Intelligence-strook (protocol als ONLINE / TLS); geen van drie leest een ander.',

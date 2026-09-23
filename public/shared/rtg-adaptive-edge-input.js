@@ -80,11 +80,13 @@
       if (Math.max(Math.abs(dx), Math.abs(dy)) > D.veeg) blockClickUntil = Date.now() + 400;
       if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > D.veeg) handlers.deck(dx < 0 ? 1 : -1);
       else if (-dy >= D.omhoog) {
+        /* Een host met een eigen paneel (de landing, de sitepagina's) krijgt
+           eerst de vraag; de kernlijst is alleen voor wie er geen heeft. */
         var depth = rt.win.RTGDiepte, adapt = rt.win.RTGAdaptief;
         if (depth && adapt && adapt.voorNu().length) {
           handlers.state('dock');
           if (-dy >= D.diep) depth.tweede(); else depth.eerste();
-        } else handlers.state('expanded');
+        } else if (!rt.edge.onEdgeAction || !handlers.action('context')) handlers.state('expanded');
       }
       else if (dy > D.veeg) handlers.state('peek');
     }

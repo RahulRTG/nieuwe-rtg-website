@@ -501,19 +501,29 @@ van het werk erna.
    in deze paragraaf.
 
 **Gedaan (23 september 2026).** `scripts/adamproef.js` loopt nu door tot de
-loonrun: 17 schakels, 14 gesloten, 3 open met reden, 0 stuk, en 9 van de 9
+loonrun: 17 schakels, 15 gesloten, 2 open met reden, 0 stuk, en 9 van de 9
 storingen gehouden (`ADAMPROEF.json`). Waar Adam niet verder kan, neemt een
 volwassen lid het over, zodat de rest van de keten toch gemeten wordt. De drie
-breuken, in de volgorde waarin een mens ze tegenkomt:
+breuken die de verlenging vond, in de volgorde waarin een mens ze tegenkomt (de
+middelste is dicht):
 
 - **Schakel 13:** een Foundation-profiel komt niet in het team. Een aanname
   claimen eist een lidsessie (`/api/werving/verbind`), en een gezinslid heeft
   die niet. De aanname eindigt bij een kassacode die de werkgever met de hand
   moet doorgeven.
-- **Schakel 16:** een aanname maakt geen `employment`. Het volwassen lid staat
-  in het team (schakel 14) en heeft een contract (schakel 15), maar
-  `/api/concern/mijnwerk` zegt *U heeft nog geen werkplek*. Dit is precies de
-  brug uit besluit 1.
+- **Schakel 16:** een aanname maakte geen `employment`. Het volwassen lid stond
+  in het team (schakel 14) en had een contract (schakel 15), maar
+  `/api/concern/mijnwerk` zei *U heeft nog geen werkplek*. **Dicht dezelfde dag**:
+  `server/kern/concern/aanname.js` is de brug uit besluit 1. De zaak wijst via
+  haar vestiging de entiteit aan, en een aanname maakt daar een dienstverband
+  met de functie als rol. De haak zit in de claim, dus ook een later geclaimde
+  uitnodiging krijgt hem. De brug loopt een kant op (hij maakt nooit een
+  personeelsplek), raadt geen werkgever als de zaak nergens aan hangt (dan
+  staat de reden in het antwoord, met de weg via `/api/concern/vestiging/zaak`),
+  en breekt geen aanmelding. De proef heeft daarvoor een ondernemer gekregen die
+  Café Brisa aan zijn eigen entiteit koppelt, langs de gewone routes; zonder de
+  brug zakt de schakel (`test/aanname-dienstverband.test.js`, en een mutatie
+  op de proef zelf).
 - **Schakel 17:** de loonrun weigert, omdat de werkgever uit de proef (Café
   Brisa) in Spanje staat en er alleen een Nederlands regelpakket ligt. Dat is
   geen codefout maar een ontbrekende bron; dat een Nederlandse run wel werkt,

@@ -363,7 +363,7 @@ bewijst: dat er niets is afgekapt. De afkapteller blijft daarom staan.
 De huisregel is die van `CONTROLPLANE.md`: je kunt niet afdwingen wat nooit in de
 schaduw heeft gelopen. Zes stappen, elk met een uitgang die zakt als hij niet klopt.
 
-1. **Inventaris** — een script (te bouwen in fase 0, `scripts/benoemingen.js`) leest wat er staat: elke
+1. **Inventaris** — een inventarisscript (nog te bouwen, in fase 0) leest wat er staat: elke
    zetel, elke boardroom-sleutel, per persoon de EFFECTIEVE rechten per stad
    zoals `magRecht` en `limietVan` ze vandaag geven. Dat wordt het nulpunt,
    vastgelegd met stempel.

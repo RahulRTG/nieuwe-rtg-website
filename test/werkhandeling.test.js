@@ -196,3 +196,19 @@ test('7. de bevestigingscode komt nooit in de uitvoer van een vertrekkende klant
   assert.ok(!JSON.stringify(uit).includes(plan.bevestiging), 'de code staat niet in de export');
   assert.ok(uit.inhoud.handelplannen, 'het voornemen zelf staat er wel -- dat is gewoon werk');
 });
+
+/* WIE EEN ROL TOEKENT KOMT UIT DE SESSIE, NIET UIT HET VERZOEK. Tot 23 september
+   2026 schreef /api/bedrijf/lid/rollen `req.body.door` als actor in de
+   gebeurtenislaag: de aanroeper typte zijn eigen naam onder een
+   toegangswijziging. Met het gedeelde beheer-token is er geen naam, en dan zegt
+   het spoor DAT in plaats van een verzonnen naam te dragen. */
+test('8. een meegestuurde naam komt niet als actor onder een rolwijziging', async () => {
+  const r = await api('/api/bedrijf/lid/rollen', { ...beheerS(), lidId, rollen: ['projectleider', 'service', 'hr'], door: 'Vervalst', reden: 'toets' });
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
+  const uit = await fetch(base + '/api/tenant/export', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(beheerS()) }).then(x => x.json());
+  const alles = JSON.stringify(uit.inhoud || {});
+  assert.ok(alles.includes('beheer (gedeeld token)'), 'het spoor zegt dat het de gedeelde beheercode was');
+  assert.ok(!alles.includes('Vervalst'), 'en de naam uit het verzoek staat nergens');
+  await api('/api/bedrijf/lid/rollen', { ...beheerS(), lidId, rollen: ['projectleider', 'service'] });
+});

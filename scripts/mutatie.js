@@ -526,6 +526,11 @@ const EIGEN_MODULE = new Map([
      Bevestigd door de motor, en dat is hier de voorwaarde: met deze regel
      muteert hij scripts/wekdekking.js en zakt de toets erop. */
   ['wekdekking.test.js', ['scripts/wekdekking.js']],
+  /* DE ZWARE STAP op het scherm is een browserscript dat zich aan `window`
+     hangt; de toets laadt hem als TEKST in een eigen venster-object en requiret
+     hem niet. Statisch ziet de motor dan geen module, en toetsenNietGemeten zou
+     het schrijven van deze toets bestraffen. */
+  ['zwaarstap.test.js', ['public/shared/zwaarstap.js']],
   /* DE MOMENTPROEF wordt door zijn toets als TEKST gelezen (fs.readFileSync) en
      niet gerequired: de toets bewaakt de VORM van het instrument -- zakt het op
      een open schakel, draagt elke bevinding een reden, staan B en D er allebei --

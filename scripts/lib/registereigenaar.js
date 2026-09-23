@@ -71,6 +71,10 @@ const EIGENAAR = {
     waarom: 'Handmatig onderhouden ontwerp- en implementatienotitie voor de drie goedgekeurde homes, met de daadwerkelijk uitgevoerde proeven en hun grenzen.' },
   'LANGUAGE.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden architectuur- en bereikbeschrijving; de drie taalrapporten dragen het afzonderlijke uitvoerbare bewijs.' },
+  'AUTHORITY.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (RTG Authority Engine); de bronverwijzingen zijn met de hand nagelopen, er is geen generator die het schrijft.' },
+  'BENOEMING.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (RTFoundation Roles & Governance 2.0); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',
     waarom: 'Handmatig beoordeelde bevindingen en resterende taalgrenzen; geen automatisch gegenereerd register.' },
   /* De aanleiding zelf. Er is geen schrijvend script: de lijst wordt met de hand

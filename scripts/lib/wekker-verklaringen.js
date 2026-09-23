@@ -87,6 +87,11 @@ module.exports = [
      onderwerp: ze dragen niet WAT er gebeurt maar dat het aankomt. */
   { bestand: 'server/kern/sessies.js', reden: 'houdt sessies gelijk over meerdere servers; zet je dat uit, dan logt iemand uit doordat zijn verzoek bij de andere server landt' },
   { bestand: 'server/kern/intreksignaal.js', reden: 'de fail-closed intrekkingsautoriteit voor account- en recordsessies. De busabonnee sluit ingetrokken credentials op alle processen en moet juist blijven werken als een productschakelaar uitgaat; schakelbaarheid zou uitloggen en beveiligingsintrekking onbetrouwbaar maken' },
+  /* De levensteken-ping van de leveranciersstroom, uit routes/supplier.js gelicht
+     (AUTHORITY.md fase 3). Hij begint ALLEEN binnen een open verzoek naar
+     /api/supplier/stream en stopt bij `close` -- geen werk dat vanzelf terugkomt,
+     maar een verbinding die open wordt gehouden voor wie hem zelf opende. */
+  { bestand: 'server/routes/supplier/stroom.js', reden: 'de keep-alive-ping van een open leveranciersstroom: hij start binnen het verzoek van wie de stroom opent, stopt bij het sluiten, en de stroom zelf wordt per bericht gekeurd (kern/sse.js geldig())' },
   { bestand: 'server/kern/sse.js', reden: 'de afleverlaag van realtime-berichten. Staat de functie kern-live uit, dan komt er geen verbinding tot stand en heeft deze abonnee niemand om aan te leveren -- hij begint zelf geen werk' },
 
   /* EEN WETTELIJKE PLICHT IS GEEN FUNCTIE MET EEN SCHAKELAAR. Zelfde regel als

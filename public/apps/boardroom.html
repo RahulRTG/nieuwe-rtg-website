@@ -168,10 +168,24 @@ window.I18N = { en: {
       });
     });
   }
-  /* Zetels geven en intrekken is een zware handeling: de server kan om een
-     passkey vragen, en /shared/zwaarbevestig.js doet dan de ceremonie. */
-  function zwaar(pad, body) {
-    return window.RTGZwaar.doe(pad, body, { token: token(), optiesPad: '/api/office/boardroom/bevestig/opties' });
+  /* Een zetel geven of intrekken is een ZWARE handeling: de server vraagt dan
+     om de passkey (401 met bevestigingNodig). /shared/zwaarstap.js vangt die
+     vraag, laat de browser tekenen en probeert het een keer opnieuw. */
+  function kaal(pad, body) {
+    return fetch(pad, { method: 'POST', body: JSON.stringify(body || {}),
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() }
+    }).then(function (r) { return r.json().catch(function () { return {}; })
+      .then(function (d) { return { status: r.status, body: d }; }); });
+  }
+  function metVinger(pad, body) {
+    if (!window.RTGZwaar) return post(pad, body);
+    return window.RTGZwaar.metVinger(function (extra) { return kaal(pad, Object.assign({}, body, extra)); },
+      function (actie) { return kaal('/api/office/boardroom/bevestig/opties', { actie: actie })
+        .then(function (x) { return x.body; }); })
+      .then(function (r) {
+        if (r.status >= 400) throw new Error((r.body && r.body.error) || T('lr.mislukt', 'Dat lukte niet.'));
+        return r.body;
+      });
   }
   // dezelfde melder als de rest van deze pagina, met dezelfde standen
   function zeg(t, soort) {
@@ -281,7 +295,7 @@ window.I18N = { en: {
         k.type = 'button';
         k.addEventListener('click', function () {
           k.disabled = true;
-          zwaar('/api/office/balie/zetel', { key: z.key, weg: true })
+          metVinger('/api/office/balie/zetel', { key: z.key, weg: true })
             .then(function (d) { zeg(T('bz.wegOk', 'De zetel is ingetrokken.'), 'goed'); toonZetels(zetelsUit(d)); })
             .catch(function (e) { zeg(e.message, 'fout'); k.disabled = false; });
         });
@@ -315,7 +329,7 @@ window.I18N = { en: {
     var b = $('bzGeef');
     b.disabled = true;
     sleutelVan(v).then(function (key) {
-      return zwaar('/api/office/balie/zetel', { key: key });
+      return metVinger('/api/office/balie/zetel', { key: key });
     }).then(function (d) {
       $('bzCode').value = '';
       zeg(T('bz.geefOk', 'De zetel is gegeven.'), 'goed');
@@ -357,10 +371,10 @@ window.I18N = { en: {
   else start();
 })();
 </script>
+<script src="/shared/passkey.js"></script>
+<script src="/shared/zwaarstap.js"></script>
 <script src="/shared/i18n.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/shared/passkey.js"></script>
-<script src="/shared/zwaarbevestig.js"></script>
 <script src="/apps/boardroom.js" defer></script>
 <script src="/apps/boardroom-eigenaar.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

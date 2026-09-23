@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1583,
-    "kernGedeeld": 239,
+    "kernBreedte": 1586,
+    "kernGedeeld": 241,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -136,6 +136,24 @@
     "officeDomeinenGemeten": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 240,
+      "meter": "kernGedeeld 240 -> 241; kernBreedte 1585 -> 1586",
+      "reden": "Intrekken sluit wat openstaat (AUTHORITY.md fase 3). Drie domeinen trekken een kantoorrecht in -- account (de kantoorrol ontkoppelen), kantoren (boardroomtoegang) en ledenbalie (een baliezetel) -- en alle drie lezen daarvoor de ene kern.kantoorIntrekking. Dat is de bedoelde koppeling: EEN plek die weet welke kantoorsessies van een mens zijn en hoe je ze sluit. Een kopie per domein zou deze meter sparen en drie intrekwegen opleveren die binnen een jaar uiteenlopen (LAT-regel 4).",
+      "waarheen": "GRENZEN.json (account, kantoren en ledenbalie dragen kantoorIntrekking) en test/kantoorintrekking.test.js, die per intrekweg tegen een echte server vasthoudt dat de open sessie meteen 401 geeft"
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 239,
+      "meter": "kernGedeeld 239 -> 240; kernBreedte 1583 -> 1585",
+      "reden": "De beleidsmotor (AUTHORITY.md fase 1, besluit A1) loopt in de schaduw mee met de vier kantoordeuren. Drie ervan (officeAuth, kluisAuth/naamAuth, boardroomAuth) worden in server.js gewikkeld; de vierde, balieAuth, woont in het domein ledenbalie en leest daarom kern.beleidsmotor, net als het domein office dat de stand toont. Dat is de bedoelde koppeling: EEN motor die elke deur kent. Een tweede motor per domein zou deze meter sparen en precies de zesde gezagsvocabulaire opleveren die besluit A1 verbiedt.",
+      "waarheen": "GRENZEN.json (office en ledenbalie dragen beleidsmotor) en test/beleidsmotor.test.js, die tegen een echte server nul keer oneens over alle vier deuren vasthoudt"
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

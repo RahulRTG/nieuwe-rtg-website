@@ -44,8 +44,10 @@ module.exports = (ctx) => {
   app.post('/api/office/commercie/zaakabonnement/zet', boardroomAuth, (req, res) => veilig(res, () => {
     if (!kern || !kern.zaakAbonnement) return { status: 503, error: 'Niet gemount.' };
     const b = req.body || {};
-    const r = kern.zaakAbonnement.zet(b.code, b.pas, b.naam || 'boardroom');
-    if (r.ok) afdelingen.audit(b.naam || 'boardroom', 'Zaakabonnement ' + r.code + ' gezet op ' + r.pas);
+    // wie het deed uit de sessie, nooit uit het verzoek (hier stond b.naam)
+    const wie = require('../../../opzet/envelop').wie(req) || 'boardroom';
+    const r = kern.zaakAbonnement.zet(b.code, b.pas, wie);
+    if (r.ok) afdelingen.audit(wie, 'Zaakabonnement ' + r.code + ' gezet op ' + r.pas);
     return r;
   }));
 

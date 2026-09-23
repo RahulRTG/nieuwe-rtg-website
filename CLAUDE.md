@@ -121,6 +121,43 @@ eligibility-motor alleen mag tóevoegen (nooit "dit is niets voor jou") en dat d
 meeteenheid van een capaciteitsmotor de taak is en nooit de mens. Paragraaf 7
 zet vijftig voorgestelde onderdelen op een rij met per stuk of hij al bestaat en
 welke grens hem eerlijk houdt.
+**`BENOEMING.md` is RTFoundation Roles & Governance 2.0** -- wie binnen de
+Foundation iets mag doen, sinds wanneer, waarom, en hoe dat ophoudt. Lees die vóór
+je aan zetels, bestuursrollen, quorum of Foundation-rechten werkt. Het is een
+verbouwing en geen nieuwbouw: `kern/rtfos/basis.js` heeft al rollen, rechten per
+rol en een uitgavegrens, en een tweede rollenlaag ernaast zou de
+`VERMOGENS`-fout zijn. De meting vond twee dingen die eerst moeten: **elke
+RTFOS-route hangt achter de RTG-kantoordeur**, dus een projectleider moet de
+gedeelde backoffice-code krijgen om zijn eigen stad te openen, en **intrekken
+sluit vandaag geen enkele sessie**. Vijf dimensies die niet meer in één titel
+samenvallen (band, stemzetel, werkrol, casusinzage, uitgavegrens), een
+benoeming waarvan de stand BEREKEND wordt, vereisten die bij een recht horen en
+een filter zijn en geen ontslag, en een migratie die voor elke persoon de
+effectieve rechten byte voor byte vergelijkt. Let op de namen: `mandaat`,
+`machtiging`, `bevoegdheid`, `geschorst` en `termijn` zijn bezet — het heet
+`uitgavegrens`, `opgeschort` en `zittingsduur`.
+
+**`AUTHORITY.md` is de RTG Authority Engine** -- van TOEGANG modelleren ("mag
+Finance in") naar BEVOEGDHEID ("mag namens RTG Nederland tot € 25.000 klaarzetten,
+niet uitvoeren, tot 31 december, boven € 10.000 met een verse passkey"). Lees die
+vóór je een poort, rol, recht, tekengrens of auditregel toevoegt. `BENOEMING.md`
+is er het Foundation-profiel van. De meting: er is geen beslispunt maar er zijn
+er zeven, geen afdwingpunt maar zestien poortfuncties plus 26 gezagsfuncties in
+handlers, en geen lidmaatschap maar elf losse opslagplaatsen met vier
+levenscycli. Twee regels die er als eerste uit kwamen en die overal gelden:
+**de actor van een auditregel komt uit de sessie en nooit uit het verzoek** (P0b
+vond zeven plekken, twee door een toets beschermd), en **de motor VERVANGT de
+vijf gezagsvocabulaires in plaats van er een zesde naast te zetten** (INT-01).
+Eén grammatica, geen tabel met alle rechten: het domein bezit zijn werkwoorden.
+**De vijf besluiten A1–A5 zijn genomen (23 september 2026)** en fase 1 staat in de
+SCHADUW: `server/kern/beleidsmotor/` kent de vier kantoordeuren als gegevens, velt
+naast elke poort een eigen besluit en telt eens/oneens (A1), en telt elke
+kantoorroute die zonder bekende poort afliep (A3) -- zonder iets tegen te houden.
+Die A3-meting vond meteen dat `/api/office/doc` paspoortscans aan de gedeelde code
+gaf; dat is nu op naam. Namen: `benoeming`, `orggraaf` en `tekengrens` zijn vrij,
+`beleidsmotor` is nu in gebruik;
+`policy`, `capability`, `machtiging`, `lidmaatschap` en `delegatie` zijn bezet.
+
 **`HDI.md` is de laag BOVEN de Foundation** — RTG Human Development
 Infrastructure, als richtingsdocument met per onderdeel of het **staat**, **een
 stap weg** is, **een besluit vraagt** of **jaren weg** is (zoals PLATFORM.md en
@@ -1343,7 +1380,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->125<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->107<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->399<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->107<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->400<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste

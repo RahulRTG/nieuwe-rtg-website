@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-22T16:24:52.794Z",
-  "commit": "151cdd519",
+  "op": "2026-09-23T11:40:50.152Z",
+  "commit": "aff2d77",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4992,
-  "geclassificeerd": 4992,
+  "totaal": 4994,
+  "geclassificeerd": 4994,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1199,
+   "NOT_APPLICABLE": 1201,
    "PROTECTED": 467,
    "INTENTIONALLY_NON_IDEMPOTENT": 136
   },
-  "vastgesteldDoorMens": 1851,
+  "vastgesteldDoorMens": 1853,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4111,
+   "AUTHENTICATED": 4113,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 737,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 20
+   "niet gemeten": 22
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -57068,6 +57068,48 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.beleidsmotor",
+   "route": "POST /api/office/beleidsmotor",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.beleidsmotor.waarom",
+   "route": "POST /api/office/beleidsmotor/waarom",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

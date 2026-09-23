@@ -61,9 +61,9 @@ module.exports = (ctx) => {
     wie: (req) => envelopWie(req)
   });
 
-  /* De sleutel van de kamer (lijst, geven, intrekken) staat in ./regie-toegang.js
-     -- afgesplitst voor de 10 KB van keuringsregel 13. Zelfde context, zelfde poort. */
+  /* De sleutel van de kamer (tonen, geven, intrekken) staat in ./regie-toegang.js. */
   require('./regie-toegang')(ctx);
+
   /* De schakelroutes van de kast (globaal, fijn, genre, de grote hendel en de
      uitrolfases) staan in ./regie-schakel.js -- afgesplitst voor de 10 KB van
      keuringsregel 13. Zelfde context, zelfde poort. */

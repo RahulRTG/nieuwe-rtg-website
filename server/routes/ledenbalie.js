@@ -22,10 +22,9 @@
    tweede oordeel hier zou op den duur van het eerste gaan afwijken, en dan is
    niet meer te zeggen welke van de twee de regel is. */
 module.exports = (kern) => {
-  const { app, officeAuth, boardroomAuth, boardroomWie, magBalie,
+  const { app, officeAuth, boardroomAuth, boardroomWie, magBalie, afdelingen, beleidsmotor,
           balieZetels, balieZetelZet, balieZetelWeg, balieZoek, balieDossier,
-          balieHerstel, balieKlachtOpen, balieKlachtStatus, balieAboVoorstel,
-          zwaarbewijs, afdelingen } = kern;
+          balieHerstel, balieKlachtOpen, balieKlachtStatus, balieAboVoorstel } = kern;
 
   /* Elk antwoord loopt door dezelfde omhulling. Hij wacht op een belofte, want
      het herstel zet e-mail en sms in gang en hoeft niet synchroon te zijn. Een
@@ -56,14 +55,16 @@ module.exports = (kern) => {
      De weigering noemt de reden. "Geen toegang" laat een medewerker met een
      geldige kantoorcode raden wat hij verkeerd doet, terwijl het antwoord juist
      iets uitlegt dat hij moet weten: deze handelingen dragen een naam. */
-  function balieAuth(req, res, next) {
+  /* De beleidsmotor loopt mee (AUTHORITY.md fase 1); de poort zelf blijft beslissen. */
+  const bewaakt = (p) => (beleidsmotor ? beleidsmotor.bewaak('balie', p) : p);
+  const balieAuth = bewaakt(function balieAuth(req, res, next) {
     const key = boardroomWie(req);
     if (!magBalie(key)) {
       return res.status(403).json({ error: 'De ledenbalie vraagt een zetel op naam. De gedeelde kantoorcode opent wel de ruimte, maar wijst niemand aan, en werk aan het account van een lid hoort herleidbaar te zijn tot een mens. Meldt u zich aan met het eigen RTG-account; de eigenaar deelt de zetels aan de balie uit.' });
     }
     req.balieKey = key;
     next();
-  }
+  });
 
   /* Zoeken op codenaam of steuncode. De sleutel van de baliemedewerker gaat
      mee, want elke raadpleging komt in het inzagejournaal te staan; zonder die
@@ -109,30 +110,28 @@ module.exports = (kern) => {
      geen namen; die blijven waar ze horen. */
   app.post('/api/office/balie/zetels', boardroomAuth, (req, res) => veilig(res, () =>
     ({ ok: true, baas: !!req.boardroomBaas, zetels: balieZetels() })));
-  /* Een zetel geven of intrekken is RECHT VERLENEN, en dat deed tot 23 september
-     2026 iedereen met een boardroomsleutel: de poort hierboven laat de eigenaar
-     EN wie van hem de sleutel kreeg binnen, en `baas` ging alleen naar het
-     scherm om knoppen te tonen. Een scherm is geen grens. Nu dezelfde drie
-     grendels als het geven van boardroomtoegang (routes/kantoren/regie.js):
-     alleen de eigenaar, een verse passkey via de zware poort (kern/zwaarbewijs.js,
-     met zijn zichtbare terugval zolang er geen passkey is), en een auditregel.
-     Ook INTREKKEN vraagt de vinger: een gestolen eigenaarssessie die de
-     balie leegveegt is een storing die niemand mag kunnen veroorzaken zonder
-     toestel. Intrekken werkt meteen, want magBalie leest de lijst bij elk
-     verzoek; er is geen token met een eigen levensduur om te laten verlopen. */
-  app.post('/api/office/balie/zetel', boardroomAuth, (req, res) => veilig(res, async () => {
-    if (!req.boardroomBaas) return { status: 403, error: 'Alleen de eigenaar geeft of trekt een baliezetel in. De boardroomsleutel opent de kamer, maar verleent geen rechten aan anderen.' };
-    const key = kort(lijf(req).key, 120);
-    if (!key) return { status: 400, error: 'Geef de sleutel van het lid dat de zetel krijgt of verliest.' };
-    const weg = lijf(req).weg === true || kort(lijf(req).actie, 20) === 'weg';
-    const bewijs = await zwaarbewijs.eis(zwaarbewijs.boardroomUser(req), 'eigenaar-baliezetel',
-      zwaarbewijs.sessieSleutel(req), req, weg ? 'Het intrekken van een baliezetel' : 'Het geven van een baliezetel');
-    if (bewijs.error) return bewijs;
-    const r = weg ? balieZetelWeg(key) : balieZetelZet(key);
-    if (r && r.error) return r;
-    afdelingen.audit('eigenaar', (weg ? 'Baliezetel ingetrokken van ' : 'Baliezetel gegeven aan ') + key);
-    // de verse lijst gaat mee terug: het scherm werkt erop, en een tweede ronde
-    // langs de server zou het beeld alleen maar even uit de pas laten lopen
-    return Object.assign({}, r, { zetels: balieZetels() });
-  }));
+  /* UITDELEN EN INTREKKEN IS VAN DE EIGENAAR (de server dwingt het af; eerst
+     verborg alleen het scherm de knop): een verse passkey, een auditregel op
+     sleutel, en intrekken sluit ook de open kantoorsessies (AUTHORITY.md fase 3). */
+  app.post('/api/office/balie/zetel', boardroomAuth, async (req, res) => {
+    try {
+      if (!req.boardroomBaas) return res.status(403).json({ error: 'Alleen de eigenaar geeft of trekt een baliezetel in.' });
+      // bij het VERZOEK gelezen: bij het bedraden kan de zware poort nog ontbreken
+      const zwaar = kern.zwaarbewijs;
+      if (!zwaar) return res.status(503).json({ error: 'De passkeybevestiging is nu niet beschikbaar; probeer het zo opnieuw.' });
+      const key = kort(lijf(req).key, 120);
+      if (!key) return res.status(400).json({ error: 'Geef de sleutel van het lid dat de zetel krijgt of verliest.' });
+      const weg = lijf(req).weg === true || kort(lijf(req).actie, 20) === 'weg';
+      const bewijs = await zwaar.eis(zwaar.boardroomUser(req), 'eigenaar-baliezetel', zwaar.sessieSleutel(req), req,
+        weg ? 'Het intrekken van een baliezetel' : 'Het geven van een baliezetel');
+      if (bewijs.error) return zwaar.stuur(res, bewijs);
+      const r = weg ? balieZetelWeg(key) : balieZetelZet(key);
+      if (r && r.error) return res.status(r.status || 400).json({ error: r.error });
+      afdelingen.audit('eigenaar', (weg ? 'Baliezetel ingetrokken van ' : 'Baliezetel gegeven aan ') + key +
+        (bewijs.bewezen ? ' (passkey)' : ' (zonder passkey: dit account heeft er nog geen)'));
+      if (weg && kern.kantoorIntrekking) r.sessiesGesloten = (await kern.kantoorIntrekking.sluitKantoorVan(key, req)).sessies;
+      // de verse lijst gaat mee terug: het scherm werkt erop
+      res.json(Object.assign({}, r, { zetels: balieZetels() }));
+    } catch (e) { console.error('[ledenbalie]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
 };

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-23T16:30:40.101Z",
-  "commit": "b1c1594",
+  "op": "2026-09-23T16:37:26.978Z",
+  "commit": "372911d",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 3,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -19,11 +19,10 @@
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 19
+  "publiekeLijstenVerschillen": 18
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
-   "/api/sat/ping",
    "/api/foundation/health",
    "/api/metrics",
    "/api/metrics/kort",
@@ -1019,25 +1018,25 @@
   },
   {
    "sleutel": "POST /api/doos/buurmelding",
-   "bestand": "server/routes/doos.js:118",
+   "bestand": "server/routes/doos.js:123",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/meting",
-   "bestand": "server/routes/doos.js:35",
+   "bestand": "server/routes/doos.js:40",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/rapport",
-   "bestand": "server/routes/doos.js:127",
+   "bestand": "server/routes/doos.js:132",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/update/status",
-   "bestand": "server/routes/doos.js:98",
+   "bestand": "server/routes/doos.js:103",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },

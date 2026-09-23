@@ -87,7 +87,6 @@ const { maakLive } = require('./kern/live');
 const { RIT_KETEN, RIT_LEGACY, RIT_MELDING, maakVervoer } = require('./kern/vervoer');
 const { VAC_SOORTEN, maakWerk } = require('./kern/werk');
 const { AI_TONE, maakAi } = require('./kern/ai');
-const { maakKantoor } = require('./kern/kantoor');
 const { SHIFT_NAMES, maakPersoneel } = require('./kern/personeel');
 const { HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES, maakLeverancier } = require('./kern/leverancier');
 const { maakLid } = require('./kern/lid');
@@ -2210,7 +2209,7 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.ran
 
 
 /* De backoffice-laag (officeAuth, officeState, pendingVerifications) staat in
-   server/kern/kantoor.js en wordt verderop opgezet via maakKantoor(), na de
+   server/kern/kantoor.js en wordt verderop opgezet via opzet/kantoordeur.js, na de
    AI-kern omdat officeState de conciergeInbox meeneemt. OFFICE_CODE blijft hier
    (nodig bij de startwaarschuwing en de kantoor-login). */
 
@@ -2248,23 +2247,11 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, notee
       return id != null ? geloof.promptRegel(id, null) : null;
     } });
 
-// De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const kantoorRauw = maakKantoor({
+// Kantoorlaag + beleidsmotor: ./opzet/kantoordeur.js (na maakAi).
+const { officeAuth, kluisAuth, naamAuth, boardroomAuth, beleidsmotor, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications, mensdeurStand } = require('./opzet/kantoordeur')(app, () => kern, {
   db, save, bewerkCollectie, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
-const { boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications, mensdeurStand } = kantoorRauw;
-/* De beleidsmotor loopt in de schaduw mee met de kantoordeuren (AUTHORITY.md
-   fase 1): hij velt een eigen besluit naast dat van de poort en houdt niets
-   tegen. De meelezer hangt VOOR de kantoorroutes (A3: route zonder poort). */
-const beleidsmotor = require('./kern/beleidsmotor').maakBeleidsmotor({
-  db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom,
-  balieBron: () => kern.magBalie });
-app.use('/api/office', beleidsmotor.meelezer);
-const officeAuth = beleidsmotor.bewaak('kantoor', kantoorRauw.officeAuth);
-const kluisAuth = beleidsmotor.bewaak('op-naam', kantoorRauw.kluisAuth);
-const naamAuth = beleidsmotor.bewaak('op-naam', kantoorRauw.naamAuth);
-const boardroomAuth = beleidsmotor.bewaak('boardroom', kantoorRauw.boardroomAuth);
 
 /* ================= DOORLOPEND GESPREK IN DE APP =================
    Elk lid heeft één doorlopend gesprek, volledig binnen de beveiligde RTG-app.

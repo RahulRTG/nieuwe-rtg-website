@@ -841,13 +841,14 @@ in plaats van haar weg te laten. Te weinig rust bij een mens blijft met opzet
 een waarschuwing. **De eigenaar koos dezelfde dag** (par. 7a): `employment` aan
 een entiteit is de waarheid, de keten van vacature tot loon wordt rond gemaakt
 voordat `werving.suite` opengaat, en Métier is de bron van vaardigheden. De
-Adamproef loopt sindsdien door tot de loonrun (17 schakels, 15 gesloten, 2 open
-met reden). Van de drie breuken die hij vond is de middelste dicht: een aanname
+Adamproef loopt sindsdien door tot de loonrun (17 schakels, 16 gesloten, 1 open
+met reden). Van de drie breuken die hij vond zijn er twee dicht: een aanname
 wordt een dienstverband bij de entiteit van de zaak (`kern/concern/aanname.js`,
-een brug die een kant op loopt en geen werkgever raadt). Open blijven dat een
-Foundation-profiel een aanname niet kan claimen omdat het geen lidaccount heeft,
-en dat de werkgever uit de proef in Spanje staat terwijl er alleen een Nederlands
-regelpakket ligt.
+een brug die een kant op loopt en geen werkgever raadt), en een gezinslid neemt
+zijn plek zelf in -- de uitnodiging reist mee met zijn sollicitatie, alleen hij
+ziet haar, en hij claimt met een eigen account (mag vanaf vijftien) in plaats van
+dat de werkgever een link doorgeeft. Open blijft dat de werkgever uit de proef in
+Spanje staat terwijl er alleen een Nederlands regelpakket ligt.
 
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG

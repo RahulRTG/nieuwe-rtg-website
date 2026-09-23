@@ -501,16 +501,25 @@ van het werk erna.
    in deze paragraaf.
 
 **Gedaan (23 september 2026).** `scripts/adamproef.js` loopt nu door tot de
-loonrun: 17 schakels, 15 gesloten, 2 open met reden, 0 stuk, en 9 van de 9
+loonrun: 17 schakels, 16 gesloten, 1 open met reden, 0 stuk, en 10 van de 10
 storingen gehouden (`ADAMPROEF.json`). Waar Adam niet verder kan, neemt een
 volwassen lid het over, zodat de rest van de keten toch gemeten wordt. De drie
 breuken die de verlenging vond, in de volgorde waarin een mens ze tegenkomt (de
-middelste is dicht):
+eerste twee zijn dicht):
 
-- **Schakel 13:** een Foundation-profiel komt niet in het team. Een aanname
+- **Schakel 13:** een Foundation-profiel kwam niet in het team. Een aanname
   claimen eist een lidsessie (`/api/werving/verbind`), en een gezinslid heeft
-  die niet. De aanname eindigt bij een kassacode die de werkgever met de hand
-  moet doorgeven.
+  die niet. De aanname eindigde bij een kassacode die de werkgever met de hand
+  moest doorgeven. **Dicht dezelfde dag** (keuze van de eigenaar: de uitnodiging
+  naar Adam). De werving bewaart de uitnodigingslink op de sollicitatie zelf;
+  `/gezin/sollicitaties` toont hem alleen aan het profiel dat solliciteerde, en
+  de werkgever ziet hem niet, want `plek` staat niet in de positieve lijst van
+  `werkgeverSollicitatie`. In `werk.html` staat *Neem je plek in*. Adam maakt een
+  gratis eigen account (een RTG-account mag vanaf vijftien) en claimt langs de
+  bestaande route, en de dienstverbandbrug geeft hem meteen een dienstverband.
+  Er is geen tweede soort identiteit bijgekomen in het personeelsregister. Een
+  nieuwe storing houdt vast dat alleen Adam de uitnodiging ziet (niet de ouder,
+  niet de zus, niet de werkgever), met Adam zelf als besturingsproef.
 - **Schakel 16:** een aanname maakte geen `employment`. Het volwassen lid stond
   in het team (schakel 14) en had een contract (schakel 15), maar
   `/api/concern/mijnwerk` zei *U heeft nog geen werkplek*. **Dicht dezelfde dag**:

@@ -29,11 +29,11 @@ const CONTRACTEN = {
     semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' },
     stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'tegen een draaiende server (test/beleidsmotor.test.js toets 8): 401 zonder sessie, ' +
-      'en per sessiesoort het besluit over zichzelf; twee keer vragen geeft hetzelfde', op: '2026-09-23' },
+    bewijs: { gemeten: 'tegen een draaiende server (test/beleidsmotor.test.js toets 8): 401 zonder sessie, 403 voor ' +
+      'de gedeelde code, en per sessie op naam het besluit over zichzelf; twee keer vragen geeft hetzelfde', op: '2026-09-23' },
     nagekeken: 'met de hand, 2026-09-23: de handler roept alleen beleidsmotor.waarom(req) aan, en die leest de ' +
       'feiten van het token en rekent met regels.kan() -- geen save(), geen toewijzing. De poort ervoor ' +
-      '(officeAuth, gewikkeld) telt via res.finish mee in de schaduw; dat is de andere ingang',
+      '(kluisAuth, gewikkeld) telt via res.finish mee in de schaduw; dat is de andere ingang',
     afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
   },
 };

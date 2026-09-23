@@ -10,7 +10,7 @@
    zijn voor de gedeelde code. */
 module.exports = (octx) => {
   const { kern } = octx;
-  const { app, officeAuth, boardroomAuth, beleidsmotor } = kern;
+  const { app, kluisAuth, boardroomAuth, beleidsmotor } = kern;
 
   app.post('/api/office/beleidsmotor', boardroomAuth, (req, res) => {
     if (!beleidsmotor || typeof beleidsmotor.stand !== 'function') {
@@ -19,10 +19,12 @@ module.exports = (octx) => {
     res.json(beleidsmotor.stand());
   });
 
-  /* WAAROM MAG IK HIER (NIET) IN? Voor elke kantoorsessie, ook de gedeelde code,
-     en alleen over zichzelf. Een weigering zonder reden laat iemand raden; dit
-     noemt per deur welke eis viel. */
-  app.post('/api/office/beleidsmotor/waarom', officeAuth, (req, res) => {
+  /* WAAROM MAG IK HIER (NIET) IN? Alleen over zichzelf, en dus alleen voor wie
+     een zelf HEEFT: een kantoorsessie op naam (kluisAuth). De gedeelde code
+     krijgt de weigering van die poort, en die zegt precies wat hij wilde weten
+     -- log in met uw eigen RTG-account. Een weigering zonder reden laat iemand
+     raden; dit noemt per deur welke eis viel. */
+  app.post('/api/office/beleidsmotor/waarom', kluisAuth, (req, res) => {
     if (!beleidsmotor || typeof beleidsmotor.waarom !== 'function') {
       return res.status(503).json({ error: 'De beleidsmotor is niet bedraad in deze server.' });
     }

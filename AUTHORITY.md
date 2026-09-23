@@ -336,7 +336,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | fase 4 |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | fase 4 |
 | 7 | **identiteiten voor agents, diensten en apparaten** | **agent staat** (23 september 2026; par. 5c); diensten en apparaten niet |
-| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf staat** (`/api/office/beleidsmotor/waarom`); reviews, slapende rechten en de simulator niet |
+| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf staat** (`/api/office/beleidsmotor/waarom`, op naam: de gedeelde code heeft geen zelf); reviews, slapende rechten en de simulator niet |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
 
 ### 5a. Fase 1, zoals hij er staat

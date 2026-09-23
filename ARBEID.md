@@ -142,9 +142,9 @@ zelf al op jaren weg gezet.
 | **Capability** | vier betekenissen al (platformvermogen in `OS.md`, functieschakelaar, capaciteit per trede, begrensd recht in `req.envelop`) | **botst** — voor menselijke skills koos `HDI.md` par. 2 `vaardigheid`, en dat woord staat al op minstens vijf plekken met dezelfde betekenis |
 | **Opportunity** | vijf vormen: vacature, Opportunity Deck, knelpuntvondst, stadsweefsel-kansen, creator-oproep (`server/kern/samenwerking.js`) | **botst** — `AANVOERVORM.json` zegt: geen gedeelde vorm, een projectie met vijf verplichte etiketten |
 | **Relationship** | minstens zes modules met `relatie` in een eigen betekenis | **botst** — zie par. 3, want dáár zit de vondst |
-| **Work** | taak, project, dienst, vervoersopdracht, klus, vacature, elk in zijn domein; `server/kern/werkcommand/register.js` als werkruimteregister dat geen tabel verplaatst | **botst** — `PLANVORM.json`: 0 gedeelde velden |
+| **Work** | taak, project, dienst, vervoersopdracht, klus, vacature, elk in zijn domein; `server/kern/werkcommand/register.js` als werkruimteregister dat geen tabel verplaatst | **botst** — `PLANVORM.json`: <!--getal:planvorm.inAlle-->0<!--/getal--> velden in alle plandomeinen |
 | **Agreement** | `server/kern/commercie/contract.js`, `server/kern/payroll/contracten.js`, `server/bedrijf/contract.js` | **botst** — `AFSPRAAK.md` par. 2.1 verbiedt een supertabel; wat gedeeld mag worden is het tekenprotocol |
-| Workflow | in- en uitdienst, voornemen, documentwerkstroom, draaiboeken, de wervingsstroom, elk in zijn domein | **jaren weg** — `REPRESENTATIE.md` par. 4 zet de universele hoofdloop en saga-orkestratie daar, en `KETENVORM.json` meet 0 gedeelde actoren |
+| Workflow | in- en uitdienst, voornemen, documentwerkstroom, draaiboeken, de wervingsstroom, elk in zijn domein | **jaren weg** — `REPRESENTATIE.md` par. 4 zet de universele hoofdloop en saga-orkestratie daar, en `KETENVORM.json` meet <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van <!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> actoren gedeeld |
 
 Twee dingen die bij het lezen van die tabel stil fout gaan. De WorkOS-manifesten
 noemen `organization` en `work_item` als objecten, maar dat zijn **labels zonder

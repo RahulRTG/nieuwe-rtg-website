@@ -33,6 +33,14 @@ const DIENSTEN = Object.freeze({
 
 const actorVan = (naam) => 'dienst:' + naam;
 
+/* Een apparaat-id is geen contactgegeven, maar kern/envelop.js weigert terecht
+   elke actor met acht of meer cijfers op rij (een telefoonnummer of een BSN). Een
+   toestel-id van acht hex-tekens is soms alleen cijfers, en dan gaf de meting
+   500 -- ongeveer een op de veertig toestellen. Een reeks cijfers wordt daarom na
+   elke vier tekens met een dubbelepunt gebroken: '12345678' wordt '1234:5678'. De
+   grens van de envelop blijft zoals hij is. */
+const zonderCijferreeks = (id) => String(id).replace(/[\d\s.-]{4}(?=[\d\s.-])/g, m => m + ':');
+
 /* Voer fn uit als deze dienst. Een onbekende naam is een fout in de code, geen
    randgeval: die hoort bij het opstarten of in een toets te zakken. */
 function alsDienst(naam, fn) {
@@ -45,7 +53,7 @@ function alsDienst(naam, fn) {
    het lid staat in de meting zelf, en een actor die een lid noemt terwijl een
    apparaat schreef, is precies de verwarring die dit oplost. */
 function alsToestel(id, fn) {
-  const e = envelop.alsStart(envelop.maak({ kanaal: 'toestel', actor: 'toestel:' + String(id).slice(0, 48),
+  const e = envelop.alsStart(envelop.maak({ kanaal: 'toestel', actor: 'toestel:' + zonderCijferreeks(String(id).slice(0, 48)),
     classificatie: 'persoonsgegeven' }));
   return envelop.inKeten(e, fn);
 }
@@ -54,7 +62,7 @@ function alsToestel(id, fn) {
    doos die met de gedeelde sleutel binnenkomt noemt zichzelf, en die naam op de
    bus zetten zou een zelfopgave als identiteit verkopen. */
 function alsDoos(naam, fn) {
-  const e = envelop.alsStart(envelop.maak({ kanaal: 'doos', actor: 'doos:' + String(naam).slice(0, 40),
+  const e = envelop.alsStart(envelop.maak({ kanaal: 'doos', actor: 'doos:' + zonderCijferreeks(String(naam).slice(0, 40)),
     classificatie: 'intern' }));
   return envelop.inKeten(e, fn);
 }

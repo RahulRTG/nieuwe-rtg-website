@@ -61,6 +61,14 @@ test('4. een toestel schrijft als toestel', () => {
   alsToestel('a1b2c3d4', () => { e = envelop.huidige(); });
   assert.equal(e.actor, 'toestel:a1b2c3d4');
   assert.equal(e.classificatie, 'persoonsgegeven', 'een meting gaat over een herleidbaar mens');
+  /* Een id van alleen cijfers lijkt voor de envelop op een telefoonnummer; dat gaf
+     een 500 bij ongeveer een op de veertig toestellen. */
+  let cijfers = null;
+  alsToestel('12345678', () => { cijfers = envelop.huidige(); });
+  assert.equal(cijfers.actor, 'toestel:1234:5678');
+  let doos = null;
+  alsDoos('doos-20260923', () => { doos = envelop.huidige(); });
+  assert.ok(doos && doos.actor.startsWith('doos:'), 'ook een doosnaam met een datum erin');
 });
 
 test('5. een bewezen doos schrijft als doos', () => {

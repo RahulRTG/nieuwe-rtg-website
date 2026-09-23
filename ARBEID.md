@@ -568,7 +568,14 @@ verklaring van een werkgever, en die wordt niet in bulk voor hem afgelegd. Wie
 gekozen wordt maar niet in het voorstel staat, wordt overgeslagen met de reden;
 personeel zonder eigen account wordt apart geteld en niet geraden; en een zaak op
 een andere vestiging dan die van de aanvrager geeft hetzelfde antwoord als "bestaat
-niet". De bevinding blijft `midden`: of hij `hoog` wordt, is een besluit voor
+niet". Het scherm staat in RTG Concern (`public/apps/concern-inhaal.js`): per zaak
+op een vestiging een knop, een voorstel met vinkjes die vooraf UIT staan, en een
+bevestiging die zonder keuze zegt waarom er niets gebeurt. De route is daarbij in
+tweeen geknipt, TONEN (`/inhaal`, leest) en DOEN (`/inhaal/bevestig`), en dat was
+geen stijlkeuze: als een route leest zonder keuze en schrijft met keuze, gaf de
+idem-poort een tweede voorstelvraag binnen vijf seconden het OUDE antwoord terug,
+met iemand erin die net een dienstverband had gekregen. De browsertoets vond het;
+geen enkele unittoets zag het. De bevinding blijft `midden`: of hij `hoog` wordt, is een besluit voor
 wanneer de inhaalslag bij de bestaande zaken gedaan is.
 
 **De keten van Adam is daarmee rond: 18 van 18 schakels gesloten, 10 van 10

@@ -199,9 +199,13 @@ test('13. de inhaalroute draait mee en opent niets van een ander', async () => {
     const ves = (await post('/api/concern/vestiging/nieuw', { entiteit: ent.id, naam: 'Hier' }, A)).body.vestiging;
     assert.ok(ves && ves.id, 'een vestiging om mee te werken');
     assert.equal((await post('/api/concern/vestiging/inhaal', { vestiging: ves.id, code: 'BRISA' })).status, 401);
-    const vreemd = await post('/api/concern/vestiging/inhaal', { vestiging: ves.id, code: 'BRISA', keuze: [1] }, B);
+    const vreemd = await post('/api/concern/vestiging/inhaal/bevestig', { vestiging: ves.id, code: 'BRISA', keuze: [1] }, B);
     assert.equal(vreemd.status, 404, 'de vestiging van een ander: ' + JSON.stringify(vreemd.body));
-    const los = await post('/api/concern/vestiging/inhaal', { vestiging: ves.id, code: 'BRISA', keuze: [1] }, A);
+    const los = await post('/api/concern/vestiging/inhaal/bevestig', { vestiging: ves.id, code: 'BRISA', keuze: [1] }, A);
+    assert.equal((await post('/api/concern/vestiging/inhaal/bevestig', { vestiging: ves.id, code: 'BRISA' }, A)).status, 400,
+      'bevestigen zonder keuze legt niets vast en zegt waarom');
+    assert.equal((await post('/api/concern/vestiging/inhaal', { vestiging: ves.id, code: 'BRISA', keuze: [1] }, A)).status, 404,
+      'de toonroute: dezelfde eigendomscontrole');
     assert.equal(los.status, 404, 'een zaak die niet aan deze vestiging hangt: ' + JSON.stringify(los.body));
     assert.equal((await post('/api/concern/mensen', { entiteit: ent.id }, A)).body.mensen.length, 0, 'er is niets vastgelegd');
   } finally { await stop(srv); fs.rmSync(TMP, { recursive: true, force: true }); }

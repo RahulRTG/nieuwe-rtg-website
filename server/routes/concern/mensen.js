@@ -84,17 +84,27 @@ module.exports = (kern, hulp) => {
     stuur(res, employmentNieuw(Object.assign({}, req.body, { entiteit: e.id })));
   });
 
-  /* De inhaalslag voor aannames van voor de brug (kern/concern/aanname.js).
-     Zonder `keuze` alleen een voorstel; de zaak moet op DEZE vestiging hangen,
-     anders zou een vestiging van de aanvrager genoeg zijn om andermans
-     personeel in dienst te verklaren. */
-  app.post('/api/concern/vestiging/inhaal', auth, (req, res) => {
+  /* De inhaalslag voor aannames van voor de brug (kern/concern/aanname.js),
+     in tweeen geknipt zoals elke handeling op dit scherm: TONEN en DOEN. Een
+     route die zonder keuze leest en met keuze schrijft, kreeg van de
+     idem-poort binnen het venster het OUDE voorstel terug (dezelfde vraag is
+     een herhaling) -- en toonde dan iemand die al een dienstverband had. De
+     zaak moet op DEZE vestiging hangen, anders zou een vestiging van de
+     aanvrager genoeg zijn om andermans personeel in dienst te verklaren. */
+  function inhaal(req, res, keuze) {
     const v = hulp.mijnVestiging(req);
     if (!v) return stuur(res, nietGevonden);
     const code = String((req.body || {}).code || '').toUpperCase();
     const personeel = hulp.personeelVan(code).map(st => ({ id: st.id, naam: st.name,
       rol: st.func || (st.role === 'manager' ? 'Manager' : ''), memberId: st.member_id }));
-    stuur(res, kern.dienstverbandInhaal({ zaak: code, vestiging: v.id, personeel, keuze: (req.body || {}).keuze }));
+    stuur(res, kern.dienstverbandInhaal({ zaak: code, vestiging: v.id, personeel, keuze }));
+  }
+  app.post('/api/concern/vestiging/inhaal', auth, (req, res) => inhaal(req, res, undefined));
+  app.post('/api/concern/vestiging/inhaal/bevestig', auth, (req, res) => {
+    const keuze = (req.body || {}).keuze;
+    if (!Array.isArray(keuze) || !keuze.length) return stuur(res, { status: 400,
+      error: 'Kies wie er een dienstverband krijgt; zonder keuze wordt er niets vastgelegd.' });
+    inhaal(req, res, keuze);
   });
 
   /* Een dienstverband is van een entiteit; de eigendomscontrole loopt daarlangs

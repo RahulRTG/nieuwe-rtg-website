@@ -852,7 +852,9 @@ vervalsen. En de loonrun leest het dienstverband: wie een strook krijgt zonder
 lopend dienstverband bij de entiteit van de zaak, wordt een bevinding
 (`loon_zonder_dienstverband`, ernst `midden` -- zichtbaar, niet blokkerend, want
 de aannames van voor de brug hebben er nog geen). Die worden ingehaald met een
-VOORSTEL en een keuze van de eigenaar (`/api/concern/vestiging/inhaal`): een
+VOORSTEL en een keuze van de eigenaar (scherm in RTG Concern; `/inhaal` toont en
+leest, `/inhaal/bevestig` legt vast -- een route die allebei deed kreeg van de
+idem-poort een oud voorstel terug): een
 dienstverband op iemands naam is een verklaring van een werkgever, en die wordt
 niet in bulk voor hem afgelegd. Let op de meetfout die daarbij
 bovenkwam: het antwoord van

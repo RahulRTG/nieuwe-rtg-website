@@ -751,25 +751,30 @@ async function loop(basis, uit) {
       const novaErin = vs.some(x => Number(x.staffId) === Number(novaStaff));
       /* Een ander lid met dezelfde vestiging en zaak in het lichaam krijgt niets:
          geen voorstel en geen dienstverband (de eigendomscontrole in de route). */
-      const vreemd = await P('/api/concern/vestiging/inhaal', { vestiging: meridiaan.vesId, code: NL_ZAAK,
+      const vreemd = await P('/api/concern/vestiging/inhaal/bevestig', { vestiging: meridiaan.vesId, code: NL_ZAAK,
         keuze: [baasNl.id] }, N);
       const voor = await P('/api/concern/mensen', { entiteit: meridiaan.entId }, meridiaan.O);
       const eerst = ((voor.data && voor.data.mensen) || []).length;
-      const doe = await P('/api/concern/vestiging/inhaal', { vestiging: meridiaan.vesId, code: NL_ZAAK,
+      const doe = await P('/api/concern/vestiging/inhaal/bevestig', { vestiging: meridiaan.vesId, code: NL_ZAAK,
         keuze: [baasNl.id] }, meridiaan.O);
-      /* Dezelfde keuze nog een keer (een dubbeltik): de ondernemer staat dan
-         niet meer in het voorstel, dus er komt geen tweede dienstverband bij. */
-      const nogEens = await P('/api/concern/vestiging/inhaal', { vestiging: meridiaan.vesId, code: NL_ZAAK,
+      /* Dezelfde keuze nog een keer (een dubbeltik). Binnen het venster vangt
+         de idem-poort hem en geeft het EERSTE antwoord terug (`herhaald: true`,
+         met dezelfde `gemaakt`); daarbuiten staat de ondernemer niet meer in het
+         voorstel en maakt de kern er niets bij. De bewering is dus de TELLING in
+         de opslag en niet het antwoord -- een herhaald antwoord zegt wat de
+         eerste keer gebeurde. */
+      const nogEens = await P('/api/concern/vestiging/inhaal/bevestig', { vestiging: meridiaan.vesId, code: NL_ZAAK,
         keuze: [baasNl.id] }, meridiaan.O);
       const na = await P('/api/concern/mensen', { entiteit: meridiaan.entId }, meridiaan.O);
       const mensen = (na.data && na.data.mensen) || [];
       const gemaakt = (doe.data && doe.data.gemaakt) || [];
-      const tweede = (nogEens.data && nogEens.data.gemaakt) || [];
+      const tweede = nogEens.data && nogEens.data.herhaald ? [] : ((nogEens.data && nogEens.data.gemaakt) || []);
       const klopt = baasErin && !novaErin && r.data.uitgevoerd === false && mensen.length === eerst + 1 &&
         gemaakt.length === 1 && !tweede.length && vreemd.status === 404 && mensen.some(m => m.rol === 'Eigenaar');
       return { klopt, wat: 'voorstel met ' + vs.length + ' mens(en)' + (baasErin ? ', de ondernemer erin' : ', ZONDER de ondernemer') +
         (novaErin ? ', het lid ten onrechte erin' : '') + '; een vreemde kreeg ' + vreemd.status + '; ' + eerst + ' dienstverband(en) voor de keuze, ' + mensen.length + ' erna' +
-        (tweede.length ? '; de herhaling maakte er NOG een' : ', ook na een herhaalde keuze') };
+        (tweede.length ? '; de herhaling maakte er NOG een' : ', ook na een herhaalde keuze' +
+          (nogEens.data && nogEens.data.herhaald ? ' (door de idem-poort als herhaling herkend)' : '')) };
     });
 
   return { w, S, M, vacId };

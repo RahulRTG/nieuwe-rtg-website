@@ -54,7 +54,7 @@ waren het er 17, en vijf daarvan waren precies de signalen die de Edge zou
 moeten krijgen (`rtg-adaptive-project`, `-presence`, `-identity`,
 `-continuation`, `-action`: de adaptieve Edge luisterde, en geen enkel scherm
 verstuurde ze). Ronde 1 heeft ze alle 17 gesloten (par. 11). Daarnaast staan er
-<!--getal:edgekaart.levendeKanalen-->13<!--/getal--> levende kanalen, met zender
+<!--getal:edgekaart.levendeKanalen-->14<!--/getal--> levende kanalen, met zender
 én luisteraar: dat getal houdt de nul eerlijk, want een wandeling die niets ziet
 geeft ook nul dood. Namen die in code worden samengesteld, staan apart onder
 `dynamisch` en worden niet geraden.

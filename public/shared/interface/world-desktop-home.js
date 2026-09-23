@@ -63,11 +63,12 @@
           var label = U.el('span', 'wd-world-label', { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS' }[world]);
           label.translate = false; brand.appendChild(label);
         }
-        w.RTGAdaptiveEdge.registerAction({ id: 'home', label: U.value('overview'), run: function () {
-          if (frame.isOpen()) frame.collapse(); else { home.scrollIntoView({ block: 'start' }); }
-        } });
       }
       edge();
+      // Home hangt aan window en niet aan het model van de Edge: dat begint bij elke start leeg.
+      w.addEventListener('rtg-edge-home', function (e) {
+        e.preventDefault(); if (frame.isOpen()) frame.collapse(); else { home.scrollIntoView({ block: 'start' }); }
+      });
       var watch = new MutationObserver(function () { if (d.body.dataset.rtgAdaptiveReady === 'true') { edge(); watch.disconnect(); } });
       if (d.body.dataset.rtgAdaptiveReady !== 'true') watch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-adaptive-ready'] });
       w.addEventListener('rtglang', function () { cards.refresh(); runtime.setState('workspace'); edge(); greet(); });

@@ -142,3 +142,26 @@ test('Foundation widgets read the chosen family profile without a paid member ac
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
   } finally { await ctx.close(); }
 });
+/* HOME OVERLEEFT EEN HERSTART VAN DE EDGE. Het tweede register begint bij elke
+   start leeg en de observer van het bureau koppelt los na de eerste keer, dus
+   een 'home' in dat register verdween na destroy() en start(): Home verliet dan
+   het document. De haak is nu een annuleerbare gebeurtenis op window, en die
+   luisteraar overleeft een herstart omdat hij niet aan het model hangt. */
+test('Home on the world desktop survives a restart of the Edge', { skip }, async () => {
+  const ctx = await context(), page = await ctx.newPage();
+  try {
+    for (const route of ['/apps/wereld.html', '/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html']) {
+      await open(page, route);
+      await page.evaluate(() => { window.RTGAdaptiveEdge.destroy(); window.RTGAdaptiveEdge.start(document, window); window.__rtgMerk = route => route; });
+      await page.waitForSelector('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');
+      await page.locator('.wd-favorites [data-widget-open="notities"]').click();
+      await page.waitForSelector('iframe[data-desktop-app="/apps/notities.html"]');
+      assert.equal(await page.locator('.wd-home').isVisible(), false, route + ': the frame is open');
+      await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
+      await page.waitForFunction(() => document.querySelector('.wd-home') && getComputedStyle(document.querySelector('.wd-home')).display !== 'none', null, { timeout: 5000 }).catch(() => {});
+      assert.equal(await page.evaluate(() => typeof window.__rtgMerk), 'function', route + ': Home left or reloaded the document');
+      assert.equal(await page.locator('.wd-home').isVisible(), true, route + ': the frame collapsed');
+      assert.equal(await page.locator('.wd-world-label').count(), 1, route + ': the world label stays');
+    }
+  } finally { await ctx.close(); }
+});

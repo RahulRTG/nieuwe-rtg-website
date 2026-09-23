@@ -294,10 +294,10 @@ const KAART = [
     ['schrijft', 'onderbalk:l', 'laat de Edge frame-balken claimen', 'if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(doc, win);'],
     ['beslist', '-', 'hooguit vier frames', "if (!x && entries.length >= 4) { o.announce(U.value('limit')); return false; }"],
     ['leest', 'identiteit:l', 'herlaadt bij een sessiewissel', "e.key === 'rtg_member_token' || e.key === 'rtf_sessie'"]]],
-  ['interface/world-desktop-home.js', 'schil', 'capability-register:s wereld:sl', [
+  ['interface/world-desktop-home.js', 'schil', 'wereld:sl', [
     ['leest', 'wereld:l', 'de wereld van het bureau', 'world = d.body.dataset.worldHome'],
     ['schrijft', 'wereld:s', 'wereldlabel in het merk van de Edge', 'label.translate = false; brand.appendChild(label);'],
-    ['schrijft', 'capability-register:s', "'home' in het tweede register", "w.RTGAdaptiveEdge.registerAction({ id: 'home', label: U.value('overview'), run: function () {"]]],
+    ['beslist', '-', 'Home klapt het frame in en annuleert de navigatie', "w.addEventListener('rtg-edge-home', function (e) {"]]],
   ['rtg-continue-key-core.js', 'continuiteit', 'hoofdactie:sb', [
     ['rendert', 'hoofdactie:s', 'herbouwt de hoofdactieknop', "b.appendChild(houder); zetAttr(b, 'data-rtg-morph-action', '');"],
     ['beslist', 'hoofdactie:b', 'is de hoofdactie bruikbaar', "if (s && (s.display === 'none' || s.visibility === 'hidden'"],

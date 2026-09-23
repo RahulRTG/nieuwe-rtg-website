@@ -9,8 +9,8 @@
   "sources": {
     "public/apps/access/meaning.js": "34aada4780c1e2e836d3e6b5d9e0839ccd51d5f75078ef0aca7a4a49499fbedd",
     "public/apps/access/portal.css": "50a4099d085813b3b8e00021f62e0e8a30e5170779f1613c5d3dc9f2d0b34b90",
-    "public/apps/app.html": "bf6557cc155e835c2e8fdcfdd6be23ee48b671774ab84a39a369da5781b7d0d7",
-    "public/apps/app-main.js": "761b933f532a6edcaf20f9346ece75f2cc1f6f4bad522318c010cb7d50100bd7",
+    "public/apps/app.html": "83ea6d30b2094c48fe3e19820fd644c00fe7552f87e98f0aef76549f20db7b96",
+    "public/apps/app-main.js": "808bed1dbf2b33a76b227d472675c388aaf5060e99bda5f0e1ea480c562e9640",
     "public/shared/rtg-edge-2.css": "2700ea360f01d73bb4c0fc906e08cdcb00ec43a2183b867e26d9a3a2f00075c4",
     "public/shared/rtg-adaptive-edge.css": "214b903989e7e5a168dba64116312c1ece31051cebac7ad4d668fb5999dca83c",
     "public/shared/rtg-simple.css": "b433583a5585f0fbd10fea808261b91e107168f6a31a350eacd3b0803e7fac23",

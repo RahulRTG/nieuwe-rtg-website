@@ -1752,17 +1752,13 @@
           "citaat": "label.translate = false; brand.appendChild(label);"
         },
         {
-          "rol": "schrijft",
-          "etiket": "capability-register:s",
-          "wat": "'home' in het tweede register",
-          "citaat": "w.RTGAdaptiveEdge.registerAction({ id: 'home', label: U.value('overview'), run: function () {"
+          "rol": "beslist",
+          "etiket": null,
+          "wat": "Home klapt het frame in en annuleert de navigatie",
+          "citaat": "w.addEventListener('rtg-edge-home', function (e) {"
         }
       ],
       "verantwoordelijkheden": [
-        {
-          "naam": "capability-register",
-          "als": "schrijver"
-        },
         {
           "naam": "wereld",
           "als": "lezer"
@@ -1779,6 +1775,7 @@
         ],
         "zendt": [],
         "luistert": [
+          "rtg-edge-home",
           "rtglang"
         ],
         "attributen": [
@@ -2244,7 +2241,9 @@
         "globals": [
           "RTGAdaptiveEdge"
         ],
-        "zendt": [],
+        "zendt": [
+          "rtg-edge-home"
+        ],
         "luistert": [],
         "attributen": [
           "data-rtg-adaptive-ready",
@@ -3407,7 +3406,6 @@
     "capability-register": {
       "schrijvers": [
         "public/shared/adaptief/register.js",
-        "public/shared/interface/world-desktop-home.js",
         "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-adaptive-edge-signals.js",
         "public/site/start/experience-edge.js"
@@ -3804,7 +3802,6 @@
       "naam": "capability-register",
       "schrijvers": [
         "public/shared/adaptief/register.js",
-        "public/shared/interface/world-desktop-home.js",
         "public/shared/rtg-adaptive-edge-core.js",
         "public/shared/rtg-adaptive-edge-signals.js",
         "public/site/start/experience-edge.js"
@@ -4010,7 +4007,6 @@
   },
   "afgeleid": {
     "registerAction": [
-      "public/shared/interface/world-desktop-home.js",
       "public/shared/rtg-adaptive-edge-signals.js",
       "public/site/start/experience-edge.js"
     ],
@@ -4041,6 +4037,6 @@
     "rollen": 217,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
-    "levendeKanalen": 13
+    "levendeKanalen": 14
   }
 }

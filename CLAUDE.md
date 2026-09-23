@@ -121,6 +121,22 @@ eligibility-motor alleen mag tóevoegen (nooit "dit is niets voor jou") en dat d
 meeteenheid van een capaciteitsmotor de taak is en nooit de mens. Paragraaf 7
 zet vijftig voorgestelde onderdelen op een rij met per stuk of hij al bestaat en
 welke grens hem eerlijk houdt.
+**`BENOEMING.md` is RTFoundation Roles & Governance 2.0** -- wie binnen de
+Foundation iets mag doen, sinds wanneer, waarom, en hoe dat ophoudt. Lees die vóór
+je aan zetels, bestuursrollen, quorum of Foundation-rechten werkt. Het is een
+verbouwing en geen nieuwbouw: `kern/rtfos/basis.js` heeft al rollen, rechten per
+rol en een uitgavegrens, en een tweede rollenlaag ernaast zou de
+`VERMOGENS`-fout zijn. De meting vond twee dingen die eerst moeten: **elke
+RTFOS-route hangt achter de RTG-kantoordeur**, dus een projectleider moet de
+gedeelde backoffice-code krijgen om zijn eigen stad te openen, en **intrekken
+sluit vandaag geen enkele sessie**. Vijf dimensies die niet meer in één titel
+samenvallen (band, stemzetel, werkrol, casusinzage, uitgavegrens), een
+benoeming waarvan de stand BEREKEND wordt, vereisten die bij een recht horen en
+een filter zijn en geen ontslag, en een migratie die voor elke persoon de
+effectieve rechten byte voor byte vergelijkt. Let op de namen: `mandaat`,
+`machtiging`, `bevoegdheid`, `geschorst` en `termijn` zijn bezet — het heet
+`uitgavegrens`, `opgeschort` en `zittingsduur`.
+
 **`HDI.md` is de laag BOVEN de Foundation** — RTG Human Development
 Infrastructure, als richtingsdocument met per onderdeel of het **staat**, **een
 stap weg** is, **een besluit vraagt** of **jaren weg** is (zoals PLATFORM.md en

@@ -227,13 +227,13 @@ eigen indruk (`SERVICE.md` par. 12).
 |---|---|---|
 | identiteit | de Edge-kern, als een scherm `setIdentity` aanroept | `edge-signaal` — en er is vandaag **geen** producent |
 | wereld | het open blad in de schil; anders de route in `rtg-world-identity.js`; anders `data-rtg-world` op de pagina | `blad`, `route`, `pagina` |
-| context | de context die het scherm in `RTGAdaptief` zette; anders het Edge-casco; anders de documenttitel | `scherm`, `edge-casco`, `document` |
-| object | `object` in de context van het scherm | `scherm` |
-| activiteit | `activiteit` in de context van het scherm | `scherm` |
+| context | de context die het scherm in `RTGAdaptief` zette (in de schil: die de brug uit het actieve blad doorgaf); anders het Edge-casco; anders de documenttitel | `scherm` (in de schil `blad`), `edge-casco`, `document` |
+| object | `object` in de context van het scherm, alleen als die context een bron heeft (anders leeg: het scherm zegt niet wie het is) | `scherm` (in de schil `blad`) |
+| activiteit | `activiteit` in de context van het scherm, alleen met een bron, net als het object | `scherm` (in de schil `blad`) |
 | presence | de Edge-kern | `edge-signaal` |
 | voortzetting | het geheugen van de werktafel (in de schil); anders het signaal van de kern | `toestel:werktafel`, `edge-signaal` |
 | hoofdactie | in de schil het ACTIEVE blad (`[data-hoofdactie]` daarin, anders leeg met reden); los het scherm zelf, anders de knop van de padtabel | `blad:data-hoofdactie`, `blad`, `scherm:data-hoofdactie`, `edge-padtabel` |
-| trust | de `rail` in de context; offline als toestand van het toestel | `scherm:rail`, `toestel` |
+| trust | de `rail` in de context; offline als toestand van het toestel | `scherm:rail` (in de schil `blad:rail`), `toestel` |
 | bevoegdheid | **niets**, met de reden erbij | — |
 
 **Gezag heeft vier waarden en de hoogste is vandaag leeg.** `autoritatief` is
@@ -263,6 +263,16 @@ leeg met die reden (`blad`) en leent het niet de knop van de schil -- de padtabe
 van Edge 2 draait niet in een blad. Wat de schil nog steeds niet ziet: de
 padtabel van een blad, en alles van een blad van een andere herkomst. De
 dekkingsmeter meet de schermen los; een meting van de schil zelf is ronde 2.
+
+**In de schil heet alles wat uit een blad komt `blad`** (ronde 2). Daar zet
+alleen de brug een context in `RTGAdaptief` -- `test/edgedekking-zelf.test.js`
+houdt dat lexicaal vast over de scripts van `app.html` -- en die geeft door wat
+het blad zei. Context, object en activiteit heten daar dus `blad` en de rail
+`blad:rail`, nooit `scherm`. Wat de meter als "het scherm zegt het zelf" telt,
+is een gesloten lijst per veld (`ZELF` in `scripts/edgedekking.js`): alleen
+`scherm` voor context, object en activiteit, `scherm:data-hoofdactie` en
+`scherm:rail`, en voor de wereld niets -- ook niet het pagina-attribuut, want
+`data-rtg-world` is een kopie van het MANIFEST en geen publicatie.
 
 ### De uitbreiding van de context, en een oud gebrek in de sleutel
 
@@ -439,9 +449,9 @@ wordt getoond, hardop, en de teller moet dalen.
 - **Nieuwe schermen krijgen het harde contract.** Een scherm dat niet in de
   basislijn van `EDGEDEKKING.json` staat, moet gemeten zijn, een wereld en een
   context hebben, een hoofdactie ZELF aanwijzen (`data-hoofdactie`, niet via de
-  padtabel) of met reden verklaren dat die er niet is (`data-rtg-edge-nvt` +
-  `data-rtg-edge-nvt-reden`), en nul geblokkeerde handelingen zonder reden
-  hebben. Een nieuw scherm dat een lid doorstuurt (een kantoor- of zaakscherm
+  padtabel) of met reden verklaren dat die er niet is
+  (`data-rtg-edge-nvt-hoofdactie="reden"`), en nul geblokkeerde handelingen
+  zonder reden hebben. Een nieuw scherm dat een lid doorstuurt (een kantoor- of zaakscherm
   naar zijn inlog) zakt, tenzij het met reden in `DOORVERWIJZING_MET_REDEN`
   staat: anders haalt het het contract zonder ooit onder zijn eigen rol gemeten
   te zijn. `test/edgenieuwscherm.test.js` houdt dat vast.
@@ -453,6 +463,17 @@ wordt getoond, hardop, en de teller moet dalen.
   verklaart dat het geen hoofdactie heeft, mag bij de titel van het casco
   blijven — daar bewijst de context-eis alleen dat er een titel is, en dat staat
   er dan ook zo.
+- **Een verklaring hoort bij een veld** (ronde 2). Een scherm verklaart per veld
+  op zijn body, en de waarde van het attribuut IS de reden:
+  `data-rtg-edge-nvt-<veld>` (dit veld bestaat hier niet) of
+  `data-rtg-edge-na-openen-<veld>` (dit veld ontstaat pas als je iets opent,
+  zoals een document). De oude vorm, een lijst velden met EEN reden voor
+  allemaal, telt niet meer: een reden voor het ene veld dekt het andere niet.
+  Zonder reden, of met beide verklaringen voor hetzelfde veld, blijft het `nee`.
+  `na-openen` telt nooit als `ja`, en van `ja` naar `na-openen` is achteruit:
+  wat er bij binnenkomst stond, staat er niet meer. De meter klikt niets aan,
+  dus dat het veld na openen WERKELIJK verschijnt, bewijst een e2e en niet het
+  register.
 - **Gewijzigde schermen worden niet slechter** — dat is dezelfde vergelijking
   per scherm als de eerste regel.
 - **De kaart loopt niet achter.** `npm run edgekaart:controle` zakt als de code

@@ -17,6 +17,10 @@
    4. DE HOOFDACTIE VAN HET ACTIEVE BLAD (ronde 1): in de schil leest
       edge/blikveld-hoofdactie.js het blad dat open is, alleen bij dezelfde
       herkomst, leent de knop van de schil niet, en schrijft of onthoudt niets.
+   5. WIE HET ZEI (ronde 2): in de schil komt de context van de brug, dus uit
+      een BLAD -- context, object en activiteit heten daar `blad` en de rail
+      `blad:rail`, nooit `scherm`. En een object of activiteit zonder bron is
+      geen publicatie: het veld blijft leeg met die reden.
 
    DE MUTATIES, elk nagetrokken: laat wereld() het src-loze schilpad overslaan (de
    wereldvolgorde zakt), laat een veld zonder reden leeg (de vormtoets zakt), laat
@@ -26,7 +30,11 @@
    knop van de schil), sla de vergelijking over zodra er een blad is, haal de
    herkomstcontrole, de try/catch of de readyState-controle weg, haal de
    `if (!h)`-tak in blikveld.js weg, en zet een setAttribute in zijn tekstVan --
-   elk zakt op zijn eigen toets. */
+   elk zakt op zijn eigen toets. Voor ronde 2: zet het pagina-attribuut VOOR de
+   route in wereld() (de wereldvolgorde zakt op de proef waarin route en
+   attribuut iets anders zeggen -- zonder die proef bleef hij groen), geef in de
+   schil weer `scherm` (de schiltoets zakt), en laat een object zonder bron weer
+   door (de brontoets zakt). */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -133,6 +141,11 @@ test('de wereld: het open blad in de schil, dan de route, dan het pagina-attribu
   assert.equal(l.velden.wereld.waarde, null, 'op de lege tafel kiest de schil nog geen wereld');
   l = maak(venster({ pad: '/apps/reizen.html' }).w).lees();
   assert.deepEqual([l.velden.wereld.waarde, l.velden.wereld.herkomst], ['travel', 'route']);
+  /* De volgorde zelf: zeggen route en attribuut iets anders, dan wint de route.
+     Zonder deze proef kon het attribuut voor de route schuiven en bleef alles
+     hier groen, want geen enkele proef droeg ze allebei. */
+  l = maak(venster({ pad: '/apps/reizen.html', body: { 'data-rtg-world': 'work' } }).w).lees();
+  assert.deepEqual([l.velden.wereld.waarde, l.velden.wereld.herkomst], ['travel', 'route']);
   l = maak(venster({ geenWereldkaart: true, body: { 'data-rtg-world': 'work' } }).w).lees();
   assert.deepEqual([l.velden.wereld.waarde, l.velden.wereld.herkomst], ['work', 'pagina']);
 });
@@ -149,6 +162,35 @@ test('de context en wat het scherm er zelf over zegt: object, activiteit en Trus
   assert.equal(l.velden.trust.herkomst, 'scherm:rail');
   const off = maak(venster({ offline: true }).w).lees();
   assert.equal(off.velden.trust.waarde[0].sleutel, 'offline', 'offline is een toestand van het toestel en staat in de rail');
+});
+
+test('in de schil komt de context uit een blad: context, object en activiteit heten blad, de rail blad:rail', () => {
+  const ctx = { bron: 'reizen.tabs', titel: 'Reizen', object: { soort: 'reis', id: 'r1' }, activiteit: 'plannen',
+    rail: [{ sleutel: 'opslag', tekst: 'Opgeslagen', staat: 'rustig' }] };
+  const l = maak(venster({ schil: {}, pad: '/apps/app.html', body: { 'data-rtg-blad-wereld': 'travel' }, adaptief: { ctx } }).w).lees();
+  assert.deepEqual(['context', 'object', 'activiteit', 'trust'].map((v) => l.velden[v].herkomst), ['blad', 'blad', 'blad', 'blad:rail']);
+  assert.equal(l.velden.context.waarde.bron, 'reizen.tabs', 'de waarde blijft wat het blad zei; alleen het etiket zegt waar het vandaan kwam');
+  assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'r1' });
+  vormKlopt(l.velden);
+  /* Los, zonder schil, is dezelfde context wel van het scherm zelf. */
+  const los = maak(venster({ pad: '/apps/reizen.html', adaptief: { ctx } }).w).lees();
+  assert.deepEqual(['context', 'object', 'activiteit', 'trust'].map((v) => los.velden[v].herkomst), ['scherm', 'scherm', 'scherm', 'scherm:rail']);
+  /* Offline blijft een toestand van het toestel, ook in de schil. */
+  const off = maak(venster({ schil: {}, offline: true, pad: '/apps/app.html', adaptief: { ctx } }).w).lees();
+  assert.equal(off.velden.trust.herkomst, 'toestel');
+});
+
+test('een object of activiteit zonder bron is geen publicatie: leeg, met de reden erbij', () => {
+  for (const schil of [null, {}]) {
+    const l = maak(venster({ schil, pad: '/apps/app.html',
+      adaptief: { ctx: { bron: '', object: { soort: 'document', id: 'd1' }, activiteit: 'schrijven' } } }).w).lees();
+    for (const v of ['object', 'activiteit']) {
+      assert.equal(l.velden[v].waarde, null, v + (schil ? ' in de schil' : ' los'));
+      assert.equal(l.velden[v].herkomst, 'geen');
+      assert.match(l.velden[v].reden, /zegt niet wie het is/);
+    }
+    vormKlopt(l.velden);
+  }
 });
 
 test('de hoofdactie: aangewezen door het scherm, en twee bronnen die iets anders zeggen is een gebrek', () => {

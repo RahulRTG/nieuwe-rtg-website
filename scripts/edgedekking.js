@@ -24,14 +24,22 @@
    WAT HET MEET, PER SCHERM
 
      velden    per veld 'ja' (er staat een waarde), 'nvt' (het scherm
-               verklaart met data-rtg-edge-nvt dat dit veld hier niet bestaat,
-               MET een niet-lege data-rtg-edge-nvt-reden) of 'nee'. Een
-               verklaring zonder reden telt niet: een leeg vak zonder reden
-               wordt gevuld met iemands eigen indruk (SERVICE.md par. 12).
+               verklaart dat dit veld hier niet bestaat), 'na-openen' (het
+               scherm verklaart dat dit veld pas ontstaat als je iets opent,
+               zoals een document) of 'nee'. Een verklaring is een attribuut
+               PER VELD op de body, en de waarde IS de reden:
+               data-rtg-edge-nvt-<veld>="..." en
+               data-rtg-edge-na-openen-<veld>="...". Een verklaring zonder
+               reden telt niet -- een leeg vak zonder reden wordt gevuld met
+               iemands eigen indruk (SERVICE.md par. 12) -- en een reden voor
+               het ene veld dekt het andere niet. 'na-openen' telt nooit als
+               'ja'. De redenen staan per veld in `redenen`.
      herkomst  per veld waar het blikveld de waarde vandaan haalde. `context`
                valt bijvoorbeeld terug op de documenttitel -- dan staat er
                'ja' met herkomst 'document', en dat is iets anders dan een
                scherm dat zijn context zelf publiceert. Lees de twee samen.
+               Welke herkomst als "het scherm zelf" telt, staat per veld in
+               ZELF hieronder, en nergens anders.
      acties    tellingen over lees().acties, gesplitst naar het register waar
                ze vandaan komen (RTGAdaptief tegenover edge-compat, de
                registerAction van de balk): standen, gezag, gevolg, herstel,
@@ -48,7 +56,8 @@
 
      - Het bewaart GEEN WAARDEN, alleen of er een is. De identiteit is een
        codenaam, en een register in de repo is geen plek voor wat een sessie
-       te zien kreeg.
+       te zien kreeg. De `redenen` zijn geen waarden van een sessie maar wat
+       het scherm in zijn eigen HTML over zichzelf verklaart.
      - Het raadt niet waarom een scherm geen blikveld heeft. Staat het er niet
        na vijftien seconden, dan leest het de keten in de pagina zelf na (body,
        wereld, basis.js, randen.js, elke lader) en noemt de eerste schakel die
@@ -60,20 +69,23 @@
        browsercontext met lege opslag. Zonder dat hangt `voortzetting` af van
        welk scherm dezelfde werker net daarvoor opende, en is de uitslag een
        eigenschap van de volgorde in plaats van het scherm.
-     - `nvt` leest het van het body-attribuut en NIET via lees(): het blikveld
-       kent data-rtg-edge-nvt nog niet. Dat is een stand die alleen deze meter
-       ziet, en een reden dekt elk genoemd veld tegelijk. Vandaag gebruikt geen
-       scherm het; wie het gaat gebruiken, zet het eerst in het blikveld.
+     - `nvt` en `na-openen` leest het van de body-attributen en NIET via
+       lees(): het blikveld kent die verklaringen niet. Dat zijn standen die
+       alleen deze meter ziet. De oude vorm (een lijst in data-rtg-edge-nvt met
+       EEN data-rtg-edge-nvt-reden voor alle genoemde velden) telt niet meer:
+       een reden hoort bij een veld. Geen scherm gebruikte hem.
      - Het klikt niets aan. Een veld dat pas na een handeling verschijnt (een
-       object na een selectie) telt hier als 'nee'; dit is de stand bij
-       binnenkomst.
+       object na het openen van een document) telt hier als 'nee', tenzij het
+       scherm dat met reden als 'na-openen' verklaart; dit is de stand bij
+       binnenkomst, en dat een veld na openen WERKELIJK verschijnt, bewijst een
+       e2e en niet deze meter.
 
    DE RATEL
 
    Staat er al een EDGEDEKKING.json, dan wordt per scherm vergeleken: een veld
-   dat 'ja' was en nu 'nee' is, is ACHTERUIT -- ook als het scherm zijn hele
-   blikveld kwijt is. Dan zakt het script, tenzij --aanvaard is meegegeven; dan
-   schrijft het toch en staan ze in `aanvaardAchteruit`, zodat een besluit
+   dat 'ja' was en nu 'nee' of 'na-openen' is, is ACHTERUIT -- ook als het
+   scherm zijn hele blikveld kwijt is. Dan zakt het script, tenzij --aanvaard
+   is meegegeven; dan schrijft het toch en staan ze in `aanvaardAchteruit`, zodat een besluit
    zichtbaar blijft in plaats van stil te verdwijnen. `basislijn` is de lijst
    schermen van de EERSTE meting en blijft daarna ongewijzigd staan.
 
@@ -112,6 +124,15 @@ const ALLEEN = alleenArg ? alleenArg.slice('--alleen='.length).split(',').map((s
 const VELDEN = ['identiteit', 'wereld', 'context', 'object', 'activiteit', 'presence',
   'voortzetting', 'hoofdactie', 'trust'];
 const STANDEN = ['AFWEZIG', 'GEBLOKKEERD', 'BESCHIKBAAR', 'LOPEND'];
+/* De twee verklaringen die een scherm per veld kan afleggen, elk een attribuut
+   data-rtg-edge-<verklaring>-<veld> met de reden als waarde. Het is ook de naam
+   van de stand in het register. */
+const VERKLARINGEN = ['nvt', 'na-openen'];
+/* De twee registers die het blikveld kent, altijd allebei, in vaste volgorde.
+   Een onverwachte herkomst krijgt een eigen bak en wordt niet bijgeteld bij een
+   bestaande -- dat zou raden zijn. (Boven de wacht, want regelVan en telling
+   worden ook buiten een meting aangeroepen.) */
+const HERKOMSTEN = ['RTGAdaptief', 'edge-compat'];
 const WERELDEN = ['living', 'travel', 'work', 'foundation'];
 /* Vier werkers tegelijk: genoeg om een ronde binnen een kwartier te houden,
    weinig genoeg om de server niet de meting te laten worden. */
@@ -141,10 +162,33 @@ function alleSchermen() {
 
 /* ZEGT HET SCHERM HET ZELF? Een `ja` zegt dat er een waarde is, niet wie hem
    leverde: de context is op bijna elk los scherm de titel die het casco uit
-   document.title haalt, en de wereld komt uit de centrale wereldkaart. Alleen
-   een herkomst die bij het scherm zelf begint (`scherm`, `scherm:*`, of het
-   pagina-attribuut) telt als "het scherm publiceert dit". */
-function zelf(herkomst) { return /^scherm/.test(herkomst || '') || herkomst === 'pagina'; }
+   document.title haalt, en de wereld komt uit de centrale wereldkaart.
+
+   Daarom een GESLOTEN LIJST PER VELD, en geen patroon over alle velden. Het
+   patroon (`^scherm`, plus het pagina-attribuut) liet twee dingen door die geen
+   publicatie van het scherm zijn: `data-rtg-world` is een gebakken kopie van het
+   MANIFEST (heritage-uitrol.js), en elke herkomst die toevallig met "scherm"
+   begint telde mee, ook een die er morgen bij komt. Nu telt alleen wat hier
+   staat, en een veld dat hier niet staat is een fout en geen stille nee.
+
+   - identiteit, wereld, presence en voortzetting: nooit. De wereld komt uit de
+     route, het blad of die kopie (K-reikwijdte: wereld telt nooit als zelf), en
+     de andere drie komen uit de Edge-kern of het toestel.
+   - context, object en activiteit: alleen `scherm`. In de schil heet wat uit een
+     blad komt `blad` (edge/blikveld.js), en dat is de brug die publiceert, niet
+     het scherm dat hier gemeten wordt.
+   - hoofdactie: alleen `scherm:data-hoofdactie`, niet de padtabel.
+   - trust: alleen `scherm:rail`; offline is een toestand van het TOESTEL. */
+const ZELF = Object.freeze({
+  identiteit: Object.freeze([]), wereld: Object.freeze([]),
+  context: Object.freeze(['scherm']), object: Object.freeze(['scherm']), activiteit: Object.freeze(['scherm']),
+  presence: Object.freeze([]), voortzetting: Object.freeze([]),
+  hoofdactie: Object.freeze(['scherm:data-hoofdactie']), trust: Object.freeze(['scherm:rail'])
+});
+function zelf(veld, herkomst) {
+  if (!Object.prototype.hasOwnProperty.call(ZELF, veld)) throw new Error('edgedekking: veld "' + veld + '" staat niet in ZELF');
+  return ZELF[veld].indexOf(String(herkomst || '')) >= 0;
+}
 
 /* Schermen die een lid met opzet doorsturen en daarom niet als lid te meten
    zijn, MET de reden. Een nieuw scherm dat doorstuurt en hier niet staat, zakt:
@@ -174,12 +218,13 @@ function contractNieuw(reg, opSchijf) {
     }
     if (s.status !== 'gemeten') { uit.push(pad + ': nieuw scherm zonder Edge (' + s.status + ')'); continue; }
     for (const veld of ['wereld', 'context']) if (s.velden[veld] !== 'ja') uit.push(pad + ': publiceert geen ' + veld);
-    const hoofd = s.velden.hoofdactie === 'nvt' || (s.velden.hoofdactie === 'ja' && zelf((s.herkomst || {}).hoofdactie));
-    if (!hoofd) uit.push(pad + ': wijst zelf geen hoofdactie aan (data-hoofdactie) en verklaart ook niet waarom niet');
+    const hoofd = s.velden.hoofdactie === 'nvt' || (s.velden.hoofdactie === 'ja' && zelf('hoofdactie', (s.herkomst || {}).hoofdactie));
+    if (!hoofd) uit.push(pad + ': wijst zelf geen hoofdactie aan (data-hoofdactie) en verklaart ook niet waarom niet' +
+      ' (data-rtg-edge-nvt-hoofdactie="reden")');
     /* Besluit 11 (EDGE.md par. 8): wie handelingen heeft, zegt ook zelf waar je
        bent. Een scherm dat met reden geen hoofdactie heeft, mag bij de titel
        van het casco blijven. */
-    else if (s.velden.hoofdactie === 'ja' && !zelf((s.herkomst || {}).context)) {
+    else if (s.velden.hoofdactie === 'ja' && !zelf('context', (s.herkomst || {}).context)) {
       uit.push(pad + ': heeft een eigen hoofdactie maar publiceert zijn context niet zelf (RTGAdaptief.context)');
     }
     for (const [bron, a] of Object.entries(s.acties || {})) {
@@ -188,7 +233,8 @@ function contractNieuw(reg, opSchijf) {
   }
   return uit;
 }
-module.exports = { alleSchermen, contractNieuw, zelf, achteruitgang, VELDEN, DOORVERWIJZING_MET_REDEN };
+module.exports = { alleSchermen, contractNieuw, zelf, ZELF, achteruitgang, regelVan, telling, VELDEN, VERKLARINGEN,
+  DOORVERWIJZING_MET_REDEN };
 
 /* ---------------------------------------------------------------------------
    DE NALOOP draait vóór alles: geen server, geen browser. Hij meet niet; hij
@@ -301,11 +347,19 @@ function ketenInPagina(schakels) {
 
 /* De meting zelf: lees() een keer, teruggebracht tot WAT er is en niet wat
    het is. Waarden gaan de pagina niet uit. */
-function leesInPagina(velden) {
+function leesInPagina({ velden, verklaringen }) {
   const l = window.RTGEdgeBlikveld.lees();
   const b = document.body;
-  const nvt = String((b && b.getAttribute('data-rtg-edge-nvt')) || '').split(/\s+/).filter(Boolean);
-  const nvtReden = String((b && b.getAttribute('data-rtg-edge-nvt-reden')) || '').trim();
+  /* De verklaringen zoals ze op de body staan, per soort en per veld; wat een
+     reden is, beslist regelVan buiten de pagina. */
+  const verklaring = {};
+  for (const soort of verklaringen) {
+    verklaring[soort] = {};
+    for (const naam of velden) {
+      const a = b ? b.getAttribute('data-rtg-edge-' + soort + '-' + naam) : null;
+      if (a !== null) verklaring[soort][naam] = String(a);
+    }
+  }
   const v = {};
   for (const naam of velden) {
     const veld = l.velden && l.velden[naam];
@@ -323,7 +377,7 @@ function leesInPagina(velden) {
     gebreken: Array.isArray(a.gebreken) ? a.gebreken.map(String) : []
   }));
   return { pad: location.pathname, velden: v, acties,
-    gebreken: Array.isArray(l.gebreken) ? l.gebreken.map(String) : [], nvt, nvtReden };
+    gebreken: Array.isArray(l.gebreken) ? l.gebreken.map(String) : [], verklaring };
 }
 
 /* ---------------------------------------------------------------------------
@@ -435,10 +489,6 @@ function telOp(doel, bron) {
     else for (const s of Object.keys(bron[k])) doel[k][s] += bron[k][s];
   }
 }
-/* De twee registers die het blikveld kent, altijd allebei, in vaste volgorde.
-   Een onverwachte herkomst krijgt een eigen bak en wordt niet bijgeteld bij een
-   bestaande -- dat zou raden zijn. */
-const HERKOMSTEN = ['RTGAdaptief', 'edge-compat'];
 function actieTelling(acties) {
   const uit = {};
   for (const h of HERKOMSTEN) uit[h] = leegActies();
@@ -451,20 +501,33 @@ function actieTelling(acties) {
   return vast;
 }
 
-/* Van een ruwe lezing naar de regel van een scherm. */
+/* Van een ruwe lezing naar de regel van een scherm.
+
+   Per veld: een waarde gaat voor elke verklaring ('ja'). Anders telt een
+   verklaring alleen met een niet-lege reden VOOR DAT VELD. Twee verklaringen
+   over hetzelfde veld die elkaar tegenspreken ("bestaat hier niet" en "ontstaat
+   na openen") verklaren niets: dat is 'nee', en geen van beide wint op
+   volgorde. */
 function regelVan(r, http, stabiel) {
-  const velden = {}, herkomst = {};
+  const velden = {}, herkomst = {}, redenen = {};
+  const reden = (soort, naam) => {
+    const x = ((r.verklaring || {})[soort] || {})[naam];
+    return typeof x === 'string' ? x.trim() : '';
+  };
   for (const naam of VELDEN) {
     const v = r.velden[naam];
     herkomst[naam] = v.herkomst;
+    const gegeven = VERKLARINGEN.filter((soort) => reden(soort, naam));
     if (v.er) velden[naam] = 'ja';
-    else if (r.nvt.includes(naam) && r.nvtReden) velden[naam] = 'nvt';
+    else if (gegeven.length === 1) { velden[naam] = gegeven[0]; redenen[naam] = reden(gegeven[0], naam); }
     else velden[naam] = 'nee';
   }
   const gebreken = new Set(r.gebreken);
   for (const a of r.acties) for (const g of a.gebreken) gebreken.add(g);
-  return { status: 'gemeten', http, velden, herkomst, acties: actieTelling(r.acties),
+  const regel = { status: 'gemeten', http, velden, herkomst, acties: actieTelling(r.acties),
     gebreken: Array.from(gebreken).sort(), stabiel };
+  if (Object.keys(redenen).length) regel.redenen = redenen;
+  return regel;
 }
 
 /* ---------------------------------------------------------------------------
@@ -539,7 +602,7 @@ async function meetScherm(browser, base, token, pad) {
     await wacht(400);
     let vorige = null, lezing = null, stabiel = false;
     for (let i = 0; i < 8; i++) {
-      lezing = await veilig(page, leesInPagina, VELDEN);
+      lezing = await veilig(page, leesInPagina, { velden: VELDEN, verklaringen: VERKLARINGEN });
       const sleutel = JSON.stringify(lezing);
       if (sleutel === vorige) { stabiel = true; break; }
       vorige = sleutel;
@@ -562,6 +625,7 @@ function vorm(r) {
     velden: r.velden || null, herkomst: r.herkomst || null, acties: r.acties || null,
     gebreken: r.gebreken || [] };
   if (r.status === 'gemeten') uit.stabiel = r.stabiel;
+  if (r.redenen) uit.redenen = r.redenen;
   if (r.redenCode) uit.redenCode = r.redenCode;
   if (r.naar !== undefined) uit.naar = r.naar;
   if (r.reden) uit.reden = r.reden;
@@ -652,7 +716,7 @@ function telling(schermen) {
   const perStatus = { gemeten: 0, 'geen-blikveld': 0, omgeleid: 0, fout: 0 };
   const geenBlikveld = {};
   const perVeld = {};
-  for (const v of VELDEN) perVeld[v] = { ja: 0, zelf: 0, nee: 0, nvt: 0, zonderMeting: 0 };
+  for (const v of VELDEN) perVeld[v] = { ja: 0, zelf: 0, nee: 0, nvt: 0, 'na-openen': 0, zonderMeting: 0 };
   const acties = {};
   for (const h of HERKOMSTEN) acties[h] = leegActies();
   const gebreken = {};
@@ -667,7 +731,7 @@ function telling(schermen) {
     if (!s.stabiel) onrustig++;
     for (const v of VELDEN) {
       perVeld[v][s.velden[v]]++;
-      if (s.velden[v] === 'ja' && zelf((s.herkomst || {})[v])) perVeld[v].zelf++;
+      if (s.velden[v] === 'ja' && zelf(v, (s.herkomst || {})[v])) perVeld[v].zelf++;
     }
     for (const h of Object.keys(s.acties)) {
       if (!acties[h]) acties[h] = leegActies();
@@ -682,10 +746,12 @@ function telling(schermen) {
     gebreken: gesorteerd(gebreken) };
 }
 
-/* DE RATEL: welk veld was 'ja' en is nu 'nee'? Een scherm dat zijn blikveld
-   kwijt is, verliest al zijn velden tegelijk -- dat is de grootste
-   achteruitgang, niet een die buiten de vergelijking valt. 'nvt' met een reden
-   is geen achteruitgang: dat is een verklaring. */
+/* DE RATEL: welk veld was 'ja' en is nu 'nee' of 'na-openen'? Een scherm dat
+   zijn blikveld kwijt is, verliest al zijn velden tegelijk -- dat is de
+   grootste achteruitgang, niet een die buiten de vergelijking valt. 'nvt' met
+   een reden is geen achteruitgang: dat is een verklaring dat het veld hier niet
+   bestaat. 'na-openen' wel: wat er bij binnenkomst STOND, staat er niet meer,
+   en een reden maakt dat niet ongedaan. */
 function achteruitgang(oud, nieuw) {
   const uit = [];
   for (const pad of Object.keys(oud.schermen || {}).sort()) {
@@ -694,11 +760,11 @@ function achteruitgang(oud, nieuw) {
     for (const v of VELDEN) {
       if (o.velden[v] !== 'ja') continue;
       const nu = n.velden ? n.velden[v] : 'nee';
-      if (nu === 'nee') { uit.push({ pad, veld: v, was: 'ja', nu: 'nee', status: n.status }); continue; }
+      if (nu === 'nee' || nu === 'na-openen') { uit.push({ pad, veld: v, was: 'ja', nu, status: n.status }); continue; }
       /* Ook achteruit: het scherm zei het ZELF en nu komt het uit een terugval
          (casco, route, padtabel). Dan blijft het 'ja' terwijl er iets verdween. */
       const hOud = (o.herkomst || {})[v], hNu = (n.herkomst || {})[v];
-      if (nu === 'ja' && zelf(hOud) && !zelf(hNu)) uit.push({ pad, veld: v, was: 'ja (' + hOud + ')', nu: 'ja (' + hNu + ')', status: n.status });
+      if (nu === 'ja' && zelf(v, hOud) && !zelf(v, hNu)) uit.push({ pad, veld: v, was: 'ja (' + hOud + ')', nu: 'ja (' + hNu + ')', status: n.status });
     }
   }
   return uit;
@@ -734,7 +800,8 @@ function achteruitgang(oud, nieuw) {
   const basislijn = oud && Array.isArray(oud.basislijn) ? oud.basislijn : Object.keys(regels).sort();
 
   const samenvatting = VELDEN.map((v) => t.perVeld[v].ja + '/' + t.schermen + ' schermen hebben ' + v +
-    ', waarvan ' + t.perVeld[v].zelf + ' door het scherm zelf' + (t.perVeld[v].nvt ? ' (+' + t.perVeld[v].nvt + ' nvt)' : ''));
+    ', waarvan ' + t.perVeld[v].zelf + ' door het scherm zelf' + (t.perVeld[v].nvt ? ' (+' + t.perVeld[v].nvt + ' nvt)' : '') +
+    (t.perVeld[v]['na-openen'] ? ' (+' + t.perVeld[v]['na-openen'] + ' na openen)' : ''));
   const eindregel = 'edgedekking: ' + t.metBlikveld + '/' + t.schermen + ' schermen met een blikveld; ' +
     VELDEN.map((v) => v + ' ' + t.perVeld[v].ja).join(', ') +
     (achteruit.length ? '; ' + achteruit.length + ' velden achteruit' : '');
@@ -754,8 +821,12 @@ function achteruitgang(oud, nieuw) {
       'browser via window.RTGEdgeBlikveld.lees(), als vers lid met een RTG Pass en getekende overeenkomst, op ' +
       VIEWPORT.width + 'x' + VIEWPORT.height + ' (touch), elk scherm in een eigen lege browsercontext. ' +
       "'ja' = er staat een waarde (lees herkomst erbij: context valt terug op de documenttitel); 'nvt' = de body verklaart " +
-      "het veld met data-rtg-edge-nvt EN een niet-lege data-rtg-edge-nvt-reden; anders 'nee'. De stand bij binnenkomst: " +
-      'er wordt niets aangeklikt. Waarden worden niet bewaard, alleen of er een is. geen-blikveld draagt de eerste ' +
+      "met data-rtg-edge-nvt-<veld>=reden dat het veld hier niet bestaat; 'na-openen' = de body verklaart met " +
+      "data-rtg-edge-na-openen-<veld>=reden dat het pas na openen ontstaat (telt nooit als ja); een reden per veld, en " +
+      "zonder reden of met beide verklaringen 'nee'. De redenen staan per scherm in redenen. zelf telt alleen de herkomsten " +
+      "uit ZELF in scripts/edgedekking.js. De stand bij binnenkomst: " +
+      'er wordt niets aangeklikt. Waarden worden niet bewaard, alleen of er een is (de redenen zijn wat het scherm in zijn ' +
+      'eigen HTML verklaart, geen sessiewaarden). geen-blikveld draagt de eerste ' +
       'ontbrekende schakel van de laadketen, in de pagina nagelezen. Wat in de volle ronde (vier tegelijk) geen blikveld had, ' +
       'niet tot rust kwam of een veld verloor, is daarna los herhaald en die uitslag telt; eersteRonde zegt wat de volle ' +
       'ronde zag als dat anders was. gebreken in de telling = op hoeveel schermen.',

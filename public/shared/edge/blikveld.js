@@ -67,12 +67,20 @@
     return veld(null, 'geen', 'geen', t, 'deze route staat niet in de wereldkaart (shared/rtg-world-identity.js)');
   }
 
-  function contextVan(A, c, t) {
+  function contextVan(bij, c, t) {
     if (c && c.bron) return veld({ bron: c.bron, titel: c.titel || '', selectie: !!c.selectie },
-      'scherm', 'ui', contextSleutel === c.sleutel ? contextGezien : null);
+      bij, 'ui', contextSleutel === c.sleutel ? contextGezien : null);
     var e = w.RTGEdge && w.RTGEdge.active;
     if (e && e.ctx && e.ctx.title) return veld({ bron: '', titel: String(e.ctx.title), scope: e.ctx.scope || '' }, 'edge-casco', 'ui', t);
     return veld(d.title ? { bron: '', titel: d.title } : null, 'document', 'ui', t, 'geen titel');
+  }
+
+  /* Object en activiteit zonder bron: wie niet zegt wie hij is, zegt ook niet
+     waar hij in staat. */
+  function eigen(c, k, bij, t, waarde) {
+    if (!c || !c[k]) return veld(null, 'geen', 'geen', t, 'het scherm publiceert geen ' + k);
+    if (!c.bron) return veld(null, 'geen', 'geen', t, 'het scherm zegt niet wie het is (de context heeft geen bron)');
+    return veld(waarde, bij, 'ui', contextGezien);
   }
 
   /* De hoofdactie leest ./blikveld-hoofdactie.js: in de schil kijkt die in het
@@ -120,7 +128,10 @@
     var t = nu(), gebreken = [], A = adaptief();
     haak(A);
     var c = A ? A.context() : null, snap = core();
-    var trust = (c && c.rail && c.rail.length) ? veld(kopie(c.rail), 'scherm:rail', 'ui', contextGezien) :
+    /* In de schil zet alleen de brug (adaptief/brug.js) een context, en die geeft
+       door wat het BLAD zei: dan is dat de herkomst, en niet `scherm`. */
+    var bij = d.getElementById('rtgCommand') ? 'blad' : 'scherm';
+    var trust = (c && c.rail && c.rail.length) ? veld(kopie(c.rail), bij + ':rail', 'ui', contextGezien) :
       veld(null, 'geen', 'geen', t, 'het scherm publiceert geen Trust Rail');
     if (w.navigator && w.navigator.onLine === false) {
       trust = veld([{ sleutel: 'offline', tekst: 'Offline', staat: 'aandacht' }].concat(trust.waarde || []), 'toestel', 'afgeleid', t);
@@ -144,11 +155,9 @@
       identiteit: snap && snap.identity ? veld(snap.identity, 'edge-signaal', 'ui', t)
         : veld(null, 'geen', 'geen', t, 'deze laag kent geen sessie, en setIdentity heeft geen producent'),
       wereld: wereld(t),
-      context: contextVan(A, c, t),
-      object: c && c.object ? veld(kopie(c.object), 'scherm', 'ui', contextGezien)
-        : veld(null, 'geen', 'geen', t, 'het scherm publiceert geen object'),
-      activiteit: c && c.activiteit ? veld(String(c.activiteit), 'scherm', 'ui', contextGezien)
-        : veld(null, 'geen', 'geen', t, 'het scherm publiceert geen activiteit'),
+      context: contextVan(bij, c, t),
+      object: eigen(c, 'object', bij, t, c && kopie(c.object)),
+      activiteit: eigen(c, 'activiteit', bij, t, c && String(c.activiteit)),
       presence: snap && snap.presence ? veld(snap.presence, 'edge-signaal', 'ui', t)
         : veld(null, 'geen', 'geen', t, 'er loopt niets dat hier wordt gemeld'),
       voortzetting: voortzetting(snap, t),

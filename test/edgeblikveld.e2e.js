@@ -8,7 +8,9 @@
    2. de WERELD volgt het open blad van de schil (en zegt op de lege tafel met
       reden dat er nog geen wereld is gekozen);
    3. de BRUG: wat een scherm in zijn blad als context publiceert -- ook het
-      nieuwe object en de activiteit -- komt in het blikveld van de schil aan;
+      nieuwe object en de activiteit -- komt in het blikveld van de schil aan,
+      met de herkomst `blad`: in de schil is het de brug die doorgeeft wat het
+      blad zei, en niet een scherm dat het zelf publiceert (ronde 2);
    4. het ENE LEESPAD: de balk tekent de handelingen die acties() geeft, en elke
       handeling draagt een Edge-stand;
    5. lees() SCHRIJFT NIETS, ook niet in een echte pagina met alle lagen geladen;
@@ -92,7 +94,7 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     await page.locator('.cmd-leeg button[data-url="/apps/reizen.html"]').click();
     const blad = () => page.frames().find((f) => /\/apps\/reizen\.html/.test(f.url()));
     await page.waitForFunction(() => document.body.getAttribute('data-rtg-blad-wereld') === 'travel', null, { timeout: 20000 });
-    await page.waitForFunction(() => RTGEdgeBlikveld.lees().velden.context.herkomst === 'scherm', null, { timeout: 20000 });
+    await page.waitForFunction(() => RTGEdgeBlikveld.lees().velden.context.herkomst === 'blad', null, { timeout: 20000 });
     let l = await page.evaluate(() => RTGEdgeBlikveld.lees());
     assert.deepEqual([l.velden.wereld.waarde, l.velden.wereld.herkomst], ['travel', 'blad']);
     assert.equal(l.velden.context.waarde.bron, 'reizen.tabs', 'de context van het blad komt via de brug in de schil');
@@ -106,7 +108,8 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     await page.waitForFunction(() => RTGEdgeBlikveld.lees().velden.activiteit.waarde === 'plannen', null, { timeout: 10000 });
     l = await page.evaluate(() => RTGEdgeBlikveld.lees());
     assert.deepEqual(l.velden.object.waarde, { soort: 'reis', id: 'proef-1' });
-    assert.equal(l.velden.object.herkomst, 'scherm');
+    assert.deepEqual([l.velden.object.herkomst, l.velden.activiteit.herkomst], ['blad', 'blad'],
+      'in de schil komt het object uit het blad, niet van een scherm dat hier zelf publiceert');
 
     // 4) De balk tekent wat acties() geeft, en elke handeling draagt een stand.
     /* De handelingen staan in het blad van de Edge, en dat tekent alleen als het

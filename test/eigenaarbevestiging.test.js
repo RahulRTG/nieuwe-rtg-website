@@ -29,7 +29,8 @@ const { PIN_ACTIES, ZWARE_ACTIES } = require('../server/kern/webauthn-acties');
 
 const OWNER = 'zwaar-eigenaar@x.nl';
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zwaar-'));
-let srv, base, tech, lid, gast, rpID, origin, sleutel;
+let srv, base, tech, lid, gast, gastKey, gastWw, rpID, origin, sleutel;
+const KANTOORCODE = 'ZWAAR-KANTOOR';
 
 function api(pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -51,7 +52,7 @@ async function bevestig(actie) {
 }
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_OWNER_EMAIL: OWNER } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_OWNER_EMAIL: OWNER, OFFICE_CODE: KANTOORCODE } });
   base = srv.base;
   const url = new URL(base);
   rpID = url.hostname;
@@ -73,7 +74,9 @@ test.before(async () => {
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v',
     tier: 'rtg', pasApp: 'rtg' });
   gast = 'gastz' + u + '@x.nl';
+  gastWw = 'geheim123';
   assert.ok(g.body.token, 'het tweede account staat er');
+  gastKey = 'user-' + g.body.state.user.id;
 });
 
 test.after(() => {
@@ -186,3 +189,84 @@ test('9. de eigendomsoverdracht vraagt het wachtwoord EN de passkey', async () =
   assert.equal(geen.status, 401, 'het juiste wachtwoord alleen is niet meer genoeg');
   assert.equal(geen.body.actie, 'eigenaar-overdracht');
 });
+
+/* ============================================================================
+   DE KANTOORSLEUTELS. Tot 23 september 2026 kon iedereen die van de eigenaar de
+   boardroomsleutel kreeg, via /api/office/balie/zetel zichzelf of een ander bij
+   de ledendossiers zetten: de route vroeg alleen `boardroomAuth`, en alleen het
+   SCHERM verborg de knop voor wie niet de eigenaar was. Intrekken van
+   boardroomtoegang vroeg ook geen vinger. Deze toetsen houden de drie grendels
+   vast: alleen de eigenaar, een verse passkey, en meteen weg na intrekken.
+   ========================================================================== */
+
+/* Een zware ceremonie achter de BOARDROOMdeur. De ceremonie is gebonden aan de
+   sessie die hem vraagt, dus hij komt van dezelfde (leden)sessie die daarna de
+   handeling doet -- niet van de technische pagina. */
+async function bevestigBoard(actie) {
+  const o = await api('/api/office/boardroom/bevestig/opties', { actie }, lid);
+  assert.equal(o.status, 200, 'boardroomceremonie voor ' + actie + ': ' + JSON.stringify(o.body).slice(0, 160));
+  return { ceremonie: o.body.ceremonie,
+    antwoord: sleutel.loginAntwoord(o.body.opties.challenge, origin, ++teller) };
+}
+
+/* Het tweede account opent de kantoordeur op zijn EIGEN naam: de backoffice-code
+   een keer koppelen, dan een kantoorsessie munten die zijn sleutel draagt. */
+async function kantoorsessieVanGast() {
+  const l = await api('/api/auth/login', { login: gast, password: gastWw, pasApp: 'rtg' });
+  assert.ok(l.body.token, 'het tweede account logt in: ' + JSON.stringify(l.body).slice(0, 160));
+  const k = await api('/api/account/koppel', { soort: 'kantoor', code: KANTOORCODE }, l.body.token);
+  assert.equal(k.status, 200, 'koppelen met de kantoorcode: ' + JSON.stringify(k.body).slice(0, 160));
+  const s = await api('/api/account/start', { rol: 'kantoor' }, l.body.token);
+  assert.equal(s.status, 200, 'de kantoorsessie op naam: ' + JSON.stringify(s.body).slice(0, 160));
+  return s.body.token;
+}
+
+test('11. een baliezetel geven of intrekken vraagt de passkey van de eigenaar', async () => {
+  const kaal = await api('/api/office/balie/zetel', { key: gastKey }, lid);
+  assert.equal(kaal.status, 401, 'zonder bewijs geen zetel: ' + JSON.stringify(kaal.body).slice(0, 160));
+  assert.equal(kaal.body.bevestigingNodig, true);
+  assert.equal(kaal.body.actie, 'eigenaar-baliezetel');
+
+  const geef = await api('/api/office/balie/zetel', { key: gastKey, ...(await bevestigBoard('eigenaar-baliezetel')) }, lid);
+  assert.equal(geef.status, 200, 'met de vinger wel: ' + JSON.stringify(geef.body).slice(0, 160));
+  assert.ok((geef.body.zetels || []).some(z => z.key === gastKey), 'de zetel staat erop');
+
+  const wegKaal = await api('/api/office/balie/zetel', { key: gastKey, weg: true }, lid);
+  assert.equal(wegKaal.status, 401, 'intrekken is even zwaar als geven');
+  const weg = await api('/api/office/balie/zetel', { key: gastKey, weg: true, ...(await bevestigBoard('eigenaar-baliezetel')) }, lid);
+  assert.equal(weg.status, 200, JSON.stringify(weg.body).slice(0, 160));
+  assert.ok(!(weg.body.zetels || []).some(z => z.key === gastKey), 'de zetel is weg');
+});
+
+test('12. een boardroomlid dat niet de eigenaar is, deelt GEEN baliezetels uit', async () => {
+  const gastLogin = await api('/api/auth/login', { login: gast, password: gastWw, pasApp: 'rtg' });
+  const codenaam = gastLogin.body.state && gastLogin.body.state.user && gastLogin.body.state.user.codename;
+  assert.ok(codenaam, 'het tweede account heeft een codenaam: ' + JSON.stringify(gastLogin.body).slice(0, 200));
+  // de gids leert een codenaam bij het eerste ingelogde verzoek (kern/gids.js, dirTouch)
+  await api('/api/auth/me', {}, gastLogin.body.token);
+  const geef = await api('/api/office/boardroom/toegang/geef',
+    { codenaam, ...(await bevestigBoard('eigenaar-boardroomtoegang')) }, lid);
+  assert.equal(geef.status, 200, 'de eigenaar geeft het tweede account de boardroom: ' + JSON.stringify(geef.body).slice(0, 160));
+
+  const kantoor = await kantoorsessieVanGast();
+  const binnen = await api('/api/office/boardroom', {}, kantoor);
+  assert.equal(binnen.status, 200, 'het boardroomlid komt binnen');
+  assert.equal(binnen.body.baas, false, 'maar is niet de eigenaar');
+
+  /* DE AANVAL: zichzelf bij de ledendossiers zetten. Dit gaf 200 tot deze fix. */
+  const zelf = await api('/api/office/balie/zetel', { key: gastKey }, kantoor);
+  assert.equal(zelf.status, 403, 'een boardroomlid zet zichzelf niet aan de balie: ' + JSON.stringify(zelf.body).slice(0, 160));
+  const ander = await api('/api/office/balie/zetel', { key: gastKey, weg: true }, kantoor);
+  assert.equal(ander.status, 403, 'en trekt er ook niemand weg');
+
+  /* Intrekken van de boardroom: zwaar, en daarna METEEN dicht. */
+  const wegKaal = await api('/api/office/boardroom/toegang/weg', { codenaam }, lid);
+  assert.equal(wegKaal.status, 401, 'boardroomtoegang intrekken vraagt de vinger');
+  assert.equal(wegKaal.body.actie, 'eigenaar-boardroomtoegang-weg');
+  const weg = await api('/api/office/boardroom/toegang/weg',
+    { codenaam, ...(await bevestigBoard('eigenaar-boardroomtoegang-weg')) }, lid);
+  assert.equal(weg.status, 200, JSON.stringify(weg.body).slice(0, 160));
+  const nu = await api('/api/office/boardroom', {}, kantoor);
+  assert.equal(nu.status, 403, 'dezelfde, nog open sessie komt de boardroom direct niet meer in');
+});
+

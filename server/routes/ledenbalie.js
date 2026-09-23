@@ -22,7 +22,7 @@
    tweede oordeel hier zou op den duur van het eerste gaan afwijken, en dan is
    niet meer te zeggen welke van de twee de regel is. */
 module.exports = (kern) => {
-  const { app, officeAuth, boardroomAuth, boardroomWie, magBalie,
+  const { app, officeAuth, boardroomAuth, boardroomWie, magBalie, afdelingen,
           balieZetels, balieZetelZet, balieZetelWeg, balieZoek, balieDossier,
           balieHerstel, balieKlachtOpen, balieKlachtStatus, balieAboVoorstel } = kern;
 
@@ -108,13 +108,29 @@ module.exports = (kern) => {
      geen namen; die blijven waar ze horen. */
   app.post('/api/office/balie/zetels', boardroomAuth, (req, res) => veilig(res, () =>
     ({ ok: true, baas: !!req.boardroomBaas, zetels: balieZetels() })));
-  app.post('/api/office/balie/zetel', boardroomAuth, (req, res) => veilig(res, () => {
-    const key = kort(lijf(req).key, 120);
-    if (!key) return { status: 400, error: 'Geef de sleutel van het lid dat de zetel krijgt of verliest.' };
-    const weg = lijf(req).weg === true || kort(lijf(req).actie, 20) === 'weg';
-    const r = weg ? balieZetelWeg(key) : balieZetelZet(key);
-    // de verse lijst gaat mee terug: het scherm werkt erop, en een tweede ronde
-    // langs de server zou het beeld alleen maar even uit de pas laten lopen
-    return (r && r.error) ? r : Object.assign({}, r, { zetels: balieZetels() });
-  }));
+  /* UITDELEN EN INTREKKEN IS VAN DE EIGENAAR, EN DE SERVER DWINGT DAT AF.
+     Hier stond alleen `boardroomAuth`; alleen het SCHERM verborg de knop, dus
+     elk boardroomlid kon zichzelf bij de ledendossiers zetten, zonder passkey
+     en zonder spoor. Nu: de eigenaar, een verse passkey, en een auditregel op
+     sleutel. magBalie leest live, dus intrekken werkt meteen. */
+  app.post('/api/office/balie/zetel', boardroomAuth, async (req, res) => {
+    try {
+      if (!req.boardroomBaas) return res.status(403).json({ error: 'Alleen de eigenaar geeft of trekt een baliezetel in.' });
+      // bij het VERZOEK gelezen: bij het bedraden kan de zware poort nog ontbreken
+      const zwaar = kern.zwaarbewijs;
+      if (!zwaar) return res.status(503).json({ error: 'De passkeybevestiging is nu niet beschikbaar; probeer het zo opnieuw.' });
+      const key = kort(lijf(req).key, 120);
+      if (!key) return res.status(400).json({ error: 'Geef de sleutel van het lid dat de zetel krijgt of verliest.' });
+      const weg = lijf(req).weg === true || kort(lijf(req).actie, 20) === 'weg';
+      const bewijs = await zwaar.eis(zwaar.boardroomUser(req), 'eigenaar-baliezetel', zwaar.sessieSleutel(req), req,
+        weg ? 'Het intrekken van een baliezetel' : 'Het geven van een baliezetel');
+      if (bewijs.error) return zwaar.stuur(res, bewijs);
+      const r = weg ? balieZetelWeg(key) : balieZetelZet(key);
+      if (r && r.error) return res.status(r.status || 400).json({ error: r.error });
+      afdelingen.audit('eigenaar', (weg ? 'Baliezetel ingetrokken van ' : 'Baliezetel gegeven aan ') + key +
+        (bewijs.bewezen ? ' (passkey)' : ' (zonder passkey: dit account heeft er nog geen)'));
+      // de verse lijst gaat mee terug: het scherm werkt erop
+      res.json(Object.assign({}, r, { zetels: balieZetels() }));
+    } catch (e) { console.error('[ledenbalie]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
 };

@@ -13,14 +13,14 @@
    opslag (./index.js telt alleen). */
 'use strict';
 
-function maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, balieBron }) {
+function maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron }) {
   const probeer = (fn) => { try { return fn(); } catch (e) { return undefined; } };
 
   return function feitenVan(req) {
     const header = (req && typeof req.get === 'function' && req.get('authorization')) || '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     if (!token) {
-      return { kantoorsessie: false, eigenaar: false, mensOpSessie: false, boardroomZetel: false, balieZetel: false };
+      return { kantoorsessie: false, eigenaar: false, mensOpSessie: false, boardroomZetel: false, balieZetel: false, eigenaarMens: false };
     }
     const sess = probeer(() => sessionFor(token) || null);
     const kantoor = sess === undefined ? undefined : !!(sess && sess.role === 'office');
@@ -41,7 +41,11 @@ function maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom
       eigenaar: eig,
       mensOpSessie: kantoor === undefined ? undefined : !!(kantoor && sess.lidKey),
       boardroomZetel: zetel(magBoardroom),
-      balieZetel: zetel(typeof balieBron === 'function' ? balieBron() : undefined)
+      balieZetel: zetel(typeof balieBron === 'function' ? balieBron() : undefined),
+      /* DE EIGENAAR ALS MENS, langs welke weg ook (eigen account of een
+         kantoorsessie op zijn sleutel). Geen deur-eis maar de vraag van besluit
+         A2: hier zou een stap-op komen. */
+      eigenaarMens: eig === true ? true : zetel(boardroomBaas)
     };
   };
 }

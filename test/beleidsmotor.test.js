@@ -154,3 +154,22 @@ test('6. de paspoortscan is op naam, zoals de lijst waar de link uit komt', asyn
   assert.equal((await doc(eig)).status, 404);
   assert.equal((await doc('onzin')).status, 401);
 });
+
+test('7. besluit A2 in de schaduw: de eigenaar door een gevoelige deur wordt geteld, een medewerker niet', async () => {
+  /* Toets 2 liet de eigenaar al door de kluis (verifications) en de balie (zoek)
+     gaan; hier eerst een medewerker op naam door dezelfde kluisdeur, zodat een
+     teller die IEDEREEN telt hier zakt. */
+  const voor = (await api('/api/office/beleidsmotor', {}, eig)).body.eigenaarZonderStapop;
+  const telVoor = (voor.find(x => x.route === 'POST /api/office/verifications') || { keer: 0 }).keer;
+  assert.equal((await api('/api/office/verifications', {}, opNaam)).status, 200);
+  const na1 = (await api('/api/office/beleidsmotor', {}, eig)).body.eigenaarZonderStapop;
+  assert.equal((na1.find(x => x.route === 'POST /api/office/verifications') || { keer: 0 }).keer, telVoor,
+    'een medewerker op naam is niet de eigenaar en telt hier niet');
+  assert.equal((await api('/api/office/verifications', {}, eig)).status, 200, 'de eigenaar wordt NIET tegengehouden (schaduw)');
+  const s = (await api('/api/office/beleidsmotor', {}, eig)).body;
+  const rij = s.eigenaarZonderStapop.find(x => x.route === 'POST /api/office/verifications');
+  assert.ok(rij && rij.keer === telVoor + 1 && rij.deur === 'op-naam', 'de eigenaar door de kluis telt: ' + JSON.stringify(s.eigenaarZonderStapop));
+  assert.ok(s.eigenaarZonderStapop.some(x => x.deur === 'balie'), 'ook de ledenbalie (toets 2) staat erin');
+  assert.ok(!s.eigenaarZonderStapop.some(x => x.route === 'POST /api/office/state'), 'de gewone kantoordeur is geen gevoelige lezing');
+  assert.deepEqual(s.stapopDeuren, ['op-naam', 'balie']);
+});

@@ -375,6 +375,18 @@ uitkomsten, en `ONBEKEND` (een bron kon niet antwoorden) is geen `WEIGEREN`.
   code, een medewerker op naam en de eigenaar, door alle vier deuren nul keer oneens.
   Drie mutaties zakken: een verkeerd feit, een blinde A3-teller, de documentdeur open.
 
+### 5a-bis. Besluit A2 in de schaduw
+
+De eigenaar is geen dagelijkse superuser: gevoelige lezingen vragen ook van hem een
+stap-op en een reden. De beleidsmotor telt nu waar dat zou gelden. `STAPOP_DEUREN`
+in `regels.js` noemt de kluisdeur (`op-naam`: identiteit en HR) en de ledenbalie;
+elke keer dat de eigenaar, via zijn account of een kantoorsessie op zijn sleutel
+(het feit `eigenaarMens`), daar doorheen gaat, telt dat als `eigenaarZonderStapop`
+per route. Er wordt niemand tegengehouden. Afdwingen is de volgende stap, en die
+vraagt dat elk van die routes een reden kan ontvangen en dat het scherm de passkey
+vraagt (`public/shared/zwaarstap.js` bestaat al). `test/beleidsmotor.test.js` toets
+7 houdt vast dat een medewerker op naam er niet in telt; twee mutaties zakken.
+
 ### 5b. Fase 3, het deel dat nu staat
 
 `server/kern/kantoor/intrekking.js`. Er komt geen tweede intrekmechanisme bij: elke

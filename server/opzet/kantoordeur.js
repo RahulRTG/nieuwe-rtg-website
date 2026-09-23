@@ -17,7 +17,7 @@ module.exports = function kantoordeur(app, kern, deps) {
   const beleidsmotor = require('../kern/beleidsmotor').maakBeleidsmotor({
     db: deps.db, save: deps.save, bewerkCollectie: deps.bewerkCollectie, sessionFor: deps.sessionFor,
     accounts: deps.accounts, eigenaar: deps.eigenaar, boardroomWie: rauw.boardroomWie,
-    magBoardroom: rauw.magBoardroom, balieBron: () => kern().magBalie });
+    magBoardroom: rauw.magBoardroom, boardroomBaas: rauw.boardroomBaas, balieBron: () => kern().magBalie });
   app.use('/api/office', beleidsmotor.meelezer);
   return Object.assign({}, rauw, {
     beleidsmotor,

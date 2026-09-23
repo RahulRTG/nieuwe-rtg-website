@@ -32,8 +32,16 @@ const FEITEN = Object.freeze({
   eigenaar: 'het eigen account van de eigenaar',
   mensOpSessie: 'een kantoorsessie die aan een RTG-account hangt (er staat een mens achter)',
   boardroomZetel: 'de eigenaar, of wie van hem boardroomtoegang kreeg',
-  balieZetel: 'een zetel aan de ledenbalie (de boardroom heeft er altijd een)'
+  balieZetel: 'een zetel aan de ledenbalie (de boardroom heeft er altijd een)',
+  eigenaarMens: 'de eigenaar zelf, via zijn account of een kantoorsessie op zijn sleutel'
 });
+
+/* BESLUIT A2 (23 september 2026): de eigenaar is geen dagelijkse superuser.
+   Gevoelige lezingen -- de deuren hieronder: de kluis (identiteit, HR) en de
+   ledenbalie -- vragen ook van hem een stap-op en een reden. Nog in de SCHADUW:
+   ./index.js telt hoe vaak de eigenaar er zonder stap-op doorheen gaat, en houdt
+   niemand tegen. */
+const STAPOP_DEUREN = Object.freeze(['op-naam', 'balie']);
 
 /* De deuren. `poort` is de functie die vandaag afdwingt; de schaduw vergelijkt
    de motor met precies die functie. */
@@ -77,4 +85,4 @@ function kan(feiten, deur) {
   return { uitkomst: UITKOMST.TOESTAAN, deur, opbouw, reden: 'Elke eis van ' + d.uitleg + ' is gehaald.' };
 }
 
-module.exports = { kan, DEUREN, FEITEN, UITKOMST };
+module.exports = { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN };

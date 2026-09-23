@@ -26,11 +26,11 @@
    pad komt van buiten en zou de opslag laten groeien. */
 'use strict';
 
-const { kan, DEUREN, FEITEN, UITKOMST } = require('./regels');
+const { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN } = require('./regels');
 const { maakFeiten } = require('./feiten');
 const { RIJP } = require('../commercie/schaduw');
 
-const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort'];
+const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop'];
 const MAX_SLEUTELS = 2400;   // ~600 kantoorroutes maal hoogstens vier deuren
 const VOORBEELDEN = 20;
 const DAG = 86400000;
@@ -45,14 +45,14 @@ const VERKLAARD_OPEN = Object.freeze({
   'GET /api/office/doc': 'een paspoortscan in een <img>: het token komt als query binnen en moet op naam zijn (officeQueryOpNaam)'
 });
 
-function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, balieBron, nu }) {
+function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron, nu }) {
   const tijd = nu || Date.now;
   const eigen = require('../eigencollectie')({ db, domein: 'kern/beleidsmotor', bezit: { beleidsmotor: 'kaart' } });
   const bak = () => eigen.bak('beleidsmotor');
   const kijk = () => eigen.kijk('beleidsmotor');
   const spoeler = require('../kantoor/mensdeur-spoel').maakSpoeler({
     bak, save, bewerkCollectie, collectie: 'beleidsmotor', maxPaden: MAX_SLEUTELS, velden: VELDEN });
-  const feitenVan = maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, balieBron });
+  const feitenVan = maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron });
   const oneensVoorbeelden = [];
   const sinds = tijd();
 
@@ -64,15 +64,23 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
   function bewaak(deur, poort) {
     if (!DEUREN[deur]) throw new Error('beleidsmotor: onbekende deur ' + deur);
     const gewikkeld = function (req, res, next) {
-      let besluit = null;
+      let besluit = null, feiten = null;
       try {
         (req.beleidsPoorten || (req.beleidsPoorten = [])).push(deur);
-        besluit = kan(feitenVan(req), deur);
+        feiten = feitenVan(req);
+        besluit = kan(feiten, deur);
       } catch (e) { besluit = null; }
       let door = false;
       if (besluit && res && typeof res.once === 'function') {
         res.once('finish', () => {
-          try { vergelijk(deur, patroon(req), door, besluit); } catch (e) { /* een meting raakt geen antwoord */ }
+          try {
+            vergelijk(deur, patroon(req), door, besluit);
+            /* A2 in de schaduw: de eigenaar door een gevoelige deur, zonder
+               stap-op. Alleen als hij er echt doorheen ging. */
+            if (door && feiten && feiten.eigenaarMens === true && STAPOP_DEUREN.includes(deur)) {
+              spoeler.tikVeld('stapop ' + deur + ' ' + patroon(req), 'eigenaarZonderStapop');
+            }
+          } catch (e) { /* een meting raakt geen antwoord */ }
         });
       }
       return poort(req, res, function () { door = true; return next.apply(this, arguments); });
@@ -116,7 +124,13 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     const beeld = spoeler.projecteer(JSON.parse(JSON.stringify(kijk() || {})));
     const perDeur = {};
     const zonderPoort = [];
+    const stapop = [];
     for (const r of Object.values(beeld)) {
+      if (r.pad.startsWith('stapop ')) {
+        const [, deur, ...rest] = r.pad.split(' ');
+        stapop.push({ deur, route: rest.join(' '), keer: r.eigenaarZonderStapop || 0 });
+        continue;
+      }
       if (r.pad.startsWith('geen-poort ')) {
         zonderPoort.push({ route: r.pad.slice(11), keer: r.zonderPoort || 0 });
         continue;
@@ -149,6 +163,11 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
       oneens: oneensVoorbeelden.slice(),
       zonderPoort: zonderPoort.sort((a, b) => b.keer - a.keer).slice(0, 100),
       zonderPoortTotaal: zonderPoort.length,
+      /* Besluit A2 in de schaduw: waar de eigenaar door een gevoelige deur ging
+         zonder stap-op. Zodra dit afdwingt, vraagt elk van deze een passkey en een
+         reden -- ook van hem. */
+      eigenaarZonderStapop: stapop.sort((a, b) => b.keer - a.keer).slice(0, 100),
+      stapopDeuren: STAPOP_DEUREN,
       verklaardOpen: VERKLAARD_OPEN
     };
   }

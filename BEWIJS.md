@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1972 bestanden en 14077 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1974 bestanden en 14092 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1972 |
-| losse beweringen (`test(...)`) | 14077 |
+| toetsbestanden | 1974 |
+| losse beweringen (`test(...)`) | 14092 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1326 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1328 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
 | alleen in de kop *genoemd*, nog niet gemeten | 167 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1728 bestanden, 13644 beweringen.
+1730 bestanden, 13659 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -83,6 +83,7 @@ toets omvalt.
 | `ai-uitwijk.test.js` | 10 | gezakt op `===->!==` | De AI-uitwijk: onze eigen dunne clients voor Claude, OpenAI en Gemini (allemaal in de Claude-vorm: messages.create in, Claude-vormig antwoord uit) plus server/ai.js die naar de volgende aanbieder overstapt als er een... |
 | `aicontext-allowlist.test.js` | 4 | gezakt op `===->!==#0` | AI-CONTEXT-01: EEN POSITIEVE VELDLIJST, NOOIT EEN OBJECT MET GATEN ERIN. MN-02-AI (test/mn02ai-contextbesmetting.test.js) bewijst dat er vandaag niets overloopt van de ene hoedanigheid naar de andere. |
 | `aidata.test.js` | 6 | gezakt op `liegpoort /api/` | De eigen-AI-dataset: de boardroom-knop die alle logs (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL bewaart om later een eigen model te trainen. Getest: het bord telt, de export is geldig... |
+| `aikosten-bron.test.js` | 6 | gezakt op `true->false#0` | DE AI-KOSTENMETER BOEKT WAT ER GELEVERD WERD (ARBEID.md par. 4 punt 12). |
 | `aikosten-route.test.js` | 8 | -- | HET LUIK OP DE MODELKRAAN. server/ai-meter.js telt wat er aan externe modellen omgaat. |
 | `aipoort.test.js` | 7 | gezakt op `true->false` | DE POORT VOOR DE AI-AANBIEDER. /api/translate is publiek en dat hoort ook -- de taalkiezer staat al op het inlogscherm. |
 | `alarm.test.js` | 12 | gezakt op `!==->===#0` | Het alarm (kern/command/alarm.js): een SLO zonder alarm is een rapportcijfer achteraf, dus dit is de piep. WAT DEZE TOETS VOORAL BEWAAKT is dat het alarm op VERANDERING piept en niet elke ronde. |
@@ -294,7 +295,7 @@ toets omvalt.
 | `concern-voorstel.test.js` | 5 | gezakt op `===->!==#0` | STAP 9: WAT UIT EEN DOCUMENT KOMT IS EEN VOORSTEL, NOOIT EEN FEIT. WAAROM DIT BESTAAT Document Intelligence is het deel dat het meest indrukwekkend oogt en het makkelijkst fout gaat: een patroonherkenner die zijn... |
 | `concern.test.js` | 15 | gezakt op `getal+1#2` | RTG CONCERN: HET BEDRIJF BOVEN DE ZAAK. WAAROM DIT BESTAAT Een bedrijf was hier een rij in `suppliers`: een code, een naam en een genre. |
 | `connect.test.js` | 38 | gezakt op `false->true#0` | FOUNDATION CONNECT -- de grenzen die geen ketenproef van buitenaf kan zien. scripts/lusproef.js loopt de lus over een echte server: vijftien schakels en tien storingen. |
-| `consent-dekking.test.js` | 3 | geen bronmutatie mogelijk | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |
+| `consent-dekking.test.js` | 4 | geen bronmutatie mogelijk | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |
 | `consent-doel-termijn.test.js` | 4 | geen bruikbare mutatie | ELK VENSTER ZEGT WAARVOOR HET BESTAAT EN WANNEER HET DICHTGAAT HDI.md par. 7 regel 6. |
 | `consent-relaties.test.js` | 15 | gezakt op `===->!==#0` | DE PERMISSION FIREWALL -- consent per PARTIJ in plaats van per laag. DE BEWERING DIE ERTOE DOET staat in toets 2: er wordt gegroepeerd op de STABIELE SLEUTEL en niet op de weergavenaam. |
 | `consent.test.js` | 8 | gezakt op `liegpoort /api/` | Het Consent Center (kern/consent.js). De belofte van dit scherm is "wie raakt mijn gegevens aan, en hier zet u het stop", en die belofte heeft twee helften die allebei kunnen breken: 1. |
@@ -634,7 +635,7 @@ toets omvalt.
 | `idemvoorziening.test.js` | 9 | gezakt op `-->+#0` | DE VOORZIENING -- een VERS onderwerp vlak voor de meting. Waarom deze laag bestaat staat in scripts/lib/idemwereld.js, en het is geen ontbrekende fixture: de idempotentieproef doet voor elke ledenroute eerst een... |
 | `idemwereld-voorvoegsel.test.js` | 4 | gezakt op `&&->||#0` | DE VOORVOEGSELREGELS VAN DE IDEMWERELD -- volgorde en reikwijdte. Twee fouten die hier echt zijn gemaakt, allebei stil: 1. |
 | `idemwereld.test.js` | 14 | genoemd | DE WERELD VAN DE IDEMPOTENTIEPROEF (TAKEN.md 4.30), los van een server. scripts/lib/idemwereld.js zet voor de idemproef een echte wereld klaar -- rekening, saldo, pas, vaste betaling, twee klompjes -- zodat de... |
-| `identiteit-opvraag.test.js` | 6 | gezakt op `===->!==#0` | De identiteit van een medewerker: ja/nee voor de werkgever, en opvragen in twee zwaartes. DE AFSPRAAK die hier wordt bewaakt: een werkgever ziet standaard alleen of de identiteit is vastgesteld -- geen... |
+| `identiteit-opvraag.test.js` | 8 | gezakt op `===->!==#0` | De identiteit van een medewerker: ja/nee voor de werkgever, en opvragen in twee zwaartes. DE AFSPRAAK die hier wordt bewaakt: een werkgever ziet standaard alleen of de identiteit is vastgesteld -- geen... |
 | `idor.test.js` | 7 | -- | HET IDOR-OORDEEL, NAGETROKKEN. Een 2xx is een BEVINDING (kan publiek zijn), een 401/403/404 is het bewijs van scheiding, en een 400 zegt niets over eigenaarschap. |
 | `idperdeel.test.js` | 6 | -- | Een veldnaam, meer betekenissen. De vorm die vier keer terugkwam, en de grens eromheen. |
 | `imageherkomst.test.js` | 19 | genoemd | DE HERKOMST VAN HET PRODUCTIE-IMAGE (scripts/imageherkomst.js). Niet te verwarren met test/herkomst.test.js: die gaat over de herkomst van GEGEVENS in RTG Command (waar komt dit veld vandaan). |
@@ -990,7 +991,7 @@ toets omvalt.
 | `onboarding-inrichten.test.js` | 3 | -- | HET INRICHTEN: in één keer invullen wat het huis anders per keer komt vragen. De voordeur vraagt vier dingen en zet de rest op 'later': telefoon en adres worden pas gevraagd op het moment dat een handeling ze nodig... |
 | `onboarding-meebouwen.test.js` | 4 | -- | MEEBOUWEN: de twee dingen die een nieuw lid aan het platform zelf bijdraagt, elk met een toestemming die ergens op slaat. Sinds de demo-inhoud eruit is begint een installatie leeg -- De Salon zonder berichten, de... |
 | `onboarding.test.js` | 11 | gezakt op `liegpoort /api/` | De verplichte onboarding + het contract: elk account vult de standaardgegevens in (paspoort, e-mail, telefoon, adres, ...) en tekent het contract. De eigenaar past de eisen en het contract aan (met AI in gewone taal,... |
-| `onderhoud.test.js` | 8 | gezakt op `===->!==#0` | DE VEGER MAG DE REM NIET LOSSEN. WAT ER MIS WAS, EN TWEE KEER. |
+| `onderhoud.test.js` | 9 | gezakt op `===->!==#0` | DE VEGER MAG DE REM NIET LOSSEN. WAT ER MIS WAS, EN TWEE KEER. |
 | `ondernemerbewijs.test.js` | 12 | geen bronmutatie mogelijk | DE BUSINESS PROOF MAP: kan hij zakken? ONDERNEMERBEWIJS.json is een PROJECTIE over zeven bestaande registers. |
 | `ondernemerpoort-e2e.test.js` | 4 | gezakt op `liegpoort /api/` | Ondernemer-poort, end-to-end: een zaak die offline staat is niet zichtbaar voor leden; pas na de poort (Salon-pagina + rondleiding kassa en werk-apps) kan de manager de zaak online zetten en verschijnt hij weer. npm test |
 | `ondernemerpoort.test.js` | 6 | gezakt op `true->false#0` | Ondernemer-poort (kern/ondernemerpoort.js): een nieuwe zaak loopt eerst de basis door (Salon-pagina + rondleiding kassa en werk-apps) voordat hij online mag. Bestaande zaken zijn grandfathered (online tenzij... |
@@ -1466,7 +1467,7 @@ toets omvalt.
 | `staff-inzet-mob.test.js` | 6 | gezakt op `liegpoort /api/` | DRIE PERSONEELSINGANGEN VAN HET MOBILITY OS DIE DOOR NIETS WERDEN AANGEROEPEN. /api/staff/mob/kaart/storingen de storingslijst van de OV-vervoerder /api/staff/mob/mijn het dispatchbeeld op de PDA... |
 | `staff-pin-productie.test.js` | 2 | -- | Productiegrens voor de oude viercijferige personeelspin. Deze toets draait de server in de gewone, niet-synthetische stand. |
 | `staffgemoed.test.js` | 7 | gezakt op `liegpoort /api/` | DE DAGCHECK-IN VOOR DE VLOER -- en vooral: wat de werkgever NIET ziet. ONDERNEMEN.md par. |
-| `staffinvite.test.js` | 12 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
+| `staffinvite.test.js` | 13 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
 | `stagevorm.test.js` | 4 | gezakt op `getal+1#0` | DE STAGEVORM-METER: kan hij nog vinden wat hij beweert niet te vinden? STAGE.md par. |
 | `startpagina.test.js` | 15 | -- | De losse GitHub Pages-voordeur: merk, routes en dagdeelbeelden. Deze pagina draait niet via de productieserver: index.html in de repositoryroot wordt rechtstreeks door GitHub Pages bediend. |
 | `stempel.test.js` | 4 | gezakt op `===->!==#0` | HET STEMPEL: WANNEER IS EEN METING ONREPRODUCEERBAAR? `boomVuil` beantwoordt een vraag met gevolgen: hoort deze uitslag bij de commit die eronder staat, of bij iets wat nergens is vastgelegd? |
@@ -1643,7 +1644,7 @@ toets omvalt.
 | `voeding.test.js` | 8 | gezakt op `liegpoort /api/` | De voedingslaag (kern/voeding.js). Wat hier wordt vastgezet is vooral wat er NIET gebeurt, want dat is de hele keuze: 1. |
 | `vonk.test.js` | 26 | gezakt op `liegpoort /api/` | RTG Vonk: dating op codenaam met de Salon-veiligheidslat. 18+ met een geverifieerd paspoort, een eindige dagselectie die wederzijds bij de wensen past, wederzijdse like = match + chatlijn + automatisch een tafel rond... |
 | `voornemen.test.js` | 15 | genoemd | HET VOORNEMEN -- van "boek vijf hotels in Parijs onder 180 euro" naar een gecontroleerd plan, met de blokkade VOOR de uitvoering. DE FOUT DIE DIT VOORKOMT. |
-| `voorspel.test.js` | 12 | gezakt op `liegpoort /api/` | De voorspeller: RTG leert het ritme van leden en zaken uit het Pay-grootboek en voorspelt eerlijk (bij te weinig data: zeggen dat het nog niet kan). Draai los: node --test test/voorspel.test.js |
+| `voorspel.test.js` | 13 | gezakt op `liegpoort /api/` | De voorspeller: RTG leert het ritme van leden en zaken uit het Pay-grootboek en voorspelt eerlijk (bij te weinig data: zeggen dat het nog niet kan). Draai los: node --test test/voorspel.test.js |
 | `voorspelplaats.test.js` | 6 | -- | DE VOORSPELLER LEERT PLAATS -- of preciezer: hij LEERT er niets van, en dat is het ontwerp (PLAATS.md fase 3). De voorspeller leerde uitsluitend uit het grootboek: hij weet WANNEER en WAT, nooit WAAR. |
 | `voorstel.test.js` | 9 | -- | HET VOORSTEL -- welke trede past bij deze zaak, en wie verplaatst haar? HET GAT DAT DIT DICHT. |
 | `voorstelintrek.test.js` | 6 | genoemd | INTREKKEN -- een klaargezet voorstel laten vervallen voor het loopt. HET BESLUIT (eigenaar, 13 september 2026): wie iets kan laten klaarzetten, moet het conversationeel ook weer kunnen terugtrekken. |
@@ -1758,6 +1759,7 @@ toets omvalt.
 | `zegel.test.js` | 6 | gezakt op `&&->||#0` | RTG Zegel (server/lib/zegel.js): bewijs zonder tonen, offline verifieerbaar. Getoetst: selectieve onthulling (ruwe persoonsgegevens komen er nooit in), offline verificatie met alleen de publieke sleutel, afwijzing... |
 | `zegelcheck.test.js` | 4 | gezakt op `!==->===#0` | RTG Zegel offline controleren (public/shared/zegelcheck.js): dezelfde WebCrypto- verificatie die de leverancier-app op het toestel draait. We maken een echt Zegel met de uitgevende kant (server/lib/zegel.js), en... |
 | `zegelroute.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Zegel-routes (server.js): een lid maakt een zegel voor een partner, de partner haalt de publieke sleutel op en verifieert OFFLINE (met server/lib/ zegel.controleer). Getoetst: selectieve onthulling (alleen ware,... |
+| `zelfzorg-repareren.test.js` | 3 | gezakt op `===->!==#0` | De reparatieknop van de zelfzorg mag klantdata en sporen niet legen (ARBEID.md par. 4 punt 9; BESTUUR.md 6.5). |
 | `zelfzorg.test.js` | 7 | gezakt op `liegpoort /api/` | De zelfzorg van het platform: opruimen, beschermen, repareren en upgraden, met de knoppen achter de kantoor-inlog. De automaat doet alleen het veilige werk; alles wat geld raakt wordt een advies, nooit een ingreep. |
 | `ziekmelding-privacy.test.js` | 3 | gezakt op `liegpoort /api/` | Een ziekmelding draagt geen omschrijving -- en de loonrun weet er wel van. WAT HIER FOUT WAS. |
 | `zinnencache.test.js` | 6 | gezakt op `return-weg#0` | DE ZINNENCACHE (server/accounts/state.js -> S.zin). node:sqlite is SYNCHROON. |

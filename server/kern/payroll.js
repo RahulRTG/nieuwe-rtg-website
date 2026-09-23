@@ -87,15 +87,22 @@ module.exports = ({ db, save, crypto, accounts, LANDEN, klokVan, openVacatures, 
     return { ok: true, aan: !!aan };
   }
 
-  /* De match-score: vak/functiewoorden, plaats en het past-signaal. */
-  function score(profiel, vac) {
-    let n = 0;
+  /* WAAROM IETS PAST, IN WOORDEN EN NIET ALS GETAL. Hier stond een match-score
+     (drie punten per gedeeld woord, twee voor de plaats, en EEN PUNT voor wie
+     minder dan acht uur per week werkt), en kandidatenVoor sorteerde mensen
+     daarop. Dat is een cijfer op een mens als sorteersleutel (CAR-05, HDI.md
+     par. 5.4, INT-04; ARBEID.md par. 4 punt 3), en het punt voor weinig uren
+     maakte van een werkdruksignaal een rangorde. Nu is het een FILTER met de
+     redenen erbij: past er iets, dan staat de kandidaat erop en staat er waarom;
+     een volgorde tussen mensen bestaat niet. */
+  function redenen(profiel, vac) {
+    const uit = [];
     const woorden = (profiel.rol + ' ' + (profiel.wens || '') + ' ' + (profiel.type || '')).toLowerCase();
     const vacTekst = (vac.func + ' ' + (vac.omschrijving || '') + ' ' + (vac.typeLabel || '')).toLowerCase();
-    for (const w of woorden.split(/[^a-z]+/)) if (w.length > 3 && vacTekst.includes(w)) n += 3;
-    if (profiel.stad && vac.plaats && vac.plaats.toLowerCase().includes(String(profiel.stad).toLowerCase())) n += 2;
-    if (profiel.past === 'rustig') n += 1; // wie weinig uren maakt, kan er werk bij hebben
-    return n;
+    const gedeeld = [...new Set(woorden.split(/[^a-z]+/).filter(w => w.length > 3 && vacTekst.includes(w)))];
+    if (gedeeld.length) uit.push('sluit aan op ' + gedeeld.slice(0, 3).join(', '));
+    if (profiel.stad && vac.plaats && vac.plaats.toLowerCase().includes(String(profiel.stad).toLowerCase())) uit.push('zelfde plaats');
+    return uit;
   }
 
   /* Kansen voor een medewerker: vacatures van ANDERE zaken die passen. */
@@ -104,11 +111,11 @@ module.exports = ({ db, save, crypto, accounts, LANDEN, klokVan, openVacatures, 
     const m = accounts.listStaff(code).find(x => x.id === staffId);
     if (!s || !m) return [];
     const o = openVoor(code, staffId);
-    const profiel = { rol: m.role, stad: s.city, type: (db.data.supplierTypes[s.type] || {}).label,
-      wens: o && o.wens, past: klokVan(code, staffId).weekUren < 8 ? 'rustig' : 'in balans' };
+    const profiel = { rol: m.role, stad: s.city, type: (db.data.supplierTypes[s.type] || {}).label, wens: o && o.wens };
+    // de nieuwste vacatures eerst (de volgorde van openVacatures), niet de "best passende"
     return openVacatures(null, null).filter(v => v.supplierCode !== code)
-      .map(v => ({ vacature: v, score: score(profiel, v) }))
-      .filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 8);
+      .map(v => ({ vacature: v, redenen: redenen(profiel, v) }))
+      .filter(x => x.redenen.length).slice(0, 8);
   }
 
   /* Kandidaten voor een vacature: ALLEEN medewerkers die open voor werk staan. */
@@ -117,10 +124,12 @@ module.exports = ({ db, save, crypto, accounts, LANDEN, klokVan, openVacatures, 
     for (const p of wieWerktWaar()) {
       if (!p.openVoorWerk || p.code === vac.supplierCode) continue;
       const o = openVoor(p.code, p.staffId) || {};
-      const n = score({ rol: p.rol, stad: p.stad, type: p.type, wens: o.wens, past: p.past }, vac);
-      if (n > 0) uit.push({ naam: p.naam.split(' ')[0], rol: p.rol, sector: p.type, stad: p.stad, past: p.past, wens: o.wens || '', score: n });
+      const r = redenen({ rol: p.rol, stad: p.stad, type: p.type, wens: o.wens }, vac);
+      if (r.length) uit.push({ naam: p.naam.split(' ')[0], rol: p.rol, sector: p.type, stad: p.stad, wens: o.wens || '', redenen: r });
     }
-    return uit.sort((a, b) => b.score - a.score).slice(0, 8);
+    /* Geen sortering en geen afkap: wie zichzelf open zette en ergens bij past,
+       staat erop. Een top-8 op volgorde maakte van de afkap een oordeel. */
+    return uit;
   }
 
   return { payroll: { loonrun, runsVan, strokenVan, wieWerktWaar, zetOpenVoorWerk, openVoor, kansenVoor, kandidatenVoor } };

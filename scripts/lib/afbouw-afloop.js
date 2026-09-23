@@ -127,11 +127,12 @@ const merk = (pid) => ({ pid: Number(pid), start: procesStart(Number(pid)) });
    start die een werker start is drie diep. */
 function kringVan(wortel, gezien = new Set()) {
   const uit = [];
-  let kinderen = [];
+  let kinderen = [], viaProc = true;
   try {
     kinderen = fs.readFileSync('/proc/' + wortel + '/task/' + wortel + '/children', 'utf8')
       .trim().split(/\s+/).filter(Boolean).map(Number);
   } catch (e) {
+    viaProc = false;
     try {
       kinderen = execFileSync('pgrep', ['-P', String(wortel)], { encoding: 'utf8' })
         .trim().split(/\s+/).filter(Boolean).map(Number);
@@ -140,7 +141,16 @@ function kringVan(wortel, gezien = new Set()) {
   for (const k of kinderen) {
     if (gezien.has(k)) continue;
     gezien.add(k);
-    uit.push(merk(k));
+    /* EEN KIND DAT AL WEG IS, LEGGEN WE NIET VAST. Tussen het lezen van de
+       kinderlijst en van /proc/<pid>/stat kan een kortlevend kind verdwijnen;
+       dan is zijn starttijd `null`, en zelfdeProces() rekent een PID zonder
+       starttijd voorzichtig als hetzelfde proces. Op een drukke runner krijgt
+       een ander proces dat nummer, en dan "leefde" er na een schone herstel()
+       ineens weer een wees (test/afbouwketen.test.js zakte daarop in CI). Waar
+       /proc er is, betekent geen starttijd: er is niets meer. */
+    const m = merk(k);
+    if (viaProc && m.start == null) continue;
+    uit.push(m);
     uit.push(...kringVan(k, gezien));
   }
   return uit;

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-23T06:15:48.036Z",
-  "commit": "3263a90",
+  "op": "2026-09-23T11:03:22.818Z",
+  "commit": "66c2b1684",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -3516,7 +3516,7 @@
   },
   {
    "sleutel": "POST /api/rtf/solliciteer",
-   "bestand": "server/routes/member/werk/rtf.js:46",
+   "bestand": "server/routes/member/werk/rtf.js:51",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },
@@ -3798,7 +3798,7 @@
   },
   {
    "sleutel": "POST /api/rtf/vacatures",
-   "bestand": "server/routes/member/werk/rtf.js:32",
+   "bestand": "server/routes/member/werk/rtf.js:37",
    "staat": "openbaar",
    "reden": "openstaande vacatures zijn openbaar"
   },
@@ -3869,7 +3869,7 @@
   },
   {
    "sleutel": "POST /api/supplier/apply",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js:12",
+   "bestand": "server/routes/supplier/werving/sollicitaties.js:13",
    "staat": "openbaar",
    "reden": "solliciteren bij een zaak kan zonder account"
   },

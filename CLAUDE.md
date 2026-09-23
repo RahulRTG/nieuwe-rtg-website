@@ -833,6 +833,35 @@ punten bouwt, want daar staan de botsingen met besluiten die al genomen zijn
 getallen van `EXECUTIE.md` blok 9, en procesanalyse gaat per stap en nooit per
 mens).
 
+**`ARBEID.md` is het Work Kernel-voorstel, gemeten** -- 48 onderdelen (103 t/m
+150) plus vijftien primitives, met Talent & Hiring als beoogde eerste verticaal.
+Lees die vóór je aan werving, talent, een interne markt of een "kernel" boven het
+Werk OS begint. De vormmeting (ad hoc, graad `vermoed`, op de lezer van
+`scripts/objectmodel.js`) vindt **0 van 309 velden in alle 18 werkdomeinen** en
+88,3% in precies één, dus er komt **geen Work Kernel als OBJECTMODEL**: van de
+vijftien primitives zijn er negen platformvermogen dat al draait (verwijzen, niet
+herbouwen), vijf domeinvermogen waar een gedeeld type de `Asset`-fout is
+(Capability, Opportunity, Relationship, Work, Agreement), en Workflow staat al op
+jaren weg. De echte vondst is een **naad en geen ontbrekende primitive**: er zijn
+**drie werkrelatiemodellen die elkaar niet lezen** (`staffId` aan een zaak,
+`employment` aan een entiteit, het werkruimtelid), dezelfde vorm als de twee
+ritwerelden -- welk model de waarheid is, is een besluit. En Talent & Hiring als
+verticaal stuit eerst op een weigering in code: `server/kern/wereld/lijsten.js`
+haalde `werving.suite` eruit omdat *een half aangezette wervingslaag gevaarlijker
+is dan een afwezige*. Par. 4 somt dertien fouten op die deze meting vond in de
+bestaande werklaag, waarvan vijf een mens raakten en op 23 september zijn gerepareerd: de Foundation-herkomst
+lekt via een ONTBREKEND veld (en `scripts/adamproef.js` schakel 8 is daar blind
+voor), "open voor werk" komt in het log van de huidige werkgever, payroll sorteert
+kandidaten op een score, `public/apps/foundation/werk.html` belooft *geen
+verborgen matchscore* boven een match die op 72 begint, en de beveiligingsplanner
+toetst rust niet over middernacht. De andere acht zijn diezelfde dag ook dicht
+(par. 4): een werkgeversinzage zonder vaststaand spoor weigert, werving staat in
+het Consent Center, een ongeijkt zekerheidscijfer stuurt de voorspeller niet
+meer, de AI-kostenmeter boekt het model dat antwoordde en laat lokaal verbruik
+buiten tarief en grens, en de Edge-balk toont een verboden actie MET haar reden
+in plaats van haar weg te laten. Te weinig rust bij een mens blijft met opzet
+een waarschuwing.
+
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
 PIN), waarachter het platform per context tijdelijke, begrensde bevoegdheden

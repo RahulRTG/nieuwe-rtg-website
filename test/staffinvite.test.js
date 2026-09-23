@@ -191,3 +191,19 @@ test('een sollicitant aannemen levert een kassacode op, geen kant-en-klaar accou
     'aannemen geeft een 128-bit kassacode om eenmalig door te geven');
   assert.equal(d.bedrijf, BEDRIJF);
 });
+
+test('de anonieme sollicitatie heeft een eigen rem: een afzender duwt de lijst van een zaak niet vol', async () => {
+  /* ARBEID.md par. 4 punt 8. De lijst van een zaak bewaart 100 sollicitaties
+     en deze route heeft geen inlog; zonder rem drukte een afzender echte
+     sollicitaties er stil uit. Een fout formulier telt niet mee. */
+  const { SOLL_PER_UUR } = require('../server/routes/supplier/werving/sollrem');
+  for (let i = 0; i < 3; i++)
+    assert.equal((await api('/api/supplier/apply', { code: 'ESVEDRA', name: '', func: 'x', contact: 'y' })).status, 400);
+  const statussen = [];
+  for (let i = 0; i < SOLL_PER_UUR + 1; i++)
+    statussen.push((await api('/api/supplier/apply', { code: 'ESVEDRA', name: 'Proef ' + i, func: 'Gids', contact: 'p' + i + '@x.nl' })).status);
+  assert.deepEqual(statussen.slice(0, SOLL_PER_UUR), Array(SOLL_PER_UUR).fill(200), 'de eerste ' + SOLL_PER_UUR + ' gaan door: ' + statussen);
+  assert.equal(statussen[SOLL_PER_UUR], 429, 'daarna houdt de rem hem tegen');
+  assert.equal((await api('/api/supplier/apply', { code: 'KIKUNOI', name: 'Ander', func: 'Bediening', contact: 'a@x.nl' })).status, 200,
+    'per zaak: bij een andere zaak kan dezelfde afzender gewoon solliciteren');
+});

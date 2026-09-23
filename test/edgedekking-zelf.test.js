@@ -25,12 +25,19 @@
       context in RTGAdaptief. Dat is de grond onder het etiket `blad`: stond er
       een tweede publicist in de schil, dan zou `blad` over hem liegen.
       LEXICAAL, en dat staat er even groot bij: een publicist die de naam via een
-      omweg aanroept, ziet deze scan niet.
+      omweg aanroept, ziet deze scan niet;
+   6. NA OPENEN (ronde 2, stap 2): een verklaring per veld, met een reden per
+      veld; `na-openen` telt nooit als `ja`, en van `ja` naar `na-openen` is
+      achteruit.
 
    DE MUTATIES, elk nagetrokken: voeg 'route' toe aan ZELF.wereld (toets 2 zakt),
    voeg 'blad' toe aan ZELF.context (toets 2 zakt), haal de trust-regel uit ZELF
    (toets 1 zakt), geef in de schil weer 'scherm' (toets 4 zakt), zet een
-   RTGAdaptief.context-aanroep in een schilscript (toets 5 zakt). */
+   RTGAdaptief.context-aanroep in een schilscript (toets 5 zakt), tel
+   'na-openen' als 'ja' (de telling zakt), laat een reden alle velden dekken (de
+   per-veldtoets zakt), laat bij twee tegenstrijdige verklaringen de eerste
+   winnen (6a zakt), en haal 'na-openen' uit achteruitgang() (de rateltoets
+   zakt). */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -167,4 +174,47 @@ test('5. in de schil zet alleen de brug een context (lexicaal)', () => {
     return /RTGAdaptief/.test(bron) && /\.context\(\s*[^)\s]/.test(bron);
   });
   assert.deepEqual(publicisten, ['/shared/adaptief/brug.js']);
+});
+
+/* Een ruwe lezing zoals leesInPagina hem uit de browser haalt: per veld of er
+   een waarde is, en de verklaringen van de body. */
+function lezing(o) {
+  const velden = {};
+  for (const v of VELDEN) velden[v] = { er: (o.er || []).includes(v), herkomst: (o.er || []).includes(v) ? 'scherm' : 'geen' };
+  return { pad: '/apps/proef.html', velden, acties: [], gebreken: [], verklaring: o.verklaring || { nvt: {}, 'na-openen': {} } };
+}
+
+test('6a. na-openen: met een reden per veld, en zonder reden is het nee', () => {
+  const r = meter.regelVan(lezing({ er: ['wereld'], verklaring: { nvt: {}, 'na-openen': { object: 'Een document bestaat pas als je er een opent.', activiteit: '  ' } } }), 200, true);
+  assert.equal(r.velden.object, 'na-openen');
+  assert.equal(r.velden.activiteit, 'nee', 'een verklaring zonder reden is geen verklaring');
+  assert.equal(r.velden.wereld, 'ja');
+  const ja = meter.regelVan(lezing({ er: ['object'], verklaring: { nvt: {}, 'na-openen': { object: 'Pas na openen.' } } }), 200, true);
+  assert.equal(ja.velden.object, 'ja', 'een waarde bij binnenkomst gaat voor een verklaring');
+  const beide = meter.regelVan(lezing({ verklaring: { nvt: { object: 'Hier geen object.' }, 'na-openen': { object: 'Pas na openen.' } } }), 200, true);
+  assert.equal(beide.velden.object, 'nee', 'twee verklaringen die elkaar tegenspreken, verklaren niets');
+});
+
+test('6b. een reden voor het ene veld dekt het andere niet', () => {
+  const r = meter.regelVan(lezing({ verklaring: { nvt: { hoofdactie: 'Een leesscherm: er is niets te doen.', context: '' },
+    'na-openen': { object: 'Pas na openen.', activiteit: '' } } }), 200, true);
+  assert.equal(r.velden.hoofdactie, 'nvt');
+  assert.equal(r.velden.context, 'nee', 'de reden van hoofdactie dekt context niet');
+  assert.equal(r.velden.object, 'na-openen');
+  assert.equal(r.velden.activiteit, 'nee', 'de reden van object dekt activiteit niet');
+});
+
+test('6c. na-openen telt nooit als ja, en van ja naar na-openen is achteruit', () => {
+  const s = { status: 'gemeten', http: 200, stabiel: true, acties: {}, gebreken: [],
+    velden: Object.fromEntries(VELDEN.map((v) => [v, 'nee'])), herkomst: Object.fromEntries(VELDEN.map((v) => [v, 'geen'])) };
+  s.velden.object = 'na-openen';
+  const t = meter.telling({ '/apps/a.html': s });
+  assert.equal(t.perVeld.object.ja, 0, 'na-openen is geen ja');
+  assert.equal(t.perVeld.object.zelf, 0);
+  assert.equal(t.perVeld.object['na-openen'], 1);
+  for (const v of VELDEN) assert.equal(typeof t.perVeld[v]['na-openen'], 'number', v + ' telt na-openen, ook als het nul is');
+  const oud = { schermen: { '/apps/a.html': { velden: { object: 'ja' }, herkomst: { object: 'scherm' } } } };
+  assert.deepEqual(meter.achteruitgang(oud, { '/apps/a.html': s }).map((a) => [a.veld, a.was, a.nu]), [['object', 'ja', 'na-openen']]);
+  s.velden.object = 'nvt';
+  assert.deepEqual(meter.achteruitgang(oud, { '/apps/a.html': s }), [], 'een verklaring dat het veld hier niet bestaat blijft geen achteruitgang');
 });

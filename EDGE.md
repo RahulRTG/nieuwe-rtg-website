@@ -449,9 +449,9 @@ wordt getoond, hardop, en de teller moet dalen.
 - **Nieuwe schermen krijgen het harde contract.** Een scherm dat niet in de
   basislijn van `EDGEDEKKING.json` staat, moet gemeten zijn, een wereld en een
   context hebben, een hoofdactie ZELF aanwijzen (`data-hoofdactie`, niet via de
-  padtabel) of met reden verklaren dat die er niet is (`data-rtg-edge-nvt` +
-  `data-rtg-edge-nvt-reden`), en nul geblokkeerde handelingen zonder reden
-  hebben. Een nieuw scherm dat een lid doorstuurt (een kantoor- of zaakscherm
+  padtabel) of met reden verklaren dat die er niet is
+  (`data-rtg-edge-nvt-hoofdactie="reden"`), en nul geblokkeerde handelingen
+  zonder reden hebben. Een nieuw scherm dat een lid doorstuurt (een kantoor- of zaakscherm
   naar zijn inlog) zakt, tenzij het met reden in `DOORVERWIJZING_MET_REDEN`
   staat: anders haalt het het contract zonder ooit onder zijn eigen rol gemeten
   te zijn. `test/edgenieuwscherm.test.js` houdt dat vast.
@@ -463,6 +463,17 @@ wordt getoond, hardop, en de teller moet dalen.
   verklaart dat het geen hoofdactie heeft, mag bij de titel van het casco
   blijven — daar bewijst de context-eis alleen dat er een titel is, en dat staat
   er dan ook zo.
+- **Een verklaring hoort bij een veld** (ronde 2). Een scherm verklaart per veld
+  op zijn body, en de waarde van het attribuut IS de reden:
+  `data-rtg-edge-nvt-<veld>` (dit veld bestaat hier niet) of
+  `data-rtg-edge-na-openen-<veld>` (dit veld ontstaat pas als je iets opent,
+  zoals een document). De oude vorm, een lijst velden met EEN reden voor
+  allemaal, telt niet meer: een reden voor het ene veld dekt het andere niet.
+  Zonder reden, of met beide verklaringen voor hetzelfde veld, blijft het `nee`.
+  `na-openen` telt nooit als `ja`, en van `ja` naar `na-openen` is achteruit:
+  wat er bij binnenkomst stond, staat er niet meer. De meter klikt niets aan,
+  dus dat het veld na openen WERKELIJK verschijnt, bewijst een e2e en niet het
+  register.
 - **Gewijzigde schermen worden niet slechter** — dat is dezelfde vergelijking
   per scherm als de eerste regel.
 - **De kaart loopt niet achter.** `npm run edgekaart:controle` zakt als de code

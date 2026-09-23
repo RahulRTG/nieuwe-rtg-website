@@ -11,7 +11,7 @@
      geen scherm en valt erbuiten;
    - het publiceert een wereld en een context;
    - het wijst een hoofdactie aan, of verklaart met reden dat die er niet is
-     (data-rtg-edge-nvt="hoofdactie" + data-rtg-edge-nvt-reden);
+     (data-rtg-edge-nvt-hoofdactie="reden": een reden per veld, sinds ronde 2);
    - geen enkele geblokkeerde handeling staat er zonder reden.
 
    Wat NIEUW is, staat vast in de basislijn van EDGEDEKKING.json: de schermen

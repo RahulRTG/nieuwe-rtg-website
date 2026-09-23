@@ -13,20 +13,20 @@
     }
   ],
   "stempel": {
-    "op": "2026-09-19T19:03:57.663Z",
-    "commit": "6083f652",
+    "op": "2026-09-23T14:22:46.627Z",
+    "commit": "1f0365c",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 605,
-    "deurEistMens": 178,
-    "deurGedeeld": 427,
+    "routes": 607,
+    "deurEistMens": 182,
+    "deurGedeeld": 425,
     "zonderBewakerslaag": 3,
-    "handlerKentMens": 141,
-    "anoniemUitvoerbaar": 365,
-    "metSpoor": 147,
-    "metReden": 280,
-    "bestanden": 95,
+    "handlerKentMens": 148,
+    "anoniemUitvoerbaar": 358,
+    "metSpoor": 144,
+    "metReden": 286,
+    "bestanden": 97,
     "zwaar": 14,
     "zwaarZonderMens": 0,
     "zwaarLezend": 4,
@@ -54,10 +54,10 @@
       "gemeten": 81,
       "geenWerk": 302,
       "geenOpslag": 203,
-      "nietInProef": 19,
-      "totaal": 605
+      "nietInProef": 21,
+      "totaal": 607
     },
-    "dekkingPct": 13.4,
+    "dekkingPct": 13.3,
     "raakt": [
       {
         "pad": "/api/office/bank/rekening/open",
@@ -183,7 +183,7 @@
     "schaduw": {
       "wat": "een nieuwe regel loopt eerst mee zonder te blokkeren",
       "aanKantoorroute": 1,
-      "aanroepersInServer": 7
+      "aanroepersInServer": 9
     },
     "rechten": {
       "wat": "machtskaart: nominaal naast effectief",
@@ -319,13 +319,13 @@
     }
   ],
   "deuren": {
-    "officeAuth": 449,
-    "boardroomAuth": 112,
+    "officeAuth": 447,
+    "boardroomAuth": 113,
     "balieAuth": 31,
-    "kluisAuth": 22,
+    "kluisAuth": 23,
     "techAuth": 16,
     "eigenaarAlleen": 10,
     "alleenBaas": 6,
-    "naamAuth": 3
+    "naamAuth": 5
   }
 }

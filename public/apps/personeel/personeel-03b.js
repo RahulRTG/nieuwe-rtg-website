@@ -16,6 +16,25 @@
     $('#teamAccessDescription').innerHTML = teamText(descriptionKey, description);
     $('#gate').scrollTop = 0;
   }
+  /* De gewone accountinlog (met zijn tweede factor) en daarna de kantoordeur.
+     Vraagt het account een tweede stap, dan loopt die via de leden-app: die
+     stap nog eens nabouwen zou een tweede inlog met eigen regels zijn. */
+  async function naarKantoorMetAccount(login, password){
+    let d = {};
+    try {
+      const r = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login, password }) });
+      d = await r.json().catch(() => ({}));
+      if (!r.ok) return false;
+    } catch(e){ return false; }
+    if (!d.token) {
+      $('#liErr').textContent = T('pd.ka.tweede','Uw account heeft toegang tot RTG Kantoor en vraagt een tweede stap. Log in via de leden-app en open daar Mijn werkplekken, Backoffice.');
+      return true;
+    }
+    try { localStorage.setItem('rtg_member_token', d.token); } catch(e){}
+    stepKantoor();
+    await kantoorMetAccount(d.token);
+    return true;
+  }
   function formulierLogin(){
     $('#gateStep').innerHTML =
       '<form class="lform" id="loginForm" autocomplete="on">'+
@@ -33,7 +52,12 @@
       $('#liErr').textContent = '';
       const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
       try { await mijnLogin($('#liUser').value.trim(), $('#liPass').value); }
-      catch(err){ $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.'); btn.disabled = false; }
+      catch(err){
+        btn.disabled = false;
+        // geen zaak, wel kantoor: zelfde account, andere deur (pda/posities.js)
+        if (err.data && err.data.kantoor && await naarKantoorMetAccount($('#liUser').value.trim(), $('#liPass').value)) return;
+        $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.');
+      }
     });
     $('#toJoin').addEventListener('click', stepAanmelden);
     $('#toForgot').addEventListener('click', stepForgot);

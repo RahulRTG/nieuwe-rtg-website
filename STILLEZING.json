@@ -1,908 +1,908 @@
 {
- "soort": "meting",
- "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
- "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
- "stempel": {
-  "op": "2026-09-23T15:15:02.270Z",
-  "commit": "109fe208",
-  "boomVuil": false,
-  "boomAnders": 0,
-  "instrument": "scripts/stillezing.js",
-  "node": "v22.22.2"
- },
- "gemeten": {
-  "server": {
-   "bewijslezingen": 79,
-   "metVanger": 9,
-   "smeltSamen": 5,
-   "zegtHet": 1,
-   "onderscheidt": 0,
-   "gooit": 2,
-   "anders": 1
+  "soort": "meting",
+  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
+  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
+  "stempel": {
+    "op": "2026-09-23T15:45:33.047Z",
+    "commit": "abdea56ab",
+    "boomVuil": false,
+    "boomAnders": 3,
+    "instrument": "scripts/stillezing.js",
+    "node": "v22.22.2"
   },
-  "scripts": {
-   "bewijslezingen": 503,
-   "metVanger": 99,
-   "smeltSamen": 61,
-   "zegtHet": 11,
-   "onderscheidt": 6,
-   "gooit": 2,
-   "anders": 19
+  "gemeten": {
+    "server": {
+      "bewijslezingen": 79,
+      "metVanger": 9,
+      "smeltSamen": 5,
+      "zegtHet": 1,
+      "onderscheidt": 0,
+      "gooit": 2,
+      "anders": 1
+    },
+    "scripts": {
+      "bewijslezingen": 503,
+      "metVanger": 99,
+      "smeltSamen": 61,
+      "zegtHet": 11,
+      "onderscheidt": 6,
+      "gooit": 2,
+      "anders": 19
+    }
+  },
+  "plekken": {
+    "server": [
+      {
+        "bestand": "server/kern/command/landpakket.js",
+        "regel": 43,
+        "leest": [
+          "LANDEN.json"
+        ],
+        "soort": "gooit"
+      },
+      {
+        "bestand": "server/kern/command/slo.js",
+        "regel": 56,
+        "leest": [
+          "SLO.json"
+        ],
+        "soort": "gooit"
+      },
+      {
+        "bestand": "server/kern/handelingsklasse/omkeerbaar.js",
+        "regel": 48,
+        "leest": [
+          "HERSTELPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "server/kern/isolatie/proefmeting.js",
+        "regel": 36,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "server/kern/stuur/gevolg.js",
+        "regel": 50,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "server/lib/mutatiecontracten-tweedehandeling.js",
+        "regel": 56,
+        "leest": [
+          "IDEMBESLUIT.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "server/opzet/begrotingsgrenzen.js",
+        "regel": 60,
+        "leest": [
+          "BEGROTING.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "server/routes/office/dekking.js",
+        "regel": 55,
+        "leest": [
+          "DEKKING.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "server/routes/office/register.js",
+        "regel": 99,
+        "leest": [
+          "WAAROM.json"
+        ],
+        "soort": "smeltSamen"
+      }
+    ],
+    "scripts": [
+      {
+        "bestand": "scripts/aanroepgraaf.js",
+        "regel": 163,
+        "leest": [
+          "KERNHERKOMST.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/actorvormen.js",
+        "regel": 169,
+        "leest": [
+          "ENVELOP.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/afbouw-slot.js",
+        "regel": 62,
+        "leest": [
+          "eigenaar.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/afbouw-slot.js",
+        "regel": 96,
+        "leest": [
+          "eigenaar.json"
+        ],
+        "soort": "gooit"
+      },
+      {
+        "bestand": "scripts/bewijskosten.js",
+        "regel": 193,
+        "leest": [
+          "HERBOUWPROEF.json"
+        ],
+        "soort": "onderscheidt"
+      },
+      {
+        "bestand": "scripts/bewijsladder.js",
+        "regel": 385,
+        "leest": [
+          "BEWIJSLADDER.json",
+          "LADDER.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/bewijsmatrix.js",
+        "regel": 338,
+        "leest": [
+          "ROLPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/bewijsmatrix.js",
+        "regel": 352,
+        "leest": [
+          "HANDELINGPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/bewijsmatrix.js",
+        "regel": 425,
+        "leest": [
+          "POORTWACHT.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/bewijsmatrix.js",
+        "regel": 848,
+        "leest": [
+          "BEWIJSMATRIX.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/bewijsschuld.js",
+        "regel": 555,
+        "leest": [
+          "BEWIJSSCHULD.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/check.js",
+        "regel": 3045,
+        "leest": [
+          "BELOFTE.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/check.js",
+        "regel": 3364,
+        "leest": [
+          "SLO.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/check.js",
+        "regel": 4867,
+        "leest": [
+          "MUTATIECONTRACT.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/check.js",
+        "regel": 5356,
+        "leest": [
+          "MUTATIECONTRACT.json"
+        ],
+        "soort": "onderscheidt"
+      },
+      {
+        "bestand": "scripts/check.js",
+        "regel": 5622,
+        "leest": [
+          "TEKSTOPPERVLAK.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/check.js",
+        "regel": 5798,
+        "leest": [
+          "EERSTEMINUUT.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/check.js",
+        "regel": 5810,
+        "leest": [
+          "NORM.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/controls.js",
+        "regel": 275,
+        "leest": [
+          "CONTROLS.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/crashas.js",
+        "regel": 168,
+        "leest": [
+          "CRASHPROEF.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/crashproef.js",
+        "regel": 187,
+        "leest": [
+          "ROUTEBRON.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/deltapoort.js",
+        "regel": 181,
+        "leest": [
+          "NORM.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/doctrine.js",
+        "regel": 461,
+        "leest": [
+          "WETTEN.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/doodspoor.js",
+        "regel": 233,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/doodspoor.js",
+        "regel": 541,
+        "leest": [
+          "DOODSPOOR.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/envelopvelden.js",
+        "regel": 147,
+        "leest": [
+          "ENVELOP.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/executionmap.js",
+        "regel": 116,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/executionmap.js",
+        "regel": 118,
+        "leest": [
+          "VERTROUWEN.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/executionmap.js",
+        "regel": 120,
+        "leest": [
+          "IDEMBESLUIT.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/executionmap.js",
+        "regel": 122,
+        "leest": [
+          "HERSTEL.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/faalproef.js",
+        "regel": 495,
+        "leest": [
+          "HERREKENBAAR.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/factuurproef.js",
+        "regel": 556,
+        "leest": [
+          "HERSTEL.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/factuurproef.js",
+        "regel": 575,
+        "leest": [
+          "HERSTELBESLUIT.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/gelding.js",
+        "regel": 254,
+        "leest": [
+          "ROUTEBRON.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/geldkaart.js",
+        "regel": 130,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/gevolgdekking.js",
+        "regel": 179,
+        "leest": [
+          "DEKKING.json",
+          "GEVOLGDEKKING.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/gewichtdrift.js",
+        "regel": 169,
+        "leest": [
+          "TOETSDUUR.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/gezag.js",
+        "regel": 353,
+        "leest": [
+          "GEZAG.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/gezagshandelingen.js",
+        "regel": 153,
+        "leest": [
+          "EXECUTION_MAP.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/gezagshandelingen.js",
+        "regel": 314,
+        "leest": [
+          "GEZAGSHANDELINGEN.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/gluurronde.js",
+        "regel": 787,
+        "leest": [
+          "NORM.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/grenslijst.js",
+        "regel": 81,
+        "leest": [
+          "GRENZEN.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/handelingsklasse.js",
+        "regel": 64,
+        "leest": [
+          "HANDELINGSKLASSE.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/handlerbewakers.js",
+        "regel": 66,
+        "leest": [
+          "MUTATIECONTRACT.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/herbouwproef.js",
+        "regel": 397,
+        "leest": [
+          "HERBOUWPROEF.json"
+        ],
+        "soort": "onderscheidt"
+      },
+      {
+        "bestand": "scripts/herstel.js",
+        "regel": 53,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/herstel.js",
+        "regel": 72,
+        "leest": [
+          "HERSTELPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/herstelproef.js",
+        "regel": 403,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/idemproef-route.js",
+        "regel": 516,
+        "leest": [
+          "IDEMBESLUIT.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/inhoudskaart.js",
+        "regel": 109,
+        "leest": [
+          "OUTPUTPROEF.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/inhoudskaart.js",
+        "regel": 208,
+        "leest": [
+          "INHOUDSKAART.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/kantoormacht.js",
+        "regel": 423,
+        "leest": [
+          "KANTOORMACHT.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/klok.js",
+        "regel": 114,
+        "leest": [
+          "KLOK.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/klokwacht.js",
+        "regel": 248,
+        "leest": [
+          "KLOKWACHT.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/krimpronde.js",
+        "regel": 301,
+        "leest": [
+          "KRIMP.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/ladder.js",
+        "regel": 291,
+        "leest": [
+          "NORM.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/lib/delen.js",
+        "regel": 129,
+        "leest": [
+          "TOETSDUUR.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/lib/idemmeting.js",
+        "regel": 91,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/lib/staatproef.js",
+        "regel": 103,
+        "leest": [
+          "IDEMBESLUIT.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/lib/wetboek.js",
+        "regel": 137,
+        "leest": [
+          "SABOTAGE.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/lib/zwaareffect.js",
+        "regel": 103,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "onderscheidt"
+      },
+      {
+        "bestand": "scripts/lussen.js",
+        "regel": 585,
+        "leest": [
+          "LUSSEN.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/machinedekking.js",
+        "regel": 132,
+        "leest": [
+          "KERNHERKOMST.json",
+          "MUTATIECONTRACT.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/machinedekking.js",
+        "regel": 345,
+        "leest": [
+          "KERNHERKOMST.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/machinedekking.js",
+        "regel": 441,
+        "leest": [
+          "EXECUTION_MAP.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/machinedekking.js",
+        "regel": 688,
+        "leest": [
+          "DEKKING.json",
+          "MACHINEDEKKING.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/mutatiecontract.js",
+        "regel": 80,
+        "leest": [
+          "AFGELEID.json",
+          "MUTATIECONTRACT-AFGELEID.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/mutatiecontract.js",
+        "regel": 84,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/mutatiecontract.js",
+        "regel": 94,
+        "leest": [
+          "SCHRIJFANALYSE.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/mutatieinventaris.js",
+        "regel": 111,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/mutatiepoort.js",
+        "regel": 36,
+        "leest": [
+          "MUTATIECONTRACT.json"
+        ],
+        "soort": "onderscheidt"
+      },
+      {
+        "bestand": "scripts/onbewezen.js",
+        "regel": 242,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/outputband.js",
+        "regel": 85,
+        "leest": [
+          "OUTPUTPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/outputband.js",
+        "regel": 128,
+        "leest": [
+          "INHOUDSKAART.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/outputband.js",
+        "regel": 196,
+        "leest": [
+          "OUTPUTPROEF.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/outputproef.js",
+        "regel": 81,
+        "leest": [
+          "MUTATIES.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/outputproef.js",
+        "regel": 145,
+        "leest": [
+          "INHOUDSKAART.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/outputproef.js",
+        "regel": 260,
+        "leest": [
+          "OUTPUTPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/outputproef.js",
+        "regel": 273,
+        "leest": [
+          "OUTPUTPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/overleving.js",
+        "regel": 520,
+        "leest": [
+          "OVERLEVING.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/resolver.js",
+        "regel": 37,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/resolverbereik.js",
+        "regel": 75,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/rolronde.js",
+        "regel": 289,
+        "leest": [
+          "NORM.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/rommeltaal.js",
+        "regel": 80,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/samenhang.js",
+        "regel": 192,
+        "leest": [
+          "KRIMP.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/scherfmeter.js",
+        "regel": 178,
+        "leest": [
+          "SCHERFMETER.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/schermen.js",
+        "regel": 269,
+        "leest": [
+          "NORM.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/schermroutes.js",
+        "regel": 212,
+        "leest": [
+          "ROUTEBRON.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/schrijfanalyse.js",
+        "regel": 107,
+        "leest": [
+          "IDEMPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/staatproef-route.js",
+        "regel": 157,
+        "leest": [
+          "STAATPROEF.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/taalkwaliteit.js",
+        "regel": 53,
+        "leest": [
+          "TAALOORDEEL.json"
+        ],
+        "soort": "anders"
+      },
+      {
+        "bestand": "scripts/test-runner.js",
+        "regel": 328,
+        "leest": [
+          "SUITE.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/toetsduur.js",
+        "regel": 290,
+        "leest": [
+          "TOETSDUUR.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/veranderbereik.js",
+        "regel": 666,
+        "leest": [
+          "VERANDERBEREIK-RONDE.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/verband.js",
+        "regel": 141,
+        "leest": [
+          "WETTEN.json"
+        ],
+        "soort": "zegtHet"
+      },
+      {
+        "bestand": "scripts/verband.js",
+        "regel": 147,
+        "leest": [
+          "MUTATIES.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/wachtwijze.js",
+        "regel": 124,
+        "leest": [
+          "WACHTWIJZE.json"
+        ],
+        "soort": "smeltSamen"
+      },
+      {
+        "bestand": "scripts/wekkers.js",
+        "regel": 122,
+        "leest": [
+          "ACTIVERING.json"
+        ],
+        "soort": "gooit"
+      },
+      {
+        "bestand": "scripts/edgekaart.js",
+        "regel": 545,
+        "leest": [
+          "EDGEKAART.json"
+        ],
+        "soort": "onderscheidt"
+      }
+    ]
   }
- },
- "plekken": {
-  "server": [
-   {
-    "bestand": "server/kern/command/landpakket.js",
-    "regel": 43,
-    "leest": [
-     "LANDEN.json"
-    ],
-    "soort": "gooit"
-   },
-   {
-    "bestand": "server/kern/command/slo.js",
-    "regel": 56,
-    "leest": [
-     "SLO.json"
-    ],
-    "soort": "gooit"
-   },
-   {
-    "bestand": "server/kern/handelingsklasse/omkeerbaar.js",
-    "regel": 48,
-    "leest": [
-     "HERSTELPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "server/kern/isolatie/proefmeting.js",
-    "regel": 36,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "server/kern/stuur/gevolg.js",
-    "regel": 50,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "server/lib/mutatiecontracten-tweedehandeling.js",
-    "regel": 56,
-    "leest": [
-     "IDEMBESLUIT.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "server/opzet/begrotingsgrenzen.js",
-    "regel": 60,
-    "leest": [
-     "BEGROTING.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "server/routes/office/dekking.js",
-    "regel": 55,
-    "leest": [
-     "DEKKING.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "server/routes/office/register.js",
-    "regel": 99,
-    "leest": [
-     "WAAROM.json"
-    ],
-    "soort": "smeltSamen"
-   }
-  ],
-  "scripts": [
-   {
-    "bestand": "scripts/aanroepgraaf.js",
-    "regel": 163,
-    "leest": [
-     "KERNHERKOMST.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/actorvormen.js",
-    "regel": 169,
-    "leest": [
-     "ENVELOP.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/afbouw-slot.js",
-    "regel": 62,
-    "leest": [
-     "eigenaar.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/afbouw-slot.js",
-    "regel": 96,
-    "leest": [
-     "eigenaar.json"
-    ],
-    "soort": "gooit"
-   },
-   {
-    "bestand": "scripts/bewijskosten.js",
-    "regel": 193,
-    "leest": [
-     "HERBOUWPROEF.json"
-    ],
-    "soort": "onderscheidt"
-   },
-   {
-    "bestand": "scripts/bewijsladder.js",
-    "regel": 385,
-    "leest": [
-     "BEWIJSLADDER.json",
-     "LADDER.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/bewijsmatrix.js",
-    "regel": 338,
-    "leest": [
-     "ROLPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/bewijsmatrix.js",
-    "regel": 352,
-    "leest": [
-     "HANDELINGPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/bewijsmatrix.js",
-    "regel": 425,
-    "leest": [
-     "POORTWACHT.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/bewijsmatrix.js",
-    "regel": 848,
-    "leest": [
-     "BEWIJSMATRIX.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/bewijsschuld.js",
-    "regel": 555,
-    "leest": [
-     "BEWIJSSCHULD.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/check.js",
-    "regel": 3045,
-    "leest": [
-     "BELOFTE.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/check.js",
-    "regel": 3364,
-    "leest": [
-     "SLO.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/check.js",
-    "regel": 4867,
-    "leest": [
-     "MUTATIECONTRACT.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/check.js",
-    "regel": 5356,
-    "leest": [
-     "MUTATIECONTRACT.json"
-    ],
-    "soort": "onderscheidt"
-   },
-   {
-    "bestand": "scripts/check.js",
-    "regel": 5622,
-    "leest": [
-     "TEKSTOPPERVLAK.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/check.js",
-    "regel": 5798,
-    "leest": [
-     "EERSTEMINUUT.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/check.js",
-    "regel": 5810,
-    "leest": [
-     "NORM.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/controls.js",
-    "regel": 275,
-    "leest": [
-     "CONTROLS.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/crashas.js",
-    "regel": 168,
-    "leest": [
-     "CRASHPROEF.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/crashproef.js",
-    "regel": 187,
-    "leest": [
-     "ROUTEBRON.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/deltapoort.js",
-    "regel": 181,
-    "leest": [
-     "NORM.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/doctrine.js",
-    "regel": 461,
-    "leest": [
-     "WETTEN.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/doodspoor.js",
-    "regel": 233,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/doodspoor.js",
-    "regel": 541,
-    "leest": [
-     "DOODSPOOR.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/edgekaart.js",
-    "regel": 538,
-    "leest": [
-     "EDGEKAART.json"
-    ],
-    "soort": "onderscheidt"
-   },
-   {
-    "bestand": "scripts/envelopvelden.js",
-    "regel": 147,
-    "leest": [
-     "ENVELOP.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/executionmap.js",
-    "regel": 116,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/executionmap.js",
-    "regel": 118,
-    "leest": [
-     "VERTROUWEN.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/executionmap.js",
-    "regel": 120,
-    "leest": [
-     "IDEMBESLUIT.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/executionmap.js",
-    "regel": 122,
-    "leest": [
-     "HERSTEL.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/faalproef.js",
-    "regel": 495,
-    "leest": [
-     "HERREKENBAAR.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/factuurproef.js",
-    "regel": 556,
-    "leest": [
-     "HERSTEL.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/factuurproef.js",
-    "regel": 575,
-    "leest": [
-     "HERSTELBESLUIT.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/gelding.js",
-    "regel": 254,
-    "leest": [
-     "ROUTEBRON.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/geldkaart.js",
-    "regel": 130,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/gevolgdekking.js",
-    "regel": 179,
-    "leest": [
-     "DEKKING.json",
-     "GEVOLGDEKKING.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/gewichtdrift.js",
-    "regel": 169,
-    "leest": [
-     "TOETSDUUR.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/gezag.js",
-    "regel": 353,
-    "leest": [
-     "GEZAG.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/gezagshandelingen.js",
-    "regel": 153,
-    "leest": [
-     "EXECUTION_MAP.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/gezagshandelingen.js",
-    "regel": 314,
-    "leest": [
-     "GEZAGSHANDELINGEN.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/gluurronde.js",
-    "regel": 787,
-    "leest": [
-     "NORM.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/grenslijst.js",
-    "regel": 81,
-    "leest": [
-     "GRENZEN.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/handelingsklasse.js",
-    "regel": 64,
-    "leest": [
-     "HANDELINGSKLASSE.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/handlerbewakers.js",
-    "regel": 66,
-    "leest": [
-     "MUTATIECONTRACT.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/herbouwproef.js",
-    "regel": 397,
-    "leest": [
-     "HERBOUWPROEF.json"
-    ],
-    "soort": "onderscheidt"
-   },
-   {
-    "bestand": "scripts/herstel.js",
-    "regel": 53,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/herstel.js",
-    "regel": 72,
-    "leest": [
-     "HERSTELPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/herstelproef.js",
-    "regel": 403,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/idemproef-route.js",
-    "regel": 516,
-    "leest": [
-     "IDEMBESLUIT.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/inhoudskaart.js",
-    "regel": 109,
-    "leest": [
-     "OUTPUTPROEF.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/inhoudskaart.js",
-    "regel": 208,
-    "leest": [
-     "INHOUDSKAART.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/kantoormacht.js",
-    "regel": 423,
-    "leest": [
-     "KANTOORMACHT.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/klok.js",
-    "regel": 114,
-    "leest": [
-     "KLOK.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/klokwacht.js",
-    "regel": 248,
-    "leest": [
-     "KLOKWACHT.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/krimpronde.js",
-    "regel": 301,
-    "leest": [
-     "KRIMP.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/ladder.js",
-    "regel": 291,
-    "leest": [
-     "NORM.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/lib/delen.js",
-    "regel": 129,
-    "leest": [
-     "TOETSDUUR.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/lib/idemmeting.js",
-    "regel": 91,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/lib/staatproef.js",
-    "regel": 103,
-    "leest": [
-     "IDEMBESLUIT.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/lib/wetboek.js",
-    "regel": 137,
-    "leest": [
-     "SABOTAGE.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/lib/zwaareffect.js",
-    "regel": 103,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "onderscheidt"
-   },
-   {
-    "bestand": "scripts/lussen.js",
-    "regel": 585,
-    "leest": [
-     "LUSSEN.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/machinedekking.js",
-    "regel": 132,
-    "leest": [
-     "KERNHERKOMST.json",
-     "MUTATIECONTRACT.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/machinedekking.js",
-    "regel": 345,
-    "leest": [
-     "KERNHERKOMST.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/machinedekking.js",
-    "regel": 441,
-    "leest": [
-     "EXECUTION_MAP.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/machinedekking.js",
-    "regel": 688,
-    "leest": [
-     "DEKKING.json",
-     "MACHINEDEKKING.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/mutatiecontract.js",
-    "regel": 80,
-    "leest": [
-     "AFGELEID.json",
-     "MUTATIECONTRACT-AFGELEID.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/mutatiecontract.js",
-    "regel": 84,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/mutatiecontract.js",
-    "regel": 94,
-    "leest": [
-     "SCHRIJFANALYSE.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/mutatieinventaris.js",
-    "regel": 111,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/mutatiepoort.js",
-    "regel": 36,
-    "leest": [
-     "MUTATIECONTRACT.json"
-    ],
-    "soort": "onderscheidt"
-   },
-   {
-    "bestand": "scripts/onbewezen.js",
-    "regel": 242,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/outputband.js",
-    "regel": 85,
-    "leest": [
-     "OUTPUTPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/outputband.js",
-    "regel": 128,
-    "leest": [
-     "INHOUDSKAART.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/outputband.js",
-    "regel": 196,
-    "leest": [
-     "OUTPUTPROEF.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/outputproef.js",
-    "regel": 81,
-    "leest": [
-     "MUTATIES.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/outputproef.js",
-    "regel": 145,
-    "leest": [
-     "INHOUDSKAART.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/outputproef.js",
-    "regel": 260,
-    "leest": [
-     "OUTPUTPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/outputproef.js",
-    "regel": 273,
-    "leest": [
-     "OUTPUTPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/overleving.js",
-    "regel": 520,
-    "leest": [
-     "OVERLEVING.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/resolver.js",
-    "regel": 37,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/resolverbereik.js",
-    "regel": 75,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/rolronde.js",
-    "regel": 289,
-    "leest": [
-     "NORM.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/rommeltaal.js",
-    "regel": 80,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/samenhang.js",
-    "regel": 192,
-    "leest": [
-     "KRIMP.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/scherfmeter.js",
-    "regel": 178,
-    "leest": [
-     "SCHERFMETER.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/schermen.js",
-    "regel": 269,
-    "leest": [
-     "NORM.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/schermroutes.js",
-    "regel": 212,
-    "leest": [
-     "ROUTEBRON.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/schrijfanalyse.js",
-    "regel": 107,
-    "leest": [
-     "IDEMPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/staatproef-route.js",
-    "regel": 157,
-    "leest": [
-     "STAATPROEF.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/taalkwaliteit.js",
-    "regel": 53,
-    "leest": [
-     "TAALOORDEEL.json"
-    ],
-    "soort": "anders"
-   },
-   {
-    "bestand": "scripts/test-runner.js",
-    "regel": 328,
-    "leest": [
-     "SUITE.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/toetsduur.js",
-    "regel": 290,
-    "leest": [
-     "TOETSDUUR.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/veranderbereik.js",
-    "regel": 666,
-    "leest": [
-     "VERANDERBEREIK-RONDE.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/verband.js",
-    "regel": 141,
-    "leest": [
-     "WETTEN.json"
-    ],
-    "soort": "zegtHet"
-   },
-   {
-    "bestand": "scripts/verband.js",
-    "regel": 147,
-    "leest": [
-     "MUTATIES.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/wachtwijze.js",
-    "regel": 124,
-    "leest": [
-     "WACHTWIJZE.json"
-    ],
-    "soort": "smeltSamen"
-   },
-   {
-    "bestand": "scripts/wekkers.js",
-    "regel": 122,
-    "leest": [
-     "ACTIVERING.json"
-    ],
-    "soort": "gooit"
-   }
-  ]
- }
 }

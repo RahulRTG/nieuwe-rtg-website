@@ -2,6 +2,7 @@
    het besluit (met automatische uitnodiging via maakInvite uit de personeels-
    laag); de sollicitatiechat staat in ./sollchat.js. Gemount vanuit
    routes/supplier/werving.js. */
+const { eigenVeld } = require('../../../kern/util');
 const { datum: klokDatum } = require('../../../lib/klok');
 const { vulVacature } = require('./vacature');
 module.exports = (wctx) => {
@@ -108,7 +109,9 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
-require('./sollchat')(kern);
+require('./sollchat')(kern, { chatVan: (id) => eigenVeld(db.data.applyChats, id),
+  sollicitatieVan: (code, id) => (db.data.applications[code] || []).find(x => x.id === id),
+  heeftMeldingen: (key) => !!db.data.notifications[key] });
 
 app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;

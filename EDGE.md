@@ -184,8 +184,8 @@ Het oordeel dat daaruit volgt:
   over betekenis: `registerAction` in de kern was een tweede register met een
   eigen uitvoerweg, en de adaptieve Edge vroeg met `window.confirm` in plaats van
   langs het gewicht. `window.confirm` is weg, en het tweede register kent alleen
-  nog licht en voert uit langs `RTGGewicht.voer`; LEEG is het pas in ronde 2
-  (besluit 11), want drie schermen leunen er nog op. Welke handelingen
+  nog licht en voert uit langs `RTGGewicht.voer`; LEEG is het pas in ronde 2,
+  want drie schermen leunen er nog op. Welke handelingen
   er zijn, leest het sinds ronde 0 niet meer zelf: `rtg-adaptive-edge-controls.js`
   vraagt ze aan het blikveld in plaats van `RTGAdaptief.voorNu()`.
 - **Het Edge-casco en Edge 2 zijn compat**: `registerAction` en de padtabel van
@@ -559,7 +559,7 @@ een andere naam of in één domein, en het werk is aansluiten en niet uitvinden.
 | 21 | Work deck | stap weg | 2 | Besloten (besluit 10): het open werkstuk; Office is de eerste producent. |
 | 22 | Meeting deck | stap weg | 4 | Meet bestaat als domein met een meeleesbaan; de Edge krijgt er alleen een compat-handeling van. |
 | 23 | Creation deck | stap weg | 2 | Document, Sheet en Present publiceren al context en handelingen; sinds deze ronde werken hun bewuste handelingen ook in het Edge-blad buiten de schil. |
-| 24 | Edge-handelingen als capabilities | stap weg | 1 en 2 | `RTGAdaptief` is al een capabilityregister. Het tweede register (`registerAction`) kent sinds ronde 1 alleen licht en voert uit langs `RTGGewicht.voer`; leeg is het pas in ronde 2 (besluit 11), als de drie schermen die erop leunen via `RTGAdaptief.declareer` publiceren. |
+| 24 | Edge-handelingen als capabilities | stap weg | 1 en 2 | `RTGAdaptief` is al een capabilityregister. Het tweede register (`registerAction`) kent sinds ronde 1 alleen licht en voert uit langs `RTGGewicht.voer`; leeg is het pas in ronde 2, als de drie schermen die erop leunen via `RTGAdaptief.declareer` publiceren. |
 | 25 | Action contracts | stap weg | 3 | Het contract met vier standen staat, over alle combinaties getoetst. Risico, authenticatie en resultaat ontbreken; gezag, gevolg en herstel staan overal op onbekend. |
 | 26 | Risk-aware actions | stap weg | 3 | Gewicht wordt per scherm verklaard, niet uit risico berekend; de frictiemotor die dat per bedrag wel doet, hangt niet aan de Edge. |
 | 27 | Preview before commit | staat | 3 | Bewust, zwaar en plechtig laten eerst zien wat er gebeurt; zonder gewichtlaag gaan ze dicht. Het GEMETEN gevolg zit er nog niet in. |
@@ -603,8 +603,8 @@ nooit op "de functie staat erin".
 | Ronde | Wat hij bewijst | Stand |
 |---|---|---|
 | 0 — fundament | de kaart, het ene leespad, herkomst per waarde, het actiecontract, de dekkingsmeter en de ratels | **staat** (dit document) |
-| 1 — fundament verbreden | de dode kanalen gesloten of verwijderd, het tweede register leeg, elke hoofdactie in een blad zichtbaar voor de schil | een stap weg |
-| 2 — context | elk scherm publiceert wereld, context en (waar het er een heeft) object en activiteit; `RTGWorkspaceContext` leest het blikveld | een stap weg |
+| 1 — fundament verbreden | de dode kanalen gesloten of verwijderd, het tweede register alleen licht (uitvoering langs `RTGGewicht.voer`), elke hoofdactie in een blad zichtbaar voor de schil | een stap weg |
+| 2 — context | elk scherm publiceert wereld, context en (waar het er een heeft) object en activiteit; `RTGWorkspaceContext` leest het blikveld; het tweede register leeg (de drie schermen die erop leunen, publiceren via `RTGAdaptief.declareer`) | een stap weg |
 | 3 — actie en trust | het eerste serveroordeel per principal en capability, één vorm voor "waarom niet", de voorgrondresolver, gewicht afgedwongen in `RTGAdaptief.doe` | een stap weg, deels besluit |
 | 4 — voortzetting en realtime | voortzetting als contract (besluit 1), presence met echte producenten, een task stack | een stap weg; de servervariant vraagt een besluit |
 | 5 — Rahul | Rahul leest het blikveld en `waarom.js`, stelt handelingen voor uit het register, en beslist niets | een stap weg na ronde 3 |
@@ -632,7 +632,7 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
 - `allowed: false` zonder reden viel stil uit de balk en is nu een zichtbaar
   gebrek (par. 1);
 - zonder gewichtstabel faalde een zware handeling open (par. 3);
-- **ronde 1: de 17 dode kanalen zijn gesloten.** Vijftien zijn weggehaald: de
+- **ronde 1: de 17 dode kanalen zijn gesloten.** Zestien zijn weggehaald: de
   vijf luisteraars in `rtg-adaptive-edge-signals.js` (er komt geen verzonnen
   zender bij; de directe API blijft), de luisteraar op `rtg-edge-ready` (de
   observer op `data-rtg-adaptive-ready` was al de echte trigger), en de zenders

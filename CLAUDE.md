@@ -1533,7 +1533,7 @@ dat letterlijk in de bron moet staan) vond <!--getal:edgekaart.dubbeleEigenaars-
 verantwoordelijkheden met meer dan één eigenaar (twee capabilityregisters, twee
 contextmodellen, vier plekken die de wereld vaststellen, vijf standmachines) en
 17 dode kanalen, waaronder precies de vijf signalen waar de adaptieve Edge naar
-luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (vijftien
+luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
 weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
 nu op <!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode tegenover
 <!--getal:edgekaart.levendeKanalen-->13<!--/getal--> levende kanalen. Het **Edge

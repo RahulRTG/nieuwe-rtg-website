@@ -52,7 +52,7 @@ test('elke dubbele eigenaar is verklaard, en elke verklaring hoort bij een dubbe
   assert.equal(r.telling.dodeKanalen, r.dodeKanalen.luisterZonderZender.length + r.dodeKanalen.zendZonderLuisteraar.length);
 });
 
-/* GEEN DOOD RTG-KANAAL (EDGE.md par. 10, ronde 1). Er waren er 17: vijftien
+/* GEEN DOOD RTG-KANAAL (EDGE.md par. 11, ronde 1). Er waren er 17: zestien
    zijn weggehaald en rtg-palet-open is aangesloten. Een nieuwe zender zonder
    luisteraar (of andersom) laat deze toets zakken met de naam erbij.
 

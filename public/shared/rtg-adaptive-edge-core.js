@@ -80,10 +80,10 @@
         return { id: id, label: m.registry[id].label, allowed: allowed(m.registry[id]) };
       }) };
   }
-  /* Het tweede register kent ALLEEN licht (EDGE.md par. 10, ronde 1). Wat een
+  /* Het tweede register kent ALLEEN licht (EDGE.md par. 11, ronde 1). Wat een
      bevestiging vraagt, hoort in RTGAdaptief en weegt langs de grammatica; een
      eigen confirm of een zwaarder gewicht wordt geweigerd, nooit stil licht
-     uitgevoerd. Leeg maken is ronde 2 (besluit 11). */
+     uitgevoerd. Leeg maken is ronde 2 (drie schermen leunen er nog op). */
   function register(state, item) {
     var id = String(item && item.id || '');
     if (!state || !/^[a-z][a-z0-9-]{1,39}$/.test(id)) return false;

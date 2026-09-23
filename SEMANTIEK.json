@@ -2178,7 +2178,7 @@
       "naam": "BRONNEN",
       "domeinen": 8,
       "betekenissen": 8,
-      "hoogsteOverlap": 0,
+      "hoogsteOverlap": 0.05,
       "soort": "botsing",
       "waar": [
         {
@@ -2196,12 +2196,12 @@
           "bestanden": [
             "server/kern/dagcoach.js"
           ],
-          "leden": 6,
+          "leden": 8,
           "voorbeeld": [
+            "agenda",
+            "boeking",
             "medicijnen",
-            "zorg",
-            "verzorging",
-            "gewoonten"
+            "zorg"
           ]
         },
         {

@@ -1078,25 +1078,25 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda",
-   "bestand": "server/foundation/gasten/gezinsleven.js:22",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:71",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/bereik",
-   "bestand": "server/foundation/gasten/gezinsleven.js:54",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:113",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/verwijder",
-   "bestand": "server/foundation/gasten/gezinsleven.js:86",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:137",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/wijzig",
-   "bestand": "server/foundation/gasten/gezinsleven.js:37",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:90",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1270,25 +1270,25 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus",
-   "bestand": "server/foundation/gasten/gezinsleven.js:106",
+   "bestand": "server/foundation/gasten/gezinsleven.js:10",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus/gedaan",
-   "bestand": "server/foundation/gasten/gezinsleven.js:119",
+   "bestand": "server/foundation/gasten/gezinsleven.js:23",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus/keur",
-   "bestand": "server/foundation/gasten/gezinsleven.js:129",
+   "bestand": "server/foundation/gasten/gezinsleven.js:33",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/klus/verwijder",
-   "bestand": "server/foundation/gasten/gezinsleven.js:140",
+   "bestand": "server/foundation/gasten/gezinsleven.js:44",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1456,19 +1456,19 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen",
-   "bestand": "server/foundation/zorg.js:92",
+   "bestand": "server/foundation/zorg.js:103",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/bevestig",
-   "bestand": "server/foundation/zorg.js:99",
+   "bestand": "server/foundation/zorg.js:110",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/intrekken",
-   "bestand": "server/foundation/zorg.js:107",
+   "bestand": "server/foundation/zorg.js:118",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -3515,7 +3515,7 @@
   },
   {
    "sleutel": "POST /api/rtf/solliciteer",
-   "bestand": "server/routes/member/werk/rtf.js:46",
+   "bestand": "server/routes/member/werk/rtf.js:51",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },
@@ -3797,7 +3797,7 @@
   },
   {
    "sleutel": "POST /api/rtf/vacatures",
-   "bestand": "server/routes/member/werk/rtf.js:32",
+   "bestand": "server/routes/member/werk/rtf.js:37",
    "staat": "openbaar",
    "reden": "openstaande vacatures zijn openbaar"
   },
@@ -3868,7 +3868,7 @@
   },
   {
    "sleutel": "POST /api/supplier/apply",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js:12",
+   "bestand": "server/routes/supplier/werving/sollicitaties.js:13",
    "staat": "openbaar",
    "reden": "solliciteren bij een zaak kan zonder account"
   },

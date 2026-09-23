@@ -35,7 +35,7 @@ const IK = 'Proef Kraanvogel 0002';
 const ZAAK_A = 'AAA', ZAAK_B = 'BBB';
 
 /* Zaak A heeft MEER geschiedenis dan B, en dat is met opzet: zonder verschil in
-   zekerheid valt er geen volgorde te bewaken, en dan zegt een toets over
+   aantal bezoeken valt er geen volgorde te bewaken, en dan zegt een toets over
    rangschikking niets. Nu is A van zichzelf de sterkste verwachting, en moet
    plaats hem opzij kunnen zetten om iets te bewijzen. */
 function boekingen(nu) {
@@ -86,8 +86,8 @@ test('1. zonder plaatslaag verandert er niets aan de voorspeller', () => {
 test('2. niets gemeten laat de volgorde met rust', () => {
   const { v } = maak();
   const r = v.voorLid(IK, null);
-  /* De volgorde is die van de zekerheid, precies zoals zonder plaatslaag. Dit
-     moet op een ECHT verschil worden gemeten: bij gelijke zekerheid zou elke
+  /* De volgorde is die van de gewoonte zelf (meeste bezoeken eerst), precies zoals zonder plaatslaag. Dit
+     moet op een ECHT verschil worden gemeten: bij een gelijke gewoonte zou elke
      rangschikking deze toets halen, ook een verkeerde. */
   assert.deepEqual(codes(r), [ZAAK_A, ZAAK_B], 'de sterkste gewoonte staat vooraan');
   for (const w of r.verwachtingen) {
@@ -108,11 +108,11 @@ test('3. wie in de buurt is, komt naar voren -- met de reden erbij', () => {
   assert.deepEqual(r.verwachtingen[0].nabij, { bevestigd: true, gemeten: true });
   assert.match(r.verwachtingen[0].waarom, /je bent nu in de buurt/,
     'Rahul noemt zijn bron: een verwachting die om een onzichtbare reden stijgt, is niet na te rekenen');
-  /* En de zekerheid is NIET opgeblazen. Die staat voor een geleerde frequentie;
-     er nabijheid bij optellen zou het getal iets anders laten betekenen. */
+  /* En de opbouw is NIET opgeblazen. Die staat voor een geleerde frequentie;
+     er nabijheid bij optellen zou hem iets anders laten betekenen. */
   const zonder = require('../server/kern/voorspel').gewoontenUit(
     boekingen(Date.now()), 'lid:' + IK).find(g => g.code === ZAAK_B);
-  assert.equal(r.verwachtingen[0].zekerheid, zonder.zekerheid,
+  assert.deepEqual(r.verwachtingen[0].opbouw, zonder.opbouw,
     'nabijheid verandert de volgorde, niet het getal');
 });
 
@@ -156,7 +156,7 @@ test('5. een waarneming voor je DIENST voedt geen aanbeveling', () => {
 
 test('6. het stille seintje zwijgt als je aantoonbaar ergens anders bent', () => {
   const { v, plaats } = maak();
-  const rijp = { verwachtingen: [{ code: ZAAK_A, rijp: 1, zekerheid: 0.9, soort: 'gewoonte',
+  const rijp = { verwachtingen: [{ code: ZAAK_A, rijp: 1, soort: 'gewoonte',
     wat: 'Zaak A rond 19:00', waarom: '5 eerdere bezoeken' }] };
   assert.ok(v.seintjeVoor(rijp), 'een rijpe verwachting fluistert mee');
 

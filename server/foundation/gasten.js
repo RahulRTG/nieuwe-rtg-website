@@ -9,8 +9,8 @@ module.exports = (ctx) => {
      mount-volgorde is vrij. */
   const deelKoppeling = require('./gasten/koppeling')(ctx);
   Object.assign(ctx, deelKoppeling);
-  const deelLeven = require('./gasten/gezinsleven')(ctx);
-  Object.assign(ctx, deelLeven);
+  Object.assign(ctx, require('./gasten/gezinsagenda')(ctx));
+  require('./gasten/gezinsleven')(ctx);
   require('./gasten/geldschool')(ctx);
   require('./gasten/keuken')(ctx);
   require('./gasten/ochtend')(ctx);

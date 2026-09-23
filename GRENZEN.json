@@ -273,6 +273,7 @@
     "connect": [
       "connect"
     ],
+    "connect-gezinsdeur": [],
     "consent": [
       "commercieelStand",
       "commercieelZet",
@@ -654,6 +655,7 @@
       "labfonds",
       "rtf"
     ],
+    "labfonds-gezinsdeur": [],
     "ledenbalie": [
       "afdelingen",
       "balieAboVoorstel",
@@ -1415,6 +1417,7 @@
       "notify",
       "notifySupplier",
       "officeQueryMag",
+      "officeQueryOpNaam",
       "officeState",
       "ondernemingBijdrageZet",
       "ondernemingProvisioningZet",
@@ -2111,6 +2114,7 @@
       "happyKorting",
       "hasCred",
       "haversine",
+      "heeftKantoor",
       "heleCenten",
       "herkomst",
       "herstelGeldig",

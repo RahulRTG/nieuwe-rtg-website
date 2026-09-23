@@ -95,7 +95,7 @@
 
   async function bewaar() {
     var naam = $('#blReceptNaam').value.trim(), tekst = $('#blReceptTekst').value.trim();
-    if (!naam || !tekst) return;
+    if (!naam || !tekst) { w.Geld.melding(!naam ? 'Geef het recept eerst een naam.' : 'Vul eerst het recept in.'); $(!naam ? '#blReceptNaam' : '#blReceptTekst').focus(); return; }
     await kluis();
     if (!w.Toestelkluis || !w.Toestelkluis.kan()) { w.Geld.melding('De kluis van dit toestel is hier niet beschikbaar.'); return; }
     await w.Toestelkluis.bewaar('recept_' + naam + '.txt', new w.Blob([tekst], { type: 'text/plain' }));

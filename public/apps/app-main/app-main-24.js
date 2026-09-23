@@ -73,7 +73,7 @@
     nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/geld.html#nalatenschap' },
     logboek:     { naam: 'Logboek',       url: '/apps/geld.html#logboek' },
     cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
-    pulse:       { naam: 'Vandaag',         url: '/apps/pulse.html' },
+    pulse:       { naam: 'Pulse',           url: '/apps/pulse.html' },
     nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
     krant:       { naam: 'Krant',     url: '/apps/krant.html' },
     /* RTG Reizen staat NAAST Vluchten, Verblijven, Reisbureau en Hangar en niet

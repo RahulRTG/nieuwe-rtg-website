@@ -27,8 +27,8 @@
        een wereld hangen zou een deur maken naar een tafel waar u niet zit. */
     mall:        { naam: 'Mall',          url: '/apps/mall.html' },
     mijnmall:    { naam: 'Mijn bestellingen', url: '/apps/mijnmall.html' },
-    pay:         { naam: 'Betalen',       url: '/apps/pay.html' },
-    huis:        { naam: 'Thuis',         url: '/apps/thuis.html' },
+    pay:         { naam: 'RTG Pay',       url: '/apps/pay.html' },
+    huis:        { naam: 'Logeren bij leden', url: '/apps/thuis.html' },
     uitgaan:     { naam: 'Uitgaan',       url: '/apps/uitgaan.html' },
     foodcourt:   { naam: 'Food Court',    url: '/apps/foodcourt.html' },
     spelavond:   { naam: 'Game Night',    url: '/apps/spelscherm.html' },

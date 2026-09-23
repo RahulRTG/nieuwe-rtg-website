@@ -101,9 +101,15 @@ module.exports = {
   //   zit, maar herstelt daarbij wel de kijkersboom; twee keer weggaan is een
   //   keer weggaan.
 
-  'POST /api/bank/advies': { zelfdeVerzoek: true }
+  'POST /api/bank/advies': { zelfdeVerzoek: true },
   // ^ dezelfde vraag binnen het venster is een dubbeltik, geen tweede vraag.
   //   Deze route roept een model aan (kern/bank/advies.js); een herhaling
   //   opslikken scheelt een modelaanroep en verliest niets, want het advies
   //   gaat over dezelfde stand.
+
+  /* De beleidsmotor in de schaduw (AUTHORITY.md fase 1), zelfde vorm als
+     /api/office/mensdeur: de handler LEEST de stand, de telling loopt via
+     res.finish in de poort. Zie server/lib/mutatiecontracten-beleidsmotor.js. */
+  'POST /api/office/beleidsmotor': { leest: true },
+  'POST /api/office/beleidsmotor/waarom': { leest: true }
 };

@@ -165,8 +165,19 @@
     return !G.vraagt;
   }
 
+  /* Het gewicht dat een handeling WERKELIJK krijgt, op een plek zodat gewicht.js
+     (dat uitvoert) en edge/actiestaat.js (dat toont) nooit uit elkaar lopen:
+     `terug` zonder weg terug is `bewust`, en een onbekende trap is `zwaar` --
+     dicht, want een tikfout mag geen lichte handeling maken. */
+  function effectief(gewicht, kanTerug) {
+    var g = gewicht || 'licht';
+    if (!GEWICHT[g]) return 'zwaar';
+    return g === 'terug' && !kanTerug ? 'bewust' : g;
+  }
+
   var gram = { GEBAREN: GEBAREN, GEWICHT: GEWICHT, TRAPPEN: TRAPPEN, VASTHOUD: VASTHOUD,
-    BRONNEN: BRONNEN, verhindering: verhindering, uitleg: uitleg, keur: keur, directMag: directMag };
+    BRONNEN: BRONNEN, verhindering: verhindering, uitleg: uitleg, keur: keur, directMag: directMag,
+    effectief: effectief };
 
   if (typeof module !== 'undefined' && module.exports) { module.exports = gram; return; }
   root.RTGGrammatica = gram;

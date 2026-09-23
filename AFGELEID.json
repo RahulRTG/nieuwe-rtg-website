@@ -11,17 +11,17 @@
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 306,
-  "bron": 9,
-  "afgeleid": 169,
-  "fragmenten": 22,
+  "artefacten": 314,
+  "bron": 10,
+  "afgeleid": 173,
+  "fragmenten": 25,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 190,
-  "afgeleidEigenaarHard": 167,
+  "metEigenaar": 197,
+  "afgeleidEigenaarHard": 171,
   "afgeleidGrendelt": 18,
-  "metStempel": 98,
+  "metStempel": 101,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -182,6 +182,18 @@
    "stempelInstrument": "scripts/appwerkt.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run appwerkt",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ARBEID.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -871,6 +883,46 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EDGE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EDGEDEKKING.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/edgedekking.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/edgedekking.js"
+   ],
+   "stempelInstrument": "scripts/edgedekking.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run edgedekking",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "EDGEKAART.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/edgekaart.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/edgekaart.js"
+   ],
+   "stempelInstrument": "scripts/edgekaart.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run edgekaart",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2503,6 +2555,32 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "OFFICE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "OFFICEVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/officevorm.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/officevorm.js"
+   ],
+   "stempelInstrument": "scripts/officevorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run officevorm:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "OMZETPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/omzetproef.js",
@@ -3082,6 +3160,32 @@
    "stempelInstrument": "scripts/scherfmeter.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run scherfmeter:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMEIGENAAR.json",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHERMFUNCTIE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schermfunctie.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/schermfunctie.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run schermfunctie",
    "grendelt": false,
    "botsingVerklaard": null
   },

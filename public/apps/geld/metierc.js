@@ -161,7 +161,7 @@
   async function chat(ev) {
     ev.preventDefault();
     var Geld = w.Geld, u = d.getElementById('mtAiUit'), t = val('mtAiIn').trim();
-    if (!t) return;
+    if (!t) { u.hidden = false; u.textContent = 'Zeg eerst wat er moet gebeuren.'; d.getElementById('mtAiIn').focus(); return; }
     d.getElementById('mtAiIn').value = '';
     u.hidden = false;
     u.textContent = 'Rahul denkt mee…';

@@ -96,7 +96,7 @@ function toon(d){
 }
 
 async function open_(code){
-  if(!code){ return; }
+  if(!code){ $('#uit').innerHTML='<p class="leeg">Vul eerst de code in die u kreeg.</p>'; $('#code').focus(); return; }
   try{
     const r = await fetch('/api/carriere/regel/toon',{method:'POST',
       headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});

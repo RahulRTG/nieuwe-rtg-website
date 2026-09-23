@@ -118,7 +118,8 @@
 
   $('#komBtn').addEventListener('click', function () {
     var code = $('#komCode').value.trim().toUpperCase();
-    if (code) { $('#komCode').value = ''; binnen({ code: code }); }
+    if (!code) { meld('Vul eerst de code van het gesprek in.'); $('#komCode').focus(); return; }
+    $('#komCode').value = ''; binnen({ code: code });
   });
   $('#komCode').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') $('#komBtn').click();

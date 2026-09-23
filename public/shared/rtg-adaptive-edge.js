@@ -61,11 +61,7 @@
     rt.sheetTitle.textContent = continuation && continuation.title || rt.edge.ctx.title || d.title || 'Wat wilt u doen?';
     rt.sheetCopy.textContent = continuation && continuation.copy || 'Wat wilt u doen?';
     rt.sheetList.textContent = '';
-    items.forEach(function (item) {
-      var b = d.createElement('button'); b.type = 'button'; b.className = 'rtg-adaptive-sheet-action';
-      b.dataset.rtgAdaptiveAction = item.id; b.textContent = item.label;
-      b.addEventListener('click', function () { execute(item.id); }); rt.sheetList.appendChild(b);
-    });
+    items.forEach(function (item) { rt.sheetList.appendChild(K.sheetButton(d, item, execute)); });
     if (!items.length) {
       var empty = d.createElement('p'); empty.className = 'rtg-adaptive-empty';
       empty.textContent = 'Voor deze context zijn geen veilige acties beschikbaar.'; rt.sheetList.appendChild(empty);

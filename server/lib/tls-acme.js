@@ -27,12 +27,9 @@ function tlsMap(dataDir) {
    niet telkens opnieuw raken). */
 function laadAccountSleutel(dataDir) {
   const pad = path.join(tlsMap(dataDir), 'acme-account.key');
-  try { return fs.readFileSync(pad, 'utf8'); }
-  catch (e) {
-    const key = x509.genKeyPair({ type: 'ec' }).keyPem;
-    try { fs.writeFileSync(pad, key, { mode: 0o600 }); } catch (x) {}
-    return key;
-  }
+  // lezen, of als eerste publiceren: nooit half, nooit twee accounts (server/lib/sleutelbestand.js)
+  return require('./sleutelbestand').leesOfPubliceer(pad, () => x509.genKeyPair({ type: 'ec' }).keyPem,
+    (p) => fs.readFileSync(p, 'utf8'));
 }
 
 // Het live certificaat op schijf (keten + sleutel), voor warme herstart en om te

@@ -185,6 +185,12 @@ const REGISTER = {
      gedeeldheid door een regex in plaats van door een feit, en leest de nul als
      bevestiging terwijl hij een blinde vlek is. */
   'PLANVORM.json': { meter: ['planDomeinenGemeten'] },
+  /* OFFICEVORM.json meet of de elf objectdomeinen onder het voorgestelde
+     `RTGObject` (OFFICE.md par. 0) een datavorm delen. Geratelde waarde: het
+     BEREIK, om exact de reden van PLANVORM.json hierboven -- de uitkomst is een
+     nul, en een nul over minder domeinen leest als bevestiging terwijl hij een
+     blinde vlek is. */
+  'OFFICEVORM.json': { meter: ['officeDomeinenGemeten'] },
   /* NEIGINGVORM.json meet of er een persoonlijke laag bij mag en in welke vorm
      (NEIGING.md par. 0). Twee geratelde waarden, en met opzet geen derde over de
      NAAMmeting: die telt sinds server/kern/neiging/ bestaat zijn eigen bestanden
@@ -259,6 +265,12 @@ const REGISTER = {
   'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt', 'tredeIngangLekken'] },
   'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },
   'ZAAKWIG.json': { meter: ['zaakwigGezakt'] },
+  /* DE EDGE (EDGE.md par. 7). De kaart draagt twee schulden; de dekking een
+     schuld die op nul hoort te staan en negen veldtanden die alleen omhoog
+     mogen. De vergelijking per scherm zit daarnaast in edgedekking.js zelf. */
+  'EDGEKAART.json': { meter: ['edgeDubbeleEigenaars', 'rtgDodeKanalen'] },
+  'EDGEDEKKING.json': { meter: ['edgeGeblokkeerdZonderWaarom', 'edgeVeldIdentiteit', 'edgeVeldWereld', 'edgeVeldContext',
+    'edgeVeldObject', 'edgeVeldActiviteit', 'edgeVeldPresence', 'edgeVeldVoortzetting', 'edgeVeldHoofdactie', 'edgeVeldTrust'] },
   'MEETLEER.json': { meter: ['meetleerBlind'] },
 
   /* Deze vier dragen hun eigen grondwaarde. De ratel staat in het genoemde
@@ -283,6 +295,12 @@ const REGISTER = {
   'ISOLATIESCHADUW.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'ISOLATIEPROEF.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
+  /* De consolidatieronde (CLAUDE.md, SCHERMEIGENAAR.json). De toets meet VERS
+     met scripts/schermfunctie.js en zakt op een overlappaar zonder oordeel, een
+     menu-ingang op een alias en een link naar een alias; het aantal open
+     oordelen mag er alleen dalen (OPEN_MAX). */
+  'SCHERMFUNCTIE.json': { eigenRatel: 'test/schermeigenaar.test.js' },
+  'SCHERMEIGENAAR.json': { eigenRatel: 'test/schermeigenaar.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
   /* De Business Proof Map en de vierde gouden keten. Beide hangen aan
      test/ondernemerbewijs.test.js, en dat is geen regel-om-de-regel: die toets

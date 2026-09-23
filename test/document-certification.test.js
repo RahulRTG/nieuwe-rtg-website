@@ -80,7 +80,7 @@ test('Edge completion waits for the operation; rejected effects are never announ
   for (const success of [false, true]) {
     let resolve, reject; const notifications = [];
     const pending = new Promise((a, b) => { resolve = a; reject = b; });
-    const w = { RTGGrammatica: {}, RTGAdaptief: { doe: () => pending }, RTGRail: { meld: x => notifications.push(x.tekst) } };
+    const w = { RTGGrammatica: require('../public/shared/adaptief/grammatica.js'), RTGAdaptief: { doe: () => pending }, RTGRail: { meld: x => notifications.push(x.tekst) } };
     vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../public/shared/adaptief/gewicht.js'), 'utf8'), { window: w, document: {} });
     assert.equal(w.RTGGewicht.voer({ id: 'documents.trash', naam: 'Trash', gewicht: 'terug', ongedaan() {} }), true);
     assert.deepEqual(notifications, []);

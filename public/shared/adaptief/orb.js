@@ -88,6 +88,9 @@
       w.setTimeout(function () {
         if (it.verhinderd && w.RTGWaarom) { w.RTGWaarom.leguit(it); return; }
         if (w.RTGGewicht) { w.RTGGewicht.voer(it); return; }
+        /* Zonder gewichtlaag alleen wat licht is, net als de balk: stil zwaar
+           uitvoeren is de enige uitkomst die hier niet mag. */
+        if ((it.gewicht || 'licht') !== 'licht') return;
         if (w.RTGAdaptief) w.RTGAdaptief.doe(it.id);
       }, 60);
     };

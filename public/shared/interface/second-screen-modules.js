@@ -72,7 +72,7 @@
     }
     function laatsteContext() { return (A && A.context && A.context()) || laatste || {}; }
     return {
-      actions: { 'context.execute': { run: function (p) { if (A && A.doe) return A.doe(String(p.id || '')); } } },
+      actions: { 'context.execute': { run: function (p) { return !!w.RTGGewicht && w.RTGGewicht.voerId(String(p.id)); } } },
       mount: function (body) {
         root = el('div', 'rtg-ss-context'); body.appendChild(root); teken(laatsteContext());
         if (A && A.opContext) af = A.opContext(teken);

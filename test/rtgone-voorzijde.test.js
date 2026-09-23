@@ -32,7 +32,7 @@ test('de rustige voorzijde tekent uitsluitend gegevens uit de bestaande RTG One-
 });
 
 test('besluiten en overdrachten blijven aan de bestaande menselijke bediening gekoppeld',()=>{
-  assert.match(gedrag,/w\.act\('goedkeuring\/beslis'/);
+  assert.match(gedrag,/decision-room\.html\?id=/,'een besluit opent in Decision Room');
   assert.match(gedrag,/w\.decisionForm\(\)/);
   assert.match(gedrag,/w\.openForm\('handover'\)/);
   assert.match(gedrag,/querySelector\('\[data-house=/);
@@ -40,4 +40,18 @@ test('besluiten en overdrachten blijven aan de bestaande menselijke bediening ge
   assert.match(beeld,/Geen stille rechtenoverdracht/);
   assert.match(beeld,/het geeft zelf geen nieuwe systeemrechten/);
   assert.match(gedrag,/Rustig overzicht/);
+});
+
+test('RTG One toont besluiten en projecten, maar beslissen en taken bijwerken hebben een eigenaar',()=>{
+  /* SCHERMEIGENAAR.json: Decision Room is eigenaar van voorleggen en beslissen,
+     Project Room van taken, bewijs en oplevering. RTG One stuurde er naast die
+     twee kamers een eigen beslis- en afvinkweg op dezelfde routes bij. De
+     MUTATIE: zet een van die aanroepen terug en deze toets zakt. */
+  for(const bron of [html,gedrag,beeld]){
+    assert.doesNotMatch(bron,/goedkeuring\/beslis/,'RTG One beslist niet zelf');
+    assert.doesNotMatch(bron,/project\/taak/,'RTG One vinkt geen projecttaken af');
+  }
+  assert.match(html,/\/apps\/decision-room\.html\?nieuw=1/,'een nieuw besluit wordt voorgelegd in Decision Room');
+  assert.match(html,/\/apps\/project-room\.html\?project=/,'taken worden bijgewerkt in Project Room');
+  assert.match(lees('public/apps/decision-room.js'),/params\.get\('nieuw'\)/,'en Decision Room opent dan de intake');
 });

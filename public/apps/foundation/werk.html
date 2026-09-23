@@ -93,10 +93,10 @@
             <button type="button" data-weergave="trajecten">Trajecten <b id="railTrajecten">0</b></button>
           </nav>
           <h2>Beslis met feiten</h2>
-          <div class="werk-principle"><strong>Jij houdt de regie.</strong>Een score is nooit een besluit. RTG toont waarom iets past, wat onbekend is en welke gegevens je deelt.</div>
+          <div class="werk-principle"><strong>Jij houdt de regie.</strong>Er staat geen score op een kans. RTG toont waarom iets past, wat onbekend is en welke gegevens je deelt.</div>
         </aside>
         <section class="werk-results" aria-label="Passende vacatures">
-          <header class="werk-results-head"><h2 id="lijstTitel">Beste volgende kansen</h2><span id="lijstSub">Uitlegbaar gesorteerd</span></header>
+          <header class="werk-results-head"><h2 id="lijstTitel">Open kansen</h2><span id="lijstSub">Nieuwste eerst, of dichtstbij met je locatie</span></header>
           <div class="werk-list" id="lijst"><div class="werk-empty"><div><b>Vacatures laden…</b><p>We bouwen je persoonlijke Opportunity Desk.</p></div></div></div>
         </section>
         <article class="werk-detail" id="werkDetail" aria-live="polite"></article>
@@ -237,12 +237,12 @@ function matchVan(v){
   const profiel = zoekWoorden([cv.headline,(cv.skills||[]).join(' '),(cv.experience||[]).join(' '),cv.about].join(' '));
   const baan = zoekWoorden([v.func,v.omschrijving,(v.vaardigheden||[]).join(' '),v.typeLabel].join(' '));
   const raak = [...new Set(profiel.filter(x=>baan.some(y=>y.includes(x)||x.includes(y))))];
-  let score = 72 + Math.min(12, raak.length*3);
-  if (v.salarisMin || v.salarisMax) score += 3;
-  if (v.uren) score += 2;
-  if (v.werkvorm) score += 2;
-  if (mijnPlek && v.loc) score += 3;
-  score = Math.max(68,Math.min(96,score));
+  /* GEEN PERCENTAGE. Hier stond een "praktische match" die op 72 begon bij nul
+     overlap, nooit onder de 68 kwam en punten gaf voor wat de WERKGEVER
+     publiceerde -- onder een kop die "geen verborgen matchscore" belooft
+     (ARBEID.md par. 4 punt 4). Er staat nooit een getal waar niemand iets heeft
+     gemeten; wat er wel is, is de overlap zelf, in woorden. */
+  const label = raak.length ? 'Sluit aan op je cv' : 'Nog geen raakvlak met je cv';
   const sterk = [];
   if (raak.length) sterk.push('Sluit aan op '+raak.slice(0,2).join(' en ')+' in je profiel');
   else sterk.push('Past bij je gekozen leeftijd, land en type werk');
@@ -252,7 +252,7 @@ function matchVan(v){
   const aandacht = [];
   if (!(v.salarisMin || v.salarisMax)) aandacht.push('Salaris is nog niet gepubliceerd');
   if (!v.werkvorm) aandacht.push('Werkvorm is nog niet bevestigd');
-  return { score, sterk:sterk.slice(0,3), aandacht:aandacht.slice(0,2) };
+  return { label, sterk:sterk.slice(0,3), aandacht:aandacht.slice(0,2) };
 }
 function kmVan(v){ return mijnPlek && v.loc ? Geo.afstandKm(mijnPlek,v.loc) : null; }
 function plaatsVan(v){ return [v.plaats||v.stad,v.landNaam].filter(Boolean).join(', ') || 'Locatie volgt'; }
@@ -271,7 +271,7 @@ function gefilterdeVacatures(){
   let rij = vacatures.filter(v => !soort || v.soort===soort).filter(v => !q || [v.func,v.bedrijf,v.omschrijving,v.plaats,v.stad,v.typeLabel,(v.vaardigheden||[]).join(' ')].join(' ').toLowerCase().includes(q));
   if (werkWeergave === 'bewaard') rij = rij.filter(v=>werkState.bewaard.includes(v.id));
   rij = rij.map(v=>({v,m:matchVan(v),km:kmVan(v)}));
-  rij.sort((a,b)=> mijnPlek ? ((a.km==null?1e9:a.km)-(b.km==null?1e9:b.km)) : b.m.score-a.m.score || String(b.v.at||'').localeCompare(String(a.v.at||'')));
+  rij.sort((a,b)=> mijnPlek ? ((a.km==null?1e9:a.km)-(b.km==null?1e9:b.km)) : String(b.v.at||'').localeCompare(String(a.v.at||'')));
   return rij;
 }
 
@@ -372,7 +372,7 @@ function metaVan(v, km){
 function vacatureKaart(x){
   const v=x.v,m=x.m, actief=v.id===geselecteerdId, bewaard=werkState.bewaard.includes(v.id), vergelijk=werkState.vergelijk.includes(v.id);
   return '<article class="werk-card '+(actief?'actief':'')+'" data-open="'+esc(v.id)+'" tabindex="0" aria-label="Open '+esc(v.func)+' bij '+esc(v.bedrijf)+'">'+
-    '<div class="werk-card-top"><div><h3>'+esc(v.func)+'</h3><div class="bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div></div><span class="werk-score">'+m.score+'%</span></div>'+
+    '<div class="werk-card-top"><div><h3>'+esc(v.func)+'</h3><div class="bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div></div><span class="werk-score">'+esc(m.label)+'</span></div>'+
     '<div class="werk-card-meta">'+metaVan(v,x.km).slice(0,4).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>'+
     '<p class="werk-card-reason">'+esc(m.sterk[0])+'</p>'+
     '<div class="werk-card-actions"><button class="werk-icon-btn '+(bewaard?'aan':'')+'" type="button" data-bewaar="'+esc(v.id)+'">'+(bewaard?'Bewaard':'Bewaar')+'</button><button class="werk-icon-btn '+(vergelijk?'aan':'')+'" type="button" data-vergelijk="'+esc(v.id)+'">Vergelijk</button></div></article>';
@@ -382,7 +382,7 @@ function detailTeken(v){
   if(!v){ el.innerHTML='<div class="werk-empty"><div><b>Kies een kans</b><p>Je ziet hier de matchuitleg, voorwaarden en wat nog onbekend is.</p></div></div>'; return; }
   const m=matchVan(v), km=kmVan(v), al=verzonden().includes(v.id), bewaard=werkState.bewaard.includes(v.id);
   const facts=[['Salaris',salaris(v)],['Werkvorm',v.werkvorm?v.werkvorm.replace('-',' '):'Nog niet bevestigd'],['Locatie',plaatsVan(v)],['Tijd',v.uren||'In overleg'],['Dienstverband',SOORT[v.soort]||v.soort],['Afstand',km!=null?Geo.tekst(km):'Toon je afstand']];
-  el.innerHTML='<div class="werk-detail-inner"><button class="werk-icon-btn" id="detailTerug" type="button">← Terug naar kansen</button><div class="werk-detail-kicker">'+m.score+'% praktische match · uitlegbaar</div><h2>'+esc(v.func)+'</h2><div class="werk-detail-bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div>'+
+  el.innerHTML='<div class="werk-detail-inner"><button class="werk-icon-btn" id="detailTerug" type="button">← Terug naar kansen</button><div class="werk-detail-kicker">'+esc(m.label)+' · uitlegbaar</div><h2>'+esc(v.func)+'</h2><div class="werk-detail-bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div>'+
     '<div class="werk-detail-actions">'+(al?'<span class="verstuurd">Sollicitatie verstuurd</span>':'<button class="werk-primary" type="button" data-sol="'+esc(v.id)+'" data-code="'+esc(v.supplierCode)+'">Start een kennismaking</button>')+'<button class="werk-secondary" type="button" data-bewaar="'+esc(v.id)+'">'+(bewaard?'Verwijder uit bewaard':'Bewaar kans')+'</button><button class="werk-secondary" type="button" data-vergelijk="'+esc(v.id)+'">Vergelijk</button></div>'+
     '<div class="werk-facts">'+facts.map(f=>'<div class="werk-fact"><small>'+esc(f[0])+'</small><b>'+esc(f[1])+'</b></div>').join('')+'</div>'+
     '<section class="werk-section"><h3>Waarom dit bij je kan passen</h3><div class="werk-reasons">'+m.sterk.map(t=>'<div class="werk-reason"><i>✓</i><span>'+esc(t)+'</span></div>').join('')+m.aandacht.map(t=>'<div class="werk-reason aandacht"><i>!</i><span>'+esc(t)+'</span></div>').join('')+'</div></section>'+
@@ -419,7 +419,7 @@ function deckTeken(){
   const x=deckRij[deckPos];
   if(!x){ stage.innerHTML='<div class="werk-empty"><div><b>Ronde voltooid</b><p>Je hebt deze zorgvuldig gekozen kansen bekeken. Open je Desk om te vergelijken of herstel een keuze.</p></div></div>'; return; }
   const v=x.v,m=x.m;
-  stage.innerHTML='<article class="deck-card" id="deckCard" tabindex="0"><span class="deck-mark nee">Niet passend</span><span class="deck-mark ja">Interesse</span><div class="deck-score"><b>'+m.score+'%</b><span>praktische match</span></div><h2>'+esc(v.func)+'</h2><div class="deck-company">'+esc(v.bedrijf)+' · '+esc(plaatsVan(v))+'</div><div class="deck-meta">'+metaVan(v,x.km).slice(0,4).map(t=>'<span>'+esc(t)+'</span>').join('')+'<span>'+esc(salaris(v))+'</span></div><div class="deck-why">'+m.sterk.slice(0,2).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div></article>';
+  stage.innerHTML='<article class="deck-card" id="deckCard" tabindex="0"><span class="deck-mark nee">Niet passend</span><span class="deck-mark ja">Interesse</span><div class="deck-score"><span>'+esc(m.label)+'</span></div><h2>'+esc(v.func)+'</h2><div class="deck-company">'+esc(v.bedrijf)+' · '+esc(plaatsVan(v))+'</div><div class="deck-meta">'+metaVan(v,x.km).slice(0,4).map(t=>'<span>'+esc(t)+'</span>').join('')+'<span>'+esc(salaris(v))+'</span></div><div class="deck-why">'+m.sterk.slice(0,2).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div></article>';
   const card=$('#deckCard'); let start=0,delta=0;
   card.addEventListener('pointerdown',e=>{start=e.clientX;delta=0;card.setPointerCapture(e.pointerId)});
   card.addEventListener('pointermove',e=>{if(!start)return;delta=e.clientX-start;card.style.transform='translateX('+delta+'px) rotate('+(delta/28)+'deg)';card.querySelector('.ja').style.opacity=Math.max(0,delta/90);card.querySelector('.nee').style.opacity=Math.max(0,-delta/90)});
@@ -455,7 +455,7 @@ async function laadMatches(){
 function vergelijkTeken(){
   const jobs=werkState.vergelijk.map(id=>vacatures.find(v=>v.id===id)).filter(Boolean);
   const grid=$('#vergelijkGrid'); grid.style.setProperty('--vergelijk-aantal',jobs.length);
-  const rijen=[['Kans',v=>'<strong>'+esc(v.func)+'</strong><br><span>'+esc(v.bedrijf)+'</span>'],['Match',v=>matchVan(v).score+'%'],['Salaris',v=>esc(salaris(v))],['Locatie',v=>esc(plaatsVan(v))],['Werkvorm',v=>esc(v.werkvorm?v.werkvorm.replace('-',' '):'Onbekend')],['Uren',v=>esc(v.uren||'In overleg')],['Aandacht',v=>esc(matchVan(v).aandacht[0]||'Geen harde blokkade gevonden')]];
+  const rijen=[['Kans',v=>'<strong>'+esc(v.func)+'</strong><br><span>'+esc(v.bedrijf)+'</span>'],['Raakvlak',v=>esc(matchVan(v).label)],['Salaris',v=>esc(salaris(v))],['Locatie',v=>esc(plaatsVan(v))],['Werkvorm',v=>esc(v.werkvorm?v.werkvorm.replace('-',' '):'Onbekend')],['Uren',v=>esc(v.uren||'In overleg')],['Aandacht',v=>esc(matchVan(v).aandacht[0]||'Geen harde blokkade gevonden')]];
   grid.innerHTML=rijen.map(r=>'<b>'+r[0]+'</b>'+jobs.map(r[1]).map(x=>'<div>'+x+'</div>').join('')).join('');
   $('#vergelijkPanel').hidden=false;
 }
@@ -489,7 +489,7 @@ document.querySelectorAll('[data-weergave]').forEach(b=>b.addEventListener('clic
   document.querySelectorAll('[data-weergave]').forEach(x=>x.classList.toggle('actief',x===b));
   werkWeergave=b.dataset.weergave;
   if(werkWeergave==='trajecten'){ $('#mijnBlok').scrollIntoView({behavior:'smooth'}); werkWeergave='kansen'; return; }
-  $('#lijstTitel').textContent=werkWeergave==='bewaard'?'Bewaarde kansen':'Beste volgende kansen'; teken();
+  $('#lijstTitel').textContent=werkWeergave==='bewaard'?'Bewaarde kansen':'Open kansen'; teken();
 }));
 $('#deckNo').addEventListener('click',()=>deckActie('niet'));
 $('#deckYes').addEventListener('click',()=>deckActie('interesse'));

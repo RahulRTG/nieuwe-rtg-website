@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5113 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5114 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,8 +18,8 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5113 |
-| servermodules (`server/**/*.js`) | 3608 |
+| API-endpoints | 5114 |
+| servermodules (`server/**/*.js`) | 3609 |
 | routebestanden (`server/routes/**`) | 599 |
 | kernmodules (`server/kern/**`) | 2259 |
 | schermen (`public/**/*.html`) | 320 |
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3483 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3484 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1585 |
+| kern-namen die routes aanraken | 1586 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 239 |
-| daarvan door precies één domein | 1346 |
+| daarvan door precies één domein | 1347 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

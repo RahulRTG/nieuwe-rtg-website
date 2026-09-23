@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T13:16:19.216Z",
-    "commit": "24aa68fcb",
+    "op": "2026-09-23T13:51:21.845Z",
+    "commit": "549bb1ee9",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/adamproef.js",
@@ -18,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Groene Hert 0701",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Rode Reiger B8E2",
       "fout": null,
       "ms": 0
     },
@@ -32,7 +32,7 @@
       "status": 200,
       "ziet": "de motor antwoordt het gezin: 1 wegen beoordeeld",
       "fout": null,
-      "ms": 11
+      "ms": 14
     },
     {
       "nr": 3,
@@ -56,7 +56,7 @@
       "status": 200,
       "ziet": "de motor gaf 3 wegen bij een kaal doel (via-werk, via-opleiding, via-opvang), samengesteld door het huis: true, geen ervan heet \"open\": true",
       "fout": null,
-      "ms": 9
+      "ms": 8
     },
     {
       "nr": 5,
@@ -66,9 +66,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature 3d6ce62f, minimumleeftijd 16",
+      "ziet": "vacature acb0f438, minimumleeftijd 16",
       "fout": null,
-      "ms": 8
+      "ms": 9
     },
     {
       "nr": 6,
@@ -80,7 +80,7 @@
       "status": 200,
       "ziet": "1 vacatures zichtbaar, magSolliciteren: true",
       "fout": null,
-      "ms": 8
+      "ms": 9
     },
     {
       "nr": 7,
@@ -92,7 +92,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 11
+      "ms": 15
     },
     {
       "nr": 8,
@@ -102,7 +102,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie 7625c687, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie 25657286, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
       "ms": 13
     },
@@ -116,7 +116,7 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 24
+      "ms": 39
     },
     {
       "nr": 10,
@@ -128,7 +128,7 @@
       "status": 200,
       "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Je plek staat klaar: open je so...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 22
+      "ms": 26
     },
     {
       "nr": 11,
@@ -140,7 +140,7 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 2
+      "ms": 3
     },
     {
       "nr": 12,
@@ -152,7 +152,7 @@
       "status": 200,
       "ziet": "opleiding + opvang + werk; 26 vondsten in 1 vorm; werk 1/1, opleiding 24/20000, opvang 1/1",
       "fout": null,
-      "ms": 11
+      "ms": 10
     },
     {
       "nr": 13,
@@ -164,7 +164,7 @@
       "status": 200,
       "ziet": "in het team (id 185), dienstverband bij Brisa SL als Keukenhulp",
       "fout": null,
-      "ms": 262
+      "ms": 252
     },
     {
       "nr": 14,
@@ -176,7 +176,7 @@
       "status": 200,
       "ziet": "direct in dienst, personeelsnummer 187",
       "fout": null,
-      "ms": 155
+      "ms": 133
     },
     {
       "nr": 15,
@@ -188,7 +188,7 @@
       "status": 200,
       "ziet": "1 contractversie(s), vanaf 2026-09-01",
       "fout": null,
-      "ms": 15
+      "ms": 14
     },
     {
       "nr": 16,
@@ -200,7 +200,7 @@
       "status": 200,
       "ziet": "1 werkplek(ken): Meridiaan BV als Receptie",
       "fout": null,
-      "ms": 5
+      "ms": 6
     },
     {
       "nr": 17,
@@ -210,9 +210,21 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "loonstrook voor personeelsnummer 187 in run run_e35a813540, basissalaris 1508.00 euro; dienstverband getoetst en gevonden; de ondernemer zonder dienstverband is gemeld",
+      "ziet": "loonstrook voor personeelsnummer 187 in run run_8b84c7c9b2, basissalaris 1508.00 euro; dienstverband getoetst en gevonden; de ondernemer zonder dienstverband is gemeld",
       "fout": null,
-      "ms": 24
+      "ms": 26
+    },
+    {
+      "nr": 18,
+      "van": "werkgever",
+      "naar": "huis",
+      "wat": "haalt de aannames van voor de brug in: eerst een voorstel, dan zijn eigen keuze",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "voorstel met 1 mens(en), de ondernemer erin; een vreemde kreeg 404; 1 dienstverband(en) voor de keuze, 2 erna, ook na een herhaalde keuze",
+      "fout": null,
+      "ms": 32
     }
   ],
   "storingen": [
@@ -286,8 +298,8 @@
     "nederland": "een volwassen lid bij MERIDIAAN (NL), met een ondernemer die de zaak aan Meridiaan BV koppelt"
   },
   "telling": {
-    "schakels": 17,
-    "gesloten": 17,
+    "schakels": 18,
+    "gesloten": 18,
     "open": 0,
     "openBekend": 0,
     "stuk": 0,

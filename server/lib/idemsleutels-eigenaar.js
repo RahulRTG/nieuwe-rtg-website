@@ -51,7 +51,12 @@ const SLEUTELS = {
     waarom: 'verse registratie-uitdaging binnen het herstelvenster' },
   'POST /api/herstel/eigenaar/passkey': { nietIdempotent: true,
     waarom: 'zet de passkey en SLUIT het venster; herhaalbaar maken zou van een geslaagd herstel ' +
-      'een kwartier lang een open deur maken' }
+      'een kwartier lang een open deur maken' },
+  /* De beleidsmotor (AUTHORITY.md fase 1): twee leeswegen. De tellers lopen via
+     de gewikkelde poorten op res.finish en niet in deze handlers, dus twee keer
+     opvragen verandert niets aan wat er geteld of besloten is. */
+  'POST /api/office/beleidsmotor': { leest: true },
+  'POST /api/office/beleidsmotor/waarom': { leest: true }
 };
 
 module.exports = { SLEUTELS };

@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-09-23T18:23:42.545Z",
-  "commit": "92e8de5c",
+  "op": "2026-09-23T19:12:11.846Z",
+  "commit": "7ccc04b7",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 8,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 628,
-  "bewaakt": 538,
+  "zonderBewakerslaag": 630,
+  "bewaakt": 540,
   "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -48,7 +48,7 @@
  "perWacht": [
   {
    "naam": "werkPoort",
-   "aantal": 95
+   "aantal": 97
   },
   {
    "naam": "poort",
@@ -702,7 +702,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/lid/tekengrens",
-   "bestand": "server/bedrijf/uitgave.js:107",
+   "bestand": "server/bedrijf/tekengrens.js:28",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },
@@ -930,19 +930,19 @@
   },
   {
    "sleutel": "POST /api/bedrijf/uitgave/betaald",
-   "bestand": "server/bedrijf/uitgave.js:85",
+   "bestand": "server/bedrijf/uitgave.js:87",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/uitgave/maak",
-   "bestand": "server/bedrijf/uitgave.js:53",
+   "bestand": "server/bedrijf/uitgave.js:55",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/uitgaven",
-   "bestand": "server/bedrijf/uitgave.js:74",
+   "bestand": "server/bedrijf/uitgave.js:76",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -987,6 +987,18 @@
    "bestand": "server/bedrijf/werkruimte.js:92",
    "staat": "bewaakt",
    "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/werkruimte/betaalwijze",
+   "bestand": "server/bedrijf/tekengrens.js:61",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/werkruimte/entiteit",
+   "bestand": "server/bedrijf/tekengrens.js:43",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/maak",

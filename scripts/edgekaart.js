@@ -284,7 +284,7 @@ const KAART = [
      ronde 2, geen samenvoeging (EDGE.md par. 1). */
   ['interface/second-screen.js', 'schil', 'vluchtige-context:l', [
     ['leest', 'vluchtige-context:l', 'context van het bovendocument', 'return w.RTGAdaptief && w.RTGAdaptief.context ? w.RTGAdaptief.context() : {};']]],
-  ['interface/second-screen-modules.js', 'schil', 'vluchtige-context:l', [
+  ['interface/modules/context.js', 'schil', 'vluchtige-context:l', [
     ['leest', 'vluchtige-context:l', 'Nu relevant: de titel uit RTGAdaptief', 'function laatsteContext() { return (A && A.context && A.context()) || laatste || {}; }']]],
   ['interface/workspace-context.js', 'schil', 'vluchtige-context:sb', [
     ['schrijft', 'vluchtige-context:s', 'een eigen current naast RTGAdaptief', "current = next; var change = { value: get(), reason: reason || 'host-update' };"],

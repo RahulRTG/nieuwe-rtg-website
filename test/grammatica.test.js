@@ -234,7 +234,7 @@ test('de Second Screen voert uit langs het gewicht, niet eromheen', () => {
      (inventaris van EDGE.md, bevestigd in de bron). Nu gaat die ingang langs
      RTGGewicht.voerId, dezelfde weg als een tik in het dock.
 
-     DE MUTATIES: laat second-screen-modules.js weer A.doe aanroepen (de
+     DE MUTATIES: laat interface/modules/context.js weer A.doe aanroepen (de
      bronhelft zakt), of laat voerId() het item overslaan en rechtstreeks doen
      (de gedragshelft zakt). */
   const vm = require('vm');
@@ -251,7 +251,7 @@ test('de Second Screen voert uit langs het gewicht, niet eromheen', () => {
   assert.deepEqual(gedaan, ['vet'], 'een lichte handeling gaat gewoon door');
   assert.equal(G.voerId('speelt-niet'), false, 'een handeling die nu niet speelt, draait niet');
   assert.deepEqual(gedaan, ['vet']);
-  const modules = lees('public/shared/interface/second-screen-modules.js');
+  const modules = lees('public/shared/interface/modules/context.js');
   assert.match(modules, /'context\.execute': \{ run: function \(p\) \{ return !!w\.RTGGewicht && w\.RTGGewicht\.voerId\(/);
   assert.doesNotMatch(modules, /A\.doe\(/, 'de Second Screen hoort RTGAdaptief.doe niet rechtstreeks aan te roepen');
 });

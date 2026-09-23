@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1586,
+    "kernBreedte": 1587,
     "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -135,6 +135,15 @@
     "planDomeinenGemeten": 7
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1586,
+      "meter": "kernBreedte 1586 -> 1587; kernGedeeld blijft 242",
+      "reden": "De kantooruitnodiging (AUTHORITY.md fase 2, besluit van de eigenaar). Het domein kantoren leest kern.kantoorUitnodiging om een uitnodiging te maken en het overzicht te tonen; de module woont bij de kantoorlaag en wordt in eenaccount verzilverd, waar de kantoorrol aan de sleutelbos komt. Een eigen kopie in het routebestand zou een tweede opslag van uitnodigingen opleveren.",
+      "waarheen": "GRENZEN.json (kantoren draagt kantoorUitnodiging) en test/kantooruitnodiging.test.js"
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

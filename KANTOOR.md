@@ -46,8 +46,8 @@ uitslag van `npm run kantoormacht` (`KANTOORMACHT.json`, blok 0 van
 
 | As | Getal | Graad |
 |---|---|---|
-| kantoorroutes (`/api/office` + `/api/boardroom`) | **<!--getal:kantoor.routes-->608<!--/getal-->** over <!--getal:kantoor.bestanden-->97<!--/getal--> bestanden | gemeten |
-| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->183<!--/getal-->** | gemeten |
+| kantoorroutes (`/api/office` + `/api/boardroom`) | **<!--getal:kantoor.routes-->610<!--/getal-->** over <!--getal:kantoor.bestanden-->98<!--/getal--> bestanden | gemeten |
+| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->185<!--/getal-->** | gemeten |
 | deur is de gedeelde code | **<!--getal:kantoor.deurGedeeld-->425<!--/getal-->** | gemeten |
 | handler kent de handelende mens | <!--getal:kantoor.handlerKentMens-->148<!--/getal--> | vermoed (bovengrens) |
 | **anoniem uitvoerbaar** | **<!--getal:kantoor.anoniem-->358<!--/getal-->** | vermoed (ondergrens) |

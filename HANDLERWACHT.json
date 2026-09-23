@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-23T09:49:41.152Z",
-  "commit": "0869deb",
-  "boomVuil": true,
-  "boomAnders": 2,
+  "op": "2026-09-23T09:57:05.581Z",
+  "commit": "785d780",
+  "boomVuil": false,
+  "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -1079,25 +1079,25 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda",
-   "bestand": "server/foundation/gasten/gezinsagenda.js:70",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:71",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/bereik",
-   "bestand": "server/foundation/gasten/gezinsagenda.js:112",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:113",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/verwijder",
-   "bestand": "server/foundation/gasten/gezinsagenda.js:136",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:137",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/agenda/wijzig",
-   "bestand": "server/foundation/gasten/gezinsagenda.js:89",
+   "bestand": "server/foundation/gasten/gezinsagenda.js:90",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -4018,7 +4018,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1451",
+   "bestand": "server/server.js:1448",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

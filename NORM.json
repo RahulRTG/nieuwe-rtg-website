@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1592,
+    "kernBreedte": 1594,
     "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -149,6 +149,15 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1592,
+      "meter": "kernBreedte 1592 -> 1594 (twee hulpnamen, geen kernvermogen)",
+      "reden": "routes/concern.js ging door de samenvoeging over de 10 kB en is geknipt naar routes/concern/vestiging.js. Die deelmodule krijgt zijn eigendomscontrole als HULP van het hoofdbestand -- mijnVestiging en beheertZaak, in de vorm waarin ./mensen.js personeelVan krijgt -- en scripts/grenzen.js telt wat een deelmodule uit zijn context destructureert als kernnaam. Er komt geen enkel kernvermogen bij: beide zijn functies die in routes/concern.js zelf worden gebouwd.",
+      "waarheen": "server/routes/concern.js (mijnVestiging, beheertZaak) en test/concern-vestiging.test.js, die de eigendomscontrole van de vestigingsroutes tegen een echte server vasthoudt."
+    },
     {
       "datum": "2026-09-23",
       "soort": "schuld",

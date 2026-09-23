@@ -269,8 +269,8 @@ een REISbestemming, en een tweede betekenis op de centrale naam van een
 reisbedrijf is de `VERMOGENS`-botsing uit `SEMANTIEK.json`.
 
 Dit is de **primitief en niet de migratie**. Van de
-<!--getal:doorbelasting.geldvormen-->212<!--/getal--> geldvormen in dit huis
-dragen er <!--getal:doorbelasting.volgbaar-->30<!--/getal--> een aantoonbare
+<!--getal:doorbelasting.geldvormen-->213<!--/getal--> geldvormen in dit huis
+dragen er <!--getal:doorbelasting.volgbaar-->31<!--/getal--> een aantoonbare
 herkomst; die andere <!--getal:doorbelasting.nietVolgbaar-->182<!--/getal-->
 gaan hier niet vanzelf op over. Wat de module levert is de VORM waarin een
 geldrij het wél kan dragen, plus het oordeel of een gegeven rij te volgen is. De
@@ -357,8 +357,8 @@ A in par. 4.1 de aanbeveling is.
 ### 4.3 De kantoordeur is één deur, en dat is de grootste blokkade
 
 Er is één gedeelde `OFFICE_CODE` en één rol `office`, met 26 kamers erachter en
-<!--getal:kantoor.routes-->614<!--/getal--> kantoorroutes, waarvan er
-<!--getal:kantoor.deurEistMens-->189<!--/getal--> een bewezen mens eisen. Een medewerker van een
+<!--getal:kantoor.routes-->616<!--/getal--> kantoorroutes, waarvan er
+<!--getal:kantoor.deurEistMens-->191<!--/getal--> een bewezen mens eisen. Een medewerker van een
 exploitant in Spanje die de balie moet bedienen, krijgt daarmee de deur van het
 hele huis — inclusief de kluis van Nederlandse leden.
 

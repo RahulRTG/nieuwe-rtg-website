@@ -333,7 +333,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | **staat** (23 september 2026; par. 5h): de uitnodiging op naam, en de gedeelde code koppelt geen kantoorrol meer (besluit van dezelfde dag). Inloggen op het kantoor met de code blijft |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
-| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e), en **het onderwerp staat ook**: de uitgave in het Werk OS, met functiescheiding en een tekengrens per lid (par. 5e, vervolg). De koppeling met de tekenlimiet uit de concerngraaf en RTG Bank als uitvoering zijn aparte besluiten |
+| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e), en **het onderwerp staat ook**: de uitgave in het Werk OS, met functiescheiding, de strengste van twee tekengrenzen (werkruimte en concerngraaf), en een betaalwijze die de werkruimte kiest en RTG aan of uit zet (par. 5e, vervolg). Samen tekenen uit de concerngraaf staat nog open |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
 | 7 | **identiteiten voor agents, diensten en apparaten** | **staat** (23 september 2026; par. 5c en 5i): agent, diensten, toestellen, webhooks, en de zaakdoos met een eigen sleutel in de schaduw. De gedeelde doos-sleutel gaat dicht als elke doos er een heeft; het overzicht toont welke nog gedeeld melden |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **staat** (23 september 2026; par. 5g) |
@@ -549,13 +549,54 @@ bestond. `bedrijf/uitgave.js` vult dat gat, en voegt geen rechtenmodel toe:
 
 `test/bedrijfuitgave.test.js` loopt het tegen een echte server; acht mutaties
 laten hem zakken, waaronder de indiener laten goedkeuren, de tekengrens negeren,
-de basiseis weghalen en de indiener uit het verzoek nemen. **Wat bewust nog niet
-staat**: de tekenlimiet van de concerngraaf hangt aan een bestuurder van een
-ENTITEIT en de tekengrens hier aan een LID van een werkruimte. Dat zijn twee van
-de drie werkrelatiemodellen die elkaar niet lezen (ARBEID.md), en welk model de
-waarheid is, is een besluit. En uitvoeren via RTG Bank (klaarzetten als
-betaalopdracht, een mens bevestigt) is een tweede besluit, omdat het een
-werkruimte aan een bankpositie koppelt.
+de basiseis weghalen en de indiener uit het verzoek nemen.
+
+**Twee besluiten erna (23 september 2026), en de meting die ze vormde.**
+
+*De strengste van twee grenzen.* De meting vond geen enkele koppeling tussen een
+werkruimte en een entiteit, en een bestuurder in de concerngraaf was een VRIJE
+naam ("marco") -- een tekenlimiet vergelijken op een naam die niemand heeft
+gecontroleerd is raden. Daarom drie stukken, en geen van drie verleent iets:
+
+- een bestuurder of gevolmachtigde is voortaan een RTG-codenaam, of uitdrukkelijk
+  iemand van buiten RTG (`kern/concern/persoon.js`, dezelfde vorm als
+  `kern/onderneming/bestuur-persoon.js`). Een vrije naam zonder die vlag wordt
+  geweigerd; oude vrije namen blijven in het register staan maar tellen niet mee
+  (`herkend` in `concernMagTekenen`);
+- een werkruimte koppelt aan een entiteit (`/api/bedrijf/werkruimte/entiteit`)
+  alleen via een lid dat aan zijn eigen RTG-account hangt en eigenaar van die
+  entiteit is -- anders kan iemand de tekenlimieten van andermans bedrijf lenen;
+- de goedkeurgrendel (`bedrijf/tekengrens.js`) neemt de laagste van de twee:
+  de grens van het lid in de werkruimte, en de tekenlimiet van dezelfde mens als
+  HERKENDE bestuurder of gevolmachtigde. Let op de eenheden: de concerngraaf
+  rekent in euro's, het Werk OS in centen.
+
+*De betaalwijze kiest de werkruimte, en RTG zet de tweede weg aan of uit.* De
+meting vond dat "klaarzetten in RTG Bank" niet kan als betaalopdracht: die boekt
+meteen, heeft geen wachtstand, en de rij dient hem vanzelf in -- geld zou het
+huis verlaten zonder dat een mens drukt. En er is geen rekening per werkruimte.
+Dus:
+
+- `extern` (standaard): buiten RTG betalen, en een ander dan de indiener noteert
+  het met een kenmerk;
+- `rtgbank`: een ander dan de indiener maakt een gewone SEPA-overboeking vanaf
+  zijn EIGEN RTG-rekening, en het Werk OS toetst die opdracht
+  (`kern/werkbetaling.js`): hij bestaat, is niet mislukt, komt van een rekening
+  van deze codenaam, is precies dit bedrag, gaat naar het IBAN van de uitgave, en
+  hangt nog niet aan een andere uitgave;
+- de schakelaar van RTG (`/api/office/werkos/bankpad/zet`) staat standaard UIT,
+  alleen de eigenaar zet hem, met de passkey (`eigenaar-werkbankpad`). Staat hij
+  uit, dan valt een werkruimte die `rtgbank` koos terug op `extern`, met de reden
+  in het antwoord.
+
+`test/bedrijfuitgave-mix.test.js` loopt het met echte RTG-accounts en een echte
+SEPA-opdracht; twaalf mutaties laten hem zakken. Twee zakten eerst NIET, en dat
+waren zwakke beweringen: de eigenaarsgrendel werd alleen met de gedeelde code
+beproefd (die al eerder faalde), en een externe met dezelfde naam als een lid
+kwam in geen toets voor. **Wat bewust nog niet staat**: een rekening op naam van
+de werkruimte zelf (wie is dan rekeninghouder, en onder welke vergunning), en de
+gezamenlijke bevoegdheid uit de concerngraaf (samen tekenen) -- de grendel kent
+hier alleen de limiet per mens.
 
 ### 5f. Fase 6: lezen is niet exporteren
 

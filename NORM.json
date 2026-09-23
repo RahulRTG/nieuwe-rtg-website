@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1590,
+    "kernBreedte": 1589,
     "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -2878,6 +2878,15 @@
       "meter": "kernBreedte 1586 -> 1589 (de SOM van twee lijnen, geen nieuwe naam)",
       "reden": "Het samengaan met main (954b4779). Twee lijnen verhoogden deze meter ONAFHANKELIJK van 1583 naar 1586, elk met drie uitgeschreven notities die hieronder blijven staan: main met de beleidsmotor, de personeelsinlog en het intrekken van kantoorrechten (AUTHORITY.md), deze tak met dienstverbandUitAanname, dienstverbandToets en dienstverbandInhaal (ARBEID.md par. 7a). Samen zijn dat zes namen en dus 1589; kernGedeeld blijft 241, want de drie namen van deze tak raakt elk precies een domein.",
       "waarheen": "GRENZEN.json draagt beide lijnen, elk onder hun eigen domein; de afzonderlijke bronnotities hieronder bepalen de vervolgstap."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1587,
+      "meter": "kernBreedte 1587 -> 1589",
+      "reden": "De Werk OS-uitgave via RTG Bank (besluit van de eigenaar: de werkruimte kiest de betaalwijze, RTG zet de weg aan of uit). Het domein kantoren leest kern.werkBankpadStand en kern.werkBankpadZet voor de boardroomschakelaar; het Werk OS leest ze plus werkBankBewijs, entiteitVind en concernMagTekenen, maar via de bedrijfslaag en niet via een route. Een eigen kopie van de schakelaar of van de bankcontrole in een routebestand zou een tweede waarheid naast kern/werkbetaling.js zijn.",
+      "waarheen": "GRENZEN.json (kantoren en bedrijf) en test/bedrijfuitgave-mix.test.js"
     }
   ],
   "prestatie": {

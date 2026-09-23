@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-23",
   "gemeten": {
-    "bestanden": 2359,
-    "domeinenTotaal": 632,
-    "koopbareVormen": 555,
-    "koopbareDomeinen": 116,
-    "envelopDrempel": 7,
-    "envelop": 46,
-    "veldenDomeineigen": 737,
-    "veldenNietEnvelop": 970,
-    "gelijkendeVormparen": 16,
+    "bestanden": 2361,
+    "domeinenTotaal": 633,
+    "koopbareVormen": 556,
+    "koopbareDomeinen": 117,
+    "envelopDrempel": 8,
+    "envelop": 40,
+    "veldenDomeineigen": 738,
+    "veldenNietEnvelop": 977,
+    "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 45,
@@ -34,8 +34,6 @@
     "centen",
     "codenaam",
     "datum",
-    "doel",
-    "domein",
     "door",
     "id",
     "idem",
@@ -45,14 +43,11 @@
     "naam",
     "naar",
     "notitie",
-    "nr",
     "ok",
     "oms",
     "omschrijving",
-    "open",
     "opties",
     "pagina",
-    "paginas",
     "prijs",
     "reden",
     "ref",
@@ -69,8 +64,7 @@
     "valuta",
     "van",
     "vraag",
-    "wat",
-    "zaak"
+    "wat"
   ],
   "perWerkwoord": {
     "toon": 90,
@@ -2229,6 +2223,21 @@
       "telt": 0
     },
     {
+      "domein": "kern/werkbetaling",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
       "domein": "kern/werkcommand",
       "heeft": {
         "toon": false,
@@ -2382,6 +2391,21 @@
       ]
     },
     {
+      "gelijkenis": 0.86,
+      "a": "server/kern/command/register.js",
+      "b": "server/kern/zaakcommand/register.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "collectie",
+        "domein",
+        "meervoud",
+        "sleutel",
+        "sub",
+        "zoek"
+      ]
+    },
+    {
       "gelijkenis": 0.83,
       "a": "server/kern/bank/overboeken.js",
       "b": "server/kern/pay/partner.js",
@@ -2407,20 +2431,6 @@
         "idemSleutel",
         "ledgerRef",
         "rail"
-      ]
-    },
-    {
-      "gelijkenis": 0.83,
-      "a": "server/kern/command/register.js",
-      "b": "server/kern/zaakcommand/register.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
-      "gedeeld": [
-        "collectie",
-        "meervoud",
-        "sleutel",
-        "sub",
-        "zoek"
       ]
     },
     {
@@ -2468,6 +2478,20 @@
         "betaalwijze",
         "codename",
         "providerId"
+      ]
+    },
+    {
+      "gelijkenis": 0.63,
+      "a": "server/kern/command/register.js",
+      "b": "server/kern/werkcommand/soorten.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/werkcommand",
+      "gedeeld": [
+        "domein",
+        "meervoud",
+        "sleutel",
+        "sub",
+        "zoek"
       ]
     },
     {

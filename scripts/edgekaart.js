@@ -22,7 +22,10 @@
                 elke verklaring een dubbele eigenaar.
      GEMETEN    per bestand, op de bron ZONDER commentaar (scripts/lib/bron.js):
                 globals, events, data-attributen op body/html, opslagsleutels en
-                fetch-paden. Plus de dode kanalen over heel public/.
+                fetch-paden. Plus de dode kanalen over heel public/, en drie
+                AFGELEIDE controles die de verklaring aan de code houden: wie het
+                tweede register vult, wie de wereld en wie de Edge 2-stand op
+                body zet, staat erop (zie DE AFGELEIDE CONTROLES).
 
    WAT HET NIET DOET. Het oordeelt niet of een dubbele eigenaar fout is -- dat
    beslist een mens. Het leest alleen LETTERLIJKE namen; een naam die wordt
@@ -517,8 +520,10 @@ function events(p, s) {
 /* Alleen een CONSTANTE (hoofdletters): een lusvariabele als `n` heet elders in
    het bestand misschien ook zo, en dan zou dit raden. */
 const constante = (s, naam) => { if (!/^[A-Z][A-Z0-9_]*$/.test(naam)) return null; const m = new RegExp('\\b' + naam + '\\s*=\\s*([\'"])([^\'"\\n]+)\\1').exec(s); return m ? m[2] : null; };
-function meet(p, s) {
-  const globals = [...s.matchAll(/\b(?:w|window|root|g)\.(RTG[\w$]*)\s*=(?!=)/g)].map(m => m[1]);
+/* De data-attributen die een bestand op body of html zet, of op een alias
+   daarvan. Apart, omdat de afgeleide controles hieronder alleen dit nodig hebben
+   en dezelfde lezer moeten gebruiken als `gemeten` (geen tweede parser). */
+function lijfAttributen(s) {
   const alias = new Set([...s.matchAll(/\b([\w$]+)\s*=\s*(?:[\w$]+\.)*(?:body|documentElement)\b(?!\s*[.(\w])/g)].map(m => m[1]));
   const lijf = r => /(^|\.)(body|documentElement)$/.test(r) || alias.has(r);
   const attributen = [];
@@ -530,6 +535,10 @@ function meet(p, s) {
   for (const m of s.matchAll(/([\w$.]+)\.dataset\.([\w$]+)\s*=(?!=)/g)) {
     if (lijf(m[1])) attributen.push('data-' + m[2].replace(/[A-Z]/g, c => '-' + c.toLowerCase()));
   }
+  return uniek(attributen);
+}
+function meet(p, s) {
+  const globals = [...s.matchAll(/\b(?:w|window|root|g)\.(RTG[\w$]*)\s*=(?!=)/g)].map(m => m[1]);
   const opslag = [];
   for (const m of s.matchAll(/([\w$.()]+)\.(?:getItem|setItem|removeItem)\(\s*/g)) {
     const a = argumenten(s, m.index + m[0].length)[0] || '';
@@ -539,7 +548,7 @@ function meet(p, s) {
   }
   const fetchen = [...s.matchAll(/\bfetch\(\s*['"`](\/api\/[^'"`$?]*)/g)].map(m => m[1]);
   const ev = events(p, s);
-  return { globals: uniek(globals), zendt: ev.zendt, luistert: ev.luistert, attributen: uniek(attributen),
+  return { globals: uniek(globals), zendt: ev.zendt, luistert: ev.luistert, attributen: lijfAttributen(s),
     opslag: uniek(opslag), fetch: uniek(fetchen) };
 }
 
@@ -555,11 +564,16 @@ function bestanden(dir, uit) {
   }
   return uit;
 }
-function kanalen() {
+/* De wandeling: elk bestand met zijn bron zonder commentaar, een keer gelezen en
+   gedeeld door de dode kanalen en de afgeleide controles hieronder. */
+function wandeling() {
   const bundel = new Set(Object.keys(bundels).map(k => 'public/' + k));
+  return bestanden('public', ['index.html']).filter(p => !bundel.has(p)).sort().map(p => [p, kaal(p, lees(p) || '')]);
+}
+function kanalen(lijst = wandeling()) {
   const zenders = {}, luisteraars = {}, dynamisch = [];
-  for (const p of bestanden('public', ['index.html']).filter(p => !bundel.has(p)).sort()) {
-    const e = events(p, kaal(p, lees(p) || ''));
+  for (const [p, code] of lijst) {
+    const e = events(p, code);
     e.zendt.filter(n => n.startsWith('rtg')).forEach(n => (zenders[n] = zenders[n] || []).push(p));
     e.luistert.forEach(n => (luisteraars[n] = luisteraars[n] || []).push(p));
     dynamisch.push(...e.dynamisch);
@@ -574,8 +588,92 @@ function kanalen() {
   };
 }
 
+/* ------------------------------------------------ DE AFGELEIDE CONTROLES
+   De KAART is verklaard: een mens zet een bestand erop, en wat hij niet ziet,
+   staat er niet op. Zo stond de gebaarlaag er na ronde 1 niet op, en leek een
+   verantwoordelijkheid een eigenaar te hebben die er twee had. Daarom leiden
+   drie controles de schrijvers LEXICAAL af uit dezelfde wandeling als de dode
+   kanalen, en leggen ze naast de kaart:
+
+     1  wie registerAction aanroept op de Edge-kern, staat erop als schrijver van
+        capability-register, met die aanroep als citaat -- en andersom. Zo kan
+        "het tweede register is leeg" (ronde 2) BEWEZEN worden: deze lijst op nul.
+     2  wie data-rtg-world op body zet, staat erop als wereld:s.
+     3  wie data-rtg-edge-2-state op body zet, staat erop als zichtbaarheidsstand:s.
+
+   Een ONDERGRENS, en dat staat erbij in plaats van eromheen: een aanroep via een
+   samengestelde naam (edge['registerAction'], een doorgegeven functie) en een
+   attribuut via een variabele of een CONTRACT-veld ontsnappen. Voor 2 en 3 is
+   dat bekend: rtg-edge-2.js zet zijn stand via CONTRACT.state en staat er om die
+   reden met de hand op. De controles leggen daarom alleen een ondergrens aan de
+   kaart op (wie de lezer vindt, moet erop), niet een bovengrens.
+
+   De ontvangers heten per plek anders: de landing en de sociale runtime noemen
+   RTGAdaptiveEdge `edge`, Signals `api`, het wereldbureau `w.RTGAdaptiveEdge`.
+   Een ontvanger die niet op RTGAdaptiveEdge eindigt en in geen van beide
+   lijsten staat, laat de controle zakken -- raden wat een naam is, doet hij niet.
+   Elke uitzondering noemt het bestand en de reden, en een uitzondering die niets
+   meer uitzondert zakt ook (net als een WAAROM zonder dubbele eigenaar). */
+const ONTVANGERS = ['edge', 'api'];   // plus elke naam die op RTGAdaptiveEdge eindigt
+const ANDERE_REGISTERS = [
+  { pad: 'public/shared/interface/workspace-broker.js', ontvanger: 'registries',
+    reden: 'het actieregister van de werkruimtemodules (workspace-registries.js), met manifest, permissie en audit; deelt alleen de naam' },
+  { pad: 'public/shared/interface/workspace-module-host.js', ontvanger: 'o',
+    reden: 'de broker van de werkruimte (workspace-broker.js), hetzelfde moduleregister; deelt alleen de naam' }
+];
+/* Een schrijver zonder lader is geen eigenaar. Of de lader ontbreekt, wordt bij
+   elke meting opnieuw nagekeken: noemt een bestand in de wandeling de naam, dan
+   vervalt de uitzondering en zakt de controle. */
+const ZONDER_LADER = ['public/site/platform-controller.js', 'public/site/platform-app.js'];
+const ATTR = { wereld: 'data-rtg-world', zichtbaarheidsstand: 'data-rtg-edge-2-state' };
+
+function afgeleid(lijst = wandeling()) {
+  const fouten = [], gevonden = { registerAction: [], wereld: [], zichtbaarheidsstand: [] }, uitgezonderd = [];
+  const schrijver = (vol, naam) => KAART.some(([p, , v]) => pad(p) === vol &&
+    v.split(' ').some(t => t.split(':')[0] === naam && (t.split(':')[1] || '').includes('s')));
+  const benut = new Set();
+  for (const [p, code] of lijst) {
+    if (code.includes('registerAction')) for (const m of code.matchAll(/([\w$.]+)\s*\.\s*registerAction\s*\(/g)) {
+      const ontv = m[1], ander = ANDERE_REGISTERS.find(a => a.pad === p && a.ontvanger === ontv);
+      if (ander) benut.add(ander);
+      else if (ONTVANGERS.includes(ontv) || /(^|\.)RTGAdaptiveEdge$/.test(ontv)) { if (!gevonden.registerAction.includes(p)) gevonden.registerAction.push(p); }
+      else fouten.push(p + ': registerAction op een onbekende ontvanger `' + ontv + '`; zet hem in ONTVANGERS of, met reden, in ANDERE_REGISTERS');
+    }
+    /* Alleen lezen waar een van de namen als TEKST staat (tussen aanhalingstekens,
+       ook in een constante) of als dataset-veld: iets anders vindt lijfAttributen
+       niet, en zo slaat de lezer de schermen over die de wereld alleen als
+       attribuut in hun opmaak dragen. */
+    if (!/['"`]data-rtg-world['"`]|\.rtgWorld\s*=|['"`]data-rtg-edge-2-state['"`]/.test(code)) continue;
+    const attr = lijfAttributen(code);
+    for (const naam of Object.keys(ATTR)) {
+      if (!attr.includes(ATTR[naam])) continue;
+      if (naam === 'wereld' && ZONDER_LADER.includes(p)) { uitgezonderd.push(p); continue; }
+      gevonden[naam].push(p);
+    }
+  }
+  /* 1: gelijk, in beide richtingen. Op de kaart telt alleen een schrijver van
+     capability-register WAARVAN een citaat de aanroep zelf is. */
+  const kaart1 = KAART.filter(([, , , rollen]) => rollen.some(([, e, , c]) => e === 'capability-register:s' && /\.\s*registerAction\s*\(/.test(c)))
+    .map(([p]) => pad(p)).sort();
+  for (const p of gevonden.registerAction) if (!kaart1.includes(p)) fouten.push(p + ': roept registerAction aan op de Edge-kern en staat niet op de kaart als schrijver van capability-register met die aanroep als citaat');
+  for (const p of kaart1) if (!gevonden.registerAction.includes(p)) fouten.push(p + ': staat op de kaart als schrijver via registerAction, maar de lezer vindt de aanroep niet');
+  /* 2 en 3: wie de lezer vindt, staat erop met de s. */
+  for (const naam of Object.keys(ATTR)) {
+    for (const p of gevonden[naam]) if (!schrijver(p, naam)) fouten.push(p + ': zet ' + ATTR[naam] + ' op body en staat niet op de kaart als ' + naam + ':s');
+  }
+  for (const a of ANDERE_REGISTERS) if (!benut.has(a)) fouten.push(a.pad + ': uitzondering voor `' + a.ontvanger + '.registerAction` zonder aanroep; haal hem weg');
+  for (const p of ZONDER_LADER) {
+    if (!uitgezonderd.includes(p)) fouten.push(p + ': uitzondering zonder lader, maar het bestand zet de wereld niet (meer); haal hem weg');
+    const naam = p.split('/').pop();
+    const lader = lijst.find(([q, code]) => q !== p && code.includes(naam));
+    if (lader) fouten.push(p + ': staat als zonder lader uitgezonderd, maar ' + lader[0] + ' noemt ' + naam);
+  }
+  for (const k of Object.keys(gevonden)) gevonden[k].sort();
+  return { fouten, gevonden, uitgezonderd: uitgezonderd.sort(), andereRegisters: ANDERE_REGISTERS.map(a => a.pad + ' (' + a.ontvanger + ')') };
+}
+
 /* ------------------------------------------------------------ DE AFLEIDING */
-function bouw() {
+function bouw(wand = wandeling()) {
   const lijst = KAART.map(([p, laag, v, rollen]) => {
     const vol = pad(p), bron = lees(vol);
     const verantwoordelijkheden = v.split(' ').filter(Boolean).flatMap(t => {
@@ -595,15 +693,19 @@ function bouw() {
     .map(n => ({ naam: n, schrijvers: verantwoordelijkheden[n].schrijvers, beslissers: verantwoordelijkheden[n].beslissers, waarom: WAAROM[n] || null }));
   const lagen = {};
   for (const l of [...LAGEN].sort()) lagen[l] = lijst.filter(b => b.laag === l).map(b => b.pad);
-  const { levend, ...dodeKanalen } = kanalen();
+  const { levend, ...dodeKanalen } = kanalen(wand);
+  const af = afgeleid(wand);
   return {
     uitleg: 'Gemaakt met scripts/edgekaart.js; de methode staat in de kop. Rollen en verantwoordelijkheden zijn VERKLAARD en elk citaat staat letterlijk in zijn bestand. ' +
       'Elk citaat hangt aan het etiket (naam:letter) waar het over gaat, of aan null als het over geen van de veertien gaat; elk etiket s of b heeft minstens een citaat. ' +
       'schrijver = houdt of zet de toestand zelf; beslisser = kiest de uitkomst; lezer = leest haar of voedt haar via de API van de eigenaar. ' +
       '`gemeten` komt uit de bron zonder commentaar en kent alleen letterlijke namen: attributen alleen op body/html of een alias daarvan, opslag `onbekend` als de opslag niet letterlijk local- of sessionStorage heet. ' +
       'dodeKanalen gaat over rtg-events in public/ (zonder public/dist, .min.js en bundels, wel hun delen) plus index.html; een naam in luisterZonderZender kan nog een zender hebben onder `dynamisch`. ' +
+      '`afgeleid` is wat de lexicale lezer over dezelfde wandeling vindt en naast de kaart legt: wie registerAction aanroept op de Edge-kern, wie data-rtg-world en wie data-rtg-edge-2-state op body zet. Een ondergrens: een samengestelde naam ontsnapt. ' +
       'Een dubbele eigenaar is een vondst en geen oordeel.',
     bestanden: lijst, verantwoordelijkheden, lagen, dubbeleEigenaars, dodeKanalen,
+    afgeleid: { registerAction: af.gevonden.registerAction, wereld: af.gevonden.wereld, zichtbaarheidsstand: af.gevonden.zichtbaarheidsstand,
+      zonderLader: af.uitgezonderd, andereRegisters: af.andereRegisters },
     telling: { bestanden: lijst.length, rollen: lijst.reduce((n, b) => n + b.rollen.length, 0), dubbeleEigenaars: dubbeleEigenaars.length,
       dodeKanalen: dodeKanalen.luisterZonderZender.length + dodeKanalen.zendZonderLuisteraar.length, levendeKanalen: levend }
   };
@@ -617,7 +719,13 @@ function main() {
     fouten.forEach(f => console.error('  ' + f));
     process.exitCode = 1; return;
   }
-  const r = bouw();
+  const wand = wandeling(), af = afgeleid(wand);
+  if (af.fouten.length) {
+    console.error('EDGEKAART: de kaart mist wat de lezer in de code vindt (' + af.fouten.length + '):');
+    af.fouten.forEach(f => console.error('  ' + f));
+    process.exitCode = 1; return;
+  }
+  const r = bouw(wand);
   const zonder = r.dubbeleEigenaars.filter(d => !d.waarom).map(d => d.naam);
   const los = Object.keys(WAAROM).filter(n => !r.dubbeleEigenaars.some(d => d.naam === n));
   if (zonder.length || los.length) {
@@ -657,4 +765,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { KAART, WAAROM, DRAAGT, ROLLEN, keur, bouw, events, meet };
+module.exports = { KAART, WAAROM, DRAAGT, ROLLEN, ONTVANGERS, ANDERE_REGISTERS, ZONDER_LADER, keur, afgeleid, wandeling, bouw, events, meet };

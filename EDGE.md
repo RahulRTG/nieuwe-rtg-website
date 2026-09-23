@@ -190,8 +190,24 @@ las zonder dat de `l` erbij stond; die zijn eerst rechtgezet, zodat de
 formaatwijziging zelf aantoonbaar niets aan de telling veranderde.
 
 Stijgen doet de teller alleen met een uitgeschreven besluit in `NORM.json`, en
-dat is in ronde 2 één keer gebeurd (11 naar 12, hierboven): **een meter die stijgt omdat hij beter ziet, is geen achteruitgang;
-een meter die laag blijft omdat hij iets niet ziet, is erger.**
+dat is in ronde 2 één keer gebeurd (11 naar 12, hierboven): **een meter die
+stijgt omdat hij beter ziet, is geen achteruitgang; een meter die laag blijft
+omdat hij iets niet ziet, is erger.**
+
+Omdat de kaart VERKLAARD is, staat er alleen op wat iemand opschrijft — zo
+stond de gebaarlaag er na ronde 1 niet op. Sinds ronde 2 leggen drie
+**afgeleide controles** de code ernaast, lexicaal uit dezelfde wandeling over
+`public/` als de dode kanalen: wie `registerAction` aanroept op de Edge-kern is
+gelijk aan de schrijvers van capability-register met die aanroep als citaat, wie
+`data-rtg-world` op body zet staat erop als `wereld:s`, en wie
+`data-rtg-edge-2-state` op body zet als `zichtbaarheidsstand:s`. De eerste is
+de meter voor "het tweede register is leeg": die lijst op nul. Het is een
+ondergrens (een samengestelde naam of een `CONTRACT`-veld ontsnapt; Edge 2 zelf
+staat er daarom met de hand op), elke uitzondering noemt bestand en reden (het
+actieregister van de werkruimte deelt alleen de naam `registerAction`; twee
+platformscripts van de site hebben geen lader, en dat wordt bij elke meting
+opnieuw nagekeken), en een uitzondering die niets meer uitzondert laat de
+controle zakken.
 
 Het oordeel dat daaruit volgt:
 

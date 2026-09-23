@@ -108,10 +108,10 @@ test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezi
   assert.match(ADAPTIVE_LOADER, /if \(!vorm\) return/);
   assert.match(ADAPTIVE_LOADER, /if \(!kern\) return/);
   assert.match(ADAPTIVE_LOADER, /if \(!invoer\) return/);
-  assert.match(SIGNALS, /rtg-adaptive-project/);
-  assert.match(SIGNALS, /rtg-adaptive-presence/);
-  assert.match(SIGNALS, /rtg-adaptive-identity/);
-  assert.match(SIGNALS, /rtg-adaptive-continuation/);
+  /* De signaallaag luistert naar niets: vijf luisteraars zonder zender zijn in
+     ronde 1 weggehaald (EDGE.md par. 10). Wie een scherm iets laat melden,
+     gebruikt de directe API (setIdentity, setPresence, continueWith). */
+  assert.doesNotMatch(SIGNALS, /addEventListener\(/);
 });
 
 test('alle Adaptive Edge-browsermodules blijven onder de productlimiet', () => {

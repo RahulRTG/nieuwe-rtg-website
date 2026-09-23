@@ -67,7 +67,7 @@
           if (frame.isOpen()) frame.collapse(); else { home.scrollIntoView({ block: 'start' }); }
         } });
       }
-      edge(); d.addEventListener('rtg-edge-ready', edge);
+      edge();
       var watch = new MutationObserver(function () { if (d.body.dataset.rtgAdaptiveReady === 'true') { edge(); watch.disconnect(); } });
       if (d.body.dataset.rtgAdaptiveReady !== 'true') watch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-adaptive-ready'] });
       w.addEventListener('rtglang', function () { cards.refresh(); runtime.setState('workspace'); edge(); greet(); });

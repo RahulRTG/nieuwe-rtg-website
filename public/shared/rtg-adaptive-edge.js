@@ -49,10 +49,7 @@
     if (action === 'status') return legacy('.rtg-edge-state');
     if (action === 'ai') return legacy('.rtg-edge-ai');
     if (action === 'presence') return rt.model.presence && rt.model.presence.action ? execute(rt.model.presence.action) : false;
-    if (action === 'connect') {
-      var event = new w.CustomEvent('rtg-adaptive-connect', { bubbles: true, cancelable: true });
-      return rt.host.dispatchEvent(event) ? legacy('.rtg-edge-menu') : true;
-    }
+    if (action === 'connect') return legacy('.rtg-edge-menu');
     return false;
   }
   function renderSheet() {

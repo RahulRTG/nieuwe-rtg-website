@@ -130,7 +130,6 @@
       try { localStorage.setItem(SLEUTEL, doel); } catch (e) {}
       if (!stil) {
         try { history.replaceState(null, '', '#deel-' + doel); } catch (e) {}
-        document.dispatchEvent(new CustomEvent('rtgdeel', { detail: { deel: doel } }));
       }
       // welk deel er open ging; de stand zonder menu (deel 3) geeft null
       // terug, zodat een aanroeper ziet dat er niets te openen viel

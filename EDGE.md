@@ -49,11 +49,15 @@ meer dan één schrijver of beslisser (par. 1), en
 <!--getal:edgekaart.dodeKanalen-->17<!--/getal--> dode kanalen: `rtg`-gebeurtenissen
 in `public/` waar wel naar geluisterd wordt maar die niemand verstuurt, of
 andersom. Die laatste telling loopt over heel `public/` en niet alleen over de
-Edge, want een dood kanaal naast de Edge is net zo dood — en vijf ervan zijn
-precies de signalen die de Edge zou moeten krijgen (`rtg-adaptive-project`,
-`-presence`, `-identity`, `-continuation`, `-action`: de adaptieve Edge luistert,
-en geen enkel scherm verstuurt ze als gebeurtenis). Namen die in code worden samengesteld, staan apart
-onder `dynamisch` en worden niet geraden.
+Edge, want een dood kanaal naast de Edge is net zo dood. Bij de eerste meting
+waren het er 17, en vijf daarvan waren precies de signalen die de Edge zou
+moeten krijgen (`rtg-adaptive-project`, `-presence`, `-identity`,
+`-continuation`, `-action`: de adaptieve Edge luisterde, en geen enkel scherm
+verstuurde ze). Ronde 1 heeft ze alle 17 gesloten (par. 11). Daarnaast staan er
+<!--getal:edgekaart.levendeKanalen-->13<!--/getal--> levende kanalen, met zender
+én luisteraar: dat getal houdt de nul eerlijk, want een wandeling die niets ziet
+geeft ook nul dood. Namen die in code worden samengesteld, staan apart onder
+`dynamisch` en worden niet geraden.
 
 **`npm run edgedekking` → `EDGEDEKKING.json`: wat een scherm aan de Edge
 vertelt.** Per scherm onder `public/apps/`, in een echte browser met een echte
@@ -91,9 +95,11 @@ de Edge een andere hoofdactie dan hij aanwijst (`hoofdactie-dubbel`), en de
 passkeyspagina wijst er twee aan (`hoofdactie-meervoudig`).
 
 Lees die nullen goed. Identiteit en voortzetting staan op nul omdat er in de
-app **geen producent** is: de adaptieve Edge luistert naar `rtg-adaptive-identity`
-en `-continuation`, en geen scherm verstuurt ze (de dode kanalen hierboven; alleen
-de openbare landing roept `continueWith` rechtstreeks aan). Presence heeft er
+app **geen producent** is: een scherm zou ze via de directe API melden
+(`setIdentity`, `continueWith`), en dat doet alleen de openbare landing. De
+luisteraars op `rtg-adaptive-identity` en `-continuation` zijn in ronde 1
+weggehaald, omdat niemand ze verstuurde (par. 11); er is geen zender bij verzonnen
+(besluit 2 en 7). Presence heeft er
 precies één: de Ga verder-toets meldt zich terwijl hij een handeling uitvoert —
 en de meter voert niets uit. Object en activiteit staan op nul omdat ze in ronde 0 zijn
 **toegevoegd** en nog geen scherm ze zet. Trust staat op nul omdat de twee
@@ -623,13 +629,27 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
 - de contextsleutel zag alleen `aan` (par. 2);
 - `allowed: false` zonder reden viel stil uit de balk en is nu een zichtbaar
   gebrek (par. 1);
-- zonder gewichtstabel faalde een zware handeling open (par. 3).
+- zonder gewichtstabel faalde een zware handeling open (par. 3);
+- **ronde 1: de 17 dode kanalen zijn gesloten.** Vijftien zijn weggehaald: de
+  vijf luisteraars in `rtg-adaptive-edge-signals.js` (er komt geen verzonnen
+  zender bij; de directe API blijft), de luisteraar op `rtg-edge-ready` (de
+  observer op `data-rtg-adaptive-ready` was al de echte trigger), en de zenders
+  van `rtg-adaptive-connect`, `rtg-world-start-ready`, `rtg-route-memory-ready`,
+  `rtg-volscherm`, `rtg-beweging`, `rtg-wachtrij-leeg`, `rtgdeel`,
+  `rtg-workspace-error`, `rtg-storyline-render` en `rtg-platform-role` -- wat die
+  meldden, staat al als attribuut, klasse of melding. Een is aangesloten:
+  `rtg-palet-open`, zodat de Zoeken-knop van de schil doet wat ⌘K doet
+  (`werkruimte.html`). Die knop staat daar in een onderbalk die niet te zien is,
+  dus de e2e bewijst de bedrading en niet dat een mens hem bereikt.
+  `test/edgekaart.test.js` zakt op elk nieuw dood kanaal, en op een wandeling die
+  niets ziet.
 
 **Nagetrokken en open, met de ronde waarin ze horen:**
 
 | Gebrek | Waar | Ronde |
 |---|---|---|
-| vijf signalen waar de Edge naar luistert en die niemand verstuurt (`rtg-adaptive-project`, `-presence`, `-identity`, `-continuation`, `-action`) | `rtg-adaptive-edge-signals.js` | 1 |
+| modulefouten van de werkruimte bereiken geen diagnose: `o.error` is de enige haak en geen aanroeper geeft hem mee (het dode kanaal `rtg-workspace-error` verborg dat) | `interface/workspace-runtime.js` | besluit (foutmelder heeft een budget van 3 en een deur zonder inlog) |
+| de home-actie op de wereldbureaus hangt aan een observer die na de eerste keer losgaat; wordt de adaptieve Edge ooit opnieuw gestart, dan verdwijnt hij (vandaag start niets hem opnieuw) | `interface/world-desktop-home.js` | 2 |
 | een handeling via `registerAction` ontloopt de gewichtsgrammatica | `rtg-adaptive-edge-core.js` | 1 |
 | `RTGAdaptief.doe()` kijkt alleen of iets verhinderd is, niet wat het weegt; wie hem rechtstreeks aanroept, slaat de bevestiging over | `adaptief/register.js` | 3 |
 | een onbekende trap is in `directMag()` licht en in `effectief()` zwaar; `directMag` heeft geen aanroeper, maar twee antwoorden op dezelfde vraag horen niet naast elkaar te staan | `adaptief/grammatica.js` | 1 |

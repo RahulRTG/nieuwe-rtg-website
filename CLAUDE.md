@@ -1532,8 +1532,11 @@ productintelligentie maar een meetbare fundering: `npm run edgekaart`
 dat letterlijk in de bron moet staan) vond <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal-->
 verantwoordelijkheden met meer dan één eigenaar (twee capabilityregisters, twee
 contextmodellen, vier plekken die de wereld vaststellen, vijf standmachines) en
-<!--getal:edgekaart.dodeKanalen-->17<!--/getal--> dode kanalen, waaronder precies de vijf signalen
-waar de adaptieve Edge naar luistert en die geen scherm verstuurt. Het **Edge
+17 dode kanalen, waaronder precies de vijf signalen waar de adaptieve Edge naar
+luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (vijftien
+weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
+nu op <!--getal:edgekaart.dodeKanalen-->17<!--/getal--> dode tegenover
+<!--getal:edgekaart.levendeKanalen-->13<!--/getal--> levende kanalen. Het **Edge
 Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
 herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
 voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op

@@ -140,10 +140,9 @@ const KAART = [
   ['rtg-adaptive-edge-loader.js', 'laden', '', [
     ['beslist', 'overslaan als de global bestaat', 'if (global && w[global]) { done(true); return; }'],
     ['schrijft', 'start de Edge na de keten', 'w.RTGAdaptiveEdge.start(d, w);']]],
-  ['rtg-adaptive-edge-signals.js', 'adaptieve-balk', 'presence:b hoofdactie:l capability-register:l identiteit:l voortzetting:l', [
+  ['rtg-adaptive-edge-signals.js', 'adaptieve-balk', 'presence:b hoofdactie:l capability-register:l', [
     ['leest', 'eenmalig de hoofdactie', "knop = d.querySelector('[data-rtg-edge-primary]:not([hidden])');"],
-    ['beslist', 'pending wordt presence', "if (staat === 'pending') api.setPresence({ label: label + ' wordt uitgevoerd'"],
-    ['leest', 'vijf events zonder zender', "d.addEventListener('rtg-adaptive-project', function (e) {"]]],
+    ['beslist', 'pending wordt presence', "if (staat === 'pending') api.setPresence({ label: label + ' wordt uitgevoerd'"]]],
   ['rtg-adaptive-edge-claim.js', 'adaptieve-balk', 'onderbalk:sb', [
     ['beslist', 'alleen vaste of plakkende balken', "if (stijl.position !== 'fixed' && stijl.position !== 'sticky') return false;"],
     ['schrijft', 'markeert de geclaimde balken', 'winnaars.forEach(function (el) { el.classList.add(EIGEN); });']]],
@@ -237,7 +236,7 @@ const KAART = [
     ['beslist', 'alleen paden binnen het huis', "b.url.charAt(0) === '/' && b.url.charAt(1) !== '/'"]]],
   ['rtg-world-start.js', 'laden', '', [
     ['leest', 'wacht op het renderstempel', "body.getAttribute('data-rtg-edge-2-rendered')==='true'"],
-    ['schrijft', 'klaar-event', "d.dispatchEvent(new CustomEvent('rtg-world-start-ready'));"]]],
+    ['schrijft', 'klaar-vlag op body', "body.setAttribute('data-rtg-world-start','ready');"]]],
   ['interface/second-screen.js', 'schil', 'zichtbaarheidsstand:sb vluchtige-context:l', [
     ['schrijft', 'eigen stand peek/panel/workspace/focus', 'root.dataset.rtgSecondScreen = state;'],
     ['beslist', 'breed: peek wordt workspace', "if (next === 'peek' && mq.matches) next = 'workspace';"],
@@ -262,8 +261,7 @@ const KAART = [
   ['rtg-route-memory.js', 'continuiteit', 'voortzetting:b hoofdactie:l', [
     ['bewaart', 'naar sessionStorage', 'return C.writeStorage(win.sessionStorage, path, state);'],
     ['beslist', 'elke interactie breekt herstel af', 'interrupted = true; stopRestore(); queueSave();'],
-    ['schrijft', 'anker via de publieke API', 'anchorDone = true; win.RTGContinueKey.setPosition(saved.anchor);'],
-    ['schrijft', 'klaar-event', "emit('rtg-route-memory-ready', { route: path, restored: !!saved });"]]],
+    ['schrijft', 'anker via de publieke API', 'anchorDone = true; win.RTGContinueKey.setPosition(saved.anchor);']]],
   ['rtg-daily.js', 'afnemer', 'onderbalk:s bevoegdheid:b', [
     ['rendert', 'exportbalk als Edge-balk', "host.setAttribute('data-rtg-edge-bar', ''); d.body.appendChild(host);"],
     ['beslist', 'gast: knoppen in Edge-balken uit', "if (state === 'guest') d.querySelectorAll('[data-rtg-edge-bar]')"],
@@ -470,6 +468,9 @@ function kanalen() {
     dynamisch.push(...e.dynamisch);
   }
   return {
+    /* Levend = een rtg-naam met zender EN luisteraar. Staat hier zodat "nul dood"
+       nooit groen is doordat de wandeling niets zag (LAT regel 9). */
+    levend: Object.keys(zenders).filter(n => luisteraars[n]).length,
     luisterZonderZender: Object.keys(luisteraars).filter(n => !zenders[n]).sort().map(n => ({ naam: n, luisteraars: luisteraars[n] })),
     zendZonderLuisteraar: Object.keys(zenders).filter(n => !luisteraars[n]).sort().map(n => ({ naam: n, zenders: zenders[n] })),
     dynamisch: dynamisch.sort((a, b) => (a.pad + a.soort + a.uitdrukking).localeCompare(b.pad + b.soort + b.uitdrukking))
@@ -497,7 +498,7 @@ function bouw() {
     .map(n => ({ naam: n, schrijvers: verantwoordelijkheden[n].schrijvers, beslissers: verantwoordelijkheden[n].beslissers, waarom: WAAROM[n] || null }));
   const lagen = {};
   for (const l of [...LAGEN].sort()) lagen[l] = lijst.filter(b => b.laag === l).map(b => b.pad);
-  const dodeKanalen = kanalen();
+  const { levend, ...dodeKanalen } = kanalen();
   return {
     uitleg: 'Gemaakt met scripts/edgekaart.js; de methode staat in de kop. Rollen en verantwoordelijkheden zijn VERKLAARD en elk citaat staat letterlijk in zijn bestand. ' +
       'schrijver = houdt of zet de toestand zelf; beslisser = kiest de uitkomst; lezer = leest haar of voedt haar via de API van de eigenaar. ' +
@@ -506,7 +507,7 @@ function bouw() {
       'Een dubbele eigenaar is een vondst en geen oordeel.',
     bestanden: lijst, verantwoordelijkheden, lagen, dubbeleEigenaars, dodeKanalen,
     telling: { bestanden: lijst.length, rollen: lijst.reduce((n, b) => n + b.rollen.length, 0), dubbeleEigenaars: dubbeleEigenaars.length,
-      dodeKanalen: dodeKanalen.luisterZonderZender.length + dodeKanalen.zendZonderLuisteraar.length }
+      dodeKanalen: dodeKanalen.luisterZonderZender.length + dodeKanalen.zendZonderLuisteraar.length, levendeKanalen: levend }
   };
 }
 
@@ -529,7 +530,7 @@ function main() {
   const t = r.telling, dk = r.dodeKanalen;
   const regel = 'EDGEKAART: ' + t.bestanden + ' bestanden, ' + t.rollen + ' rollen, ' + t.dubbeleEigenaars + ' dubbele eigenaars, ' +
     t.dodeKanalen + ' dode kanalen (' + dk.luisterZonderZender.length + ' luisteren zonder zender, ' +
-    dk.zendZonderLuisteraar.length + ' zenden zonder luisteraar), ' + dk.dynamisch.length + ' dynamisch';
+    dk.zendZonderLuisteraar.length + ' zenden zonder luisteraar), ' + t.levendeKanalen + ' levend, ' + dk.dynamisch.length + ' dynamisch';
   if (argv.includes('--controle')) {
     /* Ontbreken en onleesbaar zijn twee toestanden, en geen van beide is "loopt
        achter" (scripts/stillezing.js): ze zakken allebei, met hun eigen reden. */

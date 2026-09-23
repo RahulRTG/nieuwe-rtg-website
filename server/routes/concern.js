@@ -10,18 +10,19 @@
    ÉÉN 404 VOOR "BESTAAT NIET" EN "NIET VAN JOU". Het verschil zou verklappen
    welke id's bestaan.
 
-   De mensenkant (dienstverbanden, uitnodigen, rechten) staat in
+   De vestigingen staan in ./concern/vestiging.js. De mensenkant (dienstverbanden, uitnodigen, rechten) staat in
    ./concern/mensen.js en de veranderkant in ./concern/verandering.js: dit
    bestand ging over de 10 kB van het modulebeleid, en dat is de goede naad --
    hier het bedrijf, daar de mensen, daar de verbouwing. */
+const { duidBestuurder } = require('../kern/concern/persoon');
+
 module.exports = (kern) => {
   const { app, auth, accounts, concernNieuw, concernZet, concernBoom, concernUbo,
     concernBelangen, concernMagTekenen, concernGeraaktDoorVerloop, concernReadiness,
     concernLaunch, concernOverzicht, concernHangtAan, entiteitVind, entiteitNieuw,
     entiteitVanEigenaar, entiteitBeeld, entiteitRegistratie, entiteitOnderneming,
     entiteitGeschiedenis, entiteitVerwijder, ondernemingVind, tijdZet, tijdBeeindig,
-    tijdOpDatum, vestigingNieuw, vestigingVind, vestigingUnit, vestigingUnitLos,
-    vestigingSluit, vestigingBeeld, vestigingAlleVanEntiteit } = kern;
+    tijdOpDatum, vestigingVind } = kern;
 
   /* Zoals in routes/member/onderneming.js: een kernmodule mag een domeinstand in
      `status` zetten, en res.status() weigert een niet-numerieke code. Alleen een
@@ -114,11 +115,15 @@ module.exports = (kern) => {
      Elk feit draagt een bron; ./kern/concern/bron.js weigert het zonder. `wie`
      komt uit de sessie zodat het spoor op een codenaam staat en niet op iets
      wat de aanvrager zelf mag verzinnen. */
-  app.post('/api/concern/feit/zet', auth, (req, res) => {
+  app.post('/api/concern/feit/zet', auth, async (req, res) => {
     const e = mijn(req);
     if (!e) return stuur(res, nietGevonden);
-    const b = req.body || {};
-    stuur(res, tijdZet(e.id, String(b.soort || ''), Object.assign({}, b, { wie: req.session.key })));
+    const soort = String((req.body || {}).soort || '');
+    /* Een bestuurder of gevolmachtigde is een codenaam of uitdrukkelijk extern
+       (kern/concern/persoon.js): een tekengrens moet weten wie het is. */
+    const d = await duidBestuurder(soort, req.body, kern.keyVanCodenaam);
+    if (!d.ok) return stuur(res, d);
+    stuur(res, tijdZet(e.id, soort, Object.assign({}, d.body, { wie: req.session.key })));
   });
 
   app.post('/api/concern/feit/beeindig', auth, (req, res) => {
@@ -166,45 +171,6 @@ module.exports = (kern) => {
     res.json({ ok: true, verloopt: concernGeraaktDoorVerloop(e.id, Number((req.body || {}).dagen) || 60) });
   });
 
-  /* ---- vestigingen en operating units ---- */
-  app.post('/api/concern/vestigingen', auth, (req, res) => {
-    const e = mijn(req);
-    if (!e) return stuur(res, nietGevonden);
-    res.json({ ok: true, vestigingen: vestigingAlleVanEntiteit(e.id).map(vestigingBeeld) });
-  });
-
-  app.post('/api/concern/vestiging/nieuw', auth, (req, res) => {
-    const e = mijn(req);
-    if (!e) return stuur(res, nietGevonden);
-    stuur(res, vestigingNieuw(e, req.body || {}));
-  });
-
-  /* De zaak aanwijzen. Het bewijs is hetzelfde als bij de onderneming: een lid
-     dat als actieve beheerder in het personeelsregister van die zaak staat. */
-  app.post('/api/concern/vestiging/zaak', auth, (req, res) => {
-    const v = mijnVestiging(req);
-    if (!v) return stuur(res, nietGevonden);
-    const beheert = (code) => {
-      const acc = req.session && req.session.account;
-      if (!acc || acc.id == null || !accounts || !accounts.staffByMember) return false;
-      const rij = accounts.staffByMember(code, acc.id);
-      return !!(rij && rij.role === 'manager');
-    };
-    stuur(res, vestigingUnit(v, (req.body || {}).code, beheert));
-  });
-
-  app.post('/api/concern/vestiging/zaaklos', auth, (req, res) => {
-    const v = mijnVestiging(req);
-    if (!v) return stuur(res, nietGevonden);
-    stuur(res, vestigingUnitLos(v, (req.body || {}).code));
-  });
-
-  app.post('/api/concern/vestiging/sluit', auth, (req, res) => {
-    const v = mijnVestiging(req);
-    if (!v) return stuur(res, nietGevonden);
-    stuur(res, vestigingSluit(v, (req.body || {}).per));
-  });
-
   /* ---- readiness en livegang ---- */
   app.post('/api/concern/readiness', auth, (req, res) => {
     const e = mijn(req);
@@ -218,7 +184,17 @@ module.exports = (kern) => {
     res.json(Object.assign({ ok: true }, concernLaunch(e)));
   });
 
-  require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden });
+  const personeelVan = (code) => (accounts && accounts.listStaff ? accounts.listStaff(code) : []);
+  /* Beheert dit lid de zaak? Een actieve manager in het personeelsregister van
+     die zaak; hier gebouwd en als hulp doorgegeven, zoals personeelVan. */
+  const beheertZaak = (req, code) => {
+    const acc = req.session && req.session.account;
+    if (!acc || acc.id == null || !accounts || !accounts.staffByMember) return false;
+    const rij = accounts.staffByMember(code, acc.id);
+    return !!(rij && rij.role === 'manager');
+  };
+  require('./concern/vestiging')(kern, { mijn, mijnVestiging, stuur, nietGevonden, beheertZaak });
+  require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden, personeelVan });
   require('./concern/verandering')(kern, { mijn, stuur, nietGevonden });
   require('./concern/voorstel')(kern, { mijn, stuur, nietGevonden });
 };

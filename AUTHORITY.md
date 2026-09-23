@@ -116,8 +116,8 @@ Dit huis heeft meer dan het zelf weet:
 ### 1.5 Wat er aantoonbaar ontbreekt
 
 - **geen gegevensklasse per veld** (bevestigd; `KANTOORMACHT.md` zegt het al);
-- **geen onderscheid tussen lezen en exporteren**; `/api/office/export.csv` laat
-  geen enkel spoor na;
+- **geen onderscheid tussen lezen en exporteren**; `/api/office/export.csv` liet
+  geen enkel spoor na (gerepareerd: B1, en fase 6 in par. 5f);
 - **geen machtigingsversie in het token** (`userId.exp.issued.sid`): intrekken
   bestaat per sessie en per account, niet per recht;
 - **geen offboarding**: `server/kern/concern/employment.js` verwijst naar een
@@ -330,13 +330,13 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 |---|---|---|
 | 0 | P0 + P0b | **klaar** |
 | 1 | **de beleidsmotor in de schaduw**: `kan(...)` leest de bestaande poorten en geeft een besluit met opbouw; draait naast elke kantoorroute en telt waar hij het oneens is (de vorm van `tegenfeit.js`) | **staat, in de schaduw** (23 september 2026; zie par. 5a) |
-| 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | fase 1, besluit A2 |
+| 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | **staat** (23 september 2026; par. 5h): de uitnodiging op naam, en de gedeelde code koppelt geen kantoorrol meer (besluit van dezelfde dag). Inloggen op het kantoor met de code blijft |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
-| 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | fase 2 |
-| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | fase 4 |
-| 6 | **lezen ≠ exporteren**, en export met een spoor | fase 4 |
-| 7 | **identiteiten voor agents, diensten en apparaten** | **agent staat** (23 september 2026; par. 5c); diensten en apparaten niet |
-| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **"waarom" over jezelf staat** (`/api/office/beleidsmotor/waarom`); reviews, slapende rechten en de simulator niet |
+| 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
+| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e), en **het onderwerp staat ook**: de uitgave in het Werk OS, met functiescheiding, de strengste van twee tekengrenzen (werkruimte en concerngraaf), en een betaalwijze die de werkruimte kiest en RTG aan of uit zet (par. 5e, vervolg). Samen tekenen uit de concerngraaf staat nog open |
+| 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
+| 7 | **identiteiten voor agents, diensten en apparaten** | **staat** (23 september 2026; par. 5c en 5i): agent, diensten, toestellen, webhooks, en de zaakdoos met een eigen sleutel in de schaduw. De gedeelde doos-sleutel gaat dicht als elke doos er een heeft; het overzicht toont welke nog gedeeld melden |
+| 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **staat** (23 september 2026; par. 5g) |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
 
 ### 5a. Fase 1, zoals hij er staat
@@ -443,7 +443,400 @@ slecht: er stond een klik van het lid, en niemand zag dat een machine het deed.
 **Wat nog niet staat.** Een effectieve bevoegdheid als DOORSNEDE van mens, agent,
 doel en gegevensbeleid. Vandaag is het de bevoegdheid van de mens, versmald door
 `kern/stuur/beleid.js`; het mandaat (`kern/stuur/mandaat.js`) heeft nog geen
-aanroeper. Diensten en apparaten krijgen nog geen eigen identiteit.
+aanroeper. Diensten en toestellen kregen daarna een eigen identiteit (par. 5i).
+
+### 5d. Fase 4 in de schaduw: de boardroom in werkwoorden, de kamers met hun soort
+
+De meting vooraf: `boardroomAuth` staat op 115 routes, en die ene vlag zet
+instellingen, geld, kosten, toegang, partners, export, techniek, De Salon en
+Magnaat in een keer open. De 26 kamers hebben geen eigen deur. Ze hangen allemaal
+achter `officeAuth`, en er bestaat nergens een toewijzing van mensen aan kamers.
+De kamer staat in het lichaam van het verzoek (`id` of `kamer`) en niet in het pad.
+
+- **De gegevens.** `kern/beleidsmotor/werkwoorden.js` deelt de boardroom op in tien
+  werkwoorden (toegang, kosten, geld, export, partners, magnaat, techniek,
+  toezicht, salon en instellingen). Elk werkwoord heeft een verklaarde trede van
+  de gezagsnoemer; alleen `toezicht` staat op `tonen`. Het bestand legt ook per
+  kamer de soort vast, uit KANTOORMACHT.md par. 3: 18 bestuurlijk, 1 sociaal en
+  7 product. Alleen een bestuurlijke kamer kan een bevoegdheid dragen. Er komt
+  geen zesde vocabulaire bij (besluit A1): dit zijn de onderwerpen waaronder de
+  motor telt, geen nieuwe rollen.
+- **De telling.** Achter de boardroom telt de motor per werkwoord hoe vaak het
+  gebruikt werd, en achter de kantoordeur per kamer. Er wordt niet vastgelegd wie
+  het deed. Een kamer-id die niet in het register staat telt niet mee, zodat
+  invoer van buiten de opslag niet kan laten groeien. De stand
+  (`/api/office/beleidsmotor`) toont `werkwoorden`, `kamers` en `zonderWerkwoord`.
+- **Getoetst** in `test/beleidsmotor-werkwoorden.test.js`:
+  - elke boardroomroute valt onder precies één werkwoord, en elk werkwoord raakt
+    minstens één route;
+  - de kamersoorten zijn gelijk aan het levende register;
+  - elke kamerroute bestaat;
+  - tegen een echte server wordt het gebruik geteld, en een geweigerde of
+    verzonnen aanroep telt niet.
+
+  Vier mutaties laten de toets zakken: tellen zonder door de poort te zijn
+  gegaan, een verzonnen kamer toelaten, een werkwoord zonder route, en de
+  kantine bestuurlijk maken.
+
+**Wat nog niet staat, en waarom.** Er is nog geen zetel per werkwoord en geen
+toewijzing aan een kamer, en er wordt niets tegengehouden. Wie welk werkwoord
+krijgt is een besluit van de eigenaar, en dat hoort op een getal te staan: deze
+telling levert dat getal. Afdwingen wacht op fase 2, omdat een werkwoord niet toe
+te wijzen is aan de gedeelde code, die geen mens draagt. De uitrol gaat daarna per
+kamer en per werkwoord, niet op een percentage (KANTOORMACHT.md). De vier kamers
+die het machtsmodel mist (veiligheid, operaties, bestuur en risico) staan er ook
+nog niet.
+
+### 5e. Fase 5, de vier ogen: wat dicht is en wat eerst een onderwerp nodig heeft
+
+De meting vooraf: `geld.goedkeuren` wordt door geen enkele route op naam
+gecontroleerd. Het Werk OS (`server/bedrijf/`) kent geen factuur, betaling of
+inkooporder, en contract, klant en dienstverband leggen niet vast wie ze
+aanmaakte (`door` is hooguit een naam, en bij een dienstverband ontbreekt hij
+helemaal). De echte goedkeuringen met vier ogen staan elders: de loonrun
+(`kern/payroll/run.js`), de uitgaven van RTFOS (`kern/rtfos/geld-uitgaven.js`) en
+de beslislaag van de geldketen (`kern/commercie/besluit.js`). Daar zaten twee gaten.
+
+- **Een loonrun werd ondertekend met de gedeelde code.** De administrateur tekende
+  achter `officeAuth`, en onder de handtekening stond `onbekend`. Een handtekening
+  van niemand geeft geen vier ogen. `/api/office/payroll/run/keur` en `/definitief`
+  hangen nu achter `naamAuth`. De naam komt uit de sessie (de codenaam van de mens),
+  nooit uit het lichaam. De gedeelde code krijgt 403 met de weg erheen
+  (`test/office-payroll-dekking.test.js`).
+- **De beslislaag liet de aanvrager zichzelf goedkeuren.** Stap 4 van `beslis()`
+  keek alleen of er een `goedgekeurdDoor` was, en niet of dat een ander was. Nu
+  telt een goedkeuring door de aanvrager zelf niet als tweede persoon
+  (`test/besluit.test.js` toets 7).
+
+Beide zijn met een mutatie nagetrokken: haal de reparatie weg en de toets zakt.
+
+**Wat nog niet staat, en waarom.** De drie conflicten van `scope.js` afdwingen
+kan pas als er een ONDERWERP is om ze op af te dwingen. "Je keurt geen betaling
+goed aan een relatie die je zelf aanmaakte" vraagt een betaling die in het Werk
+OS bestaat en een relatie die haar maker vastlegt, en geen van beide is er. Een
+afdwinging over rechten die niemand controleert, zou een schijnbewaker zijn.
+Hetzelfde geldt voor een tekengrens per organisatie: `besluit.js` heeft een
+globaal beleid, en `kern/concern/graaf-bevoegdheid.js` kent al een tekenlimiet
+per bestuurder of volmacht. Die twee aan elkaar hangen is de volgende stap. Dat is
+aansluiten en niet uitvinden, en er komt geen derde rechtenmodel bij.
+
+**Het onderwerp staat (besluit van de eigenaar, 23 september 2026: de
+Werk OS-betaling bouwen).** De meting vooraf vond dat het Werk OS het meeste al
+had: de ene goedkeurroute (`bedrijf/regelpoort.js`) met een goedkeuring die aan
+het bedrag hangt, bedrijfsregels met een drempel (`bedrijf/regels.js`), en een
+dood startblok dat naar `/api/bedrijf/uitgave/maak` wees zonder dat die route
+bestond. `bedrijf/uitgave.js` vult dat gat, en voegt geen rechtenmodel toe:
+
+- **de uitgave draagt haar indiener uit de sessie** (`door`, het lid met een eigen
+  sleutel). Het beheer-token dient niets in, want een uitgave zonder gezicht maakt
+  functiescheiding ontoetsbaar;
+- **de indiener keurt niet goed**, ook niet namens een tweede recht. Dat is het
+  conflict `inkoop-en-betalen` van `scope.js`, nu afgedwongen op de plek waar het
+  onderwerp woont (de haak `keurGrendel` in de goedkeurroute);
+- **elke uitgave eist minstens een goedkeuring namens `geld.goedkeuren`**, ook
+  zonder bedrijfsregel. Anders is een uitgave onder de drempel met alleen de
+  indiener "rond". Een bedrijfsregel kan er iets bij eisen (`soort: 'uitgave'`,
+  met drempel, land en afdeling zoals bij een contract);
+- **de tekengrens is een versmalling per lid** (`/api/bedrijf/lid/tekengrens`,
+  dezelfde deur als de rollen). Boven de grens keurt het lid niet goed namens
+  `geld.goedkeuren`; geen grens betekent geen versmalling, en een grens verleent
+  nooit een recht;
+- **het bedrag staat vast**: er is geen route die het wijzigt;
+- **er gaat geen geld** (GELD.md). De stand wordt berekend
+  (`wacht op goedkeuring`, `goedgekeurd`, `betaald`), en betaald is een NOTITIE
+  van een mens die niet de indiener is, met een kenmerk: de betaling gebeurt
+  buiten RTG.
+
+`test/bedrijfuitgave.test.js` loopt het tegen een echte server; acht mutaties
+laten hem zakken, waaronder de indiener laten goedkeuren, de tekengrens negeren,
+de basiseis weghalen en de indiener uit het verzoek nemen.
+
+**Twee besluiten erna (23 september 2026), en de meting die ze vormde.**
+
+*De strengste van twee grenzen.* De meting vond geen enkele koppeling tussen een
+werkruimte en een entiteit, en een bestuurder in de concerngraaf was een VRIJE
+naam ("marco") -- een tekenlimiet vergelijken op een naam die niemand heeft
+gecontroleerd is raden. Daarom drie stukken, en geen van drie verleent iets:
+
+- een bestuurder of gevolmachtigde is voortaan een RTG-codenaam, of uitdrukkelijk
+  iemand van buiten RTG (`kern/concern/persoon.js`, dezelfde vorm als
+  `kern/onderneming/bestuur-persoon.js`). Een vrije naam zonder die vlag wordt
+  geweigerd; oude vrije namen blijven in het register staan maar tellen niet mee
+  (`herkend` in `concernMagTekenen`);
+- een werkruimte koppelt aan een entiteit (`/api/bedrijf/werkruimte/entiteit`)
+  alleen via een lid dat aan zijn eigen RTG-account hangt en eigenaar van die
+  entiteit is -- anders kan iemand de tekenlimieten van andermans bedrijf lenen;
+- de goedkeurgrendel (`bedrijf/tekengrens.js`) neemt de laagste van de twee:
+  de grens van het lid in de werkruimte, en de tekenlimiet van dezelfde mens als
+  HERKENDE bestuurder of gevolmachtigde. Let op de eenheden: de concerngraaf
+  rekent in euro's, het Werk OS in centen.
+
+*De betaalwijze kiest de werkruimte, en RTG zet de tweede weg aan of uit.* De
+meting vond dat "klaarzetten in RTG Bank" niet kan als betaalopdracht: die boekt
+meteen, heeft geen wachtstand, en de rij dient hem vanzelf in -- geld zou het
+huis verlaten zonder dat een mens drukt. En er is geen rekening per werkruimte.
+Dus:
+
+- `extern` (standaard): buiten RTG betalen, en een ander dan de indiener noteert
+  het met een kenmerk;
+- `rtgbank`: een ander dan de indiener maakt een gewone SEPA-overboeking vanaf
+  zijn EIGEN RTG-rekening, en het Werk OS toetst die opdracht
+  (`kern/werkbetaling.js`): hij bestaat, is niet mislukt, komt van een rekening
+  van deze codenaam, is precies dit bedrag, gaat naar het IBAN van de uitgave, en
+  hangt nog niet aan een andere uitgave;
+- de schakelaar van RTG (`/api/office/werkos/bankpad/zet`) staat standaard UIT,
+  alleen de eigenaar zet hem, met de passkey (`eigenaar-werkbankpad`). Staat hij
+  uit, dan valt een werkruimte die `rtgbank` koos terug op `extern`, met de reden
+  in het antwoord.
+
+`test/bedrijfuitgave-mix.test.js` loopt het met echte RTG-accounts en een echte
+SEPA-opdracht; twaalf mutaties laten hem zakken. Twee zakten eerst NIET, en dat
+waren zwakke beweringen: de eigenaarsgrendel werd alleen met de gedeelde code
+beproefd (die al eerder faalde), en een externe met dezelfde naam als een lid
+kwam in geen toets voor. **Wat bewust nog niet staat**: een rekening op naam van
+de werkruimte zelf (wie is dan rekeninghouder, en onder welke vergunning), en de
+gezamenlijke bevoegdheid uit de concerngraaf (samen tekenen) -- de grendel kent
+hier alleen de limiet per mens.
+
+### 5f. Fase 6: lezen is niet exporteren
+
+De meting vooraf ging uit van wat een export DOET, niet van hoe hij heet. Een
+kantoorroute die een bijlage meegeeft (`Content-Disposition: attachment`) stuurt
+een bestand het huis uit, en dat is daarna niet meer terug te halen. Er zijn er
+twee: `/api/office/export.csv` (alle bestellingen, ritten en boekingen met de
+codenaam van de klant) en `/api/office/aidata/export` (de complete AI-dataset).
+Beide eisen een mens (`kluisAuth` en `boardroomAuth`) en leggen hun spoor vast
+VOORDAT de bytes gaan (`inzagelog.noteerVast` en de duurzame `afdelingen.audit`);
+lukt dat niet, dan wordt er geweigerd. De andere exports in het huis zijn
+zelfexports: een lid of een zaak die de eigen gegevens ophaalt. Dat is geen
+kantoormacht.
+
+- **Het register.** `EXPORTEN` in `kern/beleidsmotor/werkwoorden.js` noemt per
+  export de poort, het spoor en wat erin zit. Het is geen zesde vocabulaire, maar
+  de verklaring waar de beleidsmotor mee telt.
+- **De telling.** Een GELEVERDE export telt apart van lezen. Een geweigerde telt
+  niet (`/api/office/beleidsmotor`, veld `exporten`).
+- **De handhaving.** `test/beleidsmotor-exporten.test.js` zoekt de bijlagen zelf
+  op in de BRON, met het commentaar eruit. De toets zakt:
+  - bij een kantoorexport die niet in het register staat;
+  - bij een verklaarde export die geen bijlage meer geeft;
+  - bij een export achter een poort die geen mens eist;
+  - bij een register dat een andere poort noemt dan de router.
+
+  Tegen een echte server exporteert de gedeelde code niets. Vier mutaties laten
+  de toets zakken, waaronder de boekhoudexport terugzetten achter `officeAuth`.
+
+**Wat dit NIET dekt.** Een JSON-antwoord met een hele collectie is ook bulk, maar
+in de bron is dat niet te onderscheiden van een scherm. Een grens daarop vraagt
+een gegevensklasse per veld, en die bestaat niet (par. 1.5). Het afschrift van een
+lid (`/api/office/bank/afschrift`) blijft achter de gedeelde code: het is lezen,
+en ENFORCE_EXECUTE vóór ENFORCE_READ is een besluit (`test/bankdeuren.test.js`).
+
+### 5g. Fase 8: de toegangsreview
+
+`/api/office/beleidsmotor/review` (boardroom, met een verplichte reden) geeft per
+houder van een kantoorzetel:
+- de codenaam, nooit een naam;
+- de zetels en sinds wanneer;
+- wat de vier deuren voor die mens zouden besluiten.
+
+De review leest drie bronnen, elk met een eigen levenscyclus: de kantoorrol op
+een account, de boardroomtoegang en de baliezetels. Hij schrijft er niets in.
+Intrekken gebeurt waar het recht woont (fase 3), want een tweede intrekweg hier
+zou uiteenlopen met de eerste. Drie dingen die niet mogen sneuvelen:
+
+- **Een review is een lijst mensen.** Daarom vraagt hij een reden, en de regel
+  in het inzagejournaal moet VASTSTAAN voordat de lijst wordt samengesteld.
+  Onder `schrijf-verloren` komt er geen lijst.
+- **Er wordt niet gerangschikt.** De volgorde is alfabetisch op codenaam en op
+  niets anders, want een review die rangschikt maakt van toegang een score.
+- **De deuren zijn GESIMULEERD en dat staat erbij**: "als deze mens met zijn
+  eigen account en de kantoorrol inlogt". Een zetel zonder kantoorrol opent
+  niets en wordt gemeld als `zetelZonderDeur`, niet verborgen.
+
+In `nietGezien` staat wat de review niet ziet: de gedeelde code (die heeft
+geen houder), rollen binnen RTFOS en rollen in het Werk OS van een klant.
+`test/beleidsmotor-review.test.js` beproeft dit tegen een eerlijke en een
+liegende server. Zes mutaties laten de toets zakken, waaronder het spoor
+negeren, geen reden eisen, een zetelbron overslaan en een besluit vast op
+toestaan zetten.
+
+**De simulator** (`/api/office/beleidsmotor/simulatie`, boardroom, reden en een
+journaalregel die vaststaat, net als de review) laat voor een codenaam zien welke
+deuren van besluit wisselen als hij een zetel erbij krijgt (`plus`) of kwijtraakt
+(`min`). Er verandert NIETS: het is een rekensom over dezelfde feiten als de
+review, en de toets kijkt na afloop of de echte zetels gelijk bleven. Een
+onbekende zetelsoort wordt genoemd (`genegeerd`) en niet stil verwerkt. De toets
+vond meteen iets dat in het ontwerp stond maar in de verwachting ontbrak: wie een
+boardroomzetel krijgt, zit ook aan de balie (`magBalie` rekent de boardroom mee),
+dus de simulatie toont twee deuren die omslaan en niet een.
+
+**Slapende rechten, op besluit van de eigenaar (23 september 2026): alleen de
+laatste gebruiksdatum per zetel, 90 dagen bewaard** (`kern/beleidsmotor/slapend.js`).
+Per houder en per zetel (kantoorrol, boardroom, balie) staat er EEN datum: de dag
+waarop hij voor het laatst door die deur ging. Er staat geen tijdstip, geen route,
+geen handeling en geen aantal bij, want dat zou een gedragslogboek over personeel
+zijn. Een datum ouder dan 90 dagen wordt gewist. Een zetel zonder datum heet pas
+`slapend: ja` als de meting zelf 90 dagen loopt; daarvoor heet hij `onbekend`, en
+"we weten het niet" is geen "slapend". De schrijfweg is die van
+`kantoor/mensdeur-spoel.js` (een RAM-buffer, `bewerkCollectie` op een timer), want
+er wordt genoteerd NA het antwoord, en een `save()` daar brak al eens de
+PostgreSQL-opstelling. `test/beleidsmotor-slapend.test.js` beproeft de 90 dagen met
+een nagebootste klok, en de reviewtoets beproeft tegen een echte server dat de
+kantoorrol vandaag `nee` is en een ongebruikte baliezetel `onbekend`. Vier mutaties
+laten de toets zakken.
+
+### 5h. Fase 2: de kantooruitnodiging op naam, naast de gedeelde code
+
+Besluit van de eigenaar (23 september 2026): nu bouwen, en de gedeelde
+kantoorcode laten werken tot de schaduw een week heeft gemeten. Wie vandaag de
+kantoorrol koppelt, doet dat met een code die het hele kantoor kent, en die code
+bewijst dus niet wie er koppelt. `kern/kantoor/uitnodiging.js` legt ernaast een
+uitnodiging die dat wel doet:
+
+- **op naam**: alleen het account waarvoor hij is gemaakt kan hem verzilveren. De
+  poging van een ander verbruikt hem niet;
+- **eenmalig**: een nieuwe uitnodiging voor dezelfde mens maakt de oude ongeldig;
+- **zeven dagen geldig**;
+- **zonder de code op te slaan**: de opslag houdt een hash. De eigenaar ziet de
+  code een keer, in het antwoord.
+
+De eigenaar maakt hem (`/api/office/kantoor/uitnodiging`). Dat is zwaar, net als
+boardroomtoegang geven, en alleen de eigenaar mag het, ook niet wie
+boardroomtoegang kreeg. De medewerker verzilvert hem via `/api/account/koppel` met
+`uitnodiging` in plaats van `code`. Dat gaat langs hetzelfde pogingenslot en
+dezelfde tweede factor, en de uitnodiging wordt pas verbruikt als ook die klopt.
+Er wordt geen recht verleend dat de gedeelde code niet ook gaf.
+
+**De schaduw**: elke geslaagde koppeling telt mee onder de weg waarlangs hij
+kwam (`/api/office/kantoor/uitnodigingen`, veld `koppelwegen`). Zodra
+`gedeeldeCode` niet meer stijgt, kan de gedeelde code dicht voor NIEUWE
+koppelingen. Dat is een apart besluit, en deze module neemt het niet.
+`test/kantooruitnodiging.test.js` beproeft dit tegen een echte server. Zeven
+mutaties laten de toets zakken, waaronder het verzilveren door een ander, geen
+vervaldatum, de code in de opslag en de eigenaarscontrole weglaten. Niet
+beproefd is de volgorde met de tweede factor (dat de uitnodiging pas na een
+geldige TOTP opgaat), want de toetsen draaien zonder `OFFICE_TOTP_SECRET`.
+
+**Dicht voor nieuwe koppelingen (besluit van de eigenaar, later op 23 september
+2026).** De week meten is niet afgewacht: de eigenaar koos "nu dicht". De
+gedeelde code koppelt geen kantoorrol meer aan een account; `/api/account/koppel`
+geeft 403 met `watNu: 'uitnodiging'`, goed of fout getypt hetzelfde antwoord, en
+telt de poging als `gedeeldeCodeGeweigerd`. Wat blijft: inloggen op het kantoor
+met de code (`/api/office/login`), en de koppelingen die al bestonden. Vier
+dingen die dat besluit blootlegde:
+
+- **er was geen scherm om een uitnodiging te maken of te verzilveren.** De
+  boardroom heeft nu *Iemand in het kantoor* (alleen de eigenaar, met de vinger),
+  en de kantoorlogin van `personeel.html` toont een veld voor de uitnodiging aan
+  wie ingelogd is en de rol nog niet heeft. Het personeelsscherm koppelde tot dan
+  STIL met de code na elke kantoorlogin; die regel is weg;
+- **de ceremonie kende de naam `eigenaar-kantooruitnodiging` niet.** Zolang de
+  eigenaar geen passkey heeft valt dat niet op; daarna was de route dicht voor
+  precies de mens die hem mag gebruiken. Hij staat nu in `ZWARE_ACTIES`, en
+  `test/eigenaarbevestiging.test.js` toets 0b leest elke `eis(..., '<naam>')` in
+  `server/` en zakt op een naam die de lijst niet kent (mutatie: de naam eruit,
+  toets zakt);
+- **de volgorde met de tweede factor is nu beproefd**: `test/eenaccount.test.js`
+  toets 8 draait met `OFFICE_TOTP_SECRET` en biedt twee keer dezelfde uitnodiging
+  met een foute factor aan; beide keren is de factor het bezwaar. Met de proef
+  weggehaald zakt hij;
+- **de prijs**: wie een kantoorrol op naam nodig heeft (de balie, RTFOS-personeel,
+  de vier-ogenproeven) heeft nu een uitnodiging van de eigenaar nodig. Zonder
+  eigenaar is er niemand die uitnodigt, en dat is de bedoeling. De proeven doen
+  het zoals productie (`kantoorKoppelBody` in `test/helper.js`, en de sleutelbos
+  in `scripts/lib/proefsleutels.js`).
+
+### 5i. Fase 7: diensten en toestellen met een eigen identiteit
+
+De meting (23 september 2026) vond dat diensten en apparaten vandaag geen
+identiteit hebben:
+- de achtergrondtaken die gegevens schrijven, deden dat zonder actor (de
+  bus-envelop gaf `null`) of met een los woord als `'automaat'` of `'systeem'`;
+- een gekoppeld toestel schreef met een eigen sleutel, maar kwam op de bus niet
+  voor;
+- webhooks van aanbieders controleren een handtekening, maar leggen de aanbieder
+  alleen vast als gegevensveld.
+
+Achteraf was dus niet te zien WELKE dienst iets deed. "Het systeem" was een
+alibi.
+
+`kern/dienstidentiteit.js` gebruikt de vorm van de AI-agent: een VOORVOEGSEL in
+de actor van de bus-envelop, `dienst:<naam>` en `toestel:<id>`, zoals
+`ai:rahul`. Er komt geen nieuwe soort in de verzoek-envelop en geen nieuwe rol:
+een identiteit zegt WIE er handelt en verleent niets.
+- **Zeven diensten** die gegevens schrijven draaien nu binnen `alsDienst`:
+  bewaarveger, webmaker-plan, prplus, payroll-bijwerken, zelfzorg, rtgai en
+  agenda-ics. Ook wat verderop uit hun werk volgt, draagt die actor, via de keten
+  van `kern/envelop.js`. De geplande publicatie van een site noteerde `null` als
+  wie en noteert nu `dienst:webmaker-plan`.
+- **De lijst is gesloten.** Een onbekende dienst gooit, en
+  `test/dienstidentiteit.test.js` zakt zodra de bron een dienst noemt die niet is
+  verklaard, of een verklaarde dienst nergens draait. Vier mutaties laten de
+  toets zakken.
+- **Een toestel schrijft als `toestel:<id>`**, niet als het lid. Het lid staat in
+  de meting zelf.
+
+**De zaakdoos krijgt een eigen sleutel, in de schaduw.** De vloot authenticeerde
+met EEN gedeelde sleutel (`RTG_DOOS_SLEUTEL`), en een doos noemde zichzelf in het
+verzoek (`body.doos`). Wie die sleutel had, kon zich dus voor elke doos uitgeven.
+Nu staat er een sleutel per doos naast (`kern/zaakdoos/sleutels.js`, zoals bij de
+toestellen):
+- 48 hex-tekens, een keer getoond, en in de opslag alleen een hash;
+- uitgeven en intrekken kan alleen de eigenaar, met dezelfde extra bevestiging als
+  bij boardroomtoegang (`/api/office/doos/sleutel` en `.../weg`);
+- met een eigen sleutel komt de NAAM uit het register en niet uit het verzoek;
+- de meting draagt `bewezen` en het wereldbord laat het verschil zien;
+- op de bus schrijft de doos als `doos:<naam>`, maar alleen als hij bewezen is: een
+  zelfopgave op de bus zetten zou een verzonnen identiteit bewijzen.
+
+De doos stuurt de eigen sleutel mee als hij er een heeft (`RTG_DOOS_ID` en
+`RTG_DOOS_EIGEN_SLEUTEL`, via `kern/zaakdoos/koppen.js`). De gedeelde sleutel
+werkt nog. Elke geldige aanroep telt onder de weg waarlangs hij kwam
+(`/api/office/doos/sleutels`); de gedeelde sleutel weghalen is een apart besluit.
+
+**Wanneer de gedeelde sleutel dicht mag: als elke doos er een heeft** (besluit
+van de eigenaar, 23 september 2026). Daarvoor moet je zien WELKE dozen nog op de
+gedeelde sleutel melden, en dat stond nergens. Het overzicht draagt nu
+`nogGedeeld`: per naam de laatste keer en het aantal, over de laatste zeven dagen,
+met `heeftEigen` als er al een sleutel is uitgegeven die nog niet op de doos
+staat. De naam is een ZELFOPGAVE (de doos zegt hem zelf, met de gedeelde
+sleutel) en het overzicht zegt dat er ook bij. Wie de gedeelde sleutel heeft, kan
+namen verzinnen: daarom een regel per naam en geen reeks, na dertig dagen stilte
+valt een naam uit de opslag, en er staan er nooit meer dan tweehonderd. De
+boardroom toont het onder *De zaakdozen*, met uitgeven en intrekken voor de
+eigenaar. Er wordt niets afgedwongen.
+
+**Die schermen vonden een gebrek dat geen toets zag: drie zware routes waren met
+een passkey onbereikbaar.** De ceremonie kent alleen de namen in `ZWARE_ACTIES`
+(`kern/webauthn-acties.js`), en `eigenaar-kantooruitnodiging`,
+`eigenaar-doossleutel`(`-weg`) en `bank.incasso` stonden daar niet in. Zonder
+passkey gaat een zware handeling op de terugval door, dus elke toets bleef groen.
+Zodra de eigenaar een passkey zet, weigert de ceremonie de naam, en is de route
+dicht voor precies de mens die hem mag gebruiken. De incassoronde is de gouden
+geldketen van MACHINE.md par. 5a. De reparatie zit bij de oorzaak:
+`kern/zwaarbewijs.js` weigert een onbekende naam bij de EERSTE aanroep met een
+500, ook zonder passkey. De toets die de incassoronde loopt, zakte daar meteen
+op. Daarnaast leest `test/eigenaarbevestiging.test.js` toets 0b elke naam die een
+route als zware ceremonie eist; die lezing is de tweede lijn, want hij miste eerst
+een naam met een punt en een naam via een hulpfunctie.
+
+**Webhooks van aanbieders schrijven nu als `aanbieder:<naam>`** (stripe, mollie,
+adyen, munt, storingen: een gesloten lijst), en alleen NA de controle van hun
+handtekening. Bij Mollie is dat na het opnieuw ophalen van de betaling, want het
+bericht zelf is geen bewijs. Een onbewezen afzender, zoals de demo-afzender,
+draait zonder actor. De eerste versie gebruikte `AsyncLocalStorage.enterWith`, en
+de toets vond dat de identiteit daarmee in de asynchrone context van de aanroeper
+bleef hangen. Het werk na de handtekening gaat daarom als functie in `alsAanbieder`.
+
+Getoetst in `test/doossleutels.test.js` en `test/dienstidentiteit.test.js`. Negen
+mutaties laten de toetsen zakken, waaronder de eigen sleutel negeren, de naam uit
+het verzoek nemen, een niet-eigenaar laten uitgeven, niet intrekken, de sleutel
+in de opslag zetten en de aanbieder niet zetten.
+
+**Wat nog niet staat.** De overige timers die niet schrijven (infrastructuur)
+zijn niet omgezet. De toegangsreview (par. 5g) toont diensten, dozen en
+aanbieders niet, want die houden geen zetel.
 
 ---
 

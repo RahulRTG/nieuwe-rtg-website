@@ -303,6 +303,11 @@ const PUBLIEK = new Map([
      blijven. Hangt een doos ooit rechtstreeks aan het internet, dan is dit
      de eerste route om alsnog achter een poort te zetten. */
   ['/api/doos/status', 'de doos vertelt hoe hij erbij staat; geen zaakdata (zie de opmerking hierboven)'],
+  /* Stond onder ALLEEN_ANONIEM en kwam hier toch door regel 28 omdat het venster
+     van die regel tot in de sleutelwacht van de doos-vloot keek (daar staat een
+     403). Toen die wacht naar routes/doos-wacht.js verhuisde, bleek de ping
+     zonder poort en zonder verklaring -- de verklaring hoort dus HIER. */
+  ['/api/sat/ping', 'leven-teken voor de satellietverbinding: een klok en verder niets'],
   // ---- machine naar machine, met een eigen bewijs in het verzoek ----
   ['/api/betaal/webhook', 'ondertekend door de betaalprovider; een sessie bestaat hier niet'],
   ['/api/betaal/webhook/mollie', 'Mollie heeft geen RTG-sessie; RTG vertrouwt het id niet en haalt de betaling met de eigen geheime sleutel bij Mollie op'],
@@ -357,7 +362,7 @@ const PUBLIEK = new Map([
    maar een plek waar iemand een pad toevoegt.
 
    Nagemeten op 30 augustus 2026, tegen scripts/routekaart.js:
-     8  GET-only, zonder bewaker    (sat/ping, foundation/health, impact, tip,
+     8  GET-only, zonder bewaker    (sat/ping -- sinds 23 september in PUBLIEK --, foundation/health, impact, tip,
                                      bespaartip, gesprekskaart, doos/rapport)
      3  GET-only, met bewaker       (sso/terug, metrics, metrics/kort)
      3  POST met een `auth` die niets eist (auth/resend, account/start,
@@ -371,7 +376,6 @@ const PUBLIEK = new Map([
    ========================================================================== */
 const ALLEEN_ANONIEM = new Map([
   // ---- gezondheid en telemetrie, alleen te lezen ----
-  ['/api/sat/ping', 'leven-teken voor de satellietverbinding'],
   ['/api/foundation/health', 'leven-teken van de RTF (zonder cijfers, zie server/foundation.js)'],
   ['/api/metrics', 'de Prometheus-scrape: van buiten 404, alleen intern of met RTG_METRICS_TOKEN. De ronde klopt zelf vanaf 127.0.0.1 aan, en dat adres mag'],
   ['/api/metrics/kort', 'dezelfde poort, in JSON, voor het techniekbord'],

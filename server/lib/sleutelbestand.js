@@ -44,6 +44,11 @@ const path = require('path');
    vervangen zou elk bestaand token ongeldig maken zonder dat iemand erom
    vroeg -- dat is een besluit van een mens, niet van een opstartpad. */
 function publiceer(pad, inhoud) {
+  /* De datamap kan nog niet bestaan: een verse installatie, of een toets die de
+     sleutel opvraagt voordat een server de map heeft gemaakt. In CI zakte
+     test/pragmavolgorde.test.js daarop zodra de scherfindeling veranderde --
+     dan was er toevallig nog geen eerdere toets die de map had aangemaakt. */
+  fs.mkdirSync(path.dirname(pad), { recursive: true });
   const tmp = pad + '.' + process.pid + '.tmp';
   /* DE MAP HOORT ER TE ZIJN, OOK ALS NIEMAND HEM AL MAAKTE. De oude schrijvers
      deden mkdir voordat ze schreven; bij de verhuizing hierheen viel dat weg, en

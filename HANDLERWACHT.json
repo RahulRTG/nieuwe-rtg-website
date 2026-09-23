@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-23T12:42:00.772Z",
-  "commit": "0ce48fef",
+  "op": "2026-09-23T20:40:38.791Z",
+  "commit": "c72451dd",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -9,8 +9,8 @@
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 624,
-  "bewaakt": 534,
+  "zonderBewakerslaag": 630,
+  "bewaakt": 540,
   "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -19,11 +19,10 @@
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 19
+  "publiekeLijstenVerschillen": 18
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
-   "/api/sat/ping",
    "/api/foundation/health",
    "/api/metrics",
    "/api/metrics/kort",
@@ -49,7 +48,7 @@
  "perWacht": [
   {
    "naam": "werkPoort",
-   "aantal": 92
+   "aantal": 97
   },
   {
    "naam": "poort",
@@ -92,12 +91,12 @@
    "aantal": 11
   },
   {
-   "naam": "lesVan",
+   "naam": "beheerVan",
    "aantal": 10
   },
   {
-   "naam": "beheerVan",
-   "aantal": 9
+   "naam": "lesVan",
+   "aantal": 10
   },
   {
    "naam": "viaBeheerOfDirectie",
@@ -619,7 +618,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/keur",
-   "bestand": "server/bedrijf/regelpoort.js:96",
+   "bestand": "server/bedrijf/regelpoort.js:97",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -702,6 +701,12 @@
    "wacht": "beheerVan"
   },
   {
+   "sleutel": "POST /api/bedrijf/lid/tekengrens",
+   "bestand": "server/bedrijf/tekengrens.js:28",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
    "sleutel": "POST /api/bedrijf/lid/uit-dienst",
    "bestand": "server/bedrijf/leden.js:67",
    "staat": "bewaakt",
@@ -763,19 +768,19 @@
   },
   {
    "sleutel": "POST /api/bedrijf/regel/weg",
-   "bestand": "server/bedrijf/regels.js:136",
+   "bestand": "server/bedrijf/regels.js:138",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/regel/zet",
-   "bestand": "server/bedrijf/regels.js:78",
+   "bestand": "server/bedrijf/regels.js:80",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/regels",
-   "bestand": "server/bedrijf/regels.js:125",
+   "bestand": "server/bedrijf/regels.js:127",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -924,6 +929,24 @@
    "wacht": "werkPoort"
   },
   {
+   "sleutel": "POST /api/bedrijf/uitgave/betaald",
+   "bestand": "server/bedrijf/uitgave.js:87",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/uitgave/maak",
+   "bestand": "server/bedrijf/uitgave.js:55",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/uitgaven",
+   "bestand": "server/bedrijf/uitgave.js:76",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
    "sleutel": "POST /api/bedrijf/uitval",
    "bestand": "server/bedrijf/uitval.js:44",
    "staat": "bewaakt",
@@ -964,6 +987,18 @@
    "bestand": "server/bedrijf/werkruimte.js:92",
    "staat": "bewaakt",
    "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/werkruimte/betaalwijze",
+   "bestand": "server/bedrijf/tekengrens.js:61",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/werkruimte/entiteit",
+   "bestand": "server/bedrijf/tekengrens.js:43",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/maak",
@@ -1019,25 +1054,25 @@
   },
   {
    "sleutel": "POST /api/doos/buurmelding",
-   "bestand": "server/routes/doos.js:140",
+   "bestand": "server/routes/doos.js:123",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/meting",
-   "bestand": "server/routes/doos.js:64",
+   "bestand": "server/routes/doos.js:40",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/rapport",
-   "bestand": "server/routes/doos.js:149",
+   "bestand": "server/routes/doos.js:132",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/update/status",
-   "bestand": "server/routes/doos.js:120",
+   "bestand": "server/routes/doos.js:103",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
@@ -3869,7 +3904,7 @@
   },
   {
    "sleutel": "POST /api/supplier/apply",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js:13",
+   "bestand": "server/routes/supplier/werving/sollicitaties.js:14",
    "staat": "openbaar",
    "reden": "solliciteren bij een zaak kan zonder account"
   },

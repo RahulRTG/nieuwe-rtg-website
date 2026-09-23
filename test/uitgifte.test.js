@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -43,7 +43,7 @@ test.before(async () => {
   const opNaam = async (naam, u) => {
     const lid = (await api(base, '/api/auth/register', { name: naam, email: 'uit' + u + '@x.nl', phone: '06' + u,
       password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'business', pasApp: 'business' })).body.token;
-    await api(base, '/api/account/koppel', { soort: 'kantoor', code: 'RTG-OFFICE' }, lid);
+    await api(base, '/api/account/koppel', await kantoorKoppelBody(base, lid), lid);
     return (await api(base, '/api/account/start', { rol: 'kantoor' }, lid)).body.token;
   };
   const u0 = Date.now().toString().slice(-7);

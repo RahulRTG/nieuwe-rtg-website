@@ -43,7 +43,8 @@ module.exports = (sctx) => {
      eigen tak krijgt -- dezelfde reden waarom kern/command/register.js bestaat. */
   const BAK = {
     contract: (w) => sctx.CONTRACTEN(w),
-    besluit: (w) => sctx.BESLUITEN(w)
+    besluit: (w) => sctx.BESLUITEN(w),
+    uitgave: (w) => sctx.UITGAVEN(w)
   };
   const vind = (w, soort, id) => (BAK[soort] ? eigenVeld(BAK[soort](w), String(id || '')) : null);
 
@@ -53,7 +54,7 @@ module.exports = (sctx) => {
      stellen dezelfde vraag -- en vier antwoorden op één vraag lopen uiteen. */
   function stand(w, soort, obj) {
     const regels = sctx.regelsVoor(w, soort, obj);
-    const eist = [...new Set(regels.flatMap(r => r.eist))];
+    const eist = [...new Set(sctx.basisEis(soort).concat(regels.flatMap(r => r.eist)))];
     const geldig = (obj.goedkeuringen || []).filter(k => !k.vervallen);
     const gedekt = new Set(geldig.map(k => k.recht));
     const ontbreekt = eist.filter(x => !gedekt.has(x));
@@ -115,12 +116,10 @@ module.exports = (sctx) => {
       let: s.eist.length ? null
         : 'Dit ' + soort + ' valt onder geen enkele regel' + (soort === 'contract'
           ? '; het heeft alleen de twee handtekeningen nodig.' : '.') });
-    /* Keuren voor scheppen. De lijst werd hier neergezet VOOR de vier-ogen-vraag
-       hem las; hij staat nu erna. Nagetrokken en niet aangenomen: dat repareert
-       hier geen gat, want deze 409 valt alleen als er AL een goedkeuring in de
-       lijst staat -- en dan bestond hij dus. Het gaat om de volgorde: lezen kan
-       zonder scheppen (wie er niet in staat, keurde niet), en dan blijft dit
-       goed zodra er ooit een controle tussen komt die wel zonder lijst valt. */
+    /* De indiener en de tekengrens (./uitgave.js). Keuren voor scheppen: lezen
+       kan zonder de lijst aan te maken, dus die komt pas na de laatste 409. */
+    const grendel = sctx.keurGrendel(g, soort, obj, recht);
+    if (grendel) return res.status(grendel.status).json({ error: grendel.error });
     const gegeven = Array.isArray(obj.goedkeuringen) ? obj.goedkeuringen : [];
     if (gegeven.some(k => k.lidId === g.l.id && !k.vervallen)) return res.status(409).json({
       error: 'U heeft dit ' + soort + ' al goedgekeurd. Eén mens keurt één keer goed -- anders vinkt iemand met twee rechten een vier-ogen-regel in zijn eentje af.' });
@@ -135,7 +134,8 @@ module.exports = (sctx) => {
       let: na.ontbreekt.length ? 'Nog nodig: goedkeuring namens ' + na.ontbreekt.join(' en ') + '.'
         : soort === 'contract'
           ? (na.mag ? 'Alles rond: het contract staat op actief.' : 'De goedkeuringen zijn rond; er ontbreekt nog een handtekening.')
-          : 'De goedkeuringen zijn rond; de stemronde kan gesloten worden.' });
+          : soort === 'uitgave' ? 'De goedkeuringen zijn rond; de uitgave kan buiten RTG worden betaald.'
+            : 'De goedkeuringen zijn rond; de stemronde kan gesloten worden.' });
   });
 
   app.post('/api/bedrijf/keuring', (req, res) => {
@@ -144,7 +144,7 @@ module.exports = (sctx) => {
     if (!BAK[soort]) return res.status(400).json({ error: 'Keuring bestaat voor: ' + Object.keys(BAK).join(', ') + '.' });
     /* Het recht van de MODULE zelf blijft gelden: wie geen contracten mag zien,
        leest hier ook geen contractstand. */
-    const nodig = soort === 'contract' ? 'recht' : 'besluit';
+    const nodig = soort === 'contract' ? 'recht' : soort === 'uitgave' ? 'geld' : 'besluit';
     if (!g.rechten.includes(nodig)) return res.status(403).json({ error: 'Daarvoor mist u het recht "' + nodig + '".' });
     const obj = vind(g.w, soort, req.body.id);
     if (!obj) return res.status(404).json({ error: 'Dat ' + soort + ' kennen we niet.' });

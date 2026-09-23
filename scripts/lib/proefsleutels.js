@@ -148,7 +148,15 @@ const MUNTERS = [
         email, password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' });
       const lidTok = tok(reg);
       if (!lidTok) return null;
-      const k = await post('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, lidTok);
+      /* De gedeelde code koppelt geen kantoorrol meer (23 september 2026): de
+         boardroom (de eigenaar) maakt een uitnodiging voor deze codenaam. */
+      const me = await post('/api/auth/me', {}, lidTok);
+      const codenaam = me && me.data && me.data.user && me.data.user.codename;
+      const u = codenaam && bos.boardroom
+        ? await post('/api/office/kantoor/uitnodiging', { codenaam }, bos.boardroom) : null;
+      const uitnodiging = u && u.data && u.data.code;
+      if (!uitnodiging) return null;
+      const k = await post('/api/account/koppel', { soort: 'kantoor', uitnodiging }, lidTok);
       if (!k || k.status !== 200 || (k.data && k.data.error)) return null;
       const s = await post('/api/account/start', { rol: 'kantoor' }, lidTok);
       const kantoorTok = tok(s);

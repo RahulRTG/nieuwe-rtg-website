@@ -53,7 +53,7 @@ const ERBIJ = {
   /* Business: de kant van de onderneming. Werven, verkopen, en het bedrijf
      zelf als profiel. */
   business: [
-    'profiel.ondernemer', 'werving.talentpool', 'sales.leads',
+    'profiel.ondernemer', 'werving.talentpool', 'werving.suite', 'sales.leads',
     'inzicht.bedrijf', 'ai.recruiter', 'ai.sales'
   ]
 };
@@ -92,7 +92,11 @@ const BESCHRIJVEND = {
   'profiel.persoonlijk': 'De profiellagen worden niet met magVan gepoort maar met lagenVoor(); dat is dezelfde lijst, een andere ingang.',
   'profiel.professioneel': 'Ook een laag: gepoort met lagenVoor(), en de inhoud komt uit RTG Zakelijk.',
   'profiel.creator': 'Ook een laag: gepoort met lagenVoor(); het gereedschap zelf woont bij de zaak.',
-  'profiel.ondernemer': 'Ook een laag: gepoort met lagenVoor(), gevuld uit de sleutelbos van kern/eenaccount.js.'
+  'profiel.ondernemer': 'Ook een laag: gepoort met lagenVoor(), gevuld uit de sleutelbos van kern/eenaccount.js.',
+  // Besluit 23 september 2026, ARBEID.md par. 7a: geen poort op de pas.
+  'werving.suite': 'De keten van vacature tot loon (werving, aanname, dienstverband via kern/concern/aanname.js, ' +
+    'contract, loonrun) wordt bij de ZAAK gepoort; een werknemer koopt nooit een pas. Assessments met opzet niet: ' +
+    'een cijfer op een mens is een grens.'
 };
 
 // De volgorde is de trap; hij staat één keer en de rest rekent ermee.

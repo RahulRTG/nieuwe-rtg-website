@@ -18,20 +18,24 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, wachtOpRust, wachtOpWaarde } = require('./helper');
 
 const pw = laadPlaywright();
 const BROWSER = process.env.RTG_CHROMIUM || undefined;
 
+/* Wacht op een TOESTAND via wachtOpWaarde uit ./helper (scripts/klokwacht.js);
+   `klopt` mag ook op null of false slaan, dus de waarde gaat verpakt terug. */
 async function wachtTot(lees, klopt, wat, grens = 8000) {
-  const eind = Date.now() + grens;
   let laatst;
-  while (Date.now() < eind) {
-    laatst = await lees();
-    if (klopt(laatst)) return laatst;
-    await new Promise((r) => setTimeout(r, 120));
+  try {
+    const raak = await wachtOpWaarde(async () => {
+      laatst = await lees();
+      return klopt(laatst) ? { waarde: laatst } : false;
+    }, { ms: grens, stap: 120, wat });
+    return raak.waarde;
+  } catch (e) {
+    assert.fail(wat + ' -- na ' + grens + 'ms stond er: ' + JSON.stringify(laatst));
   }
-  assert.fail(wat + ' -- na ' + grens + 'ms stond er: ' + JSON.stringify(laatst));
 }
 
 
@@ -183,6 +187,7 @@ test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op 
    deze proef zet het bord in een frame op dezelfde oorsprong, zoals de werktafel
    een blad opent, en drukt lang op een kaart. Eerst het gebaar en daarna de
    oorzaak: zakt hij, dan zegt de eerste bewering WAT er misgaat. */
+const gram = require('../public/shared/adaptief/grammatica.js');
 
 test('als blad in een frame: lang drukken op een notitie opent de actielade, met de grammatica die de laag zelf meebrengt',
   { skip: geenBrowser(pw) }, async () => {
@@ -204,6 +209,7 @@ test('als blad in een frame: lang drukken op een notitie opent de actielade, met
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 900, height: 900 } });
+    await page.clock.install(); // lang drukken is TIJD: de nepklok springt, er wordt niet gegokt
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
     await page.addInitScript((tok) => {
@@ -230,10 +236,10 @@ test('als blad in een frame: lang drukken op een notitie opent de actielade, met
     const b = await kaart.boundingBox();
     await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
     await page.mouse.down();
-    /* Vasthouden tot de lade open is, niet een vaste tijd (test/klokwacht.test.js). */
+    await page.clock.runFor(2 * gram.DREMPELS.lang);
+    await page.mouse.up();
     await frame.waitForFunction(() => { const d = document.querySelector('dialog.gb-blad'); return !!(d && d.open); },
       null, { timeout: 5000 }).catch(() => {});
-    await page.mouse.up();
     assert.equal(await frame.evaluate(() => !!(document.querySelector('dialog.gb-blad') || {}).open), true,
       'lang drukken op een kaart in een blad hoort de actielade te openen');
     assert.deepEqual(await frame.evaluate(() => ({

@@ -24,7 +24,7 @@
     "server/talen.js": "993c59f4fe76ef1110c384d6fc91d2f4e3aeece2fbca12bbda2922ae898a84c2",
     "server/routes/onboarding.js": "08d74042f7846b0cd177e2dfca7d25f9bea7b1103774e85a4616b3f61d09d2dd",
     "server/kern/onboarding/lid.js": "9a725122b4ee6ada6434479bd99aa68d19026355dc2eebfc3c1a4f9f9d469bc6",
-    "test/helper.js": "42437af63762283fdcfc0743825a3b72fb1da1ecc06169ebf84acbd28e02cbb3",
+    "test/helper.js": "1fdaf241a274ae1cfd44321d33587f2a180607bcfa18e301b027ad5e3a02e3a7",
     "scripts/lib/scherm.js": "9bb3c9eb5390baabb2c69dc798a1e88cfe9d07238f394273221548f53685eb5b",
     "server/translate/batch-model.js": "160464622941708e22843d7e50c6bc92e62512ca2e622f98dd70646543295a6c",
     "server/translate.js": "a9bdd5f0ec8b41494dde3cd2c15aa074087045a162ae65890c52e19fde58cf70",

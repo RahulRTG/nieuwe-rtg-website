@@ -182,3 +182,19 @@ test('elke sleutelschrijver onder server/ gaat langs server/lib/sleutelbestand.j
     assert.match(zonderCommentaar(fs.readFileSync(path.join(WORTEL, p), 'utf8')), re, p + ' laadt zijn sleutel niet meer via de helper');
   }
 });
+
+test('een sleutel publiceren in een datamap die nog niet bestaat, maakt die map aan', () => {
+  /* In CI zakte test/pragmavolgorde.test.js op ENOENT zodra de scherfindeling
+     veranderde: er was toevallig nog geen eerdere toets die server/data had
+     aangemaakt. Dat mag niet van de volgorde van toetsen afhangen. */
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+  const { publiceer } = require('../server/lib/sleutelbestand');
+  const basis = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sleutelmap-'));
+  const pad = path.join(basis, 'nog', 'niet', 'hier', 'secret.key');
+  try {
+    publiceer(pad, 'abc');
+    require('node:assert/strict').equal(fs.readFileSync(pad, 'utf8'), 'abc');
+  } finally { fs.rmSync(basis, { recursive: true, force: true }); }
+});

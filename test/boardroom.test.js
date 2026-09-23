@@ -44,7 +44,7 @@ test.before(async () => {
   esToken = regEs.body.token;
   // een Duits lid ZONDER landcode, maar met "Duitse" nationaliteit op het
   // geverifieerde paspoort: de per-land-regel moet dit alsnog herkennen
-  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE', { eigenaar: OWNER });
   const regDe = await api(base, '/api/auth/register', { name: 'Lid Duitsland', email: 'de' + u + '@x.nl',
     phone: '069' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   deToken = regDe.body.token;

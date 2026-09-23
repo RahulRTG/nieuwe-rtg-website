@@ -28,12 +28,12 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1586,
-    "kernGedeeld": 241,
+    "kernBreedte": 1594,
+    "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 331,
+    "keuringOmvang": 332,
     "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -152,11 +152,48 @@
     {
       "datum": "2026-09-23",
       "soort": "structureel",
-      "sleutel": "edgeDubbeleEigenaars",
-      "van": 11,
-      "meter": "edgeDubbeleEigenaars 11 -> 12",
-      "reden": "De kaart ziet een tweede eigenaar die er al was; er is geen code bijgekomen. Ronde 1 zette gebaar-drempel op een eigenaar (DREMPELS in grammatica.js, met de gebaarversheid van Edge 2 als enige beslisser), maar de gebaarlaag van de lijsten (shared/gebaar/, op elk scherm met basis.js) beslist met eigen maten -- RICHTING 8 en STIL 6 in gebaar-02.js, lang drukken 520 ms en 8 px per as in gebaar-03b.js -- en stond niet op de kaart. Ronde 2 zet hem erop (stap 3, samen met de andere ontbrekende producenten), in het geheugen nagerekend met bouw(): gebaar-drempel is de enige verantwoordelijkheid die daardoor dubbel wordt; alle andere nieuwe rijen landen op namen die al dubbel waren. Een meter die stijgt omdat hij beter ziet is geen achteruitgang; een meter die laag blijft omdat hij iets niet ziet, is erger.",
-      "waarheen": "EDGEKAART.json draagt beide gebaarbestanden als beslisser van gebaar-drempel met een letterlijk citaat, en de WAAROM-regel in scripts/edgekaart.js zegt waarom het dubbel is. Wanneer hij weer daalt: stap 10 van ronde 2 laat gebaar-03b.js lang drukken en stil uit DREMPELS lezen, maar gebaar-02.js houdt RICHTING en STIL, dus de teller blijft 12 tot ook die in de tabel staan."
+      "sleutel": "kernBreedte",
+      "van": 1592,
+      "meter": "kernBreedte 1592 -> 1594 (twee hulpnamen, geen kernvermogen)",
+      "reden": "routes/concern.js ging door de samenvoeging over de 10 kB en is geknipt naar routes/concern/vestiging.js. Die deelmodule krijgt zijn eigendomscontrole als HULP van het hoofdbestand -- mijnVestiging en beheertZaak, in de vorm waarin ./mensen.js personeelVan krijgt -- en scripts/grenzen.js telt wat een deelmodule uit zijn context destructureert als kernnaam. Er komt geen enkel kernvermogen bij: beide zijn functies die in routes/concern.js zelf worden gebouwd.",
+      "waarheen": "server/routes/concern.js (mijnVestiging, beheertZaak) en test/concern-vestiging.test.js, die de eigendomscontrole van de vestigingsroutes tegen een echte server vasthoudt."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 331,
+      "vervalt": "2026-12-23",
+      "meter": "keuringOmvang 331 -> 332",
+      "reden": "De SOM van twee lijnen en geen nieuwe groei: server/lib/mutatiecontracten.js is het verzamelregister waar elke tak EEN require-regel aan toevoegt. #347 bracht hem op 9393 bytes (mutatiecontracten-werkbetaling), #350 op 9387, main stond op 9335 -- alle drie onder de waarschuwingsgrens van ~9400. Samen staat hij op 9445. De harde 10 kB-grens verandert niet, en routes/concern.js, dat door dezelfde samenvoeging erover ging, is in dezelfde ronde op zijn naad geknipt (routes/concern/vestiging.js).",
+      "waarheen": "server/lib/mutatiecontracten.js: de require-lijst van deelregisters laat zich afleiden uit de bestandsnamen (mutatiecontracten-*.js) in plaats van ze een voor een te noemen; dat brengt hem ruim onder de grens."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1586,
+      "meter": "kernBreedte 1586 -> 1592 (de SOM van drie lijnen, niet een nieuwe naam)",
+      "reden": "Samenvoeging van #346, #347 en #350 op main (954b477). Main stond op 1586. #347 voegde er DRIE namen aan toe (de kantooruitnodiging, en de schakelaar en het bankbewijs van de Werk OS-uitgave: 1586 -> 1589), #350 DRIE (de brug, de loonkant en de inhaalslag uit ARBEID.md par. 7a: 1583 -> 1586 op zijn eigen basis), en #346 geen. Elke stap staat met een eigen notitie hieronder. Er komt met deze samenvoeging geen naam bij -- het getal stijgt omdat de lijnen nu naast elkaar staan.",
+      "waarheen": "De notities van de drie takken zelf; dezelfde vorm als de samenvoeging van 15 september (1579 -> 1580)."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1586,
+      "meter": "kernBreedte 1586 -> 1587; kernGedeeld blijft 242",
+      "reden": "De kantooruitnodiging (AUTHORITY.md fase 2, besluit van de eigenaar). Het domein kantoren leest kern.kantoorUitnodiging om een uitnodiging te maken en het overzicht te tonen; de module woont bij de kantoorlaag en wordt in eenaccount verzilverd, waar de kantoorrol aan de sleutelbos komt. Een eigen kopie in het routebestand zou een tweede opslag van uitnodigingen opleveren.",
+      "waarheen": "GRENZEN.json (kantoren draagt kantoorUitnodiging) en test/kantooruitnodiging.test.js"
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 241,
+      "meter": "kernGedeeld 241 -> 242; kernBreedte blijft 1586",
+      "reden": "Vier ogen op de loonrun (AUTHORITY.md fase 5). De administrateur-handtekening kon met de gedeelde code en stond dan op 'onbekend'. payroll-os leest daarom naamAuth (de poort op naam) en codenaamVan (de naam onder de handtekening, uit de sessie). Beide namen bestonden al en worden al door andere domeinen gelezen; een eigen kopie van de poort of de naamopzoeking zou deze meter sparen en een tweede, uiteenlopende deur opleveren (LAT-regel 4, en de kop van kern/kantoor/kluispoort.js).",
+      "waarheen": "GRENZEN.json (payroll-os draagt naamAuth en codenaamVan) en test/office-payroll-dekking.test.js, die vasthoudt dat de gedeelde code 403 krijgt en dat er een mens onder de handtekening staat"
     },
     {
       "datum": "2026-09-23",
@@ -2801,11 +2838,47 @@
     {
       "datum": "2026-09-23",
       "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1584,
+      "meter": "kernBreedte 1584 -> 1585; kernGedeeld blijft 239",
+      "reden": "De loonkant van besluit 1 (ARBEID.md par. 7a): de loonrun leest het dienstverband. Er komt EEN kernnaam bij, `dienstverbandToets`, aangeraakt door het domein payroll-os. Hij had onder de naam van de brug kunnen hangen (een object met twee functies onder `dienstverbandUitAanname`), en dan was deze meter niet bewogen -- maar dat zou de meter omzeilen en geen koppeling uitsparen: de loonrun raakt het concern hoe dan ook aan. De toets zelf woont in de module die het dienstverband BEZIT (kern/concern/aanname.js), zodat de loonkant niet zelf beslist wat een lopend dienstverband is.",
+      "waarheen": "server/kern/concern/aanname.js (dienstverbandToets), server/routes/payroll-os-run.js (de aansluiting bij run/open, binnen een try) en test/aanname-dienstverband.test.js toets 7 tot en met 9. De Adamproef schakel 17 meet het tegen een echte server met een besturingsproef, en zakt zonder de aansluiting."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1583,
+      "meter": "kernBreedte 1583 -> 1584; kernGedeeld blijft 239",
+      "reden": "De brug uit ARBEID.md par. 7a, besluit 1: een aanname via de werving wordt ook een dienstverband bij de entiteit. De werving kende het concern niet, dus er komt EEN kernnaam bij, `dienstverbandUitAanname`, en met opzet geen twee: de claim had ook `vestigingVanUnit` plus `employmentNieuw` kunnen aanraken, en dan zou de werving zelf beslissen welke entiteit bij een zaak hoort. Een eigen toegang zet die keuze in de module die het dienstverband BEZIT (kern/concern/aanname.js), dezelfde vorm als `ondernemingAchterZaak` op 14 september. De naam staat in GRENZEN.json bij supplier en werving, omdat de claim in beide domeinen wordt gemount; hij wordt pas bij het aanroepen opgehaald en binnen een try, zodat de grens een aanmelding nooit kan breken.",
+      "waarheen": "server/kern/concern/aanname.js (de brug, een kant op, zonder personeelsregister), server/routes/supplier/werving/uitnodiging-na.js (de haak na de claim) en test/aanname-dienstverband.test.js (zes toetsen). De Adamproef schakel 16 meet het tegen een echte server en zakt zonder de brug. Zou een dienstverband ooit een personeelsplek terugschrijven, dan is dat de plek om hem weer te splitsen."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1585,
+      "meter": "kernBreedte 1585 -> 1586",
+      "reden": "De inhaalslag voor de aannames van voor de brug (ARBEID.md par. 7a, gekozen door de eigenaar): EEN kernnaam erbij, `dienstverbandInhaal`, aangeraakt door het domein concern. Hij woont in de module die het dienstverband BEZIT (kern/concern/aanname.js), zodat de route niet zelf beslist wie er een dienstverband mist. De personeelslijst en de eigendomscontrole komen via het hulpobject van routes/concern.js, dat `accounts` al aanraakt; ze uit dat object destructureren telde de meter als twee kernnamen die het niet zijn.",
+      "waarheen": "server/kern/concern/aanname.js (dienstverbandInhaal), server/routes/concern/mensen.js (/api/concern/vestiging/inhaal) en test/aanname-dienstverband.test.js toets 10 tot en met 13. De Adamproef schakel 18 meet het tegen een echte server, en zakt zonder keuze, met een automatische keuze en zonder eigendomscontrole."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "edgeDubbeleEigenaars",
+      "van": 11,
+      "meter": "edgeDubbeleEigenaars 11 -> 12",
+      "reden": "De kaart ziet een tweede eigenaar die er al was; er is geen code bijgekomen. Ronde 1 zette gebaar-drempel op een eigenaar (DREMPELS in grammatica.js, met de gebaarversheid van Edge 2 als enige beslisser), maar de gebaarlaag van de lijsten (shared/gebaar/, op elk scherm met basis.js) beslist met eigen maten -- RICHTING 8 en STIL 6 in gebaar-02.js, lang drukken 520 ms en 8 px per as in gebaar-03b.js -- en stond niet op de kaart. Ronde 2 zet hem erop (stap 3, samen met de andere ontbrekende producenten), in het geheugen nagerekend met bouw(): gebaar-drempel is de enige verantwoordelijkheid die daardoor dubbel wordt; alle andere nieuwe rijen landen op namen die al dubbel waren. Een meter die stijgt omdat hij beter ziet is geen achteruitgang; een meter die laag blijft omdat hij iets niet ziet, is erger.",
+      "waarheen": "EDGEKAART.json draagt beide gebaarbestanden als beslisser van gebaar-drempel met een letterlijk citaat, en de WAAROM-regel in scripts/edgekaart.js zegt waarom het dubbel is. Wanneer hij weer daalt: stap 10 van ronde 2 laat gebaar-03b.js lang drukken en stil uit DREMPELS lezen, maar gebaar-02.js houdt RICHTING en STIL, dus de teller blijft 12 tot ook die in de tabel staan."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
       "sleutel": "edgeVeldWereld",
       "van": 281,
       "meter": "edgeVeldWereld 281 -> 279",
       "reden": "Twee schermen zijn bewust een doorverwijzing geworden in de consolidatieronde van 23 september 2026 (SCHERMEIGENAAR.json): /apps/vandaag.html is opgegaan in life.html (Dag, een tweede dagproduct met verzonnen momenten) en /apps/toestemming.html in mijn-relaties.html#soort (privacy.toegang). Een omleiding heeft geen eigen blikveld, dus de meter telt ze als 'omgeleid' en niet meer als 'ja'. Er verdween geen publicatie van een scherm dat er nog is: de doelen (life.html, mijn-relaties.html) staan zelf gemeten op 'ja'. De verse meting (npm run edgedekking, stempel dbb3c96) zakte daarop met 4 velden achteruit en is met --aanvaard geschreven; die vier staan in aanvaardAchteruit, en omdat die lijst bij de volgende meting verdwijnt, staat het besluit hier.",
-      "waarheen": "De twee schermen zijn doorverwijzingen geworden, en die belofte draagt nu SCHERMEIGENAAR.json met test/schermeigenaar.test.js (vandaag.html naar life.html, toestemming.html naar mijn-relaties.html). Wat het scherm publiceerde, publiceren de doelschermen: life.html en mijn-relaties.html staan in EDGEDEKKING.json gemeten op ja, en de ratel in scripts/edgedekking.js (achteruitgang) houdt ze daar."
+      "waarheen": "De doelschermen van de twee doorverwijzingen: public/apps/life.html (vandaag) en public/apps/mijn-relaties.html#soort (toestemming) staan zelf op ja in de verse meting van npm run edgedekking; de belofte woont daar."
     },
     {
       "datum": "2026-09-23",
@@ -2814,7 +2887,25 @@
       "van": 282,
       "meter": "edgeVeldContext 282 -> 280",
       "reden": "Twee schermen zijn bewust een doorverwijzing geworden in de consolidatieronde van 23 september 2026 (SCHERMEIGENAAR.json): /apps/vandaag.html is opgegaan in life.html (Dag, een tweede dagproduct met verzonnen momenten) en /apps/toestemming.html in mijn-relaties.html#soort (privacy.toegang). Een omleiding heeft geen eigen blikveld, dus de meter telt ze als 'omgeleid' en niet meer als 'ja'. Er verdween geen publicatie van een scherm dat er nog is: de doelen (life.html, mijn-relaties.html) staan zelf gemeten op 'ja'. De verse meting (npm run edgedekking, stempel dbb3c96) zakte daarop met 4 velden achteruit en is met --aanvaard geschreven; die vier staan in aanvaardAchteruit, en omdat die lijst bij de volgende meting verdwijnt, staat het besluit hier.",
-      "waarheen": "De twee schermen zijn doorverwijzingen geworden, en die belofte draagt nu SCHERMEIGENAAR.json met test/schermeigenaar.test.js (vandaag.html naar life.html, toestemming.html naar mijn-relaties.html). Wat het scherm publiceerde, publiceren de doelschermen: life.html en mijn-relaties.html staan in EDGEDEKKING.json gemeten op ja, en de ratel in scripts/edgedekking.js (achteruitgang) houdt ze daar."
+      "waarheen": "De doelschermen van de twee doorverwijzingen: public/apps/life.html (vandaag) en public/apps/mijn-relaties.html#soort (toestemming) staan zelf op ja in de verse meting van npm run edgedekking; de belofte woont daar."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1586,
+      "meter": "kernBreedte 1586 -> 1589 (de SOM van twee lijnen, geen nieuwe naam)",
+      "reden": "Het samengaan met main (954b4779). Twee lijnen verhoogden deze meter ONAFHANKELIJK van 1583 naar 1586, elk met drie uitgeschreven notities die hieronder blijven staan: main met de beleidsmotor, de personeelsinlog en het intrekken van kantoorrechten (AUTHORITY.md), deze tak met dienstverbandUitAanname, dienstverbandToets en dienstverbandInhaal (ARBEID.md par. 7a). Samen zijn dat zes namen en dus 1589; kernGedeeld blijft 241, want de drie namen van deze tak raakt elk precies een domein.",
+      "waarheen": "GRENZEN.json draagt beide lijnen, elk onder hun eigen domein; de afzonderlijke bronnotities hieronder bepalen de vervolgstap."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1587,
+      "meter": "kernBreedte 1587 -> 1589",
+      "reden": "De Werk OS-uitgave via RTG Bank (besluit van de eigenaar: de werkruimte kiest de betaalwijze, RTG zet de weg aan of uit). Het domein kantoren leest kern.werkBankpadStand en kern.werkBankpadZet voor de boardroomschakelaar; het Werk OS leest ze plus werkBankBewijs, entiteitVind en concernMagTekenen, maar via de bedrijfslaag en niet via een route. Een eigen kopie van de schakelaar of van de bankcontrole in een routebestand zou een tweede waarheid naast kern/werkbetaling.js zijn.",
+      "waarheen": "GRENZEN.json (kantoren en bedrijf) en test/bedrijfuitgave-mix.test.js"
     }
   ],
   "prestatie": {

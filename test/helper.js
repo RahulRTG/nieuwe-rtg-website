@@ -451,36 +451,50 @@ function postJson(base) {
    proefpubliek in gezelschap.js). Twee kopieen van dezelfde weg lopen uiteen
    zodra de inlog verandert -- LAT.md regel 4. Geeft null als het niet lukt, zodat
    de aanroeper zelf kan besluiten wat dat betekent. */
-async function kantoorAlsPersoon(base, code) {
+async function kantoorAlsPersoon(base, code, opties) {
   const post = postJson(base);
-  const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+  /* `opties.eigenaar`: de e-mail van de eigenaar van DEZE server. Een toets die
+     start met een eigen RTG_OWNER_EMAIL heeft een andere demo-eigenaar dan de
+     standaard, en die kon hier niet binnenkomen -- dan gaf dit hulpje null en
+     viel alles wat een kantoormens nodig had om. */
+  const login = (opties && opties.eigenaar) || 'roellie.i@gmail.com';
+  const eig = await post('/api/auth/login', { login, password: 'Imran', pasApp: 'business' });
   if (eig && eig.token) {
     const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
     if (kantoor && kantoor.token) return kantoor.token;
   }
-  /* GEEN DEMO-EIGENAAR? DAN DE WEG DIE EEN MEDEWERKER OOK LOOPT.
+  /* GEEN DEMO-EIGENAAR? DAN GEEN KANTOORMENS. Hier stond een tweede weg: een
+     vers account dat de kantoorrol koppelde met de gedeelde code. Die weg is
+     dicht (besluit van de eigenaar, 23 september 2026): de kantoorrol hangt
+     alleen nog aan een account via een uitnodiging van de eigenaar, en zonder
+     eigenaar is er niemand die uitnodigt. `code` blijft in de handtekening
+     staan zodat de aanroepers niet hoeven te veranderen. */
+  void code;
+  return null;
+}
 
-     De eigenaar hierboven bestaat alleen in de demo-seed. Toetsen die met een
-     eigen OFFICE_CODE en een lege database starten, kregen daarom `null` terug
-     en vielen terug op de gedeelde code -- en sinds kern/kantoor/kluispoort.js
-     komt die niet meer langs de kluisdeuren (KYC-besluit, documentnummer,
-     aftekenen).
+/* DE KANTOORROL KOPPELEN, ZOALS HET IN PRODUCTIE GAAT: de eigenaar maakt een
+   uitnodiging voor de codenaam van dit lid, en het lid verzilvert hem. Geeft het
+   LICHAAM voor /api/account/koppel terug, zodat een toets alleen dat hoeft te
+   wisselen. De gedeelde code koppelt niet meer (kern/eenaccount/koppelen.js).
 
-     De tweede weg is geen omweg maar het echte scenario: een eigen RTG-account,
-     daarin de kantoorrol koppelen met dezelfde code, en die rol starten. Wat je
-     terugkrijgt is een office-sessie MET een sleutel, en dat is precies wat het
-     inzagejournaal nodig heeft om een regel naar een mens terug te voeren.
-
-     Elke aanroeper krijgt een vers account, zodat twee toetsen nooit dezelfde
-     kantoormedewerker delen. */
-  const email = 'kantoor' + Date.now() + Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
-  const reg = await post('/api/auth/register', { name: 'Kantoor Toets', email,
-    password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' });
-  if (!reg || !reg.token) return null;
-  const k = await post('/api/account/koppel', { soort: 'kantoor', code: code || 'RTG-OFFICE' }, reg.token);
-  if (!k || k.error) return null;
-  const s2 = await post('/api/account/start', { rol: 'kantoor' }, reg.token);
-  return (s2 && s2.token) || null;
+   `opties.eigenaar` is een eigen eigenaarssessie (een toets met RTG_OWNER_EMAIL),
+   en `opties.bevestig` levert de zware ceremonie voor een eigenaar met passkey:
+   een uitnodiging maken is zwaar werk. */
+async function kantoorKoppelBody(base, lidToken, extra, opties) {
+  const post = postJson(base);
+  const o = opties || {};
+  const me = await post('/api/auth/me', {}, lidToken);
+  const codenaam = me && me.user && me.user.codename;
+  let eigTok = o.eigenaar || null;
+  if (!eigTok) {
+    const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+    eigTok = eig && eig.token;
+  }
+  const bewijs = o.bevestig ? await o.bevestig() : {};
+  const u = codenaam && eigTok
+    ? await post('/api/office/kantoor/uitnodiging', { codenaam, ...bewijs }, eigTok) : null;
+  return Object.assign({ soort: 'kantoor', uitnodiging: (u && u.code) || 'geen-uitnodiging' }, extra || {});
 }
 
 /* Een lid naar Lifestyle of Business tillen, zoals het in het echt gaat: een
@@ -1432,7 +1446,7 @@ async function bankDeur(page, naam, opties) {
 }
 
 module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
-  installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
+  installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
   wachtOpNetstilte, wachtOpBestand, klikEnWacht, tekstVan, postJson,

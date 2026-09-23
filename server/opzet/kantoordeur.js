@@ -19,6 +19,14 @@ module.exports = function kantoordeur(app, kern, deps) {
     accounts: deps.accounts, eigenaar: deps.eigenaar, boardroomWie: rauw.boardroomWie,
     magBoardroom: rauw.magBoardroom, boardroomBaas: rauw.boardroomBaas, balieBron: () => kern().magBalie });
   app.use('/api/office', beleidsmotor.meelezer);
+  /* Fase 8: de toegangsreview leest de drie zetelbronnen. De balie en de
+     codenamen bestaan pas bij een verzoek, vandaar de functies. */
+  beleidsmotor.review = require('../kern/beleidsmotor/review').maakReview({ kantoorHouders: () => kern().kantoorHouders(),
+    boardroomLijst: rauw.boardroomLijst, magBoardroom: rauw.magBoardroom, boardroomBaas: rauw.boardroomBaas,
+    magBalie: (k) => kern().magBalie(k), balieZetels: () => kern().balieZetels(),
+    codenaamVan: (k) => kern().codenaamVan(k), laatstGebruikt: beleidsmotor.laatstGebruikt });
+  beleidsmotor.simuleer = beleidsmotor.review.simuleer;
+  beleidsmotor.review = beleidsmotor.review.review;
   return Object.assign({}, rauw, {
     beleidsmotor,
     officeAuth: beleidsmotor.bewaak('kantoor', rauw.officeAuth),

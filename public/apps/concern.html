@@ -94,6 +94,7 @@
 <main><div id="hoofd"><div class="vak"><p class="stil">Laden&hellip;</p></div></div></main>
 <div class="melding" id="melding" role="status" aria-live="polite"></div>
 
+<script src="/apps/concern-inhaal.js"></script>
 <script>
 /* Het scherm van RTG Concern (CONCERN.md). Het toont wat de kern al kan en
    voegt er GEEN eigen redenering aan toe: elke telling, elk oordeel en elke
@@ -179,6 +180,7 @@ function vakBestuur(b){
   return '<div class="vak"><h2>Bestuur en bevoegdheid</h2><div class="lijst">'+rijen+'</div>'+
     '<div class="raster r10">'+
     '<label class="veld">Wie (codenaam)<input id="bWie"></label>'+
+    '<label class="veld"><span><input type="checkbox" id="bExtern"> Iemand buiten RTG</span></label>'+
     '<label class="veld">Rol<input id="bRol" value="bestuurder"></label>'+
     '<label class="veld">Bevoegd<select id="bBev"><option value="alleen">Alleen</option>'+
     '<option value="gezamenlijk">Gezamenlijk</option></select></label>'+
@@ -280,6 +282,7 @@ async function herlaad(){
   $('#hoofd').innerHTML=vakOverzicht(o)+vakReadiness(rd)+vakEntiteit(BEELD)+
     vakBestuur(BEELD)+vakUbo(ubo)+vakVestigingen(ves.vestigingen)+
     vakMensen(men.mensen,uitn.uitnodigingen)+
+    (window.ConcernInhaal?ConcernInhaal.vak(ves.vestigingen,esc):'')+
     '<div class="vak"><h2>Nog een entiteit</h2>'+nieuwVak()+'</div>';
   // de vestigingskeuze in het uitnodig-blok vullen
   const sel=$('#uVes');
@@ -325,7 +328,7 @@ function knopen(){
     if(!wie.trim()){meld('Wie is de bestuurder?');return;}
     const lim=($('#bLim')||{}).value;
     try{ await api('feit/zet',{entiteit:HUIDIG,soort:'bestuurder',
-      waarde:($('#bRol')||{}).value||'bestuurder',sleutel:wie.trim(),
+      waarde:($('#bRol')||{}).value||'bestuurder',sleutel:wie.trim(),extern:!!(($('#bExtern')||{}).checked),
       van:($('#bVan')||{}).value||undefined,bronSoort:'mens',
       extra:{bevoegd:($('#bBev')||{}).value||'alleen',
         tekenlimiet:lim===''?null:Number(lim)}});
@@ -346,6 +349,8 @@ function knopen(){
     try{ await api('vestiging/nieuw',{entiteit:HUIDIG,naam,plaats:($('#vPlaats')||{}).value||''});
       meld('Vestiging geopend.'); await herlaad(); }
     catch(e){ meld(e.message); }});
+
+  if(window.ConcernInhaal) ConcernInhaal.knopen({api,meld,herlaad,esc,$});
 
   const u=$('#uKnop'); if(u) u.addEventListener('click',async()=>{
     const rol=($('#uRol')||{}).value||'';

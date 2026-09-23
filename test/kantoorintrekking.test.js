@@ -16,7 +16,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 const CODE = 'INTREK-KANTOOR';
 const mappen = [];
@@ -32,7 +32,7 @@ async function medewerker() {
   const reg = (await api('/api/auth/register', { name: 'Intrek Toets ' + n, email: 'intrek' + n + Date.now() + '@voorbeeld.test',
     password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' })).body;
   assert.ok(reg.token, 'registreren lukt');
-  const k = await api('/api/account/koppel', { soort: 'kantoor', code: CODE }, reg.token);
+  const k = await api('/api/account/koppel', await kantoorKoppelBody(srv.base, reg.token), reg.token);
   assert.equal(k.status, 200, 'de kantoorrol koppelen lukt: ' + JSON.stringify(k.body).slice(0, 120));
   const start = async () => (await api('/api/account/start', { rol: 'kantoor' }, reg.token)).body.token;
   // de gids leert een codenaam bij het eerste ingelogde verzoek (kern/gids.js)

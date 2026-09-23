@@ -50,6 +50,15 @@
       "operator": "false->true",
       "gezakt": 1
     },
+    "aanname-dienstverband.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/werving/uitnodiging-na.js",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "geprobeerd": 3,
+      "scherp": "gezakt"
+    },
     "aanvoer.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -831,6 +840,20 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "bedrijfuitgave-mix.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "bedrijfuitgave.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "bedrijfwerk.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -877,6 +900,35 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "beleidsmotor-exporten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "beleidsmotor-review.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "beleidsmotor-slapend.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/beleidsmotor/slapend.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "beleidsmotor-werkwoorden.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "beleidsmotor.test.js": {
@@ -1917,6 +1969,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "concern-vestiging.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "concern-voorstel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2196,6 +2255,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "dienstidentiteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/dienstidentiteit.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "directpay.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2365,6 +2432,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "doossleutels.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
       "scherp": "gezakt"
     },
     "drempels.test.js": {
@@ -2645,6 +2719,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "eigenaarbevestiging.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 15,
       "scherp": "gezakt"
     },
     "eigenaarherstel.test.js": {
@@ -4303,6 +4384,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "scherp": "gezakt"
+    },
+    "kantooruitnodiging.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
       "scherp": "gezakt"
     },
     "kantoorwereld.test.js": {

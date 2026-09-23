@@ -18,10 +18,21 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, officeAuth, payrollOS, findSupplier, accounts, schoon } = kern;
+  const { app, officeAuth, naamAuth, payrollOS, findSupplier, accounts, schoon } = kern;
   if (!payrollOS) return;
   // dezelfde regel als in ./payroll-os.js: wie de handeling deed, voor het spoor
   const wie = (req) => (req.actor && req.actor.name) || 'onbekend';
+  /* DE HANDTEKENING KOMT UIT DE SESSIE, OP NAAM (AUTHORITY.md fase 5). Met de
+     gedeelde code stond hier 'onbekend' onder de administrateur-handtekening, en
+     dan zijn vier ogen twee handtekeningen waarvan er een niemand is. naamAuth
+     laat alleen een kantoorsessie met een mens erachter door; de naam is de
+     codenaam van die mens en nooit iets uit het lichaam. */
+  const tekenaar = (req) => {
+    const key = String(req.kantoorKey || req.officeKey || '');
+    let cn = null;
+    try { cn = key && typeof kern.codenaamVan === 'function' ? kern.codenaamVan(key) : null; } catch (e) { cn = null; }
+    return cn || key || 'onbekend';
+  };
   /* Een fout uit de kern draagt zijn eigen status; die niet doorgeven zou een
      geweigerde handeling als 200 laten terugkomen. */
   const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
@@ -55,6 +66,20 @@ module.exports = (kern) => {
     /* Meteen nalopen: een run zonder bevindingenlijst nodigt uit om hem over te
        slaan. De contracten gaan mee, zodat "loon zonder contract" echt gemeten
        wordt en niet als vals alarm afgaat (zie kern/payroll/controles.js). */
+    /* HET DIENSTVERBAND (ARBEID.md par. 7a, besluit 1): wie een strook krijgt
+       zonder lopend dienstverband bij de entiteit van deze zaak, komt als
+       bevinding in de run. Alleen wie werkelijk een strook krijgt, en het
+       concern beslist -- de naam wordt pas hier opgehaald, binnen een try, zodat
+       een ontbrekende of weigerende grens de run nooit breekt. */
+    try {
+      const toets = kern.dienstverbandToets({ zaak: s.code, periode,
+        personeel: opzet.regels.map(r => { const st = accounts.getStaffById(r.staffId);
+          return { id: r.staffId, naam: r.naam, memberId: st && st.member_id != null ? st.member_id : null }; }) });
+      for (const b of (toets.bevindingen || [])) opzet.bevindingen.push(b);
+    } catch (e) {
+      opzet.bevindingen.push({ soort: 'dienstverband_niet_getoetst', ernst: 'laag', eigenaar: 'administrateur',
+        uitleg: 'Het dienstverband kon voor deze run niet worden getoetst.' });
+    }
     const vorige = payrollOS.run.lijst(s.code).find(x => x.periode !== periode && x.stand === 'definitief');
     const bev = payrollOS.controles.loop(payrollOS.run.haal(r.run.id), {
       urenBevindingen: opzet.bevindingen, contracten: opzet.contracten,
@@ -72,20 +97,20 @@ module.exports = (kern) => {
   });
 
   /* Goedkeuren: de administrateur tekent hier, de manager aan de zaakkant. */
-  app.post('/api/office/payroll/run/keur', officeAuth, (req, res) => {
+  app.post('/api/office/payroll/run/keur', naamAuth, (req, res) => {
     const b = req.body || {};
-    antwoord(res, payrollOS.run.keurGoed(String(b.runId || ''), 'administrateur', wie(req), null));
+    antwoord(res, payrollOS.run.keurGoed(String(b.runId || ''), 'administrateur', tekenaar(req), null));
   });
 
   /* Definitief: pas als de bevindingen zijn afgehandeld EN beide handtekeningen
      staan. De controle op de bevindingen staat hier en niet in run.js, omdat
      run.js niets van de controlelaag hoort te weten -- maar hij hoort wel te
      gelden, dus staat hij op de enige plek waar definitief wordt gemaakt. */
-  app.post('/api/office/payroll/run/definitief', officeAuth, (req, res) => {
+  app.post('/api/office/payroll/run/definitief', naamAuth, (req, res) => {
     const runId = String((req.body || {}).runId || '');
     const mag = payrollOS.controles.magDefinitief(runId);
     if (mag.error) return res.status(mag.status).json(mag);
-    antwoord(res, payrollOS.run.maakDefinitief(runId, wie(req)));
+    antwoord(res, payrollOS.run.maakDefinitief(runId, tekenaar(req)));
   });
 
   app.post('/api/office/payroll/run/verklaar', officeAuth, (req, res) => {

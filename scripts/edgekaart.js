@@ -318,9 +318,8 @@ const KAART = [
     ['rendert', 'onderbalk:s', 'exportbalk als Edge-balk', "host.setAttribute('data-rtg-edge-bar', ''); d.body.appendChild(host);"],
     ['beslist', 'bevoegdheid:b', 'gast: knoppen in Edge-balken uit', "if (state === 'guest') d.querySelectorAll('[data-rtg-edge-bar]')"],
     ['schrijft', '-', 'paginastand op body', 'd.body.dataset.dailyState = state;']]],
-  ['social-intelligence-runtime.js', 'afnemer', 'capability-register:s trust-rail:s', [
-    ['schrijft', 'capability-register:s', "'social-context' in het tweede register", "edge.registerAction({ id: 'social-context', label: 'Sociale context bekijken'"],
-    ['schrijft', 'capability-register:s', 'overschrijft het actiedeck', "edge.setProjection({ deck: 'actions', actions: ['social-context'] });"],
+  ['social-intelligence-runtime.js', 'afnemer', 'capability-register:l trust-rail:s', [
+    ['schrijft', 'capability-register:l', "'sociaal.context' als declaratie, via RTGAdaptief", "A.declareer({ id: 'sociaal.context', naam: 'Sociale context bekijken'"],
     ['projecteert', 'trust-rail:s', 'verbinding uit het protocol', "? (location.protocol === 'https:' ? 'ONLINE / TLS' : 'ONLINE / LOCAL')"]]],
   /* De gebaarlaag van de lijsten (shared/gebaar.js, op elk scherm met basis.js)
      stond tot ronde 2 niet op de kaart, en daardoor leek gebaar-drempel na ronde 1

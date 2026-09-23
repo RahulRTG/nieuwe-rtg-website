@@ -190,6 +190,9 @@
 <link href="/shared/social-intelligence.css" rel="stylesheet">
 <script src="/shared/leeg.js"></script>
 <script src="/shared/social-suite.js" defer></script>
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/adaptief/grammatica.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
 <script src="/shared/social-intelligence.js" defer></script>
 <script src="/shared/social-intelligence-deck.js" defer></script>
 <script src="/shared/social-intelligence-runtime.js" defer></script>
@@ -800,6 +803,14 @@
     });
   }
 })();
+/* WAAR JE BENT, gezegd door dit scherm zelf (EDGE.md, ronde 2). De sociale
+   runtime declareert de handeling; welke handelingen hier spelen, zegt het
+   scherm. Na DOMContentLoaded, want het register laadt met defer.
+   Dit scherm heeft een eigen hoofdactie; de context komt dus van het scherm
+   dat hem kent, en niet van de gedeelde runtime. */
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.RTGAdaptief) RTGAdaptief.context({ bron: 'sociaal.comm', titel: 'Berichten', acties: ['sociaal.context'] });
+}, { once: true });
 </script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

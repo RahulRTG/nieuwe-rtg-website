@@ -14,4 +14,15 @@ function sollRem(ip, code) {
   if (sollTeller.size > 5000) for (const [kk, bb] of sollTeller) if (nu - bb.vanaf > 3600000) sollTeller.delete(kk);
   return b;
 }
-module.exports = { sollRem, SOLL_PER_UUR };
+/* Remt en antwoordt: true = tegengehouden (429 is al verstuurd), anders is
+   deze sollicitatie geteld. */
+function sollGeremd(res, ip, code) {
+  const b = sollRem(ip, code);
+  if (b.n >= SOLL_PER_UUR) {
+    res.status(429).json({ error: 'U hebt hier het afgelopen uur al veel sollicitaties ingestuurd. Probeer het later opnieuw, of bel de zaak.' });
+    return true;
+  }
+  b.n += 1;
+  return false;
+}
+module.exports = { sollRem, sollGeremd, SOLL_PER_UUR };

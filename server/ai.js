@@ -17,6 +17,7 @@ const LocalAI = require('./local-ai');
 const { kompasStatus } = require('./ai-kompas');
 const kostenhaak = require('./kern/kosten/haak'); // begint leeg; KOSTEN.md par. 6
 const meter = require('./ai-meter');
+const { geleverdModel } = require('./ai-prijzen');
 const rem = require('./ai-rem');
 const budget = require('./ai-budget');
 
@@ -39,17 +40,6 @@ function bouwKetting(opts) {
   const ketting = [];
   for (const naam of [...new Set(volgorde)]) { const c = beschikbaar[naam](); if (c) ketting.push(c); }
   return ketting;
-}
-
-/* Welk model werd er geleverd. Het antwoord zegt het zelf (`model`); zegt het
-   niets, dan is alleen bij Claude het gevraagde model ook het geleverde. Bij een
-   andere aanbieder is de gevraagde naam een Claude-naam die daar nooit draaide,
-   en dan boeken we de aanbieder -- die staat niet in de prijstabel en telt dus
-   duur, liever te vroeg dicht dan te laat (ARBEID.md par. 4 punt 12). */
-function geleverdModel(aanbieder, params, uit) {
-  if (uit && typeof uit.model === 'string' && uit.model) return uit.model;
-  if (aanbieder && aanbieder.naam === 'claude') return params && params.model;
-  return 'onbekend:' + ((aanbieder && aanbieder.naam) || 'aanbieder');
 }
 
 function maakAI(opts) {
@@ -78,10 +68,8 @@ function maakAI(opts) {
            dan geen aanroep, en valt de app terug op de regelgestuurde werkmodus
            die er toch al is voor als er geen model is -- het verschil tussen een
            grens en een storing. Zonder grens kost dit een kaartopzoeking. */
-        /* De grens gaat over GELD, dus hij sluit alleen de aanbieders die geld
-           kosten. Hier stond een throw vóór de hele keten: dan ging ook de eigen
-           modelserver dicht, terwijl die geen euro kost (ARBEID.md par. 4 punt
-           12). Dicht is nu: extern overslaan, lokaal gewoon laten antwoorden. */
+        /* De grens gaat over GELD: dicht sluit extern, en de eigen modelserver
+           antwoordt gewoon (ARBEID.md par. 4 punt 12). */
         const grens = kostenhaak.magUitgeven();
         const grensDicht = !!(grens && grens.ok === false);
         let laatste = null;
@@ -128,13 +116,9 @@ function maakAI(opts) {
                wat het HUIS uitgeeft en hoeveel capaciteit de eigen modelserver
                draagt, deze telt aan WELKE gebruiker de tokens toe te rekenen
                zijn (KOSTEN.md par. 6). Twee vragen, twee tellers. */
-            /* Alleen EXTERN: het tarief van ai-invoer is een prijs per token bij
-               een aanbieder, en de eigen modelserver kost capaciteit en geen geld
-               (die telt ./ai-meter.js in zijn lokale emmer). Hier stond ook het
-               lokale verbruik, tegen het externe tarief -- en daarmee ging de
-               verbruiksgrens ook voor het lokale model dicht. De invoer is
-               GEWOGEN zoals ./ai-meter.js weegt: een cache-leesbeurt een tiende,
-               een cache-schrijfbeurt 1,25 keer (die laatste ontbrak hier). */
+            /* Alleen EXTERN (lokaal kost capaciteit, geen geld; die telt
+               ./ai-meter.js apart), en de invoer GEWOGEN zoals de dagmeter weegt:
+               cache lezen 0,1, cache schrijven 1,25 (punt 12). */
             const u = uit && uit.usage;
             if (u && !aanbieder.lokaal) {
               const inv = Math.round(meter.gewogenInvoer(u));
@@ -151,9 +135,7 @@ function maakAI(opts) {
                 (typeof aanbieder.modelVoor === 'function' ? aanbieder.modelVoor(params) : null)
                   || (aanbieder.modellen && aanbieder.modellen.tekst), uit && uit.usage);
               else {
-                /* Het model dat ANTWOORDDE, niet het gevraagde: wie om een
-                   Claude-naam vraagt en bij OpenAI uitkomt, betaalt OpenAI.
-                   Onbekend valt in ./ai-meter.js op het duurste tarief. */
+                /* het model dat ANTWOORDDE, niet het gevraagde (ai-prijzen.js) */
                 const kosten = meter.boek(geleverdModel(aanbieder, params, uit), uit && uit.usage);
                 /* Het budget telt in euro en de meter in dollar; de omrekening
                    staat in ./ai-budget-beleid.js. Ook een vrijgestelde aanroep

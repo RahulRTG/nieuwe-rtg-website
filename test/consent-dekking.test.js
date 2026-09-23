@@ -131,7 +131,7 @@ test('elke overdracht van persoonsgegevens aan een derde in routes/ staat verkla
   assert.ok(gevonden.includes('member/werk/talent.js'), 'de scan vindt de bekende overdracht nog: ' + gevonden.join(', '));
   const onbekend = gevonden.filter(f => !OVERDRACHT[f]);
   assert.deepEqual(onbekend, [], 'nieuwe overdracht gevonden in: ' + onbekend.join(', ') +
-    ' -- zet hem in kern/consent-register.js (LAGEN of NIET_GEDEKT) en hier met de verwijzing');
+    ' -- zet hem in kern/consent-register.js (LAGEN) of kern/consent-register-grens.js (NIET_GEDEKT) en hier met de verwijzing');
   const dood = Object.keys(OVERDRACHT).filter(f => !gevonden.includes(f));
   assert.deepEqual(dood, [], 'deze staan in de lijst maar hebben de vorm niet meer: ' + dood.join(', '));
   const namen = NIET_GEDEKT.map(n => n.naam);

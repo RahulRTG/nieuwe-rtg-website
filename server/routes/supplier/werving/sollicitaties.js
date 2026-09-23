@@ -9,7 +9,7 @@ module.exports = (wctx) => {
   const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
           findSupplier, logActivity, managerOnly, notify, notifyApplicant, notifySupplier, save, schoon,
           sseToOffice, sseToSupplier, supplierAuth } = kern;
-const { sollRem, SOLL_PER_UUR } = require('./sollrem');
+const { sollGeremd } = require('./sollrem');
 app.post('/api/supplier/apply', (req, res) => {
   const s = findSupplier(req.body.code);
   if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
@@ -18,9 +18,7 @@ app.post('/api/supplier/apply', (req, res) => {
   const contact = String(req.body.contact || '').trim().slice(0, 80);
   const note = String(req.body.note || '').trim().slice(0, 400);
   if (!name || !func || !contact) return res.status(400).json({ error: 'Vul uw naam, de functie en een telefoonnummer of e-mailadres in.' });
-  const teller = sollRem(req.ip, s.code);
-  if (teller.n >= SOLL_PER_UUR) return res.status(429).json({ error: 'U hebt hier het afgelopen uur al veel sollicitaties ingestuurd. Probeer het later opnieuw, of bel de zaak.' });
-  teller.n += 1;
+  if (sollGeremd(res, req.ip, s.code)) return;
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
     name, func, contact, note, status: 'nieuw',
@@ -41,7 +39,7 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
   const a = (db.data.applications[req.supplier.code] || []).find(x => x.id === req.body.id);
   if (!a) return res.status(404).json({ error: 'Sollicitatie niet gevonden.' });
   if (req.body.action === 'uitnodigen') {
-    // uitnodigen voor een gesprek: open de chat, nog geen personeelsaccount
+    // gesprek: open de chat, nog geen personeelsaccount
     a.status = 'uitgenodigd';
     const chat = ensureApplyChat(req.supplier.code, a);
     if (!chat) return res.status(400).json({ error: 'Deze sollicitant heeft geen app-account; neem contact op via het opgegeven telefoonnummer of e-mailadres.' });
@@ -69,7 +67,7 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     // wie via de app solliciteerde is meteen in dienst; wie daarbuiten
     // solliciteerde houdt de kassacode en de wervingslink (zie uitnodiging.js)
     const direct = await neemAan(req.supplier, inv, a.key);
-    ensureApplyChat(req.supplier.code, a); // ook aangenomen sollicitanten kunnen chatten om af te spreken
+    ensureApplyChat(req.supplier.code, a); // ook na aanname: chatten om af te spreken
     save();
     logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func);
     sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
@@ -114,7 +112,7 @@ app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
   const m = chatStuur(chat, 'werkgever', req.supplier.name, req.body.text, talen.taalVan(req.body.lang));
   if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
-  // de sollicitant krijgt een seintje
+  // seintje aan de sollicitant
   const app = (db.data.applications[req.supplier.code] || []).find(x => x.id === chat.id);
   if (app && app.key && db.data.notifications[app.key])
     notify(app.key, { icon: 'berichten', title: 'Bericht van ' + chat.bedrijf, body: m.tekst.slice(0, 80) });

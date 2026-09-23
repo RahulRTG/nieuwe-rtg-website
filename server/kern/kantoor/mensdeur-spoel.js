@@ -45,8 +45,14 @@ const SPOEL_MS = 5000;
    tot hij zelf het probleem is (dezelfde regel als BUFFER_MAX in kosten/meter). */
 const BUFFER_MAX = 500;
 
-function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden }) {
-  /* De RAM-buffer: pad -> { metMens, zonderMens }, nog niet weggeschreven. */
+/* `velden` zijn de tellers per sleutel. De standaard is die van ./mensdeur.js;
+   de beleidsmotor (kern/beleidsmotor/) telt met dezelfde schrijfweg andere
+   tellers, want een tweede spoeler zou de PostgreSQL-les hierboven een tweede
+   keer moeten leren. */
+function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden, velden }) {
+  const V = Array.isArray(velden) && velden.length ? velden.slice() : ['metMens', 'zonderMens'];
+  const leeg = () => { const t = {}; for (const v of V) t[v] = 0; return t; };
+  /* De RAM-buffer: sleutel -> { <veld>: aantal }, nog niet weggeschreven. */
   let wacht = new Map();
   let klaarZetter = null;
 
@@ -58,9 +64,8 @@ function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden }) {
     for (const [pad, tik] of batch) {
       let sleutel = pad;
       if (!kaart[sleutel] && Object.keys(kaart).length >= maxPaden) sleutel = 'overig';
-      if (!kaart[sleutel]) kaart[sleutel] = { pad: sleutel, metMens: 0, zonderMens: 0 };
-      kaart[sleutel].metMens += tik.metMens;
-      kaart[sleutel].zonderMens += tik.zonderMens;
+      if (!kaart[sleutel]) kaart[sleutel] = Object.assign({ pad: sleutel }, leeg());
+      for (const v of V) kaart[sleutel][v] = (kaart[sleutel][v] || 0) + (tik[v] || 0);
     }
   }
 
@@ -89,8 +94,8 @@ function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden }) {
       return true;
     } catch (e) {
       for (const [pad, tik] of batch) {
-        const t = wacht.get(pad) || { metMens: 0, zonderMens: 0 };
-        t.metMens += tik.metMens; t.zonderMens += tik.zonderMens;
+        const t = wacht.get(pad) || leeg();
+        for (const v of V) t[v] += tik[v] || 0;
         wacht.set(pad, t);
       }
       planSpoel();
@@ -99,17 +104,19 @@ function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden }) {
   }
 
   /* Een tik erbij. Doet nooit I/O: hij plant hoogstens een spoeling. */
-  function tik(pad, heeftMens) {
-    const t = wacht.get(pad) || { metMens: 0, zonderMens: 0 };
-    if (heeftMens) t.metMens += 1; else t.zonderMens += 1;
+  function tikVeld(pad, veld) {
+    if (!V.includes(veld)) return;
+    const t = wacht.get(pad) || leeg();
+    t[veld] += 1;
     wacht.set(pad, t);
     if (wacht.size >= BUFFER_MAX) spoel(); else planSpoel();
   }
+  const tik = (pad, heeftMens) => tikVeld(pad, heeftMens ? 'metMens' : 'zonderMens');
 
   /* De nog niet gespoelde tikken over een beeld leggen, voor de lezer. */
   const projecteer = (beeld) => { if (wacht.size) pasToe(beeld, wacht); return beeld; };
 
-  return { tik, spoel, projecteer, SPOEL_MS, BUFFER_MAX };
+  return { tik, tikVeld, spoel, projecteer, SPOEL_MS, BUFFER_MAX };
 }
 
 module.exports = { maakSpoeler, SPOEL_MS, BUFFER_MAX };

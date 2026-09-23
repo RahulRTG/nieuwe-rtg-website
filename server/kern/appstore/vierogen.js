@@ -23,14 +23,18 @@
                   typen -- maar het is het enige dat werkt wanneer het kantoor
                   op een gedeelde code binnenkomt.
 
-   WAT HIJ NIET DOET: de deur dichtgooien wanneer geen van beide bekend is. Dat
-   is een echte afweging en hij staat hier hardop. Fail-closed zou hier betekenen
-   dat elke kantoorsessie zonder persoonlijke inlog niets meer kan aftekenen --
-   ook bij een externe uitgever, waar de organisatiecontrole al doet wat hij moet
-   doen. Wat er wel gebeurt: het besluit draagt de GRAAD van de scheiding
-   (`bewezen` of `opgegeven`), en die staat in het dossier. Een scheiding die op
-   een ingetypte naam rust, hoort niet te lezen als een scheiding die op twee
-   identiteiten rust (BESTUUR.md: elke bewering draagt een bewijsgraad).
+   ZONDER IDENTITEIT GAAT DE DEUR DICHT (AUTHORITY.md B2, besluit van de
+   eigenaar, 23 september 2026). Eerst stond hier het omgekeerde: kende de toets
+   geen van beide mensen, dan liet hij door met graad `onbekend`, omdat de
+   organisatiecontrole bij een externe uitgever al scheidt. Dat is precies het
+   gat waar de regel voor bestaat -- een inzending zonder mens erachter kan van
+   iedereen zijn, ook van wie hem nu aftekent. `onbekend` is geen `ja`
+   (CONTROLPLANE.md: ONBEKEND is geen WEIGEREN, maar ook geen TOESTAAN). Wat er
+   blijft: de GRAAD van de scheiding staat in het dossier (`bewezen` of
+   `opgegeven`), en een scheiding die op een ingetypte naam rust, leest niet als
+   een die op twee identiteiten rust (BESTUUR.md: elke bewering draagt een
+   bewijsgraad). De weg eromheen staat in de weigering: zend opnieuw in met een
+   persoonlijke inlog.
    ========================================================================== */
 'use strict';
 
@@ -63,8 +67,8 @@ function toets({ inzender, doorKey, doorNaam }) {
     return { mag: true, graad: 'opgegeven',
       reden: 'De namen verschillen. Dat is vastgesteld op wat er is ingetypt en niet op twee inlogs; de scheiding is dus opgegeven en niet bewezen.' };
   }
-  return { mag: true, graad: 'onbekend',
-    reden: 'Van de inzender of de ondertekenaar is geen persoon bekend. Er is dus niet vast te stellen of dit twee verschillende mensen zijn; alleen dat het twee verschillende organisaties zijn.' };
+  return { mag: false, graad: 'onbekend', code: 'geen-identiteit',
+    reden: 'Van de inzender of de ondertekenaar is geen persoon bekend, dus niet vast te stellen of dit twee verschillende mensen zijn. Laat de uitgever opnieuw inzenden met een persoonlijke inlog, en teken af met uw eigen account of uw naam.' };
 }
 
 module.exports = { toets, normNaam };

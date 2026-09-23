@@ -2,8 +2,7 @@
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 const { eigenVeld } = require('../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 module.exports = (kern) => {
-  const { accounts, app, db, findSupplier, save, scheduleFor, sessionFor, sseClients, sseSend, sseToSupplier, supplierAuth,
-          supplierState } = kern;
+  const { app, db, save, scheduleFor, sseToSupplier, supplierAuth, supplierState } = kern;
 
 
 
@@ -43,24 +42,9 @@ app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/supplier/stream', (req, res) => {
-  const sess = sessionFor(req.query.token);
-  if (!accounts.controleerStaffSessie(sess).ok) return res.status(401).end();
-  const supplier = findSupplier(sess.code);
-  if (!supplier || supplier.partnerStatus === 'geschorst' || supplier.partnerStatus === 'beeindigd')
-    return res.status(401).end();
-  if (sess.staffId != null) {
-    const staff = accounts.getStaffById(Number(sess.staffId));
-    if (!staff || String(staff.supplier_code).toUpperCase() !== String(sess.code).toUpperCase()) return res.status(401).end();
-  }
-  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
-  res.write('retry: 3000\n\n');
-  const client = { sup: sess.code, staffId: sess.staffId != null ? sess.staffId : null, res };
-  sseClients.push(client);
-  sseSend(res, 'hello', { unread: (db.data.supplierNotifications[sess.code] || []).filter(n => !n.read) });
-  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
-  req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
-});
+/* De live-stroom van de zaak staat in ./supplier/stroom.js, met de keuring per
+   bericht (AUTHORITY.md fase 3). */
+require('./supplier/stroom')(kern, (code) => (db.data.supplierNotifications[code] || []).filter(n => !n.read));
 
 app.post('/api/supplier/state', supplierAuth, (req, res) => res.json({ state: supplierState(req.supplier, req.actor) }));
 

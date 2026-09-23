@@ -87,7 +87,6 @@ const { maakLive } = require('./kern/live');
 const { RIT_KETEN, RIT_LEGACY, RIT_MELDING, maakVervoer } = require('./kern/vervoer');
 const { VAC_SOORTEN, maakWerk } = require('./kern/werk');
 const { AI_TONE, maakAi } = require('./kern/ai');
-const { maakKantoor } = require('./kern/kantoor');
 const { SHIFT_NAMES, maakPersoneel } = require('./kern/personeel');
 const { HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES, maakLeverancier } = require('./kern/leverancier');
 const { maakLid } = require('./kern/lid');
@@ -2210,7 +2209,7 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.ran
 
 
 /* De backoffice-laag (officeAuth, officeState, pendingVerifications) staat in
-   server/kern/kantoor.js en wordt verderop opgezet via maakKantoor(), na de
+   server/kern/kantoor.js en wordt verderop opgezet via opzet/kantoordeur.js, na de
    AI-kern omdat officeState de conciergeInbox meeneemt. OFFICE_CODE blijft hier
    (nodig bij de startwaarschuwing en de kantoor-login). */
 
@@ -2248,8 +2247,8 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, notee
       return id != null ? geloof.promptRegel(id, null) : null;
     } });
 
-// De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const { officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications, mensdeurStand } = maakKantoor({
+// Kantoorlaag + beleidsmotor: ./opzet/kantoordeur.js (na maakAi).
+const { officeAuth, kluisAuth, naamAuth, boardroomAuth, beleidsmotor, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications, mensdeurStand } = require('./opzet/kantoordeur')(app, () => kern, {
   db, save, bewerkCollectie, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
@@ -2290,7 +2289,7 @@ const kern = {
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, corrigeerFactuur, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, beleidsmotor, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,

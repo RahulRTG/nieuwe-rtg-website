@@ -41,7 +41,9 @@
        een vreemde site in de schil trekken. Een pad dat met EEN schuine streep
        begint is per definitie hier. */
     var bladen = g.bladen.filter(function (b) {
-      return b && typeof b.url === 'string' && b.url.charAt(0) === '/' && b.url.charAt(1) !== '/';
+      /* En geen backslash: new URL('/\\elders.nl/x', hier) wordt https://elders.nl/x. */
+      return b && typeof b.url === 'string' && b.url.charAt(0) === '/' && b.url.charAt(1) !== '/' &&
+        b.url.indexOf('\\') < 0;
     }).slice(0, MAX).map(function (b) {
       return { url: b.url, titel: typeof b.titel === 'string' ? b.titel : '' };
     });

@@ -46,6 +46,7 @@ const CONTRACTEN = Object.assign({},
      ./idemsleutels.js, die om precies dezelfde reden vier zijbestanden heeft. */
   require('./mutatiecontracten-beschermd').CONTRACTEN,
   require('./mutatiecontracten-leest').CONTRACTEN,
+  require('./mutatiecontracten-beleidsmotor').CONTRACTEN,
   require('./mutatiecontracten-vertegenwoordiging').CONTRACTEN,
   require('./mutatiecontracten-staffgemoed').CONTRACTEN,
   require('./mutatiecontracten-zaakkant').CONTRACTEN,

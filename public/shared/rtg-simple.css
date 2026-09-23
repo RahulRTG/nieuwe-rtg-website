@@ -419,6 +419,12 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
   body[data-rtg-world="travel"] .rtg-edge-mark::after{content:"TravelOS"}
   body[data-rtg-world="work"] .rtg-edge-mark::after{content:"WorkOS"}
   body[data-rtg-world="foundation"] .rtg-edge-mark::after{content:"FoundationOS"}
+  /* In de schil (app.html) volgt het label het actieve blad: shared/command/werktafel.js */
+  body[data-rtg-blad-wereld="living"] .rtg-edge-mark::after{content:"LivingOS"}
+  body[data-rtg-blad-wereld="travel"] .rtg-edge-mark::after{content:"TravelOS"}
+  body[data-rtg-blad-wereld="work"] .rtg-edge-mark::after{content:"WorkOS"}
+  body[data-rtg-blad-wereld="foundation"] .rtg-edge-mark::after{content:"FoundationOS"}
+  body[data-rtg-blad-wereld="geen"] .rtg-edge-mark::after{content:none}
   .rtg-edge-crumbs,.rtg-edge-worldbar,.rtg-edge-search,.rtg-edge-language{display:none!important}
   .rtg-edge-state{
     grid-column:2;justify-self:end;display:flex!important;width:44px;min-width:44px;

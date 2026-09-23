@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T15:56:04.237Z",
-    "commit": "6de916895",
+    "op": "2026-09-23T10:45:03.250Z",
+    "commit": "5359e1a",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -49,15 +49,6 @@
       "module": "server/kern/aanmeldingen.js",
       "operator": "false->true",
       "gezakt": 1
-    },
-    "aanname-dienstverband.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/routes/supplier/werving/uitnodiging-na.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 3,
-      "scherp": "gezakt"
     },
     "aanvoer.test.js": {
       "soort": "puur",
@@ -369,14 +360,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
-    },
-    "aikosten-bron.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/ai-meter.js",
-      "operator": "true->false#0",
-      "gezakt": 1,
-      "geprobeerd": 8
     },
     "aipoort.test.js": {
       "soort": "puur",
@@ -1045,14 +1028,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 13,
       "scherp": "gezakt"
-    },
-    "bevrust.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/beveiliging/rooster/aanvragen.js",
-      "operator": "&&->||#0",
-      "gezakt": 1,
-      "geprobeerd": 16
     },
     "bewaartermijnen.test.js": {
       "soort": "puur",
@@ -8011,6 +7986,14 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "sleutel-wedloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/sleutelbestand.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "sleutelwoorden.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -9862,14 +9845,6 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
-    "werkgeversollicitatie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/werk.js",
-      "operator": "!==->===#1",
-      "gezakt": 2,
-      "geprobeerd": 7
-    },
     "werkgevolg.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10255,14 +10230,6 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
-    "zelfzorg-repareren.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/zelfzorg/repareren.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
     "zelfzorg.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10312,6 +10279,161 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/bundel.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "baliezetel-eigenaar.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "office-ai-classificatie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "aikosten-bron.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/ai-meter.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 8
+    },
+    "bevrust.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/beveiliging/rooster/aanvragen.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 16
+    },
+    "werkgeversollicitatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/werk.js",
+      "operator": "!==->===#1",
+      "gezakt": 2,
+      "geprobeerd": 7
+    },
+    "zelfzorg-repareren.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zelfzorg/repareren.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "beleidsmotor.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "kantoorintrekking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "zwaarstap.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/zwaarstap.js",
+      "operator": "!==->===#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "gezinsagenda-motor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/agenda-pro.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "schermeigenaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/schermfunctie.js",
+      "operator": ">=->>#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "vandaag-omleiding.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
+    },
+    "edgeactiestaat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/edge/actiestaat.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "edgeblikveld.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/edge/blikveld.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "edgeblikveld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/edge/actiestaat.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "edgecontext.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/adaptief/register.js",
+      "operator": "+->-#0",
+      "gezakt": 1,
+      "geprobeerd": 7
+    },
+    "edgekaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/edgekaart.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "edgenieuwscherm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/edgedekking.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
+    "stilleknoppen.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/veiligheid.js",
+      "operator": "return-weg#1",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
+    "werktafel-lussen.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/command/bladstand.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1

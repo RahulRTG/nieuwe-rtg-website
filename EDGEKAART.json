@@ -1,0 +1,3436 @@
+{
+  "stempel": {
+    "op": "2026-09-23T10:38:41.311Z",
+    "commit": "15574cb",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/edgekaart.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Gemaakt met scripts/edgekaart.js; de methode staat in de kop. Rollen en verantwoordelijkheden zijn VERKLAARD en elk citaat staat letterlijk in zijn bestand. schrijver = houdt of zet de toestand zelf; beslisser = kiest de uitkomst; lezer = leest haar of voedt haar via de API van de eigenaar. `gemeten` komt uit de bron zonder commentaar en kent alleen letterlijke namen: attributen alleen op body/html of een alias daarvan, opslag `onbekend` als de opslag niet letterlijk local- of sessionStorage heet. dodeKanalen gaat over rtg-events in public/ (zonder public/dist, .min.js en bundels, wel hun delen) plus index.html; een naam in luisterZonderZender kan nog een zender hebben onder `dynamisch`. Een dubbele eigenaar is een vondst en geen oordeel.",
+  "bestanden": [
+    {
+      "pad": "public/apps/bestanden/adaptief.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "bestandscontext",
+          "citaat": "A.context({ bron: 'bestanden', titel: f.naam || 'Bestand',"
+        },
+        {
+          "rol": "beslist",
+          "wat": "ruimte pas boven 80%",
+          "citaat": "if (deel >= 0.8) {"
+        },
+        {
+          "rol": "beslist",
+          "wat": "gewicht hangt aan de toestand",
+          "citaat": "zet('bestanden.voorgoed', 'Voorgoed weg',"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "gewicht",
+          "als": "lezer"
+        },
+        {
+          "naam": "trust-rail",
+          "als": "lezer"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/apps/office/adaptief-pres.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "indeling als lade-capability",
+          "citaat": "A.declareer({ id: 'office.pres.indeling', naam: 'Indeling'"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "change op het echte element",
+          "citaat": "kies.dispatchEvent(new w.Event('change', { bubbles: true }));"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGOfficeAdaptiefPres"
+        ],
+        "zendt": [
+          "change"
+        ],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/apps/office/adaptief-staat.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "projecteert",
+          "wat": "rail-onderdeel classificatie",
+          "citaat": "uit.push({ sleutel: 'classificatie', tekst: CLASSNAAM[k] || k,"
+        },
+        {
+          "rol": "beslist",
+          "wat": "strikt: delen verhinderd",
+          "citaat": "var dicht = k === 'strikt';"
+        },
+        {
+          "rol": "beslist",
+          "wat": "delen weegt bewust",
+          "citaat": "gewicht: 'bewust',"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "gewicht",
+          "als": "lezer"
+        },
+        {
+          "naam": "trust-rail",
+          "als": "lezer"
+        },
+        {
+          "naam": "waarom",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGOfficeAdaptiefStaat"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/apps/office/adaptief.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "Office-context naar het register",
+          "citaat": "A.context({ bron: bron, titel: titel(), acties:"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "werkbalkknop als capability",
+          "citaat": "A.declareer({ id: id, naam: naamVan(b), label: labelVan(b)"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "wist ieders context",
+          "citaat": "if (!bron || !knoppen.length) { A.wisContext(); return; }"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/apps/reizen-performance.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "titel in de context van de casco",
+          "citaat": "w.RTGEdge.setContext({ title: bladNaam });"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "en in die van het register",
+          "citaat": "A.context({ bron: 'reizen.tabs', titel: 'TravelOS',"
+        },
+        {
+          "rol": "beslist",
+          "wat": "alleen in een frame",
+          "citaat": "if (!A || w.parent === w) return;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "identiteit",
+          "als": "lezer"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGReizen"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [
+          "localStorage rtg_member_token"
+        ],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/apps/reizen-veilig.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "zes bankhandelingen",
+          "citaat": "A.declareer({id:'reisveilig.'+item[0],naam:item[1],label:item[1]"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "actiesleutel om te ontdubbelen",
+          "citaat": "b.dataset.rtgActionKey='reisveilig.'+p.id;"
+        },
+        {
+          "rol": "leest",
+          "wat": "het ledentoken",
+          "citaat": "function token(){try{return localStorage.getItem('rtg_member_token')}"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "identiteit",
+          "als": "lezer"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [
+          "rtg-gebaar"
+        ],
+        "attributen": [],
+        "opslag": [
+          "localStorage rtg_member_token"
+        ],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief.js",
+      "laag": "grammatica-kern",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "de leer als globale",
+          "citaat": "root.RTGAdaptiefLeer = leer;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "keuring: bureau wel, telefoon niet",
+          "citaat": "if (opBureau && !(c.vormen.telefoon || []).length) {"
+        },
+        {
+          "rol": "beslist",
+          "wat": "standaardgewicht licht",
+          "citaat": "c.gewicht = (spec && spec.gewicht) || 'licht';"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "beslisser"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiefLeer"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/balk.js",
+      "laag": "grammatica-render",
+      "rollen": [
+        {
+          "rol": "rendert",
+          "wat": "de contextzone in .cmd-balk",
+          "citaat": "zone.className = 'cmd-acties';"
+        },
+        {
+          "rol": "beslist",
+          "wat": "contextacties, anders werelden",
+          "citaat": "if (!items.length && !panes().length && !vastBladen)"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "rij voor de adaptieve Edge",
+          "citaat": "o.root.rtgEdgeItems = function () { return laatsteRij.slice(); };"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "beslisser"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "schrijver"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        },
+        {
+          "naam": "wereld",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiefBalk"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/balkknop.js",
+      "laag": "grammatica-render",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "verhinderd legt uit",
+          "citaat": "if (it.verhinderd) { uitleg(it); return; }"
+        },
+        {
+          "rol": "beslist",
+          "wat": "zonder gewichtlaag alleen licht",
+          "citaat": "if ((it.gewicht || 'licht') !== 'licht') {"
+        },
+        {
+          "rol": "beslist",
+          "wat": "lang drukken na 480 ms",
+          "citaat": "klok = w.setTimeout(function () { klok = null; uitleg(it); }, 480);"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        },
+        {
+          "naam": "waarom",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiefBalkKnoppen"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/brug.js",
+      "laag": "brug",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "alleen het actieve blad levert",
+          "citaat": "if (frame !== actiefFrame()) return;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "herdeclareert met een postbode",
+          "citaat": "A.declareer({ id: c.id, naam: c.naam, label: c.label, groep: c.groep"
+        },
+        {
+          "rol": "beslist",
+          "wat": "standaard licht over de grens",
+          "citaat": "gewicht: c.gewicht || 'licht',"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "zet de context bovenin",
+          "citaat": "A.context(ctx);"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "beslisser"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiefBrugSync"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/diepte.js",
+      "laag": "grammatica-render",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "items uit het register",
+          "citaat": "return (w.RTGAdaptief && w.RTGAdaptief.voorNu()) || [];"
+        },
+        {
+          "rol": "beslist",
+          "wat": "tweede trap vanaf 150 px",
+          "citaat": "var TWEEDE = 150;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "trekstand op .cmd-balk",
+          "citaat": "b.dataset.trek = ver >= TWEEDE ? 'twee' : (ver >= EERSTE ? 'een' : '');"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGDiepte"
+        ],
+        "zendt": [],
+        "luistert": [
+          "rtg-blad-beweegt"
+        ],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/gewicht.js",
+      "laag": "trust",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "de weg per trap",
+          "citaat": "if (g === 'bewust') return bewust(it, bev);"
+        },
+        {
+          "rol": "beslist",
+          "wat": "compensatie is nooit ongedaan maken",
+          "citaat": "if (cap && cap.herstel === 'compensatie' && it.ongedaan)"
+        },
+        {
+          "rol": "leest",
+          "wat": "het effectieve gewicht",
+          "citaat": "var g = gram.effectief(it.gewicht, typeof it.ongedaan === 'function');"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "melding achteraf in de rail",
+          "citaat": "r.meld({ tekst: tekst, ongedaan: ongedaan });"
+        },
+        {
+          "rol": "leest",
+          "wat": "vasthoudduur uit de grammatica",
+          "citaat": "duur: gram.VASTHOUD[plechtigStap ? 'plechtig' : 'zwaar'],"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gebaar-drempel",
+          "als": "lezer"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        },
+        {
+          "naam": "trust-rail",
+          "als": "lezer"
+        },
+        {
+          "naam": "waarom",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGGewicht"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/grammatica.js",
+      "laag": "grammatica-kern",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "de vijf trappen",
+          "citaat": "var GEWICHT = {"
+        },
+        {
+          "rol": "beslist",
+          "wat": "terug zonder weg terug is bewust",
+          "citaat": "return g === 'terug' && !kanTerug ? 'bewust' : g;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "onbekende bron wordt toestand",
+          "citaat": "var bron = BRONNEN[v.bron] ? v.bron : 'toestand';"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "vasthoudduur per trap",
+          "citaat": "var VASTHOUD = { zwaar: 900, plechtig: 1200 };"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gebaar-drempel",
+          "als": "schrijver"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        },
+        {
+          "naam": "gewicht",
+          "als": "schrijver"
+        },
+        {
+          "naam": "waarom",
+          "als": "beslisser"
+        },
+        {
+          "naam": "waarom",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGGrammatica"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/lagen.js",
+      "laag": "grammatica-render",
+      "rollen": [
+        {
+          "rol": "rendert",
+          "wat": "lade, paneel of taak",
+          "citaat": "var wortel = el('div', 'rtg-laag rtg-laag-' + soort);"
+        },
+        {
+          "rol": "beslist",
+          "wat": "veeg omlaag vanaf 90 px",
+          "citaat": "if (y > 90) sluit();"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "een stap in de geschiedenis",
+          "citaat": "w.history.pushState({ rtgLaag: ++teller }, '')"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGLagen"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/orb.js",
+      "laag": "grammatica-render",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "splitst kan en kan niet",
+          "citaat": "kan: items.filter(function (x) { return !x.verhinderd; }),"
+        },
+        {
+          "rol": "beslist",
+          "wat": "zonder gewichtlaag alleen licht",
+          "citaat": "if ((it.gewicht || 'licht') !== 'licht') return;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "eigen langdrukdrempel",
+          "citaat": "var LANG = 480;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        },
+        {
+          "naam": "waarom",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGOrb"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/rail.js",
+      "laag": "trust",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "de rail uit de context",
+          "citaat": "var uit = (ctx && Array.isArray(ctx.rail) ? ctx.rail : []).slice();"
+        },
+        {
+          "rol": "leest",
+          "wat": "meet zelf de verbinding",
+          "citaat": "if (w.navigator && w.navigator.onLine === false) {"
+        },
+        {
+          "rol": "beslist",
+          "wat": "strook weg als er niets is",
+          "citaat": "r.hidden = !uit.length && !melding;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "de rail-API",
+          "citaat": "w.RTGRail = { teken: teken, zet: zet, meld: meld, wis: wisMelding,"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "trust-rail",
+          "als": "beslisser"
+        },
+        {
+          "naam": "trust-rail",
+          "als": "schrijver"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGRail"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/register.js",
+      "laag": "grammatica-kern",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "declaratie, laatste wint",
+          "citaat": "caps[c.id] = c;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "context naar de luisteraars",
+          "citaat": "luisterCtx.slice().forEach(function (f) { try { f(nu); } catch (e) {} });"
+        },
+        {
+          "rol": "beslist",
+          "wat": "slikt een gelijke context",
+          "citaat": "if (v.sleutel === nu.sleutel) return nu;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "zonder grammatica elke trap licht",
+          "citaat": "if (!gram && c.gewicht && c.gewicht !== 'licht') {"
+        },
+        {
+          "rol": "beslist",
+          "wat": "verhinderd gaat niet door",
+          "citaat": "return !((st && st.verhinderd) || c.verhinderd);"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "schrijver"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "beslisser"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "schrijver"
+        },
+        {
+          "naam": "waarom",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptief"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-vorm"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/vasthoud.js",
+      "laag": "grammatica-render",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "vol vasthouden bevestigt",
+          "citaat": "if (deel >= 1) { stop(); af(); return; }"
+        },
+        {
+          "rol": "beslist",
+          "wat": "loslaten onder 15% telt niet",
+          "citaat": "if (ver <= 0.15) return;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGVasthoud"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/adaptief/waarom.js",
+      "laag": "trust",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "tweede lijst van de vijf bronnen",
+          "citaat": "var BRONWOORD = {"
+        },
+        {
+          "rol": "beslist",
+          "wat": "eigen stap, los of niets aan te doen",
+          "citaat": "else regel(lijf, 'Hier kunt u zelf niets aan veranderen.', 'wm-stap');"
+        },
+        {
+          "rol": "projecteert",
+          "wat": "belofte per gewicht",
+          "citaat": "regel(lijf, BELOFTE[it.gewicht || 'licht'] || BELOFTE.licht, 'wm-belofte');"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gewicht",
+          "als": "lezer"
+        },
+        {
+          "naam": "waarom",
+          "als": "beslisser"
+        },
+        {
+          "naam": "waarom",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGWaarom"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/basis/basis-01aa-continue.js",
+      "laag": "laden",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "laadt de Continue Key",
+          "citaat": "if (!window.RTGContinueKey && !document.getElementById('rtgContinueKeyJs') &&"
+        }
+      ],
+      "verantwoordelijkheden": [],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/basis/basis-01ac-edge.js",
+      "laag": "laden",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "randen.js alleen bij een wereld",
+          "citaat": "indexOf(b.getAttribute('data-rtg-world')) < 0) return;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/basis/basis-01ad-intelligence.js",
+      "laag": "laden",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "laadt controllers die ontbreken",
+          "citaat": "if (window[bron[1]] || document.querySelector("
+        }
+      ],
+      "verantwoordelijkheden": [],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/command.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "sessie en dichte intakepoort",
+          "citaat": "function mag(){return aangemeld()&&poortDicht()}"
+        },
+        {
+          "rol": "leest",
+          "wat": "sessiestand van app-main",
+          "citaat": "return !!(app&&app.classList.contains('active'))"
+        },
+        {
+          "rol": "beslist",
+          "wat": "vangt Home van de Edge af",
+          "citaat": "if(!a||!mag()||!tafel)return;e.preventDefault();e.stopPropagation();thuis()"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "bevoegdheid",
+          "als": "beslisser"
+        },
+        {
+          "naam": "identiteit",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGCommand"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/command/bladstand.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "de echte plek van het blad",
+          "citaat": "wereld=id.classify(pad)"
+        },
+        {
+          "rol": "beslist",
+          "wat": "vier werelden of geen",
+          "citaat": "if(WERELDEN.indexOf(wereld)<0)wereld='geen';"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "wereldlabel op body",
+          "citaat": "d.body.setAttribute('data-rtg-blad-wereld',wereld)"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "wachtpost in de geschiedenis",
+          "citaat": "w.history.pushState({rtgWerktafel:1},'')"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "beslisser"
+        },
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGCommandBladstand"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-blad-wereld"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/command/geheugen.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "bewaart",
+          "wat": "hooguit twee bladen",
+          "citaat": "else w.localStorage.setItem(SLEUTEL, JSON.stringify("
+        },
+        {
+          "rol": "beslist",
+          "wat": "alleen paden binnen het huis",
+          "citaat": "b.url.charAt(0) === '/' && b.url.charAt(1) !== '/'"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "voortzetting",
+          "als": "beslisser"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGCommandGeheugen"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [
+          "localStorage rtg_cmd_bladen"
+        ],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/command/werktafel.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "rendert",
+          "wat": "bladen in de Command-balk",
+          "citaat": "b.className='cmd-balkblad'+(i===actief?' actief':'');"
+        },
+        {
+          "rol": "beslist",
+          "wat": "hooguit twee bladen",
+          "citaat": "if(panes.length>=2)verwijder(actief>=0?actief:0);"
+        },
+        {
+          "rol": "bewaart",
+          "wat": "bladen bij elke sync",
+          "citaat": "w.RTGCommandGeheugen.schrijf(panes,actief);"
+        },
+        {
+          "rol": "leest",
+          "wat": "hervat de laatste bladen",
+          "citaat": "var g=w.RTGCommandGeheugen.lees();if(!g)return;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "onderbalk",
+          "als": "schrijver"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGCommandWerktafel"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/edge/actiestaat.js",
+      "laag": "blikveld",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "hetzelfde effectieve gewicht",
+          "citaat": "var gewicht = G && gram.effectief ? gram.effectief(gevraagd, kanOngedaan) : String(gevraagd);"
+        },
+        {
+          "rol": "beslist",
+          "wat": "zonder tabel gaat zwaar dicht",
+          "citaat": "} else if (!G && gewicht !== 'licht') {"
+        },
+        {
+          "rol": "beslist",
+          "wat": "alleen een serveroordeel telt",
+          "citaat": "if (i.oordeel.bron === 'server' && OORDEEL.indexOf(i.oordeel.uitkomst) >= 0)"
+        },
+        {
+          "rol": "beslist",
+          "wat": "redenloos krijgt een vangnetzin",
+          "citaat": "gebreken.push('redenloos');"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "bevoegdheid",
+          "als": "lezer"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        },
+        {
+          "naam": "waarom",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdgeActiestaat"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/edge/blikveld.js",
+      "laag": "blikveld",
+      "rollen": [
+        {
+          "rol": "projecteert",
+          "wat": "een leesbeeld; schrijft niets",
+          "citaat": "return { versie: 1, op: t, velden: velden, acties: gedaan, gebreken: gebreken };"
+        },
+        {
+          "rol": "leest",
+          "wat": "twee hoofdactiebronnen naast elkaar",
+          "citaat": "edgeLabel !== tekstVan(scherm[0])) gebreken.push('hoofdactie-dubbel')"
+        },
+        {
+          "rol": "leest",
+          "wat": "het tweede register erbij",
+          "citaat": "gedaan.push({ id: a.id, naam: a.label, herkomst: 'edge-compat'"
+        },
+        {
+          "rol": "projecteert",
+          "wat": "bevoegdheid zonder bron",
+          "citaat": "bevoegdheid: veld(null, 'geen', 'geen', t,"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "bevoegdheid",
+          "als": "lezer"
+        },
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "gewicht",
+          "als": "lezer"
+        },
+        {
+          "naam": "hoofdactie",
+          "als": "lezer"
+        },
+        {
+          "naam": "identiteit",
+          "als": "lezer"
+        },
+        {
+          "naam": "presence",
+          "als": "lezer"
+        },
+        {
+          "naam": "trust-rail",
+          "als": "lezer"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "lezer"
+        },
+        {
+          "naam": "waarom",
+          "als": "lezer"
+        },
+        {
+          "naam": "wereld",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdgeBlikveld"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/interface/second-screen.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "eigen stand peek/panel/workspace/focus",
+          "citaat": "root.dataset.rtgSecondScreen = state;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "breed: peek wordt workspace",
+          "citaat": "if (next === 'peek' && mq.matches) next = 'workspace';"
+        },
+        {
+          "rol": "leest",
+          "wat": "context van het bovendocument",
+          "citaat": "return w.RTGAdaptief && w.RTGAdaptief.context ? w.RTGAdaptief.context() : {};"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "beslisser"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGInterfaceSecondScreen"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/interface/world-desktop-frame.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "projecteert",
+          "wat": "oogst handelingen uit het frame",
+          "citaat": "var A = scope.win.RTGAdaptief, items = A && A.voorNu ? A.voorNu() : [];"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "laat de Edge frame-balken claimen",
+          "citaat": "if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(doc, win);"
+        },
+        {
+          "rol": "beslist",
+          "wat": "hooguit vier frames",
+          "citaat": "if (!x && entries.length >= 4) { o.announce(U.value('limit')); return false; }"
+        },
+        {
+          "rol": "leest",
+          "wat": "herlaadt bij een sessiewissel",
+          "citaat": "e.key === 'rtg_member_token' || e.key === 'rtf_sessie'"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "identiteit",
+          "als": "lezer"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGDesktopFrameHost"
+        ],
+        "zendt": [
+          "rtg-widget-changed"
+        ],
+        "luistert": [
+          "rtglang"
+        ],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/randen.js",
+      "laag": "laden",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "statische wereld is leidend",
+          "citaat": ".includes(d.body.dataset.rtgWorld)) wereld = d.body.dataset.rtgWorld;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "eigen padlijst voor de wereld",
+          "citaat": "else if (['/apps/reizen.html'].includes(pad)) wereld = 'travel';"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "wereld op body in een frame",
+          "citaat": "d.body.dataset.rtgWorld = wereld;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "start de ene Edge",
+          "citaat": "laad('/shared/rtg-edge-system.js', 'RTGEdge', function (systeemKlaar) {"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "beslisser"
+        },
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGRanden"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-world"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-adaptive-edge-claim.js",
+      "laag": "adaptieve-balk",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "alleen vaste of plakkende balken",
+          "citaat": "if (stijl.position !== 'fixed' && stijl.position !== 'sticky') return false;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "markeert de geclaimde balken",
+          "citaat": "winnaars.forEach(function (el) { el.classList.add(EIGEN); });"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "onderbalk",
+          "als": "beslisser"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiveEdgeClaim"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-adaptive-edge-controls.js",
+      "laag": "adaptieve-balk",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "handelingen via het blikveld",
+          "citaat": "if (w.RTGEdgeBlikveld) return w.RTGEdgeBlikveld.acties();"
+        },
+        {
+          "rol": "beslist",
+          "wat": "welke paginaknop geoogst wordt",
+          "citaat": "if (label(el) && available(el, root) && (!tab || !tabs.has(tab))"
+        },
+        {
+          "rol": "rendert",
+          "wat": "verhuist de hoofdactie in het blad",
+          "citaat": "rt.primarySlot = primary; rt.sheet.appendChild(primary);"
+        },
+        {
+          "rol": "rendert",
+          "wat": "bladtitel uit RTGAdaptief",
+          "citaat": "if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "beslisser"
+        },
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "hoofdactie",
+          "als": "schrijver"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiveEdgeControls"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-adaptive-edge-core.js",
+      "laag": "adaptieve-balk",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "tweede register, laatste wint",
+          "citaat": "state.registry[id] = { id: id"
+        },
+        {
+          "rol": "beslist",
+          "wat": "ids buiten het patroon eruit",
+          "citaat": "if (!state || !/^[a-z][a-z0-9-]{1,39}$/.test(id)) return false;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "allowed: boolean of functie",
+          "citaat": "typeof item.allowed === 'function' ? !!item.allowed()"
+        },
+        {
+          "rol": "beslist",
+          "wat": "vier balkstanden",
+          "citaat": "var STATES = Object.freeze(['peek', 'dock', 'deck', 'expanded']);"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "bevoegdheid",
+          "als": "beslisser"
+        },
+        {
+          "naam": "capability-register",
+          "als": "beslisser"
+        },
+        {
+          "naam": "capability-register",
+          "als": "schrijver"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiveEdgeCore"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-adaptive-edge-input.js",
+      "laag": "adaptieve-balk",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "veeg opzij na 36 px wisselt deck",
+          "citaat": "if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 36)"
+        },
+        {
+          "rol": "beslist",
+          "wat": "eigen langdruk van 620 ms",
+          "citaat": "}, 620);"
+        },
+        {
+          "rol": "beslist",
+          "wat": "auto-peek bij scrollen",
+          "citaat": "if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "omhoog naar RTGDiepte",
+          "citaat": "if (-dy >= depth.DREMPELS.tweede) depth.tweede(); else depth.eerste();"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiveEdgeInput"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-adaptive-edge-loader.js",
+      "laag": "laden",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "overslaan als de global bestaat",
+          "citaat": "if (global && w[global]) { done(true); return; }"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "start de Edge na de keten",
+          "citaat": "w.RTGAdaptiveEdge.start(d, w);"
+        }
+      ],
+      "verantwoordelijkheden": [],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiveEdgeLoader"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-adaptive-edge-signals.js",
+      "laag": "adaptieve-balk",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "eenmalig de hoofdactie",
+          "citaat": "knop = d.querySelector('[data-rtg-edge-primary]:not([hidden])');"
+        },
+        {
+          "rol": "beslist",
+          "wat": "pending wordt presence",
+          "citaat": "if (staat === 'pending') api.setPresence({ label: label + ' wordt uitgevoerd'"
+        },
+        {
+          "rol": "leest",
+          "wat": "vijf events zonder zender",
+          "citaat": "d.addEventListener('rtg-adaptive-project', function (e) {"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "hoofdactie",
+          "als": "lezer"
+        },
+        {
+          "naam": "identiteit",
+          "als": "lezer"
+        },
+        {
+          "naam": "presence",
+          "als": "beslisser"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiveEdgeSignals"
+        ],
+        "zendt": [],
+        "luistert": [
+          "rtg-adaptive-action",
+          "rtg-adaptive-continuation",
+          "rtg-adaptive-identity",
+          "rtg-adaptive-presence",
+          "rtg-adaptive-project"
+        ],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-adaptive-edge.js",
+      "laag": "adaptieve-balk",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "presence in het eigen model",
+          "citaat": "rt.model.presence = input && input.label ?"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "identiteit in het eigen model",
+          "citaat": "rt.model.identity = acting ?"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "voortzetting in het eigen model",
+          "citaat": "rt.model.continuation = input && input.title ?"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "balkstand op body",
+          "citaat": "d.body.dataset.rtgAdaptiveState = rt.model.state;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "Edge 2 compact wordt peek",
+          "citaat": "else if (state === 'compact') setState('peek', 'auto');"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "klaar-vlag; CSS zet de onderbalk weg",
+          "citaat": "d.body.dataset.rtgAdaptiveReady = 'true';"
+        },
+        {
+          "rol": "beslist",
+          "wat": "eigen bevestiging met window.confirm",
+          "citaat": "if (custom.confirm && !w.confirm(custom.confirm)) return false;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "gewicht",
+          "als": "beslisser"
+        },
+        {
+          "naam": "identiteit",
+          "als": "schrijver"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "schrijver"
+        },
+        {
+          "naam": "presence",
+          "als": "schrijver"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "lezer"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "schrijver"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "beslisser"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGAdaptiveEdge"
+        ],
+        "zendt": [
+          "rtg-adaptive-connect"
+        ],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-adaptive-ready",
+          "data-rtg-adaptive-state"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-continue-key-core.js",
+      "laag": "continuiteit",
+      "rollen": [
+        {
+          "rol": "rendert",
+          "wat": "herbouwt de hoofdactieknop",
+          "citaat": "b.appendChild(houder); zetAttr(b, 'data-rtg-morph-action', '');"
+        },
+        {
+          "rol": "beslist",
+          "wat": "is de hoofdactie bruikbaar",
+          "citaat": "if (s && (s.display === 'none' || s.visibility === 'hidden'"
+        },
+        {
+          "rol": "bewaart",
+          "wat": "anker globaal",
+          "citaat": "s.setItem(STORAGE, waarde); return true;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "hoofdactie",
+          "als": "beslisser"
+        },
+        {
+          "naam": "hoofdactie",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGContinueKeyCore"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [
+          "onbekend rtg_continue_key_anchor_v1"
+        ],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-continue-key.js",
+      "laag": "continuiteit",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "alleen bij precies een hoofdactie",
+          "citaat": "if (gevonden.length !== 1) return null;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "anker op de hoofdactieknop",
+          "citaat": "C.setAttr(rt.button, 'data-rtg-key-anchor', waarde);"
+        },
+        {
+          "rol": "leest",
+          "wat": "Edge 2 focus sluit de kiezer",
+          "citaat": "(body.getAttribute('data-rtg-edge-2-state') === 'focus' ||"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "hoofdactie",
+          "als": "beslisser"
+        },
+        {
+          "naam": "hoofdactie",
+          "als": "schrijver"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGContinueKey"
+        ],
+        "zendt": [],
+        "luistert": [
+          "rtg-hand"
+        ],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-daily.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "rendert",
+          "wat": "exportbalk als Edge-balk",
+          "citaat": "host.setAttribute('data-rtg-edge-bar', ''); d.body.appendChild(host);"
+        },
+        {
+          "rol": "beslist",
+          "wat": "gast: knoppen in Edge-balken uit",
+          "citaat": "if (state === 'guest') d.querySelectorAll('[data-rtg-edge-bar]')"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "paginastand op body",
+          "citaat": "d.body.dataset.dailyState = state;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "bevoegdheid",
+          "als": "beslisser"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGDaily"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-daily-state"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-2-context.js",
+      "laag": "edge-2",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "omlaag compact, omhoog overview",
+          "citaat": "return delta>0?'compact':'overview';"
+        },
+        {
+          "rol": "beslist",
+          "wat": "onder 14 px telt niet",
+          "citaat": "Math.abs(delta)<14"
+        },
+        {
+          "rol": "beslist",
+          "wat": "een gebaar is 1500 ms vers",
+          "citaat": "var GESTURE_MS=1500;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "auto: alle twaalf balktokens",
+          "citaat": "if(raw==='auto')return{ok:true,auto:true,tokens:Object.keys(CONTEXT)};"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "beslisser"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdge2Context"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "(dynamisch) CONTRACT.state",
+          "data-rtg-edge-2-context-open"
+        ],
+        "opslag": [
+          "onbekend (dynamisch) preferenceKey(route)"
+        ],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-2-loader.js",
+      "laag": "laden",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "hoofdactie per hard pad",
+          "citaat": "if (pad === '/apps/rtg.html') {"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "muteert het object van de casco",
+          "citaat": "e.onAction = doe; e.ctx.actie = tekst; k.hidden = false; k.textContent = tekst;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "standaardstand overview",
+          "citaat": "b.setAttribute('data-rtg-edge-2-state', 'overview');"
+        },
+        {
+          "rol": "beslist",
+          "wat": "tweede autoregel voor .wk-stage",
+          "citaat": "if (nu <= 32 || verschil < -14) w.RTGEdge2.setState('overview'"
+        },
+        {
+          "rol": "beslist",
+          "wat": "kopie van de gebaarversheid",
+          "citaat": "if (tijd - gebaarTijd > w.RTGEdge2.GESTURE_MS) return;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "gebaar-drempel",
+          "als": "beslisser"
+        },
+        {
+          "naam": "hoofdactie",
+          "als": "beslisser"
+        },
+        {
+          "naam": "hoofdactie",
+          "als": "schrijver"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "beslisser"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-edge-2",
+          "data-rtg-edge-2-auto",
+          "data-rtg-edge-2-context",
+          "data-rtg-edge-2-hoofdactie",
+          "data-rtg-edge-2-state",
+          "data-rtg-edge-venster-open"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-2-reveal.js",
+      "laag": "edge-2",
+      "rollen": [
+        {
+          "rol": "rendert",
+          "wat": "herstelgrepen boven en onder",
+          "citaat": "knop.className = 'rtg-edge-2-edge-reveal rtg-edge-2-edge-reveal--' + kant[0];"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "terug naar overview via de API",
+          "citaat": "if (win.RTGEdge2) win.RTGEdge2.setState('overview', { source: 'edge' });"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "theme-color, ook in rtg-themas.js",
+          "citaat": "meta.content = kleur;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdge2Reveal"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-2.js",
+      "laag": "edge-2",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "Edge 2-stand op body",
+          "citaat": "rt.state=stand;rt.body.setAttribute(CONTRACT.state,stand);"
+        },
+        {
+          "rol": "beslist",
+          "wat": "handmatig wint van automatiek",
+          "citaat": "if(bron==='auto'&&rt.manual)return rt.state;"
+        },
+        {
+          "rol": "bewaart",
+          "wat": "handmatige stand per pad",
+          "citaat": "voorkeurSchrijf(opslag(rt.win),stand,rt.win.location&&rt.win.location.href);"
+        },
+        {
+          "rol": "rendert",
+          "wat": "paginabalken naar het contextpaneel",
+          "citaat": "el.setAttribute('data-rtg-edge-2-contextual',b.token);slot.appendChild(el);"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "onderbalk",
+          "als": "schrijver"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "beslisser"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdge2"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "(dynamisch) CONTRACT.auto",
+          "(dynamisch) CONTRACT.context",
+          "(dynamisch) CONTRACT.rendered",
+          "(dynamisch) CONTRACT.state"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-appbar.js",
+      "laag": "edge-casco",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "welke paginabalk mee gaat",
+          "citaat": "return el.hasAttribute('data-rtg-edge-bar') || (el.parentElement === d.body"
+        },
+        {
+          "rol": "rendert",
+          "wat": "verhuist de balk zelf",
+          "citaat": "rt.slot.appendChild(el);"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "de Edge bezit een appbalk",
+          "citaat": "rt.body.setAttribute('data-rtg-edge-appbar', 'true');"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "onderbalk",
+          "als": "beslisser"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdgeAppBar"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-edge-appbar"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-command.js",
+      "laag": "edge-casco",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "neemt het menu tot 999 px",
+          "citaat": "var media = venster.matchMedia('(max-width:999px)')"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "claimt de menuknop",
+          "citaat": "menu.setAttribute('data-rtg-command-owner', 'true');"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "onderbalk",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdgeCommand"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-icons.js",
+      "laag": "edge-casco",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "gedeelde icoonpaden",
+          "citaat": "w.RTGEdgeIcons = {"
+        }
+      ],
+      "verantwoordelijkheden": [],
+      "gemeten": {
+        "globals": [
+          "RTGEdgeIcons"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-library.js",
+      "laag": "edge-casco",
+      "rollen": [
+        {
+          "rol": "rendert",
+          "wat": "de hoofdactieknop",
+          "citaat": "<div class=\"rtg-edge-action\"><button type=\"button\" data-rtg-edge-primary></button></div>"
+        },
+        {
+          "rol": "rendert",
+          "wat": "de onderbalk van de casco",
+          "citaat": "<footer class=\"rtg-edge-bottom\">"
+        },
+        {
+          "rol": "leest",
+          "wat": "peilt gereedheid",
+          "citaat": "fetch('/api/ready', { cache: 'no-store' })"
+        },
+        {
+          "rol": "beslist",
+          "wat": "Beveiligd, TEST of Beperkt",
+          "citaat": "magnaat ? 'TEST' : ok ? 'Beveiligd' : 'Beperkt';"
+        },
+        {
+          "rol": "projecteert",
+          "wat": "vaste wereldvolgorde",
+          "citaat": "var ORDE = ['living', 'work', 'travel', 'foundation'];"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "hoofdactie",
+          "als": "schrijver"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "schrijver"
+        },
+        {
+          "naam": "trust-rail",
+          "als": "beslisser"
+        },
+        {
+          "naam": "trust-rail",
+          "als": "schrijver"
+        },
+        {
+          "naam": "wereld",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdgeLibrary"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": [
+          "/api/health",
+          "/api/ready"
+        ]
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-preferences.js",
+      "laag": "edge-casco",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "layoutknop weg buiten de werkruimte",
+          "citaat": "if (!e.workspace) e.root.querySelector('.rtg-edge-layout').hidden = true;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "contexttoken voor Edge 2",
+          "citaat": "w.RTGEdge2.registerContext(tokens.concat('world-shell'));"
+        },
+        {
+          "rol": "bewaart",
+          "wat": "dichtheid via de routecontext",
+          "citaat": "if (w.RTGRouteMemory) w.RTGRouteMemory.save();"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "onderbalk",
+          "als": "beslisser"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdgePreferences"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-density"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
+      "laag": "edge-casco",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "het blad gaat voor de casco",
+          "citaat": "var cfgBlad = blad !== 'geen' && w.RTGEdgeWorlds && w.RTGEdgeWorlds[blad];"
+        },
+        {
+          "rol": "bewaart",
+          "wat": "recent bij elke lezing",
+          "citaat": "sessionStorage.setItem(OPSLAG, nu);"
+        },
+        {
+          "rol": "beslist",
+          "wat": "geen vorige: de publieke ingang",
+          "citaat": "vorige = cfg ? cfg.huis || cfg.home : '/apps/app.html';"
+        },
+        {
+          "rol": "leest",
+          "wat": "appbalken als lokale acties",
+          "citaat": "root.querySelectorAll('.rtg-edge-appslot .rtg-edge-owned-bar a[href]"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "onderbalk",
+          "als": "lezer"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "beslisser"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "schrijver"
+        },
+        {
+          "naam": "wereld",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-edge-menu-face"
+        ],
+        "opslag": [
+          "sessionStorage rtg.edge.recent.v1"
+        ],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
+      "laag": "edge-casco",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "Heel RTG thuis, Hier elders",
+          "citaat": "gezicht(rt, wereldHome() ? 'all' : 'here', false);"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "menuknop wijst naar de index",
+          "citaat": "menu.setAttribute('aria-controls', index.id);"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdgeSmartMenu"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-system.js",
+      "laag": "edge-casco",
+      "rollen": [
+        {
+          "rol": "beslist",
+          "wat": "wereld: gevraagd, anders work",
+          "citaat": "var key = o.world || 'work', cfg = C[key] || C.work;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "wereld op body",
+          "citaat": "d.body.dataset.rtgWorld = key;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "eigen context",
+          "citaat": "A.ctx = Object.assign({}, A.ctx, c || {});"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "tekst van de hoofdactie",
+          "citaat": "hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "Edge 1-vouwstand",
+          "citaat": "d.body.classList.add('rtg-edge-fold')"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "hoofdactie",
+          "als": "schrijver"
+        },
+        {
+          "naam": "vluchtige-context",
+          "als": "schrijver"
+        },
+        {
+          "naam": "wereld",
+          "als": "beslisser"
+        },
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        },
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdge"
+        ],
+        "zendt": [
+          "rtg-edge-layout"
+        ],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-edge-ready",
+          "data-rtg-layout",
+          "data-rtg-world"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-edge-worlds.js",
+      "laag": "edge-casco",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "wereldcatalogi naast MAPPEN",
+          "citaat": "w.RTGEdgeWorlds = {"
+        },
+        {
+          "rol": "projecteert",
+          "wat": "rail uit ids, onbekend valt stil weg",
+          "citaat": "meta.tools = rail.map(function (id) { return alles.find("
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGEdgeWorlds"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-route-memory-core.js",
+      "laag": "continuiteit",
+      "rollen": [
+        {
+          "rol": "bewaart",
+          "wat": "routecontext naar de opslag",
+          "citaat": "storage.setItem(KEY, JSON.stringify(rows)); return true;"
+        },
+        {
+          "rol": "beslist",
+          "wat": "24 uur geldig",
+          "citaat": "row.at > now + 60000 || row.at <= now - TTL"
+        },
+        {
+          "rol": "beslist",
+          "wat": "hooguit 24 routes of 64 KB",
+          "citaat": "while (rows.length > MAX || JSON.stringify(rows).length > BYTES) rows.shift();"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "voortzetting",
+          "als": "beslisser"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGRouteMemoryCore"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [
+          "onbekend rtg.route.context.v1"
+        ],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-route-memory.js",
+      "laag": "continuiteit",
+      "rollen": [
+        {
+          "rol": "bewaart",
+          "wat": "naar sessionStorage",
+          "citaat": "return C.writeStorage(win.sessionStorage, path, state);"
+        },
+        {
+          "rol": "beslist",
+          "wat": "elke interactie breekt herstel af",
+          "citaat": "interrupted = true; stopRestore(); queueSave();"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "anker via de publieke API",
+          "citaat": "anchorDone = true; win.RTGContinueKey.setPosition(saved.anchor);"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "klaar-event",
+          "citaat": "emit('rtg-route-memory-ready', { route: path, restored: !!saved });"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "hoofdactie",
+          "als": "lezer"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "beslisser"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGRouteMemory"
+        ],
+        "zendt": [
+          "rtg-route-memory-ready"
+        ],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-density",
+          "data-rtg-section"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-themas.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "hertelt bij elke Edge 2-stand",
+          "citaat": "'data-rtg-edge-2', 'data-rtg-edge-2-rendered', 'data-rtg-edge-2-state',"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "theme-color, ook in reveal.js",
+          "citaat": "if (meta) meta.setAttribute('content', bovenrand(th));"
+        },
+        {
+          "rol": "bewaart",
+          "wat": "het gekozen thema",
+          "citaat": "localStorage.setItem(KEY, geldig(t) || 'onyx')"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "zichtbaarheidsstand",
+          "als": "lezer"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGThemas"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-thema"
+        ],
+        "opslag": [
+          "localStorage rtg_thema_v2"
+        ],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/rtg-world-start.js",
+      "laag": "laden",
+      "rollen": [
+        {
+          "rol": "leest",
+          "wat": "wacht op het renderstempel",
+          "citaat": "body.getAttribute('data-rtg-edge-2-rendered')==='true'"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "klaar-event",
+          "citaat": "d.dispatchEvent(new CustomEvent('rtg-world-start-ready'));"
+        }
+      ],
+      "verantwoordelijkheden": [],
+      "gemeten": {
+        "globals": [],
+        "zendt": [
+          "rtg-world-start-ready"
+        ],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-world-start"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/shared/social-intelligence-runtime.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "wat": "overschrijft het actiedeck",
+          "citaat": "edge.setProjection({ deck: 'actions', actions: ['social-context'] });"
+        },
+        {
+          "rol": "projecteert",
+          "wat": "verbinding uit het protocol",
+          "citaat": "? (location.protocol === 'https:' ? 'ONLINE / TLS' : 'ONLINE / LOCAL')"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "capability-register",
+          "als": "lezer"
+        },
+        {
+          "naam": "trust-rail",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [],
+        "zendt": [
+          "rtg:intel-open"
+        ],
+        "luistert": [],
+        "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    }
+  ],
+  "verantwoordelijkheden": {
+    "bevoegdheid": {
+      "schrijvers": [],
+      "beslissers": [
+        "public/shared/command.js",
+        "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/rtg-daily.js"
+      ],
+      "lezers": [
+        "public/shared/edge/actiestaat.js",
+        "public/shared/edge/blikveld.js"
+      ]
+    },
+    "capability-register": {
+      "schrijvers": [
+        "public/shared/adaptief/register.js",
+        "public/shared/rtg-adaptive-edge-core.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief.js",
+        "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-core.js"
+      ],
+      "lezers": [
+        "public/apps/bestanden/adaptief.js",
+        "public/apps/office/adaptief-pres.js",
+        "public/apps/office/adaptief-staat.js",
+        "public/apps/office/adaptief.js",
+        "public/apps/reizen-performance.js",
+        "public/apps/reizen-veilig.js",
+        "public/shared/adaptief/balk.js",
+        "public/shared/adaptief/brug.js",
+        "public/shared/adaptief/diepte.js",
+        "public/shared/adaptief/orb.js",
+        "public/shared/edge/blikveld.js",
+        "public/shared/interface/world-desktop-frame.js",
+        "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-input.js",
+        "public/shared/rtg-adaptive-edge-signals.js",
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/social-intelligence-runtime.js"
+      ]
+    },
+    "gebaar-drempel": {
+      "schrijvers": [
+        "public/shared/adaptief/grammatica.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/balkknop.js",
+        "public/shared/adaptief/diepte.js",
+        "public/shared/adaptief/lagen.js",
+        "public/shared/adaptief/orb.js",
+        "public/shared/adaptief/vasthoud.js",
+        "public/shared/rtg-adaptive-edge-input.js",
+        "public/shared/rtg-edge-2-context.js",
+        "public/shared/rtg-edge-2-loader.js"
+      ],
+      "lezers": [
+        "public/shared/adaptief/gewicht.js"
+      ]
+    },
+    "gewicht": {
+      "schrijvers": [
+        "public/shared/adaptief/grammatica.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief.js",
+        "public/shared/adaptief/balkknop.js",
+        "public/shared/adaptief/brug.js",
+        "public/shared/adaptief/gewicht.js",
+        "public/shared/adaptief/grammatica.js",
+        "public/shared/adaptief/orb.js",
+        "public/shared/adaptief/register.js",
+        "public/shared/edge/actiestaat.js",
+        "public/shared/rtg-adaptive-edge.js"
+      ],
+      "lezers": [
+        "public/apps/bestanden/adaptief.js",
+        "public/apps/office/adaptief-staat.js",
+        "public/shared/adaptief/waarom.js",
+        "public/shared/edge/blikveld.js"
+      ]
+    },
+    "hoofdactie": {
+      "schrijvers": [
+        "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-continue-key-core.js",
+        "public/shared/rtg-continue-key.js",
+        "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-library.js",
+        "public/shared/rtg-edge-system.js"
+      ],
+      "beslissers": [
+        "public/shared/rtg-continue-key-core.js",
+        "public/shared/rtg-continue-key.js",
+        "public/shared/rtg-edge-2-loader.js"
+      ],
+      "lezers": [
+        "public/shared/edge/blikveld.js",
+        "public/shared/rtg-adaptive-edge-signals.js",
+        "public/shared/rtg-route-memory.js"
+      ]
+    },
+    "identiteit": {
+      "schrijvers": [
+        "public/shared/rtg-adaptive-edge.js"
+      ],
+      "beslissers": [],
+      "lezers": [
+        "public/apps/reizen-performance.js",
+        "public/apps/reizen-veilig.js",
+        "public/shared/command.js",
+        "public/shared/edge/blikveld.js",
+        "public/shared/interface/world-desktop-frame.js",
+        "public/shared/rtg-adaptive-edge-signals.js"
+      ]
+    },
+    "onderbalk": {
+      "schrijvers": [
+        "public/shared/adaptief/balk.js",
+        "public/shared/command/werktafel.js",
+        "public/shared/rtg-adaptive-edge-claim.js",
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/rtg-daily.js",
+        "public/shared/rtg-edge-2.js",
+        "public/shared/rtg-edge-appbar.js",
+        "public/shared/rtg-edge-library.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/balk.js",
+        "public/shared/rtg-adaptive-edge-claim.js",
+        "public/shared/rtg-edge-2-context.js",
+        "public/shared/rtg-edge-appbar.js",
+        "public/shared/rtg-edge-command.js",
+        "public/shared/rtg-edge-preferences.js"
+      ],
+      "lezers": [
+        "public/shared/adaptief/diepte.js",
+        "public/shared/interface/world-desktop-frame.js",
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js"
+      ]
+    },
+    "presence": {
+      "schrijvers": [
+        "public/shared/rtg-adaptive-edge.js"
+      ],
+      "beslissers": [
+        "public/shared/rtg-adaptive-edge-signals.js"
+      ],
+      "lezers": [
+        "public/shared/edge/blikveld.js"
+      ]
+    },
+    "trust-rail": {
+      "schrijvers": [
+        "public/shared/adaptief/rail.js",
+        "public/shared/rtg-edge-library.js",
+        "public/shared/social-intelligence-runtime.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/rail.js",
+        "public/shared/rtg-edge-library.js"
+      ],
+      "lezers": [
+        "public/apps/bestanden/adaptief.js",
+        "public/apps/office/adaptief-staat.js",
+        "public/shared/adaptief/gewicht.js",
+        "public/shared/edge/blikveld.js"
+      ]
+    },
+    "vluchtige-context": {
+      "schrijvers": [
+        "public/shared/adaptief/register.js",
+        "public/shared/rtg-edge-system.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/brug.js",
+        "public/shared/adaptief/register.js"
+      ],
+      "lezers": [
+        "public/apps/bestanden/adaptief.js",
+        "public/apps/office/adaptief.js",
+        "public/apps/reizen-performance.js",
+        "public/apps/reizen-veilig.js",
+        "public/shared/adaptief/balk.js",
+        "public/shared/adaptief/brug.js",
+        "public/shared/adaptief/rail.js",
+        "public/shared/command/werktafel.js",
+        "public/shared/edge/blikveld.js",
+        "public/shared/interface/second-screen.js",
+        "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge.js"
+      ]
+    },
+    "voortzetting": {
+      "schrijvers": [
+        "public/shared/command/geheugen.js",
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
+        "public/shared/rtg-route-memory-core.js"
+      ],
+      "beslissers": [
+        "public/shared/command/geheugen.js",
+        "public/shared/command/werktafel.js",
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
+        "public/shared/rtg-route-memory-core.js",
+        "public/shared/rtg-route-memory.js"
+      ],
+      "lezers": [
+        "public/shared/edge/blikveld.js",
+        "public/shared/rtg-adaptive-edge-signals.js",
+        "public/shared/rtg-edge-preferences.js"
+      ]
+    },
+    "waarom": {
+      "schrijvers": [
+        "public/shared/adaptief/grammatica.js",
+        "public/shared/adaptief/waarom.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/balkknop.js",
+        "public/shared/adaptief/grammatica.js",
+        "public/shared/adaptief/orb.js",
+        "public/shared/adaptief/register.js",
+        "public/shared/adaptief/waarom.js",
+        "public/shared/edge/actiestaat.js"
+      ],
+      "lezers": [
+        "public/apps/office/adaptief-staat.js",
+        "public/shared/adaptief/gewicht.js",
+        "public/shared/edge/blikveld.js"
+      ]
+    },
+    "wereld": {
+      "schrijvers": [
+        "public/shared/command/bladstand.js",
+        "public/shared/randen.js",
+        "public/shared/rtg-edge-system.js",
+        "public/shared/rtg-edge-worlds.js"
+      ],
+      "beslissers": [
+        "public/shared/command/bladstand.js",
+        "public/shared/randen.js",
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
+        "public/shared/rtg-edge-system.js"
+      ],
+      "lezers": [
+        "public/shared/adaptief/balk.js",
+        "public/shared/basis/basis-01ac-edge.js",
+        "public/shared/edge/blikveld.js",
+        "public/shared/rtg-edge-library.js",
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js"
+      ]
+    },
+    "zichtbaarheidsstand": {
+      "schrijvers": [
+        "public/shared/interface/second-screen.js",
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-2.js",
+        "public/shared/rtg-edge-system.js"
+      ],
+      "beslissers": [
+        "public/shared/interface/second-screen.js",
+        "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/rtg-adaptive-edge-input.js",
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/rtg-edge-2-context.js",
+        "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-2.js"
+      ],
+      "lezers": [
+        "public/shared/rtg-continue-key.js",
+        "public/shared/rtg-edge-2-reveal.js",
+        "public/shared/rtg-themas.js"
+      ]
+    }
+  },
+  "lagen": {
+    "adaptieve-balk": [
+      "public/shared/rtg-adaptive-edge-claim.js",
+      "public/shared/rtg-adaptive-edge-controls.js",
+      "public/shared/rtg-adaptive-edge-core.js",
+      "public/shared/rtg-adaptive-edge-input.js",
+      "public/shared/rtg-adaptive-edge-signals.js",
+      "public/shared/rtg-adaptive-edge.js"
+    ],
+    "afnemer": [
+      "public/apps/bestanden/adaptief.js",
+      "public/apps/office/adaptief-pres.js",
+      "public/apps/office/adaptief-staat.js",
+      "public/apps/office/adaptief.js",
+      "public/apps/reizen-performance.js",
+      "public/apps/reizen-veilig.js",
+      "public/shared/rtg-daily.js",
+      "public/shared/social-intelligence-runtime.js"
+    ],
+    "blikveld": [
+      "public/shared/edge/actiestaat.js",
+      "public/shared/edge/blikveld.js"
+    ],
+    "brug": [
+      "public/shared/adaptief/brug.js"
+    ],
+    "continuiteit": [
+      "public/shared/rtg-continue-key-core.js",
+      "public/shared/rtg-continue-key.js",
+      "public/shared/rtg-route-memory-core.js",
+      "public/shared/rtg-route-memory.js"
+    ],
+    "edge-2": [
+      "public/shared/rtg-edge-2-context.js",
+      "public/shared/rtg-edge-2-reveal.js",
+      "public/shared/rtg-edge-2.js"
+    ],
+    "edge-casco": [
+      "public/shared/rtg-edge-appbar.js",
+      "public/shared/rtg-edge-command.js",
+      "public/shared/rtg-edge-icons.js",
+      "public/shared/rtg-edge-library.js",
+      "public/shared/rtg-edge-preferences.js",
+      "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
+      "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
+      "public/shared/rtg-edge-system.js",
+      "public/shared/rtg-edge-worlds.js"
+    ],
+    "grammatica-kern": [
+      "public/shared/adaptief.js",
+      "public/shared/adaptief/grammatica.js",
+      "public/shared/adaptief/register.js"
+    ],
+    "grammatica-render": [
+      "public/shared/adaptief/balk.js",
+      "public/shared/adaptief/balkknop.js",
+      "public/shared/adaptief/diepte.js",
+      "public/shared/adaptief/lagen.js",
+      "public/shared/adaptief/orb.js",
+      "public/shared/adaptief/vasthoud.js"
+    ],
+    "laden": [
+      "public/shared/basis/basis-01aa-continue.js",
+      "public/shared/basis/basis-01ac-edge.js",
+      "public/shared/basis/basis-01ad-intelligence.js",
+      "public/shared/randen.js",
+      "public/shared/rtg-adaptive-edge-loader.js",
+      "public/shared/rtg-edge-2-loader.js",
+      "public/shared/rtg-world-start.js"
+    ],
+    "schil": [
+      "public/shared/command.js",
+      "public/shared/command/bladstand.js",
+      "public/shared/command/geheugen.js",
+      "public/shared/command/werktafel.js",
+      "public/shared/interface/second-screen.js",
+      "public/shared/interface/world-desktop-frame.js",
+      "public/shared/rtg-themas.js"
+    ],
+    "trust": [
+      "public/shared/adaptief/gewicht.js",
+      "public/shared/adaptief/rail.js",
+      "public/shared/adaptief/waarom.js"
+    ]
+  },
+  "dubbeleEigenaars": [
+    {
+      "naam": "bevoegdheid",
+      "schrijvers": [],
+      "beslissers": [
+        "public/shared/command.js",
+        "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/rtg-daily.js"
+      ],
+      "waarom": "Drie plekken in de client beslissen wat mag (de sessiegrendel van de werktafel, allowed van de Edge-Core, de gastblokkade van RTGDaily), terwijl er geen serverroute is die per principal een oordeel geeft -- het blikveld zegt dat hardop."
+    },
+    {
+      "naam": "capability-register",
+      "schrijvers": [
+        "public/shared/adaptief/register.js",
+        "public/shared/rtg-adaptive-edge-core.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief.js",
+        "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-core.js"
+      ],
+      "waarom": "Twee registers met elk een eigen poort: RTGAdaptief (declareer, keuring via de leer en de grammatica) en de Edge-Core (registerAction, id-patroon, allowed); een actie via registerAction ontloopt de gewichtsgrammatica, en de controls oogsten paginaknoppen als derde bron."
+    },
+    {
+      "naam": "gebaar-drempel",
+      "schrijvers": [
+        "public/shared/adaptief/grammatica.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/balkknop.js",
+        "public/shared/adaptief/diepte.js",
+        "public/shared/adaptief/lagen.js",
+        "public/shared/adaptief/orb.js",
+        "public/shared/adaptief/vasthoud.js",
+        "public/shared/rtg-adaptive-edge-input.js",
+        "public/shared/rtg-edge-2-context.js",
+        "public/shared/rtg-edge-2-loader.js"
+      ],
+      "waarom": "De drempels staan in een tabel (GEBAREN, VASTHOUD) maar worden overal zelf gekozen: lang drukken is 480 ms in balkknop.js en orb.js en 620 ms in de adaptieve balk, de gebaarversheid staat als kopie in de Edge 2-loader, en diepte, lagen, vasthoud en de invoerlaag hebben elk een eigen afstand."
+    },
+    {
+      "naam": "gewicht",
+      "schrijvers": [
+        "public/shared/adaptief/grammatica.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief.js",
+        "public/shared/adaptief/balkknop.js",
+        "public/shared/adaptief/brug.js",
+        "public/shared/adaptief/gewicht.js",
+        "public/shared/adaptief/grammatica.js",
+        "public/shared/adaptief/orb.js",
+        "public/shared/adaptief/register.js",
+        "public/shared/edge/actiestaat.js",
+        "public/shared/rtg-adaptive-edge.js"
+      ],
+      "waarom": "De tabel en de regel voor het effectieve gewicht staan in grammatica.js (gewicht.js en actiestaat.js delen hem), maar de toepassing verschilt per plek: drie keer een eigen standaard licht (adaptief.js, register.js zonder grammatica, brug.js), de regel voor zonder gewichtlaag staat drie keer apart (balkknop, orb en actiestaat gaan elk zelf dicht), en window.confirm in de adaptieve Edge."
+    },
+    {
+      "naam": "hoofdactie",
+      "schrijvers": [
+        "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-continue-key-core.js",
+        "public/shared/rtg-continue-key.js",
+        "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-library.js",
+        "public/shared/rtg-edge-system.js"
+      ],
+      "beslissers": [
+        "public/shared/rtg-continue-key-core.js",
+        "public/shared/rtg-continue-key.js",
+        "public/shared/rtg-edge-2-loader.js"
+      ],
+      "waarom": "De library maakt de knop, de casco en de Edge 2-loader (padtabel) zetten tekst en actie, de Continue Key herbouwt inhoud en anker en de controls verhuizen hem; het scherm wijst intussen zijn eigen data-hoofdactie aan, en het blikveld meldt het verschil als hoofdactie-dubbel."
+    },
+    {
+      "naam": "onderbalk",
+      "schrijvers": [
+        "public/shared/adaptief/balk.js",
+        "public/shared/command/werktafel.js",
+        "public/shared/rtg-adaptive-edge-claim.js",
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/rtg-daily.js",
+        "public/shared/rtg-edge-2.js",
+        "public/shared/rtg-edge-appbar.js",
+        "public/shared/rtg-edge-library.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/balk.js",
+        "public/shared/rtg-adaptive-edge-claim.js",
+        "public/shared/rtg-edge-2-context.js",
+        "public/shared/rtg-edge-appbar.js",
+        "public/shared/rtg-edge-command.js",
+        "public/shared/rtg-edge-preferences.js"
+      ],
+      "waarom": "Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, en RTGDaily die zelf een Edge-balk ophangt."
+    },
+    {
+      "naam": "trust-rail",
+      "schrijvers": [
+        "public/shared/adaptief/rail.js",
+        "public/shared/rtg-edge-library.js",
+        "public/shared/social-intelligence-runtime.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/rail.js",
+        "public/shared/rtg-edge-library.js"
+      ],
+      "waarom": "Verbinding en beveiliging worden op drie plekken zelf afgeleid en elk op een eigen strook getoond: RTGRail (navigator.onLine), het statuspaneel van de casco (/api/ready, Beveiligd) en de Intelligence-strook (protocol als ONLINE / TLS); geen van drie leest een ander."
+    },
+    {
+      "naam": "vluchtige-context",
+      "schrijvers": [
+        "public/shared/adaptief/register.js",
+        "public/shared/rtg-edge-system.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/brug.js",
+        "public/shared/adaptief/register.js"
+      ],
+      "waarom": "Twee contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie) en RTGEdge.active.ctx (scope, titel, actie, tool); reizen-performance.js voedt ze allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen) en de brug (actief blad) elk apart."
+    },
+    {
+      "naam": "voortzetting",
+      "schrijvers": [
+        "public/shared/command/geheugen.js",
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
+        "public/shared/rtg-route-memory-core.js"
+      ],
+      "beslissers": [
+        "public/shared/command/geheugen.js",
+        "public/shared/command/werktafel.js",
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
+        "public/shared/rtg-route-memory-core.js",
+        "public/shared/rtg-route-memory.js"
+      ],
+      "waarom": "Vier geheugens voor waar was ik: continueWith (alleen in het model van de Edge), de werktafelbladen (localStorage), de routecontext (sessionStorage, 24 uur) en Recent bezocht van het slimme menu (sessionStorage); geen van vier leest een ander."
+    },
+    {
+      "naam": "waarom",
+      "schrijvers": [
+        "public/shared/adaptief/grammatica.js",
+        "public/shared/adaptief/waarom.js"
+      ],
+      "beslissers": [
+        "public/shared/adaptief/balkknop.js",
+        "public/shared/adaptief/grammatica.js",
+        "public/shared/adaptief/orb.js",
+        "public/shared/adaptief/register.js",
+        "public/shared/adaptief/waarom.js",
+        "public/shared/edge/actiestaat.js"
+      ],
+      "waarom": "De vijf bronnen staan twee keer (BRONNEN in grammatica.js, BRONWOORD in waarom.js), en verhinderd-gaat-niet-door wordt beslist in register.js, balkknop.js, orb.js en actiestaat.js naast de uitleg in grammatica.js en waarom.js."
+    },
+    {
+      "naam": "wereld",
+      "schrijvers": [
+        "public/shared/command/bladstand.js",
+        "public/shared/randen.js",
+        "public/shared/rtg-edge-system.js",
+        "public/shared/rtg-edge-worlds.js"
+      ],
+      "beslissers": [
+        "public/shared/command/bladstand.js",
+        "public/shared/randen.js",
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
+        "public/shared/rtg-edge-system.js"
+      ],
+      "waarom": "De huidige wereld wordt op vier plekken vastgesteld: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco."
+    },
+    {
+      "naam": "zichtbaarheidsstand",
+      "schrijvers": [
+        "public/shared/interface/second-screen.js",
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-2.js",
+        "public/shared/rtg-edge-system.js"
+      ],
+      "beslissers": [
+        "public/shared/interface/second-screen.js",
+        "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/rtg-adaptive-edge-input.js",
+        "public/shared/rtg-adaptive-edge.js",
+        "public/shared/rtg-edge-2-context.js",
+        "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-2.js"
+      ],
+      "waarom": "Vijf standmachines voor wat er van de Edge te zien is: Edge 2 (overview/compact/focus) met een tweede autoregel in de loader, de adaptieve balk (peek/dock/deck/expanded) die Edge 2 eenrichting volgt, de Edge 1-vouwstand en de Second Screen; ze delen geen stand."
+    }
+  ],
+  "dodeKanalen": {
+    "luisterZonderZender": [
+      {
+        "naam": "rtg-adaptive-action",
+        "luisteraars": [
+          "public/shared/rtg-adaptive-edge-signals.js"
+        ]
+      },
+      {
+        "naam": "rtg-adaptive-continuation",
+        "luisteraars": [
+          "public/shared/rtg-adaptive-edge-signals.js"
+        ]
+      },
+      {
+        "naam": "rtg-adaptive-identity",
+        "luisteraars": [
+          "public/shared/rtg-adaptive-edge-signals.js"
+        ]
+      },
+      {
+        "naam": "rtg-adaptive-presence",
+        "luisteraars": [
+          "public/shared/rtg-adaptive-edge-signals.js"
+        ]
+      },
+      {
+        "naam": "rtg-adaptive-project",
+        "luisteraars": [
+          "public/shared/rtg-adaptive-edge-signals.js"
+        ]
+      },
+      {
+        "naam": "rtg-edge-ready",
+        "luisteraars": [
+          "public/shared/interface/world-desktop-home.js"
+        ]
+      }
+    ],
+    "zendZonderLuisteraar": [
+      {
+        "naam": "rtg-adaptive-connect",
+        "zenders": [
+          "public/shared/rtg-adaptive-edge.js"
+        ]
+      },
+      {
+        "naam": "rtg-beweging",
+        "zenders": [
+          "public/shared/levendekleur/levendekleur-01.js"
+        ]
+      },
+      {
+        "naam": "rtg-palet-open",
+        "zenders": [
+          "public/shared/rtg-schil/05-context.js"
+        ]
+      },
+      {
+        "naam": "rtg-platform-role",
+        "zenders": [
+          "public/site/start/experience-platform.js"
+        ]
+      },
+      {
+        "naam": "rtg-route-memory-ready",
+        "zenders": [
+          "public/shared/rtg-route-memory.js"
+        ]
+      },
+      {
+        "naam": "rtg-storyline-render",
+        "zenders": [
+          "public/site/storyline-stage.js"
+        ]
+      },
+      {
+        "naam": "rtg-volscherm",
+        "zenders": [
+          "public/shared/volscherm.js"
+        ]
+      },
+      {
+        "naam": "rtg-wachtrij-leeg",
+        "zenders": [
+          "public/shared/verbinding/verbinding-01.js"
+        ]
+      },
+      {
+        "naam": "rtg-workspace-error",
+        "zenders": [
+          "public/shared/interface/workspace-runtime.js"
+        ]
+      },
+      {
+        "naam": "rtg-world-start-ready",
+        "zenders": [
+          "public/shared/rtg-world-start.js"
+        ]
+      },
+      {
+        "naam": "rtgdeel",
+        "zenders": [
+          "public/shared/deelmenu/deelmenu-02.js"
+        ]
+      }
+    ],
+    "dynamisch": [
+      {
+        "pad": "public/apps/foundation/realtime.js",
+        "soort": "luistert",
+        "uitdrukking": "event"
+      },
+      {
+        "pad": "public/apps/util.js",
+        "soort": "luistert",
+        "uitdrukking": "k.slice(2).toLowerCase()"
+      },
+      {
+        "pad": "public/shared/rtg-edge-2-context.js",
+        "soort": "luistert",
+        "uitdrukking": "type"
+      }
+    ]
+  },
+  "telling": {
+    "bestanden": 59,
+    "rollen": 189,
+    "dubbeleEigenaars": 12,
+    "dodeKanalen": 17
+  }
+}

@@ -3,8 +3,8 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-09-23T16:31:09.438Z",
-  "commit": "d76ef1c00",
+  "op": "2026-09-23T15:15:02.270Z",
+  "commit": "109fe208",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/stillezing.js",
@@ -12,7 +12,7 @@
  },
  "gemeten": {
   "server": {
-   "bewijslezingen": 77,
+   "bewijslezingen": 79,
    "metVanger": 9,
    "smeltSamen": 5,
    "zegtHet": 1,
@@ -21,11 +21,11 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 485,
-   "metVanger": 98,
+   "bewijslezingen": 503,
+   "metVanger": 99,
    "smeltSamen": 61,
    "zegtHet": 11,
-   "onderscheidt": 5,
+   "onderscheidt": 6,
    "gooit": 2,
    "anders": 19
   }
@@ -308,6 +308,14 @@
     "soort": "zegtHet"
    },
    {
+    "bestand": "scripts/edgekaart.js",
+    "regel": 538,
+    "leest": [
+     "EDGEKAART.json"
+    ],
+    "soort": "onderscheidt"
+   },
+   {
     "bestand": "scripts/envelopvelden.js",
     "regel": 147,
     "leest": [
@@ -518,7 +526,7 @@
    },
    {
     "bestand": "scripts/kantoormacht.js",
-    "regel": 415,
+    "regel": 423,
     "leest": [
      "KANTOORMACHT.json"
     ],

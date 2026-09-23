@@ -109,7 +109,9 @@ async function laad(){
     location.reload();
   }));
 }
-$('#open').addEventListener('click', () => { CODE = $('#code').value.trim().toUpperCase(); if (CODE) laad(); });
+$('#open').addEventListener('click', () => { CODE = $('#code').value.trim().toUpperCase();
+  if (!CODE) { $('#fout').textContent = 'Vul eerst de code van uw organisatie in.'; $('#fout').hidden = false; $('#code').focus(); return; }
+  $('#fout').hidden = true; laad(); });
 $('#code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#open').click(); });
 if (CODE) { $('#code').value = CODE; laad(); }
 </script>

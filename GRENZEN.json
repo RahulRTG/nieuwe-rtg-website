@@ -14,7 +14,8 @@
       "accKoppel",
       "accOntkoppel",
       "accRollen",
-      "accStart"
+      "accStart",
+      "kantoorIntrekking"
     ],
     "adres": [
       "adresZoek"
@@ -273,6 +274,7 @@
     "connect": [
       "connect"
     ],
+    "connect-gezinsdeur": [],
     "consent": [
       "commercieelStand",
       "commercieelZet",
@@ -601,6 +603,7 @@
       "hardware",
       "ideeen",
       "invoer",
+      "kantoorIntrekking",
       "kluisAuth",
       "magnaatLeren",
       "mail",
@@ -652,7 +655,9 @@
       "labfonds",
       "rtf"
     ],
+    "labfonds-gezinsdeur": [],
     "ledenbalie": [
+      "afdelingen",
       "balieAboVoorstel",
       "balieDossier",
       "balieHerstel",
@@ -662,8 +667,11 @@
       "balieZetelZet",
       "balieZetels",
       "balieZoek",
+      "beleidsmotor",
       "boardroomAuth",
-      "magBalie"
+      "kantoorIntrekking",
+      "magBalie",
+      "zwaarbewijs"
     ],
     "ledenregister": [
       "boardroomAuth",
@@ -1379,6 +1387,7 @@
       "assetHertaxeer",
       "assetKantoor",
       "assetTerugkoopUit",
+      "beleidsmotor",
       "boardroomAuth",
       "broadcastSync",
       "bureauBalie",
@@ -1408,6 +1417,7 @@
       "notify",
       "notifySupplier",
       "officeQueryMag",
+      "officeQueryOpNaam",
       "officeState",
       "ondernemingBijdrageZet",
       "ondernemingProvisioningZet",
@@ -2104,6 +2114,7 @@
       "happyKorting",
       "hasCred",
       "haversine",
+      "heeftKantoor",
       "heleCenten",
       "herkomst",
       "herstelGeldig",

@@ -101,18 +101,6 @@
       "sleutel": "betalen"
     },
     {
-      "naam": "Betalen",
-      "wereld": "LivingOS",
-      "soort": "link",
-      "sleutel": "pay",
-      "url": "/apps/pay.html",
-      "woorden": [
-        "jouw",
-        "geld",
-        "knop"
-      ]
-    },
-    {
       "naam": "Camera",
       "wereld": "LivingOS",
       "soort": "link",
@@ -237,11 +225,7 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "geldcommand",
-      "url": "/apps/geld-command.html",
-      "woorden": [
-        "geldomgeving",
-        "verplaatst"
-      ]
+      "url": "/apps/geld.html"
     },
     {
       "naam": "Gezin",
@@ -298,6 +282,16 @@
       "label": "Lifestyle",
       "woorden": [
         "geld"
+      ]
+    },
+    {
+      "naam": "Logeren bij leden",
+      "wereld": "LivingOS",
+      "soort": "link",
+      "sleutel": "huis",
+      "url": "/apps/thuis.html",
+      "woorden": [
+        "thuis"
       ]
     },
     {
@@ -391,7 +385,7 @@
       "url": "/apps/nieuws.html"
     },
     {
-      "naam": "Ontdekken",
+      "naam": "Overzicht",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "ontdek",
@@ -415,6 +409,13 @@
         "lifestyle",
         "pass"
       ]
+    },
+    {
+      "naam": "Pulse",
+      "wereld": "LivingOS",
+      "soort": "link",
+      "sleutel": "pulse",
+      "url": "/apps/pulse.html"
     },
     {
       "naam": "Rendez-vous",
@@ -443,6 +444,18 @@
         "minder",
         "zoeken",
         "beleven"
+      ]
+    },
+    {
+      "naam": "RTG Pay",
+      "wereld": "LivingOS",
+      "soort": "link",
+      "sleutel": "pay",
+      "url": "/apps/pay.html",
+      "woorden": [
+        "jouw",
+        "geld",
+        "knop"
       ]
     },
     {
@@ -513,13 +526,6 @@
       ]
     },
     {
-      "naam": "Thuis",
-      "wereld": "LivingOS",
-      "soort": "link",
-      "sleutel": "huis",
-      "url": "/apps/thuis.html"
-    },
-    {
       "naam": "Tweede scherm",
       "wereld": "LivingOS",
       "soort": "link",
@@ -543,19 +549,9 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "vandaag",
-      "url": "/apps/vandaag.html",
+      "url": "/apps/life.html",
       "woorden": [
-        "goedemorgen"
-      ]
-    },
-    {
-      "naam": "Vandaag",
-      "wereld": "LivingOS",
-      "soort": "link",
-      "sleutel": "pulse",
-      "url": "/apps/pulse.html",
-      "woorden": [
-        "pulse"
+        "life"
       ]
     },
     {

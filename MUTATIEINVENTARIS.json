@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-23T15:44:58.390Z",
-  "commit": "6f51dc494",
+  "op": "2026-09-23T11:40:54.098Z",
+  "commit": "aff2d77",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 1,
   "instrument": "scripts/mutatieinventaris.js",
   "node": "v22.22.2"
  },
@@ -17,14 +17,14 @@
   "werkelijkAangeroepen": 4972,
   "bewijsMetSleutel": 1716,
   "bewijsZonderSleutel": 259,
-  "verklaard": 522
+  "verklaard": 520
  },
  "autorisatie": {
-  "rol": 3914,
+  "rol": 3913,
   "(geen bewakerslaag)": 624,
   "geenBewaker": 62,
   "lichaamssleutel": 93,
-  "eigenrol": 193,
+  "eigenrol": 194,
   "objectpoort": 106,
   "omgeving": 1,
   "verzoeksignatuur": 1

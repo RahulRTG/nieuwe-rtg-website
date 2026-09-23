@@ -1,10 +1,13 @@
 /* DE HERITAGE-ROUTEKAART IS FAIL-CLOSED.
    Een nieuw echt scherm mag niet ongemerkt een vijfde kleur erven en een oude
    redirect mag geen tweede productoppervlak worden. Daarom wordt het manifest
-   hier tegen de werkelijke HTML-boom gehouden: 294 schermen, 16 doorwijzers,
+   hier tegen de werkelijke HTML-boom gehouden: 292 schermen, 18 doorwijzers,
    (290 sinds deze tak /apps/verificatie.html en /apps/vertegenwoordiging.html
    toevoegde, 292 sinds /apps/loopbaan.html en /apps/loopbaanbewijs.html erbij
-   kwamen, 293 sinds /apps/mijn-neigingen.html en 294 sinds /apps/connect.html --
+   kwamen, 293 sinds /apps/mijn-neigingen.html en 294 sinds /apps/connect.html,
+   en terug naar 293 met 17 doorwijzers sinds /apps/vandaag.html in RTG Life
+   opging (SCHERMEIGENAAR.json), en 292 met 18 sinds /apps/toestemming.html een
+   weergave van Wie heeft toegang tot mij werd --
    het getal is een grendel tegen
    een scherm dat er stil bij komt, en hoort dus mee te bewegen met een scherm
    dat er BEWUST bij komt), ieder exact eenmaal. */
@@ -36,19 +39,19 @@ const ECHTE_ROUTES = BESTANDEN.filter((bestand) =>
 const DOORWIJZERS = BESTANDEN.filter((bestand) =>
   !/\/shared\/basis\.js/.test(fs.readFileSync(bestand, 'utf8'))).map(route).sort();
 
-test('het manifest dekt 294 echte schermen en 16 redirects precies eenmaal', () => {
+test('het manifest dekt 292 echte schermen en 18 redirects precies eenmaal', () => {
   /* DE MUTATIE: voeg een HTML-scherm toe zonder manifestregel, of zet één pad
      in twee werelden. De setvergelijking of de lengtetoets moet dan zakken. */
   const echtManifest = identiteit.VALUES.flatMap((wereld) => identiteit.MANIFEST[wereld]);
   const allesManifest = echtManifest.concat(identiteit.REDIRECTS);
 
   assert.equal(BESTANDEN.length, 310, 'de appboom hoort 310 HTML-bestanden te bevatten');
-  assert.equal(ECHTE_ROUTES.length, 294, 'exact 294 blijvende schermen horen basis.js te laden');
-  assert.equal(DOORWIJZERS.length, 16, 'exact 16 oude adressen horen doorwijzers te blijven');
-  assert.equal(echtManifest.length, 294, 'het vierwereldenmanifest hoort 294 schermen te bevatten');
+  assert.equal(ECHTE_ROUTES.length, 292, 'exact 292 blijvende schermen horen basis.js te laden');
+  assert.equal(DOORWIJZERS.length, 18, 'exact 18 oude adressen horen doorwijzers te blijven');
+  assert.equal(echtManifest.length, 292, 'het vierwereldenmanifest hoort 292 schermen te bevatten');
   assert.deepEqual(identiteit.VALUES, ['living', 'travel', 'work', 'foundation'],
     'Core ondersteunt de werelden maar mag geen vijfde zichtbare wereld zijn');
-  assert.equal(identiteit.REDIRECTS.length, 16, 'het redirectmanifest hoort 16 adressen te bevatten');
+  assert.equal(identiteit.REDIRECTS.length, 18, 'het redirectmanifest hoort 18 adressen te bevatten');
   assert.equal(new Set(allesManifest).size, allesManifest.length,
     'geen route mag in twee werelden of ook als redirect staan');
   assert.deepEqual(echtManifest.slice().sort(), ECHTE_ROUTES,

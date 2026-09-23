@@ -2561,10 +2561,9 @@
     "icon": "shield-check",
     "sections": [
       "Inloggen bij een dienst",
-      "Actieve toegang",
       "Machtigingen"
     ],
-    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
+    "intro": "Inloggen met uw passkey, en iemand machtigen om dat namens u te doen.",
     "shared": false
   },
   "/apps/kantoor.html": {
@@ -3179,18 +3178,6 @@
     "intro": "Uw notities, afwegingen en plannen bij elkaar.",
     "shared": false
   },
-  "/apps/toestemming.html": {
-    "name": "Toestemming",
-    "type": "identity",
-    "icon": "shield-check",
-    "sections": [
-      "Wat er nu mag",
-      "Wie heeft er gekeken",
-      "Wat u kunt aantonen"
-    ],
-    "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
-    "shared": false
-  },
   "/apps/foundation/toetsen.html": {
     "name": "Toetsen",
     "type": "calendar",
@@ -3261,18 +3248,6 @@
       "Reisdocumenten"
     ],
     "intro": "Uw reis, stap voor stap bij elkaar.",
-    "shared": false
-  },
-  "/apps/vandaag.html": {
-    "name": "Vandaag",
-    "type": "calendar",
-    "icon": "calendar-days",
-    "sections": [
-      "Eerstvolgende afspraak",
-      "Aandacht nodig",
-      "Uw avond"
-    ],
-    "intro": "Een rustig overzicht van uw tijd.",
     "shared": false
   },
   "/apps/foundation/veilig-vertrouwd.html": {
@@ -3544,9 +3519,9 @@
     "type": "identity",
     "icon": "shield-check",
     "sections": [
-      "Uw toegang",
-      "Toestemmingen",
-      "Activiteit"
+      "Wat er nu openstaat",
+      "Wie heeft er gekeken",
+      "Wat dit scherm niet dekt"
     ],
     "intro": "Uw gegevens en bevoegdheden blijven zichtbaar en herroepbaar.",
     "shared": false

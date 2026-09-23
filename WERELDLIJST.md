@@ -30,10 +30,10 @@ Huis: `/apps/rtg.html` — 58 onderdelen.
 | onderdeel | soort | komt uit op |
 |---|---|---|
 | Het Vooruitzicht | `link:vooruitzicht` | `/apps/living-os.html` |
-| Vandaag | `link:vandaag` | `/apps/vandaag.html` |
+| Vandaag | `link:vandaag` | `/apps/life.html` |
 | Mijn leven | `link:leven` | `/apps/leven.html` |
 | Sociaal | `link:sociaal` | `/apps/sociaal.html` |
-| Geld | `link:geldcommand` | `/apps/geld-command.html` |
+| Geld | `link:geldcommand` | `/apps/geld.html` |
 | RTG Media | `link:mediaos` | `/apps/media.html` |
 | RTFoundation | `os:rtf` | kiezer in de app |
 | Betalen | `tab:betalen` | `/apps/app.html (stand betalen)` |
@@ -49,7 +49,7 @@ Huis: `/apps/rtg.html` — 58 onderdelen.
 | Logboek | `link:logboek` | `/apps/geld.html#logboek` |
 | Salon | `tab:salon` | `/apps/app.html (stand salon)` |
 | Alles bij elkaar | `link:wereldlaag` | `/apps/wereld.html` |
-| Vandaag | `link:pulse` | `/apps/pulse.html` |
+| Pulse | `link:pulse` | `/apps/pulse.html` |
 | Snaps | `os:snaps` | kiezer in de app |
 | Camera | `link:camera` | `/apps/camera.html` |
 | Berichten | `link:berichten` | `/apps/comm.html` |
@@ -60,7 +60,7 @@ Huis: `/apps/rtg.html` — 58 onderdelen.
 | Entourage | `link:entourage` | `/apps/entourage.html` |
 | Rendez-vous | `link:rendezvous` | `/apps/rendezvous.html` |
 | Attenties | `link:attenties` | `/apps/attenties.html` |
-| Ontdekken | `link:ontdek` | `/apps/rtg.html` |
+| Overzicht | `link:ontdek` | `/apps/rtg.html` |
 | Commerce | `link:commerce` | `/apps/commerce.html` |
 | Bestellen | `tab:bestellen` | `/apps/app.html (stand bestellen)` |
 | Gezin | `tab:gezin` | `/apps/app.html (stand gezin)` |
@@ -80,9 +80,9 @@ Huis: `/apps/rtg.html` — 58 onderdelen.
 | Sport | `link:sport` | `/apps/sport.html` |
 | Mall | `link:mall` | `/apps/mall.html` |
 | Mijn bestellingen | `link:mijnmall` | `/apps/mijnmall.html` |
-| Betalen | `link:pay` | `/apps/pay.html` |
+| RTG Pay | `link:pay` | `/apps/pay.html` |
 | App-dossier | `link:appdossier` | `/apps/appstore-dossier.html` |
-| Thuis | `link:huis` | `/apps/thuis.html` |
+| Logeren bij leden | `link:huis` | `/apps/thuis.html` |
 | Uitgaan | `link:uitgaan` | `/apps/uitgaan.html` |
 | Food Court | `link:foodcourt` | `/apps/foodcourt.html` |
 | Game Night | `link:spelavond` | `/apps/spelscherm.html` |

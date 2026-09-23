@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-23T15:44:53.225Z",
-  "commit": "6f51dc494",
+  "op": "2026-09-23T11:40:50.152Z",
+  "commit": "aff2d77",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
@@ -14,8 +14,8 @@
   "geclassificeerd": 4994,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1200,
-   "PROTECTED": 468,
+   "NOT_APPLICABLE": 1201,
+   "PROTECTED": 467,
    "INTENTIONALLY_NON_IDEMPOTENT": 136
   },
   "vastgesteldDoorMens": 1853,
@@ -15134,48 +15134,6 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "concern.vestiging.inhaal",
-   "route": "POST /api/concern/vestiging/inhaal",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "concern.vestiging.inhaal.bevestig",
-   "route": "POST /api/concern/vestiging/inhaal/bevestig",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -57110,6 +57068,48 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.beleidsmotor",
+   "route": "POST /api/office/beleidsmotor",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.beleidsmotor.waarom",
+   "route": "POST /api/office/beleidsmotor/waarom",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

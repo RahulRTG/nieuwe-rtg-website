@@ -1,0 +1,62 @@
+Je bouwt één spoor van ronde 2 van RTG Edge 3.0 in de repository RahulRTG/nieuwe-rtg-website (Nederlandstalige codebase). Er draaien tegelijk andere cloudsessies op andere sporen; een ouder-sessie voegt alle sporen samen in PR #346 (tak claude/app-navigation-buttons-l6yubp).
+
+BASIS EN TAK. Je kloon staat op commit fe9f1f5c van claude/app-navigation-buttons-l6yubp (ronde 1, de merge met main, en ronde 2 stap 1-5, 7-9, 11, 12 en 25: de meter telt 'zelf' per veld en de Edge-kaart heeft het rijformaat [rol, etiket, wat, citaat] met drie afgeleide controles). Werk en push UITSLUITEND op je eigen tak (de outcome-tak van deze sessie, claude/edge-r2-<spoor>). Maak GEEN pull request, abonneer je niet op PR-activiteit, en push nooit naar een andere tak. Als node_modules ontbreekt: npm ci. Chromium staat klaar (PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers); niet installeren.
+
+WAT JE LEEST. Lees vóór je begint EDGE.md (vooral par. 1, 2, 6, 7, 10 en 11), GRAMMATICA.md, LAT.md, en de kop van scripts/edgekaart.js (het rijformaat, keur(): elk citaat hangt aan een etiket in zijn rij en elk s/b-etiket heeft een citaat dat het draagt; de afgeleide controles: wie registerAction aanroept op de Edge-kern, wie data-rtg-world op body zet en wie data-rtg-edge-2-state op body zet, moet op de kaart staan). Een producent die stopt met registerAction verliest IN DEZELFDE STAP zijn capability-register:s-etiket en het citaat, anders zakt keur of de afgeleide controle.
+
+BESLUITEN VAN DE EIGENAAR (23 september 2026), niet heropenen:
+- K-reikwijdte: wereld telt nooit als 'zelf' en moet kloppen met MAPPEN op de gedeelde routes; context zelf op schermen met een eigen hoofdactie via een schuldlijst die alleen krimpt (dat is een latere stap, niet de jouwe).
+- K-casco: het samenvoegen van de twee contextmodellen is LATER; niet in ronde 2.
+- K-bladlijst: de zes snelkoppelingen van de kern gaan uit het blad (latere stap 17).
+- K-borg: de vasthoudbevestiging van gebaar wordt 'bewust' in ronde 3; in ronde 2 blijft BORGTIJD 800 staan.
+En wat de ontwerper zelf besliste:
+WAT IK ZELF BESLIS, als technisch beste optie:
+- Home blijft betekenen wat nu bewezen is: het frame inklappen, anders naar boven (world-desktop.e2e.js:86-93). De haak wordt een annuleerbare gebeurtenis 'rtg-edge-home'.
+- Vrienden is drift van een genomen besluit (WERELDEN.md:119-127) en wordt hersteld zonder vraag.
+- RTGWorkspaceContext wordt een lezer zonder eigen staat, met een eerste lezer.
+- Activiteit blijft een veld van het scherm; ronde 2 heeft er geen producent voor en zegt dat met reden.
+- Sociaal: elk scherm publiceert zijn eigen context.
+- De objectmeting gaat via een e2e, met 'na-openen' in de meter.
+- Handhaving: één tand op context-zelf.
+- De objectpoort kapt af en weigert niet, want dat is het gedrag van vandaag in de werkruimte.
+- Omhoog vegen op de landing vraagt eerst de host.
+Let op het nieuwe verklaringsformaat van de meter (stap 2): een verklaring is één attribuut PER VELD op body, met de reden als waarde: data-rtg-edge-nvt-<veld>="reden" of data-rtg-edge-na-openen-<veld>="reden".
+
+HUISREGELS DIE HIER ZWAAR WEGEN:
+- de Edge bezit de werkelijkheid niet: geen derde contextmodel, geen verzonnen producent, geen Edge-state die naar een domein terugschrijft, geen tweede lijst naast iets dat al een eigenaar heeft; een afgeleide waarde mag zich niet als eigen publicatie voordoen; een leeg veld draagt zijn reden;
+- productbestanden in public/ en server/ zijn max 10240 bytes (scripts/check.js regel 13), meet met wc -c; een bundel blijft gelijk aan zijn delen (node scripts/bundel.js);
+- schrijf code die lijkt op de code eromheen (Nederlandse commentaarblokken in dezelfde toon en dichtheid);
+- ELKE bewering in een toets trek je na met een MUTATIE: fout aanbrengen, toets draaien, zien zakken, terugdraaien (git diff leeg). Een toets die je niet hebt zien zakken is geen toets. Geen toets overslaan, uitzetten of verzwakken;
+- LAT regel 17: zeg nooit "de gate is groen" maar welke poort groen staat.
+
+VOLGORDE PER STAP. (1) de toets die het gebrek of het nieuwe gedrag vastlegt, (2) de code, (3) de mutaties uit de specificatie (en wat jij verder nodig vindt), (4) een codecommit met in de body: wat er veranderde, welke toetsen je draaide met uitslag, en elke mutatie met uitslag. Nederlandse titel in de gebiedende wijs, in de stijl van git log, eindigend op "(Edge ronde 2, stap N)".
+
+AAN HET EIND: DE REGISTERTREIN OP JE TAK, zodat de CI op je tak een echt oordeel geeft. Op een schone boom (commit eerst), in deze volgorde en alleen wat verandert: npm run edgekaart; npm run build en npm run swcache:vast; npm run websitebeelden (en daarna nog eens build als het appbeeld zijn bron veranderde); npm run language:proof als app.html of app-main.js veranderde; node scripts/mutatie.js <elk nieuw toetsbestand>; npm run bewijs; npm run stillezing:vast; npm run deelindex; npm run kaart; npm run functielijst; npm run getallen; npm run norm:vast. Commit per register (titel "Meet ... opnieuw na stap N"). Draai daarna npm run check, npm run norm en npm run registerklopt en repareer wat ze noemen. De browsermeter npm run edgedekking draai je NIET (behalve als je spoor dat uitdrukkelijk zegt): die meet de integrator aan het eind op de samengevoegde boom.
+CLAUDE.md is het bestand van de gebruiker: raak daar alleen een getal-merkteken aan via npm run getallen, en geen zinnen.
+
+COMMITS eindigen ALTIJD met precies deze twee regels:
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HoWdWcm1fHsHF53RZ3zfYT
+Zet nooit een modelnaam of model-id in een commit, code of document.
+
+PUSH EN CI. Push je tak (git push -u origin <je tak>; bij een netwerkfout tot vier keer opnieuw met 2, 4, 8, 16 s). Start daarna de CI op je tak met de GitHub-tools: mcp__github__actions_run_trigger met method run_workflow, workflow_id ci.yml, ref <je tak> (laad het schema eerst met ToolSearch). Wacht NIET op de uitslag en poll niet; beëindig je beurt. Krijg je later een bericht dat de CI op je tak rood is, zoek dan de oorzaak, repareer, laat de registertrein opnieuw lopen waar nodig, push en start de CI opnieuw.
+
+EINDVERSLAG. Schrijf je eindverslag als laatste bericht in deze sessie (per stap: klaar, gedeeltelijk of niet, met toetsen, mutaties, afwijkingen van het plan met reden, bestandsgroottes, en wat je niet hebt kunnen bevestigen). Wees eerlijk: wat niet af is, heet zo.
+
+JOUW SPOOR:
+Spoor gebaar, tak claude/edge-r2-gebaar, stap 10. Stap 7, 8 en 9 staan al in je basis (de borg en lang drukken zijn op gedrag vastgepind in test/gebaar.e2e.js en test/gebaar-notities.e2e.js, veegDoor zegt welke weg hij nam, en de koude meting staat in EDGE.md par. 11). Een eerdere bouwer was halverwege stap 10 toen hij werd gestopt; zijn onafgemaakte werk staat op de tijdelijke tak claude/edge-r2-gebaar-wip, als diff te lezen met: git fetch origin claude/edge-r2-gebaar-wip && git diff 68613187 origin/claude/edge-r2-gebaar-wip. Dat is een VERTREKPUNT en geen waarheid: het is gemaakt op een oudere basis (bad01a1) zonder het nieuwe kaartformaat, niets ervan is als af verklaard, en test/gebaar-diag.e2e.js (607 regels) lijkt een diagnosebestand dat niet hoort te blijven tenzij je een reden vindt. Neem over wat klopt, toets en mutatiecontroleer alles opnieuw. K-borg is besloten: BORGTIJD 800 BLIJFT in ronde 2 (de borg wordt bewust in ronde 3); lang drukken (520) en stil gaan naar DREMPELS, de vervaltijd van scherp via het toetsenbord volgt DREMPELS.herbevestig, en zonder tabel loopt er geen timer. De kaart heeft al gebaar-02.js en gebaar-03b.js als gebaar-drempel:b (en gewicht:b voor BORGTIJD); werk die citaten bij in het nieuwe formaat zodra de code verandert.
+
+DE SPECIFICATIE UIT HET EINDPLAN (letterlijk):
+STAP 10 -- gebaar leest DREMPELS en brengt de grammatica zelf mee; de borg volgt K-borg
+DOEL: Aanpassingen aan gebaar:
+- gebaar-01.js laadt /shared/adaptief/grammatica.js zacht bij de eerste zet() of lijst(), en alleen als !w.RTGGrammatica. grammatica.js:179-180 heeft geen bescherming tegen dubbel laden. basis.js (:319-323) laadt hem niet, en als blad krijgen 5 van de 9 gebaarschermen hem nooit (gemeten).
+- gebaar-03b.js leest bij pointerdown DREMPELS.lang en .stil (grammatica.js:83-84), in plaats van 520 (:24) en 8 (:28). Zonder tabel loopt er geen timer.
+- 'scherp' via het toetsenbord vervalt na DREMPELS.herbevestig. Dat volgt GRAMMATICA.md:205 ('vier seconden geldig') en vasthoud.js.
+- BORGTIJD: bij K-borg optie 1 blijft 800 staan en staat hij met reden op de kaart als gewicht:b tot ronde 3. Bij optie 2 leest houdVast VASTHOUD.zwaar, en weigert de borg te bevestigen zonder tabel. Bij optie 3 komt er een eigen sleutel.
+- De bundel gebaar.js wordt opnieuw gebouwd (scripts/bundel.js:51; check.js regel 6; BUNDELS.md).
+- Op de kaart gaat gebaar-03b.js voor lang en stil van gebaar-drempel:b naar :l. gebaar-02.js houdt RICHTING en STIL, dus de teller blijft 12 (vermoed, narekenen).
+BESTANDEN: public/shared/gebaar/gebaar-01.js, public/shared/gebaar/gebaar-03b.js, public/shared/gebaar.js (bundel), scripts/edgekaart.js, test/drempels.test.js, test/gebaar.test.js, test/gebaar-notities.e2e.js, test/helper.js (veegDoor wacht op window.RTGGrammatica)
+TOETSEN: 777-proef in vm: met een nep-tabel met lang=777 staat de timer op 777. Zonder tabel loopt er geen timer. | e2e op notities als same-origin blad: lang drukken opent de actielade (de grammatica komt via het zachte laden). | e2e toetsenbord: wapen de borg, wacht langer dan herbevestig, druk: er gebeurt niets. | Zacht laden op een scherm dat de grammatica al heeft: één scripttag, dezelfde globale. | De verbodslijst in drempels.test.js:93-102 krijgt gebaar-03b.js erbij. gebaar-02.js blijft er met reden buiten (RICHTING en STIL). | De e2e's van stap 7 blijven groen.
+MUTATIES: Zet '}, 520);' terug: de verbodslijst zakt. | Haal het zachte laden weg: de blad-e2e op notities zakt. | Haal de vervaltijd van 'scherp' weg: de toetsenbord-e2e zakt. | Laad altijd, zonder de controle op de globale: de dubbel-laadtoets zakt. | Alleen bij K-borg optie 2: zet BORGTIJD = 800 terug; een proef met zwaar=1234 in de nep-tabel zakt.
+REGISTERS: EDGEKAART.json, BUNDELS.md, registertrein (stap 0)
+RISICO: Zichtbaar anders gedrag: lang drukken gaat van 520 naar 480 ms. De grammatica (ongeveer 9,8 kB) wordt voortaan ook op gebaarschermen geladen die hem nog niet hadden. Vanaf nu hangt de wedloop ook af van de laadtijd van de grammatica (kantoor.html 857 ms, gemeten), vandaar het wachten in veegDoor. Het getal voor de borg verandert alleen bij K-borg optie 2.

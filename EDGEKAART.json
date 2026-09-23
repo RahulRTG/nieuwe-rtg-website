@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T15:38:14.399Z",
-    "commit": "ac14e34",
+    "op": "2026-09-23T15:41:51.194Z",
+    "commit": "b0f8c31",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -616,6 +616,10 @@
           "als": "beslisser"
         },
         {
+          "naam": "gewicht",
+          "als": "lezer"
+        },
+        {
           "naam": "trust-rail",
           "als": "lezer"
         },
@@ -648,6 +652,11 @@
           "rol": "beslist",
           "wat": "terug zonder weg terug is bewust",
           "citaat": "return g === 'terug' && !kanTerug ? 'bewust' : g;"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "de vijf bronnen van een verhindering",
+          "citaat": "var BRONNEN = {"
         },
         {
           "rol": "beslist",
@@ -1114,6 +1123,10 @@
         },
         {
           "naam": "wereld",
+          "als": "lezer"
+        },
+        {
+          "naam": "wereld",
           "als": "schrijver"
         }
       ],
@@ -1205,6 +1218,10 @@
         {
           "naam": "voortzetting",
           "als": "beslisser"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "lezer"
         }
       ],
       "gemeten": {
@@ -1251,6 +1268,10 @@
         {
           "naam": "gewicht",
           "als": "beslisser"
+        },
+        {
+          "naam": "gewicht",
+          "als": "lezer"
         },
         {
           "naam": "waarom",
@@ -1625,6 +1646,10 @@
         },
         {
           "naam": "wereld",
+          "als": "lezer"
+        },
+        {
+          "naam": "wereld",
           "als": "schrijver"
         }
       ],
@@ -1673,6 +1698,10 @@
         {
           "naam": "wereld",
           "als": "beslisser"
+        },
+        {
+          "naam": "wereld",
+          "als": "lezer"
         },
         {
           "naam": "wereld",
@@ -1833,6 +1862,10 @@
         {
           "naam": "gewicht",
           "als": "beslisser"
+        },
+        {
+          "naam": "gewicht",
+          "als": "lezer"
         },
         {
           "naam": "zichtbaarheidsstand",
@@ -2285,6 +2318,10 @@
       ],
       "verantwoordelijkheden": [
         {
+          "naam": "gebaar-drempel",
+          "als": "lezer"
+        },
+        {
           "naam": "hoofdactie",
           "als": "beslisser"
         },
@@ -2471,6 +2508,10 @@
         {
           "naam": "onderbalk",
           "als": "beslisser"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "schrijver"
         }
       ],
       "gemeten": {
@@ -2529,6 +2570,11 @@
           "rol": "beslist",
           "wat": "Beveiligd, TEST of Beperkt",
           "citaat": "magnaat ? 'TEST' : ok ? 'Beveiligd' : 'Beperkt';"
+        },
+        {
+          "rol": "schrijft",
+          "wat": "eigen gezondheidsvlag op de statusknop",
+          "citaat": "state.parentNode.dataset.edgeHealth = state.textContent === 'Beveiligd' ? 'ok' : 'waiting';"
         },
         {
           "rol": "projecteert",
@@ -2596,6 +2642,10 @@
         {
           "naam": "onderbalk",
           "als": "beslisser"
+        },
+        {
+          "naam": "onderbalk",
+          "als": "lezer"
         },
         {
           "naam": "voortzetting",
@@ -2875,6 +2925,10 @@
         {
           "naam": "voortzetting",
           "als": "beslisser"
+        },
+        {
+          "naam": "voortzetting",
+          "als": "lezer"
         }
       ],
       "gemeten": {
@@ -3200,7 +3254,8 @@
         "public/shared/adaptief/lagen.js",
         "public/shared/adaptief/orb.js",
         "public/shared/adaptief/vasthoud.js",
-        "public/shared/rtg-adaptive-edge-input.js"
+        "public/shared/rtg-adaptive-edge-input.js",
+        "public/shared/rtg-edge-2-loader.js"
       ]
     },
     "gewicht": {
@@ -3221,9 +3276,12 @@
       "lezers": [
         "public/apps/bestanden/adaptief.js",
         "public/apps/office/adaptief-staat.js",
+        "public/shared/adaptief/gewicht.js",
         "public/shared/adaptief/register.js",
         "public/shared/adaptief/waarom.js",
-        "public/shared/edge/blikveld.js"
+        "public/shared/edge/actiestaat.js",
+        "public/shared/edge/blikveld.js",
+        "public/shared/rtg-adaptive-edge-core.js"
       ]
     },
     "hoofdactie": {
@@ -3269,6 +3327,7 @@
         "public/shared/rtg-daily.js",
         "public/shared/rtg-edge-2.js",
         "public/shared/rtg-edge-appbar.js",
+        "public/shared/rtg-edge-command.js",
         "public/shared/rtg-edge-library.js"
       ],
       "beslissers": [
@@ -3282,6 +3341,7 @@
       "lezers": [
         "public/shared/adaptief/diepte.js",
         "public/shared/interface/world-desktop-frame.js",
+        "public/shared/rtg-edge-preferences.js",
         "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js"
       ]
     },
@@ -3355,8 +3415,10 @@
         "public/shared/rtg-route-memory.js"
       ],
       "lezers": [
+        "public/shared/command/werktafel.js",
         "public/shared/edge/blikveld.js",
-        "public/shared/rtg-edge-preferences.js"
+        "public/shared/rtg-edge-preferences.js",
+        "public/shared/rtg-route-memory.js"
       ]
     },
     "waarom": {
@@ -3399,7 +3461,10 @@
       "lezers": [
         "public/shared/adaptief/balk.js",
         "public/shared/basis/basis-01ac-edge.js",
+        "public/shared/command/bladstand.js",
         "public/shared/edge/blikveld.js",
+        "public/shared/interface/world-desktop-home.js",
+        "public/shared/randen.js",
         "public/shared/rtg-edge-library.js",
         "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js"
       ]
@@ -3610,6 +3675,7 @@
         "public/shared/rtg-daily.js",
         "public/shared/rtg-edge-2.js",
         "public/shared/rtg-edge-appbar.js",
+        "public/shared/rtg-edge-command.js",
         "public/shared/rtg-edge-library.js"
       ],
       "beslissers": [
@@ -3620,7 +3686,7 @@
         "public/shared/rtg-edge-command.js",
         "public/shared/rtg-edge-preferences.js"
       ],
-      "waarom": "Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, en RTGDaily die zelf een Edge-balk ophangt."
+      "waarom": "Wie onderin staat, beslissen de Command-balk, de voet van de casco, de adaptieve balk die die voet wegzet, de appbalk en de claim die elk paginabalken overnemen, Edge 2 die ze naar het contextpaneel haalt, RTGDaily die zelf een Edge-balk ophangt, en het Edge-commando dat de menuknop tot 999 px claimt."
     },
     {
       "naam": "trust-rail",
@@ -3747,7 +3813,7 @@
   },
   "telling": {
     "bestanden": 71,
-    "rollen": 214,
+    "rollen": 216,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 13

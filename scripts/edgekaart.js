@@ -274,9 +274,13 @@ const KAART = [
     ['projecteert', 'verbinding uit het protocol', "? (location.protocol === 'https:' ? 'ONLINE / TLS' : 'ONLINE / LOCAL')"]]],
   ['edge/blikveld.js', 'blikveld', 'capability-register:l vluchtige-context:l wereld:l identiteit:l presence:l trust-rail:l voortzetting:l hoofdactie:l gewicht:l waarom:l bevoegdheid:l', [
     ['projecteert', 'een leesbeeld; schrijft niets', 'return { versie: 1, op: t, velden: velden, acties: gedaan, gebreken: gebreken };'],
-    ['leest', 'twee hoofdactiebronnen naast elkaar', "edgeLabel !== tekstVan(scherm[0])) gebreken.push('hoofdactie-dubbel')"],
+    ['leest', 'de hoofdactie via zijn lezer', "H && typeof H.lees === 'function' ? H.lees(w) : null"],
     ['leest', 'het tweede register erbij', "gedaan.push({ id: a.id, naam: a.label, herkomst: 'edge-compat'"],
     ['projecteert', 'bevoegdheid zonder bron', "bevoegdheid: veld(null, 'geen', 'geen', t,"]]],
+  ['edge/blikveld-hoofdactie.js', 'blikveld', 'hoofdactie:l', [
+    ['leest', 'het actieve blad, alleen lezend', "querySelector('#rtgCommand .cmd-pane.actief iframe')"],
+    ['leest', 'twee hoofdactiebronnen naast elkaar', "edgeLabel !== tekstVan(scherm[0])) gebreken.push('hoofdactie-dubbel')"],
+    ['projecteert', 'herkomst blad of scherm', "herkomst: b ? 'blad:data-hoofdactie' : 'scherm:data-hoofdactie'"]]],
   ['edge/actiestaat.js', 'blikveld', 'gewicht:b waarom:b bevoegdheid:l', [
     ['leest', 'hetzelfde effectieve gewicht', 'var gewicht = G && gram.effectief ? gram.effectief(gevraagd, kanOngedaan) : String(gevraagd);'],
     ['beslist', 'zonder tabel gaat zwaar dicht', "} else if (!G && gewicht !== 'licht') {"],

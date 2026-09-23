@@ -141,7 +141,7 @@ test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezi
   const bronnen = ['/shared/rtg-adaptive-edge-loader.js'];
   const adaptieveBronnen = ['/shared/rtg-adaptive-edge.css', '/shared/rtg-adaptive-edge-core.js',
     '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js',
-    '/shared/adaptief/grammatica.js'];
+    '/shared/adaptief/grammatica.js', '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js'];
   for (const bron of bronnen) {
     assert.ok(LOADER.includes(bron), bron + ' ontbreekt in de loader');
     assert.ok(SW.includes(bron), bron + ' ontbreekt in de offline schil');

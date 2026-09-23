@@ -266,6 +266,7 @@ const SCHAKELS = [
   { code: 'adaptieve-lader', pad: '/shared/rtg-adaptive-edge-loader.js', naam: 'RTGAdaptiveEdgeLoader' },
   { code: 'kern', pad: '/shared/rtg-adaptive-edge-core.js', naam: 'RTGAdaptiveEdgeCore' },
   { code: 'actiestaat', pad: '/shared/edge/actiestaat.js', naam: 'RTGEdgeActiestaat' },
+  { code: 'hoofdactie', pad: '/shared/edge/blikveld-hoofdactie.js', naam: 'RTGEdgeBlikveldHoofdactie' },
   { code: 'blikveld', pad: '/shared/edge/blikveld.js', naam: 'RTGEdgeBlikveld' }
 ];
 function ketenInPagina(schakels) {

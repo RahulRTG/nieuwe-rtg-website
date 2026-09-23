@@ -140,7 +140,7 @@ verschillende momenten gebouwd:
 | Edge 2 | `rtg-edge-2*.js` | zichtbaarheidsstanden en het contextpaneel |
 | schil | `command.js`, `command/*.js` | de werktafel van `app.html`: bladen, geheugen, wereldlabel |
 | continuïteit | `rtg-continue-key*.js`, `rtg-route-memory*.js`, `rtg-world-identity.js` | Ga verder, routegeheugen, welke route bij welke wereld hoort |
-| blikveld | `edge/blikveld.js`, `edge/actiestaat.js` | **nieuw in ronde 0**: het ene leespad |
+| blikveld | `edge/blikveld.js`, `edge/blikveld-hoofdactie.js`, `edge/actiestaat.js` | **nieuw in ronde 0**: het ene leespad (de hoofdactielezer sinds ronde 1) |
 
 **Het eigendomsoordeel, en waarom het pas na de meting komt.** Het voorstel zei
 vooraf: `shared/adaptief/` is de semantische kern en `rtg-adaptive-edge*` de
@@ -232,7 +232,7 @@ eigen indruk (`SERVICE.md` par. 12).
 | activiteit | `activiteit` in de context van het scherm | `scherm` |
 | presence | de Edge-kern | `edge-signaal` |
 | voortzetting | het geheugen van de werktafel (in de schil); anders het signaal van de kern | `toestel:werktafel`, `edge-signaal` |
-| hoofdactie | `[data-hoofdactie]` van het scherm; anders de knop van de padtabel | `scherm:data-hoofdactie`, `edge-padtabel` |
+| hoofdactie | in de schil het ACTIEVE blad (`[data-hoofdactie]` daarin, anders leeg met reden); los het scherm zelf, anders de knop van de padtabel | `blad:data-hoofdactie`, `blad`, `scherm:data-hoofdactie`, `edge-padtabel` |
 | trust | de `rail` in de context; offline als toestand van het toestel | `scherm:rail`, `toestel` |
 | bevoegdheid | **niets**, met de reden erbij | — |
 
@@ -253,12 +253,16 @@ nagemaakt venster waarin elke schrijfweg een verklikker is, en
 geladen. Wie het blikveld nieuwer vindt dan het scherm, heeft ongelijk
 (besluit 5).
 
-**Wat de schil niet ziet.** Een scherm in een blad (iframe) laadt zijn eigen
-Edge niet; de schil claimt hem. De context van dat blad komt via de brug in het
-blikveld van de schil, maar een `[data-hoofdactie]` in het blad staat in een
-ander document en is voor de schil onzichtbaar. De dekkingsmeter meet de
-schermen daarom los, en de hoofdactie van een blad in de schil is een open punt
-van ronde 2 en geen stil gat.
+**Wat de schil ziet, en wat niet.** Een scherm in een blad (iframe) laadt zijn
+eigen Edge niet; de schil claimt hem. De context van dat blad komt via de brug in
+het blikveld van de schil. De `[data-hoofdactie]` van dat blad leest sinds ronde 1
+een eigen lezer, `edge/blikveld-hoofdactie.js`: bij elke `lees()` het ACTIEVE
+blad, alleen bij dezelfde herkomst en alleen dat ene verklaarde attribuut, en hij
+onthoudt en schrijft niets. Wijst het blad geen hoofdactie aan, dan staat het veld
+leeg met die reden (`blad`) en leent het niet de knop van de schil -- de padtabel
+van Edge 2 draait niet in een blad. Wat de schil nog steeds niet ziet: de
+padtabel van een blad, en alles van een blad van een andere herkomst. De
+dekkingsmeter meet de schermen los; een meting van de schil zelf is ronde 2.
 
 ### De uitbreiding van de context, en een oud gebrek in de sleutel
 
@@ -678,7 +682,18 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
   lader van de adaptieve Edge brengt de grammatica zacht mee, en de landing plus
   de negen sitepagina's die de invoerlaag zelf laden, laden hem eerst. De kopie
   van de gebaarversheid in de Edge 2-lader is weg; die heeft een eigenaar
-  (`rtg-edge-2-context.js`). `test/drempels.test.js`, vijf mutaties nagetrokken.
+  (`rtg-edge-2-context.js`). `test/drempels.test.js`, vijf mutaties nagetrokken;
+- **ronde 1: de hoofdactie van een blad is zichtbaar voor de schil.** Met een
+  geopende agenda meldde de schil "het scherm wijst geen hoofdactie aan", een lege
+  waarde met een reden die niet klopte: de knop stond in een ander document. Een
+  eigen lezer (`edge/blikveld-hoofdactie.js`, zacht geladen vóór het blikveld)
+  kijkt nu in het actieve blad, onder de drie eisen van de brug. De brug zelf was
+  gemeten en afgevallen: van de 68 schermen met een `data-hoofdactie` laadt er een
+  de brug. `test/edgeblikveld.test.js` (herkomst, niet lenen, beide gebreken, vijf
+  onleesbare bladen, geen lezer, geen schrijfweg) en stap 4b en 5 van
+  `test/edgeblikveld.e2e.js`: de agenda als blad geeft `+ Afspraak` met herkomst
+  `blad:data-hoofdactie`, terug naar reizen weer `blad`, en de verklikker staat
+  nu ook in het blad.
 
 **Nagetrokken en open, met de ronde waarin ze horen:**
 
@@ -691,7 +706,6 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
 | vijf standmachines voor wat er van de Edge te zien is | par. 1 | 2 |
 | vier geheugens voor "waar was ik" die elkaar niet lezen | par. 1 | 4 |
 | "waarom niet" heeft aan de serverkant vijf vormen zonder gedeelde woorden, en `routes/stuur.js` maakt van elke weigering een kale `error` | `server/routes/stuur.js` | 3 |
-| de hoofdactie van een blad is voor de schil onzichtbaar | par. 2 | 1 |
 
 Vijf gebreken uit dezelfde inventaris en uit de indeling van de vijftig punten
 zijn in deze ronde wél gerepareerd, omdat ze bereikbaar waren of in de verkeerde

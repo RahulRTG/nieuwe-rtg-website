@@ -14,10 +14,19 @@
       Edge-stand erbij, en het tweede register (registerAction) staat in lees() met
       zijn gebrek zichtbaar in plaats van stil weggevallen.
 
+   4. DE HOOFDACTIE VAN HET ACTIEVE BLAD (ronde 1): in de schil leest
+      edge/blikveld-hoofdactie.js het blad dat open is, alleen bij dezelfde
+      herkomst, leent de knop van de schil niet, en schrijft of onthoudt niets.
+
    DE MUTATIES, elk nagetrokken: laat wereld() het src-loze schilpad overslaan (de
    wereldvolgorde zakt), laat een veld zonder reden leeg (de vormtoets zakt), laat
    lees() de context terugschrijven (de verklikker zakt), en zet de bevoegdheid op
-   gezag 'autoritatief' (de gezagtoets zakt). */
+   gezag 'autoritatief' (de gezagtoets zakt). Voor de hoofdactielezer: geef altijd
+   'scherm:data-hoofdactie' terug, haal de `if (b)`-regel weg (dan leent hij de
+   knop van de schil), sla de vergelijking over zodra er een blad is, haal de
+   herkomstcontrole, de try/catch of de readyState-controle weg, haal de
+   `if (!h)`-tak in blikveld.js weg, en zet een setAttribute in zijn tekstVan --
+   elk zakt op zijn eigen toets. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -30,6 +39,8 @@ const Actiestaat = require('../public/shared/edge/actiestaat.js');
 const gram = require('../public/shared/adaptief/grammatica.js');
 const WereldId = require('../public/shared/rtg-world-identity.js');
 
+const Hoofdactie = require('../public/shared/edge/blikveld-hoofdactie.js');
+const HBRON = path.join(__dirname, '..', 'public', 'shared', 'edge', 'blikveld-hoofdactie.js');
 const GEZAG = ['autoritatief', 'afgeleid', 'ui', 'geen'];
 
 /* Een nagemaakt element: alleen wat het blikveld aanraakt. */
@@ -48,6 +59,7 @@ function venster(o) {
     getElementById(id) { return id === 'rtgCommand' ? (o.schil || null) : null; },
     querySelector(sel) {
       if (sel.indexOf('data-rtg-edge-primary') >= 0) return o.edgePrimary || null;
+      if (sel === '#rtgCommand .cmd-pane.actief iframe') return o.blad || null;
       return null;
     },
     querySelectorAll(sel) { return sel === '[data-hoofdactie]' ? (o.hoofdacties || []) : []; }
@@ -59,7 +71,8 @@ function venster(o) {
     sessionStorage: { setItem: verboden('sessionStorage'), getItem() { return null; } },
     postMessage: verboden('postMessage'), fetch: verboden('fetch'),
     RTGWorldIdentity: o.geenWereldkaart ? undefined : WereldId,
-    RTGEdgeActiestaat: Actiestaat, RTGGrammatica: gram };
+    RTGEdgeActiestaat: Actiestaat, RTGGrammatica: gram, RTGEdgeBlikveldHoofdactie: o.geenLezer ? undefined : Hoofdactie };
+  w.location.origin = 'https://rtg.test';
   if (o.adaptief) {
     const ctx = Object.assign({ bron: '', titel: '', acties: [], selectie: false, staat: {}, rail: [], sleutel: 'k1' }, o.adaptief.ctx);
     w.RTGAdaptief = {
@@ -169,4 +182,61 @@ test('het ene leespad: acties() met Edge-stand, en het tweede register met zijn 
   assert.ok(stil.gebreken.includes('redenloos'), 'allowed:false zonder reden hoort als gebrek zichtbaar te zijn');
   assert.ok(l.acties.every((x) => x.gezag !== 'server' && x.gezag !== 'autoritatief'), 'zonder server geen servergezag');
   assert.doesNotThrow(() => JSON.stringify(l), 'lees() is platte data');
+});
+
+/* Een nagemaakt blad: een iframe met een eigen document. */
+function bladVan(o) {
+  o = o || {};
+  const doc = { readyState: o.laadt ? 'loading' : 'complete',
+    querySelectorAll(sel) { return sel === '[data-hoofdactie]' ? (o.hoofdacties || []) : []; } };
+  const loc = o.vreemd === 'gooit' ? { get origin() { throw new Error('SecurityError'); }, get pathname() { throw new Error('SecurityError'); } }
+    : { origin: o.vreemd ? 'https://elders.test' : 'https://rtg.test', pathname: o.leeg ? 'blank' : '/apps/agenda.html' };
+  return { contentWindow: { location: loc }, contentDocument: o.vreemd === 'null' ? null : doc };
+}
+
+test('in de schil: de hoofdactie van het ACTIEVE blad, met zijn eigen herkomst', () => {
+  const eigen = el({}, '+ Afspraak');
+  const l = maak(venster({ schil: {}, pad: '/apps/app.html', blad: bladVan({ hoofdacties: [eigen] }) }).w).lees();
+  assert.equal(l.velden.hoofdactie.herkomst, 'blad:data-hoofdactie');
+  assert.deepEqual(l.velden.hoofdactie.waarde, { label: '+ Afspraak' });
+  assert.equal(l.velden.hoofdactie.gezag, 'ui');
+  vormKlopt(l.velden);
+});
+
+test('een blad zonder hoofdactie leent die van de schil niet', () => {
+  const schilKnop = el({}, 'Vergelijk werelden');
+  const l = maak(venster({ edgePrimary: schilKnop, blad: bladVan({}) }).w).lees();
+  assert.equal(l.velden.hoofdactie.waarde, null);
+  assert.equal(l.velden.hoofdactie.herkomst, 'blad');
+  assert.match(l.velden.hoofdactie.reden, /padtabel/);
+});
+
+test('twee hoofdacties in beeld is ook in de schil een gebrek', () => {
+  const l = maak(venster({ edgePrimary: el({}, 'Iets anders'), blad: bladVan({ hoofdacties: [el({}, '+ Afspraak'), el({}, 'Nog een')] }) }).w).lees();
+  assert.ok(l.gebreken.includes('hoofdactie-dubbel'));
+  assert.ok(l.gebreken.includes('hoofdactie-meervoudig'));
+});
+
+test('een blad dat niet te lezen is: leeg met reden, en het blikveld gooit niet', () => {
+  for (const [o, re] of [[{ vreemd: 'gooit', hoofdacties: [el({}, 'X')] }, /niet te lezen/], [{ vreemd: true, hoofdacties: [el({}, 'X')] }, /herkomst/],
+    [{ vreemd: 'null' }, /herkomst/], [{ leeg: true, hoofdacties: [el({}, 'X')] }, /laadt nog/], [{ laadt: true, hoofdacties: [el({}, 'X')] }, /laadt nog/]]) {
+    const l = maak(venster({ blad: bladVan(o) }).w).lees();
+    assert.equal(l.velden.hoofdactie.waarde, null, JSON.stringify(o));
+    assert.match(l.velden.hoofdactie.reden, re);
+    vormKlopt(l.velden);
+  }
+});
+
+test('zonder de lezer staat het veld leeg met die reden, en de rest loopt door', () => {
+  const l = maak(venster({ geenLezer: true, hoofdacties: [el({}, 'X')] }).w).lees();
+  assert.equal(l.velden.hoofdactie.waarde, null);
+  assert.match(l.velden.hoofdactie.reden, /niet geladen/);
+  vormKlopt(l.velden);
+});
+
+test('de hoofdactielezer bevat geen schrijfweg', () => {
+  const src = fs.readFileSync(HBRON, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+  for (const re of [/\.setAttribute\(/, /\.removeAttribute\(/, /\.dataset\.\w+\s*=[^=]/, /\.setItem\(/, /postMessage\(/, /\bfetch\(/, /innerHTML/, /classList/]) {
+    assert.doesNotMatch(src, re);
+  }
 });

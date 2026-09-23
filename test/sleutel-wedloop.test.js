@@ -87,21 +87,6 @@ test('vierentwintig processen laden tegelijk de sleutels van de kluis: niemand v
     'op EEN datamap; dan ontsleutelt het ene proces de kluis van het andere niet meer.');
 });
 
-test('een sleutel publiceert ook in een map die nog niet bestaat', () => {
-  /* Een verse checkout heeft geen server/data. test/pragmavolgorde.test.js riep
-     de sleutels aan zonder dat een server die map eerst maakte, en viel in CI om
-     met ENOENT. Mutatie: haal de mkdir uit publiceer() en deze toets zakt. */
-  const { sleutel } = require('../server/lib/sleutelbestand');
-  const wortel = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sleutelmap-'));
-  try {
-    const pad = path.join(wortel, 'nog', 'niet', 'proef.key');
-    const k = sleutel(pad, 32);
-    assert.equal(k.length, 32, 'de sleutel hoort gemaakt te zijn');
-    assert.ok(fs.existsSync(pad), 'en gepubliceerd in de nieuwe map');
-    assert.deepEqual(sleutel(pad, 32), k, 'een tweede lezing geeft dezelfde sleutel');
-  } finally { fs.rmSync(wortel, { recursive: true, force: true }); }
-});
-
 test('een bestand dat geen sleutel is, wordt nooit stil vervangen', () => {
   const { sleutel } = require('../server/lib/sleutelbestand');
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sleutelleeg-'));

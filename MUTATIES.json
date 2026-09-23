@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-23T17:00:16.158Z",
-    "commit": "5b827e6",
-    "boomVuil": false,
+    "op": "2026-09-23T17:03:52.098Z",
+    "commit": "62cb930",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
@@ -167,7 +167,8 @@
     },
     "adaptiefdelen.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest scripttags in HTML en geen module; de operatoren raken geen scripttag. Met de hand nagetrokken: vorm.js weg op reizen-veilig (zakt, en appmenu.e2e.js op de context van reizen-veilig), vorm.js na register.js op app (zakt), de objectpoort na rtg-schil.js in werkruimte (zakt, en werkruimte-objecten.e2e.js)"
     },
     "administratie.test.js": {
       "soort": "server",

@@ -1091,6 +1091,11 @@ const GEEN_BRONMUTATIE = new Map([
      het gedrag niet vast, en dat is aantoonbaar onwaar) en niet als niet-gemeten
      (dat zou eerlijk werk bestraffen, zie de kop van deze lijst). */
   ['ondernemerbewijs.test.js', 'leest registers en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). De faalklasse staat in de toets zelf: vier tegenproeven op gemuteerde registers in een wegwerpmap, elk aantoonbaar raak'],
+  /* HET REGISTER IN DELEN (Edge ronde 2, stap 19 en 20). Deze toets leest de
+     SCRIPTTAGS van zes schermen; de operatoren van de motor zijn gedragsmatig en
+     raken geen scripttag (met de HTML als module: "geen bruikbare mutatie"). De
+     foutklasse is met de hand nagetrokken, en alle drie zakten ze. */
+  ['adaptiefdelen.test.js', 'leest scripttags in HTML en geen module; de operatoren raken geen scripttag. Met de hand nagetrokken: vorm.js weg op reizen-veilig (zakt, en appmenu.e2e.js op de context van reizen-veilig), vorm.js na register.js op app (zakt), de objectpoort na rtg-schil.js in werkruimte (zakt, en werkruimte-objecten.e2e.js)'],
   ['autonomiegrens.test.js', 'leest EXECUTION_MAP.json en ROLPROEF.json en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). Toets 3 is de tegenproef: een blind pad autonoom maken laat de grens uitslaan'],
   /* Ik heb dit bestand eerst in EIGEN_MODULE gezet met public/apps/voertuig.js en
      rit.js erbij -- de twee modules die deze toets echt leest. De motor probeerde

@@ -205,6 +205,7 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
   try {
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 900, height: 900 } });
+    await page.clock.install(); // DE TIJD IS HIER HET GEDRAG: de nepklok springt, er wordt niet gegokt
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
@@ -275,7 +276,7 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
        "vier seconden geldig". Een borg die daarna nog op scherp stond, voerde uit
        op een druk die er niets meer mee te maken had. Hier wordt gewacht op de
        TIJD, want die is het gedrag -- en de tijd komt uit de tabel. */
-    await page.waitForTimeout(gram.DREMPELS.herbevestig + 500);
+    await page.clock.runFor(gram.DREMPELS.herbevestig + 500);
     assert.equal(await knop.getAttribute('data-scherp'), null,
       'na DREMPELS.herbevestig (' + gram.DREMPELS.herbevestig + ' ms) hoort scherp vervallen te zijn');
     await knop.press('Enter');
@@ -355,7 +356,7 @@ async function houdMuis(page, loc, ms) {
   const p = await midden(loc);
   await page.mouse.move(p.x, p.y);
   await page.mouse.down();
-  await page.waitForTimeout(ms);
+  await page.clock.runFor(ms);
   await page.mouse.up();
 }
 
@@ -368,7 +369,7 @@ async function houdVinger(page, loc, ms) {
   const cdp = await page.context().newCDPSession(page);
   try {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [p] });
-    await page.waitForTimeout(ms);
+    await page.clock.runFor(ms);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   } finally { await cdp.detach(); }
 }
@@ -392,6 +393,7 @@ test('met een aanwijzer: kort vasthouden op een borg doet niets, lang voert uit,
   try {
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 900, height: 900 } });
+    await page.clock.install(); // DE TIJD IS HIER HET GEDRAG: de nepklok springt, er wordt niet gegokt
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
     await openKantoor(page, base);
@@ -446,6 +448,7 @@ test('met een vinger: kort vasthouden op een borg doet niets, lang voert uit',
        met de aanwijzer, zodat alleen de hand verschilt. */
     const context = await browser.newContext({ viewport: { width: 900, height: 900 }, hasTouch: true });
     const page = await context.newPage();
+    await page.clock.install(); // DE TIJD IS HIER HET GEDRAG: de nepklok springt, er wordt niet gegokt
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
     await openKantoor(page, base);

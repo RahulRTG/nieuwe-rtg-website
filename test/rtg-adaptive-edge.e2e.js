@@ -294,13 +294,16 @@ async function volgBalk(page, doe, ms) {
   });
   if (doe === 'scrollTo') await page.evaluate(() => window.scrollTo(0, 900));
   else await doe();
-  return page.evaluate(async duur => {
-    await new Promise(r => setTimeout(r, duur));
+  /* DE DUUR IS HIER DE PROEF (de balk mag binnen dit venster niet flikkeren, en
+     het wiel hoort na de klok van de balk weer op dock te komen). Dus geen gok op
+     de echte klok maar de nepklok van de pagina, die precies zo ver springt. */
+  await page.clock.runFor(ms);
+  return page.evaluate(() => {
     const p = window.__balkProef;
     p.loopt = false; p.waarnemer.disconnect(); removeEventListener('scroll', p.scrol, { capture: true }); p.noteer();
     return { standen: p.standen, y: p.hoogste, edge2: !!window.RTGEdge2,
       edge2Stand: document.body.getAttribute('data-rtg-edge-2-state') };
-  }, ms);
+  });
 }
 
 test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zoals voorheen',
@@ -314,6 +317,7 @@ test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zo
 
     const edge2Pagina = async (st, pad) => {
       const page = await context.newPage();
+      await page.clock.install(); // volgBalk laat de nepklok springen
       await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
       if (new URL(page.url()).pathname !== pad) {
         st.skip(pad + ' leidde naar ' + new URL(page.url()).pathname + '; geen contract omzeild');
@@ -358,6 +362,7 @@ test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zo
 
     await t.test('landing: een wiel omlaag geeft peek, ook zonder Edge 2', async () => {
       const page = await context.newPage();
+      await page.clock.install(); // volgBalk laat de nepklok springen
       try {
         await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
         await page.waitForSelector('.rtg-experience-edge .rtg-adaptive-bar');

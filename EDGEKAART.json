@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T16:21:31.373Z",
-    "commit": "81cf70a0",
+    "op": "2026-09-23T16:57:45.875Z",
+    "commit": "72cafe5",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -1576,14 +1576,20 @@
       }
     },
     {
-      "pad": "public/shared/interface/second-screen-modules.js",
+      "pad": "public/shared/interface/modules/context.js",
       "laag": "schil",
       "rollen": [
         {
           "rol": "leest",
           "etiket": "vluchtige-context:l",
-          "wat": "Nu relevant: de titel uit RTGAdaptief",
+          "wat": "Nu relevant: bron en acties voor context.updated",
           "citaat": "function laatsteContext() { return (A && A.context && A.context()) || laatste || {}; }"
+        },
+        {
+          "rol": "leest",
+          "etiket": "vluchtige-context:l",
+          "wat": "Nu relevant: de titel uit de werkruimtecontext",
+          "citaat": "var v = ctx.context().velden, c = v && v.context;"
         }
       ],
       "verantwoordelijkheden": [
@@ -1602,58 +1608,20 @@
       }
     },
     {
-      "pad": "public/shared/interface/second-screen.js",
+      "pad": "public/shared/interface/workspace-context.js",
       "laag": "schil",
       "rollen": [
         {
           "rol": "leest",
           "etiket": "vluchtige-context:l",
-          "wat": "context van het bovendocument",
-          "citaat": "return w.RTGAdaptief && w.RTGAdaptief.context ? w.RTGAdaptief.context() : {};"
+          "wat": "vier velden uit het blikveld, op het moment van vragen",
+          "citaat": "var b = B.lees(), velden = {};"
         }
       ],
       "verantwoordelijkheden": [
         {
           "naam": "vluchtige-context",
           "als": "lezer"
-        }
-      ],
-      "gemeten": {
-        "globals": [
-          "RTGInterfaceSecondScreen"
-        ],
-        "zendt": [],
-        "luistert": [],
-        "attributen": [],
-        "opslag": [],
-        "fetch": []
-      }
-    },
-    {
-      "pad": "public/shared/interface/workspace-context.js",
-      "laag": "schil",
-      "rollen": [
-        {
-          "rol": "schrijft",
-          "etiket": "vluchtige-context:s",
-          "wat": "een eigen current naast RTGAdaptief",
-          "citaat": "current = next; var change = { value: get(), reason: reason || 'host-update' };"
-        },
-        {
-          "rol": "beslist",
-          "etiket": "vluchtige-context:b",
-          "wat": "slikt een gelijke context",
-          "citaat": "var next = clean(value); if (JSON.stringify(next) === JSON.stringify(current)) return get();"
-        }
-      ],
-      "verantwoordelijkheden": [
-        {
-          "naam": "vluchtige-context",
-          "als": "beslisser"
-        },
-        {
-          "naam": "vluchtige-context",
-          "als": "schrijver"
         }
       ],
       "gemeten": {
@@ -3592,13 +3560,11 @@
     "vluchtige-context": {
       "schrijvers": [
         "public/shared/adaptief/register.js",
-        "public/shared/interface/workspace-context.js",
         "public/shared/rtg-edge-system.js"
       ],
       "beslissers": [
         "public/shared/adaptief/brug.js",
-        "public/shared/adaptief/register.js",
-        "public/shared/interface/workspace-context.js"
+        "public/shared/adaptief/register.js"
       ],
       "lezers": [
         "public/apps/bestanden/adaptief.js",
@@ -3610,8 +3576,8 @@
         "public/shared/adaptief/rail.js",
         "public/shared/command/werktafel.js",
         "public/shared/edge/blikveld.js",
-        "public/shared/interface/second-screen-modules.js",
-        "public/shared/interface/second-screen.js",
+        "public/shared/interface/modules/context.js",
+        "public/shared/interface/workspace-context.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js"
       ]
@@ -3793,8 +3759,7 @@
       "public/shared/command/bladstand.js",
       "public/shared/command/geheugen.js",
       "public/shared/command/werktafel.js",
-      "public/shared/interface/second-screen-modules.js",
-      "public/shared/interface/second-screen.js",
+      "public/shared/interface/modules/context.js",
       "public/shared/interface/workspace-context.js",
       "public/shared/interface/world-desktop-frame.js",
       "public/shared/interface/world-desktop-home.js",
@@ -3921,15 +3886,13 @@
       "naam": "vluchtige-context",
       "schrijvers": [
         "public/shared/adaptief/register.js",
-        "public/shared/interface/workspace-context.js",
         "public/shared/rtg-edge-system.js"
       ],
       "beslissers": [
         "public/shared/adaptief/brug.js",
-        "public/shared/adaptief/register.js",
-        "public/shared/interface/workspace-context.js"
+        "public/shared/adaptief/register.js"
       ],
-      "waarom": "Drie contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie), RTGEdge.active.ctx (scope, titel, actie, tool) en RTGWorkspaceContext (een eigen current, gevoed uit de eerste, met een eigen ontdubbeling); reizen-performance.js voedt de eerste twee allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen), de brug (actief blad) en de werkruimte (gelijk wordt geslikt) elk apart."
+      "waarom": "Twee contextmodellen: RTGAdaptief.context() (bron, titel, acties, selectie) en RTGEdge.active.ctx (scope, titel, actie, tool); tot ronde 2 was er een derde, RTGWorkspaceContext met een eigen current en een eigen ontdubbeling, en sinds stap 23 is dat een lezer van het blikveld zonder eigen staat; reizen-performance.js voedt de eerste twee allebei, en wie de context mag zetten beslissen het register (sleutel, bron bij wissen) en de brug (actief blad) elk apart."
     },
     {
       "naam": "voortzetting",
@@ -4057,8 +4020,8 @@
     ]
   },
   "telling": {
-    "bestanden": 71,
-    "rollen": 216,
+    "bestanden": 70,
+    "rollen": 215,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 13

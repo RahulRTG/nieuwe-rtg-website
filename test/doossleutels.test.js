@@ -81,6 +81,31 @@ test('1-4. uitgeven, bewezen naam, schaduw en intrekken', async () => {
   assert.equal(o.body.wegen.eigen, 1);
   assert.equal(o.body.wegen.gedeeld, 1);
   assert.ok(!/hash|[0-9a-f]{48}/.test(JSON.stringify(o.body)), 'het overzicht draagt geen sleutel en geen hash');
+  /* Welke dozen melden nog met de gedeelde sleutel: dat bepaalt wanneer die dicht
+     kan (besluit van 23 september 2026). doos-a meldde alleen met een eigen sleutel. */
+  assert.deepEqual(o.body.nogGedeeld.map(d => [d.doos, d.aantal, d.heeftEigen]), [['doos-b', 1, false]]);
+});
+
+test('6. de lijst dozen op de gedeelde sleutel: zelfopgave, zeven dagen, en begrensd', () => {
+  let t = Date.parse('2026-09-23T09:00:00Z');
+  const db = { data: {} };
+  const s = maakDoosSleutels({ db, save: () => {}, crypto, nu: () => t });
+  s.geef('doos-x');
+  s.telWeg('gedeeld', 'Doos-X');
+  s.telWeg('gedeeld', 'doos-x');
+  s.telWeg('gedeeld', '../etc');
+  s.telWeg('eigen', 'doos-y');
+  let o = s.overzicht();
+  assert.deepEqual(o.nogGedeeld.map(d => [d.doos, d.aantal, d.heeftEigen]),
+    [['(geen geldige naam)', 1, false], ['doos-x', 2, true]], 'een eigen sleutel die nog niet op de doos staat, valt op');
+  assert.match(o.nogGedeeldUitleg, /zelfopgave/);
+  t += 8 * 86400000;
+  assert.deepEqual(s.overzicht().nogGedeeld, [], 'na zeven dagen stilte staat hij niet meer op de lijst');
+  t += 30 * 86400000;
+  s.telWeg('gedeeld', 'doos-z');
+  assert.deepEqual(Object.keys(db.data.doosGedeeldGezien), ['doos-z'], 'wat dertig dagen niet is gezien, valt uit de opslag');
+  for (let i = 0; i < 250; i++) s.telWeg('gedeeld', 'verzonnen-' + i);
+  assert.equal(Object.keys(db.data.doosGedeeldGezien).length, 200, 'wie de gedeelde sleutel heeft, laat de lijst niet groeien');
 });
 
 test('5. de sleutel staat niet in de opslag, en de koppen gaan mee als de doos er een heeft', () => {

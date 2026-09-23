@@ -96,7 +96,9 @@ test('0. de woordenlijsten delen geen enkel woord', () => {
    niet in de lijst staat, kan nooit worden bevestigd -- de ceremonie weigert de
    naam. Zolang de eigenaar geen passkey heeft valt dat niet op; daarna is de
    route dicht voor precies de mens die hem mag gebruiken. Zo ging het met de
-   kantooruitnodiging (23 september 2026). */
+   kantooruitnodiging, de doossleutels en de incassoronde (23 september 2026).
+   Deze lezing is de tweede lijn: de eerste is kern/zwaarbewijs.js, die een
+   onbekende naam bij de EERSTE aanroep weigert, ook zonder passkey. */
 test('0b. elke naam die een route als zware ceremonie eist, staat in de lijst', () => {
   const namen = new Set();
   const loop = (map) => {
@@ -105,13 +107,25 @@ test('0b. elke naam die een route als zware ceremonie eist, staat in de lijst', 
       if (n.isDirectory()) { if (n.name !== 'data' && n.name !== 'node_modules') loop(p); continue; }
       if (!n.name.endsWith('.js')) continue;
       const bron = fs.readFileSync(p, 'utf8');
-      for (const m of bron.matchAll(/\beis\(\s*[^'()]*(?:\([^()]*\))?[^'()]*,\s*'([a-z][a-z-]+)'/g)) namen.add(m[1]);
+      for (const m of bron.matchAll(/\b(?:eis|eisZwaar)\(\s*[^'()]*(?:\([^()]*\))?[^'()]*,\s*'([a-z][a-z.-]+)'/g)) namen.add(m[1]);
+      // de doorgeefvorm: eigenaarZwaar(req, res, '<naam>', ...) in routes/kantoren/doossleutels.js
+      for (const m of bron.matchAll(/\beigenaarZwaar\(\s*req\s*,\s*res\s*,\s*'([a-z][a-z.-]+)'/g)) namen.add(m[1]);
     }
   };
   loop(path.join(__dirname, '..', 'server'));
-  assert.ok(namen.size >= 9, 'de meter vindt de zware routes (' + [...namen].join(', ') + ')');
+  assert.ok(namen.size >= 13, 'de meter vindt de zware routes (' + [...namen].join(', ') + ')');
   assert.deepEqual([...namen].filter(a => !ZWARE_ACTIES.includes(a)), [],
     'een zware route met een naam die de ceremonie niet kent');
+});
+
+test('0c. de zware poort weigert een naam die hij niet kent, ook zonder passkey', async () => {
+  const zw = require('../server/kern/zwaarbewijs')({ zwaarBeveiliging: { nodig: () => false },
+    appUrl: () => 'http://localhost', log: null, beveiligVan: () => null });
+  const req = { body: {}, get: () => '' };
+  const onbekend = await zw.eis({ id: 1 }, 'eigenaar-bestaat-niet', 's', req);
+  assert.equal(onbekend.status, 500, 'een fout in de code zakt bij de eerste aanroep, niet pas met een passkey');
+  const bekend = await zw.eis({ id: 1 }, 'passkey-weg', 's', req);
+  assert.deepEqual(bekend, { ok: true, bewezen: false }, 'een bekende naam gaat zonder passkey op de terugval');
 });
 
 test('1. de ratel staat open zolang er geen passkey is', async () => {

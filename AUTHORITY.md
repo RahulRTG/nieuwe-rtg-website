@@ -335,7 +335,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e); tekengrens per organisatie en de conflicten van `scope.js` hebben eerst een onderwerp nodig |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
-| 7 | **identiteiten voor agents, diensten en apparaten** | **staat** (23 september 2026; par. 5c en 5i): agent, diensten, toestellen, webhooks, en de zaakdoos met een eigen sleutel in de schaduw; de gedeelde doos-sleutel weghalen is een apart besluit |
+| 7 | **identiteiten voor agents, diensten en apparaten** | **staat** (23 september 2026; par. 5c en 5i): agent, diensten, toestellen, webhooks, en de zaakdoos met een eigen sleutel in de schaduw. De gedeelde doos-sleutel gaat dicht als elke doos er een heeft; het overzicht toont welke nog gedeeld melden |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **staat** (23 september 2026; par. 5g) |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
 
@@ -716,6 +716,32 @@ De doos stuurt de eigen sleutel mee als hij er een heeft (`RTG_DOOS_ID` en
 `RTG_DOOS_EIGEN_SLEUTEL`, via `kern/zaakdoos/koppen.js`). De gedeelde sleutel
 werkt nog. Elke geldige aanroep telt onder de weg waarlangs hij kwam
 (`/api/office/doos/sleutels`); de gedeelde sleutel weghalen is een apart besluit.
+
+**Wanneer de gedeelde sleutel dicht mag: als elke doos er een heeft** (besluit
+van de eigenaar, 23 september 2026). Daarvoor moet je zien WELKE dozen nog op de
+gedeelde sleutel melden, en dat stond nergens. Het overzicht draagt nu
+`nogGedeeld`: per naam de laatste keer en het aantal, over de laatste zeven dagen,
+met `heeftEigen` als er al een sleutel is uitgegeven die nog niet op de doos
+staat. De naam is een ZELFOPGAVE (de doos zegt hem zelf, met de gedeelde
+sleutel) en het overzicht zegt dat er ook bij. Wie de gedeelde sleutel heeft, kan
+namen verzinnen: daarom een regel per naam en geen reeks, na dertig dagen stilte
+valt een naam uit de opslag, en er staan er nooit meer dan tweehonderd. De
+boardroom toont het onder *De zaakdozen*, met uitgeven en intrekken voor de
+eigenaar. Er wordt niets afgedwongen.
+
+**Die schermen vonden een gebrek dat geen toets zag: drie zware routes waren met
+een passkey onbereikbaar.** De ceremonie kent alleen de namen in `ZWARE_ACTIES`
+(`kern/webauthn-acties.js`), en `eigenaar-kantooruitnodiging`,
+`eigenaar-doossleutel`(`-weg`) en `bank.incasso` stonden daar niet in. Zonder
+passkey gaat een zware handeling op de terugval door, dus elke toets bleef groen.
+Zodra de eigenaar een passkey zet, weigert de ceremonie de naam, en is de route
+dicht voor precies de mens die hem mag gebruiken. De incassoronde is de gouden
+geldketen van MACHINE.md par. 5a. De reparatie zit bij de oorzaak:
+`kern/zwaarbewijs.js` weigert een onbekende naam bij de EERSTE aanroep met een
+500, ook zonder passkey. De toets die de incassoronde loopt, zakte daar meteen
+op. Daarnaast leest `test/eigenaarbevestiging.test.js` toets 0b elke naam die een
+route als zware ceremonie eist; die lezing is de tweede lijn, want hij miste eerst
+een naam met een punt en een naam via een hulpfunctie.
 
 **Webhooks van aanbieders schrijven nu als `aanbieder:<naam>`** (stripe, mollie,
 adyen, munt, storingen: een gesloten lijst), en alleen NA de controle van hun

@@ -38,7 +38,7 @@ module.exports = ({ crypto, beveilig, noteerAfketser, db, save }) => {
       return false;
     }
     doosAfketsers.delete(ip); // een goede sleutel wist de teller
-    doosSleutels().telWeg('gedeeld');
+    doosSleutels().telWeg('gedeeld', req.get('x-doos-id') || (req.body && req.body.doos));
     return true;
   }
 

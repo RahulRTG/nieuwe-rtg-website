@@ -642,6 +642,18 @@ const EIGEN_MODULE = new Map([
      platformblok zetten, de extra weergaven niet sluiten bij een tabwissel, en
      Ververs weer laten gokken welk scherm er open staat. */
   ['werkstatus.e2e.js', ['public/apps/werk/status.js', 'public/apps/werk/app.js']],
+  /* DE LUSSEN VAN DE WERKTAFEL op een telefoon: wereld open, erin, terug, Home.
+     De module die hij het hardst beproeft is de wachtpost en het wereldlabel;
+     met de hand nagetrokken (wachtpost uit -> de pagina verlaat app.html,
+     kopwereld vast op living -> het label klopt niet) en door de motor
+     bevestigd. */
+  ['werktafel-lussen.e2e.js', ['public/shared/command/bladstand.js']],
+  /* KNOPPEN DIE NIET KUNNEN, ZEGGEN WAAROM. Zes plekken in een toets. De
+     gedeelde kantoor-inlog lag voor de hand, maar daar overleefde de toets de
+     vier mutaties: de eerste plek per operator zit in dat bestand in code die
+     deze toets niet raakt. Bevestigd door de motor is de kring van Veilig
+     (return-weg: dan verschijnt de reden bij een lege codenaam niet). */
+  ['stilleknoppen.e2e.js', ['public/shared/veiligheid.js']],
   /* DE METING PER CAPABILITY. Vier mutaties, vier raak: de vloer eruit (dan
      krijgt drie verzoeken een geruststellende 0,0%), routes zonder functie
      weglaten (dan klopt het totaal terwijl er iets ontbreekt), een 4xx als

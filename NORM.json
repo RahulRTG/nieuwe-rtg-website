@@ -134,7 +134,7 @@
     "veranderbereikStatisch": 1164,
     "planDomeinenGemeten": 7,
     "edgeGeblokkeerdZonderWaarom": 0,
-    "edgeDubbeleEigenaars": 11,
+    "edgeDubbeleEigenaars": 12,
     "rtgDodeKanalen": 0,
     "edgeVeldIdentiteit": 0,
     "edgeVeldWereld": 281,
@@ -147,6 +147,15 @@
     "edgeVeldTrust": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-23",
+      "soort": "structureel",
+      "sleutel": "edgeDubbeleEigenaars",
+      "van": 11,
+      "meter": "edgeDubbeleEigenaars 11 -> 12",
+      "reden": "De kaart ziet een tweede eigenaar die er al was; er is geen code bijgekomen. Ronde 1 zette gebaar-drempel op een eigenaar (DREMPELS in grammatica.js, met de gebaarversheid van Edge 2 als enige beslisser), maar de gebaarlaag van de lijsten (shared/gebaar/, op elk scherm met basis.js) beslist met eigen maten -- RICHTING 8 en STIL 6 in gebaar-02.js, lang drukken 520 ms en 8 px per as in gebaar-03b.js -- en stond niet op de kaart. Ronde 2 zet hem erop (stap 3, samen met de andere ontbrekende producenten), in het geheugen nagerekend met bouw(): gebaar-drempel is de enige verantwoordelijkheid die daardoor dubbel wordt; alle andere nieuwe rijen landen op namen die al dubbel waren. Een meter die stijgt omdat hij beter ziet is geen achteruitgang; een meter die laag blijft omdat hij iets niet ziet, is erger.",
+      "waarheen": "EDGEKAART.json draagt beide gebaarbestanden als beslisser van gebaar-drempel met een letterlijk citaat, en de WAAROM-regel in scripts/edgekaart.js zegt waarom het dubbel is. Wanneer hij weer daalt: stap 10 van ronde 2 laat gebaar-03b.js lang drukken en stil uit DREMPELS lezen, maar gebaar-02.js houdt RICHTING en STIL, dus de teller blijft 12 tot ook die in de tabel staan."
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

@@ -24,7 +24,7 @@
         device: w.matchMedia && w.matchMedia('(min-width:1000px)').matches ? 'large' : 'compact' }, o.global),
       user: samen({ permissions: [], preferences: {}, savedWorkspaces: [] }, o.user),
       session: samen({ online: !w.navigator || w.navigator.onLine !== false, authenticated: false, activeDevice: null }, o.session),
-      workspace: samen({ id: o.workspaceId || 'default', surface: 'peek', active: null, layout: {}, context: {} }, o.workspace),
+      workspace: samen({ id: o.workspaceId || 'default', surface: 'peek', active: null, layout: {} }, o.workspace),
       module: Object.create(null)
     };
     function emit(scope, id, value, reason) {

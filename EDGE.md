@@ -161,7 +161,7 @@ wat er speelt omdat hij het op te veel plekken tegelijk weet.**
 | Verantwoordelijkheid | Wat de kaart vond |
 |---|---|
 | capability-register | twee registers met elk een eigen poort: `RTGAdaptief` (declareren, keuring) en de Edge-kern (`registerAction`); sinds ronde 1 kent de tweede alleen licht en voert hij uit langs `RTGGewicht.voer`, maar hij houdt die handelingen nog apart bij (leeg in ronde 2), en de controls oogsten paginaknoppen als derde bron. Dat tweede register heeft **vijf producenten** en niet de drie schermen die eerst werden genoemd: zijn eigen standaardingangen (zeven ids zonder uitvoering, op elk scherm met de adaptieve Edge), Signals (`primary`, ook op elk scherm), de sociale runtime (`social-context`, negen schermen), het wereldbureau (`home`, vanaf 1000 px) en de landing (zeven ids met `allowed: false` plus de scènerijen). Sinds ronde 2 staan alle vijf op de kaart; wie `registerAction` aanroept staat er als schrijver op, want alleen zo is te zien wie het register nog vult |
-| vluchtige-context | drie contextmodellen: `RTGAdaptief.context()`, `RTGEdge.active.ctx` van het casco, en `RTGWorkspaceContext` met een eigen `current` en een eigen ontdubbeling (sinds ronde 2 als schrijver en beslisser op de kaart) |
+| vluchtige-context | twee contextmodellen: `RTGAdaptief.context()` en `RTGEdge.active.ctx` van het casco. `RTGWorkspaceContext` had een eigen `current` en een eigen ontdubbeling en was daarmee een derde; sinds ronde 2 (stap 23) leest hij het blikveld op het moment van vragen, zonder eigen staat, en staat hij als lezer op de kaart. De teller beweegt daar niet van: er blijven twee schrijvers en twee beslissers |
 | wereld | vier plekken BEPALEN de wereld: het casco, `randen.js` met een eigen padlijst, `bladstand.js` en de wereldcatalogus naast `MAPPEN`. GESCHREVEN wordt hij op meer plekken, en die stonden tot ronde 2 niet op de kaart: `rtg-world-identity.js` bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, en de landing zet hem per scène vanuit drie scripts |
 | hoofdactie | de library maakt de knop, casco en padtabel zetten tekst en actie, de Ga verder-toets herbouwt hem, de controls verhuizen hem — terwijl het scherm zijn eigen `data-hoofdactie` aanwijst |
 | voortzetting | vier geheugens voor "waar was ik" (`continueWith`, de werktafel, de routecontext, Recent bezocht) die elkaar niet lezen |
@@ -233,15 +233,20 @@ Het oordeel dat daaruit volgt:
   handelingen met de herkomst `edge-compat`, en een handeling die daar
   `allowed: false` staat zonder reden, draagt het gebrek `redenloos` in plaats
   van stil uit de lijst te vallen.
-- **Er zijn vandaag al twee contextmodellen, en een afgeleide.** "Geen derde
+- **Er zijn vandaag al twee contextmodellen, en een lezer.** "Geen derde
   contextmodel" betekent daarom niet dat er één is: `RTGAdaptief.context()` is
-  de bron van wat een scherm over zichzelf zegt, `RTGEdge.active.ctx` is het
-  casco (kruimelpad, gereedschap, de padtabel), en
-  `shared/interface/workspace-context.js` (`RTGWorkspaceContext`) houdt een
-  eigen `current`, gevoed uit het eerste met een eigen ontdubbeling. Het
-  blikveld leest de eerste twee en zegt bij elke waarde welke; het maakt er geen
-  derde van. Samenvoegen is ronde 2, en de richting is dat het casco een LEZER
-  wordt van de context van het scherm.
+  de bron van wat een scherm over zichzelf zegt, en `RTGEdge.active.ctx` is het
+  casco (kruimelpad, gereedschap, de padtabel). Het blikveld leest die twee en
+  zegt bij elke waarde welke; het maakt er geen derde van.
+  `shared/interface/workspace-context.js` (`RTGWorkspaceContext`) hield een
+  eigen `current`, gevoed uit het eerste met een eigen ontdubbeling; sinds
+  ronde 2 (stap 23) geeft hij op het moment van vragen vier velden van het
+  blikveld door (wereld, context, object, activiteit), met herkomst, gezag en
+  sinds ongewijzigd, en zonder blikveld `velden: null` met de reden. De eerste
+  lezer is 'Nu relevant' in de Second Screen: die toont de titel alleen als
+  een scherm of blad hem zei. De twee modellen samenvoegen komt na ronde 2
+  (besluit K-casco), en de richting is dat het casco een LEZER wordt van de
+  context van het scherm.
 
 ---
 

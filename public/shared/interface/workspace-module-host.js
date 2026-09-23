@@ -48,7 +48,7 @@
       try {
         var surface = def.surfaces && def.surfaces[state];
         if (typeof surface === 'function') surface(body, ctx);
-        else if (typeof instance.render === 'function') instance.render(state, o.workspaceContext());
+        else if (typeof instance.render === 'function') instance.render(state);
       } catch (e) { error('render', e); fallback('Surface tijdelijk niet beschikbaar.'); }
     }
     return { root: root, body: body, render: render,

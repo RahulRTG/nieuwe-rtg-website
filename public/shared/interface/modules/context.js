@@ -1,5 +1,5 @@
 /* Nu relevant als Living Module: wat het scherm nu aanreikt, uitgevoerd langs
-   het gewicht. Afgesplitst uit second-screen-modules.js; er veranderde niets. */
+   het gewicht. Afgesplitst uit second-screen-modules.js (ronde 2, stap 22). */
 (function (w, d) {
   'use strict';
   var SDK = w.RTGModuleSDK; if (!SDK) return;
@@ -11,9 +11,16 @@
     actions: ['context.execute'], events: { publishes: ['context.updated'], subscribes: [] }
   }, function (ctx) {
     var root, laatste = null, af = null, A = w.RTGAdaptief;
+    /* De titel komt uit de werkruimtecontext (het blikveld), en alleen als een
+       scherm of blad hem zelf zei: een titel van het casco of het document is
+       een terugval van de Edge en geen context van wat hier speelt. */
+    function titel() {
+      var v = ctx.context().velden, c = v && v.context;
+      return c && (c.herkomst === 'scherm' || c.herkomst === 'blad') && c.waarde ? c.waarde.titel : '';
+    }
     function teken(c) {
       laatste = c || {}; if (!root) return; root.textContent = '';
-      if (laatste.titel) root.appendChild(el('strong', '', laatste.titel));
+      var kop = titel(); if (kop) root.appendChild(el('strong', '', kop));
       var items = A && A.voorNu ? A.voorNu() : [];
       (Array.isArray(items) ? items : []).slice(0, 4).forEach(function (x) {
         if (!x || !(x.label || x.naam)) return;

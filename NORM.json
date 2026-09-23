@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1731,
-    "toetsenNietGemeten": 624,
+    "toetsenNietGemeten": 625,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -286,6 +286,16 @@
       "meter": "keuringOmvang 330 -> 331",
       "reden": "server/kern/fiscaal/gateway/mandaat.js groeide van 5978 naar 9606 bytes en komt daarmee in de waarschuwingsband onder 10 kB; de harde grens haalt hij niet en keuringTeGroot beweegt niet. De groei is de doorsnede plus de reden waarom er NIET op aangifteplicht wordt gesneden -- dat laatste is geen sierproza maar de grens zelf: er is geen btw-plichtregister en geen loonplichtvlag, en een snede daarop zou een fiscale positie innemen die dit huis niet mag innemen (kern/fiscaal/zekerheid.js: voorbehouden). Bij deze meting is server/kern/platformfout.js met 203 bytes teruggebracht door een echte dubbeling weg te halen: de uitleg over de drie weigeringsgevallen stond na de splitsing zowel daar als in de kop van brugweigering.js (LAT-regel 4). Dat hielp de meter niet -- dat bestand zat al in de band -- en is blijven staan omdat het los van de byte klopt.",
       "waarheen": "De naad in mandaat.js is echt: verlenen/intrekken (het REGISTER) en geldt() (de VRAAG per dag) zijn twee dingen, en alleen het eerste schrijft. Bewust niet in deze wijziging, want die splitsing raakt de enige plek waar de gateway zijn mandaat ophaalt en hoort een eigen ronde met een eigen toets te zijn."
+    },
+    {
+      "datum": "2026-09-23",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 624,
+      "vervalt": "2026-12-23",
+      "meter": "toetsenNietGemeten 624 -> 625",
+      "reden": "test/werkuitgaven.e2e.js is nieuw: de browsertoets van de module Uitgaven in het Werk OS. Hij is met de hand nagetrokken met een mutatie (zonder het vaste veld in werk/acties.js zakt hij) en vond zelf een echt gebrek -- een weigering op een recht zonder het veld recht logde het lid uit. De mutatiemotor is er alleen nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee; daarna daalt deze meter terug."
     },
     {
       "datum": "2026-09-15",

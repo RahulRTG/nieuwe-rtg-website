@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-23T19:33:38.480Z",
-  "commit": "5ad29244",
+  "op": "2026-09-23T20:20:02.800Z",
+  "commit": "39b7f1d9",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -48,7 +48,7 @@
  "perWacht": [
   {
    "naam": "werkPoort",
-   "aantal": 97
+   "aantal": 98
   },
   {
    "naam": "poort",
@@ -91,12 +91,12 @@
    "aantal": 11
   },
   {
-   "naam": "beheerVan",
+   "naam": "lesVan",
    "aantal": 10
   },
   {
-   "naam": "lesVan",
-   "aantal": 10
+   "naam": "beheerVan",
+   "aantal": 9
   },
   {
    "naam": "viaBeheerOfDirectie",
@@ -624,7 +624,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/keuring",
-   "bestand": "server/bedrijf/regelpoort.js:141",
+   "bestand": "server/bedrijf/regelpoort.js:140",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -702,9 +702,9 @@
   },
   {
    "sleutel": "POST /api/bedrijf/lid/tekengrens",
-   "bestand": "server/bedrijf/tekengrens.js:28",
+   "bestand": "server/bedrijf/tekengrens.js:30",
    "staat": "bewaakt",
-   "wacht": "beheerVan"
+   "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/lid/uit-dienst",
@@ -990,13 +990,13 @@
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/betaalwijze",
-   "bestand": "server/bedrijf/tekengrens.js:61",
+   "bestand": "server/bedrijf/tekengrens.js:68",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/entiteit",
-   "bestand": "server/bedrijf/tekengrens.js:43",
+   "bestand": "server/bedrijf/tekengrens.js:48",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },

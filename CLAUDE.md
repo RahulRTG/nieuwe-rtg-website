@@ -1568,6 +1568,12 @@ via het domein en niet via een eigen verzoekobject, eerst de hoedanigheid in
 sessie en envelop en dan pas een rolwisselaar, het werkdeck gaat over het open
 werkstuk, en **een nieuw scherm met een eigen hoofdactie publiceert zijn context
 zelf** (`contractNieuw`).
+**Ronde 1 staat** (EDGE.md par. 10 en 11): de dode kanalen zijn gesloten, het
+tweede register kent alleen licht en voert uit langs `RTGGewicht.voer` (LEEG is
+ronde 2), "wat weegt dit" heeft een antwoord (`effectief()`; zonder grammatica
+blijft een gewicht staan en gaat zwaar dicht), de gebaardrempels staan op een plek
+(`DREMPELS` in `grammatica.js`; zonder tabel is een gebaar uit, nooit een kopie),
+en de schil leest de hoofdactie van het ACTIEVE blad (`edge/blikveld-hoofdactie.js`).
 
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een

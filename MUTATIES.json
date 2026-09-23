@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T09:21:40.771Z",
-    "commit": "8c08db7",
+    "op": "2026-09-23T10:45:03.250Z",
+    "commit": "5359e1a",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2465,6 +2465,54 @@
       "operator": "return-weg#0",
       "gezakt": 3,
       "geprobeerd": 2
+    },
+    "edgeactiestaat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/edge/actiestaat.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "edgeblikveld.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/edge/blikveld.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "edgeblikveld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/edge/actiestaat.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "edgecontext.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/adaptief/register.js",
+      "operator": "+->-#0",
+      "gezakt": 1,
+      "geprobeerd": 7
+    },
+    "edgekaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/edgekaart.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "edgenieuwscherm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/edgedekking.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 4
     },
     "eenaccount-werkruimte.test.js": {
       "soort": "server",

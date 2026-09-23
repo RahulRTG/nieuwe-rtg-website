@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T10:23:44.924Z",
-    "commit": "ac1feaf",
-    "boomVuil": true,
-    "boomAnders": 10,
+    "op": "2026-09-23T10:43:52.333Z",
+    "commit": "5359e1a",
+    "boomVuil": false,
+    "boomAnders": 0,
     "instrument": "scripts/edgedekking.js",
     "node": "v22.22.2"
   },
@@ -20938,54 +20938,63 @@
     "perVeld": {
       "identiteit": {
         "ja": 0,
+        "zelf": 0,
         "nee": 282,
         "nvt": 0,
         "zonderMeting": 28
       },
       "wereld": {
         "ja": 281,
+        "zelf": 0,
         "nee": 1,
         "nvt": 0,
         "zonderMeting": 28
       },
       "context": {
         "ja": 282,
+        "zelf": 1,
         "nee": 0,
         "nvt": 0,
         "zonderMeting": 28
       },
       "object": {
         "ja": 0,
+        "zelf": 0,
         "nee": 282,
         "nvt": 0,
         "zonderMeting": 28
       },
       "activiteit": {
         "ja": 0,
+        "zelf": 0,
         "nee": 282,
         "nvt": 0,
         "zonderMeting": 28
       },
       "presence": {
         "ja": 0,
+        "zelf": 0,
         "nee": 282,
         "nvt": 0,
         "zonderMeting": 28
       },
       "voortzetting": {
         "ja": 0,
+        "zelf": 0,
         "nee": 282,
         "nvt": 0,
         "zonderMeting": 28
       },
       "hoofdactie": {
         "ja": 58,
+        "zelf": 51,
         "nee": 224,
         "nvt": 0,
         "zonderMeting": 28
       },
       "trust": {
         "ja": 0,
+        "zelf": 0,
         "nee": 282,
         "nvt": 0,
         "zonderMeting": 28

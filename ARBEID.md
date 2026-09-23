@@ -474,6 +474,124 @@ stap mogelijk maakt.
 | 8 | Par. 1: vaardigheden van de vacature in de werkvondst, de weg naar een ontbrekend stuk bij `persoonseis`, en `tekorten()` per zaak voor de werkgever | bouwen | maakt de openingszin van het voorstel waar met wat er al ligt |
 | 9 | **Welk profiel is de bron van vaardigheden** (Métier of het professionele profiel van Zakelijk); daarna pas een gedeelde lijst. De vormmeting van par. 0 vastleggen als register met een ratel | besluit + meten | voorwaarde voor voorstel 103 |
 
+### 7a. De besluiten van 23 september 2026
+
+De eigenaar heeft drie van de vier besluiten uit deze tabel genomen, en de volgorde
+van het werk erna.
+
+1. **Stap 6 -- `employment` aan een ENTITEIT is de waarheid.** Een aanname via de
+   werving hoort voortaan ook een dienstverband bij de entiteit te maken, en
+   `staffId` aan een zaak wordt daarvan afgeleid. De brug loopt een kant op, in de
+   vorm van `server/kern/mobiliteit/appbrug.js`. Het werkruimtelid blijft een
+   productinstantie en geen juridische relatie (`TENANT.md`). Wat dit kost staat
+   er eerlijk bij: `kern/payroll` noemt `employment` vandaag nul keer, dus de
+   loonkant moet om.
+2. **Stap 7 -- de keten wordt rond gemaakt.** De weigering van `werving.suite` in
+   `server/kern/wereld/lijsten.js` blijft staan zolang de keten van vacature tot
+   loon niet rond is. Dat is geen "blijft dicht" maar de opdracht: het doel is de
+   hele keten, en de suite gaat pas open als een geheel. Een half proces opent hij
+   nooit.
+3. **Stap 9 -- Métier is de bron van vaardigheden.** Het loopbaanprofiel bestaat
+   voor elke mens, ook zonder bedrijf, en heeft al een naamvrijgave per werkgever.
+   Het professionele profiel van Zakelijk gaat eruit lezen; er komt een gedeelde
+   lijst die de negen plekken opneemt en geen tiende wordt.
+4. **Eerstvolgende stap: de Adamproef verlengen** (stap 5) voorbij *aangenomen*,
+   naar werkrelatie, contract en loon. Dat is meten en geen bouwen, en het maakt
+   besluit 1 hard: waar de keten breekt, staat dan in een register in plaats van
+   in deze paragraaf.
+
+**Gedaan (23 september 2026).** `scripts/adamproef.js` loopt nu door tot de
+loonrun: 17 schakels, alle 17 gesloten (sindsdien 18, zie de inhaalslag hieronder), 0 stuk, en 10 van de 10
+storingen gehouden (`ADAMPROEF.json`). Waar Adam niet verder kan, neemt een
+volwassen lid het over, zodat de rest van de keten toch gemeten wordt. De drie
+breuken die de verlenging vond, in de volgorde waarin een mens ze tegenkomt (alle
+drie dicht):
+
+- **Schakel 13:** een Foundation-profiel kwam niet in het team. Een aanname
+  claimen eist een lidsessie (`/api/werving/verbind`), en een gezinslid heeft
+  die niet. De aanname eindigde bij een kassacode die de werkgever met de hand
+  moest doorgeven. **Dicht dezelfde dag** (keuze van de eigenaar: de uitnodiging
+  naar Adam). De werving bewaart de uitnodigingslink op de sollicitatie zelf;
+  `/gezin/sollicitaties` toont hem alleen aan het profiel dat solliciteerde, en
+  de werkgever ziet hem niet, want `plek` staat niet in de positieve lijst van
+  `werkgeverSollicitatie`. In `werk.html` staat *Neem je plek in*. Adam maakt een
+  gratis eigen account (een RTG-account mag vanaf vijftien) en claimt langs de
+  bestaande route, en de dienstverbandbrug geeft hem meteen een dienstverband.
+  Er is geen tweede soort identiteit bijgekomen in het personeelsregister. Een
+  nieuwe storing houdt vast dat alleen Adam de uitnodiging ziet (niet de ouder,
+  niet de zus, niet de werkgever), met Adam zelf als besturingsproef.
+- **Schakel 16:** een aanname maakte geen `employment`. Het volwassen lid stond
+  in het team (schakel 14) en had een contract (schakel 15), maar
+  `/api/concern/mijnwerk` zei *U heeft nog geen werkplek*. **Dicht dezelfde dag**:
+  `server/kern/concern/aanname.js` is de brug uit besluit 1. De zaak wijst via
+  haar vestiging de entiteit aan, en een aanname maakt daar een dienstverband
+  met de functie als rol. De haak zit in de claim, dus ook een later geclaimde
+  uitnodiging krijgt hem. De brug loopt een kant op (hij maakt nooit een
+  personeelsplek), raadt geen werkgever als de zaak nergens aan hangt (dan
+  staat de reden in het antwoord, met de weg via `/api/concern/vestiging/zaak`),
+  en breekt geen aanmelding. De proef heeft daarvoor een ondernemer gekregen die
+  Café Brisa aan zijn eigen entiteit koppelt, langs de gewone routes; zonder de
+  brug zakt de schakel (`test/aanname-dienstverband.test.js`, en een mutatie
+  op de proef zelf).
+- **Schakel 17:** de loonrun weigerde, omdat de werkgever uit de proef (Café
+  Brisa) in Spanje staat en er alleen een Nederlands regelpakket ligt. Dat was
+  geen codefout maar een ontbrekende bron. **Rond dezelfde dag**, zonder het land
+  van Brisa te vervalsen: het volwassen lid wordt aangenomen bij de Meridiaan
+  Toren (NL), met een eigen manager en een eigen ondernemer die de zaak aan
+  Meridiaan BV koppelt. Zijn contract heeft een vaste omvang (24 uur), zodat het
+  contract het loon draagt en niet de klok. De loonrun levert nu een strook met
+  basissalaris op. Onderweg bleek de schakel zelf verkeerd te meten: hij zocht de
+  stroken in de SAMENVATTING die `run/open` teruggeeft, en die draagt ze niet,
+  dus hij had nooit kunnen sluiten. Hij leest de run nu zoals het kantoor dat doet
+  (`run/een`). Een Spaans regelpakket met een bron blijft nodig voor een loonrun
+  bij Café Brisa zelf; dat is een bron en geen code.
+
+**De loonkant leest het dienstverband** (dezelfde dag, besluit 1 aan de andere
+kant). De loonadministratie blijft rekenen op het personeelsnummer van de zaak,
+want daar hangen contract en strook. Maar bij het openen van een run toetst
+`dienstverbandToets` in `server/kern/concern/aanname.js` of wie een strook krijgt
+een lopend dienstverband heeft bij de entiteit van die zaak, in die periode. Zo
+niet, dan komt er een bevinding `loon_zonder_dienstverband` met ernst `midden`:
+zichtbaar voor de administrateur, maar niet blokkerend, want de aannames van vóór
+de brug hebben er nog geen. Wat niet te toetsen is (een zaak zonder entiteit,
+personeel zonder eigen account), staat er als `dienstverband_niet_getoetst` en
+valt niet weg. Of die bevinding ooit `hoog` wordt en een definitieve run
+tegenhoudt, is een besluit voor wanneer de oude aannames zijn bijgewerkt.
+
+**De inhaalslag voor de aannames van vóór de brug** (dezelfde dag, gekozen door
+de eigenaar). Wie al in het personeelsregister van een zaak stond, krijgt geen
+dienstverband vanzelf: `dienstverbandInhaal` in `server/kern/concern/aanname.js`,
+achter `/api/concern/vestiging/inhaal`, zet een VOORSTEL klaar (wie een eigen
+account heeft en nog geen lopend dienstverband bij deze entiteit), en legt pas iets
+vast met een `keuze` van de eigenaar. Een dienstverband op iemands naam is een
+verklaring van een werkgever, en die wordt niet in bulk voor hem afgelegd. Wie
+gekozen wordt maar niet in het voorstel staat, wordt overgeslagen met de reden;
+personeel zonder eigen account wordt apart geteld en niet geraden; en een zaak op
+een andere vestiging dan die van de aanvrager geeft hetzelfde antwoord als "bestaat
+niet". Het scherm staat in RTG Concern (`public/apps/concern-inhaal.js`): per zaak
+op een vestiging een knop, een voorstel met vinkjes die vooraf UIT staan, en een
+bevestiging die zonder keuze zegt waarom er niets gebeurt. De route is daarbij in
+tweeen geknipt, TONEN (`/inhaal`, leest) en DOEN (`/inhaal/bevestig`), en dat was
+geen stijlkeuze: als een route leest zonder keuze en schrijft met keuze, gaf de
+idem-poort een tweede voorstelvraag binnen vijf seconden het OUDE antwoord terug,
+met iemand erin die net een dienstverband had gekregen. De browsertoets vond het;
+geen enkele unittoets zag het. De bevinding blijft `midden`: of hij `hoog` wordt, is een besluit voor
+wanneer de inhaalslag bij de bestaande zaken gedaan is.
+
+**De keten van Adam is daarmee rond: 18 van 18 schakels gesloten, 10 van 10
+storingen gehouden** (`ADAMPROEF.json`), van gezin tot loonstrook. Zonder
+basissalaris zakt schakel 17, zonder de uitnodiging schakel 13, zonder de brug
+schakel 16, en zonder de dienstverbandtoets weer schakel 17 -- die heeft een
+besturingsproef: de ondernemer van Meridiaan werd manager voordat hij de zaak
+koppelde, heeft dus geen dienstverband, en hoort gemeld te worden. Schakel 18 haalt
+precies die ondernemer in: eerst een voorstel waar hij in staat en het lid niet,
+dan de keuze, een herhaalde keuze die niets meer vastlegt, en een ander lid dat met
+dezelfde vestiging en zaak in het lichaam 404 krijgt. Alle vijf met een mutatie
+nagetrokken (schakel 18 zakt als de keuze wordt genegeerd, als er zonder keuze
+wordt vastgelegd, en als de eigendomscontrole op de vestiging ontbreekt). Wat de keten met opzet NIET
+loopt: goedkeuren en uitbetalen van de loonrun (twee handtekeningen en een
+betaling, die zet een proef niet), en een loonrun bij een Spaanse zaak.
+
 De rest van par. 6 wacht op deze negen. De solver (106), de what-if-promotie
 (107), het geheugen (126, 127, 129) en de agents met eigen reikwijdte (122, 124)
 wachten bovendien op besluiten die elders al openstaan: de mandaatbesluiten uit

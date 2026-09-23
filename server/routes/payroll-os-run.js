@@ -66,6 +66,20 @@ module.exports = (kern) => {
     /* Meteen nalopen: een run zonder bevindingenlijst nodigt uit om hem over te
        slaan. De contracten gaan mee, zodat "loon zonder contract" echt gemeten
        wordt en niet als vals alarm afgaat (zie kern/payroll/controles.js). */
+    /* HET DIENSTVERBAND (ARBEID.md par. 7a, besluit 1): wie een strook krijgt
+       zonder lopend dienstverband bij de entiteit van deze zaak, komt als
+       bevinding in de run. Alleen wie werkelijk een strook krijgt, en het
+       concern beslist -- de naam wordt pas hier opgehaald, binnen een try, zodat
+       een ontbrekende of weigerende grens de run nooit breekt. */
+    try {
+      const toets = kern.dienstverbandToets({ zaak: s.code, periode,
+        personeel: opzet.regels.map(r => { const st = accounts.getStaffById(r.staffId);
+          return { id: r.staffId, naam: r.naam, memberId: st && st.member_id != null ? st.member_id : null }; }) });
+      for (const b of (toets.bevindingen || [])) opzet.bevindingen.push(b);
+    } catch (e) {
+      opzet.bevindingen.push({ soort: 'dienstverband_niet_getoetst', ernst: 'laag', eigenaar: 'administrateur',
+        uitleg: 'Het dienstverband kon voor deze run niet worden getoetst.' });
+    }
     const vorige = payrollOS.run.lijst(s.code).find(x => x.periode !== periode && x.stand === 'definitief');
     const bev = payrollOS.controles.loop(payrollOS.run.haal(r.run.id), {
       urenBevindingen: opzet.bevindingen, contracten: opzet.contracten,

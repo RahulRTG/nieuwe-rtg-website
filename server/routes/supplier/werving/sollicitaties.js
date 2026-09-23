@@ -1,13 +1,14 @@
 /* Supplier-werving (deelmodule): de sollicitatiestroom: vacature, solliciteren,
    het besluit (met automatische uitnodiging via maakInvite uit de personeels-
-   laag) en de sollicitatiechat. Gemount vanuit routes/supplier/werving.js. */
+   laag); de sollicitatiechat staat in ./sollchat.js. Gemount vanuit
+   routes/supplier/werving.js. */
 const { eigenVeld } = require('../../../kern/util');
 const { datum: klokDatum } = require('../../../lib/klok');
 const { vulVacature } = require('./vacature');
 module.exports = (wctx) => {
   const { kern, maakInvite, neemAan, wervingsBasis, wervingsLink } = wctx;
   const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
-          findSupplier, logActivity, managerOnly, notify, notifyApplicant, notifySupplier, save, schoon,
+          findSupplier, logActivity, managerOnly, notifyApplicant, notifySupplier, save, schoon,
           sseToOffice, sseToSupplier, supplierAuth } = kern;
 const { sollGeremd } = require('./sollrem');
 app.post('/api/supplier/apply', (req, res) => {
@@ -67,6 +68,13 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     // wie via de app solliciteerde is meteen in dienst; wie daarbuiten
     // solliciteerde houdt de kassacode en de wervingslink (zie uitnodiging.js)
     const direct = await neemAan(req.supplier, inv, a.key);
+    /* EEN GEZINSLID HEEFT GEEN LIDSESSIE, dus neemAan() kan hem niet verbinden,
+       en de link moest de werkgever met de hand doorgeven (Adamproef schakel
+       13). Hij staat nu op de sollicitatie zelf: /gezin/sollicitaties toont hem
+       alleen aan het profiel dat solliciteerde, en de werkgever ziet de rij door
+       de positieve lijst van werkgeverSollicitatie(), waar `plek` niet in staat.
+       De kassacode blijft eenmalig: claimen doet Adam met een eigen account. */
+    if (!direct && a.viaRTF) a.plek = { link: wervingsLink(req, inv.kassacode), at: new Date().toISOString() };
     ensureApplyChat(req.supplier.code, a); // ook na aanname: chatten om af te spreken
     save();
     logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func);
@@ -78,7 +86,8 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
       ? { icon: 'ster', titel: 'Aangenomen bij ' + req.supplier.name,
           tekst: 'Welkom bij het team. Uw werkplek staat klaar in de app onder Mijn werkplekken; u hoeft niets meer in te vullen.' }
       : { icon: 'ster', titel: 'Aangenomen bij ' + req.supplier.name,
-          tekst: 'Uw personeelsuitnodiging staat klaar. Vraag uw werkgever om de eenmalige beveiligde uitnodigingslink.' } });
+          tekst: a.plek ? 'Je plek staat klaar: open je sollicitaties in de app, daar staat je persoonlijke uitnodiging.'
+            : 'Uw personeelsuitnodiging staat klaar. Vraag uw werkgever om de eenmalige beveiligde uitnodigingslink.' } });
     /* HET VERVOLGBERICHT LANGS DEZELFDE WEGEN. Hier stond `if (a.key && ...)`,
        en dat is dezelfde stille val als in notifyApplicant: een sollicitant
        zonder LIDsessie -- een gezinslid uit de RTFoundation -- kreeg deze
@@ -100,24 +109,9 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/supplier/apply/chat', supplierAuth, (req, res) => {
-  const chat = eigenVeld(db.data.applyChats, req.body.id);
-  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
-});
-
-app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const chat = eigenVeld(db.data.applyChats, req.body.id);
-  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  const m = chatStuur(chat, 'werkgever', req.supplier.name, req.body.text, talen.taalVan(req.body.lang));
-  if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
-  // seintje aan de sollicitant
-  const app = (db.data.applications[req.supplier.code] || []).find(x => x.id === chat.id);
-  if (app && app.key && db.data.notifications[app.key])
-    notify(app.key, { icon: 'berichten', title: 'Bericht van ' + chat.bedrijf, body: m.tekst.slice(0, 80) });
-  applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
-});
+require('./sollchat')(kern, { chatVan: (id) => eigenVeld(db.data.applyChats, id),
+  sollicitatieVan: (code, id) => (db.data.applications[code] || []).find(x => x.id === id),
+  heeftMeldingen: (key) => !!db.data.notifications[key] });
 
 app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;

@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-09-19",
+  "stempel": "2026-09-23",
   "uitleg": "Wat drie onafhankelijk geschreven ketenproeven werkelijk delen, geteld uit hun registers. De vorm is per definitie gelijk (beide proeven zijn zo geschreven) en zegt dus niets; de actoren en de beloften zeggen wel iets. Zie de kop van scripts/ketenvorm.js.",
   "grens": "Drie ketens is een kleine steekproef, en ze zijn door dezelfde hand geschreven -- gedeelde beloften kunnen dus ook gedeelde gewoonte zijn. Een derde keten van een andere hand zou dat scheiden. De thema-indeling gebruikt een gesloten woordenlijst; wat er niet in past staat in nietIngedeeld en verdwijnt niet.",
   "ketens": [
@@ -34,10 +34,10 @@
       "naam": "adam",
       "domein": "foundation",
       "proef": "scripts/adamproef.js",
-      "schakels": 12,
-      "storingen": 9,
-      "sluit": false,
-      "bevindingen": 1
+      "schakels": 18,
+      "storingen": 10,
+      "sluit": true,
+      "bevindingen": 0
     },
     {
       "naam": "moment",
@@ -89,7 +89,6 @@
     },
     "apart": {
       "schakel": [
-        "antwoord",
         "bekend"
       ],
       "storing": []
@@ -122,6 +121,7 @@
         "Adam",
         "gezin",
         "huis",
+        "kantoor",
         "knelpuntmotor",
         "lid",
         "mens",
@@ -317,6 +317,11 @@
       },
       {
         "keten": "adam",
+        "storing": "de uitnodiging om de plek in te nemen staat bij Adams sollicitatie",
+        "belofte": "alleen Adam ziet hem: niet de ouder, niet de zus, en niet de werkgever in de rij van de sollicitatie"
+      },
+      {
+        "keten": "adam",
         "storing": "de client stuurt een hogere leeftijd mee dan het profiel draagt",
         "belofte": "verandert niets: de leeftijd komt uit het profiel op de server"
       },
@@ -445,6 +450,6 @@
     "themasGedeeld": 2,
     "themasBijna": 3,
     "themasTotaal": 10,
-    "nietIngedeeld": 29
+    "nietIngedeeld": 30
   }
 }

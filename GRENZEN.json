@@ -225,6 +225,7 @@
       "concernReadiness",
       "concernUbo",
       "concernZet",
+      "dienstverbandInhaal",
       "employmentBeeindig",
       "employmentNieuw",
       "employmentOpDatum",
@@ -1516,6 +1517,7 @@
       "payroll"
     ],
     "payroll-os": [
+      "dienstverbandToets",
       "findSupplier",
       "payrollOS",
       "naamAuth",
@@ -2062,6 +2064,7 @@
       "dagen",
       "dagrapport",
       "defensie",
+      "dienstverbandUitAanname",
       "doel",
       "dorpBuurt",
       "dorpDrukte",
@@ -2613,6 +2616,7 @@
       "tafelwensen"
     ],
     "werving": [
+      "dienstverbandUitAanname",
       "loginFails",
       "noteFailedTry",
       "notifySupplier",

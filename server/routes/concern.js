@@ -218,7 +218,8 @@ module.exports = (kern) => {
     res.json(Object.assign({ ok: true }, concernLaunch(e)));
   });
 
-  require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden });
+  const personeelVan = (code) => (accounts && accounts.listStaff ? accounts.listStaff(code) : []);
+  require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden, personeelVan });
   require('./concern/verandering')(kern, { mijn, stuur, nietGevonden });
   require('./concern/voorstel')(kern, { mijn, stuur, nietGevonden });
 };

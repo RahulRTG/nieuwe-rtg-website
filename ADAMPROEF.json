@@ -1,14 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:40:40.563Z",
-    "commit": "b9ef5d31",
+    "op": "2026-09-23T15:45:09.802Z",
+    "commit": "abdea56ab",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/adamproef.js",
     "node": "v22.22.2"
   },
   "uitleg": "Een keten rond een jongere van 17 zonder RTG-account: van een doel naar een mogelijkheid die hij zelf ziet. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Vierde keten naast tafel-, rit- en toelatingsproef; met opzet geen gedeelde module -- zie MAATSTAF.md par. 7 en scripts/ketenvorm.js.",
-  "grens": "Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen). De andere terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt kind; deze proef zegt niets over of de mens dit ook zo beleeft.",
+  "grens": "Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen -> team -> contract -> dienstverband -> loonrun). Vanaf schakel 14 loopt een volwassen lid door waar Adam niet verder kan; goedkeuren en uitbetalen van de loonrun zijn met opzet niet gelopen. De andere terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt kind; deze proef zegt niets over of de mens dit ook zo beleeft.",
   "schakels": [
     {
       "nr": 1,
@@ -18,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Zilveren Uil 1543",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Gouden Wolf FB63",
       "fout": null,
       "ms": 0
     },
@@ -32,7 +32,7 @@
       "status": 200,
       "ziet": "de motor antwoordt het gezin: 1 wegen beoordeeld",
       "fout": null,
-      "ms": 6
+      "ms": 10
     },
     {
       "nr": 3,
@@ -44,18 +44,19 @@
       "status": 200,
       "ziet": "3 wegen, volgorde ongewijzigd: true, geblokkeerde weg blijft staan met \"heb ik een startkwalificatie\"",
       "fout": null,
-      "ms": 7
+      "ms": 8
     },
     {
       "nr": 4,
       "van": "mens",
       "naar": "knelpuntmotor",
-      "wat": "noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan",
-      "bekend": "WAT ONTBREEKT: een bron die uit een DOEL de MANIEREN samenstelt. DEZE REDEN IS SINDS 13 SEPTEMBER 2026 SMALLER GEWORDEN EN NIET WEGGEVALLEN, en dat verschil is de moeite waard. Er is nu wel aanvoer (kern/knelpunt/aanvoer*.js, twee bronnen), maar die levert VONDSTEN bij een RANDVOORWAARDE -- wat zou dit knelpunt kunnen opheffen -- en geen WEGEN bij een kaal doel. Wie \"ik wil weer aan het werk\" intikt, heeft nog steeds zelf de manieren te bedenken; pas daarna vindt het huis er iets bij. WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. WIE EROVER GAAT: de eigenaar. De stap die nog ontbreekt is klein en eerlijk te benoemen: van een doel naar een handvol manieren, zonder ze te rangschikken.",
-      "stand": "openBekend",
-      "status": 400,
-      "antwoord": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
-      "ms": 4
+      "wat": "noemt alleen een doel; dit huis stelt de mogelijke wegen samen uit zijn eigen bronnen",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "de motor gaf 3 wegen bij een kaal doel (via-werk, via-opleiding, via-opvang), samengesteld door het huis: true, geen ervan heet \"open\": true",
+      "fout": null,
+      "ms": 5
     },
     {
       "nr": 5,
@@ -65,9 +66,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature d385839a, minimumleeftijd 16",
+      "ziet": "vacature 7b850a97, minimumleeftijd 16",
       "fout": null,
-      "ms": 6
+      "ms": 7
     },
     {
       "nr": 6,
@@ -91,7 +92,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 8
+      "ms": 9
     },
     {
       "nr": 8,
@@ -101,9 +102,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie 0e24afc8, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie a3e90a5f, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
-      "ms": 9
+      "ms": 14
     },
     {
       "nr": 9,
@@ -115,7 +116,7 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 20
+      "ms": 22
     },
     {
       "nr": 10,
@@ -125,9 +126,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Uw personeelsuitnodiging staat ...\" van RTG, ongelezen: true",
+      "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Je plek staat klaar: open je so...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 23
+      "ms": 20
     },
     {
       "nr": 11,
@@ -139,7 +140,7 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 1
+      "ms": 2
     },
     {
       "nr": 12,
@@ -149,12 +150,90 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "opleiding + werk; 25 vondsten in 1 vorm; werk 1/1, opleiding 24/20000",
+      "ziet": "opleiding + opvang + werk; 26 vondsten in 1 vorm; werk 1/1, opleiding 24/20000, opvang 1/1",
       "fout": null,
-      "ms": 7
+      "ms": 9
+    },
+    {
+      "nr": 13,
+      "van": "Adam",
+      "naar": "werkgever",
+      "wat": "neemt met een eigen account zijn plek in het team in, zonder dat de werkgever iets doorgeeft",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "in het team (id 185), dienstverband bij Brisa SL als Keukenhulp",
+      "fout": null,
+      "ms": 242
+    },
+    {
+      "nr": 14,
+      "van": "werkgever",
+      "naar": "lid",
+      "wat": "neemt een volwassen lid aan; dat staat meteen in het team",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "direct in dienst, personeelsnummer 187",
+      "fout": null,
+      "ms": 127
+    },
+    {
+      "nr": 15,
+      "van": "werkgever",
+      "naar": "huis",
+      "wat": "legt het arbeidscontract vast",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "1 contractversie(s), vanaf 2026-09-01",
+      "fout": null,
+      "ms": 15
+    },
+    {
+      "nr": 16,
+      "van": "huis",
+      "naar": "lid",
+      "wat": "maakt van de aanname een dienstverband bij de entiteit (employment)",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "1 werkplek(ken): Meridiaan BV als Receptie",
+      "fout": null,
+      "ms": 4
+    },
+    {
+      "nr": 17,
+      "van": "kantoor",
+      "naar": "lid",
+      "wat": "opent de loonrun; het contract levert een loonregel op, en de run leest het dienstverband",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "loonstrook voor personeelsnummer 187 in run run_f152df3c07, basissalaris 1508.00 euro; dienstverband getoetst en gevonden; de ondernemer zonder dienstverband is gemeld",
+      "fout": null,
+      "ms": 19
+    },
+    {
+      "nr": 18,
+      "van": "werkgever",
+      "naar": "huis",
+      "wat": "haalt de aannames van voor de brug in: eerst een voorstel, dan zijn eigen keuze",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "voorstel met 1 mens(en), de ondernemer erin; een vreemde kreeg 404; 1 dienstverband(en) voor de keuze, 2 erna, ook na een herhaalde keuze (door de idem-poort als herhaling herkend)",
+      "fout": null,
+      "ms": 25
     }
   ],
   "storingen": [
+    {
+      "naam": "de uitnodiging om de plek in te nemen staat bij Adams sollicitatie",
+      "belofte": "alleen Adam ziet hem: niet de ouder, niet de zus, en niet de werkgever in de rij van de sollicitatie",
+      "stand": "gehouden",
+      "wat": "bij Adam 1, bij de ouder 0, bij de zus 0, bij de werkgever 0"
+    },
     {
       "naam": "een gezinslid van vijftien solliciteert",
       "belofte": "wordt geweigerd met de leeftijd erbij en met wat er voor hem WEL is",
@@ -214,28 +293,21 @@
     "gezin": "via /api/foundation/gezin/maak",
     "adam": "profiel, 17 jaar, rol kind",
     "zus": "profiel, 15 jaar -- voor storing 1",
-    "werkgever": "BRISA"
+    "werkgever": "BRISA",
+    "ondernemer": "een lid, manager van BRISA, koppelt de zaak aan Brisa SL via /api/concern/vestiging/zaak",
+    "nederland": "een volwassen lid bij MERIDIAAN (NL), met een ondernemer die de zaak aan Meridiaan BV koppelt"
   },
   "telling": {
-    "schakels": 12,
-    "gesloten": 11,
+    "schakels": 18,
+    "gesloten": 18,
     "open": 0,
-    "openBekend": 1,
+    "openBekend": 0,
     "stuk": 0,
-    "storingen": 9,
-    "gehouden": 9,
+    "storingen": 10,
+    "gehouden": 10,
     "gebroken": 0
   },
-  "sluit": false,
+  "sluit": true,
   "sluitMetBevinding": true,
-  "bevindingen": [
-    {
-      "schakel": 4,
-      "van": "mens",
-      "naar": "knelpuntmotor",
-      "wat": "noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan",
-      "gemeten": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
-      "reden": "WAT ONTBREEKT: een bron die uit een DOEL de MANIEREN samenstelt. DEZE REDEN IS SINDS 13 SEPTEMBER 2026 SMALLER GEWORDEN EN NIET WEGGEVALLEN, en dat verschil is de moeite waard. Er is nu wel aanvoer (kern/knelpunt/aanvoer*.js, twee bronnen), maar die levert VONDSTEN bij een RANDVOORWAARDE -- wat zou dit knelpunt kunnen opheffen -- en geen WEGEN bij een kaal doel. Wie \"ik wil weer aan het werk\" intikt, heeft nog steeds zelf de manieren te bedenken; pas daarna vindt het huis er iets bij. WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. WIE EROVER GAAT: de eigenaar. De stap die nog ontbreekt is klein en eerlijk te benoemen: van een doel naar een handvol manieren, zonder ze te rangschikken."
-    }
-  ]
+  "bevindingen": []
 }

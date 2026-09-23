@@ -28,8 +28,9 @@
 
 const { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN } = require('./regels');
 const { maakFeiten } = require('./feiten');
+const { werkwoordVan, kamerVan } = require('./werkwoorden');
 
-const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop'];
+const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'];
 const MAX_SLEUTELS = 2400;   // ~600 kantoorroutes maal hoogstens vier deuren
 const VOORBEELDEN = 20;
 const DAG = 86400000;
@@ -77,6 +78,11 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
         if (door && feiten && feiten.eigenaarMens === true && STAPOP_DEUREN.includes(deur)) {
           spoeler.tikVeld('stapop ' + deur + ' ' + patroon(req), 'eigenaarZonderStapop');
         }
+        /* FASE 4 in de schaduw: welk werkwoord van de boardroom, en welke kamer,
+           werd gebruikt. Zonder wie; de sleutels zijn begrensd (./werkwoorden.js). */
+        if (door && deur === 'boardroom') spoeler.tikVeld('werkwoord ' + (werkwoordVan(req.routePatroon) || '(geen)'), 'gebruik');
+        const kamer = door && deur === 'kantoor' ? kamerVan(patroon(req), req.body) : null;
+        if (kamer) spoeler.tikVeld('kamer ' + kamer, 'gebruik');
       });
       return poort(req, res, function () { door = true; return next.apply(this, arguments); });
     };

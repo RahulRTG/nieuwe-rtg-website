@@ -7,6 +7,7 @@
 
 const { DEUREN, FEITEN, STAPOP_DEUREN } = require('./regels');
 const { RIJP } = require('../commercie/schaduw');
+const { WERKWOORDEN, KAMERSOORT } = require('./werkwoorden');
 
 /* Drie bakken en geen percentage, en de rijpheid per deur apart: een deur die
    rijp is en nul keer oneens, kan verhuizen; de rest niet. */
@@ -14,7 +15,9 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
   const perDeur = {};
   const zonderPoort = [];
   const stapop = [];
+  const gebruik = {};
   for (const r of Object.values(beeld)) {
+    if (r.pad.startsWith('werkwoord ') || r.pad.startsWith('kamer ')) { gebruik[r.pad] = r.gebruik || 0; continue; }
     if (r.pad.startsWith('stapop ')) {
       const [, deur, ...rest] = r.pad.split(' ');
       stapop.push({ deur, route: rest.join(' '), keer: r.eigenaarZonderStapop || 0 });
@@ -56,6 +59,14 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
        reden -- ook van hem. */
     eigenaarZonderStapop: stapop.sort((a, b) => b.keer - a.keer).slice(0, 100),
     stapopDeuren: STAPOP_DEUREN,
-    verklaardOpen
+    verklaardOpen,
+    /* FASE 4 in de schaduw: de boardroom als werkruimte met werkwoorden, en de
+       kamers met hun soort. Alleen hoe vaak; wie welk werkwoord krijgt is een
+       besluit van de eigenaar, en daar bestaat nog geen zetel voor. */
+    werkwoorden: Object.keys(WERKWOORDEN).map(w => ({ werkwoord: w, trede: WERKWOORDEN[w].trede,
+      uitleg: WERKWOORDEN[w].uitleg, gebruik: gebruik['werkwoord ' + w] || 0 })),
+    zonderWerkwoord: gebruik['werkwoord (geen)'] || 0,
+    kamers: Object.keys(KAMERSOORT).map(k => ({ kamer: k, soort: KAMERSOORT[k],
+      kanBevoegdheidDragen: KAMERSOORT[k] === 'bestuurlijk', gebruik: gebruik['kamer ' + k] || 0 }))
   };
 };

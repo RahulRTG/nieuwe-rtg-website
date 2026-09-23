@@ -332,7 +332,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 1 | **de beleidsmotor in de schaduw**: `kan(...)` leest de bestaande poorten en geeft een besluit met opbouw; draait naast elke kantoorroute en telt waar hij het oneens is (de vorm van `tegenfeit.js`) | **staat, in de schaduw** (23 september 2026; zie par. 5a) |
 | 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | fase 1, besluit A2 |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
-| 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | fase 2 |
+| 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
 | 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | fase 4 |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | fase 4 |
 | 7 | **identiteiten voor agents, diensten en apparaten** | **agent staat** (23 september 2026; par. 5c); diensten en apparaten niet |
@@ -444,6 +444,48 @@ slecht: er stond een klik van het lid, en niemand zag dat een machine het deed.
 doel en gegevensbeleid. Vandaag is het de bevoegdheid van de mens, versmald door
 `kern/stuur/beleid.js`; het mandaat (`kern/stuur/mandaat.js`) heeft nog geen
 aanroeper. Diensten en apparaten krijgen nog geen eigen identiteit.
+
+### 5d. Fase 4 in de schaduw: de boardroom in werkwoorden, de kamers met hun soort
+
+De meting vooraf: `boardroomAuth` staat op 115 routes, en die ene vlag zet
+instellingen, geld, kosten, toegang, partners, export, techniek, De Salon en
+Magnaat in een keer open. De 26 kamers hebben geen eigen deur. Ze hangen allemaal
+achter `officeAuth`, en er bestaat nergens een toewijzing van mensen aan kamers.
+De kamer staat in het lichaam van het verzoek (`id` of `kamer`) en niet in het pad.
+
+- **De gegevens.** `kern/beleidsmotor/werkwoorden.js` deelt de boardroom op in tien
+  werkwoorden (toegang, kosten, geld, export, partners, magnaat, techniek,
+  toezicht, salon en instellingen). Elk werkwoord heeft een verklaarde trede van
+  de gezagsnoemer; alleen `toezicht` staat op `tonen`. Het bestand legt ook per
+  kamer de soort vast, uit KANTOORMACHT.md par. 3: 18 bestuurlijk, 1 sociaal en
+  7 product. Alleen een bestuurlijke kamer kan een bevoegdheid dragen. Er komt
+  geen zesde vocabulaire bij (besluit A1): dit zijn de onderwerpen waaronder de
+  motor telt, geen nieuwe rollen.
+- **De telling.** Achter de boardroom telt de motor per werkwoord hoe vaak het
+  gebruikt werd, en achter de kantoordeur per kamer. Er wordt niet vastgelegd wie
+  het deed. Een kamer-id die niet in het register staat telt niet mee, zodat
+  invoer van buiten de opslag niet kan laten groeien. De stand
+  (`/api/office/beleidsmotor`) toont `werkwoorden`, `kamers` en `zonderWerkwoord`.
+- **Getoetst** in `test/beleidsmotor-werkwoorden.test.js`:
+  - elke boardroomroute valt onder precies één werkwoord, en elk werkwoord raakt
+    minstens één route;
+  - de kamersoorten zijn gelijk aan het levende register;
+  - elke kamerroute bestaat;
+  - tegen een echte server wordt het gebruik geteld, en een geweigerde of
+    verzonnen aanroep telt niet.
+
+  Vier mutaties laten de toets zakken: tellen zonder door de poort te zijn
+  gegaan, een verzonnen kamer toelaten, een werkwoord zonder route, en de
+  kantine bestuurlijk maken.
+
+**Wat nog niet staat, en waarom.** Er is nog geen zetel per werkwoord en geen
+toewijzing aan een kamer, en er wordt niets tegengehouden. Wie welk werkwoord
+krijgt is een besluit van de eigenaar, en dat hoort op een getal te staan: deze
+telling levert dat getal. Afdwingen wacht op fase 2, omdat een werkwoord niet toe
+te wijzen is aan de gedeelde code, die geen mens draagt. De uitrol gaat daarna per
+kamer en per werkwoord, niet op een percentage (KANTOORMACHT.md). De vier kamers
+die het machtsmodel mist (veiligheid, operaties, bestuur en risico) staan er ook
+nog niet.
 
 ---
 

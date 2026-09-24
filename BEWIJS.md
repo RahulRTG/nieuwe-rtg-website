@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2020 bestanden en 14327 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2021 bestanden en 14331 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2020 |
-| losse beweringen (`test(...)`) | 14327 |
+| toetsbestanden | 2021 |
+| losse beweringen (`test(...)`) | 14331 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1369 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
-| niets van beide | 407 |
+| niets van beide | 408 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1767 bestanden, 13874 beweringen.
+1768 bestanden, 13878 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -845,6 +845,7 @@ toets omvalt.
 | `magnaat-economenlab.test.js` | 6 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-economie.test.js` | 11 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-economische-motor.test.js` | 9 | gezakt op `===->!==#0` | De economische motor van Magnaat, losgemaakt uit het Oefenkantoor (ronde A1, MAGNAAT.md par. 7). |
+| `magnaat-grootboek.test.js` | 4 | -- | Het Magnaat-grootboek (ronde A2.0, MAGNAAT.md): de boekhoudautoriteit als eigen laag onder de economische motor. Wat hier vastligt, en wat test/magnaat-economische-motor.test.js niet al doet: 1. |
 | `magnaat-hospitality.test.js` | 10 | gezakt op `&&->||#0` | Magnaat Hospitality Universe: speelbaarheid, foutpaden, replay en de harde grens tussen simulatieresultaat en een levende onderneming. |
 | `magnaat-leerkring.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-motorklant.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -2,10 +2,10 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-24",
   "gemeten": {
-    "bestanden": 2378,
-    "domeinenTotaal": 634,
+    "bestanden": 2381,
+    "domeinenTotaal": 635,
     "koopbareVormen": 557,
-    "koopbareDomeinen": 118,
+    "koopbareDomeinen": 119,
     "envelopDrempel": 8,
     "envelop": 40,
     "veldenDomeineigen": 746,
@@ -13,7 +13,7 @@
     "gelijkendeVormparen": 18,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 45,
+    "werkwoordCombinaties": 46,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -67,11 +67,11 @@
     "wat"
   ],
   "perWerkwoord": {
-    "toon": 90,
-    "prijs": 37,
+    "toon": 91,
+    "prijs": 38,
     "beschikbaarheid": 52,
     "reserveer": 27,
-    "bevestig": 55,
+    "bevestig": 56,
     "lever": 20,
     "annuleer": 30,
     "retour": 8
@@ -819,7 +819,7 @@
         "toon": "overzicht",
         "prijs": "berekenMarkt",
         "beschikbaarheid": "koopVoorraad",
-        "bevestig": "bevestig"
+        "bevestig": "boekBedrijfsdag"
       },
       "telt": 4
     },
@@ -1131,6 +1131,25 @@
         "toon": "lijst",
         "beschikbaarheid": "verlopen",
         "annuleer": "annuleer"
+      },
+      "telt": 3
+    },
+    {
+      "domein": "kern/magnaat-grootboek",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "zoek",
+        "prijs": "som",
+        "bevestig": "bevestig"
       },
       "telt": 3
     },

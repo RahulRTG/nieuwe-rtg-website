@@ -32,6 +32,9 @@ const H = require('../server/kern/spellen/magnaat/handel');
 const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
 const { MARKTPRIJS } = H;
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
+/* World rekent sinds ronde A2.1 in eurocenten (../server/kern/spellen/magnaat/centen.js);
+   deze toetsen spreken in euro's en zetten om waar ze een saldo zelf aanraken. */
+const { naarCenten, uitCenten: E } = require('../server/kern/spellen/magnaat/centen');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
   save() {}, crypto: require('crypto'), codenaamVan: (h) => 'CN-' + h, nudge() {}
@@ -48,7 +51,7 @@ function opstelling(opties = {}) {
     status: 'bezig', beurt: 0, winnaar: null, variant: ECO };
   m.spel.init(p);
   const st = p.staat;
-  st.geld.anna = st.geld.boris = 5000000;
+  st.geld.anna = st.geld.boris = naarCenten(5000000);
   m.eco.zet(p, 'anna', { actie: 'open', kavel: kavelIn('terrein').id, sector: 'logistiek',
     omvang: opties.vloot || 12, naam: 'Atlas' });
   m.eco.zet(p, 'boris', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca',
@@ -127,7 +130,7 @@ test('een goedkoop contract maakt de afnemer beter af, een duur contract slechte
       looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
     const voor = st.geld.boris;
     maand(m, p, 1);
-    return st.geld.boris - voor;
+    return E(st.geld.boris - voor);
   };
   // de twee uiteinden van de prijsband (./handel.js); daarbuiten is het geen prijs
   const goedkoop = meting(H.PRIJSBAND[0]), duur = meting(H.PRIJSBAND[1]);
@@ -264,7 +267,7 @@ test('elke euro die de ene speler verlaat komt bij de andere aan', () => {
     if (metContract) sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
       eenheden: 400, bedrag: 18000, looptijd: 12, eis: 0, boete: 3000, vooraf: 50000, exclusief: false });
     maand(m, p, 3);
-    return { anna: st.geld.anna, boris: st.geld.boris, st };
+    return { anna: E(st.geld.anna), boris: E(st.geld.boris), st };
   };
   const met = meting(true), zonder = meting(false);
   /* De SOM van beide spelers mag wel verschillen -- een contract verandert de
@@ -272,7 +275,7 @@ test('elke euro die de ene speler verlaat komt bij de andere aan', () => {
      te zijn. Dus: wat de afnemer aan het contract kwijt was, is precies wat de
      leverancier eraan verdiende. */
   const c = met.st.contracten[0];
-  const overdracht = c.betaald - c.boetes + c.vooraf;
+  const overdracht = E(c.betaald - c.boetes) + c.vooraf;
   const annaExtra = met.anna - zonder.anna;
   const borisExtra = met.boris - zonder.boris;
   assert.ok(overdracht > 0, 'er is werkelijk geld gelopen: ' + overdracht);
@@ -326,10 +329,10 @@ test('een boete gaat naar de wederpartij en niet naar de bank', () => {
       looptijd: 12, eis: 0, boete, vooraf: 0, exclusief: false });
     const voorA = st.geld.anna, voorB = st.geld.boris;
     maand(m, p, 1);
-    return { anna: st.geld.anna - voorA, boris: st.geld.boris - voorB, c: st.contracten[0] };
+    return { anna: E(st.geld.anna - voorA), boris: E(st.geld.boris - voorB), c: st.contracten[0] };
   };
   const zonder = meting(0), met = meting(25000);
-  assert.equal(met.c.boetes, 25000, 'de boete valt: honderdduizend eenheden haalt niemand');
+  assert.equal(E(met.c.boetes), 25000, 'de boete valt: honderdduizend eenheden haalt niemand');
   assert.equal(zonder.c.boetes, 0);
   assert.equal(Math.round(zonder.anna - met.anna), 25000, 'de leverancier betaalt hem');
   assert.equal(Math.round(met.boris - zonder.boris), 25000, 'en de afnemer krijgt hem, tot op de euro');
@@ -356,7 +359,7 @@ test('een derde speler ziet de contracten van twee anderen niet', () => {
     modus: 'vrij', status: 'bezig', beurt: 0, winnaar: null, variant: ECO };
   m.spel.init(p);
   const st = p.staat;
-  for (const h of p.spelers) st.geld[h] = 5000000;
+  for (const h of p.spelers) st.geld[h] = naarCenten(5000000);
   m.eco.zet(p, 'anna', { actie: 'open', kavel: kavelIn('terrein').id, sector: 'logistiek', omvang: 12, naam: 'Atlas' });
   m.eco.zet(p, 'boris', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 60, naam: 'Zeezicht' });
   m.eco.zet(p, 'cato', { actie: 'open', kavel: kavelIn('centrum').id, sector: 'retail', omvang: 40, naam: 'Derde' });
@@ -430,7 +433,7 @@ test('exclusiviteit bindt de leverancier, en alleen in de zone waar hij verkocht
     modus: 'vrij', status: 'bezig', beurt: 0, winnaar: null, variant: ECO };
   m.spel.init(p);
   const st = p.staat;
-  for (const h of p.spelers) st.geld[h] = 9000000;
+  for (const h of p.spelers) st.geld[h] = naarCenten(9000000);
   m.eco.zet(p, 'anna', { actie: 'open', kavel: kavelIn('terrein').id, sector: 'logistiek', omvang: 40, naam: 'Atlas' });
   m.eco.zet(p, 'boris', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 60, naam: 'Zeezicht' });
   // cato: een restaurant NAAST boris (zelfde zone), en een tweede in het centrum
@@ -443,8 +446,8 @@ test('exclusiviteit bindt de leverancier, en alleen in de zone waar hij verkocht
     eenheden: 100, bedrag: 8000, looptijd: 12, eis: 0, boete: 1, vooraf: 200000, exclusief: true });
   // de vooruitbetaling gaat bij het TEKENEN over, niet bij de eerste levering:
   // dat is precies wat een speler ervoor terugkrijgt
-  assert.equal(Math.round(st.geld.anna - voorA), 200000, 'de leverancier heeft de vooruitbetaling gekregen');
-  assert.equal(Math.round(st.geld.boris - voorB), -200000, 'en de afnemer heeft hem betaald');
+  assert.equal(Math.round(E(st.geld.anna - voorA)), 200000, 'de leverancier heeft de vooruitbetaling gekregen');
+  assert.equal(Math.round(E(st.geld.boris - voorB)), -200000, 'en de afnemer heeft hem betaald');
   const buur = m.eco.zet(p, 'cato', { actie: 'contract-voorstel', mijn: st.vestigingen.cato[0].id, hun: A.id,
     soort: 'vervoer', eenheden: 100, bedrag: 9000, looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
   assert.equal(buur.status, 409, 'de buurman in dezelfde zone stuit op de exclusiviteit');
@@ -462,8 +465,8 @@ test('afkopen kost, en het geld gaat naar de wederpartij', () => {
   const r = m.eco.zet(p, 'boris', { actie: 'contract-opzeggen', id: c.id });
   assert.ok(r.ok);
   assert.equal(r.afkoop, 4000 * H.AFKOOP_MAANDEN, 'drie maanden boete');
-  assert.equal(Math.round(st.geld.boris - voorB), -r.afkoop);
-  assert.equal(Math.round(st.geld.anna - voorA), r.afkoop);
+  assert.equal(Math.round(E(st.geld.boris - voorB)), -r.afkoop);
+  assert.equal(Math.round(E(st.geld.anna - voorA)), r.afkoop);
   assert.equal(c.status, 'afgekocht');
   maand(m, p, 1);
   assert.equal((st.laatste.anna.contracten || []).length, 0, 'een afgekocht contract levert niets meer');
@@ -479,7 +482,7 @@ test('een vestiging sluiten is geen achterdeur uit een contract', () => {
   assert.ok(dicht.ok);
   assert.equal(dicht.afgekocht, 1);
   assert.equal(dicht.afkoop, 8000 * H.AFKOOP_MAANDEN);
-  assert.equal(Math.round(st.geld.boris - voorB), dicht.afkoop, 'de wederpartij krijgt de afkoopsom');
+  assert.equal(Math.round(E(st.geld.boris - voorB)), dicht.afkoop, 'de wederpartij krijgt de afkoopsom');
   assert.equal(c.status, 'afgekocht');
   // en er blijft geen verplichting achter die aan een verdwenen zaak hangt
   maand(m, p, 2);
@@ -612,7 +615,7 @@ test('geen enkel scenario van de geldpomp-keuring maakt waarde uit het niets', (
   for (let i = 0; i < 30; i++) { w.st.gerekendTot -= w.st.maandMs; w.m.eco.bijrekenen(w.potje); }
   assert.ok(w.st.foundation.gedaan.length > 0, 'de Foundation heeft werkelijk gebouwd');
   const gemeten = totaal(w);
-  const zonderUitgaven = gemeten.vermogen + w.st.foundation.lokaal + w.st.foundation.centraal;
+  const zonderUitgaven = gemeten.vermogen + E(w.st.foundation.lokaal + w.st.foundation.centraal);
   assert.ok(gemeten.samen > zonderUitgaven,
     'wat de Foundation heeft uitgegeven hoort in het totaal te blijven staan');
 });

@@ -7,13 +7,18 @@
    niet kijkt, komt terug in een andere situatie dan hij achterliet, en dat mag
    nergens anders vandaan komen dan hier.
 
+   ALLES HIER IS IN EUROCENTEN (./centen.js): rente en aflossing komen al als
+   centen uit ./bank.js, het onderpand levert centen op, en wat er naar het
+   maandoverzicht gaat wordt pas daar weer euro's.
+
    RENTE VERLAAT DE WERELD. Dit is de enige post in het spel waar geld niet bij
    een andere speler landt maar echt weg is; scripts/magnaat-pomp.js kent daar
    een eigen categorie voor, anders keurt die meter financiering af omdat hij
    werkt. */
 const B = require('./bank');
 
-const rond = (n) => Math.round(n);
+const { euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ mijne, cijfers, liquideer }) => {
   /* ---------- de maand ----------
@@ -31,7 +36,7 @@ module.exports = ({ mijne, cijfers, liquideer }) => {
     const c = cijfers(st, h);
     for (const l of mijne(st, h)) {
       const r = B.maandVoor(l, c);
-      st.geld[h] -= r.rente;
+      beweeg(st, { soort: 'RENTE', van: ['kas', h], naar: ['macro', 'bank'], bedrag: r.rente, omschrijving: 'Rente lening' });
       l.betaaldRente += r.rente;
       rente += r.rente;
       let afgelost = 0;
@@ -40,7 +45,7 @@ module.exports = ({ mijne, cijfers, liquideer }) => {
            rekening-courant. Dat is geen coulance maar de eerlijke volgorde: de
            schuld verschuift naar de duurste vorm en dat voel je meteen. */
         afgelost = Math.min(r.aflossing, l.restant);
-        st.geld[h] -= afgelost;
+        beweeg(st, { soort: 'AFLOSSING', van: ['kas', h], naar: ['macro', 'bank'], bedrag: afgelost, omschrijving: 'Termijn lening' });
         l.restant -= afgelost;
         l.betaaldAflossing += afgelost;
         if (st.geld[h] < 0) {
@@ -64,7 +69,7 @@ module.exports = ({ mijne, cijfers, liquideer }) => {
       if (na === 'opeisbaar') {
         opgeeist = true;
         const uitKas = Math.min(l.restant, Math.max(0, st.geld[h]));
-        st.geld[h] -= uitKas;
+        beweeg(st, { soort: 'AFLOSSING', van: ['kas', h], naar: ['macro', 'bank'], bedrag: uitKas, omschrijving: 'Aflossing na opeising' });
         l.restant -= uitKas;
         l.betaaldAflossing += uitKas;
         if (l.restant < 1) { l.restant = 0; l.status = 'afgelost'; }
@@ -81,10 +86,11 @@ module.exports = ({ mijne, cijfers, liquideer }) => {
           const naarSchuld = Math.min(l.restant, Math.max(0, opbrengst));
           l.restant -= naarSchuld;
           l.betaaldAflossing += naarSchuld;
-          st.geld[h] += opbrengst - naarSchuld;
+          beweeg(st, { soort: 'DESINVESTERING', van: ['macro', 'aannemer'], naar: ['kas', h], bedrag: opbrengst, omschrijving: 'Uitwinning onderpand' });
+          beweeg(st, { soort: 'AFLOSSING', van: ['kas', h], naar: ['macro', 'bank'], bedrag: naarSchuld, omschrijving: 'Aflossing uit uitwinning' });
           l.status = 'uitgewonnen';
           l.uitgewonnen = l.onderpand;
-          l.opbrengst = rond(opbrengst);
+          l.opbrengst = opbrengst;
           // blijft er schuld over, dan blijft die staan tegen de hoogste opslag
           if (l.restant >= 1) {
             l.status = 'loopt'; l.onderpand = null; l.opgeeist = true;
@@ -103,8 +109,8 @@ module.exports = ({ mijne, cijfers, liquideer }) => {
       }
       if (r.rente > 0 || afgelost > 0 || na)
         regels.push({ id: l.id, naam: B.VORMEN[l.soort].naam,
-          rente: rond(r.rente), aflossing: rond(afgelost), restant: rond(l.restant),
-          resultaat: -rond(r.rente + afgelost),
+          rente: euroTonen(r.rente), aflossing: euroTonen(afgelost), restant: euroTonen(l.restant),
+          resultaat: -euroTonen(r.rente + afgelost),
           breuken: r.breuken, trap: na, nieuweTrap: na && na !== voor ? na : null,
           opgeeist: opgeeist || undefined, uitgewonnen: l.uitgewonnen });
     }

@@ -1,0 +1,689 @@
+{
+  "stempel": {
+    "op": "2026-09-24T14:06:06.947Z",
+    "commit": "1b35d141c",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/magnaatgrondwet.js",
+    "node": "v22.22.2"
+  },
+  "graad": "vermoed",
+  "waarom": "handhavers en toetsen worden LEXICAAL gevonden: dat een citaat in de code staat en een toets zo heet, bewijst niet dat de toets groen is of dat de handhaver op elk pad zit. Of de genoemde toetsen slagen, beslist npm test; de schendingen zijn een telling van een patroon en dus een ONDERgrens.",
+  "grens": "dit meet wat de verklaring in scripts/lib/magnaatgrondwet.js noemt. Een regel die daar niet staat, bestaat voor deze meter niet; een schending waar geen patroon voor is geschreven, wordt niet geteld.",
+  "regels": 21,
+  "telling": {
+    "VIOLATION": 2,
+    "ABSENT": 6,
+    "PARTIAL": 6,
+    "PASS": 7
+  },
+  "vier": {
+    "gedocumenteerd": 21,
+    "geimplementeerd": 15,
+    "afgedwongen": 10,
+    "getoetst": 9
+  },
+  "schendingen": 6,
+  "perRegel": [
+    {
+      "id": "M-001",
+      "familie": "M-0",
+      "invariant": "Geld heeft altijd herkomst: elke verandering van een saldo is terug te voeren op een geboekte gebeurtenis.",
+      "stand": "VIOLATION",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 3,
+      "scopes": {
+        "world": {
+          "autoriteit": "het grootboek; st.geld is sinds A2.10 de projectie van de kas",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": {
+            "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
+            "aantal": 0,
+            "plekken": []
+          },
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/, het journaal",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "motor": {
+          "autoriteit": "het grootboek; de motor boekt alleen via zijn functies",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "academy": {
+          "autoriteit": "server/kern/magnaatwereld.js (spelerbudget)",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": {
+            "wat": "spelgeld dat als beloning wordt bijgeschreven buiten het grootboek van de motor om",
+            "aantal": 3,
+            "plekken": [
+              "server/kern/magnaatwereld.js:572",
+              "server/kern/magnaatwereld.js:700",
+              "server/kern/magnaatwereld.js:974"
+            ]
+          },
+          "deels": null,
+          "missers": [],
+          "stand": "VIOLATION"
+        }
+      }
+    },
+    {
+      "id": "M-002",
+      "familie": "M-2",
+      "invariant": "Tijd kan niet dubbel worden besteed: een uur van een actor is op hetzelfde wereldmoment hooguit een keer ingezet.",
+      "stand": "ABSENT",
+      "gedocumenteerd": true,
+      "geimplementeerd": false,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "geen: er is geen urenmodel",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        },
+        "motor": {
+          "autoriteit": "geen: er is geen urenmodel",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        }
+      }
+    },
+    {
+      "id": "M-003",
+      "familie": "M-3",
+      "invariant": "Geen actor bezit informatie die hij niet heeft verkregen: een beslissing gebruikt alleen wat die actor kan weten.",
+      "stand": "PARTIAL",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "server/kern/spellen/magnaat/weergave.js",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": "geldt voor wat SPELERS te zien krijgen; er zijn nog geen NPC-bedrijven, dus voor beslissende niet-spelers bestaat er geen informatiemodel",
+          "missers": [],
+          "stand": "PARTIAL"
+        }
+      }
+    },
+    {
+      "id": "M-004",
+      "familie": "M-0",
+      "invariant": "Voorraad kan niet negatief worden.",
+      "stand": "PASS",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/markt.js, de marktstap",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        }
+      }
+    },
+    {
+      "id": "M-005",
+      "familie": "M-0",
+      "invariant": "Een transactie heeft minimaal twee economische zijden, en debet is gelijk aan credit.",
+      "stand": "PASS",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "het grootboek: elke beweging is een overdracht met een van- en een naarkant",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": {
+            "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
+            "aantal": 0,
+            "plekken": []
+          },
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/, het journaal",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "motor": {
+          "autoriteit": "het grootboek; de motor boekt alleen via zijn functies",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        }
+      }
+    },
+    {
+      "id": "M-006",
+      "familie": "M-8",
+      "invariant": "NPC-bedrijven en spelers vallen onder dezelfde economische kernregels.",
+      "stand": "ABSENT",
+      "gedocumenteerd": true,
+      "geimplementeerd": false,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "geen: er zijn geen NPC-bedrijven",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        },
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        }
+      }
+    },
+    {
+      "id": "M-007",
+      "familie": "M-7",
+      "invariant": "AI mag economische toestand verklaren, nooit verzinnen.",
+      "stand": "ABSENT",
+      "gedocumenteerd": true,
+      "geimplementeerd": false,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "de motor; er zit vandaag geen model in Magnaat",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        },
+        "academy": {
+          "autoriteit": "de motor; uitleg is vaste tekst",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        }
+      }
+    },
+    {
+      "id": "M-008",
+      "familie": "M-8",
+      "invariant": "Er bestaat geen verborgen score op een mens: elk cijfer over een speler is voor die speler zichtbaar met zijn opbouw.",
+      "stand": "ABSENT",
+      "gedocumenteerd": true,
+      "geimplementeerd": false,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "server/kern/spellen/magnaat/weergave.js (kredietprofiel)",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        },
+        "academy": {
+          "autoriteit": "server/kern/magnaatwereld.js (xp, reputatie)",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        }
+      }
+    },
+    {
+      "id": "M-009",
+      "familie": "M-9",
+      "invariant": "Geen woonadres is speelbaar bezit: alles met een woonfunctie valt uit de kaart.",
+      "stand": "PARTIAL",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "scripts/kaart-import.js, de importeur van de kaart",
+          "draagt": "gevonden",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PARTIAL"
+        }
+      }
+    },
+    {
+      "id": "M-010",
+      "familie": "M-5",
+      "invariant": "Faillissement vernietigt geen geld zonder tegenpost; het is een proces en geen drempel.",
+      "stand": "ABSENT",
+      "gedocumenteerd": true,
+      "geimplementeerd": false,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "geen: failliet gaan bestaat in World niet, een negatief saldo kost rente",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        },
+        "motor": {
+          "autoriteit": "geen: bij tekort volgt automatisch een noodlening (geldstromen.js)",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        }
+      }
+    },
+    {
+      "id": "M-011",
+      "familie": "M-5",
+      "invariant": "Een contractverplichting is tijdgebonden toestand: zij begint en eindigt op een wereldmoment.",
+      "stand": "PASS",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "server/kern/spellen/magnaat/handel-acties.js en maand-contracten.js",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        }
+      }
+    },
+    {
+      "id": "M-012",
+      "familie": "M-3",
+      "invariant": "Een voorspelling is geen feit: een vooruitblik draagt een andere stand dan een uitkomst tot hij is gerealiseerd.",
+      "stand": "PARTIAL",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "academy": {
+          "autoriteit": "server/kern/magnaat-economenlab-training.js",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "world": {
+          "autoriteit": "geen: World kent nog geen vooruitblik",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        }
+      }
+    },
+    {
+      "id": "M-013",
+      "familie": "M-3",
+      "invariant": "Correlatie is geen causaliteit: een uitleg noemt alleen oorzaken die de motor werkelijk heeft doorgerekend.",
+      "stand": "ABSENT",
+      "gedocumenteerd": true,
+      "geimplementeerd": false,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "geen",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        },
+        "academy": {
+          "autoriteit": "server/kern/magnaat-economenlab-rapport.js",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        }
+      }
+    },
+    {
+      "id": "M-014",
+      "familie": "M-4",
+      "invariant": "Een speler die offline is, stopt de wereld niet.",
+      "stand": "PASS",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "server/kern/spellen/magnaat/economie.js, het bijrekenen op de klok",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        }
+      }
+    },
+    {
+      "id": "M-015",
+      "familie": "M-8",
+      "invariant": "Spelbalans mag het grootboek nooit vervalsen: geen speler of spelregel maakt waarde uit het niets.",
+      "stand": "VIOLATION",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 3,
+      "scopes": {
+        "world": {
+          "autoriteit": "server/kern/spellen/magnaat/handel.js (prijsband) en scripts/magnaat-pomp.js",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": "de pompmeter kent alleen de scenario's die erin geschreven zijn, en vergelijkt totalen binnen een ruismarge; er is nog geen eigenschapstoets over willekeurige reeksen transacties",
+          "missers": [],
+          "stand": "PARTIAL"
+        },
+        "academy": {
+          "autoriteit": "server/kern/magnaatwereld.js (spelerbudget)",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": {
+            "wat": "spelgeld dat als beloning wordt bijgeschreven buiten het grootboek van de motor om",
+            "aantal": 3,
+            "plekken": [
+              "server/kern/magnaatwereld.js:572",
+              "server/kern/magnaatwereld.js:700",
+              "server/kern/magnaatwereld.js:974"
+            ]
+          },
+          "deels": null,
+          "missers": [],
+          "stand": "VIOLATION"
+        }
+      }
+    },
+    {
+      "id": "M-016",
+      "familie": "M-0",
+      "invariant": "Eigendom is exclusief: een bezit is op hetzelfde wereldmoment van hooguit een eigenaar en wordt niet tweemaal overgedragen.",
+      "stand": "PASS",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "server/kern/spellen/magnaat/veiling-acties.js en aandeel.js",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        }
+      }
+    },
+    {
+      "id": "M-017",
+      "familie": "M-6",
+      "invariant": "Iedere economische mutatie heeft een gebeurtenisidentiteit: opnieuw verwerken levert geen tweede economisch resultaat op.",
+      "stand": "PARTIAL",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/, de idempotentiesleutel in het journaal",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "world": {
+          "autoriteit": "geen: een spelactie draagt geen gebeurtenis-id",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        }
+      }
+    },
+    {
+      "id": "M-018",
+      "familie": "M-6",
+      "invariant": "Historie is alleen aanvullen: een economische gebeurtenis wordt nooit achteraf herschreven of weggegooid, een correctie is een nieuwe gebeurtenis.",
+      "stand": "PARTIAL",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": false,
+      "getoetst": false,
+      "schendingen": 0,
+      "scopes": {
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/opslag.js, het journaal in de eigen collectie magnaatJournaal",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": {
+            "wat": "een journaal dat korter wordt: een afkapping, een ringbuffer of een weggehaalde gebeurtenis",
+            "aantal": 0,
+            "plekken": []
+          },
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "world": {
+          "autoriteit": "geen: er is geen gebeurtenishistorie, alleen maandverslagen",
+          "draagt": "NIEMAND",
+          "toets": "NIEMAND",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "ABSENT"
+        }
+      }
+    },
+    {
+      "id": "M-019",
+      "familie": "M-6",
+      "invariant": "Wereldregels zijn versiegebonden: een wereld draagt wereld-id, seed, regelversie, motorversie, datasetversie en aanmaakmoment.",
+      "stand": "PARTIAL",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "world": {
+          "autoriteit": "server/kern/spellen/magnaat/economie.js",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": "de seed volgt uit het potje-id, maar er wordt geen regel-, motor- of datasetversie bij de wereld bewaard",
+          "missers": [],
+          "stand": "PARTIAL"
+        },
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/, elke gebeurtenis",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": "elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A4)",
+          "missers": [],
+          "stand": "PARTIAL"
+        }
+      }
+    },
+    {
+      "id": "M-020",
+      "familie": "M-0",
+      "invariant": "Geld is een geheel aantal eurocenten: het grootboek rondt nooit af en weigert elk ander bedrag, en een economische gebeurtenis wordt een keer afgerond voordat er geboekt wordt, zodat beide kanten exact hetzelfde bedrag dragen.",
+      "stand": "PASS",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/geld.js",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "world": {
+          "autoriteit": "server/kern/spellen/magnaat/centen.js, de ene plek waar World een bedrag tot geld maakt",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        }
+      }
+    },
+    {
+      "id": "M-601",
+      "familie": "M-6",
+      "invariant": "De economische motor kent geen consument en het grootboek kent geen domein: de afhankelijkheid loopt alleen van consument naar motor naar grootboek.",
+      "stand": "PASS",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/index.js: wat per wereld verschilt komt binnen via profiel en haken",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": {
+            "wat": "de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, het grootboek, zijn Rust-client, de opslagdeclaratie en de klok",
+            "aantal": 0,
+            "plekken": []
+          },
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/index.js: soorten, versies en periode komen van de consument",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": {
+            "wat": "het grootboek noemt een domein (Oefenkantoor, markt, bedrijf, spel) of laadt iets buiten zichzelf en de opslagdeclaratie",
+            "aantal": 0,
+            "plekken": []
+          },
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        }
+      }
+    }
+  ]
+}

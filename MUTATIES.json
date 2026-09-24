@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T17:53:18.445Z",
-    "commit": "ba614933",
+    "op": "2026-09-24T18:03:31.202Z",
+    "commit": "e9eb3de6",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3175,6 +3175,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "foutindeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/foutindeling.js",
+      "operator": "false->true#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "foutmelder-dekking.test.js": {
       "soort": "puur",

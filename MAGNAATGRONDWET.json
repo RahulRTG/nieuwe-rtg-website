@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T09:13:09.879Z",
-    "commit": "8fd19c92",
+    "op": "2026-09-24T10:11:51.487Z",
+    "commit": "0afb53ad",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/magnaatgrondwet.js",
@@ -12,18 +12,18 @@
   "grens": "dit meet wat de verklaring in scripts/lib/magnaatgrondwet.js noemt. Een regel die daar niet staat, bestaat voor deze meter niet; een schending waar geen patroon voor is geschreven, wordt niet geteld.",
   "regels": 19,
   "telling": {
-    "VIOLATION": 4,
+    "VIOLATION": 3,
     "ABSENT": 6,
     "PARTIAL": 6,
-    "PASS": 3
+    "PASS": 4
   },
   "vier": {
     "gedocumenteerd": 19,
-    "geimplementeerd": 12,
+    "geimplementeerd": 13,
     "afgedwongen": 7,
-    "getoetst": 5
+    "getoetst": 6
   },
-  "schendingen": 71,
+  "schendingen": 70,
   "perRegel": [
     {
       "id": "M-001",
@@ -82,10 +82,19 @@
           "missers": [],
           "stand": "VIOLATION"
         },
-        "academy": {
-          "autoriteit": "server/kern/magnaat-economie.js, het journaal",
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/, het journaal",
           "handhaver": "gevonden",
           "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "academy": {
+          "autoriteit": "server/kern/magnaatwereld.js (spelerbudget)",
+          "handhaver": "NIEMAND",
+          "toets": "NIEMAND",
           "schending": {
             "wat": "spelgeld dat als beloning wordt bijgeschreven buiten het grootboek van de motor om",
             "aantal": 3,
@@ -121,7 +130,7 @@
           "missers": [],
           "stand": "ABSENT"
         },
-        "academy": {
+        "motor": {
           "autoriteit": "geen: er is geen urenmodel",
           "handhaver": "NIEMAND",
           "toets": "NIEMAND",
@@ -158,21 +167,21 @@
       "id": "M-004",
       "familie": "M-0",
       "invariant": "Voorraad kan niet negatief worden.",
-      "stand": "PARTIAL",
+      "stand": "PASS",
       "gedocumenteerd": true,
       "geimplementeerd": true,
       "afgedwongen": true,
-      "getoetst": false,
+      "getoetst": true,
       "schendingen": 0,
       "scopes": {
-        "academy": {
-          "autoriteit": "server/kern/magnaat-economie.js, de marktstap",
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/markt.js, de marktstap",
           "handhaver": "gevonden",
-          "toets": "NIEMAND",
+          "toets": "gevonden",
           "schending": null,
           "deels": null,
           "missers": [],
-          "stand": "PARTIAL"
+          "stand": "PASS"
         }
       }
     },
@@ -233,8 +242,8 @@
           "missers": [],
           "stand": "VIOLATION"
         },
-        "academy": {
-          "autoriteit": "server/kern/magnaat-economie.js, het journaal",
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/, het journaal",
           "handhaver": "gevonden",
           "toets": "gevonden",
           "schending": null,
@@ -264,8 +273,8 @@
           "missers": [],
           "stand": "ABSENT"
         },
-        "academy": {
-          "autoriteit": "server/kern/magnaat-economie.js",
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/",
           "handhaver": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
@@ -379,8 +388,8 @@
           "missers": [],
           "stand": "ABSENT"
         },
-        "academy": {
-          "autoriteit": "geen: bij tekort volgt automatisch een noodlening",
+        "motor": {
+          "autoriteit": "geen: bij tekort volgt automatisch een noodlening (geldstromen.js)",
           "handhaver": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
@@ -568,8 +577,8 @@
       "getoetst": false,
       "schendingen": 0,
       "scopes": {
-        "academy": {
-          "autoriteit": "server/kern/magnaat-economie.js, de idempotentiesleutel van boek()",
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/, de idempotentiesleutel in het journaal",
           "handhaver": "gevonden",
           "toets": "gevonden",
           "schending": null,
@@ -592,27 +601,25 @@
       "id": "M-018",
       "familie": "M-6",
       "invariant": "Historie is alleen aanvullen: een economische gebeurtenis wordt nooit achteraf herschreven of weggegooid, een correctie is een nieuwe gebeurtenis.",
-      "stand": "VIOLATION",
+      "stand": "PARTIAL",
       "gedocumenteerd": true,
-      "geimplementeerd": false,
+      "geimplementeerd": true,
       "afgedwongen": false,
       "getoetst": false,
-      "schendingen": 1,
+      "schendingen": 0,
       "scopes": {
-        "academy": {
-          "autoriteit": "server/kern/magnaat-economie.js, het journaal",
-          "handhaver": "NIEMAND",
-          "toets": "NIEMAND",
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/journaal-opslag.js, het journaal in de eigen collectie magnaatJournaal",
+          "handhaver": "gevonden",
+          "toets": "gevonden",
           "schending": {
-            "wat": "het journaal is een ringbuffer: boven MAX_JOURNAAL vallen de oudste boekingen eraf",
-            "aantal": 1,
-            "plekken": [
-              "server/kern/magnaat-economie.js:164"
-            ]
+            "wat": "een journaal dat korter wordt: een afkapping, een ringbuffer of een weggehaalde gebeurtenis",
+            "aantal": 0,
+            "plekken": []
           },
           "deels": null,
           "missers": [],
-          "stand": "VIOLATION"
+          "stand": "PASS"
         },
         "world": {
           "autoriteit": "geen: er is geen gebeurtenishistorie, alleen maandverslagen",
@@ -645,12 +652,12 @@
           "missers": [],
           "stand": "PARTIAL"
         },
-        "academy": {
-          "autoriteit": "server/kern/magnaat-economie.js",
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/, elke gebeurtenis",
           "handhaver": "gevonden",
           "toets": "gevonden",
           "schending": null,
-          "deels": "alleen een motorversie; geen regelversie, datasetversie of aanmaakmoment",
+          "deels": "elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A3)",
           "missers": [],
           "stand": "PARTIAL"
         }

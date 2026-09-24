@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:40:29.596Z",
-    "commit": "bd4e35b2",
+    "op": "2026-09-24T22:33:36.971Z",
+    "commit": "0f34b6ee",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9754,6 +9754,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "verzoekbetaal-race.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pay/verzoeken.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "verzoekcontext-wikkel.test.js": {
       "soort": "puur",

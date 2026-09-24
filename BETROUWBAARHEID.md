@@ -228,6 +228,47 @@ wereld raakt er meer**. Een vaste drempel alleen liet een verkeerde verklaring d
 zakt ook zodra er een wereldbouwer bestaat die niet in het register staat. Een wees
 is voortaan zichtbaar.
 
+## 4c. Bedienbaar was een kromme meetlat — vier fouten in de meter, en geen enkele in een app
+
+**Staat** (24 september 2026). Na de hermeting stond `bedienbaar` voor alle 112
+onderdelen op `NIET_GETEST`, en drie apps die op 7 september bewezen waren vielen
+terug. Dat is eerst **gediagnosticeerd en pas daarna gerepareerd**: een trechter
+per scherm, een spoor per ronde en de stadia per herkomst (DOM → zichtbaar → in
+beeld → te raken). Ze wezen vier onafhankelijke fouten aan, alle vier in de meter:
+
+| fout | gemeten | reparatie |
+|---|---|---|
+| **navigatie** | 50 van 97 schermen stopten op "geen nieuwe knop": een tik op een schillink navigeerde pas na de url-controle weg, en de volgende ronde zag 0 knoppen op een andere pagina | de **thuisregel**: vóór elke tik staat de proef op de landing, en anders keert hij terug met dezelfde gereedvoorwaarde als bij het eerste laden |
+| **de noemer groeide onder het examen** | `gevonden` was het maximum over de rondes; Buurtruil ging van 23 naar 43 na een tik op de zoekknop | de noemer **bevriest** bij het laden, vóór er getikt wordt |
+| **de schil in de noemer** | de Edge alleen: 1923 knoppen op 93 schermen, waarvan 993 onder een laag; de lus koos op DOM-volgorde, dus de rondes gingen naar schilknoppen | de noemer is de **app-herkomst** (topcontainer onder `body`); de schil krijgt een eigen bewijs |
+| **het budget** | een limiet van 14 met een drempel van de helft: op 86 van 97 schermen wiskundig onhaalbaar | het budget volgt uit de noemer; een drempel boven het budget is een **MeterConfigFout** en laat de meting als geheel falen |
+
+**De schil is een definitie en geen lijst.** Een topcontainer die een gedeeld script
+in `public/shared/` aanmaakt, is schil. `scripts/lib/bedieningsmeting.js` noemt
+elk teken met zijn bron, en `test/bedieningsmeting.test.js` zakt als die bron het
+teken niet aanmaakt.
+
+**De schil is geen plek om fouten te verbergen.** Hij staat in het register als
+eigen onderdeel (`schil`), en elke rij draagt zijn uitslag onder `afhankelijk`.
+"De eigen bediening van Horeca is bewezen" en "de gedeelde schil heeft een gebrek"
+staan naast elkaar en worden nooit samengevoegd tot "Horeca werkt".
+
+**Te raken is geen middenpunttest.** De hittest kijkt naar vijf punten na scrollen,
+en één punt is genoeg. Een knop waarvan alleen het midden onder een laag ligt, is
+voor een mens vaak gewoon bedienbaar.
+
+**De regressiefixture** (`test/appwerkt-meter.e2e.js`) is een synthetisch scherm met
+alle vier de fouten erin: 6 app-knoppen die pas na 800 ms bestaan, een paneel met
+20 extra knoppen, 30 schilknoppen waarvan 15 onder een laag, en navigerende knoppen
+in schil en app. De waarheid is een app-noemer van 6 en een schil-noemer van 15.
+Zeven mutaties, één per gerepareerd gebrek plus de wachttijd en de invariant: alle
+zeven laten een toets zakken.
+
+**Wat hier bewust niet in zit:** de losse vondst dat Routedossier voor een lid op
+`personeel.html?kantoor=1` landt terwijl `bereikbaar` op BEWEZEN staat. Die vraagt of
+`bereikbaar` alleen bewijst dat er een pagina verschijnt, of ook dat de juiste app
+voor de juiste persona is bereikt. Dat krijgt een eigen diagnose.
+
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
 `npm run appwerkt` schrijft `APPWERKT.json`: per onderdeel uit `MAPPEN`, met de

@@ -63,7 +63,9 @@
    WAT DIT SCRIPT NIET ZIET, en dat staat er even groot bij: het vult geen
    formulieren in, het tikt niets aan met een onomkeerbare naam (betalen,
    verwijderen, versturen, uitloggen -- die staan per rij in `overgeslagen`), en
-   het klikt hooguit veertien knoppen per scherm. Een groene rij betekent dus
+   het tikt alleen knoppen van de APP aan die bij het laden te raken waren
+   (./lib/bedieningsmeting.js; de gedeelde schil krijgt een eigen rij,
+   `schil`). Een groene rij betekent dus
    "de ingang opent en de bediening breekt niet", en nadrukkelijk niet "de
    functie werkt". Dat verschil is de hele reden dat de andere vijf bewijzen er
    met naam bij staan.
@@ -117,7 +119,6 @@ const controle = process.argv.includes('--controle');
 const stil = process.argv.includes('--stil');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
-const MAXKLIK = 14;
 
 /* Knoppen die iets doen wat je niet wilt uitlokken op een proefserver met een
    echte sessie. Ze worden NIET stil overgeslagen: elke rij noemt ze bij naam,
@@ -227,11 +228,35 @@ async function meet() {
     for (const ctx of Object.values(persoonlijk)) await ctx.close();
   }
   await Promise.all(Array.from({ length: PAR }, werker));
+
+  /* DE SCHIL, EEN KEER. De gedeelde bediening (Edge, sprong, Rahul, taal,
+     randtoetsen) zit op vrijwel elk scherm, en hem per app meetellen is
+     dezelfde fout 112 keer tellen. Hij krijgt hier een eigen bewijs, op de
+     eerste ingang van een lid, met exact dezelfde procedure als een app. En
+     elke rij draagt de uitslag als AFHANKELIJKHEID: een app waarvan de eigen
+     bediening bewezen is terwijl de schil een gebrek heeft, leest nooit als
+     "deze app werkt". */
+  let schil = null;
+  const schilRij = lijst.find((r) => r.pad && r.persona === 'lid' && sessies.lid);
+  if (schilRij) {
+    const ctx = await maakContext(browser, opslagVoor({ lid: sessies.lid }));
+    const b = await bedien(ctx, base, schilRij.pad, 'schil');
+    await ctx.close();
+    const stuk = [...b.crash, ...b.serverfout];
+    const o = stuk.length ? { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: stuk[0] }
+      : b.config.length ? { status: 'GEBLOKKEERD_DOOR_CONFIG', reden: b.config[0] }
+        : oordeel(b.plan, b.uitslag);
+    schil = { onderdeel: 'RTG-schil', gemetenOp: schilRij.pad, persona: 'lid',
+      bedienbaar: { status: o.status, reden: o.reden }, trechter: b.trechter, nietKlikbaar: b.nietKlikbaar };
+  } else {
+    schil = { onderdeel: 'RTG-schil', bedienbaar: { status: 'NIET_GETEST', reden: 'geen ingang van een lid met een sessie om de schil op te meten' } };
+  }
+  for (const r of uit) r.afhankelijk = { 'RTG-schil': { bewijs: 'bedienbaar', status: schil.bedienbaar.status } };
   await browser.close();
   try { child.kill(); } catch (e) {}
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   uit.sort((a, b) => (a.wereld + a.app).localeCompare(b.wereld + b.app));
-  return { regels: uit, sessiesOvergeslagen: overgeslagen };
+  return { regels: uit, schil, sessiesOvergeslagen: overgeslagen };
 }
 
 async function maakContext(browser, opslag) {
@@ -329,7 +354,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   }
 
   // ---- bewijs 2 en 8: bedienbaar en menselijk ----
-  const bediening = await bedien(eigen, base, rij.pad);
+  const bediening = await bedien(eigen, base, rij.pad, 'app');
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
   r.overgeslagen = bediening.overgeslagen;
@@ -338,34 +363,20 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.trechter = bediening.trechter;
   if (bediening.instrument.length) r.waarnemingen.push('proef: ' + bediening.instrument.join('; '));
   const stuk = [...bediening.crash, ...bediening.serverfout];
-  /* De uitsplitsing staat ALTIJD in de reden, ook bij een geslaagde rij: "3
-     knoppen aangetikt zonder fout" leest als een bewijs, maar zonder de noemer
-     weet niemand of dat alles was of het topje. */
-  const redenenTelling = {};
-  for (const n of bediening.nietKlikbaar) { const w = n.split(': ').pop(); redenenTelling[w] = (redenenTelling[w] || 0) + 1; }
-  const uitsplitsing = bediening.geklikt + ' van ' + bediening.gevonden + ' zichtbare knoppen aangetikt zonder fout'
-    + (bediening.nietKlikbaar.length ? ', ' + bediening.nietKlikbaar.length + ' niet aan te tikken (' + Object.entries(redenenTelling).map(([w, n]) => n + 'x ' + w).join(', ') + ')' : '')
-    + (bediening.overgeslagen.length ? ', ' + bediening.overgeslagen.length + ' overgeslagen omdat ze onomkeerbaar zijn' : '')
-    /* Geteld en niet weggelaten: een weigering met reden is geen defect, maar
-       wie een scherm verdenkt dat de reden inslikt, ziet hier hoe vaak. */
-    + ((bediening.weigering || []).length ? ', ' + bediening.weigering.length + 'x geweigerd met een reden (' + bediening.weigering[0] + ')' : '');
-  if (bediening.geklikt === 0 && !bediening.gevonden) {
-    r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen zichtbare knop zonder bestemming gevonden; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
-  } else if (stuk.length) {
+  /* Geteld en niet weggelaten: een weigering met reden is geen defect, maar
+     wie een scherm verdenkt dat de reden inslikt, ziet hier hoe vaak. */
+  const bijzin = ((bediening.weigering || []).length ? '; ' + bediening.weigering.length + 'x geweigerd met een reden (' + bediening.weigering[0] + ')' : '')
+    + (bediening.nietKlikbaar.length ? '; niet aan te tikken: ' + bediening.nietKlikbaar.slice(0, 3).join(', ') : '');
+  if (stuk.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: stuk[0], bewijs: bediening.crash.concat(bediening.serverfout).slice(0, 5).join(' | ') };
   } else if (bediening.config.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG', reden: bediening.config[0], bewijs: null };
-  } else if (bediening.gevonden > 0 && bediening.geklikt * 2 < bediening.gevonden) {
-    /* EEN SCHERM WAAR HET MEESTE ONAANGERAAKT BLEEF, IS NIET BEWEZEN. Op
-       vluchten.html bleken 8 van de 23 knoppen bedekt door iets anders
-       ("intercepts pointer events"), 4 onzichtbaar op het moment van tikken en
-       1 buiten beeld. Wat daarvan een overlay is die een mens eerst wegtikt en
-       wat een werkelijk onbereikbare knop, kan deze proef niet uitmaken -- en
-       juist daarom mag hij er geen groen vinkje van maken. */
-    r.bewijzen.bedienbaar = { status: 'NIET_GETEST',
-      reden: uitsplitsing + ' -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd', bewijs: null };
   } else {
-    r.bewijzen.bedienbaar = { status: 'BEWEZEN', reden: uitsplitsing, bewijs: null };
+    /* Het oordeel over de EIGEN bediening van de app, uit de bevroren noemer
+       (./lib/bedieningsmeting.js). De gedeelde schil staat er apart naast als
+       afhankelijkheid (`afhankelijk`), en wordt hier nooit bij opgeteld. */
+    const o = oordeel(bediening.plan, bediening.uitslag);
+    r.bewijzen.bedienbaar = { status: o.status, reden: o.reden + bijzin, bewijs: null };
   }
   /* Bewijs 8 wordt AFGELEID en niet apart gemeten, en dat staat er zo bij: een
      kale TypeError of 500 is nooit menselijk, en verder kan deze proef niet
@@ -432,202 +443,142 @@ async function bezoek(ctx, base, pad) {
     samenvatting: poort ? 'poort dicht' : (crash.length ? 'gooit' : tekst + ' tekens zichtbaar') };
 }
 
-/* ---- de stadia: wat de gebruiker van een knop werkelijk kan bereiken ----
+/* ---- de inventaris: wat er bij het laden staat, voor er getikt wordt ----
 
-   Waarneming, geen oordeel, een keer per scherm direct na het laden. Per
-   knop-achtig element de keten
-     DOM aanwezig -> zichtbaar (de `zie`-toets van kijkRonde) -> in beeld zonder
-     scrollen -> te raken na scrollen
-   en per herkomst (het dichtstbijzijnde voorouderelement met een id), zodat de
-   bediening van de APP en die van de gedeelde SCHIL apart te lezen zijn.
+   Per knop-achtig element: zijn handtekening (merk), zijn HERKOMST (de
+   topcontainer onder <body> -- schil of app, zie ./lib/bedieningsmeting.js),
+   of hij zichtbaar is, of hij in beeld staat zonder scrollen, en op hoeveel van
+   vijf punten hij na scrollen te raken is (elementFromPoint geeft de knop zelf
+   of iets erin). Een punt is genoeg om mee te tellen: een knop waarvan alleen
+   het midden onder een laag ligt, is voor een mens vaak gewoon bedienbaar.
 
-   "Te raken" is een hittest op VIJF punten (midden en vier punten op een kwart
-   van de randen), na scrollIntoView: raakt elementFromPoint daar de knop zelf of
-   iets IN de knop, dan telt dat punt. Alle vijf is `volledig`, een deel is
-   `gedeeltelijk`, geen is `nee` -- want een knop waarvan alleen het midden onder
-   een laag ligt, is voor een mens vaak gewoon te bedienen, en een enkele
-   middenpunttest zou hem ten onrechte afschrijven. De scrollstand wordt na
-   afloop teruggezet. */
-async function stadia(page) {
+   Dit gebeurt EEN keer, direct na het laden. Wat de proef daarna zelf openlegt
+   -- een zoekpaneel, een la -- komt niet in de noemer: de meter mag zijn eigen
+   examen niet zwaarder maken terwijl hij het afneemt. */
+async function inventaris(page) {
   return page.evaluate(() => {
-    const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
-      if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
-      const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
-    /* HERKOMST = de topcontainer onder <body>, en niet het dichtstbijzijnde id:
-       de eerste ronde vond 2542 knoppen zonder omhullend id, dus dat scheidt
-       niets. De topcontainer zegt wel of een knop in de gedeelde schil zit
-       (de Edge, de kop) of in de app zelf. */
-    const herkomst = (el) => { let a = el; while (a && a.parentElement && a.parentElement !== document.body) a = a.parentElement;
-      if (!a || a === document.body) return '(body)';
-      const kl = (typeof a.className === 'string' && a.className.trim()) ? '.' + a.className.trim().split(/\s+/)[0] : '';
-      return a.tagName.toLowerCase() + (a.id ? '#' + a.id : '') + kl; };
-    const vw = innerWidth, vh = innerHeight;
-    const sx = scrollX, sy = scrollY;
-    const alle = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
-      .filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'));
-    const uit = {};
-    for (const el of alle) {
-      const h = herkomst(el);
-      const t = uit[h] = uit[h] || { dom: 0, zichtbaar: 0, inBeeld: 0, raakbaarVolledig: 0, raakbaarGedeeltelijk: 0, nietRaakbaar: 0, voorbeelden: [] };
-      t.dom++;
-      if (!zie(el)) continue;
-      t.zichtbaar++;
-      let b = el.getBoundingClientRect();
-      if (b.bottom > 0 && b.right > 0 && b.top < vh && b.left < vw) t.inBeeld++;
-      try { el.scrollIntoView({ block: 'center', inline: 'center' }); } catch (e) {}
-      b = el.getBoundingClientRect();
-      const punten = [[0.5, 0.5], [0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]];
-      let raak = 0;
-      for (const [fx, fy] of punten) {
-        const x = b.left + b.width * fx, y = b.top + b.height * fy;
-        if (x < 0 || y < 0 || x >= vw || y >= vh) continue;
-        const hit = document.elementFromPoint(x, y);
-        if (hit && (hit === el || el.contains(hit))) raak++;
-      }
-      if (raak === punten.length) t.raakbaarVolledig++;
-      else if (raak > 0) t.raakbaarGedeeltelijk++;
-      else { t.nietRaakbaar++; if (t.voorbeelden.length < 3) t.voorbeelden.push(((el.innerText || el.getAttribute('aria-label') || el.title || '').trim().slice(0, 30)) || '(naamloos)'); }
-    }
-    scrollTo(sx, sy);
-    return uit;
-  }).catch((e) => ({ fout: String(e.message || e).slice(0, 120) }));
-}
-
-/* ---- de bediening: tikken op wat er staat ---- */
-async function bedien(ctx, base, pad) {
-  const page = await ctx.newPage();
-  const crash = [], config = [], serverfout = [], weigering = [];
-  let geklikt = 0, gevonden = 0;
-  const overgeslagen = [], nietKlikbaar = [], instrument = [];
-  /* DE TRECHTER -- waarneming, geen oordeel. Per scherm: hoeveel knoppen er
-     gezien zijn, hoeveel daarvan in aanmerking kwamen (niet onomkeerbaar),
-     hoeveel de lus selecteerde, probeerde, raakte, en na hoeveel tikken er
-     iets zichtbaars veranderde. En waarom de lus stopte. Zo is "1 van 23" te
-     ontleden in een limiet, een lus die vroeg ophoudt, of knoppen die er wel
-     staan maar niet te raken zijn -- drie verschillende oorzaken. */
-  const gezien = new Map();          // merk -> herkomst
-  const gehad = new Set();
-  let geselecteerd = 0, geprobeerd = 0, effect = 0, stop = 'limiet';
-  let stadiaPerHerkomst = null;
-  const spoor = [];
-  const vingerafdruk = () => page.evaluate(() => location.href + '|' + document.querySelectorAll('*').length + '|' + (document.body ? document.body.innerText.length : 0)).catch(() => null);
-  try {
-    await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
-    await page.waitForTimeout(2200);
-    luister(page, base, { crash, config, serverfout, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
-    stadiaPerHerkomst = await stadia(page);
-    for (let ronde = 0; ronde < MAXKLIK; ronde++) {
-      let k;
-      try { k = await kijkRonde(page, gehad); }
-      catch (e) {
-        /* Een tik kan navigeren, en dan is de context van de pagina weg op het
-           moment dat de volgende ronde kijkt ("Execution context was
-           destroyed"). Dat is een eigenschap van de PROEF en niet van het
-           scherm. Zonder deze opvang werd een navigerende knop gemeld als een
-           defect van de app -- een instrument dat zijn eigen struikelen als
-           beschuldiging uitschrijft is erger dan geen instrument. */
-        if (!/Execution context was destroyed|Target closed|Navigation|frame was detached/i.test(String(e.message || e))) throw e;
-        instrument.push('de proef verloor de pagina door een navigatie en opende hem opnieuw');
-        try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad); }
-        catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); stop = 'navigatie'; break; }
-      }
-      gevonden = Math.max(gevonden, k.zichtbaar || 0);
-      for (const z of k.zicht || []) if (!gezien.has(z.merk)) gezien.set(z.merk, z.herkomst);
-      /* Het spoor per ronde: hoeveel zichtbaar, hoeveel daarvan nog niet gehad,
-         en wat de ronde deed. Zo is te zien waarom "geen nieuwe knop" valt
-         terwijl er ongekozen knoppen gezien zijn. */
-      const nieuwNu = (k.zicht || []).filter((z) => !gehad.has(z.merk)).length;
-      spoor.push({ zichtbaar: k.zichtbaar || 0, nieuw: nieuwNu, url: page.url().replace(base, '').slice(0, 60),
-        gekozen: k.klaar ? null : String(k.tekst || '(naamloos)').slice(0, 30) });
-      if (k.klaar) { stop = 'geen nieuwe knop'; break; }
-      gehad.add(k.merk);
-      geselecteerd++;
-      if (ONOMKEERBAAR.test(k.tekst)) { overgeslagen.push(k.tekst || '(naamloos)'); continue; }
-      geprobeerd++;
-      const voor = await vingerafdruk();
-      try {
-        await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
-        await page.waitForTimeout(600);
-        geklikt++;
-        const na = await vingerafdruk();
-        if (voor && na && voor !== na) effect++;
-      } catch (e) {
-        /* De reden van een time-out staat in de LOG van Playwright ("intercepts
-           pointer events", "element is not visible"), niet in de boodschap.
-           Zonder die reden is "niet aan te tikken" een dood getal: een knop
-           onder een balk is iets anders dan een knop die er niet is. */
-        const log = String(e.message || e);
-        const waarom = (log.match(/intercepts pointer events|element is not visible|element is not stable|element is not enabled|element is outside of the viewport/i) || ['reden niet gemeld'])[0];
-        nietKlikbaar.push((k.tekst || '(naamloos)') + ': ' + waarom);
-      }
-      if (page.url().replace(base, '').split('#')[0] !== pad) {
-        try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1500); } catch (e) { stop = 'navigatie'; break; }
-      }
-    }
-  } catch (e) {
-    instrument.push('bediening mislukt: ' + String(e.message || e).split('\n')[0].slice(0, 140));
-    stop = 'uitzondering';
-  }
-  await page.close();
-  const inAanmerking = [...gezien.keys()].filter((m) => !ONOMKEERBAAR.test(m.split('|').slice(2).join(' ')));
-  const nooitGekozen = inAanmerking.filter((m) => !gehad.has(m));
-  const herkomstTelling = {};
-  for (const m of nooitGekozen) { const h = gezien.get(m); herkomstTelling[h] = (herkomstTelling[h] || 0) + 1; }
-  const trechter = { gevonden, uniekGezien: gezien.size, inAanmerking: inAanmerking.length, geselecteerd, geprobeerd,
-    gelukt: geklikt, effect, stop, limiet: MAXKLIK,
-    /* DE BUDGETVRAAG: kan deze proef met haar eigen limiet de drempel van
-       bedienbaar (de helft van de gevonden knoppen) ueberhaupt halen? Is het
-       antwoord nee, dan zegt NIET_GETEST hier iets over de meter en niets over
-       het scherm. */
-    drempelHaalbaar: gevonden === 0 || MAXKLIK * 2 >= gevonden,
-    stadia: stadiaPerHerkomst,
-    spoor: spoor.slice(0, MAXKLIK + 1),
-    nooitGekozenNaarHerkomst: Object.fromEntries(Object.entries(herkomstTelling).sort((a, b) => b[1] - a[1]).slice(0, 5)) };
-  return { geklikt, gevonden, overgeslagen, nietKlikbaar, instrument, crash, config, serverfout, weigering, trechter };
-}
-
-/* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
-
-   Hier stond eerst: markeer in EEN keer veertien knoppen met `data-appwerkt` en
-   tik ze daarna op nummer aan. Dat werkte precies een keer per scherm -- een tik
-   wisselt vaak van stand, het scherm hertekent, de markeringen verdwijnen, en
-   elke volgende klik liep in een time-out die stil werd overgeslagen. Gemeten
-   over de hele ronde: 1206 knoppen gevonden, 331 aangetikt, mediaan 14 gevonden
-   tegen 2 aangetikt. "Bedienbaar BEWEZEN" sloeg dus vrijwel overal op EEN knop,
-   en dat is de gevaarlijkste soort defect in een meter: te weinig doen en groen
-   melden.
-
-   Daarom per ronde OPNIEUW kijken, en bijhouden wat al gehad is op een
-   HANDTEKENING (tag, id, aria-label, tekst) en niet op een positie -- na een
-   hertekening klopt een positie niet meer. */
-async function kijkRonde(page, gehad) {
-  return page.evaluate((alGehad) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
     const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),
       (el.innerText || el.title || '').trim().slice(0, 40)].join('|');
-    const alle = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
-      .filter(zie).filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'));
-    document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
-    /* Voor de trechter: ELKE zichtbare knop met zijn handtekening en zijn
-       herkomst (het dichtstbijzijnde voorouderelement met een id). Alleen
-       waarneming; de keuze hieronder verandert er niet door. */
-    /* HERKOMST = de topcontainer onder <body>, en niet het dichtstbijzijnde id:
-       de eerste ronde vond 2542 knoppen zonder omhullend id, dus dat scheidt
-       niets. De topcontainer zegt wel of een knop in de gedeelde schil zit
-       (de Edge, de kop) of in de app zelf. */
     const herkomst = (el) => { let a = el; while (a && a.parentElement && a.parentElement !== document.body) a = a.parentElement;
       if (!a || a === document.body) return '(body)';
       const kl = (typeof a.className === 'string' && a.className.trim()) ? '.' + a.className.trim().split(/\s+/)[0] : '';
       return a.tagName.toLowerCase() + (a.id ? '#' + a.id : '') + kl; };
-    const zicht = alle.map((el) => ({ merk: merk(el), herkomst: herkomst(el) }));
-    const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)));
-    if (!nieuwe.length) return { klaar: true, zichtbaar: alle.length, zicht };
-    nieuwe[0].setAttribute('data-appwerkt', '1');
-    return { klaar: false, zichtbaar: alle.length, zicht, merk: merk(nieuwe[0]),
-      tekst: (nieuwe[0].innerText || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
-  }, [...gehad]);
+    const vw = innerWidth, vh = innerHeight, sx = scrollX, sy = scrollY;
+    const punten = [[0.5, 0.5], [0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]];
+    const uit = [];
+    for (const el of document.querySelectorAll('button,[role=button],[data-tab],[data-stand]')) {
+      if (el.getAttribute('href') || el.getAttribute('data-url')) continue;
+      const k = { merk: merk(el), herkomst: herkomst(el), zichtbaar: zie(el), inBeeld: false, raakpunten: 0,
+        tekst: (el.innerText || el.getAttribute('aria-label') || el.title || '').trim().slice(0, 40) };
+      if (k.zichtbaar) {
+        let b = el.getBoundingClientRect();
+        k.inBeeld = b.bottom > 0 && b.right > 0 && b.top < vh && b.left < vw;
+        try { el.scrollIntoView({ block: 'center', inline: 'center' }); } catch (e) {}
+        b = el.getBoundingClientRect();
+        for (const [fx, fy] of punten) {
+          const x = b.left + b.width * fx, y = b.top + b.height * fy;
+          if (x < 0 || y < 0 || x >= vw || y >= vh) continue;
+          const hit = document.elementFromPoint(x, y);
+          if (hit && (hit === el || el.contains(hit))) k.raakpunten++;
+        }
+      }
+      uit.push(k);
+    }
+    scrollTo(sx, sy);
+    return uit;
+  });
+}
+
+/* De stadia per kant, uit de inventaris: DOM aanwezig -> zichtbaar -> in beeld
+   -> te raken. Waarneming naast het oordeel. */
+function stadiaVan(inv) {
+  const t = { app: { dom: 0, zichtbaar: 0, inBeeld: 0, raakbaar: 0 }, schil: { dom: 0, zichtbaar: 0, inBeeld: 0, raakbaar: 0 } };
+  for (const k of inv) {
+    const s = t[isSchil(k.herkomst) ? 'schil' : 'app'];
+    s.dom++; if (k.zichtbaar) s.zichtbaar++; if (k.inBeeld) s.inBeeld++; if (k.raakpunten > 0) s.raakbaar++;
+  }
+  return t;
+}
+
+/* ---- de bediening: tikken op de bevroren noemer ----
+
+   `kant` is 'app' of 'schil'. De proef tikt ALLEEN knoppen uit de noemer van die
+   kant, elk hooguit een keer, tot het budget op is.
+
+   DE THUISREGEL. Voor elke tik staat de proef op de pagina waar hij na het laden
+   UITKWAM (de landing, na eventuele doorverwijzing -- niet het adres uit MAPPEN).
+   Staat hij ergens anders, dan gaat hij terug en wacht hij op dezelfde
+   gereedvoorwaarde als bij het eerste laden. Tot 24 september 2026 zag de proef
+   na een navigerende tik een lege, halfgeladen andere pagina, en besloot hij dat
+   er "geen nieuwe knop" was: 50 van de 97 schermen stopten zo te vroeg. */
+async function bedien(ctx, base, pad, kant = 'app') {
+  const page = await ctx.newPage();
+  const crash = [], config = [], serverfout = [], weigering = [];
+  const overgeslagen = [], nietKlikbaar = [], instrument = [];
+  const u = { geprobeerd: 0, gelukt: 0, effect: 0, nietMeerGevonden: 0, overgeslagen: 0, teruggekeerd: 0 };
+  let inv = [], p = null, thuis = null;
+  const laad = async (url) => { await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }); await page.waitForTimeout(2200); };
+  const vingerafdruk = () => page.evaluate(() => location.href + '|' + document.querySelectorAll('*').length + '|' + (document.body ? document.body.innerText.length : 0)).catch(() => null);
+  try {
+    await laad(base + pad);
+    luister(page, base, { crash, config, serverfout, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
+    thuis = page.url();
+    inv = await inventaris(page);
+    for (const k of inv) k.onomkeerbaar = ONOMKEERBAAR.test(k.tekst || '');
+    p = plan(inv);          // gooit MeterConfigFout als de drempel het budget niet kan halen
+    const doel = p[kant];
+    for (const m of doel.noemer.slice(0, doel.budget)) {
+      let hier = null;
+      try { hier = await page.evaluate(() => location.href); } catch (e) { hier = null; }
+      if (hier !== thuis) {
+        try { await laad(thuis); u.teruggekeerd++; }
+        catch (e) { instrument.push('terugkeren naar de landing lukte niet: ' + String(e.message || e).split('\n')[0].slice(0, 80)); break; }
+      }
+      let staat = false;
+      try {
+        staat = await page.evaluate((zoek) => {
+          const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),
+            (el.innerText || el.title || '').trim().slice(0, 40)].join('|');
+          document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
+          for (const el of document.querySelectorAll('button,[role=button],[data-tab],[data-stand]')) {
+            if (merk(el) === zoek) { el.setAttribute('data-appwerkt', '1'); return true; }
+          }
+          return false;
+        }, m);
+      } catch (e) { staat = false; }
+      if (!staat) { u.nietMeerGevonden++; continue; }
+      u.geprobeerd++;
+      const voor = await vingerafdruk();
+      try {
+        await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
+        await page.waitForTimeout(600);
+        u.gelukt++;
+        const na = await vingerafdruk();
+        if (voor && na && voor !== na) u.effect++;
+      } catch (e) {
+        /* De reden van een time-out staat in de LOG van Playwright, niet in de
+           boodschap; zonder die reden is "niet aan te tikken" een dood getal. */
+        const log = String(e.message || e);
+        const waarom = (log.match(/intercepts pointer events|element is not visible|element is not stable|element is not enabled|element is outside of the viewport/i) || ['reden niet gemeld'])[0];
+        nietKlikbaar.push(m.split('|').slice(2).join(' ').trim().slice(0, 40) + ': ' + waarom);
+      }
+    }
+  } catch (e) {
+    if (e && e.name === 'MeterConfigFout') { await page.close(); throw e; }
+    instrument.push('bediening mislukt: ' + String(e.message || e).split('\n')[0].slice(0, 140));
+  }
+  await page.close();
+  if (p) for (const k of inv) if (k.onomkeerbaar && k.raakpunten > 0 && (isSchil(k.herkomst) ? 'schil' : 'app') === kant) overgeslagen.push(k.tekst || '(naamloos)');
+  u.overgeslagen = overgeslagen.length;
+  const doel = p ? p[kant] : { noemer: [], drempel: 0, budget: 0 };
+  const trechter = { kant, landing: thuis ? thuis.replace(base, '') : null, stadia: stadiaVan(inv),
+    noemer: doel.noemer.length, drempel: doel.drempel, budget: doel.budget, ...u,
+    nietRaakbaar: p ? p.nietRaakbaar[kant] : null, onomkeerbaar: p ? p.onomkeerbaar[kant] : null };
+  return { plan: doel, uitslag: u, trechter, gevonden: doel.noemer.length, geklikt: u.gelukt,
+    overgeslagen, nietKlikbaar, instrument, crash, config, serverfout, weigering };
 }
 
 /* De indeling van een foutantwoord woont in ./lib/foutindeling.js: een deur,
@@ -635,6 +586,7 @@ async function kijkRonde(page, gehad) {
    gewone taal, of stuk. Daar staat ook waarom de weigering geen defect is, en
    wat die indeling niet kan zien. */
 const { deelFoutIn } = require('./lib/foutindeling');
+const { plan, oordeel, isSchil } = require('./lib/bedieningsmeting');
 
 function luister(page, base, bak) {
   page.on('pageerror', (e) => bak.crash.push('JS: ' + String(e.message || e).slice(0, 180)));
@@ -668,7 +620,7 @@ function bouw(meting) {
     uitleg: 'Doet de functie het? Per onderdeel uit MAPPEN, met de persona aan wie de wereld hem toont, gemeten in een echte browser met een echte sessie. Drie van de acht bewijzen uit BETROUWBAARHEID.md worden hier gemeten; een ander bewijs komt alleen uit een bestaande proef als het app-contract die bron noemt en het register vers is (zie `samenstelling`). Wat geen bron heeft staat er met de reden waarom het nog niet te meten is.',
     hoe: 'node scripts/appwerkt.js  (--controle zakt als het aantal defecten groeit)',
     grens: 'Een BEWEZEN rij betekent: de ingang opent voor zijn persona en de bediening breekt niet. Het betekent NIET dat de functie werkt -- daarvoor zijn de vijf bewijzen nodig die hier GEEN_FIXTURE zijn. Er worden geen formulieren ingevuld en geen onomkeerbare knoppen aangetikt; die staan per rij in `overgeslagen`. ' +
-      'EN: een groot deel van wat er zichtbaar staat is niet aan te tikken -- er ligt iets overheen, of het is weg op het moment van tikken. Raakt de proef minder dan de helft van een scherm, dan is die rij NIET_GETEST en geen BEWEZEN; zie knoppenNietKlikbaar en schermenGrotendeelsOngemeten.',
+      'BEDIENBAAR gaat over de EIGEN bediening van de app: de noemer zijn de app-knoppen die bij het laden te raken zijn (minstens een van vijf hitpunten), bevroren voor er getikt wordt; de gedeelde schil staat apart in `schil` en elke rij noemt hem onder `afhankelijk`. Haalt de proef minder dan de helft van die noemer, dan is de rij NIET_GETEST -- dat is onvoldoende interactiedekking van de meter en geen productfalen. Een drempel die het budget niet kan halen, laat de meting als geheel falen (MeterConfigFout) in plaats van een rij.',
     standen: {
       BEWEZEN: 'gemeten en in orde',
       GEBLOKKEERD_DOOR_DEFECT: 'gemeten en stuk; hier moet code voor worden gerepareerd',
@@ -691,6 +643,10 @@ function bouw(meting) {
         && /er staat een deur/.test(r.bewijzen.bereikbaar.reden || '')).length },
     telling,
     perBewijs,
+    /* De gedeelde schil als eigen onderdeel, niet in `regels` en niet in de
+       telling: hij is geen onderdeel uit MAPPEN. Elke rij noemt hem onder
+       `afhankelijk`. */
+    schil: meting.schil || null,
     /* Welke bewijzen uit een ANDERE proef komen dan deze browserronde, en welke
        gesloten ketens (nog) voor geen enkele app tellen. Die tweede lijst staat
        er even groot bij: weglaten leest als "nog niet aan toegekomen". */
@@ -714,6 +670,10 @@ function bouw(meting) {
     regels: meting.regels
   };
 }
+
+/* Voor test/appwerkt-meter.e2e.js: de bediening los aan te roepen op een
+   synthetisch scherm, zonder server en zonder register. */
+module.exports = { bedien, inventaris };
 
 /* DE WACHT: dit script schrijft APPWERKT.json en start daarom niet bij het
    requiren (scripts/meetkeuring.js, regel `wacht`). Een laadcontrole -- node -e
@@ -746,7 +706,16 @@ if (require.main === module) (async () => {
     console.log('OK: ' + is + ' defecten (register: ' + was + ').');
     process.exit(0);
   }
-  const uit = bouw(await meet());
+  let meting;
+  try { meting = await meet(); }
+  catch (e) {
+    /* Een MeterConfigFout is een fout van de METER: de drempel kan het budget
+       niet halen. Dan schrijven we niets -- een register vol NIET_GETEST zou
+       een intern probleem als uitspraak over de apps vermommen. */
+    if (e && e.name === 'MeterConfigFout') { console.error('METERFOUT: ' + e.message); process.exit(3); }
+    throw e;
+  }
+  const uit = bouw(meting);
   fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
   log('\nAPPWERKT.json geschreven: ' + uit.gemeten.onderdelen + ' onderdelen, ' + uit.gemeten.defecten + ' defect');
   for (const d of uit.defecten) log('  ✗ ' + d.wereld + ' / ' + d.app + ': ' + d.reden);

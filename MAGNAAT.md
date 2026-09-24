@@ -119,6 +119,23 @@ Achteruitgaan kan alleen door de nulstand opnieuw vast te leggen. Dat is een wij
 
 ## 7. Het traject
 
+**MAGNAAT FINISH (besluit van de eigenaar, 24 september 2026).** De fundering is goed genoeg. Vanaf hier geldt een **harde scopebevriezing**: er komen geen nieuwe invarianten, subsystemen, macro-economische ideeën of onderzoeksfuncties bij, tenzij de migratie op een aantoonbare blocker stuit. Toekomstbestendig is niet hetzelfde als toekomstvolledig. Het doel is een speelbare Magnaat World 1.0:
+
+| Ronde | Wat |
+|---|---|
+| **A2.2** | tegenpartijen, minimaal: alleen de vijf macro-actoren die nodig zijn om de 27 gebeurtenissen van de geldkaart sluitend te maken. Geen bankensimulatie en geen huishoudmodel |
+| **A2.3–A2.9** | één migratieprogramma: de zeven categorieën van de geldkaart één voor één door het grootboek. Per categorie migreren, dan toetsen tegen de golden baseline, dan de volgende. Geen architectuurrondes ertussen |
+| **A2.10** | de deur dicht: directe `st.geld`-mutaties op nul, en CI verbiedt voorgoed nieuwe. Daarmee is de financiële migratie af, en daarna zijn er geen A-nummers meer |
+| **V1 From Zero** | één speelbare keten van persoon tot eerste onderneming: startpositie, werk, inkomen, tijd, kosten, software, eigen project, klant, offerte, onderhandeling, opdracht, uitvoering, factuur, te late betaling, geldnood, keuzes, gevolgen. Met de schermen Vandaag, Wereld, Werk, Geld, Netwerk en Mijn bedrijf (dat laatste pas wanneer je een onderneming hebt), en de Edge als bediening. RTG-functies verschijnen pas als ze relevant worden |
+| **V2 Onderneming** | personeel, planning, leverancier, voorraad, kosten, verkoop, contracten en cashflow |
+| **V3 Levende markt** | NPC-bedrijven, concurrentie, synthetische consumenten, vraag en aanbod, locatie, weer en seizoen |
+| **V4 Game-afwerking** | onboarding, tempo, moeilijkheid, feedback, beeld en geluid, Edge-interacties, multiplayer, opslaan en hervatten, toegankelijkheid, mobiel, en of het leuk is. Spelers testen |
+| **V5 Release hardening** | performance, gelijktijdigheid, crashherstel, exploits en valsspelen, reconnect, oude saves, rollback, belasting, security, geldinvarianten en volledige journeys. Daarna Magnaat World 1.0 |
+
+Na 1.0 pas: de Observatory, een wetenschappelijke modus, individuele huishoudens, complexe banken, grote toeleveringsketens, macrobeleid, een onderzoekers-API en tientallen sectoren. Ook A3 t/m A6 hieronder (fysieke opslag per gebeurtenis, wereld- en versie-identiteit, herhaling, de Academy-scheiding) worden alleen opgepakt als een V-ronde erop vastloopt.
+
+### De oorspronkelijke fundering (C en A)
+
 | Ronde | Wat |
 |---|---|
 | **C0** | nulstand vastleggen als bewijs (`MAGNAATGRONDWET.json`) |
@@ -202,6 +219,15 @@ De migratievolgorde volgt de categorieën, zodat elke stap apart tegen het oude 
 - Wie rood staat en een vestiging met een contract wil sluiten, krijgt de melding "afkopen kost 0", terwijl de reden de negatieve kas is.
 - Omzet- en resultaattotalen en het resultatengeheugen van de bank zijn statistieken en geen geld. Die blijven euro's tot ze uit het grootboek worden afgeleid.
 - De teller van M-001 en M-005 staat nog op 32. Dat is ook de bedoeling: A2.1 veranderde de precisie en niet de route. De teller zakt vanaf A2.3.
+
+**A2.2 staat: de tegenpartijen, minimaal.** `server/kern/spellen/magnaat/boekhouding.js` voert de vijf tegenpartijen in, en verder niets:
+- **bank**: krediet, aflossing en rente;
+- **huishoudens**: klanten, loon, werving en afvloeiing;
+- **aannemer**: bouwen, uitbreiden, herstel, terugkoop en projecten;
+- **verzekeraar**: premie en uitkering;
+- **stad**: de rest van de stadseconomie, dus huur, grond, inkoop, vaste lasten, marketing en onderhoud.
+
+Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id}:speler:{h}:kas`), dus twee werelden raken elkaar nooit. De geldkaart heeft geen voorstellen tussen haken meer: elke kant van elk van de 27 gebeurtenissen is een besloten partij uit een gesloten lijst, en bij de twee samengestelde gebeurtenissen heeft elk deel een eigen betaler en ontvanger (`test/magnaat-world-boekhouding.test.js`). World boekt er nog niets mee. Dat begint in A2.3, met de opening.
 
 ---
 

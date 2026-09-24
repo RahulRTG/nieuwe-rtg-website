@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T13:36:26.432Z",
-    "commit": "909c92e14",
+    "op": "2026-09-24T13:44:32.657Z",
+    "commit": "2af3ad4b4",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/magnaatgrondwet.js",
@@ -12,9 +12,9 @@
   "grens": "dit meet wat de verklaring in scripts/lib/magnaatgrondwet.js noemt. Een regel die daar niet staat, bestaat voor deze meter niet; een schending waar geen patroon voor is geschreven, wordt niet geteld.",
   "regels": 21,
   "telling": {
-    "VIOLATION": 3,
+    "VIOLATION": 2,
     "ABSENT": 6,
-    "PARTIAL": 6,
+    "PARTIAL": 7,
     "PASS": 6
   },
   "vier": {
@@ -23,7 +23,7 @@
     "afgedwongen": 9,
     "getoetst": 8
   },
-  "schendingen": 14,
+  "schendingen": 6,
   "perRegel": [
     {
       "id": "M-001",
@@ -34,7 +34,7 @@
       "geimplementeerd": true,
       "afgedwongen": false,
       "getoetst": false,
-      "schendingen": 7,
+      "schendingen": 3,
       "scopes": {
         "world": {
           "autoriteit": "geen: het saldo zelf (st.geld) is de waarheid",
@@ -42,17 +42,12 @@
           "toets": "NIEMAND",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
-            "aantal": 4,
-            "plekken": [
-              "server/kern/spellen/magnaat/aandeel.js:65",
-              "server/kern/spellen/magnaat/acties.js:135",
-              "server/kern/spellen/magnaat/maand-contracten.js:40",
-              "server/kern/spellen/magnaat/maand.js:107"
-            ]
+            "aantal": 0,
+            "plekken": []
           },
           "deels": null,
           "missers": [],
-          "stand": "VIOLATION"
+          "stand": "ABSENT"
         },
         "grootboek": {
           "autoriteit": "server/kern/magnaat-grootboek/, het journaal",
@@ -170,12 +165,12 @@
       "id": "M-005",
       "familie": "M-0",
       "invariant": "Een transactie heeft minimaal twee economische zijden, en debet is gelijk aan credit.",
-      "stand": "VIOLATION",
+      "stand": "PARTIAL",
       "gedocumenteerd": true,
       "geimplementeerd": true,
       "afgedwongen": false,
       "getoetst": false,
-      "schendingen": 4,
+      "schendingen": 0,
       "scopes": {
         "world": {
           "autoriteit": "geen: er is geen journaal",
@@ -183,17 +178,12 @@
           "toets": "NIEMAND",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
-            "aantal": 4,
-            "plekken": [
-              "server/kern/spellen/magnaat/aandeel.js:65",
-              "server/kern/spellen/magnaat/acties.js:135",
-              "server/kern/spellen/magnaat/maand-contracten.js:40",
-              "server/kern/spellen/magnaat/maand.js:107"
-            ]
+            "aantal": 0,
+            "plekken": []
           },
           "deels": null,
           "missers": [],
-          "stand": "VIOLATION"
+          "stand": "ABSENT"
         },
         "grootboek": {
           "autoriteit": "server/kern/magnaat-grootboek/, het journaal",

@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
+const { startServer, stop, letOpFouten, browserOpties, geenBrowser, wachtOpRust, pasAppAdres } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
@@ -98,7 +98,7 @@ test('plaats: een lopende dienst wordt aangeboden, en pas na de tik gaat er iets
       if (r.url().includes('/api/plaats/')) verstuurd.push({ url: r.url(), body: r.postData() || '' });
     });
 
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'domcontentloaded' });
 
     /* 1. HET AANBOD KOMT, EN ZOLANG NIEMAND TIKT GEBEURT ER NIETS. Dit is het
        stuk dat een servertoets niet kan zien: een app die stilletjes zelf ja

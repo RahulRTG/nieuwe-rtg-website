@@ -1416,6 +1416,38 @@ async function edgeWerkbladen(page) {
     await page.locator('[data-edge-command-bank]:visible').click();
 }
 
+/* HET ADRES VAN DE EIGEN PAS-APP van een ingelogd lid.
+
+   Een account weet bij welke pas het hoort. Opent de browser /apps/app.html
+   ZONDER ?pas= (of in een andere pas-app), dan doet de app zelf
+   location.replace naar ?pas=<tier> (app-main-04.js; zonder ?pas= is de lijst
+   `magHier` leeg, dus dat gebeurt ALTIJD). Een toets die het kale adres opent
+   en daarna meteen navigeert of wacht, racet met die omleiding: zo stond main
+   twee merges rood op werkscherm.e2e (lokaal 3 van 6 op net::ERR_ABORTED onder
+   belasting, in CI een kale timeout).
+
+   Deze helper vraagt de SERVER welke pas bij het token hoort -- dezelfde vraag
+   die de app stelt (/api/state) -- en rekent het doel uit met dezelfde regel
+   (guest -> rtg). Hij raadt dus niets: registreert een toets als 'business'
+   maar geeft de server 'rtg', dan opent de toets de rtg-app, net als een lid.
+   Een tier zonder pas-app is een fout met de reden erbij, geen stille terugval.
+
+   Wie de omleiding ZELF toetst (premium.e2e), opent het kale adres bewust. */
+async function pasAppAdres(base, token, extra) {
+  const r = await fetch(base + '/api/state', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' });
+  const d = await r.json().catch(() => ({}));
+  const tier = d && d.state && d.state.user && d.state.user.tier;
+  const doel = tier === 'guest' ? 'rtg' : tier;
+  if (!['rtg', 'lifestyle', 'business'].includes(doel)) {
+    throw new Error('pasAppAdres: de server gaf geen pas voor dit token (HTTP ' + r.status + ', tier ' +
+      JSON.stringify(tier) + '). De app toont dan de poort en leidt niet om; open het kale adres bewust.');
+  }
+  const q = new URLSearchParams(extra || {});
+  q.set('pas', doel);
+  return base + '/apps/app.html?' + q.toString();
+}
+
 async function bankDeur(page, naam, opties) {
   const ms = (opties && opties.timeout) || 15000;
   /* Tijdens login wordt de gesloten Command-root door de echte werktafel
@@ -1446,7 +1478,7 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

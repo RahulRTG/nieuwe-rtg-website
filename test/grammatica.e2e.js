@@ -16,7 +16,7 @@
    overgeslagen. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { browserOpties, geenBrowser, laadScherm, letOpFouten, startServer, stop, wachtOpRust, wachtTot } = require('./helper');
+const { browserOpties, geenBrowser, laadScherm, letOpFouten, startServer, stop, wachtOpRust, wachtTot, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -59,7 +59,7 @@ async function metLid(fn) {
     }, reg.token);
     const page = await ctx.newPage();
     letOpFouten(page, []);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar', { timeout: 20000 });
     await page.waitForFunction(() => window.RTGCommand && window.RTGCommand.actief && window.RTGCommand.actief(),
       null, { timeout: 20000 });

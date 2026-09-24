@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, bankDeur } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, bankDeur, pasAppAdres } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkscherm-'));
@@ -158,18 +158,9 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
       body: JSON.stringify({ login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran' }) })
       .then(r => r.json());
     assert.ok(inlog.token, 'de eigenaar kan inloggen: ' + JSON.stringify(inlog).slice(0, 120));
-    /* HET ADRES VAN ZIJN EIGEN PAS-APP, en niet het kale /apps/app.html. Een
-       account weet bij welke pas het hoort: op het kale adres (of in de
-       verkeerde pas-app) doet de app zelf location.replace naar ?pas=<tier>
-       (app-main-04.js). Dat is bedoeld gedrag -- maar een toets die het kale
-       adres opent en daarna meteen opnieuw navigeert of wacht, RACET met die
-       omleiding: lokaal onder belasting zakte hij 3 van 6 keer op
-       net::ERR_ABORTED, in CI op een timeout van 30 seconden. De pas komt uit
-       de server-state en niet uit de toets, zodat een andere tier van de
-       eigenaar deze toets niet stil laat omleiden. */
-    const tier = inlog.state && inlog.state.user && inlog.state.user.tier;
-    assert.ok(['rtg', 'lifestyle', 'business'].includes(tier), 'de eigenaar heeft een pas: ' + tier);
-    const appAdres = base + '/apps/app.html?pas=' + tier;
+    /* De pas-app van de eigenaar en niet het kale /apps/app.html: dat leidt
+       zichzelf om, en daar racete deze toets mee (zie pasAppAdres in helper.js). */
+    const appAdres = await pasAppAdres(base, inlog.token);
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
@@ -269,7 +260,7 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
     await page.goto(appAdres, { waitUntil: 'domcontentloaded' });
     await wachtTot(page, () => document.getElementById('app')?.classList.contains('active'),
       null, { ms: 30000, wat: 'de app van de eigenaar (#app.active) op ' + appAdres });
-    assert.equal(new URL(page.url()).search, '?pas=' + tier, 'de app leidde niet alsnog om: ' + page.url());
+    assert.equal(new URL(page.url()).search, new URL(appAdres).search, 'de app leidde niet alsnog om: ' + page.url());
     await bankDeur(page, 'Instellingen', { timeout: 20000 });
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcZoek');

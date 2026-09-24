@@ -1,42 +1,12 @@
-/* Magnaat Economische Motor -- de markt: arbeid, vraag, levering en de dag van
-   een bedrijf.
+/* Magnaat Economische Motor -- de markt: vraag, levering en de dag van een
+   bedrijf. De schokken staan in ./schokken.js, de arbeidsmarkt in ./arbeid.js.
 
    Dit is de JavaScript-helft van motor/src/magnaat.rs (RUST-MIGRATIES.json):
    Rust rekent dezelfde marktgetallen en de boekingen blijven hier. */
 'use strict';
-const { SCHOKKEN, ECONOMISCHE_GEBEURTENISSEN, rond, begrens, som } = require('./constanten');
+const { ECONOMISCHE_GEBEURTENISSEN, rond, begrens, som } = require('./constanten');
 
 module.exports = (m) => {
-  function schokZonderMutatie(e, dag) {
-    if (e.geforceerdeSchok) return SCHOKKEN.find(s => s.id === e.geforceerdeSchok) || SCHOKKEN[0];
-    const patroon = { 3: 'vraagpiek', 6: 'leveranciersuitval', 9: 'arbeidstekort' };
-    const cyclus = dag % 12;
-    return SCHOKKEN.find(s => s.id === patroon[cyclus]) || SCHOKKEN[0];
-  }
-
-  function schokVoorDag(e) {
-    const gekozen = schokZonderMutatie(e, e.dag);
-    if (e.geforceerdeSchok) e.geforceerdeSchok = null;
-    return gekozen;
-  }
-
-  function pasArbeidsmarktToe(e, b, schok) {
-    const verschil = rond(b.personeelDoel - b.personeel);
-    if (!verschil) return 0;
-    if (verschil < 0) {
-      const vertrek = Math.min(b.personeel, Math.abs(verschil));
-      b.personeel -= vertrek;
-      m.legUit(e, 'arbeid', b.naam + ' verkleint het team', 'Het ingestelde personeelsdoel ligt lager dan de bestaande bezetting.', '-' + vertrek + ' arbeidsplaatsen', 'personeelsbesluit');
-      return -vertrek;
-    }
-    const loonFactor = begrens(b.loonMaand / 350000, .65, 1.35);
-    const beschikbaar = Math.max(0, Math.floor(verschil * schok.arbeid * loonFactor));
-    const hires = Math.min(verschil, beschikbaar || (schok.id === 'arbeidstekort' ? 0 : 1));
-    b.personeel += hires;
-    m.legUit(e, 'arbeid', b.naam + ' werft personeel', 'Beschikbaarheid en loonpositie bepalen hoeveel vacatures werkelijk worden gevuld.', '+' + hires + ' van ' + verschil + ' vacatures', 'arbeidsaanbod x relatieve beloning');
-    return hires;
-  }
-
   function aantrekkelijkheid(e, b) {
     const prijsFactor = Math.pow(11900 / Math.max(5000, b.prijs), e.instellingen.prijsElasticiteit);
     const kwaliteitFactor = begrens(b.kwaliteit / 72, .55, 1.5);
@@ -90,7 +60,7 @@ module.exports = (m) => {
     const werk = e.werk;
     const werkBonus = werk.aantal ? begrens((werk.productiviteit + werk.service + werk.controle + werk.innovatie) / (werk.aantal * 100), 0, .22) : 0;
     const bedrijven = Object.values(e.bedrijven);
-    bedrijven.forEach(b => pasArbeidsmarktToe(e, b, schok));
+    bedrijven.forEach(b => m.pasArbeidsmarktToe(e, b, schok));
 
     const totaalAantrekkelijk = som(bedrijven.map(b => aantrekkelijkheid(e, b) * 100000)) / 100000 || 1;
     const macroVraag = begrens(e.macro.consumentenvertrouwen / 100, .65, 1.25);
@@ -145,5 +115,5 @@ module.exports = (m) => {
     if (werk.aantal) m.legUit(e, 'werkvloer', tekst.titel, werk.aantal + ' voltooide dossier(s) verbeteren productiviteit, service, controle of innovatie in de volgende economische dag.', '+' + rond(werkBonus * 100) + '% productiviteitspotentieel', tekst.bron);
   }
 
-  return { schokZonderMutatie, schokVoorDag, pasArbeidsmarktToe, boekBedrijfsdag, verwerkOverheid, berekenMarkt, verklaarMarkt };
+  return { boekBedrijfsdag, verwerkOverheid, berekenMarkt, verklaarMarkt };
 };

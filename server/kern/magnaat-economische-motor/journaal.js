@@ -53,7 +53,7 @@ module.exports = (m) => {
 
   /* De projectie volgt een gebeurtenis. Dezelfde functie voor een verse boeking
      en voor herstel, zodat die twee nooit uit elkaar kunnen lopen. */
-  function projecteer(e, g, { saldi = true } = {}) {
+  function projecteerGebeurtenis(e, g, { saldi = true } = {}) {
     if (saldi) for (const lijn of g.regels) pasToe(e, lijn);
     e.laatstToegepast = g.volgnummer;
     e.totalen.debet += g.debet;
@@ -103,7 +103,7 @@ module.exports = (m) => {
       bedrag: Math.max(...schoon.map(r => Math.max(r.debet, r.credit))),
       debet, credit, regels: schoon, labels: labels.slice(0, 8)
     };
-    projecteer(e, g);
+    projecteerGebeurtenis(e, g);
     e.wachtend.push(g);
     return g;
   }
@@ -113,7 +113,7 @@ module.exports = (m) => {
   function bevestig(e) {
     if (!e.wachtend.length) return 0;
     const n = e.wachtend.length;
-    m.opslag.voegToe(m.wereld, e.wachtend);
+    m.opslag.vulJournaalAan(m.wereld, e.wachtend);
     e.wachtend = [];
     return n;
   }
@@ -123,11 +123,11 @@ module.exports = (m) => {
      ontbrekende stuk opnieuw toegepast -- niet de hele geschiedenis. Loopt het
      achter, dan staat er in de projectie iets waar geen bewijs voor is, en dat
      wordt niet stil rechtgezet: de motor weigert te boeken tot een mens kijkt. */
-  function herstel(e) {
-    const journaal = m.opslag.laatste(m.wereld);
+  function herstelProjectie(e) {
+    const journaal = m.opslag.laatsteVolgnummer(m.wereld);
     const projectie = e.laatstToegepast - e.wachtend.length;
     if (journaal > projectie && !e.wachtend.length) {
-      for (const g of m.opslag.lees(m.wereld, projectie + 1, journaal)) projecteer(e, g);
+      for (const g of m.opslag.lees(m.wereld, projectie + 1, journaal)) projecteerGebeurtenis(e, g);
       e.boekVolgorde = journaal;
       e.integriteit = null;
     } else if (journaal < projectie) {
@@ -151,5 +151,5 @@ module.exports = (m) => {
     return saldi;
   }
 
-  return { metOorzaak, rekening, regel, boek, bevestig, herstel, gebeurtenissen, saldiNa, regelVoorScherm };
+  return { metOorzaak, rekening, regel, boek, bevestig, herstelProjectie, gebeurtenissen, saldiNa, regelVoorScherm };
 };

@@ -51,14 +51,14 @@ function maak({ wereld, profiel, wereldState, opslag, save = () => {}, motorklan
   const m = { wereld, profiel, wereldState, opslag, save, haken, motor: motorklant || require('../magnaat-motorklant')() };
   /* Letterlijk opgesomd en niet uit een lijst namen geladen: de bedradingsmeter
      (keuringsregel 59, BEDRADING.json) ziet een require met een variabele als onbekende kant. */
-  const delen = [require('./journaal'), require('./geldstromen'), require('./markt'), require('./rust'),
+  const delen = [require('./journaal'), require('./geldstromen'), require('./schokken'), require('./arbeid'), require('./markt'), require('./rust'),
     require('./staat'), require('./dag'), require('./besluiten'), require('./overzicht')];
   for (const deel of delen) Object.assign(m, deel(m));
   return {
     wereld, motorVersie: MOTOR_VERSIE, regelVersie: REGEL_VERSIE,
     overzicht: m.overzicht, volgendeDag: m.volgendeDag, volgendeDagAsync: m.volgendeDagAsync,
     beslis: m.beslis, kiesSchok: m.kiesSchok, transactie: m.transactie, verricht: m.verricht,
-    verifieer: m.verifieer, gebeurtenissen: m.gebeurtenissen, saldiNa: m.saldiNa,
+    verifieerJournaal: m.verifieerJournaal, gebeurtenissen: m.gebeurtenissen, saldiNa: m.saldiNa,
     _state: m.state, _boek: m.boek
   };
 }

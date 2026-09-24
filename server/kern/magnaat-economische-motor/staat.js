@@ -77,7 +77,7 @@ module.exports = (m) => {
     if (wereld.economie && wereld.economie.versie !== STAAT_VERSIE) {
       /* Vroeger begon een andere staatvorm stil opnieuw. Met een journaal dat
          blijft bestaan zou dat de projectie van zijn bewijs losknippen. */
-      if (m.opslag.laatste(m.wereld) > 0) {
+      if (m.opslag.laatsteVolgnummer(m.wereld) > 0) {
         throw new Error('De economische staat heeft vorm ' + wereld.economie.versie + ' en de motor verwacht ' + STAAT_VERSIE + '; er staat een journaal, dus er wordt niet stil opnieuw begonnen.');
       }
       wereld.economie = null;
@@ -86,7 +86,7 @@ module.exports = (m) => {
     const e = wereld.economie;
     if (Array.isArray(e.journaal)) neemOudJournaalOver(e);
     zorgVorm(e);
-    m.herstel(e);
+    m.herstelProjectie(e);
     if (m.haken.zorgStaat) m.haken.zorgStaat(e);
     if (!e.geinitialiseerd) m.metOorzaak('opening', () => initialiseer(e));
     m.metOorzaak('migratie', () => zorgVoorraadBoekwaarde(e));

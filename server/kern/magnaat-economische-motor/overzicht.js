@@ -4,7 +4,7 @@
    lopende totalen die bij elke gebeurtenis meebewegen, niet uit een optelling
    over het hele journaal: die optelling werd per dag duurder en telde boven
    2500 posten alleen nog wat er over was. Wie het journaal zelf wil nalopen,
-   gebruikt `verifieer` -- dat is controle en geen weergave. */
+   gebruikt `verifieerJournaal` -- dat is controle en geen weergave. */
 'use strict';
 const { STAAT_VERSIE, SCHOKKEN, datumOpDag } = require('./constanten');
 
@@ -77,7 +77,7 @@ module.exports = (m) => {
      balans, volgnummers zonder gat, en de saldi van de projectie precies gelijk
      aan wat het journaal oplevert (vanaf een lege wereld, of vanaf het punt
      waar de overgenomen historie begint). */
-  function verifieer() {
+  function verifieerJournaal() {
     const e = m.state();
     const gat = m.opslag.ontbrekend(m.wereld);
     const bevindingen = [];
@@ -97,5 +97,5 @@ module.exports = (m) => {
     return { ok: !bevindingen.length, gebeurtenissen: verwacht - 1, historieVanaf: gat ? gat.tot + 1 : 1, bevindingen };
   }
 
-  return { overzicht, verifieer };
+  return { overzicht, verifieerJournaal };
 };

@@ -26,7 +26,7 @@
    rekensommen) en als eigen collectie `magnaatJournaal` in db.data. */
 'use strict';
 
-function maakOpslag(kaartVan) {
+function maakJournaalOpslag(kaartVan) {
   let gelezen = 0;
   const boekVan = (wereld) => {
     const kaart = kaartVan();
@@ -36,7 +36,7 @@ function maakOpslag(kaartVan) {
   const kijkBoek = (wereld) => kaartVan()[wereld] || null;
   const eerste = (b) => (b && b.ontbrekend ? b.ontbrekend.tot : 0) + 1;
 
-  function laatste(wereld) {
+  function laatsteVolgnummer(wereld) {
     const b = kijkBoek(wereld);
     if (!b) return 0;
     return b.gebeurtenissen.length ? b.gebeurtenissen[b.gebeurtenissen.length - 1].volgnummer : eerste(b) - 1;
@@ -47,9 +47,9 @@ function maakOpslag(kaartVan) {
     return b && Object.prototype.hasOwnProperty.call(b.sleutels, sleutel) ? b.sleutels[sleutel] : null;
   }
 
-  function voegToe(wereld, lijst) {
+  function vulJournaalAan(wereld, lijst) {
     const b = boekVan(wereld);
-    let volgende = laatste(wereld) + 1;
+    let volgende = laatsteVolgnummer(wereld) + 1;
     for (const g of lijst) {
       if (g.wereld !== wereld) throw new Error('Journaal weigert: gebeurtenis ' + g.id + ' hoort bij wereld ' + g.wereld + ', niet bij ' + wereld + '.');
       if (g.volgnummer !== volgende) {
@@ -105,19 +105,19 @@ function maakOpslag(kaartVan) {
     Object.assign(b.sleutels, sleutels);
   }
 
-  return { laatste, zoek, voegToe, lees, ontbrekend, neemOver, gelezen: () => gelezen };
+  return { laatsteVolgnummer, zoek, vulJournaalAan, lees, ontbrekend, neemOver, gelezen: () => gelezen };
 }
 
 function geheugenJournaal() {
   const kaart = {};
-  return maakOpslag(() => kaart);
+  return maakJournaalOpslag(() => kaart);
 }
 
 function collectieJournaal({ db }) {
   const eigen = require('../eigencollectie')({
     db, domein: 'kern/magnaat-economische-motor', bezit: { magnaatJournaal: 'kaart' }
   });
-  return maakOpslag(() => eigen.bak('magnaatJournaal'));
+  return maakJournaalOpslag(() => eigen.bak('magnaatJournaal'));
 }
 
 module.exports = { geheugenJournaal, collectieJournaal };

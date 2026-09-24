@@ -10,7 +10,7 @@
      - 10.000+ gebeurtenissen: de projectie klopt, het journaal is volledig, een
        gewone beslissing leest het journaal niet, en een herhaling vanaf een
        bekend volgnummer geeft precies dezelfde saldi
-     - herstel: loopt het journaal voor, dan wordt alleen het ontbrekende stuk
+     - herstelProjectie: loopt het journaal voor, dan wordt alleen het ontbrekende stuk
        toegepast; loopt het achter, dan weigert de motor te boeken
      - een wereld van voor A1 neemt zijn journaal mee, en het gat van de oude
        grens wordt benoemd in plaats van verzonnen */
@@ -63,26 +63,26 @@ test('3. het journaal vult alleen aan: geen gat, geen dubbel, geen inkorten, nie
   assert.doesNotMatch(code, /\.splice\(|\.shift\(|\.pop\(|\.length\s*=[^=]|delete\s+b\.gebeurtenissen/, 'geen enkele weg om het journaal korter te maken');
   const { ec, opslag } = economie();
   ec.volgendeDag('s', 'd1');
-  const laatste = opslag.laatste('oefenkantoor');
+  const laatste = opslag.laatsteVolgnummer('oefenkantoor');
   const g = opslag.lees('oefenkantoor', laatste, laatste)[0];
   const volgende = (n, sleutel) => Object.assign({}, g, { volgnummer: n, sleutel, regels: [], labels: [] });
-  assert.throws(() => opslag.voegToe('oefenkantoor', [volgende(laatste + 2, 'gat')]), /volgnummer/);
-  assert.throws(() => opslag.voegToe('oefenkantoor', [volgende(laatste, 'dubbel')]), /volgnummer/);
-  assert.throws(() => opslag.voegToe('oefenkantoor', [volgende(laatste + 1, g.sleutel)]), /sleutel/);
+  assert.throws(() => opslag.vulJournaalAan('oefenkantoor', [volgende(laatste + 2, 'gat')]), /volgnummer/);
+  assert.throws(() => opslag.vulJournaalAan('oefenkantoor', [volgende(laatste, 'dubbel')]), /volgnummer/);
+  assert.throws(() => opslag.vulJournaalAan('oefenkantoor', [volgende(laatste + 1, g.sleutel)]), /sleutel/);
   assert.throws(() => { g.debet = 1; }, TypeError, 'een geboekte gebeurtenis is bevroren');
-  assert.equal(opslag.laatste('oefenkantoor'), laatste, 'een geweigerde aanbieding laat niets achter');
+  assert.equal(opslag.laatsteVolgnummer('oefenkantoor'), laatste, 'een geweigerde aanbieding laat niets achter');
 });
 
 test('4. een geweigerd besluit laat niets achter in het bewijs', () => {
   const { ec, opslag } = economie();
   ec.volgendeDag('s', 'd1');
-  const voor = opslag.laatste('oefenkantoor');
+  const voor = opslag.laatsteVolgnummer('oefenkantoor');
   assert.equal(ec.beslis('directie', { lening: 5000000 }).status, 400);
   assert.equal(ec.beslis('directie', { prijs: 9999 }).status, 400);
-  assert.equal(opslag.laatste('oefenkantoor'), voor);
+  assert.equal(opslag.laatsteVolgnummer('oefenkantoor'), voor);
   assert.equal(ec._state().laatstToegepast, voor);
   assert.ok(ec.beslis('directie', { lening: 200000 }).ok);
-  assert.equal(opslag.laatste('oefenkantoor'), voor + 1, 'een geslaagde lening is precies een gebeurtenis');
+  assert.equal(opslag.laatsteVolgnummer('oefenkantoor'), voor + 1, 'een geslaagde lening is precies een gebeurtenis');
   const lening = opslag.lees('oefenkantoor', voor + 1, voor + 1)[0];
   assert.equal(lening.soort, 'LENING');
   assert.match(lening.oorzaak, /^besluit:/);
@@ -93,14 +93,14 @@ test('4. een geweigerd besluit laat niets achter in het bewijs', () => {
   const wereld = {}, eigen = geheugenJournaal();
   const motor = maak({ wereld: 'proef', profiel: maakOefen.OEFENPROFIEL, wereldState: () => wereld, opslag: eigen, motorklant: { aan: false } });
   motor.overzicht('s');
-  const tot = eigen.laatste('proef'), saldoVoor = wereld.economie.rekeningen['bank.kas'].saldo;
+  const tot = eigen.laatsteVolgnummer('proef'), saldoVoor = wereld.economie.rekeningen['bank.kas'].saldo;
   const r = (rekening, kant) => ({ rekening, actor: 'bank', naam: rekening, soort: 'actief', debet: kant === 'd' ? 500 : 0, credit: kant === 'c' ? 500 : 0 });
   const uit = motor.transactie('s', (e) => {
     motor._boek(e, 'proef:half', 'ONBEKEND', 'half besluit', [r('bank.kas', 'd'), r('bank.leningen', 'c')]);
     return { status: 400, error: 'toch niet' };
   });
   assert.equal(uit.status, 400);
-  assert.equal(eigen.laatste('proef'), tot, 'de boeking op de weggegooide kopie staat niet in het journaal');
+  assert.equal(eigen.laatsteVolgnummer('proef'), tot, 'de boeking op de weggegooide kopie staat niet in het journaal');
   assert.equal(wereld.economie.rekeningen['bank.kas'].saldo, saldoVoor, 'en niet in de projectie');
 });
 
@@ -132,19 +132,19 @@ test('5. 10.000+ gebeurtenissen: projectie klopt, journaal volledig, beslissen l
   assert.equal(opslag.gelezen(), gelezenVoor, 'een gewone beslissing leest het journaal niet');
 
   const nu = ec._state();
-  assert.deepEqual(ec.verifieer().bevindingen, [], 'de projectie is precies het journaal');
+  assert.deepEqual(ec.verifieerJournaal().bevindingen, [], 'de projectie is precies het journaal');
   const saldiNu = Object.fromEntries(Object.entries(nu.rekeningen).map(([k, r]) => [k, r.saldo]));
   assert.deepEqual(ec.saldiNa(punt.saldi, punt.bij), saldiNu, 'herhaling vanaf volgnummer ' + punt.bij + ' geeft exact de saldi van nu');
 });
 
-test('6. herstel: een voorlopend journaal wordt bijgewerkt, een achterlopend houdt de motor tegen', () => {
+test('6. herstelProjectie: een voorlopend journaal wordt bijgewerkt, een achterlopend houdt de motor tegen', () => {
   const { wereld, ec, opslag } = economie();
   ec.volgendeDag('s', 'd1');
   const projectieVoor = structuredClone(wereld.economie);
   const toegepastVoor = projectieVoor.laatstToegepast;
   ec.volgendeDag('s', 'd2');
   const saldiNa = Object.fromEntries(Object.entries(wereld.economie.rekeningen).map(([k, r]) => [k, r.saldo]));
-  const laatste = opslag.laatste('oefenkantoor');
+  const laatste = opslag.laatsteVolgnummer('oefenkantoor');
   /* De projectie van na dag 2 ging verloren, het journaal niet. */
   wereld.economie = projectieVoor;
   const gelezenVoor = opslag.gelezen();
@@ -153,7 +153,7 @@ test('6. herstel: een voorlopend journaal wordt bijgewerkt, een achterlopend hou
   assert.deepEqual(Object.fromEntries(Object.entries(e.rekeningen).map(([k, r]) => [k, r.saldo])), saldiNa);
   assert.ok(laatste > toegepastVoor);
   assert.equal(opslag.gelezen() - gelezenVoor, laatste - toegepastVoor, 'alleen het ontbrekende stuk is gelezen');
-  assert.deepEqual(ec.verifieer().bevindingen, []);
+  assert.deepEqual(ec.verifieerJournaal().bevindingen, []);
 
   /* Andersom: de projectie staat verder dan het bewijs. */
   const ander = economie();
@@ -184,12 +184,12 @@ test('7. een wereld van voor A1 neemt zijn journaal mee, en het gat van de oude 
   const o = verder.ec.overzicht('s');
   assert.equal(o.grootboek.controle.inBalans, true);
   assert.ok(!('journaal' in wereld.economie) && !('verwerkteBoekingen' in wereld.economie));
-  const v = verder.ec.verifieer();
+  const v = verder.ec.verifieerJournaal();
   assert.equal(v.historieVanaf, alle.length - 29, 'de historie begint eerlijk waar de oude grens hem liet');
   assert.deepEqual(v.bevindingen, []);
   assert.equal(verder.opslag.ontbrekend('oefenkantoor').tot, alle.length - 30);
   verder.ec.volgendeDag('s', 'd6');
-  assert.deepEqual(verder.ec.verifieer().bevindingen, [], 'na de overname loopt het journaal gewoon door');
+  assert.deepEqual(verder.ec.verifieerJournaal().bevindingen, [], 'na de overname loopt het journaal gewoon door');
 });
 
 test('8. werk is een economisch commando: de motor kent de activiteit, niet de missie', () => {

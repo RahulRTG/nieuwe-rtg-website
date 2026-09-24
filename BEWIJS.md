@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2027 |
 | losse beweringen (`test(...)`) | 14370 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1374 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1375 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
-| niets van beide | 409 |
+| niets van beide | 408 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1938,7 +1938,7 @@ toets omvalt.
 | `livinglab.e2e.js` | 2 | -- | Scherm-test voor het RTF Living Lab: het kantoorscherm (/apps/livinglab.html) en het bewonersscherm (/apps/labpas.html). WAAROM DEZE TOETS ER IS. |
 | `loopbaan.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE TWEE LOOPBAANSCHERMEN IN EEN ECHTE BROWSER. test/carriereledger.test.js bewijst het besluit en test/carriereledger.e2e.test.js dat een verzoek over HTTP bij dat besluit aankomt. |
 | `magnaat-partnerstudio.e2e.js` | 1 | gezakt op `liegpoort /api/` | De Magnaat Partnerstudio in een echte browser. De kernproeven bewijzen de publicatie- en vier-ogenregels. |
-| `magnaatleven.e2e.js` | 1 | -- | MAGNAAT VAN NUL IN EEN ECHTE BROWSER: van de voorzijde naar Vandaag, en de eerste stappen van de keten met de Edge als bediening. Wat deze toets vasthoudt en wat geen unittoets kon zien: de handeling die nu het meest... |
+| `magnaatleven.e2e.js` | 1 | gezakt op `liegpoort /api/` | MAGNAAT VAN NUL IN EEN ECHTE BROWSER: van de voorzijde naar Vandaag, en de eerste stappen van de keten met de Edge als bediening. Wat deze toets vasthoudt en wat geen unittoets kon zien: de handeling die nu het meest... |
 | `media-studio-pro.e2e.js` | 1 | -- | De Studio Pro met een echt bronbestand. Deze toets controleert de keten die voor een maker telt: openen, beeld tekenen, niet-destructief bewerken, herstellen, ondertitelen en een watermerkvrije master downloaden. |
 | `media.e2e.js` | 1 | -- | CAMERA EN MICROFOON ZOALS EEN BROWSER ZE ERVAART. WAAROM DEZE TOETS BESTAAT. |
 | `medialijst.e2e.js` | 1 | -- | DE LIJST OP HET SCHERM -- want een knop die niemand heeft zien werken, is geen knop (LAT.md regel 10). De server-kant van de afspeellijsten staat in test/medialijsten.test.js. |

@@ -231,14 +231,19 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 
 **Het migratieprogramma (A2.3–A2.9).** Een gemigreerde gebeurtenis roept `beweeg(st, { soort, van, naar, bedrag })` aan. Dat boekt de overdracht in het grootboek en werkt het saldo in de partij bij met precies hetzelfde aantal centen. Er is één regel die een saldo schrijft (`pasToe` in `boekhouding.js`), en de grondwetmeter en de geldkaart laten dat bestand met die reden buiten hun telling. Een module krijgt alleen `st` mee. Daarom hangt `koppel` de boekhouding er onder een symbool aan: dat gaat niet mee in JSON, en een ongekoppelde partij faalt hard in plaats van buiten het grootboek om te boeken. Op de geldkaart draagt een gemigreerde gebeurtenis `gemigreerd`, en haar been is dan de `beweeg`-regel in plaats van de mutatie.
 
+*Bevinding, niet gerepareerd (besluit van de eigenaar: de meter blijft zoals hij is).* `scripts/commerce.js` telt elke `beweeg({ … bedrag })` als een koopbare vorm, omdat hij een objectliteraal met een bedrag herkent. `koopbareVormen` stijgt daarom bij elke migratieronde zonder dat er iets verkoopbaars bijkomt: 557→564 in A2.4 en →567 in A2.5. Het register wordt per ronde opnieuw afgeleid. Het getal zegt hier dus iets over de meter en niets over commerce.
+
 | Ronde | Categorie | Gebeurtenissen | M-001 / M-005 | Golden baseline |
 |---|---|---|---|---|
 | A2.3 | opening | G01 | 35→34 / 32→31 | ongewijzigd groen |
 | A2.4 | overdracht | G06–G09, G11, G14, G15 | 34→20 / 31→17 | ongewijzigd groen |
+| A2.5 | financiering | G16–G22 | 20→13 / 17→10 | ongewijzigd groen |
 
 **A2.3** boekt het startkapitaal als overdracht van de inleg van de speler naar zijn kas. Een lopende partij van vóór het grootboek krijgt bij het koppelen een overname-opening voor wat er staat, zonder dat het saldo verandert.
 
 **A2.4** boekt de overdrachten tussen spelers: afkoop (drie plekken), vooruitbetaling, boete, aandelenkoop en veilinggunning. Twee overdrachten horen er bewust niet bij. Bij G10 (contractbetaling) en G13 (resultaatdeling) zit het andere been in het maandresultaat (G12), dus die gaan mee met A2.8. Eén blocker is in deze ronde gerepareerd, omdat hij niet sluitend te boeken was: bij de gunning van een vestiging betaalde de winnaar al voordat vaststond dat de zaak nog bestond. Bij `mislukt` verdween de koopsom dan zonder ontvanger. Nu gaat er in dat geval niets over (`test/spelveiling.test.js`).
+
+**A2.5** boekt de bank als tegenpartij: de lening, de aflossingen (extra, per termijn en na opeising), de rente op een lening en de rente op een negatief saldo. De uitwinning (G21) werd netto geboekt en staat nu als de twee delen die de kaart al noemde: de halve bouwsom van de aannemer naar de kas, en daaruit het deel voor de schuld naar de bank. Op de kas is dat hetzelfde bedrag.
 
 ---
 

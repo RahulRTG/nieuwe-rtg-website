@@ -31,6 +31,7 @@ const H = require('./handel');
 
 const rond = (n) => Math.round(n);
 const { naarCenten, uitCenten, euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering }) => {
   const { wikkelAf, betalingen } = require('./maand-contracten')({ rond });
@@ -75,7 +76,6 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
       const o = ontvangst[c.afnemerId] = ontvangst[c.afnemerId] || {};
       o[c.soort] = (o[c.soort] || 0) + geleverd;
     }
-    // wat elk contract betaalt, een keer in centen
     const betaling = betalingen(actief, leverDeel, toezegging);
     /* Wat er deze maand aan RENTE de wereld verlaat. Apart geteld omdat het de
        enige post is die niet bij een andere speler landt; de geldpomp-meter
@@ -118,15 +118,13 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
         kwaliteitVan[v.id] = r.kwaliteit;
         v.laatsteBezetting = r.bezetting;
       }
-      /* ROOD STAAN KOST GELD, en dit IS de rekening-courant uit ./bank.js: de
-         kredietlijn die er altijd is, het duurst en zonder aanvraag. Zonder dit
-         is overinvesteren gratis -- je kas gaat onder nul en er gebeurt niets.
-
-         Hij staat hier en niet bij de leningen omdat hij geen lening is die je
-         AANGAAT: hij ontstaat doordat je uitgeeft wat je niet hebt. */
+      /* ROOD STAAN KOST GELD: de rekening-courant uit ./bank.js, de kredietlijn
+         die er altijd is, het duurst en zonder aanvraag -- anders is
+         overinvesteren gratis. Hij staat niet bij de leningen: je gaat hem niet
+         AAN, hij ontstaat doordat je uitgeeft wat je niet hebt. */
       if (st.geld[h] < 0) {
         const rente = naarCenten(uitCenten(-st.geld[h]) * ROOD_RENTE);
-        st.geld[h] -= rente;
+        beweeg(st, { soort: 'RENTE', van: ['kas', h], naar: ['macro', 'bank'], bedrag: rente, omschrijving: 'Rente rood staan' });
         rentelast += rente;
         regels.push({ id: 'rood', naam: 'Rood staan', rente: euroTonen(rente), resultaat: -euroTonen(rente) });
       }

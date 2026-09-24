@@ -23,6 +23,7 @@ const B = require('./bank');
 
 const rond = (n) => Math.round(n);
 const { naarCenten, uitCenten, euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 const MAX_LENINGEN = 8;
 
 module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
@@ -89,7 +90,7 @@ module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
         betaaldRente: 0, betaaldAflossing: 0, status: 'loopt'
       };
       (st.leningen = st.leningen || []).push(l);
-      st.geld[h] += l.restant;
+      beweeg(st, { soort: 'LENING', van: ['macro', 'bank'], naar: ['kas', h], bedrag: l.restant, omschrijving: 'Uitbetaling lening' });
       return { status: 200, ok: true, id: l.id, rente: l.rente, maandlast: o.maandlast };
     },
 
@@ -103,7 +104,7 @@ module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
          openstaat en niet meer dan er in kas is. */
       const bedrag = Math.min(naarCenten(Math.floor(Number(z.bedrag) || 0)), l.restant, Math.max(0, st.geld[h]));
       if (bedrag < 1) return { status: 400, error: 'Daar is geen geld voor.' };
-      st.geld[h] -= bedrag;
+      beweeg(st, { soort: 'AFLOSSING', van: ['kas', h], naar: ['macro', 'bank'], bedrag, omschrijving: 'Extra aflossing' });
       l.restant -= bedrag;
       l.betaaldAflossing += bedrag;
       if (l.restant < 1) { l.restant = 0; l.status = 'afgelost'; }

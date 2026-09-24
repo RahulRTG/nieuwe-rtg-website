@@ -16,8 +16,9 @@
    7. Een partij van voor A2.1 wordt een keer omgezet, en nooit twee keer.
    8. Het maandresultaat is de som van acht gebeurtenissen, elk een keer
       afgerond -- zodat acht losse boekingen in A2.8 exact hetzelfde geven.
-   9. Na elke stap staat elke overlopende contractrekening op nul: wat de
-      leverancier in de maand kreeg, heeft de afnemer na de maand betaald. */
+   9. Na elke stap staat elke overlopende rekening op nul: wat de leverancier
+      in de maand kreeg, heeft de afnemer na de maand betaald, en wat via RTG
+      naar de RTFoundation ging, is daar ook aangekomen. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -192,18 +193,19 @@ test('8. het maandresultaat is de som van acht gebeurtenissen, elk een keer afge
   assert.ok(regels > 5, 'de toets zag echte maandregels (' + regels + ')');
 });
 
-test('9. na elke stap staat elke overlopende contractrekening op nul', () => {
-  let gezien = 0;
+test('9. na elke stap staat elke overlopende rekening op nul (contract en RTG-route)', () => {
+  const gezien = { contract: 0, rtg: 0 };
   for (const naam of Object.keys(SCENARIOS)) {
     draai(naam, {
       naElkeStap(w, stap) {
         for (const [code, r] of Object.entries((w.st.boek || {}).rekeningen || {})) {
-          if (!code.includes(':contract:')) continue;
-          gezien++;   // een rekening bestaat pas als er op geboekt is
+          const soort = code.includes(':contract:') ? 'contract' : code.includes(':rtg:') ? 'rtg' : null;
+          if (!soort) continue;
+          gezien[soort]++;   // een rekening bestaat pas als er op geboekt is
           assert.equal(r.saldo, 0, naam + ' na ' + JSON.stringify(stap[0] === 'maand' ? stap : stap[1]) + ': ' + code + ' staat op ' + r.saldo);
         }
       }
     });
   }
-  assert.ok(gezien > 3, 'de toets zag echte contractbetalingen (' + gezien + ')');
+  assert.ok(gezien.contract > 3 && gezien.rtg > 3, 'de toets zag echte betalingen: ' + JSON.stringify(gezien));
 });

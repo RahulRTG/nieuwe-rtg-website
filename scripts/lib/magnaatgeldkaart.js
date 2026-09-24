@@ -148,11 +148,11 @@ const GEBEURTENISSEN = [
   { id: 'G25', betekenis: 'UITKERING', categorie: 'verzekering', van: 'verzekeraar', naar: 'speler', tegenzijde: 'bron', gemigreerd: 'A2.6',
     benen: [b('verzekering.js', "if (uit.bedrag > 0) { beweeg(st, { soort: 'UITKERING', van: ['macro', 'verzekeraar'], naar: ['kas', h], bedrag: uit.bedrag, omschrijving: 'Uitkering' });")] },
 
-  { id: 'G26', betekenis: 'FOUNDATION_AFDRACHT', categorie: 'foundation', van: 'stad', naar: 'Foundation-pot', tegenzijde: 'bron',
-    benen: [b('foundation.js', 'f.lokaal += naarCenten(lokaal);'), b('foundation.js', 'f.centraal += naarCenten(centraal);')],
+  { id: 'G26', betekenis: 'FOUNDATION_AFDRACHT', categorie: 'foundation', van: 'stad', naar: 'Foundation-pot', tegenzijde: 'bron', gemigreerd: 'A2.9',
+    benen: [b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['macro', 'stad'], naar: ['rtg', 'foundation'], bedrag: l + c, omschrijving: 'Afdracht van de stad' });"), b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'lokaal'], bedrag: l, omschrijving: 'Naar de lokale pot' });"), b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'centraal'], bedrag: c, omschrijving: 'Naar de centrale pot' });")],
     let: 'de afdracht wordt BEREKEND over de omzet maar van niemand afgetrokken: de pot groeit uit niets. Besluit 3 (MAGNAAT.md): de stad en de spelers betalen, via RTG naar de RTFoundation. Tot die regelwijziging (A2.9) staat de stad als betaler: de berekening loopt nu over de stadsomzet en die van de spelers, zonder dat iemand het voelt' },
-  { id: 'G27', betekenis: 'FOUNDATION_PROJECT', categorie: 'foundation', van: 'Foundation-pot', naar: 'aannemer', tegenzijde: 'put',
-    benen: [b('foundation.js', 'f.lokaal -= naarCenten(p.kosten);')] }
+  { id: 'G27', betekenis: 'FOUNDATION_PROJECT', categorie: 'foundation', van: 'Foundation-pot', naar: 'aannemer', tegenzijde: 'put', gemigreerd: 'A2.9',
+    benen: [b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_PROJECT', van: ['foundation', 'lokaal'], naar: ['macro', 'aannemer'], bedrag: naarCenten(p.kosten), omschrijving: p.naam });")] }
 ];
 
 /* De patronen waarmee de toets de plekken zelf zoekt. Het eerste is letterlijk

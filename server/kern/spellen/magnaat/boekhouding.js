@@ -49,10 +49,12 @@ const REKENING = {
   /* Overlopend: de leverancier krijgt zijn contractomzet IN de maand, de
      afnemer betaalt NA de maand (./maand-contracten.js). Tussen die twee staat
      het bedrag hier, en aan het eind van de maand staat hij weer op nul. */
-  contract: (w, id) => w + ':contract:' + id + ':overlopend'
+  contract: (w, id) => w + ':contract:' + id + ':overlopend',
+  // RTG als route naar de RTFoundation (./foundation.js): na elke afdracht nul
+  rtg: (w, route) => w + ':rtg:' + route + ':route'
 };
 const HANDVAT = Symbol('boekhouding');
-const SOORT_VAN = { kas: 'actief', inleg: 'eigen-vermogen', macro: 'extern', foundation: 'actief', contract: 'overlopend' };
+const SOORT_VAN = { kas: 'actief', inleg: 'eigen-vermogen', macro: 'extern', foundation: 'actief', contract: 'overlopend', rtg: 'overlopend' };
 
 /* De projectie van het grootboek in een World-partij. */
 const nieuweProjectie = () => ({ boekVolgorde: 0, rekeningen: {}, laatstToegepast: 0,

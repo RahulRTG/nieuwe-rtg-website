@@ -24,6 +24,7 @@
    een economie heeft, en de VERHOUDING is wat je wilt laten zien. */
 
 const { naarCenten } = require('./centen');
+const { beweeg } = require('./boekhouding');
 const DEEL_LOKAAL = 0.20;
 const DEEL_CENTRAAL = 0.10;
 /* Op welk deel van de omzet die afdracht rust. Bewust laag: dit is niet
@@ -62,24 +63,28 @@ function nieuw() {
 
 /* De afdracht over een maand omzet. Geeft terug wat er is afgedragen, zodat de
    speler het als regel op zijn maandoverzicht ziet in plaats van als verschil. */
-function draagAf(f, omzet) {
+function draagAf(st, omzet) {
   const bijdrage = omzet * BIJDRAGE;
   const lokaal = bijdrage * DEEL_LOKAAL, centraal = bijdrage * DEEL_CENTRAAL;
-  /* De pot staat in eurocenten (./centen.js); elk deel wordt een keer afgerond. */
-  f.lokaal += naarCenten(lokaal);
-  f.centraal += naarCenten(centraal);
+  /* In eurocenten (./centen.js), elk deel een keer afgerond. Het loopt via RTG:
+     RTG is hier de ROUTE naar de RTFoundation en geen partij, dus zijn rekening
+     staat na de afdracht weer op nul (MAGNAAT.md, besluit 3). */
+  const l = naarCenten(lokaal), c = naarCenten(centraal);
+  beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['macro', 'stad'], naar: ['rtg', 'foundation'], bedrag: l + c, omschrijving: 'Afdracht van de stad' });
+  beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'lokaal'], bedrag: l, omschrijving: 'Naar de lokale pot' });
+  beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'centraal'], bedrag: c, omschrijving: 'Naar de centrale pot' });
   return { bijdrage: Math.round(bijdrage), lokaal: Math.round(lokaal), centraal: Math.round(centraal) };
 }
 
 /* Is er genoeg voor het volgende project? Zo ja: voer het uit en verschuif de
    zone. De volgorde ligt vast (en niet op toeval), want een campagne moet na
    een herstart hetzelfde verlopen -- zie de kop van ./stap.js. */
-function bouw(f, kaart, perZone) {
-  const klaar = [];
+function bouw(st, kaart, perZone) {
+  const f = st.foundation, klaar = [];
   // de kosten van een project staan in hele euro's; de pot in eurocenten
   while (f.volgend < PROJECTEN.length && f.lokaal >= naarCenten(PROJECTEN[f.volgend].kosten)) {
     const p = PROJECTEN[f.volgend];
-    f.lokaal -= naarCenten(p.kosten);
+    beweeg(st, { soort: 'FOUNDATION_PROJECT', van: ['foundation', 'lokaal'], naar: ['macro', 'aannemer'], bedrag: naarCenten(p.kosten), omschrijving: p.naam });
     /* Het project landt in de zone met de MEESTE bedrijvigheid: daar komt het
        geld vandaan en daar zijn de mensen die het gebruiken. Bij gelijke stand
        wint de zone die in de stadsdata het eerst staat -- vast en niet

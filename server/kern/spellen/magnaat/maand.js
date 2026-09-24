@@ -161,7 +161,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     /* De afdracht rust op de HELE stad en niet alleen op de spelers: anders
        bouwt de Foundation in een partij met twee mensen nooit iets. Zie de
        reden bij `stadsomzet` in de stadsdata. */
-    const afdracht = F.draagAf(st.foundation, wereldOmzet + (k.stadsomzet || 0));
+    const afdracht = F.draagAf(st, wereldOmzet + (k.stadsomzet || 0));
     /* Waar de bedrijvigheid zit, zodat de Foundation daar bouwt. Uit dezelfde
        telling die de concurrentiedruk gebruikt: een tweede telling zou een
        tweede antwoord op dezelfde vraag zijn. */
@@ -170,7 +170,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
       const zone = sleutel.split(':')[0];
       perZone[zone] = (perZone[zone] || 0) + druk[sleutel];
     }
-    const projecten = F.bouw(st.foundation, k, perZone);
+    const projecten = F.bouw(st, k, perZone);
     st.maand++;
     const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
       wereldOmzet: rond(wereldOmzet), contractRegels,

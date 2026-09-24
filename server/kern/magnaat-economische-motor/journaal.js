@@ -47,6 +47,10 @@ module.exports = (m) => {
     r.saldo += lijn.debet - lijn.credit;
   }
 
+  /* Wat het scherm van een gebeurtenis ziet, op EEN plek: het venster `recent`
+     wordt zowel bij boeken als bij de overname van een oude wereld gevuld. */
+  const regelVoorScherm = (g) => ({ id: g.id, datum: g.datum, omschrijving: g.omschrijving, bedrag: g.bedrag, debet: g.debet, credit: g.credit, labels: g.labels });
+
   /* De projectie volgt een gebeurtenis. Dezelfde functie voor een verse boeking
      en voor herstel, zodat die twee nooit uit elkaar kunnen lopen. */
   function projecteer(e, g, { saldi = true } = {}) {
@@ -55,7 +59,7 @@ module.exports = (m) => {
     e.totalen.debet += g.debet;
     e.totalen.credit += g.credit;
     e.totalen.aantal += 1;
-    e.recent.unshift({ id: g.id, datum: g.datum, omschrijving: g.omschrijving, bedrag: g.bedrag, debet: g.debet, credit: g.credit, labels: g.labels });
+    e.recent.unshift(regelVoorScherm(g));
     if (e.recent.length > MAX_RECENT) e.recent.length = MAX_RECENT;
     if (!e.vandaag || e.vandaag.dag !== g.dag) e.vandaag = { dag: g.dag, posten: [] };
     e.vandaag.posten.push({ volgnummer: g.volgnummer, labels: g.labels, regels: g.regels });
@@ -147,5 +151,5 @@ module.exports = (m) => {
     return saldi;
   }
 
-  return { metOorzaak, rekening, regel, boek, bevestig, herstel, gebeurtenissen, saldiNa };
+  return { metOorzaak, rekening, regel, boek, bevestig, herstel, gebeurtenissen, saldiNa, regelVoorScherm };
 };

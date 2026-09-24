@@ -52,7 +52,7 @@ module.exports = (m) => {
     e.laatstToegepast = e.boekVolgorde;
     e.totalen = { debet: 0, credit: 0, aantal: 0 };
     for (const g of gebeurtenissen) { e.totalen.debet += g.debet; e.totalen.credit += g.credit; e.totalen.aantal += 1; }
-    e.recent = oud.slice(-100).reverse().map(g => ({ id: g.id, datum: g.datum, omschrijving: g.omschrijving, bedrag: g.bedrag, debet: g.debet, credit: g.credit, labels: g.labels }));
+    e.recent = oud.slice(-100).reverse().map(m.regelVoorScherm);
     const vandaag = gebeurtenissen.filter(g => g.dag === e.dag);
     e.vandaag = { dag: e.dag, posten: vandaag.map(g => ({ volgnummer: g.volgnummer, labels: g.labels, regels: g.regels })) };
     delete e.journaal;

@@ -52,6 +52,10 @@ module.exports = (sctx) => {
     if (g.directie || !g.l.rtgKey) return res.status(g.directie ? 403 : 409).json({
       error: 'Een werkruimte koppelt u aan een entiteit met een lid dat aan zijn eigen RTG-account hangt, niet met het beheer-token.' });
     const id = schoon(req.body.entiteitId, 40);
+    /* Loskoppelen doet ook alleen de eigenaar van wat er NU hangt: anders is
+       loskoppelen de weg om de tekenlimieten en het bestuur te ontlopen. */
+    const huidig = g.w.entiteitId ? kern.entiteitVind(g.w.entiteitId) : null;
+    if (huidig && huidig.eigenaar !== g.l.rtgKey) return res.status(404).json({ error: 'De gekoppelde entiteit staat niet op uw naam.' });
     if (!id) {
       g.w.entiteitId = null; log(g.w, g.l, 'entiteit-los', null); save();
       return res.json({ ok: true, entiteitId: null, let: 'Losgekoppeld: alleen de tekengrens van de werkruimte telt nog.' });

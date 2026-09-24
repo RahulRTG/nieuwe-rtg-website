@@ -333,7 +333,7 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | **staat** (23 september 2026; par. 5h): de uitnodiging op naam, en de gedeelde code koppelt geen kantoorrol meer (besluit van dezelfde dag). Inloggen op het kantoor met de code blijft |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
-| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e), en **het onderwerp staat ook**: de uitgave in het Werk OS, met functiescheiding, de strengste van twee tekengrenzen (werkruimte en concerngraaf), en een betaalwijze die de werkruimte kiest en RTG aan of uit zet (par. 5e, vervolg). Samen tekenen uit de concerngraaf staat nog open |
+| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e), en **het onderwerp staat ook**: de uitgave in het Werk OS, met functiescheiding, de strengste van twee tekengrenzen (werkruimte en concerngraaf), en een betaalwijze die de werkruimte kiest en RTG aan of uit zet (par. 5e, vervolg). Samen tekenen staat ook: het bedrijf kiest versmallen, bestuur of een drempel (par. 5e) |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
 | 7 | **identiteiten voor agents, diensten en apparaten** | **staat** (23 september 2026; par. 5c en 5i): agent, diensten, toestellen, webhooks, en de zaakdoos met een eigen sleutel in de schaduw. De gedeelde doos-sleutel gaat dicht als elke doos er een heeft; het overzicht toont welke nog gedeeld melden |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **staat** (23 september 2026; par. 5g) |
@@ -594,9 +594,31 @@ SEPA-opdracht; twaalf mutaties laten hem zakken. Twee zakten eerst NIET, en dat
 waren zwakke beweringen: de eigenaarsgrendel werd alleen met de gedeelde code
 beproefd (die al eerder faalde), en een externe met dezelfde naam als een lid
 kwam in geen toets voor. **Wat bewust nog niet staat**: een rekening op naam van
-de werkruimte zelf (wie is dan rekeninghouder, en onder welke vergunning), en de
-gezamenlijke bevoegdheid uit de concerngraaf (samen tekenen) -- de grendel kent
-hier alleen de limiet per mens.
+de werkruimte zelf (wie is dan rekeninghouder, en onder welke vergunning).
+
+*Samen tekenen: het bedrijf kiest* (besluit van de eigenaar, 24 september 2026).
+Een gekoppelde werkruimte heeft een tekenwijze (`bedrijf/samentekenen.js`), en
+alle drie de standen bestaan:
+
+- `versmallen` (standaard): een gewoon lid met `geld.goedkeuren` keurt zoals
+  altijd, maar een herkende bestuurder die voor dit bedrag alleen GEZAMENLIJK
+  bevoegd is telt pas mee als een tweede gezamenlijk bevoegde ook goedkeurt;
+- `bestuur`: een uitgave is pas rond met een herkende bestuurder of
+  gevolmachtigde die voor het bedrag alleen bevoegd is, of met twee gezamenlijk
+  bevoegden -- naast de gewone goedkeuring, die niet wegvalt;
+- `drempel`: tot en met een zelfgekozen bedrag versmallen, erboven bestuur.
+
+Wat het bestuur mist, komt in `ontbreekt` van de regelpoort, dus "betaald
+noteren" weigert vanzelf tot het rond is. Staat er voor een bedrag niemand
+bevoegd in de graaf, dan zegt de stand dat in plaats van eeuwig te wachten. De
+tekenwijze kiest de eigenaar van de gekoppelde entiteit -- wie zelf moet
+goedkeuren, zet het regime niet losser. **En de meting vond een gat dat daar
+bij hoort**: loskoppelen (een leeg `entiteitId`) gebeurde vóór de
+eigenaarscontrole, dus elk lid met het recht `werkruimte` kon de concerngraaf
+en daarmee elke tekenlimiet ontlopen. Loskoppelen is nu ook van de eigenaar.
+`test/samentekenen.test.js`, met negen mutaties die alle negen zakken; een
+tiende (twee gezamenlijk bevoegden onder `bestuur`) overleefde eerst en kreeg
+een eigen bewering.
 
 ### 5f. Fase 6: lezen is niet exporteren
 

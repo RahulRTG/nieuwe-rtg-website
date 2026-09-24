@@ -76,7 +76,7 @@ module.exports = (sctx) => {
   app.post('/api/bedrijf/uitgaven', (req, res) => {
     const g = werkPoort(req, res, 'geld'); if (!g) return;
     const rijen = Object.values(U(g.w)).map(u => toon(g.w, u)).sort((a, b) => String(b.at).localeCompare(String(a.at)));
-    res.json({ ok: true, aantal: rijen.length, uitgaven: rijen, betaalwijze: sctx.betaalwijze(g.w),
+    res.json({ ok: true, aantal: rijen.length, uitgaven: rijen, betaalwijze: sctx.betaalwijze(g.w), tekenwijze: sctx.tekenwijze(g.w),
       let: 'De stand is berekend uit de goedkeuringen en de betaalnotitie; niemand zet hem met de hand.' });
   });
 

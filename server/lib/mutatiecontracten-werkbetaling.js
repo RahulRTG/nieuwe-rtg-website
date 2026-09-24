@@ -24,6 +24,14 @@ const CONTRACTEN = {
     nagekeken: 'met de hand, 2026-09-23: bedrijf/tekengrens.js zet g.w.betaalwijze op een van twee waarden',
     afgetekend: AF
   },
+  'POST /api/bedrijf/werkruimte/tekenwijze': {
+    mutatieId: 'bedrijf.werkruimte.tekenwijze', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: WERK, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/samentekenen.test.js toets 1-5: de tekenwijze is een toestand (versmallen, bestuur of drempel ' +
+      'met een bedrag); dezelfde keuze nog eens laat dezelfde stand achter', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: bedrijf/samentekenen.js zet g.w.tekenwijze en een journaalregel, alleen voor de eigenaar van de entiteit',
+    afgetekend: AF
+  },
   'POST /api/office/werkos/bankpad': {
     mutatieId: 'office.werkos.bankpad', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',

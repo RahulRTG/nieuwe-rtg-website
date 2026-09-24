@@ -83,6 +83,7 @@ const SLEUTELS = {
   'POST /api/bedrijf/lid/tekengrens': { zelfdeVerzoek: true },
   'POST /api/bedrijf/werkruimte/entiteit': { zelfdeVerzoek: true },
   'POST /api/bedrijf/werkruimte/betaalwijze': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/werkruimte/tekenwijze': { zelfdeVerzoek: true },
   'POST /api/office/werkos/bankpad': { leest: true },
   'POST /api/office/werkos/bankpad/zet': { zelfdeVerzoek: true },
   'POST /api/office/doos/sleutels': { leest: true },

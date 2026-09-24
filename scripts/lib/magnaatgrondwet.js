@@ -428,7 +428,7 @@ const REGELS = [
         autoriteit: 'server/kern/spellen/magnaat/centen.js, de ene plek waar World een bedrag tot geld maakt',
         handhaver: [
           { bestand: MAP + '/centen.js', citaat: 'const uit = Math.round(Number(cent.toFixed(6)));' },
-          { bestand: MAP + '/maand.js', citaat: 'betaling[c.id] = naarCenten(H.afwikkelen(c,' }
+          { bestand: MAP + '/maand-contracten.js', citaat: 'betaling[c.id] = naarCenten(H.afwikkelen(c,' }
         ],
         toets: [
           { bestand: 'test/magnaat-world-geld.test.js', naam: '4. na elke stap is elk monetair veld een geheel aantal eurocenten', bewijst: 'Number.isSafeInteger(houder[veld])' },

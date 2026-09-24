@@ -607,7 +607,7 @@ Stand: **PASS**
   - Toets: `test/magnaat-grootboek.test.js`, "5. het grootboek accepteert alleen gehele, niet-negatieve eurocenten en rondt nooit af"
 - **World**: PASS
   - Autoriteit: server/kern/spellen/magnaat/centen.js, de ene plek waar World een bedrag tot geld maakt
-  - Handhaver: `server/kern/spellen/magnaat/centen.js`, `const uit = Math.round(Number(cent.toFixed(6)));`; `server/kern/spellen/magnaat/maand.js`, `betaling[c.id] = naarCenten(H.afwikkelen(c,`
+  - Handhaver: `server/kern/spellen/magnaat/centen.js`, `const uit = Math.round(Number(cent.toFixed(6)));`; `server/kern/spellen/magnaat/maand-contracten.js`, `betaling[c.id] = naarCenten(H.afwikkelen(c,`
   - Toets: `test/magnaat-world-geld.test.js`, "4. na elke stap is elk monetair veld een geheel aantal eurocenten"; `test/magnaat-world-geld.test.js`, "5. een contractbetaling draagt aan beide kanten exact hetzelfde bedrag"
 
 **Migratie.** Geen voor World en het grootboek: sinds ronde A2.1 rekent World in hele eurocenten en wordt een gebeurtenis een keer afgerond. Wat nog rest is dat World zijn geld nog niet via het grootboek boekt (A2.3 t/m A2.9).

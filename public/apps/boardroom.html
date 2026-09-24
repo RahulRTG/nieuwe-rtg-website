@@ -115,6 +115,15 @@
       </div>
       <p class="rtg-uitleg" id="dsUit" aria-live="polite"></p>
     </section>
+
+    <!-- De kantoordeuren (AUTHORITY.md fase 1): per deur schaduw of afdwingen.
+         Afdwingen kan pas als de schaduw rijp is en de motor nooit oneens was;
+         de server rekent dat uit, deze sectie toont alleen wat hij zegt. -->
+    <section class="rtg-groep" id="bmSectie" hidden>
+      <h2 data-i18n="bm.h">De kantoordeuren</h2>
+      <p class="rtg-uitleg" data-i18n="bm.sub">De beleidsmotor loopt mee met elke kantoordeur. In de schaduw telt hij alleen; afgedwongen weigert hij naast de poort, nooit in zijn plaats.</p>
+      <div id="bmDeuren"><p class="rtg-leeg" data-i18n="bm.laden">Deuren laden&hellip;</p></div>
+    </section>
   </div>
 </main>
 
@@ -179,6 +188,8 @@ window.I18N = { en: {
   'ds.sub':'A box with its own key is proven; a box on the shared key only states its own name. The shared key closes once nobody is listed below.',
   'ds.laden':'Loading boxes…', 'ds.ph':'Name of the box', 'ds.geef':'Give its own key',
   'ds.gedeeld':'Still on the shared key (last seven days)', 'ds.geengedeeld':'No box reported on the shared key in the last seven days.',
+  'bm.h':'The office doors', 'bm.sub':'The policy engine runs alongside every office door. In the shadow it only counts; when enforced it refuses next to the gate, never instead of it.',
+  'bm.laden':'Loading doors…', 'bm.aan':'Enforce', 'bm.uit':'Back to the shadow', 'bm.schaduw':'shadow', 'bm.afdwingen':'enforced', 'bm.ok':'The door has been switched.',
   'ds.stand':'The shared key', 'ds.isdicht':'closed: only a box with its own key gets in', 'ds.isopen':'open (shadow): it still works',
   'ds.dicht':'Close the shared key', 'ds.open':'Open it again', 'ds.dichtOk':'The shared key is closed.', 'ds.openOk':'The shared key is open again.',
   'ds.eigen':'Boxes with their own key', 'ds.laatst':'last seen ', 'ds.keer':' times',
@@ -437,6 +448,30 @@ window.I18N = { en: {
       rij(e, x.doos, T('ds.sinds', 'eigen sleutel sinds ') + datum(x.sinds), k);
     });
   }
+  /* ---- de kantoordeuren: schaduw of afdwingen ---- */
+  function laadDeuren() {
+    return post('/api/office/beleidsmotor', {}).then(function (d) {
+      $('bmSectie').hidden = false;
+      var box = $('bmDeuren'); box.textContent = '';
+      var stand = d.afdwingen || {};
+      (d.deuren || []).forEach(function (x) {
+        var st = (stand[x.deur] || {}).stand || 'schaduw', k = null;
+        if (zetelBaas) {
+          var aan = st !== 'afdwingen';
+          k = el('button', 'rtg-knop', aan ? T('bm.aan', 'Afdwingen') : T('bm.uit', 'Terug naar de schaduw'));
+          k.type = 'button'; k.setAttribute('data-deur', x.deur);
+          k.addEventListener('click', function () {
+            k.disabled = true;
+            metVinger('/api/office/beleidsmotor/afdwingen/zet', { deur: x.deur, aan: aan })
+              .then(function () { zeg(T('bm.ok', 'De deur is omgezet.'), 'goed'); return laadDeuren(); })
+              .catch(function (er) { zeg(er.message, 'fout'); k.disabled = false; });
+          });
+        }
+        rij(box, x.deur + ' · ' + (st === 'afdwingen' ? T('bm.afdwingen', 'afgedwongen') : T('bm.schaduw', 'schaduw')),
+          x.eens + ' eens · ' + x.oneens + ' oneens · ' + x.waarom, k);
+      });
+    }).catch(function () { /* geen boardroom: de sectie blijft verborgen */ });
+  }
   function laadDozen() {
     return post('/api/office/doos/sleutels', {}).then(function (d) { toonDozen(d, zetelBaas); })
       .catch(function () { /* geen boardroom, geen dozen: de sectie blijft verborgen */ });
@@ -478,7 +513,7 @@ window.I18N = { en: {
     laadRegister(true).then(function (ok) {
       if (!ok) return;
       tabrij();
-      laadZetels().then(laadDozen);
+      laadZetels().then(laadDozen).then(laadDeuren);
       $('dsGeef').addEventListener('click', geefDoosSleutel);
       $('dsNaam').addEventListener('keydown', function (e) { if (e.key === 'Enter') geefDoosSleutel(); });
       $('bzGeef').addEventListener('click', geefZetel);

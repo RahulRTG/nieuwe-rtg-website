@@ -104,6 +104,13 @@ test('de eigenaar bevestigt zware handelingen met een passkey, vanaf de schermen
     await p.locator('#dsSchakel').click();
     assert.equal((await open).status(), 200, 'en weer open');
     await p.locator('#dsGedeeld', { hasText: 'open (schaduw)' }).waitFor();
+    /* de kantoordeuren: in een vers proces is geen deur rijp, en de knop zegt
+       dat met de reden van de server in plaats van stil te falen */
+    await p.locator('#bmDeuren [data-deur="kantoor"]').waitFor();
+    const deur = antwoord(p, '/api/office/beleidsmotor/afdwingen/zet');
+    await p.locator('#bmDeuren [data-deur="kantoor"]').click();
+    assert.equal((await deur).status(), 409, 'een vers proces is niet rijp');
+    await p.locator('body', { hasText: 'nog niet afgedwongen' }).waitFor();
     await c.close();
 
     /* 3. de medewerker verzilvert de uitnodiging op het personeelsscherm */

@@ -56,7 +56,7 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-herstel-af',        // POST /api/techniek/herstel/afbreken
   'eigenaar-kantooruitnodiging', // POST /api/office/kantoor/uitnodiging
   'eigenaar-doossleutel',       // POST /api/office/doos/sleutel
-  'eigenaar-doossleutel-weg', 'eigenaar-doossleutel-gedeeld',   // POST /api/office/doos/sleutel/weg
+  'eigenaar-doossleutel-weg', 'eigenaar-doossleutel-gedeeld', 'eigenaar-beleidsmotor-afdwingen',   // POST /api/office/doos/sleutel/weg
   'eigenaar-werkbankpad',       // POST /api/office/werkos/bankpad/zet
   'bank.incasso',               // POST /api/office/bank/incasso  (de geldketen, MACHINE.md par. 5a)
   'passkey-weg'                 // POST /api/webauthn/weg

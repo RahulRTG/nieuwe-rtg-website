@@ -374,6 +374,20 @@ uitkomsten, en `ONBEKEND` (een bron kon niet antwoorden) is geen `WEIGEREN`.
 - **Getoetst** in `test/beleidsmotor.test.js`: tegen een echte server met de gedeelde
   code, een medewerker op naam en de eigenaar, door alle vier deuren nul keer oneens.
   Drie mutaties zakken: een verkeerd feit, een blinde A3-teller, de documentdeur open.
+- **Uit de schaduw: een schakelaar per deur** (besluit van de eigenaar, 24 september
+  2026). Eerst gemeten: een labronde over 586 kantoorroutes met zes soorten sessies
+  gaf 3544 waarnemingen (kantoor 2632, boardroom 732, op naam 156, balie 24), NUL
+  keer oneens, nul onbekend en nul routes zonder poort. Dat is een lab en geen
+  proces, dus beslist de schakelaar niet zelf: `kern/beleidsmotor/afdwingen.js`
+  laat een deur alleen op `afdwingen` als ./stand.js hem rijp noemt en hij nooit
+  oneens was, met de reden in de weigering. Afdwingen zet de motor NAAST de poort
+  en niet in zijn plaats -- de poort zet ook de sessievelden -- dus hij kan alleen
+  een weigering toevoegen en nooit iets doorlaten wat de poort tegenhoudt.
+  `ONBEKEND` wordt een 503 en geen 403. Terug naar de schaduw kan altijd. Alleen de
+  eigenaar, met de passkey (`eigenaar-beleidsmotor-afdwingen`), onder *De
+  kantoordeuren* in de boardroom. De rijpheid telt dagen sinds de start van het
+  proces; een herstart zet die klok terug, en dat is de bestaande definitie.
+  `test/beleidsafdwingen.test.js`, vijf mutaties die alle vijf zakken.
 
 ### 5a-bis. Besluit A2 in de schaduw
 

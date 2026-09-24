@@ -118,14 +118,8 @@ const maakBetaling = require('./betaal-connect')({
      uitgang in de echte Stripe-stand veilig dicht tot er een expliciete SEPA-
      rail of gecontroleerd Connected Account is gekoppeld.
    - Idempotent op sleutel: dezelfde afdracht wordt nooit twee keer weggezet. */
-/* VOOR DE DEUR GEWEIGERD (MONEY-012). Een fout die aantoonbaar valt voordat er
-   iets naar een rail is gegaan, draagt `nietVerstuurd`. Alleen zo'n fout mag de
-   betaalopdrachtenrij laten opgeven en terugboeken (kern/betaalopdracht/
-   inzending.js); elke andere fout -- straks ook een time-out van een echte
-   rail -- betekent "uitkomst onbekend", en terugboeken op onbekend maakt geld
-   uit niets. Een fout wordt hier dus met opzet NIET standaard als veilig
-   gemerkt: wie een echte netwerkrail toevoegt, krijgt vanzelf de voorzichtige
-   kant. */
+/* MONEY-012: alleen een fout die aantoonbaar VOOR verzending valt, mag tot
+   terugboeken leiden (kern/betaalopdracht/inzending.js). Niet standaard zetten. */
 const voorDeDeur = (e) => { e.nietVerstuurd = true; return e; };
 
 async function maakUitbetaling(opdracht) {
@@ -147,7 +141,7 @@ async function maakUitbetaling(opdracht) {
     e.code = 'SEPA_SANDBOX_UIT';
     throw voorDeDeur(e);
   } else if (regie.sepaAan) {
-    // de sandbox is lokaal en weigert alleen bij de invoercontrole: niets verlaat het huis
+    // lokaal: weigert alleen bij de invoercontrole
     try { res = sandbox.sepa({ bedrag, valuta, referentie, iban, begunstigde, omschrijving }); }
     catch (e) { throw voorDeDeur(e); }
   } else if (stripe) {

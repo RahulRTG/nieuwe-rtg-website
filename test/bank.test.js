@@ -543,6 +543,7 @@ test('een uitgaande SEPA levert een betaalopdracht op die het kantoor kan volgen
   assert.equal(na.railOpen, (voor.railOpen || 0) + 1, 'er staat een opdracht meer open');
   assert.equal(na.railOpenCenten, (voor.railOpenCenten || 0) + 12500, 'voor precies dit bedrag');
   assert.equal(na.railMislukt, 0, 'en niets is mislukt');
+  assert.equal(na.railOnbekend, 0, 'en van niets is de uitkomst onbekend (MONEY-012; het veld hoort er te staan)');
   assert.ok(na.railOudsteAt > 0, 'met een leeftijd, zodat een blijvende storing opvalt');
 
   // dubbeltik: dezelfde idem-sleutel maakt geen tweede opdracht

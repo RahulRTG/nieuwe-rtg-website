@@ -40,8 +40,12 @@ function bouw(provider) {
   const opRef = (naam) => (ref) => data[naam].find(x => x.ref === ref);
   const opVeld = (naam, veld) => (v) => data[naam].filter(x => x[veld] === v);
   const voeg = (naam) => (x) => { data[naam].unshift(x); };
+  /* Directe betalingen lopen sinds MONEY-012 door de betaalwaarheid: de
+     betaling staat vast VOOR de provider wordt gebeld. */
+  const bw = require('../server/kern/betaalwaarheid')({ d: () => data, save() {}, crypto, betaal: provider,
+    nu: () => new Date().toISOString(), log: null });
   const api = maakDirectpay({
-    db: { data }, save() {}, crypto,
+    db: { data }, save() {}, crypto, betaalWaarheid: bw,
     findSupplier: c => c === 'ZAAK' ? { code: 'ZAAK', name: 'Veilige Zaak', stripeAccount: 'acct_partner' } : null,
     betaal: provider, notify() {}, notifySupplier() {}, sseToSupplier() {}, sseToCustomer() {}, sseToOffice() {}, logActivity() {},
     directBetalingMetRef: opRef('directBetalingen'), directBetalingenVanKlant: opVeld('directBetalingen', 'key'),
@@ -49,7 +53,7 @@ function bouw(provider) {
     betaalVerzoekMetRef: opRef('betaalVerzoeken'), betaalVerzoekenVoorCodenaam: opVeld('betaalVerzoeken', 'naarCodename'),
     betaalVerzoekenVanZaak: opVeld('betaalVerzoeken', 'supplierCode'), betaalVerzoekenVoegToe: voeg('betaalVerzoeken')
   });
-  return { api, data };
+  return { api, data, bw };
 }
 
 test('echte DirectPay staat dicht vóór er een PaymentIntent wordt gestart', async () => {
@@ -70,7 +74,12 @@ test('processing telt niet als partneromzet; pas de bevestigde registrar boekt',
   assert.equal(r.pending, true);
   assert.equal(x.data.directBetalingen.length, 0);
   assert.equal(x.data.directOntvangsten.ZAAK, undefined);
-  assert.equal(x.data.kaartWachtend.pi_wacht.centen, 1000);
+  /* De wachtende betaling staat in de betaalwaarheid (niet meer in
+     kaartWachtend, dat geen veegronde had), met het bedrag en de providerref. */
+  const w = x.bw.van(r.betalingId);
+  assert.equal(w.status, 'IN_BEHANDELING');
+  assert.equal(w.centen, 1000);
+  assert.equal(w.providerId, 'pi_wacht');
 
   const b = x.api.dpRegistreerBevestigd({ key: 'lid', codename: 'Veilig', supplierCode: 'ZAAK', bedragCenten: 1000,
     providerId: 'pi_wacht', idem: 'provider:pi_wacht', aanbieder: 'stripe', betaalwijze: 'kaart' });

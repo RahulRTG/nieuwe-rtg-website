@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T09:15:53.967Z",
-    "commit": "84dc8789",
+    "op": "2026-09-24T10:02:40.670Z",
+    "commit": "a4de3b4f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5120,7 +5120,7 @@
     "magnaat-economenlab.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 2
@@ -5128,10 +5128,18 @@
     "magnaat-economie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
-      "gezakt": 7,
+      "gezakt": 11,
       "geprobeerd": 2
+    },
+    "magnaat-economische-motor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "magnaat-hospitality.test.js": {
       "soort": "puur",
@@ -5190,7 +5198,7 @@
     "magnaat-rust-integratie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2

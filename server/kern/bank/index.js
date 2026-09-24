@@ -112,6 +112,9 @@ module.exports = (deps) => {
   // het financiele hart leunt op de rekening-opening (auto-spaarpot bij de veeg)
   ctx.rekeningOpen = rek.rekeningOpen;
   const hart = require('./hart')(ctx);
+  // de entiteit uit de concerngraaf betaalt langs dezelfde twee wegen als een lid
+  Object.assign(ctx, { bankOverboek: over.bankOverboek, bankSepaUit: over.bankSepaUit });
+  const entiteit = require('./entiteit')(ctx);
 
   /* Het afschrift, de gezondheid en het boardroom-overzicht: alleen lezen,
      en daarom apart in ./bord. */
@@ -128,7 +131,7 @@ module.exports = (deps) => {
     bankOpdrachtenRonde: (a) => opdrachten.ronde(a || {}),
     bankOpdrachtOpnieuw: (id) => opdrachten.dienIn(id),
     bankOpdrachtBevestig: (a) => opdrachten.bevestig(a || {}) };
-  Object.assign(api, rek, over, brug, spaar, pas, krediet, incasso, zakelijk, advies, hart);
+  Object.assign(api, rek, over, brug, spaar, pas, krediet, incasso, zakelijk, advies, hart, entiteit);
 
   /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent
      op de klok: alleen hele verstreken dagen) en de vervallen vaste betalingen

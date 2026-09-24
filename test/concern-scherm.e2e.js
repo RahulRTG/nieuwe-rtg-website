@@ -210,6 +210,8 @@ test('RTG Concern: een ondernemer begint een entiteit, legt een registratie met 
       assert.match(gekoppeld, new RegExp(ik), 'de codenaam in de schrijfwijze van de gids');
       assert.doesNotMatch(gekoppeld, /telt niet voor een tekengrens/, 'en er staat geen koppelveld meer');
       assert.equal(await page.locator('[data-duid]').count(), 0);
+      assert.match(await page.locator('#rkVak').textContent(), /Dicht \(standaard\)/,
+        'het rekeningvak zegt dat RTG het product nog niet heeft opengezet, in plaats van een knop die weigert');
 
       await page.fill('#aWie', 'marco');
       await page.fill('#aPct', '60');

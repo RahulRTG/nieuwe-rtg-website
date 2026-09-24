@@ -179,6 +179,19 @@ function duidVeld(x){
     '<button class="knop duidKnop" type="button">Koppel aan codenaam</button>'+
     (x.persoon==='vrij'?'<button class="knop duidExtern" type="button">Buiten RTG</button>':'')+'</span>';
 }
+/* De RTG-rekening van deze entiteit (kern/bank/entiteit.js). Betalen kan hier
+   niet: geld gaat er alleen af langs een goedgekeurde uitgave in het Werk OS. */
+function vakRekening(rk){
+  if(!rk) return '';
+  const r=rk.rekening;
+  const inhoud=r
+    ? '<div class="regel"><strong>'+esc(r.iban)+'</strong><span class="meta">'+esc(r.naam||'')+'</span><span class="sp"></span>'+
+      '<span class="meta">&euro; '+(Number(r.saldoCenten||0)/100).toLocaleString('nl-NL',{minimumFractionDigits:2})+'</span></div>'
+    : (rk.rtg&&rk.rtg.open
+      ? '<div class="rij r8"><button class="knop" id="rkOpen">Open een rekening</button></div>'
+      : '<p class="stil">'+esc((rk.rtg&&rk.rtg.uitleg)||'Nog niet beschikbaar.')+'</p>');
+  return '<div class="vak" id="rkVak"><h2>RTG-rekening</h2>'+inhoud+'<p class="stil r8">'+esc(rk.let||'')+'</p></div>';
+}
 function vakBestuur(b){
   if(!b) return '';
   const rijen=(b.bestuurders||[]).map(x=>'<div class="regel"><strong>'+esc(x.wie)+'</strong>'+
@@ -282,14 +295,15 @@ async function herlaad(){
   ENTS=(await api('entiteiten')).entiteiten||[];
   if(!HUIDIG||!ENTS.some(e=>e.id===HUIDIG)) HUIDIG=ENTS[0]&&ENTS[0].id;
   vulKiezer();
-  const [b,ubo,ves,men,uitn,rd]=await Promise.all([
+  const [b,ubo,ves,men,uitn,rd,rk]=await Promise.all([
     api('entiteit',{entiteit:HUIDIG}), api('ubo',{entiteit:HUIDIG}),
     api('vestigingen',{entiteit:HUIDIG}), api('mensen',{entiteit:HUIDIG}),
-    api('uitnodigingen',{entiteit:HUIDIG}), api('readiness',{entiteit:HUIDIG})]);
+    api('uitnodigingen',{entiteit:HUIDIG}), api('readiness',{entiteit:HUIDIG}),
+    api('rekening',{entiteit:HUIDIG}).catch(()=>null)]);
   BEELD=b.entiteit; RD=rd;
   $('#titel').textContent=BEELD.naam||'Mijn concern';
   $('#hoofd').innerHTML=vakOverzicht(o)+vakReadiness(rd)+vakEntiteit(BEELD)+
-    vakBestuur(BEELD)+vakUbo(ubo)+vakVestigingen(ves.vestigingen)+
+    vakBestuur(BEELD)+vakRekening(rk)+vakUbo(ubo)+vakVestigingen(ves.vestigingen)+
     vakMensen(men.mensen,uitn.uitnodigingen)+
     '<div class="vak"><h2>Nog een entiteit</h2>'+nieuwVak()+'</div>';
   // de vestigingskeuze in het uitnodig-blok vullen
@@ -352,6 +366,10 @@ function knopen(){
       bronSoort:'mens',bronDetail:'gekoppeld door de eigenaar in RTG Concern'});
       meld(extern?'Vastgelegd als iemand buiten RTG.':'Gekoppeld aan de codenaam. Hij telt nu mee voor de tekengrens.'); await herlaad(); }
     catch(e){ meld(e.message); }}));
+
+  const rko=$('#rkOpen'); if(rko) rko.addEventListener('click',async()=>{
+    try{ await api('rekening/open',{entiteit:HUIDIG}); meld('De rekening is geopend.'); await herlaad(); }
+    catch(e){ meld(e.message); }});
 
   const a=$('#aKnop'); if(a) a.addEventListener('click',async()=>{
     const wie=($('#aWie')||{}).value||'', pct=($('#aPct')||{}).value;

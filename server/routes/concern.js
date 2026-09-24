@@ -10,8 +10,7 @@
    ÉÉN 404 VOOR "BESTAAT NIET" EN "NIET VAN JOU". Het verschil zou verklappen
    welke id's bestaan.
 
-   De mensenkant staat in ./concern/mensen.js, de veranderkant in
-   ./concern/verandering.js en het duiden van een naam in ./concern/duiding.js:
+   De deelroutes staan in ./concern/ (mensen, verandering, duiding, rekening):
    dit bestand ging over de 10 kB, en dat is de goede naad. */
 const { duidBestuurder } = require('../kern/concern/persoon');
 
@@ -226,5 +225,6 @@ module.exports = (kern) => {
   require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden });
   require('./concern/verandering')(kern, { mijn, stuur, nietGevonden });
   require('./concern/duiding')(kern, { mijn, stuur, nietGevonden });
+  require('./concern/rekening')(kern, { mijn, stuur, nietGevonden });
   require('./concern/voorstel')(kern, { mijn, stuur, nietGevonden });
 };

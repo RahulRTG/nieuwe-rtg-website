@@ -89,7 +89,8 @@ De autonomieniveaus en de acht statussen worden niet vertaald maar afgebeeld:
 
 ## 3. Bouwsteen 1 -- de zoekende tegenstander
 
-**Stand: een stap weg.** Dit is het grootste gat, en het gat dat
+**Stand: staat voor RTG Pay (24 september 2026), zie het einde van deze
+paragraaf.** Dit was het grootste gat, en het gat dat
 `BEWIJSMACHINE.md` zelf aanwijst: er is geen zoeker die tegenvoorbeelden
 genereert. `sabotage` overtreedt elke wet een keer met opzet, `invoerproef`
 stuurt vaste rommel. Geen van beide zoekt.
@@ -134,6 +135,46 @@ Vier grenzen:
 "Geen tegenvoorbeeld gevonden" is geen bewijs dat er geen is. Het wordt
 vastgelegd als *gezocht: zoveel reeksen, deze assen, dit zaad*, en nooit als
 `bewezen`.
+
+### 3a. Wat er staat, en wat hij meteen vond
+
+`npm run tegenvoorbeeld` (`scripts/tegenvoorbeeld.js`, de motor in
+`scripts/lib/tegenvoorbeeld.js`). Hij draait op de opstelling van de
+Magnaat-geldpomp (`kern/spellen/magnaat/rtg-keten.js`): een verse, echte
+`kern/pay` per reeks, met de simulatiebank als geldbron. Vier soorten handeling
+(opladen, sturen, een verzoek maken, een verzoek betalen), de vier assen, en
+drie wetten die elk al in de code staan: de sluitcontrole, *een herhaling boekt
+niets*, en *een verzoek wordt ten hoogste een keer betaald*.
+
+Drie dingen die hij doet en die hier de moeite waard zijn om vast te houden:
+
+- **hij telt per soort hoe vaak die slaagde.** De eerste versie meldde "niets
+  gevonden" over reeksen waarin 317 van de 334 betalingen van een verzoek
+  werden geweigerd (geen verzoek, of de verkeerde betaler) -- exact de fout die
+  de Magnaat-geldpomp al eens maakte. Slaagt een soort nooit, dan is de
+  uitslag *niet vast te stellen* (exit 2) en noemt hij die soort;
+- **zonder simulatiebank is er geen geldbron**, en dan zegt hij dat in plaats
+  van op minder assen door te zoeken;
+- **de dubbele klik**: in een gelijktijdige stap is de volgende handeling vaak
+  dezelfde als de vorige, met een eigen sleutel. Daar zit een race tussen een
+  controle en een `await`, en daar vond hij er meteen een.
+
+**De vondst, bij de eerste echte ronde (zaad 1, reeks 7), verkleind tot twee
+stappen:** maak een verzoek, en betaal het twee keer TEGELIJK met twee
+verschillende sleutels. `verzoekBetaal()` controleert de stand `open` voordat
+het wacht op `zorgSaldo()`, en zet hem pas daarna op `betaald` -- dus beide
+betalingen komen erdoor. Met de hand nagespeeld: een verzoek van EUR 25 kost de
+betaler EUR 50 en de vrager ontvangt EUR 50. **De sluitcontrole blijft groen**,
+want het geld is keurig dubbel geboekt; daarom zag geen enkele bestaande
+controle het. De route `/api/pay/verzoek/betaal` is voor elk lid bereikbaar;
+of twee HTTP-verzoeken tegelijk er ook zo doorheen lopen, is NIET nagegaan --
+bevestigd is het in-process, op de echte `kern/pay`.
+
+De toets (`test/tegenvoorbeeld.test.js`) bevriest die uitslag met opzet niet:
+hij bewijst het INSTRUMENT. Drie gesaboteerde versies van `kern/pay`, een per
+wet, die de zoeker alle drie moet vinden, tot hooguit twee stappen moet
+verkleinen en bij de juiste wet moet noemen -- en elke wet heeft een mutatie die
+zijn toets laat zakken.
 
 ## 4. Bouwsteen 2 -- de eerste divergentie
 
@@ -341,8 +382,8 @@ onafhankelijkheid van de drie assen van `GELDING.json`.
 2. ~~**Het vertrouwensdossier**~~ -- gedaan, en anders dan hier eerst stond: het
    bestaande routedossier is aangevuld in plaats van dat er een tweede kwam
    (par. 7, correctie).
-3. **De zoeker op `geld-conservatie`**, zonder model: reeksen, gelijktijdigheid,
-   storing via de synthetische rail, krimpen.
+3. ~~**De zoeker op `geld-conservatie`**~~ -- gedaan (par. 3a), en hij vond bij
+   de eerste ronde een verzoek dat twee keer betaald kan worden.
 4. **De immuniteitsstap**: de A/B/C-vraag als deterministische indeling na een
    bevestigde vondst.
 5. **IJkpunten E0-E8 voor RTG Pay**, als spoor naast de envelop (na het besluit

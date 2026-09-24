@@ -2483,7 +2483,14 @@ terug te rollen. De tweede stap legde een eigen vergissing bloot: het
 is AANGEVULD en niet opnieuw gebouwd -- met de vervalstaat, de plek in de code
 en een blok *wat dit dossier niet weet* (tegenvoorbeeld, mutatie per route,
 productie). Zoek dus eerst of een scherm iets al toont voordat je een tweede
-bouwt.
+bouwt. De derde stap is de zoeker zelf (`npm run tegenvoorbeeld`): reeksen over
+waarden, volgorde, gelijktijdigheid en storing tegen een echte `kern/pay`, met
+krimpen, en hij oordeelt alleen met regels die al in de code staan. Bij zijn
+eerste ronde vond hij dat een verzoek (`verzoekBetaal`) twee keer betaald wordt
+als het twee keer tegelijk met verschillende sleutels binnenkomt -- terwijl de
+sluitcontrole groen blijft. Let daarbij op dat hij TELT hoe vaak elke soort
+handeling slaagde: "niets gevonden" over handelingen die allemaal geweigerd
+werden is geen uitslag, en de eerste versie leverde precies dat.
 
 ## Structuur en starten (kort)
 

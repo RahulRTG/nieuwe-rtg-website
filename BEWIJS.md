@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2019 bestanden en 14319 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2020 bestanden en 14325 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2019 |
-| losse beweringen (`test(...)`) | 14319 |
+| toetsbestanden | 2020 |
+| losse beweringen (`test(...)`) | 14325 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1367 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
-| alleen in de kop *genoemd*, nog niet gemeten | 171 |
+| alleen in de kop *genoemd*, nog niet gemeten | 172 |
 | niets van beide | 407 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1766 bestanden, 13866 beweringen.
+1767 bestanden, 13872 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1560,6 +1560,7 @@ toets omvalt.
 | `techniek-sso-scim.test.js` | 7 | gezakt op `liegpoort /api/` | DE BEDIENINGSLAAG VAN HET PLATFORM -- techniek, SSO, SCIM en de meting. Negenentwintig endpoints die de waargenomen dekkingsmeting als nooit aangeroepen aanwees, en ze horen bij elkaar: dit is de keten waarmee een... |
 | `techniek.test.js` | 11 | gezakt op `!==->===#0` | Tests voor de techniek-motor (server/techniek.js): de gezondheidschecks en de zekeringen. Zuiver, met een nagemaakte ctx; geen server of database nodig. |
 | `tegenfeit.test.js` | 9 | genoemd | HET TEGENFEIT -- wat zou er gebeurd zijn onder de nieuwe regel? WAAROM DIT ER IS. |
+| `tegenvoorbeeld.test.js` | 6 | genoemd | DE ZOEKENDE TEGENSTANDER (scripts/lib/tegenvoorbeeld.js, BEWIJSLUS.md par. 3). |
 | `tegoed.test.js` | 13 | -- | AI-TEGOED: regel 5 en 6, en nu voor het eerst afgedwongen. Ze stonden in PRIJZEN.md als NIET afgedwongen, en dat was eerlijk -- de laag bestond niet: 5. |
 | `tekstbinding.test.js` | 3 | gezakt op `false->true#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `tenant.test.js` | 8 | gezakt op `===->!==#0` | DE TENANT CONTROL PLANE OVER DE LIJN -- de routes, het merk en de bootstrap. De regels van de spine en de brug staan in test/tenantspine.test.js; hier gaat het om wat er door de deur komt. |

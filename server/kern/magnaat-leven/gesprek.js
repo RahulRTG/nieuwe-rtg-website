@@ -17,7 +17,7 @@ const R = require('./regels');
 const { AANBOD, klantenVan, VERVOLG } = require('./klanten');
 const { meld, ontgrendel, post, klantVan, deal: vindDeal, euro, tijd } = require('./staat');
 const { rest } = require('./tijd');
-const { betalingen } = require('./geld');
+const { betaalWatVervalt } = require('./geld');
 
 const fout = (error) => ({ status: 400, error });
 const heleEuro = (x) => { const n = Number(x); return Number.isInteger(n) && n > 0 && n <= 100000 ? n * 100 : null; };
@@ -83,7 +83,7 @@ function akkoord(st, d, bedrag, voorschot) {
     st.software = { sinds: st.dag, gepauzeerd: false };
     post(st, { soort: 'software', naam: a.software, bedrag: R.SOFTWARE.bedrag, dag: st.dag });
     meld(st, 'Voor klantwerk heb je ' + a.software + ' nodig: ' + euro(R.SOFTWARE.bedrag) + ' per vier weken, vanaf vandaag.', 'vraag');
-    betalingen(st);
+    betaalWatVervalt(st);
   }
   return { ok: true };
 }

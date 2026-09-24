@@ -11,7 +11,7 @@ const { AANBOD } = require('./klanten');
 const { euro } = require('./staat');
 const { vrij, gepland, rest, WAT } = require('./tijd');
 const { sneller } = require('./gesprek');
-const { volgende } = require('./volgende');
+const { handelingenNu } = require('./volgende');
 
 function dealBeeld(d) {
   const f = d.factuur;
@@ -24,7 +24,7 @@ function dealBeeld(d) {
   };
 }
 
-function agenda(st) {
+function weekAgenda(st) {
   const dagen = [];
   for (let dag = st.dag; dag <= st.dag + 6; dag++) {
     const w = R.weekdag(dag);
@@ -63,7 +63,7 @@ function beeld(st, boek, nu) {
   return {
     dag: st.dag, dagNaam: R.dagNaam(st.dag), week: Math.ceil(st.dag / 7), vrijVandaag: rest(st, st.dag),
     volgendeDagOver: Math.max(0, st.gerekendTot + st.dagMs - nu),
-    vandaag: { agenda: agenda(st), aandacht: aandacht(st, c), meldingen: st.meldingen.slice(0, 16), volgende: volgende(st) },
+    vandaag: { agenda: weekAgenda(st), aandacht: aandacht(st, c), meldingen: st.meldingen.slice(0, 16), volgende: handelingenNu(st) },
     werk: {
       baan: { werkgever: st.baan.werkgever, functie: st.baan.functie, actief: st.baan.actief, uren: st.baan.urenPerWeek,
         dienstdagen: st.baan.dienstdagen.map(w => R.DAGNAMEN[w]), loonPerWeek: st.baan.urenPerWeek * st.baan.uurloon,

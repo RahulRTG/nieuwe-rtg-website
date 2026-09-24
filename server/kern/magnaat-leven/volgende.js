@@ -10,7 +10,7 @@ const { AANBOD } = require('./klanten');
 const { euro, tijd: duur } = require('./staat');
 const { rest } = require('./tijd');
 
-function volgende(st) {
+function handelingenNu(st) {
   const uit = [];
   const zet = (actie, label, waarom, invoer) => uit.push({ actie, label, waarom, invoer: invoer || null });
   if (!st.aanbod) {
@@ -66,4 +66,4 @@ function volgende(st) {
   return uit;
 }
 
-module.exports = { volgende };
+module.exports = { handelingenNu };

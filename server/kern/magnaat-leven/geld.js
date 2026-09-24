@@ -22,18 +22,18 @@ function betaalPost(st, p) {
 }
 
 /* De volgende keer van een terugkerende betaling. */
-function volgende(st, p) {
+function volgendeKeer(st, p) {
   const v = R.VERPLICHTINGEN.find(x => x.id === p.soort) || (p.soort === 'software' ? R.SOFTWARE : null);
   if (v) post(st, { soort: p.soort, naam: p.naam, bedrag: v.bedrag, dag: (p.oorspronkelijk || p.dag) + v.elke });
 }
 
-function betalingen(st) {
+function betaalWatVervalt(st) {
   const vandaag = st.posten.filter(p => p.dag <= st.dag).sort((a, b) => a.dag - b.dag);
   for (const p of vandaag) {
     if (st.kas >= p.bedrag) {
       betaalPost(st, p);
       st.posten.splice(st.posten.indexOf(p), 1);
-      volgende(st, p);
+      volgendeKeer(st, p);
       if (p.soort === 'software' && st.software.gepauzeerd) { st.software.gepauzeerd = false; meld(st, 'Je software werkt weer.', 'goed'); }
       if (p.achterstand) meld(st, p.naam + ' is alsnog betaald.', 'goed');
       if (p.soort === 'aflossing' && !st.posten.some(x => x.soort === 'aflossing')) {
@@ -63,7 +63,7 @@ function startDag(st) {
   const eten = Math.min(Math.max(st.kas, 0), R.BOODSCHAPPEN);
   if (eten) b.boekOver(st, { soort: 'BOODSCHAPPEN', van: ['kas'], naar: ['winkels'], bedrag: eten, omschrijving: 'Boodschappen', sleutel: 'eten:' + st.dag });
   if (eten < R.BOODSCHAPPEN) meld(st, 'Je had vandaag ' + euro(eten) + ' voor eten. Het was een karige dag.', 'slecht');
-  betalingen(st);
+  betaalWatVervalt(st);
 }
 
 function uitstel(st, z) {
@@ -109,4 +109,4 @@ function volgendeLoondag(st, n) {
   return d + (n - 1) * 7;
 }
 
-module.exports = { startDag, betalingen, uitstel, lenen };
+module.exports = { startDag, betaalWatVervalt, uitstel, lenen };

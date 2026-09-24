@@ -121,10 +121,18 @@ async function loop(volgorde, { herstartElkeStap = false, eerlijk = true } = {})
    mislukking. Voor een ONBEKENDE opdracht zonder referentie gaat de uitspraak
    via een handmatige herinzending met dezelfde sleutel -- dat is precies wat
    /api/office/bank/opdrachten/opnieuw doet. */
-async function stemAf({ rail, w, id }) {
+async function stemAf({ rail, w, id }, { via = 'herinzending' } = {}) {
   rail.zetDaarna('ok');
   let o = w.op.vind(id);
   const uitgevoerd = rail.uitgevoerd.has(basis.idemSleutel);
+  if (o.status === 'ONBEKEND' && via === 'afschrift') {
+    /* De afschriftweg (kern/betaalopdracht/afstemming.js): de rail zegt wat hij
+       deed, met zijn eigen referentie en bedrag. */
+    await w.op.stemAf({ id, uitspraak: uitgevoerd ? 'uitgevoerd' : 'niet-uitgevoerd',
+      providerRef: rail.uitgevoerd.get(basis.idemSleutel) || null, centen: basis.centen, valuta: 'eur',
+      bron: 'afschrift proef', echtheid: 'DIRECT_API' });
+    return w.op.vind(id);
+  }
   if (o.status === 'ONBEKEND' && uitgevoerd) { await w.op.dienIn(id); o = w.op.vind(id); }
   if (o.status === 'ONBEKEND' && !uitgevoerd) { await w.op.bevestig({ id, gelukt: false, reden: 'rail: niet ontvangen' }); o = w.op.vind(id); }
   if (o.status === 'INGEDIEND') { await w.op.bevestig({ id, settlementRef: o.settlementRef }); o = w.op.vind(id); }
@@ -164,7 +172,7 @@ async function schendingen(volgorde, opties) {
   if (voor.status === 'ONBEKEND' && !voor.misschienVerstuurd) fout.push(naam + ': ONBEKEND zonder dat hij misschien verstuurd is');
 
   // wet 3 + wet 1 NA de afstemming: precies een waarheid, en het bedrag is precies een keer weg
-  const eind = await stemAf(run);
+  const eind = await stemAf(run, { via: opties.via });
   const naUitgevoerd = rail.uitgevoerd.has(basis.idemSleutel) ? 1 : 0;
   if (!['AFGEWIKKELD', 'TERUGGEBOEKT'].includes(eind.status)) fout.push(naam + ': eindigt op ' + eind.status);
   if (naUitgevoerd + w.terug.length !== 1) fout.push(naam + ': uitgevoerd ' + naUitgevoerd + ' + teruggeboekt ' + w.terug.length + ' is niet precies 1');
@@ -181,6 +189,12 @@ test('wet 1-4 over alle 64 storingsvolgordes, in een proces', async () => {
 test('wet 1-4 over alle 64 storingsvolgordes, met een herstart na elke stap', async () => {
   const alle = [];
   for (const v of alleVolgordes()) alle.push(...await schendingen(v, { herstartElkeStap: true }));
+  assert.deepEqual(alle, []);
+});
+
+test('wet 1-4 over alle 64 storingsvolgordes, gesloten via de afschriftweg', async () => {
+  const alle = [];
+  for (const v of alleVolgordes()) alle.push(...await schendingen(v, { via: 'afschrift' }));
   assert.deepEqual(alle, []);
 });
 
@@ -290,4 +304,76 @@ test('server/betaal.js merkt ook "geen rail" als nietVerstuurd', () => {
   const uit = JSON.parse(r.stdout.trim().split('\n').pop());
   if (uit.code === 'geen fout') return;   // deze omgeving heeft toch een rail: dan valt er niets te merken
   assert.equal(uit.nv, true, 'zonder rail gaat er niets de deur uit: ' + uit.code);
+});
+
+/* DE AFSTEMMING (kern/betaalopdracht/afstemming.js): ONBEKEND is een tussenstand.
+   Drie uitkomsten, en alleen met bewijs dat niet uit de invoer van een formulier
+   komt. */
+async function onbekendeOpdracht(volgorde = ['kwijt', 'dicht', 'dicht']) {
+  const run = await loop(volgorde);
+  assert.equal(run.w.op.vind(run.id).status, 'ONBEKEND');
+  return run;
+}
+const uitspraak = (run, extra) => Object.assign({ id: run.id, uitspraak: 'uitgevoerd',
+  providerRef: run.rail.uitgevoerd.get(basis.idemSleutel) || 'po_x', centen: basis.centen, valuta: 'eur',
+  bron: 'afschrift 24-09', echtheid: 'OVERGENOMEN' }, extra || {});
+
+test('afstemming BEVESTIGD: de rail noemt dit bedrag, de opdracht is afgewikkeld zonder teruggang', async () => {
+  const run = await onbekendeOpdracht();
+  const r = await run.w.op.stemAf(uitspraak(run));
+  assert.equal(r.uitkomst, 'BEVESTIGD');
+  assert.equal(run.w.op.vind(run.id).status, 'AFGEWIKKELD');
+  assert.equal(run.w.terug.length, 0);
+  assert.equal(run.w.op.vind(run.id).uitspraken.at(-1).echtheid, 'OVERGENOMEN', 'de graad staat in het spoor');
+});
+
+test('afstemming NIET_UITGEVOERD: het geld komt precies een keer terug', async () => {
+  const run = await onbekendeOpdracht(['stil', 'stil', 'stil']);
+  const r = await run.w.op.stemAf(uitspraak(run, { uitspraak: 'niet-uitgevoerd', providerRef: null }));
+  assert.equal(r.uitkomst, 'NIET_UITGEVOERD');
+  assert.equal(run.w.op.vind(run.id).status, 'TERUGGEBOEKT');
+  assert.equal(run.w.terug.length, 1);
+  const weer = await run.w.op.stemAf(uitspraak(run, { uitspraak: 'niet-uitgevoerd' }));
+  assert.equal(weer.status, 409, 'een tweede uitspraak raakt een gesloten opdracht niet');
+  assert.equal(run.w.terug.length, 1, 'en boekt niet nog eens terug');
+});
+
+test('afstemming VERSCHIL: ander bedrag, dan gebeurt er niets met het geld en ligt er een zaak', async () => {
+  const run = await onbekendeOpdracht();
+  const r = await run.w.op.stemAf(uitspraak(run, { centen: 12000 }));
+  assert.equal(r.uitkomst, 'VERSCHIL');
+  const o = run.w.op.vind(run.id);
+  assert.equal(o.status, 'ONBEKEND', 'niet afgewikkeld en niet teruggeboekt');
+  assert.equal(run.w.terug.length, 0);
+  assert.deepEqual(o.verschil.verwacht.centen, 12500);
+  assert.deepEqual(o.verschil.gezien.centen, 12000, 'verwacht en gezien staan naast elkaar, niets afgerond');
+  assert.equal(run.w.op.openstaand().verschil, 1, 'de zaak telt in de reconciliatie');
+
+  // een latere, kloppende uitspraak sluit hem, en het verschil blijft in het spoor
+  const later = await run.w.op.stemAf(uitspraak(run, { bron: 'gecorrigeerd afschrift' }));
+  assert.equal(later.uitkomst, 'BEVESTIGD');
+  assert.ok(run.w.op.vind(run.id).verschil.opgelostAt, 'het verschil is opgelost en niet gewist');
+  assert.equal(run.w.op.openstaand().verschil, 0);
+  assert.equal(run.w.op.vind(run.id).uitspraken.length, 2);
+});
+
+test('afstemming VERSCHIL ook bij het juiste bedrag in een andere valuta', async () => {
+  const run = await onbekendeOpdracht();
+  const r = await run.w.op.stemAf(uitspraak(run, { valuta: 'usd' }));
+  assert.equal(r.uitkomst, 'VERSCHIL', '12500 dollarcent is geen 12500 eurocent');
+  assert.equal(run.w.op.vind(run.id).status, 'ONBEKEND');
+});
+
+test('afstemming weigert zonder bewijs, zonder bron, en op een opdracht die niet ONBEKEND is', async () => {
+  const run = await onbekendeOpdracht();
+  assert.equal((await run.w.op.stemAf(uitspraak(run, { echtheid: 'PROVIDER_ASSERTED' }))).status, 403);
+  assert.equal((await run.w.op.stemAf(uitspraak(run, { echtheid: undefined }))).status, 403);
+  assert.equal((await run.w.op.stemAf(uitspraak(run, { bron: '' }))).status, 400);
+  assert.equal((await run.w.op.stemAf(uitspraak(run, { uitspraak: 'misschien' }))).status, 400);
+  assert.equal((await run.w.op.stemAf(uitspraak(run, { providerRef: null }))).status, 400, 'uitgevoerd zonder railreferentie is geen bewijs');
+  assert.equal(run.w.op.vind(run.id).status, 'ONBEKEND', 'geen van die weigeringen heeft iets veranderd');
+
+  const ander = await loop(['ok']);
+  const r = await ander.w.op.stemAf(uitspraak(ander));
+  assert.equal(r.status, 409, 'een aangenomen opdracht sluit via de rail zelf, niet via deze weg');
 });

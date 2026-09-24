@@ -606,6 +606,36 @@ test('een mislukte payout komt via de webhook binnen en brengt het geld terug', 
     'de teruggeboeking staat als bijschrijving op het afschrift');
 });
 
+/* DE AFSTEMMINGSROUTE (MONEY-012). Een ONBEKENDE uitbetaling valt in een
+   draaiende server niet uit te lokken (docs/money-012.md); de drie uitkomsten
+   staan in test/money012.test.js. Hier staat wat de ROUTE zelf belooft: alleen
+   op naam, alleen een ONBEKENDE opdracht, en een weigering maakt geen aanvraag
+   die een collega daarna kan aftekenen. */
+test('de afstemmingsroute weigert wat niet ONBEKEND is en maakt dan geen aanvraag', async () => {
+  const uit = await api('bank/sepa', { iban: lid.iban, centen: 1500, naarIban: 'NL91ABNA0417164300',
+    begunstigde: 'Ontvanger', oms: 'Afstemproef', idem: 'sepa-afstem' }, lid.token);
+  assert.equal(uit.status, 200);
+  const lijf = { id: uit.body.opdrachtId, uitspraak: 'niet-uitgevoerd', bron: 'afschrift proef' };
+
+  const gedeeld = await api('office/bank/opdrachten/afstemming', lijf, office.token);
+  assert.ok(gedeeld.status === 401 || gedeeld.status === 403, 'de gedeelde kantoorcode komt er niet door: ' + gedeeld.status);
+
+  const onbekendId = await api('office/bank/opdrachten/afstemming', { ...lijf, id: 'BO-BESTAATNIET' }, opNaam);
+  assert.equal(onbekendId.status, 404);
+
+  const ingediend = await api('office/bank/opdrachten/afstemming', lijf, opNaam);
+  assert.equal(ingediend.status, 409, 'een aangenomen opdracht sluit via de rail, niet via een afschriftregel');
+  assert.match(ingediend.body.error, /INGEDIEND/, 'de weigering noemt de stand waar hij op staat');
+
+  const zonderBron = await api('office/bank/opdrachten/afstemming', { ...lijf, bron: '' }, opNaam);
+  assert.ok(zonderBron.status === 400 || zonderBron.status === 409);
+
+  const open = await api('office/bank/handtekening/open', {}, opNaam);
+  assert.equal(open.status, 200);
+  assert.ok(!open.body.aanvragen.some(a => a.actie === 'bank.afstemming'),
+    'geen van die weigeringen liet een aanvraag achter om af te tekenen');
+});
+
 test('een payout-webhook die wij niet kennen verandert niets en valt niet om', async () => {
   const voor = (await oapi('bank/gezond', {}, 'RTG')).body;
   const evt = { id: 'evt_payout_2', type: 'payout.paid', data: { object: { id: 'po_vanIemandAnders' } } };

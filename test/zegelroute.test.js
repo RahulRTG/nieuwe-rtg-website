@@ -64,7 +64,10 @@ test('1. lid maakt zegel, partner verifieert offline; geen ruwe gegevens', async
 
     // er zitten GEEN ruwe gegevens in het token
     const payload = Buffer.from(token.split('.')[0], 'base64url').toString();
-    assert.doesNotMatch(payload, /Zegel Lid|1990|@x\.nl/, 'geen naam/geboortedatum/e-mail in het zegel');
+    /* De geboortedatum als DATUM zoeken en niet als jaartal: een kaal /1990/
+       sloeg ook aan op een tijdstempel als exp 1790199078 -- een vals alarm dat
+       afhing van de klok. */
+    assert.doesNotMatch(payload, /Zegel Lid|1990-01-01|01-01-1990|@x\.nl/, 'geen naam/geboortedatum/e-mail in het zegel');
   } finally {
     stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

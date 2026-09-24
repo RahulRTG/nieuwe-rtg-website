@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-09-24T05:18:15.711Z",
-  "commit": "77e0f470",
+  "op": "2026-09-24T04:03:25.975Z",
+  "commit": "a636fbac",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 632,
-  "bewaakt": 542,
+  "zonderBewakerslaag": 630,
+  "bewaakt": 540,
   "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -48,7 +48,7 @@
  "perWacht": [
   {
    "naam": "werkPoort",
-   "aantal": 100
+   "aantal": 98
   },
   {
    "naam": "poort",
@@ -618,13 +618,13 @@
   },
   {
    "sleutel": "POST /api/bedrijf/keur",
-   "bestand": "server/bedrijf/regelpoort.js:96",
+   "bestand": "server/bedrijf/regelpoort.js:97",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/keuring",
-   "bestand": "server/bedrijf/regelpoort.js:139",
+   "bestand": "server/bedrijf/regelpoort.js:140",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -929,12 +929,6 @@
    "wacht": "werkPoort"
   },
   {
-   "sleutel": "POST /api/bedrijf/uitgave/betaal",
-   "bestand": "server/bedrijf/entiteitbetaling.js:18",
-   "staat": "bewaakt",
-   "wacht": "werkPoort"
-  },
-  {
    "sleutel": "POST /api/bedrijf/uitgave/betaald",
    "bestand": "server/bedrijf/uitgave.js:87",
    "staat": "bewaakt",
@@ -996,7 +990,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/betaalwijze",
-   "bestand": "server/bedrijf/tekengrens.js:72",
+   "bestand": "server/bedrijf/tekengrens.js:68",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -1010,12 +1004,6 @@
    "sleutel": "POST /api/bedrijf/werkruimte/maak",
    "bestand": "server/bedrijf/werkruimte.js:37",
    "staat": "sleutelDoorgegeven"
-  },
-  {
-   "sleutel": "POST /api/bedrijf/werkruimte/tekenwijze",
-   "bestand": "server/bedrijf/samentekenen.js:79",
-   "staat": "bewaakt",
-   "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/zoek",
@@ -3916,7 +3904,7 @@
   },
   {
    "sleutel": "POST /api/supplier/apply",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js:13",
+   "bestand": "server/routes/supplier/werving/sollicitaties.js:14",
    "staat": "openbaar",
    "reden": "solliciteren bij een zaak kan zonder account"
   },

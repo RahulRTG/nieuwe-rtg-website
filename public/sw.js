@@ -14,7 +14,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-9db465c7';
+const CACHE = 'rtg-app-41695418';
 const SHELL = ['/apps/app.html', '/shared/id.js',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
      bewaren en daarna identiteit, materiaal, beweging of lettertypen missen. */
@@ -38,9 +38,9 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
   '/shared/rtg-edge-library.js', '/shared/rtg-edge-system.js', '/shared/rtg-edge-system.css',
   '/shared/rtg-edge-2-loader.js', '/shared/rtg-edge-2-context.js', '/shared/rtg-edge-command.js',
   '/shared/rtg-edge-2.js', '/shared/rtg-edge-2.css',
-  '/shared/experience-handoff.js', '/shared/rtg-adaptive-edge-loader.js', '/shared/rtg-adaptive-edge-core.js', '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js',
+  '/shared/experience-handoff.js', '/shared/rtg-adaptive-edge-loader.js', '/shared/rtg-adaptive-edge-core.js', '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/adaptief/grammatica.js',
   '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js', '/shared/rtg-adaptive-edge.css',
-  '/shared/edge/actiestaat.js', '/shared/edge/blikveld.js',
+  '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js',
   '/images/worlds/heritage/living-heritage-v2.jpg',
   '/images/worlds/heritage/travel-heritage-v2.jpg',
   '/images/worlds/heritage/work-heritage-v2.jpg',
@@ -53,7 +53,7 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
   '/apps/app.html?pas=rtg', '/apps/app.html?pas=lifestyle', '/apps/app.html?pas=business',
   '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js',
   '/shared/interface/second-screen.css', '/shared/interface/second-screen-personal.css', '/shared/interface/workspace-empty.js', '/shared/interface/second-screen-modules.js',
-  '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
+  '/shared/interface/modules/context.js', '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
   /* DE TAAL HOORT BIJ DE SCHIL. Zonder i18n.js opent een offline start altijd
      in het Nederlands, ook voor wie zijn taal allang gekozen had -- de laag die
      de tekst omzet was er domweg niet. En zonder de schilbestanden heeft die

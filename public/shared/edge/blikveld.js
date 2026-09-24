@@ -39,16 +39,6 @@
     return v;
   }
   function kopie(x) { try { return x == null ? null : JSON.parse(JSON.stringify(x)); } catch (e) { return null; } }
-  /* AANGEWEZEN, niet getekend: de Edge neemt de balk van het scherm op in zijn
-     eigen (dichte) blad of contextpaneel, dus een voorouder is dan [hidden] en
-     de maat is 0x0. De vraag is of het scherm een hoofdactie aanwijst. */
-  function aangewezen(el) { return !!el && !el.disabled && !el.hidden; }
-  /* De Ga verder-toets zet vier teksten in de knop; het label is die in rust. */
-  function tekstVan(el) {
-    var rust = el && el.querySelector && el.querySelector('[data-rtg-action-copy-for="idle"]');
-    return String((el && (el.getAttribute('aria-label') || (rust || el).textContent)) || '').replace(/\s+/g, ' ').trim().slice(0, 80);
-  }
-
   function adaptief() { return w.RTGAdaptief && typeof w.RTGAdaptief.context === 'function' ? w.RTGAdaptief : null; }
   /* Wanneer de context er kwam, weet alleen wie hem zag komen. Het blikveld hangt
      zich daarom een keer aan opContext -- lezend; de context zelf blijft van het
@@ -77,23 +67,38 @@
     return veld(null, 'geen', 'geen', t, 'deze route staat niet in de wereldkaart (shared/rtg-world-identity.js)');
   }
 
-  function contextVan(A, c, t) {
+  function contextVan(bij, c, t) {
     if (c && c.bron) return veld({ bron: c.bron, titel: c.titel || '', selectie: !!c.selectie },
-      'scherm', 'ui', contextSleutel === c.sleutel ? contextGezien : null);
+      bij, 'ui', contextSleutel === c.sleutel ? contextGezien : null);
     var e = w.RTGEdge && w.RTGEdge.active;
     if (e && e.ctx && e.ctx.title) return veld({ bron: '', titel: String(e.ctx.title), scope: e.ctx.scope || '' }, 'edge-casco', 'ui', t);
     return veld(d.title ? { bron: '', titel: d.title } : null, 'document', 'ui', t, 'geen titel');
   }
 
+  /* Object en activiteit zonder bron: wie niet zegt wie hij is, zegt ook niet
+     waar hij in staat. */
+  function eigen(c, k, bij, t, waarde) {
+    if (!c || !c[k]) return veld(null, 'geen', 'geen', t, 'het scherm publiceert geen ' + k);
+    if (!c.bron) return veld(null, 'geen', 'geen', t, 'het scherm zegt niet wie het is (de context heeft geen bron)');
+    return veld(waarde, bij, 'ui', contextGezien);
+  }
+
+  /* De vorm van het object beslist ../objectverwijzing.js, ook zijn reden. */
+  function object(c, bij, t) {
+    var P = w.RTGObjectverwijzing, o = c && c.object, v = P && o && P.verwijzing(o);
+    if (!o || !c.bron || v) return eigen(c, 'object', bij, t, v);
+    return veld(null, 'geen', 'geen', t, P ? P.reden(o) : 'objectverwijzing.js is niet geladen');
+  }
+
+  /* De hoofdactie leest ./blikveld-hoofdactie.js: in de schil kijkt die in het
+     ACTIEVE blad (EDGE.md par. 2). Zacht: ontbreekt hij, dan staat het veld leeg
+     met die reden en loopt de rest door. */
   function hoofdactie(t, gebreken) {
-    var scherm = Array.prototype.filter.call(d.querySelectorAll('[data-hoofdactie]'), aangewezen);
-    var edge = d.querySelector('[data-rtg-edge-primary]:not([hidden])');
-    var edgeLabel = aangewezen(edge) ? tekstVan(edge) : '';
-    if (scherm.length > 1) gebreken.push('hoofdactie-meervoudig');
-    if (scherm.length && edgeLabel && edgeLabel !== tekstVan(scherm[0])) gebreken.push('hoofdactie-dubbel');
-    if (scherm.length) return veld({ label: tekstVan(scherm[0]) }, 'scherm:data-hoofdactie', 'ui', t);
-    if (edgeLabel) return veld({ label: edgeLabel }, 'edge-padtabel', 'ui', t);
-    return veld(null, 'geen', 'geen', t, 'het scherm wijst geen hoofdactie aan (GRAMMATICA.md: data-hoofdactie)');
+    var H = w.RTGEdgeBlikveldHoofdactie, h = null;
+    try { h = H && typeof H.lees === 'function' ? H.lees(w) : null; } catch (e) { h = null; }
+    if (!h) return veld(null, 'geen', 'geen', t, 'de hoofdactielezer (edge/blikveld-hoofdactie.js) is niet geladen');
+    Array.prototype.push.apply(gebreken, h.gebreken || []);
+    return h.label ? veld({ label: h.label }, h.herkomst, 'ui', t) : veld(null, h.herkomst, 'geen', t, h.reden);
   }
 
   function voortzetting(snap, t) {
@@ -130,7 +135,10 @@
     var t = nu(), gebreken = [], A = adaptief();
     haak(A);
     var c = A ? A.context() : null, snap = core();
-    var trust = (c && c.rail && c.rail.length) ? veld(kopie(c.rail), 'scherm:rail', 'ui', contextGezien) :
+    /* In de schil zet alleen de brug (adaptief/brug.js) een context, en die geeft
+       door wat het BLAD zei: dan is dat de herkomst, en niet `scherm`. */
+    var bij = d.getElementById('rtgCommand') ? 'blad' : 'scherm';
+    var trust = (c && c.rail && c.rail.length) ? veld(kopie(c.rail), bij + ':rail', 'ui', contextGezien) :
       veld(null, 'geen', 'geen', t, 'het scherm publiceert geen Trust Rail');
     if (w.navigator && w.navigator.onLine === false) {
       trust = veld([{ sleutel: 'offline', tekst: 'Offline', staat: 'aandacht' }].concat(trust.waarde || []), 'toestel', 'afgeleid', t);
@@ -141,24 +149,16 @@
         gewicht: e.gewicht || it.gewicht || null, bevestiging: e.bevestiging || null, ongedaan: !!e.ongedaan,
         herstel: e.herstel || 'onbekend', gezag: e.gezag || 'onbekend', gevolg: e.gevolg || null, gebreken: e.gebreken || [] };
     });
-    /* Het TWEEDE register (registerAction van de balk) staat er ook in, met zijn
-       gebrek erbij: allowed:false zonder reden viel daar stil uit de lijst. */
-    ((snap && snap.acties) || []).forEach(function (a) {
-      var e = w.RTGEdgeActiestaat ? w.RTGEdgeActiestaat.bepaal({ id: a.id,
-        verhinderd: a.allowed ? null : { reden: '' } }, w.RTGGrammatica || null) : {};
-      gedaan.push({ id: a.id, naam: a.label, herkomst: 'edge-compat', staat: e.staat || null, waarom: e.waarom || null,
-        gewicht: e.gewicht || 'licht', bevestiging: e.bevestiging || null, ongedaan: false, herstel: 'onbekend',
-        gezag: 'onbekend', gevolg: e.gevolg || null, gebreken: e.gebreken || [] });
-    });
+    /* Het tweede register (registerAction van de balk) is weg (ronde 2, stap 18):
+       elke handeling komt uit RTGAdaptief. Een kern die toch acties draagt,
+       wordt hier niet gelezen -- test/edgeblikveld.test.js houdt dat vast. */
     var velden = {
       identiteit: snap && snap.identity ? veld(snap.identity, 'edge-signaal', 'ui', t)
         : veld(null, 'geen', 'geen', t, 'deze laag kent geen sessie, en setIdentity heeft geen producent'),
       wereld: wereld(t),
-      context: contextVan(A, c, t),
-      object: c && c.object ? veld(kopie(c.object), 'scherm', 'ui', contextGezien)
-        : veld(null, 'geen', 'geen', t, 'het scherm publiceert geen object'),
-      activiteit: c && c.activiteit ? veld(String(c.activiteit), 'scherm', 'ui', contextGezien)
-        : veld(null, 'geen', 'geen', t, 'het scherm publiceert geen activiteit'),
+      context: contextVan(bij, c, t),
+      object: object(c, bij, t),
+      activiteit: eigen(c, 'activiteit', bij, t, c && String(c.activiteit)),
       presence: snap && snap.presence ? veld(snap.presence, 'edge-signaal', 'ui', t)
         : veld(null, 'geen', 'geen', t, 'er loopt niets dat hier wordt gemeld'),
       voortzetting: voortzetting(snap, t),

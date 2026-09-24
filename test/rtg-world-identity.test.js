@@ -125,3 +125,93 @@ test('de gedeelde werkruimte kent uitsluitend centraal toegewezen gebieden', () 
     assert.equal(identity.classify('/apps/werkruimte.html?gebied='+area),world);
   assert.equal(identity.classify('/apps/kantoor.html?gebied=living'),'work','een willekeurige route kan niet van wereld wisselen');
 });
+
+/* HET MANIFEST IS OP DE GEDEELDE ROUTES EEN AFGELEIDE VAN MAPPEN.
+
+   `MAPPEN` in de app-main-bundel is de enige lijst werelden (WERELD.md); daaruit
+   wordt WERELDLIJST.md geschreven, met dezelfde lezer als hier
+   (scripts/lib/wereldregister.js -- een tweede lezer zou LAT.md regel 4 zijn).
+   Het MANIFEST hierboven kent daarnaast een vaste kamer per scherm. Waar ze
+   allebei een route noemen, is het manifest dus geen tweede eigenaar maar een
+   afgeleide die met MAPPEN moet kloppen. Zo niet, dan zegt de wereldbank "dit
+   hoort in Foundation" en verft de Edge het scherm als Living -- dat gebeurde met
+   Vrienden, die op 7 september naar FoundationOS verhuisde (WERELDEN.md) en in
+   het manifest bleef hangen.
+
+   De routes die ALLEEN in het manifest staan (een paar honderd: kassa's, PDA's,
+   juridische pagina's, foundationschermen die niet in een wereldbank hangen)
+   krijgen hier geen tweede eigenaar: MAPPEN zegt over hen niets, en deze toets
+   verzint dat niet. Dat hun enige wereld uit het manifest komt is een bestaande
+   spanning met WERELD.md, en hij staat hier genoemd in plaats van opgelost.
+
+   Een verschil dat bewust is, draagt zijn reden. Een verklaring die niet meer
+   nodig is, laat de toets ook zakken: een uitzondering die blijft liggen nadat
+   haar grond verdween, dekt de volgende drift af. */
+const reg = require('../scripts/lib/wereldregister');
+const WERELD_VAN = { LivingOS: 'living', WorkOS: 'work', TravelOS: 'travel', FoundationOS: 'foundation' };
+const STAND = 'een stand binnen de ledenapp en geen eigen pagina: /apps/app.html heeft een vaste kamer (living), ' +
+  'terwijl MAPPEN de stand in de wereld zet waar de mens hem gebruikt';
+const UITZONDERINGEN = {
+  'TravelOS tab:reizen': STAND,
+  'TravelOS tab:terplaatse': STAND,
+  'FoundationOS tab:zorg': STAND
+};
+
+function vergelijkMetMappen(uitzonderingen) {
+  const afwijkingen = [], gedeeld = new Set();
+  for (const w of reg.WERELDEN) for (const item of w.items) {
+    const los = reg.los(item);
+    if (!los.url || !los.url.startsWith('/')) continue;
+    const pad = reg.kaal(los.url.split(' ')[0]);
+    gedeeld.add(pad);
+    const sleutel = w.naam + ' ' + item, verwacht = WERELD_VAN[w.naam], manifest = identiteit.classify(pad);
+    if (manifest === verwacht) {
+      if (sleutel in uitzonderingen) afwijkingen.push(sleutel + ': verklaard maar klopt al; haal de uitzondering weg');
+      continue;
+    }
+    const reden = uitzonderingen[sleutel];
+    if (typeof reden !== 'string' || reden.trim().length < 20) {
+      afwijkingen.push(sleutel + ' -> ' + pad + ': MAPPEN=' + verwacht + ', manifest=' + manifest +
+        (sleutel in uitzonderingen ? ' (uitzondering zonder reden)' : ''));
+    }
+  }
+  for (const sleutel of Object.keys(uitzonderingen)) {
+    const [wereld, item] = sleutel.split(' ');
+    if (!reg.WERELDEN.some((w) => w.naam === wereld && w.items.includes(item))) {
+      afwijkingen.push(sleutel + ': verklaard maar staat niet (meer) in MAPPEN');
+    }
+  }
+  return { afwijkingen, gedeeld };
+}
+
+test('manifest en MAPPEN zeggen hetzelfde over de routes die ze delen', () => {
+  /* DE MUTATIES: zet /apps/geld.html in het manifest bij work (MAPPEN zegt
+     LivingOS), zet foundation/vrienden terug bij living, of maak de reden van
+     tab:zorg leeg. Elk van de drie hoort hier bij naam te verschijnen. */
+  const { afwijkingen, gedeeld } = vergelijkMetMappen(UITZONDERINGEN);
+  assert.ok(gedeeld.size >= 60, 'er horen gedeelde routes te zijn; gevonden: ' + gedeeld.size);
+  assert.deepEqual(afwijkingen, [], 'MAPPEN is de wereldlijst; het manifest volgt waar het dezelfde route noemt');
+});
+
+test('de vergelijking ziet een verschuiving en een reden die ontbreekt', () => {
+  /* Zelfijking: een uitzondering zonder reden en een verzonnen uitzondering
+     horen allebei te zakken, anders is de toets hierboven blind. */
+  const zonderReden = Object.assign({}, UITZONDERINGEN, { 'FoundationOS tab:zorg': '' });
+  assert.match(vergelijkMetMappen(zonderReden).afwijkingen.join('\n'), /tab:zorg.*zonder reden/);
+  const verzonnen = Object.assign({}, UITZONDERINGEN, { 'LivingOS link:geldcommand': STAND });
+  assert.match(vergelijkMetMappen(verzonnen).afwijkingen.join('\n'), /geldcommand: verklaard maar klopt al/);
+});
+
+test('elk wereldbureau draagt de wereld die het manifest hem geeft', () => {
+  /* DE MUTATIE: zet data-world-home op reizen.html op living. */
+  const bureaus = [];
+  for (const bestand of BESTANDEN) {
+    const html = fs.readFileSync(bestand, 'utf8');
+    const thuis = /<body\b[^>]*\bdata-world-home=["']([^"']+)["']/i.exec(html);
+    if (!thuis) continue;
+    bureaus.push(route(bestand) + '=' + thuis[1] + (identiteit.classify(route(bestand)) === thuis[1] ? '' : ' (manifest: ' +
+      identiteit.classify(route(bestand)) + ')'));
+  }
+  assert.deepEqual(bureaus.sort(), ['/apps/foundation/index.html=foundation', '/apps/foundation/os-publiek.html=foundation',
+    '/apps/kantoor.html=work', '/apps/reizen.html=travel', '/apps/rtg.html=living', '/apps/wereld.html=living']);
+});

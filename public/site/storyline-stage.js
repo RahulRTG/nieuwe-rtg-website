@@ -60,7 +60,6 @@
     });
     query('.rahul-note p').textContent = p.result;
     var badge = query('.demo-label'); badge.textContent = 'Demonstratie';
-    root.dispatchEvent(new w.CustomEvent('rtg-storyline-render', { bubbles: true }));
     return p;
   }
   function create(parent) {

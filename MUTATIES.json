@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T19:11:28.469Z",
-    "commit": "65cb9d43",
+    "op": "2026-09-23T23:23:16.164Z",
+    "commit": "e76848bd",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -49,6 +49,15 @@
       "module": "server/kern/aanmeldingen.js",
       "operator": "false->true",
       "gezakt": 1
+    },
+    "aanname-dienstverband.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/werving/uitnodiging-na.js",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "geprobeerd": 3,
+      "scherp": "gezakt"
     },
     "aanvoer.test.js": {
       "soort": "puur",
@@ -164,6 +173,11 @@
       "operator": "!==->===#0",
       "gezakt": 8,
       "geprobeerd": 2
+    },
+    "adaptiefdelen.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest scripttags in HTML en geen module; de operatoren raken geen scripttag. Met de hand nagetrokken: vorm.js weg op reizen-veilig (zakt, en appmenu.e2e.js op de context van reizen-veilig), vorm.js na register.js op app (zakt), de objectpoort na rtg-schil.js in werkruimte (zakt, en werkruimte-objecten.e2e.js)"
     },
     "administratie.test.js": {
       "soort": "server",
@@ -1955,6 +1969,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "concern-vestiging.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "concern-voorstel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2420,6 +2441,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "drempels.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "drie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2586,6 +2615,14 @@
       "gezakt": 1,
       "geprobeerd": 7
     },
+    "edgedekking-zelf.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/edgedekking.js",
+      "operator": ">=->>#0",
+      "gezakt": 2,
+      "geprobeerd": 5
+    },
     "edgekaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2601,6 +2638,21 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "edgeobject.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "edgeregister-leeg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-adaptive-edge-core.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "eenaccount-werkruimte.test.js": {
       "soort": "server",
@@ -3202,6 +3254,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "gebaar-omweg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "return-weg#1",
+      "gezakt": 1,
+      "geprobeerd": 13
+    },
     "gebouw.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3712,6 +3772,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "helper-veegdoor.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "test/helper.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "herbouwproef.test.js": {
       "soort": "puur",
@@ -5928,6 +5996,14 @@
     "objectveld.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "objectverwijzing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/objectverwijzing.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "ochtend.test.js": {
       "soort": "server",
@@ -8217,6 +8293,13 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "sociaal-edge.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "sociaal-index.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10247,6 +10330,14 @@
       "operator": "&&->||#0",
       "gezakt": 6,
       "geprobeerd": 2
+    },
+    "workspace-context.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/interface/workspace-context.js",
+      "operator": "!==->===#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "workspace-voorkeur.test.js": {
       "soort": "server",

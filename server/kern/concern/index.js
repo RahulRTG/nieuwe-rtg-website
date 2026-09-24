@@ -46,6 +46,7 @@ module.exports = (ctx) => {
   Object.assign(k, require('./employment')(k));
   Object.assign(k, require('./scope')(k));
   Object.assign(k, require('./uitnodiging')(k));
+  Object.assign(k, require('./aanname')(k));
   Object.assign(k, require('./readiness')(k));
   Object.assign(k, require('./verandering')(k));
   /* Document Intelligence en Discovery komen als LAATSTE: zij lezen alles wat

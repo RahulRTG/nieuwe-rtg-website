@@ -321,7 +321,10 @@ async function laadMijn(){
       const waar = [x.bedrijf, x.landNaam].filter(Boolean).join(' · ');
       return '<div class="msoll"><div class="mt"><b>'+esc(x.func)+'</b><span>'+esc(waar)+'</span></div>'+
         '<span class="pil '+st[1]+'">'+esc(st[0])+'</span>'+
-        (x.chatId ? '<button class="werk-icon-btn" data-chat="'+esc(x.chatId)+'" data-bedrijf="'+esc(x.bedrijf)+'">Open Deal Room</button>' : '')+'</div>';
+        (x.chatId ? '<button class="werk-icon-btn" data-chat="'+esc(x.chatId)+'" data-bedrijf="'+esc(x.bedrijf)+'">Open Deal Room</button>' : '')+
+        /* Aangenomen: de uitnodiging om je plek in te nemen staat hier, alleen
+           voor jou. Je maakt of gebruikt een eigen RTG-account; de link werkt een keer. */
+        (x.plek && x.plek.link ? '<a class="werk-icon-btn" data-plek href="'+esc(x.plek.link)+'">Neem je plek in</a>' : '')+'</div>';
     }).join('');
     $('#mijn').querySelectorAll('[data-chat]').forEach(b=> b.addEventListener('click', ()=> openChat(b.dataset.chat, b.dataset.bedrijf)));
   } catch(e){ $('#mijnBlok').hidden = true; $('#alleKop').hidden = true; }

@@ -26,11 +26,9 @@
    Levert window.RTGVasthoud(spec) -> het knopelement. */
 (function (w, d) {
   'use strict';
-  var HERBEVESTIG = 4000;
-
   w.RTGVasthoud = function (spec) {
-    var o = spec || {};
-    var duur = Math.max(300, Number(o.duur) || 900);
+    var o = spec || {}, G = w.RTGGrammatica, D = G && G.DREMPELS;
+    var duur = D ? Math.max(G.VASTHOUD.zwaar, Number(o.duur) || 0) : 0;
     var knop = d.createElement('button');
     knop.type = 'button';
     knop.className = 'vh-knop' + (o.klasse ? ' ' + o.klasse : '');
@@ -46,6 +44,14 @@
        schermlezer leest geen animatie, en "bevestig" zonder "houd vast" is een
        knop die niet reageert. */
     knop.setAttribute('aria-label', (o.tekst || 'Houd vast om te bevestigen'));
+    /* Zonder drempels kan deze knop niet meten, dus bevestigt hij nooit -- en zegt
+       dat, in plaats van een vulling die nergens heen loopt. */
+    if (!D) {
+      knop.disabled = true;
+      tekst.textContent = 'Bevestigen lukt hier nu niet';
+      knop.setAttribute('aria-label', tekst.textContent);
+      return knop;
+    }
 
     var klok = 0, start = 0, tweede = 0, bezig = false, negeerKlik = false;
 
@@ -77,7 +83,7 @@
       if (!bezig) return;
       var ver = (Date.now() - start) / duur;
       stop();
-      if (ver <= 0.15) return;
+      if (ver <= D.poging) return;
       /* DE KLIK DIE HIERNA KOMT, IS NOG DEZELFDE HANDELING -- en dat was stuk.
 
          Een korte druk zet de tweede weg klaar ("Nogmaals om te bevestigen").
@@ -101,7 +107,7 @@
         knop.classList.remove('tweede');
         tekst.textContent = o.tekst || 'Houd vast om te bevestigen';
         knop.setAttribute('aria-label', tekst.textContent);
-      }, HERBEVESTIG);
+      }, D.herbevestig);
     }
     function af() {
       if (tweede) { w.clearTimeout(tweede); tweede = 0; }

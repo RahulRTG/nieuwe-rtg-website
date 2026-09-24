@@ -235,3 +235,92 @@ test('RTG Concern: een ondernemer begint een entiteit, legt een registratie met 
       try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* weg is weg */ }
     }
   });
+
+/* DE INHAALSLAG OP HET SCHERM (ARBEID.md par. 7a, public/apps/concern-inhaal.js).
+
+   Wie in het team van een zaak kwam VOORDAT die zaak aan een vestiging hing,
+   heeft geen dienstverband. Het scherm toont per zaak het voorstel van de
+   server en legt pas iets vast als de eigenaar zelf aanvinkt. Vastgelegd:
+   geen vinkje staat vooraf aan, een klik zonder keuze stuurt niets met een
+   keuze naar de server en zegt waarom, en alleen wie gekozen is krijgt een
+   dienstverband -- de ander blijft in het voorstel staan. */
+test('RTG Concern: de eigenaar haalt een dienstverband in, alleen voor wie hij zelf aanvinkt',
+  { skip: geenBrowser(pw) }, async () => {
+    const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-concern-inhaal-'));
+    const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+    let browser;
+    try {
+      const ZAAK = 'MERIDIAAN';
+      const team = (await (await fetch(base + '/api/supplier/roster', { method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: ZAAK }) })).json()).staff || [];
+      const manager = team.find(x => x.role === 'manager');
+      const S = (await post(base, '/api/supplier/login', { code: ZAAK, staffId: manager.id, pin: '1234' })).body.token;
+      assert.ok(S, 'een managersessie bij de zaak');
+      const u = Date.now().toString().slice(-8);
+      const lid = async (n, naam) => (await post(base, '/api/auth/register', { name: naam, email: 'inh' + n + u + '@x.nl',
+        phone: '06' + String(Number(u) + n).slice(-8), password: 'geheim12345', geboortedatum: '1988-05-05',
+        tier: 'rtg', pasApp: 'rtg' })).body.token;
+      /* Beiden komen in het team langs de gewone weg: een uitnodiging van de
+         zaak en een claim met een eigen account. De zaak hangt dan nog nergens
+         aan, dus de brug maakt nog geen dienstverband -- precies de oude stand. */
+      const inTeam = async (token, naam, func, role) => {
+        const inv = await post(base, '/api/supplier/staff/invite', { name: naam, role: role || 'staff', func }, S);
+        const r = await post(base, '/api/werving/verbind', { kassacode: inv.body.invite.kassacode }, token);
+        assert.equal(r.status, 200, naam + ' komt in het team: ' + JSON.stringify(r.body).slice(0, 160));
+      };
+      const O = await lid(1, 'Eigenaar Toren');
+      const W = await lid(2, 'Wim Receptie');
+      await inTeam(O, 'Eigenaar Toren', 'Eigenaar', 'manager');
+      await inTeam(W, 'Wim Receptie', 'Receptie');
+      /* Pas daarna richt de eigenaar zijn entiteit in en koppelt hij de zaak
+         (dat mag omdat hij er manager is). */
+      const ent = (await post(base, '/api/concern/entiteit/nieuw', { naam: 'Toren BV', land: 'NL' }, O)).body.entiteit;
+      const ves = (await post(base, '/api/concern/vestiging/nieuw', { entiteit: ent.id, naam: 'Amsterdam' }, O)).body.vestiging;
+      const koppel = await post(base, '/api/concern/vestiging/zaak', { vestiging: ves.id, code: ZAAK }, O);
+      assert.equal(koppel.status, 200, 'de zaak hangt aan de vestiging: ' + JSON.stringify(koppel.body).slice(0, 160));
+      assert.equal((await post(base, '/api/concern/mensen', { entiteit: ent.id }, O)).body.mensen.length, 0,
+        'de wereld: nog niemand heeft een dienstverband');
+
+      browser = await pw.chromium.launch(browserOpties(pw));
+      const ctx = await browser.newContext({ viewport: { width: 900, height: 900 } });
+      await ctx.addInitScript((token) => {
+        localStorage.setItem('rtg_member_token', token);
+        localStorage.setItem('rtg_lang', 'nl');
+        localStorage.setItem('rtg_cookieinfo_v1', '1');
+      }, O);
+      const page = await ctx.newPage();
+      const fouten = letOpFouten(page, []);
+      const keuzes = [];
+      page.on('request', r => {
+        if (r.url().endsWith('/api/concern/vestiging/inhaal/bevestig')) keuzes.push(JSON.parse(r.postData() || '{}').keuze);
+      });
+
+      await page.goto(base + '/apps/concern.html', { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('#inhaalVak [data-inhaal-code="' + ZAAK + '"]', { timeout: 20000 });
+      await page.locator('#inhaalVak [data-inhaal-code="' + ZAAK + '"]').click();
+      await page.waitForSelector('#inhaalPaneel [data-inhaal-staff]', { timeout: 20000 });
+      const paneel = await page.locator('#inhaalPaneel').textContent();
+      assert.match(paneel, /Wim Receptie/, 'wie geen dienstverband heeft, staat in het voorstel');
+      assert.match(paneel, /zonder eigen RTG-account/, 'en wie het niet kan krijgen, staat er met de reden bij');
+      assert.equal(await page.locator('#inhaalPaneel [data-inhaal-staff]:checked').count(), 0, 'geen vinkje staat vooraf aan');
+
+      await page.locator('#inhaalDoe').click();
+      await page.waitForFunction(() => /Vink eerst aan/.test(document.querySelector('#melding').textContent), null, { timeout: 10000 });
+      assert.equal(keuzes.length, 0, 'zonder keuze gaat er niets naar de server om vast te leggen');
+
+      await page.locator('#inhaalPaneel label', { hasText: 'Wim Receptie' }).locator('input').check();
+      assert.equal(await handel(page, '#inhaalDoe', '/api/concern/vestiging/inhaal/bevestig', 'Receptie'), 200, 'vastgelegd via het scherm');
+      assert.equal(keuzes.length, 1);
+      const mensen = (await post(base, '/api/concern/mensen', { entiteit: ent.id }, O)).body.mensen;
+      assert.deepEqual(mensen.map(m => m.rol), ['Receptie'], 'alleen wie gekozen is, heeft nu een dienstverband');
+      const nogEens = (await post(base, '/api/concern/vestiging/inhaal', { vestiging: ves.id, code: ZAAK }, O)).body;
+      assert.ok(!nogEens.voorstel.some(p => p.naam === 'Wim Receptie'), 'en hij staat niet meer in het voorstel');
+      assert.ok(nogEens.voorstel.some(p => p.naam === 'Eigenaar Toren'), 'de ander wel: niet gekozen is niet vastgelegd');
+
+      assert.deepEqual(fouten, [], 'geen JS-fouten bij de inhaalslag: ' + fouten.join(' | '));
+    } finally {
+      if (browser) await browser.close();
+      await stop(child);
+      try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* weg is weg */ }
+    }
+  });

@@ -212,6 +212,7 @@
       "accounts",
       "app",
       "auth",
+      "beheertZaak",
       "concernBelangen",
       "concernBoom",
       "concernDiscovery",
@@ -234,6 +235,7 @@
       "concernReadiness",
       "concernUbo",
       "concernZet",
+      "dienstverbandInhaal",
       "employmentBeeindig",
       "employmentNieuw",
       "employmentOpDatum",
@@ -253,13 +255,14 @@
       "kwalificatieZet",
       "kwalificatiesVan",
       "mijn",
+      "mijnVestiging",
       "nietGevonden",
       "ondernemingVind",
       "scopeFunctiescheiding",
       "scopeMag",
       "stuur",
-      "tijdDuid",
       "tijdBeeindig",
+      "tijdDuid",
       "tijdOpDatum",
       "tijdZet",
       "uitnodigingAccepteer",
@@ -310,6 +313,7 @@
       "beveilig",
       "zaakdoos"
     ],
+    "doos-wacht": [],
     "drm": [
       "drm"
     ],
@@ -1531,10 +1535,11 @@
       "payroll"
     ],
     "payroll-os": [
+      "codenaamVan",
+      "dienstverbandToets",
       "findSupplier",
-      "payrollOS",
       "naamAuth",
-      "codenaamVan"
+      "payrollOS"
     ],
     "payroll-os-dekking": [
       "payrollOS"
@@ -1547,7 +1552,9 @@
       "payrollOS"
     ],
     "payroll-os-run": [
+      "dienstverbandToets",
       "findSupplier",
+      "naamAuth",
       "payrollOS"
     ],
     "payroll-os-uitgang": [
@@ -2077,6 +2084,7 @@
       "dagen",
       "dagrapport",
       "defensie",
+      "dienstverbandUitAanname",
       "doel",
       "dorpBuurt",
       "dorpDrukte",
@@ -2628,6 +2636,7 @@
       "tafelwensen"
     ],
     "werving": [
+      "dienstverbandUitAanname",
       "loginFails",
       "noteFailedTry",
       "notifySupplier",

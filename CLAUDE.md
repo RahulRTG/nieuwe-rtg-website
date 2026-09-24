@@ -917,7 +917,32 @@ het Consent Center, een ongeijkt zekerheidscijfer stuurt de voorspeller niet
 meer, de AI-kostenmeter boekt het model dat antwoordde en laat lokaal verbruik
 buiten tarief en grens, en de Edge-balk toont een verboden actie MET haar reden
 in plaats van haar weg te laten. Te weinig rust bij een mens blijft met opzet
-een waarschuwing.
+een waarschuwing. **De eigenaar koos dezelfde dag** (par. 7a): `employment` aan
+een entiteit is de waarheid, de keten van vacature tot loon wordt rond gemaakt
+voordat `werving.suite` opengaat, en Métier is de bron van vaardigheden. Dat
+laatste is gebeurd: `werving.suite` staat sinds 23 september weer bij Business,
+als BESCHRIJVEND vermogen en niet als poort op de pas -- de keten wordt bij de
+zaak gepoort, een werknemer koopt nooit een pas, en assessments zitten er met
+opzet niet in. De
+Adamproef loopt sindsdien door tot de loonstrook en is rond: 18 van 18 schakels,
+10 van 10 storingen. De drie breuken die hij vond zijn dicht: een aanname wordt
+een dienstverband bij de entiteit van de zaak (`kern/concern/aanname.js`, een
+brug die een kant op loopt en geen werkgever raadt), een gezinslid neemt zijn
+plek zelf in (de uitnodiging reist mee met zijn sollicitatie, alleen hij ziet
+haar, en hij claimt met een eigen account -- mag vanaf vijftien), en de loonrun
+wordt gemeten bij een Nederlandse zaak in plaats van het land van Café Brisa te
+vervalsen. En de loonrun leest het dienstverband: wie een strook krijgt zonder
+lopend dienstverband bij de entiteit van de zaak, wordt een bevinding
+(`loon_zonder_dienstverband`, ernst `midden` -- zichtbaar, niet blokkerend, want
+de aannames van voor de brug hebben er nog geen). Die worden ingehaald met een
+VOORSTEL en een keuze van de eigenaar (scherm in RTG Concern; `/inhaal` toont en
+leest, `/inhaal/bevestig` legt vast -- een route die allebei deed kreeg van de
+idem-poort een oud voorstel terug): een
+dienstverband op iemands naam is een verklaring van een werkgever, en die wordt
+niet in bulk voor hem afgelegd. Let op de meetfout die daarbij
+bovenkwam: het antwoord van
+`/api/office/payroll/run/open` is een samenvatting zonder stroken, dus wie
+daarin naar loonregels zoekt meet altijd nul.
 
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
@@ -1637,11 +1662,19 @@ haar nooit** -- dus geen derde contextmodel, geen `edge.canPay()` en geen
 Edge-state die naar een domein terugschrijft. Ronde 0 bouwde geen
 productintelligentie maar een meetbare fundering: `npm run edgekaart`
 (`EDGEKAART.json`: per bestand wie schrijft, beslist en leest, elk met een citaat
-dat letterlijk in de bron moet staan) vond <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal-->
-verantwoordelijkheden met meer dan één eigenaar (twee capabilityregisters, twee
-contextmodellen, vier plekken die de wereld vaststellen, vijf standmachines) en
-<!--getal:edgekaart.dodeKanalen-->17<!--/getal--> dode kanalen, waaronder precies de vijf signalen
-waar de adaptieve Edge naar luistert en die geen scherm verstuurt. Het **Edge
+dat letterlijk in de bron moet staan) vond 12 verantwoordelijkheden met meer dan
+één eigenaar (twee capabilityregisters, twee contextmodellen, vier plekken die de
+wereld vaststellen, vijf standmachines). Na ronde 1 waren het er 11, want de
+gebaardrempels kregen een eigenaar; de kaart van ronde 2 ziet meer (vijf
+producenten van het tweede register, en dat `gebaar.js` zelf over zijn drempels
+beslist) en telt er nu <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> --
+een meter die stijgt omdat hij beter kijkt, en dus een uitgeschreven besluit in
+NORM.json en geen achteruitgang. Daarnaast vond ronde 0
+17 dode kanalen, waaronder precies de vijf signalen waar de adaptieve Edge naar
+luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
+weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
+nu op <!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode tegenover
+<!--getal:edgekaart.levendeKanalen-->14<!--/getal--> levende kanalen. Het **Edge
 Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
 herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
 voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op
@@ -1673,6 +1706,12 @@ via het domein en niet via een eigen verzoekobject, eerst de hoedanigheid in
 sessie en envelop en dan pas een rolwisselaar, het werkdeck gaat over het open
 werkstuk, en **een nieuw scherm met een eigen hoofdactie publiceert zijn context
 zelf** (`contractNieuw`).
+**Ronde 1 staat** (EDGE.md par. 10 en 11): de dode kanalen zijn gesloten, het
+tweede register kent alleen licht en voert uit langs `RTGGewicht.voer` (LEEG is
+ronde 2), "wat weegt dit" heeft een antwoord (`effectief()`; zonder grammatica
+blijft een gewicht staan en gaat zwaar dicht), de gebaardrempels staan op een plek
+(`DREMPELS` in `grammatica.js`; zonder tabel is een gebaar uit, nooit een kopie),
+en de schil leest de hoofdactie van het ACTIEVE blad (`edge/blikveld-hoofdactie.js`).
 
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
@@ -2197,7 +2236,7 @@ het bord de ene helft van de functie uit en de andere niet, exact de
 `social`-fout. En de meter bewijst het besluit in plaats van het te geloven:
 `knelpunt x foundation` ging van `correct-afgesloten` naar **`waar`** zonder dat
 de 33 leugens bewogen -- het besluit is een PRODUCTvraag, of de deur daarna
-opengaat een METING. De keten staat op 12 schakels, 11 gesloten; schakel 12 is de
+opengaat een METING. De keten stond toen op 12 schakels, 11 gesloten; schakel 12 is de
 belofte dat een Foundation-profiel vanuit EEN doel echte werk- EN leermogelijkheden
 bereikt zonder dat een bron wordt verzonnen, gladgestreken of als advies vermomd.
 **Schakel 4 blijft open met een SMALLERE reden**, en dat is met opzet: er is nu

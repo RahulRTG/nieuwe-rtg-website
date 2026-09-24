@@ -247,8 +247,13 @@ test('Adaptive Edge vervangt de oude dubbele Social-randen', () => {
   assert.match(css, /body\.rtg-social-messages\[data-rtg-adaptive-ready="true"\] \.comm\{[\s\S]*var\(--rtg-adaptive-inset\)/,
     'Berichten reserveert de werkelijke ruimte van de nieuwe zwevende rand');
   const runtime = lees('public/shared/social-intelligence-runtime.js');
-  assert.match(runtime, /id: 'social-context'[\s\S]*run: openDeck/,
-    'de verborgen technische laag blijft via Acties bereikbaar');
+  assert.match(runtime, /A\.declareer\(\{ id: 'sociaal\.context'[\s\S]*doe: openDeck/,
+    'de verborgen technische laag blijft via Acties bereikbaar, als declaratie in RTGAdaptief');
+  assert.doesNotMatch(runtime, /registerAction|setProjection/,
+    'de runtime vult het tweede register van de Edge niet meer');
+  assert.match(lees('public/shared/social-intelligence.js'),
+    /command\.setAttribute\('data-rtg-action-key', 'sociaal\.context'\)/,
+    'de strookknop draagt de sleutel van de declaratie, zodat het blad hem een keer toont');
   const social = lees('public/apps/sociaal.html');
   assert.match(social, /<section class="sociaal-briefing"/,
     'de menselijke briefing is hoofdinhoud en geen terzijde');

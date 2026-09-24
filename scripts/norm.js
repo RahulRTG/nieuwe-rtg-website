@@ -943,6 +943,16 @@ const METERS = [
   { sleutel: 'edgeVeldIdentiteit', richting: 'omhoog', wat: 'schermen die identiteit aan de Edge publiceren (EDGEDEKKING.json)' },
   { sleutel: 'edgeVeldWereld', richting: 'omhoog', wat: 'schermen die wereld aan de Edge publiceren (EDGEDEKKING.json)' },
   { sleutel: 'edgeVeldContext', richting: 'omhoog', wat: 'schermen die context aan de Edge publiceren (EDGEDEKKING.json)' },
+  /* DE ENIGE ZELF-TAND, en hij is GEEN CI-handhaver: de browsermeter draait
+     niet in CI, dus dit getal beweegt alleen als iemand npm run edgedekking
+     draait en het register incheckt. Een scherm dat zijn eigen context
+     kwijtraakt, wordt dan al per scherm tegengehouden door achteruitgang() in
+     scripts/edgedekking.js. Deze tand bijt pas NA een bewuste --aanvaard: een
+     aanvaarde daling staat anders alleen in `aanvaardAchteruit`, en die lijst
+     verdwijnt bij de volgende meting. Hier moet hij een besluit met reden in
+     NORM.json worden. Geen zelf-tanden voor object en activiteit: die staan op
+     nul en kunnen niet zakken. */
+  { sleutel: 'edgeVeldContextZelf', richting: 'omhoog', wat: 'schermen die hun context ZELF aan de Edge publiceren, en niet via een terugval (EDGEDEKKING.json)' },
   { sleutel: 'edgeVeldObject', richting: 'omhoog', wat: 'schermen die object aan de Edge publiceren (EDGEDEKKING.json)' },
   { sleutel: 'edgeVeldActiviteit', richting: 'omhoog', wat: 'schermen die activiteit aan de Edge publiceren (EDGEDEKKING.json)' },
   { sleutel: 'edgeVeldPresence', richting: 'omhoog', wat: 'schermen die presence aan de Edge publiceren (EDGEDEKKING.json)' },
@@ -1290,8 +1300,11 @@ function leesZaakwig(pad) {
 /* DE EDGE-REGISTERS (EDGE.md par. 7). Een lezer voor beide, want de vorm is
    dezelfde: een `telling` met getallen. Ontbreekt het getal, dan zakt de meter
    in plaats van nul te melden -- nul geblokkeerde handelingen zonder reden is
-   precies wat een register zonder acties zou beweren. */
-function leesEdge(pad, wat) {
+   precies wat een register zonder acties zou beweren. Met `teller` leest hij
+   een andere teller van hetzelfde veld dan `ja` -- vandaag alleen `zelf`, en
+   dat is een eigen getal en geen deel van `ja`: een scherm dat zijn context
+   verliest aan de casco-terugval blijft `ja` en is niet meer `zelf`. */
+function leesEdge(pad, wat, teller) {
   const naam = path.basename(pad);
   let j;
   try { j = JSON.parse(fs.readFileSync(pad, 'utf8')); }
@@ -1300,8 +1313,8 @@ function leesEdge(pad, wat) {
   let v;
   if (wat === 'dubbeleEigenaars' || wat === 'dodeKanalen') v = t[wat];
   else if (wat === 'geblokkeerdZonderWaarom') v = t.acties ? Object.values(t.acties).reduce((som, a) => som + a.geblokkeerdZonderWaarom, 0) : undefined;
-  else v = t.perVeld && t.perVeld[wat] ? t.perVeld[wat].ja : undefined;
-  if (typeof v !== 'number' || Number.isNaN(v)) throw new Error(naam + ' draagt geen ' + wat + '; een meter zonder invoer is geen meter');
+  else v = t.perVeld && t.perVeld[wat] ? t.perVeld[wat][teller || 'ja'] : undefined;
+  if (typeof v !== 'number' || Number.isNaN(v)) throw new Error(naam + ' draagt geen ' + wat + (teller ? '.' + teller : '') + '; een meter zonder invoer is geen meter');
   return v;
 }
 
@@ -1543,7 +1556,7 @@ function meet(bronnen) {
   const tredeIngangLekken = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'), 'ingangLekken');
   const zaakwigGezakt = leesZaakwig(path.join(WORTEL, 'ZAAKWIG.json'));
   const edgeKaart = (wat) => leesEdge(path.join(WORTEL, 'EDGEKAART.json'), wat);
-  const edgeDekking = (wat) => leesEdge(path.join(WORTEL, 'EDGEDEKKING.json'), wat);
+  const edgeDekking = (wat, teller) => leesEdge(path.join(WORTEL, 'EDGEDEKKING.json'), wat, teller);
   const meetleerBlind = leesMeetleer(path.join(WORTEL, 'MEETLEER.json'));
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
@@ -1642,6 +1655,7 @@ function meet(bronnen) {
     edgeVeldIdentiteit: edgeDekking('identiteit'),
     edgeVeldWereld: edgeDekking('wereld'),
     edgeVeldContext: edgeDekking('context'),
+    edgeVeldContextZelf: edgeDekking('context', 'zelf'),
     edgeVeldObject: edgeDekking('object'),
     edgeVeldActiviteit: edgeDekking('activiteit'),
     edgeVeldPresence: edgeDekking('presence'),

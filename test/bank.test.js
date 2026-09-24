@@ -616,6 +616,9 @@ test('de afstemmingsroute weigert wat niet ONBEKEND is en maakt dan geen aanvraa
     begunstigde: 'Ontvanger', oms: 'Afstemproef', idem: 'sepa-afstem' }, lid.token);
   assert.equal(uit.status, 200);
   const lijf = { id: uit.body.opdrachtId, uitspraak: 'niet-uitgevoerd', bron: 'afschrift proef' };
+  const ids = (r) => r.body.aanvragen.map(a => a.id).sort();
+  const voor = await api('office/bank/handtekening/open', {}, opNaam);
+  assert.equal(voor.status, 200);
 
   const gedeeld = await api('office/bank/opdrachten/afstemming', lijf, office.token);
   assert.ok(gedeeld.status === 401 || gedeeld.status === 403, 'de gedeelde kantoorcode komt er niet door: ' + gedeeld.status);
@@ -630,10 +633,12 @@ test('de afstemmingsroute weigert wat niet ONBEKEND is en maakt dan geen aanvraa
   const zonderBron = await api('office/bank/opdrachten/afstemming', { ...lijf, bron: '' }, opNaam);
   assert.ok(zonderBron.status === 400 || zonderBron.status === 409);
 
-  const open = await api('office/bank/handtekening/open', {}, opNaam);
-  assert.equal(open.status, 200);
-  assert.ok(!open.body.aanvragen.some(a => a.actie === 'bank.afstemming'),
-    'geen van die weigeringen liet een aanvraag achter om af te tekenen');
+  /* Vergelijken met de lijst van VOOR de weigeringen, en niet "er zit geen
+     afstemming tussen": dat tweede slaagt ook op een lege lijst, en dan meet het
+     niets (scripts/tandeloos.js). */
+  const na = await api('office/bank/handtekening/open', {}, opNaam);
+  assert.equal(na.status, 200);
+  assert.deepEqual(ids(na), ids(voor), 'geen van die weigeringen liet een aanvraag achter om af te tekenen');
 });
 
 test('een payout-webhook die wij niet kennen verandert niets en valt niet om', async () => {

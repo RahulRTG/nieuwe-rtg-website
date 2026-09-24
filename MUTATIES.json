@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T10:02:40.670Z",
-    "commit": "a4de3b4f",
+    "op": "2026-09-24T10:47:13.559Z",
+    "commit": "60e9523da",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5226,6 +5226,14 @@
       "operator": ">=->>#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "magnaatgeldkaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/magnaatgeldkaart.js",
+      "operator": "+->-#0",
+      "gezakt": 2,
+      "geprobeerd": 9
     },
     "magnaatgrondwet.test.js": {
       "soort": "puur",

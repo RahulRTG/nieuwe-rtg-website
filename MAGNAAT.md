@@ -239,6 +239,7 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 | A2.4 | overdracht | G06–G09, G11, G14, G15 | 34→20 / 31→17 | ongewijzigd groen |
 | A2.5 | financiering | G16–G22 | 20→13 / 17→10 | ongewijzigd groen |
 | A2.6 | verzekering | G23–G25 | 13→10 / 10→7 | ongewijzigd groen |
+| A2.7 | activa | G02, G03, G05 | 10→7 / 7→4 | ongewijzigd groen |
 
 **A2.3** boekt het startkapitaal als overdracht van de inleg van de speler naar zijn kas. Een lopende partij van vóór het grootboek krijgt bij het koppelen een overname-opening voor wat er staat, zonder dat het saldo verandert.
 
@@ -247,6 +248,8 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 **A2.5** boekt de bank als tegenpartij: de lening, de aflossingen (extra, per termijn en na opeising), de rente op een lening en de rente op een negatief saldo. De uitwinning (G21) werd netto geboekt en staat nu als de twee delen die de kaart al noemde: de halve bouwsom van de aannemer naar de kas, en daaruit het deel voor de schuld naar de bank. Op de kas is dat hetzelfde bedrag.
 
 **A2.6** boekt de verzekeraar (premie en uitkering) en het herstel na schade (naar de aannemer). In deze ronde kwam een tweede blocker boven, uit `test/spelmagnaat.test.js`: twee partijen met hetzelfde id deelden één journaal, en de tweede werd geweigerd. In productie kan dat ook gebeuren, want een potje wordt opgeruimd maar zijn journaal niet. Een partij krijgt daarom `world:{id}`, en alleen als daar al een journaal staat `world:{id}:2`, `:3` en zo verder. Dat is deterministisch, en voor een gewone partij verandert er niets (`test/magnaat-world-boekhouding.test.js`, toets 7).
+
+**A2.7** boekt bouwen en uitbreiden als investering bij de aannemer, en sluiten als desinvestering (de halve bouwsom terug). Werving en afvloeiing (G04) staan op de kaart onder het maandresultaat en gaan daarom mee met A2.8.
 
 ---
 

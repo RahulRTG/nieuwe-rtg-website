@@ -48,7 +48,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       const huur = rond(kavel.eigenschappen.huur * omvang * 0.55);
       const bouwCenten = naarCenten(bouwsom);
       if (st.geld[h] < bouwCenten) return { status: 400, error: 'Openen kost ' + bouwsom + '; dat heb je niet.' };
-      st.geld[h] -= bouwCenten;
+      beweeg(st, { soort: 'INVESTERING', van: ['kas', h], naar: ['macro', 'aannemer'], bedrag: bouwCenten, omschrijving: 'Bouw vestiging' });
       const v = {
         id: 'v' + (++st.teller || (st.teller = 1)), kavel: kavelId, sector,
         naam: String(zet.naam || s.naam).slice(0, 40),
@@ -72,7 +72,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       const kosten = Math.round(erbij * SECTOREN[v.sector].bouw * KOSTENSTAND[v.prijs]);
       const uitbreidCenten = naarCenten(kosten);
       if (st.geld[h] < uitbreidCenten) return { status: 400, error: 'Uitbreiden kost ' + kosten + '; dat heb je niet.' };
-      st.geld[h] -= uitbreidCenten;
+      beweeg(st, { soort: 'INVESTERING', van: ['kas', h], naar: ['macro', 'aannemer'], bedrag: uitbreidCenten, omschrijving: 'Uitbreiding vestiging' });
       v.omvang += erbij;
       v.gebouwdVoor += kosten;
       v.huur = rond(v.huur * (1 + erbij / (v.omvang - erbij)));
@@ -98,7 +98,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       const opbrengst = naarCenten(rond(v.gebouwdVoor * 0.5));
       if (st.geld[h] + opbrengst < naarCenten(afkoop))
         return { status: 400, error: 'Er lopen contracten op deze vestiging; afkopen kost ' + afkoop + '.' };
-      st.geld[h] += opbrengst;
+      beweeg(st, { soort: 'DESINVESTERING', van: ['macro', 'aannemer'], naar: ['kas', h], bedrag: opbrengst, omschrijving: 'Sluiten vestiging' });
       for (const c of raakt) {
         const som = naarCenten(afkoopsom(c, st.maand));
         const tegen = c.leverancier === h ? c.afnemer : c.leverancier;

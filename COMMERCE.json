@@ -837,7 +837,7 @@
         "retour": false
       },
       "bewijs": {
-        "toon": "toon",
+        "toon": "bewaarEnToon",
         "prijs": "antwoordOpOfferte",
         "beschikbaarheid": "open",
         "bevestig": "bevestig"

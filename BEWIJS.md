@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2023 bestanden en 14345 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2023 bestanden en 14347 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2023 |
-| losse beweringen (`test(...)`) | 14345 |
+| losse beweringen (`test(...)`) | 14347 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1372 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1770 bestanden, 13892 beweringen.
+1770 bestanden, 13894 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -857,7 +857,7 @@ toets omvalt.
 | `magnaat-trainingslobby.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-voorzijde.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-werkroutefabriek.test.js` | 2 | gezakt op `>=->>#0` | Bewijs dat de automatische routefabriek iedere gevonden codefamilie omzet in een startbaar, synthetisch en schermgebonden trainingsdossier. |
-| `magnaat-world-boekhouding.test.js` | 5 | gezakt op `getal+1#0` | Magnaat World ronde A2.2: de vijf tegenpartijen, minimaal (MAGNAAT.md). 1. |
+| `magnaat-world-boekhouding.test.js` | 6 | gezakt op `&&->||#0` | Magnaat World ronde A2.2: de vijf tegenpartijen, minimaal (MAGNAAT.md). 1. |
 | `magnaat-world-geld.test.js` | 8 | gezakt op `true->false#0` | Het geld van Magnaat World in ronde A2 (MAGNAAT.md). 1. |
 | `magnaatgeldkaart.test.js` | 4 | gezakt op `return-weg#1` | De geldkaart van Magnaat World (ronde A2, stap 1) is compleet en klopt. De kaart zelf staat in scripts/lib/magnaatgeldkaart.js. |
 | `magnaatgrondwet.test.js` | 9 | gezakt op `===->!==#0` | De ratel onder MAGNAAT.md: economische integriteit in Magnaat kan vanaf de nulstand alleen nog verbeteren. MAGNAATGRONDWET.json is de bevroren nulstand (npm run magnaat:grondwet -- --vastleggen). |
@@ -1480,7 +1480,7 @@ toets omvalt.
 | `speltoernooi.test.js` | 14 | gezakt op `return-weg#0` | Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. De keuze die het meeste uitlegt: een toernooi valt NIET onder de progressiegrens. |
 | `speluitslagen.test.js` | 25 | gezakt op `===->!==#0` | Uitslagen die een potje overleven -- de bron onder winrate, niveaus en toernooien, die er tot nu toe niet was (een klaar potje werd na 24 uur weggegooid). De regel die het meeste werk doet: de progressiegrens geldt... |
 | `spelvariant.test.js` | 16 | gezakt op `===->!==#0` | VARIANTEN: wat er aan een spel te kiezen valt zonder dat de regels veranderen. Een variant parametriseert; hij vervangt niet. |
-| `spelveiling.test.js` | 14 | gezakt op `===->!==#0` | MAGNAAT FASE B: VEILINGEN -- het eerste waar twee spelers om HETZELFDE vechten. Contracten waren het eerste stuk van fase B en ze deden hun werk, maar de meting was hard: ze kantelen geen duel. |
+| `spelveiling.test.js` | 15 | gezakt op `===->!==#0` | MAGNAAT FASE B: VEILINGEN -- het eerste waar twee spelers om HETZELFDE vechten. Contracten waren het eerste stuk van fase B en ze deden hun werk, maar de meting was hard: ze kantelen geen duel. |
 | `spelverzekering.test.js` | 17 | gezakt op `===->!==#0` | MAGNAAT: VERZEKERINGEN -- risico als keuze in plaats van een vinkje. ACHT BEWERINGEN, en ze zijn alle acht stil terug te draaien: 1. |
 | `spoorvorm.test.js` | 11 | gezakt op `===->!==#0` | DE CONVERGENTIEMATRIX -- meet hij wat hij zegt te meten? Deze meter beoordeelt code op vier eigenschappen, en op de echte boom haalt precies één mechanisme ze alle vier. |
 | `sport-voorzijde.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |

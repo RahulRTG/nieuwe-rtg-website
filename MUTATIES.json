@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T19:41:04.104Z",
-    "commit": "e599b56a",
+    "op": "2026-09-24T20:09:39.200Z",
+    "commit": "ef1a5c26",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -10273,6 +10273,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 11,
       "scherp": "gezakt"
+    },
+    "werkrol.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wereldregister.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "werkruimte-kantoor.test.js": {
       "soort": "puur",

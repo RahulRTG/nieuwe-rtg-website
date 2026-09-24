@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T12:36:31.481Z",
-    "commit": "acc51c0",
+    "op": "2026-09-24T20:09:39.661Z",
+    "commit": "ef1a5c26",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/vindbaar.js",
     "node": "v22.22.2"
   },
@@ -12,8 +12,8 @@
   "drempel": 3,
   "bestemmingen": 99,
   "woorden": 1209,
-  "gevonden": 777,
-  "dekking": 0.6427,
+  "gevonden": 775,
+  "dekking": 0.641,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -304,6 +304,24 @@
       ]
     },
     {
+      "naam": "Partner Network",
+      "url": "/apps/partner-network.html",
+      "woorden": 22,
+      "gevonden": 12,
+      "mist": [
+        "rustige",
+        "week",
+        "vier",
+        "viering",
+        "drukte",
+        "beloften",
+        "loopt",
+        "volgens",
+        "kyoto",
+        "consortium"
+      ]
+    },
+    {
       "naam": "RTG Werk OS",
       "url": "/apps/werk.html",
       "woorden": 24,
@@ -384,22 +402,6 @@
         "persoon",
         "zekerheid",
         "gewogen"
-      ]
-    },
-    {
-      "naam": "Partner Network",
-      "url": "/apps/partner-network.html",
-      "woorden": 22,
-      "gevonden": 14,
-      "mist": [
-        "rustige",
-        "week",
-        "vier",
-        "viering",
-        "drukte",
-        "beloften",
-        "loopt",
-        "volgens"
       ]
     },
     {

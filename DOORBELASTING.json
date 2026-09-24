@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T19:33:49.517Z",
-    "commit": "5ad29244",
+    "op": "2026-09-24T20:55:30.209Z",
+    "commit": "d8b14389",
     "boomVuil": false,
-    "boomAnders": 8,
+    "boomAnders": 2,
     "instrument": "scripts/doorbelasting.js",
     "node": "v22.22.2"
   },
@@ -21,12 +21,12 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1426,
-    "geldvormen": 213,
-    "volgbaar": 31,
+    "vormenTotaal": 1425,
+    "geldvormen": 212,
+    "volgbaar": 30,
     "perHerkomstveld": {
       "bron": 16,
-      "provider": 2,
+      "provider": 1,
       "aanbieder": 7,
       "herkomst": 1,
       "leverancier": 6,
@@ -38,7 +38,6 @@
       "server/kern/betaalopdracht/index.js",
       "server/kern/betaalopdracht/index.js",
       "server/kern/betaalregie-waarheid.js",
-      "server/kern/betaalwaarheid/beeld.js",
       "server/kern/boerderij.js",
       "server/kern/boerderij/beheer.js",
       "server/kern/boerderij/erf.js",
@@ -104,10 +103,6 @@
         "volgbaar": 2
       },
       "server/kern/betaalregie-waarheid.js": {
-        "geldvormen": 1,
-        "volgbaar": 1
-      },
-      "server/kern/betaalwaarheid": {
         "geldvormen": 1,
         "volgbaar": 1
       },

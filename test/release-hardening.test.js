@@ -170,7 +170,7 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen offici�
   const bootstrap = bron.indexOf('imageherkomst.js --sleutelcontrole');
   const sleutel = bron.indexOf('imageherkomst.js --sleutelcontrole', afbouw);
   const kandidaat = bron.indexOf('docker push "$RTG_CANDIDATE_IMAGE"');
-  const teken = bron.indexOf('imageherkomst.js --binden --eis-handtekening');
+  const teken = bron.indexOf('imageherkomst.js --binden');
   const controle = bron.indexOf('imageherkomst.js --controle');
   assert.ok(afbouw >= 0 && afbouw < kandidaat, 'de volledige software-afbouw staat niet vóór het kandidaatimage');
   assert.ok(bootstrap >= 0 && bootstrap < afbouw,

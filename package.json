@@ -161,6 +161,7 @@
     "servicecaps": "node scripts/servicecaps.js",
     "onderzoeksketen": "node scripts/onderzoeksketen.js",
     "wereldlijst": "node scripts/wereldlijst.js",
+    "wereld": "node scripts/wereld.js",
     "functielijst": "node scripts/functielijst.js",
     "inlinestijl": "node scripts/inlinestijl-ronde.js",
     "inlinestijl:toon": "node scripts/inlinestijl-ronde.js --toon",

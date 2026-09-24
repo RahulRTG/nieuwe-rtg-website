@@ -187,6 +187,36 @@ eigen bewijs in `BRONSOORTEN`, nooit door een bestaande soort op te rekken). Dat
 is de volgende stap: de bestaande `scripts/lib/wereld-*.js` onder één compositor,
 zodat een app alleen verklaart welke wereld hij nodig heeft.
 
+## 4b. Werelden samenstellen — een app vraagt wat hij nodig heeft
+
+**Staat** (24 september 2026). De testwereld van par. 4 hoeft niet gebouwd te
+worden: hij ligt er in stukken. Er zijn elf wereldbouwers (`scripts/lib/wereld-*.js`),
+elk geschreven omdat een groep routes op "bestaat niet" strandde. Wat ontbrak was
+een manier om ze te **vragen**. Ze werden op één plek samengesteld, een vaste lijst
+van zes in `scripts/idemproef-route.js`, en **vijf werden door geen enkele proef
+gebruikt**: horeca, school, spel, signature en wortels. Alleen hun eigen
+unittoetsen riepen ze aan.
+
+`scripts/lib/wereldcompositor.js` is het register en het plan erboven, zonder een
+bouwer te herschrijven. `plan(['horeca'])` is een pure functie: welke werelden,
+in welke volgorde, en welke fundering (server, sleutelbos, lijfsleutelfamilies).
+Wie horeca vraagt, krijgt de gastfamilie en een open rekening, en niet de hele
+stad. `npm run wereld -- horeca school` bouwt het op een wegwerpserver en meldt per
+wereld klaar of niet, met de reden, en daarna of hij na afloop nog staat.
+
+De eerste echte bouw van de vijf ongebruikte werelden: **vier komen op**
+(signature, horeca, school, wortels). **Spel niet**, met een eerlijke reden: de
+bouwer vraagt een `member-account`-sessie, en geen enkele munter in
+`scripts/lib/proefsleutels.js` maakt die. Die toevoegen verandert de sessies van
+elke proef, en is daarom een eigen stap.
+
+Een app verklaart zijn wereld in `WERELD` in `scripts/lib/appcontract.js`, en ook
+dat is gemeten: de bouwer raakt minstens twee routes van de ingang, en **geen andere
+wereld raakt er meer**. Een vaste drempel alleen liet een verkeerde verklaring door
+(de wortels-wereld haalt twee routes van Spelen). `test/wereldcompositor.test.js`
+zakt ook zodra er een wereldbouwer bestaat die niet in het register staat. Een wees
+is voortaan zichtbaar.
+
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
 `npm run appwerkt` schrijft `APPWERKT.json`: per onderdeel uit `MAPPEN`, met de

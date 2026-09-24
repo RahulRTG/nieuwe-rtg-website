@@ -100,4 +100,21 @@ const ZONDER_APP = [
     nodig: 'een --vastleggen met huisstempel, en een besluit over de ingang van Connect' }
 ];
 
-module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP };
+/* DE WERELD DIE EEN APP NODIG HEEFT (Ronde B, 24 september 2026). Een app
+   verklaart alleen WELKE wereld; hoe die ontstaat en wat hij daarvoor nodig heeft
+   staat in ./wereldcompositor.js. Net als bij een bewijsbron is de verklaring
+   GEMETEN: de wereldbouwer moet routes raken die de ingang van de app aanroept
+   (test/wereldcompositor.test.js). Alleen koppelingen met meerdere gedeelde
+   routes staan hier; de wortels-wereld raakt twintig apps met elk EEN route, en
+   een wereld op een enkele gedeelde route declareren is raden.
+
+   Een wereld die niet opkomt blijft gewoon gedeclareerd. Spelen staat erbij
+   terwijl de spelwereld vandaag niet klaar komt -- hij vraagt een
+   `member-account`-sessie die geen munter in ./proefsleutels.js maakt. Dat is
+   precies wat Ronde C moet zien, en niet wat een declaratie mag verbergen. */
+const WERELD = {
+  'link:horeca': { werelden: ['horeca'], waarom: 'een open rekening op een tafel: de wortel van /api/supplier/horeca/*' },
+  'link:spelen': { werelden: ['spel'], waarom: 'een potje dat loopt: de wortel van /api/member/spel/*' }
+};
+
+module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD };

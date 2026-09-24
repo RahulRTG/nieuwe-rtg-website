@@ -1,12 +1,12 @@
 {
-  "simulatiemodules": 66,
-  "kernmodules": 2215,
-  "kernDomeinen": 615,
+  "simulatiemodules": 68,
+  "kernmodules": 2228,
+  "kernDomeinen": 617,
   "perWereld": {
     "magnaat": {
-      "modules": 63,
+      "modules": 65,
       "regels": 0,
-      "raaktKern": 6
+      "raaktKern": 5
     },
     "hospitality": {
       "modules": 3,
@@ -14,9 +14,9 @@
       "raaktKern": 0
     }
   },
-  "requiresTotaal": 123,
-  "geraakteKernmodules": 6,
-  "geraakteKernDomeinen": 5,
+  "requiresTotaal": 152,
+  "geraakteKernmodules": 5,
+  "geraakteKernDomeinen": 4,
   "bereikPct": 1,
   "modulesDiePratenNaarBuiten": 0,
   "kruisWereldAanroepen": 3,
@@ -62,13 +62,6 @@
       "aantal": 1
     },
     {
-      "doel": "server/kern/betaalwaarheid",
-      "door": [
-        "server/kern/spellen/magnaat/rtg-keten.js"
-      ],
-      "aantal": 1
-    },
-    {
       "doel": "server/kern/pay",
       "door": [
         "server/kern/spellen/magnaat/rtg-keten.js"
@@ -84,7 +77,7 @@
     }
   ],
   "gedeeldeOnderwerpen": 14,
-  "kandidaatparen": 41,
+  "kandidaatparen": 39,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {
@@ -215,14 +208,14 @@
     },
     {
       "onderwerp": "economie",
-      "simulatie": "server/kern/magnaat-economie.js",
+      "simulatie": "server/kern/spellen/magnaat/economie.js",
       "rtg": "server/kern/economie/index.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     },
     {
       "onderwerp": "economie",
-      "simulatie": "server/kern/magnaat-economie.js",
+      "simulatie": "server/kern/spellen/magnaat/economie.js",
       "rtg": "server/kern/fonds/economie.js",
       "vormgelijkenis": 0,
       "meetbaar": false

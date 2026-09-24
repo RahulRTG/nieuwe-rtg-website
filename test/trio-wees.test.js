@@ -24,8 +24,9 @@
    met "5 !== 6" (24 september 2026) terwijl hij lokaal groen was, en de oorzaak
    zat niet in het trio maar in deze fixture: hij vroeg EEN vrije poort en
    leidde er drie uit af (poort+1..+3) die niemand controleerde. Op Linux geeft
-   bind(0) oneven poorten en krijgt een uitgaande connect() even bronpoorten,
-   dus poort+1 -- de poort van server 1 -- lag in de bronpoortruimte van elke
+   bind(0) bij voorkeur oneven poorten en krijgt een uitgaande connect() bij
+   voorkeur even bronpoorten (raakt een helft op, dan valt de kernel op de
+   andere terug), dus poort+1 -- de poort van server 1 -- lag in de bronpoortruimte van elke
    fetch() van elke toets die tegelijk draaide. Stond daar nog een clientsocket
    (open keep-alive, of 60 s TIME_WAIT), dan zakte de listen van server 1 met
    EADDRINUSE, herstartte de hoofd hem om de 2 s op dezelfde poort en wachtte
@@ -69,8 +70,12 @@ const slaap = (ms) => new Promise(r => setTimeout(r, ms));
    meegeteld -- en bij het opruimen omgelegd -- worden. De opdrachtregel wordt
    wel GELEZEN, per gevonden nakomeling, zodat een foutmelding zegt WELKE rol
    ontbreekt ("2 servers, 2 voordeuren") in plaats van alleen een getal. */
+/* Zonder COLUMNS in de omgeving: procps kapt `args=` af op die breedte zodra
+   hij geexporteerd is (ook naar een pijp), en dan heet elke server 'anders'. */
+const psOmgeving = Object.assign({}, process.env);
+delete psOmgeving.COLUMNS;
 function stamboom(wortel) {
-  const uit = execFileSync('ps', ['-eo', 'pid=,ppid=,args='], { encoding: 'utf8' });
+  const uit = execFileSync('ps', ['-eo', 'pid=,ppid=,args='], { encoding: 'utf8', env: psOmgeving });
   const kinderen = new Map();
   const opdracht = new Map();
   for (const r of uit.trim().split('\n')) {
@@ -88,7 +93,9 @@ function stamboom(wortel) {
     const p = wachtrij.shift();
     pids.push(p);
     const args = opdracht.get(p) || '';
-    if (p === wortel) rollen.hoofd++;
+    /* De wortel telt alleen als hoofd als ps hem nog ZIET; anders zegt de
+       melding "hoofd: 1" over een proces dat al dood is. */
+    if (p === wortel) { if (opdracht.has(p)) rollen.hoofd++; }
     else if (/server\.js/.test(args)) rollen.servers++;
     else if (/trio\.js/.test(args)) rollen.voordeuren++;
     else rollen.anders++;
@@ -96,7 +103,6 @@ function stamboom(wortel) {
   }
   return { pids, rollen };
 }
-const nakomelingen = (wortel) => stamboom(wortel).pids;
 /* Leeft dit proces nog? Sein 0 verstuurt niets en zegt alleen of het bestaat. */
 const leeft = (pid) => { try { process.kill(pid, 0); return true; } catch (e) { return false; } };
 const nogInLeven = (pids) => pids.filter(leeft);
@@ -166,9 +172,12 @@ async function trioOp({ voordeuren }) {
   const env = Object.assign({}, process.env, {
     RTG_DATA_DIR: map, RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '', SMTP_URL: '',
     PORT: String(poort), RTG_TRIO_BASIS: String(basis), LOG_LEVEL: 'error',
-    RTG_LOKAAL_TLS: '', RTG_DEMO: ''
+    RTG_LOKAAL_TLS: '', RTG_DEMO: '',
+    /* Altijd expliciet, ook zonder voordeuren: anders erft toets 1 een
+       RTG_POORTWACHTERS of RTG_SPREIDING uit de omgeving van wie hem draait, en
+       dan telt hij een ander trio dan hij denkt te tellen. */
+    RTG_POORTWACHTERS: voordeuren ? String(voordeuren) : '', RTG_SPREIDING: ''
   });
-  if (voordeuren) { env.RTG_POORTWACHTERS = String(voordeuren); env.RTG_SPREIDING = ''; }
   const kind = spawn(process.execPath, [path.join(WORTEL, 'server/trio.js')],
     { env, stdio: ['ignore', 'pipe', 'pipe'] });
   /* De laatste regels van de hoofd, voor in de foutmelding. Hij geeft de uitvoer
@@ -178,22 +187,28 @@ async function trioOp({ voordeuren }) {
   const vang = d => { for (const r of String(d).split('\n')) if (r.trim()) { logboek.push(r); if (logboek.length > 60) logboek.shift(); } };
   kind.stdout.on('data', vang);
   kind.stderr.on('data', vang);
+  /* Sterft de hoofd (EADDRINUSE op PORT: server/trio.js doet dan exit 1), dan
+     is 90 s wachten zinloos en misleidend -- de lus stopt meteen en de melding
+     zegt dat en waarmee. Na de opzettelijke klap verderop staat dit ook, maar
+     dan is `op` al beslist. */
+  let dood = null;
+  kind.on('exit', (code, signaal) => { dood = { code, signaal }; });
   const t0 = Date.now();
   let op = false;
-  let stand = null;
-  for (let i = 0; i < 90 && !op; i++) {
+  for (let i = 0; i < 90 && !op && !dood; i++) {
     const viaPoort = await gezond(poort);
     const eigen = await Promise.all(serverpoorten.map(serverPid));
-    stand = stamboom(kind.pid);
+    const stand = stamboom(kind.pid);
     op = viaPoort !== null && eigen.every(p => p !== null && stand.pids.includes(p)) &&
       new Set(eigen).size === 3 && stand.pids.includes(viaPoort);
-    if (!op) await slaap(1000);
+    if (!op && !dood) await slaap(1000);
   }
   /* Nu noteren, want na de klap zijn ze niet meer terug te vinden. */
   const { pids, rollen } = stamboom(kind.pid);
   gestart.push(...pids);
   const uitleg = () => ' [poort ' + poort + ', servers ' + serverpoorten.join('/') + '; ' +
-    (op ? 'opgekomen' : 'NIET opgekomen') + ' na ' + Math.round((Date.now() - t0) / 1000) + ' s; rollen ' +
+    (op ? 'opgekomen' : 'NIET opgekomen') + ' na ' + Math.round((Date.now() - t0) / 1000) + ' s; ' +
+    (dood ? 'de hoofd is gestopt (code ' + dood.code + ', signaal ' + dood.signaal + '); ' : '') + 'rollen ' +
     JSON.stringify(rollen) + '; laatste regels van de hoofd:\n  ' + (logboek.join('\n  ') || '(niets)') + ']';
   return { map, poort, kind, pids, op, uitleg };
 }

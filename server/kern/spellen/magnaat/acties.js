@@ -20,6 +20,8 @@
 const { SECTOREN } = require('./sectoren');
 const { PRIJSSTANDEN, KOSTENSTAND } = require('./prijsstand');
 const { afkoopsom } = require('./handel');
+const { naarCenten } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
   /* ---------- de acties ---------- */
@@ -44,8 +46,9 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       const stand = PRIJSSTANDEN.includes(String(zet.prijs)) ? String(zet.prijs) : 'midden';
       const bouwsom = Math.round(omvang * s.bouw * KOSTENSTAND[stand]);
       const huur = rond(kavel.eigenschappen.huur * omvang * 0.55);
-      if (st.geld[h] < bouwsom) return { status: 400, error: 'Openen kost ' + bouwsom + '; dat heb je niet.' };
-      st.geld[h] -= bouwsom;
+      const bouwCenten = naarCenten(bouwsom);
+      if (st.geld[h] < bouwCenten) return { status: 400, error: 'Openen kost ' + bouwsom + '; dat heb je niet.' };
+      beweeg(st, { soort: 'INVESTERING', van: ['kas', h], naar: ['macro', 'aannemer'], bedrag: bouwCenten, omschrijving: 'Bouw vestiging' });
       const v = {
         id: 'v' + (++st.teller || (st.teller = 1)), kavel: kavelId, sector,
         naam: String(zet.naam || s.naam).slice(0, 40),
@@ -67,8 +70,9 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       const erbij = Math.max(1, Math.min(60, Math.floor(Number(zet.erbij) || 0)));
       if (v.omvang + erbij > 200) return { status: 400, error: 'Groter dan dit kan deze plek niet aan.' };
       const kosten = Math.round(erbij * SECTOREN[v.sector].bouw * KOSTENSTAND[v.prijs]);
-      if (st.geld[h] < kosten) return { status: 400, error: 'Uitbreiden kost ' + kosten + '; dat heb je niet.' };
-      st.geld[h] -= kosten;
+      const uitbreidCenten = naarCenten(kosten);
+      if (st.geld[h] < uitbreidCenten) return { status: 400, error: 'Uitbreiden kost ' + kosten + '; dat heb je niet.' };
+      beweeg(st, { soort: 'INVESTERING', van: ['kas', h], naar: ['macro', 'aannemer'], bedrag: uitbreidCenten, omschrijving: 'Uitbreiding vestiging' });
       v.omvang += erbij;
       v.gebouwdVoor += kosten;
       v.huur = rond(v.huur * (1 + erbij / (v.omvang - erbij)));
@@ -91,15 +95,14 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       const raakt = (st.contracten || []).filter(c => c.status === 'loopt'
         && (c.leverancierId === v.id || c.afnemerId === v.id));
       const afkoop = raakt.reduce((n, c) => n + afkoopsom(c, st.maand), 0);
-      const opbrengst = rond(v.gebouwdVoor * 0.5);
-      if (st.geld[h] + opbrengst < afkoop)
+      const opbrengst = naarCenten(rond(v.gebouwdVoor * 0.5));
+      if (st.geld[h] + opbrengst < naarCenten(afkoop))
         return { status: 400, error: 'Er lopen contracten op deze vestiging; afkopen kost ' + afkoop + '.' };
-      st.geld[h] += opbrengst;
+      beweeg(st, { soort: 'DESINVESTERING', van: ['macro', 'aannemer'], naar: ['kas', h], bedrag: opbrengst, omschrijving: 'Sluiten vestiging' });
       for (const c of raakt) {
-        const som = afkoopsom(c, st.maand);
+        const som = naarCenten(afkoopsom(c, st.maand));
         const tegen = c.leverancier === h ? c.afnemer : c.leverancier;
-        st.geld[h] -= som;
-        st.geld[tegen] += som;
+        beweeg(st, { soort: 'CONTRACT_AFKOOP', van: ['kas', h], naar: ['kas', tegen], bedrag: som, omschrijving: 'Afkoop bij sluiten' });
         c.status = 'afgekocht';
         c.eindMaand = st.maand;
         c.afkoop = som;
@@ -127,8 +130,9 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
            schuifbalk die je elke maand heen en weer zet. */
         const verschil = Math.abs(n - v.personeel);
         const kosten = verschil * s.loon;
-        if (st.geld[h] < kosten) return { status: 400, error: 'Die wijziging kost ' + kosten + ' aan werving of afvloeiing.' };
-        st.geld[h] -= kosten;
+        const personeelCenten = naarCenten(kosten);
+        if (st.geld[h] < personeelCenten) return { status: 400, error: 'Die wijziging kost ' + kosten + ' aan werving of afvloeiing.' };
+        beweeg(st, { soort: 'WERVING_AFVLOEIING', van: ['kas', h], naar: ['macro', 'huishoudens'], bedrag: personeelCenten, omschrijving: 'Werving of afvloeiing' });
         v.personeel = n;
       }
       if (zet.marketing !== undefined) v.marketing = Math.max(0, Math.min(200000, Math.floor(Number(zet.marketing) || 0)));

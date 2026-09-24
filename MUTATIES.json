@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T19:50:21.042Z",
-    "commit": "09be962f",
+    "op": "2026-09-24T21:16:03.945Z",
+    "commit": "0ae77873",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5120,7 +5120,7 @@
     "magnaat-economenlab.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 2
@@ -5128,10 +5128,26 @@
     "magnaat-economie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
-      "gezakt": 7,
+      "gezakt": 11,
       "geprobeerd": 2
+    },
+    "magnaat-economische-motor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "magnaat-grootboek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "magnaat-hospitality.test.js": {
       "soort": "puur",
@@ -5190,7 +5206,7 @@
     "magnaat-rust-integratie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
@@ -5218,6 +5234,38 @@
       "operator": ">=->>#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "magnaat-world-boekhouding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/boekhouding.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "magnaat-world-geld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/centen.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "magnaatgeldkaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "return-weg#1",
+      "gezakt": 4,
+      "geprobeerd": 13
+    },
+    "magnaatgrondwet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/magnaatgrondwet.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "magnaatlab.test.js": {
       "soort": "puur",
@@ -5794,22 +5842,6 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/mond.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "money012-inkomend.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/betaalwaarheid/index.js",
-      "operator": "!==->===#0",
-      "gezakt": 7,
-      "geprobeerd": 4
-    },
-    "money012-keten.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/betaal.js",
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
@@ -6906,6 +6938,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet"
+    },
+    "poortreeks.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "test/helper.js",
+      "operator": ">=->>#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "poortwacht.test.js": {
       "soort": "puur",
@@ -8640,7 +8680,7 @@
       "staat": "gezakt",
       "module": "server/kern/spellen/magnaat/kaart.js",
       "operator": "===->!==#0",
-      "gezakt": 14,
+      "gezakt": 15,
       "geprobeerd": 1
     },
     "spelverzekering.test.js": {

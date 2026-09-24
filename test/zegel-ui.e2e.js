@@ -6,7 +6,7 @@
    browser. Draai: node --test test/zegel-ui.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, bankDeur } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, bankDeur, pasAppAdres } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zguI-')); }
@@ -46,7 +46,7 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
        Het alternatief -- omzetten en er een ruimere wacht naast leggen -- is een
        groter venster om een race mee toe te dekken, en dat is precies wat deze
        ronde overal juist weghaalt. Liever een navigatie-eis die hier klopt. */
-    await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
+    await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'load' });
     // Sinds het OS-beginscherm zit "Toon je Zegel" in het bedieningspaneel en
     // niet meer als los knopje in de statusbalk; de knop zelf blijft het model.
     await page.waitForSelector('#zegelBtn', { state: 'attached', timeout: 15000 });

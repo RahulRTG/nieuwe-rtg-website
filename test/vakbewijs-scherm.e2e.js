@@ -23,7 +23,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, wachtOpRust, volgVerzoeken, browserOpties } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken, browserOpties, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -101,7 +101,7 @@ test('de banner vraagt om het stuk dat het werk vraagt, en alleen daar',
     ({ browser, page } = await open(base, reg.token));
     let fouten = [];
     letOpFouten(page, fouten);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'domcontentloaded' });
     /* `attached` en niet de standaard `visible`: een LEGE banner is precies wat
        we hier willen zien, en die is per definitie onzichtbaar. Op zichtbaarheid
        wachten zou hier eeuwig duren en dan een timeout opleveren die eruitziet
@@ -129,7 +129,7 @@ test('de banner vraagt om het stuk dat het werk vraagt, en alleen daar',
     ({ browser, page } = await open(base, reg.token));
     fouten = [];
     letOpFouten(page, fouten);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'domcontentloaded' });
     /* Ook hier `attached`: of de banner op dit moment ZICHTBAAR is hangt af van
        welk tabblad open staat, en dat is niet wat deze toets vraagt. Zij vraagt
        of het scherm het juiste stuk klaarzet voor wie er werkt. */

@@ -77,24 +77,9 @@ module.exports = (m) => {
      balans, volgnummers zonder gat, en de saldi van de projectie precies gelijk
      aan wat het journaal oplevert (vanaf een lege wereld, of vanaf het punt
      waar de overgenomen historie begint). */
+  /* De controle zelf is van het grootboek (../magnaat-grootboek/herstel.js). */
   function verifieerJournaal() {
-    const e = m.state();
-    const gat = m.opslag.ontbrekend(m.wereld);
-    const bevindingen = [];
-    let verwacht = gat ? gat.tot + 1 : 1;
-    for (const g of m.gebeurtenissen()) {
-      if (g.volgnummer !== verwacht) bevindingen.push('volgnummer ' + g.volgnummer + ' waar ' + verwacht + ' verwacht werd');
-      if (g.debet !== g.credit) bevindingen.push(g.id + ' is niet in balans');
-      verwacht = g.volgnummer + 1;
-    }
-    if (verwacht - 1 !== e.laatstToegepast) bevindingen.push('het journaal eindigt bij ' + (verwacht - 1) + ', de projectie bij ' + e.laatstToegepast);
-    if (!gat) {
-      const saldi = m.saldiNa({}, 0);
-      for (const [code, r] of Object.entries(e.rekeningen)) {
-        if ((saldi[code] || 0) !== r.saldo) bevindingen.push('saldo ' + code + ': projectie ' + r.saldo + ', journaal ' + (saldi[code] || 0));
-      }
-    }
-    return { ok: !bevindingen.length, gebeurtenissen: verwacht - 1, historieVanaf: gat ? gat.tot + 1 : 1, bevindingen };
+    return m.verifieer(m.state());
   }
 
   return { overzicht, verifieerJournaal };

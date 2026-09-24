@@ -25,6 +25,7 @@ const maakOefen = require('../server/kern/magnaat-oefeneconomie');
 const { geheugenJournaal } = require('../server/kern/magnaat-economische-motor');
 
 const MAP = path.join(__dirname, '..', 'server/kern/magnaat-economische-motor');
+const GROOTBOEK = path.join(__dirname, '..', 'server/kern/magnaat-grootboek');
 const gouden = require('./fixtures/magnaat-economie-gouden.json');
 
 function economie({ wereld = {}, opslag = geheugenJournaal() } = {}) {
@@ -46,7 +47,7 @@ test('1. de nieuwe motor rekent stap voor stap gelijk aan de oude (gouden refere
 
 test('2. de motor kent het Oefenkantoor niet, en leunt er ook niet op', () => {
   const VERBODEN = [/praktijk/i, /['"]rtg['"]/, /oefen/i, /academy/i, /missie/i, /economenlab/i, /magnaatwereld/i, /spelvorm/i, /functieId/, /\btaak\b/i];
-  const TOEGESTAAN = /^(\.\/[a-z-]+|\.\.\/magnaat-motorklant|\.\.\/eigencollectie|\.\.\/\.\.\/lib\/klok)$/;
+  const TOEGESTAAN = /^(\.\/[a-z-]+|\.\.\/magnaat-grootboek(\/geld)?|\.\.\/magnaat-motorklant|\.\.\/eigencollectie|\.\.\/\.\.\/lib\/klok)$/;
   const bestanden = fs.readdirSync(MAP).filter(n => n.endsWith('.js'));
   assert.ok(bestanden.length >= 8, 'de motor is gevonden');
   for (const n of bestanden) {
@@ -59,7 +60,7 @@ test('2. de motor kent het Oefenkantoor niet, en leunt er ook niet op', () => {
 });
 
 test('3. het journaal vult alleen aan: geen gat, geen dubbel, geen inkorten, niets herschrijven', () => {
-  const code = zonderCommentaar(fs.readFileSync(path.join(MAP, 'journaal-opslag.js'), 'utf8'));
+  const code = zonderCommentaar(fs.readFileSync(path.join(GROOTBOEK, 'opslag.js'), 'utf8'));
   assert.doesNotMatch(code, /\.splice\(|\.shift\(|\.pop\(|\.length\s*=[^=]|delete\s+b\.gebeurtenissen/, 'geen enkele weg om het journaal korter te maken');
   const { ec, opslag } = economie();
   ec.volgendeDag('s', 'd1');

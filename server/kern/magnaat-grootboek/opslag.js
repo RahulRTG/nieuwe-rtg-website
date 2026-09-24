@@ -1,4 +1,4 @@
-/* Magnaat Economische Motor -- het gezaghebbende journaal.
+/* Magnaat Grootboek -- het gezaghebbende journaal.
 
    Dit is het bewijs, en de rest is een projectie ervan. Drie regels, en ze
    staan hier in code en niet alleen in MAGNAAT.md:
@@ -18,7 +18,7 @@
    WAT DIT NIET IS: opslag per rij. In deze opslag is een collectie EEN waarde
    (server/db/collectie-sqlite.js), dus wordt het journaal van een wereld bij
    het wegschrijven nog in zijn geheel geserialiseerd. Dat is een eigenschap van
-   de opslaglaag en geen gedrag van de motor: de motor leest het journaal bij
+   de opslaglaag en geen gedrag van het grootboek: het grootboek leest het journaal bij
    een gewone beslissing niet (zie `gelezen`), en archiveren of per rij opslaan
    kan later als opslagstrategie zonder de logische historie aan te raken.
 
@@ -115,7 +115,7 @@ function geheugenJournaal() {
 
 function collectieJournaal({ db }) {
   const eigen = require('../eigencollectie')({
-    db, domein: 'kern/magnaat-economische-motor', bezit: { magnaatJournaal: 'kaart' }
+    db, domein: 'kern/magnaat-grootboek', bezit: { magnaatJournaal: 'kaart' }
   });
   return maakJournaalOpslag(() => eigen.bak('magnaatJournaal'));
 }

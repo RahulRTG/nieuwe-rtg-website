@@ -45,26 +45,17 @@ module.exports = (m) => {
     }));
     const sleutels = {};
     for (const [sleutel, id] of Object.entries(e.verwerkteBoekingen || {})) sleutels[sleutel] = volgnummer({ id });
-    m.opslag.neemOver(m.wereld, {
+    m.neemOver(e, {
       gebeurtenissen, sleutels,
       ontbrekend: eerste > 1 ? { tot: eerste - 1, reden: 'weggegooid door de oude journaalgrens van 2500 posten, voor ronde A1' } : null
     });
-    e.laatstToegepast = e.boekVolgorde;
-    e.totalen = { debet: 0, credit: 0, aantal: 0 };
-    for (const g of gebeurtenissen) { e.totalen.debet += g.debet; e.totalen.credit += g.credit; e.totalen.aantal += 1; }
-    e.recent = oud.slice(-100).reverse().map(m.regelVoorScherm);
-    const vandaag = gebeurtenissen.filter(g => g.dag === e.dag);
-    e.vandaag = { dag: e.dag, posten: vandaag.map(g => ({ volgnummer: g.volgnummer, labels: g.labels, regels: g.regels })) };
     delete e.journaal;
     delete e.verwerkteBoekingen;
   }
 
   function zorgVorm(e) {
     if (!Number.isSafeInteger(e.mutatieVersie) || e.mutatieVersie < 0) e.mutatieVersie = 0;
-    if (!Array.isArray(e.wachtend)) e.wachtend = [];
-    if (!e.totalen) e.totalen = { debet: 0, credit: 0, aantal: 0 };
-    if (!Array.isArray(e.recent)) e.recent = [];
-    if (!Number.isSafeInteger(e.laatstToegepast)) e.laatstToegepast = 0;
+    m.zorgVorm(e);
     for (const b of Object.values(e.bedrijven || {})) {
       if (!b.kostenUitsplitsing || typeof b.kostenUitsplitsing !== 'object') {
         b.kostenUitsplitsing = { kostprijs: 0, loon: 0, training: 0, impact: 0, rente: 0, belasting: 0 };

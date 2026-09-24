@@ -58,7 +58,8 @@ const FAMILIES = {
    die op hem draait -- vandaag het Oefenkantoor, na A2 ook World. */
 const SCOPES = {
   world: 'Magnaat World -- de economie (Quick, Campaign, Living World): server/kern/spellen/magnaat/ zonder het bord',
-  motor: 'de economische motor -- server/kern/magnaat-economische-motor/, de ene economische autoriteit (MAGNAAT.md par. 2)',
+  motor: 'de economische motor -- server/kern/magnaat-economische-motor/, het economische model van het Oefenkantoor boven het grootboek',
+  grootboek: 'het grootboek -- server/kern/magnaat-grootboek/, de ene boekhoudautoriteit onder elke Magnaat-economie (MAGNAAT.md, ronde A2.0)',
   academy: 'het Oefenkantoor -- server/kern/magnaatwereld.js en zijn adapter server/kern/magnaat-oefeneconomie.js',
   classic: 'Magnaat Classic -- het bordspel: server/kern/spellen/magnaat/bord.js en bordspel.js'
 };
@@ -94,10 +95,15 @@ const REGELS = [
         handhaver: 'NIEMAND', toets: 'NIEMAND',
         schending: DIRECTE_SALDOMUTATIE
       },
-      motor: {
-        autoriteit: 'server/kern/magnaat-economische-motor/, het journaal',
-        handhaver: [{ bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: 'function boek(e, sleutel, soort, omschrijving, regels, labels = [])' }],
+      grootboek: {
+        autoriteit: 'server/kern/magnaat-grootboek/, het journaal',
+        handhaver: [{ bestand: 'server/kern/magnaat-grootboek/boeken.js', citaat: 'function boek(p, sleutel, soort, omschrijving, regels, labels = [])' }],
         toets: [{ bestand: 'test/magnaat-economie.test.js', naam: 'de openingsbalans en iedere economische journaalpost zijn exact in balans' }]
+      },
+      motor: {
+        autoriteit: 'het grootboek; de motor boekt alleen via zijn functies',
+        handhaver: [{ bestand: 'server/kern/magnaat-economische-motor/index.js', citaat: 'Object.assign(m, grootboek);' }],
+        toets: [{ bestand: 'test/magnaat-grootboek.test.js', naam: '2. de motor boekt nergens buiten het grootboek om' }]
       },
       academy: {
         autoriteit: 'server/kern/magnaatwereld.js (spelerbudget)',
@@ -160,10 +166,18 @@ const REGELS = [
         handhaver: 'NIEMAND', toets: 'NIEMAND',
         schending: DIRECTE_SALDOMUTATIE
       },
+      grootboek: {
+        autoriteit: 'server/kern/magnaat-grootboek/, het journaal',
+        handhaver: [{ bestand: 'server/kern/magnaat-grootboek/boeken.js', citaat: "throw new Error('Ongebalanceerde journaalpost geweigerd: '" }],
+        toets: [
+          { bestand: 'test/magnaat-economie.test.js', naam: 'de openingsbalans en iedere economische journaalpost zijn exact in balans', bewijst: 'post.regels.length >= 2' },
+          { bestand: 'test/magnaat-grootboek.test.js', naam: '3. een consument zonder dagen of bedrijven kan boeken, bevestigen, herstellen en verifieren', bewijst: '/Ongebalanceerde/' }
+        ]
+      },
       motor: {
-        autoriteit: 'server/kern/magnaat-economische-motor/, het journaal',
-        handhaver: [{ bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: "throw new Error('Ongebalanceerde journaalpost geweigerd: '" }],
-        toets: [{ bestand: 'test/magnaat-economie.test.js', naam: 'de openingsbalans en iedere economische journaalpost zijn exact in balans', bewijst: 'post.regels.length >= 2' }]
+        autoriteit: 'het grootboek; de motor boekt alleen via zijn functies',
+        handhaver: [{ bestand: 'server/kern/magnaat-economische-motor/index.js', citaat: 'Object.assign(m, grootboek);' }],
+        toets: [{ bestand: 'test/magnaat-grootboek.test.js', naam: '2. de motor boekt nergens buiten het grootboek om' }]
       }
     },
     migratie: 'Zelfde weg als M-001: World boekt via de kern. De geldpompmeter blijft ernaast staan tot de eigenschapstoetsen er zijn.',
@@ -328,11 +342,11 @@ const REGELS = [
     id: 'M-017', familie: 'M-6',
     invariant: 'Iedere economische mutatie heeft een gebeurtenisidentiteit: opnieuw verwerken levert geen tweede economisch resultaat op.',
     scope: {
-      motor: {
-        autoriteit: 'server/kern/magnaat-economische-motor/, de idempotentiesleutel in het journaal',
+      grootboek: {
+        autoriteit: 'server/kern/magnaat-grootboek/, de idempotentiesleutel in het journaal',
         handhaver: [
-          { bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: "if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');" },
-          { bestand: 'server/kern/magnaat-economische-motor/journaal-opslag.js', citaat: "throw new Error('Journaal weigert: sleutel '" }
+          { bestand: 'server/kern/magnaat-grootboek/boeken.js', citaat: "if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');" },
+          { bestand: 'server/kern/magnaat-grootboek/opslag.js', citaat: "throw new Error('Journaal weigert: sleutel '" }
         ],
         toets: [
           { bestand: 'test/magnaat-economie.test.js', naam: 'een herhaald commando verwerkt nooit tweemaal dezelfde economische dag' },
@@ -348,11 +362,11 @@ const REGELS = [
     id: 'M-018', familie: 'M-6',
     invariant: 'Historie is alleen aanvullen: een economische gebeurtenis wordt nooit achteraf herschreven of weggegooid, een correctie is een nieuwe gebeurtenis.',
     scope: {
-      motor: {
-        autoriteit: 'server/kern/magnaat-economische-motor/journaal-opslag.js, het journaal in de eigen collectie magnaatJournaal',
+      grootboek: {
+        autoriteit: 'server/kern/magnaat-grootboek/opslag.js, het journaal in de eigen collectie magnaatJournaal',
         handhaver: [
-          { bestand: 'server/kern/magnaat-economische-motor/journaal-opslag.js', citaat: "throw new Error('Journaal weigert: volgnummer '" },
-          { bestand: 'server/kern/magnaat-economische-motor/journaal-opslag.js', citaat: 'Object.freeze(g);' }
+          { bestand: 'server/kern/magnaat-grootboek/opslag.js', citaat: "throw new Error('Journaal weigert: volgnummer '" },
+          { bestand: 'server/kern/magnaat-grootboek/opslag.js', citaat: 'Object.freeze(g);' }
         ],
         toets: [
           { bestand: 'test/magnaat-economische-motor.test.js', naam: '3. het journaal vult alleen aan: geen gat, geen dubbel, geen inkorten, niets herschrijven' },
@@ -361,7 +375,7 @@ const REGELS = [
         /* Het oude patroon (een ringbuffer op MAX_JOURNAAL) plus elke andere
            manier om de lijst gebeurtenissen korter te maken. */
         schending: {
-          bestanden: { map: 'server/kern/magnaat-economische-motor', zonder: [] },
+          bestanden: { map: 'server/kern/magnaat-grootboek', zonder: [] },
           patroon: 'gebeurtenissen\\.(?:splice|shift|pop)\\(|gebeurtenissen\\.length\\s*=(?!=)|\\.length\\s*=\\s*MAX_JOURNAAL',
           wat: 'een journaal dat korter wordt: een afkapping, een ringbuffer of een weggehaalde gebeurtenis'
         }
@@ -381,11 +395,11 @@ const REGELS = [
         toets: [{ bestand: 'test/spelmagnaat.test.js', naam: 'bijrekenen is deterministisch: tien maanden in een keer of tien los' }],
         deels: 'de seed volgt uit het potje-id, maar er wordt geen regel-, motor- of datasetversie bij de wereld bewaard'
       },
-      motor: {
-        autoriteit: 'server/kern/magnaat-economische-motor/, elke gebeurtenis',
+      grootboek: {
+        autoriteit: 'server/kern/magnaat-grootboek/, elke gebeurtenis',
         handhaver: [
-          { bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: 'wereld: m.wereld, volgnummer: e.boekVolgorde, soort, oorzaak,' },
-          { bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: 'regelVersie: REGEL_VERSIE, motorVersie: MOTOR_VERSIE,' }
+          { bestand: 'server/kern/magnaat-grootboek/boeken.js', citaat: 'wereld: g.wereld, volgnummer: p.boekVolgorde, soort, oorzaak,' },
+          { bestand: 'server/kern/magnaat-grootboek/boeken.js', citaat: 'regelVersie: g.versies.regel, motorVersie: g.versies.motor,' }
         ],
         toets: [
           { bestand: 'test/magnaat-economie.test.js', naam: 'dezelfde beginsituatie en besluiten geven reproduceerbaar dezelfde economie' },
@@ -403,7 +417,7 @@ const REGELS = [
        toets hield het al vast; als grondwetregel telt de meter het zelf, en een
        terugval is een VIOLATION die de ratel tegenhoudt. */
     id: 'M-601', familie: 'M-6',
-    invariant: 'De economische motor kent geen consument: hij leunt niet op het Oefenkantoor, de Academy of een spelvorm, en de afhankelijkheid loopt alleen van consument naar motor.',
+    invariant: 'De economische motor kent geen consument en het grootboek kent geen domein: de afhankelijkheid loopt alleen van consument naar motor naar grootboek.',
     scope: {
       motor: {
         autoriteit: 'server/kern/magnaat-economische-motor/index.js: wat per wereld verschilt komt binnen via profiel en haken',
@@ -421,8 +435,22 @@ const REGELS = [
           bestanden: { map: 'server/kern/magnaat-economische-motor', zonder: [] },
           vlaggen: 'i',
           patroon: 'praktijk|oefen|missie|economenlab|magnaatwereld|academy|spelvorm|functieId|[\'"]rtg[\'"]|\\btaak\\b' +
-            '|require\\(\\s*[\'"](?!\\.\\/[a-z-]+[\'"]|\\.\\.\\/magnaat-motorklant[\'"]|\\.\\.\\/eigencollectie[\'"]|\\.\\.\\/\\.\\.\\/lib\\/klok[\'"])',
-          wat: 'de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, zijn Rust-client, de opslagdeclaratie en de klok'
+            '|require\\(\\s*[\'"](?!\\.\\/[a-z-]+[\'"]|\\.\\.\\/magnaat-grootboek(?:\\/geld)?[\'"]|\\.\\.\\/magnaat-motorklant[\'"]|\\.\\.\\/eigencollectie[\'"]|\\.\\.\\/\\.\\.\\/lib\\/klok[\'"])',
+          wat: 'de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, het grootboek, zijn Rust-client, de opslagdeclaratie en de klok'
+        }
+      },
+      /* Het grootboek eronder mag nog minder weten: ook geen markt, bedrijf of
+         spel. Dezelfde woorden als test/magnaat-grootboek.test.js toets 1. */
+      grootboek: {
+        autoriteit: 'server/kern/magnaat-grootboek/index.js: soorten, versies en periode komen van de consument',
+        handhaver: [{ bestand: 'server/kern/magnaat-grootboek/index.js', citaat: "if (!soorten || typeof soorten !== 'object') throw new Error('Het grootboek vereist de lijst gebeurtenissoorten.');" }],
+        toets: [{ bestand: 'test/magnaat-grootboek.test.js', naam: '1. het grootboek kent geen domein en laadt niets buiten zichzelf en de opslag', bewijst: 'TOEGESTAAN' }],
+        schending: {
+          bestanden: { map: 'server/kern/magnaat-grootboek', zonder: [] },
+          vlaggen: 'i',
+          patroon: 'oefen|praktijk|missie|economenlab|academy|spelvorm|markt|bedrij|profiel|schok|restaurant|toerist|kavel|vestiging|[\'"]rtg[\'"]' +
+            '|require\\(\\s*[\'"](?!\\.\\/[a-z-]+[\'"]|\\.\\.\\/eigencollectie[\'"])',
+          wat: 'het grootboek noemt een domein (Oefenkantoor, markt, bedrijf, spel) of laadt iets buiten zichzelf en de opslagdeclaratie'
         }
       }
     },

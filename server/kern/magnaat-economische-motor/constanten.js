@@ -58,10 +58,10 @@ const ECONOMISCHE_GEBEURTENISSEN = {
   UITKERING: 'UITKERING', ONBEKEND: 'ONBEKEND'
 };
 
-const rond = n => Math.round(Number(n) || 0);
+/* Geld in hele eurocenten komt van het grootboek, zodat motor en grootboek
+   dezelfde afronding gebruiken. */
+const { rond, geld, som } = require('../magnaat-grootboek/geld');
 const begrens = (n, min, max) => Math.min(max, Math.max(min, Number(n) || 0));
-const geld = n => rond(n);
-const som = waarden => waarden.reduce((t, n) => t + rond(n), 0);
 
 function datumOpDag(dag) {
   const datum = new Date(STARTDATUM + 'T12:00:00.000Z');

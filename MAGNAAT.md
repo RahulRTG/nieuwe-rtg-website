@@ -223,10 +223,14 @@ Stand: **VIOLATION**
   - Handhaver: NIEMAND
   - Toets: NIEMAND
   - Schending: 32, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
-- **Economische motor**: PASS
-  - Autoriteit: server/kern/magnaat-economische-motor/, het journaal
-  - Handhaver: `server/kern/magnaat-economische-motor/journaal.js`, `function boek(e, sleutel, soort, omschrijving, regels, labels = [])`
+- **Grootboek**: PASS
+  - Autoriteit: server/kern/magnaat-grootboek/, het journaal
+  - Handhaver: `server/kern/magnaat-grootboek/boeken.js`, `function boek(p, sleutel, soort, omschrijving, regels, labels = [])`
   - Toets: `test/magnaat-economie.test.js`, "de openingsbalans en iedere economische journaalpost zijn exact in balans"
+- **Economische motor**: PASS
+  - Autoriteit: het grootboek; de motor boekt alleen via zijn functies
+  - Handhaver: `server/kern/magnaat-economische-motor/index.js`, `Object.assign(m, grootboek);`
+  - Toets: `test/magnaat-grootboek.test.js`, "2. de motor boekt nergens buiten het grootboek om"
 - **Oefenkantoor**: VIOLATION
   - Autoriteit: server/kern/magnaatwereld.js (spelerbudget)
   - Handhaver: NIEMAND
@@ -298,10 +302,14 @@ Stand: **VIOLATION**
   - Handhaver: NIEMAND
   - Toets: NIEMAND
   - Schending: 32, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
+- **Grootboek**: PASS
+  - Autoriteit: server/kern/magnaat-grootboek/, het journaal
+  - Handhaver: `server/kern/magnaat-grootboek/boeken.js`, `throw new Error('Ongebalanceerde journaalpost geweigerd: '`
+  - Toets: `test/magnaat-economie.test.js`, "de openingsbalans en iedere economische journaalpost zijn exact in balans"; `test/magnaat-grootboek.test.js`, "3. een consument zonder dagen of bedrijven kan boeken, bevestigen, herstellen en verifieren"
 - **Economische motor**: PASS
-  - Autoriteit: server/kern/magnaat-economische-motor/, het journaal
-  - Handhaver: `server/kern/magnaat-economische-motor/journaal.js`, `throw new Error('Ongebalanceerde journaalpost geweigerd: '`
-  - Toets: `test/magnaat-economie.test.js`, "de openingsbalans en iedere economische journaalpost zijn exact in balans"
+  - Autoriteit: het grootboek; de motor boekt alleen via zijn functies
+  - Handhaver: `server/kern/magnaat-economische-motor/index.js`, `Object.assign(m, grootboek);`
+  - Toets: `test/magnaat-grootboek.test.js`, "2. de motor boekt nergens buiten het grootboek om"
 
 **Migratie.** Zelfde weg als M-001: World boekt via de kern. De geldpompmeter blijft ernaast staan tot de eigenschapstoetsen er zijn.
 
@@ -508,9 +516,9 @@ Stand: **PASS**
 
 Stand: **PARTIAL**
 
-- **Economische motor**: PASS
-  - Autoriteit: server/kern/magnaat-economische-motor/, de idempotentiesleutel in het journaal
-  - Handhaver: `server/kern/magnaat-economische-motor/journaal.js`, `if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');`; `server/kern/magnaat-economische-motor/journaal-opslag.js`, `throw new Error('Journaal weigert: sleutel '`
+- **Grootboek**: PASS
+  - Autoriteit: server/kern/magnaat-grootboek/, de idempotentiesleutel in het journaal
+  - Handhaver: `server/kern/magnaat-grootboek/boeken.js`, `if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');`; `server/kern/magnaat-grootboek/opslag.js`, `throw new Error('Journaal weigert: sleutel '`
   - Toets: `test/magnaat-economie.test.js`, "een herhaald commando verwerkt nooit tweemaal dezelfde economische dag"; `test/magnaat-economische-motor.test.js`, "9. dezelfde wereld en dezelfde handelingen geven dezelfde gebeurtenissen, id voor id"
 - **World**: ABSENT
   - Autoriteit: geen: een spelactie draagt geen gebeurtenis-id
@@ -527,9 +535,9 @@ Stand: **PARTIAL**
 
 Stand: **PARTIAL**
 
-- **Economische motor**: PASS
-  - Autoriteit: server/kern/magnaat-economische-motor/journaal-opslag.js, het journaal in de eigen collectie magnaatJournaal
-  - Handhaver: `server/kern/magnaat-economische-motor/journaal-opslag.js`, `throw new Error('Journaal weigert: volgnummer '`; `server/kern/magnaat-economische-motor/journaal-opslag.js`, `Object.freeze(g);`
+- **Grootboek**: PASS
+  - Autoriteit: server/kern/magnaat-grootboek/opslag.js, het journaal in de eigen collectie magnaatJournaal
+  - Handhaver: `server/kern/magnaat-grootboek/opslag.js`, `throw new Error('Journaal weigert: volgnummer '`; `server/kern/magnaat-grootboek/opslag.js`, `Object.freeze(g);`
   - Toets: `test/magnaat-economische-motor.test.js`, "3. het journaal vult alleen aan: geen gat, geen dubbel, geen inkorten, niets herschrijven"; `test/magnaat-economische-motor.test.js`, "5. 10.000+ gebeurtenissen: projectie klopt, journaal volledig, beslissen leest niet, herhaling gelijk"
   - Schending: 0, een journaal dat korter wordt: een afkapping, een ringbuffer of een weggehaalde gebeurtenis
 - **World**: ABSENT
@@ -552,9 +560,9 @@ Stand: **PARTIAL**
   - Handhaver: `server/kern/spellen/magnaat/economie.js`, `seed: 'magnaat-'+potje.id`
   - Toets: `test/spelmagnaat.test.js`, "bijrekenen is deterministisch: tien maanden in een keer of tien los"
   - Waarom hooguit PARTIAL: de seed volgt uit het potje-id, maar er wordt geen regel-, motor- of datasetversie bij de wereld bewaard
-- **Economische motor**: PARTIAL
-  - Autoriteit: server/kern/magnaat-economische-motor/, elke gebeurtenis
-  - Handhaver: `server/kern/magnaat-economische-motor/journaal.js`, `wereld: m.wereld, volgnummer: e.boekVolgorde, soort, oorzaak,`; `server/kern/magnaat-economische-motor/journaal.js`, `regelVersie: REGEL_VERSIE, motorVersie: MOTOR_VERSIE,`
+- **Grootboek**: PARTIAL
+  - Autoriteit: server/kern/magnaat-grootboek/, elke gebeurtenis
+  - Handhaver: `server/kern/magnaat-grootboek/boeken.js`, `wereld: g.wereld, volgnummer: p.boekVolgorde, soort, oorzaak,`; `server/kern/magnaat-grootboek/boeken.js`, `regelVersie: g.versies.regel, motorVersie: g.versies.motor,`
   - Toets: `test/magnaat-economie.test.js`, "dezelfde beginsituatie en besluiten geven reproduceerbaar dezelfde economie"; `test/magnaat-economische-motor.test.js`, "9. dezelfde wereld en dezelfde handelingen geven dezelfde gebeurtenissen, id voor id"
   - Waarom hooguit PARTIAL: elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A4)
 
@@ -564,7 +572,7 @@ Stand: **PARTIAL**
 
 ### M-601: Simulatie-integriteit
 
-> De economische motor kent geen consument: hij leunt niet op het Oefenkantoor, de Academy of een spelvorm, en de afhankelijkheid loopt alleen van consument naar motor.
+> De economische motor kent geen consument en het grootboek kent geen domein: de afhankelijkheid loopt alleen van consument naar motor naar grootboek.
 
 Stand: **PASS**
 
@@ -572,7 +580,12 @@ Stand: **PASS**
   - Autoriteit: server/kern/magnaat-economische-motor/index.js: wat per wereld verschilt komt binnen via profiel en haken
   - Handhaver: `server/kern/magnaat-economische-motor/index.js`, `const m = { wereld, profiel, wereldState, opslag, save, haken,`; `server/kern/magnaat-economische-motor/index.js`, `keurProfiel(profiel);`
   - Toets: `test/magnaat-economische-motor.test.js`, "2. de motor kent het Oefenkantoor niet, en leunt er ook niet op"
-  - Schending: 0, de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, zijn Rust-client, de opslagdeclaratie en de klok
+  - Schending: 0, de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, het grootboek, zijn Rust-client, de opslagdeclaratie en de klok
+- **Grootboek**: PASS
+  - Autoriteit: server/kern/magnaat-grootboek/index.js: soorten, versies en periode komen van de consument
+  - Handhaver: `server/kern/magnaat-grootboek/index.js`, `if (!soorten || typeof soorten !== 'object') throw new Error('Het grootboek vereist de lijst gebeurtenissoorten.');`
+  - Toets: `test/magnaat-grootboek.test.js`, "1. het grootboek kent geen domein en laadt niets buiten zichzelf en de opslag"
+  - Schending: 0, het grootboek noemt een domein (Oefenkantoor, markt, bedrijf, spel) of laadt iets buiten zichzelf en de opslagdeclaratie
 
 **Migratie.** Geen: dit is de stand na ronde A1. Bij A2 komt World erbij als tweede consument, via de boekhoudkant van de motor en niet via het marktmodel van het Oefenkantoor.
 

@@ -21,11 +21,12 @@
        save, motorklant, haken: { zorgStaat, naDag, verrijk }
      })
 
-   Hoe een gebeurtenis, het journaal en de projectie samenhangen staat in
-   ./journaal.js; waarom het journaal nooit korter wordt in ./journaal-opslag.js. */
+   Hoe een gebeurtenis, het journaal en de projectie samenhangen staat in het
+   grootboek (../magnaat-grootboek/boeken.js); waarom het journaal nooit korter
+   wordt in ../magnaat-grootboek/opslag.js. */
 'use strict';
-const { MACROACTOREN, WERKACTIVITEITEN, MOTOR_VERSIE, REGEL_VERSIE } = require('./constanten');
-const { geheugenJournaal, collectieJournaal } = require('./journaal-opslag');
+const { MACROACTOREN, WERKACTIVITEITEN, MOTOR_VERSIE, REGEL_VERSIE, ECONOMISCHE_GEBEURTENISSEN, datumOpDag } = require('./constanten');
+const { maakGrootboek, geheugenJournaal, collectieJournaal } = require('../magnaat-grootboek');
 
 function keurProfiel(profiel) {
   if (!profiel || typeof profiel !== 'object') throw new Error('De economische motor vereist een profiel.');
@@ -49,9 +50,19 @@ function maak({ wereld, profiel, wereldState, opslag, save = () => {}, motorklan
   if (!opslag) throw new Error('De economische motor vereist een journaal.');
   keurProfiel(profiel);
   const m = { wereld, profiel, wereldState, opslag, save, haken, motor: motorklant || require('../magnaat-motorklant')() };
+  /* Boeken, herstellen en verifieren doet het grootboek (../magnaat-grootboek).
+     De motor zegt welke gebeurtenissen hij kent, onder welke versies hij boekt
+     en dat zijn periode een dag is; de rest van de motor roept dezelfde namen
+     aan als voor ronde A2.0. */
+  const grootboek = maakGrootboek({
+    wereld, opslag, soorten: ECONOMISCHE_GEBEURTENISSEN,
+    versies: { regel: REGEL_VERSIE, motor: MOTOR_VERSIE },
+    periode: (e) => ({ nummer: e.dag, datum: datumOpDag(e.dag) })
+  });
+  Object.assign(m, grootboek);
   /* Letterlijk opgesomd en niet uit een lijst namen geladen: de bedradingsmeter
      (keuringsregel 59, BEDRADING.json) ziet een require met een variabele als onbekende kant. */
-  const delen = [require('./journaal'), require('./geldstromen'), require('./schokken'), require('./arbeid'), require('./markt'), require('./rust'),
+  const delen = [require('./geldstromen'), require('./schokken'), require('./arbeid'), require('./markt'), require('./rust'),
     require('./staat'), require('./dag'), require('./besluiten'), require('./overzicht')];
   for (const deel of delen) Object.assign(m, deel(m));
   return {

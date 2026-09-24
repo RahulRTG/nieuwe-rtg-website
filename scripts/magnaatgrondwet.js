@@ -206,7 +206,7 @@ function toon(m) {
    achterloopt. Alles buiten de merktekens is mensenwerk en blijft staan. */
 const BEGIN = '<!-- grondwet:begin -- gegenereerd door npm run magnaat:grondwet -- --document; niet met de hand wijzigen -->';
 const EIND = '<!-- grondwet:eind -->';
-const SCOPENAAM = { world: 'World', motor: 'Economische motor', academy: 'Oefenkantoor', classic: 'Classic' };
+const SCOPENAAM = { world: 'World', motor: 'Economische motor', grootboek: 'Grootboek', academy: 'Oefenkantoor', classic: 'Classic' };
 
 function documentBlok(m, wet = WET) {
   const code = (s) => '`' + String(s).replace(/`/g, "'") + '`';

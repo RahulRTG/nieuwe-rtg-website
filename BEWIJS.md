@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2036 bestanden en 14412 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2037 bestanden en 14413 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2036 |
-| losse beweringen (`test(...)`) | 14412 |
+| toetsbestanden | 2037 |
+| losse beweringen (`test(...)`) | 14413 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1382 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
-| niets van beide | 410 |
+| niets van beide | 411 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1821,7 +1821,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-255 bestanden, 455 beweringen.
+256 bestanden, 456 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1864,6 +1864,7 @@ toets omvalt.
 | `commercie-ronde.e2e.js` | 4 | -- | DE RONDE IN DE ECHTE SERVER. test/ronde.test.js toetst de ronde met een nagebootste wereld; dit bestand toetst dat hij in de gemonteerde server BESTAAT en draait. |
 | `concern-routes.e2e.js` | 3 | -- | RTG CONCERN: DE DEUR. test/concern.test.js toetst de kern zonder server. |
 | `concern-scherm.e2e.js` | 2 | gezakt op `liegpoort /api/` | HET SCHERM VAN RTG CONCERN IN EEN ECHTE BROWSER: van naam tot entiteit met bron. WAAROM DEZE TOETS BESTAAT test/concern.test.js toetst de kern, test/concern-routes.e2e.js de deur -- allebei zonder browser. |
+| `connect-gezinsdeur.e2e.js` | 1 | -- | ONTDEKKEN VOOR EEN GEZIN -- het scherm neemt de gezinsdeur, niet de ledendeur. Op 24 september 2026 toonde /apps/connect.html een gezinslid in FoundationOS "Niet ingelogd.": het scherm riep alleen /api/connect/* aan... |
 | `connect-routes.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE TWEEENTWINTIG ROUTES VAN FOUNDATION CONNECT, tegen een echte server. test/connect.test.js beproeft de MODULES; deze toets beproeft de weg ernaartoe. |
 | `connect-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | ONTDEKKEN (/apps/connect.html) IN EEN ECHTE BROWSER. test/connect.test.js beproeft de MODULES, test/connect-routes.e2e.js de DEUREN. |
 | `contactpin.e2e.js` | 4 | -- | DE CONTACTPIN OP HET SCHERM (apps/app.html, sociale balk in De Salon). test/contactpin.test.js bewijst dat de kern en de routes kloppen. |

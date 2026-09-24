@@ -137,8 +137,10 @@ module.exports = (kern) => {
   app.post('/api/connect/horizon', auth, horizon(lid));
   app.post('/api/rtf/connect/horizon', gezinsPoort, horizon(gezin));
 
-  app.post('/api/connect/schuif', auth, (req, res) => veilig(res, () =>
-    connect.schuif(lid(req).sleutel, (req.body || {}).schuif)));
+  /* De schuif zet de mens zelf (CONNECT.md), dus ook een gezinslid. */
+  const schuif = (wie) => (req, res) => veilig(res, () => connect.schuif(wie(req).sleutel, (req.body || {}).schuif));
+  app.post('/api/connect/schuif', auth, schuif(lid));
+  app.post('/api/rtf/connect/schuif', gezinsPoort, schuif(gezin));
 
   const signaal = (wie) => (req, res) => veilig(res, () => {
     const b = req.body || {};

@@ -370,6 +370,28 @@ antwoord, en toonde geen verzonnen zekerheid, geen rommel en geen JS-fout. Allee
 LEEG antwoord is beproefd. Een backend die iets verkeerds antwoordt in plaats van
 niets, wordt niet betrapt.
 
+**En daarna gerepareerd, niet alleen gemeten** (dezelfde dag). Er was geen gedeelde
+oorzaak: elk van de schermen nam aan dat een veld er altijd is. Elk controleert nu
+direct na het ophalen wat het aantoonbaar gebruikt, en valt bij een ontbrekend veld
+terug op zijn eigen foutmelding ("Het antwoord was onvolledig, dus dit kon niet worden
+geladen."). Nooit een lege lijst: die zou beweren dat er niets is, en dan had de
+reparatie bewijs 4 zelf gebroken. Elke reparatie is twee keer nagelopen: onder de
+liegpoort (valt niet meer om), en op een gewone server met een echte sessie (toont zijn
+inhoud, en valt dus niet onterecht in zijn foutmelding). Die tweede proef ving een
+eigen fout: routedossier kreeg een lijst geeist waar het antwoord een object met
+`resultaten` draagt. Twee schermen waren geen omvaller maar een deur (de schoolsessie
+stopt zijn script met opzet), en de liegronde beoordeelt nu eerst de deur. Uitslag:
+93 BEWEZEN en 0 omvallers.
+
+**De ronde vond ook een productdefect dat met liegen niets te maken had.** Ontdekken
+(`/apps/connect.html`) staat in FoundationOS en zei een gezinslid "Niet ingelogd.":
+het scherm riep alleen de ledendeur `/api/connect/*` aan, terwijl de motor een
+gezinsdeur heeft (`/api/rtf/connect/*`, dezelfde motor) die door geen enkel scherm
+werd gebruikt. Het scherm kiest nu zijn deur: een lid gaat voor, anders de
+gezinssessie. De gezinsdeur kreeg de ene route die het scherm gebruikt en die ontbrak
+(`schuif` -- de mens zet zijn eigen horizon, CONNECT.md). Toets:
+`test/connect-gezinsdeur.e2e.js`, die zakt als de deurkeuze uit staat.
+
 Toetsen: `test/liegronde.test.js` (het oordeel, de samenstelling, en de samenhang van
 het echte register). Drie handmutaties laten hem zakken: elke klacht als defect
 tellen, de versheid overslaan, en nul gelogen antwoorden als bewezen tellen.

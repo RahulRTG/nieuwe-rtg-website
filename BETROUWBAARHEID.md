@@ -127,6 +127,66 @@ De regel die daarbovenop hoort: **een simulatie-adapter mag nooit een handeling
 laten slagen die in het echt niet zou slagen.** Vandaar dat de synthetische bank
 vier afloopen kent (`betaald`, `geweigerd`, `traag`, `terugboeking`) en niet één.
 
+## 4a. Bewijs samenstellen — wat er al gemeten is, laten tellen
+
+**Staat** (24 september 2026). De eerste stap naar de testwereld is geen nieuwe
+fixture maar een naad: er lagen gesloten ketenproeven die complete stromen lopen,
+en `APPWERKT.json` las er geen enkele. Een app mag nu een bewijs **samenstellen**
+uit een proef die al bestaat. Drie stukken, en geen van drie is een nieuw
+framework:
+
+- **`scripts/lib/appcontract.js`** zegt per app welke bron welk bewijs mag
+  leveren. Het is een verklaring en nooit een uitslag: er staat geen stand in, en
+  `test/appcontract.test.js` zakt als iemand er toch een in zet. Alleen de acht
+  bewijzen van par. 2 — er komt geen negende.
+- **`scripts/lib/bewijsbron.js`** beslist of de bron het op deze code verdient,
+  in drie stappen waarvan de eerste die faalt de uitslag bepaalt: de **koppeling**
+  is gemeten (de proef raakt routes die de ingang aanroept, via
+  `SCHERMROUTES.json` en de scripts die de ingang laadt), het register is **vers**
+  (`versheid()` uit `scripts/lib/stempel.js`, en met opzet geen tweede grendel),
+  en de keten **sluit** (de schakels zelf, niet de samenvattende telling).
+- Verouderd is `NIET_GETEST` en nooit `GEBLOKKEERD_DOOR_DEFECT`: er is dan niets
+  gemeten dat stuk was. Vers met een open schakel is `DEFECT` en nooit
+  `NIET_GETEST`: dan is er wel iets gemeten.
+
+**Een ketenproef levert precies één bewijs: `voltooibaar`.** Zijn storingen zijn
+dubbele tikken, verkeerde rollen en verboden standen — dat is niet wat
+*herstelbaar* hier betekent (uitval van Redis of PostgreSQL, een providertimeout,
+een verzoek dat midden in een mutatie afbreekt). Er is geen herstart, dus ook geen
+*persistent*; hij leest API-antwoorden, dus geen *waarheidsgetrouw*; en een
+handvol verkeerde-rol-storingen is geen kruisproef, dus geen *bevoegd*. Wie een
+keten voor een van die vier laat tellen, voert het verkeerde experiment uit met
+een geldige uitslag (`BEWIJSMACHINE.md` par. 6a).
+
+**De meting die het verwachte beeld corrigeert.** Het leek alsof zeven gesloten
+ketens veel gratis bewijs waren. Gemeten op de routes landt er **één** op de
+kernbelofte van een app in `MAPPEN`: de tafelproef op Horeca (twaalf gedeelde
+routes onder `/api/supplier/horeca/`). De andere zes staan in `ZONDER_APP`, elk
+met de reden en wat er nodig is:
+
+| keten | waarom hij (nog) niet telt |
+|---|---|
+| rit | geen scherm roept `/api/ride/request` aan; de rit start in een stand van de ledenapp zonder eigen adres |
+| Adam | loopt over `/api/rtf/solliciteer` en `/api/concern/*`; geen ingang in `MAPPEN` roept die aan |
+| moment | raakt RTG Media, maar alleen de deelbelofte volgen en gewekt worden |
+| toelating, zaak-live | de zaak- en kantoorkant; `MAPPEN` kent alleen lid- en gezinswerelden |
+| lus (Connect) | schrijft geen register, en `connect.html` staat niet in `MAPPEN` |
+
+De routeoverlap is **nodig en niet voldoende**: vandaar de belofte in woorden bij
+elke koppeling. Een keten die een deelbelofte loopt, verdient het bewijs van de
+hele app niet. Twee valkuilen die de meting zelf opleverde: een scherm met het
+voorvoegsel `/api/` leek op alle zeven ketens te landen (een voorvoegsel telt pas
+vanaf twee segmenten), en vijf van de zes registers droegen een kale datum in
+plaats van een stempel, zodat `versheid()` er niets over kon zeggen. Die vijf
+schrijven nu het huisstempel.
+
+**Wat dit betekent voor de volgorde.** Samenstellen schaalt niet door meer ketens
+te schrijven maar door de wereld eronder: de bewijsbron is gebouwd om later ook
+een wereldproef, een autorisatieproef en een verraadproef te lezen (elk met zijn
+eigen bewijs in `BRONSOORTEN`, nooit door een bestaande soort op te rekken). Dat
+is de volgende stap: de bestaande `scripts/lib/wereld-*.js` onder één compositor,
+zodat een app alleen verklaart welke wereld hij nodig heeft.
+
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
 `npm run appwerkt` schrijft `APPWERKT.json`: per onderdeel uit `MAPPEN`, met de

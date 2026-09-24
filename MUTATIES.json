@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T23:23:16.164Z",
-    "commit": "e76848bd",
+    "op": "2026-09-24T16:37:12.043Z",
+    "commit": "56ea75ba",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -493,6 +493,14 @@
       "module": "server/kern/mobiliteit/appbrug.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "appcontract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bewijsbron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "appstore-bereik.test.js": {

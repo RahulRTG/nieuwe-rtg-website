@@ -1,5 +1,12 @@
 {
-  "stempel": "2026-09-19",
+  "stempel": {
+    "op": "2026-09-24T16:37:12.120Z",
+    "commit": "56ea75ba",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/tafelproef.js",
+    "node": "v22.22.2"
+  },
   "uitleg": "Een horecaketen van tafel tot afrekening, gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zich aan wat hij belooft als het misgaat?). Zie MAATSTAF.md par. 7.",
   "grens": "Alleen de tafel-keten; bezorging, hotel en club hebben eigen naden. De rekening loopt niet door tot een creditnota: de retourlaag hangt aan een leverancierbestelling en niet aan een horecarekening. Er komt geen browser aan te pas, dus dit zegt niets over de schermen.",
   "schakels": [
@@ -12,7 +19,7 @@
       "status": 200,
       "ziet": "de gast leest tafel PROEF-1 bij Sal de Mar",
       "fout": null,
-      "ms": 16
+      "ms": 18
     },
     {
       "nr": 2,
@@ -23,7 +30,7 @@
       "status": 200,
       "ziet": "1 stoel(en), stoel 1 zonder eigen sessie: true",
       "fout": null,
-      "ms": 10
+      "ms": 12
     },
     {
       "nr": 3,
@@ -32,9 +39,9 @@
       "wat": "schuift aan via de QR en komt op dezelfde rekening",
       "stand": "gesloten",
       "status": 200,
-      "ziet": "gast op rekening 6612937d6e (zaak opende 6612937d6e), 2 stoelen",
+      "ziet": "gast op rekening eb40c7ae41 (zaak opende eb40c7ae41), 2 stoelen",
       "fout": null,
-      "ms": 22
+      "ms": 16
     },
     {
       "nr": 4,
@@ -45,7 +52,7 @@
       "status": 200,
       "ziet": "2 regel(s) op de bon van de zaak",
       "fout": null,
-      "ms": 21
+      "ms": 18
     },
     {
       "nr": 5,
@@ -56,7 +63,7 @@
       "status": 200,
       "ziet": "keukenbord 0 -> 2 bon(nen)",
       "fout": null,
-      "ms": 17
+      "ms": 14
     },
     {
       "nr": 6,
@@ -100,7 +107,7 @@
       "status": 200,
       "ziet": "de gast leest \"Verkeerd bereid: koud geserveerd\" bij Gazpacho de sandia",
       "fout": null,
-      "ms": 15
+      "ms": 11
     },
     {
       "nr": 10,
@@ -111,7 +118,7 @@
       "status": 200,
       "ziet": "bruto 3200 -> 1600 (correctie 1600), regel staat er nog: true",
       "fout": null,
-      "ms": 7
+      "ms": 5
     },
     {
       "nr": 11,
@@ -122,7 +129,7 @@
       "status": 200,
       "ziet": "zaak: openstaand 0, gesloten true | gast: 401 sessie-weg -- \"Deze tafelsessie is niet meer geldig. Scan de QR op tafel opnieuw.\"",
       "fout": null,
-      "ms": 14
+      "ms": 11
     }
   ],
   "storingen": [
@@ -172,10 +179,10 @@
       "naam": "een tweede rekening op dezelfde tafel",
       "belofte": "weigert en wijst naar de bestaande",
       "stand": "gehouden",
-      "wat": "status 409, wijst naar e91ccf17e5"
+      "wat": "status 409, wijst naar 2a75411183"
     }
   ],
-  "rekening": "6612937d6e",
+  "rekening": "eb40c7ae41",
   "telling": {
     "schakels": 11,
     "gesloten": 11,

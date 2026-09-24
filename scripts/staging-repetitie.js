@@ -10,10 +10,10 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const net = require('node:net');
 const crypto = require('node:crypto');
 const { spawn, spawnSync } = require('node:child_process');
 const { pak } = require('./afbouw-slot');
+const { vrijePoortReeks } = require('../test/helper');
 
 const ROOT = path.join(__dirname, '..');
 const geefAfbouwSlotVrij = pak('stagingrepetitie');
@@ -45,38 +45,18 @@ function pctl(waarden, p) {
   return Math.round(rij[Math.min(rij.length - 1, Math.ceil(rij.length * p) - 1)] * 10) / 10;
 }
 
-function luister(poort) {
-  return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    server.unref();
-    server.once('error', reject);
-    server.listen(poort, '127.0.0.1', () => resolve(server));
-  });
-}
-
-async function sluit(server) {
-  if (!server) return;
-  await new Promise(resolve => server.close(resolve));
-}
-
+/* DE POORTEN KOMEN UIT EEN REEKS BUITEN HET EFEMERE BEREIK. Hier stond een
+   eigen zoeklus over 41000-59000 die de zeven poorten een voor een bond als
+   proef. Die proef zag een bezette poort wel, maar het bereik lag midden in
+   ip_local_port_range: elke uitgaande verbinding van elk ander proces kan daar
+   precies op een van onze poorten landen in de seconden tussen loslaten en de
+   echte bind (dat liet test/trio-wees.test.js in CI zakken -- zie de kop van
+   dat bestand). Buiten dat bereik landt nooit een bind(0) of autobind, dus die
+   klasse bestaat daar niet. Een reeks van 92 dekt alle offsets die de keten
+   aanneemt: +10 (motor), +20 (intern), +21..+23 (het trio) en +91 (beheer). */
 async function vrijePoorten() {
-  for (let basis = 41000; basis <= 59000; basis += 37) {
-    const kandidaten = [basis, basis + 10, basis + 20, basis + 21, basis + 22, basis + 23, basis + 91];
-    if (kandidaten.some(p => p > 65535)) break;
-    const gereserveerd = [];
-    try {
-      for (const p of kandidaten) gereserveerd.push(await luister(p));
-      return {
-        publiek: basis, motor: basis + 10, intern: basis + 20,
-        trio: [basis + 21, basis + 22, basis + 23], beheer: basis + 91
-      };
-    } catch (e) {
-      // Deze reeks is al in gebruik; de volgende volledige reeks wordt beproefd.
-    } finally {
-      for (const server of gereserveerd) await sluit(server);
-    }
-  }
-  throw new Error('Geen vrije, aaneengesloten stagingpoorten gevonden.');
+  const r = await vrijePoortReeks(92);
+  return { publiek: r[0], motor: r[10], intern: r[20], trio: [r[21], r[22], r[23]], beheer: r[91] };
 }
 
 async function verzoek(pad, opties = {}, timeoutMs = 6000) {

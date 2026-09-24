@@ -38,6 +38,7 @@ const os = require('os');
 const path = require('path');
 const http = require('http');
 const { spawn, execFileSync } = require('child_process');
+const { vrijePoortReeks } = require('../test/helper');
 
 const WORTEL = path.join(__dirname, '..');
 const arg = (naam, standaard) => {
@@ -134,7 +135,13 @@ const UIT = arg('uit', null);
    de servers moeten er ook nog bij. Nooit minder dan 2, want met 1 valt er niets
    te vergelijken. */
 const VOORDEUREN = Number(arg('voordeuren', Math.max(2, Math.min(8, KERNEN - 1))));
-const POORT = 39000 + (process.pid % 900);
+/* De poort komt pas in hoofd(): uit een reeks van vier buiten het efemere
+   bereik (vrijePoortReeks in test/helper.js), want startTrio() leidt de drie
+   serverpoorten af als POORT+1..+3. Hier stond 39000 + pid % 900, midden in
+   ip_local_port_range, en dan kan een uitgaande verbinding van elk ander proces
+   op de poort van server 1 staan -- precies wat test/trio-wees.test.js in CI
+   liet zakken. Een clientproces (--client) krijgt de poort via argv. */
+let POORT = null;
 const REDIS = process.env.REDIS_URL || null;
 /* PAS AANMAKEN IN hoofd(), niet hier. Dit bestand wordt ook als CLIENT geladen
    (--client, zie boven), en dan zou elk clientproces een eigen tijdelijke map
@@ -370,6 +377,7 @@ function oordeel(rijen, omgeving) {
 async function hoofd() {
   zeg('');
   MAP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-spreiding-'));
+  [POORT] = await vrijePoortReeks(4);   // POORT, en POORT+1..+3 voor de drie servers
   zeg('DE SPREIDINGSPROEF op een EIGEN trio, poort ' + POORT + ', datamap ' + MAP + '.');
   zeg('  ' + KERNEN + ' kernen, ' + CLIENTS + ' clientproces(sen) van ' + GELIJK +
       ' gelijktijdig, ' + SECONDEN + ' s per stand.');

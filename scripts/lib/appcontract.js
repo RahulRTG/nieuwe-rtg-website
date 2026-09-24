@@ -73,6 +73,22 @@ const CONTRACT = {
       instrument: 'scripts/tafelproef.js',
       waarom: 'de tafelproef loopt exact die stroom over /api/supplier/horeca/*, de routes die /apps/horeca.html zelf aanroept'
     }
+  },
+  /* De lusproef stond tot 24 september 2026 in ZONDER_APP: hij schreef geen
+     register, en Ontdekken leek /apps/rtg.html te zijn. Beide klopten niet meer:
+     link:connect is /apps/connect.html, dat acht /api/connect-routes met de proef
+     deelt, en de proef schrijft nu LUSPROEF.json met het huisstempel. De proef
+     loopt als LID over /api/connect, de deur die connect.html zelf aanroept; de
+     gezinsdeur /api/rtf/connect is dezelfde motor maar wordt niet gelopen, en dat
+     staat in `waarom` in plaats van weggelaten. */
+  'link:connect': {
+    belofte: 'je ontdekt iets, begrijpt het, doet er iets mee, en een ander bevestigt dat het hem hielp -- zonder score, rangorde of niveau',
+    voltooibaar: {
+      soort: 'ketenproef',
+      register: 'LUSPROEF.json',
+      instrument: 'scripts/lusproef.js',
+      waarom: 'de lusproef loopt de ontdeklus van CONNECT.md over /api/connect/*, de routes die /apps/connect.html zelf aanroept, met twee leden; de gezinsdeur /api/rtf/connect (dezelfde motor) loopt hij niet'
+    }
   }
 };
 
@@ -94,10 +110,7 @@ const ZONDER_APP = [
     nodig: 'niets aan de keten -- dit bewijs hoort bij een zaak- of kantoorregister, niet bij APPWERKT' },
   { register: 'ZAAKLIVEPROEF.json', instrument: 'scripts/zaakliveproef.js',
     reden: 'de zaakkant (poort, rondleidingen, live gaan); geen ingang in MAPPEN',
-    nodig: 'idem: een zaakregister naast APPWERKT' },
-  { register: null, instrument: 'scripts/lusproef.js',
-    reden: 'schrijft geen register; zonder stempel kan versheid() er niets over zeggen. Bovendien roept connect.html de lus aan, en die staat niet in MAPPEN (Ontdekken is /apps/rtg.html)',
-    nodig: 'een --vastleggen met huisstempel, en een besluit over de ingang van Connect' }
+    nodig: 'idem: een zaakregister naast APPWERKT' }
 ];
 
 /* DE WERELD DIE EEN APP NODIG HEEFT (Ronde B, 24 september 2026). Een app

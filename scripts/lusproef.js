@@ -28,10 +28,14 @@
    zakken, of de bevinding wegpoetsen.
 
    DRAAIEN  npm run lusproef
+            npm run lusproef:vast   (schrijft LUSPROEF.json, met het huisstempel)
    ========================================================================== */
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const ws = require('./lib/wegwerpserver');
+const { stempel: huisStempel } = require('./lib/stempel');
 const { ROLLEN } = require('./lib/proefsessies');
 
 const schakels = [], storingen = [];
@@ -336,5 +340,29 @@ async function proef(basis) {
   /* `sluit` en `sluitMetBevinding` worden nooit een cijfer, in de vorm van
      scripts/ritproef.js: een open schakel met een reden is geen breuk, en een
      breuk verdwijnt nooit in een gemiddelde. */
+  /* HET REGISTER, alleen met --vastleggen. Zonder stempel kon versheid() niets
+     over deze proef zeggen, en dus kon hij geen bewijs leveren aan APPWERKT
+     (scripts/lib/appcontract.js). De standen worden bij het wegschrijven vertaald
+     naar het woordgebruik van de andere ketenregisters -- `gesloten`, `openBekend`,
+     `stuk` en `gehouden`, `gebroken` -- zodat scripts/lib/bewijsbron.js ze met
+     dezelfde lezer leest; wat hierboven op het scherm staat, verandert niet. */
+  if (process.argv.includes('--vastleggen')) {
+    const SCHAKEL = { sluit: 'gesloten', openBekend: 'openBekend', BREEKT: 'stuk' };
+    const STORING = { houdt: 'gehouden', BREEKT: 'gebroken' };
+    const reg = {
+      stempel: huisStempel(),
+      uitleg: 'De ontdeklus van Foundation Connect, gemeten per SCHAKEL (handelt actor A, en merkt actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Zesde keten naast tafel, rit, toelating, Adam en moment -- zie CONNECT.md.',
+      grens: 'Twee LEDEN over de lid-deur /api/connect. De gezinsdeur /api/rtf/connect is dezelfde motor (server/functies/register/cat-life2.js) maar wordt hier niet gelopen. Er komt geen browser aan te pas.',
+      schakels: schakels.map((k) => Object.assign({}, k, { stand: SCHAKEL[k.stand] || k.stand })),
+      storingen: storingen.map((k) => Object.assign({}, k, { stand: STORING[k.stand] || k.stand }))
+    };
+    const t = { schakels: reg.schakels.length, gesloten: 0, openBekend: 0, stuk: 0, storingen: reg.storingen.length, gehouden: 0, gebroken: 0 };
+    for (const x of reg.schakels.concat(reg.storingen)) t[x.stand] = (t[x.stand] || 0) + 1;
+    reg.telling = t;
+    reg.sluitMetBevinding = t.stuk === 0 && t.gebroken === 0;
+    reg.sluit = reg.sluitMetBevinding && t.openBekend === 0;
+    fs.writeFileSync(path.join(__dirname, '..', 'LUSPROEF.json'), JSON.stringify(reg, null, 2) + '\n');
+    console.log('  geschreven: LUSPROEF.json\n');
+  }
   process.exit(stuk ? 1 : 0);
 })().catch(e => { console.error('\n  DE PROEF ZELF IS STUK:', e.message, '\n'); process.exit(2); });

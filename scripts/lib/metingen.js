@@ -410,6 +410,10 @@ const REGISTER = {
   'DOELGROEPBEREIK.json': { eigenRatel: 'test/doelgroepbereik.test.js' },
   'AANVOERVORM.json': { eigenRatel: 'test/aanvoer.test.js' },
   'MOMENTPROEF.json': { eigenRatel: 'test/momentproef.test.js' },
+  /* LUSPROEF.json (sinds 24 september 2026) levert voltooibaar voor Ontdekken
+     via scripts/lib/appcontract.js. De toets houdt het woordgebruik vast dat
+     scripts/lib/bewijsbron.js leest, en dat de telling de rijen niet overstemt. */
+  'LUSPROEF.json': { eigenRatel: 'test/lusproef.test.js' },
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },

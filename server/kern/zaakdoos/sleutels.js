@@ -96,8 +96,8 @@ function maakDoosSleutels({ db, save, crypto, nu }) {
         'opgaven: een zelfopgave en geen identiteit. heeftEigen betekent dat er al een eigen sleutel voor die naam is ' +
         'uitgegeven maar nog niet op de doos staat. Zodra deze lijst leeg blijft, kan de gedeelde sleutel dicht.',
       wegen: Object.assign({ gedeeld: 0, eigen: 0 }, eigen.kijk('doosSleutelwegen') || {}),
-      gedeeldeSleutel: gedeeld(),
-      uitleg: gedeeld().dicht ? 'De gedeelde doos-sleutel is dicht: alleen een eigen sleutel per doos komt nog binnen.'
+      gedeeldeSleutel: gedeeldeSleutel(),
+      uitleg: gedeeldeSleutel().dicht ? 'De gedeelde doos-sleutel is dicht: alleen een eigen sleutel per doos komt nog binnen.'
         : 'Fase 7 in de schaduw: de gedeelde doos-sleutel werkt nog. Zodra nogGedeeld leeg blijft, kan de eigenaar hem dichtzetten.'
     };
   }
@@ -107,7 +107,7 @@ function maakDoosSleutels({ db, save, crypto, nu }) {
      afgelopen zeven dagen nog een doos met de gedeelde sleutel meldde -- met de
      namen erbij -- want anders staat een werkende doos morgen stil zonder dat
      iemand het zag aankomen. Weer openzetten kan altijd: dat is de noodweg. */
-  function gedeeld() {
+  function gedeeldeSleutel() {
     const d = eigen.kijk('doosGedeeldDicht') || {};
     return { dicht: d.dicht === true, door: d.door || null, at: d.at || null };
   }
@@ -120,10 +120,10 @@ function maakDoosSleutels({ db, save, crypto, nu }) {
     const d = eigen.bak('doosGedeeldDicht');
     d.dicht = dicht; d.door = wie || null; d.at = new Date(tijd()).toISOString();
     save();
-    return Object.assign({ ok: true }, gedeeld());
+    return Object.assign({ ok: true }, gedeeldeSleutel());
   }
 
-  return { geef, trekIn, welke, telWeg, overzicht, gedeeld, gedeeldZet };
+  return { geef, trekIn, welke, telWeg, overzicht, gedeeldeSleutel, gedeeldZet };
 }
 
 /* EEN INSTANTIE PER DATABASE. Twee domeinen gebruiken dit register (de vloot in

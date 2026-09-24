@@ -146,7 +146,7 @@ test('7a. dichtzetten wacht tot geen doos meer de gedeelde sleutel gebruikt', ()
   let t = Date.parse('2026-09-24T09:00:00Z');
   const db = { data: {} };
   const s = maakDoosSleutels({ db, save: () => {}, crypto, nu: () => t });
-  assert.equal(s.gedeeld().dicht, false, 'standaard open');
+  assert.equal(s.gedeeldeSleutel().dicht, false, 'standaard open');
   s.telWeg('gedeeld', 'doos-oud');
   const te = s.gedeeldZet({ dicht: true, wie: 'eigenaar' });
   assert.equal(te.status, 409, JSON.stringify(te));

@@ -412,6 +412,24 @@ const REGELS = [
     faalwijze: 'Een onderzoeker kan een wereld niet opnieuw draaien, of draait hem op andere regels zonder het te weten.'
   },
   {
+    /* Ronde A2.1, een harde regel van de eigenaar: het grootboek rondt nooit
+       af. Wanneer en hoe een bedrag wordt afgerond kan economisch betekenis
+       hebben, dus dat is domeinbeleid en gebeurt een keer, voor er geboekt
+       wordt. */
+    id: 'M-020', familie: 'M-0',
+    invariant: 'Geld is een geheel aantal eurocenten: het grootboek rondt nooit af en weigert elk ander bedrag, en een economische gebeurtenis wordt een keer afgerond voordat er geboekt wordt, zodat beide kanten exact hetzelfde bedrag dragen.',
+    scope: {
+      grootboek: {
+        autoriteit: 'server/kern/magnaat-grootboek/geld.js',
+        handhaver: [{ bestand: 'server/kern/magnaat-grootboek/geld.js', citaat: "if (typeof n !== 'number' || !Number.isSafeInteger(n) || n < 0) {" }],
+        toets: [{ bestand: 'test/magnaat-grootboek.test.js', naam: '5. het grootboek accepteert alleen gehele, niet-negatieve eurocenten en rondt nooit af', bewijst: "'1234'" }]
+      },
+      world: { autoriteit: 'geen: World rekent in euro\'s met drijvende komma', handhaver: 'NIEMAND', toets: 'NIEMAND' }
+    },
+    migratie: 'World rekent in hele eurocenten met een canonieke geldfunctie die een gebeurtenis een keer afrondt (ronde A2.1).',
+    faalwijze: 'De betaler betaalt 10,01 en de ontvanger krijgt 10,00: een cent ontstaat of verdwijnt uit het niets.'
+  },
+  {
     /* De eerste regel met een familienummer. Hij kwam uit ronde A1: de motor is
        losgemaakt uit het Oefenkantoor, en dat mag niet stil terugkruipen. De
        toets hield het al vast; als grondwetregel telt de meter het zelf, en een

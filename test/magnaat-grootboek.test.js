@@ -111,3 +111,27 @@ test('4. twee werelden delen een opslag en nooit een journaal', () => {
   assert.equal(opslag.laatsteVolgnummer('b'), 1, 'dezelfde sleutel in een andere wereld is een andere gebeurtenis');
   assert.equal(b.gebeurtenissen()[0].wereld, 'b');
 });
+
+/* MAGNAAT.md, ronde A2.1: het grootboek rondt nooit af. Afronding is
+   domeinbeleid; hier komen alleen bedragen binnen die al bepaald zijn. */
+test('5. het grootboek accepteert alleen gehele, niet-negatieve eurocenten en rondt nooit af', () => {
+  const { gb, p, opslag } = consument();
+  const post = (sleutel, bedrag) => gb.boek(p, sleutel, 'STORTING', 'x', [
+    { rekening: 'a.kas', actor: 'a', naam: 'Kas', soort: 'actief', debet: bedrag, credit: 0 },
+    { rekening: 'a.inleg', actor: 'a', naam: 'Inleg', soort: 'eigen-vermogen', debet: 0, credit: bedrag }
+  ]);
+  for (const fout of [1234.5, 0.5, 1e-9, NaN, Infinity, -Infinity, -1, '1234', null, undefined, 2 ** 53, {}]) {
+    assert.throws(() => gb.regel('a.kas', 'a', 'Kas', 'actief', 'debet', fout), /rondt niet af/, 'regel met ' + String(fout));
+    assert.throws(() => post('fout-' + String(fout), fout), /rondt niet af/, 'boeking met ' + String(fout));
+  }
+  assert.throws(() => gb.regel('a.kas', 'a', 'Kas', 'actief', 'links', 5), /debet of credit/);
+  assert.equal(p.wachtend.length, 0, 'een geweigerde boeking laat niets achter');
+
+  assert.equal(gb.regel('a.kas', 'a', 'Kas', 'actief', 'debet', 0).debet, 0, 'nul mag, en valt bij het boeken weg');
+  post('een-cent', 1);
+  post('groot', Number.MAX_SAFE_INTEGER - 1);
+  assert.throws(() => post('te-groot', 2 ** 53), /rondt niet af/);
+  gb.bevestig(p);
+  assert.equal(p.rekeningen['a.kas'].saldo, Number.MAX_SAFE_INTEGER, 'exact, zonder een cent te winnen of te verliezen');
+  assert.equal(opslag.laatsteVolgnummer('proef'), 2);
+});

@@ -5,7 +5,6 @@
    weigeren als het achterloopt, een herhaling vanaf een bekend volgnummer, en
    de controle dat de projectie precies het journaal is. */
 'use strict';
-const { rond } = require('./geld');
 
 module.exports = (g, b) => {
   /* HERSTEL. Loopt het journaal voor op de projectie (de projectie is niet
@@ -35,7 +34,7 @@ module.exports = (g, b) => {
   function saldiNa(saldiBij, bij, tot) {
     const saldi = Object.assign({}, saldiBij);
     for (const x of gebeurtenissen(bij + 1, tot)) {
-      for (const lijn of x.regels) saldi[lijn.rekening] = rond(saldi[lijn.rekening]) + lijn.debet - lijn.credit;
+      for (const lijn of x.regels) saldi[lijn.rekening] = (saldi[lijn.rekening] || 0) + lijn.debet - lijn.credit;
     }
     return saldi;
   }

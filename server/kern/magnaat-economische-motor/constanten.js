@@ -58,9 +58,12 @@ const ECONOMISCHE_GEBEURTENISSEN = {
   UITKERING: 'UITKERING', ONBEKEND: 'ONBEKEND'
 };
 
-/* Geld in hele eurocenten komt van het grootboek, zodat motor en grootboek
-   dezelfde afronding gebruiken. */
-const { rond, geld, som } = require('../magnaat-grootboek/geld');
+/* AFRONDEN IS DOMEINBELEID (MAGNAAT.md, ronde A2.1). De motor bepaalt zelf hoe
+   hij een economisch bedrag tot hele eurocenten maakt; het grootboek eronder
+   rondt nooit af en weigert alles wat geen geheel aantal centen is. */
+const rond = n => Math.round(Number(n) || 0);
+const geld = n => rond(n);
+const som = waarden => waarden.reduce((t, n) => t + rond(n), 0);
 const begrens = (n, min, max) => Math.min(max, Math.max(min, Number(n) || 0));
 
 function datumOpDag(dag) {

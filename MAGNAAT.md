@@ -208,9 +208,10 @@ De migratievolgorde volgt de categorieën, zodat elke stap apart tegen het oude 
 | M-017 | Simulatie-integriteit | **PARTIAL** | ja | ja | nee | nee |
 | M-018 | Simulatie-integriteit | **PARTIAL** | ja | ja | nee | nee |
 | M-019 | Simulatie-integriteit | **PARTIAL** | ja | ja | ja | ja |
+| M-020 | Economische waarheid | **PARTIAL** | ja | ja | nee | nee |
 | M-601 | Simulatie-integriteit | **PASS** | ja | ja | ja | ja |
 
-20 invarianten: 5 PASS, 6 PARTIAL, 6 ABSENT, 3 VIOLATION; 70 geteld schendende plekken.
+21 invarianten: 5 PASS, 7 PARTIAL, 6 ABSENT, 3 VIOLATION; 70 geteld schendende plekken.
 
 ### M-001: Economische waarheid
 
@@ -569,6 +570,25 @@ Stand: **PARTIAL**
 **Migratie.** Een wereldkop in de kern met alle zes velden, vastgelegd bij het aanmaken en nooit meer gewijzigd.
 
 **Faalwijze.** Een onderzoeker kan een wereld niet opnieuw draaien, of draait hem op andere regels zonder het te weten.
+
+### M-020: Economische waarheid
+
+> Geld is een geheel aantal eurocenten: het grootboek rondt nooit af en weigert elk ander bedrag, en een economische gebeurtenis wordt een keer afgerond voordat er geboekt wordt, zodat beide kanten exact hetzelfde bedrag dragen.
+
+Stand: **PARTIAL**
+
+- **Grootboek**: PASS
+  - Autoriteit: server/kern/magnaat-grootboek/geld.js
+  - Handhaver: `server/kern/magnaat-grootboek/geld.js`, `if (typeof n !== 'number' || !Number.isSafeInteger(n) || n < 0) {`
+  - Toets: `test/magnaat-grootboek.test.js`, "5. het grootboek accepteert alleen gehele, niet-negatieve eurocenten en rondt nooit af"
+- **World**: ABSENT
+  - Autoriteit: geen: World rekent in euro's met drijvende komma
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** World rekent in hele eurocenten met een canonieke geldfunctie die een gebeurtenis een keer afrondt (ronde A2.1).
+
+**Faalwijze.** De betaler betaalt 10,01 en de ontvanger krijgt 10,00: een cent ontstaat of verdwijnt uit het niets.
 
 ### M-601: Simulatie-integriteit
 

@@ -1,0 +1,518 @@
+# Magnaat — de grondwet
+
+> **Hoe complexer Magnaat onder water wordt, hoe eenvoudiger het boven water moet voelen — en boven water mag niets staan wat onder water niet waar is.**
+
+Dit document is normatief. Het zegt wat economische waarheid in Magnaat is, en per regel wie die afdwingt. `GAMEHALL.md` §12 beschrijft Magnaat als product en `MAGNAATLAB.md` beschrijft Magnaat als testhal. Dit document staat onder die twee: het zijn de regels waar elke nieuwe functie langs moet, en CI bewaakt dat.
+
+Het regeldeel verderop wordt **niet met de hand bijgehouden**. `npm run magnaat:grondwet` leest de verklaring in `scripts/lib/magnaatgrondwet.js`. Van elke handhaver zoekt hij het citaat letterlijk op in de code, van elke toets de naam, en de schendingen telt hij zelf. `-- --document` schrijft het deel tussen de merktekens opnieuw. `test/magnaatgrondwet.test.js` zakt in drie gevallen: als dat deel achterloopt, als een citaat niet meer klopt, en als de stand achteruitgaat.
+
+---
+
+## 0. Waarom nu, en wat de meting vond
+
+Op 24 september 2026 is voor het eerst nagemeten wat Magnaat economisch afdwingt, voordat er verder gebouwd wordt. De uitkomst was gunstiger dan hij klinkt.
+
+**Er zijn twee economische motoren, en de goede zit in het verkeerde deel.**
+
+- **World** (Quick en Campaign, `server/kern/spellen/magnaat/`) heeft **geen grootboek**. Een saldo wordt rechtstreeks gezet: `st.geld[h] += verdeeld.eigenaar`. Omzet uit gesimuleerde vraag, rente en boetes hebben geen tegenboeking. Of er geld uit het niets ontstaat, wordt achteraf gecontroleerd door de geldpompmeter. Die vergelijkt totalen binnen een ruismarge, en alleen voor de scenario's die erin geschreven zijn.
+- **Het Oefenkantoor** (`server/kern/magnaat-economie.js`) heeft **strikt dubbel boekhouden**. Een journaalpost zonder idempotentiesleutel of met debet ≠ credit wordt geweigerd, en er is een motorversie. Precies dit deel gaat volgens het besluit hieronder uit Magnaat.
+
+De bruikbare financiële kern bestaat dus al; alleen gebruikt het vlaggenschip hem niet. Daaruit volgt het belangrijkste besluit van dit document: **er komt geen tweede grootboek.**
+
+## 1. Drie producten, één merk
+
+| Product | Wat het is | Verwachting |
+|---|---|---|
+| **Magnaat Classic** | het bordspel met veertig velden, dobbelstenen en huizen (`bord.js`, `bordspel.js`) | een gezellige avond aan tafel, binnen een uur |
+| **Magnaat World** | de economische simulatie: Quick, Campaign en Living World | een speelbare digitale economie |
+| **Het Oefenkantoor** | leren werken met RTG-software op synthetische dossiers | expliciet leren: facturen, planning, dossiers |
+
+Classic valt buiten de stichtingsregels. Het is een bordspel waarin de bank bij "langs Start" geld maakt, en dat hoort zo; een grootboek eisen van Monopoly-regels is een categoriefout. Het Oefenkantoor gaat uit Magnaat: het wordt een eigen product. Het verschil is fundamenteel. In het Oefenkantoor leer je een RTG-functie omdat de opdracht dat zegt. In World heb je die functie nodig omdat je economische probleem erom vraagt.
+
+## 2. Het architectuurbesluit: één economische autoriteit
+
+**Magnaat World krijgt precies één economische autoriteit.** Er komt dus geen grootboek voor Quick naast een voor Campaign naast een voor het Oefenkantoor.
+
+De motor uit `kern/magnaat-economie.js` wordt niet letterlijk "de game". Uit die motor wordt de economische waarheid gehaald, en die wordt een eigen kern. Daaromheen draaien World (Quick, Campaign, Living World) en het Oefenkantoor. **Het Oefenkantoor mag de kern gebruiken, maar is de kern niet.** Anders draait het vlaggenschip over twee jaar op een trainingsmodule.
+
+**De naam van die kern is nog niet gekozen.** In dit huis zijn `kern`, `envelop`, `doel` en `SOORTEN` al bezet (zie `BEWIJSMACHINE.md` en `MACHINE.md`). De naam wordt in ronde A1 gemeten tegen `SEMANTIEK.json` voordat hij bestaat.
+
+**Een saldo is een projectie van waarheid, niet de waarheid zelf.** Spelcode verandert geen saldo meer. Ze vraagt de kern om een economische gebeurtenis:
+
+```
+Voornemen     VERKOOP
+  → Toets     mag deze verkoop plaatsvinden?
+  → Gebeurtenis   wat is er economisch gebeurd? (met een gebeurtenis-id)
+  → Journaal  wie geeft en wie ontvangt wat? (debet = credit)
+  → Projectie nieuw saldo, voorraad, bedrijfstoestand
+  → Uitleg    wat ziet de speler, en wat mag Rahul verklaren?
+```
+
+Directe saldomutatie (`st.geld[h] += …`) wordt niet alleen weggehaald. Ze wordt **architectonisch onmogelijk**: de telling in M-001 en M-005 gaat naar nul, en daarna bewaakt een toets dat ze daar blijft.
+
+**Rahul creëert nooit economische waarheid.** De server doet `WERELD → GEBEURTENIS → JOURNAAL → TOESTAND`; de AI doet `TOESTAND → UITLEG`, nooit andersom (M-007).
+
+## 3. Hoe een regel eruitziet
+
+Elke regel heeft per productvorm (scope) de volgende velden:
+
+| Veld | Betekenis |
+|---|---|
+| ID | `M-001`; de negentien stichtingsregels houden hun nummer |
+| Invariant | wat altijd waar moet zijn, in één zin |
+| Scope | World / Oefenkantoor / Classic, alleen waar de regel vandaag geldt |
+| Autoriteit | welk onderdeel de waarheid bezit |
+| Handhaver | welke code hem afdwingt, als citaat dat letterlijk in de code staat |
+| Toets | welke geautomatiseerde toets hem bewijst, op naam |
+| Stand | PASS / PARTIAL / ABSENT / VIOLATION, **berekend**, nergens ingevuld |
+| Migratie | wat er nog om moet |
+| Faalwijze | wat er gebeurt als de regel breekt |
+
+**NIEMAND is een geldige handhaver.** Het is de eerlijke stand van een regel die bedoeld is maar door niets wordt tegengehouden, en hij telt als ABSENT. Een document hoort niet te doen alsof iets veilig is omdat het de bedoeling is. Om dezelfde reden telt een citaat in commentaar niet: de meter haalt het commentaar weg voordat hij zoekt.
+
+De stand wordt zo berekend:
+
+- **VIOLATION**: er is minstens één schending geteld, wat er verder ook staat.
+- **PASS**: handhaver én toets gevonden, niets geschonden, en geen reden waarom de scope maar deels gedekt is.
+- **PARTIAL**: een van de twee gevonden, of allebei maar met een uitgeschreven `deels`.
+- **ABSENT**: geen van beide.
+
+Een regel krijgt de strengste stand van zijn scopes. PASS in de ene scope naast ABSENT in de andere is PARTIAL.
+
+Daarnaast vier vragen die apart worden geteld en nooit opgeteld: **gedocumenteerd** (staat hier), **geïmplementeerd** (in minstens één scope staat een handhaver), **afgedwongen** (in elke scope een handhaver en nergens een schending) en **getoetst** (in elke scope een toets).
+
+## 4. De families
+
+De negentien stichtingsregels houden hun nummer. Nieuwe regels krijgen een nummer in hun familie, zodat Magnaat niet opnieuw één groot bestand met losse spelregels wordt.
+
+| Familie | Naam | Waarover |
+|---|---|---|
+| M-0xx | Economische waarheid | geld, grootboek, eigendom, voorraad |
+| M-1xx | Marktwaarheid | prijzen, vraag, aanbod, transacties, concurrentie |
+| M-2xx | Mens- en werkwaarheid | tijd, arbeid, vaardigheden, beschikbaarheid |
+| M-3xx | Informatiewaarheid | kennis, voorspellingen, onzekerheid, oorzaak |
+| M-4xx | Wereldwaarheid | tijd, plaatsen, bevolking, voortgang zonder speler |
+| M-5xx | Ondernemingswaarheid | bedrijven, contracten, belangen, insolventie |
+| M-6xx | Simulatie-integriteit | seed, versie, herhaling, determinisme |
+| M-7xx | AI-grens | wat Rahul wel en niet bepaalt |
+| M-8xx | Spelzuiverheid | geen verborgen geldinjecties, geen rubber-banding, gelijke regels |
+| M-9xx | Privacy en veiligheid | geen woonadressen, synthetische personen, scheiding echt/spel |
+
+Het nummer van een stichtingsregel zegt niet in welke familie hij hoort; dat doet het veld `familie`. M-003 hoort bijvoorbeeld bij informatiewaarheid.
+
+## 5. De ratel: integriteit kan alleen verbeteren
+
+De huidige slechte toestand is geen CI-fout. Dan zou niemand kunnen migreren. De nulstand is **bevroren** in `MAGNAATGRONDWET.json` (`npm run magnaat:grondwet -- --vastleggen`, alleen op een schone boom), en vanaf dat moment geldt:
+
+- het aantal **VIOLATION**-regels mag nooit stijgen, en het aantal getelde schendende plekken ook niet;
+- het aantal **PASS**-regels en het aantal **afgedwongen** regels mag nooit dalen;
+- **geen enkele regel mag afzakken** (PASS → PARTIAL, PARTIAL → ABSENT, alles → VIOLATION), en een regel mag niet verdwijnen;
+- een citaat of toets die niet meer gevonden wordt, laat de toets zakken. De verklaring beweert dan iets wat niet waar is, en die moet worden rechtgezet in plaats van stil te verzwakken.
+
+Achteruitgaan kan alleen door de nulstand opnieuw vast te leggen. Dat is een wijziging van `MAGNAATGRONDWET.json` die in de diff staat, met een reden in de commit: een **constitutionele wijziging**, geen ongeluk.
+
+## 6. Wat deze meting niet bewijst
+
+- **Graad: vermoed.** Handhavers en toetsen worden lexicaal gevonden. Dat een citaat in de code staat, bewijst niet dat het op elk pad zit. Dat een toets zo heet, bewijst niet dat hij groen is; dat beslist `npm test`, waar alle genoemde toetsen in draaien.
+- **Een schending is een telling van een patroon**, en dus een ondergrens. Een regel waar geen patroon voor geschreven is, kan nooit VIOLATION zijn. Dat is de reden dat een ABSENT-regel niet "in orde" betekent.
+- **De meter kent alleen de regels in de verklaring.** Een economische eigenschap die hier niet staat, bestaat voor hem niet.
+
+## 7. Het traject
+
+| Ronde | Wat |
+|---|---|
+| **C0** | nulstand vastleggen als bewijs (`MAGNAATGRONDWET.json`) |
+| **C1** | M-001 t/m M-019 formeel, met families |
+| **C2** | machineleesbare verklaring en de meter (`npm run magnaat:grondwet`) |
+| **C3** | de ratel (`test/magnaatgrondwet.test.js`) |
+| A1 | de economische kern losmaken uit het Oefenkantoor, met een gemeten naam |
+| A2 | journaal als autoriteit: World muteert geld uitsluitend via de kern |
+| A3 | herhaling en versies: wereld-id, seed, regel-, motor- en datasetversie |
+| A4 | Quick migreren: geen directe `st.geld` meer |
+| A5 | Campaign migreren: dezelfde kern, een andere klok |
+| A6 | het Oefenkantoor scheiden: eigen product, gedeelde kern |
+| V1–V4 | de eerste verticale plak: van een mens met € 63 en een baan, via de eerste klant, een factuur die te laat wordt betaald en geldnood, naar een eerste bedrijf |
+
+Pas daarna komen bevolking, concurrenten die fouten maken, toeleveringsketens, banken en de levende stad. Pas daarna ook de nieuwe schermen, die uit de economische waarheid voortkomen: wie geen bedrijf heeft, krijgt geen tabblad "Bedrijf".
+
+In ronde C is alleen **C0–C3** gebouwd. Van A en V bestaat nog niets.
+
+---
+
+## 8. De regels
+
+<!-- grondwet:begin -- gegenereerd door npm run magnaat:grondwet -- --document; niet met de hand wijzigen -->
+
+### De stand per regel
+
+| Regel | Familie | Stand | Gedocumenteerd | Geimplementeerd | Afgedwongen | Getoetst |
+|---|---|---|---|---|---|---|
+| M-001 | Economische waarheid | **VIOLATION** | ja | ja | nee | nee |
+| M-002 | Mens- en werkwaarheid | **ABSENT** | ja | nee | nee | nee |
+| M-003 | Informatiewaarheid | **PARTIAL** | ja | ja | ja | ja |
+| M-004 | Economische waarheid | **PARTIAL** | ja | ja | ja | nee |
+| M-005 | Economische waarheid | **VIOLATION** | ja | ja | nee | nee |
+| M-006 | Spelzuiverheid | **ABSENT** | ja | nee | nee | nee |
+| M-007 | AI-grens | **ABSENT** | ja | nee | nee | nee |
+| M-008 | Spelzuiverheid | **ABSENT** | ja | nee | nee | nee |
+| M-009 | Privacy en veiligheid | **PARTIAL** | ja | ja | ja | nee |
+| M-010 | Ondernemingswaarheid | **ABSENT** | ja | nee | nee | nee |
+| M-011 | Ondernemingswaarheid | **PASS** | ja | ja | ja | ja |
+| M-012 | Informatiewaarheid | **PARTIAL** | ja | ja | nee | nee |
+| M-013 | Informatiewaarheid | **ABSENT** | ja | nee | nee | nee |
+| M-014 | Wereldwaarheid | **PASS** | ja | ja | ja | ja |
+| M-015 | Spelzuiverheid | **VIOLATION** | ja | ja | nee | nee |
+| M-016 | Economische waarheid | **PASS** | ja | ja | ja | ja |
+| M-017 | Simulatie-integriteit | **PARTIAL** | ja | ja | nee | nee |
+| M-018 | Simulatie-integriteit | **VIOLATION** | ja | nee | nee | nee |
+| M-019 | Simulatie-integriteit | **PARTIAL** | ja | ja | ja | ja |
+
+19 invarianten: 3 PASS, 6 PARTIAL, 6 ABSENT, 4 VIOLATION; 71 geteld schendende plekken.
+
+### M-001: Economische waarheid
+
+> Geld heeft altijd herkomst: elke verandering van een saldo is terug te voeren op een geboekte gebeurtenis.
+
+Stand: **VIOLATION**
+
+- **World**: VIOLATION
+  - Autoriteit: geen: het saldo zelf (st.geld) is de waarheid
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+  - Schending: 32, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
+- **Oefenkantoor**: VIOLATION
+  - Autoriteit: server/kern/magnaat-economie.js, het journaal
+  - Handhaver: `server/kern/magnaat-economie.js`, `function boek(e, sleutel, omschrijving, regels, labels = [])`
+  - Toets: `test/magnaat-economie.test.js`, "de openingsbalans en iedere economische journaalpost zijn exact in balans"
+  - Schending: 3, spelgeld dat als beloning wordt bijgeschreven buiten het grootboek van de motor om
+
+**Migratie.** World gaat op de economische kern draaien (ronde A2/A4): een saldo wordt een projectie van het journaal. In het Oefenkantoor gaat de beloning via een journaalpost of verlaat hij het geldbegrip.
+
+**Faalwijze.** Op de vraag "waar kwam deze 312 vandaan?" is geen antwoord; een fout in een spelregel maakt of vernietigt geld zonder spoor.
+
+### M-002: Mens- en werkwaarheid
+
+> Tijd kan niet dubbel worden besteed: een uur van een actor is op hetzelfde wereldmoment hooguit een keer ingezet.
+
+Stand: **ABSENT**
+
+- **World**: ABSENT
+  - Autoriteit: geen: er is geen urenmodel
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+- **Oefenkantoor**: ABSENT
+  - Autoriteit: geen: er is geen urenmodel
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** Een tijd- en capaciteitsboek in de kern (vertical slice V2); contractcapaciteit wordt bij het tekenen gereserveerd in plaats van achteraf naar rato verdeeld.
+
+**Faalwijze.** Een speler levert aan drie klanten tegelijk met dezelfde uren; tekorten verschijnen pas bij afrekening, verdeeld over iedereen.
+
+### M-003: Informatiewaarheid
+
+> Geen actor bezit informatie die hij niet heeft verkregen: een beslissing gebruikt alleen wat die actor kan weten.
+
+Stand: **PARTIAL**
+
+- **World**: PARTIAL
+  - Autoriteit: server/kern/spellen/magnaat/weergave.js
+  - Handhaver: `server/kern/spellen/magnaat/weergave.js`, `geld: rond(st.geld[mij] || 0),`; `server/kern/spellen/magnaat/weergave.js`, `return (st.contracten || []).filter(c => partij(c, h))`
+  - Toets: `test/spelmagnaat.test.js`, "bij de economie zijn de boeken van een ander niet van jou"; `test/spelveiling.test.js`, "niemand ziet andermans bod, ook niet in de publieke of kijkerweergave"
+  - Waarom hooguit PARTIAL: geldt voor wat SPELERS te zien krijgen; er zijn nog geen NPC-bedrijven, dus voor beslissende niet-spelers bestaat er geen informatiemodel
+
+**Migratie.** Een informatiemotor: wat iedere actor weet is toestand, en een NPC beslist alleen daarop (M-3xx).
+
+**Faalwijze.** Een tegenstander reageert op een prijs of kas die hij niet kan kennen; het spel voelt vals.
+
+### M-004: Economische waarheid
+
+> Voorraad kan niet negatief worden.
+
+Stand: **PARTIAL**
+
+- **Oefenkantoor**: PARTIAL
+  - Autoriteit: server/kern/magnaat-economie.js, de marktstap
+  - Handhaver: `server/kern/magnaat-economie.js`, `Math.min(b.vraagVandaag, b.capaciteitVandaag, b.voorraad)`
+  - Toets: NIEMAND
+
+**Migratie.** Een toets die verkopen tegen voorraad afzet (de bestaande toets draagt voorraad in zijn naam maar controleert alleen vraag en capaciteit); World krijgt voorraad pas met de kern.
+
+**Faalwijze.** Er wordt verkocht wat er niet is; omzet zonder goederen.
+
+### M-005: Economische waarheid
+
+> Een transactie heeft minimaal twee economische zijden, en debet is gelijk aan credit.
+
+Stand: **VIOLATION**
+
+- **World**: VIOLATION
+  - Autoriteit: geen: er is geen journaal
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+  - Schending: 32, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
+- **Oefenkantoor**: PASS
+  - Autoriteit: server/kern/magnaat-economie.js, het journaal
+  - Handhaver: `server/kern/magnaat-economie.js`, `throw new Error('Ongebalanceerde journaalpost geweigerd: '`
+  - Toets: `test/magnaat-economie.test.js`, "de openingsbalans en iedere economische journaalpost zijn exact in balans"
+
+**Migratie.** Zelfde weg als M-001: World boekt via de kern. De geldpompmeter blijft ernaast staan tot de eigenschapstoetsen er zijn.
+
+**Faalwijze.** Geld verschijnt of verdwijnt aan een kant; de totalen kloppen alleen nog binnen een ruismarge.
+
+### M-006: Spelzuiverheid
+
+> NPC-bedrijven en spelers vallen onder dezelfde economische kernregels.
+
+Stand: **ABSENT**
+
+- **World**: ABSENT
+  - Autoriteit: geen: er zijn geen NPC-bedrijven
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+- **Oefenkantoor**: ABSENT
+  - Autoriteit: server/kern/magnaat-economie.js
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** Een NPC is een actor in de kern met een eigen beslisser; de kern kent geen apart pad voor NPC's. Een toets zet een speler en een NPC in dezelfde situatie en eist dezelfde boekingen.
+
+**Faalwijze.** NPC's krijgen stilletjes gratis krediet of voorraad; spelers verliezen van een tegenstander die niet echt concurreert.
+
+### M-007: AI-grens
+
+> AI mag economische toestand verklaren, nooit verzinnen.
+
+Stand: **ABSENT**
+
+- **World**: ABSENT
+  - Autoriteit: de motor; er zit vandaag geen model in Magnaat
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+- **Oefenkantoor**: ABSENT
+  - Autoriteit: de motor; uitleg is vaste tekst
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** Zodra Rahul in Magnaat verschijnt: de AI krijgt alleen leestoegang op toestand (STATE -> UITLEG) en een toets eist dat geen AI-pad een boeking kan maken.
+
+**Faalwijze.** "De AI besluit dat je 5 miljoen verdiend hebt."
+
+### M-008: Spelzuiverheid
+
+> Er bestaat geen verborgen score op een mens: elk cijfer over een speler is voor die speler zichtbaar met zijn opbouw.
+
+Stand: **ABSENT**
+
+- **World**: ABSENT
+  - Autoriteit: server/kern/spellen/magnaat/weergave.js (kredietprofiel)
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+- **Oefenkantoor**: ABSENT
+  - Autoriteit: server/kern/magnaatwereld.js (xp, reputatie)
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** Een toets die elk veld over een speler in de staat afzet tegen wat die speler te zien krijgt.
+
+**Faalwijze.** Een onzichtbaar getal bepaalt kansen, prijzen of tegenstanders.
+
+### M-009: Privacy en veiligheid
+
+> Geen woonadres is speelbaar bezit: alles met een woonfunctie valt uit de kaart.
+
+Stand: **PARTIAL**
+
+- **World**: PARTIAL
+  - Autoriteit: scripts/kaart-import.js, de importeur van de kaart
+  - Handhaver: `scripts/kaart-import.js`, `if (doelen.includes('woonfunctie')) return { weg: 'woonfunctie' };`
+  - Toets: NIEMAND
+
+**Migratie.** Een toets die een woonfunctie-object door de importeur haalt en eist dat het wegvalt.
+
+**Faalwijze.** Iemands huis wordt een kavel in een spel.
+
+### M-010: Ondernemingswaarheid
+
+> Faillissement vernietigt geen geld zonder tegenpost; het is een proces en geen drempel.
+
+Stand: **ABSENT**
+
+- **World**: ABSENT
+  - Autoriteit: geen: failliet gaan bestaat in World niet, een negatief saldo kost rente
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+- **Oefenkantoor**: ABSENT
+  - Autoriteit: geen: bij tekort volgt automatisch een noodlening
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** Een insolventieproces in de kern: liquiditeitsdruk, achterstand, herstructurering, afwikkeling -- elke stap geboekt, verliezen bij schuldeisers volgens de regels.
+
+**Faalwijze.** Een bedrijf verdwijnt en neemt geld mee dat nergens meer staat, of het leeft eeuwig door op nooit aflopende noodleningen.
+
+### M-011: Ondernemingswaarheid
+
+> Een contractverplichting is tijdgebonden toestand: zij begint en eindigt op een wereldmoment.
+
+Stand: **PASS**
+
+- **World**: PASS
+  - Autoriteit: server/kern/spellen/magnaat/handel-acties.js en maand-contracten.js
+  - Handhaver: `server/kern/spellen/magnaat/handel-acties.js`, `c.eindMaand = st.maand + c.looptijd;`; `server/kern/spellen/magnaat/maand-contracten.js`, `if (st.maand + 1 >= c.eindMaand) c.status = 'afgelopen';`
+  - Toets: `test/spelhandel.test.js`, "een contract kan niet langer lopen dan de campagne, en de rondes zijn eindig"; `test/spelhandel.test.js`, "de afkoopsom loopt nooit op tot meer dan de resterende looptijd"
+
+**Migratie.** Contracten verhuizen mee naar de kern; hun begin en eind worden gebeurtenissen in het journaal.
+
+**Faalwijze.** Een verplichting loopt eeuwig door of verdwijnt halverwege.
+
+### M-012: Informatiewaarheid
+
+> Een voorspelling is geen feit: een vooruitblik draagt een andere stand dan een uitkomst tot hij is gerealiseerd.
+
+Stand: **PARTIAL**
+
+- **Oefenkantoor**: PASS
+  - Autoriteit: server/kern/magnaat-economenlab-training.js
+  - Handhaver: `server/kern/magnaat-economenlab-training.js`, `status: 'wacht-op-realisatie'`
+  - Toets: `test/magnaat-economenlab.test.js`, "de volgende dag ijkt de forecast en maakt de trainingsscore definitief"
+- **World**: ABSENT
+  - Autoriteit: geen: World kent nog geen vooruitblik
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** Een vooruitblik in World wordt een eigen soort toestand naast het journaal, nooit een boeking.
+
+**Faalwijze.** Een verwachting verschijnt als saldo; een speler plant op geld dat er niet is.
+
+### M-013: Informatiewaarheid
+
+> Correlatie is geen causaliteit: een uitleg noemt alleen oorzaken die de motor werkelijk heeft doorgerekend.
+
+Stand: **ABSENT**
+
+- **World**: ABSENT
+  - Autoriteit: geen
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+- **Oefenkantoor**: ABSENT
+  - Autoriteit: server/kern/magnaat-economenlab-rapport.js
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** Elke uitleg verwijst naar gebeurtenis-id's uit de causale keten; een toets eist dat een genoemde oorzaak als gebeurtenis bestaat.
+
+**Faalwijze.** De uitleg klinkt overtuigend en is verzonnen; een speler leert de verkeerde les.
+
+### M-014: Wereldwaarheid
+
+> Een speler die offline is, stopt de wereld niet.
+
+Stand: **PASS**
+
+- **World**: PASS
+  - Autoriteit: server/kern/spellen/magnaat/economie.js, het bijrekenen op de klok
+  - Handhaver: `server/kern/spellen/magnaat/economie.js`, `let stappen = Math.floor((nu - st.gerekendTot) / st.maandMs);`
+  - Toets: `test/spelmagnaat.test.js`, "bijrekenen is deterministisch: tien maanden in een keer of tien los"
+
+**Migratie.** Blijft; de klok verhuist mee naar de kern (Time Engine).
+
+**Faalwijze.** Iedereen wacht op de traagste speler; een permanente wereld staat stil.
+
+### M-015: Spelzuiverheid
+
+> Spelbalans mag het grootboek nooit vervalsen: geen speler of spelregel maakt waarde uit het niets.
+
+Stand: **VIOLATION**
+
+- **World**: PARTIAL
+  - Autoriteit: server/kern/spellen/magnaat/handel.js (prijsband) en scripts/magnaat-pomp.js
+  - Handhaver: `server/kern/spellen/magnaat/handel.js`, `const PRIJSBAND = [0.4, 2.0];`; `scripts/magnaat-pomp.js`, `RUIS`
+  - Toets: `test/spelhandel.test.js`, "geen enkel scenario van de geldpomp-keuring maakt waarde uit het niets"; `test/spelbank.test.js`, "geen van de zes financieringsroutes maakt waarde uit het niets"; `test/magnaat-rtgketen.test.js`, "2. geen enkel pompscenario maakt waarde uit het niets"
+  - Waarom hooguit PARTIAL: de pompmeter kent alleen de scenario's die erin geschreven zijn, en vergelijkt totalen binnen een ruismarge; er is nog geen eigenschapstoets over willekeurige reeksen transacties
+- **Oefenkantoor**: VIOLATION
+  - Autoriteit: server/kern/magnaatwereld.js (spelerbudget)
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+  - Schending: 3, spelgeld dat als beloning wordt bijgeschreven buiten het grootboek van de motor om
+
+**Migratie.** Eigenschapstoetsen over duizenden willekeurige transacties (debet = credit, geen onverklaarde creatie, geen dubbele gebeurtenis, herhaling geeft dezelfde eindstaat); de beloning in het Oefenkantoor gaat via het grootboek of verlaat het geldbegrip.
+
+**Faalwijze.** Een volgorde van acties die de speler rijk maakt zonder dat iemand armer wordt.
+
+### M-016: Economische waarheid
+
+> Eigendom is exclusief: een bezit is op hetzelfde wereldmoment van hooguit een eigenaar en wordt niet tweemaal overgedragen.
+
+Stand: **PASS**
+
+- **World**: PASS
+  - Autoriteit: server/kern/spellen/magnaat/veiling-acties.js en aandeel.js
+  - Handhaver: `server/kern/spellen/magnaat/veiling-acties.js`, `return { status: 409, error: 'Dat kavel staat al in de veiling.' }`; `server/kern/spellen/magnaat/aandeel.js`, `const MAX_DEEL = 49;`
+  - Toets: `test/spelveiling.test.js`, "een gewonnen kavel is van de winnaar, en van niemand anders"; `test/spelveiling.test.js`, "een kavel dat in de veiling staat is niet ondertussen te grijpen"; `test/spelaandeel.test.js`, "meer dan de helft van een zaak kun je niet weggeven"
+
+**Migratie.** Eigendom wordt een register in de kern, met overdracht als geboekte gebeurtenis.
+
+**Faalwijze.** Twee spelers bezitten hetzelfde kavel, of een aandeel wordt twee keer verkocht.
+
+### M-017: Simulatie-integriteit
+
+> Iedere economische mutatie heeft een gebeurtenisidentiteit: opnieuw verwerken levert geen tweede economisch resultaat op.
+
+Stand: **PARTIAL**
+
+- **Oefenkantoor**: PASS
+  - Autoriteit: server/kern/magnaat-economie.js, de idempotentiesleutel van boek()
+  - Handhaver: `server/kern/magnaat-economie.js`, `if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');`
+  - Toets: `test/magnaat-economie.test.js`, "een herhaald commando verwerkt nooit tweemaal dezelfde economische dag"
+- **World**: ABSENT
+  - Autoriteit: geen: een spelactie draagt geen gebeurtenis-id
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** Elke spelactie wordt een gebeurtenis met een id; ook voorraad, belangen, contracten, loon en eigendom (niet alleen geld).
+
+**Faalwijze.** Een dubbelklik of een herstart na een storing boekt dezelfde verkoop twee keer.
+
+### M-018: Simulatie-integriteit
+
+> Historie is alleen aanvullen: een economische gebeurtenis wordt nooit achteraf herschreven of weggegooid, een correctie is een nieuwe gebeurtenis.
+
+Stand: **VIOLATION**
+
+- **Oefenkantoor**: VIOLATION
+  - Autoriteit: server/kern/magnaat-economie.js, het journaal
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+  - Schending: 1, het journaal is een ringbuffer: boven MAX_JOURNAAL vallen de oudste boekingen eraf
+- **World**: ABSENT
+  - Autoriteit: geen: er is geen gebeurtenishistorie, alleen maandverslagen
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
+
+**Migratie.** Het journaal krijgt opslag die groeit (of een afgesloten periode met een openingsbalans die het verleden samenvat en bewaart), nooit een afkapping.
+
+**Faalwijze.** Een herhaling vanaf het begin kan niet meer: de eerste boekingen zijn weg.
+
+### M-019: Simulatie-integriteit
+
+> Wereldregels zijn versiegebonden: een wereld draagt wereld-id, seed, regelversie, motorversie, datasetversie en aanmaakmoment.
+
+Stand: **PARTIAL**
+
+- **World**: PARTIAL
+  - Autoriteit: server/kern/spellen/magnaat/economie.js
+  - Handhaver: `server/kern/spellen/magnaat/economie.js`, `seed: 'magnaat-'+potje.id`
+  - Toets: `test/spelmagnaat.test.js`, "bijrekenen is deterministisch: tien maanden in een keer of tien los"
+  - Waarom hooguit PARTIAL: de seed volgt uit het potje-id, maar er wordt geen regel-, motor- of datasetversie bij de wereld bewaard
+- **Oefenkantoor**: PARTIAL
+  - Autoriteit: server/kern/magnaat-economie.js
+  - Handhaver: `server/kern/magnaat-economie.js`, `versie: VERSIE, mutatieVersie: 0`
+  - Toets: `test/magnaat-economie.test.js`, "dezelfde beginsituatie en besluiten geven reproduceerbaar dezelfde economie"
+  - Waarom hooguit PARTIAL: alleen een motorversie; geen regelversie, datasetversie of aanmaakmoment
+
+**Migratie.** Een wereldkop in de kern met alle zes velden, vastgelegd bij het aanmaken en nooit meer gewijzigd.
+
+**Faalwijze.** Een onderzoeker kan een wereld niet opnieuw draaien, of draait hem op andere regels zonder het te weten.
+
+<!-- grondwet:eind -->

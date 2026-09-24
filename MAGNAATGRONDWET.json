@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T13:48:22.014Z",
-    "commit": "6ba7881f5",
+    "op": "2026-09-24T14:00:00.878Z",
+    "commit": "4fcf6cf4e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/magnaatgrondwet.js",

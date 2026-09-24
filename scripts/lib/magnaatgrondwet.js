@@ -94,8 +94,12 @@ const REGELS = [
     invariant: 'Geld heeft altijd herkomst: elke verandering van een saldo is terug te voeren op een geboekte gebeurtenis.',
     scope: {
       world: {
-        autoriteit: 'geen: het saldo zelf (st.geld) is de waarheid',
-        handhaver: 'NIEMAND', toets: 'NIEMAND',
+        autoriteit: 'het grootboek; st.geld is sinds A2.10 de projectie van de kas',
+        handhaver: [{ bestand: 'server/kern/spellen/magnaat/boekhouding.js', citaat: 'function beweeg(st, { soort, van, naar, bedrag, omschrijving })' }],
+        toets: [
+          { bestand: 'test/magnaat-world-geld.test.js', naam: '12. na elke stap is elk saldo exact zijn rekening in het grootboek', bewijst: 'REKENING.kas(w.st.wereld, h)' },
+          { bestand: 'test/magnaatgeldkaart.test.js', naam: 'A2.10: DIRECT_WORLD_MONEY_MUTATION = FORBIDDEN, en er is er geen enkele' }
+        ],
         schending: DIRECTE_SALDOMUTATIE
       },
       grootboek: {
@@ -114,7 +118,7 @@ const REGELS = [
         schending: BUDGET_BUITEN_GROOTBOEK
       }
     },
-    migratie: 'World gaat op de economische kern draaien (ronde A2/A4): een saldo wordt een projectie van het journaal. In het Oefenkantoor gaat de beloning via een journaalpost of verlaat hij het geldbegrip.',
+    migratie: 'World: gebeurd in ronde A2.3 t/m A2.10, een saldo is de projectie van het journaal. Nog open: in het Oefenkantoor gaat de beloning via een journaalpost of verlaat hij het geldbegrip.',
     faalwijze: 'Op de vraag "waar kwam deze 312 vandaan?" is geen antwoord; een fout in een spelregel maakt of vernietigt geld zonder spoor.'
   },
   {
@@ -165,8 +169,9 @@ const REGELS = [
     invariant: 'Een transactie heeft minimaal twee economische zijden, en debet is gelijk aan credit.',
     scope: {
       world: {
-        autoriteit: 'geen: er is geen journaal',
-        handhaver: 'NIEMAND', toets: 'NIEMAND',
+        autoriteit: 'het grootboek: elke beweging is een overdracht met een van- en een naarkant',
+        handhaver: [{ bestand: 'server/kern/spellen/magnaat/boekhouding.js', citaat: "[regel(naar, 'debet'), regel(van, 'credit')]" }],
+        toets: [{ bestand: 'test/magnaatgeldkaart.test.js', naam: 'A2.10: DIRECT_WORLD_MONEY_MUTATION = FORBIDDEN, en er is er geen enkele' }],
         schending: DIRECTE_SALDOMUTATIE
       },
       grootboek: {
@@ -183,7 +188,7 @@ const REGELS = [
         toets: [{ bestand: 'test/magnaat-grootboek.test.js', naam: '2. de motor boekt nergens buiten het grootboek om' }]
       }
     },
-    migratie: 'Zelfde weg als M-001: World boekt via de kern. De geldpompmeter blijft ernaast staan tot de eigenschapstoetsen er zijn.',
+    migratie: 'Geen voor World: sinds A2.10 boekt World elke beweging als overdracht. De geldpompmeter blijft ernaast staan tot de eigenschapstoetsen er zijn.',
     faalwijze: 'Geld verschijnt of verdwijnt aan een kant; de totalen kloppen alleen nog binnen een ruismarge.'
   },
   {
@@ -439,7 +444,7 @@ const REGELS = [
         ]
       }
     },
-    migratie: 'Geen voor World en het grootboek: sinds ronde A2.1 rekent World in hele eurocenten en wordt een gebeurtenis een keer afgerond. Wat nog rest is dat World zijn geld nog niet via het grootboek boekt (A2.3 t/m A2.9).',
+    migratie: 'Geen voor World en het grootboek: sinds ronde A2.1 rekent World in hele eurocenten en wordt een gebeurtenis een keer afgerond. Sinds A2.10 boekt World ook al zijn geld via het grootboek.',
     faalwijze: 'De betaler betaalt 10,01 en de ontvanger krijgt 10,00: een cent ontstaat of verdwijnt uit het niets.'
   },
   {

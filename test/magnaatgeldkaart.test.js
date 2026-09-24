@@ -109,3 +109,14 @@ test('zelfijking: een nieuwe mutatie zonder classificatie wordt gevonden', () =>
   const gedekt = new Set(kaart.GEBEURTENISSEN.flatMap(g => g.benen.flatMap(been => vindBeen(been, extra))));
   assert.ok(!gedekt.has(laatste), 'en is door geen been gedekt');
 });
+
+/* A2.10: de deur is dicht. Nul is geen stand meer maar een grens. */
+test('A2.10: DIRECT_WORLD_MONEY_MUTATION = FORBIDDEN, en er is er geen enkele', () => {
+  assert.equal(kaart.DIRECT_WORLD_MONEY_MUTATION, 'FORBIDDEN');
+  assert.deepEqual(kaart.GEBEURTENISSEN.filter(g => !g.gemigreerd).map(g => g.id), [], 'elke gebeurtenis gaat door het grootboek');
+  assert.deepEqual([...treffers().keys()], [], 'directe geldmutaties in World; boek ze via boekhouding.beweeg');
+  // en de grens bijt: een nagebootste mutatie wordt gevonden
+  const doel = WORLD_CODE.map + '/maand.js';
+  const extra = (rel) => rel === doel ? regelsVan(rel).concat(['      st.foundation.lokaal += 1;']) : regelsVan(rel);
+  assert.equal(treffers(extra).size, 1);
+});

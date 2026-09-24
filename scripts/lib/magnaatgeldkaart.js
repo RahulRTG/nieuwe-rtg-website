@@ -167,4 +167,9 @@ const ZOEK = [
   { naam: 'foundation-pot', patroon: '\\b(?:f|st\\.foundation)\\.(?:lokaal|centraal)\\s*[-+*/]?=(?!=)' }
 ];
 
-module.exports = { BETEKENISSEN, CATEGORIEEN, TEGENZIJDEN, PARTIJEN, GEBEURTENISSEN, ZOEK, MAP };
+/* A2.10: DE DEUR IS DICHT. Elke gebeurtenis gaat door het grootboek, en een
+   directe geldmutatie in World is vanaf nu geen restpost meer maar verboden:
+   test/magnaatgeldkaart.test.js zakt bij de eerste (MAGNAAT.md). */
+const DIRECT_WORLD_MONEY_MUTATION = 'FORBIDDEN';
+
+module.exports = { BETEKENISSEN, CATEGORIEEN, TEGENZIJDEN, PARTIJEN, GEBEURTENISSEN, ZOEK, MAP, DIRECT_WORLD_MONEY_MUTATION };

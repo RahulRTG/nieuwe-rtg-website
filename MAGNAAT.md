@@ -123,9 +123,9 @@ Achteruitgaan kan alleen door de nulstand opnieuw vast te leggen. Dat is een wij
 
 | Ronde | Wat |
 |---|---|
-| **A2.2** | tegenpartijen, minimaal: alleen de vijf macro-actoren die nodig zijn om de 27 gebeurtenissen van de geldkaart sluitend te maken. Geen bankensimulatie en geen huishoudmodel |
-| **A2.3–A2.9** | één migratieprogramma: de zeven categorieën van de geldkaart één voor één door het grootboek. Per categorie migreren, dan toetsen tegen de golden baseline, dan de volgende. Geen architectuurrondes ertussen |
-| **A2.10** | de deur dicht: directe `st.geld`-mutaties op nul, en CI verbiedt voorgoed nieuwe. Daarmee is de financiële migratie af, en daarna zijn er geen A-nummers meer |
+| **A2.2** ✓ | tegenpartijen, minimaal: alleen de vijf macro-actoren die nodig zijn om de 27 gebeurtenissen van de geldkaart sluitend te maken. Geen bankensimulatie en geen huishoudmodel |
+| **A2.3–A2.9** ✓ | één migratieprogramma: de zeven categorieën van de geldkaart één voor één door het grootboek. Per categorie migreren, dan toetsen tegen de golden baseline, dan de volgende. Geen architectuurrondes ertussen |
+| **A2.10** ✓ | de deur dicht: directe `st.geld`-mutaties op nul, en CI verbiedt voorgoed nieuwe. Daarmee is de financiële migratie af, en daarna zijn er geen A-nummers meer |
 | **V1 From Zero** | één speelbare keten van persoon tot eerste onderneming: startpositie, werk, inkomen, tijd, kosten, software, eigen project, klant, offerte, onderhandeling, opdracht, uitvoering, factuur, te late betaling, geldnood, keuzes, gevolgen. Met de schermen Vandaag, Wereld, Werk, Geld, Netwerk en Mijn bedrijf (dat laatste pas wanneer je een onderneming hebt), en de Edge als bediening. RTG-functies verschijnen pas als ze relevant worden |
 | **V2 Onderneming** | personeel, planning, leverancier, voorraad, kosten, verkoop, contracten en cashflow |
 | **V3 Levende markt** | NPC-bedrijven, concurrentie, synthetische consumenten, vraag en aanbod, locatie, weer en seizoen |
@@ -243,6 +243,7 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 | A2.8 | maandresultaat | G04, G10, G12, G13 | 7→3 / 4→0 (M-005 PARTIAL) | ongewijzigd groen |
 | A2.9a | foundation | G26, G27 | World-scope 0 (de 3 van M-001 zijn de Academy) | ongewijzigd groen |
 | A2.9b | regelwijziging | G28 (nieuw), G26 | ongewijzigd | v2 ongewijzigd groen; v3 eigen referentie |
+| A2.10 | de deur dicht | alle 28 | M-005 PASS; M-001 World-scope PASS | v2 en v3 groen |
 
 **A2.3** boekt het startkapitaal als overdracht van de inleg van de speler naar zijn kas. Een lopende partij van vóór het grootboek krijgt bij het koppelen een overname-opening voor wat er staat, zonder dat het saldo verandert.
 
@@ -259,6 +260,10 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 **A2.9a** boekt de Foundation met de regel van vandaag, zodat de migratie apart bewezen is van de regelwijziging. De afdracht gaat van de stad **via RTG** naar de twee potten, en de projecten gaan uit de lokale pot naar de aannemer. RTG is daarbij een route en geen partij: zijn rekening (`world:{id}:rtg:foundation:route`) staat na elke afdracht op nul, en toets 9 eist dat.
 
 **A2.9b** is de goedgekeurde regelwijziging uit besluit 3, als **regelversie 3**. De stad betaalt de afdracht over haar eigen omzet en elke speler over zijn eindverkoop, beide via RTG. De afdracht staat voortaan als regel "Afdracht RTFoundation" op het maandoverzicht van de speler. Een **lopende partij houdt haar versie**: een nieuwe partij krijgt 3, en een partij van vóór A2.1 wordt bij de omzetting naar centen versie 2. Dat maakt twee bewijzen mogelijk. `test/magnaat-world-geld.test.js` toets 2 draait de scenario's als partij op versie 2 en blijft exact gelijk aan de WORLD ECONOMIC GOLDEN BASELINE. Die is bewust niet opnieuw geschreven: opnieuw gedraaid verschilde alleen het commitveld. Toets 10 houdt versie 3 tegen een eigen referentie (`test/fixtures/magnaat-world-baseline-v3.json`). Toets 11 zet de twee versies vanuit dezelfde stand een maand naast elkaar. De pot groeit even hard, op hooguit een cent per deel per betaler na. De spelers betalen samen wat de stad niet meer betaalt. Elke speler betaalt wat zijn overzicht zegt. Op de geldkaart is dit **G28** (speler → Foundation-pot). Dat is de enige gebeurtenis die er in A2 bij kwam, en ze komt uit het besluit en niet uit de migratie.
+
+**A2.10: de deur is dicht.** Alle 28 gebeurtenissen gaan door het grootboek, en nul is geen stand meer maar een grens: `DIRECT_WORLD_MONEY_MUTATION = 'FORBIDDEN'` (`scripts/lib/magnaatgeldkaart.js`). `test/magnaatgeldkaart.test.js` zakt bij de eerste directe geldmutatie in World, op een saldo of op de Foundation-pot, en bewijst met een nagebootste mutatie dat hij bijt. Daarnaast eist `test/magnaat-world-geld.test.js` toets 12 dat na elke stap, op beide regelversies, het saldo van elke speler exact zijn kas in het grootboek is en de pot exact haar twee rekeningen. Het saldo is dus een projectie en geen tweede waarheid. In de grondwet staat M-005 op PASS en de World-scope van M-001 ook. M-001 als geheel blijft VIOLATION om drie plekken in de Academy (`virtueelBudget`), en die liggen buiten A2. De financiële migratie is daarmee af. Hierna zijn er geen A-nummers meer, en het volgende is **V1 From Zero**.
+
+Wat A2 bewust **niet** deed: het grootboek bewaart zijn journaal nog als één waarde per collectie (A3 in de oorspronkelijke fundering), en een partij kent nog geen herhaling uit het journaal (A5). Volgens de scopebevriezing komen die pas als een V-ronde erop vastloopt.
 
 ---
 

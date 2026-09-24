@@ -24,7 +24,10 @@
   11. Wat regelversie 3 verandert, en niet meer dan dat: vanuit dezelfde stand
       groeit de Foundation-pot in een maand even hard (op de afronding na),
       de spelers betalen samen wat de stad niet meer betaalt, en elke speler
-      betaalt wat er op zijn maandoverzicht staat. */
+      betaalt wat er op zijn maandoverzicht staat.
+  12. A2.10: na elke stap is het saldo van een speler exact zijn kas in het
+      grootboek, en de Foundation-pot exact haar twee rekeningen -- op beide
+      regelversies. Het saldo is een projectie, geen tweede waarheid. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -32,6 +35,7 @@ const kaart = require('../scripts/lib/magnaatgeldkaart');
 const { metDekking } = require('./lib/magnaat-geldkaart-dekking');
 const { SCENARIOS, draai, nieuweWereld, voerUit, afdruk, canoniek } = require('./lib/magnaat-world-scenarios');
 const C = require('../server/kern/spellen/magnaat/centen');
+const { REKENING } = require('../server/kern/spellen/magnaat/boekhouding');
 
 function vergelijk(ref, naam) {
   const uit = draai(naam, { regelversie: ref.regelversie }).stappen;
@@ -262,4 +266,25 @@ test('11. regelversie 3 laat de spelers de afdracht betalen, en verder verandert
     }
   }
   assert.equal(maanden, Object.keys(SCENARIOS).length, 'elk scenario kwam bij een maand');
+});
+
+test('12. na elke stap is elk saldo exact zijn rekening in het grootboek', () => {
+  let vergeleken = 0;
+  for (const naam of Object.keys(SCENARIOS)) {
+    for (const regelversie of [C.CENTEN_VERSIE, undefined]) {
+      draai(naam, {
+        regelversie,
+        naElkeStap(w, stap) {
+          const saldo = (code) => ((w.st.boek.rekeningen[code] || {}).saldo || 0);
+          const waar = naam + ' v' + w.st.regelversie + ' na ' + JSON.stringify(stap[0] === 'maand' ? stap : stap[1]);
+          for (const [h, geld] of Object.entries(w.st.geld)) {
+            assert.equal(saldo(REKENING.kas(w.st.wereld, h)), geld, waar + ': kas van ' + h);
+            vergeleken++;
+          }
+          for (const pot of ['lokaal', 'centraal']) assert.equal(saldo(REKENING.foundation(w.st.wereld, pot)), w.st.foundation[pot], waar + ': pot ' + pot);
+        }
+      });
+    }
+  }
+  assert.ok(vergeleken > 100, 'de toets vergeleek echte saldi (' + vergeleken + ')');
 });

@@ -24,3 +24,13 @@ test('geen element in de log is "onbekend", nooit een verzonnen naam', () => {
   assert.equal(onderschepper('Timeout 2500ms exceeded'), 'onbekend');
   assert.equal(onderschepper(''), 'onbekend');
 });
+
+/* Een weigering met een zin is pas een defect als het scherm die zin niet toont;
+   daarvoor moet de zin eerst betrouwbaar uit het antwoord komen. */
+test('de zin van een weigering komt uit {"error": ...}, en anders is er geen', () => {
+  const { weigerZin } = require('../scripts/appwerkt');
+  assert.equal(weigerZin('{"error":"Schrijf op wat er gebeurde."}'), 'Schrijf op wat er gebeurde.');
+  assert.equal(weigerZin('{"error":"  "}'), null, 'een lege zin zegt de gebruiker niets');
+  assert.equal(weigerZin('{"fout":"x"}'), null);
+  assert.equal(weigerZin('<html>kapot</html>'), null, 'geen JSON is geen zin');
+});

@@ -46,7 +46,7 @@ const os = require('os');
    deze toets gokte er nog een, met als gevolg een rood dat niets over de code
    zei ("Poort 39340 is al in gebruik"). Een toets die om een andere reden dan
    zijn onderwerp kan zakken, kost precies het vertrouwen dat hij moet leveren. */
-const { vrijePoort } = require('./helper');
+const { vrijePoort, vrijePoortReeks } = require('./helper');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
@@ -178,11 +178,17 @@ test('npm run telefoon: de POORTWACHTER termineert https, en dat is het commando
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-telefoon-'));
   let kind = null;
   try {
-    /* Twee losse vrije poorten: een voor de poortwachter zelf en een als basis
-       voor de drie werkers erachter. Ze uit elkaar halen scheelt de aanname dat
-       poort+10 ook vrij zou zijn. */
-    const port = await vrijePoort();
-    const trioBasis = await vrijePoort();
+    /* EEN REEKS, want het trio leidt poorten af: de drie servers op
+       trioBasis+0..2 en het CA-loket op PORT+10 (server/trio.js). Hier stonden
+       twee losse vrijePoort()-aanroepen met de belofte dat dat "de aanname dat
+       poort+10 ook vrij zou zijn" scheelde -- die belofte maakte de code niet
+       waar, en de buren van een vrije poort liggen op Linux precies in de
+       bronpoortruimte van elke fetch() (zie vrijePoortReeks in ./helper.js en
+       de kop van test/trio-wees.test.js). Veertien aaneengesloten poorten
+       buiten het efemere bereik dekken PORT, de drie servers en PORT+10. */
+    const reeks = await vrijePoortReeks(14);
+    const port = reeks[0];
+    const trioBasis = reeks[1];
     const env = Object.assign({}, process.env, {
       RTG_LOKAAL_TLS: '1', PORT: String(port), RTG_TRIO_BASIS: String(trioBasis),
       RTG_DATA_DIR: dataDir, NODE_ENV: 'test', RTG_DEMO: '1', ANTHROPIC_API_KEY: '', RTG_PG: ''

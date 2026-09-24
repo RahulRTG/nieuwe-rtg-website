@@ -12,8 +12,9 @@
 
    De vestigingen staan in ./concern/vestiging.js, de mensenkant (dienstverbanden,
    uitnodigen, rechten) in ./concern/mensen.js, de veranderkant in
-   ./concern/verandering.js en het duiden van een naam in ./concern/duiding.js:
-   dit bestand ging over de 10 kB van het modulebeleid, en dat is de goede naad. */
+   ./concern/verandering.js, het duiden van een naam in ./concern/duiding.js en de
+   rekening van een entiteit in ./concern/rekening.js: dit bestand ging over de
+   10 kB van het modulebeleid, en dat is de goede naad. */
 const { duidBestuurder } = require('../kern/concern/persoon');
 
 module.exports = (kern) => {
@@ -197,5 +198,6 @@ module.exports = (kern) => {
   require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden, personeelVan });
   require('./concern/verandering')(kern, { mijn, stuur, nietGevonden });
   require('./concern/duiding')(kern, { mijn, stuur, nietGevonden });
+  require('./concern/rekening')(kern, { mijn, stuur, nietGevonden });
   require('./concern/voorstel')(kern, { mijn, stuur, nietGevonden });
 };

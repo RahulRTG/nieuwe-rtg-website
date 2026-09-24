@@ -57,6 +57,9 @@ module.exports = (ctx) => {
        hart): die staat niet in de ledengids, dus geen codenaam-opzoek. */
     let c;
     if (ruw.startsWith('zaak:')) c = ruw;
+    /* Een entiteit uit de concerngraaf bankiert onder 'entiteit:<id>' (./entiteit.js),
+       en ALLEEN langs die ene weg: de kantoorroute neemt de codenaam uit het verzoek. */
+    else if (ruw.startsWith('entiteit:')) { if (wie !== 'entiteit') return { status: 404, error: 'Die codenaam kennen we niet.' }; c = ruw; }
     else {
       let rec; try { rec = await keyVanCodenaam(ruw); } catch (e) { rec = null; }
       if (!rec) return { status: 404, error: 'Die codenaam kennen we niet.' };

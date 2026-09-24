@@ -111,6 +111,16 @@ test('de eigenaar bevestigt zware handelingen met een passkey, vanaf de schermen
     await p.locator('#bmDeuren [data-deur="kantoor"]').click();
     assert.equal((await deur).status(), 409, 'een vers proces is niet rijp');
     await p.locator('body', { hasText: 'nog niet afgedwongen' }).waitFor();
+    /* rekeningen voor entiteiten: standaard dicht, met de vinger open en weer dicht */
+    await p.locator('#rbLijst [data-weg="open"]').waitFor();
+    const rOpen = antwoord(p, '/api/office/bank/entiteitrekening/zet');
+    await p.locator('#rbLijst [data-weg="open"]').click();
+    assert.equal((await rOpen).status(), 200, 'rekeningen voor entiteiten opengezet met de passkey');
+    await p.locator('#rbLijst', { hasText: 'Rekeningen voor entiteiten · open' }).waitFor();
+    const rDicht = antwoord(p, '/api/office/bank/entiteitrekening/zet');
+    await p.locator('#rbLijst [data-weg="open"]').click();
+    assert.equal((await rDicht).status(), 200, 'en weer dicht');
+    await p.locator('#rbLijst', { hasText: 'Rekeningen voor entiteiten · dicht' }).waitFor();
     await c.close();
 
     /* 3. de medewerker verzilvert de uitnodiging op het personeelsscherm */

@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-09-24T05:23:09.062Z",
-  "commit": "706bea36",
+  "op": "2026-09-24T07:09:59.212Z",
+  "commit": "c3b218b1",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 631,
-  "bewaakt": 541,
+  "zonderBewakerslaag": 632,
+  "bewaakt": 542,
   "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -48,7 +48,7 @@
  "perWacht": [
   {
    "naam": "werkPoort",
-   "aantal": 99
+   "aantal": 100
   },
   {
    "naam": "poort",
@@ -925,6 +925,12 @@
   {
    "sleutel": "POST /api/bedrijf/uitdienst/stap",
    "bestand": "server/bedrijf/uitdienst.js:61",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/uitgave/betaal",
+   "bestand": "server/bedrijf/entiteitbetaling.js:18",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },

@@ -114,17 +114,23 @@ test('een uitgave gaat op het scherm van indienen via een ander naar betaald', {
     await druk(1, /diende deze uitgave in/);
 
     /* ---- RTG Rekening staat standaard uit, en het scherm zegt dat ---- */
-    await page.selectOption('#a_h3_wijze', 'rekening');
-    await druk(3, /niet aangezet/);
+    await page.selectOption('#a_h4_wijze', 'rekening');
+    await druk(4, /niet aangezet/);
+    await page.selectOption('#a_h4_wijze', 'entiteit');
+    await druk(4, /die een RTG-rekening heeft/);
+
+    /* ---- betalen vanaf de entiteit kan alleen met die betaalwijze ---- */
+    await vul('a_h3_id', id);
+    await druk(3, /betaalt niet vanaf een entiteit|al betaald/);
 
     /* ---- de eigen tekengrens zet een ander ---- */
-    await vul('a_h6_lidId', LIDID[CFO.lidToken]);
-    await vul('a_h6_bedrag', '1');
-    await druk(6, /eigen tekengrens zet een ander/);
+    await vul('a_h7_lidId', LIDID[CFO.lidToken]);
+    await vul('a_h7_bedrag', '1');
+    await druk(7, /eigen tekengrens zet een ander/);
 
     /* ---- de tekenwijze vraagt eerst een gekoppelde entiteit, en zegt dat ---- */
-    await page.selectOption('#a_h4_wijze', 'bestuur');
-    await druk(4, /niet aan een entiteit/);
+    await page.selectOption('#a_h5_wijze', 'bestuur');
+    await druk(5, /niet aan een entiteit/);
 
     assert.deepEqual(fouten, [], 'geen scriptfouten: ' + fouten.join(' | '));
   } finally {

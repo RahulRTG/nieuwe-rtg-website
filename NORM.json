@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1595,
-    "kernGedeeld": 242,
+    "kernBreedte": 1599,
+    "kernGedeeld": 243,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 628,
+    "toetsenNietGemeten": 629,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,54 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1594,
+      "meter": "kernBreedte 1594 -> 1599 (de SOM van twee lijnen, geen nieuwe naam)",
+      "reden": "Het samengaan met main (930aaa3e). Main zette deze meter met eigen posten op 1595 (onder meer de twee hulpnamen van de vestigingsinhaal), deze tak met eigen posten op 1594 (de vijf smalle bankfuncties en tijdDuid). In een boom staan beide lijnen naast elkaar en dat is 1599; met deze samenvoeging komt er GEEN nieuwe naam bij. De posten van beide lijnen blijven apart staan, want samenvoegen tot een post wist welke namen het zijn.",
+      "waarheen": "GRENZEN.json draagt elke naam onder zijn eigen domein; daalt een laag weg, dan daalt deze meter vanzelf mee."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1590,
+      "meter": "kernBreedte 1590 -> 1594; kernGedeeld 242 -> 243",
+      "reden": "De rekening op naam van een entiteit (besluit van de eigenaar, 24 september 2026). In plaats van de hele kern.bank aan concern en het Werk OS te geven, staan er vijf smalle namen in de kern-tas (server/opzet/kernlaag4c.js): entiteitRekeningStand, -Zet, -Open, entiteitRekening en entiteitBetaal. Vier ervan raken een route; entiteitRekening raakt er twee domeinen (concern leest de rekening, het Werk OS toetst of de betaalwijze kan) en is daarmee de ene echte koppeling erbij. De bank importeert concern niet en andersom.",
+      "waarheen": "GRENZEN.json (concern, bedrijf, kantoren) en test/entiteitrekening.test.js"
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 628,
+      "vervalt": "2026-12-24",
+      "meter": "toetsenNietGemeten 628 -> 629",
+      "reden": "test/entiteitrekening.test.js is nieuw. Met de hand nagetrokken met tien mutaties op kern/bank/entiteit.js, de vlag in kern/bank/rekeningen.js, de KYC-drempel, de betaalroute, de weigering van betaald noteren, de betaalwijze en de eigenaarscontrole van de schakelaar; alle tien zakken. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 627,
+      "vervalt": "2026-12-24",
+      "meter": "toetsenNietGemeten 627 -> 628",
+      "reden": "test/beleidsafdwingen.test.js is nieuw (de beleidsmotor per deur uit de schaduw, besluit van de eigenaar van 24 september 2026). Met de hand nagetrokken met vijf mutaties op kern/beleidsmotor/afdwingen.js, de weigering in bewaak() en de eigenaarscontrole van de route; alle vijf zakken. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 626,
+      "vervalt": "2026-12-24",
+      "meter": "toetsenNietGemeten 626 -> 627",
+      "reden": "test/samentekenen.test.js is nieuw (samen tekenen, besluit van de eigenaar van 24 september 2026). Met de hand nagetrokken met tien mutaties op bedrijf/samentekenen.js, de regelpoort en het loskoppelen; alle tien zakken, waarvan een pas na een extra bewering. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

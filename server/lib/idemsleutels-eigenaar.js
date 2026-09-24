@@ -77,6 +77,11 @@ const SLEUTELS = {
   'POST /api/office/doos/gedeeld/zet': { zelfdeVerzoek: true },
   'POST /api/office/beleidsmotor/afdwingen': { leest: true },
   'POST /api/office/beleidsmotor/afdwingen/zet': { zelfdeVerzoek: true },
+  'POST /api/concern/rekening': { leest: true },
+  'POST /api/concern/rekening/open': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/uitgave/betaal': { zelfdeVerzoek: true },
+  'POST /api/office/bank/entiteitrekening': { leest: true },
+  'POST /api/office/bank/entiteitrekening/zet': { zelfdeVerzoek: true },
   /* De uitgave in het Werk OS: indienen is elke keer een nieuwe uitgave; betaald
      noteren en de tekengrens zetten zijn een toestand. */
   'POST /api/bedrijf/uitgave/maak': { nietIdempotent: true,

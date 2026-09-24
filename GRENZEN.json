@@ -128,6 +128,8 @@
       "zzpwacht"
     ],
     "bedrijf": [
+      "entiteitBetaal",
+      "entiteitRekening",
       "agenda",
       "assetBeeld",
       "assetMet",
@@ -204,6 +206,9 @@
       "status"
     ],
     "concern": [
+      "entiteitRekening",
+      "entiteitRekeningOpen",
+      "entiteitRekeningStand",
       "accounts",
       "app",
       "auth",
@@ -564,6 +569,8 @@
       "werkplek"
     ],
     "kantoren": [
+      "entiteitRekeningStand",
+      "entiteitRekeningZet",
       "afdelingen",
       "aidataExport",
       "aidataOverzicht",

@@ -1909,16 +1909,11 @@ const munten = maakMunten({ db, save, muntbetaal });
 const { maakSettlement } = require('./kern/settlement');
 /* payOplaadAfronden als LATE binding: de betaalkern wordt pas verderop gebouwd
    (kernlaag), maar deze functie draait pas als er een webhook binnenkomt -- dan
-   staat hij er. Zonder deze draad kan settlement een bevestigde oplading niet
-   bijschrijven, en dat is precies wat er misging: kaart afgeschreven, wallet
-   niet bijgeschreven, webhook antwoordde 200 ok. */
+   staat hij er. Sinds MONEY-012 alleen nog voor oude kaartWachtend-rijen. */
 const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd,
   payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null),
   // bevestigt het IBAN waarvandaan is opgeladen, zodat de wachttijd op DIE rekening vervalt
   payIbanBevestigd: (a) => (kern.pay && kern.pay.ibanBevestigd ? kern.pay.ibanBevestigd(a) : null) });
-/* Facturen en directe betalingen lopen via de betaalwaarheid (MONEY-012); hun
-   afwikkeling gaat door dezelfde settleFactuur. */
-require('./kern/betaalwaarheid/inkomend')({ betaalWaarheid, settleFactuur });
 
 /* De maandfactuur uit het eigen RTG Pay-saldo (kern/factuursaldo.js): de derde
    betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn en de

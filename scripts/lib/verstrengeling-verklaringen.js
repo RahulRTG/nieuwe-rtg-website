@@ -139,6 +139,8 @@ module.exports = [
     reden: 'foundation-productiepoort.js handhaaft het ene commitgebonden Foundation-vrijgavebesluit uit config/foundation-vrijgave; de requestpoort mag dat besluit niet opnieuw interpreteren' },
   { van: 'domein:rtfos', naar: 'domein:codelevenscyclus', soort: 'DOMEINRELATIE',
     reden: 'rtfos/basis.js levert opslag en onderwerpbinding aan de gedeelde lifecycle die hash, verval, gebruikslimiet, rotatie en intrekking van persoonsportaalcodes bezit' },
+  { van: 'domein:spellen', naar: 'domein:betaalwaarheid', soort: 'DOMEINRELATIE',
+    reden: 'magnaat/rtg-keten.js is het proefstuk dat de ECHTE geldketen draait (MAGNAATLAB.md); sinds MONEY-012 legt kern/pay een oplading vast in de betaalwaarheid voor de aanroep, dus de keten bouwt die mee. Alleen dit proefstuk: test/magnaat-rtgketen.test.js toets 7 zakt zodra een speelmodule kern/pay laadt' },
   { van: 'domein:spellen', naar: 'domein:spelprojectie-toegang', soort: 'DOMEINRELATIE',
     reden: 'spellen/projectie.js orkestreert een potje met de aparte toegangscyclus voor projectieschermen; de spelprojectie blijft eigenaar van het getoonde spel, de toegang van het credential' },
 

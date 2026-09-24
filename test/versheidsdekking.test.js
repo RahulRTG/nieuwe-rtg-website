@@ -49,6 +49,12 @@ const BUITEN = {
      werkelijk in de tabel staat. */
   'TAALOORDEEL.json': 'het oordeel van een mens die de taal spreekt; met de hand bijgehouden, geen meetronde -- de dekking ervan bewaakt test/taaloordeel.test.js',
   'NORM.json': 'de normtanden zelf -- hij IS de ratel en wordt door de ratels geschreven, niet door een meetronde',
+  /* De nulstand van de Magnaat-grondwet is met opzet OUD. Hij is de lat waar
+     test/magnaatgrondwet.test.js vers tegen meet; hem "verversen" is achteruit
+     mogen gaan zonder dat iemand het ziet (MAGNAAT.md par. 5). Veroudering is
+     hier dus geen signaal maar de bedoeling, en een versheidsmelding zou juist
+     aanzetten tot het verkeerde commando. */
+  'MAGNAATGRONDWET.json': 'bevroren nulstand van de Magnaat-grondwet; opnieuw vastleggen is een constitutionele wijziging en geen verversing -- de verse meting doet test/magnaatgrondwet.test.js',
   'SUITEDUUR.json': 'een tijdmeting die bij elke testronde meeschrijft; SUITE.json draagt de stand die telt',
   'KRIMP.json': 'een historielijst die aangroeit; er is geen "huidige meting" om te verouderen',
   /* HIER STOND DAT HIJ MEELIFT OP MUTATIES.json, EN DAT WAS NIET WAAR. Die twee

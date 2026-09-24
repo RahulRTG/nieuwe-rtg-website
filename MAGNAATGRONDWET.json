@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T13:24:32.123Z",
-    "commit": "cda3d0800",
+    "op": "2026-09-24T13:31:26.851Z",
+    "commit": "99efc05cb",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/magnaatgrondwet.js",
@@ -23,7 +23,7 @@
     "afgedwongen": 9,
     "getoetst": 8
   },
-  "schendingen": 26,
+  "schendingen": 20,
   "perRegel": [
     {
       "id": "M-001",
@@ -34,7 +34,7 @@
       "geimplementeerd": true,
       "afgedwongen": false,
       "getoetst": false,
-      "schendingen": 13,
+      "schendingen": 10,
       "scopes": {
         "world": {
           "autoriteit": "geen: het saldo zelf (st.geld) is de waarheid",
@@ -42,7 +42,7 @@
           "toets": "NIEMAND",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
-            "aantal": 10,
+            "aantal": 7,
             "plekken": [
               "server/kern/spellen/magnaat/aandeel.js:65",
               "server/kern/spellen/magnaat/acties.js:51",
@@ -50,10 +50,7 @@
               "server/kern/spellen/magnaat/acties.js:101",
               "server/kern/spellen/magnaat/acties.js:135",
               "server/kern/spellen/magnaat/maand-contracten.js:40",
-              "server/kern/spellen/magnaat/maand.js:107",
-              "server/kern/spellen/magnaat/verzekering.js:110",
-              "server/kern/spellen/magnaat/verzekering.js:119",
-              "server/kern/spellen/magnaat/verzekering.js:130"
+              "server/kern/spellen/magnaat/maand.js:107"
             ]
           },
           "deels": null,
@@ -181,7 +178,7 @@
       "geimplementeerd": true,
       "afgedwongen": false,
       "getoetst": false,
-      "schendingen": 10,
+      "schendingen": 7,
       "scopes": {
         "world": {
           "autoriteit": "geen: er is geen journaal",
@@ -189,7 +186,7 @@
           "toets": "NIEMAND",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
-            "aantal": 10,
+            "aantal": 7,
             "plekken": [
               "server/kern/spellen/magnaat/aandeel.js:65",
               "server/kern/spellen/magnaat/acties.js:51",
@@ -197,10 +194,7 @@
               "server/kern/spellen/magnaat/acties.js:101",
               "server/kern/spellen/magnaat/acties.js:135",
               "server/kern/spellen/magnaat/maand-contracten.js:40",
-              "server/kern/spellen/magnaat/maand.js:107",
-              "server/kern/spellen/magnaat/verzekering.js:110",
-              "server/kern/spellen/magnaat/verzekering.js:119",
-              "server/kern/spellen/magnaat/verzekering.js:130"
+              "server/kern/spellen/magnaat/maand.js:107"
             ]
           },
           "deels": null,

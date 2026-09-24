@@ -1824,7 +1824,7 @@ betaal.koppelStore({
 const {
   DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
   dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten, dpRegistreerMunt, dpRegistreerBevestigd
-} = maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
+} = maakDirectpay({ db, save, crypto, findSupplier, betaal, betaalWaarheid, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
   /* De transactie-index voor de twee geldcollecties. Ze werden hier met
      unshift+slice bijgehouden, dus zonder index (O(N) zoeken) en met een
      stille kap op de staart. Nu langs dezelfde weg als orders en boekingen. */
@@ -1916,6 +1916,9 @@ const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistr
   payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null),
   // bevestigt het IBAN waarvandaan is opgeladen, zodat de wachttijd op DIE rekening vervalt
   payIbanBevestigd: (a) => (kern.pay && kern.pay.ibanBevestigd ? kern.pay.ibanBevestigd(a) : null) });
+/* Facturen en directe betalingen lopen via de betaalwaarheid (MONEY-012); hun
+   afwikkeling gaat door dezelfde settleFactuur. */
+require('./kern/betaalwaarheid/inkomend')({ betaalWaarheid, settleFactuur });
 
 /* De maandfactuur uit het eigen RTG Pay-saldo (kern/factuursaldo.js): de derde
    betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn en de

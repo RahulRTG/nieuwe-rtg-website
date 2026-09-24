@@ -84,14 +84,56 @@ vraag een stap eerder: wat heeft de provider gedaan? Aansluiten zou de bank-SEPA
 en de partneruitbetaling naar het intent/claim-model verhuizen. De vorm is wel
 overgenomen: alleen geauthenticeerd bewijs, en een afwijking wordt een zaak.
 
+## De inkomende kant: één waarheid voor geld dat binnenkomt
+
+Opladen (`kern/pay/opladen.js`), facturen (`routes/member/betalen.js`) en directe
+betalingen aan een partner (`kern/directpay/betalen.js`) riepen elk een kale
+`betaal.maakBetaling` aan. Daarmee zaten er drie gaten in:
+- **Een wisselende sleutel.** Zonder `idem` was de providersleutel van opladen
+  bij elke poging anders. Een herhaling na een verloren antwoord belastte de kaart
+  dan twee keer.
+- **Niets vastgelegd bij een fout.** De eerste betaling werd nooit bijgeschreven,
+  en niemand wist dat hij bestond.
+- **`kaartWachtend`.** Een wachtende betaling ging daarheen, zonder veegronde en
+  met een **stille wis** van de oudste rijen boven de 20.000.
+
+Alle drie de paden lopen nu via de bestaande eigenaar, `kern/betaalwaarheid/`
+(besluit van de eigenaar, 24 september 2026: alle drie tegelijk). Er komt geen
+tweede providerwaarheid bij:
+- **Vastleggen vóór de aanroep, met vaste sleutel en vaste aanbieder.** De
+  betaling staat vast vóór de externe aanroep, met een vaste sleutel. De
+  startopties (`r.start`) gaan mee de boeken in, zodat een hervatting dezelfde
+  aanbieder gebruikt.
+- **De veegronde** (`kern/betaalwaarheid/hervat.js`, op de bestaande
+  onderhoudsklok). Die vraagt na wat geen uitsluitsel gaf: een betaling zonder
+  referentie (`onbekend`), of een betaling die wacht. Dat gebeurt met dezelfde
+  sleutel, dus het is een opzoeking en geen tweede betaling. Na zes hervattingen
+  volgt een **ESCALATIE** voor een mens; de stand blijft staan en er wordt niets
+  gewist. Een betaling die nooit is aangeboden, start de veegronde niet zelf.
+- **Precies één keer bijschrijven.** Voor opladen gebeurt dat in
+  `kern/pay/oplaadwaarheid.js`. Het bewijs daarvan staat in dezelfde opslag als de
+  boeking, en in motorstand ontdubbelt de motor op de economische sleutel.
+  Facturen en directe betalingen gaan via `kern/betaalwaarheid/inkomend.js` door
+  dezelfde `settleFactuur`, die al per betaal-id ontdubbelt.
+- **De factuurroute schrijft de ledenstaat niet meer.** `getMemberState` geeft
+  een kopie, en een save van die oude kopie zou "betaald" overschrijven. De
+  reisonderdelen van een factuur gaan mee in de afwikkeling. Voorheen deed alleen
+  de route dat, en de webhook nooit.
+- **Geen nieuwe schrijvers in `kaartWachtend`.** De webhook leest daar alleen nog
+  oude rijen uit.
+- **De gastbetaling** laat haar betaalslot staan na een uitkomst zonder
+  uitsluitsel. Anders betaalt de gast met een nieuwe sleutel opnieuw.
+- **De simulatiebank** heeft een eigen stand in `betaalwaarheid/staten.js`. Zonder
+  die stand viel ook `geweigerd` op IN_BEHANDELING en wachtte hij eeuwig.
+
 ## Welke proef welke wet dekt
 
-| Wet | Uitgaand (betaalopdracht) | Inkomend en grootboek (bestond al) |
+| Wet | Uitgaand (betaalopdracht) | Inkomend (betaalwaarheid) |
 |---|---|---|
-| 1 Behoud | `test/money012.test.js`: alle 64 storingsvolgordes, nooit uitgevoerd én teruggeboekt, en na afstemming precies één van beide | `geld-conservatie-last`, `magnaat-rtgketen` (nul verschil), sluitcontrole in `kern/pay/kijken.js` |
-| 2 Eén gevolg | idem: één sleutel per opdracht, hooguit één uitvoering en één teruggang | `betaalwebhook-fouten` (dubbele webhooks), `betaalstore`, `payout-terugboeking` (+ sqlite, pg), `banknood-idem` |
-| 3 Herstel | idem, alle 64 volgordes ook met een herstart na elke stap (de rij door JSON, zoals op schijf) | `betaalwaarheid` (sleutel overleeft herstart), `duurzaamheid-kill`, `betaalwebhook-fouten` (crash tussen teruggang en save) |
-| 4 Afstemming | ONBEKEND is zichtbaar in de reconciliatie; alle 64 volgordes sluiten ook via de afschriftweg; BEVESTIGD, NIET_UITGEVOERD en VERSCHIL (bedrag én valuta) elk apart; zonder echtheid of bron geen afstemming; de route maakt geen aanvraag voor een opdracht die niet ONBEKEND is | `betaalwaarheid` (bedrag wijkt af → CONTROLE_NODIG), `economic-runtime` (verschil → EXCEPTION) |
+| 1 Behoud | `test/money012.test.js`: alle 64 storingsvolgordes, nooit uitgevoerd én teruggeboekt, en na afstemming precies één van beide | `test/money012-inkomend.test.js`: alle 64 volgordes, hooguit één belasting, nooit bijgeschreven zonder belasting; verder `geld-conservatie-last` en `magnaat-rtgketen` (nul verschil) |
+| 2 Eén gevolg | idem: één sleutel per opdracht, hooguit één uitvoering en één teruggang | idem: één sleutel, dezelfde aanbieder ook na een herstart, één bijschrijving ook als de afhandeling na een storing herhaald wordt (met tegenproef); verder `betaalwebhook-fouten` en `betaalstore` |
+| 3 Herstel | idem, alle 64 volgordes ook met een herstart na elke stap (de rij door JSON, zoals op schijf) | idem, elke volgorde eindigt op BEVESTIGD met één bijschrijving zodra de provider zich uitspreekt, ook met een herstart na elke ronde |
+| 4 Afstemming | ONBEKEND is zichtbaar in de reconciliatie; alle 64 volgordes sluiten ook via de afschriftweg; BEVESTIGD, NIET_UITGEVOERD en VERSCHIL (bedrag én valuta) elk apart; zonder echtheid of bron geen afstemming; de route maakt geen aanvraag voor een opdracht die niet ONBEKEND is | `onbekend` telt mee in `openstaand()`; na zes hervattingen ESCALATIE en de betaling blijft staan; `betaalwaarheid` (bedrag wijkt af → CONTROLE_NODIG) |
 
 De meter kan uitslaan. De tegenproef laat de rail een verloren antwoord als "niet
 verstuurd" melden (het oude gedrag), en dan vindt de sweep geld uit niets. Vier
@@ -115,12 +157,12 @@ MONEY-012 is pas gesloten als deze punten dicht zijn of met reden uitgesloten.
 - **Het kantoorbord.** Het bord toont ONBEKEND en het aantal verschilzaken
   (`railVerschil`). Een formulier voor de afstemming staat er nog niet: de route
   wordt vandaag rechtstreeks aangeroepen.
-- **Inkomend: oude oplaadweg.** `kern/pay/opladen.js` `laadOp` geeft bij een fout
-  502 zonder iets vast te leggen. Een betaling die niet `betaald` is, blijft in
-  `kaartWachtend` staan zonder statusvraag of veegronde.
-- **Inkomend: antwoord kwijt vóór een providerreferentie.** `betaalwaarheid`
-  herstelt dan alleen via een herinzending met dezelfde sleutel. Er is geen
-  statusvraag op de sleutel zelf.
+- **Oude rijen in `kaartWachtend`.** Nieuwe rijen komen er niet meer bij. Rijen
+  van vóór deze ronde worden nog door de webhook afgewikkeld, maar hebben geen
+  veegronde. Een eenmalige overzetting naar de betaalwaarheid vraagt een besluit:
+  een oude rij draagt geen sleutel waarmee de provider hem terugvindt.
+- **Het inkomende overzicht op een scherm.** `betaalWaarheid.openstaand()` telt
+  `onbekend` en `escalatie`, maar geen kantoorscherm toont het nog.
 - **In een draaiende server.** Een verloren antwoord valt daar niet uit te
   lokken: de verraadsmotor heeft geen providerstand (`traag-antwoord` staat op
   `waar: null`). Deze ronde bewijst de beslissing in de rij en de merktekens in

@@ -1,7 +1,5 @@
-/* Magnaat Wereld heeft twee deuren: spelers komen binnen met hun ledenpas;
-   de Future Engine en testfases zitten achter de menselijke boardroom-poort. */
-/* Wie handelt hier: uit de canonieke envelop en niet uit req.boardroomKey
-   (TAKEN.md 4.72). Zie server/opzet/envelop.js voor waarom die lezer bestaat. */
+/* Twee deuren: spelers met hun ledenpas (ook Van Nul, V1); de Future Engine en testfases
+   achter de boardroom-poort. Wie handelt komt uit de envelop (TAKEN.md 4.72, opzet/envelop.js). */
 const { wie: envelopWie } = require('../opzet/envelop');
 
 module.exports = (kern) => {
@@ -19,85 +17,49 @@ module.exports = (kern) => {
     return veilig(res, () => werk(req.session.key, req.body || {}));
   };
 
-  /* Van Nul (V1): een leven per lid, van € 63 tot een eerste bedrijf. */
   app.post('/api/member/magnaat/leven/staat', auth, (req, res) => alsLid(req, res, key => magnaatWereld.leven.staat(key)));
   app.post('/api/member/magnaat/leven/actie', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.leven.actie(key, b)));
   app.post('/api/member/magnaat/overzicht', auth, (req, res) => alsLid(req, res, key => magnaatWereld.overzicht(key)));
-  app.post('/api/member/magnaat/taak/start', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.taakStart(key, b.functieId, b.apparaat)));
-  app.post('/api/member/magnaat/taak/antwoord', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.taakAntwoord(key, b.taakId, b.keuze)));
-  app.post('/api/member/magnaat/taak/handeling', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.taakHandeling(key, b.taakId, b.handeling)));
-  app.post('/api/member/magnaat/taak/actie', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.taakActie(key, b.taakId, b.invoer)));
-  app.post('/api/member/magnaat/kantoor/kies', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.kiesKantoor(key, b.kantoorId, b.rol)));
-  app.post('/api/member/magnaat/werkproces/start', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.werkprocesStart(key, b.workflowId, b.apparaat)));
-  app.post('/api/member/magnaat/economie/beslis', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.economieBeslis(key, b)));
-  app.post('/api/member/magnaat/economie/analyse', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.economieAnalyse(key, b)));
-  app.post('/api/member/magnaat/economie/volgende-dag', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.economieVolgendeDag(key, b.commandoId)));
-  app.post('/api/member/magnaat/economie/schok', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.economieSchok(key, b.schokId)));
-  app.post('/api/member/magnaat/controle/overzicht', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.controleOverzicht(key, b)));
-  app.post('/api/member/magnaat/controle/zet', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.controleZet(key, b.puntId, b.wijziging)));
-  app.post('/api/member/magnaat/controle/taak/maak', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.controleTaakMaak(key, b.puntId, b.invoer)));
-  app.post('/api/member/magnaat/controle/taak/zet', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.controleTaakZet(key, b.taakId, b.status, b.bewijs)));
-  app.post('/api/member/magnaat/controle/zelftest', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.controleZelftest(key, b.puntId)));
-  app.post('/api/member/magnaat/partner/start', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.partnerTrainingStart(key, b.code)));
-  app.post('/api/member/magnaat/partner/stap', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.partnerTrainingAntwoord(key, b.trainingId, b.keuze)));
-  app.post('/api/member/magnaat/teamkamer/mijn', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.teamkamerMijn(key, b.id)));
-  app.post('/api/member/magnaat/teamkamer/maak', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.teamkamerMaak(key, b)));
-  app.post('/api/member/magnaat/teamkamer/deelnemen', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.teamkamerDeelnemen(key, b.code)));
-  app.post('/api/member/magnaat/teamkamer/rol', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.teamkamerRol(key, b.id, b.rolId, b.revisie)));
-  app.post('/api/member/magnaat/teamkamer/start', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.teamkamerStart(key, b.id, b.revisie, b.commandoId)));
-  app.post('/api/member/magnaat/teamkamer/actie', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.teamkamerActie(key, b.id, b)));
-  app.post('/api/member/magnaat/teamkamer/bedien', auth, (req, res) => alsLid(req, res,
-    (key, b) => magnaatWereld.teamkamerBedien(key, b.id, b.actie, b.revisie, b.commandoId)));
+  app.post('/api/member/magnaat/taak/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakStart(key, b.functieId, b.apparaat)));
+  app.post('/api/member/magnaat/taak/antwoord', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakAntwoord(key, b.taakId, b.keuze)));
+  app.post('/api/member/magnaat/taak/handeling', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakHandeling(key, b.taakId, b.handeling)));
+  app.post('/api/member/magnaat/taak/actie', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakActie(key, b.taakId, b.invoer)));
+  app.post('/api/member/magnaat/kantoor/kies', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.kiesKantoor(key, b.kantoorId, b.rol)));
+  app.post('/api/member/magnaat/werkproces/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.werkprocesStart(key, b.workflowId, b.apparaat)));
+  app.post('/api/member/magnaat/economie/beslis', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.economieBeslis(key, b)));
+  app.post('/api/member/magnaat/economie/analyse', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.economieAnalyse(key, b)));
+  app.post('/api/member/magnaat/economie/volgende-dag', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.economieVolgendeDag(key, b.commandoId)));
+  app.post('/api/member/magnaat/economie/schok', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.economieSchok(key, b.schokId)));
+  app.post('/api/member/magnaat/controle/overzicht', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.controleOverzicht(key, b)));
+  app.post('/api/member/magnaat/controle/zet', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.controleZet(key, b.puntId, b.wijziging)));
+  app.post('/api/member/magnaat/controle/taak/maak', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.controleTaakMaak(key, b.puntId, b.invoer)));
+  app.post('/api/member/magnaat/controle/taak/zet', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.controleTaakZet(key, b.taakId, b.status, b.bewijs)));
+  app.post('/api/member/magnaat/controle/zelftest', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.controleZelftest(key, b.puntId)));
+  app.post('/api/member/magnaat/partner/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.partnerTrainingStart(key, b.code)));
+  app.post('/api/member/magnaat/partner/stap', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.partnerTrainingAntwoord(key, b.trainingId, b.keuze)));
+  app.post('/api/member/magnaat/teamkamer/mijn', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMijn(key, b.id)));
+  app.post('/api/member/magnaat/teamkamer/maak', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMaak(key, b)));
+  app.post('/api/member/magnaat/teamkamer/deelnemen', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerDeelnemen(key, b.code)));
+  app.post('/api/member/magnaat/teamkamer/rol', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerRol(key, b.id, b.rolId, b.revisie)));
+  app.post('/api/member/magnaat/teamkamer/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerStart(key, b.id, b.revisie, b.commandoId)));
+  app.post('/api/member/magnaat/teamkamer/actie', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerActie(key, b.id, b)));
+  app.post('/api/member/magnaat/teamkamer/bedien', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerBedien(key, b.id, b.actie, b.revisie, b.commandoId)));
 
   const alsPartner = (req, res, werk, manager = true) => {
     if (manager && !managerOnly(req, res)) return;
     return veilig(res, () => werk(req.supplier, req.actor, req.body || {}));
   };
-  app.post('/api/supplier/magnaat/studio', supplierAuth, (req, res) =>
-    alsPartner(req, res, supplier => magnaatPartnerstudio.overzicht(supplier), false));
-  app.post('/api/supplier/magnaat/studio/profiel', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.profielZet(supplier, actor, b)));
-  app.post('/api/supplier/magnaat/studio/bouwsteen', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.bouwsteenZet(supplier, actor, b.soort, b)));
-  app.post('/api/supplier/magnaat/studio/bouwsteen/weg', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.bouwsteenWeg(supplier, actor, b.soort, b)));
-  app.post('/api/supplier/magnaat/studio/importeer', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.importeer(supplier, actor, b)));
-  app.post('/api/supplier/magnaat/studio/proef/start', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor) => magnaatPartnerstudio.proefStart(supplier, actor)));
-  app.post('/api/supplier/magnaat/studio/proef/stap', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.proefAntwoord(supplier, actor, b.trainingId, b.keuze)));
-  app.post('/api/supplier/magnaat/studio/relatie', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.relatieVraag(supplier, actor, b)));
-  app.post('/api/supplier/magnaat/studio/relatie/beslis', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.relatieBeslis(supplier, actor, b)));
-  app.post('/api/supplier/magnaat/studio/indienen', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.indienen(supplier, actor, b)));
-  app.post('/api/supplier/magnaat/studio/indienen/intrekken', supplierAuth, (req, res) =>
-    alsPartner(req, res, (supplier, actor) => magnaatPartnerstudio.indieningIntrekken(supplier, actor)));
+  app.post('/api/supplier/magnaat/studio', supplierAuth, (req, res) => alsPartner(req, res, supplier => magnaatPartnerstudio.overzicht(supplier), false));
+  app.post('/api/supplier/magnaat/studio/profiel', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.profielZet(supplier, actor, b)));
+  app.post('/api/supplier/magnaat/studio/bouwsteen', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.bouwsteenZet(supplier, actor, b.soort, b)));
+  app.post('/api/supplier/magnaat/studio/bouwsteen/weg', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.bouwsteenWeg(supplier, actor, b.soort, b)));
+  app.post('/api/supplier/magnaat/studio/importeer', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.importeer(supplier, actor, b)));
+  app.post('/api/supplier/magnaat/studio/proef/start', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor) => magnaatPartnerstudio.proefStart(supplier, actor)));
+  app.post('/api/supplier/magnaat/studio/proef/stap', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.proefAntwoord(supplier, actor, b.trainingId, b.keuze)));
+  app.post('/api/supplier/magnaat/studio/relatie', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.relatieVraag(supplier, actor, b)));
+  app.post('/api/supplier/magnaat/studio/relatie/beslis', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.relatieBeslis(supplier, actor, b)));
+  app.post('/api/supplier/magnaat/studio/indienen', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor, b) => magnaatPartnerstudio.indienen(supplier, actor, b)));
+  app.post('/api/supplier/magnaat/studio/indienen/intrekken', supplierAuth, (req, res) => alsPartner(req, res, (supplier, actor) => magnaatPartnerstudio.indieningIntrekken(supplier, actor)));
 
   const wie = req => envelopWie(req) || 'boardroom';
   const boardroomActor = req => ({

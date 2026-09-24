@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T07:10:52.802Z",
-    "commit": "8392b604",
+    "op": "2026-09-24T22:41:06.187Z",
+    "commit": "9987f6ed",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",
@@ -267,6 +267,44 @@
         "aanCodenaam",
         "c",
         "klasse"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/huis.js",
+      "regel": 27,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "van"
+      ],
+      "afdrukNamen": [
+        "c",
+        "van"
+      ],
+      "regelTekst": "return metIdem(idem ? 'huisin:' + van + ':' + idem : null, 'huisin|' + van + '|' + c, async () => {",
+      "afdrukExtra": [
+        "c"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/huis.js",
+      "regel": 42,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "aan",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "aan",
+        "c"
+      ],
+      "regelTekst": "return metIdem(idem ? 'huisuit:' + aan + ':' + idem : null, 'huisuit|' + aan + '|' + c, async () => {",
+      "afdrukExtra": [
+        "c"
       ],
       "uitspraak": "voegtToe"
     },
@@ -537,45 +575,7 @@
     },
     {
       "bestand": "server/kern/pay/verzoeken.js",
-      "regel": 44,
-      "soort": "kern",
-      "binding": "server/lib/idem.js",
-      "sleutelNamen": [
-        "idem",
-        "van"
-      ],
-      "afdrukNamen": [
-        "c",
-        "van"
-      ],
-      "regelTekst": "return metIdem(idem ? 'huisin:' + van + ':' + idem : null, 'huisin|' + van + '|' + c, async () => {",
-      "afdrukExtra": [
-        "c"
-      ],
-      "uitspraak": "voegtToe"
-    },
-    {
-      "bestand": "server/kern/pay/verzoeken.js",
-      "regel": 59,
-      "soort": "kern",
-      "binding": "server/lib/idem.js",
-      "sleutelNamen": [
-        "aan",
-        "idem"
-      ],
-      "afdrukNamen": [
-        "aan",
-        "c"
-      ],
-      "regelTekst": "return metIdem(idem ? 'huisuit:' + aan + ':' + idem : null, 'huisuit|' + aan + '|' + c, async () => {",
-      "afdrukExtra": [
-        "c"
-      ],
-      "uitspraak": "voegtToe"
-    },
-    {
-      "bestand": "server/kern/pay/verzoeken.js",
-      "regel": 86,
+      "regel": 50,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -602,7 +602,7 @@
     },
     {
       "bestand": "server/kern/pay/verzoeken.js",
-      "regel": 112,
+      "regel": 88,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [

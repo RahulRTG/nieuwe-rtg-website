@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T13:06:05.087Z",
-    "commit": "e9b4b2909",
-    "boomVuil": true,
-    "boomAnders": 2,
+    "op": "2026-09-24T13:16:04.823Z",
+    "commit": "f5cc7a3c5",
+    "boomVuil": false,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -5239,9 +5239,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/spellen/magnaat/boekhouding.js",
-      "operator": "getal+1#0",
-      "gezakt": 2,
-      "geprobeerd": 5
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "magnaat-world-geld.test.js": {
       "soort": "puur",
@@ -8664,7 +8664,7 @@
       "staat": "gezakt",
       "module": "server/kern/spellen/magnaat/kaart.js",
       "operator": "===->!==#0",
-      "gezakt": 14,
+      "gezakt": 15,
       "geprobeerd": 1
     },
     "spelverzekering.test.js": {

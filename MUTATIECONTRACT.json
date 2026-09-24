@@ -1,27 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-24T07:10:06.185Z",
-  "commit": "c3b218b1",
+  "op": "2026-09-24T20:22:49.755Z",
+  "commit": "fb602700f",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 4,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5021,
+  "totaal": 5023,
   "geclassificeerd": 5021,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1211,
    "PROTECTED": 481,
-   "INTENTIONALLY_NON_IDEMPOTENT": 139
+   "INTENTIONALLY_NON_IDEMPOTENT": 139,
+   "LEGACY_PENDING_CLASSIFICATION": 2
   },
   "vastgesteldDoorMens": 1880,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4131,
+   "AUTHENTICATED": 4133,
    "PUBLIC": 124,
    "OBJECT_SCOPED": 745,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +33,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 49
+   "niet gemeten": 51
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -44225,6 +44226,44 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "member.magnaat.leven.actie",
+   "route": "POST /api/member/magnaat/leven/actie",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "member.magnaat.leven.staat",
+   "route": "POST /api/member/magnaat/leven/staat",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "member.magnaat.overzicht",

@@ -1,0 +1,3457 @@
+{
+ "uitleg": "Vingerafdrukken per stap van de Magnaat-economie VOOR ronde A1, gemaakt met scripts/magnaat-gouden.js tegen server/kern/magnaat-economie.js (laatste wijziging bfa6853b). test/magnaat-economische-motor.test.js eist dat de nieuwe motor dezelfde afdrukken geeft. Niet opnieuw uit de nieuwe code schrijven: dan vergelijkt de motor zichzelf.",
+ "bron": "server/kern/magnaat-economie.js",
+ "bronCommit": "bfa6853b",
+ "scenarios": {
+  "rustig": [
+   {
+    "stap": "start",
+    "hash": "9f173e2a13eea091b1a694be"
+   },
+   {
+    "stap": 1,
+    "soort": "dag",
+    "dag": 1,
+    "posten": 15,
+    "hash": "a1985c071db0881f06cd712d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "91b3900a40d66eca77898270",
+     "overzicht": "c98675efacf22dd9f917bfd5",
+     "posten": "6aaeb92f5e7e144057b05b59"
+    }
+   },
+   {
+    "stap": 2,
+    "soort": "dag",
+    "dag": 2,
+    "posten": 15,
+    "hash": "e2773c8e58716cb6ab36a05a",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "5d016e73af2507ab21a4d6ea",
+     "overzicht": "2627ebae6647b542a9d52f5d",
+     "posten": "054068d3edc4c2934e445a5f"
+    }
+   },
+   {
+    "stap": 3,
+    "soort": "dag",
+    "dag": 3,
+    "posten": 15,
+    "hash": "e6ab63be7d1c7b68ae56e73c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "253869043b14e3061dee882a",
+     "overzicht": "25e7cb0b9c0051d777d01905",
+     "posten": "ed883c003e27d63bdcba9138"
+    }
+   },
+   {
+    "stap": 4,
+    "soort": "dag",
+    "dag": 4,
+    "posten": 15,
+    "hash": "6743418cf6c5b3627c9270af",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "8e6527d0cbbe110b05938120",
+     "overzicht": "c9b369b27fbd7136e3e0bc1f",
+     "posten": "522856583dc11238aead9557"
+    }
+   },
+   {
+    "stap": 5,
+    "soort": "dag",
+    "dag": 5,
+    "posten": 15,
+    "hash": "ae99a9c8d7b07bbcac3f0aee",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "5191dfae627ef8dfd30869bd",
+     "overzicht": "919828fb302e5ae09558e944",
+     "posten": "0829766d0dcf2d697a18a7ec"
+    }
+   },
+   {
+    "stap": 6,
+    "soort": "dag",
+    "dag": 6,
+    "posten": 15,
+    "hash": "3f8f0fc3bba429e228283aa3",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "22204508c0b9a62ea4336c84",
+     "overzicht": "a4cf3e894fafcdcadb46a8b3",
+     "posten": "04fa0bd2b1c8343a9e0660dc"
+    }
+   },
+   {
+    "stap": 7,
+    "soort": "dag",
+    "dag": 7,
+    "posten": 15,
+    "hash": "dbd19a98d31a45d3bb08cc01",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "46485764c65d24b3edad910d",
+     "overzicht": "795def0a6a6efc16a0263b74",
+     "posten": "765f7d6a66842882bbd65366"
+    }
+   },
+   {
+    "stap": 8,
+    "soort": "dag",
+    "dag": 8,
+    "posten": 15,
+    "hash": "3e8a01cad569bda067c43c65",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "58c8ee005ebe07e986faa178",
+     "overzicht": "fb64e4f15c923fff8198d7a2",
+     "posten": "cc15e781c6c84d7c141caf53"
+    }
+   },
+   {
+    "stap": 9,
+    "soort": "dag",
+    "dag": 9,
+    "posten": 15,
+    "hash": "6fed5951f440526a5de874a2",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "416dcd97f26eb1eed471cc59",
+     "overzicht": "46c92114e47886244bd4c67a",
+     "posten": "dddc1a1cf9ec3d0f4255864c"
+    }
+   },
+   {
+    "stap": 10,
+    "soort": "dag",
+    "dag": 10,
+    "posten": 15,
+    "hash": "6517c96d31b32e9c865eba91",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "75ce9296a89b0057f5e660ee",
+     "overzicht": "172497c53ae75e45a88f4998",
+     "posten": "dea8d95893aa98052804c78f"
+    }
+   },
+   {
+    "stap": 11,
+    "soort": "dag",
+    "dag": 11,
+    "posten": 15,
+    "hash": "cfeaf612c994479e97bffb19",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "914cc07ba95c984d016ce40f",
+     "overzicht": "d6f0d9379b36310d7f7f1aec",
+     "posten": "6c3a0cbf1ba068667159bfec"
+    }
+   },
+   {
+    "stap": 12,
+    "soort": "dag",
+    "dag": 12,
+    "posten": 15,
+    "hash": "123aa9721171ba1794f6f90e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "90b03c7f06ac24556ba75754",
+     "overzicht": "59492b527c89e7adfbfeb77e",
+     "posten": "3dce2a94557154b3907f2eb3"
+    }
+   },
+   {
+    "stap": 13,
+    "soort": "dag",
+    "dag": 13,
+    "posten": 15,
+    "hash": "490d1c0a46a9f05a769b269d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "07c151768df7666cbef53735",
+     "overzicht": "edf1be1e09a296d6922c6ccc",
+     "posten": "2755ba7a2c963cd265b27e15"
+    }
+   },
+   {
+    "stap": 14,
+    "soort": "dag",
+    "dag": 14,
+    "posten": 15,
+    "hash": "b5fe5e53e26ec3a1565376c0",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "036905f23192ef69537197f1",
+     "overzicht": "0c38f87e1aee3bf1596a8d88",
+     "posten": "c426475e06af2b3994389e33"
+    }
+   },
+   {
+    "stap": 15,
+    "soort": "dag",
+    "dag": 15,
+    "posten": 15,
+    "hash": "3b132906e10ef885192ef8bb",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d5a1ad07b29df7778b2600fe",
+     "overzicht": "3c927fa40c9937eec289285a",
+     "posten": "1109db8c3f614557f15213e3"
+    }
+   },
+   {
+    "stap": 16,
+    "soort": "dag",
+    "dag": 16,
+    "posten": 15,
+    "hash": "068ab204c836e2a3306b5418",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ab3214d2511bd02f3ff4769c",
+     "overzicht": "e061ce4b7b59f37b008de3b0",
+     "posten": "af4e194d908df23153b18b26"
+    }
+   },
+   {
+    "stap": 17,
+    "soort": "dag",
+    "dag": 17,
+    "posten": 15,
+    "hash": "498824b9582ef1c1fbdf667f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2f4e5c7eef2fa508afbf1b8b",
+     "overzicht": "3c5fc230672761319d561aa8",
+     "posten": "8ce536608db447eba4d45fc6"
+    }
+   },
+   {
+    "stap": 18,
+    "soort": "dag",
+    "dag": 18,
+    "posten": 15,
+    "hash": "f0f0ac99b3b08d2dc52409bd",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "f84a4ec2ef4b253e6efb831d",
+     "overzicht": "e804f706c32cfc7ff3c4660a",
+     "posten": "541e315663ab4705e89300e9"
+    }
+   },
+   {
+    "stap": 19,
+    "soort": "dag",
+    "dag": 19,
+    "posten": 15,
+    "hash": "43270db12d9c23f5d0ef4d91",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "0229fdfe234fa8126582a678",
+     "overzicht": "cf20d1e39db97b3a1fc95a9d",
+     "posten": "28680b6ba32602110b45582b"
+    }
+   },
+   {
+    "stap": 20,
+    "soort": "dag",
+    "dag": 20,
+    "posten": 15,
+    "hash": "71231f0110042ab432ba47fc",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "9a7e9f22406bb0c7349a4451",
+     "overzicht": "d174d3e9c2289d95891bd917",
+     "posten": "6471e32af7e9489eaa895e9a"
+    }
+   },
+   {
+    "stap": 21,
+    "soort": "dag",
+    "dag": 21,
+    "posten": 15,
+    "hash": "d11c9cb1b99e93626e5019dc",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "fbd37db308220c2f307104f1",
+     "overzicht": "6cdc383727d1733d16a2e52e",
+     "posten": "91e4e3a5551c10909ac3ac0a"
+    }
+   },
+   {
+    "stap": 22,
+    "soort": "dag",
+    "dag": 22,
+    "posten": 15,
+    "hash": "10310a0f79b56a0771b4a662",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "5f1572f4b9c7f8de67475f04",
+     "overzicht": "d6f1be1636ae75215871c474",
+     "posten": "2c7bce1407e2b22938e742e2"
+    }
+   },
+   {
+    "stap": 23,
+    "soort": "dag",
+    "dag": 23,
+    "posten": 15,
+    "hash": "276b812252ba3a596fb08b41",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "be0924ae363468a46e27343b",
+     "overzicht": "be8bf47b252ed1a4003d94b0",
+     "posten": "ed9e16945867becf29d5e66b"
+    }
+   },
+   {
+    "stap": 24,
+    "soort": "dag",
+    "dag": 24,
+    "posten": 15,
+    "hash": "3272517ab9ef857cb0f4ef45",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2e40632ed533fc932b3a4e23",
+     "overzicht": "cd14771020ef98585a73c6c5",
+     "posten": "1a8df6e99154a1878fb38484"
+    }
+   },
+   {
+    "stap": 25,
+    "soort": "dag",
+    "dag": 25,
+    "posten": 15,
+    "hash": "2aa93f6d738c7eb96271fa8f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "de93852a70e5b040d60196b5",
+     "overzicht": "631cd87cf28167746570b117",
+     "posten": "360665be3c981c766deccdcb"
+    }
+   },
+   {
+    "stap": 26,
+    "soort": "dag",
+    "dag": 26,
+    "posten": 15,
+    "hash": "bc97c5921f1f315197b33518",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "dfc75d4faf9769300241033c",
+     "overzicht": "db27ac9352204e84cc29fa9d",
+     "posten": "f5809b5a8e795090875c25b2"
+    }
+   },
+   {
+    "stap": 27,
+    "soort": "dag",
+    "dag": 27,
+    "posten": 15,
+    "hash": "807b1cc18f3f282151df1f54",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "caa8d477d5ebb58919bafa8c",
+     "overzicht": "6c2c6c7434f2bee6661785e2",
+     "posten": "4c5777b7dc548ea55de2a16d"
+    }
+   },
+   {
+    "stap": 28,
+    "soort": "dag",
+    "dag": 28,
+    "posten": 15,
+    "hash": "9c929aa0cc02f4c72352bcf7",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "b8ca8fc050ec98f93d21cf6a",
+     "overzicht": "42e30a900c6fec578e218b4b",
+     "posten": "e96ab1d7af323c2876eda174"
+    }
+   },
+   {
+    "stap": 29,
+    "soort": "dag",
+    "dag": 29,
+    "posten": 15,
+    "hash": "12507251fe3ab0d0ec02ef26",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "f82b1d64664c8e633f6a2c2d",
+     "overzicht": "f0460326f8e0a6b5dfdd01bc",
+     "posten": "82d5812e332c646730b079dd"
+    }
+   },
+   {
+    "stap": 30,
+    "soort": "dag",
+    "dag": 30,
+    "posten": 15,
+    "hash": "c6a3de34da7bd266aecfb260",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "730a932f0f08f1ccbe751a88",
+     "overzicht": "f4ea2af4001ec4cf6885edfc",
+     "posten": "ec73e7fd471a992a8c7f0907"
+    }
+   }
+  ],
+  "besluiten": [
+   {
+    "stap": "start",
+    "hash": "9f173e2a13eea091b1a694be"
+   },
+   {
+    "stap": 1,
+    "soort": "dag",
+    "dag": 1,
+    "posten": 15,
+    "hash": "a1985c071db0881f06cd712d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "91b3900a40d66eca77898270",
+     "overzicht": "c98675efacf22dd9f917bfd5",
+     "posten": "6aaeb92f5e7e144057b05b59"
+    }
+   },
+   {
+    "stap": 2,
+    "soort": "beslis",
+    "dag": 1,
+    "posten": 0,
+    "hash": "7bd0e6891759cf30a6992aaa",
+    "delen": {
+     "antwoord": "4a06bc2674c8d582489d9b2f",
+     "saldi": "91b3900a40d66eca77898270",
+     "overzicht": "87bdef39aa99ee7e226d5c42",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 3,
+    "soort": "werk",
+    "dag": 1,
+    "posten": 0,
+    "hash": "7e7a4f8c20c54d0a87aeb9b9",
+    "delen": {
+     "antwoord": "a6f7c118e1db4596e985ebec",
+     "saldi": "91b3900a40d66eca77898270",
+     "overzicht": "909f0e46e57beb2d3f0f64e3",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 4,
+    "soort": "werk",
+    "dag": 1,
+    "posten": 0,
+    "hash": "9db2d22a1c7bc976684e7b4b",
+    "delen": {
+     "antwoord": "1cca187641fc72cfb6d42dc7",
+     "saldi": "91b3900a40d66eca77898270",
+     "overzicht": "7260ef6094f912a744a2a2be",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 5,
+    "soort": "dag",
+    "dag": 2,
+    "posten": 14,
+    "hash": "562cb0803314b2c0f125daa0",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "985b09549614fe82f66046e6",
+     "overzicht": "43d3baaffaf1b4858e9c7ff6",
+     "posten": "1394d2349649463a55737380"
+    }
+   },
+   {
+    "stap": 6,
+    "soort": "dag",
+    "dag": 2,
+    "posten": 0,
+    "hash": "29fa0877f32f73965a30eb67",
+    "delen": {
+     "antwoord": "878ac908ac24b65ed092261b",
+     "saldi": "985b09549614fe82f66046e6",
+     "overzicht": "43d3baaffaf1b4858e9c7ff6",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 7,
+    "soort": "schok",
+    "dag": 2,
+    "posten": 0,
+    "hash": "d377c1ec1ef4ba5c8ceadbeb",
+    "delen": {
+     "antwoord": "4a06bc2674c8d582489d9b2f",
+     "saldi": "985b09549614fe82f66046e6",
+     "overzicht": "abfde05c0cf4e16db5aa5748",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 8,
+    "soort": "werk",
+    "dag": 2,
+    "posten": 0,
+    "hash": "137cb1bbeb9fa3cc553169cb",
+    "delen": {
+     "antwoord": "8ebfde86d56d98e15ee7fb67",
+     "saldi": "985b09549614fe82f66046e6",
+     "overzicht": "8ee6ea04a8cc5d56046e13a5",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 9,
+    "soort": "werk",
+    "dag": 2,
+    "posten": 0,
+    "hash": "c7f4ed1c9f4de63c7245c408",
+    "delen": {
+     "antwoord": "4d8fec084ef7db2754a5bd70",
+     "saldi": "985b09549614fe82f66046e6",
+     "overzicht": "5c966bc6883d459e02e8ae13",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 10,
+    "soort": "dag",
+    "dag": 3,
+    "posten": 14,
+    "hash": "20ee0201f648b395138424db",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "51251604c62fa807be34bc41",
+     "overzicht": "82b1f88673ec8eca9d54ad0e",
+     "posten": "9fd297d387c3da8863c898f5"
+    }
+   },
+   {
+    "stap": 11,
+    "soort": "beslis",
+    "dag": 3,
+    "posten": 1,
+    "hash": "b2216a2d6237565745d635c4",
+    "delen": {
+     "antwoord": "4a06bc2674c8d582489d9b2f",
+     "saldi": "a9903c5a694b36127c9c5dd5",
+     "overzicht": "f82d761452cd4f15dbcb6530",
+     "posten": "72a9574bbe148396cbd5ff2c"
+    }
+   },
+   {
+    "stap": 12,
+    "soort": "beslis",
+    "dag": 3,
+    "posten": 0,
+    "hash": "07e3dc2511d8c358973ffa39",
+    "delen": {
+     "antwoord": "3e2b4d84bb3d926ced476e74",
+     "saldi": "a9903c5a694b36127c9c5dd5",
+     "overzicht": "f82d761452cd4f15dbcb6530",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 13,
+    "soort": "beslis",
+    "dag": 3,
+    "posten": 0,
+    "hash": "34c158cc16aec91c2567d239",
+    "delen": {
+     "antwoord": "479d8a5e03e4e2624c90c2e5",
+     "saldi": "a9903c5a694b36127c9c5dd5",
+     "overzicht": "f82d761452cd4f15dbcb6530",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 14,
+    "soort": "analyse",
+    "dag": 3,
+    "posten": 0,
+    "hash": "88217a540ca18da204d8b559",
+    "delen": {
+     "antwoord": "4a06bc2674c8d582489d9b2f",
+     "saldi": "a9903c5a694b36127c9c5dd5",
+     "overzicht": "f82d761452cd4f15dbcb6530",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 15,
+    "soort": "dag",
+    "dag": 4,
+    "posten": 15,
+    "hash": "2f2efc933bc5228dca617677",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "1d3a66f13b409ff6b66ed230",
+     "overzicht": "fec446ea66aacef07842e992",
+     "posten": "49480e820e3da26a22f16fc7"
+    }
+   },
+   {
+    "stap": 16,
+    "soort": "schok",
+    "dag": 4,
+    "posten": 0,
+    "hash": "d1a2bf346ad895400a0ac1c4",
+    "delen": {
+     "antwoord": "4a06bc2674c8d582489d9b2f",
+     "saldi": "1d3a66f13b409ff6b66ed230",
+     "overzicht": "a6764835d75e4f63314e2d52",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 17,
+    "soort": "beslis",
+    "dag": 4,
+    "posten": 0,
+    "hash": "2b35c1102747ba16800694ff",
+    "delen": {
+     "antwoord": "4a06bc2674c8d582489d9b2f",
+     "saldi": "1d3a66f13b409ff6b66ed230",
+     "overzicht": "c91463f3e5ce4fc20d39a9c1",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 18,
+    "soort": "dag",
+    "dag": 5,
+    "posten": 15,
+    "hash": "b0e4823c7b340512556c2677",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3cfd7d675cdf8a5052f31dae",
+     "overzicht": "065585ab79e8103c767e5f7f",
+     "posten": "39ce3e56a4f2aeefcc9ae563"
+    }
+   },
+   {
+    "stap": 19,
+    "soort": "dag",
+    "dag": 6,
+    "posten": 15,
+    "hash": "6abb1d683d65193af62611c4",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "54affb3fa930709e0295d68e",
+     "overzicht": "c222e5e6c7970eb9a77ac545",
+     "posten": "424a2a27526f9566e2088279"
+    }
+   },
+   {
+    "stap": 20,
+    "soort": "dag",
+    "dag": 7,
+    "posten": 14,
+    "hash": "9ffb3fdd9daf8736c597b556",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "81b6174658933aa3ab26bf4c",
+     "overzicht": "7cfa919ebf9f675e4ed28e54",
+     "posten": "8f6bfdb35e15b86dda8fbcf5"
+    }
+   },
+   {
+    "stap": 21,
+    "soort": "dag",
+    "dag": 8,
+    "posten": 11,
+    "hash": "77ccb5b51ad4373ec16bace5",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "08872a7e6a374dd391847b7e",
+     "overzicht": "39cd60a58ef9391adad26c39",
+     "posten": "9c1de139750e4fb28418cd23"
+    }
+   },
+   {
+    "stap": 22,
+    "soort": "dag",
+    "dag": 9,
+    "posten": 11,
+    "hash": "b0d675328e6e174cad122300",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "995e94ecdd9fca6a0e0fbc2f",
+     "overzicht": "85a41dc981ce2082c077fa4e",
+     "posten": "28a267f1bce7a9d2a72a86c7"
+    }
+   },
+   {
+    "stap": 23,
+    "soort": "dag",
+    "dag": 10,
+    "posten": 11,
+    "hash": "c67a0184a19db58b2fe77c0c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a3f06e3f2af68a0289ea77e0",
+     "overzicht": "39a0c9204c8ed346b2228cf2",
+     "posten": "e1fd784c760ab7a1bd18f576"
+    }
+   },
+   {
+    "stap": 24,
+    "soort": "dag",
+    "dag": 11,
+    "posten": 11,
+    "hash": "94fbdc95ff0bf63a81a13c90",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4af3a172b076a54ee40ecd42",
+     "overzicht": "4292988e78aa4883c4d621fb",
+     "posten": "1f06c7a0488674a63bf12dfb"
+    }
+   },
+   {
+    "stap": 25,
+    "soort": "dag",
+    "dag": 12,
+    "posten": 11,
+    "hash": "f499b4efe6937cb355ddb75b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "738b258be98cb74a1100f816",
+     "overzicht": "74a29af833acccff254419b8",
+     "posten": "975daa2f1a3cfecc1f55859b"
+    }
+   },
+   {
+    "stap": 26,
+    "soort": "dag",
+    "dag": 13,
+    "posten": 11,
+    "hash": "41d63313ea92f4879e2dad18",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "bc6b2cf3381e030600962446",
+     "overzicht": "6d225af4856cd64c80276dde",
+     "posten": "b0f74df46e9f41fd13a86faf"
+    }
+   },
+   {
+    "stap": 27,
+    "soort": "dag",
+    "dag": 14,
+    "posten": 11,
+    "hash": "bec50965f17e2cf29dae5890",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c2872ee0305b1cdab27cf113",
+     "overzicht": "e6b6d8169dc9b4cdd139e142",
+     "posten": "94975451a51fbdca9594892e"
+    }
+   },
+   {
+    "stap": 28,
+    "soort": "dag",
+    "dag": 15,
+    "posten": 11,
+    "hash": "8f68ed450725e1c117346c6b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2fdfe120048532d1b4834e30",
+     "overzicht": "c1bc3ba2697ffac7d33a3ee1",
+     "posten": "d5e4daa52d7400873067ef79"
+    }
+   },
+   {
+    "stap": 29,
+    "soort": "dag",
+    "dag": 16,
+    "posten": 11,
+    "hash": "6a76ac3c6bbbbac50822294d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "93a749821463801f2aa3229a",
+     "overzicht": "c63c345529a162ddfc566e6a",
+     "posten": "0490f6230c7dd074ee8003bb"
+    }
+   },
+   {
+    "stap": 30,
+    "soort": "werk",
+    "dag": 16,
+    "posten": 0,
+    "hash": "6cc7ac7e5717644bfbc09b1a",
+    "delen": {
+     "antwoord": "0a1c9166c2680d73df674acd",
+     "saldi": "93a749821463801f2aa3229a",
+     "overzicht": "4518289cec14236564f3c9c7",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 31,
+    "soort": "werk",
+    "dag": 16,
+    "posten": 0,
+    "hash": "ae185b1824cfd4952476290b",
+    "delen": {
+     "antwoord": "8caa2cdd955646a51f8a0d35",
+     "saldi": "93a749821463801f2aa3229a",
+     "overzicht": "df6fd4bd1810dd3ee4fd911d",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 32,
+    "soort": "dag",
+    "dag": 17,
+    "posten": 11,
+    "hash": "0bbaa863093a22cbf4d2f505",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "848e45455e6c9fd94eb003cf",
+     "overzicht": "f842bb2cac66510539f46b17",
+     "posten": "383d0cef45eeee88fc40264e"
+    }
+   }
+  ],
+  "lang": [
+   {
+    "stap": "start",
+    "hash": "0bee894cf8df2a3b9d0c564c"
+   },
+   {
+    "stap": 1,
+    "soort": "beslis",
+    "dag": 0,
+    "posten": 0,
+    "hash": "a42da197acf287fb770d55d5",
+    "delen": {
+     "antwoord": "4a06bc2674c8d582489d9b2f",
+     "saldi": "dc79c88a76d910c091b2c34e",
+     "overzicht": "090f4981f0234426dedfc9b4",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 2,
+    "soort": "dag",
+    "dag": 1,
+    "posten": 14,
+    "hash": "13a8b348bc5bb5ad01392790",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4f26468ecae0e9a4a783f477",
+     "overzicht": "db6e79f3043f8dc25b6ca836",
+     "posten": "0ab6d1c6c7bcd22156c4eebe"
+    }
+   },
+   {
+    "stap": 3,
+    "soort": "dag",
+    "dag": 2,
+    "posten": 14,
+    "hash": "d12ed2629cd2b8dd0d2cdc22",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2c799a4cef7d52c463df3d65",
+     "overzicht": "f7b810183462e61ba6feb195",
+     "posten": "c9969a765e0505af5b23171f"
+    }
+   },
+   {
+    "stap": 4,
+    "soort": "dag",
+    "dag": 3,
+    "posten": 14,
+    "hash": "438d7211a42c40f1f20c794f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a29f338285341b87a8aab1e2",
+     "overzicht": "48f5b17c34fd1c383ecada45",
+     "posten": "b390912a1fb7121ce2b9d761"
+    }
+   },
+   {
+    "stap": 5,
+    "soort": "dag",
+    "dag": 4,
+    "posten": 14,
+    "hash": "986754ba0f6a38f364475e37",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c00f74becfa4adbb6a19cc94",
+     "overzicht": "9b523a81975cda73e3fd50b1",
+     "posten": "fd0e4f17ea650ba989e6d5f7"
+    }
+   },
+   {
+    "stap": 6,
+    "soort": "dag",
+    "dag": 5,
+    "posten": 14,
+    "hash": "f1a0c0bbc7d802dfe08ce227",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "13d6fcda1bc796f88d903ef6",
+     "overzicht": "932753c2b136fc42b5723cb1",
+     "posten": "667bf44773f9ea07ba112c1e"
+    }
+   },
+   {
+    "stap": 7,
+    "soort": "dag",
+    "dag": 6,
+    "posten": 14,
+    "hash": "43551eed149f859dcdc7302e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c23b5d824c07e3e744ef0d10",
+     "overzicht": "3104364b9d692ddd11ad0805",
+     "posten": "0ebd47547128709cfec1490a"
+    }
+   },
+   {
+    "stap": 8,
+    "soort": "dag",
+    "dag": 7,
+    "posten": 14,
+    "hash": "888cfcc4a20568a854c1b9fb",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2409b42d368ad313965843fd",
+     "overzicht": "e623cde7821f0318bbde23e9",
+     "posten": "4b9185acd791ca82799d986b"
+    }
+   },
+   {
+    "stap": 9,
+    "soort": "dag",
+    "dag": 8,
+    "posten": 14,
+    "hash": "1f0673969aa360c8f6296229",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d573de572536a73c434a11fa",
+     "overzicht": "91ecf8575f19f97f066d5738",
+     "posten": "f42a7568db585587c34f81be"
+    }
+   },
+   {
+    "stap": 10,
+    "soort": "dag",
+    "dag": 9,
+    "posten": 14,
+    "hash": "30f16993e525f4f403d49e1b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "819cc18e5c2992b207df15a3",
+     "overzicht": "4d8605269897af0b9848d99c",
+     "posten": "062e901c5bdbcbdcf5288a3f"
+    }
+   },
+   {
+    "stap": 11,
+    "soort": "dag",
+    "dag": 10,
+    "posten": 14,
+    "hash": "e9fab3d1ff4f945ad8a1b95a",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "b433f9129efa47d0ee767cd9",
+     "overzicht": "6150d12af21561107e9da1ea",
+     "posten": "e189fdbabd0bf4039769f2f0"
+    }
+   },
+   {
+    "stap": 12,
+    "soort": "dag",
+    "dag": 11,
+    "posten": 14,
+    "hash": "b7919b75ec54c38e17798f7a",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a1f929e67864ad81b5172f11",
+     "overzicht": "c69983170a9c80beb1a62c8b",
+     "posten": "1a9754164fc3c1348d1a7460"
+    }
+   },
+   {
+    "stap": 13,
+    "soort": "dag",
+    "dag": 12,
+    "posten": 14,
+    "hash": "421af6468ce3d7ac44ec0f4a",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "bd5774c684c9c3471ace1c03",
+     "overzicht": "caeb432ece0290ac81ec6b06",
+     "posten": "c77560206ee598170946d159"
+    }
+   },
+   {
+    "stap": 14,
+    "soort": "dag",
+    "dag": 13,
+    "posten": 14,
+    "hash": "31e1d7305ad617851a6354d3",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ab011e6d40fda9ba8276efeb",
+     "overzicht": "d8631125f808e1d60375acb3",
+     "posten": "44ab1fd50c3baf8840c10b90"
+    }
+   },
+   {
+    "stap": 15,
+    "soort": "dag",
+    "dag": 14,
+    "posten": 14,
+    "hash": "c7857dc55796d2a492d28782",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "be67b62080e684870a333e20",
+     "overzicht": "3be77af1f6749518f2410f26",
+     "posten": "bec37da9788d6c0e0d717a4f"
+    }
+   },
+   {
+    "stap": 16,
+    "soort": "dag",
+    "dag": 15,
+    "posten": 14,
+    "hash": "7406ab13ae8bb325e2d9dce4",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "571d3005e966f88fe9e72903",
+     "overzicht": "8c0140e91767ef46d261bde1",
+     "posten": "0b892a39f892fbad76e9fc90"
+    }
+   },
+   {
+    "stap": 17,
+    "soort": "dag",
+    "dag": 16,
+    "posten": 14,
+    "hash": "9245df88875649c61961009b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3f2dbf3fe8241976eb055e74",
+     "overzicht": "54577ad4c16a6b235b716f94",
+     "posten": "9c67a7e2492427c48b427e9f"
+    }
+   },
+   {
+    "stap": 18,
+    "soort": "dag",
+    "dag": 17,
+    "posten": 14,
+    "hash": "2bd4b04da23ca5ddab1ba972",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "cfa78e1356210d68c509cfb7",
+     "overzicht": "530df89c914cdedd41ae3693",
+     "posten": "4941d1385cbeea11cac9c681"
+    }
+   },
+   {
+    "stap": 19,
+    "soort": "dag",
+    "dag": 18,
+    "posten": 15,
+    "hash": "7c03e9aac652f7bcbb4b3325",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "b43d137592ed013af94408f8",
+     "overzicht": "9d2c3df239dad45007dfa013",
+     "posten": "5666081509cf3fee26d99339"
+    }
+   },
+   {
+    "stap": 20,
+    "soort": "dag",
+    "dag": 19,
+    "posten": 15,
+    "hash": "0783dde49b0049d3e4b368dc",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "dcb73ffe5bac2a55cec68137",
+     "overzicht": "f64c701d7ad2fd0eaf9b88aa",
+     "posten": "e306d51cc0d473ec144d104a"
+    }
+   },
+   {
+    "stap": 21,
+    "soort": "dag",
+    "dag": 20,
+    "posten": 15,
+    "hash": "80ff4701a52213b1781a4a2d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "7eb49822ecd6ab699302056e",
+     "overzicht": "e0d324cbddf92c7473f3afd3",
+     "posten": "e525aad3368a39d626264415"
+    }
+   },
+   {
+    "stap": 22,
+    "soort": "dag",
+    "dag": 21,
+    "posten": 16,
+    "hash": "39213bbb1bc714c446c01aac",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "52e660c33a5d1fe9e1516bfd",
+     "overzicht": "366479c3335e01e02b9717a6",
+     "posten": "9e9a3e04e6df6b7080f1c868"
+    }
+   },
+   {
+    "stap": 23,
+    "soort": "dag",
+    "dag": 22,
+    "posten": 15,
+    "hash": "2b5d7daaecb977123d13d42b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "19c350de3c40b2a90bee025e",
+     "overzicht": "7e33d8cf57cc18315a8223df",
+     "posten": "6fa6485a5c47c618460a5e95"
+    }
+   },
+   {
+    "stap": 24,
+    "soort": "dag",
+    "dag": 23,
+    "posten": 15,
+    "hash": "fec45bed21c62ede2523454e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "7390c3132e9187cc832544f2",
+     "overzicht": "7e0d1711c0e560b120d2e8c0",
+     "posten": "df5f535c8aa586423c0cddb5"
+    }
+   },
+   {
+    "stap": 25,
+    "soort": "dag",
+    "dag": 24,
+    "posten": 16,
+    "hash": "cce8533861e4173a6f11015b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ed6899f39fda453ec3a61a1d",
+     "overzicht": "488a99c602e4f693a2696192",
+     "posten": "7ca924d5b3e946913a1fc1f0"
+    }
+   },
+   {
+    "stap": 26,
+    "soort": "dag",
+    "dag": 25,
+    "posten": 15,
+    "hash": "9b3d549b4e2ed9019561a313",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c3cd5782b13bf18a26946bd7",
+     "overzicht": "7826ecbf282ef153826a3d4b",
+     "posten": "0e1e9c2cc206dfa54dbdd3dc"
+    }
+   },
+   {
+    "stap": 27,
+    "soort": "dag",
+    "dag": 26,
+    "posten": 15,
+    "hash": "a1b375103d60f0d837aad677",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "49c56746f8dfbb324fc0f65d",
+     "overzicht": "7c9178a3b125554aaea4726c",
+     "posten": "cf57bc99238489def561ca26"
+    }
+   },
+   {
+    "stap": 28,
+    "soort": "dag",
+    "dag": 27,
+    "posten": 16,
+    "hash": "55b8f760254608d6a7ef1432",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "764fcabca18d0c9b926ba594",
+     "overzicht": "7a416cb2414c7006c8f7aa08",
+     "posten": "2b2620d6c76e000d84b047d5"
+    }
+   },
+   {
+    "stap": 29,
+    "soort": "dag",
+    "dag": 28,
+    "posten": 15,
+    "hash": "4e8b538e6a73d76d650011cf",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c4486ef263ccbd0b0a66461a",
+     "overzicht": "11fd981225c19cc4ff320290",
+     "posten": "06bd1080fc8e8a0819907ada"
+    }
+   },
+   {
+    "stap": 30,
+    "soort": "dag",
+    "dag": 29,
+    "posten": 15,
+    "hash": "60d4d8872b9cddbe314b7702",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "bdd65e3f5cf4d016614ba1bc",
+     "overzicht": "fbfb091211d5d2886a0c8063",
+     "posten": "35596b39f7e87fd81c3fe2fd"
+    }
+   },
+   {
+    "stap": 31,
+    "soort": "dag",
+    "dag": 30,
+    "posten": 16,
+    "hash": "1c400f4784a22fb5847c56d8",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "66cfb238661db6c654e4e090",
+     "overzicht": "17ae3b7036ea94caf491fea2",
+     "posten": "993bdd9af85befb4a0494b99"
+    }
+   },
+   {
+    "stap": 32,
+    "soort": "dag",
+    "dag": 31,
+    "posten": 15,
+    "hash": "1001dec92054f3b133829bd8",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "8780c27c17548e1004ed982a",
+     "overzicht": "4d7c2e4d570d36cc08449dfd",
+     "posten": "1e1acf334cae58ebe12c25df"
+    }
+   },
+   {
+    "stap": 33,
+    "soort": "dag",
+    "dag": 32,
+    "posten": 15,
+    "hash": "10418887dc42b6a999657343",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "f2ab49a2b9402ea55262ca22",
+     "overzicht": "b22f76b261a37049ec013e5f",
+     "posten": "80de19df80259af537e0cd70"
+    }
+   },
+   {
+    "stap": 34,
+    "soort": "dag",
+    "dag": 33,
+    "posten": 16,
+    "hash": "539fdd8675e75bf114602d71",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "53e9212b39b7df3062a72c1f",
+     "overzicht": "b7370fb4b63956d901d13823",
+     "posten": "f84054a2e0ab81ce3ad55b4d"
+    }
+   },
+   {
+    "stap": 35,
+    "soort": "dag",
+    "dag": 34,
+    "posten": 15,
+    "hash": "b21e8b131b0ef0d7c34603d7",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "036210df81bfa3949219568f",
+     "overzicht": "48ac96165c403207ef1532a9",
+     "posten": "6091f9c6bf24338e04b14a31"
+    }
+   },
+   {
+    "stap": 36,
+    "soort": "dag",
+    "dag": 35,
+    "posten": 15,
+    "hash": "0408a8868395de9f733562e2",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2fcea18a4c08498e4b2bd8f1",
+     "overzicht": "462d38a810f1535ff52ce75e",
+     "posten": "cd9a3820a45692f8276ddd6e"
+    }
+   },
+   {
+    "stap": 37,
+    "soort": "dag",
+    "dag": 36,
+    "posten": 16,
+    "hash": "2e17adeecb32afc6e7aa0f19",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c00aa50a985587d5a4299369",
+     "overzicht": "6e22b504fe392fd533e857e7",
+     "posten": "789fa2c0f7e971fd3c34f010"
+    }
+   },
+   {
+    "stap": 38,
+    "soort": "dag",
+    "dag": 37,
+    "posten": 15,
+    "hash": "fd3ecef2779fc35bca21a220",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "fc11b2baaf1bd8a1c064d353",
+     "overzicht": "04fd18da5245fc4c4ebf7091",
+     "posten": "cc83f0ace4010f2b7a5d7b30"
+    }
+   },
+   {
+    "stap": 39,
+    "soort": "dag",
+    "dag": 38,
+    "posten": 15,
+    "hash": "34557d7413752693c7e5a9e3",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "784d71e5cb882981c569c1ad",
+     "overzicht": "8c67d8cdeaa65855ee6a565d",
+     "posten": "c1bcee442ed1fe5aaf50b283"
+    }
+   },
+   {
+    "stap": 40,
+    "soort": "dag",
+    "dag": 39,
+    "posten": 16,
+    "hash": "8497f7f191eeae0cedd14faa",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a40d7de8a754118212c7346b",
+     "overzicht": "4d45d5e114c014a4f4d61474",
+     "posten": "2205bee6886c3e1155ff6293"
+    }
+   },
+   {
+    "stap": 41,
+    "soort": "dag",
+    "dag": 40,
+    "posten": 15,
+    "hash": "9f80cf861438c5fca8a4adbe",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "5ef8b6fe0678ecab6a7d980e",
+     "overzicht": "53619779c4453b93c0b40e62",
+     "posten": "abc56fab65dd38d262f05900"
+    }
+   },
+   {
+    "stap": 42,
+    "soort": "dag",
+    "dag": 41,
+    "posten": 15,
+    "hash": "dfabfe8b1ff5b47efbe010f3",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2987c1441a215098143cc045",
+     "overzicht": "f3a93c736e2a89a33988cd78",
+     "posten": "0a8162e0115a3e7378d22c64"
+    }
+   },
+   {
+    "stap": 43,
+    "soort": "dag",
+    "dag": 42,
+    "posten": 16,
+    "hash": "11f706aa26bca40bcf106b11",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ed5360fcfc2058dd948eb844",
+     "overzicht": "86cc60bb9b0ceb62ade1784e",
+     "posten": "661769dfc2e7b4df86f8af02"
+    }
+   },
+   {
+    "stap": 44,
+    "soort": "dag",
+    "dag": 43,
+    "posten": 15,
+    "hash": "af46192a20de925312e43b3f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c05510c11cfd092ef7d28228",
+     "overzicht": "34a1aca8d9924fc15a85e4ff",
+     "posten": "12aae61a5b7825d21c0f6787"
+    }
+   },
+   {
+    "stap": 45,
+    "soort": "dag",
+    "dag": 44,
+    "posten": 15,
+    "hash": "07ccf95df6c5d4c40ac61192",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "52a744d2f5ad5489339bae25",
+     "overzicht": "c2ee7198f951cfc6e6e30d9a",
+     "posten": "bc3bef7f04a003505d64f864"
+    }
+   },
+   {
+    "stap": 46,
+    "soort": "dag",
+    "dag": 45,
+    "posten": 16,
+    "hash": "e26ec829260d9721e980ef30",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "6ddef234d546e8c6436da171",
+     "overzicht": "40959d2d28c42d0047b99524",
+     "posten": "f37375b25f4e65ead3cfa6a9"
+    }
+   },
+   {
+    "stap": 47,
+    "soort": "dag",
+    "dag": 46,
+    "posten": 15,
+    "hash": "e139e79c56b5ced7ada25793",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4b6532ca9a318a2591c55d31",
+     "overzicht": "5b766c98e4d2e000eec7bb22",
+     "posten": "10d0549b58e35e68da1e498c"
+    }
+   },
+   {
+    "stap": 48,
+    "soort": "dag",
+    "dag": 47,
+    "posten": 15,
+    "hash": "8920815f0caacdae350267b8",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "6822a6031514a738486cc2b0",
+     "overzicht": "3846d23b097fb919354d6fdf",
+     "posten": "39e3dcd3f22d7ab40b02a66a"
+    }
+   },
+   {
+    "stap": 49,
+    "soort": "dag",
+    "dag": 48,
+    "posten": 16,
+    "hash": "2868f6a47e3c3b9618a1ddf0",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ea2dd1403112227e2791e8fb",
+     "overzicht": "2b41727e3c9b81d3e5954896",
+     "posten": "fabea880ffe9d62141c8f7c0"
+    }
+   },
+   {
+    "stap": 50,
+    "soort": "dag",
+    "dag": 49,
+    "posten": 15,
+    "hash": "c59e85321c03464e9742d182",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "26c4c7980b4d57b807677df8",
+     "overzicht": "9b6778505c7e3d2c841cf50a",
+     "posten": "3addb7cf2ec9a50889ebed00"
+    }
+   },
+   {
+    "stap": 51,
+    "soort": "dag",
+    "dag": 50,
+    "posten": 15,
+    "hash": "c850128b4b699cdd1f63354d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c7c49911a9fec4b9341b582f",
+     "overzicht": "71b71b9dc7aa986b6fd19a4e",
+     "posten": "8366236d0dc8bcdc443e2028"
+    }
+   },
+   {
+    "stap": 52,
+    "soort": "dag",
+    "dag": 51,
+    "posten": 16,
+    "hash": "6ebb9a4b67a9b5359eb4f1e5",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "fd3f4720e8c71423fb44e339",
+     "overzicht": "45fd4baae7fbf7af147d5c87",
+     "posten": "595472ffc1809789b5c6f7c4"
+    }
+   },
+   {
+    "stap": 53,
+    "soort": "dag",
+    "dag": 52,
+    "posten": 15,
+    "hash": "86307bc3fd883b627982adde",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "9c60d3de77f51a0bfd84963a",
+     "overzicht": "bee9a76850538cc2c39fa3b0",
+     "posten": "5d5646a2c3bd135917793dbe"
+    }
+   },
+   {
+    "stap": 54,
+    "soort": "dag",
+    "dag": 53,
+    "posten": 15,
+    "hash": "bca73a688171262361401b3e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d138770a099163ae78959dbe",
+     "overzicht": "9d3bcc3a94746190af26d86f",
+     "posten": "008c2b0c75afa95ce5b5b5ef"
+    }
+   },
+   {
+    "stap": 55,
+    "soort": "dag",
+    "dag": 54,
+    "posten": 15,
+    "hash": "971a998d99ce07ce45e0c963",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "9f00f688d0cc9aef3b503086",
+     "overzicht": "4526caaedbea6e40b2d5bbe4",
+     "posten": "f5e5cf68f7c31bf329928304"
+    }
+   },
+   {
+    "stap": 56,
+    "soort": "dag",
+    "dag": 55,
+    "posten": 13,
+    "hash": "1e79e0a8a5835469118e53ee",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "1883b3f966bfde026513c62e",
+     "overzicht": "a6b57236f879e8b5449a5f68",
+     "posten": "0835c93845252912ba377d3a"
+    }
+   },
+   {
+    "stap": 57,
+    "soort": "dag",
+    "dag": 56,
+    "posten": 12,
+    "hash": "f3a8a36dae87ce29641f5497",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c90255a7ccd47ce59b018077",
+     "overzicht": "d7fcd630e1a151ca7cd08822",
+     "posten": "890abf35fb5e047a43e4ba41"
+    }
+   },
+   {
+    "stap": 58,
+    "soort": "dag",
+    "dag": 57,
+    "posten": 15,
+    "hash": "7e86799b9bdff1125a3120b9",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a6598662200d92bfe9c40f82",
+     "overzicht": "a4b65df8d11fc7e169e7ce2f",
+     "posten": "901e4f85f0b3746e96ba8e32"
+    }
+   },
+   {
+    "stap": 59,
+    "soort": "dag",
+    "dag": 58,
+    "posten": 13,
+    "hash": "608054c46ce516d7a94fc225",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2f7db4be1b132c6618e56a7c",
+     "overzicht": "01f9fc2237f0f865b70c8915",
+     "posten": "e5ab664a66d928e894ad62ef"
+    }
+   },
+   {
+    "stap": 60,
+    "soort": "dag",
+    "dag": 59,
+    "posten": 13,
+    "hash": "3ea88e4150911f51610f7263",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "1def57ed7151681591960ce0",
+     "overzicht": "7ccae1a990c9b7ac993f31bc",
+     "posten": "aff20995452130e0f0ada06b"
+    }
+   },
+   {
+    "stap": 61,
+    "soort": "dag",
+    "dag": 60,
+    "posten": 15,
+    "hash": "53840939f168ead62abc90a9",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "b9e7bf2d6ea6d3d8621d5578",
+     "overzicht": "5fdeac4c783bb63387a24ad4",
+     "posten": "e86234d4adaafbde21049c3a"
+    }
+   },
+   {
+    "stap": 62,
+    "soort": "dag",
+    "dag": 61,
+    "posten": 15,
+    "hash": "d0dd697ba6b351a19e86f03b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3f5f8a3e08496cb176ffd38d",
+     "overzicht": "57d78187ea8941b984a8cb8c",
+     "posten": "88101e8d354de5f726942d2b"
+    }
+   },
+   {
+    "stap": 63,
+    "soort": "dag",
+    "dag": 62,
+    "posten": 15,
+    "hash": "3dc5f60fd324ef8928963c8c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "9993e788d83aec097b9f72a0",
+     "overzicht": "8c2d4e9e4caa6e99fd40d95a",
+     "posten": "7ea65143282da5949478c3da"
+    }
+   },
+   {
+    "stap": 64,
+    "soort": "dag",
+    "dag": 63,
+    "posten": 15,
+    "hash": "9b9a5cf5526b6d777e721617",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "edaac799dc1f8057b7a39ede",
+     "overzicht": "c026cfea485b8a2e3e20168c",
+     "posten": "2e3ac16032cc85b214d7512f"
+    }
+   },
+   {
+    "stap": 65,
+    "soort": "dag",
+    "dag": 64,
+    "posten": 14,
+    "hash": "22b7b4ecab813132eb2d5e4a",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a1a68c799b8d26aed1c4c33d",
+     "overzicht": "bfbebed1c0f8d275a4291343",
+     "posten": "97e61c3af269126f44bb0d46"
+    }
+   },
+   {
+    "stap": 66,
+    "soort": "dag",
+    "dag": 65,
+    "posten": 15,
+    "hash": "633c4806359785ead3bf3da5",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "e50b9983dd2ec5aad1419ecd",
+     "overzicht": "7787ea18825b37b54ed39ac5",
+     "posten": "b08e5cfce4cc97b7d4492ec4"
+    }
+   },
+   {
+    "stap": 67,
+    "soort": "dag",
+    "dag": 66,
+    "posten": 15,
+    "hash": "55adf0ec68295edf52fdfbbf",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "fcde9eb232849e6091652bde",
+     "overzicht": "7cc97f3b78834b4e8fc2cabb",
+     "posten": "13785c36a457a5972e40ad84"
+    }
+   },
+   {
+    "stap": 68,
+    "soort": "dag",
+    "dag": 67,
+    "posten": 16,
+    "hash": "d47a8a175cc313f4dda49433",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "447df8c1fbdfe5d3cf92c652",
+     "overzicht": "62a9b9a6727791c42ca22bc0",
+     "posten": "d8d2e6ed3b1fbedcf0b314c7"
+    }
+   },
+   {
+    "stap": 69,
+    "soort": "dag",
+    "dag": 68,
+    "posten": 15,
+    "hash": "9abcacec27582ad3ab6f17de",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "559094e6fc5c92f22fb6754f",
+     "overzicht": "119f0ea19be93e5fc62748e6",
+     "posten": "9b84343632c3977c4312ebc2"
+    }
+   },
+   {
+    "stap": 70,
+    "soort": "dag",
+    "dag": 69,
+    "posten": 15,
+    "hash": "39e7bab08110d4cd4052e30d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "755c62d26aede30297c5aed1",
+     "overzicht": "e1049d058f9256489e83a993",
+     "posten": "fca1f6c4fbc48a71f20edfaa"
+    }
+   },
+   {
+    "stap": 71,
+    "soort": "dag",
+    "dag": 70,
+    "posten": 15,
+    "hash": "ad2709bbf19256904ea72027",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "bd0ccdd8811ed1bca376905b",
+     "overzicht": "993dd12a72bd03d585376a1c",
+     "posten": "84643022115082def69c7608"
+    }
+   },
+   {
+    "stap": 72,
+    "soort": "dag",
+    "dag": 71,
+    "posten": 15,
+    "hash": "60f5b690eb56d53bac24244c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "944df58a0ec35165aaade10b",
+     "overzicht": "070d68004a189aa00f861220",
+     "posten": "c8812adac818ddf26f716bb6"
+    }
+   },
+   {
+    "stap": 73,
+    "soort": "dag",
+    "dag": 72,
+    "posten": 15,
+    "hash": "90b62ed9d5d6a58a79d1e8d2",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ee1557d84965a497d9e50977",
+     "overzicht": "50933bd72309cc1f9323d89d",
+     "posten": "95378a77bbe69895666e3574"
+    }
+   },
+   {
+    "stap": 74,
+    "soort": "dag",
+    "dag": 73,
+    "posten": 15,
+    "hash": "42a05ed98aaf2f2cd43af2ca",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4a6d66c6f5c2ac17fe0c5fce",
+     "overzicht": "88cf487dfc42718f0d2b05e7",
+     "posten": "10d13b2bc6c481a3c7ffaa61"
+    }
+   },
+   {
+    "stap": 75,
+    "soort": "dag",
+    "dag": 74,
+    "posten": 15,
+    "hash": "df2db7730675a0094cd1dedd",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ed04bedcafe0ede40ba8ce45",
+     "overzicht": "a775d173049b010261584b78",
+     "posten": "98b9ec959502be39bbe3d874"
+    }
+   },
+   {
+    "stap": 76,
+    "soort": "dag",
+    "dag": 75,
+    "posten": 15,
+    "hash": "c53942041ce82e64b0a2dc52",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "53d4d278348f8f99592b2c2e",
+     "overzicht": "3ad8e9ae164e48b26bd85596",
+     "posten": "9aae2fdd28b42e1aa47e7310"
+    }
+   },
+   {
+    "stap": 77,
+    "soort": "dag",
+    "dag": 76,
+    "posten": 16,
+    "hash": "0fd690d522b4478d3769d649",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a7b5f9215feaf079c81f30e9",
+     "overzicht": "0d89f8f34a720801d6823cba",
+     "posten": "3c4e94a445948c28915785ed"
+    }
+   },
+   {
+    "stap": 78,
+    "soort": "dag",
+    "dag": 77,
+    "posten": 15,
+    "hash": "f32357e67b246fde676c6202",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "8b3039e62fcf127c97192d54",
+     "overzicht": "ce5c651ca84d481086b84062",
+     "posten": "6d05e793b132aaaefcc9878b"
+    }
+   },
+   {
+    "stap": 79,
+    "soort": "dag",
+    "dag": 78,
+    "posten": 15,
+    "hash": "ac5cd174ca59c41eeee6e9d9",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "0dbde3a797d2d6d95101c461",
+     "overzicht": "e48845f7ba37644344013457",
+     "posten": "ab6d3f19dec2910febb0a0af"
+    }
+   },
+   {
+    "stap": 80,
+    "soort": "dag",
+    "dag": 79,
+    "posten": 16,
+    "hash": "54a553139b0e5b6881a2948f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "73410adc4fd20a4935534de8",
+     "overzicht": "31c96872ef3247d0524a327b",
+     "posten": "9d2968c7a3462caf0817e586"
+    }
+   },
+   {
+    "stap": 81,
+    "soort": "dag",
+    "dag": 80,
+    "posten": 16,
+    "hash": "3fcd6e87a98a5ba38d8acfbf",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "0a19b0be3a7b1fe6564228aa",
+     "overzicht": "072949a70cb6159994e3b0a9",
+     "posten": "16f3460688ba61340e8d5fbb"
+    }
+   },
+   {
+    "stap": 82,
+    "soort": "dag",
+    "dag": 81,
+    "posten": 15,
+    "hash": "30afee10f4e4e6d970f2fc98",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "f93724c47a9ede2610e6252e",
+     "overzicht": "76e4558dc3fe23cc74ee139c",
+     "posten": "2ffc7f6bb0c7229000fe81cd"
+    }
+   },
+   {
+    "stap": 83,
+    "soort": "dag",
+    "dag": 82,
+    "posten": 16,
+    "hash": "78fd9e38d37fcc0b2f1691b3",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d0bf5212362be7059038bf78",
+     "overzicht": "302ca75d1dd5125f5af43e91",
+     "posten": "9a2922877fad1dc2cd2b9086"
+    }
+   },
+   {
+    "stap": 84,
+    "soort": "dag",
+    "dag": 83,
+    "posten": 15,
+    "hash": "d86dc1ef73a471359c79ad34",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "38fa024c14cb629909c9171a",
+     "overzicht": "7443fde097e6640f57f14a02",
+     "posten": "8aa9c4edb6ef4a59d9ce8bec"
+    }
+   },
+   {
+    "stap": 85,
+    "soort": "dag",
+    "dag": 84,
+    "posten": 15,
+    "hash": "5f617c770b51f5e9af18399f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "92b2499009b70af2e4c0f62f",
+     "overzicht": "3ba7ad6290b943eda4bba193",
+     "posten": "e4a2caf62bdebef24d8245d1"
+    }
+   },
+   {
+    "stap": 86,
+    "soort": "dag",
+    "dag": 85,
+    "posten": 15,
+    "hash": "13c731967d605b359a933c10",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d9cbd8891d4d9b24d1676d4a",
+     "overzicht": "2a2e1e8213cf6b38e29e43f7",
+     "posten": "7b9a4df691bf4ae64f7894ec"
+    }
+   },
+   {
+    "stap": 87,
+    "soort": "dag",
+    "dag": 86,
+    "posten": 15,
+    "hash": "9646f639c6a9f161bd3317f9",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "fd09e001a6fdc09c59de080d",
+     "overzicht": "6f4fabeff74ab396ac4fe2fb",
+     "posten": "20ec166db1a7909c0d1c64d1"
+    }
+   },
+   {
+    "stap": 88,
+    "soort": "dag",
+    "dag": 87,
+    "posten": 15,
+    "hash": "5766c9327adcc0f8e3d35eb9",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "716245a2fd9fc7178a8f6c0c",
+     "overzicht": "33e120f8f1ff1f94eb792e28",
+     "posten": "8b7a40106482dbcf5be3b01c"
+    }
+   },
+   {
+    "stap": 89,
+    "soort": "dag",
+    "dag": 88,
+    "posten": 16,
+    "hash": "bd4bc83908b1a4a21851c9b6",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c680eed31a1d1b2424b0f996",
+     "overzicht": "066e967c05def51d5e432ca9",
+     "posten": "a28ac89f96d8e31fc99790a9"
+    }
+   },
+   {
+    "stap": 90,
+    "soort": "dag",
+    "dag": 89,
+    "posten": 15,
+    "hash": "9b8f223b2c791914b895b26d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "dc531dd9335c902695c2becb",
+     "overzicht": "bec3571880508196e46feebc",
+     "posten": "968a2b24dff96714966e7326"
+    }
+   },
+   {
+    "stap": 91,
+    "soort": "dag",
+    "dag": 90,
+    "posten": 15,
+    "hash": "f60bb82ace7a01799c3b8d9e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2853da112c9aa10bf1055058",
+     "overzicht": "f7db63f5b3326f71916d85ec",
+     "posten": "68b98bc32e874e84304c96f0"
+    }
+   },
+   {
+    "stap": 92,
+    "soort": "dag",
+    "dag": 91,
+    "posten": 15,
+    "hash": "59907420dbbb4e86980436c4",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "5dd5199c1831cd9c439a7a23",
+     "overzicht": "3ae600599af2815947bb9edc",
+     "posten": "9ee8cd7e7283224ee262b9d2"
+    }
+   },
+   {
+    "stap": 93,
+    "soort": "dag",
+    "dag": 92,
+    "posten": 15,
+    "hash": "b6aac08a583a7b77e4d53e33",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "e5a6b8297eb1f531098a7b87",
+     "overzicht": "79fe338fe373e10eb7bac53b",
+     "posten": "f65fe778ef5fb23232f4caca"
+    }
+   },
+   {
+    "stap": 94,
+    "soort": "dag",
+    "dag": 93,
+    "posten": 15,
+    "hash": "dc3a5d42bb7cd1113fcafa96",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3e0c5f874f8fb941616848c0",
+     "overzicht": "aa9a2988b4cd51ef7950d4a4",
+     "posten": "d6855e9b6756792b9d73d42e"
+    }
+   },
+   {
+    "stap": 95,
+    "soort": "dag",
+    "dag": 94,
+    "posten": 14,
+    "hash": "b6b298a5da7590c5d8d7c82e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "7aec5880f4b7716cfed231b7",
+     "overzicht": "2980a09d8fc0941af6d86cba",
+     "posten": "f0f5f4d49f1e292494e91d76"
+    }
+   },
+   {
+    "stap": 96,
+    "soort": "dag",
+    "dag": 95,
+    "posten": 15,
+    "hash": "dcaf453d75ff767fa5816e8d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "cd4f31e2896f76af41ad5c74",
+     "overzicht": "d34e7b6c0689317ff7f86a68",
+     "posten": "515d3a6c4a4ecaf911b2c844"
+    }
+   },
+   {
+    "stap": 97,
+    "soort": "dag",
+    "dag": 96,
+    "posten": 15,
+    "hash": "962a5dec281b72d60f82dd91",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "8776a0d6441896621792ab8a",
+     "overzicht": "4458de9c9e41d316cfca51b6",
+     "posten": "d1809d54df69a1413b319f88"
+    }
+   },
+   {
+    "stap": 98,
+    "soort": "dag",
+    "dag": 97,
+    "posten": 15,
+    "hash": "edf59b03441963af59bc5485",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "7aa6826e1b1fb5cbf5106db9",
+     "overzicht": "ddcb9e2eb00dd125c67587ae",
+     "posten": "4503d214a278b32eb98da267"
+    }
+   },
+   {
+    "stap": 99,
+    "soort": "dag",
+    "dag": 98,
+    "posten": 15,
+    "hash": "cb95a0064c3b71523cffc426",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "24d130e3dbcd891fca717105",
+     "overzicht": "47cfa39a19e41d33680e4f01",
+     "posten": "80ef98971d30a300c0f8b8bc"
+    }
+   },
+   {
+    "stap": 100,
+    "soort": "dag",
+    "dag": 99,
+    "posten": 15,
+    "hash": "5729431c8a7c7dac525d272c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "10a7283463d7aa57bf481b55",
+     "overzicht": "67baba7527afe0bf10f6f6ce",
+     "posten": "d4140bcce2546c6818e0b50e"
+    }
+   },
+   {
+    "stap": 101,
+    "soort": "dag",
+    "dag": 100,
+    "posten": 16,
+    "hash": "feac5fc9bbf6d17b2a58db50",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "588dc59ef559e91a665b5b72",
+     "overzicht": "f6c7ab8b22138ed04b2ccf9e",
+     "posten": "ce9777f539563d06aad8b226"
+    }
+   },
+   {
+    "stap": 102,
+    "soort": "dag",
+    "dag": 101,
+    "posten": 15,
+    "hash": "b4b56bda128be976b90ebd17",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d7a55c7c8bb2473b53517a96",
+     "overzicht": "e517a0a357b7133623cd9068",
+     "posten": "65a1f4331303a2b7f79a4296"
+    }
+   },
+   {
+    "stap": 103,
+    "soort": "dag",
+    "dag": 102,
+    "posten": 15,
+    "hash": "3f5343605965ed9f82e4c944",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "5dd61b25933b36a6957c69a6",
+     "overzicht": "c12448833a6dbe9db4bf5d99",
+     "posten": "b165ea4afe4e57ab7112b3b5"
+    }
+   },
+   {
+    "stap": 104,
+    "soort": "dag",
+    "dag": 103,
+    "posten": 16,
+    "hash": "63ccfdc62b043e7ff5dec52a",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "34cd607e8678acc0d7c0a859",
+     "overzicht": "a96f2955b029a89b074d02dd",
+     "posten": "d7e1d05571b2606ea0a17771"
+    }
+   },
+   {
+    "stap": 105,
+    "soort": "dag",
+    "dag": 104,
+    "posten": 15,
+    "hash": "ab04a0493511bc9f114221f8",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d25ae16184e37aef76b2b13c",
+     "overzicht": "ce484e424b4c8525cb087192",
+     "posten": "8b6afa32ad121665d1f704e7"
+    }
+   },
+   {
+    "stap": 106,
+    "soort": "dag",
+    "dag": 105,
+    "posten": 15,
+    "hash": "4ff56fb7a0ad8b908ea5456c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "de36b6f87c14f2f8060c8ed0",
+     "overzicht": "f5bda59cf06b45edabbb99ef",
+     "posten": "5c1dcc984d2561a1c7b7ea4e"
+    }
+   },
+   {
+    "stap": 107,
+    "soort": "dag",
+    "dag": 106,
+    "posten": 16,
+    "hash": "7b7c1b3d1b0393d55306b92c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3011b97780739acee023ae67",
+     "overzicht": "f903d8ec94185dd7ac4a27da",
+     "posten": "2cb9f2cf8cfe8d49bb95af9c"
+    }
+   },
+   {
+    "stap": 108,
+    "soort": "dag",
+    "dag": 107,
+    "posten": 15,
+    "hash": "2b4bf3523c186f5fa8b4d94f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "648aba34852036b4da079d94",
+     "overzicht": "88b3479166a0c8e9ecfa08cf",
+     "posten": "88c059bbbfd7b97d232554a5"
+    }
+   },
+   {
+    "stap": 109,
+    "soort": "dag",
+    "dag": 108,
+    "posten": 15,
+    "hash": "8e0671fed59eb6191dcfe908",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "e81f1dfb0207490114480958",
+     "overzicht": "1233257137efb454955ef352",
+     "posten": "c03948c3d2278eaacf4f3fec"
+    }
+   },
+   {
+    "stap": 110,
+    "soort": "dag",
+    "dag": 109,
+    "posten": 15,
+    "hash": "0a18078c0043aba20d676629",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "5a70cda86b1c47af63e051eb",
+     "overzicht": "e80a3e4524cdb7807ddbdec9",
+     "posten": "03a6f54bd5f4578955eb7e3b"
+    }
+   },
+   {
+    "stap": 111,
+    "soort": "dag",
+    "dag": 110,
+    "posten": 15,
+    "hash": "c1a712d4bb39694c228644cf",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d7ed633d7cb94a38d37bd8c1",
+     "overzicht": "9450f1dd2816ed52dbbcbf8f",
+     "posten": "7b2f3855f2191b236f07f992"
+    }
+   },
+   {
+    "stap": 112,
+    "soort": "dag",
+    "dag": 111,
+    "posten": 15,
+    "hash": "c416b970e828d06f1c24acbf",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3270056d4462047962b2dcf3",
+     "overzicht": "a1261889543c322f0f515aec",
+     "posten": "e84d5adcd93373359b5eea32"
+    }
+   },
+   {
+    "stap": 113,
+    "soort": "dag",
+    "dag": 112,
+    "posten": 14,
+    "hash": "1d22c7ea5ede97f1999d1410",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "78e62b7b0d3b31b54ac1a00a",
+     "overzicht": "d8d28b2bacca98cc0d54232c",
+     "posten": "b2dc10868d1641211e9b3943"
+    }
+   },
+   {
+    "stap": 114,
+    "soort": "dag",
+    "dag": 113,
+    "posten": 15,
+    "hash": "877e890175aabde21795647c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a60cfa4a902bbaefab9ef3ed",
+     "overzicht": "624c2de4db7ec39ff08508a2",
+     "posten": "cbba4608fd2187f643cd854d"
+    }
+   },
+   {
+    "stap": 115,
+    "soort": "dag",
+    "dag": 114,
+    "posten": 15,
+    "hash": "5faaf87027d2a540c7009c6e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "025fc441656ff8952989532e",
+     "overzicht": "412313c96bd71437805ca583",
+     "posten": "4014111d5baf2f8276723ecf"
+    }
+   },
+   {
+    "stap": 116,
+    "soort": "dag",
+    "dag": 115,
+    "posten": 16,
+    "hash": "d0adcb6c5aa6e3a599b3e89d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "425051dd102f1f0b28237c44",
+     "overzicht": "6766f653ce83d6ad10322a01",
+     "posten": "93ae5053d9d770c1ce158dcd"
+    }
+   },
+   {
+    "stap": 117,
+    "soort": "dag",
+    "dag": 116,
+    "posten": 16,
+    "hash": "b972918341c6fd0c3cb352ae",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4cb9818fcb3113608dc7bbdb",
+     "overzicht": "1e00f2368bbedfdecbbc3020",
+     "posten": "fa3a8d8d65704e5b1c9d6000"
+    }
+   },
+   {
+    "stap": 118,
+    "soort": "dag",
+    "dag": 117,
+    "posten": 15,
+    "hash": "24f60cd2b28f00e8e284a28e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "58f31de0b83cdb474d31b666",
+     "overzicht": "f310f35e81de55c4322c7295",
+     "posten": "53c8ffb74a0486cd236c67b5"
+    }
+   },
+   {
+    "stap": 119,
+    "soort": "dag",
+    "dag": 118,
+    "posten": 16,
+    "hash": "76f9a011bc94fbb965ed26d1",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d7318510e1bf27b165ee326a",
+     "overzicht": "771c01f5ab91edf437c48f4c",
+     "posten": "c54e01ea8a30997b8af17ab8"
+    }
+   },
+   {
+    "stap": 120,
+    "soort": "dag",
+    "dag": 119,
+    "posten": 15,
+    "hash": "da2717e102e2faa9f072ae7c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "33f76f4e934681890a021cb8",
+     "overzicht": "d144fa16fbbd5430f63de8c8",
+     "posten": "66ccb0f64fa7a010bf753877"
+    }
+   },
+   {
+    "stap": 121,
+    "soort": "dag",
+    "dag": 120,
+    "posten": 15,
+    "hash": "621d8c40b901cb6d015fed25",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "f326733be3a700110dd60a07",
+     "overzicht": "63d4a6bf25825b1d1aac4203",
+     "posten": "22ea0be786a15296e2bfeac2"
+    }
+   },
+   {
+    "stap": 122,
+    "soort": "dag",
+    "dag": 121,
+    "posten": 15,
+    "hash": "2cb8c8cf2c519312e18e7b62",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ea0768adbf91ece03e3f9e5b",
+     "overzicht": "37499d489cc826dae3fd3729",
+     "posten": "1b4011cb113edd194ad54c53"
+    }
+   },
+   {
+    "stap": 123,
+    "soort": "dag",
+    "dag": 122,
+    "posten": 15,
+    "hash": "bd132a3c50246acf90e69a53",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4ec177a1d899000764d515b1",
+     "overzicht": "5c02239656925235538faaa1",
+     "posten": "da113c23f68c4ae35004d663"
+    }
+   },
+   {
+    "stap": 124,
+    "soort": "dag",
+    "dag": 123,
+    "posten": 15,
+    "hash": "e909d262f0e06276f8fddbf4",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d3a2041211a4386a9ccd3a19",
+     "overzicht": "c71c5825529e091ea66608fc",
+     "posten": "dc2e932ccb522232c1f97d98"
+    }
+   },
+   {
+    "stap": 125,
+    "soort": "dag",
+    "dag": 124,
+    "posten": 16,
+    "hash": "fad52040e68aeda6b06535ad",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "912fb88d76655e818c114f98",
+     "overzicht": "bd148b36c062a55bb5e42d4e",
+     "posten": "b3bd37cfb61e64a4f1ddd125"
+    }
+   },
+   {
+    "stap": 126,
+    "soort": "dag",
+    "dag": 125,
+    "posten": 15,
+    "hash": "50b124cf081e1b4a2aeff5cb",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4cea680bcc046fb837e72802",
+     "overzicht": "420cf0049af5ea3a825d5f6f",
+     "posten": "f98d61f4487c687be944d6c6"
+    }
+   },
+   {
+    "stap": 127,
+    "soort": "dag",
+    "dag": 126,
+    "posten": 15,
+    "hash": "3f9b608a37dd96324230e88f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a5c5060994e7889b0d65073c",
+     "overzicht": "e8e88e024f72a50a7f8e9374",
+     "posten": "aa5a54b5fec20873916eefd9"
+    }
+   },
+   {
+    "stap": 128,
+    "soort": "dag",
+    "dag": 127,
+    "posten": 16,
+    "hash": "59c2f5c02d8809f3e54ef9ac",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c703f4a5962986b2ca630f90",
+     "overzicht": "26035615982cba8e035a2387",
+     "posten": "49a781032ace82e88e415bdc"
+    }
+   },
+   {
+    "stap": 129,
+    "soort": "dag",
+    "dag": 128,
+    "posten": 15,
+    "hash": "7fbb5757407b25bd1689e79d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "53bd5f632e45d90dc9a73c26",
+     "overzicht": "2c364bc8d1fec04644a58391",
+     "posten": "99338dbf05d471f65962ae80"
+    }
+   },
+   {
+    "stap": 130,
+    "soort": "dag",
+    "dag": 129,
+    "posten": 15,
+    "hash": "74783a73c4382300a7e0d390",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "96f8d1f41d3e78916938df6b",
+     "overzicht": "7c1b66e5ac300f169d712c62",
+     "posten": "e5b42e6b8a94335672e6a5f9"
+    }
+   },
+   {
+    "stap": 131,
+    "soort": "dag",
+    "dag": 130,
+    "posten": 14,
+    "hash": "76474b6cab4f32cb558f16a5",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "8d0d87deca991e2c3da7adc9",
+     "overzicht": "c77a92e909f20f70b46e5475",
+     "posten": "e27dbab620bc2376aa0f1e2f"
+    }
+   },
+   {
+    "stap": 132,
+    "soort": "dag",
+    "dag": 131,
+    "posten": 15,
+    "hash": "7701a3ed87dc867c722a6ba0",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "b55ef2aa9d3c825591bd8e56",
+     "overzicht": "bbecd84b654d11ca02df173d",
+     "posten": "135b13e494a05b3bf4a3e6e5"
+    }
+   },
+   {
+    "stap": 133,
+    "soort": "dag",
+    "dag": 132,
+    "posten": 15,
+    "hash": "fd66a32319e6c42b937fa8a1",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "b00747421f800a00cff1f651",
+     "overzicht": "4dfedd86dc32453a7986f587",
+     "posten": "918d9e3f4c5c22fd43b7cd51"
+    }
+   },
+   {
+    "stap": 134,
+    "soort": "dag",
+    "dag": 133,
+    "posten": 15,
+    "hash": "714390a4eb10c9cae0129274",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "8d1421fc5de889b35fc8f8fe",
+     "overzicht": "b87ffcfd1f0b751436ff7065",
+     "posten": "e58a4701ac54859527ef6fc6"
+    }
+   },
+   {
+    "stap": 135,
+    "soort": "dag",
+    "dag": 134,
+    "posten": 15,
+    "hash": "30fc13ca0f6c2745c91d4cae",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "90a82fd67dc7023fde66a839",
+     "overzicht": "027c388dacdbc5a8142140e4",
+     "posten": "735124c8bc0d4cc6b81ab497"
+    }
+   },
+   {
+    "stap": 136,
+    "soort": "dag",
+    "dag": 135,
+    "posten": 15,
+    "hash": "00a36f17768ce31579464de9",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ca49f8e393def6ccaf816b51",
+     "overzicht": "5d2bbdd1647b1257a42efdc1",
+     "posten": "5629f73966900ee678fd9add"
+    }
+   },
+   {
+    "stap": 137,
+    "soort": "dag",
+    "dag": 136,
+    "posten": 16,
+    "hash": "be89c1e3775d47d4967f5922",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "9fe132e4794bc83645258c48",
+     "overzicht": "05bb23a045e7c8a50ba42001",
+     "posten": "9d61df59069127f71b4300ea"
+    }
+   },
+   {
+    "stap": 138,
+    "soort": "dag",
+    "dag": 137,
+    "posten": 15,
+    "hash": "a20e39f5c052a9534f61392b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "12e34b2e50d07340b409375e",
+     "overzicht": "29107f73007932e079fce967",
+     "posten": "570a5b898ad6a89b6eef32ea"
+    }
+   },
+   {
+    "stap": 139,
+    "soort": "dag",
+    "dag": 138,
+    "posten": 15,
+    "hash": "8a411b6467e34cc8bbd5748b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "e9710ad299868383d4a539a0",
+     "overzicht": "9c404626392f1819a0f10f25",
+     "posten": "5f102aa11556c808782cba7b"
+    }
+   },
+   {
+    "stap": 140,
+    "soort": "dag",
+    "dag": 139,
+    "posten": 16,
+    "hash": "055450d1f739cc4d585c64e9",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "41dc8726d6337800910f2e61",
+     "overzicht": "6b39272e3262e55275f1b44e",
+     "posten": "73cbd05a611cf49ff48a584b"
+    }
+   },
+   {
+    "stap": 141,
+    "soort": "dag",
+    "dag": 140,
+    "posten": 16,
+    "hash": "393763174801504cf056771e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "6573cfe0623b4ece7954bd54",
+     "overzicht": "96b549d97265d55d33fdc007",
+     "posten": "c5fec39e3cbd013ba531b87b"
+    }
+   },
+   {
+    "stap": 142,
+    "soort": "dag",
+    "dag": 141,
+    "posten": 15,
+    "hash": "0030f0563b8e13172d45309c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "f683eabb976a43554fa2f54b",
+     "overzicht": "9c2eb63f7d321a04f9ecbb0f",
+     "posten": "fcb0fae76330bf4b0a18edd2"
+    }
+   },
+   {
+    "stap": 143,
+    "soort": "dag",
+    "dag": 142,
+    "posten": 16,
+    "hash": "44f57991c289c8120802045e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "9a4708dd1661c09eb5f53878",
+     "overzicht": "8f3d1563bc8d7a75591b2ac6",
+     "posten": "355e6b66ce8b03951440635f"
+    }
+   },
+   {
+    "stap": 144,
+    "soort": "dag",
+    "dag": 143,
+    "posten": 15,
+    "hash": "5b751c72222a39c1faf630d1",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "8a0c8ace94a6d552dc368343",
+     "overzicht": "5254d960d6a44abf0212e96b",
+     "posten": "e0af90d4902165ba15b3a9e8"
+    }
+   },
+   {
+    "stap": 145,
+    "soort": "dag",
+    "dag": 144,
+    "posten": 15,
+    "hash": "b40ede990f050f9f797a3608",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "05958023aca3a0fe9cb09ff7",
+     "overzicht": "0661ce878767346120b78e99",
+     "posten": "88b5bdef84becdc4ecc7e18b"
+    }
+   },
+   {
+    "stap": 146,
+    "soort": "dag",
+    "dag": 145,
+    "posten": 15,
+    "hash": "2ab3eac68dadc551416b489a",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "00274865cdfee9b9b98627e4",
+     "overzicht": "2bbf60239a53a2a39e9b8967",
+     "posten": "0d469d5b2bc6a3eea917241f"
+    }
+   },
+   {
+    "stap": 147,
+    "soort": "dag",
+    "dag": 146,
+    "posten": 15,
+    "hash": "beedbfb08b07cd55aa00e721",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "2a240c53adbb4e043fb8e512",
+     "overzicht": "f5966a2ceed555fe27d32cd1",
+     "posten": "587161235bf2bc15d5b56d4f"
+    }
+   },
+   {
+    "stap": 148,
+    "soort": "dag",
+    "dag": 147,
+    "posten": 15,
+    "hash": "f0948e528df33622706dce40",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4cb72f0300d38da3c21c4d51",
+     "overzicht": "22e13866ec65a73376392693",
+     "posten": "49acd7cb63d19990c32daa31"
+    }
+   },
+   {
+    "stap": 149,
+    "soort": "dag",
+    "dag": 148,
+    "posten": 15,
+    "hash": "1d2ffd0e4e0ccecedecf04f6",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4ea22dc7fb11b371123fd784",
+     "overzicht": "5ca5e82803cc264b45560ba7",
+     "posten": "83e1982b04dfdc79e9f5cd3a"
+    }
+   },
+   {
+    "stap": 150,
+    "soort": "dag",
+    "dag": 149,
+    "posten": 15,
+    "hash": "58346412ba1b12a31377cc80",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "40fa1e0a7dc32f9608151691",
+     "overzicht": "64b62d004e94170fb04de23d",
+     "posten": "7929167bc6bb271632a24e03"
+    }
+   },
+   {
+    "stap": 151,
+    "soort": "dag",
+    "dag": 150,
+    "posten": 15,
+    "hash": "02565b46e4491ef8b31eac84",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "b792482f5effdee80c73fdf0",
+     "overzicht": "feb15d392f70d3c9b70e0d11",
+     "posten": "36d64495fcc8328114c51105"
+    }
+   },
+   {
+    "stap": 152,
+    "soort": "dag",
+    "dag": 151,
+    "posten": 16,
+    "hash": "eb0b51ca564725ddfb3ff68f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "64c8023b4eab412112d2281d",
+     "overzicht": "833c3bfb8019193a5d6cf051",
+     "posten": "f9f11804b9914ad8ff73e7d7"
+    }
+   },
+   {
+    "stap": 153,
+    "soort": "dag",
+    "dag": 152,
+    "posten": 16,
+    "hash": "f6fb0d8b996869116adcad30",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "b5e68ccf793b9c3a29341b1e",
+     "overzicht": "1c1b2e0c69612c0f947c961f",
+     "posten": "09538f85cbe57dede6fc9771"
+    }
+   },
+   {
+    "stap": 154,
+    "soort": "dag",
+    "dag": 153,
+    "posten": 15,
+    "hash": "8103c4b136382927e3ddd840",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3066c26d49086a138752ecfa",
+     "overzicht": "4e67cd299d6cf9b9cd5a4835",
+     "posten": "3426e972acbfca8f462a9fad"
+    }
+   },
+   {
+    "stap": 155,
+    "soort": "dag",
+    "dag": 154,
+    "posten": 16,
+    "hash": "362c89ee2d3f49e80930a7a5",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ffccb8abdaabb44122ffc5d3",
+     "overzicht": "86c33d58b4c9cb97d5ea7d59",
+     "posten": "d0ff65f21731dc0d4f744a94"
+    }
+   },
+   {
+    "stap": 156,
+    "soort": "dag",
+    "dag": 155,
+    "posten": 15,
+    "hash": "9d42b60eab0f170885badbd4",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "630bd435a905e41a13bb5a48",
+     "overzicht": "ee2c41d1c26a3ed7079e488e",
+     "posten": "fee5aa72bf09c60145195469"
+    }
+   },
+   {
+    "stap": 157,
+    "soort": "dag",
+    "dag": 156,
+    "posten": 15,
+    "hash": "cfd77e0ca56d3bdaa19e8157",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "cfdfc670e698669b1f95a4fd",
+     "overzicht": "f08a6e81520022772e39c743",
+     "posten": "f18573ca047f890979f81a0e"
+    }
+   },
+   {
+    "stap": 158,
+    "soort": "dag",
+    "dag": 157,
+    "posten": 15,
+    "hash": "3a72165053641011f0f57ee7",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "fedccfd8dfe08458d48ec38f",
+     "overzicht": "e7a2bbf6896fb8321a4e32ad",
+     "posten": "07a0d077df2e6375cf62f433"
+    }
+   },
+   {
+    "stap": 159,
+    "soort": "dag",
+    "dag": 158,
+    "posten": 15,
+    "hash": "a525a8ed02662ced17f53f32",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "4f2da5925743e25787e48782",
+     "overzicht": "fe2440f838bd60a9d410c57a",
+     "posten": "6c4edd2c7646bf701f5d6058"
+    }
+   },
+   {
+    "stap": 160,
+    "soort": "dag",
+    "dag": 159,
+    "posten": 15,
+    "hash": "6cae578c2df8592597aada0e",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "5230a3f06e085c1bed2f84cb",
+     "overzicht": "ca38d5734acad7aa7653cac9",
+     "posten": "3e0d75467b2a8553d6284905"
+    }
+   },
+   {
+    "stap": 161,
+    "soort": "dag",
+    "dag": 160,
+    "posten": 16,
+    "hash": "596a928cc0ad7bc35ae69fd8",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d90c57f43b3a4c1c97a02a35",
+     "overzicht": "d373fbd06d0be6a36e2aba0e",
+     "posten": "10d00fe5600e210f7811594f"
+    }
+   },
+   {
+    "stap": 162,
+    "soort": "beslis",
+    "dag": 160,
+    "posten": 0,
+    "hash": "f4713e4e0d5693c189650425",
+    "delen": {
+     "antwoord": "9d5df2b2b7647fbe7c1cabb5",
+     "saldi": "d90c57f43b3a4c1c97a02a35",
+     "overzicht": "d373fbd06d0be6a36e2aba0e",
+     "posten": "4f53cda18c2baa0c0354bb5f"
+    }
+   },
+   {
+    "stap": 163,
+    "soort": "dag",
+    "dag": 161,
+    "posten": 15,
+    "hash": "93ff3f986905fc2443e3c81a",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "7586dcf501e8d180ec7a8b4f",
+     "overzicht": "13e54b3ab8c9b4466ed62e11",
+     "posten": "837065b7cf9217c10d3bcb7f"
+    }
+   },
+   {
+    "stap": 164,
+    "soort": "dag",
+    "dag": 162,
+    "posten": 15,
+    "hash": "1483a9784109bfe9a5854390",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "fd5646ac20b2faf879107e79",
+     "overzicht": "aeb7424f7c127cbdf73feb0c",
+     "posten": "3d1958c394b69b5c6901d178"
+    }
+   },
+   {
+    "stap": 165,
+    "soort": "dag",
+    "dag": 163,
+    "posten": 16,
+    "hash": "5cb4559c08f344aed8b97239",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3cc1de306b38e3eccee5409a",
+     "overzicht": "b15075b454e6301ecbf90de1",
+     "posten": "95692eb05dbd15df92757f13"
+    }
+   },
+   {
+    "stap": 166,
+    "soort": "dag",
+    "dag": 164,
+    "posten": 15,
+    "hash": "2789e08fb436a97f390d8558",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "e48ffb009e6ae46efdcc98b0",
+     "overzicht": "6945429c8d2756762f373c7e",
+     "posten": "7ddc2219a5c9cc55fa428d16"
+    }
+   },
+   {
+    "stap": 167,
+    "soort": "dag",
+    "dag": 165,
+    "posten": 15,
+    "hash": "5dc7af4c111d543f8073cf26",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "62a7dccfc93977bfb69a8180",
+     "overzicht": "7d36d48050273a190c3df0e0",
+     "posten": "8d5da95e384466e9993c3250"
+    }
+   },
+   {
+    "stap": 168,
+    "soort": "dag",
+    "dag": 166,
+    "posten": 14,
+    "hash": "28402286afcdcb83467c209d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "c17814389bc0be5d5d7db1eb",
+     "overzicht": "ddd78af91e00fa4b42564a6a",
+     "posten": "e5211319811ab693648aecaa"
+    }
+   },
+   {
+    "stap": 169,
+    "soort": "dag",
+    "dag": 167,
+    "posten": 15,
+    "hash": "1d591cb3cab269a08bc0cc94",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "416c7ebdcde61fd52790a20c",
+     "overzicht": "81dc00c1e84e32b2cf7c7078",
+     "posten": "1311fa2bf0979e2d99140a9e"
+    }
+   },
+   {
+    "stap": 170,
+    "soort": "dag",
+    "dag": 168,
+    "posten": 15,
+    "hash": "f8b68fc1b56e92aac39af36f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "f7b7ede2d374cf2e9b3fc2ac",
+     "overzicht": "da539d6a42de92a9e1693b0f",
+     "posten": "7e7f4a25ab67ae40a0abaaa2"
+    }
+   },
+   {
+    "stap": 171,
+    "soort": "dag",
+    "dag": 169,
+    "posten": 15,
+    "hash": "cf1d9f6a7908640ea3952b47",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "1aa1a8bc0d9a22c3588e6760",
+     "overzicht": "58ee56b7a1d94ede3e16e060",
+     "posten": "32a245e9e898d852f076c588"
+    }
+   },
+   {
+    "stap": 172,
+    "soort": "dag",
+    "dag": 170,
+    "posten": 15,
+    "hash": "104e0eaaaeb050c09b25e6fb",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "169af516af9de1a7d1d28bec",
+     "overzicht": "3e2fd9772e146078b3c55fbb",
+     "posten": "122defc37bfc31e910a26b8f"
+    }
+   },
+   {
+    "stap": 173,
+    "soort": "dag",
+    "dag": 171,
+    "posten": 15,
+    "hash": "00ea4d14e143411179079c86",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "054ed379434fb8554e58ffaa",
+     "overzicht": "5ddfe6e48b588095ec09c51b",
+     "posten": "6e5fcebbfa2bed38f63ed80c"
+    }
+   },
+   {
+    "stap": 174,
+    "soort": "dag",
+    "dag": 172,
+    "posten": 16,
+    "hash": "f054bf0f687c724cc2464595",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "ae0597de22a7af96f5e629db",
+     "overzicht": "debe9d96f9de0d62b2679d51",
+     "posten": "39f0c03048d0457b831ca858"
+    }
+   },
+   {
+    "stap": 175,
+    "soort": "dag",
+    "dag": 173,
+    "posten": 15,
+    "hash": "dc9990c5b9c0d72000a1d35b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "e4b48a09fe8a184a98036717",
+     "overzicht": "fa898ce869a6033fb09ee4df",
+     "posten": "6ddc9ef8bb118698c0c0d936"
+    }
+   },
+   {
+    "stap": 176,
+    "soort": "dag",
+    "dag": 174,
+    "posten": 15,
+    "hash": "a0c3deb945ce12306d809fb0",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3ed1191f23bd0fcd3ac0cfa9",
+     "overzicht": "dc9203f7f3b934e53003335e",
+     "posten": "f61b25db7cca3ec91190ae3d"
+    }
+   },
+   {
+    "stap": 177,
+    "soort": "dag",
+    "dag": 175,
+    "posten": 16,
+    "hash": "cd6a9f31af59f13d0a60da28",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "f2fe117b877d13849a352802",
+     "overzicht": "18856058e97cd2874dde4434",
+     "posten": "bf0d4fc5eb79485213edc76a"
+    }
+   },
+   {
+    "stap": 178,
+    "soort": "dag",
+    "dag": 176,
+    "posten": 16,
+    "hash": "8c02fde21dc9a9a654016b0d",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "781d7c2d1e9a472fdb587915",
+     "overzicht": "9c731900a923db6eb4dd7d35",
+     "posten": "f314039782e6a3fff942664b"
+    }
+   },
+   {
+    "stap": 179,
+    "soort": "dag",
+    "dag": 177,
+    "posten": 15,
+    "hash": "efff76a0c3bbe9dc7a3f9f4c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "a4cd1bdab23cc523442adbc2",
+     "overzicht": "7673c7693b2f777eac5a8de4",
+     "posten": "1bc37174782a844dc923d14e"
+    }
+   },
+   {
+    "stap": 180,
+    "soort": "dag",
+    "dag": 178,
+    "posten": 16,
+    "hash": "3cb3a8391c4559825252d990",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "7d17321f6ab2795a92269aad",
+     "overzicht": "51b0784f8ddf943f135c7d77",
+     "posten": "eba78918eedc43d500644f43"
+    }
+   },
+   {
+    "stap": 181,
+    "soort": "dag",
+    "dag": 179,
+    "posten": 15,
+    "hash": "ccd2e79e8f39bde6b9580fb3",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "7d31f4da94c158d2f039ea22",
+     "overzicht": "25ed7e20e0267ffac01dbcd8",
+     "posten": "f803cdbce77de663deb9d3af"
+    }
+   },
+   {
+    "stap": 182,
+    "soort": "dag",
+    "dag": 180,
+    "posten": 15,
+    "hash": "32ee5e8f0f6ec3f9caf470f3",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "e63054bb19559a7fde9221a1",
+     "overzicht": "5932cf9873bf49d16756bc0c",
+     "posten": "b4ae233344607aeed141225d"
+    }
+   },
+   {
+    "stap": 183,
+    "soort": "dag",
+    "dag": 181,
+    "posten": 15,
+    "hash": "502b1d980d9f2ea6614d3069",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "9fcb75100154cfeb144837ec",
+     "overzicht": "b27d95e4d65fdfc9600d5c3a",
+     "posten": "8f3174835e527eaa12d574ab"
+    }
+   },
+   {
+    "stap": 184,
+    "soort": "dag",
+    "dag": 182,
+    "posten": 15,
+    "hash": "069664da8d0ce9fef8dd4203",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "20b1bbc9e3e92ed33f80f372",
+     "overzicht": "455acdc65f225c9b83032243",
+     "posten": "08dcef75107bddb0c7332f5b"
+    }
+   },
+   {
+    "stap": 185,
+    "soort": "dag",
+    "dag": 183,
+    "posten": 15,
+    "hash": "8e887e9a13620c6d3eed990a",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "3599a08f76548dfaf35801bf",
+     "overzicht": "a94d7f2e56715aeb2cf4708f",
+     "posten": "3e792723ea24a69e7d45d321"
+    }
+   },
+   {
+    "stap": 186,
+    "soort": "dag",
+    "dag": 184,
+    "posten": 16,
+    "hash": "ed17074b59acb9a2e31b9bbe",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "d51989703ba5c5b6f2b3a314",
+     "overzicht": "4573c7c8e3f79a980ca449c2",
+     "posten": "d63d9f61803cf51c0ad8bead"
+    }
+   },
+   {
+    "stap": 187,
+    "soort": "dag",
+    "dag": 185,
+    "posten": 15,
+    "hash": "7b618b74d8045f7711872cea",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "62addc36cc1d1f2ace3ecd1a",
+     "overzicht": "a3b795bae2155db158f9cbd1",
+     "posten": "8fa9e7753ff855149e563d19"
+    }
+   },
+   {
+    "stap": 188,
+    "soort": "dag",
+    "dag": 186,
+    "posten": 15,
+    "hash": "6d6cba37b16ff2099977704b",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "16be1d5226e30d1b43bc78fc",
+     "overzicht": "5b9c427b7a67507cd1376579",
+     "posten": "c857e7183a793d832b65311b"
+    }
+   },
+   {
+    "stap": 189,
+    "soort": "dag",
+    "dag": 187,
+    "posten": 16,
+    "hash": "dda4ee005685665c874b62b8",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "431f2001491493730869acc8",
+     "overzicht": "5d6b9f100a83a2af1e179058",
+     "posten": "6c4cce1177eb834175c84c52"
+    }
+   },
+   {
+    "stap": 190,
+    "soort": "dag",
+    "dag": 188,
+    "posten": 16,
+    "hash": "6c5bec1521f5645c8ae0dbcb",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "09a26ef769aeb56621579fe7",
+     "overzicht": "d0ef4259ed92306441d1af88",
+     "posten": "74544794ced589ec8a591988"
+    }
+   },
+   {
+    "stap": 191,
+    "soort": "dag",
+    "dag": 189,
+    "posten": 15,
+    "hash": "56bde828e37e002ee72b3537",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "b1d2599b9f30372b7898d88e",
+     "overzicht": "43f5457412a722122fc9df99",
+     "posten": "a214953cfc8ef48e03aafe4b"
+    }
+   },
+   {
+    "stap": 192,
+    "soort": "dag",
+    "dag": 190,
+    "posten": 16,
+    "hash": "9cfd3308da21ec7dcb2798e8",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "5a12608abf1d41f37aed6ab0",
+     "overzicht": "8b2af972cde6ab73ec272437",
+     "posten": "ddf9c00852960a1195554fe5"
+    }
+   },
+   {
+    "stap": 193,
+    "soort": "dag",
+    "dag": 191,
+    "posten": 15,
+    "hash": "4d1408a199d4d4e051b65357",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "09f88044ba14661a18d5f9b1",
+     "overzicht": "e9d4a48fabf04145ad7b6e5b",
+     "posten": "31066e4f2ecbdd4f0963a6b4"
+    }
+   },
+   {
+    "stap": 194,
+    "soort": "dag",
+    "dag": 192,
+    "posten": 15,
+    "hash": "a38222a35746d166ea90b626",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "297582249dcd5e93eb8dbad8",
+     "overzicht": "34b97351cc274f03505f58f0",
+     "posten": "ce8d2c3c23c55fee59d42ff8"
+    }
+   },
+   {
+    "stap": 195,
+    "soort": "dag",
+    "dag": 193,
+    "posten": 15,
+    "hash": "575ef4acd33696bfad47edfa",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "8ee8650d2c6de3ffff3c6145",
+     "overzicht": "a4986de21ee8c25eba60cb35",
+     "posten": "d175faf8216d1440b43408b4"
+    }
+   },
+   {
+    "stap": 196,
+    "soort": "dag",
+    "dag": 194,
+    "posten": 15,
+    "hash": "b3dec47cfda3c8c256c72805",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "363010aeff192ea75f8a92bc",
+     "overzicht": "596b7b23031ea47f5ece59be",
+     "posten": "20fa104070205202bf420198"
+    }
+   },
+   {
+    "stap": 197,
+    "soort": "dag",
+    "dag": 195,
+    "posten": 15,
+    "hash": "b709c7acf570d3957e1e00f6",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "eb0a654fad31a13cbccd264a",
+     "overzicht": "166f71388f719e3cee0baf4b",
+     "posten": "629015d332ae22a6cf7548bd"
+    }
+   },
+   {
+    "stap": 198,
+    "soort": "dag",
+    "dag": 196,
+    "posten": 16,
+    "hash": "e6a6e6e4c6f42af25889247f",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "e0f58c7090a095653e5a8cb9",
+     "overzicht": "e0625a38b406b37865d4b748",
+     "posten": "c1fb167e9b7bab542d307233"
+    }
+   },
+   {
+    "stap": 199,
+    "soort": "dag",
+    "dag": 197,
+    "posten": 15,
+    "hash": "e76d4b8ee8068f52185dc1d4",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "eff9bfdfe243ce123d9f002d",
+     "overzicht": "8e8d44bf5ac9b1949e68ad7e",
+     "posten": "d303266aa77945ffee990001"
+    }
+   },
+   {
+    "stap": 200,
+    "soort": "dag",
+    "dag": 198,
+    "posten": 15,
+    "hash": "f4419c8ca66fcaed82f99c02",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "9f78d345c4e0280c43ffc640",
+     "overzicht": "52dc1efdbce2fb6b52faa904",
+     "posten": "68d59db9768f72ffe115252f"
+    }
+   },
+   {
+    "stap": 201,
+    "soort": "dag",
+    "dag": 199,
+    "posten": 16,
+    "hash": "37ce68b7ba44502dc6f7650c",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "9c1d8395b1fd672548da5242",
+     "overzicht": "159ad4e304341c0274f1ba19",
+     "posten": "1b6007a914f93ade77552c17"
+    }
+   },
+   {
+    "stap": 202,
+    "soort": "dag",
+    "dag": 200,
+    "posten": 15,
+    "hash": "b7cfe990799395b788b2a2d6",
+    "delen": {
+     "antwoord": "1a811637ba3a367b7de97ed3",
+     "saldi": "f04702c072acf8ff61fd3be3",
+     "overzicht": "abda0ee2e2500bafca1f0d7c",
+     "posten": "9c0f2798e8ac262bb3eae510"
+    }
+   }
+  ]
+ }
+}

@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1731,
-    "toetsenNietGemeten": 627,
+    "toetsenNietGemeten": 628,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -148,6 +148,16 @@
     "edgeVeldTrust": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-24",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 627,
+      "vervalt": "2026-12-24",
+      "meter": "toetsenNietGemeten 627 -> 628",
+      "reden": "test/beleidsafdwingen.test.js is nieuw (de beleidsmotor per deur uit de schaduw, besluit van de eigenaar van 24 september 2026). Met de hand nagetrokken met vijf mutaties op kern/beleidsmotor/afdwingen.js, de weigering in bewaak() en de eigenaarscontrole van de route; alle vijf zakken. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
     {
       "datum": "2026-09-24",
       "soort": "schuld",

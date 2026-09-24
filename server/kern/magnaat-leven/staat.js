@@ -1,28 +1,34 @@
-/* Magnaat Van Nul: WAT EEN LEVEN IS, en de twee dingen die iedereen hier doet.
+/* Magnaat FROM ZERO: WAT EEN LEVEN IS, en de handelingen die iedereen hier doet.
 
-   Een leven begint met een mens, een baan en € 63 (./regels.js). Alles wat
-   daarna gebeurt komt uit wat de speler doet (./acties.js) of uit wat de dagen
-   brengen (./dag.js). Deze module maakt de beginstand en kent twee handelingen
-   die overal voorkomen: iets melden, en een RTG-functie laten verschijnen op
-   het moment dat hij relevant wordt -- met de reden erbij, en maar een keer. */
+   Een leven begint op een maandag (./regels.js). Alles wat daarna gebeurt komt
+   uit wat de speler doet (de actiebestanden) of uit wat de dagen brengen
+   (./dag.js). Deze module maakt de beginstand en kent de gedeelde handelingen:
+   iets melden, een RTG-functie laten verschijnen wanneer hij relevant wordt
+   (met de reden, en maar een keer), en een betaling klaarzetten. */
 'use strict';
 const R = require('./regels');
+const { klantenVan } = require('./klanten');
 
-const MAX_MELDINGEN = 40;
+const MAX_MELDINGEN = 60;
 
 function nieuw({ wereld, nu }) {
-  return {
-    versie: 1, regelversie: R.REGELVERSIE, wereld,
-    dag: R.START_DAG, dagMs: R.DAG_MS, begonnen: nu, gerekendTot: nu,
+  const st = {
+    versie: 2, regelversie: R.REGELVERSIE, wereld,
+    dag: 1, dagMs: R.DAG_MS, begonnen: nu, gerekendTot: nu,
     kas: 0,
     baan: Object.assign({ actief: true }, R.BAAN),
-    uren: R.isWeekend(R.START_DAG) ? R.UREN.weekend : R.UREN.werkdag,
-    project: null, onderneming: null,
-    deals: [], dealTeller: 0, factuurTeller: 0,
-    lening: null, rood: false, overwerkDag: null,
+    bezit: ['telefoon', 'eenvoudige laptop'],
+    agenda: {},
+    aanbod: null, portfolio: 0, geleerd: 0,
+    deals: [], dealTeller: 0, factuurTeller: 0, postTeller: 0, betaald: 0,
+    posten: [],
+    software: null, lening: null,
+    onderneming: null, ondernemingVraag: null, zelfstandig: null,
     rtg: [], meldingen: [],
     boek: null
   };
+  for (const v of R.VERPLICHTINGEN) post(st, { soort: v.id, naam: v.naam, bedrag: v.bedrag, dag: v.eerste });
+  return st;
 }
 
 function meld(st, tekst, soort = 'info') {
@@ -37,16 +43,22 @@ function ontgrendel(st, id) {
   return true;
 }
 
-const aanbod = (st) => (st.project ? R.AANBOD[st.project.aanbod] : null);
-const klantVan = (st, klantId) => {
-  const a = aanbod(st);
-  return a ? a.klanten.find(k => k.id === klantId) || null : null;
-};
+/* Een betaling klaarzetten: hij wordt op zijn dag betaald als er geld is. Het
+   id komt uit een teller en nooit uit de lengte van de lijst: dat id is ook de
+   grootboeksleutel, en een sleutel die terugkomt boekt niets. */
+function post(st, { soort, naam, bedrag, dag }) {
+  st.posten.push({ id: soort + ':' + (++st.postTeller), soort, naam, bedrag, dag });
+}
+
+const klantVan = (st, klantId) => klantenVan(st.aanbod).find(k => k.id === klantId) || null;
 const deal = (st, id) => st.deals.find(d => d.id === String(id || '')) || null;
-/* Bedragen in spelteksten; het scherm zet ze zelf in de taal van de speler. */
 const euro = (cent) => {
   const a = Math.abs(cent), heel = String(Math.floor(a / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   return (cent < 0 ? '€ -' : '€ ') + heel + ',' + String(a % 100).padStart(2, '0');
 };
+const tijd = (min) => {
+  const u = Math.floor(min / 60), m = min % 60;
+  return u && m ? u + 'u ' + m + 'm' : u ? u + 'u' : m + 'm';
+};
 
-module.exports = { nieuw, meld, ontgrendel, aanbod, klantVan, deal, euro };
+module.exports = { nieuw, meld, ontgrendel, post, klantVan, deal, euro, tijd };

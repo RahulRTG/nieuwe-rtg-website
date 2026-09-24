@@ -1,21 +1,18 @@
-/* Magnaat Van Nul (V1 From Zero, MAGNAAT.md): een leven per lid.
-
-   Een mens met € 63 en een baan, via een eigen project, de eerste klant, een
-   factuur die te laat wordt betaald en geldnood, naar een eerste bedrijf.
+/* Magnaat FROM ZERO (V1, MAGNAAT.md): een leven per lid, van bijna niets tot
+   een eigen bedrijf.
 
    DE KLOK REKENT BIJ EN TIKT NIET, zoals in World: bij elke aanraking draaien
    de dagen die sinds `gerekendTot` echt verstreken zijn (hooguit
-   MAX_DAGEN_PER_KEER tegelijk), en pas daarna de handeling. Er loopt dus geen
-   timer, en wie een week wegblijft, komt terug in een week later.
+   MAX_DAGEN_PER_KEER tegelijk), en pas daarna de handeling. Wie klaar is met
+   zijn dag, sluit hem zelf af (`slaap`); de klok telt dan vanaf nu opnieuw.
 
-   Het leven hangt aan de sessiesleutel maar de wereld in het grootboek draagt
-   een hash ervan: het journaal kent geen leden. Al het geld loopt door
-   ./boek.js; na elke aanraking wordt het grootboek bevestigd. */
+   Het leven hangt aan de sessiesleutel, de wereld in het grootboek aan een hash
+   ervan: het journaal kent geen leden. Al het geld loopt door ./boek.js, en na
+   elke aanraking wordt het grootboek bevestigd. */
 'use strict';
-const crypto = require('crypto');
 const R = require('./regels');
-const { nieuw, meld, ontgrendel } = require('./staat');
-const { maakBoek, koppel } = require('./boek');
+const { nieuw, meld, ontgrendel, euro } = require('./staat');
+const { maakBoek, koppel, wereldVan } = require('./boek');
 const { volgendeDag } = require('./dag');
 const { ACTIES } = require('./acties');
 const { toon } = require('./weergave');
@@ -24,16 +21,19 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   const boek = maakBoek({ db });
   const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart' } });
   const levens = () => eigen.bak('magnaatLeven');
-  const wereldVan = (key) => 'leven:' + crypto.createHash('sha256').update(String(key)).digest('hex').slice(0, 16);
 
   function haal(key) {
     const alle = levens();
     let st = alle[key];
-    if (!st) {
-      st = nieuw({ wereld: wereldVan(key), nu: nu() });
+    /* Een leven uit de eerste opzet (versie 1) had geen week en geen agenda; het
+       begint opnieuw in plaats van half te worden omgebouwd. */
+    if (!st || st.versie !== 2) {
+      st = nieuw({ wereld: wereldVan(key) + ':2', nu: nu() });
       koppel(st, boek);
       boek.open(st, R.START_KAS);
-      meld(st, 'Je werkt als ' + R.BAAN.functie.toLowerCase() + ' bij ' + R.BAAN.werkgever + '. Over vijf dagen komt je loon; je hebt € 63.');
+      meld(st, 'Het is maandag. Je werkt 24 uur per week als keukenmedewerker bij ' + R.BAAN.werkgever +
+        ', je loon komt vrijdag, en je hebt ' + euro(R.START_KAS) + '. Je hebt een telefoon, een eenvoudige laptop, en vandaag nog ' +
+        '4u 20m voor jezelf. Wat ga je maken?');
       ontgrendel(st, 'geld');
       alle[key] = st;
     }
@@ -66,14 +66,19 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   function actie(key, body = {}) {
     const st = haal(key);
     bijrekenen(st);
-    const doe = Object.prototype.hasOwnProperty.call(ACTIES, body.actie) ? ACTIES[body.actie] : null;
-    if (!doe) { bewaarEnToon(st); return { status: 400, error: 'Die handeling bestaat niet in Van Nul.' }; }
-    const r = doe(st, body);
+    let r;
+    if (body.actie === 'slaap') {
+      volgendeDag(st);
+      st.gerekendTot = nu();
+    } else {
+      const doe = Object.prototype.hasOwnProperty.call(ACTIES, body.actie) ? ACTIES[body.actie] : null;
+      r = doe ? doe(st, body) : { status: 400, error: 'Die handeling bestaat niet in Magnaat.' };
+    }
     const beeld = bewaarEnToon(st);
     return r && r.error ? r : beeld;
   }
 
-  return { staat, actie, verifieer: (key) => boek.verifieer(haal(key)), _bijrekenen: bijrekenen };
+  return { staat, actie, verifieer: (key) => boek.verifieer(haal(key)) };
 }
 
 module.exports = { maakLeven };

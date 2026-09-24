@@ -98,12 +98,17 @@
   .nav button[hidden]{display:none}.vn-waarom{list-style:none;padding:0;margin:0 0 1.2rem;font-size:.78rem;color:var(--soft);line-height:1.6}.vn-waarom b{color:var(--paper);font-weight:600}
   .nav-meer summary{list-style:none;cursor:pointer;padding:.72rem .8rem;color:var(--soft);display:flex;align-items:center;gap:.7rem}.nav-meer summary::-webkit-details-marker{display:none}.nav-meer[open] summary{color:var(--paper)}
   .vn-kop{display:flex;justify-content:space-between;align-items:end;gap:1rem;margin-bottom:1rem}.vn-kop p{color:var(--soft);font-size:.8rem;margin:.2rem 0 0}.vn-kas small{display:block;color:var(--soft);font-size:.7rem}.vn-kas b{font-size:1.6rem;font-family:Georgia,serif;font-weight:500}.vn-kas b.vn-rood{color:var(--red)}
+  .vn-aandacht{list-style:none;padding:0;margin:0 0 1rem}.vn-a{border-left:2px solid var(--line);padding:.45rem .8rem;margin:.3rem 0;font-size:.82rem}.vn-a.vn-s-nood,.vn-a.vn-s-slecht{border-left-color:var(--red)}.vn-a.vn-s-vraag{border-left-color:var(--paper)}
+  .vn-agenda{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.4rem;margin-bottom:1.5rem}.vn-dag{border:1px solid var(--line);padding:.55rem;display:flex;flex-direction:column;gap:.3rem;font-size:.74rem;min-width:0}.vn-dag.vn-vandaag{border-color:var(--gold)}.vn-dag small{color:var(--soft);font-size:.68rem}
+  .vn-item{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;background:rgba(255,255,255,.04);padding:.25rem .35rem}.vn-item em{font-style:normal;color:var(--soft)}.vn-betaal{border-left:2px solid var(--line)}.vn-betaal.vn-open{border-left-color:var(--red)}.vn-schrap{margin-left:auto;background:none;border:0;color:var(--soft);cursor:pointer;min-width:24px;min-height:24px}
+  .vn-drie{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:.6rem}.vn-drie div{border:1px solid var(--line);padding:.8rem}.vn-drie small,.vn-drie span{display:block;color:var(--soft);font-size:.72rem}.vn-drie b{display:block;font-family:Georgia,serif;font-weight:500;font-size:1.4rem;margin:.2rem 0}
+  .vn-contact{border-bottom:1px solid var(--line);padding:.7rem 0}.vn-contact small{display:block;color:var(--soft);font-size:.72rem}.vn-rondes{margin:.4rem 0;padding-left:1.1rem;font-size:.8rem}
   .vn-nood,.vn-fout{border:1px solid var(--red);padding:.8rem 1rem;font-size:.82rem;line-height:1.5}.vn-acties{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}.vn-invoer{padding:1rem;margin-bottom:1rem}.vn-invoer label{display:block;font-size:.78rem;color:var(--soft);margin:.5rem 0}
   .vn-invoer input,.vn-invoer select{display:block;margin-top:.3rem;padding:.55rem;background:var(--night);color:var(--paper);border:1px solid var(--line);min-width:14rem}.vn-knoppen,.vn-velden{display:flex;flex-wrap:wrap;gap:.6rem;align-items:end;margin-bottom:.7rem}
   .vn-twee{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem}.vn-meldingen{list-style:none;padding:0;margin:0}.vn-m{border-bottom:1px solid var(--line);padding:.6rem 0;font-size:.82rem;line-height:1.5}.vn-m small{display:block;color:var(--soft);font-size:.68rem}.vn-m{padding-left:.7rem;border-left:2px solid transparent}.vn-m.vn-s-nood,.vn-m.vn-s-slecht{border-left-color:var(--red)}.vn-m.vn-s-goed{border-left-color:var(--gold)}.vn-m.vn-s-vraag{border-left-color:var(--paper)}.vn-m.vn-s-rtg{border-left-color:var(--line)}
   .vn-rtg{border-left:2px solid var(--gold);padding:.4rem .7rem;margin:.5rem 0}.vn-rtg small{display:block;color:var(--soft);font-size:.72rem;margin-top:.2rem}.vn-rust{color:var(--soft);font-size:.8rem}
   .vn-blok{padding:1rem 1.2rem;margin-bottom:1.2rem}.vn-blok h3{margin:.8rem 0 .4rem}.vn-regel{display:flex;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--line);padding:.45rem 0;font-size:.82rem}.vn-regel b{font-weight:600;text-align:right}
-  @media(max-width:700px){.vn-twee{grid-template-columns:1fr}.vn-kop{flex-direction:column;align-items:start}.nav-meer{display:flex}}
+  @media(max-width:700px){.vn-agenda{grid-template-columns:1fr 1fr}.vn-drie{grid-template-columns:1fr}.vn-twee{grid-template-columns:1fr}.vn-kop{flex-direction:column;align-items:start}.nav-meer{display:flex}}
 </style>
 <script src="/shared/id.js"></script>
 <script src="/shared/media.js"></script>
@@ -149,7 +154,7 @@
           <div class="mv-cijfer"><small>Niveau</small><b id="mvNiveau">-</b></div>
           <div class="mv-cijfer"><small>Balans</small><b id="mvBalans">-</b><em>spelwaarde</em></div>
         </div>
-        <button class="mv-knop mv-knop--goud mv-verdieping" type="button" data-mv-diep="vandaag">Begin bij nul: van € 63 naar je eerste bedrijf</button>
+        <button class="mv-knop mv-knop--goud mv-verdieping" type="button" data-mv-diep="vandaag">FROM ZERO: begin met € 64,32 en een baan</button>
         <button class="mv-knop mv-verdieping" type="button" data-mv-diep="werkplek">Open de volledige Magnaat-wereld</button>
       </section>
 
@@ -214,18 +219,20 @@
     <div class="topbar"><span class="crumb" id="crumb">Vandaag</span><span class="top-spacer"></span><span class="statuspill"><i class="dot"></i><b id="online">...</b> spelersprofielen</span><a class="exit" href="/apps/spelen.html">Naar alle spellen</a></div>
 
     <section class="screen aan" id="vandaag" aria-labelledby="vnVandaagKop">
-      <div class="vn-kop"><div><div class="eyebrow">Van Nul · dag <span id="vnDag">…</span></div><h2 id="vnVandaagKop">Vandaag</h2><p id="vnKlok">Je leven wordt geladen…</p></div><div class="vn-kas"><small>Op je rekening</small><b id="vnKas">…</b></div></div>
-      <p class="vn-nood" id="vnNood" hidden>Je staat rood. Een herinnering aan wie je nog moet betalen, een extra dienst of een lening bij je familie kan helpen; elke keuze heeft een gevolg.</p>
+      <div class="vn-kop"><div><div class="eyebrow">FROM ZERO · <span id="vnDag">…</span></div><h2 id="vnVandaagKop">Vandaag</h2><p id="vnKlok">Je leven wordt geladen…</p></div><div class="vn-kas"><small>Op je rekening</small><b id="vnKas">…</b></div></div>
+      <ul class="vn-aandacht" id="vnAandacht" aria-label="Wat aandacht vraagt"></ul>
       <p class="vn-fout" id="vnFout" role="alert" hidden></p>
       <div class="rtg-duimbalk vn-acties"><button type="button" class="btn primary" id="vnHoofd" data-vn-actie="0" data-hoofdactie data-rtg-edge-bar hidden></button><div class="vn-acties" id="vnActies"></div></div>
       <div class="card vn-invoer" id="vnInvoer" hidden></div>
       <ul class="vn-waarom" id="vnWaarom" aria-label="Waarom deze handelingen nu kunnen"></ul>
+      <h3>Je week</h3>
+      <div class="vn-agenda" id="vnAgenda" aria-label="Je agenda voor zeven dagen"></div>
       <div class="vn-twee"><section><h3>Wat er gebeurde</h3><ol class="vn-meldingen" id="vnMeldingen"></ol></section>
       <section><h3>Je RTG</h3><p class="vn-rust">Functies verschijnen hier pas als je ze nodig hebt.</p><div id="vnRtg"></div></section></div>
     </section>
-    <section class="screen" id="geld" aria-labelledby="vnGeldKop"><div class="eyebrow">Van Nul</div><h2 id="vnGeldKop">Geld</h2><div class="card vn-blok" id="vnGeld"></div></section>
-    <section class="screen" id="netwerk" aria-labelledby="vnNetwerkKop"><div class="eyebrow">Van Nul</div><h2 id="vnNetwerkKop">Netwerk</h2><div class="card vn-blok" id="vnNetwerk"></div></section>
-    <section class="screen" id="bedrijf" aria-labelledby="vnBedrijfKop"><div class="eyebrow">Van Nul</div><h2 id="vnBedrijfKop">Mijn bedrijf</h2><div class="card vn-blok" id="vnBedrijf"></div></section>
+    <section class="screen" id="geld" aria-labelledby="vnGeldKop"><div class="eyebrow">FROM ZERO</div><h2 id="vnGeldKop">Geld</h2><div class="card vn-blok" id="vnGeld"></div></section>
+    <section class="screen" id="netwerk" aria-labelledby="vnNetwerkKop"><div class="eyebrow">FROM ZERO</div><h2 id="vnNetwerkKop">Netwerk</h2><div class="card vn-blok" id="vnNetwerk"></div></section>
+    <section class="screen" id="bedrijf" aria-labelledby="vnBedrijfKop"><div class="eyebrow">FROM ZERO</div><h2 id="vnBedrijfKop">Mijn bedrijf</h2><div class="card vn-blok" id="vnBedrijf"></div></section>
 
     <section class="screen" id="home">
       <div class="hero">
@@ -703,6 +710,7 @@ if(window.RTGRealtime)RTGRealtime.start(TOKEN,{onSync:(scope,data)=>{if(scope!==
 setInterval(()=>{if(TEAM_ROOM&&!$('#teamOverlay').hidden&&!document.hidden)refreshTeamRoom(true)},60000);
 load();
 </script>
+<script src="/apps/magnaat-leven-schermen.js"></script>
 <script src="/apps/magnaat-leven.js"></script>
 <script src="/apps/magnaat-voorzijde-scenarios.js"></script>
 <script src="/apps/magnaat-voorzijde.js"></script>

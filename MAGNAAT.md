@@ -265,19 +265,47 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 
 Wat A2 bewust **niet** deed: het grootboek bewaart zijn journaal nog als één waarde per collectie (A3 in de oorspronkelijke fundering), en een partij kent nog geen herhaling uit het journaal (A5). Volgens de scopebevriezing komen die pas als een V-ronde erop vastloopt.
 
-### V1 From Zero: wat er staat (24 september 2026)
+### V1 FROM ZERO: wat er staat (24 september 2026)
 
-**De keten is speelbaar, van € 63 tot een eerste bedrijf.** `server/kern/magnaat-leven/` geeft elk lid één leven: een baan als magazijnmedewerker (netto € 1.650 op de 25e), € 63 op de rekening, en vier vrije uren op een werkdag en twaalf in het weekend. Wat je naast je baan begint is een van drie projecten, elk met eigen software en drie klanten. Daarna gaat het om netwerken, een offerte, onderhandelen (de klant biedt tegen; een tweede bod is zijn laatste), het werk in uren, de inschrijving bij de KvK (€ 82,25) en pas dan de factuur. De eerste klant betaalt altijd twaalf dagen te laat. Dat is de kern van de keten en geen toeval. De bedragen zijn zo gekozen dat een maand net rondkomt: wie de wanbetaler geen herinnering stuurt, staat rond dag 49 rood. Daar liggen drie keuzes, elk met een gevolg: een herinnering (dan betaalt hij binnen twee dagen), een extra dienst in het weekend, of een lening bij je familie, die in twee termijnen van je loon af gaat. Rood staan op de eerste van de maand kost rente. Een betaalde klant beveelt je aan bij de volgende.
+**De belofte:** wie niets van RTG of boekhouden weet, opent het, begint zonder uitleg, speelt een paar uur en denkt aan het eind: *ik begon letterlijk met bijna niks, en dit bedrijf heb ík opgebouwd.* V1 doet daarom één ding en geen tien: van persoon → arbeid → eerste kans → klant → opdracht → factuur → cashprobleem → onderneming. Personeel, leveranciers, voorraad en een levende markt horen bij V2 en later.
 
-**Al het geld loopt vanaf dag één door het grootboek.** Er is geen A2-migratie nodig geweest. `boek.js` is de enige plek die een saldo schrijft, en de kas is een projectie van de rekening. Twee regels kwamen uit het bouwen. Ten eerste: een sleutel die al geboekt is, geeft de bestaande boeking terug en beweegt de kas niet; anders loopt de kas stil weg van het grootboek (twee extra diensten op één zaterdag hadden precies dat gedaan). Ten tweede draagt elke boeking haar richting (`in`, `uit`) als label, zodat een scherm een uitgave niet hoeft te raden. De wereld in het journaal is een hash van de sessiesleutel: het journaal kent geen leden.
+**Je begint op een maandag** met € 64,32, een baan van 24 uur per week als keukenmedewerker (dinsdag, woensdag en zaterdag; loon op vrijdag), € 41,99 aan vaste betalingen deze week, een telefoon, een eenvoudige laptop, 4u 20m vrij vandaag, en geen onderneming (`server/kern/magnaat-leven/`, regels in `regels.js`).
 
-**De klok rekent bij en tikt niet, zoals in World.** Een speldag duurt drie echte minuten. Bij elke aanraking draaien de verstreken dagen in vaste volgorde, zodat tien dagen in één keer hetzelfde opleveren als tien losse dagen (`test/magnaatleven.test.js` toets 5).
+**Tijd is net zo schaars als geld.** Elke dag heeft vrije minuten naast je diensten. Die plan je in een agenda: aan je eigen project, aan leren, aan een opdracht, of aan de extra dienst die de keuken elke donderdag aanbiedt (€ 145 voor 7 uur). Een uur kan maar één keer op. Dat is opportunity cost, en niemand hoeft het woord te kennen om het te voelen. De agenda wordt uitgevoerd aan het eind van de dag.
 
-**De schermen staan in de Magnaat-app.** Vandaag, Wereld, Werk, Geld, Netwerk en Mijn bedrijf; dat laatste verschijnt pas met een onderneming. Commandocentrum, Functiehal, Economie en Future Lab staan onder *Meer*, en de bestaande werkplek zit onder Werk. De handeling die nu het meest zin heeft, is de hoofdactie van de Edge. Elke handeling staat er met haar reden bij, en een weigering komt van de server, ook met haar reden. RTG-functies verschijnen pas als ze relevant worden, elk met het moment en de reden. De browserproef vond iets wat geen unittoets kon zien: de Edge neemt de hoofdactieknop OVER, dus een nieuwe knop per beurt liet de oude in de Edge-voet staan. Daarom is de hoofdactie één vaste knop (`test/magnaatleven.e2e.js`).
+**Een kans komt uit wat je doet, niet uit een knop.** Na zes uur aan je eigen project heeft iemand je werk gezien. Een tevreden klant beveelt je aan, en een ingeschreven onderneming wordt gevonden (`klanten.js`, `komt`). Na een half uur gesprek weet je wat de klant wil, hoeveel werk het is en wanneer hij het nodig heeft. Daarna onderhandel je over het bedrag **én** over de voorwaarden: *jij € 900, klant € 650, jij € 800 + 25% vooraf, akkoord.* Wat eruit komt is een afspraak met een bedrag, een voorschot, uren en een deadline. Voor klantwerk heb je betaalde software nodig, en die kost vanaf die dag € 49 per vier weken.
 
-**Twee routes, en ze staan bij Magnaat Wereld:** `/api/member/magnaat/leven/staat` (idempotent, gemeten) en `/leven/actie` (bewust niet idempotent: een zet in een spel). Beide hebben een contract in `server/lib/mutatiecontracten-magnaatleven.js`.
+**Resultaat is geen bank, en dat staat in de boeken en niet alleen op het scherm.** Een voorschot is een schuld aan de klant tot je levert. Een factuur is omzet en een **vordering**, geen geld. Pas als de klant betaalt, wordt de vordering kas. Zo staat er midden in het spel: *op je rekening € 108,35 · nog te ontvangen € 600 · resultaat van je werk € 751.* Het boek (`boek.js`) kent daarvoor echte rekeningsoorten (kas, vordering, vooruit, omzet, kosten, schuld), en privé-uitgaven gaan naar een tegenpartij. Zo gaat het resultaat alleen over je werk.
 
-Wat V1 bewust **niet** doet: er is geen btw op facturen en geen belasting op de winst, de baan kun je niet opzeggen, en per project zijn er drie vaste klanten. Het leven staat nog los van World. Of een onderneming uit Van Nul in World verder mag, is een V-vraag en geen A-vraag.
+**Dan het cashprobleem.** De eerste klant betaalt altijd te laat. De huur valt op dag 15. Wie geen extra dienst draaide, kan hem niet betalen: de betaling mislukt, er komen aanmaningskosten bij, en het loon van vrijdag lost het op. Je rekening kan niet rood staan. Wat je dan kunt doen, en elk heeft een prijs:
+- extra werken: geld erbij, tijd voor je project eraf;
+- een herinnering sturen na de vervaldag: de klant betaalt binnen drie dagen;
+- korting bieden voor directe betaling: geld nu, maar minder, en de korting staat als kosten in je resultaat;
+- een nieuwe opdracht aannemen: toekomstige omzet, maar meer tijdsdruk;
+- uitstellen waar dat echt kan: telefoon en verzekering een week later tegen kosten, of software die dan stilligt. De huur kan niet;
+- financieren: lenen bij je familie, terug van je volgende twee lonen, of als onderneming een factuur laten voorfinancieren (90% nu, de rest is kosten).
+
+**Het spel stelt vast dat je onderneemt.** V1 begint niet met "richt bedrijf op". Na twee betaalde opdrachten zegt het spel dat je structureel voor klanten werkt, en vraagt het hoe je verder wilt. Een nieuwe klant neem je vanaf dan aan als onderneming. Pas na de inschrijving verschijnt **Mijn bedrijf**, met resultaat en balans. Een tevreden klant komt na drie weken terug voor onderhoud, tegen het uurtarief dat je de eerste keer afsprak: wie zich toen goedkoop verkocht, merkt dat opnieuw. Brengt je bedrijf vier weken lang twee keer je loon binnen, en bestaat het al minstens vier weken, dan kun je je baan opzeggen. Dat is het einde van V1: *je begon met € 64,32 en een baan in de keuken, en dit bedrijf heb jij opgebouwd.*
+
+**RTG-functies verschijnen pas als je ze nodig hebt**, met het moment en de reden: Geld, Agenda, Berichten, Offertes, Facturen, Betaalherinneringen, Budget, Zakelijk en Boekhouding. Geen level-up.
+
+**De schermen** staan in de Magnaat-app:
+- **Vandaag:** wat aandacht vraagt, je week in een agenda met diensten, loon en betalingen, wat er gebeurde, en je RTG;
+- **Werk:** baan, diensten, eigen project en opdrachten;
+- **Geld:** rekening, te ontvangen en resultaat naast elkaar, met wat eraan komt;
+- **Netwerk:** elk gesprek met zijn biedingen;
+- **Wereld** en **Mijn bedrijf**.
+
+De Edge draagt de handeling die nu het meest zin heeft als hoofdactie. Elke handeling staat er met haar reden bij, en een weigering komt van de server, met de reden erbij.
+
+**De klok rekent bij en tikt niet, zoals in World.** Een speldag duurt drie echte minuten, of korter als je hem zelf afsluit.
+
+**Wat de toetsen vastleggen:** de hele keten staat in `test/magnaatleven.test.js`, van € 64,32 tot de onderneming, met de onderhandeling letterlijk zoals hierboven. Zes mutaties zijn nagetrokken en zakken alle zes (onder andere: een factuur als geld boeken, een klant die op tijd betaalt, een voorschot zonder grens, rood kunnen staan). Drie dingen die het bouwen blootlegde en die nu vastliggen:
+- de id van een betaling komt uit een teller en nooit uit de lengte van de lijst, want dat id is de grootboeksleutel, en een sleutel die terugkomt boekt niets;
+- werk dat vandaag niet kan (software niet betaald), wordt geweigerd met de reden, en niet aan het eind van de dag stil weggegooid;
+- het beeld is een kopie, anders veranderde een aanroeper die `rondes.pop()` deed de echte onderhandeling.
+
+Wat V1 bewust **niet** doet: btw (de spelregel is de kleineondernemersregeling), belasting op de winst, personeel, leveranciers, voorraad, meer dan drie aanbodsoorten met zes klanten elk, en een koppeling met World.
 
 ---
 

@@ -1,12 +1,12 @@
-/* MAGNAAT VAN NUL IN EEN ECHTE BROWSER: van de voorzijde naar Vandaag, en de
-   eerste stappen van de keten met de Edge als bediening.
+/* MAGNAAT FROM ZERO IN EEN ECHTE BROWSER: van de voorzijde naar Vandaag, en de
+   eerste dag met de Edge als bediening -- kiezen wat je maakt, tijd plannen in
+   je agenda, een blok schrappen, en de dag afsluiten.
 
    Wat deze toets vasthoudt en wat geen unittoets kon zien: de handeling die nu
    het meest zin heeft is de hoofdactie van de Edge, en de Edge neemt die knop
-   OVER. De eerste versie tekende per beurt een nieuwe knop, en dan bleven de
-   oude in de Edge-voet staan -- na drie stappen stonden er drie hoofdacties,
-   waarvan twee niet meer bestonden. Daarom: precies een hoofdactie, en die
-   noemt de actuele stap. */
+   OVER. Een eerdere versie tekende per beurt een nieuwe knop, en dan bleven de
+   oude in de Edge-voet staan. Daarom: precies een hoofdactie, en die noemt de
+   actuele stap. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -16,8 +16,8 @@ const { startServer, letOpFouten, laadPlaywright, browserOpties, edgeBediening, 
 
 const pw = laadPlaywright();
 
-test('Van Nul: voorzijde, Vandaag, project, netwerk en offerte via de Edge', { timeout: 240000, skip: geenBrowser(pw) }, async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vannul-'));
+test('FROM ZERO: voorzijde, Vandaag, kiezen, plannen, schrappen en de dag afsluiten via de Edge', { timeout: 240000, skip: geenBrowser(pw) }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-fromzero-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -34,34 +34,41 @@ test('Van Nul: voorzijde, Vandaag, project, netwerk en offerte via de Edge', { t
     await page.goto(base + '/apps/magnaat.html', { waitUntil: 'domcontentloaded' });
 
     await page.click('[data-mv-diep="vandaag"]');
-    await page.waitForFunction(() => /63,00/.test(document.getElementById('vnKas').textContent), null, { timeout: 20000 });
+    await page.waitForFunction(() => /64,32/.test(document.getElementById('vnKas').textContent), null, { timeout: 20000 });
+    assert.match(await page.textContent('#vnDag'), /maandag, dag 1/);
+    assert.match(await page.textContent('#vnAgenda'), /Telefoon en zorgverzekering/, 'de betaling van woensdag staat in je week');
     assert.equal(await page.$eval('#vnNavBedrijf', e => getComputedStyle(e).display), 'none', 'Mijn bedrijf bestaat pas met een onderneming');
 
     const hoofdacties = () => page.$$eval('[data-hoofdactie]', bs => bs.map(b => b.textContent.trim()));
     const waarom = (re) => page.waitForFunction(r => new RegExp(r).test(document.getElementById('vnWaarom').textContent), re.source, { timeout: 10000 });
 
-    await edgeBediening(page, 'Begin een eigen project');
-    await page.selectOption('#vnAanbod', 'websites');
+    await edgeBediening(page, 'Kies wat je gaat maken');
+    await page.selectOption('#vnF-aanbod', 'websites');
     await page.click('[data-vn-doe]');
-    await waarom(/Netwerken/);
-    assert.match(await page.textContent('#vnKas'), /44,00/, 'de software is afgeschreven, door het grootboek');
-    assert.deepEqual(await hoofdacties(), ['Netwerken'], 'precies een hoofdactie, en het is de actuele');
+    await waarom(/Werk aan je eigen portfolio-site/);
+    assert.deepEqual(await hoofdacties(), ['Werk aan je eigen portfolio-site'], 'precies een hoofdactie, en het is de actuele');
 
-    await edgeBediening(page, 'Netwerken');
-    await waarom(/Offerte aan/);
-    assert.deepEqual(await hoofdacties(), ['Offerte aan Bakkerij Van Dam']);
-
-    await edgeBediening(page, 'Offerte aan Bakkerij Van Dam');
-    await page.fill('#vnBedrag', '1100');
+    await edgeBediening(page, 'Werk aan je eigen portfolio-site');
+    await page.selectOption('#vnF-minuten', '240');
     await page.click('[data-vn-doe]');
-    await page.waitForFunction(() => /Offertes/.test(document.getElementById('vnRtg').textContent), null, { timeout: 10000 });
-    assert.equal(await page.$eval('#vnFout', e => e.hidden), true);
+    await page.waitForFunction(() => /eigen project/.test(document.getElementById('vnAgenda').textContent), null, { timeout: 10000 });
+    assert.match(await page.textContent('#vnKlok'), /nog 20m vrij vandaag/);
 
-    await page.click('[data-screen="netwerk"]');
-    assert.match(await page.textContent('#vnNetwerk'), /Bakkerij Van Dam.*offerte verstuurd/);
+    await page.click('[data-vn-schrap="1:0"]');
+    await page.waitForFunction(() => /nog 4u 20m vrij/.test(document.getElementById('vnKlok').textContent), null, { timeout: 10000 });
+
+    await page.locator('.vn-acties button', { hasText: 'Sluit de dag af' }).click();
+    await page.waitForFunction(() => /dinsdag, dag 2/.test(document.getElementById('vnDag').textContent), null, { timeout: 10000 });
+    assert.match(await page.textContent('#vnKas'), /57,32/, 'boodschappen door het grootboek');
+
     await page.click('[data-screen="geld"]');
-    assert.match(await page.textContent('#vnGeld'), /-€\s?19,00/, 'een uitgave draagt een minteken');
-    assert.match(await page.textContent('#vnGeld'), /gelijk aan je rekening in het grootboek/);
+    const geld = await page.textContent('#vnGeld');
+    assert.match(geld, /Op je rekening.*Nog te ontvangen.*Resultaat van je werk/);
+    assert.match(geld, /Een factuur is omzet, geen geld/);
+    assert.match(geld, /-€\s?7,00/, 'een uitgave draagt een minteken');
+    assert.match(geld, /gelijk aan je rekening in het grootboek/);
+    await page.click('[data-screen="werkplek"]');
+    assert.match(await page.textContent('#vnWerk'), /Keukenmedewerker bij Brasserie De Haven/);
     assert.deepEqual(fouten, []);
   } finally {
     if (browser) await browser.close();

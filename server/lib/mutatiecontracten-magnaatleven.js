@@ -1,5 +1,5 @@
 /* ============================================================================
-   DE MUTATIECONTRACTEN VAN MAGNAAT VAN NUL (kern/magnaat-leven, V1).
+   DE MUTATIECONTRACTEN VAN MAGNAAT FROM ZERO (kern/magnaat-leven, V1).
 
    EERST GEMETEN, DAN VERKLAARD. Een dubbeltik-ronde op de kern: elke route twee
    keer met hetzelfde lijf, en tellen wat er in `magnaatLeven` en in het
@@ -10,11 +10,12 @@
    rekent alleen bij voor tijd die ECHT verstreek.
 
    `actie` is met opzet geen idempotente route: het is een zet in een spel.
-   Twee keer netwerken is twee gesprekken, twee keer twee uur werken is vier uur
-   werk. Wat maar een keer mag -- een project kiezen, je inschrijven, een
-   factuur, een lening, een extra dienst per dag -- weigert de TOESTAND met een
-   reden. En het geld kan niet dubbel: elke overdracht draagt een
-   grootboeksleutel, en een sleutel die al geboekt is beweegt de kas niet. */
+   Twee keer een uur plannen is twee uur in je agenda, twee keer de dag
+   afsluiten is twee dagen verder. Wat maar een keer mag -- kiezen wat je maakt,
+   je inschrijven, een factuur, een lening, de extra dienst van een dag --
+   weigert de TOESTAND met een reden. En het geld kan niet dubbel: elke
+   overdracht draagt een grootboeksleutel, en een sleutel die al geboekt is
+   beweegt de kas niet. */
 'use strict';
 
 const OP = '2026-09-24';
@@ -41,12 +42,12 @@ const CONTRACTEN = Object.fromEntries([
     semantiek: { klasse: 'nietHerhaalbaar' },
     toegang: LID,
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
-    waarom: 'Een handeling in Van Nul is een zet in een spel: nog een keer netwerken of werken is een ' +
+    waarom: 'Een handeling in FROM ZERO is een zet in een spel: nog een keer plannen of de dag afsluiten is een ' +
       'tweede zet en hoort zo te tellen. Eenmalige zetten weigert de toestand met een reden.',
-    bewijs: { gemeten: 'dubbeltik-ronde ' + OP + ': netwerk twee keer gaf 1 -> 2 contacten (bedoeld); ' +
-      'project twee keer gaf de tweede keer een weigering en een ongewijzigde staat; overwerk twee ' +
-      'keer op dezelfde dag gaf de tweede keer een weigering en de kas bleef op 10400 (4400 -> 10400 ' +
-      '-> 10400), gelijk aan het grootboek.', op: OP },
+    bewijs: { gemeten: 'dubbeltik-ronde ' + OP + ' op FROM ZERO: plan twee keer een uur project gaf twee ' +
+      'blokken in de agenda (bedoeld); kies twee keer gaf de tweede keer een weigering en een ongewijzigde staat; ' +
+      'de extra dienst twee keer op dezelfde donderdag gaf de tweede keer een weigering; slaap twee keer gaf twee ' +
+      'dagen verder (1 -> 3), met de kas gelijk aan het grootboek en verifieerGrootboek zonder bevindingen.', op: OP },
     afgetekend: AFGETEKEND
   }]
 ]);

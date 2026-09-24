@@ -74,6 +74,9 @@ const KANTOORBANK = Object.freeze({
   '/api/office/bank/incasso/dossier': [false, 'leest het dossier van de keten', ['LEZEN_ANDERMANS']],
   '/api/office/bank/handtekening/open': [false, 'leest wat er openstaat', ['LEZEN_ANDERMANS']],
   '/api/office/bank/handtekening/intrek': [false, 'haalt een aanvraag weg voordat er iets is uitgevoerd', ['VOORSTEL_MAKEN']],
+  '/api/office/bank/opdrachten/afstemming': [false,
+    'maakt alleen een aanvraag (MONEY-012); het geld beweegt pas als een tweede mens tekent via ' +
+    '/handtekening/bevestig', ['VOORSTEL_MAKEN']],
   '/api/office/bank/salaris/voorstel': [false, 'rekent een voorstel voor; uitbetalen is /salaris/run', ['VOORSTEL_MAKEN']],
   '/api/office/bank/gezond': [false, 'leest de gezondheid van de bankkant', []],
   '/api/office/bank/afschrift': [false, 'leest boekingen', ['LEZEN_ANDERMANS']],

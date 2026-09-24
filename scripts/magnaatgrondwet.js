@@ -108,7 +108,7 @@ function scopeStand(sc, lees, wortel) {
   }
 
   if (sc.schending) {
-    const re = new RegExp(sc.schending.patroon, 'g');
+    const re = new RegExp(sc.schending.patroon, 'g' + (sc.schending.vlaggen || ''));
     const plekken = [];
     for (const rel of bestanden(wortel, sc.schending.bestanden)) {
       const code = lees(rel, { code: true });

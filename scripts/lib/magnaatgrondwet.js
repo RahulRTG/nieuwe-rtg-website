@@ -396,6 +396,38 @@ const REGELS = [
     },
     migratie: 'Een wereldkop in de kern met alle zes velden, vastgelegd bij het aanmaken en nooit meer gewijzigd.',
     faalwijze: 'Een onderzoeker kan een wereld niet opnieuw draaien, of draait hem op andere regels zonder het te weten.'
+  },
+  {
+    /* De eerste regel met een familienummer. Hij kwam uit ronde A1: de motor is
+       losgemaakt uit het Oefenkantoor, en dat mag niet stil terugkruipen. De
+       toets hield het al vast; als grondwetregel telt de meter het zelf, en een
+       terugval is een VIOLATION die de ratel tegenhoudt. */
+    id: 'M-601', familie: 'M-6',
+    invariant: 'De economische motor kent geen consument: hij leunt niet op het Oefenkantoor, de Academy of een spelvorm, en de afhankelijkheid loopt alleen van consument naar motor.',
+    scope: {
+      motor: {
+        autoriteit: 'server/kern/magnaat-economische-motor/index.js: wat per wereld verschilt komt binnen via profiel en haken',
+        handhaver: [
+          { bestand: 'server/kern/magnaat-economische-motor/index.js', citaat: 'const m = { wereld, profiel, wereldState, opslag, save, haken,' },
+          { bestand: 'server/kern/magnaat-economische-motor/index.js', citaat: 'keurProfiel(profiel);' }
+        ],
+        toets: [
+          { bestand: 'test/magnaat-economische-motor.test.js', naam: '2. de motor kent het Oefenkantoor niet, en leunt er ook niet op', bewijst: 'TOEGESTAAN' }
+        ],
+        /* Dezelfde woorden en dezelfde toegestane requires als toets 2, zodat
+           meter en toets niet uit elkaar lopen. Gelezen zonder commentaar: een
+           uitleg die het Oefenkantoor NOEMT is geen afhankelijkheid. */
+        schending: {
+          bestanden: { map: 'server/kern/magnaat-economische-motor', zonder: [] },
+          vlaggen: 'i',
+          patroon: 'praktijk|oefen|missie|economenlab|magnaatwereld|academy|spelvorm|functieId|[\'"]rtg[\'"]|\\btaak\\b' +
+            '|require\\(\\s*[\'"](?!\\.\\/[a-z-]+[\'"]|\\.\\.\\/magnaat-motorklant[\'"]|\\.\\.\\/eigencollectie[\'"]|\\.\\.\\/\\.\\.\\/lib\\/klok[\'"])',
+          wat: 'de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, zijn Rust-client, de opslagdeclaratie en de klok'
+        }
+      }
+    },
+    migratie: 'Geen: dit is de stand na ronde A1. Bij A2 komt World erbij als tweede consument, via hetzelfde profiel en dezelfde haken.',
+    faalwijze: 'Een wijziging voor het Oefenkantoor verandert stil de economie van elke wereld die op de motor draait.'
   }
 ];
 

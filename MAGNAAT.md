@@ -176,8 +176,9 @@ Wat A1 met opzet **niet** deed: World migreren (A2), een wereldkop met seed en d
 | M-017 | Simulatie-integriteit | **PARTIAL** | ja | ja | nee | nee |
 | M-018 | Simulatie-integriteit | **PARTIAL** | ja | ja | nee | nee |
 | M-019 | Simulatie-integriteit | **PARTIAL** | ja | ja | ja | ja |
+| M-601 | Simulatie-integriteit | **PASS** | ja | ja | ja | ja |
 
-19 invarianten: 4 PASS, 6 PARTIAL, 6 ABSENT, 3 VIOLATION; 70 geteld schendende plekken.
+20 invarianten: 5 PASS, 6 PARTIAL, 6 ABSENT, 3 VIOLATION; 70 geteld schendende plekken.
 
 ### M-001: Economische waarheid
 
@@ -528,5 +529,21 @@ Stand: **PARTIAL**
 **Migratie.** Een wereldkop in de kern met alle zes velden, vastgelegd bij het aanmaken en nooit meer gewijzigd.
 
 **Faalwijze.** Een onderzoeker kan een wereld niet opnieuw draaien, of draait hem op andere regels zonder het te weten.
+
+### M-601: Simulatie-integriteit
+
+> De economische motor kent geen consument: hij leunt niet op het Oefenkantoor, de Academy of een spelvorm, en de afhankelijkheid loopt alleen van consument naar motor.
+
+Stand: **PASS**
+
+- **Economische motor**: PASS
+  - Autoriteit: server/kern/magnaat-economische-motor/index.js: wat per wereld verschilt komt binnen via profiel en haken
+  - Handhaver: `server/kern/magnaat-economische-motor/index.js`, `const m = { wereld, profiel, wereldState, opslag, save, haken,`; `server/kern/magnaat-economische-motor/index.js`, `keurProfiel(profiel);`
+  - Toets: `test/magnaat-economische-motor.test.js`, "2. de motor kent het Oefenkantoor niet, en leunt er ook niet op"
+  - Schending: 0, de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, zijn Rust-client, de opslagdeclaratie en de klok
+
+**Migratie.** Geen: dit is de stand na ronde A1. Bij A2 komt World erbij als tweede consument, via hetzelfde profiel en dezelfde haken.
+
+**Faalwijze.** Een wijziging voor het Oefenkantoor verandert stil de economie van elke wereld die op de motor draait.
 
 <!-- grondwet:eind -->

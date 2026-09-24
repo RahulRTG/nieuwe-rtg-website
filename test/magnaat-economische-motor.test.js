@@ -45,7 +45,7 @@ test('1. de nieuwe motor rekent stap voor stap gelijk aan de oude (gouden refere
 });
 
 test('2. de motor kent het Oefenkantoor niet, en leunt er ook niet op', () => {
-  const VERBODEN = [/praktijk/i, /['"]rtg['"]/, /oefen/i, /missie/i, /economenlab/i, /magnaatwereld/i, /spelvorm/i, /functieId/, /\btaak\b/i];
+  const VERBODEN = [/praktijk/i, /['"]rtg['"]/, /oefen/i, /academy/i, /missie/i, /economenlab/i, /magnaatwereld/i, /spelvorm/i, /functieId/, /\btaak\b/i];
   const TOEGESTAAN = /^(\.\/[a-z-]+|\.\.\/magnaat-motorklant|\.\.\/eigencollectie|\.\.\/\.\.\/lib\/klok)$/;
   const bestanden = fs.readdirSync(MAP).filter(n => n.endsWith('.js'));
   assert.ok(bestanden.length >= 8, 'de motor is gevonden');

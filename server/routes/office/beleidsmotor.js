@@ -16,7 +16,7 @@ module.exports = (octx) => {
     if (!beleidsmotor || typeof beleidsmotor.stand !== 'function') {
       return res.status(503).json({ error: 'De beleidsmotor is niet bedraad in deze server.' });
     }
-    res.json(beleidsmotor.stand());
+    res.json(Object.assign({}, beleidsmotor.stand(), { afdwingen: beleidsmotor.afdwingen ? beleidsmotor.afdwingen.overzicht() : null }));
   });
 
   /* DE TOEGANGSREVIEW (fase 8): wie houdt een kantoorzetel. Dat is een lijst

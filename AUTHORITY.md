@@ -333,9 +333,9 @@ per persoon de effectieve rechten vóór en ná, en meldt elke afwijking.
 | 2 | **de benoeming, RTG-breed**: kantoor, balie, boardroom en RTFOS als profielen; de gedeelde kantoorcode wordt een eenmalige uitnodiging en nooit meer blijvend personeel | **staat** (23 september 2026; par. 5h): de uitnodiging op naam, en de gedeelde code koppelt geen kantoorrol meer (besluit van dezelfde dag). Inloggen op het kantoor met de code blijft |
 | 3 | **machtigingsversie en universele intrekking**: in het token, in elke stream, en offboarding als één stap die faalt als een onderdeel faalt | **deels staat** (23 september 2026; zie par. 5b) |
 | 4 | **kamers en werkwoorden**: de 26 kamers apart, met per kamer de noemertrede; de boardroom wordt een werkruimte en geen superrol | **de gegevens en de telling staan, in de schaduw** (23 september 2026; zie par. 5d); afdwingen wacht op fase 2 en op het besluit wie welk werkwoord krijgt |
-| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e), en **het onderwerp staat ook**: de uitgave in het Werk OS, met functiescheiding, de strengste van twee tekengrenzen (werkruimte en concerngraaf), en een betaalwijze die de werkruimte kiest en RTG aan of uit zet (par. 5e, vervolg). Samen tekenen uit de concerngraaf staat nog open |
+| 5 | **tekengrenzen, scheiding van taken, vier ogen op beleid**: `besluit.js` per organisatie, de drie conflicten van `scope.js` afdwingen, `vierogen.js` dicht | **vier ogen staat** (23 september 2026; zie par. 5e), en **het onderwerp staat ook**: de uitgave in het Werk OS, met functiescheiding, de strengste van twee tekengrenzen (werkruimte en concerngraaf), en een betaalwijze die de werkruimte kiest en RTG aan of uit zet (par. 5e, vervolg). Samen tekenen staat ook: het bedrijf kiest versmallen, bestuur of een drempel (par. 5e) |
 | 6 | **lezen ≠ exporteren**, en export met een spoor | **staat** (23 september 2026; zie par. 5f) |
-| 7 | **identiteiten voor agents, diensten en apparaten** | **staat** (23 september 2026; par. 5c en 5i): agent, diensten, toestellen, webhooks, en de zaakdoos met een eigen sleutel in de schaduw. De gedeelde doos-sleutel gaat dicht als elke doos er een heeft; het overzicht toont welke nog gedeeld melden |
+| 7 | **identiteiten voor agents, diensten en apparaten** | **staat** (23 september 2026; par. 5c en 5i): agent, diensten, toestellen, webhooks, en de zaakdoos met een eigen sleutel in de schaduw. De gedeelde doos-sleutel gaat dicht met een schakelaar van de eigenaar, die weigert zolang er nog een doos gedeeld meldt (par. 5i) |
 | 8 | **reviews, slapende rechten, simulator, "waarom"** -- allemaal lezers op het besluit | **staat** (23 september 2026; par. 5g) |
 | later | gegevensklasse per veld, historie van rechten, data rooms, franchise | jaren weg |
 
@@ -374,6 +374,20 @@ uitkomsten, en `ONBEKEND` (een bron kon niet antwoorden) is geen `WEIGEREN`.
 - **Getoetst** in `test/beleidsmotor.test.js`: tegen een echte server met de gedeelde
   code, een medewerker op naam en de eigenaar, door alle vier deuren nul keer oneens.
   Drie mutaties zakken: een verkeerd feit, een blinde A3-teller, de documentdeur open.
+- **Uit de schaduw: een schakelaar per deur** (besluit van de eigenaar, 24 september
+  2026). Eerst gemeten: een labronde over 586 kantoorroutes met zes soorten sessies
+  gaf 3544 waarnemingen (kantoor 2632, boardroom 732, op naam 156, balie 24), NUL
+  keer oneens, nul onbekend en nul routes zonder poort. Dat is een lab en geen
+  proces, dus beslist de schakelaar niet zelf: `kern/beleidsmotor/afdwingen.js`
+  laat een deur alleen op `afdwingen` als ./stand.js hem rijp noemt en hij nooit
+  oneens was, met de reden in de weigering. Afdwingen zet de motor NAAST de poort
+  en niet in zijn plaats -- de poort zet ook de sessievelden -- dus hij kan alleen
+  een weigering toevoegen en nooit iets doorlaten wat de poort tegenhoudt.
+  `ONBEKEND` wordt een 503 en geen 403. Terug naar de schaduw kan altijd. Alleen de
+  eigenaar, met de passkey (`eigenaar-beleidsmotor-afdwingen`), onder *De
+  kantoordeuren* in de boardroom. De rijpheid telt dagen sinds de start van het
+  proces; een herstart zet die klok terug, en dat is de bestaande definitie.
+  `test/beleidsafdwingen.test.js`, vijf mutaties die alle vijf zakken.
 
 ### 5a-bis. Besluit A2 in de schaduw
 
@@ -594,9 +608,31 @@ SEPA-opdracht; twaalf mutaties laten hem zakken. Twee zakten eerst NIET, en dat
 waren zwakke beweringen: de eigenaarsgrendel werd alleen met de gedeelde code
 beproefd (die al eerder faalde), en een externe met dezelfde naam als een lid
 kwam in geen toets voor. **Wat bewust nog niet staat**: een rekening op naam van
-de werkruimte zelf (wie is dan rekeninghouder, en onder welke vergunning), en de
-gezamenlijke bevoegdheid uit de concerngraaf (samen tekenen) -- de grendel kent
-hier alleen de limiet per mens.
+de werkruimte zelf (wie is dan rekeninghouder, en onder welke vergunning).
+
+*Samen tekenen: het bedrijf kiest* (besluit van de eigenaar, 24 september 2026).
+Een gekoppelde werkruimte heeft een tekenwijze (`bedrijf/samentekenen.js`), en
+alle drie de standen bestaan:
+
+- `versmallen` (standaard): een gewoon lid met `geld.goedkeuren` keurt zoals
+  altijd, maar een herkende bestuurder die voor dit bedrag alleen GEZAMENLIJK
+  bevoegd is telt pas mee als een tweede gezamenlijk bevoegde ook goedkeurt;
+- `bestuur`: een uitgave is pas rond met een herkende bestuurder of
+  gevolmachtigde die voor het bedrag alleen bevoegd is, of met twee gezamenlijk
+  bevoegden -- naast de gewone goedkeuring, die niet wegvalt;
+- `drempel`: tot en met een zelfgekozen bedrag versmallen, erboven bestuur.
+
+Wat het bestuur mist, komt in `ontbreekt` van de regelpoort, dus "betaald
+noteren" weigert vanzelf tot het rond is. Staat er voor een bedrag niemand
+bevoegd in de graaf, dan zegt de stand dat in plaats van eeuwig te wachten. De
+tekenwijze kiest de eigenaar van de gekoppelde entiteit -- wie zelf moet
+goedkeuren, zet het regime niet losser. **En de meting vond een gat dat daar
+bij hoort**: loskoppelen (een leeg `entiteitId`) gebeurde vóór de
+eigenaarscontrole, dus elk lid met het recht `werkruimte` kon de concerngraaf
+en daarmee elke tekenlimiet ontlopen. Loskoppelen is nu ook van de eigenaar.
+`test/samentekenen.test.js`, met negen mutaties die alle negen zakken; een
+tiende (twee gezamenlijk bevoegden onder `bestuur`) overleefde eerst en kreeg
+een eigen bewering.
 
 ### 5f. Fase 6: lezen is niet exporteren
 
@@ -805,7 +841,18 @@ sleutel) en het overzicht zegt dat er ook bij. Wie de gedeelde sleutel heeft, ka
 namen verzinnen: daarom een regel per naam en geen reeks, na dertig dagen stilte
 valt een naam uit de opslag, en er staan er nooit meer dan tweehonderd. De
 boardroom toont het onder *De zaakdozen*, met uitgeven en intrekken voor de
-eigenaar. Er wordt niets afgedwongen.
+eigenaar.
+
+**De schakelaar staat er nu ook** (24 september 2026): `/api/office/doos/gedeeld/zet`,
+alleen de eigenaar, met de passkey (`eigenaar-doossleutel-gedeeld`), en een knop
+onder *De zaakdozen*. Het register weigert DICHTZETTEN zolang `nogGedeeld` niet
+leeg is, met de namen in de weigering -- anders staat een werkende doos morgen
+stil zonder dat iemand het zag aankomen. Weer openzetten kan altijd: dat is de
+noodweg. Staat hij dicht, dan geeft de wacht (`routes/doos-wacht.js`) een goede
+gedeelde sleutel een 403 met de reden, zonder hem als afketser te tellen (geen
+IP-blokkade), en de doos blijft in `nogGedeeld` staan zodat het kantoor ziet
+welke nog om moet. Een eigen sleutel komt gewoon binnen. Standaard staat hij
+open; dichtzetten is aan de eigenaar.
 
 **Die schermen vonden een gebrek dat geen toets zag: drie zware routes waren met
 een passkey onbereikbaar.** De ceremonie kent alleen de namen in `ZWARE_ACTIES`

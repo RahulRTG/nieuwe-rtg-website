@@ -170,7 +170,19 @@ met de reden en wat er nodig is:
 | Adam | loopt over `/api/rtf/solliciteer` en `/api/concern/*`; geen ingang in `MAPPEN` roept die aan |
 | moment | raakt RTG Media, maar alleen de deelbelofte volgen en gewekt worden |
 | toelating, zaak-live | de zaak- en kantoorkant; `MAPPEN` kent alleen lid- en gezinswerelden |
-| lus (Connect) | schrijft geen register, en `connect.html` staat niet in `MAPPEN` |
+
+**Herzien op 24 september 2026: de lus telt wel.** Twee redenen in deze tabel
+klopten niet meer. Ontdekken in `MAPPEN` is `link:connect` → `/apps/connect.html`,
+en dat scherm deelt acht `/api/connect`-routes met de lusproef; en de lusproef
+schrijft nu `LUSPROEF.json` met het huisstempel (`npm run lusproef:vast`, standen in
+het woordgebruik van de andere ketenregisters). Het is ook dezelfde belofte: CONNECT.md
+noemt de lusproef het bewijs dat de ontdeklus rond is. Ontdekken draagt daarom
+`voltooibaar = BEWEZEN`, met één voorbehoud in het contract: de proef loopt als lid
+over de deur die `connect.html` zelf aanroept, en de gezinsdeur `/api/rtf/connect`
+(dezelfde motor) loopt hij niet. De vijf andere ketens zijn opnieuw gemeten over alle
+112 rijen, en delen alleen algemene routes (`/api/login`, `/api/account/start`,
+`/api/notifications`, `/api/supplier/state`). Dat is geen gedeelde belofte, dus die
+blijven zonder app.
 
 De routeoverlap is **nodig en niet voldoende**: vandaar de belofte in woorden bij
 elke koppeling. Een keten die een deelbelofte loopt, verdient het bewijs van de

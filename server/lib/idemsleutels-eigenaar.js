@@ -74,6 +74,9 @@ const SLEUTELS = {
     waarom: 'een tweede oproep geeft een nieuwe sleutel en maakt de vorige van die doos ongeldig; een laag die ' +
       'hem opslikt geeft een sleutel terug die de doos niet meer binnenlaat' },
   'POST /api/office/doos/sleutel/weg': { zelfdeVerzoek: true },
+  'POST /api/office/doos/gedeeld/zet': { zelfdeVerzoek: true },
+  'POST /api/office/beleidsmotor/afdwingen': { leest: true },
+  'POST /api/office/beleidsmotor/afdwingen/zet': { zelfdeVerzoek: true },
   /* De uitgave in het Werk OS: indienen is elke keer een nieuwe uitgave; betaald
      noteren en de tekengrens zetten zijn een toestand. */
   'POST /api/bedrijf/uitgave/maak': { nietIdempotent: true,
@@ -83,6 +86,7 @@ const SLEUTELS = {
   'POST /api/bedrijf/lid/tekengrens': { zelfdeVerzoek: true },
   'POST /api/bedrijf/werkruimte/entiteit': { zelfdeVerzoek: true },
   'POST /api/bedrijf/werkruimte/betaalwijze': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/werkruimte/tekenwijze': { zelfdeVerzoek: true },
   'POST /api/office/werkos/bankpad': { leest: true },
   'POST /api/office/werkos/bankpad/zet': { zelfdeVerzoek: true },
   'POST /api/office/doos/sleutels': { leest: true },

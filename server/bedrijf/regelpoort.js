@@ -5,10 +5,8 @@
    ontwerpregel van deze laag: een regel bestaat pas als er code is die hem
    afdwingt, en die code is dit.
 
-   EEN GOEDKEURROUTE VOOR ALLE SOORTEN. /api/bedrijf/keur werkt op een contract
-   en op een besluit, en straks op wat er bij komt. Twee routes die hetzelfde
-   doen, lopen uiteen zodra er een grendel bij komt -- en juist bij een
-   goedkeuring is dat de grendel die je kwijtraakt (LAT-regel 4).
+   EEN GOEDKEURROUTE VOOR ALLE SOORTEN: twee routes die hetzelfde doen, lopen
+   uiteen zodra er een grendel bij komt (LAT-regel 4).
 
    TWEE AANGRIJPINGSPUNTEN, DIE VERSCHILLEND TEGENHOUDEN:
 
@@ -57,7 +55,8 @@ module.exports = (sctx) => {
     const eist = [...new Set(sctx.basisEis(soort).concat(regels.flatMap(r => r.eist)))];
     const geldig = (obj.goedkeuringen || []).filter(k => !k.vervallen);
     const gedekt = new Set(geldig.map(k => k.recht));
-    const ontbreekt = eist.filter(x => !gedekt.has(x));
+    /* Samen tekenen (./samentekenen.js) voegt toe wat het bestuur nog mist. */
+    const ontbreekt = eist.filter(x => !gedekt.has(x)).concat(sctx.bestuurOntbreekt(w, soort, obj, geldig));
     const beide = soort !== 'contract' ||
       ['wij', 'wederpartij'].every(p => (obj.handtekeningen || []).some(h => h.partij === p));
     return { regels, eist, goedkeuringen: geldig, ontbreekt, handtekeningenCompleet: beide,

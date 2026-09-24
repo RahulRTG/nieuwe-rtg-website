@@ -72,6 +72,8 @@ test('een uitgave gaat op het scherm van indienen via een ander naar betaald', {
       'Uitgaven staat in de keuzelijst');
     await wachtOpTekst(page, /Betaalwijze/, { in: '#mExtra' });
     assert.match(await page.evaluate(() => document.getElementById('mExtra').innerText), /extern/, 'standaard buiten RTG');
+    assert.match(await page.evaluate(() => document.getElementById('mExtra').innerText), /Tekenwijze[\s\S]*niet aan een entiteit gekoppeld/i,
+      'de tekenwijze staat erbij, en zegt dat hij zonder koppeling niets doet');
 
     /* ---- indienen ---- */
     await vul('a_h0_omschrijving', 'Bureaustoelen');
@@ -116,9 +118,13 @@ test('een uitgave gaat op het scherm van indienen via een ander naar betaald', {
     await druk(3, /niet aangezet/);
 
     /* ---- de eigen tekengrens zet een ander ---- */
-    await vul('a_h5_lidId', LIDID[CFO.lidToken]);
-    await vul('a_h5_bedrag', '1');
-    await druk(5, /eigen tekengrens zet een ander/);
+    await vul('a_h6_lidId', LIDID[CFO.lidToken]);
+    await vul('a_h6_bedrag', '1');
+    await druk(6, /eigen tekengrens zet een ander/);
+
+    /* ---- de tekenwijze vraagt eerst een gekoppelde entiteit, en zegt dat ---- */
+    await page.selectOption('#a_h4_wijze', 'bestuur');
+    await druk(4, /niet aan een entiteit/);
 
     assert.deepEqual(fouten, [], 'geen scriptfouten: ' + fouten.join(' | '));
   } finally {

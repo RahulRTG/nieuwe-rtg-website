@@ -47,7 +47,7 @@ const VERKLAARD_OPEN = Object.freeze({
 
 function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron, nu }) {
   const tijd = nu || Date.now;
-  const eigen = require('../eigencollectie')({ db, domein: 'kern/beleidsmotor', bezit: { beleidsmotor: 'kaart', zetelGebruik: 'kaart' } });
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/beleidsmotor', bezit: { beleidsmotor: 'kaart', zetelGebruik: 'kaart', beleidsAfdwingen: 'kaart' } });
   const bak = () => eigen.bak('beleidsmotor');
   const kijk = () => eigen.kijk('beleidsmotor');
   const spoeler = require('../kantoor/mensdeur-spoel').maakSpoeler({
@@ -58,6 +58,7 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
   const ZETEL_VAN_DEUR = { kantoor: 'kantoorrol', 'op-naam': 'kantoorrol', boardroom: 'boardroom', balie: 'balie' };
   const feitenVan = maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron });
   const oneensVoorbeelden = [];
+  const afdwingen = require('./afdwingen').maakAfdwingen({ eigen, save, stand: () => stand(), deuren: DEUREN, UITKOMST });
   const sinds = tijd();
 
   const patroon = (req) => (req.method || 'GET') + ' ' + (req.routePatroon || '(geen patroon)');
@@ -91,6 +92,8 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
         const kamer = door && deur === 'kantoor' ? kamerVan(patroon(req), req.body) : null;
         if (kamer) spoeler.tikVeld('kamer ' + kamer, 'gebruik');
       });
+      /* Afgedwongen deur (./afdwingen.js): de motor weigert NAAST de poort, nooit in zijn plaats. */
+      if (besluit && afdwingen.aan(deur) && besluit.uitkomst !== UITKOMST.TOESTAAN) return afdwingen.weiger(res, deur, besluit);
       return poort(req, res, function () { door = true; return next.apply(this, arguments); });
     };
     Object.defineProperty(gewikkeld, 'name', { value: poort.name || deur });
@@ -159,7 +162,7 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     });
   }
 
-  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, bewaak, meelezer, stand,
+  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, bewaak, meelezer, stand, afdwingen,
     spoel: () => { slapend.spoel(); return spoeler.spoel(); }, laatstGebruikt: slapend.laatst };
 }
 

@@ -37,7 +37,10 @@
       K.lijst($('mExtra'), [K.rij('<b>Betaalwijze</b> <span class="tag">' + esc(bw.wijze || 'extern') + '</span>',
         bw.wijze === 'rekening'
           ? 'Een ander dan de indiener maakt de SEPA-overboeking vanaf zijn eigen RTG-rekening en geeft het opdrachtnummer op.'
-          : (bw.reden ? esc(bw.reden) : 'Buiten RTG betalen, en een ander dan de indiener noteert het kenmerk.'))], '');
+          : (bw.reden ? esc(bw.reden) : 'Buiten RTG betalen, en een ander dan de indiener noteert het kenmerk.')),
+        /* Samen tekenen: hoe het bestuur uit de concerngraaf meetelt (server/bedrijf/samentekenen.js). */
+        K.rij('<b>Tekenwijze</b> <span class="tag">' + esc((r.body.tekenwijze || {}).wijze || 'versmallen') + '</span>',
+          esc((r.body.tekenwijze || {}).uitleg || ''))], '');
       $('mLet').textContent = r.body.let || '';
     });
   }
@@ -51,6 +54,8 @@
     ['Betaald noteren', '/uitgave/betaald', [['id', 'Uitgave-id', 'tekst', '9rem'], ['kenmerk', 'Kenmerk (buiten RTG)', 'tekst', '10rem'],
       ['opdrachtId', 'SEPA-opdracht (via RTG Rekening)', 'tekst', '11rem']]],
     ['Betaalwijze kiezen', '/werkruimte/betaalwijze', [['wijze', 'Betaalwijze', 'keuze:extern,rekening', '9rem']]],
+    ['Tekenwijze kiezen', '/werkruimte/tekenwijze', [['wijze', 'Tekenwijze', 'keuze:versmallen,bestuur,drempel', '10rem'],
+      ['drempel', 'Drempel in euro (bij drempel)', 'getal', '12rem']]],
     ['Koppel aan entiteit', '/werkruimte/entiteit', [['entiteitId', 'Entiteit-id (leeg = loskoppelen)', 'tekst', '14rem']]],
     ['Tekengrens van een lid', '/lid/tekengrens', [['lidId', 'Lid-id', 'tekst', '9rem'], ['bedrag', 'Grens in euro (leeg = geen)', 'getal', '11rem']]]
   ];

@@ -78,7 +78,14 @@ test('1-2. KYC-minimum, RTG zet het product open, een per entiteit', async () =>
   const ok = await open();
   assert.equal(ok.status, 200, JSON.stringify(ok.body));
   assert.match(ok.body.rekening.iban, /^NL/);
-  assert.equal((await open()).status, 409, 'een rekening per entiteit');
+  /* Twee lagen: een IDENTIEKE herhaling krijgt van de idempotentielaag hetzelfde
+     antwoord (geen tweede rekening), een ANDER verzoek voor dezelfde entiteit de
+     weigering van de route zelf. */
+  const nog = await open();
+  assert.equal(nog.status, 200, 'dezelfde vraag, hetzelfde antwoord');
+  assert.equal(nog.body.rekening.iban, ok.body.rekening.iban, 'en geen tweede rekening');
+  const ander = await api('/api/concern/rekening/open', { entiteit: E, naam: 'Tweede' }, OWN.rtg.token);
+  assert.equal(ander.status, 409, 'een rekening per entiteit: ' + JSON.stringify(ander.body));
 
   assert.equal((await api('/api/concern/rekening', { entiteit: E }, ANDER.token)).status, 404, 'een ander ziet hem niet');
   const eigen = await api('/api/concern/rekening', { entiteit: E }, OWN.rtg.token);
@@ -120,7 +127,11 @@ test('3-4. betalen langs een uitgave die rond is, een keer, door een ander dan d
   assert.equal(r.body.uitgave.betaald.via, 'entiteit');
   const na = (await api('/api/concern/rekening', { entiteit: E }, OWN.rtg.token)).body.rekening;
   assert.equal(na.saldoCenten, 30000 - 12000, 'precies het bedrag van de uitgave ging eraf');
-  assert.equal((await betaal(OWN)).status, 409, 'een tweede druk betaalt niet twee keer');
+  const tweede = await betaal(OWN);
+  assert.equal(tweede.status, 200, 'een tweede identieke druk krijgt hetzelfde antwoord: ' + JSON.stringify(tweede.body));
+  assert.equal(tweede.body.uitgave.betaald.kenmerk, r.body.uitgave.betaald.kenmerk, 'en is dezelfde betaling');
+  const anders = await api('/api/bedrijf/uitgave/betaal', Object.assign({ id: u.id, poging: 2 }, bare(OWN)));
+  assert.equal(anders.status, 409, 'een ander verzoek voor dezelfde uitgave: al betaald');
   const nog = (await api('/api/concern/rekening', { entiteit: E }, OWN.rtg.token)).body.rekening;
   assert.equal(nog.saldoCenten, na.saldoCenten);
   const lijst = (await api('/api/bedrijf/uitgaven', bare(OWN))).body.uitgaven.find(x => x.id === u.id);

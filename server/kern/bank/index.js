@@ -82,15 +82,10 @@ module.exports = (deps) => {
      in ./uitgang; het gat dat dit dicht in ../betaalopdracht/index.js. */
   const opdrachten = require('./uitgang')({ opdrachten: betaalOpdrachten, boek, boekAsync, grootboek, rekMeta, seintje, economischeBoekingEenmaal, geldModus });
 
-  /* DE IDEM-SLEUTELS VAN DE BANK, EEN KEER EN VOOR IEDEREEN.
-
-     Dit stond in ./overboeken.js, en daar had alleen dat bestand er iets aan:
-     storten en sepa liepen erdoor en de rest van de bank niet. De idemproef
-     mat dat op 24 augustus voor het eerst echt, en toen bleek wat er onder die
-     grens lag -- een herhaalde overboeking, bulkrun, salarisrun of pasbetaling
-     boekte gewoon nog een keer (TAKEN.md 4.57). Nu hangt hij in de gedeelde
-     ctx, met EEN sleutelruimte (`bankIdem`) voor de hele bank, zoals RTG Pay
-     dat ook doet. */
+  /* DE IDEM-SLEUTELS VAN DE BANK, EEN KEER EN VOOR IEDEREEN. Dit stond in
+     ./overboeken.js, en een herhaalde overboeking, bulkrun, salarisrun of
+     pasbetaling boekte gewoon nog een keer (TAKEN.md 4.57). Nu EEN
+     sleutelruimte (`bankIdem`) voor de hele bank, zoals RTG Pay. */
   /* EN DUURZAAM, als RTG Pay: zonder die vlag is de bundel atomair en niet
      duurzaam, en gaf /api/bank/akkoord een IBAN die de opslag nooit
      bevestigde (FAALPROEF: `gezakt`). Reikwijdte: GELDLAT.md. */
@@ -112,9 +107,7 @@ module.exports = (deps) => {
   // het financiele hart leunt op de rekening-opening (auto-spaarpot bij de veeg)
   ctx.rekeningOpen = rek.rekeningOpen;
   const hart = require('./hart')(ctx);
-  // de entiteit uit de concerngraaf betaalt langs dezelfde twee wegen als een lid
-  Object.assign(ctx, { bankOverboek: over.bankOverboek, bankSepaUit: over.bankSepaUit });
-  const entiteit = require('./entiteit')(ctx);
+  const entiteit = require('./entiteit')(Object.assign({}, ctx, over)); // betaalt langs overboeken
 
   /* Het afschrift, de gezondheid en het boardroom-overzicht: alleen lezen,
      en daarom apart in ./bord. */

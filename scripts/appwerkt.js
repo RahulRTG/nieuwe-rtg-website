@@ -461,6 +461,15 @@ async function bedien(ctx, base, pad) {
         await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
         await page.waitForTimeout(600);
         geklikt++;
+        /* EN DAN DICHT, zoals een mens doet. Een tik opent vaak een laag (het
+           paneel van Rahul, de sprong, de taalkeuze); bleef die open, dan lag hij
+           over elke volgende knop en telde de proef zijn eigen lade als
+           "onbereikbaar" (gemeten 24 september 2026: 517 knoppen, vrijwel
+           allemaal onder zo'n gedeelde laag). Escape is de gewone weg dicht; wat
+           daarna nog over een knop ligt, sluit niet met Escape of bedekt hem
+           echt -- en dat is wel een bevinding. */
+        await page.keyboard.press('Escape').catch(() => {});
+        await page.waitForTimeout(250);
       } catch (e) {
         /* De reden van een time-out staat in de LOG van Playwright ("intercepts
            pointer events", "element is not visible"), niet in de boodschap.

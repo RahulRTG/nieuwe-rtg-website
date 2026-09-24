@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:19:47.005Z",
-    "commit": "afd4d291",
+    "op": "2026-09-24T21:41:22.355Z",
+    "commit": "da24689f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4990,6 +4990,14 @@
       "operator": "false->true#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "liegronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/liegronde.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "life-schakelbaar.test.js": {
       "soort": "server",

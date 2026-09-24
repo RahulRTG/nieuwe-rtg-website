@@ -13,7 +13,9 @@ const assert = require('node:assert/strict');
 const kaart = require('../scripts/lib/magnaatgeldkaart');
 const { TEGENPARTIJEN, SOORTEN, REKENING, maakBoekhouding } = require('../server/kern/spellen/magnaat/boekhouding');
 
-const potje = (id) => ({ id, staat: { maand: 3 } });
+const potje = (id) => ({ id, staat: { maand: 3, geld: {} } });
+/* Een gekoppelde partij en haar boekhouding. */
+const open = (bh, id) => { const p = potje(id); bh.koppel(p); return bh.voor(p.staat); };
 
 test('1. er zijn precies vijf tegenpartijen, elk met een betekenis', () => {
   assert.deepEqual(Object.keys(TEGENPARTIJEN).sort(), ['aannemer', 'bank', 'huishoudens', 'stad', 'verzekeraar']);
@@ -36,7 +38,7 @@ test('3. de boekhouding kent precies de gebeurtenissoorten van de geldkaart', ()
 });
 
 test('4. een overdracht is dubbel geboekt, exact, en in hele centen', () => {
-  const b = maakBoekhouding().voor(potje('p1'));
+  const b = open(maakBoekhouding(), 'p1');
   b.overdracht({ soort: 'LENING', sleutel: 'l1', van: ['macro', 'bank'], naar: ['kas', 'anna'], bedrag: 1234567, omschrijving: 'Lening' });
   b.overdracht({ soort: 'RENTE', sleutel: 'r1', van: ['kas', 'anna'], naar: ['macro', 'bank'], bedrag: 1235, omschrijving: 'Rente' });
   assert.equal(b.saldo('kas', 'anna'), 1234567 - 1235);
@@ -55,7 +57,7 @@ test('5. twee werelden die een opslag delen, raken elkaars rekeningen en journaa
   assert.equal(REKENING.macro('world:a', 'bank'), 'world:a:macro:bank');
   const db = { data: {} };
   const bh = maakBoekhouding({ db });
-  const a = bh.voor(potje('a')), b = bh.voor(potje('b'));
+  const a = open(bh, 'a'), b = open(bh, 'b');
   a.overdracht({ soort: 'LENING', sleutel: 'zelfde', van: ['macro', 'bank'], naar: ['kas', 'x'], bedrag: 100, omschrijving: 'a' });
   b.overdracht({ soort: 'LENING', sleutel: 'zelfde', van: ['macro', 'bank'], naar: ['kas', 'x'], bedrag: 700, omschrijving: 'b' });
   a.bevestig(); b.bevestig();
@@ -66,7 +68,7 @@ test('5. twee werelden die een opslag delen, raken elkaars rekeningen en journaa
   assert.ok(b.gebeurtenissen()[0].regels.every(r => r.rekening.startsWith('world:b:')));
   /* En zonder database een eigen journaal per boekhouding: twee proefwerelden met
      hetzelfde potje-id delen dan niets. */
-  const los1 = maakBoekhouding().voor(potje('zelfde')), los2 = maakBoekhouding().voor(potje('zelfde'));
+  const los1 = open(maakBoekhouding(), 'zelfde'), los2 = open(maakBoekhouding(), 'zelfde');
   los1.overdracht({ soort: 'LENING', sleutel: 's', van: ['macro', 'bank'], naar: ['kas', 'x'], bedrag: 1, omschrijving: 'x' });
   los1.bevestig();
   assert.equal(los2.gebeurtenissen().length, 0);

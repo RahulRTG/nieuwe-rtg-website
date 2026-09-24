@@ -36,6 +36,10 @@
                   als dezelfde code twee keer in een bestand staat.
      samengesteld bij een regel die meer dan een gebeurtenis verbergt: welke
      categorie    de migratiestap (CATEGORIEEN), in de volgorde van MAGNAAT.md
+     gemigreerd   de ronde waarin de gebeurtenis door het grootboek ging (A2.3 ...).
+                  Het been wijst dan naar de boeking (`beweeg` in
+                  server/kern/spellen/magnaat/boekhouding.js) en niet meer naar een
+                  directe mutatie; de telling van de meter gaat erdoor omlaag.
      let          wat de migratie moet weten en niet mag gladstrijken
    ========================================================================== */
 'use strict';
@@ -68,8 +72,8 @@ const PARTIJEN = SPELERROLLEN.concat(['Foundation-pot', 'inleg', 'bank', 'huisho
 const b = (bestand, code, na) => (na ? { bestand: MAP + bestand, code, na } : { bestand: MAP + bestand, code });
 
 const GEBEURTENISSEN = [
-  { id: 'G01', betekenis: 'OPENING', categorie: 'opening', van: 'inleg', naar: 'speler', tegenzijde: 'bron',
-    benen: [b('economie.js', 'st.geld[h] = naarCenten(START_GELD);')],
+  { id: 'G01', betekenis: 'OPENING', categorie: 'opening', van: 'inleg', naar: 'speler', tegenzijde: 'bron', gemigreerd: 'A2.3',
+    benen: [b('boekhouding.js', "beweeg(st, { soort: 'OPENING', van: ['inleg', h], naar: ['kas', h], bedrag, omschrijving: 'Startkapitaal' });")],
     let: 'legitieme creatie, maar zonder inlegrekening: de beginbalans heeft geen passivakant' },
 
   { id: 'G02', betekenis: 'INVESTERING', categorie: 'activa', van: 'speler', naar: 'aannemer', tegenzijde: 'put',

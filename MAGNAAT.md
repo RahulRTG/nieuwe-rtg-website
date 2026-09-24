@@ -261,7 +261,7 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 | M-020 | Economische waarheid | **PASS** | ja | ja | ja | ja |
 | M-601 | Simulatie-integriteit | **PASS** | ja | ja | ja | ja |
 
-21 invarianten: 6 PASS, 6 PARTIAL, 6 ABSENT, 3 VIOLATION; 70 geteld schendende plekken.
+21 invarianten: 6 PASS, 6 PARTIAL, 6 ABSENT, 3 VIOLATION; 68 geteld schendende plekken.
 
 ### M-001: Economische waarheid
 
@@ -273,7 +273,7 @@ Stand: **VIOLATION**
   - Autoriteit: geen: het saldo zelf (st.geld) is de waarheid
   - Handhaver: NIEMAND
   - Toets: NIEMAND
-  - Schending: 32, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
+  - Schending: 31, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
 - **Grootboek**: PASS
   - Autoriteit: server/kern/magnaat-grootboek/, het journaal
   - Handhaver: `server/kern/magnaat-grootboek/boeken.js`, `function boek(p, sleutel, soort, omschrijving, regels, labels = [])`
@@ -352,7 +352,7 @@ Stand: **VIOLATION**
   - Autoriteit: geen: er is geen journaal
   - Handhaver: NIEMAND
   - Toets: NIEMAND
-  - Schending: 32, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
+  - Schending: 31, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
 - **Grootboek**: PASS
   - Autoriteit: server/kern/magnaat-grootboek/, het journaal
   - Handhaver: `server/kern/magnaat-grootboek/boeken.js`, `throw new Error('Ongebalanceerde journaalpost geweigerd: '`

@@ -60,6 +60,12 @@ test('elke geldplek in World is precies een been van een geclassificeerde gebeur
     for (const been of g.benen) {
       const plekken = vindBeen(been);
       assert.equal(plekken.length, 1, g.id + ': been "' + been.code + '" staat ' + plekken.length + ' keer in ' + been.bestand + ' (verouderd of dubbelzinnig; zet `na`)');
+      /* Een gemigreerde gebeurtenis boekt via het grootboek: haar been is geen
+         directe mutatie meer en mag dat ook nooit weer worden. */
+      if (g.gemigreerd) {
+        assert.ok(!gevonden.has(plekken[0]), g.id + ' is gemigreerd (' + g.gemigreerd + ') maar ' + plekken[0] + ' is een directe mutatie');
+        continue;
+      }
       gedekt.set(plekken[0], (gedekt.get(plekken[0]) || 0) + 1);
     }
   }
@@ -88,7 +94,7 @@ test('het saldopatroon van de kaart is dat van de grondwet, dus de 32 van M-001 
   const saldo = new RegExp(m001.patroon, 'g');
   let n = 0;
   for (const rel of worldBestanden()) for (const regel of regelsVan(rel)) n += (regel.match(saldo) || []).length;
-  const benen = kaart.GEBEURTENISSEN.flatMap(g => g.benen).filter(been => new RegExp(m001.patroon).test(been.code)).length;
+  const benen = kaart.GEBEURTENISSEN.filter(g => !g.gemigreerd).flatMap(g => g.benen).filter(been => new RegExp(m001.patroon).test(been.code)).length;
   assert.equal(benen, n, 'elke saldomutatie van de grondwetmeter heeft een been');
 });
 

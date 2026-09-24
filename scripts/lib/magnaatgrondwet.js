@@ -68,7 +68,10 @@ const MAP = 'server/kern/spellen/magnaat';
 /* World is de hele magnaatmap behalve het bord. Als lijst en niet als glob,
    zodat de meter bij een nieuw bestand in die map niet stil blind wordt: hij
    leest de map zelf (zie `bestanden` in scripts/magnaatgrondwet.js). */
-const WORLD_CODE = { map: MAP, zonder: ['bord.js', 'bordspel.js'] };
+/* boekhouding.js staat er met opzet ook buiten: dat is de ENE weg waarlangs World
+   sinds ronde A2.3 een saldo schrijft -- na een boeking in het grootboek, met
+   hetzelfde bedrag. Een mutatie daar is de projectie en geen schending. */
+const WORLD_CODE = { map: MAP, zonder: ['bord.js', 'bordspel.js', 'boekhouding.js'] };
 
 /* EEN SCHENDING, EENMAAL GESCHREVEN. Twee regels (M-001 en M-005) wijzen naar
    dezelfde vondst: in World wordt een saldo rechtstreeks verhoogd of verlaagd.

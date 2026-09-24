@@ -58,7 +58,8 @@ function maakBoek({ db } = {}) {
       zijde[0] === 'kas' ? 'actief' : 'extern', kant, bedrag);
     const voor = p.boekVolgorde;
     const g = gb.metOorzaak(soort, () => gb.boek(p, sleutel || soort + ':' + (p.boekVolgorde + 1), soort,
-      omschrijving || soort, [regel('debet', naar), regel('credit', van)], []));
+      omschrijving || soort, [regel('debet', naar), regel('credit', van)],
+      [van[0] === 'kas' ? 'uit' : naar[0] === 'kas' ? 'in' : 'tussen']));
     /* Een sleutel die al geboekt is, geeft de bestaande boeking terug en boekt
        niets: dan beweegt de kas ook niet, anders loopt hij stil weg van de rekening. */
     if (p.boekVolgorde === voor) return g;

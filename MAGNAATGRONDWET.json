@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T10:40:43.981Z",
-    "commit": "f3420fdee",
+    "op": "2026-09-24T11:13:05.323Z",
+    "commit": "8cdf49cfe",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/magnaatgrondwet.js",
@@ -82,8 +82,17 @@
           "missers": [],
           "stand": "VIOLATION"
         },
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/, het journaal",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
         "motor": {
-          "autoriteit": "server/kern/magnaat-economische-motor/, het journaal",
+          "autoriteit": "het grootboek; de motor boekt alleen via zijn functies",
           "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
@@ -242,8 +251,17 @@
           "missers": [],
           "stand": "VIOLATION"
         },
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/, het journaal",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": null,
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
         "motor": {
-          "autoriteit": "server/kern/magnaat-economische-motor/, het journaal",
+          "autoriteit": "het grootboek; de motor boekt alleen via zijn functies",
           "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
@@ -577,8 +595,8 @@
       "getoetst": false,
       "schendingen": 0,
       "scopes": {
-        "motor": {
-          "autoriteit": "server/kern/magnaat-economische-motor/, de idempotentiesleutel in het journaal",
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/, de idempotentiesleutel in het journaal",
           "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
@@ -608,8 +626,8 @@
       "getoetst": false,
       "schendingen": 0,
       "scopes": {
-        "motor": {
-          "autoriteit": "server/kern/magnaat-economische-motor/journaal-opslag.js, het journaal in de eigen collectie magnaatJournaal",
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/opslag.js, het journaal in de eigen collectie magnaatJournaal",
           "draagt": "gevonden",
           "toets": "gevonden",
           "schending": {
@@ -652,8 +670,8 @@
           "missers": [],
           "stand": "PARTIAL"
         },
-        "motor": {
-          "autoriteit": "server/kern/magnaat-economische-motor/, elke gebeurtenis",
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/, elke gebeurtenis",
           "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
@@ -666,7 +684,7 @@
     {
       "id": "M-601",
       "familie": "M-6",
-      "invariant": "De economische motor kent geen consument: hij leunt niet op het Oefenkantoor, de Academy of een spelvorm, en de afhankelijkheid loopt alleen van consument naar motor.",
+      "invariant": "De economische motor kent geen consument en het grootboek kent geen domein: de afhankelijkheid loopt alleen van consument naar motor naar grootboek.",
       "stand": "PASS",
       "gedocumenteerd": true,
       "geimplementeerd": true,
@@ -679,7 +697,20 @@
           "draagt": "gevonden",
           "toets": "gevonden",
           "schending": {
-            "wat": "de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, zijn Rust-client, de opslagdeclaratie en de klok",
+            "wat": "de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, het grootboek, zijn Rust-client, de opslagdeclaratie en de klok",
+            "aantal": 0,
+            "plekken": []
+          },
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
+        },
+        "grootboek": {
+          "autoriteit": "server/kern/magnaat-grootboek/index.js: soorten, versies en periode komen van de consument",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": {
+            "wat": "het grootboek noemt een domein (Oefenkantoor, markt, bedrijf, spel) of laadt iets buiten zichzelf en de opslagdeclaratie",
             "aantal": 0,
             "plekken": []
           },

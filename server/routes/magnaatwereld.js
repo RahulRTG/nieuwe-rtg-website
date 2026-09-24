@@ -19,6 +19,9 @@ module.exports = (kern) => {
     return veilig(res, () => werk(req.session.key, req.body || {}));
   };
 
+  /* Van Nul (V1): een leven per lid, van € 63 tot een eerste bedrijf. */
+  app.post('/api/member/magnaat/leven/staat', auth, (req, res) => alsLid(req, res, key => magnaatWereld.leven.staat(key)));
+  app.post('/api/member/magnaat/leven/actie', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.leven.actie(key, b)));
   app.post('/api/member/magnaat/overzicht', auth, (req, res) => alsLid(req, res, key => magnaatWereld.overzicht(key)));
   app.post('/api/member/magnaat/taak/start', auth, (req, res) => alsLid(req, res,
     (key, b) => magnaatWereld.taakStart(key, b.functieId, b.apparaat)));

@@ -38,7 +38,7 @@
       (g.vooruitOntvangen ? ' Aan voorschotten heb je ' + euro(g.vooruitOntvangen) + ' binnen waar je nog werk voor moet leveren.' : '') +
       (g.schuld ? ' Je familie krijgt nog ' + euro(g.schuld) + '.' : '') + '</p>' +
       '<h3>Wat eraan komt</h3>' + regels(g.komend.map(function (x) {
-        return [x.naam, euro(x.bedrag) + ' · ' + (x.achterstand ? 'staat open' : esc(x.dagNaam) + ', dag ' + x.dag) + (x.uitgesteld ? ' · uitgesteld' : '')];
+        return [x.naam + ' · aan ' + (x.leverancier || 'onbekend'), euro(x.bedrag) + ' · ' + (x.achterstand ? 'staat open' : esc(x.dagNaam) + ', dag ' + x.dag) + (x.uitgesteld ? ' · uitgesteld' : '')];
       })) +
       (g.facturen.length ? '<h3>Facturen</h3>' + regels(g.facturen.map(function (f) {
         return [f.nummer + ' · ' + f.klant, euro(f.totaal) + ' · ' + (f.betaaldOp ? 'betaald op dag ' + f.betaaldOp : f.gefinancierd ? 'voorgefinancierd' : 'open, vervalt dag ' + f.vervaldag)];

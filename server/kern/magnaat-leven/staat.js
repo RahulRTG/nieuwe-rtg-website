@@ -46,8 +46,10 @@ function ontgrendel(st, id) {
 /* Een betaling klaarzetten: hij wordt op zijn dag betaald als er geld is. Het
    id komt uit een teller en nooit uit de lengte van de lijst: dat id is ook de
    grootboeksleutel, en een sleutel die terugkomt boekt niets. */
+const AAN_WIE = { huur: 'je verhuurder', vast: 'je provider en je verzekeraar', uitstel: 'je provider en je verzekeraar',
+  software: 'de maker van je software', aanmaning: 'het incassobureau', aflossing: 'je familie' };
 function post(st, { soort, naam, bedrag, dag }) {
-  st.posten.push({ id: soort + ':' + (++st.postTeller), soort, naam, bedrag, dag });
+  st.posten.push({ id: soort + ':' + (++st.postTeller), soort, naam, leverancier: AAN_WIE[soort] || 'onbekend', bedrag, dag });
 }
 
 const klantVan = (st, klantId) => klantenVan(st.aanbod).find(k => k.id === klantId) || null;

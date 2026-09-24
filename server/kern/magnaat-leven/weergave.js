@@ -78,7 +78,7 @@ function beeld(st, boek, nu) {
       resultaat: { omzet: c.omzet, kosten: c.kosten, resultaat: c.resultaat },
       opdrachten: bedrijfDeals.map(d => ({ klant: d.klant, bedrag: d.afspraak.bedrag, korting: d.factuur.korting,
         ontvangen: d.fase === 'betaald' || d.factuur.gefinancierd, factuur: d.factuur.nummer })),
-      komend: st.posten.slice().sort((x, y) => x.dag - y.dag).map(p => ({ id: p.id, naam: p.naam, bedrag: p.bedrag, dag: p.dag, dagNaam: R.dagNaam(Math.max(p.dag, st.dag)), achterstand: !!p.achterstand, uitgesteld: !!p.uitgesteld })),
+      komend: st.posten.slice().sort((x, y) => x.dag - y.dag).map(p => ({ id: p.id, naam: p.naam, leverancier: p.leverancier, bedrag: p.bedrag, dag: p.dag, dagNaam: R.dagNaam(Math.max(p.dag, st.dag)), achterstand: !!p.achterstand, uitgesteld: !!p.uitgesteld })),
       facturen: bedrijfDeals.map(d => Object.assign({ klant: d.klant }, d.factuur)),
       recent: (st.boek.recent || []).slice(0, 12)
     },

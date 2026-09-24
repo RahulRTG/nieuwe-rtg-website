@@ -35,8 +35,8 @@ const VRIJ = [260, 180, 180, 420, 240, 180, 360];
 /* Wat het leven kost, en wanneer. Een verplichting met `uitstel` kan een week
    later, tegen de kosten die erbij staan; huur kan dat niet. */
 const VERPLICHTINGEN = [
-  { id: 'huur', naam: 'Huur van je kamer', bedrag: 65000, elke: PERIODE, eerste: 15, uitstel: null },
-  { id: 'vast', naam: 'Telefoon en zorgverzekering', bedrag: 4199, elke: 7, eerste: 3, uitstel: { dagen: 7, kosten: 750 } }
+  { id: 'huur', naam: 'Huur van je kamer', leverancier: 'je verhuurder', bedrag: 65000, elke: PERIODE, eerste: 15, uitstel: null },
+  { id: 'vast', naam: 'Telefoon en zorgverzekering', leverancier: 'je provider en je verzekeraar', bedrag: 4199, elke: 7, eerste: 3, uitstel: { dagen: 7, kosten: 750 } }
 ];
 const BOODSCHAPPEN = 700;          // per dag; zonder geld eet je goedkoper, je staat niet rood
 const SOFTWARE = { naam: 'Pro-abonnement van je werksoftware', bedrag: 4900, elke: PERIODE, uitstel: { dagen: 7, kosten: 0 } };

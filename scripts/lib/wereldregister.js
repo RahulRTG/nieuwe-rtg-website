@@ -160,8 +160,10 @@ function los(item) {
   }
   const def = LINKS[sleutel];
   if (!def) return { soort: 'link', sleutel, naam: null, url: null, bestaat: false };
-  return { soort: 'link', sleutel, naam: def.naam || sleutel, url: def.url || null,
-    bestaat: def.url ? (!kaal(def.url).startsWith('/') || bestaat(kaal(def.url))) : false };
+  /* `werkrol` is wie de ingang ZIET (app-main-24a3.js); zonder staat hij er niet. */
+  return Object.assign({ soort: 'link', sleutel, naam: def.naam || sleutel, url: def.url || null,
+    bestaat: def.url ? (!kaal(def.url).startsWith('/') || bestaat(kaal(def.url))) : false },
+  def.werkrol ? { werkrol: def.werkrol } : {});
 }
 
 module.exports = { LINKS, OSAPPS, MAPPEN, WERELDEN, TABS, APP_HTML, BRON, blok, draai, kaal, bestaat, los, PUB, WORTEL };

@@ -67,6 +67,10 @@ function bouw() {
          opent, zodat de sprong nooit een adres verzint dat niet bestaat. */
       if (l.soort === 'link') rij.url = l.url;
       if (premium.has(l.sleutel)) rij.label = 'Lifestyle';
+      /* Een ingang voor een werkrol (app-main-24a3.js) staat hier WEL, met een
+         label: de bank verbergt hem voor wie de sleutel niet heeft, deze lijst
+         zegt voor wie hij is. Dezelfde keuze als bij het premiumlabel. */
+      if (l.werkrol === 'kantoor') rij.label = 'Kantoor';
       /* DE WOORDEN DIE OP HET SCHERM ZELF STAAN. Een mens typt wat hij heeft
          zien staan, niet wat wij in deze lijst hebben gezet: "pay" vond niets
          terwijl de app RTG Pay heet en de rij hier "Betalen". Ze komen uit de

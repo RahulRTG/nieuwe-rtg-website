@@ -166,7 +166,10 @@ function rijen() {
         app: bron && bron.naam ? bron.naam : sleutel,
         functie: item,
         wereld: map.naam,
-        persona: PERSONA_VAN_WERELD[map.naam] || 'lid',
+        /* Een ingang met een werkrol toont de wereld alleen aan wie die rol in
+           zijn sleutelbos heeft (app-main-24a3.js); dat is dan aan wie hij
+           beloofd wordt, en dus de persona die erdoor moet kunnen. */
+        persona: (bron && bron.werkrol) || PERSONA_VAN_WERELD[map.naam] || 'lid',
         ingang: url || ('(' + soort + ' in de app, geen eigen adres)'),
         soort,
         pad: url ? url.split('#')[0].split('?')[0] : null

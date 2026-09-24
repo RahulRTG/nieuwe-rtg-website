@@ -23,6 +23,7 @@
     if (item.startsWith('tab:')) return tabZichtbaar(item.slice(4)) && isAan(item);
     if (item.startsWith('link:') && PREMIUM.has(item.slice(5)) && !premiumPas) return false;
     if (!itemDef(item)) return false;
+    if (item.startsWith('link:') && !werkrolOk(LINKS[item.slice(5)])) return false;
     return isAan(item);
   }
   // een gratis account (zonder pas) heeft geen wallet en geen Rahul; de kern

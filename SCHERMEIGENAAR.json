@@ -937,7 +937,7 @@
     "apps/decision-room.html": {
       "capability": "werk.besluit",
       "rol": "eigenaar",
-      "doelgroep": "business-lid",
+      "doelgroep": "kantoor",
       "doel": "Besluiten voor het bedrijf agenderen, afwegen en met de reden vastleggen."
     },
     "apps/defensie.html": {
@@ -2135,7 +2135,7 @@
     "apps/project-room.html": {
       "capability": "werk.project",
       "rol": "eigenaar",
-      "doelgroep": "zaak",
+      "doelgroep": "kantoor",
       "doel": "Projectvoortgang zien en uitvoeren (alleen wat nu kan), het projectdossier raadplegen, en bij oplevering bewijs vastleggen dat het beloofde resultaat is bereikt."
     },
     "apps/pulse.html": {
@@ -2259,7 +2259,7 @@
     "apps/rtgone.html": {
       "capability": "werk.rtgone",
       "rol": "eigenaar",
-      "doelgroep": "lid",
+      "doelgroep": "kantoor",
       "doel": "Zijn werkdag overzichtelijk beheren: beslissen met zicht op gevolg en werk laten doorlopen zonder alles over te dragen."
     },
     "apps/rtgschool.html": {

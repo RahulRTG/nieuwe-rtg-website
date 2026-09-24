@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:39:24.107Z",
-    "commit": "6610bb4bf",
+    "op": "2026-09-24T21:44:10.748Z",
+    "commit": "672169628",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doorbelasting.js",
@@ -23,16 +23,16 @@
   "vorm": {
     "vormenTotaal": 1429,
     "geldvormen": 215,
-    "volgbaar": 31,
+    "volgbaar": 33,
     "perHerkomstveld": {
       "bron": 16,
       "provider": 2,
       "aanbieder": 7,
       "herkomst": 1,
-      "leverancier": 6,
+      "leverancier": 8,
       "economischeHerkomst": 4
     },
-    "nietVolgbaar": 184,
+    "nietVolgbaar": 182,
     "volgbareModules": [
       "server/kern/appbieb.js",
       "server/kern/betaalopdracht/index.js",
@@ -47,6 +47,8 @@
       "server/kern/horeca/foliolaag.js",
       "server/kern/kosten/providerfactuur.js",
       "server/kern/kosten/providerfactuur.js",
+      "server/kern/magnaat-leven/regels.js",
+      "server/kern/magnaat-leven/weergave.js",
       "server/kern/mall/bestellingen.js",
       "server/kern/mall/bestellingen.js",
       "server/kern/mall/bestellingen.js",
@@ -245,7 +247,7 @@
       },
       "server/kern/magnaat-leven": {
         "geldvormen": 2,
-        "volgbaar": 0
+        "volgbaar": 2
       },
       "server/kern/mall": {
         "geldvormen": 11,

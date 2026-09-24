@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:39:58.853Z",
-    "commit": "da24689f",
+    "op": "2026-09-24T21:51:15.677Z",
+    "commit": "fce571c0",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/liegronde.js",
@@ -11,8 +11,8 @@
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 57,
-    "NIET_GETEST": 55
+    "BEWEZEN": 58,
+    "NIET_GETEST": 54
   },
   "regels": [
     {
@@ -759,12 +759,10 @@
       "app": "RTFoundation in jouw buurt",
       "ingang": "/apps/foundation/os-publiek.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 2,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:rtfportaal",
@@ -954,8 +952,8 @@
       "ingang": "/apps/life.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 2,
+      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 10,
       "klachten": []
     },
     {

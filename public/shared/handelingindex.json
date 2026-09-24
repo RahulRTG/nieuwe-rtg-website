@@ -920,6 +920,12 @@
       "url": "/apps/magnaat.html"
     },
     {
+      "label": "Toon meer",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
       "label": "Ververs codepunten",
       "app": "Magnaat",
       "wereld": "WorkOS",
@@ -927,12 +933,6 @@
     },
     {
       "label": "Verwerk volgende dag",
-      "app": "Magnaat",
-      "wereld": "WorkOS",
-      "url": "/apps/magnaat.html"
-    },
-    {
-      "label": "Volgende",
       "app": "Magnaat",
       "wereld": "WorkOS",
       "url": "/apps/magnaat.html"

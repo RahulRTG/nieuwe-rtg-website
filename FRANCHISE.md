@@ -357,8 +357,8 @@ A in par. 4.1 de aanbeveling is.
 ### 4.3 De kantoordeur is één deur, en dat is de grootste blokkade
 
 Er is één gedeelde `OFFICE_CODE` en één rol `office`, met 26 kamers erachter en
-<!--getal:kantoor.routes-->616<!--/getal--> kantoorroutes, waarvan er
-<!--getal:kantoor.deurEistMens-->191<!--/getal--> een bewezen mens eisen. Een medewerker van een
+<!--getal:kantoor.routes-->619<!--/getal--> kantoorroutes, waarvan er
+<!--getal:kantoor.deurEistMens-->194<!--/getal--> een bewezen mens eisen. Een medewerker van een
 exploitant in Spanje die de balie moet bedienen, krijgt daarmee de deur van het
 hele huis — inclusief de kluis van Nederlandse leden.
 

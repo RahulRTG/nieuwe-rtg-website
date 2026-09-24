@@ -1117,8 +1117,8 @@ KANTOORMACHT.md) maar wie hij IS, hoe hij binnenkomt en wanneer het systeem juis
 niets moet zeggen. Lees die vóór je aan onboarding, personeelsidentiteit,
 werktoewijzing of een kantoormelding werkt. Blok 0 van KANTOORMACHT.md staat er
 inmiddels als meter (`npm run kantoormacht`, `KANTOORMACHT.json`) en die vervangt
-de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->616<!--/getal-->
-kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->191<!--/getal--> een bewezen mens eisen en
+de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->619<!--/getal-->
+kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->194<!--/getal--> een bewezen mens eisen en
 <!--getal:kantoor.deurGedeeld-->425<!--/getal--> achter de gedeelde code hangen — en
 <!--getal:kantoor.anoniem-->358<!--/getal--> zijn er anoniem uitvoerbaar. Let op de graden: de
 deur-assen komen uit de ROUTER en zijn hard, `anoniem` is lexicaal en dus een
@@ -1425,7 +1425,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->125<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->107<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->400<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->107<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->401<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste

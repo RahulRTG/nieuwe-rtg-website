@@ -39,6 +39,13 @@ module.exports = ({ crypto, beveilig, noteerAfketser, db, save }) => {
     }
     doosAfketsers.delete(ip); // een goede sleutel wist de teller
     doosSleutels().telWeg('gedeeld', req.get('x-doos-id') || (req.body && req.body.doos));
+    /* Staat de gedeelde sleutel dicht, dan is een GOEDE gedeelde sleutel geen
+       afketser (geen blokkade per IP) maar een doos die nog om moet. Hij blijft
+       in nogGedeeld staan, zodat het kantoor ziet welke. */
+    if (doosSleutels().gedeeldeSleutel().dicht) {
+      res.status(403).json({ error: 'De gedeelde doos-sleutel is dicht. Deze doos heeft een eigen sleutel nodig (RTG_DOOS_EIGEN_SLEUTEL met RTG_DOOS_ID).' });
+      return false;
+    }
     return true;
   }
 

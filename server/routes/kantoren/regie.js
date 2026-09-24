@@ -69,6 +69,8 @@ module.exports = (ctx) => {
   require('./doossleutels')(ctx);
   /* De weg "Werk OS-uitgave via RTG Rekening" aan of uit staat in ./werkbetaling.js. */
   require('./werkbetaling')(ctx);
+  /* Per kantoordeur schaduw of afdwingen staat in ./beleidsafdwingen.js. */
+  require('./beleidsafdwingen')(ctx);
 
   /* De schakelroutes van de kast (globaal, fijn, genre, de grote hendel en de
      uitrolfases) staan in ./regie-schakel.js -- afgesplitst voor de 10 KB van

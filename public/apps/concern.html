@@ -186,7 +186,7 @@ function vakRekening(rk){
   const r=rk.rekening;
   const inhoud=r
     ? '<div class="regel"><strong>'+esc(r.iban)+'</strong><span class="meta">'+esc(r.naam||'')+'</span><span class="sp"></span>'+
-      '<span class="meta">&euro; '+(Number(r.saldoCenten||0)/100).toLocaleString('nl-NL',{minimumFractionDigits:2})+'</span></div>'
+      '<span class="meta">&euro; '+(Number(r.saldoCenten||0)/100).toLocaleString(document.documentElement.lang||undefined,{minimumFractionDigits:2})+'</span></div>'
     : (rk.rtg&&rk.rtg.open
       ? '<div class="rij r8"><button class="knop" id="rkOpen">Open een rekening</button></div>'
       : '<p class="stil">'+esc((rk.rtg&&rk.rtg.uitleg)||'Nog niet beschikbaar.')+'</p>');

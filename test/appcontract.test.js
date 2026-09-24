@@ -164,6 +164,8 @@ test('7. een koppeling die de meting niet haalt, telt niet -- ook met een vers r
 test('8. stelSamen raakt alleen wat het contract noemt', () => {
   const r = { functie: 'link:bestaat-niet', ingang: '/apps/niets.html',
     bewijzen: { voltooibaar: { status: 'GEEN_FIXTURE', reden: 'x', bewijs: null } } };
-  assert.deepEqual(B.stelSamen(r), []);
+  /* Met lege contract- en algemene lijsten: een algemene bron (ALGEMEEN) raakt
+     elke rij, en die heeft zijn eigen toets in test/liegronde.test.js. */
+  assert.deepEqual(B.stelSamen(r, { contract: {}, algemeen: {} }), []);
   assert.equal(r.bewijzen.voltooibaar.status, 'GEEN_FIXTURE');
 });

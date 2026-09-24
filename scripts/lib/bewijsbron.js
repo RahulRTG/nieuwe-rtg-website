@@ -41,7 +41,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { BEWIJZEN, BRONSOORTEN, CONTRACT } = require('./appcontract');
+const { BEWIJZEN, BRONSOORTEN, CONTRACT, ALGEMEEN } = require('./appcontract');
 
 const WORTEL = path.join(__dirname, '..', '..');
 
@@ -154,10 +154,38 @@ function ketenUitslag(register, { lees = leesStandaard, versheid } = {}) {
    bron noemt door de uitslag van die bron. Wat het contract niet noemt, blijft
    exact staan -- deze functie kan een GEEN_FIXTURE alleen vervangen door iets
    wat een bron VERDIEND heeft, nooit door een gok. */
+/* ---- EEN RONDE: EEN UITSLAG PER RIJ ---------------------------------------
+   Voor een bron uit ALGEMEEN (scripts/lib/appcontract.js). Dezelfde grendels als
+   bij een keten: geen register, geen stempel of een vervallen stempel is
+   NIET_GETEST, en een rij die er niet in staat ook. De uitslag van de rij wordt
+   overgenomen, nooit opgewaardeerd. */
+const STANDEN = new Set(['BEWEZEN', 'GEBLOKKEERD_DOOR_DEFECT', 'GEBLOKKEERD_DOOR_CONFIG', 'NIET_GETEST']);
+function rondeUitslag(register, functie, { lees = leesStandaard, versheid } = {}) {
+  const tekst = lees(register);
+  if (tekst === null) return { status: 'NIET_GETEST', reden: register + ' bestaat niet: deze ronde is nooit vastgelegd', bewijs: null };
+  let reg;
+  try { reg = JSON.parse(tekst); } catch (e) { return { status: 'NIET_GETEST', reden: register + ' is geen geldige JSON', bewijs: null }; }
+  const st = reg.stempel;
+  const v = (st && typeof st === 'object') ? versheid(st) : { vers: false, reden: 'het register draagt geen stempel met commit' };
+  const bewijs = { register, op: st && st.op ? st.op : null, commit: st && st.commit ? st.commit : null };
+  if (!v.vers) return { status: 'NIET_GETEST', reden: 'bewijs vervallen: ' + v.reden, bewijs };
+  const rij = (reg.regels || []).find((r) => r.functie === functie);
+  if (!rij) return { status: 'NIET_GETEST', reden: register + ' kent ' + functie + ' niet', bewijs };
+  if (!STANDEN.has(rij.status)) return { status: 'NIET_GETEST', reden: register + ' geeft ' + functie + ' de onbekende stand ' + rij.status, bewijs };
+  return { status: rij.status, reden: rij.reden, bewijs };
+}
+
 function bewijsVoor(functie, naam, ingang, opties = {}) {
   const c = (opties.contract || CONTRACT)[functie];
   const bron = c && c[naam];
-  if (!bron) return null;
+  if (!bron) {
+    const alg = (opties.algemeen || ALGEMEEN)[naam];
+    if (!alg) return null;
+    if (!(BRONSOORTEN[alg.soort] || []).includes(naam)) throw new Error('appcontract: een ' + alg.soort + ' mag geen ' + naam + ' leveren');
+    const uit = rondeUitslag(alg.register, functie, { lees: opties.lees || leesStandaard, versheid: opties.versheid || require('./stempel').versheid });
+    uit.bron = { soort: alg.soort, instrument: alg.instrument };
+    return uit;
+  }
   if (!BEWIJZEN.includes(naam)) throw new Error('appcontract: "' + naam + '" is geen van de acht bewijzen');
   if (!(BRONSOORTEN[bron.soort] || []).includes(naam)) {
     throw new Error('appcontract: een ' + bron.soort + ' mag geen ' + naam + ' leveren (' + functie + ')');
@@ -185,4 +213,4 @@ function stelSamen(r, opties = {}) {
   return gedaan;
 }
 
-module.exports = { proefRoutes, ingangRoutes, gedeeld, smalVoorvoegsel, ketenUitslag, bewijsVoor, stelSamen };
+module.exports = { proefRoutes, ingangRoutes, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };

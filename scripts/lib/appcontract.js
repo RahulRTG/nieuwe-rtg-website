@@ -59,7 +59,11 @@ const BEWIJZEN = ['bereikbaar', 'bedienbaar', 'voltooibaar', 'waarheidsgetrouw',
    authority, verraad) komt hier met zijn eigen bewijs bij, en niet door een
    bestaande soort op te rekken. */
 const BRONSOORTEN = {
-  ketenproef: ['voltooibaar']
+  ketenproef: ['voltooibaar'],
+  /* De liegronde levert waarheidsgetrouw en verder niets: zijn JS-fouten en
+     rommel op een leeg antwoord zeggen iets over robuustheid, niet over bewijs 8
+     (menselijk), want een echte backend antwoordt nooit zo. */
+  liegronde: ['waarheidsgetrouw']
 };
 
 /* Sleutel: de functie-id uit MAPPEN (zoals APPWERKT.json hem als `functie`
@@ -130,4 +134,18 @@ const WERELD = {
   'link:spelen': { werelden: ['spel'], waarom: 'een potje dat loopt: de wortel van /api/member/spel/*' }
 };
 
-module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD };
+/* BRONNEN DIE VOOR ELKE APP GELDEN. Een contract noemt per app een bron; een
+   ronde als de liegronde meet ELKE rij met dezelfde procedure, en heeft dus geen
+   koppeling per app nodig maar een uitslag per rij. Het register is de
+   koppeling: staat de rij er niet in, of is hij vervallen, dan blijft het bewijs
+   NIET_GETEST. Een contract per app gaat voor. */
+const ALGEMEEN = {
+  waarheidsgetrouw: {
+    soort: 'liegronde',
+    register: 'LIEGRONDE.json',
+    instrument: 'scripts/liegronde.js',
+    waarom: 'dezelfde liegpoort als test/liegend-scherm.e2e.js, per rij met de persona van die rij; alleen een verzonnen zekerheid is een defect'
+  }
+};
+
+module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD, ALGEMEEN };

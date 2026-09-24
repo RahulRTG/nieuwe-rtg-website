@@ -718,7 +718,7 @@ function bouw(meting) {
 
 /* Voor test/appwerkt-meter.e2e.js: de bediening los aan te roepen op een
    synthetisch scherm, zonder server en zonder register. */
-module.exports = { bedien, inventaris, bezoek };
+module.exports = { bedien, inventaris, bezoek, rijen, maakContext, POORTEN };
 
 /* DE WACHT: dit script schrijft APPWERKT.json en start daarom niet bij het
    requiren (scripts/meetkeuring.js, regel `wacht`). Een laadcontrole -- node -e

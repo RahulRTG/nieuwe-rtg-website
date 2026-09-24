@@ -49,7 +49,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
-const { vindKlachten, vergelijk } = require('../scripts/lib/schermleugen');
+const { vindKlachten, vergelijk, zichtbareTekst } = require('../scripts/lib/schermleugen');
 
 const pw = laadPlaywright();
 
@@ -83,21 +83,6 @@ const leesSchuld = () => {
   try { return JSON.parse(fs.readFileSync(SCHULD, 'utf8')); } catch (e) { return null; }
 };
 
-/* De zichtbare tekst, en nadrukkelijk niet de HTML: een zekerheidswoord in een
-   verborgen sjabloon of een aria-label is geen bewering aan een lid. */
-const zichtbareTekst = (page) => page.evaluate(() => {
-  const uit = [];
-  const loop = (el) => {
-    for (const k of el.children) {
-      const st = getComputedStyle(k);
-      if (st.display === 'none' || st.visibility === 'hidden' || k.hidden) continue;
-      if (!k.children.length) { const t = (k.textContent || '').trim(); if (t) uit.push(t); }
-      else loop(k);
-    }
-  };
-  loop(document.body);
-  return uit.join(' · ');
-});
 
 test('geen scherm liegt als de backend leeg antwoordt',
   { skip: geenBrowser(pw) }, async () => {

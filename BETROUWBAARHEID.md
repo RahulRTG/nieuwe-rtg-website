@@ -46,7 +46,7 @@ blijven.
 | 1 | **bereikbaar** | vindt de gebruiker de functie vanaf de plek waar RTG haar presenteert? | **staat** (`APPWERKT.json`) |
 | 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **een kwart** — knoppen wel, formulieren/uploads/toetsenbord niet; en een groot deel van wat er staat is niet aan te tikken omdat er iets overheen ligt (zie par. 5) |
 | 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een stap weg** (vraagt de testwereld uit par. 4) |
-| 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **een stap weg** (`SCHERMLEUGEN.json` doet dit voor 6 schermen) |
+| 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) |
 | 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **een stap weg** |
 | 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **half** — de routekant staat (`IDOR.json`, `ROLPROEF.json`), de schermkant niet |
 | 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **een stap weg** (`HERSTELPROEF.json`, `chaos.js`, `aanval.js` bestaan al) |
@@ -342,6 +342,37 @@ Toetsen: `test/bestemming.test.js` (de drie gevallen, een onbekende landing, de
 persona-afwijking) en `test/appwerkt-bestemming.e2e.js` (echte doorverwijzingen na
 het laden). Vijf mutaties, waaronder "terug naar url-vergelijking": alle vijf
 laten een toets zakken.
+
+## 4e. Waarheidsgetrouw: de liegpoort over elk onderdeel
+
+**Staat** (24 september 2026). Par. 7 punt 3 noemde dit een stap die rekentijd kost
+en geen ontwerp, en zo liep het ook. `scripts/liegronde.js` draait het experiment van
+`test/liegend-scherm.e2e.js` over elke rij van `APPWERKT.json`, met de persona van
+die rij. De server staat op `RTG_LIEG=/api/`, dus elk endpoint buiten de deuren
+antwoordt `{ok:true}` en verder niets. De detectoren zijn dezelfde
+(`scripts/lib/schermleugen.js`). `LIEGRONDE.json` legt de uitslag per rij vast, en
+APPWERKT neemt hem over als algemene bron (`ALGEMEEN` in `scripts/lib/appcontract.js`),
+met dezelfde versheidsgrendel als bij de ketens.
+
+**De eerste ronde vond geen enkel scherm dat een zekerheid verzint, en 38 die
+omvallen.** Van de drie detectoren gaat er maar één over bewijs 4: een zekerheidswoord
+dat in de gerenderde tekst staat en niet in de statische bron. Die sloeg nergens aan.
+De 38 klachten waren allemaal een JS-fout (22) of `undefined` in beeld (16) op het
+kale antwoord. Dat zegt iets over robuustheid bij een antwoord dat de echte backend
+nooit zo geeft, en niets over liegen. Ze als DEFECT onder bewijs 4 tellen zou er een
+nieuwe betekenis van maken. Het huis telt ze in `SCHERMLEUGEN.json` als schuld, dus
+bij zo'n scherm is bewijs 4 NIET_GETEST, met de klacht in de rij: wie omvalt, laat
+niet zien of hij een toestand zou verzinnen. Een scherm dat buiten de deuren niets
+aan de backend vroeg, is ook NIET_GETEST en nooit BEWEZEN.
+
+**Wat BEWEZEN hier betekent, en niet meer:** het scherm kreeg minstens één gelogen
+antwoord, en toonde geen verzonnen zekerheid, geen rommel en geen JS-fout. Alleen een
+LEEG antwoord is beproefd. Een backend die iets verkeerds antwoordt in plaats van
+niets, wordt niet betrapt.
+
+Toetsen: `test/liegronde.test.js` (het oordeel, de samenstelling, en de samenhang van
+het echte register). Drie handmutaties laten hem zakken: elke klacht als defect
+tellen, de versheid overslaan, en nul gelogen antwoorden als bewezen tellen.
 
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 

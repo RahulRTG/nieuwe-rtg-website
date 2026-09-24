@@ -123,7 +123,7 @@
     "veranderbereikZonderBereik": 530,
     "stilLezing": 5,
     "stilLezingMeters": 61,
-    "stilLezingBereik": 586,
+    "stilLezingBereik": 575,
     "bewijsOnderscheidt": 6,
     "connectDomeinenGemeten": 23,
     "afgeleidZonderEigenaar": 2,
@@ -149,6 +149,15 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "stilLezingBereik",
+      "van": 586,
+      "meter": "stilLezingBereik 586 -> 575 (scripts/ 503 -> 492)",
+      "reden": "Er is geen bewijslezing verdwenen: elf VALSE treffers vielen weg. De meter telt elke require( of readFileSync( met binnen 200 tekens een registernaam als bewijslezing. In de ketenproeven telden daardoor require('path') en require('./lib/wegwerpserver') mee, omdat 'TAFELPROEF.json' (en de vier andere) er vlak onder stond; in scripts/appwerkt.js een require naast APPWERKT.json. De tak van het samenstellen van bewijs (BETROUWBAARHEID.md par. 4a) zette er een commentaarblok en een stempel-require tussen, en daarmee kwam de registernaam net buiten de 200 tekens. Per bestand nagemeten tegen main (26c1fee7): tafel-, rit-, toelatings-, moment- en zaakliveproef elk 3 -> 1, appwerkt.js 4 -> 3, verder geen enkel verschil. Het commentaar terugschuiven om de treffers terug te krijgen zou de meter voor de gek houden.",
+      "waarheen": "scripts/stillezing.js: het bereik telt een lezing op NABIJHEID van een registernaam; een lezing die het register werkelijk als argument draagt, is de strengere vorm en zou deze ruis wegnemen."
+    },
     {
       "datum": "2026-09-24",
       "soort": "structureel",

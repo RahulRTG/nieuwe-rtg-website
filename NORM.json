@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1590,
+    "kernBreedte": 1595,
     "kernGedeeld": 242,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -2935,6 +2935,15 @@
       "meter": "toetsenNietGemeten 624 -> 625",
       "reden": "test/werkuitgaven.e2e.js is nieuw: de browsertoets van de module Uitgaven in het Werk OS. Hij is met de hand nagetrokken met een mutatie (zonder het vaste veld in werk/acties.js zakt hij) en vond zelf een echt gebrek -- een weigering op een recht zonder het veld recht logde het lid uit. De mutatiemotor is er alleen nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee; daarna daalt deze meter terug."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1594,
+      "meter": "kernBreedte 1594 -> 1595",
+      "reden": "SOM van twee lijnen na het samenvoegen van #347 in main: main stond op 1594 (vestigingen, Edge ronde 2) en #347 bracht zijn eigen kernnamen mee (werkBankpad, tijdDuid). Geen nieuwe naam in deze samenvoeging; de verse meting telt 1595 omdat de lijnen elkaar grotendeels overlapten.",
+      "waarheen": "de notities van 1589 en 1590 (#347) en van 1592/1594 (main) hierboven, en GRENZEN.json"
     }
   ],
   "prestatie": {

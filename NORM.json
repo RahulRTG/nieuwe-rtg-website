@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1594,
+    "kernBreedte": 1599,
     "kernGedeeld": 243,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -149,6 +149,15 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1594,
+      "meter": "kernBreedte 1594 -> 1599 (de SOM van twee lijnen, geen nieuwe naam)",
+      "reden": "Het samengaan met main (930aaa3e). Main zette deze meter met eigen posten op 1595 (onder meer de twee hulpnamen van de vestigingsinhaal), deze tak met eigen posten op 1594 (de vijf smalle bankfuncties en tijdDuid). In een boom staan beide lijnen naast elkaar en dat is 1599; met deze samenvoeging komt er GEEN nieuwe naam bij. De posten van beide lijnen blijven apart staan, want samenvoegen tot een post wist welke namen het zijn.",
+      "waarheen": "GRENZEN.json draagt elke naam onder zijn eigen domein; daalt een laag weg, dan daalt deze meter vanzelf mee."
+    },
     {
       "datum": "2026-09-24",
       "soort": "structureel",

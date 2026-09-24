@@ -453,7 +453,14 @@ async function stadia(page) {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
-    const herkomst = (el) => { let a = el.parentElement; while (a && !a.id) a = a.parentElement; return a ? '#' + a.id : '(geen id)'; };
+    /* HERKOMST = de topcontainer onder <body>, en niet het dichtstbijzijnde id:
+       de eerste ronde vond 2542 knoppen zonder omhullend id, dus dat scheidt
+       niets. De topcontainer zegt wel of een knop in de gedeelde schil zit
+       (de Edge, de kop) of in de app zelf. */
+    const herkomst = (el) => { let a = el; while (a && a.parentElement && a.parentElement !== document.body) a = a.parentElement;
+      if (!a || a === document.body) return '(body)';
+      const kl = (typeof a.className === 'string' && a.className.trim()) ? '.' + a.className.trim().split(/\s+/)[0] : '';
+      return a.tagName.toLowerCase() + (a.id ? '#' + a.id : '') + kl; };
     const vw = innerWidth, vh = innerHeight;
     const sx = scrollX, sy = scrollY;
     const alle = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
@@ -502,6 +509,7 @@ async function bedien(ctx, base, pad) {
   const gehad = new Set();
   let geselecteerd = 0, geprobeerd = 0, effect = 0, stop = 'limiet';
   let stadiaPerHerkomst = null;
+  const spoor = [];
   const vingerafdruk = () => page.evaluate(() => location.href + '|' + document.querySelectorAll('*').length + '|' + (document.body ? document.body.innerText.length : 0)).catch(() => null);
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -525,6 +533,12 @@ async function bedien(ctx, base, pad) {
       }
       gevonden = Math.max(gevonden, k.zichtbaar || 0);
       for (const z of k.zicht || []) if (!gezien.has(z.merk)) gezien.set(z.merk, z.herkomst);
+      /* Het spoor per ronde: hoeveel zichtbaar, hoeveel daarvan nog niet gehad,
+         en wat de ronde deed. Zo is te zien waarom "geen nieuwe knop" valt
+         terwijl er ongekozen knoppen gezien zijn. */
+      const nieuwNu = (k.zicht || []).filter((z) => !gehad.has(z.merk)).length;
+      spoor.push({ zichtbaar: k.zichtbaar || 0, nieuw: nieuwNu, url: page.url().replace(base, '').slice(0, 60),
+        gekozen: k.klaar ? null : String(k.tekst || '(naamloos)').slice(0, 30) });
       if (k.klaar) { stop = 'geen nieuwe knop'; break; }
       gehad.add(k.merk);
       geselecteerd++;
@@ -567,6 +581,7 @@ async function bedien(ctx, base, pad) {
        het scherm. */
     drempelHaalbaar: gevonden === 0 || MAXKLIK * 2 >= gevonden,
     stadia: stadiaPerHerkomst,
+    spoor: spoor.slice(0, MAXKLIK + 1),
     nooitGekozenNaarHerkomst: Object.fromEntries(Object.entries(herkomstTelling).sort((a, b) => b[1] - a[1]).slice(0, 5)) };
   return { geklikt, gevonden, overgeslagen, nietKlikbaar, instrument, crash, config, serverfout, weigering, trechter };
 }
@@ -598,7 +613,14 @@ async function kijkRonde(page, gehad) {
     /* Voor de trechter: ELKE zichtbare knop met zijn handtekening en zijn
        herkomst (het dichtstbijzijnde voorouderelement met een id). Alleen
        waarneming; de keuze hieronder verandert er niet door. */
-    const herkomst = (el) => { let a = el.parentElement; while (a && !a.id) a = a.parentElement; return a ? '#' + a.id : '(geen id)'; };
+    /* HERKOMST = de topcontainer onder <body>, en niet het dichtstbijzijnde id:
+       de eerste ronde vond 2542 knoppen zonder omhullend id, dus dat scheidt
+       niets. De topcontainer zegt wel of een knop in de gedeelde schil zit
+       (de Edge, de kop) of in de app zelf. */
+    const herkomst = (el) => { let a = el; while (a && a.parentElement && a.parentElement !== document.body) a = a.parentElement;
+      if (!a || a === document.body) return '(body)';
+      const kl = (typeof a.className === 'string' && a.className.trim()) ? '.' + a.className.trim().split(/\s+/)[0] : '';
+      return a.tagName.toLowerCase() + (a.id ? '#' + a.id : '') + kl; };
     const zicht = alle.map((el) => ({ merk: merk(el), herkomst: herkomst(el) }));
     const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)));
     if (!nieuwe.length) return { klaar: true, zichtbaar: alle.length, zicht };

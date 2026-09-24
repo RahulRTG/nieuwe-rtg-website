@@ -432,6 +432,60 @@ async function bezoek(ctx, base, pad) {
     samenvatting: poort ? 'poort dicht' : (crash.length ? 'gooit' : tekst + ' tekens zichtbaar') };
 }
 
+/* ---- de stadia: wat de gebruiker van een knop werkelijk kan bereiken ----
+
+   Waarneming, geen oordeel, een keer per scherm direct na het laden. Per
+   knop-achtig element de keten
+     DOM aanwezig -> zichtbaar (de `zie`-toets van kijkRonde) -> in beeld zonder
+     scrollen -> te raken na scrollen
+   en per herkomst (het dichtstbijzijnde voorouderelement met een id), zodat de
+   bediening van de APP en die van de gedeelde SCHIL apart te lezen zijn.
+
+   "Te raken" is een hittest op VIJF punten (midden en vier punten op een kwart
+   van de randen), na scrollIntoView: raakt elementFromPoint daar de knop zelf of
+   iets IN de knop, dan telt dat punt. Alle vijf is `volledig`, een deel is
+   `gedeeltelijk`, geen is `nee` -- want een knop waarvan alleen het midden onder
+   een laag ligt, is voor een mens vaak gewoon te bedienen, en een enkele
+   middenpunttest zou hem ten onrechte afschrijven. De scrollstand wordt na
+   afloop teruggezet. */
+async function stadia(page) {
+  return page.evaluate(() => {
+    const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+      if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
+      const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
+    const herkomst = (el) => { let a = el.parentElement; while (a && !a.id) a = a.parentElement; return a ? '#' + a.id : '(geen id)'; };
+    const vw = innerWidth, vh = innerHeight;
+    const sx = scrollX, sy = scrollY;
+    const alle = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+      .filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'));
+    const uit = {};
+    for (const el of alle) {
+      const h = herkomst(el);
+      const t = uit[h] = uit[h] || { dom: 0, zichtbaar: 0, inBeeld: 0, raakbaarVolledig: 0, raakbaarGedeeltelijk: 0, nietRaakbaar: 0, voorbeelden: [] };
+      t.dom++;
+      if (!zie(el)) continue;
+      t.zichtbaar++;
+      let b = el.getBoundingClientRect();
+      if (b.bottom > 0 && b.right > 0 && b.top < vh && b.left < vw) t.inBeeld++;
+      try { el.scrollIntoView({ block: 'center', inline: 'center' }); } catch (e) {}
+      b = el.getBoundingClientRect();
+      const punten = [[0.5, 0.5], [0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]];
+      let raak = 0;
+      for (const [fx, fy] of punten) {
+        const x = b.left + b.width * fx, y = b.top + b.height * fy;
+        if (x < 0 || y < 0 || x >= vw || y >= vh) continue;
+        const hit = document.elementFromPoint(x, y);
+        if (hit && (hit === el || el.contains(hit))) raak++;
+      }
+      if (raak === punten.length) t.raakbaarVolledig++;
+      else if (raak > 0) t.raakbaarGedeeltelijk++;
+      else { t.nietRaakbaar++; if (t.voorbeelden.length < 3) t.voorbeelden.push(((el.innerText || el.getAttribute('aria-label') || el.title || '').trim().slice(0, 30)) || '(naamloos)'); }
+    }
+    scrollTo(sx, sy);
+    return uit;
+  }).catch((e) => ({ fout: String(e.message || e).slice(0, 120) }));
+}
+
 /* ---- de bediening: tikken op wat er staat ---- */
 async function bedien(ctx, base, pad) {
   const page = await ctx.newPage();
@@ -447,11 +501,13 @@ async function bedien(ctx, base, pad) {
   const gezien = new Map();          // merk -> herkomst
   const gehad = new Set();
   let geselecteerd = 0, geprobeerd = 0, effect = 0, stop = 'limiet';
+  let stadiaPerHerkomst = null;
   const vingerafdruk = () => page.evaluate(() => location.href + '|' + document.querySelectorAll('*').length + '|' + (document.body ? document.body.innerText.length : 0)).catch(() => null);
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
     luister(page, base, { crash, config, serverfout, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
+    stadiaPerHerkomst = await stadia(page);
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
       let k;
       try { k = await kijkRonde(page, gehad); }
@@ -505,6 +561,12 @@ async function bedien(ctx, base, pad) {
   for (const m of nooitGekozen) { const h = gezien.get(m); herkomstTelling[h] = (herkomstTelling[h] || 0) + 1; }
   const trechter = { gevonden, uniekGezien: gezien.size, inAanmerking: inAanmerking.length, geselecteerd, geprobeerd,
     gelukt: geklikt, effect, stop, limiet: MAXKLIK,
+    /* DE BUDGETVRAAG: kan deze proef met haar eigen limiet de drempel van
+       bedienbaar (de helft van de gevonden knoppen) ueberhaupt halen? Is het
+       antwoord nee, dan zegt NIET_GETEST hier iets over de meter en niets over
+       het scherm. */
+    drempelHaalbaar: gevonden === 0 || MAXKLIK * 2 >= gevonden,
+    stadia: stadiaPerHerkomst,
     nooitGekozenNaarHerkomst: Object.fromEntries(Object.entries(herkomstTelling).sort((a, b) => b[1] - a[1]).slice(0, 5)) };
   return { geklikt, gevonden, overgeslagen, nietKlikbaar, instrument, crash, config, serverfout, weigering, trechter };
 }

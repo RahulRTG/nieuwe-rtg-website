@@ -4,7 +4,7 @@
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
     "activeringZonderReden": 0,
-    "appwerktDefecten": 4,
+    "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
     "bewijsAchterstand": 2418,
     "bewijsAlleenKeten": 17,
@@ -149,6 +149,15 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "appwerktDefecten",
+      "van": 4,
+      "meter": "appwerktDefecten 4 -> 0",
+      "reden": "Het product is gerepareerd, niet de meter. De vier defecten hadden een oorzaak: MAPPEN kende een pas maar geen werkrol, dus de ledenwereld toonde elk lid vier kantoorschermen. De ingangen dragen nu werkrol 'kantoor' en de bank toont ze alleen aan een account met een kantoorsleutel (/api/account/rollen). Hermeten met de persona aan wie de wereld ze toont: alle vier bereikbaar = BEWEZEN.",
+      "waarheen": "Bevroren op 0. test/werkrol.test.js houdt vast dat een ingang naar een kantoorscherm een werkrol draagt."
+    },
     {
       "datum": "2026-09-24",
       "soort": "structureel",
@@ -3107,7 +3116,7 @@
     "laatSpoorVerdacht": "2026-09-03",
     "rollbackUitzonderingen": "2026-09-03",
     "faalproefGezakt": "2026-09-13",
-    "appwerktDefecten": "2026-09-07",
+    "appwerktDefecten": "2026-09-24",
     "lussenGeenUitweg": "2026-09-11",
     "lussenKritiek": "2026-09-11",
     "lussenZonderOverlapRem": "2026-09-11",

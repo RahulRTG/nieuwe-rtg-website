@@ -287,15 +287,31 @@ bestaande uitkomst "verkeerd geadresseerd" met dezelfde zin. Een landing die nie
 te benoemen is, is NIET_GETEST. Het register wordt zonder vangnet gelezen: een
 onleesbaar register is geen leeg register.
 
-**Een tweede as, bewust zonder bewijsbetekenis.** Op dertien schermen meet de proef
+**Een tweede as, bewust zonder bewijsbetekenis.** Op elf schermen (eerst dertien) meet de proef
 met een andere persona (de wereld uit `MAPPEN`, via `PERSONA_VAN_WERELD`) dan het
 register als doelgroep noemt. WorkOS meet bijvoorbeeld als lid, terwijl Horeca en
 Partner Network voor een zaak zijn. Welke van de twee gelijk heeft, is geen
 meetvraag. "Vanuit welke wereld testen we" en "voor wie is dit scherm" hoeven niet
 hetzelfde begrip te zijn. De afwijking staat per rij als `personaAfwijking`, met
 beide waarden en beide bronnen. `npm run appcluster` groepeert hem per wereld op
-`gebruikt → verwacht`. Hij verandert geen enkel bewijs, tot de dertien semantisch
+`gebruikt → verwacht`. Hij verandert geen enkel bewijs, tot de elf semantisch
 zijn ingedeeld.
+
+**De vier defecten waren een productfout, en die is gerepareerd (24 september 2026).**
+Routedossier, RTG One, Decision Room en Project Room hadden een oorzaak: MAPPEN kende
+een pas maar geen werkrol, dus de ledenwereld toonde elk lid vier schermen die alleen
+met een kantoorsessie openen (`/api/rtgone` achter `officeAuth`). Een ingang in `LINKS`
+kan nu `werkrol` dragen; de bank toont hem alleen aan een account met die rol in zijn
+sleutelbos (`/api/account/rollen`), de sprongindex zet er het label "Kantoor" bij, en
+APPWERKT meet de rij met die persona. Hermeten: alle vier bereikbaar, 0 defecten.
+`test/werkrol.test.js` houdt vast dat een ingang naar een kantoorscherm een werkrol
+draagt. Twee dingen die de persona-as raakten: de doelgroep van de drie RTG
+One-schermen in `SCHERMEIGENAAR.json` stond op lid, business-lid en zaak, en is kantoor
+geworden, omdat dat de enige sessie is die hun API opent. En de doelgroep in dat
+register is een eigen woordenlijst uit een leesronde, zonder handhaver: hij zegt voor
+wie een scherm BEDOELD is. Toegang is iets anders (de acht doelgroepen van het
+functieregister, gemeten in `DOELGROEPBEREIK.json`), en de persona van een wereld is
+geen begrip uit WERELDEN.md maar een aanname van deze meter.
 
 Toetsen: `test/bestemming.test.js` (de drie gevallen, een onbekende landing, de
 persona-afwijking) en `test/appwerkt-bestemming.e2e.js` (echte doorverwijzingen na

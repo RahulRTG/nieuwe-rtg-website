@@ -158,6 +158,18 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
       body: JSON.stringify({ login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran' }) })
       .then(r => r.json());
     assert.ok(inlog.token, 'de eigenaar kan inloggen: ' + JSON.stringify(inlog).slice(0, 120));
+    /* HET ADRES VAN ZIJN EIGEN PAS-APP, en niet het kale /apps/app.html. Een
+       account weet bij welke pas het hoort: op het kale adres (of in de
+       verkeerde pas-app) doet de app zelf location.replace naar ?pas=<tier>
+       (app-main-04.js). Dat is bedoeld gedrag -- maar een toets die het kale
+       adres opent en daarna meteen opnieuw navigeert of wacht, RACET met die
+       omleiding: lokaal onder belasting zakte hij 3 van 6 keer op
+       net::ERR_ABORTED, in CI op een timeout van 30 seconden. De pas komt uit
+       de server-state en niet uit de toets, zodat een andere tier van de
+       eigenaar deze toets niet stil laat omleiden. */
+    const tier = inlog.state && inlog.state.user && inlog.state.user.tier;
+    assert.ok(['rtg', 'lifestyle', 'business'].includes(tier), 'de eigenaar heeft een pas: ' + tier);
+    const appAdres = base + '/apps/app.html?pas=' + tier;
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
@@ -221,7 +233,7 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
        (`link:office`, `os:werk`). Die verandert alleen als de app echt een
        andere app wordt. De zichtbare namen gaan wel mee in de foutmelding,
        want daarmee zoek je hem terug op het scherm. */
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(appAdres, { waitUntil: 'domcontentloaded' });
     /* De werktafel is er pas als de schil zijn wereldbank heeft opgebouwd; dat
        is wat de lus hieronder nodig heeft. */
     await wachtTot(page, () => !!document.querySelector('#rtgCommand, .cmd-bank, #osZoek'),
@@ -254,9 +266,10 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
        rest van de suite hier ook doet. */
     await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
       status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
-      null, { timeout: 30000 });
+    await page.goto(appAdres, { waitUntil: 'domcontentloaded' });
+    await wachtTot(page, () => document.getElementById('app')?.classList.contains('active'),
+      null, { ms: 30000, wat: 'de app van de eigenaar (#app.active) op ' + appAdres });
+    assert.equal(new URL(page.url()).search, '?pas=' + tier, 'de app leidde niet alsnog om: ' + page.url());
     await bankDeur(page, 'Instellingen', { timeout: 20000 });
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcZoek');

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T18:14:54.785Z",
-    "commit": "1fe850fd",
+    "op": "2026-09-24T19:20:52.433Z",
+    "commit": "8a9848ce",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 5,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -10631,6 +10631,14 @@
       "module": "scripts/bundel.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "bedieningsmeting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bedieningsmeting.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
       "geprobeerd": 1
     }
   }

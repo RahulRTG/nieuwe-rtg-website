@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 629,
+    "toetsenNietGemeten": 630,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,16 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-24",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 629,
+      "vervalt": "2026-12-24",
+      "meter": "toetsenNietGemeten 629 -> 630",
+      "reden": "test/appwerkt-meter.e2e.js is nieuw: de synthetische regressiefixture voor bedienbaar (BETROUWBAARHEID.md par. 4c). Met de hand nagetrokken met zeven mutaties -- de thuisregel weg, terugkeren zonder de gereedvoorwaarde, de schil in de noemer, bedekte knoppen meetellen, de noemer laten groeien met een paneel dat de proef opent, en (in test/bedieningsmeting.test.js) de invariant weg; alle zeven zakken. De mutatiemotor behandelt hem als servertoets en muteert met de liegpoort op /api/, maar het scherm van deze toets roept geen enkele /api/ aan: 'overleefd' zou daar een uitslag zijn over een experiment dat deze toets niet doet. Die uitslag is daarom niet in MUTATIES.json gezet.",
+      "waarheen": "Een operator in scripts/mutatie.js voor browsertoetsen op een eigen scherm (bronmutatie in scripts/lib/bedieningsmeting.js en scripts/appwerkt.js), of een expliciete indeling 'niet te meten' voor toetsen zonder /api/."
+    },
     {
       "datum": "2026-09-24",
       "soort": "structureel",

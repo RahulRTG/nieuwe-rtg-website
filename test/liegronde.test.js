@@ -70,7 +70,7 @@ test('4. een liegronde levert waarheidsgetrouw en niets anders', () => {
   assert.deepEqual(Object.keys(r.bewijzen), ['waarheidsgetrouw'], 'de ronde raakt geen ander bewijs');
 });
 
-test('5. het echte register spreekt zichzelf niet tegen', { skip: !require('fs').existsSync(require('path').join(__dirname, '..', 'LIEGRONDE.json')) && 'LIEGRONDE.json is nog niet vastgelegd' }, () => {
+test('5. het echte register spreekt zichzelf niet tegen', () => {
   const reg = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', 'LIEGRONDE.json'), 'utf8'));
   assert.ok(reg.stempel && reg.stempel.commit, 'LIEGRONDE.json draagt geen stempel met commit');
   assert.ok(reg.regels.length >= 100, 'LIEGRONDE.json draagt te weinig rijen om over MAPPEN te gaan');

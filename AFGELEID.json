@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-24T21:26:15.191Z",
-  "commit": "cb944db9",
+  "op": "2026-09-24T21:41:38.291Z",
+  "commit": "b738391d",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 317,
+  "artefacten": 318,
   "bron": 10,
-  "afgeleid": 176,
+  "afgeleid": 177,
   "fragmenten": 25,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 200,
-  "afgeleidEigenaarHard": 174,
+  "metEigenaar": 201,
+  "afgeleidEigenaarHard": 175,
   "afgeleidGrendelt": 20,
-  "metStempel": 108,
+  "metStempel": 109,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -1997,6 +1997,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LIEGRONDE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/liegronde.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/liegronde.js"
+   ],
+   "stempelInstrument": "scripts/liegronde.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {

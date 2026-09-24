@@ -24,7 +24,7 @@ function dealVoorScherm(st, d) {
   };
 }
 
-function volgende(st) {
+function volgendeStappen(st) {
   const uit = [];
   const zet = (actie, label, waarom, invoer) => uit.push({ actie, label, waarom, invoer: invoer || null });
   if (!st.project) {
@@ -59,7 +59,7 @@ function toon(st, boek, nu) {
   return {
     dag: st.dag, dagVanMaand: mdag, weekend: R.isWeekend(st.dag), uren: st.uren,
     volgendeDagOver: Math.max(0, st.gerekendTot + st.dagMs - nu),
-    vandaag: { meldingen: st.meldingen.slice(0, 12), volgende: volgende(st), rood: st.rood },
+    vandaag: { meldingen: st.meldingen.slice(0, 12), volgende: volgendeStappen(st), rood: st.rood },
     wereld: {
       stad: 'Oudwijk', aanbod: Object.entries(R.AANBOD).map(([id, x]) => ({
         id, naam: x.naam, software: x.software, softwareKosten: x.softwareKosten, gekozen: !!st.project && st.project.aanbod === id }))
@@ -83,4 +83,4 @@ function toon(st, boek, nu) {
   };
 }
 
-module.exports = { toon, volgende };
+module.exports = { toon, volgendeStappen };

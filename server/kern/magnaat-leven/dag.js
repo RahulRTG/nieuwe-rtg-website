@@ -38,7 +38,7 @@ function antwoordOpOfferte(st, d) {
 
 function betaling(st, d) {
   const k = klantVan(st, d.klantId), f = d.factuur;
-  boekVan(st).beweeg(st, { soort: 'BETALING_KLANT', van: ['klant', k.id], naar: ['kas'], bedrag: f.bedrag,
+  boekVan(st).boekOver(st, { soort: 'BETALING_KLANT', van: ['klant', k.id], naar: ['kas'], bedrag: f.bedrag,
     omschrijving: 'Factuur ' + f.nummer + ' van ' + k.naam, sleutel: 'betaling:' + d.id });
   d.fase = 'betaald';
   f.betaaldOp = st.dag;
@@ -61,35 +61,35 @@ function volgendeDag(st) {
   st.uren = R.isWeekend(dag) ? R.UREN.weekend : R.UREN.werkdag;
 
   if (mdag === 25 && st.baan.actief) {
-    boek.beweeg(st, { soort: 'LOON', van: ['werkgever'], naar: ['kas'], bedrag: st.baan.loon,
+    boek.boekOver(st, { soort: 'LOON', van: ['werkgever'], naar: ['kas'], bedrag: st.baan.loon,
       omschrijving: 'Loon van ' + st.baan.werkgever, sleutel: 'loon:' + dag });
     meld(st, 'Je loon is binnen: ' + euro(st.baan.loon) + '.', 'goed');
     if (st.lening && st.lening.restant > 0) {
       const t = Math.min(st.lening.termijn, st.lening.restant);
-      boek.beweeg(st, { soort: 'AFLOSSING', van: ['kas'], naar: ['familie'], bedrag: t,
+      boek.boekOver(st, { soort: 'AFLOSSING', van: ['kas'], naar: ['familie'], bedrag: t,
         omschrijving: 'Aflossing aan je familie', sleutel: 'aflossing:' + dag });
       st.lening.restant -= t;
       if (!st.lening.restant) { meld(st, 'Je lening bij je familie is afgelost.', 'goed'); st.lening = null; }
     }
   }
 
-  boek.beweeg(st, { soort: 'LEVENSKOSTEN', van: ['kas'], naar: ['winkels'], bedrag: R.KOSTEN.levenPerDag,
+  boek.boekOver(st, { soort: 'LEVENSKOSTEN', van: ['kas'], naar: ['winkels'], bedrag: R.KOSTEN.levenPerDag,
     omschrijving: 'Boodschappen en vervoer', sleutel: 'leven:' + dag });
 
   if (mdag === 1) {
     if (st.kas < 0) {
       const rente = Math.round(-st.kas * R.KOSTEN.roodRentePromille / 1000);
-      boek.beweeg(st, { soort: 'RENTE', van: ['kas'], naar: ['bank'], bedrag: rente,
+      boek.boekOver(st, { soort: 'RENTE', van: ['kas'], naar: ['bank'], bedrag: rente,
         omschrijving: 'Rente over rood staan', sleutel: 'rente:' + dag });
       if (rente) meld(st, 'Rood staan kostte deze maand ' + euro(rente) + ' rente.', 'slecht');
     }
-    boek.beweeg(st, { soort: 'HUUR', van: ['kas'], naar: ['verhuurder'], bedrag: R.KOSTEN.huur,
+    boek.boekOver(st, { soort: 'HUUR', van: ['kas'], naar: ['verhuurder'], bedrag: R.KOSTEN.huur,
       omschrijving: 'Huur', sleutel: 'huur:' + dag });
-    boek.beweeg(st, { soort: 'VASTE_LASTEN', van: ['kas'], naar: ['leveranciers'], bedrag: R.KOSTEN.vasteLasten,
+    boek.boekOver(st, { soort: 'VASTE_LASTEN', van: ['kas'], naar: ['leveranciers'], bedrag: R.KOSTEN.vasteLasten,
       omschrijving: 'Energie, zorgverzekering en telefoon', sleutel: 'vast:' + dag });
     if (st.project) {
       const a = R.AANBOD[st.project.aanbod];
-      boek.beweeg(st, { soort: 'SOFTWARE', van: ['kas'], naar: ['software'], bedrag: a.softwareKosten,
+      boek.boekOver(st, { soort: 'SOFTWARE', van: ['kas'], naar: ['software'], bedrag: a.softwareKosten,
         omschrijving: a.software, sleutel: 'software:' + dag });
     }
     meld(st, 'De eerste van de maand: huur, vaste lasten' + (st.project ? ' en je software' : '') + ' zijn afgeschreven.');

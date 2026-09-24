@@ -32,7 +32,7 @@ const ACTIES = {
     if (!a) return fout('Kies wat je wilt aanbieden: ' + Object.keys(R.AANBOD).join(', ') + '.');
     const u = kostUren(st, 2, 'Beginnen'); if (u) return u;
     st.project = { aanbod: z.aanbod, sinds: st.dag };
-    boekVan(st).beweeg(st, { soort: 'SOFTWARE', van: ['kas'], naar: ['software'], bedrag: a.softwareKosten,
+    boekVan(st).boekOver(st, { soort: 'SOFTWARE', van: ['kas'], naar: ['software'], bedrag: a.softwareKosten,
       omschrijving: a.software + ' (eerste maand)', sleutel: 'software:start' });
     meld(st, 'Je bent begonnen met ' + a.naam + '. ' + a.software + ' kost ' + euro(a.softwareKosten) + ' per maand.', 'goed');
     return { ok: true };
@@ -105,7 +105,7 @@ const ACTIES = {
     if (!st.project) return fout('Schrijf je in als je weet wat je aanbiedt. Kies eerst een eigen project.');
     const naam = String(z.naam || '').trim();
     if (naam.length < 2 || naam.length > 60) return fout('Geef je onderneming een naam van 2 tot 60 tekens.');
-    boekVan(st).beweeg(st, { soort: 'INSCHRIJVING', van: ['kas'], naar: ['kvk'], bedrag: R.KOSTEN.kvk,
+    boekVan(st).boekOver(st, { soort: 'INSCHRIJVING', van: ['kas'], naar: ['kvk'], bedrag: R.KOSTEN.kvk,
       omschrijving: 'Inschrijving Kamer van Koophandel', sleutel: 'kvk' });
     st.onderneming = { naam, sinds: st.dag };
     meld(st, naam + ' staat ingeschreven. Dat kostte ' + euro(R.KOSTEN.kvk) + '. Je hebt een bedrijf.', 'goed');
@@ -142,7 +142,7 @@ const ACTIES = {
     if (st.lening) return fout('Je hebt al een lening bij je familie lopen.');
     const bedrag = heleEuro(z.bedrag);
     if (!bedrag || bedrag > R.LENING.max) return fout('Je familie kan je hooguit ' + euro(R.LENING.max) + ' lenen.');
-    boekVan(st).beweeg(st, { soort: 'LENING', van: ['familie'], naar: ['kas'], bedrag,
+    boekVan(st).boekOver(st, { soort: 'LENING', van: ['familie'], naar: ['kas'], bedrag,
       omschrijving: 'Lening van je familie' });
     st.lening = { restant: bedrag, termijn: Math.ceil(bedrag / R.LENING.termijnen) };
     meld(st, 'Je familie leent je ' + euro(bedrag) + '. Je betaalt het terug in ' + R.LENING.termijnen + ' termijnen, na je loon.', 'vraag');
@@ -154,7 +154,7 @@ const ACTIES = {
     if (st.overwerkDag === st.dag) return fout('Je hebt vandaag al een extra dienst gedraaid. Er is er een per dag.');
     const o = st.baan.overwerk;
     const u = kostUren(st, o.uren, 'Een extra dienst'); if (u) return u;
-    boekVan(st).beweeg(st, { soort: 'OVERWERK', van: ['werkgever'], naar: ['kas'], bedrag: o.loon,
+    boekVan(st).boekOver(st, { soort: 'OVERWERK', van: ['werkgever'], naar: ['kas'], bedrag: o.loon,
       omschrijving: 'Extra dienst', sleutel: 'overwerk:' + st.dag });
     st.overwerkDag = st.dag;
     meld(st, 'Een extra dienst bij ' + st.baan.werkgever + ': ' + euro(o.loon) + ', en je vrije uren van vandaag zijn op.');

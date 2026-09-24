@@ -22,7 +22,8 @@ const { toon } = require('./weergave');
 
 function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   const boek = maakBoek({ db });
-  const levens = () => (db.data.magnaatLeven = db.data.magnaatLeven || {});
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart' } });
+  const levens = () => eigen.bak('magnaatLeven');
   const wereldVan = (key) => 'leven:' + crypto.createHash('sha256').update(String(key)).digest('hex').slice(0, 16);
 
   function haal(key) {
@@ -50,7 +51,7 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     return n;
   }
 
-  function afronden(st) {
+  function bewaarEnToon(st) {
     boek.bevestig(st);
     save();
     return toon(st, boek, nu());
@@ -59,16 +60,16 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   function staat(key) {
     const st = haal(key);
     bijrekenen(st);
-    return afronden(st);
+    return bewaarEnToon(st);
   }
 
   function actie(key, body = {}) {
     const st = haal(key);
     bijrekenen(st);
     const doe = Object.prototype.hasOwnProperty.call(ACTIES, body.actie) ? ACTIES[body.actie] : null;
-    if (!doe) { afronden(st); return { status: 400, error: 'Die handeling bestaat niet in Van Nul.' }; }
+    if (!doe) { bewaarEnToon(st); return { status: 400, error: 'Die handeling bestaat niet in Van Nul.' }; }
     const r = doe(st, body);
-    const beeld = afronden(st);
+    const beeld = bewaarEnToon(st);
     return r && r.error ? r : beeld;
   }
 

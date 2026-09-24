@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:51:15.677Z",
-    "commit": "fce571c0",
+    "op": "2026-09-24T22:57:51.533Z",
+    "commit": "26548bc3",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/liegronde.js",
@@ -11,8 +11,8 @@
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 58,
-    "NIET_GETEST": 54
+    "BEWEZEN": 93,
+    "NIET_GETEST": 19
   },
   "regels": [
     {
@@ -40,12 +40,10 @@
       "app": "Attenties",
       "ingang": "/apps/attenties.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'length')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:balans",
@@ -82,12 +80,10 @@
       "app": "Accountbescherming",
       "ingang": "/apps/mijn-isolatie.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 3,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:browser",
@@ -124,36 +120,30 @@
       "app": "Cellier",
       "ingang": "/apps/cellier.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'map')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'map')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:cercle",
       "app": "Cercle",
       "ingang": "/apps/cercle.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'length')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:clips",
       "app": "Video",
       "ingang": "/apps/clips.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: feedData.clips is not iterable); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 5,
-      "klachten": [
-        "JS-fout: feedData.clips is not iterable"
-      ]
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 4,
+      "klachten": []
     },
     {
       "functie": "link:commerce",
@@ -170,12 +160,10 @@
       "app": "Ontdekken",
       "ingang": "/apps/connect.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 1,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:decisionroom",
@@ -192,12 +180,10 @@
       "app": "Entourage",
       "ingang": "/apps/entourage.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'length')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:flits",
@@ -234,24 +220,20 @@
       "app": "Garde-robe",
       "ingang": "/apps/garderobe.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'map')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'map')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:gegevens",
       "app": "Wat weet RTG van mij",
       "ingang": "/apps/mijn-gegevens.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'aanwezig')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'aanwezig')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:geldcommand",
@@ -278,12 +260,10 @@
       "app": "Hangar",
       "ingang": "/apps/hangar.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'length')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:horeca",
@@ -300,12 +280,10 @@
       "app": "Logeren bij leden",
       "ingang": "/apps/thuis.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 4,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:ik",
@@ -332,12 +310,10 @@
       "app": "Klimaatfonds",
       "ingang": "/apps/foundation/klimaatfonds.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 2,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:krant",
@@ -394,51 +370,40 @@
       "app": "Mijn loopbaan",
       "ingang": "/apps/loopbaan.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 3,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:magnaat",
       "app": "Magnaat",
       "ingang": "/apps/magnaat.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 5,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:maison",
       "app": "Maison",
       "ingang": "/apps/maison.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'length')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:mall",
       "app": "Mall",
       "ingang": "/apps/mall.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 10,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'length')",
-        "JS-fout: Cannot read properties of undefined (reading 'toLocaleString')",
-        "JS-fout: Cannot read properties of undefined (reading 'toLocaleString')",
-        "JS-fout: Cannot read properties of undefined (reading 'toLocaleString')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 9,
+      "klachten": []
     },
     {
       "functie": "link:mecenaat",
@@ -455,26 +420,20 @@
       "app": "RTG Media",
       "ingang": "/apps/media.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'forEach')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 5,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'forEach')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 4,
+      "klachten": []
     },
     {
       "functie": "link:mijnmall",
       "app": "Mijn bestellingen",
       "ingang": "/apps/mijnmall.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 10,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'length')",
-        "JS-fout: Cannot read properties of undefined (reading 'length')",
-        "JS-fout: Cannot read properties of undefined (reading 'length')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 9,
+      "klachten": []
     },
     {
       "functie": "link:move",
@@ -521,24 +480,20 @@
       "app": "Mijn neigingen",
       "ingang": "/apps/mijn-neigingen.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'tekst')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'tekst')"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:nieuws",
       "app": "Nieuws",
       "ingang": "/apps/nieuws.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'map')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'map')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:office",
@@ -575,12 +530,10 @@
       "app": "Openbaar vervoer",
       "ingang": "/apps/ov.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'modus')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 8,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'modus')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "7 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 7,
+      "klachten": []
     },
     {
       "functie": "link:ovroutes",
@@ -627,12 +580,10 @@
       "app": "Live",
       "ingang": "/apps/podium.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 4,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:post",
@@ -659,24 +610,20 @@
       "app": "Pulse",
       "ingang": "/apps/pulse.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'length')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:rechterhand",
       "app": "Privekantoor",
       "ingang": "/apps/lifestyle.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'knopen')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 5,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'knopen')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 4,
+      "klachten": []
     },
     {
       "functie": "link:reisboek",
@@ -713,12 +660,10 @@
       "app": "Rendez-vous",
       "ingang": "/apps/rendezvous.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 3,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:residentie",
@@ -735,12 +680,10 @@
       "app": "Routedossier",
       "ingang": "/apps/routedossier.html",
       "persona": "kantoor",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 1,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:rtfbord",
@@ -748,7 +691,7 @@
       "ingang": "/apps/foundation/bord.html",
       "persona": "gezin",
       "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: geen schoolsessie); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "reden": "achter een deur (html.rtf-toegang-dicht); het scherm zelf is niet beproefd",
       "gelogen": 3,
       "klachten": [
         "JS-fout: geen schoolsessie"
@@ -780,7 +723,7 @@
       "ingang": "/apps/foundation/schrift.html",
       "persona": "gezin",
       "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: geen schoolsessie); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "reden": "achter een deur (html.rtf-toegang-dicht); het scherm zelf is niet beproefd",
       "gelogen": 3,
       "klachten": [
         "JS-fout: geen schoolsessie"
@@ -801,12 +744,10 @@
       "app": "RTG One",
       "ingang": "/apps/rtgone.html",
       "persona": "kantoor",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 1,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:rtmail",
@@ -883,48 +824,40 @@
       "app": "Sport",
       "ingang": "/apps/sport.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading '0')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading '0')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:stad",
       "app": "Stad",
       "ingang": "/apps/stad.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 4,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:table",
       "app": "Table",
       "ingang": "/apps/table.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'length')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:theater",
       "app": "Films en series",
       "ingang": "/apps/theater.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 5,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 4,
+      "klachten": []
     },
     {
       "functie": "link:tweedescherm",
@@ -961,12 +894,10 @@
       "app": "RTG Veilig",
       "ingang": "/apps/veilig.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 4,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:verificatie",
@@ -983,24 +914,20 @@
       "app": "Mijn team",
       "ingang": "/apps/vertegenwoordiging.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 4,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:vluchten",
       "app": "Vluchten",
       "ingang": "/apps/vluchten.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'filter')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 4,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'filter')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
+      "klachten": []
     },
     {
       "functie": "link:vonk",
@@ -1057,12 +984,10 @@
       "app": "Alles bij elkaar",
       "ingang": "/apps/wereld.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "13 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 13,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:werkos",

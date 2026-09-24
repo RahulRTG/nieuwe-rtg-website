@@ -36,9 +36,9 @@ function onderneming(st, z) {
   if (naam.length < 2 || naam.length > 60) return fout('Geef je onderneming een naam van 2 tot 60 tekens.');
   if (st.kas < R.KVK) return fout('De inschrijving kost ' + euro(R.KVK) + ', en er staat ' + euro(st.kas) + ' op je rekening.');
   boekVan(st).boekOver(st, { soort: 'INSCHRIJVING', van: ['kas'], naar: ['kosten', 'kvk'], bedrag: R.KVK,
-    omschrijving: 'Inschrijving Kamer van Koophandel', sleutel: 'kvk' });
+    omschrijving: 'Inschrijving in ' + R.JURISDICTIE.register, sleutel: 'kvk' });
   st.onderneming = { naam, sinds: st.dag };
-  meld(st, naam + ' staat ingeschreven. Je bent ondernemer. In deze versie van het spel val je onder de kleineondernemersregeling, dus er gaat geen btw op je facturen.', 'goed');
+  meld(st, naam + ' staat ingeschreven in ' + R.JURISDICTIE.register + '. Je bent ondernemer. ' + R.JURISDICTIE.btw, 'goed');
   ontgrendel(st, 'zakelijk');
   ontgrendel(st, 'boekhouding');
   return { ok: true };

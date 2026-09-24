@@ -46,6 +46,7 @@
     var i = a.invoer || {}, h = '<p>' + esc(a.waarom) + '</p><div class="vn-velden">';
     if (Array.isArray(i.aanbod)) h += '<label>Wat ga je maken <select id="vnF-aanbod">' + i.aanbod.map(function (x) { return '<option value="' + esc(x.id) + '">' + esc(x.naam) + '</option>'; }).join('') + '</select></label>';
     if (i.bedrag === 'euro') h += '<label>Bedrag in hele euro\'s <input id="vnF-bedrag" type="number" min="1" step="1" inputmode="numeric"></label>';
+    if (typeof i.dagen === 'number') h += '<label>Af binnen (dagen) <input id="vnF-dagen" type="number" min="1" max="60" step="1" value="' + i.dagen + '"></label>';
     if (Array.isArray(i.voorschot)) h += '<label>Vooraf <select id="vnF-voorschot">' + i.voorschot.map(function (p) { return '<option value="' + p + '">' + (p ? p + '%' : 'niets') + '</option>'; }).join('') + '</select></label>';
     if (i.minuten === 'minuten') {
       var opties = [];
@@ -62,12 +63,13 @@
     if (i.aanbod) b.aanbod = v('aanbod');
     if (i.bedrag) b.bedrag = Number(v('bedrag'));
     if (i.voorschot) b.voorschot = Number(v('voorschot'));
+    if (typeof i.dagen === 'number') b.dagen = Number(v('dagen'));
     if (i.minuten) b.minuten = Number(v('minuten'));
     if (i.procent) b.procent = Number(v('procent'));
     if (i.naam) b.naam = v('naam');
     return b;
   }
-  var vrijeInvoer = function (a) { var i = a.invoer || {}; return !(i.aanbod || i.bedrag || i.minuten || i.procent || i.naam); };
+  var vrijeInvoer = function (a) { var i = a.invoer || {}; return !(i.aanbod || i.bedrag || i.minuten || i.procent || i.naam || typeof i.dagen === 'number'); };
 
   function tekenAgenda(s) {
     q('#vnAgenda').innerHTML = s.vandaag.agenda.map(function (d, n) {

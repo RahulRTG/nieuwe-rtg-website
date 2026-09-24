@@ -18,17 +18,19 @@ function handelingenNu(st) {
       { aanbod: Object.entries(AANBOD).map(([id, a]) => ({ id, naam: a.naam })) });
   }
   if (st.ondernemingVraag != null && !st.onderneming) {
-    zet('onderneming', 'Schrijf je onderneming in', 'Je werkt structureel voor klanten. Het kost ' + euro(R.KVK) + '.', { naam: 'tekst' });
+    zet('onderneming', 'Schrijf je onderneming in', 'Je werkt structureel voor klanten. ' + R.JURISDICTIE.inschrijven + ' Het kost ' + euro(R.KVK) + '.', { naam: 'tekst' });
   }
   if (st.zelfstandigMag && st.baan.actief) zet('ontslag', 'Zeg je baan op', 'Je bedrijf brengt meer binnen dan twee keer je loon.');
   for (const d of st.deals) {
     const laatste = (d.rondes || [])[d.rondes.length - 1];
     if (d.fase === 'kans') zet('gesprek', 'Praat met ' + d.klant, 'Een half uur, en dan weet je wat hij wil.', { deal: d.id });
     if (d.fase === 'onderhandeling' && laatste && laatste.van === 'klant') {
-      zet('neem', 'Akkoord met ' + d.klant, d.klant + ' biedt ' + euro(laatste.bedrag) + (laatste.voorschot ? ' met ' + laatste.voorschot + '% vooraf' : '') + '.', { deal: d.id });
+      zet('neem', 'Akkoord met ' + d.klant, d.klant + ' biedt ' + euro(laatste.bedrag) + (laatste.voorschot ? ' met ' + laatste.voorschot + '% vooraf' : '') +
+        ', af binnen ' + laatste.dagen + ' dagen.', { deal: d.id });
     }
     if (d.fase === 'onderhandeling' && !d.vervolg) {
-      zet('voorstel', 'Voorstel aan ' + d.klant, duur(d.uren) + ' werk, nodig binnen ' + d.termijn + ' dagen.', { deal: d.id, bedrag: 'euro', voorschot: [0, 25, 50] });
+      zet('voorstel', 'Voorstel aan ' + d.klant, duur(d.uren) + ' werk; hij wil het binnen ' + d.termijn + ' dagen. Prijs, deadline en voorschot zijn te bespreken.',
+        { deal: d.id, bedrag: 'euro', dagen: d.termijn, voorschot: [0, 25, 50] });
     }
     if (d.fase === 'overeenkomst' && d.gedaan >= d.afspraak.minuten) zet('lever', 'Lever op aan ' + d.klant, 'Het werk is af.', { deal: d.id });
     if (d.fase === 'geleverd') zet('factuur', 'Factuur aan ' + d.klant, 'Opgeleverd; nu moet het betaald worden.', { deal: d.id });
@@ -44,7 +46,9 @@ function handelingenNu(st) {
   if (nodig > st.kas) {
     for (const p of komend) {
       const kan = p.soort === 'software' || (R.VERPLICHTINGEN.find(v => v.id === p.soort) || {}).uitstel;
-      if (kan && !p.uitgesteld) zet('uitstel', 'Stel ' + p.naam.toLowerCase() + ' uit', 'Een week later betalen' + (p.soort === 'software' ? ', maar je software ligt dan stil.' : ', tegen kosten.'), { post: p.id });
+      if (!kan || p.uitgesteld) continue;
+      if (p.soort === 'software') zet('uitstel', 'Zet je abonnement een week stil', 'Een week niets betalen, maar je software ligt dan stil: geen werk aan opdrachten.', { post: p.id });
+      else zet('uitstel', 'Vraag een betalingsregeling', p.naam + ' een week later betalen, tegen ' + euro(kan.kosten) + ' kosten.', { post: p.id });
     }
     if (!st.lening) zet('lenen', 'Leen van je familie', 'Tot ' + euro(R.LENING.max) + ', terug van je volgende twee lonen.', { bedrag: 'euro' });
   }

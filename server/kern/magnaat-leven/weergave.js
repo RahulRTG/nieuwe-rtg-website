@@ -84,7 +84,8 @@ function beeld(st, boek, nu) {
     },
     netwerk: { contacten: deals },
     wereld: {
-      stad: 'Oudwijk',
+      stad: R.JURISDICTIE.stad,
+      spelregels: [R.JURISDICTIE.inschrijven, R.JURISDICTIE.btw, R.JURISDICTIE.termijn],
       plaatsen: [{ naam: st.baan.werkgever, wat: st.baan.actief ? 'waar je werkt' : 'waar je werkte' }]
         .concat(deals.filter((d, i, l) => l.findIndex(x => x.klant === d.klant) === i).map(d => ({ naam: d.klant, wat: d.fase === 'afgehaakt' ? 'kent je' : 'klant of kans' }))),
       aanbod: Object.entries(AANBOD).map(([id, x]) => ({ id, naam: x.naam, project: x.project, software: x.software, gekozen: st.aanbod === id }))

@@ -8,18 +8,19 @@
    DE ECONOMIE STAAT PER PLAATS EN NIET PER AANBOD: de eerste klant betaalt
    altijd te laat, want dat is de kern van de keten en geen toeval. Wat een
    klant wil betalen (`max`) geldt zolang je niet meer dan `voorschot` procent
-   vooraf vraagt; zijn eerste tegenbod is `bod`. `korting` is het kleinste
+   vooraf vraagt en hem niet meer dan `speling` dagen langer laat wachten dan
+   `termijn`; zijn eerste tegenbod is `bod`. `korting` is het kleinste
    percentage waarvoor hij meteen betaalt, of null als hij dat nooit doet.
    Bedragen in centen, tijd in minuten. */
 'use strict';
 
 const PLAATSEN = [
-  { komt: { soort: 'project', minuten: 360 }, uren: 840, termijn: 9, bod: 65000, max: 80000, voorschot: 25, laat: 10, korting: 3 },
-  { komt: { soort: 'aanbeveling', na: 1 }, uren: 1200, termijn: 14, bod: 90000, max: 115000, voorschot: 25, laat: 0, korting: null },
-  { komt: { soort: 'project', minuten: 1200 }, uren: 720, termijn: 10, bod: 50000, max: 68000, voorschot: 50, laat: 4, korting: 2 },
-  { komt: { soort: 'onderneming' }, uren: 1800, termijn: 21, bod: 150000, max: 195000, voorschot: 25, laat: 12, korting: 5 },
-  { komt: { soort: 'onderneming' }, uren: 1440, termijn: 16, bod: 135000, max: 175000, voorschot: 30, laat: 0, korting: null },
-  { komt: { soort: 'aanbeveling', na: 3 }, uren: 960, termijn: 12, bod: 80000, max: 105000, voorschot: 25, laat: 2, korting: 2 }
+  { komt: { soort: 'project', minuten: 360 }, uren: 840, termijn: 9, speling: 5, bod: 65000, max: 80000, voorschot: 25, laat: 10, korting: 3 },
+  { komt: { soort: 'aanbeveling', na: 1 }, uren: 1200, termijn: 14, speling: 4, bod: 90000, max: 115000, voorschot: 25, laat: 0, korting: null },
+  { komt: { soort: 'project', minuten: 1200 }, uren: 720, termijn: 10, speling: 3, bod: 50000, max: 68000, voorschot: 50, laat: 4, korting: 2 },
+  { komt: { soort: 'onderneming' }, uren: 1800, termijn: 21, speling: 7, bod: 150000, max: 195000, voorschot: 25, laat: 12, korting: 5 },
+  { komt: { soort: 'onderneming' }, uren: 1440, termijn: 16, speling: 4, bod: 135000, max: 175000, voorschot: 30, laat: 0, korting: null },
+  { komt: { soort: 'aanbeveling', na: 3 }, uren: 960, termijn: 12, speling: 4, bod: 80000, max: 105000, voorschot: 25, laat: 2, korting: 2 }
 ];
 
 const AANBOD = {

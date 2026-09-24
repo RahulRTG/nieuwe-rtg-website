@@ -51,13 +51,16 @@
     q('#vnNetwerk').innerHTML = s.netwerk.contacten.length ? s.netwerk.contacten.map(function (d) {
       return '<div class="vn-contact"><b>' + esc(d.klant) + '</b><small>' + esc(FASE[d.fase]) + (d.vervolg ? ' · vaste klant' : '') + '</small>' +
         (d.rondes.length ? '<ol class="vn-rondes">' + d.rondes.map(function (x) {
-          return '<li>' + (x.van === 'jij' ? 'Jij' : esc(d.klant)) + ': ' + euro(x.bedrag) + (x.voorschot ? ' + ' + x.voorschot + '% vooraf' : '') + '</li>';
+          return '<li>' + (x.van === 'jij' ? 'Jij' : esc(d.klant)) + ': ' + euro(x.bedrag) + (x.voorschot ? ' + ' + x.voorschot + '% vooraf' : '') +
+            (x.dagen ? ', af binnen ' + x.dagen + ' dagen' : '') + '</li>';
         }).join('') + '</ol>' : '') +
         (d.afspraak ? '<p>Afspraak: ' + euro(d.afspraak.bedrag) + (d.afspraak.voorschotBedrag ? ', ' + euro(d.afspraak.voorschotBedrag) + ' vooraf' : '') + ', af op dag ' + d.afspraak.deadline + '.</p>' : '') + '</div>';
     }).join('') : '<p class="vn-rust">Nog niemand weet wat je maakt. Werk aan je eigen project: wie het ziet, kan iets voor je hebben.</p>';
 
     q('#vnWereld').innerHTML = '<div class="eyebrow">Je stad</div><h3>' + esc(s.wereld.stad) + '</h3>' +
       regels(s.wereld.plaatsen.map(function (x) { return [x.naam, esc(x.wat)]; })) +
+      '<h3>Spelregels van ' + esc(s.wereld.stad) + '</h3><ul class="vn-waarom">' + (s.wereld.spelregels || []).map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>' +
+      '<p class="vn-rust">Dit zijn de regels van deze spelwereld. In een echt land kunnen inschrijving, kosten en btw anders werken.</p>' +
       '<h3>Wat je hier kunt maken</h3>' + regels(s.wereld.aanbod.map(function (x) { return [x.naam + (x.gekozen ? ' (jij)' : ''), esc(x.software) + ' voor klantwerk']; }));
 
     var z = s.bedrijf;

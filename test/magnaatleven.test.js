@@ -124,6 +124,27 @@ test('een klant betaalt het bedrag, maar niet elk voorschot: te veel vooraf word
   assert.equal(v.deal('overeenkomst').afspraak.bedrag, 80000, 'een afspraak is een afspraak');
 });
 
+test('de deadline is de derde voorwaarde: meer dagen mag, maar een klant wacht niet eindeloos', () => {
+  const v = leven();
+  v.doe({ actie: 'kies', aanbod: 'websites' });
+  while (!v.deal('kans')) { if (vrijNu(v)) v.doe({ actie: 'plan', wat: 'project', dag: v.s.dag, minuten: vrijNu(v) }); v.slaap(); }
+  v.doe({ actie: 'gesprek', deal: v.deal('kans').id });
+  const id = v.deal('onderhandeling').id, dag = v.s.dag;
+  v.doe({ actie: 'voorstel', deal: id, bedrag: 800, voorschot: 25, dagen: 30 });
+  const tegen = v.deal('onderhandeling').rondes.slice(-1)[0];
+  assert.deepEqual([tegen.van, tegen.bedrag, tegen.voorschot, tegen.dagen], ['klant', 80000, 25, 14], 'prijs en voorschot zijn goed, 30 dagen niet');
+  assert.ok(v.meldt(/[Ll]anger dan 14 dagen kan ik niet wachten/), "de klant zegt waarom");
+  v.doe({ actie: 'voorstel', deal: id, bedrag: 800, voorschot: 25, dagen: 12 });
+  assert.equal(v.deal('overeenkomst').afspraak.deadline, dag + 12, 'meer tijd dan zijn voorkeur, binnen zijn speling');
+});
+
+test('de inschrijving is een regel van Oudwijk en wordt ook zo uitgesproken', () => {
+  const v = leven();
+  assert.ok(v.s.wereld.spelregels.some(r => /^In Oudwijk schrijf je je als onderneming in/.test(r)), 'het Wereld-scherm toont de regels van deze wereld');
+  const bron = ['acties.js', 'dag.js', 'gesprek.js', 'volgende.js'].map(f => require('fs').readFileSync(require('path').join(__dirname, '../server/kern/magnaat-leven', f), 'utf8')).join('');
+  assert.doesNotMatch(bron, /Kamer van Koophandel|kleineondernemersregeling/, 'geen echte instelling of regeling als wet van deze wereld');
+});
+
 test('resultaat is geen bank: een factuur maakt omzet en een vordering, geen geld', () => {
   const v = leven();
   totDeFactuur(v);

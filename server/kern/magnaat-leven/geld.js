@@ -82,7 +82,7 @@ function uitstel(st, z) {
     meld(st, 'Je software staat een week stil: tot ' + R.dagNaam(p.dag) + ' kun je niet aan opdrachten werken.', 'vraag');
   } else {
     post(st, { soort: 'uitstel', naam: 'Kosten betalingsregeling', bedrag: regel.kosten, dag: p.dag });
-    meld(st, p.naam + ' gaat naar ' + R.dagNaam(p.dag) + ' (dag ' + p.dag + '). Dat kost ' + euro(regel.kosten) + ' extra.', 'vraag');
+    meld(st, 'Betalingsregeling: ' + p.naam.toLowerCase() + ' gaat naar ' + R.dagNaam(p.dag) + ' (dag ' + p.dag + '). Dat kost ' + euro(regel.kosten) + ' extra.', 'vraag');
   }
   return { ok: true };
 }

@@ -33,7 +33,7 @@ function wieJeBent(st) {
   if (!st.onderneming && st.ondernemingVraag == null && st.betaald >= R.ONDERNEMING.opdrachten) {
     st.ondernemingVraag = st.dag;
     meld(st, 'Je hebt nu ' + st.betaald + ' opdrachten gedaan en betaald gekregen. Dat is geen hobby meer: je werkt structureel voor klanten. ' +
-      'Wil je een onderneming inschrijven? Dat kost ' + euro(R.KVK) + ', en daarna kun je nieuwe klanten aannemen.', 'vraag');
+      R.JURISDICTIE.inschrijven + ' Dat kost ' + euro(R.KVK) + ', en daarna kun je nieuwe klanten aannemen.', 'vraag');
   }
   if (st.onderneming && st.baan.actief && !st.zelfstandigMag && st.dag - st.onderneming.sinds >= R.ZELFSTANDIG.dagen) {
     const binnen = ontvangen(st, R.ZELFSTANDIG.dagen), grens = Math.round(loonPer(st, R.ZELFSTANDIG.dagen) * R.ZELFSTANDIG.factor / 100);

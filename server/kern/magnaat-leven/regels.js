@@ -40,8 +40,20 @@ const VERPLICHTINGEN = [
 ];
 const BOODSCHAPPEN = 700;          // per dag; zonder geld eet je goedkoper, je staat niet rood
 const SOFTWARE = { naam: 'Pro-abonnement van je werksoftware', bedrag: 4900, elke: PERIODE, uitstel: { dagen: 7, kosten: 0 } };
+/* DE SPELREGELS VAN DEZE WERELD, en ze zijn van Oudwijk en niet van een echt
+   land. Wanneer je je als onderneming inschrijft, wat dat kost en of er btw op
+   een factuur gaat, verschilt per jurisdictie en verandert met de tijd. Magnaat
+   doet niet alsof het ergens anders ook zo werkt: elke tekst die zo'n regel
+   noemt, noemt hem als regel van Oudwijk. */
+const JURISDICTIE = {
+  stad: 'Oudwijk',
+  register: 'het ondernemersregister van Oudwijk',
+  inschrijven: 'In Oudwijk schrijf je je als onderneming in zodra je structureel voor klanten werkt.',
+  btw: 'In Oudwijk betaalt een kleine onderneming geen btw over haar omzet.',
+  termijn: 'In Oudwijk is een betaaltermijn van 14 dagen gewoon.'
+};
 const AANMANING = 1500;            // wat een mislukte betaling kost, een keer per achterstand
-const KVK = 8225;
+const KVK = 8225;                  // de inschrijving in het register van Oudwijk
 
 /* Leren maakt je sneller: elke drie uur leren haalt vijf procent van een
    opdracht af, tot een kwart. */
@@ -67,5 +79,5 @@ const RTG = {
 };
 
 module.exports = { REGELVERSIE, DAG_MS, MAX_DAGEN_PER_KEER, START_KAS, PERIODE, DAGNAMEN, weekdag, dagNaam, BAAN, VRIJ,
-  VERPLICHTINGEN, BOODSCHAPPEN, SOFTWARE, AANMANING, KVK, LEREN, BETAALTERMIJN, HERINNERING_DAGEN, LENING,
+  VERPLICHTINGEN, BOODSCHAPPEN, SOFTWARE, JURISDICTIE, AANMANING, KVK, LEREN, BETAALTERMIJN, HERINNERING_DAGEN, LENING,
   VOORFINANCIERING, ONDERNEMING, ZELFSTANDIG, RTG };

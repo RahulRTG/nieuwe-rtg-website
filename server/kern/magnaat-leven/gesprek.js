@@ -8,6 +8,10 @@
      Jouw voorstel: € 900        Klant: € 650
      Jij: € 800 + 25% vooraf     Klant: akkoord.
 
+   Drie dingen, en niet meer: de PRIJS, de DEADLINE (meer dagen is minder
+   tijdsdruk, en een klant wacht niet eindeloos) en de BETAALSTRUCTUUR (hoeveel
+   vooraf). Geen contractsimulator.
+
    Wat daaruit komt is een AFSPRAAK met een bedrag, een voorschot, de uren en een
    deadline -- geen missie met punten. Na drie voorstellen zonder akkoord haakt
    een klant af, en een kans waar je een week niets mee doet, gaat naar iemand
@@ -43,7 +47,7 @@ function kansen(st) {
       const bedrag = opKwartje(uurtarief * VERVOLG.uren / 60);
       st.deals.push({ id: 'd' + (++st.dealTeller), klantId: d.klantId, klant: d.klant, fase: 'onderhandeling', sinds: st.dag,
         vervolg: true, uren: VERVOLG.uren, termijn: VERVOLG.termijn, gedaan: 0,
-        rondes: [{ van: 'klant', bedrag, voorschot: 0 }] });
+        rondes: [{ van: 'klant', bedrag, voorschot: 0, dagen: VERVOLG.termijn }] });
       meld(st, d.klant + ' komt terug voor onderhoud: ' + tijd(VERVOLG.uren) + ' werk tegen je oude uurtarief, ' + euro(bedrag) + '.', 'kans');
     }
     if (['kans', 'onderhandeling'].includes(d.fase) && d.sinds + 7 <= st.dag) {
@@ -57,7 +61,7 @@ function gesprek(st, z) {
   const d = vindDeal(st, z.deal);
   if (!d || d.fase !== 'kans') return fout('Een gesprek voer je met iemand die een kans voor je heeft.');
   if (st.betaald >= R.ONDERNEMING.opdrachten && !st.onderneming) {
-    return fout('Je werkt structureel voor klanten. Een nieuwe klant neem je aan als onderneming: schrijf je eerst in.');
+    return fout('Je werkt structureel voor klanten. ' + R.JURISDICTIE.inschrijven + ' Een nieuwe klant neem je dus pas aan als je ingeschreven bent: schrijf je eerst in.');
   }
   if (rest(st, st.dag) < 30) return fout('Een gesprek kost een half uur, en je hebt vandaag geen tijd meer. Morgen kan het.');
   (st.agenda[st.dag] = st.agenda[st.dag] || []).push({ wat: 'gesprek', minuten: 30, deal: d.id });
@@ -71,9 +75,9 @@ function gesprek(st, z) {
   return { ok: true };
 }
 
-function akkoord(st, d, bedrag, voorschot) {
+function akkoord(st, d, bedrag, voorschot, dagen) {
   const vb = Math.round(bedrag * voorschot / 100);
-  d.afspraak = { bedrag, voorschot, voorschotBedrag: vb, minuten: d.uren, deadline: st.dag + d.termijn, dag: st.dag };
+  d.afspraak = { bedrag, voorschot, voorschotBedrag: vb, minuten: d.uren, deadline: st.dag + (dagen || d.termijn), dag: st.dag };
   d.fase = 'overeenkomst';
   if (vb) d.voorschotDag = st.dag + 2;
   meld(st, 'Afspraak met ' + d.klant + ': ' + euro(bedrag) + (vb ? ', waarvan ' + euro(vb) + ' vooraf' : '') + ', af op ' +
@@ -93,12 +97,14 @@ function voorstel(st, z) {
   if (!d || d.fase !== 'onderhandeling') return fout('Er loopt geen gesprek waarin je een voorstel kunt doen.');
   if (d.vervolg) return fout(d.klant + ' kent je prijs al. Neem zijn aanbod aan of zeg nee.');
   const bedrag = heleEuro(z.bedrag), voorschot = Number(z.voorschot || 0);
+  const dagen = z.dagen == null || z.dagen === '' ? d.termijn : Number(z.dagen);
   if (!bedrag) return fout('Noem een bedrag in hele euro\'s.');
   if (![0, 25, 50].includes(voorschot)) return fout('Vraag geen, 25% of 50% vooraf.');
-  const k = klantVan(st, d.klantId);
-  d.rondes.push({ van: 'jij', bedrag, voorschot });
+  if (!Number.isInteger(dagen) || dagen < 1 || dagen > 60) return fout('Zeg binnen hoeveel dagen het af is: 1 tot 60.');
+  const k = klantVan(st, d.klantId), langst = k.termijn + k.speling;
+  d.rondes.push({ van: 'jij', bedrag, voorschot, dagen });
   ontgrendel(st, 'offertes');
-  if (bedrag <= k.max && voorschot <= k.voorschot) return akkoord(st, d, bedrag, voorschot);
+  if (bedrag <= k.max && voorschot <= k.voorschot && dagen <= langst) return akkoord(st, d, bedrag, voorschot, dagen);
   const mijn = d.rondes.filter(r => r.van === 'jij').length;
   if (mijn >= 3) {
     d.fase = 'afgehaakt';
@@ -106,12 +112,16 @@ function voorstel(st, z) {
     return { ok: true };
   }
   const vorige = d.rondes.filter(r => r.van === 'klant').pop();
-  const tegen = bedrag <= k.max ? { bedrag, voorschot: k.voorschot }
-    : { bedrag: vorige ? Math.min(k.max, opKwartje(vorige.bedrag + (bedrag - vorige.bedrag) / 2)) : k.bod, voorschot: Math.min(voorschot, k.voorschot) };
-  d.rondes.push({ van: 'klant', bedrag: tegen.bedrag, voorschot: tegen.voorschot });
-  meld(st, bedrag <= k.max
-    ? k.contact + ': "' + euro(bedrag) + ' is goed, maar meer dan ' + k.voorschot + '% vooraf doe ik niet."'
-    : k.contact + ': "Ik zat eerder aan ' + euro(tegen.bedrag) + (tegen.voorschot ? ' met ' + tegen.voorschot + '% vooraf' : '') + '."', 'vraag');
+  const prijs = bedrag <= k.max ? bedrag : vorige ? Math.min(k.max, opKwartje(vorige.bedrag + (bedrag - vorige.bedrag) / 2)) : k.bod;
+  const tegen = { bedrag: prijs, voorschot: Math.min(voorschot, k.voorschot), dagen: Math.min(dagen, langst) };
+  d.rondes.push(Object.assign({ van: 'klant' }, tegen));
+  const bezwaren = [];
+  if (bedrag > k.max) bezwaren.push('ik zat eerder aan ' + euro(tegen.bedrag));
+  if (voorschot > k.voorschot) bezwaren.push(k.voorschot ? 'meer dan ' + k.voorschot + '% vooraf doe ik niet' : 'vooraf betaal ik niets');
+  if (dagen > langst) bezwaren.push('langer dan ' + langst + ' dagen kan ik niet wachten');
+  const zin = bezwaren.join(', en ');
+  meld(st, k.contact + ': "' + zin.charAt(0).toUpperCase() + zin.slice(1) + '. Dus: ' + euro(tegen.bedrag) +
+    (tegen.voorschot ? ', ' + tegen.voorschot + '% vooraf' : '') + ', af binnen ' + tegen.dagen + ' dagen?"', 'vraag');
   return { ok: true };
 }
 
@@ -119,7 +129,7 @@ function neemAan(st, z) {
   const d = vindDeal(st, z.deal);
   const laatste = d && d.fase === 'onderhandeling' ? d.rondes[d.rondes.length - 1] : null;
   if (!laatste || laatste.van !== 'klant') return fout('Er ligt geen bod van de klant om aan te nemen.');
-  return akkoord(st, d, laatste.bedrag, laatste.voorschot);
+  return akkoord(st, d, laatste.bedrag, laatste.voorschot, laatste.dagen);
 }
 
 function weiger(st, z) {

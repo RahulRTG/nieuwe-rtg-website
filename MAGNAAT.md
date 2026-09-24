@@ -279,7 +279,7 @@ Wat A2 bewust **niet** deed: het grootboek bewaart zijn journaal nog als één w
 | M-002 | Mens- en werkwaarheid | **ABSENT** | ja | nee | nee | nee |
 | M-003 | Informatiewaarheid | **PARTIAL** | ja | ja | ja | ja |
 | M-004 | Economische waarheid | **PASS** | ja | ja | ja | ja |
-| M-005 | Economische waarheid | **PARTIAL** | ja | ja | nee | nee |
+| M-005 | Economische waarheid | **PASS** | ja | ja | ja | ja |
 | M-006 | Spelzuiverheid | **ABSENT** | ja | nee | nee | nee |
 | M-007 | AI-grens | **ABSENT** | ja | nee | nee | nee |
 | M-008 | Spelzuiverheid | **ABSENT** | ja | nee | nee | nee |
@@ -297,7 +297,7 @@ Wat A2 bewust **niet** deed: het grootboek bewaart zijn journaal nog als één w
 | M-020 | Economische waarheid | **PASS** | ja | ja | ja | ja |
 | M-601 | Simulatie-integriteit | **PASS** | ja | ja | ja | ja |
 
-21 invarianten: 6 PASS, 7 PARTIAL, 6 ABSENT, 2 VIOLATION; 6 geteld schendende plekken.
+21 invarianten: 7 PASS, 6 PARTIAL, 6 ABSENT, 2 VIOLATION; 6 geteld schendende plekken.
 
 ### M-001: Economische waarheid
 
@@ -305,10 +305,10 @@ Wat A2 bewust **niet** deed: het grootboek bewaart zijn journaal nog als één w
 
 Stand: **VIOLATION**
 
-- **World**: ABSENT
-  - Autoriteit: geen: het saldo zelf (st.geld) is de waarheid
-  - Handhaver: NIEMAND
-  - Toets: NIEMAND
+- **World**: PASS
+  - Autoriteit: het grootboek; st.geld is sinds A2.10 de projectie van de kas
+  - Handhaver: `server/kern/spellen/magnaat/boekhouding.js`, `function beweeg(st, { soort, van, naar, bedrag, omschrijving })`
+  - Toets: `test/magnaat-world-geld.test.js`, "12. na elke stap is elk saldo exact zijn rekening in het grootboek"; `test/magnaatgeldkaart.test.js`, "A2.10: DIRECT_WORLD_MONEY_MUTATION = FORBIDDEN, en er is er geen enkele"
   - Schending: 0, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
 - **Grootboek**: PASS
   - Autoriteit: server/kern/magnaat-grootboek/, het journaal
@@ -324,7 +324,7 @@ Stand: **VIOLATION**
   - Toets: NIEMAND
   - Schending: 3, spelgeld dat als beloning wordt bijgeschreven buiten het grootboek van de motor om
 
-**Migratie.** World gaat op de economische kern draaien (ronde A2/A4): een saldo wordt een projectie van het journaal. In het Oefenkantoor gaat de beloning via een journaalpost of verlaat hij het geldbegrip.
+**Migratie.** World: gebeurd in ronde A2.3 t/m A2.10, een saldo is de projectie van het journaal. Nog open: in het Oefenkantoor gaat de beloning via een journaalpost of verlaat hij het geldbegrip.
 
 **Faalwijze.** Op de vraag "waar kwam deze 312 vandaan?" is geen antwoord; een fout in een spelregel maakt of vernietigt geld zonder spoor.
 
@@ -382,12 +382,12 @@ Stand: **PASS**
 
 > Een transactie heeft minimaal twee economische zijden, en debet is gelijk aan credit.
 
-Stand: **PARTIAL**
+Stand: **PASS**
 
-- **World**: ABSENT
-  - Autoriteit: geen: er is geen journaal
-  - Handhaver: NIEMAND
-  - Toets: NIEMAND
+- **World**: PASS
+  - Autoriteit: het grootboek: elke beweging is een overdracht met een van- en een naarkant
+  - Handhaver: `server/kern/spellen/magnaat/boekhouding.js`, `[regel(naar, 'debet'), regel(van, 'credit')]`
+  - Toets: `test/magnaatgeldkaart.test.js`, "A2.10: DIRECT_WORLD_MONEY_MUTATION = FORBIDDEN, en er is er geen enkele"
   - Schending: 0, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
 - **Grootboek**: PASS
   - Autoriteit: server/kern/magnaat-grootboek/, het journaal
@@ -398,7 +398,7 @@ Stand: **PARTIAL**
   - Handhaver: `server/kern/magnaat-economische-motor/index.js`, `Object.assign(m, grootboek);`
   - Toets: `test/magnaat-grootboek.test.js`, "2. de motor boekt nergens buiten het grootboek om"
 
-**Migratie.** Zelfde weg als M-001: World boekt via de kern. De geldpompmeter blijft ernaast staan tot de eigenschapstoetsen er zijn.
+**Migratie.** Geen voor World: sinds A2.10 boekt World elke beweging als overdracht. De geldpompmeter blijft ernaast staan tot de eigenschapstoetsen er zijn.
 
 **Faalwijze.** Geld verschijnt of verdwijnt aan een kant; de totalen kloppen alleen nog binnen een ruismarge.
 
@@ -672,7 +672,7 @@ Stand: **PASS**
   - Handhaver: `server/kern/spellen/magnaat/centen.js`, `const uit = Math.round(Number(cent.toFixed(6)));`; `server/kern/spellen/magnaat/maand-contracten.js`, `betaling[c.id] = naarCenten(H.afwikkelen(c,`
   - Toets: `test/magnaat-world-geld.test.js`, "4. na elke stap is elk monetair veld een geheel aantal eurocenten"; `test/magnaat-world-geld.test.js`, "5. een contractbetaling draagt aan beide kanten exact hetzelfde bedrag"
 
-**Migratie.** Geen voor World en het grootboek: sinds ronde A2.1 rekent World in hele eurocenten en wordt een gebeurtenis een keer afgerond. Wat nog rest is dat World zijn geld nog niet via het grootboek boekt (A2.3 t/m A2.9).
+**Migratie.** Geen voor World en het grootboek: sinds ronde A2.1 rekent World in hele eurocenten en wordt een gebeurtenis een keer afgerond. Sinds A2.10 boekt World ook al zijn geld via het grootboek.
 
 **Faalwijze.** De betaler betaalt 10,01 en de ontvanger krijgt 10,00: een cent ontstaat of verdwijnt uit het niets.
 

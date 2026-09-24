@@ -21,20 +21,20 @@
     }
   ],
   "stempel": {
-    "op": "2026-09-24T04:03:32.203Z",
-    "commit": "12ce62cc",
+    "op": "2026-09-24T05:23:15.215Z",
+    "commit": "0418114c",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 616,
-    "deurEistMens": 191,
+    "routes": 619,
+    "deurEistMens": 194,
     "deurGedeeld": 425,
     "zonderBewakerslaag": 3,
     "handlerKentMens": 148,
     "anoniemUitvoerbaar": 358,
     "metSpoor": 148,
     "metReden": 290,
-    "bestanden": 100,
+    "bestanden": 101,
     "zwaar": 14,
     "zwaarZonderMens": 0,
     "zwaarLezend": 4,
@@ -62,8 +62,8 @@
       "gemeten": 81,
       "geenWerk": 302,
       "geenOpslag": 203,
-      "nietInProef": 30,
-      "totaal": 616
+      "nietInProef": 33,
+      "totaal": 619
     },
     "dekkingPct": 13.1,
     "raakt": [
@@ -191,7 +191,7 @@
     "schaduw": {
       "wat": "een nieuwe regel loopt eerst mee zonder te blokkeren",
       "aanKantoorroute": 1,
-      "aanroepersInServer": 9
+      "aanroepersInServer": 10
     },
     "rechten": {
       "wat": "machtskaart: nominaal naast effectief",
@@ -328,7 +328,7 @@
   ],
   "deuren": {
     "officeAuth": 447,
-    "boardroomAuth": 122,
+    "boardroomAuth": 125,
     "balieAuth": 31,
     "kluisAuth": 23,
     "techAuth": 16,

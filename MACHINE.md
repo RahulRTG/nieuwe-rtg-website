@@ -209,7 +209,7 @@ vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven di
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
 <!--getal:semantiek.namen-->125<!--/getal--> namen in meer dan één domein heeft,
 waarvan <!--getal:semantiek.betekenissen-->107<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->400<!--/getal-->
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->401<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).

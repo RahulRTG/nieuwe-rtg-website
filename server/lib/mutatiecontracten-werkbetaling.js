@@ -24,6 +24,40 @@ const CONTRACTEN = {
     nagekeken: 'met de hand, 2026-09-23: bedrijf/tekengrens.js zet g.w.betaalwijze op een van twee waarden',
     afgetekend: AF
   },
+  'POST /api/bedrijf/werkruimte/tekenwijze': {
+    mutatieId: 'bedrijf.werkruimte.tekenwijze', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: WERK, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/samentekenen.test.js toets 1-5: de tekenwijze is een toestand (versmallen, bestuur of drempel ' +
+      'met een bedrag); dezelfde keuze nog eens laat dezelfde stand achter', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: bedrijf/samentekenen.js zet g.w.tekenwijze en een journaalregel, alleen voor de eigenaar van de entiteit',
+    afgetekend: AF
+  },
+  /* De gedeelde doos-sleutel dicht of open (fase 7). Hier en niet naast de andere
+     doossleutels, omdat ./mutatiecontracten-beleidsmotor.js tegen de grens zit. */
+  'POST /api/office/doos/gedeeld/zet': {
+    mutatieId: 'office.doos.gedeeld.zet', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/doossleutels.test.js toets 7a-7c: dicht en open zijn een toestand; nog eens dicht ' +
+      'laat hem dicht, en dichtzetten weigert zolang een doos de gedeelde sleutel gebruikt', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: kern/zaakdoos/sleutels.js gedeeldZet() schrijft dicht, door en at op de ene kaart',
+    afgetekend: AF
+  },
+  /* Per kantoordeur schaduw of afdwingen (AUTHORITY.md fase 1, besluit van 24 september 2026). */
+  'POST /api/office/beleidsmotor/afdwingen': {
+    mutatieId: 'office.beleidsmotor.afdwingen', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/beleidsafdwingen.test.js toets 6: de stand lezen, standaard schaduw', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: de handler roept alleen afdwingen.overzicht() aan, die leest via eigen.kijk',
+    afgetekend: AF
+  },
+  'POST /api/office/beleidsmotor/afdwingen/zet': {
+    mutatieId: 'office.beleidsmotor.afdwingen.zet', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/beleidsafdwingen.test.js toets 1-6: schaduw en afdwingen zijn een toestand per deur; ' +
+      'nog eens dezelfde stand laat hem staan, en afdwingen weigert zolang de deur niet rijp is', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: kern/beleidsmotor/afdwingen.js zet() schrijft aan, door en at voor een deur',
+    afgetekend: AF
+  },
   'POST /api/office/werkos/bankpad': {
     mutatieId: 'office.werkos.bankpad', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',

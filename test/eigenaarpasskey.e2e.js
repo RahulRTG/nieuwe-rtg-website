@@ -94,6 +94,23 @@ test('de eigenaar bevestigt zware handelingen met een passkey, vanaf de schermen
     await p.locator('#dsUit', { hasText: 'RTG_DOOS_ID=doos-proef' }).waitFor();
     assert.match(await p.locator('#dsUit').innerText(), /[0-9a-f]{48}/);
     await p.locator('#dsEigen', { hasText: 'doos-proef' }).waitFor();
+    /* de gedeelde doos-sleutel dicht en weer open, met de vinger: hier meldt geen
+       doos met de gedeelde sleutel, dus dicht mag */
+    const dicht = antwoord(p, '/api/office/doos/gedeeld/zet');
+    await p.locator('#dsSchakel').click();
+    assert.equal((await dicht).status(), 200, 'de gedeelde sleutel is met de passkey dichtgezet');
+    await p.locator('#dsGedeeld', { hasText: 'dicht' }).waitFor();
+    const open = antwoord(p, '/api/office/doos/gedeeld/zet');
+    await p.locator('#dsSchakel').click();
+    assert.equal((await open).status(), 200, 'en weer open');
+    await p.locator('#dsGedeeld', { hasText: 'open (schaduw)' }).waitFor();
+    /* de kantoordeuren: in een vers proces is geen deur rijp, en de knop zegt
+       dat met de reden van de server in plaats van stil te falen */
+    await p.locator('#bmDeuren [data-deur="kantoor"]').waitFor();
+    const deur = antwoord(p, '/api/office/beleidsmotor/afdwingen/zet');
+    await p.locator('#bmDeuren [data-deur="kantoor"]').click();
+    assert.equal((await deur).status(), 409, 'een vers proces is niet rijp');
+    await p.locator('body', { hasText: 'nog niet afgedwongen' }).waitFor();
     await c.close();
 
     /* 3. de medewerker verzilvert de uitnodiging op het personeelsscherm */

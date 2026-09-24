@@ -179,6 +179,8 @@ window.I18N = { en: {
   'ds.sub':'A box with its own key is proven; a box on the shared key only states its own name. The shared key closes once nobody is listed below.',
   'ds.laden':'Loading boxes…', 'ds.ph':'Name of the box', 'ds.geef':'Give its own key',
   'ds.gedeeld':'Still on the shared key (last seven days)', 'ds.geengedeeld':'No box reported on the shared key in the last seven days.',
+  'ds.stand':'The shared key', 'ds.isdicht':'closed: only a box with its own key gets in', 'ds.isopen':'open (shadow): it still works',
+  'ds.dicht':'Close the shared key', 'ds.open':'Open it again', 'ds.dichtOk':'The shared key is closed.', 'ds.openOk':'The shared key is open again.',
   'ds.eigen':'Boxes with their own key', 'ds.laatst':'last seen ', 'ds.keer':' times',
   'ds.klaar':'own key issued, not yet on the box', 'ds.sinds':'own key since ', 'ds.weg':'Withdraw',
   'ds.leeg':'Please fill in the name of the box first.', 'ds.sleutel':'Key (shown once): ', 'ds.wegOk':'The key has been withdrawn.'
@@ -404,6 +406,21 @@ window.I18N = { en: {
       rij(g, x.doos, T('ds.laatst', 'laatst gezien ') + datum(x.laatst) + ' · ' + x.aantal + T('ds.keer', ' keer') +
         (x.heeftEigen ? ' · ' + T('ds.klaar', 'eigen sleutel uitgegeven, nog niet op de doos') : ''), null);
     });
+    /* De gedeelde sleutel zelf: open (schaduw) of dicht. Dichtzetten weigert de
+       server zolang er hierboven nog een doos staat, met de namen erbij. */
+    var st = d.gedeeldeSleutel || {}, sk = null;
+    if (baas) {
+      sk = el('button', 'rtg-knop', st.dicht ? T('ds.open', 'Zet weer open') : T('ds.dicht', 'Zet de gedeelde sleutel dicht'));
+      sk.type = 'button'; sk.id = 'dsSchakel';
+      sk.addEventListener('click', function () {
+        sk.disabled = true;
+        metVinger('/api/office/doos/gedeeld/zet', { dicht: !st.dicht })
+          .then(function () { zeg(st.dicht ? T('ds.openOk', 'De gedeelde sleutel staat weer open.') : T('ds.dichtOk', 'De gedeelde sleutel is dicht.'), 'goed'); return laadDozen(); })
+          .catch(function (er) { zeg(er.message, 'fout'); sk.disabled = false; });
+      });
+    }
+    rij(g, T('ds.stand', 'De gedeelde sleutel'), st.dicht ? T('ds.isdicht', 'dicht: alleen een doos met een eigen sleutel komt binnen')
+      : T('ds.isopen', 'open (schaduw): hij werkt nog'), sk);
     if ((d.dozen || []).length) e.appendChild(el('h3', 'rtg-sub', T('ds.eigen', 'Dozen met een eigen sleutel')));
     (d.dozen || []).forEach(function (x) {
       var k = null;

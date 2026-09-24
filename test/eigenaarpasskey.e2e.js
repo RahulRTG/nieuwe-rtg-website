@@ -94,6 +94,16 @@ test('de eigenaar bevestigt zware handelingen met een passkey, vanaf de schermen
     await p.locator('#dsUit', { hasText: 'RTG_DOOS_ID=doos-proef' }).waitFor();
     assert.match(await p.locator('#dsUit').innerText(), /[0-9a-f]{48}/);
     await p.locator('#dsEigen', { hasText: 'doos-proef' }).waitFor();
+    /* de gedeelde doos-sleutel dicht en weer open, met de vinger: hier meldt geen
+       doos met de gedeelde sleutel, dus dicht mag */
+    const dicht = antwoord(p, '/api/office/doos/gedeeld/zet');
+    await p.locator('#dsSchakel').click();
+    assert.equal((await dicht).status(), 200, 'de gedeelde sleutel is met de passkey dichtgezet');
+    await p.locator('#dsGedeeld', { hasText: 'dicht' }).waitFor();
+    const open = antwoord(p, '/api/office/doos/gedeeld/zet');
+    await p.locator('#dsSchakel').click();
+    assert.equal((await open).status(), 200, 'en weer open');
+    await p.locator('#dsGedeeld', { hasText: 'open (schaduw)' }).waitFor();
     await c.close();
 
     /* 3. de medewerker verzilvert de uitnodiging op het personeelsscherm */

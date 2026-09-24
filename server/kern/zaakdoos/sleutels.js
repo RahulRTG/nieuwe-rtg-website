@@ -19,7 +19,7 @@ const NAAM = /^[a-z0-9][a-z0-9-]{1,39}$/;
 function maakDoosSleutels({ db, save, crypto, nu }) {
   const tijd = nu || Date.now;
   const eigen = require('../eigencollectie')({ db, domein: 'kern/zaakdoos/sleutels',
-    bezit: { doosSleutels: 'kaart', doosSleutelwegen: 'kaart', doosGedeeldGezien: 'kaart' } });
+    bezit: { doosSleutels: 'kaart', doosSleutelwegen: 'kaart', doosGedeeldGezien: 'kaart', doosGedeeldDicht: 'kaart' } });
   const kaart = () => eigen.bak('doosSleutels');
   const hash = (s) => crypto.createHash('sha256').update(String(s || '')).digest('hex');
 
@@ -96,12 +96,34 @@ function maakDoosSleutels({ db, save, crypto, nu }) {
         'opgaven: een zelfopgave en geen identiteit. heeftEigen betekent dat er al een eigen sleutel voor die naam is ' +
         'uitgegeven maar nog niet op de doos staat. Zodra deze lijst leeg blijft, kan de gedeelde sleutel dicht.',
       wegen: Object.assign({ gedeeld: 0, eigen: 0 }, eigen.kijk('doosSleutelwegen') || {}),
-      uitleg: 'Fase 7 in de schaduw: de gedeelde doos-sleutel werkt nog. Zodra wegen.gedeeld niet meer stijgt, ' +
-        'kan hij weg -- dat is een apart besluit.'
+      gedeeldeSleutel: gedeeld(),
+      uitleg: gedeeld().dicht ? 'De gedeelde doos-sleutel is dicht: alleen een eigen sleutel per doos komt nog binnen.'
+        : 'Fase 7 in de schaduw: de gedeelde doos-sleutel werkt nog. Zodra nogGedeeld leeg blijft, kan de eigenaar hem dichtzetten.'
     };
   }
 
-  return { geef, trekIn, welke, telWeg, overzicht };
+  /* DE GEDEELDE SLEUTEL DICHT (besluit van de eigenaar, 23 september 2026: pas
+     als elke doos een eigen sleutel heeft). Dichtzetten weigert zolang er de
+     afgelopen zeven dagen nog een doos met de gedeelde sleutel meldde -- met de
+     namen erbij -- want anders staat een werkende doos morgen stil zonder dat
+     iemand het zag aankomen. Weer openzetten kan altijd: dat is de noodweg. */
+  function gedeeld() {
+    const d = eigen.kijk('doosGedeeldDicht') || {};
+    return { dicht: d.dicht === true, door: d.door || null, at: d.at || null };
+  }
+  function gedeeldZet({ dicht, wie }) {
+    if (typeof dicht !== 'boolean') return { status: 400, error: 'Zet de gedeelde sleutel dicht (true) of open (false).' };
+    const nog = overzicht().nogGedeeld;
+    if (dicht && nog.length) return { status: 409, nogGedeeld: nog.map(x => x.doos),
+      error: 'Nog niet: deze dozen meldden de afgelopen zeven dagen met de gedeelde sleutel: ' + nog.map(x => x.doos).join(', ') +
+        '. Geef ze eerst een eigen sleutel en wacht tot ze die gebruiken.' };
+    const d = eigen.bak('doosGedeeldDicht');
+    d.dicht = dicht; d.door = wie || null; d.at = new Date(tijd()).toISOString();
+    save();
+    return Object.assign({ ok: true }, gedeeld());
+  }
+
+  return { geef, trekIn, welke, telWeg, overzicht, gedeeld, gedeeldZet };
 }
 
 /* EEN INSTANTIE PER DATABASE. Twee domeinen gebruiken dit register (de vloot in

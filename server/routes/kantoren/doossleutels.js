@@ -38,5 +38,20 @@ module.exports = (ctx) => {
     } catch (e) { console.error('[doossleutel]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
+  /* De gedeelde sleutel dicht of weer open. Zwaar en alleen de eigenaar: dicht
+     zet elke doos zonder eigen sleutel buiten. Het register weigert dichtzetten
+     zolang er nog een doos met de gedeelde sleutel meldt. */
+  app.post('/api/office/doos/gedeeld/zet', boardroomAuth, async (req, res) => {
+    try {
+      const dicht = req.body && req.body.dicht;
+      if (!(await eigenaarZwaar(req, res, 'eigenaar-doossleutel-gedeeld', dicht === true
+        ? 'De gedeelde doos-sleutel dichtzetten' : 'De gedeelde doos-sleutel weer openzetten'))) return;
+      const r = register().gedeeldZet({ dicht, wie: 'eigenaar' });
+      if (r.error) return res.status(r.status || 400).json(r);
+      afdelingen.audit('eigenaar', 'Gedeelde doos-sleutel ' + (r.dicht ? 'dichtgezet' : 'weer opengezet'));
+      res.json(r);
+    } catch (e) { console.error('[doossleutel]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
   app.post('/api/office/doos/sleutels', boardroomAuth, (req, res) => res.json(Object.assign({ ok: true }, register().overzicht())));
 };

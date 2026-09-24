@@ -32,6 +32,16 @@ const CONTRACTEN = {
     nagekeken: 'met de hand, 2026-09-24: bedrijf/samentekenen.js zet g.w.tekenwijze en een journaalregel, alleen voor de eigenaar van de entiteit',
     afgetekend: AF
   },
+  /* De gedeelde doos-sleutel dicht of open (fase 7). Hier en niet naast de andere
+     doossleutels, omdat ./mutatiecontracten-beleidsmotor.js tegen de grens zit. */
+  'POST /api/office/doos/gedeeld/zet': {
+    mutatieId: 'office.doos.gedeeld.zet', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/doossleutels.test.js toets 7a-7c: dicht en open zijn een toestand; nog eens dicht ' +
+      'laat hem dicht, en dichtzetten weigert zolang een doos de gedeelde sleutel gebruikt', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: kern/zaakdoos/sleutels.js gedeeldZet() schrijft dicht, door en at op de ene kaart',
+    afgetekend: AF
+  },
   'POST /api/office/werkos/bankpad': {
     mutatieId: 'office.werkos.bankpad', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',

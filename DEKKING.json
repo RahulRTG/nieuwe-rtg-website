@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-24T04:49:28.942Z",
-    "commit": "887862ab",
-    "routesToen": 5133
+    "op": "2026-09-24T06:38:43.721Z",
+    "commit": "759a5de9",
+    "routesToen": 5142
   },
   "aangeraakt": [
     "GET /",
@@ -259,6 +259,7 @@
     "POST /api/bedrijf/toen/object",
     "POST /api/bedrijf/uitdienst",
     "POST /api/bedrijf/uitdienst/stap",
+    "POST /api/bedrijf/uitgave/betaal",
     "POST /api/bedrijf/uitgave/betaald",
     "POST /api/bedrijf/uitgave/maak",
     "POST /api/bedrijf/uitgaven",
@@ -272,6 +273,7 @@
     "POST /api/bedrijf/werkruimte/betaalwijze",
     "POST /api/bedrijf/werkruimte/entiteit",
     "POST /api/bedrijf/werkruimte/maak",
+    "POST /api/bedrijf/werkruimte/tekenwijze",
     "POST /api/bedrijf/zoek",
     "POST /api/bescherming/deur/intrekken",
     "POST /api/bescherming/deur/stand",
@@ -565,6 +567,8 @@
     "POST /api/concern/overname",
     "POST /api/concern/overzicht",
     "POST /api/concern/readiness",
+    "POST /api/concern/rekening",
+    "POST /api/concern/rekening/open",
     "POST /api/concern/tekenen",
     "POST /api/concern/ubo",
     "POST /api/concern/uitdienst/beeld",
@@ -2157,6 +2161,8 @@
     "POST /api/office/bank/autoriseer/bevestig",
     "POST /api/office/bank/bevoegdheid",
     "POST /api/office/bank/draai",
+    "POST /api/office/bank/entiteitrekening",
+    "POST /api/office/bank/entiteitrekening/zet",
     "POST /api/office/bank/gezond",
     "POST /api/office/bank/handtekening/bevestig",
     "POST /api/office/bank/handtekening/intrek",
@@ -2192,6 +2198,8 @@
     "POST /api/office/bank/terugstorting",
     "POST /api/office/bank/vergunning",
     "POST /api/office/beleidsmotor",
+    "POST /api/office/beleidsmotor/afdwingen",
+    "POST /api/office/beleidsmotor/afdwingen/zet",
     "POST /api/office/beleidsmotor/review",
     "POST /api/office/beleidsmotor/simulatie",
     "POST /api/office/beleidsmotor/waarom",
@@ -2233,6 +2241,7 @@
     "POST /api/office/dienst/in",
     "POST /api/office/dienst/uit",
     "GET /api/office/doc",
+    "POST /api/office/doos/gedeeld/zet",
     "POST /api/office/doos/netwerk-zet",
     "POST /api/office/doos/regie",
     "POST /api/office/doos/sleutel",

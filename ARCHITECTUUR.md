@@ -19,8 +19,8 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5144 |
-| servermodules (`server/**/*.js`) | 3673 |
-| routebestanden (`server/routes/**`) | 611 |
+| servermodules (`server/**/*.js`) | 3672 |
+| routebestanden (`server/routes/**`) | 610 |
 | kernmodules (`server/kern/**`) | 2302 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 390 |
@@ -106,7 +106,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 244 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -137,8 +137,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | Meting | Nu |
 |---|---|
 | kern-namen die routes aanraken | 1599 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 244 |
-| daarvan door precies één domein | 1355 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 243 |
+| daarvan door precies één domein | 1356 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -150,9 +150,9 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(208) auth(129) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) status(31)
+app(207) auth(128) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) status(31)
 accounts(27) schoon(23) codenaamVan(19) managerOnly(18) rtf(18) boardroomWie(17)
-save(17) geenGast(15) tooManyTries(14) express(13) crypto(12) findSupplier(12)
+save(17) tooManyTries(14) geenGast(14) express(13) crypto(12) findSupplier(12)
 appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10)
 rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) payrollOS(9) loginFails(8) stuur(8)
 logActivity(8) mail(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6)

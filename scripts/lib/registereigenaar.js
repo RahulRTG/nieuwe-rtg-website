@@ -234,6 +234,8 @@ const EIGENAAR = {
   'KETENBEREIK.json': { schrijver: 'scripts/ketenbereik.js' },
   'PAKTEBETEKENIS.json': { schrijver: 'scripts/paktebetekenis.js' },
   'MANDAATPROEF.json': { schrijver: 'scripts/mandaatproef.js' },
+  /* De Magnaat-grondwet komt met de tak die hem meet; zie MAGNAAT.md. */
+  'MAGNAATGRONDWET.json': { schrijver: 'scripts/magnaatgrondwet.js' },
 };
 
 /* EEN CONSTANTE NAAR DE ARTEFACTNAAM HERLEIDEN, HOOGUIT TWEE SCHAKELS DIEP.

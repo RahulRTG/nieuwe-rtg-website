@@ -72,9 +72,13 @@ const isZekerheid = (k) => /^zekerheid zonder gegevens/.test(k);
 function oordeel(m) {
   const zeker = m.klachten.filter(isZekerheid);
   if (zeker.length) return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'met een lege backend: ' + zeker[0] };
-  if (m.klachten.length) return { status: 'NIET_GETEST', reden: 'het scherm viel om of toonde rommel bij een leeg antwoord (' + m.klachten[0] + '); of het een toestand zou verzinnen, is zo niet vast te stellen' };
+  /* EERST DE DEUR, DAN DE OMVALLER. Een schoolscherm zonder schoolsessie toont
+     een deur en stopt zijn script dan met opzet (`throw new Error('geen
+     schoolsessie')`), op elke server en niet door de leugen. Dat werd eerst als
+     omvaller geteld; een scherm achter een deur is niet beproefd. */
   if (m.landing && m.landing !== m.pad) return { status: 'NIET_GETEST', reden: 'landde op ' + m.landing + ' in plaats van ' + m.pad + '; het scherm zelf is niet beproefd' };
   if (m.deur) return { status: 'NIET_GETEST', reden: 'achter een deur (' + m.deur + '); het scherm zelf is niet beproefd' };
+  if (m.klachten.length) return { status: 'NIET_GETEST', reden: 'het scherm viel om of toonde rommel bij een leeg antwoord (' + m.klachten[0] + '); of het een toestand zou verzinnen, is zo niet vast te stellen' };
   if (!m.gelogen.length) return { status: 'NIET_GETEST', reden: 'het scherm vroeg buiten de deuren niets aan de backend; er viel niets te liegen' };
   return { status: 'BEWEZEN', reden: m.gelogen.length + ' antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; ' + GRENS };
 }

@@ -13,6 +13,8 @@
 async function tekenAanvragen() {
   let d;
   try { d = await api('/api/mall/aanvragen/mijn', {}); } catch (e) { return; }
+  /* Zonder lijst geen "Nog geen aanvragen" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
+  if (!(d && Array.isArray(d.aanvragen))) { $('#aanvragen').innerHTML = '<div class="leeg">Het antwoord was onvolledig, dus dit kon niet worden geladen.</div>'; return; }
   if (!d.aanvragen.length) { $('#aanvragen').innerHTML = '<div class="leeg">Nog geen aanvragen uitgezet.</div>'; return; }
   $('#aanvragen').innerHTML = d.aanvragen.map((a) =>
     '<div class="kaart">' +

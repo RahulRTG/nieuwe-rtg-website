@@ -498,6 +498,8 @@ async function tekenTreffers(){
    Dit is het echte aanbod; de gidsen staan verderop onder Ontdekken. */
 async function laadReizen(){
   let d; try { d = await api('/api/mall/zoek', { type: 'reis', per: 6 }); } catch(e){ return; }
+  /* Onvolledig antwoord: deze etage blijft weg, net als bij een fout (LIEGRONDE.json). */
+  if (!(d && Array.isArray(d.items))) return;
   const w = $('#reizenWrap');
   if (!d.items.length){ w.innerHTML = ''; return; }
   w.innerHTML = '<div class="etage"><div class="etage-kop"><h2>Complete reizen</h2>'+
@@ -548,6 +550,8 @@ const RF = { categorie: '', zoek: '', pagina: 1, mijn: false };
 async function laadRtfbieb(){
   let d;
   try { d = await api('/api/mall/rtf'); } catch(e){ return; }
+  /* Onvolledig antwoord: deze etage blijft weg, net als bij een fout (LIEGRONDE.json). */
+  if (!(d && typeof d.totaal === 'number')) return;
   $('#rtfbieb').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>RTF-Bibliotheek</h2>'+
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' echte kind- en gezinsapps · altijd gratis · ook voor gasten</span></div>'+
@@ -626,6 +630,8 @@ const AB = { categorie: '', zoek: '', pagina: 1, mijn: false, cats: [] };
 async function laadAppbieb(){
   let d;
   try { d = await api('/api/mall/apps'); } catch(e){ return; }
+  /* Onvolledig antwoord: deze etage blijft weg, net als bij een fout (LIEGRONDE.json). */
+  if (!(d && Array.isArray(d.categorieen) && typeof d.totaal === 'number')) return;
   AB.cats = d.categorieen;
   $('#appbieb').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>App-Bibliotheek</h2>'+
@@ -1089,6 +1095,8 @@ const RB = { bestemming: '', regio: '', zoek: '', pagina: 1, mijn: false };
 async function laadReisbieb(){
   let d;
   try { d = await api('/api/mall/reis'); } catch(e){ return; }
+  /* Onvolledig antwoord: deze etage blijft weg, net als bij een fout (LIEGRONDE.json). */
+  if (!(d && typeof d.totaal === 'number')) return;
   $('#reisbieb').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>Reis-Bibliotheek</h2>'+
     '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' gidsen van eigen redactie · echt te lezen · voor iedereen open</span></div>'+

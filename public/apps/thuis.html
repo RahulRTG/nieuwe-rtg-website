@@ -226,6 +226,8 @@ async function zoek(){
   try {
     const d = await api('zoek', { plaats: $('#zPlaats').value, van: $('#zVan').value || undefined, tot: $('#zTot').value || undefined,
       gasten: Number($('#zGasten').value)||1, instant: $('#zInstant').checked || undefined });
+    /* Zonder lijst geen "Niets gevonden" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
+    if (!(d && Array.isArray(d.huizen))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     AANBOD = d.huizen;
     $('#zUit').innerHTML = d.huizen.length ? d.huizen.map(huisKaart).join('') : '<div class="leeg">Niets gevonden; probeer een andere plaats of periode.</div>';
     $('#zUit').querySelectorAll('.huis').forEach(b => b.addEventListener('click', () => openHuis(b.dataset.id)));
@@ -389,7 +391,7 @@ async function laadHuizen(){
   } catch(e){ $('#hHuizen').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 async function vulTypen(){
-  try { const d = await api('typen'); $('#nType').innerHTML = Object.entries(d.types).map(([k,v])=>'<option value="'+esc(k)+'">'+esc(v)+'</option>').join(''); } catch(e){}
+  try { const d = await api('typen'); if (!(d && d.types && typeof d.types === 'object')) return; $('#nType').innerHTML = Object.entries(d.types).map(([k,v])=>'<option value="'+esc(k)+'">'+esc(v)+'</option>').join(''); } catch(e){}
 }
 $('#nZet').addEventListener('click', async () => {
   try {

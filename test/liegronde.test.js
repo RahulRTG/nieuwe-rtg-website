@@ -37,6 +37,8 @@ test('2. wie niets vroeg, of ergens anders landde, is niet beproefd', () => {
   assert.equal(oordeel(m({ gelogen: [] })).status, 'NIET_GETEST');
   assert.equal(oordeel(m({ landing: '/apps/ander.html' })).status, 'NIET_GETEST');
   assert.equal(oordeel(m({ deur: '#poort.zien' })).status, 'NIET_GETEST');
+  assert.match(oordeel(m({ deur: 'html.rtf-school-dicht', klachten: ['JS-fout: geen schoolsessie'] })).reden, /achter een deur/,
+    'een deur die zijn script met opzet stopt, is geen omvaller');
   const ok = oordeel(m({}));
   assert.equal(ok.status, 'BEWEZEN');
   assert.match(ok.reden, /LEEG antwoord/, 'de grens hoort in elke uitslag te staan');

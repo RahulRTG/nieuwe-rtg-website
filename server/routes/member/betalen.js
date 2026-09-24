@@ -3,7 +3,7 @@
    met munten (crypto via een vergunninghoudende aanbieder, meteen omgezet naar
    euro) en facturen/jaaroverzichten als PDF. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, db, save, accounts, memberTemplate, betaal, betaalWaarheid, fonds, factuur, broadcastSync, stateFor,
+  const { app, auth, db, accounts, memberTemplate, betaal, betaalWaarheid, fonds, factuur, broadcastSync, stateFor,
           liveCodename } = kern;
   const { principalVoorSession } = require('../../kern/economie/principal');
 

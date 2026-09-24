@@ -90,6 +90,10 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
          systeemingang is nu de mond in de Edge-onderrand; die opent dezelfde
          echte werkruimte en dus dezelfde command.js-handlers. */
       await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
+      /* De adaptieve balk wordt NA die vlag gevuld (rtg-adaptive-edge.js), dus
+         eerst op de knop wachten en dan pas tellen: direct tellen was een race
+         van een paar milliseconden, die op de ene boom won en op de andere niet. */
+      await page.waitForSelector('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]', { timeout: 15000 });
       assert.equal(await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]').count(), 1,
         'er is exact één zichtbare Rahul-ingang');
       if (!lagenGetoetst) {

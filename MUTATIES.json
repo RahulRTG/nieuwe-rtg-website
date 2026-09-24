@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T10:47:13.559Z",
-    "commit": "60e9523da",
+    "op": "2026-09-24T11:17:44.941Z",
+    "commit": "5eb34d2ab",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5134,6 +5134,14 @@
       "geprobeerd": 2
     },
     "magnaat-economische-motor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "magnaat-grootboek.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/bron.js",

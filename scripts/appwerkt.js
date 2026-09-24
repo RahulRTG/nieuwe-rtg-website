@@ -230,7 +230,11 @@ async function maakContext(browser, opslag) {
      ingreep als in scripts/tikken.js en de schermtoetsen. */
   await ctx.route('**/api/onboarding/status', (r) => r.fulfill({ status: 200,
     contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
-  await ctx.addInitScript((o) => { try { for (const k of Object.keys(o)) localStorage.setItem(k, o[k]); } catch (e) {} }, opslag);
+  /* DE PERSONA SPREEKT NEDERLANDS. Zonder rtg_lang volgde het scherm de taal
+     van de headless browser (en-US), dus mat deze proef de Engelse schil van
+     een Nederlands huis -- gezien op 24 september 2026. */
+  await ctx.addInitScript((o) => { try { for (const k of Object.keys(o)) localStorage.setItem(k, o[k]); } catch (e) {} },
+    Object.assign({ rtg_lang: 'nl' }, opslag));
   return ctx;
 }
 
@@ -329,6 +333,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   if (bediening.rem.length) r.waarnemingen.push('proef: ' + bediening.rem.length + 'x de rem (429) geraakt, door het gedeelde adres van de meting');
   r.rem = bediening.rem.length + eersteBezoek.rem.length;
   r.gezegd = bediening.gezegd;
+  r.taalWissel = bediening.taalWissel;
   const stuk = [...bediening.crash, ...bediening.serverfout];
   /* De uitsplitsing staat ALTIJD in de reden, ook bij een geslaagde rij: "3
      knoppen aangetikt zonder fout" leest als een bewijs, maar zonder de noemer
@@ -434,13 +439,21 @@ function onderschepper(log) {
 
 async function bedien(ctx, base, pad) {
   const page = await ctx.newPage();
-  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [];
+  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [];
+  let laatste = null;
   let geklikt = 0, gevonden = 0;
   const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
     luister(page, base, { crash, config, serverfout, rem, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
+    /* Welke tik de taal van de persona verandert: een vertaalverzoek naar een
+       andere taal dan nl na een tik, met de knop erbij. */
+    page.on('request', (q) => {
+      if (!q.url().includes('/api/vertaal/ui')) return;
+      let naar = null; try { naar = JSON.parse(q.postData() || '{}').naar; } catch (e) {}
+      if (naar && naar !== 'nl' && laatste && !taalWissel.some((w) => w.knop === laatste && w.naar === naar)) taalWissel.push({ knop: laatste, naar });
+    });
     const gehad = new Set();
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
       let k;
@@ -461,6 +474,7 @@ async function bedien(ctx, base, pad) {
       if (k.klaar) break;
       gehad.add(k.merk);
       if (ONOMKEERBAAR.test(k.tekst)) { overgeslagen.push(k.tekst || '(naamloos)'); continue; }
+      laatste = k.tekst || '(naamloos)';
       try {
         await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
         await page.waitForTimeout(600);
@@ -498,7 +512,7 @@ async function bedien(ctx, base, pad) {
   }
   await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
   await page.close();
-  return { geklikt, gevonden, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd };
+  return { geklikt, gevonden, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -573,10 +587,10 @@ function luister(page, base, bak) {
     /* De rem (429) reageert hier op de PROEF: alle browsers van deze meting
        delen een adres. Dat is een eigenschap van het instrument, geen defect. */
     else if (s === 429 && bak.rem) bak.rem.push(pad);
-    /* Een weigering MET een zin (400/409/422 en {"error": "..."}) is pas een
+    /* Een weigering MET een zin (400/409/422/428 en {"error": "..."}) is pas een
        defect als de gebruiker niet te zien krijgt waarom. Of hij hem ziet, kijkt
        bedien() na de tik op het scherm na. */
-    else if ([400, 409, 422].includes(s) && bak.weigering && weigerZin(lijf)) bak.weigering.push({ s, pad, zin: weigerZin(lijf) });
+    else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(lijf)) bak.weigering.push({ s, pad, zin: weigerZin(lijf) });
     else bak.serverfout.push(s + ' ' + pad + (lijf ? ' -- ' + lijf.slice(0, 100) : ''));
   });
 }
@@ -613,6 +627,7 @@ function bouw(meting) {
       knoppenNietKlikbaar: meting.regels.reduce((n, r) => n + ((r.nietKlikbaar || []).length), 0),
       remGeraakt: meting.regels.reduce((n, r) => n + (r.rem || 0), 0),
       weigeringenGetoond: meting.regels.reduce((n, r) => n + ((r.gezegd || []).length), 0),
+      taalWissels: meting.regels.flatMap((r) => (r.taalWissel || []).map((w) => r.app + ': "' + w.knop + '" -> ' + w.naar)),
       /* Welke elementen de meeste kliks opvingen, over alle schermen: een
          handvol dezelfde wijst naar een gedeelde laag (de schil, de Edge),
          een lange staart naar losse schermen. */

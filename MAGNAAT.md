@@ -15,7 +15,7 @@ Op 24 september 2026 is voor het eerst nagemeten wat Magnaat economisch afdwingt
 **Er zijn twee economische motoren, en de goede zit in het verkeerde deel.**
 
 - **World** (Quick en Campaign, `server/kern/spellen/magnaat/`) heeft **geen grootboek**. Een saldo wordt rechtstreeks gezet: `st.geld[h] += verdeeld.eigenaar`. Omzet uit gesimuleerde vraag, rente en boetes hebben geen tegenboeking. Of er geld uit het niets ontstaat, wordt achteraf gecontroleerd door de geldpompmeter. Die vergelijkt totalen binnen een ruismarge, en alleen voor de scenario's die erin geschreven zijn.
-- **Het Oefenkantoor** (`server/kern/magnaat-economie.js`) heeft **strikt dubbel boekhouden**. Een journaalpost zonder idempotentiesleutel of met debet ≠ credit wordt geweigerd, en er is een motorversie. Precies dit deel gaat volgens het besluit hieronder uit Magnaat.
+- **Het Oefenkantoor** (sinds ronde A1 `server/kern/magnaat-economische-motor/`, daarvoor één los bestand) heeft **strikt dubbel boekhouden**. Een journaalpost zonder idempotentiesleutel of met debet ≠ credit wordt geweigerd, en er is een motorversie. Precies dit deel gaat volgens het besluit hieronder uit Magnaat.
 
 De bruikbare financiële kern bestaat dus al; alleen gebruikt het vlaggenschip hem niet. Daaruit volgt het belangrijkste besluit van dit document: **er komt geen tweede grootboek.**
 
@@ -33,7 +33,7 @@ Classic valt buiten de stichtingsregels. Het is een bordspel waarin de bank bij 
 
 **Magnaat World krijgt precies één economische autoriteit.** Er komt dus geen grootboek voor Quick naast een voor Campaign naast een voor het Oefenkantoor.
 
-De motor uit `kern/magnaat-economie.js` wordt niet letterlijk "de game". Uit die motor wordt de economische waarheid gehaald, en die wordt een eigen kern. Daaromheen draaien World (Quick, Campaign, Living World) en het Oefenkantoor. **Het Oefenkantoor mag de kern gebruiken, maar is de kern niet.** Anders draait het vlaggenschip over twee jaar op een trainingsmodule.
+De motor uit het Oefenkantoor (sinds A1 `kern/magnaat-economische-motor/`) wordt niet letterlijk "de game". Uit die motor wordt de economische waarheid gehaald, en die wordt een eigen kern. Daaromheen draaien World (Quick, Campaign, Living World) en het Oefenkantoor. **Het Oefenkantoor mag de kern gebruiken, maar is de kern niet.** Anders draait het vlaggenschip over twee jaar op een trainingsmodule.
 
 **De naam is `economische-motor`** (ronde A1, 24 september 2026): `server/kern/magnaat-economische-motor/`. Gemeten vóór hij bestond: als identifier kwam hij nergens in de code voor, ook niet in `SEMANTIEK.json`; `kern`, `envelop`, `doel` en `SOORTEN` waren bezet. De module heet de economische motor, zijn rol in de architectuur is de **economische autoriteit**. In de grondwet is hij een eigen scope naast de producten: wat daar geldt, geldt voor elke consument die op hem draait.
 

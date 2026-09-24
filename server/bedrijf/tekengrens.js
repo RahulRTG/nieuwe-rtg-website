@@ -10,7 +10,7 @@
       laagste van de twee wint. Beide versmallen alleen; geen van beide verleent
       een recht. Een bestuurder met een vrije naam of als extern vastgelegd telt
       niet mee: vergelijken op een naam die niemand heeft gecontroleerd is raden.
-   2. DE BETAALWIJZE kiest de werkruimte zelf: `extern` (standaard) of `rtgbank`.
+   2. DE BETAALWIJZE kiest de werkruimte zelf: `extern` (standaard) of `rekening`.
       De tweede kan alleen als RTG die weg heeft aangezet (kern/werkbetaling.js).
       Zet RTG hem later uit, dan valt de werkruimte terug op extern, met de reden.
 
@@ -22,18 +22,23 @@
 const EENHEID = require('../kern/geld/eenheid');
 
 module.exports = (sctx) => {
-  const { app, save, schoon, werkPoort, beheerVan, log, eigenVeld, kern } = sctx;
+  const { app, save, schoon, werkPoort, log, eigenVeld, kern } = sctx;
   const euro = (c) => (Number(c || 0) / 100).toFixed(2);
 
+  /* Wie de werkruimte beheert, zet de grens -- maar nooit zijn EIGEN grens: een
+     versmalling die de versmalde zelf kan weghalen, versmalt niets. */
   app.post('/api/bedrijf/lid/tekengrens', (req, res) => {
-    const w = beheerVan(req, res); if (!w) return;
+    const g = werkPoort(req, res, 'werkruimte'); if (!g) return;
+    const w = g.w;
     const l = eigenVeld(w.leden, String(req.body.lidId || ''));
     if (!l) return res.status(404).json({ error: 'Dat lid kennen we niet.' });
+    if (!g.directie && l.id === g.l.id) return res.status(409).json({
+      error: 'Uw eigen tekengrens zet een ander. Een grens die u zelf kunt weghalen, begrenst niets.' });
     const leeg = req.body.bedrag == null || req.body.bedrag === '';
     const centen = leeg ? null : EENHEID.naarCenten(Number(req.body.bedrag));
     if (!leeg && !(centen >= 0)) return res.status(400).json({ error: 'Een tekengrens is een bedrag in euro, of leeg om hem weg te halen.' });
     l.tekengrensCenten = centen;
-    log(w, null, 'tekengrens', l.id, leeg ? 'weg' : euro(centen));
+    log(w, g.directie ? null : g.l, 'tekengrens', l.id, leeg ? 'weg' : euro(centen));
     save();
     res.json({ ok: true, lidId: l.id, tekengrens: leeg ? null : euro(centen),
       let: leeg ? 'Geen tekengrens in de werkruimte. Is de werkruimte aan een entiteit gekoppeld, dan kan de concerngraaf nog een grens geven.'
@@ -42,7 +47,9 @@ module.exports = (sctx) => {
 
   app.post('/api/bedrijf/werkruimte/entiteit', (req, res) => {
     const g = werkPoort(req, res, 'werkruimte'); if (!g) return;
-    if (g.directie || !g.l.rtgKey) return res.status(403).json({
+    /* Het beheer-token is geen gezicht (403); een lid zonder RTG-account heeft een
+       goede sleutel maar geen entiteit om te bezitten (409, en dus niet uitgelogd). */
+    if (g.directie || !g.l.rtgKey) return res.status(g.directie ? 403 : 409).json({
       error: 'Een werkruimte koppelt u aan een entiteit met een lid dat aan zijn eigen RTG-account hangt, niet met het beheer-token.' });
     const id = schoon(req.body.entiteitId, 40);
     if (!id) {
@@ -61,10 +68,10 @@ module.exports = (sctx) => {
   app.post('/api/bedrijf/werkruimte/betaalwijze', (req, res) => {
     const g = werkPoort(req, res, 'werkruimte'); if (!g) return;
     const wijze = String(req.body.wijze || '');
-    if (!['extern', 'rtgbank'].includes(wijze)) return res.status(400).json({ error: 'Kies extern of rtgbank.' });
+    if (!['extern', 'rekening'].includes(wijze)) return res.status(400).json({ error: 'Kies extern of rekening.' });
     const rtg = kern.werkBankpadStand();
-    if (wijze === 'rtgbank' && !rtg.aan) return res.status(409).json({
-      error: 'RTG heeft betalen via RTG Bank voor werkruimtes (nog) niet aangezet.', uitleg: rtg.uitleg });
+    if (wijze === 'rekening' && !rtg.aan) return res.status(409).json({
+      error: 'RTG heeft betalen via RTG Rekening voor werkruimtes (nog) niet aangezet.', uitleg: rtg.uitleg });
     g.w.betaalwijze = wijze;
     log(g.w, g.l, 'betaalwijze', null, wijze);
     save();
@@ -73,10 +80,10 @@ module.exports = (sctx) => {
 
   /* Welke weg geldt NU: de keuze van de werkruimte, tenzij RTG de weg dicht heeft. */
   function betaalwijze(w) {
-    if (w.betaalwijze !== 'rtgbank') return { wijze: 'extern', gekozen: w.betaalwijze || 'extern', reden: null };
+    if (w.betaalwijze !== 'rekening') return { wijze: 'extern', gekozen: w.betaalwijze || 'extern', reden: null };
     const rtg = kern.werkBankpadStand();
-    return rtg.aan ? { wijze: 'rtgbank', gekozen: 'rtgbank', reden: null }
-      : { wijze: 'extern', gekozen: 'rtgbank', reden: 'RTG heeft betalen via RTG Bank uitgezet; tot het weer aan staat, wordt buiten RTG betaald.' };
+    return rtg.aan ? { wijze: 'rekening', gekozen: 'rekening', reden: null }
+      : { wijze: 'extern', gekozen: 'rekening', reden: 'RTG heeft betalen via RTG Rekening uitgezet; tot het weer aan staat, wordt buiten RTG betaald.' };
   }
 
   /* De grendel op het bedrag. Null is door; een object is de weigering. */

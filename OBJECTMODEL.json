@@ -5,12 +5,12 @@
     "bestanden": 2362,
     "vormen": 1426,
     "velden": 2061,
-    "modules": 786,
+    "modules": 787,
     "domeinen": 281,
     "envelopDrempel": 17,
     "envelop": 31,
     "veldenDomeineigen": 1453,
-    "veldenGedeeldVanafVier": 203,
+    "veldenGedeeldVanafVier": 204,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -312,18 +312,6 @@
       ]
     },
     {
-      "veld": "waarde",
-      "domeinen": 11,
-      "waar": [
-        "kern/assets",
-        "kern/bureau",
-        "kern/command",
-        "kern/commercie",
-        "kern/concern",
-        "kern/levensgraaf"
-      ]
-    },
-    {
       "veld": "actief",
       "domeinen": 11,
       "waar": [
@@ -417,6 +405,18 @@
         "kern/gebouw-demo",
         "kern/mobiliteit",
         "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "waarde",
+      "domeinen": 10,
+      "waar": [
+        "kern/assets",
+        "kern/bureau",
+        "kern/command",
+        "kern/commercie",
+        "kern/levensgraaf",
+        "kern/onboarding"
       ]
     },
     {

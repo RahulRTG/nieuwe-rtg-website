@@ -90,7 +90,7 @@ Object.assign(kern, require('../kern/opvang')({ db, save, crypto }));
 Object.assign(kern, require('../kern/afdelingshotel')({ db, save, crypto }));
 Object.assign(kern, require('../kern/regering')({ db, save, crypto, LANDEN,
   regelwacht: kern.regelwacht, bank: kern.bank, opvang: kern.opvang, afdelingen: kern.afdelingen, ledenAantal }));
-/* De Werk OS-uitgave via RTG Bank: de schakelaar van RTG en het bewijs van een
+/* De Werk OS-uitgave via RTG Rekening: de schakelaar van RTG en het bewijs van een
    SEPA-opdracht (kern/werkbetaling.js). Hier, want hij leest kern.bank. */
 Object.assign(kern, require('../kern/werkbetaling')({ db, save, opdrachten: hulp.betaalOpdrachten,
   rekeningenVanLid: kern.bank && kern.bank.rekeningenVanLid }));

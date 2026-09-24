@@ -95,9 +95,8 @@ module.exports = (sctx) => {
 
   /* ---------- goedkeuren ---------- */
   app.post('/api/bedrijf/keur', (req, res) => {
-    /* Geen recht in de poort: WELK recht u claimt is hier juist de vraag. De
-       jurist heeft 'recht' en niet 'geld', de CFO andersom -- porten op een van
-       de twee zou de ander buitensluiten. */
+    /* Geen recht in de poort: WELK recht u claimt is de vraag. Een weigering
+       op een recht draagt `recht`, anders logt het scherm u uit (werk/kern.js). */
     const g = werkPoort(req, res); if (!g) return;
     if (g.directie) return res.status(403).json({
       error: 'Goedkeuren doet een lid met een eigen sleutel, niet het beheer-token. Anders staat er straks een goedkeuring zonder gezicht.' });
@@ -107,7 +106,7 @@ module.exports = (sctx) => {
     if (!obj) return res.status(404).json({ error: 'Dat ' + soort + ' kennen we niet.' });
     const recht = String(req.body.recht || '');
     if (!g.rechten.includes(recht)) return res.status(403).json({
-      error: 'U draagt het recht "' + recht + '" niet, dus u kunt daar niet namens goedkeuren.' });
+      error: 'U draagt het recht "' + recht + '" niet, dus u kunt daar niet namens goedkeuren.', recht });
 
     const s = stand(g.w, soort, obj);
     if (!s.eist.includes(recht)) return res.status(409).json({
@@ -119,7 +118,7 @@ module.exports = (sctx) => {
     /* De indiener en de tekengrens (./uitgave.js). Keuren voor scheppen: lezen
        kan zonder de lijst aan te maken, dus die komt pas na de laatste 409. */
     const grendel = sctx.keurGrendel(g, soort, obj, recht);
-    if (grendel) return res.status(grendel.status).json({ error: grendel.error });
+    if (grendel) return res.status(grendel.status).json({ error: grendel.error, recht });
     const gegeven = Array.isArray(obj.goedkeuringen) ? obj.goedkeuringen : [];
     if (gegeven.some(k => k.lidId === g.l.id && !k.vervallen)) return res.status(409).json({
       error: 'U heeft dit ' + soort + ' al goedgekeurd. Eén mens keurt één keer goed -- anders vinkt iemand met twee rechten een vier-ogen-regel in zijn eentje af.' });
@@ -145,7 +144,7 @@ module.exports = (sctx) => {
     /* Het recht van de MODULE zelf blijft gelden: wie geen contracten mag zien,
        leest hier ook geen contractstand. */
     const nodig = soort === 'contract' ? 'recht' : soort === 'uitgave' ? 'geld' : 'besluit';
-    if (!g.rechten.includes(nodig)) return res.status(403).json({ error: 'Daarvoor mist u het recht "' + nodig + '".' });
+    if (!g.rechten.includes(nodig)) return res.status(403).json({ error: 'Daarvoor mist u het recht "' + nodig + '".', recht: nodig });
     const obj = vind(g.w, soort, req.body.id);
     if (!obj) return res.status(404).json({ error: 'Dat ' + soort + ' kennen we niet.' });
     const s = stand(g.w, soort, obj);

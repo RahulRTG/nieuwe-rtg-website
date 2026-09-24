@@ -451,14 +451,12 @@ function postJson(base) {
    proefpubliek in gezelschap.js). Twee kopieen van dezelfde weg lopen uiteen
    zodra de inlog verandert -- LAT.md regel 4. Geeft null als het niet lukt, zodat
    de aanroeper zelf kan besluiten wat dat betekent. */
-async function kantoorAlsPersoon(base, code, opties) {
+/* `eigenaar`: de login van de eigenaar als de toets een eigen RTG_OWNER_EMAIL zet.
+   Zonder die parameter viel zo'n toets vroeger terug op de gedeelde code, en die
+   weg is dicht -- dan kwam er stil null terug en brak de toets op een later punt. */
+async function kantoorAlsPersoon(base, code, eigenaar) {
   const post = postJson(base);
-  /* `opties.eigenaar`: de e-mail van de eigenaar van DEZE server. Een toets die
-     start met een eigen RTG_OWNER_EMAIL heeft een andere demo-eigenaar dan de
-     standaard, en die kon hier niet binnenkomen -- dan gaf dit hulpje null en
-     viel alles wat een kantoormens nodig had om. */
-  const login = (opties && opties.eigenaar) || 'roellie.i@gmail.com';
-  const eig = await post('/api/auth/login', { login, password: 'Imran', pasApp: 'business' });
+  const eig = await post('/api/auth/login', { login: eigenaar || 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
   if (eig && eig.token) {
     const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
     if (kantoor && kantoor.token) return kantoor.token;
@@ -1191,39 +1189,9 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
    bewegen en loslaten synchroon worden afgeleverd. Een timer kan niet midden
    in één JavaScript-taak vallen. Ook die poging loopt door precies dezelfde
    pointerlisteners; alleen de CI-planner zit er niet meer tussen. Geen langere
-   wachttijden: die maken een dobbelsteen stiller, niet eerlijker.
-
-   DE WEG DIE HIJ NAM, EN WAAROM DIE TERUGKOMT. De terugval hierboven maakt de
-   race onschadelijk, maar daarmee ook onzichtbaar: een proef die groen staat
-   zegt niet of dat via de browser kwam of via de rendererpoging, en hoe vaak
-   die tweede afgaat telde nergens (EDGE.md par. 11, ronde 2). veegDoor geeft
-   daarom terug welke weg het werd: 'vlucht' (de protocolvlucht naar Chromium)
-   of 'terugval' (de poging in de renderer). Wie het niet wil weten, negeert het.
-
-   LOSLATEN IS EEN KEUZE. Met { loslaten: false } blijft de knop ingedrukt,
-   zodat een proef kan kijken naar wat er ONDER een halve veeg ligt en daarna
-   zelf loslaat met een echte page.mouse.up(). Dat geldt voor BEIDE wegen: in
-   de vlucht gaat er geen mouseReleased achteraan, en de terugval heeft een
-   eigen staart -- synthetisch neer en bewegen, zonder pointerup. De enige
-   pointerup die de terugval dan nog stuurt, is die van de mislukte vlucht
-   ervoor; na de laatste pointerdown komt er geen. Lukt de rendererpoging niet,
-   dan wordt er wel losgelaten: een gebaar dat niet begon, hoort niet te
-   blijven hangen terwijl de fout wordt gemeld. */
+   wachttijden: die maken een dobbelsteen stiller, niet eerlijker. */
 async function veegDoor(page, doos, opties) {
   const o = opties || {};
-  const loslaten = o.loslaten !== false;
-  /* DE TABEL EERST (ronde 2, stap 10). Lang drukken en stilstaan lezen hun
-     drempel uit de grammatica, en de gebaarlaag laadt die zacht bij de eerste
-     zet() of lijst(). Een veeg die valt voordat hij er is, veegt over een laag
-     zonder lang drukken: dan is er geen wedloop, en bewijst de proef minder dan
-     hij lijkt. Waar de gebaarlaag staat, wacht de helper dus op de tabel. Komt
-     hij niet, dan is dat een gebrek van de laag en geen reden om zonder te vegen. */
-  const tabel = await page.waitForFunction(() => !window.RTGGebaar || !!window.RTGGrammatica, null,
-    { timeout: geduld(5000) }).then(() => true, () => false);
-  if (!tabel) {
-    throw new Error('de gebaarlaag staat er, maar de grammatica kwam niet (shared/gebaar/gebaar-01.js laadt hem ' +
-      'bij de eerste zet() of lijst()); zonder DREMPELS is lang drukken uit en meet deze veeg iets anders dan hij lijkt');
-  }
   const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
   const x0 = doos.x + doos.width * (Number.isFinite(o.startFractie) ? o.startFractie : 0.8);
   /* Dezelfde racevrije aanzet is ook nodig voor een halve veeg die alleen een
@@ -1251,8 +1219,8 @@ async function veegDoor(page, doos, opties) {
     const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
     if (begonnen) {
       for (let i = 2; i <= stappen; i++) await beweeg(x0 + (px * i) / stappen, true);
-      if (loslaten) await los(x0 + px);
-      return 'vlucht';
+      await los(x0 + px);
+      return;
     }
 
     await los(x0 + eerste);
@@ -1264,7 +1232,7 @@ async function veegDoor(page, doos, opties) {
     await page.waitForFunction(() => !document.querySelector('.gb-blad,.gb-lade,[data-gb]'), null,
       { timeout: 5000 }).catch(() => {});
     const rendererPoging = await page.evaluate(({
-      x0, y, px, stappen, eerste, kiezer, startFractie, afstand, vanBoven, loslaten
+      x0, y, px, stappen, eerste, kiezer, startFractie, afstand, vanBoven
     }) => {
       /* De regel uit zijn rechthoek, niet het toevallige bovenste element op
          dat punt. Na een langdruk kan daar nog één frame een verdwijnende
@@ -1323,19 +1291,17 @@ async function veegDoor(page, doos, opties) {
         for (let i = 2; i <= stappen; i++)
           stuur('pointermove', beginX + (verschuiving * i) / stappen, 1);
       }
-      if (!begon) { stuur('pointerup', beginX + eersteStap, 0); return 'niet-opgepakt'; }
-      if (loslaten) stuur('pointerup', beginX + verschuiving, 0);
-      return true;
+      stuur('pointerup', beginX + (begon ? verschuiving : eersteStap), 0);
+      return begon ? true : 'niet-opgepakt';
     }, {
       x0, y, px, stappen, eerste, kiezer: o.kiezer || null,
-      startFractie: o.startFractie, afstand: o.afstand, vanBoven: o.vanBoven, loslaten
+      startFractie: o.startFractie, afstand: o.afstand, vanBoven: o.vanBoven
     });
     if (rendererPoging !== true) {
       throw new Error('het gebaar begon niet via browserinput en ook niet in één rendererhandeling (' +
         (rendererPoging === 'geen-rij' ? 'er stond geen enkele .gb-rij op het scherm'
           : 'de gebaarlaag pakte de beweging niet op') + '); dan is de gebaarbedrading zelf stuk.');
     }
-    return 'terugval';
   } finally {
     await cdp.detach();
   }

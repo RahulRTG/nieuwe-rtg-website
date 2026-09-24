@@ -67,7 +67,7 @@ module.exports = (ctx) => {
   require('./uitnodiging')(ctx);
   /* Een eigen sleutel per zaakdoos (fase 7) staat in ./doossleutels.js. */
   require('./doossleutels')(ctx);
-  /* De weg "Werk OS-uitgave via RTG Bank" aan of uit staat in ./werkbetaling.js. */
+  /* De weg "Werk OS-uitgave via RTG Rekening" aan of uit staat in ./werkbetaling.js. */
   require('./werkbetaling')(ctx);
 
   /* De schakelroutes van de kast (globaal, fijn, genre, de grote hendel en de

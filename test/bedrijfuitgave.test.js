@@ -85,6 +85,18 @@ test('2-3. de indiener keurt niet goed, een ander wel; een regel telt mee', asyn
   assert.deepEqual(stand.ontbreekt, ['recht'], 'de regel houdt hem vast tot de jurist keurt');
 });
 
+test('4a. een lid zet nooit zijn eigen tekengrens, wel die van een ander', async () => {
+  const zelf = await api('/api/bedrijf/lid/tekengrens', Object.assign({ lidId: LIDID[DIR.lidToken], bedrag: 99999 }, DIR));
+  assert.equal(zelf.status, 409, JSON.stringify(zelf.body));
+  assert.match(zelf.body.error, /eigen tekengrens zet een ander/);
+  const ander = await api('/api/bedrijf/lid/tekengrens', Object.assign({ lidId: LIDID[CFO.lidToken], bedrag: 700 }, DIR));
+  assert.equal(ander.status, 200, JSON.stringify(ander.body));
+  assert.equal(ander.body.tekengrens, '700.00');
+  await api('/api/bedrijf/lid/tekengrens', Object.assign({ lidId: LIDID[CFO.lidToken], bedrag: '' }, DIR));
+  const fin = await api('/api/bedrijf/lid/tekengrens', Object.assign({ lidId: LIDID[CFO.lidToken], bedrag: 1 }, FIN));
+  assert.equal(fin.status, 403, 'zonder het recht werkruimte zet niemand een grens: ' + JSON.stringify(fin.body));
+});
+
 test('4. een tekengrens versmalt, en weghalen haalt de versmalling weg', async () => {
   const u = (await maak(FIN, 800)).body.uitgave;
   const zet = await api('/api/bedrijf/lid/tekengrens', { werkruimte: W, beheerToken: B, lidId: LIDID[CFO.lidToken], bedrag: 500 });
@@ -92,6 +104,12 @@ test('4. een tekengrens versmalt, en weghalen haalt de versmalling weg', async (
   const boven = await keur(CFO, u.id);
   assert.equal(boven.status, 403, JSON.stringify(boven.body));
   assert.match(boven.body.error, /tekengrens van 500\.00/);
+  /* Het scherm (werk/kern.js) logt uit bij een 403 ZONDER \`recht\`: een weigering op
+     een grens of een recht hoort dat veld te dragen, anders verliest de CFO zijn sessie. */
+  assert.equal(boven.body.recht, 'geld.goedkeuren', 'de weigering op de grens draagt het recht');
+  const fin = await keur(FIN, u.id);
+  assert.equal(fin.status, 403);
+  assert.equal(fin.body.recht, 'geld.goedkeuren', 'een ontbrekend recht ook: ' + JSON.stringify(fin.body));
   const klein = (await maak(FIN, 400)).body.uitgave;
   assert.equal((await keur(CFO, klein.id)).status, 200, 'onder de grens gaat het gewoon');
   await api('/api/bedrijf/lid/tekengrens', { werkruimte: W, beheerToken: B, lidId: LIDID[CFO.lidToken], bedrag: '' });

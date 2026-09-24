@@ -1,6 +1,6 @@
 /* WERK OS-UITGAVE VIA RTG BANK -- de schakelaar van RTG en het bewijs van een
    betaling. Besluit van de eigenaar (23 september 2026): een werkruimte kiest
-   zelf of een goedgekeurde uitgave buiten RTG wordt betaald of via RTG Bank, en
+   zelf of een goedgekeurde uitgave buiten RTG wordt betaald of via RTG Rekening, en
    RTG zet die tweede weg als geheel aan of uit.
 
    WAT "VIA RTG BANK" HIER BETEKENT, EN WAT NIET. De meting vooraf vond dat een
@@ -30,12 +30,12 @@ module.exports = ({ db, save, opdrachten, rekeningenVanLid }) => {
     const k = eigen.kijk('werkBankpad') || {};
     return { aan: k.aan === true, door: k.door || null, at: k.at || null,
       uitleg: k.aan === true
-        ? 'Een werkruimte mag kiezen dat een goedgekeurde uitgave via RTG Bank wordt betaald: een mens die niet de indiener is, maakt de SEPA-overboeking vanaf zijn eigen RTG-rekening, en het Werk OS controleert die voordat de uitgave betaald heet.'
+        ? 'Een werkruimte mag kiezen dat een goedgekeurde uitgave via RTG Rekening wordt betaald: een mens die niet de indiener is, maakt de SEPA-overboeking vanaf zijn eigen RTG-rekening, en het Werk OS controleert die voordat de uitgave betaald heet.'
         : 'Uit (standaard). Werkruimtes betalen een goedgekeurde uitgave buiten RTG en noteren dat met een kenmerk.' };
   }
 
   function zet({ aan, wie }) {
-    if (typeof aan !== 'boolean') return { status: 400, error: 'Zet de weg via RTG Bank aan (true) of uit (false).' };
+    if (typeof aan !== 'boolean') return { status: 400, error: 'Zet de weg via RTG Rekening aan (true) of uit (false).' };
     const k = eigen.bak('werkBankpad');
     k.aan = aan; k.door = wie || null; k.at = new Date().toISOString();
     save();

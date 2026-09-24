@@ -210,7 +210,7 @@ De migratievolgorde volgt de categorieën, zodat elke stap apart tegen het oude 
 
 **Wat A2.1 veranderde, gemeten tegen World van ervoor:**
 - Elke spelactie kreeg hetzelfde antwoord.
-- De kassen schoven na 12 tot 15 maanden hooguit € 1,97. Het maandresultaat werd vroeger op hele euro's afgerond en nu één keer op centen.
+- De kassen schoven na 12 tot 15 maanden hooguit € 2. Het maandresultaat werd vroeger als geheel op hele euro's afgerond. Nu is het de som van **acht gebeurtenissen die elk één keer op centen worden afgerond**: verkoop, contractomzet en zes kostenposten. Dat is met opzet zo, zodat de acht losse boekingen van A2.8 exact hetzelfde resultaat geven als deze baseline. In de eerste versie van A2.1 werd het resultaat nog als één bedrag afgerond. Dat zou in A2.8 de baseline hebben gebroken, en is daarom vóór het bevriezen hersteld.
 - **Een contractbetaling draagt aan beide kanten exact hetzelfde bedrag.** Vroeger rondde de leverancier over het totaal van zijn contracten af en betaalde elke afnemer zijn eigen, onafgeronde deel. De toets daarvoor controleert eerst of zijn eigen opstelling gevoelig genoeg is: één keer afronden over het totaal geeft er een andere cent dan afronden per contract. Anders zou hij alleen bij toeval kunnen zakken.
 - **Een lening met minder dan één euro restant werd kwijtgescholden** (`if (l.restant < 1)`). In centen is dat hooguit één cent, dus in feite niets meer.
 - De geldpomp-meter vindt de lekkende scenario's nu **exact op nul**. Voorheen stond daar een marge van 25 euro afrondingsruis.

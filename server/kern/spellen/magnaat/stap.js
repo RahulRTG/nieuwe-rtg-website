@@ -30,7 +30,7 @@ const { SECTOREN } = require('./sectoren');
 const { prijsVan, LATFACTOR, KOSTENSTAND } = require('./prijsstand');
 const { vraagVoor } = require('./vraag');
 const H = require('./handel');
-const { uitCenten, contractCenten: vanContract, resultaatCenten } = require('./centen');
+const { contractOmzet, maandDelen } = require('./centen');
 
 const rond = (n) => Math.round(n);
 const klem = (n, min, max) => Math.max(min, Math.min(max, n));
@@ -96,8 +96,8 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
      contract gratis geld en tekent iedereen alles. Zie ./handel.js. */
   const toegezegd = (contract && contract.eenheden) || 0;
   const { cap, geleverd, deel: leverDeel } = levering(v, arbeid, toegezegd);
-  const contractCenten = vanContract(contract);
-  const leverOmzet = contractCenten !== null ? uitCenten(contractCenten) : ((contract && contract.bedrag) || 0) * leverDeel;
+  const co = contractOmzet(contract, leverDeel);
+  const leverOmzet = co.euro;
 
   const verkocht = Math.min(gevraagd, Math.max(0, cap - geleverd));
   const gemist = Math.max(0, gevraagd - Math.max(0, cap - geleverd));
@@ -122,6 +122,8 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
   const onderhoudKosten = v.onderhoudBudget || 0;
   const kosten = inkoop + lonen + vast + huur + marketing + onderhoudKosten;
   const resultaat = omzet - kosten;
+  const delen = maandDelen({ verkoop: omzet - leverOmzet, contract: co.centen,
+    inkoop, lonen, vast, huur, marketing, onderhoud: onderhoudKosten });
 
   // de staat van het pand: zakt vanzelf, stijgt met wat je eraan besteedt
   const nodig = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1) * 0.35;
@@ -148,7 +150,7 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
     omzet: rond(omzet), inkoop: rond(inkoop), lonen: rond(lonen), vast: rond(vast),
     huur: rond(huur), marketing: rond(marketing), onderhoud: rond(onderhoudKosten),
     kosten: rond(kosten), resultaat: rond(resultaat),
-    resultaatCenten: resultaatCenten(resultaat, contractCenten),
+    resultaatCenten: delen.resultaat, delenCenten: delen,
     staat: Math.round(v.onderhoud), reputatie: Math.round(v.reputatie),
     /* De kwaliteit die deze maand geleverd is, ONGEWOGEN door de prijsstand:
        een kwaliteitseis in een contract gaat over wat er geleverd wordt en niet
@@ -157,7 +159,7 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
        twee antwoorden op dezelfde vraag. */
     kwaliteit: Math.round(kwaliteit(v, bezet, arbeid)),
     levering: toegezegd > 0
-      ? { toegezegd: rond(toegezegd), geleverd: rond(geleverd), deel: leverDeel, omzet: rond(leverOmzet), omzetCenten: contractCenten }
+      ? { toegezegd: rond(toegezegd), geleverd: rond(geleverd), deel: leverDeel, omzet: rond(leverOmzet), omzetCenten: co.centen }
       : null,
     korting: rond(korting),
     stappen: vr.stappen

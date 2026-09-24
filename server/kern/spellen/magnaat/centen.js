@@ -50,12 +50,30 @@ const euroTonen = (cent) => Math.round(uitCenten(cent));
    als er niets is vastgesteld; dan rekent de stap zoals voor A2.1. */
 const contractCenten = (contract) =>
   (contract && Number.isSafeInteger(contract.betalingCenten) ? contract.betalingCenten : null);
+/* Dezelfde omzet in beide eenheden: `centen` is wat er betaald is, `euro` rekent
+   de stap mee. Zonder vastgesteld bedrag rekent hij zoals voor A2.1 en wordt dat
+   een keer afgerond. */
+function contractOmzet(contract, leverDeel) {
+  const c = contractCenten(contract);
+  if (c !== null) return { centen: c, euro: uitCenten(c) };
+  const euro = ((contract && contract.bedrag) || 0) * leverDeel;
+  return { centen: naarCenten(euro), euro };
+}
 
-/* HET MAANDRESULTAAT ALS GELD, EEN KEER AFGEROND: de contractomzet zoals hij is
-   betaald, plus de rest van de maand tot centen. `resultaat` is in euro's en
-   bevat de contractomzet al; die wordt er exact weer uitgehaald. */
-const resultaatCenten = (resultaat, contract) =>
-  (contract === null ? naarCenten(resultaat) : contract + naarCenten(resultaat - uitCenten(contract)));
+/* HET MAANDRESULTAAT ALS GELD. Het zijn acht gebeurtenissen (de geldkaart, G12)
+   en elk wordt EEN keer afgerond: de verkoop, de contractomzet zoals hij is
+   betaald, en de zes kostenposten. Het resultaat is hun som, zodat het straks
+   exact hetzelfde is als acht losse boekingen in het grootboek. Bedragen in
+   euro's, behalve `contract`, dat al in centen is. */
+function maandDelen({ verkoop, contract, inkoop, lonen, vast, huur, marketing, onderhoud }) {
+  const d = {
+    VERKOOP: naarCenten(verkoop), CONTRACT_BETALING: contract, INKOOP: naarCenten(inkoop),
+    LOON: naarCenten(lonen), VASTE_LASTEN: naarCenten(vast), HUUR: naarCenten(huur),
+    MARKETING: naarCenten(marketing), ONDERHOUD: naarCenten(onderhoud)
+  };
+  d.resultaat = d.VERKOOP + d.CONTRACT_BETALING - d.INKOOP - d.LOON - d.VASTE_LASTEN - d.HUUR - d.MARKETING - d.ONDERHOUD;
+  return d;
+}
 
 /* DE MONETAIRE VELDEN van een World-partij. Een lijst op een plek, voor twee
    dingen die nooit uit elkaar mogen lopen: de eenmalige omzetting van een
@@ -90,4 +108,4 @@ function zorgEenheid(st) {
   return true;
 }
 
-module.exports = { naarCenten, uitCenten, euroTonen, contractCenten, resultaatCenten, MONETAIR, elkMonetairVeld, zorgEenheid, WORLD_REGELVERSIE, EENHEID };
+module.exports = { naarCenten, uitCenten, euroTonen, contractCenten, contractOmzet, maandDelen, MONETAIR, elkMonetairVeld, zorgEenheid, WORLD_REGELVERSIE, EENHEID };

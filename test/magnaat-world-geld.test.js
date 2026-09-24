@@ -13,7 +13,9 @@
       is dezelfde als die van de omzetting van een oude partij.
    5. Beide kanten van een contractbetaling dragen exact hetzelfde bedrag.
    6. De canonieke geldfunctie op haar grenzen.
-   7. Een partij van voor A2.1 wordt een keer omgezet, en nooit twee keer. */
+   7. Een partij van voor A2.1 wordt een keer omgezet, en nooit twee keer.
+   8. Het maandresultaat is de som van acht gebeurtenissen, elk een keer
+      afgerond -- zodat acht losse boekingen in A2.8 exact hetzelfde geven. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -164,4 +166,26 @@ test('7. een partij van voor A2.1 wordt een keer omgezet, en nooit twee keer', (
   assert.equal(st.regelversie, C.WORLD_REGELVERSIE);
   assert.equal(C.zorgEenheid(st), false, 'een tweede keer verandert niets');
   assert.equal(st.geld.a, 123457);
+});
+
+test('8. het maandresultaat is de som van acht gebeurtenissen, elk een keer afgerond', () => {
+  const DELEN = ['VERKOOP', 'CONTRACT_BETALING', 'INKOOP', 'LOON', 'VASTE_LASTEN', 'HUUR', 'MARKETING', 'ONDERHOUD'];
+  let regels = 0;
+  for (const naam of Object.keys(SCENARIOS)) {
+    draai(naam, {
+      naElkeStap(w, stap) {
+        if (stap[0] !== 'maand') return;
+        for (const h of Object.keys(w.st.laatste)) {
+          for (const r of ((w.st.laatste[h] || {}).regels || []).filter(x => x.delenCenten)) {
+            regels++;
+            const d = r.delenCenten;
+            for (const deel of DELEN) assert.ok(Number.isSafeInteger(d[deel]), naam + ': ' + deel + ' = ' + d[deel]);
+            const som = d.VERKOOP + d.CONTRACT_BETALING - d.INKOOP - d.LOON - d.VASTE_LASTEN - d.HUUR - d.MARKETING - d.ONDERHOUD;
+            assert.equal(r.resultaatCenten, som, naam + ': het resultaat is precies de som van de acht delen');
+          }
+        }
+      }
+    });
+  }
+  assert.ok(regels > 5, 'de toets zag echte maandregels (' + regels + ')');
 });

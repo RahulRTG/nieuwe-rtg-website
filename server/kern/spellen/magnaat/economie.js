@@ -19,11 +19,9 @@
    De descriptor draagt dat via `buitenBeurt`, en de motor houdt zich eraan door
    niets anders te doen dan wat de speler vraagt.
 
-   WAT ER IN DEZE FASE NOG NIET IS, en dat staat hier zodat niemand het
-   misverstaat: contracten tussen spelers, aandelen, banken, verzekeringen,
-   onderzoek, veilingen, AI-managers en de permanente wereld. Fase B en C in
-   GAMEHALL.md paragraaf 12.9. Wat er WEL is, is een economie die je kunt
-   spelen, en dat was de eis. */
+   GELD krijgt in ronde A2 een grootboek (./boekhouding.js): hier bestaat het
+   al per partij, en vanaf A2.3 boekt World erdoor (MAGNAAT.md).
+   Nog niet: onderzoek, AI-managers en de permanente wereld (GAMEHALL.md 12.9). */
 const { kaart, STEDENLIJST, stadNaam, stadSleutel } = require('./kaart');
 const { SECTORLIJST } = require('./sectoren');
 const { waarde } = require('./stap');
@@ -45,6 +43,7 @@ const rond = (n) => Math.round(n);
 
 module.exports = (ctx) => {
   const { db, save, codenaamVan, nudge, magnaatLeren } = ctx;
+  const boek = require('./boekhouding').maakBoekhouding({ db });
   const hospitality = require('./hospitality');
   const worldModel = require('../../hospitality-universe/world-model');
 

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T16:11:39.741Z",
-    "commit": "e5e2eb9f",
+    "op": "2026-09-24T21:40:29.596Z",
+    "commit": "bd4e35b2",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -9108,6 +9108,14 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "tegenvoorbeeld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/tegenvoorbeeld.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "tekstbinding.test.js": {
       "soort": "puur",

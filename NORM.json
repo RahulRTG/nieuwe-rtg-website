@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1731,
-    "toetsenNietGemeten": 626,
+    "toetsenNietGemeten": 627,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -148,6 +148,16 @@
     "edgeVeldTrust": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-24",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 626,
+      "vervalt": "2026-12-24",
+      "meter": "toetsenNietGemeten 626 -> 627",
+      "reden": "test/samentekenen.test.js is nieuw (samen tekenen, besluit van de eigenaar van 24 september 2026). Met de hand nagetrokken met tien mutaties op bedrijf/samentekenen.js, de regelpoort en het loskoppelen; alle tien zakken, waarvan een pas na een extra bewering. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
     {
       "datum": "2026-09-23",
       "soort": "structureel",

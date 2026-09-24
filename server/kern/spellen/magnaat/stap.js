@@ -30,7 +30,7 @@ const { SECTOREN } = require('./sectoren');
 const { prijsVan, LATFACTOR, KOSTENSTAND } = require('./prijsstand');
 const { vraagVoor } = require('./vraag');
 const H = require('./handel');
-const { naarCenten, uitCenten } = require('./centen');
+const { uitCenten, contractCenten: vanContract, resultaatCenten } = require('./centen');
 
 const rond = (n) => Math.round(n);
 const klem = (n, min, max) => Math.max(min, Math.min(max, n));
@@ -96,10 +96,7 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
      contract gratis geld en tekent iedereen alles. Zie ./handel.js. */
   const toegezegd = (contract && contract.eenheden) || 0;
   const { cap, geleverd, deel: leverDeel } = levering(v, arbeid, toegezegd);
-  /* Wat de contracten opleveren: als de maand van de wereld het per contract al
-     in centen heeft vastgesteld (../maand.js), precies die som -- dan ontvangt
-     de leverancier tot op de cent wat zijn afnemers betalen. */
-  const contractCenten = contract && Number.isSafeInteger(contract.betalingCenten) ? contract.betalingCenten : null;
+  const contractCenten = vanContract(contract);
   const leverOmzet = contractCenten !== null ? uitCenten(contractCenten) : ((contract && contract.bedrag) || 0) * leverDeel;
 
   const verkocht = Math.min(gevraagd, Math.max(0, cap - geleverd));
@@ -151,10 +148,7 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
     omzet: rond(omzet), inkoop: rond(inkoop), lonen: rond(lonen), vast: rond(vast),
     huur: rond(huur), marketing: rond(marketing), onderhoud: rond(onderhoudKosten),
     kosten: rond(kosten), resultaat: rond(resultaat),
-    /* HET RESULTAAT ALS GELD, EEN KEER AFGEROND (./centen.js): de contractomzet
-       zoals hij is betaald, plus de rest van de maand tot centen. `resultaat`
-       hierboven is wat het scherm toont, in hele euro's. */
-    resultaatCenten: (contractCenten || 0) + naarCenten(resultaat - (contractCenten !== null ? leverOmzet : 0)),
+    resultaatCenten: resultaatCenten(resultaat, contractCenten),
     staat: Math.round(v.onderhoud), reputatie: Math.round(v.reputatie),
     /* De kwaliteit die deze maand geleverd is, ONGEWOGEN door de prijsstand:
        een kwaliteitseis in een contract gaat over wat er geleverd wordt en niet

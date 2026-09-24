@@ -44,6 +44,19 @@ const uitCenten = (cent) => (Number(cent) || 0) / 100;
 /* Wat een scherm of verslag ziet: hele euro's, zoals voor A2.1. */
 const euroTonen = (cent) => Math.round(uitCenten(cent));
 
+/* DE CONTRACTOMZET VAN EEN LEVERANCIER (./stap.js): als de maand het bedrag
+   per contract al in centen heeft vastgesteld (./maand-contracten.js), precies
+   die som -- dan ontvangt hij tot op de cent wat zijn afnemers betalen. `null`
+   als er niets is vastgesteld; dan rekent de stap zoals voor A2.1. */
+const contractCenten = (contract) =>
+  (contract && Number.isSafeInteger(contract.betalingCenten) ? contract.betalingCenten : null);
+
+/* HET MAANDRESULTAAT ALS GELD, EEN KEER AFGEROND: de contractomzet zoals hij is
+   betaald, plus de rest van de maand tot centen. `resultaat` is in euro's en
+   bevat de contractomzet al; die wordt er exact weer uitgehaald. */
+const resultaatCenten = (resultaat, contract) =>
+  (contract === null ? naarCenten(resultaat) : contract + naarCenten(resultaat - uitCenten(contract)));
+
 /* DE MONETAIRE VELDEN van een World-partij. Een lijst op een plek, voor twee
    dingen die nooit uit elkaar mogen lopen: de eenmalige omzetting van een
    partij van voor A2.1 (`zorgEenheid`), en de toets dat elk van deze velden na
@@ -77,4 +90,4 @@ function zorgEenheid(st) {
   return true;
 }
 
-module.exports = { naarCenten, uitCenten, euroTonen, MONETAIR, elkMonetairVeld, zorgEenheid, WORLD_REGELVERSIE, EENHEID };
+module.exports = { naarCenten, uitCenten, euroTonen, contractCenten, resultaatCenten, MONETAIR, elkMonetairVeld, zorgEenheid, WORLD_REGELVERSIE, EENHEID };

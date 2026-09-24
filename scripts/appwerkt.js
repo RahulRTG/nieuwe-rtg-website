@@ -323,6 +323,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.geklikt = bediening.geklikt;
   r.overgeslagen = bediening.overgeslagen;
   r.nietKlikbaar = bediening.nietKlikbaar;
+  r.onderschept = bediening.onderschept;
   if (bediening.instrument.length) r.waarnemingen.push('proef: ' + bediening.instrument.join('; '));
   const stuk = [...bediening.crash, ...bediening.serverfout];
   /* De uitsplitsing staat ALTIJD in de reden, ook bij een geslaagde rij: "3
@@ -414,11 +415,24 @@ async function bezoek(ctx, base, pad) {
 }
 
 /* ---- de bediening: tikken op wat er staat ---- */
+/* Het element dat de klik opving, uit de log van Playwright: "<a ...>…</a> from
+   <div id="x" ...>…</div> subtree intercepts pointer events" -> div#x. Bij een
+   subtree telt de WORTEL (die ligt over de knop), niet het kind. */
+function onderschepper(log) {
+  const m = /(<[a-z][^>]*>)(?:[^<]*<\/[a-z0-9-]+>)?\s+(?:from\s+(<[a-z][^>]*>)(?:[^<]*<\/[a-z0-9-]+>)?\s+subtree\s+)?intercepts pointer events/i.exec(String(log || ''));
+  if (!m) return 'onbekend';
+  const el = m[2] || m[1];
+  const tag = (/^<([a-z0-9-]+)/i.exec(el) || [])[1] || '?';
+  const id = (/\sid="([^"]+)"/.exec(el) || [])[1];
+  const klas = ((/\sclass="([^"]+)"/.exec(el) || [])[1] || '').trim().split(/\s+/).filter(Boolean).slice(0, 2);
+  return tag.toLowerCase() + (id ? '#' + id : '') + klas.map((c) => '.' + c).join('');
+}
+
 async function bedien(ctx, base, pad) {
   const page = await ctx.newPage();
   const crash = [], config = [], serverfout = [];
   let geklikt = 0, gevonden = 0;
-  const overgeslagen = [], nietKlikbaar = [], instrument = [];
+  const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
@@ -455,6 +469,11 @@ async function bedien(ctx, base, pad) {
         const log = String(e.message || e);
         const waarom = (log.match(/intercepts pointer events|element is not visible|element is not stable|element is not enabled|element is outside of the viewport/i) || ['reden niet gemeld'])[0];
         nietKlikbaar.push((k.tekst || '(naamloos)') + ': ' + waarom);
+        /* WIE ligt erover. "intercepts pointer events" alleen zegt niet of het
+           een lade is die een mens eerst dichttikt of een balk die de knop
+           voorgoed bedekt (BETROUWBAARHEID.md par. 7, stap 1). Playwright noemt
+           het element; dat wordt bewaard als tag#id.klasse, zonder tekst. */
+        if (/intercepts pointer events/i.test(waarom)) onderschept.push({ knop: k.tekst || '(naamloos)', door: onderschepper(log) });
       }
       if (page.url().replace(base, '').split('#')[0] !== pad) {
         try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1500); } catch (e) { break; }
@@ -464,7 +483,7 @@ async function bedien(ctx, base, pad) {
     instrument.push('bediening mislukt: ' + String(e.message || e).split('\n')[0].slice(0, 140));
   }
   await page.close();
-  return { geklikt, gevonden, overgeslagen, nietKlikbaar, instrument, crash, config, serverfout };
+  return { geklikt, gevonden, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -548,6 +567,12 @@ function bouw(meting) {
       knoppenGevonden: meting.regels.reduce((n, r) => n + (r.gevonden || 0), 0),
       knoppenAangetikt: meting.regels.reduce((n, r) => n + (r.geklikt || 0), 0),
       knoppenNietKlikbaar: meting.regels.reduce((n, r) => n + ((r.nietKlikbaar || []).length), 0),
+      /* Welke elementen de meeste kliks opvingen, over alle schermen: een
+         handvol dezelfde wijst naar een gedeelde laag (de schil, de Edge),
+         een lange staart naar losse schermen. */
+      onderscheppers: Object.fromEntries(Object.entries(meting.regels.reduce((t, r) => {
+        for (const o of r.onderschept || []) t[o.door] = (t[o.door] || 0) + 1; return t; }, {}))
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))),
       /* De eerlijkste maat voor hoe dun bewijs 2 is: op hoeveel schermen bleef
          meer dan de helft van wat er stond onaangeraakt? */
       schermenGrotendeelsOngemeten: meting.regels.filter((r) => (r.gevonden || 0) > 0
@@ -572,6 +597,8 @@ function bouw(meting) {
    "require('./scripts/appwerkt')" -- mag geen browserronde starten en geen
    register overschrijven; dat is precies hoe ROLPROEF.json ooit van 3377 naar
    292 beproefde routes terugviel. */
+module.exports = { onderschepper };
+
 if (require.main === module) (async () => {
   /* Een gefilterde ronde vergelijken met het VOLLEDIGE register telt appels bij
      peren: minder rijen geeft altijd minder defecten, dus de ratel zou altijd

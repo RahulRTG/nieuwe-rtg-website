@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-24",
   "gemeten": {
-    "bestanden": 2368,
-    "vormen": 1426,
-    "velden": 2062,
-    "modules": 787,
+    "bestanden": 2371,
+    "vormen": 1425,
+    "velden": 2059,
+    "modules": 786,
     "domeinen": 281,
     "envelopDrempel": 17,
     "envelop": 31,
-    "veldenDomeineigen": 1453,
+    "veldenDomeineigen": 1452,
     "veldenGedeeldVanafVier": 204,
     "gelijkendeVormparen": 20
   },
@@ -324,18 +324,6 @@
       ]
     },
     {
-      "veld": "bewijs",
-      "domeinen": 11,
-      "waar": [
-        "kern/betaalwaarheid",
-        "kern/horeca",
-        "kern/invoer",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
-      ]
-    },
-    {
       "veld": "voor",
       "domeinen": 11,
       "waar": [
@@ -513,6 +501,18 @@
         "kern/leverancier",
         "kern/lidacties",
         "kern/personeel"
+      ]
+    },
+    {
+      "veld": "bewijs",
+      "domeinen": 10,
+      "waar": [
+        "kern/horeca",
+        "kern/invoer",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties",
+        "kern/magnaatwereld"
       ]
     },
     {

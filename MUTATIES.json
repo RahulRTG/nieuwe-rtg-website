@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T12:08:24.278Z",
-    "commit": "870382d67",
+    "op": "2026-09-24T12:38:22.087Z",
+    "commit": "e23bd052e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5233,6 +5233,14 @@
       "module": "server/kern/magnaat-capabilities.js",
       "operator": ">=->>#0",
       "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "magnaat-world-boekhouding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/boekhouding.js",
+      "operator": "getal+1#0",
+      "gezakt": 2,
       "geprobeerd": 3
     },
     "magnaat-world-geld.test.js": {

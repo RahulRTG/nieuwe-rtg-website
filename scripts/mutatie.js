@@ -460,6 +460,11 @@ const EIGEN_MODULE = new Map([
      veegDoor nam, en vasthouden zonder loslaten. De liegpoort raakt hem niet,
      want er gaat geen antwoord van een route in om; de module is test/helper.js. */
   ['helper-veegdoor.e2e.js', ['test/helper.js']],
+  /* DE POORTREEKS (24 september 2026). De toets legt efemeerBereik() een eigen
+     kernellezing voor en vrijePoortReeks() een eigen bereik; er gaat geen
+     antwoord van een route in om, dus de liegpoort zou hem laten "overleven"
+     terwijl hij alleen test/helper.js op de proef stelt. */
+  ['poortreeks.test.js', ['test/helper.js']],
   // The document pilot reaches this handler through HTTP, browser or child processes.
   ['document-equivalence.e2e.js', ['server/kern/document-capability.js']],
   ['document-persistence.e2e.js', ['server/kern/document-capability.js']],

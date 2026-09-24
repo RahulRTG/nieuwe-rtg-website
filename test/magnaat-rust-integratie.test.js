@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const maak = require('../server/kern/magnaat-economie');
+const maak = require('../server/kern/magnaat-oefeneconomie');
 
 const motorUrl = process.env.RTG_MOTOR_REKEN_URL;
 

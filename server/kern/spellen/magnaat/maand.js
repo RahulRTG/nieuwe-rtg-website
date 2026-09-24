@@ -1,13 +1,7 @@
 /* Magnaat: EEN SPELMAAND VOOR DE HELE WERELD.
 
-   Afgesplitst van ./economie.js, en de naad is echt: dat bestand gaat over
-   WANNEER er een maand gerekend wordt (de klok die bijrekent, het opzetten, het
-   einde, de wissel naar de acties) en dit bestand over WAT ER IN die maand
-   gebeurt. Het eerste is af en verandert niet meer; het tweede groeit met elke
-   fase mee -- fase B zette er de contractafwikkeling in, fase C zet er
-   gebeurtenissen in. Twee dingen met zo'n verschillend tempo horen niet in een
-   bestand, en de 10 kB-grens die scripts/check.js bewaakt is precies een rem
-   hierop.
+   ./economie.js gaat over WANNEER er een maand gerekend wordt, dit bestand
+   over WAT ER IN die maand gebeurt -- twee dingen met een ander tempo.
 
    DE VOLGORDE IN DEZE MAAND IS DE UITLEG, en hij staat vast omdat de klok
    bijrekent (GAMEHALL.md 12.4): tien maanden in een keer moeten hetzelfde
@@ -30,9 +24,11 @@ const F = require('./foundation');
 const H = require('./handel');
 
 const rond = (n) => Math.round(n);
+const { naarCenten, uitCenten, euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering }) => {
-  const { wikkelAf } = require('./maand-contracten')({ rond });
+  const { wikkelAf, betalingen, boekResultaat } = require('./maand-contracten')({ rond });
   function eenMaand(potje) {
     const st = potje.staat, k = K(st);
     const kwaliteitVan = {};
@@ -43,7 +39,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
         druk[zone + ':' + v.sector] = (druk[zone + ':' + v.sector] || 0) + 1;
       }
     let wereldOmzet = 0;
-    const perSpeler = {};
+    const perSpeler = {}, omzetPer = {};
     // wat de Foundation aan opleiding heeft bijgedragen; werkt door in hoeveel
     // een medewerker aankan
     const arbeid = F.arbeidBonus(st.foundation);
@@ -74,6 +70,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
       const o = ontvangst[c.afnemerId] = ontvangst[c.afnemerId] || {};
       o[c.soort] = (o[c.soort] || 0) + geleverd;
     }
+    const betaling = betalingen(actief, leverDeel, toezegging);
     /* Wat er deze maand aan RENTE de wereld verlaat. Apart geteld omdat het de
        enige post is die niet bij een andere speler landt; de geldpomp-meter
        moet hem kunnen aftrekken. */
@@ -96,12 +93,11 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
           wereldFactor: 1, arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id] });
         const regel = Object.assign({ id: v.id, naam: v.naam, sector: v.sector, kavel: kavel.naam }, r);
         regels.push(regel);
-        /* HET RESULTAAT WORDT VERDEELD als er aandeelhouders zijn (./aandeel.js).
-           De eigenaar houdt wat er niet vergeven is, de rest gaat rechtstreeks
-           naar de houders -- winst en verlies allebei. Staat er niets uit, dan
-           gaat het hele bedrag naar de eigenaar en verandert er niets. */
-        const verdeeld = verdeel(st, v.id, r.resultaat);
-        st.geld[h] += verdeeld.eigenaar;
+        /* Het resultaat komt bij de eigenaar binnen als de acht gebeurtenissen
+           van de geldkaart (G12), en gaat dan naar rato naar de aandeelhouders
+           (./aandeel.js) -- winst en verlies allebei. */
+        boekResultaat(st, h, v.id, r.delenCenten, actief, betaling);
+        const verdeeld = verdeel(st, v.id, r.resultaatCenten);
         /* OP DE GEPUSHTE REGEL en niet op `r`: de regel is een KOPIE die hierboven
            is gemaakt, dus een veld dat er daarna op `r` bij komt haalt het
            maandoverzicht nooit. Dat is precies zo misgegaan, en het viel op
@@ -111,21 +107,21 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
            spelers is geen nieuwe bedrijvigheid maar dezelfde euro die twee keer
            langskomt; hem meetellen zou de Foundation-pot laten groeien van
            spelers die geld heen en weer schuiven. */
-        wereldOmzet += r.omzet - ((r.levering && r.levering.omzet) || 0);
+        const eind = r.omzet - ((r.levering && r.levering.omzet) || 0);
+        wereldOmzet += eind;
+        omzetPer[h] = (omzetPer[h] || 0) + eind;
         kwaliteitVan[v.id] = r.kwaliteit;
         v.laatsteBezetting = r.bezetting;
       }
-      /* ROOD STAAN KOST GELD, en dit IS de rekening-courant uit ./bank.js: de
-         kredietlijn die er altijd is, het duurst en zonder aanvraag. Zonder dit
-         is overinvesteren gratis -- je kas gaat onder nul en er gebeurt niets.
-
-         Hij staat hier en niet bij de leningen omdat hij geen lening is die je
-         AANGAAT: hij ontstaat doordat je uitgeeft wat je niet hebt. */
+      /* ROOD STAAN KOST GELD: de rekening-courant uit ./bank.js, de kredietlijn
+         die er altijd is, het duurst en zonder aanvraag -- anders is
+         overinvesteren gratis. Hij staat niet bij de leningen: je gaat hem niet
+         AAN, hij ontstaat doordat je uitgeeft wat je niet hebt. */
       if (st.geld[h] < 0) {
-        const rente = -st.geld[h] * ROOD_RENTE;
-        st.geld[h] -= rente;
+        const rente = naarCenten(uitCenten(-st.geld[h]) * ROOD_RENTE);
+        beweeg(st, { soort: 'RENTE', van: ['kas', h], naar: ['macro', 'bank'], bedrag: rente, omschrijving: 'Rente rood staan' });
         rentelast += rente;
-        regels.push({ id: 'rood', naam: 'Rood staan', rente: rond(rente), resultaat: -rond(rente) });
+        regels.push({ id: 'rood', naam: 'Rood staan', rente: euroTonen(rente), resultaat: -euroTonen(rente) });
       }
       /* DE LENINGEN. Rente over het restant, dan de aflossing, dan de
          convenanten -- in die volgorde, want een aflossing verlaagt het restant
@@ -156,12 +152,14 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     /* DE CONTRACTEN AFWIKKELEN staat in ./maand-contracten.js -- na de maand,
        want de kwaliteitseis gaat over de kwaliteit die er DEZE maand geleverd
        is, en die volgt uit de maand. */
-    const contractRegels = wikkelAf(st, actief, leverDeel, kwaliteitVan);
+    const contractRegels = wikkelAf(st, actief, leverDeel, kwaliteitVan, betaling);
 
     /* De afdracht rust op de HELE stad en niet alleen op de spelers: anders
-       bouwt de Foundation in een partij met twee mensen nooit iets. Zie de
-       reden bij `stadsomzet` in de stadsdata. */
-    const afdracht = F.draagAf(st.foundation, wereldOmzet + (k.stadsomzet || 0));
+       bouwt de Foundation in een partij met twee mensen nooit iets. WIE hem
+       betaalt hangt af van de regelversie (./foundation.js). */
+    const afdracht = F.draagAf(st, wereldOmzet + (k.stadsomzet || 0), { stad: k.stadsomzet || 0, spelers: omzetPer });
+    for (const [h, euro] of Object.entries(afdracht.spelers || {}))
+      (perSpeler[h] = perSpeler[h] || []).push({ id: 'foundation', naam: 'Afdracht RTFoundation', resultaat: -euro });
     /* Waar de bedrijvigheid zit, zodat de Foundation daar bouwt. Uit dezelfde
        telling die de concurrentiedruk gebruikt: een tweede telling zou een
        tweede antwoord op dezelfde vraag zijn. */
@@ -170,11 +168,11 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
       const zone = sleutel.split(':')[0];
       perZone[zone] = (perZone[zone] || 0) + druk[sleutel];
     }
-    const projecten = F.bouw(st.foundation, k, perZone);
+    const projecten = F.bouw(st, k, perZone);
     st.maand++;
     const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
       wereldOmzet: rond(wereldOmzet), contractRegels,
-      rentelast: rond(rentelast), premielast: rond(premielast), schadelast: rond(schadelast) };
+      rentelast: euroTonen(rentelast), premielast: euroTonen(premielast), schadelast: euroTonen(schadelast) };
     for (const h of potje.spelers) st.laatste[h] = { maand: st.maand, regels: perSpeler[h] || [],
       projecten, contracten: contractRegels[h] || [] };
     return verslag;

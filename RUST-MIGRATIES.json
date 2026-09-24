@@ -17,7 +17,7 @@
     },
     {
       "volgorde": 2,
-      "pad": "server/kern/magnaat-economie.js",
+      "pad": "server/kern/magnaat-economische-motor/markt.js",
       "doel": "Deterministische markt- en macroberekeningen",
       "rust": "motor/src/magnaat.rs",
       "fase": "pariteit",

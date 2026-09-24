@@ -317,7 +317,8 @@ async function proef(basis) {
     s12.status === 200 && s12.body.ok === true, 'status ' + s12.status);
 }
 
-(async () => {
+/* Alleen als script: een require laadt de proef zonder hem te draaien. */
+if (require.main === module) (async () => {
   const s = await ws.start({ naam: 'lusproef' });
   try { await proef(s.basis); } finally { s.klaar(); }
 

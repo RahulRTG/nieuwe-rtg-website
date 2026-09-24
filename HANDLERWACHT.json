@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-09-24T04:03:25.975Z",
-  "commit": "a636fbac",
+  "op": "2026-09-24T06:36:13.883Z",
+  "commit": "5b0bde34",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 6,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 630,
-  "bewaakt": 540,
+  "zonderBewakerslaag": 632,
+  "bewaakt": 542,
   "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -48,7 +48,7 @@
  "perWacht": [
   {
    "naam": "werkPoort",
-   "aantal": 98
+   "aantal": 100
   },
   {
    "naam": "poort",
@@ -618,13 +618,13 @@
   },
   {
    "sleutel": "POST /api/bedrijf/keur",
-   "bestand": "server/bedrijf/regelpoort.js:97",
+   "bestand": "server/bedrijf/regelpoort.js:96",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/keuring",
-   "bestand": "server/bedrijf/regelpoort.js:140",
+   "bestand": "server/bedrijf/regelpoort.js:139",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -929,6 +929,12 @@
    "wacht": "werkPoort"
   },
   {
+   "sleutel": "POST /api/bedrijf/uitgave/betaal",
+   "bestand": "server/bedrijf/entiteitbetaling.js:18",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
    "sleutel": "POST /api/bedrijf/uitgave/betaald",
    "bestand": "server/bedrijf/uitgave.js:87",
    "staat": "bewaakt",
@@ -990,7 +996,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/betaalwijze",
-   "bestand": "server/bedrijf/tekengrens.js:68",
+   "bestand": "server/bedrijf/tekengrens.js:72",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -1004,6 +1010,12 @@
    "sleutel": "POST /api/bedrijf/werkruimte/maak",
    "bestand": "server/bedrijf/werkruimte.js:37",
    "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/werkruimte/tekenwijze",
+   "bestand": "server/bedrijf/samentekenen.js:79",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/zoek",

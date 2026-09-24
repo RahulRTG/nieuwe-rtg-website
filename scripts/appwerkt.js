@@ -343,7 +343,10 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   for (const n of bediening.nietKlikbaar) { const w = n.split(': ').pop(); redenenTelling[w] = (redenenTelling[w] || 0) + 1; }
   const uitsplitsing = bediening.geklikt + ' van ' + bediening.gevonden + ' zichtbare knoppen aangetikt zonder fout'
     + (bediening.nietKlikbaar.length ? ', ' + bediening.nietKlikbaar.length + ' niet aan te tikken (' + Object.entries(redenenTelling).map(([w, n]) => n + 'x ' + w).join(', ') + ')' : '')
-    + (bediening.overgeslagen.length ? ', ' + bediening.overgeslagen.length + ' overgeslagen omdat ze onomkeerbaar zijn' : '');
+    + (bediening.overgeslagen.length ? ', ' + bediening.overgeslagen.length + ' overgeslagen omdat ze onomkeerbaar zijn' : '')
+    /* Geteld en niet weggelaten: een weigering met reden is geen defect, maar
+       wie een scherm verdenkt dat de reden inslikt, ziet hier hoe vaak. */
+    + ((bediening.weigering || []).length ? ', ' + bediening.weigering.length + 'x geweigerd met een reden (' + bediening.weigering[0] + ')' : '');
   if (bediening.geklikt === 0 && !bediening.gevonden) {
     r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen zichtbare knop zonder bestemming gevonden; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
   } else if (stuk.length) {
@@ -430,13 +433,13 @@ async function bezoek(ctx, base, pad) {
 /* ---- de bediening: tikken op wat er staat ---- */
 async function bedien(ctx, base, pad) {
   const page = await ctx.newPage();
-  const crash = [], config = [], serverfout = [];
+  const crash = [], config = [], serverfout = [], weigering = [];
   let geklikt = 0, gevonden = 0;
   const overgeslagen = [], nietKlikbaar = [], instrument = [];
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
-    luister(page, base, { crash, config, serverfout });   // pas NA het laden: laadfouten horen bij bewijs 1
+    luister(page, base, { crash, config, serverfout, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
     const gehad = new Set();
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
       let k;
@@ -478,7 +481,7 @@ async function bedien(ctx, base, pad) {
     instrument.push('bediening mislukt: ' + String(e.message || e).split('\n')[0].slice(0, 140));
   }
   await page.close();
-  return { geklikt, gevonden, overgeslagen, nietKlikbaar, instrument, crash, config, serverfout };
+  return { geklikt, gevonden, overgeslagen, nietKlikbaar, instrument, crash, config, serverfout, weigering };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -513,10 +516,11 @@ async function kijkRonde(page, gehad) {
   }, [...gehad]);
 }
 
-/* Een 503 die zichzelf uitlegt is CONFIG en geen DEFECT. Dit huis schrijft die
-   uitleg zelf op -- `hoe` in het antwoord, of een zin die naar een niet
-   ingelezen bron wijst -- dus dat wordt gelezen en niet geraden. */
-const CONFIGZINNEN = /nog niet ingeladen|niet gemount|draait niet mee|is niet beschikbaar|geen model|nietGebouwd/i;
+/* De indeling van een foutantwoord woont in ./lib/foutindeling.js: een deur,
+   de omgeving (een 503 die zichzelf uitlegt), een WEIGERING met een reden in
+   gewone taal, of stuk. Daar staat ook waarom de weigering geen defect is, en
+   wat die indeling niet kan zien. */
+const { deelFoutIn } = require('./lib/foutindeling');
 
 function luister(page, base, bak) {
   page.on('pageerror', (e) => bak.crash.push('JS: ' + String(e.message || e).slice(0, 180)));
@@ -526,8 +530,10 @@ function luister(page, base, bak) {
     const pad = res.url().replace(base, '').slice(0, 80);
     if (s === 401 || s === 403 || s === 404) return;   // een deur is geen defect; bewijs 6 gaat daarover
     let lijf = '';
-    try { lijf = (await res.text()).slice(0, 200); } catch (e) { lijf = ''; }
-    if (s === 503 && (CONFIGZINNEN.test(lijf) || /"hoe"/.test(lijf))) bak.config.push(s + ' ' + pad + ' -- ' + lijf.slice(0, 120));
+    try { lijf = (await res.text()).slice(0, 400); } catch (e) { lijf = ''; }
+    const soort = deelFoutIn(s, lijf);
+    if (soort === 'config') bak.config.push(s + ' ' + pad + ' -- ' + lijf.slice(0, 120));
+    else if (soort === 'weigering') { if (bak.weigering) bak.weigering.push(s + ' ' + pad + ' -- ' + lijf.slice(0, 100)); }
     else bak.serverfout.push(s + ' ' + pad + (lijf ? ' -- ' + lijf.slice(0, 100) : ''));
   });
 }

@@ -108,10 +108,10 @@ const ZONDER_APP = [
    routes staan hier; de wortels-wereld raakt twintig apps met elk EEN route, en
    een wereld op een enkele gedeelde route declareren is raden.
 
-   Een wereld die niet opkomt blijft gewoon gedeclareerd. Spelen staat erbij
-   terwijl de spelwereld vandaag niet klaar komt -- hij vraagt een
-   `member-account`-sessie die geen munter in ./proefsleutels.js maakt. Dat is
-   precies wat Ronde C moet zien, en niet wat een declaratie mag verbergen. */
+   Een wereld die niet opkomt blijft gewoon gedeclareerd: een declaratie
+   verbergt niets. De spelwereld kwam eerst niet op -- hij vraagt een
+   `member-account`-sessie die geen munter maakte. Die munter staat sinds
+   ronde C in ./proefsleutels.js, en daarmee komt ook Spelen op. */
 const WERELD = {
   'link:horeca': { werelden: ['horeca'], waarom: 'een open rekening op een tafel: de wortel van /api/supplier/horeca/*' },
   'link:spelen': { werelden: ['spel'], waarom: 'een potje dat loopt: de wortel van /api/member/spel/*' }

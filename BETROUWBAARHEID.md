@@ -205,10 +205,21 @@ stad. `npm run wereld -- horeca school` bouwt het op een wegwerpserver en meldt 
 wereld klaar of niet, met de reden, en daarna of hij na afloop nog staat.
 
 De eerste echte bouw van de vijf ongebruikte werelden: **vier komen op**
-(signature, horeca, school, wortels). **Spel niet**, met een eerlijke reden: de
-bouwer vraagt een `member-account`-sessie, en geen enkele munter in
-`scripts/lib/proefsleutels.js` maakt die. Die toevoegen verandert de sessies van
-elke proef, en is daarom een eigen stap.
+(signature, horeca, school, wortels). **Spel eerst niet**, met een eerlijke
+reden: de bouwer vraagt een `member-account`-sessie, en geen enkele munter in
+`scripts/lib/proefsleutels.js` maakte die. Die munter staat er sinds ronde C: een
+vers gratis account langs de gewone registratie, en in `GEEN_BEWAKER`, zodat de
+verdeling van routes over rollen voor geen enkele proef verandert. Daarmee komen
+alle elf werelden op.
+
+**Het meetinstrument kreeg in dezelfde ronde een vierde bak**
+(`scripts/lib/foutindeling.js`). De proef vult geen formulieren in, dus een tik op
+"toevoegen" met een leeg veld levert een 400 met een zin als "Schrijf op wat er
+gebeurde." Dat is een weigering met een reden en geen defect. De bak is smal:
+alleen 400, 409 en 422, en alleen met een `error` die een zin is. Een code als
+`BAD_REQUEST` of een 500 met een nette zin blijft stuk. Wat de indeling niet kan
+zien, is of het scherm de zin ook toont. Daarom blijven weigeringen per rij
+geteld in de reden van `bedienbaar`, en verdwijnen ze niet.
 
 Een app verklaart zijn wereld in `WERELD` in `scripts/lib/appcontract.js`, en ook
 dat is gemeten: de bouwer raakt minstens twee routes van de ingang, en **geen andere

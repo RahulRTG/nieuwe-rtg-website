@@ -171,6 +171,28 @@ const MUNTERS = [
       return kantoorTok;
     }]),
 
+  /* EEN LID MET EEN EIGEN ACCOUNT, en dat is iets anders dan `member`.
+
+     `member` is een PASsessie uit /api/login: een lid met een pas en geen
+     account erachter. ./accountroutes.js beschrijft de verfijning naar
+     `member-account` al, en twee wereldbouwers vragen hem bij naam
+     (./wereld-spel.js voor de tegenstander in een potje, ./wereld-wortels.js
+     voor de vriendschap) -- maar geen enkele munter maakte hem. Gevonden op
+     24 september 2026 door de wereldcompositor: de spelwereld kwam niet op, met
+     als reden dat er een tweede ledensessie ontbrak.
+
+     Een VERS gratis account langs de gewone registratie, zoals iedereen. Het
+     opent niets extra's; de poorten erachter (een geverifieerd paspoort voor
+     Vonk) blijven staan. Hij staat in GEEN_BEWAKER: geen route draagt hem als
+     bewaker, dus de verdeling van routes over rollen verandert voor geen enkele
+     proef -- hij is er om te kunnen aankloppen, niet om op te verdelen. */
+  ['member-account', 'een VERS gratis lid met een eigen account (registratie, geen demo-pas): de tweede speler en de accountdeur',
+    async (post) => {
+      const email = 'lid-account-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
+      return tok(await post('/api/auth/register', { name: 'Proeflid Account', email,
+        password: 'geheim123', geboortedatum: '1990-03-03', pasApp: 'rtg' }));
+    }],
+
   /* KANTOOR OP NAAM, en dat is iets anders dan `office` hierboven.
 
      `office` is de GEDEELDE backofficecode: een sessie zonder lidKey, dus zonder
@@ -248,7 +270,7 @@ const MUNTERS = [
    de deur heet `kantoor-op-naam` -- en ze in de verdeling opnemen zou routes
    toewijzen aan een rol die niet bestaat. Ze zijn er om te KUNNEN uitwijken en
    om twee mensen naast elkaar te kunnen zetten, niet om op te verdelen. */
-const GEEN_BEWAKER = new Set(['eigenaar', 'lid-lifestyle', 'lid-business', 'kantoor-a', 'kantoor-b']);
+const GEEN_BEWAKER = new Set(['eigenaar', 'lid-lifestyle', 'lid-business', 'kantoor-a', 'kantoor-b', 'member-account']);
 
 /* De passen in de volgorde waarin een 403 wordt herprobeerd. */
 const PASLADDER = ['member', 'lid-lifestyle', 'lid-business'];

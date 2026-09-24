@@ -232,6 +232,28 @@ getal te verzinnen:
 Let op de naam: `scripts/waarom.js` bestaat al en vraagt iets anders (waarom is
 deze route ONGEMETEN).
 
+**Correctie (24 september 2026): het dossier bestond al.** Deze paragraaf deed
+alsof de deterministische functie nog gebouwd moest worden. Dat klopte niet: het
+**routedossier** in het kantoor (`server/routes/office/dossier.js`, scherm
+`/apps/routedossier.html`) toont per route de elf cellen met hun bron en reden,
+en rekent met dezelfde `bouw()` als de ratel. Wat ontbrak zijn precies de drie
+dingen hierboven, en die zijn er nu bijgezet in plaats van ernaast gebouwd:
+
+- de **vervalstaat**, uit `staatVan()` van `scripts/vertrouwen.js` -- dezelfde
+  functie als VERTROUWEN.json, en `null` met de reden als de versheid niet vast
+  te stellen is;
+- **de plek in de code**, uit ROUTEBRON.json, en `null` in plaats van een gok
+  als dat register de route niet kent;
+- **wat dit dossier niet weet**: tegenvoorbeeld gezocht, mutatie op deze route
+  en waarneming in productie. Die laatste staat op `verklaard` als een
+  sondereis de route loopt (dat is een ingerichte reis en geen waarneming, en
+  dat staat erbij), anders op `ongemeten`.
+
+Alle drie staan in het antwoord (`dossierAanvulling()`) en op het scherm; toetsen
+in `test/vervalstaten.test.js`, `test/routedossier.test.js` en
+`test/kantoorregisters.e2e.js`, elk met de mutatie erbij. De Architect zelf is
+daarmee NIET gebouwd: hij heeft nu wel een dossier om uit te lezen.
+
 ## 8. Waarneming in productie
 
 **Stand: de eerste is een uur werk.** Beschikbaarheid is geen juistheid. De
@@ -316,8 +338,9 @@ onafhankelijkheid van de drie assen van `GELDING.json`.
 
 1. ~~**De sonde leest `/api/pay/gezond`**~~ -- gedaan (par. 8): de reis
    `grootboek` in `SLO.json`, met een eigen triagelaag `geld`.
-2. **Het vertrouwensdossier**: een deterministische functie in `scripts/` die par. 7
-   samenstelt, inclusief de lijst ONBEKEND. Raakt `server/` niet.
+2. ~~**Het vertrouwensdossier**~~ -- gedaan, en anders dan hier eerst stond: het
+   bestaande routedossier is aangevuld in plaats van dat er een tweede kwam
+   (par. 7, correctie).
 3. **De zoeker op `geld-conservatie`**, zonder model: reeksen, gelijktijdigheid,
    storing via de synthetische rail, krimpen.
 4. **De immuniteitsstap**: de A/B/C-vraag als deterministische indeling na een

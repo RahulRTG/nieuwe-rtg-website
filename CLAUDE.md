@@ -2478,7 +2478,12 @@ zijn. De goedkoopste vondst: `/api/pay/gezond` bestond en de sonde las hem
 niet, dus het grootboek meldde zijn stand aan een bewaking die niet keek. Dat
 is de eerste stap die staat: de reis `grootboek` in `SLO.json`, en de triage
 duidt een 500 daarop als `geld` -- niet als routefout, en nooit als reden om
-terug te rollen.
+terug te rollen. De tweede stap legde een eigen vergissing bloot: het
+"vertrouwensdossier" bestond al als het **routedossier** in het kantoor, dus het
+is AANGEVULD en niet opnieuw gebouwd -- met de vervalstaat, de plek in de code
+en een blok *wat dit dossier niet weet* (tegenvoorbeeld, mutatie per route,
+productie). Zoek dus eerst of een scherm iets al toont voordat je een tweede
+bouwt.
 
 ## Structuur en starten (kort)
 

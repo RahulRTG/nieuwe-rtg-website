@@ -74,7 +74,7 @@
     "reserveer": 27,
     "bevestig": 57,
     "lever": 21,
-    "annuleer": 30,
+    "annuleer": 31,
     "retour": 8
   },
   "overalAanwezig": [],
@@ -542,6 +542,27 @@
       "telt": 5
     },
     {
+      "domein": "kern/magnaat-leven",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "beschikbaarheid": "open",
+        "bevestig": "akkoord",
+        "lever": "lever",
+        "annuleer": "betaalWatVervalt"
+      },
+      "telt": 5
+    },
+    {
       "domein": "kern/markt",
       "heeft": {
         "toon": true,
@@ -821,26 +842,6 @@
         "prijs": "berekenMarkt",
         "beschikbaarheid": "koopVoorraad",
         "bevestig": "boekBedrijfsdag"
-      },
-      "telt": 4
-    },
-    {
-      "domein": "kern/magnaat-leven",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": true,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "beschikbaarheid": "agenda",
-        "bevestig": "akkoord",
-        "lever": "lever"
       },
       "telt": 4
     },

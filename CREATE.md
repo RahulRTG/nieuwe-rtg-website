@@ -673,7 +673,7 @@ een kaart in de Mall, is een belofte die je niet met één getal doet.
 
 Er is geen laag die kosten per app, per gebruiker of per functie bijhoudt. Wat er
 is: `scripts/duurzaamheidskosten.js` (één meting), `kern/servicekosten.js` en
-`kern/pasprijs.js` (prijzen aan leden), en `kern/magnaat-economie.js` (de
+`kern/pasprijs.js` (prijzen aan leden), en `kern/magnaat-economische-motor/` (de
 spel-economie). Kostenvoorspelling per uitrol is een nieuw meetvlak — een goed
 idee, maar geen stap weg.
 

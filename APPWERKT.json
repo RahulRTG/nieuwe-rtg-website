@@ -10,8 +10,8 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-09-24T20:29:48.898Z",
-  "commit": "d9e5e2b2",
+  "op": "2026-09-24T21:14:31.728Z",
+  "commit": "60837d27",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
@@ -21,10 +21,10 @@
  "gemeten": {
   "onderdelen": 112,
   "defecten": 0,
-  "knoppenGevonden": 528,
-  "knoppenAangetikt": 240,
-  "knoppenNietKlikbaar": 257,
-  "schermenGrotendeelsOngemeten": 21,
+  "knoppenGevonden": 516,
+  "knoppenAangetikt": 235,
+  "knoppenNietKlikbaar": 256,
+  "schermenGrotendeelsOngemeten": 19,
   "deurenZonderPersona": 2
  },
  "telling": {
@@ -36,15 +36,15 @@
    "NIET_GETEST": 15
   },
   "bedienbaar": {
-   "NIET_GETEST": 60,
-   "BEWEZEN": 52
+   "NIET_GETEST": 59,
+   "BEWEZEN": 53
   },
   "menselijk": {
    "NIET_GETEST": 112
   },
   "voltooibaar": {
-   "GEEN_FIXTURE": 111,
-   "NIET_GETEST": 1
+   "GEEN_FIXTURE": 110,
+   "BEWEZEN": 2
   },
   "waarheidsgetrouw": {
    "GEEN_FIXTURE": 112
@@ -102,13 +102,24 @@
   "uitleg": "Een bewijs mag uit een bestaande proef komen als scripts/lib/appcontract.js die bron noemt, de proef routes raakt die de ingang aanroept, en het register vers is (versheid() in scripts/lib/stempel.js). Een ketenproef levert alleen voltooibaar.",
   "koppelingen": [
    {
+    "app": "Ontdekken",
+    "functie": "link:connect",
+    "bewijzen": {
+     "voltooibaar": {
+      "status": "BEWEZEN",
+      "bron": "scripts/lusproef.js",
+      "commit": "760b40d3"
+     }
+    }
+   },
+   {
     "app": "Horeca",
     "functie": "link:horeca",
     "bewijzen": {
      "voltooibaar": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/tafelproef.js",
-      "commit": "56ea75ba"
+      "commit": "67a51f63"
      }
     }
    }
@@ -144,12 +155,6 @@
     "instrument": "scripts/zaakliveproef.js",
     "reden": "de zaakkant (poort, rondleidingen, live gaan); geen ingang in MAPPEN",
     "nodig": "idem: een zaakregister naast APPWERKT"
-   },
-   {
-    "register": null,
-    "instrument": "scripts/lusproef.js",
-    "reden": "schrijft geen register; zonder stempel kan versheid() er niets over zeggen. Bovendien roept connect.html de lus aan, en die staat niet in MAPPEN (Ontdekken is /apps/rtg.html)",
-    "nodig": "een --vastleggen met huisstempel, en een besluit over de ingang van Connect"
    }
   ]
  },
@@ -699,9 +704,20 @@
      "bewijs": null
     },
     "voltooibaar": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 760b40d3; sindsdien is er geen code gewijzigd): 17 schakels gesloten, 12 storingen gehouden",
+     "bewijs": {
+      "register": "LUSPROEF.json",
+      "op": "2026-09-24T21:01:08.933Z",
+      "commit": "760b40d3",
+      "instrument": "scripts/lusproef.js"
+     },
+     "bron": {
+      "soort": "ketenproef",
+      "instrument": "scripts/lusproef.js",
+      "belofte": "je ontdekt iets, begrijpt het, doet er iets mee, en een ander bevestigt dat het hem hielp -- zonder score, rangorde of niveau",
+      "gedeeldeRoutes": 8
+     }
     },
     "waarheidsgetrouw": {
      "status": "GEEN_FIXTURE",
@@ -729,7 +745,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als gezin: 972 tekens zichtbaar"
+    "als gezin: 978 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -766,7 +782,9 @@
     "nietRaakbaar": 6,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "voltooibaar"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -859,9 +877,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 45,
-      "zichtbaar": 17,
-      "inBeeld": 12,
+      "dom": 56,
+      "zichtbaar": 19,
+      "inBeeld": 13,
       "raakbaar": 0
      }
     },
@@ -1067,7 +1085,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als gezin: 1271 tekens zichtbaar"
+    "als gezin: 1273 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -1382,7 +1400,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 79,
+      "dom": 80,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1493,7 +1511,7 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 78,
+      "dom": 80,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1604,7 +1622,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 70,
+      "dom": 80,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1725,7 +1743,7 @@
       "raakbaar": 10
      },
      "schil": {
-      "dom": 76,
+      "dom": 75,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1960,7 +1978,7 @@
       "raakbaar": 13
      },
      "schil": {
-      "dom": 75,
+      "dom": 76,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -2305,7 +2323,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 86,
+      "dom": 78,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -2535,7 +2553,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 87,
+      "dom": 94,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -2633,7 +2651,7 @@
     "Choose your widgets: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 4832 tekens zichtbaar"
+    "als lid: 4813 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2652,7 +2670,7 @@
       "raakbaar": 59
      },
      "schil": {
-      "dom": 71,
+      "dom": 82,
       "zichtbaar": 19,
       "inBeeld": 13,
       "raakbaar": 8
@@ -2763,7 +2781,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 78,
+      "dom": 88,
       "zichtbaar": 23,
       "inBeeld": 19,
       "raakbaar": 12
@@ -2948,7 +2966,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 89,
+      "dom": 105,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -3344,7 +3362,7 @@
     "R\nRahul\nStel me gerust een vraag.\nRAHUL: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1512 tekens zichtbaar"
+    "als lid: 1226 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3363,10 +3381,10 @@
       "raakbaar": 8
      },
      "schil": {
-      "dom": 92,
-      "zichtbaar": 24,
-      "inBeeld": 19,
-      "raakbaar": 12
+      "dom": 108,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 11
      }
     },
     "noemer": 8,
@@ -3847,9 +3865,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 71,
-      "zichtbaar": 20,
-      "inBeeld": 15,
+      "dom": 78,
+      "zichtbaar": 24,
+      "inBeeld": 19,
       "raakbaar": 12
      }
     },
@@ -4050,7 +4068,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 3138 tekens zichtbaar"
+    "als lid: 3122 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4071,8 +4089,8 @@
      "schil": {
       "dom": 64,
       "zichtbaar": 17,
-      "inBeeld": 15,
-      "raakbaar": 14
+      "inBeeld": 14,
+      "raakbaar": 13
      }
     },
     "noemer": 2,
@@ -4385,7 +4403,7 @@
     "Kanaal aanmelden: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1500 tekens zichtbaar"
+    "als lid: 1239 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4404,9 +4422,9 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 67,
-      "zichtbaar": 16,
-      "inBeeld": 12,
+      "dom": 76,
+      "zichtbaar": 23,
+      "inBeeld": 18,
       "raakbaar": 11
      }
     },
@@ -4639,10 +4657,10 @@
       "raakbaar": 13
      },
      "schil": {
-      "dom": 80,
-      "zichtbaar": 22,
-      "inBeeld": 17,
-      "raakbaar": 10
+      "dom": 94,
+      "zichtbaar": 24,
+      "inBeeld": 19,
+      "raakbaar": 12
      }
     },
     "noemer": 13,
@@ -4861,9 +4879,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 71,
-      "zichtbaar": 20,
-      "inBeeld": 15,
+      "dom": 78,
+      "zichtbaar": 24,
+      "inBeeld": 19,
       "raakbaar": 12
      }
     },
@@ -4972,7 +4990,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 73,
+      "dom": 78,
       "zichtbaar": 25,
       "inBeeld": 20,
       "raakbaar": 13
@@ -5099,7 +5117,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "10 te raken bij het laden, 10 geprobeerd, 10 gelukt, 4 met zichtbaar effect",
+     "reden": "10 te raken bij het laden, 10 geprobeerd, 10 gelukt, 3 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -5138,7 +5156,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 2996 tekens zichtbaar"
+    "als lid: 2951 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5157,10 +5175,10 @@
       "raakbaar": 10
      },
      "schil": {
-      "dom": 64,
-      "zichtbaar": 15,
-      "inBeeld": 13,
-      "raakbaar": 12
+      "dom": 74,
+      "zichtbaar": 18,
+      "inBeeld": 14,
+      "raakbaar": 11
      }
     },
     "noemer": 10,
@@ -5168,7 +5186,7 @@
     "budget": 10,
     "geprobeerd": 10,
     "gelukt": 10,
-    "effect": 4,
+    "effect": 3,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -5268,7 +5286,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 87,
+      "dom": 89,
       "zichtbaar": 25,
       "inBeeld": 20,
       "raakbaar": 13
@@ -5382,9 +5400,9 @@
       "raakbaar": 11
      },
      "schil": {
-      "dom": 67,
-      "zichtbaar": 16,
-      "inBeeld": 12,
+      "dom": 74,
+      "zichtbaar": 19,
+      "inBeeld": 14,
       "raakbaar": 11
      }
     },
@@ -5435,7 +5453,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 2 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -5493,10 +5511,10 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 78,
-      "zichtbaar": 25,
-      "inBeeld": 20,
-      "raakbaar": 13
+      "dom": 88,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 11
      }
     },
     "noemer": 4,
@@ -5504,7 +5522,7 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 4,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -5717,10 +5735,10 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 64,
-      "zichtbaar": 17,
-      "inBeeld": 14,
-      "raakbaar": 13
+      "dom": 78,
+      "zichtbaar": 24,
+      "inBeeld": 19,
+      "raakbaar": 12
      }
     },
     "noemer": 0,
@@ -5882,7 +5900,7 @@
       "raakbaar": 149
      },
      "schil": {
-      "dom": 45,
+      "dom": 54,
       "zichtbaar": 17,
       "inBeeld": 13,
       "raakbaar": 12
@@ -6104,10 +6122,10 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 64,
-      "zichtbaar": 17,
-      "inBeeld": 14,
-      "raakbaar": 13
+      "dom": 71,
+      "zichtbaar": 20,
+      "inBeeld": 15,
+      "raakbaar": 12
      }
     },
     "noemer": 0,
@@ -6157,7 +6175,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "21 te raken bij het laden, 18 geprobeerd, 11 gelukt, 8 met zichtbaar effect, 3 niet meer gevonden, 1 overgeslagen (onomkeerbaar), 8x teruggekeerd na navigatie; niet aan te tikken: ⌑\nVerblijf: element is not visible, Ontdekken: element is not visible, Uw avond: element is not visible",
+     "reden": "19 te raken bij het laden, 14 geprobeerd, 11 gelukt, 8 met zichtbaar effect, 5 niet meer gevonden, 1 overgeslagen (onomkeerbaar), 10x teruggekeerd na navigatie; niet aan te tikken: Ontdekken: element is not visible, Uw avond: element is not visible, Tweede scherm openen ＋: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -6191,22 +6209,18 @@
      "bewijs": null
     }
    },
-   "gevonden": 21,
+   "gevonden": 19,
    "geklikt": 11,
    "overgeslagen": [
     "□\nBestellen"
    ],
    "nietKlikbaar": [
-    "⌑\nVerblijf: element is not visible",
     "Ontdekken: element is not visible",
     "Uw avond: element is not visible",
-    "RahulKOMPAS: element is not visible",
-    "Tweede scherm openen ＋: element is not visible",
-    "Rahul openen: element is not visible",
-    "Versturen →: element is not visible"
+    "Tweede scherm openen ＋: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1552 tekens zichtbaar"
+    "als lid: 865 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6220,27 +6234,27 @@
     "stadia": {
      "app": {
       "dom": 22,
-      "zichtbaar": 22,
-      "inBeeld": 21,
-      "raakbaar": 22
+      "zichtbaar": 20,
+      "inBeeld": 20,
+      "raakbaar": 20
      },
      "schil": {
-      "dom": 30,
-      "zichtbaar": 2,
-      "inBeeld": 2,
-      "raakbaar": 2
+      "dom": 53,
+      "zichtbaar": 15,
+      "inBeeld": 12,
+      "raakbaar": 11
      }
     },
-    "noemer": 21,
-    "drempel": 11,
-    "budget": 21,
-    "geprobeerd": 18,
+    "noemer": 19,
+    "drempel": 10,
+    "budget": 19,
+    "geprobeerd": 14,
     "gelukt": 11,
     "effect": 8,
-    "nietMeerGevonden": 3,
+    "nietMeerGevonden": 5,
     "overgeslagen": 1,
-    "teruggekeerd": 8,
-    "nietRaakbaar": 0,
+    "teruggekeerd": 10,
+    "nietRaakbaar": 2,
     "onomkeerbaar": 1
    },
    "samengesteld": [],
@@ -6278,7 +6292,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "10 te raken bij het laden, 10 geprobeerd, 9 gelukt, 8 met zichtbaar effect; niet aan te tikken: Doe mee: element is not visible",
+     "reden": "10 te raken bij het laden, 10 geprobeerd, 9 gelukt, 7 met zichtbaar effect; niet aan te tikken: Doe mee: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -6319,7 +6333,7 @@
     "Doe mee: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1766 tekens zichtbaar"
+    "als lid: 1507 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6349,7 +6363,7 @@
     "budget": 10,
     "geprobeerd": 10,
     "gelukt": 9,
-    "effect": 8,
+    "effect": 7,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -6884,7 +6898,7 @@
     "Discover people: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 875 tekens zichtbaar"
+    "als lid: 891 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6903,10 +6917,10 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 88,
-      "zichtbaar": 21,
-      "inBeeld": 16,
-      "raakbaar": 9
+      "dom": 98,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 11
      }
     },
     "noemer": 2,
@@ -6956,7 +6970,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 1 met zichtbaar effect",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 0 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -7014,7 +7028,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 93,
+      "dom": 109,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -7025,7 +7039,7 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 4,
-    "effect": 1,
+    "effect": 0,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -7205,7 +7219,7 @@
     "Stop: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2842 tekens zichtbaar"
+    "als lid: 2797 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7224,10 +7238,10 @@
       "raakbaar": 47
      },
      "schil": {
-      "dom": 46,
+      "dom": 55,
       "zichtbaar": 16,
-      "inBeeld": 12,
-      "raakbaar": 11
+      "inBeeld": 13,
+      "raakbaar": 12
      }
     },
     "noemer": 25,
@@ -7276,8 +7290,8 @@
      "bewijs": "/apps/pay.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "12 te raken bij het laden, 5 geprobeerd, 5 gelukt, 3 met zichtbaar effect, 7 niet meer gevonden, 1 overgeslagen (onomkeerbaar), 7x teruggekeerd na navigatie -- de drempel is 6, dus dit is niet beproefd",
+     "status": "BEWEZEN",
+     "reden": "5 te raken bij het laden, 5 geprobeerd, 5 gelukt, 2 met zichtbaar effect, 1 overgeslagen (onomkeerbaar)",
      "bewijs": null
     },
     "menselijk": {
@@ -7311,7 +7325,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 12,
+   "gevonden": 5,
    "geklikt": 5,
    "overgeslagen": [
     "Tik en betaal"
@@ -7332,27 +7346,27 @@
     "stadia": {
      "app": {
       "dom": 20,
-      "zichtbaar": 13,
-      "inBeeld": 13,
-      "raakbaar": 13
+      "zichtbaar": 6,
+      "inBeeld": 6,
+      "raakbaar": 6
      },
      "schil": {
-      "dom": 76,
+      "dom": 93,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
      }
     },
-    "noemer": 12,
-    "drempel": 6,
-    "budget": 12,
+    "noemer": 5,
+    "drempel": 3,
+    "budget": 5,
     "geprobeerd": 5,
     "gelukt": 5,
-    "effect": 3,
-    "nietMeerGevonden": 7,
+    "effect": 2,
+    "nietMeerGevonden": 0,
     "overgeslagen": 1,
-    "teruggekeerd": 7,
-    "nietRaakbaar": 7,
+    "teruggekeerd": 0,
+    "nietRaakbaar": 14,
     "onomkeerbaar": 1
    },
    "samengesteld": [],
@@ -7709,7 +7723,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 68,
+      "dom": 72,
       "zichtbaar": 16,
       "inBeeld": 13,
       "raakbaar": 12
@@ -7939,9 +7953,9 @@
       "raakbaar": 8
      },
      "schil": {
-      "dom": 88,
-      "zichtbaar": 27,
-      "inBeeld": 22,
+      "dom": 63,
+      "zichtbaar": 23,
+      "inBeeld": 18,
       "raakbaar": 15
      }
     },
@@ -8050,9 +8064,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 71,
-      "zichtbaar": 20,
-      "inBeeld": 15,
+      "dom": 78,
+      "zichtbaar": 24,
+      "inBeeld": 19,
       "raakbaar": 12
      }
     },
@@ -8267,7 +8281,7 @@
     "CLUB · IBIZA\nClub Sombra\n1 avond gepland: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1375 tekens zichtbaar"
+    "als lid: 1345 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8286,10 +8300,10 @@
       "raakbaar": 9
      },
      "schil": {
-      "dom": 85,
-      "zichtbaar": 22,
-      "inBeeld": 17,
-      "raakbaar": 10
+      "dom": 97,
+      "zichtbaar": 24,
+      "inBeeld": 19,
+      "raakbaar": 12
      }
     },
     "noemer": 9,
@@ -8339,7 +8353,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "12 te raken bij het laden, 3 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 9 niet meer gevonden, 12x teruggekeerd na navigatie -- de drempel is 6, dus dit is niet beproefd",
+     "reden": "12 te raken bij het laden, 2 geprobeerd, 1 gelukt, 1 met zichtbaar effect, 10 niet meer gevonden, 11x teruggekeerd na navigatie -- de drempel is 6, dus dit is niet beproefd; niet aan te tikken: VANDAAG INVULLEN: element is not stable",
      "bewijs": null
     },
     "menselijk": {
@@ -8374,11 +8388,13 @@
     }
    },
    "gevonden": 12,
-   "geklikt": 3,
+   "geklikt": 1,
    "overgeslagen": [],
-   "nietKlikbaar": [],
+   "nietKlikbaar": [
+    "VANDAAG INVULLEN: element is not stable"
+   ],
    "waarnemingen": [
-    "als lid: 1377 tekens zichtbaar"
+    "als lid: 1635 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8397,21 +8413,21 @@
       "raakbaar": 12
      },
      "schil": {
-      "dom": 62,
+      "dom": 70,
       "zichtbaar": 16,
-      "inBeeld": 12,
-      "raakbaar": 11
+      "inBeeld": 13,
+      "raakbaar": 12
      }
     },
     "noemer": 12,
     "drempel": 6,
     "budget": 12,
-    "geprobeerd": 3,
-    "gelukt": 3,
-    "effect": 3,
-    "nietMeerGevonden": 9,
+    "geprobeerd": 2,
+    "gelukt": 1,
+    "effect": 1,
+    "nietMeerGevonden": 10,
     "overgeslagen": 0,
-    "teruggekeerd": 12,
+    "teruggekeerd": 11,
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
@@ -8491,7 +8507,7 @@
     "↑ Terug naar boven: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1206 tekens zichtbaar"
+    "als lid: 978 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8510,7 +8526,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 92,
+      "dom": 89,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -8806,9 +8822,9 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 73,
-      "zichtbaar": 20,
-      "inBeeld": 15,
+      "dom": 80,
+      "zichtbaar": 24,
+      "inBeeld": 19,
       "raakbaar": 12
      }
     },
@@ -9028,7 +9044,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 81,
+      "dom": 80,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -9344,7 +9360,7 @@
     "Plan mijn reis: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 5105 tekens zichtbaar"
+    "als lid: 5089 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9455,7 +9471,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 975 tekens zichtbaar"
+    "als lid: 955 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -9479,9 +9495,9 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 74,
-      "zichtbaar": 19,
-      "inBeeld": 14,
+      "dom": 92,
+      "zichtbaar": 23,
+      "inBeeld": 18,
       "raakbaar": 11
      }
     },
@@ -9571,7 +9587,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1315 tekens zichtbaar"
+    "als lid: 1277 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9590,7 +9606,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 86,
+      "dom": 88,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -9717,7 +9733,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "19 te raken bij het laden, 14 geprobeerd, 5 gelukt, 5 met zichtbaar effect, 5 niet meer gevonden, 9x teruggekeerd na navigatie -- de drempel is 10, dus dit is niet beproefd; niet aan te tikken: ⌂\nVandaag: element is not stable, Reizen: element is not visible, Vandaag: element is not visible",
+     "reden": "19 te raken bij het laden, 14 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 5 niet meer gevonden, 6x teruggekeerd na navigatie -- de drempel is 10, dus dit is niet beproefd; niet aan te tikken: Reizen: element is not visible, Vandaag: element is not visible, Tweede scherm openen ＋: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -9752,14 +9768,17 @@
     }
    },
    "gevonden": 19,
-   "geklikt": 5,
+   "geklikt": 2,
    "overgeslagen": [],
    "nietKlikbaar": [
-    "⌂\nVandaag: element is not stable",
     "Reizen: element is not visible",
     "Vandaag: element is not visible",
-    "Rahul\nKOMPAS: element is not visible",
-    "Tweede scherm openen ＋: element is not visible",
+    "Tweede scherm openen ＋: intercepts pointer events",
+    "MEENEMEN: intercepts pointer events",
+    "Adviseer: intercepts pointer events",
+    "Open mijn reizen →: intercepts pointer events",
+    "Bereid mijn reis voor: intercepts pointer events",
+    "Deel mijn aankomst: intercepts pointer events",
     "Loop met mij mee: intercepts pointer events",
     "Open: intercepts pointer events",
     "Plan met Rahul →: intercepts pointer events",
@@ -9795,11 +9814,11 @@
     "drempel": 10,
     "budget": 19,
     "geprobeerd": 14,
-    "gelukt": 5,
-    "effect": 5,
+    "gelukt": 2,
+    "effect": 2,
     "nietMeerGevonden": 5,
     "overgeslagen": 0,
-    "teruggekeerd": 9,
+    "teruggekeerd": 6,
     "nietRaakbaar": 4,
     "onomkeerbaar": 0
    },
@@ -9919,7 +9938,7 @@
     "Volgende →: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als kantoor: 3958 tekens zichtbaar"
+    "als kantoor: 3942 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9991,7 +10010,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "3 te raken bij het laden, 1 geprobeerd, 0 gelukt, 0 met zichtbaar effect, 2 niet meer gevonden, 2x teruggekeerd na navigatie -- de drempel is 2, dus dit is niet beproefd; niet aan te tikken: HOE DE STAD ER NU BIJ STAAT: element is not visible",
+     "reden": "geen knop die bij het laden te raken is; wat dit scherm doet loopt via links of formulieren",
      "bewijs": null
     },
     "menselijk": {
@@ -10025,14 +10044,12 @@
      "bewijs": null
     }
    },
-   "gevonden": 3,
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
-   "nietKlikbaar": [
-    "HOE DE STAD ER NU BIJ STAAT: element is not visible"
-   ],
+   "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1242 tekens zichtbaar"
+    "als lid: 1246 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10046,27 +10063,27 @@
     "stadia": {
      "app": {
       "dom": 4,
-      "zichtbaar": 3,
-      "inBeeld": 3,
-      "raakbaar": 3
+      "zichtbaar": 0,
+      "inBeeld": 0,
+      "raakbaar": 0
      },
      "schil": {
-      "dom": 85,
+      "dom": 96,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
      }
     },
-    "noemer": 3,
-    "drempel": 2,
-    "budget": 3,
-    "geprobeerd": 1,
+    "noemer": 0,
+    "drempel": 0,
+    "budget": 0,
+    "geprobeerd": 0,
     "gelukt": 0,
     "effect": 0,
-    "nietMeerGevonden": 2,
+    "nietMeerGevonden": 0,
     "overgeslagen": 0,
-    "teruggekeerd": 2,
-    "nietRaakbaar": 1,
+    "teruggekeerd": 0,
+    "nietRaakbaar": 4,
     "onomkeerbaar": 0
    },
    "samengesteld": [],
@@ -10225,7 +10242,7 @@
     "Zeg: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 725 tekens zichtbaar"
+    "als lid: 735 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10239,15 +10256,15 @@
     "stadia": {
      "app": {
       "dom": 22,
-      "zichtbaar": 11,
-      "inBeeld": 11,
+      "zichtbaar": 8,
+      "inBeeld": 8,
       "raakbaar": 8
      },
      "schil": {
-      "dom": 81,
-      "zichtbaar": 25,
-      "inBeeld": 10,
-      "raakbaar": 3
+      "dom": 94,
+      "zichtbaar": 24,
+      "inBeeld": 13,
+      "raakbaar": 6
      }
     },
     "noemer": 8,
@@ -10355,7 +10372,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 90,
+      "dom": 82,
       "zichtbaar": 25,
       "inBeeld": 20,
       "raakbaar": 13
@@ -10471,9 +10488,9 @@
       "raakbaar": 7
      },
      "schil": {
-      "dom": 82,
-      "zichtbaar": 23,
-      "inBeeld": 18,
+      "dom": 75,
+      "zichtbaar": 19,
+      "inBeeld": 14,
       "raakbaar": 11
      }
     },
@@ -10637,7 +10654,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 3 gelukt, 2 met zichtbaar effect; niet aan te tikken: Ververs: intercepts pointer events",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 3 gelukt, 1 met zichtbaar effect; niet aan te tikken: Ververs: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -10646,12 +10663,12 @@
      "bewijs": null
     },
     "voltooibaar": {
-     "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 56ea75ba, sindsdien zijn 16 codebestand(en) gewijzigd (12 andere buiten dit instrument gelaten)",
+     "status": "BEWEZEN",
+     "reden": "vers gemeten (gemeten op 67a51f63; sindsdien is er geen code gewijzigd): 11 schakels gesloten, 8 storingen gehouden",
      "bewijs": {
       "register": "TAFELPROEF.json",
-      "op": "2026-09-24T16:37:12.120Z",
-      "commit": "56ea75ba",
+      "op": "2026-09-24T21:08:13.463Z",
+      "commit": "67a51f63",
       "instrument": "scripts/tafelproef.js"
      },
      "bron": {
@@ -10689,7 +10706,7 @@
     "Ververs: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1298 tekens zichtbaar"
+    "als lid: 1314 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -10713,7 +10730,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 75,
+      "dom": 83,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -10724,7 +10741,7 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 3,
-    "effect": 2,
+    "effect": 1,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -10826,7 +10843,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 78,
+      "dom": 76,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -10878,8 +10895,8 @@
      "bewijs": "/apps/magnaat.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "11 te raken bij het laden, 11 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 1 overgeslagen (onomkeerbaar), 2x teruggekeerd na navigatie -- de drempel is 6, dus dit is niet beproefd; niet aan te tikken: Open mijn Magnaat-profiel RI: intercepts pointer events, Bekijk alle: element is not visible, Open economie: element is not visible",
+     "status": "BEWEZEN",
+     "reden": "7 te raken bij het laden, 7 geprobeerd, 4 gelukt, 4 met zichtbaar effect, 1 overgeslagen (onomkeerbaar), 3x teruggekeerd na navigatie; niet aan te tikken: Bekijk alle: element is not visible, Open economie: element is not visible, Open de volledige Magnaat-wereld: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -10913,23 +10930,18 @@
      "bewijs": null
     }
    },
-   "gevonden": 11,
-   "geklikt": 3,
+   "gevonden": 7,
+   "geklikt": 4,
    "overgeslagen": [
     "△\nMode & retail\nBestellen · veilige miss"
    ],
    "nietKlikbaar": [
-    "Open mijn Magnaat-profiel RI: intercepts pointer events",
     "Bekijk alle: element is not visible",
     "Open economie: element is not visible",
-    "Open de volledige Magnaat-wereld: element is not visible",
-    "⌂\nWereld: intercepts pointer events",
-    "◇\nMissies: intercepts pointer events",
-    "♙\nTeam: intercepts pointer events",
-    "○\nProfiel: intercepts pointer events"
+    "Open de volledige Magnaat-wereld: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1540 tekens zichtbaar"
+    "als lid: 1504 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10942,28 +10954,28 @@
     "landing": "/apps/magnaat.html",
     "stadia": {
      "app": {
-      "dom": 311,
-      "zichtbaar": 12,
-      "inBeeld": 12,
-      "raakbaar": 12
+      "dom": 115,
+      "zichtbaar": 8,
+      "inBeeld": 7,
+      "raakbaar": 8
      },
      "schil": {
-      "dom": 76,
-      "zichtbaar": 22,
-      "inBeeld": 18,
+      "dom": 62,
+      "zichtbaar": 15,
+      "inBeeld": 12,
       "raakbaar": 11
      }
     },
-    "noemer": 11,
-    "drempel": 6,
-    "budget": 11,
-    "geprobeerd": 11,
-    "gelukt": 3,
-    "effect": 3,
+    "noemer": 7,
+    "drempel": 4,
+    "budget": 7,
+    "geprobeerd": 7,
+    "gelukt": 4,
+    "effect": 4,
     "nietMeerGevonden": 0,
     "overgeslagen": 1,
-    "teruggekeerd": 2,
-    "nietRaakbaar": 92,
+    "teruggekeerd": 3,
+    "nietRaakbaar": 90,
     "onomkeerbaar": 1
    },
    "samengesteld": [],
@@ -11059,7 +11071,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 82,
+      "dom": 78,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -11151,7 +11163,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 2926 tekens zichtbaar"
+    "als lid: 2942 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11170,7 +11182,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 80,
+      "dom": 70,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -11281,7 +11293,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 80,
+      "dom": 78,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -11334,7 +11346,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "14 te raken bij het laden, 14 geprobeerd, 7 gelukt, 2 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Filters: intercepts pointer events, Onderzoek match →: intercepts pointer events, Simuleer belofte: intercepts pointer events",
+     "reden": "14 te raken bij het laden, 14 geprobeerd, 7 gelukt, 3 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Filters: intercepts pointer events, Onderzoek match →: intercepts pointer events, Simuleer belofte: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -11381,7 +11393,7 @@
     "Maak capaciteitsvoorstel: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2580 tekens zichtbaar"
+    "als lid: 2596 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -11405,7 +11417,7 @@
       "raakbaar": 14
      },
      "schil": {
-      "dom": 87,
+      "dom": 79,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -11416,7 +11428,7 @@
     "budget": 14,
     "geprobeerd": 14,
     "gelukt": 7,
-    "effect": 2,
+    "effect": 3,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 1,
@@ -11568,8 +11580,8 @@
      "bewijs": "/apps/office.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 te raken bij het laden, 2 geprobeerd, 1 gelukt, 1 met zichtbaar effect; niet aan te tikken: Open alle documenten: element is not visible",
+     "status": "NIET_GETEST",
+     "reden": "6 te raken bij het laden, 6 geprobeerd, 1 gelukt, 1 met zichtbaar effect, 4x teruggekeerd na navigatie -- de drempel is 3, dus dit is niet beproefd; niet aan te tikken: Open alle documenten: element is not visible, ●\nNodig: intercepts pointer events, ◇\nDossiers: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -11603,11 +11615,15 @@
      "bewijs": null
     }
    },
-   "gevonden": 2,
+   "gevonden": 6,
    "geklikt": 1,
    "overgeslagen": [],
    "nietKlikbaar": [
-    "Open alle documenten: element is not visible"
+    "Open alle documenten: element is not visible",
+    "●\nNodig: intercepts pointer events",
+    "◇\nDossiers: intercepts pointer events",
+    "B\nBesluit: intercepts pointer events",
+    "≡\nAlle docs: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1005 tekens zichtbaar"
@@ -11629,27 +11645,27 @@
     "stadia": {
      "app": {
       "dom": 59,
-      "zichtbaar": 2,
-      "inBeeld": 2,
-      "raakbaar": 2
+      "zichtbaar": 6,
+      "inBeeld": 6,
+      "raakbaar": 6
      },
      "schil": {
-      "dom": 95,
-      "zichtbaar": 24,
-      "inBeeld": 13,
-      "raakbaar": 6
+      "dom": 83,
+      "zichtbaar": 25,
+      "inBeeld": 10,
+      "raakbaar": 3
      }
     },
-    "noemer": 2,
-    "drempel": 1,
-    "budget": 2,
-    "geprobeerd": 2,
+    "noemer": 6,
+    "drempel": 3,
+    "budget": 6,
+    "geprobeerd": 6,
     "gelukt": 1,
     "effect": 1,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 57,
+    "teruggekeerd": 4,
+    "nietRaakbaar": 53,
     "onomkeerbaar": 0
    },
    "samengesteld": [],
@@ -11840,7 +11856,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1040 tekens zichtbaar"
+    "als lid: 1034 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11912,7 +11928,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "7 te raken bij het laden, 6 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 1 niet meer gevonden, 3x teruggekeerd na navigatie -- de drempel is 4, dus dit is niet beproefd; niet aan te tikken: Open gesprek ›: intercepts pointer events, Open alle post: intercepts pointer events, ⇄\nNaar werk: element is not visible",
+     "reden": "7 te raken bij het laden, 6 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 1 niet meer gevonden, 3x teruggekeerd na navigatie -- de drempel is 4, dus dit is niet beproefd; niet aan te tikken: Open gesprek ›: intercepts pointer events, Open alle post: intercepts pointer events, ◇\nGesprek: element is not stable",
      "bewijs": null
     },
     "menselijk": {
@@ -11947,12 +11963,13 @@
     }
    },
    "gevonden": 7,
-   "geklikt": 3,
+   "geklikt": 2,
    "overgeslagen": [],
    "nietKlikbaar": [
     "Open gesprek ›: intercepts pointer events",
     "Open alle post: intercepts pointer events",
-    "⇄\nNaar werk: element is not visible"
+    "◇\nGesprek: element is not stable",
+    "≡\nAlle post: element is not stable"
    ],
    "waarnemingen": [
     "als lid: 1441 tekens zichtbaar"
@@ -11984,8 +12001,8 @@
     "drempel": 4,
     "budget": 7,
     "geprobeerd": 6,
-    "gelukt": 3,
-    "effect": 3,
+    "gelukt": 2,
+    "effect": 2,
     "nietMeerGevonden": 1,
     "overgeslagen": 0,
     "teruggekeerd": 3,
@@ -12027,7 +12044,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "5 te raken bij het laden, 4 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 1 niet meer gevonden, 4x teruggekeerd na navigatie; niet aan te tikken: Inschrijven: element is not visible",
+     "reden": "5 te raken bij het laden, 4 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 1 niet meer gevonden, 5x teruggekeerd na navigatie; niet aan te tikken: Inschrijven: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -12092,10 +12109,10 @@
       "raakbaar": 5
      },
      "schil": {
-      "dom": 64,
-      "zichtbaar": 17,
-      "inBeeld": 14,
-      "raakbaar": 13
+      "dom": 77,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 12
      }
     },
     "noemer": 5,
@@ -12106,7 +12123,7 @@
     "effect": 3,
     "nietMeerGevonden": 1,
     "overgeslagen": 0,
-    "teruggekeerd": 4,
+    "teruggekeerd": 5,
     "nietRaakbaar": 6,
     "onomkeerbaar": 0
    },
@@ -12295,7 +12312,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1645 tekens zichtbaar"
+    "als lid: 1304 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12314,7 +12331,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 107,
+      "dom": 135,
       "zichtbaar": 45,
       "inBeeld": 40,
       "raakbaar": 33

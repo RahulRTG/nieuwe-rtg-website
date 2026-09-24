@@ -29,6 +29,8 @@ module.exports = (ctx) => {
     const idemSleutel = idem ? ('dp:' + key + ':' + String(idem).slice(0, 60)) : null;
     if (idemSleutel) {
       const al = idemZoek(idemSleutel);
+      if (al && (al.bedrag !== cent || al.supplierCode !== s.code))
+        return { status: 409, error: 'Deze sleutel hoort al bij een ander bedrag of een andere partner.' };
       if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
       const bezig = inVlucht.get(idemSleutel);
       if (bezig) {
@@ -71,6 +73,9 @@ module.exports = (ctx) => {
     const r = betaalWaarheid.van(w.id);
     if (r && r.afgehandeldAt) {
       const b = idemZoek(idemSleutel || ('waarheid:' + w.id));
+      // wat onder deze sleutel staat, moet DEZE betaling zijn
+      if (!b || b.bedrag !== cent || b.supplierCode !== s.code)
+        return { status: 409, betalingId: w.id, error: 'Deze sleutel hoort al bij een ander bedrag of een andere partner.' };
       return { status: 200, ok: true, betaling: publiek(b), betalingId: w.id };
     }
     return { status: 402, pending: true, betalingId: w.id, providerId: (r && r.providerId) || null,
@@ -93,6 +98,9 @@ module.exports = (ctx) => {
     const idemSleutel = idem || (providerId ? String(aanbieder || 'provider') + ':' + providerId : null);
     if (idemSleutel) {
       const al = idemZoek(idemSleutel);
+      // een herhaling is alleen een herhaling bij hetzelfde bedrag en dezelfde partner
+      if (al && (al.bedrag !== cent || al.supplierCode !== s.code))
+        return { status: 409, error: 'Deze sleutel hoort al bij een ander bedrag of een andere partner.' };
       if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
     }
     const isMunt = betaalwijze === 'munt';

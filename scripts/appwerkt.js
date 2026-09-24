@@ -294,6 +294,10 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     return r;
   }
 
+  /* Een BEVINDING en geen oordeel: meet de proef met een andere persona dan het
+     register als doelgroep noemt? Beide bronnen staan erbij (./lib/bestemming.js). */
+  r.personaAfwijking = personaAfwijking(rij.persona, rij.pad, SCHERMREGISTER);
+
   // ---- bewijs 1: bereikbaar voor de persona van deze wereld ----
   const eigen = persoonlijk[rij.persona];
   if (!eigen) {
@@ -349,8 +353,32 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG',
       reden: 'de server zegt zelf dat er iets in de omgeving ontbreekt: ' + eersteBezoek.config[0], bewijs: rij.pad };
   } else {
-    r.bewijzen.bereikbaar = { status: 'BEWEZEN',
-      reden: 'opent voor een ' + rij.persona + ' zonder poort en zonder fout', bewijs: rij.pad };
+    /* OPENDE ZONDER POORT EN ZONDER FOUT -- maar OP DE BEDOELDE BESTEMMING?
+       Een deur kan ook een doorverwijzing zijn: vier kantoorschermen stuurden
+       een lid naar de kantoordeur, en stonden hier op BEWEZEN. Het oordeel komt
+       uit ./lib/bestemming.js, op de capability uit SCHERMEIGENAAR.json en niet
+       op url-gelijkheid. De andere sessies worden alleen bezocht als de
+       bestemming niet klopte: dan is de vraag of de ingang verkeerd geadresseerd
+       is (de bestaande uitkomst) of gewoon niet bereikt. */
+    const landing = eersteBezoek.eind || rij.pad;
+    let o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER, persona: rij.persona, anderen: [] });
+    if (o.status !== 'BEWEZEN' && o.bestemming.uitkomst === 'andere-capability') {
+      const anderen = [];
+      for (const rol of rollen) {
+        if (rol === rij.persona || !persoonlijk[rol]) continue;
+        const b = await bezoek(persoonlijk[rol], base, rij.pad);
+        if (!b.poort && !b.crash.length) anderen.push({ persona: rol, landing: b.eind || rij.pad });
+      }
+      o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER, persona: rij.persona, anderen });
+    }
+    r.bestemming = o.bestemming;
+    r.bewijzen.bereikbaar = { status: o.status, reden: o.reden, bewijs: rij.pad };
+    if (o.status !== 'BEWEZEN') {
+      for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST',
+        reden: 'de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app', bewijs: null };
+      vulOngemeten(r);
+      return r;
+    }
   }
 
   // ---- bewijs 2 en 8: bedienbaar en menselijk ----
@@ -587,6 +615,12 @@ async function bedien(ctx, base, pad, kant = 'app') {
    wat die indeling niet kan zien. */
 const { deelFoutIn } = require('./lib/foutindeling');
 const { plan, oordeel, isSchil } = require('./lib/bedieningsmeting');
+const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
+/* De schermidentiteit van dit huis: capability, rol en doelgroep per scherm.
+   Zonder vangnet: een onleesbaar register als een LEEG register lezen zou elke
+   bestemming "niet te identificeren" maken en de meting stil laten doorgaan --
+   dan hoort de meter te vallen, niet de rijen (STILLEZING.json). */
+const SCHERMREGISTER = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SCHERMEIGENAAR.json'), 'utf8')).schermen;
 
 function luister(page, base, bak) {
   page.on('pageerror', (e) => bak.crash.push('JS: ' + String(e.message || e).slice(0, 180)));
@@ -673,7 +707,7 @@ function bouw(meting) {
 
 /* Voor test/appwerkt-meter.e2e.js: de bediening los aan te roepen op een
    synthetisch scherm, zonder server en zonder register. */
-module.exports = { bedien, inventaris };
+module.exports = { bedien, inventaris, bezoek };
 
 /* DE WACHT: dit script schrijft APPWERKT.json en start daarom niet bij het
    requiren (scripts/meetkeuring.js, regel `wacht`). Een laadcontrole -- node -e

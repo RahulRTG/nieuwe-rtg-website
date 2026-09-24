@@ -56,3 +56,16 @@ test('5. de grootste cluster staat bovenaan', () => {
     rij('C', { bevoegd: b('GEEN_FIXTURE', 'y y y y y') })] });
   assert.deepEqual(c.GEEN_FIXTURE.map((k) => k.apps.length), [2, 1]);
 });
+
+test('6. registerconflicten groeperen op wereld en gebruikt -> verwacht, los van de bewijzen', () => {
+  const { conflicten } = require('../scripts/lib/appcluster');
+  const af = (v) => ({ gebruikt: 'lid', verwacht: v, bronGebruikt: 'x', bronVerwacht: 'y' });
+  const reg = { regels: [
+    { app: 'A', wereld: 'WorkOS', personaAfwijking: af('zaak'), bewijzen: {} },
+    { app: 'B', wereld: 'WorkOS', personaAfwijking: af('zaak'), bewijzen: {} },
+    { app: 'C', wereld: 'WorkOS', personaAfwijking: af('kantoor'), bewijzen: {} },
+    { app: 'D', wereld: 'WorkOS', personaAfwijking: null, bewijzen: {} }] };
+  const c = conflicten(reg);
+  assert.deepEqual(c.map((x) => [x.verwacht, x.apps.length]), [['zaak', 2], ['kantoor', 1]]);
+  assert.equal(Object.values(cluster(reg)).flat().length, 0, 'een conflict is geen bewijsstand en komt niet in de clusters');
+});

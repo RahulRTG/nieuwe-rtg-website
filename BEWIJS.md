@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2024 bestanden en 14341 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2026 bestanden en 14348 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2024 |
-| losse beweringen (`test(...)`) | 14341 |
+| toetsbestanden | 2026 |
+| losse beweringen (`test(...)`) | 14348 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1371 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
-| niets van beide | 409 |
+| niets van beide | 411 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1770 bestanden, 13887 beweringen.
+1771 bestanden, 13893 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -103,7 +103,7 @@ toets omvalt.
 | `apipoort.test.js` | 9 | gezakt op `===->!==#0` | De API-poort (kern/command/apipoort.js): sleutels, scopes, quota en contractregels voor koppelingen. WAT DEZE TOETS VOORAL BEWAAKT zijn vier dingen die allemaal onzichtbaar kapot kunnen gaan: 1. |
 | `appbieb.test.js` | 5 | gezakt op `liegpoort /api/` | De App-Bibliotheek: de ECHTE RTG-apps van het ecosysteem (geen verzonnen namen meer). Elke tegel opent een bestaande pagina; installeren zet hem op je startscherm. |
 | `appbrug.test.js` | 10 | gezakt op `===->!==#0` | DE APPBRUG (kern/mobiliteit/appbrug.js) -- van app-rit naar vervoersopdracht. Het besluit erachter staat in MAATSTAF.md par. |
-| `appcluster.test.js` | 5 | gezakt op `===->!==#0` | ROOD CLUSTEREN -- de rode cellen van APPWERKT.json per kandidaat-oorzaak. Wat vastligt, en elke regel kan zakken: 1. |
+| `appcluster.test.js` | 6 | gezakt op `===->!==#0` | ROOD CLUSTEREN -- de rode cellen van APPWERKT.json per kandidaat-oorzaak. Wat vastligt, en elke regel kan zakken: 1. |
 | `appcontract.test.js` | 11 | gezakt op `===->!==#0` | HET APP-CONTRACT EN DE BEWIJSBRON -- een app mag bewijs samenstellen uit een proef die al bestaat, en alleen als die proef het op deze code verdient. Wat dit bestand bewaakt, en elke regel kan zakken: 1. |
 | `appstore-arena.test.js` | 10 | -- | DE ARENA VAN EEN APP -- een bord per app, met de 18+-poort van het huis. Wat deze toets vastlegt: 1. |
 | `appstore-bereik.test.js` | 5 | gezakt op `-->+#0` | HET BEREIK VAN EEN APP -- de klasse die wordt GEREKEND en nooit gezet. Een keurmerk is de duurste vorm van LAT-regel 6: een lid dat "zonder bereik" leest, gedraagt zich ernaar. |
@@ -189,6 +189,7 @@ toets omvalt.
 | `besluit.test.js` | 11 | gezakt op `!==->===#0` | DE BESLISVRAAG: een vraag, een antwoord, een vorm. Dit huis stelt "mag dit gebeuren" op tientallen plekken en beantwoordt hem elke keer anders. |
 | `bestand-binding.test.js` | 6 | gezakt op `+->-#1` | Opgeslagen bestanden zijn aan hun NAAM gebonden (server/kluis.js). De versleuteling beschermde al de inhoud van een bestand, maar zei niets over welk bestand het was. |
 | `bestanden.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Bestanden: de kluis met mappen en quotum, versies, delen op codenaam, de prullenbak als zichtbare la en de stukken-upload voor grote bestanden. |
+| `bestemming.test.js` | 5 | -- | BEREIKBAAR OP DE BEDOELDE BESTEMMING -- de pure kern (scripts/lib/bestemming.js). Vier rijen stonden op BEWEZEN terwijl een lid naar een kantoorscherm werd doorgestuurd. |
 | `betaaldienst.test.js` | 5 | gezakt op `liegpoort /api/` | De betaaldienstkosten gaan DIRECT naar de ondernemer: per kassabetaling meteen verrekend op de partnerrekening (eigen grootboekregel), transparant op de bon en in het partneroverzicht -- geen verzamelfactuur... |
 | `betaaldienstfee.test.js` | 14 | gezakt op `===->!==#0` | DE BETAALDIENSTVERGOEDING: verschuldigd is iets anders dan geboekt. In kern/pay/kassa.js stond: if (kb.error) kosten = 0; Mislukte de kostenboeking, dan werden de kosten NUL -- in de teruggave aan de kassa en dus op... |
 | `betaalopdracht.test.js` | 26 | gezakt op `true->false#0` | De betaalopdracht (kern/betaalopdracht/): het verschil tussen "geboekt" en "echt weg". Getest met een NEPRAIL die we naar believen laten mislukken, want dat is precies het geval dat er in productie niet uit te lokken... |
@@ -1810,7 +1811,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-254 bestanden, 454 beweringen.
+255 bestanden, 455 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1822,6 +1823,7 @@ toets omvalt.
 | `appmenu.e2e.js` | 10 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
 | `apps-ui.e2e.js` | 12 | genoemd | Scherm-tests voor de overige vlaggenschip-apps: leverancier, lid en backoffice. Elk logt in via een API-token in localStorage (net als de PDA- test), opent de app in een echte browser en controleert dat de beveiligde... |
 | `appstore.e2e.js` | 3 | -- | DE CEL IN EEN ECHTE BROWSER -- het enige bewijs dat telt voor deze laag. test/appstore.test.js bewijst wat de SERVER doet. |
+| `appwerkt-bestemming.e2e.js` | 1 | -- | BEREIKBAAR IN EEN ECHTE BROWSER -- doorverwijzingen die pas na het laden gebeuren. Een synthetisch huis met vier schermen en een eigen register. |
 | `appwerkt-meter.e2e.js` | 1 | -- | DE METER OP EEN SYNTHETISCH SCHERM -- de regressiefixture voor bedienbaar. Op 24 september 2026 bleek `bedienbaar` vier fouten in de METER te hebben: een navigerende tik liet de lus stoppen, panelen die de proef zelf... |
 | `avond-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET AVONDSCHERM (/apps/avond.html) IN EEN ECHTE BROWSER. test/avond.test.js bewijst dat de avondroutes de klok en het budget als GRENS behandelen en dat een tafel nooit verder komt dan `aangevraagd`. |
 | `bankkamer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |

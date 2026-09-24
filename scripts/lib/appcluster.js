@@ -47,6 +47,9 @@ function normaliseer(reden) {
     /* En de tellingen die een bedieningsreden erbij noemt: hoeveel er niet aan
        te tikken of overgeslagen was, is uitsplitsing en geen oorzaak. */
     .replace(/, # (?:niet aan te tikken \(…\)|overgeslagen omdat ze onomkeerbaar zijn|x geweigerd met een reden \(…\))/g, '')
+    /* Een bedieningsreden noemt de knop die niet aan te tikken was; welke knop
+       dat is verschilt per app, de SOORT (een laag die de tik onderschept) niet. */
+    .replace(/; niet aan te tikken: .*?(intercepts pointer events|element is not visible|element is outside of the viewport|element is not stable|element is not enabled|reden niet gemeld).*$/, '; niet aan te tikken: … $1')
     .replace(/: [^:]{80,}$/, ': …')
     .replace(/\s+/g, ' ')
     .trim();
@@ -70,4 +73,24 @@ function cluster(register) {
   return perStand;
 }
 
-module.exports = { STANDEN, normaliseer, cluster };
+/* DE REGISTERCONFLICTEN: rijen waar de proef met een andere persona mat dan
+   SCHERMEIGENAAR.json als doelgroep noemt (`personaAfwijking`). Geen bewijsstand
+   en dus nooit bij de clusters hierboven: het is een tegenspraak tussen twee
+   registers, en welke van de twee gelijk heeft is een besluit. Gegroepeerd op
+   `gebruikt -> verwacht`, zodat een structurele oorzaak (een hele wereld die met
+   de verkeerde persona gemeten wordt) als EEN groep zichtbaar is en niet als
+   dertien losse apps. */
+function conflicten(register) {
+  const bak = new Map();
+  for (const r of register.regels || []) {
+    const a = r.personaAfwijking;
+    if (!a) continue;
+    const sleutel = r.wereld + ': ' + a.gebruikt + ' -> ' + a.verwacht;
+    if (!bak.has(sleutel)) bak.set(sleutel, { wereld: r.wereld, gebruikt: a.gebruikt, verwacht: a.verwacht,
+      bronGebruikt: a.bronGebruikt, bronVerwacht: a.bronVerwacht, apps: [] });
+    bak.get(sleutel).apps.push(r.app);
+  }
+  return [...bak.values()].sort((x, y) => y.apps.length - x.apps.length || (x.wereld + x.verwacht).localeCompare(y.wereld + y.verwacht));
+}
+
+module.exports = { STANDEN, normaliseer, cluster, conflicten };

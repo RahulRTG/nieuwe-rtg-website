@@ -269,6 +269,39 @@ zeven laten een toets zakken.
 `bereikbaar` alleen bewijst dat er een pagina verschijnt, of ook dat de juiste app
 voor de juiste persona is bereikt. Dat krijgt een eigen diagnose.
 
+## 4d. Bereikbaar: de juiste actor op de bedoelde bestemming
+
+**Staat** (24 september 2026). Een diagnose over alle 112 rijen vergeleek de
+ingang uit `MAPPEN` met de pagina waar de proef werkelijk landde. **Vier rijen
+stonden op BEWEZEN terwijl een lid de app nooit bereikte**: Routedossier, Decision
+Room, Project Room en RTG One sturen een lid zonder kantoorsessie door naar de
+kantoordeur of het RTG Kantoor. De meter herkende een deur alleen als een selector
+óp de pagina, dus een deur via een doorverwijzing ging erdoorheen.
+
+**De identiteit bestond al.** `SCHERMEIGENAAR.json` noemt per scherm een
+capability, een rol en een doelgroep. `scripts/lib/bestemming.js` vergelijkt
+daarom de capability van de landing met die van de ingang, en niet de url. Een
+alias wordt gevolgd, zodat een canonieke doorverwijzing geldig blijft. Een andere
+capability is nooit BEWEZEN. Komt een andere bekende persona er wel, dan is het de
+bestaande uitkomst "verkeerd geadresseerd" met dezelfde zin. Een landing die niet
+te benoemen is, is NIET_GETEST. Het register wordt zonder vangnet gelezen: een
+onleesbaar register is geen leeg register.
+
+**Een tweede as, bewust zonder bewijsbetekenis.** Op dertien schermen meet de proef
+met een andere persona (de wereld uit `MAPPEN`, via `PERSONA_VAN_WERELD`) dan het
+register als doelgroep noemt. WorkOS meet bijvoorbeeld als lid, terwijl Horeca en
+Partner Network voor een zaak zijn. Welke van de twee gelijk heeft, is geen
+meetvraag. "Vanuit welke wereld testen we" en "voor wie is dit scherm" hoeven niet
+hetzelfde begrip te zijn. De afwijking staat per rij als `personaAfwijking`, met
+beide waarden en beide bronnen. `npm run appcluster` groepeert hem per wereld op
+`gebruikt → verwacht`. Hij verandert geen enkel bewijs, tot de dertien semantisch
+zijn ingedeeld.
+
+Toetsen: `test/bestemming.test.js` (de drie gevallen, een onbekende landing, de
+persona-afwijking) en `test/appwerkt-bestemming.e2e.js` (echte doorverwijzingen na
+het laden). Vijf mutaties, waaronder "terug naar url-vergelijking": alle vijf
+laten een toets zakken.
+
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
 `npm run appwerkt` schrijft `APPWERKT.json`: per onderdeel uit `MAPPEN`, met de

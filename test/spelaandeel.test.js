@@ -155,13 +155,19 @@ test('wat er wordt uitgekeerd houdt de eigenaar niet ook nog eens zelf', () => {
   const voorA = st.geld.anna, voorB = st.geld.boris;
   maand(m, p, 1);
   const resultaat = st.laatste.anna.regels[0].resultaat;
-  const naarA = E(st.geld.anna - voorA), naarB = E(st.geld.boris - voorB);
+  /* Sinds regelversie 3 betaalt anna ook de Foundation-afdracht over haar
+     eindverkoop (MAGNAAT.md, A2.9). Dat is een eigen regel op haar overzicht en
+     geen deel van de verdeling, dus hij wordt teruggeteld -- in hele euro's,
+     vandaar een halve euro meer ruimte bij anna. */
+  const afdracht = -((st.laatste.anna.regels.find(r => r.id === 'foundation') || {}).resultaat || 0);
+  assert.ok(afdracht > 0, 'anna draagt af: ' + afdracht);
+  const naarA = E(st.geld.anna - voorA) + afdracht, naarB = E(st.geld.boris - voorB);
   assert.ok(resultaat > 0, 'de zaak draait winst: ' + resultaat);
-  assert.ok(Math.abs(naarA + naarB - resultaat) < 1,
+  assert.ok(Math.abs(naarA + naarB - resultaat) < 1.5,
     'samen hoort dat precies het resultaat te zijn: ' + Math.round(naarA) + ' + ' + Math.round(naarB) +
     ' = ' + Math.round(naarA + naarB) + ' tegenover ' + resultaat);
   assert.ok(Math.abs(naarB - resultaat * 0.35) < 1, 'en boris krijgt precies 35%');
-  assert.ok(Math.abs(naarA - resultaat * 0.65) < 1, 'en anna houdt de andere 65%');
+  assert.ok(Math.abs(naarA - resultaat * 0.65) < 1.5, 'en anna houdt de andere 65%');
 });
 
 test('de prijs gaat van de koper naar de eigenaar, en verder nergens heen', () => {

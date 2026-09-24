@@ -25,7 +25,11 @@
    bepaald zijn, en weigert elk ander bedrag. */
 'use strict';
 
-const WORLD_REGELVERSIE = '2';
+/* De regelversie van een NIEUWE partij; een lopende partij houdt de hare.
+   1: euro's met drijvende komma. 2: hele eurocenten (A2.1). 3: de stad en de
+   spelers betalen de Foundation-afdracht (A2.9, ./foundation.js). */
+const WORLD_REGELVERSIE = '3';
+const CENTEN_VERSIE = '2';
 const EENHEID = 'eurocent';
 
 function naarCenten(euro) {
@@ -98,14 +102,15 @@ function elkMonetairVeld(st, doe) {
 }
 
 /* EENMALIG: een partij van voor A2.1 rekende in euro's. Hij wordt een keer
-   omgezet en krijgt de eenheid en de regelversie mee, zodat hij nooit twee keer
-   wordt omgezet. Een partij die al in centen rekent, blijft onaangeroerd. */
+   omgezet en krijgt de eenheid en regelversie 2 mee (alleen de centen, de rest
+   van zijn regels blijft), zodat hij nooit twee keer wordt omgezet. Een partij
+   die al in centen rekent, blijft onaangeroerd. */
 function zorgEenheid(st) {
   if (!st || st.eenheid === EENHEID) return false;
   elkMonetairVeld(st, (houder, veld) => { houder[veld] = naarCenten(Number(houder[veld]) || 0); });
   st.eenheid = EENHEID;
-  st.regelversie = WORLD_REGELVERSIE;
+  st.regelversie = CENTEN_VERSIE;
   return true;
 }
 
-module.exports = { naarCenten, uitCenten, euroTonen, contractCenten, contractOmzet, maandDelen, MONETAIR, elkMonetairVeld, zorgEenheid, WORLD_REGELVERSIE, EENHEID };
+module.exports = { naarCenten, uitCenten, euroTonen, contractCenten, contractOmzet, maandDelen, MONETAIR, elkMonetairVeld, zorgEenheid, WORLD_REGELVERSIE, CENTEN_VERSIE, EENHEID };

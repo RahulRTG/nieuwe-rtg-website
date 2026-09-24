@@ -1,13 +1,7 @@
 /* Magnaat: EEN SPELMAAND VOOR DE HELE WERELD.
 
-   Afgesplitst van ./economie.js, en de naad is echt: dat bestand gaat over
-   WANNEER er een maand gerekend wordt (de klok die bijrekent, het opzetten, het
-   einde, de wissel naar de acties) en dit bestand over WAT ER IN die maand
-   gebeurt. Het eerste is af en verandert niet meer; het tweede groeit met elke
-   fase mee -- fase B zette er de contractafwikkeling in, fase C zet er
-   gebeurtenissen in. Twee dingen met zo'n verschillend tempo horen niet in een
-   bestand, en de 10 kB-grens die scripts/check.js bewaakt is precies een rem
-   hierop.
+   ./economie.js gaat over WANNEER er een maand gerekend wordt, dit bestand
+   over WAT ER IN die maand gebeurt -- twee dingen met een ander tempo.
 
    DE VOLGORDE IN DEZE MAAND IS DE UITLEG, en hij staat vast omdat de klok
    bijrekent (GAMEHALL.md 12.4): tien maanden in een keer moeten hetzelfde
@@ -45,7 +39,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
         druk[zone + ':' + v.sector] = (druk[zone + ':' + v.sector] || 0) + 1;
       }
     let wereldOmzet = 0;
-    const perSpeler = {};
+    const perSpeler = {}, omzetPer = {};
     // wat de Foundation aan opleiding heeft bijgedragen; werkt door in hoeveel
     // een medewerker aankan
     const arbeid = F.arbeidBonus(st.foundation);
@@ -113,7 +107,9 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
            spelers is geen nieuwe bedrijvigheid maar dezelfde euro die twee keer
            langskomt; hem meetellen zou de Foundation-pot laten groeien van
            spelers die geld heen en weer schuiven. */
-        wereldOmzet += r.omzet - ((r.levering && r.levering.omzet) || 0);
+        const eind = r.omzet - ((r.levering && r.levering.omzet) || 0);
+        wereldOmzet += eind;
+        omzetPer[h] = (omzetPer[h] || 0) + eind;
         kwaliteitVan[v.id] = r.kwaliteit;
         v.laatsteBezetting = r.bezetting;
       }
@@ -159,9 +155,11 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     const contractRegels = wikkelAf(st, actief, leverDeel, kwaliteitVan, betaling);
 
     /* De afdracht rust op de HELE stad en niet alleen op de spelers: anders
-       bouwt de Foundation in een partij met twee mensen nooit iets. Zie de
-       reden bij `stadsomzet` in de stadsdata. */
-    const afdracht = F.draagAf(st, wereldOmzet + (k.stadsomzet || 0));
+       bouwt de Foundation in een partij met twee mensen nooit iets. WIE hem
+       betaalt hangt af van de regelversie (./foundation.js). */
+    const afdracht = F.draagAf(st, wereldOmzet + (k.stadsomzet || 0), { stad: k.stadsomzet || 0, spelers: omzetPer });
+    for (const [h, euro] of Object.entries(afdracht.spelers || {}))
+      (perSpeler[h] = perSpeler[h] || []).push({ id: 'foundation', naam: 'Afdracht RTFoundation', resultaat: -euro });
     /* Waar de bedrijvigheid zit, zodat de Foundation daar bouwt. Uit dezelfde
        telling die de concurrentiedruk gebruikt: een tweede telling zou een
        tweede antwoord op dezelfde vraag zijn. */

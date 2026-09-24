@@ -17,13 +17,14 @@
    Foundation die slim zou investeren om ergens winst te maken is precies wat ze
    niet is.
 
-   DE AFDRACHT KOMT UIT DE OMZET VAN DE HELE WERELD, spelers en AI-bedrijven
-   samen. Dat is een spelmechaniek en geen weergave van een echte geldstroom:
-   buiten het spel komt de bijdrage uit lidmaatschappen, niet uit de omzet van
-   ondernemers. Het staat hier zo omdat een spelwereld zonder abonnementen wel
-   een economie heeft, en de VERHOUDING is wat je wilt laten zien. */
+   DE AFDRACHT RUST OP DE OMZET VAN DE HELE WERELD, spelers en AI-bedrijven
+   samen, en sinds regelversie 3 betaalt ook ieder zijn eigen deel: de stad
+   over haar omzet, de speler over zijn eindverkoop, via RTG naar de
+   RTFoundation (MAGNAAT.md, besluit 3). Buiten het spel komt de bijdrage uit
+   lidmaatschappen; een spelwereld zonder abonnementen heeft wel een economie,
+   en de VERHOUDING is wat je wilt laten zien. */
 
-const { naarCenten } = require('./centen');
+const { naarCenten, euroTonen } = require('./centen');
 const { beweeg } = require('./boekhouding');
 const DEEL_LOKAAL = 0.20;
 const DEEL_CENTRAAL = 0.10;
@@ -63,17 +64,31 @@ function nieuw() {
 
 /* De afdracht over een maand omzet. Geeft terug wat er is afgedragen, zodat de
    speler het als regel op zijn maandoverzicht ziet in plaats van als verschil. */
-function draagAf(st, omzet) {
+/* WIE BETAALT (MAGNAAT.md, besluit 3). Tot regelversie 3 de stad over de hele
+   omzet: de pot groeide uit geld dat niemand miste. Vanaf regelversie 3 de stad
+   over haar eigen omzet en elke speler over zijn eindverkoop, dus de afdracht is
+   een echte post op zijn maandoverzicht. Een lopende partij houdt haar versie. */
+function draagAf(st, omzet, per) {
   const bijdrage = omzet * BIJDRAGE;
   const lokaal = bijdrage * DEEL_LOKAAL, centraal = bijdrage * DEEL_CENTRAAL;
-  /* In eurocenten (./centen.js), elk deel een keer afgerond. Het loopt via RTG:
-     RTG is hier de ROUTE naar de RTFoundation en geen partij, dus zijn rekening
-     staat na de afdracht weer op nul (MAGNAAT.md, besluit 3). */
-  const l = naarCenten(lokaal), c = naarCenten(centraal);
+  const v3 = Number(st.regelversie) >= 3;
+  /* In eurocenten (./centen.js), elk deel per betaler een keer afgerond. Het
+     loopt via RTG: RTG is de ROUTE naar de RTFoundation en geen partij, dus zijn
+     rekening staat na de afdracht weer op nul. */
+  const deel = (o) => { const b = o * BIJDRAGE; return [naarCenten(b * DEEL_LOKAAL), naarCenten(b * DEEL_CENTRAAL)]; };
+  let [l, c] = v3 ? deel(per.stad) : [naarCenten(lokaal), naarCenten(centraal)];
   beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['macro', 'stad'], naar: ['rtg', 'foundation'], bedrag: l + c, omschrijving: 'Afdracht van de stad' });
+  const spelers = {};
+  for (const [h, o] of Object.entries(v3 ? per.spelers : {})) {
+    const [dl, dc] = deel(o);
+    beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['kas', h], naar: ['rtg', 'foundation'], bedrag: dl + dc, omschrijving: 'Afdracht van een speler' });
+    l += dl; c += dc; spelers[h] = euroTonen(dl + dc);
+  }
   beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'lokaal'], bedrag: l, omschrijving: 'Naar de lokale pot' });
   beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'centraal'], bedrag: c, omschrijving: 'Naar de centrale pot' });
-  return { bijdrage: Math.round(bijdrage), lokaal: Math.round(lokaal), centraal: Math.round(centraal) };
+  const uit = { bijdrage: Math.round(bijdrage), lokaal: Math.round(lokaal), centraal: Math.round(centraal) };
+  if (v3) uit.spelers = spelers;
+  return uit;
 }
 
 /* Is er genoeg voor het volgende project? Zo ja: voer het uit en verschuif de

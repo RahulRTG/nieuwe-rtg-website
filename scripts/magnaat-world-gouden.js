@@ -9,8 +9,12 @@
                   -> test/fixtures/magnaat-world-voor-a21.json
      --baseline   de WORLD ECONOMIC GOLDEN BASELINE: World NA A2.1. Vanaf hier
                   mogen A2.2 t/m A2.9 de architectuur veranderen maar de
-                  speluitkomst niet (MAGNAAT.md).
+                  speluitkomst niet (MAGNAAT.md). Gedraaid als partij op
+                  regelversie 2, want een lopende partij houdt haar regels.
                   -> test/fixtures/magnaat-world-baseline.json
+     --baseline-v3  dezelfde scenario's op regelversie 3: de stad en de
+                  spelers betalen de Foundation-afdracht (A2.9, besluit 3).
+                  -> test/fixtures/magnaat-world-baseline-v3.json
 
    Beide weigeren een bestaand bestand te overschrijven zonder --opnieuw: een
    referentie die je na de verbouwing opnieuw uit de nieuwe code schrijft,
@@ -28,11 +32,12 @@ const { SCENARIOS, draai } = require('../test/lib/magnaat-world-scenarios');
 const WORTEL = path.join(__dirname, '..');
 const DOELEN = {
   '--voor-a21': { bestand: 'test/fixtures/magnaat-world-voor-a21.json', regelversie: null },
-  '--baseline': { bestand: 'test/fixtures/magnaat-world-baseline.json', regelversie: '2' }
+  '--baseline': { bestand: 'test/fixtures/magnaat-world-baseline.json', regelversie: '2', alsVersie: '2' },
+  '--baseline-v3': { bestand: 'test/fixtures/magnaat-world-baseline-v3.json', regelversie: '3' }
 };
 
 if (require.main === module) {
-  const soort = Object.keys(DOELEN).find(k => process.argv.includes(k));
+  const soort = Object.keys(DOELEN).reverse().find(k => process.argv.includes(k));
   if (!soort) { console.error('[magnaat-world-gouden] kies --voor-a21 of --baseline'); process.exit(2); }
   const doel = DOELEN[soort];
   const pad = path.join(WORTEL, doel.bestand);
@@ -41,7 +46,8 @@ if (require.main === module) {
     process.exit(2);
   }
   const { WORLD_REGELVERSIE } = require('../server/kern/spellen/magnaat/centen');
-  const versie = WORLD_REGELVERSIE || '1';
+  // een baseline op een eerdere versie draait de partij als die versie
+  const versie = doel.alsVersie || WORLD_REGELVERSIE || '1';
   if (doel.regelversie && versie !== doel.regelversie) {
     console.error('[magnaat-world-gouden] de baseline hoort bij World-regelversie ' + doel.regelversie + '; World rekent op ' + versie + '.');
     process.exit(2);
@@ -50,10 +56,12 @@ if (require.main === module) {
   const uit = {
     uitleg: soort === '--voor-a21'
       ? 'Magnaat World VOOR ronde A2.1 (regelversie 1: euro\'s met drijvende komma), per stap, gemaakt met scripts/magnaat-world-gouden.js op ' + commit + '. Het bewijs van wat A2.1 veranderde; wordt nooit opnieuw uit nieuwere code geschreven.'
-      : 'WORLD ECONOMIC GOLDEN BASELINE: Magnaat World NA ronde A2.1 (regelversie ' + versie + ', hele eurocenten), per stap, gemaakt op ' + commit + '. A2.2 t/m A2.9 moeten hier exact aan gelijk blijven.',
+      : soort === '--baseline'
+        ? 'WORLD ECONOMIC GOLDEN BASELINE: Magnaat World NA ronde A2.1 (regelversie ' + versie + ', hele eurocenten), per stap, gemaakt op ' + commit + '. A2.2 t/m A2.9 moeten hier exact aan gelijk blijven.'
+        : 'Magnaat World op regelversie ' + versie + ' (A2.9: de stad en de spelers betalen de Foundation-afdracht, via RTG), per stap, gemaakt op ' + commit + '.',
     regelversie: versie, commit,
     scenarios: Object.fromEntries(Object.keys(SCENARIOS).map(n => {
-      const r = draai(n);
+      const r = draai(n, { regelversie: doel.alsVersie });
       return [n, { stappen: r.stappen, eind: r.eind }];
     }))
   };

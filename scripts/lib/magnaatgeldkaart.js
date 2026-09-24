@@ -150,9 +150,12 @@ const GEBEURTENISSEN = [
 
   { id: 'G26', betekenis: 'FOUNDATION_AFDRACHT', categorie: 'foundation', van: 'stad', naar: 'Foundation-pot', tegenzijde: 'bron', gemigreerd: 'A2.9',
     benen: [b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['macro', 'stad'], naar: ['rtg', 'foundation'], bedrag: l + c, omschrijving: 'Afdracht van de stad' });"), b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'lokaal'], bedrag: l, omschrijving: 'Naar de lokale pot' });"), b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'centraal'], bedrag: c, omschrijving: 'Naar de centrale pot' });")],
-    let: 'de afdracht wordt BEREKEND over de omzet maar van niemand afgetrokken: de pot groeit uit niets. Besluit 3 (MAGNAAT.md): de stad en de spelers betalen, via RTG naar de RTFoundation. Tot die regelwijziging (A2.9) staat de stad als betaler: de berekening loopt nu over de stadsomzet en die van de spelers, zonder dat iemand het voelt' },
+    let: 'voor A2.9 werd de afdracht BEREKEND over de omzet maar van niemand afgetrokken: de pot groeide uit niets. Sinds A2.9 betaalt de stad, via RTG (een route die na elke afdracht op nul staat). Tot regelversie 3 over de hele omzet, daarna over haar eigen omzet, en de spelers over de hunne (G28)' },
   { id: 'G27', betekenis: 'FOUNDATION_PROJECT', categorie: 'foundation', van: 'Foundation-pot', naar: 'aannemer', tegenzijde: 'put', gemigreerd: 'A2.9',
-    benen: [b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_PROJECT', van: ['foundation', 'lokaal'], naar: ['macro', 'aannemer'], bedrag: naarCenten(p.kosten), omschrijving: p.naam });")] }
+    benen: [b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_PROJECT', van: ['foundation', 'lokaal'], naar: ['macro', 'aannemer'], bedrag: naarCenten(p.kosten), omschrijving: p.naam });")] },
+  { id: 'G28', betekenis: 'FOUNDATION_AFDRACHT', categorie: 'foundation', van: 'speler', naar: 'Foundation-pot', tegenzijde: 'overdracht', gemigreerd: 'A2.9',
+    benen: [b('foundation.js', "beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['kas', h], naar: ['rtg', 'foundation'], bedrag: dl + dc, omschrijving: 'Afdracht van een speler' });")],
+    let: 'NIEUW door besluit 3 (MAGNAAT.md), vanaf regelversie 3: de speler betaalt de afdracht over zijn eigen eindverkoop, via RTG naar de RTFoundation. Een partij op regelversie 2 kent deze gebeurtenis niet' }
 ];
 
 /* De patronen waarmee de toets de plekken zelf zoekt. Het eerste is letterlijk

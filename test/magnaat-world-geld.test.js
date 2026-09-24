@@ -18,17 +18,23 @@
       afgerond -- zodat acht losse boekingen in A2.8 exact hetzelfde geven.
    9. Na elke stap staat elke overlopende rekening op nul: wat de leverancier
       in de maand kreeg, heeft de afnemer na de maand betaald, en wat via RTG
-      naar de RTFoundation ging, is daar ook aangekomen. */
+      naar de RTFoundation ging, is daar ook aangekomen.
+  10. Een nieuwe partij rekent op regelversie 3 en stap voor stap gelijk aan
+      haar eigen referentie (test/fixtures/magnaat-world-baseline-v3.json).
+  11. Wat regelversie 3 verandert, en niet meer dan dat: vanuit dezelfde stand
+      groeit de Foundation-pot in een maand even hard (op de afronding na),
+      de spelers betalen samen wat de stad niet meer betaalt, en elke speler
+      betaalt wat er op zijn maandoverzicht staat. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const kaart = require('../scripts/lib/magnaatgeldkaart');
 const { metDekking } = require('./lib/magnaat-geldkaart-dekking');
-const { SCENARIOS, draai, nieuweWereld } = require('./lib/magnaat-world-scenarios');
+const { SCENARIOS, draai, nieuweWereld, voerUit, afdruk, canoniek } = require('./lib/magnaat-world-scenarios');
 const C = require('../server/kern/spellen/magnaat/centen');
 
 function vergelijk(ref, naam) {
-  const uit = draai(naam).stappen;
+  const uit = draai(naam, { regelversie: ref.regelversie }).stappen;
   const verwacht = ref.scenarios[naam].stappen;
   assert.equal(uit.length, verwacht.length, naam + ': ander aantal stappen');
   for (let i = 0; i < verwacht.length; i++) {
@@ -48,15 +54,17 @@ test('1. de World-scenario\'s raken alle gebeurtenissen van de geldkaart', () =>
 });
 
 test('2. World rekent stap voor stap gelijk aan de WORLD ECONOMIC GOLDEN BASELINE', () => {
+  /* Als partij op regelversie 2: een lopende partij houdt haar regels, dus
+     de migratie A2.2-A2.9 moet haar exact laten rekenen als ervoor. */
   const ref = require('./fixtures/magnaat-world-baseline.json');
-  assert.equal(ref.regelversie, C.WORLD_REGELVERSIE, 'de baseline hoort bij de regelversie waar World op rekent');
+  assert.equal(ref.regelversie, C.CENTEN_VERSIE);
   for (const naam of Object.keys(SCENARIOS)) vergelijk(ref, naam);
 });
 
 test('3. A2.1 veranderde alleen de precisie: dezelfde antwoorden, en bedragen binnen de afronding', () => {
   const voor = require('./fixtures/magnaat-world-voor-a21.json');
   for (const naam of Object.keys(SCENARIOS)) {
-    const r = draai(naam);
+    const r = draai(naam, { regelversie: C.CENTEN_VERSIE });
     const oud = voor.scenarios[naam];
     r.stappen.forEach((s, i) => {
       if (s.soort === 'maand' || s.stap === 'start') return;
@@ -166,7 +174,7 @@ test('7. een partij van voor A2.1 wordt een keer omgezet, en nooit twee keer', (
   assert.equal(st.leningen[0].opbrengst, null, 'een veld dat er niet is, blijft er niet');
   assert.equal(st.deelnemingen[0].ontvangen, -268);
   assert.equal(st.eenheid, C.EENHEID);
-  assert.equal(st.regelversie, C.WORLD_REGELVERSIE);
+  assert.equal(st.regelversie, C.CENTEN_VERSIE, 'alleen de centen: de rest van zijn regels blijft');
   assert.equal(C.zorgEenheid(st), false, 'een tweede keer verandert niets');
   assert.equal(st.geld.a, 123457);
 });
@@ -208,4 +216,50 @@ test('9. na elke stap staat elke overlopende rekening op nul (contract en RTG-ro
     });
   }
   assert.ok(gezien.contract > 3 && gezien.rtg > 3, 'de toets zag echte betalingen: ' + JSON.stringify(gezien));
+});
+
+test('10. een nieuwe partij rekent op regelversie 3, gelijk aan haar eigen referentie', () => {
+  const ref = require('./fixtures/magnaat-world-baseline-v3.json');
+  assert.equal(C.WORLD_REGELVERSIE, '3');
+  assert.equal(ref.regelversie, C.WORLD_REGELVERSIE);
+  assert.equal(nieuweWereld('wereld-a29-nieuw').st.regelversie, '3', 'een nieuwe partij krijgt de nieuwste regels');
+  for (const naam of Object.keys(SCENARIOS)) vergelijk(ref, naam);
+});
+
+test('11. regelversie 3 laat de spelers de afdracht betalen, en verder verandert er niets', () => {
+  let maanden = 0;
+  for (const naam of Object.keys(SCENARIOS)) {
+    const sc = SCENARIOS[naam];
+    const w2 = nieuweWereld(sc.potje, { regelversie: '2' }), w3 = nieuweWereld(sc.potje);   // zelfde id: het id zaait de wereld
+    for (const stap of sc.stappen) {
+      /* Tot aan de eerste maand is er niets afgedragen, dus zijn de twee
+         werelden gelijk; daarna rekenen ze allebei EEN maand vanuit dezelfde
+         stand, en is de afdracht het enige verschil. */
+      if (stap[0] !== 'maand') {
+        voerUit(w2, stap); voerUit(w3, stap);
+        assert.equal(canoniek(afdruk(w2.st)), canoniek(afdruk(w3.st)), naam + ': voor de eerste maand zijn beide gelijk');
+        continue;
+      }
+      const pot = (w) => w.st.foundation.lokaal + w.st.foundation.centraal;
+      const voor = { pot: pot(w2), geld: Object.assign({}, w2.st.geld) };
+      voerUit(w2, ['maand', 1]); voerUit(w3, ['maand', 1]);
+      maanden++;
+      const spelers = Object.keys(voor.geld);
+      const betaald = Object.fromEntries(spelers.map(h => [h, w2.st.geld[h] - w3.st.geld[h]]));
+      for (const h of spelers) {
+        const regel = (w3.st.laatste[h].regels || []).find(r => r.id === 'foundation');
+        const opOverzicht = regel ? -regel.resultaat : 0;
+        assert.ok(betaald[h] >= 0, naam + ': ' + h + ' betaalt geen negatieve afdracht');
+        assert.ok(Math.abs(C.uitCenten(betaald[h]) - opOverzicht) <= 0.5, naam + ': ' + h + ' betaalt ' + betaald[h] + ' cent, het overzicht zegt ' + opOverzicht);
+      }
+      const totaal = spelers.reduce((n, h) => n + betaald[h], 0);
+      assert.ok(totaal > 0, naam + ': de spelers dragen af');
+      /* Elk deel per betaler een keer afgerond: hooguit een cent per deel
+         per betaler (twee delen, de stad en de spelers). */
+      const ruimte = 2 * (spelers.length + 1);
+      assert.ok(Math.abs((pot(w3) - voor.pot) - (pot(w2) - voor.pot)) <= ruimte, naam + ': de pot groeit even hard: ' + (pot(w2) - voor.pot) + ' tegenover ' + (pot(w3) - voor.pot));
+      break;
+    }
+  }
+  assert.equal(maanden, Object.keys(SCENARIOS).length, 'elk scenario kwam bij een maand');
 });

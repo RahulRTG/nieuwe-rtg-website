@@ -19,13 +19,15 @@ const { canoniek, hash } = require('./magnaat-economie-scenarios');
 
 const MAP = '../../server/kern/spellen/magnaat/';
 
-function nieuweWereld(id) {
+function nieuweWereld(id, { regelversie } = {}) {
   const m = require(MAP + 'index')({ save() {}, crypto: require('crypto'), codenaamVan: (h) => h, nudge() {} });
   const { kaart } = require(MAP + 'kaart');
   const potje = { id, soort: 'magnaat', spelers: ['a', 'b', 'c'], teams: [0, 1, 2], modus: 'vrij',
     status: 'bezig', beurt: 0, winnaar: null, variant: { vorm: 'economie', stad: 'IJmuiden', duur: 'weekend' } };
   m.spel.init(potje);
   const st = potje.staat;
+  // een partij op een eerdere regelversie, zoals een lopende partij die houdt
+  if (regelversie) st.regelversie = regelversie;
   const k = kaart(st.stad);
   const kavel = (zone, n) => k.kavels.filter(x => x.zone === zone && !st.kavelBezet[x.id])[n || 0].id;
   return { m, potje, st, kavel };
@@ -128,10 +130,11 @@ const SCENARIOS = {
 };
 
 /* Draai een scenario op een verse wereld en geef per stap een vingerafdruk.
-   `naElkeStap(wereld, stap)` mag na elke stap naar de wereld kijken. */
-function draai(naam, { naElkeStap } = {}) {
+   `naElkeStap(wereld, stap)` mag na elke stap naar de wereld kijken, en
+   `regelversie` draait hem als een partij op die versie. */
+function draai(naam, { naElkeStap, regelversie } = {}) {
   const sc = SCENARIOS[naam];
-  const w = nieuweWereld(sc.potje);
+  const w = nieuweWereld(sc.potje, { regelversie });
   const uit = [{ stap: 'start', hash: hash(afdruk(w.st)) }];
   sc.stappen.forEach((stap, i) => {
     const antwoord = voerUit(w, stap);
@@ -144,4 +147,4 @@ function draai(naam, { naElkeStap } = {}) {
   return { stappen: uit, eind: afdruk(w.st), wereld: w };
 }
 
-module.exports = { SCENARIOS, draai, afdruk, canoniek, nieuweWereld };
+module.exports = { SCENARIOS, draai, afdruk, canoniek, nieuweWereld, voerUit };

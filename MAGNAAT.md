@@ -242,6 +242,7 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 | A2.7 | activa | G02, G03, G05 | 10→7 / 7→4 | ongewijzigd groen |
 | A2.8 | maandresultaat | G04, G10, G12, G13 | 7→3 / 4→0 (M-005 PARTIAL) | ongewijzigd groen |
 | A2.9a | foundation | G26, G27 | World-scope 0 (de 3 van M-001 zijn de Academy) | ongewijzigd groen |
+| A2.9b | regelwijziging | G28 (nieuw), G26 | ongewijzigd | v2 ongewijzigd groen; v3 eigen referentie |
 
 **A2.3** boekt het startkapitaal als overdracht van de inleg van de speler naar zijn kas. Een lopende partij van vóór het grootboek krijgt bij het koppelen een overname-opening voor wat er staat, zonder dat het saldo verandert.
 
@@ -256,6 +257,8 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 **A2.8** boekt het maandresultaat van een vestiging als de acht gebeurtenissen die A2.1 er al van had gemaakt: verkoop van de huishoudens, lonen naar de huishoudens, en inkoop, vaste lasten, huur, marketing en onderhoud naar de stad. Daarna gaat het resultaat naar rato van de eigenaar naar de aandeelhouders. Werving en afvloeiing gaan naar de huishoudens. Eén ding vroeg een rekening die er nog niet was. Het contractdeel komt bij de leverancier IN de maand binnen, maar de afnemer betaalt pas NA de maand (`wikkelAf`), en daartussen lezen de rood-rente en de bank het saldo. Een directe overdracht zou dat moment verschuiven en de baseline breken. Daarom betaalt de afnemer op een **overlopende rekening per contract** (`world:{id}:contract:{c}:overlopend`), en daaruit is de leverancier betaald. Het is geen actor en geen tegenpartij. Toets 9 in `test/magnaat-world-geld.test.js` eist dat die rekening na elke stap op nul staat; met één cent verschil zakt ook de baseline.
 
 **A2.9a** boekt de Foundation met de regel van vandaag, zodat de migratie apart bewezen is van de regelwijziging. De afdracht gaat van de stad **via RTG** naar de twee potten, en de projecten gaan uit de lokale pot naar de aannemer. RTG is daarbij een route en geen partij: zijn rekening (`world:{id}:rtg:foundation:route`) staat na elke afdracht op nul, en toets 9 eist dat.
+
+**A2.9b** is de goedgekeurde regelwijziging uit besluit 3, als **regelversie 3**. De stad betaalt de afdracht over haar eigen omzet en elke speler over zijn eindverkoop, beide via RTG. De afdracht staat voortaan als regel "Afdracht RTFoundation" op het maandoverzicht van de speler. Een **lopende partij houdt haar versie**: een nieuwe partij krijgt 3, en een partij van vóór A2.1 wordt bij de omzetting naar centen versie 2. Dat maakt twee bewijzen mogelijk. `test/magnaat-world-geld.test.js` toets 2 draait de scenario's als partij op versie 2 en blijft exact gelijk aan de WORLD ECONOMIC GOLDEN BASELINE. Die is bewust niet opnieuw geschreven: opnieuw gedraaid verschilde alleen het commitveld. Toets 10 houdt versie 3 tegen een eigen referentie (`test/fixtures/magnaat-world-baseline-v3.json`). Toets 11 zet de twee versies vanuit dezelfde stand een maand naast elkaar. De pot groeit even hard, op hooguit een cent per deel per betaler na. De spelers betalen samen wat de stad niet meer betaalt. Elke speler betaalt wat zijn overzicht zegt. Op de geldkaart is dit **G28** (speler → Foundation-pot). Dat is de enige gebeurtenis die er in A2 bij kwam, en ze komt uit het besluit en niet uit de migratie.
 
 ---
 

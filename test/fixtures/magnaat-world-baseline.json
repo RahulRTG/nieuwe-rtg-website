@@ -1,7 +1,7 @@
 {
- "uitleg": "WORLD ECONOMIC GOLDEN BASELINE: Magnaat World NA ronde A2.1 (regelversie 2, hele eurocenten), per stap, gemaakt op 99c6d2915. A2.2 t/m A2.9 moeten hier exact aan gelijk blijven.",
+ "uitleg": "WORLD ECONOMIC GOLDEN BASELINE: Magnaat World NA ronde A2.1 (regelversie 2, hele eurocenten), per stap, gemaakt op ea4547f09. A2.2 t/m A2.9 moeten hier exact aan gelijk blijven.",
  "regelversie": "2",
- "commit": "99c6d2915",
+ "commit": "ea4547f09",
  "scenarios": {
   "gewoon": {
    "stappen": [
@@ -310,10 +310,10 @@
      "stap": 28,
      "soort": "maand",
      "status": null,
-     "hash": "3a0f1cb129165b5d9050940a",
+     "hash": "b74cea562a47c6678589c2bd",
      "delen": {
       "antwoord": "afcea0577e4d2ed657dcaa0d",
-      "geld": "379b26fe595e08d0bde8f0a2",
+      "geld": "be0d047e821e2f19ae84d49e",
       "rest": "eeaceb23fb18bb7e3e4c3aea"
      }
     }
@@ -321,7 +321,7 @@
    "eind": {
     "maand": 12,
     "geld": {
-     "a": 14687250,
+     "a": 14687247,
      "b": 4988698,
      "c": 906175
     },

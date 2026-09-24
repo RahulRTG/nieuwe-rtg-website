@@ -53,7 +53,15 @@ function pctl(waarden, p) {
    echte bind (dat liet test/trio-wees.test.js in CI zakken -- zie de kop van
    dat bestand). Buiten dat bereik landt nooit een bind(0) of autobind, dus die
    klasse bestaat daar niet. Een reeks van 92 dekt alle offsets die de keten
-   aanneemt: +10 (motor), +20 (intern), +21..+23 (het trio) en +91 (beheer). */
+   aanneemt: +10 (motor), +20 (intern), +21..+23 (het trio) en +91 (beheer).
+
+   RESTRISICO, UITGESCHREVEN. De kiezer laat de poorten los vóór de teruggave en
+   rekent erop dat de aanroeper meteen bindt; hier zit daar start-met-motor.js
+   tussen, die eerst build.js en release-bewijs.js synchroon draait (seconden,
+   bij een koude cargo-build minuten) voordat motor, trio en sentinel binden.
+   In dat venster kan een TWEEDE reeks-kiezer in een andere checkout dezelfde
+   basis trekken (het afbouwslot is per checkout). De kans is klein en de
+   uitkomst luid: EADDRINUSE in staging-laatste.log, geen stille meting. */
 async function vrijePoorten() {
   const r = await vrijePoortReeks(92);
   return { publiek: r[0], motor: r[10], intern: r[20], trio: [r[21], r[22], r[23]], beheer: r[91] };

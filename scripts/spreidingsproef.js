@@ -11,7 +11,11 @@
 
    Die meting stond in wegwerpscripts. Dat is precies een meting te weinig: wie
    dit op de doelmachine wil weten moet hem kunnen DRAAIEN, en hem niet hoeven
-   nabouwen uit een tabel in een markdownbestand.
+   nabouwen uit een tabel in een markdownbestand. Draaien betekent: vanuit een
+   CHECKOUT op die machine (`npm run spreiding`), niet vanuit de container --
+   het script leent zijn poortkiezer van test/helper.js, en test/ gaat met
+   opzet niet mee in het image (.dockerignore). In de container zou het
+   proeftrio bovendien DATABASE_URL erven en op de productie-opslag landen.
 
    HET OORDEEL IS NIET "SNELLER" MAAR "WAAR KLEMT HET". Een doorvoergetal alleen
    zegt niets: 1,4% winst kan betekenen dat spreiding niet werkt, dat de voordeur

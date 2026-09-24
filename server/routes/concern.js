@@ -10,10 +10,10 @@
    ÉÉN 404 VOOR "BESTAAT NIET" EN "NIET VAN JOU". Het verschil zou verklappen
    welke id's bestaan.
 
-   De vestigingen staan in ./concern/vestiging.js. De mensenkant (dienstverbanden, uitnodigen, rechten) staat in
-   ./concern/mensen.js en de veranderkant in ./concern/verandering.js: dit
-   bestand ging over de 10 kB van het modulebeleid, en dat is de goede naad --
-   hier het bedrijf, daar de mensen, daar de verbouwing. */
+   De vestigingen staan in ./concern/vestiging.js, de mensenkant (dienstverbanden,
+   uitnodigen, rechten) in ./concern/mensen.js, de veranderkant in
+   ./concern/verandering.js en het duiden van een naam in ./concern/duiding.js:
+   dit bestand ging over de 10 kB van het modulebeleid, en dat is de goede naad. */
 const { duidBestuurder } = require('../kern/concern/persoon');
 
 module.exports = (kern) => {
@@ -196,5 +196,6 @@ module.exports = (kern) => {
   require('./concern/vestiging')(kern, { mijn, mijnVestiging, stuur, nietGevonden, beheertZaak });
   require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden, personeelVan });
   require('./concern/verandering')(kern, { mijn, stuur, nietGevonden });
+  require('./concern/duiding')(kern, { mijn, stuur, nietGevonden });
   require('./concern/voorstel')(kern, { mijn, stuur, nietGevonden });
 };

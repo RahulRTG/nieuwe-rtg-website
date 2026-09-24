@@ -68,6 +68,12 @@ function nepPost(mislukt = new Set()) {
         nr += 1;
         return { status: 200, data: { token: 't:register:' + nr, state: { user: { id: 1000 + nr } } } };
       }
+      /* De uitnodigingsweg van kantoor-a/-b (sinds 23 september 2026): de munter
+         leest de codenaam uit /api/auth/me en de code uit de uitnodiging. Vorm
+         nagemeten tegen een draaiende server op 23 september 2026: me geeft
+         `user.codename`, de uitnodiging `code` op het hoogste niveau. */
+      if (pad === '/api/auth/me' && tok) return { status: 200, data: { user: { codename: 'Codenaam ' + tok } } };
+      if (pad === '/api/office/kantoor/uitnodiging') return { status: 200, data: { ok: true, code: 'UITN' + nr } };
       if (pad === '/api/techniek/sso/scimsleutel') return { status: 200, data: { sleutel: 'rtgscim_' + 'x'.repeat(30) } };
       /* DE KANTOORROL LOOPT VIA EEN UITNODIGING (23 september 2026): de munter
          vraagt de codenaam van het verse account op en de boardroom maakt er een

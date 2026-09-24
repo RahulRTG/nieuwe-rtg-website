@@ -137,7 +137,9 @@
     if (rt.host.contains(node)) return false;
     closePanel(rt); setState('expanded');
     rt.customPanel = { node: node, parent: node.parentNode, next: node.nextSibling, focus: rt.doc.activeElement };
-    rt.sheetList.hidden = true; if (rt.controls) rt.controls.hidden = true;
+    /* Het paneel van de host vervangt de lijst: een lege melding van daarvoor hoort
+       er niet verborgen onder te blijven staan (stap 17, test/experience-rtg.e2e.js). */
+    rt.sheetList.textContent = ''; rt.sheetList.hidden = true; if (rt.controls) rt.controls.hidden = true;
     rt.sheetTitle.textContent = String(options && options.title || 'RTG');
     rt.sheetCopy.textContent = String(options && options.copy || '');
     node.hidden = false; rt.sheet.appendChild(node);

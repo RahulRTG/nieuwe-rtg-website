@@ -572,21 +572,21 @@ gecontroleerd is raden. Daarom drie stukken, en geen van drie verleent iets:
   rekent in euro's, het Werk OS in centen.
 
 *De betaalwijze kiest de werkruimte, en RTG zet de tweede weg aan of uit.* De
-meting vond dat "klaarzetten in RTG Bank" niet kan als betaalopdracht: die boekt
+meting vond dat "klaarzetten in RTG Rekening" niet kan als betaalopdracht: die boekt
 meteen, heeft geen wachtstand, en de rij dient hem vanzelf in -- geld zou het
 huis verlaten zonder dat een mens drukt. En er is geen rekening per werkruimte.
 Dus:
 
 - `extern` (standaard): buiten RTG betalen, en een ander dan de indiener noteert
   het met een kenmerk;
-- `rtgbank`: een ander dan de indiener maakt een gewone SEPA-overboeking vanaf
+- `rekening`: een ander dan de indiener maakt een gewone SEPA-overboeking vanaf
   zijn EIGEN RTG-rekening, en het Werk OS toetst die opdracht
   (`kern/werkbetaling.js`): hij bestaat, is niet mislukt, komt van een rekening
   van deze codenaam, is precies dit bedrag, gaat naar het IBAN van de uitgave, en
   hangt nog niet aan een andere uitgave;
 - de schakelaar van RTG (`/api/office/werkos/bankpad/zet`) staat standaard UIT,
   alleen de eigenaar zet hem, met de passkey (`eigenaar-werkbankpad`). Staat hij
-  uit, dan valt een werkruimte die `rtgbank` koos terug op `extern`, met de reden
+  uit, dan valt een werkruimte die `rekening` koos terug op `extern`, met de reden
   in het antwoord.
 
 `test/bedrijfuitgave-mix.test.js` loopt het met echte RTG-accounts en een echte

@@ -144,7 +144,8 @@ module.exports = ({ opslag, save, crypto, vandaag }) => {
     id: f.id, soort: f.soort, label: SOORTEN[f.soort] ? SOORTEN[f.soort].label : f.soort,
     sleutel: f.sleutel || null, waarde: f.waarde,
     van: f.van, tot: f.tot, loopt: f.tot === null,
-    bron: bronBeeld(f.bron), extra: f.extra || null
+    bron: bronBeeld(f.bron), extra: f.extra || null,
+    duiding: f.duiding ? { was: f.duiding.was, bron: bronBeeld(f.duiding.bron), at: f.duiding.at } : null
   });
 
   /* ALLES WAT OP DEZE DAG GOLD. Dit is de tijdmachine zelf: geef een datum en

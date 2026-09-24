@@ -456,8 +456,9 @@ async function kantoorAlsPersoon(base, code, opties) {
   /* `opties.eigenaar`: de e-mail van de eigenaar van DEZE server. Een toets die
      start met een eigen RTG_OWNER_EMAIL heeft een andere demo-eigenaar dan de
      standaard, en die kon hier niet binnenkomen -- dan gaf dit hulpje null en
-     viel alles wat een kantoormens nodig had om. */
-  const login = (opties && opties.eigenaar) || 'roellie.i@gmail.com';
+     viel alles wat een kantoormens nodig had om. Een kale string is dezelfde
+     eigenaar (zo roepen de toetsen van de kantoorsleutels hem aan). */
+  const login = (typeof opties === 'string' ? opties : opties && opties.eigenaar) || 'roellie.i@gmail.com';
   const eig = await post('/api/auth/login', { login, password: 'Imran', pasApp: 'business' });
   if (eig && eig.token) {
     const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);

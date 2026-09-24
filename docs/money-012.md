@@ -176,6 +176,19 @@ gesloten voor wat de repo kan bewijzen. Hij gaat dan alleen weer open op een
 scenario. Wat alleen met echte providers te bewijzen is, staat hieronder als
 extern bewijs en blokkeert de sluiting van het repobewijs niet.
 
+**Bevroren op 24 september 2026.** Alle drie proeven zijn groen in CI, op de
+drie gestapelde PR's die samen main (met #374) dragen:
+- #378 (uitgaand, `test/money012.test.js`) op 5196f844, run 36060872433;
+- #379 (afstemming) op 014fffed, run 36061416004;
+- #382 (inkomend en de keten, `test/money012-inkomend.test.js` en
+  `test/money012-keten.test.js`) op 9f9f168d, run 36062148814. Een schermtoets
+  van RTG Concern (`concern-scherm.e2e.js`, buiten dit diff) liep daar een keer
+  in een time-out en slaagde bij de ene herhaling; dat staat op de PR.
+
+Vanaf hier opent MONEY-012 alleen nog op een aangetoonde breuk van een van de
+vier wetten. De lijst hieronder blijft staan: dat is geen open werk voor het
+repobewijs maar wat er buiten de repo of in een besluit nog ligt.
+
 ## Wat nog openstaat
 
 MONEY-012 is pas gesloten als deze punten dicht zijn of met reden uitgesloten.

@@ -18,7 +18,7 @@
    een gebeurtenis `dag` omdat het zo in het journaal staat sinds ronde A1;
    voor het grootboek is het een periodenummer en niets meer. */
 'use strict';
-const { centen, som } = require('./geld');
+const { eisCenten, som } = require('./geld');
 
 module.exports = (g) => {
   let oorzaak = null;
@@ -41,7 +41,7 @@ module.exports = (g) => {
   function regel(rekeningCode, actor, naam, soort, kant, bedrag) {
     if (kant !== 'debet' && kant !== 'credit') throw new Error('Een boekingsregel is debet of credit, niet ' + kant + '.');
     const r = { rekening: rekeningCode, actor, naam, soort, debet: 0, credit: 0 };
-    r[kant] = centen(bedrag, rekeningCode + ' ' + kant);
+    r[kant] = eisCenten(bedrag, rekeningCode + ' ' + kant);
     return r;
   }
 
@@ -92,7 +92,7 @@ module.exports = (g) => {
     /* Ook hier geen omzetting: een regel die niet via `regel` is gemaakt, gaat
        door dezelfde grens. Een regel van nul valt weg, want die boekt niets. */
     const schoon = regels.map(r => Object.assign({}, r, {
-      debet: centen(r.debet, r.rekening + ' debet'), credit: centen(r.credit, r.rekening + ' credit')
+      debet: eisCenten(r.debet, r.rekening + ' debet'), credit: eisCenten(r.credit, r.rekening + ' credit')
     })).filter(r => r.debet > 0 || r.credit > 0);
     const debet = som(schoon.map(r => r.debet));
     const credit = som(schoon.map(r => r.credit));

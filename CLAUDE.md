@@ -2465,6 +2465,18 @@ het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
 
 **`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). En regel 13 vóór je pusht: **"mijn gebruikelijke controles" is niet "het oordeel van de keten"** — een CI-job die als EEN release-oordeel geldt heeft meer poorten dan iemand onthoudt, en `npm run ci:lokaal` draait ze allemaal omdat hij ze AFLEIDT uit `.github/workflows` in plaats van ze over te typen. Een handlijst poorten is een tweede waarheid naast ci.yml en loopt uit elkaar. En regel 17 komt uit een fout van twee keer op een dag: **een poort bewijst alleen zijn eigen bereik** — `check`, `norm` en de deltapoort stonden groen terwijl CI terecht rood bleef, want routedekking en de afdrukregel liggen daarbuiten. Zeg dus nooit "de gate is groen" maar welke poort groen staat, en wat er nog niet bevestigd is. Daar hangt de routeregel aan: een nagemaakte app bewijst het handlergedrag en niet de montage of de deur, dus **geen nieuwe HTTP-route zonder minstens één treffer op een echte server in een gewone CI-toets**. LAT.md gaat over de code, CLAUDE.md over het merk.
 
+**`BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen**
+-- de heenweg (veranderbereik, Evidence DAG, bewijsmatrix, release-bewijs,
+Sentinel, canary) staat, de terugweg van productie naar bewijs ontbreekt. Lees
+die vóór je iets bouwt dat fouten zoekt, reproduceert of verklaart. Er komen
+vier bouwstenen en niet meer: een zoekende tegenstander (eerst op
+`geld-conservatie`, zonder model, en hij oordeelt nooit zelf), de eerste
+divergentie, het herhaalpakket en immuniteit. Let op de namen: `Sentinel`,
+`capsule`, `replay` (betekent hier idempotentie), `naspelen` en `bewijskaart`
+zijn bezet, en L0-L3 en een achtstandige statusruimte zouden een zesde ladder
+zijn. De goedkoopste vondst: `/api/pay/gezond` bestaat en de sonde leest hem
+niet, dus het grootboek meldt zijn stand aan een bewaking die niet kijkt.
+
 ## Structuur en starten (kort)
 
 - `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 222 schermen), `apps/foundation/` (de RTFoundation, 85), `apps/juridisch/` (3), `site/` (`404.html`, `passen/` met vijf paspagina's, `werelden/` met vier wereldpagina's, en `start/` met de stijl en het script van de landing), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). Tellingen gemeten op 19 september 2026.

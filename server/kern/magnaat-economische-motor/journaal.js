@@ -13,7 +13,7 @@
    balanscontrole, een klein venster `recent` voor het scherm en `vandaag` voor
    de kasstroom van de lopende dag. Niets daarvan vraagt het hele journaal. */
 'use strict';
-const { GEBEURTENIS, MAX_RECENT, MOTOR_VERSIE, REGEL_VERSIE, rond, geld, som, datumOpDag } = require('./constanten');
+const { ECONOMISCHE_GEBEURTENISSEN, MAX_RECENT, MOTOR_VERSIE, REGEL_VERSIE, rond, geld, som, datumOpDag } = require('./constanten');
 
 module.exports = (m) => {
   let oorzaak = null;
@@ -78,7 +78,7 @@ module.exports = (m) => {
   function boek(e, sleutel, soort, omschrijving, regels, labels = []) {
     sleutel = String(sleutel || '').slice(0, 160);
     if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');
-    if (!GEBEURTENIS[soort]) throw new Error('Onbekende economische gebeurtenis: ' + soort + '.');
+    if (!ECONOMISCHE_GEBEURTENISSEN[soort]) throw new Error('Onbekende economische gebeurtenis: ' + soort + '.');
     eisIntegriteit(e);
     const bestaand = bestaandeGebeurtenis(e, sleutel);
     if (bestaand) return bestaand;

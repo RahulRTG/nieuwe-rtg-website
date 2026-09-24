@@ -5,7 +5,7 @@
    draagt geen journaal meer: dat groeide daar tot 2500 posten en gooide dan de
    oudste weg, en elke `beslis` kopieerde hem helemaal. */
 'use strict';
-const { STAAT_VERSIE, STARTDATUM, SCHOKKEN, SECTOREN, GEBEURTENIS, rond, kopieBedrijf } = require('./constanten');
+const { STAAT_VERSIE, STARTDATUM, SCHOKKEN, MACROACTOREN, ECONOMISCHE_GEBEURTENISSEN, rond, kopieBedrijf } = require('./constanten');
 
 module.exports = (m) => {
   function nieuweState() {
@@ -40,7 +40,7 @@ module.exports = (m) => {
     const oud = e.journaal.slice().sort((a, b) => volgnummer(a) - volgnummer(b));
     const eerste = oud.length ? volgnummer(oud[0]) : e.boekVolgorde + 1;
     const gebeurtenissen = oud.map(p => Object.assign({}, p, {
-      wereld: m.wereld, volgnummer: volgnummer(p), soort: GEBEURTENIS.ONBEKEND, oorzaak: 'overgenomen uit het journaal van voor ronde A1',
+      wereld: m.wereld, volgnummer: volgnummer(p), soort: ECONOMISCHE_GEBEURTENISSEN.ONBEKEND, oorzaak: 'overgenomen uit het journaal van voor ronde A1',
       regelVersie: '1', motorVersie: '1'
     }));
     const sleutels = {};
@@ -99,7 +99,7 @@ module.exports = (m) => {
   }
 
   function openingspost(e, actor, naam, bedrag) {
-    m.boek(e, 'opening:' + actor, GEBEURTENIS.OPENING, 'Openingsbalans ' + naam, [
+    m.boek(e, 'opening:' + actor, ECONOMISCHE_GEBEURTENISSEN.OPENING, 'Openingsbalans ' + naam, [
       m.regel(actor + '.kas', actor, 'Bank en kas', 'actief', 'debet', bedrag),
       m.regel(actor + '.eigen-vermogen', actor, 'Openingsvermogen', 'eigen-vermogen', 'credit', bedrag)
     ], ['opening']);
@@ -109,12 +109,12 @@ module.exports = (m) => {
     for (const b of Object.values(e.bedrijven)) openingspost(e, b.id, b.naam, b.cash);
     for (const b of Object.values(e.bedrijven)) {
       const waarde = rond(b.voorraad * e.instellingen.inkoopPerEenheid);
-      m.boek(e, 'opening:voorraad:' + b.id, GEBEURTENIS.VOORRAAD_OPENING, 'Openingsvoorraad ' + b.naam, [
+      m.boek(e, 'opening:voorraad:' + b.id, ECONOMISCHE_GEBEURTENISSEN.VOORRAAD_OPENING, 'Openingsvoorraad ' + b.naam, [
         m.regel(b.id + '.voorraad', b.id, 'Voorraad', 'actief', 'debet', waarde),
         m.regel(b.id + '.eigen-vermogen', b.id, 'Openingsvermogen', 'eigen-vermogen', 'credit', waarde)
       ], ['opening', 'voorraad']);
     }
-    for (const actor of SECTOREN) openingspost(e, actor, actor, m.profiel.openingskas[actor]);
+    for (const actor of MACROACTOREN) openingspost(e, actor, actor, m.profiel.openingskas[actor]);
     e.geinitialiseerd = true;
     e.verklaringen.unshift({
       dag: 0, soort: 'fundament', titel: 'Economische wereld geopend',
@@ -131,7 +131,7 @@ module.exports = (m) => {
       if (e.rekeningen[b.id + '.voorraad']) continue;
       const waarde = rond(b.voorraad * e.instellingen.inkoopPerEenheid);
       if (!waarde) continue;
-      m.boek(e, 'migratie:voorraad:' + b.id, GEBEURTENIS.VOORRAAD_MIGRATIE, 'Migratie openingsvoorraad ' + b.naam, [
+      m.boek(e, 'migratie:voorraad:' + b.id, ECONOMISCHE_GEBEURTENISSEN.VOORRAAD_MIGRATIE, 'Migratie openingsvoorraad ' + b.naam, [
         m.regel(b.id + '.voorraad', b.id, 'Voorraad', 'actief', 'debet', waarde),
         m.regel(b.id + '.eigen-vermogen', b.id, 'Openingsvermogen', 'eigen-vermogen', 'credit', waarde)
       ], ['migratie', 'voorraad']);

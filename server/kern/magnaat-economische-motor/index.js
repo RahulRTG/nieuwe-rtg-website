@@ -8,7 +8,7 @@
    arbeid, krediet, de sectoren van een wereld, en het journaal.
    WAT HIJ NIET KENT: wie hem gebruikt. Geen Oefenkantoor, geen missies, geen
    economenlab, geen bedrijf bij naam. Wat per wereld verschilt komt binnen via
-   het PROFIEL; wat een consument naast de economie wil doen, via HAKEN. De
+   het OEFENPROFIEL; wat een consument naast de economie wil doen, via HAKEN. De
    afhankelijkheid loopt een kant op: consument -> motor, nooit andersom
    (test/magnaat-economische-motor.test.js houdt dat vast op de bron).
 
@@ -24,7 +24,7 @@
    Hoe een gebeurtenis, het journaal en de projectie samenhangen staat in
    ./journaal.js; waarom het journaal nooit korter wordt in ./journaal-opslag.js. */
 'use strict';
-const { SECTOREN, ACTIVITEITEN, MOTOR_VERSIE, REGEL_VERSIE } = require('./constanten');
+const { MACROACTOREN, WERKACTIVITEITEN, MOTOR_VERSIE, REGEL_VERSIE } = require('./constanten');
 const { geheugenJournaal, collectieJournaal } = require('./journaal-opslag');
 
 function keurProfiel(profiel) {
@@ -35,9 +35,9 @@ function keurProfiel(profiel) {
     if (!b || !b.start || !Number.isInteger(b.kredietLimiet) || !Number.isInteger(b.kasBuffer)) {
       throw new Error('Bedrijf ' + id + ' mist start, kredietLimiet of kasBuffer in het profiel.');
     }
-    if (SECTOREN.includes(id)) throw new Error('Bedrijf ' + id + ' draagt de naam van een sector.');
+    if (MACROACTOREN.includes(id)) throw new Error('Bedrijf ' + id + ' draagt de naam van een sector.');
   }
-  for (const sector of SECTOREN) {
+  for (const sector of MACROACTOREN) {
     if (!Number.isInteger(profiel.openingskas && profiel.openingskas[sector])) throw new Error('Het profiel mist de openingskas van ' + sector + '.');
   }
   if (!profiel.teksten || !profiel.teksten.omgeving || !profiel.teksten.werk) throw new Error('Het profiel mist zijn teksten.');
@@ -63,4 +63,4 @@ function maak({ wereld, profiel, wereldState, opslag, save = () => {}, motorklan
   };
 }
 
-module.exports = { maak, geheugenJournaal, collectieJournaal, ACTIVITEITEN, SECTOREN };
+module.exports = { maak, geheugenJournaal, collectieJournaal, WERKACTIVITEITEN, MACROACTOREN };

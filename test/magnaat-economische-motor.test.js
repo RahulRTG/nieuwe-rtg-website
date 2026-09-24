@@ -91,7 +91,7 @@ test('4. een geweigerd besluit laat niets achter in het bewijs', () => {
      de grens dus niet. Deze transactie boekt eerst op de kopie en weigert dan. */
   const { maak } = require('../server/kern/magnaat-economische-motor');
   const wereld = {}, eigen = geheugenJournaal();
-  const motor = maak({ wereld: 'proef', profiel: maakOefen.PROFIEL, wereldState: () => wereld, opslag: eigen, motorklant: { aan: false } });
+  const motor = maak({ wereld: 'proef', profiel: maakOefen.OEFENPROFIEL, wereldState: () => wereld, opslag: eigen, motorklant: { aan: false } });
   motor.overzicht('s');
   const tot = eigen.laatste('proef'), saldoVoor = wereld.economie.rekeningen['bank.kas'].saldo;
   const r = (rekening, kant) => ({ rekening, actor: 'bank', naam: rekening, soort: 'actief', debet: kant === 'd' ? 500 : 0, credit: kant === 'c' ? 500 : 0 });
@@ -195,7 +195,7 @@ test('7. een wereld van voor A1 neemt zijn journaal mee, en het gat van de oude 
 test('8. werk is een economisch commando: de motor kent de activiteit, niet de missie', () => {
   const { maak } = require('../server/kern/magnaat-economische-motor');
   const wereld = {};
-  const motor = maak({ wereld: 'proef', profiel: maakOefen.PROFIEL, wereldState: () => wereld, opslag: geheugenJournaal(), motorklant: { aan: false } });
+  const motor = maak({ wereld: 'proef', profiel: maakOefen.OEFENPROFIEL, wereldState: () => wereld, opslag: geheugenJournaal(), motorklant: { aan: false } });
   assert.equal(motor.verricht('m', { activiteit: 'dansen', kwaliteit: 50 }).status, 400, 'een onbekende activiteit is geen werk');
   assert.equal(motor.verricht('m', { activiteit: 'service', kwaliteit: 101 }).status, 400);
   assert.ok(motor.verricht('m', { activiteit: 'innovatie', kwaliteit: 100, context: { bron: 'spel' } }).ok);

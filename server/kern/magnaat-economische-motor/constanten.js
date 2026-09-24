@@ -32,19 +32,26 @@ const SCHOKKEN = [
   { id: 'arbeidstekort', naam: 'Krappe arbeidsmarkt', uitleg: 'Vacatures zijn moeilijker te vullen en lonen staan onder opwaartse druk.', vraag: 1.04, aanbod: .94, arbeid: .43 }
 ];
 
-/* De sectoren die in elke wereld bestaan. Ze zijn economische rollen (wie
-   consumeert, wie levert, wie leent uit, wie heft, wie ontvangt opleiding en
-   bijdragen) en geen bedrijven; hun beginkas komt uit het profiel. */
-const SECTOREN = ['huishoudens', 'leverancier', 'bank', 'overheid', 'rtf'];
+/* De macro-actoren die in elke wereld bestaan. Het zijn economische rollen
+   (wie consumeert, wie levert, wie leent uit, wie heft, wie ontvangt opleiding
+   en bijdragen) en geen bedrijven; hun beginkas komt uit het profiel.
+
+   DE NAAM IS GEMETEN EN NIET GEKOZEN. Deze lijst heette eerst SECTOREN, en die
+   naam is in Magnaat World al bezet door iets anders: de bedrijfssectoren
+   (restaurant, hotel, winkel) in ../spellen/magnaat/sectoren.js. Precies bij
+   ronde A2, als World op deze motor gaat draaien, hadden die twee elkaar
+   ontmoet. SEMANTIEK.json sloeg erop uit, net als op drie andere namen uit deze
+   ronde (PROFIEL, GEBEURTENIS, ACTIVITEITEN); die zijn om dezelfde reden uniek. */
+const MACROACTOREN = ['huishoudens', 'leverancier', 'bank', 'overheid', 'rtf'];
 
 /* Wat een actor kan VERRICHTEN (zie `verricht` in ./besluiten.js). De motor
    kent de soort werk en de kwaliteit; welke opdracht of missie daarachter zat,
    kent alleen de consument. */
-const ACTIVITEITEN = ['productiviteit', 'service', 'controle', 'impact', 'innovatie'];
+const WERKACTIVITEITEN = ['productiviteit', 'service', 'controle', 'impact', 'innovatie'];
 
 /* Wat een gebeurtenis in het journaal economisch IS. De postings eronder
    zeggen wat hij boekhoudkundig deed; dit zegt wat er gebeurde. */
-const GEBEURTENIS = {
+const ECONOMISCHE_GEBEURTENISSEN = {
   OPENING: 'OPENING', VOORRAAD_OPENING: 'VOORRAAD_OPENING', VOORRAAD_MIGRATIE: 'VOORRAAD_MIGRATIE',
   LENING: 'LENING', VERKOOP: 'VERKOOP', VOORRAAD_INKOOP: 'VOORRAAD_INKOOP', KOSTPRIJS: 'KOSTPRIJS',
   LOON: 'LOON', OPLEIDING: 'OPLEIDING', IMPACT: 'IMPACT', RENTE: 'RENTE', BELASTING: 'BELASTING',
@@ -72,6 +79,6 @@ function kopieBedrijf(id, bron) {
 
 module.exports = {
   STAAT_VERSIE, MOTOR_VERSIE, REGEL_VERSIE, STARTDATUM, MAX_HISTORIE, MAX_RECENT,
-  SCHOKKEN, SECTOREN, ACTIVITEITEN, GEBEURTENIS,
+  SCHOKKEN, MACROACTOREN, WERKACTIVITEITEN, ECONOMISCHE_GEBEURTENISSEN,
   rond, begrens, geld, som, datumOpDag, kopieBedrijf
 };

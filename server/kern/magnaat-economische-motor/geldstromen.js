@@ -4,7 +4,7 @@
    per bedrijf verschilt (kredietruimte, kasbuffer) komt uit het profiel; de
    motor kent geen bedrijf bij naam. */
 'use strict';
-const { GEBEURTENIS, rond, geld, datumOpDag } = require('./constanten');
+const { ECONOMISCHE_GEBEURTENISSEN, rond, geld, datumOpDag } = require('./constanten');
 
 module.exports = (m) => {
   function saldo(e, code) {
@@ -36,7 +36,7 @@ module.exports = (m) => {
     const limiet = m.profiel.bedrijven[bedrijf].kredietLimiet;
     const bestaand = creditWaarde(e, bedrijf + '.schuld');
     if (bestaand + bedrag > limiet) return { status: 400, error: 'De lening overschrijdt de synthetische kredietlimiet.' };
-    m.boek(e, sleutel, GEBEURTENIS.LENING, 'Lening aan ' + b.naam, [
+    m.boek(e, sleutel, ECONOMISCHE_GEBEURTENISSEN.LENING, 'Lening aan ' + b.naam, [
       m.regel('bank.leningen', 'bank', 'Uitstaande leningen', 'actief', 'debet', bedrag),
       m.regel('bank.depositos', 'bank', 'Gecreeerde deposito', 'schuld', 'credit', bedrag),
       m.regel(bedrijf + '.kas', bedrijf, 'Bank en kas', 'actief', 'debet', bedrag),
@@ -65,7 +65,7 @@ module.exports = (m) => {
   function koopVoorraad(e, sleutel, b, levering) {
     const bedrag = Math.max(0, rond(levering * e.instellingen.inkoopPerEenheid));
     if (!bedrag) return null;
-    return m.boek(e, sleutel, GEBEURTENIS.VOORRAAD_INKOOP, 'Inkoop voorraad ' + b.naam, [
+    return m.boek(e, sleutel, ECONOMISCHE_GEBEURTENISSEN.VOORRAAD_INKOOP, 'Inkoop voorraad ' + b.naam, [
       m.regel(b.id + '.voorraad', b.id, 'Voorraad', 'actief', 'debet', bedrag),
       m.regel(b.id + '.kas', b.id, 'Bank en kas', 'actief', 'credit', bedrag),
       m.regel('leverancier.kas', 'leverancier', 'Bank en kas', 'actief', 'debet', bedrag),
@@ -76,7 +76,7 @@ module.exports = (m) => {
   function boekKostprijs(e, sleutel, b, verkoop) {
     const bedrag = Math.max(0, rond(verkoop * e.instellingen.inkoopPerEenheid));
     if (!bedrag) return null;
-    return m.boek(e, sleutel, GEBEURTENIS.KOSTPRIJS, 'Kostprijs verkochte diensten ' + b.naam, [
+    return m.boek(e, sleutel, ECONOMISCHE_GEBEURTENISSEN.KOSTPRIJS, 'Kostprijs verkochte diensten ' + b.naam, [
       m.regel(b.id + '.kostprijs', b.id, 'Kostprijs omzet', 'kosten', 'debet', bedrag),
       m.regel(b.id + '.voorraad', b.id, 'Voorraad', 'actief', 'credit', bedrag)
     ], ['kostprijs', 'voorraad']);

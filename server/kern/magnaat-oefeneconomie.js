@@ -5,7 +5,7 @@
    hij losgemaakt (./magnaat-economische-motor/) en zegt dit bestand alleen wat
    het Oefenkantoor ervan wil:
 
-     het PROFIEL   twee bedrijven met hun startwaarden en kredietruimte, de
+     het OEFENPROFIEL   twee bedrijven met hun startwaarden en kredietruimte, de
                    beginkas van de sectoren, en de woorden op het scherm
      de HAKEN      het economenlab leeft naast de economie (hypotheses,
                    voorspellingen, rapport) en haakt in op de dag en het overzicht
@@ -23,7 +23,7 @@ const economenlab = require('./magnaat-economenlab');
 
 const WERELD = 'oefenkantoor';
 
-const PROFIEL = {
+const OEFENPROFIEL = {
   bedrijven: {
     rtg: {
       kredietLimiet: 500000000, kasBuffer: 25000000,
@@ -55,7 +55,14 @@ const PROFIEL = {
 const SPELERBEDRIJF = 'praktijk';
 
 /* Spelvorm van een missie -> economische activiteit, met de uitleg die de
-   speler ziet. Dit is Oefenkantoor-taal; de motor kent alleen de activiteit. */
+   speler ziet. Dit is Oefenkantoor-taal; de motor kent alleen de activiteit.
+
+   De zes sleutels zijn dezelfde spelvormen als SCENARIOS in ./magnaatwereld.js,
+   en SEMANTIEK.json telt dat als een waarheid op twee plekken. Die dubbeling
+   bestond al: in de oude motor stond deze tabel naamloos in registreerWerk en
+   zag de meter hem niet. Importeren kan niet -- magnaatwereld.js laadt dit
+   bestand, dus dat zou een kring zijn. Een spelvorm die hier ontbreekt valt
+   terug op productiviteit, en dat is zichtbaar in de uitleg. */
 const KOPPELING = {
   planning: ['productiviteit', 'Ketenplanning verhoogt de leverbare capaciteit.'],
   controle: ['controle', 'Controlewerk verlaagt fouten en beschermt kwaliteit.'],
@@ -71,7 +78,7 @@ const begrens = (n, min, max) => Math.min(max, Math.max(min, Number(n) || 0));
 module.exports = ({ wereldState, save = () => {}, motorklant = null, db = null, opslag = null }) => {
   if (typeof wereldState !== 'function') throw new Error('Magnaat Economie vereist wereldState().');
   const motor = maak({
-    wereld: WERELD, profiel: PROFIEL, wereldState, save, motorklant,
+    wereld: WERELD, profiel: OEFENPROFIEL, wereldState, save, motorklant,
     opslag: opslag || (db ? collectieJournaal({ db }) : geheugenJournaal()),
     haken: {
       zorgStaat: (e) => economenlab._zorgStaat(e),
@@ -126,4 +133,4 @@ module.exports = ({ wereldState, save = () => {}, motorklant = null, db = null, 
 };
 
 module.exports.WERELD = WERELD;
-module.exports.PROFIEL = PROFIEL;
+module.exports.OEFENPROFIEL = OEFENPROFIEL;

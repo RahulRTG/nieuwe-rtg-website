@@ -11,7 +11,7 @@
                 opdracht of spelhandeling daarachter zat, vertaalt de consument;
                 de motor bepaalt welke economische gevolgen dat heeft. */
 'use strict';
-const { SCHOKKEN, ACTIVITEITEN, rond, geld } = require('./constanten');
+const { SCHOKKEN, WERKACTIVITEITEN, rond, geld } = require('./constanten');
 
 module.exports = (m) => {
   function getal(v, veld) {
@@ -88,8 +88,8 @@ module.exports = (m) => {
      volgende economische dag in de markt (./markt.js, `werkBonus`). */
   function verricht(actor, opdracht) {
     const o = opdracht && typeof opdracht === 'object' ? opdracht : {};
-    if (!ACTIVITEITEN.includes(o.activiteit)) {
-      return { status: 400, error: 'Onbekende economische activiteit; de motor kent ' + ACTIVITEITEN.join(', ') + '.' };
+    if (!WERKACTIVITEITEN.includes(o.activiteit)) {
+      return { status: 400, error: 'Onbekende economische activiteit; de motor kent ' + WERKACTIVITEITEN.join(', ') + '.' };
     }
     const kwaliteit = Number(o.kwaliteit), eenheden = o.eenheden === undefined ? 1 : Number(o.eenheden);
     if (!Number.isInteger(kwaliteit) || kwaliteit < 0 || kwaliteit > 100) return { status: 400, error: 'Kwaliteit is een geheel getal van 0 tot 100.' };

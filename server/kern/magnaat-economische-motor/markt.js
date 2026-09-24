@@ -4,7 +4,7 @@
    Dit is de JavaScript-helft van motor/src/magnaat.rs (RUST-MIGRATIES.json):
    Rust rekent dezelfde marktgetallen en de boekingen blijven hier. */
 'use strict';
-const { SCHOKKEN, GEBEURTENIS, rond, begrens, som } = require('./constanten');
+const { SCHOKKEN, ECONOMISCHE_GEBEURTENISSEN, rond, begrens, som } = require('./constanten');
 
 module.exports = (m) => {
   function schokZonderMutatie(e, dag) {
@@ -55,7 +55,7 @@ module.exports = (m) => {
     const rente = rond(m.creditWaarde(e, b.id + '.schuld') * e.macro.rente / 100 / 365);
     m.zorgLiquiditeit(e, b.id, inkoopKas + loon + training + impact + rente);
 
-    const G = GEBEURTENIS, kasNu = () => m.kas(e, b.id);
+    const G = ECONOMISCHE_GEBEURTENISSEN, kasNu = () => m.kas(e, b.id);
     m.betaalStroom(e, 'dag:' + dag + ':omzet:' + b.id, G.VERKOOP, 'Verkoop diensten ' + b.naam, 'huishoudens', b.id, omzet, 'consumptie', 'omzet', ['vraag', 'omzet']);
     m.koopVoorraad(e, 'dag:' + dag + ':inkoop:' + b.id, b, Math.min(levering, Math.floor(kasNu() / e.instellingen.inkoopPerEenheid)));
     m.boekKostprijs(e, 'dag:' + dag + ':kostprijs:' + b.id, b, verkoop);
@@ -82,7 +82,7 @@ module.exports = (m) => {
   function verwerkOverheid(e) {
     const werkloos = Math.max(0, e.macro.beroepsbevolking - werkenden(e));
     const uitkering = Math.min(m.kas(e, 'overheid'), werkloos * 5200);
-    m.betaalStroom(e, 'dag:' + e.dag + ':uitkering', GEBEURTENIS.UITKERING, 'Sociale uitkeringen', 'overheid', 'huishoudens', uitkering, 'sociale-kosten', 'overdrachtsinkomen', ['arbeid', 'stabilisator']);
+    m.betaalStroom(e, 'dag:' + e.dag + ':uitkering', ECONOMISCHE_GEBEURTENISSEN.UITKERING, 'Sociale uitkeringen', 'overheid', 'huishoudens', uitkering, 'sociale-kosten', 'overdrachtsinkomen', ['arbeid', 'stabilisator']);
   }
 
   function berekenMarkt(e) {

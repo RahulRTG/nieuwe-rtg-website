@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T10:11:51.487Z",
-    "commit": "0afb53ad",
+    "op": "2026-09-24T10:28:45.340Z",
+    "commit": "586f54a4",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/magnaatgrondwet.js",
@@ -10,18 +10,18 @@
   "graad": "vermoed",
   "waarom": "handhavers en toetsen worden LEXICAAL gevonden: dat een citaat in de code staat en een toets zo heet, bewijst niet dat de toets groen is of dat de handhaver op elk pad zit. Of de genoemde toetsen slagen, beslist npm test; de schendingen zijn een telling van een patroon en dus een ONDERgrens.",
   "grens": "dit meet wat de verklaring in scripts/lib/magnaatgrondwet.js noemt. Een regel die daar niet staat, bestaat voor deze meter niet; een schending waar geen patroon voor is geschreven, wordt niet geteld.",
-  "regels": 19,
+  "regels": 20,
   "telling": {
     "VIOLATION": 3,
     "ABSENT": 6,
     "PARTIAL": 6,
-    "PASS": 4
+    "PASS": 5
   },
   "vier": {
-    "gedocumenteerd": 19,
-    "geimplementeerd": 13,
-    "afgedwongen": 7,
-    "getoetst": 6
+    "gedocumenteerd": 20,
+    "geimplementeerd": 14,
+    "afgedwongen": 8,
+    "getoetst": 7
   },
   "schendingen": 70,
   "perRegel": [
@@ -38,7 +38,7 @@
       "scopes": {
         "world": {
           "autoriteit": "geen: het saldo zelf (st.geld) is de waarheid",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
@@ -84,7 +84,7 @@
         },
         "motor": {
           "autoriteit": "server/kern/magnaat-economische-motor/, het journaal",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": null,
@@ -93,7 +93,7 @@
         },
         "academy": {
           "autoriteit": "server/kern/magnaatwereld.js (spelerbudget)",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": {
             "wat": "spelgeld dat als beloning wordt bijgeschreven buiten het grootboek van de motor om",
@@ -123,7 +123,7 @@
       "scopes": {
         "world": {
           "autoriteit": "geen: er is geen urenmodel",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -132,7 +132,7 @@
         },
         "motor": {
           "autoriteit": "geen: er is geen urenmodel",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -154,7 +154,7 @@
       "scopes": {
         "world": {
           "autoriteit": "server/kern/spellen/magnaat/weergave.js",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": "geldt voor wat SPELERS te zien krijgen; er zijn nog geen NPC-bedrijven, dus voor beslissende niet-spelers bestaat er geen informatiemodel",
@@ -176,7 +176,7 @@
       "scopes": {
         "motor": {
           "autoriteit": "server/kern/magnaat-economische-motor/markt.js, de marktstap",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": null,
@@ -198,7 +198,7 @@
       "scopes": {
         "world": {
           "autoriteit": "geen: er is geen journaal",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
@@ -244,7 +244,7 @@
         },
         "motor": {
           "autoriteit": "server/kern/magnaat-economische-motor/, het journaal",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": null,
@@ -266,7 +266,7 @@
       "scopes": {
         "world": {
           "autoriteit": "geen: er zijn geen NPC-bedrijven",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -275,7 +275,7 @@
         },
         "motor": {
           "autoriteit": "server/kern/magnaat-economische-motor/",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -297,7 +297,7 @@
       "scopes": {
         "world": {
           "autoriteit": "de motor; er zit vandaag geen model in Magnaat",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -306,7 +306,7 @@
         },
         "academy": {
           "autoriteit": "de motor; uitleg is vaste tekst",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -328,7 +328,7 @@
       "scopes": {
         "world": {
           "autoriteit": "server/kern/spellen/magnaat/weergave.js (kredietprofiel)",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -337,7 +337,7 @@
         },
         "academy": {
           "autoriteit": "server/kern/magnaatwereld.js (xp, reputatie)",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -359,7 +359,7 @@
       "scopes": {
         "world": {
           "autoriteit": "scripts/kaart-import.js, de importeur van de kaart",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -381,7 +381,7 @@
       "scopes": {
         "world": {
           "autoriteit": "geen: failliet gaan bestaat in World niet, een negatief saldo kost rente",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -390,7 +390,7 @@
         },
         "motor": {
           "autoriteit": "geen: bij tekort volgt automatisch een noodlening (geldstromen.js)",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -412,7 +412,7 @@
       "scopes": {
         "world": {
           "autoriteit": "server/kern/spellen/magnaat/handel-acties.js en maand-contracten.js",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": null,
@@ -434,7 +434,7 @@
       "scopes": {
         "academy": {
           "autoriteit": "server/kern/magnaat-economenlab-training.js",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": null,
@@ -443,7 +443,7 @@
         },
         "world": {
           "autoriteit": "geen: World kent nog geen vooruitblik",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -465,7 +465,7 @@
       "scopes": {
         "world": {
           "autoriteit": "geen",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -474,7 +474,7 @@
         },
         "academy": {
           "autoriteit": "server/kern/magnaat-economenlab-rapport.js",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -496,7 +496,7 @@
       "scopes": {
         "world": {
           "autoriteit": "server/kern/spellen/magnaat/economie.js, het bijrekenen op de klok",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": null,
@@ -518,7 +518,7 @@
       "scopes": {
         "world": {
           "autoriteit": "server/kern/spellen/magnaat/handel.js (prijsband) en scripts/magnaat-pomp.js",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": "de pompmeter kent alleen de scenario's die erin geschreven zijn, en vergelijkt totalen binnen een ruismarge; er is nog geen eigenschapstoets over willekeurige reeksen transacties",
@@ -527,7 +527,7 @@
         },
         "academy": {
           "autoriteit": "server/kern/magnaatwereld.js (spelerbudget)",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": {
             "wat": "spelgeld dat als beloning wordt bijgeschreven buiten het grootboek van de motor om",
@@ -557,7 +557,7 @@
       "scopes": {
         "world": {
           "autoriteit": "server/kern/spellen/magnaat/veiling-acties.js en aandeel.js",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": null,
@@ -579,7 +579,7 @@
       "scopes": {
         "motor": {
           "autoriteit": "server/kern/magnaat-economische-motor/, de idempotentiesleutel in het journaal",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": null,
@@ -588,7 +588,7 @@
         },
         "world": {
           "autoriteit": "geen: een spelactie draagt geen gebeurtenis-id",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -610,7 +610,7 @@
       "scopes": {
         "motor": {
           "autoriteit": "server/kern/magnaat-economische-motor/journaal-opslag.js, het journaal in de eigen collectie magnaatJournaal",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": {
             "wat": "een journaal dat korter wordt: een afkapping, een ringbuffer of een weggehaalde gebeurtenis",
@@ -623,7 +623,7 @@
         },
         "world": {
           "autoriteit": "geen: er is geen gebeurtenishistorie, alleen maandverslagen",
-          "handhaver": "NIEMAND",
+          "draagt": "NIEMAND",
           "toets": "NIEMAND",
           "schending": null,
           "deels": null,
@@ -645,7 +645,7 @@
       "scopes": {
         "world": {
           "autoriteit": "server/kern/spellen/magnaat/economie.js",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": "de seed volgt uit het potje-id, maar er wordt geen regel-, motor- of datasetversie bij de wereld bewaard",
@@ -654,12 +654,38 @@
         },
         "motor": {
           "autoriteit": "server/kern/magnaat-economische-motor/, elke gebeurtenis",
-          "handhaver": "gevonden",
+          "draagt": "gevonden",
           "toets": "gevonden",
           "schending": null,
           "deels": "elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A3)",
           "missers": [],
           "stand": "PARTIAL"
+        }
+      }
+    },
+    {
+      "id": "M-601",
+      "familie": "M-6",
+      "invariant": "De economische motor kent geen consument: hij leunt niet op het Oefenkantoor, de Academy of een spelvorm, en de afhankelijkheid loopt alleen van consument naar motor.",
+      "stand": "PASS",
+      "gedocumenteerd": true,
+      "geimplementeerd": true,
+      "afgedwongen": true,
+      "getoetst": true,
+      "schendingen": 0,
+      "scopes": {
+        "motor": {
+          "autoriteit": "server/kern/magnaat-economische-motor/index.js: wat per wereld verschilt komt binnen via profiel en haken",
+          "draagt": "gevonden",
+          "toets": "gevonden",
+          "schending": {
+            "wat": "de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, zijn Rust-client, de opslagdeclaratie en de klok",
+            "aantal": 0,
+            "plekken": []
+          },
+          "deels": null,
+          "missers": [],
+          "stand": "PASS"
         }
       }
     }

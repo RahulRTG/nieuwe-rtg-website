@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-24",
   "gemeten": {
-    "bestanden": 2365,
-    "domeinenTotaal": 633,
-    "koopbareVormen": 556,
-    "koopbareDomeinen": 117,
+    "bestanden": 2376,
+    "domeinenTotaal": 634,
+    "koopbareVormen": 558,
+    "koopbareDomeinen": 118,
     "envelopDrempel": 8,
     "envelop": 40,
-    "veldenDomeineigen": 738,
-    "veldenNietEnvelop": 977,
-    "gelijkendeVormparen": 17,
+    "veldenDomeineigen": 746,
+    "veldenNietEnvelop": 993,
+    "gelijkendeVormparen": 18,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 45,
@@ -804,7 +804,7 @@
       "telt": 4
     },
     {
-      "domein": "kern/magnaat-economie",
+      "domein": "kern/magnaat-economische-motor",
       "heeft": {
         "toon": true,
         "prijs": true,
@@ -819,7 +819,7 @@
         "toon": "overzicht",
         "prijs": "berekenMarkt",
         "beschikbaarheid": "koopVoorraad",
-        "bevestig": "boek"
+        "bevestig": "bevestig"
       },
       "telt": 4
     },
@@ -2133,6 +2133,21 @@
       "telt": 0
     },
     {
+      "domein": "kern/magnaat-oefeneconomie",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
       "domein": "kern/move",
       "heeft": {
         "toon": false,
@@ -2465,6 +2480,23 @@
         "itemId",
         "prepMin",
         "station"
+      ]
+    },
+    {
+      "gelijkenis": 0.67,
+      "a": "server/kern/magnaat-economische-motor/rust.js",
+      "b": "server/kern/magnaat-oefeneconomie.js",
+      "domeinA": "kern/magnaat-economische-motor",
+      "domeinB": "kern/magnaat-oefeneconomie",
+      "gedeeld": [
+        "basisProductiviteit",
+        "bestelling",
+        "kwaliteit",
+        "personeel",
+        "reputatie",
+        "trainingDag",
+        "vasteCapaciteit",
+        "voorraad"
       ]
     },
     {

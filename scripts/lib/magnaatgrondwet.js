@@ -16,7 +16,7 @@
      invariant   de zin die altijd waar moet zijn. Staat woordelijk in
                  MAGNAAT.md; test/magnaatgrondwet.test.js zakt als die twee
                  uit elkaar lopen.
-     scope       per productvorm (world / academy / classic) waar de regel
+     scope       per productvorm (world / motor / academy / classic) waar de regel
                  vandaag geldt:
                    autoriteit  welk onderdeel de waarheid bezit
                    handhaver   [{ bestand, citaat }] of 'NIEMAND'
@@ -52,11 +52,14 @@ const FAMILIES = {
   'M-9': { naam: 'Privacy en veiligheid', over: 'geen woonadressen, synthetische personen, scheiding echt/spel' }
 };
 
-/* De drie productvormen. Het zijn er drie omdat het drie verwachtingen zijn
-   (MAGNAAT.md par. 1); ze delen straks EEN economische kern, maar vandaag niet. */
+/* Drie productvormen en de ene economische autoriteit eronder. De producten
+   zijn er drie omdat het drie verwachtingen zijn (MAGNAAT.md par. 1). De motor
+   is sinds ronde A1 een eigen scope: wat daar geldt, geldt voor elke consument
+   die op hem draait -- vandaag het Oefenkantoor, na A2 ook World. */
 const SCOPES = {
   world: 'Magnaat World -- de economie (Quick, Campaign, Living World): server/kern/spellen/magnaat/ zonder het bord',
-  academy: 'het Oefenkantoor -- server/kern/magnaatwereld.js met de motor server/kern/magnaat-economie.js',
+  motor: 'de economische motor -- server/kern/magnaat-economische-motor/, de ene economische autoriteit (MAGNAAT.md par. 2)',
+  academy: 'het Oefenkantoor -- server/kern/magnaatwereld.js en zijn adapter server/kern/magnaat-oefeneconomie.js',
   classic: 'Magnaat Classic -- het bordspel: server/kern/spellen/magnaat/bord.js en bordspel.js'
 };
 
@@ -91,10 +94,14 @@ const REGELS = [
         handhaver: 'NIEMAND', toets: 'NIEMAND',
         schending: DIRECTE_SALDOMUTATIE
       },
+      motor: {
+        autoriteit: 'server/kern/magnaat-economische-motor/, het journaal',
+        handhaver: [{ bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: 'function boek(e, sleutel, soort, omschrijving, regels, labels = [])' }],
+        toets: [{ bestand: 'test/magnaat-economie.test.js', naam: 'de openingsbalans en iedere economische journaalpost zijn exact in balans' }]
+      },
       academy: {
-        autoriteit: 'server/kern/magnaat-economie.js, het journaal',
-        handhaver: [{ bestand: 'server/kern/magnaat-economie.js', citaat: 'function boek(e, sleutel, omschrijving, regels, labels = [])' }],
-        toets: [{ bestand: 'test/magnaat-economie.test.js', naam: 'de openingsbalans en iedere economische journaalpost zijn exact in balans' }],
+        autoriteit: 'server/kern/magnaatwereld.js (spelerbudget)',
+        handhaver: 'NIEMAND', toets: 'NIEMAND',
         schending: BUDGET_BUITEN_GROOTBOEK
       }
     },
@@ -106,7 +113,7 @@ const REGELS = [
     invariant: 'Tijd kan niet dubbel worden besteed: een uur van een actor is op hetzelfde wereldmoment hooguit een keer ingezet.',
     scope: {
       world: { autoriteit: 'geen: er is geen urenmodel', handhaver: 'NIEMAND', toets: 'NIEMAND' },
-      academy: { autoriteit: 'geen: er is geen urenmodel', handhaver: 'NIEMAND', toets: 'NIEMAND' }
+      motor: { autoriteit: 'geen: er is geen urenmodel', handhaver: 'NIEMAND', toets: 'NIEMAND' }
     },
     migratie: 'Een tijd- en capaciteitsboek in de kern (vertical slice V2); contractcapaciteit wordt bij het tekenen gereserveerd in plaats van achteraf naar rato verdeeld.',
     faalwijze: 'Een speler levert aan drie klanten tegelijk met dezelfde uren; tekorten verschijnen pas bij afrekening, verdeeld over iedereen.'
@@ -135,10 +142,10 @@ const REGELS = [
     id: 'M-004', familie: 'M-0',
     invariant: 'Voorraad kan niet negatief worden.',
     scope: {
-      academy: {
-        autoriteit: 'server/kern/magnaat-economie.js, de marktstap',
-        handhaver: [{ bestand: 'server/kern/magnaat-economie.js', citaat: 'Math.min(b.vraagVandaag, b.capaciteitVandaag, b.voorraad)' }],
-        toets: 'NIEMAND'
+      motor: {
+        autoriteit: 'server/kern/magnaat-economische-motor/markt.js, de marktstap',
+        handhaver: [{ bestand: 'server/kern/magnaat-economische-motor/markt.js', citaat: 'Math.min(b.vraagVandaag, b.capaciteitVandaag, b.voorraad)' }],
+        toets: [{ bestand: 'test/magnaat-economische-motor.test.js', naam: '5. 10.000+ gebeurtenissen: projectie klopt, journaal volledig, beslissen leest niet, herhaling gelijk', bewijst: 'b.voorraad >= 0' }]
       }
     },
     migratie: 'Een toets die verkopen tegen voorraad afzet (de bestaande toets draagt voorraad in zijn naam maar controleert alleen vraag en capaciteit); World krijgt voorraad pas met de kern.',
@@ -153,9 +160,9 @@ const REGELS = [
         handhaver: 'NIEMAND', toets: 'NIEMAND',
         schending: DIRECTE_SALDOMUTATIE
       },
-      academy: {
-        autoriteit: 'server/kern/magnaat-economie.js, het journaal',
-        handhaver: [{ bestand: 'server/kern/magnaat-economie.js', citaat: "throw new Error('Ongebalanceerde journaalpost geweigerd: '" }],
+      motor: {
+        autoriteit: 'server/kern/magnaat-economische-motor/, het journaal',
+        handhaver: [{ bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: "throw new Error('Ongebalanceerde journaalpost geweigerd: '" }],
         toets: [{ bestand: 'test/magnaat-economie.test.js', naam: 'de openingsbalans en iedere economische journaalpost zijn exact in balans', bewijst: 'post.regels.length >= 2' }]
       }
     },
@@ -167,7 +174,7 @@ const REGELS = [
     invariant: 'NPC-bedrijven en spelers vallen onder dezelfde economische kernregels.',
     scope: {
       world: { autoriteit: 'geen: er zijn geen NPC-bedrijven', handhaver: 'NIEMAND', toets: 'NIEMAND' },
-      academy: { autoriteit: 'server/kern/magnaat-economie.js', handhaver: 'NIEMAND', toets: 'NIEMAND' }
+      motor: { autoriteit: 'server/kern/magnaat-economische-motor/', handhaver: 'NIEMAND', toets: 'NIEMAND' }
     },
     migratie: 'Een NPC is een actor in de kern met een eigen beslisser; de kern kent geen apart pad voor NPC\'s. Een toets zet een speler en een NPC in dezelfde situatie en eist dezelfde boekingen.',
     faalwijze: 'NPC\'s krijgen stilletjes gratis krediet of voorraad; spelers verliezen van een tegenstander die niet echt concurreert.'
@@ -210,7 +217,7 @@ const REGELS = [
     invariant: 'Faillissement vernietigt geen geld zonder tegenpost; het is een proces en geen drempel.',
     scope: {
       world: { autoriteit: 'geen: failliet gaan bestaat in World niet, een negatief saldo kost rente', handhaver: 'NIEMAND', toets: 'NIEMAND' },
-      academy: { autoriteit: 'geen: bij tekort volgt automatisch een noodlening', handhaver: 'NIEMAND', toets: 'NIEMAND' }
+      motor: { autoriteit: 'geen: bij tekort volgt automatisch een noodlening (geldstromen.js)', handhaver: 'NIEMAND', toets: 'NIEMAND' }
     },
     migratie: 'Een insolventieproces in de kern: liquiditeitsdruk, achterstand, herstructurering, afwikkeling -- elke stap geboekt, verliezen bij schuldeisers volgens de regels.',
     faalwijze: 'Een bedrijf verdwijnt en neemt geld mee dat nergens meer staat, of het leeft eeuwig door op nooit aflopende noodleningen.'
@@ -321,10 +328,16 @@ const REGELS = [
     id: 'M-017', familie: 'M-6',
     invariant: 'Iedere economische mutatie heeft een gebeurtenisidentiteit: opnieuw verwerken levert geen tweede economisch resultaat op.',
     scope: {
-      academy: {
-        autoriteit: 'server/kern/magnaat-economie.js, de idempotentiesleutel van boek()',
-        handhaver: [{ bestand: 'server/kern/magnaat-economie.js', citaat: "if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');" }],
-        toets: [{ bestand: 'test/magnaat-economie.test.js', naam: 'een herhaald commando verwerkt nooit tweemaal dezelfde economische dag' }]
+      motor: {
+        autoriteit: 'server/kern/magnaat-economische-motor/, de idempotentiesleutel in het journaal',
+        handhaver: [
+          { bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: "if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');" },
+          { bestand: 'server/kern/magnaat-economische-motor/journaal-opslag.js', citaat: "throw new Error('Journaal weigert: sleutel '" }
+        ],
+        toets: [
+          { bestand: 'test/magnaat-economie.test.js', naam: 'een herhaald commando verwerkt nooit tweemaal dezelfde economische dag' },
+          { bestand: 'test/magnaat-economische-motor.test.js', naam: '9. dezelfde wereld en dezelfde handelingen geven dezelfde gebeurtenissen, id voor id' }
+        ]
       },
       world: { autoriteit: 'geen: een spelactie draagt geen gebeurtenis-id', handhaver: 'NIEMAND', toets: 'NIEMAND' }
     },
@@ -335,13 +348,22 @@ const REGELS = [
     id: 'M-018', familie: 'M-6',
     invariant: 'Historie is alleen aanvullen: een economische gebeurtenis wordt nooit achteraf herschreven of weggegooid, een correctie is een nieuwe gebeurtenis.',
     scope: {
-      academy: {
-        autoriteit: 'server/kern/magnaat-economie.js, het journaal',
-        handhaver: 'NIEMAND', toets: 'NIEMAND',
+      motor: {
+        autoriteit: 'server/kern/magnaat-economische-motor/journaal-opslag.js, het journaal in de eigen collectie magnaatJournaal',
+        handhaver: [
+          { bestand: 'server/kern/magnaat-economische-motor/journaal-opslag.js', citaat: "throw new Error('Journaal weigert: volgnummer '" },
+          { bestand: 'server/kern/magnaat-economische-motor/journaal-opslag.js', citaat: 'Object.freeze(g);' }
+        ],
+        toets: [
+          { bestand: 'test/magnaat-economische-motor.test.js', naam: '3. het journaal vult alleen aan: geen gat, geen dubbel, geen inkorten, niets herschrijven' },
+          { bestand: 'test/magnaat-economische-motor.test.js', naam: '5. 10.000+ gebeurtenissen: projectie klopt, journaal volledig, beslissen leest niet, herhaling gelijk', bewijst: "alles[0].sleutel, 'opening:rtg'" }
+        ],
+        /* Het oude patroon (een ringbuffer op MAX_JOURNAAL) plus elke andere
+           manier om de lijst gebeurtenissen korter te maken. */
         schending: {
-          bestanden: ['server/kern/magnaat-economie.js'],
-          patroon: '\\.length\\s*=\\s*MAX_JOURNAAL',
-          wat: 'het journaal is een ringbuffer: boven MAX_JOURNAAL vallen de oudste boekingen eraf'
+          bestanden: { map: 'server/kern/magnaat-economische-motor', zonder: [] },
+          patroon: 'gebeurtenissen\\.(?:splice|shift|pop)\\(|gebeurtenissen\\.length\\s*=(?!=)|\\.length\\s*=\\s*MAX_JOURNAAL',
+          wat: 'een journaal dat korter wordt: een afkapping, een ringbuffer of een weggehaalde gebeurtenis'
         }
       },
       world: { autoriteit: 'geen: er is geen gebeurtenishistorie, alleen maandverslagen', handhaver: 'NIEMAND', toets: 'NIEMAND' }
@@ -359,11 +381,17 @@ const REGELS = [
         toets: [{ bestand: 'test/spelmagnaat.test.js', naam: 'bijrekenen is deterministisch: tien maanden in een keer of tien los' }],
         deels: 'de seed volgt uit het potje-id, maar er wordt geen regel-, motor- of datasetversie bij de wereld bewaard'
       },
-      academy: {
-        autoriteit: 'server/kern/magnaat-economie.js',
-        handhaver: [{ bestand: 'server/kern/magnaat-economie.js', citaat: 'versie: VERSIE, mutatieVersie: 0' }],
-        toets: [{ bestand: 'test/magnaat-economie.test.js', naam: 'dezelfde beginsituatie en besluiten geven reproduceerbaar dezelfde economie' }],
-        deels: 'alleen een motorversie; geen regelversie, datasetversie of aanmaakmoment'
+      motor: {
+        autoriteit: 'server/kern/magnaat-economische-motor/, elke gebeurtenis',
+        handhaver: [
+          { bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: 'wereld: m.wereld, volgnummer: e.boekVolgorde, soort, oorzaak,' },
+          { bestand: 'server/kern/magnaat-economische-motor/journaal.js', citaat: 'regelVersie: REGEL_VERSIE, motorVersie: MOTOR_VERSIE,' }
+        ],
+        toets: [
+          { bestand: 'test/magnaat-economie.test.js', naam: 'dezelfde beginsituatie en besluiten geven reproduceerbaar dezelfde economie' },
+          { bestand: 'test/magnaat-economische-motor.test.js', naam: '9. dezelfde wereld en dezelfde handelingen geven dezelfde gebeurtenissen, id voor id' }
+        ],
+        deels: 'elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A3)'
       }
     },
     migratie: 'Een wereldkop in de kern met alle zes velden, vastgelegd bij het aanmaken en nooit meer gewijzigd.',

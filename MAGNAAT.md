@@ -35,7 +35,7 @@ Classic valt buiten de stichtingsregels. Het is een bordspel waarin de bank bij 
 
 De motor uit `kern/magnaat-economie.js` wordt niet letterlijk "de game". Uit die motor wordt de economische waarheid gehaald, en die wordt een eigen kern. Daaromheen draaien World (Quick, Campaign, Living World) en het Oefenkantoor. **Het Oefenkantoor mag de kern gebruiken, maar is de kern niet.** Anders draait het vlaggenschip over twee jaar op een trainingsmodule.
 
-**De naam van die kern is nog niet gekozen.** In dit huis zijn `kern`, `envelop`, `doel` en `SOORTEN` al bezet (zie `BEWIJSMACHINE.md` en `MACHINE.md`). De naam wordt in ronde A1 gemeten tegen `SEMANTIEK.json` voordat hij bestaat.
+**De naam is `economische-motor`** (ronde A1, 24 september 2026): `server/kern/magnaat-economische-motor/`. Gemeten vóór hij bestond: als identifier kwam hij nergens in de code voor, ook niet in `SEMANTIEK.json`; `kern`, `envelop`, `doel` en `SOORTEN` waren bezet. De module heet de economische motor, zijn rol in de architectuur is de **economische autoriteit**. In de grondwet is hij een eigen scope naast de producten: wat daar geldt, geldt voor elke consument die op hem draait.
 
 **Een saldo is een projectie van waarheid, niet de waarheid zelf.** Spelcode verandert geen saldo meer. Ze vraagt de kern om een economische gebeurtenis:
 
@@ -60,7 +60,7 @@ Elke regel heeft per productvorm (scope) de volgende velden:
 |---|---|
 | ID | `M-001`; de negentien stichtingsregels houden hun nummer |
 | Invariant | wat altijd waar moet zijn, in één zin |
-| Scope | World / Oefenkantoor / Classic, alleen waar de regel vandaag geldt |
+| Scope | World / Economische motor / Oefenkantoor / Classic, alleen waar de regel vandaag geldt |
 | Autoriteit | welk onderdeel de waarheid bezit |
 | Handhaver | welke code hem afdwingt, als citaat dat letterlijk in de code staat |
 | Toets | welke geautomatiseerde toets hem bewijst, op naam |
@@ -135,7 +135,17 @@ Achteruitgaan kan alleen door de nulstand opnieuw vast te leggen. Dat is een wij
 
 Pas daarna komen bevolking, concurrenten die fouten maken, toeleveringsketens, banken en de levende stad. Pas daarna ook de nieuwe schermen, die uit de economische waarheid voortkomen: wie geen bedrijf heeft, krijgt geen tabblad "Bedrijf".
 
-In ronde C is alleen **C0–C3** gebouwd. Van A en V bestaat nog niets.
+**Ronde C (C0–C3) en A1 staan.** A1 haalde de motor uit het Oefenkantoor zonder één cent gedragsverandering:
+
+- **Gelijkwaardigheid bewezen tegen de oude motor.** Vóór de verhuizing is een gouden referentie geschreven uit de oude code (`test/fixtures/magnaat-economie-gouden.json`, drie scenario's, 267 stappen, 3676 boekingen). De nieuwe motor geeft bij elke stap dezelfde vingerafdruk van saldi, boekingen, antwoord en overzicht. Pas daarna is het oude bestand weggehaald.
+- **De motor kent het Oefenkantoor niet.** Bedrijven, beginkas en teksten komen uit een profiel. Het economenlab haakt in via haken. Een missie komt binnen als economisch commando `verricht` (actor, activiteit, kwaliteit, eenheden, context), en welke spelvorm welke activiteit is, zegt het Oefenkantoor (`server/kern/magnaat-oefeneconomie.js`). Een toets leest de bron van de motor en zakt zodra die een bedrijfsnaam, een missie of het lab noemt, of iets anders laadt dan zichzelf, zijn Rust-client, de opslagdeclaratie en de klok.
+- **Het journaal is gezaghebbend en wordt alleen aangevuld** (M-018): een eigen collectie `magnaatJournaal`, per wereld volgnummer 1, 2, 3 … zonder gat, sleutels en bevroren gebeurtenissen. De wereld draagt alleen de projectie: saldi, `laatstToegepast`, lopende totalen, een venster van 100 voor het scherm en de posten van vandaag. Een gebeurtenis draagt `wereld`, `volgnummer`, `soort` (wat er gebeurde), `oorzaak`, `regelVersie` en `motorVersie`, met de postings eronder.
+- **10.000+ gebeurtenissen beproefd**: 700 dagen, 10.509 gebeurtenissen. De projectie is precies het journaal, geen gebeurtenis is weg, een gewone beslissing leest het journaal nul keer, en een herhaling vanaf volgnummer n geeft exact de saldi van nu.
+- **Herstel**: loopt het journaal voor op de projectie, dan wordt alleen het ontbrekende stuk opnieuw toegepast. Loopt het achter, dan weigert de motor te boeken en zegt dat in het overzicht.
+- **Een geweigerd besluit laat niets achter**: boekingen op een kopie gaan pas bij bevestigen het journaal in.
+- **Een wereld van vóór A1** neemt zijn journaal mee. Wat de oude grens al had weggegooid, wordt als gat benoemd (`ontbrekend`) en niet verzonnen.
+
+Wat A1 met opzet **niet** deed: World migreren (A2), een wereldkop met seed en datasetversie (A3), en opslag per gebeurtenis. In deze opslag is een collectie één waarde, dus het journaal van een wereld wordt bij het wegschrijven nog in zijn geheel geserialiseerd. Dat is een eigenschap van de opslaglaag, geen gedrag van de motor, en archiveren kan later als opslagstrategie zonder de logische historie aan te raken.
 
 ---
 
@@ -150,7 +160,7 @@ In ronde C is alleen **C0–C3** gebouwd. Van A en V bestaat nog niets.
 | M-001 | Economische waarheid | **VIOLATION** | ja | ja | nee | nee |
 | M-002 | Mens- en werkwaarheid | **ABSENT** | ja | nee | nee | nee |
 | M-003 | Informatiewaarheid | **PARTIAL** | ja | ja | ja | ja |
-| M-004 | Economische waarheid | **PARTIAL** | ja | ja | ja | nee |
+| M-004 | Economische waarheid | **PASS** | ja | ja | ja | ja |
 | M-005 | Economische waarheid | **VIOLATION** | ja | ja | nee | nee |
 | M-006 | Spelzuiverheid | **ABSENT** | ja | nee | nee | nee |
 | M-007 | AI-grens | **ABSENT** | ja | nee | nee | nee |
@@ -164,10 +174,10 @@ In ronde C is alleen **C0–C3** gebouwd. Van A en V bestaat nog niets.
 | M-015 | Spelzuiverheid | **VIOLATION** | ja | ja | nee | nee |
 | M-016 | Economische waarheid | **PASS** | ja | ja | ja | ja |
 | M-017 | Simulatie-integriteit | **PARTIAL** | ja | ja | nee | nee |
-| M-018 | Simulatie-integriteit | **VIOLATION** | ja | nee | nee | nee |
+| M-018 | Simulatie-integriteit | **PARTIAL** | ja | ja | nee | nee |
 | M-019 | Simulatie-integriteit | **PARTIAL** | ja | ja | ja | ja |
 
-19 invarianten: 3 PASS, 6 PARTIAL, 6 ABSENT, 4 VIOLATION; 71 geteld schendende plekken.
+19 invarianten: 4 PASS, 6 PARTIAL, 6 ABSENT, 3 VIOLATION; 70 geteld schendende plekken.
 
 ### M-001: Economische waarheid
 
@@ -180,10 +190,14 @@ Stand: **VIOLATION**
   - Handhaver: NIEMAND
   - Toets: NIEMAND
   - Schending: 32, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
-- **Oefenkantoor**: VIOLATION
-  - Autoriteit: server/kern/magnaat-economie.js, het journaal
-  - Handhaver: `server/kern/magnaat-economie.js`, `function boek(e, sleutel, omschrijving, regels, labels = [])`
+- **Economische motor**: PASS
+  - Autoriteit: server/kern/magnaat-economische-motor/, het journaal
+  - Handhaver: `server/kern/magnaat-economische-motor/journaal.js`, `function boek(e, sleutel, soort, omschrijving, regels, labels = [])`
   - Toets: `test/magnaat-economie.test.js`, "de openingsbalans en iedere economische journaalpost zijn exact in balans"
+- **Oefenkantoor**: VIOLATION
+  - Autoriteit: server/kern/magnaatwereld.js (spelerbudget)
+  - Handhaver: NIEMAND
+  - Toets: NIEMAND
   - Schending: 3, spelgeld dat als beloning wordt bijgeschreven buiten het grootboek van de motor om
 
 **Migratie.** World gaat op de economische kern draaien (ronde A2/A4): een saldo wordt een projectie van het journaal. In het Oefenkantoor gaat de beloning via een journaalpost of verlaat hij het geldbegrip.
@@ -200,7 +214,7 @@ Stand: **ABSENT**
   - Autoriteit: geen: er is geen urenmodel
   - Handhaver: NIEMAND
   - Toets: NIEMAND
-- **Oefenkantoor**: ABSENT
+- **Economische motor**: ABSENT
   - Autoriteit: geen: er is geen urenmodel
   - Handhaver: NIEMAND
   - Toets: NIEMAND
@@ -229,12 +243,12 @@ Stand: **PARTIAL**
 
 > Voorraad kan niet negatief worden.
 
-Stand: **PARTIAL**
+Stand: **PASS**
 
-- **Oefenkantoor**: PARTIAL
-  - Autoriteit: server/kern/magnaat-economie.js, de marktstap
-  - Handhaver: `server/kern/magnaat-economie.js`, `Math.min(b.vraagVandaag, b.capaciteitVandaag, b.voorraad)`
-  - Toets: NIEMAND
+- **Economische motor**: PASS
+  - Autoriteit: server/kern/magnaat-economische-motor/markt.js, de marktstap
+  - Handhaver: `server/kern/magnaat-economische-motor/markt.js`, `Math.min(b.vraagVandaag, b.capaciteitVandaag, b.voorraad)`
+  - Toets: `test/magnaat-economische-motor.test.js`, "5. 10.000+ gebeurtenissen: projectie klopt, journaal volledig, beslissen leest niet, herhaling gelijk"
 
 **Migratie.** Een toets die verkopen tegen voorraad afzet (de bestaande toets draagt voorraad in zijn naam maar controleert alleen vraag en capaciteit); World krijgt voorraad pas met de kern.
 
@@ -251,9 +265,9 @@ Stand: **VIOLATION**
   - Handhaver: NIEMAND
   - Toets: NIEMAND
   - Schending: 32, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
-- **Oefenkantoor**: PASS
-  - Autoriteit: server/kern/magnaat-economie.js, het journaal
-  - Handhaver: `server/kern/magnaat-economie.js`, `throw new Error('Ongebalanceerde journaalpost geweigerd: '`
+- **Economische motor**: PASS
+  - Autoriteit: server/kern/magnaat-economische-motor/, het journaal
+  - Handhaver: `server/kern/magnaat-economische-motor/journaal.js`, `throw new Error('Ongebalanceerde journaalpost geweigerd: '`
   - Toets: `test/magnaat-economie.test.js`, "de openingsbalans en iedere economische journaalpost zijn exact in balans"
 
 **Migratie.** Zelfde weg als M-001: World boekt via de kern. De geldpompmeter blijft ernaast staan tot de eigenschapstoetsen er zijn.
@@ -270,8 +284,8 @@ Stand: **ABSENT**
   - Autoriteit: geen: er zijn geen NPC-bedrijven
   - Handhaver: NIEMAND
   - Toets: NIEMAND
-- **Oefenkantoor**: ABSENT
-  - Autoriteit: server/kern/magnaat-economie.js
+- **Economische motor**: ABSENT
+  - Autoriteit: server/kern/magnaat-economische-motor/
   - Handhaver: NIEMAND
   - Toets: NIEMAND
 
@@ -342,8 +356,8 @@ Stand: **ABSENT**
   - Autoriteit: geen: failliet gaan bestaat in World niet, een negatief saldo kost rente
   - Handhaver: NIEMAND
   - Toets: NIEMAND
-- **Oefenkantoor**: ABSENT
-  - Autoriteit: geen: bij tekort volgt automatisch een noodlening
+- **Economische motor**: ABSENT
+  - Autoriteit: geen: bij tekort volgt automatisch een noodlening (geldstromen.js)
   - Handhaver: NIEMAND
   - Toets: NIEMAND
 
@@ -461,10 +475,10 @@ Stand: **PASS**
 
 Stand: **PARTIAL**
 
-- **Oefenkantoor**: PASS
-  - Autoriteit: server/kern/magnaat-economie.js, de idempotentiesleutel van boek()
-  - Handhaver: `server/kern/magnaat-economie.js`, `if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');`
-  - Toets: `test/magnaat-economie.test.js`, "een herhaald commando verwerkt nooit tweemaal dezelfde economische dag"
+- **Economische motor**: PASS
+  - Autoriteit: server/kern/magnaat-economische-motor/, de idempotentiesleutel in het journaal
+  - Handhaver: `server/kern/magnaat-economische-motor/journaal.js`, `if (!sleutel) throw new Error('Een economische boeking vereist een idempotentiesleutel.');`; `server/kern/magnaat-economische-motor/journaal-opslag.js`, `throw new Error('Journaal weigert: sleutel '`
+  - Toets: `test/magnaat-economie.test.js`, "een herhaald commando verwerkt nooit tweemaal dezelfde economische dag"; `test/magnaat-economische-motor.test.js`, "9. dezelfde wereld en dezelfde handelingen geven dezelfde gebeurtenissen, id voor id"
 - **World**: ABSENT
   - Autoriteit: geen: een spelactie draagt geen gebeurtenis-id
   - Handhaver: NIEMAND
@@ -478,13 +492,13 @@ Stand: **PARTIAL**
 
 > Historie is alleen aanvullen: een economische gebeurtenis wordt nooit achteraf herschreven of weggegooid, een correctie is een nieuwe gebeurtenis.
 
-Stand: **VIOLATION**
+Stand: **PARTIAL**
 
-- **Oefenkantoor**: VIOLATION
-  - Autoriteit: server/kern/magnaat-economie.js, het journaal
-  - Handhaver: NIEMAND
-  - Toets: NIEMAND
-  - Schending: 1, het journaal is een ringbuffer: boven MAX_JOURNAAL vallen de oudste boekingen eraf
+- **Economische motor**: PASS
+  - Autoriteit: server/kern/magnaat-economische-motor/journaal-opslag.js, het journaal in de eigen collectie magnaatJournaal
+  - Handhaver: `server/kern/magnaat-economische-motor/journaal-opslag.js`, `throw new Error('Journaal weigert: volgnummer '`; `server/kern/magnaat-economische-motor/journaal-opslag.js`, `Object.freeze(g);`
+  - Toets: `test/magnaat-economische-motor.test.js`, "3. het journaal vult alleen aan: geen gat, geen dubbel, geen inkorten, niets herschrijven"; `test/magnaat-economische-motor.test.js`, "5. 10.000+ gebeurtenissen: projectie klopt, journaal volledig, beslissen leest niet, herhaling gelijk"
+  - Schending: 0, een journaal dat korter wordt: een afkapping, een ringbuffer of een weggehaalde gebeurtenis
 - **World**: ABSENT
   - Autoriteit: geen: er is geen gebeurtenishistorie, alleen maandverslagen
   - Handhaver: NIEMAND
@@ -505,11 +519,11 @@ Stand: **PARTIAL**
   - Handhaver: `server/kern/spellen/magnaat/economie.js`, `seed: 'magnaat-'+potje.id`
   - Toets: `test/spelmagnaat.test.js`, "bijrekenen is deterministisch: tien maanden in een keer of tien los"
   - Waarom hooguit PARTIAL: de seed volgt uit het potje-id, maar er wordt geen regel-, motor- of datasetversie bij de wereld bewaard
-- **Oefenkantoor**: PARTIAL
-  - Autoriteit: server/kern/magnaat-economie.js
-  - Handhaver: `server/kern/magnaat-economie.js`, `versie: VERSIE, mutatieVersie: 0`
-  - Toets: `test/magnaat-economie.test.js`, "dezelfde beginsituatie en besluiten geven reproduceerbaar dezelfde economie"
-  - Waarom hooguit PARTIAL: alleen een motorversie; geen regelversie, datasetversie of aanmaakmoment
+- **Economische motor**: PARTIAL
+  - Autoriteit: server/kern/magnaat-economische-motor/, elke gebeurtenis
+  - Handhaver: `server/kern/magnaat-economische-motor/journaal.js`, `wereld: m.wereld, volgnummer: e.boekVolgorde, soort, oorzaak,`; `server/kern/magnaat-economische-motor/journaal.js`, `regelVersie: REGEL_VERSIE, motorVersie: MOTOR_VERSIE,`
+  - Toets: `test/magnaat-economie.test.js`, "dezelfde beginsituatie en besluiten geven reproduceerbaar dezelfde economie"; `test/magnaat-economische-motor.test.js`, "9. dezelfde wereld en dezelfde handelingen geven dezelfde gebeurtenissen, id voor id"
+  - Waarom hooguit PARTIAL: elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A3)
 
 **Migratie.** Een wereldkop in de kern met alle zes velden, vastgelegd bij het aanmaken en nooit meer gewijzigd.
 

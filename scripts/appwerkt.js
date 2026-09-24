@@ -568,18 +568,26 @@ async function bedien(ctx, base, pad, kant = 'app') {
         try { await laad(thuis); u.teruggekeerd++; }
         catch (e) { instrument.push('terugkeren naar de landing lukte niet: ' + String(e.message || e).split('\n')[0].slice(0, 80)); break; }
       }
-      let staat = false;
-      try {
-        staat = await page.evaluate((zoek) => {
-          const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),
-            (el.innerText || el.title || '').trim().slice(0, 40)].join('|');
-          document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
-          for (const el of document.querySelectorAll('button,[role=button],[data-tab],[data-stand]')) {
-            if (merk(el) === zoek) { el.setAttribute('data-appwerkt', '1'); return true; }
-          }
-          return false;
-        }, m);
-      } catch (e) { staat = false; }
+      const zoekKnop = () => page.evaluate((zoek) => {
+        const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),
+          (el.innerText || el.title || '').trim().slice(0, 40)].join('|');
+        document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
+        for (const el of document.querySelectorAll('button,[role=button],[data-tab],[data-stand]')) {
+          if (merk(el) === zoek) { el.setAttribute('data-appwerkt', '1'); return true; }
+        }
+        return false;
+      }, m).catch(() => false);
+      let staat = await zoekKnop();
+      /* EEN STANDWISSEL IS OOK WEGGAAN. Een tik kan de inhoud vervangen zonder
+         dat de url verandert (Mijn leven zet na "Laat Rahul kiezen" een voorstel
+         neer, Reizen & Veilig na "Meenemen" een andere stand). De knoppen erna
+         bestaan dan niet meer, en dat is geen verloren knop maar een proef die
+         niet thuis is. Dus eerst terug naar de landing, met dezelfde
+         klaar-voorwaarde; pas wat daarna nog ontbreekt, is niet meer gevonden. */
+      if (!staat) {
+        try { await laad(thuis); u.teruggekeerd++; staat = await zoekKnop(); }
+        catch (e) { instrument.push('terugkeren naar de landing lukte niet: ' + String(e.message || e).split('\n')[0].slice(0, 80)); break; }
+      }
       if (!staat) { u.nietMeerGevonden++; continue; }
       u.geprobeerd++;
       const voor = await vingerafdruk();

@@ -5,13 +5,15 @@
    groeiden de noemer aan, de gedeelde schil zat in de noemer van elke app, en
    het budget kon de drempel niet halen. Dit scherm bevat ze alle vier met opzet:
 
-     APP     6 knoppen die te raken zijn (pas na 800 ms zichtbaar); A6 opent een paneel met 20 nieuwe
-             knoppen, A5 navigeert weg naar een pagina zonder knoppen
+     APP     7 knoppen die te raken zijn (pas na 800 ms zichtbaar); A6 opent een paneel met 20 nieuwe
+             knoppen, A5 navigeert weg naar een pagina zonder knoppen, A7 vervangt de
+             inhoud zonder te navigeren (een standwissel, gevonden op 24 september)
      SCHIL   30 knoppen in `div.rtg-edge-chrome`, waarvan 15 onder een laag;
              S1 navigeert weg
 
    De waarheid die hier vastligt, ongeacht die vijftig schil- en paneelknoppen:
-     - de app-noemer is 6, en de proef raakt alle 6 (ook na de navigatie van A5);
+     - de app-noemer is 7, en de proef raakt alle 7 (ook na de navigatie van A5
+       en de standwissel van A7);
      - de schil-noemer is 15, en de navigatie van S1 laat die meting niet stoppen.
 
    Verandert iemand de selectie en springt de noemer naar 56, of stopt de lus
@@ -46,6 +48,10 @@ const SCHERM = '<!doctype html><html><head><meta charset="utf-8"><style>' +
   '<main id="app"></main><script>setTimeout(function(){document.getElementById(\'app\').innerHTML=' +
   JSON.stringify(knoppen('A', 4) +
     '<button type="button" onclick="location.href=\'/weg.html\'">A5</button>' +
+    /* A7 vervangt de hele inhoud ZONDER te navigeren, zoals een scherm dat na een
+       tik een andere stand neerzet (Mijn leven, Reizen & Veilig). De knoppen
+       erna bestaan dan niet meer tot de proef terugkeert naar de landing. */
+    '<button type="button" onclick="document.getElementById(\'app\').innerHTML=\'<p>Andere stand</p>\'">A7</button>' +
     /* A6 opent een paneel met 20 knoppen, en die horen NIET in de noemer. Met een
        lus en niet met een HTML-tekenreeks: de eerste versie brak op de
        aanhalingstekens en zette de paneelknoppen al bij het laden neer. */
@@ -74,9 +80,9 @@ test('de meter telt de app en niet de schil, bevriest zijn noemer, en overleeft 
       const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
 
       const app = await bedien(ctx, base, '/scherm.html', 'app');
-      assert.equal(app.trechter.noemer, 6, 'de app-noemer is 6: niet de 30 schilknoppen en niet de 20 paneelknoppen');
-      assert.equal(app.plan.drempel, 3);
-      assert.equal(app.uitslag.gelukt, 6, 'alle zes app-knoppen geraakt, ook na de navigatie van A5');
+      assert.equal(app.trechter.noemer, 7, 'de app-noemer is 7: niet de 30 schilknoppen en niet de 20 paneelknoppen');
+      assert.equal(app.plan.drempel, 4);
+      assert.equal(app.uitslag.gelukt, 7, 'alle zeven app-knoppen geraakt, ook na de navigatie van A5 en de standwissel van A7');
       assert.equal(app.uitslag.nietMeerGevonden, 0);
       assert.ok(app.uitslag.teruggekeerd >= 1, 'A5 navigeerde weg; de proef had terug moeten keren');
       assert.equal(app.trechter.stadia.schil.dom, 30);

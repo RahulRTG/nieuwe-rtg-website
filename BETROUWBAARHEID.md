@@ -269,6 +269,19 @@ zeven laten een toets zakken.
 `bereikbaar` alleen bewijst dat er een pagina verschijnt, of ook dat de juiste app
 voor de juiste persona is bereikt. Dat krijgt een eigen diagnose.
 
+**Een vijfde meterfout: een standwissel is ook weggaan** (24 september 2026, na de
+hermeting). Stap 1 van de afbouw ging uit van een onstabiele knopidentiteit, en een
+diagnose over de drie rijen waar "niet meer gevonden" het oordeel besliste (Mijn leven,
+Vandaag, Reizen & Veilig) weerlegde dat: de verloren knoppen bestonden niet meer met
+een andere tekst, er stond geen enkel element meer met dezelfde attributen. Een tik
+("Laat Rahul kiezen", "Meenemen") had de inhoud vervangen zonder de url te veranderen,
+en de thuisregel keerde alleen terug bij een andere url. Nu keert de proef ook terug
+als de volgende knop uit de noemer niet meer in de pagina staat, met dezelfde
+klaar-voorwaarde; pas wat daarna nog ontbreekt, telt als niet meer gevonden. De
+fixture kreeg knop A7, die de inhoud vervangt zonder te navigeren: zonder de
+reparatie raakt de proef er 6 van de 7. Er is bewust geen nieuwe knopidentiteit
+gebouwd, want die had dit niet opgelost.
+
 ## 4d. Bereikbaar: de juiste actor op de bedoelde bestemming
 
 **Staat** (24 september 2026). Een diagnose over alle 112 rijen vergeleek de

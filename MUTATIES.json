@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:16:17.786Z",
-    "commit": "e4f537b0",
+    "op": "2026-09-24T21:19:47.005Z",
+    "commit": "afd4d291",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -5126,7 +5126,11 @@
     },
     "lusproef.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "scripts/lib/bewijsbron.js",
+      "operator": "===->!==#1",
+      "gezakt": 1,
+      "geprobeerd": 8
     },
     "lussen.test.js": {
       "soort": "puur",

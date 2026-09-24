@@ -10,8 +10,8 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-09-24T19:16:28.293Z",
-  "commit": "8a9848ce",
+  "op": "2026-09-24T19:40:24.178Z",
+  "commit": "e599b56a",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
@@ -20,24 +20,26 @@
  "sessiesOvergeslagen": [],
  "gemeten": {
   "onderdelen": 112,
-  "defecten": 0,
-  "knoppenGevonden": 471,
-  "knoppenAangetikt": 204,
+  "defecten": 4,
+  "knoppenGevonden": 470,
+  "knoppenAangetikt": 197,
   "knoppenNietKlikbaar": 212,
-  "schermenGrotendeelsOngemeten": 22,
+  "schermenGrotendeelsOngemeten": 23,
   "deurenZonderPersona": 2
  },
  "telling": {
-  "GEEN_FIXTURE": 112
+  "GEEN_FIXTURE": 108,
+  "GEBLOKKEERD_DOOR_DEFECT": 4
  },
  "perBewijs": {
   "bereikbaar": {
-   "BEWEZEN": 97,
-   "NIET_GETEST": 15
+   "BEWEZEN": 93,
+   "NIET_GETEST": 15,
+   "GEBLOKKEERD_DOOR_DEFECT": 4
   },
   "bedienbaar": {
-   "NIET_GETEST": 61,
-   "BEWEZEN": 51
+   "NIET_GETEST": 66,
+   "BEWEZEN": 46
   },
   "menselijk": {
    "NIET_GETEST": 112
@@ -155,7 +157,32 @@
    }
   ]
  },
- "defecten": [],
+ "defecten": [
+  {
+   "app": "Routedossier",
+   "wereld": "TravelOS",
+   "ingang": "/apps/routedossier.html",
+   "reden": "de wereld toont deze ingang aan een lid, maar de deur gaat alleen open voor een kantoor: een lid wordt doorgestuurd naar apps/personeel.html (zaak.teamroom)"
+  },
+  {
+   "app": "Decision Room",
+   "wereld": "WorkOS",
+   "ingang": "/apps/decision-room.html",
+   "reden": "de wereld toont deze ingang aan een lid, maar de deur gaat alleen open voor een kantoor: een lid wordt doorgestuurd naar apps/rtgkantoor.html (kantoor.ai-besturing)"
+  },
+  {
+   "app": "Project Room",
+   "wereld": "WorkOS",
+   "ingang": "/apps/project-room.html",
+   "reden": "de wereld toont deze ingang aan een lid, maar de deur gaat alleen open voor een kantoor: een lid wordt doorgestuurd naar apps/rtgkantoor.html (kantoor.ai-besturing)"
+  },
+  {
+   "app": "RTG One",
+   "wereld": "WorkOS",
+   "ingang": "/apps/rtgone.html",
+   "reden": "de wereld toont deze ingang aan een lid, maar de deur gaat alleen open voor een kantoor: een lid wordt doorgestuurd naar apps/rtgkantoor.html (kantoor.ai-besturing)"
+  }
+ ],
  "deurenZonderPersona": [
   {
    "app": "Het bord",
@@ -226,6 +253,17 @@
    "waarnemingen": [
     "als gezin: 1083 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "gezin",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "lid",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "gemeenschap.buurtruil",
+    "landingCap": "gemeenschap.buurtruil"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/foundation/buurtruil.html",
@@ -237,10 +275,10 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 49,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 11
+      "dom": 42,
+      "zichtbaar": 22,
+      "inBeeld": 17,
+      "raakbaar": 10
      }
     },
     "noemer": 0,
@@ -331,6 +369,17 @@
    "waarnemingen": [
     "als gezin: 1045 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "gezin",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "lid",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geven.doneren",
+    "landingCap": "geven.doneren"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/foundation/geven.html",
@@ -436,6 +485,12 @@
    "waarnemingen": [
     "als gezin: poort dicht"
    ],
+   "personaAfwijking": {
+    "gebruikt": "gezin",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "zaak",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
    "samengesteld": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -512,6 +567,7 @@
    "waarnemingen": [
     "als gezin: poort dicht"
    ],
+   "personaAfwijking": null,
    "samengesteld": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -588,6 +644,17 @@
    "waarnemingen": [
     "als gezin: 1006 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "gezin",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "lid",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "gemeenschap.klimaatfonds",
+    "landingCap": "gemeenschap.klimaatfonds"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/foundation/klimaatfonds.html",
@@ -599,10 +666,10 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 49,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 11
+      "dom": 42,
+      "zichtbaar": 22,
+      "inBeeld": 17,
+      "raakbaar": 10
      }
     },
     "noemer": 1,
@@ -693,6 +760,12 @@
    "waarnemingen": [
     "als gezin: 978 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "ontdekken.connect",
+    "landingCap": "ontdekken.connect"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/connect.html",
@@ -798,20 +871,26 @@
    "waarnemingen": [
     "als gezin: 76 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "wereld.foundation",
+    "landingCap": "wereld.foundation"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/foundation/os-publiek.html",
     "stadia": {
      "app": {
-      "dom": 50,
-      "zichtbaar": 43,
-      "inBeeld": 12,
+      "dom": 51,
+      "zichtbaar": 44,
+      "inBeeld": 13,
       "raakbaar": 0
      },
      "schil": {
-      "dom": 45,
-      "zichtbaar": 17,
-      "inBeeld": 12,
+      "dom": 33,
+      "zichtbaar": 13,
+      "inBeeld": 10,
       "raakbaar": 0
      }
     },
@@ -901,8 +980,19 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als gezin: 1442 tekens zichtbaar"
+    "als gezin: 1434 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "gezin",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "rtf-organisatie",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "portaal.toegang",
+    "landingCap": "portaal.toegang"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/foundation/os-portaal.html",
@@ -1006,8 +1096,14 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als gezin: 1272 tekens zichtbaar"
+    "als gezin: 1269 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "rtf.contacten",
+    "landingCap": "rtf.contacten"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/foundation/vrienden.html",
@@ -1187,6 +1283,12 @@
    "waarnemingen": [
     "als gezin: 1389 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "rtf.hulp-zorg",
+    "landingCap": "rtf.hulp-zorg"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/foundation/zorg.html",
@@ -1292,6 +1394,12 @@
    "waarnemingen": [
     "als lid: 1914 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "account.bescherming",
+    "landingCap": "account.bescherming"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/mijn-isolatie.html",
@@ -1303,7 +1411,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 79,
+      "dom": 80,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1397,6 +1505,12 @@
    "waarnemingen": [
     "als lid: 1979 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "identiteit.verificatie",
+    "landingCap": "identiteit.verificatie"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/verificatie.html",
@@ -1408,7 +1522,7 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 80,
+      "dom": 82,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1502,6 +1616,12 @@
    "waarnemingen": [
     "als lid: 1162 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "site.juridisch",
+    "landingCap": "site.juridisch"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/juridisch.html",
@@ -1513,7 +1633,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 70,
+      "dom": 72,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1617,6 +1737,12 @@
    "waarnemingen": [
     "als lid: 1834 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "privacy.voorkeuren",
+    "landingCap": "privacy.voorkeuren"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/mijn-neigingen.html",
@@ -1628,7 +1754,7 @@
       "raakbaar": 10
      },
      "schil": {
-      "dom": 75,
+      "dom": 84,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1725,6 +1851,12 @@
    "waarnemingen": [
     "als lid: 1238 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "account.passkeys",
+    "landingCap": "account.passkeys"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/passkeys.html",
@@ -1840,6 +1972,12 @@
    "waarnemingen": [
     "als lid: 2464 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "instellingen.postvoorkeuren",
+    "landingCap": "instellingen.postvoorkeuren"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/mijn-post.html",
@@ -1851,7 +1989,7 @@
       "raakbaar": 13
      },
      "schil": {
-      "dom": 75,
+      "dom": 76,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1953,6 +2091,12 @@
    "waarnemingen": [
     "als lid: 1921 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "veilig.noodcontacten",
+    "landingCap": "veilig.noodcontacten"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/veilig.html#vandaag",
@@ -2062,6 +2206,12 @@
    "waarnemingen": [
     "als lid: 1278 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "account.sessies",
+    "landingCap": "account.sessies"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/mijn-sessies.html",
@@ -2167,6 +2317,12 @@
    "waarnemingen": [
     "als lid: 16681 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "privacy.gegevens",
+    "landingCap": "privacy.gegevens"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/mijn-gegevens.html",
@@ -2178,7 +2334,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 78,
+      "dom": 86,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -2278,6 +2434,12 @@
    "waarnemingen": [
     "als lid: 2144 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "instellingen.profiel",
+    "landingCap": "instellingen.profiel"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/ik.html",
@@ -2385,6 +2547,12 @@
    "waarnemingen": [
     "als lid: 1262 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "privacy.toegang",
+    "landingCap": "privacy.toegang"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/mijn-relaties.html",
@@ -2449,7 +2617,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "32 te raken bij het laden, 32 geprobeerd, 27 gelukt, 14 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Next week: element is not visible, Open your calendar: element is not visible, Remove from your widgets: element is not visible",
+     "reden": "32 te raken bij het laden, 32 geprobeerd, 27 gelukt, 15 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Next week: element is not visible, Open your calendar: element is not visible, Remove from your widgets: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -2496,6 +2664,12 @@
    "waarnemingen": [
     "als lid: 4814 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "sociaal.alles",
+    "landingCap": "sociaal.alles"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/wereld.html",
@@ -2518,7 +2692,7 @@
     "budget": 32,
     "geprobeerd": 32,
     "gelukt": 27,
-    "effect": 14,
+    "effect": 15,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 1,
@@ -2601,6 +2775,12 @@
    "waarnemingen": [
     "als lid: 3263 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "appstore.dossier",
+    "landingCap": "appstore.dossier"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/appstore-dossier.html",
@@ -2612,7 +2792,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 86,
+      "dom": 88,
       "zichtbaar": 23,
       "inBeeld": 19,
       "raakbaar": 12
@@ -2780,6 +2960,12 @@
    "waarnemingen": [
     "als lid: 1604 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "relaties.attenties",
+    "landingCap": "relaties.attenties"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/attenties.html",
@@ -2844,7 +3030,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 2 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -2885,6 +3071,12 @@
    "waarnemingen": [
     "als lid: 1468 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
@@ -2907,7 +3099,7 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 4,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -2990,6 +3182,12 @@
    "waarnemingen": [
     "als lid: 1468 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
@@ -3175,8 +3373,14 @@
     "R\nRahul\nStel me gerust een vraag.\nRAHUL: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1226 tekens zichtbaar"
+    "als lid: 1512 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "comm.berichten",
+    "landingCap": "comm.berichten"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/comm.html",
@@ -3188,10 +3392,10 @@
       "raakbaar": 8
      },
      "schil": {
-      "dom": 108,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 11
+      "dom": 90,
+      "zichtbaar": 24,
+      "inBeeld": 19,
+      "raakbaar": 12
      }
     },
     "noemer": 8,
@@ -3315,7 +3519,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 2 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -3356,6 +3560,12 @@
    "waarnemingen": [
     "als lid: 1468 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
@@ -3367,10 +3577,10 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 74,
-      "zichtbaar": 25,
-      "inBeeld": 20,
-      "raakbaar": 13
+      "dom": 88,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 11
      }
     },
     "noemer": 4,
@@ -3378,7 +3588,7 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 4,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -3538,6 +3748,12 @@
    "waarnemingen": [
     "als lid: 1000 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "media.camera",
+    "landingCap": "media.camera"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/camera.html",
@@ -3549,10 +3765,10 @@
       "raakbaar": 9
      },
      "schil": {
-      "dom": 90,
-      "zichtbaar": 24,
-      "inBeeld": 13,
-      "raakbaar": 6
+      "dom": 77,
+      "zichtbaar": 25,
+      "inBeeld": 10,
+      "raakbaar": 3
      }
     },
     "noemer": 9,
@@ -3643,6 +3859,12 @@
    "waarnemingen": [
     "als lid: 1166 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "leven.cellier",
+    "landingCap": "leven.cellier"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/cellier.html",
@@ -3748,6 +3970,12 @@
    "waarnemingen": [
     "als lid: 1525 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "leven.cercle",
+    "landingCap": "leven.cercle"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/cercle.html",
@@ -3853,6 +4081,12 @@
    "waarnemingen": [
     "als lid: 3138 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "winkel.commerce",
+    "landingCap": "winkel.commerce"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/commerce.html",
@@ -3864,7 +4098,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 78,
+      "dom": 81,
       "zichtbaar": 24,
       "inBeeld": 20,
       "raakbaar": 13
@@ -3958,6 +4192,12 @@
    "waarnemingen": [
     "als lid: 1320 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "daten.vonk",
+    "landingCap": "daten.vonk"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/vonk.html",
@@ -3969,7 +4209,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 107,
+      "dom": 89,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -4063,6 +4303,12 @@
    "waarnemingen": [
     "als lid: 1593 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "leven.entourage",
+    "landingCap": "leven.entourage"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/entourage.html",
@@ -4168,8 +4414,14 @@
     "Kanaal aanmelden: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1239 tekens zichtbaar"
+    "als lid: 1500 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "media.theater",
+    "landingCap": "media.theater"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/theater.html",
@@ -4234,7 +4486,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 2 met zichtbaar effect",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -4275,6 +4527,12 @@
    "waarnemingen": [
     "als lid: 1468 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
@@ -4286,10 +4544,10 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 88,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 11
+      "dom": 75,
+      "zichtbaar": 25,
+      "inBeeld": 20,
+      "raakbaar": 13
      }
     },
     "noemer": 4,
@@ -4297,7 +4555,7 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 4,
-    "effect": 2,
+    "effect": 3,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -4393,6 +4651,12 @@
    "waarnemingen": [
     "als lid: 1533 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "horeca.reserveren",
+    "landingCap": "horeca.reserveren"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/foodcourt.html",
@@ -4498,6 +4762,12 @@
    "waarnemingen": [
     "als lid: 166 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "spelen.projectiescherm",
+    "landingCap": "spelen.projectiescherm"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/spelscherm.html",
@@ -4603,6 +4873,12 @@
    "waarnemingen": [
     "als lid: 1173 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "leven.garderobe",
+    "landingCap": "leven.garderobe"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/garderobe.html",
@@ -4667,7 +4943,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "8 te raken bij het laden, 8 geprobeerd, 5 gelukt, 3 met zichtbaar effect; niet aan te tikken: Betalen: element is not visible, Vooruit: element is not visible, Meer: element is not visible",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -4701,39 +4977,41 @@
      "bewijs": null
     }
    },
-   "gevonden": 8,
-   "geklikt": 5,
+   "gevonden": 4,
+   "geklikt": 4,
    "overgeslagen": [],
-   "nietKlikbaar": [
-    "Betalen: element is not visible",
-    "Vooruit: element is not visible",
-    "Meer: element is not visible"
-   ],
+   "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1485 tekens zichtbaar"
+    "als lid: 1748 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
     "stadia": {
      "app": {
-      "dom": 9,
-      "zichtbaar": 8,
-      "inBeeld": 7,
-      "raakbaar": 8
+      "dom": 5,
+      "zichtbaar": 4,
+      "inBeeld": 3,
+      "raakbaar": 4
      },
      "schil": {
-      "dom": 53,
-      "zichtbaar": 16,
-      "inBeeld": 12,
-      "raakbaar": 11
+      "dom": 73,
+      "zichtbaar": 25,
+      "inBeeld": 20,
+      "raakbaar": 13
      }
     },
-    "noemer": 8,
-    "drempel": 4,
-    "budget": 8,
-    "geprobeerd": 8,
-    "gelukt": 5,
+    "noemer": 4,
+    "drempel": 2,
+    "budget": 4,
+    "geprobeerd": 4,
+    "gelukt": 4,
     "effect": 3,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
@@ -4891,6 +5169,12 @@
    "waarnemingen": [
     "als lid: 2951 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "leven.vooruitzicht",
+    "landingCap": "leven.vooruitzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/living-os.html",
@@ -4902,10 +5186,10 @@
       "raakbaar": 10
      },
      "schil": {
-      "dom": 62,
+      "dom": 67,
       "zichtbaar": 15,
-      "inBeeld": 12,
-      "raakbaar": 11
+      "inBeeld": 13,
+      "raakbaar": 12
      }
     },
     "noemer": 10,
@@ -4996,6 +5280,12 @@
    "waarnemingen": [
     "als lid: 835 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "media.krant",
+    "landingCap": "media.krant"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/krant.html",
@@ -5007,9 +5297,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 79,
-      "zichtbaar": 25,
-      "inBeeld": 20,
+      "dom": 72,
+      "zichtbaar": 21,
+      "inBeeld": 16,
       "raakbaar": 13
      }
     },
@@ -5060,7 +5350,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "11 te raken bij het laden, 9 geprobeerd, 6 gelukt, 6 met zichtbaar effect, 2 niet meer gevonden; niet aan te tikken: BUSINESS: intercepts pointer events, COMMERCE: intercepts pointer events, Kanaal aanmelden: element is not visible",
+     "reden": "11 te raken bij het laden, 9 geprobeerd, 6 gelukt, 5 met zichtbaar effect, 2 niet meer gevonden; niet aan te tikken: BUSINESS: intercepts pointer events, COMMERCE: intercepts pointer events, Kanaal aanmelden: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -5105,6 +5395,12 @@
    "waarnemingen": [
     "als lid: 1504 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "media.podium",
+    "landingCap": "media.podium"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/podium.html",
@@ -5116,10 +5412,10 @@
       "raakbaar": 11
      },
      "schil": {
-      "dom": 62,
-      "zichtbaar": 16,
-      "inBeeld": 13,
-      "raakbaar": 12
+      "dom": 74,
+      "zichtbaar": 19,
+      "inBeeld": 14,
+      "raakbaar": 11
      }
     },
     "noemer": 11,
@@ -5127,7 +5423,7 @@
     "budget": 11,
     "geprobeerd": 9,
     "gelukt": 6,
-    "effect": 6,
+    "effect": 5,
     "nietMeerGevonden": 2,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -5210,6 +5506,12 @@
    "waarnemingen": [
     "als lid: 1468 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
@@ -5221,7 +5523,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 87,
+      "dom": 88,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -5317,6 +5619,12 @@
    "waarnemingen": [
     "als lid: 1104 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "verblijf.logeren-bij-leden",
+    "landingCap": "verblijf.logeren-bij-leden"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/thuis.html",
@@ -5328,7 +5636,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 91,
+      "dom": 89,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -5422,6 +5730,12 @@
    "waarnemingen": [
     "als lid: 1241 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "woning.huishouden",
+    "landingCap": "woning.huishouden"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/maison.html",
@@ -5433,7 +5747,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 86,
+      "dom": 88,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -5581,6 +5895,12 @@
    "waarnemingen": [
     "als lid: 24743 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "winkel.mall",
+    "landingCap": "winkel.mall"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/mall.html",
@@ -5592,10 +5912,10 @@
       "raakbaar": 149
      },
      "schil": {
-      "dom": 52,
+      "dom": 54,
       "zichtbaar": 17,
-      "inBeeld": 13,
-      "raakbaar": 12
+      "inBeeld": 14,
+      "raakbaar": 13
      }
     },
     "noemer": 54,
@@ -5686,6 +6006,12 @@
    "waarnemingen": [
     "als lid: 1468 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
@@ -5697,7 +6023,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 88,
+      "dom": 86,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -5791,6 +6117,12 @@
    "waarnemingen": [
     "als lid: 1086 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "winkel.bestellingen",
+    "landingCap": "winkel.bestellingen"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/mijnmall.html",
@@ -5802,9 +6134,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 78,
-      "zichtbaar": 22,
-      "inBeeld": 17,
+      "dom": 71,
+      "zichtbaar": 18,
+      "inBeeld": 13,
       "raakbaar": 10
      }
     },
@@ -5855,7 +6187,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "21 te raken bij het laden, 8 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 13 niet meer gevonden, 1 overgeslagen (onomkeerbaar) -- de drempel is 11, dus dit is niet beproefd; niet aan te tikken: Ontdekken: element is not visible, Uw avond: element is not visible, Tweede scherm openen ＋: element is not visible",
+     "reden": "19 te raken bij het laden, 6 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 13 niet meer gevonden, 1 overgeslagen (onomkeerbaar) -- de drempel is 10, dus dit is niet beproefd; niet aan te tikken: ◇\nOntdekken: element is not stable, Ontdekken: element is not visible, Uw avond: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -5889,48 +6221,53 @@
      "bewijs": null
     }
    },
-   "gevonden": 21,
-   "geklikt": 3,
+   "gevonden": 19,
+   "geklikt": 2,
    "overgeslagen": [
     "□\nBestellen"
    ],
    "nietKlikbaar": [
+    "◇\nOntdekken: element is not stable",
     "Ontdekken: element is not visible",
     "Uw avond: element is not visible",
-    "Tweede scherm openen ＋: element is not visible",
-    "Rahul openen: element is not visible",
-    "Versturen →: element is not visible"
+    "Tweede scherm openen ＋: element is not visible"
    ],
    "waarnemingen": [
     "als lid: 1486 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "leven.werkblad",
+    "landingCap": "leven.werkblad"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/leven.html",
     "stadia": {
      "app": {
       "dom": 22,
-      "zichtbaar": 22,
-      "inBeeld": 21,
-      "raakbaar": 22
+      "zichtbaar": 20,
+      "inBeeld": 20,
+      "raakbaar": 20
      },
      "schil": {
-      "dom": 30,
-      "zichtbaar": 2,
-      "inBeeld": 2,
-      "raakbaar": 2
+      "dom": 53,
+      "zichtbaar": 15,
+      "inBeeld": 12,
+      "raakbaar": 11
      }
     },
-    "noemer": 21,
-    "drempel": 11,
-    "budget": 21,
-    "geprobeerd": 8,
-    "gelukt": 3,
-    "effect": 3,
+    "noemer": 19,
+    "drempel": 10,
+    "budget": 19,
+    "geprobeerd": 6,
+    "gelukt": 2,
+    "effect": 2,
     "nietMeerGevonden": 13,
     "overgeslagen": 1,
     "teruggekeerd": 0,
-    "nietRaakbaar": 0,
+    "nietRaakbaar": 2,
     "onomkeerbaar": 1
    },
    "samengesteld": [],
@@ -5968,7 +6305,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "10 te raken bij het laden, 10 geprobeerd, 9 gelukt, 8 met zichtbaar effect; niet aan te tikken: Doe mee: element is not visible",
+     "reden": "10 te raken bij het laden, 10 geprobeerd, 9 gelukt, 7 met zichtbaar effect; niet aan te tikken: Doe mee: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -6009,8 +6346,14 @@
     "Doe mee: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1766 tekens zichtbaar"
+    "als lid: 1507 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "media.luisteren",
+    "landingCap": "media.luisteren"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/muziek.html",
@@ -6033,7 +6376,7 @@
     "budget": 10,
     "geprobeerd": 10,
     "gelukt": 9,
-    "effect": 8,
+    "effect": 7,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -6116,6 +6459,12 @@
    "waarnemingen": [
     "als lid: 1468 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
@@ -6229,6 +6578,12 @@
    "waarnemingen": [
     "als lid: 881 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "nieuws.lezen",
+    "landingCap": "nieuws.lezen"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/nieuws.html",
@@ -6240,7 +6595,7 @@
       "raakbaar": 8
      },
      "schil": {
-      "dom": 77,
+      "dom": 72,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -6334,20 +6689,26 @@
    "waarnemingen": [
     "als lid: 72 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "wereld.living",
+    "landingCap": "wereld.living"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/rtg.html",
     "stadia": {
      "app": {
-      "dom": 57,
+      "dom": 55,
       "zichtbaar": 43,
       "inBeeld": 43,
       "raakbaar": 0
      },
      "schil": {
-      "dom": 62,
-      "zichtbaar": 14,
-      "inBeeld": 11,
+      "dom": 73,
+      "zichtbaar": 19,
+      "inBeeld": 14,
       "raakbaar": 0
      }
     },
@@ -6360,7 +6721,7 @@
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
-    "nietRaakbaar": 20,
+    "nietRaakbaar": 18,
     "onomkeerbaar": 0
    },
    "samengesteld": [],
@@ -6437,8 +6798,14 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1636 tekens zichtbaar"
+    "als lid: 1652 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "concierge.privekantoor",
+    "landingCap": "concierge.privekantoor"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/lifestyle.html",
@@ -6546,6 +6913,12 @@
    "waarnemingen": [
     "als lid: 891 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "sociaal.pulse",
+    "landingCap": "sociaal.pulse"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/pulse.html",
@@ -6557,10 +6930,10 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 98,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 11
+      "dom": 63,
+      "zichtbaar": 17,
+      "inBeeld": 12,
+      "raakbaar": 9
      }
     },
     "noemer": 2,
@@ -6651,6 +7024,12 @@
    "waarnemingen": [
     "als lid: 1333 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "sociaal.ontmoeten",
+    "landingCap": "sociaal.ontmoeten"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/rendezvous.html",
@@ -6789,7 +7168,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "26 te raken bij het laden, 26 geprobeerd, 1 gelukt, 1 met zichtbaar effect -- de drempel is 13, dus dit is niet beproefd; niet aan te tikken: Menu: element is not visible, Samen: intercepts pointer events, Bibliotheek: intercepts pointer events",
+     "reden": "25 te raken bij het laden, 25 geprobeerd, 1 gelukt, 1 met zichtbaar effect -- de drempel is 13, dus dit is niet beproefd; niet aan te tikken: Samen: intercepts pointer events, Bibliotheek: intercepts pointer events, Mijn bord: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -6823,11 +7202,10 @@
      "bewijs": null
     }
    },
-   "gevonden": 26,
+   "gevonden": 25,
    "geklikt": 1,
    "overgeslagen": [],
    "nietKlikbaar": [
-    "Menu: element is not visible",
     "Samen: intercepts pointer events",
     "Bibliotheek: intercepts pointer events",
     "Mijn bord: intercepts pointer events",
@@ -6854,35 +7232,41 @@
     "Stop: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2797 tekens zichtbaar"
+    "als lid: 2842 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "media.centrum",
+    "landingCap": "media.centrum"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/media.html",
     "stadia": {
      "app": {
       "dom": 88,
-      "zichtbaar": 48,
-      "inBeeld": 47,
-      "raakbaar": 48
+      "zichtbaar": 47,
+      "inBeeld": 46,
+      "raakbaar": 47
      },
      "schil": {
-      "dom": 26,
-      "zichtbaar": 3,
-      "inBeeld": 2,
-      "raakbaar": 2
+      "dom": 62,
+      "zichtbaar": 19,
+      "inBeeld": 14,
+      "raakbaar": 11
      }
     },
-    "noemer": 26,
+    "noemer": 25,
     "drempel": 13,
-    "budget": 26,
-    "geprobeerd": 26,
+    "budget": 25,
+    "geprobeerd": 25,
     "gelukt": 1,
     "effect": 1,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
-    "nietRaakbaar": 40,
+    "nietRaakbaar": 41,
     "onomkeerbaar": 0
    },
    "samengesteld": [],
@@ -6920,7 +7304,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "12 te raken bij het laden, 5 geprobeerd, 5 gelukt, 3 met zichtbaar effect, 7 niet meer gevonden, 1 overgeslagen (onomkeerbaar) -- de drempel is 6, dus dit is niet beproefd",
+     "reden": "12 te raken bij het laden, 5 geprobeerd, 5 gelukt, 2 met zichtbaar effect, 7 niet meer gevonden, 1 overgeslagen (onomkeerbaar) -- de drempel is 6, dus dit is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6963,6 +7347,12 @@
    "waarnemingen": [
     "als lid: 798 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "betalen.rtgpay",
+    "landingCap": "betalen.rtgpay"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/pay.html",
@@ -6974,7 +7364,7 @@
       "raakbaar": 13
      },
      "schil": {
-      "dom": 76,
+      "dom": 78,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -6985,7 +7375,7 @@
     "budget": 12,
     "geprobeerd": 5,
     "gelukt": 5,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 7,
     "overgeslagen": 1,
     "teruggekeerd": 0,
@@ -7142,6 +7532,12 @@
    "waarnemingen": [
     "als lid: 1468 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
@@ -7321,8 +7717,14 @@
     "Rahul\nKOMPAS: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1952 tekens zichtbaar"
+    "als lid: 2018 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "sociaal.leven",
+    "landingCap": "sociaal.leven"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/sociaal.html",
@@ -7334,7 +7736,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 68,
+      "dom": 72,
       "zichtbaar": 16,
       "inBeeld": 13,
       "raakbaar": 12
@@ -7426,8 +7828,14 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1203 tekens zichtbaar"
+    "als lid: 947 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "spelen.bordspel",
+    "landingCap": "spelen.bordspel"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/spelen.html",
@@ -7439,7 +7847,7 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 78,
+      "dom": 80,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -7492,7 +7900,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "8 te raken bij het laden, 8 geprobeerd, 1 gelukt, 1 met zichtbaar effect -- de drempel is 4, dus dit is niet beproefd; niet aan te tikken: VANDAAG: intercepts pointer events, DE STAND: intercepts pointer events, TICKETS: intercepts pointer events",
+     "reden": "13 te raken bij het laden, 13 geprobeerd, 1 gelukt, 1 met zichtbaar effect -- de drempel is 7, dus dit is niet beproefd; niet aan te tikken: VANDAAG: intercepts pointer events, DE STAND: intercepts pointer events, TICKETS: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -7526,7 +7934,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 8,
+   "gevonden": 13,
    "geklikt": 1,
    "overgeslagen": [],
    "nietKlikbaar": [
@@ -7536,32 +7944,43 @@
     "MIJN TICKETS: intercepts pointer events",
     "DE CLUB: intercepts pointer events",
     "Bekijk wedstrijddag: intercepts pointer events",
-    "Bekijk alles: intercepts pointer events"
+    "Bekijk alles: intercepts pointer events",
+    "Vandaag: element is not visible",
+    "Tickets: element is not visible",
+    "Een ticket reserveren Ticket reserveren: element is not visible",
+    "Mijn club: element is not visible",
+    "Meer: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1223 tekens zichtbaar"
+    "als lid: 1190 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "sport.wedstrijd",
+    "landingCap": "sport.wedstrijd"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/sport.html#bord",
     "stadia": {
      "app": {
-      "dom": 8,
-      "zichtbaar": 8,
-      "inBeeld": 8,
-      "raakbaar": 8
+      "dom": 13,
+      "zichtbaar": 13,
+      "inBeeld": 13,
+      "raakbaar": 13
      },
      "schil": {
-      "dom": 88,
-      "zichtbaar": 27,
-      "inBeeld": 22,
-      "raakbaar": 15
+      "dom": 76,
+      "zichtbaar": 20,
+      "inBeeld": 15,
+      "raakbaar": 12
      }
     },
-    "noemer": 8,
-    "drempel": 4,
-    "budget": 8,
-    "geprobeerd": 8,
+    "noemer": 13,
+    "drempel": 7,
+    "budget": 13,
+    "geprobeerd": 13,
     "gelukt": 1,
     "effect": 1,
     "nietMeerGevonden": 0,
@@ -7646,6 +8065,12 @@
    "waarnemingen": [
     "als lid: 1173 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "leven.tafel-gelegenheid",
+    "landingCap": "leven.tafel-gelegenheid"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/table.html",
@@ -7751,6 +8176,17 @@
    "waarnemingen": [
     "als lid: 748 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "lid",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "zaak",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "horeca.tweedescherm",
+    "landingCap": "horeca.tweedescherm"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/scherm.html",
@@ -7865,6 +8301,12 @@
    "waarnemingen": [
     "als lid: 1345 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "leven.uitgaan",
+    "landingCap": "leven.uitgaan"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/uitgaan.html",
@@ -7968,8 +8410,14 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1377 tekens zichtbaar"
+    "als lid: 1590 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "dag.overzicht",
+    "landingCap": "dag.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/life.html",
@@ -7981,9 +8429,9 @@
       "raakbaar": 12
      },
      "schil": {
-      "dom": 54,
-      "zichtbaar": 16,
-      "inBeeld": 12,
+      "dom": 84,
+      "zichtbaar": 23,
+      "inBeeld": 18,
       "raakbaar": 11
      }
     },
@@ -8075,8 +8523,14 @@
     "↑ Terug naar boven: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 978 tekens zichtbaar"
+    "als lid: 1237 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "media.clips",
+    "landingCap": "media.clips"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/clips.html",
@@ -8088,10 +8542,10 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 81,
-      "zichtbaar": 24,
-      "inBeeld": 19,
-      "raakbaar": 12
+      "dom": 92,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 11
      }
     },
     "noemer": 3,
@@ -8256,6 +8710,12 @@
    "waarnemingen": [
     "als lid: 1468 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/geld.html#overzicht",
@@ -8361,6 +8821,12 @@
    "waarnemingen": [
     "als lid: 1158 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "woning.overzicht",
+    "landingCap": "woning.overzicht"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/wonen.html",
@@ -8464,8 +8930,14 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 899 tekens zichtbaar"
+    "als lid: 883 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "reizen.aankomst",
+    "landingCap": "reizen.aankomst"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/arrival.html",
@@ -8477,7 +8949,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 77,
+      "dom": 73,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -8571,6 +9043,12 @@
    "waarnemingen": [
     "als lid: 941 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "reizen.haalbaarheid",
+    "landingCap": "reizen.haalbaarheid"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/move.html",
@@ -8582,10 +9060,10 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 72,
-      "zichtbaar": 24,
-      "inBeeld": 19,
-      "raakbaar": 12
+      "dom": 81,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 11
      }
     },
     "noemer": 0,
@@ -8674,8 +9152,14 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1514 tekens zichtbaar"
+    "als lid: 1498 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "reizen.vliegtuig",
+    "landingCap": "reizen.vliegtuig"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/hangar.html",
@@ -8687,9 +9171,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 80,
-      "zichtbaar": 24,
-      "inBeeld": 19,
+      "dom": 73,
+      "zichtbaar": 20,
+      "inBeeld": 15,
       "raakbaar": 12
      }
     },
@@ -8781,6 +9265,12 @@
    "waarnemingen": [
     "als lid: 1302 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "navigatie.route",
+    "landingCap": "navigatie.route"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/navigatie.html",
@@ -8792,7 +9282,7 @@
       "raakbaar": 6
      },
      "schil": {
-      "dom": 83,
+      "dom": 87,
       "zichtbaar": 26,
       "inBeeld": 15,
       "raakbaar": 8
@@ -8845,7 +9335,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 3 gelukt, 2 met zichtbaar effect; niet aan te tikken: Plan mijn reis: element is not visible",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 3 gelukt, 3 met zichtbaar effect; niet aan te tikken: Plan mijn reis: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -8886,8 +9376,14 @@
     "Plan mijn reis: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 5105 tekens zichtbaar"
+    "als lid: 5089 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "vervoer.rit",
+    "landingCap": "vervoer.rit"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/ov.html",
@@ -8899,9 +9395,9 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 92,
-      "zichtbaar": 25,
-      "inBeeld": 20,
+      "dom": 77,
+      "zichtbaar": 21,
+      "inBeeld": 16,
       "raakbaar": 13
      }
     },
@@ -8910,7 +9406,7 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 3,
-    "effect": 2,
+    "effect": 3,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -8993,6 +9489,17 @@
    "waarnemingen": [
     "als lid: 955 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "lid",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "zaak",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "zaak.ovroutes",
+    "landingCap": "zaak.ovroutes"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/ovroutes.html",
@@ -9098,6 +9605,12 @@
    "waarnemingen": [
     "als lid: 1277 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "reizen.reisboek",
+    "landingCap": "reizen.reisboek"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/reisboek.html",
@@ -9109,7 +9622,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 100,
+      "dom": 88,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -9236,7 +9749,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "19 te raken bij het laden, 6 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 13 niet meer gevonden -- de drempel is 10, dus dit is niet beproefd; niet aan te tikken: Reizen: element is not visible, Vandaag: element is not visible, Tweede scherm openen ＋: element is not visible",
+     "reden": "19 te raken bij het laden, 5 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 14 niet meer gevonden -- de drempel is 10, dus dit is niet beproefd; niet aan te tikken: Reizen: element is not visible, Vandaag: element is not visible, Tweede scherm openen ＋: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -9271,7 +9784,7 @@
     }
    },
    "gevonden": 19,
-   "geklikt": 3,
+   "geklikt": 2,
    "overgeslagen": [],
    "nietKlikbaar": [
     "Reizen: element is not visible",
@@ -9279,8 +9792,14 @@
     "Tweede scherm openen ＋: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 2167 tekens zichtbaar"
+    "als lid: 2247 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "reizen.veilig",
+    "landingCap": "reizen.veilig"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/reizen-veilig.html",
@@ -9301,10 +9820,10 @@
     "noemer": 19,
     "drempel": 10,
     "budget": 19,
-    "geprobeerd": 6,
-    "gelukt": 3,
-    "effect": 3,
-    "nietMeerGevonden": 13,
+    "geprobeerd": 5,
+    "gelukt": 2,
+    "effect": 2,
+    "nietMeerGevonden": 14,
     "overgeslagen": 0,
     "teruggekeerd": 0,
     "nietRaakbaar": 4,
@@ -9339,18 +9858,18 @@
    "ingang": "/apps/routedossier.html",
    "bewijzen": {
     "bereikbaar": {
-     "status": "BEWEZEN",
-     "reden": "opent voor een lid zonder poort en zonder fout",
+     "status": "GEBLOKKEERD_DOOR_DEFECT",
+     "reden": "de wereld toont deze ingang aan een lid, maar de deur gaat alleen open voor een kantoor: een lid wordt doorgestuurd naar apps/personeel.html (zaak.teamroom)",
      "bewijs": "/apps/routedossier.html"
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "4 te raken bij het laden, 1 geprobeerd, 1 gelukt, 1 met zichtbaar effect, 3 niet meer gevonden -- de drempel is 2, dus dit is niet beproefd",
+     "reden": "de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app",
      "bewijs": null
     },
     "menselijk": {
      "status": "NIET_GETEST",
-     "reden": "afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7",
+     "reden": "de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app",
      "bewijs": null
     },
     "voltooibaar": {
@@ -9379,41 +9898,23 @@
      "bewijs": null
     }
    },
-   "gevonden": 4,
-   "geklikt": 1,
+   "gevonden": 0,
+   "geklikt": 0,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 852 tekens zichtbaar"
+    "als lid: 836 tekens zichtbaar"
    ],
-   "trechter": {
-    "kant": "app",
-    "landing": "/apps/personeel.html?kantoor=1&terug=%2Fapps%2Froutedossier.html",
-    "stadia": {
-     "app": {
-      "dom": 77,
-      "zichtbaar": 4,
-      "inBeeld": 4,
-      "raakbaar": 4
-     },
-     "schil": {
-      "dom": 90,
-      "zichtbaar": 17,
-      "inBeeld": 11,
-      "raakbaar": 5
-     }
-    },
-    "noemer": 4,
-    "drempel": 2,
-    "budget": 4,
-    "geprobeerd": 1,
-    "gelukt": 1,
-    "effect": 1,
-    "nietMeerGevonden": 3,
-    "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 62,
-    "onomkeerbaar": 0
+   "personaAfwijking": {
+    "gebruikt": "lid",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "kantoor",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "andere-capability",
+    "ingangCap": "kantoor.routedossier",
+    "landingCap": "zaak.teamroom"
    },
    "samengesteld": [],
    "mobiel": {
@@ -9428,7 +9929,7 @@
     "status": "NIET_GETEST",
     "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
    },
-   "status": "GEEN_FIXTURE",
+   "status": "GEBLOKKEERD_DOOR_DEFECT",
    "afhankelijk": {
     "RTG-schil": {
      "bewijs": "bedienbaar",
@@ -9450,7 +9951,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "3 te raken bij het laden, 2 geprobeerd, 1 gelukt, 1 met zichtbaar effect, 1 niet meer gevonden, 1x teruggekeerd na navigatie -- de drempel is 2, dus dit is niet beproefd; niet aan te tikken: IETS KAPOT OF VOL GEZIEN? MELD HET: element is not visible",
+     "reden": "3 te raken bij het laden, 1 geprobeerd, 0 gelukt, 0 met zichtbaar effect, 2 niet meer gevonden -- de drempel is 2, dus dit is niet beproefd; niet aan te tikken: HOE DE STAD ER NU BIJ STAAT: element is not stable",
      "bewijs": null
     },
     "menselijk": {
@@ -9485,14 +9986,20 @@
     }
    },
    "gevonden": 3,
-   "geklikt": 1,
+   "geklikt": 0,
    "overgeslagen": [],
    "nietKlikbaar": [
-    "IETS KAPOT OF VOL GEZIEN? MELD HET: element is not visible"
+    "HOE DE STAD ER NU BIJ STAAT: element is not stable"
    ],
    "waarnemingen": [
-    "als lid: 1176 tekens zichtbaar"
+    "als lid: 1240 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "reizen.stad",
+    "landingCap": "reizen.stad"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/stad.html",
@@ -9513,12 +10020,12 @@
     "noemer": 3,
     "drempel": 2,
     "budget": 3,
-    "geprobeerd": 2,
-    "gelukt": 1,
-    "effect": 1,
-    "nietMeerGevonden": 1,
+    "geprobeerd": 1,
+    "gelukt": 0,
+    "effect": 0,
+    "nietMeerGevonden": 2,
     "overgeslagen": 0,
-    "teruggekeerd": 1,
+    "teruggekeerd": 0,
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
@@ -9680,6 +10187,12 @@
    "waarnemingen": [
     "als lid: 725 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "sociaal.residentie",
+    "landingCap": "sociaal.residentie"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/residentie.html",
@@ -9785,6 +10298,12 @@
    "waarnemingen": [
     "als lid: 1107 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "navigatie.verkeersmeldingen",
+    "landingCap": "navigatie.verkeersmeldingen"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/flits.html",
@@ -9895,6 +10414,12 @@
    "waarnemingen": [
     "als lid: 1351 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "reizen.vluchten",
+    "landingCap": "reizen.vluchten"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/vluchten.html",
@@ -9906,9 +10431,9 @@
       "raakbaar": 7
      },
      "schil": {
-      "dom": 91,
-      "zichtbaar": 23,
-      "inBeeld": 18,
+      "dom": 75,
+      "zichtbaar": 19,
+      "inBeeld": 14,
       "raakbaar": 11
      }
     },
@@ -9953,18 +10478,18 @@
    "ingang": "/apps/decision-room.html",
    "bewijzen": {
     "bereikbaar": {
-     "status": "BEWEZEN",
-     "reden": "opent voor een lid zonder poort en zonder fout",
+     "status": "GEBLOKKEERD_DOOR_DEFECT",
+     "reden": "de wereld toont deze ingang aan een lid, maar de deur gaat alleen open voor een kantoor: een lid wordt doorgestuurd naar apps/rtgkantoor.html (kantoor.ai-besturing)",
      "bewijs": "/apps/decision-room.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 te raken bij het laden, 1 geprobeerd, 1 gelukt, 1 met zichtbaar effect",
+     "status": "NIET_GETEST",
+     "reden": "de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app",
      "bewijs": null
     },
     "menselijk": {
      "status": "NIET_GETEST",
-     "reden": "afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7",
+     "reden": "de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app",
      "bewijs": null
     },
     "voltooibaar": {
@@ -9993,41 +10518,18 @@
      "bewijs": null
     }
    },
-   "gevonden": 1,
-   "geklikt": 1,
+   "gevonden": 0,
+   "geklikt": 0,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 852 tekens zichtbaar"
+    "als lid: 1098 tekens zichtbaar"
    ],
-   "trechter": {
-    "kant": "app",
-    "landing": "/apps/rtgkantoor.html",
-    "stadia": {
-     "app": {
-      "dom": 6,
-      "zichtbaar": 1,
-      "inBeeld": 1,
-      "raakbaar": 1
-     },
-     "schil": {
-      "dom": 78,
-      "zichtbaar": 24,
-      "inBeeld": 19,
-      "raakbaar": 12
-     }
-    },
-    "noemer": 1,
-    "drempel": 1,
-    "budget": 1,
-    "geprobeerd": 1,
-    "gelukt": 1,
-    "effect": 1,
-    "nietMeerGevonden": 0,
-    "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 5,
-    "onomkeerbaar": 0
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "andere-capability",
+    "ingangCap": "werk.besluit",
+    "landingCap": "kantoor.ai-besturing"
    },
    "samengesteld": [],
    "mobiel": {
@@ -10042,7 +10544,7 @@
     "status": "NIET_GETEST",
     "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
    },
-   "status": "GEEN_FIXTURE",
+   "status": "GEBLOKKEERD_DOOR_DEFECT",
    "afhankelijk": {
     "RTG-schil": {
      "bewijs": "bedienbaar",
@@ -10074,7 +10576,7 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 56ea75ba; sindsdien is er geen code gewijzigd die dit instrument raakt (9 wijziging(en) in scripts die het niet inleest)): 11 schakels gesloten, 8 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 56ea75ba; sindsdien is er geen code gewijzigd die dit instrument raakt (10 wijziging(en) in scripts die het niet inleest)): 11 schakels gesloten, 8 storingen gehouden",
      "bewijs": {
       "register": "TAFELPROEF.json",
       "op": "2026-09-24T16:37:12.120Z",
@@ -10118,6 +10620,17 @@
    "waarnemingen": [
     "als lid: 1314 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "lid",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "zaak",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "horeca.dashboard",
+    "landingCap": "horeca.dashboard"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/horeca.html",
@@ -10225,6 +10738,12 @@
    "waarnemingen": [
     "als lid: 1284 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "loon.strook",
+    "landingCap": "loon.strook"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/loonstrook.html",
@@ -10236,7 +10755,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 86,
+      "dom": 78,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -10339,8 +10858,14 @@
     "○\nProfiel: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1606 tekens zichtbaar"
+    "als lid: 673 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "spel.magnaat",
+    "landingCap": "spel.magnaat"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/magnaat.html",
@@ -10352,10 +10877,10 @@
       "raakbaar": 12
      },
      "schil": {
-      "dom": 62,
+      "dom": 60,
       "zichtbaar": 15,
-      "inBeeld": 13,
-      "raakbaar": 12
+      "inBeeld": 12,
+      "raakbaar": 11
      }
     },
     "noemer": 11,
@@ -10446,6 +10971,12 @@
    "waarnemingen": [
     "als lid: 3460 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "loopbaan.ledger",
+    "landingCap": "loopbaan.ledger"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/loopbaan.html",
@@ -10551,6 +11082,12 @@
    "waarnemingen": [
     "als lid: 2942 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "mandaat.beheer",
+    "landingCap": "mandaat.beheer"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/vertegenwoordiging.html",
@@ -10656,6 +11193,12 @@
    "waarnemingen": [
     "als lid: 908 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "werk.onderneming",
+    "landingCap": "werk.onderneming"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/onderneming.html",
@@ -10769,6 +11312,17 @@
    "waarnemingen": [
     "als lid: 2596 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "lid",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "zaak",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "zaak.partnernetwerk",
+    "landingCap": "zaak.partnernetwerk"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/partner-network.html",
@@ -10827,18 +11381,18 @@
    "ingang": "/apps/project-room.html",
    "bewijzen": {
     "bereikbaar": {
-     "status": "BEWEZEN",
-     "reden": "opent voor een lid zonder poort en zonder fout",
+     "status": "GEBLOKKEERD_DOOR_DEFECT",
+     "reden": "de wereld toont deze ingang aan een lid, maar de deur gaat alleen open voor een kantoor: een lid wordt doorgestuurd naar apps/rtgkantoor.html (kantoor.ai-besturing)",
      "bewijs": "/apps/project-room.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 te raken bij het laden, 1 geprobeerd, 1 gelukt, 1 met zichtbaar effect",
+     "status": "NIET_GETEST",
+     "reden": "de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app",
      "bewijs": null
     },
     "menselijk": {
      "status": "NIET_GETEST",
-     "reden": "afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7",
+     "reden": "de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app",
      "bewijs": null
     },
     "voltooibaar": {
@@ -10867,41 +11421,23 @@
      "bewijs": null
     }
    },
-   "gevonden": 1,
-   "geklikt": 1,
+   "gevonden": 0,
+   "geklikt": 0,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 852 tekens zichtbaar"
+    "als lid: 1164 tekens zichtbaar"
    ],
-   "trechter": {
-    "kant": "app",
-    "landing": "/apps/rtgkantoor.html",
-    "stadia": {
-     "app": {
-      "dom": 6,
-      "zichtbaar": 1,
-      "inBeeld": 1,
-      "raakbaar": 1
-     },
-     "schil": {
-      "dom": 78,
-      "zichtbaar": 24,
-      "inBeeld": 19,
-      "raakbaar": 12
-     }
-    },
-    "noemer": 1,
-    "drempel": 1,
-    "budget": 1,
-    "geprobeerd": 1,
-    "gelukt": 1,
-    "effect": 1,
-    "nietMeerGevonden": 0,
-    "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 5,
-    "onomkeerbaar": 0
+   "personaAfwijking": {
+    "gebruikt": "lid",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "zaak",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "andere-capability",
+    "ingangCap": "werk.project",
+    "landingCap": "kantoor.ai-besturing"
    },
    "samengesteld": [],
    "mobiel": {
@@ -10916,7 +11452,7 @@
     "status": "NIET_GETEST",
     "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
    },
-   "status": "GEEN_FIXTURE",
+   "status": "GEBLOKKEERD_DOOR_DEFECT",
    "afhankelijk": {
     "RTG-schil": {
      "bewijs": "bedienbaar",
@@ -10937,8 +11473,8 @@
      "bewijs": "/apps/office.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 te raken bij het laden, 2 geprobeerd, 1 gelukt, 1 met zichtbaar effect; niet aan te tikken: Open alle documenten: element is not visible",
+     "status": "NIET_GETEST",
+     "reden": "6 te raken bij het laden, 2 geprobeerd, 1 gelukt, 1 met zichtbaar effect, 4 niet meer gevonden -- de drempel is 3, dus dit is niet beproefd; niet aan te tikken: Open alle documenten: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -10972,42 +11508,53 @@
      "bewijs": null
     }
    },
-   "gevonden": 2,
+   "gevonden": 6,
    "geklikt": 1,
    "overgeslagen": [],
    "nietKlikbaar": [
     "Open alle documenten: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1005 tekens zichtbaar"
+    "als lid: 1020 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "lid",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "zaak",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "docs.office",
+    "landingCap": "docs.office"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/office.html",
     "stadia": {
      "app": {
       "dom": 59,
-      "zichtbaar": 2,
-      "inBeeld": 2,
-      "raakbaar": 2
+      "zichtbaar": 6,
+      "inBeeld": 6,
+      "raakbaar": 6
      },
      "schil": {
-      "dom": 95,
-      "zichtbaar": 24,
-      "inBeeld": 13,
-      "raakbaar": 6
+      "dom": 83,
+      "zichtbaar": 25,
+      "inBeeld": 10,
+      "raakbaar": 3
      }
     },
-    "noemer": 2,
-    "drempel": 1,
-    "budget": 2,
+    "noemer": 6,
+    "drempel": 3,
+    "budget": 6,
     "geprobeerd": 2,
     "gelukt": 1,
     "effect": 1,
-    "nietMeerGevonden": 0,
+    "nietMeerGevonden": 4,
     "overgeslagen": 0,
     "teruggekeerd": 0,
-    "nietRaakbaar": 57,
+    "nietRaakbaar": 53,
     "onomkeerbaar": 0
    },
    "samengesteld": [],
@@ -11039,18 +11586,18 @@
    "ingang": "/apps/rtgone.html",
    "bewijzen": {
     "bereikbaar": {
-     "status": "BEWEZEN",
-     "reden": "opent voor een lid zonder poort en zonder fout",
+     "status": "GEBLOKKEERD_DOOR_DEFECT",
+     "reden": "de wereld toont deze ingang aan een lid, maar de deur gaat alleen open voor een kantoor: een lid wordt doorgestuurd naar apps/rtgkantoor.html (kantoor.ai-besturing)",
      "bewijs": "/apps/rtgone.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 te raken bij het laden, 1 geprobeerd, 1 gelukt, 1 met zichtbaar effect",
+     "status": "NIET_GETEST",
+     "reden": "de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app",
      "bewijs": null
     },
     "menselijk": {
      "status": "NIET_GETEST",
-     "reden": "afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7",
+     "reden": "de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app",
      "bewijs": null
     },
     "voltooibaar": {
@@ -11079,41 +11626,18 @@
      "bewijs": null
     }
    },
-   "gevonden": 1,
-   "geklikt": 1,
+   "gevonden": 0,
+   "geklikt": 0,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 1098 tekens zichtbaar"
    ],
-   "trechter": {
-    "kant": "app",
-    "landing": "/apps/rtgkantoor.html",
-    "stadia": {
-     "app": {
-      "dom": 6,
-      "zichtbaar": 1,
-      "inBeeld": 1,
-      "raakbaar": 1
-     },
-     "schil": {
-      "dom": 71,
-      "zichtbaar": 20,
-      "inBeeld": 15,
-      "raakbaar": 12
-     }
-    },
-    "noemer": 1,
-    "drempel": 1,
-    "budget": 1,
-    "geprobeerd": 1,
-    "gelukt": 1,
-    "effect": 1,
-    "nietMeerGevonden": 0,
-    "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 5,
-    "onomkeerbaar": 0
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "andere-capability",
+    "ingangCap": "werk.rtgone",
+    "landingCap": "kantoor.ai-besturing"
    },
    "samengesteld": [],
    "mobiel": {
@@ -11128,7 +11652,7 @@
     "status": "NIET_GETEST",
     "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
    },
-   "status": "GEEN_FIXTURE",
+   "status": "GEBLOKKEERD_DOOR_DEFECT",
    "afhankelijk": {
     "RTG-schil": {
      "bewijs": "bedienbaar",
@@ -11189,8 +11713,14 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1040 tekens zichtbaar"
+    "als lid: 1034 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "werk.organisatie",
+    "landingCap": "werk.organisatie"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/werk.html",
@@ -11202,7 +11732,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 96,
+      "dom": 98,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -11297,8 +11827,14 @@
     "Open alle post: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1441 tekens zichtbaar"
+    "als lid: 1470 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "comm.mail",
+    "landingCap": "comm.mail"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/rtmail.html",
@@ -11362,8 +11898,8 @@
      "bewijs": "/apps/rtgschool.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 te raken bij het laden, 1 geprobeerd, 1 gelukt, 1 met zichtbaar effect",
+     "status": "NIET_GETEST",
+     "reden": "5 te raken bij het laden, 2 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 3 niet meer gevonden, 1x teruggekeerd na navigatie -- de drempel is 3, dus dit is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -11397,40 +11933,51 @@
      "bewijs": null
     }
    },
-   "gevonden": 1,
-   "geklikt": 1,
+   "gevonden": 5,
+   "geklikt": 2,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1908 tekens zichtbaar"
+    "als lid: 811 tekens zichtbaar"
    ],
+   "personaAfwijking": {
+    "gebruikt": "lid",
+    "bronGebruikt": "PERSONA_VAN_WERELD in scripts/appwerkt.js (de wereld uit MAPPEN)",
+    "verwacht": "rtf-kind",
+    "bronVerwacht": "SCHERMEIGENAAR.json"
+   },
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "leren.school",
+    "landingCap": "leren.school"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/rtgschool.html",
     "stadia": {
      "app": {
       "dom": 11,
-      "zichtbaar": 1,
-      "inBeeld": 1,
-      "raakbaar": 1
+      "zichtbaar": 5,
+      "inBeeld": 5,
+      "raakbaar": 5
      },
      "schil": {
-      "dom": 95,
+      "dom": 81,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 12
      }
     },
-    "noemer": 1,
-    "drempel": 1,
-    "budget": 1,
-    "geprobeerd": 1,
-    "gelukt": 1,
-    "effect": 1,
-    "nietMeerGevonden": 0,
+    "noemer": 5,
+    "drempel": 3,
+    "budget": 5,
+    "geprobeerd": 2,
+    "gelukt": 2,
+    "effect": 2,
+    "nietMeerGevonden": 3,
     "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 10,
+    "teruggekeerd": 1,
+    "nietRaakbaar": 6,
     "onomkeerbaar": 0
    },
    "samengesteld": [],
@@ -11468,7 +12015,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "3 te raken bij het laden, 3 geprobeerd, 3 gelukt, 2 met zichtbaar effect",
+     "reden": "3 te raken bij het laden, 3 geprobeerd, 3 gelukt, 3 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -11509,6 +12056,12 @@
    "waarnemingen": [
     "als lid: 892 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "web.browser",
+    "landingCap": "web.browser"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/browser.html",
@@ -11520,10 +12073,10 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 99,
-      "zichtbaar": 28,
-      "inBeeld": 17,
-      "raakbaar": 7
+      "dom": 86,
+      "zichtbaar": 29,
+      "inBeeld": 14,
+      "raakbaar": 4
      }
     },
     "noemer": 3,
@@ -11531,7 +12084,7 @@
     "budget": 3,
     "geprobeerd": 3,
     "gelukt": 3,
-    "effect": 2,
+    "effect": 3,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -11612,8 +12165,14 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1320 tekens zichtbaar"
+    "als lid: 1304 tekens zichtbaar"
    ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "werk.website-maker",
+    "landingCap": "werk.website-maker"
+   },
    "trechter": {
     "kant": "app",
     "landing": "/apps/sitemaker.html",
@@ -11625,7 +12184,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 135,
+      "dom": 107,
       "zichtbaar": 45,
       "inBeeld": 40,
       "raakbaar": 33

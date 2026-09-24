@@ -41,6 +41,11 @@ const { zonderCommentaar } = require('../scripts/lib/bron.js');
    laat deze toets zakken. */
 const BUITEN = {
   'BEWIJSSCHULD.json': 'een schuldenlijst die met de hand wordt bijgehouden en per post een sluitweg draagt; geen meetronde',
+  /* Sinds 24 september 2026 noemt scripts/appwerkt.js deze naam, en daarom ziet
+     de detectie hierboven hem als SCHRIJVER. Hij LEEST hem alleen: het register
+     is de schermidentiteit (capability, rol, doelgroep) waarop bereikbaar zijn
+     bestemming beoordeelt (scripts/lib/bestemming.js). */
+  'SCHERMEIGENAAR.json': 'een oordeelregister dat een mens bijhoudt (capability, rol en doelgroep per scherm), bewaakt door test/schermeigenaar.test.js tegen een verse meting; scripts/appwerkt.js leest hem en schrijft hem niet',
   /* Het oordeel van een mens die de taal spreekt. Een machine kan het niet
      opnieuw draaien en het veroudert ook niet: wat een spreker in september zag,
      zag hij. Wat wel kan verlopen is de DEKKING ervan -- verandert de tabel na

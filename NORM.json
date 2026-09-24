@@ -4,7 +4,7 @@
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
     "activeringZonderReden": 0,
-    "appwerktDefecten": 0,
+    "appwerktDefecten": 4,
     "beweringenZonderVulcontrole": 100,
     "bewijsAchterstand": 2418,
     "bewijsAlleenKeten": 17,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 630,
+    "toetsenNietGemeten": 631,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,25 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "appwerktDefecten",
+      "van": 0,
+      "meter": "appwerktDefecten 0 -> 4",
+      "reden": "Geen achteruitgang maar een eerlijker meting. De vier stonden op bereikbaar = BEWEZEN terwijl een lid ze nooit bereikte: Routedossier, Decision Room, Project Room en RTG One sturen een lid zonder kantoorsessie door naar de kantoordeur of het RTG Kantoor, en de meter zag een deur alleen als selector op de pagina. Sinds scripts/lib/bestemming.js oordeelt bereikbaar op de capability van de landing (SCHERMEIGENAAR.json); de kantoorsessie komt wel op de bedoelde capability, dus dit is de bestaande uitkomst 'verkeerd geadresseerd' -- dezelfde zin en dezelfde betekenis als een dichte deur op de pagina. Er is geen product aangepast; de vier waren al zo.",
+      "waarheen": "Per ingang een besluit: hoort hij in de wereld van een lid (en moet de app een lid dan bedienen), of hoort hij bij het kantoor (en dan uit MAPPEN van die wereld). Let op RTG One: SCHERMEIGENAAR.json noemt als doelgroep lid, en toch vraagt het scherm een kantoorsessie."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 630,
+      "vervalt": "2026-12-24",
+      "meter": "toetsenNietGemeten 630 -> 631",
+      "reden": "test/appwerkt-bestemming.e2e.js is nieuw (BETROUWBAARHEID.md par. 4d): echte doorverwijzingen na het laden, beoordeeld op capability. Met de hand nagetrokken met vijf mutaties op scripts/lib/bestemming.js, waaronder terug naar url-vergelijking en een doorverwijzing als bereikt tellen; vier ervan laten deze toets zakken en alle vijf test/bestemming.test.js. De mutatiemotor muteert met de liegpoort op /api/, en dit synthetische scherm raakt geen /api/, dus die uitslag zou over een ander experiment gaan.",
+      "waarheen": "Dezelfde als bij test/appwerkt-meter.e2e.js: een operator voor browsertoetsen op een eigen scherm in scripts/mutatie.js."
+    },
     {
       "datum": "2026-09-24",
       "soort": "schuld",

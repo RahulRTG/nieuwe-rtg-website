@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T19:20:52.433Z",
-    "commit": "8a9848ce",
+    "op": "2026-09-24T19:41:04.104Z",
+    "commit": "e599b56a",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -791,6 +791,14 @@
       "gezakt": 3,
       "geprobeerd": 2
     },
+    "bedieningsmeting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bedieningsmeting.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "bedrading.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1039,6 +1047,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "bestemming.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bestemming.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "betaaldienst.test.js": {
       "soort": "server",
@@ -10631,14 +10647,6 @@
       "module": "scripts/bundel.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "bedieningsmeting.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bedieningsmeting.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
       "geprobeerd": 1
     }
   }

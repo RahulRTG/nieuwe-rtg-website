@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T16:37:12.043Z",
-    "commit": "56ea75ba",
+    "op": "2026-09-24T17:53:18.445Z",
+    "commit": "ba614933",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -10029,6 +10029,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "wereldcompositor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wereldcompositor.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "wereldkern.test.js": {
       "soort": "puur",

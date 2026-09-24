@@ -54,12 +54,16 @@ const STANDEN = ['VIOLATION', 'ABSENT', 'PARTIAL', 'PASS'];
    uitslaan, meet niets). */
 function maakLezer(wortel) {
   const cache = new Map();
-  return function lees(rel, { code = false } = {}) {
-    const sleutel = rel + (code ? '#code' : '');
+  /* `plat`: het commentaar wordt platgeslagen in plaats van weggehaald, zodat
+     een schending met zijn ECHTE regelnummer wordt gemeld. Zonder die vorm
+     verschoof elke plek met het aantal commentaarregels erboven, en wees de
+     telling van ronde C naar regels waar niets stond. */
+  return function lees(rel, { code = false, plat = false } = {}) {
+    const sleutel = rel + (code ? (plat ? '#plat' : '#code') : '');
     if (!cache.has(sleutel)) {
       let tekst = null;
       try { tekst = fs.readFileSync(path.join(wortel, rel), 'utf8'); } catch (e) { tekst = null; }
-      cache.set(sleutel, tekst == null ? null : (code ? zonderCommentaar(tekst) : tekst));
+      cache.set(sleutel, tekst == null ? null : (code ? zonderCommentaar(tekst, { regelsHeel: plat }) : tekst));
     }
     return cache.get(sleutel);
   };
@@ -111,7 +115,7 @@ function scopeStand(sc, lees, wortel) {
     const re = new RegExp(sc.schending.patroon, 'g' + (sc.schending.vlaggen || ''));
     const plekken = [];
     for (const rel of bestanden(wortel, sc.schending.bestanden)) {
-      const code = lees(rel, { code: true });
+      const code = lees(rel, { code: true, plat: true });
       if (code == null) continue;
       code.split('\n').forEach((regel, i) => {
         const n = (regel.match(re) || []).length;

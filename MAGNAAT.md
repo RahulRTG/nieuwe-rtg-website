@@ -126,10 +126,10 @@ Achteruitgaan kan alleen door de nulstand opnieuw vast te leggen. Dat is een wij
 | **C2** | machineleesbare verklaring en de meter (`npm run magnaat:grondwet`) |
 | **C3** | de ratel (`test/magnaatgrondwet.test.js`) |
 | A1 | de economische kern losmaken uit het Oefenkantoor, met een gemeten naam |
-| A2 | journaal als autoriteit: World muteert geld uitsluitend via de kern |
-| A3 | herhaling en versies: wereld-id, seed, regel-, motor- en datasetversie |
-| A4 | Quick migreren: geen directe `st.geld` meer |
-| A5 | Campaign migreren: dezelfde kern, een andere klok |
+| A2 | World op de economische autoriteit: elke euro van Quick en Campaign via een commando met betekenis, geen directe `st.geld` meer |
+| A3 | fysieke append-only opslag: een gebeurtenis per rij in plaats van een journaal als één waarde |
+| A4 | wereld- en versie-identiteit: wereld-id, seed, regel-, motor- en datasetversie, aanmaakmoment |
+| A5 | deterministische herhaling: een wereld opnieuw draaien vanaf zijn journaal |
 | A6 | het Oefenkantoor scheiden: eigen product, gedeelde kern |
 | V1–V4 | de eerste verticale plak: van een mens met € 63 en een baan, via de eerste klant, een factuur die te laat wordt betaald en geldnood, naar een eerste bedrijf |
 
@@ -145,7 +145,20 @@ Pas daarna komen bevolking, concurrenten die fouten maken, toeleveringsketens, b
 - **Een geweigerd besluit laat niets achter**: boekingen op een kopie gaan pas bij bevestigen het journaal in.
 - **Een wereld van vóór A1** neemt zijn journaal mee. Wat de oude grens al had weggegooid, wordt als gat benoemd (`ontbrekend`) en niet verzonnen.
 
-Wat A1 met opzet **niet** deed: World migreren (A2), een wereldkop met seed en datasetversie (A3), en opslag per gebeurtenis. In deze opslag is een collectie één waarde, dus het journaal van een wereld wordt bij het wegschrijven nog in zijn geheel geserialiseerd. Dat is een eigenschap van de opslaglaag, geen gedrag van de motor, en archiveren kan later als opslagstrategie zonder de logische historie aan te raken.
+Wat A1 met opzet **niet** deed: World migreren (A2), opslag per gebeurtenis (A3) en een wereldkop met seed en datasetversie (A4). In deze opslag is een collectie één waarde, dus het journaal van een wereld wordt bij het wegschrijven nog in zijn geheel geserialiseerd. Dat is een eigenschap van de opslaglaag, geen gedrag van de motor, en archiveren kan later als opslagstrategie zonder de logische historie aan te raken.
+
+**A2, stap 1: de inventaris staat, en World is nog niet aangeraakt.** Voordat er één regel van World verandert, heeft elke geldplek een economische betekenis en een tegenzijde gekregen. De kaart staat in `scripts/lib/magnaatgeldkaart.js`, en `test/magnaatgeldkaart.test.js` zoekt de plekken zelf opnieuw in de code: elke gevonden plek is precies een been van een gebeurtenis, en een nieuwe mutatie zonder classificatie laat de toets zakken. Wat de lezing opleverde:
+
+- **36 plekken, 27 gebeurtenissen, 7 categorieën.** De 32 saldomutaties van M-001 plus 4 in de Foundation-pot, die de grondwetmeter niet ziet omdat ze geen `geld[...]` heten. Bij zes overdrachten staan betalen en ontvangen als twee losse mutaties in de code (vijf keer op twee regels, één keer op dezelfde regel), en één betaalbeen hoort bij twee verschillende gebeurtenissen (een kavel is een gronduitgifte, een vestiging een overname).
+- **Eén regel verbergt acht gebeurtenissen.** `st.geld[h] += verdeeld.eigenaar` in `maand.js` is het saldo van omzet min inkoop, lonen, vaste lasten, huur, marketing en onderhoud. De meter telt er één; het zijn er acht. De migratie telt dus gebeurtenissen en geen regels.
+- **Bij 18 van de 27 bestaat de tegenzijde niet.** Alleen overdrachten tussen spelers (contracten, aandelen, veiling) hebben twee benen. Bouwen, rente, aflossen, premie en schade laten geld verdwijnen; openen, lenen, sluiten, uitkeren en de Foundation-afdracht laten het ontstaan. Wie het ontvangt of betaalt, bestaat in World niet. De kaart noemt per geval een voorgestelde tegenpartij tussen haken (bank, aannemer, verzekeraar, huishoudens, arbeidsmarkt). Dat is een voorstel en nog geen besluit.
+- **De Foundation-pot groeit uit het niets.** De afdracht wordt berekend over de omzet van de stad, maar van niemand afgetrokken.
+- **Rood staan is geen lening maar een negatief saldo.** De rekening-courant bestaat alleen als `st.geld[h] < 0`.
+- **World rekent in euro's met drijvende komma, de motor in hele eurocenten.** Resultaatdeling en rente op rood worden niet afgerond, en een contractbetaling wordt aan de ene kant wel en aan de andere kant niet afgerond. "Financieel gelijk" kan dus niet byte voor byte zijn; de toegestane afwijking wordt een besluit.
+- **De motor moet eerst in tweeën.** A1 leverde de boekhoudautoriteit (commando, boekingen, journaal, projectie) samen met het marktmodel van het Oefenkantoor. World heeft een eigen marktmodel (`stap.js`) en hoort alleen de eerste helft te gebruiken. Die naad komt in A2 vóór de migratie.
+- **De grondwetmeter meldde verschoven regelnummers.** Hij haalde commentaar weg en telde daarna de regels. Hij slaat het commentaar nu plat, zoals `scripts/lib/bron.js` daarvoor al een vorm had. De tellingen zijn gelijk gebleven; alleen de adressen kloppen nu.
+
+De migratievolgorde volgt de categorieën, zodat elke stap apart tegen het oude gedrag te bewijzen is: opening, overdrachten tussen spelers (tegenzijde bestaat al, laagste risico), financiering, verzekering, activa, maandresultaat (het grootste stuk) en de Foundation.
 
 ---
 
@@ -524,7 +537,7 @@ Stand: **PARTIAL**
   - Autoriteit: server/kern/magnaat-economische-motor/, elke gebeurtenis
   - Handhaver: `server/kern/magnaat-economische-motor/journaal.js`, `wereld: m.wereld, volgnummer: e.boekVolgorde, soort, oorzaak,`; `server/kern/magnaat-economische-motor/journaal.js`, `regelVersie: REGEL_VERSIE, motorVersie: MOTOR_VERSIE,`
   - Toets: `test/magnaat-economie.test.js`, "dezelfde beginsituatie en besluiten geven reproduceerbaar dezelfde economie"; `test/magnaat-economische-motor.test.js`, "9. dezelfde wereld en dezelfde handelingen geven dezelfde gebeurtenissen, id voor id"
-  - Waarom hooguit PARTIAL: elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A3)
+  - Waarom hooguit PARTIAL: elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A4)
 
 **Migratie.** Een wereldkop in de kern met alle zes velden, vastgelegd bij het aanmaken en nooit meer gewijzigd.
 
@@ -542,7 +555,7 @@ Stand: **PASS**
   - Toets: `test/magnaat-economische-motor.test.js`, "2. de motor kent het Oefenkantoor niet, en leunt er ook niet op"
   - Schending: 0, de motor noemt een consument (Oefenkantoor, Academy, missie, spelvorm) of laadt iets buiten zichzelf, zijn Rust-client, de opslagdeclaratie en de klok
 
-**Migratie.** Geen: dit is de stand na ronde A1. Bij A2 komt World erbij als tweede consument, via hetzelfde profiel en dezelfde haken.
+**Migratie.** Geen: dit is de stand na ronde A1. Bij A2 komt World erbij als tweede consument, via de boekhoudkant van de motor en niet via het marktmodel van het Oefenkantoor.
 
 **Faalwijze.** Een wijziging voor het Oefenkantoor verandert stil de economie van elke wereld die op de motor draait.
 

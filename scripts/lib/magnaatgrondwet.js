@@ -391,7 +391,7 @@ const REGELS = [
           { bestand: 'test/magnaat-economie.test.js', naam: 'dezelfde beginsituatie en besluiten geven reproduceerbaar dezelfde economie' },
           { bestand: 'test/magnaat-economische-motor.test.js', naam: '9. dezelfde wereld en dezelfde handelingen geven dezelfde gebeurtenissen, id voor id' }
         ],
-        deels: 'elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A3)'
+        deels: 'elke gebeurtenis draagt wereld-id, volgnummer, regel- en motorversie; er is nog geen seed, datasetversie of aanmaakmoment als wereldkop (ronde A4)'
       }
     },
     migratie: 'Een wereldkop in de kern met alle zes velden, vastgelegd bij het aanmaken en nooit meer gewijzigd.',
@@ -426,7 +426,7 @@ const REGELS = [
         }
       }
     },
-    migratie: 'Geen: dit is de stand na ronde A1. Bij A2 komt World erbij als tweede consument, via hetzelfde profiel en dezelfde haken.',
+    migratie: 'Geen: dit is de stand na ronde A1. Bij A2 komt World erbij als tweede consument, via de boekhoudkant van de motor en niet via het marktmodel van het Oefenkantoor.',
     faalwijze: 'Een wijziging voor het Oefenkantoor verandert stil de economie van elke wereld die op de motor draait.'
   }
 ];

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T13:59:56.477Z",
-    "commit": "6d57cae07",
+    "op": "2026-09-24T14:06:02.206Z",
+    "commit": "5abeb7209",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5256,7 +5256,7 @@
       "staat": "gezakt",
       "module": "scripts/lib/bron.js",
       "operator": "return-weg#1",
-      "gezakt": 3,
+      "gezakt": 4,
       "geprobeerd": 13
     },
     "magnaatgrondwet.test.js": {

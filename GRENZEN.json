@@ -571,7 +571,6 @@
     "kantoren": [
       "entiteitRekeningStand",
       "entiteitRekeningZet",
-      "beleidsmotor",
       "afdelingen",
       "aidataExport",
       "aidataOverzicht",
@@ -594,6 +593,7 @@
       "bankTerugstorting",
       "bankTerugstortingZet",
       "bankVergunningZet",
+      "beleidsmotor",
       "betaal",
       "betaalRegie",
       "bevoegd",

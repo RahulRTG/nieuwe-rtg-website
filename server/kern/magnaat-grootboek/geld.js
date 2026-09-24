@@ -7,13 +7,13 @@
    Oefenkantoor of World. Het grootboek registreert uitsluitend bedragen die
    al bepaald zijn.
 
-   Daarom weigert `centen` alles wat geen geheel, niet-negatief aantal
+   Daarom weigert `eisCenten` alles wat geen geheel, niet-negatief aantal
    eurocenten is: een breuk, NaN, Infinity, een negatief getal, en ook een
    tekst als "1234" -- aan deze grens wordt niets omgezet. Een boekingsregel is
    debet OF credit en nooit negatief; een saldo mag wel onder nul. */
 'use strict';
 
-function centen(n, wat) {
+function eisCenten(n, wat) {
   if (typeof n !== 'number' || !Number.isSafeInteger(n) || n < 0) {
     throw new Error('Het grootboek rondt niet af: ' + (wat || 'een bedrag') + ' is geen geheel, niet-negatief aantal eurocenten (' +
       typeof n + ' ' + String(n) + ').');
@@ -21,7 +21,7 @@ function centen(n, wat) {
   return n;
 }
 
-/* De som van bedragen die al door `centen` zijn gegaan. */
+/* De som van bedragen die al door `eisCenten` zijn gegaan. */
 function som(waarden) {
   let t = 0;
   for (const n of waarden) t += n;
@@ -29,4 +29,4 @@ function som(waarden) {
   return t;
 }
 
-module.exports = { centen, som };
+module.exports = { eisCenten, som };

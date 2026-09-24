@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2018 bestanden en 14308 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2019 bestanden en 14312 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2018 |
-| losse beweringen (`test(...)`) | 14308 |
+| toetsbestanden | 2019 |
+| losse beweringen (`test(...)`) | 14312 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1366 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1367 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1765 bestanden, 13855 beweringen.
+1766 bestanden, 13859 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1150,6 +1150,7 @@ toets omvalt.
 | `podiumzones.test.js` | 7 | gezakt op `liegpoort /api/` | HET PODIUM ALS WERELDEN OP EEN MOTOR -- en wat er tussen die werelden NIET doorheen komt. Het Podium was een product achter een deur (geverifieerd paspoort, 18+). |
 | `pols.test.js` | 15 | gezakt op `liegpoort /api/` | DE POLS VAN EEN ZAAK: hoe druk, hoe luid, hoe gezellig het NU is. Drie bronnen -- wat wij meten, wat de zaak invult, wat gasten melden -- en het hele risico van deze laag zit in het door elkaar lopen daarvan. |
 | `poortrace.test.js` | 1 | geen bronmutatie mogelijk | EEN BEZETTE POORT IS EEN STARTFOUT, GEEN SERVERFOUT. app.listen meldt een mislukking (EADDRINUSE als de poort bezet is) via een 'error'-gebeurtenis op de server. |
+| `poortreeks.test.js` | 4 | gezakt op `>=->>#0` | DE POORTREEKS -- de kiezer onder trio-wees, tls-boot, chaos, spreidingsproef en de stagingrepetitie, beproefd op wat de machine van CI NIET heeft. test/trio-wees.test.js toets 0 meet de kiezer tegen de ECHTE... |
 | `poortwacht-oordeel.test.js` | 7 | genoemd | EEN DEUR DIE STRANDDE OP ZIJN VALIDATIE, IS GEEN DEUR ZONDER SLOT. HET GEVAL. |
 | `poortwacht.test.js` | 3 | gezakt op `===->!==#0` | De poortwacht-bevindingen, vastgelegd zodat ze niet terugkruipen. scripts/poortwacht.js klopt anoniem aan bij alle 2496 geregistreerde API-routes. |
 | `portemonnee.test.js` | 5 | gezakt op `liegpoort /api/` | DE PORTEMONNEE EN DE POST -- geld tussen mensen, en wat erover geschreven wordt. WAAROM DIT ER IS RTG Pay raakt het meest gevoelige dat een app kan doen: het saldo van een mens verplaatsen. |

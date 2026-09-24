@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-23T23:23:16.164Z",
-    "commit": "e76848bd",
+    "op": "2026-09-24T16:11:39.741Z",
+    "commit": "e5e2eb9f",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 7,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -6882,6 +6882,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet"
+    },
+    "poortreeks.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "test/helper.js",
+      "operator": ">=->>#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "poortwacht.test.js": {
       "soort": "puur",

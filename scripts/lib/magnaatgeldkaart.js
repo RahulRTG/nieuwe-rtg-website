@@ -97,7 +97,7 @@ const GEBEURTENISSEN = [
   { id: 'G12', betekenis: 'VERKOOP', categorie: 'maandresultaat', van: '(huishoudens)', naar: 'speler', tegenzijde: 'bron',
     samengesteld: ['VERKOOP', 'CONTRACT_BETALING', 'INKOOP', 'LOON', 'VASTE_LASTEN', 'HUUR', 'MARKETING', 'ONDERHOUD'],
     benen: [b('maand.js', 'st.geld[h] += verdeeld.eigenaar;')],
-    let: 'EEN regel, acht gebeurtenissen: het saldo van omzet min zes kostenposten (stap.js). Alleen het contractdeel heeft een tegenzijde (G10); de rest ontstaat of verdwijnt. Hier telt de meter 1 en zijn het er 8' },
+    let: 'EEN regel, acht gebeurtenissen: het saldo van omzet min zes kostenposten (stap.js). Alleen het contractdeel heeft een tegenzijde (G10); de rest ontstaat of verdwijnt. Hier telt de meter 1 en zijn het er 8. Sinds A2.1 wordt elk van de acht een keer afgerond (centen.js, maandDelen) en is het resultaat hun som' },
   { id: 'G13', betekenis: 'RESULTAATDELING', categorie: 'overdracht', van: 'eigenaar vestiging', naar: 'aandeelhouder', tegenzijde: 'elders',
     benen: [b('aandeel.js', 'st.geld[d.houder] += bedrag;')],
     let: 'het andere been is wat de eigenaar in G12 NIET krijgt; bij verlies betaalt de houder mee. Sinds A2.1 wordt elk deel een keer tot centen afgerond en houdt de eigenaar exact de rest' },

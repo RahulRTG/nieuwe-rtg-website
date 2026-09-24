@@ -334,6 +334,8 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.geklikt = bediening.geklikt;
   r.overgeslagen = bediening.overgeslagen;
   r.nietKlikbaar = bediening.nietKlikbaar;
+  /* Waarneming naast het oordeel, en bewust niet in het oordeel: zie bedien(). */
+  r.trechter = bediening.trechter;
   if (bediening.instrument.length) r.waarnemingen.push('proef: ' + bediening.instrument.join('; '));
   const stuk = [...bediening.crash, ...bediening.serverfout];
   /* De uitsplitsing staat ALTIJD in de reden, ook bij een geslaagde rij: "3
@@ -436,11 +438,20 @@ async function bedien(ctx, base, pad) {
   const crash = [], config = [], serverfout = [], weigering = [];
   let geklikt = 0, gevonden = 0;
   const overgeslagen = [], nietKlikbaar = [], instrument = [];
+  /* DE TRECHTER -- waarneming, geen oordeel. Per scherm: hoeveel knoppen er
+     gezien zijn, hoeveel daarvan in aanmerking kwamen (niet onomkeerbaar),
+     hoeveel de lus selecteerde, probeerde, raakte, en na hoeveel tikken er
+     iets zichtbaars veranderde. En waarom de lus stopte. Zo is "1 van 23" te
+     ontleden in een limiet, een lus die vroeg ophoudt, of knoppen die er wel
+     staan maar niet te raken zijn -- drie verschillende oorzaken. */
+  const gezien = new Map();          // merk -> herkomst
+  const gehad = new Set();
+  let geselecteerd = 0, geprobeerd = 0, effect = 0, stop = 'limiet';
+  const vingerafdruk = () => page.evaluate(() => location.href + '|' + document.querySelectorAll('*').length + '|' + (document.body ? document.body.innerText.length : 0)).catch(() => null);
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
     luister(page, base, { crash, config, serverfout, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
-    const gehad = new Set();
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
       let k;
       try { k = await kijkRonde(page, gehad); }
@@ -454,16 +465,22 @@ async function bedien(ctx, base, pad) {
         if (!/Execution context was destroyed|Target closed|Navigation|frame was detached/i.test(String(e.message || e))) throw e;
         instrument.push('de proef verloor de pagina door een navigatie en opende hem opnieuw');
         try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad); }
-        catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); break; }
+        catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); stop = 'navigatie'; break; }
       }
       gevonden = Math.max(gevonden, k.zichtbaar || 0);
-      if (k.klaar) break;
+      for (const z of k.zicht || []) if (!gezien.has(z.merk)) gezien.set(z.merk, z.herkomst);
+      if (k.klaar) { stop = 'geen nieuwe knop'; break; }
       gehad.add(k.merk);
+      geselecteerd++;
       if (ONOMKEERBAAR.test(k.tekst)) { overgeslagen.push(k.tekst || '(naamloos)'); continue; }
+      geprobeerd++;
+      const voor = await vingerafdruk();
       try {
         await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
         await page.waitForTimeout(600);
         geklikt++;
+        const na = await vingerafdruk();
+        if (voor && na && voor !== na) effect++;
       } catch (e) {
         /* De reden van een time-out staat in de LOG van Playwright ("intercepts
            pointer events", "element is not visible"), niet in de boodschap.
@@ -474,14 +491,22 @@ async function bedien(ctx, base, pad) {
         nietKlikbaar.push((k.tekst || '(naamloos)') + ': ' + waarom);
       }
       if (page.url().replace(base, '').split('#')[0] !== pad) {
-        try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1500); } catch (e) { break; }
+        try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1500); } catch (e) { stop = 'navigatie'; break; }
       }
     }
   } catch (e) {
     instrument.push('bediening mislukt: ' + String(e.message || e).split('\n')[0].slice(0, 140));
+    stop = 'uitzondering';
   }
   await page.close();
-  return { geklikt, gevonden, overgeslagen, nietKlikbaar, instrument, crash, config, serverfout, weigering };
+  const inAanmerking = [...gezien.keys()].filter((m) => !ONOMKEERBAAR.test(m.split('|').slice(2).join(' ')));
+  const nooitGekozen = inAanmerking.filter((m) => !gehad.has(m));
+  const herkomstTelling = {};
+  for (const m of nooitGekozen) { const h = gezien.get(m); herkomstTelling[h] = (herkomstTelling[h] || 0) + 1; }
+  const trechter = { gevonden, uniekGezien: gezien.size, inAanmerking: inAanmerking.length, geselecteerd, geprobeerd,
+    gelukt: geklikt, effect, stop, limiet: MAXKLIK,
+    nooitGekozenNaarHerkomst: Object.fromEntries(Object.entries(herkomstTelling).sort((a, b) => b[1] - a[1]).slice(0, 5)) };
+  return { geklikt, gevonden, overgeslagen, nietKlikbaar, instrument, crash, config, serverfout, weigering, trechter };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -508,10 +533,15 @@ async function kijkRonde(page, gehad) {
     const alle = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
       .filter(zie).filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'));
     document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
+    /* Voor de trechter: ELKE zichtbare knop met zijn handtekening en zijn
+       herkomst (het dichtstbijzijnde voorouderelement met een id). Alleen
+       waarneming; de keuze hieronder verandert er niet door. */
+    const herkomst = (el) => { let a = el.parentElement; while (a && !a.id) a = a.parentElement; return a ? '#' + a.id : '(geen id)'; };
+    const zicht = alle.map((el) => ({ merk: merk(el), herkomst: herkomst(el) }));
     const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)));
-    if (!nieuwe.length) return { klaar: true, zichtbaar: alle.length };
+    if (!nieuwe.length) return { klaar: true, zichtbaar: alle.length, zicht };
     nieuwe[0].setAttribute('data-appwerkt', '1');
-    return { klaar: false, zichtbaar: alle.length, merk: merk(nieuwe[0]),
+    return { klaar: false, zichtbaar: alle.length, zicht, merk: merk(nieuwe[0]),
       tekst: (nieuwe[0].innerText || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
   }, [...gehad]);
 }

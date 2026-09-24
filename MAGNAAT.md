@@ -265,6 +265,20 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 
 Wat A2 bewust **niet** deed: het grootboek bewaart zijn journaal nog als één waarde per collectie (A3 in de oorspronkelijke fundering), en een partij kent nog geen herhaling uit het journaal (A5). Volgens de scopebevriezing komen die pas als een V-ronde erop vastloopt.
 
+### V1 From Zero: wat er staat (24 september 2026)
+
+**De keten is speelbaar, van € 63 tot een eerste bedrijf.** `server/kern/magnaat-leven/` geeft elk lid één leven: een baan als magazijnmedewerker (netto € 1.650 op de 25e), € 63 op de rekening, en vier vrije uren op een werkdag en twaalf in het weekend. Wat je naast je baan begint is een van drie projecten, elk met eigen software en drie klanten. Daarna gaat het om netwerken, een offerte, onderhandelen (de klant biedt tegen; een tweede bod is zijn laatste), het werk in uren, de inschrijving bij de KvK (€ 82,25) en pas dan de factuur. De eerste klant betaalt altijd twaalf dagen te laat. Dat is de kern van de keten en geen toeval. De bedragen zijn zo gekozen dat een maand net rondkomt: wie de wanbetaler geen herinnering stuurt, staat rond dag 49 rood. Daar liggen drie keuzes, elk met een gevolg: een herinnering (dan betaalt hij binnen twee dagen), een extra dienst in het weekend, of een lening bij je familie, die in twee termijnen van je loon af gaat. Rood staan op de eerste van de maand kost rente. Een betaalde klant beveelt je aan bij de volgende.
+
+**Al het geld loopt vanaf dag één door het grootboek.** Er is geen A2-migratie nodig geweest. `boek.js` is de enige plek die een saldo schrijft, en de kas is een projectie van de rekening. Twee regels kwamen uit het bouwen. Ten eerste: een sleutel die al geboekt is, geeft de bestaande boeking terug en beweegt de kas niet; anders loopt de kas stil weg van het grootboek (twee extra diensten op één zaterdag hadden precies dat gedaan). Ten tweede draagt elke boeking haar richting (`in`, `uit`) als label, zodat een scherm een uitgave niet hoeft te raden. De wereld in het journaal is een hash van de sessiesleutel: het journaal kent geen leden.
+
+**De klok rekent bij en tikt niet, zoals in World.** Een speldag duurt drie echte minuten. Bij elke aanraking draaien de verstreken dagen in vaste volgorde, zodat tien dagen in één keer hetzelfde opleveren als tien losse dagen (`test/magnaatleven.test.js` toets 5).
+
+**De schermen staan in de Magnaat-app.** Vandaag, Wereld, Werk, Geld, Netwerk en Mijn bedrijf; dat laatste verschijnt pas met een onderneming. Commandocentrum, Functiehal, Economie en Future Lab staan onder *Meer*, en de bestaande werkplek zit onder Werk. De handeling die nu het meest zin heeft, is de hoofdactie van de Edge. Elke handeling staat er met haar reden bij, en een weigering komt van de server, ook met haar reden. RTG-functies verschijnen pas als ze relevant worden, elk met het moment en de reden. De browserproef vond iets wat geen unittoets kon zien: de Edge neemt de hoofdactieknop OVER, dus een nieuwe knop per beurt liet de oude in de Edge-voet staan. Daarom is de hoofdactie één vaste knop (`test/magnaatleven.e2e.js`).
+
+**Twee routes, en ze staan bij Magnaat Wereld:** `/api/member/magnaat/leven/staat` (idempotent, gemeten) en `/leven/actie` (bewust niet idempotent: een zet in een spel). Beide hebben een contract in `server/lib/mutatiecontracten-magnaatleven.js`.
+
+Wat V1 bewust **niet** doet: er is geen btw op facturen en geen belasting op de winst, de baan kun je niet opzeggen, en per project zijn er drie vaste klanten. Het leven staat nog los van World. Of een onderneming uit Van Nul in World verder mag, is een V-vraag en geen A-vraag.
+
 ---
 
 ## 8. De regels

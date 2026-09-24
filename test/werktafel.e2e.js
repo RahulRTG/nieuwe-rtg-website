@@ -25,7 +25,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust, wachtTot } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust, wachtTot, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -147,7 +147,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.addInitScript(t => { try { localStorage.setItem('rtg_member_token', t); } catch (e) {} }, token);
     /* Zelfde reden als hierboven. Deze had geen eigen wacht erna, dus die staat
        er nu: het stijlblad is binnen -- de beweringen meten gestapelde lagen. */
-    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await page.goto(await pasAppAdres(srv.base, token), { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForFunction(() => document.styleSheets.length > 0, null, { timeout: 20000 });
 
     // 1) de intake staat open en hoort BOVENOP te liggen, ook op 1440px

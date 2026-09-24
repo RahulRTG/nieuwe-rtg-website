@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur, edgeActies } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur, edgeActies, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -214,7 +214,7 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
           codenaam die je aan iedereen laat zien die over je schouder meekijkt. */
     const thuis = await ctx.newPage();
     await volgVerzoeken(thuis);
-    await thuis.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await thuis.goto(await pasAppAdres(base, reg.token), { waitUntil: 'domcontentloaded' });
     await thuis.waitForSelector('#osMappen .os-app, .os-wm', { timeout: 15000, state: 'attached' });
     await wachtOpRust(thuis);
     const opThuis = await thuis.evaluate(() => ({
@@ -480,7 +480,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
 
     /* DE BELOFTE IS DEZELFDE, DE PLEK NIET.

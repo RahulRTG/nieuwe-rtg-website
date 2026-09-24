@@ -14,7 +14,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, stop, volgVerzoeken, wachtOpRust } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, stop, volgVerzoeken, wachtOpRust, pasAppAdres } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -166,7 +166,7 @@ test('Locatie: de schakelaar is te bedienen vanuit het bedieningspaneel',
       }, reg.token);
       const page = await ctx.newPage();
       letOpFouten(page, fouten);
-      await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+      await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'domcontentloaded' });
       // de tegel staat in de HTML maar is pas te zien als het paneel open is
       await page.waitForSelector('#osCcGps', { state: 'attached', timeout: 15000 });
       /* Blijven proberen tot het paneel echt opengaat: de knop staat in de HTML,

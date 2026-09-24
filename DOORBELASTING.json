@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T09:58:38.760Z",
-    "commit": "e0e0832e",
+    "op": "2026-09-24T10:00:25.834Z",
+    "commit": "356a28db",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doorbelasting.js",
@@ -21,8 +21,8 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1427,
-    "geldvormen": 214,
+    "vormenTotaal": 1426,
+    "geldvormen": 213,
     "volgbaar": 31,
     "perHerkomstveld": {
       "bron": 16,
@@ -32,7 +32,7 @@
       "leverancier": 6,
       "economischeHerkomst": 4
     },
-    "nietVolgbaar": 183,
+    "nietVolgbaar": 182,
     "volgbareModules": [
       "server/kern/appbieb.js",
       "server/kern/betaalopdracht/index.js",
@@ -236,7 +236,7 @@
         "volgbaar": 0
       },
       "server/kern/magnaat-economische-motor": {
-        "geldvormen": 5,
+        "geldvormen": 4,
         "volgbaar": 0
       },
       "server/kern/mall": {

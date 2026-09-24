@@ -127,13 +127,15 @@ const SCENARIOS = {
   }
 };
 
-/* Draai een scenario op een verse wereld en geef per stap een vingerafdruk. */
-function draai(naam) {
+/* Draai een scenario op een verse wereld en geef per stap een vingerafdruk.
+   `naElkeStap(wereld, stap)` mag na elke stap naar de wereld kijken. */
+function draai(naam, { naElkeStap } = {}) {
   const sc = SCENARIOS[naam];
   const w = nieuweWereld(sc.potje);
   const uit = [{ stap: 'start', hash: hash(afdruk(w.st)) }];
   sc.stappen.forEach((stap, i) => {
     const antwoord = voerUit(w, stap);
+    if (naElkeStap) naElkeStap(w, stap);
     const a = afdruk(w.st);
     uit.push({ stap: i + 1, soort: stap[0] === 'maand' ? 'maand' : (typeof stap[2] === 'function' ? stap[2](w).actie : stap[2].actie), status: antwoord.status || null,
       hash: hash({ antwoord, afdruk: a }),
@@ -142,4 +144,4 @@ function draai(naam) {
   return { stappen: uit, eind: afdruk(w.st), wereld: w };
 }
 
-module.exports = { SCENARIOS, draai, afdruk, canoniek };
+module.exports = { SCENARIOS, draai, afdruk, canoniek, nieuweWereld };

@@ -29,6 +29,7 @@ const { SECTORLIJST } = require('./sectoren');
 const { waarde } = require('./stap');
 const F = require('./foundation');
 const H = require('./handel');
+const { naarCenten, zorgEenheid, EENHEID, WORLD_REGELVERSIE } = require('./centen');
 
 /* De speelduur in SPELMAANDEN, per variant. Een Quick is drie jaar economie in
    een klein uur: lang genoeg dat een investering zich terugbetaalt, kort genoeg
@@ -36,7 +37,7 @@ const H = require('./handel');
 const DUUR = { quick: 36, avond: 96, weekend: 240 };
 // hoeveel echte milliseconden een spelmaand duurt
 const MAAND_MS = { quick: 100000, avond: 150000, weekend: 720000 };
-const START_GELD = 250000;
+const START_GELD = 250000;         // euro's; op de rekening in centen
 const ROOD_RENTE = 0.014;          // maandrente op een negatieve kas; zie de reden bij het gebruik
 const MAX_MAANDEN_PER_KEER = 60;   // een vangnet: een partij die maanden lag hoort niet in een keer door te rekenen
 
@@ -59,10 +60,11 @@ module.exports = (ctx) => {
       contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
       deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
       resultaatlog: {}, betaalgemist: {}, polissen: [], polisTeller: 0,
+      eenheid: EENHEID, regelversie: WORLD_REGELVERSIE,
       laatste: {}, klaar: false, hospitality: hospitality.nieuw(), leer:{acties:{},fouten:{}},
       universe: { wereld: worldModel.maak({ id: 'MAGNAAT-'+potje.id, seed: 'magnaat-'+potje.id }), briefing: null, vergelijking: null, evidence: null }
     };
-    for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
+    for (const h of potje.spelers) { st.geld[h] = naarCenten(START_GELD); st.vestigingen[h] = []; st.laatste[h] = null; }
     potje.staat = st;
   }
 
@@ -78,6 +80,7 @@ module.exports = (ctx) => {
      ververst hoe snel de tijd gaat. */
   function bijrekenen(potje) {
     const st = potje.staat;
+    zorgEenheid(st);   // van voor A2.1: een keer naar centen
     if (st.klaar) return [];
     const nu = Date.now();
     let stappen = Math.floor((nu - st.gerekendTot) / st.maandMs);

@@ -40,7 +40,7 @@ if (require.main === module) {
     console.error('[magnaat-world-gouden] ' + doel.bestand + ' bestaat al; overschrijven alleen met --opnieuw.');
     process.exit(2);
   }
-  const { WORLD_REGELVERSIE } = require('../server/kern/spellen/magnaat/economie');
+  const { WORLD_REGELVERSIE } = require('../server/kern/spellen/magnaat/centen');
   const versie = WORLD_REGELVERSIE || '1';
   if (doel.regelversie && versie !== doel.regelversie) {
     console.error('[magnaat-world-gouden] de baseline hoort bij World-regelversie ' + doel.regelversie + '; World rekent op ' + versie + '.');

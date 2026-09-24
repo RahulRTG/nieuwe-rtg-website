@@ -10,23 +10,43 @@
    boetes lopen van leverancier naar afnemer. Zo staat elk bedrag EEN keer op
    een rekening, en klopt de som over alle spelers. */
 const H = require('./handel');
+const { naarCenten, euroTonen } = require('./centen');
 
 module.exports = ({ rond }) => {
-  function wikkelAf(st, actief, leverDeel, kwaliteitVan) {
+  /* WAT ELK CONTRACT DEZE MAAND BETAALT, EEN KEER, in eurocenten (./centen.js).
+     Dat bedrag gaat bij de afnemer eraf (wikkelAf hieronder) en de som ervan is
+     precies wat de leverancier aan contractomzet krijgt (./stap.js, via
+     `betalingCenten` op zijn toezegging). Voor ronde A2.1 rekende de
+     leverancier zijn omzet over het totaal van zijn contracten en betaalde elke
+     afnemer zijn eigen deel, en dan liepen de twee kanten een fractie uiteen. */
+  function betalingen(actief, leverDeel, toezegging) {
+    const betaling = {};
+    for (const c of actief) {
+      betaling[c.id] = naarCenten(H.afwikkelen(c, { geleverd: c.eenheden * (leverDeel[c.leverancierId] || 0), kwaliteit: 0 }).betaling);
+      const t = toezegging[c.leverancierId];
+      t.betalingCenten = (t.betalingCenten || 0) + betaling[c.id];
+    }
+    return betaling;
+  }
+
+  /* `betaling` is per contract het bedrag van `betalingen` hierboven. */
+  function wikkelAf(st, actief, leverDeel, kwaliteitVan, betaling) {
     const contractRegels = {};
     for (const c of actief) {
       const r = H.afwikkelen(c, { geleverd: c.eenheden * (leverDeel[c.leverancierId] || 0),
         kwaliteit: kwaliteitVan[c.leverancierId] === undefined ? 0 : kwaliteitVan[c.leverancierId] });
-      st.geld[c.afnemer] -= r.betaling;
-      c.betaald += r.betaling; c.ontvangen += r.betaling;
+      const bedrag = betaling[c.id];
+      st.geld[c.afnemer] -= bedrag;
+      c.betaald += bedrag; c.ontvangen += bedrag;
       if (r.boete > 0) {
-        st.geld[c.leverancier] -= r.boete;
-        st.geld[c.afnemer] += r.boete;
-        c.boetes += r.boete;
+        const boete = naarCenten(r.boete);
+        st.geld[c.leverancier] -= boete;
+        st.geld[c.afnemer] += boete;
+        c.boetes += boete;
         c.maandenTekort++;
       } else c.maandenGeleverd++;
       const regel = { id: c.id, soort: c.soort, geleverd: rond(r.geleverd), toegezegd: c.eenheden,
-        bedrag: rond(r.betaling), boete: rond(r.boete), tekort: r.tekort, onderMaat: r.onderMaat };
+        bedrag: euroTonen(bedrag), boete: rond(r.boete), tekort: r.tekort, onderMaat: r.onderMaat };
       for (const kant of ['leverancier', 'afnemer'])
         (contractRegels[c[kant]] = contractRegels[c[kant]] || []).push(Object.assign({ rol: kant }, regel));
       if (st.maand + 1 >= c.eindMaand) c.status = 'afgelopen';
@@ -34,5 +54,5 @@ module.exports = ({ rond }) => {
     return contractRegels;
   }
 
-  return { wikkelAf };
+  return { wikkelAf, betalingen };
 };

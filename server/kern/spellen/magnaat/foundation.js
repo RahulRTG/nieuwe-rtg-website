@@ -23,6 +23,7 @@
    ondernemers. Het staat hier zo omdat een spelwereld zonder abonnementen wel
    een economie heeft, en de VERHOUDING is wat je wilt laten zien. */
 
+const { naarCenten } = require('./centen');
 const DEEL_LOKAAL = 0.20;
 const DEEL_CENTRAAL = 0.10;
 /* Op welk deel van de omzet die afdracht rust. Bewust laag: dit is niet
@@ -64,8 +65,9 @@ function nieuw() {
 function draagAf(f, omzet) {
   const bijdrage = omzet * BIJDRAGE;
   const lokaal = bijdrage * DEEL_LOKAAL, centraal = bijdrage * DEEL_CENTRAAL;
-  f.lokaal += lokaal;
-  f.centraal += centraal;
+  /* De pot staat in eurocenten (./centen.js); elk deel wordt een keer afgerond. */
+  f.lokaal += naarCenten(lokaal);
+  f.centraal += naarCenten(centraal);
   return { bijdrage: Math.round(bijdrage), lokaal: Math.round(lokaal), centraal: Math.round(centraal) };
 }
 
@@ -74,9 +76,10 @@ function draagAf(f, omzet) {
    een herstart hetzelfde verlopen -- zie de kop van ./stap.js. */
 function bouw(f, kaart, perZone) {
   const klaar = [];
-  while (f.volgend < PROJECTEN.length && f.lokaal >= PROJECTEN[f.volgend].kosten) {
+  // de kosten van een project staan in hele euro's; de pot in eurocenten
+  while (f.volgend < PROJECTEN.length && f.lokaal >= naarCenten(PROJECTEN[f.volgend].kosten)) {
     const p = PROJECTEN[f.volgend];
-    f.lokaal -= p.kosten;
+    f.lokaal -= naarCenten(p.kosten);
     /* Het project landt in de zone met de MEESTE bedrijvigheid: daar komt het
        geld vandaan en daar zijn de mensen die het gebruiken. Bij gelijke stand
        wint de zone die in de stadsdata het eerst staat -- vast en niet

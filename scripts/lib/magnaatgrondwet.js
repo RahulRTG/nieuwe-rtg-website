@@ -131,7 +131,7 @@ const REGELS = [
       world: {
         autoriteit: 'server/kern/spellen/magnaat/weergave.js',
         handhaver: [
-          { bestand: MAP + '/weergave.js', citaat: 'geld: rond(st.geld[mij] || 0),' },
+          { bestand: MAP + '/weergave.js', citaat: 'geld: euroTonen(st.geld[mij] || 0),' },
           { bestand: MAP + '/weergave.js', citaat: 'return (st.contracten || []).filter(c => partij(c, h))' }
         ],
         toets: [
@@ -424,9 +424,19 @@ const REGELS = [
         handhaver: [{ bestand: 'server/kern/magnaat-grootboek/geld.js', citaat: "if (typeof n !== 'number' || !Number.isSafeInteger(n) || n < 0) {" }],
         toets: [{ bestand: 'test/magnaat-grootboek.test.js', naam: '5. het grootboek accepteert alleen gehele, niet-negatieve eurocenten en rondt nooit af', bewijst: "'1234'" }]
       },
-      world: { autoriteit: 'geen: World rekent in euro\'s met drijvende komma', handhaver: 'NIEMAND', toets: 'NIEMAND' }
+      world: {
+        autoriteit: 'server/kern/spellen/magnaat/centen.js, de ene plek waar World een bedrag tot geld maakt',
+        handhaver: [
+          { bestand: MAP + '/centen.js', citaat: 'const uit = Math.round(Number(cent.toFixed(6)));' },
+          { bestand: MAP + '/maand.js', citaat: 'betaling[c.id] = naarCenten(H.afwikkelen(c,' }
+        ],
+        toets: [
+          { bestand: 'test/magnaat-world-geld.test.js', naam: '4. na elke stap is elk monetair veld een geheel aantal eurocenten', bewijst: 'Number.isSafeInteger(houder[veld])' },
+          { bestand: 'test/magnaat-world-geld.test.js', naam: '5. een contractbetaling draagt aan beide kanten exact hetzelfde bedrag', bewijst: 'niet gevoelig voor de volgorde van afronden' }
+        ]
+      }
     },
-    migratie: 'World rekent in hele eurocenten met een canonieke geldfunctie die een gebeurtenis een keer afrondt (ronde A2.1).',
+    migratie: 'Geen voor World en het grootboek: sinds ronde A2.1 rekent World in hele eurocenten en wordt een gebeurtenis een keer afgerond. Wat nog rest is dat World zijn geld nog niet via het grootboek boekt (A2.3 t/m A2.9).',
     faalwijze: 'De betaler betaalt 10,01 en de ontvanger krijgt 10,00: een cent ontstaat of verdwijnt uit het niets.'
   },
   {

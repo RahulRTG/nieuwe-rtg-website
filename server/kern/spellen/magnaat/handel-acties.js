@@ -25,6 +25,7 @@
    contracten lopen -- dat staat op straat, de vrachtwagens rijden -- maar niet
    tegen welke prijs. */
 const H = require('./handel');
+const { naarCenten } = require('./centen');
 
 const MAX_RONDEN = 6;
 const MAX_OPEN = 5;
@@ -146,13 +147,16 @@ module.exports = ({ K, mijnVestiging, rond }) => {
          ingaat zou betekenen dat de uitkomst van die maand afhangt van het
          moment waarop iemand op de knop drukte. Dat is precies wat 12.4
          verbiedt. */
-      if (c.vooraf > 0 && st.geld[c.afnemer] < c.vooraf)
+      /* De vooruitbetaling is afgesproken in hele euro's; wat er overgaat is een
+         keer tot centen gemaakt en beide kanten krijgen datzelfde bedrag. */
+      const vooraf = naarCenten(c.vooraf || 0);
+      if (vooraf > 0 && st.geld[c.afnemer] < vooraf)
         return { status: 400, error: 'De vooruitbetaling van ' + c.vooraf + ' staat niet op de rekening.' };
       const dubbel = lopend(st).find(x => x.afnemerId === c.afnemerId && x.soort === c.soort);
       if (dubbel) return { status: 409, error: 'Voor die post loopt inmiddels al een contract.' };
       if (!vanIemand(st, c.leverancierId) || !vanIemand(st, c.afnemerId))
         return { status: 409, error: 'Een van beide vestigingen bestaat niet meer.' };
-      if (c.vooraf > 0) { st.geld[c.afnemer] -= c.vooraf; st.geld[c.leverancier] += c.vooraf; }
+      if (vooraf > 0) { st.geld[c.afnemer] -= vooraf; st.geld[c.leverancier] += vooraf; }
       c.status = 'loopt';
       c.gesloten = st.maand;
       c.startMaand = st.maand + 1;
@@ -168,15 +172,16 @@ module.exports = ({ K, mijnVestiging, rond }) => {
       const c = draad(st, String(zet.id || ''));
       if (!c || !partij(c, h)) return { status: 404, error: 'Dat contract bestaat niet.' };
       if (c.status !== 'loopt') return { status: 409, error: 'Dat contract loopt niet.' };
-      const som = H.afkoopsom(c, st.maand);
-      if (st.geld[h] < som) return { status: 400, error: 'Afkopen kost ' + som + '; dat heb je niet.' };
+      const afkoopEuro = H.afkoopsom(c, st.maand);
+      const som = naarCenten(afkoopEuro);
+      if (st.geld[h] < som) return { status: 400, error: 'Afkopen kost ' + afkoopEuro + '; dat heb je niet.' };
       const tegen = c.leverancier === h ? c.afnemer : c.leverancier;
       st.geld[h] -= som;
       st.geld[tegen] += som;
       c.status = 'afgekocht';
       c.eindMaand = st.maand;
       c.afkoop = som;
-      return { status: 200, ok: true, wek: tegen, afkoop: som };
+      return { status: 200, ok: true, wek: tegen, afkoop: afkoopEuro };
     }
   };
 

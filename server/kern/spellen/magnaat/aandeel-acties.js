@@ -11,6 +11,8 @@
 
    ALLEBEI VRIJE ACTIES, om dezelfde reden als daar: op je beurt wachten om te
    mogen onderhandelen maakt van een partij van zes een week vertraging. */
+const { naarCenten } = require('./centen');
+
 module.exports = ({ wieHeeft, uitgegeven, MAX_DEEL }) => {
   const MAX_OPEN = 4;   // openstaande voorstellen per speler
 
@@ -72,14 +74,15 @@ module.exports = ({ wieHeeft, uitgegeven, MAX_DEEL }) => {
       if (!wieHeeft(st, d.vestiging)) return { status: 409, error: 'Die vestiging bestaat niet meer.' };
       if (uitgegeven(st, d.vestiging) + d.deel > MAX_DEEL)
         return { status: 409, error: 'Er is inmiddels te veel van deze zaak vergeven.' };
-      if (st.geld[d.houder] < d.prijs) return { status: 400, error: 'De koper heeft ' + d.prijs + ' niet op de rekening.' };
+      const koopsom = naarCenten(d.prijs);
+      if (st.geld[d.houder] < koopsom) return { status: 400, error: 'De koper heeft ' + d.prijs + ' niet op de rekening.' };
       /* DE EIGENAAR VAN NU KRIJGT HET GELD, en dat is niet vanzelfsprekend: het
          belang hangt aan de VESTIGING (besluit 4), dus als de zaak inmiddels van
          een ander is, betaalt de koper aan die ander. Dat is ook de eerlijke
          kant -- die ander draagt vanaf nu het verwaterde resultaat. */
       const nu = wieHeeft(st, d.vestiging).speler;
-      st.geld[d.houder] -= d.prijs;
-      st.geld[nu] += d.prijs;
+      st.geld[d.houder] -= koopsom;
+      st.geld[nu] += koopsom;
       d.status = 'loopt';
       d.eigenaar = nu;
       d.gekocht = st.maand;

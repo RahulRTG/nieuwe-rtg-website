@@ -22,6 +22,7 @@
 const B = require('./bank');
 
 const rond = (n) => Math.round(n);
+const { naarCenten, uitCenten, euroTonen } = require('./centen');
 const MAX_LENINGEN = 8;
 
 module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
@@ -43,7 +44,7 @@ module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
     /* Wat er al op DIT pand rust; zie de reden bij `ruimte` in ./bank.js. */
     const onderpandSchuld = onderpand ? (st.leningen || [])
       .filter(l => l.status === 'loopt' && l.onderpand === onderpand.id)
-      .reduce((n, l) => n + l.restant, 0) : 0;
+      .reduce((n, l) => n + uitCenten(l.restant), 0) : 0;
     const max = B.ruimte(soort, { vermogen: c.vermogen, schuld: c.schuld,
       achtergesteldeSchuld: c.achtergesteld, onderpandSchuld,
       onderpandwaarde: onderpand ? waarde(onderpand) : 0 });
@@ -82,13 +83,13 @@ module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
 
       const l = {
         id: 'l' + (st.leningTeller = (st.leningTeller || 0) + 1),
-        speler: h, soort, hoofdsom: bedrag, restant: bedrag, rente: o.rente,
+        speler: h, soort, hoofdsom: bedrag, restant: naarCenten(bedrag), rente: o.rente,
         looptijd: o.looptijd, startMaand: st.maand, eindMaand: o.looptijd ? st.maand + o.looptijd : null,
         onderpand: o.onderpand, opslag: 0, breukMaanden: 0, herzien: 0,
         betaaldRente: 0, betaaldAflossing: 0, status: 'loopt'
       };
       (st.leningen = st.leningen || []).push(l);
-      st.geld[h] += bedrag;
+      st.geld[h] += l.restant;
       return { status: 200, ok: true, id: l.id, rente: l.rente, maandlast: o.maandlast };
     },
 
@@ -98,13 +99,15 @@ module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
       const st = potje.staat;
       const l = (st.leningen || []).find(x => x.id === String(z.id || '') && x.speler === h && x.status === 'loopt');
       if (!l) return { status: 404, error: 'Die lening loopt niet op jouw naam.' };
-      const bedrag = Math.min(Math.floor(Number(z.bedrag) || 0), l.restant, Math.floor(st.geld[h]));
+      /* In eurocenten: wat de speler vraagt (hele euro's), niet meer dan er
+         openstaat en niet meer dan er in kas is. */
+      const bedrag = Math.min(naarCenten(Math.floor(Number(z.bedrag) || 0)), l.restant, Math.max(0, st.geld[h]));
       if (bedrag < 1) return { status: 400, error: 'Daar is geen geld voor.' };
       st.geld[h] -= bedrag;
       l.restant -= bedrag;
       l.betaaldAflossing += bedrag;
       if (l.restant < 1) { l.restant = 0; l.status = 'afgelost'; }
-      return { status: 200, ok: true, restant: rond(l.restant), status_: l.status };
+      return { status: 200, ok: true, restant: euroTonen(l.restant), status_: l.status };
     },
 
     /* VRIJ: herzien. De uitweg uit een convenant, en hij kost wat hij hoort te
@@ -136,13 +139,13 @@ module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
     return {
       leningen: (st.leningen || []).filter(l => l.speler === h).map(l => ({
         id: l.id, soort: l.soort, naam: B.VORMEN[l.soort].naam, status: l.status,
-        hoofdsom: l.hoofdsom, restant: rond(l.restant), rente: l.rente, opslag: l.opslag || 0,
+        hoofdsom: l.hoofdsom, restant: euroTonen(l.restant), rente: l.rente, opslag: l.opslag || 0,
         looptijd: l.looptijd, eindMaand: l.eindMaand, onderpand: l.onderpand,
-        maandlast: rond(l.restant * (l.rente + (l.opslag || 0))
+        maandlast: rond(uitCenten(l.restant) * (l.rente + (l.opslag || 0))
           + (B.VORMEN[l.soort].aflossend && l.looptijd ? l.hoofdsom / l.looptijd : 0)),
         breukMaanden: l.breukMaanden || 0, trap: B.trapVan(l.breukMaanden || 0),
         herzienbaar: l.herzien < 1 && B.VORMEN[l.soort].aflossend,
-        betaaldRente: rond(l.betaaldRente), betaaldAflossing: rond(l.betaaldAflossing)
+        betaaldRente: euroTonen(l.betaaldRente), betaaldAflossing: euroTonen(l.betaaldAflossing)
       })),
       // wat er vandaag te krijgen is, per vorm -- de offerte vooraf
       offertes: B.VORMLIJST.filter(s => !B.VORMEN[s].automatisch && !B.VORMEN[s].onderpand)

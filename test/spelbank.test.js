@@ -27,6 +27,9 @@ const assert = require('node:assert/strict');
 
 const B = require('../server/kern/spellen/magnaat/bank');
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
+/* World rekent sinds ronde A2.1 in eurocenten (../server/kern/spellen/magnaat/centen.js);
+   deze toetsen spreken in euro's en zetten om waar ze een saldo zelf aanraken. */
+const { naarCenten, uitCenten: E } = require('../server/kern/spellen/magnaat/centen');
 const { waarde } = require('../server/kern/spellen/magnaat/waardering');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
@@ -40,7 +43,7 @@ function opstelling(spelers = ['anna', 'boris']) {
   const p = { id: 'p1', soort: 'magnaat', spelers, teams: spelers.map((_, i) => i), modus: 'vrij',
     status: 'bezig', beurt: 0, winnaar: null, variant: ECO };
   m.spel.init(p);
-  for (const h of spelers) p.staat.geld[h] = 2000000;
+  for (const h of spelers) p.staat.geld[h] = naarCenten(2000000);
   m.eco.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40, naam: 'Zeezicht' });
   return { m, p, st: p.staat, A: p.staat.vestigingen.anna[0] };
 }
@@ -57,7 +60,7 @@ const maandKrap = (m, p, h, n = 1) => {
        norm te halen, en dan telt de trap opnieuw vanaf nul -- wat correct is
        maar betekent dat zo'n toets de herstelkracht meet en niet de trap. */
     for (const v of p.staat.vestigingen[h] || []) { v.personeel = 0; v.marketing = 0; }
-    p.staat.geld[h] = 500;
+    p.staat.geld[h] = naarCenten(500);
     p.staat.gerekendTot -= p.staat.maandMs;
     m.eco.bijrekenen(p);
   }
@@ -113,7 +116,7 @@ test('een sterke balans leent goedkoper dan een zwakke, en je ziet waarom', () =
   maand(zwak.m, zwak.p, 6);
   // dezelfde wereld, maar boris... eh, anna zit vol schuld en heeft geen buffer
   zwak.m.eco.zet(zwak.p, 'anna', { actie: 'krediet-opnemen', soort: 'investering', bedrag: 900000, looptijd: 48 });
-  zwak.st.geld.anna = 5000;
+  zwak.st.geld.anna = naarCenten(5000);
 
   const a = sterk.m.eco.zicht(sterk.p, sterk.st, 'anna').financiering.offertes.find(o => o.soort === 'investering');
   const b = zwak.m.eco.zicht(zwak.p, zwak.st, 'anna').financiering.offertes.find(o => o.soort === 'investering');
@@ -168,7 +171,7 @@ test('het kredietprofiel staat nergens opgeslagen; het volgt uit de toestand', (
   const voor = m.eco.zicht(p, st, 'anna').krediet;
   assert.equal(voor.assen.liquiditeit.sterren >= 1 && voor.assen.liquiditeit.sterren <= 5, true);
   // de kas leeghalen hoort het profiel meteen te veranderen, zonder tussenkomst
-  st.geld.anna = 100;
+  st.geld.anna = naarCenten(100);
   const na = m.eco.zicht(p, st, 'anna').krediet;
   assert.ok(na.assen.liquiditeit.waarde < voor.assen.liquiditeit.waarde,
     'de liquiditeitsas hoort mee te bewegen met de kas');

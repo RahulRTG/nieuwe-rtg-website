@@ -28,6 +28,8 @@ const assert = require('node:assert/strict');
 const R = require('../server/kern/spellen/magnaat/risico');
 const P = require('../server/kern/spellen/magnaat/polis');
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
+/* World rekent sinds ronde A2.1 in eurocenten (zie ../server/kern/spellen/magnaat/centen.js). */
+const { naarCenten, uitCenten: E } = require('../server/kern/spellen/magnaat/centen');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
   save() {}, crypto: require('crypto'), codenaamVan: (h) => 'CN-' + h, nudge() {}
@@ -40,7 +42,7 @@ function opstelling(id = 'p1') {
   const p = { id, soort: 'magnaat', spelers: ['anna', 'boris'], teams: [0, 1], modus: 'vrij',
     status: 'bezig', beurt: 0, winnaar: null, variant: ECO };
   m.spel.init(p);
-  for (const h of p.spelers) p.staat.geld[h] = 5000000;
+  for (const h of p.spelers) p.staat.geld[h] = naarCenten(5000000);
   m.eco.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40, naam: 'Zeezicht' });
   return { m, p, st: p.staat, A: p.staat.vestigingen.anna[0] };
 }

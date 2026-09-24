@@ -24,6 +24,9 @@ const assert = require('node:assert/strict');
 
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 const { waarde } = require('../server/kern/spellen/magnaat/stap');
+/* World rekent sinds ronde A2.1 in eurocenten (../server/kern/spellen/magnaat/centen.js);
+   deze toetsen spreken in euro's en zetten om waar ze een saldo zelf aanraken. */
+const { naarCenten, uitCenten: E } = require('../server/kern/spellen/magnaat/centen');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
   save() {}, crypto: require('crypto'), codenaamVan: (h) => 'CN-' + h, nudge() {}
@@ -36,7 +39,7 @@ function opstelling(spelers = ['anna', 'boris']) {
   const p = { id: 'p1', soort: 'magnaat', spelers, teams: spelers.map((_, i) => i), modus: 'vrij',
     status: 'bezig', beurt: 0, winnaar: null, variant: ECO };
   m.spel.init(p);
-  for (const h of spelers) p.staat.geld[h] = 5000000;
+  for (const h of spelers) p.staat.geld[h] = naarCenten(5000000);
   m.eco.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40, naam: 'Zeezicht' });
   return { m, p, st: p.staat, A: p.staat.vestigingen.anna[0] };
 }
@@ -95,7 +98,7 @@ test('een aandeelhouder deelt in de winst en net zo hard in het verlies', () => 
     const voor = st.geld.boris;
     maand(m, p, 1);
     const regel = st.laatste.anna.regels[0];
-    return { resultaat: regel.resultaat, boris: st.geld.boris - voor, aandeelhouders: regel.aandeelhouders };
+    return { resultaat: regel.resultaat, boris: E(st.geld.boris - voor), aandeelhouders: regel.aandeelhouders };
   };
   const goed = meting(false), slecht = meting(true);
   assert.ok(goed.resultaat > 0 && goed.boris > 0, 'winst wordt gedeeld: ' + Math.round(goed.boris));
@@ -152,7 +155,7 @@ test('wat er wordt uitgekeerd houdt de eigenaar niet ook nog eens zelf', () => {
   const voorA = st.geld.anna, voorB = st.geld.boris;
   maand(m, p, 1);
   const resultaat = st.laatste.anna.regels[0].resultaat;
-  const naarA = st.geld.anna - voorA, naarB = st.geld.boris - voorB;
+  const naarA = E(st.geld.anna - voorA), naarB = E(st.geld.boris - voorB);
   assert.ok(resultaat > 0, 'de zaak draait winst: ' + resultaat);
   assert.ok(Math.abs(naarA + naarB - resultaat) < 1,
     'samen hoort dat precies het resultaat te zijn: ' + Math.round(naarA) + ' + ' + Math.round(naarB) +
@@ -166,8 +169,8 @@ test('de prijs gaat van de koper naar de eigenaar, en verder nergens heen', () =
   maand(m, p, 1);
   const voorA = st.geld.anna, voorB = st.geld.boris;
   koop(m, p, 'boris', 'anna', { vestiging: A.id, deel: 25, prijs: 175000 });
-  assert.equal(Math.round(st.geld.anna - voorA), 175000);
-  assert.equal(Math.round(st.geld.boris - voorB), -175000);
+  assert.equal(Math.round(E(st.geld.anna - voorA)), 175000);
+  assert.equal(Math.round(E(st.geld.boris - voorB)), -175000);
 });
 
 /* ================= 5. het belang hangt aan de vestiging ================= */
@@ -211,7 +214,7 @@ test('je tekent je eigen voorstel niet, en een tegenvoorstel draait de beurt om'
   assert.equal(m.eco.zet(p, 'anna', { actie: 'belang-antwoord', id: r.id, antwoord: 'ja' }).status, 409);
   const voorA = st.geld.anna;
   assert.ok(m.eco.zet(p, 'boris', { actie: 'belang-antwoord', id: r.id, antwoord: 'ja' }).ok);
-  assert.equal(Math.round(st.geld.anna - voorA), 400000, 'het tegenvoorstel is wat er getekend wordt');
+  assert.equal(Math.round(E(st.geld.anna - voorA)), 400000, 'het tegenvoorstel is wat er getekend wordt');
 });
 
 test('een tegenvoorstel gaat door dezelfde zeef als een eerste voorstel', () => {
@@ -240,7 +243,7 @@ test('een belang kopen zonder geld kan niet', () => {
   const { m, p, st, A } = opstelling();
   maand(m, p, 1);
   const r = m.eco.zet(p, 'boris', { actie: 'belang-voorstel', vestiging: A.id, deel: 20, prijs: 4000000 });
-  st.geld.boris = 1000;
+  st.geld.boris = naarCenten(1000);
   const t = m.eco.zet(p, 'anna', { actie: 'belang-antwoord', id: r.id, antwoord: 'ja' });
   assert.equal(t.status, 400);
   assert.equal(st.deelnemingen[0].status, 'voorgesteld', 'en het voorstel blijft gewoon liggen');

@@ -30,9 +30,10 @@ const F = require('./foundation');
 const H = require('./handel');
 
 const rond = (n) => Math.round(n);
+const { naarCenten, uitCenten, euroTonen } = require('./centen');
 
 module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering }) => {
-  const { wikkelAf } = require('./maand-contracten')({ rond });
+  const { wikkelAf, betalingen } = require('./maand-contracten')({ rond });
   function eenMaand(potje) {
     const st = potje.staat, k = K(st);
     const kwaliteitVan = {};
@@ -74,6 +75,8 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
       const o = ontvangst[c.afnemerId] = ontvangst[c.afnemerId] || {};
       o[c.soort] = (o[c.soort] || 0) + geleverd;
     }
+    // wat elk contract betaalt, een keer in centen
+    const betaling = betalingen(actief, leverDeel, toezegging);
     /* Wat er deze maand aan RENTE de wereld verlaat. Apart geteld omdat het de
        enige post is die niet bij een andere speler landt; de geldpomp-meter
        moet hem kunnen aftrekken. */
@@ -100,7 +103,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
            De eigenaar houdt wat er niet vergeven is, de rest gaat rechtstreeks
            naar de houders -- winst en verlies allebei. Staat er niets uit, dan
            gaat het hele bedrag naar de eigenaar en verandert er niets. */
-        const verdeeld = verdeel(st, v.id, r.resultaat);
+        const verdeeld = verdeel(st, v.id, r.resultaatCenten);
         st.geld[h] += verdeeld.eigenaar;
         /* OP DE GEPUSHTE REGEL en niet op `r`: de regel is een KOPIE die hierboven
            is gemaakt, dus een veld dat er daarna op `r` bij komt haalt het
@@ -122,10 +125,10 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
          Hij staat hier en niet bij de leningen omdat hij geen lening is die je
          AANGAAT: hij ontstaat doordat je uitgeeft wat je niet hebt. */
       if (st.geld[h] < 0) {
-        const rente = -st.geld[h] * ROOD_RENTE;
+        const rente = naarCenten(uitCenten(-st.geld[h]) * ROOD_RENTE);
         st.geld[h] -= rente;
         rentelast += rente;
-        regels.push({ id: 'rood', naam: 'Rood staan', rente: rond(rente), resultaat: -rond(rente) });
+        regels.push({ id: 'rood', naam: 'Rood staan', rente: euroTonen(rente), resultaat: -euroTonen(rente) });
       }
       /* DE LENINGEN. Rente over het restant, dan de aflossing, dan de
          convenanten -- in die volgorde, want een aflossing verlaagt het restant
@@ -156,7 +159,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     /* DE CONTRACTEN AFWIKKELEN staat in ./maand-contracten.js -- na de maand,
        want de kwaliteitseis gaat over de kwaliteit die er DEZE maand geleverd
        is, en die volgt uit de maand. */
-    const contractRegels = wikkelAf(st, actief, leverDeel, kwaliteitVan);
+    const contractRegels = wikkelAf(st, actief, leverDeel, kwaliteitVan, betaling);
 
     /* De afdracht rust op de HELE stad en niet alleen op de spelers: anders
        bouwt de Foundation in een partij met twee mensen nooit iets. Zie de
@@ -174,7 +177,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     st.maand++;
     const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
       wereldOmzet: rond(wereldOmzet), contractRegels,
-      rentelast: rond(rentelast), premielast: rond(premielast), schadelast: rond(schadelast) };
+      rentelast: euroTonen(rentelast), premielast: euroTonen(premielast), schadelast: euroTonen(schadelast) };
     for (const h of potje.spelers) st.laatste[h] = { maand: st.maand, regels: perSpeler[h] || [],
       projecten, contracten: contractRegels[h] || [] };
     return verslag;

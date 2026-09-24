@@ -179,6 +179,30 @@ De stappen van A2 zijn daarmee: **A2.0** het grootboek losmaken (pariteit tegen 
 
 De migratievolgorde volgt de categorieën, zodat elke stap apart tegen het oude gedrag te bewijzen is: opening, overdrachten tussen spelers (tegenzijde bestaat al, laagste risico), financiering, verzekering, activa, maandresultaat (het grootste stuk) en de Foundation.
 
+**A2.0 en A2.1 staan.** A2.0 maakte het grootboek een eigen laag onder de motor (`server/kern/magnaat-grootboek/`), zonder één cent gedragsverandering: de gouden referentie van A1 bleef op alle 267 stappen gelijk. A2.1 is de enige toegestane geldgedragswijziging van World, en hij is in vier stappen gelopen:
+
+1. **World vastgelegd vóór de wijziging** (`test/fixtures/magnaat-world-voor-a21.json`). Twee scenario's, "gewoon" en "crisis", raken samen alle 27 gebeurtenissen van de geldkaart. Dat is **gemeten**: een teller op elk been telt wat er echt liep (`test/lib/magnaat-geldkaart-dekking.js`).
+2. **Het grootboek rondt nooit af** (grondwetregel M-020). Het accepteert alleen gehele, niet-negatieve eurocenten en weigert de rest met de reden erbij: een breuk, NaN, Infinity, een negatief getal, 2^53, en ook de tekst `"1234"`. Afronden is domeinbeleid. De motor van het Oefenkantoor heeft zijn eigen afrondingsfunctie terug, en de A1-referentie bleef groen: hij gaf al alleen hele centen door.
+3. **World rekent in hele eurocenten**, met één canonieke functie (`server/kern/spellen/magnaat/centen.js`). De afrondingsregel is rekenkundig, de helft van nul af, met een grens tegen binaire breuken (1,005 wordt 101 cent).
+   - Wat geld **houdt of verplaatst** staat in centen: kassen, de Foundation-pot, het restant van een lening, betaalde rente en aflossing, contractbetalingen, boetes en afkopen, uitkeringen uit belangen, premies en polisuitkeringen.
+   - **Afgesproken termen** blijven hele euro's, want die zijn al exact: een hoofdsom, een contractbedrag, een bod, een belangprijs. Ze worden pas geld als ze door `naarCenten` gaan.
+   - **De buitenkant blijft in euro's**: wat een speler intikt en wat hij ziet.
+   - **Een partij van vóór A2.1** wordt bij het laden één keer omgezet en krijgt `eenheid` en `regelversie` mee. Een tweede keer omzetten gebeurt niet. De lijst monetaire velden is dezelfde als die van de invariant-toets.
+   - **`st.geld` heeft met opzet zijn naam gehouden.** Het patroon van M-001 kijkt naar `geld[...]`, dus een nieuwe naam zou de teller laten zakken zonder dat er iets is opgelost.
+4. **De WORLD ECONOMIC GOLDEN BASELINE** staat in `test/fixtures/magnaat-world-baseline.json` (regelversie 2). A2.2 t/m A2.9 moeten daar stap voor stap exact aan gelijk blijven, op de vooraf goedgekeurde Foundation-regelwijziging na.
+
+**Wat A2.1 veranderde, gemeten tegen World van ervoor:**
+- Elke spelactie kreeg hetzelfde antwoord.
+- De kassen schoven na 12 tot 15 maanden hooguit € 1,97. Het maandresultaat werd vroeger op hele euro's afgerond en nu één keer op centen.
+- **Een contractbetaling draagt aan beide kanten exact hetzelfde bedrag.** Vroeger rondde de leverancier over het totaal van zijn contracten af en betaalde elke afnemer zijn eigen, onafgeronde deel. De toets daarvoor controleert eerst of zijn eigen opstelling gevoelig genoeg is: één keer afronden over het totaal geeft er een andere cent dan afronden per contract. Anders zou hij alleen bij toeval kunnen zakken.
+- **Een lening met minder dan één euro restant werd kwijtgescholden** (`if (l.restant < 1)`). In centen is dat hooguit één cent, dus in feite niets meer.
+- De geldpomp-meter vindt de lekkende scenario's nu **exact op nul**. Voorheen stond daar een marge van 25 euro afrondingsruis.
+
+**Vondsten die niet in A2.1 zijn opgelost:**
+- Wie rood staat en een vestiging met een contract wil sluiten, krijgt de melding "afkopen kost 0", terwijl de reden de negatieve kas is.
+- Omzet- en resultaattotalen en het resultatengeheugen van de bank zijn statistieken en geen geld. Die blijven euro's tot ze uit het grootboek worden afgeleid.
+- De teller van M-001 en M-005 staat nog op 32. Dat is ook de bedoeling: A2.1 veranderde de precisie en niet de route. De teller zakt vanaf A2.3.
+
 ---
 
 ## 8. De regels
@@ -208,10 +232,10 @@ De migratievolgorde volgt de categorieën, zodat elke stap apart tegen het oude 
 | M-017 | Simulatie-integriteit | **PARTIAL** | ja | ja | nee | nee |
 | M-018 | Simulatie-integriteit | **PARTIAL** | ja | ja | nee | nee |
 | M-019 | Simulatie-integriteit | **PARTIAL** | ja | ja | ja | ja |
-| M-020 | Economische waarheid | **PARTIAL** | ja | ja | nee | nee |
+| M-020 | Economische waarheid | **PASS** | ja | ja | ja | ja |
 | M-601 | Simulatie-integriteit | **PASS** | ja | ja | ja | ja |
 
-21 invarianten: 5 PASS, 7 PARTIAL, 6 ABSENT, 3 VIOLATION; 70 geteld schendende plekken.
+21 invarianten: 6 PASS, 6 PARTIAL, 6 ABSENT, 3 VIOLATION; 70 geteld schendende plekken.
 
 ### M-001: Economische waarheid
 
@@ -269,7 +293,7 @@ Stand: **PARTIAL**
 
 - **World**: PARTIAL
   - Autoriteit: server/kern/spellen/magnaat/weergave.js
-  - Handhaver: `server/kern/spellen/magnaat/weergave.js`, `geld: rond(st.geld[mij] || 0),`; `server/kern/spellen/magnaat/weergave.js`, `return (st.contracten || []).filter(c => partij(c, h))`
+  - Handhaver: `server/kern/spellen/magnaat/weergave.js`, `geld: euroTonen(st.geld[mij] || 0),`; `server/kern/spellen/magnaat/weergave.js`, `return (st.contracten || []).filter(c => partij(c, h))`
   - Toets: `test/spelmagnaat.test.js`, "bij de economie zijn de boeken van een ander niet van jou"; `test/spelveiling.test.js`, "niemand ziet andermans bod, ook niet in de publieke of kijkerweergave"
   - Waarom hooguit PARTIAL: geldt voor wat SPELERS te zien krijgen; er zijn nog geen NPC-bedrijven, dus voor beslissende niet-spelers bestaat er geen informatiemodel
 
@@ -575,18 +599,18 @@ Stand: **PARTIAL**
 
 > Geld is een geheel aantal eurocenten: het grootboek rondt nooit af en weigert elk ander bedrag, en een economische gebeurtenis wordt een keer afgerond voordat er geboekt wordt, zodat beide kanten exact hetzelfde bedrag dragen.
 
-Stand: **PARTIAL**
+Stand: **PASS**
 
 - **Grootboek**: PASS
   - Autoriteit: server/kern/magnaat-grootboek/geld.js
   - Handhaver: `server/kern/magnaat-grootboek/geld.js`, `if (typeof n !== 'number' || !Number.isSafeInteger(n) || n < 0) {`
   - Toets: `test/magnaat-grootboek.test.js`, "5. het grootboek accepteert alleen gehele, niet-negatieve eurocenten en rondt nooit af"
-- **World**: ABSENT
-  - Autoriteit: geen: World rekent in euro's met drijvende komma
-  - Handhaver: NIEMAND
-  - Toets: NIEMAND
+- **World**: PASS
+  - Autoriteit: server/kern/spellen/magnaat/centen.js, de ene plek waar World een bedrag tot geld maakt
+  - Handhaver: `server/kern/spellen/magnaat/centen.js`, `const uit = Math.round(Number(cent.toFixed(6)));`; `server/kern/spellen/magnaat/maand.js`, `betaling[c.id] = naarCenten(H.afwikkelen(c,`
+  - Toets: `test/magnaat-world-geld.test.js`, "4. na elke stap is elk monetair veld een geheel aantal eurocenten"; `test/magnaat-world-geld.test.js`, "5. een contractbetaling draagt aan beide kanten exact hetzelfde bedrag"
 
-**Migratie.** World rekent in hele eurocenten met een canonieke geldfunctie die een gebeurtenis een keer afrondt (ronde A2.1).
+**Migratie.** Geen voor World en het grootboek: sinds ronde A2.1 rekent World in hele eurocenten en wordt een gebeurtenis een keer afgerond. Wat nog rest is dat World zijn geld nog niet via het grootboek boekt (A2.3 t/m A2.9).
 
 **Faalwijze.** De betaler betaalt 10,01 en de ontvanger krijgt 10,00: een cent ontstaat of verdwijnt uit het niets.
 

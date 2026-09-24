@@ -31,7 +31,9 @@ module.exports = (kern, { mijn, stuur, nietGevonden }) => {
     if (!reg.length) mist.push('een registratie (bijvoorbeeld het KvK-nummer)');
     if (!herkend) mist.push('een bestuurder of gevolmachtigde op zijn RTG-codenaam');
     if (mist.length) return res.status(409).json({ error: 'Voor een rekening mist deze entiteit nog: ' + mist.join(' en ') + '.', mist });
-    const b = req.body || {};
-    stuur(res, await entiteitRekeningOpen({ entiteitId: e.id, naam: b.naam, idem: b.idem }));
+    /* Geen eigen idem-sleutel: een identieke herhaling vangt de centrale laag
+       (server/middleware/idempotentie.js), en een ANDER verzoek voor dezelfde
+       entiteit weigert kern/bank/entiteit.js op de toestand (een per entiteit). */
+    stuur(res, await entiteitRekeningOpen({ entiteitId: e.id, naam: (req.body || {}).naam }));
   });
 };

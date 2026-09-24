@@ -564,7 +564,6 @@
       "werkplek"
     ],
     "kantoren": [
-      "beleidsmotor",
       "afdelingen",
       "aidataExport",
       "aidataOverzicht",
@@ -587,6 +586,7 @@
       "bankTerugstorting",
       "bankTerugstortingZet",
       "bankVergunningZet",
+      "beleidsmotor",
       "betaal",
       "betaalRegie",
       "bevoegd",

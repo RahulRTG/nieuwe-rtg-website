@@ -1464,6 +1464,11 @@ function tekenMagnaatEco(){
   $('#ecSinds').innerHTML = !sinds || !sinds.regels.length ? '' :
     '<div class="sec">Afgelopen maand</div>' + sinds.regels.map(r => r.id === 'rood'
       ? '<div class="rij"><div class="nm">Rood staan<small>rente over je negatieve kas</small></div><b style="color:#C23A5E;">' + ecGeld(-r.rente) + '</b></div>'
+      /* Wat geen zaak is (een lening, een schade, de Foundation-afdracht) heeft
+         geen bezetting en geen omzet: alleen een naam en wat het kostte. */
+      : typeof r.bezetting !== 'number'
+      ? '<div class="rij"><div class="nm">' + esc(r.naam) + (r.zaak ? '<small>' + esc(r.zaak) + '</small>' : '') + '</div>' +
+        '<b style="color:' + ((r.resultaat || 0) >= 0 ? '#5FA56A' : '#C23A5E') + ';">' + ecGeld(r.resultaat || 0) + '</b></div>'
       : '<div class="rij"><div class="nm">' + esc(r.naam) + '<small>' + r.bezetting + '% bezet · omzet ' + ecGeld(r.omzet) +
         (r.gemist ? ' · ' + r.gemist + ' misgelopen' : '') + '</small></div>' +
         '<b style="color:' + (r.resultaat >= 0 ? '#5FA56A' : '#C23A5E') + ';">' + ecGeld(r.resultaat) + '</b></div>').join('') +

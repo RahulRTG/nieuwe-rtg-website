@@ -96,6 +96,7 @@ module.exports = (sctx) => {
     if (s.stand !== 'goedgekeurd') return res.status(409).json({
       error: 'Deze uitgave is nog niet goedgekeurd. Nog nodig: ' + s.ontbreekt.join(' en ') + '.' });
     const bw = sctx.betaalwijze(g.w);
+    if (bw.wijze === 'entiteit') return res.status(409).json({ error: 'Deze werkruimte betaalt vanaf de entiteit: gebruik Betalen (/uitgave/betaal).' });
     let kenmerk = schoon(req.body.kenmerk, 60);
     if (bw.wijze === 'rekening') {
       const f = viaBank(g, u, String(req.body.opdrachtId || ''));

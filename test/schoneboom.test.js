@@ -153,8 +153,13 @@ test('14. een wijziging buiten het instrument veroudert het register niet', () =
   /* Een PR-checkout voegt een synthetische mergecommit toe. Daardoor viel het
      vaste bewijsgeval precies als nummer 41 buiten het oude venster van 40,
      terwijl dezelfde toets op de brontak wel groen was. Houd genoeg echte
-     historie over om niet van die checkoutvorm afhankelijk te zijn. */
-  const commits = spawnSync('git', ['log', '--format=%h', '-200', 'HEAD'],
+     historie over om niet van die checkoutvorm afhankelijk te zijn.
+     Tweede keer (24 september 2026): een PR-tak met twee samenvoegingen van
+     main en een reeks registercommits duwde het enige geval van plaats 186
+     naar 205, en de toets zakte zonder dat versheid() veranderde. Het venster
+     meet dus niets over de code maar over de lengte van de historie; CI haalt
+     die volledig op (fetch-depth: 0), dus het venster mag ruim zijn. */
+  const commits = spawnSync('git', ['log', '--format=%h', '-1000', 'HEAD'],
     { cwd: WORTEL2, encoding: 'utf8' }).stdout.split('\n').filter(Boolean);
 
   /* Per commit zijn EIGEN wijziging (ouder..commit), en niet de opgetelde

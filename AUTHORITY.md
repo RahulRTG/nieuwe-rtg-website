@@ -607,8 +607,36 @@ Dus:
 SEPA-opdracht; twaalf mutaties laten hem zakken. Twee zakten eerst NIET, en dat
 waren zwakke beweringen: de eigenaarsgrendel werd alleen met de gedeelde code
 beproefd (die al eerder faalde), en een externe met dezelfde naam als een lid
-kwam in geen toets voor. **Wat bewust nog niet staat**: een rekening op naam van
-de werkruimte zelf (wie is dan rekeninghouder, en onder welke vergunning).
+kwam in geen toets voor. *Een rekening op naam van de entiteit* (besluit van de eigenaar, 24 september
+2026). Eerst gemeten: een RTG-rekening hoort bij precies een houder
+(`kern/bank/eigendom.js`), maar die houder hoeft geen mens te zijn -- een zaak
+bankiert al onder `zaak:<code>`. Een entiteit uit de concerngraaf bankiert daarom
+onder `entiteit:<id>` (`kern/bank/entiteit.js`): zelfde grootboek, zelfde
+bankregie en vergunningsgrendel, zelfde eigendomscontrole, en GEEN tweede soort
+rekening. Vier grendels:
+
+- RTG zet het product open (`/api/office/bank/entiteitrekening/zet`, alleen de
+  eigenaar met de passkey `eigenaar-entiteitrekening`), standaard DICHT: een
+  rechtspersoon is een nieuw soort klant;
+- openen doet de eigenaar van de entiteit (`/api/concern/rekening/open`), met een
+  KYC-minimum dat de graaf al kent -- een registratie en een HERKENDE bestuurder --
+  en een per entiteit;
+- de vlag `entiteit:` wordt alleen geaccepteerd van die ene aanroeper: de
+  kantoorroute neemt de codenaam uit het verzoek, dus langs daar zou iedereen met
+  de gedeelde code een rekening op naam van andermans bedrijf kunnen openen;
+- er gaat ALLEEN geld af langs het Werk OS: betaalwijze `entiteit`, een uitgave die
+  rond is, `/api/bedrijf/uitgave/betaal` door een ander dan de indiener, met de
+  uitgave als idempotentiesleutel -- en "betaald noteren" weigert bij deze wijze,
+  want het geld komt echt van de rekening of er staat niets.
+
+De eigenaar ziet de rekening in RTG Concern; de twee schakelaars van RTG staan in
+de boardroom onder *RTG Rekening voor bedrijven*. `test/entiteitrekening.test.js`
+loopt de hele keten met echt geld in het grootboek; tien mutaties zakken, waarvan
+de eigenaarscontrole van de schakelaar pas na een extra bewering. **Wat bewust nog
+niet staat**: een rekening op naam van de WERKRUIMTE zelf (die is geen
+rechtspersoon), en een volledige KYC voor een rechtspersoon (UBO-verificatie tegen
+een register) -- het minimum hier is wat de graaf weet, en de UBO in de graaf is
+een opgave en geen bewijs.
 
 *Samen tekenen: het bedrijf kiest* (besluit van de eigenaar, 24 september 2026).
 Een gekoppelde werkruimte heeft een tekenwijze (`bedrijf/samentekenen.js`), en

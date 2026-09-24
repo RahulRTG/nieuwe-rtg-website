@@ -116,6 +116,15 @@
       <p class="rtg-uitleg" id="dsUit" aria-live="polite"></p>
     </section>
 
+    <!-- RTG Rekening voor bedrijven: twee schakelaars van RTG, allebei standaard
+         dicht en alleen voor de eigenaar met de vinger (kern/werkbetaling.js en
+         kern/bank/entiteit.js). -->
+    <section class="rtg-groep" id="rbSectie" hidden>
+      <h2 data-i18n="rb.h">RTG Rekening voor bedrijven</h2>
+      <p class="rtg-uitleg" data-i18n="rb.sub">Twee wegen die RTG bewust opent: een Werk OS-uitgave betalen vanaf de eigen RTG-rekening van een lid, en een rekening op naam van een entiteit uit de concerngraaf.</p>
+      <div id="rbLijst"></div>
+    </section>
+
     <!-- De kantoordeuren (AUTHORITY.md fase 1): per deur schaduw of afdwingen.
          Afdwingen kan pas als de schaduw rijp is en de motor nooit oneens was;
          de server rekent dat uit, deze sectie toont alleen wat hij zegt. -->
@@ -188,6 +197,8 @@ window.I18N = { en: {
   'ds.sub':'A box with its own key is proven; a box on the shared key only states its own name. The shared key closes once nobody is listed below.',
   'ds.laden':'Loading boxes…', 'ds.ph':'Name of the box', 'ds.geef':'Give its own key',
   'ds.gedeeld':'Still on the shared key (last seven days)', 'ds.geengedeeld':'No box reported on the shared key in the last seven days.',
+  'rb.h':'RTG Account for businesses', 'rb.sub':'Two ways RTG opens on purpose: paying a Work OS expense from a member\'s own RTG account, and an account in the name of an entity from the company graph.',
+  'rb.werk':'Work OS expense via a member account', 'rb.ent':'Accounts for entities', 'rb.open':'open', 'rb.dicht':'closed', 'rb.zetOpen':'Open', 'rb.zetDicht':'Close', 'rb.ok':'Switched.',
   'bm.h':'The office doors', 'bm.sub':'The policy engine runs alongside every office door. In the shadow it only counts; when enforced it refuses next to the gate, never instead of it.',
   'bm.laden':'Loading doors…', 'bm.aan':'Enforce', 'bm.uit':'Back to the shadow', 'bm.schaduw':'shadow', 'bm.afdwingen':'enforced', 'bm.ok':'The door has been switched.',
   'ds.stand':'The shared key', 'ds.isdicht':'closed: only a box with its own key gets in', 'ds.isopen':'open (shadow): it still works',
@@ -448,6 +459,32 @@ window.I18N = { en: {
       rij(e, x.doos, T('ds.sinds', 'eigen sleutel sinds ') + datum(x.sinds), k);
     });
   }
+  /* ---- RTG Rekening voor bedrijven: twee schakelaars ---- */
+  function laadRekeningen() {
+    var wegen = [
+      { lees: '/api/office/werkos/bankpad', zet: '/api/office/werkos/bankpad/zet', veld: 'aan', naam: T('rb.werk', 'Werk OS-uitgave via de rekening van een lid') },
+      { lees: '/api/office/bank/entiteitrekening', zet: '/api/office/bank/entiteitrekening/zet', veld: 'open', naam: T('rb.ent', 'Rekeningen voor entiteiten') }
+    ];
+    return Promise.all(wegen.map(function (w) { return post(w.lees, {}); })).then(function (st) {
+      $('rbSectie').hidden = false;
+      var box = $('rbLijst'); box.textContent = '';
+      wegen.forEach(function (w, i) {
+        var aan = st[i][w.veld] === true, k = null;
+        if (zetelBaas) {
+          k = el('button', 'rtg-knop', aan ? T('rb.zetDicht', 'Zet dicht') : T('rb.zetOpen', 'Zet open'));
+          k.type = 'button'; k.setAttribute('data-weg', w.veld);
+          k.addEventListener('click', function () {
+            k.disabled = true;
+            var body = {}; body[w.veld] = !aan;
+            metVinger(w.zet, body).then(function () { zeg(T('rb.ok', 'Omgezet.'), 'goed'); return laadRekeningen(); })
+              .catch(function (er) { zeg(er.message, 'fout'); k.disabled = false; });
+          });
+        }
+        rij(box, w.naam + ' · ' + (aan ? T('rb.open', 'open') : T('rb.dicht', 'dicht')), st[i].uitleg || '', k);
+      });
+    }).catch(function () { /* geen boardroom: de sectie blijft verborgen */ });
+  }
+
   /* ---- de kantoordeuren: schaduw of afdwingen ---- */
   function laadDeuren() {
     return post('/api/office/beleidsmotor', {}).then(function (d) {
@@ -513,7 +550,7 @@ window.I18N = { en: {
     laadRegister(true).then(function (ok) {
       if (!ok) return;
       tabrij();
-      laadZetels().then(laadDozen).then(laadDeuren);
+      laadZetels().then(laadDozen).then(laadDeuren).then(laadRekeningen);
       $('dsGeef').addEventListener('click', geefDoosSleutel);
       $('dsNaam').addEventListener('keydown', function (e) { if (e.key === 'Enter') geefDoosSleutel(); });
       $('bzGeef').addEventListener('click', geefZetel);

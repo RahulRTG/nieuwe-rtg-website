@@ -6,7 +6,7 @@
    Draai: node --test test/scan-tafel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -61,7 +61,7 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
        hieronder op wachten. */
     const statusAntwoord = page.waitForResponse(
       r => r.url().includes('/api/onboarding/status'), { timeout: 30000 }).catch(() => null);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'domcontentloaded' });
     await statusAntwoord;
 
     // 4) de eigen QR-onderdelen zijn geladen en scannen is bereikbaar. Sinds

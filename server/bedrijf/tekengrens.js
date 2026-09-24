@@ -72,7 +72,9 @@ module.exports = (sctx) => {
   app.post('/api/bedrijf/werkruimte/betaalwijze', (req, res) => {
     const g = werkPoort(req, res, 'werkruimte'); if (!g) return;
     const wijze = String(req.body.wijze || '');
-    if (!['extern', 'rekening'].includes(wijze)) return res.status(400).json({ error: 'Kies extern of rekening.' });
+    if (!['extern', 'rekening', 'entiteit'].includes(wijze)) return res.status(400).json({ error: 'Kies extern, rekening of entiteit.' });
+    if (wijze === 'entiteit' && !(g.w.entiteitId && kern.entiteitRekening(g.w.entiteitId))) return res.status(409).json({
+      error: 'Betalen vanaf de entiteit kan pas als de werkruimte aan een entiteit hangt die een RTG-rekening heeft.' });
     const rtg = kern.werkBankpadStand();
     if (wijze === 'rekening' && !rtg.aan) return res.status(409).json({
       error: 'RTG heeft betalen via RTG Rekening voor werkruimtes (nog) niet aangezet.', uitleg: rtg.uitleg });
@@ -84,6 +86,13 @@ module.exports = (sctx) => {
 
   /* Welke weg geldt NU: de keuze van de werkruimte, tenzij RTG de weg dicht heeft. */
   function betaalwijze(w) {
+    /* Vanaf de rekening van de entiteit (./entiteitbetaling.js): alleen zolang de
+       koppeling en de rekening er zijn; anders buiten RTG, met de reden. */
+    if (w.betaalwijze === 'entiteit') {
+      const r = w.entiteitId ? kern.entiteitRekening(w.entiteitId) : null;
+      return r ? { wijze: 'entiteit', gekozen: 'entiteit', reden: null, iban: r.iban }
+        : { wijze: 'extern', gekozen: 'entiteit', reden: 'De werkruimte hangt niet (meer) aan een entiteit met een RTG-rekening; tot dat zo is, wordt buiten RTG betaald.' };
+    }
     if (w.betaalwijze !== 'rekening') return { wijze: 'extern', gekozen: w.betaalwijze || 'extern', reden: null };
     const rtg = kern.werkBankpadStand();
     return rtg.aan ? { wijze: 'rekening', gekozen: 'rekening', reden: null }

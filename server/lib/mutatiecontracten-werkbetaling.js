@@ -58,6 +58,44 @@ const CONTRACTEN = {
     nagekeken: 'met de hand, 2026-09-24: kern/beleidsmotor/afdwingen.js zet() schrijft aan, door en at voor een deur',
     afgetekend: AF
   },
+  /* De rekening op naam van een entiteit (kern/bank/entiteit.js, 24 september 2026). */
+  'POST /api/concern/rekening': {
+    mutatieId: 'concern.rekening', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'entiteit' }, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/entiteitrekening.test.js toets 1-2: lezen, voor de eigenaar; een ander krijgt 404', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: de handler leest entiteitRekeningStand() en entiteitRekening(); geen schrijfactie',
+    afgetekend: AF
+  },
+  'POST /api/concern/rekening/open': {
+    mutatieId: 'concern.rekening.open', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'entiteit' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/entiteitrekening.test.js toets 1-2: een tweede opening geeft 409 met de bestaande rekening; ' +
+      'er komt er nooit een tweede. Een toestandscontrole en geen duplicaatlaag', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: kern/bank/entiteit.js open() weigert als er al een rekening met de vlag is',
+    afgetekend: AF
+  },
+  'POST /api/bedrijf/uitgave/betaal': {
+    mutatieId: 'bedrijf.uitgave.betaal', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: WERK, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/entiteitrekening.test.js toets 3-4: een tweede druk geeft 409 en het saldo blijft gelijk; ' +
+      'de bank draagt de uitgave als idempotentiesleutel', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: bedrijf/entiteitbetaling.js weigert zodra u.betaald staat, en entiteitBetaal geeft altijd een sleutel mee',
+    afgetekend: AF
+  },
+  'POST /api/office/bank/entiteitrekening': {
+    mutatieId: 'office.bank.entiteitrekening', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/entiteitrekening.test.js toets 1-2: de stand lezen, standaard dicht', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: de handler roept alleen entiteitRekeningStand() aan',
+    afgetekend: AF
+  },
+  'POST /api/office/bank/entiteitrekening/zet': {
+    mutatieId: 'office.bank.entiteitrekening.zet', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/entiteitrekening.test.js toets 1-2: open en dicht zijn een toestand', op: '2026-09-24' },
+    nagekeken: 'met de hand, 2026-09-24: kern/bank/entiteit.js zet() schrijft open, door en at op de ene kaart',
+    afgetekend: AF
+  },
   'POST /api/office/werkos/bankpad': {
     mutatieId: 'office.werkos.bankpad', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',

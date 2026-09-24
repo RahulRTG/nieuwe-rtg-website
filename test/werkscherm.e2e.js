@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, bankDeur } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, bankDeur, pasAppAdres } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkscherm-'));
@@ -158,6 +158,9 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
       body: JSON.stringify({ login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran' }) })
       .then(r => r.json());
     assert.ok(inlog.token, 'de eigenaar kan inloggen: ' + JSON.stringify(inlog).slice(0, 120));
+    /* De pas-app van de eigenaar en niet het kale /apps/app.html: dat leidt
+       zichzelf om, en daar racete deze toets mee (zie pasAppAdres in helper.js). */
+    const appAdres = await pasAppAdres(base, inlog.token);
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
@@ -221,7 +224,7 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
        (`link:office`, `os:werk`). Die verandert alleen als de app echt een
        andere app wordt. De zichtbare namen gaan wel mee in de foutmelding,
        want daarmee zoek je hem terug op het scherm. */
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(appAdres, { waitUntil: 'domcontentloaded' });
     /* De werktafel is er pas als de schil zijn wereldbank heeft opgebouwd; dat
        is wat de lus hieronder nodig heeft. */
     await wachtTot(page, () => !!document.querySelector('#rtgCommand, .cmd-bank, #osZoek'),
@@ -254,9 +257,10 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
        rest van de suite hier ook doet. */
     await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
       status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
-      null, { timeout: 30000 });
+    await page.goto(appAdres, { waitUntil: 'domcontentloaded' });
+    await wachtTot(page, () => document.getElementById('app')?.classList.contains('active'),
+      null, { ms: 30000, wat: 'de app van de eigenaar (#app.active) op ' + appAdres });
+    assert.equal(new URL(page.url()).search, new URL(appAdres).search, 'de app leidde niet alsnog om: ' + page.url());
     await bankDeur(page, 'Instellingen', { timeout: 20000 });
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcZoek');

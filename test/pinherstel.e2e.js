@@ -27,7 +27,7 @@
    RTG_CHROMIUM=... node --test test/pinherstel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, bankDeur } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, bankDeur, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -133,7 +133,7 @@ test('pin-herstel: de link uit de mail zet een nieuwe pin die werkt', { skip }, 
 test('pin-herstel: "Pin vergeten?" staat in het pin-scherm en start de stroom', { skip }, async () => {
   await omgeving(async ({ base, browser }) => {
     const token = await lidMetPin(base, '246810');
-    const { page, fouten } = await ingelogd(browser, base, token, '/apps/app.html');
+    const { page, fouten } = await ingelogd(browser, base, token, (await pasAppAdres(base, token)).slice(base.length));
 
     // De drie hoofdwerelden hebben losse apptegels vervangen. Pinbeheer blijft
     // daarom als vaste, zichtbare ingang in het bedieningspaneel bereikbaar --

@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { browserOpties, geenBrowser, laadPlaywright, startServer, stop } = require('./helper');
+const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, pasAppAdres } = require('./helper');
 const pw = laadPlaywright();
 
 const SCHERMEN = [
@@ -211,7 +211,7 @@ test('Edge voert appbediening uit, controleert actuele beschikbaarheid en sluit 
       localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, account.token);
     const page = await context.newPage();
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(await pasAppAdres(base, account.token), { waitUntil: 'domcontentloaded' });
     await wacht(page, '/apps/app.html');
     await page.waitForSelector('#rtgCommand[data-stand="open"]');
     assert.equal(await page.locator('.cmd-balk').isVisible(), false);

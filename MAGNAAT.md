@@ -268,7 +268,7 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 | M-002 | Mens- en werkwaarheid | **ABSENT** | ja | nee | nee | nee |
 | M-003 | Informatiewaarheid | **PARTIAL** | ja | ja | ja | ja |
 | M-004 | Economische waarheid | **PASS** | ja | ja | ja | ja |
-| M-005 | Economische waarheid | **VIOLATION** | ja | ja | nee | nee |
+| M-005 | Economische waarheid | **PARTIAL** | ja | ja | nee | nee |
 | M-006 | Spelzuiverheid | **ABSENT** | ja | nee | nee | nee |
 | M-007 | AI-grens | **ABSENT** | ja | nee | nee | nee |
 | M-008 | Spelzuiverheid | **ABSENT** | ja | nee | nee | nee |
@@ -286,7 +286,7 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 | M-020 | Economische waarheid | **PASS** | ja | ja | ja | ja |
 | M-601 | Simulatie-integriteit | **PASS** | ja | ja | ja | ja |
 
-21 invarianten: 6 PASS, 6 PARTIAL, 6 ABSENT, 3 VIOLATION; 14 geteld schendende plekken.
+21 invarianten: 6 PASS, 7 PARTIAL, 6 ABSENT, 2 VIOLATION; 6 geteld schendende plekken.
 
 ### M-001: Economische waarheid
 
@@ -294,11 +294,11 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 
 Stand: **VIOLATION**
 
-- **World**: VIOLATION
+- **World**: ABSENT
   - Autoriteit: geen: het saldo zelf (st.geld) is de waarheid
   - Handhaver: NIEMAND
   - Toets: NIEMAND
-  - Schending: 4, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
+  - Schending: 0, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
 - **Grootboek**: PASS
   - Autoriteit: server/kern/magnaat-grootboek/, het journaal
   - Handhaver: `server/kern/magnaat-grootboek/boeken.js`, `function boek(p, sleutel, soort, omschrijving, regels, labels = [])`
@@ -371,13 +371,13 @@ Stand: **PASS**
 
 > Een transactie heeft minimaal twee economische zijden, en debet is gelijk aan credit.
 
-Stand: **VIOLATION**
+Stand: **PARTIAL**
 
-- **World**: VIOLATION
+- **World**: ABSENT
   - Autoriteit: geen: er is geen journaal
   - Handhaver: NIEMAND
   - Toets: NIEMAND
-  - Schending: 4, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
+  - Schending: 0, een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost
 - **Grootboek**: PASS
   - Autoriteit: server/kern/magnaat-grootboek/, het journaal
   - Handhaver: `server/kern/magnaat-grootboek/boeken.js`, `throw new Error('Ongebalanceerde journaalpost geweigerd: '`

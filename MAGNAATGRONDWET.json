@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T12:04:00.126Z",
-    "commit": "9f14e9267",
+    "op": "2026-09-24T13:07:42.240Z",
+    "commit": "fda58e251",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/magnaatgrondwet.js",
@@ -23,7 +23,7 @@
     "afgedwongen": 9,
     "getoetst": 8
   },
-  "schendingen": 70,
+  "schendingen": 68,
   "perRegel": [
     {
       "id": "M-001",
@@ -34,7 +34,7 @@
       "geimplementeerd": true,
       "afgedwongen": false,
       "getoetst": false,
-      "schendingen": 35,
+      "schendingen": 34,
       "scopes": {
         "world": {
           "autoriteit": "geen: het saldo zelf (st.geld) is de waarheid",
@@ -42,7 +42,7 @@
           "toets": "NIEMAND",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
-            "aantal": 32,
+            "aantal": 31,
             "plekken": [
               "server/kern/spellen/magnaat/aandeel-acties.js:84",
               "server/kern/spellen/magnaat/aandeel-acties.js:85",
@@ -61,7 +61,6 @@
               "server/kern/spellen/magnaat/bank-maand.js:47",
               "server/kern/spellen/magnaat/bank-maand.js:71",
               "server/kern/spellen/magnaat/bank-maand.js:88",
-              "server/kern/spellen/magnaat/economie.js:67",
               "server/kern/spellen/magnaat/handel-acties.js:159",
               "server/kern/spellen/magnaat/handel-acties.js:159",
               "server/kern/spellen/magnaat/handel-acties.js:179",
@@ -203,7 +202,7 @@
       "geimplementeerd": true,
       "afgedwongen": false,
       "getoetst": false,
-      "schendingen": 32,
+      "schendingen": 31,
       "scopes": {
         "world": {
           "autoriteit": "geen: er is geen journaal",
@@ -211,7 +210,7 @@
           "toets": "NIEMAND",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
-            "aantal": 32,
+            "aantal": 31,
             "plekken": [
               "server/kern/spellen/magnaat/aandeel-acties.js:84",
               "server/kern/spellen/magnaat/aandeel-acties.js:85",
@@ -230,7 +229,6 @@
               "server/kern/spellen/magnaat/bank-maand.js:47",
               "server/kern/spellen/magnaat/bank-maand.js:71",
               "server/kern/spellen/magnaat/bank-maand.js:88",
-              "server/kern/spellen/magnaat/economie.js:67",
               "server/kern/spellen/magnaat/handel-acties.js:159",
               "server/kern/spellen/magnaat/handel-acties.js:159",
               "server/kern/spellen/magnaat/handel-acties.js:179",

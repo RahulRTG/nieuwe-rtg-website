@@ -10,7 +10,8 @@
    voorgelegde lezing in plaats van de eigen /proc.
 
    MUTATIES (LAT.md regel 2), elk gezien zakken voor deze toets erin ging:
-     - `lo >= 1024` terug naar `lo > 1024`          -> toets 1 zakt op "1024 65535"
+     - `lo >= 1` terug naar `lo > 1024`             -> toets 1 zakt op "1024 65535"
+     - `lo >= 1` naar `lo >= 1024`                   -> toets 1 zakt op "1 65535"
      - het venster boven het bereik weghalen        -> toets 3 zakt: reeks komt niet
      - de weigering zonder venster weghalen         -> toets 3 zakt op rejects */
 'use strict';
@@ -27,13 +28,16 @@ test('1. een geldige lezing wordt overgenomen, ook op de kernelgrens 1024', () =
   assert.deepEqual(efemeerBereik(() => '1024 61000'), [1024, 61000]);
   assert.deepEqual(efemeerBereik(() => '32768\t60999\n'), STANDAARD);
   assert.deepEqual(efemeerBereik(() => '49152 65535'), [49152, 65535]);
+  // wat de kernel aanneemt is echt: met ip_unprivileged_port_start op 0 mag lo tot 1
+  assert.deepEqual(efemeerBereik(() => '1 65535'), [1, 65535]);
 });
 
-test('2. onzin, een omgekeerd bereik, iets onder de kernelgrens en geen /proc geven de Linux-standaard', () => {
+test('2. onzin, een omgekeerd bereik, nul, een breuk en geen /proc geven de Linux-standaard', () => {
   assert.deepEqual(efemeerBereik(() => 'onzin'), STANDAARD);
   assert.deepEqual(efemeerBereik(() => ''), STANDAARD);
   assert.deepEqual(efemeerBereik(() => '60999 32768'), STANDAARD);
-  assert.deepEqual(efemeerBereik(() => '80 65535'), STANDAARD);
+  assert.deepEqual(efemeerBereik(() => '0 65535'), STANDAARD);
+  assert.deepEqual(efemeerBereik(() => '1.5 65535'), STANDAARD);
   assert.deepEqual(efemeerBereik(() => '1024 70000'), STANDAARD);
   assert.deepEqual(efemeerBereik(() => { throw new Error('ENOENT'); }), STANDAARD);
 });

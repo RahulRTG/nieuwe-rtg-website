@@ -277,7 +277,9 @@ test('een automatisch ontdekt werkproces opent het echte scherm en rondt het syn
   assert.ok(r.taak.economischEffect);
   assert.equal(db.data.orders, undefined);
   assert.equal(db.data.pay, undefined);
-  assert.deepEqual(Object.keys(db.data), ['magnaatWereld']);
+  /* Alleen de twee spelcollecties: de wereld en, sinds ronde A1, het journaal
+     van de economische motor. Geen enkele productiecollectie. */
+  assert.deepEqual(Object.keys(db.data).sort(), ['magnaatJournaal', 'magnaatWereld']);
 });
 
 test('een volledig servicedossier gebruikt drie echte RTG-schermen en vier gevalideerde werkhandelingen', () => {
@@ -313,7 +315,9 @@ test('een volledig servicedossier gebruikt drie echte RTG-schermen en vier geval
   assert.equal(r.taak.status, 'klaar');
   assert.equal(db.data.orders, undefined);
   assert.equal(db.data.pay, undefined);
-  assert.deepEqual(Object.keys(db.data), ['magnaatWereld']);
+  /* Alleen de twee spelcollecties: de wereld en, sinds ronde A1, het journaal
+     van de economische motor. Geen enkele productiecollectie. */
+  assert.deepEqual(Object.keys(db.data).sort(), ['magnaatJournaal', 'magnaatWereld']);
 });
 
 test('een onvolledige dossierhandeling wordt geweigerd en raakt de werklog niet', () => {

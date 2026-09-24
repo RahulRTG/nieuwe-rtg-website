@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const maak = require('../server/kern/magnaat-economie');
+const maak = require('../server/kern/magnaat-oefeneconomie');
 
 function motor() {
   const wereld = {};
@@ -41,8 +41,8 @@ test('inkoop kapitaliseert voorraad en verkoop boekt de kostprijs in de resultat
   assert.equal(lab.balans.controle.verschil, 0);
   assert.equal(lab.kasstroom.controle, 0);
   assert.equal(lab.kasstroom.begin + lab.kasstroom.mutatie, lab.kasstroom.eind);
-  const inkoop = wereld.economie.journaal.find(j => j.sleutel === 'dag:1:inkoop:praktijk');
-  const kostprijs = wereld.economie.journaal.find(j => j.sleutel === 'dag:1:kostprijs:praktijk');
+  const inkoop = economie._gebeurtenissen().find(j => j.sleutel === 'dag:1:inkoop:praktijk');
+  const kostprijs = economie._gebeurtenissen().find(j => j.sleutel === 'dag:1:kostprijs:praktijk');
   assert.ok(inkoop.regels.some(r => r.rekening === 'praktijk.voorraad' && r.debet > 0));
   assert.ok(kostprijs.regels.some(r => r.rekening === 'praktijk.voorraad' && r.credit > 0));
 });

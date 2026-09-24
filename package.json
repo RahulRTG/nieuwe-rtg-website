@@ -67,6 +67,7 @@
     "websitewaarheid:controle": "node scripts/websitewaarheid.js --controle",
     "websitebeelden": "node scripts/websitebeelden.js && node scripts/websitewaarheid.js",
     "handelingindex": "node scripts/handelingindex.js",
+    "magnaat:grondwet": "node scripts/magnaatgrondwet.js",
     "handelingindex:controle": "node scripts/handelingindex.js --controle",
     "vindbaar": "node scripts/vindbaar.js",
     "rommeltaal": "node scripts/rommeltaal.js",

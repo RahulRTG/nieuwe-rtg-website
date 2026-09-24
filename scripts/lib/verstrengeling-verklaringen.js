@@ -143,6 +143,8 @@ module.exports = [
     reden: 'spellen/projectie.js orkestreert een potje met de aparte toegangscyclus voor projectieschermen; de spelprojectie blijft eigenaar van het getoonde spel, de toegang van het credential' },
 
   /* ---- EEN OPEN VRAAG, EN DIE WORDT NIET WEGGESCHREVEN ---- */
+  { van: 'domein:spellen', naar: 'domein:magnaat-grootboek', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'kern/spellen/magnaat/boekhouding.js boekt World via het Magnaat-grootboek: de ene boekhoudautoriteit onder elke Magnaat-economie (MAGNAAT.md, besluit 4 van ronde A2). Een eigen boekhouding in World ernaast zou een tweede boekhoudwaarheid zijn; het grootboek kent geen domein (grondwetregel M-601)' },
   { van: 'domein:spellen', naar: 'domein:hospitality-universe', soort: 'DOMEINRELATIE',
     reden: 'Magnaat leest het wereldmodel van de hospitality-universe (economie.js r.48, r.151). MAGNAATLAB.md noemt dit met zoveel woorden: er staan TWEE synthetische werelden die elkaar aanroepen, en die vraag hoort beantwoord vóór er een derde bij komt. De rand is dus bekend en bedoeld; de vraag erachter staat open en staat daar' },
 
@@ -217,8 +219,8 @@ module.exports = [
     reden: 'magnaatwereld.js is 58 KB en is opgeknipt in magnaat-*; dit is een van die delen (GAMEHALL.md)' },
   { van: 'domein:magnaatwereld', naar: 'domein:magnaat-capabilities', soort: 'EIGEN_DATA',
     reden: 'zelfde opknipping van magnaatwereld.js' },
-  { van: 'domein:magnaatwereld', naar: 'domein:magnaat-economie', soort: 'EIGEN_DATA',
-    reden: 'zelfde opknipping van magnaatwereld.js' },
+  { van: 'domein:magnaatwereld', naar: 'domein:magnaat-oefeneconomie', soort: 'EIGEN_DATA',
+    reden: 'zelfde opknipping van magnaatwereld.js: de economie van het Oefenkantoor, sinds ronde A1 een consument van de economische motor (MAGNAAT.md)' },
   { van: 'domein:magnaatwereld', naar: 'domein:magnaat-trainingslobby', soort: 'EIGEN_DATA',
     reden: 'zelfde opknipping van magnaatwereld.js' },
   { van: 'domein:magnaatwereld', naar: 'domein:magnaat-controle', soort: 'EIGEN_DATA',

@@ -184,9 +184,11 @@ test('npm run telefoon: de POORTWACHTER termineert https, en dat is het commando
        poort+10 ook vrij zou zijn" scheelde -- die belofte maakte de code niet
        waar, en de buren van een vrije poort liggen op Linux precies in de
        bronpoortruimte van elke fetch() (zie vrijePoortReeks in ./helper.js en
-       de kop van test/trio-wees.test.js). Veertien aaneengesloten poorten
-       buiten het efemere bereik dekken PORT, de drie servers en PORT+10. */
-    const reeks = await vrijePoortReeks(14);
+       de kop van test/trio-wees.test.js). Elf aaneengesloten poorten buiten
+       het efemere bereik dekken alles wat het trio afleidt: reeks[0] is PORT,
+       reeks[1..3] zijn de drie servers, reeks[10] is PORT+10 -- meer leidt
+       server/trio*.js nergens af. */
+    const reeks = await vrijePoortReeks(11);
     const port = reeks[0];
     const trioBasis = reeks[1];
     const env = Object.assign({}, process.env, {

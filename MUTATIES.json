@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T20:09:39.200Z",
-    "commit": "ef1a5c26",
+    "op": "2026-09-24T16:11:39.741Z",
+    "commit": "e5e2eb9f",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 7,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -495,22 +495,6 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
-    "appcluster.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/appcluster.js",
-      "operator": "===->!==#0",
-      "gezakt": 5,
-      "geprobeerd": 1
-    },
-    "appcontract.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bewijsbron.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
     "appstore-bereik.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -791,14 +775,6 @@
       "gezakt": 3,
       "geprobeerd": 2
     },
-    "bedieningsmeting.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bedieningsmeting.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 1
-    },
     "bedrading.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1047,14 +1023,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
-    },
-    "bestemming.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bestemming.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
     },
     "betaaldienst.test.js": {
       "soort": "server",
@@ -3200,14 +3168,6 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
-    "foutindeling.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/foutindeling.js",
-      "operator": "false->true#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
     "foutmelder-dekking.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5160,7 +5120,7 @@
     "magnaat-economenlab.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 2
@@ -5168,10 +5128,26 @@
     "magnaat-economie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
-      "gezakt": 7,
+      "gezakt": 11,
       "geprobeerd": 2
+    },
+    "magnaat-economische-motor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "magnaat-grootboek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "magnaat-hospitality.test.js": {
       "soort": "puur",
@@ -5230,7 +5206,7 @@
     "magnaat-rust-integratie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
@@ -5258,6 +5234,38 @@
       "operator": ">=->>#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "magnaat-world-boekhouding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/boekhouding.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "magnaat-world-geld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/centen.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "magnaatgeldkaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "return-weg#1",
+      "gezakt": 4,
+      "geprobeerd": 13
+    },
+    "magnaatgrondwet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/magnaatgrondwet.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "magnaatlab.test.js": {
       "soort": "puur",
@@ -6922,6 +6930,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet"
+    },
+    "poortreeks.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "test/helper.js",
+      "operator": ">=->>#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "poortwacht.test.js": {
       "soort": "puur",
@@ -8656,7 +8672,7 @@
       "staat": "gezakt",
       "module": "server/kern/spellen/magnaat/kaart.js",
       "operator": "===->!==#0",
-      "gezakt": 14,
+      "gezakt": 15,
       "geprobeerd": 1
     },
     "spelverzekering.test.js": {
@@ -10062,14 +10078,6 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
-    "wereldcompositor.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/wereldcompositor.js",
-      "operator": "getal+1#0",
-      "gezakt": 1,
-      "geprobeerd": 5
-    },
     "wereldkern.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10273,14 +10281,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 11,
       "scherp": "gezakt"
-    },
-    "werkrol.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/wereldregister.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
     },
     "werkruimte-kantoor.test.js": {
       "soort": "puur",

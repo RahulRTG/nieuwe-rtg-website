@@ -126,6 +126,11 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* MAGNAATGRONDWET.json (npm run magnaat:grondwet -- --vastleggen) is de
+     bevroren nulstand van de Magnaat-grondwet (MAGNAAT.md). De ratel woont in
+     de toets en is vierledig: niet meer schendingen, niet minder PASS of
+     afgedwongen, en geen enkele regel die zakt. */
+  'MAGNAATGRONDWET.json': { eigenRatel: 'test/magnaatgrondwet.test.js' },
   /* STEMPELVEILIGHEID.json (npm run stempelveiligheid) telt welke generatoren
      repo-waarheid kunnen wegschrijven die niemand heeft gevraagd. Twee schulden
      omlaag en een bereikmeter omhoog, om exact de reden die bij STILSPOOR.json

@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-24T19:41:05.196Z",
-  "commit": "e599b56a",
+  "op": "2026-09-24T10:09:47.267Z",
+  "commit": "96051869",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 7,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 314,
+  "artefacten": 316,
   "bron": 10,
-  "afgeleid": 173,
+  "afgeleid": 175,
   "fragmenten": 25,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 197,
-  "afgeleidEigenaarHard": 171,
-  "afgeleidGrendelt": 18,
-  "metStempel": 106,
+  "metEigenaar": 199,
+  "afgeleidEigenaarHard": 173,
+  "afgeleidGrendelt": 20,
+  "metStempel": 102,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -2088,6 +2088,34 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "MAGNAAT.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/magnaatgrondwet.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/magnaatgrondwet.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MAGNAATGRONDWET.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/magnaatgrondwet.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/magnaatgrondwet.js"
+   ],
+   "stempelInstrument": "scripts/magnaatgrondwet.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "MAGNAATLAB.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/magnaatlab.js",
@@ -2297,11 +2325,11 @@
    "naam": "MOMENTPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/momentproef.js",
-   "graad": "stempel",
+   "graad": "gemeten",
    "schrijvers": [
     "scripts/momentproef.js"
    ],
-   "stempelInstrument": "scripts/momentproef.js",
+   "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run momentproef:vast",
    "grendelt": false,
@@ -3013,11 +3041,11 @@
    "naam": "RITPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/ritproef.js",
-   "graad": "stempel",
+   "graad": "gemeten",
    "schrijvers": [
     "scripts/ritproef.js"
    ],
-   "stempelInstrument": "scripts/ritproef.js",
+   "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run ritproef:vast",
    "grendelt": false,
@@ -3565,11 +3593,11 @@
    "naam": "TAFELPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/tafelproef.js",
-   "graad": "stempel",
+   "graad": "gemeten",
    "schrijvers": [
     "scripts/tafelproef.js"
    ],
-   "stempelInstrument": "scripts/tafelproef.js",
+   "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run tafelproef:vast",
    "grendelt": false,
@@ -3655,11 +3683,11 @@
    "naam": "TOELATINGSPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/toelatingsproef.js",
-   "graad": "stempel",
+   "graad": "gemeten",
    "schrijvers": [
     "scripts/toelatingsproef.js"
    ],
-   "stempelInstrument": "scripts/toelatingsproef.js",
+   "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run toelatingsproef:vast",
    "grendelt": false,
@@ -4113,11 +4141,11 @@
    "naam": "ZAAKLIVEPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/zaakliveproef.js",
-   "graad": "stempel",
+   "graad": "gemeten",
    "schrijvers": [
     "scripts/zaakliveproef.js"
    ],
-   "stempelInstrument": "scripts/zaakliveproef.js",
+   "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run zaakliveproef:vast",
    "grendelt": false,

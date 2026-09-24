@@ -2490,7 +2490,14 @@ eerste ronde vond hij dat een verzoek (`verzoekBetaal`) twee keer betaald wordt
 als het twee keer tegelijk met verschillende sleutels binnenkomt -- terwijl de
 sluitcontrole groen blijft. Let daarbij op dat hij TELT hoe vaak elke soort
 handeling slaagde: "niets gevonden" over handelingen die allemaal geweigerd
-werden is geen uitslag, en de eerste versie leverde precies dat.
+werden is geen uitslag, en de eerste versie leverde precies dat. Die vondst is
+gerepareerd (BEWIJSLUS.md par. 6a: een slot per verzoek en de stand opnieuw
+gecontroleerd binnen het werk), en het verkleinde tegenvoorbeeld is de blijvende
+toets (`test/verzoekbetaal-race.test.js`). Let op de grens van zo'n vondst: over
+HTTP in de toetsopstelling kwam de dubbele betaling NIET door, omdat het werk
+daar nergens op echte I/O wacht; op het productiepad (Rust-motor, echte
+provider) wel. Een vondst van de zoeker gaat over de CODE; welke omgeving hem
+bereikt is een aparte vraag.
 
 ## Structuur en starten (kort)
 

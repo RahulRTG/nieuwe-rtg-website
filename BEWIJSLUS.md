@@ -167,8 +167,9 @@ betalingen komen erdoor. Met de hand nagespeeld: een verzoek van EUR 25 kost de
 betaler EUR 50 en de vrager ontvangt EUR 50. **De sluitcontrole blijft groen**,
 want het geld is keurig dubbel geboekt; daarom zag geen enkele bestaande
 controle het. De route `/api/pay/verzoek/betaal` is voor elk lid bereikbaar;
-of twee HTTP-verzoeken tegelijk er ook zo doorheen lopen, is NIET nagegaan --
-bevestigd is het in-process, op de echte `kern/pay`.
+of twee HTTP-verzoeken tegelijk er ook zo doorheen lopen, is daarna nagegaan
+(par. 6a): in de toetsopstelling niet, op het productiepad vermoedelijk wel. De
+fout is gerepareerd.
 
 De toets (`test/tegenvoorbeeld.test.js`) bevriest die uitslag met opzet niet:
 hij bewijst het INSTRUMENT. Drie gesaboteerde versies van `kern/pay`, een per
@@ -233,7 +234,9 @@ productie hoort daar een bewaartermijn bij, en dat raakt `DPIA.md`.
 
 ## 6. Bouwsteen 4 -- immuniteit
 
-**Stand: een stap weg.** Alle onderdelen bestaan; wat ontbreekt is de ene
+**Stand: een keer met de hand doorlopen, op de vondst van par. 3a (zie 6a).**
+De indeling hieronder is nog geen deterministische functie. Alle onderdelen
+bestaan; wat ontbreekt is de ene
 deterministische vraag na een bevestigde fout: *welke bestaande waarheid had dit
 moeten voorkomen?* Drie antwoorden, elk met een eigen weg die al bestaat:
 
@@ -249,6 +252,44 @@ waar het hoort, en die toets moet **zakken op de oude code** voordat hij telt
 
 Wat dit oplevert is een meting over de bewijsmachine zelf: dezelfde klasse fout
 twee keer is een bevinding over de machine en niet over de code.
+
+### 6a. De eerste keer: een verzoek dat twee keer betaald werd
+
+**Indeling: B.** De wet bestond (`verzoekBetaal()` weigert al met "Dit verzoek is
+al afgehandeld"), maar geen proef keek naar twee betalingen in hetzelfde venster.
+Niet A, want er was geen instrument dat deze toestand ooit had moeten raken; niet
+C, want de waarheid hoefde niet uitgevonden te worden.
+
+**De reparatie** (`server/kern/pay/verzoeken.js`): binnen het werk wordt de stand
+opnieuw gecontroleerd, zonder `await` ertussen, en zolang een verzoek wordt
+betaald staat er een slot op. Het slot staat in het geheugen van het proces en
+niet in de database: een blijvend slot dat na een crash blijft staan, zou het
+verzoek voor altijd dichtzetten. Wat blijvend is, is de stand `betaald`. Het
+bestand liep daarmee over de 10 kB, dus de huisrekening van RTG verhuisde naar
+een eigen deelbestand (`server/kern/pay/huis.js`), in dezelfde vorm als `tik.js`.
+
+**De blijvende toets** (`test/verzoekbetaal-race.test.js`) is het verkleinde
+tegenvoorbeeld zelf, en hij zakte op de oude code. Een tweede toets bewaakt de
+reparatie: een mislukte betaling laat het slot los, anders blijft het verzoek
+voor altijd "wordt al betaald" (mutatie op het vrijgeven: raak). Na de reparatie
+vindt `npm run tegenvoorbeeld` in 100 reeksen niets meer, met 80 geslaagde
+betalingen van een verzoek -- de soort is dus werkelijk beproefd.
+
+**Wat de HTTP-proef liet zien, en waarom die toets er niet staat.** Twee
+gelijktijdige HTTP-verzoeken tegen een echte server kwamen op de OUDE code niet
+dubbel door: het eerste liep af voordat de server het tweede had gelezen, omdat
+het werk in de toetsopstelling (SQLite, demo-provider) nergens op echte I/O
+wacht. Een toets die op de oude code groen bleef, is geen toets, dus hij is
+weggehaald in plaats van bewaard. Op het productiepad zit die I/O er wel: de
+Rust-motor achter `boekAsync`, een echte provider achter het automatisch
+bijladen. `server/lib/idem.js` zegt dat met zoveel woorden over zijn eigen
+grendel. Voor productie is de graad daarom `vermoed` en niet `gemeten`.
+
+**De les voor de zoeker zelf.** Zijn gelijktijdigheid is `Promise.all` in een
+proces: strenger dan HTTP in de toetsopstelling, en vergelijkbaar met het
+productiepad. Een vondst van de zoeker is dus een vondst over de CODE. Of een
+bepaalde omgeving hem bereikt, is een aparte vraag, en die hoort er per vondst
+bij te staan.
 
 ## 7. De Architect als uitlegger
 
@@ -384,8 +425,9 @@ onafhankelijkheid van de drie assen van `GELDING.json`.
    (par. 7, correctie).
 3. ~~**De zoeker op `geld-conservatie`**~~ -- gedaan (par. 3a), en hij vond bij
    de eerste ronde een verzoek dat twee keer betaald kan worden.
-4. **De immuniteitsstap**: de A/B/C-vraag als deterministische indeling na een
-   bevestigde vondst.
+4. **De immuniteitsstap** -- een keer met de hand doorlopen op de eerste vondst
+   (par. 6a, klasse B, gerepareerd, met een toets die op de oude code zakte). Als
+   deterministische indeling staat hij nog niet.
 5. **IJkpunten E0-E8 voor RTG Pay**, als spoor naast de envelop (na het besluit
    in par. 4).
 6. **Het herhaalpakket en de herhaalmatrix**, eerst in de testwereld.

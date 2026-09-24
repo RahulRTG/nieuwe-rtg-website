@@ -555,7 +555,7 @@ function terugweg(uit) {
       .filter(r => r && String(r.route || r.heen || '').includes('/api/pay/saldo')).length;
   } catch (e) { kandidaten = null; }
   try {
-    primitive = /huisUit/.test(fs.readFileSync(path.join(W.WORTEL, 'server/kern/pay/verzoeken.js'), 'utf8'));
+    primitive = /huisUit/.test(fs.readFileSync(path.join(W.WORTEL, 'server/kern/pay/huis.js'), 'utf8'));
   } catch (e) { primitive = null; }
   /* HET BESLUIT IS GENOMEN, EN DE PROEF LEEST HET IN PLAATS VAN HET TE HERHALEN.
 

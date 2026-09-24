@@ -105,6 +105,7 @@ module.exports = function hangDwarseRoutersOp(grens) {
   require('../routes/borden')(grens('borden'));
   require('../routes/spellen')(grens('spellen'));
   require('../routes/magnaatwereld')(grens('magnaatwereld'));
+  require('../routes/magnaatleven')(grens('magnaatleven'));
   require('../routes/leren')(grens('leren'));
   /* Payroll OS: de routes van de nieuwe loonlaag (kern/payroll/), naast de
      oude payroll-routes en met dezelfde poorten. */

@@ -23,6 +23,8 @@ Object.assign(kern, require('../kern/magnaatwereld')({
   db, save, bewerkCollectie, crypto, functies: require('../functies'), sseToCustomer,
   partnerstudio: partnerstudio.magnaatPartnerstudio, codenaamVan: kern.codenaamVan
 }));
+/* Magnaat Van Nul (V1): een leven per lid, met al het geld door het grootboek. */
+kern.magnaatLeven = require('../kern/magnaat-leven').maakLeven({ db, save });
 
 /* De positie van de RTFoundation in RTG Pay (kern/rtfwallet.js): waar een gift
    landt en wie hem uitbetaalt. Hij hangt hier en niet bij de andere

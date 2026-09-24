@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T14:00:00.878Z",
-    "commit": "4fcf6cf4e",
+    "op": "2026-09-24T14:06:06.947Z",
+    "commit": "1b35d141c",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/magnaatgrondwet.js",
@@ -14,14 +14,14 @@
   "telling": {
     "VIOLATION": 2,
     "ABSENT": 6,
-    "PARTIAL": 7,
-    "PASS": 6
+    "PARTIAL": 6,
+    "PASS": 7
   },
   "vier": {
     "gedocumenteerd": 21,
     "geimplementeerd": 15,
-    "afgedwongen": 9,
-    "getoetst": 8
+    "afgedwongen": 10,
+    "getoetst": 9
   },
   "schendingen": 6,
   "perRegel": [
@@ -37,9 +37,9 @@
       "schendingen": 3,
       "scopes": {
         "world": {
-          "autoriteit": "geen: het saldo zelf (st.geld) is de waarheid",
-          "draagt": "NIEMAND",
-          "toets": "NIEMAND",
+          "autoriteit": "het grootboek; st.geld is sinds A2.10 de projectie van de kas",
+          "draagt": "gevonden",
+          "toets": "gevonden",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
             "aantal": 0,
@@ -47,7 +47,7 @@
           },
           "deels": null,
           "missers": [],
-          "stand": "ABSENT"
+          "stand": "PASS"
         },
         "grootboek": {
           "autoriteit": "server/kern/magnaat-grootboek/, het journaal",
@@ -165,17 +165,17 @@
       "id": "M-005",
       "familie": "M-0",
       "invariant": "Een transactie heeft minimaal twee economische zijden, en debet is gelijk aan credit.",
-      "stand": "PARTIAL",
+      "stand": "PASS",
       "gedocumenteerd": true,
       "geimplementeerd": true,
-      "afgedwongen": false,
-      "getoetst": false,
+      "afgedwongen": true,
+      "getoetst": true,
       "schendingen": 0,
       "scopes": {
         "world": {
-          "autoriteit": "geen: er is geen journaal",
-          "draagt": "NIEMAND",
-          "toets": "NIEMAND",
+          "autoriteit": "het grootboek: elke beweging is een overdracht met een van- en een naarkant",
+          "draagt": "gevonden",
+          "toets": "gevonden",
           "schending": {
             "wat": "een saldo dat rechtstreeks wordt gezet, verhoogd of verlaagd (st.geld[h] += ...), zonder journaalpost",
             "aantal": 0,
@@ -183,7 +183,7 @@
           },
           "deels": null,
           "missers": [],
-          "stand": "ABSENT"
+          "stand": "PASS"
         },
         "grootboek": {
           "autoriteit": "server/kern/magnaat-grootboek/, het journaal",

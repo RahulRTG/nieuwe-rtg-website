@@ -52,6 +52,7 @@ const REKENING = {
   },
   foundation: (w, pot) => w + ':rtfoundation:' + pot
 };
+const HANDVAT = Symbol('boekhouding');
 const SOORT_VAN = { kas: 'actief', inleg: 'eigen-vermogen', macro: 'extern', foundation: 'actief' };
 
 /* De projectie van het grootboek in een World-partij. */
@@ -126,6 +127,7 @@ function maakBoekhouding({ db } = {}) {
      te veranderen. Zo begint haar grootboek waar ze is, niet bij nul. */
   function koppel(potje) {
     const st = potje.staat;
+    st[HANDVAT] = api;
     if (st.wereld) return;
     st.wereld = wereldId(potje);
     const b = voor(st);
@@ -151,7 +153,20 @@ function maakBoekhouding({ db } = {}) {
     voor(st).bevestig();
   }
 
-  return { voor, beweeg, koppel, open, bevestig: (st) => (st.wereld ? voor(st).bevestig() : 0) };
+  const api = { voor, beweeg, koppel, open, bevestig: (st) => (st.wereld ? voor(st).bevestig() : 0) };
+  return api;
 }
 
-module.exports = { TEGENPARTIJEN, SOORTEN, REKENING, wereldId, maakBoekhouding };
+/* DE WEG VANUIT DE MODULES. De gebeurtenissen van World krijgen alleen `st`
+   mee; `koppel` hangt de boekhouding van de partij er daarom aan onder een
+   symbool. Dat is een handvat voor de looptijd en geen staat: een symbool gaat
+   niet mee in JSON, dus er wordt niets van opgeslagen, en een partij die niet
+   gekoppeld is kan geen geld bewegen -- ze faalt hard in plaats van stil buiten
+   het grootboek om te boeken. */
+function beweeg(st, opdracht) {
+  const b = st && st[HANDVAT];
+  if (!b) throw new Error('Geld bewegen kan alleen in een partij die aan het grootboek hangt (boekhouding.koppel).');
+  return b.beweeg(st, opdracht);
+}
+
+module.exports = { TEGENPARTIJEN, SOORTEN, REKENING, wereldId, maakBoekhouding, beweeg };

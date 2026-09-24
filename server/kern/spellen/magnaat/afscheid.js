@@ -9,6 +9,7 @@
    HET IS BEWUST GEEN "FAILLISSEMENT". Een speler raakt hier een PAND kwijt en
    nooit zijn hele bedrijf; zie GAMEHALL.md 12.6 en de reden in ./bank.js. */
 const { naarCenten } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ mijnVestiging, afkoopsom, rond }) => {
   /* Wat er met een onderpand gebeurt als de bank het opeist, loopt langs
@@ -25,8 +26,7 @@ module.exports = ({ mijnVestiging, afkoopsom, rond }) => {
       if (c.leverancierId !== v.id && c.afnemerId !== v.id) continue;
       const som = naarCenten(afkoopsom(c, st.maand));
       const tegen = c.leverancier === h ? c.afnemer : c.leverancier;
-      st.geld[h] -= som;
-      st.geld[tegen] += som;
+      beweeg(st, { soort: 'CONTRACT_AFKOOP', van: ['kas', h], naar: ['kas', tegen], bedrag: som, omschrijving: 'Afkoop bij afscheid' });
       c.status = 'afgekocht'; c.eindMaand = st.maand; c.afkoop = som;
     }
     st.vestigingen[h] = st.vestigingen[h].filter(x => x !== v);

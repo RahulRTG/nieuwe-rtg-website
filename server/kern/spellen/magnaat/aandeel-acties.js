@@ -12,6 +12,7 @@
    ALLEBEI VRIJE ACTIES, om dezelfde reden als daar: op je beurt wachten om te
    mogen onderhandelen maakt van een partij van zes een week vertraging. */
 const { naarCenten } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ wieHeeft, uitgegeven, MAX_DEEL }) => {
   const MAX_OPEN = 4;   // openstaande voorstellen per speler
@@ -81,8 +82,7 @@ module.exports = ({ wieHeeft, uitgegeven, MAX_DEEL }) => {
          een ander is, betaalt de koper aan die ander. Dat is ook de eerlijke
          kant -- die ander draagt vanaf nu het verwaterde resultaat. */
       const nu = wieHeeft(st, d.vestiging).speler;
-      st.geld[d.houder] -= koopsom;
-      st.geld[nu] += koopsom;
+      beweeg(st, { soort: 'AANDELENKOOP', van: ['kas', d.houder], naar: ['kas', nu], bedrag: koopsom, omschrijving: 'Koop van een belang' });
       d.status = 'loopt';
       d.eigenaar = nu;
       d.gekocht = st.maand;

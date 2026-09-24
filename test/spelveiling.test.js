@@ -285,6 +285,26 @@ test('grond gaat naar de Foundation-pot, een zaak naar de verkoper', () => {
   assert.ok(st.geld.anna <= annaVoor, 'wie een kavel inzet verdient er niets aan');
 });
 
+/* Ronde A2.4: de winnaar betaalde al voordat vaststond dat de zaak nog bestond,
+   en bij `mislukt` verdween zijn koopsom zonder ontvanger. Nu gaat er dan niets
+   over, ook geen geld. */
+test('bestaat de geveilde zaak niet meer, dan betaalt de winnaar ook niets', () => {
+  const { m, p, st } = opstelling(['anna', 'boris', 'cato']);
+  m.eco.zet(p, 'anna', { actie: 'open', kavel: kavelIn('terrein').id, sector: 'logistiek', omvang: 12, naam: 'Atlas' });
+  maand(m, p, 1);
+  const A = st.vestigingen.anna[0];
+  const v = m.eco.zet(p, 'anna', { actie: 'veiling-start', soort: 'vestiging', vestiging: A.id, duur: 'kort' });
+  assert.ok(v.ok, v.error);
+  m.eco.zet(p, 'cato', { actie: 'veiling-bod', id: v.id, bedrag: 400000 });
+  st.vestigingen.anna = [];   // de zaak verdwijnt voor de hamer valt
+  const voorCato = st.geld.cato;
+  const verslagen = [];
+  for (let i = 0; i < 2; i++) { st.gerekendTot -= st.maandMs; verslagen.push(...m.eco.bijrekenen(p)); }
+  const uitslag = verslagen.flatMap(x => x.veilingen || []).find(x => x.id === v.id);
+  assert.equal(uitslag.mislukt, 'die vestiging bestaat niet meer');
+  assert.equal(st.geld.cato, voorCato, 'de winnaar houdt zijn geld');
+});
+
 test('een veiling zonder biedingen kun je intrekken, een met biedingen niet', () => {
   const { m, p, st } = opstelling();
   const v = m.eco.zet(p, 'anna', { actie: 'veiling-start', soort: 'kavel', kavel: kavelIn('haven').id, duur: 'lang' });

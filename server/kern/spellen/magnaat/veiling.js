@@ -43,6 +43,7 @@
    dezelfde winnaar als tien maanden los. */
 const rond = (n) => Math.round(n);
 const { naarCenten } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 /* Hoe lang een veiling loopt, in spelmaanden. Kort genoeg dat een Quick van
    zesendertig maanden er meerdere kent, lang genoeg dat iemand die een dag niet
@@ -106,19 +107,20 @@ module.exports = ({ K, wieHeeft, afkoopsom }) => {
     /* Het bod is in hele euro's; wat er overgaat is een keer omgezet, en beide
        kanten krijgen datzelfde bedrag (./centen.js). */
     const koopsom = naarCenten(v.prijs);
-    st.geld[v.winnaar] -= koopsom;
     if (v.soort === 'kavel') {
       /* Het kavel wordt gereserveerd, niet bebouwd: WAT er komt is nog steeds
          een keuze. De reservering is de hele koop -- daarom staat er ook geen
          bouwsom tegenover. */
       (st.kavelRecht = st.kavelRecht || {})[v.kavel] = v.winnaar;
       // de grondopbrengst gaat naar de Foundation-pot van de stad; zie ./foundation.js
-      st.foundation.lokaal += koopsom;
+      beweeg(st, { soort: 'VEILING_GUNNING', van: ['kas', v.winnaar], naar: ['foundation', 'lokaal'], bedrag: koopsom, omschrijving: 'Gunning kavel' });
       return { kavel: v.kavel };
     }
     const w = wieHeeft(st, v.vestiging);
+    /* Bestaat de zaak niet meer, dan gaat er niets over -- ook geen geld. Voor
+       A2.4 betaalde de winnaar hier al en ontving niemand iets. */
     if (!w) return { mislukt: 'die vestiging bestaat niet meer' };
-    st.geld[w.speler] += koopsom;
+    beweeg(st, { soort: 'VEILING_GUNNING', van: ['kas', v.winnaar], naar: ['kas', w.speler], bedrag: koopsom, omschrijving: 'Gunning vestiging' });
     st.vestigingen[w.speler] = st.vestigingen[w.speler].filter(x => x !== w.v);
     st.vestigingen[v.winnaar].push(w.v);
     st.kavelBezet[w.v.kavel] = v.winnaar;

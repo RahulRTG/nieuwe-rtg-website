@@ -11,6 +11,7 @@
    een rekening, en klopt de som over alle spelers. */
 const H = require('./handel');
 const { naarCenten, euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ rond }) => {
   /* WAT ELK CONTRACT DEZE MAAND BETAALT, EEN KEER, in eurocenten (./centen.js).
@@ -40,8 +41,7 @@ module.exports = ({ rond }) => {
       c.betaald += bedrag; c.ontvangen += bedrag;
       if (r.boete > 0) {
         const boete = naarCenten(r.boete);
-        st.geld[c.leverancier] -= boete;
-        st.geld[c.afnemer] += boete;
+        beweeg(st, { soort: 'CONTRACT_BOETE', van: ['kas', c.leverancier], naar: ['kas', c.afnemer], bedrag: boete, omschrijving: 'Boete wegens tekort' });
         c.boetes += boete;
         c.maandenTekort++;
       } else c.maandenGeleverd++;

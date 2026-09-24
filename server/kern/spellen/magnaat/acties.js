@@ -21,6 +21,7 @@ const { SECTOREN } = require('./sectoren');
 const { PRIJSSTANDEN, KOSTENSTAND } = require('./prijsstand');
 const { afkoopsom } = require('./handel');
 const { naarCenten } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
   /* ---------- de acties ---------- */
@@ -101,8 +102,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       for (const c of raakt) {
         const som = naarCenten(afkoopsom(c, st.maand));
         const tegen = c.leverancier === h ? c.afnemer : c.leverancier;
-        st.geld[h] -= som;
-        st.geld[tegen] += som;
+        beweeg(st, { soort: 'CONTRACT_AFKOOP', van: ['kas', h], naar: ['kas', tegen], bedrag: som, omschrijving: 'Afkoop bij sluiten' });
         c.status = 'afgekocht';
         c.eindMaand = st.maand;
         c.afkoop = som;

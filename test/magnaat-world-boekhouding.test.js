@@ -6,12 +6,14 @@
    3. De boekhouding kent dezelfde gebeurtenissoorten als de geldkaart.
    4. Een overdracht is dubbel geboekt, exact, en in hele centen.
    5. Elke rekening draagt de wereld in haar naam: twee werelden die een opslag
-      delen, raken elkaars rekeningen en journaal nooit. */
+      delen, raken elkaars rekeningen en journaal nooit.
+   6. Een module beweegt geld alleen in een gekoppelde partij, en het handvat
+      daarvoor wordt niet opgeslagen. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const kaart = require('../scripts/lib/magnaatgeldkaart');
-const { TEGENPARTIJEN, SOORTEN, REKENING, maakBoekhouding } = require('../server/kern/spellen/magnaat/boekhouding');
+const { TEGENPARTIJEN, SOORTEN, REKENING, maakBoekhouding, beweeg } = require('../server/kern/spellen/magnaat/boekhouding');
 
 const potje = (id) => ({ id, staat: { maand: 3, geld: {} } });
 /* Een gekoppelde partij en haar boekhouding. */
@@ -72,4 +74,17 @@ test('5. twee werelden die een opslag delen, raken elkaars rekeningen en journaa
   los1.overdracht({ soort: 'LENING', sleutel: 's', van: ['macro', 'bank'], naar: ['kas', 'x'], bedrag: 1, omschrijving: 'x' });
   los1.bevestig();
   assert.equal(los2.gebeurtenissen().length, 0);
+});
+
+test('6. geld bewegen kan alleen in een gekoppelde partij, en het handvat gaat niet mee in de opslag', () => {
+  const p = potje('p6');
+  p.staat.geld = { anna: 0, boris: 0 };
+  const zet = () => beweeg(p.staat, { soort: 'AANDELENKOOP', van: ['kas', 'anna'], naar: ['kas', 'boris'], bedrag: 500 });
+  assert.throws(zet, /aan het grootboek hangt/);
+  maakBoekhouding().koppel(p);
+  zet();
+  assert.deepEqual(p.staat.geld, { anna: -500, boris: 500 });
+  const opgeslagen = JSON.parse(JSON.stringify(p.staat));
+  assert.throws(() => beweeg(opgeslagen, { soort: 'AANDELENKOOP', van: ['kas', 'anna'], naar: ['kas', 'boris'], bedrag: 1 }), /aan het grootboek hangt/,
+    'een partij uit de opslag moet eerst opnieuw gekoppeld worden');
 });

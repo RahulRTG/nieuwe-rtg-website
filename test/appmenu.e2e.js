@@ -292,6 +292,25 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
         try {
           await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
           await wachtOpRust(page);
+          /* EEN DOORVERWIJSPAGINA HEEFT GEEN MENU NODIG, WEL EEN AANKOMST.
+             kantoorpda.html en zorgbalie.html sturen met een meta-refresh door
+             naar de personeels-app. Dat gebeurt pas na het laden (lokaal 0,8 tot
+             1,7 s, onder CI-belasting later). Viel die navigatie midden in de
+             menuwacht hieronder, dan gooide de wacht en wees page.url() nog naar
+             de oude pagina -- en stond er "geen app-menu" bij een pagina die
+             gewoon onderweg was (CI op #366). Dus: wacht op de aankomst zelf.
+             Komt die niet, dan is dat een echte fout en staat de reden erbij. */
+          let doorverwijzing = true;
+          try {
+            doorverwijzing = await page.evaluate(() =>
+              !!document.querySelector('meta[http-equiv="refresh" i]'));
+          } catch (e) { /* context weg: de navigatie is al bezig */ }
+          if (doorverwijzing) {
+            const aangekomen = await page.waitForURL(u => new URL(u).pathname !== pad, { timeout: 30000 })
+              .then(() => true, () => false);
+            if (!aangekomen) menuFouten.push(pad + ' (meta-refresh stuurde binnen 30 s niet door)');
+            continue;
+          }
           let meedoen;
           try {
             meedoen = await page.evaluate(() => !document.body.hasAttribute('data-ios-uit') &&

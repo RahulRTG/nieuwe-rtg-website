@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T18:03:31.202Z",
-    "commit": "e9eb3de6",
+    "op": "2026-09-24T18:14:54.785Z",
+    "commit": "1fe850fd",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -493,6 +493,14 @@
       "module": "server/kern/mobiliteit/appbrug.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "appcluster.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/appcluster.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
       "geprobeerd": 1
     },
     "appcontract.test.js": {

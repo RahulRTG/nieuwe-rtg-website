@@ -129,7 +129,13 @@ function maakBoekhouding({ db } = {}) {
     const st = potje.staat;
     st[HANDVAT] = api;
     if (st.wereld) return;
-    st.wereld = wereldId(potje);
+    /* De wereld is `world:{id}`, tenzij daar al een journaal staat: een potje
+       wordt opgeruimd maar zijn journaal niet, en een nieuw potje met hetzelfde
+       id mag daar niet in verder boeken. Dan `world:{id}:2`, `:3`, enzovoort --
+       deterministisch, en voor een gewone partij gewoon `world:{id}`. */
+    let w = wereldId(potje);
+    for (let n = 2; cache.has(w) || opslag.laatsteVolgnummer(w) > 0; n++) w = wereldId(potje) + ':' + n;
+    st.wereld = w;
     const b = voor(st);
     for (const [h, bedrag] of Object.entries(st.geld || {})) {
       if (!bedrag) continue;

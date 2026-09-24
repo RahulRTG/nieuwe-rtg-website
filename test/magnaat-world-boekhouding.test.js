@@ -8,7 +8,8 @@
    5. Elke rekening draagt de wereld in haar naam: twee werelden die een opslag
       delen, raken elkaars rekeningen en journaal nooit.
    6. Een module beweegt geld alleen in een gekoppelde partij, en het handvat
-      daarvoor wordt niet opgeslagen. */
+      daarvoor wordt niet opgeslagen.
+   7. Een nieuwe partij met het id van een oude boekt nooit in diens journaal. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -87,4 +88,24 @@ test('6. geld bewegen kan alleen in een gekoppelde partij, en het handvat gaat n
   const opgeslagen = JSON.parse(JSON.stringify(p.staat));
   assert.throws(() => beweeg(opgeslagen, { soort: 'AANDELENKOOP', van: ['kas', 'anna'], naar: ['kas', 'boris'], bedrag: 1 }), /aan het grootboek hangt/,
     'een partij uit de opslag moet eerst opnieuw gekoppeld worden');
+});
+
+test('7. een nieuwe partij met het id van een oude krijgt een eigen wereld', () => {
+  const db = { data: {} };
+  const oud = potje('p7');
+  oud.staat.geld = { anna: 0 };
+  maakBoekhouding({ db }).open(oud, 1000);
+  assert.equal(oud.staat.wereld, 'world:p7');
+  // het potje is opgeruimd, het journaal niet; een nieuwe server, hetzelfde id
+  const nieuw = potje('p7');
+  nieuw.staat.geld = { anna: 0 };
+  maakBoekhouding({ db }).open(nieuw, 2500);
+  assert.equal(nieuw.staat.wereld, 'world:p7:2');
+  assert.equal(nieuw.staat.geld.anna, 2500);
+  // en binnen dezelfde server net zo
+  const bh = maakBoekhouding();
+  const a = potje('p8'), b = potje('p8');
+  a.staat.geld = { anna: 0 }; b.staat.geld = { anna: 0 };
+  bh.open(a, 1); bh.open(b, 2);
+  assert.deepEqual([a.staat.wereld, b.staat.wereld], ['world:p8', 'world:p8:2']);
 });

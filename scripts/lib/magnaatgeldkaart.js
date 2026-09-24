@@ -141,12 +141,12 @@ const GEBEURTENISSEN = [
     benen: [b('maand.js', "beweeg(st, { soort: 'RENTE', van: ['kas', h], naar: ['macro', 'bank'], bedrag: rente, omschrijving: 'Rente rood staan' });")],
     let: 'rood staan: de rekening-courant is een NEGATIEF SALDO en geen lening. Sinds A2.1 een keer tot centen afgerond' },
 
-  { id: 'G23', betekenis: 'PREMIE', categorie: 'verzekering', van: 'speler', naar: 'verzekeraar', tegenzijde: 'put',
-    benen: [b('verzekering.js', 'st.geld[h] -= bedrag;')] },
-  { id: 'G24', betekenis: 'SCHADE', categorie: 'verzekering', van: 'speler', naar: 'aannemer', tegenzijde: 'put',
-    benen: [b('verzekering.js', 'st.geld[h] -= kosten;')], let: 'pandschade verlaagt ook de staat van het pand' },
-  { id: 'G25', betekenis: 'UITKERING', categorie: 'verzekering', van: 'verzekeraar', naar: 'speler', tegenzijde: 'bron',
-    benen: [b('verzekering.js', 'if (uit.bedrag > 0) { st.geld[h] += uit.bedrag;')] },
+  { id: 'G23', betekenis: 'PREMIE', categorie: 'verzekering', van: 'speler', naar: 'verzekeraar', tegenzijde: 'put', gemigreerd: 'A2.6',
+    benen: [b('verzekering.js', "beweeg(st, { soort: 'PREMIE', van: ['kas', h], naar: ['macro', 'verzekeraar'], bedrag, omschrijving: 'Premie' });")] },
+  { id: 'G24', betekenis: 'SCHADE', categorie: 'verzekering', van: 'speler', naar: 'aannemer', tegenzijde: 'put', gemigreerd: 'A2.6',
+    benen: [b('verzekering.js', "beweeg(st, { soort: 'SCHADE', van: ['kas', h], naar: ['macro', 'aannemer'], bedrag: kosten, omschrijving: 'Herstel na schade' });")], let: 'pandschade verlaagt ook de staat van het pand' },
+  { id: 'G25', betekenis: 'UITKERING', categorie: 'verzekering', van: 'verzekeraar', naar: 'speler', tegenzijde: 'bron', gemigreerd: 'A2.6',
+    benen: [b('verzekering.js', "if (uit.bedrag > 0) { beweeg(st, { soort: 'UITKERING', van: ['macro', 'verzekeraar'], naar: ['kas', h], bedrag: uit.bedrag, omschrijving: 'Uitkering' });")] },
 
   { id: 'G26', betekenis: 'FOUNDATION_AFDRACHT', categorie: 'foundation', van: 'stad', naar: 'Foundation-pot', tegenzijde: 'bron',
     benen: [b('foundation.js', 'f.lokaal += naarCenten(lokaal);'), b('foundation.js', 'f.centraal += naarCenten(centraal);')],

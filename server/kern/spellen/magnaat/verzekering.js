@@ -20,6 +20,7 @@ const P = require('./polis');
 
 const rond = (n) => Math.round(n);
 const { naarCenten, euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ mijnVestiging }) => {
   const mijne = (st, h) => (st.polissen || []).filter(p => p.speler === h && p.status === 'loopt');
@@ -107,7 +108,7 @@ module.exports = ({ mijnVestiging }) => {
       for (const p of polissen.filter(x => x.vestiging === v.id)) {
         // de premie wordt in euro's gerekend en een keer tot centen gemaakt (./centen.js)
         const bedrag = naarCenten(P.premieVoor(p.risico, v, omzet, p, ctx));
-        st.geld[h] -= bedrag;
+        beweeg(st, { soort: 'PREMIE', van: ['kas', h], naar: ['macro', 'verzekeraar'], bedrag, omschrijving: 'Premie' });
         p.betaald += bedrag;
         premie += bedrag;
       }
@@ -116,7 +117,7 @@ module.exports = ({ mijnVestiging }) => {
         const kostenEuro = R.kosten(voorval, v, omzet);
         if (kostenEuro < 1) continue;
         const kosten = naarCenten(kostenEuro);
-        st.geld[h] -= kosten;
+        beweeg(st, { soort: 'SCHADE', van: ['kas', h], naar: ['macro', 'aannemer'], bedrag: kosten, omschrijving: 'Herstel na schade' });
         schade += kosten;
         /* PANDSCHADE ZET OOK DE STAAT TERUG. Zonder dat is een brand alleen een
            rekening, en dan werkt hij niet door in kwaliteit en reputatie -- en
@@ -127,7 +128,7 @@ module.exports = ({ mijnVestiging }) => {
         const uitEuro = p ? P.uitkering(p, v, kostenEuro) : { bedrag: 0, reden: 'niet verzekerd' };
         // nooit meer dan de schade: de afronding is monotoon, dus de centen ook niet
         const uit = { bedrag: naarCenten(uitEuro.bedrag), reden: uitEuro.reden };
-        if (uit.bedrag > 0) { st.geld[h] += uit.bedrag; p.uitgekeerd += uit.bedrag; uitgekeerd += uit.bedrag; }
+        if (uit.bedrag > 0) { beweeg(st, { soort: 'UITKERING', van: ['macro', 'verzekeraar'], naar: ['kas', h], bedrag: uit.bedrag, omschrijving: 'Uitkering' }); p.uitgekeerd += uit.bedrag; uitgekeerd += uit.bedrag; }
         if (p) p.voorvallen++;
         regels.push({ id: voorval.risico, naam: voorval.naam, zaak: v.naam,
           schade: euroTonen(kosten), uitkering: euroTonen(uit.bedrag), reden: uit.reden,

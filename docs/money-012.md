@@ -140,6 +140,42 @@ verstuurd" melden (het oude gedrag), en dan vindt de sweep geld uit niets. Vier
 mutaties op de reparatie laten de juiste toetsen zakken. Een vijfde bleef groen
 en wees een overbodige tak aan; die is verwijderd.
 
+## De eindproef
+
+`test/money012-keten.test.js` draait de echte keten in één proces en toetst geen
+losse modules:
+1. `pay.laadOp`, gevolgd door de betaalwaarheid;
+2. `server/betaal.js` met de simulatiebank;
+3. een storingslaag: het antwoord raakt kwijt, of de aanroep valt om vóór de rail;
+4. herstarts, waarbij de opslag door JSON gaat;
+5. de veegronde;
+6. de afhandelaar;
+7. het grootboek.
+
+De volgordes: 27 storingsvolgordes, telkens met en zonder herstart en met en
+zonder een klant die opnieuw drukt. Na elke volgorde gelden deze vier eisen:
+- de rail heeft precies één keer uitgevoerd;
+- de wallet staat op precies het bedrag;
+- het grootboek sluit;
+- er staat niets open, niets onbekend en niets geëscaleerd.
+
+Antwoordt de rail nooit, dan is er niets belast en niets bijgeschreven, sluit het
+grootboek, en staat de betaling geëscaleerd en eerlijk `onbekend`. Een tegenproef
+met de oude weg laat een dubbele belasting zien, en twee mutaties op de echte
+keten laten de eindproef zakken.
+
+**De einddefinitie van MONEY-012:** *een crash, retry, time-out of onbekende
+provideruitkomst mag de financiële waarheid niet veranderen.* De uitgaande kant
+bewijst dat met `test/money012.test.js`, de inkomende kant met
+`test/money012-inkomend.test.js`, en de keten als geheel met
+`test/money012-keten.test.js`.
+
+**Bevriezen.** Zodra deze drie proeven in CI groen zijn, geldt MONEY-012 als
+gesloten voor wat de repo kan bewijzen. Hij gaat dan alleen weer open op een
+*aangetoonde* breuk van een van de vier wetten, niet op een nieuw bedacht
+scenario. Wat alleen met echte providers te bewijzen is, staat hieronder als
+extern bewijs en blokkeert de sluiting van het repobewijs niet.
+
 ## Wat nog openstaat
 
 MONEY-012 is pas gesloten als deze punten dicht zijn of met reden uitgesloten.

@@ -238,3 +238,25 @@ test('een hervatting gebruikt dezelfde aanbieder als de eerste poging', async ()
   await wereld.w.ronde({ tot: wereld.klok.t });
   assert.deepEqual(p.aanbieders, ['mollie', 'mollie'], 'ook na een herstart dezelfde aanbieder');
 });
+
+/* Vergeten (AVG art. 17): de betaalwaarheid houdt, net als het grootboek van RTG
+   Pay, de codenaam als bewijs van binnengekomen geld -- maar de SLEUTEL van het
+   lid gaat eruit, uit de eigenaar en uit de context. test/vergeten.test.js
+   raakt alleen een oplading (codenaam), dus dit pad wordt hier gemeten. */
+test('vergeten haalt de sleutel uit de betaalwaarheid en laat bedrag en codenaam staan', () => {
+  const key = 'user-7';
+  const db = { data: { cvs: {}, live: {}, posts: [], notifications: {}, betaalWaarheid: {
+    'BW-A': { id: 'BW-A', actor: 'dp:' + key, centen: 1200, soort: 'direct',
+      context: { key, codename: 'Stille Reiger', supplierCode: 'ZAAK' } },
+    'BW-B': { id: 'BW-B', actor: 'dp:user-70', centen: 500, soort: 'direct', context: { key: 'user-70' } }
+  } } };
+  const { wisEigen } = require('../server/kern/vergeten/eigen')({ db });
+  wisEigen(key, () => {}, [], 'Stille Reiger');
+  const a = db.data.betaalWaarheid['BW-A'];
+  assert.ok(!JSON.stringify(a).includes(key), 'de sleutel is weg: ' + JSON.stringify(a));
+  assert.equal(a.actor, 'dp:vergeten');
+  assert.equal(a.centen, 1200, 'het bedrag blijft, dat is het bewijs');
+  assert.equal(a.context.codename, 'Stille Reiger', 'de codenaam blijft, zonder sleutel leidt hij nergens heen');
+  // een ander lid wiens sleutel met dezelfde tekens begint, blijft ongemoeid
+  assert.equal(db.data.betaalWaarheid['BW-B'].context.key, 'user-70');
+});

@@ -60,3 +60,13 @@ test('3. het echte register is bruikbaar als bewijs en spreekt zichzelf niet teg
   const heel = tel(reg.schakels, 'stuk') === 0 && tel(reg.storingen, 'gebroken') === 0 && tel(reg.schakels, 'openBekend') === 0;
   assert.equal(reg.sluit, heel, '`sluit` zegt iets anders dan de rijen');
 });
+
+test('4. de lezer van APPWERKT leest het echte register als een gesloten keten', () => {
+  /* Dit is de proef die ertoe doet: niet of het register er netjes uitziet, maar
+     of scripts/lib/bewijsbron.js er BEWEZEN in leest. Versheid wordt hier op
+     vers gezet, want die hangt aan de commit en niet aan het woordgebruik; wat
+     overblijft is de vraag of lezer en schrijver dezelfde taal spreken. */
+  const { ketenUitslag } = require('../scripts/lib/bewijsbron');
+  const u = ketenUitslag(REGISTER, { versheid: () => ({ vers: true, reden: 'vers gezet in de toets' }) });
+  assert.equal(u.status, 'BEWEZEN', REGISTER + ' leest als ' + u.status + ': ' + u.reden);
+});

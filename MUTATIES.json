@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T20:53:50.033Z",
-    "commit": "96944eb3",
+    "op": "2026-09-24T21:16:17.786Z",
+    "commit": "e4f537b0",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -5123,6 +5123,10 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "lusproef.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "lussen.test.js": {
       "soort": "puur",

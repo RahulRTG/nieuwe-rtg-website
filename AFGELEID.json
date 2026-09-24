@@ -3,10 +3,10 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-24T21:41:38.291Z",
-  "commit": "b738391d",
+  "op": "2026-09-24T23:08:19.725Z",
+  "commit": "7de02b5e",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
@@ -2003,13 +2003,13 @@
    "naam": "LIEGRONDE.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/liegronde.js",
-   "graad": "stempel",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/liegronde.js"
    ],
    "stempelInstrument": "scripts/liegronde.js",
    "stempelAnders": false,
-   "versheidOpdracht": null,
+   "versheidOpdracht": "npm run liegronde:vast",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -2053,13 +2053,13 @@
    "naam": "LUSPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/lusproef.js",
-   "graad": "stempel",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/lusproef.js"
    ],
    "stempelInstrument": "scripts/lusproef.js",
    "stempelAnders": false,
-   "versheidOpdracht": null,
+   "versheidOpdracht": "npm run lusproef:vast",
    "grendelt": false,
    "botsingVerklaard": null
   },

@@ -10,8 +10,8 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-09-24T21:14:31.728Z",
-  "commit": "60837d27",
+  "op": "2026-09-24T21:57:30.400Z",
+  "commit": "3008d7d1",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
@@ -21,10 +21,10 @@
  "gemeten": {
   "onderdelen": 112,
   "defecten": 0,
-  "knoppenGevonden": 516,
-  "knoppenAangetikt": 235,
-  "knoppenNietKlikbaar": 256,
-  "schermenGrotendeelsOngemeten": 19,
+  "knoppenGevonden": 528,
+  "knoppenAangetikt": 244,
+  "knoppenNietKlikbaar": 260,
+  "schermenGrotendeelsOngemeten": 18,
   "deurenZonderPersona": 2
  },
  "telling": {
@@ -36,8 +36,8 @@
    "NIET_GETEST": 15
   },
   "bedienbaar": {
-   "NIET_GETEST": 59,
-   "BEWEZEN": 53
+   "NIET_GETEST": 56,
+   "BEWEZEN": 56
   },
   "menselijk": {
    "NIET_GETEST": 112
@@ -47,7 +47,8 @@
    "BEWEZEN": 2
   },
   "waarheidsgetrouw": {
-   "GEEN_FIXTURE": 112
+   "NIET_GETEST": 54,
+   "BEWEZEN": 58
   },
   "persistent": {
    "GEEN_FIXTURE": 112
@@ -102,13 +103,1063 @@
   "uitleg": "Een bewijs mag uit een bestaande proef komen als scripts/lib/appcontract.js die bron noemt, de proef routes raakt die de ingang aanroept, en het register vers is (versheid() in scripts/lib/stempel.js). Een ketenproef levert alleen voltooibaar.",
   "koppelingen": [
    {
+    "app": "Buurtruil",
+    "functie": "link:buurtruil",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Geven",
+    "functie": "link:geven",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Het bord",
+    "functie": "link:rtfbord",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Het schrift",
+    "functie": "link:rtfschrift",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Klimaatfonds",
+    "functie": "link:klimaat",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
     "app": "Ontdekken",
     "functie": "link:connect",
     "bewijzen": {
      "voltooibaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lusproef.js",
-      "commit": "760b40d3"
+      "commit": "33818743"
+     },
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTFoundation in jouw buurt",
+    "functie": "link:rtfbuurt",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTFoundation portaal",
+    "functie": "link:rtfportaal",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Vrienden",
+    "functie": "link:vrienden",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "zorg",
+    "functie": "tab:zorg",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Zorg",
+    "functie": "link:foundationzorg",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Accountbescherming",
+    "functie": "link:bescherming",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Identiteit aantonen",
+    "functie": "link:verificatie",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Juridisch",
+    "functie": "link:juridisch",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Mijn neigingen",
+    "functie": "link:neigingen",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Passkeys",
+    "functie": "link:passkeys",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Post van RTG",
+    "functie": "link:post",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTG Veilig",
+    "functie": "link:veilig",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Waar ben ik aanwezig",
+    "functie": "link:sessies",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Wat weet RTG van mij",
+    "functie": "link:gegevens",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Wie ben ik",
+    "functie": "link:ik",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Wie heeft toegang tot mij",
+    "functie": "link:relaties",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Alles bij elkaar",
+    "functie": "link:wereldlaag",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "App-dossier",
+    "functie": "link:appdossier",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "assets",
+    "functie": "tab:assets",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Attenties",
+    "functie": "link:attenties",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Balans",
+    "functie": "link:balans",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Bank",
+    "functie": "link:bank",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Bellen",
+    "functie": "os:bellen",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Berichten",
+    "functie": "link:berichten",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "bestellen",
+    "functie": "tab:bestellen",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Betaalcode",
+    "functie": "link:rtgcode",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "betalen",
+    "functie": "tab:betalen",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Camera",
+    "functie": "link:camera",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Cellier",
+    "functie": "link:cellier",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Cercle",
+    "functie": "link:cercle",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Commerce",
+    "functie": "link:commerce",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Daten",
+    "functie": "link:vonk",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Entourage",
+    "functie": "link:entourage",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Films en series",
+    "functie": "link:theater",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Fonds",
+    "functie": "link:labfonds",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Food Court",
+    "functie": "link:foodcourt",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Game Night",
+    "functie": "link:spelavond",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Garde-robe",
+    "functie": "link:garderobe",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Geld",
+    "functie": "link:geldcommand",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "gezin",
+    "functie": "tab:gezin",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Het Vooruitzicht",
+    "functie": "link:vooruitzicht",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Krant",
+    "functie": "link:krant",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Live",
+    "functie": "link:podium",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Logboek",
+    "functie": "link:logboek",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Logeren bij leden",
+    "functie": "link:huis",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Maison",
+    "functie": "link:maison",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Mall",
+    "functie": "link:mall",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Mecenaat",
+    "functie": "link:mecenaat",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Mijn bestellingen",
+    "functie": "link:mijnmall",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Mijn leven",
+    "functie": "link:leven",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Muziek",
+    "functie": "link:muziek",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Nalatenschap",
+    "functie": "link:nalatenschap",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Nieuws",
+    "functie": "link:nieuws",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Overzicht",
+    "functie": "link:ontdek",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Privekantoor",
+    "functie": "link:rechterhand",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Pulse",
+    "functie": "link:pulse",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Rendez-vous",
+    "functie": "link:rendezvous",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTFoundation",
+    "functie": "os:rtf",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTG Media",
+    "functie": "link:mediaos",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTG Pay",
+    "functie": "link:pay",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "salon",
+    "functie": "tab:salon",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Samen betalen",
+    "functie": "link:wbw",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Snaps",
+    "functie": "os:snaps",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Sociaal",
+    "functie": "link:sociaal",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Spelen",
+    "functie": "link:spelen",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Sport",
+    "functie": "link:sport",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Table",
+    "functie": "link:table",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Tweede scherm",
+    "functie": "link:tweedescherm",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Uitgaan",
+    "functie": "link:uitgaan",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Vandaag",
+    "functie": "link:vandaag",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Video",
+    "functie": "link:clips",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Videobellen",
+    "functie": "os:videobellen",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Wallet",
+    "functie": "link:wallet",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Wonen",
+    "functie": "link:wonen",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Aankomst",
+    "functie": "link:aankomst",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Haal ik het?",
+    "functie": "link:move",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Hangar",
+    "functie": "link:hangar",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Navigatie",
+    "functie": "link:navigatie",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Openbaar vervoer",
+    "functie": "link:ov",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "OV-routes",
+    "functie": "link:ovroutes",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Reisboek",
+    "functie": "link:reisboek",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "reizen",
+    "functie": "tab:reizen",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Reizen & Veilig",
+    "functie": "link:reizen",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Routedossier",
+    "functie": "link:routedossier",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Stad",
+    "functie": "link:stad",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "terplaatse",
+    "functie": "tab:terplaatse",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Verblijven",
+    "functie": "link:residentie",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Verkeer",
+    "functie": "link:flits",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Vluchten",
+    "functie": "link:vluchten",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Decision Room",
+    "functie": "link:decisionroom",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
      }
     }
    },
@@ -120,6 +1171,176 @@
       "status": "BEWEZEN",
       "bron": "scripts/tafelproef.js",
       "commit": "67a51f63"
+     },
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Loon",
+    "functie": "link:loonstrook",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Magnaat",
+    "functie": "link:magnaat",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Mijn loopbaan",
+    "functie": "link:loopbaan",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Mijn team",
+    "functie": "link:vertegenwoordiging",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Onderneming",
+    "functie": "link:onderneming",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Partner Network",
+    "functie": "link:partnernetwerk",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Project Room",
+    "functie": "link:projectroom",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTDocs",
+    "functie": "link:office",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTG One",
+    "functie": "link:rtgone",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTG Werk OS",
+    "functie": "link:werkos",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "RTMail",
+    "functie": "link:rtmail",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "School",
+    "functie": "link:school",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Web",
+    "functie": "link:browser",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Website",
+    "functie": "link:sitemaker",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "BEWEZEN",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
+     }
+    }
+   },
+   {
+    "app": "Werk",
+    "functie": "os:werk",
+    "bewijzen": {
+     "waarheidsgetrouw": {
+      "status": "NIET_GETEST",
+      "bron": "scripts/liegronde.js",
+      "commit": "fce571c0"
      }
     }
    }
@@ -202,9 +1423,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm vroeg buiten de deuren niets aan de backend; er viel niets te liegen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -269,7 +1498,9 @@
     "nietRaakbaar": 5,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -318,9 +1549,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm vroeg buiten de deuren niets aan de backend; er viel niets te liegen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -343,7 +1582,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als gezin: 1045 tekens zichtbaar"
+    "als gezin: 1029 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -385,7 +1624,9 @@
     "nietRaakbaar": 8,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -434,9 +1675,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: geen schoolsessie); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -467,7 +1716,9 @@
     "verwacht": "zaak",
     "bronVerwacht": "SCHERMEIGENAAR.json"
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -516,9 +1767,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: geen schoolsessie); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -544,7 +1803,9 @@
     "als gezin: poort dicht"
    ],
    "personaAfwijking": null,
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -593,9 +1854,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -642,10 +1911,10 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 49,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 11
+      "dom": 42,
+      "zichtbaar": 22,
+      "inBeeld": 17,
+      "raakbaar": 10
      }
     },
     "noemer": 1,
@@ -660,7 +1929,9 @@
     "nietRaakbaar": 2,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -705,11 +1976,11 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 760b40d3; sindsdien is er geen code gewijzigd): 17 schakels gesloten, 12 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 33818743; sindsdien is er geen code gewijzigd): 17 schakels gesloten, 12 storingen gehouden",
      "bewijs": {
       "register": "LUSPROEF.json",
-      "op": "2026-09-24T21:01:08.933Z",
-      "commit": "760b40d3",
+      "op": "2026-09-24T21:49:03.643Z",
+      "commit": "33818743",
       "instrument": "scripts/lusproef.js"
      },
      "bron": {
@@ -720,9 +1991,17 @@
      }
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -783,7 +2062,8 @@
     "onomkeerbaar": 0
    },
    "samengesteld": [
-    "voltooibaar"
+    "voltooibaar",
+    "waarheidsgetrouw"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -818,8 +2098,8 @@
      "bewijs": "/apps/foundation/os-publiek.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "geen knop die bij het laden te raken is; wat dit scherm doet loopt via links of formulieren",
+     "status": "BEWEZEN",
+     "reden": "9 te raken bij het laden, 9 geprobeerd, 6 gelukt, 4 met zichtbaar effect; niet aan te tikken: Open the app: element is not visible, Remove from your widgets: element is not visible, Choose your widgets: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -833,9 +2113,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -853,12 +2141,16 @@
      "bewijs": null
     }
    },
-   "gevonden": 0,
-   "geklikt": 0,
+   "gevonden": 9,
+   "geklikt": 6,
    "overgeslagen": [],
-   "nietKlikbaar": [],
+   "nietKlikbaar": [
+    "Open the app: element is not visible",
+    "Remove from your widgets: element is not visible",
+    "Choose your widgets: element is not visible"
+   ],
    "waarnemingen": [
-    "als gezin: 76 tekens zichtbaar"
+    "als gezin: 3238 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -874,28 +2166,30 @@
       "dom": 50,
       "zichtbaar": 43,
       "inBeeld": 12,
-      "raakbaar": 0
+      "raakbaar": 13
      },
      "schil": {
-      "dom": 56,
-      "zichtbaar": 19,
-      "inBeeld": 13,
-      "raakbaar": 0
+      "dom": 52,
+      "zichtbaar": 20,
+      "inBeeld": 14,
+      "raakbaar": 9
      }
     },
-    "noemer": 0,
-    "drempel": 0,
-    "budget": 0,
-    "geprobeerd": 0,
-    "gelukt": 0,
-    "effect": 0,
+    "noemer": 9,
+    "drempel": 5,
+    "budget": 9,
+    "geprobeerd": 9,
+    "gelukt": 6,
+    "effect": 4,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
-    "nietRaakbaar": 15,
+    "nietRaakbaar": 17,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -944,9 +2238,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm vroeg buiten de deuren niets aan de backend; er viel niets te liegen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1011,7 +2313,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -1060,9 +2364,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "achter een deur (html.rtf-toegang-dicht); het scherm zelf is niet beproefd",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1122,7 +2434,9 @@
     "nietRaakbaar": 31,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -1171,9 +2485,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1196,7 +2518,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -1245,9 +2569,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1307,7 +2639,9 @@
     "nietRaakbaar": 8,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -1356,9 +2690,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1400,7 +2742,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 80,
+      "dom": 77,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1418,7 +2760,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -1467,9 +2811,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1529,7 +2881,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -1578,9 +2932,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1640,7 +3002,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -1689,9 +3053,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'tekst')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1743,9 +3115,9 @@
       "raakbaar": 10
      },
      "schil": {
-      "dom": 75,
-      "zichtbaar": 22,
-      "inBeeld": 18,
+      "dom": 68,
+      "zichtbaar": 18,
+      "inBeeld": 14,
       "raakbaar": 11
      }
     },
@@ -1761,7 +3133,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -1810,9 +3184,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1857,7 +3239,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 86,
+      "dom": 84,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -1875,7 +3257,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -1924,9 +3308,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -1978,9 +3370,9 @@
       "raakbaar": 13
      },
      "schil": {
-      "dom": 76,
-      "zichtbaar": 22,
-      "inBeeld": 18,
+      "dom": 68,
+      "zichtbaar": 18,
+      "inBeeld": 14,
       "raakbaar": 11
      }
     },
@@ -1996,7 +3388,9 @@
     "nietRaakbaar": 2,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -2045,9 +3439,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -2115,7 +3517,9 @@
     "nietRaakbaar": 12,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -2164,9 +3568,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -2230,7 +3642,9 @@
     "nietRaakbaar": 2,
     "onomkeerbaar": 1
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -2279,9 +3693,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'aanwezig')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -2323,7 +3745,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 78,
+      "dom": 76,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -2341,7 +3763,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -2390,9 +3814,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -2458,7 +3890,9 @@
     "nietRaakbaar": 24,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -2507,9 +3941,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -2571,7 +4013,9 @@
     "nietRaakbaar": 5,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -2620,9 +4064,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -2651,7 +4103,7 @@
     "Choose your widgets: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 4813 tekens zichtbaar"
+    "als lid: 4814 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2670,7 +4122,7 @@
       "raakbaar": 59
      },
      "schil": {
-      "dom": 82,
+      "dom": 69,
       "zichtbaar": 19,
       "inBeeld": 13,
       "raakbaar": 8
@@ -2688,7 +4140,9 @@
     "nietRaakbaar": 9,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -2737,9 +4191,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -2762,7 +4224,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 3263 tekens zichtbaar"
+    "als lid: 3235 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2799,7 +4261,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -2848,9 +4312,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -2873,7 +4345,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -2922,9 +4396,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -2966,7 +4448,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 105,
+      "dom": 107,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -2984,7 +4466,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -3033,9 +4517,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -3058,7 +4550,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1468 tekens zichtbaar"
+    "als lid: 1485 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3095,7 +4587,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -3144,387 +4638,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
-    },
-    "persistent": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt een tweede sessie en een herstart op dezelfde data",
-     "bewijs": null
-    },
-    "bevoegd": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet",
-     "bewijs": null
-    },
-    "herstelbaar": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie",
-     "bewijs": null
-    }
-   },
-   "gevonden": 4,
-   "geklikt": 4,
-   "overgeslagen": [],
-   "nietKlikbaar": [],
-   "waarnemingen": [
-    "als lid: 1468 tekens zichtbaar"
-   ],
-   "personaAfwijking": null,
-   "bestemming": {
-    "uitkomst": "zelfde-scherm",
-    "ingangCap": "geld.overzicht",
-    "landingCap": "geld.overzicht"
-   },
-   "trechter": {
-    "kant": "app",
-    "landing": "/apps/geld.html#overzicht",
-    "stadia": {
-     "app": {
-      "dom": 5,
-      "zichtbaar": 4,
-      "inBeeld": 3,
-      "raakbaar": 4
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
      },
-     "schil": {
-      "dom": 91,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 11
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
      }
-    },
-    "noemer": 4,
-    "drempel": 2,
-    "budget": 4,
-    "geprobeerd": 4,
-    "gelukt": 4,
-    "effect": 2,
-    "nietMeerGevonden": 0,
-    "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 1,
-    "onomkeerbaar": 0
-   },
-   "samengesteld": [],
-   "mobiel": {
-    "status": "NIET_GETEST",
-    "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
-   },
-   "toegankelijk": {
-    "status": "NIET_GETEST",
-    "reden": "gemeten door npm run a11y (A11Y-INGELOGD.json), nog niet aan deze rij gekoppeld"
-   },
-   "provider": {
-    "status": "NIET_GETEST",
-    "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
-   },
-   "status": "GEEN_FIXTURE",
-   "afhankelijk": {
-    "RTG-schil": {
-     "bewijs": "bedienbaar",
-     "status": "BEWEZEN"
-    }
-   }
-  },
-  {
-   "app": "Bellen",
-   "functie": "os:bellen",
-   "wereld": "LivingOS",
-   "persona": "lid",
-   "ingang": "(os in de app, geen eigen adres)",
-   "bewijzen": {
-    "bereikbaar": {
-     "status": "NIET_GETEST",
-     "reden": "een kiezer in de app: het adres ontstaat pas na een keuze",
-     "bewijs": null
-    },
-    "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "een kiezer in de app: het adres ontstaat pas na een keuze",
-     "bewijs": null
-    },
-    "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "een kiezer in de app: het adres ontstaat pas na een keuze",
-     "bewijs": null
-    },
-    "voltooibaar": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4",
-     "bewijs": null
-    },
-    "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
-    },
-    "persistent": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt een tweede sessie en een herstart op dezelfde data",
-     "bewijs": null
-    },
-    "bevoegd": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet",
-     "bewijs": null
-    },
-    "herstelbaar": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie",
-     "bewijs": null
-    }
-   },
-   "gevonden": 0,
-   "geklikt": 0,
-   "overgeslagen": [],
-   "nietKlikbaar": [],
-   "waarnemingen": [],
-   "samengesteld": [],
-   "mobiel": {
-    "status": "NIET_GETEST",
-    "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
-   },
-   "toegankelijk": {
-    "status": "NIET_GETEST",
-    "reden": "gemeten door npm run a11y (A11Y-INGELOGD.json), nog niet aan deze rij gekoppeld"
-   },
-   "provider": {
-    "status": "NIET_GETEST",
-    "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
-   },
-   "status": "GEEN_FIXTURE",
-   "afhankelijk": {
-    "RTG-schil": {
-     "bewijs": "bedienbaar",
-     "status": "BEWEZEN"
-    }
-   }
-  },
-  {
-   "app": "Berichten",
-   "functie": "link:berichten",
-   "wereld": "LivingOS",
-   "persona": "lid",
-   "ingang": "/apps/comm.html",
-   "bewijzen": {
-    "bereikbaar": {
-     "status": "BEWEZEN",
-     "reden": "opent voor een lid zonder poort en zonder fout",
-     "bewijs": "/apps/comm.html"
-    },
-    "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "8 te raken bij het laden, 8 geprobeerd, 1 gelukt, 1 met zichtbaar effect -- de drempel is 4, dus dit is niet beproefd; niet aan te tikken: ALLES: intercepts pointer events, MENSEN: intercepts pointer events, ZAKEN: intercepts pointer events",
-     "bewijs": null
-    },
-    "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7",
-     "bewijs": null
-    },
-    "voltooibaar": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4",
-     "bewijs": null
-    },
-    "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
-    },
-    "persistent": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt een tweede sessie en een herstart op dezelfde data",
-     "bewijs": null
-    },
-    "bevoegd": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet",
-     "bewijs": null
-    },
-    "herstelbaar": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie",
-     "bewijs": null
-    }
-   },
-   "gevonden": 8,
-   "geklikt": 1,
-   "overgeslagen": [],
-   "nietKlikbaar": [
-    "ALLES: intercepts pointer events",
-    "MENSEN: intercepts pointer events",
-    "ZAKEN: intercepts pointer events",
-    "ONDERWEG: intercepts pointer events",
-    "OFFICIEEL: intercepts pointer events",
-    "RAHUL: intercepts pointer events",
-    "R\nRahul\nStel me gerust een vraag.\nRAHUL: intercepts pointer events"
-   ],
-   "waarnemingen": [
-    "als lid: 1226 tekens zichtbaar"
-   ],
-   "personaAfwijking": null,
-   "bestemming": {
-    "uitkomst": "zelfde-scherm",
-    "ingangCap": "comm.berichten",
-    "landingCap": "comm.berichten"
-   },
-   "trechter": {
-    "kant": "app",
-    "landing": "/apps/comm.html",
-    "stadia": {
-     "app": {
-      "dom": 17,
-      "zichtbaar": 8,
-      "inBeeld": 8,
-      "raakbaar": 8
-     },
-     "schil": {
-      "dom": 108,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 11
-     }
-    },
-    "noemer": 8,
-    "drempel": 4,
-    "budget": 8,
-    "geprobeerd": 8,
-    "gelukt": 1,
-    "effect": 1,
-    "nietMeerGevonden": 0,
-    "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 9,
-    "onomkeerbaar": 0
-   },
-   "samengesteld": [],
-   "mobiel": {
-    "status": "NIET_GETEST",
-    "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
-   },
-   "toegankelijk": {
-    "status": "NIET_GETEST",
-    "reden": "gemeten door npm run a11y (A11Y-INGELOGD.json), nog niet aan deze rij gekoppeld"
-   },
-   "provider": {
-    "status": "NIET_GETEST",
-    "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
-   },
-   "status": "GEEN_FIXTURE",
-   "afhankelijk": {
-    "RTG-schil": {
-     "bewijs": "bedienbaar",
-     "status": "BEWEZEN"
-    }
-   }
-  },
-  {
-   "app": "bestellen",
-   "functie": "tab:bestellen",
-   "wereld": "LivingOS",
-   "persona": "lid",
-   "ingang": "(tab in de app, geen eigen adres)",
-   "bewijzen": {
-    "bereikbaar": {
-     "status": "NIET_GETEST",
-     "reden": "een stand binnen de ledenapp, geen eigen adres: alleen te meten door de app te bedienen",
-     "bewijs": null
-    },
-    "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "een stand binnen de ledenapp, geen eigen adres: alleen te meten door de app te bedienen",
-     "bewijs": null
-    },
-    "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "een stand binnen de ledenapp, geen eigen adres: alleen te meten door de app te bedienen",
-     "bewijs": null
-    },
-    "voltooibaar": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4",
-     "bewijs": null
-    },
-    "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
-    },
-    "persistent": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt een tweede sessie en een herstart op dezelfde data",
-     "bewijs": null
-    },
-    "bevoegd": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet",
-     "bewijs": null
-    },
-    "herstelbaar": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie",
-     "bewijs": null
-    }
-   },
-   "gevonden": 0,
-   "geklikt": 0,
-   "overgeslagen": [],
-   "nietKlikbaar": [],
-   "waarnemingen": [],
-   "samengesteld": [],
-   "mobiel": {
-    "status": "NIET_GETEST",
-    "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
-   },
-   "toegankelijk": {
-    "status": "NIET_GETEST",
-    "reden": "gemeten door npm run a11y (A11Y-INGELOGD.json), nog niet aan deze rij gekoppeld"
-   },
-   "provider": {
-    "status": "NIET_GETEST",
-    "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
-   },
-   "status": "GEEN_FIXTURE",
-   "afhankelijk": {
-    "RTG-schil": {
-     "bewijs": "bedienbaar",
-     "status": "BEWEZEN"
-    }
-   }
-  },
-  {
-   "app": "Betaalcode",
-   "functie": "link:rtgcode",
-   "wereld": "LivingOS",
-   "persona": "lid",
-   "ingang": "/apps/geld.html#rtgcode",
-   "bewijzen": {
-    "bereikbaar": {
-     "status": "BEWEZEN",
-     "reden": "opent voor een lid zonder poort en zonder fout",
-     "bewijs": "/apps/geld.html"
-    },
-    "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 2 met zichtbaar effect",
-     "bewijs": null
-    },
-    "menselijk": {
-     "status": "NIET_GETEST",
-     "reden": "afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7",
-     "bewijs": null
-    },
-    "voltooibaar": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4",
-     "bewijs": null
-    },
-    "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -3584,7 +4708,427 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
+   "mobiel": {
+    "status": "NIET_GETEST",
+    "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
+   },
+   "toegankelijk": {
+    "status": "NIET_GETEST",
+    "reden": "gemeten door npm run a11y (A11Y-INGELOGD.json), nog niet aan deze rij gekoppeld"
+   },
+   "provider": {
+    "status": "NIET_GETEST",
+    "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
+   },
+   "status": "GEEN_FIXTURE",
+   "afhankelijk": {
+    "RTG-schil": {
+     "bewijs": "bedienbaar",
+     "status": "BEWEZEN"
+    }
+   }
+  },
+  {
+   "app": "Bellen",
+   "functie": "os:bellen",
+   "wereld": "LivingOS",
+   "persona": "lid",
+   "ingang": "(os in de app, geen eigen adres)",
+   "bewijzen": {
+    "bereikbaar": {
+     "status": "NIET_GETEST",
+     "reden": "een kiezer in de app: het adres ontstaat pas na een keuze",
+     "bewijs": null
+    },
+    "bedienbaar": {
+     "status": "NIET_GETEST",
+     "reden": "een kiezer in de app: het adres ontstaat pas na een keuze",
+     "bewijs": null
+    },
+    "menselijk": {
+     "status": "NIET_GETEST",
+     "reden": "een kiezer in de app: het adres ontstaat pas na een keuze",
+     "bewijs": null
+    },
+    "voltooibaar": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4",
+     "bewijs": null
+    },
+    "waarheidsgetrouw": {
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
+    },
+    "persistent": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt een tweede sessie en een herstart op dezelfde data",
+     "bewijs": null
+    },
+    "bevoegd": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet",
+     "bewijs": null
+    },
+    "herstelbaar": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie",
+     "bewijs": null
+    }
+   },
+   "gevonden": 0,
+   "geklikt": 0,
+   "overgeslagen": [],
+   "nietKlikbaar": [],
+   "waarnemingen": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
+   "mobiel": {
+    "status": "NIET_GETEST",
+    "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
+   },
+   "toegankelijk": {
+    "status": "NIET_GETEST",
+    "reden": "gemeten door npm run a11y (A11Y-INGELOGD.json), nog niet aan deze rij gekoppeld"
+   },
+   "provider": {
+    "status": "NIET_GETEST",
+    "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
+   },
+   "status": "GEEN_FIXTURE",
+   "afhankelijk": {
+    "RTG-schil": {
+     "bewijs": "bedienbaar",
+     "status": "BEWEZEN"
+    }
+   }
+  },
+  {
+   "app": "Berichten",
+   "functie": "link:berichten",
+   "wereld": "LivingOS",
+   "persona": "lid",
+   "ingang": "/apps/comm.html",
+   "bewijzen": {
+    "bereikbaar": {
+     "status": "BEWEZEN",
+     "reden": "opent voor een lid zonder poort en zonder fout",
+     "bewijs": "/apps/comm.html"
+    },
+    "bedienbaar": {
+     "status": "NIET_GETEST",
+     "reden": "8 te raken bij het laden, 8 geprobeerd, 1 gelukt, 1 met zichtbaar effect -- de drempel is 4, dus dit is niet beproefd; niet aan te tikken: ALLES: intercepts pointer events, MENSEN: intercepts pointer events, ZAKEN: intercepts pointer events",
+     "bewijs": null
+    },
+    "menselijk": {
+     "status": "NIET_GETEST",
+     "reden": "afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7",
+     "bewijs": null
+    },
+    "voltooibaar": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4",
+     "bewijs": null
+    },
+    "waarheidsgetrouw": {
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
+    },
+    "persistent": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt een tweede sessie en een herstart op dezelfde data",
+     "bewijs": null
+    },
+    "bevoegd": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet",
+     "bewijs": null
+    },
+    "herstelbaar": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie",
+     "bewijs": null
+    }
+   },
+   "gevonden": 8,
+   "geklikt": 1,
+   "overgeslagen": [],
+   "nietKlikbaar": [
+    "ALLES: intercepts pointer events",
+    "MENSEN: intercepts pointer events",
+    "ZAKEN: intercepts pointer events",
+    "ONDERWEG: intercepts pointer events",
+    "OFFICIEEL: intercepts pointer events",
+    "RAHUL: intercepts pointer events",
+    "R\nRahul\nStel me gerust een vraag.\nRAHUL: intercepts pointer events"
+   ],
+   "waarnemingen": [
+    "als lid: 1512 tekens zichtbaar"
+   ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "comm.berichten",
+    "landingCap": "comm.berichten"
+   },
+   "trechter": {
+    "kant": "app",
+    "landing": "/apps/comm.html",
+    "stadia": {
+     "app": {
+      "dom": 17,
+      "zichtbaar": 8,
+      "inBeeld": 8,
+      "raakbaar": 8
+     },
+     "schil": {
+      "dom": 108,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 11
+     }
+    },
+    "noemer": 8,
+    "drempel": 4,
+    "budget": 8,
+    "geprobeerd": 8,
+    "gelukt": 1,
+    "effect": 1,
+    "nietMeerGevonden": 0,
+    "overgeslagen": 0,
+    "teruggekeerd": 0,
+    "nietRaakbaar": 9,
+    "onomkeerbaar": 0
+   },
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
+   "mobiel": {
+    "status": "NIET_GETEST",
+    "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
+   },
+   "toegankelijk": {
+    "status": "NIET_GETEST",
+    "reden": "gemeten door npm run a11y (A11Y-INGELOGD.json), nog niet aan deze rij gekoppeld"
+   },
+   "provider": {
+    "status": "NIET_GETEST",
+    "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
+   },
+   "status": "GEEN_FIXTURE",
+   "afhankelijk": {
+    "RTG-schil": {
+     "bewijs": "bedienbaar",
+     "status": "BEWEZEN"
+    }
+   }
+  },
+  {
+   "app": "bestellen",
+   "functie": "tab:bestellen",
+   "wereld": "LivingOS",
+   "persona": "lid",
+   "ingang": "(tab in de app, geen eigen adres)",
+   "bewijzen": {
+    "bereikbaar": {
+     "status": "NIET_GETEST",
+     "reden": "een stand binnen de ledenapp, geen eigen adres: alleen te meten door de app te bedienen",
+     "bewijs": null
+    },
+    "bedienbaar": {
+     "status": "NIET_GETEST",
+     "reden": "een stand binnen de ledenapp, geen eigen adres: alleen te meten door de app te bedienen",
+     "bewijs": null
+    },
+    "menselijk": {
+     "status": "NIET_GETEST",
+     "reden": "een stand binnen de ledenapp, geen eigen adres: alleen te meten door de app te bedienen",
+     "bewijs": null
+    },
+    "voltooibaar": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4",
+     "bewijs": null
+    },
+    "waarheidsgetrouw": {
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
+    },
+    "persistent": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt een tweede sessie en een herstart op dezelfde data",
+     "bewijs": null
+    },
+    "bevoegd": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet",
+     "bewijs": null
+    },
+    "herstelbaar": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie",
+     "bewijs": null
+    }
+   },
+   "gevonden": 0,
+   "geklikt": 0,
+   "overgeslagen": [],
+   "nietKlikbaar": [],
+   "waarnemingen": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
+   "mobiel": {
+    "status": "NIET_GETEST",
+    "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
+   },
+   "toegankelijk": {
+    "status": "NIET_GETEST",
+    "reden": "gemeten door npm run a11y (A11Y-INGELOGD.json), nog niet aan deze rij gekoppeld"
+   },
+   "provider": {
+    "status": "NIET_GETEST",
+    "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
+   },
+   "status": "GEEN_FIXTURE",
+   "afhankelijk": {
+    "RTG-schil": {
+     "bewijs": "bedienbaar",
+     "status": "BEWEZEN"
+    }
+   }
+  },
+  {
+   "app": "Betaalcode",
+   "functie": "link:rtgcode",
+   "wereld": "LivingOS",
+   "persona": "lid",
+   "ingang": "/apps/geld.html#rtgcode",
+   "bewijzen": {
+    "bereikbaar": {
+     "status": "BEWEZEN",
+     "reden": "opent voor een lid zonder poort en zonder fout",
+     "bewijs": "/apps/geld.html"
+    },
+    "bedienbaar": {
+     "status": "BEWEZEN",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect",
+     "bewijs": null
+    },
+    "menselijk": {
+     "status": "NIET_GETEST",
+     "reden": "afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7",
+     "bewijs": null
+    },
+    "voltooibaar": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4",
+     "bewijs": null
+    },
+    "waarheidsgetrouw": {
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
+    },
+    "persistent": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt een tweede sessie en een herstart op dezelfde data",
+     "bewijs": null
+    },
+    "bevoegd": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet",
+     "bewijs": null
+    },
+    "herstelbaar": {
+     "status": "GEEN_FIXTURE",
+     "reden": "vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie",
+     "bewijs": null
+    }
+   },
+   "gevonden": 4,
+   "geklikt": 4,
+   "overgeslagen": [],
+   "nietKlikbaar": [],
+   "waarnemingen": [
+    "als lid: 1468 tekens zichtbaar"
+   ],
+   "personaAfwijking": null,
+   "bestemming": {
+    "uitkomst": "zelfde-scherm",
+    "ingangCap": "geld.overzicht",
+    "landingCap": "geld.overzicht"
+   },
+   "trechter": {
+    "kant": "app",
+    "landing": "/apps/geld.html#overzicht",
+    "stadia": {
+     "app": {
+      "dom": 5,
+      "zichtbaar": 4,
+      "inBeeld": 3,
+      "raakbaar": 4
+     },
+     "schil": {
+      "dom": 75,
+      "zichtbaar": 25,
+      "inBeeld": 20,
+      "raakbaar": 13
+     }
+    },
+    "noemer": 4,
+    "drempel": 2,
+    "budget": 4,
+    "geprobeerd": 4,
+    "gelukt": 4,
+    "effect": 3,
+    "nietMeerGevonden": 0,
+    "overgeslagen": 0,
+    "teruggekeerd": 0,
+    "nietRaakbaar": 1,
+    "onomkeerbaar": 0
+   },
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -3633,9 +5177,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -3658,7 +5210,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -3707,9 +5261,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -3754,10 +5316,10 @@
       "raakbaar": 9
      },
      "schil": {
-      "dom": 77,
-      "zichtbaar": 25,
-      "inBeeld": 10,
-      "raakbaar": 3
+      "dom": 88,
+      "zichtbaar": 24,
+      "inBeeld": 13,
+      "raakbaar": 6
      }
     },
     "noemer": 9,
@@ -3772,7 +5334,9 @@
     "nietRaakbaar": 23,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -3821,9 +5385,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'map')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -3865,9 +5437,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 78,
-      "zichtbaar": 24,
-      "inBeeld": 19,
+      "dom": 71,
+      "zichtbaar": 20,
+      "inBeeld": 15,
       "raakbaar": 12
      }
     },
@@ -3883,7 +5455,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -3932,9 +5506,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -3994,7 +5576,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -4043,9 +5627,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -4087,9 +5679,9 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 64,
-      "zichtbaar": 17,
-      "inBeeld": 14,
+      "dom": 72,
+      "zichtbaar": 20,
+      "inBeeld": 16,
       "raakbaar": 13
      }
     },
@@ -4105,7 +5697,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -4154,9 +5748,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -4216,7 +5818,9 @@
     "nietRaakbaar": 5,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -4265,9 +5869,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -4327,7 +5939,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -4376,9 +5990,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -4403,7 +6025,7 @@
     "Kanaal aanmelden: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1239 tekens zichtbaar"
+    "als lid: 1255 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4422,7 +6044,7 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 76,
+      "dom": 86,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -4440,7 +6062,9 @@
     "nietRaakbaar": 8,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -4489,9 +6113,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -4551,7 +6183,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -4600,9 +6234,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -4675,7 +6317,9 @@
     "nietRaakbaar": 3,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -4724,9 +6368,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -4786,7 +6438,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -4835,9 +6489,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'map')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -4879,9 +6541,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 78,
-      "zichtbaar": 24,
-      "inBeeld": 19,
+      "dom": 71,
+      "zichtbaar": 20,
+      "inBeeld": 15,
       "raakbaar": 12
      }
     },
@@ -4897,7 +6559,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -4932,7 +6596,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect",
+     "reden": "8 te raken bij het laden, 8 geprobeerd, 4 gelukt, 2 met zichtbaar effect; niet aan te tikken: Overzicht: element is not visible, Betalen: element is not visible, Vooruit: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -4946,9 +6610,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -4966,12 +6638,17 @@
      "bewijs": null
     }
    },
-   "gevonden": 4,
+   "gevonden": 8,
    "geklikt": 4,
    "overgeslagen": [],
-   "nietKlikbaar": [],
+   "nietKlikbaar": [
+    "Overzicht: element is not visible",
+    "Betalen: element is not visible",
+    "Vooruit: element is not visible",
+    "Meer: element is not visible"
+   ],
    "waarnemingen": [
-    "als lid: 1485 tekens zichtbaar"
+    "als lid: 1748 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4984,31 +6661,33 @@
     "landing": "/apps/geld.html#overzicht",
     "stadia": {
      "app": {
-      "dom": 5,
-      "zichtbaar": 4,
-      "inBeeld": 3,
-      "raakbaar": 4
+      "dom": 9,
+      "zichtbaar": 8,
+      "inBeeld": 7,
+      "raakbaar": 8
      },
      "schil": {
-      "dom": 78,
-      "zichtbaar": 25,
-      "inBeeld": 20,
-      "raakbaar": 13
+      "dom": 62,
+      "zichtbaar": 19,
+      "inBeeld": 14,
+      "raakbaar": 11
      }
     },
-    "noemer": 4,
-    "drempel": 2,
-    "budget": 4,
-    "geprobeerd": 4,
+    "noemer": 8,
+    "drempel": 4,
+    "budget": 8,
+    "geprobeerd": 8,
     "gelukt": 4,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -5057,9 +6736,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -5082,7 +6769,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -5117,7 +6806,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "10 te raken bij het laden, 10 geprobeerd, 10 gelukt, 3 met zichtbaar effect",
+     "reden": "10 te raken bij het laden, 10 geprobeerd, 10 gelukt, 2 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -5131,9 +6820,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "11 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -5175,9 +6872,9 @@
       "raakbaar": 10
      },
      "schil": {
-      "dom": 74,
-      "zichtbaar": 18,
-      "inBeeld": 14,
+      "dom": 55,
+      "zichtbaar": 15,
+      "inBeeld": 12,
       "raakbaar": 11
      }
     },
@@ -5186,14 +6883,16 @@
     "budget": 10,
     "geprobeerd": 10,
     "gelukt": 10,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
     "nietRaakbaar": 14,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -5242,9 +6941,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -5286,9 +6993,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 89,
-      "zichtbaar": 25,
-      "inBeeld": 20,
+      "dom": 59,
+      "zichtbaar": 21,
+      "inBeeld": 16,
       "raakbaar": 13
      }
     },
@@ -5304,7 +7011,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -5353,9 +7062,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -5400,9 +7117,9 @@
       "raakbaar": 11
      },
      "schil": {
-      "dom": 74,
-      "zichtbaar": 19,
-      "inBeeld": 14,
+      "dom": 81,
+      "zichtbaar": 23,
+      "inBeeld": 18,
       "raakbaar": 11
      }
     },
@@ -5418,7 +7135,9 @@
     "nietRaakbaar": 8,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -5467,9 +7186,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -5529,7 +7256,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -5578,9 +7307,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -5642,7 +7379,9 @@
     "nietRaakbaar": 3,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -5691,9 +7430,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -5753,7 +7500,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -5802,9 +7551,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -5902,8 +7659,8 @@
      "schil": {
       "dom": 54,
       "zichtbaar": 17,
-      "inBeeld": 13,
-      "raakbaar": 12
+      "inBeeld": 14,
+      "raakbaar": 13
      }
     },
     "noemer": 54,
@@ -5918,7 +7675,9 @@
     "nietRaakbaar": 6,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -5967,9 +7726,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -6029,7 +7796,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -6078,9 +7847,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -6103,7 +7880,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1111 tekens zichtbaar"
+    "als lid: 1378 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6122,10 +7899,10 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 71,
-      "zichtbaar": 20,
-      "inBeeld": 15,
-      "raakbaar": 12
+      "dom": 78,
+      "zichtbaar": 22,
+      "inBeeld": 17,
+      "raakbaar": 10
      }
     },
     "noemer": 0,
@@ -6140,7 +7917,9 @@
     "nietRaakbaar": 5,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -6175,7 +7954,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "19 te raken bij het laden, 14 geprobeerd, 11 gelukt, 8 met zichtbaar effect, 5 niet meer gevonden, 1 overgeslagen (onomkeerbaar), 10x teruggekeerd na navigatie; niet aan te tikken: Ontdekken: element is not visible, Uw avond: element is not visible, Tweede scherm openen ＋: element is not visible",
+     "reden": "19 te raken bij het laden, 15 geprobeerd, 11 gelukt, 8 met zichtbaar effect, 4 niet meer gevonden, 1 overgeslagen (onomkeerbaar), 9x teruggekeerd na navigatie; niet aan te tikken: ◇\nOntdekken: element is not stable, Ontdekken: element is not visible, Uw avond: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -6189,9 +7968,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -6215,12 +8002,13 @@
     "□\nBestellen"
    ],
    "nietKlikbaar": [
+    "◇\nOntdekken: element is not stable",
     "Ontdekken: element is not visible",
     "Uw avond: element is not visible",
     "Tweede scherm openen ＋: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 865 tekens zichtbaar"
+    "als lid: 1486 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6235,29 +8023,31 @@
      "app": {
       "dom": 22,
       "zichtbaar": 20,
-      "inBeeld": 20,
+      "inBeeld": 19,
       "raakbaar": 20
      },
      "schil": {
-      "dom": 53,
-      "zichtbaar": 15,
-      "inBeeld": 12,
-      "raakbaar": 11
+      "dom": 32,
+      "zichtbaar": 2,
+      "inBeeld": 2,
+      "raakbaar": 2
      }
     },
     "noemer": 19,
     "drempel": 10,
     "budget": 19,
-    "geprobeerd": 14,
+    "geprobeerd": 15,
     "gelukt": 11,
     "effect": 8,
-    "nietMeerGevonden": 5,
+    "nietMeerGevonden": 4,
     "overgeslagen": 1,
-    "teruggekeerd": 10,
+    "teruggekeerd": 9,
     "nietRaakbaar": 2,
     "onomkeerbaar": 1
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -6306,9 +8096,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -6333,7 +8131,7 @@
     "Doe mee: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1507 tekens zichtbaar"
+    "als lid: 1766 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6370,7 +8168,9 @@
     "nietRaakbaar": 10,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -6419,9 +8219,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -6481,7 +8289,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -6530,9 +8340,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'map')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -6582,7 +8400,7 @@
       "raakbaar": 8
      },
      "schil": {
-      "dom": 80,
+      "dom": 72,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -6600,7 +8418,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -6649,9 +8469,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "17 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -6687,15 +8515,15 @@
     "landing": "/apps/rtg.html",
     "stadia": {
      "app": {
-      "dom": 56,
-      "zichtbaar": 42,
-      "inBeeld": 42,
+      "dom": 58,
+      "zichtbaar": 43,
+      "inBeeld": 43,
       "raakbaar": 0
      },
      "schil": {
-      "dom": 49,
-      "zichtbaar": 14,
-      "inBeeld": 10,
+      "dom": 61,
+      "zichtbaar": 12,
+      "inBeeld": 8,
       "raakbaar": 0
      }
     },
@@ -6708,10 +8536,12 @@
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
-    "nietRaakbaar": 20,
+    "nietRaakbaar": 21,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -6760,9 +8590,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'knopen')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -6785,7 +8623,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1652 tekens zichtbaar"
+    "als lid: 1636 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6804,9 +8642,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 71,
-      "zichtbaar": 20,
-      "inBeeld": 15,
+      "dom": 78,
+      "zichtbaar": 24,
+      "inBeeld": 19,
       "raakbaar": 12
      }
     },
@@ -6822,7 +8660,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -6871,9 +8711,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -6917,7 +8765,7 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 98,
+      "dom": 96,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -6935,7 +8783,9 @@
     "nietRaakbaar": 3,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -6984,9 +8834,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7046,7 +8904,9 @@
     "nietRaakbaar": 3,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -7095,9 +8955,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7120,7 +8988,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -7169,9 +9039,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'forEach')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7240,8 +9118,8 @@
      "schil": {
       "dom": 55,
       "zichtbaar": 16,
-      "inBeeld": 13,
-      "raakbaar": 12
+      "inBeeld": 12,
+      "raakbaar": 11
      }
     },
     "noemer": 25,
@@ -7256,7 +9134,9 @@
     "nietRaakbaar": 41,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -7305,9 +9185,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7332,7 +9220,7 @@
    ],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 911 tekens zichtbaar"
+    "als lid: 912 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7369,7 +9257,9 @@
     "nietRaakbaar": 14,
     "onomkeerbaar": 1
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -7418,9 +9308,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7443,7 +9341,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -7492,9 +9392,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7554,7 +9462,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -7603,9 +9513,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7628,7 +9546,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -7677,9 +9597,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "7 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7723,7 +9651,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 72,
+      "dom": 68,
       "zichtbaar": 16,
       "inBeeld": 13,
       "raakbaar": 12
@@ -7741,7 +9669,9 @@
     "nietRaakbaar": 7,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -7790,9 +9720,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "12 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7852,7 +9790,9 @@
     "nietRaakbaar": 28,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -7901,9 +9841,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading '0')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -7953,7 +9901,7 @@
       "raakbaar": 8
      },
      "schil": {
-      "dom": 63,
+      "dom": 81,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 15
@@ -7971,7 +9919,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -8020,9 +9970,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -8064,9 +10022,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 78,
-      "zichtbaar": 24,
-      "inBeeld": 19,
+      "dom": 71,
+      "zichtbaar": 20,
+      "inBeeld": 15,
       "raakbaar": 12
      }
     },
@@ -8082,7 +10040,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -8131,9 +10091,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -8198,7 +10166,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -8247,9 +10217,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -8318,7 +10296,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -8353,7 +10333,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "12 te raken bij het laden, 2 geprobeerd, 1 gelukt, 1 met zichtbaar effect, 10 niet meer gevonden, 11x teruggekeerd na navigatie -- de drempel is 6, dus dit is niet beproefd; niet aan te tikken: VANDAAG INVULLEN: element is not stable",
+     "reden": "12 te raken bij het laden, 2 geprobeerd, 1 gelukt, 1 met zichtbaar effect, 10 niet meer gevonden, 10x teruggekeerd na navigatie -- de drempel is 6, dus dit is niet beproefd; niet aan te tikken: UW DAG: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -8367,9 +10347,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -8391,7 +10379,7 @@
    "geklikt": 1,
    "overgeslagen": [],
    "nietKlikbaar": [
-    "VANDAAG INVULLEN: element is not stable"
+    "UW DAG: element is not visible"
    ],
    "waarnemingen": [
     "als lid: 1635 tekens zichtbaar"
@@ -8413,7 +10401,7 @@
       "raakbaar": 12
      },
      "schil": {
-      "dom": 70,
+      "dom": 62,
       "zichtbaar": 16,
       "inBeeld": 13,
       "raakbaar": 12
@@ -8427,11 +10415,13 @@
     "effect": 1,
     "nietMeerGevonden": 10,
     "overgeslagen": 0,
-    "teruggekeerd": 11,
+    "teruggekeerd": 10,
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -8466,7 +10456,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "3 te raken bij het laden, 3 geprobeerd, 2 gelukt, 1 met zichtbaar effect; niet aan te tikken: ↑ Terug naar boven: intercepts pointer events",
+     "reden": "3 te raken bij het laden, 3 geprobeerd, 2 gelukt, 2 met zichtbaar effect; niet aan te tikken: ↑ Terug naar boven: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -8480,9 +10470,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: feedData.clips is not iterable); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -8507,7 +10505,7 @@
     "↑ Terug naar boven: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 978 tekens zichtbaar"
+    "als lid: 980 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8526,7 +10524,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 89,
+      "dom": 92,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -8537,14 +10535,16 @@
     "budget": 3,
     "geprobeerd": 3,
     "gelukt": 2,
-    "effect": 1,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
     "nietRaakbaar": 15,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -8593,9 +10593,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -8618,7 +10626,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -8653,7 +10663,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 2 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -8667,9 +10677,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -8711,10 +10729,10 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 75,
-      "zichtbaar": 25,
-      "inBeeld": 20,
-      "raakbaar": 13
+      "dom": 88,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 11
      }
     },
     "noemer": 4,
@@ -8722,14 +10740,16 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 4,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -8778,9 +10798,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -8822,9 +10850,9 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 80,
-      "zichtbaar": 24,
-      "inBeeld": 19,
+      "dom": 71,
+      "zichtbaar": 20,
+      "inBeeld": 15,
       "raakbaar": 12
      }
     },
@@ -8840,7 +10868,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -8889,9 +10919,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -8951,7 +10989,9 @@
     "nietRaakbaar": 5,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -9000,9 +11040,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -9044,7 +11092,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 80,
+      "dom": 81,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -9062,7 +11110,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -9111,9 +11161,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -9136,7 +11194,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1514 tekens zichtbaar"
+    "als lid: 1498 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9173,7 +11231,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -9222,9 +11282,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -9284,7 +11352,9 @@
     "nietRaakbaar": 19,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -9319,7 +11389,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 3 gelukt, 3 met zichtbaar effect; niet aan te tikken: Plan mijn reis: element is not visible",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 3 gelukt, 2 met zichtbaar effect; niet aan te tikken: Plan mijn reis: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -9333,9 +11403,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'modus')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -9379,7 +11457,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 84,
+      "dom": 92,
       "zichtbaar": 25,
       "inBeeld": 20,
       "raakbaar": 13
@@ -9390,14 +11468,16 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 3,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
     "nietRaakbaar": 14,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -9446,9 +11526,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -9513,7 +11601,9 @@
     "nietRaakbaar": 6,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -9562,9 +11652,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -9606,7 +11704,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 88,
+      "dom": 86,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -9624,7 +11722,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -9673,9 +11773,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -9698,7 +11806,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -9733,7 +11843,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "19 te raken bij het laden, 14 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 5 niet meer gevonden, 6x teruggekeerd na navigatie -- de drempel is 10, dus dit is niet beproefd; niet aan te tikken: Reizen: element is not visible, Vandaag: element is not visible, Tweede scherm openen ＋: intercepts pointer events",
+     "reden": "19 te raken bij het laden, 14 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 5 niet meer gevonden, 6x teruggekeerd na navigatie -- de drempel is 10, dus dit is niet beproefd; niet aan te tikken: Reizen: element is not visible, Vandaag: element is not visible, Tweede scherm openen ＋: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -9747,9 +11857,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -9773,7 +11891,7 @@
    "nietKlikbaar": [
     "Reizen: element is not visible",
     "Vandaag: element is not visible",
-    "Tweede scherm openen ＋: intercepts pointer events",
+    "Tweede scherm openen ＋: element is not visible",
     "MEENEMEN: intercepts pointer events",
     "Adviseer: intercepts pointer events",
     "Open mijn reizen →: intercepts pointer events",
@@ -9785,7 +11903,7 @@
     "Nieuw Moment: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2167 tekens zichtbaar"
+    "als lid: 2247 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9822,7 +11940,9 @@
     "nietRaakbaar": 4,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -9871,9 +11991,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -9938,7 +12066,7 @@
     "Volgende →: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als kantoor: 3942 tekens zichtbaar"
+    "als kantoor: 3958 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9975,7 +12103,9 @@
     "nietRaakbaar": 2,
     "onomkeerbaar": 3
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -10009,8 +12139,8 @@
      "bewijs": "/apps/stad.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "geen knop die bij het laden te raken is; wat dit scherm doet loopt via links of formulieren",
+     "status": "BEWEZEN",
+     "reden": "3 te raken bij het laden, 2 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 1 niet meer gevonden, 3x teruggekeerd na navigatie",
      "bewijs": null
     },
     "menselijk": {
@@ -10024,9 +12154,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -10044,12 +12182,12 @@
      "bewijs": null
     }
    },
-   "gevonden": 0,
-   "geklikt": 0,
+   "gevonden": 3,
+   "geklikt": 2,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1246 tekens zichtbaar"
+    "als lid: 1245 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10063,30 +12201,32 @@
     "stadia": {
      "app": {
       "dom": 4,
-      "zichtbaar": 0,
-      "inBeeld": 0,
-      "raakbaar": 0
+      "zichtbaar": 3,
+      "inBeeld": 3,
+      "raakbaar": 3
      },
      "schil": {
-      "dom": 96,
+      "dom": 83,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
      }
     },
-    "noemer": 0,
-    "drempel": 0,
-    "budget": 0,
-    "geprobeerd": 0,
-    "gelukt": 0,
-    "effect": 0,
-    "nietMeerGevonden": 0,
+    "noemer": 3,
+    "drempel": 2,
+    "budget": 3,
+    "geprobeerd": 2,
+    "gelukt": 2,
+    "effect": 2,
+    "nietMeerGevonden": 1,
     "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 4,
+    "teruggekeerd": 3,
+    "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -10135,9 +12275,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -10160,7 +12308,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -10209,9 +12359,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -10242,7 +12400,7 @@
     "Zeg: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 735 tekens zichtbaar"
+    "als lid: 725 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10256,15 +12414,15 @@
     "stadia": {
      "app": {
       "dom": 22,
-      "zichtbaar": 8,
-      "inBeeld": 8,
+      "zichtbaar": 11,
+      "inBeeld": 11,
       "raakbaar": 8
      },
      "schil": {
-      "dom": 94,
-      "zichtbaar": 24,
-      "inBeeld": 13,
-      "raakbaar": 6
+      "dom": 81,
+      "zichtbaar": 25,
+      "inBeeld": 10,
+      "raakbaar": 3
      }
     },
     "noemer": 8,
@@ -10279,7 +12437,9 @@
     "nietRaakbaar": 14,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -10328,9 +12488,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -10372,7 +12540,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 82,
+      "dom": 90,
       "zichtbaar": 25,
       "inBeeld": 20,
       "raakbaar": 13
@@ -10390,7 +12558,9 @@
     "nietRaakbaar": 4,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -10439,9 +12609,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'filter')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -10488,9 +12666,9 @@
       "raakbaar": 7
      },
      "schil": {
-      "dom": 75,
-      "zichtbaar": 19,
-      "inBeeld": 14,
+      "dom": 82,
+      "zichtbaar": 23,
+      "inBeeld": 18,
       "raakbaar": 11
      }
     },
@@ -10506,7 +12684,9 @@
     "nietRaakbaar": 4,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -10555,9 +12735,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -10619,7 +12807,9 @@
     "nietRaakbaar": 9,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -10664,7 +12854,7 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 67a51f63; sindsdien is er geen code gewijzigd): 11 schakels gesloten, 8 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 67a51f63; sindsdien is er geen code gewijzigd die dit instrument raakt (8 wijziging(en) in scripts die het niet inleest)): 11 schakels gesloten, 8 storingen gehouden",
      "bewijs": {
       "register": "TAFELPROEF.json",
       "op": "2026-09-24T21:08:13.463Z",
@@ -10679,9 +12869,17 @@
      }
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -10749,7 +12947,8 @@
     "onomkeerbaar": 0
    },
    "samengesteld": [
-    "voltooibaar"
+    "voltooibaar",
+    "waarheidsgetrouw"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -10799,9 +12998,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -10843,7 +13050,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 76,
+      "dom": 78,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -10861,7 +13068,9 @@
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -10910,9 +13119,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -10941,7 +13158,7 @@
     "Open de volledige Magnaat-wereld: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1504 tekens zichtbaar"
+    "als lid: 1570 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10978,7 +13195,9 @@
     "nietRaakbaar": 90,
     "onomkeerbaar": 1
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -11027,9 +13246,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -11071,7 +13298,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 78,
+      "dom": 70,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -11089,7 +13316,9 @@
     "nietRaakbaar": 2,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -11138,9 +13367,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -11182,7 +13419,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 70,
+      "dom": 80,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -11200,7 +13437,9 @@
     "nietRaakbaar": 2,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -11249,9 +13488,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -11274,7 +13521,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 908 tekens zichtbaar"
+    "als lid: 892 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11293,7 +13540,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 78,
+      "dom": 88,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -11311,7 +13558,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -11346,7 +13595,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "14 te raken bij het laden, 14 geprobeerd, 7 gelukt, 3 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Filters: intercepts pointer events, Onderzoek match →: intercepts pointer events, Simuleer belofte: intercepts pointer events",
+     "reden": "14 te raken bij het laden, 14 geprobeerd, 7 gelukt, 2 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Filters: intercepts pointer events, Onderzoek match →: intercepts pointer events, Simuleer belofte: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -11360,9 +13609,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -11393,7 +13650,7 @@
     "Maak capaciteitsvoorstel: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2596 tekens zichtbaar"
+    "als lid: 2580 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -11417,7 +13674,7 @@
       "raakbaar": 14
      },
      "schil": {
-      "dom": 79,
+      "dom": 87,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -11428,14 +13685,16 @@
     "budget": 14,
     "geprobeerd": 14,
     "gelukt": 7,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 1,
     "nietRaakbaar": 4,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -11484,9 +13743,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -11546,7 +13813,9 @@
     "nietRaakbaar": 8,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -11580,8 +13849,8 @@
      "bewijs": "/apps/office.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "6 te raken bij het laden, 6 geprobeerd, 1 gelukt, 1 met zichtbaar effect, 4x teruggekeerd na navigatie -- de drempel is 3, dus dit is niet beproefd; niet aan te tikken: Open alle documenten: element is not visible, ●\nNodig: intercepts pointer events, ◇\nDossiers: intercepts pointer events",
+     "status": "BEWEZEN",
+     "reden": "2 te raken bij het laden, 2 geprobeerd, 1 gelukt, 1 met zichtbaar effect; niet aan te tikken: Open alle documenten: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -11595,9 +13864,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -11615,15 +13892,11 @@
      "bewijs": null
     }
    },
-   "gevonden": 6,
+   "gevonden": 2,
    "geklikt": 1,
    "overgeslagen": [],
    "nietKlikbaar": [
-    "Open alle documenten: element is not visible",
-    "●\nNodig: intercepts pointer events",
-    "◇\nDossiers: intercepts pointer events",
-    "B\nBesluit: intercepts pointer events",
-    "≡\nAlle docs: intercepts pointer events"
+    "Open alle documenten: element is not visible"
    ],
    "waarnemingen": [
     "als lid: 1005 tekens zichtbaar"
@@ -11645,30 +13918,32 @@
     "stadia": {
      "app": {
       "dom": 59,
-      "zichtbaar": 6,
-      "inBeeld": 6,
-      "raakbaar": 6
+      "zichtbaar": 2,
+      "inBeeld": 2,
+      "raakbaar": 2
      },
      "schil": {
-      "dom": 83,
-      "zichtbaar": 25,
-      "inBeeld": 10,
-      "raakbaar": 3
+      "dom": 95,
+      "zichtbaar": 24,
+      "inBeeld": 13,
+      "raakbaar": 6
      }
     },
-    "noemer": 6,
-    "drempel": 3,
-    "budget": 6,
-    "geprobeerd": 6,
+    "noemer": 2,
+    "drempel": 1,
+    "budget": 2,
+    "geprobeerd": 2,
     "gelukt": 1,
     "effect": 1,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
-    "teruggekeerd": 4,
-    "nietRaakbaar": 53,
+    "teruggekeerd": 0,
+    "nietRaakbaar": 57,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -11717,9 +13992,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -11782,7 +14065,9 @@
     "nietRaakbaar": 22,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -11831,9 +14116,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -11856,7 +14149,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1034 tekens zichtbaar"
+    "als lid: 1040 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11893,7 +14186,9 @@
     "nietRaakbaar": 15,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -11928,7 +14223,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "7 te raken bij het laden, 6 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 1 niet meer gevonden, 3x teruggekeerd na navigatie -- de drempel is 4, dus dit is niet beproefd; niet aan te tikken: Open gesprek ›: intercepts pointer events, Open alle post: intercepts pointer events, ◇\nGesprek: element is not stable",
+     "reden": "7 te raken bij het laden, 7 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 2x teruggekeerd na navigatie -- de drempel is 4, dus dit is niet beproefd; niet aan te tikken: Open gesprek ›: intercepts pointer events, Open alle post: intercepts pointer events, ◇\nGesprek: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -11942,9 +14237,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -11963,13 +14266,13 @@
     }
    },
    "gevonden": 7,
-   "geklikt": 2,
+   "geklikt": 3,
    "overgeslagen": [],
    "nietKlikbaar": [
     "Open gesprek ›: intercepts pointer events",
     "Open alle post: intercepts pointer events",
-    "◇\nGesprek: element is not stable",
-    "≡\nAlle post: element is not stable"
+    "◇\nGesprek: element is not visible",
+    "≡\nAlle post: element is not visible"
    ],
    "waarnemingen": [
     "als lid: 1441 tekens zichtbaar"
@@ -12000,16 +14303,18 @@
     "noemer": 7,
     "drempel": 4,
     "budget": 7,
-    "geprobeerd": 6,
-    "gelukt": 2,
-    "effect": 2,
-    "nietMeerGevonden": 1,
+    "geprobeerd": 7,
+    "gelukt": 3,
+    "effect": 3,
+    "nietMeerGevonden": 0,
     "overgeslagen": 0,
-    "teruggekeerd": 3,
+    "teruggekeerd": 2,
     "nietRaakbaar": 11,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -12044,7 +14349,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "5 te raken bij het laden, 4 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 1 niet meer gevonden, 5x teruggekeerd na navigatie; niet aan te tikken: Inschrijven: element is not visible",
+     "reden": "5 te raken bij het laden, 4 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 1 niet meer gevonden, 4x teruggekeerd na navigatie; niet aan te tikken: Inschrijven: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -12058,9 +14363,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "7 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -12109,9 +14422,9 @@
       "raakbaar": 5
      },
      "schil": {
-      "dom": 77,
-      "zichtbaar": 23,
-      "inBeeld": 18,
+      "dom": 71,
+      "zichtbaar": 20,
+      "inBeeld": 15,
       "raakbaar": 12
      }
     },
@@ -12123,11 +14436,13 @@
     "effect": 3,
     "nietMeerGevonden": 1,
     "overgeslagen": 0,
-    "teruggekeerd": 5,
+    "teruggekeerd": 4,
     "nietRaakbaar": 6,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -12176,9 +14491,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -12220,9 +14543,9 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 79,
-      "zichtbaar": 25,
-      "inBeeld": 20,
+      "dom": 86,
+      "zichtbaar": 29,
+      "inBeeld": 14,
       "raakbaar": 4
      }
     },
@@ -12238,7 +14561,9 @@
     "nietRaakbaar": 0,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -12287,9 +14612,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -12331,7 +14664,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 135,
+      "dom": 107,
       "zichtbaar": 45,
       "inBeeld": 40,
       "raakbaar": 33
@@ -12349,7 +14682,9 @@
     "nietRaakbaar": 24,
     "onomkeerbaar": 0
    },
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"
@@ -12398,9 +14733,17 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "GEEN_FIXTURE",
-     "reden": "vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes",
-     "bewijs": null
+     "status": "NIET_GETEST",
+     "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
+     "bewijs": {
+      "register": "LIEGRONDE.json",
+      "op": "2026-09-24T21:51:15.677Z",
+      "commit": "fce571c0"
+     },
+     "bron": {
+      "soort": "liegronde",
+      "instrument": "scripts/liegronde.js"
+     }
     },
     "persistent": {
      "status": "GEEN_FIXTURE",
@@ -12423,7 +14766,9 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [],
-   "samengesteld": [],
+   "samengesteld": [
+    "waarheidsgetrouw"
+   ],
    "mobiel": {
     "status": "NIET_GETEST",
     "reden": "deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md"

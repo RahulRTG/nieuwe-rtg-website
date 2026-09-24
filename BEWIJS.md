@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2004 bestanden en 14218 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2004 bestanden en 14221 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2004 |
-| losse beweringen (`test(...)`) | 14218 |
+| losse beweringen (`test(...)`) | 14221 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1355 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1754 bestanden, 13779 beweringen.
+1754 bestanden, 13782 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -357,7 +357,7 @@ toets omvalt.
 | `doorwerking.test.js` | 7 | gezakt op `===->!==#0` | DE DOORWERKING VAN HET ZORGPROFIEL (scripts/doorwerking.js). MAATSTAF.md U10: een gegeven wordt één keer gevraagd en alleen hergebruikt met doel, toestemming, bron en actualiteit. |
 | `doos-journaal.test.js` | 3 | gezakt op `true->false` | Zaakdoos-journaal, beveiliging: het journaal wordt na herstel nagespeeld naar de cloud met de inlog van de doos. Daarom is het gezegeld (HMAC), genummerd (seq) en padgebonden. |
 | `doos-regie.test.js` | 5 | gezakt op `liegpoort /api/` | De doos-regie: het beheer op afstand van de Zaakdoos-vloot. Het kantoor zet een doelversie en per doos een netwerkrol (accesspoint, versterker, gastwifi); de doos haalt beide zelf op bij zijn eigen melding en meldt... |
-| `doossleutels.test.js` | 3 | gezakt op `liegpoort /api/` | EEN SLEUTEL PER ZAAKDOOS (AUTHORITY.md fase 7, in de schaduw). Vijf dingen die niet mogen sneuvelen: 1. |
+| `doossleutels.test.js` | 6 | gezakt op `liegpoort /api/` | EEN SLEUTEL PER ZAAKDOOS (AUTHORITY.md fase 7, in de schaduw). Vijf dingen die niet mogen sneuvelen: 1. |
 | `drie.test.js` | 9 | gezakt op `!==->===` | Drie (public/shared/drie.js): de pure kern van de 3D-laag -- mat4/vec3 en de meshbouwers -- draait ook in Node en is hier los getoetst (geen canvas nodig). De WebGL-renderer zelf leeft alleen in de browser en valt... |
 | `drm.test.js` | 5 | gezakt op `liegpoort /api/` | RTG contentbescherming, de DRM-route (kern/drm.js): Encrypted Media Extensions met een Clear Key-licentie die RTG zelf bedient. Draai: npm test |
 | `droogloop.test.js` | 9 | gezakt op `!==->===#0` | De droogloop beproefd op zijn twee eigen aannames: dat hij het VERSCHIL ziet, en dat hij huishouding van domein scheidt. Niet op de server -- die draait in het instrument zelf en kost een minuut; hier staan de twee... |

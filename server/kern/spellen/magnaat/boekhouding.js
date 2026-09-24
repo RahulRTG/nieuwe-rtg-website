@@ -1,19 +1,14 @@
 /* Magnaat World: DE TEGENPARTIJEN EN DE WEG NAAR HET GROOTBOEK (ronde A2.2-A2.10).
 
-   MAGNAAT.md, MAGNAAT FINISH: minimaal. Alleen de vijf macro-actoren die nodig
-   zijn om de 27 gebeurtenissen van de geldkaart (scripts/lib/magnaatgeldkaart.js)
-   sluitend te maken -- geen bankensimulatie, geen huishoudmodel. Ze zijn geen
-   sluitposten: elk heeft een betekenis, zodat later te zien is waar geld heen
-   ging. En elk heeft een VASTE IDENTITEIT PER WERELD (`world:{id}:macro:bank`),
-   zodat een wereld nooit tegen de rekening van een andere boekt.
+   Minimaal (MAGNAAT.md): alleen de vijf macro-actoren die de 27 gebeurtenissen
+   van de geldkaart (scripts/lib/magnaatgeldkaart.js) sluitend maken, elk met
+   een betekenis en een VASTE IDENTITEIT PER WERELD (`world:{id}:macro:bank`).
 
-   BEWEGEN, EN DAT IS DE ENE WEG. Een gemigreerde gebeurtenis roept `beweeg`
-   aan: die boekt de overdracht in het grootboek en werkt daarna het saldo in de
-   partij (`st.geld`, de Foundation-pot) bij met EXACT hetzelfde aantal centen.
-   Dit bestand is dus de enige plek in World die een saldo schrijft; de
-   grondwetmeter en de geldkaart laten het daarom buiten hun telling van directe
-   mutaties, met die reden erbij. Zodra alle gebeurtenissen gemigreerd zijn
-   (A2.10), is `st.geld` voor elke speler exact het saldo van zijn kas. */
+   BEWEGEN IS DE ENE WEG. `beweeg` boekt de overdracht in het grootboek en werkt
+   daarna het saldo in de partij (`st.geld`, de Foundation-pot) bij met EXACT
+   hetzelfde aantal centen. Dit is dus de enige plek in World die een saldo
+   schrijft; de grondwetmeter en de geldkaart tellen dit bestand daarom niet
+   mee als directe mutatie. */
 'use strict';
 const { maakGrootboek, geheugenJournaal, collectieJournaal } = require('../../magnaat-grootboek');
 const { WORLD_REGELVERSIE } = require('./centen');

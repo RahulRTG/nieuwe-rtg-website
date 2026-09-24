@@ -50,10 +50,14 @@ const REKENING = {
     if (!TEGENPARTIJEN[naam]) throw new Error('Geen tegenpartij in World: ' + naam + '.');
     return w + ':macro:' + naam;
   },
-  foundation: (w, pot) => w + ':rtfoundation:' + pot
+  foundation: (w, pot) => w + ':rtfoundation:' + pot,
+  /* Overlopend: de leverancier krijgt zijn contractomzet IN de maand, de
+     afnemer betaalt NA de maand (./maand-contracten.js). Tussen die twee staat
+     het bedrag hier, en aan het eind van de maand staat hij weer op nul. */
+  contract: (w, id) => w + ':contract:' + id + ':overlopend'
 };
 const HANDVAT = Symbol('boekhouding');
-const SOORT_VAN = { kas: 'actief', inleg: 'eigen-vermogen', macro: 'extern', foundation: 'actief' };
+const SOORT_VAN = { kas: 'actief', inleg: 'eigen-vermogen', macro: 'extern', foundation: 'actief', contract: 'overlopend' };
 
 /* De projectie van het grootboek in een World-partij. */
 const nieuweProjectie = () => ({ boekVolgorde: 0, rekeningen: {}, laatstToegepast: 0,

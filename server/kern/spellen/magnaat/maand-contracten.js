@@ -37,7 +37,7 @@ module.exports = ({ rond }) => {
       const r = H.afwikkelen(c, { geleverd: c.eenheden * (leverDeel[c.leverancierId] || 0),
         kwaliteit: kwaliteitVan[c.leverancierId] === undefined ? 0 : kwaliteitVan[c.leverancierId] });
       const bedrag = betaling[c.id];
-      st.geld[c.afnemer] -= bedrag;
+      beweeg(st, { soort: 'CONTRACT_BETALING', van: ['kas', c.afnemer], naar: ['contract', c.id], bedrag, omschrijving: 'Betaling contract' });
       c.betaald += bedrag; c.ontvangen += bedrag;
       if (r.boete > 0) {
         const boete = naarCenten(r.boete);
@@ -54,5 +54,22 @@ module.exports = ({ rond }) => {
     return contractRegels;
   }
 
-  return { wikkelAf, betalingen };
+  /* HET MAANDRESULTAAT VAN EEN VESTIGING ALS GELD (geldkaart G12): acht
+     gebeurtenissen, elk al een keer afgerond (./centen.js, maandDelen). Het
+     contractdeel komt per contract van de overlopende rekening waarop de
+     afnemer in wikkelAf betaalt; de som is precies `d.CONTRACT_BETALING`. */
+  function boekResultaat(st, h, vestigingId, d, actief, betaling) {
+    beweeg(st, { soort: 'VERKOOP', van: ['macro', 'huishoudens'], naar: ['kas', h], bedrag: d.VERKOOP });
+    for (const c of actief) {
+      if (c.leverancierId === vestigingId) { beweeg(st, { soort: 'CONTRACT_BETALING', van: ['contract', c.id], naar: ['kas', h], bedrag: betaling[c.id] }); }
+    }
+    beweeg(st, { soort: 'INKOOP', van: ['kas', h], naar: ['macro', 'stad'], bedrag: d.INKOOP });
+    beweeg(st, { soort: 'LOON', van: ['kas', h], naar: ['macro', 'huishoudens'], bedrag: d.LOON });
+    beweeg(st, { soort: 'VASTE_LASTEN', van: ['kas', h], naar: ['macro', 'stad'], bedrag: d.VASTE_LASTEN });
+    beweeg(st, { soort: 'HUUR', van: ['kas', h], naar: ['macro', 'stad'], bedrag: d.HUUR });
+    beweeg(st, { soort: 'MARKETING', van: ['kas', h], naar: ['macro', 'stad'], bedrag: d.MARKETING });
+    beweeg(st, { soort: 'ONDERHOUD', van: ['kas', h], naar: ['macro', 'stad'], bedrag: d.ONDERHOUD });
+  }
+
+  return { wikkelAf, betalingen, boekResultaat };
 };

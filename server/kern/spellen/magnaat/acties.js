@@ -132,7 +132,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
         const kosten = verschil * s.loon;
         const personeelCenten = naarCenten(kosten);
         if (st.geld[h] < personeelCenten) return { status: 400, error: 'Die wijziging kost ' + kosten + ' aan werving of afvloeiing.' };
-        st.geld[h] -= personeelCenten;
+        beweeg(st, { soort: 'WERVING_AFVLOEIING', van: ['kas', h], naar: ['macro', 'huishoudens'], bedrag: personeelCenten, omschrijving: 'Werving of afvloeiing' });
         v.personeel = n;
       }
       if (zet.marketing !== undefined) v.marketing = Math.max(0, Math.min(200000, Math.floor(Number(zet.marketing) || 0)));

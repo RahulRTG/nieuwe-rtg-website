@@ -231,7 +231,7 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 
 **Het migratieprogramma (A2.3–A2.9).** Een gemigreerde gebeurtenis roept `beweeg(st, { soort, van, naar, bedrag })` aan. Dat boekt de overdracht in het grootboek en werkt het saldo in de partij bij met precies hetzelfde aantal centen. Er is één regel die een saldo schrijft (`pasToe` in `boekhouding.js`), en de grondwetmeter en de geldkaart laten dat bestand met die reden buiten hun telling. Een module krijgt alleen `st` mee. Daarom hangt `koppel` de boekhouding er onder een symbool aan: dat gaat niet mee in JSON, en een ongekoppelde partij faalt hard in plaats van buiten het grootboek om te boeken. Op de geldkaart draagt een gemigreerde gebeurtenis `gemigreerd`, en haar been is dan de `beweeg`-regel in plaats van de mutatie.
 
-*Bevinding, niet gerepareerd (besluit van de eigenaar: de meter blijft zoals hij is).* `scripts/commerce.js` telt elke `beweeg({ … bedrag })` als een koopbare vorm, omdat hij een objectliteraal met een bedrag herkent. `koopbareVormen` stijgt daarom bij elke migratieronde zonder dat er iets verkoopbaars bijkomt: 557→564 in A2.4, →567 in A2.5 en →568 in A2.6. Het register wordt per ronde opnieuw afgeleid. Het getal zegt hier dus iets over de meter en niets over commerce.
+*Bevinding, niet gerepareerd (besluit van de eigenaar: de meter blijft zoals hij is).* `scripts/commerce.js` telt elke `beweeg({ … bedrag })` als een koopbare vorm, omdat hij een objectliteraal met een bedrag herkent. `koopbareVormen` stijgt daarom bij elke migratieronde zonder dat er iets verkoopbaars bijkomt: 557→564 in A2.4, →567 in A2.5, →568 in A2.6 en verder in latere rondes. Het register wordt per ronde opnieuw afgeleid. Het getal zegt hier dus iets over de meter en niets over commerce.
 
 | Ronde | Categorie | Gebeurtenissen | M-001 / M-005 | Golden baseline |
 |---|---|---|---|---|
@@ -240,6 +240,7 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 | A2.5 | financiering | G16–G22 | 20→13 / 17→10 | ongewijzigd groen |
 | A2.6 | verzekering | G23–G25 | 13→10 / 10→7 | ongewijzigd groen |
 | A2.7 | activa | G02, G03, G05 | 10→7 / 7→4 | ongewijzigd groen |
+| A2.8 | maandresultaat | G04, G10, G12, G13 | 7→3 / 4→0 (M-005 PARTIAL) | ongewijzigd groen |
 
 **A2.3** boekt het startkapitaal als overdracht van de inleg van de speler naar zijn kas. Een lopende partij van vóór het grootboek krijgt bij het koppelen een overname-opening voor wat er staat, zonder dat het saldo verandert.
 
@@ -250,6 +251,8 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 **A2.6** boekt de verzekeraar (premie en uitkering) en het herstel na schade (naar de aannemer). In deze ronde kwam een tweede blocker boven, uit `test/spelmagnaat.test.js`: twee partijen met hetzelfde id deelden één journaal, en de tweede werd geweigerd. In productie kan dat ook gebeuren, want een potje wordt opgeruimd maar zijn journaal niet. Een partij krijgt daarom `world:{id}`, en alleen als daar al een journaal staat `world:{id}:2`, `:3` en zo verder. Dat is deterministisch, en voor een gewone partij verandert er niets (`test/magnaat-world-boekhouding.test.js`, toets 7).
 
 **A2.7** boekt bouwen en uitbreiden als investering bij de aannemer, en sluiten als desinvestering (de halve bouwsom terug). Werving en afvloeiing (G04) staan op de kaart onder het maandresultaat en gaan daarom mee met A2.8.
+
+**A2.8** boekt het maandresultaat van een vestiging als de acht gebeurtenissen die A2.1 er al van had gemaakt: verkoop van de huishoudens, lonen naar de huishoudens, en inkoop, vaste lasten, huur, marketing en onderhoud naar de stad. Daarna gaat het resultaat naar rato van de eigenaar naar de aandeelhouders. Werving en afvloeiing gaan naar de huishoudens. Eén ding vroeg een rekening die er nog niet was. Het contractdeel komt bij de leverancier IN de maand binnen, maar de afnemer betaalt pas NA de maand (`wikkelAf`), en daartussen lezen de rood-rente en de bank het saldo. Een directe overdracht zou dat moment verschuiven en de baseline breken. Daarom betaalt de afnemer op een **overlopende rekening per contract** (`world:{id}:contract:{c}:overlopend`), en daaruit is de leverancier betaald. Het is geen actor en geen tegenpartij. Toets 9 in `test/magnaat-world-geld.test.js` eist dat die rekening na elke stap op nul staat; met één cent verschil zakt ook de baseline.
 
 ---
 

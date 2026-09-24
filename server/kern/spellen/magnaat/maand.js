@@ -34,7 +34,7 @@ const { naarCenten, uitCenten, euroTonen } = require('./centen');
 const { beweeg } = require('./boekhouding');
 
 module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering }) => {
-  const { wikkelAf, betalingen } = require('./maand-contracten')({ rond });
+  const { wikkelAf, betalingen, boekResultaat } = require('./maand-contracten')({ rond });
   function eenMaand(potje) {
     const st = potje.staat, k = K(st);
     const kwaliteitVan = {};
@@ -99,12 +99,11 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
           wereldFactor: 1, arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id] });
         const regel = Object.assign({ id: v.id, naam: v.naam, sector: v.sector, kavel: kavel.naam }, r);
         regels.push(regel);
-        /* HET RESULTAAT WORDT VERDEELD als er aandeelhouders zijn (./aandeel.js).
-           De eigenaar houdt wat er niet vergeven is, de rest gaat rechtstreeks
-           naar de houders -- winst en verlies allebei. Staat er niets uit, dan
-           gaat het hele bedrag naar de eigenaar en verandert er niets. */
+        /* Het resultaat komt bij de eigenaar binnen als de acht gebeurtenissen
+           van de geldkaart (G12), en gaat dan naar rato naar de aandeelhouders
+           (./aandeel.js) -- winst en verlies allebei. */
+        boekResultaat(st, h, v.id, r.delenCenten, actief, betaling);
         const verdeeld = verdeel(st, v.id, r.resultaatCenten);
-        st.geld[h] += verdeeld.eigenaar;
         /* OP DE GEPUSHTE REGEL en niet op `r`: de regel is een KOPIE die hierboven
            is gemaakt, dus een veld dat er daarna op `r` bij komt haalt het
            maandoverzicht nooit. Dat is precies zo misgegaan, en het viel op

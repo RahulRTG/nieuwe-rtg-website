@@ -31,6 +31,7 @@
    ermee doet, dat bestand kent het gesprek. */
 const rond = (n) => Math.round(n);
 const { naarCenten, uitCenten, euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 const MAX_DEEL = 49;      // procent dat weg mag; zie besluit 2
 
@@ -60,9 +61,10 @@ module.exports = ({ wieHeeft, waarde }) => {
     if (!rijen.length) return { eigenaar: resultaat, uit: [] };
     const uit = [];
     let weg = 0;
+    const eigenaar = wieHeeft(st, vestigingId).speler;
     for (const d of rijen) {
       const bedrag = naarCenten(uitCenten(resultaat) * (d.deel / 100));
-      st.geld[d.houder] += bedrag;
+      if (d.houder !== eigenaar) { beweeg(st, { soort: 'RESULTAATDELING', van: ['kas', eigenaar], naar: ['kas', d.houder], bedrag, omschrijving: 'Deel van het resultaat' }); }
       d.ontvangen += bedrag;
       weg += bedrag;
       uit.push({ id: d.id, houder: d.houder, deel: d.deel, bedrag: euroTonen(bedrag) });

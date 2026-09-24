@@ -162,6 +162,7 @@
     "onderzoeksketen": "node scripts/onderzoeksketen.js",
     "wereldlijst": "node scripts/wereldlijst.js",
     "wereld": "node scripts/wereld.js",
+    "appcluster": "node scripts/appcluster.js",
     "functielijst": "node scripts/functielijst.js",
     "inlinestijl": "node scripts/inlinestijl-ronde.js",
     "inlinestijl:toon": "node scripts/inlinestijl-ronde.js --toon",

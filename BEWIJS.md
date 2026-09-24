@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2021 bestanden en 14331 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2022 bestanden en 14336 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2021 |
-| losse beweringen (`test(...)`) | 14331 |
+| toetsbestanden | 2022 |
+| losse beweringen (`test(...)`) | 14336 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1369 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
-| niets van beide | 408 |
+| niets van beide | 409 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1768 bestanden, 13878 beweringen.
+1769 bestanden, 13883 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -103,6 +103,7 @@ toets omvalt.
 | `apipoort.test.js` | 9 | gezakt op `===->!==#0` | De API-poort (kern/command/apipoort.js): sleutels, scopes, quota en contractregels voor koppelingen. WAT DEZE TOETS VOORAL BEWAAKT zijn vier dingen die allemaal onzichtbaar kapot kunnen gaan: 1. |
 | `appbieb.test.js` | 5 | gezakt op `liegpoort /api/` | De App-Bibliotheek: de ECHTE RTG-apps van het ecosysteem (geen verzonnen namen meer). Elke tegel opent een bestaande pagina; installeren zet hem op je startscherm. |
 | `appbrug.test.js` | 10 | gezakt op `===->!==#0` | DE APPBRUG (kern/mobiliteit/appbrug.js) -- van app-rit naar vervoersopdracht. Het besluit erachter staat in MAATSTAF.md par. |
+| `appcluster.test.js` | 5 | -- | ROOD CLUSTEREN -- de rode cellen van APPWERKT.json per kandidaat-oorzaak. Wat vastligt, en elke regel kan zakken: 1. |
 | `appcontract.test.js` | 11 | gezakt op `===->!==#0` | HET APP-CONTRACT EN DE BEWIJSBRON -- een app mag bewijs samenstellen uit een proef die al bestaat, en alleen als die proef het op deze code verdient. Wat dit bestand bewaakt, en elke regel kan zakken: 1. |
 | `appstore-arena.test.js` | 10 | -- | DE ARENA VAN EEN APP -- een bord per app, met de 18+-poort van het huis. Wat deze toets vastlegt: 1. |
 | `appstore-bereik.test.js` | 5 | gezakt op `-->+#0` | HET BEREIK VAN EEN APP -- de klasse die wordt GEREKEND en nooit gezet. Een keurmerk is de duurste vorm van LAT-regel 6: een lid dat "zonder bereik" leest, gedraagt zich ernaar. |

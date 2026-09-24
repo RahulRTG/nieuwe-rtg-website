@@ -12,7 +12,6 @@
    DAT IS WAAROM DIT BESTAND NIET MEER `geldpositie.js` HEET: een tabel die ook
    CONFIGUREREN draagt, is geen geldtabel.
 
-
    DE VRAAG IS MET OPZET DEZE EN NIET "zit deze route in het bankdomein". Dat tweede
    vermengt handelingstype met domeincontext, en dan wordt het effectmodel juist minder
    waar op het moment dat je het voor causaliteit wilt gebruiken: een leesroute of een
@@ -87,6 +86,8 @@ const KANTOORBANK = Object.freeze({
   '/api/office/bank/draai': [false, 'draait de stand een slag; dit is de vervalsing die deze tabel opende', ['CONFIGUREREN']],
   '/api/office/bank/operationeel': [false, 'zet de bank aan of uit als uitgevende partij', ['CONFIGUREREN']],
   '/api/office/bank/leden': [false, 'zet de bank open of dicht voor leden', ['CONFIGUREREN']],
+  '/api/office/bank/entiteitrekening': [false, 'leest de stand', []],
+  '/api/office/bank/entiteitrekening/zet': [false, 'zet het product open/dicht', ['CONFIGUREREN']],
   '/api/office/bank/nood': [false, 'noodstop: clearing valt terug op de kaart-rails', ['CONFIGUREREN']],
   '/api/office/bank/herstel': [false, 'heft de noodstop op', ['CONFIGUREREN']],
   '/api/office/bank/mislukking': [false, 'legt een mislukte clearing vast en kan de noodstop trippen', ['CONFIGUREREN']],

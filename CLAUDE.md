@@ -2474,8 +2474,11 @@ vier bouwstenen en niet meer: een zoekende tegenstander (eerst op
 divergentie, het herhaalpakket en immuniteit. Let op de namen: `Sentinel`,
 `capsule`, `replay` (betekent hier idempotentie), `naspelen` en `bewijskaart`
 zijn bezet, en L0-L3 en een achtstandige statusruimte zouden een zesde ladder
-zijn. De goedkoopste vondst: `/api/pay/gezond` bestaat en de sonde leest hem
-niet, dus het grootboek meldt zijn stand aan een bewaking die niet kijkt.
+zijn. De goedkoopste vondst: `/api/pay/gezond` bestond en de sonde las hem
+niet, dus het grootboek meldde zijn stand aan een bewaking die niet keek. Dat
+is de eerste stap die staat: de reis `grootboek` in `SLO.json`, en de triage
+duidt een 500 daarop als `geld` -- niet als routefout, en nooit als reden om
+terug te rollen.
 
 ## Structuur en starten (kort)
 

@@ -258,6 +258,38 @@ test('triage: een enkele stukke reis rolt nooit terug', () => {
   assert.equal(u.terugrollen, false);
 });
 
+/* Het grootboek dat niet sluit is geen routefout maar een gebroken geldinvariant
+   (BEWIJSLUS.md par. 8). De sonde geeft `reis` en geen `pad`, dus die vorm
+   staat er letterlijk in: een toets die alleen `pad` voert, zag die reis nooit.
+   MUTATIE: de grootboektak in scripts/triage.js weghalen -> dit wordt 'deels'
+   en de eerste toets zakt. */
+test('triage: een grootboek dat niet sluit is geld, en terugrollen herstelt het niet', () => {
+  const u = triage.duid([
+    { reis: 'gezond', status: 200, gelukt: true },
+    { reis: 'voordeur', status: 200, gelukt: true },
+    { reis: 'grootboek', status: 500, gelukt: false, reden: 'status 500 terwijl 200 werd verwacht' }
+  ]);
+  assert.equal(u.laag, 'geld');
+  assert.equal(u.terugrollen, false, 'het verschil staat in de boekingen, niet in de uitrol');
+  assert.match(u.doen, /bewijsbord/);
+});
+
+test('triage: valt alles om, dan is het de app, ook als het grootboek meedoet', () => {
+  const u = triage.duid([
+    { reis: 'gezond', status: 500, gelukt: false },
+    { reis: 'grootboek', status: 500, gelukt: false }
+  ]);
+  assert.equal(u.laag, 'app', 'een 500 van een stukke app zegt niets over het geld');
+});
+
+test('triage: een grootboekreis die niet antwoordt is geen geldoordeel', () => {
+  const u = triage.duid([
+    { reis: 'gezond', status: 200, gelukt: true },
+    { reis: 'grootboek', status: 404, gelukt: false }
+  ]);
+  assert.equal(u.laag, 'deels', 'alleen een 500 is het teken dat de sluitcontrole niet klopt');
+});
+
 test('triage: alles groen is geen incident', () => {
   const u = triage.duid([{ pad: '/', status: 200 }, { pad: '/api/gezond', status: 204 }]);
   assert.equal(u.laag, 'geen');

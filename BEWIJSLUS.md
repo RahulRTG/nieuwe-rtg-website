@@ -243,6 +243,15 @@ kop van `kern/pay/index.js` zegt dat hij "het aan de bewaking meldt". Het wordt
 alleen gelezen door `tot-crash`, `ketenronde` en de motorproeven, nooit in
 productie. Het wordt dus aan de bewaking gemeld, maar de bewaking kijkt niet.
 
+**Dat staat sinds 24 september 2026**: de reis `grootboek` in `SLO.json` loopt
+elke sonderonde mee, en `scripts/triage.js` duidt een 500 op die reis als laag
+`geld` en niet als `deels` -- een grootboek dat niet sluit is geen route die
+omvalt, en terugrollen laat het verschil in de boekingen gewoon staan. Valt
+alles om, dan blijft het `app`: een 500 van een stukke app zegt niets over het
+geld. Toetsen in `test/grondwacht.test.js`, met de mutatie erbij. Wat dit NIET
+is: een waarneming per betaling. Het is een ja of nee over het hele grootboek,
+eens per sonderonde.
+
 Vier invarianten om mee te beginnen, en niet meer:
 
 | Invariant | Wat er al is |
@@ -305,8 +314,8 @@ onafhankelijkheid van de drie assen van `GELDING.json`.
 
 ## 12. De volgorde
 
-1. **De sonde leest `/api/pay/gezond`** -- een reis erbij in `SLO.json`. De
-   eerste semantische waarneming in productie, voor bijna niets.
+1. ~~**De sonde leest `/api/pay/gezond`**~~ -- gedaan (par. 8): de reis
+   `grootboek` in `SLO.json`, met een eigen triagelaag `geld`.
 2. **Het vertrouwensdossier**: een deterministische functie in `scripts/` die par. 7
    samenstelt, inclusief de lijst ONBEKEND. Raakt `server/` niet.
 3. **De zoeker op `geld-conservatie`**, zonder model: reeksen, gelijktijdigheid,

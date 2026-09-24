@@ -3,20 +3,20 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-24T06:08:19.736Z",
-  "commit": "583e6be4",
+  "op": "2026-09-24T20:12:38.884Z",
+  "commit": "f9c2b8d2",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 314,
+  "artefacten": 315,
   "bron": 10,
   "afgeleid": 173,
   "fragmenten": 25,
   "momentopname": 1,
-  "onbeslist": 105,
+  "onbeslist": 106,
   "afgeleidZonderEigenaar": 2,
   "metEigenaar": 197,
   "afgeleidEigenaarHard": 171,
@@ -387,6 +387,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run bewijsladder:vast",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEWIJSLUS.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {

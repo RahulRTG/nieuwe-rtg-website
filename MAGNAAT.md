@@ -158,6 +158,15 @@ Wat A1 met opzet **niet** deed: World migreren (A2), opslag per gebeurtenis (A3)
 - **De motor moet eerst in tweeën.** A1 leverde de boekhoudautoriteit (commando, boekingen, journaal, projectie) samen met het marktmodel van het Oefenkantoor. World heeft een eigen marktmodel (`stap.js`) en hoort alleen de eerste helft te gebruiken. Die naad komt in A2 vóór de migratie.
 - **De grondwetmeter meldde verschoven regelnummers.** Hij haalde commentaar weg en telde daarna de regels. Hij slaat het commentaar nu plat, zoals `scripts/lib/bron.js` daarvoor al een vorm had. De tellingen zijn gelijk gebleven; alleen de adressen kloppen nu.
 
+**De vier besluiten van A2 (24 september 2026).**
+
+1. **Eerst de afronding repareren.** Vóór de migratie komt een eigen stap die de oude afrondingen in World rechtzet: de contractbetaling (aan de ene kant afgerond, aan de andere niet), de resultaatdeling, de rente op rood en de Foundation-afdracht. World gaat daarbij over op hele eurocenten. Dat is een BEWUSTE gedragswijziging met een eigen regelversie. Daarna wordt een gouden referentie van World vastgelegd, en de migratie moet daar exact tegen gelijk blijven.
+2. **Macro-actoren per wereld.** Elke wereld krijgt boekbare tegenpartijen: bank, huishoudens (klanten en loon), aannemer, verzekeraar en de stad (huur en grond). Er verdwijnt geen geld meer uit World en er ontstaat niets meer uit het niets. Voor de spelers blijft het financieel gelijk.
+3. **De Foundation-afdracht wordt betaald door de stad en de spelers, via RTG naar de RTFoundation, zoals het buiten het spel bedoeld is.** De afdracht wordt dus een echte post naar rato van de omzet, en niet langer geld uit het niets. Ook dit is een bewuste regelwijziging met een eigen regelversie, apart van de pariteit. De opmerking dat RTG in het spel ook zijn big-tech-concurrenten heeft, staat als ontwerpvraag voor de latere ronden; A2 legt alleen vast wie betaalt.
+4. **Het grootboek wordt een eigen laag onder de motor.** `magnaat-economische-motor/` splitst in een grootboek (commando's met betekenis, validatie, boekingen, journaal, projectie, herstel) en het marktmodel van het Oefenkantoor erbovenop. World en het Oefenkantoor worden allebei consumenten van het grootboek. De gouden referentie van A1 blijft daarbij ongewijzigd groen, en M-601 geldt voor beide lagen.
+
+De stappen van A2 zijn daarmee: **A2.0** het grootboek losmaken (pariteit tegen de A1-referentie), **A2.1** de afronding in World repareren en daarna de gouden referentie van World vastleggen, **A2.2** de macro-actoren, **A2.3 t/m A2.9** de migratie per categorie, en **A2.10** de harde CI-fout zodra de teller op nul staat.
+
 De migratievolgorde volgt de categorieën, zodat elke stap apart tegen het oude gedrag te bewijzen is: opening, overdrachten tussen spelers (tegenzijde bestaat al, laagste risico), financiering, verzekering, activa, maandresultaat (het grootste stuk) en de Foundation.
 
 ---

@@ -130,7 +130,7 @@ const GEBEURTENISSEN = [
 
   { id: 'G26', betekenis: 'FOUNDATION_AFDRACHT', categorie: 'foundation', van: '(niemand)', naar: 'Foundation-pot', tegenzijde: 'bron',
     benen: [b('foundation.js', 'f.lokaal += lokaal;'), b('foundation.js', 'f.centraal += centraal;')],
-    let: 'de afdracht wordt BEREKEND over de omzet maar van niemand afgetrokken: de pot groeit uit niets. Wie betaalt is een besluit' },
+    let: 'de afdracht wordt BEREKEND over de omzet maar van niemand afgetrokken: de pot groeit uit niets. Besluit 3 (MAGNAAT.md): de stad en de spelers betalen, via RTG naar de RTFoundation' },
   { id: 'G27', betekenis: 'FOUNDATION_PROJECT', categorie: 'foundation', van: 'Foundation-pot', naar: '(aannemer)', tegenzijde: 'put',
     benen: [b('foundation.js', 'f.lokaal -= p.kosten;')] }
 ];

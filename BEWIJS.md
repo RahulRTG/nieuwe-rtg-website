@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2026 bestanden en 14369 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2026 bestanden en 14376 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2026 |
-| losse beweringen (`test(...)`) | 14369 |
+| losse beweringen (`test(...)`) | 14376 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1374 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1773 bestanden, 13916 beweringen.
+1773 bestanden, 13923 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -144,7 +144,7 @@ toets omvalt.
 | `balkkleur.test.js` | 5 | gezakt op `+->-#0` | DE KLEUR VAN DE iOS-BALK, EN WAAROM DAAR EEN METER ONDER HOORT. De acties rechtsboven in de balk en de terugknop links stonden op --ios-accent, en dat is de DAGKLEUR: zestien ankertinten (vier seizoenen x vier... |
 | `bank-beheer.test.js` | 13 | gezakt op `liegpoort /api/` | RTG Bank, de tien endpoints die nog nergens werden aangeraakt. bank.test.js dekt de kern (openen, storten, overboeken, de drie-standen-knop). |
 | `bank-eigendom.test.js` | 5 | gezakt op `true->false#0` | EEN LEGE AANVRAGER IS GEEN VRIJBRIEF. De bankmodules hielden bezit tegen de aanvrager met deze vorm: if (!m \|\| (codenaam && m.codenaam !== String(codenaam).trim())) ... |
-| `bank.test.js` | 25 | gezakt op `liegpoort /api/` | RTG Bank: de eigen bank op het RTG Pay-grootboek, met de 3-standen knop van de boardroom (partner -> hybride -> eigen). Getest: de leden-bank die pas open gaat als de boardroom hem live zet + akkoord (opt-in) die de... |
+| `bank.test.js` | 26 | gezakt op `liegpoort /api/` | RTG Bank: de eigen bank op het RTG Pay-grootboek, met de 3-standen knop van de boardroom (partner -> hybride -> eigen). Getest: de leden-bank die pas open gaat als de boardroom hem live zet + akkoord (opt-in) die de... |
 | `bankbeveiliging.test.js` | 3 | gezakt op `liegpoort /api/` | De bank-laag: tijd-veilige vergelijkingen, de TOTP-tweede factor op de backoffice en het inlog-auditlog. |
 | `bankdeuren.test.js` | 7 | gezakt op `liegpoort /api/` | ACHTER WELKE DEUR STAAT RTG BANK? De keuring telde 649 endpoints zonder toets. |
 | `bankduurzaam.test.js` | 2 | genoemd | DE BANK BEVESTIGT GEEN REKENING DIE DE OPSLAG NIET HEEFT. WAAROM DEZE TOETS BESTAAT. |
@@ -955,7 +955,7 @@ toets omvalt.
 | `momentproef.test.js` | 9 | gezakt op `===->!==#48` | DE MOMENTPROEF -- de vierde keten, en de eerste die over een PROJECTIE gaat. scripts/momentproef.js legt een publieke keten af zoals scripts/ritproef.js een ritketen: van een feit bij de bron tot een melding bij... |
 | `mond.test.js` | 10 | gezakt op `===->!==#0` | De RTG-signatuurmond (public/shared/mond.js): het puntenveld dat de lippen vormt is een pure functie met diepte (z). Hier los getoetst in Node -- de WebGL-render en de 2D-terugval leven alleen in de browser. |
 | `money-credential-productiepoort.test.js` | 12 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `money012.test.js` | 9 | gezakt op `===->!==#0` | MONEY-012 -- geld dat het huis verlaat, eindigt na elke onderbreking in precies EEN verklaarbare waarheid. Vier wetten, en deze toets beproeft ze op de uitgaande kant (de betaalopdracht, server/kern/betaalopdracht/),... |
+| `money012.test.js` | 15 | gezakt op `===->!==#0` | MONEY-012 -- geld dat het huis verlaat, eindigt na elke onderbreking in precies EEN verklaarbare waarheid. Vier wetten, en deze toets beproeft ze op de uitgaande kant (de betaalopdracht, server/kern/betaalopdracht/),... |
 | `motor-initialisatie.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `motor-vingerafdruk.test.js` | 4 | gezakt op `!==->===#0` | De saldi-vingerafdruk (drift-detector): borgt dat de JS-berekening BYTE-VOOR- BYTE gelijk is aan de Rust-motor (motor/src/pay.rs::vingerafdruk), zodat de schaduw-drift-detector per-rekening-drift vangt die de... |
 | `motorverbinding.test.js` | 7 | -- | De gedeelde motorverbinding op het GELDPAD, in de AAN-stand. Waarom dit bestand er is. |

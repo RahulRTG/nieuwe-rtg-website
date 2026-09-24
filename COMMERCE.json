@@ -2,27 +2,27 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-24",
   "gemeten": {
-    "bestanden": 2392,
+    "bestanden": 2398,
     "domeinenTotaal": 636,
-    "koopbareVormen": 575,
+    "koopbareVormen": 585,
     "koopbareDomeinen": 120,
     "envelopDrempel": 8,
     "envelop": 41,
-    "veldenDomeineigen": 750,
-    "veldenNietEnvelop": 998,
+    "veldenDomeineigen": 754,
+    "veldenNietEnvelop": 1007,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 46,
+    "werkwoordCombinaties": 47,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 116,
+    "optellingen": 118,
     "optelDomeinen": 59,
     "optelCenten": 64,
     "optelEuro": 5,
     "optelGemengd": 0,
-    "optelOnbekend": 47
+    "optelOnbekend": 49
   },
   "envelop": [
     "aantal",
@@ -69,11 +69,11 @@
   ],
   "perWerkwoord": {
     "toon": 92,
-    "prijs": 39,
+    "prijs": 38,
     "beschikbaarheid": 53,
     "reserveer": 27,
     "bevestig": 57,
-    "lever": 20,
+    "lever": 21,
     "annuleer": 30,
     "retour": 8
   },
@@ -828,19 +828,19 @@
       "domein": "kern/magnaat-leven",
       "heeft": {
         "toon": true,
-        "prijs": true,
+        "prijs": false,
         "beschikbaarheid": true,
         "reserveer": false,
         "bevestig": true,
-        "lever": false,
+        "lever": true,
         "annuleer": false,
         "retour": false
       },
       "bewijs": {
-        "toon": "bewaarEnToon",
-        "prijs": "antwoordOpOfferte",
-        "beschikbaarheid": "open",
-        "bevestig": "bevestig"
+        "toon": "beeld",
+        "beschikbaarheid": "agenda",
+        "bevestig": "akkoord",
+        "lever": "lever"
       },
       "telt": 4
     },
@@ -2713,6 +2713,15 @@
       ]
     },
     {
+      "domein": "kern/magnaat-leven",
+      "plekken": 3,
+      "waar": [
+        "server/kern/magnaat-leven/dag.js",
+        "server/kern/magnaat-leven/volgende.js",
+        "server/kern/magnaat-leven/weergave.js"
+      ]
+    },
+    {
       "domein": "kern/waarde",
       "plekken": 3,
       "waar": [
@@ -2815,14 +2824,6 @@
       "waar": [
         "server/kern/voorspel/index.js",
         "server/kern/voorspel/rekenen.js"
-      ]
-    },
-    {
-      "domein": "bedrijf",
-      "plekken": 2,
-      "waar": [
-        "server/bedrijf/beeld.js",
-        "server/bedrijf/klant.js"
       ]
     }
   ]

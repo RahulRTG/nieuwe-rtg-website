@@ -1,6 +1,6 @@
 {
   "simulatiemodules": 68,
-  "kernmodules": 2234,
+  "kernmodules": 2240,
   "kernDomeinen": 618,
   "perWereld": {
     "magnaat": {
@@ -97,21 +97,28 @@
     {
       "onderwerp": "acties",
       "simulatie": "server/kern/spellen/magnaat/acties.js",
-      "rtg": "server/kern/magnaat-leven/acties.js",
+      "rtg": "server/kern/vertegenwoordiging/acties.js",
       "vormgelijkenis": 0.07,
       "meetbaar": true
     },
     {
-      "onderwerp": "acties",
-      "simulatie": "server/kern/spellen/magnaat/acties.js",
-      "rtg": "server/kern/vertegenwoordiging/acties.js",
-      "vormgelijkenis": 0.07,
+      "onderwerp": "weergave",
+      "simulatie": "server/kern/spellen/magnaat/weergave.js",
+      "rtg": "server/kern/magnaat-leven/weergave.js",
+      "vormgelijkenis": 0.06,
       "meetbaar": true
     },
     {
       "onderwerp": "acties",
       "simulatie": "server/kern/spellen/magnaat/acties.js",
       "rtg": "server/kern/fluister/acties.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "acties",
+      "simulatie": "server/kern/spellen/magnaat/acties.js",
+      "rtg": "server/kern/magnaat-leven/acties.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     },
@@ -210,13 +217,6 @@
       "onderwerp": "bord",
       "simulatie": "server/kern/spellen/magnaat/bord.js",
       "rtg": "server/kern/stadsweefsel/bord.js",
-      "vormgelijkenis": 0,
-      "meetbaar": false
-    },
-    {
-      "onderwerp": "economie",
-      "simulatie": "server/kern/spellen/magnaat/economie.js",
-      "rtg": "server/kern/economie/index.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     }

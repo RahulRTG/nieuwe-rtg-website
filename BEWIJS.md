@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2003 bestanden en 14215 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2004 bestanden en 14218 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2003 |
-| losse beweringen (`test(...)`) | 14215 |
+| toetsbestanden | 2004 |
+| losse beweringen (`test(...)`) | 14218 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1355 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 407 |
+| niets van beide | 408 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1753 bestanden, 13776 beweringen.
+1754 bestanden, 13779 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1337,6 +1337,7 @@ toets omvalt.
 | `samen-routes-failclosed.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `samen.test.js` | 8 | gezakt op `liegpoort /api/` | Samen: meekijken en samen doen door het leden-OS. Kamers op code, alles op codenaam, live seintjes via de SSE-stroom; gasten doen niet mee en kamers verlopen vanzelf. |
 | `samendelen.test.js` | 3 | gezakt op `liegpoort /api/` | SAMEN DELEN -- vrienden worden, samen uitgeven, verrekenen, en de wekker. WAAROM DIT ER IS Wie betaalt wat (WBW) is het lijstje waar vriendschappen op stuklopen: een weekend weg, vier mensen, iedereen legt iets voor,... |
+| `samentekenen.test.js` | 3 | -- | RTG Werk OS: SAMEN TEKENEN (server/bedrijf/samentekenen.js). Besluit van de eigenaar (24 september 2026): het bedrijf kiest zelf hoe het bestuur uit de concerngraaf meetelt bij een uitgave -- versmallen, bestuur of... |
 | `samenvoeging-routes.test.js` | 6 | gezakt op `liegpoort /api/` | ELF ROUTES UIT DE SAMENVOEGING DIE GEEN TOETS OVER DE DRAAD HADDEN. De twaalf takken van 1 september 2026 brachten routes mee waarvan de handler wel getoetst was (rechtstreeks aangeroepen, zoals... |
 | `samenwerking.test.js` | 5 | gezakt op `liegpoort /api/` | End-to-end tests voor de samenwerkingslaag (kern/samenwerking.js): EGn knop om als creator een leverancier voor te stellen, en een oproep waarop creators reageren en de leverancier er een kiest. We loggen als manager... |
 | `samlacs.test.js` | 6 | gezakt op `liegpoort /api/` | DE SAML-DEUR ALS DEUR: van de heenreis tot een echt sessietoken. test/samlxsw.test.js doet de aanvallen op de handtekening, los van een server. |

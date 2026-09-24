@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-09-23T20:20:02.800Z",
-  "commit": "39b7f1d9",
+  "op": "2026-09-24T04:06:16.045Z",
+  "commit": "61b661cf",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 5,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 630,
-  "bewaakt": 540,
+  "zonderBewakerslaag": 631,
+  "bewaakt": 541,
   "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -48,7 +48,7 @@
  "perWacht": [
   {
    "naam": "werkPoort",
-   "aantal": 98
+   "aantal": 99
   },
   {
    "naam": "poort",
@@ -618,13 +618,13 @@
   },
   {
    "sleutel": "POST /api/bedrijf/keur",
-   "bestand": "server/bedrijf/regelpoort.js:97",
+   "bestand": "server/bedrijf/regelpoort.js:96",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/keuring",
-   "bestand": "server/bedrijf/regelpoort.js:140",
+   "bestand": "server/bedrijf/regelpoort.js:139",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -990,7 +990,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/betaalwijze",
-   "bestand": "server/bedrijf/tekengrens.js:68",
+   "bestand": "server/bedrijf/tekengrens.js:72",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -1004,6 +1004,12 @@
    "sleutel": "POST /api/bedrijf/werkruimte/maak",
    "bestand": "server/bedrijf/werkruimte.js:37",
    "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/werkruimte/tekenwijze",
+   "bestand": "server/bedrijf/samentekenen.js:79",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/zoek",

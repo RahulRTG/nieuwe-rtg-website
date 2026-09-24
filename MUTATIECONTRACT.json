@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-23T20:39:10.408Z",
-  "commit": "855086a2",
+  "op": "2026-09-24T04:04:35.171Z",
+  "commit": "61b661cf",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,20 +10,20 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5010,
-  "geclassificeerd": 5010,
+  "totaal": 5011,
+  "geclassificeerd": 5011,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1207,
-   "PROTECTED": 474,
+   "PROTECTED": 475,
    "INTENTIONALLY_NON_IDEMPOTENT": 139
   },
-  "vastgesteldDoorMens": 1869,
+  "vastgesteldDoorMens": 1870,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4122,
    "PUBLIC": 124,
-   "OBJECT_SCOPED": 743,
+   "OBJECT_SCOPED": 744,
    "(niet af te leiden -- vraagt een verklaring)": 5,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 38
+   "niet gemeten": 39
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -7235,6 +7235,25 @@
     "grond": "gemerkt",
     "hindernis": null
    },
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bedrijf.werkruimte.tekenwijze",
+   "route": "POST /api/bedrijf/werkruimte/tekenwijze",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
    "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,

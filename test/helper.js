@@ -79,10 +79,21 @@ function vrijePoort() {
    een andere toets; bij een botsing komt er een nieuwe basis. De poorten gaan
    pas los vlak voor de teruggave, dus de aanroeper spawnt meteen. */
 const EFEMEER_STANDAARD = [32768, 60999];
-function efemeerBereik() {
+const EFEMEER_BESTAND = '/proc/sys/net/ipv4/ip_local_port_range';
+/* `lees` is injecteerbaar, zodat een toets een andere kernelinstelling kan
+   voorleggen zonder aan de machine te komen (test/poortreeks.test.js).
+
+   DE GRENS IS >= 1024 EN NIET > 1024. 1024 is het laagste dat de kernel toestaat
+   en precies de waarde uit de gangbare tuning "1024 65535" voor hosts met veel
+   uitgaande verbindingen. Met > viel die ECHTE lezing stil terug op de
+   Linux-standaard, en dan koos de reeks 20000-32767 -- middenin het werkelijke
+   efemere bereik -- terwijl toets 0 van trio-wees groen bleef, want die meet de
+   helper tegen zichzelf (reviewronde 24 september 2026). */
+function efemeerBereik(lees) {
   try {
-    const [lo, hi] = fs.readFileSync('/proc/sys/net/ipv4/ip_local_port_range', 'utf8').trim().split(/\s+/).map(Number);
-    if (lo > 1024 && hi > lo) return [lo, hi];
+    const tekst = (lees || (() => fs.readFileSync(EFEMEER_BESTAND, 'utf8')))();
+    const [lo, hi] = String(tekst).trim().split(/\s+/).map(Number);
+    if (Number.isInteger(lo) && Number.isInteger(hi) && lo >= 1024 && hi > lo && hi <= 65535) return [lo, hi];
   } catch (e) { /* geen /proc (macOS): de Linux-standaard is daar ook veilig, want macOS begint bij 49152 */ }
   return EFEMEER_STANDAARD;
 }
@@ -92,12 +103,28 @@ const bindProef = (p) => new Promise((resolve, reject) => {
   s.on('error', reject);
   s.listen(p, '0.0.0.0', () => resolve(s));
 });
-async function vrijePoortReeks(n) {
-  const [lo] = efemeerBereik();
+/* `opties.bereik` vervangt de kernellezing -- alleen voor een toets die wil zien
+   wat deze functie doet bij een bereik dat deze machine niet heeft. */
+async function vrijePoortReeks(n, opties) {
+  const [lo, hi] = (opties && opties.bereik) || efemeerBereik();
   const ONDER = 20000;                       // onder de 20000 wonen de vaste diensten (3000-3003, 5432, 6379)
-  if (!(n > 0) || lo - n <= ONDER) throw new Error('vrijePoortReeks: geen ruimte onder het efemere bereik (lo ' + lo + ')');
+  const BOVEN = 65535;
+  if (!(n > 0)) throw new Error('vrijePoortReeks: n moet positief zijn');
+  /* Eerst onder het bereik (de Linux-standaard laat daar 12.000 poorten vrij),
+     en pas als dat venster er niet is of dertig keer bezet blijkt erboven
+     (tuning "1024 61000"). Is er geen van beide, dan bestaat er op deze host
+     geen poort waar nooit een autobind landt, en dat zeggen we hardop: een reeks
+     die stil in het bereik valt is de flake in een nieuwe jas. */
+  const vensters = [];
+  if (lo - n > ONDER) vensters.push([ONDER, lo - n]);          // basis + n - 1 < lo
+  if (BOVEN - n > hi) vensters.push([hi + 1, BOVEN - n]);      // basis + n - 1 < 65535
+  if (!vensters.length) {
+    throw new Error('vrijePoortReeks: ip_local_port_range ' + lo + '-' + hi + ' laat geen ' + n +
+      ' poorten buiten het efemere bereik over (boven ' + ONDER + '); op deze host is de poortbotsing niet te vermijden');
+  }
   for (let poging = 0; poging < 60; poging++) {
-    const basis = ONDER + Math.floor(Math.random() * (lo - n - ONDER));
+    const [van, tot] = vensters[Math.min(Math.floor(poging / 30), vensters.length - 1)];
+    const basis = van + Math.floor(Math.random() * (tot - van + 1));
     const open = [];
     try {
       for (let i = 0; i < n; i++) open.push(await bindProef(basis + i));
@@ -108,7 +135,7 @@ async function vrijePoortReeks(n) {
     await Promise.all(open.map(s => new Promise(r => s.close(r))));
     return Array.from({ length: n }, (_, i) => basis + i);
   }
-  throw new Error('vrijePoortReeks: na 60 pogingen geen ' + n + ' aaneengesloten vrije poorten onder ' + lo);
+  throw new Error('vrijePoortReeks: na 60 pogingen geen ' + n + ' aaneengesloten vrije poorten buiten ' + lo + '-' + hi);
 }
 
 /* Start server/server.js (of een ander script) en wacht tot hij gezond is.

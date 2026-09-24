@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2004 bestanden en 14221 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2005 bestanden en 14224 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2004 |
-| losse beweringen (`test(...)`) | 14221 |
+| toetsbestanden | 2005 |
+| losse beweringen (`test(...)`) | 14224 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1355 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 408 |
+| niets van beide | 409 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1754 bestanden, 13782 beweringen.
+1755 bestanden, 13785 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -167,6 +167,7 @@ toets omvalt.
 | `belasting-groothandels.test.js` | 2 | gezakt op `liegpoort /api/` | De belastingtool van elke zaak + meerdere groothandels per zaak. |
 | `belasting.test.js` | 4 | -- | Belasting: de donderdag van de leerling en de week van de docent. De beloftes die hier hard worden gemaakt: - een dag telt over vakken EN klassen heen. |
 | `belastingkantoor.test.js` | 10 | gezakt op `liegpoort /api/` | Het Belastingkantoor (kern/overheid/kantoor.js): de inspecteurscockpit met invordering via de Berichtenbox, het btw-beeld uit de facturatiemotor + KVK, de slimme signalen en de AI-chef-inspecteur. Alleen voor het rijk. |
+| `beleidsafdwingen.test.js` | 3 | -- | DE BELEIDSMOTOR AFDWINGEN PER DEUR (server/kern/beleidsmotor/afdwingen.js). Besluit van de eigenaar (24 september 2026): per kantoordeur schaduw of afdwingen, standaard schaduw. |
 | `beleidsmotor-exporten.test.js` | 3 | gezakt op `liegpoort /api/` | LEZEN IS NIET EXPORTEREN (AUTHORITY.md fase 6). Drie dingen die niet mogen sneuvelen: 1. |
 | `beleidsmotor-review.test.js` | 3 | gezakt op `liegpoort /api/` | DE TOEGANGSREVIEW (AUTHORITY.md fase 8). Vijf dingen die niet mogen sneuvelen: 1. |
 | `beleidsmotor-slapend.test.js` | 3 | gezakt op `false->true#0` | SLAPENDE RECHTEN (AUTHORITY.md fase 8, besluit van 23 september 2026). Vier dingen die niet mogen sneuvelen: 1. |

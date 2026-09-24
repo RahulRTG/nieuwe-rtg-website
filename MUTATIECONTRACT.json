@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-24T04:17:05.911Z",
-  "commit": "c031a1aa",
+  "op": "2026-09-24T04:59:16.256Z",
+  "commit": "17fb93dc",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,18 +10,18 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5012,
-  "geclassificeerd": 5012,
+  "totaal": 5014,
+  "geclassificeerd": 5014,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1207,
-   "PROTECTED": 476,
+   "NOT_APPLICABLE": 1208,
+   "PROTECTED": 477,
    "INTENTIONALLY_NON_IDEMPOTENT": 139
   },
-  "vastgesteldDoorMens": 1871,
+  "vastgesteldDoorMens": 1873,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4123,
+   "AUTHENTICATED": 4125,
    "PUBLIC": 124,
    "OBJECT_SCOPED": 744,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 40
+   "niet gemeten": 42
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -57253,6 +57253,48 @@
    },
    "bewijs": null,
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.beleidsmotor.afdwingen",
+   "route": "POST /api/office/beleidsmotor/afdwingen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.beleidsmotor.afdwingen.zet",
+   "route": "POST /api/office/beleidsmotor/afdwingen/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

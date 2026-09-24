@@ -77,9 +77,13 @@ function bestanden(wortel, spec) {
 }
 
 function scopeStand(sc, lees, wortel) {
-  const uit = { autoriteit: sc.autoriteit, handhaver: null, toets: null, schending: null, deels: sc.deels || null, missers: [] };
+  /* In het register heet het veld `draagt` en niet `handhaver`: dat woord is
+     in dit huis gesplitst in DRAAGT (de code die de regel draagt) en
+     BEWAAKT_DOOR (de toets die rood wordt) -- LAT.md regel 14,
+     scripts/lib/bewijsvelden.js. Hier is het de code; de toets staat in `toets`. */
+  const uit = { autoriteit: sc.autoriteit, draagt: null, toets: null, schending: null, deels: sc.deels || null, missers: [] };
 
-  if (sc.handhaver === 'NIEMAND') uit.handhaver = 'NIEMAND';
+  if (sc.handhaver === 'NIEMAND') uit.draagt = 'NIEMAND';
   else {
     const gevonden = sc.handhaver.map(h => {
       const code = lees(h.bestand, { code: true });
@@ -87,7 +91,7 @@ function scopeStand(sc, lees, wortel) {
       if (!ok) uit.missers.push('handhaver niet gevonden: ' + h.bestand + ' -- "' + h.citaat + '"');
       return ok;
     });
-    uit.handhaver = gevonden.every(Boolean) ? 'gevonden' : 'citaat-weg';
+    uit.draagt = gevonden.every(Boolean) ? 'gevonden' : 'citaat-weg';
   }
 
   if (sc.toets === 'NIEMAND') uit.toets = 'NIEMAND';
@@ -117,7 +121,7 @@ function scopeStand(sc, lees, wortel) {
     uit.schending = { wat: sc.schending.wat, aantal: plekken.length, plekken };
   }
 
-  const heeftH = uit.handhaver === 'gevonden', heeftT = uit.toets === 'gevonden';
+  const heeftH = uit.draagt === 'gevonden', heeftT = uit.toets === 'gevonden';
   if (uit.schending && uit.schending.aantal > 0) uit.stand = 'VIOLATION';
   else if (heeftH && heeftT && !uit.deels) uit.stand = 'PASS';
   else if (heeftH || heeftT) uit.stand = 'PARTIAL';
@@ -144,8 +148,8 @@ function meet({ wortel = WORTEL, wet = WET } = {}) {
       id: r.id, familie: r.familie, invariant: r.invariant,
       stand: regelStand(scopes),
       gedocumenteerd: doc.includes(r.id) && doc.includes(r.invariant),
-      geimplementeerd: lijst.some(x => x.handhaver === 'gevonden'),
-      afgedwongen: lijst.every(x => x.handhaver === 'gevonden' && !(x.schending && x.schending.aantal > 0)),
+      geimplementeerd: lijst.some(x => x.draagt === 'gevonden'),
+      afgedwongen: lijst.every(x => x.draagt === 'gevonden' && !(x.schending && x.schending.aantal > 0)),
       getoetst: lijst.every(x => x.toets === 'gevonden'),
       schendingen: lijst.reduce((n, x) => n + (x.schending ? x.schending.aantal : 0), 0),
       scopes

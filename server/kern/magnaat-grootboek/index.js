@@ -42,7 +42,7 @@ function maakGrootboek({ wereld, opslag, soorten, versies, periode, idVoorvoegse
   return {
     metOorzaak: b.metOorzaak, rekening: b.rekening, regel: b.regel, boek: b.boek, bevestig: b.bevestig,
     regelVoorScherm: b.regelVoorScherm, herstelProjectie: h.herstelProjectie, gebeurtenissen: h.gebeurtenissen,
-    saldiNa: h.saldiNa, verifieer: h.verifieer, neemOver: h.neemOver, zorgVorm: h.zorgVorm
+    saldiNa: h.saldiNa, verifieerGrootboek: h.verifieerGrootboek, neemOver: h.neemOver, zorgVorm: h.zorgVorm
   };
 }
 

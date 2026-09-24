@@ -55,7 +55,7 @@ module.exports = (g) => {
 
   /* De projectie volgt een gebeurtenis. Dezelfde functie voor een verse boeking
      en voor herstel, zodat die twee nooit uit elkaar kunnen lopen. */
-  function projecteer(p, x) {
+  function projecteerGebeurtenis(p, x) {
     for (const lijn of x.regels) pasToe(p, lijn);
     p.laatstToegepast = x.volgnummer;
     p.totalen.debet += x.debet;
@@ -106,7 +106,7 @@ module.exports = (g) => {
       bedrag: Math.max(...schoon.map(r => Math.max(r.debet, r.credit))),
       debet, credit, regels: schoon, labels: labels.slice(0, 8)
     };
-    projecteer(p, x);
+    projecteerGebeurtenis(p, x);
     p.wachtend.push(x);
     return x;
   }
@@ -121,5 +121,5 @@ module.exports = (g) => {
     return n;
   }
 
-  return { metOorzaak, rekening, regel, boek, bevestig, projecteer, regelVoorScherm };
+  return { metOorzaak, rekening, regel, boek, bevestig, projecteerGebeurtenis, regelVoorScherm };
 };

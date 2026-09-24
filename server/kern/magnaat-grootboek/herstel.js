@@ -17,7 +17,7 @@ module.exports = (g, b) => {
     const journaal = g.opslag.laatsteVolgnummer(g.wereld);
     const projectie = p.laatstToegepast - p.wachtend.length;
     if (journaal > projectie && !p.wachtend.length) {
-      for (const x of g.opslag.lees(g.wereld, projectie + 1, journaal)) b.projecteer(p, x);
+      for (const x of g.opslag.lees(g.wereld, projectie + 1, journaal)) b.projecteerGebeurtenis(p, x);
       p.boekVolgorde = journaal;
       p.integriteit = null;
     } else if (journaal < projectie) {
@@ -43,7 +43,7 @@ module.exports = (g, b) => {
   /* De controle: geen gat, geen dubbel, elke gebeurtenis in balans, en -- als
      de hele historie er is -- de saldi van de projectie precies die van het
      journaal. Een gat van voor de overname wordt benoemd, niet verzwegen. */
-  function verifieer(p) {
+  function verifieerGrootboek(p) {
     const gat = g.opslag.ontbrekend(g.wereld);
     const bevindingen = [];
     let verwacht = gat ? gat.tot + 1 : 1;
@@ -85,5 +85,5 @@ module.exports = (g, b) => {
     if (!Number.isSafeInteger(p.laatstToegepast)) p.laatstToegepast = 0;
   }
 
-  return { herstelProjectie, gebeurtenissen, saldiNa, verifieer, neemOver, zorgVorm };
+  return { herstelProjectie, gebeurtenissen, saldiNa, verifieerGrootboek, neemOver, zorgVorm };
 };

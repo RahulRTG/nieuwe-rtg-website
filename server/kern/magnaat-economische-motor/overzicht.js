@@ -79,7 +79,7 @@ module.exports = (m) => {
      waar de overgenomen historie begint). */
   /* De controle zelf is van het grootboek (../magnaat-grootboek/herstel.js). */
   function verifieerJournaal() {
-    return m.verifieer(m.state());
+    return m.verifieerGrootboek(m.state());
   }
 
   return { overzicht, verifieerJournaal };

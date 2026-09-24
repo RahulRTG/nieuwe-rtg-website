@@ -84,7 +84,7 @@ test('3. een consument zonder dagen of bedrijven kan boeken, bevestigen, herstel
   assert.throws(() => gb.boek(p, '', 'STORTING', 'x', []), /idempotentiesleutel/);
 
   storting('s4', 250); gb.bevestig(p);
-  assert.deepEqual(gb.verifieer(p), { ok: true, gebeurtenissen: 2, historieVanaf: 1, bevindingen: [] });
+  assert.deepEqual(gb.verifieerGrootboek(p), { ok: true, gebeurtenissen: 2, historieVanaf: 1, bevindingen: [] });
 
   /* Een projectie die achterloopt (niet weggeschreven) wordt bijgewerkt met
      alleen het ontbrekende stuk; een journaal dat achterloopt houdt het boeken tegen. */

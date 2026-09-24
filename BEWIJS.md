@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2034 bestanden en 14403 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2035 bestanden en 14407 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2034 |
-| losse beweringen (`test(...)`) | 14403 |
+| toetsbestanden | 2035 |
+| losse beweringen (`test(...)`) | 14407 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1380 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1381 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1779 bestanden, 13948 beweringen.
+1780 bestanden, 13952 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -844,6 +844,7 @@ toets omvalt.
 | `luchthaven-vip.test.js` | 5 | gezakt op `liegpoort /api/` | De uitbreiding van RTG Airport: helikopters (helipads, lichtste draai), privejets (GA-stands via het charterloket), de Koninklijke Vleugel (vips onder protocolnaam; de boarding wacht op het protocol) en de lounges... |
 | `luchthaven.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie. Getest: de passagiersketen (boeken -> inchecken -> boarding pass + koffertags), de operationele grendels (een kist boardt pas als de draai rond is;... |
 | `luchtzijde-taal.test.js` | 5 | gezakt op `liegpoort /api/` | De luchtzijde-stand voor partners (boarding pass aan de deur, dubbele prijzen op de kassa, de vertaalknop) + de moedertaal van het account (iedereen praat de eigen taal, de ander leest de zijne in de vriendenchat). |
+| `lusproef.test.js` | 4 | gezakt op `===->!==#1` | DE LUSPROEF EN ZIJN REGISTER -- de zesde keten, en sinds 24 september 2026 een bron van bewijs voor APPWERKT. scripts/lusproef.js loopt de ontdeklus van Foundation Connect af (CONNECT.md) tegen een wegwerpserver. |
 | `lussen.test.js` | 27 | gezakt op `===->!==#0` | DE LUSINDEX (scripts/lussen.js + scripts/lib/lusvorm.js). WAT DEZE TOETS WERKELIJK BEWAAKT. |
 | `machinedekking.test.js` | 9 | gezakt op `true->false#0` | DE MACHINEDEKKING (scripts/machinedekking.js). Deze meter beweert iets dat makkelijk stil kan verschuiven: hoeveel van de eigen motoren raakt een handeling. |
 | `magnaat-capabilities.test.js` | 7 | geen bruikbare mutatie | **geen kop** -- deze toets zegt nergens wat hij bewijst |

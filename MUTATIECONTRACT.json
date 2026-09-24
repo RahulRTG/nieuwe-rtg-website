@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-09-24T17:53:07.941Z",
-  "commit": "de792aeb",
-  "boomVuil": true,
+  "op": "2026-09-24T19:40:37.896Z",
+  "commit": "5f864c7b",
+  "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
@@ -56913,7 +56913,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

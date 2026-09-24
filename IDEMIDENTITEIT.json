@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-19T18:56:38.180Z",
-    "commit": "6083f652",
+    "op": "2026-09-24T05:27:24.970Z",
+    "commit": "821d9e27",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",
     "node": "v22.22.2"
   },
@@ -163,7 +163,7 @@
     },
     {
       "bestand": "server/kern/bank/rekeningen.js",
-      "regel": 65,
+      "regel": 68,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [

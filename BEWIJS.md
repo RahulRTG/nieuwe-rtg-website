@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2013 bestanden en 14292 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2015 bestanden en 14296 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2013 |
-| losse beweringen (`test(...)`) | 14292 |
+| toetsbestanden | 2015 |
+| losse beweringen (`test(...)`) | 14296 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1366 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
-| niets van beide | 403 |
+| niets van beide | 405 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1761 bestanden, 13840 beweringen.
+1762 bestanden, 13843 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -160,7 +160,7 @@ toets omvalt.
 | `bedrijfscontrole.test.js` | 5 | gezakt op `true->false#0` | Bewijst de toelatingsgrens voor WORK-bedrijven: ieder bedrijf krijgt vaste KVK-, bevoegdheids-, vergunning- en integriteitscontroles; gereguleerde sectoren krijgen hun eigen officiële registerbewijs; een open,... |
 | `bedrijfsintake.test.js` | 1 | gezakt op `liegpoort /api/` | Golf 6: de ondernemersintake en de automatische bedrijfsprovisioning. Getoetst: de aanvraag draagt de bedrijfsbehoeften; zonder menselijk akkoord gebeurt er niets; na akkoord + eerste termijn voldaan staat de zaak er... |
 | `bedrijfuitgave-mix.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Werk OS: de uitgave met de STRENGSTE VAN TWEE TEKENGRENZEN en de BETAALWIJZE die de werkruimte kiest (AUTHORITY.md par. 5e, vervolg). |
-| `bedrijfuitgave.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Werk OS: de UITGAVE, de tekengrens en functiescheiding (AUTHORITY.md fase 5, par. 5j). |
+| `bedrijfuitgave.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Werk OS: de UITGAVE, de tekengrens en functiescheiding (AUTHORITY.md fase 5, par. 5j). |
 | `bedrijfwerk.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Werk OS, deel 2: projecten en de kennisbank. De beweringen die ertoe doen, en het zijn er zes: - VOORTGANG WORDT GETELD, NOOIT INGEVULD. |
 | `beginscherm.test.js` | 4 | geen module gevonden | HET BEGINSCHERM DRAAGT DE WERELDEN EN VERDER GEEN LOSSE APPS. Dat is de afspraak van PLATFORM.md par. |
 | `begroting.test.js` | 13 | gezakt op `===->!==#0` | DE BEGROTING (server/opzet/begroting.js). WAT HIER OP HET SPEL STAAT. |
@@ -305,6 +305,7 @@ toets omvalt.
 | `concern-vestiging.test.js` | 1 | gezakt op `liegpoort /api/` | RTG Concern: VESTIGINGEN, tegen een echte server (routes/concern/vestiging.js). De vestigingsroutes gingen naar een eigen deelmodule toen de samenvoeging van twee takken routes/concern.js over de 10 kB duwde. |
 | `concern-voorstel.test.js` | 5 | gezakt op `===->!==#0` | STAP 9: WAT UIT EEN DOCUMENT KOMT IS EEN VOORSTEL, NOOIT EEN FEIT. WAAROM DIT BESTAAT Document Intelligence is het deel dat het meest indrukwekkend oogt en het makkelijkst fout gaat: een patroonherkenner die zijn... |
 | `concern.test.js` | 15 | gezakt op `getal+1#2` | RTG CONCERN: HET BEDRIJF BOVEN DE ZAAK. WAAROM DIT BESTAAT Een bedrijf was hier een rij in `suppliers`: een code, een naam en een genre. |
+| `concernduiding.test.js` | 2 | -- | CONCERN: EEN VRIJE NAAM ALSNOG DUIDEN (server/kern/concern/duiding.js). Een bestuurder van voor 23 september 2026 draagt een vrije naam en telt niet mee voor de tekengrens in het Werk OS. |
 | `connect.test.js` | 38 | gezakt op `false->true#0` | FOUNDATION CONNECT -- de grenzen die geen ketenproef van buitenaf kan zien. scripts/lusproef.js loopt de lus over een echte server: vijftien schakels en tien storingen. |
 | `consent-dekking.test.js` | 4 | geen bronmutatie mogelijk | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |
 | `consent-doel-termijn.test.js` | 4 | geen bruikbare mutatie | ELK VENSTER ZEGT WAARVOOR HET BESTAAT EN WANNEER HET DICHTGAAT HDI.md par. 7 regel 6. |
@@ -1801,7 +1802,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-252 bestanden, 452 beweringen.
+253 bestanden, 453 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2046,6 +2047,7 @@ toets omvalt.
 | `werkstatus.e2e.js` | 1 | gezakt op `===->!==#0` | DE ORGANISATIESTAND OP EEN ECHT SCHERM -- en vooral wat er NIET staat. De bewijspoort (kern/tenant/bewijs.js) maakte van elke enterprisebewering een object met een bron of een reden. |
 | `werktafel-lussen.e2e.js` | 1 | gezakt op `===->!==#0` | DE LUSSEN VAN DE WERKTAFEL OP EEN TELEFOON: een wereld openen, erin rondgaan, en weer terugkomen -- met de knoppen die een mens werkelijk gebruikt. Vier fouten die samen het gevoel gaven dat je "niet fatsoenlijk door... |
 | `werktafel.e2e.js` | 4 | genoemd | DE WERKTAFEL: wanneer hij er WEL mag staan, en wanneer niet. Deze toets bestaat om twee fouten die alleen op een breed venster bestonden, en die daarom niemand zag: de app wordt op een telefoon ontwikkeld en op een... |
+| `werkuitgaven.e2e.js` | 1 | -- | HET WERK OS: DE MODULE UITGAVEN, IN EEN ECHTE BROWSER. De routes van een uitgave zijn beproefd in test/bedrijfuitgave.test.js. |
 | `winkel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE WINKEL VAN DE RTFOUNDATION (/apps/foundation/winkel.html) IN EEN ECHTE BROWSER. kern/rtfos/winkel.js draagt vier grendels en test/rtfos-gift-ruil-routes.test.js beproeft ze over de draad: geen voorraad geen... |
 | `world-dashboard.e2e.js` | 1 | -- | DE VIER WERELDHOMES ZIJN HUN EIGEN DASHBOARD. Deze proef bewaakt de grens die bij de nieuwe schil het makkelijkst weer vervaagt: de gedeelde laag mag de echte Living-, Work-, Travel- en Foundation-DOM alleen opmaken. |
 | `world-desktop-identity.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-25T01:36:39.890Z",
-    "commit": "acf89ca3",
+    "op": "2026-09-25T08:53:32.474Z",
+    "commit": "13c2d2e3",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 0,
     "instrument": "scripts/liegronde.js",
     "node": "v22.22.2"
   },
@@ -381,8 +381,8 @@
       "ingang": "/apps/magnaat.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 5,
+      "reden": "6 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 6,
       "klachten": []
     },
     {
@@ -765,8 +765,8 @@
       "ingang": "/apps/rtgschool.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "7 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 7,
+      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 2,
       "klachten": []
     },
     {

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T06:55:07.970Z",
-    "commit": "e58de8f7e",
+    "op": "2026-09-25T06:55:09.128Z",
+    "commit": "81a53699a",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5897,6 +5897,14 @@
       "operator": "!==->===#0",
       "gezakt": 7,
       "geprobeerd": 4
+    },
+    "money012-keten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "money012.test.js": {
       "soort": "puur",

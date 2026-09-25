@@ -259,10 +259,12 @@ module.exports = ({
     return s;
   }
 
-  /* De economie blijft bewust onderdeel van dezelfde geïsoleerde spelstaat.
-     Daarmee kan een missie de bedrijfsvoering beïnvloeden zonder ooit orders,
-     betalingen of andere productiedata van RTG aan te raken. */
-  const economie = require('./magnaat-economie')({ wereldState: state, save });
+  /* De projectie van de economie blijft onderdeel van dezelfde geïsoleerde
+     spelstaat, zodat een missie de bedrijfsvoering kan beïnvloeden zonder ooit
+     orders, betalingen of andere productiedata van RTG aan te raken. Het
+     journaal -- het bewijs eronder -- staat sinds ronde A1 in een eigen
+     collectie van de economische motor; daarom gaat `db` mee. */
+  const economie = require('./magnaat-oefeneconomie')({ wereldState: state, save, db });
   const trainingslobbies = require('./magnaat-trainingslobby')({
     db, save, bewerkCollectie, crypto, partnerstudio, codenaamVan, sseToCustomer
   });

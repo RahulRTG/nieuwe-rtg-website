@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T02:51:55.844Z",
-    "commit": "a9a62322",
+    "op": "2026-09-24T21:03:45.606Z",
+    "commit": "466d411e1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5128,7 +5128,7 @@
     "magnaat-economenlab.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 2
@@ -5136,10 +5136,26 @@
     "magnaat-economie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
-      "gezakt": 7,
+      "gezakt": 11,
       "geprobeerd": 2
+    },
+    "magnaat-economische-motor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "magnaat-grootboek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "magnaat-hospitality.test.js": {
       "soort": "puur",
@@ -5198,7 +5214,7 @@
     "magnaat-rust-integratie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
+      "module": "server/kern/magnaat-oefeneconomie.js",
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
@@ -5227,6 +5243,38 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "magnaat-world-boekhouding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/boekhouding.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "magnaat-world-geld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/centen.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "magnaatgeldkaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "return-weg#1",
+      "gezakt": 4,
+      "geprobeerd": 13
+    },
+    "magnaatgrondwet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/magnaatgrondwet.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "magnaatlab.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5234,6 +5282,20 @@
       "operator": "return-weg#1",
       "gezakt": 2,
       "geprobeerd": 4
+    },
+    "magnaatleven.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatleven.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "magnaatwereld.test.js": {
       "soort": "puur",
@@ -8632,7 +8694,7 @@
       "staat": "gezakt",
       "module": "server/kern/spellen/magnaat/kaart.js",
       "operator": "===->!==#0",
-      "gezakt": 14,
+      "gezakt": 15,
       "geprobeerd": 1
     },
     "spelverzekering.test.js": {

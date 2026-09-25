@@ -842,6 +842,12 @@
       "url": "/apps/magnaat.html"
     },
     {
+      "label": "C Commandocentrum",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
       "label": "Computer",
       "app": "Magnaat",
       "wereld": "WorkOS",
@@ -854,13 +860,25 @@
       "url": "/apps/magnaat.html"
     },
     {
+      "label": "E Economie",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "F Functiehal",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
       "label": "Kies een functie",
       "app": "Magnaat",
       "wereld": "WorkOS",
       "url": "/apps/magnaat.html"
     },
     {
-      "label": "Maak testtaak",
+      "label": "L Future Lab",
       "app": "Magnaat",
       "wereld": "WorkOS",
       "url": "/apps/magnaat.html"
@@ -879,12 +897,6 @@
     },
     {
       "label": "Open lab",
-      "app": "Magnaat",
-      "wereld": "WorkOS",
-      "url": "/apps/magnaat.html"
-    },
-    {
-      "label": "Open veilig scherm",
       "app": "Magnaat",
       "wereld": "WorkOS",
       "url": "/apps/magnaat.html"
@@ -914,7 +926,7 @@
       "url": "/apps/magnaat.html"
     },
     {
-      "label": "Strategie vastleggen",
+      "label": "Toon meer",
       "app": "Magnaat",
       "wereld": "WorkOS",
       "url": "/apps/magnaat.html"
@@ -932,19 +944,7 @@
       "url": "/apps/magnaat.html"
     },
     {
-      "label": "Volgende",
-      "app": "Magnaat",
-      "wereld": "WorkOS",
-      "url": "/apps/magnaat.html"
-    },
-    {
       "label": "Volgende uitdaging",
-      "app": "Magnaat",
-      "wereld": "WorkOS",
-      "url": "/apps/magnaat.html"
-    },
-    {
-      "label": "Vorige",
       "app": "Magnaat",
       "wereld": "WorkOS",
       "url": "/apps/magnaat.html"

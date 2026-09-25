@@ -43,6 +43,7 @@
 const { SECTOREN } = require('./sectoren');
 
 const rond = (n) => Math.round(n);
+const { naarCenten, uitCenten } = require('./centen');
 const klem = (n, a, b) => Math.max(a, Math.min(b, n));
 
 /* De vormen. `basis` is de maandrente voor een vlekkeloos profiel; de opslagen
@@ -105,12 +106,16 @@ const { NORMEN, TRAP, BREUK_OPSLAG, breuken, trapVan } = require('./convenant');
    Rente over het restant, dan de aflossing, dan de convenanten. In die
    volgorde, want een aflossing verlaagt het restant en zou anders de rente van
    diezelfde maand drukken -- en dan hangt je rentelast af van het moment waarop
-   de motor toevallig aflost. */
+   de motor toevallig aflost.
+
+   IN EUROCENTEN: het restant staat in centen, de hoofdsom in hele euro's (het
+   afgesproken bedrag). Rente en aflossing worden hier elk een keer tot centen
+   gemaakt (./centen.js), en dat bedrag gaat zo naar de speler en de lening. */
 function maandVoor(lening, cijfers) {
   const v = VORMEN[lening.soort];
-  const rente = lening.restant * (lening.rente + (lening.opslag || 0));
+  const rente = naarCenten(uitCenten(lening.restant) * (lening.rente + (lening.opslag || 0)));
   let aflossing = 0;
-  if (v.aflossend && lening.looptijd > 0) aflossing = Math.min(lening.restant, lening.hoofdsom / lening.looptijd);
+  if (v.aflossend && lening.looptijd > 0) aflossing = Math.min(lening.restant, naarCenten(lening.hoofdsom / lening.looptijd));
   const stuk = breuken(lening, cijfers);
   return { rente, aflossing, breuken: stuk };
 }

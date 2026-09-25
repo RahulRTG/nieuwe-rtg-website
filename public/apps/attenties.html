@@ -122,7 +122,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function(){
 });
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('attenties'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon het relatiebeheer niet laden.</div>'; return; }
+  let d; try{ d=await api('attenties'); /* Ontbreekt een veld, dan de eigen foutmelding hieronder -- nooit een lege lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */ if(!(d && Array.isArray(d.aankomend) && Array.isArray(d.banden) && Array.isArray(d.relaties))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon het relatiebeheer niet laden.</div>'; return; }
   DATA=d;
   if(open){ const r=d.relaties.find(x=>x.id===open); if(r) return detail(d,r); open=null; }
   let h='';

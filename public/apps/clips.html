@@ -232,6 +232,8 @@
   async function laadFeed() {
     const r = await api('feed', { alleenOndertiteld });
     if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
+    /* Ontbreekt de lijst, dan zeggen we dat -- nooit een lege feed, die zou beweren dat er niets is (LIEGRONDE.json). */
+    if (!r.body || !Array.isArray(r.body.clips)) { zeg('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); return; }
     feedData = r.body;
     mijnIds = (feedData.mijn || []).map(c => c.id);
     const alles = [...(feedData.mijn || []).slice(0, 3), ...feedData.clips];

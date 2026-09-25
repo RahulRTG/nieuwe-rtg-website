@@ -411,6 +411,8 @@
   let privateMeta = null, privateModi = new Set(['chauffeur']);
   async function laadMoveWereld() {
     const r = await api('regie'); if (r.status !== 200) return;
+    /* Zonder ervaring of briefing blijft de kop zoals hij in de HTML staat, in plaats van om te vallen (LIEGRONDE.json). */
+    if (!(r.body && r.body.ervaring && r.body.briefing)) return;
     const e = r.body.ervaring, hero = $('#moveHero');
     hero.classList.toggle('private', e.modus === 'private'); hero.classList.toggle('lifestyle', e.modus === 'lifestyle');
     hero.style.setProperty('--accent', e.accent); $('#moveBelofte').textContent = e.belofte;

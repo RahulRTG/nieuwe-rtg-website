@@ -226,3 +226,33 @@ test('een kantoormedewerker krijgt zijn baliezetel van de boardroom', async () =
 test('de basisrollen zijn de drie zonder welke een proef niets meet', () => {
   assert.deepStrictEqual(bos.BASISROLLEN, ['member', 'office', 'supplier']);
 });
+
+/* ============================================================================
+   MEMBER-ACCOUNT IS EEN EIGEN MENS MET EEN ACCOUNT, EN GEEN DEUR.
+
+   De wereldcompositor vond op 24 september 2026 dat de spelwereld nooit kon
+   opkomen: hij vraagt een tweede ledensessie, `member-account`, en geen munter
+   maakte die. Drie dingen liggen hier vast:
+     1. hij bestaat, en is een ANDER token dan `member` (een tegenstander die
+        jijzelf blijkt te zijn, is geen potje);
+     2. hij komt langs de registratie en niet langs de demo-inlog, want het
+        verschil tussen die twee IS het account;
+     3. hij staat NIET in de rollenlijst: geen route draagt hem als bewaker, en
+        erin opnemen zou de verdeling van elke proef stil veranderen.
+
+   DE MUTATIE: laat de munter `tok(await post('/api/login', { tier: 'rtg' }))`
+   teruggeven, of haal hem uit GEEN_BEWAKER -> deze toets zakt.
+   ========================================================================== */
+test('member-account is een apart lid met een account, en geen bewakersrol', async () => {
+  const { post, gezien } = nepPost();
+  const voor = gezien.length;
+  const b = await bos.haalSleutels({ post });
+  assert.ok(b.tokens['member-account'], 'geen sleutel voor member-account');
+  assert.notStrictEqual(b.tokens['member-account'], b.tokens.member,
+    'member-account draagt de sleutel van member; dan speelt een lid tegen zichzelf');
+  assert.ok(!b.rollen.includes('member-account'),
+    'member-account staat in de rollenlijst; geen route draagt hem, dus hij hoort er niet in');
+  const registraties = gezien.slice(voor).filter(g => g.pad === '/api/auth/register');
+  assert.ok(registraties.length >= 3,
+    'kantoor-a, kantoor-b en member-account horen elk hun eigen account te registreren; nu ' + registraties.length);
+});

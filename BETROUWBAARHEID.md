@@ -46,9 +46,9 @@ blijven.
 | 1 | **bereikbaar** | vindt de gebruiker de functie vanaf de plek waar RTG haar presenteert? | **staat** (`APPWERKT.json`) |
 | 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **een kwart** — knoppen wel, formulieren/uploads/toetsenbord niet; en een groot deel van wat er staat is niet aan te tikken omdat er iets overheen ligt (zie par. 5) |
 | 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een stap weg** (vraagt de testwereld uit par. 4) |
-| 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **een stap weg** (`SCHERMLEUGEN.json` doet dit voor 6 schermen) |
+| 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) |
 | 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **een stap weg** |
-| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **half** — de routekant staat (`IDOR.json`, `ROLPROEF.json`), de schermkant niet |
+| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **gemeten voor leden en gezinnen** (`BEVOEGD.json`, par. 4f): ledenschermen bakenen af op de sessie en worden samengesteld uit `IDOR.json` en `ROLPROEF.json`, gezinsschermen krijgen een kruisproef op de gezinscode; zaak en kantoor hebben nog geen proef |
 | 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **een stap weg** (`HERSTELPROEF.json`, `chaos.js`, `aanval.js` bestaan al) |
 | 8 | **menselijk** | krijgt de gebruiker nooit een kale 500, TypeError, lege pagina of dode knop? | **half** — kale fouten worden gezien, de bruikbaarheid van een melding niet |
 
@@ -126,6 +126,359 @@ fail-closed is:
 De regel die daarbovenop hoort: **een simulatie-adapter mag nooit een handeling
 laten slagen die in het echt niet zou slagen.** Vandaar dat de synthetische bank
 vier afloopen kent (`betaald`, `geweigerd`, `traag`, `terugboeking`) en niet één.
+
+## 4a. Bewijs samenstellen — wat er al gemeten is, laten tellen
+
+**Staat** (24 september 2026). De eerste stap naar de testwereld is geen nieuwe
+fixture maar een naad: er lagen gesloten ketenproeven die complete stromen lopen,
+en `APPWERKT.json` las er geen enkele. Een app mag nu een bewijs **samenstellen**
+uit een proef die al bestaat. Drie stukken, en geen van drie is een nieuw
+framework:
+
+- **`scripts/lib/appcontract.js`** zegt per app welke bron welk bewijs mag
+  leveren. Het is een verklaring en nooit een uitslag: er staat geen stand in, en
+  `test/appcontract.test.js` zakt als iemand er toch een in zet. Alleen de acht
+  bewijzen van par. 2 — er komt geen negende.
+- **`scripts/lib/bewijsbron.js`** beslist of de bron het op deze code verdient,
+  in drie stappen waarvan de eerste die faalt de uitslag bepaalt: de **koppeling**
+  is gemeten (de proef raakt routes die de ingang aanroept, via
+  `SCHERMROUTES.json` en de scripts die de ingang laadt), het register is **vers**
+  (`versheid()` uit `scripts/lib/stempel.js`, en met opzet geen tweede grendel),
+  en de keten **sluit** (de schakels zelf, niet de samenvattende telling).
+- Verouderd is `NIET_GETEST` en nooit `GEBLOKKEERD_DOOR_DEFECT`: er is dan niets
+  gemeten dat stuk was. Vers met een open schakel is `DEFECT` en nooit
+  `NIET_GETEST`: dan is er wel iets gemeten.
+
+**Een ketenproef levert precies één bewijs: `voltooibaar`.** Zijn storingen zijn
+dubbele tikken, verkeerde rollen en verboden standen — dat is niet wat
+*herstelbaar* hier betekent (uitval van Redis of PostgreSQL, een providertimeout,
+een verzoek dat midden in een mutatie afbreekt). Er is geen herstart, dus ook geen
+*persistent*; hij leest API-antwoorden, dus geen *waarheidsgetrouw*; en een
+handvol verkeerde-rol-storingen is geen kruisproef, dus geen *bevoegd*. Wie een
+keten voor een van die vier laat tellen, voert het verkeerde experiment uit met
+een geldige uitslag (`BEWIJSMACHINE.md` par. 6a).
+
+**De meting die het verwachte beeld corrigeert.** Het leek alsof zeven gesloten
+ketens veel gratis bewijs waren. Gemeten op de routes landt er **één** op de
+kernbelofte van een app in `MAPPEN`: de tafelproef op Horeca (twaalf gedeelde
+routes onder `/api/supplier/horeca/`). De andere zes staan in `ZONDER_APP`, elk
+met de reden en wat er nodig is:
+
+| keten | waarom hij (nog) niet telt |
+|---|---|
+| rit | geen scherm roept `/api/ride/request` aan; de rit start in een stand van de ledenapp zonder eigen adres |
+| Adam | loopt over `/api/rtf/solliciteer` en `/api/concern/*`; geen ingang in `MAPPEN` roept die aan |
+| moment | raakt RTG Media, maar alleen de deelbelofte volgen en gewekt worden |
+| toelating, zaak-live | de zaak- en kantoorkant; `MAPPEN` kent alleen lid- en gezinswerelden |
+
+**Herzien op 24 september 2026: de lus telt wel.** Twee redenen in deze tabel
+klopten niet meer. Ontdekken in `MAPPEN` is `link:connect` → `/apps/connect.html`,
+en dat scherm deelt acht `/api/connect`-routes met de lusproef; en de lusproef
+schrijft nu `LUSPROEF.json` met het huisstempel (`npm run lusproef:vast`, standen in
+het woordgebruik van de andere ketenregisters). Het is ook dezelfde belofte: CONNECT.md
+noemt de lusproef het bewijs dat de ontdeklus rond is. Ontdekken draagt daarom
+`voltooibaar = BEWEZEN`, met één voorbehoud in het contract: de proef loopt als lid
+over de deur die `connect.html` zelf aanroept, en de gezinsdeur `/api/rtf/connect`
+(dezelfde motor) loopt hij niet. De vijf andere ketens zijn opnieuw gemeten over alle
+112 rijen, en delen alleen algemene routes (`/api/login`, `/api/account/start`,
+`/api/notifications`, `/api/supplier/state`). Dat is geen gedeelde belofte, dus die
+blijven zonder app.
+
+De routeoverlap is **nodig en niet voldoende**: vandaar de belofte in woorden bij
+elke koppeling. Een keten die een deelbelofte loopt, verdient het bewijs van de
+hele app niet. Twee valkuilen die de meting zelf opleverde: een scherm met het
+voorvoegsel `/api/` leek op alle zeven ketens te landen (een voorvoegsel telt pas
+vanaf twee segmenten), en vijf van de zes registers droegen een kale datum in
+plaats van een stempel, zodat `versheid()` er niets over kon zeggen. Die vijf
+schrijven nu het huisstempel.
+
+**Wat dit betekent voor de volgorde.** Samenstellen schaalt niet door meer ketens
+te schrijven maar door de wereld eronder: de bewijsbron is gebouwd om later ook
+een wereldproef, een autorisatieproef en een verraadproef te lezen (elk met zijn
+eigen bewijs in `BRONSOORTEN`, nooit door een bestaande soort op te rekken). Dat
+is de volgende stap: de bestaande `scripts/lib/wereld-*.js` onder één compositor,
+zodat een app alleen verklaart welke wereld hij nodig heeft.
+
+## 4b. Werelden samenstellen — een app vraagt wat hij nodig heeft
+
+**Staat** (24 september 2026). De testwereld van par. 4 hoeft niet gebouwd te
+worden: hij ligt er in stukken. Er zijn elf wereldbouwers (`scripts/lib/wereld-*.js`),
+elk geschreven omdat een groep routes op "bestaat niet" strandde. Wat ontbrak was
+een manier om ze te **vragen**. Ze werden op één plek samengesteld, een vaste lijst
+van zes in `scripts/idemproef-route.js`, en **vijf werden door geen enkele proef
+gebruikt**: horeca, school, spel, signature en wortels. Alleen hun eigen
+unittoetsen riepen ze aan.
+
+`scripts/lib/wereldcompositor.js` is het register en het plan erboven, zonder een
+bouwer te herschrijven. `plan(['horeca'])` is een pure functie: welke werelden,
+in welke volgorde, en welke fundering (server, sleutelbos, lijfsleutelfamilies).
+Wie horeca vraagt, krijgt de gastfamilie en een open rekening, en niet de hele
+stad. `npm run wereld -- horeca school` bouwt het op een wegwerpserver en meldt per
+wereld klaar of niet, met de reden, en daarna of hij na afloop nog staat.
+
+De eerste echte bouw van de vijf ongebruikte werelden: **vier komen op**
+(signature, horeca, school, wortels). **Spel eerst niet**, met een eerlijke
+reden: de bouwer vraagt een `member-account`-sessie, en geen enkele munter in
+`scripts/lib/proefsleutels.js` maakte die. Die munter staat er sinds ronde C: een
+vers gratis account langs de gewone registratie, en in `GEEN_BEWAKER`, zodat de
+verdeling van routes over rollen voor geen enkele proef verandert. Daarmee komen
+alle elf werelden op.
+
+**Het meetinstrument kreeg in dezelfde ronde een vierde bak**
+(`scripts/lib/foutindeling.js`). De proef vult geen formulieren in, dus een tik op
+"toevoegen" met een leeg veld levert een 400 met een zin als "Schrijf op wat er
+gebeurde." Dat is een weigering met een reden en geen defect. De bak is smal:
+alleen 400, 409 en 422, en alleen met een `error` die een zin is. Een code als
+`BAD_REQUEST` of een 500 met een nette zin blijft stuk. Wat de indeling niet kan
+zien, is of het scherm de zin ook toont. Daarom blijven weigeringen per rij
+geteld in de reden van `bedienbaar`, en verdwijnen ze niet.
+
+Een app verklaart zijn wereld in `WERELD` in `scripts/lib/appcontract.js`, en ook
+dat is gemeten: de bouwer raakt minstens twee routes van de ingang, en **geen andere
+wereld raakt er meer**. Een vaste drempel alleen liet een verkeerde verklaring door
+(de wortels-wereld haalt twee routes van Spelen). `test/wereldcompositor.test.js`
+zakt ook zodra er een wereldbouwer bestaat die niet in het register staat. Een wees
+is voortaan zichtbaar.
+
+## 4c. Bedienbaar was een kromme meetlat — vier fouten in de meter, en geen enkele in een app
+
+> **Vervangen op 25 september 2026.** Deze paragraaf beschrijft de eerste
+> reparatie van de bedienbaar-meter, met een noemer die bij het laden bevroren
+> werd, een budget en een drempel (de module bedieningsmeting in scripts/lib, verwijderd in 8c78a044). Tegelijk
+> kwam er langs een andere weg (#392) een tweede reparatie op main: per ronde
+> opnieuw kijken, na elke tik Escape, vastleggen wie een klik opving, en een
+> weigering waarvan het scherm de reden niet toont als defect. Bij het
+> samenvoegen is gekozen voor die van main als basis (besluit van de eigenaar).
+> De module en haar twee toetsen zijn weg; de diagnose hieronder blijft staan
+> omdat de vier meterfouten echt waren, en de tweede reparatie dezelfde
+> symptomen aanpakt.
+
+**Staat** (24 september 2026). Na de hermeting stond `bedienbaar` voor alle 112
+onderdelen op `NIET_GETEST`, en drie apps die op 7 september bewezen waren vielen
+terug. Dat is eerst **gediagnosticeerd en pas daarna gerepareerd**: een trechter
+per scherm, een spoor per ronde en de stadia per herkomst (DOM → zichtbaar → in
+beeld → te raken). Ze wezen vier onafhankelijke fouten aan, alle vier in de meter:
+
+| fout | gemeten | reparatie |
+|---|---|---|
+| **navigatie** | 50 van 97 schermen stopten op "geen nieuwe knop": een tik op een schillink navigeerde pas na de url-controle weg, en de volgende ronde zag 0 knoppen op een andere pagina | de **thuisregel**: vóór elke tik staat de proef op de landing, en anders keert hij terug met dezelfde gereedvoorwaarde als bij het eerste laden |
+| **de noemer groeide onder het examen** | `gevonden` was het maximum over de rondes; Buurtruil ging van 23 naar 43 na een tik op de zoekknop | de noemer **bevriest** bij het laden, vóór er getikt wordt |
+| **de schil in de noemer** | de Edge alleen: 1923 knoppen op 93 schermen, waarvan 993 onder een laag; de lus koos op DOM-volgorde, dus de rondes gingen naar schilknoppen | de noemer is de **app-herkomst** (topcontainer onder `body`); de schil krijgt een eigen bewijs |
+| **het budget** | een limiet van 14 met een drempel van de helft: op 86 van 97 schermen wiskundig onhaalbaar | het budget volgt uit de noemer; een drempel boven het budget is een **MeterConfigFout** en laat de meting als geheel falen |
+
+**De schil is een definitie en geen lijst.** Een topcontainer die een gedeeld script
+in `public/shared/` aanmaakt, is schil. De module bedieningsmeting (verwijderd, zie de noot hierboven) noemde
+elk teken met zijn bron, en haar toets zakte als die bron het
+teken niet aanmaakt.
+
+**De schil is geen plek om fouten te verbergen.** Hij staat in het register als
+eigen onderdeel (`schil`), en elke rij draagt zijn uitslag onder `afhankelijk`.
+"De eigen bediening van Horeca is bewezen" en "de gedeelde schil heeft een gebrek"
+staan naast elkaar en worden nooit samengevoegd tot "Horeca werkt".
+
+**Te raken is geen middenpunttest.** De hittest kijkt naar vijf punten na scrollen,
+en één punt is genoeg. Een knop waarvan alleen het midden onder een laag ligt, is
+voor een mens vaak gewoon bedienbaar.
+
+**De regressiefixture** (de browsertoets appwerkt-meter, verwijderd met de module) was een synthetisch scherm met
+alle vier de fouten erin: 6 app-knoppen die pas na 800 ms bestaan, een paneel met
+20 extra knoppen, 30 schilknoppen waarvan 15 onder een laag, en navigerende knoppen
+in schil en app. De waarheid is een app-noemer van 6 en een schil-noemer van 15.
+Zeven mutaties, één per gerepareerd gebrek plus de wachttijd en de invariant: alle
+zeven laten een toets zakken.
+
+**Wat hier bewust niet in zit:** de losse vondst dat Routedossier voor een lid op
+`personeel.html?kantoor=1` landt terwijl `bereikbaar` op BEWEZEN staat. Die vraagt of
+`bereikbaar` alleen bewijst dat er een pagina verschijnt, of ook dat de juiste app
+voor de juiste persona is bereikt. Dat krijgt een eigen diagnose.
+
+**Een vijfde meterfout: een standwissel is ook weggaan** (24 september 2026, na de
+hermeting). Stap 1 van de afbouw ging uit van een onstabiele knopidentiteit, en een
+diagnose over de drie rijen waar "niet meer gevonden" het oordeel besliste (Mijn leven,
+Vandaag, Reizen & Veilig) weerlegde dat: de verloren knoppen bestonden niet meer met
+een andere tekst, er stond geen enkel element meer met dezelfde attributen. Een tik
+("Laat Rahul kiezen", "Meenemen") had de inhoud vervangen zonder de url te veranderen,
+en de thuisregel keerde alleen terug bij een andere url. Nu keert de proef ook terug
+als de volgende knop uit de noemer niet meer in de pagina staat, met dezelfde
+klaar-voorwaarde; pas wat daarna nog ontbreekt, telt als niet meer gevonden. De
+fixture kreeg knop A7, die de inhoud vervangt zonder te navigeren: zonder de
+reparatie raakt de proef er 6 van de 7. Er is bewust geen nieuwe knopidentiteit
+gebouwd, want die had dit niet opgelost.
+
+## 4d. Bereikbaar: de juiste actor op de bedoelde bestemming
+
+**Staat** (24 september 2026). Een diagnose over alle 112 rijen vergeleek de
+ingang uit `MAPPEN` met de pagina waar de proef werkelijk landde. **Vier rijen
+stonden op BEWEZEN terwijl een lid de app nooit bereikte**: Routedossier, Decision
+Room, Project Room en RTG One sturen een lid zonder kantoorsessie door naar de
+kantoordeur of het RTG Kantoor. De meter herkende een deur alleen als een selector
+óp de pagina, dus een deur via een doorverwijzing ging erdoorheen.
+
+**De identiteit bestond al.** `SCHERMEIGENAAR.json` noemt per scherm een
+capability, een rol en een doelgroep. `scripts/lib/bestemming.js` vergelijkt
+daarom de capability van de landing met die van de ingang, en niet de url. Een
+alias wordt gevolgd, zodat een canonieke doorverwijzing geldig blijft. Een andere
+capability is nooit BEWEZEN. Komt een andere bekende persona er wel, dan is het de
+bestaande uitkomst "verkeerd geadresseerd" met dezelfde zin. Een landing die niet
+te benoemen is, is NIET_GETEST. Het register wordt zonder vangnet gelezen: een
+onleesbaar register is geen leeg register.
+
+**Een tweede as, bewust zonder bewijsbetekenis.** Op elf schermen (eerst dertien) meet de proef
+met een andere persona (de wereld uit `MAPPEN`, via `PERSONA_VAN_WERELD`) dan het
+register als doelgroep noemt. WorkOS meet bijvoorbeeld als lid, terwijl Horeca en
+Partner Network voor een zaak zijn. Welke van de twee gelijk heeft, is geen
+meetvraag. "Vanuit welke wereld testen we" en "voor wie is dit scherm" hoeven niet
+hetzelfde begrip te zijn. De afwijking staat per rij als `personaAfwijking`, met
+beide waarden en beide bronnen. `npm run appcluster` groepeert hem per wereld op
+`gebruikt → verwacht`. Hij verandert geen enkel bewijs, tot de elf semantisch
+zijn ingedeeld.
+
+**De vier defecten waren een productfout, en die is gerepareerd (24 september 2026).**
+Routedossier, RTG One, Decision Room en Project Room hadden een oorzaak: MAPPEN kende
+een pas maar geen werkrol, dus de ledenwereld toonde elk lid vier schermen die alleen
+met een kantoorsessie openen (`/api/rtgone` achter `officeAuth`). Een ingang in `LINKS`
+kan nu `werkrol` dragen; de bank toont hem alleen aan een account met die rol in zijn
+sleutelbos (`/api/account/rollen`), de sprongindex zet er het label "Kantoor" bij, en
+APPWERKT meet de rij met die persona. Hermeten: alle vier bereikbaar, 0 defecten.
+`test/werkrol.test.js` houdt vast dat een ingang naar een kantoorscherm een werkrol
+draagt. Twee dingen die de persona-as raakten: de doelgroep van de drie RTG
+One-schermen in `SCHERMEIGENAAR.json` stond op lid, business-lid en zaak, en is kantoor
+geworden, omdat dat de enige sessie is die hun API opent. En de doelgroep in dat
+register is een eigen woordenlijst uit een leesronde, zonder handhaver: hij zegt voor
+wie een scherm BEDOELD is. Toegang is iets anders (de acht doelgroepen van het
+functieregister, gemeten in `DOELGROEPBEREIK.json`), en de persona van een wereld is
+geen begrip uit WERELDEN.md maar een aanname van deze meter.
+
+Toetsen: `test/bestemming.test.js` (de drie gevallen, een onbekende landing, de
+persona-afwijking) en `test/appwerkt-bestemming.e2e.js` (echte doorverwijzingen na
+het laden). Vijf mutaties, waaronder "terug naar url-vergelijking": alle vijf
+laten een toets zakken.
+
+## 4e. Waarheidsgetrouw: de liegpoort over elk onderdeel
+
+**Staat** (24 september 2026). Par. 7 punt 3 noemde dit een stap die rekentijd kost
+en geen ontwerp, en zo liep het ook. `scripts/liegronde.js` draait het experiment van
+`test/liegend-scherm.e2e.js` over elke rij van `APPWERKT.json`, met de persona van
+die rij. De server staat op `RTG_LIEG=/api/`, dus elk endpoint buiten de deuren
+antwoordt `{ok:true}` en verder niets. De detectoren zijn dezelfde
+(`scripts/lib/schermleugen.js`). `LIEGRONDE.json` legt de uitslag per rij vast, en
+APPWERKT neemt hem over als algemene bron (`ALGEMEEN` in `scripts/lib/appcontract.js`),
+met dezelfde versheidsgrendel als bij de ketens.
+
+**De eerste ronde vond geen enkel scherm dat een zekerheid verzint, en 38 die
+omvallen.** Van de drie detectoren gaat er maar één over bewijs 4: een zekerheidswoord
+dat in de gerenderde tekst staat en niet in de statische bron. Die sloeg nergens aan.
+De 38 klachten waren allemaal een JS-fout (22) of `undefined` in beeld (16) op het
+kale antwoord. Dat zegt iets over robuustheid bij een antwoord dat de echte backend
+nooit zo geeft, en niets over liegen. Ze als DEFECT onder bewijs 4 tellen zou er een
+nieuwe betekenis van maken. Het huis telt ze in `SCHERMLEUGEN.json` als schuld, dus
+bij zo'n scherm is bewijs 4 NIET_GETEST, met de klacht in de rij: wie omvalt, laat
+niet zien of hij een toestand zou verzinnen. Een scherm dat buiten de deuren niets
+aan de backend vroeg, is ook NIET_GETEST en nooit BEWEZEN.
+
+**Wat BEWEZEN hier betekent, en niet meer:** het scherm kreeg minstens één gelogen
+antwoord, en toonde geen verzonnen zekerheid, geen rommel en geen JS-fout. Alleen een
+LEEG antwoord is beproefd. Een backend die iets verkeerds antwoordt in plaats van
+niets, wordt niet betrapt.
+
+**En daarna gerepareerd, niet alleen gemeten** (dezelfde dag). Er was geen gedeelde
+oorzaak: elk van de schermen nam aan dat een veld er altijd is. Elk controleert nu
+direct na het ophalen wat het aantoonbaar gebruikt, en valt bij een ontbrekend veld
+terug op zijn eigen foutmelding ("Het antwoord was onvolledig, dus dit kon niet worden
+geladen."). Nooit een lege lijst: die zou beweren dat er niets is, en dan had de
+reparatie bewijs 4 zelf gebroken. Elke reparatie is twee keer nagelopen: onder de
+liegpoort (valt niet meer om), en op een gewone server met een echte sessie (toont zijn
+inhoud, en valt dus niet onterecht in zijn foutmelding). Die tweede proef ving een
+eigen fout: routedossier kreeg een lijst geeist waar het antwoord een object met
+`resultaten` draagt. Twee schermen waren geen omvaller maar een deur (de schoolsessie
+stopt zijn script met opzet), en de liegronde beoordeelt nu eerst de deur. Uitslag:
+93 BEWEZEN en 0 omvallers.
+
+**De ronde vond ook een productdefect dat met liegen niets te maken had.** Ontdekken
+(`/apps/connect.html`) staat in FoundationOS en zei een gezinslid "Niet ingelogd.":
+het scherm riep alleen de ledendeur `/api/connect/*` aan, terwijl de motor een
+gezinsdeur heeft (`/api/rtf/connect/*`, dezelfde motor) die door geen enkel scherm
+werd gebruikt. Het scherm kiest nu zijn deur: een lid gaat voor, anders de
+gezinssessie. De gezinsdeur kreeg de ene route die het scherm gebruikt en die ontbrak
+(`schuif` -- de mens zet zijn eigen horizon, CONNECT.md). Toets:
+`test/connect-gezinsdeur.e2e.js`, die zakt als de deurkeuze uit staat.
+
+Toetsen: `test/liegronde.test.js` (het oordeel, de samenstelling, en de samenhang van
+het echte register). Drie handmutaties laten hem zakken: elke klacht als defect
+tellen, de versheid overslaan, en nul gelogen antwoorden als bewezen tellen.
+
+## 4f. Bevoegd aan de schermkant: eerst gemeten of er iets te kruisen valt
+
+Rij 6 van de tabel zegt dat de routekant van *bevoegd* staat (`IDOR.json`,
+`ROLPROEF.json`) en de schermkant niet. Voordat daar een kruisronde voor kwam (open
+het scherm als eigenaar A, dan als vreemde B, en kijk of B iets van A ziet), is
+eerst gemeten of een scherm iets van zijn eigenaar bij NAAM vraagt. Doet het dat
+niet, dan vraagt B zijn eigen gegevens op, en "B zag niets van A" is dan een
+groen vinkje op een experiment dat niet is uitgevoerd (BEWIJSMACHINE.md par. 6a).
+
+Een kruispoging telt dus alleen als een verzoek van het scherm een object van A
+noemt in zijn adres of lijf. Twee verkenningen van 25 september 2026, allebei bij
+het laden van het scherm (zonder tikken):
+
+| eigenaar | ledenschermen die een object van A noemen | gezinsschermen |
+|---|---|---|
+| vers account, merkteken = codenaam, nummer, e-mail, gezinscode | **0 van 85** | 5 van 10 |
+| sleutelbos-lid met alle elf werelden gebouwd, merkteken = elk id uit A's eigen antwoorden | **4 van 85** | 1 van 10 |
+
+Van die 85 kregen er in de tweede ronde 31 wel ids terug en noemden ze bij het
+laden niet; 50 kregen er geen, omdat de werelden niet op het lid staan dat die
+schermen opent. Twee verklaringen, en de metingen scheiden ze maar half: een
+ledenscherm bakent bij het laden af op de SESSIE en niet op een id (dan is de
+routekant de juiste proef en is rij 6 te streng), en een scherm noemt een object
+pas na een tik op een detail (dan hoort de kruisronde op de verkenning van
+*bedienbaar* te liggen en niet op het laden). Er is daarom (nog) geen kruisronde
+gebouwd: bij het laden zou hij op hoogstens vijf rijen iets kunnen bewijzen.
+Het verkenningsscript staat niet in de repo; wat het deed staat hierboven.
+
+**De tweede verklaring is daarna nagemeten, en zij valt af.** Een derde verkenning
+liep over dezelfde tikken als *bedienbaar* (`bedien()` uit `scripts/appwerkt.js`),
+als het sleutelbos-lid met alle elf werelden, en speelde elk GET-verzoek dat een id
+uit A's eigen antwoorden noemde drie keer na: als A, anoniem en als een vers lid B.
+Een kruispoging telt alleen als A het object krijgt en een anonieme bezoeker niet,
+want anders is het openbaar en is "B ziet het" geen lek. Uitslag over 85
+ledenschermen: **1 scherm met 3 paren** (Magnaat, en daar zijn het toevallige
+getallen in `/api/talen`, `/api/ready` en `/api/health`: 1 openbaar, 1 waar A
+zelf niets terugkreeg, 1 niet afgerond), **0 gescheiden, 0 lek**. Ook na tikken
+noemt geen ledenscherm een object van zijn eigenaar bij id. Een ledenscherm bakent
+dus af op de sessie, en de vraag of een vreemde bij andermans object kan is daar
+een ROUTEvraag: wat `IDOR.json` (hetzelfde rol, ander lid) en `ROLPROEF.json`
+(verkeerde rol) meten. Voor gezinsschermen ligt het anders: vijf van de tien
+noemen hun gezinscode in het verzoek, en daar heeft een kruisproef aan de
+schermkant wel een onderwerp.
+
+**Daaruit is de bevoegdronde gebouwd** (`scripts/bevoegdronde.js`,
+`BEVOEGD.json`, 25 september 2026, besluit van de eigenaar). Twee helften, en ze
+worden niet opgeteld:
+
+- **Ledenschermen worden samengesteld**, en streng: BEWEZEN alleen als ELKE route
+  die het scherm aanroept in `IDOR.json` gemeten is (`gescheiden`, `nagekeken`
+  of `publiek`), elke schrijfroute ook in `ROLPROEF.json` dicht en schoon, en
+  beide registers vers. `ROLPROEF` alleen telt niet: die zegt of een andere ROL
+  erbij kan, niet een ander lid. Een voorvoegsel dat het scherm zelf aan elkaar
+  plakt telt als gemeten als elke bekende route eronder gemeten is.
+- **Gezinsschermen worden gekruist**: gezin A opent het scherm, en elk verzoek
+  met A's code wordt nagespeeld met het token van gezin B (A's code blijft
+  staan) en zonder token. Een paar telt alleen als A zelf binnenkwam.
+
+Voor die ronde zijn `IDOR.json` en `ROLPROEF.json` vers gemeten (ze stonden op
+31 augustus en 19 september). IDOR vond daarbij vijf nieuwe
+doorbraak-kandidaten; met de hand nagekeken waren het alle vijf routes waar B
+iets van B doet, en ze staan met hun reden in `NAGEKEKEN` van
+`scripts/idorproef.js`. Stand: 672 gescheiden, 0 doorbraak, 0 lek; ROLPROEF 3889
+routes beproefd, 0 open, 0 privacylek.
+
+De uitslag is kleiner dan een ruwe schatting (23 ledenapps) en dat is de
+strengheid, niet een tekort in de ronde: **4 ledenschermen en 5 gezinsschermen
+BEWEZEN, 0 defect**. Bij de meeste ledenschermen staat minstens een route op
+`onbereikbaar` in IDOR -- de proef vond daar geen id van A om mee te kruisen --
+en een route die niet gekruist is, is niet gemeten. Wat die rijen omhoog brengt
+is dus IDOR laten reiken tot die routes (een wereld waarin A daar iets bezit),
+niet de regel versoepelen.
 
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 

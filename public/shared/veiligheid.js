@@ -66,6 +66,8 @@
      nooit langs; dat is geen beperking maar het ontwerp. */
   V.kringKaart = function (host, opnieuw) {
     V.api('/api/veiligheid/kring').then(function (d) {
+      /* Onvolledig antwoord: langs de foutweg hieronder, niet een ruwe TypeError in de kaart (LIEGRONDE.json). */
+      if (!(d && d.kring && Array.isArray(d.kring.contacten) && Array.isArray(d.kring.mails))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
       var k = d.kring;
       var rijen = k.contacten.map(function (c) {
         return '<div class="rij">' +

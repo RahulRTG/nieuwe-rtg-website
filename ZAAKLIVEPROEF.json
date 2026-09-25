@@ -1,5 +1,12 @@
 {
-  "stempel": "2026-09-13",
+  "stempel": {
+    "op": "2026-09-24T16:37:35.883Z",
+    "commit": "56ea75ba",
+    "boomVuil": false,
+    "boomAnders": 5,
+    "instrument": "scripts/zaakliveproef.js",
+    "node": "v22.22.2"
+  },
   "uitleg": "Van goedgekeurde aanvraag naar een zaak die een lid werkelijk kan zien. De toelatingsketen ervoor is hier WERELD en geen schakel; die is elders beproefd.",
   "grens": "Geen browser, geen betaling. De proef meet de partner-app en de ledenkant van EEN zaak in een vrij genre (hotel); een gereguleerd genre loopt eerst door de toelatingsketen.",
   "genre": "hotel",
@@ -14,7 +21,7 @@
       "status": 200,
       "ziet": "zaak PROEFHOTEL, rol manager",
       "fout": null,
-      "ms": 124
+      "ms": 148
     },
     {
       "nr": 2,
@@ -26,7 +33,7 @@
       "status": 200,
       "ziet": "3 open stap(pen), 3 met uitleg",
       "fout": null,
-      "ms": 9
+      "ms": 10
     },
     {
       "nr": 3,
@@ -50,7 +57,7 @@
       "status": 200,
       "ziet": "compleet: true",
       "fout": null,
-      "ms": 15
+      "ms": 13
     },
     {
       "nr": 5,
@@ -62,7 +69,7 @@
       "status": 200,
       "ziet": "poort klaar: false, lid ziet de zaak: nee (kassa:false, werk:false, salon:false)",
       "fout": null,
-      "ms": 14
+      "ms": 15
     },
     {
       "nr": 6,
@@ -98,7 +105,7 @@
       "status": 200,
       "ziet": "bio bij het lid: Een klein proefhotel aan de gracht, acht kamers en een binne",
       "fout": null,
-      "ms": 17
+      "ms": 15
     },
     {
       "nr": 9,
@@ -110,7 +117,7 @@
       "status": 200,
       "ziet": "na herinloggen -- klaar: true, online: true",
       "fout": null,
-      "ms": 119
+      "ms": 109
     }
   ],
   "storingen": [
@@ -171,7 +178,7 @@
   "zaak": {
     "code": "PROEFHOTEL",
     "genre": "hotel",
-    "aanmelding": "563ad3aa"
+    "aanmelding": "ad5ba86a"
   },
   "telling": {
     "schakels": 9,

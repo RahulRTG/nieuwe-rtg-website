@@ -47,6 +47,10 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+/* Het volle stempel (commit + boomVuil + instrument) en niet een kale datum:
+   APPWERKT.json leest deze proef als bewijsbron, en zonder waartegen-is-dit-
+   gemeten kan versheid() niet zeggen of het bewijs nog bij deze code hoort. */
+const { stempel: huisStempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'ZAAKLIVEPROEF.json');
@@ -337,7 +341,7 @@ async function storingen(basis, uit, w) {
 }
 
 async function meet() {
-  const uit = { stempel: new Date().toISOString().slice(0, 10),
+  const uit = { stempel: huisStempel(),
     uitleg: 'Van goedgekeurde aanvraag naar een zaak die een lid werkelijk kan zien. ' +
       'De toelatingsketen ervoor is hier WERELD en geen schakel; die is elders beproefd.',
     grens: 'Geen browser, geen betaling. De proef meet de partner-app en de ledenkant van EEN zaak ' +

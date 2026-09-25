@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-25T10:27:15.917Z",
-  "commit": "6505f286",
+  "op": "2026-09-25T14:00:31.720Z",
+  "commit": "c2dc75dc",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 317,
+  "artefacten": 320,
   "bron": 11,
-  "afgeleid": 175,
+  "afgeleid": 178,
   "fragmenten": 25,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 199,
-  "afgeleidEigenaarHard": 173,
+  "metEigenaar": 202,
+  "afgeleidEigenaarHard": 176,
   "afgeleidGrendelt": 20,
-  "metStempel": 102,
+  "metStempel": 110,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -345,6 +345,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEVOEGD.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/bevoegdronde.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/bevoegdronde.js"
+   ],
+   "stempelInstrument": "scripts/bevoegdronde.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run bevoegdronde:vast",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2012,6 +2026,20 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "LIEGRONDE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/liegronde.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/liegronde.js"
+   ],
+   "stempelInstrument": "scripts/liegronde.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run liegronde:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "LIFE.md",
    "soort": "ONBESLIST",
    "eigenaar": null,
@@ -2045,6 +2073,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LUSPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/lusproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/lusproef.js"
+   ],
+   "stempelInstrument": "scripts/lusproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run lusproef:vast",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2337,11 +2379,11 @@
    "naam": "MOMENTPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/momentproef.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/momentproef.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/momentproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run momentproef:vast",
    "grendelt": false,
@@ -3053,11 +3095,11 @@
    "naam": "RITPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/ritproef.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/ritproef.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/ritproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run ritproef:vast",
    "grendelt": false,
@@ -3605,11 +3647,11 @@
    "naam": "TAFELPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/tafelproef.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/tafelproef.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/tafelproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run tafelproef:vast",
    "grendelt": false,
@@ -3695,11 +3737,11 @@
    "naam": "TOELATINGSPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/toelatingsproef.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/toelatingsproef.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/toelatingsproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run toelatingsproef:vast",
    "grendelt": false,
@@ -4153,11 +4195,11 @@
    "naam": "ZAAKLIVEPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/zaakliveproef.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/zaakliveproef.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/zaakliveproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run zaakliveproef:vast",
    "grendelt": false,

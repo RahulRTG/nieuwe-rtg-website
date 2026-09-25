@@ -439,6 +439,8 @@ async function start() {
 
   try {
     const r = await api('steden');
+    /* Onvolledig antwoord: de melding, nooit een lege lijst of een ruwe TypeError (LIEGRONDE.json). */
+    if (!(r && Array.isArray(r.steden))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     $('#wat').textContent = r.wat;
     $('#steden').innerHTML = r.steden.length
       ? r.steden.map(s => '<button type="button" class="buurtstad" data-stad="' + esc(s.id) + '" aria-pressed="false">' +
@@ -469,6 +471,8 @@ async function start() {
 
   try {
     const c = await api('campagnes');
+    /* Onvolledig antwoord: de melding, nooit een lege lijst of een ruwe TypeError (LIEGRONDE.json). */
+    if (!(c && Array.isArray(c.campagnes))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     $('#campagnes').innerHTML = '<div class="buurtsec">Wat er landelijk loopt</div>' + (c.campagnes.length
       ? c.campagnes.map(x =>
           '<div class="lijnrij">' +
@@ -497,6 +501,8 @@ async function toonStad(id, opties) {
   const actueel = () => versie === STAD_VERSIE && (!(opties && opties.restore) || HERSTEL_STAD_TOEGESTAAN);
   try {
     const r = await api('stad', { id });
+    /* Onvolledig antwoord: de melding, nooit een lege lijst of een ruwe TypeError (LIEGRONDE.json). */
+    if (!(r && Array.isArray(r.projecten) && Array.isArray(r.activiteiten))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     if (!actueel()) return false;
     GEKOZEN = id;
     $('#doenReden').hidden = true;

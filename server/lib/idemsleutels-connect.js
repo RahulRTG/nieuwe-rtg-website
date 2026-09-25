@@ -54,6 +54,7 @@ const SLEUTELS = {
   'POST /api/connect/naklank/weg': { velden: ['id', 'soort'] },
   /* De schuif ZET een waarde; twee keer dezelfde waarde is dezelfde stand. */
   'POST /api/connect/schuif': { velden: ['schuif'] },
+  'POST /api/rtf/connect/schuif': { velden: ['schuif'] },
   /* `werk` neemt de eigen werken over uit kern/mediaos/werkherkomst.js.
 
      HIER STOND `zelfdeVerzoek: true` EN DAT WAS FOUT -- gevonden door

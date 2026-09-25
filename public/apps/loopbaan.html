@@ -190,7 +190,7 @@ async function tekenDelen(){
 }
 
 async function laad(){
-  try{ MIJN = await api('/mijn'); teken(); await tekenDelen(); }
+  try{ MIJN = await api('/mijn'); /* Zonder reeks geen "Uw loopbaan begint hier" -- dat zou beweren dat er niets is (LIEGRONDE.json). */ if(!(MIJN && Array.isArray(MIJN.feiten) && Array.isArray(MIJN.voorraden) && MIJN.kapitalen && typeof MIJN.kapitalen === 'object' && MIJN.nooit && typeof MIJN.nooit === 'object')) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); teken(); await tekenDelen(); }
   catch(e){ $('#reeks').innerHTML='<p class="leeg">'+esc(e.message)+'</p>'; }
 }
 

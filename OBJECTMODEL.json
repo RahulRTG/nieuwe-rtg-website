@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-24",
   "gemeten": {
-    "bestanden": 2385,
-    "vormen": 1426,
-    "velden": 2063,
-    "modules": 790,
-    "domeinen": 282,
+    "bestanden": 2398,
+    "vormen": 1429,
+    "velden": 2069,
+    "modules": 793,
+    "domeinen": 283,
     "envelopDrempel": 17,
-    "envelop": 31,
-    "veldenDomeineigen": 1454,
-    "veldenGedeeldVanafVier": 205,
+    "envelop": 32,
+    "veldenDomeineigen": 1459,
+    "veldenGedeeldVanafVier": 204,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -34,6 +34,7 @@
     "prijs",
     "reden",
     "ref",
+    "sinds",
     "soort",
     "stand",
     "status",
@@ -47,18 +48,6 @@
     "wie"
   ],
   "gedeeld": [
-    {
-      "veld": "sinds",
-      "domeinen": 16,
-      "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/clubs",
-        "kern/command",
-        "kern/commercie",
-        "kern/ledenbalie-inzage"
-      ]
-    },
     {
       "veld": "naar",
       "domeinen": 16,
@@ -120,6 +109,18 @@
       ]
     },
     {
+      "veld": "bedrag",
+      "domeinen": 14,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/gemeente",
+        "kern/koppel",
+        "kern/labfonds",
+        "kern/livinglab"
+      ]
+    },
+    {
       "veld": "onderwerp",
       "domeinen": 14,
       "waar": [
@@ -165,18 +166,6 @@
         "kern/groothandel",
         "kern/keuken",
         "kern/kosten"
-      ]
-    },
-    {
-      "veld": "bedrag",
-      "domeinen": 13,
-      "waar": [
-        "kern/bureau",
-        "kern/command",
-        "kern/gemeente",
-        "kern/koppel",
-        "kern/labfonds",
-        "kern/livinglab"
       ]
     },
     {
@@ -525,6 +514,18 @@
         "kern/festival",
         "kern/mobiliteit",
         "kern/navigatie"
+      ]
+    },
+    {
+      "veld": "kamer",
+      "domeinen": 9,
+      "waar": [
+        "kern/afdelingen",
+        "kern/bureau",
+        "kern/gast",
+        "kern/homemerken",
+        "kern/levensgraaf",
+        "kern/magnaat-trainingslobby-regie"
       ]
     }
   ],

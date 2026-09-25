@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T00:58:54.945Z",
-    "commit": "f85ee29c",
+    "op": "2026-09-24T21:03:45.606Z",
+    "commit": "466d411e1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -562,14 +562,6 @@
       "soort": "puur",
       "staat": "al rood",
       "gezakteZonderMutatie": 1
-    },
-    "appwerkt-onderschepper.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/appwerkt.js",
-      "operator": "===->!==#8",
-      "gezakt": 2,
-      "geprobeerd": 50
     },
     "archief.test.js": {
       "soort": "server",
@@ -5283,6 +5275,20 @@
       "gezakt": 2,
       "geprobeerd": 4
     },
+    "magnaatleven.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatleven.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "magnaatwereld.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7092,13 +7098,6 @@
       "operator": "+->-#1",
       "gezakt": 5,
       "geprobeerd": 4
-    },
-    "rahul-escape.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
     },
     "rahul-hart.test.js": {
       "soort": "puur",

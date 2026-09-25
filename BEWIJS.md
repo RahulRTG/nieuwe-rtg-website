@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2029 bestanden en 14391 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2030 bestanden en 14400 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2029 |
-| losse beweringen (`test(...)`) | 14391 |
+| toetsbestanden | 2030 |
+| losse beweringen (`test(...)`) | 14400 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1377 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1378 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1774 bestanden, 13936 beweringen.
+1775 bestanden, 13945 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -864,6 +864,7 @@ toets omvalt.
 | `magnaatgrondwet.test.js` | 9 | gezakt op `===->!==#0` | De ratel onder MAGNAAT.md: economische integriteit in Magnaat kan vanaf de nulstand alleen nog verbeteren. MAGNAATGRONDWET.json is de bevroren nulstand (npm run magnaat:grondwet -- --vastleggen). |
 | `magnaatlab.test.js` | 9 | gezakt op `return-weg#1` | DE TESTHAL-METING -- en of hij werkelijk iets onderscheidt. scripts/magnaatlab.js beantwoordt de vraag uit MAGNAATLAB.md par. |
 | `magnaatleven.test.js` | 17 | gezakt op `liegpoort /api/` | Magnaat FROM ZERO (V1): van een mens met € 64,32 en een baan in de keuken, via zijn eigen project, een kans, een onderhandeling en een factuur, naar een cashprobleem en een eerste bedrijf. Elke euro loopt door het... |
+| `magnaatmarkt.test.js` | 9 | gezakt op `===->!==#0` | Magnaat V3 LEVENDE MARKT: Oudwijk met concurrenten, kopers, wijken, weer en seizoen. Wat je verkoopt is een aandeel; concurrenten reageren op je prijs en maken fouten; een klant uit de markt heeft een offerte van een... |
 | `magnaatonderneming.test.js` | 12 | gezakt op `===->!==#0` | Magnaat V2 ONDERNEMING: wat er gebeurt als je bedrijf groter wordt dan jij. Personeel dat loon kost voordat de klant betaalt, planning over meer mensen, contracten met vaste uren, een leverancier die eerst geld wil,... |
 | `magnaatwereld.test.js` | 20 | gezakt op `!==->===#0` | Magnaat Wereld: alle functies zijn speelbaar, maar de spelbrug raakt nooit productie. De Future Engine stelt voor; een mens bepaalt iedere fase. |
 | `mail-eigen.test.js` | 18 | gezakt op `===->!==#0` | Eigen post: DKIM-ondertekening (server/dkim.js) en directe bezorging bij de mailserver van de ontvanger (server/smtp-direct.js), plus de koppeling in server/mail.js. Waar dit op let, in volgorde van belang: 1. |

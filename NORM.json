@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1600,
+    "kernBreedte": 1601,
     "kernGedeeld": 243,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -3068,6 +3068,15 @@
       "meter": "toetsenNietGemeten 626 -> 627",
       "reden": "test/samentekenen.test.js is nieuw (samen tekenen, besluit van de eigenaar van 24 september 2026). Met de hand nagetrokken met tien mutaties op bedrijf/samentekenen.js, de regelpoort en het loskoppelen; alle tien zakken, waarvan een pas na een extra bewering. De mutatiemotor is er nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1600,
+      "meter": "kernBreedte 1600 -> 1601",
+      "reden": "DemocratieOS fase B (POLITIEK.md par. 18.1) krijgt een eigen kernnaam `democratie` en hangt NIET onder een bestaande naam. Dat is een keuze en geen slordigheid: proef P3 (RTG verdwijnt) eist dat deze laag als geheel kan verhuizen, en een laag die onder de naam van een ander domein hangt, is precies de afhankelijkheid die P3 moet voorkomen. Wat hij van RTG gebruikt staat in server/kern/democratie/afhankelijkheden.js en wordt door test/democratie-afhankelijk.test.js bewaakt.",
+      "waarheen": "GRENZEN.json (democratie), server/kern/democratie/afhankelijkheden.js en test/democratie-afhankelijk.test.js"
     }
   ],
   "prestatie": {

@@ -37,7 +37,7 @@
         "staat": "GROEN",
         "beweringen": 15,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:41:42.767Z",
+        "at": "2026-09-25T11:12:24.056Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -52,12 +52,13 @@
       "bewijs": [
         "test/keten.test.js",
         "test/securitylog-keten.test.js",
-        "test/boardlog-keten.test.js"
+        "test/boardlog-keten.test.js",
+        "test/democratie.test.js"
       ],
       "bewijsstuk": "de ketenhash van het journaal (inzagelog.ketenTop(), securityLogKeten().top)",
       "dekking": {
-        "beproefd": 5,
-        "totaal": 5,
+        "beproefd": 6,
+        "totaal": 6,
         "eenheid": "auditjournalen aan de keten",
         "tellers": {},
         "pct": 100
@@ -65,13 +66,14 @@
       "grens": "ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD nodig, en die is nog niet in bedrijf.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 46,
+        "beweringen": 58,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:41:56.349Z",
+        "at": "2026-09-25T11:12:36.002Z",
         "bestanden": [
           "test/keten.test.js",
           "test/securitylog-keten.test.js",
-          "test/boardlog-keten.test.js"
+          "test/boardlog-keten.test.js",
+          "test/democratie.test.js"
         ]
       }
     },
@@ -99,7 +101,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 44,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:01.443Z",
+        "at": "2026-09-25T11:12:40.162Z",
         "bestanden": [
           "test/keten.test.js",
           "test/ankerdienst.test.js",
@@ -118,11 +120,11 @@
         "test/verraad.test.js",
         "test/verraadtelling.test.js"
       ],
-      "bewijsstuk": "de catalogus in dit bestand -- per verraad waar hij is ingebouwd",
+      "bewijsstuk": "./verraad-catalogus.js -- per verraad waar hij is ingebouwd",
       "grens": "de motor MAAKT de vraag stelbaar en beantwoordt hem niet. Dat een verraad is ingebouwd zegt niets over hoe het systeem erop reageert; daarvoor moet een ronde draaien en die uitkomst is een bevinding, geen oordeel.",
       "dekking": {
         "beproefd": 3,
-        "totaal": 9,
+        "totaal": 12,
         "eenheid": "verraden beproefd in de laatste ronde",
         "tellers": {
           "toegediend": 3,
@@ -131,13 +133,13 @@
           "blindeInjecties": 0,
           "onherhaalbareRondes": 0
         },
-        "pct": 33.3
+        "pct": 25
       },
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 33,
+        "beweringen": 39,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:02.387Z",
+        "at": "2026-09-25T11:12:40.938Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -173,7 +175,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:02.643Z",
+        "at": "2026-09-25T11:12:41.116Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -202,7 +204,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:04.662Z",
+        "at": "2026-09-25T11:12:42.873Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -233,7 +235,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:29.814Z",
+        "at": "2026-09-25T11:13:05.971Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -250,23 +252,23 @@
       ],
       "bewijsstuk": "ROLPROEF.json -- per route welke verkeerde rollen zijn geprobeerd",
       "dekking": {
-        "beproefd": 3858,
-        "totaal": 3931,
+        "beproefd": 3884,
+        "totaal": 4259,
         "eenheid": "schrijfroutes met een rol",
         "tellers": {
-          "doorbraken": 31,
+          "doorbraken": 0,
           "lekken": 0,
           "zijeffecten": 0,
           "blindeRondes": 0
         },
-        "pct": 98.1
+        "pct": 91.2
       },
       "grens": "meet twee foutklassen op SCHRIJFroutes: binnenkomen met de verkeerde rol, en een weigering die gegevens meegeeft. Twee leden met DEZELFDE rol die bij elkaars dossier kunnen (een IDOR) valt hier niet onder; leesroutes worden niet geprobeerd.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 13,
+        "beweringen": 15,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:30.019Z",
+        "at": "2026-09-25T11:13:06.128Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -282,24 +284,24 @@
       ],
       "bewijsstuk": "INVOERPROEF.json -- per route hoeveel rommel erheen ging en wat eruit kwam",
       "dekking": {
-        "beproefd": 3368,
-        "totaal": 3891,
+        "beproefd": 3486,
+        "totaal": 4219,
         "eenheid": "routes waar rommel voorbij de poort kwam",
         "tellers": {
           "breuken": 0,
           "sporen": 0,
-          "achterEenPoort": 523,
+          "achterEenPoort": 509,
           "blindeRondes": 0,
-          "tokensHernieuwd": 12
+          "tokensHernieuwd": 11
         },
-        "pct": 86.6
+        "pct": 82.6
       },
       "grens": "meet twee foutklassen op routes met een herkenbare rol: omvallen op rommel (5xx of geen antwoord) en een antwoord dat interne details meegeeft. Hij zegt NIETS over of de validatie het juiste heeft geweigerd -- een route die alles slikt en 200 teruggeeft telt hier als dicht. Routes achter een tweede grendel (KYC, onboarding) staan als ongemeten met reden.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:30.258Z",
+        "at": "2026-09-25T11:13:06.273Z",
         "bestanden": [
           "test/invoerproef.test.js"
         ]
@@ -315,15 +317,15 @@
       ],
       "bewijsstuk": "IDEMPROEF.json -- per route de drie oproepen en wat eruit kwam",
       "dekking": {
-        "beproefd": 1572,
-        "totaal": 1573,
+        "beproefd": 1715,
+        "totaal": 1716,
         "eenheid": "routes waar een tweede effect zichtbaar zou zijn",
         "tellers": {
           "onbeschermd": 1,
-          "ongemeten": 3156,
-          "uitOpslag": 3,
+          "ongemeten": 3256,
+          "uitOpslag": 4,
           "blindeRondes": 0,
-          "tokensHernieuwd": 60
+          "tokensHernieuwd": 21
         },
         "pct": 99.9
       },
@@ -332,7 +334,7 @@
         "staat": "GROEN",
         "beweringen": 36,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:30.530Z",
+        "at": "2026-09-25T11:13:06.489Z",
         "bestanden": [
           "test/idemproef.test.js"
         ]
@@ -348,12 +350,12 @@
       ],
       "bewijsstuk": "AUDITPROEF.json -- per route of er een spoor achterbleef, plus de ketencontrole",
       "dekking": {
-        "beproefd": 1040,
-        "totaal": 1040,
+        "beproefd": 1058,
+        "totaal": 1058,
         "eenheid": "schrijfroutes die werkelijk werk deden",
         "tellers": {
           "gezakt": 0,
-          "ongemeten": 2595,
+          "ongemeten": 2672,
           "blindeRondes": 0,
           "ketenHeel": null
         },
@@ -364,7 +366,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:30.884Z",
+        "at": "2026-09-25T11:13:06.786Z",
         "bestanden": [
           "test/auditspoor.test.js"
         ]
@@ -381,16 +383,16 @@
       ],
       "bewijsstuk": "STAATPROEF.json -- per route welke collecties bewogen, en wat de herhaling deed",
       "dekking": {
-        "beproefd": 3060,
-        "totaal": 3889,
+        "beproefd": 3317,
+        "totaal": 4217,
         "eenheid": "routes waar de toestand is gemeten",
         "tellers": {
-          "state": 424,
-          "sideEffect": 424,
-          "rollback": 2634,
-          "rollbackGezakt": 2,
-          "idemBewezen": 413,
-          "idemGezakt": 11,
+          "state": 442,
+          "sideEffect": 442,
+          "rollback": 2875,
+          "rollbackGezakt": 0,
+          "idemBewezen": 440,
+          "idemGezakt": 2,
           "blindeRondes": 0
         },
         "pct": 78.7
@@ -398,9 +400,9 @@
       "grens": "ziet de DATABASE en niets daarbuiten: een mail, een push of een betaling bij een derde valt er niet onder, dus SIDE_EFFECT betekent hier \"buiten de eigen collectie\" en niet \"buiten het huis\". Ziet ook geen wijziging die zichzelf binnen één verzoek opheft. Een route waar de eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 40,
+        "beweringen": 44,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:31.450Z",
+        "at": "2026-09-25T11:13:07.200Z",
         "bestanden": [
           "test/staatproef.test.js",
           "test/vingerafdruk.test.js"
@@ -417,21 +419,21 @@
       ],
       "bewijsstuk": "BEWIJSMATRIX.json -- elf schakels per route, met bron per bewezen cel",
       "dekking": {
-        "beproefd": 25500,
-        "totaal": 53306,
+        "beproefd": 26449,
+        "totaal": 54681,
         "eenheid": "cellen",
         "tellers": {
-          "ongemeten": 27453,
-          "gezakt": 45
+          "ongemeten": 27512,
+          "gezakt": 25
         },
-        "pct": 47.8
+        "pct": 48.4
       },
       "grens": "het register MEET niets zelf; het verzamelt wat andere instrumenten meten. Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 19,
+        "beweringen": 26,
         "overgeslagen": 0,
-        "at": "2026-09-02T18:42:32.690Z",
+        "at": "2026-09-25T11:13:08.653Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

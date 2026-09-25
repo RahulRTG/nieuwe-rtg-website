@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5147 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5151 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5147 |
-| servermodules (`server/**/*.js`) | 3701 |
-| routebestanden (`server/routes/**`) | 612 |
+| API-endpoints | 5151 |
+| servermodules (`server/**/*.js`) | 3702 |
+| routebestanden (`server/routes/**`) | 613 |
 | kernmodules (`server/kern/**`) | 2326 |
 | schermen (`public/**/*.html`) | 320 |
-| gedeelde browsermodules (`public/shared/*.js`) | 390 |
-| toetsbestanden (`test/*.test.js`) | 1790 |
-| schermtoetsen (`test/*.e2e.js`) | 258 |
+| gedeelde browsermodules (`public/shared/*.js`) | 398 |
+| toetsbestanden (`test/*.test.js`) | 1793 |
+| schermtoetsen (`test/*.e2e.js`) | 259 |
 
 ## 2. De weg van een verzoek
 
@@ -150,7 +150,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(207) auth(128) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) status(31)
+app(208) auth(128) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) status(31)
 accounts(27) schoon(23) codenaamVan(19) managerOnly(18) rtf(18) boardroomWie(17)
 save(17) tooManyTries(14) geenGast(14) express(13) crypto(12) findSupplier(12)
 appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10)

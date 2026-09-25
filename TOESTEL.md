@@ -238,10 +238,10 @@ meter er staat.
 |---|---|---|
 | 1 | Herkomst per antwoord en drie plaatsnamen | **staat** (par. 8) |
 | 2 | Dit document en de grenzen | **staat** |
-| 3 | Toestelcel en echte toestelmeting (leeg geraamte) | een stap weg; wacht op besluit 1 |
-| 4 | Toestelrekenaar: browsermodel → WebGPU → WASM, WebNN als latere trede | een stap weg na 3 |
-| 5 | Modelmanifest, hashes, licentiegrendel, OPFS-beheer, terugrollen | een stap weg; wacht op besluit 2 en 3 |
-| 6 | `spraak.naartekst` op het toestel, gemeten op echte telefoons | een stap weg na 4-5; vult SERVICE.md par. 13d zonder `LOCAL_AI_URL` |
+| 3 | Toestelcel en echte toestelmeting | **staat** (par. 10) |
+| 4 | Toestelrekenaar met twee uitvoerders (eigen WASM, ONNX Runtime) | **staat** voor WASM (par. 10); WebGPU is hier niet te meten, het browsermodel en WebNN een stap weg |
+| 5 | Modelmanifest, hashes, licentiegrendel, OPFS-beheer | **staat** (par. 10); terugrollen naar een vorige versie een stap weg |
+| 6 | `spraak.naartekst` op het toestel, gemeten op echte telefoons | een stap weg; wacht op `huggingface.co` in het netwerkbeleid; vult SERVICE.md par. 13d zonder `LOCAL_AI_URL` |
 | 7 | `tekst.vector` over de Toestelkluis | een stap weg na 4-5 |
 | 8 | Samenvatten en herschrijven | een stap weg; het browsermodel als eerste trede |
 | 9 | Een kleine algemene LLM | jaren weg op een telefoon, dichterbij op een laptop; te meten, niet te schatten |
@@ -250,20 +250,22 @@ meter er staat.
 
 ## 7. Besluiten van de eigenaar
 
-1. **`'wasm-unsafe-eval'` op de toestelcel**, en alleen daar. Dit versoepelt de
-   strengste regel van het huis op één pagina. Advies: ja, op die ene pagina,
-   met `connect-src 'none'` ernaast en een toets die de combinatie vasthoudt.
+1. **`'wasm-unsafe-eval'` op de toestelcel**, en alleen daar. Genomen op 25
+   september 2026: ja, op die ene pagina, met `connect-src 'none'` ernaast;
+   `test/toestel-routes.test.js` houdt de combinatie vast.
 2. **Modelhosting.** Honderden MB tot enkele GB per model, van de eigen origin
    (de CSP staat geen CDN toe). Dat kost bandbreedte en hoort in KOSTEN.md.
    Advies: eigen origin met Range-ondersteuning, per taak.
-3. **Welke modellicenties toegestaan zijn.** Apache-2.0 en MIT zijn
-   eenvoudig. Voor de voorwaarden van Gemma en de Llama-licentie is eerst een
-   juridisch oordeel nodig. Advies: begin met alleen Apache/MIT.
+3. **Welke modellicenties toegestaan zijn.** Genomen op 25 september 2026:
+   zo breed mogelijk. Alles met bekende voorwaarden die commercieel gebruik
+   toestaan, ook Gemma en Llama met hun eisen erbij; onbekend en
+   niet-commercieel blijven dicht (`public/shared/toestel/licenties.js`).
 4. **Het browsermodel opnemen**, met de voorwaarden van de leverancier.
    Advies: ja als optimalisatie, zichtbaar als "model van uw browser", nooit
    als enige weg.
-5. **Standaard downloadbeleid.** Advies: alleen na een tik van het lid, en op
-   een mobiele verbinding nog een keer vragen.
+5. **Standaard downloadbeleid.** Genomen op 25 september 2026: alleen na een
+   tik van het lid, en op een mobiele verbinding (of een die de browser niet
+   laat zien) nog een keer vragen (`public/shared/toestel/opslag.js`).
 6. **Waar de modelsleutel woont.** Genomen op 25 september 2026: offline en
    onder menselijke controle, met rotatie als protocol en een eigen
    vertrouwensdomein, los van de release-trust (par. 9.3).
@@ -503,3 +505,69 @@ kwaliteitsmaat hebben (9.2) en maximaal verschillend zijn: geluid in en tekst
 uit tegenover tekst in en een vector uit. Twee punten liggen altijd op een
 lijn, dus pas een derde, anders gevormde taak (OCR) zegt dat het contract
 generaliseert.
+
+## 10. De machine staat (25 september 2026)
+
+Par. 9 is bevroren; dit is wat de bouw ervan maakte. Stap 3 t/m 5 van par. 6
+staan, als machine en zonder werk erop: spraak en vectoren zijn de volgende
+twee bewijzen.
+
+| Onderdeel | Waar | Bewijs |
+|---|---|---|
+| De poorten: zes die uitsluiten, kosten die kiest | `public/shared/toestel/poorten.js` | `test/toestel-poorten.test.js`: 2000 rondes willekeurige kandidaten, een afgevallene wordt nooit gekozen; twee mutaties (kiezen over alle kandidaten, de privacypoort overslaan) zakken |
+| De licentiegrendel, zo breed mogelijk | `public/shared/toestel/licenties.js` | onbekend en niet-commercieel dicht, met de reden |
+| Het manifest als grendel | `public/shared/toestel/manifest.js` | `test/toestel-manifest.test.js`: elke stap weigert op zijn eigen plek; drie mutaties (hash, intrekking, voorvoegsel) zakken |
+| Offline ondertekenen | `scripts/toestel-artefact.js`, `scripts/lib/toestelteken.js` | weigert een private sleutel in de repo en tekenen met een niet-actieve sleutel |
+| De vertrouwde sleutels | `public/shared/toestel/sleutels.js` | met opzet **leeg**: zolang er geen echte sleutel bij een mens ligt, laadt geen toestel iets (e2e: de productielijst weigert bij stap 1) |
+| Vier serverdeuren | `server/routes/toestel.js` | `test/toestel-routes.test.js`, echte server: de cel draagt `'wasm-unsafe-eval'` alleen met `connect-src 'none'`, een gewone pagina niet |
+| De cel | `public/shared/toestel/cel.js`, via `/toestel/cel` | e2e: IN het sandboxframe gemeten -- `fetch` dicht, ouder dicht, OPFS dicht, origin `null` |
+| De rekenaar | `public/shared/toestel/rekenaar.js` | e2e: 6 × 7 = 42 met herkomst `toestel`; gewijzigde bytes weigeren bij `hash`; elke cel `sandbox="allow-scripts"` en `allow=""`, en na afloop weg |
+| Opslag op het toestel | `public/shared/toestel/opslag.js` | e2e: geen download zonder tik, onbekende verbinding vraagt nog eens, tweede keer uit OPFS |
+| De meting | `public/shared/toestel/meting.js` | feiten zonder klasse; energie `null` met de reden; niets naar RTG |
+| Tweede uitvoerder: ONNX Runtime Web 1.30 | `scripts/toestelproef.js` | echte runtime in dezelfde cel: [1,2,3] × [4,5,6] = [4,10,18], 209 ms rekentijd, zonder een regel in rekenaar of cel te veranderen |
+
+### 10.1 Wat het bouwen blootlegde
+
+- **De cel heeft geen origin, en dan werkt `same-origin` tegen je.** Het huis
+  zet op elk statisch bestand `Cross-Origin-Resource-Policy: same-origin`, dus
+  de cel kon haar eigen script niet laden en zei nooit "klaar"
+  (`ERR_BLOCKED_BY_RESPONSE.NotSameOrigin`). Het celscript heeft daarom een
+  eigen adres, `/toestel/cel.js`, met `cross-origin` voor dat ene openbare
+  bestand. Alleen de echte browser vond dit; elke toets op de server stond
+  groen.
+- **Een toets die het voorvoegsel niet kon missen, miste het.** Het
+  weghalen van `RTG:MODEL:v1` liet de manifesttoets eerst groen: hij bewees
+  alleen dat een ANDER voorvoegsel faalt. Er staat nu ook een handtekening
+  over de kale inhoud naast.
+- **Een isolatieproef die zelf de cel opent, bewijst niets over de
+  rekenaar.** De e2e-toets kijkt nu welk kader de rekenaar ZELF bouwt; met
+  `allow-same-origin` erbij zakt hij.
+- **Een rekencel hoort geen camera te krijgen.** Keuringsregel 38b eiste
+  `RTGMedia.kader()` voor elk gebouwd kader; hij kent nu ook het omgekeerde
+  besluit voor een gebouwd kader (`allow=""`), zoals hij dat al kende voor de
+  App Store-cel.
+- **De runtime is een artefact en geen afhankelijkheid.** Het huis heeft nul
+  afhankelijkheden (keuringsregel 14), en ONNX Runtime is 14 MB aan
+  WebAssembly. Hij komt daarom binnen zoals een model: ondertekend, met hash en
+  licentie, als blob-module in de cel. Vandaar `blob:` in de `script-src` van
+  de cel, en alleen daar.
+
+### 10.2 Wat er met opzet nog niet is
+
+- **WebGPU**: headless Chromium heeft hier geen adapter, dus alleen de
+  WASM-route is bewezen. `feiten().webgpu` staat hier op `false`, en dat is
+  gemeten en niet aangenomen.
+- **Echte modellen**: Hugging Face wordt door het netwerkbeleid van deze
+  omgeving geweigerd. Zodra `huggingface.co` openstaat, volgen
+  `spraak.naartekst` (Whisper, MIT) en `tekst.vector` (een Apache-model), elk
+  met een proefset en een gemeten maat (par. 9.2).
+- **Het rekentijdplafond** staat in de rekenaar maar is niet beproefd: daar
+  is een uitvoerder voor nodig die bewust te lang rekent.
+- **Centrale tellers (TOE-07)**: de meting stuurt niets naar RTG. Grove
+  tellers zonder toestel-id komen pas als er iets te tellen valt.
+- **Het downloadscherm**: `opslag.haal()` weigert zonder tik, maar het scherm
+  dat de tik vraagt (wat, hoe groot, wat blijft) hoort bij de eerste echte
+  taak en is er nog niet.
+- **De sleutellijst in de service-worker-schil**: `sleutels.js` is nog leeg en
+  staat nog niet in `SHELL`; dat gebeurt met de eerste echte sleutel, en dan
+  hoort `npm run swcache` erbij.

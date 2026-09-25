@@ -2410,7 +2410,15 @@ met `connect-src 'none'`, zodat "dit toestel nooit verlaten" een grens van de
 browser is en geen belofte van onze code. `op-dit-apparaat` betekende de
 server van RTG en werd aan het lid getoond als "deze Mac"; het heet nu
 `rtg-server`. Het label onder een antwoord komt sindsdien uit wat er bij DAT
-verzoek gebeurde (`ai-stand.js` `uitgevoerd()`), niet uit de configuratie.
+verzoek gebeurde (`ai-stand.js` `uitgevoerd()`), niet uit de configuratie. **De machine staat sinds dezelfde dag** (par. 10):
+zes poorten die uitsluiten en kosten die als enige kiest, een manifest dat als
+grendel werkt (sleutel, handtekening, hash, licentie, contract; de sleutellijst
+is met opzet LEEG tot er een echte sleutel bij een mens ligt), en een cel als
+`<iframe sandbox="allow-scripts" allow="">` op `/toestel/cel`. Twee dingen daar
+niet wegpoetsen: de ONNX-runtime is een ondertekend ARTEFACT en geen
+afhankelijkheid (keuringsregel 14), en het celscript woont op `/toestel/cel.js`
+omdat de cel geen origin heeft en het huis elk statisch bestand `same-origin`
+geeft -- alleen de echte browser vond dat.
 
 **`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution
 Physics (de uitvoeringskant van hetzelfde voorstel waarvan RUNTIME.md de

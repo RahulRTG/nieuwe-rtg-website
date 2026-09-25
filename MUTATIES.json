@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T07:08:57.877Z",
-    "commit": "3f32cb94",
+    "op": "2026-09-25T07:09:14.297Z",
+    "commit": "18c60bb4",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5935,6 +5935,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "mutatiebijwerking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mutatie.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "mutatiecontract.test.js": {
       "soort": "puur",

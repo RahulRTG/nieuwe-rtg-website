@@ -269,8 +269,8 @@ een REISbestemming, en een tweede betekenis op de centrale naam van een
 reisbedrijf is de `VERMOGENS`-botsing uit `SEMANTIEK.json`.
 
 Dit is de **primitief en niet de migratie**. Van de
-<!--getal:doorbelasting.geldvormen-->215<!--/getal--> geldvormen in dit huis
-dragen er <!--getal:doorbelasting.volgbaar-->33<!--/getal--> een aantoonbare
+<!--getal:doorbelasting.geldvormen-->217<!--/getal--> geldvormen in dit huis
+dragen er <!--getal:doorbelasting.volgbaar-->35<!--/getal--> een aantoonbare
 herkomst; die andere <!--getal:doorbelasting.nietVolgbaar-->182<!--/getal-->
 gaan hier niet vanzelf op over. Wat de module levert is de VORM waarin een
 geldrij het wél kan dragen, plus het oordeel of een gegeven rij te volgen is. De

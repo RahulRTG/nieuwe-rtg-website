@@ -42,7 +42,9 @@ function kansen(st) {
     ontgrendel(st, 'berichten');
   }
   for (const d of st.deals) {
-    if (d.fase === 'betaald' && !d.laatGeleverd && d.betaaldOp + VERVOLG.naDagen === st.dag) {
+    /* Wie een contract heeft of aangeboden kreeg, komt niet ook nog los terug (V2). */
+    const vast = (st.contracten || []).some(c => c.klantId === d.klantId && ['aanbod', 'actief'].includes(c.stand));
+    if (d.fase === 'betaald' && !d.laatGeleverd && !d.contract && !vast && d.betaaldOp + VERVOLG.naDagen === st.dag) {
       const uurtarief = Math.round(d.afspraak.bedrag * 60 / d.afspraak.minuten);
       const bedrag = opKwartje(uurtarief * VERVOLG.uren / 60);
       st.deals.push({ id: 'd' + (++st.dealTeller), klantId: d.klantId, klant: d.klant, fase: 'onderhandeling', sinds: st.dag,

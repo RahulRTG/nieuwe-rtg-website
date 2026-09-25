@@ -163,9 +163,9 @@ geldt "dit toestel nooit verlaten" als een grens van de browser.
   (HTTP Range), en een half binnengehaald bestand wordt nooit geladen.
 - **Licentie als grendel en niet als veld** (de vorm van KAARTEN.md par. 5a):
   een model zonder toegestane licentie in het manifest laadt de cel niet.
-- **Een handtekening op het manifest** voegt pas iets toe als modellen ook van
-  een spiegel komen. Van de eigen origin is de hash voldoende. Stand: vraagt
-  een besluit (par. 7).
+- **Een handtekening op het manifest**, met een sleutel die offline blijft en
+  kan roteren. Besloten op 25 september 2026; de uitwerking en wat hij wel en
+  niet beschermt staan in par. 9.3.
 - **Terugrollen**: de vorige versie blijft staan tot de nieuwe één keer goed
   heeft geladen. Ruimte gaat per taak op volgorde van laatst gebruikt, en het
   lid ziet en wist het zelf.
@@ -264,6 +264,9 @@ meter er staat.
    als enige weg.
 5. **Standaard downloadbeleid.** Advies: alleen na een tik van het lid, en op
    een mobiele verbinding nog een keer vragen.
+6. **Waar de modelsleutel woont.** Genomen op 25 september 2026: offline en
+   onder menselijke controle, met rotatie als protocol en een eigen
+   vertrouwensdomein, los van de release-trust (par. 9.3).
 
 ## 8. Wat er op 25 september 2026 is gerepareerd
 
@@ -297,3 +300,206 @@ Wat nog **niet** gedekt is: andere schermen met een eigen AI-aanroep (de
 fluisterlaag van het personeel, de schrijfhulp in Office) tonen de stand of
 niets. Die krijgen `uitgevoerd` wanneer ze een herkomstlabel gaan tonen, en
 niet eerder.
+
+## 9. De beslisvolgorde en vier eigenschappen voor productie
+
+Tweede ronde, 25 september 2026. Wat hier staat, verandert niets aan par. 0-8;
+het maakt de planner van par. 3.2 volledig.
+
+### 9.1 De volgorde is een filter, en pas het laatste is een keuze
+
+```
+TAAKCONTRACT
+  1. beleid       mag deze aanroeper deze taak laten doen?          (weigert)
+  2. privacy      mag deze invoer deze PLAATS bereiken?             (weigert)
+  3. techniek     welke techniek kan het (regels, algoritme, model)? (weigert)
+  4. uitvoerders  welke zijn hier aanwezig en toegelaten (par. 9.3)? (weigert)
+  5. kwaliteit    welke halen de GEMETEN minimumkwaliteit (9.2)?    (weigert)
+  6. last         welke passen in wachttijd, geheugen, energie (9.4)? (weigert)
+  7. kosten       van wat overblijft: de goedkoopste                (kiest)
+UITVOEREN -> meting + herkomst + kosten
+```
+
+Stap 1 t/m 6 **sluiten uit** en wegen niets. Dat wordt een toets en geen
+voornemen: de planner krijgt een kandidaat die op kosten wint en op een
+eerdere stap afvalt, en die kandidaat mag nooit gekozen worden, hoe groot
+het kostenvoordeel ook is. Alleen stap 7 kiest. Zo kan een
+kostenvoordeel nooit een privacy- of kwaliteitsgrens compenseren. Dat is
+dezelfde regel als in CONNECT.md (*de mixer verdeelt plekken en geen punten*):
+zodra elke eigenschap een getal levert en de hoogste som wint, zit er weer een
+gewichtenvector die niemand kan lezen. Elke uitsluiting draagt haar reden in
+woorden. Valt alles af, dan is de uitslag *"deze taak kan hier niet"* met de
+eerste stap die iedereen uitsloot, en nooit een stille uitwijk naar een
+plaats die stap 2 had verboden.
+
+### 9.2 Kwaliteitsgrens vóór kosten
+
+Een minimumkwaliteit bestaat alleen als hij **gemeten** is. Daarom heeft elk
+taakcontract een vaste proefset met een maat die bij de taak hoort:
+
+| Taak | Maat | Graad |
+|---|---|---|
+| `spraak.naartekst` | woordfout (WER) op een vaste Nederlandse set | gemeten |
+| `tekst.vector` | recall@10 op een vaste zoekset | gemeten |
+| `tekst.taal` | nauwkeurigheid op een vaste set | gemeten |
+| `document.tekst` (OCR) | tekenfout (CER) | gemeten |
+| `tekst.samenvatten`, `tekst.herschrijven` | **geen automatische maat die de kwaliteit vaststelt** | beoordeeld door een mens op een vaste set, graad `vermoed` |
+
+De laatste rij staat er met opzet zo. Een ROUGE-getal op een samenvatting zegt
+iets over woordoverlap en niet over of de samenvatting klopt. Een grens op dat
+getal is een schijngrens. Voor die taken is de grens *"een mens keurde deze
+uitvoerder op deze set"*, en een nieuwe uitvoerder wacht op die keuring.
+
+### 9.3 Supply chain: het manifest als grendel
+
+Per uitvoerbaar artefact:
+
+```
+model-id, versie, sha256, grootte, bron (waar het vandaan komt en wie het
+maakte), licentie + naamsvermelding, taakcontracten waarvoor het is toegelaten,
+gemeten kwaliteit per contract (met proefset-versie en datum), handtekening
+```
+
+De toestelcel laadt een bestand alleen als de hash overeenkomt met een
+manifestregel die zelf geldig is ondertekend. Een onbekend of gewijzigd bestand
+is **niet uitvoerbaar**, en dat is zichtbaar: het is geen waarschuwing die
+toch laadt.
+
+**De controle, in deze volgorde, en elke stap weigert:** bekende sleutel →
+handtekening geldig → hash klopt → licentie toegestaan → contract passend →
+pas dan laden. Het manifest draagt daarvoor ook `sleutel-id` en de
+handtekening zelf.
+
+**Sleutelrotatie is een protocol en geen noodgreep.** De webapp kent een lijst
+vertrouwde modelsleutels, en elke regel heeft een id, de publieke helft,
+geldig-vanaf en een stand:
+
+| Stand | Controleert handtekeningen | Tekent nieuwe manifesten |
+|---|---|---|
+| `actief` | ja | ja |
+| `uitgefaseerd` | ja | nee |
+| `ingetrokken` | **nee** | nee |
+
+Wat een handtekening niet kan dragen is een betrouwbaar TIJDSTIP: wie de
+private sleutel heeft, zet er elke datum op. Daarom werkt intrekken over alles
+wat onder die sleutel viel en niet over "wat na datum X getekend is". Een
+ingetrokken sleutel maakt al zijn modellen onlaadbaar tot ze opnieuw zijn
+ondertekend, en dat is de juiste kant om naar te falen. Geldig-tot is
+optioneel en is dan een geplande uitfasering, geen bescherming.
+
+**Een eigen vertrouwensdomein, los van de releases.** `server/config/release-trust.js`
+kent drie rollen (BUILD, EVIDENCE, PROMOTION), elk met Ed25519, een eigen
+publiek bestand en een eigen domeinvoorvoegsel (`RTG:BUILD:v1` enzovoort), zodat
+een handtekening uit de ene rol nooit in de andere geldt. De modelsleutel volgt
+dat patroon (Ed25519, voorvoegsel `RTG:MODEL:v1`) maar komt er **niet als vierde
+rol in**. Die drie zijn vaste ankers zonder rotatie, en een gelekte modelsleutel
+mag niets betekenen voor een release, en andersom. Andere sleutel, andere
+lijst, andere intrekking.
+
+**Controleren gebeurt in de browser**, met WebCrypto Ed25519. Kan de browser
+dat niet, dan laadt de cel niets. Dat is geen terugval op "vertrouw de hash
+dan maar".
+
+Wat de handtekening wel en niet beschermt, want dat verschil wordt vaak
+gemist. Hij beschermt tegen een gemanipuleerde **opslag** (een spiegel, een
+CDN, een aangetaste bucket): die kan het bestand vervangen, maar niet de
+handtekening namaken. Hij beschermt **niet** tegen een aangetaste **origin**:
+wie de JavaScript of de service worker van RTG kan vervangen, kan ook de code
+vervangen die de handtekening controleert. Zo wordt hij dus ook niet
+gepresenteerd. De lijst vertrouwde sleutels staat in de
+service-worker-schil (vingerafdruk-cache), zodat een wissel een release is en
+geen configuratie. De private helft verlaat de offline omgeving niet en woont
+niet in de repo of op een server (besluit 6).
+
+### 9.4 Energie en warmte als echte grens
+
+"Lokaal is goedkoper voor RTG" is geen argument als een telefoon heet wordt om
+€ 0,002 te besparen. De grens komt daarom vóór de kosten (stap 6), en een lid
+kan hem aanscherpen ("spaar mijn batterij").
+
+Wat een browser werkelijk laat zien, en dat is minder dan het voorstel
+aanneemt:
+
+| Signaal | Beschikbaar | Gebruik |
+|---|---|---|
+| Laadt het toestel, batterijniveau | `navigator.getBattery()`, alleen Chromium; niet in Safari of Firefox | zwaar werk alleen aan de lader of boven een drempel; ontbreekt het signaal, dan de strengste aanname |
+| Warmte | **geen API** | niet meten; afleiden uit `vertraging_bij_herhaling` (par. 3.2): wordt dezelfde taak binnen een sessie trager, dan stopt de toestelcel met zwaar werk voor die sessie |
+| Zuinige stand van het OS | niet betrouwbaar leesbaar | niet gebruiken |
+| Rekentijd per taak | zelf gemeten | harde bovengrens in het contract (`reken_max_ms`); daarboven breekt de cel af |
+
+Een grens die we niet kunnen meten, bouwen we dus niet als meting maar als
+**voorzichtigheid**: een plafond op rekentijd en een terugval zodra het
+toestel trager wordt. Dat staat er zo bij, zodat niemand later denkt dat RTG
+de temperatuur van een telefoon kent.
+
+### 9.5 Canary voor een nieuwe uitvoerder of een nieuw model
+
+```
+proefset (9.2) -> vergelijking met de huidige uitvoerder op hetzelfde toestel
+   -> kleine uitrol -> vergelijking in het veld -> promotie of terugrollen
+```
+
+Twee aanpassingen op wat al in dit huis is besloten:
+
+- **Promotie is een besluit van een mens.** Automatisch terugrollen mag, en
+  moet zelfs, zodra een meting onder de grens zakt. Automatisch promoveren
+  niet: *autonomie wordt gepromoveerd en nooit geslopen* (FABRIC.md), en een
+  gegenereerde meting promoveert niets tot een mens hem heeft afgetekend
+  (CODE.md par. 7).
+- **Voor de livegang is er geen veld.** Zonder leden is een uitrol op een
+  percentage zinloos, net als bij drie medewerkers (KANTOORMACHT.md). Tot er
+  echte gebruikers zijn, is de canary de proefset op een vaste rij echte
+  toestellen, en dat heet dan ook zo.
+
+### 9.6 Wat elke uitvoering oplevert, en waar dat blijft
+
+Elke uitvoering levert een waarneming op: *dit model, met deze uitvoerder, op
+deze browser en deze hardware, haalde voor taak X zoveel per seconde, zoveel
+ms starttijd en zoveel geheugen*. Daarmee wordt de planner beter.
+
+**Maar die combinatie is een vingerafdruk.** GPU-adapter, browserversie,
+geheugen en snelheden samen zijn precies waarmee trackers een toestel
+herkennen, en `toestelsleutel.js` zegt met zoveel woorden dat er hier niets
+aan de browser wordt gemeten om iemand te herkennen. Daarom twee lagen:
+
+- **Op het toestel** blijft de volledige waarneming staan. De planner van DIT
+  toestel leert van zijn eigen metingen, en die verlaten het toestel niet.
+- **Naar RTG** gaan alleen grove klassen als tellers (bijvoorbeeld
+  `webgpu/wasm`, geheugen in drie banden, taak, uitvoerder, geslaagd of niet
+  hier, snelheid in banden). Er gaat geen adapternaam, geen exacte versie,
+  geen toestel-id en geen sessiesleutel mee (TOE-07). Een klasse waar maar
+  enkele toestellen in vallen, wordt niet gerapporteerd.
+
+Dat kost de centrale planner precisie. Die prijs is bewust: een
+optimalisatie die een lid herkenbaar maakt, is geen optimalisatie.
+
+### 9.7 Verder dan AI: een rekentaak, geen handeling
+
+Het contract werkt ook voor taken zonder model: `route.optimaliseer`,
+`bestand.omzetten`, `tekst.vertalen`. Sommige doet een algoritme, sommige een
+model, sommige het toestel en sommige RTG. Het product hoeft dat niet te
+weten.
+
+De grens die dat houdbaar houdt: **een taakcontract dekt alleen rekentaken
+zonder bijwerking** (invoer erin, uitkomst eruit, verder niets). Alles wat
+iets verandert (opslaan, versturen, betalen, boeken) blijft van de execution
+plane (EXECUTIE.md) en komt nooit in een taakcontract. Zonder die grens wordt
+het taakcontract de zeventiende motor naast MACHINE.md.
+
+Daarom ook een naamkeuze: de router wordt **geen "execution planner"**.
+`kern/stuur/plan.js` is al PLAN (EXECUTIE.md blok 3), en de router beslist
+bewust nog niets (blok 8). Hij wordt breder: van *welke techniek* naar *welke
+techniek, op welke plaats, met welke uitvoerder*. Hij blijft een router voor
+**rekentaken**. De kaart van wat een handeling doet en mag, blijft waar die al
+staat.
+
+### 9.8 Wat dit verandert aan de volgorde (par. 6)
+
+De machine vóór de functies: stap 3 t/m 5 worden **toestelcel + taakcontract +
+planner met de volgorde van 9.1 + manifestgrendel + meting (9.6)**, samen, en
+pas daarna het eerste werk. Spraak en vectoren zijn niet het doel maar de
+twee bewijzen dat de machine werkt. Ze zijn gekozen omdat ze een gemeten
+kwaliteitsmaat hebben (9.2) en maximaal verschillend zijn: geluid in en tekst
+uit tegenover tekst in en een vector uit. Twee punten liggen altijd op een
+lijn, dus pas een derde, anders gevormde taak (OCR) zegt dat het contract
+generaliseert.

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T04:37:55.443Z",
-    "commit": "4493ec3d",
+    "op": "2026-09-25T04:44:32.128Z",
+    "commit": "c7236135",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5883,6 +5883,22 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "money012-inkomend.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalwaarheid/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
+      "geprobeerd": 4
+    },
+    "money012-keten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "money012.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6814,6 +6830,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "paytegoed.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "payterug.test.js": {

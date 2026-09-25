@@ -117,12 +117,13 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
         const stand = await pasProviderToe(r, vers, 'hervat:' + r.providerId, 'ophalen');
         return { betaling: stand, actie: beeld.actieVan(vers) };
       }
-      gebeurtenis(r, 'PROVIDER_START', { bron: opties.aanbieder || 'automatisch' });
+      // startopties vast, eenmalig: een hervatting moet dezelfde aanbieder gebruiken (./hervat.js)
+      if (!r.start) r.start = require('./hervat').startVan(opties);
+      const st = r.start;
+      gebeurtenis(r, 'PROVIDER_START', { bron: st.aanbieder || 'automatisch', hervat: !!opties.hervat });
       save(); /* waarheid bestaat VOOR de externe aanroep */
-      const p = await betaal.maakBetaling({ bedrag: r.centen, valuta: r.valuta,
-        referentie: r.id, idempotentieSleutel: 'waarheid:' + r.id,
-        omschrijving: opties.omschrijving, aanbieder: opties.aanbieder,
-        methode: opties.methode, returnUrl: opties.returnUrl, webhookUrl: opties.webhookUrl });
+      const p = await betaal.maakBetaling(Object.assign({ bedrag: r.centen, valuta: r.valuta,
+        referentie: r.id, idempotentieSleutel: 'waarheid:' + r.id }, st));
       const stand = await pasProviderToe(r, p, 'start:' + p.id, 'start');
       return { betaling: stand, actie: beeld.actieVan(p) };
     })();
@@ -172,7 +173,15 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
   const terug = require('./terug')({ d, doos, save, nuIso, gebeurtenis, naar, STATUS,
     definitiefBetaald, publiek, betaal, hash });
 
+  // gestrande afhandelingen, dan de veegronde zonder uitsluitsel (./hervat.js)
+  const veeg = require('./hervat')({ doos, save, nuIso, gebeurtenis, STATUS, definitiefBetaald, log });
+  async function ronde(opties) {
+    const a = await afhandeling.ronde(opties);
+    const h = await veeg.hervat(Object.assign({}, opties || {}, { begin }));
+    return Object.assign(a, { hervat: h });
+  }
+
   return { STATUS, maak, begin, publiek, van, vanActor, providerMelding,
     terugbetalen: terug.terugbetalen, providerTerugbetaling: terug.providerTerugbetaling,
-    registreerAfhandeling, ronde: afhandeling.ronde, definitiefBetaald };
+    registreerAfhandeling, ronde, openstaand: veeg.openstaand, definitiefBetaald };
 };

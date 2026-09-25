@@ -1,9 +1,9 @@
 {
-  "catalogi": 1137,
-  "verschillendeNamen": 680,
-  "namenInMeerDomeinen": 128,
-  "woordenMetMeerBetekenissen": 110,
-  "betekenissenTotaal": 408,
+  "catalogi": 1141,
+  "verschillendeNamen": 683,
+  "namenInMeerDomeinen": 129,
+  "woordenMetMeerBetekenissen": 111,
+  "betekenissenTotaal": 410,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 33,
@@ -1683,7 +1683,7 @@
           "bestanden": [
             "server/kern/betaalopdracht/status.js"
           ],
-          "leden": 5,
+          "leden": 6,
           "voorbeeld": [
             "GEBOEKT",
             "INGEDIEND",
@@ -3621,5 +3621,5 @@
       ]
     }
   ],
-  "bestanden": 3669
+  "bestanden": 3689
 }

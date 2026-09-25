@@ -14,6 +14,11 @@
 const REGELVERSIE = '2';
 const DAG_MS = 180000;             // een speldag duurt drie echte minuten, tenzij je hem zelf afsluit
 const MAX_DAGEN_PER_KEER = 120;    // een vangnet, zoals in World
+/* HET TEMPO VAN EEN SPEELRONDE. Drie minuten per dag is een leven dat je naast
+   je eigen dag speelt; wie de keten in een uur wil doorlopen, zet hem vlotter.
+   Wat een dag BETEKENT verandert niet, alleen hoe lang hij echt duurt. */
+const TEMPO = { rustig: 180000, vlot: 60000, proef: 20000 };
+const DOORSPOELEN_MAX = 14;        // hooguit twee weken ineens, dan kijk je weer
 const START_KAS = 6432;            // € 64,32
 const PERIODE = 28;                // de huur gaat per vier weken
 const DAGNAMEN = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
@@ -75,9 +80,13 @@ const RTG = {
   herinneringen: { naam: 'Betaalherinneringen', waarom: 'een klant betaalt te laat' },
   budget: { naam: 'Budget en betalingen', waarom: 'er is meer te betalen dan er op je rekening staat' },
   zakelijk: { naam: 'RTG Zakelijk', waarom: 'je hebt een onderneming ingeschreven' },
-  boekhouding: { naam: 'Boekhouding', waarom: 'je onderneming heeft een resultaat en een balans' }
+  boekhouding: { naam: 'Boekhouding', waarom: 'je onderneming heeft een resultaat en een balans' },
+  personeel: { naam: 'Personeel en planning', waarom: 'je hebt iemand aangenomen' },
+  handel: { naam: 'Inkoop en voorraad', waarom: 'je koopt in bij een leverancier' },
+  contracten: { naam: 'Contracten', waarom: 'een klant wil vast werk' },
+  prognose: { naam: 'Cashflowprognose', waarom: 'je hebt vaste lasten die elke week terugkomen' }
 };
 
-module.exports = { REGELVERSIE, DAG_MS, MAX_DAGEN_PER_KEER, START_KAS, PERIODE, DAGNAMEN, weekdag, dagNaam, BAAN, VRIJ,
+module.exports = { REGELVERSIE, DAG_MS, MAX_DAGEN_PER_KEER, TEMPO, DOORSPOELEN_MAX, START_KAS, PERIODE, DAGNAMEN, weekdag, dagNaam, BAAN, VRIJ,
   VERPLICHTINGEN, BOODSCHAPPEN, SOFTWARE, JURISDICTIE, AANMANING, KVK, LEREN, BETAALTERMIJN, HERINNERING_DAGEN, LENING,
   VOORFINANCIERING, ONDERNEMING, ZELFSTANDIG, RTG };

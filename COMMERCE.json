@@ -2,18 +2,18 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-25",
   "gemeten": {
-    "bestanden": 2399,
+    "bestanden": 2405,
     "domeinenTotaal": 636,
-    "koopbareVormen": 587,
+    "koopbareVormen": 597,
     "koopbareDomeinen": 120,
     "envelopDrempel": 8,
-    "envelop": 41,
-    "veldenDomeineigen": 755,
-    "veldenNietEnvelop": 1010,
+    "envelop": 42,
+    "veldenDomeineigen": 774,
+    "veldenNietEnvelop": 1036,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 47,
+    "werkwoordCombinaties": 46,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -64,14 +64,15 @@
     "uitleg",
     "valuta",
     "van",
+    "voorraad",
     "vraag",
     "wat"
   ],
   "perWerkwoord": {
     "toon": 92,
-    "prijs": 38,
+    "prijs": 39,
     "beschikbaarheid": 53,
-    "reserveer": 27,
+    "reserveer": 28,
     "bevestig": 57,
     "lever": 21,
     "annuleer": 31,
@@ -123,6 +124,29 @@
         "lever": "maakUitgifte",
         "annuleer": "intrekkenKaal",
         "retour": "maakTeruggave"
+      },
+      "telt": 7
+    },
+    {
+      "domein": "kern/magnaat-leven",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "kostenPerSoort",
+        "beschikbaarheid": "open",
+        "reserveer": "geblokkeerd",
+        "bevestig": "akkoord",
+        "lever": "lever",
+        "annuleer": "betaalWatVervalt"
       },
       "telt": 7
     },
@@ -538,27 +562,6 @@
         "beschikbaarheid": "agenda",
         "reserveer": "onderhoudBij",
         "lever": "uitgifte"
-      },
-      "telt": 5
-    },
-    {
-      "domein": "kern/magnaat-leven",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": true,
-        "annuleer": true,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "beschikbaarheid": "open",
-        "bevestig": "akkoord",
-        "lever": "lever",
-        "annuleer": "betaalWatVervalt"
       },
       "telt": 5
     },
@@ -2397,6 +2400,23 @@
     },
     {
       "gelijkenis": 0.89,
+      "a": "server/kern/mall/demozaken.js",
+      "b": "server/kern/retail/vloer.js",
+      "domeinA": "kern/mall",
+      "domeinB": "kern/retail",
+      "gedeeld": [
+        "categorie",
+        "drop",
+        "foto",
+        "materiaal",
+        "price",
+        "publiekePrijs",
+        "sku",
+        "varianten"
+      ]
+    },
+    {
+      "gelijkenis": 0.89,
       "a": "server/kern/reisbureau-betaling.js",
       "b": "server/kern/reisbureau-geldrijen.js",
       "domeinA": "kern/reisbureau-betaling",
@@ -2489,23 +2509,6 @@
       ]
     },
     {
-      "gelijkenis": 0.8,
-      "a": "server/kern/mall/demozaken.js",
-      "b": "server/kern/retail/vloer.js",
-      "domeinA": "kern/mall",
-      "domeinB": "kern/retail",
-      "gedeeld": [
-        "categorie",
-        "drop",
-        "foto",
-        "materiaal",
-        "price",
-        "publiekePrijs",
-        "sku",
-        "varianten"
-      ]
-    },
-    {
       "gelijkenis": 0.73,
       "a": "server/kern/gast/order.js",
       "b": "server/kern/horeca/regel.js",
@@ -2524,6 +2527,19 @@
     },
     {
       "gelijkenis": 0.67,
+      "a": "server/kern/directpay/betalen.js",
+      "b": "server/kern/settlement.js",
+      "domeinA": "kern/directpay",
+      "domeinB": "kern/settlement",
+      "gedeeld": [
+        "aanbieder",
+        "betaalwijze",
+        "codename",
+        "providerId"
+      ]
+    },
+    {
+      "gelijkenis": 0.64,
       "a": "server/kern/magnaat-economische-motor/rust.js",
       "b": "server/kern/magnaat-oefeneconomie.js",
       "domeinA": "kern/magnaat-economische-motor",
@@ -2535,21 +2551,7 @@
         "personeel",
         "reputatie",
         "trainingDag",
-        "vasteCapaciteit",
-        "voorraad"
-      ]
-    },
-    {
-      "gelijkenis": 0.67,
-      "a": "server/kern/directpay/betalen.js",
-      "b": "server/kern/settlement.js",
-      "domeinA": "kern/directpay",
-      "domeinB": "kern/settlement",
-      "gedeeld": [
-        "aanbieder",
-        "betaalwijze",
-        "codename",
-        "providerId"
+        "vasteCapaciteit"
       ]
     },
     {

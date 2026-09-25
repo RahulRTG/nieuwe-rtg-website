@@ -13,7 +13,7 @@
 
    Een rekening wordt genoemd als [soort, sleutel]: ['kas'], ['vordering',
    klant], ['vooruit', klant], ['omzet'], ['kosten', wat], ['schuld', aan wie],
-   ['begin'], of een tegenpartij buiten je boeken (werkgever, verhuurder, ...).
+   ['begin'], ['voorraad'], ['crediteur', leverancier], of een tegenpartij buiten je boeken (werkgever, verhuurder, ...).
    Privé-uitgaven gaan naar een tegenpartij; kosten van je werk naar `kosten`,
    zodat het resultaat alleen over je werk gaat. */
 'use strict';
@@ -22,12 +22,12 @@ const { maakGrootboek, geheugenJournaal, collectieJournaal } = require('../magna
 const { REGELVERSIE } = require('./regels');
 
 const EIGEN = { kas: 'actief', vordering: 'actief', vooruit: 'passief', omzet: 'opbrengst', kosten: 'kosten',
-  schuld: 'passief', begin: 'passief' };
+  schuld: 'passief', begin: 'passief', voorraad: 'actief', crediteur: 'passief' };
 const TEGENPARTIJEN = ['werkgever', 'verhuurder', 'winkels', 'leveranciers', 'familie', 'incasso', 'financier', 'kvk', 'software'];
 
 const SOORTEN = Object.fromEntries(['OPENING', 'LOON', 'EXTRA_DIENST', 'VERPLICHTING', 'BOODSCHAPPEN', 'SOFTWARE',
   'AANMANING', 'INSCHRIJVING', 'VOORSCHOT', 'FACTUUR', 'BETALING_KLANT', 'KORTING', 'VOORFINANCIERING', 'LENING',
-  'AFLOSSING'].map(s => [s, s]));
+  'AFLOSSING', 'LOON_PERSONEEL', 'WERKPLEK', 'INHUUR', 'INKOOP', 'BETALING_LEVERANCIER', 'VERKOOP'].map(s => [s, s]));
 
 const HANDVAT = Symbol('boek');
 
@@ -95,7 +95,7 @@ function maakBoek({ db } = {}) {
   /* Wat de boeken zeggen, in de taal van de speler. */
   function cijfers(st) {
     const r = st.boek.rekeningen, pre = st.wereld + ':';
-    let vorderingen = 0, vooruit = 0, kosten = 0, schuld = 0;
+    let vorderingen = 0, vooruit = 0, kosten = 0, schuld = 0, voorraad = 0, crediteuren = 0;
     for (const [code, x] of Object.entries(r)) {
       if (!code.startsWith(pre)) continue;
       const k = code.slice(pre.length).split(':')[0];
@@ -103,9 +103,11 @@ function maakBoek({ db } = {}) {
       if (k === 'vooruit') vooruit -= x.saldo;
       if (k === 'kosten') kosten += x.saldo;
       if (k === 'schuld') schuld -= x.saldo;
+      if (k === 'voorraad') voorraad += x.saldo;
+      if (k === 'crediteur') crediteuren -= x.saldo;
     }
     const omzet = 0 - saldo(st, ['omzet']);   // 0 - en geen -: een lege rekening is 0 en geen -0
-    return { kas: saldo(st, ['kas']), vorderingen, vooruit, omzet, kosten, resultaat: omzet - kosten, schuld };
+    return { kas: saldo(st, ['kas']), vorderingen, vooruit, omzet, kosten, resultaat: omzet - kosten, schuld, voorraad, crediteuren };
   }
 
   function open(st, bedrag) {

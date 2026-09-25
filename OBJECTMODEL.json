@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-25",
   "gemeten": {
-    "bestanden": 2399,
-    "vormen": 1429,
-    "velden": 2070,
-    "modules": 793,
+    "bestanden": 2405,
+    "vormen": 1433,
+    "velden": 2076,
+    "modules": 796,
     "domeinen": 283,
     "envelopDrempel": 17,
     "envelop": 32,
-    "veldenDomeineigen": 1459,
-    "veldenGedeeldVanafVier": 204,
+    "veldenDomeineigen": 1464,
+    "veldenGedeeldVanafVier": 205,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -373,6 +373,18 @@
       ]
     },
     {
+      "veld": "rol",
+      "domeinen": 11,
+      "waar": [
+        "kern/concern",
+        "kern/livinglab",
+        "kern/magnaat-leven",
+        "kern/magnaatwereld",
+        "kern/onderneming",
+        "kern/rechterhand"
+      ]
+    },
+    {
       "veld": "klaar",
       "domeinen": 10,
       "waar": [
@@ -481,18 +493,6 @@
       ]
     },
     {
-      "veld": "rol",
-      "domeinen": 10,
-      "waar": [
-        "kern/concern",
-        "kern/livinglab",
-        "kern/magnaatwereld",
-        "kern/onderneming",
-        "kern/rechterhand",
-        "kern/reisgezelschap"
-      ]
-    },
-    {
       "veld": "name",
       "domeinen": 10,
       "waar": [
@@ -505,6 +505,18 @@
       ]
     },
     {
+      "veld": "dagen",
+      "domeinen": 10,
+      "waar": [
+        "kern/gewoonten",
+        "kern/klok",
+        "kern/levensgraaf",
+        "kern/levenslijn",
+        "kern/magnaat-leven",
+        "kern/mobiliteit"
+      ]
+    },
+    {
       "veld": "geldigTot",
       "domeinen": 9,
       "waar": [
@@ -514,18 +526,6 @@
         "kern/festival",
         "kern/mobiliteit",
         "kern/navigatie"
-      ]
-    },
-    {
-      "veld": "kamer",
-      "domeinen": 9,
-      "waar": [
-        "kern/afdelingen",
-        "kern/bureau",
-        "kern/gast",
-        "kern/homemerken",
-        "kern/levensgraaf",
-        "kern/magnaat-trainingslobby-regie"
       ]
     }
   ],

@@ -97,7 +97,7 @@
   .office{margin-bottom:1.2rem}.codelaag{border:1px solid var(--line);margin:1.2rem 0 0;background:#0C0C0B}.codelaag>summary{cursor:pointer;list-style:none;padding:1rem;display:grid;gap:.2rem}.codelaag>summary::-webkit-details-marker{display:none}.codelaag>summary b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.1rem}.codelaag>summary small{color:var(--soft);font-size:.72rem}.codelaag>summary:after{content:'+';position:absolute;right:1rem}.codelaag{position:relative}.codelaag[open]>summary:after{content:'\2212'}.codelaag[open]>summary{border-bottom:1px solid var(--line)}.codelaag .codeband,.codelaag .controlroom{margin:0;border-left:0;border-right:0}
   .nav button[hidden]{display:none}.vn-waarom{list-style:none;padding:0;margin:0 0 1.2rem;font-size:.78rem;color:var(--soft);line-height:1.6}.vn-waarom b{color:var(--paper);font-weight:600}
   .nav-meer summary{list-style:none;cursor:pointer;padding:.72rem .8rem;color:var(--soft);display:flex;align-items:center;gap:.7rem}.nav-meer summary::-webkit-details-marker{display:none}.nav-meer[open] summary{color:var(--paper)}
-  .vn-kop{display:flex;justify-content:space-between;align-items:end;gap:1rem;margin-bottom:1rem}.vn-kop p{color:var(--soft);font-size:.8rem;margin:.2rem 0 0}.vn-kas small{display:block;color:var(--soft);font-size:.7rem}.vn-kas b{font-size:1.6rem;font-family:Georgia,serif;font-weight:500}.vn-kas b.vn-rood{color:var(--red)}
+  .vn-kop{display:flex;justify-content:space-between;align-items:end;gap:1rem;margin-bottom:1rem}.vn-kop p{color:var(--soft);font-size:.8rem;margin:.2rem 0 0}.vn-tempo{display:inline-flex;gap:.4rem;align-items:center;font-size:.72rem;color:var(--soft);margin-top:.4rem}.vn-tempo select{background:var(--night);color:var(--paper);border:1px solid var(--line);padding:.2rem .4rem;min-height:24px}.vn-kas small{display:block;color:var(--soft);font-size:.7rem}.vn-kas b{font-size:1.6rem;font-family:Georgia,serif;font-weight:500}.vn-kas b.vn-rood{color:var(--red)}
   .vn-aandacht{list-style:none;padding:0;margin:0 0 1rem}.vn-a{border-left:2px solid var(--line);padding:.45rem .8rem;margin:.3rem 0;font-size:.82rem}.vn-a.vn-s-nood,.vn-a.vn-s-slecht{border-left-color:var(--red)}.vn-a.vn-s-vraag{border-left-color:var(--paper)}
   .vn-agenda{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.4rem;margin-bottom:1.5rem}.vn-dag{border:1px solid var(--line);padding:.55rem;display:flex;flex-direction:column;gap:.3rem;font-size:.74rem;min-width:0}.vn-dag.vn-vandaag{border-color:var(--gold)}.vn-dag small{color:var(--soft);font-size:.68rem}
   .vn-item{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;background:rgba(255,255,255,.04);padding:.25rem .35rem}.vn-item em{font-style:normal;color:var(--soft)}.vn-betaal{border-left:2px solid var(--line)}.vn-betaal.vn-open{border-left-color:var(--red)}.vn-schrap{margin-left:auto;background:none;border:0;color:var(--soft);cursor:pointer;min-width:24px;min-height:24px}
@@ -219,7 +219,7 @@
     <div class="topbar"><span class="crumb" id="crumb">Vandaag</span><span class="top-spacer"></span><span class="statuspill"><i class="dot"></i><b id="online">...</b> spelersprofielen</span><a class="exit" href="/apps/spelen.html">Naar alle spellen</a></div>
 
     <section class="screen aan" id="vandaag" aria-labelledby="vnVandaagKop">
-      <div class="vn-kop"><div><div class="eyebrow">FROM ZERO · <span id="vnDag">…</span></div><h2 id="vnVandaagKop">Vandaag</h2><p id="vnKlok">Je leven wordt geladen…</p></div><div class="vn-kas"><small>Op je rekening</small><b id="vnKas">…</b></div></div>
+      <div class="vn-kop"><div><div class="eyebrow">FROM ZERO · <span id="vnDag">…</span></div><h2 id="vnVandaagKop">Vandaag</h2><p id="vnKlok">Je leven wordt geladen…</p><label class="vn-tempo">Tempo van deze speelronde <select id="vnTempo"></select></label></div><div class="vn-kas"><small>Op je rekening</small><b id="vnKas">…</b></div></div>
       <ul class="vn-aandacht" id="vnAandacht" aria-label="Wat aandacht vraagt"></ul>
       <p class="vn-fout" id="vnFout" role="alert" hidden></p>
       <div class="rtg-duimbalk vn-acties"><button type="button" class="btn primary" id="vnHoofd" data-vn-actie="0" data-hoofdactie data-rtg-edge-bar hidden></button><div class="vn-acties" id="vnActies"></div></div>
@@ -711,6 +711,8 @@ setInterval(()=>{if(TEAM_ROOM&&!$('#teamOverlay').hidden&&!document.hidden)refre
 load();
 </script>
 <script src="/apps/magnaat-leven-schermen.js"></script>
+<script src="/apps/magnaat-leven-bedrijf.js"></script>
+<script src="/apps/magnaat-leven-invoer.js"></script>
 <script src="/apps/magnaat-leven.js"></script>
 <script src="/apps/magnaat-voorzijde-scenarios.js"></script>
 <script src="/apps/magnaat-voorzijde.js"></script>

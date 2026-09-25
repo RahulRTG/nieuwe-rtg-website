@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T03:30:03.648Z",
-    "commit": "1a4685e8",
+    "op": "2026-09-25T03:10:14.853Z",
+    "commit": "116eecf91",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5289,6 +5289,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "magnaatmarkt.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "magnaatonderneming.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8315,14 +8323,6 @@
       "operator": "return-weg#2",
       "gezakt": 1,
       "geprobeerd": 4
-    },
-    "signing-repetitie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/config/release-trust.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 2
     },
     "simulatiebank.test.js": {
       "soort": "server",

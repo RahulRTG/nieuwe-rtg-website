@@ -73,7 +73,7 @@ function gesprek(st, z) {
   d.fase = 'onderhandeling';
   d.sinds = st.dag;
   meld(st, k.contact + ' wil ' + k.behoefte + '. Jij schat ' + tijd(d.uren) + ' werk, en hij heeft het over ' + k.termijn +
-    ' dagen nodig. Wat vraag je?', 'vraag');
+    ' dagen nodig.' + (k.offerte ? ' Hij heeft ook een offerte van ' + k.offerte.van + ': ' + euro(k.offerte.bedrag) + '.' : '') + ' Wat vraag je?', 'vraag');
   return { ok: true };
 }
 

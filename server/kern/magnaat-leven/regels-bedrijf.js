@@ -43,11 +43,10 @@ const HANDELSWAAR = {
   foto: { naam: 'Ingelijste print', leverancier: 'Drukkerij Oudwijk', inkoop: 1800, advies: 4500, minimum: 10, levertijd: 2, termijn: 30 },
   administratie: { naam: 'Bonnenscanner, ingericht', leverancier: 'Kantoorvak Oudwijk', inkoop: 6000, advies: 11000, minimum: 5, levertijd: 3, termijn: 30 }
 };
-/* DE VRAAG: hoeveel stuks er per week verkocht zouden worden, in duizendsten,
-   bij de adviesprijs. Elke betaalde klant brengt mensen mee, tot een plafond.
-   Een hogere prijs verkoopt kwadratisch minder; verkopen wat je niet hebt, kan
-   niet -- dat is een gemiste verkoop, en die telt. */
-const HANDELSVRAAG = { perKlant: 2000, basis: 2000, plafond: 12000, prijsMin: 50, prijsMax: 200, bestelMax: 50 };
+/* Wat een prijs mag zijn (procent van de adviesprijs) en hoeveel stuks er per
+   keer besteld kunnen worden. Hoeveel er verkocht wordt, is sinds V3 een
+   marktaandeel (./markt.js). */
+const HANDELSVRAAG = { prijsMin: 50, prijsMax: 200, bestelMax: 50 };
 
 /* EEN ONDERHOUDSCONTRACT: een tevreden klant van je onderneming wil vast werk,
    elke vier weken, tegen het uurtarief dat hij van je kent. Je tekent of je

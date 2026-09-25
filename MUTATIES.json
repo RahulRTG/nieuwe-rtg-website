@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T09:19:45.796Z",
-    "commit": "b71d0ab79",
+    "op": "2026-09-25T12:30:03.539Z",
+    "commit": "547cbffe6",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5375,6 +5375,14 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "magnaatbalans.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/boek.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 5
     },
     "magnaatgeldkaart.test.js": {
       "soort": "puur",

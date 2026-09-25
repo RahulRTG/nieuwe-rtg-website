@@ -30,9 +30,11 @@
 
   function teken(s, h) {
     var q = h.q, esc = h.esc, euro = h.euro;
-    var g = s.gids, gk = q('#vnGids');
-    gk.hidden = !g;
-    gk.innerHTML = g ? '<b>Je eerste stappen</b> · ' + g.gedaan + ' van ' + g.stappen.length + '<ol>' + g.stappen.map(function (x) {
+    var g = s.gids, gk = q('#vnGids'), einde = s.verhaal && s.verhaal.einde;
+    gk.hidden = !g && !einde;
+    /* Een leven dat voorbij is, zegt dat eerst, en waar je opnieuw begint. */
+    gk.innerHTML = einde ? '<b>Dit leven is voorbij</b><p>' + esc(einde.tekst) + '</p><p class="vn-rust">Onder Wereld kun je opnieuw beginnen, ook op een andere moeilijkheid.</p>'
+      : g ? '<b>Je eerste stappen</b> · ' + g.gedaan + ' van ' + g.stappen.length + '<ol>' + g.stappen.map(function (x) {
       return '<li class="' + (x.klaar ? 'klaar' : x.id === g.nu ? 'nu' : '') + '">' + esc(x.tekst) + (x.id === g.nu ? '<small>' + esc(x.uitleg) + '</small>' : '') + '</li>';
     }).join('') + '</ol>' : '';
 
@@ -56,7 +58,7 @@
 
     var v = s.verhaal, vk = q('#vnVerhaal');
     if (vk && v) {
-      vk.innerHTML = (v.slot ? '<div class="vn-gids"><b>Dit heb jij opgebouwd</b><p>' + esc(v.slot.tekst) + '</p><p class="vn-rust">Omzet ' + euro(v.slot.omzet) +
+      vk.innerHTML = (v.einde ? '<div class="vn-gids"><b>Hoe het afliep</b><p>' + esc(v.einde.tekst) + '</p></div>' : '') + (v.slot ? '<div class="vn-gids"><b>Dit heb jij opgebouwd</b><p>' + esc(v.slot.tekst) + '</p><p class="vn-rust">Omzet ' + euro(v.slot.omzet) +
         ' · resultaat ' + euro(v.slot.resultaat) + ' · ' + v.slot.klanten + ' klanten · ' + v.slot.team + ' mensen in je team</p></div>' : '') +
         '<h3>Jouw verhaal</h3>' + (v.mijlpalen.length ? '<ol class="vn-meldingen">' + v.mijlpalen.map(function (x) {
           return '<li class="vn-m vn-s-goed"><small>dag ' + esc(x.dag) + '</small>' + esc(x.tekst) + '</li>';

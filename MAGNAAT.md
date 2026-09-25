@@ -510,6 +510,46 @@ Wat V5 bewust **niet** doet:
 - **Een eigen beveiligingslaag.** De route eist een ledensessie, zoals elke ledenroute.
 - **Balansaanpassingen.** Die horen bij de speelronde.
 
+### MAGNAAT WORLD 1.0: balans en afronding (25 september 2026)
+
+**De vondst van V5 is opgelost.** De moeilijkheid bepaalt nu ook het einde, en niet alleen het begin. De automatische speler (`test/lib-magnaatspeler.js`) is de meetlat, en `test/magnaatbalans.test.js` houdt hem daaraan, voor alle drie de aanbiedingen:
+
+| | Licht | Normaal | Zwaar |
+|---|---|---|---|
+| Je bedrijf bestaat minstens | 5 weken | 9 weken | 15 weken |
+| en bracht in die tijd binnen | 1,5 keer je loon | 2 keer je loon | 2,5 keer je loon |
+| en je hebt op de bank | 2 weken loon | 4 weken loon | 8 weken loon |
+| De speler leeft van zijn bedrijf op dag | 67 | 97 | 139 |
+| Huur open tot je kamer wordt opgezegd | nooit | 35 dagen | 21 dagen |
+
+**Je bedrijf draagt je pas als het genoeg binnenbrengt en je een buffer hebt.** De buffer is de maand dat een klant laat betaalt. Wie alle omzet meteen uitgeeft, krijgt de melding "je kunt je baan opzeggen" niet, hoeveel er ook binnenkomt. De melding noemt de termijn, de factor en wat er op de bank staat.
+
+**Op normaal en zwaar kun je verliezen.**
+- Staat de huur van je kamer langer open dan je verhuurder accepteert, dan zegt hij je kamer op, en dit leven is **voorbij**.
+- Een week ervoor schrijft hij je.
+- Alleen de huur van je kamer telt: andere achterstanden zijn duur, maar je woont nog.
+- Een leven dat voorbij is, staat stil. De Edge biedt niets meer aan, de klok loopt niet door en een handeling krijgt 409. Het verhaal vertelt hoe het afliep, en onder Wereld begin je opnieuw, ook op een andere moeilijkheid.
+- Voorbij is iets anders dan **bevroren** (V5): voorbij is een spelafloop met kloppende boeken, bevroren is een beschermingsstand omdat de boeken niet meer kloppen.
+
+**Wat verliezen is, en wat niet:**
+- De toets speelt het slecht: na de inschrijving drie mensen aannemen en daarna niets meer doen. Het loon eet de rekening leeg. Op zwaar is het leven dan voorbij rond dag 90, op normaal rond dag 105, en op licht nooit.
+- Wie alleen in de keuken werkt, verliest niet. Tweehonderd dagen niets doen kost je geen kamer. Stilstaan is geen straf; overmoed is dat wel.
+
+**Wat Magnaat World 1.0 is:**
+- één leven per lid, van een maandag met bijna niets en een baan in de keuken tot een eigen bedrijf (V1);
+- met een team, contracten, voorraad, een prognose en een vestiging (V2);
+- in een markt met seizoenen, weer, concurrenten die reageren, en wijken (V3);
+- met een gids, drie moeilijkheden, mijlpalen, een slot en een einde (V4 en 1.0);
+- en met boeken die na elke handeling worden gecontroleerd, verzoeken die niet dubbel worden uitgevoerd, en oude saves die blijven laden (V5).
+
+Al het geld loopt door één grootboek.
+
+Wat 1.0 bewust **niet** is:
+- **Multiplayer.** Een gedeeld Oudwijk raakt de gelijktijdigheid, en die is in V5 alleen binnen één proces beproefd.
+- **Een speelronde met mensen.** De balans is afgestemd op een automatische speler, die redelijk speelt maar niet slim. Of dag 97 op normaal goed *voelt*, zegt pas een mens. De getallen staan in één tabel in `regels.js` (MOEILIJKHEID) en zijn daar te verschuiven zonder de keten te raken.
+- **Verliezen op licht.** Dat is de bedoeling van licht.
+- **Faillissement van de onderneming los van de mens.** Het einde gaat over je kamer, niet over een rechtbank. Een faillissement vraagt een curator en een schuldeisersvolgorde die het spel niet heeft.
+
 ---
 
 ## 8. De regels

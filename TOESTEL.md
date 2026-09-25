@@ -563,6 +563,7 @@ twee bewijzen.
   met een proefset en een gemeten maat (par. 9.2).
 - **Het rekentijdplafond** staat in de rekenaar maar is niet beproefd: daar
   is een uitvoerder voor nodig die bewust te lang rekent.
+- **Een schakelaar in de boardroom**: `/toestel` staat in `kern/bestuursroutes.js` en `kern/platformregister/bediening.js` en niet aan een functie, omdat de functiepoort alleen `/api` afdwingt. De uitknop is nu een lege sleutellijst en geen manifest; een echte schakelaar vraagt dat de functiepoort ook `/toestel` afdwingt.
 - **Centrale tellers (TOE-07)**: de meting stuurt niets naar RTG. Grove
   tellers zonder toestel-id komen pas als er iets te tellen valt.
 - **Het downloadscherm**: `opslag.haal()` weigert zonder tik, maar het scherm

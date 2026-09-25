@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T04:37:55.443Z",
-    "commit": "4493ec3d",
+    "op": "2026-09-25T04:44:13.939Z",
+    "commit": "6c784a7d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5882,6 +5882,14 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "money012-inkomend.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalwaarheid/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
+      "geprobeerd": 4
     },
     "money012.test.js": {
       "soort": "puur",

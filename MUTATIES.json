@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T01:10:04.838Z",
-    "commit": "d8b3b082",
+    "op": "2026-09-25T02:21:55.678Z",
+    "commit": "793020659",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5289,6 +5289,21 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "magnaatonderneming.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatonderneming.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
     "magnaatwereld.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8300,14 +8315,6 @@
       "operator": "return-weg#2",
       "gezakt": 1,
       "geprobeerd": 4
-    },
-    "signing-repetitie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/config/release-trust.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 2
     },
     "simulatiebank.test.js": {
       "soort": "server",

@@ -201,7 +201,7 @@ const fout = e => P('<div class="leeg">'+esc(e.message)+'</div>');
    krijgen hier meteen hun twee knoppen: wie op dit scherm ziet dat er iets op
    hem wacht, hoort het niet ergens anders te moeten gaan zoeken. */
 async function vNu(){
-  let d; try{ d = await api('nu'); }catch(e){ return fout(e); }
+  let d; try{ d = await api('nu'); /* Ontbreekt een deel, dan de melding -- nooit een lege situation room (LIEGRONDE.json). */ if(!(d && d.tellingen && typeof d.tellingen === 'object' && Array.isArray(d.regels))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ return fout(e); }
   const t = d.tellingen;
   let h = '<div class="kop '+esc(d.ernst)+'"><div class="datum">'+esc(datum(d.datum))+'</div><h2>'+esc(d.kop)+'</h2>'
     + '<div class="telling">'+t.knopen+' zaken in uw kantoor'

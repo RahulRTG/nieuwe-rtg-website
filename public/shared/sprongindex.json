@@ -696,6 +696,7 @@
       "soort": "link",
       "sleutel": "decisionroom",
       "url": "/apps/decision-room.html",
+      "label": "Kantoor",
       "woorden": [
         "workos",
         "beslis",
@@ -780,6 +781,7 @@
       "soort": "link",
       "sleutel": "projectroom",
       "url": "/apps/project-room.html",
+      "label": "Kantoor",
       "woorden": [
         "workos",
         "maak",
@@ -807,6 +809,7 @@
       "soort": "link",
       "sleutel": "rtgone",
       "url": "/apps/rtgone.html",
+      "label": "Kantoor",
       "woorden": [
         "workos",
         "werkdag",
@@ -973,7 +976,8 @@
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "routedossier",
-      "url": "/apps/routedossier.html"
+      "url": "/apps/routedossier.html",
+      "label": "Kantoor"
     },
     {
       "naam": "Stad",

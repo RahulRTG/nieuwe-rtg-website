@@ -110,6 +110,14 @@ test('RTG Concern: een ondernemer begint een entiteit, legt een registratie met 
       const fouten = letOpFouten(page, []);
       const nieuwVerzoeken = [];
       page.on('request', r => { if (r.url().endsWith('/api/concern/entiteit/nieuw')) nieuwVerzoeken.push(r.url()); });
+      /* De lijst rechtsvormen komt hier met opzet traag. Na elke handeling
+         bouwt herlaad() het scherm opnieuw en haalt die lijst op; hingen de
+         knoppen pas daarna, dan stond het scherm er met knoppen die niets deden,
+         en een klik in dat gat verdween (in CI gezien bij 'Vestiging openen'). */
+      await page.route('**/api/onderneming/rechtsvormen', async (route) => {
+        await new Promise((r) => setTimeout(r, 1500));
+        await route.continue();
+      });
 
       await page.goto(base + '/apps/concern.html', { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#nNaam', { state: 'visible', timeout: 20000 });

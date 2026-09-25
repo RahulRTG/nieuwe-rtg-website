@@ -242,6 +242,10 @@
   function toonIntake(s) {
     const el = $('#intake'); el.textContent = '';
     if (!s || s.error) { $('#uitleg').textContent = (s && s.error) || 'Dit lukte niet.'; return; }
+    /* Geen klaar-stand en geen vraag: het antwoord was onvolledig. Dat zeggen we, in plaats van om te vallen (LIEGRONDE.json). */
+    if (!s.klaar && !(s.vraag && Array.isArray(s.vraag.opties))) {
+      $('#uitleg').textContent = 'Het antwoord was onvolledig, dus dit kon niet worden geladen.'; return;
+    }
     $('#uitleg').textContent = s.klaar
       ? 'RTG past zich aan jou aan -- niet andersom. Hieronder staat wat hij van je denkt te weten.'
       : 'Een halve minuut is genoeg om te beginnen.';
@@ -291,6 +295,10 @@
     const gr = $('#grenzen'); gr.textContent = '';
     if (r.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
     if (r.body.error) return;
+    /* Zonder lijst geen "Nog niets" -- dat zou beweren dat er niets is. We zeggen dat het antwoord onvolledig was (LIEGRONDE.json). */
+    if (!(Array.isArray(r.body.neigingen) && Array.isArray(r.body.grenzen))) {
+      el.appendChild(tekst(maak('p', 'stil'), 'Het antwoord was onvolledig, dus dit kon niet worden geladen.')); return;
+    }
 
     el.appendChild(tekst(maak('h2'), 'Wat RTG van mij denkt te weten'));
     if (!r.body.neigingen.length) {

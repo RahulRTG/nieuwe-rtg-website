@@ -100,7 +100,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>({
 }));
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('entourage'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon het gezelschap niet laden.</div>'; return; }
+  let d; try{ d=await api('entourage'); /* Ontbreekt een veld, dan de eigen foutmelding hieronder -- nooit een lege lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */ if(!(d && Array.isArray(d.attenties) && Array.isArray(d.banden) && Array.isArray(d.gezelschap) && Array.isArray(d.soorten))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon het gezelschap niet laden.</div>'; return; }
   GEZELSCHAP=d.gezelschap||[];
   let h='';
   if(d.attenties.length){ h+='<div class="attn"><h2>Documenten die aandacht vragen</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.naam)+'</b> · '+esc(a.soort)+' '+(a.verlopen?'verlopen':'geldig tot')+' '+dt(a.tot)+'</div>').join('')+'<small style="display:block;margin-top:0.5rem;opacity:.75;">'+esc(d.bron)+'</small></div>'; }

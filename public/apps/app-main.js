@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'd659ea22';
+var RTG_BOUW = 'bdba37ae';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3919,7 +3919,7 @@ var RTG_BOUW = 'd659ea22';
        (APPSTORE.md). Dat het nergens aan hing, maakte die belofte leeg. */
     appdossier:  { naam: 'App-dossier',   url: '/apps/appstore-dossier.html' },
     aankomst:    { naam: 'Aankomst',      url: '/apps/arrival.html' },
-    routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html' },
+    routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html', werkrol: 'kantoor' }, // zie app-main-24a3.js
     ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html' },
     /* Foundation Connect (apps/connect.html): de ontdeklus. Hij heet op het
        scherm "Ontdekken" en niet "Connect" -- een wereldnaam hoort te klinken
@@ -3959,9 +3959,11 @@ var RTG_BOUW = 'd659ea22';
        en een tak die daarvoor aftakte kent die keuze nog niet. */
     mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
     office:      { naam: 'RTDocs',       url: '/apps/office.html' },
-    rtgone:      { naam: 'RTG One',      url: '/apps/rtgone.html' },
-    decisionroom:{ naam: 'Decision Room',url: '/apps/decision-room.html' },
-    projectroom: { naam: 'Project Room', url: '/apps/project-room.html' },
+    /* werkrol: zie app-main-24a3.js. Alle drie praten alleen met /api/rtgone
+       achter officeAuth: zonder kantoorsleutel is de ingang een omleiding. */
+    rtgone:      { naam: 'RTG One',      url: '/apps/rtgone.html', werkrol: 'kantoor' },
+    decisionroom:{ naam: 'Decision Room',url: '/apps/decision-room.html', werkrol: 'kantoor' },
+    projectroom: { naam: 'Project Room', url: '/apps/project-room.html', werkrol: 'kantoor' },
     rtmail:      { naam: 'RTMail',       url: '/apps/rtmail.html' },
     magnaat:     { naam: 'Magnaat',      url: '/apps/magnaat.html' },
     /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
@@ -4345,6 +4347,27 @@ var RTG_BOUW = 'd659ea22';
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';
 
+  /* DE WERKROL: de derde as naast wereld en pas. Een ingang met `werkrol` in
+     LINKS verschijnt alleen voor een account dat die rol in zijn sleutelbos
+     heeft (/api/account/rollen, dezelfde lijst als de Werk-kiezer). Routedossier,
+     RTG One, Decision Room en Project Room openen alleen met een kantoorsessie;
+     zonder kantoorsleutel stuurden ze elk lid door naar de kantoordeur
+     (APPWERKT.json, 24 september 2026). Een zichtbare ingang naar een functie
+     die niet te bereiken is, is een productdefect (BETROUWBAARHEID.md).
+     Zolang de sleutelbos niet geladen is, blijft de ingang weg: wie dat niet
+     weet, verbergt liever dan dat hij iets belooft. */
+  let werkrollen = null;
+  const werkrolOk = (def) => !def || !def.werkrol || (!!werkrollen && werkrollen.has(def.werkrol));
+  (function laadWerkrollen() {
+    let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
+    if (!tok) return;
+    fetch('/api/account/rollen', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { werkrollen = new Set(((d && d.rollen) || []).map((r) => r.rol)); if (werkrollen.size) bouw(); })
+      .catch(() => {});
+  })();
+
   /* Afgesplitst van app-main-24.js, dat over de 10 KB ging toen "Mijn loon"
      erbij kwam. De snede loopt langs een echte grens: hierboven staat WAT er
      op het OS staat (de registry, de mappen), hieronder staat hoe je WERK
@@ -4634,6 +4657,7 @@ var RTG_BOUW = 'd659ea22';
     if (item.startsWith('tab:')) return tabZichtbaar(item.slice(4)) && isAan(item);
     if (item.startsWith('link:') && PREMIUM.has(item.slice(5)) && !premiumPas) return false;
     if (!itemDef(item)) return false;
+    if (item.startsWith('link:') && !werkrolOk(LINKS[item.slice(5)])) return false;
     return isAan(item);
   }
   // een gratis account (zonder pas) heeft geen wallet en geen Rahul; de kern

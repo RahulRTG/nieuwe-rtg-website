@@ -109,14 +109,10 @@ test('de toestelrekenlaag rekent in een afgesloten cel, en alleen met onderteken
       assert.ok(u.sandbox.every(x => x === 'allow-scripts'), 'elke cel is sandbox allow-scripts, zonder same-origin: ' + u.sandbox);
 
       /* De cel zelf: open er een en reken IN het sandboxframe. */
+      const geladen = page.waitForEvent('framenavigated', { predicate: f => /\/toestel\/cel$/.test(f.url()) });
       await page.evaluate(() => { const f = document.createElement('iframe'); f.sandbox = 'allow-scripts';
         f.src = '/toestel/cel'; document.body.appendChild(f); });
-      let cel = null;
-      for (let i = 0; i < 50 && !cel; i++) {
-        cel = page.frames().find(f => /\/toestel\/cel$/.test(f.url())) || null;
-        if (!cel) await page.waitForTimeout(100);
-      }
-      assert.ok(cel, 'de cel laadt');
+      const cel = await geladen;
       await cel.waitForLoadState();
       const binnen = await cel.evaluate(async () => {
         const o = {};

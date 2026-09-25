@@ -39,12 +39,16 @@ function nepServer(afhandelaar) {
 
 const tekstVan = body => JSON.stringify(body.messages || []);
 const antwoord = t => ({ json: { choices: [{ message: { content: t }, finish_reason: 'stop' }] } });
-const wacht = ms => new Promise(r => setTimeout(r, ms));
 
 test('1. twee gelijktijdige verzoeken zien elk alleen hun eigen uitvoerplaats', async () => {
-  // De eigen modelserver: vraag A antwoordt traag, vraag B faalt meteen.
+  /* De eigen modelserver: vraag B faalt meteen, vraag A antwoordt pas als B
+     helemaal klaar is. Dat is een VOLGORDE op toestand en geen wachttijd: een
+     toets die een race bewijst met een klok, bewijst een race met een race
+     (test/klokwacht.test.js). */
+  let laatALos;
+  const bKlaar = new Promise((r) => { laatALos = r; });
   const lokaal = await nepServer(async (body) => {
-    if (tekstVan(body).includes('vraag-A')) { await wacht(150); return antwoord('lokaal A'); }
+    if (tekstVan(body).includes('vraag-A')) { await bKlaar; return antwoord('lokaal A'); }
     return { status: 500, json: { error: 'uit' } };
   });
   const extern = await nepServer(async () => antwoord('extern B'));
@@ -58,14 +62,17 @@ test('1. twee gelijktijdige verzoeken zien elk alleen hun eigen uitvoerplaats', 
       await ai.messages.create({ model: 'x', max_tokens: 20, messages: [{ role: 'user', content: id }] });
       return uitgevoerd();
     });
-    const [a, b] = await Promise.all([vraag('vraag-A'), vraag('vraag-B')]);
+    const pa = vraag('vraag-A');
+    const b = await vraag('vraag-B');
+    laatALos();
+    const a = await pa;
 
     assert.deepEqual(a.plaatsen, ['rtg-server'], 'A antwoordde op de eigen modelserver');
     assert.equal(a.extern, false, 'A mag niet de externe uitwijk van B erven');
     assert.deepEqual(b.plaatsen, ['externe-provider'], 'B week uit naar extern');
     assert.equal(b.extern, true);
     // Het gedeelde veld zegt iets over de LAATSTE aanroep van de keten, en dat is
-    // A (die was trager). Wie daar de herkomst van B uit leest, zit ernaast --
+    // A (die wachtte op B). Wie daar de herkomst van B uit leest, zit ernaast --
     // precies waarom het geen herkomst is.
     assert.equal(ai.actief, 'local');
   } finally { lokaal.srv.close(); extern.srv.close(); }

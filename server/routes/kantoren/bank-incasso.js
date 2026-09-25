@@ -70,7 +70,7 @@ module.exports = (ctx) => {
        juiste plek voor die grens: de assurance-as is de as die een echt account
        eist, niet de baan eromheen. */
     const zw = await zwaar.eis(boardroomUser(req), 'bank.incasso', sleutel, req, 'De incassoronde');
-    if (!zw.ok) { veilig(res, () => zw); return; }
+    if (!zw.ok) return zwaar.stuur(res, zw);   // stuur, niet veilig: bevestigingNodig moet het scherm halen
 
     const blik = bank.bankIncassoVooruitblik({ tot });
     if (!blik.posten.length) { veilig(res, () => ({ status: 400,

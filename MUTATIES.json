@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T10:18:02.768Z",
-    "commit": "8d86cce1",
+    "op": "2026-09-25T09:19:45.796Z",
+    "commit": "b71d0ab79",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2241,21 +2241,6 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
-    },
-    "democratie-afhankelijk.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "democratie.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
     },
     "demostand.test.js": {
       "soort": "server",
@@ -5313,6 +5298,21 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "magnaatafwerking.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatafwerking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "magnaatgeldkaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5327,6 +5327,21 @@
       "module": "scripts/magnaatgrondwet.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "magnaathardening.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaathardening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "magnaatlab.test.js": {
@@ -5372,6 +5387,14 @@
       "module": "server/kern/magnaat-leven/index.js",
       "operator": "===->!==#0",
       "gezakt": 12,
+      "geprobeerd": 1
+    },
+    "magnaatreis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/bewaking.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "magnaatwereld.test.js": {
@@ -5548,6 +5571,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "margeschaal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/margeschaal.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "marina.test.js": {
       "soort": "server",
@@ -5998,6 +6029,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "mutatiebijwerking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mutatie.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "mutatiecontract.test.js": {
       "soort": "puur",

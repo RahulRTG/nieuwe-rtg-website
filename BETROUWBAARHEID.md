@@ -244,7 +244,7 @@ is voortaan zichtbaar.
 
 > **Vervangen op 25 september 2026.** Deze paragraaf beschrijft de eerste
 > reparatie van de bedienbaar-meter, met een noemer die bij het laden bevroren
-> werd, een budget en een drempel (`scripts/lib/bedieningsmeting.js`). Tegelijk
+> werd, een budget en een drempel (de module bedieningsmeting in scripts/lib, verwijderd in 8c78a044). Tegelijk
 > kwam er langs een andere weg (#392) een tweede reparatie op main: per ronde
 > opnieuw kijken, na elke tik Escape, vastleggen wie een klik opving, en een
 > weigering waarvan het scherm de reden niet toont als defect. Bij het
@@ -267,8 +267,8 @@ beeld → te raken). Ze wezen vier onafhankelijke fouten aan, alle vier in de me
 | **het budget** | een limiet van 14 met een drempel van de helft: op 86 van 97 schermen wiskundig onhaalbaar | het budget volgt uit de noemer; een drempel boven het budget is een **MeterConfigFout** en laat de meting als geheel falen |
 
 **De schil is een definitie en geen lijst.** Een topcontainer die een gedeeld script
-in `public/shared/` aanmaakt, is schil. `scripts/lib/bedieningsmeting.js` noemt
-elk teken met zijn bron, en `test/bedieningsmeting.test.js` zakt als die bron het
+in `public/shared/` aanmaakt, is schil. De module bedieningsmeting (verwijderd, zie de noot hierboven) noemde
+elk teken met zijn bron, en haar toets zakte als die bron het
 teken niet aanmaakt.
 
 **De schil is geen plek om fouten te verbergen.** Hij staat in het register als
@@ -280,7 +280,7 @@ staan naast elkaar en worden nooit samengevoegd tot "Horeca werkt".
 en één punt is genoeg. Een knop waarvan alleen het midden onder een laag ligt, is
 voor een mens vaak gewoon bedienbaar.
 
-**De regressiefixture** (`test/appwerkt-meter.e2e.js`) is een synthetisch scherm met
+**De regressiefixture** (de browsertoets appwerkt-meter, verwijderd met de module) was een synthetisch scherm met
 alle vier de fouten erin: 6 app-knoppen die pas na 800 ms bestaan, een paneel met
 20 extra knoppen, 30 schilknoppen waarvan 15 onder een laag, en navigerende knoppen
 in schil en app. De waarheid is een app-noemer van 6 en een schil-noemer van 15.

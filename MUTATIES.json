@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-25T04:23:45.629Z",
-    "commit": "17cf749bc",
+    "op": "2026-09-25T08:29:08.290Z",
+    "commit": "91829cc6",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -1139,6 +1139,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 13,
       "scherp": "gezakt"
+    },
+    "bevoegdronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bevoegdronde.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "bevrust.test.js": {
       "soort": "puur",

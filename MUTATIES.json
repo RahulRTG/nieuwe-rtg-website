@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T07:04:36.520Z",
-    "commit": "86882c32f",
+    "op": "2026-09-25T10:18:02.768Z",
+    "commit": "8d86cce1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2241,6 +2241,21 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "democratie-afhankelijk.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "democratie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "demostand.test.js": {
       "soort": "server",

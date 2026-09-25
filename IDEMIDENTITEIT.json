@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T02:18:32.789Z",
-    "commit": "143cc0c3",
+    "op": "2026-09-25T03:03:41.210Z",
+    "commit": "ca469c36",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",

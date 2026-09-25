@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T03:42:39.001Z",
-    "commit": "55111153",
+    "op": "2026-09-25T03:53:54.857Z",
+    "commit": "149e25a0",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5883,6 +5883,22 @@
       "gezakt": 7,
       "geprobeerd": 4
     },
+    "money012-keten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "money012.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalopdracht/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
+      "geprobeerd": 3
+    },
     "motor-vingerafdruk.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6806,6 +6822,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "paytegoed.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "payterug.test.js": {

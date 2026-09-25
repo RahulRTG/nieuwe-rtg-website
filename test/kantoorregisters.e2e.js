@@ -260,6 +260,23 @@ test('het routedossier opent een route en toont zijn assen',
       for (const p of paden) assert.match(p, /health/i, 'een resultaat dat niet bij de zoekterm hoort: ' + p);
     });
 
+    /* BEWIJSLUS.md par. 7: een veld dat de server levert en geen scherm toont,
+       ziet niemand. MUTATIE: `kop +` en `+ staart` uit toonDossier() halen in
+       public/apps/routedossier.html -> deze deeltoets zakt. */
+    await t.test('het dossier toont de vervalstaat, de plek in de code en wat niemand meet', async () => {
+      await page.fill('#zoek', '/api/pay/gezond');
+      await page.click('#zoeken');
+      await wachtOpRust(page);
+      await page.click('#lijst > *');
+      await page.waitForSelector('#dossier[open]', { timeout: 10000 });
+      const lijf = await page.$eval('#dLijf', el => el.innerText);
+      assert.match(lijf, /VERVALSTAAT/, 'de vervalstaat staat niet op het scherm');
+      assert.match(lijf, /server\/routes\/pay\.js:\d+/, 'de plek in de code staat niet op het scherm');
+      assert.match(lijf, /WAT DIT DOSSIER NIET WEET/, 'het blok met wat niemand meet ontbreekt');
+      assert.match(lijf, /reis "grootboek"/, 'de sondereis op deze route wordt niet genoemd');
+      await page.click('#dSluit');
+    });
+
     assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
   } finally {
     if (browser) await browser.close();

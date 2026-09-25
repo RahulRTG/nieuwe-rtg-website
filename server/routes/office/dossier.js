@@ -41,6 +41,7 @@
 const fs = require('fs');
 const path = require('path');
 const matrix = require('../../../scripts/bewijsmatrix');
+const vertrouwen = require('../../../scripts/vertrouwen');
 
 const WORTEL = path.join(__dirname, '../../..');
 /* De vijf registers plus het journaal. Verandert er een, dan is het dossier
@@ -173,7 +174,7 @@ module.exports = (octx) => {
     const zoek = String(methode || '').toUpperCase() + ' ' + String(pad || '');
     const rij = m.rijen.find(r => r.methode + ' ' + r.pad === zoek);
     if (!rij) return { gevonden: false, gevraagd: zoek };
-    return { gevonden: true, route: rij, schakels: schakels() };
+    return { gevonden: true, route: rij, schakels: schakels(), ...vertrouwen.dossierAanvulling(rij) };
   }
 
   app.post('/api/office/routedossier', officeAuth, (req, res) => {

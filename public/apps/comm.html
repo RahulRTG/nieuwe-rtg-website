@@ -590,6 +590,10 @@
   }
   function sluitBlad() { $('#bladWaas').classList.remove('open'); }
   $('#bladWaas').addEventListener('click', function (e) { if (e.target === $('#bladWaas')) sluitBlad(); });
+  /* Escape sluit het blad, zoals elke modale laag in dit huis (appmenu, basis, bediening, ios).
+     Het blad is aria-modal en de rest van de pagina gaat inert: zonder deze regel zat wie met
+     een toetsenbord werkt erachter vast (24 september 2026). */
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('#bladWaas').classList.contains('open')) sluitBlad(); });
 
   /* Wat je met een gesprek kunt (bovenaan houden, stil zetten, uit de lijst)
      zat hier onder een eigen ⋮-knop. Die is weg: het app-menu (shared/appmenu.js)

@@ -193,7 +193,7 @@
   }
 
   async function profiel() {
-    const data = await api('profiel'); const p = data.profiel; locaties = [...(p.locaties || [])];
+    const data = await api('profiel'); /* Zonder profiel geen leeg formulier dat doet alsof er niets was ingevuld (LIEGRONDE.json). */ if (!(data && data.profiel && typeof data.profiel === 'object')) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); const p = data.profiel; locaties = [...(p.locaties || [])];
     const buiten = (p.wensen || []).filter(x => !voorkeuren.some(v => v.toLowerCase() === String(x).toLowerCase()));
     const checks = voorkeuren.map(v => '<label><input type="checkbox" data-pref="'+esc(v)+'"'+((p.wensen||[]).some(x=>String(x).toLowerCase()===v.toLowerCase())?' checked':'')+'><span>'+esc(v)+'</span></label>').join('');
     let werk = '<div class="dating-visibility"><div><strong>Profielzichtbaarheid</strong><small>U verschijnt uitsluitend op codenaam in de besloten Signature-selectie.</small></div><label class="dating-switch"><input type="checkbox" id="aan"'+(p.aan?' checked':'')+' aria-label="Profiel zichtbaar"><span></span></label></div>'+

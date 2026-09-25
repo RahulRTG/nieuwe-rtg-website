@@ -138,6 +138,8 @@
 
 
   function teken(d) {
+    // zonder stukken: onvolledig, dus de foutweg (LIEGRONDE.json)
+    if (d && !d.error && !Array.isArray(d.stukken)) d = { error: 'Het antwoord was onvolledig, dus dit kon niet worden geladen.' };
     stand = d;
     /* Welke clips op DIT toestel staan, zodat de deler ze kan uitdienen en de
        aanwezigheid kan kloppen. Zonder deze regel is een maker die hier zit
@@ -146,12 +148,9 @@
       S.deler.zetEigen((d.stukken || []).filter(function (x) { return x.vorm === 'clip' && x.mijn; })
         .map(function (x) { return x.id.slice(x.id.indexOf(':') + 1); }));
     }
-    /* EEN UITGELOGD SCHERM IS GEEN FOUTMELDING. Hier stond alleen
-       `$('#uitleg').textContent = d.error` en dan `return`: de zin "Niet
-       ingelogd." kwam als kale regel bovenaan een leeg vlak van driehonderd
-       pixels te staan, terwijl de LEGE stand er twee regels verderop al een
-       vorm voor had (d.leeg). Twee wegen naar hetzelfde moment, en maar een
-       ervan was ontworpen. Nu gebruiken ze allebei hetzelfde vlak. */
+    /* EEN UITGELOGD SCHERM IS GEEN FOUTMELDING. "Niet ingelogd." stond als
+       kale regel boven een leeg vlak, terwijl de lege stand (d.leeg) er al een
+       vorm voor had. Nu gebruiken ze allebei hetzelfde vlak. */
     if (d.error) {
       $('#uitleg').textContent = '';
       var doosF = $('#stukken'); doosF.textContent = '';

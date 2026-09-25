@@ -1,0 +1,201 @@
+{
+  "stempel": {
+    "op": "2026-09-25T08:52:10.526Z",
+    "commit": "910cd346",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/lusproef.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "De ontdeklus van Foundation Connect, gemeten per SCHAKEL (handelt actor A, en merkt actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Zesde keten naast tafel, rit, toelating, Adam en moment -- zie CONNECT.md.",
+  "grens": "Twee LEDEN over de lid-deur /api/connect. De gezinsdeur /api/rtf/connect is dezelfde motor (server/functies/register/cat-life2.js) maar wordt hier niet gelopen. Er komt geen browser aan te pas.",
+  "schakels": [
+    {
+      "nr": 1,
+      "wat": "een lid zegt \"meer voetbal\" en dat wordt bewaard",
+      "stand": "gesloten",
+      "detail": "gewicht 1"
+    },
+    {
+      "nr": 2,
+      "wat": "van een alledaags onderwerp naar een vak waar niet om gevraagd is",
+      "stand": "gesloten",
+      "detail": "voetbal -> rekenen: \"Hoe kan een ploeg meer doelpunten maken en toch minder punten halen?\""
+    },
+    {
+      "nr": 3,
+      "wat": "elke plek zegt WAAROM hij er staat en welke motor hem koos",
+      "stand": "gesloten",
+      "detail": "3 plekken, alle met motor + reden + wat hij niet dekt"
+    },
+    {
+      "nr": 4,
+      "wat": "een motor zonder bron meldt dat hij niet kijkt, met de reden",
+      "stand": "gesloten",
+      "detail": "5 van 8 motoren: groei, menselijk, brug, actualiteit, toeval"
+    },
+    {
+      "nr": 5,
+      "wat": "iets openen zet de trede \"gezien\" in het eigen leerdossier",
+      "stand": "gesloten",
+      "detail": "trede gezien"
+    },
+    {
+      "nr": 6,
+      "wat": "de mens zet zelf \"begrepen\", en die regel draagt de graad `vermoed`",
+      "stand": "gesloten",
+      "detail": "graad vermoed"
+    },
+    {
+      "nr": 7,
+      "wat": "de twee treden met bewijskracht kan hij niet zelf zetten",
+      "stand": "gesloten",
+      "detail": "gebruikt en doorgegeven allebei geweigerd met de reden"
+    },
+    {
+      "nr": 8,
+      "wat": "een ECHT domein meldt werk aan, en Connect neemt het auteurschap over",
+      "stand": "gesloten",
+      "detail": "clip gemaakt (200); overgenomen: gemaakt, aangeboden"
+    },
+    {
+      "nr": 9,
+      "wat": "bereikt staat in het dossier van de maker en NIET in zijn portfolio",
+      "stand": "gesloten",
+      "detail": "bereikt geschreven: true; in portfolio: false"
+    },
+    {
+      "nr": 10,
+      "wat": "\"mooi\" levert de maker niets op, \"geprobeerd\" wel",
+      "stand": "gesloten",
+      "detail": "na \"mooi\": 3 bewijzen; na \"geprobeerd\": 4"
+    },
+    {
+      "nr": 11,
+      "wat": "de teller kent zes soorten en GEEN totaal",
+      "stand": "gesloten",
+      "detail": "6 soorten, velden: soorten, nietGemeten"
+    },
+    {
+      "nr": 12,
+      "wat": "het dossier geeft de hoogste trede per ONDERWERP en geen niveau",
+      "stand": "gesloten",
+      "detail": "flow=gebruikt, rekenen=begrepen"
+    },
+    {
+      "nr": 13,
+      "wat": "de schuif van de mens verdeelt de plekken en niets anders doet dat",
+      "stand": "gesloten",
+      "detail": "schuif 0 -> {\"ontdekken\":0,\"vertrouwd\":12}, schuif 100 -> {\"ontdekken\":12,\"vertrouwd\":0}"
+    },
+    {
+      "nr": 14,
+      "wat": "het antwoord zegt zelf wanneer het genoeg is",
+      "stand": "gesloten",
+      "detail": "Dit is alles wat er nu voor u is. Dat is geen storing -- er ..."
+    },
+    {
+      "nr": 15,
+      "wat": "een gezinsprofiel krijgt dezelfde motor langs een eigen deur",
+      "stand": "gesloten",
+      "detail": "4 plekken"
+    },
+    {
+      "nr": 16,
+      "wat": "een minderjarig profiel gaat niet publiek, maar kan altijd versmallen",
+      "stand": "gesloten",
+      "detail": "publiek geweigerd (400), versmallen lukt wel"
+    },
+    {
+      "nr": 17,
+      "wat": "alleen lezen verandert niets aan de eigen stand",
+      "stand": "gesloten",
+      "detail": "dossier 0 regels, schuif 40"
+    }
+  ],
+  "storingen": [
+    {
+      "nr": 1,
+      "wat": "zonder inlog komt er niets uit",
+      "stand": "gehouden",
+      "detail": "status 401"
+    },
+    {
+      "nr": 2,
+      "wat": "een gezinsdeur zonder token gaat niet open",
+      "stand": "gehouden",
+      "detail": "status 403"
+    },
+    {
+      "nr": 3,
+      "wat": "een mens zet alleen de treden die over hemzelf gaan",
+      "stand": "gehouden",
+      "detail": "toegepast mag (200), geoefend niet (400): Deze trede wordt door het systeem gezet, niet door"
+    },
+    {
+      "nr": 4,
+      "wat": "zonder vaststaande maker komt er geen regel in andermans dossier",
+      "stand": "gehouden",
+      "detail": "Deze naklank is geteld, maar er kon geen regel bij een maker w"
+    },
+    {
+      "nr": 5,
+      "wat": "een contactgegeven wordt niet als voorkeur bewaard",
+      "stand": "gehouden",
+      "detail": "Dit lijkt geen onderwerp maar een contactgegeven. Voorkeuren"
+    },
+    {
+      "nr": 6,
+      "wat": "\"verras me\" verzet de instelling van de mens NIET",
+      "stand": "gehouden",
+      "detail": "eenmalig=true, schuif blijft 100"
+    },
+    {
+      "nr": 7,
+      "wat": "een werkwoord dat botst met een grens, wordt geweigerd MET de reden",
+      "stand": "gehouden",
+      "detail": "Dit werkwoord bestaat hier niet. Punten, niveaus en streaks "
+    },
+    {
+      "nr": 8,
+      "wat": "een schuif buiten bereik weigert in plaats van af te kappen",
+      "stand": "gehouden",
+      "detail": "De schuif loopt van 0 (vertrouwd) tot 100 (ontdekk"
+    },
+    {
+      "nr": 9,
+      "wat": "terugnemen wat er niet staat, is geen fout",
+      "stand": "gehouden",
+      "detail": "ok zonder dat er iets stond"
+    },
+    {
+      "nr": 10,
+      "wat": "zonder plaats meldt de laag dat, in plaats van stil niets lokaals te tonen",
+      "stand": "gehouden",
+      "detail": "Voor wat er in de buurt gebeurt is een plaats nodig. Di"
+    },
+    {
+      "nr": 11,
+      "wat": "vrije tekst komt het dossier niet in, ook niet als eigen bron",
+      "stand": "gehouden",
+      "detail": "geweigerd (400) en niets bewaard"
+    },
+    {
+      "nr": 12,
+      "wat": "en een ECHTE verwijzing komt er gewoon langs",
+      "stand": "gehouden",
+      "detail": "status 200"
+    }
+  ],
+  "telling": {
+    "schakels": 17,
+    "gesloten": 17,
+    "openBekend": 0,
+    "stuk": 0,
+    "storingen": 12,
+    "gehouden": 12,
+    "gebroken": 0
+  },
+  "sluitMetBevinding": true,
+  "sluit": true
+}

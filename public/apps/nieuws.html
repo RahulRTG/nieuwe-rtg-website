@@ -94,7 +94,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(function(){
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="leeg">Log eerst in via de RTG-app; daarna leest het nieuws hier.</div>'; return; }
   if(OPEN) return lees(OPEN);
-  let d; try{ d=await api('',{rubriek:RUB}); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let d; try{ d=await api('',{rubriek:RUB}); /* Ontbreekt een veld, dan de eigen foutmelding hieronder -- nooit een lege lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */ if(!(d && Array.isArray(d.artikelen) && Array.isArray(d.rubrieken))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   ARTIKELEN=d.artikelen||[];
   let h='<div class="rubrieken"><button class="rub'+(RUB===''?' aan':'')+'" data-r="">alles</button>'+d.rubrieken.map(r=>'<button class="rub'+(RUB===r?' aan':'')+'" data-r="'+r+'">'+r+'</button>').join('')+'</div>';
   h+= d.artikelen.length ? d.artikelen.map(a=>'<article class="art" data-id="'+a.id+'"><div class="rlbl">'+esc(a.rubriek)+'</div><h2>'+esc(a.kop)+'</h2><div class="intro">'+esc(a.intro||'')+'</div><div class="meta">door '+esc(a.auteur)+' · '+tijd(a.at)+'</div></article>').join('')

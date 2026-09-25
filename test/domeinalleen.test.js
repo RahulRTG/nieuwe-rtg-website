@@ -150,7 +150,19 @@ async function opgestart(dataDir, domeinen, pad, methode) {
   for (let poging = 0; ; poging++) {
     const port = 36000 + Math.floor(Math.random() * 2000);
     const { kind, uitInfo } = boot(port, dataDir, domeinen);
-    try { await wachtTotOp(port, uitInfo, pad, methode, kind); return { kind, uitInfo, port }; }
+    try {
+      await wachtTotOp(port, uitInfo, pad, methode, kind);
+      /* IS DIT ONZE SERVER? Een antwoord op de poort bewijst niet dat ONS kind
+         antwoordt. Zat er al een server van een andere toets op die gokte poort,
+         dan gaf die de wacht zijn antwoord terwijl ons kind met EADDRINUSE
+         stierf -- en daarna antwoordde hij met ALLE domeinen: /api/supplier/login
+         gaf 401 waar 404 hoorde (CI, 25 september 2026). /api/health noemt de
+         pid; die moet van ons kind zijn. */
+      const h = await vraag(port, '/api/health');
+      let pid = null; try { pid = JSON.parse(h.body).pid; } catch (e) {}
+      if (pid !== kind.pid) throw new Error('EADDRINUSE: op poort ' + port + ' antwoordde pid ' + pid + ' in plaats van ons kind (' + kind.pid + ')');
+      return { kind, uitInfo, port };
+    }
     catch (e) {
       kind.kill('SIGKILL');
       if (poging < 3 && /EADDRINUSE/.test(String(e.message))) continue;

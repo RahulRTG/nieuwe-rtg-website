@@ -29,9 +29,11 @@
        en een tak die daarvoor aftakte kent die keuze nog niet. */
     mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
     office:      { naam: 'RTDocs',       url: '/apps/office.html' },
-    rtgone:      { naam: 'RTG One',      url: '/apps/rtgone.html' },
-    decisionroom:{ naam: 'Decision Room',url: '/apps/decision-room.html' },
-    projectroom: { naam: 'Project Room', url: '/apps/project-room.html' },
+    /* werkrol: zie app-main-24a3.js. Alle drie praten alleen met /api/rtgone
+       achter officeAuth: zonder kantoorsleutel is de ingang een omleiding. */
+    rtgone:      { naam: 'RTG One',      url: '/apps/rtgone.html', werkrol: 'kantoor' },
+    decisionroom:{ naam: 'Decision Room',url: '/apps/decision-room.html', werkrol: 'kantoor' },
+    projectroom: { naam: 'Project Room', url: '/apps/project-room.html', werkrol: 'kantoor' },
     rtmail:      { naam: 'RTMail',       url: '/apps/rtmail.html' },
     magnaat:     { naam: 'Magnaat',      url: '/apps/magnaat.html' },
     /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee

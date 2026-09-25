@@ -43,6 +43,10 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+/* Het volle stempel (commit + boomVuil + instrument) en niet een kale datum:
+   APPWERKT.json leest deze proef als bewijsbron, en zonder waartegen-is-dit-
+   gemeten kan versheid() niet zeggen of het bewijs nog bij deze code hoort. */
+const { stempel: huisStempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'TAFELPROEF.json');
@@ -403,7 +407,7 @@ async function storingen(basis, uit) {
 
 async function meet() {
   const uit = {
-    stempel: new Date().toISOString().slice(0, 10),
+    stempel: huisStempel(),
     uitleg: 'Een horecaketen van tafel tot afrekening, gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zich aan wat hij belooft als het misgaat?). Zie MAATSTAF.md par. 7.',
     grens: 'Alleen de tafel-keten; bezorging, hotel en club hebben eigen naden. De rekening loopt niet door tot een creditnota: de retourlaag hangt aan een leverancierbestelling en niet aan een horecarekening. Er komt geen browser aan te pas, dus dit zegt niets over de schermen.',
     schakels: [], storingen: [], rekening: null

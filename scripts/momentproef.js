@@ -41,6 +41,10 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+/* Het volle stempel (commit + boomVuil + instrument) en niet een kale datum:
+   APPWERKT.json leest deze proef als bewijsbron, en zonder waartegen-is-dit-
+   gemeten kan versheid() niet zeggen of het bewijs nog bij deze code hoort. */
+const { stempel: huisStempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'MOMENTPROEF.json');
@@ -832,7 +836,7 @@ async function architectuur(basis, uit, s) {
 
 async function meet() {
   const uit = {
-    stempel: new Date().toISOString().slice(0, 10),
+    stempel: huisStempel(),
     uitleg: 'Een publieke keten van een feit bij de bron tot een melding bij iemand die daar zelf ja tegen zei, gemeten per SCHAKEL (handelt actor A, en weet actor B het?) en per STORING (houdt de keten zijn belofte als het misgaat?). Vierde keten naast tafelproef, ritproef en toelatingsproef -- zie STAGE.md par. 6.',
     grens: 'Alle vier de Moment-aanleidingen lopen hier echt: festivalboeking, festivalproduct en de uitlichting in De Salon op de hoofdserver, de wedstrijd van een sportclub op een eigen server (schakel 10 -- zie de kop van sportclubKeten voor waarom dat een tweede server vraagt). Wat hier NIET gemeten is: er komt geen browser aan te pas, en er wordt niets betaald -- dat een fan werkelijk een kaart KAN kopen blijft ongemeten, want die route bestaat aan de ledenkant niet. Schakel 5 meet dat hij het moment TERUGVINDT, niet dat hij het kan afrekenen.',
     schakels: [], storingen: [], architectuur: [], wereld: null

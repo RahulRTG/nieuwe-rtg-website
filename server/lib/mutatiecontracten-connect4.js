@@ -80,6 +80,20 @@ const CONTRACTEN = {
   'POST /api/connect/schuif': valtSamen('connect.schuif', LID,
     'zet een getal van 0 tot 100. Twee keer dezelfde waarde is dezelfde stand; buiten bereik weigert ' +
     'de kern met de reden.'),
+  /* De gezinsdeur van de schuif kwam er op 24 september 2026 bij, toen bleek dat
+     Ontdekken een gezinslid "Niet ingelogd." zei. Eigen bewijs en eigen aftekening:
+     de lusproef van 15 september kende deze route niet. */
+  'POST /api/rtf/connect/schuif': {
+    mutatieId: 'connect.schuif.gezin', herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: GEZIN, stand: 'PROTECTED',
+    nagekeken: '2026-09-24: zelfde handler als POST /api/connect/schuif (een waarde zetten, 0 tot 100), met ' +
+      'de gezinssleutel in plaats van de ledensleutel; de sleutel staat in ./idemsleutels-connect.js.',
+    bewijs: { gemeten: 'test/connect-routes.e2e.js raakt de route op een echte server met een geldig paar ' +
+      'code+token; test/connect-gezinsdeur.e2e.js bewijst dat Ontdekken voor een gezin deze deur neemt.',
+      op: '2026-09-24' },
+    afgetekend: { door: 'Claude, op grond van de twee toetsen hierboven; niet door een mens nagelezen', op: '2026-09-24' }
+  },
   'POST /api/connect/signaal': {
     mutatieId: 'connect.signaal', herkomst: 'mens',
     /* Twee keer "meer hiervan" betekent meer dan een keer. Het loopt niet weg:

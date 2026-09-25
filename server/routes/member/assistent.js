@@ -49,7 +49,8 @@ module.exports = (kern) => {
         const stand = aiStatus();
         meet(true);
         return res.json({ reply: reply || 'Excuses, ik heb geen antwoord kunnen formuleren.', source: 'ai', ai: true,
-          modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas });
+          modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas,
+          uitgevoerd: require('../../ai-stand').uitgevoerd() });
       } catch (e) {
         console.error('AI-provider niet bereikbaar; handmatige werkmodus blijft actief:', e.message);
       }
@@ -64,7 +65,8 @@ module.exports = (kern) => {
        demo-reis uit de seed en gingen zo ook naar leden die nergens heen gingen. */
     meet(false);
     res.json({ reply: cannedAnswer(vraag, req.session.tier, eigenReis), source: 'regels', ai: false,
-      modus: 'handmatig', verwerking: 'geen-model', kompas: stand.kompas });
+      modus: 'handmatig', verwerking: 'geen-model', kompas: stand.kompas,
+      uitgevoerd: require('../../ai-stand').uitgevoerd() });
   });
 
   app.post('/api/chat/history', auth, (req, res) => {

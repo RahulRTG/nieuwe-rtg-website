@@ -58,10 +58,33 @@ function pad() {
   return (c && c.req && c.req.path) || '';
 }
 
+/* WAAR DIT ANTWOORD WERKELIJK IS UITGEVOERD. Het label onder een antwoord
+   kwam uit de CONFIGURATIE (./ai-stand.js): "hybride" stond er ook als het
+   lokale model antwoordde, en "lokaal" ook als er helemaal geen model aan te
+   pas kwam. En de keten hield de laatst gebruikte aanbieder bij op een GEDEELD
+   object (`client.actief` in ./ai.js), dus bij twee gelijktijdige vragen kon
+   het ene antwoord de herkomst van het andere krijgen. Een herkomst hoort bij
+   de AANROEP, en de enige plek die per verzoek bestaat is deze context.
+
+   Het blijft bij de NAAM van de aanbieder en de PLAATS: geen prompt, geen
+   tokens, geen persoon. Buiten een verzoek (cron, opstart) is er niets om aan
+   te hangen, en dan wordt er ook niets bijgehouden. */
+function noteerUitvoering(aanbieder, plaats) {
+  const c = huidig();
+  if (!c) return;
+  if (!Array.isArray(c.uitvoering)) c.uitvoering = [];
+  if (c.uitvoering.length < 50) c.uitvoering.push({ aanbieder: String(aanbieder || ''), plaats: String(plaats || '') });
+}
+
+const uitvoeringen = () => {
+  const c = huidig();
+  return c && Array.isArray(c.uitvoering) ? c.uitvoering.slice() : [];
+};
+
 /* De middleware. Meer doet hij niet: het tellen en het remmen gebeurt pas als
    er echt een model wordt aangeroepen. */
 function contextMiddleware() {
   return (req, res, next) => inContext({ ip: req.ip || '', req }, () => next());
 }
 
-module.exports = { inContext, huidig, ip, sessie, pad, contextMiddleware };
+module.exports = { inContext, huidig, ip, sessie, pad, noteerUitvoering, uitvoeringen, contextMiddleware };

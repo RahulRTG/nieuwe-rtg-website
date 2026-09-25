@@ -25,10 +25,10 @@ function heeftBeeld(params) {
 
 function netwerkGrens(u) {
   const host = u.hostname.replace(/^\[|\]$/g, '').toLowerCase();
-  if (host === '127.0.0.1' || host === 'localhost' || host === '::1') return 'op-dit-apparaat';
+  if (host === '127.0.0.1' || host === 'localhost' || host === '::1') return 'rtg-server';
   const delen = host.split('.').map(Number);
   const geldigV4 = delen.length === 4 && delen.every(n => Number.isInteger(n) && n >= 0 && n <= 255);
-  if (geldigV4 && delen[0] === 127) return 'op-dit-apparaat';
+  if (geldigV4 && delen[0] === 127) return 'rtg-server';
   const priveV4 = geldigV4 && (delen[0] === 10 || (delen[0] === 172 && delen[1] >= 16 && delen[1] <= 31) ||
       (delen[0] === 192 && delen[1] === 168) || (delen[0] === 169 && delen[1] === 254));
   const priveV6 = /^(?:fc|fd)[0-9a-f]{2}:/.test(host) || /^fe[89ab][0-9a-f]:/.test(host);

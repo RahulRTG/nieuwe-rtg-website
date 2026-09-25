@@ -48,7 +48,7 @@ RTG_EXTERNE_AI_UIT=1
 De provider accepteert standaard alleen loopback. `LOCAL_AI_LAN_TOESTAAN=1`
 is een bewuste uitzondering voor een private IP- of hostnaam op het eigen
 netwerk; een publieke host wordt ook met die schakelaar geweigerd. De status
-onderscheidt daarom `op-dit-apparaat` van `eigen-netwerk`.
+onderscheidt daarom `rtg-server` van `eigen-netwerk`. Dat is de server van RTG en nooit het toestel van het lid: `toestel` is gereserveerd voor inferentie in de browser (TOESTEL.md).
 `LOCAL_AI_TOOLS=0` voorkomt dat een tekstmodel ten onrechte tool-calling claimt.
 Zonder `LOCAL_AI_MODEL_VISION` slaat de keten lokaal beeld over; de afbeelding
 wordt nooit stil weggegooid terwijl het model doet alsof het die zag.

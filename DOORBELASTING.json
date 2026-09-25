@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-25T13:47:52.515Z",
-    "commit": "1b945b9a6",
+    "op": "2026-09-25T13:51:25.641Z",
+    "commit": "4220c5acb",
     "boomVuil": false,
-    "boomAnders": 10,
+    "boomAnders": 4,
     "instrument": "scripts/doorbelasting.js",
     "node": "v22.22.2"
   },

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T06:55:09.128Z",
-    "commit": "81a53699a",
+    "op": "2026-09-25T06:55:26.202Z",
+    "commit": "51d6178e1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6837,6 +6837,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "paytegoed.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "payterug.test.js": {

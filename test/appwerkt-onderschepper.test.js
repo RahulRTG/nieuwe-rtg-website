@@ -34,3 +34,11 @@ test('de zin van een weigering komt uit {"error": ...}, en anders is er geen', (
   assert.equal(weigerZin('{"fout":"x"}'), null);
   assert.equal(weigerZin('<html>kapot</html>'), null, 'geen JSON is geen zin');
 });
+
+test('een lange weigering wordt als geheel gelezen, niet afgekapt', () => {
+  const { weigerZin } = require('../scripts/appwerkt');
+  const lang = JSON.stringify({ error: 'Hiervoor heb ik nog je paspoortgegevens nodig; dat vraag ik even.',
+    soort: 'vlucht', ontbreekt: ['paspoortnummer', 'geldig tot', 'nationaliteit'], uitleg: 'x'.repeat(200) });
+  assert.equal(weigerZin(lang), 'Hiervoor heb ik nog je paspoortgegevens nodig; dat vraag ik even.');
+  assert.equal(weigerZin(lang.slice(0, 200)), null, 'zo zag de meter het vroeger: afgekapt is het geen JSON');
+});

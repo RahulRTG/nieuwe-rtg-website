@@ -581,8 +581,10 @@ function luister(page, base, bak) {
     if (s < 400) return;
     const pad = res.url().replace(base, '').slice(0, 80);
     if (s === 401 || s === 403 || s === 404) return;   // een deur is geen defect; bewijs 6 gaat daarover
-    let lijf = '';
-    try { lijf = (await res.text()).slice(0, 200); } catch (e) { lijf = ''; }
+    // de zin eerst uit het HELE antwoord: afgekapt op 200 tekens is het geen JSON meer
+    let vol = '';
+    try { vol = await res.text(); } catch (e) { vol = ''; }
+    const lijf = vol.slice(0, 200);
     if (s === 503 && (CONFIGZINNEN.test(lijf) || /"hoe"/.test(lijf))) bak.config.push(s + ' ' + pad + ' -- ' + lijf.slice(0, 120));
     /* De rem (429) reageert hier op de PROEF: alle browsers van deze meting
        delen een adres. Dat is een eigenschap van het instrument, geen defect. */
@@ -590,7 +592,7 @@ function luister(page, base, bak) {
     /* Een weigering MET een zin (400/409/422/428 en {"error": "..."}) is pas een
        defect als de gebruiker niet te zien krijgt waarom. Of hij hem ziet, kijkt
        bedien() na de tik op het scherm na. */
-    else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(lijf)) bak.weigering.push({ s, pad, zin: weigerZin(lijf) });
+    else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(vol)) bak.weigering.push({ s, pad, zin: weigerZin(vol) });
     else bak.serverfout.push(s + ' ' + pad + (lijf ? ' -- ' + lijf.slice(0, 100) : ''));
   });
 }

@@ -225,6 +225,19 @@ function codemasker(bron) {
     }
     i++;
   }
+  /* EN DE PROGRAMMAWACHT, want die bepaalt of een bestand een PROGRAMMA of een
+     BIBLIOTHEEK is -- en geen toets gaat daarover. Op 25 september 2026 draaide
+     `===->!==` de wacht om in scripts/margeschaal.js (`if (require.main ===
+     module) process.exit(main())`). De `require` in test/margeschaal.test.js
+     startte daarna het omzetprogramma, en dat herschreef de marges van 144
+     bestanden in public/. De motor zette zijn eigen mutatie netjes terug, maar niet
+     wat het gemuteerde programma elders schreef -- en elke toets die daarna werd
+     gemeten, las een veranderde boom. Een uitslag zei hier dus niets over de toets
+     en veel over de schade. Beide vormen (196 keer `===`, 58 keer `!==`) vallen
+     daarom buiten schot; wat er TOCH buiten het gemuteerde bestand verandert,
+     vangt bijwerkingVan() hieronder. */
+  const WACHT = /require\.main\s*[!=]==?\s*module|module\s*[!=]==?\s*require\.main/g;
+  for (let m; (m = WACHT.exec(bron));) uit(m.index, m.index + m[0].length);
   return masker;
 }
 
@@ -392,6 +405,58 @@ const WACHT_MUTATIE = 90000;
 /* `forceer` zet --test-force-exit erbij: de draaier stopt zodra de toetsen klaar
    zijn, ook als er nog een handle openstaat. Alleen gebruikt om NA een time-out te
    achterhalen wat de asserties zeiden -- zie tijdoutMaarMeetbaar(). */
+/* WAT ER BUITEN HET GEMUTEERDE BESTAND IN DE BRON VERANDERT.
+
+   De motor zet zijn eigen mutatie altijd terug (metMutatie), maar een gemuteerd
+   programma kan ELDERS schrijven -- zie de programmawacht in codemasker(). Dat is
+   niet alleen schade aan de werkboom: elke toets die daarna gemeten wordt, leest
+   een andere bron dan die op de stempel staat, en zijn uitslag gaat dan over
+   iets anders dan wat er in MUTATIES.json komt te staan.
+
+   Dus neemt de motor voor elke gemuteerde toets een beeld van de werkboom
+   (gevolgde EN nieuwe bestanden, zonder wat git negeert, zoals server/data/), en
+   kijkt hij na de run wat er anders is. Is er iets anders, dan:
+     - zet hij het terug: een bestand dat al gewijzigd was krijgt zijn inhoud van
+       voor de run, een schoon bestand komt uit git, en een nieuw bestand gaat weg;
+     - is de uitslag `bijwerking`, en die telt als NIET gemeten (norm.js en
+       bewijs.js kennen hem niet als gezakt of overleefd). Een zakker met
+       bijwerking bewijst niet dat de toets gevoelig is: hij kan zijn gezakt op de
+       schade in plaats van op de mutatie. */
+function bronStand(uitgezonderd, wortel = WORTEL) {
+  const r = spawnSync('git', ['status', '--porcelain', '-z', '--untracked-files=all'],
+    { cwd: wortel, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  if (r.status !== 0) throw new Error('git status faalde; zonder beeld van de werkboom meet de motor niet (' + String(r.stderr || '').trim() + ')');
+  const stand = new Map();
+  for (const regel of String(r.stdout).split('\0').filter(Boolean)) {
+    const rel = regel.slice(3);
+    if (!rel || path.join(wortel, rel) === uitgezonderd) continue;
+    let inhoud = null;
+    try { inhoud = fs.readFileSync(path.join(wortel, rel)); } catch (e) { /* verwijderd: inhoud blijft null */ }
+    stand.set(rel, inhoud);
+  }
+  return stand;
+}
+function bijwerkingVan(voor, na) {
+  const gelijk = (a, b) => (a === null || b === null ? a === b : a.equals(b));
+  const paden = [];
+  for (const [rel, inhoud] of na) if (!voor.has(rel) || !gelijk(voor.get(rel), inhoud)) paden.push(rel);
+  for (const rel of voor.keys()) if (!na.has(rel)) paden.push(rel);   // was gewijzigd, is nu weer als in git
+  return paden;
+}
+function herstelBron(voor, paden, wortel = WORTEL) {
+  for (const rel of paden) {
+    const abs = path.join(wortel, rel);
+    if (voor.has(rel)) {
+      const v = voor.get(rel);
+      if (v === null) { try { fs.rmSync(abs, { force: true }); } catch (e) { /* stond er al niet */ } }
+      else fs.writeFileSync(abs, v);
+      continue;
+    }
+    const r = spawnSync('git', ['checkout', '--', rel], { cwd: wortel, encoding: 'utf8' });
+    if (r.status !== 0) fs.rmSync(abs, { force: true });   // niet in git: een nieuw bestand, dus weg
+  }
+}
+
 function draaiToets(bestand, env, wacht, forceer) {
   /* DE REPORTER STAAT VASTGEPIND OP TAP, want deze functie leest de uitslag
      met /^# tests/ en /^not ok/. Tot Node 22 was TAP de standaard zonder TTY;
@@ -1343,6 +1408,7 @@ function proefPuur(naam, posities) {
   for (const rel of modules) {
     const p = path.join(WORTEL, rel);
     const origineel = fs.readFileSync(p, 'utf8');
+    const voor = bronStand(p);           // na de nulmeting: wat die schreef, telt niet als bijwerking
     for (let i = 0; i < diep; i++) {
       for (const op of OPERATOREN) {
         const nieuw = muteer(origineel, op, i);
@@ -1355,6 +1421,13 @@ function proefPuur(naam, posities) {
           if (check.status !== 0) return null;    // mutatie brak de syntaxis: telt niet
           geprobeerd++;
           const na = draaiToets(bestand, null, WACHT_MUTATIE);
+          const schade = bijwerkingVan(voor, bronStand(p));
+          if (schade.length) {
+            herstelBron(voor, schade);
+            return { soort: 'puur', staat: 'bijwerking', module: rel, operator: op.naam + '#' + i, geprobeerd,
+              aantal: schade.length, paden: schade.slice(0, 5),
+              reden: 'met deze mutatie schreef de toets buiten ' + rel + ' in de bron; teruggezet, en de uitslag telt niet' };
+          }
           /* EEN VASTLOPER IS GEEN ZAKKER EN GEEN OVERLEVER. De toets was zonder
              mutatie binnen de tijd groen; komt hij er nu niet uit, dan heeft de
              mutatie het gedrag echt veranderd -- maar de toets heeft niets GEMELD,
@@ -1726,6 +1799,9 @@ module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGAN
      een time-out krijgt SIGKILL en geen SIGTERM (anders blijven er wezen achter
      die poorten vasthouden en latere metingen vervuilen). */
   draaiToets,
+  /* De bijwerkingswacht, zodat test/mutatiebijwerking.test.js hem in een eigen
+     repo kan beproeven in plaats van in deze werkboom. */
+  bronStand, bijwerkingVan, herstelBron,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js
      meldt een bestand aan, muteert het, stuurt SIGTERM en kijkt of het terugstaat. */

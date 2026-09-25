@@ -17,6 +17,7 @@ const { volgendeDag } = require('./dag');
 const { ACTIES } = require('./acties');
 const { toon } = require('./weergave');
 const speelronde = require('./speelronde');
+const { controleer, bevries } = require('./bewaking');
 
 function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   const boek = maakBoek({ db });
@@ -66,13 +67,57 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   /* TERWIJL JE WEG WAS (V4): wie na een paar dagen terugkomt, ziet eerst wat er
      in die dagen gebeurde dat ertoe doet, en niet alleen de stand van nu. */
   function staat(key) {
-    const st = haal(key), voor = st.dag, n = bijrekenen(st);
-    const weg = n >= 2 ? { dagen: n, van: voor, meldingen: st.meldingen.filter(m => m.dag > voor && m.soort !== 'info' && m.soort !== 'rtg').slice(0, 8) } : null;
-    return bewaarEnToon(st, weg);
+    const st = haal(key);
+    if (st.bevroren) return bewaarEnToon(st);
+    return beschermd(st, () => {
+      const voor = st.dag, n = bijrekenen(st);
+      const weg = n >= 2 ? { dagen: n, van: voor, meldingen: st.meldingen.filter(m => m.dag > voor && m.soort !== 'info' && m.soort !== 'rtg').slice(0, 8) } : null;
+      return bewaarEnToon(st, weg);
+    });
   }
 
-  function actie(key, body = {}) {
+  /* Het vangnet om alles wat een leven verandert. Nog niets geboekt: terug naar
+     hoe het was. Wel geboekt: bevriezen, want het journaal gaat niet terug.
+     En kloppen de invarianten na afloop niet, dan ook bevriezen. */
+  function beschermd(st, doe) {
+    const voor = structuredClone(st), volgorde = st.boek.boekVolgorde;
+    try {
+      const r = doe();
+      const schending = r && r.nieuw ? [] : controleer(st, boek);
+      if (!schending.length) return r;
+      bevries(st, schending[0], meld);
+      save();
+      return { status: 409, error: 'Dit leven is bevroren: ' + schending[0] + '.' };
+    } catch (e) {
+      if (st.boek.boekVolgorde === volgorde) {
+        for (const k of Object.keys(st)) delete st[k];
+        Object.assign(st, voor);
+        koppel(st, boek);
+        return { status: 500, error: 'Er ging iets mis bij deze handeling. Er is niets veranderd.' };
+      }
+      bevries(st, 'een handeling brak af nadat er al geboekt was', meld);
+      save();
+      return { status: 500, error: 'Er ging iets mis na een boeking. Dit leven is bevroren om je boeken te beschermen; begin opnieuw.' };
+    }
+  }
+
+  /* V5: een handeling op een leven, met een vangnet eromheen (./bewaking.js).
+     Een verzoek met een `verzoek`-sleutel die al is uitgevoerd, wordt niet
+     nog eens uitgevoerd: wie na een verbroken verbinding opnieuw verstuurt,
+     sluit geen dag twee keer af. */
+  function actie(key, invoer) {
+    const body = invoer && typeof invoer === 'object' && !Array.isArray(invoer) ? invoer : {};
+    if (typeof body.actie !== 'string') return { status: 400, error: 'Die handeling bestaat niet in Magnaat.' };
     const st = haal(key);
+    if (st.bevroren && body.actie !== 'opnieuw') {
+      return { status: 409, error: 'Dit leven is bevroren: ' + st.bevroren.reden + '. Begin opnieuw om verder te spelen.' };
+    }
+    const vk = typeof body.verzoek === 'string' && body.verzoek.length <= 64 ? body.verzoek : null;
+    if (vk && (st.verzoeken || []).includes(vk)) return Object.assign(bewaarEnToon(st), { herhaald: true });
+    return beschermd(st, () => voerUit(key, st, body, vk));
+  }
+
+  function voerUit(key, st, body, vk) {
     bijrekenen(st);
     let r;
     if (body.actie === 'slaap') {
@@ -85,17 +130,18 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     } else if (body.actie === 'opnieuw') {
       if (body.zeker !== true) return { status: 400, error: 'Opnieuw beginnen gooit dit leven weg. Bevestig het met "zeker".' };
       if (body.moeilijkheid != null && !R.MOEILIJKHEID[body.moeilijkheid]) return { status: 400, error: 'Kies licht, normaal of zwaar.' };
-      return bewaarEnToon(haal(key, true, body.moeilijkheid));
+      return Object.assign(bewaarEnToon(haal(key, true, body.moeilijkheid)), { nieuw: true });
     } else if (body.actie === 'moeilijkheid') {
       /* Op de eerste dag, voordat je iets hebt gekozen, gaat er niets verloren: dan kan het zonder bevestiging. */
       if (!R.MOEILIJKHEID[body.stand]) return { status: 400, error: 'Kies licht, normaal of zwaar.' };
       if (st.dag !== 1 || st.aanbod) return { status: 400, error: 'De moeilijkheid kies je aan het begin. Wil je het anders, begin dan opnieuw.' };
       if ((st.moeilijkheid || 'normaal') === body.stand) return bewaarEnToon(st);
-      return bewaarEnToon(haal(key, true, body.stand));
+      return Object.assign(bewaarEnToon(haal(key, true, body.stand)), { nieuw: true });
     } else {
       const doe = Object.prototype.hasOwnProperty.call(ACTIES, body.actie) ? ACTIES[body.actie] : null;
       r = doe ? doe(st, body) : { status: 400, error: 'Die handeling bestaat niet in Magnaat.' };
     }
+    if (vk && !(r && r.error)) st.verzoeken = [vk].concat(st.verzoeken || []).slice(0, 20);
     const beeld = bewaarEnToon(st);
     return r && r.error ? r : beeld;
   }

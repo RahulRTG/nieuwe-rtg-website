@@ -12,9 +12,11 @@ const R = require('./regels');
 const B = require('./regels-bedrijf');
 const { werkminuten } = require('./team');
 const { waarVan, vraagPerWeek, geblokkeerd } = require('./voorraad');
+const { aandelen } = require('./markt');
+const M = require('./regels-markt');
 
 const KOSTEN = { software: 'Software', personeel: 'Loon van je team', inhuur: 'Freelancers', werkplek: 'Werkplekken',
-  inkoopwaarde: 'Inkoopwaarde van wat je verkocht', korting: 'Korting aan klanten', financiering: 'Voorfinanciering', kvk: 'Inschrijving' };
+  inkoopwaarde: 'Inkoopwaarde van wat je verkocht', huisvesting: 'Huisvesting', korting: 'Korting aan klanten', financiering: 'Voorfinanciering', kvk: 'Inschrijving' };
 
 /* Het loon dat je team in dit venster krijgt: op elke vrijdag, en op de dag na
    iemands laatste werkdag. */
@@ -33,6 +35,7 @@ function teamLoon(st, van, tot) {
       if (e >= van && e <= tot) som += Math.round(minuten * m.uurloon / 60);
       vorige = Math.max(vorige, eind);
     }
+    if (st.vestiging && st.vestiging.wijk !== 'thuis') continue;
     for (let d = m.werkplekVolgende; d <= tot && (m.einde == null || d <= m.einde); d += B.WERKPLEK.elke) if (d >= van) som += B.WERKPLEK.bedrag;
   }
   return som;
@@ -55,6 +58,8 @@ function prognose(st) {
       if (d.fase === 'overeenkomst' && d.voorschotDag && !d.voorschotOntvangen && binnen(d.voorschotDag)) erin += d.afspraak.voorschotBedrag;
     }
     eruit += teamLoon(st, van, tot);
+    const v = st.vestiging, huur = v ? M.WIJKEN[v.wijk].huur : 0;
+    if (huur && v.volgende != null) for (let d = v.volgende; d <= tot; d += R.PERIODE) if (d >= van) eruit += huur;
     kas += erin - eruit;
     weken.push({ week: w + 1, van, tot, in: erin, uit: eruit, eind: kas });
   }
@@ -86,7 +91,7 @@ function bedrijfExtra(st) {
       product: w.naam, leverancier: w.leverancier, inkoop: w.inkoop, advies: w.advies, minimum: w.minimum,
       gestart: !!h, prijs: h ? h.prijs : w.advies, voorraad: h ? h.voorraad : 0, onderweg: st.leveringen.reduce((s, l) => s + l.aantal, 0),
       verkocht: h ? h.verkocht : 0, gemist: h ? h.gemist : 0, omzet: h ? h.omzet : 0, marge: h ? h.omzet - h.verkocht * w.inkoop : 0,
-      perWeek: Math.round(vraagPerWeek(st) / 100) / 10, geblokkeerd: geblokkeerd(st)
+      perWeek: Math.round(vraagPerWeek(st) / 100) / 10, geblokkeerd: geblokkeerd(st), aandeel: h ? aandelen(st).jij : null
     } : null,
     kosten: kostenPerSoort(st)
   };

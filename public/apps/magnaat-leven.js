@@ -40,7 +40,8 @@
     var t = q('#vnTempo');
     if (t && !t.options.length) t.innerHTML = s.tempo.standen.map(function (x) { return '<option value="' + esc(x) + '">' + esc(x) + '</option>'; }).join('');
     if (t) t.value = s.tempo.stand;
-    q('#vnKlok').textContent = 'Week ' + s.week + ' · nog ' + duur(s.vrijVandaag) + ' vrij vandaag · de dag loopt vanzelf af over ' +
+    var k = s.kalender;
+    q('#vnKlok').textContent = (k ? k.maand + ', ' + k.seizoen + ', ' + k.weer + ' · ' : '') + 'Week ' + s.week + ' · nog ' + duur(s.vrijVandaag) + ' vrij vandaag · de dag loopt vanzelf af over ' +
       Math.ceil(s.volgendeDagOver / 60000) + ' min, of sluit hem zelf af';
   }
 

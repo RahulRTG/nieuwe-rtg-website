@@ -110,7 +110,15 @@ const NAGEKEKEN = {
   'POST /api/samen/mee': 'een samen-code werkt als een uitnodigingslink: wie hem heeft mag meedoen, en hij komt binnen onder zijn eigen codenaam. De kamer is vol bij twaalf',
   'POST /api/samen/staat': 'de stand van een kamer waarvan je de code hebt; zelfde code-is-de-sleutel als hierboven',
   'POST /api/theater/kanaal/aanmeld': 'theaterKanaalMaak(req.session.key, ...) meldt een NIEUW kanaal aan voor B zelf',
-  'POST /api/veiligheid/rust/aan': 'zet de rustmodus van B (rustAan(req.session.key, ...)); het id uit het lijf is verrijking die de route niet leest'
+  'POST /api/veiligheid/rust/aan': 'zet de rustmodus van B (rustAan(req.session.key, ...)); het id uit het lijf is verrijking die de route niet leest',
+
+  /* DE DERDE OOGST (25 september 2026): vijf nieuwe kandidaten bij een verse
+     meting, alle vijf B die iets van B doet. */
+  'POST /api/connect/kring': 'connect.kringZet(huidig, gewenst) is een ZUIVERE berekening over twee kringnamen uit het lijf; er wordt geen opgeslagen object gelezen of geschreven',
+  'POST /api/meet/maak': 'meet.meetMaak(req.session.key, ...) maakt een NIEUWE vergadering voor B; het id uit het lijf wijst niets aan',
+  'POST /api/mijn/post/zet': 'commercieel.zet(req.session.key, soort, kanalen) zet B\'s EIGEN posttoestemming per soort; een soort is een categorie en geen object',
+  'POST /api/opvang/vraag': 'de code is de openbare code van een opvang; de aanvraag komt op B\'s eigen codenaam (opvangwijzerVraag(sess, codenaam, ...))',
+  'POST /api/samen/maak': 'samen.maak(req.session.key, codenaam) leest het lijf niet en maakt een NIEUWE kamer voor B'
 };
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;

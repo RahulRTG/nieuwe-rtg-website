@@ -157,6 +157,24 @@
 (() => {
   const $ = s => document.querySelector(s);
   const esc = s => Veilig.esc(String(s == null ? '' : s));
+  /* DE DEUR KIEZEN. Connect heeft een motor met twee deuren
+     (server/functies/register/cat-life2.js). Een gezinslid in FoundationOS heeft
+     geen ledentoken maar een gezinssessie (rtf_sessie), en kreeg hier "Niet
+     ingelogd." (24 september 2026). Een lid gaat voor; anders de gezinsdeur, met
+     code en token in het lijf zoals gezinsPoort ze leest. Bij de aanroep en niet
+     bij het laden, want Veilig komt pas met `defer`. */
+  const gezinsSessie = () => {
+    try {
+      if (localStorage.getItem('rtg_member_token')) return null;
+      const s = JSON.parse(localStorage.getItem('rtf_sessie') || 'null');
+      return s && s.code && s.token ? { code: s.code, token: s.token } : null;
+    } catch (e) { return null; }
+  };
+  const roep = (pad, body) => {
+    const g = gezinsSessie();
+    return g ? Veilig.api(pad.replace('/api/connect/', '/api/rtf/connect/'), Object.assign({}, body || {}, g))
+      : Veilig.api(pad, body);
+  };
   let staat = { schuif: 40, verras: false };
 
   function tekenVondst(p) {
@@ -191,7 +209,7 @@
        met alles wat langskwam, meet aandacht en geen leren. */
     el.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', async () => {
       try {
-        await Veilig.api('/api/connect/open', { id: b.dataset.id,
+        await roep('/api/connect/open', { id: b.dataset.id,
           onderwerp: b.dataset.onderwerp, herkomst: b.dataset.herkomst });
       } catch (e) { /* de ingang gaat voor: een spoor dat niet lukt, houdt de mens niet tegen */ }
       window.location.href = b.dataset.open;
@@ -200,7 +218,7 @@
       el.querySelectorAll('[' + attr + ']').forEach(b => b.addEventListener('click', async () => {
         const onderwerp = b.getAttribute(attr);
         try {
-          await Veilig.api('/api/connect/signaal', { onderwerp, signaal: welk });
+          await roep('/api/connect/signaal', { onderwerp, signaal: welk });
           Veilig.melding('Genoteerd. Dit stuurt wat u ziet en niets anders.');
           laad();
         } catch (e) { Veilig.melding(e.message); }
@@ -221,7 +239,7 @@
     $('#onderwerpen').innerHTML = (kandidaten || []).map(o =>
       '<button class="merk" data-kies="' + esc(o) + '">' + esc(o) + '</button>').join('');
     $('#onderwerpen').querySelectorAll('[data-kies]').forEach(b => b.addEventListener('click', async () => {
-      try { await Veilig.api('/api/connect/signaal', { onderwerp: b.dataset.kies, signaal: 'meer' }); laad(); }
+      try { await roep('/api/connect/signaal', { onderwerp: b.dataset.kies, signaal: 'meer' }); laad(); }
       catch (e) { Veilig.melding(e.message); }
     }));
     $('#mijnOnderwerpen').innerHTML = h.onderwerpen && h.onderwerpen.length
@@ -262,7 +280,9 @@
   async function laad() {
     const plaats = ($('#plaats').value || '').trim();
     try {
-      const d = await Veilig.api('/api/connect/ontdek', { plaats, verras: staat.verras });
+      const d = await roep('/api/connect/ontdek', { plaats, verras: staat.verras });
+      /* Zonder plekken geen "Er is nu niets voor u" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
+      if (!(d && Array.isArray(d.plekken))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
       staat.verras = false;
       teken(d);
       tekenMotoren(d.motoren || []);
@@ -273,9 +293,9 @@
          de volledige stand komt van /horizon -- en dan is de eerste tekening
          werk dat niemand ziet, met een zichtbare sprong in de schuifbalk als
          het tweede antwoord traag is. */
-      tekenHorizon(await Veilig.api('/api/connect/horizon'), d.onderwerpenDieBruggenKennen);
-      tekenDossier(await Veilig.api('/api/connect/dossier'));
-      tekenPortfolio(await Veilig.api('/api/connect/portfolio'));
+      tekenHorizon(await roep('/api/connect/horizon'), d.onderwerpenDieBruggenKennen);
+      tekenDossier(await roep('/api/connect/dossier'));
+      tekenPortfolio(await roep('/api/connect/portfolio'));
     } catch (e) {
       $('#lijst').innerHTML = '<p class="stil">' + esc(e.message) + '</p>';
     }
@@ -283,7 +303,7 @@
 
   function start() {
     $('#schuif').addEventListener('change', async () => {
-      try { await Veilig.api('/api/connect/schuif', { schuif: Number($('#schuif').value) }); laad(); }
+      try { await roep('/api/connect/schuif', { schuif: Number($('#schuif').value) }); laad(); }
       catch (e) { Veilig.melding(e.message); }
     });
     /* "Verras me" verzet de instelling NIET -- hij geldt voor dit ene verzoek.
@@ -294,7 +314,7 @@
        bij het openen van het scherm. Zie de kop van kern/connect/werkbij.js. */
     $('#werkBij').addEventListener('click', async () => {
       try {
-        const r = await Veilig.api('/api/connect/werk');
+        const r = await roep('/api/connect/werk');
         Veilig.melding(r.nieuw && r.nieuw.length
           ? r.nieuw.length + ' bewijsstuk(ken) erbij uit uw eigen werk.'
           : (r.geenBron ? r.reden : 'Er kwam niets nieuws bij; wat er is, stond er al.'));

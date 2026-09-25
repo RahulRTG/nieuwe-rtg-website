@@ -197,6 +197,8 @@ async function laad(){
   try{
     LIJST = await api('/bevoegdheden');
     MIJN = await api('/mijn');
+    /* Zonder lijsten geen "Er staat niemand naast u" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
+    if(!(LIJST && Array.isArray(LIJST.bevoegdheden) && MIJN && Array.isArray(MIJN.team) && Array.isArray(MIJN.ikSta) && Array.isArray(MIJN.log))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     teken();
   }catch(e){ $('#team').innerHTML='<p class="leeg">'+esc(e.message)+'</p>'; }
 }

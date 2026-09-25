@@ -65,7 +65,7 @@ test('een leven dat voorbij is, staat stil: geen handelingen, de klok loopt niet
   const p = slechtSpel('zwaar');
   const dag = p.st().dag;
   const s = p.L.staat(p.key);
-  assert.deepEqual(s.vandaag.volgende, [], 'de Edge biedt niets meer aan');
+  assert.deepEqual(s.vandaag.volgende.map(a => a.actie), ['oordeel'], 'de Edge biedt niets meer aan, behalve zeggen hoe het speelde');
   assert.match(s.verhaal.einde.tekst, /Op dag \d+ was het voorbij: je huur stond 21 dagen open/);
   assert.deepEqual(s.wereld.voorbij, p.st().voorbij);
   const r = p.L.actie(p.key, { actie: 'slaap' });

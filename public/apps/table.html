@@ -94,7 +94,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
 });
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('table'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
+  let d; try{ d=await api('table'); /* Ontbreekt een veld, dan de eigen foutmelding hieronder -- nooit een lege lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */ if(!(d && Array.isArray(d.events))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
   DATA=d;
   if(open){ const e=d.events.find(x=>x.id===open); if(e) return detail(e); open=null; }
   let h='<div class="deel">Nieuwe gelegenheid</div><div class="kaart"><h2>Nieuwe gelegenheid</h2><span class="lbl">Naam</span><input class="veld" id="nN" placeholder="Bijv. Zomerdiner"><div class="rij h-mt40"><input class="veld" id="nD" type="date"><input class="veld" id="nT" type="time"><input class="veld" id="nL" placeholder="locatie"></div><div class="h-mt60"><button class="knop" id="nDoe">Aanmaken</button></div></div>';

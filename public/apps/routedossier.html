@@ -314,6 +314,8 @@
       const d = await haal({ zoek: $('#zoek').value.trim(), schakel,
         staat: $('#staat').value, pagina, limiet: 40 });
       if (!d) return;
+      /* Onvolledig antwoord: de melding hieronder, niet een ruwe TypeError in de lijst (LIEGRONDE.json). */
+      if (!(Array.isArray(d.schakels) && d.perSchakel && typeof d.perSchakel === 'object' && d.lijst && Array.isArray(d.lijst.resultaten))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
       window.__routes = d.routes;
       tekenAssen(d); tekenSamenvatting(d); tekenFilteruitleg(d.lijst); tekenLijst(d.lijst);
     } catch (e) {

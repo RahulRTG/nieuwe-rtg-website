@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T12:30:03.539Z",
-    "commit": "547cbffe6",
+    "op": "2026-09-25T13:50:55.472Z",
+    "commit": "58fb26410",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -493,6 +493,22 @@
       "module": "server/kern/mobiliteit/appbrug.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "appcluster.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/appcluster.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "appcontract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bewijsbron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "appstore-bereik.test.js": {
@@ -1032,6 +1048,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "bestemming.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bestemming.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "betaaldienst.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1115,6 +1139,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 13,
       "scherp": "gezakt"
+    },
+    "bevoegdronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bevoegdronde.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "bevrust.test.js": {
       "soort": "puur",
@@ -1999,6 +2031,13 @@
       "operator": "getal+1#2",
       "gezakt": 1,
       "geprobeerd": 5
+    },
+    "connect-gezinsdeur.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "connect-routes.e2e.js": {
       "soort": "server",
@@ -3206,6 +3245,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "foutindeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/foutindeling.js",
+      "operator": "false->true#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "foutmelder-dekking.test.js": {
       "soort": "puur",
@@ -5013,6 +5060,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "liegronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/liegronde.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "life-schakelbaar.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5145,6 +5200,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "lusproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bewijsbron.js",
+      "operator": "===->!==#1",
+      "gezakt": 1,
+      "geprobeerd": 8
     },
     "lussen.test.js": {
       "soort": "puur",
@@ -5419,6 +5482,21 @@
       "operator": "!==->===#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "magnaatspeelronde.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatspeelronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 6,
+      "geprobeerd": 2
     },
     "magnaatwereld.test.js": {
       "soort": "puur",
@@ -10309,6 +10387,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "wereldcompositor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wereldcompositor.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 5
+    },
     "wereldkern.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10512,6 +10598,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 11,
       "scherp": "gezakt"
+    },
+    "werkrol.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wereldregister.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "werkruimte-kantoor.test.js": {
       "soort": "puur",

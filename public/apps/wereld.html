@@ -666,6 +666,8 @@
 
   function start() { return api('/state', {})
     .then(function (d) {
+      /* Onvolledig antwoord: langs de foutweg hieronder, niet om vallen (LIEGRONDE.json). */
+      if (!(d && Array.isArray(d.modi))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
       staat.modus = d.modus; staat.lens = d.lens || 'friends'; staat.modi = d.modi; staat.kaart = d.koppelkaart || {};
       staat.vermogens = d.vermogens || []; staat.lenzen = d.lenzen || [];
       $('#membership').hidden = staat.weergave !== 'feed'; $('#livingAccess').hidden = true;

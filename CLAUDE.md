@@ -278,21 +278,29 @@ drukken. De zes vragen per bewijsstuk (`stelt`, `nietZegt`, `doorWie`, `graad`,
 `werkwoord`, `herkomst`) gebruiken met opzet de woorden van
 `kern/carriereledger/regels.js` en geen tweede vocabulaire.
 
-**`POLITIEK.md` is de democratische lus van FoundationOS** (werknaam
-PolitiekOS): een mens wordt niet alleen gehoord, hij kan volgen wat er daarna
-gebeurt. Het is een richtingsdocument (staat / een stap weg / vraagt een besluit
-/ jaren weg), en de eerste correctie is dat het **twee lagen** zijn en niet een.
-De burgerlaag (welkom, bijeenkomst, luisteren, samen maken, doen, terugkoppeling)
-woont in FoundationOS en is **partijneutraal**. De partijlaag (leden, congres,
-programma) woont bij de partij zelf, als klant, tegen de gewone prijs, want gratis
-gebruik is een gift aan een partij, en de eigenaar van RTG wil zelf een partij
-oprichten (MN-01/MN-02). Bijna elke stap bestaat al in een ander domein, dus het
-werk is aansluiten: `livinglab/vraagbesluit.js` IS al *Niemand kwijt* voor een
-domein. `zaak` en `tafel` zijn ernstig bezet, dus de kern heet voorlopig
-`kwestie`. Acht grenzen (PO-01 t/m PO-08), waarvan er drie vóór de eerste
-AI-functie een handhaver moeten krijgen: partijneutraal, geen kiezersprofiel, en
-geen overtuigingsmachine. Voor dat laatste bestaat vandaag in het hele huis geen
-centrale regel.
+**`POLITIEK.md` is het masterplan voor DemocratieOS en de partij** -- twee
+projecten die bewust uit elkaar worden gehouden: DemocratieOS (werknaam) is
+partijneutrale burgerinfrastructuur in FoundationOS voor burgers, organisaties,
+overheden en alle partijen, en een toekomstige partij van de eigenaar is daarop
+een gewone deelnemer, als klant en met exact dezelfde rechten. Dat moet
+technisch gelden, ook als de oprichter RTG bezit. Twee proeven houden het
+eerlijk: P1 (de partij verdwijnt en DemocratieOS draait door) is machinaal te
+bewijzen, P2 (de oprichter verdwijnt uit RTG en de partij draait door) maar half
+-- de rest staat in statuten en contracten, en dat staat er liever dan een groen
+vinkje. Dertien grondwetsregels (DO-01 t/m DO-13) met per regel wie hem vandaag
+handhaaft (meestal niemand), een lus van twaalf stappen waarvan bijna elke stap
+al in een ander domein staat (`livinglab/vraagbesluit.js` IS al *Niemand kwijt*
+voor een domein), en een kwestie die niets bezit en alleen verwijst. Let op de
+namen: `zaak` en `tafel` zijn ernstig bezet (de kern heet `kwestie`),
+**`toezegging` is een financiele belofte van het mecenaat** in de geldgraaf (de
+politieke heet `politiekeToezegging`), en `partij` is een contractpartij of een
+potje (`politiekePartij`). De scherpste regels: er is geen overtuigings-API en
+dat is geen promptfilter maar een capability die niet bestaat, volgorde is ook
+een rangorde (dus nooit alfabetisch of op zetels), en een toets beschermt tegen
+vergissingen en niet tegen de eigenaar -- de echte bescherming van de grondwet
+zit in statuten, een extern verankerd wijzigingslog en review die ook voor
+beheerders geldt. Wetgeving (Wfpp, de aanstaande Wpp) komt er als
+`POLITICAL_LAW_PROFILE_NL` met versie en bron in, nooit als constante.
 
 **`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
 Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk

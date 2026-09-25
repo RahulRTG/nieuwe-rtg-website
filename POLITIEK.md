@@ -1,346 +1,533 @@
-# PolitiekOS — de democratische lus van FoundationOS
+# DemocratieOS en de partij — twee projecten, één muur
 
-*Werknaam. Het is geen vijfde wereld en geen partij-app: het is een onderdeel van
-**FoundationOS**, en de publieke naam is nog een besluit (par. 9).*
+*Werknamen. DemocratieOS is geen vijfde wereld maar een onderdeel van
+**FoundationOS**. Het achtervoegsel "OS" dragen verder alleen de vier werelden,
+dus de publieke naam is een besluit (par. 19).*
 
-In één zin: **iemand wordt niet alleen gehoord, hij kan volgen wat er daarna
-gebeurt.** De technologie zorgt ervoor dat een inbreng nooit stil verdwijnt, en
-dat wie tegen een voorstel besluit, laat zien waarom.
+Dit document beschrijft **twee projecten die bewust uit elkaar worden gehouden**:
 
-> Welkom → Ontmoeten → Luisteren → Samen begrijpen → Samen maken → Besluiten →
-> Doen → Bewijzen → Terugkomen → (opnieuw)
+1. **DemocratieOS**: neutrale infrastructuur voor burgers, maatschappelijke
+   organisaties, overheden en **álle** democratische partijen.
+2. **Een toekomstige politieke partij**: één gewone deelnemer aan dat systeem,
+   met exact dezelfde rechten als elke andere partij. Dat moet **technisch**
+   gelden, ook als de oprichter RTG bezit.
 
-Lees dit document vóór je iets bouwt waarmee een mens een maatschappelijke vraag
-inbrengt, anderen ontmoet om erover te praten, of een besluit terugkrijgt.
-`LEVEN.md` par. 2, `LIFE.md` par. 4, `FOUNDATION.md` par. 5 en `HDI.md` par. 5
-staan er onverkort boven; wat hier staat komt daar bovenop.
+De zin die boven alles staat:
 
-Zoals `HDI.md`, `PLATFORM.md` en `ECONOMIE.md` is dit een richtingsdocument: per
-onderdeel staat er of het **staat**, **een stap weg** is, **een besluit vraagt**
-of **jaren weg** is.
+> **DemocratieOS stelt mensen beter in staat zelf politieke keuzes te maken. Het
+> systeem maakt die keuzes niet voor hen.**
+
+Lees dit vóór je iets bouwt waarmee een mens een maatschappelijke kwestie
+inbrengt, een bijeenkomst organiseert, een politiek voorstel volgt of een besluit
+terugkrijgt. `LEVEN.md` par. 2, `LIFE.md` par. 4, `FOUNDATION.md` par. 5, `HDI.md`
+par. 5 en `MENSNETWERK.md` (MN-01 t/m MN-03) staan er onverkort boven.
+
+Zoals `HDI.md` en `ECONOMIE.md` is dit een richtingsdocument: per onderdeel staat
+er of het **staat**, **een stap weg** is, **een besluit vraagt** of **jaren weg**
+is.
 
 ---
 
-## 0. De eerste correctie: twee lagen, niet één
+## 0. Wat er sinds versie 1 veranderde
 
-Het voorstel beschrijft één systeem. Juridisch en in de architectuur zijn het er
-twee, en wie ze samenvoegt, bouwt precies wat dit huis op drie plekken al
-weigert.
+- **Het plan is groter dan één partij.** Versie 1 splitste een burgerlaag van een
+  partijlaag. Nu is die burgerlaag een eigen project (DemocratieOS) met een eigen
+  grondwet, en is de partij een klant zoals elke andere.
+- **Een correctie op versie 1: `toezegging` is bezet.** Het woord draagt in 69
+  bestanden een *financiële* belofte: de open giften van het mecenaat in
+  `server/kern/geldgraaf/bronnen.js`, `server/kern/geldwereld.js` en
+  `server/kern/levensgraaf/bronnen2.js`, met `soort: 'toezegging'`. Een politieke
+  belofte onder dezelfde naam is precies de `VERMOGENS`-botsing. De code heet
+  daarom **`politiekeToezegging`** (nul treffers). Op het scherm mag het gewoon
+  "toezegging" heten, want een codenaam en een schermnaam hoeven niet gelijk te
+  zijn.
+- **`partij` is ook bezet**: het woord staat in 283 bestanden, vooral als partij
+  bij een contract en als potje in een spel (`kern/spellen/partij.js`). In de code
+  heet het daarom `politiekePartij`.
 
-| Laag | Wat erin zit | Waar het woont | Waarom daar |
+---
+
+## 1. Drie rechtspersonen, één muur
+
+| | Wat het is | Wat het nooit is |
+|---|---|---|
+| **RTG** | commercieel bedrijf en technologische infrastructuur | politieke actor |
+| **RTFoundation / DemocratieOS** | partijneutrale burgerinfrastructuur | campagne-instrument, leadgenerator |
+| **De partij** | een zelfstandige vereniging | een afdeling van RTG of RTF |
+
+De partij heeft alles zelf: bankrekening, boekhouding, ledenadministratie,
+personeel, bestuur, contracten, data, domeinen, communicatie, AI-context,
+authenticatie en analytics. Er is **geen gedeelde politieke dataset**. Koopt de
+partij commerciële diensten van RTG, dan gebeurt dat tegen de voorwaarden die voor
+elke vergelijkbare klant gelden (`TENANT.md`: *`org` IS de klant*).
+
+### 1.1 De twee onafhankelijkheidsproeven
+
+Neutraliteit is pas bewezen als deze twee proeven slagen:
+
+| Proef | Wat hij vraagt | Machinaal te bewijzen? |
+|---|---|---|
+| **P1: de partij verdwijnt** | draait DemocratieOS volledig door zonder die ene partij? | **ja.** Alle DemocratieOS-toetsen draaien met een **leeg partijenregister** en met een register van drie willekeurige partijen, en de uitkomst is gelijk. Kent de code een partij bij naam, dan zakt hij (DO-03) |
+| **P2: de oprichter verdwijnt uit RTG** | kan de partij doorgaan als de oprichter geen enkele functie in RTG meer heeft? | **alleen gedeeltelijk.** De partij draait buiten deze repository. Wat dit huis kan bewijzen: de uitgang van een tenant (export, opzegging, overdracht) werkt zonder medewerking van één persoon, en geen enkele bevoegdheid van de partij hangt aan de identiteit van de oprichter (MN-01 is daar de proefopzet voor). De rest is juridisch en organisatorisch, en dat staat er liever eerlijk bij dan als groen vinkje |
+
+---
+
+## 2. De grondwet van DemocratieOS
+
+Elke regel draagt wie hem vandaag handhaaft. Een regel zonder handhaver is een
+zin, geen regel (`LAT.md` regel 13). Waar een functie botst met een regel,
+vervalt de functie.
+
+| Code | Regel | Wat er al staat | Handhaver vandaag |
 |---|---|---|---|
-| **De burgerlaag** | welkom, bijeenkomst, luisteren, samen maken, doen, terugkoppeling, de meter *Niemand kwijt* | **FoundationOS** (RTFoundation) | het is maatschappelijke infrastructuur, open voor iedereen, **partijneutraal** |
-| **De partijlaag** | leden, congres, fractie, het eigen verkiezingsprogramma, de eigen besluitkamer | **bij de partij zelf**, als klant (`TENANT.md`: *`org` IS de klant*) | een partij is een vereniging met eigen rechtspersoon, eigen geld en eigen data |
+| **DO-01 Menselijke waardigheid** | geen mens wordt score, doelgroep of politiek profiel | CAR-05, `scripts/lib/cijferopmens.js` | **gedeeltelijk**: de scan dekt deze map nog niet |
+| **DO-02 Niemand kwijt** | elke kwestie heeft een aantoonbaar vervolg of een gemotiveerde eindstand | `server/kern/livinglab/vraagbesluit.js` voor één domein | **niemand**: de meter komt in fase B |
+| **DO-03 Gelijke partijrechten** | de infrastructuur kent geen favoriete partij | — | **niemand**: fase C |
+| **DO-04 Geen eigenaarprivilege** | RTG, de oprichter en zijn partij krijgen geen bijzondere politieke capability | MN-01 (`test/mn01-bevoegdheidsvoordeel.test.js`) als vorm | **niemand** voor dit domein |
+| **DO-05 Geen politieke microtargeting** | Foundation-, Living-, Service-, RTG- en kwestiedata worden nooit gebruikt om politieke overtuigbaarheid te voorspellen | `server/kern/bureau/relaties.js` en `server/kern/vonk/selectie.js` weigeren politieke voorkeur lokaal | **gedeeltelijk** |
+| **DO-06 AI adviseert, mensen besluiten** | Rahul stelt voor, een mens besluit | `FABRIC.md`, `server/kern/stuur/beleid.js` | **staat** voor het huis, niet voor dit domein |
+| **DO-07 Geen algoritmische winnaar** | geen partijscore, geen betrouwbaarheidsranglijst, geen stemadvies | — | **niemand** |
+| **DO-08 Herleidbaar bewijs** | een publieke feitelijke bewering gaat waar mogelijk terug naar bron, berekening en aanname | `server/kern/livinglab/graden.js`, `server/kern/fiscaal/herkomst.js` als vorm | een stap weg |
+| **DO-09 Macht is zichtbaar** | wie besloot, met welke bevoegdheid en wanneer | `server/kern/stadsweefsel/besluitvorming.js` | **staat** voor de stad |
+| **DO-10 Geschiedenis wordt niet herschreven** | een correctie is een nieuwe gebeurtenis | `server/lib/keten.js` | **staat** als primitief, niet aangesloten |
+| **DO-11 Toegankelijkheid is fundamenteel** | B1, meertaligheid, screenreader, grote tekst | `TOEGANKELIJK.md`: er is **geen B1-laag** | poorten voor contrast en structuur, niet voor taal |
+| **DO-12 Offline telt even zwaar** | een gesprek in het buurthuis is geen tweederangs inbreng | — | **niemand** |
+| **DO-13 Zelf kiezen** | het systeem levert informatie, de burger neemt de politieke beslissing | — | draagt DO-07 en par. 9 |
 
-Drie redenen, en elk is op zichzelf genoeg:
-
-1. **Geld.** Een ANBI-stichting die één partij helpt, zet haar eigen status op het
-   spel. De economische firewall (`server/kern/economie/firewall.js`) weigert een
-   stroom tussen werelden zonder grondslag. `GIFT.md` zegt bovendien dat de
-   RTFoundation nog geen positie heeft om geld op te ontvangen.
-2. **Gift in natura.** Gebruikt een partij de software van de stichting of van RTG
-   gratis of met korting, dan is dat een gift aan een politieke partij. Die valt
-   onder de meldplicht van de Wet financiering politieke partijen. De uitweg
-   staat in grens **PO-01**: de burgerlaag is voor elke partij, raad en elk
-   initiatief gelijk, en de partijlaag betaalt de gewone prijs.
-3. **De eigenaar.** De eigenaar van RTG wil zelf een partij oprichten. Precies
-   daarvoor bestaan MN-01 (geen bevoegdheidsvoordeel, ook niet voor de eigenaar)
-   en MN-02 (kennis uit hoedanigheid A gaat niet stilzwijgend mee naar
-   hoedanigheid B) in `MENSNETWERK.md`. Wat iemand bij de stichting inbrengt,
-   bereikt de partij van de eigenaar nooit, ook niet als "signaal".
-
-Het eigen onderscheid van het voorstel komt daarmee sterker terug in plaats van
-zwakker. Omdat de lus niet van één partij is, kan elke partij er haar beloften in
-laten volgen. Dan wint een partij die haar beloften nakomt, en niet een partij die
-het platform bezit.
+Een bijzonder punt bij DO-12: offline inbreng wordt door een **mens** ingevoerd
+(een gastheer, een vrijwilliger). Hij krijgt de herkomst `ter-plaatse` en weegt in
+elke telling exact even zwaar. De herkomst is er om te kunnen nagaan, niet om te
+wegen.
 
 ---
 
-## 1. Wat er al staat
+## 3. De universele lus
 
-De meting (een verkenning door de bronboom, lexicaal en dus graad `vermoed`)
-vindt geen enkele module die "politiek" heet. Voor bijna elke stap van de lus is
-er wel een module die hem al doet, alleen in een ander domein: de Living Lab, het
-Stadsweefsel (de stad als klant), de RTFoundation-kernel en RTG Service. **Het werk
-is dus aansluiten en niet uitvinden**, dezelfde conclusie als in `HDI.md` par. 1.
+> WELKOM → KWESTIE → LUISTEREN → BIJEENKOMST → BEWIJS → MOGELIJKHEDEN → VOORSTEL →
+> BESLUIT → ACTIE → RESULTAAT → TERUGKOPPELING → HEROPENEN
+
+Bijna elke stap bestaat al in een ander domein. **Het werk is aansluiten, niet
+uitvinden** (dezelfde conclusie als `HDI.md` par. 1).
 
 | Stap | Wat er al staat | Stand |
 |---|---|---|
-| **Welkom** | `public/apps/foundation/os-publiek.html` + `server/kern/rtfos/publiek.js`: "RTFoundation in jouw buurt", zonder code of inlog. `server/routes/rtfos/voordeur.js`: een publieke ingang zonder account, met twee remmen. | **een stap weg**: er is een deur, maar geen deur voor *"wat speelt er bij jou?"* |
-| **Ontmoeten** | `server/kern/genootschap/bijeenkomst.js`: datum, plek en wie er komt, zonder sociale druk, met "misschien" als eigen antwoord. `server/kern/rtfos/activiteiten.js`: buurtmaaltijden en inloopuren, met wachtlijst, check-in en ouderlijke toestemming. `server/translate/` voor vertaling, `server/kern/toegankelijk.js` voor het toegankelijkheidsprofiel. | **een stap weg**: bijeenkomsten bestaan, maar niet rond een *kwestie* |
-| **Luisteren** | `server/kern/stadsweefsel/inspraak.js`: een codenaam per bewoner per raadpleging, vrije tekst gaat nooit de AI-dataset in, *"nooit wie wat vond"*. `server/kern/rtfos/gemeente.js`: telt zonder te lezen, en een buurt met minder dan vijf wordt samengevoegd. `server/kern/service/patroon.js`: meldingen die hetzelfde zeggen worden een *vermoeden*, en een mens bevestigt. | **staat**, verspreid over drie domeinen. Wat ontbreekt: *"genoemd in drie wijken"* over een kwestie heen |
-| **Samen begrijpen / maken** | `server/kern/livinglab/werkplaats.js`: taken, documenten met versies, een besluitenlog. `server/kern/livinglab/ai.js`: Rahul als onderzoekscoach, die wijst op wat het tegendeel zou bewijzen, met een plafond in code. | **een stap weg**. Er is **geen B1-laag** (`TOEGANKELIJK.md` zegt het met zoveel woorden) en geen tegenargumentenzoeker |
-| **Beleidslab** | `server/kern/command/simulatie.js`: wat-als met de aannames in de uitslag. `server/kern/stadsweefsel/simulatie.js`: vier scenariovormen. `server/kern/livinglab/graden.js`: het bewijsplafond waarvan het laagste wint. `server/kern/fiscaal/regelwacht.js`: regels per jaargang. | **jaren weg** voor "wie profiteert, welke wet, wat kost het". De losse bouwstenen staan |
-| **Besluiten** | `server/kern/stadsweefsel/besluitvorming.js`: voorstel → advies → stemmen per fractie. Een advies staat naast het besluit, en de uitslag wordt bij het sluiten vastgelegd en niet bij elke weergave herrekend. `server/kern/rtfos/bestuur.js`: quorum, en wie een belang heeft stemt niet. `server/kern/rtfos/zetels.js`: de enige plek waar bevoegdheid wordt uitgedeeld. `server/kern/overheid/bestuur.js`: stemmen achter `volwassen()` (A3, 18+). | **staat**, voor de stad en de stichting. Voor een partij hoort het in de partijlaag (par. 0) |
-| **Doen** | `server/kern/rtfos/vrijwilligers-inzet.js`: matching, uren, evaluatie. `server/kern/rtfos/projecten.js` ("Samen aan een project"). `server/kern/rtfos/ruil.js` (Buurtruil). | **een stap weg**: alles loopt via de organisatie van de stichting, niets begint bij de burger zelf |
-| **Belofteboek** | `server/lib/keten.js`: een journaal met een hashketen, waarvan het verleden niet stil te herschrijven is. `server/kern/livinglab/conclusielijn.js`: de geschiedenis van een conclusie, die alleen aangroeit. `server/kern/rtgone.js` kent een `belofte` met eigenaar en deadline, maar zonder geschiedenis. | **een stap weg**: de keten staat, het register niet |
-| **Bewijzen** | `server/kern/stadsweefsel/rekenkamer.js`: *"feiten en vragen, geen cijfer en geen stoplicht — een systeem dat zijn eigen projecten een score geeft, heeft zichzelf tot rechter benoemd"*. `server/kern/livinglab/graden.js`: de ladder aanname → bewezen, waarbij "sterk" en "bewezen" een mens vragen. | **staat**, en is precies de toon van het voorstel |
-| **Terugkomen** | `server/kern/livinglab/vraagbesluit.js`: elke buurtvraag krijgt een stand en een reden uit een **gesloten lijst**, wordt nooit verwijderd en komt nooit op een ranglijst. `server/kern/ontvanger.js`: een bericht is pas bezorgd als er een bewezen leespad is. `server/kern/service/patroon.js` licht alle gekoppelde melders één keer in. | **staat als patroon**. `vraagbesluit.js` IS *Niemand kwijt* voor één domein |
-
-De vondst die het ontwerp het meest stuurt: **`vraagbesluit.js` heeft de kern van
-het voorstel al**, met dezelfde redenering. *"Een afgewezen vraag die verdwijnt,
-is niet te onderscheiden van een vraag die nooit is gesteld."* Daar begint de
-bouw (par. 8).
+| Welkom | `server/kern/rtfos/publiek.js` (zonder inlog), `server/routes/rtfos/voordeur.js` (zonder account, met twee remmen) | een stap weg |
+| Kwestie | niets; de dunne laag van par. 4 | te bouwen, fase B |
+| Luisteren | `server/kern/stadsweefsel/inspraak.js` (*"nooit wie wat vond"*), `server/kern/rtfos/gemeente.js` (ondergrens van vijf), `server/kern/service/patroon.js` (vermoeden, een mens bevestigt) | staat, verspreid |
+| Bijeenkomst | `server/kern/genootschap/bijeenkomst.js`, `server/kern/rtfos/activiteiten.js`, `server/translate/`, `server/kern/toegankelijk.js` | een stap weg |
+| Bewijs | `server/kern/livinglab/graden.js` (laagste plafond wint), `server/kern/livinglab/conclusielijn.js` | staat als vorm |
+| Mogelijkheden | `server/kern/livinglab/werkplaats.js`, `server/kern/knelpunt/` (vondsten bij een randvoorwaarde, nooit bij een mens) | een stap weg |
+| Voorstel | de aannamelijst (par. 7.2) | te bouwen |
+| Besluit | `server/kern/stadsweefsel/besluitvorming.js`, `server/kern/rtfos/bestuur.js` | staat, per orgaan |
+| Actie | `server/kern/rtfos/vrijwilligers-inzet.js`, `server/kern/rtfos/projecten.js` | een stap weg (DoeNetwerk, par. 6) |
+| Resultaat | `server/kern/stadsweefsel/rekenkamer.js` (*"geen cijfer en geen stoplicht"*) | staat als vorm |
+| Terugkoppeling | `server/kern/ontvanger.js` (pas bezorgd met een bewezen leespad) | staat |
+| Heropenen | — | te bouwen: een nieuwe behandelronde, de oude blijft staan |
 
 ---
 
-## 2. Namen: de helft is bezet
+## 4. De kwestie: de dunne laag
 
-Dezelfde les als `vermogens`, `moment` en `envelop`: een centraal woord dat al een
-andere betekenis heeft, kost later meer dan het nu kost om te hernoemen. De
-tellingen zijn lexicaal (bestanden die het woord bevatten) en dus een ondergrens.
+**Een kwestie bezit niets. Hij verwijst.**
 
-| Voorgesteld | Al bezet als | Ernst |
+| Waarnaar | Waar het woont |
+|---|---|
+| mens | identiteit en kluis (codenaam, nooit een naam) |
+| bewijs | het bewijsdomein |
+| geld | de geldlaag (`kern/pay/poort.js`) |
+| bijeenkomst | `genootschap/bijeenkomst.js` |
+| besluit | het besluitdomein van het bevoegde orgaan |
+| actie | het DoeNetwerk |
+| toezegging | het register van par. 8 |
+
+Zo ontstaat er geen monsterdatabase: dat is de `journeys`-fout uit
+`TRAVELCOMMERCE.md` en de `humans`-grens uit `HDI.md` par. 5.1. De vorm staat al
+in `server/kern/service/zaak.js` (*een zaak weet waarover het gaat en opent
+niets*).
+
+Een kwestie heeft een tijdlijn met één schrijver, zoals `service/loop.js`:
+
+> KW-000184 — Onveilige oversteek bij school
+> ingebracht → vergelijkbare signalen gevonden → menselijke bevestiging →
+> bijeenkomst gehouden → gemeente reageerde → drie mogelijkheden onderzocht →
+> partijen koppelden voorstellen → besluit → uitvoering → resultaat onderzocht →
+> inwoners geïnformeerd
+
+**Niets verdwijnt, en niets wordt eeuwige waarheid.** Een gesloten kwestie kan
+door nieuwe feiten een nieuwe **behandelronde** krijgen. Die komt als nieuwe regel
+op dezelfde tijdlijn; de vorige ronde blijft ongewijzigd staan.
+
+Eindstanden, als gesloten lijst naar het voorbeeld van `vraagbesluit.js`:
+
+| Eindstand | Wat de inbrenger terugkrijgt |
+|---|---|
+| `uitgevoerd` | wat er is gedaan en wat we over het resultaat weten |
+| `afgewezen` | wie, met welke bevoegdheid, waarom, en de argumenten voor en tegen |
+| `samengevoegd` | de nieuwe kwestie; hij blijft inbrenger |
+| `doorgestuurd` | naar wie, en hoe hij het daar volgt |
+| `onhaalbaar` | de reden uit de lijst |
+| `samen-opgelost` | wat het DoeNetwerk deed; er kwam geen politicus aan te pas |
+| `ingetrokken` | niets meer, want dat is zijn eigen keuze |
+
+---
+
+## 5. De burgerkant: warm, niet als overheidsportaal
+
+De eerste vraag is niet *"Selecteer beleidscategorie"* maar:
+
+> **Welkom. Wat speelt er bij jou?**
+> Ik wil iets vertellen · Ik heb een idee · Ik wil helpen · Ik wil iets begrijpen ·
+> Wat gebeurt er bij mij in de buurt? · Ik wil mensen ontmoeten
+
+Drie regels daaronder:
+- **Luisteren en kijken kan zonder account.** Inbrengen kan met elk account, en
+  een betaalde pas geeft nooit meer gewicht (`WERELDEN.md`: passen bepalen
+  commerciële rechten, en deelnemen is geen commercieel recht).
+- **Geen politieke profilering bij binnenkomst.** Het gebied kiest de mens zelf,
+  zoals in `inspraak.js`. Er wordt geen adres opgezocht.
+- **Een jongere mag meedoen** (`LEVEN.md` par. 2). Stemmen in een formeel besluit
+  gaat langs `volwassen()` in `server/kern/volwassen.js` en krijgt geen eigen
+  kopie van die regel.
+
+---
+
+## 6. DoeNetwerk
+
+Het werkelijk nieuwe onderdeel. De eerste vraag is niet *"welke wet moet
+veranderen?"* maar **"kunnen mensen dit samen oplossen?"**
+
+> mensen vinden → bijeenkomst → rollen → benodigdheden → toestemming →
+> financiering → actie → resultaat → terugkoppeling
+
+Wat er al staat: vrijwilligersinzet, projecten, Buurtruil
+(`server/kern/rtfos/ruil.js`) en de bijeenkomst. Wat ontbreekt: **een actie die bij
+een burger begint** in plaats van bij de organisatie van de stichting. Twee grenzen
+blijven gelden:
+- **Samenstellen en klaarzetten, bevestigen doet de mens** (`LIFE.md`): een
+  uitnodiging aan een ander gaat nooit automatisch.
+- **Geld verlaat het huis nooit vanzelf** (`GELD.md`): financiering wordt
+  klaargezet en een mens voert uit.
+
+Sommige kwesties eindigen nooit bij een politicus. Daar is de eindstand
+`samen-opgelost` voor.
+
+---
+
+## 7. Het politieke protocol
+
+### 7.1 Eén aansluiting voor alle partijen
+
+Elke deelnemende partij publiceert via **hetzelfde schema, dezelfde API-versie en
+dezelfde limieten**. Het schema kent tien soorten: standpunt, voorstel,
+amendement, onderbouwing, dekking, toezegging, stemming, wijziging, uitvoering en
+toelichting.
+
+Er komt geen `if (partij === X) extra()`, en **de build zakt daarop** (DO-03).
+Een partij is gegevens in een register en nooit een tak in de code.
+
+**Het partijenregister is zelf een machtspunt.** Wie bepaalt welke partij mag
+aansluiten, bepaalt het speelveld. Toelating hangt daarom uitsluitend aan een
+**objectief criterium** dat niemand per geval kan kiezen: een bij de Kiesraad
+geregistreerde aanduiding, of een deelname aan een gemeenteraadsverkiezing. Welk
+criterium precies, is een besluit (par. 19). "Wij vinden deze partij niet
+democratisch genoeg" is geen criterium maar een oordeel, en een oordeel hoort bij
+de rechter, niet bij de infrastructuur.
+
+### 7.2 De aannamelijst onder een voorstel
+
+Voordat een partij roept dat iets gaat werken, draagt een voorstel een vaste lijst:
+wat kost het, wie betaalt het, wie profiteert, wie heeft er nadeel van, welke
+regel moet veranderen, wie voert het uit, en welke aannames zijn onzeker. **Elk veld
+staat op `onbekend` tot iemand het met een bron invult.** Een leeg veld is een
+vaststelling en geen oordeel, en het staat voor elke partij op dezelfde plek.
+
+Een echte beleidssimulatiemotor is **jaren weg**. Zonder deze lijst eronder zou hij
+een orakel zijn.
+
+---
+
+## 8. Het toezeggingsregister
+
+Los van partijprogramma's. Een `politiekeToezegging` draagt: wie hem deed,
+wanneer, waar, de **letterlijke bron**, het onderwerp, het bestuursniveau, de
+beoogde termijn, een meetbare formulering (als die er is), latere wijzigingen,
+relevante besluiten en stemmingen, en de toelichting van de partij.
+
+- **Geen score.** Nooit *"betrouwbaarheid partij: 74%"*. De feiten staan er, de
+  burger oordeelt.
+- **Een partij mag uitleggen** waarom iets niet uitvoerbaar bleek. Die toelichting
+  staat naast het feit en vervangt het nooit.
+- **Een wijziging is een nieuwe regel** op `server/lib/keten.js`. Voor een openbaar
+  register hoort het anker buiten de eigen database te liggen
+  (`server/lib/keten-anker.js`; `AFSPRAAK.md`: *een anker in dezelfde database is
+  geen anker*).
+- **Wie de stand zet**, is een besluit. De partij zelf zet nooit "nagekomen"
+  (geen eigen voldoende). Dat vraagt een bron of een besluit van het bevoegde
+  orgaan.
+
+---
+
+## 9. Vergelijken zonder stemadvies
+
+De burger kiest een onderwerp (bijvoorbeeld Wonen). Daarna verschijnen de
+geregistreerde voorstellen van alle partijen, volgens dezelfde presentatieregels.
+De burger kiest zelf waarop hij vergelijkt: kosten, tijdlijn, juridische
+verandering, belastingeffect, uitvoering, onderbouwing, tegenargumenten, eerdere
+stemmingen en toezeggingen.
+
+Drie presentatieregels die makkelijk over het hoofd worden gezien:
+- **Volgorde is ook een rangorde.** Alfabetisch bevoordeelt de A, en "meeste
+  zetels eerst" bevoordeelt de gevestigde partij. De volgorde is daarom de
+  **officiële lijstvolgorde**, of een per bezoek wisselende volgorde waarvan de
+  gebruikte volgorde zichtbaar is. Welke van de twee is een besluit.
+- **Afwezigheid is neutraal.** "Deze partij heeft hierover niets aangeleverd"
+  staat bij elke partij op dezelfde plek en in dezelfde vorm. Het is geen rood
+  vakje.
+- **Geen betaalde plek.** Er is geen manier om hoger, groter of eerder te staan.
+
+Rahul mag zeggen: *"Leg het verschil tussen deze twee voorstellen uit op B1."*
+Rahul zegt nooit: *"Welke partij past het beste bij mij?"*
+
+---
+
+## 10. Rahul als democratische assistent
+
+Rahul krijgt in dit domein een **`kwestieProjectie`**, en nooit automatisch een
+burgerprofiel. Dit is dezelfde vorm als `vondsten(voorwaarde)` in
+`server/kern/knelpunt/`: de functie **kan** geen mens ontvangen, in plaats van dat
+het verboden is.
+
+Toegestaan: B1 maken, vertalen, ontbrekende dekking aanwijzen, ontbrekende
+tegenargumenten aanwijzen, feitelijke verschillen tussen voorstellen uitleggen,
+beweringen zonder bron aanwijzen en uitvoeringsafhankelijkheden noemen.
+
+**Er is geen overtuigings-API, en dat is geen promptfilter: de capability bestaat
+niet.** Een toets zakt zodra in dit domein een route, tool of functie verschijnt
+die een doelgroep, segment of overtuigbaarheid als invoer of uitvoer draagt (de
+woordenlijst op één plek, zoals `scripts/lib/cijferopmens.js`).
+
+B1 gaat alleen via een **lokaal** model (`LOCAL_AI_URL`). De originele tekst blijft
+leidend en de B1-versie draagt het label "vereenvoudigd".
+
+Buiten de code: de EU-verordening over politieke reclame (2024/900) is volgens de
+opgave van de eigenaar sinds 10 oktober 2025 van toepassing, en de AP wijst op de
+transparantie- en privacyverplichtingen. Een jurist bevestigt wat dat voor dit
+domein betekent (par. 20).
+
+---
+
+## 11. De constitutionele suite
+
+Neutraliteit wordt code. De namen hieronder komen van de eigenaar. Elke toets
+krijgt een zelfijking (een met opzet foute invoer die hij moet vinden), want een
+toets die niet kan zakken, meet niets.
+
+| Toets | Wat hij bewijst | Vorm die al bestaat |
 |---|---|---|
-| **Zaak** | een bedrijf of leverancier (`zaakcode` in 194 bestanden, `kern/zaak.js`), plus al vier soorten "casus": servicezaak, stadsweefselzaak, commandzaak, beschermzaak | **ernstig**: de centrale naam van de laag zou de vijfde betekenis worden |
-| **Tafel** | horeca (`tafelticket`, `tafelproef`, `rendezvous-tafels`), in 930 bestanden | **ernstig** |
-| **Belofte** | het doctrinewoord van het hele huis, plus `BELOFTE.md` (het register van productbeloften) | **hoog**: "belofteboek" zou naast `BELOFTE.json` staan |
-| **Werkplaats** | twee betekenissen: RTG Werkplaats (appbureau) en de Living Lab-werkplaats | midden |
-| **Voordeur** | de publieke landing en de beschermzaak-ingang | midden |
-| **Vraagstuk** | de onderzoeksvraag van de Living Lab | **dichtbij in betekenis**: dit kan hetzelfde ding zijn, en dan is het geen botsing maar een aansluiting |
+| `PARTY_CAPABILITY_PARITY` | elke partij heeft exact dezelfde routes, limieten en API-versie | — |
+| `PARTY_DATA_PARITY` | elke partij ziet exact dezelfde gegevens | MN-02-proef (byte voor byte) |
+| `PARTY_AI_PARITY` | Rahul geeft voor verwisselde partijnamen een gelijkwaardig antwoord | `test/aicontext-allowlist.test.js` |
+| `PARTY_PRESENTATION_PARITY` | zelfde velden, zelfde afwezigheidsvorm, volgorde volgens par. 9 | — |
+| `PARTY_PRICE_PARITY` | een partij betaalt wat elke vergelijkbare klant betaalt | `kern/pasladder.js` |
+| `OWNER_NO_ADVANTAGE` | de oprichter en zijn partij krijgen 404 waar ze geen recht hebben | `test/mn01-bevoegdheidsvoordeel.test.js` |
+| `FOUNDATION_PARTY_NEUTRALITY` | de code van dit domein kent geen partij bij naam (proef P1) | — |
+| `NO_POLITICAL_PROFILE` | er bestaat geen veld of afleiding voor politieke voorkeur | `bureau/relaties.js` |
+| `NO_CROSS_WORLD_TARGETING` | geen lezer van andere werelden in dit domein | `server/kern/economie/firewall.js` |
+| `NO_PERSUASION_CAPABILITY` | par. 10 | `scripts/lib/cijferopmens.js` |
+| `NO_PAID_RANKING` | er is geen betaalpad naar zichtbaarheid | — |
+| `ISSUE_PARTY_NEUTRALITY` | een kwestie is van niemand; een partij koppelt, ze eigent zich niets toe | — |
+| `HISTORY_IMMUTABLE` | een correctie is een nieuwe regel | `server/lib/keten.js` |
+| `HUMAN_DECIDES` | geen besluit zonder mens met bevoegdheid | `stadsweefsel/besluitvorming.js` |
+| `NIEMAND_KWIJT` | **0 onverklaard verdwenen** | `vraagbesluit.js`, `scripts/doodspoor.js` |
 
-Voorstel, met het besluit bij de eigenaar (par. 9):
-- **De kern heet `kwestie`.** Als identifier is het vrij (het woord komt alleen in
-  proza voor: "geen smaakkwestie"), en het past op zowel "dit zebrapad" als "hoe
-  organiseren we ouderenzorg". Een codenaam en een schermnaam hoeven niet
-  hetzelfde te zijn, maar op een scherm in FoundationOS waar "zaak" ook "bedrijf"
-  betekent, is "Zaak" verwarrend.
-- **Ontmoeten heet `bijeenkomst`**, en is die van `genootschap/bijeenkomst.js`
-  plus een verwijzing naar de kwestie. Het wordt geen tweede.
-- **Het belofteregister heet `toezegging`.** Het woord "belofte" blijft van de
-  doctrine.
+**NIEMAND_KWIJT wordt huisbreed, en dan als invariant en niet als score.** Hij telt
+kwesties zonder eindstand voorbij hun termijn, eindstanden zonder bewezen leespad
+naar de inbrenger (de fout uit `MAATSTAF.md` par. 7f) en samenvoegingen waarbij
+een inbrenger zoekraakte. De uitkomst is een ratel die alleen omlaag mag. Hij is
+nooit een ranglijst van kwesties, wijken of medewerkers.
+
+Let op de verhouding met `scripts/doodspoor.js`. Die vraagt of een *handeling*
+ergens aankomt, en is een triagelijst. NIEMAND_KWIJT vraagt of een *mens* een
+antwoord kreeg, en is een invariant. Ze delen een vraag, niet een meter.
 
 ---
 
-## 3. De kwestie: één object dat verwijst en niets bezit
+## 12. Onafhankelijk toezicht
 
-Het voorstel zegt: *"alles blijft aan diezelfde Zaak gekoppeld: mensen,
-ervaringen, bewijs, voorstellen, besluiten, geld, uitvoering en resultaten."*
-Dat is goed als het **verwijzen** betekent, en fout als het **bezitten** betekent.
-Een kwestie die mensen, geld en bewijs bezit, is de `journeys`-fout uit
-`TRAVELCOMMERCE.md` en de `humans`-grens uit `HDI.md` par. 5.1 tegelijk.
+Het doel: de oprichter kan de neutraliteitsregels **niet alleen** wijzigen. Dat
+beschermt de andere partijen, en de oprichter zelf tegen de verdenking dat hij de
+spelregels stil heeft veranderd.
 
-De vorm die wél werkt, staat al twee keer:
-- `server/kern/service/zaak.js`: een zaak weet *waarover* het gaat en opent
-  niets. `betrokken` is een soort plus een code, en al het andere gaat weg.
-- `server/kern/levensgraaf/graaf.js`: een projectie met etiketten, geen tweede
-  database.
+**Wat code hier kan, en wat niet.** Wie beheerder is van de repository, kan
+uiteindelijk elke toets verwijderen. Een toets beschermt dus tegen vergissingen,
+niet tegen de eigenaar. Echte bescherming zit in drie lagen daarbuiten:
 
-Wat de kwestie dus zelf draagt:
+1. **Statuten.** Het toezichtsorgaan en zijn vetorecht staan in de statuten van
+   de rechtspersoon die DemocratieOS draagt. Dan is omzeilen een schending van de
+   statuten en geen commit.
+2. **Een openbaar wijzigingslog** van de grondwet (par. 2 en 11), verankerd buiten
+   de eigen database, zodat een stille wijziging achteraf aantoonbaar is.
+3. **Verplichte review in de repository**: de grondwetbestanden krijgen een
+   code-eigenaar uit het toezichtsorgaan, en de branchbescherming geldt ook voor
+   beheerders.
 
-| Veld | Wat | Wat het nooit is |
+De samenstelling (staatsrecht, privacy, cybersecurity, toegankelijkheid,
+burgerparticipatie, technologie) en de procedure (technische review, juridische
+review, onafhankelijke goedkeuring, openbaar log) zijn een besluit.
+
+---
+
+## 13. Het dreigingsmodel
+
+| Wie of wat | Wat hij probeert | Tegenmaatregel |
 |---|---|---|
-| `onderwerp` | de vraag in de woorden van de inbrenger | een categorie waarin een mens wordt ingedeeld |
-| `gebied` | door de inbrenger zelf gekozen (zoals in `inspraak.js`) | een opgezocht woonadres |
-| `tijdlijn` | wat er gebeurde, met één schrijver (zoals `service/loop.js`) | een status die je kunt overschrijven |
-| `verwijzingen` | naar bijeenkomsten, bijdragen, voorstellen, besluiten, toezeggingen, uitvoering en uitkomst, elk in zijn eigen domein | een kopie van die dingen |
-| `inbrengers` | codenamen, met toestemming, alleen om terugkoppeling te sturen | een lijst van mensen die "voor" iets zijn |
-| `eindstand` | uit een gesloten lijst, met reden (par. 7) | leeg zonder dat iemand het ziet |
-
-Een kwestie mag **groeien** (samenvoegen, opschalen van buurt naar land). Bij het
-samenvoegen gaan de inbrengers van beide kwesties mee: een samengevoegde kwestie
-die de oorspronkelijke inbrenger kwijtraakt, is de stille verdwijning die deze
-laag moet voorkomen.
+| **de oprichter of RTG** | een voordeel voor de eigen partij | DO-03, DO-04, P1, par. 12 |
+| **een partij** | het register bespelen: overvloed aan posts, strategisch leeg laten, andermans bron betwisten | dezelfde limieten voor iedereen, afwezigheid neutraal, betwisting als nieuwe regel met bron |
+| **nepburgers** (astroturfing) | een kwestie groter laten lijken dan hij is | telling per kwestie en gebied met de remmen van `voordeur.js`; een vermoeden bevestigt een mens; dat een kwestie aandacht krijgt, beslist niets |
+| **een buitenlandse actor** | invloed via inbreng of geld | geen geldweg naar partijen via dit domein; herkomstregels liggen bij de partij (Wfpp) |
+| **een RTG-medewerker** | burgerdata inzien voor een partij | geen kantoorweg naar kwestiedata zonder reden en journaal (`MENSNETWERK.md` besluit 5) |
+| **prompt injection** via bijdragen | Rahul laten overtuigen of rangschikken | de capability bestaat niet (par. 10); bijdragen zijn gegevens, nooit instructies |
+| **de burger zelf, later** | "ik wil dat wat ik zei weg is" | intrekken mag; de kwestie blijft, zijn inbreng wordt als ingetrokken gemarkeerd zonder de geschiedenis te herschrijven |
 
 ---
 
-## 4. De lus, stap voor stap: wat hergebruiken, wat bouwen
+## 14. De partij zelf, buiten dit huis
 
-1. **Welkom.** Geen "word lid" maar *wie ben je, wat speelt er, wil je praten,
-   helpen, leren, organiseren of kijken?* Hergebruik de publieke deur van
-   `rtfos/publiek.js`. Te bouwen: een ingang die naar een kwestie, een
-   bijeenkomst of alleen meelezen leidt. **Geen account nodig om te luisteren**,
-   en een account om in te brengen hangt nooit aan een betaalde pas (PO-07).
-2. **Ontmoeten.** `genootschap/bijeenkomst.js` plus een verwijzing naar de kwestie.
-   Toegankelijkheid en vertaling komen per bijeenkomst uit de bestaande lagen.
-   Een fysiek lokaal huis is een plek met een adres en krijgt geen eigen model.
-3. **Luisteren.** Bijdragen hangen aan de kwestie en tellen zoals in `inspraak.js`
-   en `gemeente.js`: *hoeveel en uit welk gebied, nooit wie wat vond*, met de
-   ondergrens van vijf. Het signaal *"dit wordt in drie wijken genoemd"* is een
-   **vermoeden** in de vorm van `service/patroon.js`, dat een mens bevestigt.
-4. **Samen maken.** De Living Lab-werkplaats met de kwestie als onderwerp. Rahul
-   in de rol van `livinglab/ai.js` (par. 5).
-5. **Beleidslab.** Begin niet met simuleren maar met **aannames zichtbaar maken**:
-   een voorstel draagt een lijst van wat het kost, wie het betaalt, welke regel
-   moet veranderen en wie het uitvoert. Elk veld staat op `onbekend` tot iemand
-   het invult, met een bron. Dat is een stap weg. Een echte scenariomotor is
-   jaren weg, en zonder die lijst eronder zou hij een orakel zijn.
-6. **Besluiten.** In de burgerlaag gaat het over wie er in *deze* context
-   beslist: een gemeente (`stadsweefsel/besluitvorming.js`), het bestuur van de
-   stichting (`rtfos/bestuur.js`) of een partij (partijlaag). De kwestie toont
-   **wie bevoegd is** en verwijst naar het besluit met argumenten voor en tegen.
-   Is niemand in het systeem bevoegd, dan is de eindstand `doorgestuurd`, met
-   naar wie.
-7. **Doen.** Het eigenlijke verschil. Te bouwen: een actie die bij een **burger**
-   begint (honderd mensen herstellen een speeltuin) en niet bij de stichting.
-   Hergebruik `vrijwilligers-inzet.js` en `projecten.js`. De grens uit `LIFE.md`
-   blijft: *samenstellen en klaarzetten, bevestigen doet de mens*. Een uitnodiging
-   aan een ander gaat nooit automatisch.
-8. **Toezeggingen (Belofteboek).** Een toezegging heeft een eigenaar (een partij,
-   een fractie, een wethouder), een datum, een doel en afhankelijkheden, en een
-   stand die **alleen aangroeit** op `server/lib/keten.js`. Een wijziging is een
-   nieuwe regel en nooit een overschrijving. Partijneutraal: elke partij kan hier
-   haar toezeggingen laten volgen, onder dezelfde regels.
-9. **Bewijzen (Resultaatkamer).** `stadsweefsel/rekenkamer.js` is de vorm: feiten
-   en vragen, geen stoplicht. De uitkomst draagt een graad (`onbekend`, `vermoed`,
-   `gemeten`, `bewezen`), en **de eigenaar van een toezegging zet haar nooit zelf
-   op nagekomen** (PO-05).
-10. **Terugkomen.** Bij elke eindstand gaat er een bericht naar alle inbrengers,
-    over een bewezen leespad (`ontvanger.js`): *dit brachten jullie in → dit is
-    onderzocht → dit is besloten, door wie en waarom → dit is gedaan → dit weten we
-    over het resultaat, en zo zeker is dat → wat zien jullie nu?* Daarna mag de
-    kwestie opnieuw beginnen, als nieuwe regel op dezelfde tijdlijn.
+Wat hier staat is een **richting**, geen juridisch advies. De getallen zijn de
+opgave van de eigenaar van 25 september 2026. Deze sessie heeft ze niet
+nagetrokken, en een jurist bevestigt ze.
+
+**Rechtsvorm.** Een vereniging met volledige rechtsbevoegdheid, met statuten in een
+notariële akte. Daarin minimaal: ledenvergadering of congres, bestuur (voorzitter,
+secretaris, penningmeester), toelating en beëindiging van lidmaatschap, de
+kandidaatstellingsprocedure, interne besluitvorming, belangenconflicten, financieel
+toezicht, statutenwijziging en opheffing. Vrijwillig daarbovenop, passend bij deze
+opzet: **oprichter is niet eigenaar**. De leden vormen de partij.
+
+**Registratie bij de Kiesraad** (opgave eigenaar): de aanduiding wordt geregistreerd
+met notariële statuten, een waarborgsom (€ 450, terug bij een geldige lijst bij de
+eerstvolgende verkiezing), een gemachtigde en een plaatsvervanger, uiterlijk 42
+dagen vóór de kandidaatstelling. Een registratie voor de Tweede Kamer werkt door
+naar Provinciale Staten, waterschappen en gemeenteraden.
+
+**Deelname** is een aparte stap: voor een nieuwe partij ondersteuningsverklaringen
+(30 per kieskring, 10 op Bonaire) en een eigen waarborgsom.
+
+**Verkiezingsgereedheid** (statuten, registratie, gemachtigden,
+kandidatenprocedure, instemmingsverklaringen, ondersteuningsverklaringen,
+waarborgsom, termijnen, financiële en privacyverplichtingen) is een checklist die
+administratieve fouten voorkomt en de Kiesraad niet vervangt. **Waar hij woont, is
+een besluit** (par. 19): als gratis dienst van de stichting aan partijen is hij,
+ook voor iedereen gelijk, mogelijk een gift in natura aan elke partij die hem
+gebruikt.
+
+### 14.1 Wetgeving als versie, nooit als constante
+
+Er komen **geen bedragen in de constitutionele code**. Er komt een
+`POLITICAL_LAW_PROFILE_NL` met versie, geldigheidsdatum en juridische bron. De vorm
+bestaat al: `server/kern/fiscaal/regelwacht.js` bewaart regels per jaargang, en
+`scripts/wetwacht.js` meldt dat een wetsbron veranderde, waarna een mens oordeelt.
+
+De reden is concreet: volgens de opgave van de eigenaar ligt het wetsvoorstel Wet
+op de politieke partijen (Wpp) nog bij de Tweede Kamer, met verdere behandeling
+gepland voor december 2026. Het raakt financiering, interne organisatie,
+transparantie en politieke advertenties.
 
 ---
 
-## 5. Rahul als publieke dienaar
+## 15. Geld
 
-Rahul is geen leider en geen campagnemedewerker. Hij helpt de lus eerlijk te
-houden. Wat hij mag, en waar dat al staat:
+**DemocratieOS verplaatst geen geld naar partijen.** Het toont wat partijen
+openbaar maken, volgens dezelfde regels voor iedereen.
 
-| Rahul zegt | Waar het op rust | Stand |
-|---|---|---|
-| *"Deze oplossing kost € 4 miljoen, en niemand heeft gezegd waar dat vandaan komt."* | de aannamelijst van het beleidslab (par. 4.5): een leeg veld is een vaststelling, geen oordeel | een stap weg |
-| *"Een belangrijk tegenargument uit de bijdragen komt niet terug in het voorstel."* | bijdragen en voorstel naast elkaar. Rahul wijst aan, een mens beslist of het terechtkomt | een stap weg |
-| *"Deze tekst is C1. Zal ik hem ook op B1 zetten?"* | er is vandaag geen B1-laag. Alleen via een **lokaal** model (`LOCAL_AI_URL`), het origineel blijft leidend, en de B1-versie wordt als versie gemarkeerd | een stap weg |
+De Wfpp (opgave eigenaar, te bevestigen):
+- giften vanaf € 1.000 openbaar maken;
+- substantiële giften vanaf € 10.000 per donateur per jaar binnen drie dagen melden;
+- giften boven € 100.000 verboden;
+- buitenlandse financiële giften verboden.
 
-Wat hij nooit doet, en **dat hoort in code te staan en niet in een prompt**:
-
-- **Geen overtuigingsvraag.** *"Hoe krijgen we deze groep zover dat ze op ons
-  stemt?"* heeft in deze laag geen antwoord, en structureel geen ingang. Er is
-  vandaag **geen centrale regel tegen overtuigen of targeting** in het huis (alleen
-  losse opmerkingen per domein), dus daar hoort een handhaver bij (PO-03).
-- **Geen standpunt.** Rahul zegt niet wat de goede uitkomst is. Hij toont
-  argumenten, kosten, onzekerheid en wie er beslist.
-- **Geen kiezersbeeld.** Rahul krijgt in deze laag nooit gegevens over een mens of
-  een groep mee, alleen de kwestie en haar bijdragen, geteld zoals in par. 4.3.
-
-De vorm van die laatste grens staat al: `server/kern/knelpunt/` geeft zijn functie
-`vondsten()` alleen een randvoorwaarde en verder niets, zodat een
-geschiktheidstoets daar structureel niet *kan* in plaats van verboden is. De
-AI-functies van deze laag krijgen dezelfde handtekening: kwestie in, nooit een
-persoon.
+De eigen partij kan vrijwillig strenger zijn. DemocratieOS blijft neutraal en legt
+geen strengere regel op aan andere partijen dan de wet doet.
 
 ---
 
-## 6. De grenzen
+## 16. Wat DemocratieOS níét bouwt
 
-Waar een functie botst met een grens, vervalt de functie. Per grens staat erbij
-wie hem vandaag handhaaft.
+Deze afwezigheid is onderdeel van de architectuur. De lijst gaat de toets van
+`NO_PERSUASION_CAPABILITY` in, zodat een van deze dingen niet stil kan ontstaan:
 
-- **PO-01 Partijneutraal.** De burgerlaag kent geen enkele partij bij naam. Elke
-  partij, raad en elk initiatief krijgt dezelfde toegang op dezelfde voorwaarden,
-  en een partij die meer wil, is een klant tegen de gewone prijs. *Handhaver:
-  niemand. Te maken: een toets die zakt zodra de code van deze laag een
-  partijnaam of een partijspecifieke tak draagt.*
-- **PO-02 Geen kiezersprofiel.** Politieke voorkeur is een bijzonder
-  persoonsgegeven (AVG art. 9) en bestaat hier niet als veld, niet als segment en
-  niet als afleiding. Een bijdrage is geen stemintentie. Er wordt geteld per
-  kwestie en per gebied, met een ondergrens van vijf. *Handhaver: gedeeltelijk
-  (`bureau/relaties.js` en `vonk/selectie.js` weigeren het veld lokaal). Te maken:
-  de nieuwe map in de scan van `scripts/lib/cijferopmens.js` en een veldtoets voor
-  deze laag.*
-- **PO-03 Geen overtuigingsmachine.** Geen route, tool of prompt die een groep
-  als doelwit neemt, een boodschap per segment maakt of meet wie "te winnen" is.
-  *Handhaver: niemand. Te maken: vóór de eerste AI-functie van deze laag, niet
-  erna.*
-- **PO-04 Niemand kwijt.** Elke kwestie eindigt in een eindstand uit een gesloten
-  lijst, met een reden, en elke inbrenger krijgt die terug over een bewezen
-  leespad. Een kwestie wordt nooit verwijderd. *Handhaver: de meter van par. 7.*
-- **PO-05 Geen eigen voldoende.** Wie een toezegging doet, zet haar niet zelf op
-  nagekomen. De uitkomst draagt een graad en de onzekerheid staat even groot op
-  het scherm als de uitkomst. *Handhaver: het patroon van `rekenkamer.js`. Te
-  maken: de toezeggingslaag zelf.*
-- **PO-06 Geschiedenis groeit alleen aan.** Een toezegging, een besluit en een
-  eindstand worden nooit overschreven maar aangevuld, op `server/lib/keten.js`.
-- **PO-07 Deelnemen staat nooit achter een pas.** Democratische deelname is geen
-  commercieel recht (`WERELDEN.md`: *passen bepalen commerciële rechten*).
-  Luisteren kan zonder account, inbrengen met elk account, en een betaalde pas
-  geeft nooit meer gewicht.
-- **PO-08 Een kind is geen profiel.** Een jongere mag inbrengen en meedoen
-  (`LEVEN.md` par. 2). Stemmen in een formeel besluit gaat, waar de wet dat eist,
-  langs `volwassen()` in `server/kern/volwassen.js` en krijgt geen eigen kopie van
-  die regel.
+kiezersscore · politieke persoonlijkheidsscore · detectie van zwevende kiezers ·
+emotionele kwetsbaarheidsscore · politieke lookalike-doelgroepen uit RTG-data ·
+automatische propaganda · AI-stemadvies · partijranglijst · betaalde politieke
+ranglijst · Foundation-naar-partij-leadgenerator · eigenaarsexport · geheime
+campagne-API
 
 ---
 
-## 7. De meter *Niemand kwijt*
+## 17. De fysieke wereld
 
-Dit is de meter die de lus bewaakt en die het voorstel een eigen categorie
-geeft.
+Lokale ontmoetingsplekken, niet uitsluitend van een partij: koffie drinken, een
+kwestie bespreken, een bijeenkomst organiseren, digitale hulp krijgen, iets leren,
+vrijwilligers vinden of gewoon binnenlopen. DemocratieOS doet de administratie
+erachter, met `server/kern/rtfos/activiteiten.js` als bestaande basis (wachtlijst,
+check-in, ouderlijke toestemming, VOG).
 
-**Eindstanden** (gesloten lijst, naar het voorbeeld van `livinglab/vraagbesluit.js`):
+Let op de naam: **"Huis" is in dit repository het woord voor het hele systeem**
+("dit huis"). Een fysieke plek heet dus anders, bijvoorbeeld ontmoetingsplek.
 
-| Eindstand | Betekent | Wat de inbrenger krijgt |
-|---|---|---|
-| `uitgevoerd` | er is gedaan wat besloten is | wat er gedaan is, en wat we over het resultaat weten |
-| `afgewezen` | een bevoegde heeft nee gezegd | wie, waarom, en de argumenten voor en tegen |
-| `samengevoegd` | gaat verder in een andere kwestie | de nieuwe kwestie, en hij blijft inbrenger |
-| `doorgestuurd` | niemand hier is bevoegd | naar wie, en hoe hij het daar kan volgen |
-| `onhaalbaar` | kan niet, met reden (kosten, wet, gegevens die niet in verhouding staan) | de reden uit de lijst |
-| `ingetrokken` | de inbrenger stopt zelf | niets meer, want dat is zijn keuze |
-
-**Wat de meter telt** (een eigen meter, nog te bouwen):
-- kwesties zonder eindstand die langer dan hun termijn stilstaan, per stand;
-- eindstanden waarvan een inbrenger **geen bewezen leespad** heeft (de fout uit
-  `MAATSTAF.md` par. 7f: een bericht zonder lezer ziet er bezorgd uit);
-- samenvoegingen waarbij een inbrenger zoekraakte.
-
-Twee regels, zoals bij de andere meters in dit huis: de telling is een **ratel die
-alleen omlaag mag**, en de meter heeft een **zelfijking** (een kwestie die met
-opzet kwijtraakt moet hij vinden). Een meter die niets kan vinden, staat groen om
-dezelfde reden als een meter die niets vindt.
-
-**Wat hij nooit wordt:** een ranglijst van kwesties, een score per wijk, of een
-cijfer per medewerker of bewindspersoon. Hij telt wat er openstaat, niet wie er
-achterloopt.
+*Door en voor mensen. Dingen samen doen.* De techniek is daar bijna onzichtbaar.
 
 ---
 
-## 8. Bouwvolgorde
+## 18. Bouwvolgorde
 
-| Fase | Wat | Waarom eerst |
-|---|---|---|
-| **0** | De besluiten van par. 9 | naam, neutraliteit en rechtsvorm bepalen alles daarna |
-| **1** | De **kleinste lus**: kwestie → eindstand met reden → terugkoppeling, plus de meter *Niemand kwijt* en de toetsen voor PO-01, PO-02 en PO-03 | dit is het eigen onderscheid, en het staat al als patroon in `vraagbesluit.js`. De grenzen komen vóór de eerste AI-functie, niet erna |
-| **2** | Welkom + bijeenkomst + luisteren | dan heeft een kwestie mensen om zich heen |
-| **3** | Samen maken + de aannamelijst van het beleidslab + B1 via een lokaal model | dan heeft een kwestie voorstellen |
-| **4** | Toezeggingen + bewijzen | dan heeft een besluit een vervolg dat je kunt nagaan |
-| **5** | Doen (actie die bij de burger begint) | het grootste verschil, maar het leunt op 1 t/m 4 |
-| **6** | De partijlaag, als klant | pas als de burgerlaag voor iedereen staat |
-| jaren weg | een echte beleidsscenariomotor, publieke verificatie van besluiten | zonder de aannamelijst en de keten eronder zouden ze een orakel zijn |
-
-Het onderdeel komt in FoundationOS langs de gewone weg: een scherm onder
-`public/apps/foundation/`, een `link:` in het register, één regel in de
-FoundationOS-map van `MAPPEN`, en `npm run wereldlijst`. Een app hoort in precies
-één wereld (`scripts/check.js`).
+| Fase | Wat | Stand | Waarom op deze plek |
+|---|---|---|---|
+| **A — Constitutie** | dit document, DemocratieOS gedefinieerd, de scheiding, de grondwet, het dreigingsmodel, **juridische review** | document staat; de review vraagt een mens | alles daarna leunt erop |
+| **B — Minimale burgerlus** | kwestie → behandeling → eindstand → reden → bewezen terugkoppeling, plus NIEMAND_KWIJT | een stap weg | het eigen onderscheid, en het patroon staat al |
+| **C — Neutraliteit** | de suite van par. 11, P1, owner isolation | een stap weg | de grenzen staan vóór de eerste partij en vóór de eerste AI-functie |
+| **D — Menselijkheid** | B1 (lokaal), toegankelijkheid, meertaligheid, bijeenkomsten, offline inbreng | een stap weg | DO-11 en DO-12 |
+| **E — DoeNetwerk** | een actie die bij de burger begint | een stap weg | leunt op B en D |
+| **F — Politiek protocol** | aansluiting voor partijen, partijenregister, voorstellen, bronnen, stemmingen | vraagt een besluit (toelatingscriterium) | pas als C de gelijkheid bewijst |
+| **G — Toezeggingen** | het register van par. 8, verankerd | vraagt een besluit (het anker) | leunt op F |
+| **H — Rahul** | de democratische assistent | een stap weg | pas nu, omdat zijn grenzen dan al bestaan |
+| **I — Partijorganisatie** | de vereniging en haar eigen software | **buiten dit huis** | los van DemocratieOS |
+| **J — Verkiezingsgereedheid** | Kiesraad, kandidaten, verklaringen, waarborgsommen | vraagt een besluit (par. 14) | de laatste stap |
+| jaren weg | beleidssimulatie, publieke verificatie van besluiten | — | zonder de aannamelijst en de keten zouden ze een orakel zijn |
 
 ---
 
-## 9. Besluiten die bij de eigenaar liggen
+## 19. Besluiten van de eigenaar
 
-1. **De naam van het object.** `kwestie` (vrij), `vraagstuk` (aansluiten op de
-   Living Lab), of toch `zaak` en daarvoor de botsing betalen.
-2. **De rechtsvorm van de burgerlaag.** Binnen de RTFoundation (kan alleen als hij
-   strikt partijneutraal blijft), of een aparte stichting met een eigen bestuur
-   (meer afstand tot de eigenaar-politicus, meer werk).
-3. **Wie de burgerlaag gebruikt.** Alleen burgers en initiatieven, ook
-   gemeenteraden (het Stadsweefsel staat al), of ook partijen, via hun
-   toezeggingen.
-4. **Deelnemen zonder account.** Alleen meelezen, of ook inbrengen met een
-   eenmalige code (meer bereik, meer misbruikrisico: dan hoort er een rem bij in
-   de vorm van `routes/rtfos/voordeur.js`).
+1. **Publieke naam.** "DemocratieOS" suggereert een vijfde wereld naast LivingOS,
+   WorkOS, TravelOS en FoundationOS. Kies een naam zonder "OS" (aanbevolen), of
+   houd hem als werknaam en besluit bij de lancering.
+2. **Rechtspersoon van DemocratieOS.** Binnen de RTFoundation, strikt neutraal
+   (sneller, maar dezelfde stichting als de oprichter), of een aparte stichting
+   met het toezichtsorgaan in de statuten (aanbevolen voor proef P2 en par. 12,
+   meer werk).
+3. **Toelating tot het partijenregister.** Kiesraadregistratie (aanbevolen: het
+   meest objectief), deelname aan een verkiezing op elk niveau, of beide.
+4. **Volgorde bij vergelijken.** De officiële lijstvolgorde, of een per bezoek
+   wisselende volgorde die zichtbaar is.
+5. **Verkiezingsgereedheid.** Als dienst tegen kostprijs voor elke partij
+   (aanbevolen), gratis voor iedereen (mogelijk een gift in natura), of helemaal
+   buiten DemocratieOS.
+6. **Het anker van het toezeggingsregister.** Buiten de eigen database (aanbevolen),
+   of eerst intern met de keten en later extern.
 
 ---
 
-## 10. Wat dit document niet zegt
+## 20. Wat dit document niet zegt
 
-- **Het is geen juridisch advies.** De Wet financiering politieke partijen, het
-  wetsvoorstel Wet op de politieke partijen, de ANBI-voorwaarden en de AVG zijn
-  hier genoemd als richting, niet getoetst. Volgens de fiscale klassen van dit
-  huis is dat `advies`: een jurist met kennis van partijfinanciering beoordeelt.
-- **Niets hiervan is gebouwd.** De tabel in par. 1 zegt wat er in andere domeinen
-  staat, niet dat het hier al werkt.
+- **Het is geen juridisch advies.** De Wfpp, de Wpp, de Kieswet, de ANBI-regels,
+  de AVG en de EU-verordening over politieke reclame zijn hier genoemd als
+  richting. Volgens de fiscale klassen van dit huis is dat `advies`: een jurist
+  met kennis van partijfinanciering en kiesrecht beoordeelt het.
+- **Niets hiervan is gebouwd.** Par. 3 zegt wat er in andere domeinen staat, niet
+  dat het hier werkt.
+- **Proef P2 is maar half machinaal.** Wie leest dat de scheiding "bewezen" is,
+  moet weten dat de helft ervan in statuten en contracten staat en niet in code.
 - **Er is nog nooit een burger door deze lus gelopen.** Of iemand zich gehoord
-  voelt terwijl zijn voorstel is afgewezen, is geen eigenschap van de code maar
+  voelt terwijl zijn voorstel werd afgewezen, is geen eigenschap van de code maar
   iets wat je aan mensen vraagt.

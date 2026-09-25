@@ -40,9 +40,12 @@ const ONBEKEND = 'Onbekende Uil 99';     // een codenaam die de kluis niet kent
    (server/kern/spellen/magnaat/rtg-keten.js): echte poort, echt grootboek, echte
    idempotentie, en stubs voor wat er niet toe doet. Een tweede opstelling met
    eigen stubs zou uit de eerste lopen. `sabotage` is voor de zelfijking. */
-function maakWereld({ betaal, sabotage } = {}) {
-  const b = betaal || require('../../server/betaal');
-  const keten = require('../../server/kern/spellen/magnaat/rtg-keten')({ betaal: b });
+/* `wortel` wijst naar een andere checkout (de herhaalmatrix, ./herhaalpakket.js):
+   dan komt het systeem onder toets daarvandaan en blijft de proef van hier. */
+function maakWereld({ betaal, sabotage, wortel } = {}) {
+  const uit = (p) => require(wortel ? require('path').join(wortel, p) : '../../' + p);
+  const b = betaal || uit('server/betaal');
+  const keten = uit('server/kern/spellen/magnaat/rtg-keten')({ betaal: b });
   /* Elk seintje naar een lid, zodat de ijkpunten (./ijkpunten.js, E5) kunnen
      zien of wie iets ontving daarvan hoorde. */
   const seintjes = [];
@@ -131,10 +134,17 @@ async function doe(w, op, spoor) {
 /* ------------------------------------------------------------------ oordelen
    Drie regels, en alle drie staan ze al in de code. Geen daarvan is voor deze
    motor verzonnen; wie er een toevoegt, noemt waar hij beloofd wordt. */
+const WETTEN = {
+  geld: { wet: 'geld-conservatie', bron: 'server/kern/pay/kijken.js sluitcontrole() en WETTEN.json' },
+  herhaling: { wet: 'een herhaling boekt niets', bron: 'MUTATIECONTRACT.md en de idem-laag van kern/pay (metIdem)' },
+  verzoek: { wet: 'een verzoek wordt ten hoogste een keer betaald',
+    bron: 'server/kern/pay/verzoeken.js verzoekBetaal() ("Dit verzoek is al afgehandeld")' }
+};
+
 function oordeel(w) {
   const sluit = w.pay.sluitcontrole();
   if (!sluit.klopt) {
-    return { wet: 'geld-conservatie', bron: 'server/kern/pay/kijken.js sluitcontrole() en WETTEN.json',
+    return { ...WETTEN.geld,
       wat: 'de som van alle saldi is ' + sluit.som + (sluit.rood.length ? ' en rood staat: ' + sluit.rood.join(', ') : '') };
   }
   boekingen(w);
@@ -162,7 +172,7 @@ function oordeelMetSpoor(w, spoor) {
      een herhaling doet geen tweede handeling). */
   const p2p = rijen.filter(r => r.soort === 'p2p' && String(r.van).startsWith('lid:') && String(r.naar).startsWith('lid:'));
   if (p2p.length !== spoor.stuurBoekingen.size) {
-    return { wet: 'een herhaling boekt niets', bron: 'MUTATIECONTRACT.md en de idem-laag van kern/pay (metIdem)',
+    return { ...WETTEN.herhaling,
       wat: p2p.length + ' overdrachten in het grootboek tegenover ' + spoor.stuurBoekingen.size + ' geslaagde antwoorden' };
   }
   /* Een verzoek wordt ten hoogste een keer betaald: verzoekBetaal() weigert met
@@ -170,8 +180,7 @@ function oordeelMetSpoor(w, spoor) {
   const perVerzoek = new Map();
   for (const r of rijen) if (r.soort === 'klompje' && r.ref) perVerzoek.set(r.ref, (perVerzoek.get(r.ref) || 0) + 1);
   for (const [ref, n] of perVerzoek) {
-    if (n > 1) return { wet: 'een verzoek wordt ten hoogste een keer betaald',
-      bron: 'server/kern/pay/verzoeken.js verzoekBetaal() ("Dit verzoek is al afgehandeld")',
+    if (n > 1) return { ...WETTEN.verzoek,
       wat: 'verzoek ' + ref + ' is ' + n + ' keer betaald' };
   }
   return null;
@@ -239,4 +248,4 @@ async function zoek({ zaad = 1, reeksen = 100, lengte = 12, maak, spelers }) {
   return { gevonden: false, zaad, reeksen, lengte, tel, nietBeproefd: nietBeproefd() };
 }
 
-module.exports = { maakWereld, storingsas, genereer, doe, oordeel, oordeelMetSpoor, boekingen, voerUit, krimp, zoek, ONBEKEND };
+module.exports = { WETTEN, maakWereld, storingsas, genereer, doe, oordeel, oordeelMetSpoor, boekingen, voerUit, krimp, zoek, ONBEKEND };

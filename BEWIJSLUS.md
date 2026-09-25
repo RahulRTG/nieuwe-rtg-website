@@ -257,7 +257,7 @@ feit over twee waarnemingen, zonder graad.
 
 ## 5. Bouwsteen 3 -- het herhaalpakket
 
-**Stand: een stap weg in de testwereld, een besluit voor productie.** Een fout
+**Stand: staat in de testwereld (par. 5a), een besluit voor productie.** Een fout
 wordt een herhaalbaar object:
 
     identiteit van het artefact en de configuratie, de causale keten,
@@ -281,6 +281,48 @@ het pakket wordt AFGELEID en niet dichtgeklapt bewaard, draagt **geen
 aliassen** (een pakket met codenamen maakt de scheiding ongedaan zodra iemand
 het doorstuurt), en bevat de OPZET en niet de ruwe gegevens. Voor een pakket uit
 productie hoort daar een bewaartermijn bij, en dat raakt `DPIA.md`.
+
+### 5a. Wat er staat (25 september 2026)
+
+`scripts/lib/herhaalpakket.js` en `npm run herhaalpakket` (`maak`, `speel`,
+`matrix`), bewaakt door `test/herhaalpakket.test.js`. Het pakket volgt de regels
+van de capsule van het Living Lab: het wordt AFGELEID uit een uitslag van de
+zoeker en draagt de commit waarop het is gemaakt, codenamen worden ROLLEN
+(`speler-1`, ...) met een grendel die weigert als er toch een doorheen komt, en de
+begintoestand is een LEGE wereld plus de stappen die hem vullen -- er gaat geen
+database in. Wat niet deterministisch is, staat erin (`voorbehoud`): de klok is
+niet vastgezet, en de volgorde binnen een gelijktijdige stap geldt alleen zolang
+het werk niet op echte I/O wacht.
+
+De matrix speelt hetzelfde pakket na op elke commit in een eigen worktree en een
+eigen proces. Het eerste echte pakket is de race van par. 3a, gemaakt op de
+commit van voor de reparatie (`test/fixtures/herhaalpakket-verzoekrace.json`,
+twee stappen: een verzoek van een cent en twee gelijktijdige betalingen):
+
+| artefact | uitkomst |
+|---|---|
+| `f3bab5a1^` (voor de reparatie) | breekt, E2 -> E3 |
+| `origin/main` (25 september 2026) | **breekt**, E2 -> E3 |
+| `f3bab5a1` (de reparatie) | houdt |
+| de kop van deze tak | houdt |
+
+De tweede regel is de vondst: **main betaalt een verzoek vandaag nog twee keer**,
+omdat de reparatie op deze tak staat en nog niet is samengevoegd. Dat is geen
+nieuwe fout maar precies wat de matrix hoort te laten zien -- waar een fout wel en
+niet zit, per artefact.
+
+Drie dingen daar niet wegpoetsen. Een kolom die niet kon draaien (een onbekende
+commit, of een artefact zonder proefopstelling) heet `niet vast te stellen` en
+laat de matrix met uitgang 2 eindigen; hij telt nooit als `houdt`. Een ANDERE wet
+die breekt heet `breekt-anders` en nooit `breekt`, want dan is het een ander
+tegenvoorbeeld en geen herhaling. En een oudere commit heeft de kapotte
+proefopstelling nog waarin `seintje()` nooit afgaat (par. 4a): de divergentie
+PROEFT daarom per wereld of een seintje zichtbaar is, en zet E5 anders op
+`niet-waargenomen` met de reden, in plaats van op elke oude commit een
+schijnafwijking te melden.
+
+Wat er NIET is: een automatische bisect bovenop de matrix, en pakketten uit
+productie (besluit 2 van par. 13).
 
 ## 6. Bouwsteen 4 -- immuniteit
 
@@ -481,7 +523,8 @@ onafhankelijkheid van de drie assen van `GELDING.json`.
 5. ~~**IJkpunten E0-E8 voor RTG Pay**~~ -- gedaan in de testwereld (par. 4a),
    naast de envelop, voor `stuur` en `betaal`. Op de echte fout van par. 3a wijst
    hij het besluit (E3) aan.
-6. **Het herhaalpakket en de herhaalmatrix**, eerst in de testwereld.
+6. ~~**Het herhaalpakket en de herhaalmatrix**~~ -- gedaan in de testwereld
+   (par. 5a). De matrix liet meteen zien dat main de race nog heeft.
 
 Pas als deze lus betrouwbaar rond is, komt de nachtelijke zoektocht: ongebruikte
 rekentijd die systematisch toestanden, volgordes, storingen en

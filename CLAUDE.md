@@ -2510,7 +2510,15 @@ E6 staat voor RTG Pay altijd op `niet-waargenomen`, want kern/pay zet geen
 gebeurtenis in een envelop. Het spoor staat NAAST de envelop en alleen in de
 testwereld. Het bouwen vond ook een fixturefout: `rtg-keten.js` gaf
 `keyVanCodenaam` een kale tekst waar `kern/gids.js` een object geeft, dus
-`seintje()` ging in de proefwereld nooit af.
+`seintje()` ging in de proefwereld nooit af. De vijfde stap is het
+**herhaalpakket** (`npm run herhaalpakket`, par. 5a): een tegenvoorbeeld als
+object, met rollen in plaats van codenamen (een grendel weigert anders), een lege
+begintoestand in plaats van een database, en een `voorbehoud` voor wat niet
+deterministisch is. De **herhaalmatrix** speelt hetzelfde pakket na op meerdere
+commits, elk in een eigen worktree, en liet meteen zien dat main de dubbele
+betaling nog heeft -- de reparatie staat op de tak van PR #380. Een kolom die niet
+kon draaien is `niet vast te stellen` en nooit `houdt`; een andere wet is
+`breekt-anders` en nooit `breekt`.
 
 ## Structuur en starten (kort)
 

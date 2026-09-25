@@ -161,6 +161,7 @@ function rijStuur(w, ctx, op, a) {
 function rij(w, ctx, op, a) {
   if (!INGERICHT.includes(op.soort)) return { nietIngericht: 'de ijkpunten zijn (nog) alleen ingericht voor ' + INGERICHT.join(' en ') };
   const r = op.soort === 'betaal' ? rijBetaal(w, ctx, op, a) : rijStuur(w, ctx, op, a);
+  if (r && ctx.e5 && !ctx.e5.zichtbaar) r[5] = nietGezien(5, ctx.e5.reden);
   return r ? { punten: r } : { nietIngericht: 'er was nog geen verzoek om te betalen' };
 }
 
@@ -174,10 +175,32 @@ function eersteDivergentie(punten) {
   return { van: i >= 0 ? punten[i].punt : null, naar: punten[j].punt, overgeslagen, ijkpunt: punten[j] };
 }
 
+/* KAN DEZE WERELD EEN SEINTJE LATEN ZIEN? Een oudere proefopstelling gaf
+   `keyVanCodenaam` een kale tekst, en dan gaat seintje() nooit af (par. 4a). Op
+   zo'n artefact (de herhaalmatrix speelt ook oude commits na) zou E5 bij elke
+   geslaagde handeling afwijken terwijl RTG Pay niets fout doet. Een proef van
+   een overdracht beslist het; lukt zelfs die niet, dan is het onbekend. */
+async function seintjesZichtbaar(maak) {
+  const w = maak();
+  const [a, b] = w.spelers;
+  for (let p = 0; p < 20; p++) {
+    const r = await w.pay.laadOp({ codenaam: a, centen: 1000, idem: 'seintjesproef:' + p });
+    if (r && r.ok) {
+      const s = await w.pay.stuur({ van: a, aanCodenaam: b, centen: 100, idem: 'seintjesproef', oms: 'proef' });
+      await new Promise(r2 => setImmediate(r2));
+      if (!(s && s.ok)) return { zichtbaar: false, reden: 'de proefoverdracht lukte niet, dus is niet vast te stellen of deze wereld seintjes laat zien' };
+      return w.seintjes.length ? { zichtbaar: true }
+        : { zichtbaar: false, reden: 'deze opstelling laat geen seintje zien (keyVanCodenaam geeft geen object); E5 is hier niet waar te nemen' };
+    }
+  }
+  return { zichtbaar: false, reden: 'opladen lukte niet in deze wereld, dus is niet vast te stellen of hij seintjes laat zien' };
+}
+
 /* Speel stappen opnieuw met ijkpunten, en stop bij de eerste stap waarin er een
    wijkt. Wijkt er nergens een terwijl een wet wel brak, dan zegt de uitslag dat:
    dan zijn de ijkpunten te grof, en dat is een bevinding over dit instrument. */
 async function ontleed(stappen, maak) {
+  const e5 = await seintjesZichtbaar(maak);
   const w = maak();
   const spoor = { stuurBoekingen: new Set(), verzoeken: [] };
   const eerder = new Set();   // sleutels van betalingen die al slaagden
@@ -188,7 +211,7 @@ async function ontleed(stappen, maak) {
     const antwoorden = await Promise.all(stap.ops.map(op => tv.doe(w, op, spoor)));
     await new Promise(r => setImmediate(r));   // seintje() loopt via een promise
     const na = momentopname(w);
-    const ctx = { voor, na, stap, antwoorden, eerder, spoor: { verzoeken: bekend } };
+    const ctx = { voor, na, stap, antwoorden, eerder, e5, spoor: { verzoeken: bekend } };
     const rijen = stap.ops.map((op, k) => ({ op: k, ...rij(w, ctx, op, antwoorden[k]) }));
     const met = rijen.filter(r => r.punten).map(r => ({ ...r, divergentie: eersteDivergentie(r.punten) }))
       .filter(r => r.divergentie).sort((x, y) => PUNTEN.indexOf(x.divergentie.naar) - PUNTEN.indexOf(y.divergentie.naar));

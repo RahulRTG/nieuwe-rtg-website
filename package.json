@@ -337,6 +337,7 @@
     "swcache:vast": "node scripts/swcache.js --schrijf",
     "herstelproef": "node scripts/herstelproef.js",
     "tegenvoorbeeld": "RTG_SIMULATIEBANK=1 node scripts/tegenvoorbeeld.js",
+    "herhaalpakket": "RTG_SIMULATIEBANK=1 node scripts/herhaalpakket.js",
     "scherfmeter": "node scripts/scherfmeter.js",
     "scherfmeter:vast": "node scripts/scherfmeter.js --vastleggen",
     "doodspoor": "node scripts/doodspoor.js",

@@ -166,11 +166,15 @@ test('7. opladen loopt over de simulatiebank, en de poort doet zijn werk ongewij
   const codenaam = (await api('pay/overzicht', {}, token)).body.codenaam;
   assert.ok(codenaam, 'het lid heeft een codenaam');
 
-  /* De sleutel die de server bouwt staat in kern/pay/opladen.js. We zoeken er
-     een die 'betaald' geeft en een die 'geweigerd' geeft -- de afloop is dus
-     VOORAF bekend, en daarna kijken we of het grootboek hem volgt. */
+  /* De sleutel die de server bouwt: opladen gaat via kern/betaalwaarheid
+     (MONEY-012), die de provider 'waarheid:<id>' geeft, met een id dat uit de
+     eigenaar en de idem-sleutel van kern/pay/opladen.js volgt (idVan in
+     kern/betaalwaarheid/index.js). We zoeken er een die 'betaald' geeft en een
+     die 'geweigerd' geeft -- de afloop is dus VOORAF bekend, en daarna kijken
+     we of het grootboek hem volgt. */
   const b = maak({ RTG_SIMULATIEBANK: '1' });
-  const sleutelVan = (idem) => 'pay-oplaad:' + codenaam + ':' + idem;
+  const sleutelVan = (idem) => 'waarheid:BW-' + require('crypto').createHash('sha256')
+    .update('pay:' + codenaam + '|' + 'pay-oplaad:' + codenaam + ':' + idem).digest('hex').slice(0, 20).toUpperCase();
   const zoek = (wil) => {
     for (let i = 0; i < 500; i++) {
       const idem = 'sim-' + wil + '-' + i;

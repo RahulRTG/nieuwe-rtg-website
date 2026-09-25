@@ -25,13 +25,17 @@ const SLEUTELS = {
   /* Een leesroute. Apart van "geen verklaring": dit is een besluit. */
   'POST /api/techniek/herstel/stand': { leest: true },
 
-  /* De drie loketten die een verse WebAuthn-uitdaging munten. */
+  /* De loketten die een verse WebAuthn-uitdaging munten. */
   'POST /api/techniek/bevestig/opties': { nietIdempotent: true,
     waarom: 'munt een verse uitdaging voor een benoemde zware handeling; een bewaard antwoord ' +
       'zou dezelfde challenge twee keer geldig maken en de binding opheffen' },
   'POST /api/office/boardroom/bevestig/opties': { nietIdempotent: true,
     waarom: 'zelfde ceremonie achter de boardroomdeur, en om dezelfde reden: een herhaalde ' +
       'challenge is een herbruikbare challenge' },
+  'POST /api/office/bank/incasso/opties': { nietIdempotent: true,
+    waarom: 'de ceremonie voor de incassoronde, gebonden aan zijn grens; een herhaalde challenge is een herbruikbare challenge' },
+  'POST /api/office/bank/handtekening/opties': { nietIdempotent: true,
+    waarom: 'de ceremonie voor de tweede handtekening, gebonden aan die aanvraag; een herhaalde challenge is een herbruikbare challenge' },
   'POST /api/webauthn/bevestig/opties': { nietIdempotent: true,
     waarom: 'de ceremonie waarmee een lid het weghalen van een passkey bevestigt; herhaalbaar ' +
       'maken zou een onderschepte bevestiging een tweede sleutel laten verwijderen' },

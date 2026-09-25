@@ -30,7 +30,10 @@ function maak({ railFaalt = 0, railStatus = 'ingepland', terugboekFaalt = false,
     railInzenden: async (o) => {
       rail.pogingen.push(o.id);
       rail.sleutels.push(o.idemSleutel);
-      if (nogFalen > 0) { nogFalen--; throw new Error('de rail is onbereikbaar'); }
+      /* "Onbereikbaar" betekent: de verbinding kwam niet tot stand, er ging
+         niets de deur uit. Dat merkt de rail als `nietVerstuurd`; alleen zo'n
+         fout mag tot terugboeken leiden (MONEY-012, test/money012.test.js). */
+      if (nogFalen > 0) { nogFalen--; throw Object.assign(new Error('de rail is onbereikbaar'), { nietVerstuurd: true }); }
       return { id: 'RAIL-' + rail.pogingen.length, status: railStatus };
     },
   });
@@ -277,7 +280,7 @@ test('een soort zonder geregistreerde teruggang wordt geweigerd, niet geraden', 
   const op = require('../server/kern/betaalopdracht')({
     d: () => db.data, save: () => {}, crypto, nu: () => 3000,
     maxPogingen: 1, log: { warn: (m, g) => klachten.push([m, g]) },
-    railInzenden: async () => { throw new Error('rail dicht'); }
+    railInzenden: async () => { throw Object.assign(new Error('rail dicht'), { nietVerstuurd: true }); }
   });
   const o = op.maak({ ...basis, soort: 'onbekende-rail' });
   await op.dienIn(o);

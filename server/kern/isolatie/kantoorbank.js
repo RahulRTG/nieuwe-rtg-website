@@ -14,8 +14,7 @@
 
    DE VRAAG IS MET OPZET DEZE EN NIET "zit deze route in het bankdomein". Dat tweede
    vermengt handelingstype met domeincontext, en dan wordt het effectmodel juist minder
-   waar op het moment dat je het voor causaliteit wilt gebruiken: een leesroute of een
-   regel-instelling die in het bankdomein woont, beweegt zelf geen geld.
+   waar op het moment dat je het voor causaliteit wilt gebruiken (zie punt 2).
 
    WAT DEZE TABEL REPAREERT, en het was een echte vervalsing in twee richtingen. Van de
    39 kantoor-bankroutes droegen er vier GELD_BEWEGEN -- /draai, /leden, /mislukking en
@@ -35,13 +34,11 @@
    DE DERDE KOLOM IS EEN LIJST EN MAG LEEG ZIJN, en dat is geen slordigheid: /gezond leest
    een SYSTEEMstand en geen gegevens van iemand, en /bevoegdheid leest een matrix per land.
    Daar past geen van de zeventien werkwoorden, en er een uitkiezen dat er bijna op lijkt
-   zou semantiek verzinnen op precies de plek waar dat niet mag. Een lege lijst met een
-   grond ernaast is dan het eerlijke antwoord.
+   zou semantiek verzinnen op precies de plek waar dat niet mag.
 
-   EN DE TABEL IS GESLOTEN OVER ZIJN BEREIK. test/geldpositie.test.js eist dat ELKE
+   EN DE TABEL IS GESLOTEN OVER ZIJN BEREIK. test/kantoorbank.test.js eist dat ELKE
    /api/office/bank/-route hier een antwoord heeft: een nieuwe route zakt dus tot iemand
-   de vraag beantwoordt. Een tabel die stilletjes achterloopt op de code is geen
-   verklaring maar een momentopname. */
+   de vraag beantwoordt (de reden staat in die toets). */
 'use strict';
 
 /* Per pad: kan het na commit een geldpositie wijzigen, en waarom. De grond is geen
@@ -72,8 +69,11 @@ const KANTOORBANK = Object.freeze({
     'zet een voornemen klaar voor een tweede mens; het eigen gevolgcontract sluit ' +
     'GELD_BEWEGEN met zoveel woorden uit', ['VOORSTEL_MAKEN']],
   '/api/office/bank/incasso/dossier': [false, 'leest het dossier van de keten', ['LEZEN_ANDERMANS']],
+  '/api/office/bank/incasso/opties': [false, 'zet een passkeyceremonie klaar', []],
+  '/api/office/bank/handtekening/opties': [false, 'zet een passkeyceremonie klaar', []],
   '/api/office/bank/handtekening/open': [false, 'leest wat er openstaat', ['LEZEN_ANDERMANS']],
   '/api/office/bank/handtekening/intrek': [false, 'haalt een aanvraag weg voordat er iets is uitgevoerd', ['VOORSTEL_MAKEN']],
+  '/api/office/bank/opdrachten/afstemming': [false, 'een aanvraag; geld beweegt pas na de tweede handtekening', ['VOORSTEL_MAKEN']],
   '/api/office/bank/salaris/voorstel': [false, 'rekent een voorstel voor; uitbetalen is /salaris/run', ['VOORSTEL_MAKEN']],
   '/api/office/bank/gezond': [false, 'leest de gezondheid van de bankkant', []],
   '/api/office/bank/afschrift': [false, 'leest boekingen', ['LEZEN_ANDERMANS']],

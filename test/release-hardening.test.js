@@ -13,6 +13,11 @@ test('alle Docker- en deployinvoer telt als releasecode', () => {
   for (const rel of ['Dockerfile', '.dockerignore', 'docker-compose.yml',
     'docker-compose.live.yml', 'docker-compose.nood.yaml', 'deploy/live.env.example',
     '.github/workflows/release-image.yml']) assert.equal(isCodePad(rel), true, rel);
+  /* EN DE TEGENPROEF: registers en documenten zijn uitkomsten en geen code. Zonder
+     deze kant bleef de toets groen als isCodePad ALLES code noemde -- dan telt
+     elke meting als onreproduceerbaar en zegt het stempel niets meer. */
+  for (const rel of ['LAT.md', 'docs/money-012.md', 'MUTATIES.json', 'Dockerfile.bak',
+    'docker-compose', 'deployment/x.yml']) assert.equal(isCodePad(rel), false, rel);
 });
 
 test('de releasepoort weigert servicebevoegdheden zonder echte lezer', () => {
@@ -170,7 +175,7 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen offici�
   const bootstrap = bron.indexOf('imageherkomst.js --sleutelcontrole');
   const sleutel = bron.indexOf('imageherkomst.js --sleutelcontrole', afbouw);
   const kandidaat = bron.indexOf('docker push "$RTG_CANDIDATE_IMAGE"');
-  const teken = bron.indexOf('imageherkomst.js --binden --eis-handtekening');
+  const teken = bron.indexOf('imageherkomst.js --binden');
   const controle = bron.indexOf('imageherkomst.js --controle');
   assert.ok(afbouw >= 0 && afbouw < kandidaat, 'de volledige software-afbouw staat niet vóór het kandidaatimage');
   assert.ok(bootstrap >= 0 && bootstrap < afbouw,

@@ -331,7 +331,9 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
   const AUDITTAK = new Map([
     ['handelingLog', ['sleutel']],
     ['paySaldi', ['codenaam']],
-    ['payBoekingen', ['codenaam']]
+    ['payBoekingen', ['codenaam']],
+    // dezelfde grond: het bewijs van binnengekomen geld; de sleutel gaat eruit
+    ['betaalWaarheid', ['codenaam']]
   ]);
   await totdat('de sleutel van het lid overal weg was behalve uit het auditspoor',
     () => {

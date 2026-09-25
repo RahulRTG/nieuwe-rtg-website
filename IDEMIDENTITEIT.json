@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T22:41:06.187Z",
-    "commit": "9987f6ed",
+    "op": "2026-09-25T06:54:12.341Z",
+    "commit": "7ce3b9025",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",
@@ -19,9 +19,9 @@
   "voegtToe": 31,
   "nietTeLezen": 4,
   "voegtToeIsGeenGoedkeuring": true,
-  "handwerkPlekken": 4,
-  "handwerkVergelijkt": 1,
-  "handwerkGeenVergelijking": 3,
+  "handwerkPlekken": 5,
+  "handwerkVergelijkt": 4,
+  "handwerkGeenVergelijking": 1,
   "plekken": [
     {
       "bestand": "server/kern/bank/incasso.js",
@@ -271,44 +271,6 @@
       "uitspraak": "voegtToe"
     },
     {
-      "bestand": "server/kern/pay/huis.js",
-      "regel": 27,
-      "soort": "kern",
-      "binding": "server/lib/idem.js",
-      "sleutelNamen": [
-        "idem",
-        "van"
-      ],
-      "afdrukNamen": [
-        "c",
-        "van"
-      ],
-      "regelTekst": "return metIdem(idem ? 'huisin:' + van + ':' + idem : null, 'huisin|' + van + '|' + c, async () => {",
-      "afdrukExtra": [
-        "c"
-      ],
-      "uitspraak": "voegtToe"
-    },
-    {
-      "bestand": "server/kern/pay/huis.js",
-      "regel": 42,
-      "soort": "kern",
-      "binding": "server/lib/idem.js",
-      "sleutelNamen": [
-        "aan",
-        "idem"
-      ],
-      "afdrukNamen": [
-        "aan",
-        "c"
-      ],
-      "regelTekst": "return metIdem(idem ? 'huisuit:' + aan + ':' + idem : null, 'huisuit|' + aan + '|' + c, async () => {",
-      "afdrukExtra": [
-        "c"
-      ],
-      "uitspraak": "voegtToe"
-    },
-    {
       "bestand": "server/kern/pay/kassa.js",
       "regel": 66,
       "soort": "kern",
@@ -333,7 +295,7 @@
     },
     {
       "bestand": "server/kern/pay/opladen.js",
-      "regel": 27,
+      "regel": 28,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -575,7 +537,45 @@
     },
     {
       "bestand": "server/kern/pay/verzoeken.js",
-      "regel": 50,
+      "regel": 44,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "van"
+      ],
+      "afdrukNamen": [
+        "c",
+        "van"
+      ],
+      "regelTekst": "return metIdem(idem ? 'huisin:' + van + ':' + idem : null, 'huisin|' + van + '|' + c, async () => {",
+      "afdrukExtra": [
+        "c"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/verzoeken.js",
+      "regel": 59,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "aan",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "aan",
+        "c"
+      ],
+      "regelTekst": "return metIdem(idem ? 'huisuit:' + aan + ':' + idem : null, 'huisuit|' + aan + '|' + c, async () => {",
+      "afdrukExtra": [
+        "c"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/verzoeken.js",
+      "regel": 86,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -602,7 +602,7 @@
     },
     {
       "bestand": "server/kern/pay/verzoeken.js",
-      "regel": 88,
+      "regel": 112,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -785,20 +785,38 @@
     },
     {
       "bestand": "server/kern/directpay/betalen.js",
-      "regel": 32,
+      "regel": 31,
       "opzoeker": "idemZoek",
       "gevondenAls": "al",
-      "vergeleken": [],
-      "uitspraak": "geenVergelijking",
+      "vergeleken": [
+        "bedrag",
+        "supplierCode"
+      ],
+      "uitspraak": "vergelijkt",
       "regelTekst": "const al = idemZoek(idemSleutel);"
     },
     {
       "bestand": "server/kern/directpay/betalen.js",
-      "regel": 114,
+      "regel": 75,
+      "opzoeker": "idemZoek",
+      "gevondenAls": "b",
+      "vergeleken": [
+        "bedrag",
+        "supplierCode"
+      ],
+      "uitspraak": "vergelijkt",
+      "regelTekst": "const b = idemZoek(idemSleutel || ('waarheid:' + w.id));"
+    },
+    {
+      "bestand": "server/kern/directpay/betalen.js",
+      "regel": 100,
       "opzoeker": "idemZoek",
       "gevondenAls": "al",
-      "vergeleken": [],
-      "uitspraak": "geenVergelijking",
+      "vergeleken": [
+        "bedrag",
+        "supplierCode"
+      ],
+      "uitspraak": "vergelijkt",
       "regelTekst": "const al = idemZoek(idemSleutel);"
     },
     {

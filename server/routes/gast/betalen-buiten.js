@@ -131,8 +131,12 @@ module.exports = function betaalBuiten(ctx) {
       save();
       return res.json(Object.assign({ ok: true, rekeningId: rek.id }, uit));
     } catch (e) {
-      if (w && rek.betaalSlot && rek.betaalSlot.betalingId === w.id && !w.providerId) delete rek.betaalSlot;
+      // misschien afgeschreven (MONEY-012): slot blijft, anders betaalt de gast opnieuw
+      const onbekend = !!(w && betaalWaarheid.publiek(w).onbekend);
+      if (w && !onbekend && rek.betaalSlot && rek.betaalSlot.betalingId === w.id && !w.providerId) delete rek.betaalSlot;
       save();
+      if (onbekend) return res.status(502).json({ code: 'uitkomst-onbekend', betalingId: w.id,
+        error: 'De betaling gaf geen uitsluitsel. Betaal niet opnieuw; RTG zoekt het na.' });
       return res.status(502).json({ error: 'De betaling kon niet veilig starten. Je bestelling staat wel opgeslagen; er is niets dubbel afgeschreven.', code: 'provider-niet-bereikbaar' });
     }
   });

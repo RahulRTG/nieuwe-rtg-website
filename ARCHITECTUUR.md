@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5144 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5145 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5144 |
-| servermodules (`server/**/*.js`) | 3681 |
-| routebestanden (`server/routes/**`) | 610 |
+| API-endpoints | 5145 |
+| servermodules (`server/**/*.js`) | 3682 |
+| routebestanden (`server/routes/**`) | 611 |
 | kernmodules (`server/kern/**`) | 2309 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 390 |
-| toetsbestanden (`test/*.test.js`) | 1773 |
+| toetsbestanden (`test/*.test.js`) | 1774 |
 | schermtoetsen (`test/*.e2e.js`) | 254 |
 
 ## 2. De weg van een verzoek
@@ -128,7 +128,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3510 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3511 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

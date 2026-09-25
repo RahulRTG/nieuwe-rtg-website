@@ -40,7 +40,8 @@
     var t = q('#vnTempo');
     if (t && !t.options.length) t.innerHTML = s.tempo.standen.map(function (x) { return '<option value="' + esc(x) + '">' + esc(x) + '</option>'; }).join('');
     if (t) t.value = s.tempo.stand;
-    q('#vnKlok').textContent = 'Week ' + s.week + ' · nog ' + duur(s.vrijVandaag) + ' vrij vandaag · de dag loopt vanzelf af over ' +
+    var k = s.kalender;
+    q('#vnKlok').textContent = (k ? k.maand + ', ' + k.seizoen + ', ' + k.weer + ' · ' : '') + 'Week ' + s.week + ' · nog ' + duur(s.vrijVandaag) + ' vrij vandaag · de dag loopt vanzelf af over ' +
       Math.ceil(s.volgendeDagOver / 60000) + ' min, of sluit hem zelf af';
   }
 
@@ -79,8 +80,10 @@
     q('#vnInvoer').hidden = !a;
     q('#vnInvoer').innerHTML = a ? invoerVoor(a) : '';
     tekenAgenda(s);
-    q('#vnMeldingen').innerHTML = v.meldingen.map(function (m) {
-      return '<li class="vn-m vn-s-' + esc(m.soort) + '"><small>dag ' + esc(m.dag) + '</small>' + esc(m.tekst) + '</li>'; }).join('');
+    /* De laatste acht meteen; de rest achter een klik, anders is Vandaag op een telefoon vooral geschiedenis. */
+    var li = function (m) { return '<li class="vn-m vn-s-' + esc(m.soort) + '"><small>dag ' + esc(m.dag) + '</small>' + esc(m.tekst) + '</li>'; };
+    q('#vnMeldingen').innerHTML = v.meldingen.slice(0, 8).map(li).join('') + (v.meldingen.length > 8
+      ? '<li><details class="vn-meer"><summary>Eerder (' + (v.meldingen.length - 8) + ')</summary><ol class="vn-meldingen">' + v.meldingen.slice(8).map(li).join('') + '</ol></details></li>' : '');
     q('#vnRtg').innerHTML = s.rtg.map(function (r) {
       return '<div class="vn-rtg"><b>' + esc(r.naam) + '</b><small>verscheen op dag ' + esc(r.dag) + ' · ' + esc(r.waarom) + '</small></div>'; }).join('');
   }
@@ -91,6 +94,7 @@
     var hulp = { q: q, esc: esc, euro: euro, duur: duur };
     if (window.RTGMagnaatLevenSchermen) window.RTGMagnaatLevenSchermen.teken(s, hulp);
     if (window.RTGMagnaatLevenBedrijf) window.RTGMagnaatLevenBedrijf.teken(s, hulp);
+    if (window.RTGMagnaatLevenVerhaal) window.RTGMagnaatLevenVerhaal.teken(s, hulp);
     klok(s);
   }
 
@@ -103,7 +107,7 @@
     /* Opnieuw beginnen gooit een leven weg en kan niet terug: de eerste tik vraagt
        het, de tweede doet het. */
     if (t.dataset.vnOpnieuw != null) {
-      if (t.dataset.zeker) { doe({ actie: 'opnieuw', zeker: true }); return; }
+      if (t.dataset.zeker) { var nv = q('#vnNiveau'); doe({ actie: 'opnieuw', zeker: true, moeilijkheid: nv ? nv.value : undefined }); return; }
       t.dataset.zeker = '1';
       t.textContent = 'Ja, gooi dit leven weg en begin opnieuw';
       return;

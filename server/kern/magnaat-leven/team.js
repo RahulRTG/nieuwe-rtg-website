@@ -16,6 +16,7 @@ const B = require('./regels-bedrijf');
 const { meld, ontgrendel, post, euro, tijd } = require('./staat');
 const { boekVan } = require('./boek');
 const { betaalWatVervalt } = require('./geld');
+const { mijlpaal } = require('./gids');
 
 const fout = (error) => ({ status: 400, error });
 const teamlid = (st, id) => (st.team || []).find(m => m.id === String(id || '') && !m.weg) || null;
@@ -29,6 +30,8 @@ function werkminuten(m, dag) {
 }
 
 function werkplek(st, m) {
+  /* In een eigen bedrijfsruimte (V3) werkt je team daar, en is er geen losse werkplek. */
+  if (st.vestiging && st.vestiging.wijk !== 'thuis') { m.werkplekVolgende = st.dag + B.WERKPLEK.elke; return; }
   post(st, { soort: 'werkplek', naam: B.WERKPLEK.naam + ' voor ' + m.naam, bedrag: B.WERKPLEK.bedrag, dag: st.dag,
     leverancier: B.WERKPLEK.leverancier, naar: ['kosten', 'werkplek'], boekSoort: 'WERKPLEK' });
   m.werkplekVolgende = st.dag + B.WERKPLEK.elke;
@@ -43,6 +46,7 @@ function werf(st, z) {
   if (st.team.filter(m => !m.weg).length >= B.TEAM_MAX) return fout('Meer dan ' + B.TEAM_MAX + ' mensen kun je naast je eigen werk niet aansturen.');
   const m = Object.assign({}, k, { dagen: k.dagen.slice(), sinds: st.dag, betaaldTot: st.dag - 1, gewerkt: 0, gestaakt: null, einde: null, weg: false });
   st.team.push(m);
+  mijlpaal(st, 'team', 'Je eerste medewerker: ' + m.naam + '.');
   if (m.contract === 'dienst') {
     werkplek(st, m);
     betaalWatVervalt(st);

@@ -12,6 +12,7 @@ const R = require('./regels');
 const { AANBOD } = require('./klanten');
 const { meld, ontgrendel, euro } = require('./staat');
 const { boekVan } = require('./boek');
+const { mijlpaal } = require('./gids');
 const tijd = require('./tijd');
 const gesprek = require('./gesprek');
 const opdracht = require('./opdracht');
@@ -19,6 +20,7 @@ const geld = require('./geld');
 const team = require('./team');
 const voorraad = require('./voorraad');
 const contract = require('./contract');
+const { vestig } = require('./vestiging');
 
 const fout = (error) => ({ status: 400, error });
 
@@ -41,6 +43,7 @@ function onderneming(st, z) {
   boekVan(st).boekOver(st, { soort: 'INSCHRIJVING', van: ['kas'], naar: ['kosten', 'kvk'], bedrag: R.KVK,
     omschrijving: 'Inschrijving in ' + R.JURISDICTIE.register, sleutel: 'kvk' });
   st.onderneming = { naam, sinds: st.dag };
+  mijlpaal(st, 'onderneming', naam + ' ingeschreven in ' + R.JURISDICTIE.register + '.');
   meld(st, naam + ' staat ingeschreven in ' + R.JURISDICTIE.register + '. Je bent ondernemer. ' + R.JURISDICTIE.btw, 'goed');
   ontgrendel(st, 'zakelijk');
   ontgrendel(st, 'boekhouding');
@@ -52,7 +55,8 @@ function ontslag(st) {
   if (!st.zelfstandigMag) return fout('Je bedrijf draagt je nog niet: pas als het vier weken twee keer je loon binnenbrengt.');
   st.baan.actief = false;
   st.zelfstandig = st.dag;
-  meld(st, 'Je hebt opgezegd bij ' + st.baan.werkgever + '. Je begon met ' + euro(R.START_KAS) + ' en een baan in de keuken; ' +
+  mijlpaal(st, 'zelfstandig', 'Je zegde je baan op bij ' + st.baan.werkgever + ': je leeft van je eigen bedrijf.');
+  meld(st, 'Je hebt opgezegd bij ' + st.baan.werkgever + '. Je begon met ' + euro(R.niveauVan(st).startKas) + ' en een baan in de keuken; ' +
     (st.onderneming ? st.onderneming.naam : 'je bedrijf') + ' is van jou, en jij hebt het opgebouwd.', 'goed');
   return { ok: true };
 }
@@ -65,7 +69,8 @@ const ACTIES = {
   korting: opdracht.korting, voorfinancier: opdracht.voorfinancier,
   uitstel: geld.uitstel, lenen: geld.lenen,
   werf: team.werf, ontsla: team.ontsla, bestel: voorraad.bestelInkoop, prijs: voorraad.prijs,
-  teken: contract.teken, wijsaf: contract.wijsAf, zegop: contract.zegOp
+  teken: contract.teken, wijsaf: contract.wijsAf, zegop: contract.zegOp,
+  vestig
 };
 
 module.exports = { ACTIES };

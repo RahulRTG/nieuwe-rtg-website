@@ -71,6 +71,18 @@ const VOORFINANCIERING = { deel: 90 };                   // je krijgt nu 90% van
 const ONDERNEMING = { opdrachten: 2 };                   // na twee betaalde opdrachten ben je structureel bezig
 const ZELFSTANDIG = { dagen: 28, factor: 200 };          // je bedrijf brengt twee keer je loon binnen, en bestaat al vier weken
 
+/* HOE ZWAAR HET LEVEN IS (V4). Normaal is het leven zoals het bedoeld is;
+   licht geeft wat meer ruimte om te leren, zwaar laat bijna niets over. Wat er
+   schuift: waarmee je begint, hoe laat klanten betalen (procent van hun
+   gewoonte) en wat je kamer kost (procent). De keten zelf verandert niet. */
+const MOEILIJKHEID = {
+  licht: { naam: 'Licht', startKas: 25000, laat: 50, huur: 85, uitleg: 'meer om mee te beginnen, klanten betalen eerder, je kamer is goedkoper' },
+  normaal: { naam: 'Normaal', startKas: START_KAS, laat: 100, huur: 100, uitleg: 'zoals het bedoeld is' },
+  zwaar: { naam: 'Zwaar', startKas: 1500, laat: 150, huur: 110, uitleg: 'bijna niets op de bank, klanten betalen later, je kamer is duurder' }
+};
+const niveauVan = (st) => MOEILIJKHEID[st.moeilijkheid] || MOEILIJKHEID.normaal;
+const verplichtingBedrag = (st, v) => (v.id === 'huur' ? Math.round(v.bedrag * niveauVan(st).huur / 100) : v.bedrag);
+
 const RTG = {
   geld: { naam: 'RTG Geld', waarom: 'je hebt een rekening en een loon' },
   agenda: { naam: 'Agenda', waarom: 'je plant je eerste vrije uren' },
@@ -89,4 +101,4 @@ const RTG = {
 
 module.exports = { REGELVERSIE, DAG_MS, MAX_DAGEN_PER_KEER, TEMPO, DOORSPOELEN_MAX, START_KAS, PERIODE, DAGNAMEN, weekdag, dagNaam, BAAN, VRIJ,
   VERPLICHTINGEN, BOODSCHAPPEN, SOFTWARE, JURISDICTIE, AANMANING, KVK, LEREN, BETAALTERMIJN, HERINNERING_DAGEN, LENING,
-  VOORFINANCIERING, ONDERNEMING, ZELFSTANDIG, RTG };
+  VOORFINANCIERING, ONDERNEMING, ZELFSTANDIG, RTG, MOEILIJKHEID, niveauVan, verplichtingBedrag };

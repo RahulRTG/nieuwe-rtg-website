@@ -378,6 +378,84 @@ Een leven van vóór V2 gaat door, met een leeg bedrijf erbij.
 
 Wat V2 bewust **niet** doet: loonheffing en sociale lasten als aparte posten (in Oudwijk is het uurloon alles), verlof en ziekte, meer dan drie mensen, meer dan één product, voorraad die veroudert, een webwinkel als eigen kanaal, en concurrenten. Dat laatste hoort bij **V3 Levende markt**.
 
+### V3 LEVENDE MARKT: wat er staat (25 september 2026)
+
+**De belofte:** tot V2 was Oudwijk een decor. Klanten kwamen op vaste momenten, en wie iets verkocht, verkocht alleen. V3 zet er een markt omheen die op jou reageert, zonder dat het spel willekeurig wordt. Alles is **deterministisch**: het weer, de fouten van concurrenten en de klanten uit de markt volgen uit de wereld en de dag (`kalender.js`, `lot`). Hetzelfde leven met dezelfde keuzes geeft dus dezelfde markt, en een ander leven een andere. De getallen staan in `regels-markt.js`.
+
+**Seizoen en weer** (`kalender.js`):
+- Een maand duurt vier weken, en dag 1 valt begin maart.
+- Het weer verschilt per dag en volgt het seizoen: in de zomer is het de helft van de dagen zonnig, in de winter hooguit een op de zes.
+- Het weer stuurt hoeveel mensen de deur uit gaan en iets zien liggen: storm is 45%, zon is 115%.
+- Het seizoen stuurt de vraag per product. Tablets verkopen bij het terrasseizoen, prints voor de feestdagen, en scanners bij de jaarafsluiting.
+- Op Vandaag staat bovenaan de maand, het seizoen en het weer.
+
+**Kopers en marktaandeel** (`markt.js`):
+- Wat je verkoopt is geen formule meer, maar je **aandeel** in wat heel Oudwijk koopt.
+- Drie soorten kopers kiezen elke dag tussen jou en drie concurrenten: wie op de prijs let (35%), wie op kwaliteit let (40%) en wie koopt wat hij tegenkomt (25%).
+- Ze letten op prijs, op naam en op waar je zit.
+- Je **reputatie** groeit met elke opdracht die op tijd betaald werd. Een te late levering telt dubbel tegen.
+
+**Concurrenten** (drie per aanbod, elk met een eigen tarief, prijs, reputatie en betrouwbaarheid):
+- **Ze reageren elke maandag.** Wie klanten aan jou verliest en duurder is, zakt in prijs, maar nooit onder zijn bodem. Wie ver boven jou zit terwijl jij beter verkoopt, gaat omhoog. Een prijsoorlog kost dus allebei marge.
+- **Ze maken fouten.** In de weken dat een concurrent te laat levert, zoekt een van zijn klanten iemand anders.
+- **Zo'n klant uit de markt** heeft een **offerte van een andere concurrent** naast zich liggen, en dat hoor je in het gesprek. Hij betaalt je hooguit die offerte plus 3% per goede klant, tot 15%. Onder de prijs van de concurrent zeg je dus ja tegen minder, en erboven heb je een naam nodig.
+- Naast de fouten brengt ook het seizoen klanten. Wie zichtbaarder zit, wordt vaker gevonden.
+- Hooguit één zo'n klant per week, en nooit als er al twee kansen openstaan.
+
+**Locatie:**
+- Je bedrijf kan thuis zitten (geen huur, nauwelijks zichtbaar), in Broedplaats Oost, in het Havenkwartier of in de Winkelstraat Centrum (€ 900 per vier weken, zichtbaarheid 220).
+- Verhuizen kost een keer geld plus de eerste huur. Daarna komt de huur elke vier weken terug en staat hij in de prognose.
+- Buiten thuis werkt je team in je eigen ruimte, en vervallen de losse werkplekken uit V2.
+- Of een dure plek zich terugverdient, zie je op Wereld: daar staan je aandeel, dat van de concurrenten en wat elke plek kost.
+
+**Wat de toetsen vastleggen:**
+- `test/magnaatmarkt.test.js` heeft negen toetsen: kalender en weer, determinisme per leven, aandeel naar prijs, plek en naam, seizoen, reactie van concurrenten met bodem, de klant uit de markt met zijn offerte, verhuizen met huur en zonder werkplek, en dezelfde markt voor dezelfde keuzes.
+- De e2e-toets van V2 verhuist er via de Edge bij, en kijkt of Wereld de markt toont.
+- Acht mutaties zijn nagetrokken, en alle acht zakken: kopers die niet op prijs letten, reputatie zonder effect, concurrenten die niet reageren, een klant die boven zijn offerte betaalt, huur die niet terugkomt, een werkplek die blijft, weer zonder seizoen en vraag zonder seizoen. De weermutatie zakte pas nadat de toets een drempel kreeg: "meer zon in de zomer" haalde een willekeurige reeks ook weleens.
+- De vraagtoets van V2 zegt nu dat twee keer zo duur **minder dan de helft** verkoopt, omdat de kopers naar een concurrent gaan. Dat is een nieuwe regel en geen versoepeling.
+
+Wat V3 bewust **niet** doet:
+- concurrenten die failliet gaan of erbij komen;
+- concurrenten die om jouw vaste klanten of contracten vechten;
+- weer dat je eigen dag verandert: de keuken en je boodschappen blijven gelijk;
+- per-wijk verschillen in koperssoort.
+
+Dat is werk voor **V4 Game-afwerking**, als spelen laat zien dat het ontbreekt.
+
+### V4 GAME-AFWERKING: wat er staat (25 september 2026)
+
+Gekozen: **afwerking zonder multiplayer**. Een gedeeld Oudwijk raakt het grootboek, de gelijktijdigheid en valsspelen, en hoort daarom na V5. V4 gaat over de speler die Magnaat opent en nergens van weet (`gids.js` en `regels.js`, MOEILIJKHEID).
+
+- **Je eerste uur, zonder uitlegscherm.** De Edge zegt al wat nu zin heeft. Daarnaast staat een gids met de negen stappen van niets naar je eerste betaalde klant, elk met een regel waarom:
+  - kies wat je maakt;
+  - plan tijd;
+  - sluit de dag af;
+  - laat iemand je werk zien;
+  - praat;
+  - maak een afspraak;
+  - lever op;
+  - factureer;
+  - word betaald.
+
+  De gids wordt **afgeleid** uit wat je deed en niet bijgehouden, dus hij kan niet uit de pas lopen met het spel. Na de eerste betaling verdwijnt hij.
+- **Drie moeilijkheden.**
+  - *Licht*: € 250 om mee te beginnen, klanten betalen twee keer zo snel, de kamer kost 85%.
+  - *Normaal*: zoals het bedoeld is.
+  - *Zwaar*: € 15, klanten betalen anderhalf keer zo laat, de kamer kost 110%.
+
+  De keten zelf verandert niet, alleen die drie getallen. Kiezen kan op dag 1 voordat je iets koos, want dan gaat er niets verloren. Daarna kan het alleen door opnieuw te beginnen, met bevestiging, en dan kies je de moeilijkheid erbij.
+- **Mijlpalen en een slot.** De momenten die er later toe doen worden een keer vastgelegd, met de dag: je eerste klant, je eerste geld, je onderneming, je eerste medewerker, je eerste vaste klant, je eerste verkoop, je eerste bedrijfsruimte, en de dag dat je je baan opzegt. Samen zijn ze *Jouw verhaal* op Wereld. Wie van zijn bedrijf leeft, krijgt daar het slot dat V1 belooft: waarmee je begon, na hoeveel dagen, en wat je hebt (omzet, resultaat, klanten, team).
+- **Terwijl je weg was.** Wie na twee dagen of meer terugkomt, ziet eerst wat er in die dagen gebeurde dat ertoe doet, in plaats van alleen de stand van nu. Na de eerste handeling verdwijnt het. Dit is ook het antwoord op *opslaan en hervatten*: de server bewaart elk leven al, en hervatten is dus vooral weten waar je was.
+- **Toegankelijk en mobiel.** De nieuwste melding gaat naar een aria-live-regio, zodat een schermlezer hoort wat een ziende speler ziet verschijnen. Op Vandaag staan de laatste acht meldingen, de rest staat achter *Eerder*. De keuzelijsten passen op een telefoon: de browsertoets vond dat Wereld op 390 pixels 718 pixels breed werd door een lange keuzelijst, en meet sindsdien per scherm of er horizontaal gescrold kan worden.
+- **Geluid staat uit tot je het aanzet**, en de keuze blijft alleen in je eigen browser. Er worden geen bestanden geladen: twee korte tonen uit de Web Audio API, omhoog bij iets goeds en omlaag bij geldnood. Geen muziek en geen herhaling: dit huis maakt geen verslavende patronen.
+
+**Wat de toetsen vastleggen:**
+- `test/magnaatafwerking.test.js` (zes toetsen) dekt de gids stap voor stap, de moeilijkheid (dag 1 via de Edge, daarna alleen opnieuw beginnen), betaaltermijnen van 5, 10 en 15 dagen per stand, mijlpalen die een keer vastgelegd worden, het slot, en *terwijl je weg was*.
+- `test/magnaatafwerking.e2e.js` speelt het in een echte browser op 390 pixels.
+- Acht mutaties zijn nagetrokken en zakken alle acht. Het vastleggen van een mijlpaal zakte pas na een eigen toets: in een gewone speelronde komt geen mijlpaal twee keer langs.
+
+Wat V4 bewust **niet** doet: multiplayer (na V5), muziek, animaties die om aandacht vragen, en een tutorial die je moet doorklikken.
+
 ---
 
 ## 8. De regels

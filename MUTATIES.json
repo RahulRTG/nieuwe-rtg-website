@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T02:21:55.678Z",
-    "commit": "793020659",
+    "op": "2026-09-25T04:23:45.629Z",
+    "commit": "17cf749bc",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5267,6 +5267,21 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "magnaatafwerking.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatafwerking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "magnaatgeldkaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5304,6 +5319,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "magnaatmarkt.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "magnaatonderneming.e2e.js": {
       "soort": "server",

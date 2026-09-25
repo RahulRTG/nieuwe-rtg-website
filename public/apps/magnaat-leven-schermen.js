@@ -59,11 +59,13 @@
 
     q('#vnWereld').innerHTML = '<div class="eyebrow">Je stad</div><h3>' + esc(s.wereld.stad) + '</h3>' +
       regels(s.wereld.plaatsen.map(function (x) { return [x.naam, esc(x.wat)]; })) +
-      '<h3>Spelregels van ' + esc(s.wereld.stad) + '</h3><ul class="vn-waarom">' + (s.wereld.spelregels || []).map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>' +
+      '<div id="vnVerhaal"></div><div id="vnMarkt"></div><h3>Spelregels van ' + esc(s.wereld.stad) + '</h3><ul class="vn-waarom">' + (s.wereld.spelregels || []).map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>' +
       '<p class="vn-rust">Dit zijn de regels van deze spelwereld. In een echt land kunnen inschrijving, kosten en btw anders werken.</p>' +
       '<h3>Wat je hier kunt maken</h3>' + regels(s.wereld.aanbod.map(function (x) { return [x.naam + (x.gekozen ? ' (jij)' : ''), esc(x.software) + ' voor klantwerk']; })) +
       '<h3>Een andere weg proberen</h3><p class="vn-rust">Je begint dan opnieuw op maandag met ' + euro(s.wereld.startKas) + '. Wat je in dit leven deed, blijft in het grootboek staan.' +
-      (s.ronde ? ' Dit is je poging ' + (s.ronde + 1) + '.' : '') + '</p><button type="button" class="btn subtle" data-vn-opnieuw>Begin opnieuw</button>';
+      (s.ronde ? ' Dit is je poging ' + (s.ronde + 1) + '.' : '') + '</p><label class="vn-tempo">Hoe zwaar <select id="vnNiveau">' + (s.wereld.niveaus || []).map(function (n) {
+        return '<option value="' + esc(n.id) + '"' + (n.id === s.wereld.moeilijkheid ? ' selected' : '') + '>' + esc(n.naam) + ': ' + esc(n.uitleg) + '</option>';
+      }).join('') + '</select></label> <button type="button" class="btn subtle" data-vn-opnieuw>Begin opnieuw</button>';
 
     /* Mijn bedrijf en de prognose tekent ./magnaat-leven-bedrijf.js. */
   }

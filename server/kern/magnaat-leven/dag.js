@@ -30,6 +30,7 @@ const { teamDag } = require('./team');
 const { handelDag } = require('./voorraad');
 const { contractDag } = require('./contract');
 const { marktDag } = require('./markt');
+const { huurDag } = require('./vestiging');
 
 /* Wat je bedrijf de afgelopen vier weken op je rekening bracht. */
 function ontvangen(st, dagen) {
@@ -58,6 +59,7 @@ function volgendeDag(st) {
   voerUit(st);
   st.dag += 1;
   teamDag(st);
+  huurDag(st);
   marktDag(st);
   handelDag(st);
   startDag(st);

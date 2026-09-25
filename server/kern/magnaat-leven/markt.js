@@ -12,18 +12,14 @@
    heeft een offerte van een concurrent naast zich liggen, en betaalt jou alleen
    meer als je naam dat waard is.
 
-   WAAR JE ZIT, kost huur en brengt zichtbaarheid. Buiten Thuis heb je ruimte
-   voor je team, en vervallen de losse werkplekken (./team.js). */
+   WAAR JE ZIT, kost huur en brengt zichtbaarheid: dat staat in ./vestiging.js. */
 'use strict';
 const M = require('./regels-markt');
 const B = require('./regels-bedrijf');
-const { meld, post, euro, tijd } = require('./staat');
-const { boekVan } = require('./boek');
-const { betaalWatVervalt } = require('./geld');
+const { meld, euro, tijd } = require('./staat');
 const { lot, seizoenVan, weekVan, weerVan } = require('./kalender');
 const R = require('./regels');
 
-const fout = (error) => ({ status: 400, error });
 const opKwartje = (c) => Math.round(c / 2500) * 2500;
 const tussen = (st, label, [van, tot], stap = 1) => van + lot(st, label, Math.floor((tot - van) / stap) + 1) * stap;
 
@@ -73,7 +69,7 @@ function stadsvraag(st, dag) {
 const mijnVraag = (st, dag) => Math.floor(stadsvraag(st, dag) * (aandelen(st).jij || 0) / 1000 * (dag ? 1 : 7));
 
 /* Maandag: de concurrenten bekijken hun prijs. */
-function reageer(st) {
+function concurrentenReageren(st) {
   const h = st.handel, w = B.HANDELSWAAR[st.aanbod];
   if (!h || !w) return;
   const a = aandelen(st), bodem = Math.max(M.REACTIE.bodem, Math.ceil(w.inkoop * 110 / w.advies));
@@ -119,35 +115,11 @@ function leads(st) {
   if (lot(st, 'seizoen:' + week, 100) < M.MARKTKLANTEN.seizoenKans * seizoen / 100 * zicht / 100) marktklant(st, {});
 }
 
-function huurPost(st) {
-  const w = M.WIJKEN[st.vestiging.wijk];
-  post(st, { soort: 'huisvesting', naam: 'Huur ' + w.naam, bedrag: w.huur, dag: st.dag, leverancier: 'verhuurder ' + w.naam,
-    naar: ['kosten', 'huisvesting'], boekSoort: 'HUUR_BEDRIJF' });
-  st.vestiging.volgende = st.dag + R.PERIODE;
-}
-
+/* Elke maandag: de concurrenten bekijken hun prijs, en de markt brengt misschien een klant. */
 function marktDag(st) {
-  if (st.vestiging.volgende != null && st.vestiging.volgende <= st.dag && M.WIJKEN[st.vestiging.wijk].huur) huurPost(st);
   if (R.weekdag(st.dag) !== 0) return;
-  reageer(st);
+  concurrentenReageren(st);
   leads(st);
-}
-
-function vestig(st, z) {
-  if (!st.onderneming) return fout('Een bedrijfsruimte huur je als onderneming.');
-  const w = M.WIJKEN[z.wijk];
-  if (!w) return fout('Kies een plek: ' + Object.values(M.WIJKEN).map(x => x.naam).join(', ') + '.');
-  if (z.wijk === st.vestiging.wijk) return fout('Je zit al in ' + w.naam + '.');
-  if (st.kas < w.verhuis + w.huur) return fout('Verhuizen naar ' + w.naam + ' kost ' + euro(w.verhuis) + ' plus de eerste huur van ' + euro(w.huur) + ', en er staat ' + euro(st.kas) + ' op je rekening.');
-  const oud = M.WIJKEN[st.vestiging.wijk];
-  st.posten = st.posten.filter(p => p.soort !== 'huisvesting' || p.achterstand);
-  if (w.verhuis) boekVan(st).boekOver(st, { soort: 'VERHUIZING', van: ['kas'], naar: ['kosten', 'huisvesting'], bedrag: w.verhuis,
-    omschrijving: 'Verhuizing naar ' + w.naam, sleutel: 'verhuis:' + st.dag });
-  st.vestiging = { wijk: z.wijk, sinds: st.dag, volgende: null };
-  if (w.huur) { huurPost(st); betaalWatVervalt(st); }
-  meld(st, 'Je bedrijf zit nu in ' + w.naam + (oud.huur ? ' en niet meer in ' + oud.naam : '') + '. ' +
-    (w.huur ? 'Huur ' + euro(w.huur) + ' per vier weken; je team werkt hier, dus losse werkplekken zijn niet meer nodig.' : 'Geen huur, en ook minder mensen die je zien.'), 'goed');
-  return { ok: true };
 }
 
 /* Wat de speler van de markt ziet. */
@@ -166,4 +138,4 @@ function marktBeeld(st) {
   };
 }
 
-module.exports = { marktDag, vestig, aandelen, mijnVraag, reputatie, marktBeeld };
+module.exports = { marktDag, aandelen, mijnVraag, reputatie, marktBeeld };

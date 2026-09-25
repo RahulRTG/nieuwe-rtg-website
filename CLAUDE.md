@@ -2396,6 +2396,22 @@ kwam sprong het bronbereik naar 100%, want een index noemt elk bestand. Structuu
 (welke functies wonen hier) en gedrag (schrijft het, is het bewezen) staan daarom
 apart, en alleen die tweede zegt nog iets.
 
+**`TOESTEL.md` is AI op het toestel van het lid** -- rekenen in de browser
+(WebGPU, WASM, later WebNN, of het model dat de browser meebrengt) als derde
+plaats naast de eigen modelserver van RTG en een externe aanbieder. Lees die
+vóór je een model naar de browser brengt. De kern: **geen model is
+infrastructuur, een taakcontract is infrastructuur** -- Rahul vraagt
+`spraak.naartekst` onder voorwaarden, en de techniek eronder mag wisselen.
+Drie dingen die niet mogen sneuvelen: **de server beweert nooit `toestel`**
+(hij ziet het per definitie niet; `test/ai-herkomst.test.js`), **het toestel
+levert inhoud en nooit een handeling** (het heet daarom toestelREKENlaag en
+geen execution layer -- dat woord is van EXECUTIE.md), en de rekencel draait
+met `connect-src 'none'`, zodat "dit toestel nooit verlaten" een grens van de
+browser is en geen belofte van onze code. `op-dit-apparaat` betekende de
+server van RTG en werd aan het lid getoond als "deze Mac"; het heet nu
+`rtg-server`. Het label onder een antwoord komt sindsdien uit wat er bij DAT
+verzoek gebeurde (`ai-stand.js` `uitgevoerd()`), niet uit de configuratie.
+
 **`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution
 Physics (de uitvoeringskant van hetzelfde voorstel waarvan RUNTIME.md de
 werkelijkheidskant is), als richtingsdocument met per onderdeel of het **staat**, **een stap

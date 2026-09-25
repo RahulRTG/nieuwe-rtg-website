@@ -1,0 +1,93 @@
+{
+  "soort": "herhaalpakket",
+  "versie": 1,
+  "herkomst": {
+    "artefact": {
+      "commit": "f9417aed5fe574ecddb83de6a2f1e819dfa220a4",
+      "boomSchoon": true,
+      "node": "v22.22.2"
+    },
+    "configuratie": {
+      "simulatiebank": true,
+      "opstelling": "server/kern/spellen/magnaat/rtg-keten.js",
+      "motor": "scripts/lib/tegenvoorbeeld.js"
+    },
+    "gevonden": {
+      "zaad": 1,
+      "reeks": 7,
+      "reeksen": 100,
+      "lengte": 12,
+      "verkleindIn": 12
+    }
+  },
+  "begintoestand": {
+    "soort": "leeg",
+    "uitleg": "een verse kern/pay zonder saldi, boekingen of verzoeken; alles wat er staat komt uit de stappen"
+  },
+  "rollen": 3,
+  "stappen": [
+    {
+      "ops": [
+        {
+          "soort": "verzoek",
+          "van": "speler-3",
+          "aan": "speler-2",
+          "centen": 1,
+          "idem": "i1"
+        }
+      ]
+    },
+    {
+      "ops": [
+        {
+          "soort": "betaal",
+          "wie": null,
+          "verzoek": 2,
+          "idem": "i6"
+        },
+        {
+          "soort": "betaal",
+          "wie": null,
+          "verzoek": 2,
+          "idem": "i7"
+        }
+      ]
+    }
+  ],
+  "afhankelijkheden": {
+    "betaalbank": "server/betaal/synthetisch.js: de afloop van een oplading volgt uit de idem-sleutel, en die staat in de stappen"
+  },
+  "wetten": [
+    {
+      "wet": "geld-conservatie",
+      "bron": "server/kern/pay/kijken.js sluitcontrole() en WETTEN.json"
+    },
+    {
+      "wet": "een herhaling boekt niets",
+      "bron": "MUTATIECONTRACT.md en de idem-laag van kern/pay (metIdem)"
+    },
+    {
+      "wet": "een verzoek wordt ten hoogste een keer betaald",
+      "bron": "server/kern/pay/verzoeken.js verzoekBetaal() (\"Dit verzoek is al afgehandeld\")"
+    }
+  ],
+  "verwacht": {
+    "schending": {
+      "wet": "een verzoek wordt ten hoogste een keer betaald",
+      "stap": 1
+    },
+    "divergentie": {
+      "van": "E2 ingangstoestand",
+      "naar": "E3 effectbesluit"
+    }
+  },
+  "voorbehoud": [
+    "de klok is niet vastgezet: kern/pay stempelt met de systeemklok, en geen wet hangt ervan af",
+    "de volgorde binnen een gelijktijdige stap is deterministisch zolang het werk nergens op echte I/O wacht; met de Rust-motor of een echte provider is dat niet zo (BEWIJSLUS.md par. 3a)"
+  ],
+  "bevatNiet": {
+    "aliassen": "Er staan geen codenamen in, alleen rollen. Een pakket met codenamen maakt de scheiding ongedaan zodra iemand het doorstuurt.",
+    "ruweGegevens": "Er zit geen database in. De begintoestand is leeg en de stappen vullen hem.",
+    "productie": "Dit pakket komt uit de testwereld. Wat er van een productiefout in mag, is nog niet besloten (BEWIJSLUS.md par. 13, besluit 2)."
+  }
+}

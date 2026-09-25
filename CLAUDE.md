@@ -2465,6 +2465,61 @@ het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
 
 **`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). En regel 13 vóór je pusht: **"mijn gebruikelijke controles" is niet "het oordeel van de keten"** — een CI-job die als EEN release-oordeel geldt heeft meer poorten dan iemand onthoudt, en `npm run ci:lokaal` draait ze allemaal omdat hij ze AFLEIDT uit `.github/workflows` in plaats van ze over te typen. Een handlijst poorten is een tweede waarheid naast ci.yml en loopt uit elkaar. En regel 17 komt uit een fout van twee keer op een dag: **een poort bewijst alleen zijn eigen bereik** — `check`, `norm` en de deltapoort stonden groen terwijl CI terecht rood bleef, want routedekking en de afdrukregel liggen daarbuiten. Zeg dus nooit "de gate is groen" maar welke poort groen staat, en wat er nog niet bevestigd is. Daar hangt de routeregel aan: een nagemaakte app bewijst het handlergedrag en niet de montage of de deur, dus **geen nieuwe HTTP-route zonder minstens één treffer op een echte server in een gewone CI-toets**. LAT.md gaat over de code, CLAUDE.md over het merk.
 
+**`BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen**
+-- de heenweg (veranderbereik, Evidence DAG, bewijsmatrix, release-bewijs,
+Sentinel, canary) staat, de terugweg van productie naar bewijs ontbreekt. Lees
+die vóór je iets bouwt dat fouten zoekt, reproduceert of verklaart. Er komen
+vier bouwstenen en niet meer: een zoekende tegenstander (eerst op
+`geld-conservatie`, zonder model, en hij oordeelt nooit zelf), de eerste
+divergentie, het herhaalpakket en immuniteit. Let op de namen: `Sentinel`,
+`capsule`, `replay` (betekent hier idempotentie), `naspelen` en `bewijskaart`
+zijn bezet, en L0-L3 en een achtstandige statusruimte zouden een zesde ladder
+zijn. De goedkoopste vondst: `/api/pay/gezond` bestond en de sonde las hem
+niet, dus het grootboek meldde zijn stand aan een bewaking die niet keek. Dat
+is de eerste stap die staat: de reis `grootboek` in `SLO.json`, en de triage
+duidt een 500 daarop als `geld` -- niet als routefout, en nooit als reden om
+terug te rollen. De tweede stap legde een eigen vergissing bloot: het
+"vertrouwensdossier" bestond al als het **routedossier** in het kantoor, dus het
+is AANGEVULD en niet opnieuw gebouwd -- met de vervalstaat, de plek in de code
+en een blok *wat dit dossier niet weet* (tegenvoorbeeld, mutatie per route,
+productie). Zoek dus eerst of een scherm iets al toont voordat je een tweede
+bouwt. De derde stap is de zoeker zelf (`npm run tegenvoorbeeld`): reeksen over
+waarden, volgorde, gelijktijdigheid en storing tegen een echte `kern/pay`, met
+krimpen, en hij oordeelt alleen met regels die al in de code staan. Bij zijn
+eerste ronde vond hij dat een verzoek (`verzoekBetaal`) twee keer betaald wordt
+als het twee keer tegelijk met verschillende sleutels binnenkomt -- terwijl de
+sluitcontrole groen blijft. Let daarbij op dat hij TELT hoe vaak elke soort
+handeling slaagde: "niets gevonden" over handelingen die allemaal geweigerd
+werden is geen uitslag, en de eerste versie leverde precies dat. Die vondst is
+gerepareerd (BEWIJSLUS.md par. 6a: een slot per verzoek en de stand opnieuw
+gecontroleerd binnen het werk), en het verkleinde tegenvoorbeeld is de blijvende
+toets (`test/verzoekbetaal-race.test.js`). Let op de grens van zo'n vondst: over
+HTTP in de toetsopstelling kwam de dubbele betaling NIET door, omdat het werk
+daar nergens op echte I/O wacht; op het productiepad (Rust-motor, echte
+provider) wel. Een vondst van de zoeker gaat over de CODE; welke omgeving hem
+bereikt is een aparte vraag. De vierde stap is de **eerste divergentie**
+(`scripts/lib/divergentie.js`, par. 4a): elk verkleind tegenvoorbeeld loopt nog
+een keer langs negen ijkpunten (E0 intentie tot E8 uitkomst), en de uitslag zegt
+waar het voor het EERST onwaar werd. Op de echte race wijst hij E3 aan (het
+besluit, waar de reparatie zit) terwijl de wet het pas bij E4 (de opslag) zag.
+Drie dingen daar niet wegpoetsen: elk ijkpunt is een VERBOD uit de code en geen
+tweede model van RTG Pay; er worden EFFECTEN geteld en geen ok-antwoorden (een
+herhaling met een sleutel die al slaagde krijgt `ok` zonder iets te doen, en de
+eerste versie meldde daarom op 27 van de 40 gezonde reeksen een afwijking); en
+E6 staat voor RTG Pay altijd op `niet-waargenomen`, want kern/pay zet geen
+gebeurtenis in een envelop. Het spoor staat NAAST de envelop en alleen in de
+testwereld. Het bouwen vond ook een fixturefout: `rtg-keten.js` gaf
+`keyVanCodenaam` een kale tekst waar `kern/gids.js` een object geeft, dus
+`seintje()` ging in de proefwereld nooit af. De vijfde stap is het
+**herhaalpakket** (`npm run herhaalpakket`, par. 5a): een tegenvoorbeeld als
+object, met rollen in plaats van codenamen (een grendel weigert anders), een lege
+begintoestand in plaats van een database, en een `voorbehoud` voor wat niet
+deterministisch is. De **herhaalmatrix** speelt hetzelfde pakket na op meerdere
+commits, elk in een eigen worktree, en liet meteen zien dat main de dubbele
+betaling nog heeft -- de reparatie staat op de tak van PR #380. Een kolom die niet
+kon draaien is `niet vast te stellen` en nooit `houdt`; een andere wet is
+`breekt-anders` en nooit `breekt`.
+
 ## Structuur en starten (kort)
 
 - `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 222 schermen), `apps/foundation/` (de RTFoundation, 85), `apps/juridisch/` (3), `site/` (`404.html`, `passen/` met vijf paspagina's, `werelden/` met vier wereldpagina's, en `start/` met de stijl en het script van de landing), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). Tellingen gemeten op 19 september 2026.

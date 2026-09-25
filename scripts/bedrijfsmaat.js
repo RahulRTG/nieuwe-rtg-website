@@ -83,6 +83,7 @@ function meet() {
     telling: {
       maten: maten.length, domeinen: B.DOMEINEN.length, perStatus, primairGat, perGat,
       ketens: inv.ketens.length, ketensGegrond: inv.ketens.filter(k => k.gegrond).length,
+      bestaatGedeeltelijk: maten.filter(m => m.status === 'bestaat' && m.gedeeltelijk).length,
       rustOpGat: inv.rustOpGat.length, privacyGaten: inv.privacyGaten.length,
       verworpen: inv.verworpen.length, vormfouten: B.vormfouten().length
     },

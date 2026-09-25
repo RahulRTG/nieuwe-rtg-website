@@ -4,7 +4,7 @@
    rijen buiten het geheugen (ledenGids* uit db.js); zonder Postgres draait
    alles op db.data.memberDir zoals voorheen. De lezers merken het verschil
    niet: gidsHaal/gidsZoekCodenaam/keyVanCodenaam blijven hetzelfde. */
-module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal }) => {
+module.exports = ({ db, save, raakAanwezig, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal }) => {
   // de demo-persona's die bij het opstarten in de gids komen; geen echte leden
   const GIDS_SEED_TIERS = ['rtg', 'lifestyle', 'business'];
 
@@ -15,6 +15,9 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
     if (!sess) return;
     if (sess.tier === 'guest' && !sess.account) return;
     const cn = liveCodename(sess);
+    /* De dag van het laatste bezoek (kern/aanwezigheid.js) op hetzelfde keelgat,
+       zodat "aanwezig" en "in de gids" niet op twee deuren iets anders betekenen. */
+    if (typeof raakAanwezig === 'function') raakAanwezig(cn);
     // Met Postgres gaat het lid naar de geindexeerde ledengids (member_dir) en
     // NIET naar db.data.memberDir: zo groeit de gids buiten het geheugen en
     // staan er bij miljoenen leden geen miljoenen rijen in het proces.

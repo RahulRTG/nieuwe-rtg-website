@@ -33,7 +33,7 @@ const { WERELDEN } = require('../economie/werelden');
 const { KLASSEN } = require('./poort');
 const { BESLUITEN } = require('./besluiten');
 
-const MATEN = [].concat(require('./maten-geld'), require('./maten-kosten'), require('./maten-groei'),
+const MATEN = [].concat(require('./maten-geld'), require('./maten-kosten'), require('./maten-groei'), require('./maten-behoud'),
   require('./maten-markt'), require('./maten-product'), require('./maten-operatie'), require('./maten-weerbaarheid'));
 
 /* De domeinen die de eigenaar noemde (25 september 2026). Elk heeft minstens een maat. */
@@ -57,7 +57,7 @@ const KETENS = Object.freeze([
   { id: 'geld', naam: 'van ontvangen omzet naar runway',
     schakels: ['omzet.leden-ontvangen', 'marge.bruto-rtg', 'marge.operationeel-rtg', 'cash.rtg-bankpositie', 'runway.rtg'] },
   { id: 'funnel', naam: 'van nieuw lid naar behoud',
-    schakels: ['acquisitie.nieuwe-leden', 'cohort.aanmeldweek', 'activatie.eerste-waarde', 'uitkomst.klantwaarde', 'retentie.actief-na-30-dagen'] },
+    schakels: ['acquisitie.nieuwe-leden', 'cohort.aanmeldweek', 'activatie.eerste-waarde', 'uitkomst.klantwaarde', 'retentie.aanwezig'] },
   { id: 'werving', naam: 'van campagne naar wervingskosten',
     schakels: ['campagnes.rtg-marketing', 'acquisitie.kanaal', 'cac.per-kanaal'] },
   { id: 'kosten', naam: 'van verbruik naar unit economics',
@@ -102,6 +102,7 @@ function vormfouten() {
     if (KLASSEN[m.privacy] && KLASSEN[m.privacy].optellend && !m.groepsgrens && !waarom.groepsgrens)
       w('telt op over mensen of zaken; zeg waar de projectie de groepsgrens afdwingt, of waarom niet');
     if (!m.eigenaar && !waarom.eigenaar) w('geen eigenaar en geen reden');
+    if (m.gedeeltelijk != null && String(m.gedeeltelijk).length < 20) w('gedeeltelijk zonder reden van betekenis');
   }
   for (const k of KETENS) for (const s of k.schakels) if (!ids.has(s)) f.push('keten ' + k.id + ': onbekende schakel ' + s);
   for (const d of DOMEINEN) if (!MATEN.some(m => m.domein === d)) f.push('domein zonder maat: ' + d);

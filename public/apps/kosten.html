@@ -351,7 +351,7 @@ function tekenWerelden(w, posten){
     '<p class="sub">Kosten van de ene economie komen nooit bij een gebruiker van de andere. De RTFoundation is een eigen rechtspersoon met een eigen vermogen; wat zij kost wordt uit haar eigen begroting betaald, niet uit die van RTG-gebruikers.</p>'+
     '<div class="schuif"><table><thead><tr><th>Economie</th><th class="getal">Gebruikers</th><th>Factureert</th><th>Grond</th></tr></thead><tbody>'+
     w.werelden.map(x => '<tr><td><b>'+esc(x.naam)+'</b><br><code>'+esc(x.id)+'</code></td>'+
-      '<td class="getal">'+x.gebruikers+'</td>'+
+      '<td class="getal">'+(x.gebruikers == null ? '<span class="sub">te kleine groep</span>' : x.gebruikers)+'</td>'+
       '<td>'+(x.factureerbaar ? 'ja' : '<span class="st">nee</span>')+'</td>'+
       '<td class="sub">'+esc(x.grond)+'</td></tr>').join('')+
     '</tbody></table></div>'+

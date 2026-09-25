@@ -103,3 +103,17 @@ test('6. de besluiten C1 en C2 reizen mee, met hun herkomst', () => {
   const { LEZEN, KLEIN, VOORSTEL } = require('../server/kern/stuur/beleid-lijsten');
   assert.ok(LEZEN.office && KLEIN.office.length === 0 && VOORSTEL.office.length === 0, 'C2 staat in het stuur zoals het besluit zegt');
 });
+
+test('7. een telling per categorie: samenvoegen waar de naam iets verraadt, secundair onderdrukken waar niet', () => {
+  const benoemd = P.groepeer([{ naam: 'RTG Pass', aantal: 40 }, { naam: 'Lifestyle', aantal: 3 }, { naam: 'Business', aantal: 12 }], { benoemd: true });
+  assert.equal(benoemd.find(r => r.naam === 'Lifestyle').aantal, null, 'de kleine pas houdt zijn naam en verliest zijn aantal');
+  assert.equal(benoemd.find(r => r.naam === 'Business').aantal, null,
+    'een enkele verborgen groep is terug te rekenen uit het totaal, dus de kleinste zichtbare gaat ook dicht');
+  assert.equal(benoemd.find(r => r.naam === 'RTG Pass').aantal, 40);
+  const steden = P.groepeer([{ naam: 'Amsterdam', aantal: 40 }, { naam: 'Maastricht', aantal: 3 }, { naam: 'Delft', aantal: 2 }]);
+  assert.ok(!steden.some(r => r.naam === 'Maastricht' || r.naam === 'Delft'), 'de naam van een kleine stad verdwijnt');
+  const overig = steden.find(r => r.samengevoegd);
+  assert.equal(overig.aantal, null, 'en de samengevoegde rest onder de grens draagt ook geen aantal');
+  const groot = P.groepeer([{ naam: 'A', aantal: 40 }, { naam: 'B', aantal: 6 }, { naam: 'C', aantal: 7 }]);
+  assert.equal(groot.find(r => r.samengevoegd).aantal, 13, 'samen boven de grens: het totaal van de rest mag');
+});

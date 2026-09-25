@@ -120,6 +120,12 @@ module.exports = [
     vorm: 'lijst', datum: 'geopend', waarom: 'een venster duurt hoogstens een dienst; wat er na twee dagen nog staat is een venster dat niemand heeft gesloten' },
   { tak: 'plaatsWaarnemingen', label: 'hek-waarnemingen (binnen/buiten)', dagen: 2, grond: 'nodig',
     vorm: 'lijst', datum: 'at', waarom: 'hoort bij een venster en gaat met dat venster mee weg; dit vangt wat een gemist opruimmoment liet staan' },
+  /* De dag van het laatste bezoek per lid (kern/aanwezigheid.js). Dertien
+     maanden, besloten door de eigenaar op 25 september 2026: genoeg voor een
+     retentie over 365 dagen, en een lid dat een jaar en een maand weg is,
+     verdwijnt uit dit spoor. */
+  { tak: 'laatstActief', label: 'dag van het laatste bezoek per lid', dagen: 395, grond: 'nodig',
+    vorm: 'lijst', datum: 'dag', waarom: 'retentie als aanwezigheid (30, 90 en 365 dagen); alleen een dag, geen tijd of handeling' },
   { tak: 'plaatsLog', label: 'actielog van de plaatslaag', dagen: 90, grond: 'audit',
     vorm: 'lijst', datum: 'at', waarom: 'een lid moet kunnen navragen waarom zijn toestel iets over zijn plaats heeft gemeld; dat is de tegenhanger van de laag zelf en mag hem overleven' }
 ];

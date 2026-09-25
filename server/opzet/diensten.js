@@ -30,7 +30,7 @@ module.exports = function maakDiensten(deps) {
     DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n, 
     ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsWeg,
     ledenGidsZet, ledenGidsZoek, ledenPrijs, maakLive, mail,
-    onExternalChange, ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, herbouwSessions,
+    onExternalChange, ordersVanKlant, raakAanwezig, rtf, save, schild, schoon, sessionFor, sessions, herbouwSessions,
     sseToOffice, sseToSupplier, tokenHash
   } = deps;
   /* TWEE NAMEN DIE ER NOG NIET ZIJN als dit blok draait: lidBoardUit en
@@ -100,7 +100,7 @@ module.exports = function maakDiensten(deps) {
   /* De ledengids (sleutel -> codenaam + pas) staat in server/kern/gids.js:
      dirTouch, ledental, opzoeken en zoeken op codenaam, met of zonder Postgres. */
   const { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, keyVanCodenaam, gidsWeg } =
-    require('../kern/gids')({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal });
+    require('../kern/gids')({ db, save, raakAanwezig, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal });
   // Bij gedeelde data (Redis): na een externe wijziging de sessie-index opnieuw
   // vullen, zodat een lezersproces tokens kent die de schrijver net aanmaakte.
   onExternalChange(() => {

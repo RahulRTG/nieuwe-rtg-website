@@ -130,8 +130,8 @@
     $('#stat').innerHTML =
       '<div class="b"><div class="l">'+T('bo.partners','Partners')+'</div><div class="v">'+state.suppliers.length+'</div></div>' +
       '<div class="b"><div class="l">'+T('bo.livenu','Nu onderweg')+'</div><div class="v">'+(st2.liveNu||0)+'</div></div>' +
-      '<div class="b"><div class="l">'+T('bo.today','Vandaag')+'</div><div class="v a">'+(st2.aantalVandaag||0)+' · '+eur(st2.omzetVandaag||0)+'</div></div>' +
-      '<div class="b"><div class="l">'+T('bo.weekrev','Weekomzet')+'</div><div class="v g">'+eur(st2.omzetWeek||0)+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.today','Vandaag')+'</div><div class="v a">'+(st2.omzetVandaag == null && st2.omzetStand ? T('bo.klein','te kleine groep') : (st2.aantalVandaag||0)+' · '+eur(st2.omzetVandaag||0))+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.weekrev','Weekomzet')+'</div><div class="v g">'+(st2.omzetWeek == null && st2.omzetStand ? T('bo.klein','te kleine groep') : eur(st2.omzetWeek||0))+'</div></div>' +
       '<div class="b"><div class="l">RTFoundation</div><div class="v g">'+eur(st2.foundation||0)+'</div></div>' +
       (st2.fondsAfdracht ? '<div class="b"><div class="l">'+T('bo.rtfteStorten','RTF af te dragen')+'</div><div class="v'+(st2.fondsAfdracht.teStorten>0 && !st2.fondsAfdracht.iban?' a':' g')+'">'+eur(st2.fondsAfdracht.teStorten||0)+'</div><div class="sub">'+(st2.fondsAfdracht.iban?(T('bo.rtfNaar','naar')+' '+escHtml(st2.fondsAfdracht.iban)):T('bo.rtfGeenIban','IBAN nog niet ingesteld'))+'</div></div>' : '') +
       (st2.muntOntvangst && st2.muntOntvangst.aan ? '<div class="b"><div class="l">'+T('bo.munt','Munten (in euro)')+'</div><div class="v g">'+eur(st2.muntOntvangst.ontvangen||0)+'</div>'+(st2.muntOntvangst.wacht?'<div class="sub">'+st2.muntOntvangst.wacht+' '+T('bo.muntWacht','openstaand')+'</div>':'')+'</div>' : '') +
@@ -167,10 +167,11 @@
 
     // omzet per dag: de laatste zeven dagen als staafjes, vandaag uitgelicht
     const wk = state.week || [];
-    const maxDag = Math.max.apply(null, wk.map(d=>d.omzet).concat([1]));
+    // een dag onder de groepsgrens (minder dan vijf zaken) draagt geen bedrag: dan een streepje en geen balk
+    const maxDag = Math.max.apply(null, wk.map(d=>d.omzet||0).concat([1]));
     $('#weekChart').innerHTML = wk.map((d, i) =>
       '<div class="cb'+(i===wk.length-1?' vandaag':'')+'" title="'+d.aantal+' '+T('bo.trans','transactie(s)')+'">'+
-      '<b>'+(d.omzet?eur(d.omzet):'·')+'</b><i style="height:'+Math.max(2, Math.round(d.omzet/maxDag*72))+'%;"></i><span>'+d.label+'</span></div>'
+      '<b>'+(d.omzet == null && d.stand ? T('bo.kleinKort','klein') : (d.omzet?eur(d.omzet):'·'))+'</b><i style="height:'+Math.max(2, Math.round((d.omzet||0)/maxDag*72))+'%;"></i><span>'+d.label+'</span></div>'
     ).join('');
 
     const live = (state.live || []).filter(g => past(g.codename, (g.dest&&g.dest.name)||'', (g.partners||[]).join(' ')));

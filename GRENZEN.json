@@ -146,6 +146,10 @@
       "werkBankpadStand",
       "werkplekken"
     ],
+    "bedrijfsmaat": [
+      "bedrijfsmaat",
+      "boardroomAuth"
+    ],
     "bestanden": [
       "bestanden"
     ],

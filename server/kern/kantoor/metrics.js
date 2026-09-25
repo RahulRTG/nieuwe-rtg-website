@@ -3,23 +3,35 @@
    ontvangsten), de partnerprestaties (schaalvast: EEN keer optellen per code) en het
    actiecentrum (alle alerts die nu een oog van RTG nodig hebben, belangrijkste eerst).
    Krijgt de gedeelde ctx van kern/kantoor/index.js. */
+const { TE_KLEINE_GROEP, KLASSEN } = require('../bedrijfsmaat/poort');
+const ZAKEN_GRENS = KLASSEN.zaken.grens;
+
 module.exports = (ctx) => {
   const { db, accounts, conciergeInbox, beveilig } = ctx;
   const dagVan = iso => String(iso || '').slice(0, 10);
 
   // de weektrend en de dagcijfers, plus foundation-afdracht en munt-ontvangsten
   function weekEnStats(betaaldeOrders, betaaldeRitten, live, nu) {
+    /* De groepspoort (bedrijfsmaat/poort.js, besluit 25 sept 2026): een totaal
+       over minder dan vijf zaken is de omzet van een aanwijsbare zaak. Dan geen
+       bedrag en geen aantal, en geen nul. De lijst per zaak blijft (mens op naam). */
+    const zaakVan = (x) => x.supplierCode || null;
+    const dicht = (dag) => Object.assign(dag, { omzet: null, aantal: null, stand: TE_KLEINE_GROEP, grens: ZAKEN_GRENS });
     const week = [];
+    const zakenWeek = new Set();
     for (let i = 6; i >= 0; i--) {
       const d = new Date(nu - i * 86400000).toISOString().slice(0, 10);
       const dagOrders = betaaldeOrders.filter(o => dagVan(o.paidAt || o.at) === d);
       const dagRitten = betaaldeRitten.filter(r => dagVan(r.paidAt || r.at) === d);
-      week.push({
+      const zaken = new Set(dagOrders.concat(dagRitten).map(zaakVan).filter(Boolean));
+      zaken.forEach(z => zakenWeek.add(z));
+      const dag = {
         date: d,
         label: new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'short' }),
         omzet: dagOrders.reduce((s2, o) => s2 + (o.total || 0), 0) + dagRitten.reduce((s2, r) => s2 + (r.quote || 0), 0),
         aantal: dagOrders.length + dagRitten.length
-      });
+      };
+      week.push(zaken.size > 0 && zaken.size < ZAKEN_GRENS ? dicht(dag) : dag);
     }
     // De RTFoundation krijgt 30% van de abonnementsbijdragen (ex btw); RTG
     // verdient niets aan boekingen, dus die tellen hier niet mee.
@@ -57,9 +69,11 @@ module.exports = (ctx) => {
       aantal: muntRijen.length, wacht: muntWacht,
       ontvangen: Math.round(muntEuroCenten) / 100
     };
+    const weekDicht = zakenWeek.size > 0 && zakenWeek.size < ZAKEN_GRENS;
     const stats = {
       omzetVandaag: week[6].omzet, aantalVandaag: week[6].aantal,
-      omzetWeek: week.reduce((s2, d) => s2 + d.omzet, 0),
+      omzetWeek: weekDicht || week.some(d => d.omzet == null) ? null : week.reduce((s2, d) => s2 + d.omzet, 0),
+      omzetStand: weekDicht || week.some(d => d.omzet == null) ? TE_KLEINE_GROEP : null, omzetGrens: ZAKEN_GRENS,
       foundation: fonds, fondsAfdracht, muntOntvangst, liveNu: live.length
     };
     return { week, stats };

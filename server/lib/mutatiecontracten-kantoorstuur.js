@@ -41,4 +41,20 @@ const CONTRACTEN = {
   }
 };
 
+/* De stand van de bedrijfsmaten woont hier mee: dezelfde ronde, hetzelfde
+   besluit (C2, tonen), en ook deze route kan per constructie alleen lezen. */
+CONTRACTEN['POST /api/office/bedrijfsmaat'] = {
+  mutatieId: 'office.bedrijfsmaat',
+  herkomst: 'mens',
+  semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' },
+  stand: 'NOT_APPLICABLE',
+  bewijs: { gemeten: 'tegen een draaiende server (test/bedrijfsmaat-stand.test.js toets 1): 401 zonder sessie, 403 voor de ' +
+    'gedeelde code, 200 voor de eigenaar, en twee keer lezen geeft dezelfde maten', op: '2026-09-25' },
+  nagekeken: 'met de hand, 2026-09-25: de handler roept alleen bedrijfsmaat.stand() aan (server/kern/bedrijfsmaat/stand.js). ' +
+    'Die leest via pasgeschiedenis.pasOvergangen() en aanwezigheid.laatstActief() (eigencollectie.kijk: afwezig blijft ' +
+    'afwezig) en via db.data.rides, .orders en .lidmaatschapBetalingen -- geen save(), geen toewijzing',
+  afgetekend: AF
+};
+
 module.exports = { CONTRACTEN };

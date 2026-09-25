@@ -52,6 +52,12 @@ const BELEID = [
      niemand kan navertellen. */
   { tak: 'lidmaatschapBetalingen', label: 'lidmaatschapstermijnen', dagen: 7 * JAAR / DAG, grond: 'wettelijk',
     vorm: 'lijst', datum: 'at', waarom: 'fiscale bewaarplicht (7 jaar, art. 52 AWR); ook de foundation-split moet navolgbaar blijven' },
+  /* De pasgeschiedenis (kern/pasgeschiedenis.js): dezelfde termijn als de
+     termijnen hierboven, besloten door de eigenaar op 25 september 2026. Een
+     pasovergang hoort bij de administratie van het lidmaatschap; er staat alleen
+     codenaam, van, naar en de dag in. */
+  { tak: 'pasOvergangen', label: 'pasovergangen (van, naar, wanneer)', dagen: 7 * JAAR / DAG, grond: 'wettelijk',
+    vorm: 'lijst', datum: 'op', waarom: 'hoort bij de lidmaatschapsadministratie (7 jaar, als de termijnen); nieuw lid, cohort en churn rusten erop' },
 
   // --- audit: lang genoeg om een incident te kunnen navertellen ---
   { tak: 'inzageLog', label: 'inzagejournaal identiteitskluis', dagen: 2 * JAAR / DAG, grond: 'audit',

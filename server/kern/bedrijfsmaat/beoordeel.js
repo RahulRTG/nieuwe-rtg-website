@@ -56,7 +56,10 @@ module.exports = ({ MATEN, ELEMENTEN, GATEN, STATUS, KETENS, KLASSEN, opId }) =>
       afhankelijk: m.afhankelijk.slice(), status, gaten, elementen,
       groepsgrens: { vereist: !!klasse.optellend, afgedwongen: klasse.optellend ? afgedwongen : null, citaten: gg,
         reden: klasse.optellend && !afgedwongen ? ((m.waarom || {}).groepsgrens || null) : null },
-      keten: { gegrond: !zwak.length && status === STATUS.bestaat, zwakkeSchakels: zwak }
+      keten: { gegrond: !zwak.length && status === STATUS.bestaat, zwakkeSchakels: zwak },
+      /* Bestaat is niet compleet. Een maat die haar vier elementen kan aantonen
+         maar een deel van de werkelijkheid niet ziet, zegt dat hier. */
+      gedeeltelijk: m.gedeeltelijk || null
     };
     klaar.set(id, uit);
     return uit;

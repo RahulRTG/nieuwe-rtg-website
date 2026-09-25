@@ -67,4 +67,35 @@ function toon(maat, meting) {
   return { stand: TOONBAAR, waarde: m.waarde, n: m.n };
 }
 
-module.exports = { KLASSEN, grensVan, toon, TOONBAAR, TE_KLEINE_GROEP, GROEP_ONBEKEND };
+/* EEN TELLING PER CATEGORIE -- dezelfde grens, twee vormen.
+
+   BENOEMD (pas, geslacht): de categorieen zijn vast en hun namen verraden niets.
+   Een te kleine groep houdt zijn naam en verliest zijn aantal. En omdat het
+   totaal elders staat, is een enkele verborgen groep terug te rekenen (totaal min
+   de rest) -- dan gaat ook de kleinste zichtbare groep dicht: secundaire
+   onderdrukking, zodat er altijd minstens twee onbekenden zijn.
+
+   ONBENOEMD (land, stad, werkgever): hier verraadt de NAAM al iets -- "Maastricht:
+   te klein" zegt dat er in Maastricht iemand woont. Kleine groepen gaan daarom
+   samen op in een regel "Overige", en die regel heeft zelf de grens. */
+const OVERIGE = 'Overige (kleine groepen)';
+function groepeer(rijen, { grens = 10, benoemd = false } = {}) {
+  const lijst = (Array.isArray(rijen) ? rijen : []).map(r => Object.assign({}, r));
+  const dicht = (r) => { r.aantal = null; r.stand = TE_KLEINE_GROEP; r.grens = grens; return r; };
+  if (benoemd) {
+    const klein = lijst.filter(r => Number(r.aantal) > 0 && r.aantal < grens);
+    klein.forEach(dicht);
+    if (klein.length === 1) {
+      const open = lijst.filter(r => r.aantal != null && r.aantal > 0).sort((a, b) => a.aantal - b.aantal)[0];
+      if (open) dicht(open);
+    }
+    return lijst;
+  }
+  const groot = lijst.filter(r => r.aantal >= grens);
+  const rest = lijst.filter(r => !(r.aantal >= grens)).reduce((n, r) => n + (Number(r.aantal) || 0), 0);
+  if (rest > 0) groot.push(rest >= grens ? { naam: OVERIGE, aantal: rest, samengevoegd: true }
+    : dicht({ naam: OVERIGE, samengevoegd: true }));
+  return groot;
+}
+
+module.exports = { KLASSEN, grensVan, toon, groepeer, OVERIGE, TOONBAAR, TE_KLEINE_GROEP, GROEP_ONBEKEND };

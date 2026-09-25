@@ -41,7 +41,7 @@ test('1. office staat alleen op lezen, en de andere twee lijsten zijn leeg', () 
   assert.deepEqual(VOORSTEL.office, [], 'C2: geen voorstelrecht voor het kantoor');
 });
 
-test('2. de drie tonen-paden zijn lezen; wat mensen toont of iets zet blijft verboden', () => {
+test('2. de tonen-paden zijn lezen; wat mensen toont of iets zet blijft verboden', () => {
   for (const p of TONEN) assert.equal(beleidVoor(p, 'office').niveau, NIVEAUS.lezen, p);
   for (const p of NOOIT) assert.equal(beleidVoor(p, 'office').niveau, NIVEAUS.verboden, p + ' hoort niet aan het kantoorstuur');
   /* Andersom: de lijst is precies deze drie. Wie er een vierde bijzet, zet hem

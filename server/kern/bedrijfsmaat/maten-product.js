@@ -41,8 +41,10 @@ module.exports = [
     berekening: 'teller per drager in de kostenmeter', actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: 'kern/kosten',
     graad: 'gemeten', afhankelijk: [],
     bron: [c('server/kern/kosten/meter.js', 'function meet')], definitie: [c('server/kern/kosten/soorten.js', "id: 'verzoek'")],
-    projectie: [c('server/kern/kosten/meter.js', 'function dragers')], bewijs: [c('server/kern/kosten/soorten.js', "meetweg: 'gemeten'")], groepsgrens: null,
-    waarom: { groepsgrens: 'Per drager en voor de factuur; een optelling per pas of cohort met een groepsgrens bestaat niet.' } },
+    projectie: [c('server/kern/kosten/meter.js', 'function dragers')], bewijs: [c('server/kern/kosten/soorten.js', "meetweg: 'gemeten'")],
+    groepsgrens: [c('test/stuur-kantoor.test.js', "const TONEN = ['/api/command/puls'")],
+    gedeeltelijk: 'Per drager en voor de factuur, voor een mens op naam (mens ja, machine nee). Een optelling per pas of cohort met de groepsgrens bestaat nog niet.',
+    waarom: {} },
 
   { id: 'gebruik.per-functie', domein: 'gebruik', wereld: 'consument', eenheid: 'gebruikers per functie per periode',
     betekenis: 'Welke functies werkelijk worden gebruikt.', berekening: 'nog niet vastgesteld',

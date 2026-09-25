@@ -60,6 +60,10 @@ const LEZEN = Object.freeze({
      De AI kan nooit meer dan de mens die hem aanroept: /economie/werelden en
      /kosten/periode hangen achter de boardroom, dus een medewerker op naam
      zonder boardroomtoegang krijgt daar gewoon de weigering van de route zelf. */
+  /* /api/office/bedrijfsmaat hoort hier inhoudelijk bij (hij toont totalen, en
+     elk getal over mensen is al langs de groepspoort) maar staat er nog NIET: de
+     idempotentieproef heeft hem niet gemeten, en een pad zonder gemeten gevolg
+     laat onbekendeEffectpaden stijgen. Hij komt erbij met die meting. */
   office: [
     /^\/api\/command\/puls$/,
     /^\/api\/office\/economie\/werelden$/,

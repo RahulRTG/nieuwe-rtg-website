@@ -57,7 +57,7 @@ function wieJeBent(st) {
   }
 }
 const weken = (d) => (d % 7 ? d + ' dagen' : d / 7 + ' weken');
-const keer = (f) => (f % 100 ? (f / 100).toLocaleString('nl-NL') + ' keer' : ['', 'een', 'twee', 'drie', 'vier'][f / 100] + ' keer');
+const keer = (f) => (f % 100 ? String(f / 100).replace('.', ',') + ' keer' : ['', 'een', 'twee', 'drie', 'vier'][f / 100] + ' keer');
 
 /* UITGEZET (1.0): staat je huur langer open dan je verhuurder accepteert, dan
    zegt hij je kamer op en is dit leven voorbij. Een week ervoor hoor je het.

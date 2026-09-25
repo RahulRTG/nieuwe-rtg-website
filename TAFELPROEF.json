@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:08:13.463Z",
-    "commit": "67a51f63",
+    "op": "2026-09-25T01:35:12.054Z",
+    "commit": "acf89ca3",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/tafelproef.js",
@@ -19,7 +19,7 @@
       "status": 200,
       "ziet": "de gast leest tafel PROEF-1 bij Sal de Mar",
       "fout": null,
-      "ms": 22
+      "ms": 21
     },
     {
       "nr": 2,
@@ -30,7 +30,7 @@
       "status": 200,
       "ziet": "1 stoel(en), stoel 1 zonder eigen sessie: true",
       "fout": null,
-      "ms": 15
+      "ms": 10
     },
     {
       "nr": 3,
@@ -39,9 +39,9 @@
       "wat": "schuift aan via de QR en komt op dezelfde rekening",
       "stand": "gesloten",
       "status": 200,
-      "ziet": "gast op rekening 416c3e91fb (zaak opende 416c3e91fb), 2 stoelen",
+      "ziet": "gast op rekening 22a76db393 (zaak opende 22a76db393), 2 stoelen",
       "fout": null,
-      "ms": 20
+      "ms": 14
     },
     {
       "nr": 4,
@@ -52,7 +52,7 @@
       "status": 200,
       "ziet": "2 regel(s) op de bon van de zaak",
       "fout": null,
-      "ms": 16
+      "ms": 13
     },
     {
       "nr": 5,
@@ -85,7 +85,7 @@
       "status": 200,
       "ziet": "1 van 2 uitgegeven",
       "fout": null,
-      "ms": 8
+      "ms": 9
     },
     {
       "nr": 8,
@@ -107,7 +107,7 @@
       "status": 200,
       "ziet": "de gast leest \"Verkeerd bereid: koud geserveerd\" bij Gazpacho de sandia",
       "fout": null,
-      "ms": 11
+      "ms": 13
     },
     {
       "nr": 10,
@@ -118,7 +118,7 @@
       "status": 200,
       "ziet": "bruto 3200 -> 1600 (correctie 1600), regel staat er nog: true",
       "fout": null,
-      "ms": 5
+      "ms": 4
     },
     {
       "nr": 11,
@@ -129,7 +129,7 @@
       "status": 200,
       "ziet": "zaak: openstaand 0, gesloten true | gast: 401 sessie-weg -- \"Deze tafelsessie is niet meer geldig. Scan de QR op tafel opnieuw.\"",
       "fout": null,
-      "ms": 13
+      "ms": 10
     }
   ],
   "storingen": [
@@ -179,10 +179,10 @@
       "naam": "een tweede rekening op dezelfde tafel",
       "belofte": "weigert en wijst naar de bestaande",
       "stand": "gehouden",
-      "wat": "status 409, wijst naar 831de09f42"
+      "wat": "status 409, wijst naar f3d5f3efda"
     }
   ],
-  "rekening": "416c3e91fb",
+  "rekening": "22a76db393",
   "telling": {
     "schakels": 11,
     "gesloten": 11,

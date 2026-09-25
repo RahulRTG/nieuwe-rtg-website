@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 631,
+    "toetsenNietGemeten": 634,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,35 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-25",
+      "soort": "structureel",
+      "sleutel": "toetsenNietGemeten",
+      "van": 633,
+      "meter": "toetsenNietGemeten 633 -> 634",
+      "reden": "Het samengaan met main (tweede merge van 25 september). Main meet 630, en deze tak voegt vier nieuwe toetsen toe waar de mutatiemotor nog niet langs is geweest: test/bedrijfsmaat-stand.test.js en test/pasbronnen.test.js (elk met een eigen post hieronder), plus test/bedrijfsmaat.test.js en test/stuur-kantoor.test.js (de twee posten hierna). Tot nu stonden main en deze tak elk los op 631 met ELK hun eigen twee posten; in een boom zijn dat 634. Er komt met deze samenvoeging geen toets bij -- de vier posten worden niet samengevat, zodat elk bestand zijn eigen reden en sluitweg houdt.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt alle vier mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 632,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 632 -> 633",
+      "reden": "test/stuur-kantoor.test.js is nieuw (besluit C2: het kantoor als AI-rol, alleen op tonen). Met de hand nagetrokken met twee mutaties: /api/office/bank/incasso in LEZEN.office gezet (toets 2 en 4 zakken: een schrijvende route hoort geweigerd te worden) en naamAuth op /api/office/doe vervangen door officeAuth (toets 3 zakt: de gedeelde code komt aan het stuur). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 631,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 631 -> 632",
+      "reden": "test/bedrijfsmaat.test.js is nieuw (de catalogus, de groepspoort en de meter van AUTONOMIE.md). Met de hand nagetrokken met twee mutaties: de groepspoort liet een waarde onder de grens door (toets 1 zakt) en een citaat in de catalogus verwees naar een regel die er niet staat (toets 5 zakt: verworpen). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
     {
       "datum": "2026-09-25",
       "soort": "structureel",

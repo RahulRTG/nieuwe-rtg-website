@@ -37,7 +37,7 @@
         "staat": "GROEN",
         "beweringen": 15,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:15:24.213Z",
+        "at": "2026-09-25T11:12:24.056Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -66,9 +66,9 @@
       "grens": "ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD nodig, en die is nog niet in bedrijf.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 56,
+        "beweringen": 58,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:15:36.342Z",
+        "at": "2026-09-25T11:12:36.002Z",
         "bestanden": [
           "test/keten.test.js",
           "test/securitylog-keten.test.js",
@@ -101,7 +101,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 44,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:15:40.618Z",
+        "at": "2026-09-25T11:12:40.162Z",
         "bestanden": [
           "test/keten.test.js",
           "test/ankerdienst.test.js",
@@ -139,7 +139,7 @@
         "staat": "GROEN",
         "beweringen": 39,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:15:41.359Z",
+        "at": "2026-09-25T11:12:40.938Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -175,7 +175,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:15:41.514Z",
+        "at": "2026-09-25T11:12:41.116Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -204,7 +204,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:15:43.279Z",
+        "at": "2026-09-25T11:12:42.873Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -235,7 +235,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:16:06.855Z",
+        "at": "2026-09-25T11:13:05.971Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -268,7 +268,7 @@
         "staat": "GROEN",
         "beweringen": 15,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:16:07.023Z",
+        "at": "2026-09-25T11:13:06.128Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -301,7 +301,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:16:07.175Z",
+        "at": "2026-09-25T11:13:06.273Z",
         "bestanden": [
           "test/invoerproef.test.js"
         ]
@@ -334,7 +334,7 @@
         "staat": "GROEN",
         "beweringen": 36,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:16:07.400Z",
+        "at": "2026-09-25T11:13:06.489Z",
         "bestanden": [
           "test/idemproef.test.js"
         ]
@@ -366,7 +366,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:16:07.704Z",
+        "at": "2026-09-25T11:13:06.786Z",
         "bestanden": [
           "test/auditspoor.test.js"
         ]
@@ -402,7 +402,7 @@
         "staat": "GROEN",
         "beweringen": 44,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:16:08.133Z",
+        "at": "2026-09-25T11:13:07.200Z",
         "bestanden": [
           "test/staatproef.test.js",
           "test/vingerafdruk.test.js"
@@ -433,7 +433,7 @@
         "staat": "GROEN",
         "beweringen": 26,
         "overgeslagen": 0,
-        "at": "2026-09-25T10:16:09.544Z",
+        "at": "2026-09-25T11:13:08.653Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

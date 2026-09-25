@@ -32,6 +32,7 @@ const { maakKoppeling } = require('./koppeling');
 const { meet } = require('./meter');
 const { EINDSTANDEN } = require('./eindstanden');
 const AFHANKELIJK = require('./afhankelijkheden');
+const { BEWIJSSTAND } = require('./bewijsstand');
 
 function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamVan }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/democratie',
@@ -43,7 +44,15 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
   const koppeling = maakKoppeling({ crypto, nu,
     kaart: () => eigen.bak('democratieInbrengers'), kijk: () => eigen.kijk('democratieInbrengers') });
 
-  const wie = (sleutel) => (codenaamVan && codenaamVan(sleutel)) || 'een behandelaar';
+  /* Wie beslist, staat er op zijn CODENAAM (DO-09). `codenaamVan` geeft de
+     sleutel zelf terug als er geen codenaam is -- na een verwijderd account,
+     of met een koude gids -- en dan zou er een ruwe RTG-sleutel in de
+     eindstand belanden. Zonder codenaam beslist er dus niemand. */
+  const wie = (sleutel) => {
+    const c = codenaamVan && codenaamVan(sleutel);
+    return (c && c !== sleutel && !/^user-/.test(String(c))) ? c : null;
+  };
+  const zonderNaam = { status: 403, error: 'Wie over een kwestie beslist, doet dat onder een codenaam, en voor deze sessie is er geen. Log opnieuw in met een bestaand account.' };
   const zoek = (id) => kijk()[String(id || '').toUpperCase()] || null;
   const publiek = maakBeeld();
 
@@ -61,8 +70,11 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
       if (!t || t.stand !== 'klaargezet' || !sleutel) continue;
       let gewekt = null;
       try {
-        gewekt = meldLid(sleutel, { icon: 'kwestie', scope: 'democratie', title: 'Je kwestie heeft een uitkomst',
-          body: k.id + ': ' + r.eindstand.stand + '. Open je kwesties om te lezen waarom.' });
+        /* De wek zegt NIET welke kwestie en niet welke uitkomst: een bericht op
+           de sleutel van het lid met het kwestienummer erin is een koppeling
+           tussen mens en kwestie buiten ./koppeling.js om. */
+        gewekt = meldLid(sleutel, { icon: 'kwestie', scope: 'democratie', title: 'Er is nieuws in je kwesties',
+          body: 'Open je kwesties om te lezen wat er is besloten en waarom.' });
       } catch (e) { console.warn('[democratie] wek mislukt voor ' + k.id + ': ' + e.message); }
       if (!gewekt) continue;
       const mis = await vastleggen(() => { schrijver.trede(k, ref, 'gewekt'); });
@@ -82,10 +94,12 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
     const naar = String(b.stand || 'in-behandeling');
     /* Eerst weigeren, dan pas de opslag aanraken: een geweigerd verzoek laat
        geen spoor in de opslag na. */
+    const door = wie(doorSleutel);
+    if (!door) return zonderNaam;
     if (!schrijver.loopt(k)) return { status: 409, error: 'Deze ronde is al afgesloten. Heropen de kwestie als er iets nieuws is.' };
     if (!['in-behandeling', 'wacht-op-bevoegde'].includes(naar)) return { status: 400, error: 'Kies in-behandeling of wacht-op-bevoegde.' };
     if (schrijver.huidige(k).stand === naar) return { ok: true, herhaling: true, kwestie: publiek(k, null) };
-    const mis = await vastleggen(() => { schrijver.behandel(k, wie(doorSleutel), naar, schoon(b.notitie, 300) || null); });
+    const mis = await vastleggen(() => { schrijver.behandel(k, door, naar, schoon(b.notitie, 300) || null); });
     return mis || { ok: true, kwestie: publiek(k, null) };
   }
 
@@ -94,6 +108,8 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
     if (!k) return { status: 404, error: 'Onbekende kwestie.' };
     const g = { stand: String(b.stand || ''), toelichting: schoon(b.toelichting, 1000),
       bevoegdheid: schoon(b.bevoegdheid, 120), naar: schoon(b.naar, 120), in: String(b.in || '').toUpperCase() || null };
+    const door = wie(doorSleutel);
+    if (!door) return zonderNaam;
     const fout = schrijver.toetsEindstand(k, g, false);
     if (fout) return fout;
     const doel = g.stand === 'samengevoegd' ? zoek(g.in) : null;
@@ -102,7 +118,7 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
     }
     const mis = await vastleggen(() => {
       if (doel) schrijver.volg(doel, ontvangersVan(k));
-      schrijver.sluit(k, wie(doorSleutel), g, ontvangersVan(k));
+      schrijver.sluit(k, door, g, ontvangersVan(k));
     });
     if (mis) return mis;
     await wek(k);
@@ -113,9 +129,11 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
     const k = zoek(b.id);
     if (!k) return { status: 404, error: 'Onbekende kwestie.' };
     const reden = schoon(b.reden, 600);
+    const door = wie(doorSleutel);
+    if (!door) return zonderNaam;
     if (schrijver.loopt(k)) return { status: 409, error: 'Deze kwestie loopt nog; er is niets te heropenen.' };
     if (reden.length < 15) return { status: 400, error: 'Zeg in minstens vijftien tekens welk nieuw feit een nieuwe ronde rechtvaardigt.' };
-    const mis = await vastleggen(() => { schrijver.heropen(k, wie(doorSleutel), reden); });
+    const mis = await vastleggen(() => { schrijver.heropen(k, door, reden); });
     return mis || { ok: true, kwestie: publiek(k, null) };
   }
 
@@ -130,7 +148,8 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
      verhuizing begint met weten wat er mee moet. */
   const meter = () => Object.assign(meet({ kwesties: kijk(), journaal: eigen.kijk('democratieJournaal'), koppeling }),
     { afhankelijkVanRtg: { modules: Object.keys(AFHANKELIJK.MODULES), geinjecteerd: Object.keys(AFHANKELIJK.GEINJECTEERD),
-      routes: Object.keys(AFHANKELIJK.ROUTES) } });
+      routes: Object.keys(AFHANKELIJK.ROUTES) },
+      bewijsstand: BEWIJSSTAND.map(b => ({ code: b.code, stand: b.stand, wat: b.wat, sluit: b.sluit || null })) });
 
   /* Voor het recht op vergetelheid (kern/vergeten.js): synchroon, binnen de
      vastlegging van wie roept. De kwesties blijven; de weg naar de mens niet. */

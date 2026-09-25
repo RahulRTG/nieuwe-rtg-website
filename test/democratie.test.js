@@ -87,6 +87,8 @@ test('4. de eisen per eindstand: bevoegdheid, naar wie, en in welke kwestie', as
   /* samenvoegen: wie a inbracht, volgt b en krijgt ook de uitkomst van b */
   assert.equal((await d.sluit('u', { id: a.id, stand: 'samengevoegd', toelichting: lang, in: b.id })).ok, true);
   assert.equal(d.mijn('user-1').kwesties.length, 2, 'de inbrenger van a ziet ook b');
+  assert.equal((await d.intrek('user-2', b.id)).status, 409,
+    'wie b inbracht, kan b niet intrekken nu de inbrenger van a hem volgt (W3)');
   assert.equal((await d.sluit('u', { id: b.id, stand: 'samen-opgelost', toelichting: lang })).ok, true);
   const bij1 = d.mijn('user-1').kwesties.find(k => k.id === b.id);
   assert.equal(bij1.rondes[0].terugkoppeling.stand, 'gewekt', 'de volger kreeg de uitkomst van b');
@@ -154,6 +156,46 @@ test('7. vergeten: de kwestie blijft, de weg naar de mens niet, en dat is geen b
   assert.equal((await d.intrek('user-5', k.id)).status, 404);
 });
 
+test('11. geen ruwe sleutel in een besluit, en het kantoor ziet geen tijdstip dat naar een mens wijst', async () => {
+  /* W1: codenaamVan geeft de sleutel zelf terug als er geen codenaam is. */
+  const db = { data: {} };
+  const d = maakDemocratie({ db, save: () => {}, bijeen: async (fn) => fn(), inBundel: () => true, crypto,
+    codenaamVan: (k) => (k === 'user-99' ? k : 'Codenaam-' + k.replace('user-', 'nr')), meldLid: (k, n) => n });
+  const k = (await d.inbreng('user-1', { onderwerp: 'Een kwestie voor een verdwenen behandelaar' })).kwestie;
+  assert.equal((await d.behandel('user-99', { id: k.id })).status, 403);
+  assert.equal((await d.sluit('user-99', { id: k.id, stand: 'uitgevoerd', toelichting: lang })).status, 403);
+  assert.ok(!/user-\d/.test(JSON.stringify(d.lijst())), 'geen RTG-sleutel in wat het kantoor ziet');
+  await d.sluit('user-9', { id: k.id, stand: 'uitgevoerd', toelichting: lang });
+  await d.gezien('user-1', k.id);
+  assert.ok(!/user-\d/.test(JSON.stringify(db.data.democratieKwesties)), 'en ook niet in de opgeslagen kwestie');
+
+  /* B4: het kantoor ziet dagen en geen terugkoppelregels; het lid ziet zijn eigen tijden exact. */
+  const kantoor = d.lijst().kwesties[0];
+  assert.ok(!kantoor.tijdlijn.some(t => t.wat === 'terugkoppeling' || t.wat === 'volgers'));
+  const tijden = [kantoor.at, kantoor.rondes[0].geopend, kantoor.rondes[0].eindstand.at].concat(kantoor.tijdlijn.map(t => t.at));
+  assert.ok(tijden.every(t => /^\d{4}-\d{2}-\d{2}$/.test(t)), 'het kantoor ziet alleen dagen: ' + tijden.join(', '));
+  const eigen = d.mijn('user-1').kwesties[0];
+  assert.ok(eigen.tijdlijn.some(t => t.wat === 'terugkoppeling'), 'het lid ziet zijn eigen tijdlijn wel helemaal');
+  assert.match(eigen.at, /T\d{2}:/);
+});
+
+test('12. de bewijsstand: bewezen noemt een toets die bestaat, onbewezen heeft een sluitweg', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const { BEWIJSSTAND } = require('../server/kern/democratie/bewijsstand');
+  const codes = BEWIJSSTAND.map(b => b.code);
+  for (const c of ['NIEMAND_KWIJT', 'SQLITE_CRASH_CONSISTENCY', 'POSTGRES_DURABILITY', 'INBRENG_IDEMPOTENT', 'PSEUDONIMITEIT']) {
+    assert.ok(codes.includes(c), c + ' hoort op de lijst te staan, ook als hij onbewezen is');
+  }
+  for (const b of BEWIJSSTAND) {
+    assert.ok(['bewezen', 'onbewezen'].includes(b.stand), b.code);
+    if (b.stand === 'bewezen') assert.ok(fs.existsSync(path.join(__dirname, '..', b.toets)), b.code + ': ' + b.toets);
+    else assert.ok(String(b.sluit || '').length > 40, b.code + ' heeft geen sluitweg');
+  }
+  const { d } = wereld();
+  assert.deepEqual(d.meter().bewijsstand.map(b => b.code), codes, 'de meter zegt erbij wat het bord niet belooft');
+});
+
 /* ---------------------------------------------------------------- server */
 
 function api(base, pad, body, token) {
@@ -218,7 +260,10 @@ test('9. de hele lus tegen een echte server: inbrengen, behandelen, eindstand, w
   assert.equal(tweede.status, 409, 'een eindstand verandert niet achteraf, ook niet met hetzelfde verzoek');
 
   const post = await api(srv.base, '/api/notifications', {}, tok);
-  assert.ok((post.body.notifications || []).some(n => String(n.body || '').includes(id)), 'de wek staat in zijn berichten');
+  const wekken = (post.body.notifications || []).filter(n => n.scope === 'democratie');
+  assert.ok(wekken.length >= 1, 'de wek staat in zijn berichten');
+  assert.ok(!wekken.some(n => /KW-[0-9A-F]{6}/.test(JSON.stringify(n))),
+    'de wek noemt geen kwestienummer: dat zou mens en kwestie buiten de koppeling om verbinden (B3)');
   const mijn = (await api(srv.base, LID[1], {}, tok)).body.kwesties[0];
   assert.equal(mijn.rondes[0].eindstand.stand, 'samen-opgelost');
   assert.equal(mijn.rondes[0].terugkoppeling.stand, 'gewekt');

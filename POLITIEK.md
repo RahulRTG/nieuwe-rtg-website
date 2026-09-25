@@ -652,6 +652,25 @@ geen AI.
 
 **Wat de verliesproef niet bewijst.** Hij draait op sqlite, waar gewoon wegschrijven al synchroon is. Hij bewijst dus de samenhang van de keten onder crashes, niet dat de duurzame vastlegging op PostgreSQL even streng is. En wie geen 200 kreeg, weet dat hij het opnieuw moet doen; daarbij kan een tweede kwestie ontstaan. Die is niet kwijt, maar hij is wel dubbel, en dat lost `samengevoegd` op.
 
+**Vier gebreken gevonden en gerepareerd voor B dichtging.** Een aanvalsmatrix over elke identiteit in RTG en een privacyverkenning vonden ze, en elk heeft nu een toets die met een mutatie is zien zakken:
+- **W1, een ruwe sleutel in een besluit.** `codenaamVan` geeft de sleutel zelf terug als er geen codenaam is, en een kantoorsessie overleeft het verwijderen van het account. Wie geen codenaam heeft, beslist nu niets (403).
+- **W3, intrekken sloot andermans kwestie.** Na een samenvoeging kon de inbrenger van het doel de kwestie van een volger afsluiten als "ingetrokken", zonder naam en reden. Wie volgers heeft, trekt niet in; het kantoor sluit af, met een reden.
+- **B3, de wek noemde het kwestienummer.** Dat verbond mens en kwestie in de berichten van het lid, buiten de koppeling om. De wek zegt nu alleen dat er nieuws is.
+- **B4, het kantoor zag tijdstippen tot op de milliseconde**, en regels over wie wanneer iets las. Naast elk ander log is dat een sleutel naar de mens. Het kantoor ziet nu dagen, en geen terugkoppel- of volgersregels; de opgeslagen tijden blijven exact.
+
+**De bewijsstand** staat machineleesbaar in `server/kern/democratie/bewijsstand.js` en gaat mee met de meter, zodat het bord zegt wat het niet belooft:
+
+| Code | Stand | Sluitweg |
+|---|---|---|
+| `NIEMAND_KWIJT` | bewezen | — |
+| `SQLITE_CRASH_CONSISTENCY` | bewezen | — (bewust niet "crash durability": op sqlite is gewoon wegschrijven al synchroon) |
+| `UNDECLARED_RTG_DEPENDENCY` | bewezen | — (een verklaring is nog geen verhuizing) |
+| `POSTGRES_DURABILITY` | **onbewezen** | een PostgreSQL-verliesproef; eerst een `sterf-na-commit` in de responspoort, want die vuurt op PostgreSQL vandaag nooit. Een crash van de PG-server zelf blijft buiten bereik |
+| `INBRENG_IDEMPOTENT` | **onbewezen** | een verzoeksleutel op de koppelingsrij (niet op de kwestie, DO-01), in dezelfde vastlegging; de bestaande duplicaatlagen staan in het geheugen en overleven geen herstart |
+| `PSEUDONIMITEIT` | **onbewezen** | fase C, zie hieronder |
+
+**Besluit van 25 september 2026: pseudoniem loggen.** Het handelingsspoor en `apiSpoor` leggen bij elke POST de sleutel van het lid vast, met een tijdstip in milliseconden en een hash van het verzoek die uit onderwerp en gebied na te rekenen is -- en beide zijn leesbaar met de gedeelde kantoorcode. Voor de burgerpaden van DemocratieOS blijft de regel staan, maar zonder sleutel en zonder hash; het eigen journaal met hashketen is het auditspoor van dit domein, en besluiten van het kantoor staan daar op naam. Dat is een verklaarde uitzondering in de AUDIT-kolom. De uitvoering hoort bij fase C, samen met de proef die erop moet zakken.
+
 ### 18.2 Fase C probeert B kapot te maken
 
 Elke regel hieronder wordt een toets die kan zakken, met een zelfijking:
@@ -667,6 +686,31 @@ Elke regel hieronder wordt een toets die kan zakken, met een zelfijking:
 | kwestie ≠ targetinginvoer | geen lezer die kwestiedata aan een partij of segment koppelt |
 | bijdrage ≠ instructie aan Rahul | een bijdrage die een instructie bevat, verandert niets aan het gedrag |
 | partij verdwijnt ≠ burgerlus verandert | proef P1: dezelfde uitkomst met leeg register en met drie partijen |
+
+Aangescherpt bij het sluiten van B:
+- **Vier actoren, niet drie.** `GEEN_PARTIJ` staat naast Noord, Midden en Zuid, want drie partijen die gelijk behandeld worden kunnen samen alsnog voorsprong hebben op een burger zonder partij. De invariant: **GEEN_PARTIJ = NOORD = MIDDEN = ZUID**, behalve waar een openbaar contract een partijrol noodzakelijk maakt.
+- **Toestand vergelijken, niet alleen statuscodes.** Zelfde uitgangssituatie, zelfde kwestie, zelfde toegestane handeling, alleen de partijcontext anders: dan is de burgerkern byte voor byte gelijk -- stand, tijdlijn, journaal, terugkoppeling, bewijsvereisten.
+- **OWNER_NO_ADVANTAGE via elke indirecte ingang.** Niet `if (partij === eigen)` maar een legitieme RTG-bevoegdheid die doorlekt: eigenaarstoken (dat met een enkel token door BEIDE deuren komt), kantoor op naam, boardroomtoegang, techniek, Foundation-zetels, werkruimte, zaak, demosessies, service-identiteiten en gecombineerde rollen. De eerste echte bevinding staat al klaar: **W2, wie een kwestie inbracht of volgt, behandelt hem niet** -- vandaag kan een kantoormens met ook een lidaccount zijn eigen kwestie afsluiten. En W4: het kantoor heropent een door de burger ingetrokken kwestie zonder dat die burger iets vroeg.
+- **De privacy-tegenproef.** Een doorzoeking van de hele database op een sleutel en een kwestie samen (buiten de koppeling), en de koppelaanval met alleen wat het kantoor kan lezen. Die zakt vandaag op het handelingsspoor en `apiSpoor`; na het pseudoniem loggen hoort hij groen te worden. Het tijdstip van de wek blijft een zijkanaal tot de wek wordt gebundeld.
+
+### 18.4 De release-trein en de V1-freeze
+
+De snelste route is de kortste bewijsroute naar een bruikbare V1. Een trein, in deze volgorde, en elke wagon sluit voordat de volgende vertrekt:
+
+1. **B sluiten**: `DEKKING.json` uit een volledige meting, bewijsstand, CI groen.
+2. **C, alleen de constitutionele kern**: de vier actoren, vergelijken van invoer, uitvoering en uitkomst, de owner-aanvalsmatrix en de privacy-tegenproef. Geen echte partij, geen scherm, geen AI. Groen = bevroren.
+3. **De menselijke V1**: een simpele voorkant -- *wat speelt er bij jou?*, inbrengen, voortgang, uitkomst met reden, terugkoppeling -- met B1 en toegankelijkheid. Geen honderd schermen.
+4. **DoeNetwerk**: net genoeg om `samen-opgelost` echt te laten ontstaan (aansluiten, bijeenkomst, actie, resultaat, terugkoppeling), op genootschap en bijeenkomst.
+5. **Political Connector V1**: echte `politiekePartij` -- register, voorstel koppelen, toelichting, bron -- alle partijen hetzelfde contract.
+6. **`politiekeToezegging` V1**: registreren, bron, wijzigingen die alleen aangroeien, uitvoering of stemming, externe verankering. Geen score.
+7. **Rahul als laatste**: B1, samenvatten, ontbrekende bron, ontbrekend tegenargument, dekking en uitvoerbaarheid -- alleen op de kwestieprojectie, lokaal waar de grondwet dat eist.
+8. **Productieproeven**: `POSTGRES_DURABILITY` en `INBRENG_IDEMPOTENT` dicht vóór publieke ingebruikname; daarna storingen, back-up en herstel, rechten, privacy, belasting, en externe security- en juridische review.
+
+**De V1-freeze.** Een nieuw idee gaat op de V2-lijst, tenzij het nodig is voor de lus, de neutraliteit, de veiligheid of de wettelijke ingebruikname. Dus voorlopig geen uitgebreide verkiezingsmodule, geen digital twin, geen honderden beleidsfuncties, geen partij-CRM, geen campagnefuncties en geen nieuwe werelden.
+
+Het V1-doel is klein: *een burger komt binnen, brengt een kwestie in, anderen werken ermee, ze handelen misschien samen, politieke organisaties reageren onder identieke regels, besluiten en resultaten blijven controleerbaar -- en de oorspronkelijke burger raakt nooit ongemerkt kwijt.*
+
+**Parallel werk is parallel bewijs, geen parallel productontwerp**: agents verkennen neutraliteit, privacy, DoeNetwerk en PostgreSQL, maar de constitutionele kern blijft één gecontroleerde schrijflijn.
 
 ### 18.3 De eerste partij is synthetisch
 

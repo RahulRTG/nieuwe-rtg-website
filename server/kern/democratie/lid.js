@@ -58,6 +58,12 @@ function maakLid({ kaart, kijk, zoek, schrijver, koppeling, vastleggen, publiek,
 
   const intrek = (sleutel, id) => eigenHandeling(sleutel, id, async (k, refs) => {
     if (!refs.includes(k.inbrenger)) return { status: 403, error: 'Alleen wie de kwestie inbracht, kan hem intrekken.' };
+    /* Wie volgt, is door een samenvoeging bij deze kwestie gekomen en heeft er
+       zelf belang bij. Intrekken zou HUN kwestie afsluiten als "ingetrokken",
+       zonder naam en zonder reden. */
+    if ((k.volgers || []).length) {
+      return { status: 409, error: 'Anderen volgen deze kwestie ook; u kunt hem niet voor hen afsluiten. Het kantoor kan hem afsluiten, met een reden.' };
+    }
     const fout = schrijver.toetsEindstand(k, { stand: 'ingetrokken' }, true);
     if (fout) return fout;
     const mis = await vastleggen(() => {

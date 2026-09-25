@@ -152,6 +152,8 @@ module.exports = function maakVergeten(kern) {
        op een TTL van dertig dagen, en juist de oudste rij is de rij die het
        langst blijft liggen. */
     if (kern.sessieregister && kern.sessieregister.wisLid) kern.sessieregister.wisLid(key);
+    /* DemocratieOS: de kwesties blijven, de weg van het inbrengersnummer naar de mens niet. */
+    if (kern.democratieVergeet) kern.democratieVergeet(key);
     // alle sessies van dit lid uitloggen
     for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
     /* EEN SUCCESANTWOORD BETEKENT HIER OOK: OP SCHIJF.

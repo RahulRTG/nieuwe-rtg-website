@@ -631,6 +631,27 @@ Let op de naam: **"Huis" is in dit repository het woord voor het hele systeem**
 Fase B kent **geen partij**. Er is geen register, geen voorstel van een partij en
 geen AI.
 
+### 18.1a Wat fase B nu is (25 september 2026)
+
+**Gebouwd**, in `server/kern/democratie/` en `server/routes/democratie/`:
+
+| Onderdeel | Waar | Wat vaststaat |
+|---|---|---|
+| gesloten eindstanden | `eindstanden.js` | zeven, met `samen-opgelost`; geen "anders" |
+| de kwestie met één schrijver | `kwestie.js` | tijdlijn en journaal zijn een hashketen en worden nooit ingekort; een eindstand verandert niet achteraf, heropenen is een nieuwe ronde |
+| de koppeling naar de mens | `koppeling.js` | de enige plek met een RTG-sleutel; elke kwestie een eigen inbrengersnummer; vergeten laat de kwestie staan |
+| terugkoppeling in drie treden | `index.js`, `lid.js` | `klaargezet` (te lezen via de eigen lijst, in dezelfde vastlegging als de eindstand), `gewekt` (melding), `gezien` |
+| NIEMAND_KWIJT | `meter.js` | tellingen per stand plus zeven soorten breuk; nooit een percentage |
+| verklaarde afhankelijkheden | `afhankelijkheden.js` | elke module en naam uit RTG, met wat hij doet en hoe vervangbaar hij is |
+| tien routes | `/api/member/democratie/...`, `/api/office/democratie/...` | het kantoor alleen op naam; een demosessie brengt niets in |
+
+**Bewezen** door drie toetsbestanden, elk met mutaties die hem lieten zakken:
+- `test/democratie.test.js`: de lus, de eisen per eindstand, geen RTG-sleutel in een kwestie, en een zelfijking die elke soort breuk een keer maakt;
+- `test/democratie-afhankelijk.test.js`: `UNDECLARED_RTG_DEPENDENCY = 0`, plus DO-03 in zijn kleinste vorm (fase B kent het woord partij niet);
+- `test/democratie-verlies.test.js`: honderd kwesties door een storm van crashes (voor de mutatie, na de commit, voor de wek), met een herstart na elke dood. In de eerste ronde: 95 geaccepteerd, 27 keer gestorven, 33 eindstanden, **nul kwijt en nul onverklaard**. Een mutatie die de koppeling naar de mens in een tweede vastlegging zet, laat deze proef zakken: dat is precies de mens die tussen twee systemen verdwijnt.
+
+**Wat de verliesproef niet bewijst.** Hij draait op sqlite, waar gewoon wegschrijven al synchroon is. Hij bewijst dus de samenhang van de keten onder crashes, niet dat de duurzame vastlegging op PostgreSQL even streng is. En wie geen 200 kreeg, weet dat hij het opnieuw moet doen; daarbij kan een tweede kwestie ontstaan. Die is niet kwijt, maar hij is wel dubbel, en dat lost `samengevoegd` op.
+
 ### 18.2 Fase C probeert B kapot te maken
 
 Elke regel hieronder wordt een toets die kan zakken, met een zelfijking:

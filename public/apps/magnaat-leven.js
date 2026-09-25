@@ -29,9 +29,20 @@
   }
   function meldFout(t) { var e = q('#vnFout'); e.textContent = t; e.hidden = !t; }
   function laad() { return vraag('staat').then(teken).catch(function (e) { meldFout(e.message); }); }
+  /* Elke handeling draagt een eigen sleutel. Valt de verbinding weg, dan gaat
+     dezelfde handeling met dezelfde sleutel nog een keer: de server voert hem
+     hooguit een keer uit, dus je sluit geen dag twee keer af (V5). */
+  var teller = 0;
   function doe(body) {
     meldFout('');
-    return vraag('actie', body).then(function (s) { KEUZE = null; teken(s); }).catch(function (e) { meldFout(e.message); });
+    body.verzoek = Date.now().toString(36) + '-' + (++teller);
+    var klaar = function (s) { KEUZE = null; teken(s); };
+    return vraag('actie', body).then(klaar).catch(function (e) {
+      if (!(e instanceof TypeError)) { meldFout(e.message); return; }
+      meldFout('De verbinding viel weg. Nog een keer proberen…');
+      return new Promise(function (ok) { setTimeout(ok, 1500); }).then(function () { return vraag('actie', body); })
+        .then(function (s) { meldFout(''); klaar(s); }).catch(function (e2) { meldFout(e2 instanceof TypeError ? 'Geen verbinding. Je handeling is niet verstuurd; probeer het zo nog eens.' : e2.message); });
+    });
   }
 
   function klok(s) {

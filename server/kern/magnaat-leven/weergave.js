@@ -65,8 +65,15 @@ function aandacht(st, c) {
 const toon = (st, boek, nu, weg) => structuredClone(Object.assign(beeld(st, boek, nu), { terwijlWeg: weg || null }));
 
 function beeld(st, boek, nu) {
-  const c = boek.cijfers(st), a = st.aanbod ? AANBOD[st.aanbod] : null, deals = st.deals.map(dealBeeld);
-  const bedrijfDeals = deals.filter(d => d.afspraak && d.factuur);
+  const c = boek.cijfers(st), a = st.aanbod ? AANBOD[st.aanbod] : null, alle = st.deals.map(dealBeeld);
+  /* V5: WAT HET SCHERM KRIJGT BLIJFT BEGRENSD. Alles wat nog loopt, altijd;
+     van wat klaar is alleen de laatste dertig. Na twee jaar spelen groeide het
+     beeld anders tot boven de 170 kB per tik. De rekenregels lezen st.deals
+     zelf en merken hier niets van. */
+  const KLAAR = ['betaald', 'afgehaakt'], ZICHT = 30;
+  const houd = new Set(alle.filter(d => KLAAR.includes(d.fase)).slice(-ZICHT));
+  const deals = alle.filter(d => !KLAAR.includes(d.fase) || houd.has(d));      // in de volgorde van het spel
+  const bedrijfDeals = alle.filter(d => d.afspraak && d.factuur).slice(-ZICHT);
   return {
     dag: st.dag, dagNaam: R.dagNaam(st.dag), week: Math.ceil(st.dag / 7), vrijVandaag: rest(st, st.dag), kalender: kalender(st),
     volgendeDagOver: Math.max(0, st.gerekendTot + st.dagMs - nu),
@@ -91,7 +98,7 @@ function beeld(st, boek, nu) {
       recent: (st.boek.recent || []).slice(0, 12),
       prognose: prognose(st)
     },
-    netwerk: { contacten: deals },
+    netwerk: { contacten: deals, eerder: alle.length - deals.length },
     wereld: {
       stad: R.JURISDICTIE.stad, startKas: R.niveauVan(st).startKas, moeilijkheid: st.moeilijkheid || 'normaal',
       niveaus: Object.entries(R.MOEILIJKHEID).map(([id, x]) => ({ id, naam: x.naam, uitleg: x.uitleg, startKas: x.startKas })),

@@ -272,18 +272,6 @@ function controleerHandtekening(document, handtekening, publiekPem) {
   } catch (e) { return false; }
 }
 
-/* Controleer vóór publicatie dat het CI-geheim werkelijk bij het vastgelegde
-   vertrouwensanker hoort. Achteraf afkeuren is te laat: het image staat dan al
-   in de registry. Een vaste, niet-geheime proeftekst is voldoende; alleen het
-   bezit van de privésleutel moet hier worden bewezen. */
-function sleutelpaarKlopt(priveSleutel, publiekPem) {
-  try {
-    const proef = Buffer.from('rtg-release-sleutelproef-v1', 'utf8');
-    const handtekening = crypto.sign(null, proef, priveSleutel);
-    return crypto.verify(null, proef, crypto.createPublicKey(publiekPem), handtekening);
-  } catch (e) { return false; }
-}
-
 /* ---------------------------------------------------------------------------
    HET HERKOMSTDOCUMENT.
    ------------------------------------------------------------------------- */
@@ -553,7 +541,21 @@ function doeControle() {
     ((document.bron || {}).werkboomSchoon === false ? ' (werkboom bevatte wijzigingen)' : ''));
 }
 
+/* ELKE VLAG BETEKENT IETS, OF HIJ WORDT GEWEIGERD. De workflow riep jarenlang
+   `--binden --eis-handtekening` aan terwijl dit script die vlag nergens las:
+   hij stond er als bescherming en deed niets (binden eist de handtekening
+   altijd al, zie trust.authorizedPrivate in doeBinden). Een onbekende vlag
+   stil negeren laat zo'n schijngarantie ontstaan; daarom een gesloten lijst. */
+const VLAGGEN = new Set(['nieuwe-sleutel', 'sleutelcontrole', 'sbom', 'binden', 'controle',
+  'eis-image', 'eis-kandidaat', 'bewijs', 'bewijs-inhoud', 'commit', 'digest', 'draait',
+  'herkomst', 'image', 'pakketten', 'uit']);
+function onbekendeVlaggen(argv) {
+  return argv.filter(a => a.startsWith('--')).map(a => a.slice(2).split('=')[0]).filter(n => !VLAGGEN.has(n));
+}
+
 function hoofd() {
+  const onbekend = onbekendeVlaggen(process.argv.slice(2));
+  if (onbekend.length) throw new Error('Onbekende vlag: --' + onbekend.join(', --') + '. Een vlag die niets doet, mag geen bescherming suggereren.');
   if (process.argv.includes('--nieuwe-sleutel')) return doeNieuweSleutel();
   if (process.argv.includes('--sleutelcontrole')) return doeSleutelcontrole();
   if (process.argv.includes('--sbom')) return doeSbom();
@@ -569,6 +571,6 @@ if (require.main === module) {
 
 module.exports = {
   leesDpkg, leesApk, leesCargoLock, leesNpmLock, maakSbom, canoniek, sha256,
-  nieuweSleutel, teken, controleerHandtekening, sleutelpaarKlopt, maakHerkomst,
+  nieuweSleutel, teken, controleerHandtekening, onbekendeVlaggen, maakHerkomst,
   controleerHerkomst, controleerKandidaatHerkomst, UITVOER_BESTANDEN, uitvoeringHashes
 };

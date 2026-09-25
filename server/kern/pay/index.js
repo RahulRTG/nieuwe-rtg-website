@@ -30,16 +30,15 @@
 
 module.exports = (ctxIn) => {
   const { db, save, bijeen, economischeBoekingEenmaal, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
-    betaaldienstKosten, betaalOpdrachten, waarde, accounts, payBoekingenVoegToe } = ctxIn;
+    betaaldienstKosten, betaalOpdrachten, waarde, accounts, payBoekingenVoegToe, betaalWaarheid } = ctxIn;
   if (typeof payBoekingenVoegToe !== 'function')
     throw new Error('pay: payBoekingenVoegToe ontbreekt. Zonder die weg landt geen enkele grootboekregel in het transactiegrootboek.');
   /* DE TIJD VAN DE HELE PAYLAAG, uit de huisklok en niet uit het
      besturingssysteem. Elk deelbestand hieronder leest `nu` uit deze ctx, dus
      deze ene regel bepaalt of vervaldatums, aflopende reserveringen, de
      wachttijd op een gewijzigd IBAN en dag- en maandgrenzen met RTG_KLOK
-     meebewegen. Stond hier Date.now(), dan zaten de deelbestanden formeel op
-     een gedeelde klok en in werkelijkheid nog steeds aan het OS -- de teller
-     tevreden, de tijdmachine niet. Zonder RTG_KLOK geeft klok.nu() exact
+     meebewegen. Met Date.now() hier zaten de deelbestanden in werkelijkheid
+     nog steeds aan het OS. Zonder RTG_KLOK geeft klok.nu() exact
      Date.now(); in productie weigert een verzette klok bij het laden. */
   const nu = require('../../lib/klok').nu;
   /* De opslagvorm -- de vijf bakken in db.data en de vier naamregels ('lid:',
@@ -89,7 +88,7 @@ module.exports = (ctxIn) => {
      raakt de boekingsregels zelf niet aan. */
   const { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
     betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
-    motorklant, geldModus, keyVanCodenaam, plafondFout,
+    motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
   });
 

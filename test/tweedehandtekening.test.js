@@ -32,10 +32,11 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweehand-'));
 const CODE = 'KANTOOR-TWEEHAND-1';
-let srv, base, gedeeld, eenA, eenB, lid, iban;
+let srv, base, gedeeld, eenA, eenB, lid, iban, pk, sleutelA, sleutelB;
 
 function api(pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -61,6 +62,9 @@ async function medewerker(merk) {
   assert.equal(kop.status, 200, 'medewerker ' + merk + ' koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 120));
   const start = await api('/api/account/start', { rol: 'kantoor' }, reg.body.token);
   assert.ok(start.body.token, 'medewerker ' + merk + ' staat op naam in de backoffice');
+  /* Het LEDENtoken erbij: daar hangt een passkey aan, en een geldhandeling vraagt
+     er sinds 25 september 2026 een bij beide handtekeningen (toets 6). */
+  medewerker.lid = reg.body.token;
   return start.body.token;
 }
 
@@ -84,7 +88,12 @@ test.before(async () => {
   assert.equal(live.status, 200, 'de leden-bank staat live: ' + JSON.stringify(live.body).slice(0, 140));
 
   eenA = await medewerker(1);
+  const lidA = medewerker.lid;
   eenB = await medewerker(2);
+  const lidB = medewerker.lid;
+  pk = kantoorPasskey(base);
+  sleutelA = await pk.zet(lidA);
+  sleutelB = await pk.zet(lidB);
 
   const u = Date.now().toString(36);
   lid = (await api('/api/auth/register', { name: 'Rekeninghouder', email: 'rh' + u + '@voorbeeld.test',
@@ -210,7 +219,10 @@ test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden we
   /* 31 dagen vooruit: dan is een maandelijkse betaling een keer aan de beurt. */
   const tot = Date.now() + 31 * 86400000;
 
-  const r = await api('/api/office/bank/incasso', { tot }, eenA);
+  /* Beide handtekeningen vragen een passkeyceremonie, gebonden aan deze grens en
+     aan deze aanvraag (routes/kantoren/bank-passkey.js). */
+  const inc = () => pk.ceremonie(sleutelA, '/api/office/bank/incasso/opties', { tot }, eenA);
+  const r = await api('/api/office/bank/incasso', { tot, ...(await inc()) }, eenA);
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
   assert.equal(r.body.needsAuth, true, 'de incassoronde ging zonder tweede mens door');
   assert.equal(r.body.uitgevoerd, undefined, 'de ronde heeft al gedraaid bij de aanvraag');
@@ -228,7 +240,7 @@ test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden we
     'het mandaat hoort hier NEE te zeggen: geld is nooit autonoom');
 
   /* DE ECONOMISCHE SLEUTEL: dezelfde grens is hetzelfde voornemen, geen tweede. */
-  const nog = await api('/api/office/bank/incasso', { tot }, eenA);
+  const nog = await api('/api/office/bank/incasso', { tot, ...(await inc()) }, eenA);
   assert.equal(nog.status, 200, JSON.stringify(nog.body).slice(0, 160));
   assert.equal(nog.body.voornemen.id, r.body.voornemen.id,
     'een tweede aanvraag op dezelfde grens maakte een TWEEDE voornemen -- dan int een dubbeltik twee keer');
@@ -237,14 +249,17 @@ test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden we
      zodat toets 7 straks een leeg loket aantreft en niet over onze rommel valt. */
   await api('/api/office/bank/handtekening/intrek', { id: nog.body.aanvraag.id }, eenA);
 
-  const zelf = await api('/api/office/bank/handtekening/bevestig', { id: r.body.aanvraag.id }, eenA);
+  const hand = (sl, wie) => pk.ceremonie(sl, '/api/office/bank/handtekening/opties', { id: r.body.aanvraag.id }, wie);
+  const zelf = await api('/api/office/bank/handtekening/bevestig',
+    { id: r.body.aanvraag.id, ...(await hand(sleutelA, eenA)) }, eenA);
   assert.equal(zelf.status, 403, 'de aanvrager kon zijn eigen incassoronde aftekenen');
 
   /* Het saldo van de ONTVANGER, langs de weg die een lid werkelijk heeft
      (/api/bank/rekening geeft de detail van een eigen rekening). */
   const saldoVan = async () => (await api('/api/bank/rekening', { iban: naarIban }, lid2)).body;
   const saldoVoor = await saldoVan();
-  const ok = await api('/api/office/bank/handtekening/bevestig', { id: r.body.aanvraag.id }, eenB);
+  const ok = await api('/api/office/bank/handtekening/bevestig',
+    { id: r.body.aanvraag.id, ...(await hand(sleutelB, eenB)) }, eenB);
   assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 200));
   assert.equal(ok.body.handeling, 'bank.incasso');
 
@@ -280,22 +295,17 @@ test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden we
   const dos = await api('/api/office/bank/incasso/dossier', { voornemen: r.body.voornemen.id }, eenB);
   assert.equal(dos.status, 200, JSON.stringify(dos.body).slice(0, 160));
 
-  /* EN HIER IS HET DOSSIER EERLIJKER DAN PRETTIG, en dat is precies waarom het
-     bestaat. Deze medewerkers hebben geen passkey: kern/zwaarbewijs.js laat de
-     handeling dan DOOR op de terugval en meldt dat aan de beveiliging, dus de as
-     `assurance` staat op `vermoed` en telt niet als gehaald. De keten is dus
-     gelopen, het geld is verplaatst, en de keten heet NIET rond -- met de naam van
-     de ene as die eraan ontbreekt en de reden erbij.
-
-     Wie deze toets ooit op `rond: true` wil hebben, geeft de medewerker een
-     passkey; wie hem groen maakt door `vermoed` te laten meetellen, sloopt het
-     verschil tussen een as die gelopen is en een as die aanwezig lijkt. */
-  assert.deepEqual(dos.body.dossier.open, ['assurance'],
+  /* EN NU IS DE KETEN ROND. Tot 25 september 2026 stond hier het omgekeerde: de
+     medewerkers hadden geen passkey, kern/zwaarbewijs.js liet de handeling door op
+     de terugval, en het dossier zei eerlijk `assurance: vermoed` en niet rond. Die
+     terugval is voor geldhandelingen dicht (besluit eigenaar); zonder passkey komt
+     de aanvraag er nu niet eens door (test/kantoordeur-passkey.test.js). Wie deze
+     toets groen wil houden door `vermoed` weer te laten meetellen, heeft de
+     verkeerde as aangeraakt: hier is hij BEWEZEN omdat er een ceremonie liep. */
+  assert.equal(dos.body.dossier.rond, true,
     'open assen na de uitvoering: ' + (dos.body.dossier.open || []).join(', '));
-  assert.equal(dos.body.dossier.rond, false);
   const ass = dos.body.dossier.assen.find(a => a.as === 'assurance');
-  assert.equal(ass.graad, 'vermoed');
-  assert.match(ass.reden, /passkey/i, 'de open as zegt niet waarom hij open staat');
+  assert.equal(ass.graad, 'bewezen', 'de assurance-as: ' + JSON.stringify(ass));
   const tweede = dos.body.dossier.assen.find(a => a.as === 'tweedeMens');
   const eerste = dos.body.dossier.assen.find(a => a.as === 'mensbewijs');
   assert.ok(tweede && tweede.uitslag, 'de tweede mens staat niet in het dossier');

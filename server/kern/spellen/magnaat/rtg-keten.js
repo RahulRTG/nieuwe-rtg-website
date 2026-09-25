@@ -71,7 +71,13 @@ module.exports = function rtgKeten({ betaal, crypto }) {
      is een stub -- maar de poort, het grootboek en de idempotentie zijn echt. */
   function opstelling() {
     const db = { data: {} };
+    const cr = crypto || require('crypto');
+    /* De betaalwaarheid hoort bij de keten: opladen legt de betaling daar vast
+       VOOR de aanroep (MONEY-012). Zonder haar weigert kern/pay elke oplading. */
+    const betaalWaarheid = require('../../betaalwaarheid')({ d: () => db.data, save: () => {},
+      crypto: cr, betaal, log: null });
     const { pay } = require('../../pay')({
+      betaalWaarheid,
       db,
       /* Als PROPERTY en niet als methode-verkorting: kruisscan (keuringsregel 9)
          leest `save() {}` als een kale verwijzing naar de top-level `save` van een

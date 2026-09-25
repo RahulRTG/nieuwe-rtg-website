@@ -223,6 +223,10 @@ test('5b. de zes geld-knoppen vragen een NAAM, en een medewerker op naam komt er
   for (const pad of KLUIS) {
     const r = await api(pad, {}, opNaam);
     assert.notEqual(r.status, 401, pad + ' hoort een kantoorsessie op naam niet te weigeren');
+    /* DE NAAMDEUR IS GEPASSEERD. Een geldhandeling vraagt daarachter nog een passkey
+       (besluit eigenaar 25-09-2026, routes/kantoren/bank-passkey.js): die weigering
+       mag, maar alleen met die reden -- elke andere 403 is de deur die niet opengaat. */
+    if (r.status === 403 && r.body.watNu === 'passkey-zetten') continue;
     assert.notEqual(r.status, 403, pad + ' hoort een kantoorsessie op naam niet te weigeren (kreeg ' +
       r.status + ': ' + JSON.stringify(r.body).slice(0, 120) + ')');
   }

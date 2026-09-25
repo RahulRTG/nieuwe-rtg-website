@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1599,
+    "kernBreedte": 1600,
     "kernGedeeld": 243,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -113,7 +113,7 @@
     "namensMechanismenGemeten": 7,
     "idemVerklaard": 1,
     "idemAfdrukVoegtNietsToe": 2,
-    "idemHandwerkGeenVergelijking": 3,
+    "idemHandwerkGeenVergelijking": 1,
     "neigingVerwijzingRot": 0,
     "neigingVoorkeurBlind": 14,
     "spoorConvergent": 1,
@@ -166,6 +166,15 @@
       "meter": "kernBreedte 1590 -> 1594; kernGedeeld 242 -> 243",
       "reden": "De rekening op naam van een entiteit (besluit van de eigenaar, 24 september 2026). In plaats van de hele kern.bank aan concern en het Werk OS te geven, staan er vijf smalle namen in de kern-tas (server/opzet/kernlaag4c.js): entiteitRekeningStand, -Zet, -Open, entiteitRekening en entiteitBetaal. Vier ervan raken een route; entiteitRekening raakt er twee domeinen (concern leest de rekening, het Werk OS toetst of de betaalwijze kan) en is daarmee de ene echte koppeling erbij. De bank importeert concern niet en andersom.",
       "waarheen": "GRENZEN.json (concern, bedrijf, kantoren) en test/entiteitrekening.test.js"
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1599,
+      "meter": "kernBreedte 1599 -> 1600",
+      "reden": "MONEY-012, de inkomende kant (besluit van de eigenaar, 24 september 2026: opladen, facturen en directpay alle drie via de betaalwaarheid). De factuurroute (domein member) gebruikt nu kern.betaalWaarheid in plaats van een kale betaal.maakBetaling plus kaartWachtend: vastleggen voor de aanroep, een vaste sleutel, een veegronde en precies een afwikkeling. Het domein kreeg daarmee een naam uit de kern-tas erbij; kaartWachtend kreeg geen nieuwe schrijver meer.",
+      "waarheen": "GRENZEN.json (member), test/money012-inkomend.test.js en test/money012-keten.test.js"
     },
     {
       "datum": "2026-09-24",
@@ -3114,7 +3123,7 @@
     "namensMechanismenGemeten": "2026-09-15",
     "idemVerklaard": "2026-09-15",
     "idemAfdrukVoegtNietsToe": "2026-09-15",
-    "idemHandwerkGeenVergelijking": "2026-09-15",
+    "idemHandwerkGeenVergelijking": "2026-09-24",
     "neigingVerwijzingRot": "2026-09-15",
     "neigingVoorkeurBlind": "2026-09-15",
     "veranderbereikZonderBereik": "2026-09-16",

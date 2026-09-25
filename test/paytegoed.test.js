@@ -116,7 +116,8 @@ test('het plafond valt vóór de kaart: een volle wallet raakt de betaal-naad ni
   let kaartAanroepen = 0;
   const basis = {
     betaal: {
-      maakBetaling: async () => { kaartAanroepen++; return { id: 'bet1', status: 'betaald' }; }
+      AANBIEDER: 'demo', // een onbekende aanbieder met 'betaald' telt terecht niet als bevestigd
+      maakBetaling: async () => { kaartAanroepen++; return { id: 'bet1', status: 'betaald', aanbieder: 'demo' }; }
     },
     metIdem: (sleutel, afdruk, werk) => werk(),
     boekAsync: async ({ van, naar, centen }) => {
@@ -133,6 +134,10 @@ test('het plafond valt vóór de kaart: een volle wallet raakt de betaal-naad ni
       ? { status: 409, code: 'wallet-plafond', error: 'vol' } : null,
     OPLAAD_MIN: 100, MAX_CENTEN: 500000, AUTOLAAD_STAP: 1000
   };
+  // opladen legt de betaling sinds MONEY-012 eerst vast in de betaalwaarheid
+  const bwData = {};
+  basis.betaalWaarheid = require('../server/kern/betaalwaarheid')({ d: () => bwData, save: () => {}, crypto,
+    betaal: basis.betaal, nu: () => new Date().toISOString(), log: null });
   const { laadOp } = require('../server/kern/pay/opladen').maakOpladen(basis);
 
   const geweigerd = await laadOp({ codenaam: 'Vol', centen: 100000 });

@@ -23,6 +23,9 @@ module.exports = function hangWebhooksOp(deps) {
      handler uitgelezen. Zo kan de volgorde niet stilzwijgend omvallen. */
   const munten = { bevestig: (a) => deps.muntenVan().bevestig(a) };
   const settleFactuur = (...a) => deps.settleFactuurVan()(...a);
+  /* Facturen en directe betalingen lopen via de betaalwaarheid (MONEY-012); hun
+     afwikkeling gaat door dezelfde settleFactuur, laat gebonden zoals hierboven. */
+  require('../kern/betaalwaarheid/inkomend')({ betaalWaarheid, settleFactuur });
   const verwerkPayout = require('./webhook-payout');
   /* DE TWEE WEBHOOKS STAAN HIER, EN NIET ACHTER DE POORTWACHTERS.
 

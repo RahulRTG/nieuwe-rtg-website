@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:03:45.606Z",
-    "commit": "466d411e1",
+    "op": "2026-09-25T02:19:38.465Z",
+    "commit": "936a7ece",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4341,6 +4341,13 @@
       "operator": "return-weg#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "kantoordeur-passkey.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "kantoordienst.test.js": {
       "soort": "server",

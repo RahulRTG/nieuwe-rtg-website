@@ -242,6 +242,17 @@ is voortaan zichtbaar.
 
 ## 4c. Bedienbaar was een kromme meetlat — vier fouten in de meter, en geen enkele in een app
 
+> **Vervangen op 25 september 2026.** Deze paragraaf beschrijft de eerste
+> reparatie van de bedienbaar-meter, met een noemer die bij het laden bevroren
+> werd, een budget en een drempel (`scripts/lib/bedieningsmeting.js`). Tegelijk
+> kwam er langs een andere weg (#392) een tweede reparatie op main: per ronde
+> opnieuw kijken, na elke tik Escape, vastleggen wie een klik opving, en een
+> weigering waarvan het scherm de reden niet toont als defect. Bij het
+> samenvoegen is gekozen voor die van main als basis (besluit van de eigenaar).
+> De module en haar twee toetsen zijn weg; de diagnose hieronder blijft staan
+> omdat de vier meterfouten echt waren, en de tweede reparatie dezelfde
+> symptomen aanpakt.
+
 **Staat** (24 september 2026). Na de hermeting stond `bedienbaar` voor alle 112
 onderdelen op `NIET_GETEST`, en drie apps die op 7 september bewezen waren vielen
 terug. Dat is eerst **gediagnosticeerd en pas daarna gerepareerd**: een trechter
@@ -537,6 +548,47 @@ het eerste getal dat waar is.
 De les die hier het meeste waard is: **de eerste twee verklaringen waren
 verhalen, de derde was een meting.** Een register dat op ronde 1 was blijven
 staan, had 87 rijen BEWEZEN gemeld op één klik per scherm.
+
+### Stap 1 uitgezocht (24–25 september 2026): wie lag er over die knoppen
+
+De meter bewaarde alleen de woorden "intercepts pointer events" en gooide het
+element weg dat Playwright noemt. Nu staat per knop `onderschept` (tag#id.klasse,
+zonder tekst) en in `gemeten.onderscheppers` de telling over alle schermen. Vijf
+rondes, elk op een schone boom:
+
+| ronde | wat er veranderde | niet aan te tikken | defecten |
+|---|---|---|---|
+| 1 | alleen het element vastleggen | 517 | 1 |
+| 2 | na elke tik Escape, zoals een mens | 437 | 76 |
+| 3 | de taalkeuze niet aantikken; 429 is de rem van de proef; een getoonde weigering is geen defect | 382 | 1 |
+| 4 | de persona spreekt Nederlands | 409 | 1 |
+| 5 | de zin van een weigering uit het hele antwoord | 421 | **0** |
+
+Wat dat liet zien:
+
+- **Het grootste deel was de proef zelf.** De uitvoerlaag, de sprong, de
+  taalkeuze, de lade en de intel-laag gingen open door een tik van de proef en
+  bleven over elke volgende knop liggen. Met Escape gaan ze dicht en verdwijnen
+  ze uit de telling.
+- **Eén laag ging niet dicht, en dat was een productgebrek.** Het Rahul-paneel
+  ligt vast over het werkblad en reageerde niet op Escape (109 knoppen eronder).
+  Escape drukt nu zijn eigen sluitknop (`shared/rahul-tab/helpers.js`,
+  `test/rahul-escape.e2e.js`).
+- **De proef mat de verkeerde taal.** Zonder `rtg_lang` volgde het scherm de
+  headless browser (en-US). Met een Nederlandse persona verdwenen ook de 3556
+  vertaalverzoeken die op de rem liepen. Welke tik de taal eerder wisselde, is
+  niet vastgesteld: in ronde 4 en 5 wisselde er niets meer (`taalWissels` is leeg).
+- **Een weigering met een zin is geen defect als het scherm hem toont.** Zeven
+  weigeringen (bijvoorbeeld "Geef het kanaal een naam.", en de 428 van Vluchten
+  die om paspoortgegevens vraagt) staan nu als `weigeringenGetoond`. Een weigering
+  waarvan het scherm de reden niet toont, blijft een defect.
+
+**Wat er nog over knoppen ligt, is de volgende stap.** Na ronde 5 zijn het vrijwel
+alleen nog paginadelen: `body`, `main#main`, `main#rtg-inhoud`, `header.ios-nav`.
+Dat past bij knoppen die onder een vaste kop terechtkomen als de proef ernaartoe
+scrolt, of bij knoppen die de pagina werkelijk bedekt. Die twee zijn nog niet uit
+elkaar gehaald. Tot dat gebeurd is, blijft bewijs 2 op 1 BEWEZEN en 111
+NIET_GETEST staan, en dat is het eerlijke getal.
 
 `npm run appwerkt:controle` is de ratel: het aantal defecten mag alleen omlaag.
 Groeit het, dan is er een functie stukgegaan die het deed, en dat hoort de bouw te

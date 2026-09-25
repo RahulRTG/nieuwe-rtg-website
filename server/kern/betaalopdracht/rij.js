@@ -81,7 +81,8 @@ module.exports = (ctx) => {
 
      Een opgegeven opdracht (MISLUKT) blijft liggen: die is al zes keer
      geprobeerd en het geld is terug. Hem weer oppakken is een besluit van het
-     kantoor, geen werk van een tik. */
+     kantoor, geen werk van een tik. Een ONBEKENDE ook: die wacht op een
+     uitspraak van de rail, en blijven aanbieden verandert daar niets aan. */
   let bezig = false;
   async function ronde({ tot } = {}) {
     if (bezig) return { ok: true, overgeslagen: true, reden: 'er loopt al een ronde' };
@@ -89,7 +90,7 @@ module.exports = (ctx) => {
     const grens = Number.isFinite(tot) ? tot : nu();
     let gedaan = 0, gelukt = 0, opgegeven = 0;
     try {
-      for (const o of rij().filter(x => !AF.has(x.status) && x.status !== STATUS.MISLUKT && (x.volgendeAt || 0) <= grens)) {
+      for (const o of rij().filter(x => !AF.has(x.status) && x.status !== STATUS.MISLUKT && x.status !== STATUS.ONBEKEND && (x.volgendeAt || 0) <= grens)) {
         const voor = o.status;
         await dienIn(o);
         gedaan++;

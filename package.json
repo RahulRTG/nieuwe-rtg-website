@@ -113,7 +113,6 @@
     "bron:bewijs": "node scripts/bron-release-bewijs.js",
     "release:controle": "node scripts/release-bewijs.js --controle",
     "release:gate": "node scripts/release-gate.js",
-    "imageherkomst:sleutel": "node scripts/imageherkomst.js --nieuwe-sleutel",
     "sbom": "node scripts/imageherkomst.js --sbom",
     "imageherkomst": "node scripts/imageherkomst.js --binden",
     "imageherkomst:controle": "node scripts/imageherkomst.js --controle",

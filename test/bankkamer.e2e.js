@@ -90,6 +90,9 @@ test('de bankkamer toont de reconciliatie en de bevoegdheid, en liegt daar niet 
       assert.match(tekst, /1 × € 75,00|1 × € 75\.00/, 'een opdracht van 75 euro, zoals de API zegt: ' + tekst.slice(0, 200));
       assert.match(tekst, /aangenomen, nog niet bevestigd/, 'de status staat er in mensentaal');
       assert.doesNotMatch(tekst, /Er staat geld af dat nergens is aangekomen/, 'er is niets mislukt, dus geen alarm');
+      // MONEY-012: de tegel voor een onbekende uitkomst staat er, en zonder zo'n opdracht geen waarschuwing
+      assert.match(tekst, /Uitkomst onbekend/, 'de tegel voor een onbekende uitkomst staat er');
+      assert.doesNotMatch(tekst, /weet RTG niet of de rail hem uitvoerde/, 'niets is onbekend, dus geen waarschuwing');
     });
 
     await t.test('de matrix zegt WAAROM iets dicht is, niet alleen DAT het dicht is', async () => {

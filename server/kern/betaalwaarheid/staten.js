@@ -33,6 +33,15 @@ function providerStatus(aanbieder, stand, gebeurtenis) {
   const s = String(stand || '').toLowerCase();
   const g = String(gebeurtenis || '').toLowerCase();
   if (aanbieder === 'magnaat-test' || aanbieder === 'demo') return s === 'betaald' ? STATUS.BEVESTIGD : STATUS.WACHT_OP_KLANT;
+  /* De simulatiebank (server/betaal/synthetisch.js). Zonder deze tak viel elke
+     afloop -- ook `geweigerd` -- op IN_BEHANDELING, en wachtte een geweigerde
+     simulatie eeuwig op een bevestiging die niet kon komen. `teruggeboekt` is
+     "betaald en direct teruggehaald": er is geen geld binnen. */
+  if (aanbieder === 'simulatie') {
+    if (s === 'betaald') return STATUS.BEVESTIGD;
+    if (s === 'geweigerd' || s === 'teruggeboekt') return STATUS.GEWEIGERD;
+    if (s === 'open') return STATUS.WACHT_OP_KLANT;
+  }
   if (aanbieder === 'mollie') {
     if (s === 'paid') return STATUS.BEVESTIGD;
     if (s === 'authorized' || s === 'pending') return STATUS.IN_BEHANDELING;

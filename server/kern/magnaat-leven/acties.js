@@ -16,6 +16,9 @@ const tijd = require('./tijd');
 const gesprek = require('./gesprek');
 const opdracht = require('./opdracht');
 const geld = require('./geld');
+const team = require('./team');
+const voorraad = require('./voorraad');
+const contract = require('./contract');
 
 const fout = (error) => ({ status: 400, error });
 
@@ -60,7 +63,9 @@ const ACTIES = {
   gesprek: gesprek.gesprek, voorstel: gesprek.voorstel, neem: gesprek.neemAan, weiger: gesprek.weiger,
   lever: opdracht.lever, factuur: opdracht.factuur, herinnering: opdracht.herinnering,
   korting: opdracht.korting, voorfinancier: opdracht.voorfinancier,
-  uitstel: geld.uitstel, lenen: geld.lenen
+  uitstel: geld.uitstel, lenen: geld.lenen,
+  werf: team.werf, ontsla: team.ontsla, bestel: voorraad.bestelInkoop, prijs: voorraad.prijs,
+  teken: contract.teken, wijsaf: contract.wijsAf, zegop: contract.zegOp
 };
 
 module.exports = { ACTIES };

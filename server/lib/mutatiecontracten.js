@@ -127,6 +127,7 @@ const CONTRACTEN = Object.assign({},
      loket zijn. Eigen bestand omdat het interessante in het VERSCHIL tussen die
      twee helften zit -- zie de kop. */
   require('./mutatiecontracten-tweedehand').CONTRACTEN,
+  require('./mutatiecontracten-afstemming').CONTRACTEN,
   require('./mutatiecontracten-wonen').CONTRACTEN,
   require('./mutatiecontracten-project-room').CONTRACTEN,
   /* De zware poort: drie ceremonieloketten, alle drie met opzet niet

@@ -24,4 +24,14 @@
     return ['Wat vraagt nu aandacht?', 'Open het juiste onderdeel', 'Bereid de volgende stap voor'];
   }
   window.RTGRahulTabHelpers = { tekst: tekst, context: context, suggesties: suggesties };
+  /* Escape sluit het Rahul-paneel, zoals elke andere laag in deze schil
+     (GRAMMATICA.md: ik kan bijna altijd terug). Het paneel ligt vast over het
+     werkblad; zonder dit was de sluitknop de enige weg terug. Dezelfde knop,
+     dus dezelfde weg dicht. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var paneel = document.querySelector('.rtg-rahul-page');
+    var dicht = paneel && !paneel.hidden && paneel.querySelector('.rtg-command-close');
+    if (dicht) { e.stopPropagation(); dicht.click(); }
+  }, true);
 })();

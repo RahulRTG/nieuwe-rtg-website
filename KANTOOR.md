@@ -454,7 +454,7 @@ het is de bouwlijst.
 |---|---|---|
 | **0** | de meter — `scripts/kantoormacht.js` → `KANTOORMACHT.json` | **staat** (6 sep 2026) |
 | **1** | mens achter de deur: schaduw, dan `ENFORCE_EXECUTE` | een besluit vraagt |
-| **2** | passkey aan de kantoordeur — `webauthn/` koppelen | een stap weg |
+| **2** | passkey aan de kantoordeur — `webauthn/` koppelen | **half**: verplicht voor geld (25 sep 2026), de rest een stap weg |
 | **3** | `actor.*` compleet in de envelop | een stap weg |
 | **4** | verantwoordelijkheidsgraaf als projectie | een besluit vraagt |
 | **5** | tijdelijke bevoegdheid — `commercie/bevoegdheid.js` aansluiten | een stap weg |
@@ -469,6 +469,23 @@ het is de bouwlijst.
 Blok 2 vóór blok 1 is geen vergissing: een passkey aan de deur maakt
 `ENFORCE_EXECUTE` betaalbaar, want dan is "inloggen op naam" geen extra last maar
 juist minder wrijving dan een code overtypen.
+
+**Blok 2 staat half, en de helft die staat is de geldhelft (besluit van de
+eigenaar, 25 september 2026).** Tot dan liet `kern/zwaarbewijs.js` een
+medewerker zonder passkey op de terugval door, met een melding aan de
+beveiliging, en had een medewerker MET passkey geen kantoorroute om de
+ceremonie te openen: de veiligere mens werd buitengesloten. Nu vragen beide
+handtekeningen onder een geldhandeling een ceremonie, elk op de eigen deur en
+gebonden aan de eigen handeling: de aanvrager aan de grens van de ronde
+(`/api/office/bank/incasso/opties`), de tweede mens aan die ene aanvraag
+(`/api/office/bank/handtekening/opties`). Zonder passkey komt er een 403 met
+`watNu: 'passkey-zetten'` en geen terugval. Dat is met opzet strenger dan
+*schaduw eerst*: het gaat om twee knoppen met twee bekende mensen erachter, en
+een terugval onder geld is precies de uitzondering waar een aanvaller op mikt.
+Wat geen geld raakt (rood staan, rekening openen) blijft op de oude regels, en
+de toets houdt dat vast als tegenproef -- de goedkoopste implementatie van
+"dicht" is alles dicht. Welke tweede handtekening geld raakt, weet de handeling
+zelf (`geld: true` bij `tweedeHand.registreer`), niet de deur.
 
 ## 15. Wat er bewust niet komt
 

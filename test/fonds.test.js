@@ -58,7 +58,8 @@ function nepRij(db, { faalt = 0, maxPogingen = 2 } = {}) {
     maxPogingen, backoffMs: [1], log: { warn: () => {} },
     railInzenden: async () => {
       n++;
-      if (nog > 0) { nog--; throw new Error('de rail is onbereikbaar'); }
+      // onbereikbaar = er ging niets de deur uit (MONEY-012: alleen dan mag er teruggeboekt worden)
+      if (nog > 0) { nog--; throw Object.assign(new Error('de rail is onbereikbaar'), { nietVerstuurd: true }); }
       return { id: 'UIT-' + n, status: 'ingepland' };
     }
   });

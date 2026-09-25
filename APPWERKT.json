@@ -10,8 +10,8 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-09-24T21:57:30.400Z",
-  "commit": "3008d7d1",
+  "op": "2026-09-25T01:42:54.342Z",
+  "commit": "cfe47f75",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
@@ -21,10 +21,10 @@
  "gemeten": {
   "onderdelen": 112,
   "defecten": 0,
-  "knoppenGevonden": 528,
-  "knoppenAangetikt": 244,
-  "knoppenNietKlikbaar": 260,
-  "schermenGrotendeelsOngemeten": 18,
+  "knoppenGevonden": 517,
+  "knoppenAangetikt": 250,
+  "knoppenNietKlikbaar": 249,
+  "schermenGrotendeelsOngemeten": 17,
   "deurenZonderPersona": 2
  },
  "telling": {
@@ -36,8 +36,8 @@
    "NIET_GETEST": 15
   },
   "bedienbaar": {
-   "NIET_GETEST": 56,
-   "BEWEZEN": 56
+   "NIET_GETEST": 55,
+   "BEWEZEN": 57
   },
   "menselijk": {
    "NIET_GETEST": 112
@@ -47,8 +47,8 @@
    "BEWEZEN": 2
   },
   "waarheidsgetrouw": {
-   "NIET_GETEST": 54,
-   "BEWEZEN": 58
+   "NIET_GETEST": 19,
+   "BEWEZEN": 93
   },
   "persistent": {
    "GEEN_FIXTURE": 112
@@ -109,7 +109,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -120,7 +120,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -131,7 +131,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -142,7 +142,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -151,9 +151,9 @@
     "functie": "link:klimaat",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -164,12 +164,12 @@
      "voltooibaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lusproef.js",
-      "commit": "33818743"
+      "commit": "acf89ca3"
      },
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -180,7 +180,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -191,7 +191,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -202,7 +202,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -213,7 +213,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -224,7 +224,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -233,9 +233,9 @@
     "functie": "link:bescherming",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -246,7 +246,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -257,7 +257,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -266,9 +266,9 @@
     "functie": "link:neigingen",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -279,7 +279,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -290,7 +290,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -299,9 +299,9 @@
     "functie": "link:veilig",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -312,7 +312,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -321,9 +321,9 @@
     "functie": "link:gegevens",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -334,7 +334,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -345,7 +345,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -354,9 +354,9 @@
     "functie": "link:wereldlaag",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -367,7 +367,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -378,7 +378,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -387,9 +387,9 @@
     "functie": "link:attenties",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -400,7 +400,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -411,7 +411,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -422,7 +422,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -433,7 +433,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -444,7 +444,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -455,7 +455,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -466,7 +466,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -477,7 +477,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -486,9 +486,9 @@
     "functie": "link:cellier",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -497,9 +497,9 @@
     "functie": "link:cercle",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -510,7 +510,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -521,7 +521,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -530,9 +530,9 @@
     "functie": "link:entourage",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -541,9 +541,9 @@
     "functie": "link:theater",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -554,7 +554,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -565,7 +565,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -576,7 +576,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -585,9 +585,9 @@
     "functie": "link:garderobe",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -598,7 +598,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -609,7 +609,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -620,7 +620,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -631,7 +631,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -640,9 +640,9 @@
     "functie": "link:podium",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -653,7 +653,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -662,9 +662,9 @@
     "functie": "link:huis",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -673,9 +673,9 @@
     "functie": "link:maison",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -684,9 +684,9 @@
     "functie": "link:mall",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -697,7 +697,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -706,9 +706,9 @@
     "functie": "link:mijnmall",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -719,7 +719,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -730,7 +730,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -741,7 +741,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -750,9 +750,9 @@
     "functie": "link:nieuws",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -763,7 +763,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -772,9 +772,9 @@
     "functie": "link:rechterhand",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -783,9 +783,9 @@
     "functie": "link:pulse",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -794,9 +794,9 @@
     "functie": "link:rendezvous",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -807,7 +807,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -816,9 +816,9 @@
     "functie": "link:mediaos",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -829,7 +829,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -840,7 +840,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -851,7 +851,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -862,7 +862,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -873,7 +873,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -884,7 +884,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -893,9 +893,9 @@
     "functie": "link:sport",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -904,9 +904,9 @@
     "functie": "link:table",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -917,7 +917,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -928,7 +928,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -939,7 +939,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -948,9 +948,9 @@
     "functie": "link:clips",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -961,7 +961,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -972,7 +972,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -983,7 +983,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -994,7 +994,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1005,7 +1005,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1014,9 +1014,9 @@
     "functie": "link:hangar",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1027,7 +1027,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1036,9 +1036,9 @@
     "functie": "link:ov",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1049,7 +1049,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1060,7 +1060,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1071,7 +1071,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1082,7 +1082,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1091,9 +1091,9 @@
     "functie": "link:routedossier",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1102,9 +1102,9 @@
     "functie": "link:stad",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1115,7 +1115,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1126,7 +1126,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1137,7 +1137,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1146,9 +1146,9 @@
     "functie": "link:vluchten",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1159,7 +1159,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1170,12 +1170,12 @@
      "voltooibaar": {
       "status": "BEWEZEN",
       "bron": "scripts/tafelproef.js",
-      "commit": "67a51f63"
+      "commit": "acf89ca3"
      },
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1186,7 +1186,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1195,9 +1195,9 @@
     "functie": "link:magnaat",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1206,9 +1206,9 @@
     "functie": "link:loopbaan",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1217,9 +1217,9 @@
     "functie": "link:vertegenwoordiging",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1230,7 +1230,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1241,7 +1241,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1252,7 +1252,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1263,7 +1263,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1272,9 +1272,9 @@
     "functie": "link:rtgone",
     "bewijzen": {
      "waarheidsgetrouw": {
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1285,7 +1285,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1296,7 +1296,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1307,7 +1307,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1318,7 +1318,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1329,7 +1329,7 @@
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    },
@@ -1340,7 +1340,7 @@
      "waarheidsgetrouw": {
       "status": "NIET_GETEST",
       "bron": "scripts/liegronde.js",
-      "commit": "fce571c0"
+      "commit": "acf89ca3"
      }
     }
    }
@@ -1427,8 +1427,8 @@
      "reden": "het scherm vroeg buiten de deuren niets aan de backend; er viel niets te liegen",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -1480,10 +1480,10 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 49,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 11
+      "dom": 42,
+      "zichtbaar": 22,
+      "inBeeld": 17,
+      "raakbaar": 10
      }
     },
     "noemer": 0,
@@ -1553,8 +1553,8 @@
      "reden": "het scherm vroeg buiten de deuren niets aan de backend; er viel niets te liegen",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -1582,7 +1582,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als gezin: 1029 tekens zichtbaar"
+    "als gezin: 1045 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -1676,11 +1676,11 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: geen schoolsessie); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "reden": "achter een deur (html.rtf-toegang-dicht); het scherm zelf is niet beproefd",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -1768,11 +1768,11 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: geen schoolsessie); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "reden": "achter een deur (html.rtf-toegang-dicht); het scherm zelf is niet beproefd",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -1854,12 +1854,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -1965,8 +1965,8 @@
      "bewijs": "/apps/connect.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "geen knop die bij het laden te raken is; wat dit scherm doet loopt via links of formulieren",
+     "status": "BEWEZEN",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect, 1x teruggekeerd na navigatie",
      "bewijs": null
     },
     "menselijk": {
@@ -1976,11 +1976,11 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 33818743; sindsdien is er geen code gewijzigd): 17 schakels gesloten, 12 storingen gehouden",
+     "reden": "vers gemeten (gemeten op acf89ca3; sindsdien is er geen code gewijzigd): 17 schakels gesloten, 12 storingen gehouden",
      "bewijs": {
       "register": "LUSPROEF.json",
-      "op": "2026-09-24T21:49:03.643Z",
-      "commit": "33818743",
+      "op": "2026-09-25T01:35:20.581Z",
+      "commit": "acf89ca3",
       "instrument": "scripts/lusproef.js"
      },
      "bron": {
@@ -1991,12 +1991,12 @@
      }
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -2019,12 +2019,12 @@
      "bewijs": null
     }
    },
-   "gevonden": 0,
-   "geklikt": 0,
+   "gevonden": 4,
+   "geklikt": 4,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als gezin: 978 tekens zichtbaar"
+    "als gezin: 2308 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2037,10 +2037,10 @@
     "landing": "/apps/connect.html",
     "stadia": {
      "app": {
-      "dom": 6,
-      "zichtbaar": 0,
-      "inBeeld": 0,
-      "raakbaar": 0
+      "dom": 39,
+      "zichtbaar": 16,
+      "inBeeld": 16,
+      "raakbaar": 16
      },
      "schil": {
       "dom": 63,
@@ -2049,16 +2049,16 @@
       "raakbaar": 11
      }
     },
-    "noemer": 0,
-    "drempel": 0,
-    "budget": 0,
-    "geprobeerd": 0,
-    "gelukt": 0,
-    "effect": 0,
+    "noemer": 4,
+    "drempel": 2,
+    "budget": 4,
+    "geprobeerd": 4,
+    "gelukt": 4,
+    "effect": 3,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
-    "teruggekeerd": 0,
-    "nietRaakbaar": 6,
+    "teruggekeerd": 1,
+    "nietRaakbaar": 23,
     "onomkeerbaar": 0
    },
    "samengesteld": [
@@ -2117,8 +2117,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -2150,7 +2150,7 @@
     "Choose your widgets: element is not visible"
    ],
    "waarnemingen": [
-    "als gezin: 3238 tekens zichtbaar"
+    "als gezin: 3235 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2242,8 +2242,8 @@
      "reden": "het scherm vroeg buiten de deuren niets aan de backend; er viel niets te liegen",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -2368,8 +2368,8 @@
      "reden": "achter een deur (html.rtf-toegang-dicht); het scherm zelf is niet beproefd",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -2397,7 +2397,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als gezin: 1273 tekens zichtbaar"
+    "als gezin: 1279 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2489,8 +2489,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -2573,8 +2573,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -2690,12 +2690,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -2742,7 +2742,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 77,
+      "dom": 79,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -2815,8 +2815,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -2936,8 +2936,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -3053,12 +3053,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'tekst')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -3115,9 +3115,9 @@
       "raakbaar": 10
      },
      "schil": {
-      "dom": 68,
-      "zichtbaar": 18,
-      "inBeeld": 14,
+      "dom": 83,
+      "zichtbaar": 22,
+      "inBeeld": 18,
       "raakbaar": 11
      }
     },
@@ -3188,8 +3188,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -3239,7 +3239,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 84,
+      "dom": 86,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -3312,8 +3312,8 @@
      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -3370,9 +3370,9 @@
       "raakbaar": 13
      },
      "schil": {
-      "dom": 68,
-      "zichtbaar": 18,
-      "inBeeld": 14,
+      "dom": 84,
+      "zichtbaar": 22,
+      "inBeeld": 18,
       "raakbaar": 11
      }
     },
@@ -3439,12 +3439,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -3572,8 +3572,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -3624,7 +3624,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 86,
+      "dom": 84,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -3693,12 +3693,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'aanwezig')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -3745,7 +3745,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 76,
+      "dom": 86,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -3818,8 +3818,8 @@
      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -3945,8 +3945,8 @@
      "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -3995,7 +3995,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 94,
+      "dom": 87,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -4050,7 +4050,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "32 te raken bij het laden, 32 geprobeerd, 27 gelukt, 14 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Next week: element is not visible, Open your calendar: element is not visible, Remove from your widgets: element is not visible",
+     "reden": "32 te raken bij het laden, 32 geprobeerd, 27 gelukt, 15 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Next week: element is not visible, Open your calendar: element is not visible, Remove from your widgets: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -4064,12 +4064,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "13 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -4103,7 +4103,7 @@
     "Choose your widgets: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 4814 tekens zichtbaar"
+    "als lid: 4812 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4122,7 +4122,7 @@
       "raakbaar": 59
      },
      "schil": {
-      "dom": 69,
+      "dom": 82,
       "zichtbaar": 19,
       "inBeeld": 13,
       "raakbaar": 8
@@ -4133,7 +4133,7 @@
     "budget": 32,
     "geprobeerd": 32,
     "gelukt": 27,
-    "effect": 14,
+    "effect": 15,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 1,
@@ -4195,8 +4195,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -4224,7 +4224,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 3235 tekens zichtbaar"
+    "als lid: 3263 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4316,8 +4316,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -4396,12 +4396,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -4521,8 +4521,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -4550,7 +4550,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1485 tekens zichtbaar"
+    "als lid: 1468 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4642,8 +4642,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -4763,8 +4763,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -4847,8 +4847,8 @@
      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -4884,7 +4884,7 @@
     "R\nRahul\nStel me gerust een vraag.\nRAHUL: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1512 tekens zichtbaar"
+    "als lid: 1226 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4976,8 +4976,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -5042,7 +5042,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 3 met zichtbaar effect",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 4 gelukt, 2 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -5060,8 +5060,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -5108,10 +5108,10 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 75,
-      "zichtbaar": 25,
-      "inBeeld": 20,
-      "raakbaar": 13
+      "dom": 88,
+      "zichtbaar": 23,
+      "inBeeld": 18,
+      "raakbaar": 11
      }
     },
     "noemer": 4,
@@ -5119,7 +5119,7 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 4,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -5181,8 +5181,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -5265,8 +5265,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -5316,7 +5316,7 @@
       "raakbaar": 9
      },
      "schil": {
-      "dom": 88,
+      "dom": 90,
       "zichtbaar": 24,
       "inBeeld": 13,
       "raakbaar": 6
@@ -5385,12 +5385,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'map')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -5506,12 +5506,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -5631,8 +5631,8 @@
      "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -5660,7 +5660,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 3122 tekens zichtbaar"
+    "als lid: 3138 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5679,9 +5679,9 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 72,
-      "zichtbaar": 20,
-      "inBeeld": 16,
+      "dom": 89,
+      "zichtbaar": 24,
+      "inBeeld": 20,
       "raakbaar": 13
      }
     },
@@ -5752,8 +5752,8 @@
      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -5869,12 +5869,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -5990,12 +5990,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -6044,7 +6044,7 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 86,
+      "dom": 81,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -6117,8 +6117,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -6238,8 +6238,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -6372,8 +6372,8 @@
      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -6489,12 +6489,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'map')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -6614,8 +6614,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -6740,8 +6740,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -6806,7 +6806,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "10 te raken bij het laden, 10 geprobeerd, 10 gelukt, 2 met zichtbaar effect",
+     "reden": "10 te raken bij het laden, 10 geprobeerd, 10 gelukt, 3 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -6824,8 +6824,8 @@
      "reden": "11 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -6872,7 +6872,7 @@
       "raakbaar": 10
      },
      "schil": {
-      "dom": 55,
+      "dom": 64,
       "zichtbaar": 15,
       "inBeeld": 12,
       "raakbaar": 11
@@ -6883,7 +6883,7 @@
     "budget": 10,
     "geprobeerd": 10,
     "gelukt": 10,
-    "effect": 2,
+    "effect": 3,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -6945,8 +6945,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -6993,9 +6993,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 59,
-      "zichtbaar": 21,
-      "inBeeld": 16,
+      "dom": 89,
+      "zichtbaar": 25,
+      "inBeeld": 20,
       "raakbaar": 13
      }
     },
@@ -7062,12 +7062,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -7098,7 +7098,7 @@
     "COMMERCE: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1504 tekens zichtbaar"
+    "als lid: 1520 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7190,8 +7190,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -7307,12 +7307,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -7361,7 +7361,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 89,
+      "dom": 91,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -7430,12 +7430,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -7463,7 +7463,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1225 tekens zichtbaar"
+    "als lid: 1241 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7551,12 +7551,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -7730,8 +7730,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -7847,12 +7847,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -7880,7 +7880,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1378 tekens zichtbaar"
+    "als lid: 1086 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7899,10 +7899,10 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 78,
-      "zichtbaar": 22,
-      "inBeeld": 17,
-      "raakbaar": 10
+      "dom": 92,
+      "zichtbaar": 24,
+      "inBeeld": 19,
+      "raakbaar": 12
      }
     },
     "noemer": 0,
@@ -7954,7 +7954,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "19 te raken bij het laden, 15 geprobeerd, 11 gelukt, 8 met zichtbaar effect, 4 niet meer gevonden, 1 overgeslagen (onomkeerbaar), 9x teruggekeerd na navigatie; niet aan te tikken: ◇\nOntdekken: element is not stable, Ontdekken: element is not visible, Uw avond: element is not visible",
+     "reden": "19 te raken bij het laden, 14 geprobeerd, 11 gelukt, 7 met zichtbaar effect, 5 niet meer gevonden, 1 overgeslagen (onomkeerbaar), 9x teruggekeerd na navigatie; niet aan te tikken: Ontdekken: element is not visible, Uw avond: element is not visible, Tweede scherm openen ＋: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -7972,8 +7972,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -8002,7 +8002,6 @@
     "□\nBestellen"
    ],
    "nietKlikbaar": [
-    "◇\nOntdekken: element is not stable",
     "Ontdekken: element is not visible",
     "Uw avond: element is not visible",
     "Tweede scherm openen ＋: element is not visible"
@@ -8027,7 +8026,7 @@
       "raakbaar": 20
      },
      "schil": {
-      "dom": 32,
+      "dom": 30,
       "zichtbaar": 2,
       "inBeeld": 2,
       "raakbaar": 2
@@ -8036,10 +8035,10 @@
     "noemer": 19,
     "drempel": 10,
     "budget": 19,
-    "geprobeerd": 15,
+    "geprobeerd": 14,
     "gelukt": 11,
-    "effect": 8,
-    "nietMeerGevonden": 4,
+    "effect": 7,
+    "nietMeerGevonden": 5,
     "overgeslagen": 1,
     "teruggekeerd": 9,
     "nietRaakbaar": 2,
@@ -8100,8 +8099,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -8131,7 +8130,7 @@
     "Doe mee: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1766 tekens zichtbaar"
+    "als lid: 1507 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8150,10 +8149,10 @@
       "raakbaar": 10
      },
      "schil": {
-      "dom": 64,
-      "zichtbaar": 10,
-      "inBeeld": 7,
-      "raakbaar": 6
+      "dom": 71,
+      "zichtbaar": 13,
+      "inBeeld": 8,
+      "raakbaar": 5
      }
     },
     "noemer": 10,
@@ -8223,8 +8222,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -8340,12 +8339,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'map')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -8400,7 +8399,7 @@
       "raakbaar": 8
      },
      "schil": {
-      "dom": 72,
+      "dom": 80,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -8473,8 +8472,8 @@
      "reden": "17 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -8515,15 +8514,15 @@
     "landing": "/apps/rtg.html",
     "stadia": {
      "app": {
-      "dom": 58,
+      "dom": 55,
       "zichtbaar": 43,
       "inBeeld": 43,
       "raakbaar": 0
      },
      "schil": {
-      "dom": 61,
-      "zichtbaar": 12,
-      "inBeeld": 8,
+      "dom": 73,
+      "zichtbaar": 19,
+      "inBeeld": 14,
       "raakbaar": 0
      }
     },
@@ -8536,7 +8535,7 @@
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
-    "nietRaakbaar": 21,
+    "nietRaakbaar": 18,
     "onomkeerbaar": 0
    },
    "samengesteld": [
@@ -8590,12 +8589,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'knopen')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -8623,7 +8622,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1636 tekens zichtbaar"
+    "als lid: 1652 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8642,7 +8641,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 78,
+      "dom": 88,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
@@ -8711,12 +8710,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -8765,7 +8764,7 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 96,
+      "dom": 98,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -8834,12 +8833,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -8959,8 +8958,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -9025,7 +9024,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "25 te raken bij het laden, 25 geprobeerd, 1 gelukt, 1 met zichtbaar effect -- de drempel is 13, dus dit is niet beproefd; niet aan te tikken: Samen: intercepts pointer events, Bibliotheek: intercepts pointer events, Mijn bord: intercepts pointer events",
+     "reden": "26 te raken bij het laden, 26 geprobeerd, 1 gelukt, 1 met zichtbaar effect -- de drempel is 13, dus dit is niet beproefd; niet aan te tikken: Menu: element is not visible, Samen: intercepts pointer events, Bibliotheek: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -9039,12 +9038,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'forEach')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -9067,10 +9066,11 @@
      "bewijs": null
     }
    },
-   "gevonden": 25,
+   "gevonden": 26,
    "geklikt": 1,
    "overgeslagen": [],
    "nietKlikbaar": [
+    "Menu: element is not visible",
     "Samen: intercepts pointer events",
     "Bibliotheek: intercepts pointer events",
     "Mijn bord: intercepts pointer events",
@@ -9111,27 +9111,27 @@
     "stadia": {
      "app": {
       "dom": 88,
-      "zichtbaar": 47,
-      "inBeeld": 46,
-      "raakbaar": 47
+      "zichtbaar": 48,
+      "inBeeld": 47,
+      "raakbaar": 48
      },
      "schil": {
-      "dom": 55,
-      "zichtbaar": 16,
-      "inBeeld": 12,
-      "raakbaar": 11
+      "dom": 29,
+      "zichtbaar": 3,
+      "inBeeld": 2,
+      "raakbaar": 2
      }
     },
-    "noemer": 25,
+    "noemer": 26,
     "drempel": 13,
-    "budget": 25,
-    "geprobeerd": 25,
+    "budget": 26,
+    "geprobeerd": 26,
     "gelukt": 1,
     "effect": 1,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
-    "nietRaakbaar": 41,
+    "nietRaakbaar": 40,
     "onomkeerbaar": 0
    },
    "samengesteld": [
@@ -9189,8 +9189,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -9220,7 +9220,7 @@
    ],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 912 tekens zichtbaar"
+    "als lid: 798 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9312,8 +9312,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -9396,8 +9396,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -9517,8 +9517,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -9601,8 +9601,8 @@
      "reden": "7 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -9632,7 +9632,7 @@
     "Rahul\nKOMPAS: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2018 tekens zichtbaar"
+    "als lid: 1951 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9651,10 +9651,10 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 68,
+      "dom": 56,
       "zichtbaar": 16,
-      "inBeeld": 13,
-      "raakbaar": 12
+      "inBeeld": 12,
+      "raakbaar": 11
      }
     },
     "noemer": 3,
@@ -9724,8 +9724,8 @@
      "reden": "12 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -9753,7 +9753,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 963 tekens zichtbaar"
+    "als lid: 947 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9772,7 +9772,7 @@
       "raakbaar": 2
      },
      "schil": {
-      "dom": 80,
+      "dom": 78,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -9841,12 +9841,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading '0')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -9901,10 +9901,10 @@
       "raakbaar": 8
      },
      "schil": {
-      "dom": 81,
-      "zichtbaar": 23,
-      "inBeeld": 18,
-      "raakbaar": 15
+      "dom": 104,
+      "zichtbaar": 24,
+      "inBeeld": 19,
+      "raakbaar": 12
      }
     },
     "noemer": 8,
@@ -9970,12 +9970,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -10022,9 +10022,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 71,
-      "zichtbaar": 20,
-      "inBeeld": 15,
+      "dom": 78,
+      "zichtbaar": 24,
+      "inBeeld": 19,
       "raakbaar": 12
      }
     },
@@ -10095,8 +10095,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -10221,8 +10221,8 @@
      "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -10333,7 +10333,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "12 te raken bij het laden, 2 geprobeerd, 1 gelukt, 1 met zichtbaar effect, 10 niet meer gevonden, 10x teruggekeerd na navigatie -- de drempel is 6, dus dit is niet beproefd; niet aan te tikken: UW DAG: element is not visible",
+     "reden": "12 te raken bij het laden, 2 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 10 niet meer gevonden, 11x teruggekeerd na navigatie -- de drempel is 6, dus dit is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -10351,8 +10351,8 @@
      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -10376,11 +10376,9 @@
     }
    },
    "gevonden": 12,
-   "geklikt": 1,
+   "geklikt": 2,
    "overgeslagen": [],
-   "nietKlikbaar": [
-    "UW DAG: element is not visible"
-   ],
+   "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 1635 tekens zichtbaar"
    ],
@@ -10401,21 +10399,21 @@
       "raakbaar": 12
      },
      "schil": {
-      "dom": 62,
-      "zichtbaar": 16,
-      "inBeeld": 13,
-      "raakbaar": 12
+      "dom": 69,
+      "zichtbaar": 19,
+      "inBeeld": 14,
+      "raakbaar": 11
      }
     },
     "noemer": 12,
     "drempel": 6,
     "budget": 12,
     "geprobeerd": 2,
-    "gelukt": 1,
-    "effect": 1,
+    "gelukt": 2,
+    "effect": 2,
     "nietMeerGevonden": 10,
     "overgeslagen": 0,
-    "teruggekeerd": 10,
+    "teruggekeerd": 11,
     "nietRaakbaar": 1,
     "onomkeerbaar": 0
    },
@@ -10456,7 +10454,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "3 te raken bij het laden, 3 geprobeerd, 2 gelukt, 2 met zichtbaar effect; niet aan te tikken: ↑ Terug naar boven: intercepts pointer events",
+     "reden": "3 te raken bij het laden, 3 geprobeerd, 2 gelukt, 1 met zichtbaar effect; niet aan te tikken: ↑ Terug naar boven: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -10470,12 +10468,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: feedData.clips is not iterable); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -10505,7 +10503,7 @@
     "↑ Terug naar boven: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 980 tekens zichtbaar"
+    "als lid: 978 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10524,7 +10522,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 92,
+      "dom": 90,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -10535,7 +10533,7 @@
     "budget": 3,
     "geprobeerd": 3,
     "gelukt": 2,
-    "effect": 2,
+    "effect": 1,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -10597,8 +10595,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -10681,8 +10679,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -10729,7 +10727,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 88,
+      "dom": 86,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -10802,8 +10800,8 @@
      "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -10831,7 +10829,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1142 tekens zichtbaar"
+    "als lid: 1158 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10850,9 +10848,9 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 71,
-      "zichtbaar": 20,
-      "inBeeld": 15,
+      "dom": 80,
+      "zichtbaar": 24,
+      "inBeeld": 19,
       "raakbaar": 12
      }
     },
@@ -10923,8 +10921,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -11044,8 +11042,8 @@
      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -11161,12 +11159,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'length')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -11194,7 +11192,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1498 tekens zichtbaar"
+    "als lid: 1514 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11213,9 +11211,9 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 73,
-      "zichtbaar": 20,
-      "inBeeld": 15,
+      "dom": 90,
+      "zichtbaar": 24,
+      "inBeeld": 19,
       "raakbaar": 12
      }
     },
@@ -11286,8 +11284,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -11403,12 +11401,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'modus')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "7 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -11530,8 +11528,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -11583,7 +11581,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 92,
+      "dom": 93,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -11656,8 +11654,8 @@
      "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -11704,7 +11702,7 @@
       "raakbaar": 0
      },
      "schil": {
-      "dom": 86,
+      "dom": 100,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -11777,8 +11775,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -11842,8 +11840,8 @@
      "bewijs": "/apps/reizen-veilig.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "19 te raken bij het laden, 14 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 5 niet meer gevonden, 6x teruggekeerd na navigatie -- de drempel is 10, dus dit is niet beproefd; niet aan te tikken: Reizen: element is not visible, Vandaag: element is not visible, Tweede scherm openen ＋: element is not visible",
+     "status": "BEWEZEN",
+     "reden": "9 te raken bij het laden, 9 geprobeerd, 5 gelukt, 5 met zichtbaar effect, 3x teruggekeerd na navigatie; niet aan te tikken: Loop met mij mee: intercepts pointer events, Open: intercepts pointer events, Plan met Rahul →: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -11861,8 +11859,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -11885,25 +11883,17 @@
      "bewijs": null
     }
    },
-   "gevonden": 19,
-   "geklikt": 2,
+   "gevonden": 9,
+   "geklikt": 5,
    "overgeslagen": [],
    "nietKlikbaar": [
-    "Reizen: element is not visible",
-    "Vandaag: element is not visible",
-    "Tweede scherm openen ＋: element is not visible",
-    "MEENEMEN: intercepts pointer events",
-    "Adviseer: intercepts pointer events",
-    "Open mijn reizen →: intercepts pointer events",
-    "Bereid mijn reis voor: intercepts pointer events",
-    "Deel mijn aankomst: intercepts pointer events",
     "Loop met mij mee: intercepts pointer events",
     "Open: intercepts pointer events",
     "Plan met Rahul →: intercepts pointer events",
     "Nieuw Moment: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2247 tekens zichtbaar"
+    "als lid: 2167 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11916,28 +11906,28 @@
     "landing": "/apps/reizen-veilig.html",
     "stadia": {
      "app": {
-      "dom": 23,
-      "zichtbaar": 19,
-      "inBeeld": 18,
-      "raakbaar": 19
+      "dom": 21,
+      "zichtbaar": 9,
+      "inBeeld": 8,
+      "raakbaar": 9
      },
      "schil": {
-      "dom": 79,
+      "dom": 95,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
      }
     },
-    "noemer": 19,
-    "drempel": 10,
-    "budget": 19,
-    "geprobeerd": 14,
-    "gelukt": 2,
-    "effect": 2,
-    "nietMeerGevonden": 5,
+    "noemer": 9,
+    "drempel": 5,
+    "budget": 9,
+    "geprobeerd": 9,
+    "gelukt": 5,
+    "effect": 5,
+    "nietMeerGevonden": 0,
     "overgeslagen": 0,
-    "teruggekeerd": 6,
-    "nietRaakbaar": 4,
+    "teruggekeerd": 3,
+    "nietRaakbaar": 12,
     "onomkeerbaar": 0
    },
    "samengesteld": [
@@ -11991,12 +11981,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -12139,8 +12129,8 @@
      "bewijs": "/apps/stad.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "3 te raken bij het laden, 2 geprobeerd, 2 gelukt, 2 met zichtbaar effect, 1 niet meer gevonden, 3x teruggekeerd na navigatie",
+     "status": "NIET_GETEST",
+     "reden": "geen knop die bij het laden te raken is; wat dit scherm doet loopt via links of formulieren",
      "bewijs": null
     },
     "menselijk": {
@@ -12154,12 +12144,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -12182,12 +12172,12 @@
      "bewijs": null
     }
    },
-   "gevonden": 3,
-   "geklikt": 2,
+   "gevonden": 0,
+   "geklikt": 0,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1245 tekens zichtbaar"
+    "als lid: 1240 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12201,27 +12191,27 @@
     "stadia": {
      "app": {
       "dom": 4,
-      "zichtbaar": 3,
-      "inBeeld": 3,
-      "raakbaar": 3
+      "zichtbaar": 0,
+      "inBeeld": 0,
+      "raakbaar": 0
      },
      "schil": {
-      "dom": 83,
+      "dom": 92,
       "zichtbaar": 24,
       "inBeeld": 19,
       "raakbaar": 12
      }
     },
-    "noemer": 3,
-    "drempel": 2,
-    "budget": 3,
-    "geprobeerd": 2,
-    "gelukt": 2,
-    "effect": 2,
-    "nietMeerGevonden": 1,
+    "noemer": 0,
+    "drempel": 0,
+    "budget": 0,
+    "geprobeerd": 0,
+    "gelukt": 0,
+    "effect": 0,
+    "nietMeerGevonden": 0,
     "overgeslagen": 0,
-    "teruggekeerd": 3,
-    "nietRaakbaar": 1,
+    "teruggekeerd": 0,
+    "nietRaakbaar": 4,
     "onomkeerbaar": 0
    },
    "samengesteld": [
@@ -12279,8 +12269,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -12363,8 +12353,8 @@
      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -12419,7 +12409,7 @@
       "raakbaar": 8
      },
      "schil": {
-      "dom": 81,
+      "dom": 83,
       "zichtbaar": 25,
       "inBeeld": 10,
       "raakbaar": 3
@@ -12492,8 +12482,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -12609,12 +12599,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'filter')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -12666,7 +12656,7 @@
       "raakbaar": 7
      },
      "schil": {
-      "dom": 82,
+      "dom": 84,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -12739,8 +12729,8 @@
      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -12844,7 +12834,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 te raken bij het laden, 4 geprobeerd, 3 gelukt, 1 met zichtbaar effect; niet aan te tikken: Ververs: intercepts pointer events",
+     "reden": "4 te raken bij het laden, 4 geprobeerd, 3 gelukt, 2 met zichtbaar effect; niet aan te tikken: Ververs: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -12854,11 +12844,11 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 67a51f63; sindsdien is er geen code gewijzigd die dit instrument raakt (8 wijziging(en) in scripts die het niet inleest)): 11 schakels gesloten, 8 storingen gehouden",
+     "reden": "vers gemeten (gemeten op acf89ca3; sindsdien is er geen code gewijzigd): 11 schakels gesloten, 8 storingen gehouden",
      "bewijs": {
       "register": "TAFELPROEF.json",
-      "op": "2026-09-24T21:08:13.463Z",
-      "commit": "67a51f63",
+      "op": "2026-09-25T01:35:12.054Z",
+      "commit": "acf89ca3",
       "instrument": "scripts/tafelproef.js"
      },
      "bron": {
@@ -12873,8 +12863,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -12928,7 +12918,7 @@
       "raakbaar": 4
      },
      "schil": {
-      "dom": 83,
+      "dom": 75,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -12939,7 +12929,7 @@
     "budget": 4,
     "geprobeerd": 4,
     "gelukt": 3,
-    "effect": 1,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -13002,8 +12992,8 @@
      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -13105,7 +13095,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "7 te raken bij het laden, 7 geprobeerd, 4 gelukt, 4 met zichtbaar effect, 1 overgeslagen (onomkeerbaar), 3x teruggekeerd na navigatie; niet aan te tikken: Bekijk alle: element is not visible, Open economie: element is not visible, Open de volledige Magnaat-wereld: element is not visible",
+     "reden": "8 te raken bij het laden, 8 geprobeerd, 5 gelukt, 5 met zichtbaar effect, 4x teruggekeerd na navigatie; niet aan te tikken: Bekijk alle: element is not visible, Open economie: element is not visible, Open de volledige Magnaat-wereld: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -13119,12 +13109,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -13147,18 +13137,16 @@
      "bewijs": null
     }
    },
-   "gevonden": 7,
-   "geklikt": 4,
-   "overgeslagen": [
-    "△\nMode & retail\nBestellen · veilige miss"
-   ],
+   "gevonden": 8,
+   "geklikt": 5,
+   "overgeslagen": [],
    "nietKlikbaar": [
     "Bekijk alle: element is not visible",
     "Open economie: element is not visible",
     "Open de volledige Magnaat-wereld: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1570 tekens zichtbaar"
+    "als lid: 1598 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13183,17 +13171,17 @@
       "raakbaar": 11
      }
     },
-    "noemer": 7,
+    "noemer": 8,
     "drempel": 4,
-    "budget": 7,
-    "geprobeerd": 7,
-    "gelukt": 4,
-    "effect": 4,
+    "budget": 8,
+    "geprobeerd": 8,
+    "gelukt": 5,
+    "effect": 5,
     "nietMeerGevonden": 0,
-    "overgeslagen": 1,
-    "teruggekeerd": 3,
+    "overgeslagen": 0,
+    "teruggekeerd": 4,
     "nietRaakbaar": 90,
-    "onomkeerbaar": 1
+    "onomkeerbaar": 0
    },
    "samengesteld": [
     "waarheidsgetrouw"
@@ -13246,12 +13234,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -13298,7 +13286,7 @@
       "raakbaar": 1
      },
      "schil": {
-      "dom": 70,
+      "dom": 80,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
@@ -13367,12 +13355,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -13492,8 +13480,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -13521,7 +13509,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 892 tekens zichtbaar"
+    "als lid: 908 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13595,7 +13583,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "14 te raken bij het laden, 14 geprobeerd, 7 gelukt, 2 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Filters: intercepts pointer events, Onderzoek match →: intercepts pointer events, Simuleer belofte: intercepts pointer events",
+     "reden": "14 te raken bij het laden, 14 geprobeerd, 7 gelukt, 3 met zichtbaar effect, 1x teruggekeerd na navigatie; niet aan te tikken: Filters: intercepts pointer events, Onderzoek match →: intercepts pointer events, Simuleer belofte: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -13613,8 +13601,8 @@
      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -13674,7 +13662,7 @@
       "raakbaar": 14
      },
      "schil": {
-      "dom": 87,
+      "dom": 79,
       "zichtbaar": 22,
       "inBeeld": 18,
       "raakbaar": 11
@@ -13685,7 +13673,7 @@
     "budget": 14,
     "geprobeerd": 14,
     "gelukt": 7,
-    "effect": 2,
+    "effect": 3,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 1,
@@ -13747,8 +13735,8 @@
      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -13868,8 +13856,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -13992,12 +13980,12 @@
      "bewijs": null
     },
     "waarheidsgetrouw": {
-     "status": "NIET_GETEST",
-     "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+     "status": "BEWEZEN",
+     "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -14120,8 +14108,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -14149,7 +14137,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1040 tekens zichtbaar"
+    "als lid: 1034 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14223,7 +14211,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "7 te raken bij het laden, 7 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 2x teruggekeerd na navigatie -- de drempel is 4, dus dit is niet beproefd; niet aan te tikken: Open gesprek ›: intercepts pointer events, Open alle post: intercepts pointer events, ◇\nGesprek: element is not visible",
+     "reden": "3 te raken bij het laden, 3 geprobeerd, 1 gelukt, 1 met zichtbaar effect -- de drempel is 2, dus dit is niet beproefd; niet aan te tikken: Open gesprek ›: intercepts pointer events, Open alle post: intercepts pointer events",
      "bewijs": null
     },
     "menselijk": {
@@ -14241,8 +14229,8 @@
      "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -14265,17 +14253,15 @@
      "bewijs": null
     }
    },
-   "gevonden": 7,
-   "geklikt": 3,
+   "gevonden": 3,
+   "geklikt": 1,
    "overgeslagen": [],
    "nietKlikbaar": [
     "Open gesprek ›: intercepts pointer events",
-    "Open alle post: intercepts pointer events",
-    "◇\nGesprek: element is not visible",
-    "≡\nAlle post: element is not visible"
+    "Open alle post: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1441 tekens zichtbaar"
+    "als lid: 1439 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14289,27 +14275,27 @@
     "stadia": {
      "app": {
       "dom": 18,
-      "zichtbaar": 7,
-      "inBeeld": 7,
-      "raakbaar": 7
+      "zichtbaar": 3,
+      "inBeeld": 3,
+      "raakbaar": 3
      },
      "schil": {
-      "dom": 80,
+      "dom": 94,
       "zichtbaar": 23,
       "inBeeld": 18,
       "raakbaar": 11
      }
     },
-    "noemer": 7,
-    "drempel": 4,
-    "budget": 7,
-    "geprobeerd": 7,
-    "gelukt": 3,
-    "effect": 3,
+    "noemer": 3,
+    "drempel": 2,
+    "budget": 3,
+    "geprobeerd": 3,
+    "gelukt": 1,
+    "effect": 1,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
-    "teruggekeerd": 2,
-    "nietRaakbaar": 11,
+    "teruggekeerd": 0,
+    "nietRaakbaar": 15,
     "onomkeerbaar": 0
    },
    "samengesteld": [
@@ -14349,7 +14335,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "5 te raken bij het laden, 4 geprobeerd, 3 gelukt, 3 met zichtbaar effect, 1 niet meer gevonden, 4x teruggekeerd na navigatie; niet aan te tikken: Inschrijven: element is not visible",
+     "reden": "5 te raken bij het laden, 5 geprobeerd, 4 gelukt, 4 met zichtbaar effect, 4x teruggekeerd na navigatie; niet aan te tikken: Inschrijven: element is not visible",
      "bewijs": null
     },
     "menselijk": {
@@ -14367,8 +14353,8 @@
      "reden": "7 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -14392,13 +14378,13 @@
     }
    },
    "gevonden": 5,
-   "geklikt": 3,
+   "geklikt": 4,
    "overgeslagen": [],
    "nietKlikbaar": [
     "Inschrijven: element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 811 tekens zichtbaar"
+    "als lid: 1908 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -14422,19 +14408,19 @@
       "raakbaar": 5
      },
      "schil": {
-      "dom": 71,
-      "zichtbaar": 20,
-      "inBeeld": 15,
+      "dom": 81,
+      "zichtbaar": 23,
+      "inBeeld": 18,
       "raakbaar": 12
      }
     },
     "noemer": 5,
     "drempel": 3,
     "budget": 5,
-    "geprobeerd": 4,
-    "gelukt": 3,
-    "effect": 3,
-    "nietMeerGevonden": 1,
+    "geprobeerd": 5,
+    "gelukt": 4,
+    "effect": 4,
+    "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 4,
     "nietRaakbaar": 6,
@@ -14477,7 +14463,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "3 te raken bij het laden, 3 geprobeerd, 3 gelukt, 3 met zichtbaar effect",
+     "reden": "3 te raken bij het laden, 3 geprobeerd, 3 gelukt, 2 met zichtbaar effect",
      "bewijs": null
     },
     "menselijk": {
@@ -14495,8 +14481,8 @@
      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -14543,7 +14529,7 @@
       "raakbaar": 3
      },
      "schil": {
-      "dom": 86,
+      "dom": 88,
       "zichtbaar": 29,
       "inBeeld": 14,
       "raakbaar": 4
@@ -14554,7 +14540,7 @@
     "budget": 3,
     "geprobeerd": 3,
     "gelukt": 3,
-    "effect": 3,
+    "effect": 2,
     "nietMeerGevonden": 0,
     "overgeslagen": 0,
     "teruggekeerd": 0,
@@ -14616,8 +14602,8 @@
      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",
@@ -14737,8 +14723,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "LIEGRONDE.json",
-      "op": "2026-09-24T21:51:15.677Z",
-      "commit": "fce571c0"
+      "op": "2026-09-25T01:36:39.890Z",
+      "commit": "acf89ca3"
      },
      "bron": {
       "soort": "liegronde",

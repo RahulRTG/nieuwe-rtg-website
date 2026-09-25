@@ -77,7 +77,7 @@ test('4. met manifest geeft de server de regels ongewijzigd door', async () => {
   fs.rmSync(path.join(TOESTEL, 'manifest.json'));
 });
 
-test('5. een artefact heet naar zijn hash, komt met Range en is onveranderlijk', async () => {
+test('5. GET /toestel/artefact/:sha: een artefact heet naar zijn hash, komt met Range en is onveranderlijk', async () => {
   const heel = await fetch(srv.base + '/toestel/artefact/' + SHA);
   assert.equal(heel.status, 200);
   assert.match(heel.headers.get('cache-control'), /immutable/);

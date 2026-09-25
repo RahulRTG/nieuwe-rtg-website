@@ -456,6 +456,60 @@ Gekozen: **afwerking zonder multiplayer**. Een gedeeld Oudwijk raakt het grootbo
 
 Wat V4 bewust **niet** doet: multiplayer (na V5), muziek, animaties die om aandacht vragen, en een tutorial die je moet doorklikken.
 
+### V5 RELEASE HARDENING: wat er staat (25 september 2026)
+
+**De belofte:** wat er na een handeling staat, klopt. Klopt het niet, dan merkt het spel dat, zegt het dat, en rekent het niet stil verder op een kapot boek (`bewaking.js`, `index.js`).
+
+**Geldinvarianten na elke handeling:**
+- het saldo is precies de rekening `kas` in het grootboek;
+- je staat nooit rood;
+- het grootboek klopt met zijn eigen journaal;
+- elk saldo is een heel aantal centen;
+- voorraad in de boeken is precies het aantal stuks tegen inkoopprijs;
+- geen twee betalingen delen een sleutel;
+- het team is nooit groter dan mag.
+
+**Rollback en bevriezen, en die zijn met opzet verschillend:**
+- Breekt een handeling af **voordat** er iets is geboekt, dan gaat het leven terug naar hoe het was, en de speler hoort dat er niets veranderd is.
+- Breekt ze af **nadat** er is geboekt, of kloppen de invarianten niet meer, dan **bevriest** het leven, met de reden erbij. Het journaal groeit alleen en gaat niet terug, dus een stille rollback zou de projectie losmaken van het journaal.
+- Een bevroren leven kun je bekijken en opnieuw beginnen, maar er gebeurt niets meer.
+
+**Verbroken verbinding:**
+- Elke handeling uit het scherm draagt een eigen sleutel (`verzoek`). Valt de verbinding weg, dan verstuurt het scherm dezelfde handeling met dezelfde sleutel nog een keer.
+- De server voert een sleutel die hij al kent niet opnieuw uit. Wie op "Sluit de dag af" drukt terwijl de verbinding hapert, sluit dus maar één dag af.
+- Een geweigerde handeling mag wel opnieuw, want er gebeurde niets.
+- De browsertoets laat het lastigste geval zien: de server voerde de handeling uit en het antwoord ging verloren.
+
+**Invoer:** een handeling zonder lichaam, met een lijst, een getal, of met een object als naam is een weigering en geen crash. De fuzzer vond er één die crashte (`null`) en één die de handeling liet mislukken (`{ actie: { toString: 1 } }`); het vangnet maakte daar nog een nette 500 van.
+
+**Begrensd beeld:** van wat klaar is, krijgt het scherm alleen de laatste dertig contacten en facturen. Alles wat nog loopt, krijgt het altijd. Na twee jaar spelen groeide het beeld anders tot 173 kB per tik; nu blijft het rond de 50 kB. De spelregels lezen `st.deals` zelf en merken hier niets van.
+
+**Oude saves:** `test/fixtures/magnaat-leven-v1.json` is een leven van vóór V2, met het journaal erbij. Het laadt, krijgt een leeg bedrijf, een markt en de moeilijkheid normaal, en speelt door met kloppende boeken.
+
+**Wat de toetsen vastleggen:**
+- `test/magnaathardening.test.js` (acht toetsen):
+  - een fuzz-speler over 3.200 stappen, waarvan de helft als onderneming met kapitaal, met willekeurige handelingen en rommel als invoer en na elke stap de invarianten;
+  - rommel als invoer;
+  - een herhaald verzoek;
+  - rollback voor een boeking en bevriezen na een boeking;
+  - een invariant die breekt;
+  - voorraad buiten de boeken om;
+  - de oude save.
+- `test/magnaatreis.test.js` laat een automatische speler (`test/lib-magnaatspeler.js`) het hele spel uitspelen op licht, normaal en zwaar, tot zijn ontslag bij de keuken. Na elke dag worden de boeken gecontroleerd, en de mijlpalen komen in de volgorde van het verhaal. Daarnaast speelt hij twee jaar door: gemiddeld 7 ms per speldag, 120 dagen bijrekenen in één verzoek in 28 ms, en een begrensd beeld.
+- `test/magnaathardening.e2e.js` is de verloren-antwoord-proef.
+- Negen mutaties zijn nagetrokken en zakken alle negen. De controle op voorraad in de boeken zakte pas nadat hij een eigen toets kreeg.
+
+**Wat de reis over de balans vertelt, en dat is een vondst en geen bug:**
+- De automatische speler wordt zelfstandig op dag 60 (licht) en dag 62 (normaal en zwaar). De moeilijkheid verschuift het begin, maar het einde nauwelijks: na een paar weken bepalen je klanten het verloop, en niet je startgeld.
+- Twee maanden van keuken naar eigen bedrijf is voor een speler die zijn uren goed verkoopt ook kort.
+- Of dat erg is, beslist een speelronde met mensen, niet deze toets.
+
+Wat V5 bewust **niet** doet:
+- **Gelijktijdigheid over meerdere processen.** Een handeling is synchroon binnen één proces. Twee servers op één leven zijn niet beproefd.
+- **Een terugdraaibaar journaal.** Dat is een grens en geen gat.
+- **Een eigen beveiligingslaag.** De route eist een ledensessie, zoals elke ledenroute.
+- **Balansaanpassingen.** Die horen bij de speelronde.
+
 ---
 
 ## 8. De regels

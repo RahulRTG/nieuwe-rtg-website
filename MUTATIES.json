@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T07:04:36.520Z",
-    "commit": "86882c32f",
+    "op": "2026-09-25T09:19:45.796Z",
+    "commit": "b71d0ab79",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5392,6 +5392,21 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "magnaathardening.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaathardening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "magnaatlab.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5435,6 +5450,14 @@
       "module": "server/kern/magnaat-leven/index.js",
       "operator": "===->!==#0",
       "gezakt": 12,
+      "geprobeerd": 1
+    },
+    "magnaatreis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/bewaking.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "magnaatwereld.test.js": {

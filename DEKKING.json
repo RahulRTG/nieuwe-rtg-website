@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-25T09:20:33.289Z",
-    "commit": "0ff6128f",
-    "routesToen": 5148
+    "op": "2026-09-25T18:26:10.125Z",
+    "commit": "c6a9bd98",
+    "routesToen": 5158
   },
   "aangeraakt": [
     "GET /",
@@ -1638,6 +1638,10 @@
     "POST /api/member/connect/intrek",
     "POST /api/member/connect/respond",
     "POST /api/member/connections",
+    "POST /api/member/democratie/kwestie/gezien",
+    "POST /api/member/democratie/kwestie/inbreng",
+    "POST /api/member/democratie/kwestie/intrek",
+    "POST /api/member/democratie/kwestie/mijn",
     "POST /api/member/dm",
     "POST /api/member/dm/send",
     "POST /api/member/doe",
@@ -2242,6 +2246,12 @@
     "POST /api/office/concierge",
     "POST /api/office/concierge/voortgang",
     "POST /api/office/conversations",
+    "POST /api/office/democratie/kwestie/behandel",
+    "POST /api/office/democratie/kwestie/eindstand",
+    "POST /api/office/democratie/kwestie/herbezorg",
+    "POST /api/office/democratie/kwestie/heropen",
+    "POST /api/office/democratie/kwestie/lijst",
+    "POST /api/office/democratie/meter",
     "POST /api/office/dienst",
     "POST /api/office/dienst/in",
     "POST /api/office/dienst/uit",

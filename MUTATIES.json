@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T12:30:03.539Z",
-    "commit": "547cbffe6",
+    "op": "2026-09-25T13:50:55.472Z",
+    "commit": "58fb26410",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5404,6 +5404,21 @@
       "operator": "!==->===#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "magnaatspeelronde.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatspeelronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 6,
+      "geprobeerd": 2
     },
     "magnaatwereld.test.js": {
       "soort": "puur",

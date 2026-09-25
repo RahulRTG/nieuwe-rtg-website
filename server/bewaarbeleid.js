@@ -13,7 +13,8 @@ const JAAR = 365 * DAG;
 
 /* vorm: hoe de tak in elkaar zit.
      lijst          -- een array van items
-     mapVanLijsten  -- { sleutel: [ item, ... ] }, per lid
+     mapVanLijsten  -- { sleutel: [ item, ... ] }, per lid; met leegWeg valt een
+                       sleutel met een lege lijst weg (codenaam als sleutel)
    datum: het veld met de tijdstempel (ISO of ms). */
 const BELEID = [
   // --- wettelijk: NIET eerder weg, ook niet op verzoek ---
@@ -57,7 +58,7 @@ const BELEID = [
      pasovergang hoort bij de administratie van het lidmaatschap; er staat alleen
      codenaam, van, naar en de dag in. */
   { tak: 'pasOvergangen', label: 'pasovergangen (van, naar, wanneer)', dagen: 7 * JAAR / DAG, grond: 'wettelijk',
-    vorm: 'lijst', datum: 'op', waarom: 'hoort bij de lidmaatschapsadministratie (7 jaar, als de termijnen); nieuw lid, cohort en churn rusten erop' },
+    vorm: 'mapVanLijsten', leegWeg: true, datum: 'op', waarom: 'hoort bij de lidmaatschapsadministratie (7 jaar, als de termijnen); nieuw lid, cohort en churn rusten erop' },
 
   // --- audit: lang genoeg om een incident te kunnen navertellen ---
   { tak: 'inzageLog', label: 'inzagejournaal identiteitskluis', dagen: 2 * JAAR / DAG, grond: 'audit',

@@ -8,8 +8,9 @@
    2. de accountlaag meldt ELKE aanmaak en ELKE verandering via setTier, ook een
       die de luisteraar laat vallen, zonder de overgang zelf tegen te houden;
    3. de aanwezigheid schrijft per lid hooguit een keer per dag, en alleen de dag;
-   4. een index die bij een vervangen lijst hoort, wordt opnieuw gebouwd -- anders
-      schrijft een bezoek na de bewaarveger in een object dat al weg is;
+   4. de bewaarveger laat een verlopen lid ook als SLEUTEL verdwijnen, en de
+      schrijver gaat door bewerkCollectie (een eigen transactie, buiten de
+      requestcommit) zonder dat een fout daar de melder raakt;
    5. beide takken staan in het bewaarbeleid, met de termijnen van het besluit.
 
    Draai los: node --test test/pasbronnen.test.js */
@@ -79,14 +80,34 @@ test('3. aanwezigheid: een dag per lid, een keer per dag', () => {
   assert.equal(A.raakAanwezig(''), false);
 });
 
-test('4. na een vervangen lijst wordt de index opnieuw gebouwd', () => {
-  const db = nepDb(); let t = Date.parse('2026-09-25T09:00:00Z');
+test('4. de bewaarveger laat een verlopen lid verdwijnen, ook als sleutel', () => {
+  const db = nepDb(); let t = Date.now() - 400 * 86400000;
   const A = require('../server/kern/aanwezigheid')({ db, save: () => {}, nu: () => t });
   A.raakAanwezig('Amberen Vos');
-  db.data.laatstActief = [];            // wat de bewaarveger doet: de lijst vervangen
-  t += 86400000;
+  t = Date.now();
+  A.raakAanwezig('Blauwe Reiger');
+  const { veeg, rapport } = require('../server/bewaartermijnen');
+  rapport(db);
+  assert.ok('Amberen Vos' in db.data.laatstActief, 'het rapport wijzigt niets');
+  veeg(db, { echt: true });
+  assert.deepEqual(Object.keys(db.data.laatstActief), ['Blauwe Reiger'],
+    'na dertien maanden is de codenaam weg, niet alleen zijn dag');
+});
+
+test('4b. met bewerkCollectie schrijft hij in een eigen transactie, en een fout houdt niets tegen', () => {
+  const db = nepDb(); const sleutels = [];
+  const bewerk = (sleutel, werk) => { sleutels.push(sleutel); const w = db.data[sleutel] || (db.data[sleutel] = {}); return werk(w); };
+  const A = require('../server/kern/aanwezigheid')({ db, save: () => { throw new Error('mag niet: de transactie bewaart zelf'); }, bewerkCollectie: bewerk });
+  const P = require('../server/kern/pasgeschiedenis')({ db, save: () => { throw new Error('idem'); }, bewerkCollectie: bewerk });
   assert.equal(A.raakAanwezig('Amberen Vos'), true);
-  assert.equal(db.data.laatstActief.length, 1, 'het bezoek landt in de NIEUWE lijst');
+  assert.equal(P.noteerPasOvergang({ codenaam: 'Amberen Vos', van: null, naar: 'rtg' }), true);
+  assert.deepEqual(sleutels, ['laatstActief', 'pasOvergangen']);
+  assert.equal(P.pasOvergangen()[0].codenaam, 'Amberen Vos');
+  const stuk = require('../server/kern/pasgeschiedenis')({ db, save: () => {}, bewerkCollectie: () => Promise.reject(new Error('botsing')) });
+  const fout = console.error; console.error = () => {};
+  try {
+    assert.equal(stuk.noteerPasOvergang({ codenaam: 'Blauwe Reiger', van: null, naar: 'rtg' }), true, 'de melder merkt niets');
+  } finally { console.error = fout; }
 });
 
 test('5. beide takken staan in het bewaarbeleid met de termijnen van het besluit', () => {
@@ -96,6 +117,7 @@ test('5. beide takken staan in het bewaarbeleid met de termijnen van het besluit
   assert.ok(pas && aw);
   assert.equal(pas.dagen, 7 * 365, 'pasgeschiedenis: zeven jaar');
   assert.equal(pas.datum, 'op');
+  assert.ok(pas.leegWeg && aw.leegWeg, 'de codenaam gaat mee weg');
   assert.equal(aw.dagen, 395, 'laatst actief: dertien maanden');
   assert.equal(aw.datum, 'dag');
 });

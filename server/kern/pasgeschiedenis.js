@@ -16,32 +16,48 @@
    een weg die er nog niet is -- er bestaat vandaag GEEN weg van een betaalde pas
    naar gast -- vanzelf meegenomen zodra hij komt.
 
-   WAT ER STAAT: codenaam, van, naar, dag en tijd, en de weg (aanmaak of besluit).
+   WAT ER STAAT: per codenaam de overgangen met van, naar, dag en tijd, en de
+   weg (aanmaak of besluit).
    Geen naam, geen reden, geen bedrag. Bewaard zeven jaar, dezelfde termijn als de
    lidmaatschapstermijnen (server/bewaarbeleid.js): een pasovergang hoort bij de
    administratie van het lidmaatschap. */
 'use strict';
 
 const PASSEN = ['guest', 'rtg', 'lifestyle', 'business'];
+const NAAM = 'pasOvergangen';
 
-module.exports = ({ db, save, accounts }) => {
-  const eigen = require('./eigencollectie')({ db, domein: 'kern/pasgeschiedenis', bezit: { pasOvergangen: 'lijst' } });
+/* DE VORM IS EEN KAART PER CODENAAM ({ codenaam: [overgang, ...] }) en geen
+   platte lijst. Niet uit smaak: in de PostgreSQL-stand met meer instanties
+   commit elk verzoek zijn gewijzigde collecties optimistisch, en twintig
+   gelijktijdige registraties die elk dezelfde lijst verlengen botsen dan
+   (409, en 5xx onder spitsdruk -- gezien in pgtoetsen). Daarom schrijft deze
+   module via bewerkCollectie: een eigen transactie per collectie met een rijslot,
+   en die kent alleen een kaart als verse vorm. */
+module.exports = ({ db, save, bewerkCollectie, accounts }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/pasgeschiedenis', bezit: { [NAAM]: 'kaart' } });
+  const schrijf = require('./eigentransactie')({ naam: NAAM, eigen, save, bewerkCollectie });
 
   function noteerPasOvergang({ codenaam, van, naar, op, bron } = {}) {
     if (!codenaam || !PASSEN.includes(naar)) return false;
     if (van != null && !PASSEN.includes(van)) return false;
     if (van === naar) return false;
-    eigen.bak('pasOvergangen').push({ codenaam: String(codenaam), van: van || null, naar,
-      op: op || new Date().toISOString(), bron: bron === 'aanmaak' ? 'aanmaak' : 'besluit' });
-    save();
+    const cn = String(codenaam);
+    const rij = { van: van || null, naar, op: op || new Date().toISOString(),
+      bron: bron === 'aanmaak' ? 'aanmaak' : 'besluit' };
+    schrijf(kaart => { (Array.isArray(kaart[cn]) ? kaart[cn] : (kaart[cn] = [])).push(rij); });
     return true;
   }
 
   if (accounts && typeof accounts.opPasOvergang === 'function') accounts.opPasOvergang(noteerPasOvergang);
 
-  /* Lezen maakt niets aan (eigencollectie.kijk): een verse installatie zonder
-     overgangen is een lege lijst, geen opgeslagen lege collectie. */
-  const pasOvergangen = () => eigen.kijk('pasOvergangen');
+  /* Lezen maakt niets aan (eigencollectie.kijk) en geeft een platte lijst met de
+     codenaam erbij: de lezers hoeven de opslagvorm niet te kennen. */
+  function pasOvergangen() {
+    const kaart = eigen.kijk(NAAM), uit = [];
+    for (const cn of Object.keys(kaart || {}))
+      for (const r of Array.isArray(kaart[cn]) ? kaart[cn] : []) uit.push(Object.assign({ codenaam: cn }, r));
+    return uit;
+  }
 
   return { noteerPasOvergang, pasOvergangen, PASSEN };
 };

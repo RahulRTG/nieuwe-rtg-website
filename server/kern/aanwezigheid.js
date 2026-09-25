@@ -24,36 +24,41 @@ const BEWAAR_DAGEN = 395;
    hieronder: zolang er nog geen instantie is, gebeurt er niets. Een instantie
    meldt zich bij het bouwen aan als de actieve. */
 let actief = null;
+const NAAM = 'laatstActief';
 
-function maakAanwezigheid({ db, save, nu }) {
-  const eigen = require('./eigencollectie')({ db, domein: 'kern/aanwezigheid', bezit: { laatstActief: 'lijst' } });
+/* De opslag is een kaart { codenaam: [{ dag }] } en schrijft via
+   ./eigentransactie.js: bij het eerste bezoek van de dag schrijven vele leden
+   tegelijk, en in de PostgreSQL-stand met meer instanties botst een gedeelde
+   lijst dan in de requestcommit. De ene rij per lid staat in een lijstje zodat
+   de bewaarveger hem op zijn dag kan laten verlopen (vorm mapVanLijsten, met
+   `leegWeg`: een verlopen lid verdwijnt ook als sleutel). */
+function maakAanwezigheid({ db, save, bewerkCollectie, nu }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/aanwezigheid', bezit: { [NAAM]: 'kaart' } });
+  const schrijf = require('./eigentransactie')({ naam: NAAM, eigen, save, bewerkCollectie });
   const klok = typeof nu === 'function' ? nu : Date.now;
-  /* Een index op codenaam, gebonden aan de LIJST waaruit hij is gebouwd. Vervangt
-     de bewaarveger of een externe wijziging de lijst, dan hoort de index daar
-     niet meer bij en wordt hij opnieuw gebouwd -- anders schrijft raak() in een
-     object dat al uit de opslag is gevallen. */
-  let index = null, vanLijst = null;
-  function idx(lijst) {
-    if (index && vanLijst === lijst) return index;
-    index = new Map(); vanLijst = lijst;
-    for (const r of lijst) if (r && r.codenaam) index.set(r.codenaam, r);
-    return index;
-  }
+  /* Wat dit proces vandaag al heeft laten schrijven. Zonder dit gaat elk verzoek
+     van een lid tot de commit zichtbaar is opnieuw een transactie in. */
+  let vandaag = null, gezien = new Set();
 
   function raakAanwezig(codenaam) {
     if (!codenaam) return false;
+    const cn = String(codenaam);
     const dag = new Date(klok()).toISOString().slice(0, 10);
-    const lijst = eigen.bak('laatstActief');
-    const i = idx(lijst);
-    const r = i.get(codenaam);
-    if (r && r.dag === dag) return false;
-    if (r) r.dag = dag;
-    else { const n = { codenaam: String(codenaam), dag }; lijst.push(n); i.set(n.codenaam, n); }
-    save();
+    if (dag !== vandaag) { vandaag = dag; gezien = new Set(); }
+    if (gezien.has(cn)) return false;
+    const r = eigen.kijk(NAAM)[cn];
+    gezien.add(cn);
+    if (Array.isArray(r) && r[0] && r[0].dag === dag) return false;
+    schrijf(kaart => { kaart[cn] = [{ dag }]; });
     return true;
   }
 
-  const laatstActief = () => eigen.kijk('laatstActief');
+  function laatstActief() {
+    const kaart = eigen.kijk(NAAM), uit = [];
+    for (const cn of Object.keys(kaart || {}))
+      if (Array.isArray(kaart[cn]) && kaart[cn][0]) uit.push({ codenaam: cn, dag: kaart[cn][0].dag });
+    return uit;
+  }
 
   const api = { raakAanwezig, laatstActief, BEWAAR_DAGEN };
   actief = api;

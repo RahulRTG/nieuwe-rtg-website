@@ -125,7 +125,7 @@ module.exports = [
      retentie over 365 dagen, en een lid dat een jaar en een maand weg is,
      verdwijnt uit dit spoor. */
   { tak: 'laatstActief', label: 'dag van het laatste bezoek per lid', dagen: 395, grond: 'nodig',
-    vorm: 'lijst', datum: 'dag', waarom: 'retentie als aanwezigheid (30, 90 en 365 dagen); alleen een dag, geen tijd of handeling' },
+    vorm: 'mapVanLijsten', leegWeg: true, datum: 'dag', waarom: 'retentie als aanwezigheid (30, 90 en 365 dagen); alleen een dag, geen tijd of handeling' },
   { tak: 'plaatsLog', label: 'actielog van de plaatslaag', dagen: 90, grond: 'audit',
     vorm: 'lijst', datum: 'at', waarom: 'een lid moet kunnen navragen waarom zijn toestel iets over zijn plaats heeft gemeld; dat is de tegenhanger van de laag zelf en mag hem overleven' }
 ];

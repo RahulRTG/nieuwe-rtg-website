@@ -138,8 +138,8 @@ Object.assign(kern, require('../kern/economie')({ db, save }));
    laatste bezoek per lid (kern/aanwezigheid.js; de ledengids raakt hem aan) en
    de pasgeschiedenis (kern/pasgeschiedenis.js; de accountlaag meldt elke
    overgang). */
-kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save });
-kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, accounts });
+kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save, bewerkCollectie });
+kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkCollectie, accounts });
 kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
     betaalschemas: () => db.data.lidmaatschapBetalingen },

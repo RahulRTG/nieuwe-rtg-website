@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-25T03:10:49.333Z",
-    "commit": "426f3dde3",
+    "op": "2026-09-25T03:14:22.007Z",
+    "commit": "c4ed945e7",
     "boomVuil": false,
-    "boomAnders": 10,
+    "boomAnders": 4,
     "instrument": "scripts/doorbelasting.js",
     "node": "v22.22.2"
   },
@@ -22,17 +22,17 @@
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
     "vormenTotaal": 1436,
-    "geldvormen": 219,
-    "volgbaar": 35,
+    "geldvormen": 218,
+    "volgbaar": 36,
     "perHerkomstveld": {
-      "bron": 18,
+      "bron": 19,
       "provider": 2,
       "aanbieder": 7,
       "herkomst": 1,
       "leverancier": 8,
       "economischeHerkomst": 4
     },
-    "nietVolgbaar": 184,
+    "nietVolgbaar": 182,
     "volgbareModules": [
       "server/kern/appbieb.js",
       "server/kern/betaalopdracht/index.js",
@@ -48,6 +48,7 @@
       "server/kern/kosten/providerfactuur.js",
       "server/kern/kosten/providerfactuur.js",
       "server/kern/magnaat-leven/contract.js",
+      "server/kern/magnaat-leven/markt.js",
       "server/kern/magnaat-leven/regels.js",
       "server/kern/magnaat-leven/weergave-bedrijf.js",
       "server/kern/magnaat-leven/weergave.js",
@@ -248,8 +249,8 @@
         "volgbaar": 0
       },
       "server/kern/magnaat-leven": {
-        "geldvormen": 6,
-        "volgbaar": 4
+        "geldvormen": 5,
+        "volgbaar": 5
       },
       "server/kern/mall": {
         "geldvormen": 11,

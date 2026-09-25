@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T22:33:36.971Z",
-    "commit": "0f34b6ee",
+    "op": "2026-09-25T02:51:55.844Z",
+    "commit": "a9a62322",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2269,6 +2269,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "divergentie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/divergentie.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "doctrine.test.js": {
       "soort": "puur",

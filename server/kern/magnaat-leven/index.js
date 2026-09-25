@@ -18,10 +18,11 @@ const { ACTIES } = require('./acties');
 const { toon } = require('./weergave');
 const speelronde = require('./speelronde');
 const { controleer, bevries } = require('./bewaking');
+const { oordeelGeef, oordeelOverzicht } = require('./oordeel');
 
 function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   const boek = maakBoek({ db });
-  const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart' } });
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart', magnaatOordelen: 'lijst' } });
   const levens = () => eigen.bak('magnaatLeven');
 
   function haal(key, opnieuw, moeilijkheid) {
@@ -112,7 +113,7 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     if (st.bevroren && body.actie !== 'opnieuw') {
       return { status: 409, error: 'Dit leven is bevroren: ' + st.bevroren.reden + '. Begin opnieuw om verder te spelen.' };
     }
-    if (st.voorbij && body.actie !== 'opnieuw') {
+    if (st.voorbij && body.actie !== 'opnieuw' && body.actie !== 'oordeel') {
       return { status: 409, error: 'Dit leven is voorbij: ' + st.voorbij.reden + '. Begin opnieuw om verder te spelen.' };
     }
     const vk = typeof body.verzoek === 'string' && body.verzoek.length <= 64 ? body.verzoek : null;
@@ -126,6 +127,8 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     if (body.actie === 'slaap') {
       volgendeDag(st);
       st.gerekendTot = nu();
+    } else if (body.actie === 'oordeel') {
+      r = oordeelGeef(st, body, eigen.bak('magnaatOordelen'), nu());
     } else if (body.actie === 'tempo') {
       r = speelronde.tempo(st, body, nu());
     } else if (body.actie === 'doorspoelen') {
@@ -149,7 +152,10 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     return r && r.error ? r : beeld;
   }
 
-  return { staat, actie, verifieer: (key) => boek.verifieer(haal(key)) };
+  /* De speelronde voor het kantoor (./oordeel.js): anoniem, en lezen schept niets. */
+  const oordelen = () => oordeelOverzicht(eigen.kijk('magnaatOordelen') || []);
+
+  return { staat, actie, oordelen, verifieer: (key) => boek.verifieer(haal(key)) };
 }
 
 module.exports = { maakLeven };

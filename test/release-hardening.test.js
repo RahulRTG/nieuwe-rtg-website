@@ -13,6 +13,11 @@ test('alle Docker- en deployinvoer telt als releasecode', () => {
   for (const rel of ['Dockerfile', '.dockerignore', 'docker-compose.yml',
     'docker-compose.live.yml', 'docker-compose.nood.yaml', 'deploy/live.env.example',
     '.github/workflows/release-image.yml']) assert.equal(isCodePad(rel), true, rel);
+  /* EN DE TEGENPROEF: registers en documenten zijn uitkomsten en geen code. Zonder
+     deze kant bleef de toets groen als isCodePad ALLES code noemde -- dan telt
+     elke meting als onreproduceerbaar en zegt het stempel niets meer. */
+  for (const rel of ['LAT.md', 'docs/money-012.md', 'MUTATIES.json', 'Dockerfile.bak',
+    'docker-compose', 'deployment/x.yml']) assert.equal(isCodePad(rel), false, rel);
 });
 
 test('de releasepoort weigert servicebevoegdheden zonder echte lezer', () => {

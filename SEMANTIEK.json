@@ -1,6 +1,6 @@
 {
-  "catalogi": 1127,
-  "verschillendeNamen": 671,
+  "catalogi": 1136,
+  "verschillendeNamen": 679,
   "namenInMeerDomeinen": 128,
   "woordenMetMeerBetekenissen": 110,
   "betekenissenTotaal": 408,
@@ -49,6 +49,7 @@
         "server/kern/fluister.js",
         "server/kern/huis.js",
         "server/kern/invoer-lezer.js",
+        "server/kern/magnaat-leven/regels-markt.js",
         "server/kern/socialegraaf/lijn.js",
         "server/kern/tijdlijn.js"
       ],
@@ -526,7 +527,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 222,
+  "dubbelingenZonderNaam": 226,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -772,6 +773,21 @@
       "overlap": 1,
       "a": "server/kern/kosten/factuurregel.js",
       "aNaam": "MAAND",
+      "b": "server/kern/magnaat-leven/regels-markt.js",
+      "bNaam": "MAANDEN",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/kosten/factuurregel.js",
+      "aNaam": "MAAND",
       "b": "server/kern/socialegraaf/lijn.js",
       "bNaam": "MAANDEN",
       "leden": 12,
@@ -802,22 +818,7 @@
       "overlap": 1,
       "a": "server/kern/lid/facturen.js",
       "aNaam": "MAAND_NL",
-      "b": "server/kern/socialegraaf/lijn.js",
-      "bNaam": "MAANDEN",
-      "leden": 12,
-      "voorbeeld": [
-        "januari",
-        "februari",
-        "maart",
-        "april",
-        "mei"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/kern/lid/facturen.js",
-      "aNaam": "MAAND_NL",
-      "b": "server/kern/tijdlijn.js",
+      "b": "server/kern/magnaat-leven/regels-markt.js",
       "bNaam": "MAANDEN",
       "leden": 12,
       "voorbeeld": [
@@ -3620,5 +3621,5 @@
       ]
     }
   ],
-  "bestanden": 3664
+  "bestanden": 3668
 }

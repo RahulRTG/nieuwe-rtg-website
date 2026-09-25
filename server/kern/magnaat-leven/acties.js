@@ -19,6 +19,7 @@ const geld = require('./geld');
 const team = require('./team');
 const voorraad = require('./voorraad');
 const contract = require('./contract');
+const { vestig } = require('./vestiging');
 
 const fout = (error) => ({ status: 400, error });
 
@@ -65,7 +66,8 @@ const ACTIES = {
   korting: opdracht.korting, voorfinancier: opdracht.voorfinancier,
   uitstel: geld.uitstel, lenen: geld.lenen,
   werf: team.werf, ontsla: team.ontsla, bestel: voorraad.bestelInkoop, prijs: voorraad.prijs,
-  teken: contract.teken, wijsaf: contract.wijsAf, zegop: contract.zegOp
+  teken: contract.teken, wijsaf: contract.wijsAf, zegop: contract.zegOp,
+  vestig
 };
 
 module.exports = { ACTIES };

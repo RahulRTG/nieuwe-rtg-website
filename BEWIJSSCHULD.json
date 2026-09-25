@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-19T19:08:25.687Z",
-  "commit": "6083f652",
+  "op": "2026-09-25T08:29:07.545Z",
+  "commit": "34e11c23",
   "boomVuil": false,
-  "boomAnders": 57,
+  "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -13,7 +13,7 @@
   "posten": 18,
   "meetwerk": 2095,
   "instrument": 323,
-  "grens": 665
+  "grens": 674
  },
  "aflossing": {
   "doel": 0,
@@ -29,12 +29,12 @@
  "gemeten": {
   "postenTotaal": 18,
   "achterstand": 2418,
-  "randVanDeMethode": 665,
+  "randVanDeMethode": 674,
   "auth-onbeslist": 1,
-  "capability-in-handler": 550,
+  "capability-in-handler": 558,
   "objectpoort": 52,
   "output-deuren": 18,
-  "lichaamssleutel": 93,
+  "lichaamssleutel": 94,
   "output-niet-toerekenbaar": 285,
   "output-blind": 0,
   "output-onwaarneembaar": 4,
@@ -62,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 550,
+   "aantal": 558,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -86,7 +86,7 @@
    "id": "lichaamssleutel",
    "soort": "grens",
    "wat": "routes waarvan de sleutel een VELD IN HET VERZOEK is, geen token in de kop",
-   "aantal": 93,
+   "aantal": 94,
    "waarom": "gastAuth leest req.body.sleutel, gezinsPoort en rtfPoort lezen code+token uit het lichaam. Een member-, supplier- of officetoken is voor zo n deur niet fout maar IRRELEVANT: hij kijkt er niet naar. Alle drie krijgen dezelfde 401.",
    "sluit": "niets in deze proef; die 401 als bewijs tellen zou dezelfde fout zijn die de AUTH-as al 294 cellen kostte. Een proef op sessiesleutels is een andere vraag."
   },
@@ -198,23 +198,19 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-09-13",
-    "aantal": 1
-   },
-   {
     "op": "2026-09-14",
     "aantal": 1
    },
    {
     "op": "2026-09-19",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-25",
+    "aantal": 1
    }
   ],
   "capability-in-handler": [
-   {
-    "op": "2026-09-13",
-    "aantal": 549
-   },
    {
     "op": "2026-09-14",
     "aantal": 549
@@ -222,41 +218,41 @@
    {
     "op": "2026-09-19",
     "aantal": 550
+   },
+   {
+    "op": "2026-09-25",
+    "aantal": 558
    }
   ],
   "objectpoort": [
-   {
-    "op": "2026-09-13",
-    "aantal": 52
-   },
    {
     "op": "2026-09-14",
     "aantal": 52
    },
    {
     "op": "2026-09-19",
+    "aantal": 52
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 52
    }
   ],
   "output-deuren": [
    {
-    "op": "2026-09-13",
-    "aantal": 18
-   },
-   {
     "op": "2026-09-14",
     "aantal": 18
    },
    {
     "op": "2026-09-19",
     "aantal": 18
+   },
+   {
+    "op": "2026-09-25",
+    "aantal": 18
    }
   ],
   "lichaamssleutel": [
-   {
-    "op": "2026-09-13",
-    "aantal": 74
-   },
    {
     "op": "2026-09-14",
     "aantal": 74
@@ -264,83 +260,83 @@
    {
     "op": "2026-09-19",
     "aantal": 93
+   },
+   {
+    "op": "2026-09-25",
+    "aantal": 94
    }
   ],
   "output-niet-toerekenbaar": [
-   {
-    "op": "2026-09-13",
-    "aantal": 285
-   },
    {
     "op": "2026-09-14",
     "aantal": 285
    },
    {
     "op": "2026-09-19",
+    "aantal": 285
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 285
    }
   ],
   "output-blind": [
    {
-    "op": "2026-09-13",
-    "aantal": 0
-   },
-   {
     "op": "2026-09-14",
     "aantal": 0
    },
    {
     "op": "2026-09-19",
+    "aantal": 0
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-09-13",
-    "aantal": 4
-   },
-   {
     "op": "2026-09-14",
     "aantal": 4
    },
    {
     "op": "2026-09-19",
+    "aantal": 4
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-09-13",
-    "aantal": null
-   },
-   {
     "op": "2026-09-14",
     "aantal": null
    },
    {
     "op": "2026-09-19",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-25",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-09-13",
-    "aantal": null
-   },
-   {
     "op": "2026-09-14",
     "aantal": null
    },
    {
     "op": "2026-09-19",
     "aantal": null
+   },
+   {
+    "op": "2026-09-25",
+    "aantal": null
    }
   ],
   "rollback-gezakt": [
-   {
-    "op": "2026-09-13",
-    "aantal": 1
-   },
    {
     "op": "2026-09-14",
     "aantal": 1
@@ -348,103 +344,107 @@
    {
     "op": "2026-09-19",
     "aantal": 0
+   },
+   {
+    "op": "2026-09-25",
+    "aantal": 0
    }
   ],
   "object-vooraf": [
-   {
-    "op": "2026-09-13",
-    "aantal": 323
-   },
    {
     "op": "2026-09-14",
     "aantal": 323
    },
    {
     "op": "2026-09-19",
+    "aantal": 323
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 323
    }
   ],
   "proefruis": [
    {
-    "op": "2026-09-13",
-    "aantal": 1
-   },
-   {
     "op": "2026-09-14",
     "aantal": 1
    },
    {
     "op": "2026-09-19",
+    "aantal": 1
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
-    "op": "2026-09-13",
-    "aantal": 89
-   },
-   {
     "op": "2026-09-14",
     "aantal": 95
    },
    {
     "op": "2026-09-19",
+    "aantal": 95
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 95
    }
   ],
   "droogloop-onbeoordeeld": [
    {
-    "op": "2026-09-13",
-    "aantal": 2
-   },
-   {
     "op": "2026-09-14",
     "aantal": 2
    },
    {
     "op": "2026-09-19",
+    "aantal": 2
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-09-13",
-    "aantal": 49
-   },
-   {
     "op": "2026-09-14",
     "aantal": 49
    },
    {
     "op": "2026-09-19",
+    "aantal": 49
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
    {
-    "op": "2026-09-13",
-    "aantal": 1578
-   },
-   {
     "op": "2026-09-14",
     "aantal": 1607
    },
    {
     "op": "2026-09-19",
+    "aantal": 1607
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 1607
    }
   ],
   "wegwerpserver-kopieen": [
    {
-    "op": "2026-09-13",
-    "aantal": 3
-   },
-   {
     "op": "2026-09-14",
     "aantal": 3
    },
    {
     "op": "2026-09-19",
+    "aantal": 3
+   },
+   {
+    "op": "2026-09-25",
     "aantal": 3
    }
   ]
@@ -481,6 +481,12 @@
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
   },
   {
+   "id": "gevolg-onbekend",
+   "aantal": 95,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
+  },
+  {
    "id": "droogloop-onbeoordeeld",
    "aantal": 2,
    "meetdagen": 3,
@@ -491,6 +497,12 @@
    "aantal": 49,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
+  },
+  {
+   "id": "idem-ongeclassificeerd",
+   "aantal": 1607,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
   {
    "id": "wegwerpserver-kopieen",

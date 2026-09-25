@@ -45,12 +45,36 @@ function wieJeBent(st) {
     meld(st, 'Je hebt nu ' + st.betaald + ' opdrachten gedaan en betaald gekregen. Dat is geen hobby meer: je werkt structureel voor klanten. ' +
       R.JURISDICTIE.inschrijven + ' Dat kost ' + euro(R.KVK) + ', en daarna kun je nieuwe klanten aannemen.', 'vraag');
   }
-  if (st.onderneming && st.baan.actief && !st.zelfstandigMag && st.dag - st.onderneming.sinds >= R.ZELFSTANDIG.dagen) {
-    const binnen = ontvangen(st, R.ZELFSTANDIG.dagen), grens = Math.round(loonPer(st, R.ZELFSTANDIG.dagen) * R.ZELFSTANDIG.factor / 100);
-    if (binnen >= grens) {
+  const z = R.niveauVan(st).zelfstandig;
+  if (st.onderneming && st.baan.actief && !st.zelfstandigMag && st.dag - st.onderneming.sinds >= z.dagen) {
+    const binnen = ontvangen(st, z.dagen), grens = Math.round(loonPer(st, z.dagen) * z.factor / 100);
+    const buffer = Math.round(loonPer(st, 7 * z.buffer));
+    if (binnen >= grens && st.kas >= buffer) {
       st.zelfstandigMag = st.dag;
-      meld(st, 'Je bedrijf bracht de afgelopen vier weken ' + euro(binnen) + ' binnen: meer dan twee keer je loon. ' +
-        'Je kunt je baan opzeggen en van je eigen bedrijf leven.', 'vraag');
+      meld(st, 'Je bedrijf bracht de afgelopen ' + weken(z.dagen) + ' ' + euro(binnen) + ' binnen, meer dan ' + keer(z.factor) + ' je loon, ' +
+        'en je hebt ' + euro(st.kas) + ' op de bank. Je kunt je baan opzeggen en van je eigen bedrijf leven.', 'vraag');
+    }
+  }
+}
+const weken = (d) => (d % 7 ? d + ' dagen' : d / 7 + ' weken');
+const keer = (f) => (f % 100 ? String(f / 100).replace('.', ',') + ' keer' : ['', 'een', 'twee', 'drie', 'vier'][f / 100] + ' keer');
+
+/* UITGEZET (1.0): staat je huur langer open dan je verhuurder accepteert, dan
+   zegt hij je kamer op en is dit leven voorbij. Een week ervoor hoor je het.
+   Alleen de huur van je kamer telt: de rest is duur, maar je woont nog. */
+function uitzetting(st) {
+  const grens = R.niveauVan(st).uitzetting;
+  if (!grens || st.voorbij) return;
+  for (const p of st.posten.filter(x => x.soort === 'huur' && x.achterstand)) {
+    const open = st.dag - p.dag;
+    if (open >= grens) {
+      st.voorbij = { dag: st.dag, reden: 'je huur stond ' + open + ' dagen open, en je verhuurder heeft je kamer opgezegd' };
+      meld(st, 'Dit leven is voorbij: ' + st.voorbij.reden + '. Je kunt terugkijken en opnieuw beginnen.', 'nood');
+      return;
+    }
+    if (open >= grens - 7 && !p.gewaarschuwd) {
+      p.gewaarschuwd = true;
+      meld(st, 'Je verhuurder schrijft: betaal je de huur niet binnen ' + (grens - open) + ' dagen, dan zegt hij je kamer op.', 'nood');
     }
   }
 }
@@ -63,6 +87,7 @@ function volgendeDag(st) {
   marktDag(st);
   handelDag(st);
   startDag(st);
+  uitzetting(st);
   klantDag(st);
   contractDag(st);
   kansen(st);

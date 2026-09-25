@@ -52,7 +52,7 @@ function onderneming(st, z) {
 
 function ontslag(st) {
   if (!st.baan.actief) return fout('Je werkt al niet meer bij ' + st.baan.werkgever + '.');
-  if (!st.zelfstandigMag) return fout('Je bedrijf draagt je nog niet: pas als het vier weken twee keer je loon binnenbrengt.');
+  if (!st.zelfstandigMag) return fout('Je bedrijf draagt je nog niet: het moet een tijd meer dan je loon binnenbrengen, en je hebt een buffer op de bank nodig.');
   st.baan.actief = false;
   st.zelfstandig = st.dag;
   mijlpaal(st, 'zelfstandig', 'Je zegde je baan op bij ' + st.baan.werkgever + ': je leeft van je eigen bedrijf.');

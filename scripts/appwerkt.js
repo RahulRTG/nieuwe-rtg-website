@@ -37,8 +37,15 @@
      2 bedienbaar   -- doen de knoppen iets, zonder te breken?
      8 menselijk    -- geen kale TypeError, 500 of knop die stil niets doet.
 
+   SAMENSTELLEN (24 september 2026). Een bewijs mag ook uit een proef komen die
+   al bestaat -- een gesloten ketenproef, of een ronde die elke rij meet (de
+   liegronde, de bevoegdronde). Welke bron dat mag, staat in
+   scripts/lib/appcontract.js; of hij het op deze code verdient, beslist
+   scripts/lib/bewijsbron.js. Niemand schrijft hier PASS: een verouderd
+   register maakt het NIET_GETEST.
+
    De andere vijf (voltooibaar, waarheidsgetrouw, persistent, bevoegd,
-   herstelbaar) vragen een testwereld waarin betalen, versturen en verwijderen
+   herstelbaar) vragen verder een testwereld waarin betalen, versturen en verwijderen
    ECHT mogen -- met sandboxprovider, sink-mailbox en wegwerpdata. Die bestaat
    nog niet, en daarom staan ze hier als GEEN_FIXTURE met de reden. Ze staan er
    WEL, want een bewijs dat je weglaat ziet eruit als een bewijs dat je haalt.
@@ -99,6 +106,11 @@ const path = require('path');
 const reg = require('./lib/wereldregister');
 const { haalSessies, opslagVoor } = require('./lib/proefsessies');
 const { stempel } = require('./lib/stempel');
+/* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
+   een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
+const { stelSamen } = require('./lib/bewijsbron');
+const { CONTRACT, ZONDER_APP } = require('./lib/appcontract');
+const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'APPWERKT.json');
@@ -154,7 +166,10 @@ function rijen() {
         app: bron && bron.naam ? bron.naam : sleutel,
         functie: item,
         wereld: map.naam,
-        persona: PERSONA_VAN_WERELD[map.naam] || 'lid',
+        /* Een ingang met een werkrol toont de wereld alleen aan wie die rol in
+           zijn sleutelbos heeft (app-main-24a3.js); dat is dan aan wie hij
+           beloofd wordt, en dus de persona die erdoor moet kunnen. */
+        persona: (bron && bron.werkrol) || PERSONA_VAN_WERELD[map.naam] || 'lid',
         ingang: url || ('(' + soort + ' in de app, geen eigen adres)'),
         soort,
         pad: url ? url.split('#')[0].split('?')[0] : null
@@ -262,6 +277,10 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     return r;
   }
 
+  /* Een BEVINDING en geen oordeel: meet de proef met een andere persona dan het
+     register als doelgroep noemt? Beide bronnen staan erbij (./lib/bestemming.js). */
+  r.personaAfwijking = personaAfwijking(rij.persona, rij.pad, SCHERMREGISTER());
+
   // ---- bewijs 1: bereikbaar voor de persona van deze wereld ----
   const eigen = persoonlijk[rij.persona];
   if (!eigen) {
@@ -318,8 +337,32 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG',
       reden: 'de server zegt zelf dat er iets in de omgeving ontbreekt: ' + eersteBezoek.config[0], bewijs: rij.pad };
   } else {
-    r.bewijzen.bereikbaar = { status: 'BEWEZEN',
-      reden: 'opent voor een ' + rij.persona + ' zonder poort en zonder fout', bewijs: rij.pad };
+    /* OPENDE ZONDER POORT EN ZONDER FOUT -- maar OP DE BEDOELDE BESTEMMING?
+       Een deur kan ook een doorverwijzing zijn: vier kantoorschermen stuurden
+       een lid naar de kantoordeur, en stonden hier op BEWEZEN. Het oordeel komt
+       uit ./lib/bestemming.js, op de capability uit SCHERMEIGENAAR.json en niet
+       op url-gelijkheid. De andere sessies worden alleen bezocht als de
+       bestemming niet klopte: dan is de vraag of de ingang verkeerd geadresseerd
+       is (de bestaande uitkomst) of gewoon niet bereikt. */
+    const landing = eersteBezoek.eind || rij.pad;
+    let o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen: [] });
+    if (o.status !== 'BEWEZEN' && o.bestemming.uitkomst === 'andere-capability') {
+      const anderen = [];
+      for (const rol of rollen) {
+        if (rol === rij.persona || !persoonlijk[rol]) continue;
+        const b = await bezoek(persoonlijk[rol], base, rij.pad);
+        if (!b.poort && !b.crash.length) anderen.push({ persona: rol, landing: b.eind || rij.pad });
+      }
+      o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen });
+    }
+    r.bestemming = o.bestemming;
+    r.bewijzen.bereikbaar = { status: o.status, reden: o.reden, bewijs: rij.pad };
+    if (o.status !== 'BEWEZEN') {
+      for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST',
+        reden: 'de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app', bewijs: null };
+      vulOngemeten(r);
+      return r;
+    }
   }
 
   // ---- bewijs 2 en 8: bedienbaar en menselijk ----
@@ -374,6 +417,9 @@ async function meetRij(rij, base, persoonlijk, rollen) {
 
 function vulOngemeten(r) {
   for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak();
+  /* Pas NA de standaard: een contract kan een GEEN_FIXTURE alleen vervangen
+     door wat een bron verdiend heeft. Niet genoemd = blijft staan. */
+  r.samengesteld = stelSamen(r);
   /* De vier randvoorwaarden uit de opdracht die hier niet gemeten worden, maar
      die wel een plek in de rij verdienen -- weglaten leest als "in orde". */
   r.mobiel = { status: 'NIET_GETEST', reden: 'deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md' };
@@ -645,6 +691,20 @@ function bouw(meting) {
         && /er staat een deur/.test(r.bewijzen.bereikbaar.reden || '')).length },
     telling,
     perBewijs,
+    /* Welke bewijzen uit een ANDERE proef komen dan deze browserronde, en welke
+       gesloten ketens (nog) voor geen enkele app tellen. Die tweede lijst staat
+       er even groot bij: weglaten leest als "nog niet aan toegekomen". */
+    samenstelling: {
+      uitleg: 'Een bewijs mag uit een bestaande proef komen als scripts/lib/appcontract.js die bron noemt, de proef routes raakt die de ingang aanroept, en het register vers is (versheid() in scripts/lib/stempel.js). Een ketenproef levert alleen voltooibaar; een ronde uit ALGEMEEN levert per rij alleen het bewijs waarvoor hij staat.',
+      koppelingen: meting.regels.filter((r) => (r.samengesteld || []).length).map((r) => ({
+        app: r.app, functie: r.functie,
+        bewijzen: Object.fromEntries(r.samengesteld.map((n) => [n, { status: r.bewijzen[n].status,
+          bron: r.bewijzen[n].bron ? r.bewijzen[n].bron.instrument : null,
+          commit: r.bewijzen[n].bewijs ? r.bewijzen[n].bewijs.commit : null }]))
+      })),
+      contractZonderRij: Object.keys(CONTRACT).filter((f) => !meting.regels.some((r) => r.functie === f)),
+      ketensZonderApp: ZONDER_APP
+    },
     defecten: defecten.map((d) => ({ app: d.app, wereld: d.wereld, ingang: d.ingang,
       reden: Object.values(d.bewijzen).find((b) => b.status === 'GEBLOKKEERD_DOOR_DEFECT').reden })),
     deurenZonderPersona: meting.regels.filter((r) => r.bewijzen.bereikbaar
@@ -660,7 +720,18 @@ function bouw(meting) {
    "require('./scripts/appwerkt')" -- mag geen browserronde starten en geen
    register overschrijven; dat is precies hoe ROLPROEF.json ooit van 3377 naar
    292 beproefde routes terugviel. */
-module.exports = { onderschepper, weigerZin };
+/* SCHERMEIGENAAR.json pas lezen als er gemeten wordt: een laadcontrole hoort
+   niets van schijf te halen. */
+let schermregister = null;
+function SCHERMREGISTER() {
+  if (!schermregister) schermregister = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SCHERMEIGENAAR.json'), 'utf8')).schermen;
+  return schermregister;
+}
+
+/* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
+   bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
+   (scripts/liegronde.js, scripts/bevoegdronde.js). */
+module.exports = { onderschepper, weigerZin, rijen, maakContext, bezoek, bedien, POORTEN };
 
 if (require.main === module) (async () => {
   /* Een gefilterde ronde vergelijken met het VOLLEDIGE register telt appels bij

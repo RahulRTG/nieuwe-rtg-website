@@ -170,6 +170,8 @@
 
   function laad() {
     haal('/api/isolatie/mijn', {}).then(function (d) {
+      /* Onvolledig antwoord: langs de foutweg hieronder, niet om vallen met een ruwe TypeError (LIEGRONDE.json). */
+      if (!(d && d.mijn && d.platform)) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
       stand = d;
       tekenNu(d); tekenBereik(d); tekenKeuzes(d); tekenTerug(d);
     }).catch(function (e) { meld('fout', e.message); });

@@ -1,5 +1,12 @@
 {
-  "stempel": "2026-09-19",
+  "stempel": {
+    "op": "2026-09-24T16:37:16.698Z",
+    "commit": "56ea75ba",
+    "boomVuil": false,
+    "boomAnders": 2,
+    "instrument": "scripts/ritproef.js",
+    "node": "v22.22.2"
+  },
   "uitleg": "Een ritketen van aanvraag tot afronding, gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Tweede keten naast scripts/tafelproef.js, in een ander domein -- zie MAATSTAF.md par. 7.",
   "grens": "Alleen de rit bij een vervoerszaak; OV, vluchten en zakelijk vervoer hebben eigen naden. De proef zet een chauffeur klaar omdat de seed er geen heeft. Er komt geen browser aan te pas, en de betaling loopt via de demo-rail: dat het geld werkelijk bij de vervoerder landt, is hier niet gemeten.",
   "schakels": [
@@ -11,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "rit RTG-R-198953 -> opdracht RTG-M-2C4DA9, op het bord: true, klant heet \"Amberen Vos\"",
+      "ziet": "rit RTG-R-AA1611 -> opdracht RTG-M-64CD1A, op het bord: true, klant heet \"Amberen Vos\"",
       "fout": null,
       "ms": 19
     },
@@ -25,7 +32,7 @@
       "status": 200,
       "ziet": "betaald: true, stand nu \"aangevraagd\"",
       "fout": null,
-      "ms": 17
+      "ms": 18
     },
     {
       "nr": 3,
@@ -37,7 +44,7 @@
       "status": 200,
       "ziet": "het lid leest chauffeur \"Chauffeur Proef\" bij stand \"geaccepteerd\"",
       "fout": null,
-      "ms": 34
+      "ms": 37
     },
     {
       "nr": 4,
@@ -49,7 +56,7 @@
       "status": 200,
       "ziet": "het lid leest stand \"onderweg\"",
       "fout": null,
-      "ms": 20
+      "ms": 16
     },
     {
       "nr": 5,
@@ -61,7 +68,7 @@
       "status": 200,
       "ziet": "het lid leest stand \"aangekomen\"",
       "fout": null,
-      "ms": 15
+      "ms": 16
     },
     {
       "nr": 6,
@@ -97,7 +104,7 @@
       "status": 200,
       "ziet": "staat in de historie met stand \"afgerond\"",
       "fout": null,
-      "ms": 5
+      "ms": 7
     }
   ],
   "storingen": [
@@ -141,7 +148,7 @@
       "naam": "een bestemming die alleen een tekst is",
       "belofte": "wordt nooit een plek op de kaart: de opdracht draagt een bestemming die onbekend heet en geen afstand",
       "stand": "gehouden",
-      "wat": "opdracht RTG-M-F7F8F6, bestemming: {\"label\":\"Bestemming nog niet bekend\",\"bron\":\"onbekend\",\"onbekend\":true}, km: 0"
+      "wat": "opdracht RTG-M-000663, bestemming: {\"label\":\"Bestemming nog niet bekend\",\"bron\":\"onbekend\",\"onbekend\":true}, km: 0"
     },
     {
       "naam": "een rit die op \"aan-boord\" gaat",
@@ -153,7 +160,7 @@
       "naam": "een rit zonder bestemming, bij een vervoerder die die soort aanneemt",
       "belofte": "gaat gewoon door en krijgt een opdracht met een bestemming die nog niet bekend is",
       "stand": "gehouden",
-      "wat": "status 200, opdracht: RTG-M-26CF4C"
+      "wat": "status 200, opdracht: RTG-M-21AF2E"
     },
     {
       "naam": "een vervoerder die alleen ritten mét bestemming aanneemt",
@@ -168,7 +175,7 @@
       "wat": "toewijzen: 200, chauffeur: Losse Chauffeur, op zijn bord: true"
     }
   ],
-  "rit": "RTG-R-198953",
+  "rit": "RTG-R-AA1611",
   "wereld": {
     "chauffeur": "via /api/supplier/staff/add, want de seed geeft ISLATR geen personeel"
   },

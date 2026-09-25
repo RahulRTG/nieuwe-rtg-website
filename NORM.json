@@ -123,7 +123,7 @@
     "veranderbereikZonderBereik": 530,
     "stilLezing": 5,
     "stilLezingMeters": 61,
-    "stilLezingBereik": 586,
+    "stilLezingBereik": 575,
     "bewijsOnderscheidt": 6,
     "connectDomeinenGemeten": 23,
     "afgeleidZonderEigenaar": 2,
@@ -177,6 +177,53 @@
       "meter": "toetsenNietGemeten 629 -> 630",
       "reden": "test/pasbronnen.test.js is nieuw. Met de hand nagetrokken met twee mutaties: de weigering van een niet-overgang (van === naar) in kern/pasgeschiedenis.js weg (toets 1 zakt) en de binding van de index aan zijn lijst in kern/aanwezigheid.js weg (toets 4 zakt). De mutatiemotor is er nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "appwerktDefecten",
+      "van": 4,
+      "meter": "appwerktDefecten 4 -> 0",
+      "reden": "Het product is gerepareerd, niet de meter. De vier defecten hadden een oorzaak: MAPPEN kende een pas maar geen werkrol, dus de ledenwereld toonde elk lid vier kantoorschermen. De ingangen dragen nu werkrol 'kantoor' en de bank toont ze alleen aan een account met een kantoorsleutel (/api/account/rollen). Hermeten met de persona aan wie de wereld ze toont: alle vier bereikbaar = BEWEZEN.",
+      "waarheen": "Bevroren op 0. test/werkrol.test.js houdt vast dat een ingang naar een kantoorscherm een werkrol draagt."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "appwerktDefecten",
+      "van": 0,
+      "meter": "appwerktDefecten 0 -> 4",
+      "reden": "Geen achteruitgang maar een eerlijker meting. De vier stonden op bereikbaar = BEWEZEN terwijl een lid ze nooit bereikte: Routedossier, Decision Room, Project Room en RTG One sturen een lid zonder kantoorsessie door naar de kantoordeur of het RTG Kantoor, en de meter zag een deur alleen als selector op de pagina. Sinds scripts/lib/bestemming.js oordeelt bereikbaar op de capability van de landing (SCHERMEIGENAAR.json); de kantoorsessie komt wel op de bedoelde capability, dus dit is de bestaande uitkomst 'verkeerd geadresseerd' -- dezelfde zin en dezelfde betekenis als een dichte deur op de pagina. Er is geen product aangepast; de vier waren al zo.",
+      "waarheen": "Per ingang een besluit: hoort hij in de wereld van een lid (en moet de app een lid dan bedienen), of hoort hij bij het kantoor (en dan uit MAPPEN van die wereld). Let op RTG One: SCHERMEIGENAAR.json noemt als doelgroep lid, en toch vraagt het scherm een kantoorsessie."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 630,
+      "vervalt": "2026-12-24",
+      "meter": "toetsenNietGemeten 630 -> 631",
+      "reden": "test/appwerkt-bestemming.e2e.js is nieuw (BETROUWBAARHEID.md par. 4d): echte doorverwijzingen na het laden, beoordeeld op capability. Met de hand nagetrokken met vijf mutaties op scripts/lib/bestemming.js, waaronder terug naar url-vergelijking en een doorverwijzing als bereikt tellen; vier ervan laten deze toets zakken en alle vijf test/bestemming.test.js. De mutatiemotor muteert met de liegpoort op /api/, en dit synthetische scherm raakt geen /api/, dus die uitslag zou over een ander experiment gaan.",
+      "waarheen": "Dezelfde als bij test/appwerkt-meter.e2e.js: een operator voor browsertoetsen op een eigen scherm in scripts/mutatie.js."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 629,
+      "vervalt": "2026-12-24",
+      "meter": "toetsenNietGemeten 629 -> 630",
+      "reden": "test/appwerkt-meter.e2e.js is nieuw: de synthetische regressiefixture voor bedienbaar (BETROUWBAARHEID.md par. 4c). Met de hand nagetrokken met zeven mutaties -- de thuisregel weg, terugkeren zonder de gereedvoorwaarde, de schil in de noemer, bedekte knoppen meetellen, de noemer laten groeien met een paneel dat de proef opent, en (in test/bedieningsmeting.test.js) de invariant weg; alle zeven zakken. De mutatiemotor behandelt hem als servertoets en muteert met de liegpoort op /api/, maar het scherm van deze toets roept geen enkele /api/ aan: 'overleefd' zou daar een uitslag zijn over een experiment dat deze toets niet doet. Die uitslag is daarom niet in MUTATIES.json gezet.",
+      "waarheen": "Een operator in scripts/mutatie.js voor browsertoetsen op een eigen scherm (bronmutatie in scripts/lib/bedieningsmeting.js en scripts/appwerkt.js), of een expliciete indeling 'niet te meten' voor toetsen zonder /api/."
+    },
+    {
+      "datum": "2026-09-24",
+      "soort": "structureel",
+      "sleutel": "stilLezingBereik",
+      "van": 586,
+      "meter": "stilLezingBereik 586 -> 575 (scripts/ 503 -> 492)",
+      "reden": "Er is geen bewijslezing verdwenen: elf VALSE treffers vielen weg. De meter telt elke require( of readFileSync( met binnen 200 tekens een registernaam als bewijslezing. In de ketenproeven telden daardoor require('path') en require('./lib/wegwerpserver') mee, omdat 'TAFELPROEF.json' (en de vier andere) er vlak onder stond; in scripts/appwerkt.js een require naast APPWERKT.json. De tak van het samenstellen van bewijs (BETROUWBAARHEID.md par. 4a) zette er een commentaarblok en een stempel-require tussen, en daarmee kwam de registernaam net buiten de 200 tekens. Per bestand nagemeten tegen main (26c1fee7): tafel-, rit-, toelatings-, moment- en zaakliveproef elk 3 -> 1, appwerkt.js 4 -> 3, verder geen enkel verschil. Het commentaar terugschuiven om de treffers terug te krijgen zou de meter voor de gek houden.",
+      "waarheen": "scripts/stillezing.js: het bereik telt een lezing op NABIJHEID van een registernaam; een lezing die het register werkelijk als argument draagt, is de strengere vorm en zou deze ruis wegnemen."
     },
     {
       "datum": "2026-09-24",
@@ -3107,7 +3154,7 @@
     "laatSpoorVerdacht": "2026-09-03",
     "rollbackUitzonderingen": "2026-09-03",
     "faalproefGezakt": "2026-09-13",
-    "appwerktDefecten": "2026-09-07",
+    "appwerktDefecten": "2026-09-24",
     "lussenGeenUitweg": "2026-09-11",
     "lussenKritiek": "2026-09-11",
     "lussenZonderOverlapRem": "2026-09-11",

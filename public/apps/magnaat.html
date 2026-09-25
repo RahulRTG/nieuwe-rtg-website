@@ -411,7 +411,7 @@ document.querySelectorAll('[data-screen]').forEach(b=>b.onclick=()=>go(b.dataset
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
 
 async function load(){
-  try{DATA=await api('overzicht');render();if(DATA.speler.actieveTaak){TASK=DATA.speler.actieveTaak;renderPda();}if(DATA.speler.kantoor)await loadControl(1);}
+  try{DATA=await api('overzicht');/* Onvolledig antwoord: langs de foutweg, niet om vallen met een ruwe TypeError in de toast (LIEGRONDE.json). */if(!(DATA&&DATA.speler&&DATA.wereld&&DATA.capabilityGraph&&DATA.capabilityGraph.cijfers&&DATA.spelbrug&&Array.isArray(DATA.catalogus)))throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');render();if(DATA.speler.actieveTaak){TASK=DATA.speler.actieveTaak;renderPda();}if(DATA.speler.kantoor)await loadControl(1);}
   catch(e){toast(e.message)}
 }
 function render(){

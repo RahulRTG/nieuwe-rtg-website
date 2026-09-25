@@ -1,9 +1,9 @@
 {
-  "catalogi": 1140,
+  "catalogi": 1138,
   "verschillendeNamen": 681,
   "namenInMeerDomeinen": 128,
   "woordenMetMeerBetekenissen": 110,
-  "betekenissenTotaal": 409,
+  "betekenissenTotaal": 408,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 33,
@@ -399,7 +399,6 @@
         "server/ai-budget-beleid.js",
         "server/kern/aanmeldingen.js",
         "server/kern/paseis.js",
-        "server/kern/pasgeschiedenis.js",
         "server/kern/passen.js"
       ],
       "leden": 4,
@@ -528,7 +527,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 257,
+  "dubbelingenZonderNaam": 226,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -2592,106 +2591,6 @@
       ]
     },
     {
-      "naam": "RANG",
-      "domeinen": 8,
-      "betekenissen": 8,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/bankregie/index.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "partner",
-            "hybride",
-            "eigen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/bedrijfsmaat/projecties.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "guest",
-            "rtg",
-            "lifestyle",
-            "business"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/bevoegdheid/lijst.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "betaalinstelling",
-            "elektronischgeldinstelling",
-            "bank"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/herkomst.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "behandelaar",
-            "apparaat",
-            "zelf",
-            "afgeleid"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/levenslijn/fasen.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "komt",
-            "geweest",
-            "nvt"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderneming/regie.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "mens",
-            "na-termijn",
-            "automatisch"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/vonk/halfweg.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "laag",
-            "midden",
-            "hoog"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/wereldkern.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "incident",
-            "aandacht",
-            "actief",
-            "gezond"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "NIET_GEBOUWD",
       "domeinen": 13,
       "betekenissen": 7,
@@ -2786,6 +2685,94 @@
             "locatie",
             "audio",
             "doorlopend"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "RANG",
+      "domeinen": 7,
+      "betekenissen": 7,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bankregie/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "partner",
+            "hybride",
+            "eigen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/bevoegdheid/lijst.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "betaalinstelling",
+            "elektronischgeldinstelling",
+            "bank"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/herkomst.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "behandelaar",
+            "apparaat",
+            "zelf",
+            "afgeleid"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levenslijn/fasen.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "komt",
+            "geweest",
+            "nvt"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/regie.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "mens",
+            "na-termijn",
+            "automatisch"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/vonk/halfweg.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "laag",
+            "midden",
+            "hoog"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/wereldkern.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "incident",
+            "aandacht",
+            "actief",
+            "gezond"
           ]
         }
       ]
@@ -3634,5 +3621,5 @@
       ]
     }
   ],
-  "bestanden": 3699
+  "bestanden": 3678
 }

@@ -54,6 +54,15 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  /* Twee registers uit de afbouw van APPWERKT (24 september 2026). Beide zijn
+     een bron voor een bewijs en worden via versheid() gelezen, dus hun eigenaar
+     staat hier en niet alleen in de detectie. */
+  'LUSPROEF.json': { schrijver: 'scripts/lusproef.js',
+    waarom: 'lusproef.js --vastleggen schrijft het na een volledige keten tegen een wegwerpserver; APPWERKT leest het als bron voor voltooibaar van Ontdekken (scripts/lib/appcontract.js).' },
+  'LIEGRONDE.json': { schrijver: 'scripts/liegronde.js',
+    waarom: 'liegronde.js --vastleggen schrijft het na een browserronde met de liegpoort over elke rij van MAPPEN; APPWERKT leest het als bron voor waarheidsgetrouw (ALGEMEEN in scripts/lib/appcontract.js).' },
+  'BEVOEGD.json': { schrijver: 'scripts/bevoegdronde.js',
+    waarom: 'bevoegdronde.js --vastleggen stelt de ledenrijen samen uit IDOR.json en ROLPROEF.json en loopt een kruisproef over de gezinsschermen; APPWERKT leest het als bron voor bevoegd (ALGEMEEN in scripts/lib/appcontract.js).' },
   'WORLD-DESKTOP.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden ontwerp- en bereikbeschrijving van de desktopwerelden; uitvoerbare toetsen leveren het afzonderlijke bewijs.' },
   'WEBSITE-STORYLINE.md': { soort: 'BRON',

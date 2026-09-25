@@ -292,7 +292,7 @@ async function herlaad(){
   const o=await api('overzicht');
   /* ook de lege stand krijgt zijn rechtsvormen meteen, en niet pas na een
      aanraking van het land */
-  if(o.leeg){ $('#hoofd').innerHTML=leeg(); await vulRechtsvormen(); knopen(); return; }
+  if(o.leeg){ $('#hoofd').innerHTML=leeg(); knopen(); await vulRechtsvormen(); return; }
   ENTS=(await api('entiteiten')).entiteiten||[];
   if(!HUIDIG||!ENTS.some(e=>e.id===HUIDIG)) HUIDIG=ENTS[0]&&ENTS[0].id;
   vulKiezer();
@@ -312,8 +312,11 @@ async function herlaad(){
   const sel=$('#uVes');
   if(sel) sel.innerHTML='<option value="">Overal</option>'+
     (ves.vestigingen||[]).filter(x=>x.open).map(x=>'<option value="'+esc(x.id)+'">'+esc(x.naam)+'</option>').join('');
-  await vulRechtsvormen();
+  /* eerst de knoppen, dan pas de lijst rechtsvormen ophalen: zolang die fetch
+     loopt stond het nieuwe scherm er al, met knoppen die niets deden. Een klik in
+     dat gat verdween zonder spoor. */
   knopen();
+  await vulRechtsvormen();
 }
 
 async function vulRechtsvormen(){

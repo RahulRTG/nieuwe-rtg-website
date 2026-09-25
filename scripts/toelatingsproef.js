@@ -37,6 +37,10 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+/* Het volle stempel (commit + boomVuil + instrument) en niet een kale datum:
+   APPWERKT.json leest deze proef als bewijsbron, en zonder waartegen-is-dit-
+   gemeten kan versheid() niet zeggen of het bewijs nog bij deze code hoort. */
+const { stempel: huisStempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'TOELATINGSPROEF.json');
@@ -332,7 +336,7 @@ async function storingen(basis, uit) {
 
 async function meet() {
   const uit = {
-    stempel: new Date().toISOString().slice(0, 10),
+    stempel: huisStempel(),
     uitleg: 'De toelatingsketen van een zaak in een gereguleerd genre: aanvraag, bewijs, aftekenen, besluit, zaak, herkeuring. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Derde keten naast tafelproef en ritproef -- zie MAATSTAF.md par. 7.',
     grens: 'Alleen de zaakaanmelding in een gereguleerd genre; de ballotage van een LID en een vrij genre lopen anders. Geen browser. Dat het geld werkelijk binnenkomt is niet gemeten: de termijn wordt administratief afgetekend.',
     genre: GENRE, schakels: [], storingen: [], aanmelding: null, wereld: null

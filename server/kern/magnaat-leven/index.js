@@ -50,7 +50,7 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   function bijrekenen(st) {
     const t = nu();
     let n = 0;
-    while (t - st.gerekendTot >= st.dagMs && n < R.MAX_DAGEN_PER_KEER) {
+    while (t - st.gerekendTot >= st.dagMs && n < R.MAX_DAGEN_PER_KEER && !st.voorbij) {
       volgendeDag(st);
       st.gerekendTot += st.dagMs;
       n++;
@@ -111,6 +111,9 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     const st = haal(key);
     if (st.bevroren && body.actie !== 'opnieuw') {
       return { status: 409, error: 'Dit leven is bevroren: ' + st.bevroren.reden + '. Begin opnieuw om verder te spelen.' };
+    }
+    if (st.voorbij && body.actie !== 'opnieuw') {
+      return { status: 409, error: 'Dit leven is voorbij: ' + st.voorbij.reden + '. Begin opnieuw om verder te spelen.' };
     }
     const vk = typeof body.verzoek === 'string' && body.verzoek.length <= 64 ? body.verzoek : null;
     if (vk && (st.verzoeken || []).includes(vk)) return Object.assign(bewaarEnToon(st), { herhaald: true });

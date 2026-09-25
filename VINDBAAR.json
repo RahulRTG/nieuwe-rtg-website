@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T12:36:31.481Z",
-    "commit": "acc51c0",
+    "op": "2026-09-25T09:50:46.197Z",
+    "commit": "52d6801a",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -11,14 +11,14 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 99,
-  "woorden": 1209,
-  "gevonden": 777,
-  "dekking": 0.6427,
+  "woorden": 1205,
+  "gevonden": 775,
+  "dekking": 0.6432,
   "perBestemming": [
     {
       "naam": "Magnaat",
       "url": "/apps/magnaat.html",
-      "woorden": 87,
+      "woorden": 83,
       "gevonden": 35,
       "mist": [
         "werkvloer",
@@ -30,16 +30,17 @@
         "waarom",
         "werkte",
         "meegenomen",
+        "week",
+        "gebeurde",
+        "bedrijf",
         "instapt",
         "lobby",
         "partnerwereld",
-        "future",
         "alsof",
-        "functies",
         "dagdienst",
         "laden",
         "soleerd",
-        "functiehal",
+        "functies",
         "wereldkaart",
         "waarin",
         "oefenen",
@@ -58,21 +59,16 @@
         "laatste",
         "geldstromen",
         "opdracht",
-        "bedrijfstraining",
-        "bedrijfsteamkamer",
-        "bedrijf",
+        "strategie",
+        "vastleggen",
+        "testtaak",
+        "vorige",
         "blokkeer",
         "afronden",
         "vrije",
         "teamkamer",
         "oefen",
-        "solo",
-        "teamtraining",
-        "hervat",
-        "overdragen",
-        "pauzeer",
-        "kamer",
-        "trainingsronde"
+        "solo"
       ]
     },
     {
@@ -304,6 +300,24 @@
       ]
     },
     {
+      "naam": "Partner Network",
+      "url": "/apps/partner-network.html",
+      "woorden": 22,
+      "gevonden": 12,
+      "mist": [
+        "rustige",
+        "week",
+        "vier",
+        "viering",
+        "drukte",
+        "beloften",
+        "loopt",
+        "volgens",
+        "kyoto",
+        "consortium"
+      ]
+    },
+    {
       "naam": "RTG Werk OS",
       "url": "/apps/werk.html",
       "woorden": 24,
@@ -384,22 +398,6 @@
         "persoon",
         "zekerheid",
         "gewogen"
-      ]
-    },
-    {
-      "naam": "Partner Network",
-      "url": "/apps/partner-network.html",
-      "woorden": 22,
-      "gevonden": 14,
-      "mist": [
-        "rustige",
-        "week",
-        "vier",
-        "viering",
-        "drukte",
-        "beloften",
-        "loopt",
-        "volgens"
       ]
     },
     {

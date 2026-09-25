@@ -66,10 +66,10 @@ module.exports = (ctx) => {
     const sleutel = 'incasso:' + tot;
     /* `boardroomUser` lost de MENS achter deze sessie op; is er geen (de
        gedeelde code, of de eigenaar zonder gekoppeld account), dan weigert
-       `eis` met zoveel woorden -- en dan begint de keten niet eens. Dat is de
+       `eis` -- en dan begint de keten niet eens. Dat is de
        juiste plek voor die grens: de assurance-as is de as die een echt account
        eist, niet de baan eromheen. */
-    const zw = await zwaar.eis(boardroomUser(req), 'bank.incasso', sleutel, req, 'De incassoronde');
+    const zw = await zwaar.eis(boardroomUser(req), 'bank.incasso', sleutel, req, 'De incassoronde', { zonderTerugval: true });
     if (!zw.ok) return zwaar.stuur(res, zw);
 
     const blik = bank.bankIncassoVooruitblik({ tot });

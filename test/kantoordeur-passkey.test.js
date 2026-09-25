@@ -1,4 +1,3 @@
-'use strict';
 /* EEN KANTOORMEDEWERKER MET EEN PASSKEY KAN DE INCASSORONDE STARTEN, en dan is
    de geldketen rond.
 
@@ -15,20 +14,24 @@
    Deze toets loopt de hele baan met een echte (software)passkey: registreren
    op het eigen account, de ceremonie openen op de kantoordeur, de ronde
    aanvragen met het antwoord, een tweede mens die tekent, geld dat beweegt, en
-   een dossier dat nu RONd is omdat de as `assurance` bewezen is. test/
-   tweedehandtekening.test.js toets 6 houdt de andere kant vast: zonder passkey
-   blijft de as `vermoed` en heet de keten niet rond. */
+   een dossier dat nu ROND is omdat de as `assurance` bewezen is.
+
+   En daarna besloot de eigenaar (25 september 2026) dat de terugval voor
+   geldhandelingen dicht gaat, en dat de TWEEDE handtekening dezelfde ceremonie
+   vraagt, gebonden aan de aanvraag (routes/kantoren/bank-passkey.js). De
+   derde toets hieronder houdt die grens vast, met rood staan als tegenproef. */
+'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorKoppelBody } = require('./helper');
-const { maakAuthenticator } = require('./webauthn-authenticator');
+const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoorpasskey-'));
 const CODE = 'KANTOOR-PASSKEY-1';
-let srv, base, origin, gedeeld;
+let srv, base, gedeeld, pk;
 
 function api(pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -65,7 +68,7 @@ async function lidMetRekening(naam) {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
   base = srv.base;
-  origin = new URL(base).origin;
+  pk = kantoorPasskey(base);
   gedeeld = (await api('/api/office/login', { code: CODE })).body.token;
   assert.ok(gedeeld, 'de gedeelde kantoorinlog werkt');
   const live = await api('/api/office/bank/leden', { aan: true, naam: 'RTG' }, gedeeld);
@@ -80,13 +83,10 @@ test('een medewerker met passkey start de incassoronde met een ceremonie, en de 
   const a = await medewerker(1);
   const b = await medewerker(2);
 
-  // A zet een passkey op zijn eigen account
-  const sleutel = maakAuthenticator(new URL(base).hostname);
-  const regOpties = await api('/api/webauthn/registreer/opties', {}, a.lid);
-  assert.equal(regOpties.status, 200, JSON.stringify(regOpties.body).slice(0, 160));
-  const reg = await api('/api/webauthn/registreer',
-    { antwoord: sleutel.registratieAntwoord(regOpties.body.opties.challenge, origin), naam: 'Toestel kantoor' }, a.lid);
-  assert.equal(reg.status, 200, 'passkey geregistreerd: ' + JSON.stringify(reg.body).slice(0, 160));
+  // A en B zetten elk een passkey op hun eigen account: sinds 25 september 2026
+  // vragen BEIDE handtekeningen onder een geldhandeling er een (bank-passkey.js)
+  const sleutelA = await pk.zet(a.lid);
+  const sleutelB = await pk.zet(b.lid);
 
   // een vaste betaling die aan de beurt is, zodat de ronde iets te innen heeft
   const betaler = await lidMetRekening('Betaler');
@@ -105,24 +105,30 @@ test('een medewerker met passkey start de incassoronde met een ceremonie, en de 
   assert.equal(zonder.body.bevestigingNodig, true);
 
   // DE CEREMONIE OPENEN OP DE KANTOORDEUR, voor precies deze handeling en grens
-  const opties = await api('/api/office/bank/incasso/opties', { tot }, a.kantoor);
-  assert.equal(opties.status, 200, 'de kantoordeur opent geen ceremonie voor de incassoronde: ' +
-    JSON.stringify(opties.body).slice(0, 160));
-  const antwoord = sleutel.loginAntwoord(opties.body.opties.challenge, origin, 1);
-  const r = await api('/api/office/bank/incasso', { tot, ceremonie: opties.body.ceremonie, antwoord }, a.kantoor);
+  const c = await pk.ceremonie(sleutelA, '/api/office/bank/incasso/opties', { tot }, a.kantoor);
+  const r = await api('/api/office/bank/incasso', { tot, ...c }, a.kantoor);
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
   assert.equal(r.body.needsAuth, true, 'de ronde ging zonder tweede mens door');
 
   // een ceremonie voor een andere grens dekt deze ronde niet
-  const ander = await api('/api/office/bank/incasso/opties', { tot: tot + 1 }, a.kantoor);
-  const verkeerd = await api('/api/office/bank/incasso', { tot,
-    ceremonie: ander.body.ceremonie, antwoord: sleutel.loginAntwoord(ander.body.opties.challenge, origin, 2) }, a.kantoor);
+  const ander = await pk.ceremonie(sleutelA, '/api/office/bank/incasso/opties', { tot: tot + 1 }, a.kantoor);
+  const verkeerd = await api('/api/office/bank/incasso', { tot, ...ander }, a.kantoor);
   assert.notEqual(verkeerd.status, 200, 'een ceremonie voor een andere grens werd aanvaard');
 
   // de tweede mens tekent, en het geld beweegt
   const saldo = async () => Number(((await api('/api/bank/rekening', { iban: ontvanger.iban }, ontvanger.token)).body.rekening || {}).saldoCenten);
   const voor = await saldo();
-  const ok = await api('/api/office/bank/handtekening/bevestig', { id: r.body.aanvraag.id }, b.kantoor);
+  const id = r.body.aanvraag.id;
+  // ook de TWEEDE handtekening vraagt een ceremonie, en zonder zegt de deur dat
+  const kaal = await api('/api/office/bank/handtekening/bevestig', { id }, b.kantoor);
+  assert.equal(kaal.status, 401, 'de tweede handtekening ging zonder passkey: ' + JSON.stringify(kaal.body).slice(0, 160));
+  assert.equal(kaal.body.bevestigingNodig, true);
+  // een ceremonie van de AANVRAGER dekt de handtekening van de tweede mens niet
+  const vanA = await pk.ceremonie(sleutelA, '/api/office/bank/handtekening/opties', { id }, a.kantoor);
+  assert.notEqual((await api('/api/office/bank/handtekening/bevestig', { id, ...vanA }, b.kantoor)).status, 200,
+    'de ceremonie van de aanvrager werd aanvaard als handtekening van de tweede mens');
+  const cB = await pk.ceremonie(sleutelB, '/api/office/bank/handtekening/opties', { id }, b.kantoor);
+  const ok = await api('/api/office/bank/handtekening/bevestig', { id, ...cB }, b.kantoor);
   assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 200));
   assert.equal(await saldo() - voor, 100, 'de incassoronde heeft geen geld verplaatst');
 
@@ -135,7 +141,46 @@ test('een medewerker met passkey start de incassoronde met een ceremonie, en de 
   assert.equal(dos.body.dossier.rond, true, 'open assen: ' + (dos.body.dossier.open || []).join(', '));
 });
 
-test('de ceremonie-deur staat niet open voor de gedeelde code', async () => {
+test('de ceremonie-deuren staan niet open voor de gedeelde code', async () => {
   const r = await api('/api/office/bank/incasso/opties', { tot: Date.now() }, gedeeld);
   assert.equal(r.status, 403, JSON.stringify(r.body).slice(0, 160));
+  const h = await api('/api/office/bank/handtekening/opties', { id: 'x' }, gedeeld);
+  assert.equal(h.status, 403, JSON.stringify(h.body).slice(0, 160));
+});
+
+/* NU DICHT VOOR GELDHANDELINGEN (besluit eigenaar, 25 september 2026). Een
+   medewerker zonder passkey kwam tot dan op de terugval door, met een melding aan
+   de beveiliging. Dat is voor geld dicht: de weigering is 403 met de weg erheen
+   (`passkey-zetten`), bij de aanvraag EN bij de tweede handtekening. Rood staan
+   raakt geen geld en blijft op de oude regels -- dat is de tegenproef, want de
+   goedkoopste implementatie van "dicht" is alles dicht. */
+test('zonder passkey: geen incassoronde en geen tweede handtekening onder geld, wel onder rood staan', async () => {
+  const c = await medewerker(3);
+  const d = await medewerker(4);
+  const incasso = await api('/api/office/bank/incasso', { tot: Date.now() + 31 * 86400000 }, c.kantoor);
+  assert.equal(incasso.status, 403, JSON.stringify(incasso.body).slice(0, 160));
+  assert.equal(incasso.body.watNu, 'passkey-zetten', 'de weigering zegt niet hoe het wel kan');
+
+  // een geldaanvraag van iemand MET passkey, die een medewerker zonder niet mag aftekenen
+  const e = await medewerker(5);
+  const sleutelE = await pk.zet(e.lid);
+  const betaler = await lidMetRekening('Betaler twee');
+  const ontvanger = await lidMetRekening('Ontvanger twee');
+  await api('/api/bank/storten', { iban: betaler.iban, centen: 500, idem: 'kp-stort2-' + Date.now() }, betaler.token);
+  await api('/api/bank/terugkerend/zet', { vanIban: betaler.iban, naarIban: ontvanger.iban,
+    centen: 100, interval: 'maand', oms: 'Zonder passkey', idem: 'kp-inc2-' + Date.now() }, betaler.token);
+  const tot = Date.now() + 32 * 86400000;
+  const aan = await api('/api/office/bank/incasso',
+    { tot, ...(await pk.ceremonie(sleutelE, '/api/office/bank/incasso/opties', { tot }, e.kantoor)) }, e.kantoor);
+  assert.equal(aan.body.needsAuth, true, JSON.stringify(aan.body).slice(0, 160));
+  const bev = await api('/api/office/bank/handtekening/bevestig', { id: aan.body.aanvraag.id }, d.kantoor);
+  assert.equal(bev.status, 403, JSON.stringify(bev.body).slice(0, 160));
+  assert.equal(bev.body.watNu, 'passkey-zetten');
+
+  // de tegenproef: rood staan raakt geen geld, en daar tekent een tweede mens zonder passkey gewoon af
+  const rek = await lidMetRekening('Roodstaander');
+  const rood = await api('/api/office/bank/rekening/rood', { iban: rek.iban, euro: 100 }, c.kantoor);
+  assert.equal(rood.body.needsAuth, true, JSON.stringify(rood.body).slice(0, 160));
+  const ok = await api('/api/office/bank/handtekening/bevestig', { id: rood.body.aanvraag.id }, d.kantoor);
+  assert.equal(ok.status, 200, 'rood staan vraagt ineens een passkey: ' + JSON.stringify(ok.body).slice(0, 160));
 });

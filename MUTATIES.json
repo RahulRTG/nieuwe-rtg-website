@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T03:29:59.551Z",
-    "commit": "d3cce9ce",
+    "op": "2026-09-25T03:10:14.853Z",
+    "commit": "116eecf91",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5289,6 +5289,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "magnaatmarkt.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "magnaatonderneming.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5874,14 +5882,6 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
-    },
-    "money012.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/betaalopdracht/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 6,
-      "geprobeerd": 3
     },
     "motor-vingerafdruk.test.js": {
       "soort": "puur",

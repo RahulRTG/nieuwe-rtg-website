@@ -19,8 +19,8 @@
 const R = require('./regels');
 const { meld } = require('./staat');
 
-const OORDELEN = { 'te-makkelijk': 'Te makkelijk', goed: 'Goed zo', 'te-zwaar': 'Te zwaar' };
-const MOMENTEN = {
+const OORDEELSOORTEN = { 'te-makkelijk': 'Te makkelijk', goed: 'Goed zo', 'te-zwaar': 'Te zwaar' };
+const OORDEELMOMENTEN = {
   voorbij: 'dit leven is voorbij',
   zelfstandig: 'je kunt van je eigen bedrijf leven',
   onderneming: 'je hebt je onderneming ingeschreven'
@@ -31,14 +31,14 @@ const MAX = 2000, TEKST = 280;
 function oordeelOpen(st) {
   const gedaan = st.oordelen || {};
   const bereikt = { voorbij: !!st.voorbij, zelfstandig: !!st.zelfstandigMag, onderneming: !!st.onderneming };
-  return Object.keys(MOMENTEN).find(m => bereikt[m] && !gedaan[m]) || null;
+  return Object.keys(OORDEELMOMENTEN).find(m => bereikt[m] && !gedaan[m]) || null;
 }
 
 function oordeelGeef(st, z, lijst, nu) {
   const moment = oordeelOpen(st);
   if (!moment) return { status: 400, error: 'Er staat nu geen vraag open over hoe het speelt.' };
   if (z.moment !== moment) return { status: 400, error: 'Die vraag staat niet (meer) open.' };
-  if (z.oordeel !== 'overslaan' && !Object.prototype.hasOwnProperty.call(OORDELEN, z.oordeel)) {
+  if (z.oordeel !== 'overslaan' && !Object.prototype.hasOwnProperty.call(OORDEELSOORTEN, z.oordeel)) {
     return { status: 400, error: 'Kies te makkelijk, goed zo of te zwaar, of sla de vraag over.' };
   }
   /* Een antwoord sluit ook de eerdere momenten die nog openstonden: wie op het
@@ -57,15 +57,15 @@ function oordeelGeef(st, z, lijst, nu) {
 
 /* Wat het kantoor ziet: tellingen per niveau en moment, en de laatste regels tekst. */
 function oordeelOverzicht(lijst) {
-  const leeg = () => Object.fromEntries(Object.keys(OORDELEN).map(o => [o, 0]));
+  const leeg = () => Object.fromEntries(Object.keys(OORDEELSOORTEN).map(o => [o, 0]));
   const perNiveau = {};
-  for (const n of Object.keys(R.MOEILIJKHEID)) perNiveau[n] = Object.fromEntries(Object.keys(MOMENTEN).map(m => [m, leeg()]));
+  for (const n of Object.keys(R.MOEILIJKHEID)) perNiveau[n] = Object.fromEntries(Object.keys(OORDEELMOMENTEN).map(m => [m, leeg()]));
   for (const x of lijst) {
     const cel = perNiveau[x.moeilijkheid] && perNiveau[x.moeilijkheid][x.moment];
     if (cel && Object.prototype.hasOwnProperty.call(cel, x.oordeel)) cel[x.oordeel] += 1;
   }
   return {
-    totaal: lijst.length, max: MAX, oordelen: OORDELEN, momenten: MOMENTEN, perNiveau,
+    totaal: lijst.length, max: MAX, oordelen: OORDEELSOORTEN, momenten: OORDEELMOMENTEN, perNiveau,
     regels: lijst.filter(x => x.tekst).slice(-20).reverse()
       .map(x => ({ moeilijkheid: x.moeilijkheid, moment: x.moment, dag: x.dag, oordeel: x.oordeel, tekst: x.tekst, op: x.op })),
     grens: 'Anoniem: geen sessiesleutel, geen codenaam, geen wereld. Tellingen per niveau en moment, nooit per speler.',
@@ -73,4 +73,4 @@ function oordeelOverzicht(lijst) {
   };
 }
 
-module.exports = { oordeelOpen, oordeelGeef, oordeelOverzicht, OORDELEN, MOMENTEN, MAX, TEKST };
+module.exports = { oordeelOpen, oordeelGeef, oordeelOverzicht, OORDEELSOORTEN, OORDEELMOMENTEN, MAX, TEKST };

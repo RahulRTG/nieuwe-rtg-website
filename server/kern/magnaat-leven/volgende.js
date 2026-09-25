@@ -10,15 +10,15 @@ const { AANBOD } = require('./klanten');
 const { euro, tijd: duur } = require('./staat');
 const { rest } = require('./tijd');
 const { contractAanbod, bedrijfHandelingen } = require('./volgende-bedrijf');
-const { oordeelOpen, OORDELEN, MOMENTEN } = require('./oordeel');
+const { oordeelOpen, OORDEELSOORTEN, OORDEELMOMENTEN } = require('./oordeel');
 
 function handelingenNu(st) {
   const uit = [];
   const zet = (actie, label, waarom, invoer) => uit.push({ actie, label, waarom, invoer: invoer || null });
   const oordeel = () => {
     const moment = oordeelOpen(st);
-    if (moment) zet('oordeel', 'Hoe speelt het?', 'Nu ' + MOMENTEN[moment] + ': is het spel te makkelijk, goed zo of te zwaar? Anoniem, en overslaan mag.',
-      { moment, oordeel: Object.entries(OORDELEN).map(([id, naam]) => ({ id, naam })).concat({ id: 'overslaan', naam: 'Overslaan' }), toelichting: 'tekst' });
+    if (moment) zet('oordeel', 'Hoe speelt het?', 'Nu ' + OORDEELMOMENTEN[moment] + ': is het spel te makkelijk, goed zo of te zwaar? Anoniem, en overslaan mag.',
+      { moment, oordeel: Object.entries(OORDEELSOORTEN).map(([id, naam]) => ({ id, naam })).concat({ id: 'overslaan', naam: 'Overslaan' }), toelichting: 'tekst' });
   };
   /* Een leven dat voorbij of bevroren is, heeft geen handelingen meer, behalve zeggen hoe het speelde: opnieuw beginnen vraagt een bevestiging op het scherm. */
   if (st.bevroren) return uit;

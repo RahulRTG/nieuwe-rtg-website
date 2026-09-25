@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T02:21:55.678Z",
-    "commit": "793020659",
+    "op": "2026-09-25T03:30:03.648Z",
+    "commit": "1a4685e8",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -8315,6 +8315,14 @@
       "operator": "return-weg#2",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "signing-repetitie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/release-trust.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "simulatiebank.test.js": {
       "soort": "server",

@@ -29,6 +29,8 @@ function werkminuten(m, dag) {
 }
 
 function werkplek(st, m) {
+  /* In een eigen bedrijfsruimte (V3) werkt je team daar, en is er geen losse werkplek. */
+  if (st.vestiging && st.vestiging.wijk !== 'thuis') { m.werkplekVolgende = st.dag + B.WERKPLEK.elke; return; }
   post(st, { soort: 'werkplek', naam: B.WERKPLEK.naam + ' voor ' + m.naam, bedrag: B.WERKPLEK.bedrag, dag: st.dag,
     leverancier: B.WERKPLEK.leverancier, naar: ['kosten', 'werkplek'], boekSoort: 'WERKPLEK' });
   m.werkplekVolgende = st.dag + B.WERKPLEK.elke;

@@ -29,7 +29,7 @@ function nieuw({ wereld, nu }) {
     boek: null
   };
   for (const v of R.VERPLICHTINGEN) post(st, { soort: v.id, naam: v.naam, bedrag: v.bedrag, dag: v.eerste });
-  return st;
+  return zorgBedrijf(st);
 }
 
 function meld(st, tekst, soort = 'info') {
@@ -65,10 +65,18 @@ function zorgBedrijf(st) {
   for (const [k, v] of [['team', []], ['handel', null], ['leveringen', []], ['contracten', []], ['contractTeller', 0]]) {
     if (st[k] === undefined) st[k] = Array.isArray(v) ? [] : v;
   }
+  /* V3: de markt en waar je bedrijf zit. De concurrenten beginnen op hun eigen prijs. */
+  if (!st.vestiging) st.vestiging = { wijk: 'thuis', sinds: st.dag, volgende: null };
+  if (!st.markt) {
+    const prijzen = {};
+    for (const lijst of Object.values(require('./regels-markt').CONCURRENTEN)) for (const c of lijst) prijzen[c.id] = c.prijs;
+    st.markt = { prijzen, klanten: [], leadTeller: 0 };
+  }
   return st;
 }
 
-const klantVan = (st, klantId) => klantenVan(st.aanbod).find(k => k.id === klantId) || null;
+const klantVan = (st, klantId) => klantenVan(st.aanbod).find(k => k.id === klantId) ||
+  ((st.markt || {}).klanten || []).find(k => k.id === klantId) || null;
 const deal = (st, id) => st.deals.find(d => d.id === String(id || '')) || null;
 const euro = (cent) => {
   const a = Math.abs(cent), heel = String(Math.floor(a / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');

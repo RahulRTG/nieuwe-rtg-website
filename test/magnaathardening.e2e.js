@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpNetstilte } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -41,7 +41,7 @@ test('V5: een verloren antwoord wordt opnieuw gevraagd, en de dag gaat maar een 
     });
     await page.locator('.vn-acties button', { hasText: 'Sluit de dag af' }).click();
     await page.waitForFunction(() => /dinsdag, dag 2/.test(document.getElementById('vnDag').textContent), null, { timeout: 15000 });
-    await page.waitForTimeout(500);
+    await wachtOpNetstilte(page);                // geen derde verzoek meer onderweg
     assert.equal(verzoeken.length, 2, 'een keer verstuurd, een keer opnieuw');
     assert.equal(verzoeken[0].verzoek, verzoeken[1].verzoek, 'met dezelfde sleutel');
     const s = await (await fetch(base + '/api/member/magnaat/leven/staat', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + r.token }, body: '{}' })).json();

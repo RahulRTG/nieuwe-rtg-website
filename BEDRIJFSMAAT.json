@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-25T11:25:16.080Z",
-    "commit": "5b2771ef",
+    "op": "2026-09-25T11:36:33.040Z",
+    "commit": "49edc051",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 4,
     "instrument": "scripts/bedrijfsmaat.js",
     "node": "v22.22.2"
   },
@@ -966,7 +966,7 @@
       "betekenis": "Wat leden via partnerzaken betaalden (orders en ritten). Geld van de zaak, niet van RTG.",
       "wereld": "commercieel",
       "bronnen": [
-        "server/kern/kantoor/metrics.js"
+        "server/kern/kantoor/metrics-week.js"
       ],
       "berekening": "som van betaalde orders (total) en ritten (quote) per dag, zeven dagen terug",
       "eenheid": "euro per dag en per week",
@@ -987,7 +987,7 @@
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/kantoor/metrics.js",
+              "bestand": "server/kern/kantoor/metrics-week.js",
               "citaat": "betaaldeOrders.filter",
               "klopt": true
             }
@@ -1003,7 +1003,7 @@
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/kantoor/metrics.js",
+              "bestand": "server/kern/kantoor/metrics-week.js",
               "citaat": "omzetWeek:",
               "klopt": true
             }
@@ -1021,7 +1021,7 @@
         "afgedwongen": true,
         "citaten": [
           {
-            "bestand": "server/kern/kantoor/metrics.js",
+            "bestand": "server/kern/kantoor/metrics-week.js",
             "citaat": "zaken.size < ZAKEN_GRENS ? dicht(dag) : dag",
             "klopt": true
           }
@@ -1083,7 +1083,7 @@
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/kantoor/metrics.js",
+              "bestand": "server/kern/kantoor/metrics-week.js",
               "citaat": "const fondsAfdracht = {",
               "klopt": true
             }

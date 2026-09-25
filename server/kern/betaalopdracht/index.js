@@ -56,6 +56,7 @@ module.exports = function maakBetaalopdrachten(opties) {
     claimId: o.claimId || null,
     tariefCenten: o.tariefCenten || 0, settlementRef: o.settlementRef || null,
     pogingen: o.pogingen, volgendeAt: o.volgendeAt || null, laatsteFout: o.laatsteFout || null,
+    misschienVerstuurd: !!o.misschienVerstuurd,
     afwikkelingNodig: !!o.afwikkelingNodig, afwikkelingVerwerktAt: o.afwikkelingVerwerktAt || null,
     afwikkelFout: o.afwikkelFout || null,
     at: o.at, klaarAt: o.klaarAt || null

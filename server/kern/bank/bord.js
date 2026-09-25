@@ -36,7 +36,7 @@ module.exports = ({ grootboek, rekeningen, rekMeta, saldoVan, isExtern, saldi, n
       foundationCenten: saldoVan('extern:foundation'),
       railOpenCenten: rail.centen, railOpen: rail.aantal, railMislukt: rail.mislukt,
       railZonderTerugboeking: rail.zonderTerugboeking, railOudsteAt: rail.oudsteAt,
-      railOnbekend: rail.onbekend, railOnbekendeCenten: rail.onbekendeCenten,
+      railOnbekend: rail.onbekend, railOnbekendeCenten: rail.onbekendeCenten, railVerschil: rail.verschil,
       aantalRekeningen: rekN, boekingenVandaag: grootboek().filter(b => nu() - b.at < 86400000).length };
   }
   function overzicht() {

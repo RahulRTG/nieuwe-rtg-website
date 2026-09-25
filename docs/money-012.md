@@ -55,6 +55,35 @@ waar geld het huis echt verlaat, en allebei een schending van wet 1.
   verstuurd". Wie later een echte netwerkrail aansluit, krijgt vanzelf dat
   gedrag.
 
+## ONBEKEND is een tussenstand: de afstemming
+
+ONBEKEND zet het geld vast, zodat het niet dubbel uitgaat. Zonder uitweg zou hij
+het voor altijd vastzetten. `kern/betaalopdracht/afstemming.js` sluit een
+ONBEKENDE opdracht op de uitspraak van de rail, met drie uitkomsten:
+
+| Uitspraak van de rail | Uitkomst | Wat er met het geld gebeurt |
+|---|---|---|
+| uitgevoerd, dit bedrag, deze valuta | **BEVESTIGD** | AFGEWIKKELD, geen teruggang |
+| niet uitgevoerd | **NIET_UITGEVOERD** | MISLUKT, precies één keer teruggeboekt |
+| uitgevoerd, ander bedrag of andere valuta | **VERSCHIL** | niets: de opdracht blijft ONBEKEND en krijgt een verschilzaak met verwacht naast gezien |
+
+Een verschil wordt nooit afgerond of stil gecorrigeerd. Een latere, kloppende
+uitspraak sluit hem, en het verschil blijft in het spoor staan (`opgelostAt`).
+
+**Bewijs dat niet uit een formulier komt.** De echtheid is `CRYPTOGRAPHIC` (een
+ondertekend bericht), `DIRECT_API` (een antwoord op onze eigen vraag) of
+`OVERGENOMEN`. Dat laatste is een afschriftregel die een kantoormens overneemt
+via `POST /api/office/bank/opdrachten/afstemming`. Een tweede mens tekent die
+aanvraag af via de bestaande tweede-handtekeningdeur (besluit van de eigenaar,
+24 september 2026: beide wegen, met vier ogen). De route zet die echtheid zelf;
+het formulier kan hem niet opgeven.
+
+**Waarom niet `economie/runtime/reconciliatie.js`.** Die legt een settlement die
+al bevestigd is naast een afschriftregel: klopt wat de provider zei? Hier is de
+vraag een stap eerder: wat heeft de provider gedaan? Aansluiten zou de bank-SEPA
+en de partneruitbetaling naar het intent/claim-model verhuizen. De vorm is wel
+overgenomen: alleen geauthenticeerd bewijs, en een afwijking wordt een zaak.
+
 ## Welke proef welke wet dekt
 
 | Wet | Uitgaand (betaalopdracht) | Inkomend en grootboek (bestond al) |
@@ -62,7 +91,7 @@ waar geld het huis echt verlaat, en allebei een schending van wet 1.
 | 1 Behoud | `test/money012.test.js`: alle 64 storingsvolgordes, nooit uitgevoerd én teruggeboekt, en na afstemming precies één van beide | `geld-conservatie-last`, `magnaat-rtgketen` (nul verschil), sluitcontrole in `kern/pay/kijken.js` |
 | 2 Eén gevolg | idem: één sleutel per opdracht, hooguit één uitvoering en één teruggang | `betaalwebhook-fouten` (dubbele webhooks), `betaalstore`, `payout-terugboeking` (+ sqlite, pg), `banknood-idem` |
 | 3 Herstel | idem, alle 64 volgordes ook met een herstart na elke stap (de rij door JSON, zoals op schijf) | `betaalwaarheid` (sleutel overleeft herstart), `duurzaamheid-kill`, `betaalwebhook-fouten` (crash tussen teruggang en save) |
-| 4 Afstemming | ONBEKEND is zichtbaar in de reconciliatie; een rail die nog geen uitsluitsel geeft, houdt hem ONBEKEND | `betaalwaarheid` (bedrag wijkt af → CONTROLE_NODIG), `economic-runtime` (verschil → EXCEPTION) |
+| 4 Afstemming | ONBEKEND is zichtbaar in de reconciliatie; alle 64 volgordes sluiten ook via de afschriftweg; BEVESTIGD, NIET_UITGEVOERD en VERSCHIL (bedrag én valuta) elk apart; zonder echtheid of bron geen afstemming; de route maakt geen aanvraag voor een opdracht die niet ONBEKEND is | `betaalwaarheid` (bedrag wijkt af → CONTROLE_NODIG), `economic-runtime` (verschil → EXCEPTION) |
 
 De meter kan uitslaan. De tegenproef laat de rail een verloren antwoord als "niet
 verstuurd" melden (het oude gedrag), en dan vindt de sweep geld uit niets. Vier
@@ -73,11 +102,19 @@ en wees een overbodige tak aan; die is verwijderd.
 
 MONEY-012 is pas gesloten als deze punten dicht zijn of met reden uitgesloten.
 
-- **Afstemming met het afschrift van de provider.** `kern/pay/bewijs.js`
-  `afstemming()` leest `payAfstemming`, maar niets schrijft dat. De controle staat
-  daarom altijd op `niet-bewezen`. Er is geen weg die het afschrift van een
-  provider naast het grootboek legt. Voor de Foundation-afdracht bestaat die vorm
-  wel (`kern/economie/runtime/reconciliatie.js`).
+- **Afschrift ophalen en het Pay-bewijsbord.** Een ONBEKENDE uitbetaling kan nu
+  worden afgesloten. Het afschrift *ophalen* bestaat nog niet: er is geen echte
+  uitbetaalrail en geen statusvraag (`haalUitbetaling`). `kern/pay/bewijs.js`
+  `afstemming()` leest `payAfstemming`, maar niets schrijft dat, dus die controle
+  staat nog altijd op `niet-bewezen`. Die gaat over het Pay-grootboek (de
+  inkomende kant) en hoort bij het volgende punt.
+- **De ondertekende webhook als afstemkanaal.** Een payout-webhook vindt zijn
+  opdracht op de referentie van de rail. Bij een verloren antwoord kent RTG die
+  referentie niet, dus zo'n opdracht sluit vandaag via een herinzending of via de
+  afschriftweg, en niet via de webhook.
+- **Het kantoorbord.** Het bord toont ONBEKEND en het aantal verschilzaken
+  (`railVerschil`). Een formulier voor de afstemming staat er nog niet: de route
+  wordt vandaag rechtstreeks aangeroepen.
 - **Inkomend: oude oplaadweg.** `kern/pay/opladen.js` `laadOp` geeft bij een fout
   502 zonder iets vast te leggen. Een betaling die niet `betaald` is, blijft in
   `kaartWachtend` staan zonder statusvraag of veegronde.

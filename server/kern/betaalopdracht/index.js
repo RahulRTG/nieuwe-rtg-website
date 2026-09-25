@@ -56,7 +56,7 @@ module.exports = function maakBetaalopdrachten(opties) {
     claimId: o.claimId || null,
     tariefCenten: o.tariefCenten || 0, settlementRef: o.settlementRef || null,
     pogingen: o.pogingen, volgendeAt: o.volgendeAt || null, laatsteFout: o.laatsteFout || null,
-    misschienVerstuurd: !!o.misschienVerstuurd,
+    misschienVerstuurd: !!o.misschienVerstuurd, verschil: o.verschil || null,
     afwikkelingNodig: !!o.afwikkelingNodig, afwikkelingVerwerktAt: o.afwikkelingVerwerktAt || null,
     afwikkelFout: o.afwikkelFout || null,
     at: o.at, klaarAt: o.klaarAt || null
@@ -155,8 +155,9 @@ module.exports = function maakBetaalopdrachten(opties) {
   const inzending = require('./inzending')(ctx);
   ctx.dienIn = inzending.dienIn;
   ctx.draaiTerug = inzending.draaiTerug;   // bevestig() met een mislukking gebruikt dezelfde teruggang
+  const { stemAf } = require('./afstemming')(ctx);   // ONBEKEND sluiten op de uitspraak van de rail
 
   return { STATUS, maak, publiek, registreerTeruggang, registreerAfwikkeling,
-    dienIn: inzending.dienIn, ...derij };
+    dienIn: inzending.dienIn, stemAf, ...derij };
 };
 module.exports.STATUS = STATUS;

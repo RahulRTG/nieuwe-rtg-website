@@ -33,7 +33,7 @@ const RAM_MAX = 50000;
 function maakOpenstaandOverzicht(rij) {
   const uit = { status: 200, aantal: 0, centen: 0, perStatus: {}, oudsteAt: null,
     mislukt: 0, mislukteCenten: 0, zonderTerugboeking: 0, zonderAfwikkeling: 0,
-    onbekend: 0, onbekendeCenten: 0 };
+    onbekend: 0, onbekendeCenten: 0, verschil: 0 };
   for (const o of rij) {
     uit.perStatus[o.status] = (uit.perStatus[o.status] || 0) + 1;
     if (o.status === STATUS.AFGEWIKKELD && o.afwikkelingNodig && !o.afwikkelingVerwerktAt)
@@ -46,6 +46,7 @@ function maakOpenstaandOverzicht(rij) {
       if (o.terugboekFout) uit.zonderTerugboeking++;
     }
     if (o.status === STATUS.ONBEKEND) { uit.onbekend++; uit.onbekendeCenten += o.centen; }
+    if (o.status === STATUS.ONBEKEND && o.verschil && !o.verschil.opgelostAt) uit.verschil++;
   }
   return uit;
 }

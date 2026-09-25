@@ -138,8 +138,7 @@ module.exports = (ctx) => {
   /* De twee handelingen die een tweede mens vragen, plus het loket waar die
      tekent. Eigen bestand: ./bank-rekeningen ging er anders over de 10 KB, en
      de naad is een echte -- daar staan de knoppen, hier de ceremonie. */
-  const { geldPasskey } = require('./bank-passkey')(ctx);
-  require('./bank-tweedehand')(Object.assign({}, ctx, { naam, geldPasskey }));
+  require('./bank-tweedehand')(Object.assign({}, ctx, { naam }));
   /* De gouden weg (MACHINE.md): de incassoronde langs de hele machine. Eigen
      bestand om dezelfde reden als hierboven -- ./bank-rekeningen ging er anders
      over de 10 KB, en het IS een ander onderwerp. */

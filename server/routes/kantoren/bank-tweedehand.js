@@ -31,7 +31,8 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { app, kluisAuth, veilig, afdelingen, sseToOffice, kern, tweedeHand, geldPasskey } = ctx;
+  const { app, kluisAuth, veilig, afdelingen, sseToOffice, kern, tweedeHand } = ctx;
+  const { geldPasskey } = require('./bank-passkey')(ctx);
   const bank = kern.bank;
   const sync = () => sseToOffice('sync', { scope: 'bank' });
 

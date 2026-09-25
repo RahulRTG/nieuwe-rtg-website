@@ -17,26 +17,30 @@
    Dezelfde deur als de handeling zelf (kluisAuth: een naam, nooit de gedeelde
    code). `geldPasskey` is de controle die de bevestig-route voor zich zet.
 
-   Gemount vanuit ./bank.js, met dezelfde context. */
+   Gemount vanuit ./bank-tweedehand.js, dat de controle voor zijn bevestig-route
+   nodig heeft; zo komt er geen nieuwe naam in de gedeelde kern-context bij. */
 'use strict';
 
 module.exports = (ctx) => {
   const { app, kluisAuth, zwaar, boardroomUser, tweedeHand } = ctx;
 
-  const loket = (pad, actie, binding) => app.post(pad, kluisAuth, async (req, res) => {
-    const b = binding(req.body || {});
-    if (!b) return res.status(400).json({ error: 'Voor welke handeling? Die ontbreekt of klopt niet.' });
-    const r = await zwaar.opties(boardroomUser(req), actie, b, req);
+  /* Twee routes met hun pad LETTERLIJK in de aanroep: de schakelkast leest paden
+     uit de bron, en een pad dat een helper opbouwt ziet hij niet. */
+  async function loket(req, res, actie, binding) {
+    if (!binding) return res.status(400).json({ error: 'Voor welke handeling? Die ontbreekt of klopt niet.' });
+    const r = await zwaar.opties(boardroomUser(req), actie, binding, req);
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);
-  });
+  }
 
-  loket('/api/office/bank/incasso/opties', 'bank.incasso', (b) => {
-    const tot = b.tot != null ? Number(b.tot) : NaN;
-    return Number.isFinite(tot) ? 'incasso:' + tot : null;
+  app.post('/api/office/bank/incasso/opties', kluisAuth, (req, res) => {
+    const tot = (req.body || {}).tot != null ? Number(req.body.tot) : NaN;
+    return loket(req, res, 'bank.incasso', Number.isFinite(tot) ? 'incasso:' + tot : null);
   });
-  loket('/api/office/bank/handtekening/opties', 'bank.bevestig', (b) =>
-    (b.id && tweedeHand.raaktGeld(String(b.id))) ? 'handtekening:' + String(b.id) : null);
+  app.post('/api/office/bank/handtekening/opties', kluisAuth, (req, res) => {
+    const id = String((req.body || {}).id || '');
+    return loket(req, res, 'bank.bevestig', id && tweedeHand.raaktGeld(id) ? 'handtekening:' + id : null);
+  });
 
   /* Voor de bevestig-route: raakt de aanvraag geld, dan eerst de passkey van de
      tweede mens, zonder terugval. Anders ongemoeid (een onbekende aanvraag geeft

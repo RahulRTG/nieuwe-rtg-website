@@ -32,10 +32,9 @@
   /* Elke handeling draagt een eigen sleutel. Valt de verbinding weg, dan gaat
      dezelfde handeling met dezelfde sleutel nog een keer: de server voert hem
      hooguit een keer uit, dus je sluit geen dag twee keer af (V5). */
-  var teller = 0;
   function doe(body) {
     meldFout('');
-    body.verzoek = Date.now().toString(36) + '-' + (++teller);
+    body.verzoek = window.RTGId('vn');
     var klaar = function (s) { KEUZE = null; teken(s); };
     return vraag('actie', body).then(klaar).catch(function (e) {
       if (!(e instanceof TypeError)) { meldFout(e.message); return; }

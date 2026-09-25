@@ -26,7 +26,9 @@ const vrijNu = (v) => v.s.vrijVandaag - (v.s.vrijVandaag % 30);
 
 /* De eerste klant, van project tot factuur -- zoals in magnaatleven.test.js. */
 function totDeFactuur(v) {
-  while (!v.deal('kans')) { if (vrijNu(v)) v.doe({ actie: 'plan', wat: 'project', dag: v.s.dag, minuten: vrijNu(v) }); v.slaap(); }
+  /* Hooguit dertig dagen: een toets die op een kapotte klok eindeloos wacht, zakt nooit. */
+  for (let i = 0; i < 30 && !v.deal('kans'); i++) { if (vrijNu(v)) v.doe({ actie: 'plan', wat: 'project', dag: v.s.dag, minuten: vrijNu(v) }); v.slaap(); }
+  assert.ok(v.deal('kans'), 'binnen dertig dagen komt er een kans');
   v.ok({ actie: 'gesprek', deal: v.deal('kans').id });
   const id = v.deal('onderhandeling').id;
   v.ok({ actie: 'voorstel', deal: id, bedrag: 800, voorschot: 25 });

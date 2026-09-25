@@ -12,16 +12,21 @@
 const R = require('./regels');
 const { meld, ontgrendel, deal: vindDeal, euro, tijd } = require('./staat');
 const { boekVan } = require('./boek');
+const { werkminuten, teamlid } = require('./team');
 
 const WAT = { project: 'eigen project', leren: 'leren', opdracht: 'opdracht', extra: 'extra dienst', gesprek: 'klantgesprek' };
 
-function vrij(st, dag) {
+/* `wie` is jij (leeg of 'ik') of iemand uit je team (V2, ./team.js): ieder heeft
+   zijn eigen uren, en die kunnen niet naar een ander. */
+const van = (wie) => (wie && wie !== 'ik' ? wie : 'ik');
+function vrij(st, dag, wie) {
+  if (van(wie) !== 'ik') return werkminuten(teamlid(st, wie), dag);
   const w = R.weekdag(dag);
   /* Zonder baan komen de dienstdagen vrij: dan heb je er zeven uur. */
   return !st.baan.actief && st.baan.dienstdagen.includes(w) ? 420 : R.VRIJ[w];
 }
-const gepland = (st, dag) => (st.agenda[dag] || []).reduce((s, x) => s + x.minuten, 0);
-const rest = (st, dag) => vrij(st, dag) - gepland(st, dag);
+const gepland = (st, dag, wie) => (st.agenda[dag] || []).filter(x => van(x.wie) === van(wie)).reduce((s, x) => s + x.minuten, 0);
+const rest = (st, dag, wie) => vrij(st, dag, wie) - gepland(st, dag, wie);
 
 const fout = (error) => ({ status: 400, error });
 
@@ -30,6 +35,15 @@ function plan(st, z) {
   if (!Number.isInteger(dag) || dag < st.dag || dag > st.dag + 6) return fout('Je plant vandaag en de zes dagen daarna.');
   if (!WAT[wat] || wat === 'gesprek') return fout('Plan tijd voor je project, om te leren, voor een opdracht of voor een extra dienst.');
   const regel = { wat, minuten };
+  const wie = van(z.wie);
+  if (wie !== 'ik') {
+    const m = teamlid(st, wie);
+    if (!m) return fout('Die persoon werkt niet voor je.');
+    if (wat !== 'opdracht') return fout(m.naam + ' werkt aan je opdrachten. Je eigen project en wat je leert, blijven van jou.');
+    if (m.gestaakt) return fout(m.naam + ' werkt niet zolang zijn loon niet betaald is.');
+    if (!werkminuten(m, dag)) return fout(m.naam + ' werkt op ' + m.dagen.map(w => R.DAGNAMEN[w]).join(', ') + (m.einde != null ? ', tot en met dag ' + m.einde : '') + '.');
+    regel.wie = m.id;
+  }
   if (wat === 'extra') {
     if (!st.baan.actief) return fout('Je hebt geen baan meer om een extra dienst te draaien.');
     if (R.weekdag(dag) !== st.baan.extra.dag) return fout('De keuken vraagt extra mensen op ' + R.DAGNAMEN[st.baan.extra.dag] + '.');
@@ -48,8 +62,9 @@ function plan(st, z) {
     }
     regel.deal = d.id;
   }
-  if (rest(st, dag) < regel.minuten) {
-    return fout('Op ' + R.dagNaam(dag) + ' heb je nog ' + tijd(Math.max(0, rest(st, dag))) + ' vrij, en dit kost ' + tijd(regel.minuten) + '.');
+  if (rest(st, dag, wie) < regel.minuten) {
+    return fout('Op ' + R.dagNaam(dag) + (wie === 'ik' ? ' heb je' : ' heeft ' + teamlid(st, wie).naam) + ' nog ' + tijd(Math.max(0, rest(st, dag, wie))) +
+      ' vrij, en dit kost ' + tijd(regel.minuten) + '.');
   }
   (st.agenda[dag] = st.agenda[dag] || []).push(regel);
   ontgrendel(st, 'agenda');
@@ -82,7 +97,15 @@ function voerUit(st) {
         meld(st, 'Je software staat stil omdat hij niet betaald is: ' + tijd(x.minuten) + ' werk ging verloren.', 'slecht');
         continue;
       }
-      d.gedaan = Math.min(d.afspraak.minuten, d.gedaan + x.minuten);
+      let werk = x.minuten;
+      if (x.wie) {
+        const m = st.team.find(t => t.id === x.wie);
+        if (!m || m.weg) continue;
+        if (m.gestaakt) { meld(st, m.naam + ' werkte niet: zijn loon is niet betaald. ' + tijd(x.minuten) + ' bleef liggen.', 'slecht'); continue; }
+        if (m.contract === 'inhuur') m.gewerkt += x.minuten;
+        werk = Math.floor(x.minuten * m.tempo / 100);
+      }
+      d.gedaan = Math.min(d.afspraak.minuten, d.gedaan + werk);
       if (d.gedaan >= d.afspraak.minuten) meld(st, 'Het werk voor ' + d.klant + ' is af. Lever het op.', 'goed');
     }
   }

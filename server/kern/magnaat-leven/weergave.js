@@ -12,6 +12,7 @@ const { euro } = require('./staat');
 const { vrij, gepland, rest, WAT } = require('./tijd');
 const { sneller } = require('./gesprek');
 const { handelingenNu } = require('./volgende');
+const { prognose, bedrijfExtra } = require('./weergave-bedrijf');
 
 function dealBeeld(d) {
   const f = d.factuur;
@@ -31,7 +32,8 @@ function weekAgenda(st) {
     dagen.push({ dag, naam: R.DAGNAMEN[w], dienst: st.baan.actief && st.baan.dienstdagen.includes(w), loondag: st.baan.actief && w === st.baan.loondag,
       vrij: vrij(st, dag), gepland: gepland(st, dag), rest: rest(st, dag),
       items: (st.agenda[dag] || []).map((x, i) => ({ index: i, wat: x.wat, naam: WAT[x.wat], minuten: x.minuten,
-        klant: x.deal ? (st.deals.find(d => d.id === x.deal) || {}).klant : null })),
+        klant: x.deal ? (st.deals.find(d => d.id === x.deal) || {}).klant : null,
+        door: x.wie ? ((st.team || []).find(m => m.id === x.wie) || {}).naam || null : null })),
       betalingen: st.posten.filter(p => p.dag === dag || (dag === st.dag && p.dag < dag)).map(p => ({ naam: p.naam, bedrag: p.bedrag, achterstand: !!p.achterstand })) });
   }
   return dagen;
@@ -47,6 +49,8 @@ function aandacht(st, c) {
     if (d.fase === 'overeenkomst' && d.afspraak.deadline - st.dag <= 3) uit.push({ soort: 'vraag', tekst: 'Het werk voor ' + d.klant + ' moet ' + (d.afspraak.deadline < st.dag ? 'al af zijn' : 'op ' + R.dagNaam(d.afspraak.deadline) + ' af zijn') + '.' });
   }
   if (st.software && st.software.gepauzeerd) uit.push({ soort: 'nood', tekst: 'Je software staat stil tot hij betaald is: zolang kun je niet aan een opdracht werken.' });
+  const pr = st.onderneming ? prognose(st) : null, tekort = pr && pr.weken.find(w => w.eind < 0);
+  if (tekort) uit.push({ soort: 'nood', tekst: 'Volgens je prognose sta je in week ' + tekort.week + ' ' + euro(-tekort.eind) + ' tekort, als er niets bij komt.' });
   if (c.vorderingen > 0 && st.kas < c.vorderingen) uit.push({ soort: 'info', tekst: 'Je bent ' + euro(c.vorderingen) + ' tegoed, maar dat is nog geen geld.' });
   return uit;
 }
@@ -81,7 +85,8 @@ function beeld(st, boek, nu) {
         ontvangen: d.fase === 'betaald' || d.factuur.gefinancierd, factuur: d.factuur.nummer })),
       komend: st.posten.slice().sort((x, y) => x.dag - y.dag).map(p => ({ id: p.id, naam: p.naam, leverancier: p.leverancier, bedrag: p.bedrag, dag: p.dag, dagNaam: R.dagNaam(Math.max(p.dag, st.dag)), achterstand: !!p.achterstand, uitgesteld: !!p.uitgesteld })),
       facturen: bedrijfDeals.map(d => Object.assign({ klant: d.klant }, d.factuur)),
-      recent: (st.boek.recent || []).slice(0, 12)
+      recent: (st.boek.recent || []).slice(0, 12),
+      prognose: prognose(st)
     },
     netwerk: { contacten: deals },
     wereld: {
@@ -91,11 +96,11 @@ function beeld(st, boek, nu) {
         .concat(deals.filter((d, i, l) => l.findIndex(x => x.klant === d.klant) === i).map(d => ({ naam: d.klant, wat: d.fase === 'afgehaakt' ? 'kent je' : 'klant of kans' }))),
       aanbod: Object.entries(AANBOD).map(([id, x]) => ({ id, naam: x.naam, project: x.project, software: x.software, gekozen: st.aanbod === id }))
     },
-    bedrijf: st.onderneming ? {
+    bedrijf: st.onderneming ? Object.assign({
       naam: st.onderneming.naam, sinds: st.onderneming.sinds, omzet: c.omzet, kosten: c.kosten, resultaat: c.resultaat,
-      balans: { kas: c.kas, vorderingen: c.vorderingen, vooruit: c.vooruit, schuld: c.schuld },
+      balans: { kas: c.kas, vorderingen: c.vorderingen, voorraad: c.voorraad, vooruit: c.vooruit, crediteuren: c.crediteuren, schuld: c.schuld },
       zelfstandig: st.zelfstandig
-    } : null,
+    }, bedrijfExtra(st)) : null,
     rtg: st.rtg
   };
 }

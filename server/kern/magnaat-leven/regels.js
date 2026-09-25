@@ -80,7 +80,11 @@ const RTG = {
   herinneringen: { naam: 'Betaalherinneringen', waarom: 'een klant betaalt te laat' },
   budget: { naam: 'Budget en betalingen', waarom: 'er is meer te betalen dan er op je rekening staat' },
   zakelijk: { naam: 'RTG Zakelijk', waarom: 'je hebt een onderneming ingeschreven' },
-  boekhouding: { naam: 'Boekhouding', waarom: 'je onderneming heeft een resultaat en een balans' }
+  boekhouding: { naam: 'Boekhouding', waarom: 'je onderneming heeft een resultaat en een balans' },
+  personeel: { naam: 'Personeel en planning', waarom: 'je hebt iemand aangenomen' },
+  handel: { naam: 'Inkoop en voorraad', waarom: 'je koopt in bij een leverancier' },
+  contracten: { naam: 'Contracten', waarom: 'een klant wil vast werk' },
+  prognose: { naam: 'Cashflowprognose', waarom: 'je hebt vaste lasten die elke week terugkomen' }
 };
 
 module.exports = { REGELVERSIE, DAG_MS, MAX_DAGEN_PER_KEER, TEMPO, DOORSPOELEN_MAX, START_KAS, PERIODE, DAGNAMEN, weekdag, dagNaam, BAAN, VRIJ,

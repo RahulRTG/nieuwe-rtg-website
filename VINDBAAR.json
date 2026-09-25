@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T20:09:39.661Z",
-    "commit": "ef1a5c26",
+    "op": "2026-09-25T00:57:50.068Z",
+    "commit": "251f8873",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
     "node": "v22.22.2"
   },
@@ -11,14 +11,14 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 99,
-  "woorden": 1209,
+  "woorden": 1208,
   "gevonden": 775,
-  "dekking": 0.641,
+  "dekking": 0.6416,
   "perBestemming": [
     {
       "naam": "Magnaat",
       "url": "/apps/magnaat.html",
-      "woorden": 87,
+      "woorden": 86,
       "gevonden": 35,
       "mist": [
         "werkvloer",
@@ -35,10 +35,10 @@
         "partnerwereld",
         "future",
         "alsof",
-        "functies",
         "dagdienst",
         "laden",
         "soleerd",
+        "functies",
         "functiehal",
         "wereldkaart",
         "waarin",
@@ -71,8 +71,7 @@
         "hervat",
         "overdragen",
         "pauzeer",
-        "kamer",
-        "trainingsronde"
+        "kamer"
       ]
     },
     {

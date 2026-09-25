@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T04:19:10.996Z",
-    "commit": "56a1c2762",
+    "op": "2026-09-25T04:23:45.629Z",
+    "commit": "17cf749bc",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5250,6 +5250,13 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "magnaatafwerking.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "magnaatafwerking.test.js": {
       "soort": "puur",

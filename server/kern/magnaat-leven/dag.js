@@ -12,7 +12,8 @@
 
    Met een onderneming (V2) komen er drie bij: je team (loon, werkplekken,
    wie vertrekt) en je handel (leveringen, verkoop) voor de betalingen, en na de
-   klanten je contracten.
+   klanten je contracten. De markt (V3) komt vlak na je team: huur van je
+   bedrijfsruimte, en op maandag de concurrenten en nieuwe klanten.
 
    Dat laatste is het punt van V1: je richt geen bedrijf op omdat een knop dat
    zegt. Na twee betaalde opdrachten stelt het spel vast dat je structureel voor
@@ -28,6 +29,8 @@ const { kansen } = require('./gesprek');
 const { teamDag } = require('./team');
 const { handelDag } = require('./voorraad');
 const { contractDag } = require('./contract');
+const { marktDag } = require('./markt');
+const { huurDag } = require('./vestiging');
 
 /* Wat je bedrijf de afgelopen vier weken op je rekening bracht. */
 function ontvangen(st, dagen) {
@@ -56,6 +59,8 @@ function volgendeDag(st) {
   voerUit(st);
   st.dag += 1;
   teamDag(st);
+  huurDag(st);
+  marktDag(st);
   handelDag(st);
   startDag(st);
   klantDag(st);

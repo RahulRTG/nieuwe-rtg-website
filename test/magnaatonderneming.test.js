@@ -156,12 +156,12 @@ test('handel: de eerste bestelling vooraf, daarna krediet, voorraad is geld op d
   assert.equal(v.L.verifieer('lid').ok, true);
 });
 
-test('de vraag hangt aan je prijs en je klanten; wat er niet ligt, is een gemiste verkoop', () => {
+test('de vraag hangt aan je prijs; wat er niet ligt, is een gemiste verkoop', () => {
   const v = ondernemer('foto');
   v.ok({ actie: 'bestel', aantal: 10 });
   const normaal = v.s.bedrijf.handel.perWeek;
   v.ok({ actie: 'prijs', bedrag: 90 });
-  assert.ok(v.s.bedrijf.handel.perWeek < normaal / 3, 'twee keer zo duur verkoopt een kwart');
+  assert.ok(v.s.bedrijf.handel.perWeek < normaal / 2, 'twee keer zo duur: minder dan de helft, want de kopers gaan naar de concurrent');
   assert.match(v.doe({ actie: 'prijs', bedrag: 10 }).error, /tussen/);
   v.ok({ actie: 'prijs', bedrag: 25 });
   v.slaap(30);

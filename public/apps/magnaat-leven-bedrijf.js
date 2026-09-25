@@ -9,6 +9,8 @@
   'use strict';
   var STAND = { aanbod: 'aangeboden', actief: 'loopt', afgelopen: 'afgelopen', opgezegd: 'opgezegd', afgewezen: 'afgewezen', verlopen: 'verlopen' };
 
+  var pct = function (p) { return String(p / 10).replace('.', ',') + '%'; };
+
   function teken(s, h) {
     var q = h.q, esc = h.esc, euro = h.euro, duur = h.duur;
     var regels = function (rijen) {
@@ -20,6 +22,18 @@
       plek.innerHTML = '<h3>De komende vier weken</h3>' + regels(p.weken.map(function (w) {
         return ['Week ' + w.week + ' · dag ' + w.van + ' tot ' + w.tot, '+' + euro(w.in) + ' · -' + euro(w.uit) + ' · ' + (w.eind < 0 ? 'tekort ' + euro(-w.eind) : 'daarna ' + euro(w.eind))];
       })) + '<p class="vn-rust">Hier staat alleen wat vaststaat. Niet meegeteld: ' + esc(p.nietMee.join('; ')) + '.</p>';
+    }
+
+    var mk = s.wereld.markt, mplek = q('#vnMarkt');
+    if (mplek && mk) {
+      mplek.innerHTML = '<h3>De markt</h3>' + (mk.concurrenten.length ? regels(mk.concurrenten.map(function (c) {
+        return [c.naam + ' · ' + c.wijk, euro(c.tarief) + ' per uur' + (c.prijs != null ? ' · verkoopt voor ' + euro(c.prijs) : '') +
+          ' · reputatie ' + c.kwaliteit + (c.aandeel != null ? ' · aandeel ' + pct(c.aandeel) : '')];
+      })) + (mk.jouwAandeel != null ? regels([['Jij', 'reputatie ' + mk.kwaliteit + ' · aandeel ' + pct(mk.jouwAandeel)]]) : '') +
+        '<p class="vn-rust">' + esc(mk.uitleg) + '</p>' : '<p class="vn-rust">Kies wat je maakt; dan zie je wie dat hier ook doet.</p>') +
+        '<h3>Waar je kunt zitten</h3>' + regels(mk.wijken.map(function (w) {
+          return [w.naam + (w.jij ? ' (jij)' : ''), (w.huur ? euro(w.huur) + ' per vier weken' : 'geen huur') + ' · zichtbaarheid ' + w.zichtbaar];
+        })) + '<p class="vn-rust">Kopers: ' + esc(mk.kopers.map(function (k) { return k.aandeel + '% ' + k.naam; }).join(', ')) + '.</p>';
     }
 
     var z = s.bedrijf;
@@ -43,7 +57,7 @@
         ['Je prijs', euro(hw.prijs) + ' · klanten betalen er gewoonlijk ' + euro(hw.advies) + ' voor'],
         ['Op voorraad', hw.voorraad + ' stuks' + (hw.onderweg ? ', ' + hw.onderweg + ' onderweg' : '')],
         ['Verkocht', hw.verkocht + ' stuks, marge ' + euro(hw.marge) + (hw.gemist ? ' · ' + hw.gemist + ' gemist' : '')],
-        ['Vraag', 'ongeveer ' + String(hw.perWeek).replace('.', ',') + ' per week bij deze prijs']]) : '') +
+        ['Vraag', 'ongeveer ' + String(hw.perWeek).replace('.', ',') + ' per week bij deze prijs, in dit seizoen' + (hw.aandeel != null ? ' · ' + pct(hw.aandeel) + ' van de markt' : '')]]) : '') +
       '<h3>Balans</h3>' + regels([['Bank', euro(z.balans.kas)], ['Te ontvangen', euro(z.balans.vorderingen)], ['Voorraad', euro(z.balans.voorraad)],
         ['Voorschotten (nog leveren)', euro(z.balans.vooruit)], ['Aan leveranciers', euro(z.balans.crediteuren)], ['Schuld', euro(z.balans.schuld)]]);
   }

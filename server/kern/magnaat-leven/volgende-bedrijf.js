@@ -7,6 +7,7 @@ const B = require('./regels-bedrijf');
 const { euro, tijd: duur } = require('./staat');
 const { rest } = require('./tijd');
 const { waarVan, geblokkeerd } = require('./voorraad');
+const M = require('./regels-markt');
 
 function contractAanbod(st, zet) {
   for (const c of st.contracten || []) {
@@ -46,6 +47,9 @@ function bedrijfHandelingen(st, zet) {
       euro(w.advies) + ' voor.' + (st.handel ? ' Betalen binnen ' + w.termijn + ' dagen na levering.' : ' De eerste keer betaal je vooraf.'),
     { aantal: 'getal', minimum: w.minimum });
   }
+  const plekken = Object.entries(M.WIJKEN).filter(([id]) => id !== (st.vestiging || {}).wijk);
+  zet('vestig', 'Verhuis je bedrijf', 'Waar je zit, bepaalt hoeveel mensen je zien en wat het kost.',
+    { wijk: plekken.map(([id, x]) => ({ id, naam: x.naam + (x.huur ? ': ' + euro(x.huur) + ' per vier weken, verhuizen ' + euro(x.verhuis) : ': geen huur, weinig zichtbaar') })) });
   if (st.handel) zet('prijs', 'Verander je verkoopprijs', 'Nu ' + euro(st.handel.prijs) + '. Duurder verkoopt minder, goedkoper meer.', { bedrag: 'euro' });
   for (const c of st.contracten) {
     if (c.stand === 'actief' && !c.opgezegd) zet('zegop', 'Zeg het contract met ' + c.klant + ' op', 'De termijn die loopt, maak je af.', { contract: c.id });

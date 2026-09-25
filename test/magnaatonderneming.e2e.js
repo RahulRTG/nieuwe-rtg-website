@@ -45,7 +45,7 @@ async function totOnderneming(base, token) {
   return s;
 }
 
-test('V2: iemand aannemen en inkopen via de Edge, en Mijn bedrijf en de prognose laten zien wat dat betekent', { timeout: 240000, skip: geenBrowser(pw) }, async () => {
+test('V2 en V3: iemand aannemen, inkopen en verhuizen via de Edge, en Mijn bedrijf, de markt en de prognose laten zien wat dat betekent', { timeout: 240000, skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-onderneming-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -81,6 +81,18 @@ test('V2: iemand aannemen en inkopen via de Edge, en Mijn bedrijf en de prognose
     assert.match(bedrijf, /Handel: Kassatablet met je site erop.*3 onderweg/);
     assert.match(bedrijf, /Kosten per soort.*Werkplekken/);
     assert.match(bedrijf, /Balans.*Voorraad.*Aan leveranciers/);
+
+    /* V3: de markt staat op Wereld, en verhuizen gaat via de Edge. */
+    await page.click('[data-screen="vandaag"]');
+    assert.match(await page.textContent('#vnKlok'), /^(maart|april|mei), lente, /);
+    await page.locator('#vnActies button', { hasText: 'Verhuis je bedrijf' }).click();
+    await page.selectOption('#vnF-wijk', 'oost');
+    await page.click('[data-vn-doe]');
+    await page.waitForFunction(() => /Je bedrijf zit nu in Broedplaats Oost/.test(document.getElementById('vnMeldingen').textContent), null, { timeout: 10000 });
+    await page.click('[data-screen="wereld"]');
+    const wereld = await page.textContent('#vnWereld');
+    assert.match(wereld, /De markt.*Pixelwerk.*WebStudio Noord.*SnelSite/);
+    assert.match(wereld, /Broedplaats Oost \(jij\)/);
 
     await page.click('[data-screen="geld"]');
     const geld = await page.textContent('#vnGeld');

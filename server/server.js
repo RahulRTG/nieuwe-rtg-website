@@ -1824,7 +1824,7 @@ betaal.koppelStore({
 const {
   DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
   dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten, dpRegistreerMunt, dpRegistreerBevestigd
-} = maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
+} = maakDirectpay({ db, save, crypto, findSupplier, betaal, betaalWaarheid, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
   /* De transactie-index voor de twee geldcollecties. Ze werden hier met
      unshift+slice bijgehouden, dus zonder index (O(N) zoeken) en met een
      stille kap op de staart. Nu langs dezelfde weg als orders en boekingen. */
@@ -1909,9 +1909,7 @@ const munten = maakMunten({ db, save, muntbetaal });
 const { maakSettlement } = require('./kern/settlement');
 /* payOplaadAfronden als LATE binding: de betaalkern wordt pas verderop gebouwd
    (kernlaag), maar deze functie draait pas als er een webhook binnenkomt -- dan
-   staat hij er. Zonder deze draad kan settlement een bevestigde oplading niet
-   bijschrijven, en dat is precies wat er misging: kaart afgeschreven, wallet
-   niet bijgeschreven, webhook antwoordde 200 ok. */
+   staat hij er. Sinds MONEY-012 alleen nog voor oude kaartWachtend-rijen. */
 const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd,
   payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null),
   // bevestigt het IBAN waarvandaan is opgeladen, zodat de wachttijd op DIE rekening vervalt

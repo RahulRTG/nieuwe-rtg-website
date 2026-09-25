@@ -111,7 +111,8 @@ function controleerBestanden({ dossierPad, handtekeningPad, bewijsRoot, sleutelP
 
     if (!trustRoot || path.resolve(sleutelPad) !== path.resolve(trustRoot, trust.ROLES.EVIDENCE.publicFile))
       return fout('verkeerd-evidence-vertrouwensanker');
-    const ankers = trust.anchors(trustRoot);
+    let ankers;
+    try { ankers = trust.anchors(trustRoot); } catch (e) { return fout('vertrouwensanker-ontbreekt'); }
     const sleutelBytes = ankers.EVIDENCE.bytes;
     let sleutel;
     try { sleutel = crypto.createPublicKey(sleutelBytes); }

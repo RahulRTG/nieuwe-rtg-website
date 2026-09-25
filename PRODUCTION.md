@@ -456,9 +456,9 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
   dat laatste toets je alleen de handtekening en niet wat er staat te draaien.
   **Twee eerlijke grenzen.** (1) Dit is geen Sigstore: geen transparantielogboek,
   geen keyless-OIDC, geen derde die meekijkt -- wie sigstore-verificatie eist
-  krijgt dat hier niet (`TAKEN.md` 3.5). (2) Zolang `deploy/release-sleutel.pub`
-  niet bestaat, worden stuklijst en herkomstdocument wel gemaakt maar is er
-  niets te verifieren; de workflow zegt dat dan hardop als waarschuwing.
+  krijgt dat hier niet (`TAKEN.md` 3.6). (2) Zolang de drie publieke ankers uit
+  `deploy/TRUST.md` niet bestaan, bouwt de imageworkflow niets: hij weigert bij
+  de eerste sleutelcontrole, voor de bouw. Een waarschuwingsuitweg is er niet meer.
 - **Graceful shutdown** — `SIGTERM`/`SIGINT` schrijven data weg en sluiten netjes.
 - **Failover** — drie-server-cluster met poortwachter (`server/trio.js`).
 - **Toegankelijkheid** — alle vlaggenschip-schermen axe-schoon (CI bewaakt dit).

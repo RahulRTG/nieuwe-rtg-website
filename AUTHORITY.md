@@ -299,7 +299,7 @@ Vijf keuzes die het model dragen, elk met een bestaand voorbeeld:
 | 47 | minimale rechten voor processen | taken draaien als "het systeem" | jaren weg |
 | 48 | SCIM | `server/scim/` | **staat** |
 | 49 | SSO en federatie | SAML en OIDC | **staat** |
-| 50 | passkeys voor bevoorrechte rollen | passkeys staan; niet verplicht per rol | een stap weg |
+| 50 | passkeys voor bevoorrechte rollen | verplicht voor beide handtekeningen onder een geldhandeling van het kantoor (25 sep 2026, KANTOOR.md par. 14); verder niet per rol | staat voor geld |
 | 51 | stap-op naar risico | per handeling (`ZWARE_ACTIES`), niet per bedrag | een stap weg |
 | 52 | beheerde apparaten | toestelbinding voor leden | een stap weg |
 | 53 | locatie als signaal | werkplekzone voor personeel | staat in één domein |

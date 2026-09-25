@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T07:01:06.118Z",
-    "commit": "7d9d68ea8",
+    "op": "2026-09-25T07:04:36.520Z",
+    "commit": "86882c32f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -562,6 +562,14 @@
       "soort": "puur",
       "staat": "al rood",
       "gezakteZonderMutatie": 1
+    },
+    "appwerkt-onderschepper.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/appwerkt.js",
+      "operator": "===->!==#8",
+      "gezakt": 2,
+      "geprobeerd": 50
     },
     "archief.test.js": {
       "soort": "server",
@@ -3136,6 +3144,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "foundation-vrijgave.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/foundation-vrijgave.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "foundation.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4208,6 +4224,14 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "imageherkomst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/imageherkomst.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "imap.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4341,6 +4365,13 @@
       "operator": "return-weg#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "kantoordeur-passkey.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "kantoordienst.test.js": {
       "soort": "server",
@@ -5251,21 +5282,6 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
-    "magnaatafwerking.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "magnaatafwerking.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/magnaat-leven/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 4,
-      "geprobeerd": 1
-    },
     "magnaatgeldkaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5280,21 +5296,6 @@
       "module": "scripts/magnaatgrondwet.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "magnaathardening.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "magnaathardening.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/magnaat-leven/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
       "geprobeerd": 1
     },
     "magnaatlab.test.js": {
@@ -5340,14 +5341,6 @@
       "module": "server/kern/magnaat-leven/index.js",
       "operator": "===->!==#0",
       "gezakt": 12,
-      "geprobeerd": 1
-    },
-    "magnaatreis.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/magnaat-leven/bewaking.js",
-      "operator": "!==->===#0",
-      "gezakt": 4,
       "geprobeerd": 1
     },
     "magnaatwereld.test.js": {
@@ -5920,6 +5913,30 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "money012-inkomend.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalwaarheid/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
+      "geprobeerd": 4
+    },
+    "money012-keten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "money012.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalopdracht/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
+      "geprobeerd": 3
     },
     "motor-vingerafdruk.test.js": {
       "soort": "puur",
@@ -6846,6 +6863,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "paytegoed.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
     "payterug.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7160,6 +7184,13 @@
       "gezakt": 5,
       "geprobeerd": 4
     },
+    "rahul-escape.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "rahul-hart.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -7389,6 +7420,14 @@
       "module": "scripts/release-bewijs.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "release-hardening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/stempel.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "release-trust.test.js": {
@@ -8361,6 +8400,14 @@
       "operator": "return-weg#2",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "signing-repetitie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/release-trust.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "simulatiebank.test.js": {
       "soort": "server",

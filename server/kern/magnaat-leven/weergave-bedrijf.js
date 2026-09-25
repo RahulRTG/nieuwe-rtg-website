@@ -80,7 +80,7 @@ function bedrijfExtra(st) {
   return {
     team: (st.team || []).map(m => ({ id: m.id, naam: m.naam, rol: m.rol, contract: m.contract, uurloon: m.uurloon, tempo: m.tempo,
       dagen: m.dagen.map(x => R.DAGNAMEN[x]), minuten: m.minuten, sinds: m.sinds, einde: m.einde, weg: m.weg, gestaakt: !!m.gestaakt })),
-    contracten: (st.contracten || []).map(c => ({ id: c.id, klant: c.klant, stand: c.stand, minuten: c.minuten, bedrag: c.bedrag,
+    contracten: (st.contracten || []).map(c => ({ id: c.id, klant: c.klant, bron: 'klant', stand: c.stand, minuten: c.minuten, bedrag: c.bedrag,
       termijn: c.termijn, termijnen: c.termijnen, opgezegd: c.opgezegd, verlenging: c.verlenging })),
     handel: w ? {
       product: w.naam, leverancier: w.leverancier, inkoop: w.inkoop, advies: w.advies, minimum: w.minimum,

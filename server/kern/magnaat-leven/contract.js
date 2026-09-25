@@ -19,7 +19,8 @@ const opKwartje = (c) => Math.round(c / 2500) * 2500;
 const vind = (st, id) => (st.contracten || []).find(c => c.id === String(id || '')) || null;
 
 function aanbod(st, bron, verlenging) {
-  const c = { id: 'c' + (++st.contractTeller), klantId: bron.klantId, klant: bron.klant, stand: 'aanbod', sinds: st.dag,
+  /* `bron` zegt waar het geld van een contract vandaan komt: van de klant, en niet van RTG. */
+  const c = { id: 'c' + (++st.contractTeller), klantId: bron.klantId, klant: bron.klant, bron: 'klant', stand: 'aanbod', sinds: st.dag,
     minuten: bron.minuten, bedrag: bron.bedrag, termijnen: B.KLANTCONTRACT.termijnen, termijn: 0, volgende: null, opgezegd: false, verlenging: !!verlenging };
   st.contracten.push(c);
   meld(st, c.klant + (verlenging ? ' wil het contract verlengen: ' : ' wil vast werk: ') + tijd(c.minuten) + ' elke vier weken voor ' + euro(c.bedrag) +

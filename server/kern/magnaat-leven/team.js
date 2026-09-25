@@ -80,7 +80,7 @@ function afrekenen(st, m, tot) {
   m.betaaldTot = tot;
 }
 
-function vertrek(st, m, waarom) {
+function laatGaan(st, m, waarom) {
   afrekenen(st, m, m.einde);
   m.weg = true;
   for (const [dag, lijst] of Object.entries(st.agenda)) st.agenda[dag] = lijst.filter(x => x.wie !== m.id);
@@ -94,10 +94,10 @@ function teamDag(st) {
     if (m.weg) continue;
     if (m.gestaakt && st.dag - m.gestaakt >= B.LOON_STAKING) {
       m.einde = Math.min(m.einde == null ? st.dag - 1 : m.einde, st.dag - 1);
-      vertrek(st, m, ' is weggegaan: al een week geen loon. Wat hij tegoed heeft, blijft verschuldigd.');
+      laatGaan(st, m, ' is weggegaan: al een week geen loon. Wat hij tegoed heeft, blijft verschuldigd.');
       continue;
     }
-    if (m.einde != null && st.dag > m.einde) { vertrek(st, m, ' werkt niet meer voor je. Zijn laatste loon of factuur staat klaar.'); continue; }
+    if (m.einde != null && st.dag > m.einde) { laatGaan(st, m, ' werkt niet meer voor je. Zijn laatste loon of factuur staat klaar.'); continue; }
     if (m.contract === 'dienst' && m.werkplekVolgende <= st.dag) werkplek(st, m);
     if (R.weekdag(st.dag) === R.BAAN.loondag) afrekenen(st, m, st.dag - 1);
   }

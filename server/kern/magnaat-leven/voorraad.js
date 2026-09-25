@@ -31,7 +31,7 @@ function vraagPerWeek(st) {
   return Math.floor(basis * w.advies * w.advies / (h.prijs * h.prijs));
 }
 
-function bestel(st, z) {
+function bestelInkoop(st, z) {
   const w = waarVan(st);
   if (!st.onderneming || !w) return fout('Inkopen bij een groothandel doe je als onderneming.');
   if (geblokkeerd(st)) return fout(w.leverancier + ' levert niet meer zolang je laatste factuur openstaat.');
@@ -107,4 +107,4 @@ function handelDag(st) {
       ['debet', ['kosten', 'inkoopwaarde'], n * w.inkoop], ['credit', ['voorraad'], n * w.inkoop]] });
 }
 
-module.exports = { bestel, prijs, handelDag, vraagPerWeek, waarVan, geblokkeerd };
+module.exports = { bestelInkoop, prijs, handelDag, vraagPerWeek, waarVan, geblokkeerd };

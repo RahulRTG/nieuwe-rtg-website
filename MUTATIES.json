@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:03:45.606Z",
-    "commit": "466d411e1",
-    "boomVuil": false,
+    "op": "2026-09-25T02:18:19.773Z",
+    "commit": "90b0ffd99",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
@@ -5288,6 +5288,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "magnaatonderneming.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatonderneming.test.js": {
+      "soort": "puur",
+      "staat": "te langzaam",
+      "lekt": true,
+      "reden": "ook met --test-force-exit niet af binnen 360s; de toetsen zelf komen niet klaar, dus dit is traagheid en niet alleen een handle",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 1
     },
     "magnaatwereld.test.js": {
       "soort": "puur",

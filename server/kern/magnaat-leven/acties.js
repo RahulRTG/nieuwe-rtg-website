@@ -64,7 +64,7 @@ const ACTIES = {
   lever: opdracht.lever, factuur: opdracht.factuur, herinnering: opdracht.herinnering,
   korting: opdracht.korting, voorfinancier: opdracht.voorfinancier,
   uitstel: geld.uitstel, lenen: geld.lenen,
-  werf: team.werf, ontsla: team.ontsla, bestel: voorraad.bestel, prijs: voorraad.prijs,
+  werf: team.werf, ontsla: team.ontsla, bestel: voorraad.bestelInkoop, prijs: voorraad.prijs,
   teken: contract.teken, wijsaf: contract.wijsAf, zegop: contract.zegOp
 };
 

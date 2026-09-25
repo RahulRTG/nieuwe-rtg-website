@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T02:21:55.678Z",
-    "commit": "793020659",
+    "op": "2026-09-25T03:29:59.551Z",
+    "commit": "d3cce9ce",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5874,6 +5874,14 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "money012.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalopdracht/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 3
     },
     "motor-vingerafdruk.test.js": {
       "soort": "puur",

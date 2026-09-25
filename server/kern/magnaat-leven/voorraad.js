@@ -17,6 +17,7 @@ const B = require('./regels-bedrijf');
 const { meld, ontgrendel, post, euro } = require('./staat');
 const { boekVan } = require('./boek');
 const { mijnVraag } = require('./markt');
+const { mijlpaal } = require('./gids');
 
 const fout = (error) => ({ status: 400, error });
 const waarVan = (st) => (st.aanbod ? B.HANDELSWAAR[st.aanbod] : null);
@@ -97,6 +98,7 @@ function handelDag(st) {
   }
   if (!n) return;
   h.verkocht += n;
+  mijlpaal(st, 'verkoop', 'Je eerste verkoop: ' + w.naam.toLowerCase() + '.');
   h.omzet += n * h.prijs;
   b.boek(st, { soort: 'VERKOOP', omschrijving: n + ' x ' + w.naam + ' verkocht', sleutel: 'verkoop:' + st.dag,
     regels: [['debet', ['kas'], n * h.prijs], ['credit', ['omzet'], n * h.prijs],

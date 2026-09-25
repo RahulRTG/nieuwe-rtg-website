@@ -23,7 +23,7 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart' } });
   const levens = () => eigen.bak('magnaatLeven');
 
-  function haal(key, opnieuw) {
+  function haal(key, opnieuw, moeilijkheid) {
     const alle = levens();
     let st = alle[key];
     /* Een leven uit de eerste opzet (versie 1) had geen week en geen agenda; het
@@ -32,12 +32,13 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
        blijft staan en wordt niet overschreven, want een journaal groeit alleen. */
     if (!st || st.versie !== 2 || opnieuw) {
       const ronde = opnieuw ? (st.ronde || 0) + 1 : 0;
-      st = nieuw({ wereld: wereldVan(key) + ':2' + (ronde ? ':' + ronde : ''), nu: nu() });
+      const niveau = moeilijkheid || (st && st.moeilijkheid) || 'normaal';
+      st = nieuw({ wereld: wereldVan(key) + ':2' + (ronde ? ':' + ronde : ''), nu: nu(), moeilijkheid: niveau });
       st.ronde = ronde;
       koppel(st, boek);
-      boek.open(st, R.START_KAS);
+      boek.open(st, R.niveauVan(st).startKas);
       meld(st, 'Het is maandag. Je werkt 24 uur per week als keukenmedewerker bij ' + R.BAAN.werkgever +
-        ', je loon komt vrijdag, en je hebt ' + euro(R.START_KAS) + '. Je hebt een telefoon, een eenvoudige laptop, en vandaag nog ' +
+        ', je loon komt vrijdag, en je hebt ' + euro(R.niveauVan(st).startKas) + '. Je hebt een telefoon, een eenvoudige laptop, en vandaag nog ' +
         '4u 20m voor jezelf. Wat ga je maken?');
       ontgrendel(st, 'geld');
       alle[key] = st;
@@ -56,16 +57,18 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     return n;
   }
 
-  function bewaarEnToon(st) {
+  function bewaarEnToon(st, weg) {
     boek.bevestig(st);
     save();
-    return toon(st, boek, nu());
+    return toon(st, boek, nu(), weg);
   }
 
+  /* TERWIJL JE WEG WAS (V4): wie na een paar dagen terugkomt, ziet eerst wat er
+     in die dagen gebeurde dat ertoe doet, en niet alleen de stand van nu. */
   function staat(key) {
-    const st = haal(key);
-    bijrekenen(st);
-    return bewaarEnToon(st);
+    const st = haal(key), voor = st.dag, n = bijrekenen(st);
+    const weg = n >= 2 ? { dagen: n, van: voor, meldingen: st.meldingen.filter(m => m.dag > voor && m.soort !== 'info' && m.soort !== 'rtg').slice(0, 8) } : null;
+    return bewaarEnToon(st, weg);
   }
 
   function actie(key, body = {}) {
@@ -81,7 +84,14 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
       r = speelronde.doorspoelen(st, nu());
     } else if (body.actie === 'opnieuw') {
       if (body.zeker !== true) return { status: 400, error: 'Opnieuw beginnen gooit dit leven weg. Bevestig het met "zeker".' };
-      return bewaarEnToon(haal(key, true));
+      if (body.moeilijkheid != null && !R.MOEILIJKHEID[body.moeilijkheid]) return { status: 400, error: 'Kies licht, normaal of zwaar.' };
+      return bewaarEnToon(haal(key, true, body.moeilijkheid));
+    } else if (body.actie === 'moeilijkheid') {
+      /* Op de eerste dag, voordat je iets hebt gekozen, gaat er niets verloren: dan kan het zonder bevestiging. */
+      if (!R.MOEILIJKHEID[body.stand]) return { status: 400, error: 'Kies licht, normaal of zwaar.' };
+      if (st.dag !== 1 || st.aanbod) return { status: 400, error: 'De moeilijkheid kies je aan het begin. Wil je het anders, begin dan opnieuw.' };
+      if ((st.moeilijkheid || 'normaal') === body.stand) return bewaarEnToon(st);
+      return bewaarEnToon(haal(key, true, body.stand));
     } else {
       const doe = Object.prototype.hasOwnProperty.call(ACTIES, body.actie) ? ACTIES[body.actie] : null;
       r = doe ? doe(st, body) : { status: 400, error: 'Die handeling bestaat niet in Magnaat.' };

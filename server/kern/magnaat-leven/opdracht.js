@@ -14,6 +14,7 @@
 const R = require('./regels');
 const { meld, ontgrendel, klantVan, deal: vindDeal, euro } = require('./staat');
 const { boekVan } = require('./boek');
+const { mijlpaal } = require('./gids');
 
 const fout = (error) => ({ status: 400, error });
 
@@ -41,7 +42,7 @@ function factuur(st, z) {
   boekVan(st).boek(st, { soort: 'FACTUUR', omschrijving: 'Factuur ' + nummer + ' aan ' + d.klant, sleutel: 'factuur:' + d.id,
     regels: [['debet', ['vooruit', d.klantId], vooraf], ['debet', ['vordering', d.klantId], rest], ['credit', ['omzet'], a.bedrag]] });
   const vervaldag = st.dag + R.BETAALTERMIJN;
-  const laat = d.vervolg ? 0 : k.laat + (d.laatGeleverd ? 7 : 0);
+  const laat = d.vervolg ? 0 : Math.round(k.laat * R.niveauVan(st).laat / 100) + (d.laatGeleverd ? 7 : 0);
   d.factuur = { nummer, dag: st.dag, totaal: a.bedrag, rest, vervaldag, betaalDag: rest ? vervaldag + laat : st.dag, herinnerd: false };
   d.fase = 'gefactureerd';
   if (!rest) betaal(st, d);
@@ -64,6 +65,7 @@ function betaal(st, d) {
   }
   d.fase = 'betaald';
   d.betaaldOp = st.dag;
+  mijlpaal(st, 'geld', 'Je eerste geld van een klant: ' + d.klant + ' betaalde factuur ' + f.nummer + '.');
   st.betaald += d.vervolg ? 0 : 1;
 }
 

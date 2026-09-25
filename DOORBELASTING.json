@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T10:09:44.332Z",
-    "commit": "96051869",
+    "op": "2026-09-25T00:47:30.265Z",
+    "commit": "ca5d24b93",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 11,
     "instrument": "scripts/doorbelasting.js",
     "node": "v22.22.2"
   },
@@ -21,15 +21,15 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1426,
-    "geldvormen": 213,
-    "volgbaar": 31,
+    "vormenTotaal": 1429,
+    "geldvormen": 215,
+    "volgbaar": 33,
     "perHerkomstveld": {
       "bron": 16,
       "provider": 2,
       "aanbieder": 7,
       "herkomst": 1,
-      "leverancier": 6,
+      "leverancier": 8,
       "economischeHerkomst": 4
     },
     "nietVolgbaar": 182,
@@ -47,6 +47,8 @@
       "server/kern/horeca/foliolaag.js",
       "server/kern/kosten/providerfactuur.js",
       "server/kern/kosten/providerfactuur.js",
+      "server/kern/magnaat-leven/regels.js",
+      "server/kern/magnaat-leven/weergave.js",
       "server/kern/mall/bestellingen.js",
       "server/kern/mall/bestellingen.js",
       "server/kern/mall/bestellingen.js",
@@ -236,8 +238,16 @@
         "volgbaar": 0
       },
       "server/kern/magnaat-economische-motor": {
-        "geldvormen": 4,
+        "geldvormen": 2,
         "volgbaar": 0
+      },
+      "server/kern/magnaat-grootboek": {
+        "geldvormen": 2,
+        "volgbaar": 0
+      },
+      "server/kern/magnaat-leven": {
+        "geldvormen": 2,
+        "volgbaar": 2
       },
       "server/kern/mall": {
         "geldvormen": 11,

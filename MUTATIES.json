@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T01:27:03.207Z",
-    "commit": "3d706bd6",
+    "op": "2026-09-25T02:21:55.678Z",
+    "commit": "793020659",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5289,6 +5289,21 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "magnaatonderneming.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatonderneming.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
     "magnaatwereld.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5859,30 +5874,6 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
-    },
-    "money012-inkomend.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/betaalwaarheid/index.js",
-      "operator": "!==->===#0",
-      "gezakt": 7,
-      "geprobeerd": 4
-    },
-    "money012-keten.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/betaal.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "money012.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/betaalopdracht/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 6,
-      "geprobeerd": 3
     },
     "motor-vingerafdruk.test.js": {
       "soort": "puur",

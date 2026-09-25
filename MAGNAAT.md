@@ -305,7 +305,78 @@ De Edge draagt de handeling die nu het meest zin heeft als hoofdactie. Elke hand
 - werk dat vandaag niet kan (software niet betaald), wordt geweigerd met de reden, en niet aan het eind van de dag stil weggegooid;
 - het beeld is een kopie, anders veranderde een aanroeper die `rondes.pop()` deed de echte onderhandeling.
 
+### De speelronde: V1 is pas af als iemand hem gespeeld heeft
+
+De vragen die er nu toe doen, beantwoordt geen invariant. Ze worden beantwoord door te spelen:
+
+- Is werken vervelend genoeg dat je wilt ontsnappen, maar nuttig genoeg dat je het soms nodig hebt?
+- Is vrije tijd echt schaars?
+- Voelt die eerste klant waardevol?
+- Doet een late betaling pijn?
+- Voelt € 800 ontvangen als iets wat je zelf hebt opgebouwd?
+- En de lat van V1: kan iemand die niets van RTG of boekhouden weet het openen, zonder uitleg beginnen, een paar uur spelen, en aan het eind denken dat hij dit bedrijf zelf heeft opgebouwd?
+
+Om die ronde in een uur te kunnen spelen in plaats van in vier, zijn er drie hulpen, en geen van drieën verandert wat er in een dag gebeurt (`speelronde.js`):
+
+- het **tempo**: *rustig* (3 minuten per dag), *vlot* (1 minuut) of *proef* (20 seconden);
+- **doorspoelen naar het volgende moment**: de dagen lopen door tot er een kans, een vraag, geldnood of slecht nieuws is, en hooguit twee weken. Wat je plande gebeurt, en ongeplande vrije tijd is weg. Doorspoelen is dus tijd laten liggen, niet gratis tijd;
+- **opnieuw beginnen**, met een bevestiging. Het oude leven blijft in het grootboek staan onder een eigen wereld, want een journaal groeit alleen.
+
 Wat V1 bewust **niet** doet: btw (in Oudwijk betaalt een kleine onderneming die niet), belasting op de winst, bewust netwerken als eigen activiteit, personeel, leveranciers, voorraad, meer dan drie aanbodsoorten met zes klanten elk, en een koppeling met World.
+
+### V2 ONDERNEMING: wat er staat (25 september 2026)
+
+**De belofte:** V1 eindigt bij een onderneming die jou draagt. Vanaf dat moment is je eigen tijd de grens: meer klanten betekent meer uren, en die heb je niet. V2 geeft je vier manieren om daaraan te ontsnappen. Elk heeft een prijs die je voelt voordat hij iets oplevert. Alles hangt aan de inschrijving: zonder onderneming geen personeel en geen groothandel, met de reden erbij. De getallen staan in `regels-bedrijf.js`.
+
+**Personeel en planning** (`team.js`, en `tijd.js` met `wie`):
+- Je kiest uit drie mensen:
+  - **Kim**, junior in dienst: maandag en woensdag, € 16 per uur. Hij werkt op 70% van jouw tempo, dus acht uur van hem is 5u 36m werk.
+  - **Daan**, ervaren en in dienst: drie dagen, € 26 per uur.
+  - **Ravi**, freelancer: € 40 per uur, alleen voor de uren die hij maakt.
+- **In dienst** krijgt iemand elke vrijdag loon over zijn contractdagen, ook in een week waarin je hem niet inplant. Hij heeft een werkplek nodig (€ 150 per vier weken), en je software kost een licentie meer.
+- **Een freelancer** stuurt elke vrijdag een factuur over de uren die hij echt maakte. Die factuur is kosten en een schuld, en moet binnen veertien dagen betaald zijn.
+- Je plant je team in dezelfde agenda als jezelf, en ieder heeft zijn eigen uren. Een teamlid werkt aan opdrachten en nooit aan je eigen project of aan leren: dat blijft van jou.
+- **Opzeggen:** iemand in dienst werkt en krijgt loon nog veertien dagen; een freelancer stopt na vandaag.
+- **Loon dat niet betaald kan worden** wordt geen aanmaning. De medewerker legt het werk neer, en na een week gaat hij weg. Het loon blijft verschuldigd.
+
+**Contracten** (`contract.js`):
+- Een klant die je al eens betaalde, biedt je onderneming na tien dagen vast werk aan. Dat is twaalf uur per vier weken, tegen het uurtarief dat hij van je kent, drie termijnen lang.
+- Je tekent of je bedankt, en het aanbod staat een week open. Onderhandelen deed je de eerste keer: de drie dimensies uit V1 blijven voor projecten.
+- Elke termijn is een gewone opdracht met een deadline aan het eind van de vier weken: leveren, factureren, betaald worden.
+- Wie een termijn te laat levert, krijgt geen verlenging; wie alles op tijd leverde, krijgt een verlengingsaanbod.
+- Opzeggen kan altijd. De termijn die loopt, maak je af.
+- Een klant met een contract komt niet ook nog los terug voor onderhoud.
+
+**Leverancier, voorraad en verkoop** (`voorraad.js`):
+- Bij elk aanbod hoort iets om te verkopen: een kassatablet met de site erop, een ingelijste print of een ingerichte bonnenscanner.
+- **De eerste bestelling betaal je vooraf**, want een leverancier kent je nog niet. Daarna krijg je dertig dagen na levering. Wie een factuur laat openstaan, krijgt niets meer geleverd.
+- **Voorraad is geld op de plank, en dat staat in de boeken.** Een vooruitbetaling is een tegoed bij de leverancier. Bij levering wordt het voorraad en een schuld (`crediteur`). Bij verkoop komt er geld en omzet bij, en gaat de inkoopwaarde als kosten van de voorraad af. Je resultaat is dus de marge en niet de omzet.
+- **De vraag** volgt uit het aantal klanten dat je betaalde en uit je prijs. Twee keer zo duur verkoopt een kwart, en dezelfde keuzes geven dezelfde verkoop.
+- Wat je niet op voorraad hebt, is een **gemiste verkoop**, en die telt. Wat nog nooit te koop lag, mist niemand.
+
+**Kosten en cashflow** (`weergave-bedrijf.js`):
+- Mijn bedrijf toont de kosten per soort (loon, freelancers, werkplekken, inkoopwaarde, software, korting, financiering, inschrijving), rechtstreeks uit het grootboek.
+- De balans heeft er voorraad en schulden aan leveranciers bij.
+- Geld heeft een **prognose voor vier weken**. Die rekent alleen met wat vaststaat:
+  - betalingen die klaarstaan;
+  - je loon en je boodschappen;
+  - het loon en de werkplekken van je team;
+  - facturen op hun vervaldag;
+  - afgesproken voorschotten.
+- **Wat er niet in staat, staat erbij**: nieuwe opdrachten, contracttermijnen en verkoop (die moet je nog verdienen), uren van een freelancer die je nog niet hebt ingepland, en een klant die te laat betaalt. Een prognose die dat verzwijgt, belooft geld dat er niet is.
+- Ziet de prognose een tekort, dan staat dat bij wat aandacht vraagt, voordat de betaling mislukt.
+
+**Wat de toetsen vastleggen:** `test/magnaatonderneming.test.js` (twaalf toetsen) en `test/magnaatonderneming.e2e.js`. De e2e-toets speelt via de route tot de inschrijving, en neemt daarna in de browser iemand aan en koopt in. Zes mutaties zijn nagetrokken en zakken alle zes:
+- de prognose zonder teamloon;
+- verkoop zonder inkoopwaarde;
+- loon alleen over ingeplande dagen;
+- een junior op vol tempo;
+- een eerste bestelling zonder vooruitbetaling;
+- onbetaald loon als gewone aanmaning.
+
+Een leven van vóór V2 gaat door, met een leeg bedrijf erbij.
+
+Wat V2 bewust **niet** doet: loonheffing en sociale lasten als aparte posten (in Oudwijk is het uurloon alles), verlof en ziekte, meer dan drie mensen, meer dan één product, voorraad die veroudert, een webwinkel als eigen kanaal, en concurrenten. Dat laatste hoort bij **V3 Levende markt**.
 
 ---
 

@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-25",
   "gemeten": {
-    "bestanden": 2402,
-    "vormen": 1428,
-    "velden": 2067,
-    "modules": 792,
+    "bestanden": 2405,
+    "vormen": 1433,
+    "velden": 2076,
+    "modules": 796,
     "domeinen": 283,
     "envelopDrempel": 17,
     "envelop": 32,
-    "veldenDomeineigen": 1458,
-    "veldenGedeeldVanafVier": 204,
+    "veldenDomeineigen": 1464,
+    "veldenGedeeldVanafVier": 205,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -313,6 +313,18 @@
       ]
     },
     {
+      "veld": "bewijs",
+      "domeinen": 11,
+      "waar": [
+        "kern/betaalwaarheid",
+        "kern/horeca",
+        "kern/invoer",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties"
+      ]
+    },
+    {
       "veld": "voor",
       "domeinen": 11,
       "waar": [
@@ -358,6 +370,18 @@
         "kern/envelop",
         "kern/experience",
         "kern/luchthaven"
+      ]
+    },
+    {
+      "veld": "rol",
+      "domeinen": 11,
+      "waar": [
+        "kern/concern",
+        "kern/livinglab",
+        "kern/magnaat-leven",
+        "kern/magnaatwereld",
+        "kern/onderneming",
+        "kern/rechterhand"
       ]
     },
     {
@@ -469,18 +493,6 @@
       ]
     },
     {
-      "veld": "rol",
-      "domeinen": 10,
-      "waar": [
-        "kern/concern",
-        "kern/livinglab",
-        "kern/magnaatwereld",
-        "kern/onderneming",
-        "kern/rechterhand",
-        "kern/reisgezelschap"
-      ]
-    },
-    {
       "veld": "name",
       "domeinen": 10,
       "waar": [
@@ -493,15 +505,15 @@
       ]
     },
     {
-      "veld": "bewijs",
+      "veld": "dagen",
       "domeinen": 10,
       "waar": [
-        "kern/horeca",
-        "kern/invoer",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties",
-        "kern/magnaatwereld"
+        "kern/gewoonten",
+        "kern/klok",
+        "kern/levensgraaf",
+        "kern/levenslijn",
+        "kern/magnaat-leven",
+        "kern/mobiliteit"
       ]
     },
     {
@@ -514,18 +526,6 @@
         "kern/festival",
         "kern/mobiliteit",
         "kern/navigatie"
-      ]
-    },
-    {
-      "veld": "kamer",
-      "domeinen": 9,
-      "waar": [
-        "kern/afdelingen",
-        "kern/bureau",
-        "kern/gast",
-        "kern/homemerken",
-        "kern/levensgraaf",
-        "kern/magnaat-trainingslobby-regie"
       ]
     }
   ],

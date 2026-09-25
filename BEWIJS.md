@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2030 bestanden en 14405 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2029 bestanden en 14391 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2030 |
-| losse beweringen (`test(...)`) | 14405 |
+| toetsbestanden | 2029 |
+| losse beweringen (`test(...)`) | 14391 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1378 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1377 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1776 bestanden, 13951 beweringen.
+1774 bestanden, 13936 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -144,7 +144,7 @@ toets omvalt.
 | `balkkleur.test.js` | 5 | gezakt op `+->-#0` | DE KLEUR VAN DE iOS-BALK, EN WAAROM DAAR EEN METER ONDER HOORT. De acties rechtsboven in de balk en de terugknop links stonden op --ios-accent, en dat is de DAGKLEUR: zestien ankertinten (vier seizoenen x vier... |
 | `bank-beheer.test.js` | 13 | gezakt op `liegpoort /api/` | RTG Bank, de tien endpoints die nog nergens werden aangeraakt. bank.test.js dekt de kern (openen, storten, overboeken, de drie-standen-knop). |
 | `bank-eigendom.test.js` | 5 | gezakt op `true->false#0` | EEN LEGE AANVRAGER IS GEEN VRIJBRIEF. De bankmodules hielden bezit tegen de aanvrager met deze vorm: if (!m \|\| (codenaam && m.codenaam !== String(codenaam).trim())) ... |
-| `bank.test.js` | 26 | gezakt op `liegpoort /api/` | RTG Bank: de eigen bank op het RTG Pay-grootboek, met de 3-standen knop van de boardroom (partner -> hybride -> eigen). Getest: de leden-bank die pas open gaat als de boardroom hem live zet + akkoord (opt-in) die de... |
+| `bank.test.js` | 25 | gezakt op `liegpoort /api/` | RTG Bank: de eigen bank op het RTG Pay-grootboek, met de 3-standen knop van de boardroom (partner -> hybride -> eigen). Getest: de leden-bank die pas open gaat als de boardroom hem live zet + akkoord (opt-in) die de... |
 | `bankbeveiliging.test.js` | 3 | gezakt op `liegpoort /api/` | De bank-laag: tijd-veilige vergelijkingen, de TOTP-tweede factor op de backoffice en het inlog-auditlog. |
 | `bankdeuren.test.js` | 7 | gezakt op `liegpoort /api/` | ACHTER WELKE DEUR STAAT RTG BANK? De keuring telde 649 endpoints zonder toets. |
 | `bankduurzaam.test.js` | 2 | genoemd | DE BANK BEVESTIGT GEEN REKENING DIE DE OPSLAG NIET HEEFT. WAAROM DEZE TOETS BESTAAT. |
@@ -528,7 +528,7 @@ toets omvalt.
 | `geldketen.test.js` | 14 | gezakt op `===->!==#0` | DE GOUDEN WEG (server/kern/kantoor/geldketen.js). Deze toets beproeft de BAAN en niet de motoren: die hebben hun eigen toetsen. |
 | `geldregie.test.js` | 5 | gezakt op `liegpoort /api/` | De geld-regie van de boardroom: RTG bepaalt de pasprijzen (publiek zichtbaar, de voorwaarden volgen live), de interne partnervergoeding per genre of per zaak, en het RTG-ledenvoordeel per genre (RTG legt bij; de zaak... |
 | `geldroutes.test.js` | 5 | gezakt op `!==->===#0` | GEEN SLEUTEL IS GEEN VERZOEK -- op de handelingen die geld verplaatsen. Overal elders in dit huis is een idem-sleutel een vangnet: is hij er niet, dan gebeurt het werk gewoon. |
-| `geldveilig.test.js` | 7 | gezakt op `true->false#0` | Veiligheidsgrenzen rond echt geld. Deze toetsen sturen niets naar buiten: Stripe wijst naar een dichte lokale poort en de DirectPay-provider is nep. |
+| `geldveilig.test.js` | 5 | gezakt op `true->false#0` | Veiligheidsgrenzen rond echt geld. Deze toetsen sturen niets naar buiten: Stripe wijst naar een dichte lokale poort en de DirectPay-provider is nep. |
 | `geldwereld.test.js` | 8 | gezakt op `!==->===#0` | RTG Geld, de samenhanglaag. Zelfde beloftes als de andere werelden -- bezit niets, verzint niets, meldt stille bronnen -- plus de regel die alleen hier geldt: DEZE LAAG TELT NIETS ZELF OP. |
 | `geloofbieb.test.js` | 7 | gezakt op `liegpoort /api/` | De Geloof & Wijsheid-Bibliotheek: een ECHTE, leesbare kern over alle religies en levensbeschouwingen, als gelijken naast elkaar, altijd gratis (cadeau van de RTFoundation), met de leeftijdspoort van het profiel. Elk... |
 | `gemeente.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Gemeente (kern/gemeente.js): het civiele systeem als partner-genre. Vier pijlers voor inwoners, gemeente-medewerkers en RTG-partners. |
@@ -863,7 +863,8 @@ toets omvalt.
 | `magnaatgeldkaart.test.js` | 5 | gezakt op `return-weg#1` | De geldkaart van Magnaat World (ronde A2, stap 1) is compleet en klopt. De kaart zelf staat in scripts/lib/magnaatgeldkaart.js. |
 | `magnaatgrondwet.test.js` | 9 | gezakt op `===->!==#0` | De ratel onder MAGNAAT.md: economische integriteit in Magnaat kan vanaf de nulstand alleen nog verbeteren. MAGNAATGRONDWET.json is de bevroren nulstand (npm run magnaat:grondwet -- --vastleggen). |
 | `magnaatlab.test.js` | 9 | gezakt op `return-weg#1` | DE TESTHAL-METING -- en of hij werkelijk iets onderscheidt. scripts/magnaatlab.js beantwoordt de vraag uit MAGNAATLAB.md par. |
-| `magnaatleven.test.js` | 14 | gezakt op `liegpoort /api/` | Magnaat FROM ZERO (V1): van een mens met € 64,32 en een baan in de keuken, via zijn eigen project, een kans, een onderhandeling en een factuur, naar een cashprobleem en een eerste bedrijf. Elke euro loopt door het... |
+| `magnaatleven.test.js` | 17 | gezakt op `liegpoort /api/` | Magnaat FROM ZERO (V1): van een mens met € 64,32 en een baan in de keuken, via zijn eigen project, een kans, een onderhandeling en een factuur, naar een cashprobleem en een eerste bedrijf. Elke euro loopt door het... |
+| `magnaatonderneming.test.js` | 12 | gezakt op `===->!==#0` | Magnaat V2 ONDERNEMING: wat er gebeurt als je bedrijf groter wordt dan jij. Personeel dat loon kost voordat de klant betaalt, planning over meer mensen, contracten met vaste uren, een leverancier die eerst geld wil,... |
 | `magnaatwereld.test.js` | 20 | gezakt op `!==->===#0` | Magnaat Wereld: alle functies zijn speelbaar, maar de spelbrug raakt nooit productie. De Future Engine stelt voor; een mens bepaalt iedere fase. |
 | `mail-eigen.test.js` | 18 | gezakt op `===->!==#0` | Eigen post: DKIM-ondertekening (server/dkim.js) en directe bezorging bij de mailserver van de ontvanger (server/smtp-direct.js), plus de koppeling in server/mail.js. Waar dit op let, in volgorde van belang: 1. |
 | `mail-publiek.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -956,9 +957,6 @@ toets omvalt.
 | `momentproef.test.js` | 9 | gezakt op `===->!==#48` | DE MOMENTPROEF -- de vierde keten, en de eerste die over een PROJECTIE gaat. scripts/momentproef.js legt een publieke keten af zoals scripts/ritproef.js een ritketen: van een feit bij de bron tot een melding bij... |
 | `mond.test.js` | 10 | gezakt op `===->!==#0` | De RTG-signatuurmond (public/shared/mond.js): het puntenveld dat de lippen vormt is een pure functie met diepte (z). Hier los getoetst in Node -- de WebGL-render en de 2D-terugval leven alleen in de browser. |
 | `money-credential-productiepoort.test.js` | 12 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `money012-inkomend.test.js` | 9 | gezakt op `!==->===#0` | MONEY-012, de inkomende kant -- geld dat het huis BINNENKOMT eindigt na elke onderbreking in precies een verklaarbare waarheid. Dezelfde vier wetten als test/money012.test.js (de uitgaande kant), nu op... |
-| `money012-keten.test.js` | 3 | gezakt op `===->!==#0` | MONEY-012, DE EINDPROEF -- de keten als een systeem en niet als losse modules. test/money012.test.js en test/money012-inkomend.test.js beproeven elk een module met een nagemaakte buitenwereld. |
-| `money012.test.js` | 15 | gezakt op `===->!==#0` | MONEY-012 -- geld dat het huis verlaat, eindigt na elke onderbreking in precies EEN verklaarbare waarheid. Vier wetten, en deze toets beproeft ze op de uitgaande kant (de betaalopdracht, server/kern/betaalopdracht/),... |
 | `motor-initialisatie.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `motor-vingerafdruk.test.js` | 4 | gezakt op `!==->===#0` | De saldi-vingerafdruk (drift-detector): borgt dat de JS-berekening BYTE-VOOR- BYTE gelijk is aan de Rust-motor (motor/src/pay.rs::vingerafdruk), zodat de schaduw-drift-detector per-rekening-drift vangt die de... |
 | `motorverbinding.test.js` | 7 | -- | De gedeelde motorverbinding op het GELDPAD, in de AAN-stand. Waarom dit bestand er is. |
@@ -1816,7 +1814,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-254 bestanden, 454 beweringen.
+255 bestanden, 455 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1942,6 +1940,7 @@ toets omvalt.
 | `loopbaan.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE TWEE LOOPBAANSCHERMEN IN EEN ECHTE BROWSER. test/carriereledger.test.js bewijst het besluit en test/carriereledger.e2e.test.js dat een verzoek over HTTP bij dat besluit aankomt. |
 | `magnaat-partnerstudio.e2e.js` | 1 | gezakt op `liegpoort /api/` | De Magnaat Partnerstudio in een echte browser. De kernproeven bewijzen de publicatie- en vier-ogenregels. |
 | `magnaatleven.e2e.js` | 1 | gezakt op `liegpoort /api/` | MAGNAAT FROM ZERO IN EEN ECHTE BROWSER: van de voorzijde naar Vandaag, en de eerste dag met de Edge als bediening -- kiezen wat je maakt, tijd plannen in je agenda, een blok schrappen, en de dag afsluiten. Wat deze... |
+| `magnaatonderneming.e2e.js` | 1 | gezakt op `liegpoort /api/` | MAGNAAT V2 ONDERNEMING IN EEN ECHTE BROWSER. Het leven wordt eerst via de gewone route tot een ingeschreven onderneming gespeeld (dezelfde handelingen die een speler doet); daarna gaat het in de browser verder:... |
 | `media-studio-pro.e2e.js` | 1 | -- | De Studio Pro met een echt bronbestand. Deze toets controleert de keten die voor een maker telt: openen, beeld tekenen, niet-destructief bewerken, herstellen, ondertitelen en een watermerkvrije master downloaden. |
 | `media.e2e.js` | 1 | -- | CAMERA EN MICROFOON ZOALS EEN BROWSER ZE ERVAART. WAAROM DEZE TOETS BESTAAT. |
 | `medialijst.e2e.js` | 1 | -- | DE LIJST OP HET SCHERM -- want een knop die niemand heeft zien werken, is geen knop (LAT.md regel 10). De server-kant van de afspeellijsten staat in test/medialijsten.test.js. |

@@ -245,6 +245,49 @@ test('dezelfde keuzes geven hetzelfde leven, en de klok rekent tien dagen in een
   assert.deepEqual(ineens.s.geld, los.s.geld);
 });
 
+test('de speelronde: tempo verandert hoe lang een dag duurt, niet wat erin gebeurt', () => {
+  const v = leven();
+  assert.equal(v.s.tempo.stand, 'rustig');
+  assert.match(v.doe({ actie: 'tempo', stand: 'turbo' }).error, /rustig, vlot, proef/);
+  v.doe({ actie: 'tempo', stand: 'proef' });
+  assert.equal(v.st().dagMs, R.TEMPO.proef);
+  assert.equal(v.s.dag, 1, 'wisselen laat geen dagen tegelijk vallen');
+  v.wacht(R.TEMPO.proef / R.DAG_MS * 3);
+  assert.equal(v.s.dag, 4, 'drie proefdagen later');
+});
+
+test('doorspoelen stopt bij het volgende moment dat aandacht vraagt, en ongeplande tijd is weg', () => {
+  const v = leven();
+  v.doe({ actie: 'kies', aanbod: 'websites' });
+  v.doe({ actie: 'plan', wat: 'project', dag: 1, minuten: 240 });
+  v.doe({ actie: 'plan', wat: 'project', dag: 2, minuten: 180 });
+  v.doe({ actie: 'doorspoelen' });
+  assert.ok(v.deal('kans'), 'de kans uit het project is het moment');
+  assert.equal(v.s.dag, 3, 'en daar stopt het, niet later');
+  assert.equal(v.st().portfolio, 420, 'wat gepland was, is gebeurd; de rest niet');
+  const w = leven();
+  w.doe({ actie: 'doorspoelen' });
+  assert.ok(w.s.dag <= 1 + R.DOORSPOELEN_MAX, 'hooguit twee weken');
+  assert.equal(w.st().portfolio, 0, 'niets gepland is niets gedaan');
+  assert.equal(w.s.geld.bank, w.st().kas);
+});
+
+test('opnieuw beginnen vraagt een bevestiging, en het oude journaal blijft staan', () => {
+  const v = leven();
+  v.doe({ actie: 'kies', aanbod: 'foto' });
+  v.slaap(3);
+  const oud = v.st().wereld;
+  assert.match(v.doe({ actie: 'opnieuw' }).error, /Bevestig/);
+  assert.equal(v.st().dag, 4);
+  v.doe({ actie: 'opnieuw', zeker: true });
+  assert.equal(v.s.dag, 1);
+  assert.equal(v.s.geld.bank, R.START_KAS);
+  assert.equal(v.s.werk.project, null);
+  assert.notEqual(v.st().wereld, oud, 'een nieuwe wereld in het grootboek');
+  assert.ok(JSON.stringify(v.db.data.magnaatJournaal || {}).includes(oud), 'het oude journaal is er nog: een journaal groeit alleen');
+  assert.equal(v.L.verifieer('lid').ok, true);
+});
+
 test('de routes: kijken en handelen met een ledensessie, en een gast komt er niet in', async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-fromzero-'));
   const { child, base } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } });

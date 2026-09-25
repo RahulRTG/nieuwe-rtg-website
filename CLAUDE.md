@@ -300,7 +300,18 @@ een rangorde (dus nooit alfabetisch of op zetels), en een toets beschermt tegen
 vergissingen en niet tegen de eigenaar -- de echte bescherming van de grondwet
 zit in statuten, een extern verankerd wijzigingslog en review die ook voor
 beheerders geldt. Wetgeving (Wfpp, de aanstaande Wpp) komt er als
-`POLITICAL_LAW_PROFILE_NL` met versie en bron in, nooit als constante.
+`POLITICAL_LAW_PROFILE_NL` in, met per waarde rechtsgrond, toepassingsbereik,
+bron, geldig-vanaf en laatst-gecontroleerd -- nooit als constante. **Fase A is
+gesloten (25 september 2026)**: DemocratieOS krijgt een eigen rechtspersoon (de
+RTFoundation is initiatiefnemer, geen bestuurder), de grondwet heeft drie
+wijzigingsniveaus (NORMAAL, BESCHERMD, GRONDWET met wachttijd en extern anker) en
+een noodprocedure die alleen mag UITZETTEN en nooit een partijprivilege mag
+maken, en er is een derde proef (P3: RTG verdwijnt) die vandaag niet haalbaar is
+en daarom vanaf de eerste regel een eigen map met verklaarde afhankelijkheden
+eist. Fase B bouwt alleen kwestie -> eindstand -> terugkoppeling -> NIEMAND_KWIJT
+en kent geen partij; fase C probeert dat kapot te maken met drie synthetische
+partijen (Noord, Midden, Zuid). Pas als B en C groen zijn, komt er een echte
+partij aan de runtime -- en dat is niet die van de oprichter.
 
 **`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
 Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk

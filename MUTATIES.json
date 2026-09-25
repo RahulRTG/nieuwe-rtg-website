@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T02:21:55.678Z",
-    "commit": "793020659",
+    "op": "2026-09-25T03:36:39.558Z",
+    "commit": "08c9d837",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -562,6 +562,14 @@
       "soort": "puur",
       "staat": "al rood",
       "gezakteZonderMutatie": 1
+    },
+    "appwerkt-onderschepper.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/appwerkt.js",
+      "operator": "===->!==#8",
+      "gezakt": 2,
+      "geprobeerd": 50
     },
     "archief.test.js": {
       "soort": "server",

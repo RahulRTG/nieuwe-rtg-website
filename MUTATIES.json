@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T00:58:36.111Z",
-    "commit": "040ff910",
+    "op": "2026-09-25T00:58:54.945Z",
+    "commit": "f85ee29c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7092,6 +7092,13 @@
       "operator": "+->-#1",
       "gezakt": 5,
       "geprobeerd": 4
+    },
+    "rahul-escape.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "rahul-hart.test.js": {
       "soort": "puur",

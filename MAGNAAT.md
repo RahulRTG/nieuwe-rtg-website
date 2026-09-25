@@ -265,6 +265,48 @@ Elke rekening draagt de wereld in haar naam (`world:{id}:macro:bank`, `world:{id
 
 Wat A2 bewust **niet** deed: het grootboek bewaart zijn journaal nog als één waarde per collectie (A3 in de oorspronkelijke fundering), en een partij kent nog geen herhaling uit het journaal (A5). Volgens de scopebevriezing komen die pas als een V-ronde erop vastloopt.
 
+### V1 FROM ZERO: wat er staat (24 september 2026)
+
+**De belofte:** wie niets van RTG of boekhouden weet, opent het, begint zonder uitleg, speelt een paar uur en denkt aan het eind: *ik begon letterlijk met bijna niks, en dit bedrijf heb ík opgebouwd.* V1 doet daarom één ding en geen tien: van persoon → arbeid → eerste kans → klant → opdracht → factuur → cashprobleem → onderneming. Personeel, leveranciers, voorraad en een levende markt horen bij V2 en later.
+
+**Je begint op een maandag** met € 64,32, een baan van 24 uur per week als keukenmedewerker (dinsdag, woensdag en zaterdag; loon op vrijdag), € 41,99 aan vaste betalingen deze week, een telefoon, een eenvoudige laptop, 4u 20m vrij vandaag, en geen onderneming (`server/kern/magnaat-leven/`, regels in `regels.js`).
+
+**Tijd is net zo schaars als geld.** Elke dag heeft vrije minuten naast je diensten. Die plan je in een agenda: aan je eigen project, aan leren, aan een opdracht, of aan de extra dienst die de keuken elke donderdag aanbiedt (€ 145 voor 7 uur). Een uur kan maar één keer op. Dat is opportunity cost, en niemand hoeft het woord te kennen om het te voelen. De agenda wordt uitgevoerd aan het eind van de dag.
+
+**Een kans komt uit wat je doet, niet uit een knop.** Na zes uur aan je eigen project heeft iemand je werk gezien. Een tevreden klant beveelt je aan, en een ingeschreven onderneming wordt gevonden (`klanten.js`, `komt`). Na een half uur gesprek weet je wat de klant wil, hoeveel werk het is en wanneer hij het nodig heeft. Daarna onderhandel je over drie dingen en niet meer: de **prijs**, de **deadline** (meer dagen is minder tijdsdruk, maar een klant wacht niet eindeloos) en de **betaalstructuur** (hoeveel vooraf): *jij € 900, klant € 650, jij € 800 + 25% vooraf, akkoord.* Een klant die iets niet wil, zegt welk van de drie en waarom. Wat eruit komt is een afspraak met een bedrag, een voorschot, uren en een deadline. Voor klantwerk heb je betaalde software nodig, en die kost vanaf die dag € 49 per vier weken.
+
+**Resultaat is geen bank, en dat staat in de boeken en niet alleen op het scherm.** Een voorschot is een schuld aan de klant tot je levert. Een factuur is omzet en een **vordering**, geen geld. Pas als de klant betaalt, wordt de vordering kas. Zo staat er midden in het spel: *op je rekening € 108,35 · nog te ontvangen € 600 · resultaat van je werk € 751.* Het boek (`boek.js`) kent daarvoor echte rekeningsoorten (kas, vordering, vooruit, omzet, kosten, schuld), en privé-uitgaven gaan naar een tegenpartij. Zo gaat het resultaat alleen over je werk.
+
+**Dan het cashprobleem.** De eerste klant betaalt altijd te laat. De huur valt op dag 15. Wie geen extra dienst draaide, kan hem niet betalen: de betaling mislukt, er komen aanmaningskosten bij, en het loon van vrijdag lost het op. Je rekening kan niet rood staan. Wat je dan kunt doen, en elk heeft een prijs:
+- extra werken: geld erbij, tijd voor je project eraf;
+- een herinnering sturen na de vervaldag: de klant betaalt binnen drie dagen;
+- korting bieden voor directe betaling: geld nu, maar minder, en de korting staat als kosten in je resultaat;
+- een nieuwe opdracht aannemen: toekomstige omzet, maar meer tijdsdruk;
+- een betalingsregeling waar de verplichting die toestaat: telefoon en verzekering een week later tegen € 7,50, of je abonnement een week stilzetten (en dan ligt je software stil). Voor de huur bestaat die regeling niet, en er is geen algemene knop "stel uit";
+- financieren: lenen bij je familie, terug van je volgende twee lonen, of als onderneming een factuur laten voorfinancieren (90% nu, de rest is kosten).
+
+**Het spel stelt vast dat je onderneemt.** V1 begint niet met "richt bedrijf op": je kunt economisch actief worden voordat je jezelf als ondernemer ziet. Na twee betaalde opdrachten zegt het spel dat je structureel voor klanten werkt, en vraagt het hoe je verder wilt. **Die regel is van Oudwijk en niet van een echt land.** Wanneer je je inschrijft, wat dat kost en of er btw op een factuur gaat, verschilt per jurisdictie. Daarom noemt elke tekst hem als regel van Oudwijk (`JURISDICTIE` in `regels.js`), staan de spelregels op het Wereld-scherm, en zakt een toets zodra een echte instelling of regeling als wet van deze wereld opduikt. Een nieuwe klant neem je vanaf dan aan als onderneming. Pas na de inschrijving verschijnt **Mijn bedrijf**, met resultaat en balans. Een tevreden klant komt na drie weken terug voor onderhoud, tegen het uurtarief dat je de eerste keer afsprak: wie zich toen goedkoop verkocht, merkt dat opnieuw. Brengt je bedrijf vier weken lang twee keer je loon binnen, en bestaat het al minstens vier weken, dan kun je je baan opzeggen. Dat is het einde van V1: *je begon met € 64,32 en een baan in de keuken, en dit bedrijf heb jij opgebouwd.*
+
+**RTG-functies verschijnen pas als je ze nodig hebt**, met het moment en de reden: Geld, Agenda, Berichten, Offertes, Facturen, Betaalherinneringen, Budget, Zakelijk en Boekhouding. Geen level-up.
+
+**De schermen** staan in de Magnaat-app:
+- **Vandaag:** wat aandacht vraagt, je week in een agenda met diensten, loon en betalingen, wat er gebeurde, en je RTG;
+- **Werk:** baan, diensten, eigen project en opdrachten;
+- **Geld:** rekening, te ontvangen en resultaat naast elkaar, met wat eraan komt;
+- **Netwerk:** elk gesprek met zijn biedingen;
+- **Wereld** en **Mijn bedrijf**.
+
+De Edge draagt de handeling die nu het meest zin heeft als hoofdactie. Elke handeling staat er met haar reden bij, en een weigering komt van de server, met de reden erbij.
+
+**De klok rekent bij en tikt niet, zoals in World.** Een speldag duurt drie echte minuten, of korter als je hem zelf afsluit.
+
+**Wat de toetsen vastleggen:** de hele keten staat in `test/magnaatleven.test.js`, van € 64,32 tot de onderneming, met de onderhandeling letterlijk zoals hierboven. Zes mutaties zijn nagetrokken en zakken alle zes (onder andere: een factuur als geld boeken, een klant die op tijd betaalt, een voorschot zonder grens, rood kunnen staan). Drie dingen die het bouwen blootlegde en die nu vastliggen:
+- de id van een betaling komt uit een teller en nooit uit de lengte van de lijst, want dat id is de grootboeksleutel, en een sleutel die terugkomt boekt niets;
+- werk dat vandaag niet kan (software niet betaald), wordt geweigerd met de reden, en niet aan het eind van de dag stil weggegooid;
+- het beeld is een kopie, anders veranderde een aanroeper die `rondes.pop()` deed de echte onderhandeling.
+
+Wat V1 bewust **niet** doet: btw (in Oudwijk betaalt een kleine onderneming die niet), belasting op de winst, bewust netwerken als eigen activiteit, personeel, leveranciers, voorraad, meer dan drie aanbodsoorten met zes klanten elk, en een koppeling met World.
+
 ---
 
 ## 8. De regels

@@ -9,6 +9,7 @@ const R = require('./regels');
 const { AANBOD } = require('./klanten');
 const { euro, tijd: duur } = require('./staat');
 const { rest } = require('./tijd');
+const { contractAanbod, bedrijfHandelingen } = require('./volgende-bedrijf');
 
 function handelingenNu(st) {
   const uit = [];
@@ -41,6 +42,7 @@ function handelingenNu(st) {
       if (st.onderneming) zet('voorfinancier', 'Factuur voorfinancieren', R.VOORFINANCIERING.deel + '% van ' + euro(d.factuur.rest) + ' nu; de rest kost het.', { deal: d.id });
     }
   }
+  contractAanbod(st, zet);
   const komend = st.posten.filter(p => p.dag <= st.dag + 7);
   const nodig = komend.reduce((s, p) => s + p.bedrag, 0);
   if (nodig > st.kas) {
@@ -58,6 +60,7 @@ function handelingenNu(st) {
     zet('plan', 'Werk aan ' + AANBOD[st.aanbod].project, 'Wie je werk ziet, kan er iets van vinden.', { wat: 'project', dag: st.dag, minuten: 'minuten' });
     zet('plan', 'Leer iets', 'Wie meer kan, doet een opdracht sneller.', { wat: 'leren', dag: st.dag, minuten: 'minuten' });
   }
+  bedrijfHandelingen(st, zet);
   if (st.baan.actief) {
     for (let dag = st.dag; dag <= st.dag + 6; dag++) {
       if (R.weekdag(dag) === st.baan.extra.dag && rest(st, dag) >= st.baan.extra.minuten) {

@@ -305,6 +305,23 @@ De Edge draagt de handeling die nu het meest zin heeft als hoofdactie. Elke hand
 - werk dat vandaag niet kan (software niet betaald), wordt geweigerd met de reden, en niet aan het eind van de dag stil weggegooid;
 - het beeld is een kopie, anders veranderde een aanroeper die `rondes.pop()` deed de echte onderhandeling.
 
+### De speelronde: V1 is pas af als iemand hem gespeeld heeft
+
+De vragen die er nu toe doen, beantwoordt geen invariant. Ze worden beantwoord door te spelen:
+
+- Is werken vervelend genoeg dat je wilt ontsnappen, maar nuttig genoeg dat je het soms nodig hebt?
+- Is vrije tijd echt schaars?
+- Voelt die eerste klant waardevol?
+- Doet een late betaling pijn?
+- Voelt € 800 ontvangen als iets wat je zelf hebt opgebouwd?
+- En de lat van V1: kan iemand die niets van RTG of boekhouden weet het openen, zonder uitleg beginnen, een paar uur spelen, en aan het eind denken dat hij dit bedrijf zelf heeft opgebouwd?
+
+Om die ronde in een uur te kunnen spelen in plaats van in vier, zijn er drie hulpen, en geen van drieën verandert wat er in een dag gebeurt (`speelronde.js`):
+
+- het **tempo**: *rustig* (3 minuten per dag), *vlot* (1 minuut) of *proef* (20 seconden);
+- **doorspoelen naar het volgende moment**: de dagen lopen door tot er een kans, een vraag, geldnood of slecht nieuws is, en hooguit twee weken. Wat je plande gebeurt, en ongeplande vrije tijd is weg. Doorspoelen is dus tijd laten liggen, niet gratis tijd;
+- **opnieuw beginnen**, met een bevestiging. Het oude leven blijft in het grootboek staan onder een eigen wereld, want een journaal groeit alleen.
+
 Wat V1 bewust **niet** doet: btw (in Oudwijk betaalt een kleine onderneming die niet), belasting op de winst, bewust netwerken als eigen activiteit, personeel, leveranciers, voorraad, meer dan drie aanbodsoorten met zes klanten elk, en een koppeling met World.
 
 ---

@@ -134,6 +134,12 @@ Object.assign(kern, require('../kern/economie')({ db, save }));
    uitgerekend op de pasgeschiedenis, de laatste bezoekdag, de uitkomsten en de
    lidmaatschapstermijnen, en elk getal over mensen langs de groepspoort. Leest
    alleen; na de economielaag omdat elke maat een economische wereld draagt. */
+/* De twee bronnen eronder (besluiten van 25 september 2026): de dag van het
+   laatste bezoek per lid (kern/aanwezigheid.js; de ledengids raakt hem aan) en
+   de pasgeschiedenis (kern/pasgeschiedenis.js; de accountlaag meldt elke
+   overgang). */
+kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save });
+kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, accounts });
 kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
     betaalschemas: () => db.data.lidmaatschapBetalingen },

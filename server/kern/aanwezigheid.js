@@ -19,7 +19,13 @@
 
 const BEWAAR_DAGEN = 395;
 
-module.exports = ({ db, save, nu }) => {
+/* DE LATE BINDING. De ledengids (kern/gids.js) wordt eerder gebouwd dan deze
+   module (server/opzet/kernlaag4.js), dus hij raakt de aanwezigheid via `raak`
+   hieronder: zolang er nog geen instantie is, gebeurt er niets. Een instantie
+   meldt zich bij het bouwen aan als de actieve. */
+let actief = null;
+
+function maakAanwezigheid({ db, save, nu }) {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/aanwezigheid', bezit: { laatstActief: 'lijst' } });
   const klok = typeof nu === 'function' ? nu : Date.now;
   /* Een index op codenaam, gebonden aan de LIJST waaruit hij is gebouwd. Vervangt
@@ -49,5 +55,10 @@ module.exports = ({ db, save, nu }) => {
 
   const laatstActief = () => eigen.kijk('laatstActief');
 
-  return { raakAanwezig, laatstActief, BEWAAR_DAGEN };
-};
+  const api = { raakAanwezig, laatstActief, BEWAAR_DAGEN };
+  actief = api;
+  return api;
+}
+
+module.exports = maakAanwezigheid;
+module.exports.raak = (codenaam) => (actief ? actief.raakAanwezig(codenaam) : false);

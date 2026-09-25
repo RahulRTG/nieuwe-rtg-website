@@ -16,6 +16,15 @@
    Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
    DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
 module.exports = [
+  /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september
+     2026: retentie ook als aanwezigheid, een dag per lid). kern/gids.js dirTouch
+     is het ene keelgat waar elk ledenverzoek langskomt; daar wordt ook de dag van
+     het laatste bezoek aangeraakt, zodat "aanwezig" en "in de gids" niet op twee
+     deuren iets anders betekenen. De gids leest niets terug: het is een melding,
+     via een late binding (kern/aanwezigheid.js `raak`), omdat de gids eerder
+     wordt gebouwd dan de module die de dag bewaart. */
+  { van: 'domein:gids', naar: 'domein:aanwezigheid', soort: 'DOMEINRELATIE',
+    reden: 'de ledengids meldt bij elk ledenverzoek de bezoekdag aan kern/aanwezigheid.js; hetzelfde keelgat, geen tweede definitie van aanwezig' },
   /* DE ZWARE POORT LEEST DE LIJST ZWARE HANDELINGEN. kern/zwaarbewijs.js weigert
      een actienaam die kern/webauthn-acties.js niet kent bij de EERSTE aanroep:
      zonder die controle ging zo'n route op de terugval door zolang de eigenaar

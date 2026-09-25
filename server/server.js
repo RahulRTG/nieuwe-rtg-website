@@ -737,12 +737,6 @@ const { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
    plus de poortwachters resolveSession en auth -- staat in ./opzet/diensten.js.
    De in- en uitgangslijsten zijn uitgerekend met scripts/blokscan.js, niet met
    de hand bijgehouden. */
-/* De twee bronnen onder retentie, nieuw lid, cohort en churn (besluiten van de
-   eigenaar, 25 september 2026): de dag van het laatste bezoek per lid
-   (kern/aanwezigheid.js, aangeraakt naast de ledengids) en de pasgeschiedenis
-   (kern/pasgeschiedenis.js, gemeld door de accountlaag). */
-const aanwezigheid = require('./kern/aanwezigheid')({ db, save });
-const pasgeschiedenis = require('./kern/pasgeschiedenis')({ db, save, accounts });
 const {
   AUTHOR_TIER, SSE_BUFFER_TTL, aiPoort, antivirus, archief, atelierweb, auth, automatisering, 
   beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
@@ -757,7 +751,7 @@ const {
   DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n,
   ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsWeg, ledenGidsZet,
   ledenGidsZoek, ledenPrijs, maakLive, mail, onExternalChange,
-  ordersVanKlant, raakAanwezig: aanwezigheid.raakAanwezig, rtf, save, schild, schoon, sessionFor, sessions, herbouwSessions, sseToOffice, sseToSupplier,
+  ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, herbouwSessions, sseToOffice, sseToSupplier,
   tokenHash,
   // pas verderop in dit bestand gebouwd; zie de uitleg in diensten.js
   lidBoardUitVan: () => lidBoardUit, lidPadFunctieVan: () => lidPadFunctie,
@@ -2285,7 +2279,7 @@ const kern = {
      (kern/spraaktekst.js). Geen state, dus rechtstreeks op de kern. */
   spraaktekst: require('./kern/spraaktekst'),
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, betaalWaarheid, betaalRegie, broadcastSync,
-  aanwezigheid, pasgeschiedenis, bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, rondEuro, chatApplicant,
+  bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, rondEuro, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,

@@ -173,3 +173,22 @@ test('6. het dossier van EEN route draagt elf cellen met hun reden', async () =>
   const weg = (await vraag({ methode: 'POST', pad: '/api/dit-bestaat-niet-xyz' })).body;
   assert.equal(weg.gevonden, false, 'een onbekende route levert geen half dossier op');
 });
+
+/* 7. WAT HET DOSSIER NIET WEET (BEWIJSLUS.md par. 7), over de echte route en
+   niet over een nagemaakte app: de vervalstaat, de plek in de code en de drie
+   assen die niemand meet. MUTATIE: `...vertrouwen.dossierAanvulling(rij)` uit
+   eenRoute() in server/routes/office/dossier.js halen -> deze toets zakt. */
+test('7. het dossier zegt waar de route staat, hoe vers het bewijs is en wat niemand meet', async () => {
+  const d = (await vraag({ methode: 'GET', pad: '/api/pay/gezond' })).body;
+  assert.equal(d.gevonden, true);
+
+  assert.ok(d.vervalstaat && 'staat' in d.vervalstaat && d.vervalstaat.reden,
+    'de vervalstaat staat er, en draagt altijd een reden -- ook als hij null is');
+  assert.equal(d.bron.bestand, 'server/routes/pay.js', 'de plek komt uit ROUTEBRON.json');
+
+  assert.equal(d.nietGemeten.productie.staat, 'verklaard',
+    'de sondereis "grootboek" loopt deze route');
+  assert.equal(d.nietGemeten.productie.reis, 'grootboek');
+  assert.equal(d.nietGemeten.tegenvoorbeeld.staat, 'ongemeten');
+  assert.equal(d.nietGemeten.mutatiePerRoute.staat, 'ongemeten');
+});

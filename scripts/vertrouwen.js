@@ -146,6 +146,74 @@ function staatVan(cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar) {
       'wordt dan ' + hw + ' dagen' };
 }
 
+/* WAT HET DOSSIER VAN EEN ROUTE NIET WEET (BEWIJSLUS.md par. 7). De elf cellen
+   zeggen wat er gemeten is; deze drie assen staan ernaast omdat er voor GEEN
+   route iets bestaat dat ze vult, of omdat alleen een verklaring bestaat en geen
+   meting. Ze staan er met opzet in de woorden van de matrix (`ongemeten` met
+   `nodig`, of `verklaard`) en niet als een eigen ladder.
+
+   Zonder deze lijst leest een dossier met elf groene cellen als "alles is
+   bewezen", terwijl niemand ooit naar een tegenvoorbeeld heeft gezocht, niemand
+   weet hoeveel mutanten op DEZE route sneuvelden, en productie er niets over
+   zegt. Een leeg vak wordt gevuld met iemands eigen indruk.
+
+   `reizen` zijn de sondereizen uit SLO.json. Pure functie. */
+function nietGemetenVan(methode, pad, reizen) {
+  const reis = (Array.isArray(reizen) ? reizen : [])
+    .find(r => r && r.pad === pad && String(r.methode || 'GET').toUpperCase() === methode);
+  return {
+    tegenvoorbeeld: { staat: 'ongemeten',
+      reden: 'er is geen zoeker die voor deze route een tegenvoorbeeld heeft gezocht',
+      nodig: 'de zoekende tegenstander uit BEWIJSLUS.md par. 3' },
+    mutatiePerRoute: { staat: 'ongemeten',
+      reden: 'scripts/mutatie.js meet per TOETSBESTAND; hoeveel mutanten op deze route sneuvelden is onbekend',
+      nodig: 'een mutatiemeting die haar uitslag aan routes koppelt' },
+    productie: reis
+      ? { staat: 'verklaard', reis: reis.id,
+          reden: 'de sonde is ingericht om deze route te lopen (reis "' + reis.id + '"); of dat in productie ' +
+            'gebeurt en wat hij zag, staat niet in dit dossier' }
+      : { staat: 'ongemeten',
+          reden: 'geen sondereis loopt deze route; productie bevestigt hier niets',
+          nodig: 'een reis in SLO.json, of een invariant in productie (BEWIJSLUS.md par. 8)' }
+  };
+}
+
+/* DRIE DINGEN NAAST DE ELF CELLEN van een routedossier (BEWIJSLUS.md par. 7),
+   voor server/routes/office/dossier.js. Alle drie AFGELEID uit wat er al is en
+   geen van drieen een eigen oordeel:
+
+     vervalstaat   staatVan() hierboven -- dezelfde functie die VERTROUWEN.json
+                   rekent, over dezelfde cellen. Is de versheid niet vast te
+                   stellen, dan staat er null MET de reden: een staat zonder
+                   ouderdom zou een verzonnen staat zijn.
+     bron          waar de route in de code staat, uit ROUTEBRON.json (de ROUTER,
+                   niet een regex). Onbekend is null, nooit een geraden bestand.
+     nietGemeten   nietGemetenVan() hierboven.
+
+   `lees` is in te voeren zodat een toets verzonnen registers kan geven. */
+function dossierAanvulling(rij, lees, nu) {
+  const lezer = lees || ((naam) => {
+    try { return JSON.parse(fs.readFileSync(path.join(WORTEL, naam), 'utf8')); }
+    catch (e) { return null; }
+  });
+  let vervalstaat;
+  try {
+    const oud = ouderdom(Number.isFinite(nu) ? nu : Date.now());
+    vervalstaat = { ...staatVan(rij.cellen, oud.dagen, undefined, oud.onreproduceerbaar),
+      ouderdomDagen: Math.round(oud.dagen * 10) / 10 };
+  } catch (e) {
+    vervalstaat = { staat: null, reden: 'niet vast te stellen: ' + e.message };
+  }
+  const sleutel = rij.methode + ' ' + rij.pad;
+  const rb = lezer('ROUTEBRON.json');
+  const treffer = rb && rb.perRoute ? Object.values(rb.perRoute).find(x => x && x.route === sleutel) : null;
+  const bron = treffer
+    ? { bestand: treffer.bestand, regel: treffer.regel, register: 'ROUTEBRON.json' }
+    : { bestand: null, reden: rb ? 'ROUTEBRON.json kent deze route niet' : 'ROUTEBRON.json is niet te lezen' };
+  const slo = lezer('SLO.json');
+  return { vervalstaat, bron, nietGemeten: nietGemetenVan(rij.methode, rij.pad, slo && slo.reizen) };
+}
+
 /* Alle routes: de matrixrijen door de staatmachine. Losgetrokken van meet()
    zodat de toets hem verzonnen rijen kan voeren zonder de echte registers. */
 function bereken(rijen, ouderdomDagen, halfwaardetijd, onreproduceerbaar) {
@@ -225,7 +293,7 @@ function meet() {
   };
 }
 
-module.exports = { staatVan, bereken, ouderdom, meet, HALFWAARDETIJD_DAGEN, BRONNEN };
+module.exports = { staatVan, bereken, ouderdom, meet, nietGemetenVan, dossierAanvulling, HALFWAARDETIJD_DAGEN, BRONNEN };
 
 
 /* ==========================================================================

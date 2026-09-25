@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-25T08:21:12.427Z",
-  "commit": "560d8fe8",
+  "op": "2026-09-25T08:51:19.565Z",
+  "commit": "20f1a782",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/rolproef-route.js",
@@ -827,7 +827,7 @@
    ]
   }
  ],
- "routesGevonden": 5054,
+ "routesGevonden": 5057,
  "nietTeKruisen": [
   {
    "methode": "POST",
@@ -1641,7 +1641,7 @@
   }
  ],
  "gemeten": {
-  "routesMetRol": 4292,
+  "routesMetRol": 4295,
   "beproefd": 3889,
   "pogingen": 8000,
   "nietTeKruisen": 135,
@@ -19243,6 +19243,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/handtekening/opties",
+   "rol": "kantoor-op-naam",
+   "geprobeerd": [
+    "member",
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bank/herstel",
    "rol": "office",
    "geprobeerd": [
@@ -19267,6 +19279,18 @@
   {
    "methode": "POST",
    "pad": "/api/office/bank/incasso/dossier",
+   "rol": "kantoor-op-naam",
+   "geprobeerd": [
+    "member",
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/incasso/opties",
    "rol": "kantoor-op-naam",
    "geprobeerd": [
     "member",
@@ -19362,6 +19386,18 @@
    "geprobeerd": [
     "member",
     "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/opdrachten/afstemming",
+   "rol": "kantoor-op-naam",
+   "geprobeerd": [
+    "member",
+    "supplier",
+    "office"
    ],
    "acl": "dicht",
    "privacy": "schoon"
@@ -44609,42 +44645,6 @@
   {
    "methode": "POST",
    "pad": "/api/techniek/bewaren/veeg",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/controle/incident",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/controle/integriteit",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/eigenaar",
    "rol": "techniek",
    "geprobeerd": [
     "member",

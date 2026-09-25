@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2032 bestanden en 14407 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2033 bestanden en 14412 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2032 |
-| losse beweringen (`test(...)`) | 14407 |
+| toetsbestanden | 2033 |
+| losse beweringen (`test(...)`) | 14412 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1380 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1382 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
-| niets van beide | 408 |
+| niets van beide | 407 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1776 bestanden, 13951 beweringen.
+1777 bestanden, 13956 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -894,7 +894,7 @@ toets omvalt.
 | `mandaatpoort.test.js` | 12 | gezakt op `===->!==#0` | DE MANDAATPOORT (server/kern/stuur/mandaatpoort.js). DE REGEL DIE HIJ BEWAAKT: geen muterend effect vanuit een intentie zonder aantoonbaar gezag. |
 | `mandaatproef.test.js` | 5 | gezakt op `&&->||#0` | DE MANDAATPROEF (scripts/mandaatproef.js). Bewaakt de VORM van de proef en niet zijn uitslag: die hoort te veranderen zodra een mandaat verleend kan worden. |
 | `marechaussee.test.js` | 5 | gezakt op `liegpoort /api/` | De Brigade RTG Airport (kern/marechaussee.js): de grensbalie op de echte luchthavendata (passagierslijst op codenaam, besluit per reiziger), patrouilles door de zones, incidenten en het grens-signaal in de cockpit. |
-| `margeschaal.test.js` | 10 | -- | DE RUIMTESCHAAL (ONTWERP.md 2b, TAKEN.md 4.51). Zeventien willekeurige margestappen zijn er vijf geworden, en drie daarvan stonden al in ONTWERP.md als de basisruimte van World, Pro en Command. |
+| `margeschaal.test.js` | 10 | gezakt op `!==->===#0` | DE RUIMTESCHAAL (ONTWERP.md 2b, TAKEN.md 4.51). Zeventien willekeurige margestappen zijn er vijf geworden, en drie daarvan stonden al in ONTWERP.md als de basisruimte van World, Pro en Command. |
 | `marina.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Marina: het jachthaven-systeem (demo Marina Portell). Bewaakt de toewijzing van ligplaatsen aan passanten (eerste passende plaats, vol is vol), de bescherming van vaste liggers, de brandstofsteiger, service met... |
 | `markt-zaak.test.js` | 7 | gezakt op `liegpoort /api/` | DE MARKTPLAATS VANAF DE ZAAK -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: status, verwijder, antwoord, chat, deal/voorstel, deal/hier,... |
 | `markt.test.js` | 11 | gezakt op `liegpoort /api/` | Marktplaats in de RTFoundation-app: gezinnen kopen en verkopen, leveranciers kunnen er ook op verkopen. Met de vier pijlers: veiligheid (kinderen kijken alleen, oplichting wordt gemarkeerd, melden/blokkeren), respect... |
@@ -970,6 +970,7 @@ toets omvalt.
 | `multi-instance-sqlite.test.js` | 1 | gezakt op `liegpoort /api/` | Multi-instance: twee losse serverprocessen achter dezelfde gedeelde SQLite- opslag (store.db), zoals achter de poortwachter draaien. Elke top-level collectie is een rij met een oplopend versienummer; een korte... |
 | `munten.test.js` | 4 | gezakt op `liegpoort /api/` | Munten ontvangen en omzetten. RTG accepteert crypto voor zijn eigen diensten en zet ze meteen om naar euro's via een aanbieder-naad; zelf nooit crypto in bezit. |
 | `mutatie.test.js` | 9 | genoemd | DE MUTATIESEMANTIEK -- en of de poort werkelijk dichtgaat. kern/mutatie.js draait om een omkering die makkelijk weer terug te draaien is: het doel is niet dat alles idempotent IS, maar dat van alles wat publiek... |
+| `mutatiebijwerking.test.js` | 5 | gezakt op `&&->||#0` | DE MUTATIEMOTOR SCHRIJFT NIET BUITEN ZIJN MUTATIE (scripts/mutatie.js). Op 25 september 2026 draaide de motor `===->!==` om in de programmawacht van scripts/margeschaal.js (`if (require.main === module)... |
 | `mutatieboek.test.js` | 15 | genoemd | HET MUTATIEBOEK SLUIT. WAT HIER BEWAAKT WORDT, EN WAAROM HET GEEN GETAL IS. |
 | `mutatiecontract.test.js` | 30 | gezakt op `true->false#0` | HET MUTATIECONTRACTREGISTER -- de poort en de lat. Twee dingen worden hier afgedwongen, en ze zijn allebei een grens en geen gewoonte: 1. |
 | `mutatiedekking.test.js` | 7 | muteert zelf | DUN EN BEPROEFD ZIJN NIET HETZELFDE SOORT OVERLEVER (TAKEN.md 4.53). WAAROM DEZE TOETS ER IS. |

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T08:28:41.657Z",
-    "commit": "3a186741",
+    "op": "2026-09-25T08:51:52.448Z",
+    "commit": "28be5395",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
@@ -236,7 +236,7 @@
       "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/HGPTVZ/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/SPMST5/gezondheid",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -972,7 +972,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/HGPTVZ/mij",
+          "verzoek": "GET /api/foundation/gezin/SPMST5/mij",
           "a": 200,
           "b": 403,
           "anoniem": 403,

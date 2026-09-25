@@ -5298,6 +5298,21 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "magnaatafwerking.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatafwerking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "magnaatgeldkaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5556,6 +5571,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "margeschaal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/margeschaal.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "marina.test.js": {
       "soort": "server",
@@ -6006,6 +6029,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "mutatiebijwerking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mutatie.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "mutatiecontract.test.js": {
       "soort": "puur",

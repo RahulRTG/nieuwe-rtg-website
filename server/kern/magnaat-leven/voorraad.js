@@ -16,20 +16,16 @@
 const B = require('./regels-bedrijf');
 const { meld, ontgrendel, post, euro } = require('./staat');
 const { boekVan } = require('./boek');
+const { mijnVraag } = require('./markt');
 
 const fout = (error) => ({ status: 400, error });
 const waarVan = (st) => (st.aanbod ? B.HANDELSWAAR[st.aanbod] : null);
 const geblokkeerd = (st) => st.posten.some(p => p.soort === 'leverancier' && p.achterstand);
 
-/* Stuks per week, in duizendsten: meer klanten, meer vraag; een hogere prijs,
-   kwadratisch minder. */
-function vraagPerWeek(st) {
-  const w = waarVan(st), h = st.handel;
-  if (!w || !h) return 0;
-  const klanten = new Set(st.deals.filter(d => d.fase === 'betaald').map(d => d.klantId)).size;
-  const basis = Math.min(B.HANDELSVRAAG.plafond, B.HANDELSVRAAG.basis + klanten * B.HANDELSVRAAG.perKlant);
-  return Math.floor(basis * w.advies * w.advies / (h.prijs * h.prijs));
-}
+/* Stuks per week, in duizendsten, in dit seizoen: je deel van wat heel
+   Oudwijk koopt (V3, ./markt.js). Je prijs, je naam en waar je zit, bepalen
+   dat deel; de concurrenten de rest. */
+const vraagPerWeek = (st) => (waarVan(st) && st.handel ? mijnVraag(st) : 0);
 
 function bestelInkoop(st, z) {
   const w = waarVan(st);
@@ -87,7 +83,7 @@ function handelDag(st) {
   }
   st.leveringen = st.leveringen.filter(x => x.dag > st.dag);
   if (!h.inWinkel) return;             // wat nog nooit te koop lag, mist ook niemand
-  h.tegoed += Math.floor(vraagPerWeek(st) / 7);
+  h.tegoed += mijnVraag(st, st.dag);                // het weer van vandaag telt mee
   let n = 0;
   while (h.tegoed >= 1000 && h.voorraad > 0) { h.tegoed -= 1000; h.voorraad--; n++; }
   if (h.tegoed >= 1000) {

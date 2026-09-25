@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T03:41:43.004Z",
-    "commit": "a205c919",
+    "op": "2026-09-25T04:37:00.085Z",
+    "commit": "5dd5b698",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doorbelasting.js",
@@ -21,12 +21,12 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1432,
-    "geldvormen": 216,
-    "volgbaar": 34,
+    "vormenTotaal": 1436,
+    "geldvormen": 218,
+    "volgbaar": 36,
     "perHerkomstveld": {
-      "bron": 18,
-      "provider": 1,
+      "bron": 19,
+      "provider": 2,
       "aanbieder": 7,
       "herkomst": 1,
       "leverancier": 8,
@@ -38,6 +38,7 @@
       "server/kern/betaalopdracht/index.js",
       "server/kern/betaalopdracht/index.js",
       "server/kern/betaalregie-waarheid.js",
+      "server/kern/betaalwaarheid/beeld.js",
       "server/kern/boerderij.js",
       "server/kern/boerderij/beheer.js",
       "server/kern/boerderij/erf.js",
@@ -47,6 +48,7 @@
       "server/kern/kosten/providerfactuur.js",
       "server/kern/kosten/providerfactuur.js",
       "server/kern/magnaat-leven/contract.js",
+      "server/kern/magnaat-leven/markt.js",
       "server/kern/magnaat-leven/regels.js",
       "server/kern/magnaat-leven/weergave-bedrijf.js",
       "server/kern/magnaat-leven/weergave.js",
@@ -107,6 +109,10 @@
         "volgbaar": 2
       },
       "server/kern/betaalregie-waarheid.js": {
+        "geldvormen": 1,
+        "volgbaar": 1
+      },
+      "server/kern/betaalwaarheid": {
         "geldvormen": 1,
         "volgbaar": 1
       },
@@ -243,8 +249,8 @@
         "volgbaar": 0
       },
       "server/kern/magnaat-leven": {
-        "geldvormen": 4,
-        "volgbaar": 4
+        "geldvormen": 5,
+        "volgbaar": 5
       },
       "server/kern/mall": {
         "geldvormen": 11,
@@ -588,41 +594,10 @@
     "grens": "Dit is de NORM en geen waarneming: deze wereld is verzonnen en deterministisch. Hij bewijst dat de machine niet gaat raden, en zegt NIETS over wat RTG werkelijk verdient. Dat staat in B2, en die twee worden nooit opgeteld. Dat geldt ook voor de dekkingsgetallen hierboven: een zaadwereld bewijst dat de rekenmachine werkt, productie vertelt hoeveel van de werkelijkheid zij begrijpt."
   },
   "euros": {
-    "noemerCenten": 24,
-    "rijen": 1,
-    "perKlasse": {
-      "rtgEigen": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "derdePartij": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "belasting": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "fee": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "kortingRefund": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "onbekend": {
-        "rijen": 1,
-        "centen": 24
-      }
-    },
-    "redenen": [
-      {
-        "reden": "onbekend: wel een bedrag (totaal), geen herkomstveld -- niet te volgen",
-        "rijen": 1
-      }
-    ],
-    "waaromGeen": null
+    "noemerCenten": 0,
+    "rijen": 0,
+    "perKlasse": null,
+    "waaromGeen": "er is geen server/data/store.db -- deze meter verzint geen bedragen"
   },
   "euroDekkingProductie": {
     "status": "GEEN_NOEMER",
@@ -630,15 +605,16 @@
     "verklaardEuro": null,
     "totaalEuro": null,
     "verklaardCenten": 0,
-    "noemerCenten": 24,
+    "noemerCenten": 0,
     "kanoniekeRijen": 0,
-    "bedragrijen": 1,
+    "bedragrijen": 0,
     "ontbreekt": {},
     "beletsels": [
+      "er is geen server/data/store.db -- deze meter verzint geen bedragen",
       "de bedragen in de opslag dragen geen valuta, dus deze noemer is niet aantoonbaar in euro; kern/waarde/dekking.js weigert om die reden ook een totaal over meerdere munten",
       "niemand heeft verklaard of deze opslag productie of een ontwikkelomgeving is (RTG_ECONOMIE_WERELD is niet gezet). Een dekkingscijfer zonder die verklaring leest als productie, en zaaddata is uiterlijk niet van echte handel te onderscheiden."
     ],
-    "reden": "de bedragen in de opslag dragen geen valuta, dus deze noemer is niet aantoonbaar in euro; kern/waarde/dekking.js weigert om die reden ook een totaal over meerdere munten",
+    "reden": "er is geen server/data/store.db -- deze meter verzint geen bedragen",
     "grens": "De noemer is ELK bedrag dat deze meter in de opslag vindt, niet alleen de rijen die de economische keten dragen -- anders meldt zes goede rijen naast tienduizend losse bedragen 100%. De teller is de STRENGE: bedrag, herkomst, eigenaar, tegenpartij, bron en classificatie moeten er alle zes staan. Dit getal wordt nooit vergeleken met de vormdekking uit A (die telt vormen) en nooit met de dekking uit B1 (die rekent over een fixture)."
   }
 }

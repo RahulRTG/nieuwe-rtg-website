@@ -63,6 +63,7 @@ function beeld(st, boek, nu) {
   return {
     dag: st.dag, dagNaam: R.dagNaam(st.dag), week: Math.ceil(st.dag / 7), vrijVandaag: rest(st, st.dag),
     volgendeDagOver: Math.max(0, st.gerekendTot + st.dagMs - nu),
+    tempo: { stand: st.tempo || 'rustig', standen: Object.keys(R.TEMPO) }, ronde: st.ronde || 0,
     vandaag: { agenda: weekAgenda(st), aandacht: aandacht(st, c), meldingen: st.meldingen.slice(0, 16), volgende: handelingenNu(st) },
     werk: {
       baan: { werkgever: st.baan.werkgever, functie: st.baan.functie, actief: st.baan.actief, uren: st.baan.urenPerWeek,
@@ -84,7 +85,7 @@ function beeld(st, boek, nu) {
     },
     netwerk: { contacten: deals },
     wereld: {
-      stad: R.JURISDICTIE.stad,
+      stad: R.JURISDICTIE.stad, startKas: R.START_KAS,
       spelregels: [R.JURISDICTIE.inschrijven, R.JURISDICTIE.btw, R.JURISDICTIE.termijn],
       plaatsen: [{ naam: st.baan.werkgever, wat: st.baan.actief ? 'waar je werkt' : 'waar je werkte' }]
         .concat(deals.filter((d, i, l) => l.findIndex(x => x.klant === d.klant) === i).map(d => ({ naam: d.klant, wat: d.fase === 'afgehaakt' ? 'kent je' : 'klant of kans' }))),

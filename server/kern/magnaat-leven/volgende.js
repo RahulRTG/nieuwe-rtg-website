@@ -67,6 +67,7 @@ function handelingenNu(st) {
     }
   }
   zet('slaap', 'Sluit de dag af', 'Wat je hebt gepland, gebeurt; dan begint ' + R.dagNaam(st.dag + 1) + '.');
+  zet('doorspoelen', 'Spoel door naar het volgende moment', 'De dagen lopen door tot er iets gebeurt, hooguit twee weken. Wat je plande gebeurt; ongeplande vrije tijd is weg.');
   return uit;
 }
 

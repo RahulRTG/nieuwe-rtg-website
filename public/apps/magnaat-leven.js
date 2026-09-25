@@ -37,6 +37,9 @@
   function klok(s) {
     clearTimeout(KLOK);
     KLOK = setTimeout(laad, Math.max(1000, s.volgendeDagOver + 500));
+    var t = q('#vnTempo');
+    if (t && !t.options.length) t.innerHTML = s.tempo.standen.map(function (x) { return '<option value="' + esc(x) + '">' + esc(x) + '</option>'; }).join('');
+    if (t) t.value = s.tempo.stand;
     q('#vnKlok').textContent = 'Week ' + s.week + ' · nog ' + duur(s.vrijVandaag) + ' vrij vandaag · de dag loopt vanzelf af over ' +
       Math.ceil(s.volgendeDagOver / 60000) + ' min, of sluit hem zelf af';
   }
@@ -113,9 +116,20 @@
     klok(s);
   }
 
+  document.addEventListener('change', function (e) {
+    if (e.target.id === 'vnTempo') doe({ actie: 'tempo', stand: e.target.value });
+  });
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('[data-vn-actie],[data-vn-doe],[data-vn-schrap]');
+    var t = e.target.closest('[data-vn-actie],[data-vn-doe],[data-vn-schrap],[data-vn-opnieuw]');
     if (!t || !LEVEN) return;
+    /* Opnieuw beginnen gooit een leven weg en kan niet terug: de eerste tik vraagt
+       het, de tweede doet het. */
+    if (t.dataset.vnOpnieuw != null) {
+      if (t.dataset.zeker) { doe({ actie: 'opnieuw', zeker: true }); return; }
+      t.dataset.zeker = '1';
+      t.textContent = 'Ja, gooi dit leven weg en begin opnieuw';
+      return;
+    }
     if (t.dataset.vnSchrap) { var p = t.dataset.vnSchrap.split(':'); doe({ actie: 'schrap', dag: Number(p[0]), index: Number(p[1]) }); return; }
     if (t.dataset.vnActie != null) {
       var n = Number(t.dataset.vnActie), a = LEVEN.vandaag.volgende[n];

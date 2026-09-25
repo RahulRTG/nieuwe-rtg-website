@@ -52,29 +52,29 @@ const OPLAAD = Object.freeze({
       { soort: 'direct', graad: 'gemeten', collectie: 'betaalIdem',
         wat: 'dezelfde bescherming aan de kant van de betaal-naad',
         reden: 'gemeten in dezelfde ronde' },
-      /* DE TAK DIE DE METING STRUCTUREEL NIET KAN ZIEN, en dat is geen tekort van dit
-         contract maar een eigenschap van de proef. Hij draait in demostand, waar
-         betaal.maakBetaling meteen `betaald` teruggeeft; de wachtrij-tak loopt daar dus
-         nooit. Vandaar `vermoed` en niet `gemeten` -- de keuring zou een `gemeten` claim op
-         kaartWachtend terecht weigeren. */
-      { soort: 'direct', graad: 'vermoed', collectie: 'kaartWachtend',
-        wat: 'is de betaling niet meteen rond, dan komt er een rij bij met soort `oplaad`, ' +
-          'de codenaam en het bedrag, zodat de webhook later weet wie hij moet crediteren',
-        reden: 'kern/pay/opladen.js schrijft die rij, maar de proef draait in demostand waar de ' +
-          'betaling meteen `betaald` is -- deze tak liep niet en is dus verklaard en niet gemeten' },
+      /* DE BETAALWAARHEID (MONEY-012). Opladen legt de betaling sinds 24 september
+         2026 vast in kern/betaalwaarheid VOOR de aanroep; kaartWachtend krijgt geen
+         nieuwe rij meer. `vermoed` en niet `gemeten`: de idempotentieproef heeft deze
+         collectie nog niet opnieuw gemeten, en de keuring weigert terecht een
+         `gemeten` claim die de proef nooit zag. */
+      { soort: 'direct', graad: 'vermoed', collectie: 'betaalWaarheid',
+        wat: 'de betaling staat vast VOOR de aanroep bij de aanbieder, met een vaste sleutel, ' +
+          'zodat een verloren antwoord of een wachtende betaling niet zoekraakt',
+        reden: 'kern/pay/opladen.js roept betaalWaarheid.maak en .begin aan; nog niet opnieuw gemeten' },
       { soort: 'buiten', graad: 'vermoed',
         wat: 'de aanbieder belast de kaart, weigert, of laat de betaling openstaan',
         uitkomsten: ['betaald', 'geweigerd', 'wacht-op-bevestiging'],
-        reden: 'een gesloten set: kern/pay/opladen.js kent naast betaald/succeeded alleen de ' +
-          'wachttak en een 502 als de aanroep zelf stukloopt' },
+        reden: 'een gesloten set: de betaalwaarheid kent bevestigd, wachtend en geweigerd, en ' +
+          'een 502 zonder uitsluitsel als de aanroep zelf stukloopt (dan zoekt de veegronde het na)' },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'de ruimte onder het walletplafond krimpt met het opgeladen bedrag',
         reden: 'volgt uit het gestegen saldo; geen eigen collectie' },
       { soort: 'mislukking', graad: 'vermoed',
-        wat: 'blijft de bevestiging van de aanbieder uit, dan is de kaart belast en de wallet niet -- ' +
-          'tot de webhook de wachtrij verwerkt',
-        reden: 'uitgeschreven in de kop van kern/pay/opladen.js, waar deze fout echt is gemaakt: de ' +
-          'webhook vond de oplading niet omdat er niets in kaartWachtend stond' }
+        wat: 'blijft de bevestiging van de aanbieder uit, dan is de kaart misschien belast en de ' +
+          'wallet niet -- tot de webhook of de veegronde de betaling afmaakt, of hem na zes ' +
+          'hervattingen escaleert naar een mens',
+        reden: 'kern/betaalwaarheid/hervat.js; de bijschrijving gebeurt precies een keer in ' +
+          'kern/pay/oplaadwaarheid.js' }
     ],
     onzeker: [
       { wat: 'hoe lang een openstaande betaling openstaat',

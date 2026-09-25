@@ -2788,15 +2788,21 @@ function bankRenderGezond(g){
    er meer naar. */
 function bankRenderRail(g, op){
   const alarm = (g.railMislukt || 0) > 0 || (g.railZonderTerugboeking || 0) > 0;
+  const onbekend = (g.railOnbekend || 0) > 0;
   const oud = g.railOudsteAt ? Math.round((Date.now() - g.railOudsteAt) / 3600000) : 0;
   const tegels = [
     ['Onderweg', String(g.railOpen || 0) + ' × ' + bkEuro(g.railOpenCenten), false],
     ['Langst onderweg', g.railOudsteAt ? (oud < 1 ? 'minder dan een uur' : oud + ' uur') : 'niets', false],
     ['Opgegeven', String(g.railMislukt || 0), (g.railMislukt || 0) > 0],
-    ['Af zonder bestemming', String(g.railZonderTerugboeking || 0), (g.railZonderTerugboeking || 0) > 0]
+    ['Af zonder bestemming', String(g.railZonderTerugboeking || 0), (g.railZonderTerugboeking || 0) > 0],
+    /* MONEY-012: de rail kan hem hebben uitgevoerd, wij weten het niet. Er is
+       NIET teruggeboekt; opnieuw indienen met dezelfde sleutel haalt de uitspraak
+       van de rail op. */
+    ['Uitkomst onbekend', String(g.railOnbekend || 0) + ' × ' + bkEuro(g.railOnbekendeCenten || 0), (g.railOnbekend || 0) > 0]
   ];
   const STATUSZIN = { GEBOEKT: 'wacht op de rail', INGEDIEND: 'aangenomen, nog niet bevestigd',
-    AFGEWIKKELD: 'afgerond', MISLUKT: 'opgegeven', TERUGGEBOEKT: 'teruggeboekt' };
+    AFGEWIKKELD: 'afgerond', MISLUKT: 'opgegeven', TERUGGEBOEKT: 'teruggeboekt',
+    ONBEKEND: 'uitkomst onbekend, niet teruggeboekt' };
   const rijen = (op.opdrachten || []).map(o =>
     '<div class="bk-rij">' +
     '<strong class="soort">' + esc(o.soort) + '</strong>' +
@@ -2804,7 +2810,7 @@ function bankRenderRail(g, op){
     '<span class="bk-stil">' + esc(STATUSZIN[o.status] || o.status) + '</span>' +
     (o.pogingen > 1 ? '<span class="bk-stil">' + o.pogingen + ' pogingen</span>' : '') +
     (o.laatsteFout ? '<span class="reden">' + esc(o.laatsteFout) + '</span>' : '') +
-    (o.status === 'MISLUKT' ? '<button class="knop stil mini" data-opnieuw="' + esc(o.id) + '">Opnieuw indienen</button>' : '') +
+    ((o.status === 'MISLUKT' || o.status === 'ONBEKEND') ? '<button class="knop stil mini" data-opnieuw="' + esc(o.id) + '">Opnieuw indienen</button>' : '') +
     '</div>').join('');
   $('#bankRail').innerHTML =
     '<div class="kpis bk-tegels">' + tegels.map(([l, v, rood]) =>
@@ -2813,7 +2819,8 @@ function bankRenderRail(g, op){
       '<div class="waarde">' + esc(v) + '</div></div>').join('') + '</div>' +
     (rijen || '<div class="leeg">Niets onderweg.</div>') +
     '<div class="bk-na"><button class="knop stil bk-knopje" id="bankRondeBtn" type="button">Nu opnieuw aanbieden</button>' +
-    (alarm ? ' <span class="bk-waarschuw">Er staat geld af dat nergens is aangekomen.</span>' : '') + '</div>';
+    (alarm ? ' <span class="bk-waarschuw">Er staat geld af dat nergens is aangekomen.</span>' : '') +
+    (onbekend ? ' <span class="bk-waarschuw">Van een uitbetaling weet RTG niet of de rail hem uitvoerde. Er is niet teruggeboekt; dien hem opnieuw in om de uitspraak van de rail op te halen.</span>' : '') + '</div>';
   $('#bankRondeBtn').addEventListener('click', async () => {
     try { const d = await api('bank/opdrachten/ronde', {}); meld(d.gedaan ? d.gedaan + ' opnieuw aangeboden.' : 'Niets aan de beurt.'); bankVervers(); } catch (e) { meld(e.message); }
   });

@@ -123,7 +123,8 @@ module.exports = (deps) => {
     bankOpdrachtenOpen: () => opdrachten.openstaand(),
     bankOpdrachtenRonde: (a) => opdrachten.ronde(a || {}),
     bankOpdrachtOpnieuw: (id) => opdrachten.dienIn(id),
-    bankOpdrachtBevestig: (a) => opdrachten.bevestig(a || {}) };
+    bankOpdrachtBevestig: (a) => opdrachten.bevestig(a || {}),
+    bankOpdrachtVind: (id) => opdrachten.vind(id), bankOpdrachtStemAf: (a) => opdrachten.stemAf(a || {}) };
   Object.assign(api, rek, over, brug, spaar, pas, krediet, incasso, zakelijk, advies, hart, entiteit);
 
   /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent

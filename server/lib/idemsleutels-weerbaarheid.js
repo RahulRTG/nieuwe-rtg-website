@@ -28,6 +28,11 @@ const SLEUTELS = {
     waarom: 'de handtekening wordt eenmalig opgebruikt; een bewaard antwoord zou een uitvoering melden die niet plaatsvond' },
   'POST /api/office/bank/handtekening/intrek': { nietIdempotent: true,
     waarom: 'intrekken haalt de aanvraag weg; een tweede oproep hoort te horen dat er niets meer openstaat' },
-  'POST /api/office/stuur/herkomstschaduw': { leest: true }
+  'POST /api/office/stuur/herkomstschaduw': { leest: true },
+  /* MONEY-012: de afstemming van een onbekende uitbetaling maakt een aanvraag voor
+     dezelfde tweede handtekening. Een tweede oproep is een tweede aanvraag; de
+     tweede aftekening weigert dan met 409 omdat de opdracht niet meer ONBEKEND is. */
+  'POST /api/office/bank/opdrachten/afstemming': { nietIdempotent: true,
+    waarom: 'een aanvraag, geen geldbeweging; hooguit een wordt uitgevoerd, want daarna staat de opdracht niet meer op ONBEKEND' }
 };
 module.exports = { SLEUTELS };

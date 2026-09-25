@@ -12,11 +12,25 @@ module.exports = (ctx) => {
      afgewikkeld als de rail dat zelf al meldt). Mislukt hij, dan telt de poging
      en schuift de volgende kans op; bij de laatste poging gaat hij naar MISLUKT
      en volgt de terugboeking. De fout wordt altijd bewaard: een opdracht die
-     zonder reden stilstaat is hetzelfde probleem als daarvoor. */
+     zonder reden stilstaat is hetzelfde probleem als daarvoor.
+
+     MAAR NIET ELKE FOUT IS EEN MISLUKKING (MONEY-012). Een time-out of een
+     verbroken verbinding NA het versturen zegt niet dat er niets is betaald;
+     hij zegt dat wij het niet weten. Terugboeken op zo'n fout maakt geld uit
+     niets zodra de rail hem wel uitvoerde. Daarom telt alleen een fout die de
+     rail zelf als `nietVerstuurd` merkt (hij kwam niet verder dan onze kant van
+     de deur) mee voor opgeven-en-terugboeken. Elke andere fout -- en elke fout
+     op een opdracht die de rail eerder al had AANGENOMEN -- maakt de uitkomst
+     onbekend: na de laatste poging gaat hij naar ONBEKEND, blijft openstaan en
+     wacht op een uitspraak van de rail. Onbekend is geen mislukt. */
   async function dienIn(opdracht) {
     const o = typeof opdracht === 'string' ? ctx.vind(opdracht) : opdracht;
     if (!o) return { status: 404, error: 'Die betaalopdracht bestaat niet.' };
     if (AF.has(o.status)) return publiek(o);
+    /* Heeft de rail hem al eens aangenomen? Vastgesteld VOOR de handmatige
+       herstart hieronder, want die zet MISLUKT op INGEDIEND zonder dat de rail
+       iets heeft gezegd. */
+    const wasAangenomen = o.status === STATUS.INGEDIEND || !!o.settlementRef;
     if (o.status === STATUS.MISLUKT) { o.status = STATUS.INGEDIEND; o.pogingen = 0; } // met de hand opnieuw; zie OVERGANG
     o.pogingen += 1;
     o.laatstePogingAt = nu();
@@ -26,7 +40,16 @@ module.exports = (ctx) => {
 
     if (fout) {
       o.laatsteFout = String((fout && fout.message) || fout || 'onbekende fout').slice(0, 300);
-      if (o.pogingen >= maxPogingen) {
+      /* `misschienVerstuurd` gaat nooit meer uit. Daarom blijft een ONBEKENDE
+         opdracht die met de hand opnieuw wordt aangeboden en weer geen antwoord
+         krijgt vanzelf ONBEKEND: hij kan via deze weg niet meer bij opgeven-en-
+         terugboeken komen, alleen via een uitspraak van de rail (bevestig). */
+      if (wasAangenomen || !(fout && fout.nietVerstuurd === true)) o.misschienVerstuurd = true;
+      if (o.pogingen >= maxPogingen && o.misschienVerstuurd) {
+        zet(o, STATUS.ONBEKEND, { volgendeAt: null });
+        save();
+        klacht('betaalopdracht ONBEKEND na ' + o.pogingen + ' pogingen: de rail kan hem hebben uitgevoerd, er wordt NIET teruggeboekt', { id: o.id, ledgerRef: o.ledgerRef, fout: o.laatsteFout });
+      } else if (o.pogingen >= maxPogingen) {
         zet(o, STATUS.MISLUKT, { volgendeAt: null });
         save();
         klacht('betaalopdracht opgegeven na ' + o.pogingen + ' pogingen, geld wordt teruggeboekt', { id: o.id, ledgerRef: o.ledgerRef, fout: o.laatsteFout });

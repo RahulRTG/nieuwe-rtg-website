@@ -1683,7 +1683,7 @@
           "bestanden": [
             "server/kern/betaalopdracht/status.js"
           ],
-          "leden": 5,
+          "leden": 6,
           "voorbeeld": [
             "GEBOEKT",
             "INGEDIEND",
@@ -3621,5 +3621,5 @@
       ]
     }
   ],
-  "bestanden": 3669
+  "bestanden": 3678
 }

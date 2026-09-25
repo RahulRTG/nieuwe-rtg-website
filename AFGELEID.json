@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-25T10:27:15.917Z",
-  "commit": "6505f286",
+  "op": "2026-09-25T12:37:53.366Z",
+  "commit": "58149076",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 317,
+  "artefacten": 319,
   "bron": 11,
-  "afgeleid": 175,
-  "fragmenten": 25,
+  "afgeleid": 176,
+  "fragmenten": 26,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 199,
-  "afgeleidEigenaarHard": 173,
-  "afgeleidGrendelt": 20,
-  "metStempel": 102,
+  "metEigenaar": 201,
+  "afgeleidEigenaarHard": 174,
+  "afgeleidGrendelt": 21,
+  "metStempel": 103,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -238,6 +238,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "AUTONOMIE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "BEDRADING.json",
    "soort": "ONBESLIST",
    "eigenaar": null,
@@ -247,6 +259,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEDRIJFSMAAT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/bedrijfsmaat.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/bedrijfsmaat.js"
+   ],
+   "stempelInstrument": "scripts/bedrijfsmaat.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run bedrijfsmaat:vast",
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {

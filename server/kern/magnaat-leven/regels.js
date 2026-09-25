@@ -69,16 +69,24 @@ const HERINNERING_DAGEN = 3;
 const LENING = { max: 25000, termijnen: 2 };             // familie, terug van je volgende twee lonen
 const VOORFINANCIERING = { deel: 90 };                   // je krijgt nu 90% van wat openstaat; de financier int
 const ONDERNEMING = { opdrachten: 2 };                   // na twee betaalde opdrachten ben je structureel bezig
-const ZELFSTANDIG = { dagen: 28, factor: 200 };          // je bedrijf brengt twee keer je loon binnen, en bestaat al vier weken
+/* Wanneer je bedrijf je draagt: het bestaat al `dagen`, bracht in die periode
+   `factor` procent van je loon binnen, en je hebt `buffer` weken loon op de
+   bank voor de maand dat een klant laat is. Per moeilijkheid (1.0). */
+const ZELFSTANDIG = { dagen: 63, factor: 200, buffer: 4 };
 
 /* HOE ZWAAR HET LEVEN IS (V4). Normaal is het leven zoals het bedoeld is;
    licht geeft wat meer ruimte om te leren, zwaar laat bijna niets over. Wat er
    schuift: waarmee je begint, hoe laat klanten betalen (procent van hun
-   gewoonte) en wat je kamer kost (procent). De keten zelf verandert niet. */
+   gewoonte), wat je kamer kost (procent) en wanneer je bedrijf je draagt
+   (Magnaat 1.0: anders zat het einde op alle drie de niveaus rond dag 60, omdat
+   alleen het begin schoof), en na hoeveel dagen open huur je verhuurder je
+   kamer opzegt -- dan is dit leven voorbij. Op licht gebeurt dat niet. De
+   automatische speler (test/lib-magnaatspeler.js) is de meetlat: zelfstandig
+   rond dag 70, 100 en 140. De keten zelf verandert niet. */
 const MOEILIJKHEID = {
-  licht: { naam: 'Licht', startKas: 25000, laat: 50, huur: 85, uitleg: 'meer om mee te beginnen, klanten betalen eerder, je kamer is goedkoper' },
-  normaal: { naam: 'Normaal', startKas: START_KAS, laat: 100, huur: 100, uitleg: 'zoals het bedoeld is' },
-  zwaar: { naam: 'Zwaar', startKas: 1500, laat: 150, huur: 110, uitleg: 'bijna niets op de bank, klanten betalen later, je kamer is duurder' }
+  licht: { naam: 'Licht', startKas: 25000, laat: 50, huur: 85, zelfstandig: { dagen: 35, factor: 150, buffer: 2 }, uitzetting: null, uitleg: 'meer om mee te beginnen, klanten betalen eerder, je kamer is goedkoper' },
+  normaal: { naam: 'Normaal', startKas: START_KAS, laat: 100, huur: 100, zelfstandig: ZELFSTANDIG, uitzetting: 35, uitleg: 'zoals het bedoeld is' },
+  zwaar: { naam: 'Zwaar', startKas: 1500, laat: 150, huur: 110, zelfstandig: { dagen: 105, factor: 250, buffer: 8 }, uitzetting: 21, uitleg: 'bijna niets op de bank, klanten betalen later, je kamer is duurder' }
 };
 const niveauVan = (st) => MOEILIJKHEID[st.moeilijkheid] || MOEILIJKHEID.normaal;
 const verplichtingBedrag = (st, v) => (v.id === 'huur' ? Math.round(v.bedrag * niveauVan(st).huur / 100) : v.bedrag);

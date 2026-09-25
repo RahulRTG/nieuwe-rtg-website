@@ -48,22 +48,16 @@ const LEZEN = Object.freeze({
      staat hier en in GEEN van de twee lijsten eronder, en daar staat hij met
      opzet als lege lijst zodat een toevoeging een zichtbare bewerking is.
 
-     DRIE PADEN, en elk om dezelfde drie redenen: hij schrijft niets (de
-     idempotentieproef zag geen enkele collectie bewegen), hij toont TOTALEN en
-     geen mensen, en hij gaat over RTG als onderneming. Wat er bewust NIET staat:
-     /api/office/state en /payroll/overzicht (codenamen, namen en uren per
-     mens, achter een deur die de gedeelde code doorlaat), /kosten/overzicht
-     (een kostenlijst per drager), /kosten/vooruitblik (per drager zodra het lijf
-     er een noemt -- een regex op het pad ziet het lijf niet), /command/gezondheid
-     (zet alarmen als bijwerking) en /service/stand (verzet een zaak).
+     DRIE PADEN: ze schrijven niets (gemeten), tonen TOTALEN en geen mensen, en
+     gaan over RTG als onderneming. Bewust NIET: /office/state en
+     /payroll/overzicht (mensen), /kosten/overzicht en /kosten/vooruitblik (per
+     drager), /command/gezondheid (zet alarmen) en /service/stand (verzet een zaak).
 
      De AI kan nooit meer dan de mens die hem aanroept: /economie/werelden en
      /kosten/periode hangen achter de boardroom, dus een medewerker op naam
      zonder boardroomtoegang krijgt daar gewoon de weigering van de route zelf. */
-  /* /api/office/bedrijfsmaat hoort hier inhoudelijk bij (hij toont totalen, en
-     elk getal over mensen is al langs de groepspoort) maar staat er nog NIET: de
-     idempotentieproef heeft hem niet gemeten, en een pad zonder gemeten gevolg
-     laat onbekendeEffectpaden stijgen. Hij komt erbij met die meting. */
+  /* /api/office/bedrijfsmaat hoort hier inhoudelijk bij, maar komt pas als de
+     idempotentieproef hem gemeten heeft (anders stijgt onbekendeEffectpaden). */
   office: [
     /^\/api\/command\/puls$/,
     /^\/api\/office\/economie\/werelden$/,

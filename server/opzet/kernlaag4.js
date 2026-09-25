@@ -134,7 +134,9 @@ Object.assign(kern, require('../kern/economie')({ db, save }));
    uitgerekend op de pasgeschiedenis, de laatste bezoekdag, de uitkomsten en de
    lidmaatschapstermijnen, en elk getal over mensen langs de groepspoort. Leest
    alleen; na de economielaag omdat elke maat een economische wereld draagt. */
-kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({ db,
+kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
+  lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
+    betaalschemas: () => db.data.lidmaatschapBetalingen },
   pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid });
 Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,
   keyVanCodenaam, bestandenOpslag: kern.bestandenOpslag,

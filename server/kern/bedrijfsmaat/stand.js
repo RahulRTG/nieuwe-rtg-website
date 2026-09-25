@@ -10,7 +10,10 @@
    geen voetnoot: de pasgeschiedenis begint op de dag dat hij werd ingebouwd, de
    uitkomsten zijn nog alleen ritten en bestellingen, en de omzet ziet het
    betaalschema van aanmeldingen maar niet de ledenfacturen in de kluis. Een
-   getal dat compleet LIJKT terwijl het dat niet is, is erger dan geen getal. */
+   getal dat compleet LIJKT terwijl het dat niet is, is erger dan geen getal.
+
+   DE OPSLAG KOMT ALS LEZERS BINNEN (`lees.ritten`, `lees.bestellingen`,
+   `lees.betaalschemas`), zodat dit bestand geen eigen deur naar de opslag is. */
 'use strict';
 
 const P = require('./projecties');
@@ -20,23 +23,22 @@ const { DEFINITIES } = require('./definities');
 const GEPEILD = 'gemeten';
 const VANAF = 'Leden van voor de ingebruikname van kern/pasgeschiedenis.js hebben geen overgang en tellen niet mee.';
 
-module.exports = ({ db, pasgeschiedenis, aanwezigheid, nu }) => {
+module.exports = ({ lees, pasgeschiedenis, aanwezigheid, nu }) => {
   const klok = typeof nu === 'function' ? nu : Date.now;
   const lijst = (x) => (Array.isArray(x) ? x : []);
 
   /* De geslaagde uitkomsten (definities.activatie), uit twee domeinen. */
   function uitkomsten() {
-    const d = (db && db.data) || {};
     const uit = [];
-    for (const r of lijst(d.rides))
+    for (const r of lijst(lees.ritten()))
       if (['afgerond', 'gearriveerd'].includes(r.status) && r.customerCodename)
         uit.push({ codenaam: r.customerCodename, op: r.finishedAt || r.at });
-    for (const o of lijst(d.orders))
+    for (const o of lijst(lees.bestellingen()))
       if (['bezorgd', 'opgehaald'].includes(o.status) && o.customerCodename)
         uit.push({ codenaam: o.customerCodename, op: o.finishedAt || o.at });
     return uit;
   }
-  const termijnen = () => lijst(((db && db.data) || {}).lidmaatschapBetalingen).flatMap(r => lijst(r && r.termijnen));
+  const termijnen = () => lijst(lees.betaalschemas()).flatMap(r => lijst(r && r.termijnen));
 
   const maat = (id, def, uitkomst, dektNiet, extra) => Object.assign({
     id, definitie: { versie: def.versie, regel: def.regel }, graad: GEPEILD, dektNiet }, uitkomst, extra || {});

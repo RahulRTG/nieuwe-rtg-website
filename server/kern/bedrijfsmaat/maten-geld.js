@@ -3,7 +3,7 @@
    controleert dat, en een citaat dat er niet staat telt als niet bestaand. */
 'use strict';
 const c = (bestand, citaat) => ({ bestand, citaat });
-const MET = 'server/kern/kantoor/metrics.js', OMZ = 'server/kern/ledenregister/omzet.js';
+const MET = 'server/kern/kantoor/metrics-week.js', OMZ = 'server/kern/ledenregister/omzet.js';
 const KOS = 'server/kern/kosten/', FONDS = 'server/kern/fonds.js';
 const DEF = 'server/kern/bedrijfsmaat/definities.js', PRJ = 'server/kern/bedrijfsmaat/projecties.js';
 const STAND = 'server/kern/bedrijfsmaat/stand.js';

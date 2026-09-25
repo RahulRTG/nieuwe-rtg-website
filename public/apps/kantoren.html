@@ -4187,10 +4187,9 @@ async function laadLedenregister(){
   // de omzet + 30%-split
   /* Een pas onder de groepsgrens toont geen aantal en geen omzet: prijs maal
      aantal zou het aantal alsnog verraden (server/kern/bedrijfsmaat/poort.js). */
-  const omzetRijen = (d.omzet||[]).map(o => o.aantal == null
-    ? '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b></span><span class="stil" style="color:var(--soft);font-size:.78rem;">te kleine groep</span></div>'
-    : '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw')+'</span></span>'+
-    '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:.82rem;">'+(o.opMaat?'op maat':eur(o.maandOmzet)+' /mnd')+'</span></div>').join('');
+  const omzetRijen = (d.omzet||[]).map(o =>
+    '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+(o.aantal == null ? 'te kleine groep' : o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw'))+'</span></span>'+
+    '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:.82rem;">'+(o.aantal == null ? '' : (o.opMaat?'op maat':eur(o.maandOmzet)+' /mnd'))+'</span></div>').join('');
   const s = d.split || {};
   box.innerHTML =
     kop('Per pas') + tegels((d.perPas||[]).map(p => ({ naam: p.naam, aantal: p.aantal }))) +

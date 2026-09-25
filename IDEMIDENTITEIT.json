@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:26:20.371Z",
-    "commit": "5cdb15e6",
+    "op": "2026-09-25T01:19:36.274Z",
+    "commit": "2f46159e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",
@@ -19,9 +19,9 @@
   "voegtToe": 31,
   "nietTeLezen": 4,
   "voegtToeIsGeenGoedkeuring": true,
-  "handwerkPlekken": 5,
-  "handwerkVergelijkt": 4,
-  "handwerkGeenVergelijking": 1,
+  "handwerkPlekken": 4,
+  "handwerkVergelijkt": 1,
+  "handwerkGeenVergelijking": 3,
   "plekken": [
     {
       "bestand": "server/kern/bank/incasso.js",
@@ -295,7 +295,7 @@
     },
     {
       "bestand": "server/kern/pay/opladen.js",
-      "regel": 28,
+      "regel": 27,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -785,38 +785,20 @@
     },
     {
       "bestand": "server/kern/directpay/betalen.js",
-      "regel": 31,
+      "regel": 32,
       "opzoeker": "idemZoek",
       "gevondenAls": "al",
-      "vergeleken": [
-        "bedrag",
-        "supplierCode"
-      ],
-      "uitspraak": "vergelijkt",
+      "vergeleken": [],
+      "uitspraak": "geenVergelijking",
       "regelTekst": "const al = idemZoek(idemSleutel);"
     },
     {
       "bestand": "server/kern/directpay/betalen.js",
-      "regel": 75,
-      "opzoeker": "idemZoek",
-      "gevondenAls": "b",
-      "vergeleken": [
-        "bedrag",
-        "supplierCode"
-      ],
-      "uitspraak": "vergelijkt",
-      "regelTekst": "const b = idemZoek(idemSleutel || ('waarheid:' + w.id));"
-    },
-    {
-      "bestand": "server/kern/directpay/betalen.js",
-      "regel": 100,
+      "regel": 114,
       "opzoeker": "idemZoek",
       "gevondenAls": "al",
-      "vergeleken": [
-        "bedrag",
-        "supplierCode"
-      ],
-      "uitspraak": "vergelijkt",
+      "vergeleken": [],
+      "uitspraak": "geenVergelijking",
       "regelTekst": "const al = idemZoek(idemSleutel);"
     },
     {

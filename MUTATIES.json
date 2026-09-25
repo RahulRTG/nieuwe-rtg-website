@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-24T21:27:08.990Z",
-    "commit": "f635efff",
+    "op": "2026-09-25T01:20:23.980Z",
+    "commit": "104f0368",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5275,6 +5275,20 @@
       "gezakt": 2,
       "geprobeerd": 4
     },
+    "magnaatleven.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatleven.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "magnaatwereld.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5842,22 +5856,6 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/mond.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "money012-inkomend.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/betaalwaarheid/index.js",
-      "operator": "!==->===#0",
-      "gezakt": 7,
-      "geprobeerd": 4
-    },
-    "money012-keten.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/betaal.js",
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1

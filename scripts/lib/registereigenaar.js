@@ -61,6 +61,8 @@ const EIGENAAR = {
     waarom: 'lusproef.js --vastleggen schrijft het na een volledige keten tegen een wegwerpserver; APPWERKT leest het als bron voor voltooibaar van Ontdekken (scripts/lib/appcontract.js).' },
   'LIEGRONDE.json': { schrijver: 'scripts/liegronde.js',
     waarom: 'liegronde.js --vastleggen schrijft het na een browserronde met de liegpoort over elke rij van MAPPEN; APPWERKT leest het als bron voor waarheidsgetrouw (ALGEMEEN in scripts/lib/appcontract.js).' },
+  'BEVOEGD.json': { schrijver: 'scripts/bevoegdronde.js',
+    waarom: 'bevoegdronde.js --vastleggen stelt de ledenrijen samen uit IDOR.json en ROLPROEF.json en loopt een kruisproef over de gezinsschermen; APPWERKT leest het als bron voor bevoegd (ALGEMEEN in scripts/lib/appcontract.js).' },
   'WORLD-DESKTOP.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden ontwerp- en bereikbeschrijving van de desktopwerelden; uitvoerbare toetsen leveren het afzonderlijke bewijs.' },
   'WEBSITE-STORYLINE.md': { soort: 'BRON',

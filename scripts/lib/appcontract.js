@@ -63,7 +63,10 @@ const BRONSOORTEN = {
   /* De liegronde levert waarheidsgetrouw en verder niets: zijn JS-fouten en
      rommel op een leeg antwoord zeggen iets over robuustheid, niet over bewijs 8
      (menselijk), want een echte backend antwoordt nooit zo. */
-  liegronde: ['waarheidsgetrouw']
+  liegronde: ['waarheidsgetrouw'],
+  /* De bevoegdronde levert bevoegd en verder niets: IDOR en ROLPROEF zeggen
+     wie er NIET bij kan, niet of het scherm iets bewaart of herstelt. */
+  bevoegdronde: ['bevoegd']
 };
 
 /* Sleutel: de functie-id uit MAPPEN (zoals APPWERKT.json hem als `functie`
@@ -145,6 +148,12 @@ const ALGEMEEN = {
     register: 'LIEGRONDE.json',
     instrument: 'scripts/liegronde.js',
     waarom: 'dezelfde liegpoort als test/liegend-scherm.e2e.js, per rij met de persona van die rij; alleen een verzonnen zekerheid is een defect'
+  },
+  bevoegd: {
+    soort: 'bevoegdronde',
+    register: 'BEVOEGD.json',
+    instrument: 'scripts/bevoegdronde.js',
+    waarom: 'ledenschermen bakenen af op de sessie (BETROUWBAARHEID.md par. 4f), dus hun routes uit IDOR.json en ROLPROEF.json; gezinsschermen noemen hun code, dus een kruisproef met het token van een ander gezin'
   }
 };
 

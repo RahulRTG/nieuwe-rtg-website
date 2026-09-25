@@ -441,6 +441,7 @@ const REGISTERS = [
   ['MOMENTPROEF.json', 'npm run momentproef:vast', 'of de publieke keten sluit, van een feit bij de bron tot een melding bij een volger'],
   ['LUSPROEF.json', 'npm run lusproef:vast', 'of de ontdeklus van Foundation Connect sluit, tot een ander die bevestigt dat het hem hielp'],
   ['LIEGRONDE.json', 'npm run liegronde:vast', 'of een scherm een zekerheid verzint als de backend leeg antwoordt, per onderdeel uit MAPPEN'],
+  ['BEVOEGD.json', 'npm run bevoegdronde:vast', 'of een ander lid, een andere rol of een ander gezin bij het werk van een onderdeel uit MAPPEN kan'],
   ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],
   ['AANVOERVORM.json', 'npm run aanvoervorm:vast', 'of de vijf terreinen van de aanvoer een VORM delen -- de vraag onder het aanvoercontract'],
 

@@ -62,12 +62,14 @@ test('3. de samenstelling neemt de rij over en waardeert nooit op', () => {
 
 test('4. een liegronde levert waarheidsgetrouw en niets anders', () => {
   assert.deepEqual(BRONSOORTEN.liegronde, ['waarheidsgetrouw']);
-  assert.deepEqual(Object.keys(ALGEMEEN), ['waarheidsgetrouw']);
+  assert.equal(ALGEMEEN.waarheidsgetrouw.soort, 'liegronde');
+  assert.deepEqual(Object.keys(ALGEMEEN).filter((k) => ALGEMEEN[k].soort === 'liegronde'), ['waarheidsgetrouw'],
+    'de liegronde staat voor een ander bewijs in ALGEMEEN');
   assert.throws(() => B.bewijsVoor('link:a', 'menselijk', '/apps/a.html',
     { contract: {}, algemeen: { menselijk: { soort: 'liegronde', register: 'L.json', instrument: 'x' } }, versheid: vers }), /mag geen menselijk/);
   const r = { functie: 'link:a', ingang: '/apps/a.html', bewijzen: {} };
   const regels = [{ functie: 'link:a', status: 'BEWEZEN', reden: 'r' }];
-  B.stelSamen(r, { contract: {}, lees: () => REG(regels), versheid: vers });
+  B.stelSamen(r, { contract: {}, algemeen: { waarheidsgetrouw: ALGEMEEN.waarheidsgetrouw }, lees: () => REG(regels), versheid: vers });
   assert.equal(r.bewijzen.waarheidsgetrouw.status, 'BEWEZEN');
   assert.deepEqual(Object.keys(r.bewijzen), ['waarheidsgetrouw'], 'de ronde raakt geen ander bewijs');
 });

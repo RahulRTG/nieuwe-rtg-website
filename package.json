@@ -450,6 +450,8 @@
     "lusproef:vast": "node scripts/lusproef.js --vastleggen",
     "liegronde": "node scripts/liegronde.js",
     "liegronde:vast": "node scripts/liegronde.js --vastleggen",
+    "bevoegdronde": "node scripts/bevoegdronde.js",
+    "bevoegdronde:vast": "node scripts/bevoegdronde.js --vastleggen",
     "mandaatproef": "node scripts/mandaatproef.js",
     "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen"
   },

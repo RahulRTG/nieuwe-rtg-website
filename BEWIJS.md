@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2044 bestanden en 14460 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2045 bestanden en 14465 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2044 |
-| losse beweringen (`test(...)`) | 14460 |
+| toetsbestanden | 2045 |
+| losse beweringen (`test(...)`) | 14465 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1390 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 170 |
-| niets van beide | 410 |
+| niets van beide | 411 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1785 bestanden, 14001 beweringen.
+1786 bestanden, 14006 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -201,6 +201,7 @@ toets omvalt.
 | `betrouwbaarheid.test.js` | 8 | gezakt op `true->false#0` | Het betrouwbaarheidsniveau (kern/betrouwbaarheid.js): hoe zeker weet RTG dat dit deze mens is. Deze module verzint niets -- hij geeft een naam aan wat de identiteitslaag al wist -- dus wat hier vastligt is de... |
 | `beveiliging.test.js` | 18 | gezakt op `===->!==` | Tests voor de beveiligingsmeldingen (server/beveiliging.js): melden, samenvoegen, samenvatting, afhandelen en escalatie naar de eigenaar. Zuiver, met een nagemaakte db. |
 | `beveiligingsteam.test.js` | 13 | gezakt op `liegpoort /api/` | Het beveiligings-commandocentrum voor topbeveiligingsteams: de manager plant het rooster (of laat de AI het overnemen), bewaakt het budget, beheert posten en handelt inzetaanvragen af; de bewaker gebruikt de PDA (op... |
+| `bevoegdronde.test.js` | 5 | -- | DE BEVOEGDRONDE -- bewijs 6 (bevoegd) per onderdeel uit MAPPEN. scripts/bevoegdronde.js stelt de ledenrijen samen uit IDOR.json en ROLPROEF.json, en loopt een kruisproef over de gezinsschermen (waarom die splitsing:... |
 | `bevrust.test.js` | 5 | gezakt op `&&->||#0` | RUST OVER DE DATUMGRENS in het beveiligingsrooster (ARBEID.md par. 4 punt 5). |
 | `bewaartermijnen.test.js` | 11 | gezakt op `false->true` | BEWAARTERMIJNEN -- houden we niet langer dan mag, en niet korter dan moet? Twee kanten die allebei fout kunnen gaan, en die elkaars tegenpool zijn: te LANG bewaren -> overtreding van opslagbeperking (AVG art. |
 | `bewaarveger.test.js` | 11 | gezakt op `+->-` | De bewaarveger: de wisregels uit het papierwerkregister als code (server/bewaarveger.js). Elke regel heeft een eigen toets en is met een mutatie geverifieerd; de klok is geinjecteerd, dus niets slaapt echt. |

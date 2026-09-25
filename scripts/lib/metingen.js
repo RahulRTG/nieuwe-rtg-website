@@ -418,6 +418,10 @@ const REGISTER = {
      rij van APPWERKT.json. De toets houdt vast dat een BEWEZEN rij iets gelogen
      kreeg en dat een DEFECT een verzonnen zekerheid draagt. */
   'LIEGRONDE.json': { eigenRatel: 'test/liegronde.test.js' },
+  /* BEVOEGD.json (sinds 25 september 2026) levert bevoegd voor elke rij van
+     APPWERKT.json. De toets houdt vast dat een ledenscherm alleen BEWEZEN is als
+     ELKE route gemeten is, en dat een gezinspaar zonder A binnen niets bewijst. */
+  'BEVOEGD.json': { eigenRatel: 'test/bevoegdronde.test.js' },
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },

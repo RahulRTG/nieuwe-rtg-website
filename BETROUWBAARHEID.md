@@ -48,7 +48,7 @@ blijven.
 | 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een stap weg** (vraagt de testwereld uit par. 4) |
 | 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) |
 | 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **een stap weg** |
-| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **half** — de routekant staat (`IDOR.json`, `ROLPROEF.json`), de schermkant niet |
+| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **gemeten voor leden en gezinnen** (`BEVOEGD.json`, par. 4f): ledenschermen bakenen af op de sessie en worden samengesteld uit `IDOR.json` en `ROLPROEF.json`, gezinsschermen krijgen een kruisproef op de gezinscode; zaak en kantoor hebben nog geen proef |
 | 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **een stap weg** (`HERSTELPROEF.json`, `chaos.js`, `aanval.js` bestaan al) |
 | 8 | **menselijk** | krijgt de gebruiker nooit een kale 500, TypeError, lege pagina of dode knop? | **half** — kale fouten worden gezien, de bruikbaarheid van een melding niet |
 
@@ -439,6 +439,35 @@ een ROUTEvraag: wat `IDOR.json` (hetzelfde rol, ander lid) en `ROLPROEF.json`
 (verkeerde rol) meten. Voor gezinsschermen ligt het anders: vijf van de tien
 noemen hun gezinscode in het verzoek, en daar heeft een kruisproef aan de
 schermkant wel een onderwerp.
+
+**Daaruit is de bevoegdronde gebouwd** (`scripts/bevoegdronde.js`,
+`BEVOEGD.json`, 25 september 2026, besluit van de eigenaar). Twee helften, en ze
+worden niet opgeteld:
+
+- **Ledenschermen worden samengesteld**, en streng: BEWEZEN alleen als ELKE route
+  die het scherm aanroept in `IDOR.json` gemeten is (`gescheiden`, `nagekeken`
+  of `publiek`), elke schrijfroute ook in `ROLPROEF.json` dicht en schoon, en
+  beide registers vers. `ROLPROEF` alleen telt niet: die zegt of een andere ROL
+  erbij kan, niet een ander lid. Een voorvoegsel dat het scherm zelf aan elkaar
+  plakt telt als gemeten als elke bekende route eronder gemeten is.
+- **Gezinsschermen worden gekruist**: gezin A opent het scherm, en elk verzoek
+  met A's code wordt nagespeeld met het token van gezin B (A's code blijft
+  staan) en zonder token. Een paar telt alleen als A zelf binnenkwam.
+
+Voor die ronde zijn `IDOR.json` en `ROLPROEF.json` vers gemeten (ze stonden op
+31 augustus en 19 september). IDOR vond daarbij vijf nieuwe
+doorbraak-kandidaten; met de hand nagekeken waren het alle vijf routes waar B
+iets van B doet, en ze staan met hun reden in `NAGEKEKEN` van
+`scripts/idorproef.js`. Stand: 672 gescheiden, 0 doorbraak, 0 lek; ROLPROEF 3889
+routes beproefd, 0 open, 0 privacylek.
+
+De uitslag is kleiner dan een ruwe schatting (23 ledenapps) en dat is de
+strengheid, niet een tekort in de ronde: **4 ledenschermen en 5 gezinsschermen
+BEWEZEN, 0 defect**. Bij de meeste ledenschermen staat minstens een route op
+`onbereikbaar` in IDOR -- de proef vond daar geen id van A om mee te kruisen --
+en een route die niet gekruist is, is niet gemeten. Wat die rijen omhoog brengt
+is dus IDOR laten reiken tot die routes (een wereld waarin A daar iets bezit),
+niet de regel versoepelen.
 
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 

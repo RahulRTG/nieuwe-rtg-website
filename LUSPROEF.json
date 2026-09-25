@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-25T01:35:20.581Z",
-    "commit": "acf89ca3",
+    "op": "2026-09-25T08:52:10.526Z",
+    "commit": "910cd346",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/lusproef.js",
     "node": "v22.22.2"
   },

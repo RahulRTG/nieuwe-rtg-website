@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2047 bestanden en 14493 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2050 bestanden en 14513 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2047 |
-| losse beweringen (`test(...)`) | 14493 |
+| toetsbestanden | 2050 |
+| losse beweringen (`test(...)`) | 14513 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1400 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
-| alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 405 |
+| alleen in de kop *genoemd*, nog niet gemeten | 169 |
+| niets van beide | 407 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1789 bestanden, 14035 beweringen.
+1792 bestanden, 14055 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -338,6 +338,9 @@ toets omvalt.
 | `dekking.test.js` | 2 | gezakt op `===->!==#0` | DE DEKKINGSMETER LEEST ALLE JOURNALEN, NIET EEN (scripts/dekking.js). WAAROM DEZE TOETS ER IS. |
 | `delen.test.js` | 30 | gezakt op `===->!==#0` | DE SUITE IN DELEN, EN DE VLOER DAAROVERHEEN. Sinds de CI de unit-suite en de schermtoetsen over vier runners verdeelt, hangen er twee nieuwe manieren aan waarop deze keten stil minder kan gaan toetsen dan hij belooft: 1. |
 | `deltapoort.test.js` | 23 | gezakt op `===->!==#0` | DE IJKING VAN DE DELTAPOORT -- regel 2 van de lat, op de poort zelf. scripts/deltapoort.js houdt nieuw werk aan de norm. |
+| `democratie-afhankelijk.test.js` | 6 | -- | UNDECLARED_RTG_DEPENDENCY = 0 -- proef P3 wordt meetbaar (POLITIEK.md par. 1.1). |
+| `democratie-verlies.test.js` | 2 | genoemd | NIEMAND KWIJT, ONDER STORINGEN -- de verliesproef van fase B (POLITIEK.md par. 18.1). |
+| `democratie.test.js` | 12 | -- | DEMOCRATIEOS FASE B -- de minimale burgerlus (POLITIEK.md par. 18.1). |
 | `demokosten.test.js` | 5 | -- | WAT DE DEMOSEED KOST, EN WAAROM DAT EEN METER VERDIENT. De demostand zet bij een verse database 183 personeelsrijen neer (71 zaken, server/kern/staffseed.js en staffseed2.js). |
 | `demostand.test.js` | 7 | gezakt op `liegpoort /api/` | De demo-stand hoort UIT te staan als niemand erom vraagt. WAT ER OPENSTOND, op de echte server, op het open internet: 1. |
 | `demozaken.test.js` | 4 | gezakt op `liegpoort /api/` | DE LIVEGANG-SCHOONMAAK: welke zaken verdwijnen er zonder RTG_DEMO, en welke niet. WAT ER MISGING De opruiming stond in initdata/deel7-salon.js en draaide dus VOOR deel8, deel9 en deel10. |

@@ -126,7 +126,10 @@ const LEZERS = {
     naOmzetting: 'na het besluit, en hier telt het het zwaarst: een inzagebeeld dat een rit mist, is een onvolledig antwoord op een AVG-verzoek' },
   'server/kern/ervaring/leden/spaarpot.js': { soort: 'historie',
     wat: 'ritten die punten of spaargeld opleverden',
-    naOmzetting: 'na het besluit. Punten die verdwijnen zijn een belofte die het huis terugneemt zonder het te zeggen' }
+    naOmzetting: 'na het besluit. Punten die verdwijnen zijn een belofte die het huis terugneemt zonder het te zeggen' },
+  'server/opzet/kernlaag4.js': { soort: 'historie',
+    wat: 'afgeronde ritten als geslaagde uitkomst voor activatie en retentie (kern/bedrijfsmaat/stand.js, als lezer)',
+    naOmzetting: 'na het besluit. Een rit die uit de telling valt, maakt een geactiveerd lid stil tot een niet-geactiveerd lid' }
 };
 
 /* Plekken die de naam noemen zonder hem te lezen: commentaar en registers.
@@ -134,7 +137,8 @@ const LEZERS = {
 const GEEN_LEZER = {
   'server/kern/mobiliteit/appbrug.js': 'noemt de twee lijsten in zijn kop; leest ze niet',
   'server/kern/wereld/koppel.js': 'legt in commentaar uit dat rides de oudere rij is en de verwijzing naar de opdracht gaat',
-  'server/lib/mutatiecontracten-uitvoer.js': 'commentaar bij een contract: de sortering raakt een kopie en nooit db.data.rides'
+  'server/lib/mutatiecontracten-uitvoer.js': 'commentaar bij een contract: de sortering raakt een kopie en nooit db.data.rides',
+  'server/lib/mutatiecontracten-kantoorstuur.js': 'tekst in een contract: de bedrijfsmaat leest de ritten via een lezer en schrijft niet'
 };
 
 function tel() {

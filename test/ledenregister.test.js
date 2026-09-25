@@ -4,13 +4,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+/* De woonplaats hangt aan het STAMnummer van de sleutel, zodat een vertienvoudigd
+   lid (user-1-7) in dezelfde stad woont als zijn origineel (user-1). */
+const STAD = { 1: 'Ibiza', 2: 'Amsterdam', 3: 'Ibiza' };
 function maak(rijen, contracten) {
   const accounts = { ledenRegisterRijen: () => rijen };
-  const onboarding = { store: () => ({ profielen: {
-    'user-1': { velden: { woonplaats: 'Ibiza' } },
-    'user-2': { velden: { woonplaats: 'Amsterdam' } },
-    'user-3': { velden: { woonplaats: 'Ibiza' } }
-  } }) };
+  const profielen = {};
+  for (const r of rijen) { const stam = String(r.key).split('-')[1]; if (STAD[stam]) profielen[r.key] = { velden: { woonplaats: STAD[stam] } }; }
+  const onboarding = { store: () => ({ profielen }) };
   const geldPasprijzen = () => ({ passen: { rtg: { maandCenten: 6500 }, lifestyle: { maandCenten: 2000000 } } });
   const db = { data: { contracten: contracten || [] } };
   return require('../server/kern/ledenregister')({ accounts, onboarding, geldPasprijzen,
@@ -25,25 +26,42 @@ const RIJEN = [
   { id: 5, key: 'user-5', tier: 'business', codename: 'Eik', geslacht: 'm', land: 'NL' }
 ];
 
+/* DE GROEPSPOORT (besluit van de eigenaar, 25 september 2026): onder de tien
+   leden geen aantal, ook niet op het kantoorscherm. De rekentoetsen hieronder
+   draaien daarom op dezelfde leden MAAL TIEN -- zelfde verhoudingen, groepen
+   boven de grens -- en de poort zelf wordt apart bewaakt met de kleine set. */
+const tien = (rijen) => rijen.flatMap(r => Array.from({ length: 10 }, (_, i) =>
+  Object.assign({}, r, { id: r.id * 100 + i, key: r.key + '-' + i, codename: r.codename + i })));
+
+test('onder de tien leden geen aantal: kleine groepen gaan dicht of op in "Overige"', () => {
+  const r = maak(RIJEN).register();
+  for (const veld of ['perPas', 'perGeslacht', 'perLand', 'perStad'])
+    for (const x of r[veld]) assert.ok(x.aantal == null || x.aantal === 0 || x.aantal >= 10, veld + ' ' + x.naam + ': ' + x.aantal);
+  assert.ok(!r.perStad.some(x => x.naam === 'Amsterdam'), 'de naam van een stad met een lid verdwijnt');
+  const rtg = r.omzet.find(o => o.pas === 'rtg');
+  assert.equal(rtg.maandOmzet, null, 'twee leden: geen omzet per pas, want prijs maal aantal verraadt het aantal');
+  assert.equal(r.lijst.length, 5, 'de werklijst per persoon blijft voor de mens op naam');
+});
+
 test('splitst per pas, geslacht, land en stad', () => {
-  const lr = maak(RIJEN);
+  const lr = maak(tien(RIJEN));
   const r = lr.register();
   const pas = Object.fromEntries(r.perPas.map(p => [p.pas, p.aantal]));
-  assert.equal(pas.rtg, 2);
-  assert.equal(pas.lifestyle, 1);
-  assert.equal(pas.business, 1);
-  assert.equal(pas.gratis, 1); // de gast telt als gratis
+  assert.equal(pas.rtg, 20);
+  assert.equal(pas.lifestyle, 10);
+  assert.equal(pas.business, 10);
+  assert.equal(pas.gratis, 10); // de gast telt als gratis
   const gesl = Object.fromEntries(r.perGeslacht.map(g => [g.naam, g.aantal]));
-  assert.equal(gesl.Vrouw, 1); assert.equal(gesl.Man, 2); assert.equal(gesl.X, 1);
+  assert.equal(gesl.Vrouw, 10); assert.equal(gesl.Man, 20); assert.equal(gesl.X, 10);
   const stad = Object.fromEntries(r.perStad.map(s => [s.naam, s.aantal]));
-  assert.equal(stad.Ibiza, 2); assert.equal(stad.Amsterdam, 1);
+  assert.equal(stad.Ibiza, 20); assert.equal(stad.Amsterdam, 10);
 });
 
 test('omzet per pas en de 30%-split (20% lokaal, 10% RTF)', () => {
-  const lr = maak(RIJEN);
+  const lr = maak(tien(RIJEN));
   const r = lr.register();
   const omzet = Object.fromEntries(r.omzet.map(o => [o.pas, o]));
-  assert.equal(omzet.rtg.maandOmzet, 130);       // 2 x 65
+  assert.equal(omzet.rtg.maandOmzet, 1300);      // 20 x 65
 
   /* SINDS DE LADDER (20 augustus 2026) zijn Business EN Lifestyle contractueel:
      hun bijdrage staat op het contract van het lid en niet in de prijslijst.
@@ -63,12 +81,12 @@ test('omzet per pas en de 30%-split (20% lokaal, 10% RTF)', () => {
       pas + ': een lid zonder contract hoort zichtbaar te blijven, niet stil uit het totaal te vallen');
   }
   // het totaal loopt dus alleen over de treden met een lijstprijs
-  assert.equal(r.split.totaalOmzet, 130);
-  assert.equal(r.split.foundation30, Math.round(130 * 0.30 * 100) / 100);
-  assert.equal(r.split.lokaal20, Math.round(130 * 0.20 * 100) / 100);
-  assert.equal(r.split.rtf10, Math.round(130 * 0.10 * 100) / 100);
-  // en de leden die er niet in zitten, worden wel geteld: 1 Lifestyle + 1 Business
-  assert.equal(r.split.businessOpMaat, 2,
+  assert.equal(r.split.totaalOmzet, 1300);
+  assert.equal(r.split.foundation30, Math.round(1300 * 0.30 * 100) / 100);
+  assert.equal(r.split.lokaal20, Math.round(1300 * 0.20 * 100) / 100);
+  assert.equal(r.split.rtf10, Math.round(1300 * 0.10 * 100) / 100);
+  // en de leden die er niet in zitten, worden wel geteld: 10 Lifestyle + 10 Business
+  assert.equal(r.split.businessOpMaat, 20,
     'een lid buiten het totaal hoort zichtbaar te blijven, anders lijkt het totaal compleet');
 });
 
@@ -100,11 +118,11 @@ const RIJEN_VIA = [
 ];
 
 test('telt wie er via welk bedrijf lid is geworden, op naam van het bedrijf', () => {
-  const lr = maak(RIJEN_VIA);
+  const lr = maak(tien(RIJEN_VIA));
   const r = lr.register();
-  assert.equal(r.viaBedrijf, 3, 'drie van de vier kwamen via een werkgever binnen');
+  assert.equal(r.viaBedrijf, 30, 'drie van de vier kwamen via een werkgever binnen');
   const per = r.perBedrijf.map(b => [b.naam, b.aantal]);
-  assert.deepEqual(per, [['Es Vedra Tours', 2], ['Kikunoi', 1]], 'grootste kanaal eerst');
+  assert.deepEqual(per, [['Es Vedra Tours', 20], ['Kikunoi', 10]], 'grootste kanaal eerst');
   assert.equal(r.perBedrijf[0].code, 'ESVEDRA', 'de zaakcode reist mee om op te kunnen zoeken');
 });
 
@@ -134,7 +152,7 @@ test('een contractuele trede telt mee met wat er is afgesproken', () => {
     { pas: 'business', status: 'GEEINDIGD', afgesprokenCenten: 900000 },  // telt niet mee
     { pas: 'business', status: 'CONCEPT', afgesprokenCenten: 999999 }     // ook niet
   ];
-  const lr = maak(RIJEN, contracten);
+  const lr = maak(tien(RIJEN), contracten);
   const r = lr.register();
   const omzet = Object.fromEntries(r.omzet.map(o => [o.pas, o]));
 
@@ -145,6 +163,6 @@ test('een contractuele trede telt mee met wat er is afgesproken', () => {
   assert.equal(omzet.business.uitContracten, 1);
 
   // en het totaal loopt nu over alle treden met een bekend bedrag
-  assert.equal(r.split.totaalOmzet, 130 + 27500 + 7500);
-  assert.equal(r.split.foundation30, Math.round((130 + 27500 + 7500) * 0.30 * 100) / 100);
+  assert.equal(r.split.totaalOmzet, 1300 + 27500 + 7500);
+  assert.equal(r.split.foundation30, Math.round((1300 + 27500 + 7500) * 0.30 * 100) / 100);
 });

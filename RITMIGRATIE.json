@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-09-19",
+  "stempel": "2026-09-25",
   "uitleg": "Per lezer van db.data.rides: wat hij eruit haalt en of de opdrachtwereld dat kan leveren. Geschreven vóór de migratie, zodat die niet wordt geraden. Zie MAATSTAF.md par. 7.5.",
   "blokkade": {
     "stand": "opgeheven",
@@ -12,16 +12,16 @@
     "bijOmzetting": "elke lezer die naar de opdrachtwereld gaat, moet zo'n rit afvangen -- zichtbaar, met de reden erbij, en nooit door hem stil uit de lijst te laten vallen."
   },
   "telling": {
-    "bestanden": 21,
-    "treffers": 36,
+    "bestanden": 23,
+    "treffers": 38,
     "schrijver": 2,
     "stand": 7,
-    "historie": 9,
-    "geenLezer": 3,
+    "historie": 10,
+    "geenLezer": 4,
     "onbekend": 0,
     "kanNu": 7,
     "wachtOpBesluit": 0,
-    "daarna": 11
+    "daarna": 12
   },
   "perSoort": {
     "schrijver": [
@@ -112,6 +112,12 @@
         "treffers": 1,
         "wat": "fooien per dag van een zaak",
         "naOmzetting": "na het besluit. Fooi is geld van een mens: een rit die uit de telling valt, kost een chauffeur zijn deel"
+      },
+      {
+        "bestand": "server/opzet/kernlaag4.js",
+        "treffers": 1,
+        "wat": "afgeronde ritten als geslaagde uitkomst voor activatie en retentie (kern/bedrijfsmaat/stand.js, als lezer)",
+        "naOmzetting": "na het besluit. Een rit die uit de telling valt, maakt een geactiveerd lid stil tot een niet-geactiveerd lid"
       },
       {
         "bestand": "server/routes/member/zakelijk.js",

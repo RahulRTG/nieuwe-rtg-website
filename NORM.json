@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1600,
+    "kernBreedte": 1601,
     "kernGedeeld": 243,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 631,
+    "toetsenNietGemeten": 634,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,64 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-25",
+      "soort": "structureel",
+      "sleutel": "toetsenNietGemeten",
+      "van": 633,
+      "meter": "toetsenNietGemeten 633 -> 634",
+      "reden": "Het samengaan met main (tweede merge van 25 september). Main meet 630, en deze tak voegt vier nieuwe toetsen toe waar de mutatiemotor nog niet langs is geweest: test/bedrijfsmaat-stand.test.js en test/pasbronnen.test.js (elk met een eigen post hieronder), plus test/bedrijfsmaat.test.js en test/stuur-kantoor.test.js (de twee posten hierna). Tot nu stonden main en deze tak elk los op 631 met ELK hun eigen twee posten; in een boom zijn dat 634. Er komt met deze samenvoeging geen toets bij -- de vier posten worden niet samengevat, zodat elk bestand zijn eigen reden en sluitweg houdt.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt alle vier mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 632,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 632 -> 633",
+      "reden": "test/stuur-kantoor.test.js is nieuw (besluit C2: het kantoor als AI-rol, alleen op tonen). Met de hand nagetrokken met twee mutaties: /api/office/bank/incasso in LEZEN.office gezet (toets 2 en 4 zakken: een schrijvende route hoort geweigerd te worden) en naamAuth op /api/office/doe vervangen door officeAuth (toets 3 zakt: de gedeelde code komt aan het stuur). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 631,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 631 -> 632",
+      "reden": "test/bedrijfsmaat.test.js is nieuw (de catalogus, de groepspoort en de meter van AUTONOMIE.md). Met de hand nagetrokken met twee mutaties: de groepspoort liet een waarde onder de grens door (toets 1 zakt) en een citaat in de catalogus verwees naar een regel die er niet staat (toets 5 zakt: verworpen). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1600,
+      "meter": "kernBreedte 1600 -> 1601",
+      "reden": "De eerste sensor van AUTONOMIE (besluiten C1 en C2 van de eigenaar, 25 september 2026). Het domein bedrijfsmaat leest kern.bedrijfsmaat: de stand van de bedrijfsmaten, uitgerekend in server/kern/bedrijfsmaat/stand.js en langs de groepspoort gestuurd. Een eigen instantie in het routebestand zou een tweede stand naast de eerste maken; de route leest daarom de ene uit de kern-tas.",
+      "waarheen": "GRENZEN.json (bedrijfsmaat draagt bedrijfsmaat en boardroomAuth) en test/bedrijfsmaat-stand.test.js"
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 630,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 630 -> 631",
+      "reden": "test/bedrijfsmaat-stand.test.js is nieuw. Met de hand nagetrokken met twee mutaties: de melding van de pasovergang in server/accounts/users.js uitgezet (toets 3 en 4 zakken: geen nieuwe leden) en de groepspoort in kern/ledenregister.js vervangen door de ruwe telling (toets 6 zakt: 'perPas RTG Business Pass toont 1'). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 629,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 629 -> 630",
+      "reden": "test/pasbronnen.test.js is nieuw. Met de hand nagetrokken met twee mutaties: de weigering van een niet-overgang (van === naar) in kern/pasgeschiedenis.js weg (toets 1 zakt) en de binding van de index aan zijn lijst in kern/aanwezigheid.js weg (toets 4 zakt). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
     {
       "datum": "2026-09-24",
       "soort": "structureel",

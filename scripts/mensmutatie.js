@@ -276,7 +276,7 @@ const MUTATIES = [
     weg: 'het stuur kan zijn eigen klaargezette handeling bevestigen',
     hoortTeZakken: 'bevestigveiligheid (de poort op /api/member/doe/bevestig)',
     tekst: [{ bestand: CL,
-      van: '  /^\\/api\\/(member|supplier|staff)\\/doe(?:\\/|$)/ // stuur + menselijke bevestiging: geen rondzingen',
+      van: '  /^\\/api\\/(member|supplier|staff|office)\\/doe(?:\\/|$)/ // stuur + menselijke bevestiging: geen rondzingen',
       naar: '  /^\\/api\\/zzz-nooit\\/doe(?:\\/|$)/ // gemuteerd' }] }
 ];
 

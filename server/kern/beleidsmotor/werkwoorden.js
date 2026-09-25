@@ -37,7 +37,7 @@ const WERKWOORDEN = Object.freeze({
     voorvoegsels: ['/api/office/magnaat/', '/api/office/boardroom/magnaat/'] },
   techniek: { trede: 'uitvoeren', uitleg: 'integraties, noodstop, lastafworp, quarantaine van capabilities en de sleutels van de zaakdozen',
     voorvoegsels: ['/api/office/techniek', '/api/office/gezondheid/', '/api/office/doos/'] },
-  toezicht: { trede: 'tonen', uitleg: 'het journaal lezen', voorvoegsels: ['/api/office/journaal'] },
+  toezicht: { trede: 'tonen', uitleg: 'het journaal en de bedrijfsmaten lezen (AUTONOMIE.md)', voorvoegsels: ['/api/office/journaal', '/api/office/bedrijfsmaat'] },
   salon: { trede: 'uitvoeren', uitleg: 'De Salon uitlichten en belangen beoordelen', voorvoegsels: ['/api/office/salon/'] },
   instellingen: { trede: 'uitvoeren', uitleg: 'het platform zelf: schakelaars, genres, fasen, de mall, paniek en Rahul',
     voorvoegsels: ['/api/office/boardroom', '/api/office/mall/', '/api/office/paniek/', '/api/office/wereld/',

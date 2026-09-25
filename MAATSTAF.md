@@ -649,10 +649,10 @@ vast:
 De aanvraag verschijnt nu op het dispatchbord, en schakel 1 sluit.
 
 **De migratie is in kaart gebracht, en de kaart stopte hem meteen.**
-`scripts/ritmigratie.js` (`npm run ritmigratie`) deelt de <!--getal:ritmigratie.bestanden-->21<!--/getal-->
+`scripts/ritmigratie.js` (`npm run ritmigratie`) deelt de <!--getal:ritmigratie.bestanden-->23<!--/getal-->
 plekken die `db.data.rides` noemen in naar wat ze ermee doen:
 <!--getal:ritmigratie.stand-->7<!--/getal--> lezen de **lopende** rit,
-<!--getal:ritmigratie.historie-->9<!--/getal--> tellen **historie** af,
+<!--getal:ritmigratie.historie-->10<!--/getal--> tellen **historie** af,
 2 **schrijven**, en 3 noemen hem alleen in commentaar.
 
 Die kaart is geschreven vóór er een regel verplaatst werd, en zij bewees haar
@@ -695,7 +695,7 @@ Wat er gebeurt bij een rit zonder bestemming:
 Zo of zo heeft elke rit die bestáát voortaan een opdracht. De teller in de
 migratiekaart staat daarmee op **<!--getal:ritmigratie.kanNu-->7<!--/getal-->
 lezers die om kunnen** (de stand-lezers), daarna
-<!--getal:ritmigratie.daarna-->11<!--/getal--> (historie, dan de schrijvers).
+<!--getal:ritmigratie.daarna-->12<!--/getal--> (historie, dan de schrijvers).
 
 **En de losse chauffeur is geen bijzonder geval.** Hij is een zaak met één
 persoon erin: hij meldt zich aan op eigen naam (`staffId` + pincode), wijst

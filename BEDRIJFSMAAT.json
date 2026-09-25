@@ -1,0 +1,5769 @@
+{
+  "stempel": {
+    "op": "2026-09-25T11:54:02.869Z",
+    "commit": "fe8ad091",
+    "boomVuil": false,
+    "boomAnders": 7,
+    "instrument": "scripts/bedrijfsmaat.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Het bedrijfsmaatregister: per maat over RTG als onderneming of die bestaat, en zo niet, welk van de vier elementen ontbreekt (bron, definitie, projectie, bewijs). Een PROJECTIE op bestaande bronnen; er staat geen enkele waarde in. De catalogus en de regels wonen in server/kern/bedrijfsmaat/, de meter controleert elk citaat in de bron.",
+  "grens": "Dit register zegt NIET hoe groot een maat is, en niet of zijn uitkomst juist is: alleen of hij aantoonbaar bestaat en waar hij vandaan komt. Een maat die bestaat kan nog steeds verkeerd rekenen. De status is beschrijvend en wordt nooit opgeteld tot een score; perGat telt elke maat bij elk van haar gaten, primairGat alleen bij het eerste.",
+  "versie": 1,
+  "besluiten": [
+    {
+      "id": "C1",
+      "naam": "Eén waarnemende laag",
+      "besloten": "25 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "RTG en de RTFoundation mogen door dezelfde intelligentielaag worden waargenomen. Iedere waarneming en iedere voorgestelde handeling behoudt haar economische wereld. kern/economie/firewall.js wordt niet omzeild of versoepeld. RTF-informatie kan buiten haar economische wereld hoogstens tot een constatering of een voorstel leiden.",
+      "kort": "Eén waarnemend brein is niet één portemonnee.",
+      "handhaving": "Elke bedrijfsmaat draagt precies één wereld uit kern/economie/werelden.js; de meter weigert een maat zonder wereld of met een onbekende. De firewall is in deze ronde niet aangeraakt."
+    },
+    {
+      "id": "C2",
+      "naam": "Het kantoor als AI-rol, uitsluitend tonen",
+      "besloten": "25 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "office wordt een AI-rol, uitsluitend op de bestaande gezagstrede tonen (lezen). Geen nieuwe gezagsladder en geen muterende kantoormacht.",
+      "kort": "Het kantoor kijkt mee; het stuur verandert er niets.",
+      "handhaving": "kern/stuur/beleid-lijsten.js (office alleen in LEZEN, lege KLEIN en VOORSTEL), de ingang /api/office/doe op naam, en test/stuur-kantoor.test.js."
+    }
+  ],
+  "telling": {
+    "maten": 64,
+    "domeinen": 28,
+    "perStatus": {
+      "bestaat": 31,
+      "half": 23,
+      "ontbreekt": 10,
+      "onbekend": 0
+    },
+    "primairGat": {
+      "BRON_ONTBREEKT": 10,
+      "DEFINITIE_ONTBREEKT": 12,
+      "PROJECTIE_ONTBREEKT": 5,
+      "BEWIJS_ONTBREEKT": 6
+    },
+    "perGat": {
+      "BRON_ONTBREEKT": 10,
+      "DEFINITIE_ONTBREEKT": 22,
+      "PROJECTIE_ONTBREEKT": 24,
+      "BEWIJS_ONTBREEKT": 33
+    },
+    "ketens": 6,
+    "ketensGegrond": 1,
+    "bestaatGedeeltelijk": 5,
+    "rustOpGat": 2,
+    "privacyGaten": 0,
+    "verworpen": 0,
+    "vormfouten": 0
+  },
+  "perDomein": {
+    "geld": {
+      "maten": 2,
+      "bestaat": 1,
+      "half": 1,
+      "ontbreekt": 0
+    },
+    "cash": {
+      "maten": 1,
+      "bestaat": 0,
+      "half": 0,
+      "ontbreekt": 1
+    },
+    "omzet": {
+      "maten": 4,
+      "bestaat": 3,
+      "half": 1,
+      "ontbreekt": 0
+    },
+    "marge": {
+      "maten": 3,
+      "bestaat": 0,
+      "half": 2,
+      "ontbreekt": 1
+    },
+    "kosten": {
+      "maten": 4,
+      "bestaat": 4,
+      "half": 0,
+      "ontbreekt": 0
+    },
+    "liquiditeit": {
+      "maten": 1,
+      "bestaat": 0,
+      "half": 0,
+      "ontbreekt": 1
+    },
+    "runway": {
+      "maten": 1,
+      "bestaat": 0,
+      "half": 0,
+      "ontbreekt": 1
+    },
+    "acquisitie": {
+      "maten": 3,
+      "bestaat": 1,
+      "half": 1,
+      "ontbreekt": 1
+    },
+    "cac": {
+      "maten": 1,
+      "bestaat": 0,
+      "half": 0,
+      "ontbreekt": 1
+    },
+    "activatie": {
+      "maten": 1,
+      "bestaat": 1,
+      "half": 0,
+      "ontbreekt": 0
+    },
+    "cohort": {
+      "maten": 1,
+      "bestaat": 1,
+      "half": 0,
+      "ontbreekt": 0
+    },
+    "retentie": {
+      "maten": 3,
+      "bestaat": 2,
+      "half": 1,
+      "ontbreekt": 0
+    },
+    "churn": {
+      "maten": 3,
+      "bestaat": 2,
+      "half": 1,
+      "ontbreekt": 0
+    },
+    "uitkomst": {
+      "maten": 3,
+      "bestaat": 1,
+      "half": 2,
+      "ontbreekt": 0
+    },
+    "gebruik": {
+      "maten": 3,
+      "bestaat": 2,
+      "half": 0,
+      "ontbreekt": 1
+    },
+    "support": {
+      "maten": 1,
+      "bestaat": 1,
+      "half": 0,
+      "ontbreekt": 0
+    },
+    "kwaliteit": {
+      "maten": 3,
+      "bestaat": 3,
+      "half": 0,
+      "ontbreekt": 0
+    },
+    "performance": {
+      "maten": 2,
+      "bestaat": 2,
+      "half": 0,
+      "ontbreekt": 0
+    },
+    "capaciteit": {
+      "maten": 2,
+      "bestaat": 0,
+      "half": 2,
+      "ontbreekt": 0
+    },
+    "personeel": {
+      "maten": 2,
+      "bestaat": 0,
+      "half": 1,
+      "ontbreekt": 1
+    },
+    "leveranciers": {
+      "maten": 2,
+      "bestaat": 1,
+      "half": 1,
+      "ontbreekt": 0
+    },
+    "campagnes": {
+      "maten": 2,
+      "bestaat": 0,
+      "half": 1,
+      "ontbreekt": 1
+    },
+    "infrastructuur": {
+      "maten": 3,
+      "bestaat": 3,
+      "half": 0,
+      "ontbreekt": 0
+    },
+    "fiscaliteit": {
+      "maten": 2,
+      "bestaat": 1,
+      "half": 1,
+      "ontbreekt": 0
+    },
+    "risico": {
+      "maten": 3,
+      "bestaat": 1,
+      "half": 1,
+      "ontbreekt": 1
+    },
+    "weerbaarheid": {
+      "maten": 3,
+      "bestaat": 1,
+      "half": 2,
+      "ontbreekt": 0
+    },
+    "commerciele-groei": {
+      "maten": 2,
+      "bestaat": 0,
+      "half": 2,
+      "ontbreekt": 0
+    },
+    "geografische-groei": {
+      "maten": 3,
+      "bestaat": 0,
+      "half": 3,
+      "ontbreekt": 0
+    }
+  },
+  "perWereld": {
+    "commercieel": 6,
+    "rtg-intern": 34,
+    "consument": 21,
+    "rtfoundation": 3
+  },
+  "ketens": [
+    {
+      "id": "geld",
+      "naam": "van ontvangen omzet naar runway",
+      "gegrond": false,
+      "eersteBreuk": "marge.bruto-rtg",
+      "bestaand": 1,
+      "van": 5,
+      "schakels": [
+        {
+          "id": "omzet.leden-ontvangen",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "marge.bruto-rtg",
+          "status": "half",
+          "gaten": [
+            "PROJECTIE_ONTBREEKT",
+            "BEWIJS_ONTBREEKT"
+          ]
+        },
+        {
+          "id": "marge.operationeel-rtg",
+          "status": "ontbreekt",
+          "gaten": [
+            "BRON_ONTBREEKT",
+            "DEFINITIE_ONTBREEKT",
+            "PROJECTIE_ONTBREEKT",
+            "BEWIJS_ONTBREEKT"
+          ]
+        },
+        {
+          "id": "cash.rtg-bankpositie",
+          "status": "ontbreekt",
+          "gaten": [
+            "BRON_ONTBREEKT",
+            "DEFINITIE_ONTBREEKT",
+            "PROJECTIE_ONTBREEKT",
+            "BEWIJS_ONTBREEKT"
+          ]
+        },
+        {
+          "id": "runway.rtg",
+          "status": "ontbreekt",
+          "gaten": [
+            "BRON_ONTBREEKT",
+            "DEFINITIE_ONTBREEKT",
+            "PROJECTIE_ONTBREEKT",
+            "BEWIJS_ONTBREEKT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "funnel",
+      "naam": "van nieuw lid naar behoud",
+      "gegrond": false,
+      "eersteBreuk": "uitkomst.klantwaarde",
+      "bestaand": 4,
+      "van": 5,
+      "schakels": [
+        {
+          "id": "acquisitie.nieuwe-leden",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "cohort.aanmeldweek",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "activatie.eerste-waarde",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "uitkomst.klantwaarde",
+          "status": "half",
+          "gaten": [
+            "DEFINITIE_ONTBREEKT",
+            "PROJECTIE_ONTBREEKT",
+            "BEWIJS_ONTBREEKT"
+          ]
+        },
+        {
+          "id": "retentie.aanwezig",
+          "status": "bestaat",
+          "gaten": []
+        }
+      ]
+    },
+    {
+      "id": "werving",
+      "naam": "van campagne naar wervingskosten",
+      "gegrond": false,
+      "eersteBreuk": "campagnes.rtg-marketing",
+      "bestaand": 0,
+      "van": 3,
+      "schakels": [
+        {
+          "id": "campagnes.rtg-marketing",
+          "status": "ontbreekt",
+          "gaten": [
+            "BRON_ONTBREEKT",
+            "DEFINITIE_ONTBREEKT",
+            "PROJECTIE_ONTBREEKT",
+            "BEWIJS_ONTBREEKT"
+          ]
+        },
+        {
+          "id": "acquisitie.kanaal",
+          "status": "ontbreekt",
+          "gaten": [
+            "BRON_ONTBREEKT",
+            "DEFINITIE_ONTBREEKT",
+            "PROJECTIE_ONTBREEKT",
+            "BEWIJS_ONTBREEKT"
+          ]
+        },
+        {
+          "id": "cac.per-kanaal",
+          "status": "ontbreekt",
+          "gaten": [
+            "BRON_ONTBREEKT",
+            "DEFINITIE_ONTBREEKT",
+            "PROJECTIE_ONTBREEKT",
+            "BEWIJS_ONTBREEKT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kosten",
+      "naam": "van verbruik naar unit economics",
+      "gegrond": false,
+      "eersteBreuk": "marge.per-lid",
+      "bestaand": 3,
+      "van": 4,
+      "schakels": [
+        {
+          "id": "kosten.per-drager",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "kosten.maand-totaal",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "kosten.vooruitblik",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "marge.per-lid",
+          "status": "half",
+          "gaten": [
+            "DEFINITIE_ONTBREEKT",
+            "PROJECTIE_ONTBREEKT",
+            "BEWIJS_ONTBREEKT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "service",
+      "naam": "van fout naar opgelost probleem",
+      "gegrond": true,
+      "eersteBreuk": null,
+      "bestaand": 3,
+      "van": 3,
+      "schakels": [
+        {
+          "id": "kwaliteit.foutsignalen",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "support.klokken",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "uitkomst.service-zonder-herhaling",
+          "status": "bestaat",
+          "gaten": []
+        }
+      ]
+    },
+    {
+      "id": "afdracht",
+      "naam": "van bijdrage naar de RTFoundation",
+      "gegrond": false,
+      "eersteBreuk": "omzet.leden-maand",
+      "bestaand": 2,
+      "van": 3,
+      "schakels": [
+        {
+          "id": "omzet.leden-maand",
+          "status": "half",
+          "gaten": [
+            "BEWIJS_ONTBREEKT"
+          ]
+        },
+        {
+          "id": "omzet.leden-ontvangen",
+          "status": "bestaat",
+          "gaten": []
+        },
+        {
+          "id": "geld.foundation-afdracht",
+          "status": "bestaat",
+          "gaten": []
+        }
+      ]
+    }
+  ],
+  "rustOpGat": [
+    {
+      "id": "activatie.eerste-waarde",
+      "zwakkeSchakels": [
+        "uitkomst.rit-afgerond"
+      ]
+    },
+    {
+      "id": "retentie.waarde",
+      "zwakkeSchakels": [
+        "uitkomst.rit-afgerond"
+      ]
+    }
+  ],
+  "privacyGaten": [],
+  "verworpen": [],
+  "vormfouten": [],
+  "graaf": {
+    "knopen": [
+      {
+        "id": "geld.transactievolume",
+        "status": "half",
+        "domein": "geld"
+      },
+      {
+        "id": "geld.foundation-afdracht",
+        "status": "bestaat",
+        "domein": "geld"
+      },
+      {
+        "id": "omzet.leden-maand",
+        "status": "half",
+        "domein": "omzet"
+      },
+      {
+        "id": "omzet.leden-ontvangen",
+        "status": "bestaat",
+        "domein": "omzet"
+      },
+      {
+        "id": "omzet.leden-gefactureerd",
+        "status": "bestaat",
+        "domein": "omzet"
+      },
+      {
+        "id": "omzet.doorbelasting",
+        "status": "bestaat",
+        "domein": "omzet"
+      },
+      {
+        "id": "fiscaal.btw-rtg",
+        "status": "half",
+        "domein": "fiscaliteit"
+      },
+      {
+        "id": "fiscaal.btw-zaken",
+        "status": "bestaat",
+        "domein": "fiscaliteit"
+      },
+      {
+        "id": "marge.bruto-rtg",
+        "status": "half",
+        "domein": "marge"
+      },
+      {
+        "id": "marge.operationeel-rtg",
+        "status": "ontbreekt",
+        "domein": "marge"
+      },
+      {
+        "id": "marge.per-lid",
+        "status": "half",
+        "domein": "marge"
+      },
+      {
+        "id": "kosten.per-drager",
+        "status": "bestaat",
+        "domein": "kosten"
+      },
+      {
+        "id": "kosten.maand-totaal",
+        "status": "bestaat",
+        "domein": "kosten"
+      },
+      {
+        "id": "kosten.vooruitblik",
+        "status": "bestaat",
+        "domein": "kosten"
+      },
+      {
+        "id": "kosten.herkomst",
+        "status": "bestaat",
+        "domein": "kosten"
+      },
+      {
+        "id": "cash.rtg-bankpositie",
+        "status": "ontbreekt",
+        "domein": "cash"
+      },
+      {
+        "id": "liquiditeit.rtg",
+        "status": "ontbreekt",
+        "domein": "liquiditeit"
+      },
+      {
+        "id": "runway.rtg",
+        "status": "ontbreekt",
+        "domein": "runway"
+      },
+      {
+        "id": "acquisitie.nieuwe-leden",
+        "status": "bestaat",
+        "domein": "acquisitie"
+      },
+      {
+        "id": "acquisitie.via-werkgever",
+        "status": "half",
+        "domein": "acquisitie"
+      },
+      {
+        "id": "acquisitie.kanaal",
+        "status": "ontbreekt",
+        "domein": "acquisitie"
+      },
+      {
+        "id": "cac.per-kanaal",
+        "status": "ontbreekt",
+        "domein": "cac"
+      },
+      {
+        "id": "cohort.aanmeldweek",
+        "status": "bestaat",
+        "domein": "cohort"
+      },
+      {
+        "id": "activatie.eerste-waarde",
+        "status": "bestaat",
+        "domein": "activatie"
+      },
+      {
+        "id": "retentie.aanwezig",
+        "status": "bestaat",
+        "domein": "retentie"
+      },
+      {
+        "id": "retentie.waarde",
+        "status": "bestaat",
+        "domein": "retentie"
+      },
+      {
+        "id": "retentie.contract-verlengd",
+        "status": "half",
+        "domein": "retentie"
+      },
+      {
+        "id": "churn.pas-naar-gast",
+        "status": "bestaat",
+        "domein": "churn"
+      },
+      {
+        "id": "churn.afwaardering",
+        "status": "bestaat",
+        "domein": "churn"
+      },
+      {
+        "id": "churn.contract-geeindigd",
+        "status": "half",
+        "domein": "churn"
+      },
+      {
+        "id": "campagnes.rtg-marketing",
+        "status": "ontbreekt",
+        "domein": "campagnes"
+      },
+      {
+        "id": "campagnes.rtf-werving",
+        "status": "half",
+        "domein": "campagnes"
+      },
+      {
+        "id": "groei.leden-per-pas",
+        "status": "half",
+        "domein": "commerciele-groei"
+      },
+      {
+        "id": "groei.zaken-per-genre",
+        "status": "half",
+        "domein": "commerciele-groei"
+      },
+      {
+        "id": "geo.leden-per-land",
+        "status": "half",
+        "domein": "geografische-groei"
+      },
+      {
+        "id": "geo.leden-per-stad",
+        "status": "half",
+        "domein": "geografische-groei"
+      },
+      {
+        "id": "geo.rtf-steden",
+        "status": "half",
+        "domein": "geografische-groei"
+      },
+      {
+        "id": "uitkomst.service-zonder-herhaling",
+        "status": "bestaat",
+        "domein": "uitkomst"
+      },
+      {
+        "id": "uitkomst.rit-afgerond",
+        "status": "half",
+        "domein": "uitkomst"
+      },
+      {
+        "id": "uitkomst.klantwaarde",
+        "status": "half",
+        "domein": "uitkomst"
+      },
+      {
+        "id": "gebruik.ai",
+        "status": "bestaat",
+        "domein": "gebruik"
+      },
+      {
+        "id": "gebruik.verzoeken-per-drager",
+        "status": "bestaat",
+        "domein": "gebruik"
+      },
+      {
+        "id": "gebruik.per-functie",
+        "status": "ontbreekt",
+        "domein": "gebruik"
+      },
+      {
+        "id": "support.klokken",
+        "status": "bestaat",
+        "domein": "support"
+      },
+      {
+        "id": "kwaliteit.foutsignalen",
+        "status": "bestaat",
+        "domein": "kwaliteit"
+      },
+      {
+        "id": "kwaliteit.incidenten",
+        "status": "bestaat",
+        "domein": "kwaliteit"
+      },
+      {
+        "id": "kwaliteit.functie-bestaat",
+        "status": "bestaat",
+        "domein": "kwaliteit"
+      },
+      {
+        "id": "performance.beschikbaarheid",
+        "status": "bestaat",
+        "domein": "performance"
+      },
+      {
+        "id": "performance.snelheid",
+        "status": "bestaat",
+        "domein": "performance"
+      },
+      {
+        "id": "capaciteit.partners",
+        "status": "half",
+        "domein": "capaciteit"
+      },
+      {
+        "id": "capaciteit.service",
+        "status": "half",
+        "domein": "capaciteit"
+      },
+      {
+        "id": "personeel.rtg-op-naam",
+        "status": "half",
+        "domein": "personeel"
+      },
+      {
+        "id": "personeel.rtg-werkdruk",
+        "status": "ontbreekt",
+        "domein": "personeel"
+      },
+      {
+        "id": "leveranciers.providers",
+        "status": "bestaat",
+        "domein": "leveranciers"
+      },
+      {
+        "id": "leveranciers.partners-toelating",
+        "status": "half",
+        "domein": "leveranciers"
+      },
+      {
+        "id": "infra.gezondheid",
+        "status": "bestaat",
+        "domein": "infrastructuur"
+      },
+      {
+        "id": "infra.kosten-toegerekend",
+        "status": "bestaat",
+        "domein": "infrastructuur"
+      },
+      {
+        "id": "infra.opslag",
+        "status": "bestaat",
+        "domein": "infrastructuur"
+      },
+      {
+        "id": "risico.rtg",
+        "status": "ontbreekt",
+        "domein": "risico"
+      },
+      {
+        "id": "risico.rtf",
+        "status": "bestaat",
+        "domein": "risico"
+      },
+      {
+        "id": "risico.betalingen-onbekend",
+        "status": "half",
+        "domein": "risico"
+      },
+      {
+        "id": "weerbaarheid.backup",
+        "status": "bestaat",
+        "domein": "weerbaarheid"
+      },
+      {
+        "id": "weerbaarheid.terugwegen",
+        "status": "half",
+        "domein": "weerbaarheid"
+      },
+      {
+        "id": "weerbaarheid.afhankelijkheden",
+        "status": "half",
+        "domein": "weerbaarheid"
+      }
+    ],
+    "kanten": [
+      {
+        "van": "omzet.leden-ontvangen",
+        "naar": "geld.foundation-afdracht",
+        "gegrond": true
+      },
+      {
+        "van": "groei.leden-per-pas",
+        "naar": "omzet.leden-maand",
+        "gegrond": false
+      },
+      {
+        "van": "kosten.per-drager",
+        "naar": "omzet.doorbelasting",
+        "gegrond": true
+      },
+      {
+        "van": "omzet.leden-ontvangen",
+        "naar": "fiscaal.btw-rtg",
+        "gegrond": true
+      },
+      {
+        "van": "omzet.leden-ontvangen",
+        "naar": "marge.bruto-rtg",
+        "gegrond": true
+      },
+      {
+        "van": "kosten.maand-totaal",
+        "naar": "marge.bruto-rtg",
+        "gegrond": true
+      },
+      {
+        "van": "marge.bruto-rtg",
+        "naar": "marge.operationeel-rtg",
+        "gegrond": false
+      },
+      {
+        "van": "personeel.rtg-op-naam",
+        "naar": "marge.operationeel-rtg",
+        "gegrond": false
+      },
+      {
+        "van": "omzet.leden-maand",
+        "naar": "marge.per-lid",
+        "gegrond": false
+      },
+      {
+        "van": "kosten.per-drager",
+        "naar": "marge.per-lid",
+        "gegrond": true
+      },
+      {
+        "van": "kosten.per-drager",
+        "naar": "kosten.maand-totaal",
+        "gegrond": true
+      },
+      {
+        "van": "kosten.maand-totaal",
+        "naar": "kosten.vooruitblik",
+        "gegrond": true
+      },
+      {
+        "van": "kosten.maand-totaal",
+        "naar": "kosten.herkomst",
+        "gegrond": true
+      },
+      {
+        "van": "cash.rtg-bankpositie",
+        "naar": "liquiditeit.rtg",
+        "gegrond": false
+      },
+      {
+        "van": "cash.rtg-bankpositie",
+        "naar": "runway.rtg",
+        "gegrond": false
+      },
+      {
+        "van": "marge.operationeel-rtg",
+        "naar": "runway.rtg",
+        "gegrond": false
+      },
+      {
+        "van": "campagnes.rtg-marketing",
+        "naar": "acquisitie.kanaal",
+        "gegrond": false
+      },
+      {
+        "van": "acquisitie.kanaal",
+        "naar": "cac.per-kanaal",
+        "gegrond": false
+      },
+      {
+        "van": "acquisitie.nieuwe-leden",
+        "naar": "cac.per-kanaal",
+        "gegrond": true
+      },
+      {
+        "van": "campagnes.rtg-marketing",
+        "naar": "cac.per-kanaal",
+        "gegrond": false
+      },
+      {
+        "van": "acquisitie.nieuwe-leden",
+        "naar": "cohort.aanmeldweek",
+        "gegrond": true
+      },
+      {
+        "van": "cohort.aanmeldweek",
+        "naar": "activatie.eerste-waarde",
+        "gegrond": true
+      },
+      {
+        "van": "uitkomst.rit-afgerond",
+        "naar": "activatie.eerste-waarde",
+        "gegrond": false
+      },
+      {
+        "van": "cohort.aanmeldweek",
+        "naar": "retentie.aanwezig",
+        "gegrond": true
+      },
+      {
+        "van": "cohort.aanmeldweek",
+        "naar": "retentie.waarde",
+        "gegrond": true
+      },
+      {
+        "van": "activatie.eerste-waarde",
+        "naar": "retentie.waarde",
+        "gegrond": true
+      },
+      {
+        "van": "support.klokken",
+        "naar": "uitkomst.service-zonder-herhaling",
+        "gegrond": true
+      },
+      {
+        "van": "uitkomst.service-zonder-herhaling",
+        "naar": "uitkomst.klantwaarde",
+        "gegrond": true
+      },
+      {
+        "van": "uitkomst.rit-afgerond",
+        "naar": "uitkomst.klantwaarde",
+        "gegrond": false
+      },
+      {
+        "van": "support.klokken",
+        "naar": "capaciteit.service",
+        "gegrond": true
+      },
+      {
+        "van": "personeel.rtg-op-naam",
+        "naar": "personeel.rtg-werkdruk",
+        "gegrond": false
+      },
+      {
+        "van": "leveranciers.providers",
+        "naar": "weerbaarheid.afhankelijkheden",
+        "gegrond": true
+      }
+    ]
+  },
+  "maten": [
+    {
+      "id": "geld.transactievolume",
+      "versie": 1,
+      "domein": "geld",
+      "betekenis": "Wat leden via partnerzaken betaalden (orders en ritten). Geld van de zaak, niet van RTG.",
+      "wereld": "commercieel",
+      "bronnen": [
+        "server/kern/kantoor/metrics-week.js"
+      ],
+      "berekening": "som van betaalde orders (total) en ritten (quote) per dag, zeven dagen terug",
+      "eenheid": "euro per dag en per week",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 5,
+      "privacyklasse": "zaken",
+      "eigenaar": "kern/kantoor",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kantoor/metrics-week.js",
+              "citaat": "betaaldeOrders.filter",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Het getal heet in de code `omzet`, terwijl dezelfde functie zegt dat RTG niets aan boekingen verdient: het is transactievolume van zaken en geen omzet van RTG. Die naam is nergens gedefinieerd."
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kantoor/metrics-week.js",
+              "citaat": "omzetWeek:",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Geen graad, geen peilmoment, en de valuta en btw van de onderliggende orders worden niet genoemd."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/kantoor/metrics-week.js",
+            "citaat": "zaken.size < ZAKEN_GRENS ? dicht(dag) : dag",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "geld.foundation-afdracht",
+      "versie": 1,
+      "domein": "geld",
+      "betekenis": "Het deel van de lidmaatschapsbijdragen dat RTG aan de RTFoundation verschuldigd is, en wat daarvan gestort is.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/fonds.js"
+      ],
+      "berekening": "grootboek fondsAfdrachten per betaling; totaal, te storten, ingepland en gestort",
+      "eenheid": "euro",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/fonds",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "omzet.leden-ontvangen"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/fonds.js",
+              "citaat": "async function boekAfdracht",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/fonds.js",
+              "citaat": "function aandeelCenten",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kantoor/metrics-week.js",
+              "citaat": "const fondsAfdracht = {",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/fonds.js",
+              "citaat": "async function reconcileSettlement",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/fonds.js",
+              "citaat": "function proof",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "omzet.leden-maand",
+      "versie": 1,
+      "domein": "omzet",
+      "betekenis": "De terugkerende maandbijdrage van alle leden: lijstprijs maal aantal voor RTG Pass, de afgesproken contractbedragen voor de contractuele treden.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/ledenregister/omzet.js",
+        "server/accounts/dossier.js"
+      ],
+      "berekening": "per pas aantal x maandprijs, of de som van afgesprokenCenten van lopende contracten; leden zonder contract apart",
+      "eenheid": "euro per maand",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/ledenregister",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "groei.leden-per-pas"
+      ],
+      "status": "half",
+      "gaten": [
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister/omzet.js",
+              "citaat": "afgesprokenCenten",
+              "klopt": true
+            },
+            {
+              "bestand": "server/accounts/dossier.js",
+              "citaat": "function ledenRegisterRijen",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister/omzet.js",
+              "citaat": "WAT BRENGEN DE LEDEN OP",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister/omzet.js",
+              "citaat": "function omzetstaat",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De staat zegt eerlijk wat er NIET in zit (zonderContract), maar draagt geen graad en geen peilmoment. Het is een terugkerend bedrag uit afspraken, geen ontvangen geld; dat verschil staat nergens in het antwoord."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "groei.leden-per-pas"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "omzet.leden-ontvangen",
+      "versie": 1,
+      "domein": "omzet",
+      "betekenis": "De lidmaatschapstermijnen die een mens in de maand als voldaan aftekende (kasbasis).",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/aanmeldingen.js"
+      ],
+      "berekening": "som van centen van termijnen met status voldaan en voldaan.at in de maand",
+      "eenheid": "eurocent per maand, zonder btw",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/aanmeldingen.js",
+              "citaat": "function termijnVoldaan",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "omzetOntvangen: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function omzet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "peilmoment, maand: m",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Alleen de betaalschema's uit aanmeldingen. De ledenfacturen van RTG Pass-leden staan per lid versleuteld in de kluis (member_state) en worden niet gelezen; ze optellen is een leesweg naar de kluis en vraagt een besluit."
+    },
+    {
+      "id": "omzet.leden-gefactureerd",
+      "versie": 1,
+      "domein": "omzet",
+      "betekenis": "De lidmaatschapstermijnen die in de maand vervallen (factuurbasis), naast de ontvangen omzet.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/aanmeldingen/betaalschema.js"
+      ],
+      "berekening": "som van centen van termijnen waarvan vervalt in de maand ligt",
+      "eenheid": "eurocent per maand, zonder btw",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/aanmeldingen/betaalschema.js",
+              "citaat": "function vertaal",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "omzetGefactureerd: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function omzet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "peilmoment, maand: m",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Zelfde grens als de ontvangen omzet: de ledenfacturen in de kluis tellen niet mee."
+    },
+    {
+      "id": "omzet.doorbelasting",
+      "versie": 1,
+      "domein": "omzet",
+      "betekenis": "Kosten die RTG na vrijgave door een mens doorbelast aan zaken.",
+      "wereld": "commercieel",
+      "bronnen": [
+        "server/kern/kosten/factuurregel.js"
+      ],
+      "berekening": "per drager het klaargezette en vrijgegeven bedrag uit de kostenlaag",
+      "eenheid": "euro per maand",
+      "graad": "vermoed",
+      "actualiteit": "periode",
+      "minimaleGroep": 5,
+      "privacyklasse": "zaken",
+      "eigenaar": "kern/kosten",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "kosten.per-drager"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/factuurregel.js",
+              "citaat": "function boekDoorbelasting",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/beleidkaart.js",
+              "citaat": "bestaatNog",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/doorbelasting.js",
+              "citaat": "function standVoor",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/doorbelasting.js",
+              "citaat": "function vrijgeven",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "test/stuur-kantoor.test.js",
+            "citaat": "const TONEN = ['/api/command/puls'",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Een werklijst per zaak voor een mens op naam die een doorbelasting vrijgeeft (besluit 25 september 2026: mens ja, machine nee). Een totaal over zaken met de groepsgrens bestaat nog niet."
+    },
+    {
+      "id": "fiscaal.btw-rtg",
+      "versie": 1,
+      "domein": "fiscaliteit",
+      "betekenis": "De btw die RTG zelf verschuldigd is over zijn eigen facturen.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kosten/factuurregel.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "euro per aangifteperiode",
+      "graad": "onbekend",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "omzet.leden-ontvangen"
+      ],
+      "status": "half",
+      "gaten": [
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/factuurregel.js",
+              "citaat": "md.invoices.push",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/fiscaal/tarief.js",
+              "citaat": "WELK BTW-TARIEF HOORT BIJ DEZE VERKOOP",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De aangiftemotor (kern/fiscaal/btwaangifte.js) rekent voor een ZAAK; RTG is geen zaak in zijn eigen systeem, dus zijn eigen aangifte wordt nergens samengesteld."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie; de zekerheidsklassen en de herkomstketen staan klaar."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "fiscaal.btw-zaken",
+      "versie": 1,
+      "domein": "fiscaliteit",
+      "betekenis": "De btw-aangifte die RTG voor een zaak samenstelt uit haar eigen factuurregister.",
+      "wereld": "commercieel",
+      "bronnen": [
+        "server/kern/fiscaal/btwaangifte.js"
+      ],
+      "berekening": "telling uit het factuurregister van de zaak, per tarief",
+      "eenheid": "euro per aangifteperiode, per zaak",
+      "graad": "gemeten",
+      "actualiteit": "periode",
+      "minimaleGroep": 5,
+      "privacyklasse": "zaken",
+      "eigenaar": "kern/fiscaal",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/fiscaal/btwaangifte.js",
+              "citaat": "bezit: { btwAangiftes: 'lijst' }",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/fiscaal/zekerheid.js",
+              "citaat": "DE VIER ZEKERHEIDSKLASSEN",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/fiscaal/btwaangifte.js",
+              "citaat": "function maak(zaak, periode",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/fiscaal/herkomst.js",
+              "citaat": "function verklaar",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "test/stuur-kantoor.test.js",
+            "citaat": "const TONEN = ['/api/command/puls'",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "marge.bruto-rtg",
+      "versie": 1,
+      "domein": "marge",
+      "betekenis": "Ontvangen omzet min de directe kosten van het platform.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "euro per maand",
+      "graad": "onbekend",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "omzet.leden-ontvangen",
+        "kosten.maand-totaal"
+      ],
+      "status": "half",
+      "gaten": [
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "afgeleid": true,
+          "citaten": [],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "brutomarge: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Geen functie zet de ontvangen omzet en de GEMETEN kostensoorten van een maand naast elkaar. De kostenlaag rekent per drager en per periode; een totaal per soort als bedrag zonder toegerekende soorten moet daar eerst uit komen."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "marge.operationeel-rtg",
+      "versie": 1,
+      "domein": "marge",
+      "betekenis": "Brutomarge min de vaste kosten van de organisatie (mensen, huisvesting, diensten).",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "euro per maand",
+      "graad": "onbekend",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "marge.bruto-rtg",
+        "personeel.rtg-op-naam"
+      ],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De vaste kosten van RTG als organisatie (salarissen van het eigen kantoor, huur, abonnementen) worden nergens geregistreerd; de kostenlaag kent alleen platformkosten."
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet besloten."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "marge.bruto-rtg",
+          "personeel.rtg-op-naam"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "marge.per-lid",
+      "versie": 1,
+      "domein": "marge",
+      "betekenis": "Unit economics: wat een lid bijdraagt min wat hij kost, opgeteld per pas of cohort en nooit per mens.",
+      "wereld": "consument",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "euro per lid per maand",
+      "graad": "onbekend",
+      "actualiteit": "periode",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "omzet.leden-maand",
+        "kosten.per-drager"
+      ],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "afgeleid": true,
+          "citaten": [],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Kosten per drager bestaan, opbrengst per drager niet; welke van de twee de noemer is (pas, cohort) is niet besloten."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Er is nog geen projectie om hem in af te dwingen."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "groei.leden-per-pas",
+          "omzet.leden-maand"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "kosten.per-drager",
+      "versie": 1,
+      "domein": "kosten",
+      "betekenis": "Wat een lid, zaak of gezin het huis deze maand kostte, per kostensoort, met de graad per regel.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kosten/meter.js"
+      ],
+      "berekening": "tellers per soort x tarief; toegerekende soorten uit de nota met een verdeelsleutel",
+      "eenheid": "euro per drager per maand",
+      "graad": "vermoed",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/kosten",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/meter.js",
+              "citaat": "function meet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/soorten.js",
+              "citaat": "WELKE KOSTEN BESTAAN ER",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/overzicht.js",
+              "citaat": "function alleDragers",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/overzicht.js",
+              "citaat": "graad: 'onbekend'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "test/stuur-kantoor.test.js",
+            "citaat": "const TONEN = ['/api/command/puls'",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Een werklijst per drager voor een mens op naam in de boardroom (besluit 25 september 2026: mens ja, machine nee). Een totaal per pas of cohort met de groepsgrens bestaat nog niet."
+    },
+    {
+      "id": "kosten.maand-totaal",
+      "versie": 1,
+      "domein": "kosten",
+      "betekenis": "De kosten van een afgesloten maand; een maand gaat pas dicht als elk verschil een verklaring draagt.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kosten/meter.js"
+      ],
+      "berekening": "periodestand uit meter en nota, met verschillen en verklaringen",
+      "eenheid": "euro per maand",
+      "graad": "gemeten",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/kosten",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "kosten.per-drager"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/meter.js",
+              "citaat": "function kijkPeriode",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/periode.js",
+              "citaat": "function verschillen",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/periode.js",
+              "citaat": "function stand",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/periode.js",
+              "citaat": "function verklaar",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "kosten.vooruitblik",
+      "versie": 1,
+      "domein": "kosten",
+      "betekenis": "Waar de lopende maand uitkomt, met een band die pas verschijnt als de trefzekerheid over afgesloten maanden gemeten is.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kosten/meter.js"
+      ],
+      "berekening": "projectie op het lopende verbruik; trefzekerheid uit vastgelegde voorspellingen tegen de werkelijkheid",
+      "eenheid": "euro per maand",
+      "graad": "vermoed",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/kosten",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "kosten.maand-totaal"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/meter.js",
+              "citaat": "function kijkPeriode",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/vooruitblik.js",
+              "citaat": "WAT WORDT HET DEZE MAAND?",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/vooruitblik.js",
+              "citaat": "function projectie",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/vooruitblik.js",
+              "citaat": "function trefzekerheid",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "kosten.herkomst",
+      "versie": 1,
+      "domein": "kosten",
+      "betekenis": "Waar een kostenregel vandaan komt, tot de factuur van de leverancier of tot de mens die hem overnam.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kosten/providerfactuur.js"
+      ],
+      "berekening": "herkomstketen per regel",
+      "eenheid": "keten tot de leveranciersfactuur",
+      "graad": "gemeten",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/kosten",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "kosten.maand-totaal"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/providerfactuur.js",
+              "citaat": "function factuurZet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/herkomst.js",
+              "citaat": "function herkomst",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/herkomst.js",
+              "citaat": "function herkomst",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/providerfactuur.js",
+              "citaat": "function bronVan",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "cash.rtg-bankpositie",
+      "versie": 1,
+      "domein": "cash",
+      "betekenis": "Het saldo op de rekeningen van RTG zelf.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "euro",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "RTG registreert zijn eigen banksaldo nergens. kern/bankregie en kern/pay gaan over het geld van leden en zaken; de kasvooruitblik (kern/onderneming/kas.js) is een instrument voor een ondernemer, niet voor RTG."
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt pas als er een bron is."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "liquiditeit.rtg",
+      "versie": 1,
+      "domein": "liquiditeit",
+      "betekenis": "Beschikbaar geld tegenover wat RTG op korte termijn moet betalen, inclusief het tegoed dat leden bij RTG hebben staan.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "euro",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "cash.rtg-bankpositie"
+      ],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Er is geen register van de korte verplichtingen van RTG zelf, en geen kaspositie om ze tegenover te zetten."
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet besloten."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "cash.rtg-bankpositie"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "runway.rtg",
+      "versie": 1,
+      "domein": "runway",
+      "betekenis": "Hoe lang RTG met de huidige kaspositie en het huidige netto verbruik doorkan.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "maanden",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "cash.rtg-bankpositie",
+        "marge.operationeel-rtg"
+      ],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "afgeleid": true,
+          "citaten": [],
+          "reden": "afgeleid, maar zonder bron in: cash.rtg-bankpositie, marge.operationeel-rtg"
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet besloten (netto of bruto verbruik, welke horizon)."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De rekenvorm bestaat voor een ondernemer in kern/onderneming/kas.js; voor RTG zelf niet."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "cash.rtg-bankpositie",
+          "marge.bruto-rtg",
+          "marge.operationeel-rtg",
+          "personeel.rtg-op-naam"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "acquisitie.nieuwe-leden",
+      "versie": 1,
+      "domein": "acquisitie",
+      "betekenis": "Hoeveel mensen er in een maand lid werden: hun eerste pas boven gast.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/pasgeschiedenis.js"
+      ],
+      "berekening": "eerste overgang naar een betaalde pas in de pasgeschiedenis, geteld per maand",
+      "eenheid": "leden per maand",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/pasgeschiedenis.js",
+              "citaat": "function noteerPasOvergang",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "nieuwLid: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function nieuweLeden",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "peilmoment, maand: m",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "toon(LEDEN, {",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "acquisitie.via-werkgever",
+      "versie": 1,
+      "domein": "acquisitie",
+      "betekenis": "Aanwas via de wervingslink van een werkgever: welk bedrijf hoeveel leden bracht, nooit wie.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/ledenregister.js"
+      ],
+      "berekening": "telling per zaakcode van de uitnodiging waarmee een lid binnenkwam",
+      "eenheid": "leden per werkgever",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/ledenregister",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "r.via && r.via.code",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "AANWAS PER BEDRIJF",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "perBedrijf: groepstelling(sorteerTelling(perBedrijf)",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Geen graad en geen peilmoment in het antwoord."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/ledenregister.js",
+            "citaat": "perBedrijf: groepstelling(",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "acquisitie.kanaal",
+      "versie": 1,
+      "domein": "acquisitie",
+      "betekenis": "Via welke campagne, verwijzing of link iemand binnenkwam.",
+      "wereld": "consument",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "leden per kanaal",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "campagnes.rtg-marketing"
+      ],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Geen enkele route legt een herkomstkanaal vast (nul treffers in server/ op utm, verwijzer, referral of acquisitiekanaal). Alleen de werkgeverslink wordt onthouden."
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt pas als er een bron is."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Idem."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "campagnes.rtg-marketing"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "cac.per-kanaal",
+      "versie": 1,
+      "domein": "cac",
+      "betekenis": "Wat het kost om via een kanaal een lid te werven.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "marketinguitgaven per kanaal / nieuwe leden per kanaal",
+      "eenheid": "euro per nieuw lid",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "acquisitie.kanaal",
+        "acquisitie.nieuwe-leden",
+        "campagnes.rtg-marketing"
+      ],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "afgeleid": true,
+          "citaten": [],
+          "reden": "afgeleid, maar zonder bron in: acquisitie.kanaal, campagnes.rtg-marketing"
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet besloten welke uitgaven meetellen."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "acquisitie.kanaal",
+          "campagnes.rtg-marketing"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "cohort.aanmeldweek",
+      "versie": 1,
+      "domein": "cohort",
+      "betekenis": "Leden gegroepeerd naar de ISO-week waarin ze nieuw lid werden, zodat gedrag per groep te volgen is.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/pasgeschiedenis.js"
+      ],
+      "berekening": "ISO-week van het moment van nieuw lid, de laatste twaalf weken",
+      "eenheid": "leden per ISO-week",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "acquisitie.nieuwe-leden"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/pasgeschiedenis.js",
+              "citaat": "function noteerPasOvergang",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "cohort: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function isoWeek",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "peilmoment, maand: m",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "grootte: toon(LEDEN",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "activatie.eerste-waarde",
+      "versie": 1,
+      "domein": "activatie",
+      "betekenis": "Het aandeel nieuwe leden met een eerste geslaagde uitkomst binnen 30 dagen, in welke wereld ook.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/pasgeschiedenis.js",
+        "server/kern/bedrijfsmaat/stand.js"
+      ],
+      "berekening": "teller: leden van een afgelopen cohortvenster met een afgeronde rit of bezorgde/opgehaalde bestelling binnen 30 dagen; noemer: die leden",
+      "eenheid": "aandeel van een cohort",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "cohort.aanmeldweek",
+        "uitkomst.rit-afgerond"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/pasgeschiedenis.js",
+              "citaat": "function noteerPasOvergang",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "function uitkomsten",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "activatie: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function activatie",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "peilmoment, maand: m",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "activatie: verhouding(LEDEN",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "uitkomst.rit-afgerond"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "retentie.aanwezig",
+      "versie": 1,
+      "domein": "retentie",
+      "betekenis": "Het aandeel van een cohort waarvan de laatste bezoekdag op of na dag 30 na nieuw lid ligt.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/aanwezigheid.js",
+        "server/kern/pasgeschiedenis.js"
+      ],
+      "berekening": "laatste bezoekdag uit kern/aanwezigheid.js tegen het moment van nieuw lid; alleen cohorten van wie dag 30 voorbij is",
+      "eenheid": "aandeel van een cohort",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "cohort.aanmeldweek"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/aanwezigheid.js",
+              "citaat": "function raakAanwezig",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/pasgeschiedenis.js",
+              "citaat": "function noteerPasOvergang",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "retentieAanwezig: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function retentieAanwezig",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "peilmoment, maand: m",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "retentieAanwezig: verhouding(LEDEN",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "retentie.waarde",
+      "versie": 1,
+      "domein": "retentie",
+      "betekenis": "Het aandeel van een cohort met een geslaagde uitkomst tussen dag 30 en dag 60 na nieuw lid.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/pasgeschiedenis.js",
+        "server/kern/bedrijfsmaat/stand.js"
+      ],
+      "berekening": "dezelfde uitkomstenlijst als activatie, in het venster 30-60; alleen cohorten van wie dag 60 voorbij is",
+      "eenheid": "aandeel van een cohort",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "cohort.aanmeldweek",
+        "activatie.eerste-waarde"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/pasgeschiedenis.js",
+              "citaat": "function noteerPasOvergang",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "function uitkomsten",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "retentieWaarde: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function retentieWaarde",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "peilmoment, maand: m",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "retentieWaarde: verhouding(LEDEN",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "uitkomst.rit-afgerond"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "retentie.contract-verlengd",
+      "versie": 1,
+      "domein": "retentie",
+      "betekenis": "Hoeveel contractuele lidmaatschappen bij hun verlengmoment werden verlengd.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/commercie/contract.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "contracten per periode",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/commercie/contract.js",
+              "citaat": "function verleng",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet besloten; en de meeste betalende leden hebben een pas zonder contract (AFSPRAAK.md), dus deze maat ziet alleen de contractuele treden."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Volgt uit de projectie."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "churn.pas-naar-gast",
+      "versie": 1,
+      "domein": "churn",
+      "betekenis": "Leden wier pas in een maand naar gast gaat, gedeeld door de betalende leden aan het begin van die maand.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/pasgeschiedenis.js"
+      ],
+      "berekening": "overgangen naar gast in de pasgeschiedenis; noemer uit de pas van ieder op de laatste milliseconde van de vorige maand",
+      "eenheid": "aandeel betalende leden per maand",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/pasgeschiedenis.js",
+              "citaat": "function noteerPasOvergang",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "churn: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function churnEnAfwaardering",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "peilmoment, maand: m",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "verhouding(LEDEN, { teller: ce.churn",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "churn.afwaardering",
+      "versie": 1,
+      "domein": "churn",
+      "betekenis": "Leden die in een maand naar een lagere betaalde pas gaan; geen churn, en daarom apart.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/pasgeschiedenis.js"
+      ],
+      "berekening": "overgangen tussen betaalde passen naar een lagere rang, zelfde noemer als churn",
+      "eenheid": "aandeel betalende leden per maand",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/pasgeschiedenis.js",
+              "citaat": "function noteerPasOvergang",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "afwaardering: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function churnEnAfwaardering",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "peilmoment, maand: m",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "teller: ce.afwaardering",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "churn.contract-geeindigd",
+      "versie": 1,
+      "domein": "churn",
+      "betekenis": "Contractuele lidmaatschappen die GEEINDIGD bereiken; volgens de definitie van churn tellen ze mee.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/commercie/contract.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "contracten per maand",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/commercie/contract.js",
+              "citaat": "function beeindig",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "churn: d(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De projectie telt alleen de pasgeschiedenis. Een contract hangt aan een aanmelding en niet aan een codenaam, dus de koppeling contract -> lid moet eerst gelegd worden."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Volgt uit de projectie."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "campagnes.rtg-marketing",
+      "versie": 1,
+      "domein": "campagnes",
+      "betekenis": "De campagnes van RTG zelf: wat ze kostten, wie ze bereikten, wat ze opleverden.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "euro en bereik per campagne",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Er is geen register van RTG-campagnes of marketinguitgaven, en de kostenlaag kent geen marketingsoort. Het campagnebeeld (uitgelichte Salon-posts) draagt geen uitgave en geen bereik."
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt pas als er een bron is (en incrementeel effect, niet klikken)."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "campagnes.rtf-werving",
+      "versie": 1,
+      "domein": "campagnes",
+      "betekenis": "Landelijke wervingscampagnes van de RTFoundation en hoe hun opbrengst naar steden gaat.",
+      "wereld": "rtfoundation",
+      "bronnen": [
+        "server/kern/rtfos/campagnes.js"
+      ],
+      "berekening": "per campagne de opgehaalde bedragen en de verdeelsleutel",
+      "eenheid": "euro per campagne",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/rtfos",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/campagnes.js",
+              "citaat": "function maak",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/campagnes.js",
+              "citaat": "landelijk werven, lokaal besteden",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/campagnes.js",
+              "citaat": "function ronde",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Geen graad of peilmoment in het antwoord. Blijft binnen de wereld rtfoundation (C1)."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "groei.leden-per-pas",
+      "versie": 1,
+      "domein": "commerciele-groei",
+      "betekenis": "Hoeveel leden elke pas heeft.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/accounts/dossier.js"
+      ],
+      "berekening": "telling per pas uit het ledenregister",
+      "eenheid": "leden per pas",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/ledenregister",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/accounts/dossier.js",
+              "citaat": "function ledenRegisterRijen",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/pasladder.js",
+              "citaat": "const LADDER = [",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "const perPasOpen = groepstelling(PAS_VOLGORDE.map",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Geen graad of peilmoment; het register telt tot 20000 rijen en zegt niet of het afkapte."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/ledenregister.js",
+            "citaat": "perPas: perPasOpen",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "groei.zaken-per-genre",
+      "versie": 1,
+      "domein": "commerciele-groei",
+      "betekenis": "Hoeveel actieve partnerzaken er per genre zijn, en hoe dat groeit.",
+      "wereld": "commercieel",
+      "bronnen": [
+        "server/kern/kantoor/metrics.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "zaken per genre",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 5,
+      "privacyklasse": "zaken",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kantoor/metrics.js",
+              "citaat": "o.supplierCode",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Wat een ACTIEVE zaak is (toegelaten, verkocht iets, is open) is niet besloten."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De prestatielijst telt omzet per zaakcode, geen zaken per genre."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Volgt uit de projectie."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "geo.leden-per-land",
+      "versie": 1,
+      "domein": "geografische-groei",
+      "betekenis": "Waar de leden wonen, per land.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/ledenregister.js"
+      ],
+      "berekening": "telling per land uit het ledenregister",
+      "eenheid": "leden per land",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/ledenregister",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "telOp(perLand, r.land)",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Waar het land vandaan komt (opgegeven, gecontroleerd, woon- of verblijfsland) staat niet in de maat."
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "perLand: groepstelling(sorteerTelling(perLand))",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Geen graad of peilmoment."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/ledenregister.js",
+            "citaat": "perLand: groepstelling(",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "geo.leden-per-stad",
+      "versie": 1,
+      "domein": "geografische-groei",
+      "betekenis": "Waar de leden wonen, per stad.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/ledenregister.js"
+      ],
+      "berekening": "telling per stad uit het intakeprofiel",
+      "eenheid": "leden per stad",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/ledenregister",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "telOp(perStad, stad)",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De stad komt uit het intakeprofiel; of dat woonplaats is, staat niet vast."
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "perStad: groepstelling(sorteerTelling(perStad))",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Geen graad of peilmoment."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/ledenregister.js",
+            "citaat": "perStad: groepstelling(",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "geo.rtf-steden",
+      "versie": 1,
+      "domein": "geografische-groei",
+      "betekenis": "In welke steden de RTFoundation actief is, en in welke stand.",
+      "wereld": "rtfoundation",
+      "bronnen": [
+        "server/kern/rtfos/steden.js"
+      ],
+      "berekening": "stedenboom met status per stad",
+      "eenheid": "steden met status",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/rtfos",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/steden.js",
+              "citaat": "function stadMaak",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/steden.js",
+              "citaat": "const STATUS = ['verkend'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/steden.js",
+              "citaat": "function boom",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Geen graad of peilmoment in het antwoord."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "uitkomst.service-zonder-herhaling",
+      "versie": 1,
+      "domein": "uitkomst",
+      "betekenis": "Hoeveel problemen zijn opgelost zonder dat de melder zijn verhaal opnieuw hoefde te doen.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/service/loop.js"
+      ],
+      "berekening": "opgeloste zaken zonder door de structuur afgedwongen herhaling, gedeeld door opgeloste zaken met een menselijke overdracht",
+      "eenheid": "aandeel opgeloste zaken",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/service",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "support.klokken"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/loop.js",
+              "citaat": "function noteer",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/kwaliteit.js",
+              "citaat": "DE MAAT DIE HIER TELT",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/kwaliteit.js",
+              "citaat": "function meting",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/kwaliteit.js",
+              "citaat": "nietTeZeggen: true",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/service/kwaliteit.js",
+            "citaat": "const MINIMUM = 10",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "uitkomst.rit-afgerond",
+      "versie": 1,
+      "domein": "uitkomst",
+      "betekenis": "Ritten die de keten tot het einde liepen.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/kantoor/metrics.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "ritten per periode",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kantoor/metrics.js",
+              "citaat": "r.finishedAt",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/vervoer.js",
+              "citaat": "const RIT_KETEN",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De prestatielijst telt ritten per zaak en een gemiddelde duur, geen afgeronde ritten per periode."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Volgt uit de projectie."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "uitkomst.klantwaarde",
+      "versie": 1,
+      "domein": "uitkomst",
+      "betekenis": "Klantwaarde als geslaagde uitkomst over de werelden heen, niet als aandacht of engagement.",
+      "wereld": "consument",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "aandeel geslaagde bedoelingen",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "uitkomst.service-zonder-herhaling",
+        "uitkomst.rit-afgerond"
+      ],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "afgeleid": true,
+          "citaten": [],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Wat een geslaagde uitkomst is, verschilt per wereld en is per wereld niet besloten. Een samengesteld cijfer erover is met opzet niet de bedoeling (INT-04); het blijven naast elkaar staande maten."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Volgt uit de projectie."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "uitkomst.rit-afgerond"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "gebruik.ai",
+      "versie": 1,
+      "domein": "gebruik",
+      "betekenis": "Hoeveel het huis de modellen gebruikt, met lokaal en extern gescheiden.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/ai-meter.js"
+      ],
+      "berekening": "teller per dag in de AI-meter; lokaal verbruik buiten tarief en grens",
+      "eenheid": "aanroepen en tokens per dag, lokaal en extern apart",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "server/ai-meter",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/ai-meter.js",
+              "citaat": "function boek(",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/soorten.js",
+              "citaat": "id: 'ai-invoer'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/ai-meter.js",
+              "citaat": "function stand",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/ai-meter.js",
+              "citaat": "function boekLokaal",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "gebruik.verzoeken-per-drager",
+      "versie": 1,
+      "domein": "gebruik",
+      "betekenis": "Hoe intensief een lid, zaak of gezin het platform gebruikt, gemeten als serververzoeken.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/kosten/meter.js"
+      ],
+      "berekening": "teller per drager in de kostenmeter",
+      "eenheid": "verzoeken per drager per maand",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/kosten",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/meter.js",
+              "citaat": "function meet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/soorten.js",
+              "citaat": "id: 'verzoek'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/meter.js",
+              "citaat": "function dragers",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/soorten.js",
+              "citaat": "meetweg: 'gemeten'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "test/stuur-kantoor.test.js",
+            "citaat": "const TONEN = ['/api/command/puls'",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Per drager en voor de factuur, voor een mens op naam (mens ja, machine nee). Een optelling per pas of cohort met de groepsgrens bestaat nog niet."
+    },
+    {
+      "id": "gebruik.per-functie",
+      "versie": 1,
+      "domein": "gebruik",
+      "betekenis": "Welke functies werkelijk worden gebruikt.",
+      "wereld": "consument",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "gebruikers per functie per periode",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Er is geen runtime-telling per functie. De kostenmeter telt verzoeken per drager, niet per functie; de routedekking bestaat alleen onder de toetsen."
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt pas als er een bron is."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Idem."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "support.klokken",
+      "versie": 1,
+      "domein": "support",
+      "betekenis": "Reactie-, doorloop- en hersteltijd van een servicezaak, met de tijd dat op de melder werd gewacht eraf.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/service/loop.js"
+      ],
+      "berekening": "vier klokken uit de zaak-tijdlijn; wacht-op-melder wordt afgetrokken",
+      "eenheid": "minuten per zaak, vier klokken",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/service",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/loop.js",
+              "citaat": "function noteer",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/klok.js",
+              "citaat": "DE VIER KLOKKEN VAN EEN SERVICEZAAK",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/klok.js",
+              "citaat": "function klokken",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/kwaliteit.js",
+              "citaat": "nietTeZeggen: true",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/service/kwaliteit.js",
+            "citaat": "const MINIMUM = 10",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "kwaliteit.foutsignalen",
+      "versie": 1,
+      "domein": "kwaliteit",
+      "betekenis": "Fouten die schermen melden, gebundeld op vingerafdruk.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/service/foutsignaal.js"
+      ],
+      "berekening": "telling per afdruk en per scherm",
+      "eenheid": "signalen per vingerafdruk",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/service",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/foutsignaal.js",
+              "citaat": "function meld",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/foutsignaal.js",
+              "citaat": "function afdruk",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/foutsignaal.js",
+              "citaat": "function lijst",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/foutsignaal.js",
+              "citaat": "gebruikersWaarom",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "kwaliteit.incidenten",
+      "versie": 1,
+      "domein": "kwaliteit",
+      "betekenis": "Storingen als object met een nummer, een impact en een verloop.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/command/incident.js"
+      ],
+      "berekening": "incidentkaart met gewogen impact",
+      "eenheid": "incidenten met impact",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/command",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/incident.js",
+              "citaat": "function maak",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/incident.js",
+              "citaat": "HET INCIDENT ALS OBJECT",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/incident.js",
+              "citaat": "function kaart",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/incident-impact.js",
+              "citaat": "NIET_TE_METEN",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "kwaliteit.functie-bestaat",
+      "versie": 1,
+      "domein": "kwaliteit",
+      "betekenis": "Of een belofte uit de werelden aantoonbaar werkt voor de persona die haar ziet (BETROUWBAARHEID.md).",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "APPWERKT.json"
+      ],
+      "berekening": "per onderdeel de strengste van de gemeten bewijzen",
+      "eenheid": "beloften per bewijsstand",
+      "graad": "gemeten",
+      "actualiteit": "bij-meting",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "scripts/appwerkt",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "APPWERKT.json",
+              "citaat": "\"perBewijs\"",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "BETROUWBAARHEID.md",
+              "citaat": "Een functie bestaat pas als",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "APPWERKT.json",
+              "citaat": "\"telling\"",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "APPWERKT.json",
+              "citaat": "\"stempel\"",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "performance.beschikbaarheid",
+      "versie": 1,
+      "domein": "performance",
+      "betekenis": "Beschikbaarheid tegen het servicedoel, met foutbudget.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/command/slo.js"
+      ],
+      "berekening": "aandeel verzoeken zonder 5xx over dertig dagen",
+      "eenheid": "aandeel verzoeken zonder 5xx",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/command",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/slo.js",
+              "citaat": "function maakSlo",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "SLO.json",
+              "citaat": "aandeel verzoeken zonder 5xx",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/slo.js",
+              "citaat": "function doelStand",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "SLO.json",
+              "citaat": "\"minimumVerzoeken\"",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "performance.snelheid",
+      "versie": 1,
+      "domein": "performance",
+      "betekenis": "Hoe snel leesendpoints antwoorden, tegen het servicedoel.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/command/slo.js"
+      ],
+      "berekening": "kwantielen van rtg_duur_seconden",
+      "eenheid": "seconden, p90 en p99",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/command",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/slo.js",
+              "citaat": "function kwantielGrens",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "SLO.json",
+              "citaat": "p90 van rtg_duur_seconden",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/slo.js",
+              "citaat": "function doelStand",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "SLO.json",
+              "citaat": "\"minimumDekking\"",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "capaciteit.partners",
+      "versie": 1,
+      "domein": "capaciteit",
+      "betekenis": "Bezetting en ruimte bij partnerzaken: tafels, kamers, ritten, terreinen.",
+      "wereld": "commercieel",
+      "bronnen": [
+        "server/kern/festival/bezetting.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "per domein verschillend",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 5,
+      "privacyklasse": "zaken",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/festival/bezetting.js",
+              "citaat": "function bezetting",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Elk domein meet zijn eigen bezetting; een gedeelde betekenis over domeinen heen is gemeten afwezig (PLANNING.md: 0 van 269 velden in alle plandomeinen). Een RTG-breed getal hoort er dus niet te komen, wel een lens per domein."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Volgt uit de projectie."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "capaciteit.service",
+      "versie": 1,
+      "domein": "capaciteit",
+      "betekenis": "Hoeveel werk er bij de serviceteams ligt.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/service/teams.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "open zaken per team",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "personeel",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "support.klokken"
+      ],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/service/teams.js",
+              "citaat": "const TEAMS = {",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet besloten; en per team met een of twee mensen is werklast een getal over een mens (KANTOORMACHT.md)."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Volgt uit de projectie."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "personeel.rtg-op-naam",
+      "versie": 1,
+      "domein": "personeel",
+      "betekenis": "Hoeveel mensen er op naam voor het kantoor van RTG werken.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kantoor/uitnodiging.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "medewerkers",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "personeel",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kantoor/uitnodiging.js",
+              "citaat": "function verzilver",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Een kantoorrol op een account is geen dienstverband; het dienstverband bij RTG zelf staat niet in kern/concern/employment.js."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd; de mensdeur telt verzoeken met en zonder naam, geen mensen."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Met drie mensen op kantoor valt elk getal onder de grens; dat is juist."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "personeel.rtg-werkdruk",
+      "versie": 1,
+      "domein": "personeel",
+      "betekenis": "Werkdruk van het eigen kantoor, op teamniveau en nooit per mens.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "uren per team per week",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": 10,
+      "privacyklasse": "personeel",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "personeel.rtg-op-naam"
+      ],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De urenklok (kern/personeel.js) staat per zaakcode en is voor partnerpersoneel; het eigen kantoor van RTG klokt nergens."
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt pas als er een bron is."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Idem."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "personeel.rtg-op-naam"
+        ]
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "leveranciers.providers",
+      "versie": 1,
+      "domein": "leveranciers",
+      "betekenis": "Wat RTG aan zijn eigen leveranciers (hosting, modellen, berichten) betaalt, uit hun facturen.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kosten/providerfactuur.js"
+      ],
+      "berekening": "leveranciersfacturen per periode",
+      "eenheid": "euro per leverancier per maand",
+      "graad": "gemeten",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/kosten",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/providerfactuur.js",
+              "citaat": "function factuurZet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/providerfactuur.js",
+              "citaat": "function bronVan",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/routes/kosten-kantoor.js",
+              "citaat": "/api/office/kosten/leveranciersfacturen",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/herkomst.js",
+              "citaat": "function herkomst",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "leveranciers.partners-toelating",
+      "versie": 1,
+      "domein": "leveranciers",
+      "betekenis": "Zaken die zich aanmelden en waar ze staan in de toelating.",
+      "wereld": "commercieel",
+      "bronnen": [
+        "server/kern/aanmeldingen/bewijs.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "aanvragen per stand",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": 5,
+      "privacyklasse": "zaken",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/aanmeldingen/bewijs.js",
+              "citaat": "function bewijsIndien",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De keten is beproefd (npm run toelatingsproef), maar een doorlooptijd of wachtrij als bedrijfsmaat is niet besloten."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": false,
+        "citaten": [],
+        "reden": "Volgt uit de projectie."
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "infra.gezondheid",
+      "versie": 1,
+      "domein": "infrastructuur",
+      "betekenis": "Doet het het: per vermogen een oordeel met de bewijsgraad en de bronnen eronder.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/command/gezondheid.js"
+      ],
+      "berekening": "strengste bevinding per vermogen; onbekend is geen in orde",
+      "eenheid": "oordeel per vermogen, met graad",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/command",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/gezondheid.js",
+              "citaat": "async function controleer",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/gezondheid.js",
+              "citaat": "DE GEZONDHEIDSKAART",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/gezondheid.js",
+              "citaat": "function stand",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/command/gezondheid.js",
+              "citaat": "bewijs: { graad",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "infra.kosten-toegerekend",
+      "versie": 1,
+      "domein": "infrastructuur",
+      "betekenis": "Stroom en serverhuur, verdeeld uit de echte nota met de sleutel erbij.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kosten/toerekening.js"
+      ],
+      "berekening": "nota x verdeelsleutel",
+      "eenheid": "euro per maand",
+      "graad": "vermoed",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/kosten",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/toerekening.js",
+              "citaat": "function verdeling",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/soorten.js",
+              "citaat": "id: 'hosting'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/overzicht.js",
+              "citaat": "function directeKostenPerDrager",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/soorten.js",
+              "citaat": "meetweg: 'toegerekend'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "infra.opslag",
+      "versie": 1,
+      "domein": "infrastructuur",
+      "betekenis": "Opgeslagen gegevens als stand die je peilt, niet als stroom die je optelt.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kosten/meterstand.js"
+      ],
+      "berekening": "periodieke peiling",
+      "eenheid": "GB-maand",
+      "graad": "gemeten",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/kosten",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/meterstand.js",
+              "citaat": "function peil",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/soorten.js",
+              "citaat": "id: 'opslag'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/meter.js",
+              "citaat": "function beeldPeriode",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/soorten.js",
+              "citaat": "meetweg: 'gemeten'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "risico.rtg",
+      "versie": 1,
+      "domein": "risico",
+      "betekenis": "Het risicoregister van RTG zelf.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "risico per categorie met stand",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [],
+      "status": "ontbreekt",
+      "gaten": [
+        "BRON_ONTBREEKT",
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Er is geen risicoregister voor RTG (KANTOORMACHT.md: er is geen enkele risicomodule). Het register in kern/rtfos/risico.js is van de RTFoundation en blijft in haar wereld (C1)."
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt pas als er een bron is."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Idem."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "risico.rtf",
+      "versie": 1,
+      "domein": "risico",
+      "betekenis": "Het risicoregister van de RTFoundation: geen \"beheerst\" zonder maatregel, en een verlopen herbeoordeling valt op.",
+      "wereld": "rtfoundation",
+      "bronnen": [
+        "server/kern/rtfos/risico.js"
+      ],
+      "berekening": "register met stand en herbeoordelingsdatum",
+      "eenheid": "risico per stad en landelijk",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/rtfos",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/risico.js",
+              "citaat": "function meld",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/risico.js",
+              "citaat": "const CATEGORIEEN = [",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/risico.js",
+              "citaat": "function lijst",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/risico.js",
+              "citaat": "function herbeoordeel",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "risico.betalingen-onbekend",
+      "versie": 1,
+      "domein": "risico",
+      "betekenis": "Betalingen waarvan de afloop niet vaststaat na een crash, time-out of herhaling.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/betaalwaarheid/staten.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "betalingen in een onbekende stand",
+      "graad": "onbekend",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/betaalwaarheid",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/betaalwaarheid/staten.js",
+              "citaat": "const OVERGANGEN =",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/betaalwaarheid/index.js",
+              "citaat": "De RTG Payment Truth",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "De waarheid staat per betaling; een telling van onbekende standen als bedrijfsmaat bestaat niet."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "weerbaarheid.backup",
+      "versie": 1,
+      "domein": "weerbaarheid",
+      "betekenis": "Of er een back-up is waar ook iets IN staat, en van wanneer.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/backupstand.js"
+      ],
+      "berekening": "inhoudscontrole van de laatste dagmap",
+      "eenheid": "laatste bruikbare back-up",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "server/backupstand",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/backupstand.js",
+              "citaat": "function lees",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/backupstand.js",
+              "citaat": "IS ER EEN BACK-UP",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/backupstand.js",
+              "citaat": "function inhoud",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/backupstand.js",
+              "citaat": "function inhoud",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "weerbaarheid.terugwegen",
+      "versie": 1,
+      "domein": "weerbaarheid",
+      "betekenis": "Welke handelingen een beproefde terugweg hebben (exact of compensatie).",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "scripts/herstelproef.js"
+      ],
+      "berekening": "heen, kijken, terug, kijken, per paar",
+      "eenheid": "paren per herstelsoort",
+      "graad": "onbekend",
+      "actualiteit": "bij-meting",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "scripts/herstelproef",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "half",
+      "gaten": [
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "scripts/herstelproef.js",
+              "citaat": "function parenUit",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "INTELLIGENTIE.md",
+              "citaat": "De terugweg is het echte plafond op autonomie",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "HERSTELPROEF.json",
+              "citaat": "\"wereldOntbreekt\"",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "HERSTELPROEF.json draagt geen stempel (geen commit, geen datum), en volgens INTELLIGENTIE.md par. 3.5a reproduceert hij niet op een andere machine. Het getal staat er; wanneer en waarop het gemeten is, niet."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "weerbaarheid.afhankelijkheden",
+      "versie": 1,
+      "domein": "weerbaarheid",
+      "betekenis": "Van welke externe leveranciers een vermogen afhangt, en wat er gebeurt als er een wegvalt.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/kosten/providerfactuur.js"
+      ],
+      "berekening": "nog niet vastgesteld",
+      "eenheid": "leveranciers per vermogen",
+      "graad": "onbekend",
+      "actualiteit": "onbekend",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": null,
+      "eigenaarReden": "Niemand.",
+      "afhankelijk": [
+        "leveranciers.providers"
+      ],
+      "status": "half",
+      "gaten": [
+        "DEFINITIE_ONTBREEKT",
+        "PROJECTIE_ONTBREEKT",
+        "BEWIJS_ONTBREEKT"
+      ],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/kosten/providerfactuur.js",
+              "citaat": "function factuurZet",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Welke leverancier voor welk vermogen onmisbaar is, is niet vastgelegd."
+        },
+        "projectie": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Niet gebouwd."
+        },
+        "bewijs": {
+          "aanwezig": false,
+          "citaten": [],
+          "reden": "Volgt uit de projectie."
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    }
+  ]
+}

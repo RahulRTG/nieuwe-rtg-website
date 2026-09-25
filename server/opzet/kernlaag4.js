@@ -130,6 +130,20 @@ Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, gel
    NA de geldregie om de pasprijs; het fonds gaat laat gebonden mee. Zet ook de
    kostenhaak aan, die tot hier leeg was. */
 Object.assign(kern, require('../kern/economie')({ db, save }));
+/* De eerste sensor van AUTONOMIE (server/kern/bedrijfsmaat/): de bedrijfsmaten
+   uitgerekend op de pasgeschiedenis, de laatste bezoekdag, de uitkomsten en de
+   lidmaatschapstermijnen, en elk getal over mensen langs de groepspoort. Leest
+   alleen; na de economielaag omdat elke maat een economische wereld draagt. */
+/* De twee bronnen eronder (besluiten van 25 september 2026): de dag van het
+   laatste bezoek per lid (kern/aanwezigheid.js; de ledengids raakt hem aan) en
+   de pasgeschiedenis (kern/pasgeschiedenis.js; de accountlaag meldt elke
+   overgang). */
+kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save, bewerkCollectie });
+kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkCollectie, accounts });
+kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
+  lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
+    betaalschemas: () => db.data.lidmaatschapBetalingen },
+  pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid });
 Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,
   keyVanCodenaam, bestandenOpslag: kern.bestandenOpslag,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),

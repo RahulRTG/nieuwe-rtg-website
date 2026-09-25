@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T04:31:26.980Z",
-    "commit": "36e8b8ea",
+    "op": "2026-09-25T04:38:30.114Z",
+    "commit": "0abfea6e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -562,6 +562,14 @@
       "soort": "puur",
       "staat": "al rood",
       "gezakteZonderMutatie": 1
+    },
+    "appwerkt-onderschepper.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/appwerkt.js",
+      "operator": "===->!==#8",
+      "gezakt": 2,
+      "geprobeerd": 50
     },
     "archief.test.js": {
       "soort": "server",
@@ -7122,6 +7130,13 @@
       "gezakt": 5,
       "geprobeerd": 4
     },
+    "rahul-escape.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "rahul-hart.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -8323,14 +8338,6 @@
       "operator": "return-weg#2",
       "gezakt": 1,
       "geprobeerd": 4
-    },
-    "signing-repetitie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/config/release-trust.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 2
     },
     "simulatiebank.test.js": {
       "soort": "server",

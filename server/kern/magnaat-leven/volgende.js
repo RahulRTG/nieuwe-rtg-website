@@ -10,12 +10,19 @@ const { AANBOD } = require('./klanten');
 const { euro, tijd: duur } = require('./staat');
 const { rest } = require('./tijd');
 const { contractAanbod, bedrijfHandelingen } = require('./volgende-bedrijf');
+const { oordeelOpen, OORDELEN, MOMENTEN } = require('./oordeel');
 
 function handelingenNu(st) {
   const uit = [];
   const zet = (actie, label, waarom, invoer) => uit.push({ actie, label, waarom, invoer: invoer || null });
-  /* Een leven dat voorbij of bevroren is, heeft geen handelingen meer: alleen opnieuw beginnen, en dat vraagt een bevestiging op het scherm. */
-  if (st.voorbij || st.bevroren) return uit;
+  const oordeel = () => {
+    const moment = oordeelOpen(st);
+    if (moment) zet('oordeel', 'Hoe speelt het?', 'Nu ' + MOMENTEN[moment] + ': is het spel te makkelijk, goed zo of te zwaar? Anoniem, en overslaan mag.',
+      { moment, oordeel: Object.entries(OORDELEN).map(([id, naam]) => ({ id, naam })).concat({ id: 'overslaan', naam: 'Overslaan' }), toelichting: 'tekst' });
+  };
+  /* Een leven dat voorbij of bevroren is, heeft geen handelingen meer, behalve zeggen hoe het speelde: opnieuw beginnen vraagt een bevestiging op het scherm. */
+  if (st.bevroren) return uit;
+  if (st.voorbij) { oordeel(); return uit; }
   if (!st.aanbod) {
     zet('kies', 'Kies wat je gaat maken', 'Met je laptop en telefoon kun je iets voor jezelf beginnen.',
       { aanbod: Object.entries(AANBOD).map(([id, a]) => ({ id, naam: a.naam })) });
@@ -76,6 +83,7 @@ function handelingenNu(st) {
       }
     }
   }
+  oordeel();
   zet('slaap', 'Sluit de dag af', 'Wat je hebt gepland, gebeurt; dan begint ' + R.dagNaam(st.dag + 1) + '.');
   zet('doorspoelen', 'Spoel door naar het volgende moment', 'De dagen lopen door tot er iets gebeurt, hooguit twee weken. Wat je plande gebeurt; ongeplande vrije tijd is weg.');
   return uit;

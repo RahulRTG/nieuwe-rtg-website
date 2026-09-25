@@ -20,7 +20,7 @@
 
 const OP = '2026-09-24';
 const AFGETEKEND = {
-  door: 'Claude (Opus 5.5), op grond van een gedraaide dubbeltik-ronde op kern/magnaat-leven; ' +
+  door: 'Claude Code, op grond van een gedraaide dubbeltik-ronde op kern/magnaat-leven; ' +
     'niet door een mens nagelezen',
   op: OP
 };

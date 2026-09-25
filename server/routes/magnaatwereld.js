@@ -66,7 +66,9 @@ module.exports = (kern) => {
     sleutel: wie(req), naam: req.boardroomBaas ? 'RTG-eigenaar' : wie(req),
     rol: req.boardroomBaas ? 'publicist' : 'controleur'
   });
-  app.post('/api/office/magnaat/status', boardroomAuth, (req, res) => veilig(res, () => magnaatWereld.kantoorStatus()));
+  /* De speelronde van Van Nul hangt aan de bestaande status: anoniem, alleen tellingen en losse regels (kern/magnaat-leven/oordeel.js). */
+  app.post('/api/office/magnaat/status', boardroomAuth, (req, res) => veilig(res, () =>
+    Object.assign(magnaatWereld.kantoorStatus(), { speelronde: magnaatWereld.leven ? magnaatWereld.leven.oordelen() : null })));
   app.post('/api/office/magnaat/scan', boardroomAuth, (req, res) => veilig(res,
     () => magnaatWereld.scan(wie(req), true)));
   app.post('/api/office/magnaat/beslis', boardroomAuth, (req, res) => veilig(res,

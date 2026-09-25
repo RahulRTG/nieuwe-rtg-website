@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   /* Vaste waarden die de server al invulde: een opdracht, een dag, wie het doet. */
-  var VAST = ['deal', 'wat', 'dag', 'post', 'wie', 'medewerker', 'contract'];
+  var VAST = ['deal', 'wat', 'dag', 'post', 'wie', 'medewerker', 'contract', 'moment'];
 
   function keuzes(id, label, lijst) {
     return '<label>' + label + ' <select id="vnF-' + id + '">' + lijst.join('') + '</select></label>';
@@ -28,6 +28,8 @@
       v += keuzes('minuten', 'Hoe lang', m);
     }
     if (i.procent === 'getal') v += '<label>Korting in procent <input id="vnF-procent" type="number" min="1" max="20" step="1" value="3"></label>';
+    if (Array.isArray(i.oordeel)) v += keuzes('oordeel', 'Het spel is', opties(i.oordeel));
+    if (i.toelichting === 'tekst') v += '<label>Eén regel, als je wilt (geen namen) <input id="vnF-toelichting" maxlength="280"></label>';
     if (i.naam === 'tekst') v += '<label>Naam van je onderneming <input id="vnF-naam" maxlength="60"></label>';
     return v + '</div><button class="btn primary" type="button" data-vn-doe>' + esc(a.label) + '</button>';
   }
@@ -47,13 +49,15 @@
     if (i.minuten === 'minuten') b.minuten = Number(v('minuten'));
     if (i.procent) b.procent = Number(v('procent'));
     if (i.naam) b.naam = v('naam');
+    if (i.oordeel) b.oordeel = v('oordeel');
+    if (i.toelichting) b.toelichting = v('toelichting');
     return b;
   }
 
   /* Een handeling zonder iets om in te vullen gaat meteen. */
   function zonderVelden(a) {
     var i = a.invoer || {};
-    return !(i.aanbod || i.kandidaat || i.wijk || i.stand || i.bedrag || i.aantal || i.minuten === 'minuten' || i.procent || i.naam || typeof i.dagen === 'number');
+    return !(i.aanbod || i.kandidaat || i.wijk || i.stand || i.bedrag || i.aantal || i.minuten === 'minuten' || i.procent || i.naam || i.oordeel || typeof i.dagen === 'number');
   }
 
   window.RTGMagnaatLevenInvoer = { html: html, lichaam: lichaam, zonderVelden: zonderVelden };

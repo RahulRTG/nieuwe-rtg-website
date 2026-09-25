@@ -92,7 +92,7 @@ test('concurrenten reageren op je prijs, maar nooit onder hun bodem', () => {
   v.ok({ actie: 'prijs', bedrag: 25 });
   for (let i = 0; i < 10; i++) { v.slaap(7); }
   const prijzen = v.st().markt.prijzen;
-  assert.ok(Object.keys(prijzen).filter(id => ['licht', 'kader', 'klik'].includes(id)).some(id => prijzen[id] < M.CONCURRENTEN.foto.find(c => c.id === id).prijs),
+  assert.ok(Object.keys(prijzen).filter(id => ['licht', 'kader', 'klik'].includes(id)).some(id => prijzen[id] < M.CONCURRENTEN.foto.find(c => c.id === id).prijsPct),
     'minstens een concurrent is in prijs gezakt');
   for (const c of M.CONCURRENTEN.foto) assert.ok(prijzen[c.id] >= M.REACTIE.bodem);
   assert.ok(v.meldt(/verlaagt zijn prijs/));

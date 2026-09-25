@@ -69,7 +69,7 @@ function zorgBedrijf(st) {
   if (!st.vestiging) st.vestiging = { wijk: 'thuis', sinds: st.dag, volgende: null };
   if (!st.markt) {
     const prijzen = {};
-    for (const lijst of Object.values(require('./regels-markt').CONCURRENTEN)) for (const c of lijst) prijzen[c.id] = c.prijs;
+    for (const lijst of Object.values(require('./regels-markt').CONCURRENTEN)) for (const c of lijst) prijzen[c.id] = c.prijsPct;
     st.markt = { prijzen, klanten: [], leadTeller: 0 };
   }
   return st;

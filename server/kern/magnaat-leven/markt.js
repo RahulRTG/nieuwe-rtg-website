@@ -34,9 +34,10 @@ const kwaliteit = (st) => Math.min(90, 50 + reputatie(st) * 5);
 function verkopers(st) {
   const w = B.HANDELSWAAR[st.aanbod];
   if (!w) return [];
-  const uit = M.CONCURRENTEN[st.aanbod].map(c => ({ id: c.id, naam: c.naam, wijk: c.wijk, kwaliteit: c.kwaliteit,
+  /* `bron` zegt wiens prijs het is: die van een concurrent, of die van jou. */
+  const uit = M.CONCURRENTEN[st.aanbod].map(c => ({ id: c.id, naam: c.naam, bron: 'concurrent', wijk: c.wijk, kwaliteit: c.kwaliteit,
     prijs: Math.round(w.advies * st.markt.prijzen[c.id] / 100) }));
-  if (st.handel) uit.unshift({ id: 'jij', naam: st.onderneming ? st.onderneming.naam : 'jij', wijk: st.vestiging.wijk, kwaliteit: kwaliteit(st), prijs: st.handel.prijs });
+  if (st.handel) uit.unshift({ id: 'jij', naam: st.onderneming ? st.onderneming.naam : 'jij', bron: 'jij', wijk: st.vestiging.wijk, kwaliteit: kwaliteit(st), prijs: st.handel.prijs });
   return uit;
 }
 

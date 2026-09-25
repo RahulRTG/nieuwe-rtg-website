@@ -54,25 +54,25 @@ const WIJKEN = {
   centrum: { naam: 'Winkelstraat Centrum', huur: 90000, verhuis: 15000, zichtbaar: 220 }
 };
 
-/* De concurrenten per aanbod. `prijs` en `tarief` zijn procenten van de
+/* De concurrenten per aanbod. `prijsPct` en `tarief` zijn procenten van de
    adviesprijs en van het markttarief; `betrouwbaar` is hoe vaak ze op tijd
    leveren -- de rest van de weken gaat er een klant van ze weg. */
 const MARKTTARIEF = { websites: 5500, foto: 4500, administratie: 4000 };
 const CONCURRENTEN = {
   websites: [
-    { id: 'pixel', naam: 'Pixelwerk', wijk: 'centrum', prijs: 110, tarief: 115, kwaliteit: 75, betrouwbaar: 80 },
-    { id: 'noord', naam: 'WebStudio Noord', wijk: 'oost', prijs: 95, tarief: 95, kwaliteit: 60, betrouwbaar: 70 },
-    { id: 'snel', naam: 'SnelSite', wijk: 'haven', prijs: 80, tarief: 75, kwaliteit: 40, betrouwbaar: 55 }
+    { id: 'pixel', naam: 'Pixelwerk', wijk: 'centrum', prijsPct: 110, tarief: 115, kwaliteit: 75, betrouwbaar: 80 },
+    { id: 'noord', naam: 'WebStudio Noord', wijk: 'oost', prijsPct: 95, tarief: 95, kwaliteit: 60, betrouwbaar: 70 },
+    { id: 'snel', naam: 'SnelSite', wijk: 'haven', prijsPct: 80, tarief: 75, kwaliteit: 40, betrouwbaar: 55 }
   ],
   foto: [
-    { id: 'licht', naam: 'Studio Licht', wijk: 'centrum', prijs: 115, tarief: 120, kwaliteit: 80, betrouwbaar: 85 },
-    { id: 'kader', naam: 'Kader & Co', wijk: 'haven', prijs: 100, tarief: 100, kwaliteit: 65, betrouwbaar: 75 },
-    { id: 'klik', naam: 'Klikfabriek', wijk: 'oost', prijs: 75, tarief: 70, kwaliteit: 35, betrouwbaar: 55 }
+    { id: 'licht', naam: 'Studio Licht', wijk: 'centrum', prijsPct: 115, tarief: 120, kwaliteit: 80, betrouwbaar: 85 },
+    { id: 'kader', naam: 'Kader & Co', wijk: 'haven', prijsPct: 100, tarief: 100, kwaliteit: 65, betrouwbaar: 75 },
+    { id: 'klik', naam: 'Klikfabriek', wijk: 'oost', prijsPct: 75, tarief: 70, kwaliteit: 35, betrouwbaar: 55 }
   ],
   administratie: [
-    { id: 'balans', naam: 'Balans Adviseurs', wijk: 'centrum', prijs: 115, tarief: 125, kwaliteit: 85, betrouwbaar: 90 },
-    { id: 'boek', naam: 'Boekhoudhuis Oost', wijk: 'oost', prijs: 100, tarief: 95, kwaliteit: 60, betrouwbaar: 70 },
-    { id: 'goedkoop', naam: 'Admin Direct', wijk: 'haven', prijs: 80, tarief: 70, kwaliteit: 40, betrouwbaar: 50 }
+    { id: 'balans', naam: 'Balans Adviseurs', wijk: 'centrum', prijsPct: 115, tarief: 125, kwaliteit: 85, betrouwbaar: 90 },
+    { id: 'boek', naam: 'Boekhoudhuis Oost', wijk: 'oost', prijsPct: 100, tarief: 95, kwaliteit: 60, betrouwbaar: 70 },
+    { id: 'goedkoop', naam: 'Admin Direct', wijk: 'haven', prijsPct: 80, tarief: 70, kwaliteit: 40, betrouwbaar: 50 }
   ]
 };
 /* Hoe concurrenten op jou reageren, elke maandag: wie klanten aan jou verliest

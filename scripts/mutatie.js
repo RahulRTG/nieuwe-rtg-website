@@ -465,6 +465,18 @@ const EIGEN_MODULE = new Map([
      antwoord van een route in om, dus de liegpoort zou hem laten "overleven"
      terwijl hij alleen test/helper.js op de proef stelt. */
   ['poortreeks.test.js', ['test/helper.js']],
+  /* DE VERZOEKRACE (24 september 2026, BEWIJSLUS.md par. 6a). De toets bouwt RTG
+     Pay via de opstelling van de Magnaat-geldpomp, en de motor koos die
+     opstelling als module -- een mutatie daar zegt niets over het betalen van een
+     verzoek. De module die hij beproeft is verzoeken.js; met de hand nagetrokken:
+     het slot vrijgeven weghalen (toets 2 zakt), en de reparatie terugdraaien
+     naar de code van voor 24 september (toets 1 zakt). */
+  ['verzoekbetaal-race.test.js', ['server/kern/pay/verzoeken.js']],
+  /* De eerste require is de zoeker (./lib/tegenvoorbeeld.js), want de toets
+     bouwt zijn wereld daarmee; wat hij bewaakt is de divergentie. Met de hand
+     gedraaid (zie de kop van de toets): het E1-verbod weghalen, effecten weer als
+     ok-antwoorden tellen en `overgeslagen` niet vullen laten hem alle drie zakken. */
+  ['divergentie.test.js', ['scripts/lib/divergentie.js']],
   // The document pilot reaches this handler through HTTP, browser or child processes.
   ['document-equivalence.e2e.js', ['server/kern/document-capability.js']],
   ['document-persistence.e2e.js', ['server/kern/document-capability.js']],

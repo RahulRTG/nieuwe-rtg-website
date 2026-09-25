@@ -271,7 +271,25 @@
     if (!d || !d.gevonden) return;
     $('#dMethode').textContent = methode;
     $('#dPad').textContent = pad;
-    $('#dLijf').innerHTML = d.schakels.map(s => {
+    /* BEWIJSLUS.md par. 7: naast de elf cellen de vervalstaat, de plek in de code
+       en wat NIEMAND meet. Zonder dat laatste blok leest een dossier met elf
+       groene cellen als "alles bewezen". Alles komt van de server; een veld dat
+       ontbreekt (een oudere server) laat zijn blok weg in plaats van iets te raden. */
+    const v = d.vervalstaat, b = d.bron, n = d.nietGemeten;
+    const kop = (v ? '<div class="cel"><div class="as-naam">VERVALSTAAT · ' + esc(v.staat || 'niet vast te stellen') +
+        (Number.isFinite(v.ouderdomDagen) ? ' · ' + esc(String(v.ouderdomDagen)) + ' dagen oud' : '') + '</div>' +
+        '<div class="wat">' + esc(v.reden || '') + '</div>' +
+        (v.heropent ? '<div class="bron">' + esc(v.heropent) + '</div>' : '') + '</div>' : '') +
+      (b ? '<div class="cel"><div class="as-naam">IN DE CODE</div><div class="wat">' +
+        (b.bestand ? esc(b.bestand + ':' + b.regel) : esc(b.reden || 'onbekend')) + '</div>' +
+        (b.register ? '<div class="bron">uit ' + esc(b.register) + '</div>' : '') + '</div>' : '');
+    const NIET = { tegenvoorbeeld: 'TEGENVOORBEELD GEZOCHT', mutatiePerRoute: 'MUTATIE OP DEZE ROUTE',
+      productie: 'WAARNEMING IN PRODUCTIE' };
+    const staart = n ? '<div class="cel"><div class="as-naam">WAT DIT DOSSIER NIET WEET</div></div>' +
+      Object.keys(NIET).filter(k => n[k]).map(k => '<div class="cel"><div class="as-naam">' + esc(NIET[k]) +
+        ' · ' + esc(n[k].staat) + '</div><div class="wat">' + esc(n[k].reden || '') + '</div>' +
+        (n[k].nodig ? '<div class="bron">nodig: ' + esc(n[k].nodig) + '</div>' : '') + '</div>').join('') : '';
+    $('#dLijf').innerHTML = kop + d.schakels.map(s => {
       const c = d.route.cellen[s.id] || { staat: 'ongemeten' };
       /* De REDEN is het waardevolste veld en stond nergens op een scherm. "Deze
          route is ongemeten" helpt niemand; "onbeslist: status 404 op een leeg
@@ -287,7 +305,7 @@
         '<div class="bron">' + (c.bron ? 'gemeten door ' + esc(c.bron)
           : (s.bron ? 'instrument: ' + esc(s.bron) : 'geen instrument -- ' + esc(s.nodig || 'nog te bouwen'))) +
         '</div></div>';
-    }).join('');
+    }).join('') + staart;
     $('#dossier').showModal();
   }
 

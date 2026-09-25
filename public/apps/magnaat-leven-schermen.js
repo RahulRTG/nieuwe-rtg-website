@@ -1,4 +1,4 @@
-/* Magnaat FROM ZERO: Werk, Geld, Netwerk, Wereld en Mijn bedrijf. Vandaag en de
+/* Magnaat FROM ZERO: Werk, Geld, Netwerk en Wereld. Vandaag en de
    Edge staan in ./magnaat-leven.js, dat dit bestand de gegevens geeft; hier
    wordt niets gevraagd en niets gerekend.
 
@@ -37,7 +37,7 @@
       '<p class="vn-rust">Een factuur is omzet, geen geld. Je resultaat telt hem meteen; je rekening pas als de klant betaalt.' +
       (g.vooruitOntvangen ? ' Aan voorschotten heb je ' + euro(g.vooruitOntvangen) + ' binnen waar je nog werk voor moet leveren.' : '') +
       (g.schuld ? ' Je familie krijgt nog ' + euro(g.schuld) + '.' : '') + '</p>' +
-      '<h3>Wat eraan komt</h3>' + regels(g.komend.map(function (x) {
+      '<div id="vnPrognose"></div><h3>Wat eraan komt</h3>' + regels(g.komend.map(function (x) {
         return [x.naam + ' · aan ' + (x.leverancier || 'onbekend'), euro(x.bedrag) + ' · ' + (x.achterstand ? 'staat open' : esc(x.dagNaam) + ', dag ' + x.dag) + (x.uitgesteld ? ' · uitgesteld' : '')];
       })) +
       (g.facturen.length ? '<h3>Facturen</h3>' + regels(g.facturen.map(function (f) {
@@ -65,11 +65,7 @@
       '<h3>Een andere weg proberen</h3><p class="vn-rust">Je begint dan opnieuw op maandag met ' + euro(s.wereld.startKas) + '. Wat je in dit leven deed, blijft in het grootboek staan.' +
       (s.ronde ? ' Dit is je poging ' + (s.ronde + 1) + '.' : '') + '</p><button type="button" class="btn subtle" data-vn-opnieuw>Begin opnieuw</button>';
 
-    var z = s.bedrijf;
-    q('#vnNavBedrijf').hidden = !z;
-    q('#vnBedrijf').innerHTML = z ? '<h3>' + esc(z.naam) + '</h3><p>Ingeschreven op dag ' + z.sinds + (z.zelfstandig ? ', en sinds dag ' + z.zelfstandig + ' leef je ervan' : '') + '.</p>' +
-      '<h3>Resultaat</h3>' + regels([['Omzet', euro(z.omzet)], ['Kosten', '-' + euro(z.kosten)], ['Resultaat', euro(z.resultaat)]]) +
-      '<h3>Balans</h3>' + regels([['Bank', euro(z.balans.kas)], ['Te ontvangen', euro(z.balans.vorderingen)], ['Voorschotten (nog leveren)', euro(z.balans.vooruit)], ['Schuld', euro(z.balans.schuld)]]) : '';
+    /* Mijn bedrijf en de prognose tekent ./magnaat-leven-bedrijf.js. */
   }
 
   window.RTGMagnaatLevenSchermen = { teken: teken };

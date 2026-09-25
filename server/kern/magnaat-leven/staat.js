@@ -24,6 +24,7 @@ function nieuw({ wereld, nu }) {
     posten: [],
     software: null, lening: null,
     onderneming: null, ondernemingVraag: null, zelfstandig: null,
+    team: [], handel: null, leveringen: [], contracten: [], contractTeller: 0,
     rtg: [], meldingen: [],
     boek: null
   };
@@ -48,8 +49,23 @@ function ontgrendel(st, id) {
    grootboeksleutel, en een sleutel die terugkomt boekt niets. */
 const AAN_WIE = { huur: 'je verhuurder', vast: 'je provider en je verzekeraar', uitstel: 'je provider en je verzekeraar',
   software: 'de maker van je software', aanmaning: 'het incassobureau', aflossing: 'je familie' };
-function post(st, { soort, naam, bedrag, dag }) {
-  st.posten.push({ id: soort + ':' + (++st.postTeller), soort, naam, leverancier: AAN_WIE[soort] || 'onbekend', bedrag, dag });
+/* Een betaling van het bedrijf (V2) zegt zelf naar welke rekening hij gaat
+   (`naar`, met de soort boeking), en bij loon voor wie hij is. */
+function post(st, { soort, naam, bedrag, dag, leverancier, naar, boekSoort, medewerker }) {
+  const p = { id: soort + ':' + (++st.postTeller), soort, naam, leverancier: leverancier || AAN_WIE[soort] || 'onbekend', bedrag, dag };
+  if (naar) Object.assign(p, { naar, boekSoort });
+  if (medewerker) p.medewerker = medewerker;
+  st.posten.push(p);
+  return p;
+}
+
+/* Een leven van voor V2 krijgt de lege velden van een bedrijf erbij, zonder
+   opnieuw te beginnen: er is nog niets van, dus er valt niets om te bouwen. */
+function zorgBedrijf(st) {
+  for (const [k, v] of [['team', []], ['handel', null], ['leveringen', []], ['contracten', []], ['contractTeller', 0]]) {
+    if (st[k] === undefined) st[k] = Array.isArray(v) ? [] : v;
+  }
+  return st;
 }
 
 const klantVan = (st, klantId) => klantenVan(st.aanbod).find(k => k.id === klantId) || null;
@@ -63,4 +79,4 @@ const tijd = (min) => {
   return u && m ? u + 'u ' + m + 'm' : u ? u + 'u' : m + 'm';
 };
 
-module.exports = { nieuw, meld, ontgrendel, post, klantVan, deal, euro, tijd };
+module.exports = { nieuw, zorgBedrijf, meld, ontgrendel, post, klantVan, deal, euro, tijd };

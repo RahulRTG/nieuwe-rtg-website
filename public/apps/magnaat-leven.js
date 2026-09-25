@@ -44,42 +44,18 @@
       Math.ceil(s.volgendeDagOver / 60000) + ' min, of sluit hem zelf af';
   }
 
-  /* Het invulveld van een handeling: vaste waarden gaan mee, markeringen worden velden. */
-  function invoerVoor(a) {
-    var i = a.invoer || {}, h = '<p>' + esc(a.waarom) + '</p><div class="vn-velden">';
-    if (Array.isArray(i.aanbod)) h += '<label>Wat ga je maken <select id="vnF-aanbod">' + i.aanbod.map(function (x) { return '<option value="' + esc(x.id) + '">' + esc(x.naam) + '</option>'; }).join('') + '</select></label>';
-    if (i.bedrag === 'euro') h += '<label>Bedrag in hele euro\'s <input id="vnF-bedrag" type="number" min="1" step="1" inputmode="numeric"></label>';
-    if (typeof i.dagen === 'number') h += '<label>Af binnen (dagen) <input id="vnF-dagen" type="number" min="1" max="60" step="1" value="' + i.dagen + '"></label>';
-    if (Array.isArray(i.voorschot)) h += '<label>Vooraf <select id="vnF-voorschot">' + i.voorschot.map(function (p) { return '<option value="' + p + '">' + (p ? p + '%' : 'niets') + '</option>'; }).join('') + '</select></label>';
-    if (i.minuten === 'minuten') {
-      var opties = [];
-      for (var m = 30; m <= LEVEN.vrijVandaag; m += 30) opties.push(m);
-      h += '<label>Hoe lang <select id="vnF-minuten">' + opties.reverse().map(function (m) { return '<option value="' + m + '">' + duur(m) + '</option>'; }).join('') + '</select></label>';
-    }
-    if (i.procent === 'getal') h += '<label>Korting in procent <input id="vnF-procent" type="number" min="1" max="20" step="1" value="3"></label>';
-    if (i.naam === 'tekst') h += '<label>Naam van je onderneming <input id="vnF-naam" maxlength="60"></label>';
-    return h + '</div><button class="btn primary" type="button" data-vn-doe>' + esc(a.label) + '</button>';
-  }
-  function lichaam(a) {
-    var b = { actie: a.actie }, i = a.invoer || {}, v = function (n) { var e = q('#vnF-' + n); return e ? e.value : undefined; };
-    ['deal', 'wat', 'dag', 'post'].forEach(function (k) { if (i[k] != null && typeof i[k] !== 'object') b[k] = i[k]; });
-    if (i.aanbod) b.aanbod = v('aanbod');
-    if (i.bedrag) b.bedrag = Number(v('bedrag'));
-    if (i.voorschot) b.voorschot = Number(v('voorschot'));
-    if (typeof i.dagen === 'number') b.dagen = Number(v('dagen'));
-    if (i.minuten) b.minuten = Number(v('minuten'));
-    if (i.procent) b.procent = Number(v('procent'));
-    if (i.naam) b.naam = v('naam');
-    return b;
-  }
-  var vrijeInvoer = function (a) { var i = a.invoer || {}; return !(i.aanbod || i.bedrag || i.minuten || i.procent || i.naam || typeof i.dagen === 'number'); };
+  /* De velden van een handeling bouwt en leest ./magnaat-leven-invoer.js. */
+  var INVOER = window.RTGMagnaatLevenInvoer;
+  var invoerVoor = function (a) { return INVOER.html(a, { esc: esc, duur: duur, vrij: LEVEN.vrijVandaag }); };
+  var lichaam = function (a) { return INVOER.lichaam(a, q); };
+  var vrijeInvoer = function (a) { return INVOER.zonderVelden(a); };
 
   function tekenAgenda(s) {
     q('#vnAgenda').innerHTML = s.vandaag.agenda.map(function (d, n) {
       return '<div class="vn-dag' + (n === 0 ? ' vn-vandaag' : '') + '"><b>' + esc(d.naam) + '</b><small>dag ' + d.dag +
         (d.dienst ? ' · dienst' : '') + (d.loondag ? ' · loon' : '') + '</small>' +
         d.items.map(function (x) {
-          return '<span class="vn-item vn-w-' + esc(x.wat) + '">' + esc(x.naam) + (x.klant ? ' · ' + esc(x.klant) : '') + ' <em>' + duur(x.minuten) + '</em>' +
+          return '<span class="vn-item vn-w-' + esc(x.wat) + '">' + (x.door ? esc(x.door) + ': ' : '') + esc(x.naam) + (x.klant ? ' · ' + esc(x.klant) : '') + ' <em>' + duur(x.minuten) + '</em>' +
             (x.wat !== 'gesprek' ? '<button type="button" class="vn-schrap" data-vn-schrap="' + d.dag + ':' + x.index + '" aria-label="Schrap ' + esc(x.naam) + '">×</button>' : '') + '</span>';
         }).join('') +
         d.betalingen.map(function (p) { return '<span class="vn-item vn-betaal' + (p.achterstand ? ' vn-open' : '') + '">' + esc(p.naam) + ' <em>' + euro(p.bedrag) + '</em></span>'; }).join('') +
@@ -112,7 +88,9 @@
   function teken(s) {
     LEVEN = s;
     tekenVandaag(s);
-    if (window.RTGMagnaatLevenSchermen) window.RTGMagnaatLevenSchermen.teken(s, { q: q, esc: esc, euro: euro, duur: duur });
+    var hulp = { q: q, esc: esc, euro: euro, duur: duur };
+    if (window.RTGMagnaatLevenSchermen) window.RTGMagnaatLevenSchermen.teken(s, hulp);
+    if (window.RTGMagnaatLevenBedrijf) window.RTGMagnaatLevenBedrijf.teken(s, hulp);
     klok(s);
   }
 

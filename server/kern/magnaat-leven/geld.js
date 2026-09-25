@@ -16,7 +16,8 @@ const TEGEN = { huur: 'verhuurder', vast: 'leveranciers', software: null, aanman
 
 function betaalPost(st, p) {
   const b = boekVan(st), sleutel = 'post:' + p.id;
-  if (p.soort === 'software') b.boekOver(st, { soort: 'SOFTWARE', van: ['kas'], naar: ['kosten', 'software'], bedrag: p.bedrag, omschrijving: p.naam, sleutel });
+  if (p.naar) b.boekOver(st, { soort: p.boekSoort, van: ['kas'], naar: p.naar, bedrag: p.bedrag, omschrijving: p.naam, sleutel });
+  else if (p.soort === 'software') b.boekOver(st, { soort: 'SOFTWARE', van: ['kas'], naar: ['kosten', 'software'], bedrag: p.bedrag, omschrijving: p.naam, sleutel });
   else if (p.soort === 'aflossing') b.boekOver(st, { soort: 'AFLOSSING', van: ['kas'], naar: ['schuld', 'familie'], bedrag: p.bedrag, omschrijving: p.naam, sleutel });
   else b.boekOver(st, { soort: p.soort === 'aanmaning' ? 'AANMANING' : 'VERPLICHTING', van: ['kas'], naar: [TEGEN[p.soort] || 'leveranciers'], bedrag: p.bedrag, omschrijving: p.naam, sleutel });
 }
@@ -24,7 +25,9 @@ function betaalPost(st, p) {
 /* De volgende keer van een terugkerende betaling. */
 function volgendeKeer(st, p) {
   const v = R.VERPLICHTINGEN.find(x => x.id === p.soort) || (p.soort === 'software' ? R.SOFTWARE : null);
-  if (v) post(st, { soort: p.soort, naam: p.naam, bedrag: v.bedrag, dag: (p.oorspronkelijk || p.dag) + v.elke });
+  /* Een licentie per mens die met de software werkt: jij en je team (V2). */
+  const licenties = p.soort === 'software' ? 1 + (st.team || []).filter(m => !m.weg).length : 1;
+  if (v) post(st, { soort: p.soort, naam: p.naam, bedrag: v.bedrag * licenties, dag: (p.oorspronkelijk || p.dag) + v.elke });
 }
 
 function betaalWatVervalt(st) {
@@ -36,6 +39,8 @@ function betaalWatVervalt(st) {
       volgendeKeer(st, p);
       if (p.soort === 'software' && st.software.gepauzeerd) { st.software.gepauzeerd = false; meld(st, 'Je software werkt weer.', 'goed'); }
       if (p.achterstand) meld(st, p.naam + ' is alsnog betaald.', 'goed');
+      const m = p.medewerker && st.team.find(x => x.id === p.medewerker);
+      if (m && m.gestaakt && !st.posten.some(x => x.medewerker === m.id && x.achterstand)) { m.gestaakt = null; meld(st, m.naam + ' werkt weer.', 'goed'); }
       if (p.soort === 'aflossing' && !st.posten.some(x => x.soort === 'aflossing')) {
         st.lening = null;
         meld(st, 'Je lening bij je familie is afgelost.', 'goed');
@@ -44,6 +49,14 @@ function betaalWatVervalt(st) {
     }
     if (p.achterstand) continue;
     p.achterstand = true;
+    if (p.soort === 'loon') {
+      const m = st.team.find(x => x.id === p.medewerker);
+      if (m && !m.gestaakt) m.gestaakt = st.dag;
+      meld(st, p.naam + ' (' + euro(p.bedrag) + ') kon niet worden betaald. ' + (m ? m.naam : 'Je medewerker') +
+        ' werkt niet zonder loon, en gaat weg als het een week duurt. Het loon blijft verschuldigd.', 'nood');
+      ontgrendel(st, 'budget');
+      continue;
+    }
     meld(st, p.naam + ' (' + euro(p.bedrag) + ') kon niet worden betaald: er staat ' + euro(st.kas) + ' op je rekening. ' +
       (p.soort === 'software' ? 'Je software staat stil tot hij betaald is.'
         : ['aanmaning', 'aflossing', 'uitstel'].includes(p.soort) ? 'Hij blijft openstaan.' : 'Er komen ' + euro(R.AANMANING) + ' aanmaningskosten bij.'), 'nood');

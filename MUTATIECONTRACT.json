@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-25T03:21:16.910Z",
-  "commit": "3a6f271a",
+  "op": "2026-09-25T02:27:30.867Z",
+  "commit": "bc18d35de",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5025,
-  "geclassificeerd": 5025,
+  "totaal": 5023,
+  "geclassificeerd": 5023,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1211,
    "PROTECTED": 482,
-   "INTENTIONALLY_NON_IDEMPOTENT": 142
+   "INTENTIONALLY_NON_IDEMPOTENT": 140
   },
-  "vastgesteldDoorMens": 1884,
+  "vastgesteldDoorMens": 1882,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4135,
+   "AUTHENTICATED": 4133,
    "PUBLIC": 124,
    "OBJECT_SCOPED": 745,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 53
+   "niet gemeten": 51
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -56583,8 +56583,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "kluisAuth",
-     "geldPasskey"
+     "kluisAuth"
     ]
    },
    "bewijs": {
@@ -56649,27 +56648,6 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "zwaar.opties.handtekening",
-   "route": "POST /api/office/bank/handtekening/opties",
-   "semantiek": {
-    "klasse": "nietHerhaalbaar"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "kluisAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -56751,27 +56729,6 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "zwaar.opties.incasso",
-   "route": "POST /api/office/bank/incasso/opties",
-   "semantiek": {
-    "klasse": "nietHerhaalbaar"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "kluisAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

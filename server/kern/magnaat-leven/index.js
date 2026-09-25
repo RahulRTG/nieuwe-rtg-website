@@ -11,7 +11,7 @@
    elke aanraking wordt het grootboek bevestigd. */
 'use strict';
 const R = require('./regels');
-const { nieuw, meld, ontgrendel, euro } = require('./staat');
+const { nieuw, zorgBedrijf, meld, ontgrendel, euro } = require('./staat');
 const { maakBoek, koppel, wereldVan } = require('./boek');
 const { volgendeDag } = require('./dag');
 const { ACTIES } = require('./acties');
@@ -42,7 +42,7 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
       ontgrendel(st, 'geld');
       alle[key] = st;
     }
-    return koppel(st, boek);
+    return koppel(zorgBedrijf(st), boek);
   }
 
   function bijrekenen(st) {

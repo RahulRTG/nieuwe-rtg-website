@@ -4,13 +4,14 @@
    - /api/member/doe    het lid (en de gratis app), met de leden-token
    - /api/supplier/doe  de zaak (eigenaar of manager)
    - /api/staff/doe     het personeel op de PDA (logt in binnen de zaak)
+   - /api/office/doe    het kantoor, op NAAM en uitsluitend op tonen (besluit C2)
    De /kaart-varianten geven uitsluitend de expliciet beoordeelde paden terug.
    Een wijziging levert een eenmalig servervoorstel; alleen /doe/bevestig kan
    dat exacte voorstel uitvoeren. De tool-lus zelf mag die route nooit zien. */
 const { dragersVanVerzoek } = require('../kern/isolatie/sessiedragers');
 
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, stuurRoep, stuurBevestig, stuurPaden } = kern;
+  const { app, auth, supplierAuth, naamAuth, stuurRoep, stuurBevestig, stuurPaden } = kern;
 
   /* DE ISOLATIECONTEXT HOORT OOK HIER, en dat werd bijna vergeten. De tool-lus
      (kern/stuur/lus.js) versmalt zijn kaart al op de stand van de aanroeper --
@@ -135,5 +136,21 @@ module.exports = (kern) => {
   app.post('/api/staff/doe/kaart', supplierAuth, (req, res) => {
     if (!alleenPersoneel(req, res, 'staff')) return;
     res.json(metUitleg(stuurPaden(app, 'staff', isoContext(req))));
+  });
+
+  /* ---- HET KANTOOR (besluit C2 van de eigenaar, 25 september 2026) ----
+
+     OP NAAM, en dat is de reden dat hier naamAuth staat en geen officeAuth. Wat
+     de AI namens het kantoor doet, draagt de naam van de mens die het vroeg; een
+     spoor dat eindigt bij de gedeelde kantoorcode is een alibi (KANTOOR.md). De
+     gedeelde code krijgt de weigering MET de weg ernaartoe (inloggen op naam).
+
+     GEEN /doe/bevestig, en dat is geen halve oplevering: `office` staat alleen
+     in de lezen-lijst van kern/stuur/beleid-lijsten.js, er ontstaat dus nooit
+     een voorstel om te bevestigen. Een bevestigroute zou een deur zijn naar een
+     kamer die het besluit met opzet leeg liet. */
+  app.post('/api/office/doe', naamAuth, doeHandler('office'));
+  app.post('/api/office/doe/kaart', naamAuth, (req, res) => {
+    res.json(metUitleg(stuurPaden(app, 'office', null)));
   });
 };

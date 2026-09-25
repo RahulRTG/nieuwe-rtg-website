@@ -217,6 +217,10 @@ const EIGENAAR = {
       'namens-iemand-handelen een vorm en een woordenschat? Geschreven met --vastleggen, ' +
       'gelezen door test/namensvorm.test.js, scripts/norm.js (de ratel namensMechanismenGemeten) ' +
       'en scripts/getallen.js (zeven levende getallen in het document).' },
+  'BEDRIJFSMAAT.json': { schrijver: 'scripts/bedrijfsmaat.js',
+    waarom: 'het bedrijfsmaatregister: per maat over RTG als onderneming of hij bestaat en welk element ' +
+      'ontbreekt, met de ketens en de groepsgrens. De catalogus woont in server/kern/bedrijfsmaat/; ' +
+      'geschreven met --vastleggen, gelezen door test/bedrijfsmaat.test.js.' },
   'SPOORVORM.json': { schrijver: 'scripts/spoorvorm.js',
     waarom: 'de convergentiematrix achter REPRESENTATIE.md par. 8.1: hoeveel van de zeven ' +
       'mechanismen halen de vier spoor-eigenschappen die kern/vertegenwoordiging/handelen.js ' +

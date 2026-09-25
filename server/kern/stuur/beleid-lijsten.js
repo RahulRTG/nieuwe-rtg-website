@@ -42,6 +42,28 @@ const LEZEN = Object.freeze({
     /^\/api\/staff\/fluister\/profiel$/,
     /^\/api\/staff\/ov\/(dienst|lijnen)$/,
     /^\/api\/staff\/mob\/kaart\/storingen$/
+  ],
+  /* HET KANTOOR, UITSLUITEND OP TONEN (besluit C2 van de eigenaar, 25 september
+     2026). Geen nieuwe gezagstrede en geen muterende kantoormacht: `office`
+     staat hier en in GEEN van de twee lijsten eronder, en daar staat hij met
+     opzet als lege lijst zodat een toevoeging een zichtbare bewerking is.
+
+     DRIE PADEN, en elk om dezelfde drie redenen: hij schrijft niets (de
+     idempotentieproef zag geen enkele collectie bewegen), hij toont TOTALEN en
+     geen mensen, en hij gaat over RTG als onderneming. Wat er bewust NIET staat:
+     /api/office/state en /payroll/overzicht (codenamen, namen en uren per
+     mens, achter een deur die de gedeelde code doorlaat), /kosten/overzicht
+     (een kostenlijst per drager), /kosten/vooruitblik (per drager zodra het lijf
+     er een noemt -- een regex op het pad ziet het lijf niet), /command/gezondheid
+     (zet alarmen als bijwerking) en /service/stand (verzet een zaak).
+
+     De AI kan nooit meer dan de mens die hem aanroept: /economie/werelden en
+     /kosten/periode hangen achter de boardroom, dus een medewerker op naam
+     zonder boardroomtoegang krijgt daar gewoon de weigering van de route zelf. */
+  office: [
+    /^\/api\/command\/puls$/,
+    /^\/api\/office\/economie\/werelden$/,
+    /^\/api\/office\/kosten\/periode$/
   ]
 });
 
@@ -72,7 +94,8 @@ const KLEIN = Object.freeze({
      Die twee horen apart gesteld te worden, en tot dan staat het gat zichtbaar
      in plaats van half gebouwd (zie routes/stuur.js). */
   supplier: [],
-  staff: []
+  staff: [],
+  office: [] // C2: tonen, en niets dat verandert
 });
 
 /* DE ZESDE DIE SCHRIJFT, en de eerste die GELD verplaatst: /api/pay/saldo stond in de
@@ -138,7 +161,11 @@ const VOORSTEL = Object.freeze({
     /^\/api\/staff\/mob\/kaart\/(controle|storing)$/,
     /^\/api\/staff\/mob\/cdt\/(aanmelden|soort|afmelden)$/,
     /^\/api\/supplier\/(room\/hk|door\/zet|ticket\/add)$/
-  ]
+  ],
+  /* C2: het kantoor krijgt geen voorstelrecht. Een voorstel bevestigen vraagt
+     een identiteit die kern/stuur/goedkeuring.js voor een kantoorsessie niet
+     kent, en muterende kantoormacht is precies wat het besluit uitsloot. */
+  office: []
 });
 
 module.exports = { LEZEN, KLEIN, VOORSTEL };

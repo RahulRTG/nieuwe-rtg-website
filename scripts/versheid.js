@@ -523,6 +523,10 @@ const REGISTERS = [
      uitweg zijn, terwijl er sindsdien drie bij kunnen zijn gekomen -- en aan dat
      getal hangt sinds 11 september 2026 een normtand. */
   ['LUSSEN.json', 'npm run lussen', 'elke cyclische gedraging met zijn terminatiegraad, en de drie schulden waar NORM.json op ratelt'],
+  /* De eerste sensor van AUTONOMIE (besluiten C1 en C2, 25 september 2026). Een
+     verouderd register zegt dat een maat bestaat terwijl zijn projectie intussen
+     is hernoemd -- en daar leunt straks een conclusie op. */
+  ['BEDRIJFSMAAT.json', 'npm run bedrijfsmaat:vast', 'welke cijfers over RTG als onderneming aantoonbaar bestaan, per maat het ontbrekende element, en welke ketens gegrond zijn'],
   ['CARRIEREVORM.json', 'node scripts/carrierevorm.js --vastleggen', 'of de talentdomeinen een datavorm delen -- CARRIERE.md par. 0 rust erop, dus een verouderde uitslag draagt daar een conclusie die niemand nog heeft nagerekend'],
   /* Zelfde soort als zijn buurman hierboven, en om dezelfde reden `overig`: het
      is een uitslag waar een DOCUMENT op rust en geen poort waar iemand langs

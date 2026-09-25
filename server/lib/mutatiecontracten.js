@@ -136,6 +136,8 @@ const CONTRACTEN = Object.assign({},
   /* Het eigenaarsherstel: zeven routes, per stuk beantwoord of een herhaling
      een ander antwoord krijgt. Eigen bestand, zie de kop daar. */
   require('./mutatiecontracten-herstel').CONTRACTEN,
+  /* Het kantoor aan het stuur, uitsluitend op tonen (besluit C2). Zie de kop. */
+  require('./mutatiecontracten-kantoorstuur').CONTRACTEN,
   /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
      kreeg, met de hand gelezen op 13 september 2026. Drie bestanden omdat ze
      drie verschillende dingen bleken: lezers, lezers-met-een-seeder, en wat

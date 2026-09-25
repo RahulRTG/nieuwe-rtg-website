@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-25T04:24:16.221Z",
-  "commit": "ea5cb92f4",
+  "op": "2026-09-25T06:49:31.725Z",
+  "commit": "1fa7239c",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,20 +10,20 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5023,
-  "geclassificeerd": 5023,
+  "totaal": 5024,
+  "geclassificeerd": 5024,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1211,
-   "PROTECTED": 482,
+   "PROTECTED": 483,
    "INTENTIONALLY_NON_IDEMPOTENT": 140
   },
-  "vastgesteldDoorMens": 1882,
+  "vastgesteldDoorMens": 1883,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4133,
    "PUBLIC": 124,
-   "OBJECT_SCOPED": 745,
+   "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 5,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 51
+   "niet gemeten": 52
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -80537,6 +80537,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "connect.schuif.gezin",
+   "route": "POST /api/rtf/connect/schuif",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinsPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

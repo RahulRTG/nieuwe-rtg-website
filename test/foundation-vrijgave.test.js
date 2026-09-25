@@ -52,6 +52,11 @@ test('alleen een ondertekend dossier met de werkelijk gemounte bewijsbytes geldt
   fs.symlinkSync(doel, gekoppeld);
   assert.equal(extern.controleerReleaseRoot(link, COMMIT).ok, false,
     'een symlink kan gemounte bewijsbytes niet omleiden');
+
+  // zonder de drie vaste ankers zegt de reden dat, en niet "bewijsbestand onbruikbaar"
+  const anker = maakRoot('anker'); maakGetekendeVrijgave(anker);
+  fs.unlinkSync(path.join(anker, 'deploy', 'promotie-sleutel.pub'));
+  assert.equal(extern.controleerReleaseRoot(anker, COMMIT).reden, 'vertrouwensanker-ontbreekt');
 });
 
 test('algemene release accepteert bewezen gesloten Foundation maar runtime-open niet', t => {

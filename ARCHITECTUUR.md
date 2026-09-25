@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5145 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5144 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5145 |
-| servermodules (`server/**/*.js`) | 3697 |
-| routebestanden (`server/routes/**`) | 611 |
-| kernmodules (`server/kern/**`) | 2323 |
+| API-endpoints | 5144 |
+| servermodules (`server/**/*.js`) | 3691 |
+| routebestanden (`server/routes/**`) | 610 |
+| kernmodules (`server/kern/**`) | 2319 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 390 |
-| toetsbestanden (`test/*.test.js`) | 1778 |
+| toetsbestanden (`test/*.test.js`) | 1776 |
 | schermtoetsen (`test/*.e2e.js`) | 255 |
 
 ## 2. De weg van een verzoek
@@ -111,7 +111,7 @@ zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
-| `member` | 699 | 72 | 16 | 428 |
+| `member` | 699 | 72 | 16 | 427 |
 | `supplier` | 624 | 127 | 6 | 337 |
 | `office` | 74 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |
@@ -128,7 +128,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3511 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3510 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -136,9 +136,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1600 |
+| kern-namen die routes aanraken | 1599 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 243 |
-| daarvan door precies één domein | 1357 |
+| daarvan door precies één domein | 1356 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

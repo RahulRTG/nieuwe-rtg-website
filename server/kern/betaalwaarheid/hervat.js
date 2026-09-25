@@ -32,7 +32,7 @@ module.exports = function maakHervat(ctx) {
   const onbekend = r => !r.providerId && gestart(r) && !definitiefBetaald(r.status);
   const WACHTEND = new Set([STATUS.AANGEMAAKT, STATUS.WACHT_OP_KLANT, STATUS.IN_BEHANDELING]);
 
-  function kandidaat(r, grens) {
+  function magHervatten(r, grens) {
     if (!r || !WACHTEND.has(r.status) || r.escalatie || !gestart(r)) return false;
     const volgende = r.hervatVolgendeAt ? tijdVan(r.hervatVolgendeAt) : tijdVan(r.bijgewerktAt) + WACHT_MS[0];
     return volgende <= grens;
@@ -40,7 +40,7 @@ module.exports = function maakHervat(ctx) {
 
   async function hervat({ begin, tot, limiet } = {}) {
     const grens = Number.isFinite(tot) ? tot : tijdVan(tot || nuIso());
-    const lijst = Object.values(doos()).filter(r => kandidaat(r, grens))
+    const lijst = Object.values(doos()).filter(r => magHervatten(r, grens))
       .slice(0, Math.min(100, Math.max(1, Number(limiet) || 25)));
     let afgerond = 0, wachtNog = 0, geescaleerd = 0;
     for (const r of lijst) {

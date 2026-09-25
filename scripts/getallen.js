@@ -292,6 +292,21 @@ const GETALLEN = {
     wat: 'storingen in de ritketen waarbij het systeem zich aan zijn uitgeschreven belofte hield' },
   'rit.bevindingen': { bron: 'RITPROEF.json', veld: 'telling.openBekend',
     wat: 'schakels in de ritketen die aantoonbaar niet sluiten, met een uitgeschreven reden' },
+  /* AUTONOMIE.md: het bedrijfsmaatregister (scripts/bedrijfsmaat.js). */
+  'bedrijfsmaat.maten': { bron: 'BEDRIJFSMAAT.json', veld: 'telling.maten',
+    wat: 'bedrijfsmaten in de catalogus over de domeinen van de eigenaar' },
+  'bedrijfsmaat.bestaat': { bron: 'BEDRIJFSMAAT.json', veld: 'telling.perStatus.bestaat',
+    wat: 'maten waarvan bron, definitie, projectie en bewijs alle vier aantoonbaar zijn' },
+  'bedrijfsmaat.half': { bron: 'BEDRIJFSMAAT.json', veld: 'telling.perStatus.half',
+    wat: 'maten met een bron maar zonder een of meer van de andere drie elementen' },
+  'bedrijfsmaat.ontbreekt': { bron: 'BEDRIJFSMAAT.json', veld: 'telling.perStatus.ontbreekt',
+    wat: 'maten waarvan de werkelijkheid nergens wordt geregistreerd' },
+  'bedrijfsmaat.gedeeltelijk': { bron: 'BEDRIJFSMAAT.json', veld: 'telling.bestaatGedeeltelijk',
+    wat: 'bestaande maten die een deel van de werkelijkheid niet zien' },
+  'bedrijfsmaat.ketensGegrond': { bron: 'BEDRIJFSMAAT.json', veld: 'telling.ketensGegrond',
+    wat: 'ketens waarvan elke schakel bestaat' },
+  'bedrijfsmaat.privacyGaten': { bron: 'BEDRIJFSMAAT.json', veld: 'telling.privacyGaten',
+    wat: 'projecties over mensen zonder afgedwongen groepsgrens' },
   'ketenvorm.actorenGedeeld': { bron: 'KETENVORM.json', veld: 'telling.actorenGedeeld',
     wat: 'actornamen die in beide gouden ketens voorkomen' },
   'ketenvorm.actorenTotaal': { bron: 'KETENVORM.json', veld: 'telling.actorenTotaal',
@@ -632,7 +647,7 @@ const GETALLEN = {
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
   'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md',
-  'KEURING.md', 'VERANDERING.md', 'PLANNING.md', 'OFFICE.md', 'EDGE.md'];
+  'KEURING.md', 'VERANDERING.md', 'PLANNING.md', 'OFFICE.md', 'EDGE.md', 'AUTONOMIE.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

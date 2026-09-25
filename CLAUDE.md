@@ -2295,6 +2295,28 @@ stappen zijn geen bouwwerk maar een besluit (`mandaat.js` een aanroeper geven, e
 `RTG_HERKOMST_AFDWINGEN` omzetten -- die prijs is gemeten: een lid gaat van 120
 naar 36 paden, een zaak van 53 naar 9).
 
+**`AUTONOMIE.md` is de RTG Autonomy Kernel** -- de organisatorische intelligentie
+BOVEN de bestaande motoren: RTG bestuurt zichzelf binnen een door mensen
+vastgestelde constitutie. De machine krijgt initiatief, niet vanzelf gezag. Lees
+die vóór je iets bouwt dat over RTG als ONDERNEMING rekent (omzet, cohorten,
+churn, cash, marge). Twee constitutionele besluiten van 25 september 2026: **C1**
+-- een waarnemend brein is niet een portemonnee (RTG en de RTFoundation samen
+waargenomen, elke maat draagt precies een economische wereld, de firewall blijft)
+-- en **C2** -- het kantoor is een AI-rol uitsluitend op tonen, op naam, met drie
+gemeten leespaden en geen bevestigroute. De fundering is gemeten en niet
+verklaard: `npm run bedrijfsmaat` (`BEDRIJFSMAAT.json`, catalogus in
+`server/kern/bedrijfsmaat/`) houdt per maat vier elementen tegen de code --
+bron, definitie, projectie, bewijs -- met vier gatsoorten en een
+afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->31<!--/getal--> van <!--getal:bedrijfsmaat.maten-->64<!--/getal--> maten bestaan en
+<!--getal:bedrijfsmaat.ketensGegrond-->1<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
+geen breinen** (geen eigen opslag per lens), **de groepspoort staat aan de bron
+van een maat** (`bedrijfsmaat/poort.js`: onder de grens geen waarde, geen nul en
+geen aantal, ook op het kantoorscherm; werklijsten per persoon blijven voor een
+mens op naam en komen niet op het stuur), en **autonome actie alleen als geen
+dimensie van de streefstand buiten haar tolerantie verslechtert** -- geen gewogen
+som. De definities (nieuw lid, cohort, activatie, churn, retentie, omzet,
+brutomarge) staan met een versie in `bedrijfsmaat/definities.js`.
+
 **`CODE.md` is de laag waarin RTG naar zijn EIGEN software kijkt** -- de Code
 Intelligence Plane, als richtingsdocument met per onderdeel of het **staat**,
 **een stap weg** is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je

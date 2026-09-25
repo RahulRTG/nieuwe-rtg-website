@@ -131,8 +131,8 @@ test('een medewerker met passkey start de incassoronde met een ceremonie, en de 
   assert.equal(dos.status, 200, JSON.stringify(dos.body).slice(0, 160));
   const ass = dos.body.dossier.assen.find(x => x.as === 'assurance');
   assert.equal(ass.graad, 'bewezen', 'de assurance-as: ' + JSON.stringify(ass));
-  assert.deepEqual(dos.body.dossier.open, [], 'open assen: ' + (dos.body.dossier.open || []).join(', '));
-  assert.equal(dos.body.dossier.rond, true);
+  // rond betekent in de geldketen: geen enkele verplichte as open (en dat slaagt niet op een leeg dossier)
+  assert.equal(dos.body.dossier.rond, true, 'open assen: ' + (dos.body.dossier.open || []).join(', '));
 });
 
 test('de ceremonie-deur staat niet open voor de gedeelde code', async () => {

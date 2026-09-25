@@ -27,7 +27,7 @@ function volgendeKeer(st, p) {
   const v = R.VERPLICHTINGEN.find(x => x.id === p.soort) || (p.soort === 'software' ? R.SOFTWARE : null);
   /* Een licentie per mens die met de software werkt: jij en je team (V2). */
   const licenties = p.soort === 'software' ? 1 + (st.team || []).filter(m => !m.weg).length : 1;
-  if (v) post(st, { soort: p.soort, naam: p.naam, bedrag: v.bedrag * licenties, dag: (p.oorspronkelijk || p.dag) + v.elke });
+  if (v) post(st, { soort: p.soort, naam: p.naam, bedrag: (v.id ? R.verplichtingBedrag(st, v) : v.bedrag) * licenties, dag: (p.oorspronkelijk || p.dag) + v.elke });
 }
 
 function betaalWatVervalt(st) {

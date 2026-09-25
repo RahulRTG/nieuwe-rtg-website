@@ -422,6 +422,40 @@ Wat V3 bewust **niet** doet:
 
 Dat is werk voor **V4 Game-afwerking**, als spelen laat zien dat het ontbreekt.
 
+### V4 GAME-AFWERKING: wat er staat (25 september 2026)
+
+Gekozen: **afwerking zonder multiplayer**. Een gedeeld Oudwijk raakt het grootboek, de gelijktijdigheid en valsspelen, en hoort daarom na V5. V4 gaat over de speler die Magnaat opent en nergens van weet (`gids.js` en `regels.js`, MOEILIJKHEID).
+
+- **Je eerste uur, zonder uitlegscherm.** De Edge zegt al wat nu zin heeft. Daarnaast staat een gids met de negen stappen van niets naar je eerste betaalde klant, elk met een regel waarom:
+  - kies wat je maakt;
+  - plan tijd;
+  - sluit de dag af;
+  - laat iemand je werk zien;
+  - praat;
+  - maak een afspraak;
+  - lever op;
+  - factureer;
+  - word betaald.
+
+  De gids wordt **afgeleid** uit wat je deed en niet bijgehouden, dus hij kan niet uit de pas lopen met het spel. Na de eerste betaling verdwijnt hij.
+- **Drie moeilijkheden.**
+  - *Licht*: € 250 om mee te beginnen, klanten betalen twee keer zo snel, de kamer kost 85%.
+  - *Normaal*: zoals het bedoeld is.
+  - *Zwaar*: € 15, klanten betalen anderhalf keer zo laat, de kamer kost 110%.
+
+  De keten zelf verandert niet, alleen die drie getallen. Kiezen kan op dag 1 voordat je iets koos, want dan gaat er niets verloren. Daarna kan het alleen door opnieuw te beginnen, met bevestiging, en dan kies je de moeilijkheid erbij.
+- **Mijlpalen en een slot.** De momenten die er later toe doen worden een keer vastgelegd, met de dag: je eerste klant, je eerste geld, je onderneming, je eerste medewerker, je eerste vaste klant, je eerste verkoop, je eerste bedrijfsruimte, en de dag dat je je baan opzegt. Samen zijn ze *Jouw verhaal* op Wereld. Wie van zijn bedrijf leeft, krijgt daar het slot dat V1 belooft: waarmee je begon, na hoeveel dagen, en wat je hebt (omzet, resultaat, klanten, team).
+- **Terwijl je weg was.** Wie na twee dagen of meer terugkomt, ziet eerst wat er in die dagen gebeurde dat ertoe doet, in plaats van alleen de stand van nu. Na de eerste handeling verdwijnt het. Dit is ook het antwoord op *opslaan en hervatten*: de server bewaart elk leven al, en hervatten is dus vooral weten waar je was.
+- **Toegankelijk en mobiel.** De nieuwste melding gaat naar een aria-live-regio, zodat een schermlezer hoort wat een ziende speler ziet verschijnen. Op Vandaag staan de laatste acht meldingen, de rest staat achter *Eerder*. De keuzelijsten passen op een telefoon: de browsertoets vond dat Wereld op 390 pixels 718 pixels breed werd door een lange keuzelijst, en meet sindsdien per scherm of er horizontaal gescrold kan worden.
+- **Geluid staat uit tot je het aanzet**, en de keuze blijft alleen in je eigen browser. Er worden geen bestanden geladen: twee korte tonen uit de Web Audio API, omhoog bij iets goeds en omlaag bij geldnood. Geen muziek en geen herhaling: dit huis maakt geen verslavende patronen.
+
+**Wat de toetsen vastleggen:**
+- `test/magnaatafwerking.test.js` (zes toetsen) dekt de gids stap voor stap, de moeilijkheid (dag 1 via de Edge, daarna alleen opnieuw beginnen), betaaltermijnen van 5, 10 en 15 dagen per stand, mijlpalen die een keer vastgelegd worden, het slot, en *terwijl je weg was*.
+- `test/magnaatafwerking.e2e.js` speelt het in een echte browser op 390 pixels.
+- Acht mutaties zijn nagetrokken en zakken alle acht. Het vastleggen van een mijlpaal zakte pas na een eigen toets: in een gewone speelronde komt geen mijlpaal twee keer langs.
+
+Wat V4 bewust **niet** doet: multiplayer (na V5), muziek, animaties die om aandacht vragen, en een tutorial die je moet doorklikken.
+
 ---
 
 ## 8. De regels

@@ -11,9 +11,9 @@ const { klantenVan } = require('./klanten');
 
 const MAX_MELDINGEN = 60;
 
-function nieuw({ wereld, nu }) {
+function nieuw({ wereld, nu, moeilijkheid = 'normaal' }) {
   const st = {
-    versie: 2, regelversie: R.REGELVERSIE, wereld,
+    versie: 2, regelversie: R.REGELVERSIE, wereld, moeilijkheid,
     dag: 1, dagMs: R.DAG_MS, begonnen: nu, gerekendTot: nu,
     kas: 0,
     baan: Object.assign({ actief: true }, R.BAAN),
@@ -28,7 +28,7 @@ function nieuw({ wereld, nu }) {
     rtg: [], meldingen: [],
     boek: null
   };
-  for (const v of R.VERPLICHTINGEN) post(st, { soort: v.id, naam: v.naam, bedrag: v.bedrag, dag: v.eerste });
+  for (const v of R.VERPLICHTINGEN) post(st, { soort: v.id, naam: v.naam, bedrag: R.verplichtingBedrag(st, v), dag: v.eerste });
   return zorgBedrijf(st);
 }
 

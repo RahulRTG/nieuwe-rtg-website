@@ -15,6 +15,7 @@ const { handelingenNu } = require('./volgende');
 const { prognose, bedrijfExtra } = require('./weergave-bedrijf');
 const { kalender } = require('./kalender');
 const { marktBeeld } = require('./markt');
+const { gids, verhaal } = require('./gids');
 
 function dealBeeld(d) {
   const f = d.factuur;
@@ -61,7 +62,7 @@ function aandacht(st, c) {
    verandert, verandert niets aan het leven. Zonder kopie ging een onderhandeling
    stuk doordat een aanroeper `rondes.pop()` deed op wat hij voor zijn eigen
    lijst hield. */
-const toon = (st, boek, nu) => structuredClone(beeld(st, boek, nu));
+const toon = (st, boek, nu, weg) => structuredClone(Object.assign(beeld(st, boek, nu), { terwijlWeg: weg || null }));
 
 function beeld(st, boek, nu) {
   const c = boek.cijfers(st), a = st.aanbod ? AANBOD[st.aanbod] : null, deals = st.deals.map(dealBeeld);
@@ -92,7 +93,8 @@ function beeld(st, boek, nu) {
     },
     netwerk: { contacten: deals },
     wereld: {
-      stad: R.JURISDICTIE.stad, startKas: R.START_KAS,
+      stad: R.JURISDICTIE.stad, startKas: R.niveauVan(st).startKas, moeilijkheid: st.moeilijkheid || 'normaal',
+      niveaus: Object.entries(R.MOEILIJKHEID).map(([id, x]) => ({ id, naam: x.naam, uitleg: x.uitleg, startKas: x.startKas })),
       spelregels: [R.JURISDICTIE.inschrijven, R.JURISDICTIE.btw, R.JURISDICTIE.termijn],
       plaatsen: [{ naam: st.baan.werkgever, wat: st.baan.actief ? 'waar je werkt' : 'waar je werkte' }]
         .concat(deals.filter((d, i, l) => l.findIndex(x => x.klant === d.klant) === i).map(d => ({ naam: d.klant, wat: d.fase === 'afgehaakt' ? 'kent je' : 'klant of kans' }))),
@@ -104,7 +106,8 @@ function beeld(st, boek, nu) {
       balans: { kas: c.kas, vorderingen: c.vorderingen, voorraad: c.voorraad, vooruit: c.vooruit, crediteuren: c.crediteuren, schuld: c.schuld },
       zelfstandig: st.zelfstandig
     }, bedrijfExtra(st)) : null,
-    rtg: st.rtg
+    rtg: st.rtg,
+    gids: gids(st), verhaal: verhaal(st, c)
   };
 }
 

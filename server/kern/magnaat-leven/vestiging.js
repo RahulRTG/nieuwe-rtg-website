@@ -11,6 +11,7 @@ const R = require('./regels');
 const { meld, post, euro } = require('./staat');
 const { boekVan } = require('./boek');
 const { betaalWatVervalt } = require('./geld');
+const { mijlpaal } = require('./gids');
 
 const fout = (error) => ({ status: 400, error });
 
@@ -37,6 +38,7 @@ function vestig(st, z) {
   if (w.verhuis) boekVan(st).boekOver(st, { soort: 'VERHUIZING', van: ['kas'], naar: ['kosten', 'huisvesting'], bedrag: w.verhuis,
     omschrijving: 'Verhuizing naar ' + w.naam, sleutel: 'verhuis:' + st.dag });
   st.vestiging = { wijk: z.wijk, sinds: st.dag, volgende: null };
+  if (w.huur) mijlpaal(st, 'vestiging', 'Je eerste bedrijfsruimte: ' + w.naam + '.');
   if (w.huur) { huurPost(st); betaalWatVervalt(st); }
   meld(st, 'Je bedrijf zit nu in ' + w.naam + (oud.huur ? ' en niet meer in ' + oud.naam : '') + '. ' +
     (w.huur ? 'Huur ' + euro(w.huur) + ' per vier weken; je team werkt hier, dus losse werkplekken zijn niet meer nodig.' : 'Geen huur, en ook minder mensen die je zien.'), 'goed');

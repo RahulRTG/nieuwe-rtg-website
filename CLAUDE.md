@@ -1425,7 +1425,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->128<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->110<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->408<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->110<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->409<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -2075,9 +2075,9 @@ en het pad gaat nooit via `incident` of `geannuleerd` -- dat zou een gebeurtenis
 verzinnen die niet plaatsvond. De standen worden VERTAALD en niet overgetypt
 (toets 4 zakt zodra een ritstand naar `rijdt` vertaalt). En de brug loopt ÉÉN
 KANT OP: twee lijsten die elkaar bijwerken hebben geen waarheid meer. **De migratie is in kaart en staat stil op EEN besluit**
-(`scripts/ritmigratie.js`): van de <!--getal:ritmigratie.bestanden-->21<!--/getal-->
+(`scripts/ritmigratie.js`): van de <!--getal:ritmigratie.bestanden-->23<!--/getal-->
 plekken die `db.data.rides` noemen lezen er <!--getal:ritmigratie.stand-->7<!--/getal-->
-de lopende rit, tellen <!--getal:ritmigratie.historie-->9<!--/getal--> historie af,
+de lopende rit, tellen <!--getal:ritmigratie.historie-->10<!--/getal--> historie af,
 schrijven er 2 en noemen er 3 hem alleen in commentaar. De kaart bewees haar nut
 binnen het uur: de eerste versie zei "zeven kunnen nu om", maar een rit ZONDER
 opdracht valt dan uit beeld -- en dan ziet een lid zijn eigen taxi niet meer in
@@ -2093,7 +2093,7 @@ geen afstand, geen vaste prijs, wel een plek op het dispatchbord. Neemt hij hem
 niet aan, dan weigert `kern/lidacties/ritten.js` met de reden en de weg
 eromheen. Zo of zo heeft elke rit die BESTAAT voortaan een opdracht. Stand nu:
 <!--getal:ritmigratie.kanNu-->7<!--/getal--> lezers kunnen om (de stand-lezers),
-daarna <!--getal:ritmigratie.daarna-->11<!--/getal--> (historie, dan de
+daarna <!--getal:ritmigratie.daarna-->12<!--/getal--> (historie, dan de
 schrijvers). **De losse chauffeur is geen bijzonder geval**: hij is een zaak met
 een persoon erin, meldt zich aan op eigen naam en wijst zichzelf de rit toe met
 `self: true` -- wie met het BEDRIJFSaccount inlogt heeft geen `staffId` en kan

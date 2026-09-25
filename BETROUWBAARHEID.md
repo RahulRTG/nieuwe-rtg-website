@@ -424,6 +424,22 @@ pas na een tik op een detail (dan hoort de kruisronde op de verkenning van
 gebouwd: bij het laden zou hij op hoogstens vijf rijen iets kunnen bewijzen.
 Het verkenningsscript staat niet in de repo; wat het deed staat hierboven.
 
+**De tweede verklaring is daarna nagemeten, en zij valt af.** Een derde verkenning
+liep over dezelfde tikken als *bedienbaar* (`bedien()` uit `scripts/appwerkt.js`),
+als het sleutelbos-lid met alle elf werelden, en speelde elk GET-verzoek dat een id
+uit A's eigen antwoorden noemde drie keer na: als A, anoniem en als een vers lid B.
+Een kruispoging telt alleen als A het object krijgt en een anonieme bezoeker niet,
+want anders is het openbaar en is "B ziet het" geen lek. Uitslag over 85
+ledenschermen: **1 scherm met 3 paren** (Magnaat, en daar zijn het toevallige
+getallen in `/api/talen`, `/api/ready` en `/api/health`: 1 openbaar, 1 waar A
+zelf niets terugkreeg, 1 niet afgerond), **0 gescheiden, 0 lek**. Ook na tikken
+noemt geen ledenscherm een object van zijn eigenaar bij id. Een ledenscherm bakent
+dus af op de sessie, en de vraag of een vreemde bij andermans object kan is daar
+een ROUTEvraag: wat `IDOR.json` (hetzelfde rol, ander lid) en `ROLPROEF.json`
+(verkeerde rol) meten. Voor gezinsschermen ligt het anders: vijf van de tien
+noemen hun gezinscode in het verzoek, en daar heeft een kruisproef aan de
+schermkant wel een onderwerp.
+
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
 `npm run appwerkt` schrijft `APPWERKT.json`: per onderdeel uit `MAPPEN`, met de

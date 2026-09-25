@@ -2293,6 +2293,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "divergentie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/divergentie.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "doctrine.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3819,6 +3827,14 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 3
+    },
+    "herhaalpakket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/herhaalpakket.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "heritage-context.e2e.js": {
       "soort": "server",
@@ -9294,6 +9310,14 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "tegenvoorbeeld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/tegenvoorbeeld.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "tekstbinding.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -9931,6 +9955,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "verzoekbetaal-race.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pay/verzoeken.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "verzoekcontext-wikkel.test.js": {
       "soort": "puur",

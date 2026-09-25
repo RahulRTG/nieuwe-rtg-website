@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2030 bestanden en 14394 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2030 bestanden en 14400 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2030 |
-| losse beweringen (`test(...)`) | 14394 |
+| losse beweringen (`test(...)`) | 14400 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 171 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1378 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1775 bestanden, 13939 beweringen.
+1775 bestanden, 13945 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -702,7 +702,6 @@ toets omvalt.
 | `kaart.test.js` | 8 | gezakt op `===->!==` | De kaart-uitwijk (public/shared/kaart.js): de pure parseGeo() ontleedt de geo:-URI's die het huis gebruikt tot iets toonbaars. Getoetst op beide vormen (echte coördinaten en het adres-alleen 0,0?q=...), op de... |
 | `kantoorawait.test.js` | 5 | genoemd | HET KANTOOR BEVESTIGT GEEN VERWIJDERING DIE DE OPSLAG NIET HEEFT. TWEE FOUTEN IN EEN KETEN, en ze hielden elkaar overeind. |
 | `kantoorbank.test.js` | 10 | gezakt op `return-weg#0` | KAN DEZE HANDELING NA COMMIT EEN KANTOORBANK WIJZIGEN? (server/kern/isolatie/kantoorbank.js) DE VRAAG DIE DEZE SUITE AFDWINGT is met opzet NIET "zit deze route in het bankdomein". |
-| `kantoordeur-passkey.test.js` | 3 | gezakt op `liegpoort /api/` | EEN KANTOORMEDEWERKER MET EEN PASSKEY KAN DE INCASSORONDE STARTEN, en dan is de geldketen rond. Gevonden bij het meten van "passkeys aan de kantoordeur" (25 september 2026): kern/zwaarbewijs.js eist voor... |
 | `kantoordienst.test.js` | 3 | gezakt op `liegpoort /api/` | HET RTG-KANTOOR OP EEN WERKDAG: AANMELDEN, INWERKEN, EN DE NOODKNOP. DRIE DINGEN DIE HIER SAMENKOMEN 1. |
 | `kantoorgesprek.test.js` | 2 | gezakt op `liegpoort /api/` | De backoffice binnenkomen door met Rahul te praten in plaats van een codeveld in te vullen -- zonder dat de deur daar zachter van wordt. Dat laatste is de kern van deze test. |
 | `kantoorintrekking.test.js` | 5 | gezakt op `liegpoort /api/` | INTREKKEN SLUIT WAT AL OPENSTAAT (AUTHORITY.md fase 3). Vijf dingen die niet mogen sneuvelen: 1. |
@@ -865,6 +864,7 @@ toets omvalt.
 | `magnaatgrondwet.test.js` | 9 | gezakt op `===->!==#0` | De ratel onder MAGNAAT.md: economische integriteit in Magnaat kan vanaf de nulstand alleen nog verbeteren. MAGNAATGRONDWET.json is de bevroren nulstand (npm run magnaat:grondwet -- --vastleggen). |
 | `magnaatlab.test.js` | 9 | gezakt op `return-weg#1` | DE TESTHAL-METING -- en of hij werkelijk iets onderscheidt. scripts/magnaatlab.js beantwoordt de vraag uit MAGNAATLAB.md par. |
 | `magnaatleven.test.js` | 17 | gezakt op `liegpoort /api/` | Magnaat FROM ZERO (V1): van een mens met € 64,32 en een baan in de keuken, via zijn eigen project, een kans, een onderhandeling en een factuur, naar een cashprobleem en een eerste bedrijf. Elke euro loopt door het... |
+| `magnaatmarkt.test.js` | 9 | gezakt op `===->!==#0` | Magnaat V3 LEVENDE MARKT: Oudwijk met concurrenten, kopers, wijken, weer en seizoen. Wat je verkoopt is een aandeel; concurrenten reageren op je prijs en maken fouten; een klant uit de markt heeft een offerte van een... |
 | `magnaatonderneming.test.js` | 12 | gezakt op `===->!==#0` | Magnaat V2 ONDERNEMING: wat er gebeurt als je bedrijf groter wordt dan jij. Personeel dat loon kost voordat de klant betaalt, planning over meer mensen, contracten met vaste uren, een leverancier die eerst geld wil,... |
 | `magnaatwereld.test.js` | 20 | gezakt op `!==->===#0` | Magnaat Wereld: alle functies zijn speelbaar, maar de spelbrug raakt nooit productie. De Future Engine stelt voor; een mens bepaalt iedere fase. |
 | `mail-eigen.test.js` | 18 | gezakt op `===->!==#0` | Eigen post: DKIM-ondertekening (server/dkim.js) en directe bezorging bij de mailserver van de ontvanger (server/smtp-direct.js), plus de koppeling in server/mail.js. Waar dit op let, in volgorde van belang: 1. |

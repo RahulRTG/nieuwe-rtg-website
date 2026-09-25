@@ -13,6 +13,8 @@ const { vrij, gepland, rest, WAT } = require('./tijd');
 const { sneller } = require('./gesprek');
 const { handelingenNu } = require('./volgende');
 const { prognose, bedrijfExtra } = require('./weergave-bedrijf');
+const { kalender } = require('./kalender');
+const { marktBeeld } = require('./markt');
 
 function dealBeeld(d) {
   const f = d.factuur;
@@ -65,7 +67,7 @@ function beeld(st, boek, nu) {
   const c = boek.cijfers(st), a = st.aanbod ? AANBOD[st.aanbod] : null, deals = st.deals.map(dealBeeld);
   const bedrijfDeals = deals.filter(d => d.afspraak && d.factuur);
   return {
-    dag: st.dag, dagNaam: R.dagNaam(st.dag), week: Math.ceil(st.dag / 7), vrijVandaag: rest(st, st.dag),
+    dag: st.dag, dagNaam: R.dagNaam(st.dag), week: Math.ceil(st.dag / 7), vrijVandaag: rest(st, st.dag), kalender: kalender(st),
     volgendeDagOver: Math.max(0, st.gerekendTot + st.dagMs - nu),
     tempo: { stand: st.tempo || 'rustig', standen: Object.keys(R.TEMPO) }, ronde: st.ronde || 0,
     vandaag: { agenda: weekAgenda(st), aandacht: aandacht(st, c), meldingen: st.meldingen.slice(0, 16), volgende: handelingenNu(st) },
@@ -94,6 +96,7 @@ function beeld(st, boek, nu) {
       spelregels: [R.JURISDICTIE.inschrijven, R.JURISDICTIE.btw, R.JURISDICTIE.termijn],
       plaatsen: [{ naam: st.baan.werkgever, wat: st.baan.actief ? 'waar je werkt' : 'waar je werkte' }]
         .concat(deals.filter((d, i, l) => l.findIndex(x => x.klant === d.klant) === i).map(d => ({ naam: d.klant, wat: d.fase === 'afgehaakt' ? 'kent je' : 'klant of kans' }))),
+      markt: marktBeeld(st),
       aanbod: Object.entries(AANBOD).map(([id, x]) => ({ id, naam: x.naam, project: x.project, software: x.software, gekozen: st.aanbod === id }))
     },
     bedrijf: st.onderneming ? Object.assign({

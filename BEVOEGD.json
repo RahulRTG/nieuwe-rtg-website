@@ -1,0 +1,1178 @@
+{
+  "stempel": {
+    "op": "2026-09-25T08:28:41.657Z",
+    "commit": "3a186741",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/bevoegdronde.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.",
+  "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token.",
+  "bronnen": {
+    "vervallen": []
+  },
+  "telling": {
+    "NIET_GETEST": 103,
+    "BEWEZEN": 9
+  },
+  "regels": [
+    {
+      "functie": "link:aankomst",
+      "app": "Aankomst",
+      "ingang": "/apps/arrival.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 3,
+      "open": 3,
+      "reden": "3 van de 3 routes niet gemeten, o.a. /api/arrival/pass staat niet in IDOR.json; /api/arrival/pulse staat niet in IDOR.json; /api/plaats/venster is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:appdossier",
+      "app": "App-dossier",
+      "ingang": "/apps/appstore-dossier.html",
+      "persona": "lid",
+      "status": "BEWEZEN",
+      "routes": 2,
+      "reden": "alle 2 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+    },
+    {
+      "functie": "link:attenties",
+      "app": "Attenties",
+      "ingang": "/apps/attenties.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 75,
+      "open": 6,
+      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:balans",
+      "app": "Balans",
+      "ingang": "/apps/geld.html#balans",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:bank",
+      "app": "Bank",
+      "ingang": "/apps/geld.html#bank",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:berichten",
+      "app": "Berichten",
+      "ingang": "/apps/comm.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 6,
+      "open": 5,
+      "reden": "5 van de 6 routes niet gemeten, o.a. /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:bescherming",
+      "app": "Accountbescherming",
+      "ingang": "/apps/mijn-isolatie.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 7,
+      "open": 2,
+      "reden": "2 van de 7 routes niet gemeten, o.a. /api/isolatie/mijn/ontsluiting is in IDOR.json onbereikbaar; /api/isolatie/mijn/zet is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:browser",
+      "app": "Web",
+      "ingang": "/apps/browser.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:buurtruil",
+      "app": "Buurtruil",
+      "ingang": "/apps/foundation/buurtruil.html",
+      "persona": "gezin",
+      "status": "NIET_GETEST",
+      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
+      "kruisparen": []
+    },
+    {
+      "functie": "link:camera",
+      "app": "Camera",
+      "ingang": "/apps/camera.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 1,
+      "open": 1,
+      "reden": "1 van de 1 routes niet gemeten, o.a. /api/fluister is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:cellier",
+      "app": "Cellier",
+      "ingang": "/apps/cellier.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 70,
+      "open": 1,
+      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:cercle",
+      "app": "Cercle",
+      "ingang": "/apps/cercle.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 75,
+      "open": 6,
+      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:clips",
+      "app": "Video",
+      "ingang": "/apps/clips.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:commerce",
+      "app": "Commerce",
+      "ingang": "/apps/commerce.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 9,
+      "open": 9,
+      "reden": "9 van de 9 routes niet gemeten, o.a. /api/commerce/aanbod is in IDOR.json onbereikbaar; /api/commerce/etalage is in IDOR.json onbereikbaar; /api/commerce/mand is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:connect",
+      "app": "Ontdekken",
+      "ingang": "/apps/connect.html",
+      "persona": "gezin",
+      "status": "BEWEZEN",
+      "paren": 4,
+      "reden": "4 van de 4 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/rtf/connect/ontdek",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/connect/horizon",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/connect/dossier",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/connect/portfolio",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        }
+      ]
+    },
+    {
+      "functie": "link:decisionroom",
+      "app": "Decision Room",
+      "ingang": "/apps/decision-room.html",
+      "persona": "kantoor",
+      "status": "NIET_GETEST",
+      "reden": "deze ronde heeft geen kruisproef voor de persona kantoor"
+    },
+    {
+      "functie": "link:entourage",
+      "app": "Entourage",
+      "ingang": "/apps/entourage.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 75,
+      "open": 6,
+      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:flits",
+      "app": "Verkeer",
+      "ingang": "/apps/flits.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:foodcourt",
+      "app": "Food Court",
+      "ingang": "/apps/foodcourt.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 6,
+      "open": 4,
+      "reden": "4 van de 6 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:foundationzorg",
+      "app": "Zorg",
+      "ingang": "/apps/foundation/zorg.html",
+      "persona": "gezin",
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "GET /api/foundation/gezin/HGPTVZ/gezondheid",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        }
+      ]
+    },
+    {
+      "functie": "link:garderobe",
+      "app": "Garde-robe",
+      "ingang": "/apps/garderobe.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 70,
+      "open": 1,
+      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:gegevens",
+      "app": "Wat weet RTG van mij",
+      "ingang": "/apps/mijn-gegevens.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 11,
+      "open": 3,
+      "reden": "3 van de 11 routes niet gemeten, o.a. /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar; /api/webauthn/registreer is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:geldcommand",
+      "app": "Geld",
+      "ingang": "/apps/geld.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:geven",
+      "app": "Geven",
+      "ingang": "/apps/foundation/geven.html",
+      "persona": "gezin",
+      "status": "NIET_GETEST",
+      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
+      "kruisparen": []
+    },
+    {
+      "functie": "link:hangar",
+      "app": "Hangar",
+      "ingang": "/apps/hangar.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 70,
+      "open": 1,
+      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:horeca",
+      "app": "Horeca",
+      "ingang": "/apps/horeca.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 134,
+      "open": 132,
+      "reden": "132 van de 134 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/supplier/horeca/arrival/promise staat niet in IDOR.json; /api/supplier/horeca/arrivals staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:huis",
+      "app": "Logeren bij leden",
+      "ingang": "/apps/thuis.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:ik",
+      "app": "Wie ben ik",
+      "ingang": "/apps/ik.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 12,
+      "open": 3,
+      "reden": "3 van de 12 routes niet gemeten, o.a. /api/veiligheid/kring/mail is in IDOR.json onbereikbaar; /api/veiligheid/kring/toevoegen is in IDOR.json onbereikbaar; /api/veiligheid/plek is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:juridisch",
+      "app": "Juridisch",
+      "ingang": "/apps/juridisch.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:klimaat",
+      "app": "Klimaatfonds",
+      "ingang": "/apps/foundation/klimaatfonds.html",
+      "persona": "gezin",
+      "status": "NIET_GETEST",
+      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
+      "kruisparen": []
+    },
+    {
+      "functie": "link:krant",
+      "app": "Krant",
+      "ingang": "/apps/krant.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:labfonds",
+      "app": "Fonds",
+      "ingang": "/apps/geld.html#labfonds",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:leven",
+      "app": "Mijn leven",
+      "ingang": "/apps/leven.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 4,
+      "open": 3,
+      "reden": "3 van de 4 routes niet gemeten, o.a. /api/avond/voorstel is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:logboek",
+      "app": "Logboek",
+      "ingang": "/apps/geld.html#logboek",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:loonstrook",
+      "app": "Loon",
+      "ingang": "/apps/loonstrook.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:loopbaan",
+      "app": "Mijn loopbaan",
+      "ingang": "/apps/loopbaan.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 6,
+      "open": 6,
+      "reden": "6 van de 6 routes niet gemeten, o.a. /api/carriere/ledger/deel is in IDOR.json onbereikbaar; /api/carriere/ledger/delen is in IDOR.json onbereikbaar; /api/carriere/ledger/intrek is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:magnaat",
+      "app": "Magnaat",
+      "ingang": "/apps/magnaat.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 74,
+      "open": 18,
+      "reden": "18 van de 74 routes niet gemeten, o.a. /api/member/magnaat/economie/analyse is in IDOR.json onbereikbaar; /api/member/magnaat/economie/schok is in IDOR.json onbereikbaar; /api/member/magnaat/economie/volgende-dag is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:maison",
+      "app": "Maison",
+      "ingang": "/apps/maison.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 70,
+      "open": 1,
+      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:mall",
+      "app": "Mall",
+      "ingang": "/apps/mall.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 58,
+      "open": 20,
+      "reden": "20 van de 58 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/bieb/ai is in IDOR.json onbereikbaar; /api/booking/request is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:mecenaat",
+      "app": "Mecenaat",
+      "ingang": "/apps/geld.html#mecenaat",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:mediaos",
+      "app": "RTG Media",
+      "ingang": "/apps/media.html",
+      "persona": "lid",
+      "status": "BEWEZEN",
+      "routes": 3,
+      "reden": "alle 3 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+    },
+    {
+      "functie": "link:mijnmall",
+      "app": "Mijn bestellingen",
+      "ingang": "/apps/mijnmall.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 14,
+      "open": 1,
+      "reden": "1 van de 14 routes niet gemeten, o.a. /api/mall/aanvraag is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:move",
+      "app": "Haal ik het?",
+      "ingang": "/apps/move.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:muziek",
+      "app": "Muziek",
+      "ingang": "/apps/muziek.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 1,
+      "open": 1,
+      "reden": "1 van de 1 routes niet gemeten, o.a. /api/fluister is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:nalatenschap",
+      "app": "Nalatenschap",
+      "ingang": "/apps/geld.html#nalatenschap",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:navigatie",
+      "app": "Navigatie",
+      "ingang": "/apps/navigatie.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 1,
+      "open": 1,
+      "reden": "1 van de 1 routes niet gemeten, o.a. /api/nav/gebied/pakket/*: de registers kennen geen route onder dit voorvoegsel"
+    },
+    {
+      "functie": "link:neigingen",
+      "app": "Mijn neigingen",
+      "ingang": "/apps/mijn-neigingen.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 17,
+      "open": 4,
+      "reden": "4 van de 17 routes niet gemeten, o.a. /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/neiging/antwoord is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:nieuws",
+      "app": "Nieuws",
+      "ingang": "/apps/nieuws.html",
+      "persona": "lid",
+      "status": "BEWEZEN",
+      "routes": 3,
+      "reden": "alle 3 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+    },
+    {
+      "functie": "link:office",
+      "app": "RTDocs",
+      "ingang": "/apps/office.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 1,
+      "open": 1,
+      "reden": "1 van de 1 routes niet gemeten, o.a. /api/supplier/ai staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:onderneming",
+      "app": "Onderneming",
+      "ingang": "/apps/onderneming.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 1,
+      "open": 1,
+      "reden": "1 van de 1 routes niet gemeten, o.a. /api/onderneming/rechtsvormen staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:ontdek",
+      "app": "Overzicht",
+      "ingang": "/apps/rtg.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 7,
+      "open": 2,
+      "reden": "2 van de 7 routes niet gemeten, o.a. /api/sociaal/lijn is in IDOR.json onbereikbaar; /api/sociaal/wereld is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:ov",
+      "app": "Openbaar vervoer",
+      "ingang": "/apps/ov.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:ovroutes",
+      "app": "OV-routes",
+      "ingang": "/apps/ovroutes.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/checkin staat niet in IDOR.json; /api/staff/ov/dienst staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:partnernetwerk",
+      "app": "Partner Network",
+      "ingang": "/apps/partner-network.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:passkeys",
+      "app": "Passkeys",
+      "ingang": "/apps/passkeys.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:pay",
+      "app": "RTG Pay",
+      "ingang": "/apps/pay.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 1,
+      "open": 1,
+      "reden": "1 van de 1 routes niet gemeten, o.a. /api/login staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:podium",
+      "app": "Live",
+      "ingang": "/apps/podium.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 1,
+      "open": 1,
+      "reden": "1 van de 1 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:post",
+      "app": "Post van RTG",
+      "ingang": "/apps/mijn-post.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 14,
+      "open": 3,
+      "reden": "3 van de 14 routes niet gemeten, o.a. /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar; /api/webauthn/registreer is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:projectroom",
+      "app": "Project Room",
+      "ingang": "/apps/project-room.html",
+      "persona": "kantoor",
+      "status": "NIET_GETEST",
+      "reden": "deze ronde heeft geen kruisproef voor de persona kantoor"
+    },
+    {
+      "functie": "link:pulse",
+      "app": "Pulse",
+      "ingang": "/apps/pulse.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 15,
+      "open": 1,
+      "reden": "1 van de 15 routes niet gemeten, o.a. /api/member/pulse/volg is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:rechterhand",
+      "app": "Privekantoor",
+      "ingang": "/apps/lifestyle.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 68,
+      "open": 1,
+      "reden": "1 van de 68 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:reisboek",
+      "app": "Reisboek",
+      "ingang": "/apps/reisboek.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 12,
+      "open": 3,
+      "reden": "3 van de 12 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/gids/app staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:reizen",
+      "app": "Reizen & Veilig",
+      "ingang": "/apps/reizen-veilig.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 5,
+      "open": 1,
+      "reden": "1 van de 5 routes niet gemeten, o.a. /api/veiligheid/moment/maak is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:relaties",
+      "app": "Wie heeft toegang tot mij",
+      "ingang": "/apps/mijn-relaties.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 13,
+      "open": 3,
+      "reden": "3 van de 13 routes niet gemeten, o.a. /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar; /api/webauthn/registreer is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:rendezvous",
+      "app": "Rendez-vous",
+      "ingang": "/apps/rendezvous.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 24,
+      "open": 6,
+      "reden": "6 van de 24 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:residentie",
+      "app": "Verblijven",
+      "ingang": "/apps/residentie.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:routedossier",
+      "app": "Routedossier",
+      "ingang": "/apps/routedossier.html",
+      "persona": "kantoor",
+      "status": "NIET_GETEST",
+      "reden": "deze ronde heeft geen kruisproef voor de persona kantoor"
+    },
+    {
+      "functie": "link:rtfbord",
+      "app": "Het bord",
+      "ingang": "/apps/foundation/bord.html",
+      "persona": "gezin",
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/rtf/toegang",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        }
+      ]
+    },
+    {
+      "functie": "link:rtfbuurt",
+      "app": "RTFoundation in jouw buurt",
+      "ingang": "/apps/foundation/os-publiek.html",
+      "persona": "gezin",
+      "status": "NIET_GETEST",
+      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
+      "kruisparen": []
+    },
+    {
+      "functie": "link:rtfportaal",
+      "app": "RTFoundation portaal",
+      "ingang": "/apps/foundation/os-portaal.html",
+      "persona": "gezin",
+      "status": "NIET_GETEST",
+      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
+      "kruisparen": []
+    },
+    {
+      "functie": "link:rtfschrift",
+      "app": "Het schrift",
+      "ingang": "/apps/foundation/schrift.html",
+      "persona": "gezin",
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/rtf/toegang",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        }
+      ]
+    },
+    {
+      "functie": "link:rtgcode",
+      "app": "Betaalcode",
+      "ingang": "/apps/geld.html#rtgcode",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:rtgone",
+      "app": "RTG One",
+      "ingang": "/apps/rtgone.html",
+      "persona": "kantoor",
+      "status": "NIET_GETEST",
+      "reden": "deze ronde heeft geen kruisproef voor de persona kantoor"
+    },
+    {
+      "functie": "link:rtmail",
+      "app": "RTMail",
+      "ingang": "/apps/rtmail.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 62,
+      "open": 33,
+      "reden": "33 van de 62 routes niet gemeten, o.a. /api/account/start is in IDOR.json onbereikbaar; /api/member/rtmail/afwezig is in IDOR.json onbereikbaar; /api/member/rtmail/antwoord is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:school",
+      "app": "School",
+      "ingang": "/apps/rtgschool.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 5,
+      "open": 4,
+      "reden": "4 van de 5 routes niet gemeten, o.a. /api/bijles/gesprek is in IDOR.json onbereikbaar; /api/bijles/vraag is in IDOR.json onbereikbaar; /api/leerstof/examen is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:sessies",
+      "app": "Waar ben ik aanwezig",
+      "ingang": "/apps/mijn-sessies.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 14,
+      "open": 4,
+      "reden": "4 van de 14 routes niet gemeten, o.a. /api/mijn/toestel/bind is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:sitemaker",
+      "app": "Website",
+      "ingang": "/apps/sitemaker.html",
+      "persona": "lid",
+      "status": "BEWEZEN",
+      "routes": 1,
+      "reden": "alle 1 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+    },
+    {
+      "functie": "link:sociaal",
+      "app": "Sociaal",
+      "ingang": "/apps/sociaal.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 11,
+      "open": 10,
+      "reden": "10 van de 11 routes niet gemeten, o.a. /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:spelavond",
+      "app": "Game Night",
+      "ingang": "/apps/spelscherm.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/projectie/kijk staat niet in IDOR.json; /api/projectie/koppel staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:spelen",
+      "app": "Spelen",
+      "ingang": "/apps/spelen.html?pas=",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 47,
+      "open": 13,
+      "reden": "13 van de 47 routes niet gemeten, o.a. /api/member/spel/arcade-bord is in IDOR.json onbereikbaar; /api/member/spel/arcade-score is in IDOR.json onbereikbaar; /api/member/spel/dag is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:sport",
+      "app": "Sport",
+      "ingang": "/apps/sport.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 11,
+      "open": 3,
+      "reden": "3 van de 11 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:stad",
+      "app": "Stad",
+      "ingang": "/apps/stad.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:table",
+      "app": "Table",
+      "ingang": "/apps/table.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 70,
+      "open": 1,
+      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:theater",
+      "app": "Films en series",
+      "ingang": "/apps/theater.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/theater/kijk/*: de registers kennen geen route onder dit voorvoegsel; /api/theater/upload/*: de registers kennen geen route onder dit voorvoegsel"
+    },
+    {
+      "functie": "link:tweedescherm",
+      "app": "Tweede scherm",
+      "ingang": "/apps/scherm.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/supplier/ai staat niet in IDOR.json; /api/supplier/state staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:uitgaan",
+      "app": "Uitgaan",
+      "ingang": "/apps/uitgaan.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 6,
+      "open": 3,
+      "reden": "3 van de 6 routes niet gemeten, o.a. /api/event/rsvp is in IDOR.json onbereikbaar; /api/event/rsvp/annuleer is in IDOR.json onbereikbaar; /api/fluister is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:vandaag",
+      "app": "Vandaag",
+      "ingang": "/apps/life.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 26,
+      "open": 11,
+      "reden": "11 van de 26 routes niet gemeten, o.a. /api/dag is in IDOR.json onbereikbaar; /api/medicatie is in IDOR.json onbereikbaar; /api/metingen is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:veilig",
+      "app": "RTG Veilig",
+      "ingang": "/apps/veilig.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 21,
+      "open": 6,
+      "reden": "6 van de 21 routes niet gemeten, o.a. /api/veiligheid/alarm is in IDOR.json onbereikbaar; /api/veiligheid/codewoord/zet is in IDOR.json onbereikbaar; /api/veiligheid/kring/mail is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:verificatie",
+      "app": "Identiteit aantonen",
+      "ingang": "/apps/verificatie.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:vertegenwoordiging",
+      "app": "Mijn team",
+      "ingang": "/apps/vertegenwoordiging.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:vluchten",
+      "app": "Vluchten",
+      "ingang": "/apps/vluchten.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 7,
+      "open": 2,
+      "reden": "2 van de 7 routes niet gemeten, o.a. /api/member/vluchten/boek is in IDOR.json onbereikbaar; /api/member/vluchten/charter is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:vonk",
+      "app": "Daten",
+      "ingang": "/apps/vonk.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 5,
+      "open": 5,
+      "reden": "5 van de 5 routes niet gemeten, o.a. /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:vooruitzicht",
+      "app": "Het Vooruitzicht",
+      "ingang": "/apps/living-os.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 12,
+      "open": 4,
+      "reden": "4 van de 12 routes niet gemeten, o.a. /api/agenda/bereik is in IDOR.json onbereikbaar; /api/fluister is in IDOR.json onbereikbaar; /api/geld/cockpit is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:vrienden",
+      "app": "Vrienden",
+      "ingang": "/apps/foundation/vrienden.html",
+      "persona": "gezin",
+      "status": "BEWEZEN",
+      "paren": 8,
+      "reden": "8 van de 8 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/rtf/toegang",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "GET /api/foundation/gezin/HGPTVZ/mij",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/connections",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "GET /api/rtf/social/stream",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/pin",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/stories",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/snaps",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/opdracht",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        }
+      ]
+    },
+    {
+      "functie": "link:wallet",
+      "app": "Wallet",
+      "ingang": "/apps/geld.html#wallet",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:wbw",
+      "app": "Samen betalen",
+      "ingang": "/apps/geld.html#wbw",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 95,
+      "open": 56,
+      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "link:wereldlaag",
+      "app": "Alles bij elkaar",
+      "ingang": "/apps/wereld.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+    },
+    {
+      "functie": "link:werkos",
+      "app": "RTG Werk OS",
+      "ingang": "/apps/werk.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 5,
+      "open": 5,
+      "reden": "5 van de 5 routes niet gemeten, o.a. /api/bedrijf/mijn is in IDOR.json onbereikbaar; /api/tenant/bijstand*: de registers kennen geen route onder dit voorvoegsel; /api/tenant/bootstrap staat niet in IDOR.json"
+    },
+    {
+      "functie": "link:wonen",
+      "app": "Wonen",
+      "ingang": "/apps/wonen.html",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "routes": 7,
+      "open": 1,
+      "reden": "1 van de 7 routes niet gemeten, o.a. /api/home/onderhoud/meld is in IDOR.json onbereikbaar"
+    },
+    {
+      "functie": "os:bellen",
+      "app": "Bellen",
+      "ingang": "(os in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "os:rtf",
+      "app": "RTFoundation",
+      "ingang": "(os in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "os:snaps",
+      "app": "Snaps",
+      "ingang": "(os in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "os:videobellen",
+      "app": "Videobellen",
+      "ingang": "(os in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "os:werk",
+      "app": "Werk",
+      "ingang": "(os in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "tab:assets",
+      "app": "assets",
+      "ingang": "(tab in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "tab:bestellen",
+      "app": "bestellen",
+      "ingang": "(tab in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "tab:betalen",
+      "app": "betalen",
+      "ingang": "(tab in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "tab:gezin",
+      "app": "gezin",
+      "ingang": "(tab in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "tab:reizen",
+      "app": "reizen",
+      "ingang": "(tab in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "tab:salon",
+      "app": "salon",
+      "ingang": "(tab in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "tab:terplaatse",
+      "app": "terplaatse",
+      "ingang": "(tab in de app, geen eigen adres)",
+      "persona": "lid",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+    },
+    {
+      "functie": "tab:zorg",
+      "app": "zorg",
+      "ingang": "(tab in de app, geen eigen adres)",
+      "persona": "gezin",
+      "status": "NIET_GETEST",
+      "reden": "geen eigen adres"
+    }
+  ]
+}

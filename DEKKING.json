@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-25T15:06:48.650Z",
-    "commit": "2fee04ab",
-    "routesToen": 5151
+    "op": "2026-09-25T15:19:02.331Z",
+    "commit": "bec0dacc",
+    "routesToen": 5152
   },
   "aangeraakt": [
     "GET /",
@@ -2202,7 +2202,6 @@
     "POST /api/office/bank/salaris/voorstel",
     "POST /api/office/bank/terugstorting",
     "POST /api/office/bank/vergunning",
-    "POST /api/office/bedrijfsmaat",
     "POST /api/office/beleidsmotor",
     "POST /api/office/beleidsmotor/afdwingen",
     "POST /api/office/beleidsmotor/afdwingen/zet",
@@ -2247,8 +2246,6 @@
     "POST /api/office/dienst/in",
     "POST /api/office/dienst/uit",
     "GET /api/office/doc",
-    "POST /api/office/doe",
-    "POST /api/office/doe/kaart",
     "POST /api/office/doos/gedeeld/zet",
     "POST /api/office/doos/netwerk-zet",
     "POST /api/office/doos/regie",
@@ -5156,6 +5153,10 @@
     "GET /scriptbundel.js",
     "GET /stijlblok.css",
     "GET /stijlbundel.css",
+    "GET /toestel/artefact/:sha",
+    "GET /toestel/cel",
+    "GET /toestel/cel.js",
+    "GET /toestel/manifest.json",
     "GET /werken/:code"
   ]
 }

@@ -52,7 +52,15 @@ const REDENEN = [
      `eigenaarherstel`) -- dat is een uitgang en geen slot. */
   ['/api/techniek/bevestig/opties', 'het loket dat een zware bevestiging start; uitschakelbaar maken zou de bevestiging zelf uitschakelbaar maken'],
   ['/api/office/boardroom/bevestig/opties', 'hetzelfde loket achter de boardroomdeur, en om dezelfde reden geen schakelaar'],
-  ['/api/techniek/herstel', 'het inrichten, aflezen en AFBREKEN van een herstelquorum is bediening: afbreken moet altijd kunnen, ook als het huis half uitstaat']
+  ['/api/techniek/herstel', 'het inrichten, aflezen en AFBREKEN van een herstelquorum is bediening: afbreken moet altijd kunnen, ook als het huis half uitstaat'],
+  /* DE TOESTELREKENLAAG (TOESTEL.md par. 10). Geen API-route, dus de
+     functiepoort (middleware/functieschakelaars.js) raakt haar niet: een
+     functie met dit pad zou een knop in de boardroom zijn die niets tegenhoudt.
+     De echte uitknop is er wel en staat standaard UIT: zonder sleutel in
+     public/shared/toestel/sleutels.js en zonder uitgerold manifest laadt geen
+     toestel iets. Een boardroomschakelaar is een stap weg en vraagt dat de
+     functiepoort ook /toestel afdwingt. */
+  ['/toestel', 'de afgesloten rekencel en haar ondertekende artefacten; uit zolang er geen modelsleutel en geen manifest is, en een schakelaar hier zou door de functiepoort (alleen /api) niet worden afgedwongen']
 ];
 
 const BUITEN = new Map(REDENEN);

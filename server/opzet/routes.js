@@ -116,6 +116,9 @@ module.exports = function hangRoutesOp(kern) {
      domeinen die er al over gaan. De kern eronder is in kernlaag2 gemonteerd,
      vlak achter de Mall die hij leest. */
   require('../routes/commerce')(grens('commerce'));
+  /* De toestelrekenlaag (TOESTEL.md): de afgesloten rekencel met haar eigen CSP,
+     het ondertekende manifest en de artefacten. De server rekent hier niet. */
+  require('../routes/toestel')(grens('toestel'));
   /* De routers die aan meer dan een domein hangen -- van sleutelwoorden tot
      de ledenbalie -- staan in ./routes-dwars.js. Alleen `grens` gaat mee: dat
      is precies waarom dat blok als geheel kon verhuizen. */

@@ -182,7 +182,18 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      De scherpe controle hierboven (`onverklaard <= 10`) beweegt NIET mee en staat
      nog steeds op 10: deze drie zijn verklaard, dus ze raken hem niet. Dat is het
      hele punt van twee grenzen naast elkaar. */
-  assert.ok(zonder.length <= 143,
+  /* 143 -> 147: DE TOESTELREKENLAAG (TOESTEL.md par. 10). Vier routes onder
+     /toestel: de afgesloten rekencel, haar script, het manifest en de
+     artefacten. Ze hangen NIET aan een functie, en niet omdat ze niet
+     uitschakelbaar horen te zijn: de functiepoort (middleware/
+     functieschakelaars.js) dwingt alleen /api af, dus een functie op /toestel
+     zou een knop zijn die niets tegenhoudt. De uitknop die er WEL is staat
+     standaard uit: zonder sleutel in shared/toestel/sleutels.js en zonder
+     uitgerold manifest laadt geen toestel iets. Alle vier staan met hun reden
+     in kern/bestuursroutes.js EN in kern/platformregister/bediening.js, en
+     test/platformregister.test.js was groen -- 7 van 7 -- voordat dit getal
+     werd verzet. `onverklaard <= 10` beweegt niet mee en staat nog op 10. */
+  assert.ok(zonder.length <= 147,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

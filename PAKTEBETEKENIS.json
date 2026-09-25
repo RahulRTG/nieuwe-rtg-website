@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-19T19:07:10.005Z",
-    "commit": "6083f652",
+    "op": "2026-09-25T11:37:44.169Z",
+    "commit": "4ff37e34",
     "boomVuil": false,
-    "boomAnders": 36,
+    "boomAnders": 0,
     "instrument": "scripts/paktebetekenis.js",
     "node": "v22.22.2"
   },
@@ -218,6 +218,7 @@
           "NACONTROLE_GESLAAGD": false,
           "_collecties": [
             "betaalIdem",
+            "betaalWaarheid",
             "commBerichten",
             "commGesprekken",
             "commStand",
@@ -242,7 +243,7 @@
             "handelingLog",
             "routerschaduw"
           ],
-          "_schrijfacties": 21
+          "_schrijfacties": 25
         },
         "zinnen": [
           {
@@ -319,6 +320,13 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
           "pakketId": "6a5c2c86761e",
@@ -365,7 +373,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64231ffb,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,geldregie=3:e1cd2265,handelingLog=2:ac45ddfd,apiSpoor=2:dc996354,veilig=1:484ab44e,fluister=1:e4af74cd,routerschaduw=3:ee2f7870",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:08b0eb03,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,geldregie=3:e1cd2265,handelingLog=2:ac611327,apiSpoor=2:99b9d292,veilig=1:484ab44e,fluister=1:c3b1da34,routerschaduw=3:579c07b9",
       "veranderd": null,
       "schakels": [
         "lus"
@@ -415,6 +423,13 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
           "pakketId": "6a5c2c86761e",
@@ -461,7 +476,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64231ffb,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,geldregie=3:e1cd2265,handelingLog=3:8754e3ef,apiSpoor=2:833754d2,veilig=1:484ab44e,fluister=1:2d51a6e9,routerschaduw=3:dd373219",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:08b0eb03,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,geldregie=3:e1cd2265,handelingLog=3:d056f428,apiSpoor=2:c1ec060d,veilig=1:484ab44e,fluister=1:5ff68563,routerschaduw=3:4319ad9f",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -520,6 +535,13 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
           "pakketId": "27dd2dd669a1",
@@ -566,7 +588,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64231ffb,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,geldregie=3:e1cd2265,handelingLog=4:5925dd16,apiSpoor=2:e759e5bd,veilig=1:484ab44e,fluister=1:d1a6bfda,routerschaduw=3:90bd5780",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:08b0eb03,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,geldregie=3:e1cd2265,handelingLog=4:2ee672cd,apiSpoor=2:d57aad83,veilig=1:484ab44e,fluister=1:ef9a1ece,routerschaduw=3:de3ad07a",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -622,6 +644,13 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
           "pakketId": "2dbb74c89739",
@@ -668,7 +697,7 @@
       },
       "effectKop": "opslag=1",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64231ffb,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,geldregie=3:e1cd2265,handelingLog=5:541fb33a,apiSpoor=2:9f888dfe,veilig=1:484ab44e,fluister=1:d1a6bfda,routerschaduw=3:3af32c7d",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:08b0eb03,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,geldregie=3:e1cd2265,handelingLog=5:34452f0e,apiSpoor=2:4be21193,veilig=1:484ab44e,fluister=1:ef9a1ece,routerschaduw=3:001fe951",
       "veranderd": [
         "apiSpoor",
         "handelingLog",
@@ -722,6 +751,13 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
           "pakketId": "9ef23a831a87",
@@ -768,7 +804,7 @@
       },
       "effectKop": "opslag=1",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64231ffb,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,geldregie=3:e1cd2265,handelingLog=6:ff562f64,apiSpoor=2:3cc8b0cc,veilig=1:484ab44e,fluister=1:d1a6bfda,routerschaduw=3:03c56a4e",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:08b0eb03,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,geldregie=3:e1cd2265,handelingLog=6:a9de9122,apiSpoor=2:02c5f581,veilig=1:484ab44e,fluister=1:ef9a1ece,routerschaduw=3:fdcb9b02",
       "veranderd": [
         "apiSpoor",
         "handelingLog",
@@ -824,6 +860,13 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
           "pakketId": "3c2a77d9af3b",
@@ -870,7 +913,7 @@
       },
       "effectKop": "opslag=3",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64231ffb,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,geldregie=3:e1cd2265,handelingLog=7:61810eff,apiSpoor=2:8b94d57a,veilig=1:484ab44e,fluister=1:77234274,routerschaduw=3:950dacbb",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:08b0eb03,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,geldregie=3:e1cd2265,handelingLog=7:640879fd,apiSpoor=2:69ad80fa,veilig=1:484ab44e,fluister=1:8181dd31,routerschaduw=3:10050806",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -927,6 +970,13 @@
             "toegang",
             "definitieve-toezegging"
           ]
+        },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
         },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
@@ -974,7 +1024,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64231ffb,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,geldregie=3:e1cd2265,handelingLog=8:41170b5f,apiSpoor=2:1253b43a,veilig=1:484ab44e,fluister=1:ba403379,routerschaduw=3:7c6acbdd",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:08b0eb03,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,geldregie=3:e1cd2265,handelingLog=8:3340d347,apiSpoor=2:269ba978,veilig=1:484ab44e,fluister=1:81b5b05e,routerschaduw=3:babbb4ee",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -1031,6 +1081,13 @@
             "toegang",
             "definitieve-toezegging"
           ]
+        },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
         },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
@@ -1078,7 +1135,7 @@
       },
       "effectKop": "opslag=3",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:64231ffb,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,geldregie=3:e1cd2265,handelingLog=9:0995ef8d,apiSpoor=2:10c5960c,veilig=1:484ab44e,fluister=1:18b84acc,routerschaduw=3:4ffc8686",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:08b0eb03,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,geldregie=3:e1cd2265,handelingLog=9:b7d23a9a,apiSpoor=2:f80384c0,veilig=1:484ab44e,fluister=1:baf0b7bc,routerschaduw=3:11016d46",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -1111,7 +1168,7 @@
       "status": 200,
       "lijf": {
         "ok": true,
-        "antwoord": "Besteld en betaald bij Sunset Ibiza: 2x Sangria blanca, samen € 30,00. Uw ophaalcode is SMWX; de zaak gaat er direct mee aan de slag.",
+        "antwoord": "Besteld en betaald bij Sunset Ibiza: 2x Sangria blanca, samen € 30,00. Uw ophaalcode is TN3U; de zaak gaat er direct mee aan de slag.",
         "gedaan": true,
         "voorstel": false,
         "pakte": true,
@@ -1135,6 +1192,13 @@
             "toegang",
             "definitieve-toezegging"
           ]
+        },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
         },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
@@ -1180,12 +1244,13 @@
           ]
         }
       },
-      "effectKop": "opslag=21",
+      "effectKop": "opslag=25",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:e8565a21,orders=1:a70a02bc,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=2:029ef1f3,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:fe06263c,pushSubs=3:7ffc6b38,supplierNotifications=1:36806059,punten=1:a79a8e3f,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,payBoekingen=2:8e04a83b,geldregie=3:e1cd2265,handelingLog=10:df40f01d,apiSpoor=2:b7965501,veilig=1:484ab44e,fluister=1:fdc9242c,routerschaduw=3:6605a746,commGesprekken=1:289196c5,commBerichten=1:79537459,commStand=1:5bf964a5,payIdem=3:5a547c1a,payIdemAfdruk=2:28dce8d8,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:591ba92e,rtmail=1:62dcafd4,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5b6765f5,orders=1:07f7b4a3,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=2:92f2c37b,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:07067d4e,pushSubs=3:7ffc6b38,supplierNotifications=1:f0914f42,punten=1:3b91cc30,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,payBoekingen=2:e2d0bde2,geldregie=3:e1cd2265,handelingLog=10:d9eca21a,apiSpoor=2:5dc78e5f,veilig=1:484ab44e,fluister=1:ddc8e263,routerschaduw=3:cdf47819,commGesprekken=1:af6f75f0,commBerichten=1:022d0dff,commStand=1:f7e4165a,payIdem=3:af1deeb9,payIdemAfdruk=2:8efefdf8,betaalWaarheid=1:2bf07eaf,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:a9a8ca3b,rtmail=1:e2fdd950,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
       "veranderd": [
         "apiSpoor",
         "betaalIdem",
+        "betaalWaarheid",
         "commBerichten",
         "commGesprekken",
         "commStand",
@@ -1217,6 +1282,7 @@
         "NACONTROLE_GESLAAGD": false,
         "_collecties": [
           "betaalIdem",
+          "betaalWaarheid",
           "commBerichten",
           "commGesprekken",
           "commStand",
@@ -1241,7 +1307,7 @@
           "handelingLog",
           "routerschaduw"
         ],
-        "_schrijfacties": 21
+        "_schrijfacties": 25
       }
     },
     {
@@ -1276,6 +1342,13 @@
             "toegang",
             "definitieve-toezegging"
           ]
+        },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
         },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
@@ -1323,7 +1396,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:e8565a21,orders=1:a70a02bc,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=2:029ef1f3,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:fe06263c,pushSubs=3:7ffc6b38,supplierNotifications=1:36806059,punten=1:a79a8e3f,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,payBoekingen=2:8e04a83b,geldregie=3:e1cd2265,handelingLog=11:0aaa6f6e,apiSpoor=2:93b814e3,veilig=1:484ab44e,fluister=1:ea87e9ac,routerschaduw=3:cd166659,commGesprekken=1:289196c5,commBerichten=1:79537459,commStand=1:5bf964a5,payIdem=3:5a547c1a,payIdemAfdruk=2:28dce8d8,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:591ba92e,rtmail=1:62dcafd4,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5b6765f5,orders=1:07f7b4a3,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=2:92f2c37b,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:07067d4e,pushSubs=3:7ffc6b38,supplierNotifications=1:f0914f42,punten=1:3b91cc30,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,payBoekingen=2:e2d0bde2,geldregie=3:e1cd2265,handelingLog=11:b25ad8c1,apiSpoor=2:c3d27487,veilig=1:484ab44e,fluister=1:2dc979ce,routerschaduw=3:990071b7,commGesprekken=1:af6f75f0,commBerichten=1:022d0dff,commStand=1:f7e4165a,payIdem=3:af1deeb9,payIdemAfdruk=2:8efefdf8,betaalWaarheid=1:2bf07eaf,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:a9a8ca3b,rtmail=1:e2fdd950,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -1380,6 +1453,13 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
           "pakketId": "4021770ad0aa",
@@ -1426,7 +1506,7 @@
       },
       "effectKop": "opslag=3",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:e8565a21,orders=1:a70a02bc,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:36ad9230,supplierNet=2:4ac11507,betaalIdem=2:029ef1f3,muntIdem=1:189d6c1a,payrollRegels=1:911204a1,gemeenteBekend=2:87b1ef34,rijkBekend=2:933ab9fc,rijkVerkiezing=7:546520f8,luchthaven=8:69435cea,kmar=3:2278382f,sportclubs=1:a8ecc79e,schaduwregels=6:6f8f62ff,rechtsvormRegels=4:a3139701,fiscaalRegels=4:9d539d04,fiscaalJaargangen=1:2191c900,mobMatching=3:d27ab4c2,magnaatWereld=8:2be59f1d,integratiekamer=6:2f0824e5,sessions=2:6a4e2454,notifications=3:fe06263c,pushSubs=3:7ffc6b38,supplierNotifications=1:36806059,punten=1:a79a8e3f,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:5af41fb8,hulp=2:ae1198c9,defensie=1:14b6acfc,vakbewijzen=27:b29befd6,payBoekingen=2:8e04a83b,geldregie=3:e1cd2265,handelingLog=12:389f3361,apiSpoor=2:0a9c1c94,veilig=1:484ab44e,fluister=1:dbf00879,routerschaduw=3:f6b99545,commGesprekken=1:289196c5,commBerichten=1:79537459,commStand=1:5bf964a5,payIdem=3:5a547c1a,payIdemAfdruk=2:28dce8d8,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:591ba92e,rtmail=1:62dcafd4,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:5b6765f5,orders=1:07f7b4a3,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:e07b2829,supplierNet=2:b528a8c7,betaalIdem=2:92f2c37b,muntIdem=1:189d6c1a,payrollRegels=1:b85d5fa6,gemeenteBekend=2:b97e5533,rijkBekend=2:2af0671d,rijkVerkiezing=7:57ab0d62,luchthaven=8:938b6853,kmar=3:2278382f,sportclubs=1:1244af7f,schaduwregels=6:3ce04588,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:6698da82,fiscaalJaargangen=1:a5db7e7b,mobMatching=3:d27ab4c2,magnaatWereld=8:94394f48,integratiekamer=6:2f0824e5,sessions=2:935c996f,notifications=3:07067d4e,pushSubs=3:7ffc6b38,supplierNotifications=1:f0914f42,punten=1:3b91cc30,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:a65b58a3,hulp=2:ae1198c9,defensie=1:073de3af,vakbewijzen=27:e2fb38cd,payBoekingen=2:e2d0bde2,geldregie=3:e1cd2265,handelingLog=12:c4db7147,apiSpoor=2:e6c9923c,veilig=1:484ab44e,fluister=1:3fa3004b,routerschaduw=3:f4257b3c,commGesprekken=1:af6f75f0,commBerichten=1:022d0dff,commStand=1:f7e4165a,payIdem=3:af1deeb9,payIdemAfdruk=2:8efefdf8,betaalWaarheid=1:2bf07eaf,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:a9a8ca3b,rtmail=1:e2fdd950,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -1466,11 +1546,11 @@
         "viaModel": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -1485,11 +1565,22 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": false,
+          "plaatsen": [
+            "rtg-server"
+          ],
+          "aanbieders": [
+            "local"
+          ],
+          "extern": false,
+          "aanroepen": 1
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "785a7825fe40",
+          "pakketId": "906a838c6c13",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -1516,7 +1607,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -1531,7 +1622,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:75cfefac,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,geldregie=3:e1cd2265,handelingLog=2:dadd9078,apiSpoor=2:41cfe158,veilig=1:484ab44e,fluister=1:ff3bbd8d,kosten=1:c728550c,routerschaduw=3:638c7400",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:ba1b78d0,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,geldregie=3:e1cd2265,handelingLog=2:07c2dc76,apiSpoor=2:913e7f97,veilig=1:484ab44e,fluister=1:987c3169,kosten=1:c728550c,routerschaduw=3:0a7d7dfc",
       "veranderd": null,
       "schakels": [],
       "lagen": {
@@ -1561,11 +1652,11 @@
         "viaModel": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -1580,11 +1671,22 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": false,
+          "plaatsen": [
+            "rtg-server"
+          ],
+          "aanbieders": [
+            "local"
+          ],
+          "extern": false,
+          "aanroepen": 1
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "785a7825fe40",
+          "pakketId": "906a838c6c13",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -1611,7 +1713,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -1626,7 +1728,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:75cfefac,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,geldregie=3:e1cd2265,handelingLog=3:65efe160,apiSpoor=2:f41cfae7,veilig=1:484ab44e,fluister=1:2a25a9c0,kosten=1:c728550c,routerschaduw=3:192f69bf",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:ba1b78d0,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,geldregie=3:e1cd2265,handelingLog=3:465d7ab5,apiSpoor=2:21663b27,veilig=1:484ab44e,fluister=1:7f41a859,kosten=1:c728550c,routerschaduw=3:2c841ef2",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -1664,11 +1766,11 @@
         "pakte": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -1683,11 +1785,18 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "f165d569eb04",
+          "pakketId": "65f833f7fb12",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -1714,7 +1823,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -1729,7 +1838,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:75cfefac,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,geldregie=3:e1cd2265,handelingLog=4:164131ea,apiSpoor=2:624a3a3d,veilig=1:484ab44e,fluister=1:01542fd8,kosten=1:c728550c,routerschaduw=3:6c1a8557",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:ba1b78d0,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,geldregie=3:e1cd2265,handelingLog=4:55fcef4f,apiSpoor=2:c97c47cc,veilig=1:484ab44e,fluister=1:cfe97c10,kosten=1:c728550c,routerschaduw=3:aaef325a",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -1766,11 +1875,11 @@
         "pakte": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -1785,11 +1894,18 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "30044d1b165c",
+          "pakketId": "ec1daf4a9c63",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -1816,7 +1932,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -1831,7 +1947,7 @@
       },
       "effectKop": "opslag=1",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:75cfefac,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,geldregie=3:e1cd2265,handelingLog=5:324538c5,apiSpoor=2:d7312a0e,veilig=1:484ab44e,fluister=1:01542fd8,kosten=1:c728550c,routerschaduw=3:38777209",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:ba1b78d0,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,geldregie=3:e1cd2265,handelingLog=5:c6317642,apiSpoor=2:014bc70e,veilig=1:484ab44e,fluister=1:cfe97c10,kosten=1:c728550c,routerschaduw=3:cf340eb3",
       "veranderd": [
         "apiSpoor",
         "handelingLog",
@@ -1866,11 +1982,11 @@
         "pakte": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -1885,11 +2001,18 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "1be4fc003c08",
+          "pakketId": "3ab7623f3efc",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -1916,7 +2039,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -1931,7 +2054,7 @@
       },
       "effectKop": "opslag=1",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:75cfefac,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,geldregie=3:e1cd2265,handelingLog=6:be21f414,apiSpoor=2:6f4f990a,veilig=1:484ab44e,fluister=1:01542fd8,kosten=1:c728550c,routerschaduw=3:d4c5394f",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:ba1b78d0,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,geldregie=3:e1cd2265,handelingLog=6:0b67372b,apiSpoor=2:055e33e0,veilig=1:484ab44e,fluister=1:cfe97c10,kosten=1:c728550c,routerschaduw=3:e8834899",
       "veranderd": [
         "apiSpoor",
         "handelingLog",
@@ -1969,11 +2092,11 @@
         "viaModel": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -1988,11 +2111,22 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": false,
+          "plaatsen": [
+            "rtg-server"
+          ],
+          "aanbieders": [
+            "local"
+          ],
+          "extern": false,
+          "aanroepen": 1
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "b49f5d1833f0",
+          "pakketId": "a7d8cb98be16",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -2019,7 +2153,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -2034,7 +2168,7 @@
       },
       "effectKop": "opslag=3",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:75cfefac,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,geldregie=3:e1cd2265,handelingLog=7:431e4e4e,apiSpoor=2:1f9df5e8,veilig=1:484ab44e,fluister=1:0dc06549,kosten=1:c728550c,routerschaduw=3:eaf9785b",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:ba1b78d0,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,geldregie=3:e1cd2265,handelingLog=7:ff430036,apiSpoor=2:6565a3ff,veilig=1:484ab44e,fluister=1:f7d21bb2,kosten=1:c728550c,routerschaduw=3:3c144d9a",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -2073,11 +2207,11 @@
         "pakte": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -2092,11 +2226,18 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "8618b0104e7d",
+          "pakketId": "f0efad50abde",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -2123,7 +2264,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -2138,7 +2279,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:75cfefac,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,geldregie=3:e1cd2265,handelingLog=8:ee17ec86,apiSpoor=2:1c8634b0,veilig=1:484ab44e,fluister=1:d75da14b,kosten=1:c728550c,routerschaduw=3:e017ff99",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:ba1b78d0,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,geldregie=3:e1cd2265,handelingLog=8:5bcccf04,apiSpoor=2:5e5e4c24,veilig=1:484ab44e,fluister=1:daa801fe,kosten=1:c728550c,routerschaduw=3:565151ce",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -2177,11 +2318,11 @@
         "pakte": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -2196,11 +2337,18 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "2a25e591f521",
+          "pakketId": "bc7007668f62",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -2227,7 +2375,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -2242,7 +2390,7 @@
       },
       "effectKop": "opslag=3",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:75cfefac,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,geldregie=3:e1cd2265,handelingLog=9:8f9e4251,apiSpoor=2:76dcf3ed,veilig=1:484ab44e,fluister=1:9ea388ec,kosten=1:c728550c,routerschaduw=3:61c79d3c",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:ba1b78d0,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=1:189d6c1a,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:7ffc6b38,pushSubs=3:7ffc6b38,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,geldregie=3:e1cd2265,handelingLog=9:e9f53ea1,apiSpoor=2:94bb1259,veilig=1:484ab44e,fluister=1:2828c083,kosten=1:c728550c,routerschaduw=3:625ebff5",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -2275,17 +2423,17 @@
       "status": 200,
       "lijf": {
         "ok": true,
-        "antwoord": "Besteld en betaald bij Sunset Ibiza: 2x Sangria blanca, samen € 30,00. Uw ophaalcode is VBQ6; de zaak gaat er direct mee aan de slag.",
+        "antwoord": "Besteld en betaald bij Sunset Ibiza: 2x Sangria blanca, samen € 30,00. Uw ophaalcode is TXW3; de zaak gaat er direct mee aan de slag.",
         "gedaan": true,
         "voorstel": false,
         "pakte": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -2300,11 +2448,18 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "dd5af22969c4",
+          "pakketId": "a27c5be54a3a",
           "status": "uitgevoerd-en-gelogd",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Opdracht uitgevoerd via de toegestane workflow",
@@ -2331,7 +2486,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -2344,12 +2499,13 @@
           ]
         }
       },
-      "effectKop": "opslag=21",
+      "effectKop": "opslag=25",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:8aebeabc,orders=1:7109d96a,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=2:ca30eddc,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:a3031421,pushSubs=3:7ffc6b38,supplierNotifications=1:31a84a75,punten=1:2b5cf3eb,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,payBoekingen=2:ee1029d6,geldregie=3:e1cd2265,handelingLog=10:3c9e6b54,apiSpoor=2:35474ec1,veilig=1:484ab44e,fluister=1:e9ab3840,kosten=1:c728550c,routerschaduw=3:0446a62e,commGesprekken=1:487d9210,commBerichten=1:6a742754,commStand=1:8c938368,payIdem=3:e0745c27,payIdemAfdruk=2:824b2d33,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:b03d30ff,rtmail=1:751cc44f,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:14277521,orders=1:a8138a34,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=2:b9d6c208,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:aac36e0e,pushSubs=3:7ffc6b38,supplierNotifications=1:52e3f5e5,punten=1:9aa1c545,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,payBoekingen=2:db527102,geldregie=3:e1cd2265,handelingLog=10:41c4c47c,apiSpoor=2:513480ec,veilig=1:484ab44e,fluister=1:eb7b0554,kosten=1:c728550c,routerschaduw=3:2653e1d1,commGesprekken=1:8a3d4f3b,commBerichten=1:70337aea,commStand=1:ab4137ca,payIdem=3:8bf70458,payIdemAfdruk=2:1fdfc074,betaalWaarheid=1:ca78d548,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:1a4f758a,rtmail=1:dddf8a27,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
       "veranderd": [
         "apiSpoor",
         "betaalIdem",
+        "betaalWaarheid",
         "commBerichten",
         "commGesprekken",
         "commStand",
@@ -2381,6 +2537,7 @@
         "NACONTROLE_GESLAAGD": false,
         "_collecties": [
           "betaalIdem",
+          "betaalWaarheid",
           "commBerichten",
           "commGesprekken",
           "commStand",
@@ -2405,7 +2562,7 @@
           "handelingLog",
           "routerschaduw"
         ],
-        "_schrijfacties": 21
+        "_schrijfacties": 25
       }
     },
     {
@@ -2423,11 +2580,11 @@
         "viaModel": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -2442,11 +2599,22 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": false,
+          "plaatsen": [
+            "rtg-server"
+          ],
+          "aanbieders": [
+            "local"
+          ],
+          "extern": false,
+          "aanroepen": 1
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "fb8e4f0e2ea7",
+          "pakketId": "3c0d78d94e56",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -2473,7 +2641,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -2488,7 +2656,7 @@
       },
       "effectKop": "opslag=2",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:8aebeabc,orders=1:7109d96a,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=2:ca30eddc,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:a3031421,pushSubs=3:7ffc6b38,supplierNotifications=1:31a84a75,punten=1:2b5cf3eb,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,payBoekingen=2:ee1029d6,geldregie=3:e1cd2265,handelingLog=11:11356bcf,apiSpoor=2:a829e611,veilig=1:484ab44e,fluister=1:91866a78,kosten=1:c728550c,routerschaduw=3:afa2845a,commGesprekken=1:487d9210,commBerichten=1:6a742754,commStand=1:8c938368,payIdem=3:e0745c27,payIdemAfdruk=2:824b2d33,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:b03d30ff,rtmail=1:751cc44f,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:14277521,orders=1:a8138a34,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=2:b9d6c208,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:aac36e0e,pushSubs=3:7ffc6b38,supplierNotifications=1:52e3f5e5,punten=1:9aa1c545,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,payBoekingen=2:db527102,geldregie=3:e1cd2265,handelingLog=11:24c9a7fb,apiSpoor=2:4977a006,veilig=1:484ab44e,fluister=1:04475b9e,kosten=1:c728550c,routerschaduw=3:2e13a443,commGesprekken=1:8a3d4f3b,commBerichten=1:70337aea,commStand=1:ab4137ca,payIdem=3:8bf70458,payIdemAfdruk=2:1fdfc074,betaalWaarheid=1:ca78d548,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:1a4f758a,rtmail=1:dddf8a27,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
       "veranderd": [
         "apiSpoor",
         "fluister",
@@ -2526,11 +2694,11 @@
         "pakte": true,
         "aiBeschikbaar": true,
         "modus": "lokaal",
-        "verwerking": "op-dit-apparaat",
+        "verwerking": "rtg-server",
         "kompas": {
           "naam": "RTG Kompas",
-          "route": "op-dit-apparaat",
-          "privacy": "Inhoud blijft op deze Mac",
+          "route": "rtg-server",
+          "privacy": "Inhoud blijft op de eigen modelserver van RTG",
           "ritme": [
             "nu",
             "straks",
@@ -2545,11 +2713,18 @@
             "definitieve-toezegging"
           ]
         },
+        "uitgevoerd": {
+          "zonderModel": true,
+          "plaatsen": [],
+          "aanbieders": [],
+          "extern": false,
+          "aanroepen": 0
+        },
         "liveTwin": {
           "schema": "rtg.live-twin/1",
-          "pakketId": "bbebd3e1dd0f",
+          "pakketId": "54493344329f",
           "status": "voorbereid",
-          "route": "op-dit-apparaat",
+          "route": "rtg-server",
           "autoriteit": "mens",
           "ritme": {
             "nu": "Antwoord en veilige route zijn voorbereid",
@@ -2576,7 +2751,7 @@
               "id": "modelroute",
               "soort": "runtime",
               "label": "Verwerkingsroute",
-              "detail": "Inhoud blijft op deze Mac",
+              "detail": "Inhoud blijft op de eigen modelserver van RTG",
               "status": "server-bepaald"
             },
             {
@@ -2591,7 +2766,7 @@
       },
       "effectKop": "opslag=3",
       "effectNietGemeten": "bestand,externe-aanroep",
-      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:8aebeabc,orders=1:7109d96a,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:94c713d1,supplierNet=2:3424b2e7,betaalIdem=2:ca30eddc,muntIdem=1:189d6c1a,payrollRegels=1:7385b095,gemeenteBekend=2:c9dc9348,rijkBekend=2:a6b58a12,rijkVerkiezing=7:9f2865e1,luchthaven=8:814b11c4,kmar=3:2278382f,sportclubs=1:4625cef0,schaduwregels=6:d8ec47e0,rechtsvormRegels=4:a3139701,fiscaalRegels=4:d0e8bb67,fiscaalJaargangen=1:a392c513,mobMatching=3:d27ab4c2,magnaatWereld=8:5fa42ec2,integratiekamer=6:2f0824e5,sessions=2:7b90d168,notifications=3:a3031421,pushSubs=3:7ffc6b38,supplierNotifications=1:31a84a75,punten=1:2b5cf3eb,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:02ec55df,hulp=2:ae1198c9,defensie=1:3e329e7c,vakbewijzen=27:ca6ee3a8,payBoekingen=2:ee1029d6,geldregie=3:e1cd2265,handelingLog=12:fa42b3c8,apiSpoor=2:fbf3cad1,veilig=1:484ab44e,fluister=1:f5f86184,kosten=1:c728550c,routerschaduw=3:c7972520,commGesprekken=1:487d9210,commBerichten=1:6a742754,commStand=1:8c938368,payIdem=3:e0745c27,payIdemAfdruk=2:824b2d33,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:b03d30ff,rtmail=1:751cc44f,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
+      "staatKop": "creatorCredit=3:acf63bc1,creatorLikes=3:ddce3c22,contacts=1:21f72e5c,invoices=4:2ac0c30b,trip=4:25172455,posts=6:7bd40a46,partners=2:90b90cad,partnerTrips=4:6bfa915d,talen=2:befcc042,supplierTypes=78:79f33d4e,suppliers=77:14277521,orders=1:a8138a34,livingLab=6:b0f0bb47,muziekUitgaven=2:68a781e4,accountRollen=1:1fc3b165,supplierNet=2:6928f1e5,betaalIdem=2:b9d6c208,muntIdem=1:189d6c1a,payrollRegels=1:eeb0d5f9,gemeenteBekend=2:0adbf732,rijkBekend=2:64f7e729,rijkVerkiezing=7:3d9397a0,luchthaven=8:ada7fc06,kmar=3:2278382f,sportclubs=1:d7f32909,schaduwregels=6:a9b09155,foundation=2:a32fdc87,rechtsvormRegels=4:a3139701,fiscaalRegels=4:af2b6829,fiscaalJaargangen=1:ea4b2e25,mobMatching=3:d27ab4c2,magnaatWereld=8:62ce4d88,integratiekamer=6:2f0824e5,sessions=2:b4bffd39,notifications=3:aac36e0e,pushSubs=3:7ffc6b38,supplierNotifications=1:52e3f5e5,punten=1:9aa1c545,memberDir=3:ac2b41c4,onboarding=2:3dd714fd,vapid=2:dfa8578e,hulp=2:ae1198c9,defensie=1:0ed1f482,vakbewijzen=27:fc014764,payBoekingen=2:db527102,geldregie=3:e1cd2265,handelingLog=12:5a5bce6f,apiSpoor=2:012329ad,veilig=1:484ab44e,fluister=1:2876deb2,kosten=1:c728550c,routerschaduw=3:9d6631af,commGesprekken=1:8a3d4f3b,commBerichten=1:70337aea,commStand=1:ab4137ca,payIdem=3:8bf70458,payIdemAfdruk=2:1fdfc074,betaalWaarheid=1:ca78d548,paySaldi=3:ce199bf9,geldbeleid=1:14fb6a77,facturen=1:1a4f758a,rtmail=1:dddf8a27,rtmailRegels=1:2e0d43e0,rtmailSchrijf=2:3ffcf241",
       "veranderd": [
         "apiSpoor",
         "fluister",

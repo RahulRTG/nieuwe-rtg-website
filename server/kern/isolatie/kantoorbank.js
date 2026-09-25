@@ -34,8 +34,7 @@
    DE DERDE KOLOM IS EEN LIJST EN MAG LEEG ZIJN, en dat is geen slordigheid: /gezond leest
    een SYSTEEMstand en geen gegevens van iemand, en /bevoegdheid leest een matrix per land.
    Daar past geen van de zeventien werkwoorden, en er een uitkiezen dat er bijna op lijkt
-   zou semantiek verzinnen op precies de plek waar dat niet mag. Een lege lijst met een
-   grond ernaast is dan het eerlijke antwoord.
+   zou semantiek verzinnen op precies de plek waar dat niet mag.
 
    EN DE TABEL IS GESLOTEN OVER ZIJN BEREIK. test/kantoorbank.test.js eist dat ELKE
    /api/office/bank/-route hier een antwoord heeft: een nieuwe route zakt dus tot iemand
@@ -70,6 +69,8 @@ const KANTOORBANK = Object.freeze({
     'zet een voornemen klaar voor een tweede mens; het eigen gevolgcontract sluit ' +
     'GELD_BEWEGEN met zoveel woorden uit', ['VOORSTEL_MAKEN']],
   '/api/office/bank/incasso/dossier': [false, 'leest het dossier van de keten', ['LEZEN_ANDERMANS']],
+  '/api/office/bank/incasso/opties': [false, 'zet een passkeyceremonie klaar', []],
+  '/api/office/bank/handtekening/opties': [false, 'zet een passkeyceremonie klaar', []],
   '/api/office/bank/handtekening/open': [false, 'leest wat er openstaat', ['LEZEN_ANDERMANS']],
   '/api/office/bank/handtekening/intrek': [false, 'haalt een aanvraag weg voordat er iets is uitgevoerd', ['VOORSTEL_MAKEN']],
   '/api/office/bank/opdrachten/afstemming': [false, 'een aanvraag; geld beweegt pas na de tweede handtekening', ['VOORSTEL_MAKEN']],

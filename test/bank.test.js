@@ -12,6 +12,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { kantoorPasskey } = require('./kantoorpasskey');
 
 let srv, base, lid, office;
 /* De vier-ogen op het OPSCHALEN vraagt twee ECHTE personen. Vroeger stonden hier
@@ -21,7 +22,7 @@ let srv, base, lid, office;
    req.body.naam, dus een sessie kon beide rollen spelen. Opschalen zit nu achter
    de boardroomdeur en de identiteit komt uit de sessie. Deze twee tokens zijn
    dus geen testdecor maar de kern van wat de knop beschermt. */
-let baas, tweede, opNaam, opNaam2;
+let baas, tweede, opNaam, opNaam2, pk, sleutel1, sleutel2;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bank-'));
 
 const api = (pad, body, token) => fetch(base + '/api/' + pad, {
@@ -49,9 +50,15 @@ const kapi = (pad, body, nm) => api('office/' + pad, { ...(body || {}), naam: nm
    ceremonie struikelt -- die heeft zijn eigen toets in
    test/tweedehandtekening.test.js. */
 async function metTweedeHand(pad, body) {
-  const aanvraag = await kapi(pad, body);
+  /* Een GELDhandeling vraagt bij beide handtekeningen een passkeyceremonie
+     (besluit 25 september 2026, routes/kantoren/bank-passkey.js); rood staan niet. */
+  const geld = pad === 'bank/incasso';
+  const c1 = geld ? await pk.ceremonie(sleutel1, '/api/office/bank/incasso/opties', body, opNaam) : {};
+  const aanvraag = await kapi(pad, { ...body, ...c1 });
   if (!aanvraag.body || !aanvraag.body.needsAuth) return aanvraag;
-  return api('office/bank/handtekening/bevestig', { id: aanvraag.body.aanvraag.id }, opNaam2);
+  const id = aanvraag.body.aanvraag.id;
+  const c2 = geld ? await pk.ceremonie(sleutel2, '/api/office/bank/handtekening/opties', { id }, opNaam2) : {};
+  return api('office/bank/handtekening/bevestig', { id, ...c2 }, opNaam2);
 }
 
 function ibanGeldig(iban) {
@@ -123,6 +130,9 @@ test.before(async () => {
   assert.equal(kop3.status, 200, 'de tweede medewerker koppelt de kantoorrol: ' + JSON.stringify(kop3.body).slice(0, 140));
   opNaam2 = (await api('account/start', { rol: 'kantoor' }, med2.token)).body.token;
   assert.ok(opNaam2, 'en staat ook op naam in de backoffice');
+  pk = kantoorPasskey(base);
+  sleutel1 = await pk.zet(med.token);
+  sleutel2 = await pk.zet(med2.token);
 
   /* DE VERGUNNING VASTLEGGEN, en dat is sinds de bevoegdheidslaag geen decor.
      Wat RTG zelf mag hangt niet aan de drie-standen-knop maar aan wat er is

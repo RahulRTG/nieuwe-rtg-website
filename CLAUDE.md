@@ -278,6 +278,22 @@ drukken. De zes vragen per bewijsstuk (`stelt`, `nietZegt`, `doorWie`, `graad`,
 `werkwoord`, `herkomst`) gebruiken met opzet de woorden van
 `kern/carriereledger/regels.js` en geen tweede vocabulaire.
 
+**`POLITIEK.md` is de democratische lus van FoundationOS** (werknaam
+PolitiekOS): een mens wordt niet alleen gehoord, hij kan volgen wat er daarna
+gebeurt. Het is een richtingsdocument (staat / een stap weg / vraagt een besluit
+/ jaren weg), en de eerste correctie is dat het **twee lagen** zijn en niet een.
+De burgerlaag (welkom, bijeenkomst, luisteren, samen maken, doen, terugkoppeling)
+woont in FoundationOS en is **partijneutraal**. De partijlaag (leden, congres,
+programma) woont bij de partij zelf, als klant, tegen de gewone prijs, want gratis
+gebruik is een gift aan een partij, en de eigenaar van RTG wil zelf een partij
+oprichten (MN-01/MN-02). Bijna elke stap bestaat al in een ander domein, dus het
+werk is aansluiten: `livinglab/vraagbesluit.js` IS al *Niemand kwijt* voor een
+domein. `zaak` en `tafel` zijn ernstig bezet, dus de kern heet voorlopig
+`kwestie`. Acht grenzen (PO-01 t/m PO-08), waarvan er drie vóór de eerste
+AI-functie een handhaver moeten krijgen: partijneutraal, geen kiezersprofiel, en
+geen overtuigingsmachine. Voor dat laatste bestaat vandaag in het hele huis geen
+centrale regel.
+
 **`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
 Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk
 zoekt de juiste mensen, Rendez-vous maakt de juiste ontmoeting** — bij Vonk is de

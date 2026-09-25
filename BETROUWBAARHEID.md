@@ -396,6 +396,34 @@ Toetsen: `test/liegronde.test.js` (het oordeel, de samenstelling, en de samenhan
 het echte register). Drie handmutaties laten hem zakken: elke klacht als defect
 tellen, de versheid overslaan, en nul gelogen antwoorden als bewezen tellen.
 
+## 4f. Bevoegd aan de schermkant: eerst gemeten of er iets te kruisen valt
+
+Rij 6 van de tabel zegt dat de routekant van *bevoegd* staat (`IDOR.json`,
+`ROLPROEF.json`) en de schermkant niet. Voordat daar een kruisronde voor kwam (open
+het scherm als eigenaar A, dan als vreemde B, en kijk of B iets van A ziet), is
+eerst gemeten of een scherm iets van zijn eigenaar bij NAAM vraagt. Doet het dat
+niet, dan vraagt B zijn eigen gegevens op, en "B zag niets van A" is dan een
+groen vinkje op een experiment dat niet is uitgevoerd (BEWIJSMACHINE.md par. 6a).
+
+Een kruispoging telt dus alleen als een verzoek van het scherm een object van A
+noemt in zijn adres of lijf. Twee verkenningen van 25 september 2026, allebei bij
+het laden van het scherm (zonder tikken):
+
+| eigenaar | ledenschermen die een object van A noemen | gezinsschermen |
+|---|---|---|
+| vers account, merkteken = codenaam, nummer, e-mail, gezinscode | **0 van 85** | 5 van 10 |
+| sleutelbos-lid met alle elf werelden gebouwd, merkteken = elk id uit A's eigen antwoorden | **4 van 85** | 1 van 10 |
+
+Van die 85 kregen er in de tweede ronde 31 wel ids terug en noemden ze bij het
+laden niet; 50 kregen er geen, omdat de werelden niet op het lid staan dat die
+schermen opent. Twee verklaringen, en de metingen scheiden ze maar half: een
+ledenscherm bakent bij het laden af op de SESSIE en niet op een id (dan is de
+routekant de juiste proef en is rij 6 te streng), en een scherm noemt een object
+pas na een tik op een detail (dan hoort de kruisronde op de verkenning van
+*bedienbaar* te liggen en niet op het laden). Er is daarom (nog) geen kruisronde
+gebouwd: bij het laden zou hij op hoogstens vijf rijen iets kunnen bewijzen.
+Het verkenningsscript staat niet in de repo; wat het deed staat hierboven.
+
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
 `npm run appwerkt` schrijft `APPWERKT.json`: per onderdeel uit `MAPPEN`, met de

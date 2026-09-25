@@ -43,9 +43,12 @@ const ONBEKEND = 'Onbekende Uil 99';     // een codenaam die de kluis niet kent
 function maakWereld({ betaal, sabotage } = {}) {
   const b = betaal || require('../../server/betaal');
   const keten = require('../../server/kern/spellen/magnaat/rtg-keten')({ betaal: b });
-  const { db, pay } = keten.opstelling();
+  /* Elk seintje naar een lid, zodat de ijkpunten (./ijkpunten.js, E5) kunnen
+     zien of wie iets ontving daarvan hoorde. */
+  const seintjes = [];
+  const { db, pay } = keten.opstelling({ sseToCustomer: (key) => seintjes.push(key) });
   if (sabotage) sabotage(pay, db);
-  return { db, pay, spelers: keten.SPELERS };
+  return { db, pay, spelers: keten.SPELERS, seintjes };
 }
 
 function storingsas(betaal) {
@@ -236,4 +239,4 @@ async function zoek({ zaad = 1, reeksen = 100, lengte = 12, maak, spelers }) {
   return { gevonden: false, zaad, reeksen, lengte, tel, nietBeproefd: nietBeproefd() };
 }
 
-module.exports = { maakWereld, storingsas, genereer, doe, oordeel, oordeelMetSpoor, voerUit, krimp, zoek, ONBEKEND };
+module.exports = { maakWereld, storingsas, genereer, doe, oordeel, oordeelMetSpoor, boekingen, voerUit, krimp, zoek, ONBEKEND };

@@ -179,7 +179,8 @@ zijn toets laat zakken.
 
 ## 4. Bouwsteen 2 -- de eerste divergentie
 
-**Stand: vraagt een besluit, daarna een stap weg.** De vraag is niet *waar
+**Stand: staat in de testwereld, voor `stuur` en `betaal` van RTG Pay** (par.
+4a). De vraag is niet *waar
 crashte het* maar *waar werd het voor het eerst onwaar*. Een uitvoering krijgt
 semantische ijkpunten:
 
@@ -204,6 +205,55 @@ eerst RTG Pay.
 Grens: een ijkpunt draagt metadata en relaties, **geen inhoud** -- geen bedrag
 naast een codenaam, geen berichttekst. Anders is het spoor een tweede kopie van
 de data die het moet bewaken.
+
+### 4a. Wat er staat (25 september 2026)
+
+`scripts/lib/divergentie.js`, aangeroepen door `npm run tegenvoorbeeld` op elk
+verkleind tegenvoorbeeld, en bewaakt door `test/divergentie.test.js`. De naam is
+geen `ijkpunten`: dat is al een functie in `server/kern/ov/dienst.js` met een
+OV-betekenis, en `divergentie` kwam nergens voor.
+
+Het besluit uit par. 13.1 is op de aanbeveling uitgevoerd: **naast de envelop**.
+Er is geen letter aan `kern/envelop.js` veranderd; het spoor leeft in de
+testwereld van de zoeker en is daarmee ook omkeerbaar.
+
+Vier dingen die het bouwen blootlegde:
+
+1. **Op de echte fout wijst hij het besluit aan, niet de opslag.** Met de twee
+   regels uit `verzoekBetaal()` weggehaald die de race van par. 3a dichtzetten,
+   vindt de zoeker zaad 1 opnieuw en zegt de divergentie *E2 klopt, E3 wijkt:
+   hooguit 1 toegestaan besluit, 2 toegestaan*. De wet zag het pas bij de opslag
+   (E4); de reparatie zit bij het besluit (E3). Dat verschil is precies waarvoor
+   deze bouwsteen bestaat.
+2. **Elk ijkpunt is een VERBOD en geen model.** "Er is betaald door een ander
+   dan aan wie het verzoek staat" is te zien zonder na te bouwen wanneer RTG Pay
+   hoort te betalen. Een tweede model van RTG Pay zou zelf de fout kunnen
+   bevatten die het moet vinden. Gevolg: de ijkpunten zien soms iets wat geen
+   wet ziet -- een betaling door de verkeerde breekt geen enkele van de drie
+   wetten van de zoeker en valt bij E1 wel op (toets 2a). Of de ijkpunten daarom
+   ook tijdens het ZOEKEN moeten meekijken en niet alleen achteraf, is nog niet
+   besloten.
+3. **De eerste versie loog op gezonde code, 27 van de 40 reeksen.** Een herhaling
+   met een sleutel die al slaagde krijgt het bewaarde antwoord terug zonder iets
+   te doen (`metIdem`), en het spoor van de zoeker kan een verzoek twee keer
+   dragen (een herhaalde `verzoekMaak` geeft hetzelfde verzoek terug). Een
+   ijkpunt telt daarom EFFECTEN, niet ok-antwoorden, en vergelijkt op id. Toets 1
+   houdt dat vast: veertig schone reeksen, nul afwijkingen.
+4. **De proefopstelling kon E5 niet zien.** `rtg-keten.js` gaf voor
+   `keyVanCodenaam` een kale tekst terug waar `kern/gids.js` een object geeft,
+   dus `seintje()` ging in de testwereld nooit af -- dezelfde fixturefout als in
+   `CARRIERE.md` (de proef hield zich aan de vorm die de code aannam). Hersteld,
+   en de Magnaat-geldpomp en de raceproef bleven groen.
+
+**E6 is voor RTG Pay altijd `niet-waargenomen`**, met de reden: kern/pay zet geen
+gebeurtenis in een envelop (nul verwijzingen naar `kern/envelop.js` in
+`server/kern/pay/` en `server/routes/pay*.js`). Een divergentie die daaroverheen
+springt, noemt hem in `overgeslagen`. Dat is geen gat in de meter maar een
+bevinding over RTG Pay, en die staat hier in plaats van dat E6 stil groen is.
+
+Wat hij NIET doet: `laad` en `verzoek` (geen rij, wel de reden), productie (er
+wordt niets geschreven buiten de testwereld), en een oordeel -- de uitslag is een
+feit over twee waarnemingen, zonder graad.
 
 ## 5. Bouwsteen 3 -- het herhaalpakket
 
@@ -428,8 +478,9 @@ onafhankelijkheid van de drie assen van `GELDING.json`.
 4. **De immuniteitsstap** -- een keer met de hand doorlopen op de eerste vondst
    (par. 6a, klasse B, gerepareerd, met een toets die op de oude code zakte). Als
    deterministische indeling staat hij nog niet.
-5. **IJkpunten E0-E8 voor RTG Pay**, als spoor naast de envelop (na het besluit
-   in par. 4).
+5. ~~**IJkpunten E0-E8 voor RTG Pay**~~ -- gedaan in de testwereld (par. 4a),
+   naast de envelop, voor `stuur` en `betaal`. Op de echte fout van par. 3a wijst
+   hij het besluit (E3) aan.
 6. **Het herhaalpakket en de herhaalmatrix**, eerst in de testwereld.
 
 Pas als deze lus betrouwbaar rond is, komt de nachtelijke zoektocht: ongebruikte
@@ -440,7 +491,10 @@ vast te leggen, niet als taak.
 
 ## 13. Open besluiten voor de eigenaar
 
-1. **IJkpunten naast de envelop of erin** (par. 4). Aanbevolen: ernaast.
+1. ~~**IJkpunten naast de envelop of erin**~~ (par. 4) -- ernaast, op de
+   aanbeveling uitgevoerd (par. 4a). Het spoor leeft alleen in de testwereld, dus
+   dit is omkeerbaar tot het naar productie gaat; dan hoort er een bewaartermijn
+   bij, net als bij besluit 2.
 2. **Wat van een productiefout in een herhaalpakket mag** (par. 5), en met welke
    bewaartermijn. Aanbevolen: de regels van het Living Lab overnemen, plus een
    termijn, en tot dat besluit alleen pakketten uit de testwereld.

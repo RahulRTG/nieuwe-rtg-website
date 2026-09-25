@@ -10,7 +10,8 @@
    UITGANG
      0  gezocht en niets gevonden. Dat is GEEN bewijs dat er niets is; de
         uitslag zegt hoeveel reeksen, welke assen en welk zaad.
-     1  een tegenvoorbeeld, verkleind, met het zaad om hem na te spelen.
+     1  een tegenvoorbeeld, verkleind, met het zaad om hem na te spelen, en de
+        eerste divergentie langs de ijkpunten E0-E8 (./lib/divergentie.js).
      2  niet vast te stellen: de motor kon niet draaien.
 
    RTG_SIMULATIEBANK=1 zet de as STORING aan (de npm-opdracht doet dat). Zonder
@@ -23,6 +24,7 @@
 'use strict';
 
 const m = require('./lib/tegenvoorbeeld');
+const dv = require('./lib/divergentie');
 
 const arg = (naam, standaard) => {
   const a = process.argv.find(x => x.startsWith('--' + naam + '='));
@@ -70,6 +72,21 @@ async function hoofd() {
     console.log('  stap ' + (i + 1) + (s.ops.length > 1 ? '  (tegelijk)' : ''));
     for (const op of s.ops) console.log('    ' + toonOp(op));
   });
+  /* WAAR HET VOOR HET EERST ONWAAR WERD (BEWIJSLUS.md par. 4): het verkleinde
+     voorbeeld nog een keer, nu langs de ijkpunten E0-E8. */
+  const o = await dv.ontleed(u.stappen, () => m.maakWereld());
+  if (o.gevonden) {
+    const d = o.divergentie;
+    console.log('\n  EERSTE DIVERGENTIE in stap ' + (o.stap + 1) + ', handeling ' + (o.op + 1) + ': ' +
+      (d.van ? d.van + ' klopt, ' : '') + d.naar + ' wijkt' +
+      (d.overgeslagen.length ? ' (niet waargenomen ertussen: ' + d.overgeslagen.join(', ') + ')' : ''));
+    console.log('    verwacht:    ' + d.ijkpunt.verwacht);
+    console.log('    waargenomen: ' + d.ijkpunt.waargenomen);
+    console.log('    bron:        ' + d.ijkpunt.bron);
+  } else {
+    console.log('\n  EERSTE DIVERGENTIE: niet vast te stellen -- ' +
+      (o.teGrof || 'de ijkpunten zijn alleen ingericht voor stuur en betaal'));
+  }
   console.log('\nNaspelen: node scripts/tegenvoorbeeld.js --zaad=' + zaad + ' --reeksen=' + (u.reeks + 1) + ' --lengte=' + lengte);
   return 1;
 }

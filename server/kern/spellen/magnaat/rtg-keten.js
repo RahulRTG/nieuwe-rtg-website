@@ -69,7 +69,7 @@ module.exports = function rtgKeten({ betaal, crypto }) {
   /* EEN VERSE KETEN. Een lege database, een echte kern/pay eroverheen, en de
      betaalnaad als geldbron. Alles wat pay nodig heeft en hier niet toe doet,
      is een stub -- maar de poort, het grootboek en de idempotentie zijn echt. */
-  function opstelling() {
+  function opstelling({ sseToCustomer } = {}) {
     const db = { data: {} };
     const { pay } = require('../../pay')({
       db,
@@ -86,9 +86,10 @@ module.exports = function rtgKeten({ betaal, crypto }) {
          codenaam kennen we niet" en meet deze proef opnieuw niets. In productie
          kijkt deze functie in de identiteitskluis; hier is de kluis de lijst van
          drie proefspelers en verder niemand. Dat is met opzet nauw: een proef
-         die IEDERE codenaam laat bestaan, toetst die deur niet mee. */
-      keyVanCodenaam: (c) => (SPELERS.includes(c) ? 'proef:' + c : null),
-      sseToCustomer() {},
+         die IEDERE codenaam laat bestaan, toetst die deur niet mee. Een OBJECT
+         zoals kern/gids.js: met een kale tekst ging seintje() nooit af. */
+      keyVanCodenaam: (c) => (SPELERS.includes(c) ? { key: 'proef:' + c } : null),
+      sseToCustomer: sseToCustomer || (() => {}),
       schoon: (x) => String(x || ''),
       betaaldienstKosten: () => 0,
       betaalOpdrachten: {

@@ -2497,7 +2497,20 @@ toets (`test/verzoekbetaal-race.test.js`). Let op de grens van zo'n vondst: over
 HTTP in de toetsopstelling kwam de dubbele betaling NIET door, omdat het werk
 daar nergens op echte I/O wacht; op het productiepad (Rust-motor, echte
 provider) wel. Een vondst van de zoeker gaat over de CODE; welke omgeving hem
-bereikt is een aparte vraag.
+bereikt is een aparte vraag. De vierde stap is de **eerste divergentie**
+(`scripts/lib/divergentie.js`, par. 4a): elk verkleind tegenvoorbeeld loopt nog
+een keer langs negen ijkpunten (E0 intentie tot E8 uitkomst), en de uitslag zegt
+waar het voor het EERST onwaar werd. Op de echte race wijst hij E3 aan (het
+besluit, waar de reparatie zit) terwijl de wet het pas bij E4 (de opslag) zag.
+Drie dingen daar niet wegpoetsen: elk ijkpunt is een VERBOD uit de code en geen
+tweede model van RTG Pay; er worden EFFECTEN geteld en geen ok-antwoorden (een
+herhaling met een sleutel die al slaagde krijgt `ok` zonder iets te doen, en de
+eerste versie meldde daarom op 27 van de 40 gezonde reeksen een afwijking); en
+E6 staat voor RTG Pay altijd op `niet-waargenomen`, want kern/pay zet geen
+gebeurtenis in een envelop. Het spoor staat NAAST de envelop en alleen in de
+testwereld. Het bouwen vond ook een fixturefout: `rtg-keten.js` gaf
+`keyVanCodenaam` een kale tekst waar `kern/gids.js` een object geeft, dus
+`seintje()` ging in de proefwereld nooit af.
 
 ## Structuur en starten (kort)
 

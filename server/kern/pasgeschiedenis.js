@@ -25,6 +25,10 @@
 
 const PASSEN = ['guest', 'rtg', 'lifestyle', 'business'];
 const NAAM = 'pasOvergangen';
+const crypto = require('crypto');
+/* Zelfde late binding als kern/aanwezigheid.js: kern/vergeten.js kent deze
+   module via `vergeet` hieronder, zonder de kern-tas. */
+let actief = null;
 
 /* DE VORM IS EEN KAART PER CODENAAM ({ codenaam: [overgang, ...] }) en geen
    platte lijst. Niet uit smaak: in de PostgreSQL-stand met meer instanties
@@ -59,5 +63,27 @@ module.exports = ({ db, save, bewerkCollectie, accounts }) => {
     return uit;
   }
 
-  return { noteerPasOvergang, pasOvergangen, PASSEN };
+  /* Recht op vergetelheid. De overgangen blijven staan, maar niet meer onder de
+     codenaam: onder een willekeurig nieuw kenmerk dat nergens anders voorkomt.
+     Zo blijft een cohort of een churnmaand over het verleden kloppen (een
+     verwijderd lid WAS lid), terwijl er geen draad meer naar de persoon loopt --
+     van, naar, dag en weg zeggen samen niemand iets. Een verwijdering wordt hier
+     GEEN overgang naar gast: of vertrek door verwijderen churn is, is een
+     definitievraag (definities.churn) en geen bijwerking van het wissen. */
+  function vergeet(codenaam) {
+    if (!codenaam) return false;
+    const cn = String(codenaam);
+    if (!(cn in eigen.kijk(NAAM))) return false;
+    const anoniem = 'weg-' + crypto.randomBytes(9).toString('hex');
+    schrijf(kaart => {
+      if (!Array.isArray(kaart[cn])) return;
+      kaart[anoniem] = kaart[cn]; delete kaart[cn];
+    });
+    return true;
+  }
+
+  const api = { noteerPasOvergang, pasOvergangen, vergeet, PASSEN };
+  actief = api;
+  return api;
 };
+module.exports.vergeet = (codenaam) => (actief ? actief.vergeet(codenaam) : false);

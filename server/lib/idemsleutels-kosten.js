@@ -51,6 +51,14 @@ const SLEUTELS = {
   /* De proef rekent een doorbelasting DOOR zonder hem te doen -- dat is de hele
      bedoeling van een firewallproef, en dus leest hij. */
   'POST /api/office/economie/proef': { leest: true },
+  /* De bedrijfsmaten (AUTONOMIE.md): een stand uitrekenen verandert niets. */
+  'POST /api/office/bedrijfsmaat': { leest: true },
+  /* Het kantoorstuur (besluit C2): het model mag alleen de drie tonen-paden
+     lezen, maar een tweede vraag is een tweede gesprek met een nieuw antwoord. */
+  'POST /api/office/doe': { nietIdempotent: true,
+    waarom: 'elke vraag aan Rahul is een nieuw gesprek met een nieuw antwoord; er verandert niets in ' +
+      'de opslag (alleen tonen-paden), maar een laag die de tweede vraag opslikt geeft een oud antwoord' },
+  'POST /api/office/doe/kaart': { leest: true },
 
   /* ---- zetten: dezelfde waarde tweemaal is dezelfde eindstand ---- */
   'POST /api/kosten/grens/zet': { zelfdeVerzoek: true },                    // het eigen plafond

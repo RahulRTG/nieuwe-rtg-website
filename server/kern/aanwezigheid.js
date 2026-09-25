@@ -60,10 +60,23 @@ function maakAanwezigheid({ db, save, bewerkCollectie, nu }) {
     return uit;
   }
 
-  const api = { raakAanwezig, laatstActief, BEWAAR_DAGEN };
+  /* Recht op vergetelheid: de dag gaat mee weg. Er is geen grond om hem te
+     houden -- hij bestaat alleen voor retentie, en een verwijderd lid telt daar
+     niet meer in mee. Aangeroepen vanuit kern/vergeten.js. */
+  function vergeet(codenaam) {
+    if (!codenaam) return false;
+    const cn = String(codenaam);
+    gezien.delete(cn);
+    if (!(cn in eigen.kijk(NAAM))) return false;
+    schrijf(kaart => { delete kaart[cn]; });
+    return true;
+  }
+
+  const api = { raakAanwezig, laatstActief, vergeet, BEWAAR_DAGEN };
   actief = api;
   return api;
 }
 
 module.exports = maakAanwezigheid;
 module.exports.raak = (codenaam) => (actief ? actief.raakAanwezig(codenaam) : false);
+module.exports.vergeet = (codenaam) => (actief ? actief.vergeet(codenaam) : false);

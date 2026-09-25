@@ -50,7 +50,7 @@ test('fuzz: duizenden willekeurige en kwaadaardige handelingen, en na elke stap 
         v.L.actie('lid', { actie: 'onderneming', naam: 'Fuzz ' + seed });
       }
       let body;
-      if (r() < 0.55) {
+      if (r() < 0.55 && s.vandaag.volgende.length) {       // een leven dat voorbij is, heeft geen handelingen meer
         const a = kies(s.vandaag.volgende);
         body = Object.assign({ actie: a.actie }, a.invoer || {});
         for (const k of Object.keys(body)) {

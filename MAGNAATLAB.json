@@ -1,12 +1,12 @@
 {
   "simulatiemodules": 68,
-  "kernmodules": 2241,
+  "kernmodules": 2244,
   "kernDomeinen": 618,
   "perWereld": {
     "magnaat": {
       "modules": 65,
       "regels": 0,
-      "raaktKern": 5
+      "raaktKern": 6
     },
     "hospitality": {
       "modules": 3,
@@ -14,9 +14,9 @@
       "raaktKern": 0
     }
   },
-  "requiresTotaal": 152,
-  "geraakteKernmodules": 5,
-  "geraakteKernDomeinen": 4,
+  "requiresTotaal": 154,
+  "geraakteKernmodules": 6,
+  "geraakteKernDomeinen": 5,
   "bereikPct": 1,
   "modulesDiePratenNaarBuiten": 0,
   "kruisWereldAanroepen": 3,
@@ -58,6 +58,13 @@
       "doel": "server/kern/magnaat-kantoorregels/tabel",
       "door": [
         "server/kern/magnaat-kantoorregels.js"
+      ],
+      "aantal": 1
+    },
+    {
+      "doel": "server/kern/betaalwaarheid",
+      "door": [
+        "server/kern/spellen/magnaat/rtg-keten.js"
       ],
       "aantal": 1
     },

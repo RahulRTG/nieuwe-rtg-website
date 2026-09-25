@@ -13,6 +13,7 @@
 const R = require('./regels');
 const B = require('./regels-bedrijf');
 const { meld, ontgrendel, euro, tijd } = require('./staat');
+const { mijlpaal } = require('./gids');
 
 const fout = (error) => ({ status: 400, error });
 const opKwartje = (c) => Math.round(c / 2500) * 2500;
@@ -68,6 +69,7 @@ function teken(st, z) {
   const c = vind(st, z.contract);
   if (!c || c.stand !== 'aanbod') return fout('Er ligt geen contract om te tekenen.');
   c.stand = 'actief';
+  mijlpaal(st, 'contract', 'Je eerste vaste klant: ' + c.klant + '.');
   meld(st, 'Contract met ' + c.klant + ' getekend: ' + euro(c.bedrag) + ' per vier weken, ' + c.termijnen + ' termijnen.', 'goed');
   termijn(st, c);
   return { ok: true };

@@ -22,6 +22,7 @@ const { AANBOD, klantenVan, VERVOLG } = require('./klanten');
 const { meld, ontgrendel, post, klantVan, deal: vindDeal, euro, tijd } = require('./staat');
 const { rest } = require('./tijd');
 const { betaalWatVervalt } = require('./geld');
+const { mijlpaal } = require('./gids');
 
 const fout = (error) => ({ status: 400, error });
 const heleEuro = (x) => { const n = Number(x); return Number.isInteger(n) && n > 0 && n <= 100000 ? n * 100 : null; };
@@ -81,6 +82,7 @@ function akkoord(st, d, bedrag, voorschot, dagen) {
   const vb = Math.round(bedrag * voorschot / 100);
   d.afspraak = { bedrag, voorschot, voorschotBedrag: vb, minuten: d.uren, deadline: st.dag + (dagen || d.termijn), dag: st.dag };
   d.fase = 'overeenkomst';
+  mijlpaal(st, 'klant', 'Je eerste klant: ' + d.klant + ', voor ' + euro(bedrag) + '.');
   if (vb) d.voorschotDag = st.dag + 2;
   meld(st, 'Afspraak met ' + d.klant + ': ' + euro(bedrag) + (vb ? ', waarvan ' + euro(vb) + ' vooraf' : '') + ', af op ' +
     R.dagNaam(d.afspraak.deadline) + ' (dag ' + d.afspraak.deadline + ').', 'goed');

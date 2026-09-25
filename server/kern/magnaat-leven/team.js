@@ -16,6 +16,7 @@ const B = require('./regels-bedrijf');
 const { meld, ontgrendel, post, euro, tijd } = require('./staat');
 const { boekVan } = require('./boek');
 const { betaalWatVervalt } = require('./geld');
+const { mijlpaal } = require('./gids');
 
 const fout = (error) => ({ status: 400, error });
 const teamlid = (st, id) => (st.team || []).find(m => m.id === String(id || '') && !m.weg) || null;
@@ -45,6 +46,7 @@ function werf(st, z) {
   if (st.team.filter(m => !m.weg).length >= B.TEAM_MAX) return fout('Meer dan ' + B.TEAM_MAX + ' mensen kun je naast je eigen werk niet aansturen.');
   const m = Object.assign({}, k, { dagen: k.dagen.slice(), sinds: st.dag, betaaldTot: st.dag - 1, gewerkt: 0, gestaakt: null, einde: null, weg: false });
   st.team.push(m);
+  mijlpaal(st, 'team', 'Je eerste medewerker: ' + m.naam + '.');
   if (m.contract === 'dienst') {
     werkplek(st, m);
     betaalWatVervalt(st);

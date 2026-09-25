@@ -17,6 +17,7 @@
     if (Array.isArray(i.aanbod)) v += keuzes('aanbod', 'Wat ga je maken', opties(i.aanbod));
     if (Array.isArray(i.kandidaat)) v += keuzes('kandidaat', 'Wie neem je aan', opties(i.kandidaat));
     if (Array.isArray(i.wijk)) v += keuzes('wijk', 'Waarheen', opties(i.wijk));
+    if (Array.isArray(i.stand)) v += keuzes('stand', 'Hoe zwaar', opties(i.stand));
     if (i.bedrag === 'euro') v += '<label>Bedrag in hele euro\'s <input id="vnF-bedrag" type="number" min="1" step="1" inputmode="numeric"></label>';
     if (i.aantal === 'getal') v += '<label>Hoeveel stuks <input id="vnF-aantal" type="number" min="' + (i.minimum || 1) + '" step="1" value="' + (i.minimum || 1) + '" inputmode="numeric"></label>';
     if (typeof i.dagen === 'number') v += '<label>Af binnen (dagen) <input id="vnF-dagen" type="number" min="1" max="60" step="1" value="' + i.dagen + '"></label>';
@@ -38,6 +39,7 @@
     if (i.aanbod) b.aanbod = v('aanbod');
     if (i.kandidaat) b.kandidaat = v('kandidaat');
     if (i.wijk) b.wijk = v('wijk');
+    if (i.stand) b.stand = v('stand');
     if (i.bedrag) b.bedrag = Number(v('bedrag'));
     if (i.aantal) b.aantal = Number(v('aantal'));
     if (i.voorschot) b.voorschot = Number(v('voorschot'));
@@ -51,7 +53,7 @@
   /* Een handeling zonder iets om in te vullen gaat meteen. */
   function zonderVelden(a) {
     var i = a.invoer || {};
-    return !(i.aanbod || i.kandidaat || i.wijk || i.bedrag || i.aantal || i.minuten === 'minuten' || i.procent || i.naam || typeof i.dagen === 'number');
+    return !(i.aanbod || i.kandidaat || i.wijk || i.stand || i.bedrag || i.aantal || i.minuten === 'minuten' || i.procent || i.naam || typeof i.dagen === 'number');
   }
 
   window.RTGMagnaatLevenInvoer = { html: html, lichaam: lichaam, zonderVelden: zonderVelden };

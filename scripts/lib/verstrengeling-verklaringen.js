@@ -25,6 +25,12 @@ module.exports = [
      wordt gebouwd dan de module die de dag bewaart. */
   { van: 'domein:gids', naar: 'domein:aanwezigheid', soort: 'DOMEINRELATIE',
     reden: 'de ledengids meldt bij elk ledenverzoek de bezoekdag aan kern/aanwezigheid.js; hetzelfde keelgat, geen tweede definitie van aanwezig' },
+  /* HET RECHT OP VERGETELHEID RAAKT DE PASGESCHIEDENIS. kern/vergeten.js is de
+     ene plek die weet wat er bij een verwijdering met elke tak gebeurt; de
+     pasovergangen verliezen daar hun codenaam (en blijven onder een willekeurig
+     kenmerk staan). test/vergeten.test.js veegt de hele database na. */
+  { van: 'domein:vergeten', naar: 'domein:pasgeschiedenis', soort: 'BELEID',
+    reden: 'bij een verwijdering haalt kern/vergeten.js de codenaam van de pasovergangen; de regel woont in kern/pasgeschiedenis.js `vergeet`' },
   /* EEN SCHRIJVER BUITEN DE REQUESTCOMMIT, gedeeld door de twee meetbronnen van
      25 september 2026. Beide schrijven vanuit gewone verzoeken in een gedeelde
      collectie en botsten in PostgreSQL met twee instanties (409 op registratie,

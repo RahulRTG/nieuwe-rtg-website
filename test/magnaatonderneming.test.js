@@ -20,7 +20,8 @@ function leven() {
     doe(b) { const r = L.actie('lid', b); if (!r.error) v.s = r; return r; },
     ok(b) { const r = v.doe(b); assert.ok(!r.error, b.actie + ': ' + r.error); return r; },
     slaap(n = 1) { for (let i = 0; i < n; i++) v.doe({ actie: 'slaap' }); return v.s; },
-    tot(weekdag) { while (R.weekdag(v.s.dag) !== weekdag) v.slaap(); return v.s; },
+    /* Hooguit een week: een toets die op een kapotte kalender eindeloos wacht, zakt nooit. */
+    tot(weekdag) { for (let i = 0; i < 7 && R.weekdag(v.s.dag) !== weekdag; i++) v.slaap(); assert.equal(R.weekdag(v.s.dag), weekdag); return v.s; },
     saldo: (rek) => ((v.st().boek.rekeningen[v.st().wereld + ':' + rek] || {}).saldo || 0),
     meldt: (re) => v.st().meldingen.some(m => re.test(m.tekst))
   };

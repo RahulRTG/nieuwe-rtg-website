@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T06:56:02.187Z",
-    "commit": "5943e9f77",
+    "op": "2026-09-25T07:04:36.520Z",
+    "commit": "86882c32f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3144,6 +3144,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "foundation-vrijgave.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/foundation-vrijgave.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "foundation.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4214,6 +4222,14 @@
       "module": "server/kern/payroll/identiteit.js",
       "operator": "===->!==#0",
       "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "imageherkomst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/imageherkomst.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "imap.test.js": {
@@ -7404,6 +7420,14 @@
       "module": "scripts/release-bewijs.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "release-hardening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/stempel.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "release-trust.test.js": {

@@ -550,6 +550,41 @@ Wat 1.0 bewust **niet** is:
 - **Verliezen op licht.** Dat is de bedoeling van licht.
 - **Faillissement van de onderneming los van de mens.** Het einde gaat over je kamer, niet over een rechtbank. Een faillissement vraagt een curator en een schuldeisersvolgorde die het spel niet heeft.
 
+### NA 1.0: de speelronde met mensen (25 september 2026)
+
+De balans van 1.0 is afgestemd op een automatische speler. Of dag 97 op normaal goed *voelt*, zegt alleen een mens. Daarom vraagt het spel het nu zelf (`oordeel.js`).
+
+**Wanneer het spel het vraagt:**
+- De vraag komt op drie momenten: als je je onderneming inschrijft, als je van je bedrijf kunt leven, en als een leven voorbij is.
+- Je kiest te makkelijk, goed zo of te zwaar. Een regel tekst mag erbij, of je slaat de vraag over.
+- De vraag staat tussen de handelingen en is nooit de hoofdactie. Een leven dat voorbij is, kan alleen nog deze vraag beantwoorden.
+- Een antwoord sluit ook de eerdere momenten die nog openstonden. Wie op het einde zegt hoe het ging, krijgt daarna niet alsnog de vraag van de inschrijving.
+
+**Anoniem, en dat staat in de vorm van wat er bewaard wordt:**
+- Een oordeel draagt het niveau, het moment, de speldag, de datum, het oordeel en eventueel de regel tekst. Verder niets: geen sessiesleutel, geen codenaam, geen wereld.
+- Dat een moment beantwoord is, weet alleen het eigen leven van de speler. Het kantoor kan een oordeel dus niet terugvoeren op een speler.
+- Een regel tekst is hooguit 280 tekens, zonder stuurtekens. Het scherm vraagt er geen namen in te zetten.
+- De lijst houdt hooguit 2000 oordelen; de oudste valt eraf.
+
+**Wat het kantoor ziet:**
+- Het Magnaat-kantoor (`/apps/magnaat-kantoor.html`, achter de boardroom-poort) heeft het blok "Hoe spelers de balans ervaren".
+- Daarin staat een tabel per niveau en moment, plus de laatste twintig regels tekst. Die tekst wordt ge-escaped, want het is invoer van een speler.
+- Het blok hangt aan de bestaande route `/api/office/magnaat/status`. Er is geen nieuwe route.
+- Er komt geen cijfer per speler en geen ranglijst, want er is geen speler om te rangschikken.
+
+**Wat met opzet niet gemeten wordt, en dat staat ook in het antwoord:**
+- wie een oordeel gaf;
+- hoe vaak een vraag werd overgeslagen.
+
+**De toetsen:**
+- `test/magnaatspeelronde.test.js` (7 toetsen). De toets die het anoniem-zijn vasthoudt, legt de sleutels van een opgeslagen oordeel vast en zoekt de sessiesleutel en de wereld in de opslag.
+- `test/magnaatspeelronde.e2e.js`:
+  - een kantoormens op naam ziet het blok leeg, en daarna met oordelen;
+  - tekst met HTML wordt niet als HTML getekend;
+  - een lid komt niet bij de route.
+
+**Wat hiermee nog niet gebeurt:** de balans verschuiven. Dat is een besluit op grond van wat er binnenkomt, en de getallen staan klaar in de tabel MOEILIJKHEID van `regels.js`.
+
 ---
 
 ## 8. De regels

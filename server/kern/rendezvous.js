@@ -1,6 +1,6 @@
 /* Rendez-vous: besloten introductions en Society op codenaam. */
 module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin, sociaalRate,
-  connectionBlocking, media, sseToCustomer, connectionMediaTicketSecret }) => {
+  connectionBlocking, media, sseToCustomer, connectionMediaTicketSecret, partnerSuppliers, partnerBookings }) => {
   const Projection = require('./connection-projection');
   const ConnectionPartner = require('./connection-partner');
   const nu = () => new Date().toISOString();
@@ -25,15 +25,18 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
   /* Gebruik de gids op accountsleutel; sessie-gebaseerde naamresolutie is hier
      onjuist en zou ieder profiel tot dezelfde terugvalcodenaam reduceren. */
   const codenaam = key => (codenaamVan ? codenaamVan(key) : '') || 'Een lid';
-  const partnerCandidates = (program, context) => ConnectionPartner.candidates(db.data.suppliers || [], program,
-    { ...(context || {}), bookings: db.data.reserveringen || [] }).map(s => Projection.project(Projection.NAMES.CONNECTION_PARTNER_OFFICE, {
+  const leveranciers = () => typeof partnerSuppliers === 'function' ? partnerSuppliers() : [];
+  const boekingen = () => typeof partnerBookings === 'function' ? partnerBookings() : [];
+  const partnerCandidates = (program, context) => ConnectionPartner.candidates(leveranciers(), program,
+    { ...(context || {}), bookings: boekingen() }).map(s => Projection.project(Projection.NAMES.CONNECTION_PARTNER_OFFICE, {
       code: s.code, name: s.name, city: s.city, location: s.loc && s.loc.label, program,
       services: ConnectionPartner.stored(s, program).services
     }));
   const partnerEligible = (code, program, context) => {
-    const s = (db.data.suppliers || []).find(x => x.code === code);
-    return !!(s && ConnectionPartner.eligible(s, program, { ...(context || {}), bookings: db.data.reserveringen || [],
-      activeBookings: ConnectionPartner.activeBookings(db.data.reserveringen || [], code, context && context.date, context && context.time) }).ok);
+    const s = leveranciers().find(x => x.code === code);
+    const reserveringen = boekingen();
+    return !!(s && ConnectionPartner.eligible(s, program, { ...(context || {}), bookings: reserveringen,
+      activeBookings: ConnectionPartner.activeBookings(reserveringen, code, context && context.date, context && context.time) }).ok);
   };
   /* Uit de dating-premium-ronde op main: een blokkade werkt in BEIDE richtingen,
      wie u blokkeerde ziet u ook niet meer. */

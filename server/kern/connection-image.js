@@ -34,7 +34,7 @@ function pngChunk(type, data) {
   return Buffer.concat([lengte, naam, data, som]);
 }
 
-function grenzen(width, height) {
+function beeldGrenzen(width, height) {
   if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width < 1 || height < 1)
     throw new Error('De foto heeft geen geldige afmetingen.');
   if (width > MAX_ZIJDE || height > MAX_ZIJDE || width * height > MAX_PIXELS)
@@ -66,7 +66,7 @@ function png(buf) {
   }
   if (!ihdr || !idat.length || !iend || op !== buf.length) throw new Error('De PNG is niet volledig.');
   const width = ihdr.readUInt32BE(0), height = ihdr.readUInt32BE(4);
-  grenzen(width, height);
+  beeldGrenzen(width, height);
   const diepte = ihdr[8], kleur = ihdr[9];
   const kanalen = { 0: 1, 2: 3, 3: 1, 4: 2, 6: 4 }[kleur];
   if (!kanalen || ![1, 2, 4, 8, 16].includes(diepte) || (kleur !== 0 && kleur !== 3 && diepte < 8))
@@ -100,7 +100,7 @@ function jpeg(buf) {
     const begin = op - 2, einde = op + lengte;
     if ([0xc0, 0xc1, 0xc2].includes(marker)) {
       if (lengte < 8) throw new Error('De JPEG-beeldkop is ongeldig.');
-      height = buf.readUInt16BE(op + 3); width = buf.readUInt16BE(op + 5); grenzen(width, height);
+      height = buf.readUInt16BE(op + 3); width = buf.readUInt16BE(op + 5); beeldGrenzen(width, height);
     }
     if (marker === 0xda) {
       delen.push(buf.subarray(begin, einde));
@@ -120,7 +120,7 @@ function jpeg(buf) {
   return { bytes, mime: 'image/jpeg', width, height, metadataStripped: true };
 }
 
-function normaliseer(bytes, opgegevenMime) {
+function beeldNormaliseer(bytes, opgegevenMime) {
   if (!Buffer.isBuffer(bytes) || !bytes.length) throw new Error('Kies eerst een foto.');
   if (bytes.length > MAX_BYTES) throw new Error('De foto is groter dan 8 MB.');
   let uit;
@@ -132,4 +132,4 @@ function normaliseer(bytes, opgegevenMime) {
   return uit;
 }
 
-module.exports = { normaliseer, png, jpeg, MAX_BYTES, MAX_ZIJDE, MAX_PIXELS };
+module.exports = { normaliseer: beeldNormaliseer, png, jpeg, MAX_BYTES, MAX_ZIJDE, MAX_PIXELS };

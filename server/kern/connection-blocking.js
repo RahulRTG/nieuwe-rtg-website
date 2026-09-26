@@ -10,12 +10,10 @@
 module.exports = ({ db, save, nu }) => {
   const listeners = new Set();
   const klok = typeof nu === 'function' ? nu : () => new Date().toISOString();
-  const lees = () => (db.data.connectionBlocks && typeof db.data.connectionBlocks === 'object')
-    ? db.data.connectionBlocks : null;
-  const pak = () => {
-    if (!db.data.connectionBlocks || typeof db.data.connectionBlocks !== 'object') db.data.connectionBlocks = {};
-    return db.data.connectionBlocks;
-  };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/connection-blocking',
+    bezit: { connectionBlocks: 'kaart' } });
+  const lees = () => eigen.kijk('connectionBlocks');
+  const pak = () => eigen.bak('connectionBlocks');
   const richting = (a, b) => {
     const r = lees();
     return !!(r && r[a] && r[a][b]);
@@ -24,7 +22,7 @@ module.exports = ({ db, save, nu }) => {
     const x = String(a || ''), y = String(b || '');
     return !!(x && y && (richting(x, y) || richting(y, x)));
   }
-  function blokkeer(van, naar, product) {
+  function connectionBlokkeer(van, naar, product) {
     const a = String(van || ''), b = String(naar || '');
     if (!a || !b || a === b) return { ok: false, error: 'Ongeldige blokkade.' };
     const r = pak();
@@ -34,5 +32,6 @@ module.exports = ({ db, save, nu }) => {
     for (const fn of listeners) { try { fn(a, b, product); } catch (e) {} }
     return { ok: true };
   }
-  return { isGeblokkeerd, blokkeer, onBlock(fn) { if (typeof fn === 'function') listeners.add(fn); return () => listeners.delete(fn); } };
+  return { isGeblokkeerd, blokkeer: connectionBlokkeer,
+    onBlock(fn) { if (typeof fn === 'function') listeners.add(fn); return () => listeners.delete(fn); } };
 };

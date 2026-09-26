@@ -68,9 +68,9 @@ function action(def, beschikbaar) {
   return capability ? { id, labelKey, capability, ...(intent ? { intent } : {}) } : null;
 }
 
-function project(surface, availableCapabilities) {
+function edgeProject(surface, availableCapabilities) {
   const beschikbaar = new Set(availableCapabilities || []);
   return (DEFINITIONS[surface] || []).map(d => action(d, beschikbaar)).filter(Boolean);
 }
 
-module.exports = { VERSION, DEFINITIONS, project };
+module.exports = { VERSION, DEFINITIONS, project: edgeProject };

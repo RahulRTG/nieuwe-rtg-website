@@ -92,6 +92,8 @@ test('blokkeren in een product sluit beide producten in beide richtingen', async
   assert.equal((await api('/api/member/rendezvous/blokkeer', { id: dInC.id }, c.token)).status, 200);
   const vonkC = await api('/api/vonk/selectie', {}, c.token);
   const vonkD = await api('/api/vonk/selectie', {}, d.token);
+  assert.ok(vonkC.body.mensen.length >= 1, 'C houdt andere geldige Vonk-kandidaten over');
+  assert.ok(vonkD.body.mensen.length >= 1, 'D houdt andere geldige Vonk-kandidaten over');
   assert.ok(!vonkC.body.mensen.some(x => x.codenaam === d.codenaam), 'Rendez-vous-blokkade verwijdert D uit Vonk bij C');
   assert.ok(!vonkD.body.mensen.some(x => x.codenaam === c.codenaam), 'ook deze richting is wederzijds');
 });

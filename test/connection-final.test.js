@@ -50,8 +50,13 @@ test('voice en video bestaan pas na doelgebonden wederzijdse consent en revoke s
   assert.equal(comm.sendSignal('a',start.call.id,'caption',{text:'Goedenavond'}).status,200);
   const first=comm.poll('b',start.call.id);assert.equal(first.signals[0].payload.text,'Goedenavond');
   assert.deepEqual(comm.poll('b',start.call.id,first.signals[0].id).signals,[],'poll levert bevestigde signalen niet opnieuw');
+  comm.terminatePair('a','b','BLOCKED');
+  assert.equal(db.data.connectionCommunication.calls.find(x=>x.id===start.call.id).state,'BLOCKED',
+    'een blokkade beëindigt de actieve realtime-sessie in de opslag');
+  const hervat=comm.startCall('a',{id:'a|b'},'voice','call-start-key-0004');
+  assert.equal(comm.answer('b',hervat.call.id,true).call.state,'ACTIVE');
   comm.consent('a',{id:'a|b'},'connection.voice',false);
-  assert.equal(comm.poll('b',start.call.id).call.state,'CONSENT_REVOKED');
+  assert.equal(comm.poll('b',hervat.call.id).call.state,'CONSENT_REVOKED');
 });
 
 test('Concierge kan alleen via echte service-overgangen bevestigd worden',()=>{

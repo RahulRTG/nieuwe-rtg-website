@@ -90,6 +90,7 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
 
   profileMedia = require('../connection-profile-media')({ db, save, crypto, media, schoon, gate: mag,
     isBlocked: geblokkeerd, isMatch: (a, b) => !!matchTussen(a, b),
+    profileActive: owner => !!(d().profielen[owner] && d().profielen[owner].actief !== false),
     ticketSecret: connectionMediaTicketSecret });
 
   const communication = require('../connection-communication')({ product: 'vonk', db, save, crypto, media, schoon,

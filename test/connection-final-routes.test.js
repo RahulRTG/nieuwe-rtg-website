@@ -6,6 +6,7 @@ const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
 const {startServer,stop,kantoorAlsPersoon,elevateTier}=require('./helper');
+const {padVorm}=require('../server/kern/journaalvorm');
 
 const ID_PNG='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const FOTO=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAADHRFWHRHUFMANTIuMSw0LjMwjiV2AAAAFUlEQVR4nGOokNP4D8IMJxZE/QdhAEXMCP2u5XZBAAAAAElFTkSuQmCC','base64');
@@ -27,13 +28,58 @@ test.after(()=>{stop(srv&&srv.child);try{fs.rmSync(TMP,{recursive:true,force:tru
 test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',async()=>{
   for(const u of [A,B]){
     assert.equal((await api('/api/vonk/profiel',{over:'Open voor een rustige ontmoeting.',stad:'Utrecht',lat:52.09,lng:5.12,leeftijdMin:18,leeftijdMax:99,maxKm:100},u.token)).status,200);
-    assert.equal((await api('/api/member/rendezvous/profiel/zet',{aan:true,over:'Private society member',locaties:['Amsterdam']},u.token)).status,200);
+    assert.equal((await api('/api/member/rendezvous/profiel/zet',{aan:true,over:'Private society member',locaties:['Amsterdam'],
+      aanwezig:[{stad:'Amsterdam',van:'2026-11-06',tot:'2026-11-08'}]},u.token)).status,200);
   }
   const upload=await api('/api/member/rendezvous/profile-photo',FOTO,B.token,{'Content-Type':'image/png','X-RTG-Visibility':'DISCOVERY','Idempotency-Key':'rv-profile-photo-final-0001'});
   assert.equal(upload.status,200,JSON.stringify(upload.body));
   assert.equal((await api('/api/member/rendezvous/profile-photo/publish',{id:upload.body.media.id,visibility:'DISCOVERY'},B.token)).status,200);
   const candidates=await api('/api/member/rendezvous/kandidaten',{},A.token),candidate=candidates.body.kandidaten.find(x=>x.codenaam===B.codenaam);
   assert.equal(candidate.media.length,1);assert.equal(Object.hasOwn(candidate.media[0],'ref'),false);
+  assert.equal((await fetch(base+candidate.media[0].src)).status,200);
+  assert.equal((await fetch(base+'/api/member/rendezvous/profile-photo/delivery/ongeldig')).status,404);
+  assert.equal(padVorm(candidate.media[0].src),'/api/member/rendezvous/profile-photo/delivery/:ticket');
+  assert.equal((await api('/api/member/rendezvous/like',{id:candidate.id},A.token)).status,200);
+  const candidateA=(await api('/api/member/rendezvous/kandidaten',{},B.token)).body.kandidaten.find(x=>x.codenaam===A.codenaam);
+  assert.equal((await api('/api/member/rendezvous/like',{id:candidateA.id},B.token)).status,200);
+  assert.equal((await api('/api/member/rendezvous/matches',{},A.token)).body.matches.length,1);
+
+  const rvContext=[candidate.id,candidateA.id].sort().join('|');
+  assert.equal((await api('/api/connection/rendezvous/text',{id:rvContext,text:'Zullen we rustig kennismaken?'},A.token)).status,200);
+  let rvStatus=await api('/api/connection/rendezvous/status',{id:rvContext},B.token);
+  assert.equal(rvStatus.body.messages[0].text,'Zullen we rustig kennismaken?');
+  const rvText=rvStatus.body.messages[0];
+  assert.equal((await api('/api/connection/rendezvous/message/report',{id:rvContext,messageId:rvText.id,reason:'Routeproef'},B.token)).status,200);
+  assert.equal((await api('/api/connection/rendezvous/message/remove',{id:rvContext,messageId:rvText.id},A.token)).status,200);
+  const rvMedia=await api('/api/connection/rendezvous/message-media',WEBM,A.token,{'Content-Type':'audio/webm','X-RTG-Context':rvContext,'X-RTG-Media-Kind':'voice','X-RTG-Transcript':'Vrijdagavond past voor mij.','Idempotency-Key':'rv-voice-final-0001'});
+  assert.equal(rvMedia.status,200,JSON.stringify(rvMedia.body));
+  rvStatus=await api('/api/connection/rendezvous/status',{id:rvContext},B.token);
+  const rvVoice=rvStatus.body.messages.find(x=>x.kind==='voice');
+  assert.equal(rvVoice.media.transcript,'Vrijdagavond past voor mij.');
+  assert.equal((await fetch(base+rvVoice.media.src)).status,200);
+  assert.equal((await fetch(base+'/api/connection/rendezvous/message-media/delivery/ongeldig')).status,404);
+  assert.equal(padVorm(rvVoice.media.src),'/api/connection/rendezvous/message-media/delivery/:ticket');
+  for(const u of [A,B])assert.equal((await api('/api/connection/rendezvous/consent',{id:rvContext,capability:'connection.voice',active:true},u.token)).status,200);
+  const rvCall=await api('/api/connection/rendezvous/call/start',{id:rvContext,type:'voice'},A.token,{'Idempotency-Key':'rv-call-final-0001'});
+  assert.equal(rvCall.body.call.state,'RINGING');
+  assert.equal((await api('/api/connection/rendezvous/call/answer',{callId:rvCall.body.call.id,accept:true},B.token)).body.call.state,'ACTIVE');
+  assert.equal((await api('/api/connection/rendezvous/call/signal',{callId:rvCall.body.call.id,kind:'caption',payload:{text:'Tot vrijdag'}},A.token)).status,200);
+  assert.equal((await api('/api/connection/rendezvous/call/poll',{callId:rvCall.body.call.id},B.token)).body.signals[0].payload.text,'Tot vrijdag');
+  assert.equal((await api('/api/connection/rendezvous/call/end',{callId:rvCall.body.call.id},A.token)).status,200);
+  assert.equal((await api('/api/member/rendezvous/profile-photo/order',{ids:[upload.body.media.id]},B.token)).status,200);
+  assert.equal((await api('/api/member/rendezvous/profile-photo/remove',{id:upload.body.media.id},B.token)).status,200);
+  const arranged=await api('/api/member/rendezvous/arrange',{id:candidate.id,setting:'diner'},A.token);
+  assert.equal(arranged.status,200,JSON.stringify(arranged.body));
+  const akkoordA=await api('/api/member/rendezvous/akkoord',{id:candidate.id,ja:true},A.token);
+  assert.equal(akkoordA.status,200,JSON.stringify(akkoordA.body));
+  const akkoordB=await api('/api/member/rendezvous/akkoord',{id:candidateA.id,ja:true},B.token);
+  assert.equal(akkoordB.status,200,JSON.stringify(akkoordB.body));
+  const arrangements=await api('/api/office/rendezvous/arrangements',{},office);
+  const arrangement=arrangements.body.requests.find(x=>x.id===rvContext);
+  assert.ok(arrangement,'de dubbele goedkeuring bereikt de werkqueue van De Rechterhand');
+  for(const state of ['ACKNOWLEDGED','IN_PROGRESS'])
+    assert.equal((await api('/api/office/rendezvous/arrangement/step',{id:arrangement.id,state},office)).status,200);
+  assert.equal((await api('/api/office/rendezvous/arrangement/step',{id:arrangement.id,state:'CONFIRMED',confirmation:'Arrangement RV-2026'},office)).status,200);
 
   await api('/api/vonk/like',{codenaam:B.codenaam},A.token);const matched=await api('/api/vonk/like',{codenaam:A.codenaam},B.token);
   assert.equal(matched.body.match,true);const id=matched.body.id;
@@ -47,6 +93,7 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   assert.equal(media.status,200,JSON.stringify(media.body));status=await api('/api/connection/vonk/status',{id},B.token);
   const voice=status.body.messages.find(x=>x.kind==='voice');assert.equal(voice.media.transcript,'Ik stel zaterdagmiddag voor.');
   assert.equal((await fetch(base+voice.media.src)).status,200);
+  assert.equal(padVorm(voice.media.src),'/api/connection/vonk/message-media/delivery/:ticket');
 
   for(const u of [A,B])assert.equal((await api('/api/connection/vonk/consent',{id,capability:'connection.voice',active:true},u.token)).status,200);
   const edge=await api('/api/vonk/edge',{id},A.token);assert.ok(edge.body.actions.some(x=>x.id==='voice'));
@@ -56,6 +103,8 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   const poll=await api('/api/connection/vonk/call/poll',{callId:call.body.call.id},B.token);assert.equal(poll.body.signals[0].payload.text,'Goedenavond');
   await api('/api/connection/vonk/consent',{id,capability:'connection.voice',active:false},A.token);
   assert.equal((await api('/api/connection/vonk/call/poll',{callId:call.body.call.id},B.token)).body.call.state,'CONSENT_REVOKED');
+  assert.equal((await api('/api/connection/vonk/call/end',{callId:call.body.call.id},A.token)).status,200);
+  assert.equal((await fetch(base+'/api/connection/vonk/message-media/delivery/ongeldig')).status,404);
 
   const request=await api('/api/member/rendezvous/concierge/request',{subject:'Diner',request:'Een rustige tafel in Amsterdam.',idempotencyKey:'rv-concierge-final-0001'},A.token);
   const rid=request.body.request.id;for(const [state,extra] of [['ACKNOWLEDGED',{}],['IN_PROGRESS',{}],['PROPOSED',{proposal:'Vrijdag om 20:00'}]])
@@ -66,6 +115,9 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
 
   const circle=await api('/api/office/rendezvous/circle/create',{name:'Founders',theme:'Ondernemen',context:'Besloten tafel.',idempotencyKey:'rv-circle-final-0001'},office);
   await api('/api/office/rendezvous/circle/invite',{circleId:circle.body.circle.id,codename:A.codenaam},office);
+  const gathering=await api('/api/office/rendezvous/circle/gathering',{circleId:circle.body.circle.id,title:'Founders dinner',city:'Amsterdam',date:'2026-11-06',context:'Een rustige kennismaking.','idempotencyKey':'rv-gathering-final-0001'},office);
+  assert.equal((await api('/api/member/rendezvous/circle/rsvp',{circleId:circle.body.circle.id,gatheringId:gathering.body.gathering.id,yes:true},A.token)).body.state,'ACCEPTED');
+  assert.equal((await api('/api/office/rendezvous/circles',{},office)).body.circles.length,1);
   const circles=await api('/api/member/rendezvous/circles',{},A.token);
   assert.equal(circles.status,200);assert.equal(Object.hasOwn(circles.body.circles[0],'members'),false);
 });

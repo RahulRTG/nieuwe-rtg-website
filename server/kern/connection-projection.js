@@ -2,6 +2,7 @@
 'use strict';
 
 const VERSION = 6;
+const { rahulOutputGuard } = require('./connection-projection-rahul');
 
 const NAMES = Object.freeze({
   VONK_PROFILE_OWNER: 'VONK_PROFILE_OWNER',
@@ -78,7 +79,7 @@ function presence(v) {
   return alleen(v, CONTRACTS[NAMES.RENDEZVOUS_PRESENCE]);
 }
 
-function project(name, source) {
+function connectionProject(name, source) {
   if (!CONTRACTS[name]) throw new Error('Onbekende Connection-projectie: ' + name);
   const s = source && typeof source === 'object' ? source : {};
   const uit = alleen(s, CONTRACTS[name]);
@@ -93,8 +94,8 @@ function project(name, source) {
   }
 
   if (name === NAMES.VONK_MATCH) {
-    if (aanwezig(s.tafel)) uit.tafel = project(NAMES.VONK_MEET, s.tafel);
-    if (aanwezig(s.berichten)) uit.berichten = s.berichten.map(x => project(NAMES.VONK_CONVERSATION, x));
+    if (aanwezig(s.tafel)) uit.tafel = connectionProject(NAMES.VONK_MEET, s.tafel);
+    if (aanwezig(s.berichten)) uit.berichten = s.berichten.map(x => connectionProject(NAMES.VONK_CONVERSATION, x));
   }
   if (name === NAMES.VONK_CONVERSATION && aanwezig(s.media) && s.media) {
     uit.media = alleen(s.media, ['purpose', 'mime', 'src']);
@@ -103,7 +104,7 @@ function project(name, source) {
     if (aanwezig(s.messages)) uit.messages = s.messages.map(m => alleen(m, ['id', 'kind', 'mine', 'text', 'at', 'media']));
     for (const m of uit.messages || []) if (m.media) m.media = alleen(m.media, ['purpose', 'mime', 'src', 'transcript']);
     if (aanwezig(s.consent)) uit.consent = alleen(s.consent, ['voice', 'video']);
-    if (aanwezig(s.call) && s.call) uit.call = project(NAMES.CONNECTION_CALL, s.call);
+    if (aanwezig(s.call) && s.call) uit.call = connectionProject(NAMES.CONNECTION_CALL, s.call);
   }
   if (name === NAMES.RENDEZVOUS_MATCH || name === NAMES.RENDEZVOUS_INTRODUCTION) {
     if (aanwezig(s.samen)) uit.samen = s.samen.map(presence);
@@ -131,32 +132,7 @@ function project(name, source) {
 }
 
 function projectList(name, rows) {
-  return (Array.isArray(rows) ? rows : []).map(row => project(name, row));
+  return (Array.isArray(rows) ? rows : []).map(row => connectionProject(name, row));
 }
 
-/* Rahul krijgt eerst een minimale inputprojectie. Zijn vrije tekst passeert na
-   generatie opnieuw deze grens: een waarde uit een privébron die niet in de
-   projectie stond, maakt het gehele antwoord dicht in plaats van half rood. */
-const GEVOELIGE_SLEUTELS = new Set(['legalName', 'echteNaam', 'birthDate', 'geboortedatum', 'address', 'adres',
-  'exactLocation', 'lat', 'lng', 'religion', 'geloof', 'religionImportance', 'thuis']);
-
-function gevoeligeWaarden(value, gevonden, sleutel) {
-  const uit = gevonden || [];
-  if (Array.isArray(value)) for (const v of value) gevoeligeWaarden(v, uit, sleutel);
-  else if (value && typeof value === 'object') for (const [k, v] of Object.entries(value)) gevoeligeWaarden(v, uit, k);
-  else if (GEVOELIGE_SLEUTELS.has(sleutel) && typeof value === 'string' && value.trim().length >= 3) uit.push(value.trim());
-  else if (GEVOELIGE_SLEUTELS.has(sleutel) && typeof value === 'number' && Number.isFinite(value)) uit.push(String(value));
-  return uit;
-}
-
-function rahulOutputGuard(tekst, toegestaneProjectie, priveBronnen) {
-  const antwoord = String(tekst || '');
-  const toegestaan = JSON.stringify(toegestaneProjectie || {}).toLowerCase();
-  const verboden = gevoeligeWaarden(Array.isArray(priveBronnen) ? priveBronnen : [priveBronnen]);
-  const lek = verboden.find(v => !toegestaan.includes(v.toLowerCase()) &&
-    antwoord.toLowerCase().includes(v.toLowerCase()));
-  if (lek) return { ok: false, tekst: 'Ik kan alleen werken met gegevens die voor deze ontmoeting zijn vrijgegeven.' };
-  return { ok: true, tekst: antwoord };
-}
-
-module.exports = { VERSION, NAMES, CONTRACTS, project, projectList, rahulOutputGuard };
+module.exports = { VERSION, NAMES, CONTRACTS, project: connectionProject, projectList, rahulOutputGuard };

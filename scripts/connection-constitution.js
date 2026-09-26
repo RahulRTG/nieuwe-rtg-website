@@ -32,6 +32,7 @@ const BRONNEN = [
   'server/kern/connection-consent.js',
   'server/kern/connection-edge.js',
   'server/kern/connection-projection.js',
+  'server/kern/connection-projection-rahul.js',
   'server/kern/connection-product-state.js',
   'server/kern/connection-image.js',
   'server/kern/connection-profile-media.js',

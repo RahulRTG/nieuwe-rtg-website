@@ -7,10 +7,11 @@ module.exports = function maakConnectionCommunication({ product, db, save, crypt
   resolveContext, isBlocked, notify, signal, ticketSecret }) {
   const rates = new Map();
   const now = () => new Date().toISOString();
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/connection-communication',
+    bezit: { connectionCommunication: 'kaart' } });
   const root = () => {
-    if (!db.data.connectionCommunication || typeof db.data.connectionCommunication !== 'object')
-      db.data.connectionCommunication = { messages: [], media: [], calls: [], consent: {} };
-    const r = db.data.connectionCommunication;
+    const r = eigen.bak('connectionCommunication', b => Object.assign(b,
+      { messages: [], media: [], calls: [], consent: {} }));
     for (const k of ['messages', 'media', 'calls', 'reports']) if (!Array.isArray(r[k])) r[k] = [];
     if (!r.consent || typeof r.consent !== 'object') r.consent = {};
     return r;
@@ -47,7 +48,7 @@ module.exports = function maakConnectionCommunication({ product, db, save, crypt
     if (m.mediaId) out.media = mediaService.project(m.mediaId, viewer, m.scope);
     return out;
   }
-  function status(actor, input) {
+  function communicationStatus(actor, input) {
     const c = context(actor, input);
     if (!c) return { status: 404, code: 'CONNECTION_CONTEXT_NOT_FOUND', error: 'Dit gesprek bestaat niet.' };
     const r = root();
@@ -71,7 +72,7 @@ module.exports = function maakConnectionCommunication({ product, db, save, crypt
     else Consent.grant(r.consent, b, { at: now() });
     if (active === false) calls.close(c, capability === CALL_TYPES.video ? 'video' : 'voice', 'CONSENT_REVOKED');
     save(); ping(c.counterpart, 'consent', c.scope);
-    return status(actor, input);
+    return communicationStatus(actor, input);
   }
   function sendText(actor, input, value) {
     const c = context(actor, input); if (!c) return { status: 404, error: 'Dit gesprek bestaat niet.' };
@@ -96,7 +97,7 @@ module.exports = function maakConnectionCommunication({ product, db, save, crypt
     try { if (notify && kind === 'call') notify(actor, { title: product === 'vonk' ? 'Vonk' : 'Rendez-vous', body: 'Er is een oproep voor u.', scope: 'lifestyle' }); } catch (e) {}
   }
   const deliver = token => mediaService.deliver(token);
-  return { status, consent, sendText, sendMedia, ...messageActions, startCall:calls.start, answer:calls.answer,
+  return { status:communicationStatus, consent, sendText, sendMedia, ...messageActions, startCall:calls.start, answer:calls.answer,
     sendSignal:calls.signal, poll:calls.poll, end:calls.end, deliver,
     hasMutual: (actor, input, capability) => { const c = context(actor, input); return !!(c && mutual(root(), actor, c, capability)); },
     CALL_TYPES, MEDIA_TYPES: mediaService.MEDIA_TYPES };

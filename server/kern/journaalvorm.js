@@ -18,6 +18,10 @@ function padVorm(p) {
        niet noodzakelijk zestien hextekens achter elkaar. */
     .replace(/^\/api\/vonk\/profile-photo\/delivery\/[^/]+(?=\/|$)/i,
       '/api/vonk/profile-photo/delivery/:ticket')
+    .replace(/^\/api\/member\/rendezvous\/profile-photo\/delivery\/[^/]+(?=\/|$)/i,
+      '/api/member/rendezvous/profile-photo/delivery/:ticket')
+    .replace(/^\/api\/connection\/(vonk|rendezvous)\/message-media\/delivery\/[^/]+(?=\/|$)/i,
+      '/api/connection/$1/message-media/delivery/:ticket')
     /* Oude wervingslinks droegen de zes-teken-bearer in het pad. Nieuwe links
        gebruiken uitsluitend een browserfragment, maar een oude bookmark mag
        ook bij een omleiding nooit alsnog in verzoek-, fout- of journaallogs

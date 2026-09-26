@@ -81,6 +81,9 @@ test('upload accepted is een concept en lekt nooit een opslagreferentie', async 
   assert.equal(opnieuw.body.herhaald, true);
   assert.equal(opnieuw.body.media.id, r.body.media.id);
   B.fotoId = r.body.media.id;
+  const volgorde = await json('/api/vonk/profile-photo/order', { ids:[B.fotoId] }, B.token);
+  assert.equal(volgorde.status, 200);
+  assert.equal(volgorde.body.media[0].id, B.fotoId);
   const s = await json('/api/vonk/selectie', {}, A.token);
   const kaart = s.body.mensen.find(x => x.codenaam === B.codenaam);
   assert.ok(kaart); assert.deepEqual(kaart.media, []);
@@ -139,6 +142,8 @@ test('verwijderen wist de eigenaarprojectie en maakt het ticket direct waardeloo
   const up = await upload(FOTO, 'image/png', A.token, 'PRIVATE', 'profile-photo-upload-remove-0001');
   const ticket = up.body.media.src;
   assert.equal((await fetch(base + ticket)).status, 200);
+  const voor = await json('/api/vonk/selectie', {}, A.token);
+  assert.ok(voor.body.profiel.media.length >= 1, 'de eigenaarprojectie bevat de foto voor het verwijderen');
   const weg = await json('/api/vonk/profile-photo/remove', { id:up.body.media.id }, A.token);
   assert.equal(weg.status, 200);
   assert.equal((await fetch(base + ticket)).status, 404);

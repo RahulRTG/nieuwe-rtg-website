@@ -33,7 +33,7 @@ const REDENEN = Object.freeze({
   RAHUL_DENY: 'Rahul heeft hier niet meer rechten dan het lid.'
 });
 
-function weiger(code, extra) {
+function connectionWeiger(code, extra) {
   return { allow: false, code, reden: REDENEN[code], ...(extra || {}) };
 }
 
@@ -50,35 +50,35 @@ function projectieVan(product, capability, actor, capabilityContract) {
   return capabilityContract && capabilityContract.projection || null;
 }
 
-function beslis({ actor, product, capability, state, _delegated }) {
+function connectionBeslis({ actor, product, capability, state, _delegated }) {
   const p = CONTRACT.products[product];
-  if (!p) return weiger('PRODUCT_UNKNOWN');
+  if (!p) return connectionWeiger('PRODUCT_UNKNOWN');
   const c = CONTRACT.capabilities[capability];
-  if (!c) return weiger('CAPABILITY_UNKNOWN');
-  if (!c.implemented) return weiger('NOT_IMPLEMENTED');
+  if (!c) return connectionWeiger('CAPABILITY_UNKNOWN');
+  if (!c.implemented) return connectionWeiger('NOT_IMPLEMENTED');
   const actors = p.capabilities[capability];
-  if (!actors) return weiger('PRODUCT_DENY');
+  if (!actors) return connectionWeiger('PRODUCT_DENY');
   const s = state && typeof state === 'object' ? state : {};
 
   /* Een blokkade mag nooit worden omzeild via een andere capability. Alleen de
      blokkeerhandeling zelf blijft bereikbaar, zodat die veilig idempotent kan
      zijn. */
-  if (s.blocked && capability !== 'connection.safety.block') return weiger('BLOCKED');
+  if (s.blocked && capability !== 'connection.safety.block') return connectionWeiger('BLOCKED');
 
-  if (!actors.includes(actor)) return weiger('ACTOR_DENY');
+  if (!actors.includes(actor)) return connectionWeiger('ACTOR_DENY');
   const projection = projectieVan(p, capability, actor, c);
   if (actor === 'office') return { allow: true, code: 'ALLOW', domainState: c.domainState.slice(), projection };
 
-  if (!pasOpen(p, s.pass)) return weiger('PASS_REQUIRED');
-  if (!s.verified) return weiger('IDENTITY_REQUIRED');
-  if (!s.adult) return weiger('AGE_REQUIRED');
+  if (!pasOpen(p, s.pass)) return connectionWeiger('PASS_REQUIRED');
+  if (!s.verified) return connectionWeiger('IDENTITY_REQUIRED');
+  if (!s.adult) return connectionWeiger('AGE_REQUIRED');
 
   /* Rahul krijgt eerst zijn expliciete productregel en daarna exact dezelfde
      voordeurbeslissing als het lid. `_delegated` voorkomt recursie en is niet
      publiek nodig. */
   if (actor === 'rahul' && !_delegated) {
-    const lid = beslis({ actor: 'member', product, capability, state: s, _delegated: true });
-    if (!lid.allow) return weiger('RAHUL_DENY', { oorzaak: lid.code });
+    const lid = connectionBeslis({ actor: 'member', product, capability, state: s, _delegated: true });
+    if (!lid.allow) return connectionWeiger('RAHUL_DENY', { oorzaak: lid.code });
   }
   return { allow: true, code: 'ALLOW', domainState: c.domainState.slice(), projection };
 }
@@ -96,4 +96,4 @@ function matrix() {
   return uit;
 }
 
-module.exports = { CONTRACT, REDENEN, beslis, matrix };
+module.exports = { CONTRACT, REDENEN, beslis: connectionBeslis, matrix };

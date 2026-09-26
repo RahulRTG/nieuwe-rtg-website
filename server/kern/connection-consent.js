@@ -21,7 +21,7 @@ const MUTUAL_STATES = Object.freeze({
   REVOKED: 'REVOKED'
 });
 
-function normaliseer(input) {
+function consentNormaliseer(input) {
   const b = input && typeof input === 'object' ? input : {};
   const uit = {
     actor: String(b.actor || '').trim(),
@@ -37,15 +37,15 @@ function normaliseer(input) {
   return uit;
 }
 
-function sleutel(input) {
-  const b = normaliseer(input);
+function consentSleutel(input) {
+  const b = consentNormaliseer(input);
   return [b.actor, b.counterpart, b.purpose, b.capability, b.scope, 'v' + b.version]
     .map(x => encodeURIComponent(x)).join('|');
 }
 
 function record(ledger, input) {
   if (!ledger || typeof ledger !== 'object') return null;
-  return ledger[sleutel(input)] || null;
+  return ledger[consentSleutel(input)] || null;
 }
 
 function toestand(ledger, input, now) {
@@ -57,10 +57,10 @@ function toestand(ledger, input, now) {
   return Number.isFinite(einde) && Number.isFinite(tijd) && einde <= tijd ? STATES.EXPIRED : STATES.ACTIVE;
 }
 
-function gebeurtenis(ledger, input, state, opties) {
+function consentGebeurtenis(ledger, input, state, opties) {
   if (!ledger || typeof ledger !== 'object') throw new Error('Een toestemmingsledger is vereist.');
-  const b = normaliseer(input);
-  const id = sleutel(b);
+  const b = consentNormaliseer(input);
+  const id = consentSleutel(b);
   const oud = ledger[id] || {};
   const at = String((opties && opties.at) || new Date().toISOString());
   const events = Array.isArray(oud.events) ? oud.events.slice() : [];
@@ -78,10 +78,10 @@ function gebeurtenis(ledger, input, state, opties) {
   return ledger[id];
 }
 
-function grant(ledger, input, opties) { return gebeurtenis(ledger, input, STATES.ACTIVE, opties); }
-function revoke(ledger, input, opties) { return gebeurtenis(ledger, input, STATES.REVOKED, opties); }
-function expire(ledger, input, opties) { return gebeurtenis(ledger, input, STATES.EXPIRED, opties); }
-function actief(ledger, input, now) { return toestand(ledger, input, now) === STATES.ACTIVE; }
+function grant(ledger, input, opties) { return consentGebeurtenis(ledger, input, STATES.ACTIVE, opties); }
+function revoke(ledger, input, opties) { return consentGebeurtenis(ledger, input, STATES.REVOKED, opties); }
+function expire(ledger, input, opties) { return consentGebeurtenis(ledger, input, STATES.EXPIRED, opties); }
+function consentActief(ledger, input, now) { return toestand(ledger, input, now) === STATES.ACTIVE; }
 
 function wederzijds(ledger, a, b, now) {
   const sa = toestand(ledger, a, now);
@@ -95,4 +95,5 @@ function wederzijds(ledger, a, b, now) {
   return MUTUAL_STATES.NONE;
 }
 
-module.exports = { STATES, MUTUAL_STATES, normaliseer, sleutel, record, toestand, grant, revoke, expire, actief, wederzijds };
+module.exports = { STATES, MUTUAL_STATES, normaliseer: consentNormaliseer, sleutel: consentSleutel,
+  record, toestand, grant, revoke, expire, actief: consentActief, wederzijds };

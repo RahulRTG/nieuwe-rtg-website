@@ -22,11 +22,10 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
   const ticketBasis = ticketSecret ? String(ticketSecret) : crypto.randomBytes(32);
   const key = crypto.createHash('sha256').update(ticketBasis).update('\0connection-profile-media').digest();
   const nu = () => new Date().toISOString();
-  const lees = () => Array.isArray(db.data.connectionProfileMedia) ? db.data.connectionProfileMedia : [];
-  const bak = () => {
-    if (!Array.isArray(db.data.connectionProfileMedia)) db.data.connectionProfileMedia = [];
-    return db.data.connectionProfileMedia;
-  };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/connection-profile-media',
+    bezit: { connectionProfileMedia: 'lijst' } });
+  const lees = () => eigen.kijk('connectionProfileMedia');
+  const bak = () => eigen.bak('connectionProfileMedia');
   const hoort = x => (x.product || 'vonk') === product;
   const vind = id => lees().find(x => x.id === String(id || '') && hoort(x)) || null;
   const van = owner => lees().filter(x => x.owner === owner && hoort(x)).sort((a, b) => a.position - b.position || a.createdAt.localeCompare(b.createdAt));
@@ -53,16 +52,13 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
     } catch (e) { return null; }
   }
 
-  function magZien(item, viewer, context) {
+  function mediaMagZien(item, viewer, context) {
     if (!item || item.processingState !== 'READY') return false;
     if (viewer === item.owner) return true;
     if (item.publicationState !== 'PUBLISHED' || item.visibility === 'PRIVATE') return false;
     if (isBlocked && isBlocked(viewer, item.owner)) return false;
     if (profileActive && !profileActive(item.owner)) return false;
-    if (!profileActive) {
-      const profiel = db.data.vonk && db.data.vonk.profielen && db.data.vonk.profielen[item.owner];
-      if (!profiel || profiel.actief === false) return false;
-    }
+    if (!profileActive) return false;
     if (context === 'discovery') return item.visibility === 'DISCOVERY';
     if (context === 'match' && isMatch && isMatch(viewer, item.owner))
       return item.visibility === 'DISCOVERY' || item.visibility === 'AFTER_MATCH';
@@ -76,7 +72,7 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
   }
 
   function projecteerEen(item, viewer, context) {
-    if (!magZien(item, viewer, context)) return null;
+    if (!mediaMagZien(item, viewer, context)) return null;
     const toegang = ticket(item, viewer, context);
     return { id: item.id, purpose: PURPOSE, visibility: item.visibility,
       processingState: item.processingState, publicationState: item.publicationState,
@@ -85,7 +81,7 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
       version: item.version, alt: item.alt, src: toegang.src, expiresAt: toegang.expiresAt };
   }
 
-  function projecteer(viewer, owner, context) {
+  function mediaProjecteer(viewer, owner, context) {
     return van(owner).map(x => projecteerEen(x, viewer, context)).filter(Boolean);
   }
 
@@ -128,7 +124,7 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
     return { status: 200, ok: true, media: projecteerEen(item, owner, 'owner') };
   }
 
-  function publiceer(owner, id, visibility, aan) {
+  function mediaPubliceer(owner, id, visibility, aan) {
     const dicht = poort(owner); if (dicht) return dicht;
     const item = vind(id);
     if (!item || item.owner !== owner) return { status: 404, error: 'Deze profielfoto bestaat niet.' };
@@ -149,7 +145,7 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
     const dicht = poort(owner); if (dicht) return dicht;
     const item = vind(id);
     if (!item || item.owner !== owner) return { status: 404, error: 'Deze profielfoto bestaat niet.' };
-    db.data.connectionProfileMedia = lees().filter(x => x.id !== item.id);
+    eigen.zetBak('connectionProfileMedia', lees().filter(x => x.id !== item.id));
     media.verwijder(item.ref); save();
     return { status: 200, ok: true };
   }
@@ -163,19 +159,20 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
       const item = vind(mediaId); item.position = position; item.version += 1; item.updatedAt = nu();
     });
     save();
-    return { status: 200, ok: true, media: projecteer(owner, owner, 'owner') };
+    return { status: 200, ok: true, media: mediaProjecteer(owner, owner, 'owner') };
   }
 
   async function lever(token) {
     const toegang = decrypt(token);
     if (!toegang || !Number.isFinite(toegang.exp) || toegang.exp < Date.now()) return null;
     const item = vind(toegang.id);
-    if (!item || item.version !== toegang.version || !magZien(item, toegang.viewer, toegang.context)) return null;
+    if (!item || item.version !== toegang.version || !mediaMagZien(item, toegang.viewer, toegang.context)) return null;
     const bytes = await media.leesBuf(item.ref);
     return bytes ? { bytes, mime: item.mime } : null;
   }
 
-  return { upload, publiceer, verwijder, orden, lever, projecteer, magZien,
+  return { upload, publiceer: mediaPubliceer, verwijder, orden, lever,
+    projecteer: mediaProjecteer, magZien: mediaMagZien,
     PURPOSE, VISIBILITY, MAX_PHOTOS, TICKET_MS };
 };
 

@@ -58,7 +58,7 @@ function stored(supplier, id) {
   };
 }
 
-function project(supplier) {
+function partnerProject(supplier) {
   return {
     version: 1,
     default: 'off',
@@ -137,4 +137,4 @@ function candidates(suppliers, program, context = {}) {
   }).ok);
 }
 
-module.exports = { PROGRAMS, DAYS, locations, stored, project, update, eligible, candidates, activeBookings };
+module.exports = { PROGRAMS, DAYS, locations, stored, project: partnerProject, update, eligible, candidates, activeBookings };

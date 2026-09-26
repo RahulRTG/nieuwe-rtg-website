@@ -32,7 +32,7 @@ module.exports = ({ product, root, media, crypto, ticketSecret, context, isBlock
       id: item.id, viewer, scope, purpose: item.purpose, version: item.version, exp: Date.now() + TICKET_MS
     });
   }
-  function project(mediaId, viewer, scope) {
+  function mediaProject(mediaId, viewer, scope) {
     const item = root().media.find(x => x.id === mediaId && x.product === product);
     return item ? { purpose: item.purpose, mime: item.mime, src: src(item, viewer, scope),
       ...(item.transcript ? { transcript: item.transcript } : {}) } : undefined;
@@ -79,5 +79,5 @@ module.exports = ({ product, root, media, crypto, ticketSecret, context, isBlock
     const c = context(t.viewer, { id: t.scope }); if (!c || c.scope !== item.scope || c.pair !== item.pair) return null;
     const bytes = await media.leesBuf(item.ref); return bytes ? { bytes, mime: item.mime } : null;
   }
-  return { project, upload, deliver, MEDIA_TYPES };
+  return { project: mediaProject, upload, deliver, MEDIA_TYPES };
 };

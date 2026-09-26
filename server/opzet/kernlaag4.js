@@ -24,6 +24,7 @@ kern.connectionBlocking = require('../kern/connection-blocking')({ db, save });
 // Rendez-vous deelt zijn 18+/KYC-poort met Vonk; de route bewaakt de pas.
 Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic, notify, accounts, leeftijdVan,
   connectionBlocking: kern.connectionBlocking,
+  partnerSuppliers: () => db.data.suppliers || [], partnerBookings: () => db.data.reserveringen || [],
   media, sseToCustomer: hulp.sseToCustomer, connectionMediaTicketSecret: process.env.RTG_ENC_KEY,
   /* codenaamVan en niet liveCodename: zie de kop van kern/rendezvous.js. Laat
      gebonden, want de sociale laag wordt later samengesteld. */

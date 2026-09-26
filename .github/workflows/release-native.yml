@@ -22,7 +22,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Pakket- en trustgrenzen
-        run: node --test test/native-artifact.test.js test/release-trust.test.js test/productie-promotie.test.js
+        run: node --test test/native-artifact.test.js test/native-process.test.js test/release-trust.test.js test/productie-promotie.test.js test/productie-status.test.js
       - name: Eén native kandidaat bouwen uit een schone commit
         run: node scripts/native-release.js build .release/native
       - name: Exact pakket met eigen runtime, SQLite en procesherstart beproeven

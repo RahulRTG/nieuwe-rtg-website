@@ -48,15 +48,42 @@ actieve releaseverwijzing. Runtimegegevens en secrets horen buiten het pakket.
 Een succesvolle BUILD-signature is geen EVIDENCE-attestatie of PROMOTION.
 De bestaande productiebeslissing vereist nog de volledige regressie, externe
 providerbewijzen, geldcorrectheid en een bewezen rollback. De huidige
-`productie-status`/`live-vrijgave`-keten verwacht OCI-imagebewijzen en is niet
-automatisch geldig voor dit native pakket. Tot de native promotie-adapter en
-alle vereiste bewijzen zijn afgerond, is native productiepromotie geblokkeerd.
+`productie-status --native` gebruikt dezelfde inhoudelijke gates, met de native
+artifactcontrole in plaats van de OCI-controle. `productie-promotie` maakt
+vervolgens een afzonderlijk `rtg-native-promotie-v1`-statement onder de
+PROMOTION-rol. De Docker-startwikkel accepteert dit niet als OCI-promotie.
 
-De volgende proef moet kandidaat én vorige bekende goede native artifact
+De native kandidaat vereist daarnaast een `HOST-CONFIG.json` onder
+`.release/native/`, met schema `rtg-native-host-v1`, platform `darwin`, arch
+`arm64`, service `nl.rtg.server`, port, absolute store en dataDirectory. De
+velden launcher en launchAgent bevatten elk het absolute pad en de actuele
+SHA-256 van de bestaande Keychain-wikkel en launchd-plist. Het volledige
+bestand wordt in READY en PROMOTION gepind. Data mag niet onder de releasestore
+staan. De wikkel moet `scripts/native-start.js` uit de vertrouwde, schone
+controller-checkout aanroepen; de script- en bewijsversie blijft gelijk.
+
+Na alle gates en ondertekening kan `node scripts/native-activate.js COMMIT`
+uitsluitend de gepinde kandidaat selecteren. Het bewaart eerst het geautoriseerde
+vorige pakket, schrijft een duurzame actieve verwijzing, herstart uitsluitend
+`nl.rtg.server` en controleert health, readiness, PID, werkmap, uitvoerbaar pad
+en alle pakketbytes. Bij mislukking selecteert het exact het geautoriseerde
+vorige pakket. Rollback controleert de oorspronkelijke PROMOTION en het vorige
+artifact; een defect in de kandidaat kan die herstelautorisatie niet wissen.
+Zonder bewijs of signature start deze adapter geen productiehandeling.
+
+De rollbackproef moet kandidaat én vorige bekende goede native artifact
 gebruiken, met blijvende synthetische data, schema-compatibiliteitscontrole,
 smoke na rollback en opnieuw starten van exact de kandidaat. Een herstart van
 dezelfde versie telt niet als deze rollback. De huidige productiecheckout is
 nog geen ondertekend, onveranderlijk rollbackartifact.
+
+Een vierde argument voor `native-rehearsal.js` geeft het vorige pakket mee.
+Daarmee doorloopt de proef beide versies met dezelfde synthetische data en
+controleert hij integriteit en documentinhoud na terug- en vooruitzetten.
+`previousKnownGood` blijft daarbij bewust false: een gekozen testpakket is
+niet automatisch een bekende goede productiebaseline. Dat oordeel vereist
+het onafhankelijke, ondertekende `deploymentRollback`-dossier. Dat dossier
+moet exact de bytes van `ROLLBACK-PROOF.json` binden.
 
 Ook het huidige B2B2C-go-livebeleid vereist PostgreSQL, Redis en bewezen
 geldrails. Een enkele Mac met SQLite en uitgeschakelde geldrails kan veilig

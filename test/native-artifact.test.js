@@ -107,3 +107,54 @@ test('native artifact: symbolic releasestore mag geen stage naar een andere omge
   assert.throws(() => native.stage(f.archive, f.attestation, f.root, commit, link), /releasestore/);
   assert.deepEqual(fs.readdirSync(f.store), []);
 });
+
+function rollbackFixture(t) {
+  const f = fixture(t), dir = path.join(f.root, '.release/native'); fs.mkdirSync(dir, { recursive:true });
+  fs.copyFileSync(f.archive, path.join(dir, 'previous.rtgp'));
+  fs.writeFileSync(path.join(dir, 'previous.rtgp.attestation.json'), JSON.stringify(f.attestation));
+  const data = path.join(f.dir, 'data'); fs.mkdirSync(data);
+  const launcher = path.join(f.dir, 'launcher'), agent = path.join(f.dir, 'agent');
+  fs.writeFileSync(launcher, 'synthetic launcher; never executed'); fs.writeFileSync(agent, 'synthetic agent; never loaded');
+  const config = { schema:'rtg-native-host-v1', platform:'darwin', arch:'arm64', service:'nl.rtg.server', port:3999,
+    store:f.store, dataDirectory:data, launcher:{ path:launcher, sha256:native.hashFile(launcher) },
+    launchAgent:{ path:agent, sha256:native.hashFile(agent) } };
+  const configFile = path.join(dir, 'HOST-CONFIG.json'); fs.writeFileSync(configFile, JSON.stringify(config));
+  const promotion = { formaat:'rtg-native-promotie-v1', ondertekenDomein:trust.ROLES.PROMOTION.domain,
+    commit:'f'.repeat(40), kandidaat:{ soort:'native',
+      artifact:{ platform:'darwin', arch:'arm64', digest:'sha256:' + 'e'.repeat(64), manifestSha256:'b'.repeat(64),
+        runtimeProofSha256:'c'.repeat(64), attestationSha256:'d'.repeat(64) },
+      rollback:{ previousCommit:commit, previousDigest:'sha256:' + f.packed.archiveSha256,
+        proofSha256:'a'.repeat(64), externalEvidenceBound:true } },
+    bewijzen:{ nativeHost:{ sha256:native.hashFile(configFile) } } };
+  const bytes = Buffer.from(JSON.stringify(promotion));
+  fs.writeFileSync(path.join(f.root, '.release/productie-promotie.json'), bytes);
+  fs.writeFileSync(path.join(f.root, '.release/productie-promotie.sig'), trust.sign('PROMOTION', bytes, f.keys.PROMOTION.privateKey));
+  return { ...f, promotion, bytes, launcher };
+}
+test('native rollback blijft mogelijk zonder werkende kandidaat maar uitsluitend naar het ondertekende vorige artifact', t => {
+  const f = rollbackFixture(t), host = require('../scripts/lib/native-host');
+  const authorized = host.rollbackAuthorization(f.root, f.promotion.commit);
+  assert.equal(authorized.selected.commit, commit);
+  assert.equal(authorized.artifact.archiveSha256, f.packed.archiveSha256);
+  const selected = host.select(f.root, f.promotion.commit, 'rollback');
+  assert.equal(host.current(f.root).pointer.digest, selected.pointer.digest);
+  assert.equal(fs.existsSync(path.join(f.root, '.release/native/candidate.rtgp')), false);
+  assert.throws(() => host.authorizedSelection(f.promotion, 'arbitrary'), /selectiestand/);
+});
+test('native rollback weigert BUILD als promotie-authority en gewijzigde hostconfiguratie', t => {
+  const f = rollbackFixture(t), host = require('../scripts/lib/native-host');
+  fs.writeFileSync(path.join(f.root, '.release/productie-promotie.sig'), trust.sign('PROMOTION', f.bytes, f.keys.BUILD.privateKey));
+  assert.throws(() => host.rollbackAuthorization(f.root, f.promotion.commit), /rollback-authority/);
+  fs.writeFileSync(path.join(f.root, '.release/productie-promotie.sig'), trust.sign('PROMOTION', f.bytes, f.keys.PROMOTION.privateKey));
+  fs.writeFileSync(f.launcher, 'altered launcher');
+  assert.throws(() => host.rollbackAuthorization(f.root, f.promotion.commit), /hostconfiguratie gewijzigd/);
+});
+test('native actieve verwijzing kan geen willekeurige artifact of authority kiezen', t => {
+  const f = rollbackFixture(t), host = require('../scripts/lib/native-host');
+  const selected = host.select(f.root, f.promotion.commit, 'rollback');
+  host.writePointer(f.store, { ...selected.pointer, digest:'sha256:' + '0'.repeat(64) });
+  assert.throws(() => host.current(f.root), /buiten de getekende/);
+  fs.unlinkSync(path.join(f.store, 'current.json'));
+  fs.symlinkSync(f.launcher, path.join(f.store, 'current.json'));
+  assert.throws(() => host.writePointer(f.store, selected.pointer), /geen regulier/);
+});

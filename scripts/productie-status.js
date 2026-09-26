@@ -9,7 +9,7 @@ const crypto = require('crypto');
 const cp = require('child_process');
 const { hoortBij, beoordeel } = require('./lib/productie-oordeel');
 const schermBewijs = require('./lib/schermsuite-bewijs');
-const { BRONNEN } = require('./lib/productie-vrijgave');
+const { bewijsBronnen } = require('./lib/productie-vrijgave');
 const externBewijs = require('../server/config/external-release');
 
 const ROOT = path.join(__dirname, '..');
@@ -31,28 +31,31 @@ function suiteInventaris(root) {
     bestandenSha256: crypto.createHash('sha256').update(namen.join('\n') + '\n').digest('hex') };
 }
 
-function maak(root = ROOT) {
+function maak(root = ROOT, artifactSoort = 'oci') {
   const commitUit = cp.spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: root, encoding: 'utf8' });
   const commit = commitUit.status === 0 ? String(commitUit.stdout || '').trim() : null;
   let codeSchoon = false;
   try { codeSchoon = require('./lib/productie-vrijgave').eisSchoneReleasebron(root) === commit; }
   catch (e) { codeSchoon = false; }
-  const invoer = { commit, codeSchoon, suiteVerwachting: suiteInventaris(root),
+  const invoer = { commit, codeSchoon, artifactSoort, suiteVerwachting: suiteInventaris(root),
     schermVerwachting: schermBewijs.inventaris(root) };
   const bronnen = {};
-  for (const [naam, rel] of Object.entries(BRONNEN)) {
-    invoer[naam] = lees(root, rel);
+  for (const [naam, rel] of Object.entries(bewijsBronnen(artifactSoort))) {
+    invoer[naam] = rel.endsWith('.rtgp') ? null : lees(root, rel);
     bronnen[naam] = { pad: rel, sha256: sha256Bestand(root, rel) };
   }
   invoer.externControle = externBewijs.controleerReleaseRoot(root, commit);
   try {
-    const kandidaat = require('./lib/live-kandidaat').controleer(root, commit);
-    invoer.kandidaatControle = { ok:true, commit:kandidaat.commit,
-      image:kandidaat.image, backup:kandidaat.backup, bewijsSha256:kandidaat.bewijsSha256 };
+    if (artifactSoort === 'native') invoer.kandidaatControle = require('./lib/native-kandidaat').controleer(root, commit);
+    else {
+      const kandidaat = require('./lib/live-kandidaat').controleer(root, commit);
+      invoer.kandidaatControle = { ok:true, commit:kandidaat.commit,
+        image:kandidaat.image, backup:kandidaat.backup, bewijsSha256:kandidaat.bewijsSha256 };
+    }
   } catch (e) { invoer.kandidaatControle = { ok:false, reden:e.message }; }
   const oordeel = beoordeel(invoer);
   const rapport = {
-    formaat: 'rtg-production-status-v1', gemaakt: new Date().toISOString(), commit,
+    formaat: 'rtg-production-status-v1', gemaakt: new Date().toISOString(), commit, artifactSoort,
     release: (() => { try { return JSON.parse(fs.readFileSync(path.join(root, 'package.json'))).version; }
       catch (e) { return null; } })(),
     PRODUCTION_STATUS: oordeel.status, blokkades: oordeel.blokkades, bronnen,
@@ -63,8 +66,8 @@ function maak(root = ROOT) {
   return rapport;
 }
 
-function schrijf(root = ROOT, doel = DOEL) {
-  const rapport = maak(root);
+function schrijf(root = ROOT, doel = DOEL, artifactSoort = 'oci') {
+  const rapport = maak(root, artifactSoort);
   fs.mkdirSync(path.dirname(doel), { recursive: true, mode: 0o700 });
   const tijdelijk = doel + '.tmp-' + process.pid;
   fs.writeFileSync(tijdelijk, JSON.stringify(rapport, null, 2) + '\n', { mode: 0o600 });
@@ -75,7 +78,7 @@ function schrijf(root = ROOT, doel = DOEL) {
 
 if (require.main === module) {
   try {
-    const rapport = schrijf();
+    const rapport = schrijf(ROOT, DOEL, process.argv.includes('--native') ? 'native' : 'oci');
     console.log('PRODUCTION_STATUS=' + rapport.PRODUCTION_STATUS);
     console.log('Commit: ' + (rapport.commit || 'onbekend'));
     console.log('Bewijs SHA-256: ' + rapport.bewijsSha256);

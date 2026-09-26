@@ -62,6 +62,7 @@ function build(root, output) {
     fs.mkdirSync(output, { recursive:true, mode:0o700 });
     const target = path.join(output, 'candidate.rtgp');
     const result = native.pack(payload, target, metadata);
+    fs.copyFileSync(path.join(sourceDir, 'release-bewijs.json'), path.join(output, 'app-release-bewijs.json'), fs.constants.COPYFILE_EXCL);
     fs.writeFileSync(path.join(output, 'ARTIFACT-IDENTITY.json'), JSON.stringify({
       ...result, artifact:'candidate.rtgp', signature:'NOT_SIGNED', releaseStatus:'BLOCKED'
     }, null, 2) + '\n', { flag:'wx' });

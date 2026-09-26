@@ -3,39 +3,36 @@
 // Start uitsluitend de meegeleverde runtime en app in een tijdelijke omgeving.
 // Deze proef bewijst geen providers, echte gebruikers of productieconfiguratie.
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os');
-const cp = require('node:child_process'), crypto = require('node:crypto'), net = require('node:net');
+const cp = require('node:child_process'), crypto = require('node:crypto');
 const assert = require('node:assert/strict');
 const { setTimeout:pause } = require('node:timers/promises');
 const native = require('./lib/native-artifact');
 
-async function freePort() {
-  const s = net.createServer();
-  await new Promise((resolve,reject) => { s.once('error', reject); s.listen(0, '127.0.0.1', resolve); });
-  const port = s.address().port; await new Promise(resolve => s.close(resolve)); return port;
-}
-async function stop(child) {
-  if (!child || child.exitCode !== null || child.signalCode) return;
-  const exited = new Promise(resolve => child.once('exit', resolve));
-  child.kill('SIGTERM');
-  const abort = new AbortController();
-  try {
-    const graceful = await Promise.race([exited.then(() => true), pause(15000, false, { signal:abort.signal })]);
-    if (!graceful) { child.kill('SIGKILL'); await exited; throw Error('Native proefserver vereiste een geforceerde stop.'); }
-  } finally { abort.abort(); }
-}
-async function rehearse(file, commit, output) {
+const { freePort, stop } = require('./lib/native-process');
+
+async function rehearse(file, commit, output, previousFile) {
   const p = native.inspect(file);
   assert.equal(p.manifest.commit, commit, 'artifact hoort bij de kandidaat');
   assert.equal(process.platform, p.manifest.platform); assert.equal(process.arch, p.manifest.arch);
   const temporary = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-native-rehearsal-')));
-  const release = path.join(temporary, 'release'), data = path.join(temporary, 'data');
+  const candidateRelease = path.join(temporary, 'release'), data = path.join(temporary, 'data');
+  let release = candidateRelease, activeManifest = p.manifest, previous;
   fs.mkdirSync(release); fs.mkdirSync(data);
   native.inspect(file, release); native.verifyInstalled(release, p.manifest);
+  if (previousFile) {
+    previous = native.inspect(previousFile);
+    assert.notEqual(previous.archiveSha256, p.archiveSha256, 'een andere artifact is vereist voor rollback');
+    release = path.join(temporary, 'previous'); fs.mkdirSync(release);
+    native.inspect(previousFile, release); activeManifest = previous.manifest;
+  }
   const evidence = { schema:'rtg-native-rehearsal-v1', commit, archiveSha256:p.archiveSha256,
     manifestSha256:p.manifestSha256, startedAt:new Date().toISOString(),
     environment:'ISOLATED_NONPRODUCTION_SQLITE', device:'LOCAL_NATIVE_PROCESS',
     scope:'Exact package process, API, durable document state and restart; not full release, production configuration, provider or previous-artifact rollback proof.',
     steps:[], requests:[], databaseAssertions:[], status:'FAIL', rollback:'NOT_PROVEN' };
+  if (previous) Object.assign(evidence, { schema:'rtg-native-rollback-v1', previousSha256:previous.archiveSha256,
+    previousCommit:previous.manifest.commit, previousKnownGood:false, dataPreserved:false,
+    scope:'Isolated two-artifact rollback mechanism. Previous production baseline qualification requires independent evidence; never inferred from this rehearsal.' });
   let child, base, token;
   const env = { PATH:path.join(release, 'runtime') + ':/usr/bin:/bin', HOME:temporary, TMPDIR:temporary,
     NODE_ENV:'test', RTG_DATA_DIR:data, RTG_STORE:'sqlite', RTG_MAGNAAT_TEST:'0', RTG_DEMO:'0',
@@ -99,13 +96,25 @@ async function rehearse(file, commit, output) {
     const registered = await request('/api/auth/register', account); assert.ok(registered.token); token = registered.token;
     const f = await request('/api/bestanden/upload', { naam:'native-proof.txt', dataUrl:'data:text/plain;base64,bmF0aXZlLXByb29m' });
     const before = await state(f.id); assert.ok(before);
+    if (previous) {
+      await stop(child); child = null; database(f.id, false); native.verifyInstalled(release, activeManifest);
+      evidence.steps.push({ name:'previous-baseline', status:'PASS' });
+      release = candidateRelease; activeManifest = p.manifest; await start();
+      const login = await request('/api/auth/login', { email:account.email, password:account.password });
+      assert.ok(login.token); token = login.token;
+      assert.equal((await state(f.id)).weg, false);
+    }
     const action = { capability:'documents.trash', contractVersion:1, operationId:crypto.randomUUID(), id:f.id, expectedVersion:before.documentVersion };
     const trash = await request('/api/bestanden/actie', action); assert.equal(trash.resource.state, 'trashed');
     const retry = await request('/api/bestanden/actie', action); assert.equal(retry.herhaald, true);
     await request('/api/bestanden/mijn', {}, 401, null);
     evidence.steps.push({ name:'registration, document mutation, retry, unauthenticated denial', status:'PASS' });
     await stop(child); child = null; database(f.id, true);
-    native.verifyInstalled(release, p.manifest);
+    native.verifyInstalled(release, activeManifest);
+    if (previous) {
+      evidence.steps.push({ name:'candidate-mutation', status:'PASS' });
+      release = path.join(temporary, 'previous'); activeManifest = previous.manifest;
+    }
     await start();
     const login = await request('/api/auth/login', { email:account.email, password:account.password });
     assert.ok(login.token); token = login.token;
@@ -114,7 +123,18 @@ async function rehearse(file, commit, output) {
     assert.equal(restored.resource.state, 'active');
     evidence.steps.push({ name:'same-artifact restart, login, durable trash, restore', status:'PASS' });
     await stop(child); child = null; database(f.id, false);
-    native.verifyInstalled(release, p.manifest);
+    native.verifyInstalled(release, activeManifest);
+    if (previous) {
+      evidence.steps.push({ name:'rollback-previous', status:'PASS' }, { name:'schema-integrity', status:'PASS' });
+      release = candidateRelease; activeManifest = p.manifest; await start();
+      const again = await request('/api/auth/login', { email:account.email, password:account.password });
+      assert.ok(again.token); token = again.token;
+      assert.equal((await state(f.id)).weg, false);
+      const content = await request('/api/bestanden/haal', { id:f.id });
+      assert.equal(content.dataUrl, 'data:text/plain;base64,bmF0aXZlLXByb29m');
+      await stop(child); child = null; database(f.id, false); native.verifyInstalled(release, activeManifest);
+      evidence.steps.push({ name:'candidate-again', status:'PASS' }); evidence.dataPreserved = true;
+    }
     evidence.steps.push({ name:'artifact unchanged after both processes', status:'PASS' });
     evidence.status = 'PASS';
   } catch (e) { evidence.error = e.message; throw e; }
@@ -130,9 +150,9 @@ async function rehearse(file, commit, output) {
   return evidence;
 }
 if (require.main === module) {
-  const [file, commit, output] = process.argv.slice(2);
+  const [file, commit, output, previous] = process.argv.slice(2);
   if (!file || !commit || !output) { console.error('Gebruik: native-rehearsal.js PAKKET COMMIT BEWIJS'); process.exitCode = 1; }
-  else rehearse(file, commit, output).then(e => console.log('Native package rehearsal: ' + e.status))
+  else rehearse(file, commit, output, previous).then(e => console.log('Native package rehearsal: ' + e.status))
     .catch(e => { console.error('[native-rehearsal] ' + e.message); process.exitCode = 1; });
 }
 module.exports = { rehearse };

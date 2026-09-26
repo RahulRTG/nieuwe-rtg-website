@@ -75,6 +75,32 @@ function kandidaatDeel(naam) {
     immutable:verwijzing + '@' + digest, herkomstSha256:'9'.repeat(64), sbomSha256:'a'.repeat(64) };
 }
 
+function nativeGroen() {
+  const v = groen(); v.artifactSoort = 'native';
+  v.kandidaatControle = { ok:true, soort:'native', commit:COMMIT, bewijsSha256:'4'.repeat(64),
+    artifact:{ platform:'darwin', arch:'arm64', digest:'sha256:' + '5'.repeat(64), manifestSha256:'6'.repeat(64),
+      runtimeProofSha256:'7'.repeat(64), attestationSha256:'8'.repeat(64) },
+    rollback:{ previousDigest:'sha256:' + '9'.repeat(64), proofSha256:'a'.repeat(64), externalEvidenceBound:true } };
+  return v;
+}
+test('native kandidaat vervangt alleen de artifactpoort; alle productiegates blijven vereist', () => {
+  assert.equal(beoordeel(nativeGroen()).status, 'READY');
+  for (const field of ['suite', 'schermsuite', 'pg', 'releaseGate', 'staging', 'golive', 'externControle']) {
+    const v = nativeGroen(); v[field] = null;
+    assert.equal(beoordeel(v).status, 'BLOCKED', field);
+  }
+  const money = nativeGroen(); money.golive.geld.inkomendGeconfigureerd = false;
+  assert.equal(beoordeel(money).status, 'BLOCKED');
+});
+test('native runtimeherstart, onbekende artifactsoort en onbeoordeelde rollback geven geen READY', () => {
+  const same = nativeGroen(); same.kandidaatControle.rollback.previousDigest = same.kandidaatControle.artifact.digest;
+  assert.equal(beoordeel(same).status, 'BLOCKED');
+  const unknown = groen(); unknown.artifactSoort = 'anything';
+  assert.equal(beoordeel(unknown).status, 'BLOCKED');
+  const unsigned = nativeGroen(); unsigned.kandidaatControle.rollback.externalEvidenceBound = false;
+  assert.equal(beoordeel(unsigned).status, 'BLOCKED');
+});
+
 test('alleen vier verse groene poorten op exact dezelfde code geven READY', () => {
   const uit = beoordeel(groen());
   assert.deepEqual(uit, { status: 'READY', blokkades: [] });

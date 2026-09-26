@@ -22,8 +22,7 @@ test('de eerste 58 producttests blijven de baseline', () => {
 test('default deny: onbekende en niet-gebouwde capabilities blijven dicht', () => {
   assert.equal(policy.beslis({ actor: 'member', product: 'vonk', capability: 'connection.bestaat.niet', state: goed }).code,
     'CAPABILITY_UNKNOWN');
-  for (const capability of ['connection.voice', 'connection.video', 'connection.media',
-    'connection.route', 'connection.concierge.reserve', 'connection.concierge.request']) {
+  for (const capability of ['connection.route', 'connection.concierge.reserve']) {
     assert.equal(policy.beslis({ actor: 'member', product: 'vonk', capability, state: goed }).code,
       'NOT_IMPLEMENTED', capability + ' is nergens geopend');
   }
@@ -31,8 +30,10 @@ test('default deny: onbekende en niet-gebouwde capabilities blijven dicht', () =
 
 test('capability is niet permission: product, pas en toestand beslissen afzonderlijk', () => {
   assert.equal(policy.beslis({ actor: 'member', product: 'vonk', capability: 'connection.message', state: goed }).allow, true);
-  assert.equal(policy.beslis({ actor: 'member', product: 'rendezvous', capability: 'connection.message', state: goed }).code,
-    'PRODUCT_DENY', 'Rendez-vous heeft geen chat omdat Vonk hem heeft');
+  assert.equal(policy.beslis({ actor: 'member', product: 'rendezvous', capability: 'connection.message', state: goed }).allow,
+    true, 'gedeelde techniek blijft per product expliciet geopend');
+  assert.equal(policy.beslis({ actor: 'member', product: 'rendezvous', capability: 'connection.payment.confirm', state: goed }).code,
+    'PRODUCT_DENY', 'een Vonk-geldcapability lekt niet naar Rendez-vous');
   assert.equal(policy.beslis({ actor: 'member', product: 'rendezvous', capability: 'connection.discover',
     state: { ...goed, pass: 'rtg' } }).code, 'PASS_REQUIRED');
   assert.equal(policy.beslis({ actor: 'member', product: 'vonk', capability: 'connection.discover',

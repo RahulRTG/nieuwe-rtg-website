@@ -39,7 +39,7 @@ test('een eerste Rendez-vous-ja kan de introductie niet openen', () => {
   assert.equal(r.code, 'MUTUAL_CONSENT_REQUIRED');
 });
 
-test('implemented:false voice en route bestaan niet in Edge of capabilities', () => {
+test('zonder wederzijdse call-consent en met implemented:false route ontstaan geen call- of routeacties', () => {
   const state = Vonk.match({ key: 'a', now: '2026-09-22T12:00:00.000Z', match: {
     id: 'm1', a: 'a', b: 'b', status: 'bevestigd', tafel: { datum: '2026-09-22' }, betaald: {}, halfweg: { keuzes: {} }
   } });
@@ -63,17 +63,18 @@ test('een bevestigde toekomstige Vonk-date projecteert alleen Date en Safety', (
   assert.ok(!edge.actions.some(a => ['chat', 'meet', 'voice', 'route'].includes(a.id)));
 });
 
-test('Rendez-vous Concierge suggereert geen ongebouwde automatische service', () => {
+test('Rendez-vous projecteert een echte Concierge-service maar geen automatische reservering', () => {
   const edge = ProductState.resolve({ actor: 'member', product: 'rendezvous',
     productState: Rendezvous.root({ aan: true }), access: toegang, subject: 'a', context: { kind: 'root' } });
-  assert.deepEqual(edge.actions.map(a => a.id), ['today', 'society']);
-  assert.ok(!edge.availableCapabilities.includes('connection.concierge.request'));
+  assert.deepEqual(edge.actions.map(a => a.id), ['today', 'society', 'concierge']);
+  assert.ok(edge.availableCapabilities.includes('connection.concierge.request'));
+  assert.ok(!edge.availableCapabilities.includes('connection.concierge.reserve'));
 });
 
 test('een Vonk-capability verschijnt nooit op een Rendez-vous-surface', () => {
   const edge = ProductState.resolve({ actor: 'member', product: 'rendezvous',
     productState: { surface: 'RENDEZVOUS_ROOT', state: 'TODAY',
-      candidates: ['connection.message', 'connection.discover'], fingerprint: {} },
+      candidates: ['connection.payment.confirm', 'connection.discover'], fingerprint: {} },
     access: toegang, subject: 'a', context: {} });
   assert.deepEqual(edge.availableCapabilities, ['connection.discover']);
 });

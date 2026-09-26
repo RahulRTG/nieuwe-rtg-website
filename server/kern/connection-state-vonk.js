@@ -35,7 +35,7 @@ function discovery(profile, facts) {
     fingerprint: { profile: !!profile, active: !!(profile && profile.actief), ...(facts || {}) } };
 }
 
-function match({ match: m, key, now }) {
+function match({ match: m, key, now, communication }) {
   if (!m) return null;
   const today = String(now || new Date().toISOString()).slice(0, 10);
   const date = m.tafel && m.tafel.datum ? String(m.tafel.datum) : '';
@@ -53,7 +53,9 @@ function match({ match: m, key, now }) {
     if (aantal === 1) state = STATES.MEET_AWAITING_BOTH;
     else if (aantal >= 2) state = STATES.MEET_PLANNING;
   }
-  const basis = ['connection.message', 'connection.safety.block', 'connection.voice'];
+  const basis = ['connection.message', 'connection.media', 'connection.communication.consent', 'connection.safety.block'];
+  if (communication && communication.voice) basis.push('connection.voice');
+  if (communication && communication.video) basis.push('connection.video');
   if (![STATES.DATE_ACTIVE, STATES.POST_DATE].includes(state)) {
     basis.push('connection.meet.plan', 'connection.meet.choose');
     if (m.tafel && !(m.betaald && m.betaald[key])) basis.push('connection.payment.confirm');

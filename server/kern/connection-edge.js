@@ -19,6 +19,8 @@ const DEFINITIONS = Object.freeze({
   VONK_MATCH: [
     ['chat', 'connection.edge.chat', 'connection.message'],
     ['meet', 'connection.edge.meet', ['connection.meet.plan', 'connection.meet.choose']],
+    ['voice', 'connection.edge.voice', 'connection.voice'],
+    ['video', 'connection.edge.video', 'connection.video'],
     ['more', 'connection.edge.more', 'connection.safety.block']
   ],
   VONK_DATE_ACTIVE: [
@@ -34,9 +36,15 @@ const DEFINITIONS = Object.freeze({
   RENDEZVOUS_INTRODUCTION: [
     ['not_now', 'connection.edge.not_now', ['connection.match.choose', 'connection.introduction.answer'], 'decline'],
     ['open_to_introduction', 'connection.edge.open_to_introduction', ['connection.match.choose', 'connection.introduction.answer'], 'accept'],
+    ['conversation', 'connection.edge.conversation', 'connection.message'],
+    ['voice', 'connection.edge.voice', 'connection.voice'],
+    ['video', 'connection.edge.video', 'connection.video'],
     ['safety', 'connection.edge.safety', 'connection.safety.block']
   ],
   RENDEZVOUS_ARRANGE: [
+    ['conversation', 'connection.edge.conversation', 'connection.message'],
+    ['voice', 'connection.edge.voice', 'connection.voice'],
+    ['video', 'connection.edge.video', 'connection.video'],
     ['arrange', 'connection.edge.arrange', 'connection.meet.plan'],
     ['approve', 'connection.edge.approve', 'connection.meet.accept'],
     ['together', 'connection.edge.together', 'connection.relationship.declare'],

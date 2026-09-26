@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5117 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5160 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5117 |
-| servermodules (`server/**/*.js`) | 3611 |
-| routebestanden (`server/routes/**`) | 597 |
-| kernmodules (`server/kern/**`) | 2265 |
+| API-endpoints | 5160 |
+| servermodules (`server/**/*.js`) | 3621 |
+| routebestanden (`server/routes/**`) | 598 |
+| kernmodules (`server/kern/**`) | 2273 |
 | schermen (`public/**/*.html`) | 320 |
-| gedeelde browsermodules (`public/shared/*.js`) | 384 |
-| toetsbestanden (`test/*.test.js`) | 1727 |
+| gedeelde browsermodules (`public/shared/*.js`) | 386 |
+| toetsbestanden (`test/*.test.js`) | 1729 |
 | schermtoetsen (`test/*.e2e.js`) | 241 |
 
 ## 2. De weg van een verzoek
@@ -110,7 +110,7 @@ zie §5 -- er zijn nog 238 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
-| `member` | 700 | 72 | 16 | 429 |
+| `member` | 730 | 73 | 18 | 459 |
 | `supplier` | 624 | 125 | 6 | 334 |
 | `office` | 70 | 20 | 3 | 82 |
 | `staff` | 26 | 8 | 1 | 42 |
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3486 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3499 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1590 |
+| kern-namen die routes aanraken | 1633 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 238 |
-| daarvan door precies één domein | 1352 |
+| daarvan door precies één domein | 1395 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -169,9 +169,9 @@ tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
 | 41 | `server/routes/member/voertuigen.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
+| 38 | `server/routes/member/rendezvous.js` |
 | 38 | `server/routes/staff.js` |
 | 35 | `server/routes/auth.js` |
-| 34 | `server/routes/auth/herstel.js` |
 
 ## 6. Waar de waarheid staat
 

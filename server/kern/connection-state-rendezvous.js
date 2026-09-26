@@ -57,7 +57,7 @@ function candidate(profile, facts) {
     fingerprint: { active: !!(profile && profile.aan), ...(facts || {}) } };
 }
 
-function match({ proposal, key, targetKey, together, now }) {
+function match({ proposal, key, targetKey, together, now, communication }) {
   if (together) return { surface: 'RENDEZVOUS_TOGETHER', state: STATES.TOGETHER,
     candidates: ['connection.relationship.declare', 'connection.safety.block'], fingerprint: { together: true } };
   if (!proposal) return { surface: 'RENDEZVOUS_ARRANGE', state: STATES.ARRANGE_DRAFT,
@@ -68,7 +68,10 @@ function match({ proposal, key, targetKey, together, now }) {
   const mutual = own === Consent.STATES.ACTIVE && other === Consent.STATES.ACTIVE;
   const state = proposal.bijRechterhand ? STATES.HANDED_TO_RECHTERHAND
     : mutual ? STATES.ARRANGE_APPROVED : STATES.ARRANGE_AWAITING_BOTH;
-  const candidates = ['connection.relationship.declare', 'connection.safety.block'];
+  const candidates = ['connection.relationship.declare', 'connection.safety.block', 'connection.message',
+    'connection.media', 'connection.communication.consent'];
+  if (communication && communication.voice) candidates.push('connection.voice');
+  if (communication && communication.video) candidates.push('connection.video');
   if (state === STATES.ARRANGE_AWAITING_BOTH) candidates.push('connection.meet.plan', 'connection.meet.accept');
   return { surface: 'RENDEZVOUS_ARRANGE', state, candidates, fingerprint: {
     id: proposal.id, setting: proposal.setting, ownConsent: own, otherConsent: other,
@@ -76,11 +79,14 @@ function match({ proposal, key, targetKey, together, now }) {
   } };
 }
 
-function introduction(intro, key) {
+function introduction(intro, key, communication) {
   if (!intro) return null;
   return { surface: 'RENDEZVOUS_INTRODUCTION',
     state: intro.geopend ? STATES.INTRODUCTION_OPEN : STATES.INTRODUCTION_PENDING,
-    candidates: intro.geopend ? ['connection.safety.block'] : ['connection.introduction.answer', 'connection.safety.block'],
+    candidates: intro.geopend ? ['connection.message', 'connection.media', 'connection.communication.consent',
+      ...(communication && communication.voice ? ['connection.voice'] : []),
+      ...(communication && communication.video ? ['connection.video'] : []), 'connection.safety.block']
+      : ['connection.introduction.answer', 'connection.safety.block'],
     fingerprint: { id: intro.id, opened: !!intro.geopend, ownAnswer: intro.ja && intro.ja[key] } };
 }
 

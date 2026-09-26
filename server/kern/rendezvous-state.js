@@ -3,7 +3,7 @@
 const ProductState = require('./connection-product-state');
 const RendezvousState = require('./connection-state-rendezvous');
 
-module.exports = ({ R, mag, nu, geblokkeerd, ontdek, samen, matchesVan }) => {
+module.exports = ({ R, mag, nu, geblokkeerd, ontdek, samen, matchesVan, communication }) => {
   const paar = (a, b) => [a, b].sort().join('|');
   function edge(key, input) {
     const poort = mag(key);
@@ -18,7 +18,9 @@ module.exports = ({ R, mag, nu, geblokkeerd, ontdek, samen, matchesVan }) => {
       const rij = (ontdek.rvKandidaten(key).kandidaten || []).find(x => x.id === targetKey);
       if (rij && rij.status === 'match') productState = RendezvousState.match({
         proposal: (r.voorstellen || {})[paar(key, targetKey)], key, targetKey,
-        together: samen.rvPartnerVan(key) === targetKey, now: nu()
+        together: samen.rvPartnerVan(key) === targetKey, now: nu(), communication: communication ? {
+          voice: communication.hasMutual(key, { id: targetKey }, 'connection.voice'),
+          video: communication.hasMutual(key, { id: targetKey }, 'connection.video') } : null
       });
       else if (rij) productState = RendezvousState.candidate(r.profielen[targetKey],
         { status: rij.status, likedMe: !!rij.likteMij });
@@ -26,14 +28,18 @@ module.exports = ({ R, mag, nu, geblokkeerd, ontdek, samen, matchesVan }) => {
       targetKey = String(b.id || '');
       const m = matchesVan(key).find(x => x.id === targetKey);
       if (m) productState = RendezvousState.match({ proposal: (r.voorstellen || {})[paar(key, targetKey)],
-        key, targetKey, together: samen.rvPartnerVan(key) === targetKey, now: nu() });
+        key, targetKey, together: samen.rvPartnerVan(key) === targetKey, now: nu(), communication: communication ? {
+          voice: communication.hasMutual(key, { id: targetKey }, 'connection.voice'),
+          video: communication.hasMutual(key, { id: targetKey }, 'connection.video') } : null });
     } else if (b.kind === 'introduction') {
       const intro = (r.introducties || {})[String(b.id || '')];
       if (intro) {
         const delen = intro.id.split('|');
         if (delen.includes(key)) {
           targetKey = delen[0] === key ? delen[1] : delen[0];
-          productState = RendezvousState.introduction(intro, key);
+          productState = RendezvousState.introduction(intro, key, communication ? {
+            voice: communication.hasMutual(key, { id: intro.id }, 'connection.voice'),
+            video: communication.hasMutual(key, { id: intro.id }, 'connection.video') } : null);
         }
       }
     } else if (b.kind === 'table') productState = RendezvousState.table((r.tafels || {})[String(b.id || '')], key);

@@ -32,7 +32,7 @@ test('de Connection Edge rendert uitsluitend acties uit availableCapabilities', 
   assert.deepEqual(Client.viewModel('vonk', p).actions.map(x => x.id), ['discover']);
 });
 
-test('implemented:false verschijnt niet in het Vonk-DOM-model', () => {
+test('zonder call-consent en met implemented:false route verschijnen geen ongeldige Edge-acties', () => {
   const actief = Vonk.match({ key:'a', now:'2026-09-22T12:00:00.000Z', match:{ id:'m1', a:'a', b:'b',
     status:'bevestigd', tafel:{ datum:'2026-09-22' }, betaald:{}, halfweg:{ keuzes:{} } } });
   const edge = model('vonk', actief, member);

@@ -1,10 +1,5 @@
-/* Rendez-vous, deelbestand "kring": THE TABLE, MOMENT EN ENCOUNTER.
+/* Rendez-vous Society: The Table, Moment en Encounter.
 
-   Niet elke ontmoeting hoeft een date te zijn (ONTMOETEN.md par. 2.6). Dit
-   bestand doet de vormen waarbij de FYSIEKE WERELD het werk doet en de software
-   alleen de deur openzet.
-
-   ---------------------------------------------------------------------------
    EEN MECHANISME, TWEE MOMENTEN
 
    Moment en Encounter lijken twee functies maar zijn er een. Allebei is het:
@@ -26,8 +21,7 @@
    dat je moeilijk kunt afslaan. Een nee wordt daarom ook nooit gemeld -- de
    ander leest niets, en dat is precies de bedoeling.
 
-   ---------------------------------------------------------------------------
-   ENCOUNTER DRAAIT OP DE CONTACTPIN, EN LEENT NIETS ANDERS
+   ENCOUNTER DRAAIT OP DE CONTACTPIN
 
    De pin (kern/sociaal/pin.js) is een ADRES en geen geheim: hij bewijst niets,
    hij wijst alleen aan, en hij werkt pas als u hem zelf afgeeft. Dat is precies
@@ -46,7 +40,6 @@
    wanneer hij de app opent. Zo staat er niets in de code dat doet alsof er een
    planner is die er niet is.
 
-   ---------------------------------------------------------------------------
    THE TABLE: NIEMAND HOORT OOIT WIE ER NOG MEER IS
 
    Een tafel is zes of acht leden, en een genodigde ziet de tafel -- stad, dag,
@@ -55,11 +48,9 @@
    kunst, en het werkt alleen zolang niemand het merkt. Zou de lijst zichtbaar
    zijn, dan was het een koppelavond met een ander woord ervoor.
 
-   Een tafel wordt door RTG samengesteld en niet door een lid. Er is nog geen
-   backofficescherm waar dat gebeurt; de kern kan het wel, en dat gat staat zo in
-   ONTMOETEN.md. */
+   Een tafel wordt door RTG samengesteld en niet door een lid. */
 module.exports = (ctx) => {
-  const { R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, geblokkeerd, Projection } = ctx;
+  const { R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, sociaalRate, geblokkeerd, Projection, profileMedia } = ctx;
 
   const id = () => 'rv' + crypto.randomBytes(4).toString('hex');
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
@@ -93,6 +84,9 @@ module.exports = (ctx) => {
     if (!poort.ok) return { status: 403, error: poort.reden };
     const t = T()[String(tid || '')];
     if (!t || !t.genodigden[key]) return { status: 404, error: 'Deze uitnodiging staat niet op uw naam.' };
+    if (ja !== false && geblokkeerd && Object.keys(t.genodigden).some(other => other !== key &&
+      t.genodigden[other].status === 'ja' && geblokkeerd(R(), key, other)))
+      return { status: 409, error: 'Deze tafelsamenstelling is door een veiligheidswijziging vervallen.' };
     t.genodigden[key] = { status: ja === false ? 'nee' : 'ja', at: nu() };
     save();
     return { status: 200, ok: true, mijnStatus: t.genodigden[key].status };
@@ -128,7 +122,8 @@ module.exports = (ctx) => {
       if (geblokkeerd && geblokkeerd(R(), key, met)) continue;
       uit.push(Projection.project(Projection.NAMES.RENDEZVOUS_INTRODUCTION,
         { id: v.id, soort: v.soort, aanleiding: v.aanleiding, codenaam: codenaam(met),
-          ikAntwoordde: v.ja[key] === undefined ? null : !!v.ja[key], geopend: !!v.geopend, at: v.at }));
+          ikAntwoordde: v.ja[key] === undefined ? null : !!v.ja[key], geopend: !!v.geopend, at: v.at,
+          media: profileMedia ? profileMedia.projecteer(key, met, v.geopend ? 'match' : 'discovery') : [] }));
     }
     return { status: 200, introducties: uit.sort((a, b) => String(b.at).localeCompare(String(a.at))) };
   }
@@ -166,17 +161,23 @@ module.exports = (ctx) => {
   function encounter(key, pin) {
     const poort = mag(key);
     if (!poort.ok) return { status: 403, error: poort.reden };
+    if (sociaalRate && !sociaalRate(key, 'rendezvous-encounter', 8, 15 * 60 * 1000))
+      return { status: 429, error: 'Te veel Encounter-pogingen. Probeer het later opnieuw.' };
     const doel = handleVanPin ? handleVanPin(String(pin || '').trim()) : null;
     if (!doel || doel === key) return { status: 404, error: 'Die pin wijst niemand aan.' };
     const r = R();
     if (geblokkeerd && geblokkeerd(r, key, doel)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
     if (!r.ontmoetingen || typeof r.ontmoetingen !== 'object') r.ontmoetingen = {};
     const sl = paar(key, doel);
-    const o = r.ontmoetingen[sl] || (r.ontmoetingen[sl] = { wie: {}, at: nu() });
+    let o = r.ontmoetingen[sl];
+    if (o && o.completed) return { status: 409, error: 'Deze Encounter-code is al gebruikt.' };
+    if (o && Date.now() - Date.parse(o.at) > 12 * 60 * 60 * 1000) o = null;
+    o = o || (r.ontmoetingen[sl] = { wie: {}, at: nu() });
     o.wie[key] = nu();
     save();
     if (!o.wie[doel]) return { status: 200,
       ...Projection.project(Projection.NAMES.RENDEZVOUS_ENCOUNTER, { ok: true, wacht: true }) };
+    o.completed = nu();
     introBied('encounter', key, doel, 'u heeft elkaar ontmoet');
     return { status: 200, ...Projection.project(Projection.NAMES.RENDEZVOUS_ENCOUNTER,
       { ok: true, wacht: false, codenaam: codenaam(doel) }) };

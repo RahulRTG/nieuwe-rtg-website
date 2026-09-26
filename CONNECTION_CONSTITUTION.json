@@ -1,10 +1,10 @@
 {
   "schema": "RTG_CONNECTION_CONSTITUTION",
-  "version": 5,
-  "source_sha256": "9045d56388253d019909af009911604cad2555d9e62bffbcfffa822efab970a5",
+  "version": 6,
+  "source_sha256": "f550ef7d40e041798644c61562916bb1813eaacc1d345ff52e03754dc6d90f68",
   "tests": {
-    "total": 108,
-    "passed": 108,
+    "total": 113,
+    "passed": 113,
     "failed": 0,
     "baseline_tests": 58,
     "constitution_tests": 8,
@@ -12,7 +12,8 @@
     "projection_tests": 8,
     "product_state_tests": 12,
     "edge_experience_tests": 10,
-    "profile_media_tests": 8
+    "profile_media_tests": 8,
+    "final_product_tests": 5
   },
   "proofs": {
     "default_deny": "PROVEN",
@@ -45,7 +46,12 @@
     "profile_media_progressive_disclosure": "PROVEN",
     "profile_media_blocking": "PROVEN",
     "profile_media_storage_isolation": "PROVEN",
-    "photo_identity_separation": "PROVEN"
+    "photo_identity_separation": "PROVEN",
+    "communication_media_purpose": "PROVEN",
+    "call_consent_and_revocation": "PROVEN",
+    "concierge_fulfilment_states": "PROVEN",
+    "circle_member_isolation": "PROVEN",
+    "final_route_chain": "PROVEN"
   },
   "projection_contracts": [
     "VONK_PROFILE_OWNER",
@@ -54,6 +60,8 @@
     "VONK_MATCH",
     "VONK_CONVERSATION",
     "VONK_MEET",
+    "CONNECTION_COMMUNICATION",
+    "CONNECTION_CALL",
     "RENDEZVOUS_PROFILE_OWNER",
     "RENDEZVOUS_MATCH",
     "RENDEZVOUS_INTRODUCTION",
@@ -63,11 +71,15 @@
     "RENDEZVOUS_TABLE_OFFICE",
     "RENDEZVOUS_TOGETHER",
     "RENDEZVOUS_MEET",
+    "RENDEZVOUS_CONCIERGE_MEMBER",
+    "RENDEZVOUS_CONCIERGE_OFFICE",
+    "RENDEZVOUS_CIRCLE_MEMBER",
+    "RENDEZVOUS_CIRCLE_OFFICE",
     "RAHUL_CONNECTION",
     "BACKOFFICE_SAFETY",
     "VONK_EDGE",
     "RENDEZVOUS_EDGE"
   ],
-  "policy_rows": 29,
+  "policy_rows": 45,
   "unimplemented_capabilities_exposed": 0
 }

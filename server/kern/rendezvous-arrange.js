@@ -112,7 +112,9 @@ module.exports = (ctx) => {
     setting: v.setting, settingLabel: v.settingLabel, stad: v.stad, van: v.van, tot: v.tot,
     dagdeel: v.dagdeel, dagdeelLabel: v.dagdeelLabel,
     ikAkkoord: actief(v, key, targetKey), anderAkkoord: actief(v, targetKey, key),
-    tekst: zin(v), bijRechterhand: !!v.bijRechterhand
+    tekst: zin(v), bijRechterhand: !!v.bijRechterhand,
+    fulfilmentState: v.fulfilment && v.fulfilment.state,
+    confirmation: v.fulfilment && v.fulfilment.state === 'CONFIRMED' ? v.fulfilment.confirmation : undefined
   });
 
   function zin(v) {
@@ -147,6 +149,7 @@ module.exports = (ctx) => {
          Rechterhand-dossier te staan. Nadrukkelijk NIET gereserveerd: de notitie
          zegt dat De Rechterhand hem oppakt, want dat is wat er waar is. */
       v.bijRechterhand = nu();
+      v.fulfilment = { state: 'REQUESTED', updatedAt: nu(), history: [{ state: 'REQUESTED', at: nu() }] };
       for (const [wie, met] of [[key, targetKey], [targetKey, key]]) {
         try {
           tableZet(wie, { naam: 'Rendez-vous met ' + codenaam(met), datum: v.van || '',
@@ -160,5 +163,26 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, voorstel: uit(v, key, targetKey) };
   }
 
-  return { rvArrange: stel, rvAkkoord: akkoord };
+  function queue() {
+    return { status: 200, requests: Object.values(V()).filter(v => v.bijRechterhand).map(v => ({
+      id:v.id, setting:v.setting, city:v.stad, from:v.van, to:v.tot, daypart:v.dagdeel,
+      members:v.id.split('|').map(codenaam), state:(v.fulfilment&&v.fulfilment.state)||'REQUESTED',
+      confirmation:v.fulfilment&&v.fulfilment.confirmation
+    })) };
+  }
+  function fulfil(id, state, confirmation) {
+    const v=V()[String(id||'')];if(!v||!v.bijRechterhand)return {status:404,error:'Dit arrangement bestaat niet.'};
+    const current=(v.fulfilment&&v.fulfilment.state)||'REQUESTED';
+    const next={REQUESTED:['ACKNOWLEDGED','CANNOT_FULFIL'],ACKNOWLEDGED:['IN_PROGRESS','CANNOT_FULFIL'],
+      IN_PROGRESS:['CONFIRMED','CANNOT_FULFIL']}[current]||[];
+    if(!next.includes(state))return {status:409,error:'Deze fulfilmentovergang is niet toegestaan.'};
+    if(state==='CONFIRMED'&&!schoon(confirmation,500))return {status:400,error:'Een echte bevestiging is vereist.'};
+    v.fulfilment=v.fulfilment||{history:[]};v.fulfilment.state=state;v.fulfilment.updatedAt=nu();
+    if(state==='CONFIRMED')v.fulfilment.confirmation=schoon(confirmation,500);
+    v.fulfilment.history.push({state,at:v.fulfilment.updatedAt});save();
+    for(const member of v.id.split('|'))try{notify(member,{title:'Rendez-vous',body:state==='CONFIRMED'?'Approved. We’ll take care of the rest. Uw arrangement is bevestigd.':'De Rechterhand heeft uw arrangement bijgewerkt.',scope:'lifestyle'});}catch(e){}
+    return {status:200,ok:true,state};
+  }
+
+  return { rvArrange: stel, rvAkkoord: akkoord, rvArrangeQueue: queue, rvArrangeFulfil: fulfil };
 };

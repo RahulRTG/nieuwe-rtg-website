@@ -1,10 +1,5 @@
-/* Veilige profielfoto's voor Connection OS.
-
-   Opslag, publicatie en levering zijn afzonderlijke stappen. Een opgeslagen
-   foto is dus nooit vanzelf zichtbaar. Permanente opslagreferenties verlaten
-   deze module niet; de browser ontvangt alleen een kortlevend, versleuteld
-   delivery-ticket. Ook bij levering worden blokkade, disclosure en matchstatus
-   opnieuw gecontroleerd, zodat intrekken meteen effect heeft op nieuw verkeer. */
+/* Veilige Connection-profielfoto's: opslag, publicatie en kortlevende levering
+   zijn gescheiden; disclosure, match en block worden bij levering herzien. */
 'use strict';
 
 const Beeld = require('./connection-image');
@@ -17,7 +12,9 @@ const RATE_WINDOW_MS = 60 * 60 * 1000;
 const RATE_MAX = 10;
 
 module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, schoon, gate,
-  isBlocked, isMatch, ticketSecret }) {
+  isBlocked, isMatch, ticketSecret, product: productName, profileActive, deliveryBase }) {
+  const product = productName || 'vonk';
+  const basis = deliveryBase || '/api/vonk/profile-photo/delivery/';
   const uploads = new Map();
   /* Productie levert RTG_ENC_KEY. Een losse lokale of testmatige kern zonder
      configuratie krijgt een willekeurige processleutel, nooit de voorspelbare
@@ -30,8 +27,9 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
     if (!Array.isArray(db.data.connectionProfileMedia)) db.data.connectionProfileMedia = [];
     return db.data.connectionProfileMedia;
   };
-  const vind = id => lees().find(x => x.id === String(id || '')) || null;
-  const van = owner => lees().filter(x => x.owner === owner).sort((a, b) => a.position - b.position || a.createdAt.localeCompare(b.createdAt));
+  const hoort = x => (x.product || 'vonk') === product;
+  const vind = id => lees().find(x => x.id === String(id || '') && hoort(x)) || null;
+  const van = owner => lees().filter(x => x.owner === owner && hoort(x)).sort((a, b) => a.position - b.position || a.createdAt.localeCompare(b.createdAt));
   const veiligTekst = (v, n) => schoon ? schoon(v, n) : String(v || '').slice(0, n);
   const zicht = v => VISIBILITY.includes(String(v || '').toUpperCase()) ? String(v).toUpperCase() : 'DISCOVERY';
 
@@ -44,7 +42,10 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
   }
   function decrypt(token) {
     try {
-      const raw = Buffer.from(String(token || ''), 'base64url');
+      const text = String(token || '');
+      if (!/^[A-Za-z0-9_-]+$/.test(text)) return null;
+      const raw = Buffer.from(text, 'base64url');
+      if (raw.toString('base64url') !== text) return null;
       if (raw.length < 29) return null;
       const decipher = crypto.createDecipheriv('aes-256-gcm', key, raw.subarray(0, 12));
       decipher.setAuthTag(raw.subarray(12, 28));
@@ -57,8 +58,11 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
     if (viewer === item.owner) return true;
     if (item.publicationState !== 'PUBLISHED' || item.visibility === 'PRIVATE') return false;
     if (isBlocked && isBlocked(viewer, item.owner)) return false;
-    const profiel = db.data.vonk && db.data.vonk.profielen && db.data.vonk.profielen[item.owner];
-    if (!profiel || profiel.actief === false) return false;
+    if (profileActive && !profileActive(item.owner)) return false;
+    if (!profileActive) {
+      const profiel = db.data.vonk && db.data.vonk.profielen && db.data.vonk.profielen[item.owner];
+      if (!profiel || profiel.actief === false) return false;
+    }
     if (context === 'discovery') return item.visibility === 'DISCOVERY';
     if (context === 'match' && isMatch && isMatch(viewer, item.owner))
       return item.visibility === 'DISCOVERY' || item.visibility === 'AFTER_MATCH';
@@ -67,7 +71,7 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
 
   function ticket(item, viewer, context) {
     const exp = Date.now() + TICKET_MS;
-    return { src: '/api/vonk/profile-photo/delivery/' + encrypt({ id: item.id, viewer, context, version: item.version, exp }),
+    return { src: basis + encrypt({ id: item.id, viewer, context, version: item.version, exp }),
       expiresAt: new Date(exp).toISOString() };
   }
 
@@ -112,7 +116,7 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
     const opgeslagen = await media.bewaarBestandPrive(beeld.bytes, beeld.mime, Beeld.MAX_BYTES);
     if (!opgeslagen || opgeslagen.type !== 'image') return { status: 400, error: 'De foto kon niet veilig worden bewaard.' };
     const at = nu();
-    const item = { id: 'cpm' + crypto.randomBytes(9).toString('hex'), owner, purpose: PURPOSE,
+    const item = { id: 'cpm' + crypto.randomBytes(9).toString('hex'), product, owner, purpose: PURPOSE,
       ref: opgeslagen.ref, mime: beeld.mime, bytes: opgeslagen.bytes, width: beeld.width, height: beeld.height,
       alt: veiligTekst(opties && opties.alt, 120) || 'Profielfoto', visibility: zicht(opties && opties.visibility),
       processingState: 'READY', publicationState: 'DRAFT', moderationState: 'NOT_REVIEWED',
@@ -150,6 +154,18 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
     return { status: 200, ok: true };
   }
 
+  function orden(owner, ids) {
+    const dicht = poort(owner); if (dicht) return dicht;
+    const huidig = van(owner), volgorde = Array.isArray(ids) ? ids.map(String) : [];
+    if (volgorde.length !== huidig.length || new Set(volgorde).size !== huidig.length ||
+      huidig.some(x => !volgorde.includes(x.id))) return { status: 400, error: 'De fotovolgorde is niet compleet.' };
+    volgorde.forEach((mediaId, position) => {
+      const item = vind(mediaId); item.position = position; item.version += 1; item.updatedAt = nu();
+    });
+    save();
+    return { status: 200, ok: true, media: projecteer(owner, owner, 'owner') };
+  }
+
   async function lever(token) {
     const toegang = decrypt(token);
     if (!toegang || !Number.isFinite(toegang.exp) || toegang.exp < Date.now()) return null;
@@ -159,7 +175,7 @@ module.exports = function maakConnectionProfileMedia({ db, save, crypto, media, 
     return bytes ? { bytes, mime: item.mime } : null;
   }
 
-  return { upload, publiceer, verwijder, lever, projecteer, magZien,
+  return { upload, publiceer, verwijder, orden, lever, projecteer, magZien,
     PURPOSE, VISIBILITY, MAX_PHOTOS, TICKET_MS };
 };
 

@@ -5,7 +5,7 @@
    allowlist. Niet-toegestane eigenschappen zijn afwezig, niet null. */
 'use strict';
 
-const VERSION = 3;
+const VERSION = 5;
 
 const NAMES = Object.freeze({
   VONK_PROFILE_OWNER: 'VONK_PROFILE_OWNER',
@@ -14,6 +14,8 @@ const NAMES = Object.freeze({
   VONK_MATCH: 'VONK_MATCH',
   VONK_CONVERSATION: 'VONK_CONVERSATION',
   VONK_MEET: 'VONK_MEET',
+  CONNECTION_COMMUNICATION: 'CONNECTION_COMMUNICATION',
+  CONNECTION_CALL: 'CONNECTION_CALL',
   RENDEZVOUS_PROFILE_OWNER: 'RENDEZVOUS_PROFILE_OWNER',
   RENDEZVOUS_MATCH: 'RENDEZVOUS_MATCH',
   RENDEZVOUS_INTRODUCTION: 'RENDEZVOUS_INTRODUCTION',
@@ -23,6 +25,10 @@ const NAMES = Object.freeze({
   RENDEZVOUS_TABLE_OFFICE: 'RENDEZVOUS_TABLE_OFFICE',
   RENDEZVOUS_TOGETHER: 'RENDEZVOUS_TOGETHER',
   RENDEZVOUS_MEET: 'RENDEZVOUS_MEET',
+  RENDEZVOUS_CONCIERGE_MEMBER: 'RENDEZVOUS_CONCIERGE_MEMBER',
+  RENDEZVOUS_CONCIERGE_OFFICE: 'RENDEZVOUS_CONCIERGE_OFFICE',
+  RENDEZVOUS_CIRCLE_MEMBER: 'RENDEZVOUS_CIRCLE_MEMBER',
+  RENDEZVOUS_CIRCLE_OFFICE: 'RENDEZVOUS_CIRCLE_OFFICE',
   RAHUL_CONNECTION: 'RAHUL_CONNECTION',
   BACKOFFICE_SAFETY: 'BACKOFFICE_SAFETY',
   VONK_EDGE: 'VONK_EDGE',
@@ -34,17 +40,23 @@ const CONTRACTS = Object.freeze({
   [NAMES.VONK_PROFILE_MEDIA_OWNER]: ['media'],
   [NAMES.VONK_DISCOVERY]: ['codenaam', 'over', 'leeftijd', 'stad', 'interesses', 'betrouwbaarheid', 'kenmerken', 'gemeen', 'waarom', 'media'],
   [NAMES.VONK_MATCH]: ['id', 'met', 'at', 'status', 'betrouwbaarheid', 'tafel', 'ikBetaalde', 'anderBetaalde', 'berichten', 'kenmerken', 'wanneer', 'media'],
-  [NAMES.VONK_CONVERSATION]: ['van', 'tekst', 'at'],
+  [NAMES.VONK_CONVERSATION]: ['van', 'tekst', 'kind', 'media', 'at'],
   [NAMES.VONK_MEET]: ['supplierCode', 'supplierName', 'plek', 'middenAfstandKm', 'datum', 'tijd', 'prijsPP', 'rtgDeel', 'soort', 'reisminuten', 'waarom'],
+  [NAMES.CONNECTION_COMMUNICATION]: ['scope', 'messages', 'consent', 'call'],
+  [NAMES.CONNECTION_CALL]: ['id', 'type', 'state', 'incoming', 'revision', 'signals'],
   [NAMES.RENDEZVOUS_PROFILE_OWNER]: ['codenaam', 'rooster', 'profiel'],
-  [NAMES.RENDEZVOUS_MATCH]: ['id', 'codenaam', 'gedeeldeLocaties', 'samen', 'wanneer', 'voorstel', 'sinds'],
-  [NAMES.RENDEZVOUS_INTRODUCTION]: ['id', 'codenaam', 'over', 'zoekt', 'wensen', 'locaties', 'gedeeldeLocaties', 'samen', 'likteMij', 'status', 'soort', 'aanleiding', 'ikAntwoordde', 'geopend', 'at'],
+  [NAMES.RENDEZVOUS_MATCH]: ['id', 'codenaam', 'gedeeldeLocaties', 'samen', 'wanneer', 'voorstel', 'sinds', 'media'],
+  [NAMES.RENDEZVOUS_INTRODUCTION]: ['id', 'codenaam', 'over', 'zoekt', 'wensen', 'locaties', 'gedeeldeLocaties', 'samen', 'likteMij', 'status', 'soort', 'aanleiding', 'ikAntwoordde', 'geopend', 'at', 'media'],
   [NAMES.RENDEZVOUS_PRESENCE]: ['stad', 'van', 'tot'],
   [NAMES.RENDEZVOUS_ENCOUNTER]: ['ok', 'wacht', 'codenaam'],
   [NAMES.RENDEZVOUS_TABLE_MEMBER]: ['id', 'naam', 'stad', 'datum', 'tijd', 'thema', 'plaatsen', 'mijnStatus'],
   [NAMES.RENDEZVOUS_TABLE_OFFICE]: ['id', 'naam', 'stad', 'datum', 'tijd', 'thema', 'plaatsen', 'at', 'genodigden', 'toegezegd', 'aantal'],
   [NAMES.RENDEZVOUS_TOGETHER]: ['samen', 'met', 'ikVerklaarde'],
-  [NAMES.RENDEZVOUS_MEET]: ['setting', 'settingLabel', 'stad', 'van', 'tot', 'dagdeel', 'dagdeelLabel', 'ikAkkoord', 'anderAkkoord', 'tekst', 'bijRechterhand'],
+  [NAMES.RENDEZVOUS_MEET]: ['setting', 'settingLabel', 'stad', 'van', 'tot', 'dagdeel', 'dagdeelLabel', 'ikAkkoord', 'anderAkkoord', 'tekst', 'bijRechterhand', 'fulfilmentState', 'confirmation'],
+  [NAMES.RENDEZVOUS_CONCIERGE_MEMBER]: ['id', 'subject', 'request', 'city', 'window', 'state', 'proposal', 'confirmation', 'updatedAt'],
+  [NAMES.RENDEZVOUS_CONCIERGE_OFFICE]: ['id', 'member', 'subject', 'request', 'city', 'window', 'state', 'proposal', 'confirmation', 'updatedAt'],
+  [NAMES.RENDEZVOUS_CIRCLE_MEMBER]: ['id', 'name', 'theme', 'context', 'membership', 'gatherings'],
+  [NAMES.RENDEZVOUS_CIRCLE_OFFICE]: ['id', 'name', 'theme', 'members', 'gatherings'],
   [NAMES.RAHUL_CONNECTION]: ['matchCodenaam', 'gedeeldeLocaties', 'openLocaties', 'watIkZoek', 'presence', 'gedeeldDagdeel', 'voorkeursStad'],
   [NAMES.BACKOFFICE_SAFETY]: ['id', 'van', 'over', 'reden', 'at', 'status'],
   [NAMES.VONK_EDGE]: ['surface', 'state', 'availableCapabilities', 'actions', 'stateRevision', 'policyVersion', 'projectionVersion', 'stateContractVersion'],
@@ -86,12 +98,27 @@ function project(name, source) {
     if (aanwezig(s.tafel)) uit.tafel = project(NAMES.VONK_MEET, s.tafel);
     if (aanwezig(s.berichten)) uit.berichten = s.berichten.map(x => project(NAMES.VONK_CONVERSATION, x));
   }
+  if (name === NAMES.VONK_CONVERSATION && aanwezig(s.media) && s.media) {
+    uit.media = alleen(s.media, ['purpose', 'mime', 'src']);
+  }
+  if (name === NAMES.CONNECTION_COMMUNICATION) {
+    if (aanwezig(s.messages)) uit.messages = s.messages.map(m => alleen(m, ['id', 'kind', 'mine', 'text', 'at', 'media']));
+    for (const m of uit.messages || []) if (m.media) m.media = alleen(m.media, ['purpose', 'mime', 'src', 'transcript']);
+    if (aanwezig(s.consent)) uit.consent = alleen(s.consent, ['voice', 'video']);
+    if (aanwezig(s.call) && s.call) uit.call = project(NAMES.CONNECTION_CALL, s.call);
+  }
   if (name === NAMES.RENDEZVOUS_MATCH || name === NAMES.RENDEZVOUS_INTRODUCTION) {
     if (aanwezig(s.samen)) uit.samen = s.samen.map(presence);
+    if (aanwezig(s.media)) uit.media = (Array.isArray(s.media) ? s.media : []).map(m => alleen(m,
+      ['id', 'purpose', 'visibility', 'processingState', 'publicationState', 'moderationState',
+        'verificationState', 'width', 'height', 'mime', 'position', 'version', 'alt', 'src', 'expiresAt']));
   }
   if (name === NAMES.RENDEZVOUS_PROFILE_OWNER && aanwezig(s.profiel)) {
-    uit.profiel = alleen(s.profiel, ['aan', 'over', 'zoekt', 'wensen', 'locaties', 'thuis', 'aanwezig', 'beschikbaar']);
+    uit.profiel = alleen(s.profiel, ['aan', 'over', 'zoekt', 'wensen', 'locaties', 'thuis', 'aanwezig', 'beschikbaar', 'media']);
     if (aanwezig(s.profiel.aanwezig)) uit.profiel.aanwezig = s.profiel.aanwezig.map(presence);
+    if (aanwezig(s.profiel.media)) uit.profiel.media = s.profiel.media.map(m => alleen(m,
+      ['id', 'purpose', 'visibility', 'processingState', 'publicationState', 'moderationState',
+        'verificationState', 'width', 'height', 'mime', 'position', 'version', 'alt', 'src', 'expiresAt']));
   }
   if (name === NAMES.RENDEZVOUS_TABLE_OFFICE && aanwezig(s.genodigden)) {
     uit.genodigden = s.genodigden.map(g => alleen(g, ['codenaam', 'status']));

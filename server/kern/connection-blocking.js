@@ -8,6 +8,7 @@
 'use strict';
 
 module.exports = ({ db, save, nu }) => {
+  const listeners = new Set();
   const klok = typeof nu === 'function' ? nu : () => new Date().toISOString();
   const lees = () => (db.data.connectionBlocks && typeof db.data.connectionBlocks === 'object')
     ? db.data.connectionBlocks : null;
@@ -30,7 +31,8 @@ module.exports = ({ db, save, nu }) => {
     if (!r[a] || typeof r[a] !== 'object') r[a] = {};
     if (!r[a][b]) r[a][b] = { at: klok(), product: String(product || 'connection') };
     save();
+    for (const fn of listeners) { try { fn(a, b, product); } catch (e) {} }
     return { ok: true };
   }
-  return { isGeblokkeerd, blokkeer };
+  return { isGeblokkeerd, blokkeer, onBlock(fn) { if (typeof fn === 'function') listeners.add(fn); return () => listeners.delete(fn); } };
 };

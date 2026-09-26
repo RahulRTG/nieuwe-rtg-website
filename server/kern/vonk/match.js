@@ -7,7 +7,7 @@
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine, niveauVan,
     reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN,
-    kenmerkenVan, wanneerMet, optiesVoor, geblokkeerd, connectionBlocking, Projection, profileMedia } = ctx;
+    kenmerkenVan, wanneerMet, optiesVoor, geblokkeerd, connectionBlocking, Projection, profileMedia, communication } = ctx;
 
   /* Like/voorbij; wederzijds opent match, chat en tafel. */
   async function like(key, codenaam, aan) {
@@ -63,48 +63,22 @@ module.exports = (ctx) => {
       datum: dag, tijd: '19:30', prijsPP: PRIJS_CENTEN / 100, rtgDeel: RTG_CENTEN / 100 };
   }
 
-  /* ---- betalen (EUR 10 p.p.) en dan echt reserveren ---- */
-  async function betaal(key, mid) {
-    const m = d().matches.find(x => x.id === mid && (x.a === key || x.b === key));
-    if (!m) return { status: 404, error: 'Deze match bestaat niet.' };
-    if (geblokkeerd(key, m.a === key ? m.b : m.a)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
-    if (!m.tafel) return { status: 409, error: 'Er is geen tafel om te bevestigen; spreek zelf iets af in de chat.' };
-    if (m.betaald[key]) return { status: 200, ok: true, al: true, status2: m.status };
-    const codenaam = codenaamVan(key);
-    // EUR 5 naar RTG en EUR 5 als aanbetaling bij de zaak, in een keer uit de wallet
-    const r1 = await pay.boekAsync({ van: 'lid:' + codenaam, naar: 'extern:vonk-rtg', centen: RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, deel RTG', ref: m.id });
-    if (r1 && r1.error) return { status: 402, error: r1.error };
-    const r2 = await pay.boekAsync({ van: 'lid:' + codenaam, naar: 'partner:' + m.tafel.supplierCode, centen: PRIJS_CENTEN - RTG_CENTEN, soort: 'vonk', oms: 'Vonk-date, aanbetaling zaak', ref: m.id });
-    /* Faalt de tweede poot, dan gaat het RTG-deel terug; anders betaalt een
-       volgende poging opnieuw terwijl de date niet staat. */
-    if (r2 && r2.error) {
-      await pay.boekAsync({ van: 'extern:vonk-rtg', naar: 'lid:' + codenaam, centen: RTG_CENTEN, soort: 'terug', oms: 'Vonk-date niet doorgegaan, teruggeboekt', ref: m.id });
-      return { status: 402, error: r2.error };
-    }
-    m.betaald[key] = nu();
-    const ander = m.a === key ? m.b : m.a;
-    if (m.betaald[ander]) {
-      // allebei betaald: nu pas de echte reservering (op beide codenamen)
-      const res = reserveerTafel({ key, tier: 'rtg' }, codenaamVan(m.a) + ' & ' + codenaamVan(m.b),
-        { supplierCode: m.tafel.supplierCode, datum: m.tafel.datum, tijd: m.tafel.tijd, personen: 2, notitie: 'Vonk-date (aanbetaling voldaan)' });
-      m.status = res && res.ok ? 'bevestigd' : 'betaald';
-      m.reserveringId = res && res.ok ? res.reservering.id : null;
-      for (const wie of [m.a, m.b]) { try { notify(wie, { icon: 'bar', title: 'De date staat', body: m.tafel.supplierName + ', ' + m.tafel.datum + ' ' + m.tafel.tijd + '. Veel plezier!' }); } catch (e) {} }
-    }
-    save();
-    return { status: 200, ok: true, status2: m.status };
-  }
+  const betaal = require('./payment')({ d, save, nu, geblokkeerd, codenaamVan, pay, reserveerTafel,
+    notify, PRIJS_CENTEN, RTG_CENTEN });
 
   /* ---- de chatlijn (pas na een match) + blokkeren en melden ---- */
   function bericht(key, mid, tekst) {
     const m = d().matches.find(x => x.id === mid && (x.a === key || x.b === key));
     if (!m) return { status: 404, error: 'Deze match bestaat niet.' };
     if (geblokkeerd(key, m.a === key ? m.b : m.a)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
-    const t = schoon(tekst, 300);
-    if (!t) return { status: 400, error: 'Zeg iets liefs.' };
-    m.berichten.push({ van: codenaamVan(key), tekst: t, at: nu() });
-    m.berichten = m.berichten.slice(-200);
-    save();
+    const gedeeld = communication ? communication.sendText(key, { id: mid }, tekst) : null;
+    if (gedeeld && gedeeld.error) return gedeeld;
+    if (!communication) {
+      const t = schoon(tekst, 300);
+      if (!t) return { status: 400, error: 'Schrijf eerst een bericht.' };
+      m.berichten.push({ van: codenaamVan(key), tekst: t, at: nu() });
+      m.berichten = m.berichten.slice(-200); save();
+    }
     const ander = m.a === key ? m.b : m.a;
     try { sseToCustomer(ander, 'vonk', { kind: 'bericht', id: m.id }); } catch (e) {}
     return { status: 200, ok: true };
@@ -120,7 +94,10 @@ module.exports = (ctx) => {
       id: m.id, met: codenaamVan(m.a === key ? m.b : m.a), at: m.at, status: m.status,
       betrouwbaarheid: niveauVan ? niveauVan(m.a === key ? m.b : m.a) : null,
       tafel: m.tafel, ikBetaalde: !!m.betaald[key], anderBetaalde: !!m.betaald[m.a === key ? m.b : m.a],
-      berichten: m.berichten.slice(-30),
+      berichten: communication ? (communication.status(key, { id: m.id }).messages || []).map(b => ({
+        van: b.mine ? codenaamVan(key) : codenaamVan(m.a === key ? m.b : m.a), tekst: b.text || '', at: b.at,
+        kind: b.kind, media: b.media
+      })) : m.berichten.slice(-30),
       // hier gaan de assen open die het lid op 'pas na een match' had gezet
       kenmerken: kenmerkenVan(m.a === key ? m.b : m.a),
       media: profileMedia ? profileMedia.projecteer(key, m.a === key ? m.b : m.a, 'match') : [],
@@ -136,6 +113,8 @@ module.exports = (ctx) => {
     if (!doel) return { status: 404, error: 'Geen lid met die codenaam.' };
     const p = d().profielen[key];
     if (p && !p.blokkade.includes(doel)) p.blokkade.push(doel);
+    const openMatch = d().matches.find(m => (m.a === key && m.b === doel) || (m.a === doel && m.b === key));
+    if (communication && openMatch) communication.terminatePair(key, doel, 'BLOCKED');
     if (connectionBlocking) connectionBlocking.blokkeer(key, doel, 'vonk');
     d().matches = d().matches.filter(m => !((m.a === key && m.b === doel) || (m.a === doel && m.b === key)));
     if (meld) {

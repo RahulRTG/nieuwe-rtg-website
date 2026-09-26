@@ -1,21 +1,8 @@
-/* Kern-module "rendezvous": Rendez-vous -- de besloten AI-datingapp van de
-   Lifestyle Pass. Leden zetten een discreet profiel op met hun wensen en de
-   locaties waar zij openstaan voor een jetset-date. Twee leden die elkaar leuk
-   vinden (wederzijdse like) hebben een match; Rahul stelt dan een date voor op een
-   locatie die beiden hebben aangegeven of voor openstaan. De pool bestaat alleen
-   uit Lifestyle- en Business-leden -- exclusief en op codenaam (privacy by design:
-   echte namen blijven in de kluis). Rahul BELOOFT nooit een reservering; hij stelt
-   voor en De Rechterhand regelt het pas als het rond is. Gedeelde context vanuit
-   server.js.
-
-   DE POORT. Rendez-vous eist hetzelfde als Vonk: een echt account, een door RTG
-   geverifieerd paspoort en 18 of ouder (kern/ontmoetpoort.js). Dat stond hier
-   lang NIET -- er was alleen een pas-eis op de route, waardoor de exclusieve app
-   losser was dan de brede. De pas-eis (Lifestyle of Business) blijft op de route
-   waar hij hoort; de leeftijd en de identiteit horen hier, want de kern is wat
-   elke ingang passeert. */
-module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin,
-  connectionBlocking }) => {
+/* Rendez-vous: besloten introductions en Society op codenaam. Identiteit en
+   18+ worden in ontmoetpoort afgedwongen; fulfilment wordt pas bevestigd nadat
+   De Rechterhand dat werkelijk heeft gedaan. */
+module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin, sociaalRate,
+  connectionBlocking, media, sseToCustomer, connectionMediaTicketSecret }) => {
   const Projection = require('./connection-projection');
   const nu = () => new Date().toISOString();
   const { ontmoetPoort } = require('./ontmoetpoort').maakOntmoetpoort({ accounts, leeftijdVan });
@@ -40,16 +27,8 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
     if (!Array.isArray(r.meldingen)) r.meldingen = [];
     return r;
   }
-  /* DE CODENAAM VAN EEN SLEUTEL. Hier stond `liveCodename(key)`, en dat is de
-     verkeerde functie: liveCodename verwacht een SESSIE (hij leest
-     `session.account`), en elke andere aanroeper in dit huis geeft er ook een
-     sessie aan. Met een sleutelstring erin gaf hij altijd null -- en viel alles
-     terug op de tekst hieronder. Gevolg: iedereen in Rendez-vous heette "Een
-     lid". Een app die volledig op codenamen draait, had er dus maar een.
-
-     codenaamVan leest de gids op sleutel, en is bovendien de tegenhanger van
-     keyVanCodenaam -- zonder dat kon het kantoor een tafel niet op codenaam
-     samenstellen. */
+  /* Gebruik de gids op accountsleutel; sessie-gebaseerde naamresolutie is hier
+     onjuist en zou ieder profiel tot dezelfde terugvalcodenaam reduceren. */
   const codenaam = key => (codenaamVan ? codenaamVan(key) : '') || 'Een lid';
   /* Uit de dating-premium-ronde op main: een blokkade werkt in BEIDE richtingen,
      wie u blokkeerde ziet u ook niet meer. */
@@ -75,7 +54,7 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
       { codenaam: codenaam(key), rooster: B.rooster(),
         profiel: { aan: !!p.aan, over: p.over || '', zoekt: p.zoekt || '', wensen: p.wensen || [],
         locaties: p.locaties || [], thuis: p.thuis || '', aanwezig: AW.schoonAanwezig(p.aanwezig, schoon),
-        beschikbaar: B.schoonBeschikbaar(p.beschikbaar) } }) };
+        beschikbaar: B.schoonBeschikbaar(p.beschikbaar), media: profileMedia ? profileMedia.projecteer(key, key, 'owner') : [] } }) };
   }
   function rvProfiel(key, b) {
     const poort = mag(key);
@@ -111,7 +90,8 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
           { id: t, codenaam: codenaam(t), gedeeldeLocaties: g, samen,
           // pas hier, na de wederzijdse like: een dagdeel of niets
           wanneer: B.zin(mij.beschikbaar, r.profielen[t].beschikbaar),
-          voorstel: (samen[0] && samen[0].stad) || g[0] || null, sinds: mijn[t] }));
+          voorstel: (samen[0] && samen[0].stad) || g[0] || null, sinds: mijn[t],
+          media: profileMedia ? profileMedia.projecteer(key, t, 'match') : [] }));
       }
     }
     uit.sort((a, b) => String(b.sinds).localeCompare(String(a.sinds)));
@@ -135,26 +115,39 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
     return { status: 200, ok: true, aanwezig: [], thuis: '' };
   }
 
+  const { profileMedia, communication } = require('./rendezvous-connection-setup')({ R, db, save, crypto,
+    media, schoon, mag, geblokkeerd, connectionBlocking, connectionMediaTicketSecret, notify, sseToCustomer });
+
   // Together: twee eenzijdige verklaringen, "samen" is de projectie erover
   const samen = require('./rendezvous-samen')({ R, mag, codenaam, nu, save, geblokkeerd, Projection });
-  const ontdek = require('./rendezvous-ontdek')({ R, AW, B, mag, codenaam, gedeeld, save, notify, nu, geblokkeerd, Projection,
+  const ontdek = require('./rendezvous-ontdek')({ R, AW, B, mag, codenaam, gedeeld, save, notify, nu, geblokkeerd, Projection, profileMedia,
     partnerVan: samen.rvPartnerVan });
   // The Table, Moment en Encounter (een tweezijdige ja, twee momenten)
-  const kring = require('./rendezvous-kring')({ R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, geblokkeerd, Projection });
+  const kring = require('./rendezvous-kring')({ R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, sociaalRate, geblokkeerd, Projection, profileMedia });
   const { rvDate } = require('./rendezvous-date')({ R, AW, B, mag, codenaam, schoon, matchesVan, anthropic, Projection });
   // Arrange It: Rahul stelt samen, beiden keuren goed, De Rechterhand regelt
   const arrange = require('./rendezvous-arrange')({ R, AW, B, mag, codenaam, schoon, nu, save,
     matchesVan, tableZet, notify, Projection });
+  const concierge = require('./rendezvous-concierge')({ R, mag, schoon, nu, save, crypto, notify });
+  const circles = require('./rendezvous-circles')({ R, mag, schoon, nu, save, crypto, notify, geblokkeerd });
 
-  const stateApi = require('./rendezvous-state')({ R, mag, nu, geblokkeerd, ontdek, samen, matchesVan });
+  const stateApi = require('./rendezvous-state')({ R, mag, nu, geblokkeerd, ontdek, samen, matchesVan, communication });
   /* rvKies en rvMeldingen komen uit de dating-premium-ronde (main): kiezen met
      drie acties (like/pas/blokkeer) en de meldingen voor kantoor. De routelaag
      stuurt like en pas daar al langs, dus rvLike/rvPas uit ontdek bestaan niet
      meer -- twee mutatiepaden naar dezelfde like is precies de dubbeling die de
      samenvoeging eerder in het reisscherm liet zien. */
   return { rvProfielGet, rvProfiel, ...ontdek, ...kring, rvMatches, rvDate, rvAanwezigWis,
-    rvKies, rvMeldingen,
+    rvFotoUpload: profileMedia.upload, rvFotoPubliceer: profileMedia.publiceer,
+    rvFotoVerwijder: profileMedia.verwijder, rvFotoOrden: profileMedia.orden, rvFotoLever: profileMedia.lever,
+    rvCommStatus: communication.status, rvCommConsent: communication.consent, rvCommText: communication.sendText,
+    rvCommRemove: communication.removeMessage, rvCommReport: communication.reportMessage,
+    rvCommMedia: communication.sendMedia, rvCommCallStart: communication.startCall,
+    rvCommCallAnswer: communication.answer, rvCommCallSignal: communication.sendSignal,
+    rvCommCallPoll: communication.poll, rvCommCallEnd: communication.end, rvCommMediaLever: communication.deliver,
+    rvKies, rvMeldingen, ...concierge, ...circles,
     ...stateApi,
     rvArrange: arrange.rvArrange, rvAkkoord: arrange.rvAkkoord,
+    rvArrangeQueue: arrange.rvArrangeQueue, rvArrangeFulfil: arrange.rvArrangeFulfil,
     rvSamen: samen.rvSamen, rvSamenZet: samen.rvSamenZet };
 };

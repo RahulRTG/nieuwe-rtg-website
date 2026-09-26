@@ -19,6 +19,9 @@
 <link href="/shared/social-intelligence.css" rel="stylesheet">
 <link href="/shared/dating-premium.css" rel="stylesheet">
 <link href="/shared/connection-edge.css" rel="stylesheet">
+<link href="/shared/connection-communication.css" rel="stylesheet">
+<link href="/shared/connection-communication-final.css" rel="stylesheet">
+<link href="/shared/media.css" rel="stylesheet">
 <link href="/shared/vonk-2.css" rel="stylesheet">
 <style>
   /* Samenvoeging 26-8-2026: de premium-opzet (dating-premium.css) is de basis;
@@ -113,6 +116,11 @@
 <script src="/shared/connection-edge-core.js"></script>
 <script src="/shared/connection-edge-input.js"></script>
 <script src="/shared/connection-edge.js"></script>
+<script src="/shared/media.js"></script>
+<script src="/shared/meeluister.js"></script>
+<script src="/shared/meelezen.js"></script>
+<script src="/shared/connection-communication-view.js"></script>
+<script src="/shared/connection-communication.js"></script>
 <script src="/shared/vonk-2-core.js"></script>
 <script>
 (() => {
@@ -123,6 +131,7 @@
   const Experience=window.RTGVonkExperience;
   const eersteRoute=Experience.leesHash(location.hash);
   let tab = eersteRoute.tab, selectie = null, matches = [], geo = null, safetyTarget = null, payTarget = null, connectionEdge = null;
+  let communicationClients=[];
   const pendingActions=new Set();
   /* Uit de ONTMOETEN.md-ronde: de assentabel (kern/vonk/wensen.js), de dagdelen
      (kern/beschikbaar.js) en de tafelkaart (kern/vonk/halfweg.js) komen van de
@@ -204,7 +213,7 @@
     if(connectionEdge)connectionEdge.clear();
     const kyc=/verifieer|paspoort|kyc/i.test(fout.message), leeftijd=/vanaf 18|18 jaar/i.test(fout.message);
     const titel=kyc?'Verifieer eerst uw identiteit':leeftijd?'Vonk is alleen voor 18+':'Open Vonk via uw ledenaccount';
-    $('#inhoud').innerHTML='<section class="dating-gate"><div class="dating-seal">V</div><span class="dating-eyebrow">Toegang bewaakt</span><h2>'+titel+'</h2><p>'+esc(fout.message)+'</p><div class="dating-actions"><a class="dating-button primary" href="/apps/app.html">'+(kyc?'Start identiteitscontrole':'Terug naar de leden-app')+'</a></div></section>';
+    $('#inhoud').innerHTML='<section class="dating-gate"><div class="dating-seal">V</div><span class="dating-eyebrow">Toegang bewaakt</span><h2>'+titel+'</h2><p>'+esc(fout.message)+'</p><p>Vonk toont leden uitsluitend op codenaam.</p><div class="dating-actions"><a class="dating-button primary" href="/apps/app.html">'+(kyc?'Start identiteitscontrole':'Terug naar de leden-app')+'</a></div></section>';
   }
   function openSafety(naam){safetyTarget=naam;$('#safetyReason').value='';$('#safetyTitle').textContent=naam+' blokkeren?';$('#safetyDialog').showModal();}
   async function safety(report){if(!safetyTarget)return;const reden=$('#safetyReason').value.trim();if(report&&!reden){meld('Vul kort een reden in voor RTG.');return;}const knop=report?$('#blockReport'):$('#blockOnly');return eenmaal('safety:'+safetyTarget,knop,async()=>{try{await api('blokkeer',{codenaam:safetyTarget,meld:report?reden:''});$('#safetyDialog').close();meld(report?'Geblokkeerd en veilig gemeld bij RTG.':'Geblokkeerd. Jullie zien elkaar niet meer.');await laad();}catch(e){meld(e.message);}});}
@@ -324,8 +333,9 @@
           return;
         }
         const kaart=document.querySelector('[data-connection-match="'+CSS.escape(String(context.id))+'"]');
-        if(action.id==='chat'){const veld=kaart&&kaart.querySelector('[data-text]');if(veld){veld.scrollIntoView({block:'center'});veld.focus();}}
+        if(action.id==='chat'){const veld=kaart&&kaart.querySelector('[data-cc-text]');if(veld){veld.scrollIntoView({block:'center'});veld.focus();}}
         else if(action.id==='meet')await openHalfweg(context.id,projection.stateRevision);
+        else if((action.id==='voice'||action.id==='video')&&kaart){const b=kaart.querySelector('[data-cc-call="'+action.id+'"]');if(b)b.click();}
         else if(action.id==='more'||action.id==='safety')openSafety(context.label||'Dit lid');
         else if(action.id==='date'&&kaart)kaart.scrollIntoView({block:'center'});
       }});
@@ -368,6 +378,7 @@
     document.querySelectorAll('[data-photo-publish]').forEach(b=>b.onclick=()=>eenmaal('foto-publiceer:'+b.dataset.photoPublish,b,async()=>{try{const sel=document.querySelector('[data-photo-visibility="'+CSS.escape(b.dataset.photoPublish)+'"]');await api('profile-photo/publish',{id:b.dataset.photoPublish,visibility:sel&&sel.value,publish:true});meld('De foto is gepubliceerd binnen de gekozen context.');await laad();}catch(e){meld(e.message);}}));
     document.querySelectorAll('[data-photo-unpublish]').forEach(b=>b.onclick=()=>eenmaal('foto-intrekken:'+b.dataset.photoUnpublish,b,async()=>{try{await api('profile-photo/publish',{id:b.dataset.photoUnpublish,publish:false});meld('De foto is direct uit alle nieuwe projecties gehaald.');await laad();}catch(e){meld(e.message);}}));
     document.querySelectorAll('[data-photo-remove]').forEach(b=>b.onclick=()=>eenmaal('foto-verwijder:'+b.dataset.photoRemove,b,async()=>{try{await api('profile-photo/remove',{id:b.dataset.photoRemove});meld('De foto is verwijderd.');await laad();}catch(e){meld(e.message);}}));
+    document.querySelectorAll('[data-photo-move]').forEach(b=>b.onclick=()=>eenmaal('foto-volgorde:'+b.dataset.photoMove,b,async()=>{const ids=(p.media||[]).map(x=>x.id),i=ids.indexOf(b.dataset.photoMove),j=i+Number(b.dataset.direction);if(i<0||j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];try{await api('profile-photo/order',{ids});meld(j===0?'Hoofdbeeld bijgewerkt.':'Fotovolgorde bijgewerkt.');await laad();}catch(e){meld(e.message);}}));
     $('#pBewaar').onclick=async()=>{const target=[...document.querySelectorAll('[data-looking]:checked')].map(x=>x.dataset.looking);if(!target.length){meld('Kies ten minste één voorkeur.');return;}const data={over:$('#pOver').value,stad:$('#pStad').value,geslacht:(document.querySelector('[name="gender"]:checked')||{}).value||'x',zoekt:target,leeftijdMin:$('#pMin').value,leeftijdMax:$('#pMax').value,maxKm:$('#pKm').value,actief:$('#pActief').checked,interesses:[...document.querySelectorAll('[data-interest]:checked')].map(x=>x.dataset.interest).concat($('#pExtra').value.split(',').map(x=>x.trim()).filter(Boolean))};if(geo)Object.assign(data,geo);try{await api('profiel',data);$('#pStatus').textContent='Bewaard · '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});meld('Uw Vonk-profiel is veilig bewaard.');await laad();}catch(e){meld(e.message);}};
     const wB=$('#wBewaar');if(wB)wB.onclick=async()=>{
       const kenmerken={},wensen={},zicht={};
@@ -398,7 +409,7 @@
 
   function mediaBeheerHtml(media){
     const labels={DISCOVERY:'In Today’s Six',AFTER_MATCH:'Pas na een match',PRIVATE:'Alleen voor mij'};
-    const items=(media||[]).map(m=>'<article class="vonk-photo-item"><img src="'+esc(m.src)+'" alt="'+esc(m.alt||'Eigen profielfoto')+'"><div><strong>'+(m.publicationState==='PUBLISHED'?'Gepubliceerd':'Concept')+'</strong><small>'+esc(labels[m.visibility]||m.visibility)+' · foto niet afzonderlijk geverifieerd</small><label>Zichtbaarheid<select class="dating-input" data-photo-visibility="'+esc(m.id)+'">'+Object.entries(labels).map(([v,l])=>'<option value="'+v+'"'+(m.visibility===v?' selected':'')+'>'+l+'</option>').join('')+'</select></label><div class="vonk-photo-actions">'+(m.publicationState==='PUBLISHED'?'<button class="dating-button quiet" type="button" data-photo-unpublish="'+esc(m.id)+'">Trek terug</button>':'<button class="dating-button" type="button" data-photo-publish="'+esc(m.id)+'">Publiceer</button>')+'<button class="dating-button quiet" type="button" data-photo-remove="'+esc(m.id)+'">Verwijder</button></div></div></article>').join('');
+    const items=(media||[]).map((m,i)=>'<article class="vonk-photo-item"><img src="'+esc(m.src)+'" alt="'+esc(m.alt||'Eigen profielfoto')+'"><div><strong>'+(i===0?'Hoofdbeeld · ':'')+(m.publicationState==='PUBLISHED'?'Gepubliceerd':'Concept')+'</strong><small>'+esc(labels[m.visibility]||m.visibility)+' · foto niet afzonderlijk geverifieerd</small><label>Zichtbaarheid<select class="dating-input" data-photo-visibility="'+esc(m.id)+'">'+Object.entries(labels).map(([v,l])=>'<option value="'+v+'"'+(m.visibility===v?' selected':'')+'>'+l+'</option>').join('')+'</select></label><div class="vonk-photo-actions"><button class="dating-button quiet" type="button" data-photo-move="'+esc(m.id)+'" data-direction="-1"'+(i===0?' disabled':'')+'>Eerder</button><button class="dating-button quiet" type="button" data-photo-move="'+esc(m.id)+'" data-direction="1"'+(i===media.length-1?' disabled':'')+'>Later</button>'+(m.publicationState==='PUBLISHED'?'<button class="dating-button quiet" type="button" data-photo-unpublish="'+esc(m.id)+'">Trek terug</button>':'<button class="dating-button" type="button" data-photo-publish="'+esc(m.id)+'">Publiceer</button>')+'<button class="dating-button quiet" type="button" data-photo-remove="'+esc(m.id)+'">Verwijder</button></div></div></article>').join('');
     return '<section class="vonk-photo-studio" aria-labelledby="photoTitle"><div><span class="vonk-kicker">Profile Presence</span><h3 id="photoTitle">Uw foto’s, per context.</h3><p>Uploaden maakt een foto nog niet zichtbaar. Na veilige verwerking kiest u zelf of hij in Today’s Six, pas na een match of alleen voor uzelf bestaat. GPS- en camerametadata worden verwijderd.</p></div><div class="vonk-photo-upload"><label for="photoVisibility">Nieuwe foto zichtbaar</label><select class="dating-input" id="photoVisibility"><option value="DISCOVERY">In Today’s Six</option><option value="AFTER_MATCH">Pas na een match</option><option value="PRIVATE">Alleen voor mij</option></select><button class="dating-button" type="button" id="photoChoose">Kies een foto</button><input id="photoInput" type="file" accept="image/jpeg,image/png" hidden><small>JPEG of PNG · maximaal 8 MB en 24 megapixel · maximaal zes foto’s.</small></div>'+(items?'<div class="vonk-photo-list">'+items+'</div>':'<div class="vonk-photo-empty">Nog geen foto’s. Vonk blijft eerlijk grafisch totdat u er zelf één publiceert.</div>')+'</section>';
   }
 
@@ -422,14 +433,16 @@
   }
 
   function renderMatches(){
+    communicationClients.forEach(x=>x.unmount());communicationClients=[];
     const cards=matches.map(x=>tekenConnection(x)).join('');
     const lijst=matches.length?'<div class="vonk-connections">'+cards+'</div>':'<section class="vonk-empty"><div><span class="vonk-kicker">Matches</span><h3>Nog niemand hoeft te wachten.</h3><p>Pas na twee afzonderlijke interesses opent een gesprek. Een eerste keuze blijft onzichtbaar.</p></div></section>';
     $('#inhoud').innerHTML='<section class="vonk-connections-head"><div><span class="vonk-kicker">Wederzijds</span><h2>Van Vonk naar ontmoeting.</h2></div><p>Een gesprek, een eerlijke plek in het midden en twee persoonlijke akkoorden. Iedere stap blijft van jullie.</p></section>'+lijst;
     document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>openPay(b.dataset.pay));
     document.querySelectorAll('[data-send]').forEach(b=>b.onclick=()=>stuurBericht(b.dataset.send,b));
-    document.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>{const inp=document.querySelector('[data-text="'+CSS.escape(b.dataset.prompt)+'"]');if(inp){inp.value=b.dataset.copy;inp.focus();}});
+    document.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>{const inp=document.querySelector('[data-cc-text]');if(inp){inp.value=b.dataset.copy;inp.focus();}});
     document.querySelectorAll('[data-safe]').forEach(b=>b.onclick=()=>openSafety(b.dataset.safe));
     document.querySelectorAll('[data-halfweg]').forEach(b=>b.onclick=()=>openHalfweg(b.dataset.halfweg,connectionEdge&&connectionEdge.revision(b.dataset.halfweg)));
+    document.querySelectorAll('[data-connection-communication]').forEach(el=>{const c=RTGConnectionCommunication.create({product:'vonk',token,onError:e=>meld(e.message),onNotice:meld});communicationClients.push(c);c.mount(el,el.dataset.connectionCommunication);});
     bindMatchContexts();
   }
 
@@ -438,11 +451,9 @@
     const mf=Experience.hoofdfoto(x);
     const kop='<header class="vonk-connection__head"><div class="vonk-miniature">'+(mf?'<img src="'+esc(mf.src)+'" alt="'+esc(mf.alt)+'">':'<span aria-hidden="true">'+esc(profileMark(x.met))+'</span>')+'</div><div><h3>'+esc(x.met)+'</h3><div class="vonk-connection__state">'+esc(faseLabel(fase))+'</div></div><div class="vonk-connection__trust">18+ · geverifieerd'+niveau(x.betrouwbaarheid)+'</div></header>';
     if(bevestigd&&t)return '<article class="vonk-connection" data-connection-match="'+esc(x.id)+'" data-connection-name="'+esc(x.met)+'">'+kop+'<div class="vonk-date"><div class="vonk-date__mark"><span>Date</span></div><div class="vonk-date__detail"><span class="vonk-kicker">Afspraak bevestigd</span><h4>'+esc(t.supplierName)+'</h4><p>De reservering staat. Alleen de praktische informatie die al bestaat wordt hier getoond.</p><div class="vonk-date__facts"><div><span>Wanneer</span><strong>'+esc(datumTekst(t.datum))+' · '+esc(t.tijd)+'</strong></div><div><span>Waar</span><strong>'+esc(t.plek)+'</strong></div><div><span>Reservering</span><strong>Voor twee bevestigd</strong></div></div><button class="vonk-safety-link" type="button" data-safe="'+esc(x.met)+'">Safety · blokkeren of melden</button></div></div></article>';
-    const berichten=(x.berichten||[]), eigen=selectie.profiel&&selectie.profiel.codenaam;
-    const chat=berichten.length?berichten.map(b=>'<div class="vonk-message'+(b.van===eigen?' mine':'')+'"><b>'+esc(b.van)+'</b>'+esc(b.tekst)+'</div>').join(''):'<div class="dating-meta">Jullie staan allebei open voor contact. Wie begint, bepalen jullie zelf.</div>';
     const prompts=Experience.gesprekstarters(x).map(p=>'<button class="vonk-prompt" type="button" data-prompt="'+esc(x.id)+'" data-copy="'+esc(p)+'">'+esc(p)+'</button>').join('');
     const meet='<div class="vonk-panel-title"><h4>Meet Halfway</h4><span>privé kiezen</span></div><div class="vonk-meet-progress" aria-label="Vier stappen naar een afspraak"><span>Wensen</span><span>Midden</span><span>Kiezen</span><span>Akkoord</span></div>'+(x.wanneer?'<p class="dating-copy">'+esc(x.wanneer.tekst)+'</p>':'')+(t?'<div class="vonk-meet-card"><h5>'+esc(t.supplierName)+'</h5><p>'+esc(t.plek)+' · '+esc(datumTekst(t.datum))+' om '+esc(t.tijd)+'</p><p>€ '+esc(t.prijsPP)+' p.p. · reservering pas na twee bevestigingen.</p></div>':'<p class="dating-copy">Er is nog geen automatische tafel beschikbaar.</p>')+'<div id="hw-'+esc(x.id)+'"></div><div class="dating-actions">'+(t&&!x.ikBetaalde?'<button class="dating-button primary" type="button" data-pay="'+esc(x.id)+'">€ '+esc(t.prijsPP)+' persoonlijk bevestigen</button>':'')+'<button class="dating-button" type="button" data-halfweg="'+esc(x.id)+'">Bekijk maximaal drie plekken</button></div>';
-    return '<article class="vonk-connection" data-connection-match="'+esc(x.id)+'" data-connection-name="'+esc(x.met)+'">'+kop+'<div class="vonk-connection__body"><section class="vonk-conversation"><div class="vonk-panel-title"><h4>Gesprek</h4><span>tekst · privé</span></div>'+(merken(x.kenmerken)?'<div class="dating-chips">'+merken(x.kenmerken)+'</div>':'')+'<div class="vonk-chat" aria-label="Chat met '+esc(x.met)+'">'+chat+'</div>'+(prompts?'<div class="vonk-prompts" aria-label="Gespreksstarters uit gedeelde informatie">'+prompts+'</div>':'')+'<div class="vonk-composer"><input class="dating-input" data-text="'+esc(x.id)+'" maxlength="300" placeholder="Schrijf zelf een bericht" aria-label="Bericht aan '+esc(x.met)+'"><button class="dating-button" type="button" data-send="'+esc(x.id)+'">Verstuur</button></div><button class="vonk-safety-link" type="button" data-safe="'+esc(x.met)+'">Safety · blokkeren of melden</button></section><section class="vonk-meeting" id="meet-'+esc(x.id)+'">'+meet+'</section></div></article>';
+    return '<article class="vonk-connection" data-connection-match="'+esc(x.id)+'" data-connection-name="'+esc(x.met)+'">'+kop+'<div class="vonk-connection__body"><section class="vonk-conversation"><div class="vonk-panel-title"><h4>Gesprek</h4><span>tekst · media · live</span></div>'+(merken(x.kenmerken)?'<div class="dating-chips">'+merken(x.kenmerken)+'</div>':'')+(prompts?'<div class="vonk-prompts" aria-label="Gespreksstarters uit gedeelde informatie">'+prompts+'</div>':'')+'<div data-connection-communication="'+esc(x.id)+'"></div><button class="vonk-safety-link" type="button" data-safe="'+esc(x.met)+'">Safety · blokkeren of melden</button></section><section class="vonk-meeting" id="meet-'+esc(x.id)+'">'+meet+'</section></div></article>';
   }
 
   async function stuurBericht(id,knop){

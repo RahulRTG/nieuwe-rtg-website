@@ -9,7 +9,7 @@
    Afgesplitst van ./rendezvous.js, dat het profiel houdt. Krijgt de gedeelde
    context van daar. */
 module.exports = (ctx) => {
-  const { R, AW, B, mag, codenaam, gedeeld, save, notify, nu, partnerVan, geblokkeerd, Projection } = ctx;
+  const { R, AW, B, mag, codenaam, gedeeld, save, notify, nu, partnerVan, geblokkeerd, Projection, profileMedia } = ctx;
 
   function rvKandidaten(key) {
     const poort = mag(key);
@@ -38,7 +38,8 @@ module.exports = (ctx) => {
            derde grens in de kop van ./rendezvous-aanwezig.js. */
         samen: AW.overlapTussen(mij, p),
         likteMij: zijLikenMij && !ikLikeHen,
-        status: ikLikeHen && zijLikenMij ? 'match' : ikLikeHen ? 'geliked' : 'nieuw' }));
+        status: ikLikeHen && zijLikenMij ? 'match' : ikLikeHen ? 'geliked' : 'nieuw',
+        media: profileMedia ? profileMedia.projecteer(key, k, ikLikeHen && zijLikenMij ? 'match' : 'discovery') : [] }));
     }
     /* Eerst wie u al leuk vindt, dan wie u BINNENKORT TEGENKOMT, en pas daarna
        de gedeelde steden. Die middelste is de hele reden van de Presence Graph:

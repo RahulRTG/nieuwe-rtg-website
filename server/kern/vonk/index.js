@@ -114,9 +114,19 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     isBlocked: geblokkeerd, isMatch: (a, b) => !!matchTussen(a, b),
     ticketSecret: connectionMediaTicketSecret });
 
+  const communication = require('../connection-communication')({ product: 'vonk', db, save, crypto, media, schoon,
+    ticketSecret: connectionMediaTicketSecret, notify, signal: sseToCustomer,
+    isBlocked: geblokkeerd,
+    resolveContext: (actor, input) => {
+      const m = d().matches.find(x => x.id === String(input && input.id || '') && (x.a === actor || x.b === actor));
+      return m ? { counterpart: m.a === actor ? m.b : m.a, scope: m.id } : null;
+    } });
+  if (connectionBlocking && connectionBlocking.onBlock)
+    connectionBlocking.onBlock((a, b) => communication.terminatePair(a, b, 'BLOCKED'));
+
   const ctx = { db, save, schoon, id, nu, d, mag, likeVan, matchTussen, publiek, DAG_MAX, niveauVan, geblokkeerd,
     Projection,
-    profileMedia,
+    profileMedia, communication,
     codenaamVan, keyVanCodenaam, haversine,
     reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN, connectionBlocking,
     /* Pas na een wederzijdse like gaan de assen open die op 'match' staan. Dat
@@ -140,8 +150,14 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     tafelkaart: H.tafelkaart };
   const api = { vonkProfielZet: profielZet,
     vonkFotoUpload: profileMedia.upload, vonkFotoPubliceer: profileMedia.publiceer,
-    vonkFotoVerwijder: profileMedia.verwijder, vonkFotoLever: profileMedia.lever };
-  Object.assign(api, require('./state')({ d, mag, nu, geblokkeerd }));
+    vonkFotoVerwijder: profileMedia.verwijder, vonkFotoOrden: profileMedia.orden, vonkFotoLever: profileMedia.lever,
+    vonkCommStatus: communication.status, vonkCommConsent: communication.consent, vonkCommText: communication.sendText,
+    vonkCommRemove: communication.removeMessage, vonkCommReport: communication.reportMessage,
+    vonkCommMedia: communication.sendMedia, vonkCommCallStart: communication.startCall,
+    vonkCommCallAnswer: communication.answer, vonkCommCallSignal: communication.sendSignal,
+    vonkCommCallPoll: communication.poll, vonkCommCallEnd: communication.end,
+    vonkCommMediaLever: communication.deliver };
+  Object.assign(api, require('./state')({ d, mag, nu, geblokkeerd, communication }));
   Object.assign(api, require('./selectie')(ctx));
   Object.assign(api, require('./kiezen')(ctx));
   Object.assign(api, require('./match')(ctx));

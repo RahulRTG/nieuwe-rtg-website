@@ -24,6 +24,7 @@ kern.connectionBlocking = require('../kern/connection-blocking')({ db, save });
 // Rendez-vous deelt zijn 18+/KYC-poort met Vonk; de route bewaakt de pas.
 Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic, notify, accounts, leeftijdVan,
   connectionBlocking: kern.connectionBlocking,
+  media, sseToCustomer: hulp.sseToCustomer, connectionMediaTicketSecret: process.env.RTG_ENC_KEY,
   /* codenaamVan en niet liveCodename: zie de kop van kern/rendezvous.js. Laat
      gebonden, want de sociale laag wordt later samengesteld. */
   codenaamVan: (k) => kern.codenaamVan(k),
@@ -32,7 +33,8 @@ Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic,
   tableZet: kern.tableZet,
   /* De contactpin uit kern/sociaal: Encounter LEENT hem als adres en maakt geen
      eigen koppelcode. Zie de kop van kern/rendezvous-kring.js. */
-  handleVanPin: (pin) => kern.handleVanPin(pin) }));
+  handleVanPin: (pin) => kern.handleVanPin(pin),
+  sociaalRate: (...args) => kern.sociaalRate(...args) }));
 // De wauw-laag: stemming, verjaardagsglans en De Terugblik over alle socials
 Object.assign(kern, require('../kern/wauw')({ db, save, accounts, socialConnecties: kern.socialConnecties }));
 // RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)

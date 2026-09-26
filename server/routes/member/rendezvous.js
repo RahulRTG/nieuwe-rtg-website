@@ -88,7 +88,7 @@ module.exports = (kern) => {
     if(!eisCapability(req,res,'connection.concierge.manage','office'))return;stuur(res,rvArrangeQueue());
   });
   app.post('/api/office/rendezvous/arrangement/step', officeAuth, (req,res) => {
-    if(!eisCapability(req,res,'connection.concierge.manage','office'))return;stuur(res,rvArrangeFulfil((req.body||{}).id,(req.body||{}).state,(req.body||{}).confirmation));
+    if(!eisCapability(req,res,'connection.concierge.manage','office'))return;stuur(res,rvArrangeFulfil((req.body||{}).id,(req.body||{}).state,(req.body||{}).confirmation,(req.body||{}).supplierCode));
   });
   app.post('/api/member/rendezvous/circles', auth, doe('connection.circle.read', (k) => rvCircles(k)));
   app.post('/api/member/rendezvous/circle/rsvp', auth, doe('connection.circle.read', (k,b) => rvCircleRsvp(k,b.circleId,b.gatheringId,b.yes)));

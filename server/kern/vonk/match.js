@@ -7,7 +7,9 @@
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine, niveauVan,
     reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN,
-    kenmerkenVan, wanneerMet, optiesVoor, geblokkeerd, connectionBlocking, Projection, profileMedia, communication } = ctx;
+    kenmerkenVan, wanneerMet, optiesVoor, partnerEligible, geblokkeerd, connectionBlocking, Projection, profileMedia, communication } = ctx;
+
+  const volgendeDatum = () => new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
 
   /* Like/voorbij; wederzijds opent match, chat en tafel. */
   async function like(key, codenaam, aan) {
@@ -27,11 +29,12 @@ module.exports = (ctx) => {
     if (!terug || terug.nee) { save(); return { status: 200, ok: true, match: false }; }
     // wederzijds: de match, de chatlijn en de tafel in het midden
     const m = { id: id(), a: key, b: doel, at: nu(), berichten: [], betaald: {}, status: 'wacht-op-betaling' };
-    m.tafel = tafelInHetMidden(d().profielen[key], d().profielen[doel]);
+    const planning = { date: volgendeDatum(), time: '19:30' };
+    m.tafel = tafelInHetMidden(d().profielen[key], d().profielen[doel], planning);
     /* Meet Halfway (./halfweg + ./kiezen): drie plekken van verschillende soort
        rond hetzelfde midden. De automatische tafel hierboven blijft de bodem --
        kiest niemand, dan staat er nog steeds iets. */
-    m.halfweg = { ...(optiesVoor(d().profielen[key], d().profielen[doel]) || { opties: [], waarom: null }), keuzes: {} };
+    m.halfweg = { ...(optiesVoor(d().profielen[key], d().profielen[doel], planning) || { opties: [], waarom: null }), keuzes: {} };
     d().matches.unshift(m);
     save();
     for (const wie of [key, doel]) {
@@ -44,26 +47,26 @@ module.exports = (ctx) => {
   }
   /* De dichtstbijzijnde partner rond het geografische midden. Haversine krijgt
      twee punten; een zaak zonder meetbare afstand doet niet mee. */
-  function tafelInHetMidden(pa, pb) {
+  function tafelInHetMidden(pa, pb, planning) {
     if (!pa || !pb || !isFinite(pa.lat) || !isFinite(pa.lng) || !isFinite(pb.lat) || !isFinite(pb.lng)) return null;
     const mid = { lat: (pa.lat + pb.lat) / 2, lng: (pa.lng + pb.lng) / 2 };
     let beste = null, besteAf = Infinity;
     for (const s of Object.values(db.data.suppliers || {})) {
       if (!(s.tables || []).length || !s.loc || !isFinite(s.loc.lat) || !isFinite(s.loc.lng)) continue;
       if (s.settings && s.settings.reservationsOpen === false) continue;
+      if (!partnerEligible(s.code, { date: planning.date, time: planning.time, service: 'diner' })) continue;
       const af = haversine(mid, { lat: s.loc.lat, lng: s.loc.lng });
       if (af == null) continue;
       if (af < besteAf) { besteAf = af; beste = s; }
     }
     if (!beste) return null;
-    const dag = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
     return { supplierCode: beste.code, supplierName: beste.name, plek: (beste.loc && beste.loc.label) || beste.city || '',
       /* De afstand maakt "rond het midden" narekenbaar. */
       middenAfstandKm: Math.round(besteAf / 100) / 10,
-      datum: dag, tijd: '19:30', prijsPP: PRIJS_CENTEN / 100, rtgDeel: RTG_CENTEN / 100 };
+      datum: planning.date, tijd: planning.time, prijsPP: PRIJS_CENTEN / 100, rtgDeel: RTG_CENTEN / 100 };
   }
 
-  const betaal = require('./payment')({ d, save, nu, geblokkeerd, codenaamVan, pay, reserveerTafel,
+  const betaal = require('./payment')({ d, save, nu, geblokkeerd, codenaamVan, pay, reserveerTafel, partnerEligible,
     notify, PRIJS_CENTEN, RTG_CENTEN });
 
   /* ---- de chatlijn (pas na een match) + blokkeren en melden ---- */

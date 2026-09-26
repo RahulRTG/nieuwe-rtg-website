@@ -1,11 +1,7 @@
-/* CONNECTION OS -- benoemde serverprojecties.
-
-   Een consumer krijgt nooit een opslagobject om daarna zelf velden weg te
-   poetsen. Elke projectie hieronder bouwt een nieuw object uit een vaste
-   allowlist. Niet-toegestane eigenschappen zijn afwezig, niet null. */
+/* Benoemde serverprojecties: iedere consumer krijgt alleen zijn allowlist. */
 'use strict';
 
-const VERSION = 5;
+const VERSION = 6;
 
 const NAMES = Object.freeze({
   VONK_PROFILE_OWNER: 'VONK_PROFILE_OWNER',
@@ -29,6 +25,7 @@ const NAMES = Object.freeze({
   RENDEZVOUS_CONCIERGE_OFFICE: 'RENDEZVOUS_CONCIERGE_OFFICE',
   RENDEZVOUS_CIRCLE_MEMBER: 'RENDEZVOUS_CIRCLE_MEMBER',
   RENDEZVOUS_CIRCLE_OFFICE: 'RENDEZVOUS_CIRCLE_OFFICE',
+  CONNECTION_PARTNER_OFFICE: 'CONNECTION_PARTNER_OFFICE',
   RAHUL_CONNECTION: 'RAHUL_CONNECTION',
   BACKOFFICE_SAFETY: 'BACKOFFICE_SAFETY',
   VONK_EDGE: 'VONK_EDGE',
@@ -50,13 +47,14 @@ const CONTRACTS = Object.freeze({
   [NAMES.RENDEZVOUS_PRESENCE]: ['stad', 'van', 'tot'],
   [NAMES.RENDEZVOUS_ENCOUNTER]: ['ok', 'wacht', 'codenaam'],
   [NAMES.RENDEZVOUS_TABLE_MEMBER]: ['id', 'naam', 'stad', 'datum', 'tijd', 'thema', 'plaatsen', 'mijnStatus'],
-  [NAMES.RENDEZVOUS_TABLE_OFFICE]: ['id', 'naam', 'stad', 'datum', 'tijd', 'thema', 'plaatsen', 'at', 'genodigden', 'toegezegd', 'aantal'],
+  [NAMES.RENDEZVOUS_TABLE_OFFICE]: ['id', 'naam', 'stad', 'datum', 'tijd', 'thema', 'plaatsen', 'at', 'genodigden', 'toegezegd', 'aantal', 'supplierCode', 'supplierName'],
   [NAMES.RENDEZVOUS_TOGETHER]: ['samen', 'met', 'ikVerklaarde'],
-  [NAMES.RENDEZVOUS_MEET]: ['setting', 'settingLabel', 'stad', 'van', 'tot', 'dagdeel', 'dagdeelLabel', 'ikAkkoord', 'anderAkkoord', 'tekst', 'bijRechterhand', 'fulfilmentState', 'confirmation'],
-  [NAMES.RENDEZVOUS_CONCIERGE_MEMBER]: ['id', 'subject', 'request', 'city', 'window', 'state', 'proposal', 'confirmation', 'updatedAt'],
-  [NAMES.RENDEZVOUS_CONCIERGE_OFFICE]: ['id', 'member', 'subject', 'request', 'city', 'window', 'state', 'proposal', 'confirmation', 'updatedAt'],
+  [NAMES.RENDEZVOUS_MEET]: ['setting', 'settingLabel', 'stad', 'van', 'tot', 'dagdeel', 'dagdeelLabel', 'ikAkkoord', 'anderAkkoord', 'tekst', 'bijRechterhand', 'fulfilmentState', 'confirmation', 'partnerName'],
+  [NAMES.RENDEZVOUS_CONCIERGE_MEMBER]: ['id', 'subject', 'request', 'city', 'window', 'state', 'proposal', 'confirmation', 'partnerName', 'updatedAt'],
+  [NAMES.RENDEZVOUS_CONCIERGE_OFFICE]: ['id', 'member', 'subject', 'request', 'city', 'window', 'state', 'proposal', 'confirmation', 'partnerCode', 'partnerName', 'updatedAt'],
   [NAMES.RENDEZVOUS_CIRCLE_MEMBER]: ['id', 'name', 'theme', 'context', 'membership', 'gatherings'],
   [NAMES.RENDEZVOUS_CIRCLE_OFFICE]: ['id', 'name', 'theme', 'members', 'gatherings'],
+  [NAMES.CONNECTION_PARTNER_OFFICE]: ['code', 'name', 'city', 'location', 'program', 'services'],
   [NAMES.RAHUL_CONNECTION]: ['matchCodenaam', 'gedeeldeLocaties', 'openLocaties', 'watIkZoek', 'presence', 'gedeeldDagdeel', 'voorkeursStad'],
   [NAMES.BACKOFFICE_SAFETY]: ['id', 'van', 'over', 'reden', 'at', 'status'],
   [NAMES.VONK_EDGE]: ['surface', 'state', 'availableCapabilities', 'actions', 'stateRevision', 'policyVersion', 'projectionVersion', 'stateContractVersion'],

@@ -1,10 +1,10 @@
 {
   "schema": "RTG_CONNECTION_CONSTITUTION",
-  "version": 6,
-  "source_sha256": "f550ef7d40e041798644c61562916bb1813eaacc1d345ff52e03754dc6d90f68",
+  "version": 7,
+  "source_sha256": "87059058fcadbba8ab395174ccd03427eac743e5e19d82dae1468c636dcb2235",
   "tests": {
-    "total": 113,
-    "passed": 113,
+    "total": 117,
+    "passed": 117,
     "failed": 0,
     "baseline_tests": 58,
     "constitution_tests": 8,
@@ -13,7 +13,7 @@
     "product_state_tests": 12,
     "edge_experience_tests": 10,
     "profile_media_tests": 8,
-    "final_product_tests": 5
+    "final_product_tests": 9
   },
   "proofs": {
     "default_deny": "PROVEN",
@@ -51,7 +51,8 @@
     "call_consent_and_revocation": "PROVEN",
     "concierge_fulfilment_states": "PROVEN",
     "circle_member_isolation": "PROVEN",
-    "final_route_chain": "PROVEN"
+    "final_route_chain": "PROVEN",
+    "partner_explicit_opt_in": "PROVEN"
   },
   "projection_contracts": [
     "VONK_PROFILE_OWNER",
@@ -75,6 +76,7 @@
     "RENDEZVOUS_CONCIERGE_OFFICE",
     "RENDEZVOUS_CIRCLE_MEMBER",
     "RENDEZVOUS_CIRCLE_OFFICE",
+    "CONNECTION_PARTNER_OFFICE",
     "RAHUL_CONNECTION",
     "BACKOFFICE_SAFETY",
     "VONK_EDGE",

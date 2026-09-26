@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1970 bestanden en 14100 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1970 bestanden en 14104 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1970 |
-| losse beweringen (`test(...)`) | 14100 |
+| losse beweringen (`test(...)`) | 14104 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 167 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1315 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 73 |
-| alleen in de kop *genoemd*, nog niet gemeten | 169 |
-| niets van beide | 413 |
+| alleen in de kop *genoemd*, nog niet gemeten | 170 |
+| niets van beide | 412 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1729 bestanden, 13670 beweringen.
+1729 bestanden, 13674 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -297,7 +297,7 @@ toets omvalt.
 | `connection-cross-product.test.js` | 1 | -- | Bewijst dat veiligheid geen productgrens kent. Dit is een aparte suite boven de 58 bevroren producttests, zodat hun baseline zelf ongewijzigd blijft. |
 | `connection-edge-experience.test.js` | 10 | genoemd | RONDE 4: CONNECTION EDGE EXPERIENCE De renderer krijgt geen eigen productwaarheid. Deze toetsen leggen vast dat DOM-acties uitsluitend uit de actuele serverprojectie komen, dat stale en geblokkeerde contexten... |
 | `connection-final-routes.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `connection-final.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `connection-final.test.js` | 8 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `connection-product-state.test.js` | 12 | genoemd | RONDE 3: PRODUCT STATE & EDGE CONTRACT Deze toetsen bewijzen dat producttoestand, capabilities, Edge-projecties en transities uitsluitend door de server worden bepaald. Ze beproeven vooral wat niet mag ontstaan:... |
 | `connection-profile-media.test.js` | 8 | -- | RONDE 6 -- veilige Profile Media. De toets loopt via de echte Vonk-routes: concept -> publicatie -> projection -> tijdelijke levering -> intrekken en blokkeren. |
 | `connection-projection.test.js` | 12 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -1,33 +1,11 @@
-/* Kern-module "vonk": RTG Vonk, de datingkant van het ledenbestand. Leden
-   (18+, met actief RTG-geverifieerd paspoort, net als het Podium) maken een
-   profiel op CODENAAM met hun wensen; de app stelt elke dag een eindige,
-   wederzijds passende selectie voor (geen oneindige swipe-stroom). Liken
-   twee mensen elkaar, dan is het een match: de chatlijn gaat open en RTG
-   zet automatisch een tafel voor twee klaar bij een partner rond het
-   geografische MIDDEN van hun twee woonplaatsen. De date kost EUR 10 p.p.
-   (vooraf, via RTG Pay): EUR 5 voor RTG en EUR 5 als aanbetaling bij de
-   zaak. Veiligheid op Salon-niveau: alleen stad zichtbaar (nooit adres),
-   chat pas na een match, blokkeren en melden met backoffice-opvolging.
-
-   DE VOORKEURSTAAL (./wensen.js) is wat Vonk onderscheidt van matchen op
-   afstand en interesses: per as kan een lid zeggen of iets VERPLICHT is, een
-   STERKE VOORKEUR of LEUK MEEGENOMEN, en alleen het eerste filtert -- en dan nog
-   alleen op een uitgesproken tegenstelling. Wat een lid van een ander vraagt
-   (`wensen`) is voor niemand zichtbaar; wat een lid over zichzelf zegt
-   (`kenmerken`) is per as zelf op zichtbaar/na-een-match/alleen-de-engine te
-   zetten. De reden bij een kandidaat noemt daarom nooit een waarde die het lid
-   verborgen houdt. Zie de kop van ./wensen.js voor het waarom.
-
-   maakVonk(state) volgt het vaste kern-patroon. Dit is de orkestrator: de
-   poort, het profiel/de wensen en de dagselectie wonen hier; de voorkeurstaal
-   in ./wensen; de like/match, het betalen, de chat en het blokkeren/melden in
-   ./match. */
+/* Vonk-orkestrator: identiteit, profiel, selectie, match, Meet en veiligheid. */
 const { coord } = require('../util');
 const { maakOntmoetpoort, MIN_LEEFTIJD } = require('../ontmoetpoort');
 const W = require('./wensen');
 const B = require('../beschikbaar');
 const H = require('./halfweg');
 const Projection = require('../connection-projection');
+const ConnectionPartner = require('../connection-partner');
 
 const DAG_MAX = 6;            // de eindige dagselectie
 const PRIJS_CENTEN = 1000;    // EUR 10 p.p.
@@ -140,12 +118,19 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     rooster: B.rooster,
     /* De drie plekken rond het midden. De aardrijkskunde blijft hier -- halfweg
        rekent niet zelf aan afstanden maar krijgt ze aangeleverd. */
-    optiesVoor: (pa, pb) => {
+    optiesVoor: (pa, pb, planning) => {
       if (!pa || !pb || !isFinite(pa.lat) || !isFinite(pa.lng) || !isFinite(pb.lat) || !isFinite(pb.lng)) return null;
       return H.drieOpties({ a: pa, b: pb, suppliers: db.data.suppliers,
         mid: { lat: (pa.lat + pb.lat) / 2, lng: (pa.lng + pb.lng) / 2 },
         afstandM: (p, l) => haversine({ lat: p.lat, lng: p.lng }, { lat: l.lat, lng: l.lng }),
-        reisMin: m => etaMinutes(m, 'driving') });
+        reisMin: m => etaMinutes(m, 'driving'), date: planning && planning.date,
+        time: planning && planning.time, bookings: db.data.reserveringen || [] });
+    },
+    partnerEligible: (supplierCode, context) => {
+      const s = Object.values(db.data.suppliers || {}).find(x => x.code === supplierCode);
+      return !!(s && ConnectionPartner.eligible(s, 'vonk', { ...context,
+        bookings: db.data.reserveringen || [], activeBookings: ConnectionPartner.activeBookings(
+          db.data.reserveringen || [], s.code, context && context.date, context && context.time) }).ok);
     },
     tafelkaart: H.tafelkaart };
   const api = { vonkProfielZet: profielZet,

@@ -1,43 +1,11 @@
-/* Rendez-vous, deelbestand "arrange": ARRANGE IT.
-
-   De knop waar de app op uitkomt (ONTMOETEN.md par. 2.5). Meer hoeft een lid
-   niet te doen: Rendez-vous weet inmiddels waar u allebei bent
-   (./rendezvous-aanwezig), wanneer u allebei kunt (./beschikbaar) en wat u
-   zoekt. Rahul stelt daarvan een ontmoeting samen, beiden keuren goed, en pas
-   dan gaat het naar De Rechterhand.
-
-   DE DRIEDELING IS HIER LETTERLIJK CODE, geen belofte in een prompt:
-
-     Rahul denkt        `arrange()` zet een voorstel klaar
-     de leden kiezen    `akkoord()`, twee keer, door twee mensen
-     De Rechterhand     pas daarna, en die BOEKT -- wij niet
-
-   ER STAAT GEEN ZAAKNAAM IN HET VOORSTEL, en dat is geen tekortkoming maar de
-   merkregel uit CLAUDE.md: nooit een echt hotel- of restaurantmerk opvoeren als
-   bevestigde partner, en nooit doen alsof er iets geboekt is. Het voorstel
-   beschrijft de SETTING -- een diner, een borrel, een tentoonstelling met een
-   glas erna -- plus de stad, de dagen en het dagdeel. Welke zaak het wordt,
-   regelt De Rechterhand, en dat is precies waar het verschil met Vonk zit: daar
-   kiest de software een tafel, hier kiest een mens hem.
-
-   WAT ER BIJ TWEE AKKOORDEN GEBEURT. Er verschijnt bij ALLEBEI een gelegenheid
-   in hun eigen Rechterhand-dossier (kern/rechterhand/table.js), met de status dat
-   De Rechterhand hem oppakt. Er wordt niets gereserveerd, niets afgeschreven en
-   niets bevestigd -- dat zou precies de claim zijn die hier niet gemaakt mag
-   worden.
-
-   EEN AKKOORD IS INTREKBAAR ZOLANG DE ANDER NOG NIET AKKOORD IS, en het voorstel
-   vervalt zodra iemand zijn aanwezigheid of beschikbaarheid wijzigt waardoor de
-   grond eronder wegvalt. Een voorstel dat over een verlopen weekend gaat, moet
-   niet blijven staan alsof het nog kan.
-
-   GEEN AANSPORING. Geen "de ander wacht", geen teller, geen herinnering.
-   LIFE.md par. 4.1. */
+/* Arrange It: Rahul stelt voor, beide leden kiezen en pas daarna voert De
+   Rechterhand uit. Een akkoord blijft intrekbaar zolang de ander niet koos. */
 const Consent = require('./connection-consent');
 const RendezvousState = require('./connection-state-rendezvous');
 
 module.exports = (ctx) => {
-  const { R, AW, B, mag, codenaam, schoon, nu, save, matchesVan, tableZet, notify, Projection } = ctx;
+  const { R, AW, B, mag, codenaam, schoon, nu, save, matchesVan, tableZet, notify, Projection,
+    partnerCandidates = () => [], partnerEligible = () => false } = ctx;
 
   /* Drie settings, en geen enkele is een zaak. Bewust niet alleen eten: een
      tentoonstelling met een glas erna is een andere eerste ontmoeting dan een
@@ -114,7 +82,8 @@ module.exports = (ctx) => {
     ikAkkoord: actief(v, key, targetKey), anderAkkoord: actief(v, targetKey, key),
     tekst: zin(v), bijRechterhand: !!v.bijRechterhand,
     fulfilmentState: v.fulfilment && v.fulfilment.state,
-    confirmation: v.fulfilment && v.fulfilment.state === 'CONFIRMED' ? v.fulfilment.confirmation : undefined
+    confirmation: v.fulfilment && v.fulfilment.state === 'CONFIRMED' ? v.fulfilment.confirmation : undefined,
+    partnerName: v.fulfilment && v.fulfilment.state === 'CONFIRMED' ? v.fulfilment.partnerName : undefined
   });
 
   function zin(v) {
@@ -167,18 +136,25 @@ module.exports = (ctx) => {
     return { status: 200, requests: Object.values(V()).filter(v => v.bijRechterhand).map(v => ({
       id:v.id, setting:v.setting, city:v.stad, from:v.van, to:v.tot, daypart:v.dagdeel,
       members:v.id.split('|').map(codenaam), state:(v.fulfilment&&v.fulfilment.state)||'REQUESTED',
-      confirmation:v.fulfilment&&v.fulfilment.confirmation
+      confirmation:v.fulfilment&&v.fulfilment.confirmation,
+      partners:partnerCandidates('rendezvous',{city:v.stad,date:v.van,service:v.setting})
     })) };
   }
-  function fulfil(id, state, confirmation) {
+  function fulfil(id, state, confirmation, supplierCode) {
     const v=V()[String(id||'')];if(!v||!v.bijRechterhand)return {status:404,error:'Dit arrangement bestaat niet.'};
     const current=(v.fulfilment&&v.fulfilment.state)||'REQUESTED';
     const next={REQUESTED:['ACKNOWLEDGED','CANNOT_FULFIL'],ACKNOWLEDGED:['IN_PROGRESS','CANNOT_FULFIL'],
       IN_PROGRESS:['CONFIRMED','CANNOT_FULFIL']}[current]||[];
     if(!next.includes(state))return {status:409,error:'Deze fulfilmentovergang is niet toegestaan.'};
     if(state==='CONFIRMED'&&!schoon(confirmation,500))return {status:400,error:'Een echte bevestiging is vereist.'};
+    const code=schoon(supplierCode,30).toUpperCase();
+    if(code&&state==='CONFIRMED'&&!partnerEligible(code,'rendezvous',{city:v.stad,date:v.van,service:v.setting}))
+      return {status:409,error:'Deze partner neemt voor dit arrangement niet deel aan Rendez-vous.'};
     v.fulfilment=v.fulfilment||{history:[]};v.fulfilment.state=state;v.fulfilment.updatedAt=nu();
-    if(state==='CONFIRMED')v.fulfilment.confirmation=schoon(confirmation,500);
+    if(state==='CONFIRMED'){
+      v.fulfilment.confirmation=schoon(confirmation,500);
+      if(code){const p=partnerCandidates('rendezvous',{city:v.stad,date:v.van,service:v.setting}).find(x=>x.code===code);v.fulfilment.partnerCode=code;v.fulfilment.partnerName=p&&p.name;}
+    }
     v.fulfilment.history.push({state,at:v.fulfilment.updatedAt});save();
     for(const member of v.id.split('|'))try{notify(member,{title:'Rendez-vous',body:state==='CONFIRMED'?'Approved. We’ll take care of the rest. Uw arrangement is bevestigd.':'De Rechterhand heeft uw arrangement bijgewerkt.',scope:'lifestyle'});}catch(e){}
     return {status:200,ok:true,state};

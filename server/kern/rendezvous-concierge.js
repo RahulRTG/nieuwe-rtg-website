@@ -10,12 +10,12 @@ const OFFICE_NEXT = Object.freeze({ REQUESTED:['ACKNOWLEDGED','CANNOT_FULFIL'],
   ACKNOWLEDGED:['IN_PROGRESS','CANNOT_FULFIL'], IN_PROGRESS:['PROPOSED','CANNOT_FULFIL'],
   MEMBER_APPROVAL:['CONFIRMED','CANNOT_FULFIL'] });
 
-module.exports = ({ R, mag, schoon, nu, save, crypto, notify }) => {
+module.exports = ({ R, mag, schoon, nu, save, crypto, notify, partnerCandidates = () => [], partnerEligible = () => false }) => {
   function C() { const r=R(); if(!Array.isArray(r.concierge))r.concierge=[]; return r.concierge; }
   const memberView = x => ({ id:x.id, subject:x.subject, request:x.request, city:x.city,
     window:x.window, state:x.state, proposal:x.proposal || undefined,
-    confirmation:x.state==='CONFIRMED'?x.confirmation:undefined, updatedAt:x.updatedAt });
-  const officeView = x => ({ ...memberView(x), member:x.member });
+    confirmation:x.state==='CONFIRMED'?x.confirmation:undefined, partnerName:x.state==='CONFIRMED'?x.partnerName:undefined, updatedAt:x.updatedAt });
+  const officeView = x => ({ ...memberView(x), member:x.member, partnerCode:x.partnerCode, partnerName:x.partnerName });
   function list(key) {
     const gate=mag(key);if(!gate.ok)return {status:403,error:gate.reden};
     return {status:200,requests:C().filter(x=>x.member===key).slice().reverse().map(memberView)};
@@ -40,13 +40,19 @@ module.exports = ({ R, mag, schoon, nu, save, crypto, notify }) => {
     x.history.push({state:x.state,at:x.updatedAt,actor:'member'});save();
     return {status:200,ok:true,request:memberView(x)};
   }
-  function officeList() { return {status:200,requests:C().slice().reverse().map(officeView)}; }
+  function officeList() { return {status:200,requests:C().slice().reverse().map(x=>({ ...officeView(x),
+    partners:partnerCandidates('concierge',{city:x.city}) }))}; }
   function officeStep(id, state, body, actor) {
     const x=C().find(v=>v.id===String(id||''));if(!x)return {status:404,error:'Dit verzoek bestaat niet.'};
     const next=String(state||'');if(!(OFFICE_NEXT[x.state]||[]).includes(next))
       return {status:409,error:'Deze service-overgang is niet toegestaan.'};
     if(next==='PROPOSED') { const p=schoon(body&&body.proposal,1000);if(!p)return {status:400,error:'Een voorstel is vereist.'};x.proposal=p; }
-    if(next==='CONFIRMED') { const c=schoon(body&&body.confirmation,1000);if(!c)return {status:400,error:'Bevestigde fulfilmentinformatie is vereist.'};x.confirmation=c; }
+    if(next==='CONFIRMED') {
+      const c=schoon(body&&body.confirmation,1000);if(!c)return {status:400,error:'Bevestigde fulfilmentinformatie is vereist.'};
+      const code=schoon(body&&body.supplierCode,30).toUpperCase();
+      if(code&&!partnerEligible(code,'concierge',{city:x.city}))return {status:409,error:'Deze partner neemt niet deel aan dit Concierge-verzoek.'};
+      x.confirmation=c;if(code){const p=partnerCandidates('concierge',{city:x.city}).find(v=>v.code===code);x.partnerCode=code;x.partnerName=p&&p.name;}
+    }
     x.state=next;x.updatedAt=nu();x.history.push({state:next,at:x.updatedAt,actor:schoon(actor,80)||'office'});save();
     try{notify(x.member,{title:'Rendez-vous Concierge',body:next==='CONFIRMED'?'Uw verzoek is bevestigd.':'Uw verzoek is bijgewerkt.',scope:'lifestyle'});}catch(e){}
     return {status:200,ok:true,request:officeView(x)};

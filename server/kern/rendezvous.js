@@ -1,19 +1,14 @@
-/* Rendez-vous: besloten introductions en Society op codenaam. Identiteit en
-   18+ worden in ontmoetpoort afgedwongen; fulfilment wordt pas bevestigd nadat
-   De Rechterhand dat werkelijk heeft gedaan. */
+/* Rendez-vous: besloten introductions en Society op codenaam. */
 module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin, sociaalRate,
   connectionBlocking, media, sseToCustomer, connectionMediaTicketSecret }) => {
   const Projection = require('./connection-projection');
+  const ConnectionPartner = require('./connection-partner');
   const nu = () => new Date().toISOString();
   const { ontmoetPoort } = require('./ontmoetpoort').maakOntmoetpoort({ accounts, leeftijdVan });
   const mag = key => ontmoetPoort(key, 'Rendez-vous');
-  /* De Presence Graph. Zuivere functies over wat een lid zelf intikte; dit
-     bestand geeft er GEEN reisbron aan mee, en dat is de grens zelf en niet een
-     controle erop -- zie de kop van ./rendezvous-aanwezig.js. */
+  /* Presence leest uitsluitend wat het lid hier zelf deelt, nooit TravelOS. */
   const AW = require('./rendezvous-aanwezig');
-  /* Private Availability: dezelfde code als Vonks Blind Availability
-     (./beschikbaar.js). Een ritme in dagdelen; alleen de doorsnede komt eruit,
-     en pas bij een wederzijdse match. */
+  /* Private Availability deelt pas na een match de doorsnede. */
   const B = require('./beschikbaar');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
   const lijstUit = (v, max, elk) => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => schoon(x, elk || 40)).filter(Boolean).slice(0, max || 12);
@@ -30,6 +25,16 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
   /* Gebruik de gids op accountsleutel; sessie-gebaseerde naamresolutie is hier
      onjuist en zou ieder profiel tot dezelfde terugvalcodenaam reduceren. */
   const codenaam = key => (codenaamVan ? codenaamVan(key) : '') || 'Een lid';
+  const partnerCandidates = (program, context) => ConnectionPartner.candidates(db.data.suppliers || [], program,
+    { ...(context || {}), bookings: db.data.reserveringen || [] }).map(s => Projection.project(Projection.NAMES.CONNECTION_PARTNER_OFFICE, {
+      code: s.code, name: s.name, city: s.city, location: s.loc && s.loc.label, program,
+      services: ConnectionPartner.stored(s, program).services
+    }));
+  const partnerEligible = (code, program, context) => {
+    const s = (db.data.suppliers || []).find(x => x.code === code);
+    return !!(s && ConnectionPartner.eligible(s, program, { ...(context || {}), bookings: db.data.reserveringen || [],
+      activeBookings: ConnectionPartner.activeBookings(db.data.reserveringen || [], code, context && context.date, context && context.time) }).ok);
+  };
   /* Uit de dating-premium-ronde op main: een blokkade werkt in BEIDE richtingen,
      wie u blokkeerde ziet u ook niet meer. */
   const geblokkeerd = (r, a, b) => !!((r.blokkades[a] && r.blokkades[a][b]) || (r.blokkades[b] && r.blokkades[b][a])
@@ -123,12 +128,12 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
   const ontdek = require('./rendezvous-ontdek')({ R, AW, B, mag, codenaam, gedeeld, save, notify, nu, geblokkeerd, Projection, profileMedia,
     partnerVan: samen.rvPartnerVan });
   // The Table, Moment en Encounter (een tweezijdige ja, twee momenten)
-  const kring = require('./rendezvous-kring')({ R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, sociaalRate, geblokkeerd, Projection, profileMedia });
+  const kring = require('./rendezvous-kring')({ R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, sociaalRate, geblokkeerd, Projection, profileMedia, partnerCandidates, partnerEligible });
   const { rvDate } = require('./rendezvous-date')({ R, AW, B, mag, codenaam, schoon, matchesVan, anthropic, Projection });
   // Arrange It: Rahul stelt samen, beiden keuren goed, De Rechterhand regelt
   const arrange = require('./rendezvous-arrange')({ R, AW, B, mag, codenaam, schoon, nu, save,
-    matchesVan, tableZet, notify, Projection });
-  const concierge = require('./rendezvous-concierge')({ R, mag, schoon, nu, save, crypto, notify });
+    matchesVan, tableZet, notify, Projection, partnerCandidates, partnerEligible });
+  const concierge = require('./rendezvous-concierge')({ R, mag, schoon, nu, save, crypto, notify, partnerCandidates, partnerEligible });
   const circles = require('./rendezvous-circles')({ R, mag, schoon, nu, save, crypto, notify, geblokkeerd });
 
   const stateApi = require('./rendezvous-state')({ R, mag, nu, geblokkeerd, ontdek, samen, matchesVan, communication });

@@ -50,7 +50,7 @@
 
    Een tafel wordt door RTG samengesteld en niet door een lid. */
 module.exports = (ctx) => {
-  const { R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, sociaalRate, geblokkeerd, Projection, profileMedia } = ctx;
+  const { R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, sociaalRate, geblokkeerd, Projection, profileMedia, partnerCandidates, partnerEligible } = ctx;
 
   const id = () => 'rv' + crypto.randomBytes(4).toString('hex');
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
@@ -59,7 +59,7 @@ module.exports = (ctx) => {
 
   function T() { const r = R(); if (!r.tafels || typeof r.tafels !== 'object') r.tafels = {}; return r.tafels; }
   // de kantoorkant (samenstellen en overzicht) woont in ./rendezvous-tafels.js
-  const kantoor = require('./rendezvous-tafels')({ T, id, isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')), schoon, nu, save, notify, codenaam, geblokkeerd, R, Projection });
+  const kantoor = require('./rendezvous-tafels')({ T, id, isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')), schoon, nu, save, notify, codenaam, geblokkeerd, R, Projection, partnerCandidates, partnerEligible });
   function I() { const r = R(); if (!r.introducties || typeof r.introducties !== 'object') r.introducties = {}; return r.introducties; }
 
   /* ---- The Table ---- */

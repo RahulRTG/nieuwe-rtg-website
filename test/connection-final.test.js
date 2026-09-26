@@ -7,6 +7,8 @@ const maakBlocking=require('../server/kern/connection-blocking');
 const maakCommunication=require('../server/kern/connection-communication');
 const maakConcierge=require('../server/kern/rendezvous-concierge');
 const maakCircles=require('../server/kern/rendezvous-circles');
+const ConnectionPartner=require('../server/kern/connection-partner');
+const fs=require('node:fs');
 
 const schoon=(v,n)=>String(v==null?'':v).replace(/[<>]/g,'').trim().slice(0,n||200);
 
@@ -74,4 +76,53 @@ test('Circles tonen geen ledenlijst en blokkades verhinderen gedeeld lidmaatscha
   assert.equal(api.rvCircleInvite(circle.id,'b').status,409);
   const view=api.rvCircles('a').circles[0];
   assert.equal(Object.hasOwn(view,'members'),false);
+});
+
+test('Connection-partners staan standaard uit en kiezen ieder programma afzonderlijk',()=>{
+  const s={code:'DATE1',name:'Datehuis',type:'restaurant',city:'Amsterdam',online:true,
+    loc:{lat:52.37,lng:4.89,label:'Centrum'},tables:[{id:'t1'}],settings:{reservationsOpen:true}};
+  assert.equal(ConnectionPartner.eligible(s,'vonk',{service:'diner'}).reason,'NOT_OPTED_IN');
+  ConnectionPartner.update(s,{programs:{vonk:{enabled:true,locations:['primary'],services:['diner'],days:[5],from:'18:00',to:'23:00',maxPerSlot:2}}});
+  assert.equal(ConnectionPartner.eligible(s,'vonk',{service:'diner',date:'2026-09-25',time:'20:00'}).ok,true);
+  assert.equal(ConnectionPartner.eligible(s,'vonk',{service:'borrel',date:'2026-09-25',time:'20:00'}).reason,'SERVICE_NOT_OPTED_IN');
+  assert.equal(ConnectionPartner.eligible(s,'rendezvous',{service:'diner'}).reason,'NOT_OPTED_IN','Vonk-toestemming opent Rendez-vous niet');
+  assert.equal(ConnectionPartner.eligible(s,'vonk',{service:'diner',date:'2026-09-26',time:'20:00'}).reason,'DAY_NOT_AVAILABLE');
+  assert.equal(ConnectionPartner.eligible(s,'vonk',{service:'diner',date:'2026-09-25',time:'17:00'}).reason,'TIME_NOT_AVAILABLE');
+});
+
+test('pauze, locatie en capaciteit sluiten alleen nieuwe Connection-voorstellen',()=>{
+  const s={code:'DATE2',name:'Tafelhuis',type:'restaurant',city:'Amsterdam',online:true,
+    loc:{lat:52.37,lng:4.89,label:'Centrum'},tables:[{id:'t1'}],settings:{reservationsOpen:true}};
+  ConnectionPartner.update(s,{programs:{table:{enabled:true,locations:['primary'],services:['diner'],days:[0,1,2,3,4,5,6],maxPerSlot:1}}});
+  const existing={id:'old',supplierCode:s.code,status:'bevestigd',datum:'2026-10-02',tijd:'20:00'};
+  assert.equal(ConnectionPartner.eligible(s,'table',{service:'diner',date:'2026-10-02',time:'20:00',activeBookings:1}).reason,'PROGRAM_CAPACITY_REACHED');
+  ConnectionPartner.update(s,{programs:{table:{pausedUntil:'2026-10-03'}}});
+  assert.equal(ConnectionPartner.eligible(s,'table',{service:'diner',today:'2026-10-02'}).reason,'PAUSED');
+  assert.equal(existing.status,'bevestigd','de deelnameconfiguratie muteert een bestaande afspraak niet');
+});
+
+test('partnerapp rendert de servergedreven Connection-keuzes',()=>{
+  const bron=fs.readFileSync(require('node:path').join(__dirname,'../public/apps/leverancier/leverancier-84b.js'),'utf8');
+  const html=fs.readFileSync(require('node:path').join(__dirname,'../public/apps/leverancier.html'),'utf8');
+  assert.match(bron,/state\.connectionParticipation/);
+  assert.match(bron,/data-cp-program/);
+  assert.match(bron,/connectionParticipation:\{programs\}/);
+  assert.match(bron,/cp\.program\.vonk/,'programmanamen volgen dezelfde taalrail als de rest van de app');
+  assert.match(html,/'cp\.title':'Connection programmes'/,'Engels is expliciet; de overige producttalen kunnen hier atomair van worden afgeleid');
+  assert.match(html,/'cp\.saved':'Participation updated\./);
+});
+
+test('een ingetrokken partnerdeelname blokkeert een nieuwe betaling maar laat een bevestigde date staan',async()=>{
+  const maakBetaling=require('../server/kern/vonk/payment');let boekingen=0;
+  const open={id:'m-open',a:'a',b:'b',betaald:{},status:'wacht-op-betaling',
+    tafel:{supplierCode:'DATE3',datum:'2026-10-02',tijd:'20:00',soort:'diner'}};
+  const confirmed={id:'m-confirmed',a:'a',b:'b',betaald:{a:'eerder'},status:'bevestigd',reserveringId:'r1',
+    tafel:{supplierCode:'DATE3',datum:'2026-10-02',tijd:'20:00',soort:'diner'}};
+  const data={matches:[open,confirmed]},betaal=maakBetaling({d:()=>data,save:()=>{},nu:()=>new Date().toISOString(),
+    geblokkeerd:()=>false,codenaamVan:x=>x,pay:{boekAsync:async()=>{boekingen++;return {ok:true};}},reserveerTafel:()=>({ok:true}),notify:()=>{},
+    partnerEligible:()=>false,PRIJS_CENTEN:1000,RTG_CENTEN:500});
+  const geweigerd=await betaal('a','m-open');
+  assert.equal(geweigerd.code,'PARTNER_NOT_PARTICIPATING');assert.equal(boekingen,0);assert.equal(open.tafel,null);
+  const bestaand=await betaal('a','m-confirmed');
+  assert.equal(bestaand.status,200);assert.equal(confirmed.reserveringId,'r1');
 });

@@ -28,6 +28,7 @@ const BRONNEN = [
   'server/kern/connection-policy.json',
   'server/kern/connection-policy.js',
   'server/kern/connection-blocking.js',
+  'server/kern/connection-partner.js',
   'server/kern/connection-consent.js',
   'server/kern/connection-edge.js',
   'server/kern/connection-projection.js',
@@ -64,6 +65,7 @@ const BRONNEN = [
   'server/opzet/kernlaag7.js',
   'server/opzet/kernlaag7-vonk.js',
   'server/routes/connection-policy.js',
+  'server/routes/supplier/toegang-settings.js',
   'server/routes/member/rendezvous.js',
   'server/routes/member/rendezvous-connection.js',
   'server/routes/office/rendezvous.js',
@@ -85,6 +87,9 @@ const BRONNEN = [
   'public/apps/rendezvous.html',
   'public/shared/rendezvous-2.css',
   'public/apps/concierge.html',
+  'public/apps/leverancier/leverancier-72.js',
+  'public/apps/leverancier/leverancier-84a.js',
+  'public/apps/leverancier/leverancier-84b.js',
   ...TESTS
 ];
 
@@ -117,7 +122,7 @@ for (const bestand of BRONNEN) hash.update(bestand).update('\0').update(tekst(be
 
 const bewijs = {
   schema: 'RTG_CONNECTION_CONSTITUTION',
-  version: 6,
+  version: 7,
   source_sha256: hash.digest('hex'),
   tests: {
     total: productTests + constitutionCore + ronde2Tests + productStateTests + edgeExperienceTests + profileMediaTests + finalTests,
@@ -171,6 +176,7 @@ const bewijs = {
     ,concierge_fulfilment_states: heeft('Concierge kan alleen via echte service-overgangen') ? 'PROVEN' : 'FAILED'
     ,circle_member_isolation: heeft('Circles tonen geen ledenlijst') ? 'PROVEN' : 'FAILED'
     ,final_route_chain: heeft('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen') ? 'PROVEN' : 'FAILED'
+    ,partner_explicit_opt_in: heeft('Connection-partners staan standaard uit') && heeft('pauze, locatie en capaciteit sluiten') ? 'PROVEN' : 'FAILED'
   },
   projection_contracts: names,
   policy_rows: matrix.length,

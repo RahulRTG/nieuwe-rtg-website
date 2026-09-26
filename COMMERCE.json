@@ -2,8 +2,8 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-26",
   "gemeten": {
-    "bestanden": 2359,
-    "domeinenTotaal": 642,
+    "bestanden": 2360,
+    "domeinenTotaal": 643,
     "koopbareVormen": 556,
     "koopbareDomeinen": 116,
     "envelopDrempel": 7,
@@ -13,7 +13,7 @@
     "gelijkendeVormparen": 16,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 45,
+    "werkwoordCombinaties": 44,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -77,7 +77,7 @@
     "prijs": 37,
     "beschikbaarheid": 52,
     "reserveer": 27,
-    "bevestig": 55,
+    "bevestig": 56,
     "lever": 20,
     "annuleer": 30,
     "retour": 8
@@ -1198,6 +1198,25 @@
       "telt": 3
     },
     {
+      "domein": "kern/vonk",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "publiek",
+        "reserveer": "blokkeer",
+        "bevestig": "boek"
+      },
+      "telt": 3
+    },
+    {
       "domein": "kern/werkplaats",
       "heeft": {
         "toon": true,
@@ -1537,24 +1556,6 @@
       "bewijs": {
         "toon": "jeugdbeeld",
         "annuleer": "intrek"
-      },
-      "telt": 2
-    },
-    {
-      "domein": "kern/vonk",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": true,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "publiek",
-        "reserveer": "blokkeer"
       },
       "telt": 2
     },

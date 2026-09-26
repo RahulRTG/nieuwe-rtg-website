@@ -22,9 +22,11 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Pakket- en trustgrenzen
-        run: node --test test/native-artifact.test.js test/native-process.test.js test/release-trust.test.js test/productie-promotie.test.js test/productie-status.test.js
+        run: node --test test/native-artifact.test.js test/native-process.test.js test/native-source-binding.test.js test/release-trust.test.js test/productie-promotie.test.js test/productie-status.test.js
       - name: Eén native kandidaat bouwen uit een schone commit
         run: node scripts/native-release.js build .release/native
+      - name: Exacte broninventaris bewaren
+        run: node scripts/bron-release-bewijs.js --uit=.release/native/bron-release-bewijs.json
       - name: Exact pakket met eigen runtime, SQLite en procesherstart beproeven
         run: node scripts/native-rehearsal.js .release/native/candidate.rtgp "$GITHUB_SHA" .release/native/RUNTIME-PROOF.json
       # Alleen deze stap krijgt de BUILD-key. Er is geen toegang tot de twee

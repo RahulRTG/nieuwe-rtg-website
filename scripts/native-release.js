@@ -78,6 +78,12 @@ function main(args) {
   } else if (mode === 'attest' && rest.length === 2) {
     const file = path.resolve(rest[0]), attestation = native.attest(file, root, process.env, rest[1]);
     fs.writeFileSync(file + '.attestation.json', JSON.stringify(attestation, null, 2) + '\n', { flag:'wx', mode:0o600 });
+    const identityFile = path.join(path.dirname(file), 'ARTIFACT-IDENTITY.json');
+    const identity = JSON.parse(fs.readFileSync(identityFile));
+    if (identity.archiveSha256 !== attestation.statement.archiveSha256) throw Error('Artifact-identiteitsdossier wijkt af.');
+    identity.signature = { status:'SIGNED', role:'BUILD', domain:attestation.statement.domain,
+      attestationSha256:native.hashFile(file + '.attestation.json') };
+    fs.writeFileSync(identityFile, JSON.stringify(identity, null, 2) + '\n');
     console.log('BUILD-herkomst ondertekend; geen externe attestatie of promotie.');
   } else if (mode === 'verify' && rest.length === 2) {
     const [file, commit] = rest;

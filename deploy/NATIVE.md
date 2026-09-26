@@ -70,6 +70,9 @@ en alle pakketbytes. Bij mislukking selecteert het exact het geautoriseerde
 vorige pakket. Rollback controleert de oorspronkelijke PROMOTION en het vorige
 artifact; een defect in de kandidaat kan die herstelautorisatie niet wissen.
 Zonder bewijs of signature start deze adapter geen productiehandeling.
+De automatische uitkomst is maximaal `PROMOTED_SMOKE_PASSED`. Daarna blijft
+de productieobservatie van fouten, latency, queues, realtime en providers
+vereist; een geslaagde healthcheck alleen wordt niet als LIVE gecertificeerd.
 
 De rollbackproef moet kandidaat én vorige bekende goede native artifact
 gebruiken, met blijvende synthetische data, schema-compatibiliteitscontrole,

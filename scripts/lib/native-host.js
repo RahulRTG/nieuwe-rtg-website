@@ -91,7 +91,7 @@ function select(root, commit, selection) {
 }
 function current(root) {
   const config = configuration(root);
-  const pointer = JSON.parse(fs.readFileSync(path.join(config.store, 'current.json')));
+  const pointer = JSON.parse(require('./productie-promotie').leesRegulier(path.join(config.store, 'current.json')));
   if (pointer.schema !== 'rtg-native-pointer-v1') throw Error('Onbekende native verwijzing.');
   const a = authorized(root, pointer.authorityCommit, pointer.selection);
   if (pointer.commit !== a.selected.commit || pointer.digest !== a.selected.digest ||

@@ -20,7 +20,14 @@ async function smoke(a) {
         const command = cp.execFileSync('/bin/ps', ['-p', String(health.pid), '-o', 'comm='], { encoding:'utf8', timeout:5000 }).trim();
         if (cwd.split('\n').includes('n' + path.join(a.release, 'app')) && command === path.join(a.release, 'runtime/node')) {
           native.verifyInstalled(a.release, a.artifact.manifest);
-          return { pid:health.pid, ready:true, digest:a.selected.digest, checkedAt:new Date().toISOString() };
+          const reads = [];
+          for (const route of ['/', '/apps/app.html', '/apps/bestanden.html']) {
+            const response = await fetch('http://127.0.0.1:' + a.config.port + route, { signal:AbortSignal.timeout(5000) });
+            if (response.status !== 200 || !/text\/html/i.test(response.headers.get('content-type') || ''))
+              throw Error('Native smoke-read mislukt: ' + route);
+            await response.arrayBuffer(); reads.push({ path:route, status:response.status });
+          }
+          return { pid:health.pid, ready:true, digest:a.selected.digest, reads, checkedAt:new Date().toISOString() };
         }
       }
     } catch (e) { if (Date.now() >= until) throw e; }
@@ -33,13 +40,13 @@ async function activate(root, commit) {
   const a = host.authorized(root, commit, 'candidate');
   const lock = path.join(a.config.store, '.activation-lock');
   fs.mkdirSync(lock, { mode:0o700 });
-  const report = { schema:'rtg-native-deployment-v1', commit, startedAt:new Date().toISOString(), status:'BLOCKED' };
+  const report = { schema:'rtg-native-deployment-v1', commit, startedAt:new Date().toISOString(), status:'BLOCKED', observability:'PENDING' };
   try {
     // Ook het terugvalpakket is aanwezig en geverifieerd vóór de eerste omschakeling.
     const old = host.authorized(root, commit, 'rollback');
     native.stage(old.archive, old.attestation, root, old.selected.commit, old.config.store);
     const selected = host.select(root, commit, 'candidate');
-    try { restart(selected.config); report.smoke = await smoke(selected); report.status = 'LIVE'; }
+    try { restart(selected.config); report.smoke = await smoke(selected); report.status = 'PROMOTED_SMOKE_PASSED'; }
     catch (e) {
       report.failure = e.message;
       const rollback = host.select(root, commit, 'rollback'); restart(rollback.config);

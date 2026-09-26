@@ -14,6 +14,11 @@ const read = (root, name) => JSON.parse(fs.readFileSync(path.join(root, name)));
 function controleer(root, commit) {
   const attestation = read(root, REL.nativeAttestation);
   const candidate = native.verify(path.join(root, REL.nativeArchive), attestation, root, commit);
+  const source = read(root, '.release/bron-release-bewijs.json');
+  const sourceCheck = require('../bron-release-bewijs').controleer(root, source, commit);
+  if (!sourceCheck.ok || candidate.manifest.tree !== source.boom ||
+      candidate.manifest.sourceInventorySha256 !== source.inventarisSha256)
+    throw Error('Native artifact is niet aan de exacte gecontroleerde Git-boom gebonden.');
   const runtime = read(root, REL.nativeRuntime), runtimeHash = native.hashFile(path.join(root, REL.nativeRuntime));
   if (attestation.statement.runtimeProofSha256 !== runtimeHash || runtime.status !== 'PASS' ||
       runtime.commit !== commit || runtime.archiveSha256 !== candidate.archiveSha256 ||
